@@ -1,0 +1,3 @@
+cargo:rerun-if-changed=build/main.rs
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=/home/evanmcfarland/rust_hello/target/wasm32-unknown-unknown/release/build/typenum-1c379b1aa93444a3/out/consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=/home/evanmcfarland/rust_hello/target/wasm32-unknown-unknown/release/build/typenum-1c379b1aa93444a3/out/op.rs

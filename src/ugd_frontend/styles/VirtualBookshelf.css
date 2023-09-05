@@ -1,0 +1,62 @@
+.loadingMore {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9em;
+    color: #6a6a6a;
+  }
+  
+
+
+.bookshelf {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+    padding: 20px 0;
+    max-width: 100%;
+  }
+  
+  .book {
+    width: 15%;
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    background: #f5f2e9;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+    margin-bottom: 20px;
+    transition: transform .2s;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  
+  .bookImage {
+    flex: 1 0 auto;
+    position: relative;
+  }
+  
+  .image {
+    width: 100%;
+    display: block;
+  }
+  
+  .bookInfo {
+    padding: 5px 5px;
+    font-size: 0.75em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: 'ellipsis';
+  }
+  
+  .title {
+    margin: 5px 0;
+    font-weight: bold;
+  }
+  
+  .author {
+    margin: 5px 0;
+    font-size: 0.9em;
+    font-weight: normal;
+    color: #6a6a6a;
+  }
+  

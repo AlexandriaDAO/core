@@ -1,0 +1,33 @@
+{
+  "canisters": {
+    "ugd_backend": {
+      "candid": "src/ugd_backend/backend.did",
+      "package": "ugd_backend",
+      "type": "rust"
+    },
+    "ugd_frontend": {
+      "dependencies": [
+        "ugd_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/ugd_frontend/src/index.html"
+      },
+      "source": [
+        "src/ugd_frontend/assets",
+        "dist/ugd_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "scripts": {
+    "prebuild": "node generateTree.js"
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
