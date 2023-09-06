@@ -3,12 +3,13 @@ name = "ugd_backend"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
 candid = "0.8"
 ic-cdk = "0.7"
-ic-cdk-timers = "0.1" # Feel free to remove this dependency if you don't need timers
+# ic-cdk-macros = "0.7.1"
+ic-cdk-timers = "0.1"
+# serde_json = "1.0"
+# serde = { version = "1.0", features = ["derive"] }

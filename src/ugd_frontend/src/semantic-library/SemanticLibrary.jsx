@@ -1,3 +1,45 @@
+    // // OG API versino before IC migration.
+    // const handleSearchSubmit = useCallback(async () => {
+    //     if (searchValue.trim() !== '') {
+    //         setSubmittedSearchValue(searchValue);
+    //         setIsLoading(true);
+    //         const response = await fetch('/api/semantic-library', {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({ query: searchValue, author: selectedAuthor }),
+    //         });
+    //         if (response.ok) {
+    //             const responseData = await response.json();
+    //             setData(responseData);
+    //             setIsFlipped(new Array(responseData.titles.length).fill(false));
+    //         }
+    //         setIsLoading(false);
+    //     }
+    // }, [searchValue, selectedAuthor]);
+
+
+    // // Attempt via backend.
+    // const handleSearchSubmit = useCallback(async () => {
+    //     if (searchValue.trim() !== '') {
+    //         setSubmittedSearchValue(searchValue);
+    //         setIsLoading(true);
+    
+    //         try {
+    //             const bookCards = await yourActor.get_book_cards();
+    //             setData(bookCards);
+    //             setIsFlipped(new Array(bookCards.length).fill(false));
+    //         } catch (e) {
+    //             console.error('Failed to fetch data:', e);
+    //         }
+            
+    //         setIsLoading(false);
+    //     }
+    // }, [searchValue, selectedAuthor]);
+
+
+
+
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { Select, Input, Button, Spin, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
@@ -7,8 +49,13 @@ import VirtualBookShelfComponent from './VirtualBookshelf';
 import BookCard from './BookCard';
 import '../../styles/SemanticLibraryPage.css';
 
-// import { Actor, HttpAgent } from '@dfinity/agent';
-// import { idlFactory as book_card_idl } from './book_card.did.js';
+import { Actor, HttpAgent, IDL } from '@dfinity/agent';
+import ugd_backend from '../../../../canister_ids.json';
+import ugd_backend_did from '../../../../src/declarations/ugd_backend/ugd_backend.did';
+
+const agent = new HttpAgent();
+// const actorInterfaceFactory = IDL.Interface.from(candid);
+// const yourActor = Actor.createActor(actorInterfaceFactory, { agent, canisterId: yourCanisterId });
 
 
 const { Option } = Select;
@@ -55,46 +102,28 @@ const SemanticLibrary = () => {
     const handleSearchChange = e => setSearchValue(e.target.value);
     const handleKeyPress = (e) => { if (e.key === 'Enter') handleSearchSubmit(); };
 
+    
+    // Demo test http get request:
     const handleSearchSubmit = useCallback(async () => {
         if (searchValue.trim() !== '') {
             setSubmittedSearchValue(searchValue);
             setIsLoading(true);
-            const response = await fetch('/api/semantic-library', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: searchValue, author: selectedAuthor }),
-            });
+            
+            const canisterUrl = `http://localhost:8080?canisterId=${ugd_backend}`;
+            const apiUrl = `${canisterUrl}/search?input=${searchValue}`;
+    
+            const response = await fetch(apiUrl);
+            
             if (response.ok) {
-                const responseData = await response.json();
+                const responseData = await response.text();
                 setData(responseData);
-                setIsFlipped(new Array(responseData.titles.length).fill(false));
             }
+            
             setIsLoading(false);
         }
-    }, [searchValue, selectedAuthor]);
+    }, [searchValue]);
 
-    // const agent = new HttpAgent();
-    // const bookCardActor = Actor.createActor(book_card_idl, { agent, canisterId: 'your-canister-id' });
-
-    // const handleSearchSubmit = useCallback(async () => {
-    //     if (searchValue.trim() !== '') {
-    //         setSubmittedSearchValue(searchValue);
-    //         setIsLoading(true);
-            
-    //         try {
-    //             // Replace your existing API call with a call to your Rust backend
-    //             const bookCards = await bookCardActor.get_book_cards({ query: searchValue, author: selectedAuthor });
-
-    //             setData(bookCards);
-    //             setIsFlipped(new Array(bookCards.length).fill(false));
-    //         } catch (error) {
-    //             console.error("An error occurred while fetching data:", error);
-    //         }
-            
-    //         setIsLoading(false);
-    //     }
-    // }, [searchValue, selectedAuthor]);
-
+    
 
     const toggleFlipped = (index) => {
         setIsFlipped(prevFlipped => {
