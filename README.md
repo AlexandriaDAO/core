@@ -1,3 +1,19 @@
+Dev Replication requirements (WSL Ubuntu)
+
+- Install DFX
+- Install NVM: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash` | `nvm install --lts`
+- Install Node & NPM: `sudo apt install nodejs npm`
+- Update them: `sudo apt-get update
+sudo apt-get upgrade nodejs` 
+- Ensure the latest versions: `nvm install --lts`
+- Install Cargo: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+- Add wasm: `rustup target add wasm32-unknown-unknown`
+
+
+
+
+
+
 # ugd
 
 Welcome to your new ugd project and to the internet computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
