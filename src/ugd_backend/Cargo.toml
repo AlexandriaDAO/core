@@ -7,8 +7,8 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-candid = "0.8"
-ic-cdk = "0.7"
+candid = "0.8.2"
+ic-cdk = "0.7.0"
 # ic-cdk-macros = "0.7.1"
 ic-cdk-timers = "0.1"
 # serde_json = "1.0"

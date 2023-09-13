@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ignoreDirs = ['.next', 'node_modules', '.git', 'public', 'data', '.dfx', 'out', 'dist'];
-const ignoreFilePrefixes = ['.env', '.git', '.nvmrc', '.prettierrc', '.eslintrc', 'LICENSE', 'package', 'READ', 'filtered', 'generate'];
+const ignoreFilePrefixes = ['assets', 'declarations', 'target', '.env', '.git', '.nvmrc', '.prettierrc', '.eslintrc', 'LICENSE', 'package', 'READ', 'filtered', 'generate', 'tree'];
 
 const essentialFiles = {
   backend: ['helper', 'model', 'service'],
