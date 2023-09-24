@@ -18,15 +18,23 @@
 │   ├── ugd_frontend/
 │   │   ├── src/
 │   │   │   ├── .ic-assets.json5
+│   │   │   ├── contexts/
+│   │   │   │   └── CardStateContext.tsx
 │   │   │   ├── index.html
 │   │   │   ├── index.js
 │   │   │   ├── semantic-library/
 │   │   │   │   ├── BookCard.jsx
 │   │   │   │   ├── SemanticLibrary.jsx
 │   │   │   │   └── VirtualBookshelf.tsx
+│   │   │   ├── the-greats/
+│   │   │   │   ├── AuthorCards.tsx
+│   │   │   │   ├── AuthorPanel.jsx
+│   │   │   │   └── Stream.tsx
 │   │   ├── styles/
+│   │   │   ├── AuthorCards.css
 │   │   │   ├── SemanticLibraryPage.css
-│   │   │   └── VirtualBookshelf.css
+│   │   │   ├── VirtualBookshelf.css
+│   │   │   └── main.css
 │   │   ├── utils/
 │   │   │   ├── handleReadBookClick.ts
 │   │   │   └── useBackgroundPosition.js

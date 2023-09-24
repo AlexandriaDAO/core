@@ -1,87 +1,168 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+// Semantic UI Carousel version w/o shuffled books.
+
+import React, { useState, useEffect } from 'react';
 import { handleReadBookClick } from '../../utils/handleReadBookClick';
+import { Card, Image, Segment } from 'semantic-ui-react';
 import '../../styles/VirtualBookshelf.css';
 
-const VirtualBookshelf: React.FC = () => {
-  const [books, setBooks] = useState<any[]>([]);
-  const [displayedBooks, setDisplayedBooks] = useState<any[]>([]);
-  const [loadingMore, setLoadingMore] = useState<boolean>(false);
-  const observer = useRef<IntersectionObserver | null>(null);
-  const lastBookRef = useRef<HTMLDivElement | null>(null);
+interface Book {
+  author: string;
+  title: string;
+  imagePath: string;
+}
 
-  const loadMoreBooks = useCallback(() => {
-    if (loadingMore) return;
-    setLoadingMore(true);
-    setDisplayedBooks(books.slice(0, displayedBooks.length + 15));
-    setLoadingMore(false);
-  }, [displayedBooks, loadingMore, books]);
+const VirtualBookShelfComponent = ({ author }: { author: string }) => {
+  const [groupedBooks, setGroupedBooks] = useState<{ [author: string]: Book[] }>({});
+  const booksByThisAuthor = groupedBooks[author] || [];
 
   useEffect(() => {
     fetch('/public/books.json')
       .then((response) => response.json())
-      .then((data) => {
-        const shuffledBooks = shuffleArray(data);
-        setBooks(shuffledBooks);
-        setDisplayedBooks(shuffledBooks.slice(0, 20));
+      .then((data: Book[]) => {
+      
+        const authorGroups: { [author: string]: Book[] } = {};
+        data.forEach((book) => {
+          if (!authorGroups[book.author]) {
+            authorGroups[book.author] = [];
+          }
+          authorGroups[book.author].push(book);
+        });
+        setGroupedBooks(authorGroups);
       });
   }, []);
 
-  useEffect(() => {
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          loadMoreBooks();
-        }
-      },
-      { rootMargin: '0px 0px 200px 0px' }
-    );
-
-    if (lastBookRef.current) observer.current.observe(lastBookRef.current);
-
-    return () => {
-      if (observer.current) observer.current.disconnect();
-    };
-  }, [loadMoreBooks, displayedBooks]);
-
   return (
-    <div className="bookshelf">
-      {displayedBooks.map((book, index) => {
-        const isLastBook = index === displayedBooks.length - 1;
-        const pathParts = book.imagePath.split('/');
-        const authorId = pathParts[pathParts.length - 2].split(' ').join('_');
-        const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join('_');
-        
-        return (
-          <div key={index} ref={isLastBook ? lastBookRef : null} className="book">
-            <a href="#" onClick={(e) => { 
-                e.preventDefault();
-                console.log("Clicked"); 
-                handleReadBookClick(authorId, title); 
-            }} className="bookImage">
-              <img src={`/public${book.imagePath}`}  alt={title} className="image" />
-            </a>
-            <div className="bookInfo">
-              <p className="title">{title.replace(/_/g, ' ')}</p>
-              <p className="author">{authorId.replace(/_/g, ' ')}</p>
+    <div className="✍️">
+      <div className="🌐🌈">
+        <Segment
+          className={`🌟 📜 🕵️‍♀️📜`}
+          style={{ display: 'flex', overflowX: 'auto' }}
+        >
+          {booksByThisAuthor.map((book, bookIndex) => (
+            <div className="👤🎴-container" key={bookIndex}>
+              <Card 
+                className={`👤🎴 👤🎴-custom`} 
+                onClick={() => handleReadBookClick(book.author, book.title)}
+              >
+                <div className="🖼️🌌">
+                  <Image
+                    src={`/public${book.imagePath}`}
+                    alt={book.title}
+                    className="👩‍🎨📷"
+                  />
+                </div>
+                <Card.Content className="👤🎴-header">
+                    {book.title}
+                </Card.Content>
+              </Card>
             </div>
-          </div>
-        );
-      })}
-      {loadingMore && <div className="loadingMore">Loading more books...</div>}
+          ))}
+        </Segment>
+      </div>
     </div>
-  );
+  );  
 };
 
-function shuffleArray(array: any[]) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
+export default VirtualBookShelfComponent;
 
-export default VirtualBookshelf;
+
+
+
+
+
+
+
+
+
+
+
+
+// // OG Version Before I merged ChatPage and Semantic Library
+
+// import React, { useState, useEffect, useRef, useCallback } from 'react';
+// import { handleReadBookClick } from '../../utils/handleReadBookClick';
+// import '../../styles/VirtualBookshelf.css';
+
+// const VirtualBookshelf: React.FC = () => {
+//   const [books, setBooks] = useState<any[]>([]);
+//   const [displayedBooks, setDisplayedBooks] = useState<any[]>([]);
+//   const [loadingMore, setLoadingMore] = useState<boolean>(false);
+//   const observer = useRef<IntersectionObserver | null>(null);
+//   const lastBookRef = useRef<HTMLDivElement | null>(null);
+
+//   const loadMoreBooks = useCallback(() => {
+//     if (loadingMore) return;
+//     setLoadingMore(true);
+//     setDisplayedBooks(books.slice(0, displayedBooks.length + 15));
+//     setLoadingMore(false);
+//   }, [displayedBooks, loadingMore, books]);
+
+//   useEffect(() => {
+//     fetch('/public/books.json')
+//       .then((response) => response.json())
+//       .then((data) => {
+//         const shuffledBooks = shuffleArray(data);
+//         setBooks(shuffledBooks);
+//         setDisplayedBooks(shuffledBooks.slice(0, 20));
+//       });
+//   }, []);
+
+//   useEffect(() => {
+//     if (observer.current) observer.current.disconnect();
+//     observer.current = new IntersectionObserver(
+//       ([entry]) => {
+//         if (entry.isIntersecting) {
+//           loadMoreBooks();
+//         }
+//       },
+//       { rootMargin: '0px 0px 200px 0px' }
+//     );
+
+//     if (lastBookRef.current) observer.current.observe(lastBookRef.current);
+
+//     return () => {
+//       if (observer.current) observer.current.disconnect();
+//     };
+//   }, [loadMoreBooks, displayedBooks]);
+
+//   return (
+//     <div className="bookshelf">
+//       {displayedBooks.map((book, index) => {
+//         const isLastBook = index === displayedBooks.length - 1;
+//         const pathParts = book.imagePath.split('/');
+//         const authorId = pathParts[pathParts.length - 2].split(' ').join('_');
+//         const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join('_');
+        
+//         return (
+//           <div key={index} ref={isLastBook ? lastBookRef : null} className="book">
+//             <a href="#" onClick={(e) => { 
+//                 e.preventDefault();
+//                 console.log("Clicked"); 
+//                 handleReadBookClick(authorId, title); 
+//             }} className="bookImage">
+//               <img src={`/public${book.imagePath}`}  alt={title} className="image" />
+//             </a>
+//             <div className="bookInfo">
+//               <p className="title">{title.replace(/_/g, ' ')}</p>
+//               <p className="author">{authorId.replace(/_/g, ' ')}</p>
+//             </div>
+//           </div>
+//         );
+//       })}
+//       {loadingMore && <div className="loadingMore">Loading more books...</div>}
+//     </div>
+//   );
+// };
+
+// function shuffleArray(array: any[]) {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]];
+//   }
+//   return array;
+// }
+
+// export default VirtualBookshelf;
 
 
 
