@@ -35,6 +35,7 @@ import { createRoot } from 'react-dom/client';
 import SemanticLibrary from './semantic-library/SemanticLibrary';
 import { ugd_backend } from "../../declarations/ugd_backend";
 import useBackgroundPosition from '../utils/useBackgroundPosition';
+import '../styles/main.css';
 
 const App = () => {
   const [imageUrl, setImageUrl] = useState(null);
