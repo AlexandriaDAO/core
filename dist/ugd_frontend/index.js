@@ -26021,6 +26021,8 @@ __webpack_require__.r(__webpack_exports__);
 
 // export default SemanticLibrary;
 
+// Simplified for Hello World only backend.
+
 
 
 
@@ -36660,7 +36662,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `.container {
+___CSS_LOADER_EXPORT___.push([module.id, `/* .container {
     position: relative;
     max-width: 1200px;
     margin: 0 auto;
@@ -36705,7 +36707,39 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.container {
     align-items: center;
     height: 50vh;
   }
-  `, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/SemanticLibraryPage.css"],"names":[],"mappings":"AAAA;IACI,kBAAkB;IAClB,iBAAiB;IACjB,cAAc;IACd,aAAa;IACb,2DAA2D;EAC7D;;EAEA;IACE,kBAAkB;IAClB,MAAM;IACN,OAAO;IACP,QAAQ;IACR,SAAS;IACT,aAAa;EACf;;EAEA;IACE,kBAAkB;IAClB,mBAAmB;EACrB;;EAEA;IACE,aAAa;IACb,uBAAuB;IACvB,mBAAmB;IACnB,mBAAmB;EACrB;;EAEA;IACE,UAAU;IACV,gBAAgB;IAChB,gBAAgB;EAClB;;EAEA;IACE,UAAU;EACZ;;EAEA;IACE,aAAa;IACb,uBAAuB;IACvB,mBAAmB;IACnB,YAAY;EACd","sourcesContent":[".container {\n    position: relative;\n    max-width: 1200px;\n    margin: 0 auto;\n    padding: 20px;\n    font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  }\n  \n  .content {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    padding: 40px;\n  }\n  \n  .header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  \n  .searchSection {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    margin-bottom: 40px;\n  }\n  \n  .select {\n    width: 20%;\n    min-width: 180px;\n    margin-right: 2%;\n  }\n  \n  .searchInput {\n    width: 78%;\n  }\n  \n  .loading {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    height: 50vh;\n  }\n  "],"sourceRoot":""}]);
+   */`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/SemanticLibraryPage.css"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IA6CI","sourcesContent":["/* .container {\n    position: relative;\n    max-width: 1200px;\n    margin: 0 auto;\n    padding: 20px;\n    font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n  }\n  \n  .content {\n    position: absolute;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    padding: 40px;\n  }\n  \n  .header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  \n  .searchSection {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    margin-bottom: 40px;\n  }\n  \n  .select {\n    width: 20%;\n    min-width: 180px;\n    margin-right: 2%;\n  }\n  \n  .searchInput {\n    width: 78%;\n  }\n  \n  .loading {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    height: 50vh;\n  }\n   */"],"sourceRoot":""}]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./src/ugd_frontend/styles/main.css":
+/*!********************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./src/ugd_frontend/styles/main.css ***!
+  \********************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "./node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  } */
+  `, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/main.css"],"names":[],"mappings":"AAAA;;;;KAIK","sourcesContent":["/* * {\n    margin: 0;\n    padding: 0;\n    box-sizing: border-box;\n  } */\n  "],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -86275,6 +86309,61 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./src/ugd_frontend/styles/main.css":
+/*!******************************************!*\
+  !*** ./src/ugd_frontend/styles/main.css ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "./node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "./node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "./node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "./node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_main_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!./main.css */ "./node_modules/css-loader/dist/cjs.js!./src/ugd_frontend/styles/main.css");
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
+
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_main_css__WEBPACK_IMPORTED_MODULE_6__["default"], options);
+
+
+
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_main_css__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_main_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_main_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
 /*!****************************************************************************!*\
   !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
@@ -89957,125 +90046,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _semantic_library_SemanticLibrary__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./semantic-library/SemanticLibrary */ "./src/ugd_frontend/src/semantic-library/SemanticLibrary.jsx");
 /* harmony import */ var _declarations_ugd_backend__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../declarations/ugd_backend */ "./src/declarations/ugd_backend/index.js");
 /* harmony import */ var _utils_useBackgroundPosition__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/useBackgroundPosition */ "./src/ugd_frontend/utils/useBackgroundPosition.js");
-// import React, { useState, useEffect } from 'react';
-// import { createRoot } from 'react-dom/client';
-// import 'semantic-ui-css/semantic.min.css';
-// import SemanticLibrary from './semantic-library/SemanticLibrary';
-// import useBackgroundPosition from '../utils/useBackgroundPosition';
-
-// // New Backend Function That takes input and returns "Hello, input": 
-// import { ugd_backend } from "../../declarations/ugd_backend"
-
-// function SemanticLibraryPage() {
-//   const backgroundPosition = useBackgroundPosition();
-//   const [imageUrl, setImageUrl] = useState(null);
-
-//   useEffect(() => {
-//     const image = require.context('../assets/public/images/', false, /\.(png|jpe?g|svg)$/);
-//     setImageUrl(image('./BlackedOut.png').default);
-//   }, []);
-
-//   if (!imageUrl) return <div>Loading...</div>;
-
-//   return (
-//     <div style={{
-//       position: 'relative',
-//       minHeight: '100vh',
-//     }}>
-//       <div id="imageContainer" style={{
-//         backgroundImage: `url(${imageUrl})`,
-//         backgroundPosition: backgroundPosition,
-//         backgroundSize: 'cover',
-//         backgroundAttachment: 'fixed',
-//         position: 'absolute',
-//         top: 0,
-//         left: 0,
-//         width: '100%',
-//         height: '100%',
-//         opacity: '0.1',
-//         zIndex: -1,
-//       }}/>
-//       <div>
-//         <SemanticLibrary/>
-//       </div>
-//     </div>
-//   );
-// }
-
-// const root = document.getElementById('app');
-// const appRoot = createRoot(root);
-
-// appRoot.render(
-//   <React.StrictMode>
-//     <SemanticLibraryPage />
-//   </React.StrictMode>
-// );
-
-// // First version that works with the origional index.html
-
-// import { ugd_backend } from "../../declarations/ugd_backend"
-
-// document.querySelector("form").addEventListener("submit", async (e) => {
-//   e.preventDefault();
-//   const button = e.target.querySelector("button");
-
-//   const name = document.getElementById("name").value.toString();
-
-//   button.setAttribute("disabled", true);
-
-//   // Interact with foo actor, calling the greet method
-//   const greeting = await ugd_backend.greet(name);
-
-//   button.removeAttribute("disabled");
-
-//   document.getElementById("greeting").innerText = greeting;
-
-//   return false;
-// });
-
-// import React, { useEffect } from 'react';
-// import ReactDOM from 'react-dom';
-// import SemanticLibrary from './semantic-library/SemanticLibrary';
-// import { ugd_backend } from "../../declarations/ugd_backend"
-
-// // Initialize React App within an existing DOM
-// const initializeReactApp = () => {
-//   const semanticLibraryRoot = document.getElementById("semantic-library-root");
-//   if (semanticLibraryRoot) {
-//     ReactDOM.render(
-//       <React.StrictMode>
-//         <SemanticLibrary />
-//       </React.StrictMode>,
-//       semanticLibraryRoot
-//     );
-//   }
-// };
-
-// document.addEventListener("DOMContentLoaded", () => {
-//   initializeReactApp();
-
-//   // Your existing code can stay here
-//   const form = document.querySelector("form");
-//   if (form) {
-//     form.addEventListener("submit", async (e) => {
-//       e.preventDefault();
-//       const button = e.target.querySelector("button");
-//       const name = document.getElementById("name").value.toString();
-//       button.setAttribute("disabled", true);
-
-//       const greeting = await ugd_backend.greet(name);
-//       button.removeAttribute("disabled");
-//       document.getElementById("greeting").innerText = greeting;
-
-//       return false;
-//     });
-//   }
-// });
+/* harmony import */ var _styles_main_css__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../styles/main.css */ "./src/ugd_frontend/styles/main.css");
+// pages/the-greats.tsx
 
 
 
 
 
+
+
+// import AuthorPanel from './the-greats/AuthorPanel';
+// import AUTHOR_INFO from '../assets/author_data';
 
 const App = () => {
   const [imageUrl, setImageUrl] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
@@ -90112,8 +90093,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const root = (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(semanticLibraryRoot);
     root.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(App, null)));
   }
-
-  // Your existing form code can stay here
   const form = document.querySelector("form");
   if (form) {
     form.addEventListener("submit", async e => {
@@ -90128,6 +90107,109 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// // Compbined Version: 
+// // index.js
+// import React, { useEffect, useState } from 'react';
+// import { createRoot } from 'react-dom/client';
+// import SemanticLibrary from './semantic-library/SemanticLibrary';
+// import { ugd_backend } from "../../declarations/ugd_backend";
+// import useBackgroundPosition from '../utils/useBackgroundPosition';
+// import '../styles/main.css';
+// import AUTHOR_INFO from '../assets/author_data';
+// import AuthorCards from './the-greats/AuthorCards'
+
+// // Your original HomePage code, now embedded into this file
+// function HomePage({ authors }) {
+//   const [activeAuthor, setActiveAuthor] = useState(null);
+
+//   useEffect(() => {
+//     setActiveAuthor(null);
+//   }, []);
+
+//   const handleCardClick = (authorId) => {
+//     setActiveAuthor(authorId === activeAuthor ? null : authorId);
+//   };
+
+//   return (
+//     <div className="grid">
+//       {authors.map((author) => (
+//         <div key={author.id} onClick={() => handleCardClick(author.id)}>
+//           {/* Assume AuthorCard is available or imported */}
+//           <AuthorCards 
+//             author={author} 
+//             expanded={activeAuthor === author.id} 
+//           />
+//         </div>
+//       ))}
+//     </div>
+//   );
+// }
+
+// const App = () => {
+//   const [imageUrl, setImageUrl] = useState(null);
+//   const backgroundPosition = useBackgroundPosition();
+
+//   useEffect(() => {
+//     const image = require.context('../assets/public/images/', false, /\.(png|jpe?g|svg)$/);
+//     setImageUrl(image('./BlackedOut.png').default);
+//   }, []);
+
+//   return (
+//     <div style={{ position: 'relative', minHeight: '100vh' }}>
+//       {imageUrl && (
+//         <div id="imageContainer" style={{
+//           backgroundImage: `url(${imageUrl})`,
+//           backgroundPosition: backgroundPosition,
+//           backgroundSize: 'cover',
+//           backgroundAttachment: 'fixed',
+//           position: 'absolute',
+//           top: 0,
+//           left: 0,
+//           width: '100%',
+//           height: '100%',
+//           opacity: '0.1',
+//           zIndex: -1,
+//         }} />
+//       )}
+//       <div>
+//         <SemanticLibrary />
+//       </div>
+//       {/* Embed HomePage right under SemanticLibrary */}
+//       <div>
+//         {/* <HomePage authors={AUTHOR_INFO} /> */}
+//       </div>
+//     </div>
+//   );
+// };
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   const semanticLibraryRoot = document.getElementById("semantic-library-root");
+//   if (semanticLibraryRoot) {
+//     const root = createRoot(semanticLibraryRoot);
+//     root.render(
+//       <React.StrictMode>
+//         <App />
+//       </React.StrictMode>
+//     );
+//   }
+
+//   const form = document.querySelector("form");
+//   if (form) {
+//     form.addEventListener("submit", async (e) => {
+//       e.preventDefault();
+//       const button = e.target.querySelector("button");
+//       const name = document.getElementById("name").value.toString();
+//       button.setAttribute("disabled", true);
+
+//       const greeting = await ugd_backend.greet(name);
+//       button.removeAttribute("disabled");
+//       document.getElementById("greeting").innerText = greeting;
+
+//       return false;
+//     });
+//   }
+// });
 })();
 
 /******/ })()

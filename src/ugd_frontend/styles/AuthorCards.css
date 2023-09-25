@@ -1,11 +1,9 @@
-
+/* 
 .grid {
     display: grid;
     gap: 3em;
     padding: 2em;
   }
-
-  /* Span from the first to the last grid column */
 
 @media only screen and (min-width: 200px) {
   .grid {
@@ -30,7 +28,6 @@
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
 }
-
 
 .cardImage {
   width: 100%;
@@ -79,4 +76,12 @@
 
 .cardBack::-webkit-scrollbar {
   display: none;
-}
+} */
+
+
+
+
+
+
+
+
