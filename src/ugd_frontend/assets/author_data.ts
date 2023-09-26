@@ -138,7 +138,7 @@ const AUTHOR_INFO: Author[] = [
     "paragraphs_json": 'https://raw.githubusercontent.com/evanmcfarland/A-Statistical-Approach-to-Happiness/main/data/Friedrich%20Nietzsche/nietzsche_books_paragraphs.json',
     },
     {
-    "id": "Grecko Romans",
+    "id": "Greco Romans",
     "category": ["Philosophy", "Empires", "History", "Politics", "Religion", "Art", "Epic", "Mythology", "Ancient Greece", "Ancient Rome"],
     "cluster": "Greco_Sections",
     "image": "greckopfp.png",

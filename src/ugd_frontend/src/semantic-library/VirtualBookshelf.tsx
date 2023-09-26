@@ -1,9 +1,8 @@
-// Semantic UI Carousel version w/o shuffled books.
-
 import React, { useState, useEffect } from 'react';
 import { handleReadBookClick } from '../../utils/handleReadBookClick';
 import { Card, Image, Segment } from 'semantic-ui-react';
-import '../../styles/VirtualBookshelf.css';
+// import '../../styles/VirtualBookshelf.css';
+// import '../../styles/main.css';
 
 interface Book {
   author: string;
@@ -32,26 +31,26 @@ const VirtualBookShelfComponent = ({ author }: { author: string }) => {
   }, []);
 
   return (
-    <div className="✍️">
-      <div className="🌐🌈">
+    <div className="relative w-screen left-0 top-4 font-serif text-center text-gray-300">
+      <div className="flex flex-col overflow-auto">
         <Segment
-          className={`🌟 📜 🕵️‍♀️📜`}
+          className="flex flex-nowrap overflow-x-auto w-full bg-yellow-100 p-2"
           style={{ display: 'flex', overflowX: 'auto' }}
         >
           {booksByThisAuthor.map((book, bookIndex) => (
-            <div className="👤🎴-container" key={bookIndex}>
+            <div className="flex-shrink-0 p-0 pr-4 transition-transform duration-400 relative transform hover:scale-105 hover:z-10" key={bookIndex}>
               <Card 
-                className={`👤🎴 👤🎴-custom`} 
+                className="flex flex-col w-56 bg-green-100 cursor-pointer"
                 onClick={() => handleReadBookClick(book.author, book.title)}
               >
-                <div className="🖼️🌌">
+                <div className="p-2 flex items-center justify-center">
                   <Image
                     src={`/public${book.imagePath}`}
                     alt={book.title}
-                    className="👩‍🎨📷"
+                    className="w-9/10 object-cover object-center"
                   />
                 </div>
-                <Card.Content className="👤🎴-header">
+                <Card.Content className="text-black font-bold text-lg font-CALIBRI truncate h-20 leading-snug box-content">
                     {book.title}
                 </Card.Content>
               </Card>
@@ -67,6 +66,85 @@ export default VirtualBookShelfComponent;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // Semantic UI Carousel version w/o shuffled books.
+
+// import React, { useState, useEffect } from 'react';
+// import { handleReadBookClick } from '../../utils/handleReadBookClick';
+// import { Card, Image, Segment } from 'semantic-ui-react';
+// import '../../styles/VirtualBookshelf.css';
+
+// interface Book {
+//   author: string;
+//   title: string;
+//   imagePath: string;
+// }
+
+// const VirtualBookShelfComponent = ({ author }: { author: string }) => {
+//   const [groupedBooks, setGroupedBooks] = useState<{ [author: string]: Book[] }>({});
+//   const booksByThisAuthor = groupedBooks[author] || [];
+
+//   useEffect(() => {
+//     fetch('/public/books.json')
+//       .then((response) => response.json())
+//       .then((data: Book[]) => {
+      
+//         const authorGroups: { [author: string]: Book[] } = {};
+//         data.forEach((book) => {
+//           if (!authorGroups[book.author]) {
+//             authorGroups[book.author] = [];
+//           }
+//           authorGroups[book.author].push(book);
+//         });
+//         setGroupedBooks(authorGroups);
+//       });
+//   }, []);
+
+//   return (
+//     <div className="✍️">
+//       <div className="🌐🌈">
+//         <Segment
+//           className={`🌟 📜 🕵️‍♀️📜`}
+//           style={{ display: 'flex', overflowX: 'auto' }}
+//         >
+//           {booksByThisAuthor.map((book, bookIndex) => (
+//             <div className="👤🎴-container" key={bookIndex}>
+//               <Card 
+//                 className={`👤🎴 👤🎴-custom`} 
+//                 onClick={() => handleReadBookClick(book.author, book.title)}
+//               >
+//                 <div className="🖼️🌌">
+//                   <Image
+//                     src={`/public${book.imagePath}`}
+//                     alt={book.title}
+//                     className="👩‍🎨📷"
+//                   />
+//                 </div>
+//                 <Card.Content className="👤🎴-header">
+//                     {book.title}
+//                 </Card.Content>
+//               </Card>
+//             </div>
+//           ))}
+//         </Segment>
+//       </div>
+//     </div>
+//   );  
+// };
+
+// export default VirtualBookShelfComponent;
 
 
 

@@ -7,7 +7,7 @@ export const handleReadBookClick = (authorId: string, title: string) => {
     console.log('Author Link:', authorLink);
     console.log('Title Clustered:', titleClustered);
 
-    if (authorLink === "Grecko_Romans") {
+    if (authorLink === "Greco_Romans") {
         window.open("https://classics.mit.edu/Browse/index.html", '_blank');
     } else if (authorLink === "Carl_Jung") {
         window.open("https://archive.org/details/jung-carl-gustav-complete/01%20Psychiatric%20Studies/", '_blank');

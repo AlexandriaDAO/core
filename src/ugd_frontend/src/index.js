@@ -6,8 +6,8 @@ import { ugd_backend } from "../../declarations/ugd_backend";
 import useBackgroundPosition from '../utils/useBackgroundPosition';
 import '../styles/main.css';
 
-// import AuthorPanel from './the-greats/AuthorPanel';
-// import AUTHOR_INFO from '../assets/author_data';
+import AuthorPanel from './the-greats/AuthorPanel';
+import AUTHOR_INFO from '../assets/author_data';
 
 
 const App = () => {
@@ -38,7 +38,7 @@ const App = () => {
       )}
       <div>
         <SemanticLibrary />
-        {/* <AuthorPanel authors={AUTHOR_INFO} /> */}
+        <AuthorPanel authors={AUTHOR_INFO} />
       </div>
     </div>
   );
