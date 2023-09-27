@@ -3,7 +3,6 @@
 
 import React, { useState, useCallback } from 'react';
 import AUTHOR_INFO from '../../assets/author_data';
-
 import { ugd_backend } from '../../../declarations/ugd_backend';
 
 const SemanticLibrary = () => {
