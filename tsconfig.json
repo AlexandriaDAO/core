@@ -15,6 +15,6 @@
     "noEmit": false,
     "jsx": "react"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/ugd_frontend/src/VirtualBookshelf.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/types/*.ts", "src/ugd_frontend/src/VirtualBookshelf.tsx"],
   "exclude": ["node_modules"]
 }
