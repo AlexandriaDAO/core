@@ -35,7 +35,7 @@ const AuthorCards: React.FC<AuthorCardsProps> = ({ author, expanded }) => {
               </div>
             </div>
             <div className="card-face card-back">
-              <div className="extension"></div> 
+              {/* <div className="extension"></div>  */}
               {/* Here you can put the content of the back side */}
             </div>
            </div>

@@ -65,7 +65,7 @@ function AuthorPanel({ authors }) {
   // Calculate layout dynamically
   const generateLayout = () => {
     const layouts = {};
-    const cols = { lg: 5, md: 4, sm: 3, xs: 2, xxs: 2 }; // Update as needed
+    const cols = { lg: 5, md: 4, sm: 3, xs: 3, xxs: 2 };
 
     for (const [breakpoint, numCols] of Object.entries(cols)) {
       let rowStart = 0;
@@ -84,12 +84,12 @@ function AuthorPanel({ authors }) {
               i: authors[i].id,
               x,
               y,
-              w: 1,
+              w: 0.9,
               h: 1.5,
             });
           });
           currentRow = [];
-          rowStart += 1.5; // Increment row start position
+          rowStart += 1.5;
         }
       });
     }
@@ -103,17 +103,15 @@ function AuthorPanel({ authors }) {
     <ResponsiveGridLayout
       className="layout"
       layouts={layouts}
-      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-      cols={{ lg: 5, md: 4, sm: 3, xs: 2, xxs: 2 }}
+      breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 710, xxs: 0 }}
+      cols={{ lg: 5, md: 4, sm: 3, xs: 3, xxs: 2 }}
       autoSize={true}
+      margin={[0, 25]}
+      containerPadding={[0, 70]}
     >
-      {/* {authors.map((author) => (
-        <div key={author.id} onClick={() => handleCardClick(author.id)}>
-          <AuthorCards author={author} expanded={activeAuthor === author.id} />
-        </div>
-      ))} */}
       {authors.map((author) => (
         <div key={author.id} onClick={() => handleCardClick(author.id)} className="flex justify-center items-center h-full">
+        {/* <div key={author.id} onClick={() => handleCardClick(author.id)} > */}
           <AuthorCards author={author} expanded={activeAuthor === author.id} />
         </div>
       ))}
