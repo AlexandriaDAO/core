@@ -1,7 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import useStreamingText from '../../utils/Stream';
-import { useCardState } from '../contexts/CardStateContext';
-import VirtualBookShelfComponent from '../semantic-library/VirtualBookshelf';
 import '../../styles/AuthorCards.css';
 
 interface AuthorCardsProps {
@@ -14,18 +12,27 @@ interface AuthorCardsProps {
 }
 
 const AuthorCards: React.FC<AuthorCardsProps> = ({ author, expanded }) => {
-  const { cardState, flipCard } = useCardState(author.id);
-  const streamedDescription = useStreamingText(author.description, 15, cardState.startStreaming || false);
+  const [hasFlipped, setHasFlipped] = useState(false);
+  const [cardFlipped, setCardFlipped] = useState(false);
+  const shouldStartStreaming = hasFlipped;
+  
+  const streamedDescription = useStreamingText(author.description, 15, shouldStartStreaming);
+
+  useEffect(() => {
+    if (expanded && !hasFlipped) {
+      setHasFlipped(true);
+    }
+  }, [expanded]);
 
   const handleClick = () => {
-    flipCard();
+    setCardFlipped(!cardFlipped);
   };
 
   return (
     <>
       <div className={`author-container flex ${expanded ? 'expanded' : ''}`}>
-        <div className={`card-wrapper ${expanded ? 'cardFlipped' : ''}`}>
-        <div className="author-card" onClick={handleClick}>
+        <div className={`card-wrapper ${cardFlipped ? 'cardFlipped' : ''}`}>
+          <div className="author-card" onClick={handleClick}>
             <div className="card-face card-front">
               <div className="image-container w-full h-32 rounded-t-lg overflow-hidden shadow-inner">
                 <img src={`/images/${author.id}.png`} className="object-cover min-w-full min-h-full" alt={`${author.id}`} />
@@ -35,24 +42,29 @@ const AuthorCards: React.FC<AuthorCardsProps> = ({ author, expanded }) => {
               </div>
             </div>
             <div className="card-face card-back">
-              <div className="extension">
-                <div className={`virtual-bookshelf-container transform transition-transform duration-500 ease-in-out ${expanded ? 'translate-x-0' : '-translate-x-full'}`}>
-                  {expanded && <VirtualBookShelfComponent author={author.id} />}
-                </div> 
-              </div> 
-              {/* Here you can put the content of the back side */}
+              <p className="text-xs font-semibold text-gray-700">{streamedDescription}</p>
             </div>
-           </div>
+          </div>
         </div>
       </div>
     </>
   );
-};              
+};
 
 export default AuthorCards;
 
 
 
-{/* <div className={`virtual-bookshelf-container transform transition-transform duration-500 ease-in-out ${expanded ? 'translate-x-0' : '-translate-x-full'}`}>
-  {expanded && <VirtualBookShelfComponent author={author.id} />}
-</div> */}
+
+
+
+
+
+
+
+
+
+
+
+
+
