@@ -1,35 +1,3 @@
-/* .grid {
-  display: grid;
-  gap: 3em;
-  padding: 2em;
-}
-
-@media only screen and (min-width: 200px) {
-.grid {
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-}
-}
-
-@media only screen and (min-width: 768px) {
-.grid {
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-}
-}
-
-@media only screen and (min-width: 992px) {
-.grid {
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-}
-}
-
-@media only screen and (min-width: 1200px) {
-.grid {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-}
-} */
-
-
-
 .author-container {
 display: flex;
 flex-wrap: wrap;
@@ -48,6 +16,11 @@ transform-style: preserve-3d;
 transform: rotateY(0);
 transition: transform 0.5s;
 }
+
+body {
+  overflow-x: hidden;
+}
+
 
 .card-wrapper.cardFlipped .author-card {
 transform: rotateY(180deg);
@@ -107,7 +80,7 @@ text-overflow: ellipsis;
 
 
 .extension {
-position: absolute;
+position: relative;
 top: 0;
 left: 100%;
 width: 300%;
@@ -121,11 +94,7 @@ transition: transform 0.5s ease;
 transform: translateX(0);
 }
 
-
-
-
-
-@media (max-width: 768px) {
+@media (max-width: 68px) {
   .card-wrapper {
     min-width: 50px;
   }
@@ -133,6 +102,28 @@ transform: translateX(0);
     width: 100%;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

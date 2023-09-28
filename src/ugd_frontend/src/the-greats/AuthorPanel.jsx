@@ -1,47 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import AuthorCards from './AuthorCards';
-// // import '../../styles/AuthorCards.css';
-// import { useResetCards } from '../contexts/CardStateContext';
-
-// function AuthorPanel({ authors }) {
-//   const [activeAuthor, setActiveAuthor] = useState(null);
-//   const resetCards = useResetCards();
-
-//   useEffect(() => {
-//     setActiveAuthor(null);
-//     resetCards();
-//   }, []);
-
-//   const handleCardClick = (authorId) => {
-//     setActiveAuthor(authorId === activeAuthor ? null : authorId);
-//   };
-
-//   return (
-//     <div className="grid">
-//       {authors.map((author) => (
-//         <div key={author.id} onClick={() => handleCardClick(author.id)}>
-//           <AuthorCards 
-//             author={author} 
-//             expanded={activeAuthor === author.id} 
-//           />
-//         </div>
-//       ))}
-//     </div>
-//   );
-// }
-
-// export default AuthorPanel;
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import AuthorCards from './AuthorCards';
 import { Responsive, WidthProvider } from 'react-grid-layout';
@@ -100,22 +56,25 @@ function AuthorPanel({ authors }) {
   const layouts = generateLayout();
 
   return (
+    <div style={{ paddingBottom: '50px' }}> 
     <ResponsiveGridLayout
       className="layout"
       layouts={layouts}
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 710, xxs: 0 }}
       cols={{ lg: 5, md: 4, sm: 3, xs: 3, xxs: 2 }}
       autoSize={true}
-      margin={[0, 25]}
-      containerPadding={[0, 70]}
+      isDraggable={false}
     >
       {authors.map((author) => (
-        <div key={author.id} onClick={() => handleCardClick(author.id)} className="flex justify-center items-center h-full">
-        {/* <div key={author.id} onClick={() => handleCardClick(author.id)} > */}
+        <div key={author.id} 
+        onClick={() => handleCardClick(author.id)} 
+        className="flex justify-center items-center h-full"
+        >
           <AuthorCards author={author} expanded={activeAuthor === author.id} />
         </div>
       ))}
     </ResponsiveGridLayout>
+    </div>
   );
 }
 
