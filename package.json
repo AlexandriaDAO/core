@@ -29,7 +29,8 @@
     "react-grid-layout": "^1.4.2",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.4",
-    "tailwindcss": "^3.3.3"
+    "tailwindcss": "^3.3.3",
+    "webfontloader": "^1.6.28"
   },
   "devDependencies": {
     "@babel/core": "^7.22.15",

@@ -9,6 +9,15 @@ import '../styles/main.css';
 import AuthorPanel from './the-greats/AuthorPanel';
 import AUTHOR_INFO from '../assets/author_data';
 
+import WebFont from 'webfontloader';
+
+WebFont.load({
+  google: {
+    families: ['Georgia', 'Lobster', 'Roboto:300,400,700', "Times New Roman"]
+  }
+});
+
+
 
 const App = () => {
   const [imageUrl, setImageUrl] = useState(null);
