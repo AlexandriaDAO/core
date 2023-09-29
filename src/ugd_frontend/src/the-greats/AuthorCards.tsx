@@ -8,10 +8,9 @@ interface AuthorCardsProps {
     description: string;
     categories: string[];
   };
-  expanded: boolean;
 }
 
-const AuthorCards: React.FC<AuthorCardsProps> = ({ author, expanded }) => {
+const AuthorCards: React.FC<AuthorCardsProps> = ({ author }) => {
   const [hasFlipped, setHasFlipped] = useState(false);
   const [cardFlipped, setCardFlipped] = useState(false);
   const shouldStartStreaming = hasFlipped;
@@ -19,10 +18,10 @@ const AuthorCards: React.FC<AuthorCardsProps> = ({ author, expanded }) => {
   const streamedDescription = useStreamingText(author.description, 15, shouldStartStreaming);
 
   useEffect(() => {
-    if (expanded && !hasFlipped) {
+    if (cardFlipped && !hasFlipped) {
       setHasFlipped(true);
     }
-  }, [expanded]);
+  }, [cardFlipped]);
 
   const handleClick = () => {
     setCardFlipped(!cardFlipped);
@@ -30,7 +29,7 @@ const AuthorCards: React.FC<AuthorCardsProps> = ({ author, expanded }) => {
 
   return (
     <>
-      <div className={`author-container flex ${expanded ? 'expanded' : ''}`}>
+      <div className={`author-container flex ${cardFlipped ? 'expanded' : ''}`}>
         <div className={`card-wrapper ${cardFlipped ? 'cardFlipped' : ''}`}>
           <div className="author-card" onClick={handleClick}>
             <div className="card-face card-front">
@@ -52,19 +51,4 @@ const AuthorCards: React.FC<AuthorCardsProps> = ({ author, expanded }) => {
 };
 
 export default AuthorCards;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

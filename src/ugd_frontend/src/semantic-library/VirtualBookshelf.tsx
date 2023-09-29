@@ -28,19 +28,24 @@ const VirtualBookShelfComponent = ({ author }: { author: string }) => {
   }, []);
 
   return (
-    <div>
-      <div style={{ width: '100%', overflowX: 'auto', whiteSpace: 'nowrap' }}>
-        <div style={{ display: 'inline-block' }}>
+    <div className="relative w-3/5 left-0 top-4 font-serif text-center text-gray-300" style={{ backgroundColor: '#F0F0F0' }}>
+      <div className="flex flex-col overflow-auto">
+        <div className="flex flex-nowrap overflow-x-auto w-full p-2 rounded-lg shadow-lg" style={{ backgroundColor: '#E0E0E0' }}>
           {booksByThisAuthor.map((book, bookIndex) => (
-            <div key={bookIndex} style={{ display: 'inline-block' }}>
-              <div onClick={() => handleReadBookClick(book.author, book.title)}>
-                <div>
+            <div className="flex-shrink-0 p-0 pr-4 transition-transform duration-400 relative transform hover:scale-105 hover:z-10" key={bookIndex}>
+              <div 
+                className="flex flex-col w-36 cursor-pointer rounded-lg shadow-md hover:shadow-lg" 
+                style={{ backgroundColor: '#D0D0D0' }}
+                onClick={() => handleReadBookClick(book.author, book.title)}
+              >
+                <div className="p-2 flex items-center justify-center">
                   <img
                     src={`/public${book.imagePath}`}
                     alt={book.title}
+                    className="w-9/10 object-cover object-center rounded-t-lg"
                   />
                 </div>
-                <div>
+                <div className="text-black font-bold text-md font-CALIBRI truncate h-16 leading-snug p-2 rounded-b-lg">
                   {book.title}
                 </div>
               </div>
@@ -50,11 +55,38 @@ const VirtualBookShelfComponent = ({ author }: { author: string }) => {
       </div>
     </div>
   );
+  
+  
+
 };
 
 export default VirtualBookShelfComponent;
 
 
+  // // OG No Styles
+  // return (
+  //   <div>
+  //     <div style={{ width: '100%', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+  //       <div style={{ display: 'inline-block' }}>
+  //         {booksByThisAuthor.map((book, bookIndex) => (
+  //           <div key={bookIndex} style={{ display: 'inline-block' }}>
+  //             <div onClick={() => handleReadBookClick(book.author, book.title)}>
+  //               <div>
+  //                 <img
+  //                   src={`/public${book.imagePath}`}
+  //                   alt={book.title}
+  //                 />
+  //               </div>
+  //               <div>
+  //                 {book.title}
+  //               </div>
+  //             </div>
+  //           </div>
+  //         ))}
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 
 
 
@@ -66,33 +98,6 @@ export default VirtualBookShelfComponent;
 
 
 // OG with all the facny styling.
-  // return (
-  //   <div className="relative w-screen left-0 top-4 font-serif text-center text-gray-300">
-  //     <div className="flex flex-col overflow-auto">
-  //       <div className="flex flex-nowrap overflow-x-auto w-full bg-yellow-100 p-2">
-  //         {booksByThisAuthor.map((book, bookIndex) => (
-  //           <div className="flex-shrink-0 p-0 pr-4 transition-transform duration-400 relative transform hover:scale-105 hover:z-10" key={bookIndex}>
-  //             <div 
-  //               className="flex flex-col w-56 bg-green-100 cursor-pointer"
-  //               onClick={() => handleReadBookClick(book.author, book.title)}
-  //             >
-  //               <div className="p-2 flex items-center justify-center">
-  //                 <img
-  //                   src={`/public${book.imagePath}`}
-  //                   alt={book.title}
-  //                   className="w-9/10 object-cover object-center"
-  //                 />
-  //               </div>
-  //               <div className="text-black font-bold text-lg font-CALIBRI truncate h-20 leading-snug box-content">
-  //                 {book.title}
-  //               </div>
-  //             </div>
-  //           </div>
-  //         ))}
-  //       </div>
-  //     </div>
-  //   </div>
-  // );  
 
 
 
