@@ -6098,7 +6098,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _AuthorCards__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AuthorCards */ "./src/ugd_frontend/src/the-greats/AuthorCards.tsx");
 /* harmony import */ var react_grid_layout__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-grid-layout */ "./node_modules/react-grid-layout/index.js");
 /* harmony import */ var react_grid_layout__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_grid_layout__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _contexts_CardStateContext__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../contexts/CardStateContext */ "./src/ugd_frontend/src/contexts/CardStateContext.tsx");
+/* harmony import */ var _semantic_library_VirtualBookshelf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../semantic-library/VirtualBookshelf */ "./src/ugd_frontend/src/semantic-library/VirtualBookshelf.tsx");
 
 
 
@@ -6108,16 +6108,9 @@ function AuthorPanel({
   authors
 }) {
   const [activeAuthor, setActiveAuthor] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  const resetCards = (0,_contexts_CardStateContext__WEBPACK_IMPORTED_MODULE_3__.useResetCards)();
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    setActiveAuthor(null);
-    resetCards();
-  }, []);
   const handleCardClick = authorId => {
     setActiveAuthor(authorId === activeAuthor ? null : authorId);
   };
-
-  // Calculate layout dynamically
   const generateLayout = () => {
     const layouts = {};
     const cols = {
@@ -6142,26 +6135,41 @@ function AuthorPanel({
               i: authors[i].id,
               x,
               y,
-              w: 0.9,
-              h: 1.5
+              w: 1,
+              h: 1
             });
           });
+          if (authors.some(a => currentRow.includes(authors.indexOf(a)) && a.id === activeAuthor)) {
+            layouts[breakpoint].push({
+              i: `extra-${activeAuthor}`,
+              x: 0,
+              y: rowStart + 1,
+              w: numCols,
+              h: 1
+            });
+            rowStart++;
+          }
           currentRow = [];
-          rowStart += 1.5;
+          rowStart++;
         }
       });
     }
     return layouts;
   };
-  const layouts = generateLayout();
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(ResponsiveGridLayout, {
+  const layouts = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(generateLayout, [activeAuthor, authors]);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    style: {
+      paddingBottom: '3000px',
+      paddingRight: '25px'
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(ResponsiveGridLayout, {
     className: "layout",
     layouts: layouts,
     breakpoints: {
       lg: 1200,
       md: 996,
       sm: 768,
-      xs: 710,
+      xs: 480,
       xxs: 0
     },
     cols: {
@@ -6171,9 +6179,11 @@ function AuthorPanel({
       xs: 3,
       xxs: 2
     },
+    rowHeight: 250,
+    containerPadding: [0, 0],
+    margin: [0, 0],
     autoSize: true,
-    margin: [0, 25],
-    containerPadding: [0, 70]
+    isDraggable: false
   }, authors.map(author => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     key: author.id,
     onClick: () => handleCardClick(author.id),
@@ -6181,6 +6191,16 @@ function AuthorPanel({
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_AuthorCards__WEBPACK_IMPORTED_MODULE_1__["default"], {
     author: author,
     expanded: activeAuthor === author.id
+  }))), activeAuthor && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    key: `extra-${activeAuthor}`,
+    className: "virtual-bookshelf-container",
+    style: {
+      height: '100%',
+      gridColumnStart: 1,
+      gridColumnEnd: -1
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_semantic_library_VirtualBookshelf__WEBPACK_IMPORTED_MODULE_3__["default"], {
+    author: activeAuthor
   }))));
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AuthorPanel);
@@ -16576,17 +16596,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `.author-container {
-display: flex;
-flex-wrap: wrap;
-overflow: visible;
-}
-
-.author-container.expanded {
-width: auto;
-}
-
-.author-card {
+___CSS_LOADER_EXPORT___.push([module.id, `.author-card {
 width: 120%;
 height: 145%;
 position: relative;
@@ -16594,6 +16604,13 @@ transform-style: preserve-3d;
 transform: rotateY(0);
 transition: transform 0.5s;
 }
+
+.author-name {
+  font-family: 'Georgia', cursive;
+  font-size: 18px;
+  font-weight: 500;
+}
+
 
 .card-wrapper.cardFlipped .author-card {
 transform: rotateY(180deg);
@@ -16606,14 +16623,15 @@ height: 100%;
 backface-visibility: hidden;
 border: 1px solid #252525;
 border-radius: 0.5rem;
-
+overflow: hidden;
 }
 
 .card-front {
-background: #fbfbf5;
+background: #fbfbf8;
 display: flex;
 flex-direction: column;
 align-items: center;
+box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);
 }
 
 .card-front:hover {
@@ -16622,8 +16640,24 @@ box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 
 .card-back {
 transform: rotateY(180deg);
-background: #fff;
+background: #fbfbf8;
+text-align: center;
+padding: 10px;
+overflow-y: auto;
 }
+
+.card-back::-webkit-scrollbar {
+  display: none;
+}
+
+.card-back:-ms-overflow-style {
+  display: none;
+}
+
+.card-back {
+  scrollbar-width: none;
+}
+
 
 .card-wrapper {
 perspective: 1000px;
@@ -16634,15 +16668,18 @@ height: 150px;
 .image-container {
 height: calc(100% - 25px);
 width: 100%;
-border-top-left-radius: 0.5rem;
-border-top-right-radius: 0.5rem;
+border-bottom: 1.4px solid #252525;
+}
+
+.streamed-description {
+  font-family: 'Times New Roman', cursive;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.2rem;
 }
 
 .text-container {
-height: 15px;
-width: 100%;
-border-bottom-left-radius: 0.2rem;
-border-bottom-right-radius: 0.2rem;
+width: 95%;
 }
 
 .text-container p {
@@ -16651,27 +16688,11 @@ overflow: hidden;
 text-overflow: ellipsis;
 }
 
-
-.extension {
-position: absolute;
-top: 0;
-left: 100%;
-width: 300%;
-height: 100%;
-background-color: #f1f1f1;
-transform: translateX(-100%);
-transition: transform 0.5s ease;
-}
-
 .card-wrapper.cardFlipped .extension {
 transform: translateX(0);
 }
 
-
-
-
-
-@media (max-width: 768px) {
+@media (max-width: 68px) {
   .card-wrapper {
     min-width: 50px;
   }
@@ -16679,11 +16700,6 @@ transform: translateX(0);
     width: 100%;
   }
 }
-
-
-
-
-
 
 
 
@@ -16769,7 +16785,7 @@ transform: translateX(0);
 
 
 
-`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/AuthorCards.css"],"names":[],"mappings":"AAAA;AACA,aAAa;AACb,eAAe;AACf,iBAAiB;AACjB;;AAEA;AACA,WAAW;AACX;;AAEA;AACA,WAAW;AACX,YAAY;AACZ,kBAAkB;AAClB,4BAA4B;AAC5B,qBAAqB;AACrB,0BAA0B;AAC1B;;AAEA;AACA,0BAA0B;AAC1B;;AAEA;AACA,kBAAkB;AAClB,WAAW;AACX,YAAY;AACZ,2BAA2B;AAC3B,yBAAyB;AACzB,qBAAqB;;AAErB;;AAEA;AACA,mBAAmB;AACnB,aAAa;AACb,sBAAsB;AACtB,mBAAmB;AACnB;;AAEA;AACA,4EAA4E;AAC5E;;AAEA;AACA,0BAA0B;AAC1B,gBAAgB;AAChB;;AAEA;AACA,mBAAmB;AACnB,YAAY;AACZ,aAAa;AACb;;AAEA;AACA,yBAAyB;AACzB,WAAW;AACX,8BAA8B;AAC9B,+BAA+B;AAC/B;;AAEA;AACA,YAAY;AACZ,WAAW;AACX,iCAAiC;AACjC,kCAAkC;AAClC;;AAEA;AACA,mBAAmB;AACnB,gBAAgB;AAChB,uBAAuB;AACvB;;;AAGA;AACA,kBAAkB;AAClB,MAAM;AACN,UAAU;AACV,WAAW;AACX,YAAY;AACZ,yBAAyB;AACzB,4BAA4B;AAC5B,+BAA+B;AAC/B;;AAEA;AACA,wBAAwB;AACxB;;;;;;AAMA;EACE;IACE,eAAe;EACjB;EACA;IACE,WAAW;EACb;AACF;;;;;;;;;;;;;;;;;;;;;;;;;;;AA2BA,2CAA2C;;AAE3C;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAqDE","sourcesContent":[".author-container {\ndisplay: flex;\nflex-wrap: wrap;\noverflow: visible;\n}\n\n.author-container.expanded {\nwidth: auto;\n}\n\n.author-card {\nwidth: 120%;\nheight: 145%;\nposition: relative;\ntransform-style: preserve-3d;\ntransform: rotateY(0);\ntransition: transform 0.5s;\n}\n\n.card-wrapper.cardFlipped .author-card {\ntransform: rotateY(180deg);\n}\n\n.card-face {\nposition: absolute;\nwidth: 100%;\nheight: 100%;\nbackface-visibility: hidden;\nborder: 1px solid #252525;\nborder-radius: 0.5rem;\n\n}\n\n.card-front {\nbackground: #fbfbf5;\ndisplay: flex;\nflex-direction: column;\nalign-items: center;\n}\n\n.card-front:hover {\nbox-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);\n}\n\n.card-back {\ntransform: rotateY(180deg);\nbackground: #fff;\n}\n\n.card-wrapper {\nperspective: 1000px;\nwidth: 150px;\nheight: 150px;\n}\n\n.image-container {\nheight: calc(100% - 25px);\nwidth: 100%;\nborder-top-left-radius: 0.5rem;\nborder-top-right-radius: 0.5rem;\n}\n\n.text-container {\nheight: 15px;\nwidth: 100%;\nborder-bottom-left-radius: 0.2rem;\nborder-bottom-right-radius: 0.2rem;\n}\n\n.text-container p {\nwhite-space: nowrap;\noverflow: hidden;\ntext-overflow: ellipsis;\n}\n\n\n.extension {\nposition: absolute;\ntop: 0;\nleft: 100%;\nwidth: 300%;\nheight: 100%;\nbackground-color: #f1f1f1;\ntransform: translateX(-100%);\ntransition: transform 0.5s ease;\n}\n\n.card-wrapper.cardFlipped .extension {\ntransform: translateX(0);\n}\n\n\n\n\n\n@media (max-width: 768px) {\n  .card-wrapper {\n    min-width: 50px;\n  }\n  .author-card {\n    width: 100%;\n  }\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* OG Web2 Version with Semantic UI Cards */\n\n/* \n.cardImage {\n  width: 100%;\n  height: auto;\n  object-fit: cover;\n  padding: .5rem;\n}\n\n.cardContainer {\n  perspective: 1000px;\n  transition: transform 1s;\n  transform-style: preserve-3d;\n  position: relative;\n  width: 100%;\n  height: 100%;\n}\n\n.cardFlipped {\n  transform: rotateY(180deg);\n}\n\n.cardFront,\n.cardBack {\n  backface-visibility: hidden;\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border-radius: 5px;\n  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);\n  background: #fbfbf5 !important;\n  transition: transform 0.6s;\n  transform-style: preserve-3d;\n}\n\n.cardBack {\n  transform: rotateY(180deg);\n  -ms-overflow-style: none; \n  scrollbar-width: none; \n  padding: 10px; \n  display: flex;\n  flex-direction: column;\n  justify-content: space-between;\n}\n\n.cardBack::-webkit-scrollbar {\n  display: none;\n}\n\n\n\n\n */\n\n\n\n\n\n\n\n\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/AuthorCards.css"],"names":[],"mappings":"AAAA;AACA,WAAW;AACX,YAAY;AACZ,kBAAkB;AAClB,4BAA4B;AAC5B,qBAAqB;AACrB,0BAA0B;AAC1B;;AAEA;EACE,+BAA+B;EAC/B,eAAe;EACf,gBAAgB;AAClB;;;AAGA;AACA,0BAA0B;AAC1B;;AAEA;AACA,kBAAkB;AAClB,WAAW;AACX,YAAY;AACZ,2BAA2B;AAC3B,yBAAyB;AACzB,qBAAqB;AACrB,gBAAgB;AAChB;;AAEA;AACA,mBAAmB;AACnB,aAAa;AACb,sBAAsB;AACtB,mBAAmB;AACnB,8CAA8C;AAC9C;;AAEA;AACA,4EAA4E;AAC5E;;AAEA;AACA,0BAA0B;AAC1B,mBAAmB;AACnB,kBAAkB;AAClB,aAAa;AACb,gBAAgB;AAChB;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,qBAAqB;AACvB;;;AAGA;AACA,mBAAmB;AACnB,YAAY;AACZ,aAAa;AACb;;AAEA;AACA,yBAAyB;AACzB,WAAW;AACX,kCAAkC;AAClC;;AAEA;EACE,uCAAuC;EACvC,eAAe;EACf,gBAAgB;EAChB,mBAAmB;AACrB;;AAEA;AACA,UAAU;AACV;;AAEA;AACA,mBAAmB;AACnB,gBAAgB;AAChB,uBAAuB;AACvB;;AAEA;AACA,wBAAwB;AACxB;;AAEA;EACE;IACE,eAAe;EACjB;EACA;IACE,WAAW;EACb;AACF;;;;;;;;;;;;;;;;;;;;;;AAsBA,2CAA2C;;AAE3C;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAqDE","sourcesContent":[".author-card {\nwidth: 120%;\nheight: 145%;\nposition: relative;\ntransform-style: preserve-3d;\ntransform: rotateY(0);\ntransition: transform 0.5s;\n}\n\n.author-name {\n  font-family: 'Georgia', cursive;\n  font-size: 18px;\n  font-weight: 500;\n}\n\n\n.card-wrapper.cardFlipped .author-card {\ntransform: rotateY(180deg);\n}\n\n.card-face {\nposition: absolute;\nwidth: 100%;\nheight: 100%;\nbackface-visibility: hidden;\nborder: 1px solid #252525;\nborder-radius: 0.5rem;\noverflow: hidden;\n}\n\n.card-front {\nbackground: #fbfbf8;\ndisplay: flex;\nflex-direction: column;\nalign-items: center;\nbox-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);\n}\n\n.card-front:hover {\nbox-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);\n}\n\n.card-back {\ntransform: rotateY(180deg);\nbackground: #fbfbf8;\ntext-align: center;\npadding: 10px;\noverflow-y: auto;\n}\n\n.card-back::-webkit-scrollbar {\n  display: none;\n}\n\n.card-back:-ms-overflow-style {\n  display: none;\n}\n\n.card-back {\n  scrollbar-width: none;\n}\n\n\n.card-wrapper {\nperspective: 1000px;\nwidth: 150px;\nheight: 150px;\n}\n\n.image-container {\nheight: calc(100% - 25px);\nwidth: 100%;\nborder-bottom: 1.4px solid #252525;\n}\n\n.streamed-description {\n  font-family: 'Times New Roman', cursive;\n  font-size: 1rem;\n  font-weight: 400;\n  line-height: 1.2rem;\n}\n\n.text-container {\nwidth: 95%;\n}\n\n.text-container p {\nwhite-space: nowrap;\noverflow: hidden;\ntext-overflow: ellipsis;\n}\n\n.card-wrapper.cardFlipped .extension {\ntransform: translateX(0);\n}\n\n@media (max-width: 68px) {\n  .card-wrapper {\n    min-width: 50px;\n  }\n  .author-card {\n    width: 100%;\n  }\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* OG Web2 Version with Semantic UI Cards */\n\n/* \n.cardImage {\n  width: 100%;\n  height: auto;\n  object-fit: cover;\n  padding: .5rem;\n}\n\n.cardContainer {\n  perspective: 1000px;\n  transition: transform 1s;\n  transform-style: preserve-3d;\n  position: relative;\n  width: 100%;\n  height: 100%;\n}\n\n.cardFlipped {\n  transform: rotateY(180deg);\n}\n\n.cardFront,\n.cardBack {\n  backface-visibility: hidden;\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border-radius: 5px;\n  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);\n  background: #fbfbf5 !important;\n  transition: transform 0.6s;\n  transform-style: preserve-3d;\n}\n\n.cardBack {\n  transform: rotateY(180deg);\n  -ms-overflow-style: none; \n  scrollbar-width: none; \n  padding: 10px; \n  display: flex;\n  flex-direction: column;\n  justify-content: space-between;\n}\n\n.cardBack::-webkit-scrollbar {\n  display: none;\n}\n\n\n\n\n */\n\n\n\n\n\n\n\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -60233,6 +60249,16 @@ var AUTHOR_INFO = [
         "cluster": "Benjamin_Franklin",
         "image": "Benjamin Franklin.png",
         "description": "Pioneering Visionary & Distinguished Polymath (1706-1790) | Trailblazer in the Discovery of Electricity & Foundational Contributor to the Birth of the United States | Illustrious Founder of the American Philosophical Association | Co-Author of the Declaration of Independence | A luminary who, despite his monumental achievements, once humbly professed, 'I may not be a man of unparalleled greatness, but I am, undeniably, a man of virtue and worth.'",
+        "books": [
+            "The Complete Works in Philosophy Politics and Morals of the late Dr Benjamin Franklin Vol 1 of 3",
+            "The Complete Works in Philosophy Politics and Morals of the late Dr Benjamin Franklin Vol 2 of 3",
+            "The Complete Works in Philosophy Politics and Morals of the late Dr Benjamin Franklin Vol 3 of 3",
+        ],
+        "book_descriptions": [
+            "Volume 1 presents an extensive compilation of Benjamin Franklin’s thoughts, covering his insights into philosophy and showcasing his intellect and rational approach to life’s various aspects.",
+            "In Volume 2, the exploration into Franklin's works continues, presenting his perspectives on politics, his views on governance, democracy, and the foundational principles that underlie the American political landscape.",
+            "Volume 3 concludes the series, delving into Franklin’s moral views, his understanding of human nature, ethics, and the guiding principles that he believed should underpin a just and prosperous society."
+        ],
     },
     {
         "id": "The Bible",
@@ -60240,6 +60266,142 @@ var AUTHOR_INFO = [
         "cluster": "The_Bible",
         "image": "The Bible.png",
         "description": "The Entire King James Bible, Separated and Indexed by Verse.",
+        "books": [
+            "Amos",
+            "Ecclesiastes",
+            "Ezra",
+            "Habakkuk",
+            "Haggai",
+            "Hosea",
+            "Joel",
+            "Jonah",
+            "Malachi",
+            "Micah",
+            "Nahum",
+            "Obadiah",
+            "The Acts of the Apostles",
+            "The Book of Daniel",
+            "The Book of Esther",
+            "The Book of Job",
+            "The Book of Joshua",
+            "The Book of Judges",
+            "The Book of Nehemiah",
+            "The Book of Psalms",
+            "The Book of Ruth",
+            "The Book of the Prophet Ezekiel",
+            "The Book of the Prophet Isaiah",
+            "The Book of the Prophet Jeremiah",
+            "The Epistle of Paul the Apostle to Philemon",
+            "The Epistle of Paul the Apostle to the Colossians",
+            "The Epistle of Paul the Apostle to the Ephesians",
+            "The Epistle of Paul the Apostle to the Galatians",
+            "The Epistle of Paul the Apostle to the Hebrews",
+            "The Epistle of Paul the Apostle to the Philippians",
+            "The Epistle of Paul the Apostle to the Romans",
+            "The Epistle of Paul the Apostle to Titus",
+            "The Fifth Book of Moses Called Deuteronomy",
+            "The First Book of Moses Called Genesis",
+            "The First Book of Samuel",
+            "The First Book of the Chronicles",
+            "The First Book of the Kings",
+            "The First Epistle General of John",
+            "The First Epistle General of Peter",
+            "The First Epistle of Paul the Apostle to the Corinthians",
+            "The First Epistle of Paul the Apostle to the Thessalonians",
+            "The First Epistle of Paul the Apostle to Timothy",
+            "The Fourth Book of Moses Called Numbers",
+            "The General Epistle of James",
+            "The General Epistle of Jude",
+            "The Gospel According to Saint John",
+            "The Gospel According to Saint Luke",
+            "The Gospel According to Saint Mark",
+            "The Gospel According to Saint Matthew",
+            "The Lamentations of Jeremiah",
+            "The Proverbs",
+            "The Revelation of Saint John the Divine",
+            "The Second Book of Moses Called Exodus",
+            "The Second Book of Samuel",
+            "The Second Book of the Chronicles",
+            "The Second Book of the Kings",
+            "The Second Epistle General of John",
+            "The Second Epistle of Paul the Apostle to the Corinthians",
+            "The Second Epistle of Paul the Apostle to the Thessalonians",
+            "The Second Epistle of Paul the Apostle to Timothy",
+            "The Second General Epistle of Peter",
+            "The Song of Solomon",
+            "The Third Book of Moses Called Leviticus",
+            "The Third Epistle General of John",
+            "Zechariah",
+            "Zephaniah",
+        ],
+        book_descriptions: [
+            "Amos delivers harsh warnings to the Northern Kingdom of Israel, condemning them for their sins and injustices, and foretelling of destruction and exile.",
+            "Ecclesiastes delves into the futility of human endeavors, urging readers to find fulfillment and joy in the fear of God rather than the pursuits of life.",
+            "Ezra narrates the return of the Jews from Babylonian exile and their endeavors to rebuild the temple in Jerusalem.",
+            "Habakkuk consists of dialogues between the prophet and God, addressing the problem of why God allows suffering and injustice.",
+            "Haggai encourages the Jewish people to rebuild the temple, assuring them of God’s presence and support.",
+            "Hosea’s marriage to an unfaithful wife serves as a metaphor for the relationship between God and Israel.",
+            "Joel prophesizes a locust plague and a future divine judgment, calling people to repentance and emphasizing God’s mercy.",
+            "Jonah tells the story of the reluctant prophet who tries to flee from God’s command to preach repentance to the city of Nineveh.",
+            "Malachi addresses the spiritual indifference of the Israelites after their return from exile and calls them back to faithfulness.",
+            "Micah brings a message of judgment and hope to both Israel and Judah, highlighting God’s justice and mercy.",
+            "Nahum prophesizes the fall of Nineveh, bringing a message of comfort to the oppressed people of Judah.",
+            "Obadiah conveys God’s judgment against the nation of Edom, who betrayed the people of Judah.",
+            "The Acts of the Apostles documents the early history of the Christian Church, chronicling the actions of Jesus’ apostles after His ascension.",
+            "The Book of Daniel tells of Daniel’s experiences and visions in Babylon, including prophecies of future kingdoms and the end times.",
+            "The Book of Esther recounts how Esther, a Jewish queen, bravely saves her people from extermination in Persia.",
+            "The Book of Job explores themes of suffering and patience as Job endures great loss and illness, seeking understanding.",
+            "The Book of Joshua describes the conquest and settlement of Canaan by the Israelites under Joshua’s leadership.",
+            "The Book of Judges tells of the leaders who governed Israel between Joshua and Samuel, detailing their victories and failures.",
+            "The Book of Nehemiah details Nehemiah’s efforts to rebuild Jerusalem's walls and restore the community after exile.",
+            "The Book of Psalms is a collection of religious songs, prayers, and poems, expressing the emotions and experiences of the psalmists.",
+            "The Book of Ruth tells the story of Ruth and Naomi, exemplifying loyalty, kindness, and God’s providential care.",
+            "The Book of the Prophet Ezekiel contains Ezekiel’s prophecies, including visions of the fall of Jerusalem and the restoration of Israel.",
+            "The Book of the Prophet Isaiah presents Isaiah’s prophecies, foretelling the Messiah and calling Israel to repentance.",
+            "The Book of the Prophet Jeremiah contains Jeremiah’s messages of warning to Judah and predictions of its fall.",
+            "Paul’s letter to Philemon addresses the issue of slavery, appealing for grace and reconciliation.",
+            "Paul’s letter to the Colossians affirms Christ’s supremacy and counters false teachings within the church.",
+            "Paul's letter to the Ephesians expounds on the themes of unity in Christ and the Christian’s calling in the world.",
+            "Paul’s letter to the Galatians defends the true gospel against judaizing influences, highlighting justification by faith.",
+            "The letter to the Hebrews elaborates on Christ’s supremacy and the New Covenant, encouraging perseverance in faith.",
+            "Paul’s letter to the Philippians emphasizes joy, unity, and humility, providing insight into Christian living.",
+            "Paul’s letter to the Romans outlines key doctrines concerning sin, salvation, and Christian living.",
+            "Paul’s letter to Titus provides instructions for church leadership and practical Christian living.",
+            "Deuteronomy, the fifth book of Moses, recounts Israel’s journey and reiterates the laws and covenant established by God.",
+            "Genesis, the first book of Moses, tells the story of creation, early humanity, and the origins of the Israelite people.",
+            "The First Book of Samuel recounts the establishment of the monarchy in Israel under Saul and David.",
+            "The First Book of the Chronicles provides a genealogical record and history of the Davidic kingdom.",
+            "The First Book of the Kings chronicles the reigns of Solomon and his successors in Israel and Judah.",
+            "John's first epistle assures believers of their eternal life and encourages love, obedience, and discernment.",
+            "Peter's first epistle comforts suffering Christians and exhorts them to holy living.",
+            "Paul’s first letter to the Corinthians addresses various moral and doctrinal issues facing the Corinthian church.",
+            "Paul’s first letter to the Thessalonians encourages the new believers in Thessalonica and addresses questions about the second coming of Christ.",
+            "Paul’s first letter to Timothy provides guidance for Timothy’s leadership in the Ephesian church.",
+            "The Fourth Book of Moses, Numbers, narrates the Israelites’ wilderness journey and their preparations to enter Canaan.",
+            "James’s general epistle gives practical advice for Christian living and emphasizes faith and works.",
+            "Jude’s general epistle warns against false teachers and encourages Christians to persevere in the faith.",
+            "An account that emphasizes the deep love and compassion of Jesus, focusing on his miracles, his crucifixion, and his divine relationship with God the Father.",
+            "A narrative presenting a compassionate and detailed account of the life of Jesus, with an emphasis on his kindness and concern for the marginalized, including a significant amount of Jesus's teachings.",
+            "A concise account of Jesus’s life, focusing on his deeds, his service, and his swift path to crucifixion, presenting a direct and powerful portrayal of his life and mission.",
+            "A comprehensive narrative that begins with Jesus’s genealogy and includes significant teachings, such as the Sermon on the Mount, providing a rich and thorough account of Jesus’s life and mission.",
+            "A poetic and profound expression of grief and sorrow, recounting the destruction of Jerusalem by Babylon in 586 B.C.",
+            "A collection of wise sayings and guidance on living a righteous and prosperous life, traditionally attributed to King Solomon.",
+            "A prophetic and symbolic vision of the end of the world, offering hope and assurance of God’s ultimate victory over evil.",
+            "A historical account of the Israelites' escape from Egypt and their journey to Mount Sinai under the leadership of Moses, including the giving of the Ten Commandments.",
+            "A historical narrative focusing on the reign of King David, his triumphs, failures, and the moral and political challenges he faced.",
+            "A record detailing the history of Israel and Judah, focusing on their religious revival and the rulers who led them back to the worship of God.",
+            "A historical narrative of the kings of ancient Israel, detailing their reigns, the events during their rule, and the impact of their leadership on the nation.",
+            "A brief letter that emphasizes love and truth and warns against false teachings, encouraging adherence to the commandments of Jesus Christ.",
+            "A letter providing counsel and encouragement to the Corinthians, addressing issues of division, morality, and the resurrection of Jesus Christ.",
+            "A letter to the Thessalonians, offering guidance for living a Christian life, encouraging preparedness for the return of Jesus Christ, and offering comfort and assurance in the resurrection.",
+            "A personal letter to Timothy, providing guidance for church leadership and encouragement for perseverance in the faith.",
+            "A letter offering counsel on vigilance against false teachings, the importance of knowledge, and the assurance of God’s promise of eternal life.",
+            "A poetic book celebrating the expression of love within the bounds of marriage, traditionally attributed to King Solomon.",
+            "A detailed outline of the laws, rituals, and practices of the Israelites, providing instructions for worship and community life.",
+            "A brief letter emphasizing the importance of love, truth, and faithful adherence to the teachings of Jesus Christ.",
+            "A book of prophesy, filled with visions of the restoration of Jerusalem, the coming of the Messiah, and the future triumph of good over evil.",
+            "A short prophetic book foretelling the destruction of Jerusalem and Judah, and the eventual restoration of God's people."
+        ],
     },
     {
         "id": "Carl Jung",
@@ -60268,6 +60430,26 @@ var AUTHOR_INFO = [
             "Practice of Psychotherapy",
             "Development of Personality",
             "The Symbolic Life"
+        ],
+        "book_descriptions": [
+            "An exploration into diverse psychiatric cases, providing insight into the developing field of psychiatry in the early 20th century.",
+            "An in-depth examination into the origins of mental diseases, proposing theories related to unconscious factors and early experiences.",
+            "An exploration of Freud's theories, offering critical insight and comparison with Jung's own perspectives on psychoanalysis.",
+            "A deep dive into the significant symbols of transformation and their role within the human psyche.",
+            "A detailed discussion on psychological types, exploring the dimensions of introversion and extraversion, thinking and feeling, and other psychological distinctions.",
+            "An introduction to Jung's foundational concepts in analytical psychology, laying out theories on the human mind and its connection to the world.",
+            "An examination of the structure and dynamics of the psyche, including its different components and their interactions.",
+            "Volume 1 focuses on archetypes and the collective unconscious, elaborating on the universal symbols and ideas present in the human mind.",
+            "Volume 2 presents research into the phenomenology of the self, exploring concepts of identity and individuality.",
+            "A reflective analysis of the challenges facing civilization, including discussions on societal upheaval and the clash of cultures.",
+            "A comparative exploration of psychological perspectives on religion in both Western and Eastern contexts.",
+            "An exploration into the connections between psychology and alchemy, delving into alchemical symbolism and its psychological interpretations.",
+            "A study on alchemical symbolism and its relevance to psychoanalytical interpretations.",
+            "An in-depth exploration of the Mysterium Coniunctionis, an alchemical concept representing the union of opposites.",
+            "An examination of the role of spirit in various forms of human expression including art and literature.",
+            "Insights into the practical aspects of psychotherapy, offering guidance and perspective for practitioners.",
+            "A discussion on the development of personality, examining the factors influencing personality formation and growth.",
+            "A collection of various writings, exploring symbolic expression in human life and its relevance to understanding the human experience.",
         ],
         "sentences_json": 'https://raw.githubusercontent.com/evanmcfarland/A-Statistical-Approach-to-Happiness/main/data/Carl%20Jung/jung_books_sentences.json',
         "segments_json": 'https://raw.githubusercontent.com/evanmcfarland/A-Statistical-Approach-to-Happiness/main/data/Carl%20Jung/jung_books_segments.json',
@@ -60311,6 +60493,36 @@ var AUTHOR_INFO = [
             'The zoology of the voyage of H.M.S. Beagle [vol. 1 of 5]  Fossil mammalia',
             'Darwinism stated by Darwin himself Characteristic passages from the writings of Charles Darwin'
         ],
+        "book_descriptions": [
+            'A detailed narrative of Charles Darwin’s adventurous expedition on the HMS Beagle that shaped his understanding of biology and laid the groundwork for the theory of evolution.',
+            'An exploration of the various ways emotions manifest in humans and animals, supported by rich observations and intricate illustrations.',
+            'The seminal work where Darwin presents his groundbreaking theory of evolution, explaining how species adapt and evolve over generations.',
+            'An intimate look into the life of Charles Darwin, written by the man himself, offering insights into his personal and scientific journey.',
+            'The first volume of a compilation of letters and correspondences by Charles Darwin, providing a closer look at his life and work.',
+            'Continuing from the first volume, this book offers more letters and insights into the life and scientific explorations of Charles Darwin.',
+            'Darwin’s exploration into human evolution and the role of sexual selection in the development of human attributes and behavior.',
+            'A scientific note in which Darwin details the anatomical similarities and differences between humans and apes, focusing on brain structure.',
+            'An exploration into the world of earthworms and their role in the formation of vegetable mould, reflecting on their habits and impact on the earth’s soil.',
+            'A study into the movements and habits of climbing plants, shedding light on their adaptation and survival mechanisms.',
+            'An in-depth study on the formation, structure, and importance of coral reefs, backed by Darwin’s own observations and studies.',
+            'The first volume presenting a collection of unpublished letters by Charles Darwin, offering further insight into his work and thoughts.',
+            'Continuing with more letters, this second volume sheds more light on Darwin’s unpublished thoughts and correspondences.',
+            'An exploration into the geological and volcanic aspects of islands, based on Darwin’s own observations and studies.',
+            'A comprehensive study on the variation observed in animals and plants under domestication, offering insights into artificial selection.',
+            'Darwin’s observations on the geology of South America, based on his travels and studies in the continent.',
+            'A detailed journal chronicling the natural history and geology of the countries visited during the voyage of the HMS Beagle.',
+            'An examination into the different forms of flowers on the same species of plants, exploring diversity and adaptation.',
+            'A complete volume presenting Darwin’s works on coral reefs, volcanic islands, and South American geology.',
+            'A study into the effects of cross and self-fertilisation in plants and their impact on plant evolution and adaptation.',
+            'An exploration into the fascinating world of plant movement, examining the various ways plants adapt to their environment.',
+            'A detailed study on insectivorous plants, shedding light on their unique adaptation and survival mechanisms.',
+            'Two essays written by Darwin in 1842 and 1844 laying down the foundations for his later work on the theory of evolution.',
+            'The first volume of a detailed monograph on the sub-class Cirripedia, focusing on Lepadidae or pedunculated cirripedes.',
+            'A biographical account combining Darwin’s autobiographical chapter and a series of his published letters, offering a comprehensive look at his life.',
+            'The second volume of the monograph on Cirripedia, focusing on the Balanidae or sessile cirripedes, the Verrucidae, and others.',
+            'The first volume of the zoology of the voyage of HMS Beagle, focusing on fossil mammalia.',
+            'A compilation of passages from Darwin’s writings, stating his theories and thoughts on evolution and natural selection in his own words.'
+        ],
         "sentences_json": 'https://drive.google.com/file/d/1bgvrTsDUqWYmoUqVeORNVP3Y2CkL7Kv7/view?usp=share_link',
         "segments_json": 'https://drive.google.com/file/d/1Yh2ey5uxoTSEnA9_L5EXrXLWWo1PnzvN/view?usp=share_link',
         "paragraphs_json": 'https://drive.google.com/file/d/1607oWxOQli9BPL-anOmJ3NuSZgfT5hP6/view?usp=share_link'
@@ -60345,6 +60557,28 @@ var AUTHOR_INFO = [
             'The Will to Power  An Attempted Transvaluation of All Values. Book I and II',
             'The Will to Power  An Attempted Transvaluation of All Values. Book III and IV'
         ],
+        "book_descriptions": [
+            "A philosophical novel that explores the journey of the prophet Zarathustra as he shares his wisdom with the masses, offering insights on morality, life, and the will to power.",
+            "A profound work that challenges traditional notions of morality, proposing a reinterpretation of moral values free from religious preconceptions.",
+            "An exploration into classical philology and its significance, with a particular focus on Homer’s epic poems and their influence on Western education and literature.",
+            "Volume 8 presents a comprehensive look at Nietzsche's thoughts on philology, exploring its development, its practitioners, and its impact on society and education.",
+            "A critical exploration of Christianity, wherein Nietzsche argues that Christian values undermine human creativity and suppress humanity’s natural instincts.",
+            "A compilation exploring Nietzsche's critical views on Richard Wagner, his music, and his cultural influence, complemented by selected aphorisms.",
+            "A critique and exploration of the educational institutions of Nietzsche's time, delving into their goals, methods, and effectiveness.",
+            "Part 2 of a work for free spirits, delving into a range of topics and offering Nietzsche's insights into human nature, morality, and society.",
+            "Part II presents a collection of essays that reflect Nietzsche’s bold and unconventional thinking, offering critique on culture, society, and individuals of his time.",
+            "A philosophical work that explores various themes including morality, religion, and culture, providing insight into human nature and society.",
+            "A compelling examination of the origins and development of tragedy as an art form, juxtaposed with the pessimism pervading Greek culture.",
+            "Volume Two contains essays exploring early Greek philosophy and its impact on Western thought and society.",
+            "Part I contains essays critiquing David Strauss and Richard Wagner, offering insight into their works and influence on society and culture.",
+            "Part 1 explores various philosophical themes, offering Nietzsche’s perspectives on humanity, society, and morality.",
+            "Volume Ten delves into the joyful wisdom, exploring themes of life, death, and the pursuit of happiness and knowledge.",
+            "Volume Seventeen, Nietzsche's autobiographical work, offers insight into his life, works, and philosophical development.",
+            "Volume Sixteen discusses how to philosophize with a hammer, providing a critical examination of idols of his time alongside his work, The Antichrist.",
+            "Volume Thirteen examines the genealogy of morals, presenting Nietzsche’s critique of moral values and exploration of their origins.",
+            "Book I and II attempt a reevaluation of all values, exploring themes of will, power, and their role in shaping society and individuals.",
+            "Book III and IV continue the exploration of the will to power and the attempted transvaluation of all values, providing further insight into Nietzsche’s philosophy."
+        ],
         "sentences_json": 'https://raw.githubusercontent.com/evanmcfarland/A-Statistical-Approach-to-Happiness/main/data/Friedrich%20Nietzsche/nietzsche_books_sentences.json',
         "segments_json": 'https://raw.githubusercontent.com/evanmcfarland/A-Statistical-Approach-to-Happiness/main/data/Friedrich%20Nietzsche/nietzsche_books_segments.json',
         "paragraphs_json": 'https://raw.githubusercontent.com/evanmcfarland/A-Statistical-Approach-to-Happiness/main/data/Friedrich%20Nietzsche/nietzsche_books_paragraphs.json',
@@ -60365,9 +60599,44 @@ var AUTHOR_INFO = [
         "last": "thoreau",
         "image": "thoreaupfp.png",
         "description": "Philosopher & Naturalist (1817-1862) | Wrote on the importance of nature, self-reliance, and simplicity | Lived in a cabin in the woods for two years | I show how we all live shares little resemblance with how we ought to live  | \"I went to the woods because I wished to live deliberately, to front only the essential facts of life, and see if I could not learn what it had to teach, and not, when I came to die, discover that I had not lived.\"",
-        "sentences_json": 'https://drive.google.com/file/d/1_xtiN7xKjD5DXtCFzkPPLxc2XMO6jO1O/view?usp=share_link',
-        "segments_json": 'https://drive.google.com/file/d/1oEY4zWrqb3JGNfMIBDvTatPuNHpy-kzJ/view?usp=share_link',
-        "paragraphs_json": 'https://drive.google.com/file/d/1kpFuTYcNgFyEfeq1dLZcduK4uBoXfG-v/view?usp=share_link'
+        "books": [
+            "A Plea for Captain John Brown Read to the citizens of Concord, Massachusetts on Sunday evening, October thirtieth, eighteen fifty-nine",
+            "A Week on the Concord and Merrimack Rivers",
+            "A Yankee in Canada with Antislavery and reform papers",
+            "Canoeing in the wilderness",
+            "Cape Cod",
+            "Excursions and Poems The Writings of Henry David Thoreau Volume 05 of 20",
+            "Excursions",
+            "Familiar Letters The Writings of Henry David Thoreau Volume 06 of 20",
+            "Journal 01 18371846 The Writings of Henry David Thoreau Volume 07 of 20",
+            "Journal 02 1850September 15 1851 The Writings of Henry David Thoreau Volume 08 of 20",
+            "On the Duty of Civil Disobedience",
+            "Paradise to be Regained",
+            "Poems of Nature",
+            "The Maine Woods The Writings of Henry David Thoreau Volume 03 of 20",
+            "The Service",
+            "Walking",
+            "Wild Apples",
+        ],
+        "book_descriptions": [
+            "A compelling speech that advocates for the moral righteousness of the actions of John Brown, a radical abolitionist who led an armed insurrection against slavery.",
+            "A detailed narrative of Thoreau's boat trip with his brother John along the Concord and Merrimack Rivers, musing on philosophy, history, and the essence of life.",
+            "A travel narrative depicting Thoreau’s experiences in Canada, complemented by a collection of his essays on antislavery and reform.",
+            "A vivid recount of Thoreau's canoeing adventures in the wilderness, illuminating his profound connection with nature and his adept skills in navigating the wild.",
+            "A richly detailed account of Thoreau’s explorations on Cape Cod, providing a unique perspective on the landscape, people, and essence of the place.",
+            "Volume 05 includes Thoreau’s excursions and poems, offering a diverse collection of his writings that reflect his love for nature and his philosophical insights.",
+            "A collection of Thoreau’s essays from his travels, offering observations and reflections on nature, humanity, and life.",
+            "Volume 06 provides a collection of Thoreau's letters, giving readers insight into his personal life, relationships, and thoughts.",
+            "Volume 07 presents Thoreau’s journal entries from 1837 to 1846, showcasing his daily reflections, observations, and deep connection with nature and life.",
+            "Volume 08 continues with Thoreau’s journal entries from 1850 to 1851, offering a closer look at his thoughts, observations, and his profound love for nature.",
+            "An essay that argues for individuals to resist governmental civil injustice, highlighting the moral duty to oppose laws that conflict with individual conscience.",
+            "An essay expressing optimism for humanity’s future, advocating for a return to harmony with nature for the attainment of paradise.",
+            "A collection of Thoreau’s poems reflecting his profound love for nature and his keen observations of the natural world.",
+            "Volume 03 explores Thoreau’s journeys in the Maine Woods, offering vivid descriptions and reflections on the wilderness and its influence on him.",
+            "An essay exploring the concept of service and its relation to a higher moral law, emphasizing inner integrity over external observances.",
+            "An essay highlighting the importance of walking as a means of connecting with nature, promoting inner peace, and fostering physical and mental well-being.",
+            "An essay exploring the history, beauty, and symbolism of wild apples, reflecting Thoreau’s deep love for nature and his keen observational skills."
+        ],
     },
     { "id": "The Occult",
         "category": ["Mysticism", "Psychology", "Religion", "Truth", "Seeking", "Spirituality", "Discovery", "Occult", "Esotericism", "Secrets", "Enlightenment", "Idealism"],
@@ -60375,7 +60644,48 @@ var AUTHOR_INFO = [
         "image": "occultpfp.png",
         "description": "Top 20 Books by Popularity, aggregated by Julie of globalgreyebooks.com: General Book of the Tarot | Black Pullet | Book of Forbidden Knowledge | Grand Grimoire with Great Clavicle of Solomon | The Simon Necronomicon | Book of Ceremonial Magic | Psychic Self Defense | Dogma et Rituel de la Haute Magie Part I | Dogma et Rituel de la Haute Magie Part II | Philosophy of Natural Magic | Goal of Life | Sixth and Seventh Books of Moses | The Chymical Wedding of Christian Rosenkreutz | Secret Teachings of All Ages | Symbolism of the Tarot | The Tarot of the Bohemians | Key of Solomon the King | Mathers Sacred Magic of Abramelin the Mage | Kybalion | Numbers Their Occult Power and Mystic Virtues",
         "books": [
-            'The Occult',
+            "Black Pullet",
+            "Book of Ceremonial Magic",
+            "Book of Forbidden Knowledge",
+            "Dogma et Rituel de la Haute Magie Part I",
+            "Dogma et Rituel de la Haute Magie Part II",
+            "General Book of the Tarot",
+            "Goal of Life",
+            "Grand Grimoire with Great Clavicle of Solomon",
+            "Key of Solomon the King",
+            "Kybalion",
+            "Mathers Sacred Magic of Abramelin the Mage",
+            "Numbers Their Occult Power and Mystic Virtues",
+            "Philosophy of Natural Magic",
+            "Psychic Self Defense",
+            "Secret Teachings of All Ages",
+            "Sixth and Seventh Books of Moses",
+            "Symbolism of the Tarot",
+            "The Chymical Wedding of Christian Rosenkreutz",
+            "The Simon Necronomicon",
+            "The Tarot of the Bohemians",
+        ],
+        "book_descriptions": [
+            "A mystical text allegedly inscribed by a mysterious figure, revealing the art of manipulating magical talismans for protection and magical knowledge.",
+            "A comprehensive guide that explores the theories and practices of ceremonial magic, offering detailed insights into the arcane world of occult rituals and symbols.",
+            "A collection of esoteric knowledge forbidden to the uninitiated, detailing various occult practices, charms, and divinations.",
+            "Part I offers an in-depth exploration into the world of high magic, discussing theories, rituals, and the foundational principles that underlie magical practices.",
+            "Continuing from Part I, Part II further delves into the ritual and practice of high magic, offering deeper insights and practical instructions for the aspiring magician.",
+            "A detailed guide to understanding the Tarot, offering interpretative insights into the symbolism, meanings, and usage of Tarot cards in divination.",
+            "An exploration of life's ultimate purpose, delving into mystical and esoteric theories to uncover the hidden path to enlightenment and self-realization.",
+            "A powerful grimoire revealing the secrets of summoning and controlling powerful spirits, linked to the legendary King Solomon.",
+            "A comprehensive manual detailing the key of Solomon, revealing the ancient secrets of invoking and commanding spirits and forces.",
+            "A foundational text on hermetic philosophy, exploring the principles of mentalism, correspondence, and other hermetic laws.",
+            "Explores the sacred magic of Abramelin the Mage, detailing the ritual processes and spiritual exercises for attaining higher knowledge and divine wisdom.",
+            "A thorough examination of numbers and their esoteric significance, exploring their hidden meanings and the power they hold within the occult.",
+            "A treatise on natural magic, exploring the philosophical principles that underlie the practice of magical arts and the connection with natural forces.",
+            "A guide on how to defend oneself against psychic attacks, offering practical advice and techniques for psychic self-protection.",
+            "A comprehensive exploration of the hidden teachings of various ages, delving into the mysteries of ancient symbols, rituals, and esoteric philosophies.",
+            "Explores the magical and mystical significance of the Sixth and Seventh Books of Moses, offering insights into their teachings and practices.",
+            "A deep dive into the symbolism within the Tarot, revealing the profound meanings embedded within the cards and their connections to various esoteric traditions.",
+            "A mystical narrative describing the allegorical journey of Christian Rosenkreutz, exploring alchemical and spiritual enlightenment.",
+            "Presents a collection of ancient Sumerian and Babylonian texts, offering insights into the lore, magick, and spirituality of the ancient Near East.",
+            "A comprehensive guide to understanding and practicing Tarot, offering insights into card meanings, symbolism, and their use in divination and spiritual growth."
         ],
     },
     {
@@ -60413,9 +60723,33 @@ var AUTHOR_INFO = [
             'The Perfect Sermon, or The Asclepius',
             'The Virgin of The World'
         ],
-        "sentences_json": 'https://raw.githubusercontent.com/evanmcfarland/A-Statistical-Approach-to-Happiness/main/data/hermes/hermes_books_sentences.json',
-        "segments_json": 'https://raw.githubusercontent.com/evanmcfarland/A-Statistical-Approach-to-Happiness/main/data/hermes/hermes_books_segments.json',
-        "paragraphs_json": 'https://raw.githubusercontent.com/evanmcfarland/A-Statistical-Approach-to-Happiness/main/data/hermes/hermes_books_paragraphs.json'
+        "book_descriptions": [
+            "A comprehensive treatise discussing the ancient rituals and knowledge surrounding initiations, presented through a conversation between Hermes and Asclepios.",
+            "A seminal text offering insights and wisdom from Thoth the Atlantean, revealing ancient secrets of alchemy, life, and the universe.",
+            "A collection of fragments offering insights from the conversations of Hermes with his son, Tatios, discussing various metaphysical and philosophical issues.",
+            "Pieces of Hermes' teachings to Ammon, discussing ancient wisdom, spirituality, and the cosmos.",
+            "A collection of Hermes’ fragmented writings that explore various aspects of hermetic wisdom, spirituality, and understanding of the universe.",
+            "The first book of The Corpus Hermeticum wherein Poemandres shares profound spiritual wisdom and insights into the nature of the universe and humanity.",
+            "The second book of The Corpus Hermeticum, presenting teachings and wisdom conveyed to Asclepius about the divine and the nature of reality.",
+            "The third book of The Corpus Hermeticum offers a sacred sermon, expounding on spiritual wisdom and divine truths.",
+            "The fourth book discusses the concept of The Cup or Monad, exploring the themes of unity, wholeness, and the interconnection of all things.",
+            "The fifth book explores the paradoxical nature of God, elucidating how the unmanifest God is most manifest in the cosmos.",
+            "The sixth book highlights the idea that true goodness resides in God alone, while it is absent elsewhere.",
+            "The seventh book emphasizes the ill of ignorance about God, advocating the importance of knowledge and understanding of the divine.",
+            "The eighth book provides insights into the eternal nature of existence, debunking the human misconceptions regarding destruction and death.",
+            "This book delves into the intricacies of thought and sense, discussing their roles and functions in understanding and perceiving reality.",
+            "The tenth book, titled The Key, unlocks profound hermetic wisdom and insights, offering guidance and understanding to seekers of truth.",
+            "The eleventh book presents a discourse of Mind unto Hermes, revealing deeper understanding and insights into the nature of the mind and reality.",
+            "The twelfth book explores the concept of the Common Mind, discussing its attributes, functions, and significance in the grand scheme of existence.",
+            "The thirteenth book provides a secret sermon on the mountain, offering spiritual enlightenment and wisdom from Hermes.",
+            "The fourteenth book contains a letter from Thrice-Greatest Hermes to Asclepius, imparting profound hermetic wisdom and teachings.",
+            "The fifteenth book presents the definitions given by Asclepius to King Ammon, elucidating various hermetic concepts and principles.",
+            "The sixteenth book contains teachings of Asclepius to the King, offering royal wisdom and guidance on rulership and governance.",
+            "The seventeenth book, The Encomium of Kings, extols the virtues and responsibilities of kingship, providing insights into righteous and wise rulership.",
+            "This book offers the definitions of Asclepios, presenting a detailed exploration of hermetic wisdom and principles.",
+            "Also known as The Asclepius, The Perfect Sermon imparts profound spiritual and philosophical teachings and insights from Hermes.",
+            "The Virgin of The World unveils hermetic wisdom and teachings regarding the cosmos, divinity, and the intricate workings of the universe."
+        ],
     },
     {
         "id": "Sigmund Freud",
@@ -60426,10 +60760,49 @@ var AUTHOR_INFO = [
         "image": "freudpfp.png",
         "description": "Father of Psychoanalysis (1856-1939) | My theories on the unconscious mind revolutionized psychology | My work on dreams, the ego, and the id are still studied today | My ideas on the human psyche have influenced countless artists and writers | My work on sexuality and the Oedipus complex are still debated today | \"The mind is like an iceberg, it floats with one-seventh of its bulk above water.\"",
         "books": [
-            'A General Introduction to Psychoanalysis',
-            'tbd'
+            "A General Introduction to Psychoanalysis",
+            "An Outline of PsychoAnalysis",
+            "Beyond the Pleasure Principle",
+            "Civilization and Its Discontents",
+            "Delusion and Dream   an Interpretation in the Light of Psychoanalysis of Gradiva",
+            "Dream Psychology  Psychoanalysis for Beginners",
+            "Group Psychology and The Analysis of The Ego",
+            "Inhibitions Symptoms and Anxiety",
+            "Jokes and Their Relation to The Unconscious",
+            "Leonardo da Vinci  A Psychosexual Study of an Infantile Reminiscence",
+            "Moses and Monotheism",
+            "PsychoAnalysis and the War Neuroses",
+            "Psychopathology of Everyday Life",
+            "Reflections on War and Death",
+            "Studies On Hysteria",
+            "The Ego and the Id",
+            "The Future of an Illusion",
+            "The Interpretati on of Dreams",
+            "Three Contributions to the Theory of Sex",
+            "Totem and Taboo Resemblances Between the Psychic Lives of Savages and Neurotics",
         ],
-        "sentences_json": 'https://raw.githubusercontent.com/evanmcfarland/A-Statistical-Approach-to-Happiness/main/data/sigmund_freud/sigmund_freud_sentences.json',
+        "book_descriptions": [
+            "A foundational text where Freud systematically outlines the key principles and concepts of psychoanalysis, providing a comprehensive overview for newcomers to the field.",
+            "This work succinctly outlines Freud's theories on the mind and its workings, making psychoanalytic concepts more accessible to a broad audience.",
+            "In this groundbreaking work, Freud explores the forces that drive humans beyond the pursuit of pleasure, introducing the concept of the death drive.",
+            "Freud analyzes the conflict between individual instinctual desires and the repressive constraints of civilization, examining the resultant discontent.",
+            "Freud provides a psychoanalytic interpretation of Wilhelm Jensen's novel Gradiva, exploring themes of fantasy, delusion, and dreams.",
+            "An introductory text that offers a comprehensive and accessible exploration of dream psychology and psychoanalytic principles for beginners.",
+            "Freud delves into the intricacies of group dynamics, exploring how individuals' egos and unconscious minds operate within a collective.",
+            "This work explores the causes and implications of inhibitions, symptoms, and anxiety, shedding light on their psychoanalytic interpretations.",
+            "Freud examines the psychological mechanisms behind humor, establishing a connection between jokes and the unconscious mind.",
+            "This text presents a psychosexual analysis of Leonardo da Vinci, exploring his art and life through the lens of infantile reminiscence.",
+            "Freud discusses the historical Moses, monotheism, and its influence on religion and civilization, presenting psychoanalytic insights.",
+            "This book examines the psychological effects of World War I, offering a psychoanalytic perspective on war neuroses.",
+            "Freud explores the psychological underpinnings of everyday errors, slips, and forgetfulness, revealing the role of the unconscious in these phenomena.",
+            "In this contemplative work, Freud discusses the psychological and philosophical implications of war and death on the human psyche.",
+            "This pioneering work delves into the study of hysteria, exploring case studies and discussing Freud’s collaborative work with Breuer.",
+            "Freud delineates the functions and interactions of the ego, super ego, and id, offering insights into human behavior and mental processes.",
+            "Freud examines religious illusion and its role in society, offering a critical perspective on religion’s future.",
+            "This seminal work presents Freud's exploration and analysis of dreams, revealing their significance in understanding the unconscious mind.",
+            "In this work, Freud discusses fundamental aspects of sexuality including sexual development and aberrations.",
+            "Freud investigates the parallels between the psychic lives of savages and neurotics, exploring totemism and taboo in this context."
+        ],
     },
 ];
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AUTHOR_INFO);
@@ -60781,102 +61154,591 @@ var AUTHOR_INFO = [
 
 /***/ }),
 
-/***/ "./src/ugd_frontend/src/contexts/CardStateContext.tsx":
-/*!************************************************************!*\
-  !*** ./src/ugd_frontend/src/contexts/CardStateContext.tsx ***!
-  \************************************************************/
+/***/ "./src/ugd_frontend/src/cards/AuthorCard.tsx":
+/*!***************************************************!*\
+  !*** ./src/ugd_frontend/src/cards/AuthorCard.tsx ***!
+  \***************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   AuthorCardProvider: () => (/* binding */ AuthorCardProvider),
-/* harmony export */   useCardState: () => (/* binding */ useCardState),
-/* harmony export */   useResetCards: () => (/* binding */ useResetCards)
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
+/* harmony import */ var _styles_AuthorCards_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/AuthorCards.css */ "./src/ugd_frontend/styles/AuthorCards.css");
+
+
+var AuthorCard = function (_a) {
+    var image = _a.image, title = _a.title, onCardClick = _a.onCardClick, flipped = _a.flipped, description = _a.description;
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "\n          card-wrapper \n          ".concat(flipped ? 'cardFlipped transform rotate-y-180' : '', " \n          transition-transform duration-500 ease-in-out \n          perspective-[1000px] w-150 h-150\n        "), onClick: onCardClick },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-card relative transform-gpu transition-transform duration-500 ease-in-out" },
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-front absolute inset-0 bg-[#fbfbf8] border border-[#252525] rounded-[.5rem] flex flex-col items-center" },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "image-container w-full h-full minus-mb-[25px] overflow-hidden rounded-t-[.5rem] shadow-inner" },
+                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", { src: image, className: "object-cover w-full h-full", alt: title })),
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "text-container w-[95%] h-[15px] bg-gray-100 rounded-b-lg flex items-center justify-center" },
+                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "overflow-hidden overflow-ellipsis author-name" }, title))),
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-back absolute inset-0 bg-[#fbfbf8] text-center p-10 overflow-y-auto" },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "streamed-description" }, description)))));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AuthorCard);
+
+
+/***/ }),
+
+/***/ "./src/ugd_frontend/src/cards/BookCard.tsx":
+/*!*************************************************!*\
+  !*** ./src/ugd_frontend/src/cards/BookCard.tsx ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _styles_AuthorCards_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/AuthorCards.css */ "./src/ugd_frontend/styles/AuthorCards.css");
+
+
+var BookCard = function (_a) {
+    var image = _a.image, title = _a.title, onCardClick = _a.onCardClick, flipped = _a.flipped, description = _a.description;
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "\n          card-wrapper \n          ".concat(flipped ? 'cardFlipped transform rotate-y-180' : '', " \n          transition-transform duration-500 ease-in-out \n          perspective-[1000px] w-150 h-150\n        "), onClick: onCardClick },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "book-card relative transform-gpu transition-transform duration-500 ease-in-out" },
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-front absolute inset-0 bg-[#fbfbf8] border border-[#252525] rounded-[.5rem] flex flex-col items-center" },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "image-container w-full h-full minus-mb-[25px] overflow-hidden rounded-t-[.5rem] shadow-inner" },
+                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", { src: image, className: "object-cover w-full h-full", alt: title })),
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "text-container w-[95%] h-[15px] bg-gray-100 rounded-b-lg flex items-center justify-center" },
+                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "overflow-hidden overflow-ellipsis author-name" }, title))),
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-back absolute inset-0 bg-[#fbfbf8] text-center p-10 overflow-y-auto" },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "streamed-description" }, description)))));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BookCard);
+
+
+/***/ }),
+
+/***/ "./src/ugd_frontend/src/cards/BookCards.tsx":
+/*!**************************************************!*\
+  !*** ./src/ugd_frontend/src/cards/BookCards.tsx ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _BookCard__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BookCard */ "./src/ugd_frontend/src/cards/BookCard.tsx");
+
+
+var BookCards = function (_a) {
+    var book = _a.book;
+    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), hasFlipped = _b[0], setHasFlipped = _b[1];
+    var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), cardFlipped = _c[0], setCardFlipped = _c[1];
+    var shouldStartStreaming = hasFlipped;
+    var streamedDescription = "Demo description for now";
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+        if (cardFlipped && !hasFlipped) {
+            setHasFlipped(true);
         }
-        return t;
+    }, [cardFlipped]);
+    var handleClick = function () {
+        setCardFlipped(!cardFlipped);
     };
-    return __assign.apply(this, arguments);
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "\n        author-container flex\n        ".concat(cardFlipped ? 'expanded w-auto' : 'w-[150px]', "\n      ") },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_BookCard__WEBPACK_IMPORTED_MODULE_1__["default"], { image: "/public".concat(book.imagePath), title: book.title, onCardClick: handleClick, flipped: cardFlipped, description: streamedDescription })));
 };
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BookCards);
 
-var CardStateContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)({
-    cardState: {},
-    setCardState: function () { },
-    activeChat: null,
-    setActiveChat: function () { },
-    resetCards: function () { },
-});
-var AuthorCardProvider = function (_a) {
-    var children = _a.children;
-    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({}), cardState = _b[0], setCardState = _b[1];
-    var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null), activeChat = _c[0], setActiveChat = _c[1];
-    var resetCards = function () {
-        var resetState = Object.fromEntries(Object.entries(cardState).map(function (_a) {
-            var key = _a[0], value = _a[1];
-            return [key, __assign(__assign({}, value), { isFlipped: false })];
-        }));
-        setCardState(resetState);
-    };
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(CardStateContext.Provider, { value: { cardState: cardState, setCardState: setCardState, activeChat: activeChat, setActiveChat: setActiveChat, resetCards: resetCards } }, children));
-};
-var useResetCards = function () {
-    var _a = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(CardStateContext), cardState = _a.cardState, setCardState = _a.setCardState;
-    var resetCards = function () {
-        var resetState = Object.fromEntries(Object.entries(cardState).map(function (_a) {
-            var key = _a[0], value = _a[1];
-            return [key, __assign(__assign({}, value), { isFlipped: false })];
-        }));
-        setCardState(resetState);
-    };
-    return resetCards;
-};
-var useCardState = function (id) {
-    var _a = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(CardStateContext), cardState = _a.cardState, setCardState = _a.setCardState, activeChat = _a.activeChat, setActiveChat = _a.setActiveChat;
-    var defaultState = cardState[id] || { isFlipped: false, startStreaming: false, chatMode: false };
-    var state = __assign(__assign({}, defaultState), cardState[id]);
-    var flipCard = function () {
-        setCardState(function (prevState) {
-            var _a;
-            var _b, _c, _d, _e;
-            var wasFlippedBefore = (_b = prevState[id]) === null || _b === void 0 ? void 0 : _b.isFlipped;
-            var shouldStartStreaming = ((_c = prevState[id]) === null || _c === void 0 ? void 0 : _c.isFlipped) == null;
-            return __assign(__assign({}, prevState), (_a = {}, _a[id] = __assign(__assign({}, prevState[id]), { isFlipped: !((_d = prevState[id]) === null || _d === void 0 ? void 0 : _d.isFlipped), startStreaming: shouldStartStreaming ? true : (_e = prevState[id]) === null || _e === void 0 ? void 0 : _e.startStreaming }), _a));
-        });
-    };
-    var startChat = function () {
-        console.log(id);
-        setActiveChat(id);
-        setCardState(function (prevState) {
-            var _a;
-            return (__assign(__assign({}, prevState), (_a = {}, _a[id] = __assign(__assign({}, prevState[id]), { chatMode: true }), _a)));
-        });
-    };
-    var stopChat = function () {
-        setActiveChat(null);
-        setCardState(function (prevState) {
-            var _a;
-            return (__assign(__assign({}, prevState), (_a = {}, _a[id] = __assign(__assign({}, prevState[id]), { chatMode: false }), _a)));
-        });
-    };
-    return {
-        cardState: state,
-        flipCard: flipCard,
-        startChat: startChat,
-        stopChat: stopChat,
-        activeChat: activeChat,
-        setActiveChat: setActiveChat,
-    };
-};
 
+/***/ }),
+
+/***/ "./src/ugd_frontend/src/semantic-library/VirtualBookshelf.tsx":
+/*!********************************************************************!*\
+  !*** ./src/ugd_frontend/src/semantic-library/VirtualBookshelf.tsx ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _cards_BookCards__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../cards/BookCards */ "./src/ugd_frontend/src/cards/BookCards.tsx");
+
+
+var VirtualBookShelfComponent = function (_a) {
+    var author = _a.author;
+    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({}), groupedBooks = _b[0], setGroupedBooks = _b[1];
+    var booksByThisAuthor = groupedBooks[author] || [];
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+        fetch('/public/books.json')
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+            var authorGroups = {};
+            data.forEach(function (book) {
+                if (!authorGroups[book.author]) {
+                    authorGroups[book.author] = [];
+                }
+                authorGroups[book.author].push(book);
+            });
+            setGroupedBooks(authorGroups);
+        });
+    }, []);
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null,
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { style: { width: '100%', overflowX: 'auto', whiteSpace: 'nowrap' } },
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { style: { display: 'inline-block' } }, booksByThisAuthor.map(function (book, bookIndex) { return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { key: bookIndex, style: { display: 'inline-block' } },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_cards_BookCards__WEBPACK_IMPORTED_MODULE_1__["default"], { book: {
+                        id: book.title,
+                        description: "",
+                        categories: [],
+                        imagePath: book.imagePath,
+                        title: book.title, // passing title
+                    } }))); })))));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (VirtualBookShelfComponent);
+// return (
+//   <div className="relative w-3/5 left-0 top-4 font-serif text-center text-gray-300" style={{ backgroundColor: '#F0F0F0' }}>
+//     <div className="flex flex-col overflow-auto">
+//       <div className="flex flex-nowrap overflow-x-auto w-full p-2 rounded-lg shadow-lg" style={{ backgroundColor: '#E0E0E0' }}>
+//         {booksByThisAuthor.map((book, bookIndex) => (
+//           <div className="flex-shrink-0 p-0 pr-4 transition-transform duration-400 relative transform hover:scale-105 hover:z-10" key={bookIndex}>
+//             <div 
+//               className="flex flex-col w-36 cursor-pointer rounded-lg shadow-md hover:shadow-lg" 
+//               style={{ backgroundColor: '#D0D0D0' }}
+//               onClick={() => handleReadBookClick(book.author, book.title)}
+//             >
+//               <div className="p-2 flex items-center justify-center">
+//                 <img
+//                   src={`/public${book.imagePath}`}
+//                   alt={book.title}
+//                   className="w-9/10 object-cover object-center rounded-t-lg"
+//                 />
+//               </div>
+//               <div className="text-black font-bold text-md font-CALIBRI truncate h-16 leading-snug p-2 rounded-b-lg">
+//                 {book.title}
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   </div>
+// );
+// // OG No Styles
+// return (
+//   <div>
+//     <div style={{ width: '100%', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+//       <div style={{ display: 'inline-block' }}>
+//         {booksByThisAuthor.map((book, bookIndex) => (
+//           <div key={bookIndex} style={{ display: 'inline-block' }}>
+//             <div onClick={() => handleReadBookClick(book.author, book.title)}>
+//               <div>
+//                 <img
+//                   src={`/public${book.imagePath}`}
+//                   alt={book.title}
+//                 />
+//               </div>
+//               <div>
+//                 {book.title}
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   </div>
+// );
+// OG with all the facny styling.
+// // Semantic UI Carousel version w/o shuffled books.
+// import React, { useState, useEffect } from 'react';
+// import { handleReadBookClick } from '../../utils/handleReadBookClick';
+// import { Card, Image, Segment } from 'semantic-ui-react';
+// import '../../styles/VirtualBookshelf.css';
+// interface Book {
+//   author: string;
+//   title: string;
+//   imagePath: string;
+// }
+// const VirtualBookShelfComponent = ({ author }: { author: string }) => {
+//   const [groupedBooks, setGroupedBooks] = useState<{ [author: string]: Book[] }>({});
+//   const booksByThisAuthor = groupedBooks[author] || [];
+//   useEffect(() => {
+//     fetch('/public/books.json')
+//       .then((response) => response.json())
+//       .then((data: Book[]) => {
+//         const authorGroups: { [author: string]: Book[] } = {};
+//         data.forEach((book) => {
+//           if (!authorGroups[book.author]) {
+//             authorGroups[book.author] = [];
+//           }
+//           authorGroups[book.author].push(book);
+//         });
+//         setGroupedBooks(authorGroups);
+//       });
+//   }, []);
+//   return (
+//     <div className="✍️">
+//       <div className="🌐🌈">
+//         <Segment
+//           className={`🌟 📜 🕵️‍♀️📜`}
+//           style={{ display: 'flex', overflowX: 'auto' }}
+//         >
+//           {booksByThisAuthor.map((book, bookIndex) => (
+//             <div className="👤🎴-container" key={bookIndex}>
+//               <Card 
+//                 className={`👤🎴 👤🎴-custom`} 
+//                 onClick={() => handleReadBookClick(book.author, book.title)}
+//               >
+//                 <div className="🖼️🌌">
+//                   <Image
+//                     src={`/public${book.imagePath}`}
+//                     alt={book.title}
+//                     className="👩‍🎨📷"
+//                   />
+//                 </div>
+//                 <Card.Content className="👤🎴-header">
+//                     {book.title}
+//                 </Card.Content>
+//               </Card>
+//             </div>
+//           ))}
+//         </Segment>
+//       </div>
+//     </div>
+//   );  
+// };
+// export default VirtualBookShelfComponent;
+// // OG Version Before I merged ChatPage and Semantic Library
+// import React, { useState, useEffect, useRef, useCallback } from 'react';
+// import { handleReadBookClick } from '../../utils/handleReadBookClick';
+// import '../../styles/VirtualBookshelf.css';
+// const VirtualBookshelf: React.FC = () => {
+//   const [books, setBooks] = useState<any[]>([]);
+//   const [displayedBooks, setDisplayedBooks] = useState<any[]>([]);
+//   const [loadingMore, setLoadingMore] = useState<boolean>(false);
+//   const observer = useRef<IntersectionObserver | null>(null);
+//   const lastBookRef = useRef<HTMLDivElement | null>(null);
+//   const loadMoreBooks = useCallback(() => {
+//     if (loadingMore) return;
+//     setLoadingMore(true);
+//     setDisplayedBooks(books.slice(0, displayedBooks.length + 15));
+//     setLoadingMore(false);
+//   }, [displayedBooks, loadingMore, books]);
+//   useEffect(() => {
+//     fetch('/public/books.json')
+//       .then((response) => response.json())
+//       .then((data) => {
+//         const shuffledBooks = shuffleArray(data);
+//         setBooks(shuffledBooks);
+//         setDisplayedBooks(shuffledBooks.slice(0, 20));
+//       });
+//   }, []);
+//   useEffect(() => {
+//     if (observer.current) observer.current.disconnect();
+//     observer.current = new IntersectionObserver(
+//       ([entry]) => {
+//         if (entry.isIntersecting) {
+//           loadMoreBooks();
+//         }
+//       },
+//       { rootMargin: '0px 0px 200px 0px' }
+//     );
+//     if (lastBookRef.current) observer.current.observe(lastBookRef.current);
+//     return () => {
+//       if (observer.current) observer.current.disconnect();
+//     };
+//   }, [loadMoreBooks, displayedBooks]);
+//   return (
+//     <div className="bookshelf">
+//       {displayedBooks.map((book, index) => {
+//         const isLastBook = index === displayedBooks.length - 1;
+//         const pathParts = book.imagePath.split('/');
+//         const authorId = pathParts[pathParts.length - 2].split(' ').join('_');
+//         const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join('_');
+//         return (
+//           <div key={index} ref={isLastBook ? lastBookRef : null} className="book">
+//             <a href="#" onClick={(e) => { 
+//                 e.preventDefault();
+//                 console.log("Clicked"); 
+//                 handleReadBookClick(authorId, title); 
+//             }} className="bookImage">
+//               <img src={`/public${book.imagePath}`}  alt={title} className="image" />
+//             </a>
+//             <div className="bookInfo">
+//               <p className="title">{title.replace(/_/g, ' ')}</p>
+//               <p className="author">{authorId.replace(/_/g, ' ')}</p>
+//             </div>
+//           </div>
+//         );
+//       })}
+//       {loadingMore && <div className="loadingMore">Loading more books...</div>}
+//     </div>
+//   );
+// };
+// function shuffleArray(array: any[]) {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]];
+//   }
+//   return array;
+// }
+// export default VirtualBookshelf;
+// // Working, but with imageMap instead of UseSate and useEffect.
+// import React, { useState, useEffect, useRef, useCallback } from 'react';
+// import { handleReadBookClick } from '../utils/handleReadBookClick';
+// import imageMap from '../assets/imageMap';
+// import '../styles/VirtualBookshelf.css';
+// const VirtualBookshelf = () => {
+//   const [books, setBooks] = useState([]);
+//   const [displayedBooks, setDisplayedBooks] = useState([]);
+//   const [loadingMore, setLoadingMore] = useState(false);
+//   const observer = useRef(null);
+//   const lastBookRef = useRef(null);
+//   const loadMoreBooks = useCallback(() => {
+//     if (loadingMore) return;
+//     setLoadingMore(true);
+//     setDisplayedBooks(books.slice(0, displayedBooks.length + 15));
+//     setLoadingMore(false);
+//   }, [displayedBooks, loadingMore, books]);
+//   useEffect(() => {
+//     fetch('/public/books.json')
+//       .then((response) => response.json())
+//       .then((data) => {
+//         const shuffledBooks = shuffleArray(data);
+//         setBooks(shuffledBooks);
+//         setDisplayedBooks(shuffledBooks.slice(0, 20));
+//       });
+//   }, []);
+//   useEffect(() => {
+//     if (observer.current) observer.current.disconnect();
+//     observer.current = new IntersectionObserver(
+//       ([entry]) => {
+//         if (entry.isIntersecting) {
+//           loadMoreBooks();
+//         }
+//       },
+//       { rootMargin: '0px 0px 200px 0px' }
+//     );
+//     if (lastBookRef.current) observer.current.observe(lastBookRef.current);
+//     return () => {
+//       if (observer.current) observer.current.disconnect();
+//     };
+//   }, [loadMoreBooks, displayedBooks]);
+//   return (
+//     <div className="bookshelf">
+//       {displayedBooks.map((book, index) => {
+//         const isLastBook = index === displayedBooks.length - 1;
+//         const pathParts = book.imagePath.split('/');
+//         const authorId = pathParts[pathParts.length - 2].split(' ').join('_');
+//         const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join('_');
+//         const imageIdentifier = `${authorId}_${title}`;
+//         const imageUrl = `/public${imageMap[imageIdentifier]}` || '';
+//         console.log('Image URL:', imageUrl);
+//         console.log('Image Identifier:', imageIdentifier);
+//         return (
+//           <div key={index} ref={isLastBook ? lastBookRef : null} className="book">
+//             <a href="#" onClick={(e) => { 
+//                 e.preventDefault();
+//                 console.log("Clicked"); 
+//                 handleReadBookClick(authorId, title); 
+//             }} className="bookImage">
+//               <img src={imageUrl} alt={title} className="image" />
+//             </a>
+//             <div className="bookInfo">
+//               <p className="title">{title.replace(/_/g, ' ')}</p>
+//               <p className="author">{authorId.replace(/_/g, ' ')}</p>
+//             </div>
+//           </div>
+//         );
+//       })}
+//       {loadingMore && <div className="loadingMore">Loading more books...</div>}
+//     </div>
+//   );
+// };
+// function shuffleArray(array) {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]];
+//   }
+//   return array;
+// }
+// export default VirtualBookshelf;
+// import React, { useState, useEffect, useRef, useCallback } from 'react';
+// import { handleReadBookClick } from '../utils/handleReadBookClick';
+// import imageMap from '../assets/imageMap';
+// import '../styles/VirtualBookshelf.css';
+// const VirtualBookshelf = () => {
+//   const [books, setBooks] = useState([]);
+//   const [displayedBooks, setDisplayedBooks] = useState([]);
+//   const [loadingMore, setLoadingMore] = useState(false);
+//   const [imageUrls, setImageUrls] = useState({}); // New state to manage image URLs
+//   const observer = useRef(null);
+//   const lastBookRef = useRef(null);
+//   const loadMoreBooks = useCallback(() => {
+//     if (loadingMore) return;
+//     setLoadingMore(true);
+//     setDisplayedBooks(books.slice(0, displayedBooks.length + 15));
+//     setLoadingMore(false);
+//   }, [displayedBooks, loadingMore, books]);
+//   useEffect(() => {
+//     // Fetch book data and images
+//     fetch('/public/books.json')
+//       .then((response) => response.json())
+//       .then((data) => {
+//         const shuffledBooks = shuffleArray(data);
+//         setBooks(shuffledBooks);
+//         setDisplayedBooks(shuffledBooks.slice(0, 20));
+//         const newImageUrls = {};
+//         shuffledBooks.forEach((book) => {
+//           const pathParts = book.imagePath.split('/');
+//           const authorId = pathParts[pathParts.length - 2].split(' ').join('_');
+//           const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join('_');
+//           const imageIdentifier = `${authorId}_${title}`;
+//           newImageUrls[imageIdentifier] = `/public${imageMap[imageIdentifier]}`;
+//         });
+//         setImageUrls(newImageUrls);  // Set the image URLs using useState
+//       });
+//   }, []);
+//   useEffect(() => {
+//     if (observer.current) observer.current.disconnect();
+//     observer.current = new IntersectionObserver(
+//       ([entry]) => {
+//         if (entry.isIntersecting) {
+//           loadMoreBooks();
+//         }
+//       },
+//       { rootMargin: '0px 0px 200px 0px' }
+//     );
+//     if (lastBookRef.current) observer.current.observe(lastBookRef.current);
+//     return () => {
+//       if (observer.current) observer.current.disconnect();
+//     };
+//   }, [loadMoreBooks, displayedBooks]);
+//   return (
+//     <div className="bookshelf">
+//       {displayedBooks.map((book, index) => {
+//         const isLastBook = index === displayedBooks.length - 1;
+//         const pathParts = book.imagePath.split('/');
+//         const authorId = pathParts[pathParts.length - 2].split(' ').join('_');
+//         const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join('_');
+//         const imageIdentifier = `${authorId}_${title}`;
+//         const imageUrl = imageUrls[imageIdentifier] || '';
+//         console.log('ImageUrlFromState: ', imageUrl)
+//         // const images = require.context('../assets/public/bookimages/', false, /\.(png|jpe?g|svg)$/);
+//         // const image = require.context('../assets/public/bookimages/', false, /\.(png|jpe?g|svg)$/);
+//         // console.log(`./${imageIdentifier}.png`)
+//         // const imageUrlFromContext = image(`./${imageIdentifier}.png`).default;
+//         // console.log('URL using require.context: ', imageUrlFromContext);
+//         return (
+//           <div key={index} ref={isLastBook ? lastBookRef : null} className="book">
+//             <a href="#" onClick={(e) => { 
+//                 e.preventDefault();
+//                 console.log("Clicked"); 
+//                 handleReadBookClick(authorId, title); 
+//             }} className="bookImage">
+//               <img src={imageUrl} alt={title} className="image" />
+//             </a>
+//             <div className="bookInfo">
+//               <p className="title">{title.replace(/_/g, ' ')}</p>
+//               <p className="author">{authorId.replace(/_/g, ' ')}</p>
+//             </div>
+//           </div>
+//         );
+//       })}
+//       {loadingMore && <div className="loadingMore">Loading more books...</div>}
+//     </div>
+//   );
+// };
+// function shuffleArray(array) {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]];
+//   }
+//   return array;
+// }
+// export default VirtualBookshelf;
+// import React, { useState, useEffect, useRef, useCallback } from 'react';
+// import { handleReadBookClick } from '../utils/handleReadBookClick';
+// import '../styles/VirtualBookshelf.css';
+// const VirtualBookshelf = () => {
+//   const [books, setBooks] = useState([]);
+//   const [displayedBooks, setDisplayedBooks] = useState([]);
+//   const [loadingMore, setLoadingMore] = useState(false);
+//   const observer = useRef(null);
+//   const lastBookRef = useRef(null);
+//   const loadMoreBooks = useCallback(() => {
+//     if (loadingMore) return;
+//     setLoadingMore(true);
+//     setDisplayedBooks(books.slice(0, displayedBooks.length + 15));
+//     setLoadingMore(false);
+//   }, [displayedBooks, loadingMore, books]);
+//   useEffect(() => {
+//     fetch('/public/books.json')
+//       .then((response) => response.json())
+//       .then((data) => {
+//         const shuffledBooks = shuffleArray(data);
+//         setBooks(shuffledBooks);
+//         setDisplayedBooks(shuffledBooks.slice(0, 20));
+//       });
+//   }, []);
+//   useEffect(() => {
+//     if (observer.current) observer.current.disconnect();
+//     observer.current = new IntersectionObserver(
+//       ([entry]) => {
+//         if (entry.isIntersecting) {
+//           loadMoreBooks();
+//         }
+//       },
+//       { rootMargin: '0px 0px 200px 0px' }
+//     );
+//     if (lastBookRef.current) observer.current.observe(lastBookRef.current);
+//     return () => {
+//       if (observer.current) observer.current.disconnect();
+//     };
+//   }, [loadMoreBooks, displayedBooks]);
+//   return (
+//     <div className="bookshelf">
+//       {displayedBooks.map((book, index) => {
+//         const isLastBook = index === displayedBooks.length - 1;
+//         const pathParts = book.imagePath.split('/');
+//         const authorId = pathParts[pathParts.length - 2].split(' ').join(' ');
+//         const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join(' ');
+//         const imageUrl = `/public/bookimages/${authorId}/${title}.png`;
+//         return (
+//           <div key={index} ref={isLastBook ? lastBookRef : null} className="book">
+//             <a href="#" onClick={(e) => { 
+//                 e.preventDefault();
+//                 handleReadBookClick(authorId, title); 
+//             }} className="bookImage">
+//               <img src={imageUrl} alt={title} className="image" />
+//             </a>
+//             <div className="bookInfo">
+//               <p className="title">{title.replace(/_/g, ' ')}</p>
+//               <p className="author">{authorId.replace(/_/g, ' ')}</p>
+//             </div>
+//           </div>
+//         );
+//       })}
+//       {loadingMore && <div className="loadingMore">Loading more books...</div>}
+//     </div>
+//   );
+// };
+// function shuffleArray(array) {
+//   for (let i = array.length - 1; i > 0; i--) {
+//     const j = Math.floor(Math.random() * (i + 1));
+//     [array[i], array[j]] = [array[j], array[i]];
+//   }
+//   return array;
+// }
+// export default VirtualBookshelf;
 
 
 /***/ }),
@@ -60895,95 +61757,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _utils_Stream__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/Stream */ "./src/ugd_frontend/utils/Stream.tsx");
-/* harmony import */ var _contexts_CardStateContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../contexts/CardStateContext */ "./src/ugd_frontend/src/contexts/CardStateContext.tsx");
-/* harmony import */ var _styles_AuthorCards_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../styles/AuthorCards.css */ "./src/ugd_frontend/styles/AuthorCards.css");
+/* harmony import */ var _cards_AuthorCard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../cards/AuthorCard */ "./src/ugd_frontend/src/cards/AuthorCard.tsx");
 
 
-
-// import VirtualBookShelfComponent from '../semantic-library/VirtualBookshelf';
 
 var AuthorCards = function (_a) {
-    var author = _a.author, expanded = _a.expanded;
-    var _b = (0,_contexts_CardStateContext__WEBPACK_IMPORTED_MODULE_2__.useCardState)(author.id), cardState = _b.cardState, flipCard = _b.flipCard;
-    var streamedDescription = (0,_utils_Stream__WEBPACK_IMPORTED_MODULE_1__["default"])(author.description, 15, cardState.startStreaming || false);
+    var author = _a.author;
+    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), hasFlipped = _b[0], setHasFlipped = _b[1];
+    var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), cardFlipped = _c[0], setCardFlipped = _c[1];
+    var shouldStartStreaming = hasFlipped;
+    var streamedDescription = (0,_utils_Stream__WEBPACK_IMPORTED_MODULE_1__["default"])(author.description, 15, shouldStartStreaming);
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+        if (cardFlipped && !hasFlipped) {
+            setHasFlipped(true);
+        }
+    }, [cardFlipped]);
     var handleClick = function () {
-        flipCard();
+        setCardFlipped(!cardFlipped);
     };
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null,
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-container flex ".concat(expanded ? 'expanded' : '') },
-            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-wrapper ".concat(expanded ? 'cardFlipped' : '') },
-                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-card", onClick: handleClick },
-                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-front" },
-                        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "image-container w-full h-32 rounded-t-lg overflow-hidden shadow-inner" },
-                            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", { src: "/images/".concat(author.id, ".png"), className: "object-cover min-w-full min-h-full", alt: "".concat(author.id) })),
-                        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "text-container w-full h-8 flex items-center justify-center bg-gray-100 rounded-b-lg" },
-                            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "text-xs font-semibold text-gray-700" }, "".concat(author.id)))),
-                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-back" }))))));
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "\n        author-container flex\n        ".concat(cardFlipped ? 'expanded w-auto' : 'w-[150px]', "\n      ") },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_cards_AuthorCard__WEBPACK_IMPORTED_MODULE_2__["default"], { image: "/images/".concat(author.id, ".png"), title: author.id, onCardClick: handleClick, flipped: cardFlipped, description: streamedDescription })));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AuthorCards);
-// <div className={`virtual-bookshelf-container transform transition-transform duration-500 ease-in-out ${expanded ? 'translate-x-0' : '-translate-x-full'}`}>
-//   {expanded && <VirtualBookShelfComponent author={author.id} />}
-// </div>
-// import React from 'react';
-// import { Responsive, WidthProvider } from 'react-grid-layout';
-// import useStreamingText from '../../utils/Stream';
-// import { useCardState } from '../contexts/CardStateContext';
-// import '../../styles/AuthorCards.css'
-// import 'react-grid-layout/css/styles.css';
-// import 'react-resizable/css/styles.css';
-// interface AuthorCardsProps {
-//   author: {
-//     id: string;
-//     description: string;
-//     categories: string[];
-//   };
-//   expanded: boolean;
-// }
-// const ResponsiveGridLayout = WidthProvider(Responsive);
-// const AuthorCards: React.FC<AuthorCardsProps> = ({ author, expanded }) => {
-//   const { cardState, flipCard } = useCardState(author.id);
-//   const streamedDescription = useStreamingText(
-//     author.description,
-//     15,
-//     cardState.startStreaming || false
-//   );
-//   const handleClick = () => {
-//     flipCard();
-//   };
-//   const layout = [
-//     { i: 'a', x: 0, y: 0, w: 1, h: 1 },
-//   ];
-//   return (
-//     <>
-//       <ResponsiveGridLayout
-//         className="layout"
-//         layouts={{ lg: layout, md: layout, sm: layout, xs: layout, xxs: layout }}
-//         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-//         cols={{ lg: 5, md: 4, sm: 3, xs: 2, xxs: 2 }} // Adjust the number of columns here
-//       >
-//         <div key="a" className={`author-container flex ${expanded ? 'expanded' : ''}`}>
-//           <div className={`card-wrapper ${expanded ? 'cardFlipped' : ''}`}>
-//             <div className="author-card" onClick={handleClick}>
-//               <div className="card-face card-front">
-//                 <div className="image-container w-full h-32 rounded-t-lg overflow-hidden shadow-inner">
-//                   <img src={`/images/${author.id}.png`} className="object-cover min-w-full min-h-full" alt={`${author.id}`} />
-//                 </div>
-//                 <div className="text-container w-full h-8 flex items-center justify-center bg-gray-100 rounded-b-lg">
-//                   <p className="text-xs font-semibold text-gray-700">{`${author.id}`}</p>
-//                 </div>
-//               </div>
-//               <div className="card-face card-back">
-//                 <div className="extension"></div>
-//                 {/* Here you can put the content of the back side */}
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </ResponsiveGridLayout>
-//     </>
-//   );
-// };
-// export default AuthorCards;
 
 
 /***/ }),
@@ -61026,6 +61821,34 @@ var useStreamingText = function (text, speed, startStreaming) {
     return streamedText;
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (useStreamingText);
+
+
+/***/ }),
+
+/***/ "./node_modules/webfontloader/webfontloader.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/webfontloader/webfontloader.js ***!
+  \*****************************************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;/* Web Font Loader v1.6.28 - (c) Adobe Systems, Google. License: Apache 2.0 */(function(){function aa(a,b,c){return a.call.apply(a.bind,arguments)}function ba(a,b,c){if(!a)throw Error();if(2<arguments.length){var d=Array.prototype.slice.call(arguments,2);return function(){var c=Array.prototype.slice.call(arguments);Array.prototype.unshift.apply(c,d);return a.apply(b,c)}}return function(){return a.apply(b,arguments)}}function p(a,b,c){p=Function.prototype.bind&&-1!=Function.prototype.bind.toString().indexOf("native code")?aa:ba;return p.apply(null,arguments)}var q=Date.now||function(){return+new Date};function ca(a,b){this.a=a;this.o=b||a;this.c=this.o.document}var da=!!window.FontFace;function t(a,b,c,d){b=a.c.createElement(b);if(c)for(var e in c)c.hasOwnProperty(e)&&("style"==e?b.style.cssText=c[e]:b.setAttribute(e,c[e]));d&&b.appendChild(a.c.createTextNode(d));return b}function u(a,b,c){a=a.c.getElementsByTagName(b)[0];a||(a=document.documentElement);a.insertBefore(c,a.lastChild)}function v(a){a.parentNode&&a.parentNode.removeChild(a)}
+function w(a,b,c){b=b||[];c=c||[];for(var d=a.className.split(/\s+/),e=0;e<b.length;e+=1){for(var f=!1,g=0;g<d.length;g+=1)if(b[e]===d[g]){f=!0;break}f||d.push(b[e])}b=[];for(e=0;e<d.length;e+=1){f=!1;for(g=0;g<c.length;g+=1)if(d[e]===c[g]){f=!0;break}f||b.push(d[e])}a.className=b.join(" ").replace(/\s+/g," ").replace(/^\s+|\s+$/,"")}function y(a,b){for(var c=a.className.split(/\s+/),d=0,e=c.length;d<e;d++)if(c[d]==b)return!0;return!1}
+function ea(a){return a.o.location.hostname||a.a.location.hostname}function z(a,b,c){function d(){m&&e&&f&&(m(g),m=null)}b=t(a,"link",{rel:"stylesheet",href:b,media:"all"});var e=!1,f=!0,g=null,m=c||null;da?(b.onload=function(){e=!0;d()},b.onerror=function(){e=!0;g=Error("Stylesheet failed to load");d()}):setTimeout(function(){e=!0;d()},0);u(a,"head",b)}
+function A(a,b,c,d){var e=a.c.getElementsByTagName("head")[0];if(e){var f=t(a,"script",{src:b}),g=!1;f.onload=f.onreadystatechange=function(){g||this.readyState&&"loaded"!=this.readyState&&"complete"!=this.readyState||(g=!0,c&&c(null),f.onload=f.onreadystatechange=null,"HEAD"==f.parentNode.tagName&&e.removeChild(f))};e.appendChild(f);setTimeout(function(){g||(g=!0,c&&c(Error("Script load timeout")))},d||5E3);return f}return null};function B(){this.a=0;this.c=null}function C(a){a.a++;return function(){a.a--;D(a)}}function E(a,b){a.c=b;D(a)}function D(a){0==a.a&&a.c&&(a.c(),a.c=null)};function F(a){this.a=a||"-"}F.prototype.c=function(a){for(var b=[],c=0;c<arguments.length;c++)b.push(arguments[c].replace(/[\W_]+/g,"").toLowerCase());return b.join(this.a)};function G(a,b){this.c=a;this.f=4;this.a="n";var c=(b||"n4").match(/^([nio])([1-9])$/i);c&&(this.a=c[1],this.f=parseInt(c[2],10))}function fa(a){return H(a)+" "+(a.f+"00")+" 300px "+I(a.c)}function I(a){var b=[];a=a.split(/,\s*/);for(var c=0;c<a.length;c++){var d=a[c].replace(/['"]/g,"");-1!=d.indexOf(" ")||/^\d/.test(d)?b.push("'"+d+"'"):b.push(d)}return b.join(",")}function J(a){return a.a+a.f}function H(a){var b="normal";"o"===a.a?b="oblique":"i"===a.a&&(b="italic");return b}
+function ga(a){var b=4,c="n",d=null;a&&((d=a.match(/(normal|oblique|italic)/i))&&d[1]&&(c=d[1].substr(0,1).toLowerCase()),(d=a.match(/([1-9]00|normal|bold)/i))&&d[1]&&(/bold/i.test(d[1])?b=7:/[1-9]00/.test(d[1])&&(b=parseInt(d[1].substr(0,1),10))));return c+b};function ha(a,b){this.c=a;this.f=a.o.document.documentElement;this.h=b;this.a=new F("-");this.j=!1!==b.events;this.g=!1!==b.classes}function ia(a){a.g&&w(a.f,[a.a.c("wf","loading")]);K(a,"loading")}function L(a){if(a.g){var b=y(a.f,a.a.c("wf","active")),c=[],d=[a.a.c("wf","loading")];b||c.push(a.a.c("wf","inactive"));w(a.f,c,d)}K(a,"inactive")}function K(a,b,c){if(a.j&&a.h[b])if(c)a.h[b](c.c,J(c));else a.h[b]()};function ja(){this.c={}}function ka(a,b,c){var d=[],e;for(e in b)if(b.hasOwnProperty(e)){var f=a.c[e];f&&d.push(f(b[e],c))}return d};function M(a,b){this.c=a;this.f=b;this.a=t(this.c,"span",{"aria-hidden":"true"},this.f)}function N(a){u(a.c,"body",a.a)}function O(a){return"display:block;position:absolute;top:-9999px;left:-9999px;font-size:300px;width:auto;height:auto;line-height:normal;margin:0;padding:0;font-variant:normal;white-space:nowrap;font-family:"+I(a.c)+";"+("font-style:"+H(a)+";font-weight:"+(a.f+"00")+";")};function P(a,b,c,d,e,f){this.g=a;this.j=b;this.a=d;this.c=c;this.f=e||3E3;this.h=f||void 0}P.prototype.start=function(){var a=this.c.o.document,b=this,c=q(),d=new Promise(function(d,e){function f(){q()-c>=b.f?e():a.fonts.load(fa(b.a),b.h).then(function(a){1<=a.length?d():setTimeout(f,25)},function(){e()})}f()}),e=null,f=new Promise(function(a,d){e=setTimeout(d,b.f)});Promise.race([f,d]).then(function(){e&&(clearTimeout(e),e=null);b.g(b.a)},function(){b.j(b.a)})};function Q(a,b,c,d,e,f,g){this.v=a;this.B=b;this.c=c;this.a=d;this.s=g||"BESbswy";this.f={};this.w=e||3E3;this.u=f||null;this.m=this.j=this.h=this.g=null;this.g=new M(this.c,this.s);this.h=new M(this.c,this.s);this.j=new M(this.c,this.s);this.m=new M(this.c,this.s);a=new G(this.a.c+",serif",J(this.a));a=O(a);this.g.a.style.cssText=a;a=new G(this.a.c+",sans-serif",J(this.a));a=O(a);this.h.a.style.cssText=a;a=new G("serif",J(this.a));a=O(a);this.j.a.style.cssText=a;a=new G("sans-serif",J(this.a));a=
+O(a);this.m.a.style.cssText=a;N(this.g);N(this.h);N(this.j);N(this.m)}var R={D:"serif",C:"sans-serif"},S=null;function T(){if(null===S){var a=/AppleWebKit\/([0-9]+)(?:\.([0-9]+))/.exec(window.navigator.userAgent);S=!!a&&(536>parseInt(a[1],10)||536===parseInt(a[1],10)&&11>=parseInt(a[2],10))}return S}Q.prototype.start=function(){this.f.serif=this.j.a.offsetWidth;this.f["sans-serif"]=this.m.a.offsetWidth;this.A=q();U(this)};
+function la(a,b,c){for(var d in R)if(R.hasOwnProperty(d)&&b===a.f[R[d]]&&c===a.f[R[d]])return!0;return!1}function U(a){var b=a.g.a.offsetWidth,c=a.h.a.offsetWidth,d;(d=b===a.f.serif&&c===a.f["sans-serif"])||(d=T()&&la(a,b,c));d?q()-a.A>=a.w?T()&&la(a,b,c)&&(null===a.u||a.u.hasOwnProperty(a.a.c))?V(a,a.v):V(a,a.B):ma(a):V(a,a.v)}function ma(a){setTimeout(p(function(){U(this)},a),50)}function V(a,b){setTimeout(p(function(){v(this.g.a);v(this.h.a);v(this.j.a);v(this.m.a);b(this.a)},a),0)};function W(a,b,c){this.c=a;this.a=b;this.f=0;this.m=this.j=!1;this.s=c}var X=null;W.prototype.g=function(a){var b=this.a;b.g&&w(b.f,[b.a.c("wf",a.c,J(a).toString(),"active")],[b.a.c("wf",a.c,J(a).toString(),"loading"),b.a.c("wf",a.c,J(a).toString(),"inactive")]);K(b,"fontactive",a);this.m=!0;na(this)};
+W.prototype.h=function(a){var b=this.a;if(b.g){var c=y(b.f,b.a.c("wf",a.c,J(a).toString(),"active")),d=[],e=[b.a.c("wf",a.c,J(a).toString(),"loading")];c||d.push(b.a.c("wf",a.c,J(a).toString(),"inactive"));w(b.f,d,e)}K(b,"fontinactive",a);na(this)};function na(a){0==--a.f&&a.j&&(a.m?(a=a.a,a.g&&w(a.f,[a.a.c("wf","active")],[a.a.c("wf","loading"),a.a.c("wf","inactive")]),K(a,"active")):L(a.a))};function oa(a){this.j=a;this.a=new ja;this.h=0;this.f=this.g=!0}oa.prototype.load=function(a){this.c=new ca(this.j,a.context||this.j);this.g=!1!==a.events;this.f=!1!==a.classes;pa(this,new ha(this.c,a),a)};
+function qa(a,b,c,d,e){var f=0==--a.h;(a.f||a.g)&&setTimeout(function(){var a=e||null,m=d||null||{};if(0===c.length&&f)L(b.a);else{b.f+=c.length;f&&(b.j=f);var h,l=[];for(h=0;h<c.length;h++){var k=c[h],n=m[k.c],r=b.a,x=k;r.g&&w(r.f,[r.a.c("wf",x.c,J(x).toString(),"loading")]);K(r,"fontloading",x);r=null;if(null===X)if(window.FontFace){var x=/Gecko.*Firefox\/(\d+)/.exec(window.navigator.userAgent),xa=/OS X.*Version\/10\..*Safari/.exec(window.navigator.userAgent)&&/Apple/.exec(window.navigator.vendor);
+X=x?42<parseInt(x[1],10):xa?!1:!0}else X=!1;X?r=new P(p(b.g,b),p(b.h,b),b.c,k,b.s,n):r=new Q(p(b.g,b),p(b.h,b),b.c,k,b.s,a,n);l.push(r)}for(h=0;h<l.length;h++)l[h].start()}},0)}function pa(a,b,c){var d=[],e=c.timeout;ia(b);var d=ka(a.a,c,a.c),f=new W(a.c,b,e);a.h=d.length;b=0;for(c=d.length;b<c;b++)d[b].load(function(b,d,c){qa(a,f,b,d,c)})};function ra(a,b){this.c=a;this.a=b}
+ra.prototype.load=function(a){function b(){if(f["__mti_fntLst"+d]){var c=f["__mti_fntLst"+d](),e=[],h;if(c)for(var l=0;l<c.length;l++){var k=c[l].fontfamily;void 0!=c[l].fontStyle&&void 0!=c[l].fontWeight?(h=c[l].fontStyle+c[l].fontWeight,e.push(new G(k,h))):e.push(new G(k))}a(e)}else setTimeout(function(){b()},50)}var c=this,d=c.a.projectId,e=c.a.version;if(d){var f=c.c.o;A(this.c,(c.a.api||"https://fast.fonts.net/jsapi")+"/"+d+".js"+(e?"?v="+e:""),function(e){e?a([]):(f["__MonotypeConfiguration__"+
+d]=function(){return c.a},b())}).id="__MonotypeAPIScript__"+d}else a([])};function sa(a,b){this.c=a;this.a=b}sa.prototype.load=function(a){var b,c,d=this.a.urls||[],e=this.a.families||[],f=this.a.testStrings||{},g=new B;b=0;for(c=d.length;b<c;b++)z(this.c,d[b],C(g));var m=[];b=0;for(c=e.length;b<c;b++)if(d=e[b].split(":"),d[1])for(var h=d[1].split(","),l=0;l<h.length;l+=1)m.push(new G(d[0],h[l]));else m.push(new G(d[0]));E(g,function(){a(m,f)})};function ta(a,b){a?this.c=a:this.c=ua;this.a=[];this.f=[];this.g=b||""}var ua="https://fonts.googleapis.com/css";function va(a,b){for(var c=b.length,d=0;d<c;d++){var e=b[d].split(":");3==e.length&&a.f.push(e.pop());var f="";2==e.length&&""!=e[1]&&(f=":");a.a.push(e.join(f))}}
+function wa(a){if(0==a.a.length)throw Error("No fonts to load!");if(-1!=a.c.indexOf("kit="))return a.c;for(var b=a.a.length,c=[],d=0;d<b;d++)c.push(a.a[d].replace(/ /g,"+"));b=a.c+"?family="+c.join("%7C");0<a.f.length&&(b+="&subset="+a.f.join(","));0<a.g.length&&(b+="&text="+encodeURIComponent(a.g));return b};function ya(a){this.f=a;this.a=[];this.c={}}
+var za={latin:"BESbswy","latin-ext":"\u00e7\u00f6\u00fc\u011f\u015f",cyrillic:"\u0439\u044f\u0416",greek:"\u03b1\u03b2\u03a3",khmer:"\u1780\u1781\u1782",Hanuman:"\u1780\u1781\u1782"},Aa={thin:"1",extralight:"2","extra-light":"2",ultralight:"2","ultra-light":"2",light:"3",regular:"4",book:"4",medium:"5","semi-bold":"6",semibold:"6","demi-bold":"6",demibold:"6",bold:"7","extra-bold":"8",extrabold:"8","ultra-bold":"8",ultrabold:"8",black:"9",heavy:"9",l:"3",r:"4",b:"7"},Ba={i:"i",italic:"i",n:"n",normal:"n"},
+Ca=/^(thin|(?:(?:extra|ultra)-?)?light|regular|book|medium|(?:(?:semi|demi|extra|ultra)-?)?bold|black|heavy|l|r|b|[1-9]00)?(n|i|normal|italic)?$/;
+function Da(a){for(var b=a.f.length,c=0;c<b;c++){var d=a.f[c].split(":"),e=d[0].replace(/\+/g," "),f=["n4"];if(2<=d.length){var g;var m=d[1];g=[];if(m)for(var m=m.split(","),h=m.length,l=0;l<h;l++){var k;k=m[l];if(k.match(/^[\w-]+$/)){var n=Ca.exec(k.toLowerCase());if(null==n)k="";else{k=n[2];k=null==k||""==k?"n":Ba[k];n=n[1];if(null==n||""==n)n="4";else var r=Aa[n],n=r?r:isNaN(n)?"4":n.substr(0,1);k=[k,n].join("")}}else k="";k&&g.push(k)}0<g.length&&(f=g);3==d.length&&(d=d[2],g=[],d=d?d.split(","):
+g,0<d.length&&(d=za[d[0]])&&(a.c[e]=d))}a.c[e]||(d=za[e])&&(a.c[e]=d);for(d=0;d<f.length;d+=1)a.a.push(new G(e,f[d]))}};function Ea(a,b){this.c=a;this.a=b}var Fa={Arimo:!0,Cousine:!0,Tinos:!0};Ea.prototype.load=function(a){var b=new B,c=this.c,d=new ta(this.a.api,this.a.text),e=this.a.families;va(d,e);var f=new ya(e);Da(f);z(c,wa(d),C(b));E(b,function(){a(f.a,f.c,Fa)})};function Ga(a,b){this.c=a;this.a=b}Ga.prototype.load=function(a){var b=this.a.id,c=this.c.o;b?A(this.c,(this.a.api||"https://use.typekit.net")+"/"+b+".js",function(b){if(b)a([]);else if(c.Typekit&&c.Typekit.config&&c.Typekit.config.fn){b=c.Typekit.config.fn;for(var e=[],f=0;f<b.length;f+=2)for(var g=b[f],m=b[f+1],h=0;h<m.length;h++)e.push(new G(g,m[h]));try{c.Typekit.load({events:!1,classes:!1,async:!0})}catch(l){}a(e)}},2E3):a([])};function Ha(a,b){this.c=a;this.f=b;this.a=[]}Ha.prototype.load=function(a){var b=this.f.id,c=this.c.o,d=this;b?(c.__webfontfontdeckmodule__||(c.__webfontfontdeckmodule__={}),c.__webfontfontdeckmodule__[b]=function(b,c){for(var g=0,m=c.fonts.length;g<m;++g){var h=c.fonts[g];d.a.push(new G(h.name,ga("font-weight:"+h.weight+";font-style:"+h.style)))}a(d.a)},A(this.c,(this.f.api||"https://f.fontdeck.com/s/css/js/")+ea(this.c)+"/"+b+".js",function(b){b&&a([])})):a([])};var Y=new oa(window);Y.a.c.custom=function(a,b){return new sa(b,a)};Y.a.c.fontdeck=function(a,b){return new Ha(b,a)};Y.a.c.monotype=function(a,b){return new ra(b,a)};Y.a.c.typekit=function(a,b){return new Ga(b,a)};Y.a.c.google=function(a,b){return new Ea(b,a)};var Z={load:p(Y.load,Y)}; true?!(__WEBPACK_AMD_DEFINE_RESULT__ = (function(){return Z}).call(exports, __webpack_require__, exports, module),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):0;}());
 
 
 /***/ }),
@@ -61744,6 +62567,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _styles_main_css__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../styles/main.css */ "./src/ugd_frontend/styles/main.css");
 /* harmony import */ var _the_greats_AuthorPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./the-greats/AuthorPanel */ "./src/ugd_frontend/src/the-greats/AuthorPanel.jsx");
 /* harmony import */ var _assets_author_data__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../assets/author_data */ "./src/ugd_frontend/assets/author_data.ts");
+/* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! webfontloader */ "./node_modules/webfontloader/webfontloader.js");
+/* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(webfontloader__WEBPACK_IMPORTED_MODULE_8__);
 // pages/the-greats.tsx
 
 
@@ -61753,6 +62578,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+webfontloader__WEBPACK_IMPORTED_MODULE_8___default().load({
+  google: {
+    families: ['Georgia', 'Lobster', 'Roboto:300,400,700', "Times New Roman"]
+  }
+});
 const App = () => {
   const [imageUrl, setImageUrl] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const backgroundPosition = (0,_utils_useBackgroundPosition__WEBPACK_IMPORTED_MODULE_4__["default"])();
