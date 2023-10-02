@@ -13,7 +13,7 @@ import WebFont from 'webfontloader';
 
 WebFont.load({
   google: {
-    families: ['Georgia', 'Lobster', 'Roboto:300,400,700', "Times New Roman"]
+    families: ['Georgia', 'Lobster', 'Lexend', 'Roboto:300,400,700', "Times New Roman", 'Nunito']
   }
 });
 
