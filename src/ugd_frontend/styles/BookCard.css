@@ -108,9 +108,9 @@ line-height: 0.96rem;
 
 
 .BCReadBook-button {
-    background-color: #5e5e5e;
+    background-color: #373737;
     color: white;
-    padding: 10px 30px; /* Increased padding for better appearance */
+    padding: 10px 30px;
     border: none;
     border-radius: 5px;
     font-weight: bold;
@@ -120,11 +120,11 @@ line-height: 0.96rem;
     left: 50%;
     transform: translateX(-50%);
     transition: background-color 0.3s, transform 0.3s;
-    font-size: 0.875rem; /* Reduced font size to fit text in one line */
-    white-space: nowrap; /* Prevents text from breaking into a new line */
+    font-size: 0.875rem;
+    white-space: nowrap;
 }
 
 .BCReadBook-button:hover {
     background-color: #252984;
-    transform: translateX(-50%) scale(1.05); /* Slight scale effect on hover */
+    transform: translateX(-50%) scale(1.05);
 }

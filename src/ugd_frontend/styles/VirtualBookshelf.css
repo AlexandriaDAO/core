@@ -10,17 +10,29 @@
 }
 
 .segment-area {
-  background-color: #E5E7EB;
+  background: linear-gradient(135deg, #F7F9FC 0%, #E5E7EB 100%);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
   width: 100%;
-  height: 100%;
+  height: 90%;
 }
+
+
 
 .carousel-wrapper {
   display: flex;
   overflow-x: auto;
   white-space: nowrap;
   height: 100%;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+
+.carousel-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
 
 .carousel-card {
   display: inline-block;
@@ -36,6 +48,21 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
