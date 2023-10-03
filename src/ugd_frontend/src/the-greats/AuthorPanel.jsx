@@ -62,7 +62,7 @@ function AuthorPanel({ authors }) {
   const layouts = useMemo(generateLayout, [activeAuthor, authors]);
 
   return (
-    <div style={{ paddingBottom: '3000px', paddingRight: '25px' }}> 
+    <div style={{ paddingBottom: '3000px' }}> 
     <ResponsiveGridLayout
       className="layout"
       layouts={layouts}

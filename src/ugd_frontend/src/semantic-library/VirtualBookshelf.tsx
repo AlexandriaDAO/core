@@ -35,7 +35,7 @@ const VirtualBookShelfComponent = ({ author }: { author: string }) => {
             <div className="carousel-card" key={bookIndex}>
               <BookCards
                 book={{
-                  id: book.title,
+                  author: book.author,
                   description: "Lorem ipsum",
                   categories: [],
                   imagePath: book.imagePath,

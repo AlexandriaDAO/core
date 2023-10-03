@@ -1,45 +1,12 @@
-// import React from 'react';
-// import BookCard from './BookCard'
-// import AUTHOR_INFO from '../../assets/author_data';
-
-// interface AuthorCardsProps {
-//   book: {
-//     id: string;
-//     description: string;
-//     categories: string[];
-//     imagePath: string;
-//     title: string;
-//   };
-// }
-
-// const BookCards: React.FC<AuthorCardsProps> = ({ book }) => {
-//   const streamedDescription = "Demo description for now";
-
-//   return (
-//     <div className="author-container flex w-[150px]">
-//       <BookCard
-//         image={`/public${book.imagePath}`}
-//         title={book.title}
-//         description={streamedDescription}
-//       />
-//     </div>
-//   );
-// };
-
-// export default BookCards;
-
-
-
-
-
 import React, {useState} from 'react';
 import BookCard from './BookCard'
 import AUTHOR_INFO from '../../assets/author_data';
 import useStreamingText from '../../utils/Stream';
+import { handleReadBookClick } from '../../utils/handleReadBookClick';
 
 interface AuthorCardsProps {
   book: {
-    id: string;
+    author: string;
     description: string;
     categories: string[];
     imagePath: string;
@@ -56,6 +23,14 @@ const BookCards: React.FC<AuthorCardsProps> = ({ book }) => {
 
   // Find the author object from AUTHOR_INFO by checking if the books array includes the book title
   const author = AUTHOR_INFO.find(author => author?.books?.includes(book.title));
+
+  const onReadBookClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    handleReadBookClick(book.author, book.title);
+    console.log("Author", author)
+    console.log("book.id", book.author)
+    console.log("title.id", book.title)
+  };
 
   let bookDescription = "Description not found";
   if (author) {
@@ -74,6 +49,7 @@ const BookCards: React.FC<AuthorCardsProps> = ({ book }) => {
         description={streamedDescription}
         flipped={flipped}
         onCardClick={onCardClick}
+        onReadBookClick={onReadBookClick}
       />
     </div>
   );

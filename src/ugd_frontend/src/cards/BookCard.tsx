@@ -86,6 +86,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import '../../styles/BookCard.css';
+import { handleReadBookClick } from '../../utils/handleReadBookClick';
 
 interface CardProps {
   image: string;
@@ -93,9 +94,10 @@ interface CardProps {
   description: string;
   flipped: boolean;
   onCardClick: () => void;
+  onReadBookClick: (event: React.MouseEvent) => void;
 }
 
-const BCBookCard: React.FC<CardProps> = ({ image, title, description, flipped, onCardClick }) => {
+const BCBookCard: React.FC<CardProps> = ({ image, title, description, flipped, onCardClick, onReadBookClick }) => {
   const titleRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -149,6 +151,12 @@ const BCBookCard: React.FC<CardProps> = ({ image, title, description, flipped, o
         </div>
         <div className="BCCard-face BCCard-back absolute inset-0 bg-[#fbfbf8] text-center p-10 overflow-y-auto">
           <p className="BCStreamed-description">{description}</p>
+          <button 
+            className="BCReadBook-button" 
+            onClick={onReadBookClick}
+          >
+            Read Book
+          </button>
         </div>
       </div>
     </div>
