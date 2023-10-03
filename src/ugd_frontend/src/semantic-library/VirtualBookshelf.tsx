@@ -11,8 +11,7 @@ interface Book {
 const VirtualBookShelfComponent = ({ author }: { author: string }) => {
   const [groupedBooks, setGroupedBooks] = useState<{ [author: string]: Book[] }>({});
   const booksByThisAuthor = groupedBooks[author] || [];
-  const [flippedCards, setFlippedCards] = useState<{ [id: string]: boolean }>({});
-
+  
   useEffect(() => {
     fetch('/public/books.json')
       .then((response) => response.json())

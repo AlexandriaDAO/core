@@ -17,8 +17,6 @@ WebFont.load({
   }
 });
 
-
-
 const App = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const backgroundPosition = useBackgroundPosition();
