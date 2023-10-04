@@ -1,5 +1,6 @@
 import React from 'react';
 import '../../styles/AuthorCards.css'
+import Scaler from './Scaler'
 
 interface CardProps {
   image: string;
@@ -11,18 +12,17 @@ interface CardProps {
 
 const AuthorCard: React.FC<CardProps> = ({ image, title, onCardClick, flipped, description }) => {
   return (
+  <Scaler>
     <div
       className={`
-          card-wrapper 
-          ${flipped ? 'cardFlipped transform rotate-y-180' : ''} 
-          transition-transform duration-500 ease-in-out 
-          perspective-[1000px] w-150 h-150
+          card-wrapper
+          ${flipped ? 'cardFlipped' : ''} 
         `}
       onClick={onCardClick}
     >
       <div className="author-card relative transform-gpu transition-transform duration-500 ease-in-out">
         <div className="card-face card-front absolute inset-0 bg-[#fbfbf8] border border-[#252525] rounded-[.5rem] flex flex-col items-center">
-          <div className="image-container w-full h-full minus-mb-[25px] overflow-hidden rounded-t-[.5rem] shadow-inner">
+          <div className="image-container">
             <img src={image} className="object-cover w-full h-full" alt={title} />
           </div>
           <div className="text-container w-[95%] h-[15px] bg-gray-100 rounded-b-lg flex items-center justify-center">
@@ -34,8 +34,8 @@ const AuthorCard: React.FC<CardProps> = ({ image, title, onCardClick, flipped, d
         </div>
       </div>
     </div>
+  </Scaler>
   );
 };
 
 export default AuthorCard;
-

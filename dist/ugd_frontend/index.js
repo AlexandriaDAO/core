@@ -5842,6 +5842,79 @@ const init = ({
 
 /***/ }),
 
+/***/ "./src/ugd_frontend/src/cards/Scaler.jsx":
+/*!***********************************************!*\
+  !*** ./src/ugd_frontend/src/cards/Scaler.jsx ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   useScale: () => (/* binding */ useScale)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _styles_Scaler_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/Scaler.css */ "./src/ugd_frontend/styles/Scaler.css");
+// import React from 'react';
+// import '../../styles/Scaler.css'
+
+// function Scaler(props) {
+//   return (
+//     <div className="scaler">
+//       {props.children}
+//     </div>
+//   );
+// }
+
+// export default Scaler;
+
+
+
+const ScaleContext = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)(1);
+function Scaler(props) {
+  const scale = getCurrentScale();
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(ScaleContext.Provider, {
+    value: scale
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "scaler"
+  }, props.children));
+}
+function getCurrentScale() {
+  const width = window.innerWidth;
+  if (width <= 600) {
+    return 0.88;
+  } else if (width <= 669) {
+    return 0.88;
+  } else if (width <= 739) {
+    return 0.91;
+  } else if (width <= 809) {
+    return 0.94;
+  } else if (width <= 879) {
+    return 0.97;
+  } else if (width <= 949) {
+    return 1.00;
+  } else if (width <= 1019) {
+    return 1.03;
+  } else if (width <= 1089) {
+    return 1.06;
+  } else if (width <= 1159) {
+    return 1.09;
+  } else if (width <= 1198) {
+    return 1.12;
+  } else if (width >= 1199) {
+    return 1.15;
+  }
+  return 1;
+}
+function useScale() {
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(ScaleContext);
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Scaler);
+
+/***/ }),
+
 /***/ "./src/ugd_frontend/src/semantic-library/SemanticLibrary.jsx":
 /*!*******************************************************************!*\
   !*** ./src/ugd_frontend/src/semantic-library/SemanticLibrary.jsx ***!
@@ -6095,15 +6168,190 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _AuthorCards__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AuthorCards */ "./src/ugd_frontend/src/the-greats/AuthorCards.tsx");
-/* harmony import */ var react_grid_layout__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-grid-layout */ "./node_modules/react-grid-layout/index.js");
-/* harmony import */ var react_grid_layout__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_grid_layout__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _semantic_library_VirtualBookshelf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../semantic-library/VirtualBookshelf */ "./src/ugd_frontend/src/semantic-library/VirtualBookshelf.tsx");
+/* harmony import */ var _cards_Scaler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../cards/Scaler */ "./src/ugd_frontend/src/cards/Scaler.jsx");
+/* harmony import */ var _cards_AuthorCards__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../cards/AuthorCards */ "./src/ugd_frontend/src/cards/AuthorCards.tsx");
+/* harmony import */ var react_grid_layout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-grid-layout */ "./node_modules/react-grid-layout/index.js");
+/* harmony import */ var react_grid_layout__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_grid_layout__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _semantic_library_VirtualBookshelf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../semantic-library/VirtualBookshelf */ "./src/ugd_frontend/src/semantic-library/VirtualBookshelf.tsx");
+// import React, { useState, useMemo } from 'react';
+// import Scaler from '../cards/Scaler';
+// import AuthorCards from '../cards/AuthorCards';
+// import { Responsive, WidthProvider } from 'react-grid-layout';
+// import VirtualBookShelfComponent from '../semantic-library/VirtualBookshelf';
+
+// const ResponsiveGridLayout = WidthProvider(Responsive);
+
+// function AuthorPanel({ authors }) {
+//   const [activeAuthor, setActiveAuthor] = useState(null);
+
+//   const handleCardClick = (authorId) => {
+//     setActiveAuthor(authorId === activeAuthor ? null : authorId);
+//   };
+
+//   const CARD_WIDTH = 180;
+//   const CARD_HEIGHT = 217.5;
+
+//   const generateLayout = () => {
+//     const layouts = {};
+//     const cols = { lg: 5, md: 4, sm: 3, xs: 2, xxs: 2 };
+
+//     for (const [breakpoint, numCols] of Object.entries(cols)) {
+//       layouts[breakpoint] = [];
+//       authors.forEach((author, index) => {
+//         layouts[breakpoint].push({
+//           i: author.id,
+//           x: index % numCols,
+//           y: Math.floor(index / numCols),
+//           w: 1,
+//           h: 1
+//         });
+//       });
+
+//       if (activeAuthor) {
+//         const index = authors.findIndex(a => a.id === activeAuthor);
+//         layouts[breakpoint].push({
+//           i: `extra-${activeAuthor}`,
+//           x: 0,
+//           y: Math.floor(index / numCols) + 1,
+//           w: numCols, 
+//           h: 1,
+//         });
+//       }
+//     }
+//     return layouts;
+//   };
+
+//   const layouts = useMemo(generateLayout, [activeAuthor, authors]);
+
+//   return (
+//     <div style={{ paddingBottom: '3000px' }}>
+//       <Scaler>
+//         <ResponsiveGridLayout
+//           className="layout"
+//           layouts={layouts}
+//           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+//           cols={{ lg: 5, md: 4, sm: 3, xs: 2, xxs: 2 }}
+//           rowHeight={CARD_HEIGHT}
+//           containerPadding={[0, 0]}
+//           margin={[0, 0]}
+//           autoSize={true}
+//           isDraggable={false}
+//         >
+//           {authors.map((author) => (
+//             <div 
+//               key={author.id} 
+//               onClick={() => handleCardClick(author.id)} 
+//               className="flex justify-center items-center h-full"
+//               style={{ width: CARD_WIDTH }}
+//             >
+//               <AuthorCards author={author} expanded={activeAuthor === author.id} />
+//             </div>
+//           ))}
+//           {/* Render the extra rows */}
+//           {activeAuthor && (
+//             <div key={`extra-${activeAuthor}`} className="virtual-bookshelf-container" style={{ height: '100%', gridColumnStart: 1, gridColumnEnd: -1 }}>
+//               <VirtualBookShelfComponent author={activeAuthor} />
+//             </div>
+//           )}
+//         </ResponsiveGridLayout>
+//       </Scaler>
+//     </div>
+//   );
+// }
+
+// export default AuthorPanel;
+
+// import React, { useState, useMemo } from 'react';
+// import Scaler from '../cards/Scaler';
+// import AuthorCards from '../cards/AuthorCards';
+// import { Responsive, WidthProvider } from 'react-grid-layout';
+// import VirtualBookShelfComponent from '../semantic-library/VirtualBookshelf';
+
+// const ResponsiveGridLayout = WidthProvider(Responsive);
+
+// function AuthorPanel({ authors }) {
+//   const [activeAuthor, setActiveAuthor] = useState(null);
+
+//   const handleCardClick = (authorId) => {
+//     setActiveAuthor(authorId === activeAuthor ? null : authorId);
+//   };
+
+//   const CARD_WIDTH = 180;
+
+//   const generateLayout = () => {
+//     const layouts = {};
+//     const cols = { lg: 5, md: 4, sm: 3, xs: 2, xxs: 2 };
+
+//     for (const [breakpoint, numCols] of Object.entries(cols)) {
+//       layouts[breakpoint] = [];
+//       authors.forEach((author, index) => {
+//         layouts[breakpoint].push({
+//           i: author.id,
+//           x: index % numCols,
+//           y: Math.floor(index / numCols),
+//           w: 1,
+//           h: 1
+//         });
+//       });
+
+//       if (activeAuthor) {
+//         const index = authors.findIndex(a => a.id === activeAuthor);
+//         layouts[breakpoint].push({
+//           i: `extra-${activeAuthor}`,
+//           x: 0,
+//           y: Math.floor(index / numCols) + 1,
+//           w: numCols, 
+//           h: 1,
+//         });
+//       }
+//     }
+//     return layouts;
+//   };
+
+//   const layouts = useMemo(generateLayout, [activeAuthor, authors]);
+
+//   return (
+//     <div style={{ paddingBottom: '3000px' }}>
+//       <Scaler>
+//         <ResponsiveGridLayout
+//           className="layout"
+//           layouts={layouts}
+//           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+//           cols={{ lg: 5, md: 4, sm: 3, xs: 2, xxs: 2 }}
+//           containerPadding={[0, 0]}
+//           margin={[0, 0]}
+//           isDraggable={false}
+//         >
+//           {authors.map((author) => (
+//             <div 
+//               key={author.id} 
+//               onClick={() => handleCardClick(author.id)} 
+//               className="flex justify-center items-center h-full"
+//               style={{ width: CARD_WIDTH }}
+//             >
+//               <AuthorCards author={author} expanded={activeAuthor === author.id} />
+//             </div>
+//           ))}
+//           {activeAuthor && (
+//             <div key={`extra-${activeAuthor}`} className="virtual-bookshelf-container" style={{ height: '100%', gridColumnStart: 1, gridColumnEnd: -1 }}>
+//               <VirtualBookShelfComponent author={activeAuthor} />
+//             </div>
+//           )}
+//         </ResponsiveGridLayout>
+//       </Scaler>
+//     </div>
+//   );
+// }
+
+// export default AuthorPanel;
 
 
 
 
-const ResponsiveGridLayout = (0,react_grid_layout__WEBPACK_IMPORTED_MODULE_2__.WidthProvider)(react_grid_layout__WEBPACK_IMPORTED_MODULE_2__.Responsive);
+
+
+
+const ResponsiveGridLayout = (0,react_grid_layout__WEBPACK_IMPORTED_MODULE_3__.WidthProvider)(react_grid_layout__WEBPACK_IMPORTED_MODULE_3__.Responsive);
 function AuthorPanel({
   authors
 }) {
@@ -6111,84 +6359,90 @@ function AuthorPanel({
   const handleCardClick = authorId => {
     setActiveAuthor(authorId === activeAuthor ? null : authorId);
   };
+  const scale = (0,_cards_Scaler__WEBPACK_IMPORTED_MODULE_1__.useScale)();
+  const CARD_WIDTH = 180 * scale;
+  const CARD_HEIGHT = 217.5 * scale;
+
+  // const CARD_WIDTH = 180;
+  // const CARD_HEIGHT = 217.5;
+
+  const containerRef = react__WEBPACK_IMPORTED_MODULE_0___default().useRef(null);
+  const [containerWidth, setContainerWidth] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(0);
+
+  // Listen for container width changes
+  react__WEBPACK_IMPORTED_MODULE_0___default().useEffect(() => {
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.offsetWidth);
+    }
+
+    // Optionally, listen to window resize if you expect dynamic changes
+    const handleResize = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  const getCols = () => {
+    // Dynamically determine number of columns based on container width and card width
+    const numCols = Math.floor(containerWidth / CARD_WIDTH);
+    return numCols > 0 ? numCols : 1;
+  };
   const generateLayout = () => {
     const layouts = {};
-    const cols = {
-      lg: 5,
-      md: 4,
-      sm: 3,
-      xs: 3,
-      xxs: 2
-    };
-    for (const [breakpoint, numCols] of Object.entries(cols)) {
-      let rowStart = 0;
-      let currentRow = [];
-      layouts[breakpoint] = [];
-      authors.forEach((author, index) => {
-        currentRow.push(index);
-        if (currentRow.length === numCols || index === authors.length - 1) {
-          const xStart = Math.floor((numCols - currentRow.length) / 2);
-          currentRow.forEach((i, j) => {
-            const x = xStart + j;
-            const y = rowStart;
-            layouts[breakpoint].push({
-              i: authors[i].id,
-              x,
-              y,
-              w: 1,
-              h: 1
-            });
-          });
-          if (authors.some(a => currentRow.includes(authors.indexOf(a)) && a.id === activeAuthor)) {
-            layouts[breakpoint].push({
-              i: `extra-${activeAuthor}`,
-              x: 0,
-              y: rowStart + 1,
-              w: numCols,
-              h: 1
-            });
-            rowStart++;
-          }
-          currentRow = [];
-          rowStart++;
-        }
+    const numCols = getCols();
+    layouts['xxs'] = [];
+    authors.forEach((author, index) => {
+      layouts['xxs'].push({
+        i: author.id,
+        x: index % numCols,
+        y: Math.floor(index / numCols),
+        w: 1,
+        h: 1
+      });
+    });
+    if (activeAuthor) {
+      const index = authors.findIndex(a => a.id === activeAuthor);
+      layouts['xxs'].push({
+        i: `extra-${activeAuthor}`,
+        x: 0,
+        y: Math.floor(index / numCols) + 1,
+        w: numCols,
+        h: 1
       });
     }
     return layouts;
   };
-  const layouts = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(generateLayout, [activeAuthor, authors]);
+  const layouts = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(generateLayout, [activeAuthor, authors, containerWidth]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    ref: containerRef,
     style: {
-      paddingBottom: '3000px',
-      paddingRight: '25px'
+      paddingBottom: '3000px'
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(ResponsiveGridLayout, {
     className: "layout",
     layouts: layouts,
     breakpoints: {
-      lg: 1200,
-      md: 996,
-      sm: 768,
-      xs: 480,
       xxs: 0
     },
     cols: {
-      lg: 5,
-      md: 4,
-      sm: 3,
-      xs: 3,
-      xxs: 2
+      xxs: getCols()
     },
-    rowHeight: 250,
+    rowHeight: CARD_HEIGHT,
     containerPadding: [0, 0],
     margin: [0, 0],
     autoSize: true,
-    isDraggable: false
+    isDraggable: true
   }, authors.map(author => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     key: author.id,
     onClick: () => handleCardClick(author.id),
-    className: "flex justify-center items-center h-full"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_AuthorCards__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    className: "flex justify-center items-center h-full",
+    style: {
+      width: CARD_WIDTH,
+      border: '1px solid red'
+    }
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_cards_AuthorCards__WEBPACK_IMPORTED_MODULE_2__["default"], {
     author: author,
     expanded: activeAuthor === author.id
   }))), activeAuthor && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -6199,7 +6453,7 @@ function AuthorPanel({
       gridColumnStart: 1,
       gridColumnEnd: -1
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_semantic_library_VirtualBookshelf__WEBPACK_IMPORTED_MODULE_3__["default"], {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_semantic_library_VirtualBookshelf__WEBPACK_IMPORTED_MODULE_4__["default"], {
     author: activeAuthor
   }))));
 }
@@ -16598,7 +16852,7 @@ var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBP
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `.author-card {
 width: 120%;
-height: 145%;
+height: 120%;
 position: relative;
 transform-style: preserve-3d;
 transform: rotateY(0);
@@ -16610,7 +16864,6 @@ transition: transform 0.5s;
   font-size: 18px;
   font-weight: 500;
 }
-
 
 .card-wrapper.cardFlipped .author-card {
 transform: rotateY(180deg);
@@ -16658,11 +16911,16 @@ overflow-y: auto;
   scrollbar-width: none;
 }
 
-
 .card-wrapper {
 perspective: 1000px;
 width: 150px;
 height: 150px;
+/* width: 180px;
+height: 180px; */
+
+display: flex;
+align-items: center;
+justify-content: center;
 }
 
 .image-container {
@@ -16692,20 +16950,27 @@ text-overflow: ellipsis;
 transform: translateX(0);
 }
 
-@media (max-width: 68px) {
+/* @media (max-width: 68px) {
   .card-wrapper {
     min-width: 50px;
   }
   .author-card {
     width: 100%;
   }
+} */
+
+
+
+
+
+
+.author-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* your other styles here */
 }
-
-
-
-
-
-
 
 
 
@@ -16785,7 +17050,353 @@ transform: translateX(0);
 
 
 
-`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/AuthorCards.css"],"names":[],"mappings":"AAAA;AACA,WAAW;AACX,YAAY;AACZ,kBAAkB;AAClB,4BAA4B;AAC5B,qBAAqB;AACrB,0BAA0B;AAC1B;;AAEA;EACE,+BAA+B;EAC/B,eAAe;EACf,gBAAgB;AAClB;;;AAGA;AACA,0BAA0B;AAC1B;;AAEA;AACA,kBAAkB;AAClB,WAAW;AACX,YAAY;AACZ,2BAA2B;AAC3B,yBAAyB;AACzB,qBAAqB;AACrB,gBAAgB;AAChB;;AAEA;AACA,mBAAmB;AACnB,aAAa;AACb,sBAAsB;AACtB,mBAAmB;AACnB,8CAA8C;AAC9C;;AAEA;AACA,4EAA4E;AAC5E;;AAEA;AACA,0BAA0B;AAC1B,mBAAmB;AACnB,kBAAkB;AAClB,aAAa;AACb,gBAAgB;AAChB;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,qBAAqB;AACvB;;;AAGA;AACA,mBAAmB;AACnB,YAAY;AACZ,aAAa;AACb;;AAEA;AACA,yBAAyB;AACzB,WAAW;AACX,kCAAkC;AAClC;;AAEA;EACE,uCAAuC;EACvC,eAAe;EACf,gBAAgB;EAChB,mBAAmB;AACrB;;AAEA;AACA,UAAU;AACV;;AAEA;AACA,mBAAmB;AACnB,gBAAgB;AAChB,uBAAuB;AACvB;;AAEA;AACA,wBAAwB;AACxB;;AAEA;EACE;IACE,eAAe;EACjB;EACA;IACE,WAAW;EACb;AACF;;;;;;;;;;;;;;;;;;;;;;AAsBA,2CAA2C;;AAE3C;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAqDE","sourcesContent":[".author-card {\nwidth: 120%;\nheight: 145%;\nposition: relative;\ntransform-style: preserve-3d;\ntransform: rotateY(0);\ntransition: transform 0.5s;\n}\n\n.author-name {\n  font-family: 'Georgia', cursive;\n  font-size: 18px;\n  font-weight: 500;\n}\n\n\n.card-wrapper.cardFlipped .author-card {\ntransform: rotateY(180deg);\n}\n\n.card-face {\nposition: absolute;\nwidth: 100%;\nheight: 100%;\nbackface-visibility: hidden;\nborder: 1px solid #252525;\nborder-radius: 0.5rem;\noverflow: hidden;\n}\n\n.card-front {\nbackground: #fbfbf8;\ndisplay: flex;\nflex-direction: column;\nalign-items: center;\nbox-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);\n}\n\n.card-front:hover {\nbox-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);\n}\n\n.card-back {\ntransform: rotateY(180deg);\nbackground: #fbfbf8;\ntext-align: center;\npadding: 10px;\noverflow-y: auto;\n}\n\n.card-back::-webkit-scrollbar {\n  display: none;\n}\n\n.card-back:-ms-overflow-style {\n  display: none;\n}\n\n.card-back {\n  scrollbar-width: none;\n}\n\n\n.card-wrapper {\nperspective: 1000px;\nwidth: 150px;\nheight: 150px;\n}\n\n.image-container {\nheight: calc(100% - 25px);\nwidth: 100%;\nborder-bottom: 1.4px solid #252525;\n}\n\n.streamed-description {\n  font-family: 'Times New Roman', cursive;\n  font-size: 1rem;\n  font-weight: 400;\n  line-height: 1.2rem;\n}\n\n.text-container {\nwidth: 95%;\n}\n\n.text-container p {\nwhite-space: nowrap;\noverflow: hidden;\ntext-overflow: ellipsis;\n}\n\n.card-wrapper.cardFlipped .extension {\ntransform: translateX(0);\n}\n\n@media (max-width: 68px) {\n  .card-wrapper {\n    min-width: 50px;\n  }\n  .author-card {\n    width: 100%;\n  }\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* OG Web2 Version with Semantic UI Cards */\n\n/* \n.cardImage {\n  width: 100%;\n  height: auto;\n  object-fit: cover;\n  padding: .5rem;\n}\n\n.cardContainer {\n  perspective: 1000px;\n  transition: transform 1s;\n  transform-style: preserve-3d;\n  position: relative;\n  width: 100%;\n  height: 100%;\n}\n\n.cardFlipped {\n  transform: rotateY(180deg);\n}\n\n.cardFront,\n.cardBack {\n  backface-visibility: hidden;\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border-radius: 5px;\n  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);\n  background: #fbfbf5 !important;\n  transition: transform 0.6s;\n  transform-style: preserve-3d;\n}\n\n.cardBack {\n  transform: rotateY(180deg);\n  -ms-overflow-style: none; \n  scrollbar-width: none; \n  padding: 10px; \n  display: flex;\n  flex-direction: column;\n  justify-content: space-between;\n}\n\n.cardBack::-webkit-scrollbar {\n  display: none;\n}\n\n\n\n\n */\n\n\n\n\n\n\n\n\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/AuthorCards.css"],"names":[],"mappings":"AAAA;AACA,WAAW;AACX,YAAY;AACZ,kBAAkB;AAClB,4BAA4B;AAC5B,qBAAqB;AACrB,0BAA0B;AAC1B;;AAEA;EACE,+BAA+B;EAC/B,eAAe;EACf,gBAAgB;AAClB;;AAEA;AACA,0BAA0B;AAC1B;;AAEA;AACA,kBAAkB;AAClB,WAAW;AACX,YAAY;AACZ,2BAA2B;AAC3B,yBAAyB;AACzB,qBAAqB;AACrB,gBAAgB;AAChB;;AAEA;AACA,mBAAmB;AACnB,aAAa;AACb,sBAAsB;AACtB,mBAAmB;AACnB,8CAA8C;AAC9C;;AAEA;AACA,4EAA4E;AAC5E;;AAEA;AACA,0BAA0B;AAC1B,mBAAmB;AACnB,kBAAkB;AAClB,aAAa;AACb,gBAAgB;AAChB;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,qBAAqB;AACvB;;AAEA;AACA,mBAAmB;AACnB,YAAY;AACZ,aAAa;AACb;gBACgB;;AAEhB,aAAa;AACb,mBAAmB;AACnB,uBAAuB;AACvB;;AAEA;AACA,yBAAyB;AACzB,WAAW;AACX,kCAAkC;AAClC;;AAEA;EACE,uCAAuC;EACvC,eAAe;EACf,gBAAgB;EAChB,mBAAmB;AACrB;;AAEA;AACA,UAAU;AACV;;AAEA;AACA,mBAAmB;AACnB,gBAAgB;AAChB,uBAAuB;AACvB;;AAEA;AACA,wBAAwB;AACxB;;AAEA;;;;;;;GAOG;;;;;;;AAOH;EACE,aAAa;EACb,uBAAuB;EACvB,mBAAmB;;EAEnB,2BAA2B;AAC7B;;;;;;;;;;;;;;;;AAgBA,2CAA2C;;AAE3C;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAqDE","sourcesContent":[".author-card {\nwidth: 120%;\nheight: 120%;\nposition: relative;\ntransform-style: preserve-3d;\ntransform: rotateY(0);\ntransition: transform 0.5s;\n}\n\n.author-name {\n  font-family: 'Georgia', cursive;\n  font-size: 18px;\n  font-weight: 500;\n}\n\n.card-wrapper.cardFlipped .author-card {\ntransform: rotateY(180deg);\n}\n\n.card-face {\nposition: absolute;\nwidth: 100%;\nheight: 100%;\nbackface-visibility: hidden;\nborder: 1px solid #252525;\nborder-radius: 0.5rem;\noverflow: hidden;\n}\n\n.card-front {\nbackground: #fbfbf8;\ndisplay: flex;\nflex-direction: column;\nalign-items: center;\nbox-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);\n}\n\n.card-front:hover {\nbox-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);\n}\n\n.card-back {\ntransform: rotateY(180deg);\nbackground: #fbfbf8;\ntext-align: center;\npadding: 10px;\noverflow-y: auto;\n}\n\n.card-back::-webkit-scrollbar {\n  display: none;\n}\n\n.card-back:-ms-overflow-style {\n  display: none;\n}\n\n.card-back {\n  scrollbar-width: none;\n}\n\n.card-wrapper {\nperspective: 1000px;\nwidth: 150px;\nheight: 150px;\n/* width: 180px;\nheight: 180px; */\n\ndisplay: flex;\nalign-items: center;\njustify-content: center;\n}\n\n.image-container {\nheight: calc(100% - 25px);\nwidth: 100%;\nborder-bottom: 1.4px solid #252525;\n}\n\n.streamed-description {\n  font-family: 'Times New Roman', cursive;\n  font-size: 1rem;\n  font-weight: 400;\n  line-height: 1.2rem;\n}\n\n.text-container {\nwidth: 95%;\n}\n\n.text-container p {\nwhite-space: nowrap;\noverflow: hidden;\ntext-overflow: ellipsis;\n}\n\n.card-wrapper.cardFlipped .extension {\ntransform: translateX(0);\n}\n\n/* @media (max-width: 68px) {\n  .card-wrapper {\n    min-width: 50px;\n  }\n  .author-card {\n    width: 100%;\n  }\n} */\n\n\n\n\n\n\n.author-container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n\n  /* your other styles here */\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* OG Web2 Version with Semantic UI Cards */\n\n/* \n.cardImage {\n  width: 100%;\n  height: auto;\n  object-fit: cover;\n  padding: .5rem;\n}\n\n.cardContainer {\n  perspective: 1000px;\n  transition: transform 1s;\n  transform-style: preserve-3d;\n  position: relative;\n  width: 100%;\n  height: 100%;\n}\n\n.cardFlipped {\n  transform: rotateY(180deg);\n}\n\n.cardFront,\n.cardBack {\n  backface-visibility: hidden;\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border-radius: 5px;\n  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);\n  background: #fbfbf5 !important;\n  transition: transform 0.6s;\n  transform-style: preserve-3d;\n}\n\n.cardBack {\n  transform: rotateY(180deg);\n  -ms-overflow-style: none; \n  scrollbar-width: none; \n  padding: 10px; \n  display: flex;\n  flex-direction: column;\n  justify-content: space-between;\n}\n\n.cardBack::-webkit-scrollbar {\n  display: none;\n}\n\n\n\n\n */\n\n\n\n\n\n\n\n\n"],"sourceRoot":""}]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/BookCard.css":
+/*!******************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/BookCard.css ***!
+  \******************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "./node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.BCCardFlipped .BCBook-card {
+    transform: rotateY(180deg);
+}
+
+.BCBook-card {
+    width: 120%;
+    height: 190%;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateY(0);
+    transition: transform 0.5s;
+}
+
+.BCCard-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border: 1px solid #252525;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.BCCard-front {
+    background: #fbfbf8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);
+}
+
+.BCCard-front:hover {
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+}
+
+.BCCard-back {
+    transform: rotateY(180deg);
+    background: #fbfbf8;
+    text-align: center;
+    padding: 10px;
+    overflow-y: auto;
+    white-space: normal;
+}
+
+.BCCard-back::-webkit-scrollbar {
+    display: none;
+}
+
+.BCCard-back {
+    scrollbar-width: none;
+}
+
+
+.BCText-container {
+    width: 100%;
+    height: 90px;
+    overflow: hidden;
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(128,128,128,1) 100%);
+}
+
+
+.BCText-container p {
+    padding: 15px 5px 15px 5px;
+    position: absolute;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 68px) {
+    .BCCard-wrapper {
+        min-width: 50px;
+    }
+    .BCAuthor-card {
+        width: 100%;
+    }
+}
+
+
+.BCCard-wrapper {
+    perspective: 1000px;
+    width: 130px;
+    height: 120px;
+    padding: 0px 0px 0px 0px;
+}
+  
+.BCImage-container {
+height: calc(100% - 20px);
+width: 100%;
+border-bottom: 1.12px solid #252525;
+}
+
+.BCAuthor-name {
+font-family: 'Nunito';
+font-weight: 700;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+  
+
+.BCStreamed-description {
+font-family: 'Times New Roman', cursive;
+font-size: 1rem;
+font-weight: 400;
+line-height: 0.96rem;
+}
+
+
+.BCReadBook-button {
+    background-color: #373737;
+    color: white;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: background-color 0.3s, transform 0.3s;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.BCReadBook-button:hover {
+    background-color: #252984;
+    transform: translateX(-50%) scale(1.05);
+}
+`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/BookCard.css"],"names":[],"mappings":"AAAA;IACI,0BAA0B;AAC9B;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,kBAAkB;IAClB,4BAA4B;IAC5B,qBAAqB;IACrB,0BAA0B;AAC9B;;AAEA;IACI,kBAAkB;IAClB,WAAW;IACX,YAAY;IACZ,2BAA2B;IAC3B,yBAAyB;IACzB,qBAAqB;IACrB,gBAAgB;AACpB;;AAEA;IACI,mBAAmB;IACnB,aAAa;IACb,sBAAsB;IACtB,mBAAmB;IACnB,8CAA8C;AAClD;;AAEA;IACI,4EAA4E;AAChF;;AAEA;IACI,0BAA0B;IAC1B,mBAAmB;IACnB,kBAAkB;IAClB,aAAa;IACb,gBAAgB;IAChB,mBAAmB;AACvB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,qBAAqB;AACzB;;;AAGA;IACI,WAAW;IACX,YAAY;IACZ,gBAAgB;IAChB,wFAAwF;AAC5F;;;AAGA;IACI,0BAA0B;IAC1B,kBAAkB;IAClB,mBAAmB;IACnB,gBAAgB;IAChB,uBAAuB;AAC3B;;AAEA;IACI;QACI,eAAe;IACnB;IACA;QACI,WAAW;IACf;AACJ;;;AAGA;IACI,mBAAmB;IACnB,YAAY;IACZ,aAAa;IACb,wBAAwB;AAC5B;;AAEA;AACA,yBAAyB;AACzB,WAAW;AACX,mCAAmC;AACnC;;AAEA;AACA,qBAAqB;AACrB,gBAAgB;AAChB,mBAAmB;AACnB,gBAAgB;AAChB,uBAAuB;AACvB;;;AAGA;AACA,uCAAuC;AACvC,eAAe;AACf,gBAAgB;AAChB,oBAAoB;AACpB;;;AAGA;IACI,yBAAyB;IACzB,YAAY;IACZ,kBAAkB;IAClB,YAAY;IACZ,kBAAkB;IAClB,iBAAiB;IACjB,eAAe;IACf,kBAAkB;IAClB,YAAY;IACZ,SAAS;IACT,2BAA2B;IAC3B,iDAAiD;IACjD,mBAAmB;IACnB,mBAAmB;AACvB;;AAEA;IACI,yBAAyB;IACzB,uCAAuC;AAC3C","sourcesContent":[".BCCardFlipped .BCBook-card {\n    transform: rotateY(180deg);\n}\n\n.BCBook-card {\n    width: 120%;\n    height: 190%;\n    position: relative;\n    transform-style: preserve-3d;\n    transform: rotateY(0);\n    transition: transform 0.5s;\n}\n\n.BCCard-face {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    backface-visibility: hidden;\n    border: 1px solid #252525;\n    border-radius: 0.5rem;\n    overflow: hidden;\n}\n\n.BCCard-front {\n    background: #fbfbf8;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);\n}\n\n.BCCard-front:hover {\n    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);\n}\n\n.BCCard-back {\n    transform: rotateY(180deg);\n    background: #fbfbf8;\n    text-align: center;\n    padding: 10px;\n    overflow-y: auto;\n    white-space: normal;\n}\n\n.BCCard-back::-webkit-scrollbar {\n    display: none;\n}\n\n.BCCard-back {\n    scrollbar-width: none;\n}\n\n\n.BCText-container {\n    width: 100%;\n    height: 90px;\n    overflow: hidden;\n    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(128,128,128,1) 100%);\n}\n\n\n.BCText-container p {\n    padding: 15px 5px 15px 5px;\n    position: absolute;\n    white-space: normal;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n@media (max-width: 68px) {\n    .BCCard-wrapper {\n        min-width: 50px;\n    }\n    .BCAuthor-card {\n        width: 100%;\n    }\n}\n\n\n.BCCard-wrapper {\n    perspective: 1000px;\n    width: 130px;\n    height: 120px;\n    padding: 0px 0px 0px 0px;\n}\n  \n.BCImage-container {\nheight: calc(100% - 20px);\nwidth: 100%;\nborder-bottom: 1.12px solid #252525;\n}\n\n.BCAuthor-name {\nfont-family: 'Nunito';\nfont-weight: 700;\nwhite-space: nowrap;\noverflow: hidden;\ntext-overflow: ellipsis;\n}\n  \n\n.BCStreamed-description {\nfont-family: 'Times New Roman', cursive;\nfont-size: 1rem;\nfont-weight: 400;\nline-height: 0.96rem;\n}\n\n\n.BCReadBook-button {\n    background-color: #373737;\n    color: white;\n    padding: 10px 30px;\n    border: none;\n    border-radius: 5px;\n    font-weight: bold;\n    cursor: pointer;\n    position: absolute;\n    bottom: 10px;\n    left: 50%;\n    transform: translateX(-50%);\n    transition: background-color 0.3s, transform 0.3s;\n    font-size: 0.875rem;\n    white-space: nowrap;\n}\n\n.BCReadBook-button:hover {\n    background-color: #252984;\n    transform: translateX(-50%) scale(1.05);\n}\n"],"sourceRoot":""}]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/Scaler.css":
+/*!****************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/Scaler.css ***!
+  \****************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "./node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* .scaler {
+  transform-origin: top left;
+}
+
+@media (max-width: 600px) {
+  .scaler {
+    transform: scale(0.85);
+  }
+}
+
+@media (min-width: 1200px) {
+  .scaler {
+    transform: scale(1.15);
+  }
+} */
+
+
+
+.scaler {
+  transform-origin: center;
+}
+
+@media (max-width: 600px) {
+  .scaler {
+    transform: scale(0.88);
+  }
+}
+
+@media (min-width: 601px) and (max-width: 669px) {
+  .scaler {
+    transform: scale(0.88);
+  }
+}
+
+@media (min-width: 670px) and (max-width: 739px) {
+  .scaler {
+    transform: scale(0.91);
+  }
+}
+
+@media (min-width: 740px) and (max-width: 809px) {
+  .scaler {
+    transform: scale(0.94);
+  }
+}
+
+@media (min-width: 810px) and (max-width: 879px) {
+  .scaler {
+    transform: scale(0.97);
+  }
+}
+
+@media (min-width: 880px) and (max-width: 949px) {
+  .scaler {
+    transform: scale(1.00);
+  }
+}
+
+@media (min-width: 950px) and (max-width: 1019px) {
+  .scaler {
+    transform: scale(1.03);
+  }
+}
+
+@media (min-width: 1020px) and (max-width: 1089px) {
+  .scaler {
+    transform: scale(1.06);
+  }
+}
+
+@media (min-width: 1090px) and (max-width: 1159px) {
+  .scaler {
+    transform: scale(1.09);
+  }
+}
+
+@media (min-width: 1160px) and (max-width: 1198px) {
+  .scaler {
+    transform: scale(1.12);
+  }
+}
+
+@media (min-width: 1199px) {
+  .scaler {
+    transform: scale(1.15);
+  }
+}
+
+`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/Scaler.css"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;;GAcG;;;;AAIH;EACE,wBAAwB;AAC1B;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF","sourcesContent":["/* .scaler {\n  transform-origin: top left;\n}\n\n@media (max-width: 600px) {\n  .scaler {\n    transform: scale(0.85);\n  }\n}\n\n@media (min-width: 1200px) {\n  .scaler {\n    transform: scale(1.15);\n  }\n} */\n\n\n\n.scaler {\n  transform-origin: center;\n}\n\n@media (max-width: 600px) {\n  .scaler {\n    transform: scale(0.88);\n  }\n}\n\n@media (min-width: 601px) and (max-width: 669px) {\n  .scaler {\n    transform: scale(0.88);\n  }\n}\n\n@media (min-width: 670px) and (max-width: 739px) {\n  .scaler {\n    transform: scale(0.91);\n  }\n}\n\n@media (min-width: 740px) and (max-width: 809px) {\n  .scaler {\n    transform: scale(0.94);\n  }\n}\n\n@media (min-width: 810px) and (max-width: 879px) {\n  .scaler {\n    transform: scale(0.97);\n  }\n}\n\n@media (min-width: 880px) and (max-width: 949px) {\n  .scaler {\n    transform: scale(1.00);\n  }\n}\n\n@media (min-width: 950px) and (max-width: 1019px) {\n  .scaler {\n    transform: scale(1.03);\n  }\n}\n\n@media (min-width: 1020px) and (max-width: 1089px) {\n  .scaler {\n    transform: scale(1.06);\n  }\n}\n\n@media (min-width: 1090px) and (max-width: 1159px) {\n  .scaler {\n    transform: scale(1.09);\n  }\n}\n\n@media (min-width: 1160px) and (max-width: 1198px) {\n  .scaler {\n    transform: scale(1.12);\n  }\n}\n\n@media (min-width: 1199px) {\n  .scaler {\n    transform: scale(1.15);\n  }\n}\n\n"],"sourceRoot":""}]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/VirtualBookshelf.css":
+/*!**************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/VirtualBookshelf.css ***!
+  \**************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "./node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.carousel-container {
+  position: relative;
+  width: 90%;
+  max-width: 1200px;
+  margin-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow-x: hidden;
+  height: 300px;
+}
+
+.segment-area {
+  background: linear-gradient(135deg, #F7F9FC 0%, #E5E7EB 100%);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  width: 100%;
+  height: 90%;
+}
+
+.carousel-wrapper {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  height: 100%;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.carousel-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+
+.carousel-card {
+  display: inline-block;
+  padding: 20px;
+  width: 240px;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/VirtualBookshelf.css"],"names":[],"mappings":"AAAA;EACE,kBAAkB;EAClB,UAAU;EACV,iBAAiB;EACjB,gBAAgB;EAChB,iBAAiB;EACjB,kBAAkB;EAClB,kBAAkB;EAClB,aAAa;AACf;;AAEA;EACE,6DAA6D;EAC7D,uCAAuC;EACvC,oCAAoC;EACpC,mBAAmB;EACnB,WAAW;EACX,WAAW;AACb;;AAEA;EACE,aAAa;EACb,gBAAgB;EAChB,mBAAmB;EACnB,YAAY;EACZ,wBAAwB;EACxB,qBAAqB;AACvB;;AAEA;EACE,aAAa;AACf;;;AAGA;EACE,qBAAqB;EACrB,aAAa;EACb,YAAY;AACd;;AAEA;EACE,wBAAwB;EACxB,qBAAqB;AACvB;;AAEA;EACE,aAAa;AACf","sourcesContent":[".carousel-container {\n  position: relative;\n  width: 90%;\n  max-width: 1200px;\n  margin-top: 50px;\n  margin-left: auto;\n  margin-right: auto;\n  overflow-x: hidden;\n  height: 300px;\n}\n\n.segment-area {\n  background: linear-gradient(135deg, #F7F9FC 0%, #E5E7EB 100%);\n  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  border-radius: 12px;\n  width: 100%;\n  height: 90%;\n}\n\n.carousel-wrapper {\n  display: flex;\n  overflow-x: auto;\n  white-space: nowrap;\n  height: 100%;\n  -ms-overflow-style: none;\n  scrollbar-width: none;\n}\n\n.carousel-wrapper::-webkit-scrollbar {\n  display: none;\n}\n\n\n.carousel-card {\n  display: inline-block;\n  padding: 20px;\n  width: 240px;\n}\n\n.scrollbar-hide {\n  -ms-overflow-style: none;\n  scrollbar-width: none;\n}\n\n.scrollbar-hide::-webkit-scrollbar {\n  display: none;\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -54123,6 +54734,16 @@ function e(r){var o,t,f="";if("string"==typeof r||"number"==typeof r)f+=r;else i
 
 /***/ }),
 
+/***/ "./node_modules/react-image-file-resizer/build/index.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/react-image-file-resizer/build/index.js ***!
+  \**************************************************************/
+/***/ ((module) => {
+
+(()=>{"use strict";var e={d:(t,a)=>{for(var r in a)e.o(a,r)&&!e.o(t,r)&&Object.defineProperty(t,r,{enumerable:!0,get:a[r]})},o:(e,t)=>Object.prototype.hasOwnProperty.call(e,t),r:e=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})}},t={};function a(e,t){for(var a=0;a<t.length;a++){var r=t[a];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r)}}e.r(t),e.d(t,{default:()=>n});var r=function(){function e(){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,e)}var t,r;return t=e,r=[{key:"changeHeightWidth",value:function(e,t,a,r,n,i){return a>r&&(e=Math.round(e*r/a),a=r),e>t&&(a=Math.round(a*t/e),e=t),n&&a<n&&(e=Math.round(e*n/a),a=n),i&&e<i&&(a=Math.round(a*i/e),e=i),{height:e,width:a}}},{key:"resizeAndRotateImage",value:function(e,t,a,r,n){var i=arguments.length>5&&void 0!==arguments[5]?arguments[5]:"jpeg",o=arguments.length>6&&void 0!==arguments[6]?arguments[6]:100,l=arguments.length>7&&void 0!==arguments[7]?arguments[7]:0,h=o/100,g=document.createElement("canvas"),u=e.width,d=e.height,c=this.changeHeightWidth(d,a,u,t,r,n);!l||90!==l&&270!==l?(g.width=c.width,g.height=c.height):(g.width=c.height,g.height=c.width),u=c.width,d=c.height;var s=g.getContext("2d");return s.fillStyle="rgba(0, 0, 0, 0)",s.fillRect(0,0,u,d),s.imageSmoothingEnabled&&s.imageSmoothingQuality&&(s.imageSmoothingQuality="high"),l&&(s.rotate(l*Math.PI/180),90===l?s.translate(0,-g.width):180===l?s.translate(-g.width,-g.height):270===l?s.translate(-g.height,0):0!==l&&360!==l||s.translate(0,0)),s.drawImage(e,0,0,u,d),g.toDataURL("image/".concat(i),h)}},{key:"b64toByteArrays",value:function(e,t){t=t||"image/jpeg";for(var a=atob(e.toString().replace(/^data:image\/(png|jpeg|jpg|webp);base64,/,"")),r=[],n=0;n<a.length;n+=512){for(var i=a.slice(n,n+512),o=new Array(i.length),l=0;l<i.length;l++)o[l]=i.charCodeAt(l);var h=new Uint8Array(o);r.push(h)}return r}},{key:"b64toBlob",value:function(e,t){var a=this.b64toByteArrays(e,t);return new Blob(a,{type:t,lastModified:new Date})}},{key:"b64toFile",value:function(e,t,a){var r=this.b64toByteArrays(e,a);return new File(r,t,{type:a,lastModified:new Date})}},{key:"createResizedImage",value:function(t,a,r,n,i,o,l){var h=arguments.length>7&&void 0!==arguments[7]?arguments[7]:"base64",g=arguments.length>8&&void 0!==arguments[8]?arguments[8]:null,u=arguments.length>9&&void 0!==arguments[9]?arguments[9]:null,d=new FileReader;if(!t)throw Error("File Not Found!");if(t.type&&!t.type.includes("image"))throw Error("File Is NOT Image!");d.readAsDataURL(t),d.onload=function(){var c=new Image;c.src=d.result,c.onload=function(){var d=e.resizeAndRotateImage(c,a,r,g,u,n,i,o),s="image/".concat(n);switch(h){case"blob":var f=e.b64toBlob(d,s);l(f);break;case"base64":l(d);break;case"file":var b=t.name.toString().replace(/(png|jpeg|jpg|webp)$/i,"").concat(n.toString()),v=e.b64toFile(d,b,s);l(v);break;default:l(d)}}},d.onerror=function(e){throw Error(e)}}}],null&&0,r&&a(t,r),e}();const n={imageFileResizer:function(e,t,a,n,i,o,l,h,g,u){return r.createResizedImage(e,t,a,n,i,o,l,h,g,u)}};module.exports=t})();
+
+/***/ }),
+
 /***/ "./node_modules/react-is/cjs/react-is.development.js":
 /*!***********************************************************!*\
   !*** ./node_modules/react-is/cjs/react-is.development.js ***!
@@ -59903,6 +60524,171 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./src/ugd_frontend/styles/BookCard.css":
+/*!**********************************************!*\
+  !*** ./src/ugd_frontend/styles/BookCard.css ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "./node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "./node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "./node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "./node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_BookCard_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!../../../node_modules/postcss-loader/dist/cjs.js!./BookCard.css */ "./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/BookCard.css");
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
+
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_BookCard_css__WEBPACK_IMPORTED_MODULE_6__["default"], options);
+
+
+
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_BookCard_css__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_BookCard_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_BookCard_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
+
+/***/ }),
+
+/***/ "./src/ugd_frontend/styles/Scaler.css":
+/*!********************************************!*\
+  !*** ./src/ugd_frontend/styles/Scaler.css ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "./node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "./node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "./node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "./node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_Scaler_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!../../../node_modules/postcss-loader/dist/cjs.js!./Scaler.css */ "./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/Scaler.css");
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
+
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_Scaler_css__WEBPACK_IMPORTED_MODULE_6__["default"], options);
+
+
+
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_Scaler_css__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_Scaler_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_Scaler_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
+
+/***/ }),
+
+/***/ "./src/ugd_frontend/styles/VirtualBookshelf.css":
+/*!******************************************************!*\
+  !*** ./src/ugd_frontend/styles/VirtualBookshelf.css ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "./node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "./node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "./node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "./node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_VirtualBookshelf_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!../../../node_modules/postcss-loader/dist/cjs.js!./VirtualBookshelf.css */ "./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/VirtualBookshelf.css");
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
+
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_VirtualBookshelf_css__WEBPACK_IMPORTED_MODULE_6__["default"], options);
+
+
+
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_VirtualBookshelf_css__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_VirtualBookshelf_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_VirtualBookshelf_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
+
+/***/ }),
+
 /***/ "./src/ugd_frontend/styles/main.css":
 /*!******************************************!*\
   !*** ./src/ugd_frontend/styles/main.css ***!
@@ -61168,21 +61954,65 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _styles_AuthorCards_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/AuthorCards.css */ "./src/ugd_frontend/styles/AuthorCards.css");
+/* harmony import */ var _Scaler__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Scaler */ "./src/ugd_frontend/src/cards/Scaler.jsx");
+
 
 
 var AuthorCard = function (_a) {
     var image = _a.image, title = _a.title, onCardClick = _a.onCardClick, flipped = _a.flipped, description = _a.description;
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "\n          card-wrapper \n          ".concat(flipped ? 'cardFlipped transform rotate-y-180' : '', " \n          transition-transform duration-500 ease-in-out \n          perspective-[1000px] w-150 h-150\n        "), onClick: onCardClick },
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-card relative transform-gpu transition-transform duration-500 ease-in-out" },
-            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-front absolute inset-0 bg-[#fbfbf8] border border-[#252525] rounded-[.5rem] flex flex-col items-center" },
-                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "image-container w-full h-full minus-mb-[25px] overflow-hidden rounded-t-[.5rem] shadow-inner" },
-                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", { src: image, className: "object-cover w-full h-full", alt: title })),
-                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "text-container w-[95%] h-[15px] bg-gray-100 rounded-b-lg flex items-center justify-center" },
-                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "overflow-hidden overflow-ellipsis author-name" }, title))),
-            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-back absolute inset-0 bg-[#fbfbf8] text-center p-10 overflow-y-auto" },
-                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "streamed-description" }, description)))));
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Scaler__WEBPACK_IMPORTED_MODULE_2__["default"], null,
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "\n          card-wrapper\n          ".concat(flipped ? 'cardFlipped' : '', " \n        "), onClick: onCardClick },
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-card relative transform-gpu transition-transform duration-500 ease-in-out" },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-front absolute inset-0 bg-[#fbfbf8] border border-[#252525] rounded-[.5rem] flex flex-col items-center" },
+                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "image-container" },
+                        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", { src: image, className: "object-cover w-full h-full", alt: title })),
+                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "text-container w-[95%] h-[15px] bg-gray-100 rounded-b-lg flex items-center justify-center" },
+                        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "overflow-hidden overflow-ellipsis author-name" }, title))),
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-back absolute inset-0 bg-[#fbfbf8] text-center p-10 overflow-y-auto" },
+                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "streamed-description" }, description))))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AuthorCard);
+
+
+/***/ }),
+
+/***/ "./src/ugd_frontend/src/cards/AuthorCards.tsx":
+/*!****************************************************!*\
+  !*** ./src/ugd_frontend/src/cards/AuthorCards.tsx ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils_Stream__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/Stream */ "./src/ugd_frontend/utils/Stream.tsx");
+/* harmony import */ var _AuthorCard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AuthorCard */ "./src/ugd_frontend/src/cards/AuthorCard.tsx");
+/* harmony import */ var _styles_AuthorCards_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../styles/AuthorCards.css */ "./src/ugd_frontend/styles/AuthorCards.css");
+
+
+
+
+var AuthorCards = function (_a) {
+    var author = _a.author;
+    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), hasFlipped = _b[0], setHasFlipped = _b[1];
+    var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), cardFlipped = _c[0], setCardFlipped = _c[1];
+    var shouldStartStreaming = hasFlipped;
+    var streamedDescription = (0,_utils_Stream__WEBPACK_IMPORTED_MODULE_1__["default"])(author.description, 15, shouldStartStreaming);
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+        if (cardFlipped && !hasFlipped) {
+            setHasFlipped(true);
+        }
+    }, [cardFlipped]);
+    var handleClick = function () {
+        setCardFlipped(!cardFlipped);
+    };
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_AuthorCard__WEBPACK_IMPORTED_MODULE_2__["default"], { image: "/images/".concat(author.id, ".png"), title: author.id, onCardClick: handleClick, flipped: cardFlipped, description: streamedDescription }));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AuthorCards);
 
 
 /***/ }),
@@ -61200,22 +62030,64 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _styles_AuthorCards_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/AuthorCards.css */ "./src/ugd_frontend/styles/AuthorCards.css");
+/* harmony import */ var _styles_BookCard_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/BookCard.css */ "./src/ugd_frontend/styles/BookCard.css");
+/* harmony import */ var react_image_file_resizer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-image-file-resizer */ "./node_modules/react-image-file-resizer/build/index.js");
+/* harmony import */ var react_image_file_resizer__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_image_file_resizer__WEBPACK_IMPORTED_MODULE_2__);
 
 
-var BookCard = function (_a) {
-    var image = _a.image, title = _a.title, onCardClick = _a.onCardClick, flipped = _a.flipped, description = _a.description;
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "\n          card-wrapper \n          ".concat(flipped ? 'cardFlipped transform rotate-y-180' : '', " \n          transition-transform duration-500 ease-in-out \n          perspective-[1000px] w-150 h-150\n        "), onClick: onCardClick },
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "book-card relative transform-gpu transition-transform duration-500 ease-in-out" },
-            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-front absolute inset-0 bg-[#fbfbf8] border border-[#252525] rounded-[.5rem] flex flex-col items-center" },
-                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "image-container w-full h-full minus-mb-[25px] overflow-hidden rounded-t-[.5rem] shadow-inner" },
-                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", { src: image, className: "object-cover w-full h-full", alt: title })),
-                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "text-container w-[95%] h-[15px] bg-gray-100 rounded-b-lg flex items-center justify-center" },
-                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "overflow-hidden overflow-ellipsis author-name" }, title))),
-            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-back absolute inset-0 bg-[#fbfbf8] text-center p-10 overflow-y-auto" },
-                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "streamed-description" }, description)))));
+
+var BCBookCard = function (_a) {
+    var image = _a.image, title = _a.title, description = _a.description, flipped = _a.flipped, onCardClick = _a.onCardClick, onReadBookClick = _a.onReadBookClick;
+    var titleRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+        if (titleRef.current) {
+            var element = titleRef.current;
+            if (element.offsetWidth < element.scrollWidth) {
+                element.style.fontSize = 'clamp';
+            }
+        }
+    }, []);
+    var dynamicFontSize = '1.3rem';
+    var dynamicLineHeight = 0.8;
+    var displayTitle = title;
+    var titleLength = title.length;
+    var maxTitleLength = 65;
+    for (var i = 0; i < titleLength; i++) {
+        if (i % 5 === 0 && i !== 0) {
+            dynamicFontSize = "".concat(parseFloat(dynamicFontSize) - 0.04, "rem");
+            dynamicLineHeight += 0.03;
+        }
+        if (i >= maxTitleLength) {
+            displayTitle = "".concat(title.substring(0, i), "...");
+            break;
+        }
+    }
+    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(""), compressedImageSrc = _b[0], setCompressedImageSrc = _b[1];
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+        if (image) {
+            fetch(image)
+                .then(function (response) { return response.blob(); })
+                .then(function (blob) {
+                react_image_file_resizer__WEBPACK_IMPORTED_MODULE_2___default().imageFileResizer(blob, 300, 300, 'PNG', 90, 0, function (uri) {
+                    if (typeof uri === 'string') {
+                        setCompressedImageSrc(uri);
+                    }
+                }, 'base64');
+            });
+        }
+    }, [image]);
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "BCCard-wrapper w-120 h-120 ".concat(flipped ? 'BCCardFlipped' : ''), onClick: onCardClick },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "BCBook-card relative transform-gpu" },
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "BCCard-face BCCard-front absolute inset-0 bg-[#fbfbf8] border border-[#252525] rounded-[.5rem] flex flex-col items-center" },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "BCImage-container w-full h-full minus-mb-[25px] overflow-hidden rounded-t-[.5rem] shadow-inner" },
+                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", { src: compressedImageSrc, className: "object-cover w-full h-full", alt: title })),
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "BCText-container w-[95%] h-[30px] rounded-b-lg flex items-center justify-center" },
+                    react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { ref: titleRef, style: { fontSize: dynamicFontSize, lineHeight: dynamicLineHeight }, className: "BCAuthor-name text-center" }, displayTitle))),
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "BCCard-face BCCard-back absolute inset-0 bg-[#fbfbf8] text-center p-10 overflow-y-auto" },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "BCStreamed-description" }, description),
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", { className: "BCReadBook-button", onClick: onReadBookClick }, "Read Book")))));
 };
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BookCard);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BCBookCard);
 
 
 /***/ }),
@@ -61234,26 +62106,89 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _BookCard__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BookCard */ "./src/ugd_frontend/src/cards/BookCard.tsx");
+/* harmony import */ var _assets_author_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../assets/author_data */ "./src/ugd_frontend/assets/author_data.ts");
+/* harmony import */ var _utils_Stream__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/Stream */ "./src/ugd_frontend/utils/Stream.tsx");
+/* harmony import */ var _utils_handleReadBookClick__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/handleReadBookClick */ "./src/ugd_frontend/utils/handleReadBookClick.ts");
+
+
+
 
 
 var BookCards = function (_a) {
+    var _b;
     var book = _a.book;
-    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), hasFlipped = _b[0], setHasFlipped = _b[1];
-    var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), cardFlipped = _c[0], setCardFlipped = _c[1];
-    var shouldStartStreaming = hasFlipped;
-    var streamedDescription = "Demo description for now";
-    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-        if (cardFlipped && !hasFlipped) {
-            setHasFlipped(true);
-        }
-    }, [cardFlipped]);
-    var handleClick = function () {
-        setCardFlipped(!cardFlipped);
+    var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), flipped = _c[0], setFlipped = _c[1];
+    var onCardClick = function () {
+        setFlipped(!flipped);
     };
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "\n        author-container flex\n        ".concat(cardFlipped ? 'expanded w-auto' : 'w-[150px]', "\n      ") },
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_BookCard__WEBPACK_IMPORTED_MODULE_1__["default"], { image: "/public".concat(book.imagePath), title: book.title, onCardClick: handleClick, flipped: cardFlipped, description: streamedDescription })));
+    // Find the author object from AUTHOR_INFO by checking if the books array includes the book title
+    var author = _assets_author_data__WEBPACK_IMPORTED_MODULE_2__["default"].find(function (author) { var _a; return (_a = author === null || author === void 0 ? void 0 : author.books) === null || _a === void 0 ? void 0 : _a.includes(book.title); });
+    var onReadBookClick = function (event) {
+        event.stopPropagation();
+        (0,_utils_handleReadBookClick__WEBPACK_IMPORTED_MODULE_4__.handleReadBookClick)(book.author, book.title);
+        console.log("Author", author);
+        console.log("book.id", book.author);
+        console.log("title.id", book.title);
+    };
+    var bookDescription = "Description not found";
+    if (author) {
+        var bookIndex = (_b = author === null || author === void 0 ? void 0 : author.books) === null || _b === void 0 ? void 0 : _b.indexOf(book.title);
+        bookDescription = (author === null || author === void 0 ? void 0 : author.book_descriptions) ? author.book_descriptions[bookIndex] : "Description not found";
+    }
+    var shouldStartStreaming = flipped;
+    var streamedDescription = (0,_utils_Stream__WEBPACK_IMPORTED_MODULE_3__["default"])(bookDescription, 15, shouldStartStreaming);
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-container flex w-[150px]" },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_BookCard__WEBPACK_IMPORTED_MODULE_1__["default"], { image: "/public".concat(book.imagePath), title: book.title, description: streamedDescription, flipped: flipped, onCardClick: onCardClick, onReadBookClick: onReadBookClick })));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BookCards);
+// import React, { useState, useEffect } from 'react';
+// import useStreamingText from '../../utils/Stream';
+// import BookCard from './BookCard';
+// import AUTHOR_INFO from '../../assets/author_data';
+// interface AuthorCardsProps {
+//   book: {
+//     id: string;
+//     description: string;
+//     categories: string[];
+//     imagePath: string;
+//     title: string;
+//   };
+// }
+// const BookCards: React.FC<AuthorCardsProps> = ({ book }) => {
+//   const [hasFlipped, setHasFlipped] = useState(false);
+//   const [cardFlipped, setCardFlipped] = useState(false);
+//   const shouldStartStreaming = hasFlipped;
+// // Find the author object from AUTHOR_INFO by checking if the books array includes the book title
+// const author = AUTHOR_INFO.find(author => author?.books?.includes(book.title));
+// let bookDescription = "Description not found";
+// if (author) {
+//   const bookIndex = author?.books?.indexOf(book.title);
+//   bookDescription = author?.book_descriptions ? author.book_descriptions[bookIndex as number] : "Description not found";
+// }
+//   const streamedDescription = useStreamingText(bookDescription, 15, shouldStartStreaming);
+//   useEffect(() => {
+//     if (cardFlipped && !hasFlipped) {
+//       setHasFlipped(true);
+//     }
+//   }, [cardFlipped]);
+//   const handleClick = () => {
+//     setCardFlipped(!cardFlipped);
+//   };
+//   return (
+//     <div
+//       className={`author-container flex ${cardFlipped ? 'expanded w-auto' : 'w-[150px]'}`}
+//     >
+//       <BookCard
+//         image={`/public${book.imagePath}`}
+//         title={book.title}
+//         onCardClick={handleClick}
+//         flipped={cardFlipped}
+//         description={streamedDescription}
+//       />
+//     </div>
+//   );
+// };
+// export default BookCards;
 
 
 /***/ }),
@@ -61271,7 +62206,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _cards_BookCards__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../cards/BookCards */ "./src/ugd_frontend/src/cards/BookCards.tsx");
+/* harmony import */ var _styles_VirtualBookshelf_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/VirtualBookshelf.css */ "./src/ugd_frontend/styles/VirtualBookshelf.css");
+/* harmony import */ var _cards_BookCards__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../cards/BookCards */ "./src/ugd_frontend/src/cards/BookCards.tsx");
+
 
 
 var VirtualBookShelfComponent = function (_a) {
@@ -61292,493 +62229,18 @@ var VirtualBookShelfComponent = function (_a) {
             setGroupedBooks(authorGroups);
         });
     }, []);
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null,
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { style: { width: '100%', overflowX: 'auto', whiteSpace: 'nowrap' } },
-            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { style: { display: 'inline-block' } }, booksByThisAuthor.map(function (book, bookIndex) { return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { key: bookIndex, style: { display: 'inline-block' } },
-                react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_cards_BookCards__WEBPACK_IMPORTED_MODULE_1__["default"], { book: {
-                        id: book.title,
-                        description: "",
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "carousel-container" },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "segment-area" },
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "carousel-wrapper" }, booksByThisAuthor.map(function (book, bookIndex) { return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "carousel-card", key: bookIndex },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_cards_BookCards__WEBPACK_IMPORTED_MODULE_2__["default"], { book: {
+                        author: book.author,
+                        description: "Lorem ipsum",
                         categories: [],
                         imagePath: book.imagePath,
-                        title: book.title, // passing title
+                        title: book.title,
                     } }))); })))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (VirtualBookShelfComponent);
-// return (
-//   <div className="relative w-3/5 left-0 top-4 font-serif text-center text-gray-300" style={{ backgroundColor: '#F0F0F0' }}>
-//     <div className="flex flex-col overflow-auto">
-//       <div className="flex flex-nowrap overflow-x-auto w-full p-2 rounded-lg shadow-lg" style={{ backgroundColor: '#E0E0E0' }}>
-//         {booksByThisAuthor.map((book, bookIndex) => (
-//           <div className="flex-shrink-0 p-0 pr-4 transition-transform duration-400 relative transform hover:scale-105 hover:z-10" key={bookIndex}>
-//             <div 
-//               className="flex flex-col w-36 cursor-pointer rounded-lg shadow-md hover:shadow-lg" 
-//               style={{ backgroundColor: '#D0D0D0' }}
-//               onClick={() => handleReadBookClick(book.author, book.title)}
-//             >
-//               <div className="p-2 flex items-center justify-center">
-//                 <img
-//                   src={`/public${book.imagePath}`}
-//                   alt={book.title}
-//                   className="w-9/10 object-cover object-center rounded-t-lg"
-//                 />
-//               </div>
-//               <div className="text-black font-bold text-md font-CALIBRI truncate h-16 leading-snug p-2 rounded-b-lg">
-//                 {book.title}
-//               </div>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   </div>
-// );
-// // OG No Styles
-// return (
-//   <div>
-//     <div style={{ width: '100%', overflowX: 'auto', whiteSpace: 'nowrap' }}>
-//       <div style={{ display: 'inline-block' }}>
-//         {booksByThisAuthor.map((book, bookIndex) => (
-//           <div key={bookIndex} style={{ display: 'inline-block' }}>
-//             <div onClick={() => handleReadBookClick(book.author, book.title)}>
-//               <div>
-//                 <img
-//                   src={`/public${book.imagePath}`}
-//                   alt={book.title}
-//                 />
-//               </div>
-//               <div>
-//                 {book.title}
-//               </div>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   </div>
-// );
-// OG with all the facny styling.
-// // Semantic UI Carousel version w/o shuffled books.
-// import React, { useState, useEffect } from 'react';
-// import { handleReadBookClick } from '../../utils/handleReadBookClick';
-// import { Card, Image, Segment } from 'semantic-ui-react';
-// import '../../styles/VirtualBookshelf.css';
-// interface Book {
-//   author: string;
-//   title: string;
-//   imagePath: string;
-// }
-// const VirtualBookShelfComponent = ({ author }: { author: string }) => {
-//   const [groupedBooks, setGroupedBooks] = useState<{ [author: string]: Book[] }>({});
-//   const booksByThisAuthor = groupedBooks[author] || [];
-//   useEffect(() => {
-//     fetch('/public/books.json')
-//       .then((response) => response.json())
-//       .then((data: Book[]) => {
-//         const authorGroups: { [author: string]: Book[] } = {};
-//         data.forEach((book) => {
-//           if (!authorGroups[book.author]) {
-//             authorGroups[book.author] = [];
-//           }
-//           authorGroups[book.author].push(book);
-//         });
-//         setGroupedBooks(authorGroups);
-//       });
-//   }, []);
-//   return (
-//     <div className="✍️">
-//       <div className="🌐🌈">
-//         <Segment
-//           className={`🌟 📜 🕵️‍♀️📜`}
-//           style={{ display: 'flex', overflowX: 'auto' }}
-//         >
-//           {booksByThisAuthor.map((book, bookIndex) => (
-//             <div className="👤🎴-container" key={bookIndex}>
-//               <Card 
-//                 className={`👤🎴 👤🎴-custom`} 
-//                 onClick={() => handleReadBookClick(book.author, book.title)}
-//               >
-//                 <div className="🖼️🌌">
-//                   <Image
-//                     src={`/public${book.imagePath}`}
-//                     alt={book.title}
-//                     className="👩‍🎨📷"
-//                   />
-//                 </div>
-//                 <Card.Content className="👤🎴-header">
-//                     {book.title}
-//                 </Card.Content>
-//               </Card>
-//             </div>
-//           ))}
-//         </Segment>
-//       </div>
-//     </div>
-//   );  
-// };
-// export default VirtualBookShelfComponent;
-// // OG Version Before I merged ChatPage and Semantic Library
-// import React, { useState, useEffect, useRef, useCallback } from 'react';
-// import { handleReadBookClick } from '../../utils/handleReadBookClick';
-// import '../../styles/VirtualBookshelf.css';
-// const VirtualBookshelf: React.FC = () => {
-//   const [books, setBooks] = useState<any[]>([]);
-//   const [displayedBooks, setDisplayedBooks] = useState<any[]>([]);
-//   const [loadingMore, setLoadingMore] = useState<boolean>(false);
-//   const observer = useRef<IntersectionObserver | null>(null);
-//   const lastBookRef = useRef<HTMLDivElement | null>(null);
-//   const loadMoreBooks = useCallback(() => {
-//     if (loadingMore) return;
-//     setLoadingMore(true);
-//     setDisplayedBooks(books.slice(0, displayedBooks.length + 15));
-//     setLoadingMore(false);
-//   }, [displayedBooks, loadingMore, books]);
-//   useEffect(() => {
-//     fetch('/public/books.json')
-//       .then((response) => response.json())
-//       .then((data) => {
-//         const shuffledBooks = shuffleArray(data);
-//         setBooks(shuffledBooks);
-//         setDisplayedBooks(shuffledBooks.slice(0, 20));
-//       });
-//   }, []);
-//   useEffect(() => {
-//     if (observer.current) observer.current.disconnect();
-//     observer.current = new IntersectionObserver(
-//       ([entry]) => {
-//         if (entry.isIntersecting) {
-//           loadMoreBooks();
-//         }
-//       },
-//       { rootMargin: '0px 0px 200px 0px' }
-//     );
-//     if (lastBookRef.current) observer.current.observe(lastBookRef.current);
-//     return () => {
-//       if (observer.current) observer.current.disconnect();
-//     };
-//   }, [loadMoreBooks, displayedBooks]);
-//   return (
-//     <div className="bookshelf">
-//       {displayedBooks.map((book, index) => {
-//         const isLastBook = index === displayedBooks.length - 1;
-//         const pathParts = book.imagePath.split('/');
-//         const authorId = pathParts[pathParts.length - 2].split(' ').join('_');
-//         const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join('_');
-//         return (
-//           <div key={index} ref={isLastBook ? lastBookRef : null} className="book">
-//             <a href="#" onClick={(e) => { 
-//                 e.preventDefault();
-//                 console.log("Clicked"); 
-//                 handleReadBookClick(authorId, title); 
-//             }} className="bookImage">
-//               <img src={`/public${book.imagePath}`}  alt={title} className="image" />
-//             </a>
-//             <div className="bookInfo">
-//               <p className="title">{title.replace(/_/g, ' ')}</p>
-//               <p className="author">{authorId.replace(/_/g, ' ')}</p>
-//             </div>
-//           </div>
-//         );
-//       })}
-//       {loadingMore && <div className="loadingMore">Loading more books...</div>}
-//     </div>
-//   );
-// };
-// function shuffleArray(array: any[]) {
-//   for (let i = array.length - 1; i > 0; i--) {
-//     const j = Math.floor(Math.random() * (i + 1));
-//     [array[i], array[j]] = [array[j], array[i]];
-//   }
-//   return array;
-// }
-// export default VirtualBookshelf;
-// // Working, but with imageMap instead of UseSate and useEffect.
-// import React, { useState, useEffect, useRef, useCallback } from 'react';
-// import { handleReadBookClick } from '../utils/handleReadBookClick';
-// import imageMap from '../assets/imageMap';
-// import '../styles/VirtualBookshelf.css';
-// const VirtualBookshelf = () => {
-//   const [books, setBooks] = useState([]);
-//   const [displayedBooks, setDisplayedBooks] = useState([]);
-//   const [loadingMore, setLoadingMore] = useState(false);
-//   const observer = useRef(null);
-//   const lastBookRef = useRef(null);
-//   const loadMoreBooks = useCallback(() => {
-//     if (loadingMore) return;
-//     setLoadingMore(true);
-//     setDisplayedBooks(books.slice(0, displayedBooks.length + 15));
-//     setLoadingMore(false);
-//   }, [displayedBooks, loadingMore, books]);
-//   useEffect(() => {
-//     fetch('/public/books.json')
-//       .then((response) => response.json())
-//       .then((data) => {
-//         const shuffledBooks = shuffleArray(data);
-//         setBooks(shuffledBooks);
-//         setDisplayedBooks(shuffledBooks.slice(0, 20));
-//       });
-//   }, []);
-//   useEffect(() => {
-//     if (observer.current) observer.current.disconnect();
-//     observer.current = new IntersectionObserver(
-//       ([entry]) => {
-//         if (entry.isIntersecting) {
-//           loadMoreBooks();
-//         }
-//       },
-//       { rootMargin: '0px 0px 200px 0px' }
-//     );
-//     if (lastBookRef.current) observer.current.observe(lastBookRef.current);
-//     return () => {
-//       if (observer.current) observer.current.disconnect();
-//     };
-//   }, [loadMoreBooks, displayedBooks]);
-//   return (
-//     <div className="bookshelf">
-//       {displayedBooks.map((book, index) => {
-//         const isLastBook = index === displayedBooks.length - 1;
-//         const pathParts = book.imagePath.split('/');
-//         const authorId = pathParts[pathParts.length - 2].split(' ').join('_');
-//         const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join('_');
-//         const imageIdentifier = `${authorId}_${title}`;
-//         const imageUrl = `/public${imageMap[imageIdentifier]}` || '';
-//         console.log('Image URL:', imageUrl);
-//         console.log('Image Identifier:', imageIdentifier);
-//         return (
-//           <div key={index} ref={isLastBook ? lastBookRef : null} className="book">
-//             <a href="#" onClick={(e) => { 
-//                 e.preventDefault();
-//                 console.log("Clicked"); 
-//                 handleReadBookClick(authorId, title); 
-//             }} className="bookImage">
-//               <img src={imageUrl} alt={title} className="image" />
-//             </a>
-//             <div className="bookInfo">
-//               <p className="title">{title.replace(/_/g, ' ')}</p>
-//               <p className="author">{authorId.replace(/_/g, ' ')}</p>
-//             </div>
-//           </div>
-//         );
-//       })}
-//       {loadingMore && <div className="loadingMore">Loading more books...</div>}
-//     </div>
-//   );
-// };
-// function shuffleArray(array) {
-//   for (let i = array.length - 1; i > 0; i--) {
-//     const j = Math.floor(Math.random() * (i + 1));
-//     [array[i], array[j]] = [array[j], array[i]];
-//   }
-//   return array;
-// }
-// export default VirtualBookshelf;
-// import React, { useState, useEffect, useRef, useCallback } from 'react';
-// import { handleReadBookClick } from '../utils/handleReadBookClick';
-// import imageMap from '../assets/imageMap';
-// import '../styles/VirtualBookshelf.css';
-// const VirtualBookshelf = () => {
-//   const [books, setBooks] = useState([]);
-//   const [displayedBooks, setDisplayedBooks] = useState([]);
-//   const [loadingMore, setLoadingMore] = useState(false);
-//   const [imageUrls, setImageUrls] = useState({}); // New state to manage image URLs
-//   const observer = useRef(null);
-//   const lastBookRef = useRef(null);
-//   const loadMoreBooks = useCallback(() => {
-//     if (loadingMore) return;
-//     setLoadingMore(true);
-//     setDisplayedBooks(books.slice(0, displayedBooks.length + 15));
-//     setLoadingMore(false);
-//   }, [displayedBooks, loadingMore, books]);
-//   useEffect(() => {
-//     // Fetch book data and images
-//     fetch('/public/books.json')
-//       .then((response) => response.json())
-//       .then((data) => {
-//         const shuffledBooks = shuffleArray(data);
-//         setBooks(shuffledBooks);
-//         setDisplayedBooks(shuffledBooks.slice(0, 20));
-//         const newImageUrls = {};
-//         shuffledBooks.forEach((book) => {
-//           const pathParts = book.imagePath.split('/');
-//           const authorId = pathParts[pathParts.length - 2].split(' ').join('_');
-//           const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join('_');
-//           const imageIdentifier = `${authorId}_${title}`;
-//           newImageUrls[imageIdentifier] = `/public${imageMap[imageIdentifier]}`;
-//         });
-//         setImageUrls(newImageUrls);  // Set the image URLs using useState
-//       });
-//   }, []);
-//   useEffect(() => {
-//     if (observer.current) observer.current.disconnect();
-//     observer.current = new IntersectionObserver(
-//       ([entry]) => {
-//         if (entry.isIntersecting) {
-//           loadMoreBooks();
-//         }
-//       },
-//       { rootMargin: '0px 0px 200px 0px' }
-//     );
-//     if (lastBookRef.current) observer.current.observe(lastBookRef.current);
-//     return () => {
-//       if (observer.current) observer.current.disconnect();
-//     };
-//   }, [loadMoreBooks, displayedBooks]);
-//   return (
-//     <div className="bookshelf">
-//       {displayedBooks.map((book, index) => {
-//         const isLastBook = index === displayedBooks.length - 1;
-//         const pathParts = book.imagePath.split('/');
-//         const authorId = pathParts[pathParts.length - 2].split(' ').join('_');
-//         const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join('_');
-//         const imageIdentifier = `${authorId}_${title}`;
-//         const imageUrl = imageUrls[imageIdentifier] || '';
-//         console.log('ImageUrlFromState: ', imageUrl)
-//         // const images = require.context('../assets/public/bookimages/', false, /\.(png|jpe?g|svg)$/);
-//         // const image = require.context('../assets/public/bookimages/', false, /\.(png|jpe?g|svg)$/);
-//         // console.log(`./${imageIdentifier}.png`)
-//         // const imageUrlFromContext = image(`./${imageIdentifier}.png`).default;
-//         // console.log('URL using require.context: ', imageUrlFromContext);
-//         return (
-//           <div key={index} ref={isLastBook ? lastBookRef : null} className="book">
-//             <a href="#" onClick={(e) => { 
-//                 e.preventDefault();
-//                 console.log("Clicked"); 
-//                 handleReadBookClick(authorId, title); 
-//             }} className="bookImage">
-//               <img src={imageUrl} alt={title} className="image" />
-//             </a>
-//             <div className="bookInfo">
-//               <p className="title">{title.replace(/_/g, ' ')}</p>
-//               <p className="author">{authorId.replace(/_/g, ' ')}</p>
-//             </div>
-//           </div>
-//         );
-//       })}
-//       {loadingMore && <div className="loadingMore">Loading more books...</div>}
-//     </div>
-//   );
-// };
-// function shuffleArray(array) {
-//   for (let i = array.length - 1; i > 0; i--) {
-//     const j = Math.floor(Math.random() * (i + 1));
-//     [array[i], array[j]] = [array[j], array[i]];
-//   }
-//   return array;
-// }
-// export default VirtualBookshelf;
-// import React, { useState, useEffect, useRef, useCallback } from 'react';
-// import { handleReadBookClick } from '../utils/handleReadBookClick';
-// import '../styles/VirtualBookshelf.css';
-// const VirtualBookshelf = () => {
-//   const [books, setBooks] = useState([]);
-//   const [displayedBooks, setDisplayedBooks] = useState([]);
-//   const [loadingMore, setLoadingMore] = useState(false);
-//   const observer = useRef(null);
-//   const lastBookRef = useRef(null);
-//   const loadMoreBooks = useCallback(() => {
-//     if (loadingMore) return;
-//     setLoadingMore(true);
-//     setDisplayedBooks(books.slice(0, displayedBooks.length + 15));
-//     setLoadingMore(false);
-//   }, [displayedBooks, loadingMore, books]);
-//   useEffect(() => {
-//     fetch('/public/books.json')
-//       .then((response) => response.json())
-//       .then((data) => {
-//         const shuffledBooks = shuffleArray(data);
-//         setBooks(shuffledBooks);
-//         setDisplayedBooks(shuffledBooks.slice(0, 20));
-//       });
-//   }, []);
-//   useEffect(() => {
-//     if (observer.current) observer.current.disconnect();
-//     observer.current = new IntersectionObserver(
-//       ([entry]) => {
-//         if (entry.isIntersecting) {
-//           loadMoreBooks();
-//         }
-//       },
-//       { rootMargin: '0px 0px 200px 0px' }
-//     );
-//     if (lastBookRef.current) observer.current.observe(lastBookRef.current);
-//     return () => {
-//       if (observer.current) observer.current.disconnect();
-//     };
-//   }, [loadMoreBooks, displayedBooks]);
-//   return (
-//     <div className="bookshelf">
-//       {displayedBooks.map((book, index) => {
-//         const isLastBook = index === displayedBooks.length - 1;
-//         const pathParts = book.imagePath.split('/');
-//         const authorId = pathParts[pathParts.length - 2].split(' ').join(' ');
-//         const title = pathParts[pathParts.length - 1].replace('.png', '').split(' ').join(' ');
-//         const imageUrl = `/public/bookimages/${authorId}/${title}.png`;
-//         return (
-//           <div key={index} ref={isLastBook ? lastBookRef : null} className="book">
-//             <a href="#" onClick={(e) => { 
-//                 e.preventDefault();
-//                 handleReadBookClick(authorId, title); 
-//             }} className="bookImage">
-//               <img src={imageUrl} alt={title} className="image" />
-//             </a>
-//             <div className="bookInfo">
-//               <p className="title">{title.replace(/_/g, ' ')}</p>
-//               <p className="author">{authorId.replace(/_/g, ' ')}</p>
-//             </div>
-//           </div>
-//         );
-//       })}
-//       {loadingMore && <div className="loadingMore">Loading more books...</div>}
-//     </div>
-//   );
-// };
-// function shuffleArray(array) {
-//   for (let i = array.length - 1; i > 0; i--) {
-//     const j = Math.floor(Math.random() * (i + 1));
-//     [array[i], array[j]] = [array[j], array[i]];
-//   }
-//   return array;
-// }
-// export default VirtualBookshelf;
-
-
-/***/ }),
-
-/***/ "./src/ugd_frontend/src/the-greats/AuthorCards.tsx":
-/*!*********************************************************!*\
-  !*** ./src/ugd_frontend/src/the-greats/AuthorCards.tsx ***!
-  \*********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _utils_Stream__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/Stream */ "./src/ugd_frontend/utils/Stream.tsx");
-/* harmony import */ var _cards_AuthorCard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../cards/AuthorCard */ "./src/ugd_frontend/src/cards/AuthorCard.tsx");
-
-
-
-var AuthorCards = function (_a) {
-    var author = _a.author;
-    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), hasFlipped = _b[0], setHasFlipped = _b[1];
-    var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), cardFlipped = _c[0], setCardFlipped = _c[1];
-    var shouldStartStreaming = hasFlipped;
-    var streamedDescription = (0,_utils_Stream__WEBPACK_IMPORTED_MODULE_1__["default"])(author.description, 15, shouldStartStreaming);
-    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-        if (cardFlipped && !hasFlipped) {
-            setHasFlipped(true);
-        }
-    }, [cardFlipped]);
-    var handleClick = function () {
-        setCardFlipped(!cardFlipped);
-    };
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "\n        author-container flex\n        ".concat(cardFlipped ? 'expanded w-auto' : 'w-[150px]', "\n      ") },
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_cards_AuthorCard__WEBPACK_IMPORTED_MODULE_2__["default"], { image: "/images/".concat(author.id, ".png"), title: author.id, onCardClick: handleClick, flipped: cardFlipped, description: streamedDescription })));
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AuthorCards);
 
 
 /***/ }),
@@ -61821,6 +62283,45 @@ var useStreamingText = function (text, speed, startStreaming) {
     return streamedText;
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (useStreamingText);
+
+
+/***/ }),
+
+/***/ "./src/ugd_frontend/utils/handleReadBookClick.ts":
+/*!*******************************************************!*\
+  !*** ./src/ugd_frontend/utils/handleReadBookClick.ts ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   handleReadBookClick: () => (/* binding */ handleReadBookClick)
+/* harmony export */ });
+// Later will point to canisters. Right now it's AWS Lambda and S3 buckets.
+var handleReadBookClick = function (authorId, title) {
+    var titleClustered = title.split(" ").join("_");
+    var authorLink = authorId.split(" ").join("_");
+    console.log('Author Link:', authorLink);
+    console.log('Title Clustered:', titleClustered);
+    if (authorLink === "Greco_Romans") {
+        window.open("https://classics.mit.edu/Browse/index.html", '_blank');
+    }
+    else if (authorLink === "Carl_Jung") {
+        window.open("https://archive.org/details/jung-carl-gustav-complete/01%20Psychiatric%20Studies/", '_blank');
+    }
+    else if (authorLink === "The_Bible") {
+        window.open("https://www.semantic-library.com/?bookPath=https%3A%2F%2Funcensoredgreatsebooks.s3.us-east-2.amazonaws.com%2FThe_Bible%2FThe_Bible%40%40The_Bible.epub", '_blank');
+    }
+    else {
+        var bookUrl = "https://uncensoredgreatsebooks.s3.us-east-2.amazonaws.com/".concat(authorLink, "/").concat(authorLink, "@@").concat(titleClustered, ".epub");
+        var readerAppUrl = "https://www.semantic-library.com";
+        var url = new URL(readerAppUrl);
+        url.searchParams.set("bookPath", bookUrl);
+        window.open(url.href, '_blank');
+        console.log(bookUrl);
+    }
+};
 
 
 /***/ }),
@@ -62581,7 +63082,7 @@ __webpack_require__.r(__webpack_exports__);
 
 webfontloader__WEBPACK_IMPORTED_MODULE_8___default().load({
   google: {
-    families: ['Georgia', 'Lobster', 'Roboto:300,400,700', "Times New Roman"]
+    families: ['Georgia', 'Lobster', 'Lexend', 'Roboto:300,400,700', "Times New Roman", 'Nunito']
   }
 });
 const App = () => {

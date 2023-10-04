@@ -1,11 +1,9 @@
 body {
-    font-family: sans-serif;
+    font-family: 'Times New Roman', Times, serif;
     font-size: 1.5rem;
 }
 
 img {
-    max-width: 50vw;
-    max-height: 25vw;
     display: block;
     margin: auto;
 }

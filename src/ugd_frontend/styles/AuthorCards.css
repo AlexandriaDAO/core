@@ -1,6 +1,6 @@
 .author-card {
 width: 120%;
-height: 145%;
+height: 120%;
 position: relative;
 transform-style: preserve-3d;
 transform: rotateY(0);
@@ -12,7 +12,6 @@ transition: transform 0.5s;
   font-size: 18px;
   font-weight: 500;
 }
-
 
 .card-wrapper.cardFlipped .author-card {
 transform: rotateY(180deg);
@@ -60,11 +59,16 @@ overflow-y: auto;
   scrollbar-width: none;
 }
 
-
 .card-wrapper {
 perspective: 1000px;
 width: 150px;
 height: 150px;
+/* width: 180px;
+height: 180px; */
+
+display: flex;
+align-items: center;
+justify-content: center;
 }
 
 .image-container {
@@ -94,20 +98,27 @@ text-overflow: ellipsis;
 transform: translateX(0);
 }
 
-@media (max-width: 68px) {
+/* @media (max-width: 68px) {
   .card-wrapper {
     min-width: 50px;
   }
   .author-card {
     width: 100%;
   }
+} */
+
+
+
+
+
+
+.author-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* your other styles here */
 }
-
-
-
-
-
-
 
 
 

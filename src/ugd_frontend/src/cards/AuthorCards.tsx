@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useStreamingText from '../../utils/Stream';
-import AuthorCard from '../cards/AuthorCard'
+import AuthorCard from './AuthorCard'
+import '../../styles/AuthorCards.css'
 
 interface AuthorCardsProps {
   author: {
@@ -28,12 +29,6 @@ const AuthorCards: React.FC<AuthorCardsProps> = ({ author }) => {
   };
 
   return (
-    <div
-      className={`
-        author-container flex
-        ${cardFlipped ? 'expanded w-auto' : 'w-[150px]'}
-      `}
-    >
       <AuthorCard
         image={`/images/${author.id}.png`}
         title={author.id}
@@ -41,7 +36,6 @@ const AuthorCards: React.FC<AuthorCardsProps> = ({ author }) => {
         flipped={cardFlipped}
         description={streamedDescription}
       />
-    </div>
   );
 };
 
