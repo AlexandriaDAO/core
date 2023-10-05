@@ -5,6 +5,7 @@ import SemanticLibrary from './semantic-library/SemanticLibrary';
 import { ugd_backend } from "../../declarations/ugd_backend";
 import useBackgroundPosition from '../utils/useBackgroundPosition';
 import Scaler from './cards/Scaler';
+import Tabs from './header/Tabs'
 import '../styles/main.css';
 
 import AuthorPanel from './the-greats/AuthorPanel';
@@ -44,7 +45,8 @@ const App = () => {
           zIndex: -1,
         }} />
       )}
-      <div>
+      <div style={{ paddingTop: '25px' }}>
+        <Tabs/>
         <SemanticLibrary />
         <div className='main-grid-container'>
           {/* <Scaler> */}
