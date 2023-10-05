@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Menu } from 'semantic-ui-react';
 
 const Tabs = () => {
-    const [activeItem, setActiveItem] = useState('Read');  // default tab
-    const [visualActiveItem, setVisualActiveItem] = useState('Read');  // default visual tab
+    const [activeItem, setActiveItem] = useState('Create');
+    const [visualActiveItem, setVisualActiveItem] = useState('Create');
     const [containerWidth, setContainerWidth] = useState('75%');
 
     const handleItemClick = (e, { name }) => {
@@ -46,7 +46,8 @@ const Tabs = () => {
             position: 'relative',
             boxShadow: '0 0 3px rgba(0, 0, 0, .1), 0 0 6px rgba(0, 0, 0, .1), 0 0 9px rgba(0, 0, 0, .1), 0 0 12px rgba(0, 0, 0, .1), 0 0 15px rgba(0, 0, 0, .1)',
             boxShadow: '0 0 3px rgba(255, 255, 255, .1), 0 0 6px rgba(255, 255, 255, .1), 0 0 9px rgba(255, 255, 255, .1), 0 0 12px rgba(255, 255, 255, .1), 0 0 15px rgba(255, 255, 255, .1)',
-            backgroundImage: 'linear-gradient(45deg, #7f00ff, #483d8b, #4682b4, #20b2aa, #a3be8c, #d08770)',
+            background: 'linear-gradient(to right, #7f00ff, #483d8b, #4682b4, #20b2aa, #a3be8c, #d08770)',
+
         }}>    
             <div style={{
                 position: 'absolute',
@@ -57,8 +58,8 @@ const Tabs = () => {
                 background: 'grey',
                 borderRadius: '0 0 10px 10px',
                 transition: '0.3s',
-                left: visualActiveItem === 'Chat' ? '15px' : 
-                visualActiveItem === 'Read' ? '34%' : '64.5%'
+                left: visualActiveItem === 'Earn' ? '15px' : 
+                visualActiveItem === 'Create' ? '34%' : '64.5%'
             }}></div>
             <Menu.Item
                 name='Earn'

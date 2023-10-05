@@ -1,7 +1,7 @@
 // pages/the-greats.tsx
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import SemanticLibrary from './semantic-library/SemanticLibrary';
+import SearchBar from './header/SearchBar';
 import { ugd_backend } from "../../declarations/ugd_backend";
 import useBackgroundPosition from '../utils/useBackgroundPosition';
 import Scaler from './cards/Scaler';
@@ -47,7 +47,7 @@ const App = () => {
       )}
       <div style={{ paddingTop: '25px' }}>
         <Tabs/>
-        <SemanticLibrary />
+        <SearchBar />
         <div className='main-grid-container'>
           {/* <Scaler> */}
             <AuthorPanel authors={AUTHOR_INFO} />
