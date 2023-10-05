@@ -33,3 +33,21 @@ button[type="submit"] {
 #greeting:empty {
     display: none;
 }
+
+
+
+
+
+
+
+
+
+
+/* .main-grid-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+} */

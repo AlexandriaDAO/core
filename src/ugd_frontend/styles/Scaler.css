@@ -1,28 +1,10 @@
-/* .scaler {
-  transform-origin: top left;
-}
-
-@media (max-width: 600px) {
-  .scaler {
-    transform: scale(0.85);
-  }
-}
-
-@media (min-width: 1200px) {
-  .scaler {
-    transform: scale(1.15);
-  }
-} */
-
-
-
 .scaler {
   transform-origin: center;
 }
 
 @media (max-width: 600px) {
   .scaler {
-    transform: scale(0.88);
+    transform: scale(0.83);
   }
 }
 

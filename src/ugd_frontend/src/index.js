@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import SemanticLibrary from './semantic-library/SemanticLibrary';
 import { ugd_backend } from "../../declarations/ugd_backend";
 import useBackgroundPosition from '../utils/useBackgroundPosition';
+import Scaler from './cards/Scaler';
 import '../styles/main.css';
 
 import AuthorPanel from './the-greats/AuthorPanel';
@@ -45,7 +46,11 @@ const App = () => {
       )}
       <div>
         <SemanticLibrary />
-        <AuthorPanel authors={AUTHOR_INFO} />
+        <div className='main-grid-container'>
+          {/* <Scaler> */}
+            <AuthorPanel authors={AUTHOR_INFO} />
+          {/* </Scaler> */}
+        </div>
       </div>
     </div>
   );

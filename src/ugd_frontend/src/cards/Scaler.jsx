@@ -34,7 +34,7 @@ function getCurrentScale() {
   const width = window.innerWidth;
 
   if (width <= 600) {
-    return 0.88;
+    return 0.83;
   } else if (width <= 669) {
     return 0.88;
   } else if (width <= 739) {
