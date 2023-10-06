@@ -1,8 +1,12 @@
+.scale-down {
+  transform: scale(0.8);
+}
+
 .carousel-container {
-  position: relative;
-  width: 90%;
-  max-width: 1200px;
-  margin-top: 50px;
+  position: absolute;
+  width: 1000px;
+  max-width: 100%;
+  margin-top: -30px;
   margin-left: auto;
   margin-right: auto;
   overflow-x: hidden;
@@ -11,12 +15,6 @@
 
 .segment-area {
   background: linear-gradient(180deg, #aca473 0%, #797761 100%);
-  /* background: linear-gradient(180deg, #a3be8c 0%, #d08770  100%); */
-  /* background: linear-gradient(180deg, #6f8160 0%, #aca473 100%);  */
-  /* background: linear-gradient(180deg, #20b2aa 0%, #a3be8c 100%);  */
-  /* #20b2aa, #a3be8c */
-  /* #a3be8c, #d08770 */
-  /* background: #f7f5e8; */
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
@@ -25,10 +23,10 @@
 }
 
 .carousel-wrapper {
-  display: flex;
   overflow-x: auto;
   white-space: nowrap;
   height: 100%;
+  width: 100%;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -36,7 +34,6 @@
 .carousel-wrapper::-webkit-scrollbar {
   display: none;
 }
-
 
 .carousel-card {
   display: inline-block;

@@ -125,7 +125,7 @@ line-height: 0.96rem;
 }
 
 .BCReadBook-button:hover {
-    /* background-color: #e79475; */
+    background-color: #e79475;
     background-color: #a3be8c;
     transform: translateX(-50%) scale(1.05);
 }

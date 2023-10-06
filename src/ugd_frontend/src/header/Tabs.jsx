@@ -4,36 +4,15 @@ import { Menu } from 'semantic-ui-react';
 const Tabs = () => {
     const [activeItem, setActiveItem] = useState('Create');
     const [visualActiveItem, setVisualActiveItem] = useState('Create');
-    const [containerWidth, setContainerWidth] = useState('75%');
+    const containerWidth='60vw'
 
     const handleItemClick = (e, { name }) => {
         setActiveItem(name);
         setVisualActiveItem(name);
     };
 
-    const updateWidth = () => {
-        const winWidth = window.innerWidth;
-
-        if (winWidth >= 1024) {
-            setContainerWidth('50%');
-        } else if (winWidth >= 768) {
-            setContainerWidth('60%');
-        } else {
-            setContainerWidth('75%');
-        }
-    };
-
-    useEffect(() => {
-        updateWidth();
-        window.addEventListener('resize', updateWidth);
-
-        return () => {
-            window.removeEventListener('resize', updateWidth);
-        };
-    }, []);
-
     return (
-      <div style={{ width: containerWidth, margin: '0 auto' }}>
+      <div style={{ width: containerWidth, maxWidth: '550px', minWidth: '280px', margin: '0 auto' }}>
         <div style={{
             flex: 2,
             display: 'flex',

@@ -28,7 +28,7 @@ const VirtualBookShelfComponent = ({ author }: { author: string }) => {
   }, []);
 
   return (
-    <div className="carousel-container">
+    <div className="carousel-container scale-down">
       <div className="segment-area">
         <div className="carousel-wrapper">
           {booksByThisAuthor.map((book, bookIndex) => (
