@@ -28,7 +28,9 @@ overflow: hidden;
 }
 
 .card-front {
-background: #fbfbf8;
+/* background: #fbfbf8; */
+background: #f7f5e8;
+
 display: flex;
 flex-direction: column;
 align-items: center;
@@ -41,7 +43,8 @@ box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 
 .card-back {
 transform: rotateY(180deg);
-background: #fbfbf8;
+/* background: #fbfbf8; */
+background: #f7f5e8;
 text-align: center;
 padding: 10px;
 overflow-y: auto;

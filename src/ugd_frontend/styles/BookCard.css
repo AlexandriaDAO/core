@@ -35,7 +35,7 @@
 
 .BCCard-back {
     transform: rotateY(180deg);
-    background: #fbfbf8;
+    background: #f7f5e8;
     text-align: center;
     padding: 10px;
     overflow-y: auto;
@@ -125,6 +125,7 @@ line-height: 0.96rem;
 }
 
 .BCReadBook-button:hover {
-    background-color: #252984;
+    /* background-color: #e79475; */
+    background-color: #a3be8c;
     transform: translateX(-50%) scale(1.05);
 }

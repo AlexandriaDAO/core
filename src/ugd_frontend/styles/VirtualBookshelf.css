@@ -10,7 +10,13 @@
 }
 
 .segment-area {
-  background: linear-gradient(135deg, #F7F9FC 0%, #E5E7EB 100%);
+  background: linear-gradient(180deg, #aca473 0%, #797761 100%);
+  /* background: linear-gradient(180deg, #a3be8c 0%, #d08770  100%); */
+  /* background: linear-gradient(180deg, #6f8160 0%, #aca473 100%);  */
+  /* background: linear-gradient(180deg, #20b2aa 0%, #a3be8c 100%);  */
+  /* #20b2aa, #a3be8c */
+  /* #a3be8c, #d08770 */
+  /* background: #f7f5e8; */
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
