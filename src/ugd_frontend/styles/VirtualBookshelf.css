@@ -1,14 +1,15 @@
 .scale-down {
   transform: scale(0.8);
+  transform-origin: left center;
 }
 
 .carousel-container {
-  position: absolute;
-  width: 1000px;
-  max-width: 100%;
+  position: relative;
+  width: 2000px;
+  max-width: 120%;
   margin-top: -30px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: 2vw;
+  margin-right: 2vw;
   overflow-x: hidden;
   height: 300px;
 }
@@ -37,8 +38,8 @@
 
 .carousel-card {
   display: inline-block;
-  padding: 20px;
-  width: 240px;
+  padding: 15px;
+  width: 200px;
 }
 
 .scrollbar-hide {
@@ -49,3 +50,36 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* .segment-area::before,
+.segment-area::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100px;
+  pointer-events: none;
+  z-index: 2;
+} */
+/* .segment-area::before {
+  left: 0;
+  background: linear-gradient(to right, #fff 0%, transparent 100%);
+}
+.segment-area::after {
+  right: 0;
+  background: linear-gradient(to left, #fff 0%, transparent 100%);
+} */

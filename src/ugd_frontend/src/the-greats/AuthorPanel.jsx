@@ -363,7 +363,7 @@ function AuthorPanel({ authors }) {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-}, []); // This will run only once, when the component is mounted
+  }, []);
 
   const getCols = () => {
     const numCols = Math.floor(containerWidth / CARD_WIDTH);
@@ -391,14 +391,23 @@ function AuthorPanel({ authors }) {
 
     if (activeAuthor) {
       const index = authors.findIndex(a => a.id === activeAuthor);
+      let yPosition;
+  
+      if (index >= fullRows * numCols) {
+          yPosition = Math.floor(index / numCols) + 1;
+      } else {
+          yPosition = Math.floor(index / numCols);
+      }
+  
       layouts['xxs'].push({
-        i: `extra-${activeAuthor}`,
-        x: 0,
-        y: Math.floor(index / numCols) + 1,
-        w: numCols,
-        h: 1,
+          i: `extra-${activeAuthor}`,
+          x: 0,
+          y: yPosition,
+          w: numCols,
+          h: 1,
       });
     }
+  
     return layouts;
   };
 
