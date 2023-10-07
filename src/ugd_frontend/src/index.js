@@ -4,7 +4,6 @@ import { createRoot } from 'react-dom/client';
 import SearchBar from './header/SearchBar';
 import { ugd_backend } from "../../declarations/ugd_backend";
 import useBackgroundPosition from '../utils/useBackgroundPosition';
-import Scaler from '../utils/Scaler';
 import Tabs from './header/Tabs'
 import '../styles/main.css';
 
@@ -49,9 +48,7 @@ const App = () => {
         <Tabs/>
         <SearchBar />
         <div className='main-grid-container'>
-          {/* <Scaler> */}
-            <AuthorPanel authors={AUTHOR_INFO} />
-          {/* </Scaler> */}
+          <AuthorPanel authors={AUTHOR_INFO} />
         </div>
       </div>
     </div>

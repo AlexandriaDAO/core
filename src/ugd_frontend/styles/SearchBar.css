@@ -67,7 +67,10 @@
   background: linear-gradient(to right, #5a63c6, #6e3c9b);
 }
 
-.dropdown {
+
+
+
+/* .dropdown {
   position: absolute;
   top: 100%;
   left: 0;
@@ -81,7 +84,54 @@
 
 .dropdown.visible {
   display: block;
+} */
+
+.filter-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
 }
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.filter-item:last-child {
+  margin-bottom: 0;
+}
+
+.filter-item input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
