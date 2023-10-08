@@ -68,24 +68,6 @@
 }
 
 
-
-
-/* .dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  width: 200px;
-  display: none;
-}
-
-.dropdown.visible {
-  display: block;
-} */
-
 .filter-popup {
   position: absolute;
   top: 100%;
@@ -112,28 +94,6 @@
 .filter-item input[type="checkbox"] {
   margin-right: 0.5rem;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

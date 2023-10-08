@@ -1,4 +1,3 @@
-// pages/the-greats.tsx
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import SearchBar from './header/SearchBar';
@@ -21,6 +20,7 @@ WebFont.load({
 const App = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const backgroundPosition = useBackgroundPosition();
+  const [selectedAuthors, setSelectedAuthors] = useState(AUTHOR_INFO.map(author => author.id));
 
   useEffect(() => {
     const image = require.context('../assets/public/images/', false, /\.(png|jpe?g|svg)$/);
@@ -46,9 +46,10 @@ const App = () => {
       )}
       <div style={{ paddingTop: '25px' }}>
         <Tabs/>
-        <SearchBar />
+        {/* <SearchBar/>  */}
+        <SearchBar selectedAuthors={selectedAuthors} setSelectedAuthors={setSelectedAuthors} />
         <div className='main-grid-container'>
-          <AuthorPanel authors={AUTHOR_INFO} />
+          <AuthorPanel authors={AUTHOR_INFO.filter(author => selectedAuthors.includes(author.id))} />
         </div>
       </div>
     </div>
@@ -82,9 +83,6 @@ const App = () => {
     });
   }
 });
-
-
-
 
 
 
