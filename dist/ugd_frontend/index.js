@@ -6432,6 +6432,12 @@ const SearchBar = ({
       setIsLoading(false);
     }
   }, [searchValue]);
+  const handleKeyDown = e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearchSubmit();
+    }
+  };
   const toggleDropdown = () => setIsDropdownVisible(prev => !prev);
   const handleAuthorSelection = authorId => setSelectedAuthors(prevAuthors => prevAuthors.includes(authorId) ? prevAuthors.filter(id => id !== authorId) : [...prevAuthors, authorId]);
   const handleAllBooksSelection = () => setSelectedAuthors(selectedAuthors.length === _assets_author_data__WEBPACK_IMPORTED_MODULE_1__["default"].length ? [] : _assets_author_data__WEBPACK_IMPORTED_MODULE_1__["default"].map(author => author.id));
@@ -6453,7 +6459,8 @@ const SearchBar = ({
     type: "text",
     className: "search-input",
     placeholder: "Type a topic or a query...",
-    onChange: handleSearchChange
+    onChange: handleSearchChange,
+    onKeyDown: handleKeyDown
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
     className: "search-icon-button",
     onClick: handleSearchSubmit
@@ -6468,89 +6475,6 @@ const SearchBar = ({
   }, data));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SearchBar);
-
-// import React, { useState, useCallback } from 'react';
-// import AUTHOR_INFO from '../../assets/author_data';
-// import { ugd_backend } from '../../../declarations/ugd_backend';
-// import '../../styles/SearchBar.css';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faSearch } from '@fortawesome/free-solid-svg-icons';
-// import AuthorFilter from './AuthorFilter';
-
-// const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, setSelectedCategories }) => {
-//   const [searchValue, setSearchValue] = useState('');
-//   const [data, setData] = useState(null);
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-
-//   const allCategories = [...new Set(AUTHOR_INFO.flatMap(author => author.category))];
-
-//   const handleSearchChange = event => setSearchValue(event.target.value);
-
-//   const handleSearchSubmit = useCallback(async () => {
-//     if (searchValue.trim()) {
-//       setIsLoading(true);
-//       try {
-//         const response = await ugd_backend.greet(searchValue);
-//         setData(response);
-//       } catch (error) {
-//         console.error("Failed to fetch the message:", error);
-//       }
-//       setIsLoading(false);
-//     }
-//   }, [searchValue]);
-
-//   const handleKeyDown = (e) => {
-//     if (e.key === 'Enter') {
-//       e.preventDefault();
-//       handleSearchSubmit();
-//     }
-//   };
-
-//   const toggleDropdown = () => setIsDropdownVisible(prev => !prev);
-
-//   const handleAuthorSelection = authorId => setSelectedAuthors(prevAuthors => 
-//     prevAuthors.includes(authorId) ? prevAuthors.filter(id => id !== authorId) : [...prevAuthors, authorId]);
-
-//   const handleAllBooksSelection = () => setSelectedAuthors(
-//     selectedAuthors.length === AUTHOR_INFO.length ? [] : AUTHOR_INFO.map(author => author.id)
-//   );
-
-//   const handleCategorySelection = category => setSelectedCategories(prevCategories =>
-//     prevCategories.includes(category) ? prevCategories.filter(cat => cat !== category) : [...prevCategories, category]);
-
-//   return (
-//     <div className="searchbar-wrapper">
-//       <div className="searchbar">
-//         <AuthorFilter 
-//           isDropdownVisible={isDropdownVisible}
-//           toggleDropdown={toggleDropdown}
-//           selectedAuthors={selectedAuthors}
-//           handleAuthorSelection={handleAuthorSelection}
-//           handleAllBooksSelection={handleAllBooksSelection}
-//           allCategories={allCategories}
-//           selectedCategories={selectedCategories}
-//           handleCategorySelection={handleCategorySelection}
-//         />
-//         <input
-//           type="text"
-//           className="search-input"
-//           placeholder="Type a topic or a query..."
-//           onChange={handleSearchChange}
-//           onKeyDown={handleKeyDown} // Added this line
-//         />
-//         <button className="search-icon-button" onClick={handleSearchSubmit}>
-//           <FontAwesomeIcon icon={faSearch} />
-//         </button>
-//       </div>
-//       {isLoading ? (
-//         <div className="loading-indicator"><div className="loader"></div></div>
-//       ) : data && <div className="greeting">{data}</div>}
-//     </div>
-//   );
-// };
-
-// export default SearchBar;
 
 /***/ }),
 
@@ -64593,8 +64517,31 @@ __webpack_require__.r(__webpack_exports__);
 
 var AuthorCard = function (_a) {
     var image = _a.image, title = _a.title, onCardClick = _a.onCardClick, flipped = _a.flipped, description = _a.description;
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "\n            card-wrapper\n            ".concat(flipped ? 'cardFlipped' : '', " \n          "), onClick: onCardClick },
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-card relative transform-gpu transition-transform duration-500 ease-in-out" },
+    // return (
+    //     <div
+    //       className={`
+    //           card-wrapper
+    //           ${flipped ? 'cardFlipped' : ''} 
+    //         `}
+    //       onClick={onCardClick}
+    //     >
+    //       <div className="author-card relative transform-gpu transition-transform duration-500 ease-in-out">
+    //         <div className="card-face card-front absolute inset-0 bg-[#fbfbf8] border border-[#252525] rounded-[.5rem] flex flex-col items-center">
+    //           <div className="image-container">
+    //             <img src={image} className="object-cover w-full h-full" alt={title} />
+    //           </div>
+    //           <div className="text-container w-[95%] h-[15px] bg-gray-100 rounded-b-lg flex items-center justify-center">
+    //             <p className="overflow-hidden overflow-ellipsis author-name">{title}</p>
+    //           </div>
+    //         </div>
+    //         <div className="card-face card-back absolute inset-0 bg-[#fbfbf8] text-center p-10 overflow-y-auto">
+    //           <p className="streamed-description">{description}</p>
+    //         </div>
+    //       </div>
+    //     </div>
+    // );
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-wrapper ".concat(flipped ? 'cardFlipped' : ''), onClick: onCardClick },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-card relative" },
             react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "card-face card-front absolute inset-0 bg-[#fbfbf8] border border-[#252525] rounded-[.5rem] flex flex-col items-center" },
                 react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "image-container" },
                     react__WEBPACK_IMPORTED_MODULE_0___default().createElement("img", { src: image, className: "object-cover w-full h-full", alt: title })),
