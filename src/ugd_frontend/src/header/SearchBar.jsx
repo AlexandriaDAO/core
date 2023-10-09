@@ -29,6 +29,13 @@ const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, se
     }
   }, [searchValue]);
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearchSubmit();
+    }
+  };
+
   const toggleDropdown = () => setIsDropdownVisible(prev => !prev);
 
   const handleAuthorSelection = authorId => setSelectedAuthors(prevAuthors => 
@@ -59,6 +66,7 @@ const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, se
           className="search-input"
           placeholder="Type a topic or a query..."
           onChange={handleSearchChange}
+          onKeyDown={handleKeyDown}
         />
         <button className="search-icon-button" onClick={handleSearchSubmit}>
           <FontAwesomeIcon icon={faSearch} />

@@ -2,6 +2,7 @@
 ├── Cargo.toml
 ├── canister_ids.json
 ├── dfx.json
+├── postcss.config.js
 ├── src/
 │   ├── ugd_backend/
 │   │   ├── Cargo.toml
@@ -18,25 +19,42 @@
 │   ├── ugd_frontend/
 │   │   ├── src/
 │   │   │   ├── .ic-assets.json5
+│   │   │   ├── cards/
+│   │   │   │   ├── AuthorCard.tsx
+│   │   │   │   ├── AuthorCards.tsx
+│   │   │   │   ├── BookCard.tsx
+│   │   │   │   ├── BookCards.tsx
+│   │   │   │   └── MessageCard.jsx
 │   │   │   ├── contexts/
 │   │   │   │   └── CardStateContext.tsx
+│   │   │   ├── header/
+│   │   │   │   ├── AuthorFilter.jsx
+│   │   │   │   ├── SearchBar.jsx
+│   │   │   │   └── Tabs.jsx
 │   │   │   ├── index.html
 │   │   │   ├── index.js
 │   │   │   ├── semantic-library/
-│   │   │   │   ├── BookCard.jsx
-│   │   │   │   ├── SemanticLibrary.jsx
 │   │   │   │   └── VirtualBookshelf.tsx
 │   │   │   ├── the-greats/
-│   │   │   │   ├── AuthorCards.tsx
-│   │   │   │   ├── AuthorPanel.jsx
-│   │   │   │   └── Stream.tsx
+│   │   │   │   └── AuthorPanel.jsx
 │   │   ├── styles/
 │   │   │   ├── AuthorCards.css
+│   │   │   ├── AuthorFilter.css
+│   │   │   ├── AuthorPanel.css
+│   │   │   ├── BookCard.css
+│   │   │   ├── Scaler.css
+│   │   │   ├── SearchBar.css
 │   │   │   ├── SemanticLibraryPage.css
 │   │   │   ├── VirtualBookshelf.css
-│   │   │   └── main.css
+│   │   │   ├── main.css
+│   │   │   └── tailwind.css
+│   │   ├── types/
+│   │   │   └── react-grid-layout.d.ts
 │   │   ├── utils/
+│   │   │   ├── Scaler.jsx
+│   │   │   ├── Stream.tsx
 │   │   │   ├── handleReadBookClick.ts
 │   │   │   └── useBackgroundPosition.js
+├── tailwind.config.js
 ├── tsconfig.json
 ├── webpack.config.js
