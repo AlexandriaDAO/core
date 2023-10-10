@@ -1,14 +1,42 @@
 // service : {
-//     "greet": (text) -> (text) query;
-// }
-
-
-// service : {
 //   "inc": () -> ();
 //   "read": () -> (nat) query;
 //   "write": (nat) -> ();
 // }
 
+// service : {
+//     "greet": (text) -> (text) query;
+// }
 service : {
-    "greet": (text) -> (text) query;
+    "mc_front": (text) -> (text) query;
 }
+
+
+
+
+
+// // Me Version
+// type message_card = record {
+//     input : text;
+//     output : text;
+// }
+
+// service message_card_response : {
+//     mc_front: (input : text) -> (opt message_card) query;
+// }
+
+
+
+
+
+
+// // AI Version
+// type Response = record {
+//     query: text;
+//     ai_message: text;
+// };
+
+
+// service : {
+//     "mc_front": (text) -> (Response) query;
+// }
