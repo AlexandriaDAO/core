@@ -7,6 +7,7 @@
 // service : {
 //     "greet": (text) -> (text) query;
 // }
+
 service : {
     "mc_front": (text) -> (text) query;
 }
