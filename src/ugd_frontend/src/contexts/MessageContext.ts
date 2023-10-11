@@ -1,9 +1,10 @@
-// // First problem version
 // import React from 'react';
 
 // interface IMessageContext {
 //   message: string;
 //   updateMessage: (query: string) => void;
+//   isLoading: boolean;
+//   error: string | null;
 // }
 
 // const MessageContext = React.createContext<IMessageContext | undefined>(undefined);
@@ -15,16 +16,21 @@
 
 
 
-// // Second version
+
 import React from 'react';
 
-interface IMessageContext {
+interface MessageCard {
+  user_query: string;
   message: string;
+}
+
+interface MessageCardContext {
+  message: MessageCard | null;
   updateMessage: (query: string) => void;
   isLoading: boolean;
   error: string | null;
 }
 
-const MessageContext = React.createContext<IMessageContext | undefined>(undefined);
+const MessageContext = React.createContext<MessageCardContext | undefined>(undefined);
 
 export default MessageContext;

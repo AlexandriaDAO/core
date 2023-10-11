@@ -6278,8 +6278,12 @@ __webpack_require__.r(__webpack_exports__);
 const idlFactory = ({
   IDL
 }) => {
+  const MessageCard = IDL.Record({
+    'user_query': IDL.Text,
+    'message': IDL.Text
+  });
   return IDL.Service({
-    'mc_front': IDL.Func([IDL.Text], [IDL.Text], ['query'])
+    'mc_front': IDL.Func([IDL.Text], [IDL.Opt(MessageCard)], ['query'])
   });
 };
 const init = ({
@@ -6401,91 +6405,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.mjs");
 /* harmony import */ var _AuthorFilter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./AuthorFilter */ "./src/ugd_frontend/src/header/AuthorFilter.jsx");
 /* harmony import */ var _src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../src/contexts/MessageContext */ "./src/ugd_frontend/src/contexts/MessageContext.ts");
-// // OG
-// import React, { useState, useCallback } from 'react';
-// import AUTHOR_INFO from '../../assets/author_data';
-// import { ugd_backend } from '../../../declarations/ugd_backend';
-// import '../../styles/SearchBar.css';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faSearch } from '@fortawesome/free-solid-svg-icons';
-// import AuthorFilter from './AuthorFilter';
-
-// const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, setSelectedCategories }) => {
-//   const [searchValue, setSearchValue] = useState('');
-//   const [data, setData] = useState(null);
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-
-//   const allCategories = [...new Set(AUTHOR_INFO.flatMap(author => author.category))];
-
-//   const handleSearchChange = event => setSearchValue(event.target.value);
-
-//   const handleSearchSubmit = useCallback(async () => {
-//     if (searchValue.trim()) {
-//       setIsLoading(true);
-//       try {
-//         const response = await ugd_backend.mc_front(searchValue);
-//         setData(response);
-//       } catch (error) {
-//         console.error("Failed to fetch the message:", error);
-//       }
-//       setIsLoading(false);
-//     }
-//   }, [searchValue]);
-
-//   const handleKeyDown = (e) => {
-//     if (e.key === 'Enter') {
-//       e.preventDefault();
-//       handleSearchSubmit();
-//     }
-//   };
-
-//   const toggleDropdown = () => setIsDropdownVisible(prev => !prev);
-
-//   const handleAuthorSelection = authorId => setSelectedAuthors(prevAuthors => 
-//     prevAuthors.includes(authorId) ? prevAuthors.filter(id => id !== authorId) : [...prevAuthors, authorId]);
-
-//   const handleAllBooksSelection = () => setSelectedAuthors(
-//     selectedAuthors.length === AUTHOR_INFO.length ? [] : AUTHOR_INFO.map(author => author.id)
-//   );
-
-//   const handleCategorySelection = category => setSelectedCategories(prevCategories =>
-//     prevCategories.includes(category) ? prevCategories.filter(cat => cat !== category) : [...prevCategories, category]);
-
-//   return (
-//     <div className="searchbar-wrapper">
-//       <div className="searchbar">
-//         <AuthorFilter 
-//           isDropdownVisible={isDropdownVisible}
-//           toggleDropdown={toggleDropdown}
-//           selectedAuthors={selectedAuthors}
-//           handleAuthorSelection={handleAuthorSelection}
-//           handleAllBooksSelection={handleAllBooksSelection}
-//           allCategories={allCategories}
-//           selectedCategories={selectedCategories}
-//           handleCategorySelection={handleCategorySelection}
-//         />
-//         <input
-//           type="text"
-//           className="search-input"
-//           placeholder="Type a topic or a query..."
-//           onChange={handleSearchChange}
-//           onKeyDown={handleKeyDown}
-//         />
-//         <button className="search-icon-button" onClick={handleSearchSubmit}>
-//           <FontAwesomeIcon icon={faSearch} />
-//         </button>
-//       </div>
-//       {isLoading ? (
-//         <div className="loading-indicator"><div className="loader"></div></div>
-//       ) : data && <div className="greeting">{data}</div>}
-//     </div>
-//   );
-// };
-
-// export default SearchBar;
-
-// Trying to use context instead of direct api call.
+// Revised trying to use context instead of direct api call.
 
 
 
@@ -6509,11 +6429,13 @@ const SearchBar = ({
   }
   const {
     message,
-    updateMessage
+    updateMessage,
+    isLoading,
+    error
   } = messageContext;
   const handleSearchSubmit = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
     if (searchValue.trim()) {
-      updateMessage(searchValue); // Loading state should be managed in the MessageProvider
+      updateMessage(searchValue);
     }
   }, [searchValue, updateMessage]);
   const handleKeyDown = e => {
@@ -6550,7 +6472,15 @@ const SearchBar = ({
     onClick: handleSearchSubmit
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_3__.FontAwesomeIcon, {
     icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_6__.faSearch
-  }))));
+  }))), isLoading ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "loading-indicator"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "loader"
+  })) : error ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "error-message"
+  }, error) : message && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "greeting"
+  }, message));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SearchBar);
 
@@ -17716,7 +17646,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.searchbar-wrapper {
   background: linear-gradient(to right, #5a63c6, #6e3c9b);
 }
 
-/* .searchbar-loading {
+.searchbar-loading {
   margin-top: 15px;
   text-align: center;
 }
@@ -17729,7 +17659,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.searchbar-wrapper {
   border-radius: 50%;
   border-top-color: #667eea;
   animation: spin 1s linear infinite;
-} */
+}
 
 @keyframes spin {
   0% {
@@ -17745,7 +17675,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.searchbar-wrapper {
   font-size: 18px;
 }
 
-`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/SearchBar.css"],"names":[],"mappings":"AAAA;EACE,gBAAgB;EAChB,WAAW;EACX,aAAa;EACb,cAAc;AAChB;;AAEA;EACE,kBAAkB;EAClB,aAAa;EACb,mBAAmB;EACnB,YAAY;EACZ,mBAAmB;EACnB,+CAA+C;EAC/C,2FAA2F;AAC7F;;AAEA;EACE,OAAO;EACP,kBAAkB;EAClB,YAAY;EACZ,kBAAkB;EAClB,eAAe;EACf,yBAAyB;EACzB,4BAA4B;AAC9B;;AAEA;EACE,WAAW;EACX,YAAY;EACZ,kBAAkB;EAClB,aAAa;EACb,uBAAuB;EACvB,mBAAmB;EACnB,YAAY;EACZ,cAAc;EACd,WAAW;AACb;;AAEA;EACE,uDAAuD;EACvD,eAAe;AACjB;;AAEA;EACE,eAAe;AACjB;;AAEA;EACE;IACE,YAAY;EACd;;EAEA;IACE,cAAc;IACd,wBAAwB;EAC1B;;EAEA;IACE,UAAU;IACV,WAAW;IACX,cAAc;EAChB;AACF;;AAEA;EACE,uDAAuD;AACzD;;AAEA;;;;;;;;;;;;;GAaG;;AAEH;EACE;MACI,uBAAuB;EAC3B;EACA;MACI,yBAAyB;EAC7B;AACF;;AAEA;EACE,gBAAgB;EAChB,eAAe;AACjB","sourcesContent":[".searchbar-wrapper {\n  max-width: 800px;\n  width: 100%;\n  padding: 20px;\n  margin: 0 auto; \n}\n\n.searchbar {\n  position: relative;\n  display: flex;\n  align-items: center;\n  padding: 8px;\n  border-radius: 30px;\n  box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);\n  background: linear-gradient(to right, #5b4e81, #6f649c, #837bb7, #9e95ce, #b9b3e4, #d6cf9a);\n}\n\n.search-input {\n  flex: 1;\n  padding: 10px 20px;\n  border: none;\n  border-radius: 5px;\n  font-size: 18px;\n  background-color: #faf8ef;\n  transition: border 0.3s ease;\n}\n\n.filter-icon-button, .search-icon-button {\n  width: 45px;\n  height: 45px;\n  border-radius: 50%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  border: none;\n  margin: 0 10px;\n  color: #fff;\n}\n\n.search-icon-button {\n  background: linear-gradient(to right, #667eea, #764ba2);\n  font-size: 22px;\n}\n\n.filter-icon-button {\n  font-size: 28px;\n}\n\n@media (max-width: 480px) {\n  .searchbar-wrapper {\n    padding: 2vw;\n  }\n\n  .search-input {\n    font-size: 4vw;\n    padding: 1vw 4vw 1vw 2vw;\n  }\n\n  .filter-icon-button, .search-icon-button {\n    width: 8vw;\n    height: 8vw;\n    font-size: 5vw;\n  }\n}\n\n.icon-button:hover {\n  background: linear-gradient(to right, #5a63c6, #6e3c9b);\n}\n\n/* .searchbar-loading {\n  margin-top: 15px;\n  text-align: center;\n}\n\n.searchbar-loader {\n  display: inline-block;\n  width: 40px;\n  height: 40px;\n  border: 4px solid #ccc;\n  border-radius: 50%;\n  border-top-color: #667eea;\n  animation: spin 1s linear infinite;\n} */\n\n@keyframes spin {\n  0% {\n      transform: rotate(0deg);\n  }\n  100% {\n      transform: rotate(360deg);\n  }\n}\n\n.searchbar-greeting {\n  margin-top: 15px;\n  font-size: 18px;\n}\n\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/SearchBar.css"],"names":[],"mappings":"AAAA;EACE,gBAAgB;EAChB,WAAW;EACX,aAAa;EACb,cAAc;AAChB;;AAEA;EACE,kBAAkB;EAClB,aAAa;EACb,mBAAmB;EACnB,YAAY;EACZ,mBAAmB;EACnB,+CAA+C;EAC/C,2FAA2F;AAC7F;;AAEA;EACE,OAAO;EACP,kBAAkB;EAClB,YAAY;EACZ,kBAAkB;EAClB,eAAe;EACf,yBAAyB;EACzB,4BAA4B;AAC9B;;AAEA;EACE,WAAW;EACX,YAAY;EACZ,kBAAkB;EAClB,aAAa;EACb,uBAAuB;EACvB,mBAAmB;EACnB,YAAY;EACZ,cAAc;EACd,WAAW;AACb;;AAEA;EACE,uDAAuD;EACvD,eAAe;AACjB;;AAEA;EACE,eAAe;AACjB;;AAEA;EACE;IACE,YAAY;EACd;;EAEA;IACE,cAAc;IACd,wBAAwB;EAC1B;;EAEA;IACE,UAAU;IACV,WAAW;IACX,cAAc;EAChB;AACF;;AAEA;EACE,uDAAuD;AACzD;;AAEA;EACE,gBAAgB;EAChB,kBAAkB;AACpB;;AAEA;EACE,qBAAqB;EACrB,WAAW;EACX,YAAY;EACZ,sBAAsB;EACtB,kBAAkB;EAClB,yBAAyB;EACzB,kCAAkC;AACpC;;AAEA;EACE;MACI,uBAAuB;EAC3B;EACA;MACI,yBAAyB;EAC7B;AACF;;AAEA;EACE,gBAAgB;EAChB,eAAe;AACjB","sourcesContent":[".searchbar-wrapper {\n  max-width: 800px;\n  width: 100%;\n  padding: 20px;\n  margin: 0 auto; \n}\n\n.searchbar {\n  position: relative;\n  display: flex;\n  align-items: center;\n  padding: 8px;\n  border-radius: 30px;\n  box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);\n  background: linear-gradient(to right, #5b4e81, #6f649c, #837bb7, #9e95ce, #b9b3e4, #d6cf9a);\n}\n\n.search-input {\n  flex: 1;\n  padding: 10px 20px;\n  border: none;\n  border-radius: 5px;\n  font-size: 18px;\n  background-color: #faf8ef;\n  transition: border 0.3s ease;\n}\n\n.filter-icon-button, .search-icon-button {\n  width: 45px;\n  height: 45px;\n  border-radius: 50%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  border: none;\n  margin: 0 10px;\n  color: #fff;\n}\n\n.search-icon-button {\n  background: linear-gradient(to right, #667eea, #764ba2);\n  font-size: 22px;\n}\n\n.filter-icon-button {\n  font-size: 28px;\n}\n\n@media (max-width: 480px) {\n  .searchbar-wrapper {\n    padding: 2vw;\n  }\n\n  .search-input {\n    font-size: 4vw;\n    padding: 1vw 4vw 1vw 2vw;\n  }\n\n  .filter-icon-button, .search-icon-button {\n    width: 8vw;\n    height: 8vw;\n    font-size: 5vw;\n  }\n}\n\n.icon-button:hover {\n  background: linear-gradient(to right, #5a63c6, #6e3c9b);\n}\n\n.searchbar-loading {\n  margin-top: 15px;\n  text-align: center;\n}\n\n.searchbar-loader {\n  display: inline-block;\n  width: 40px;\n  height: 40px;\n  border: 4px solid #ccc;\n  border-radius: 50%;\n  border-top-color: #667eea;\n  animation: spin 1s linear infinite;\n}\n\n@keyframes spin {\n  0% {\n      transform: rotate(0deg);\n  }\n  100% {\n      transform: rotate(360deg);\n  }\n}\n\n.searchbar-greeting {\n  margin-top: 15px;\n  font-size: 18px;\n}\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -64840,49 +64770,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-// First problem version
+// import React from 'react';
+// interface IMessageContext {
+//   message: string;
+//   updateMessage: (query: string) => void;
+//   isLoading: boolean;
+//   error: string | null;
+// }
+// const MessageContext = React.createContext<IMessageContext | undefined>(undefined);
+// export default MessageContext;
 
 var MessageContext = react__WEBPACK_IMPORTED_MODULE_0___default().createContext(undefined);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MessageContext);
-// // Second version
-// import React, { createContext, useState, useContext } from 'react';
-// import { ugd_backend } from "../declarations/ugd_backend";
-// interface MessageContextType {
-//   message: string;
-//   setMessage: React.Dispatch<React.SetStateAction<string>>;
-//   handleFormSubmit: (e: Event) => void;
-// }
-// const MessageContext = createContext<MessageContextType | undefined>(undefined);
-// export const useMessageContext = () => {
-//   const context = useContext(MessageContext);
-//   if (!context) {
-//     throw new Error("useMessageContext must be used within a MessageProvider");
-//   }
-//   return context;
-// };
-// export const MessageProvider: React.FC = ({ children }) => {
-//   const [message, setMessage] = useState<string>("");
-//   const handleFormSubmit = async (e: Event) => {
-//     e.preventDefault();
-//     const form = e.target as HTMLFormElement;
-//     const button: HTMLButtonElement | null = form.querySelector("button");
-//     const queryInput: HTMLInputElement | null = document.getElementById("query") as HTMLInputElement | null;
-//     if (!button || !queryInput) {
-//       console.error("Elements not found");
-//       return;
-//     }
-//     const query = queryInput.value;
-//     button.setAttribute("disabled", "true");
-//     const responseMessage = await ugd_backend.mc_front(query);
-//     setMessage(responseMessage);
-//     button.removeAttribute("disabled");
-//   };
-//   return (
-//     <MessageContext.Provider value={{ message, setMessage, handleFormSubmit }}>
-//       {children}
-//     </MessageContext.Provider>
-//   );
-// };
 
 
 /***/ }),
@@ -65011,9 +64910,9 @@ var VirtualBookShelfComponent = function (_a) {
 
 /***/ }),
 
-/***/ "./src/ugd_frontend/utils/MessageReciever.tsx":
+/***/ "./src/ugd_frontend/utils/MessageProvider.tsx":
 /*!****************************************************!*\
-  !*** ./src/ugd_frontend/utils/MessageReciever.tsx ***!
+  !*** ./src/ugd_frontend/utils/MessageProvider.tsx ***!
   \****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -65026,9 +64925,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _declarations_ugd_backend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../declarations/ugd_backend */ "./src/declarations/ugd_backend/index.js");
 /* harmony import */ var _src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../src/contexts/MessageContext */ "./src/ugd_frontend/src/contexts/MessageContext.ts");
-// // OG
-// import React, { useEffect, useState } from 'react';
+// // Revising Broken First version using context.
+// import React, { useState } from 'react';
 // import { ugd_backend } from "../../declarations/ugd_backend";
+// import MessageContext from '../src/contexts/MessageContext';
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -65065,80 +64965,82 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-// const MessageReceiver: React.FC = () => {
+// interface MessageProviderProps {
+//   children: React.ReactNode;
+// }
+// const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
 //   const [message, setMessage] = useState<string>("");
-//   const handleFormSubmit = async (e: Event) => {
-//     e.preventDefault();
-//     const form = e.target as HTMLFormElement;
-//     const button: HTMLButtonElement | null = form.querySelector("button");
-//     const queryInput: HTMLInputElement | null = document.getElementById("query") as HTMLInputElement | null;
-//     if (!button || !queryInput) {
-//       console.error("Elements not found");
-//       return;
+//   const [isLoading, setIsLoading] = useState<boolean>(false);
+//   const [error, setError] = useState<string | null>(null);
+//   const updateMessage = async (query: string) => {
+//     setIsLoading(true);
+//     try {
+//         const responseMessage = await ugd_backend.mc_front(query);
+//         setMessage(responseMessage);
+//         setError(null);
+//     } catch (error) {
+//         setError(`Failed to fetch the message`);
+//     } finally {
+//         setIsLoading(false);
 //     }
-//     const query = queryInput.value;
-//     button.setAttribute("disabled", "true");
-//     const responseMessage = await ugd_backend.mc_front(query);
-//     setMessage(responseMessage);
-//     button.removeAttribute("disabled");
-//   };
-//   useEffect(() => {
-//     const form = document.querySelector("form");
-//     if (form) {
-//       form.addEventListener("submit", handleFormSubmit);
-//     }
-//     return () => {
-//       if (form) {
-//         form.removeEventListener("submit", handleFormSubmit);
-//       }
-//     };
-//   }, []);
-//   return <div id="message">{message}</div>;
 // };
-// export default MessageReceiver;
-// Broken First version using context.
+//   return (
+//     <MessageContext.Provider value={{ message, updateMessage, isLoading, error }}>
+//       {children}
+//       <div id="message">{message}</div>
+//     </MessageContext.Provider>
+//   );
+// };
+// export default MessageProvider;
 
 
 
 var MessageProvider = function (_a) {
     var children = _a.children;
-    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(""), message = _b[0], setMessage = _b[1];
+    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null), message = _b[0], setMessage = _b[1];
+    var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), isLoading = _c[0], setIsLoading = _c[1];
+    var _d = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null), error = _d[0], setError = _d[1];
     var updateMessage = function (query) { return __awaiter(void 0, void 0, void 0, function () {
-        var responseMessage;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, _declarations_ugd_backend__WEBPACK_IMPORTED_MODULE_1__.ugd_backend.mc_front(query)];
+        var response, firstResponse, error_1;
+        var _a, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    setIsLoading(true);
+                    _c.label = 1;
                 case 1:
-                    responseMessage = _a.sent();
-                    setMessage(responseMessage);
-                    return [2 /*return*/];
+                    _c.trys.push([1, 3, 4, 5]);
+                    return [4 /*yield*/, _declarations_ugd_backend__WEBPACK_IMPORTED_MODULE_1__.ugd_backend.mc_front(query)];
+                case 2:
+                    response = _c.sent();
+                    if (response && response.length > 0) {
+                        firstResponse = response[0];
+                        setMessage({
+                            user_query: (_a = firstResponse === null || firstResponse === void 0 ? void 0 : firstResponse.user_query) !== null && _a !== void 0 ? _a : "",
+                            message: (_b = firstResponse === null || firstResponse === void 0 ? void 0 : firstResponse.message) !== null && _b !== void 0 ? _b : "",
+                        });
+                        setError(null);
+                    }
+                    else {
+                        setError("No response received from the backend");
+                    }
+                    return [3 /*break*/, 5];
+                case 3:
+                    error_1 = _c.sent();
+                    setError("Failed to fetch the message");
+                    return [3 /*break*/, 5];
+                case 4:
+                    setIsLoading(false);
+                    return [7 /*endfinally*/];
+                case 5: return [2 /*return*/];
             }
         });
     }); };
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_2__["default"].Provider, { value: { message: message, updateMessage: updateMessage } },
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_2__["default"].Provider, { value: { message: message, updateMessage: updateMessage, isLoading: isLoading, error: error } },
         children,
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { id: "message" }, message)));
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { id: "message" }, message ? "".concat(message.user_query, ": ").concat(message.message) : "No message")));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MessageProvider);
-// // Second verison with context
-// import React, { useEffect } from 'react';
-// import { useMessageContext } from "../src/contexts/MessageContext";
-// const MessageReceiver: React.FC = () => {
-//   const { message, handleFormSubmit } = useMessageContext();
-//   useEffect(() => {
-//     const form = document.querySelector("form");
-//     if (form) {
-//       form.addEventListener("submit", handleFormSubmit);
-//     }
-//     return () => {
-//       if (form) {
-//         form.removeEventListener("submit", handleFormSubmit);
-//       }
-//     };
-//   }, [handleFormSubmit]);
-//   return <div id="message">{message}</div>;
-// };
-// export default MessageReceiver;
 // // New version that respects the new rust file that returns Option<MessageCard>
 // import React, { useEffect, useState } from 'react';
 // import { ugd_backend } from "../../declarations/ugd_backend";
@@ -90645,86 +90547,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! webfontloader */ "./node_modules/webfontloader/webfontloader.js");
 /* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(webfontloader__WEBPACK_IMPORTED_MODULE_7__);
 /* harmony import */ var _styles_main_css__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../styles/main.css */ "./src/ugd_frontend/styles/main.css");
-/* harmony import */ var _utils_MessageReciever__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../utils/MessageReciever */ "./src/ugd_frontend/utils/MessageReciever.tsx");
-// import React, { useEffect, useState } from 'react';
-// import { createRoot } from 'react-dom/client';
-// import SearchBar from './header/SearchBar';
-// import useBackgroundPosition from '../utils/useBackgroundPosition';
-// import Tabs from './header/Tabs'
-// import AuthorPanel from './the-greats/AuthorPanel';
-// import AUTHOR_INFO from '../assets/author_data';
-// import WebFont from 'webfontloader';
-// import '../styles/main.css';
-// import MessageReceiver from '../utils/MessageReciever'
-
-// WebFont.load({
-//   google: {
-//     families: ['Georgia', 'Lobster', 'Lexend', 'Roboto:300,400,700', "Times New Roman", 'Nunito']
-//   }
-// });
-
-// const App = () => {
-//   const [imageUrl, setImageUrl] = useState(null);
-//   const backgroundPosition = useBackgroundPosition();
-//   const [selectedAuthors, setSelectedAuthors] = useState(AUTHOR_INFO.map(author => author.id));
-//   const [selectedCategories, setSelectedCategories] = useState([]);
-
-//   useEffect(() => {
-//     const image = require.context('../assets/public/images/', false, /\.(png|jpe?g|svg)$/);
-//     setImageUrl(image('./BlackedOut.png').default);
-//   }, []);
-
-//   return (
-//     <div style={{ position: 'relative', minHeight: '100vh' }}>
-//       {imageUrl && (
-//         <div id="imageContainer" style={{
-//           backgroundImage: `url(${imageUrl})`,
-//           backgroundPosition: backgroundPosition,
-//           backgroundSize: 'cover',
-//           backgroundAttachment: 'fixed',
-//           position: 'absolute',
-//           top: 0,
-//           left: 0,
-//           width: '100%',
-//           height: '100%',
-//           opacity: '0.5',
-//           zIndex: -1,
-//         }} />
-//       )}
-//       <div style={{ paddingTop: '25px' }}>
-//         <Tabs/>
-//         <SearchBar 
-//           selectedAuthors={selectedAuthors} 
-//           setSelectedAuthors={setSelectedAuthors} 
-//           selectedCategories={selectedCategories} 
-//           setSelectedCategories={setSelectedCategories}
-//         />
-//         <div className='main-grid-container'>
-//           <AuthorPanel authors={AUTHOR_INFO.filter(author => 
-//             selectedAuthors.includes(author.id) &&
-//             (selectedCategories.length === 0 || 
-//             selectedCategories.some(cat => author.category.includes(cat)))
-//           )} />
-//           <MessageReceiver />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-//   document.addEventListener("DOMContentLoaded", () => {
-//   const semanticLibraryRoot = document.getElementById("semantic-library-root");
-//   if (semanticLibraryRoot) {
-//     const root = createRoot(semanticLibraryRoot);
-//     root.render(
-//       <React.StrictMode>
-//         <App />
-//       </React.StrictMode>
-//     );
-//   }
-
-// });
-
+/* harmony import */ var _utils_MessageProvider__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../utils/MessageProvider */ "./src/ugd_frontend/utils/MessageProvider.tsx");
 
 
 
@@ -90749,7 +90572,7 @@ const App = () => {
     const image = __webpack_require__("./src/ugd_frontend/assets/public/images sync \\.(png%7Cjpe?g%7Csvg)$");
     setImageUrl(image('./BlackedOut.png').default);
   }, []);
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_utils_MessageReciever__WEBPACK_IMPORTED_MODULE_9__["default"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_utils_MessageProvider__WEBPACK_IMPORTED_MODULE_9__["default"], null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     style: {
       position: 'relative',
       minHeight: '100vh'

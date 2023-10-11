@@ -3,37 +3,29 @@ pub mod message_card;
 pub mod author_card;
 pub mod types;
 
-
 // #[ic_cdk::query]
-// fn greet(name: String) -> String {
-//     format!("Hello, {}!", name)
+// fn mc_front(query: String) -> String {
+//     format!("{}", query)
 // }
 
 
 
-#[ic_cdk::query]
-fn mc_front(query: String) -> String {
-    format!("{}", query)
+// use serde::Deserialize;
+extern crate serde;
+
+#[derive(Clone, Debug, candid::CandidType, serde::Deserialize)]
+pub struct MessageCard {
+    pub user_query: String,
+    pub message: String,
 }
 
-
-
-// extern crate serde;
-// use serde::Deserialize;
-
-// #[derive(Clone, Debug, candid::CandidType, serde::Deserialize)]
-// pub struct MessageCard {
-//     pub input: String,
-//     pub output: String,
-// }
-
-// #[ic_cdk::query]
-// fn mc_front(input: String) -> Option<MessageCard> {
-//     Some(MessageCard {
-//         input,
-//         output: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...".to_string(),
-//     })
-// }
+#[ic_cdk::query]
+fn mc_front(user_query: String) -> Option<MessageCard> {
+    Some(MessageCard {
+        user_query,
+        message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...".to_string(),
+    })
+}
 
 
 

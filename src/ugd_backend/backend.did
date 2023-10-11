@@ -4,27 +4,25 @@
 //   "write": (nat) -> ();
 // }
 
+
 // service : {
-//     "greet": (text) -> (text) query;
+//     "mc_front": (text) -> (text) query;
 // }
 
-service : {
-    "mc_front": (text) -> (text) query;
+
+
+
+
+
+// Me Version
+type MessageCard = record {
+    user_query : text;
+    message : text;
 }
 
-
-
-
-
-// // Me Version
-// type message_card = record {
-//     input : text;
-//     output : text;
-// }
-
-// service message_card_response : {
-//     mc_front: (input : text) -> (opt message_card) query;
-// }
+service message_card_service : {
+    mc_front: (user_query : text) -> (opt MessageCard) query;
+}
 
 
 
