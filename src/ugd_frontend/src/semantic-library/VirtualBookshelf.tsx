@@ -11,7 +11,7 @@ interface Book {
 const VirtualBookShelfComponent = ({ author }: { author: string }) => {
   const [groupedBooks, setGroupedBooks] = useState<{ [author: string]: Book[] }>({});
   const booksByThisAuthor = groupedBooks[author] || [];
-  const carouselWrapperRef = useRef<HTMLDivElement | null>(null);  // ref for the carousel wrapper
+  const carouselWrapperRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetch('/public/books.json')

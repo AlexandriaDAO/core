@@ -6402,10 +6402,100 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _assets_author_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../assets/author_data */ "./src/ugd_frontend/assets/author_data.ts");
 /* harmony import */ var _styles_SearchBar_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../styles/SearchBar.css */ "./src/ugd_frontend/styles/SearchBar.css");
 /* harmony import */ var _fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @fortawesome/react-fontawesome */ "./node_modules/@fortawesome/react-fontawesome/index.es.js");
-/* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.mjs");
+/* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.mjs");
 /* harmony import */ var _AuthorFilter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./AuthorFilter */ "./src/ugd_frontend/src/header/AuthorFilter.jsx");
 /* harmony import */ var _src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../src/contexts/MessageContext */ "./src/ugd_frontend/src/contexts/MessageContext.ts");
-// Revised trying to use context instead of direct api call.
+/* harmony import */ var _cards_MessageCard__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../cards/MessageCard */ "./src/ugd_frontend/src/cards/MessageCard.tsx");
+// // Revised trying to use context instead of direct api call.
+// import React, { useState, useCallback, useContext } from 'react';
+// import AUTHOR_INFO from '../../assets/author_data';
+// import '../../styles/SearchBar.css';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faSearch } from '@fortawesome/free-solid-svg-icons';
+// import AuthorFilter from './AuthorFilter';
+// import MessageContext from '../../src/contexts/MessageContext';
+
+// import MessageCard from '../cards/MessageCard';
+
+// const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, setSelectedCategories }) => {
+//   const [searchValue, setSearchValue] = useState('');
+//   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+//   const allCategories = [...new Set(AUTHOR_INFO.flatMap(author => author.category))];
+
+//   const handleSearchChange = event => setSearchValue(event.target.value);
+
+//   const messageContext = useContext(MessageContext);
+
+//   if (!messageContext) {
+//     throw new Error("SearchBar must be used within a MessageProvider");
+//   }
+
+//   const { message, updateMessage, isLoading, error } = messageContext;
+
+//   const handleSearchSubmit = useCallback(() => {
+//     if (searchValue.trim()) {
+//       updateMessage(searchValue);
+//     }
+//   }, [searchValue, updateMessage]);
+
+//   const handleKeyDown = (e) => {
+//     if (e.key === 'Enter') {
+//       e.preventDefault();
+//       handleSearchSubmit();
+//     }
+//   };
+
+//   const toggleDropdown = () => setIsDropdownVisible(prev => !prev);
+
+//   const handleAuthorSelection = authorId => setSelectedAuthors(prevAuthors => 
+//     prevAuthors.includes(authorId) ? prevAuthors.filter(id => id !== authorId) : [...prevAuthors, authorId]);
+
+//   const handleAllBooksSelection = () => setSelectedAuthors(
+//     selectedAuthors.length === AUTHOR_INFO.length ? [] : AUTHOR_INFO.map(author => author.id)
+//   );
+
+//   const handleCategorySelection = category => setSelectedCategories(prevCategories =>
+//     prevCategories.includes(category) ? prevCategories.filter(cat => cat !== category) : [...prevCategories, category]);
+
+//   return (
+//     <div className="searchbar-wrapper">
+//       <div className="searchbar">
+//         <AuthorFilter 
+//           isDropdownVisible={isDropdownVisible}
+//           toggleDropdown={toggleDropdown}
+//           selectedAuthors={selectedAuthors}
+//           handleAuthorSelection={handleAuthorSelection}
+//           handleAllBooksSelection={handleAllBooksSelection}
+//           allCategories={allCategories}
+//           selectedCategories={selectedCategories}
+//           handleCategorySelection={handleCategorySelection}
+//         />
+//         <input
+//           type="text"
+//           className="search-input"
+//           placeholder="Type a topic or a query..."
+//           onChange={handleSearchChange}
+//           onKeyDown={handleKeyDown}
+//         />
+//         <button className="search-icon-button" onClick={handleSearchSubmit}>
+//           <FontAwesomeIcon icon={faSearch} />
+//         </button>
+//       </div>
+//       {isLoading ? (
+//             <div className="loading-indicator"><div className="loader"></div></div>
+//         ) : error ? (
+//             <div className="error-message">{error}</div>
+//         ) : message && <MessageCard messageData={message} />}
+
+//     </div>
+//   );
+// };
+
+// export default SearchBar;
+
+// Passing the random author that becomes fixed to MessageCard: 
+
 
 
 
@@ -6421,6 +6511,7 @@ const SearchBar = ({
 }) => {
   const [searchValue, setSearchValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
   const [isDropdownVisible, setIsDropdownVisible] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [randomAuthorId, setRandomAuthorId] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
   const allCategories = [...new Set(_assets_author_data__WEBPACK_IMPORTED_MODULE_1__["default"].flatMap(author => author.category))];
   const handleSearchChange = event => setSearchValue(event.target.value);
   const messageContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_5__["default"]);
@@ -6435,6 +6526,9 @@ const SearchBar = ({
   } = messageContext;
   const handleSearchSubmit = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
     if (searchValue.trim()) {
+      const randomIndex = Math.floor(Math.random() * _assets_author_data__WEBPACK_IMPORTED_MODULE_1__["default"].length);
+      const randomAuthor = _assets_author_data__WEBPACK_IMPORTED_MODULE_1__["default"][randomIndex];
+      setRandomAuthorId(randomAuthor.id);
       updateMessage(searchValue);
     }
   }, [searchValue, updateMessage]);
@@ -6471,16 +6565,17 @@ const SearchBar = ({
     className: "search-icon-button",
     onClick: handleSearchSubmit
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_3__.FontAwesomeIcon, {
-    icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_6__.faSearch
+    icon: _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_7__.faSearch
   }))), isLoading ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "loading-indicator"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "loader"
   })) : error ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "error-message"
-  }, error) : message && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "greeting"
-  }, message));
+  }, error) : message && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_cards_MessageCard__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    messageData: message,
+    randomAuthorId: randomAuthorId
+  }));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (SearchBar);
 
@@ -6608,6 +6703,127 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_grid_layout__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-grid-layout */ "./node_modules/react-grid-layout/index.js");
 /* harmony import */ var react_grid_layout__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_grid_layout__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _semantic_library_VirtualBookshelf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../semantic-library/VirtualBookshelf */ "./src/ugd_frontend/src/semantic-library/VirtualBookshelf.tsx");
+/* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
+// import React, { useState, useEffect, useMemo, useRef } from 'react';
+// import AuthorCards from '../cards/AuthorCards';
+// import { Responsive, WidthProvider } from 'react-grid-layout';
+// import VirtualBookShelfComponent from '../semantic-library/VirtualBookshelf';
+
+// const ResponsiveGridLayout = WidthProvider(Responsive);
+
+// function AuthorPanel({ authors }) {
+//   const [activeAuthor, setActiveAuthor] = useState(null);
+
+//   const handleCardClick = (authorId) => {
+//     setActiveAuthor(authorId === activeAuthor ? null : authorId);
+//   };
+
+//   const CARD_WIDTH = 180;
+//   const CARD_HEIGHT = 217.5;
+
+//   const containerRef = useRef(null);
+//   const [containerWidth, setContainerWidth] = useState(0);
+
+//   const updateContainerWidth = () => {
+//     if (containerRef.current) {
+//         setContainerWidth(containerRef.current.offsetWidth);
+//     }
+//   };
+
+//   useEffect(() => {
+//     updateContainerWidth();
+
+//     const handleResize = () => {
+//         updateContainerWidth();
+//     };
+
+//     window.addEventListener('resize', handleResize);
+//     return () => window.removeEventListener('resize', handleResize);
+//   }, []);
+
+//   const getCols = () => {
+//     const numCols = Math.floor(containerWidth / CARD_WIDTH);
+//     console.log("Number of Columms: ", numCols)
+//     return numCols > 0 ? numCols : 1;
+//   };
+
+//   const generateLayout = () => {
+//     const layouts = { xxs: [] };
+//     const numCols = getCols();
+//     const numCards = authors.length;
+//     const fullRows = Math.floor(numCards / numCols);
+//     const lastRowCards = numCards % numCols;
+
+//     authors.forEach((author, index) => {
+//       let xAdjustment = (index >= fullRows * numCols && lastRowCards !== 0) ? (numCols - lastRowCards) : 0;
+
+//       layouts['xxs'].push({
+//         i: author.id.toString(),
+//         x: (index % numCols) + xAdjustment,
+//         y: Math.floor(index / numCols),
+//         w: 1,
+//         h: 1
+//       });
+//     });
+
+//     const index = activeAuthor ? authors.findIndex(a => a.id === activeAuthor) : 0;
+//     let yPosition;
+
+//     if (index >= fullRows * numCols) {
+//         yPosition = Math.floor(index / numCols) + 1;
+//     } else {
+//         yPosition = Math.floor(index / numCols);
+//     }
+
+//     layouts['xxs'].push({
+//         i: `extra-${activeAuthor || 'none'}`,
+//         x: 0,
+//         y: yPosition,
+//         w: numCols,
+//         h: activeAuthor ? 1 : 0,
+//     });
+
+//     return layouts;
+//   };
+
+//   const layouts = useMemo(generateLayout, [activeAuthor, authors, containerWidth]);
+
+//   return (
+//     <div ref={containerRef} style={{ paddingBottom: '3000px' }}>
+//       <ResponsiveGridLayout
+//         className="layout"
+//         layouts={layouts}
+//         breakpoints={{ xxs: 0 }}
+//         cols={{ xxs: getCols() }}
+//         rowHeight={CARD_HEIGHT}
+//         containerPadding={[0, 0]}
+//         margin={[0, 0]}
+//         autoSize={true}
+//         isDraggable={false}
+//       >            
+//         {authors.map((author) => (
+//           <div 
+//             key={author.id} 
+//             onClick={() => handleCardClick(author.id)} 
+//             className="flex justify-center items-center h-full"
+//             style={{ width: CARD_WIDTH }}
+//           >
+//             <AuthorCards author={author} expanded={activeAuthor === author.id} />
+//           </div>
+//         ))}
+//         {activeAuthor && (
+//           <div key={`extra-${activeAuthor}`} className="virtual-bookshelf-container" style={{ height: '100%', gridColumnStart: 1, gridColumnEnd: -1 }}>
+//             <VirtualBookShelfComponent author={activeAuthor} />
+//           </div>
+//         )}
+//       </ResponsiveGridLayout>
+//     </div>
+//   );
+// }
+
+// export default AuthorPanel;
+
+
 
 
 
@@ -6682,7 +6898,7 @@ function AuthorPanel({
     style: {
       paddingBottom: '3000px'
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(ResponsiveGridLayout, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__.AuthorProvider, null, "  ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(ResponsiveGridLayout, {
     className: "layout",
     layouts: layouts,
     breakpoints: {
@@ -6704,7 +6920,7 @@ function AuthorPanel({
       width: CARD_WIDTH
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_cards_AuthorCards__WEBPACK_IMPORTED_MODULE_1__["default"], {
-    author: author,
+    authorId: author.id,
     expanded: activeAuthor === author.id
   }))), activeAuthor && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     key: `extra-${activeAuthor}`,
@@ -6716,7 +6932,7 @@ function AuthorPanel({
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_semantic_library_VirtualBookshelf__WEBPACK_IMPORTED_MODULE_3__["default"], {
     author: activeAuthor
-  }))));
+  })))));
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AuthorPanel);
 
@@ -17551,6 +17767,50 @@ line-height: 0.96rem;
     background-color: #a3be8c;
     transform: translateX(-50%) scale(1.05);
 }`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/BookCard.css"],"names":[],"mappings":"AAAA;IACI,0BAA0B;AAC9B;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,kBAAkB;IAClB,4BAA4B;IAC5B,qBAAqB;IACrB,0BAA0B;AAC9B;;AAEA;IACI,kBAAkB;IAClB,WAAW;IACX,YAAY;IACZ,2BAA2B;IAC3B,yBAAyB;IACzB,qBAAqB;IACrB,gBAAgB;AACpB;;AAEA;IACI,mBAAmB;IACnB,aAAa;IACb,sBAAsB;IACtB,mBAAmB;IACnB,8CAA8C;AAClD;;AAEA;IACI,4EAA4E;AAChF;;AAEA;IACI,0BAA0B;IAC1B,mBAAmB;IACnB,kBAAkB;IAClB,aAAa;IACb,gBAAgB;IAChB,mBAAmB;AACvB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,qBAAqB;AACzB;;;AAGA;IACI,WAAW;IACX,YAAY;IACZ,gBAAgB;IAChB,wFAAwF;AAC5F;;;AAGA;IACI,0BAA0B;IAC1B,kBAAkB;IAClB,mBAAmB;IACnB,gBAAgB;IAChB,uBAAuB;AAC3B;;AAEA;IACI;QACI,eAAe;IACnB;IACA;QACI,WAAW;IACf;AACJ;;;AAGA;IACI,mBAAmB;IACnB,YAAY;IACZ,aAAa;IACb,wBAAwB;AAC5B;;AAEA;AACA,yBAAyB;AACzB,WAAW;AACX,mCAAmC;AACnC;;AAEA;AACA,qBAAqB;AACrB,gBAAgB;AAChB,mBAAmB;AACnB,gBAAgB;AAChB,uBAAuB;AACvB;;;AAGA;AACA,uCAAuC;AACvC,eAAe;AACf,gBAAgB;AAChB,oBAAoB;AACpB;;;AAGA;IACI,yBAAyB;IACzB,YAAY;IACZ,kBAAkB;IAClB,YAAY;IACZ,kBAAkB;IAClB,iBAAiB;IACjB,eAAe;IACf,kBAAkB;IAClB,YAAY;IACZ,SAAS;IACT,2BAA2B;IAC3B,iDAAiD;IACjD,mBAAmB;IACnB,mBAAmB;AACvB;;AAEA;IACI,yBAAyB;IACzB,yBAAyB;IACzB,uCAAuC;AAC3C","sourcesContent":[".BCCardFlipped .BCBook-card {\n    transform: rotateY(180deg);\n}\n\n.BCBook-card {\n    width: 120%;\n    height: 190%;\n    position: relative;\n    transform-style: preserve-3d;\n    transform: rotateY(0);\n    transition: transform 0.5s;\n}\n\n.BCCard-face {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    backface-visibility: hidden;\n    border: 1px solid #252525;\n    border-radius: 0.5rem;\n    overflow: hidden;\n}\n\n.BCCard-front {\n    background: #fbfbf8;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);\n}\n\n.BCCard-front:hover {\n    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);\n}\n\n.BCCard-back {\n    transform: rotateY(180deg);\n    background: #f7f5e8;\n    text-align: center;\n    padding: 10px;\n    overflow-y: auto;\n    white-space: normal;\n}\n\n.BCCard-back::-webkit-scrollbar {\n    display: none;\n}\n\n.BCCard-back {\n    scrollbar-width: none;\n}\n\n\n.BCText-container {\n    width: 100%;\n    height: 90px;\n    overflow: hidden;\n    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(128,128,128,1) 100%);\n}\n\n\n.BCText-container p {\n    padding: 15px 5px 15px 5px;\n    position: absolute;\n    white-space: normal;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n@media (max-width: 68px) {\n    .BCCard-wrapper {\n        min-width: 50px;\n    }\n    .BCAuthor-card {\n        width: 100%;\n    }\n}\n\n\n.BCCard-wrapper {\n    perspective: 1000px;\n    width: 130px;\n    height: 120px;\n    padding: 0px 0px 0px 0px;\n}\n  \n.BCImage-container {\nheight: calc(100% - 20px);\nwidth: 100%;\nborder-bottom: 1.12px solid #252525;\n}\n\n.BCAuthor-name {\nfont-family: 'Nunito';\nfont-weight: 700;\nwhite-space: nowrap;\noverflow: hidden;\ntext-overflow: ellipsis;\n}\n  \n\n.BCStreamed-description {\nfont-family: 'Times New Roman', cursive;\nfont-size: 1rem;\nfont-weight: 400;\nline-height: 0.96rem;\n}\n\n\n.BCReadBook-button {\n    background-color: #373737;\n    color: white;\n    padding: 10px 30px;\n    border: none;\n    border-radius: 5px;\n    font-weight: bold;\n    cursor: pointer;\n    position: absolute;\n    bottom: 10px;\n    left: 50%;\n    transform: translateX(-50%);\n    transition: background-color 0.3s, transform 0.3s;\n    font-size: 0.875rem;\n    white-space: nowrap;\n}\n\n.BCReadBook-button:hover {\n    background-color: #e79475;\n    background-color: #a3be8c;\n    transform: translateX(-50%) scale(1.05);\n}"],"sourceRoot":""}]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/MessageCard.css":
+/*!*********************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/MessageCard.css ***!
+  \*********************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "./node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.message-card {
+  border: 1px solid #e0e0e0;
+  background-color: #e0e0e0;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 16px;
+}
+
+.message-card-query {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.message-card-content {
+  margin: 0;
+}
+`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/MessageCard.css"],"names":[],"mappings":"AAAA;EACE,yBAAyB;EACzB,yBAAyB;EACzB,aAAa;EACb,kBAAkB;EAClB,wCAAwC;EACxC,gBAAgB;AAClB;;AAEA;EACE,iBAAiB;EACjB,kBAAkB;AACpB;;AAEA;EACE,SAAS;AACX","sourcesContent":[".message-card {\n  border: 1px solid #e0e0e0;\n  background-color: #e0e0e0;\n  padding: 16px;\n  border-radius: 8px;\n  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\n  margin-top: 16px;\n}\n\n.message-card-query {\n  font-weight: bold;\n  margin-bottom: 8px;\n}\n\n.message-card-content {\n  margin: 0;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -63146,6 +63406,61 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./src/ugd_frontend/styles/MessageCard.css":
+/*!*************************************************!*\
+  !*** ./src/ugd_frontend/styles/MessageCard.css ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "./node_modules/style-loader/dist/runtime/styleDomAPI.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertBySelector.js */ "./node_modules/style-loader/dist/runtime/insertBySelector.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "./node_modules/style-loader/dist/runtime/insertStyleElement.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "./node_modules/style-loader/dist/runtime/styleTagTransform.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_MessageCard_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js!../../../node_modules/postcss-loader/dist/cjs.js!./MessageCard.css */ "./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/ugd_frontend/styles/MessageCard.css");
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
+options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
+
+      options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
+    
+options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
+options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_MessageCard_css__WEBPACK_IMPORTED_MODULE_6__["default"], options);
+
+
+
+
+       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_MessageCard_css__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_MessageCard_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_node_modules_postcss_loader_dist_cjs_js_MessageCard_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
+
+
+/***/ }),
+
 /***/ "./src/ugd_frontend/styles/SearchBar.css":
 /*!***********************************************!*\
   !*** ./src/ugd_frontend/styles/SearchBar.css ***!
@@ -63593,6 +63908,7 @@ module.exports = styleTagTransform;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AUTHOR_INFO: () => (/* binding */ AUTHOR_INFO),
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 var AUTHOR_INFO = [
@@ -64556,12 +64872,54 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_Stream__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/Stream */ "./src/ugd_frontend/utils/Stream.tsx");
 /* harmony import */ var _AuthorCard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AuthorCard */ "./src/ugd_frontend/src/cards/AuthorCard.tsx");
 /* harmony import */ var _styles_AuthorCards_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../styles/AuthorCards.css */ "./src/ugd_frontend/styles/AuthorCards.css");
+/* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
+// import React, { useState, useEffect } from 'react';
+// import useStreamingText from '../../utils/Stream';
+// import AuthorCard from './AuthorCard'
+// import '../../styles/AuthorCards.css'
+// interface AuthorCardsProps {
+//   author: {
+//     id: string;
+//     description: string;
+//     categories: string[];
+//   };
+// }
+// const AuthorCards: React.FC<AuthorCardsProps> = ({ author }) => {
+//   const [hasFlipped, setHasFlipped] = useState(false);
+//   const [cardFlipped, setCardFlipped] = useState(false);
+//   const shouldStartStreaming = hasFlipped;
+//   const streamedDescription = useStreamingText(author.description, 15, shouldStartStreaming);
+//   useEffect(() => {
+//     if (cardFlipped && !hasFlipped) {
+//       setHasFlipped(true);
+//     }
+//   }, [cardFlipped]);
+//   const handleClick = () => {
+//     setCardFlipped(!cardFlipped);
+//   };
+//   return (
+//       <AuthorCard
+//         image={`/images/${author.id}.png`}
+//         title={author.id}
+//         onCardClick={handleClick}
+//         flipped={cardFlipped}
+//         description={streamedDescription}
+//       />
+//   );
+// };
+// export default AuthorCards;
+
 
 
 
 
 var AuthorCards = function (_a) {
-    var author = _a.author;
+    var authorId = _a.authorId;
+    var authors = (0,_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__.useAuthors)().authors; // Use the context
+    var author = authors.find(function (a) { return a.id === authorId; }); // Find the author based on the provided id
+    if (!author) {
+        return null; // Handle cases where the author isn't found for the given ID
+    }
     var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), hasFlipped = _b[0], setHasFlipped = _b[1];
     var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), cardFlipped = _c[0], setCardFlipped = _c[1];
     var shouldStartStreaming = hasFlipped;
@@ -64670,48 +65028,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _BookCard__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BookCard */ "./src/ugd_frontend/src/cards/BookCard.tsx");
-/* harmony import */ var _assets_author_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../assets/author_data */ "./src/ugd_frontend/assets/author_data.ts");
-/* harmony import */ var _utils_Stream__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/Stream */ "./src/ugd_frontend/utils/Stream.tsx");
-/* harmony import */ var _utils_handleReadBookClick__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/handleReadBookClick */ "./src/ugd_frontend/utils/handleReadBookClick.ts");
-
-
-
-
-
-var BookCards = function (_a) {
-    var _b;
-    var book = _a.book;
-    var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), flipped = _c[0], setFlipped = _c[1];
-    var onCardClick = function () {
-        setFlipped(!flipped);
-    };
-    // Find the author object from AUTHOR_INFO by checking if the books array includes the book title
-    var author = _assets_author_data__WEBPACK_IMPORTED_MODULE_2__["default"].find(function (author) { var _a; return (_a = author === null || author === void 0 ? void 0 : author.books) === null || _a === void 0 ? void 0 : _a.includes(book.title); });
-    var onReadBookClick = function (event) {
-        event.stopPropagation();
-        (0,_utils_handleReadBookClick__WEBPACK_IMPORTED_MODULE_4__.handleReadBookClick)(book.author, book.title);
-        console.log("Author", author);
-        console.log("book.id", book.author);
-        console.log("title.id", book.title);
-    };
-    var bookDescription = "Description not found";
-    if (author) {
-        var bookIndex = (_b = author === null || author === void 0 ? void 0 : author.books) === null || _b === void 0 ? void 0 : _b.indexOf(book.title);
-        bookDescription = (author === null || author === void 0 ? void 0 : author.book_descriptions) ? author.book_descriptions[bookIndex] : "Description not found";
-    }
-    var shouldStartStreaming = flipped;
-    var streamedDescription = (0,_utils_Stream__WEBPACK_IMPORTED_MODULE_3__["default"])(bookDescription, 15, shouldStartStreaming);
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-container flex w-[150px]" },
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_BookCard__WEBPACK_IMPORTED_MODULE_1__["default"], { image: "/public".concat(book.imagePath), title: book.title, description: streamedDescription, flipped: flipped, onCardClick: onCardClick, onReadBookClick: onReadBookClick })));
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BookCards);
-// import React, { useState, useEffect } from 'react';
-// import useStreamingText from '../../utils/Stream';
-// import BookCard from './BookCard';
+/* harmony import */ var _utils_Stream__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/Stream */ "./src/ugd_frontend/utils/Stream.tsx");
+/* harmony import */ var _utils_handleReadBookClick__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/handleReadBookClick */ "./src/ugd_frontend/utils/handleReadBookClick.ts");
+/* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
+// import React, {useState} from 'react';
+// import BookCard from './BookCard'
 // import AUTHOR_INFO from '../../assets/author_data';
+// import useStreamingText from '../../utils/Stream';
+// import { handleReadBookClick } from '../../utils/handleReadBookClick';
 // interface AuthorCardsProps {
 //   book: {
-//     id: string;
+//     author: string;
 //     description: string;
 //     categories: string[];
 //     imagePath: string;
@@ -64719,40 +65046,208 @@ var BookCards = function (_a) {
 //   };
 // }
 // const BookCards: React.FC<AuthorCardsProps> = ({ book }) => {
-//   const [hasFlipped, setHasFlipped] = useState(false);
-//   const [cardFlipped, setCardFlipped] = useState(false);
-//   const shouldStartStreaming = hasFlipped;
-// // Find the author object from AUTHOR_INFO by checking if the books array includes the book title
-// const author = AUTHOR_INFO.find(author => author?.books?.includes(book.title));
-// let bookDescription = "Description not found";
-// if (author) {
-//   const bookIndex = author?.books?.indexOf(book.title);
-//   bookDescription = author?.book_descriptions ? author.book_descriptions[bookIndex as number] : "Description not found";
-// }
-//   const streamedDescription = useStreamingText(bookDescription, 15, shouldStartStreaming);
-//   useEffect(() => {
-//     if (cardFlipped && !hasFlipped) {
-//       setHasFlipped(true);
-//     }
-//   }, [cardFlipped]);
-//   const handleClick = () => {
-//     setCardFlipped(!cardFlipped);
+//   const [flipped, setFlipped] = useState(false);
+//   const onCardClick = () => {
+//     setFlipped(!flipped);
 //   };
+//   // Find the author object from AUTHOR_INFO by checking if the books array includes the book title
+//   const author = AUTHOR_INFO.find(author => author?.books?.includes(book.title));
+//   const onReadBookClick = (event: React.MouseEvent) => {
+//     event.stopPropagation();
+//     handleReadBookClick(book.author, book.title);
+//     console.log("Author", author)
+//     console.log("book.id", book.author)
+//     console.log("title.id", book.title)
+//   };
+//   let bookDescription = "Description not found";
+//   if (author) {
+//     const bookIndex = author?.books?.indexOf(book.title);
+//     bookDescription = author?.book_descriptions ? author.book_descriptions[bookIndex as number] : "Description not found";
+//   }
+//   const shouldStartStreaming = flipped;
+//   const streamedDescription = useStreamingText(bookDescription, 15, shouldStartStreaming);
 //   return (
-//     <div
-//       className={`author-container flex ${cardFlipped ? 'expanded w-auto' : 'w-[150px]'}`}
-//     >
+//     <div className="author-container flex w-[150px]">
 //       <BookCard
 //         image={`/public${book.imagePath}`}
 //         title={book.title}
-//         onCardClick={handleClick}
-//         flipped={cardFlipped}
 //         description={streamedDescription}
+//         flipped={flipped}
+//         onCardClick={onCardClick}
+//         onReadBookClick={onReadBookClick}
 //       />
 //     </div>
 //   );
 // };
 // export default BookCards;
+
+
+
+
+ // Import useAuthors
+var BookCards = function (_a) {
+    var _b;
+    var book = _a.book;
+    var authors = (0,_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__.useAuthors)().authors; // Use the context
+    var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), flipped = _c[0], setFlipped = _c[1];
+    var onCardClick = function () {
+        setFlipped(!flipped);
+    };
+    // Find the author object from the context by checking if the books array includes the book title
+    var author = authors.find(function (author) { var _a; return (_a = author === null || author === void 0 ? void 0 : author.books) === null || _a === void 0 ? void 0 : _a.includes(book.title); });
+    var onReadBookClick = function (event) {
+        event.stopPropagation();
+        (0,_utils_handleReadBookClick__WEBPACK_IMPORTED_MODULE_3__.handleReadBookClick)(book.author, book.title);
+    };
+    var bookDescription = "Description not found";
+    if (author) {
+        var bookIndex = (_b = author === null || author === void 0 ? void 0 : author.books) === null || _b === void 0 ? void 0 : _b.indexOf(book.title);
+        bookDescription = (author === null || author === void 0 ? void 0 : author.book_descriptions) ? author.book_descriptions[bookIndex] : "Description not found";
+    }
+    var shouldStartStreaming = flipped;
+    var streamedDescription = (0,_utils_Stream__WEBPACK_IMPORTED_MODULE_2__["default"])(bookDescription, 15, shouldStartStreaming);
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-container flex w-[150px]" },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_BookCard__WEBPACK_IMPORTED_MODULE_1__["default"], { image: "/public".concat(book.imagePath), title: book.title, description: streamedDescription, flipped: flipped, onCardClick: onCardClick, onReadBookClick: onReadBookClick })));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (BookCards);
+
+
+/***/ }),
+
+/***/ "./src/ugd_frontend/src/cards/MessageCard.tsx":
+/*!****************************************************!*\
+  !*** ./src/ugd_frontend/src/cards/MessageCard.tsx ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _styles_MessageCard_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/MessageCard.css */ "./src/ugd_frontend/styles/MessageCard.css");
+/* harmony import */ var _AuthorCards__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AuthorCards */ "./src/ugd_frontend/src/cards/AuthorCards.tsx");
+// // import React from 'react';
+// // import '../../styles/MessageCard.css'
+// // interface Message {
+// //   user_query: string;
+// //   message: string;
+// //   // ... any other properties you might add in the future.
+// // }
+// // interface MessageCardProps {
+// //   messageData: Message;
+// // }
+// // const MessageCard: React.FC<MessageCardProps> = ({ messageData }) => {
+// //   return (
+// //     <div className="message-card">
+// //       <h3 className="message-card-query">Query: {messageData.user_query}</h3>
+// //       <p className="message-card-content">{messageData.message}</p>
+// //       {/* Any additional properties can be rendered here */}
+// //     </div>
+// //   );
+// // };
+// // export default MessageCard;
+// import React from 'react';
+// import '../../styles/MessageCard.css';
+// import { useAuthors } from '../contexts/AuthorContext';
+// import AuthorCards from './AuthorCards';
+// interface Message {
+//   user_query: string;
+//   message: string;
+//   // ... any other properties
+// }
+// interface MessageCardProps {
+//   messageData: Message;
+// }
+// const MessageCard: React.FC<MessageCardProps> = ({ messageData }) => {
+//   const { authors } = useAuthors();
+//   // Get a random author
+//   const randomIndex = Math.floor(Math.random() * authors.length);
+//   const randomAuthor = authors[randomIndex];
+//   return (
+//     <div className="message-card">
+//       <h3 className="message-card-query">Query: {messageData.user_query}</h3>
+//       <p className="message-card-content">{messageData.message}</p>
+//       <AuthorCards authorId={randomAuthor.id} /> {/* Display the random author card */}
+//       {/* Any additional properties can be rendered here */}
+//     </div>
+//   );
+// };
+// export default MessageCard;
+// import React from 'react';
+// import '../../styles/MessageCard.css'
+// interface Message {
+//   user_query: string;
+//   message: string;
+//   // ... any other properties you might add in the future.
+// }
+// interface MessageCardProps {
+//   messageData: Message;
+// }
+// const MessageCard: React.FC<MessageCardProps> = ({ messageData }) => {
+//   return (
+//     <div className="message-card">
+//       <h3 className="message-card-query">Query: {messageData.user_query}</h3>
+//       <p className="message-card-content">{messageData.message}</p>
+//       {/* Any additional properties can be rendered here */}
+//     </div>
+//   );
+// };
+// export default MessageCard;
+// Getting RandomAuthor from SearchBar
+
+
+
+var MessageCard = function (_a) {
+    var messageData = _a.messageData, randomAuthorId = _a.randomAuthorId;
+    if (!randomAuthorId)
+        return null;
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "message-card" },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h3", { className: "message-card-query" },
+            "Query: ",
+            messageData.user_query),
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "message-card-content" }, messageData.message),
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_AuthorCards__WEBPACK_IMPORTED_MODULE_2__["default"], { authorId: randomAuthorId })));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MessageCard);
+
+
+/***/ }),
+
+/***/ "./src/ugd_frontend/src/contexts/AuthorContext.tsx":
+/*!*********************************************************!*\
+  !*** ./src/ugd_frontend/src/contexts/AuthorContext.tsx ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   AuthorProvider: () => (/* binding */ AuthorProvider),
+/* harmony export */   useAuthors: () => (/* binding */ useAuthors)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _assets_author_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../assets/author_data */ "./src/ugd_frontend/assets/author_data.ts");
+// AuthorContext.tsx
+// // I'd eventualy like to use this to get the author's info directly from AUTHOR_INFO, and only from AUTHOR_INFO.
+
+
+var AuthorContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)(undefined);
+var AuthorProvider = function (_a) {
+    var children = _a.children;
+    var authors = _assets_author_data__WEBPACK_IMPORTED_MODULE_1__.AUTHOR_INFO;
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(AuthorContext.Provider, { value: { authors: authors } }, children));
+};
+var useAuthors = function () {
+    var context = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(AuthorContext);
+    if (!context) {
+        throw new Error('useAuthors must be used within an AuthorProvider');
+    }
+    return context;
+};
 
 
 /***/ }),
@@ -64770,15 +65265,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-// import React from 'react';
-// interface IMessageContext {
-//   message: string;
-//   updateMessage: (query: string) => void;
-//   isLoading: boolean;
-//   error: string | null;
-// }
-// const MessageContext = React.createContext<IMessageContext | undefined>(undefined);
-// export default MessageContext;
 
 var MessageContext = react__WEBPACK_IMPORTED_MODULE_0___default().createContext(undefined);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MessageContext);
@@ -64801,54 +65287,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _styles_VirtualBookshelf_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/VirtualBookshelf.css */ "./src/ugd_frontend/styles/VirtualBookshelf.css");
 /* harmony import */ var _cards_BookCards__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../cards/BookCards */ "./src/ugd_frontend/src/cards/BookCards.tsx");
-// import React, { useState, useEffect } from 'react';
-// import '../../styles/VirtualBookshelf.css';
-// import BookCards from '../cards/BookCards';
-// interface Book {
-//   author: string;
-//   title: string;
-//   imagePath: string;
-// }
-// const VirtualBookShelfComponent = ({ author }: { author: string }) => {
-//   const [groupedBooks, setGroupedBooks] = useState<{ [author: string]: Book[] }>({});
-//   const booksByThisAuthor = groupedBooks[author] || [];
-//   useEffect(() => {
-//     fetch('/public/books.json')
-//       .then((response) => response.json())
-//       .then((data: Book[]) => {
-//         const authorGroups: { [author: string]: Book[] } = {};
-//         data.forEach((book) => {
-//           if (!authorGroups[book.author]) {
-//             authorGroups[book.author] = [];
-//           }
-//           authorGroups[book.author].push(book);
-//         });
-//         setGroupedBooks(authorGroups);
-//       });
-//   }, []);
-//   return (
-//     <div className="carousel-container scale-down">
-//       <div className="segment-area">
-//         <div className="carousel-wrapper">
-//           {booksByThisAuthor.map((book, bookIndex) => (
-//             <div className="carousel-card" key={bookIndex}>
-//               <BookCards
-//                 book={{
-//                   author: book.author,
-//                   description: "Lorem ipsum",
-//                   categories: [],
-//                   imagePath: book.imagePath,
-//                   title: book.title,
-//                 }}
-//               />
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );  
-// };
-// export default VirtualBookShelfComponent;
 
 
 
@@ -64925,10 +65363,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _declarations_ugd_backend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../declarations/ugd_backend */ "./src/declarations/ugd_backend/index.js");
 /* harmony import */ var _src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../src/contexts/MessageContext */ "./src/ugd_frontend/src/contexts/MessageContext.ts");
-// // Revising Broken First version using context.
-// import React, { useState } from 'react';
-// import { ugd_backend } from "../../declarations/ugd_backend";
-// import MessageContext from '../src/contexts/MessageContext';
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -64965,33 +65399,6 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-// interface MessageProviderProps {
-//   children: React.ReactNode;
-// }
-// const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
-//   const [message, setMessage] = useState<string>("");
-//   const [isLoading, setIsLoading] = useState<boolean>(false);
-//   const [error, setError] = useState<string | null>(null);
-//   const updateMessage = async (query: string) => {
-//     setIsLoading(true);
-//     try {
-//         const responseMessage = await ugd_backend.mc_front(query);
-//         setMessage(responseMessage);
-//         setError(null);
-//     } catch (error) {
-//         setError(`Failed to fetch the message`);
-//     } finally {
-//         setIsLoading(false);
-//     }
-// };
-//   return (
-//     <MessageContext.Provider value={{ message, updateMessage, isLoading, error }}>
-//       {children}
-//       <div id="message">{message}</div>
-//     </MessageContext.Provider>
-//   );
-// };
-// export default MessageProvider;
 
 
 
@@ -65036,62 +65443,9 @@ var MessageProvider = function (_a) {
             }
         });
     }); };
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_2__["default"].Provider, { value: { message: message, updateMessage: updateMessage, isLoading: isLoading, error: error } },
-        children,
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { id: "message" }, message ? "".concat(message.user_query, ": ").concat(message.message) : "No message")));
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_2__["default"].Provider, { value: { message: message, updateMessage: updateMessage, isLoading: isLoading, error: error } }, children));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MessageProvider);
-// // New version that respects the new rust file that returns Option<MessageCard>
-// import React, { useEffect, useState } from 'react';
-// import { ugd_backend } from "../../declarations/ugd_backend";
-// type MCResponse = {
-//   query: string;
-//   ai_message: string;
-// };
-// const MessageReceiver: React.FC = () => {
-//   const [response, setResponse] = useState<MCResponse | null>(null);
-//   const handleFormSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     const form = e.target as HTMLFormElement;
-//     const button: HTMLButtonElement | null = form.querySelector("button");
-//     const nameInput: HTMLInputElement | null = document.getElementById("name") as HTMLInputElement | null;
-//     if (!button || !nameInput) {
-//       console.error("Elements not found");
-//       return;
-//     }
-//     const input_query = nameInput.value;
-//     button.setAttribute("disabled", "true");
-//     try {
-//       const result = await ugd_backend.mc_front(input_query);
-//       if (result) {
-//         const { input, output } = result;
-//         setResponse({ query: input, ai_message: output });
-//       } else {
-//         console.error("Received no result from mc_front");
-//       }
-//     } catch (error) {
-//       console.error("Error fetching the response:", error);
-//     }
-//   };
-//   useEffect(() => {
-//     const form = document.querySelector("form");
-//     if (form) {
-//       form.addEventListener("submit", handleFormSubmit as any);
-//     }
-//     return () => {
-//       if (form) {
-//         form.removeEventListener("submit", handleFormSubmit as any);
-//       }
-//     };
-//   }, []);
-//   return (
-//     <div id="mcResponseOutput">
-//       <p>Query: {response?.query}</p>
-//       <p>AI Message: {response?.ai_message}</p>
-//     </div>
-//   );
-// };
-// export default MessageReceiver;
 
 
 /***/ }),
@@ -90548,6 +90902,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(webfontloader__WEBPACK_IMPORTED_MODULE_7__);
 /* harmony import */ var _styles_main_css__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../styles/main.css */ "./src/ugd_frontend/styles/main.css");
 /* harmony import */ var _utils_MessageProvider__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../utils/MessageProvider */ "./src/ugd_frontend/utils/MessageProvider.tsx");
+/* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
+
 
 
 
@@ -90611,7 +90967,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const semanticLibraryRoot = document.getElementById("semantic-library-root");
   if (semanticLibraryRoot) {
     const root = (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(semanticLibraryRoot);
-    root.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(App, null)));
+    root.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_10__.AuthorProvider, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(App, null))));
   }
 });
 })();

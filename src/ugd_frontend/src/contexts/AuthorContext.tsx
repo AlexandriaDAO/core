@@ -1,6 +1,4 @@
-// AuthorContext.tsx
-
-// // I'd eventualy like to use this to get the author's info directly from AUTHOR_INFO, and only from AUTHOR_INFO.
+// OG: Now makes author object from pure AUTHOR_INFO
 import React, { createContext, useContext, ReactNode } from 'react';
 import { Author, AUTHOR_INFO } from '../../assets/author_data';
 

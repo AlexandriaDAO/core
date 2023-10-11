@@ -72,7 +72,6 @@ const App = () => {
     const root = createRoot(semanticLibraryRoot);
     root.render(
       <React.StrictMode>
-        {/* <App /> */}
         <AuthorProvider>
           <App />
         </AuthorProvider>

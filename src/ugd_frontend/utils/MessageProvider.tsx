@@ -43,13 +43,6 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
   return (
     <MessageContext.Provider value={{ message, updateMessage, isLoading, error }}>
       {children}
-      
-      {/* This part displays on the bottom. Not needed since MessageCard */}
-      {/* <div id="message">
-        {message 
-          ? `Query: ${message.user_query}, Message: ${message.message}` 
-          : "No message"}
-      </div> */}
     </MessageContext.Provider>
   );
 };
