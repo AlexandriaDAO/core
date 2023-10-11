@@ -20,9 +20,15 @@ const MessageCard: React.FC<MessageCardProps> = ({ messageData, randomAuthorId }
 
   return (
     <div className="message-card">
-      <h3 className="message-card-query">Query: {messageData.user_query}</h3>
-      <p className="message-card-content">{messageData.message}</p>
-      <AuthorCards authorId={randomAuthorId} />
+      <div className="author-card-container">
+        <AuthorCards authorId={randomAuthorId} />
+      </div>
+      <div className="text-container">
+        <h3 className="message-card-query">Input Query:</h3>
+        <p className="message-card-query-content">{messageData.user_query}</p>
+        <hr className="content-divider" />
+        <p className="message-card-content">{messageData.message}</p>
+      </div>
     </div>
   );
 };
