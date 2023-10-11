@@ -29,22 +29,6 @@ fn mc_front(user_query: String) -> Option<MessageCard> {
 
 
 
-// // IDK Version
-// #[derive(Clone, Debug, candid::CandidType, serde::Deserialize)]
-// pub struct Response {
-//     pub query: String,
-//     pub ai_message: String,
-// }
-
-// #[ic_cdk::query]
-// fn mc_front(query: String) -> Response {
-//     Response {
-//         query,
-//         ai_message: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...".to_string(),
-//     }
-// }
-
-
 
 
 

@@ -7,6 +7,8 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import AuthorFilter from './AuthorFilter';
 import MessageContext from '../../src/contexts/MessageContext';
 
+import MessageCard from '../cards/MessageCard';
+
 const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, setSelectedCategories }) => {
   const [searchValue, setSearchValue] = useState('');
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
@@ -78,7 +80,12 @@ const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, se
             <div className="error-message">{error}</div>
         // Version before the listed element version. Yahoo!
         // ) : message && <div className="greeting">{message}</div>}
-        ) : message && <div className="greeting">Query: {message.user_query}, Response: {message.message}</div>}
+
+        // ) : message && <div className="greeting">Query: {message.user_query}, Response: {message.message}</div>}
+
+        // ) : message && <MessageCard userQuery={message.user_query} messageContent={message.message} />}
+
+        ) : message && <MessageCard messageData={message} />}
 
     </div>
   );

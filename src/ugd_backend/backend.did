@@ -14,7 +14,7 @@
 
 
 
-// Me Version
+// OG
 type MessageCard = record {
     user_query : text;
     message : text;
@@ -23,19 +23,3 @@ type MessageCard = record {
 service message_card_service : {
     mc_front: (user_query : text) -> (opt MessageCard) query;
 }
-
-
-
-
-
-
-// // AI Version
-// type Response = record {
-//     query: text;
-//     ai_message: text;
-// };
-
-
-// service : {
-//     "mc_front": (text) -> (Response) query;
-// }
