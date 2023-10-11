@@ -1,4 +1,4 @@
-interface Author {
+export interface Author {
     id: string;
     first?: string;
     last?: string;
@@ -15,7 +15,7 @@ interface Author {
   }
   
 
-const AUTHOR_INFO: Author[] = [
+export const AUTHOR_INFO: Author[] = [
     {
     "id": "Benjamin Franklin",
     "category": ["Philosophy", "Science", "American History", "Politics", "Inventions", "Philosophy", "Government", "Pioneer"],

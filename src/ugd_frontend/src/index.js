@@ -8,6 +8,7 @@ import AUTHOR_INFO from '../assets/author_data';
 import WebFont from 'webfontloader';
 import '../styles/main.css';
 import MessageProvider from '../utils/MessageProvider'
+import { AuthorProvider } from './contexts/AuthorContext'
 
 WebFont.load({
   google: {
@@ -71,9 +72,12 @@ const App = () => {
     const root = createRoot(semanticLibraryRoot);
     root.render(
       <React.StrictMode>
-        <App />
+        {/* <App /> */}
+        <AuthorProvider>
+          <App />
+        </AuthorProvider>
       </React.StrictMode>
     );
   }
-  
+
 });
