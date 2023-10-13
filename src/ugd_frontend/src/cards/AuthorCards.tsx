@@ -15,11 +15,11 @@ const AuthorCards: React.FC<AuthorCardsProps> = ({ authorId }) => {
   if (!author) {
     return null;
   }
-
+  
   const [hasFlipped, setHasFlipped] = useState(false);
   const [cardFlipped, setCardFlipped] = useState(false);
+
   const shouldStartStreaming = hasFlipped;
-  
   const streamedDescription = useStreamingText(author.description, 15, shouldStartStreaming);
 
   useEffect(() => {

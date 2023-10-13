@@ -7,7 +7,8 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import AuthorFilter from './AuthorFilter';
 import MessageContext from '../../src/contexts/MessageContext';
 
-import MessageCard from '../cards/MessageCard';
+// import MessageCard from '../cards/MessageCard';
+import MessageCard from '../cards/MessageCard/MessageCard';
 
 const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, setSelectedCategories }) => {
   const [searchValue, setSearchValue] = useState('');

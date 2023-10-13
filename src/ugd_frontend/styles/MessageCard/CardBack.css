@@ -1,0 +1,14 @@
+.flip-button {
+  padding: 8px 12px;
+  margin-top: 12px;
+  background-color: #d3c2af;
+  border: none;
+  border-radius: 5px;
+  color: #faf8ef;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.flip-button:hover {
+  background-color: #b5a58f;
+}
