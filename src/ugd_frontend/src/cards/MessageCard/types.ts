@@ -18,3 +18,9 @@ export interface CardFrontProps {
 export interface CardBackProps {
   onFlip: () => void;
 }
+
+export interface Book {
+  author: string;
+  title: string;
+  imagePath: string;
+}

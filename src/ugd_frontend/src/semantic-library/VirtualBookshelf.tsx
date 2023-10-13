@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../styles/VirtualBookshelf.css';
 import BookCards from '../cards/BookCards';
-
-interface Book {
-  author: string;
-  title: string;
-  imagePath: string;
-}
+import { Book } from '../cards/MessageCard/types';
 
 const VirtualBookShelfComponent = ({ author }: { author: string }) => {
   const [groupedBooks, setGroupedBooks] = useState<{ [author: string]: Book[] }>({});

@@ -25,7 +25,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 4% 0;
+  padding: 4% 1rem; 
   border-right: 1px dashed #d3c2af;
   margin-right: 20px;
 }
@@ -33,6 +33,7 @@
 .MC-text-container {
   flex-grow: 1;
   display: flex;
+  padding: 0 1rem;
   flex-direction: column;
   justify-content: flex-start;
 }
@@ -69,6 +70,17 @@
   margin: 4px 0;
 }
 
+.MC-flip-button {
+  margin-top: 1rem; 
+  padding: 0.5rem 1rem;
+  background-color: #d3c2af;
+  color: #444;
+  border-radius: 0.25rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
 @media (max-width: 767px) {
   .MC-author-card-container {
     border-bottom: 1px dashed #d3c2af;
@@ -77,4 +89,9 @@
     border-right: none;
     margin-right: 0;
   }
+
+  .MC-card-front {
+    flex-direction: column;
+  }
+
 }
