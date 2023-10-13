@@ -6235,7 +6235,7 @@ __webpack_require__.r(__webpack_exports__);
  * process.env.CANISTER_ID_<CANISTER_NAME_UPPERCASE>
  * beginning in dfx 0.15.0
  */
-const canisterId = "asrmz-lmaaa-aaaaa-qaaeq-cai" || 0;
+const canisterId = "bkyz2-fmaaa-aaaaa-qaaaq-cai" || 0;
 const createActor = (canisterId, options = {}) => {
   const agent = options.agent || new _dfinity_agent__WEBPACK_IMPORTED_MODULE_0__.HttpAgent({
     ...options.agentOptions
@@ -6406,94 +6406,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _AuthorFilter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./AuthorFilter */ "./src/ugd_frontend/src/header/AuthorFilter.jsx");
 /* harmony import */ var _src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../src/contexts/MessageContext */ "./src/ugd_frontend/src/contexts/MessageContext.ts");
 /* harmony import */ var _cards_MessageCard__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../cards/MessageCard */ "./src/ugd_frontend/src/cards/MessageCard.tsx");
-// // Revised trying to use context instead of direct api call.
-// import React, { useState, useCallback, useContext } from 'react';
-// import AUTHOR_INFO from '../../assets/author_data';
-// import '../../styles/SearchBar.css';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faSearch } from '@fortawesome/free-solid-svg-icons';
-// import AuthorFilter from './AuthorFilter';
-// import MessageContext from '../../src/contexts/MessageContext';
-
-// import MessageCard from '../cards/MessageCard';
-
-// const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, setSelectedCategories }) => {
-//   const [searchValue, setSearchValue] = useState('');
-//   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-
-//   const allCategories = [...new Set(AUTHOR_INFO.flatMap(author => author.category))];
-
-//   const handleSearchChange = event => setSearchValue(event.target.value);
-
-//   const messageContext = useContext(MessageContext);
-
-//   if (!messageContext) {
-//     throw new Error("SearchBar must be used within a MessageProvider");
-//   }
-
-//   const { message, updateMessage, isLoading, error } = messageContext;
-
-//   const handleSearchSubmit = useCallback(() => {
-//     if (searchValue.trim()) {
-//       updateMessage(searchValue);
-//     }
-//   }, [searchValue, updateMessage]);
-
-//   const handleKeyDown = (e) => {
-//     if (e.key === 'Enter') {
-//       e.preventDefault();
-//       handleSearchSubmit();
-//     }
-//   };
-
-//   const toggleDropdown = () => setIsDropdownVisible(prev => !prev);
-
-//   const handleAuthorSelection = authorId => setSelectedAuthors(prevAuthors => 
-//     prevAuthors.includes(authorId) ? prevAuthors.filter(id => id !== authorId) : [...prevAuthors, authorId]);
-
-//   const handleAllBooksSelection = () => setSelectedAuthors(
-//     selectedAuthors.length === AUTHOR_INFO.length ? [] : AUTHOR_INFO.map(author => author.id)
-//   );
-
-//   const handleCategorySelection = category => setSelectedCategories(prevCategories =>
-//     prevCategories.includes(category) ? prevCategories.filter(cat => cat !== category) : [...prevCategories, category]);
-
-//   return (
-//     <div className="searchbar-wrapper">
-//       <div className="searchbar">
-//         <AuthorFilter 
-//           isDropdownVisible={isDropdownVisible}
-//           toggleDropdown={toggleDropdown}
-//           selectedAuthors={selectedAuthors}
-//           handleAuthorSelection={handleAuthorSelection}
-//           handleAllBooksSelection={handleAllBooksSelection}
-//           allCategories={allCategories}
-//           selectedCategories={selectedCategories}
-//           handleCategorySelection={handleCategorySelection}
-//         />
-//         <input
-//           type="text"
-//           className="search-input"
-//           placeholder="Type a topic or a query..."
-//           onChange={handleSearchChange}
-//           onKeyDown={handleKeyDown}
-//         />
-//         <button className="search-icon-button" onClick={handleSearchSubmit}>
-//           <FontAwesomeIcon icon={faSearch} />
-//         </button>
-//       </div>
-//       {isLoading ? (
-//             <div className="loading-indicator"><div className="loader"></div></div>
-//         ) : error ? (
-//             <div className="error-message">{error}</div>
-//         ) : message && <MessageCard messageData={message} />}
-
-//     </div>
-//   );
-// };
-
-// export default SearchBar;
-
 // Passing the random author that becomes fixed to MessageCard: 
 
 
@@ -6704,125 +6616,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_grid_layout__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_grid_layout__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _semantic_library_VirtualBookshelf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../semantic-library/VirtualBookshelf */ "./src/ugd_frontend/src/semantic-library/VirtualBookshelf.tsx");
 /* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
-// import React, { useState, useEffect, useMemo, useRef } from 'react';
-// import AuthorCards from '../cards/AuthorCards';
-// import { Responsive, WidthProvider } from 'react-grid-layout';
-// import VirtualBookShelfComponent from '../semantic-library/VirtualBookshelf';
-
-// const ResponsiveGridLayout = WidthProvider(Responsive);
-
-// function AuthorPanel({ authors }) {
-//   const [activeAuthor, setActiveAuthor] = useState(null);
-
-//   const handleCardClick = (authorId) => {
-//     setActiveAuthor(authorId === activeAuthor ? null : authorId);
-//   };
-
-//   const CARD_WIDTH = 180;
-//   const CARD_HEIGHT = 217.5;
-
-//   const containerRef = useRef(null);
-//   const [containerWidth, setContainerWidth] = useState(0);
-
-//   const updateContainerWidth = () => {
-//     if (containerRef.current) {
-//         setContainerWidth(containerRef.current.offsetWidth);
-//     }
-//   };
-
-//   useEffect(() => {
-//     updateContainerWidth();
-
-//     const handleResize = () => {
-//         updateContainerWidth();
-//     };
-
-//     window.addEventListener('resize', handleResize);
-//     return () => window.removeEventListener('resize', handleResize);
-//   }, []);
-
-//   const getCols = () => {
-//     const numCols = Math.floor(containerWidth / CARD_WIDTH);
-//     console.log("Number of Columms: ", numCols)
-//     return numCols > 0 ? numCols : 1;
-//   };
-
-//   const generateLayout = () => {
-//     const layouts = { xxs: [] };
-//     const numCols = getCols();
-//     const numCards = authors.length;
-//     const fullRows = Math.floor(numCards / numCols);
-//     const lastRowCards = numCards % numCols;
-
-//     authors.forEach((author, index) => {
-//       let xAdjustment = (index >= fullRows * numCols && lastRowCards !== 0) ? (numCols - lastRowCards) : 0;
-
-//       layouts['xxs'].push({
-//         i: author.id.toString(),
-//         x: (index % numCols) + xAdjustment,
-//         y: Math.floor(index / numCols),
-//         w: 1,
-//         h: 1
-//       });
-//     });
-
-//     const index = activeAuthor ? authors.findIndex(a => a.id === activeAuthor) : 0;
-//     let yPosition;
-
-//     if (index >= fullRows * numCols) {
-//         yPosition = Math.floor(index / numCols) + 1;
-//     } else {
-//         yPosition = Math.floor(index / numCols);
-//     }
-
-//     layouts['xxs'].push({
-//         i: `extra-${activeAuthor || 'none'}`,
-//         x: 0,
-//         y: yPosition,
-//         w: numCols,
-//         h: activeAuthor ? 1 : 0,
-//     });
-
-//     return layouts;
-//   };
-
-//   const layouts = useMemo(generateLayout, [activeAuthor, authors, containerWidth]);
-
-//   return (
-//     <div ref={containerRef} style={{ paddingBottom: '3000px' }}>
-//       <ResponsiveGridLayout
-//         className="layout"
-//         layouts={layouts}
-//         breakpoints={{ xxs: 0 }}
-//         cols={{ xxs: getCols() }}
-//         rowHeight={CARD_HEIGHT}
-//         containerPadding={[0, 0]}
-//         margin={[0, 0]}
-//         autoSize={true}
-//         isDraggable={false}
-//       >            
-//         {authors.map((author) => (
-//           <div 
-//             key={author.id} 
-//             onClick={() => handleCardClick(author.id)} 
-//             className="flex justify-center items-center h-full"
-//             style={{ width: CARD_WIDTH }}
-//           >
-//             <AuthorCards author={author} expanded={activeAuthor === author.id} />
-//           </div>
-//         ))}
-//         {activeAuthor && (
-//           <div key={`extra-${activeAuthor}`} className="virtual-bookshelf-container" style={{ height: '100%', gridColumnStart: 1, gridColumnEnd: -1 }}>
-//             <VirtualBookShelfComponent author={activeAuthor} />
-//           </div>
-//         )}
-//       </ResponsiveGridLayout>
-//     </div>
-//   );
-// }
-
-// export default AuthorPanel;
-
 
 
 
@@ -17794,23 +17587,63 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `.message-card {
-  border: 1px solid #e0e0e0;
-  background-color: #e0e0e0;
-  padding: 16px;
+  display: flex;
+  border: 1px solid #d3c2af;
+  background-color: #faf8ef;
+  padding: 12px 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-top: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  margin-top: 20px;
+  position: relative;
 }
 
 .message-card-query {
-  font-weight: bold;
-  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 0.95em;
+  margin-bottom: 2px;
+  color: #7a7a7a;
+}
+
+.message-card-query-content {
+  font-size: 1em;
+  font-style: italic;
+  margin-bottom: 6px;
+  color: #555;
+  max-width: 90%;
 }
 
 .message-card-content {
-  margin: 0;
+  line-height: 1.5;
+  font-size: 1em;
+  color: #444;
+  max-width: 90%;
 }
-`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/MessageCard.css"],"names":[],"mappings":"AAAA;EACE,yBAAyB;EACzB,yBAAyB;EACzB,aAAa;EACb,kBAAkB;EAClB,wCAAwC;EACxC,gBAAgB;AAClB;;AAEA;EACE,iBAAiB;EACjB,kBAAkB;AACpB;;AAEA;EACE,SAAS;AACX","sourcesContent":[".message-card {\n  border: 1px solid #e0e0e0;\n  background-color: #e0e0e0;\n  padding: 16px;\n  border-radius: 8px;\n  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\n  margin-top: 16px;\n}\n\n.message-card-query {\n  font-weight: bold;\n  margin-bottom: 8px;\n}\n\n.message-card-content {\n  margin: 0;\n}\n"],"sourceRoot":""}]);
+
+.author-card-container {
+  display: flex;
+  flex-basis: 25%;
+  justify-content: center;
+  align-items: center;
+  padding: 4% 0;
+  border-right: 1px dashed #d3c2af;
+  margin-right: 20px;
+}
+
+.text-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.content-divider {
+  width: 85%;
+  border: 0;
+  height: 1px;
+  background-color: #d3c2af;
+  margin: 4px 0;
+}
+`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/MessageCard.css"],"names":[],"mappings":"AAAA;EACE,aAAa;EACb,yBAAyB;EACzB,yBAAyB;EACzB,kBAAkB;EAClB,kBAAkB;EAClB,yCAAyC;EACzC,gBAAgB;EAChB,kBAAkB;AACpB;;AAEA;EACE,gBAAgB;EAChB,iBAAiB;EACjB,kBAAkB;EAClB,cAAc;AAChB;;AAEA;EACE,cAAc;EACd,kBAAkB;EAClB,kBAAkB;EAClB,WAAW;EACX,cAAc;AAChB;;AAEA;EACE,gBAAgB;EAChB,cAAc;EACd,WAAW;EACX,cAAc;AAChB;;AAEA;EACE,aAAa;EACb,eAAe;EACf,uBAAuB;EACvB,mBAAmB;EACnB,aAAa;EACb,gCAAgC;EAChC,kBAAkB;AACpB;;AAEA;EACE,YAAY;EACZ,aAAa;EACb,sBAAsB;EACtB,2BAA2B;AAC7B;;AAEA;EACE,UAAU;EACV,SAAS;EACT,WAAW;EACX,yBAAyB;EACzB,aAAa;AACf","sourcesContent":[".message-card {\n  display: flex;\n  border: 1px solid #d3c2af;\n  background-color: #faf8ef;\n  padding: 12px 20px;\n  border-radius: 8px;\n  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);\n  margin-top: 20px;\n  position: relative;\n}\n\n.message-card-query {\n  font-weight: 600;\n  font-size: 0.95em;\n  margin-bottom: 2px;\n  color: #7a7a7a;\n}\n\n.message-card-query-content {\n  font-size: 1em;\n  font-style: italic;\n  margin-bottom: 6px;\n  color: #555;\n  max-width: 90%;\n}\n\n.message-card-content {\n  line-height: 1.5;\n  font-size: 1em;\n  color: #444;\n  max-width: 90%;\n}\n\n.author-card-container {\n  display: flex;\n  flex-basis: 25%;\n  justify-content: center;\n  align-items: center;\n  padding: 4% 0;\n  border-right: 1px dashed #d3c2af;\n  margin-right: 20px;\n}\n\n.text-container {\n  flex-grow: 1;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-start;\n}\n\n.content-divider {\n  width: 85%;\n  border: 0;\n  height: 1px;\n  background-color: #d3c2af;\n  margin: 4px 0;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -64873,41 +64706,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _AuthorCard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AuthorCard */ "./src/ugd_frontend/src/cards/AuthorCard.tsx");
 /* harmony import */ var _styles_AuthorCards_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../styles/AuthorCards.css */ "./src/ugd_frontend/styles/AuthorCards.css");
 /* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
-// import React, { useState, useEffect } from 'react';
-// import useStreamingText from '../../utils/Stream';
-// import AuthorCard from './AuthorCard'
-// import '../../styles/AuthorCards.css'
-// interface AuthorCardsProps {
-//   author: {
-//     id: string;
-//     description: string;
-//     categories: string[];
-//   };
-// }
-// const AuthorCards: React.FC<AuthorCardsProps> = ({ author }) => {
-//   const [hasFlipped, setHasFlipped] = useState(false);
-//   const [cardFlipped, setCardFlipped] = useState(false);
-//   const shouldStartStreaming = hasFlipped;
-//   const streamedDescription = useStreamingText(author.description, 15, shouldStartStreaming);
-//   useEffect(() => {
-//     if (cardFlipped && !hasFlipped) {
-//       setHasFlipped(true);
-//     }
-//   }, [cardFlipped]);
-//   const handleClick = () => {
-//     setCardFlipped(!cardFlipped);
-//   };
-//   return (
-//       <AuthorCard
-//         image={`/images/${author.id}.png`}
-//         title={author.id}
-//         onCardClick={handleClick}
-//         flipped={cardFlipped}
-//         description={streamedDescription}
-//       />
-//   );
-// };
-// export default AuthorCards;
 
 
 
@@ -64915,10 +64713,10 @@ __webpack_require__.r(__webpack_exports__);
 
 var AuthorCards = function (_a) {
     var authorId = _a.authorId;
-    var authors = (0,_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__.useAuthors)().authors; // Use the context
-    var author = authors.find(function (a) { return a.id === authorId; }); // Find the author based on the provided id
+    var authors = (0,_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__.useAuthors)().authors;
+    var author = authors.find(function (a) { return a.id === authorId; });
     if (!author) {
-        return null; // Handle cases where the author isn't found for the given ID
+        return null;
     }
     var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), hasFlipped = _b[0], setHasFlipped = _b[1];
     var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), cardFlipped = _c[0], setCardFlipped = _c[1];
@@ -65031,69 +64829,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_Stream__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/Stream */ "./src/ugd_frontend/utils/Stream.tsx");
 /* harmony import */ var _utils_handleReadBookClick__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/handleReadBookClick */ "./src/ugd_frontend/utils/handleReadBookClick.ts");
 /* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
-// import React, {useState} from 'react';
-// import BookCard from './BookCard'
-// import AUTHOR_INFO from '../../assets/author_data';
-// import useStreamingText from '../../utils/Stream';
-// import { handleReadBookClick } from '../../utils/handleReadBookClick';
-// interface AuthorCardsProps {
-//   book: {
-//     author: string;
-//     description: string;
-//     categories: string[];
-//     imagePath: string;
-//     title: string;
-//   };
-// }
-// const BookCards: React.FC<AuthorCardsProps> = ({ book }) => {
-//   const [flipped, setFlipped] = useState(false);
-//   const onCardClick = () => {
-//     setFlipped(!flipped);
-//   };
-//   // Find the author object from AUTHOR_INFO by checking if the books array includes the book title
-//   const author = AUTHOR_INFO.find(author => author?.books?.includes(book.title));
-//   const onReadBookClick = (event: React.MouseEvent) => {
-//     event.stopPropagation();
-//     handleReadBookClick(book.author, book.title);
-//     console.log("Author", author)
-//     console.log("book.id", book.author)
-//     console.log("title.id", book.title)
-//   };
-//   let bookDescription = "Description not found";
-//   if (author) {
-//     const bookIndex = author?.books?.indexOf(book.title);
-//     bookDescription = author?.book_descriptions ? author.book_descriptions[bookIndex as number] : "Description not found";
-//   }
-//   const shouldStartStreaming = flipped;
-//   const streamedDescription = useStreamingText(bookDescription, 15, shouldStartStreaming);
-//   return (
-//     <div className="author-container flex w-[150px]">
-//       <BookCard
-//         image={`/public${book.imagePath}`}
-//         title={book.title}
-//         description={streamedDescription}
-//         flipped={flipped}
-//         onCardClick={onCardClick}
-//         onReadBookClick={onReadBookClick}
-//       />
-//     </div>
-//   );
-// };
-// export default BookCards;
 
 
 
 
- // Import useAuthors
+
 var BookCards = function (_a) {
     var _b;
     var book = _a.book;
-    var authors = (0,_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__.useAuthors)().authors; // Use the context
+    var authors = (0,_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_4__.useAuthors)().authors;
     var _c = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false), flipped = _c[0], setFlipped = _c[1];
     var onCardClick = function () {
         setFlipped(!flipped);
     };
-    // Find the author object from the context by checking if the books array includes the book title
     var author = authors.find(function (author) { var _a; return (_a = author === null || author === void 0 ? void 0 : author.books) === null || _a === void 0 ? void 0 : _a.includes(book.title); });
     var onReadBookClick = function (event) {
         event.stopPropagation();
@@ -65129,73 +64877,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _styles_MessageCard_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/MessageCard.css */ "./src/ugd_frontend/styles/MessageCard.css");
 /* harmony import */ var _AuthorCards__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AuthorCards */ "./src/ugd_frontend/src/cards/AuthorCards.tsx");
-// // import React from 'react';
-// // import '../../styles/MessageCard.css'
-// // interface Message {
-// //   user_query: string;
-// //   message: string;
-// //   // ... any other properties you might add in the future.
-// // }
-// // interface MessageCardProps {
-// //   messageData: Message;
-// // }
-// // const MessageCard: React.FC<MessageCardProps> = ({ messageData }) => {
-// //   return (
-// //     <div className="message-card">
-// //       <h3 className="message-card-query">Query: {messageData.user_query}</h3>
-// //       <p className="message-card-content">{messageData.message}</p>
-// //       {/* Any additional properties can be rendered here */}
-// //     </div>
-// //   );
-// // };
-// // export default MessageCard;
-// import React from 'react';
-// import '../../styles/MessageCard.css';
-// import { useAuthors } from '../contexts/AuthorContext';
-// import AuthorCards from './AuthorCards';
-// interface Message {
-//   user_query: string;
-//   message: string;
-//   // ... any other properties
-// }
-// interface MessageCardProps {
-//   messageData: Message;
-// }
-// const MessageCard: React.FC<MessageCardProps> = ({ messageData }) => {
-//   const { authors } = useAuthors();
-//   // Get a random author
-//   const randomIndex = Math.floor(Math.random() * authors.length);
-//   const randomAuthor = authors[randomIndex];
-//   return (
-//     <div className="message-card">
-//       <h3 className="message-card-query">Query: {messageData.user_query}</h3>
-//       <p className="message-card-content">{messageData.message}</p>
-//       <AuthorCards authorId={randomAuthor.id} /> {/* Display the random author card */}
-//       {/* Any additional properties can be rendered here */}
-//     </div>
-//   );
-// };
-// export default MessageCard;
-// import React from 'react';
-// import '../../styles/MessageCard.css'
-// interface Message {
-//   user_query: string;
-//   message: string;
-//   // ... any other properties you might add in the future.
-// }
-// interface MessageCardProps {
-//   messageData: Message;
-// }
-// const MessageCard: React.FC<MessageCardProps> = ({ messageData }) => {
-//   return (
-//     <div className="message-card">
-//       <h3 className="message-card-query">Query: {messageData.user_query}</h3>
-//       <p className="message-card-content">{messageData.message}</p>
-//       {/* Any additional properties can be rendered here */}
-//     </div>
-//   );
-// };
-// export default MessageCard;
 // Getting RandomAuthor from SearchBar
 
 
@@ -65205,11 +64886,13 @@ var MessageCard = function (_a) {
     if (!randomAuthorId)
         return null;
     return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "message-card" },
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h3", { className: "message-card-query" },
-            "Query: ",
-            messageData.user_query),
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "message-card-content" }, messageData.message),
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_AuthorCards__WEBPACK_IMPORTED_MODULE_2__["default"], { authorId: randomAuthorId })));
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "author-card-container" },
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_AuthorCards__WEBPACK_IMPORTED_MODULE_2__["default"], { authorId: randomAuthorId })),
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "text-container" },
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h3", { className: "message-card-query" }, "Input Query:"),
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "message-card-query-content" }, messageData.user_query),
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("hr", { className: "content-divider" }),
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", { className: "message-card-content" }, messageData.message))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (MessageCard);
 
@@ -65231,8 +64914,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _assets_author_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../assets/author_data */ "./src/ugd_frontend/assets/author_data.ts");
-// AuthorContext.tsx
-// // I'd eventualy like to use this to get the author's info directly from AUTHOR_INFO, and only from AUTHOR_INFO.
+// OG: Now makes author object from pure AUTHOR_INFO
 
 
 var AuthorContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)(undefined);
@@ -65294,7 +64976,7 @@ var VirtualBookShelfComponent = function (_a) {
     var author = _a.author;
     var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({}), groupedBooks = _b[0], setGroupedBooks = _b[1];
     var booksByThisAuthor = groupedBooks[author] || [];
-    var carouselWrapperRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null); // ref for the carousel wrapper
+    var carouselWrapperRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
     (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
         fetch('/public/books.json')
             .then(function (response) { return response.json(); })

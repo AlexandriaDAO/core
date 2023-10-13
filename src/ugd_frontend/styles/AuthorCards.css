@@ -92,9 +92,10 @@ width: 95%;
 }
 
 .text-container p {
-white-space: nowrap;
-overflow: hidden;
-text-overflow: ellipsis;
+  max-width: 95%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-wrapper.cardFlipped .extension {
@@ -119,8 +120,6 @@ transform: translateX(0);
   display: flex;
   justify-content: center;
   align-items: center;
-
-  /* your other styles here */
 }
 
 

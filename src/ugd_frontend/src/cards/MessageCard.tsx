@@ -1,7 +1,6 @@
 // Getting RandomAuthor from SearchBar
 import React from 'react';
 import '../../styles/MessageCard.css';
-import { useAuthors } from '../contexts/AuthorContext';
 import AuthorCards from './AuthorCards';
 
 interface Message {
