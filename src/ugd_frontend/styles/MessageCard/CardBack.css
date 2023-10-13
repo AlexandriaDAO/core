@@ -1,4 +1,4 @@
-.flip-button {
+.MC-flip-button {
   padding: 8px 12px;
   margin-top: 12px;
   background-color: #d3c2af;
@@ -9,6 +9,27 @@
   transition: background-color 0.3s;
 }
 
-.flip-button:hover {
+.MC-flip-button:hover {
   background-color: #b5a58f;
 }
+
+.MC-card-back {
+  transform: rotateY(180deg);
+  background: #fbfbf8;
+  text-align: center;
+  padding: 10px;
+  overflow-y: auto;
+  }
+  
+  .MC-card-back::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .MC-card-back:-ms-overflow-style {
+    display: none;
+  }
+  
+  .MC-card-back {
+    scrollbar-width: none;
+  }
+  
