@@ -6,7 +6,7 @@ interface MessageCard {
 }
 
 interface MessageCardContext {
-  message: MessageCard | null;
+  message: MessageCard | null; 
   updateMessage: (query: string) => void;
   isLoading: boolean;
   error: string | null;
