@@ -52,7 +52,6 @@ const App = () => {
           setSelectedAuthors={setSelectedAuthors} 
           selectedCategories={selectedCategories} 
           setSelectedCategories={setSelectedCategories}
-          // setSelectedBooks={setSelectedBooks}
         />
         <div className='main-grid-container'>
           <AuthorPanel authors={AUTHOR_INFO.filter(author => 
