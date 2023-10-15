@@ -4,9 +4,6 @@ export const handleReadBookClick = (authorId: string, title: string) => {
     const titleClustered = title.split(" ").join("_");
     const authorLink = authorId.split(" ").join("_");
 
-    console.log('Author Link:', authorLink);
-    console.log('Title Clustered:', titleClustered);
-
     if (authorLink === "Greco_Romans") {
         window.open("https://classics.mit.edu/Browse/index.html", '_blank');
     } else if (authorLink === "Carl_Jung") {
@@ -21,5 +18,4 @@ export const handleReadBookClick = (authorId: string, title: string) => {
         window.open(url.href, '_blank');
         console.log(bookUrl);
     }
-
 };

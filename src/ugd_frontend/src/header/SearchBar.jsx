@@ -92,3 +92,162 @@ const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, se
 };
 
 export default SearchBar;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // Failed ttempt at getting the 3 books to load with the author.
+// import React, { useState, useCallback, useContext } from 'react';
+// import AUTHOR_INFO from '../../assets/author_data';
+// import '../../styles/SearchBar.css';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faSearch } from '@fortawesome/free-solid-svg-icons';
+// import AuthorFilter from './AuthorFilter';
+// import MessageContext from '../../src/contexts/MessageContext';
+// import MessageCard from '../cards/MessageCard/MessageCard';
+
+// const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, setSelectedCategories }) => {
+//   const [searchValue, setSearchValue] = useState('');
+//   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+//   const [randomAuthorId, setRandomAuthorId] = useState(null);
+//   const [selectedBooks, setSelectedBooks] = useState([]);
+
+//   const allCategories = [...new Set(AUTHOR_INFO.flatMap(author => author.category))];
+
+//   const handleSearchChange = event => setSearchValue(event.target.value);
+
+//   const messageContext = useContext(MessageContext);
+
+//   if (!messageContext) {
+//     throw new Error("SearchBar must be used within a MessageProvider");
+//   }
+
+//   const { message, updateMessage, isLoading, error } = messageContext;
+
+//   const getRandomBooksFromSearch = async (searchValue) => {
+//     const response = await fetch('/public/books.json');
+//     const books = await response.json();
+//     console.log("All books: ", books);
+  
+//     const filteredBooks = books.filter((book) => {
+//       return book.title.toLowerCase().includes(searchValue.toLowerCase());
+//     });
+  
+//     const shuffledBooks = [...filteredBooks].sort(() => 0.5 - Math.random());
+//     const randomSelectedBooks = shuffledBooks.slice(0, 3);
+  
+//     return randomSelectedBooks;
+//   };
+
+//   const handleSearchSubmit = useCallback(async () => {
+//     if (searchValue.trim()) {
+//       const randomIndex = Math.floor(Math.random() * AUTHOR_INFO.length);
+//       const randomAuthor = AUTHOR_INFO[randomIndex];
+//       setRandomAuthorId(randomAuthor.id);
+      
+//       const randomBooks = await getRandomBooksFromSearch(searchValue);
+//       console.log("Selected books: ", randomBooks);
+//       setSelectedBooks(randomBooks);
+      
+//       updateMessage(searchValue);
+//     }
+//   }, [searchValue, updateMessage, setSelectedBooks]);
+
+//   const handleKeyDown = (e) => {
+//     if (e.key === 'Enter') {
+//       e.preventDefault();
+//       handleSearchSubmit();
+//     }
+//   };
+
+//   const toggleDropdown = () => setIsDropdownVisible(prev => !prev);
+
+//   const handleAuthorSelection = authorId => setSelectedAuthors(prevAuthors => 
+//     prevAuthors.includes(authorId) ? prevAuthors.filter(id => id !== authorId) : [...prevAuthors, authorId]);
+
+//   const handleAllBooksSelection = () => setSelectedAuthors(
+//     selectedAuthors.length === AUTHOR_INFO.length ? [] : AUTHOR_INFO.map(author => author.id)
+//   );
+
+//   const handleCategorySelection = category => setSelectedCategories(prevCategories =>
+//     prevCategories.includes(category) ? prevCategories.filter(cat => cat !== category) : [...prevCategories, category]);
+
+//   return (
+//     <div className="searchbar-wrapper">
+//       <div className="searchbar">
+//         <AuthorFilter 
+//           isDropdownVisible={isDropdownVisible}
+//           toggleDropdown={toggleDropdown}
+//           selectedAuthors={selectedAuthors}
+//           handleAuthorSelection={handleAuthorSelection}
+//           handleAllBooksSelection={handleAllBooksSelection}
+//           allCategories={allCategories}
+//           selectedCategories={selectedCategories}
+//           handleCategorySelection={handleCategorySelection}
+//         />
+//         <input
+//           type="text"
+//           className="search-input"
+//           placeholder="Type a topic or a query..."
+//           onChange={handleSearchChange}
+//           onKeyDown={handleKeyDown}
+//         />
+//         <button className="search-icon-button" onClick={handleSearchSubmit}>
+//           <FontAwesomeIcon icon={faSearch} />
+//         </button>
+//       </div>
+//       {isLoading ? (
+//             <div className="loading-indicator"><div className="loader"></div></div>
+//         ) : error ? (
+//             <div className="error-message">{error}</div>
+//         ) : message && <MessageCard messageData={message} randomAuthorId={randomAuthorId} selectedBooks={selectedBooks} />
+//       }
+//     </div>
+//   );
+// };
+
+// export default SearchBar;

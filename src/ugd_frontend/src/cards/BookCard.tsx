@@ -45,9 +45,34 @@ const BCBookCard: React.FC<CardProps> = ({ image, title, description, flipped, o
   const [compressedImageSrc, setCompressedImageSrc] = useState<string>("");
 
   useEffect(() => {
+    // if (image) {
+    //   fetch(image)
+    //     .then(response => response.blob())
+    //     .then(blob => {
+    //       Resizer.imageFileResizer(
+    //         blob,
+    //         300,
+    //         300,
+    //         'PNG',
+    //         90,
+    //         0,
+    //         (uri) => {
+    //           if (typeof uri === 'string') {
+    //             setCompressedImageSrc(uri);
+    //           }
+    //         },
+    //         'base64'
+    //       );
+    //     });
+    // }
     if (image) {
       fetch(image)
-        .then(response => response.blob())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network Response was not okay');
+          }
+          return response.blob();
+        })
         .then(blob => {
           Resizer.imageFileResizer(
             blob,
@@ -63,8 +88,12 @@ const BCBookCard: React.FC<CardProps> = ({ image, title, description, flipped, o
             },
             'base64'
           );
+        })
+        .catch(error => {
+          console.error('There was a problem fetching the image: ', error);
+          console.log('Failed image URL:', image);
         });
-    }
+    }    
   }, [image]);  
 
   return (

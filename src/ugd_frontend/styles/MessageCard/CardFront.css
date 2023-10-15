@@ -15,7 +15,7 @@
   align-items: center;
   box-shadow: 0 4px 8px rgba(255, 255, 255, 0.4);
 }
-  
+
 .MC-card-front:hover {
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
