@@ -6,17 +6,18 @@ export interface Message {
 
 export interface MessageCardProps {
   messageData: Message;
-  randomAuthorId: string | null;
+  currentAuthorId: string | null;
 }
 
 export interface CardFrontProps {
   messageData: Message;
   onFlip: () => void;
-  randomAuthorId: string;
+  currentAuthorId: string;
 }
 
 export interface CardBackProps {
   onFlip: () => void;
+  currentAuthorId: string;
 }
 
 // export interface Book {

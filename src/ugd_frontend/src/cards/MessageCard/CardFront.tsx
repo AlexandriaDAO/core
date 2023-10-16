@@ -3,10 +3,10 @@ import AuthorCards from '../AuthorCards';
 import { CardFrontProps } from './types';
 import '../../../styles/MessageCard/CardFront.css';
 
-const CardFront: React.FC<CardFrontProps> = ({ messageData, onFlip, randomAuthorId }) => (
+const CardFront: React.FC<CardFrontProps> = ({ messageData, onFlip, currentAuthorId }) => (
   <div className="MC-card-face MC-card-front absolute inset-0 bg-[#faf8ef] border border-[#d3c2af] rounded-[.5rem] flex flex-row items-center">
     <div className="MC-author-card-container">
-      <AuthorCards authorId={randomAuthorId} />
+      <AuthorCards authorId={currentAuthorId} />
     </div>
     <div className="MC-text-container">
       <h3 className="MC-message-card-query">Input Query:</h3>
@@ -19,3 +19,6 @@ const CardFront: React.FC<CardFrontProps> = ({ messageData, onFlip, randomAuthor
 );
 
 export default CardFront;
+
+
+

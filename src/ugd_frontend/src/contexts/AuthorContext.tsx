@@ -25,3 +25,11 @@ export const useAuthors = () => {
   }
   return context;
 };
+
+export const getBooksByAuthorId = (authorId: string, authors: Author[]): string[] => {
+  const author = authors.find(author => author.id === authorId);
+  if (author && author?.books?.length) {
+    return author.books.slice(0, 3);
+  }
+  return [];
+}
