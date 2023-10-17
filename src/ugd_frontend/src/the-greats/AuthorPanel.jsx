@@ -8,6 +8,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 function AuthorPanel({ authors }) {
   const [activeAuthor, setActiveAuthor] = useState(null);
+  const [numCols, setNumCols] = useState(1);
 
   const handleCardClick = (authorId) => {
     setActiveAuthor(authorId === activeAuthor ? null : authorId);
@@ -36,15 +37,18 @@ function AuthorPanel({ authors }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const getCols = () => {
-    const numCols = Math.floor(containerWidth / CARD_WIDTH);
-    console.log("Number of Columms: ", numCols)
-    return numCols > 0 ? numCols : 1;
-  };
+  useEffect(() => {
+    const calculateCols = () => {
+      const columns = Math.floor(containerWidth / CARD_WIDTH);
+      // console.log("Number of Columns: ", columns);
+      setNumCols(columns > 0 ? columns : 1);
+    };
+    
+    calculateCols();
+  }, [containerWidth]);
 
   const generateLayout = () => {
     const layouts = { xxs: [] };
-    const numCols = getCols();
     const numCards = authors.length;
     const fullRows = Math.floor(numCards / numCols);
     const lastRowCards = numCards % numCols;
@@ -81,16 +85,16 @@ function AuthorPanel({ authors }) {
     return layouts;
   };
 
-  const layouts = useMemo(generateLayout, [activeAuthor, authors, containerWidth]);
+  const layouts = useMemo(generateLayout, [activeAuthor, authors, numCols]);
 
   return (
     <div ref={containerRef} style={{ paddingBottom: '3000px' }}>
-      <AuthorProvider>  {/* Wrap content with the AuthorProvider */}
+      <AuthorProvider>
         <ResponsiveGridLayout
           className="layout"
           layouts={layouts}
           breakpoints={{ xxs: 0 }}
-          cols={{ xxs: getCols() }}
+          cols={{ xxs: numCols }}
           rowHeight={CARD_HEIGHT}
           containerPadding={[0, 0]}
           margin={[0, 0]}
@@ -104,7 +108,6 @@ function AuthorPanel({ authors }) {
               className="flex justify-center items-center h-full"
               style={{ width: CARD_WIDTH }}
             >
-              {/* Provide the authorId instead of the entire author object */}
               <AuthorCards authorId={author.id} expanded={activeAuthor === author.id} />
             </div>
           ))}
