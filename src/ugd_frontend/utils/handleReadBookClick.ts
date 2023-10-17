@@ -24,8 +24,13 @@ export const handleReadBookClick = (authorId: string, title: string) => {
 
 export const sanitizeTitleForPath = (title: string): string => {
     return title
+      .replace(/\(/g, '')
+      .replace(/\)/g, '')
+      .replace(/\[/g, '')
+      .replace(/\]/g, '')
       .replace(/,/g, '')
       .replace(/;/g, '')
+      .replace(/:/g, '')
       .replace(/-/g, '')
       .replace(/\./g, '')
       .replace(/—/g, '')
