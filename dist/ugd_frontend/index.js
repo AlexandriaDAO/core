@@ -65083,9 +65083,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
-/* harmony import */ var _styles_MessageCard_CardBack_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../styles/MessageCard/CardBack.css */ "./src/ugd_frontend/styles/MessageCard/CardBack.css");
-/* harmony import */ var _BookCards__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../BookCards */ "./src/ugd_frontend/src/cards/BookCards.tsx");
+/* harmony import */ var _styles_MessageCard_CardBack_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../styles/MessageCard/CardBack.css */ "./src/ugd_frontend/styles/MessageCard/CardBack.css");
+/* harmony import */ var _BookCards__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../BookCards */ "./src/ugd_frontend/src/cards/BookCards.tsx");
+/* harmony import */ var _utils_useAuthorBooks__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../utils/useAuthorBooks */ "./src/ugd_frontend/utils/useAuthorBooks.ts");
 // import React from 'react';
 // import { CardBackProps } from './types';
 // import '../../../styles/MessageCard/CardBack.css';
@@ -65096,39 +65096,59 @@ __webpack_require__.r(__webpack_exports__);
 //   </div>
 // );
 // export default CardBack;
+// import React, { useEffect, useState } from 'react';
+// import { useAuthors } from '../../contexts/AuthorContext';
+// import { CardBackProps } from './types';
+// import '../../../styles/MessageCard/CardBack.css';
+// import BookCards from '../BookCards';
+// import { sanitizeTitleForPath } from '../../../utils/handleReadBookClick';
+// const CardBack: React.FC<CardBackProps> = ({ onFlip, currentAuthorId }) => {
+//   const { authors } = useAuthors();
+//   const [top3Books, setTop3Books] = useState<any[]>([]);
+//   useEffect(() => {
+//     if (currentAuthorId) {
+//       const matchedAuthor = authors.find(author => author.id === currentAuthorId);
+//       if (matchedAuthor) {
+//         const booksWithDescriptions = (matchedAuthor.books?.slice(0, 3) || []).map((title, index) => {
+//           return {
+//             title,
+//             description: matchedAuthor.book_descriptions?.[index] || "Description not available",
+//             imagePath: `/bookimages/${matchedAuthor.id}/${sanitizeTitleForPath(title)}.png`,
+//           };
+//         });
+//         setTop3Books(booksWithDescriptions);
+//       }
+//     }
+//   }, [currentAuthorId, authors]);
+//   return (
+//     <div className="MC-card-face MC-card-back absolute inset-0 bg-[#faf8ef] text-center p-10 overflow-y-auto">
+//       {top3Books.map((book, index) => (
+//         <BookCards
+//           key={index}
+//           book={{
+//             author: "",
+//             description: book.description,
+//             categories: [],
+//             imagePath: book.imagePath,
+//             title: book.title
+//           }}
+//         />
+//       ))}
+//       <button onClick={onFlip} className="MC-flip-button">Flip</button>
+//     </div>
+//   );
+// };
+// export default CardBack;
 
 
 
 
 var CardBack = function (_a) {
     var onFlip = _a.onFlip, currentAuthorId = _a.currentAuthorId;
-    var authors = (0,_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_1__.useAuthors)().authors;
-    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]), top3Books = _b[0], setTop3Books = _b[1];
-    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-        var _a;
-        if (currentAuthorId) {
-            var matchedAuthor_1 = authors.find(function (author) { return author.id === currentAuthorId; });
-            if (matchedAuthor_1) {
-                var booksWithDescriptions = (((_a = matchedAuthor_1.books) === null || _a === void 0 ? void 0 : _a.slice(0, 3)) || []).map(function (title, index) {
-                    var _a;
-                    return {
-                        title: title,
-                        description: ((_a = matchedAuthor_1.book_descriptions) === null || _a === void 0 ? void 0 : _a[index]) || "Description not available",
-                        imagePath: "/public/path-to-book-images/".concat(title, ".png")
-                    };
-                });
-                setTop3Books(booksWithDescriptions);
-            }
-        }
-    }, [currentAuthorId, authors]);
+    var books = (0,_utils_useAuthorBooks__WEBPACK_IMPORTED_MODULE_3__["default"])(currentAuthorId);
+    var top3Books = books.slice(0, 3);
     return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "MC-card-face MC-card-back absolute inset-0 bg-[#faf8ef] text-center p-10 overflow-y-auto" },
-        top3Books.map(function (book, index) { return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_BookCards__WEBPACK_IMPORTED_MODULE_3__["default"], { key: index, book: {
-                author: "",
-                description: book.description,
-                categories: [],
-                imagePath: book.imagePath,
-                title: book.title
-            } })); }),
+        top3Books.map(function (book, index) { return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_BookCards__WEBPACK_IMPORTED_MODULE_2__["default"], { key: index, book: book })); }),
         react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", { onClick: onFlip, className: "MC-flip-button" }, "Flip")));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (CardBack);
@@ -65302,43 +65322,78 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _styles_VirtualBookshelf_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/VirtualBookshelf.css */ "./src/ugd_frontend/styles/VirtualBookshelf.css");
 /* harmony import */ var _cards_BookCards__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../cards/BookCards */ "./src/ugd_frontend/src/cards/BookCards.tsx");
-/* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
+/* harmony import */ var _utils_useAuthorBooks__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/useAuthorBooks */ "./src/ugd_frontend/utils/useAuthorBooks.ts");
+// import React, { useState, useEffect, useRef } from 'react';
+// import '../../styles/VirtualBookshelf.css';
+// import BookCards from '../cards/BookCards';
+// import { Book } from '../cards/MessageCard/types';
+// import { useAuthors } from '../contexts/AuthorContext';
+// import { sanitizeTitleForPath } from '../../utils/handleReadBookClick';
+// const VirtualBookShelfComponent = ({ author }: { author: string }) => {
+//   const [groupedBooks, setGroupedBooks] = useState<{ [author: string]: Book[] }>({});
+//   const booksByThisAuthor = groupedBooks[author] || [];
+//   const carouselWrapperRef = useRef<HTMLDivElement | null>(null);
+//   const { authors } = useAuthors();
+//   useEffect(() => {
+//     const authorInfo = authors.find(info => info.id === author);
+//     const booksForAuthor: Book[] = [];
+//     authorInfo?.books?.forEach((title, index) => {
+//       booksForAuthor.push({
+//         author: author,
+//         description: authorInfo.book_descriptions?.[index] || "Description not available",
+//         categories: authorInfo.category || [],
+//         imagePath: `/bookimages/${author}/${sanitizeTitleForPath(title)}.png`,
+//         title: title,
+//       });
+//     });
+//     setGroupedBooks({ [author]: booksForAuthor });
+//   }, [author, authors]);
+//   useEffect(() => {
+//     const adjustScaleBasedOnPosition = () => {
+//       const currentRef = carouselWrapperRef.current;
+//       if (currentRef) {
+//         const cards = currentRef.querySelectorAll('.carousel-card') as NodeListOf<HTMLDivElement>;
+//         const carouselMidpoint = currentRef.offsetWidth * 0.8 / 2;
+//         cards.forEach(card => {
+//           const cardMidpoint = card.getBoundingClientRect().left + card.offsetWidth / 2 - currentRef.getBoundingClientRect().left;
+//           const distanceFromCenter = Math.abs(carouselMidpoint - cardMidpoint);
+//           const scale = 1.1 - Math.min(distanceFromCenter / 1000, 0.2);
+//           card.style.transform = `scale(${scale})`;
+//         });
+//       }
+//     }
+//     const currentRef = carouselWrapperRef.current;
+//     if (currentRef) {
+//       currentRef.addEventListener('scroll', adjustScaleBasedOnPosition);
+//       adjustScaleBasedOnPosition();
+//       return () => {
+//         currentRef.removeEventListener('scroll', adjustScaleBasedOnPosition);
+//       }
+//     }
+//   }, [carouselWrapperRef, booksByThisAuthor]);
+//   return (
+//     <div className="carousel-container scale-down">
+//       <div className="segment-area">
+//         <div className="carousel-wrapper" ref={carouselWrapperRef}>
+//           {booksByThisAuthor.map((book, bookIndex) => (
+//             <div className="carousel-card" key={bookIndex}>
+//               <BookCards book={book} />
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );  
+// };
+// export default VirtualBookShelfComponent;
 
 
 
 
 var VirtualBookShelfComponent = function (_a) {
     var author = _a.author;
-    var _b = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({}), groupedBooks = _b[0], setGroupedBooks = _b[1];
-    var booksByThisAuthor = groupedBooks[author] || [];
+    var booksByThisAuthor = (0,_utils_useAuthorBooks__WEBPACK_IMPORTED_MODULE_3__["default"])(author);
     var carouselWrapperRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-    var authors = (0,_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_3__.useAuthors)().authors;
-    var sanitizeTitleForPath = function (title) {
-        return title
-            .replace(/,/g, '')
-            .replace(/;/g, '')
-            .replace(/-/g, '')
-            .replace(/\./g, '')
-            .replace(/—/g, '')
-            .replace(/&/g, 'and');
-    };
-    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-        var _a;
-        var _b;
-        var authorInfo = authors.find(function (info) { return info.id === author; });
-        var booksForAuthor = [];
-        (_b = authorInfo === null || authorInfo === void 0 ? void 0 : authorInfo.books) === null || _b === void 0 ? void 0 : _b.forEach(function (title, index) {
-            var _a;
-            booksForAuthor.push({
-                author: author,
-                description: ((_a = authorInfo.book_descriptions) === null || _a === void 0 ? void 0 : _a[index]) || "Description not available",
-                categories: authorInfo.category || [],
-                imagePath: "/bookimages/".concat(author, "/").concat(sanitizeTitleForPath(title), ".png"),
-                title: title,
-            });
-        });
-        setGroupedBooks((_a = {}, _a[author] = booksForAuthor, _a));
-    }, [author, authors]);
     (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
         var adjustScaleBasedOnPosition = function () {
             var currentRef = carouselWrapperRef.current;
@@ -65526,7 +65581,8 @@ var useStreamingText = function (text, speed, startStreaming) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   handleReadBookClick: () => (/* binding */ handleReadBookClick)
+/* harmony export */   handleReadBookClick: () => (/* binding */ handleReadBookClick),
+/* harmony export */   sanitizeTitleForPath: () => (/* binding */ sanitizeTitleForPath)
 /* harmony export */ });
 // Later will point to canisters. Right now it's AWS Lambda and S3 buckets.
 var handleReadBookClick = function (authorId, title) {
@@ -65550,6 +65606,59 @@ var handleReadBookClick = function (authorId, title) {
         console.log(bookUrl);
     }
 };
+var sanitizeTitleForPath = function (title) {
+    return title
+        .replace(/,/g, '')
+        .replace(/;/g, '')
+        .replace(/-/g, '')
+        .replace(/\./g, '')
+        .replace(/—/g, '')
+        .replace(/&/g, 'and');
+};
+
+
+/***/ }),
+
+/***/ "./src/ugd_frontend/utils/useAuthorBooks.ts":
+/*!**************************************************!*\
+  !*** ./src/ugd_frontend/utils/useAuthorBooks.ts ***!
+  \**************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _src_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../src/contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
+/* harmony import */ var _handleReadBookClick__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./handleReadBookClick */ "./src/ugd_frontend/utils/handleReadBookClick.ts");
+
+
+
+var useAuthorBooks = function (authorId) {
+    var _a = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]), books = _a[0], setBooks = _a[1];
+    var authors = (0,_src_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_1__.useAuthors)().authors;
+    (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+        var _a;
+        var authorInfo = authors.find(function (info) { return info.id === authorId; });
+        var booksForAuthor = [];
+        (_a = authorInfo === null || authorInfo === void 0 ? void 0 : authorInfo.books) === null || _a === void 0 ? void 0 : _a.forEach(function (title, index) {
+            var _a;
+            booksForAuthor.push({
+                author: authorId,
+                description: ((_a = authorInfo.book_descriptions) === null || _a === void 0 ? void 0 : _a[index]) || "Description not available",
+                categories: authorInfo.category || [],
+                imagePath: "/bookimages/".concat(authorId, "/").concat((0,_handleReadBookClick__WEBPACK_IMPORTED_MODULE_2__.sanitizeTitleForPath)(title), ".png"),
+                title: title,
+            });
+        });
+        setBooks(booksForAuthor);
+    }, [authorId, authors]);
+    return books;
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (useAuthorBooks);
 
 
 /***/ }),

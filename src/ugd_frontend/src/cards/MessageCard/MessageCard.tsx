@@ -18,23 +18,6 @@ const MessageCard: React.FC = () => {
 
   if (!currentAuthorId || !messageData) return null;
 
-//   return (
-//     <div className={`message-card-wrapper ${cardFlipped ? 'cardFlipped' : ''}`}>
-//       <div className="message-card relative">
-//         <CardFront messageData={messageData} onFlip={handleClick} currentAuthorId={currentAuthorId} />
-//         <CardBack onFlip={handleClick} />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default MessageCard;
-
-
-
-
-
-
 return (
   <div className={`message-card-wrapper ${cardFlipped ? 'cardFlipped' : ''}`}>
     <div className="message-card relative">

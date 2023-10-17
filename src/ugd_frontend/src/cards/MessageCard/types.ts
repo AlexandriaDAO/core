@@ -20,12 +20,6 @@ export interface CardBackProps {
   currentAuthorId: string;
 }
 
-// export interface Book {
-//   author: string;
-//   title: string;
-//   imagePath: string;
-// }
-
 export interface Book {
   author: string;
   title: string;

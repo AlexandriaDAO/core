@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../styles/BookCard.css';
 import Resizer from 'react-image-file-resizer'
+// import placeholderBook from '../../assets/public/bookimages/placeholder-cover.png';
 
 interface CardProps {
   image: string;
@@ -44,28 +45,58 @@ const BCBookCard: React.FC<CardProps> = ({ image, title, description, flipped, o
 
   const [compressedImageSrc, setCompressedImageSrc] = useState<string>("");
 
-  useEffect(() => {
-    if (image) {
-      fetch(image)
-        .then(response => response.blob())
-        .then(blob => {
-          Resizer.imageFileResizer(
-            blob,
-            300,
-            300,
-            'PNG',
-            90,
-            0,
-            (uri) => {
-              if (typeof uri === 'string') {
-                setCompressedImageSrc(uri);
-              }
-            },
-            'base64'
-          );
-        });
-    }
-  }, [image]);  
+  // useEffect(() => {
+  //   if (image) {
+  //     fetch(image)
+  //       .then(response => response.blob())
+  //       .then(blob => {
+  //         Resizer.imageFileResizer(
+  //           blob,
+  //           300,
+  //           300,
+  //           'PNG',
+  //           90,
+  //           0,
+  //           (uri) => {
+  //             if (typeof uri === 'string') {
+  //               setCompressedImageSrc(uri);
+  //             }
+  //           },
+  //           'base64'
+  //         );
+  //       });
+  //   }
+  // }, [image]);  
+
+  if (image) {
+    fetch(image)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network Response was not okay');
+        }
+        return response.blob();
+      })
+      .then(blob => {
+        Resizer.imageFileResizer(
+          blob,
+          300,
+          300,
+          'PNG',
+          90,
+          0,
+          (uri) => {
+            if (typeof uri === 'string') {
+              setCompressedImageSrc(uri);
+            }
+          },
+          'base64'
+        );
+      })
+      .catch(error => {
+        console.error('There was a problem fetching the image: ', error);
+        console.log('Failed image URL:', image);
+      });
+  }    
 
   return (
     <div
@@ -112,33 +143,3 @@ export default BCBookCard;
 
 
 
-// For when I need to debug image loading: 
-    // if (image) {
-    //   fetch(image)
-    //     .then(response => {
-    //       if (!response.ok) {
-    //         throw new Error('Network Response was not okay');
-    //       }
-    //       return response.blob();
-    //     })
-    //     .then(blob => {
-    //       Resizer.imageFileResizer(
-    //         blob,
-    //         300,
-    //         300,
-    //         'PNG',
-    //         90,
-    //         0,
-    //         (uri) => {
-    //           if (typeof uri === 'string') {
-    //             setCompressedImageSrc(uri);
-    //           }
-    //         },
-    //         'base64'
-    //       );
-    //     })
-    //     .catch(error => {
-    //       console.error('There was a problem fetching the image: ', error);
-    //       console.log('Failed image URL:', image);
-    //     });
-    // }    
