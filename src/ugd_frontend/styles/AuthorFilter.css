@@ -50,3 +50,15 @@
 .collapsible-content {
   margin-top: 0.5rem;
 }
+
+
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+input[type=range] {
+  width: 100%;
+  margin: 10px 0;
+}

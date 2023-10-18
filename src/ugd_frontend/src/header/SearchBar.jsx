@@ -3,7 +3,7 @@ import React, { useState, useCallback, useContext } from 'react';
 import '../../styles/SearchBar.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import AuthorFilter from './AuthorFilter';
+import AuthorFilter from './settings/AuthorFilter';
 import MessageContext from '../../src/contexts/MessageContext';
 import MessageCard from '../cards/MessageCard/MessageCard';
 import { useAuthors } from '../contexts/AuthorContext';

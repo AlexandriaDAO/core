@@ -9,6 +9,7 @@ import WebFont from 'webfontloader';
 import '../styles/main.css';
 import MessageProvider from '../utils/MessageProvider'
 import { AuthorProvider } from './contexts/AuthorContext'
+import { SettingsProvider } from './contexts/SettingsContext';
 
 WebFont.load({
   google: {
@@ -73,10 +74,11 @@ const App = () => {
     root.render(
       <React.StrictMode>
         <AuthorProvider>
-          <App />
+          <SettingsProvider>
+            <App />
+          </SettingsProvider>
         </AuthorProvider>
       </React.StrictMode>
     );
   }
-
 });
