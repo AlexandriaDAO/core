@@ -8,7 +8,6 @@ const MessageCard: React.FC = () => {
   const [cardFlipped, setCardFlipped] = useState(false);
 
   const context = useContext(MessageContext);
-  
   const messageData = context?.message;
   const currentAuthorId = context?.currentAuthorId;
 
@@ -18,14 +17,14 @@ const MessageCard: React.FC = () => {
 
   if (!currentAuthorId || !messageData) return null;
 
-return (
-  <div className={`message-card-wrapper ${cardFlipped ? 'cardFlipped' : ''}`}>
-    <div className="message-card relative">
-      <CardFront messageData={messageData} onFlip={handleClick} currentAuthorId={currentAuthorId} />
-      <CardBack onFlip={handleClick} currentAuthorId={currentAuthorId} />
+  return (
+    <div className={`message-card-wrapper ${cardFlipped ? 'cardFlipped' : ''}`}>
+      <div className="message-card">
+        <CardFront messageData={messageData} onFlip={handleClick} currentAuthorId={currentAuthorId} />
+        <CardBack onFlip={handleClick} currentAuthorId={currentAuthorId} />
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default MessageCard;
