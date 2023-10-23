@@ -1,4 +1,5 @@
 .searchbar-wrapper {
+  max-width: 800px;
   width: 100%;
   padding: 20px;
   margin: 0 auto; 

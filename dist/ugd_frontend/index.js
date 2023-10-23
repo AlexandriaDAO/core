@@ -6294,100 +6294,40 @@ const init = ({
 
 /***/ }),
 
-/***/ "./src/ugd_frontend/src/header/AuthorFilter.jsx":
-/*!******************************************************!*\
-  !*** ./src/ugd_frontend/src/header/AuthorFilter.jsx ***!
-  \******************************************************/
+/***/ "./src/ugd_frontend/src/contexts/SettingsContext.js":
+/*!**********************************************************!*\
+  !*** ./src/ugd_frontend/src/contexts/SettingsContext.js ***!
+  \**********************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   SettingsProvider: () => (/* binding */ SettingsProvider),
+/* harmony export */   useSettings: () => (/* binding */ useSettings)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @fortawesome/react-fontawesome */ "./node_modules/@fortawesome/react-fontawesome/index.es.js");
-/* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.mjs");
-/* harmony import */ var _styles_AuthorFilter_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../styles/AuthorFilter.css */ "./src/ugd_frontend/styles/AuthorFilter.css");
-/* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
 
-
-
-
-
-const CollapsibleSection = ({
-  title,
+const SettingsContext = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)();
+const useSettings = () => {
+  const context = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(SettingsContext);
+  if (!context) {
+    throw new Error("useSettings must be used within a SettingsProvider");
+  }
+  return context;
+};
+const SettingsProvider = ({
   children
 }) => {
-  const [isOpen, setIsOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "collapsible-section"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
-    className: "collapsible-header",
-    onClick: () => setIsOpen(!isOpen)
-  }, title, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_1__.FontAwesomeIcon, {
-    icon: isOpen ? _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_4__.faChevronUp : _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_4__.faChevronDown
-  })), isOpen && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "collapsible-content"
-  }, children));
+  const [topBooksCount, setTopBooksCount] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(3);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(SettingsContext.Provider, {
+    value: {
+      topBooksCount,
+      setTopBooksCount
+    }
+  }, children);
 };
-const AuthorFilter = ({
-  isDropdownVisible,
-  toggleDropdown,
-  selectedAuthors,
-  handleAuthorSelection,
-  handleAllBooksSelection,
-  allCategories,
-  selectedCategories,
-  handleCategorySelection
-}) => {
-  const {
-    authors
-  } = (0,_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_3__.useAuthors)();
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
-    className: "filter-icon-button",
-    onClick: toggleDropdown
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_1__.FontAwesomeIcon, {
-    icon: isDropdownVisible ? _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_4__.faTimes : _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_4__.faBars
-  })), isDropdownVisible && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "filter-popup"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "filter-item"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
-    type: "checkbox",
-    id: "all-books",
-    checked: selectedAuthors.length === authors.length,
-    onChange: handleAllBooksSelection
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
-    htmlFor: "all-books"
-  }, "All Books")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(CollapsibleSection, {
-    title: "Categories"
-  }, allCategories.map(category => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    key: category,
-    className: "filter-item"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
-    type: "checkbox",
-    id: category,
-    checked: selectedCategories.includes(category),
-    onChange: () => handleCategorySelection(category)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
-    htmlFor: category
-  }, category)))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(CollapsibleSection, {
-    title: "Authors"
-  }, authors.filter(author => selectedCategories.some(cat => author.category.includes(cat)) || selectedCategories.length === 0).map(author => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    key: author.id,
-    className: "filter-item"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
-    type: "checkbox",
-    id: author.id,
-    checked: selectedAuthors.includes(author.id),
-    onChange: () => handleAuthorSelection(author.id)
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
-    htmlFor: author.id
-  }, author.id))))));
-};
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AuthorFilter);
 
 /***/ }),
 
@@ -6407,7 +6347,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _styles_SearchBar_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../styles/SearchBar.css */ "./src/ugd_frontend/styles/SearchBar.css");
 /* harmony import */ var _fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @fortawesome/react-fontawesome */ "./node_modules/@fortawesome/react-fontawesome/index.es.js");
 /* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.mjs");
-/* harmony import */ var _AuthorFilter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./AuthorFilter */ "./src/ugd_frontend/src/header/AuthorFilter.jsx");
+/* harmony import */ var _settings_AuthorFilter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./settings/AuthorFilter */ "./src/ugd_frontend/src/header/settings/AuthorFilter.jsx");
 /* harmony import */ var _src_contexts_MessageContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../src/contexts/MessageContext */ "./src/ugd_frontend/src/contexts/MessageContext.ts");
 /* harmony import */ var _cards_MessageCard_MessageCard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../cards/MessageCard/MessageCard */ "./src/ugd_frontend/src/cards/MessageCard/MessageCard.tsx");
 /* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
@@ -6466,7 +6406,7 @@ const SearchBar = ({
     className: "searchbar-wrapper"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "searchbar"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_AuthorFilter__WEBPACK_IMPORTED_MODULE_3__["default"], {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_settings_AuthorFilter__WEBPACK_IMPORTED_MODULE_3__["default"], {
     isDropdownVisible: isDropdownVisible,
     toggleDropdown: toggleDropdown,
     selectedAuthors: selectedAuthors,
@@ -6600,6 +6540,122 @@ const Tabs = () => {
   })));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Tabs);
+
+/***/ }),
+
+/***/ "./src/ugd_frontend/src/header/settings/AuthorFilter.jsx":
+/*!***************************************************************!*\
+  !*** ./src/ugd_frontend/src/header/settings/AuthorFilter.jsx ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @fortawesome/react-fontawesome */ "./node_modules/@fortawesome/react-fontawesome/index.es.js");
+/* harmony import */ var _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @fortawesome/free-solid-svg-icons */ "./node_modules/@fortawesome/free-solid-svg-icons/index.mjs");
+/* harmony import */ var _styles_AuthorFilter_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../styles/AuthorFilter.css */ "./src/ugd_frontend/styles/AuthorFilter.css");
+/* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
+/* harmony import */ var _contexts_SettingsContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../contexts/SettingsContext */ "./src/ugd_frontend/src/contexts/SettingsContext.js");
+
+
+
+
+
+
+const CollapsibleSection = ({
+  title,
+  children
+}) => {
+  const [isOpen, setIsOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "collapsible-section"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+    className: "collapsible-header",
+    onClick: () => setIsOpen(!isOpen)
+  }, title, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_1__.FontAwesomeIcon, {
+    icon: isOpen ? _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_5__.faChevronUp : _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_5__.faChevronDown
+  })), isOpen && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "collapsible-content"
+  }, children));
+};
+const AuthorFilter = ({
+  isDropdownVisible,
+  toggleDropdown,
+  selectedAuthors,
+  handleAuthorSelection,
+  handleAllBooksSelection,
+  allCategories,
+  selectedCategories,
+  handleCategorySelection
+}) => {
+  const {
+    authors
+  } = (0,_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_3__.useAuthors)();
+  const {
+    topBooksCount,
+    setTopBooksCount
+  } = (0,_contexts_SettingsContext__WEBPACK_IMPORTED_MODULE_4__.useSettings)();
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+    className: "filter-icon-button",
+    onClick: toggleDropdown
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_fortawesome_react_fontawesome__WEBPACK_IMPORTED_MODULE_1__.FontAwesomeIcon, {
+    icon: isDropdownVisible ? _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_5__.faTimes : _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_5__.faBars
+  })), isDropdownVisible && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "filter-popup"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "filter-item"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    type: "checkbox",
+    id: "all-books",
+    checked: selectedAuthors.length === authors.length,
+    onChange: handleAllBooksSelection
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
+    htmlFor: "all-books"
+  }, "All Books")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(CollapsibleSection, {
+    title: "Categories"
+  }, allCategories.map(category => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    key: category,
+    className: "filter-item"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    type: "checkbox",
+    id: category,
+    checked: selectedCategories.includes(category),
+    onChange: () => handleCategorySelection(category)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
+    htmlFor: category
+  }, category)))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(CollapsibleSection, {
+    title: "Authors"
+  }, authors.filter(author => selectedCategories.some(cat => author.category.includes(cat)) || selectedCategories.length === 0).map(author => /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    key: author.id,
+    className: "filter-item"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    type: "checkbox",
+    id: author.id,
+    checked: selectedAuthors.includes(author.id),
+    onChange: () => handleAuthorSelection(author.id)
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
+    htmlFor: author.id
+  }, author.id)))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(CollapsibleSection, {
+    title: "Settings"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
+    className: "slider-container"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("label", {
+    htmlFor: "top-books-slider"
+  }, "Top Books to Display: ", topBooksCount), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("input", {
+    id: "top-books-slider",
+    type: "range",
+    min: "1",
+    max: "10",
+    value: topBooksCount,
+    onChange: e => setTopBooksCount(Number(e.target.value))
+  })))));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (AuthorFilter);
 
 /***/ }),
 
@@ -17311,7 +17367,19 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.filter-popup {
 .collapsible-content {
   margin-top: 0.5rem;
 }
-`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/AuthorFilter.css"],"names":[],"mappings":"AAAA;EACE,kBAAkB;EAClB,SAAS,GAAG,uDAAuD;EACnE,OAAO;EACP,WAAW;EACX,UAAU;EACV,sBAAsB;EACtB,yBAAyB;EACzB,sBAAsB;EACtB,wCAAwC;EACxC,eAAe;EACf,iBAAiB;EACjB,gBAAgB;AAClB;;AAEA;EACE,aAAa;EACb,mBAAmB;EACnB,qBAAqB;AACvB;;AAEA;EACE,gBAAgB;AAClB;;AAEA;EACE,oBAAoB;AACtB;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,aAAa;EACb,8BAA8B;EAC9B,mBAAmB;EACnB,yBAAyB;EACzB,oBAAoB;EACpB,sBAAsB;EACtB,eAAe;EACf,gBAAgB;EAChB,iCAAiC;AACnC;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,kBAAkB;AACpB","sourcesContent":[".filter-popup {\n  position: absolute;\n  top: 110%;  /* Adjusts the vertical position below the search bar */\n  left: 0;\n  width: 100%;\n  z-index: 1;\n  background-color: #fff;\n  border: 1px solid #e2e8f0;\n  border-radius: 0.25rem;\n  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\n  padding: 0.5rem;\n  max-height: 400px;\n  overflow-y: auto;\n}\n\n.filter-item {\n  display: flex;\n  align-items: center;\n  margin-bottom: 0.5rem;\n}\n\n.filter-item:last-child {\n  margin-bottom: 0;\n}\n\n.filter-item input[type=\"checkbox\"] {\n  margin-right: 0.5rem;\n}\n\n.collapsible-section {\n  margin-bottom: 1rem;\n}\n\n.collapsible-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  background-color: #f7fafc;\n  padding: 0.5rem 1rem;\n  border-radius: 0.25rem;\n  cursor: pointer;\n  font-weight: 600;\n  transition: background-color 0.3s;\n}\n\n.collapsible-header:hover {\n  background-color: #e2e8f0;\n}\n\n.collapsible-content {\n  margin-top: 0.5rem;\n}\n"],"sourceRoot":""}]);
+
+
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+input[type=range] {
+  width: 100%;
+  margin: 10px 0;
+}
+`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/AuthorFilter.css"],"names":[],"mappings":"AAAA;EACE,kBAAkB;EAClB,SAAS,GAAG,uDAAuD;EACnE,OAAO;EACP,WAAW;EACX,UAAU;EACV,sBAAsB;EACtB,yBAAyB;EACzB,sBAAsB;EACtB,wCAAwC;EACxC,eAAe;EACf,iBAAiB;EACjB,gBAAgB;AAClB;;AAEA;EACE,aAAa;EACb,mBAAmB;EACnB,qBAAqB;AACvB;;AAEA;EACE,gBAAgB;AAClB;;AAEA;EACE,oBAAoB;AACtB;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,aAAa;EACb,8BAA8B;EAC9B,mBAAmB;EACnB,yBAAyB;EACzB,oBAAoB;EACpB,sBAAsB;EACtB,eAAe;EACf,gBAAgB;EAChB,iCAAiC;AACnC;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,kBAAkB;AACpB;;;AAGA;EACE,aAAa;EACb,sBAAsB;EACtB,uBAAuB;AACzB;;AAEA;EACE,WAAW;EACX,cAAc;AAChB","sourcesContent":[".filter-popup {\n  position: absolute;\n  top: 110%;  /* Adjusts the vertical position below the search bar */\n  left: 0;\n  width: 100%;\n  z-index: 1;\n  background-color: #fff;\n  border: 1px solid #e2e8f0;\n  border-radius: 0.25rem;\n  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\n  padding: 0.5rem;\n  max-height: 400px;\n  overflow-y: auto;\n}\n\n.filter-item {\n  display: flex;\n  align-items: center;\n  margin-bottom: 0.5rem;\n}\n\n.filter-item:last-child {\n  margin-bottom: 0;\n}\n\n.filter-item input[type=\"checkbox\"] {\n  margin-right: 0.5rem;\n}\n\n.collapsible-section {\n  margin-bottom: 1rem;\n}\n\n.collapsible-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  background-color: #f7fafc;\n  padding: 0.5rem 1rem;\n  border-radius: 0.25rem;\n  cursor: pointer;\n  font-weight: 600;\n  transition: background-color 0.3s;\n}\n\n.collapsible-header:hover {\n  background-color: #e2e8f0;\n}\n\n.collapsible-content {\n  margin-top: 0.5rem;\n}\n\n\n.slider-container {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n}\n\ninput[type=range] {\n  width: 100%;\n  margin: 10px 0;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -17495,24 +17563,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `.MC-card-face {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
-}
-
-.MC-card-back {
+___CSS_LOADER_EXPORT___.push([module.id, `.MC-card-back {
   transform: rotateY(180deg);
-}
-
-
-.MC-book-cards-container {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 80px;
 }
 
 .MC-flip-button {
@@ -17539,8 +17591,45 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.MC-card-face {
 }
 
 .MC-card-back {
-  scrollbar-width: none;
-}`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/MessageCard/CardBack.css"],"names":[],"mappings":"AAAA;EACE,kBAAkB;EAClB,WAAW;EACX,YAAY;EACZ,2BAA2B;EAC3B,4BAA4B;AAC9B;;AAEA;EACE,0BAA0B;AAC5B;;;AAGA;EACE,aAAa;EACb,uBAAuB;EACvB,eAAe;EACf,SAAS;AACX;;AAEA;EACE,iBAAiB;EACjB,gBAAgB;EAChB,yBAAyB;EACzB,YAAY;EACZ,kBAAkB;EAClB,cAAc;EACd,eAAe;EACf,iCAAiC;AACnC;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,qBAAqB;AACvB","sourcesContent":[".MC-card-face {\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  backface-visibility: hidden;\n  transform-style: preserve-3d;\n}\n\n.MC-card-back {\n  transform: rotateY(180deg);\n}\n\n\n.MC-book-cards-container {\n  display: flex;\n  justify-content: center;\n  flex-wrap: wrap;\n  gap: 80px;\n}\n\n.MC-flip-button {\n  padding: 8px 12px;\n  margin-top: 12px;\n  background-color: #d3c2af;\n  border: none;\n  border-radius: 5px;\n  color: #faf8ef;\n  cursor: pointer;\n  transition: background-color 0.3s;\n}\n\n.MC-flip-button:hover {\n  background-color: #b5a58f;\n}\n\n.MC-card-back::-webkit-scrollbar {\n  display: none;\n}\n\n.MC-card-back:-ms-overflow-style {\n  display: none;\n}\n\n.MC-card-back {\n  scrollbar-width: none;\n}"],"sourceRoot":""}]);
+  backface-visibility: hidden;
+}
+
+.MC-book-cards-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  width: 90%;
+}
+
+.SC-source-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.SC-book-card-container {
+  flex: 1;
+  margin-right: 16px;
+}
+
+.SC-text-container {
+  flex: 1;
+  text-align: left;
+}
+
+.SC-message-card-content {
+  font-size: 16px;
+  line-height: 1.4;
+}`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/MessageCard/CardBack.css"],"names":[],"mappings":"AAAA;EACE,0BAA0B;AAC5B;;AAEA;EACE,iBAAiB;EACjB,gBAAgB;EAChB,yBAAyB;EACzB,YAAY;EACZ,kBAAkB;EAClB,cAAc;EACd,eAAe;EACf,iCAAiC;AACnC;;AAEA;EACE,yBAAyB;AAC3B;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,2BAA2B;AAC7B;;AAEA;EACE,aAAa;EACb,sBAAsB;EACtB,mBAAmB;EACnB,SAAS;EACT,aAAa;EACb,UAAU;AACZ;;AAEA;EACE,aAAa;EACb,mBAAmB;EACnB,mBAAmB;EACnB,WAAW;EACX,sBAAsB;EACtB,sBAAsB;EACtB,kBAAkB;EAClB,gBAAgB;EAChB,aAAa;EACb,qCAAqC;AACvC;;AAEA;EACE,OAAO;EACP,kBAAkB;AACpB;;AAEA;EACE,OAAO;EACP,gBAAgB;AAClB;;AAEA;EACE,eAAe;EACf,gBAAgB;AAClB","sourcesContent":[".MC-card-back {\n  transform: rotateY(180deg);\n}\n\n.MC-flip-button {\n  padding: 8px 12px;\n  margin-top: 12px;\n  background-color: #d3c2af;\n  border: none;\n  border-radius: 5px;\n  color: #faf8ef;\n  cursor: pointer;\n  transition: background-color 0.3s;\n}\n\n.MC-flip-button:hover {\n  background-color: #b5a58f;\n}\n\n.MC-card-back::-webkit-scrollbar {\n  display: none;\n}\n\n.MC-card-back:-ms-overflow-style {\n  display: none;\n}\n\n.MC-card-back {\n  backface-visibility: hidden;\n}\n\n.MC-book-cards-container {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 16px;\n  padding: 20px;\n  width: 90%;\n}\n\n.SC-source-card {\n  display: flex;\n  flex-direction: row;\n  align-items: center;\n  width: 100%;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 8px;\n  overflow: hidden;\n  padding: 16px;\n  box-shadow: 0 4px 8px rgba(0,0,0,0.1);\n}\n\n.SC-book-card-container {\n  flex: 1;\n  margin-right: 16px;\n}\n\n.SC-text-container {\n  flex: 1;\n  text-align: left;\n}\n\n.SC-message-card-content {\n  font-size: 16px;\n  line-height: 1.4;\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -17692,9 +17781,7 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `.message-card-wrapper {
-  perspective: 1000px;
   width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17703,7 +17790,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.message-card-wrapper {
 
 .message-card {
   width: 100%;
-  height: 300px;
+  min-height: 500px;
   position: relative;
   transform-style: preserve-3d;
   transform: rotateY(0);
@@ -17725,7 +17812,12 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.message-card-wrapper {
     flex-direction: column;
   }
 }
-`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/MessageCard/MessageCard.css"],"names":[],"mappings":"AAAA;EACE,mBAAmB;EACnB,WAAW;EACX,YAAY;EACZ,aAAa;EACb,mBAAmB;EACnB,uBAAuB;EACvB,gBAAgB;AAClB;;AAEA;EACE,WAAW;EACX,aAAa;EACb,kBAAkB;EAClB,4BAA4B;EAC5B,qBAAqB;EACrB,0BAA0B;EAC1B,aAAa;EACb,yBAAyB;EACzB,yBAAyB;EACzB,kBAAkB;EAClB,kBAAkB;EAClB,yCAAyC;AAC3C;;AAEA;EACE,0BAA0B;AAC5B;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF","sourcesContent":[".message-card-wrapper {\n  perspective: 1000px;\n  width: 100%;\n  height: 100%;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  margin-top: 20px;\n}\n\n.message-card {\n  width: 100%;\n  height: 300px;\n  position: relative;\n  transform-style: preserve-3d;\n  transform: rotateY(0);\n  transition: transform 0.5s;\n  display: flex;\n  border: 1px solid #d3c2af;\n  background-color: #faf8ef;\n  padding: 12px 20px;\n  border-radius: 8px;\n  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);\n}\n\n.message-card-wrapper.cardFlipped .message-card {\n  transform: rotateY(180deg);\n}\n\n@media (max-width: 767px) { \n  .message-card {\n    flex-direction: column;\n  }\n}\n"],"sourceRoot":""}]);
+
+
+
+
+
+`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/MessageCard/MessageCard.css"],"names":[],"mappings":"AAAA;EACE,WAAW;EACX,aAAa;EACb,mBAAmB;EACnB,uBAAuB;EACvB,gBAAgB;AAClB;;AAEA;EACE,WAAW;EACX,iBAAiB;EACjB,kBAAkB;EAClB,4BAA4B;EAC5B,qBAAqB;EACrB,0BAA0B;EAC1B,aAAa;EACb,yBAAyB;EACzB,yBAAyB;EACzB,kBAAkB;EAClB,kBAAkB;EAClB,yCAAyC;AAC3C;;AAEA;EACE,0BAA0B;AAC5B;;AAEA;EACE;IACE,sBAAsB;EACxB;AACF","sourcesContent":[".message-card-wrapper {\n  width: 100%;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  margin-top: 20px;\n}\n\n.message-card {\n  width: 100%;\n  min-height: 500px;\n  position: relative;\n  transform-style: preserve-3d;\n  transform: rotateY(0);\n  transition: transform 0.5s;\n  display: flex;\n  border: 1px solid #d3c2af;\n  background-color: #faf8ef;\n  padding: 12px 20px;\n  border-radius: 8px;\n  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);\n}\n\n.message-card-wrapper.cardFlipped .message-card {\n  transform: rotateY(180deg);\n}\n\n@media (max-width: 767px) { \n  .message-card {\n    flex-direction: column;\n  }\n}\n\n\n\n\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -17753,7 +17845,6 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `.searchbar-wrapper {
-  max-width: 800px;
   width: 100%;
   padding: 20px;
   margin: 0 auto; 
@@ -17850,7 +17941,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.searchbar-wrapper {
   font-size: 18px;
 }
 
-`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/SearchBar.css"],"names":[],"mappings":"AAAA;EACE,gBAAgB;EAChB,WAAW;EACX,aAAa;EACb,cAAc;AAChB;;AAEA;EACE,kBAAkB;EAClB,aAAa;EACb,mBAAmB;EACnB,YAAY;EACZ,mBAAmB;EACnB,+CAA+C;EAC/C,2FAA2F;AAC7F;;AAEA;EACE,OAAO;EACP,kBAAkB;EAClB,YAAY;EACZ,kBAAkB;EAClB,eAAe;EACf,yBAAyB;EACzB,4BAA4B;AAC9B;;AAEA;EACE,WAAW;EACX,YAAY;EACZ,kBAAkB;EAClB,aAAa;EACb,uBAAuB;EACvB,mBAAmB;EACnB,YAAY;EACZ,cAAc;EACd,WAAW;AACb;;AAEA;EACE,uDAAuD;EACvD,eAAe;AACjB;;AAEA;EACE,eAAe;AACjB;;AAEA;EACE;IACE,YAAY;EACd;;EAEA;IACE,cAAc;IACd,wBAAwB;EAC1B;;EAEA;IACE,UAAU;IACV,WAAW;IACX,cAAc;EAChB;AACF;;AAEA;EACE,uDAAuD;AACzD;;AAEA;EACE,gBAAgB;EAChB,kBAAkB;AACpB;;AAEA;EACE,qBAAqB;EACrB,WAAW;EACX,YAAY;EACZ,sBAAsB;EACtB,kBAAkB;EAClB,yBAAyB;EACzB,kCAAkC;AACpC;;AAEA;EACE;MACI,uBAAuB;EAC3B;EACA;MACI,yBAAyB;EAC7B;AACF;;AAEA;EACE,gBAAgB;EAChB,eAAe;AACjB","sourcesContent":[".searchbar-wrapper {\n  max-width: 800px;\n  width: 100%;\n  padding: 20px;\n  margin: 0 auto; \n}\n\n.searchbar {\n  position: relative;\n  display: flex;\n  align-items: center;\n  padding: 8px;\n  border-radius: 30px;\n  box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);\n  background: linear-gradient(to right, #5b4e81, #6f649c, #837bb7, #9e95ce, #b9b3e4, #d6cf9a);\n}\n\n.search-input {\n  flex: 1;\n  padding: 10px 20px;\n  border: none;\n  border-radius: 5px;\n  font-size: 18px;\n  background-color: #faf8ef;\n  transition: border 0.3s ease;\n}\n\n.filter-icon-button, .search-icon-button {\n  width: 45px;\n  height: 45px;\n  border-radius: 50%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  border: none;\n  margin: 0 10px;\n  color: #fff;\n}\n\n.search-icon-button {\n  background: linear-gradient(to right, #667eea, #764ba2);\n  font-size: 22px;\n}\n\n.filter-icon-button {\n  font-size: 28px;\n}\n\n@media (max-width: 480px) {\n  .searchbar-wrapper {\n    padding: 2vw;\n  }\n\n  .search-input {\n    font-size: 4vw;\n    padding: 1vw 4vw 1vw 2vw;\n  }\n\n  .filter-icon-button, .search-icon-button {\n    width: 8vw;\n    height: 8vw;\n    font-size: 5vw;\n  }\n}\n\n.icon-button:hover {\n  background: linear-gradient(to right, #5a63c6, #6e3c9b);\n}\n\n.searchbar-loading {\n  margin-top: 15px;\n  text-align: center;\n}\n\n.searchbar-loader {\n  display: inline-block;\n  width: 40px;\n  height: 40px;\n  border: 4px solid #ccc;\n  border-radius: 50%;\n  border-top-color: #667eea;\n  animation: spin 1s linear infinite;\n}\n\n@keyframes spin {\n  0% {\n      transform: rotate(0deg);\n  }\n  100% {\n      transform: rotate(360deg);\n  }\n}\n\n.searchbar-greeting {\n  margin-top: 15px;\n  font-size: 18px;\n}\n\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/ugd_frontend/styles/SearchBar.css"],"names":[],"mappings":"AAAA;EACE,WAAW;EACX,aAAa;EACb,cAAc;AAChB;;AAEA;EACE,kBAAkB;EAClB,aAAa;EACb,mBAAmB;EACnB,YAAY;EACZ,mBAAmB;EACnB,+CAA+C;EAC/C,2FAA2F;AAC7F;;AAEA;EACE,OAAO;EACP,kBAAkB;EAClB,YAAY;EACZ,kBAAkB;EAClB,eAAe;EACf,yBAAyB;EACzB,4BAA4B;AAC9B;;AAEA;EACE,WAAW;EACX,YAAY;EACZ,kBAAkB;EAClB,aAAa;EACb,uBAAuB;EACvB,mBAAmB;EACnB,YAAY;EACZ,cAAc;EACd,WAAW;AACb;;AAEA;EACE,uDAAuD;EACvD,eAAe;AACjB;;AAEA;EACE,eAAe;AACjB;;AAEA;EACE;IACE,YAAY;EACd;;EAEA;IACE,cAAc;IACd,wBAAwB;EAC1B;;EAEA;IACE,UAAU;IACV,WAAW;IACX,cAAc;EAChB;AACF;;AAEA;EACE,uDAAuD;AACzD;;AAEA;EACE,gBAAgB;EAChB,kBAAkB;AACpB;;AAEA;EACE,qBAAqB;EACrB,WAAW;EACX,YAAY;EACZ,sBAAsB;EACtB,kBAAkB;EAClB,yBAAyB;EACzB,kCAAkC;AACpC;;AAEA;EACE;MACI,uBAAuB;EAC3B;EACA;MACI,yBAAyB;EAC7B;AACF;;AAEA;EACE,gBAAgB;EAChB,eAAe;AACjB","sourcesContent":[".searchbar-wrapper {\n  width: 100%;\n  padding: 20px;\n  margin: 0 auto; \n}\n\n.searchbar {\n  position: relative;\n  display: flex;\n  align-items: center;\n  padding: 8px;\n  border-radius: 30px;\n  box-shadow: 0 5px 20px rgba(255, 255, 255, 0.2);\n  background: linear-gradient(to right, #5b4e81, #6f649c, #837bb7, #9e95ce, #b9b3e4, #d6cf9a);\n}\n\n.search-input {\n  flex: 1;\n  padding: 10px 20px;\n  border: none;\n  border-radius: 5px;\n  font-size: 18px;\n  background-color: #faf8ef;\n  transition: border 0.3s ease;\n}\n\n.filter-icon-button, .search-icon-button {\n  width: 45px;\n  height: 45px;\n  border-radius: 50%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  border: none;\n  margin: 0 10px;\n  color: #fff;\n}\n\n.search-icon-button {\n  background: linear-gradient(to right, #667eea, #764ba2);\n  font-size: 22px;\n}\n\n.filter-icon-button {\n  font-size: 28px;\n}\n\n@media (max-width: 480px) {\n  .searchbar-wrapper {\n    padding: 2vw;\n  }\n\n  .search-input {\n    font-size: 4vw;\n    padding: 1vw 4vw 1vw 2vw;\n  }\n\n  .filter-icon-button, .search-icon-button {\n    width: 8vw;\n    height: 8vw;\n    font-size: 5vw;\n  }\n}\n\n.icon-button:hover {\n  background: linear-gradient(to right, #5a63c6, #6e3c9b);\n}\n\n.searchbar-loading {\n  margin-top: 15px;\n  text-align: center;\n}\n\n.searchbar-loader {\n  display: inline-block;\n  width: 40px;\n  height: 40px;\n  border: 4px solid #ccc;\n  border-radius: 50%;\n  border-top-color: #667eea;\n  animation: spin 1s linear infinite;\n}\n\n@keyframes spin {\n  0% {\n      transform: rotate(0deg);\n  }\n  100% {\n      transform: rotate(360deg);\n  }\n}\n\n.searchbar-greeting {\n  margin-top: 15px;\n  font-size: 18px;\n}\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -65092,20 +65183,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _styles_MessageCard_CardBack_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../styles/MessageCard/CardBack.css */ "./src/ugd_frontend/styles/MessageCard/CardBack.css");
-/* harmony import */ var _BookCards__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../BookCards */ "./src/ugd_frontend/src/cards/BookCards.tsx");
+/* harmony import */ var _BookCards__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../BookCards */ "./src/ugd_frontend/src/cards/BookCards.tsx");
+/* harmony import */ var _styles_MessageCard_CardBack_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../styles/MessageCard/CardBack.css */ "./src/ugd_frontend/styles/MessageCard/CardBack.css");
 /* harmony import */ var _utils_useAuthorBooks__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../utils/useAuthorBooks */ "./src/ugd_frontend/utils/useAuthorBooks.ts");
+/* harmony import */ var _contexts_SettingsContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../contexts/SettingsContext */ "./src/ugd_frontend/src/contexts/SettingsContext.js");
+
 
 
 
 
 var CardBack = function (_a) {
-    var onFlip = _a.onFlip, currentAuthorId = _a.currentAuthorId;
+    var currentAuthorId = _a.currentAuthorId;
     var books = (0,_utils_useAuthorBooks__WEBPACK_IMPORTED_MODULE_3__["default"])(currentAuthorId);
-    var top3Books = books.slice(0, 3);
-    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "MC-card-face MC-card-back absolute inset-0 bg-[#faf8ef] text-center p-10 overflow-y-auto" },
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", { className: "MC-flip-button", onClick: onFlip }, "Flip"),
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "MC-book-cards-container" }, top3Books.map(function (book, index) { return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_BookCards__WEBPACK_IMPORTED_MODULE_2__["default"], { key: index, book: book })); }))));
+    var topBooksCount = (0,_contexts_SettingsContext__WEBPACK_IMPORTED_MODULE_4__.useSettings)().topBooksCount;
+    var topNBooks = books.slice(0, topBooksCount);
+    return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "MC-card-back absolute inset-0 bg-[#faf8ef] flex flex-column items-center" },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "MC-book-cards-container" }, topNBooks.map(function (book, index) { return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "SC-source-card", key: index },
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "SC-book-card-container" },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_BookCards__WEBPACK_IMPORTED_MODULE_1__["default"], { book: book })),
+            react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "SC-text-container" },
+                react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", { className: "SC-message-card-content" }, "Demo text: This will be an extractive summary of the source itself, with an option to expand into the full source snippet, and eventually ebook.")))); }))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (CardBack);
 
@@ -65180,7 +65277,7 @@ var MessageCard = function () {
     if (!currentAuthorId || !messageData)
         return null;
     return (react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "message-card-wrapper ".concat(cardFlipped ? 'cardFlipped' : '') },
-        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "message-card relative" },
+        react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", { className: "message-card" },
             react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_CardFront__WEBPACK_IMPORTED_MODULE_2__["default"], { messageData: messageData, onFlip: handleClick, currentAuthorId: currentAuthorId }),
             react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_CardBack__WEBPACK_IMPORTED_MODULE_3__["default"], { onFlip: handleClick, currentAuthorId: currentAuthorId }))));
 };
@@ -90923,6 +91020,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _styles_main_css__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../styles/main.css */ "./src/ugd_frontend/styles/main.css");
 /* harmony import */ var _utils_MessageProvider__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../utils/MessageProvider */ "./src/ugd_frontend/utils/MessageProvider.tsx");
 /* harmony import */ var _contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./contexts/AuthorContext */ "./src/ugd_frontend/src/contexts/AuthorContext.tsx");
+/* harmony import */ var _contexts_SettingsContext__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./contexts/SettingsContext */ "./src/ugd_frontend/src/contexts/SettingsContext.js");
+
 
 
 
@@ -90987,7 +91086,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const semanticLibraryRoot = document.getElementById("semantic-library-root");
   if (semanticLibraryRoot) {
     const root = (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(semanticLibraryRoot);
-    root.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_10__.AuthorProvider, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(App, null))));
+    root.render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().StrictMode), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_contexts_AuthorContext__WEBPACK_IMPORTED_MODULE_10__.AuthorProvider, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_contexts_SettingsContext__WEBPACK_IMPORTED_MODULE_11__.SettingsProvider, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(App, null)))));
   }
 });
 })();
