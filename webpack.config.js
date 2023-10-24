@@ -15,8 +15,6 @@ module.exports = {
   target: "web",
   mode: isDevelopment ? "development" : "production",
   entry: {
-    // The frontend.entrypoint points to the HTML file for this build, so we need
-    // to replace the extension to `.js`.
     index: path.join(__dirname, frontend_entry).replace(/\.html$/, ".js"),
   },
   devtool: isDevelopment ? "source-map" : false,
@@ -105,8 +103,6 @@ module.exports = {
       ],
     }),
   ],
-  // proxy /api to port 4943 during development.
-  // if you edit dfx.json to define a project-specific local network, change the port to match.
   devServer: {
     proxy: {
       "/api": {

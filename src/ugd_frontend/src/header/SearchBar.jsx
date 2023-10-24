@@ -1,4 +1,3 @@
-// Context file single component version
 import React, { useState, useCallback, useContext } from 'react';
 import '../../styles/SearchBar.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -57,26 +56,28 @@ const SearchBar = ({ selectedAuthors, setSelectedAuthors, selectedCategories, se
   return (
     <div className="searchbar-wrapper">
       <div className="searchbar">
-        <AuthorFilter 
-          isDropdownVisible={isDropdownVisible}
-          toggleDropdown={toggleDropdown}
-          selectedAuthors={selectedAuthors}
-          handleAuthorSelection={handleAuthorSelection}
-          handleAllBooksSelection={handleAllBooksSelection}
-          allCategories={allCategories}
-          selectedCategories={selectedCategories}
-          handleCategorySelection={handleCategorySelection}
-        />
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Type a topic or a query..."
-          onChange={handleSearchChange}
-          onKeyDown={handleKeyDown}
-        />
-        <button className="search-icon-button" onClick={handleSearchSubmit}>
-          <FontAwesomeIcon icon={faSearch} />
-        </button>
+        <div className="searchbar-inner">
+          <AuthorFilter 
+              isDropdownVisible={isDropdownVisible}
+              toggleDropdown={toggleDropdown}
+              selectedAuthors={selectedAuthors}
+              handleAuthorSelection={handleAuthorSelection}
+              handleAllBooksSelection={handleAllBooksSelection}
+              allCategories={allCategories}
+              selectedCategories={selectedCategories}
+              handleCategorySelection={handleCategorySelection}
+          />
+          <input
+              type="text"
+              className="search-input"
+              placeholder="Ask me anything..."
+              onChange={handleSearchChange}
+              onKeyDown={handleKeyDown}
+          />
+          <button className="search-icon-button" onClick={handleSearchSubmit}>
+            <FontAwesomeIcon icon={faSearch} />
+          </button>
+      </div>
       </div>
       {isLoading ? (
         <div className="loading-indicator"><div className="loader"></div></div>

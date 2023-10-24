@@ -1,6 +1,6 @@
 .filter-popup {
   position: absolute;
-  top: 110%;  /* Adjusts the vertical position below the search bar */
+  top: 110%;
   left: 0;
   width: 100%;
   z-index: 1;
