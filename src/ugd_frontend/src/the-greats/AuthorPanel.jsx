@@ -6,6 +6,8 @@ import { AuthorProvider } from '../contexts/AuthorContext';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
+import '../../styles/react-grid-layout.css'
+
 function AuthorPanel({ authors }) {
   const [activeAuthor, setActiveAuthor] = useState(null);
   const [numCols, setNumCols] = useState(1);
@@ -99,7 +101,7 @@ function AuthorPanel({ authors }) {
           containerPadding={[0, 0]}
           margin={[0, 0]}
           autoSize={true}
-          isDraggable={false}
+          isDraggable={true}
         >            
           {authors.map((author) => (
             <div 
