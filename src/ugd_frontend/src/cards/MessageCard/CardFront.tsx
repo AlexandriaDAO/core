@@ -1,5 +1,5 @@
 import React from 'react';
-import AuthorCards from '../AuthorCards';
+import AuthorCards from '../AuthorCard';
 import { CardFrontProps } from './types';
 import '../../../styles/MessageCard/CardFront.css';
 

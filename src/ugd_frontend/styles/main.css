@@ -47,6 +47,25 @@ body {
   line-height: inherit; /* 2 */
 }
 
+
+body ::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+}
+
+body ::-webkit-scrollbar-thumb {
+  cursor: pointer;
+  border-radius: 5px;
+  background: rgba(0,0,0,.25);
+  -webkit-transition: color .2s ease;
+  transition: color .2s ease;
+}
+body ::-webkit-scrollbar-track {
+  background: rgba(0,0,0,.1);
+  border-radius: 0;
+}
+
 /*
 1. Add the correct height in Firefox.
 2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)

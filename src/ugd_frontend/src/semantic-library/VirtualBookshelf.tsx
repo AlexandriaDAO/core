@@ -3,7 +3,7 @@ import '../../styles/VirtualBookshelf.css';
 import BookCards from '../cards/BookCards';
 import useAuthorBooks from '../../utils/useAuthorBooks';
 
-const VirtualBookShelfComponent = ({ author }: { author: string }) => {
+const VirtualBookShelf = ({ author }: { author: string }) => {
   const booksByThisAuthor = useAuthorBooks(author);
   const carouselWrapperRef = useRef<HTMLDivElement | null>(null);
 
@@ -50,4 +50,4 @@ const VirtualBookShelfComponent = ({ author }: { author: string }) => {
   );  
 };
 
-export default VirtualBookShelfComponent;
+export default VirtualBookShelf;
