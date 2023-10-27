@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import AuthorCards from '../cards/AuthorCards';
+import AuthorCard from '../cards/AuthorCard';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import VirtualBookShelfComponent from '../semantic-library/VirtualBookshelf';
 import { AuthorProvider } from '../contexts/AuthorContext';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -12,12 +11,8 @@ function AuthorPanel({ authors }) {
   const [activeAuthor, setActiveAuthor] = useState(null);
   const [numCols, setNumCols] = useState(1);
 
-  const handleCardClick = (authorId) => {
-    setActiveAuthor(authorId === activeAuthor ? null : authorId);
-  };
-
-  const CARD_WIDTH = 180;
-  const CARD_HEIGHT = 217.5;
+  const CARD_WIDTH = 300;
+  const CARD_HEIGHT = 500;
 
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -101,25 +96,22 @@ function AuthorPanel({ authors }) {
           containerPadding={[0, 0]}
           margin={[0, 0]}
           autoSize={true}
-          isDraggable={true}
+          isDraggable={false}
         >            
           {authors.map((author) => (
             <div 
               key={author.id} 
-              onClick={() => handleCardClick(author.id)} 
+              // onClick={() => handleCardClick(author.id)} 
               className="flex justify-center items-center h-full"
               style={{ width: CARD_WIDTH }}
             >
-              <AuthorCards authorId={author.id} expanded={activeAuthor === author.id} />
+              <AuthorCard authorId={author.id} setActiveAuthor={setActiveAuthor}/>
             </div>
           ))}
-          {activeAuthor && (
-            <div key={`extra-${activeAuthor}`} className="virtual-bookshelf-container" style={{ height: '100%', gridColumnStart: 1, gridColumnEnd: -1 }}>
-              <VirtualBookShelfComponent author={activeAuthor} />
-            </div>
-          )}
         </ResponsiveGridLayout>
       </AuthorProvider>
+
+        
     </div>
   );
 }

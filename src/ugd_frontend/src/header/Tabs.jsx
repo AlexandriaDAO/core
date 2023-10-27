@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Menu } from 'semantic-ui-react';
 
 const Tabs = () => {
@@ -6,9 +7,13 @@ const Tabs = () => {
     const [visualActiveItem, setVisualActiveItem] = useState('Create');
     const containerWidth='60vw'
 
+    const navigate = useNavigate()
+
     const handleItemClick = (e, { name }) => {
         setActiveItem(name);
         setVisualActiveItem(name);
+        
+        navigate("/"+ name.toLowerCase())
     };
 
     return (
