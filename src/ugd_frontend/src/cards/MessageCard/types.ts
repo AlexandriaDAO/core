@@ -9,6 +9,28 @@ export interface MessageCardProps {
   currentAuthorId: string | null;
 }
 
+// NEW PROPS -------------------------------
+export interface DetailsHeaderInterface {
+  onFlip: () => void;
+  onMessageTypeUpdate: (messageType: string) => void;
+  messageType: string;
+}
+
+export interface CardDetailsFrontProps {
+  messageData: Message;
+  messageType: string;
+}
+
+export interface CardDetailsBackProps {
+  currentAuthorId: string;
+}
+
+export interface UserProfileInterface {
+  currentAuthorId: string;
+  InputMessage: string;
+}
+// NEW PROPS -------------------------------
+
 export interface CardFrontProps {
   messageData: Message;
   onFlip: () => void;
@@ -26,6 +48,4 @@ export interface Book {
   imagePath: string;
   description: string;
   categories: string[];
-  
 }
-
