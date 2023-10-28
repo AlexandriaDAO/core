@@ -4,7 +4,7 @@ import '../../styles/AuthorCard.css';
 import { useAuthors } from '../contexts/AuthorContext';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp, faStar, faTimes, faRotateRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faStar, faRepeat, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import VirtualBookShelf from '../semantic-library/VirtualBookshelf';
 
 interface AuthorCardProps {
@@ -52,11 +52,12 @@ const AuthorCard: React.FC<AuthorCardProps> = ({ authorId, setActiveAuthor}) => 
 					<div className="front flex flex-col">
 					<div className="front__bkg-photo flex-shrink-0  flex items-start justify-between">
 						<FontAwesomeIcon icon={faStar} size='2xl' className='front__icon text-gray-300 m-2 cursor-pointer px-1 py-1 hover:text-[#fc0]' onClick={handleFavorite} />
-						<FontAwesomeIcon icon={faRotateRight} size='2xl' className='front__icon text-gray-300 m-2 cursor-pointer px-2 py-1 hover:text-white' onClick={() => setFlipped(true)} />
-					</div>
+=					</div>
 						<div className='relative flex-shrink-0 basis-[150px]'>
 							<img className="front__face-photo" src={`/images/${author.id}.png`} alt="" />
 							<div className='flex justify-between items-center relative top-[100px]'>
+							<FontAwesomeIcon icon={faRotateLeft} size='2xl' className='front__icon text-black-300 m-2 cursor-pointer px-2 py-1' onClick={() => setFlipped(true)} />
+
 								<h3 className="text-2xl p-2 flex-grow text-center">{author.id}</h3>
 								{!statsVisible && <FontAwesomeIcon onClick={()=>setStatsVisible(true)} icon={faChevronDown} size='xl' className='m-2 cursor-pointer px-2 py-1' /> }
 								{statsVisible && <FontAwesomeIcon onClick={()=>setStatsVisible(false)} icon={faChevronUp} size='xl' className='m-2 cursor-pointer px-2 py-1' /> }
@@ -121,7 +122,12 @@ const AuthorCard: React.FC<AuthorCardProps> = ({ authorId, setActiveAuthor}) => 
 					</div>
 					<div className="back flex flex-col justify-between items-center">
 						<div className="w-full flex basis-[30px] shrink-0 items-center justify-end">
-							<FontAwesomeIcon icon={faTimes} size='xl' className='m-2 cursor-pointer rounded-full px-2 py-1 border-2 border-black border-solid hover:bg-black hover:text-white' onClick={() => setFlipped(false)} />
+							{/* Should be a carousel of author.categories list. Each element should be scrollable at the top like the bookcards. These will serve as the category tags. */}
+							{author.category.map((category, index) => (
+								<span key={index} className="category-tag">
+										#{category}
+								</span>
+							))}
 						</div>
 						<div className="flex-grow flex items-center p-3 text-xl overflow-auto text-justify">
 							<p className='h-auto max-h-full w-full'>
@@ -130,7 +136,8 @@ const AuthorCard: React.FC<AuthorCardProps> = ({ authorId, setActiveAuthor}) => 
 						</div>
 						<div className='flex basis-[60px] shrink-0 justify-evenly items-center w-full'>
 							<button onClick={handleReadClick} className='bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-5 border-2 border-black border-solid rounded'>Read</button>
-							<button className='bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-5 border-2 border-black border-solid rounded'>Bid/Buy</button>
+								<FontAwesomeIcon icon={faRepeat} size='xl' className='bg-gray-200 m-2 cursor-pointer rounded-full px-2 py-1 border-2 border-black border-solid hover:bg-black hover:text-white' onClick={() => setFlipped(false)} />
+							<button className='bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-5 border-2 border-black border-solid rounded'>Buy</button>
 						</div>
 					</div>
 				</div>

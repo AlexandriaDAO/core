@@ -18,7 +18,7 @@
   color: #071011;
   font-size: 1rem;
   text-align: center;
-  transition: all 0.6s cubic-bezier(0.8, -0.4, 0.2, 1.7);
+  transition: all 0.3s;
   transform-style: preserve-3d;
   /*&:hover .front__face-photo,
   &:hover .front__footer {
@@ -148,4 +148,28 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
+}
+
+/* ----Category Carousel---- */
+
+
+.carousel-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.carousel-content {
+  transition: transform 0.3s ease-in-out;
+}
+
+.category-tag {
+  background-color: #eee;
+  padding: 5px 15px;
+  border-radius: 15px;
+  margin: 0 5px;
+  display: inline-block;
+}
+
+.hidden {
+  display: none;
 }
