@@ -4,7 +4,7 @@ import '../../styles/AuthorCard.css';
 import { useAuthors } from '../contexts/AuthorContext';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronUp, faEllipsisVertical, faStar, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronUp, faStar, faTimes, faRotateRight } from '@fortawesome/free-solid-svg-icons';
 import VirtualBookShelf from '../semantic-library/VirtualBookshelf';
 
 interface AuthorCardProps {
@@ -29,23 +29,14 @@ const AuthorCard: React.FC<AuthorCardProps> = ({ authorId, setActiveAuthor}) => 
 	const streamedDescription = useStreamingText(author.description, 10, streamed);
 
 	useEffect(() => {
-		// stream everytime card is flipped
-		// if (flipped) {
-		//   if(!streamed) {
-		//     setStreamed(true);
-		//   }
-		// }else{
-		//   setStreamed(false);
-		// }
 
-		// stream only first time
 		if (flipped && !streamed) {
 			setStreamed(true);
 		}
 	}, [flipped]);
 
-	const handleFavourite = () => {
-		alert("Favourited");
+	const handleFavorite = () => {
+		alert("Favorited");
 	}
 
 	const handleReadClick = ()=>{
@@ -56,12 +47,13 @@ const AuthorCard: React.FC<AuthorCardProps> = ({ authorId, setActiveAuthor}) => 
 	return (
 		<div>
 			<div className="outer-div font-sans">
-				<div className="inner-div" style={{ transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
+				<div className={`inner-div ${flipped ? 'flipped' : ''}`} style={{ transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
+
 					<div className="front flex flex-col">
-						<div className="front__bkg-photo flex-shrink-0  flex items-start justify-between">
-							<FontAwesomeIcon icon={faStar} size='2xl' className='text-gray-300 m-2 cursor-pointer px-1 py-1 hover:text-[#fc0]' onClick={handleFavourite} />
-							<FontAwesomeIcon icon={faEllipsisVertical} size='2xl' className='text-gray-300 m-2 cursor-pointer px-2 py-1 hover:text-white' onClick={() => setFlipped(true)} />
-						</div>
+					<div className="front__bkg-photo flex-shrink-0  flex items-start justify-between">
+						<FontAwesomeIcon icon={faStar} size='2xl' className='front__icon text-gray-300 m-2 cursor-pointer px-1 py-1 hover:text-[#fc0]' onClick={handleFavorite} />
+						<FontAwesomeIcon icon={faRotateRight} size='2xl' className='front__icon text-gray-300 m-2 cursor-pointer px-2 py-1 hover:text-white' onClick={() => setFlipped(true)} />
+					</div>
 						<div className='relative flex-shrink-0 basis-[150px]'>
 							<img className="front__face-photo" src={`/images/${author.id}.png`} alt="" />
 							<div className='flex justify-between items-center relative top-[100px]'>
