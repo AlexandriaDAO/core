@@ -96,7 +96,7 @@ function AuthorPanel({ authors }) {
           containerPadding={[0, 0]}
           margin={[0, 0]}
           autoSize={true}
-          isDraggable={false}
+          isDraggable={true}
         >            
           {authors.map((author) => (
             <div 
