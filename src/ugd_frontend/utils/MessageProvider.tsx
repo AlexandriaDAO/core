@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ugd_backend } from "../../declarations/ugd_backend";
+import { ugd_backend } from '../src/declarations/ugd_backend';
 import MessageContext from '../src/contexts/MessageContext';
 
 interface MessageProviderProps {
