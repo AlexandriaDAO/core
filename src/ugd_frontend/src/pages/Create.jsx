@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import SearchBar from "../header/SearchBar";
 import useBackgroundPosition from "../../utils/useBackgroundPosition";
-import Tabs from "../header/Tabs";
 import AuthorPanel from "../the-greats/AuthorPanel";
 import AUTHOR_INFO from "../../assets/author_data";
 import MessageCard from "../cards/MessageCard/MessageCard";
@@ -25,26 +24,6 @@ function Create() {
 
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>
-      {imageUrl && (
-        <div
-          id="imageContainer"
-          style={{
-            backgroundImage: `url(${imageUrl})`,
-            backgroundPosition: backgroundPosition,
-            backgroundSize: "cover",
-            backgroundAttachment: "fixed",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            opacity: "0.5",
-            zIndex: -1,
-          }}
-        />
-      )}
-      <div style={{ paddingTop: "25px" }}>
-        <Tabs />
         <SearchBar
           selectedAuthors={selectedAuthors}
           setSelectedAuthors={setSelectedAuthors}
@@ -64,7 +43,6 @@ function Create() {
           />
         </div>
       </div>
-    </div>
   );
 }
 

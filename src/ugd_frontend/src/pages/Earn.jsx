@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import SearchBar from '../header/SearchBar';
 import useBackgroundPosition from '../../utils/useBackgroundPosition';
-import Tabs from '../header/Tabs'
 import AuthorPanel from '../the-greats/AuthorPanel';
 import AUTHOR_INFO from '../../assets/author_data';
 
@@ -17,25 +15,8 @@ function Earn() {
 	}, []);
   
 	return (
-		<div style={{ position: 'relative', minHeight: '100vh' }}>
-		{imageUrl && (
-		  <div id="imageContainer" style={{
-			backgroundImage: `url(${imageUrl})`,
-			backgroundPosition: backgroundPosition,
-			backgroundSize: 'cover',
-			backgroundAttachment: 'fixed',
-			position: 'absolute',
-			top: 0,
-			left: 0,
-			width: '100%',
-			height: '100%',
-			opacity: '0.5',
-			zIndex: -1,
-		  }} />
-		)}
-		<div style={{ paddingTop: '25px' }}>
-		  <Tabs/>
 
+		<div style={{ paddingTop: '5px' }}>
 		  	<div className='w-3/4 mt-10 flex flex-col items-center justify-center mx-auto font-sans gap-2'>
 				<div className='flex justify-between w-full'> 
 					<h3> Your Assets: </h3> 
@@ -49,9 +30,6 @@ function Earn() {
 					</div>
 				</div>
 			</div>
-
-
-
 		  <div className='main-grid-container'>
 			<AuthorPanel authors={AUTHOR_INFO.filter(author => 
 			  selectedAuthors.includes(author.id) &&
@@ -60,7 +38,6 @@ function Earn() {
 			)} />
 		  </div>
 		</div>
-	  </div>
 	)
 }
 
