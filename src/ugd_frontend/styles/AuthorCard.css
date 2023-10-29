@@ -173,3 +173,52 @@
 .hidden {
   display: none;
 }
+
+
+
+/* ----Buttons on Card Back---- */
+
+.read-button, .buy-button {
+  font-weight: bold;
+  padding: 10px 20px;
+  border: 2px solid black;
+  border-radius: 0.5rem;
+  text-align: center;
+  display: inline-block;
+  margin: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.read-button {
+  background-color: #3B82F6;
+  color: white;
+}
+
+.read-button:hover {
+  background-color: #2563EB;
+}
+
+.buy-button {
+  background-color: #059669;
+  color: white;
+}
+
+.buy-button:hover {
+  background-color: #047857;
+}
+
+.icon-button {
+  background-color: #E5E7EB;
+  margin: 5px;
+  padding: 10px;
+  border: 2px solid black;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.icon-button:hover {
+  background-color: black;
+  color: white;
+}
+

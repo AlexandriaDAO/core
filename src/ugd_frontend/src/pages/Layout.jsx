@@ -4,23 +4,12 @@ import Tabs from '../header/Tabs';
 import Create from './Create';
 import Earn from './Earn';
 import Share from './Share';
-import useBackgroundPosition from '../../utils/useBackgroundPosition';
+import '../../styles/main.css'
 
 const Layout = () => {
-    const [imageUrl, setImageUrl] = useState(null);
-    const backgroundPosition = useBackgroundPosition();
-
-    useEffect(() => {
-        const image = require.context('../../assets/public/images/', false, /\.(png|jpe?g|svg)$/);
-        setImageUrl(image('./BlackedOut.png').default);
-    }, []);
-
     return (
         <div style={{ position: 'relative', minHeight: '100vh' }}>
-            {imageUrl && (
-              <div id="imageContainer" style={{
-                backgroundImage: `url(${imageUrl})`,
-                backgroundPosition: backgroundPosition,
+            <div id="imageContainer" className="image-container" style={{
                 backgroundSize: 'cover',
                 backgroundAttachment: 'fixed',
                 position: 'absolute',
@@ -30,9 +19,7 @@ const Layout = () => {
                 height: '100%',
                 opacity: '0.5',
                 zIndex: -1,
-              }} />
-            )}
-
+            }} />
             <div style={{ paddingTop: '25px' }}>
                 <Tabs />
                 <Routes>

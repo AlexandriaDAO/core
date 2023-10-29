@@ -1,18 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import useBackgroundPosition from '../../utils/useBackgroundPosition';
+import React, { useState } from 'react'
 import AuthorPanel from '../the-greats/AuthorPanel';
 import AUTHOR_INFO from '../../assets/author_data';
 
 function Earn() {
-	const [imageUrl, setImageUrl] = useState(null);
-	const backgroundPosition = useBackgroundPosition();
 	const [selectedAuthors, setSelectedAuthors] = useState(AUTHOR_INFO.map(author => author.id));
 	const [selectedCategories, setSelectedCategories] = useState([]);
-  
-	useEffect(() => {
-	  const image = require.context('../../assets/public/images/', false, /\.(png|jpe?g|svg)$/);
-	  setImageUrl(image('./BlackedOut.png').default);
-	}, []);
   
 	return (
 

@@ -135,9 +135,9 @@ const AuthorCard: React.FC<AuthorCardProps> = ({ authorId, setActiveAuthor}) => 
 							</p>
 						</div>
 						<div className='flex basis-[60px] shrink-0 justify-evenly items-center w-full'>
-							<button onClick={handleReadClick} className='bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-5 border-2 border-black border-solid rounded'>Read</button>
-								<FontAwesomeIcon icon={faRepeat} size='xl' className='bg-gray-200 m-2 cursor-pointer rounded-full px-2 py-1 border-2 border-black border-solid hover:bg-black hover:text-white' onClick={() => setFlipped(false)} />
-							<button className='bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-5 border-2 border-black border-solid rounded'>Buy</button>
+							<button onClick={handleReadClick} className='read-button'>Read</button>
+								<FontAwesomeIcon icon={faRepeat} size='xl' className='icon-button' onClick={() => setFlipped(false)} />
+							<button className='buy-button'>Buy</button>
 						</div>
 					</div>
 				</div>
