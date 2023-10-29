@@ -10,6 +10,14 @@ function Create() {
   );
   const [selectedCategories, setSelectedCategories] = useState([]);
 
+  useEffect(() => {
+    const image = require.context(
+      "../../assets/public/images/",
+      false,
+      /\.(png|jpe?g|svg)$/
+    );
+  }, []);
+
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>
         <SearchBar
