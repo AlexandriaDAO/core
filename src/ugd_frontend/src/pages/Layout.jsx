@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Routes, Route, Outlet, Navigate } from "react-router-dom";
+import React from 'react';
+import { Routes, Route, Navigate } from "react-router-dom";
 import Tabs from '../header/Tabs';
 import Create from './Create';
 import Earn from './Earn';
 import Share from './Share';
-import '../../styles/main.css'
+import Post from './Post';
+import NotFound from "./NotFound";
+import '../../styles/main.css';
 
 const Layout = () => {
     return (
@@ -23,11 +25,12 @@ const Layout = () => {
             <div style={{ paddingTop: '25px' }}>
                 <Tabs />
                 <Routes>
-                    <Route path="/create" element={<Create />} />
-                    <Route path="/earn" element={<Earn />} />
-                    <Route path="/share" element={<Share />} />
                     <Route path="/" element={<Navigate to="/create" />} />
-                    <Route path="*" element={<Outlet />} />
+                    <Route path="create" element={<Create />} />
+                    <Route path="earn" element={<Earn />} />
+                    <Route path="share" element={<Share />} />
+                    <Route path="post" element={<Post />} />
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </div>
         </div>

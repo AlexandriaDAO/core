@@ -37,6 +37,7 @@ function AuthorPanel({ authors }) {
   useEffect(() => {
     const calculateCols = () => {
       const columns = Math.floor(containerWidth / CARD_WIDTH);
+
       setNumCols(columns > 0 ? columns : 1);
     };
     
@@ -100,7 +101,6 @@ function AuthorPanel({ authors }) {
           {authors.map((author) => (
             <div 
               key={author.id} 
-              // onClick={() => handleCardClick(author.id)} 
               className="flex justify-center items-center h-full"
               style={{ width: CARD_WIDTH }}
             >

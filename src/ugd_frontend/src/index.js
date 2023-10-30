@@ -4,6 +4,10 @@ import WebFont from 'webfontloader';
 import MessageProvider from '../utils/MessageProvider'
 import { AuthorProvider } from './contexts/AuthorContext'
 import { SettingsProvider } from './contexts/SettingsContext';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./pages/Layout";
+import '../styles/tailwind.css';
+import '../styles/main.css';
 
 WebFont.load({
   google: {
@@ -11,34 +15,19 @@ WebFont.load({
   }
 });
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./pages/Layout";
-import Earn from "./pages/Earn";
-import Create from "./pages/Create";
-import Share from "./pages/Share";
-import NotFound from "./pages/NotFound";
-
-import '../styles/tailwind.css';
-import '../styles/main.css';
-
 const App = () => {
   return (
     <MessageProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Create />} />
-            <Route path="earn" element={<Earn />} />
-            <Route path="share" element={<Share />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
+          <Route path="*" element={<Layout />} />
         </Routes>
       </BrowserRouter>
     </MessageProvider>
   );
 };
 
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
   const semanticLibraryRoot = document.getElementById("semantic-library-root");
   if (semanticLibraryRoot) {
     const root = createRoot(semanticLibraryRoot);
