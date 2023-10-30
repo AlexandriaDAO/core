@@ -37,7 +37,6 @@ function AuthorPanel({ authors }) {
   useEffect(() => {
     const calculateCols = () => {
       const columns = Math.floor(containerWidth / CARD_WIDTH);
-      // console.log("Number of Columns: ", columns);
       setNumCols(columns > 0 ? columns : 1);
     };
     
