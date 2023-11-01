@@ -20,7 +20,7 @@ const UserProfile: React.FC<UserProfileInterface> = ({ currentAuthorId, InputMes
       <div className="messageCardAuthorProfile">
         <div className="messageCardUserProfile">
           <div className="messageUserProfileImg">
-            <img src={`/images/${author.id}.png`} alt="" />
+            <img src={`/images/authors/${author.id}.png`} alt="" />
           </div>
           <div className="userAuthorProfile">
             <h2>{author.id}</h2>

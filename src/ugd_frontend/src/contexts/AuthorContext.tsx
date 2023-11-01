@@ -1,9 +1,14 @@
 // OG: Now makes author object from pure AUTHOR_INFO
-import React, { createContext, useContext, ReactNode } from 'react';
-import { Author, AUTHOR_INFO } from '../../assets/author_data';
+import React, { createContext, useContext, ReactNode, useState } from 'react';
+import { Author, AUTHOR_INFO } from '../data/author_data';
 
 interface AuthorContextProps {
   authors: Author[];
+  
+  stats: any,
+  setStats: React.Dispatch<React.SetStateAction<any>>,
+  shelf: any,
+  setShelf: React.Dispatch<React.SetStateAction<any>>,  
 }
 
 const AuthorContext = createContext<AuthorContextProps | undefined>(undefined);
@@ -11,8 +16,13 @@ const AuthorContext = createContext<AuthorContextProps | undefined>(undefined);
 export const AuthorProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const authors = AUTHOR_INFO;
 
+  // stats contains author id or null 
+  const [stats, setStats] = useState(null);
+  // shelf contains author id or null
+  const [shelf, setShelf] = useState(null);
+
   return (
-    <AuthorContext.Provider value={{ authors }}>
+    <AuthorContext.Provider value={{ authors, stats, setStats, shelf, setShelf }}>
       {children}
     </AuthorContext.Provider>
   );

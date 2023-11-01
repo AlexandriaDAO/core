@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SearchBar from "../header/SearchBar";
 import AuthorPanel from "../the-greats/AuthorPanel";
-import AUTHOR_INFO from "../../assets/author_data";
+import AUTHOR_INFO from "../data/author_data";
 import MessageCard from "../cards/MessageCard/MessageCard";
 
 function Create() {
@@ -10,13 +10,13 @@ function Create() {
   );
   const [selectedCategories, setSelectedCategories] = useState([]);
 
-  useEffect(() => {
-    const image = require.context(
-      "../../assets/public/images/",
-      false,
-      /\.(png|jpe?g|svg)$/
-    );
-  }, []);
+  // useEffect(() => {
+  //   const image = require.context(
+  //     "../../assets/public/images/",
+  //     false,
+  //     /\.(png|jpe?g|svg)$/
+  //   );
+  // }, []);
 
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>

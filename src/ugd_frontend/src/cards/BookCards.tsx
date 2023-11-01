@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BookCard from './BookCard';
-import useStreamingText from '../../utils/Stream';
-import { handleReadBookClick } from '../../utils/handleReadBookClick';
+import useStreamingText from '../utils/Stream';
+import { handleReadBookClick } from '../utils/handleReadBookClick';
 import { useAuthors } from '../contexts/AuthorContext';
 
 interface BookCardsProps {
@@ -41,7 +41,7 @@ const BookCards: React.FC<BookCardsProps> = ({ book }) => {
   return (
     <div className="author-container flex w-[150px]">
       <BookCard
-        image={`/public${book.imagePath}`}
+        image={book.imagePath}
         title={book.title}
         description={streamedDescription}
         flipped={flipped}

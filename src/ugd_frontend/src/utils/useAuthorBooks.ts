@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useAuthors } from '../src/contexts/AuthorContext';
-import { Book } from '../src/cards/MessageCard/types';
+import { useAuthors } from '../contexts/AuthorContext';
+import { Book } from '../cards/MessageCard/types';
 import { sanitizeTitleForPath } from './handleReadBookClick';
 
 const useAuthorBooks = (authorId: string) => {
@@ -16,7 +16,7 @@ const useAuthorBooks = (authorId: string) => {
         author: authorId,
         description: authorInfo.book_descriptions?.[index] || "Description not available",
         categories: authorInfo.category || [],
-        imagePath: `/bookimages/${authorId}/${sanitizeTitleForPath(title)}.png`,
+        imagePath: `/images/books/${authorId}/${sanitizeTitleForPath(title)}.png`,
         title: title,
       });
     });

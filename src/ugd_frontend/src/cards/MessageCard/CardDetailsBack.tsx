@@ -1,6 +1,6 @@
 import React from 'react'
 import { CardDetailsBackProps } from './types'
-import useAuthorBooks from '../../../utils/useAuthorBooks';
+import useAuthorBooks from '../../utils/useAuthorBooks';
 import { useSettings } from '../../contexts/SettingsContext';
 
 const CardDetailsBack: React.FC<CardDetailsBackProps> = ({ currentAuthorId }) => {

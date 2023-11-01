@@ -43,6 +43,7 @@
   left: 0;
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
+  box-shadow: 0 15px 10px -10px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
 }
 
 .front {
@@ -50,91 +51,9 @@
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
   border-radius: 5px;
-  box-shadow: 0 15px 10px -10px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;
-}
-
-.front__bkg-photo {
-  position: relative;
-  height: 150px;
-  width: 300px;
-  background-size: cover;
-  -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
-  overflow: hidden;
-  border-top-right-radius: 5px;
-  border-top-left-radius: 5px;
-}
-
-.front__icon {
-  position: relative;
-  z-index: 5;
 }
 
 
-.front__face-photo {
-  position: absolute;
-  top: -200px;
-  left: 0px;
-  height: 300px;
-  width: 300px;
-  margin: 0 auto;
-  border-radius: 5px 5px 0px 0px;
-  border: none;
-  background-size: cover;
-  overflow: hidden;
-  z-index: 3;
-}
-
-
-.front__text {
-  position: relative;
-  top: -55px;
-  margin: 0 auto;
-  font-family: "Montserrat";
-  font-size: 18px;
-  -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
-}
-/* .front__text .front__text-header {
-  font-weight: 700;
-  font-family: "Oswald";
-  text-transform: uppercase;
-  font-size: 20px;
-} */
-
-.front__text .front__text-para {
-  position: relative;
-  top: -5px;
-  color: #000;
-  font-size: 14px;
-  letter-spacing: 0.4px;
-  font-weight: 400;
-  font-family: "Montserrat", sans-serif;
-}
-.front__text .front-icons {
-  position: relative;
-  top: 0;
-  font-size: 14px;
-  margin-right: 6px;
-  color: gray;
-}
-
-.front__text .front__text-hover {
-  position: relative;
-  top: 10px;
-  font-size: 10px;
-  color: tomato;
-  -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  border: 2px solid tomato;
-  padding: 8px 15px;
-  border-radius: 30px;
-  background: tomato;
-  color: #fff;
-}
 
 .back {
   transform: rotateY(180deg);
@@ -150,7 +69,19 @@
   align-items: center;
 }
 
+.back p {
+  font-family: monospace;
+}
+
 /* ----Category Carousel---- */
+
+/* used for horizontal category tags scrolling */
+.scrollbar-sm::-webkit-scrollbar {
+  height:  5px;
+}
+.scrollbar-sm::-webkit-scrollbar-thumb {
+  background: #b7e8d8;
+}
 
 
 .carousel-container {
@@ -180,7 +111,7 @@
 
 .read-button, .buy-button {
   font-weight: bold;
-  padding: 10px 20px;
+  padding: 5px 20px;
   border: 2px solid black;
   border-radius: 0.5rem;
   text-align: center;
@@ -210,7 +141,7 @@
 .icon-button {
   background-color: #E5E7EB;
   margin: 5px;
-  padding: 10px;
+  padding: 7px;
   border: 2px solid black;
   border-radius: 50%;
   cursor: pointer;
@@ -222,3 +153,9 @@
   color: white;
 }
 
+.stats tr{
+  color: #fcfcfc;
+}
+.stats td{
+  color: white;
+}

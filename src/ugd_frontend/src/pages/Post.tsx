@@ -4,7 +4,7 @@ import isHotkey from 'is-hotkey';
 import { Editable, withReact, useSlate, Slate } from 'slate-react';
 import { Editor, Transforms, createEditor, Descendant, Element as SlateElement } from 'slate';
 import { withHistory } from 'slate-history';
-import { Button, Icon, Toolbar } from '../dashboards/textboxComponents'
+import { Button, Icon, Toolbar } from '../dashboards/textbox'
 
 const HOTKEYS = {
   'mod+b': 'bold',

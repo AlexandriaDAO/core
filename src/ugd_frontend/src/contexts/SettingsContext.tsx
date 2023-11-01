@@ -1,6 +1,11 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { useState, useContext, ReactNode } from 'react';
 
-const SettingsContext = createContext();
+interface SettingContext {
+  topBooksCount: number,
+  setTopBooksCount: React.Dispatch<React.SetStateAction<number>>,
+}
+
+const SettingsContext = React.createContext<SettingContext | undefined>(undefined);
 
 export const useSettings = () => {
   const context = useContext(SettingsContext);
@@ -10,7 +15,7 @@ export const useSettings = () => {
   return context;
 };
 
-export const SettingsProvider = ({ children }) => {
+export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [topBooksCount, setTopBooksCount] = useState(3);
 
   return (

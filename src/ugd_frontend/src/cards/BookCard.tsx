@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import '../../styles/BookCard.css';
+import '../styles/BookCard.css';
 import Resizer from 'react-image-file-resizer'
 // import placeholderBook from '../../assets/public/bookimages/placeholder-cover.png';
 

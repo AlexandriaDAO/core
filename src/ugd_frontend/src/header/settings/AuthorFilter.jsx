@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faBars, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import '../../../styles/AuthorFilter.css'
+import '../../styles/AuthorFilter.css'
 import { useAuthors } from '../../contexts/AuthorContext';
 import { useSettings } from '../../contexts/SettingsContext';
 

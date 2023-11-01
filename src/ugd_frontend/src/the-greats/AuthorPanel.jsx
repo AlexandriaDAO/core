@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import AuthorCard from '../cards/AuthorCard';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { AuthorProvider } from '../contexts/AuthorContext';
+import Shelf from '../components/Author/Shelf';
+import Stats from '../components/Author/Stats';
+import { useAuthors } from '../contexts/AuthorContext';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-import '../../styles/react-grid-layout.css'
+import '../styles/react-grid-layout.css'
 
 function AuthorPanel({ authors }) {
-  const [activeAuthor, setActiveAuthor] = useState(null);
+	const { stats, shelf } = useAuthors();
+
   const [numCols, setNumCols] = useState(1);
 
   const CARD_WIDTH = 300;
-  const CARD_HEIGHT = 500;
+  const CARD_HEIGHT = 400;
 
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -62,7 +65,7 @@ function AuthorPanel({ authors }) {
       });
     });
 
-    const index = activeAuthor ? authors.findIndex(a => a.id === activeAuthor) : 0;
+    const index = stats ? authors.findIndex(a => a.id === stats) : shelf ? authors.findIndex(a => a.id === shelf) : 0;
     let yPosition;
 
     if (index >= fullRows * numCols) {
@@ -72,45 +75,52 @@ function AuthorPanel({ authors }) {
     }
 
     layouts['xxs'].push({
-        i: `extra-${activeAuthor || 'none'}`,
+        i: `extra-${stats || shelf || 'none'}`,
         x: 0,
         y: yPosition,
         w: numCols,
-        h: activeAuthor ? 1 : 0,
+        h: stats ? 1 : shelf ? 1 : 0,
     });
   
     return layouts;
   };
 
-  const layouts = useMemo(generateLayout, [activeAuthor, authors, numCols]);
+  const layouts = useMemo(generateLayout, [stats, shelf, authors, numCols]);
 
   return (
-    <div ref={containerRef} style={{ paddingBottom: '3000px' }}>
-      <AuthorProvider>
-        <ResponsiveGridLayout
-          className="layout"
-          layouts={layouts}
-          breakpoints={{ xxs: 0 }}
-          cols={{ xxs: numCols }}
-          rowHeight={CARD_HEIGHT}
-          containerPadding={[0, 0]}
-          margin={[0, 0]}
-          autoSize={true}
-          isDraggable={true}
-        >            
-          {authors.map((author) => (
-            <div 
-              key={author.id} 
-              className="flex justify-center items-center h-full"
-              style={{ width: CARD_WIDTH }}
-            >
-              <AuthorCard authorId={author.id} setActiveAuthor={setActiveAuthor}/>
-            </div>
-          ))}
-        </ResponsiveGridLayout>
-      </AuthorProvider>
-
-        
+    <div ref={containerRef} className='my-10'>
+      <ResponsiveGridLayout
+        className="layout"
+        layouts={layouts}
+        breakpoints={{ xxs: 0 }}
+        cols={{ xxs: numCols }}
+        rowHeight={CARD_HEIGHT}
+        containerPadding={[0, 0]}
+        margin={[0, 0]}
+        autoSize={true}
+        isDraggable={true}
+        isResizable={false}
+      >            
+        {authors.map((author) => (
+          <div 
+            key={author.id} 
+            className="flex justify-center items-start h-full"
+            style={{ width: CARD_WIDTH }}
+          >
+            <AuthorCard authorId={author.id} />
+          </div>
+        ))}
+         {stats && (
+          <div key={`extra-${stats}`} className="h-full" style={{ gridColumnStart: 1, gridColumnEnd: -1 }}>
+            <Stats />
+          </div>
+        )}
+        {shelf && (
+          <div key={`extra-${shelf}`} className="h-full" style={{ gridColumnStart: 1, gridColumnEnd: -1 }}>
+            <Shelf />
+          </div>
+        )}
+      </ResponsiveGridLayout>
     </div>
   );
 }

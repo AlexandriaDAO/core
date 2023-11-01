@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ugd_backend } from '../src/declarations/ugd_backend';
-import MessageContext from '../src/contexts/MessageContext';
+import { ugd_backend } from '../declarations/ugd_backend';
+import MessageContext from '../contexts/MessageContext';
 
 interface MessageProviderProps {
   children: React.ReactNode;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import AuthorPanel from '../the-greats/AuthorPanel';
-import AUTHOR_INFO from '../../assets/author_data';
+import AUTHOR_INFO from '../data/author_data';
 
 function Earn() {
 	const [selectedAuthors, setSelectedAuthors] = useState(AUTHOR_INFO.map(author => author.id));

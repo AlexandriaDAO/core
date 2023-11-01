@@ -2,7 +2,7 @@ import React from 'react';
 import BookCards from '../BookCards';
 import { CardBackProps } from './types';
 import '../../../styles/MessageCard/CardBack.css';
-import useAuthorBooks from '../../../utils/useAuthorBooks';
+import useAuthorBooks from '../../utils/useAuthorBooks';
 import { useSettings } from '../../contexts/SettingsContext';
 
 

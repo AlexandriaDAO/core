@@ -5,8 +5,9 @@ import Create from './Create';
 import Earn from './Earn';
 import Share from './Share';
 import Post from './Post';
+import Author from './Author';
 import NotFound from "./NotFound";
-import '../../styles/main.css';
+import '../styles/main.css';
 
 const Layout = () => {
     return (
@@ -30,6 +31,7 @@ const Layout = () => {
                     <Route path="earn" element={<Earn />} />
                     <Route path="share" element={<Share />} />
                     <Route path="post" element={<Post />} />
+                    <Route path="author" element={<Author />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </div>

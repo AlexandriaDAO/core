@@ -1,7 +1,7 @@
 import React from 'react';
 import AuthorCards from '../AuthorCard';
 import { CardFrontProps } from './types';
-import '../../../styles/MessageCard/CardFront.css';
+import '../styles/MessageCard/CardFront.css';
 
 const CardFront: React.FC<CardFrontProps> = ({ messageData, onFlip, currentAuthorId }) => (
   <div className="MC-card-face MC-card-front absolute inset-0 bg-[#faf8ef] border border-[#d3c2af] rounded-[.5rem] flex flex-row items-center">

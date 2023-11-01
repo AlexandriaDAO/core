@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import '../../styles/VirtualBookshelf.css';
-import BookCards from '../cards/BookCards';
+import '../../styles/AuthorShelf.css';
+import BookCards from "../../cards/BookCards";
 import useAuthorBooks from '../../utils/useAuthorBooks';
+import { useAuthors } from '../../contexts/AuthorContext';
 
-const VirtualBookShelf = ({ author }: { author: string }) => {
-  const booksByThisAuthor = useAuthorBooks(author);
+const Shelf = () => {
+	const { shelf } = useAuthors();
+  const booksByThisAuthor = useAuthorBooks(shelf);
   const carouselWrapperRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -50,4 +52,4 @@ const VirtualBookShelf = ({ author }: { author: string }) => {
   );  
 };
 
-export default VirtualBookShelf;
+export default Shelf;
