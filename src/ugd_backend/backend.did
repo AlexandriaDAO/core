@@ -1,3 +1,52 @@
+// // Stable memory of natural numbers (quickstart)
+// service : {
+//     "stable_get": (nat) -> (opt nat) query;
+//     "stable_insert": (nat, nat) -> (opt nat);
+// }
+
+
+// // Assets example
+// service : {
+//     "get": (text) -> (opt blob) query;
+//     "insert": (text, blob) -> (opt blob);
+// }
+
+
+
+// Custom Types Example (User Profile)
+type UserProfile = record {
+    age: nat8;
+    name: text;
+};
+
+service : {
+    "get": (nat64) -> (opt UserProfile) query;
+    "insert": (nat64, UserProfile) -> (opt UserProfile);
+}
+
+
+
+
+
+
+
+
+
+
+
+// // OG
+// type MessageCard = record {
+//     user_query : text;
+//     message : text;
+// }
+
+// 
+// service message_card_service : {
+//     mc_front: (user_query : text) -> (opt MessageCard) query;
+// }
+
+
+// // Example Reference
 // service : {
 //   "inc": () -> ();
 //   "read": () -> (nat) query;
@@ -8,18 +57,3 @@
 // service : {
 //     "mc_front": (text) -> (text) query;
 // }
-
-
-
-
-
-
-// OG
-type MessageCard = record {
-    user_query : text;
-    message : text;
-}
-
-service message_card_service : {
-    mc_front: (user_query : text) -> (opt MessageCard) query;
-}
