@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import AuthorCard from '../cards/AuthorCard';
-import { Responsive, WidthProvider } from 'react-grid-layout';
-import Shelf from '../components/Author/Shelf';
-import Stats from '../components/Author/Stats';
-import { useAuthors } from '../contexts/AuthorContext';
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import AuthorCards from "../components/AuthorCards/AuthorCards";
+import { Responsive, WidthProvider } from "react-grid-layout";
+import Shelf from "../components/Author/Shelf";
+import Stats from "../components/Author/Stats";
+import { useAuthors } from "../contexts/AuthorContext";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-import '../styles/react-grid-layout.css'
+import "../styles/react-grid-layout.css";
 
 function AuthorPanel({ authors }) {
-	const { stats, shelf } = useAuthors();
+  const { stats, shelf } = useAuthors();
 
   const [numCols, setNumCols] = useState(1);
 
@@ -22,7 +22,7 @@ function AuthorPanel({ authors }) {
 
   const updateContainerWidth = () => {
     if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
+      setContainerWidth(containerRef.current.offsetWidth);
     }
   };
 
@@ -30,11 +30,11 @@ function AuthorPanel({ authors }) {
     updateContainerWidth();
 
     const handleResize = () => {
-        updateContainerWidth();
+      updateContainerWidth();
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ function AuthorPanel({ authors }) {
 
       setNumCols(columns > 0 ? columns : 1);
     };
-    
+
     calculateCols();
   }, [containerWidth]);
 
@@ -54,41 +54,48 @@ function AuthorPanel({ authors }) {
     const lastRowCards = numCards % numCols;
 
     authors.forEach((author, index) => {
-      let xAdjustment = (index >= fullRows * numCols && lastRowCards !== 0) ? (numCols - lastRowCards) : 0;
+      let xAdjustment =
+        index >= fullRows * numCols && lastRowCards !== 0
+          ? numCols - lastRowCards
+          : 0;
 
-      layouts['xxs'].push({
+      layouts["xxs"].push({
         i: author.id.toString(),
         x: (index % numCols) + xAdjustment,
         y: Math.floor(index / numCols),
         w: 1,
-        h: 1
+        h: 1,
       });
     });
 
-    const index = stats ? authors.findIndex(a => a.id === stats) : shelf ? authors.findIndex(a => a.id === shelf) : 0;
+    const index = stats
+      ? authors.findIndex((a) => a.id === stats)
+      : shelf
+      ? authors.findIndex((a) => a.id === shelf)
+      : 0;
     let yPosition;
 
     if (index >= fullRows * numCols) {
-        yPosition = Math.floor(index / numCols) + 1;
+      yPosition = Math.floor(index / numCols) + 1;
     } else {
-        yPosition = Math.floor(index / numCols);
+      yPosition = Math.floor(index / numCols);
     }
 
-    layouts['xxs'].push({
-        i: `extra-${stats || shelf || 'none'}`,
-        x: 0,
-        y: yPosition,
-        w: numCols,
-        h: stats ? 1 : shelf ? 1 : 0,
+    layouts["xxs"].push({
+      i: `extra-${stats || shelf || "none"}`,
+      x: 0,
+      y: yPosition,
+      w: numCols,
+      h: stats ? 1 : shelf ? 1 : 0,
     });
-  
+
     return layouts;
   };
 
   const layouts = useMemo(generateLayout, [stats, shelf, authors, numCols]);
 
   return (
-    <div ref={containerRef} className='my-10'>
+    <div ref={containerRef} className="my-10">
       <ResponsiveGridLayout
         className="layout"
         layouts={layouts}
@@ -100,23 +107,31 @@ function AuthorPanel({ authors }) {
         autoSize={true}
         isDraggable={true}
         isResizable={false}
-      >            
+      >
         {authors.map((author) => (
-          <div 
-            key={author.id} 
+          <div
+            key={author.id}
             className="flex justify-center items-start h-full"
             style={{ width: CARD_WIDTH }}
           >
-            <AuthorCard authorId={author.id} />
+            <AuthorCards author={author} />
           </div>
         ))}
-         {stats && (
-          <div key={`extra-${stats}`} className="h-full" style={{ gridColumnStart: 1, gridColumnEnd: -1 }}>
+        {stats && (
+          <div
+            key={`extra-${stats}`}
+            className="h-full"
+            style={{ gridColumnStart: 1, gridColumnEnd: -1, zIndex: -1 }}
+          >
             <Stats />
           </div>
         )}
         {shelf && (
-          <div key={`extra-${shelf}`} className="h-full" style={{ gridColumnStart: 1, gridColumnEnd: -1 }}>
+          <div
+            key={`extra-${shelf}`}
+            className="h-full"
+            style={{ gridColumnStart: 1, gridColumnEnd: -1 }}
+          >
             <Shelf />
           </div>
         )}

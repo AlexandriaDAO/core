@@ -3,6 +3,7 @@ import BookCard from './BookCard';
 import useStreamingText from '../utils/Stream';
 import { handleReadBookClick } from '../utils/handleReadBookClick';
 import { useAuthors } from '../contexts/AuthorContext';
+import BooksCard from '@/components/BooksCard/BooksCard';
 
 interface BookCardsProps {
   book: {
@@ -39,15 +40,14 @@ const BookCards: React.FC<BookCardsProps> = ({ book }) => {
   const streamedDescription = useStreamingText(bookDescription, 15, shouldStartStreaming);
 
   return (
-    <div className="author-container flex w-[150px]">
-      <BookCard
-        image={book.imagePath}
+    <div>
+
+      <BooksCard image={book.imagePath}
         title={book.title}
         description={streamedDescription}
         flipped={flipped}
         onCardClick={onCardClick}
-        onReadBookClick={onReadBookClick}
-      />
+        onReadBookClick={onReadBookClick} />
     </div>
   );
 };

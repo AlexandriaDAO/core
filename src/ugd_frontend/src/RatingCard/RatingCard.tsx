@@ -1,25 +1,25 @@
 import React, { useState } from 'react'
 import ReactStars from 'react-rating-star-with-type'
 
-interface RatingStarInterface{
+interface RatingStarInterface {
   value?: number;
   size?: number;
 }
 
-const RatingCard:React.FC = ({value,size}:RatingStarInterface) => {
+const RatingCard: React.FC<RatingStarInterface> = ({ value, size }) => {
 
   const [star, setStar] = useState(5);
 
-  const onChange=(nextValue:number)=>{
-      setStar(nextValue)
+  const onChange = (nextValue: number) => {
+    setStar(nextValue)
   }
   return (
-    <ReactStars 
-    onChange={onChange} 
-    value={value || 5}  
-    size={size || 20}
-    isEdit={true}  
-    activeColors={["#8568FC",]} 
+    <ReactStars
+      onChange={onChange}
+      value={value || 5}
+      size={size || 20}
+      isEdit={true}
+      activeColors={["#8568FC",]}
     />
   )
 }

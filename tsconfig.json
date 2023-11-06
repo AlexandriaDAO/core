@@ -19,6 +19,17 @@
       "@/*": ["src/ugd_frontend/src/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/types/*.ts", "src/ugd_frontend/src/VirtualBookshelf.tsx", "src/ugd_frontend/src/header/Tabs.jsx", "src/ugd_frontend/src/cards/MessageCard.tsx", "src/ugd_frontend/src/header/settings/AuthorFilter.jsx", "src/ugd_frontend/src/header/SearchBar.jsx", "src/ugd_frontend/utils/useAuthorBooks.jsx"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/types/*.ts",
+    "src/ugd_frontend/src/VirtualBookshelf.tsx",
+    "src/ugd_frontend/src/header/Tabs.jsx",
+    "src/ugd_frontend/src/cards/MessageCard.tsx",
+    "src/ugd_frontend/src/header/settings/AuthorFilter.jsx",
+    "src/ugd_frontend/src/header/SearchBar.jsx",
+    "src/ugd_frontend/utils/useAuthorBooks.jsx",
+    "src/ugd_frontend/src/components/ReactSlider/ReactSlider.jsx"
+  ],
   "exclude": ["node_modules"]
 }
