@@ -1,55 +1,52 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import '../../styles/AuthorShelf.css';
 import BookCards from "../../cards/BookCards";
 import useAuthorBooks from '../../utils/useAuthorBooks';
 import { useAuthors } from '../../contexts/AuthorContext';
+import './author.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import ReactSlider from '../ReactSlider/ReactSlider'
+import { SwiperSlide } from "swiper/react";
+
 
 const Shelf = () => {
-	const { shelf } = useAuthors();
+  const { shelf } = useAuthors();
+  const PrevRef = useRef(null);
+  const NextRef = useRef(null);
+
   const booksByThisAuthor = useAuthorBooks(shelf);
-  const carouselWrapperRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const adjustScaleBasedOnPosition = () => {
-      const currentRef = carouselWrapperRef.current;
-      if (currentRef) {
-        const cards = currentRef.querySelectorAll('.carousel-card') as NodeListOf<HTMLDivElement>;
-        const carouselMidpoint = currentRef.offsetWidth * 0.8 / 2;
-
-        cards.forEach(card => {
-          const cardMidpoint = card.getBoundingClientRect().left + card.offsetWidth / 2 - currentRef.getBoundingClientRect().left;
-          const distanceFromCenter = Math.abs(carouselMidpoint - cardMidpoint);
-
-          const scale = 1.1 - Math.min(distanceFromCenter / 1000, 0.2);
-          card.style.transform = `scale(${scale})`;
-        });
-      }
-    }
-
-    const currentRef = carouselWrapperRef.current;
-    if (currentRef) {
-      currentRef.addEventListener('scroll', adjustScaleBasedOnPosition);
-      adjustScaleBasedOnPosition();
-
-      return () => {
-        currentRef.removeEventListener('scroll', adjustScaleBasedOnPosition);
-      }
-    }
-  }, [carouselWrapperRef, booksByThisAuthor]);
 
   return (
-    <div className="carousel-container scale-down">
-      <div className="segment-area">
-        <div className="carousel-wrapper" ref={carouselWrapperRef}>
-          {booksByThisAuthor.map((book, bookIndex) => (
-            <div className="carousel-card" key={bookIndex}>
-              <BookCards book={book} />
-            </div>
-          ))}
+    <div className="mainShelfContainer">
+      <div className="innerShelfContainer">
+        <div className="shelfContainerHeader">
+          <h2>Books Shelf</h2>
+          <div className="carouselBtnsShelf">
+            <button className='slideHelfBtns prev' ref={PrevRef}><FontAwesomeIcon icon={faChevronLeft} size='sm' /></button>
+            <button className='slideHelfBtns next' ref={NextRef}><FontAwesomeIcon icon={faChevronRight} size='sm' /></button>
+          </div>
         </div>
+
+
+        <div className="innerBooksShelfCarousel">
+
+          <ReactSlider PrevRef={PrevRef} NextRef={NextRef} >
+            {booksByThisAuthor.map((book, bookIndex) => (
+              <SwiperSlide key={bookIndex}>
+                <BookCards book={book} />
+              </SwiperSlide>
+            ))}
+          </ReactSlider>
+        </div>
+
+
       </div>
     </div>
-  );  
+  );
 };
 
 export default Shelf;
+
+

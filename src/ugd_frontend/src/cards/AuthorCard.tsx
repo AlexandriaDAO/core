@@ -36,13 +36,13 @@ const AuthorCard: React.FC<AuthorCardProps> = ({ authorId }) => {
 	}
 
 
-	const handleCardFlip = ()=>{
+	const handleCardFlip = () => {
 		setFlipped(!flipped)
 
 		setStats(null);
 		setShelf(null);
-	} 
-	
+	}
+
 	return (
 		<div className="outer-div font-sans">
 			<div className={`inner-div ${flipped ? 'flipped' : ''}`} style={{ transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
@@ -57,19 +57,19 @@ const AuthorCard: React.FC<AuthorCardProps> = ({ authorId }) => {
 						</div>
 						<div className='basis-[50px] w-full flex justify-between items-center'>
 							<FontAwesomeIcon icon={faRotateLeft} size='lg' className='icon-button' onClick={handleCardFlip} />
-							
+
 							<Link to="/author">
 								<h3 className="hover:underline underline-offset-4 text-xl whitespace-nowrap text-ellipsis overflow-hidden p-2 flex-grow text-center">{author.id}</h3>
 							</Link>
 
 							{stats && stats == author.id ? (
-								<FontAwesomeIcon onClick={()=>setStats(null)} icon={faArrowUp} size='lg' className='cursor-pointer hover:text-gray-600 m-2 px-2 py-1' /> 
+								<FontAwesomeIcon onClick={() => setStats(null)} icon={faArrowUp} size='lg' className='cursor-pointer hover:text-gray-600 m-2 px-2 py-1' />
 							) : (
-								<FontAwesomeIcon onClick={()=>setStats(author.id)} icon={faArrowDown} size='lg' className='animate-bounce cursor-pointer hover:text-gray-600 m-2 px-2 py-1' />
+								<FontAwesomeIcon onClick={() => setStats(author.id)} icon={faArrowDown} size='lg' className='animate-bounce cursor-pointer hover:text-gray-600 m-2 px-2 py-1' />
 							)}
 
 						</div>
-						{ stats && stats == author.id && (
+						{stats && stats == author.id && (
 							<div className='stats text-sm flex flex-grow flex-col w-full py-1 gap-2 bg-gradient-to-r from-[#40C9FF] to-[#DB69E7]'>
 								<div className='flex w-auto justify-center items-center'>
 									<span className='px-2 font-semibold'>Rating: </span>
@@ -120,8 +120,8 @@ const AuthorCard: React.FC<AuthorCardProps> = ({ authorId }) => {
 									</tbody>
 								</table>
 
-								
-								<div className="scrollbar-sm  w-full h-auto flex-wrap overflow-x-auto flex items-center p-3 gap-1 ">			
+
+								<div className="scrollbar-sm  w-full h-auto flex-wrap overflow-x-auto flex items-center p-3 gap-1 ">
 									<span className='font-bold px-2 '>Training</span>
 									<span className="text-xs whitespace-nowrap inline-flex items-center font-semibold leading-sm px-3 py-1 bg-blue-200 text-blue-700 rounded-full">#5.21G Tokens</span>
 									<span className="text-xs whitespace-nowrap inline-flex items-center font-semibold leading-sm px-3 py-1 bg-blue-200 text-blue-700 rounded-full">#4 Epochs</span>
@@ -159,11 +159,11 @@ const AuthorCard: React.FC<AuthorCardProps> = ({ authorId }) => {
 					<div className='flex basis-[50px] shrink-0 justify-evenly items-center w-full'>
 
 						{shelf && shelf == author.id ? (
-							<button onClick={()=>setShelf(null)} className='read-button flex gap-1 justify-center items-center'>
+							<button onClick={() => setShelf(null)} className='read-button flex gap-1 justify-center items-center'>
 								Read <FontAwesomeIcon icon={faArrowUp} className='animate-bounce' />
 							</button>
 						) : (
-							<button onClick={()=>setShelf(author.id)} className='read-button flex gap-1 justify-center items-center'>
+							<button onClick={() => setShelf(author.id)} className='read-button flex gap-1 justify-center items-center'>
 								Read <FontAwesomeIcon icon={faArrowDown} className='animate-bounce' />
 							</button>
 						)}

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/BookCard.css';
 import Resizer from 'react-image-file-resizer'
-// import placeholderBook from '../../assets/public/bookimages/placeholder-cover.png';
 
 interface CardProps {
   image: string;
@@ -29,7 +28,7 @@ const BCBookCard: React.FC<CardProps> = ({ image, title, description, flipped, o
   let displayTitle = title;
   const titleLength = title.length;
 
-  const maxTitleLength = 65; 
+  const maxTitleLength = 65;
 
   for (let i = 0; i < titleLength; i++) {
     if (i % 5 === 0 && i !== 0) {
@@ -45,28 +44,6 @@ const BCBookCard: React.FC<CardProps> = ({ image, title, description, flipped, o
 
   const [compressedImageSrc, setCompressedImageSrc] = useState<string>("");
 
-  // useEffect(() => {
-  //   if (image) {
-  //     fetch(image)
-  //       .then(response => response.blob())
-  //       .then(blob => {
-  //         Resizer.imageFileResizer(
-  //           blob,
-  //           300,
-  //           300,
-  //           'PNG',
-  //           90,
-  //           0,
-  //           (uri) => {
-  //             if (typeof uri === 'string') {
-  //               setCompressedImageSrc(uri);
-  //             }
-  //           },
-  //           'base64'
-  //         );
-  //       });
-  //   }
-  // }, [image]);  
 
   if (image) {
     fetch(image)
@@ -96,7 +73,7 @@ const BCBookCard: React.FC<CardProps> = ({ image, title, description, flipped, o
         console.error('There was a problem fetching the image: ', error);
         console.log('Failed image URL:', image);
       });
-  }    
+  }
 
   return (
     <div
@@ -120,8 +97,8 @@ const BCBookCard: React.FC<CardProps> = ({ image, title, description, flipped, o
         </div>
         <div className="BCCard-face BCCard-back absolute inset-0 bg-[#fbfbf8] text-center p-10 overflow-y-auto">
           <p className="BCStreamed-description">{description}</p>
-          <button 
-            className="BCReadBook-button" 
+          <button
+            className="BCReadBook-button"
             onClick={onReadBookClick}
           >
             Read Book
