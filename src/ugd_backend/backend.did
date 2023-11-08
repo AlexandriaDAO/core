@@ -1,33 +1,63 @@
-// // Stable memory of natural numbers (quickstart)
+// type MessageCard = record {
+//     user_query: text;
+//     message: text;
+// };
+
 // service : {
-//     "stable_get": (nat) -> (opt nat) query;
-//     "stable_insert": (nat, nat) -> (opt nat);
+//     "stable_get": (nat) -> (opt record { nat; nat; }) query;
+//     "stable_insert": (nat, nat, nat) -> (opt record { nat; nat; });
+//     "save_message_card": (text, text) -> ();
+//     "get_message_card": (text) -> (opt MessageCard) query;
 // }
 
-
-// // Assets example
-// service : {
-//     "get": (text) -> (opt blob) query;
-//     "insert": (text, blob) -> (opt blob);
-// }
-
-
-
-// Custom Types Example (User Profile)
-type UserProfile = record {
-    age: nat8;
-    name: text;
+type MessageCard = record {
+    user_query: text;
+    message: text;
+    likes: nat;
+    bookmarks: nat;
 };
 
 service : {
-    "get": (nat64) -> (opt UserProfile) query;
-    "insert": (nat64, UserProfile) -> (opt UserProfile);
+    "save_message_card": (text, text, nat, nat) -> ();
+    "get_message_card": (text) -> (opt MessageCard) query;
 }
 
 
 
 
 
+
+
+
+
+// type Post = record {
+//   id : nat64;
+//   status : PostStatus;
+//   share_count : nat64;
+//   hashtags : vec text;
+//   description : text;
+//   created_at : SystemTime;
+//   likes : vec principal;
+//   video_uid : text;
+//   home_feed_score : FeedScore;
+//   view_stats : PostViewStatistics;
+//   hot_or_not_details : opt HotOrNotDetails;
+//   creator_consent_for_inclusion_in_hot_or_not : bool;
+// };
+// type PostStatus = variant {
+//   BannedForExplicitness;
+//   BannedDueToUserReporting;
+//   Uploaded;
+//   CheckingExplicitness;
+//   ReadyToView;
+//   Transcoding;
+//   Deleted;
+// };
+// type PostViewStatistics = record {
+//   total_view_count : nat64;
+//   average_watch_percentage : nat8;
+//   threshold_view_count : nat64;
+// };
 
 
 
@@ -40,10 +70,63 @@ service : {
 //     message : text;
 // }
 
-// 
+
 // service message_card_service : {
 //     mc_front: (user_query : text) -> (opt MessageCard) query;
 // }
+
+
+
+
+
+// // Stable memory of natural numbers (quickstart)
+// service : {
+//     "stable_get": (nat) -> (opt nat) query;
+//     "stable_insert": (nat, nat) -> (opt nat);
+// }
+
+
+// // storing 2 vals, Working without custom types.
+// service : {
+//     "stable_get": (nat) -> (opt record { nat; nat; }) query;
+//     "stable_insert": (nat, nat, nat) -> (opt record { nat; nat; });
+// }
+
+
+
+// // Custom Types Example (User Profile)
+// // This works because the types are explicit in Rust
+// type UserProfile = record {
+//     age: nat8;
+//     name: text;
+// };
+
+// service : {
+//     "get": (nat64) -> (opt UserProfile) query;
+//     "insert": (nat64, UserProfile) -> (opt UserProfile);
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // // Example Reference
