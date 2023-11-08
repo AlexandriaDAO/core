@@ -19,7 +19,7 @@ function Create() {
   // }, []);
 
   return (
-    <div style={{ position: "relative", minHeight: "100vh" }}>
+    <div className='h-full w-full relative'>
         <SearchBar
           selectedAuthors={selectedAuthors}
           setSelectedAuthors={setSelectedAuthors}

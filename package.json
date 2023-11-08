@@ -36,6 +36,7 @@
     "react-grid-layout": "^1.4.2",
     "react-image-file-resizer": "^0.4.8",
     "react-rating-star-with-type": "^1.2.1",
+    "react-reader": "^2.0.4",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.4",
     "slate": "^0.100.0",
@@ -43,6 +44,7 @@
     "slate-react": "^0.100.0",
     "swiper": "^11.0.3",
     "tailwindcss": "^3.3.3",
+    "use-local-storage-state": "^19.1.0",
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
