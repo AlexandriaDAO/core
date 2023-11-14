@@ -29,7 +29,11 @@
     "src/ugd_frontend/src/header/settings/AuthorFilter.jsx",
     "src/ugd_frontend/src/header/SearchBar.jsx",
     "src/ugd_frontend/utils/useAuthorBooks.jsx",
-    "src/ugd_frontend/src/components/ReactSlider/ReactSlider.jsx"
+    "src/ugd_frontend/src/components/ReactSlider/ReactSlider.jsx", 
+    "src/ugd_frontend/src/pages/Book.jsx",
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules", 
+    "src/ugd_frontend/src/Reader/**/*.js"
+  ]
 }

@@ -39,13 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
   if (semanticLibraryRoot) {
     const root = createRoot(semanticLibraryRoot);
     root.render(
-      <React.StrictMode>
+      // <React.StrictMode>
         <AuthorProvider>
           <SettingsProvider>
             <App />
           </SettingsProvider>
         </AuthorProvider>
-      </React.StrictMode>
+      // </React.StrictMode>
     );
   }
 });

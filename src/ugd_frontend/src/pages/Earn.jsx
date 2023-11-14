@@ -8,7 +8,7 @@ function Earn() {
   
 	return (
 
-		<div style={{ paddingTop: '5px' }}>
+		<div className='h-full w-full' style={{ paddingTop: '5px' }}>
 		  	<div className='w-3/4 mt-10 flex flex-col items-center justify-center mx-auto font-sans gap-2'>
 				<div className='flex justify-between w-full'> 
 					<h3> Your Assets: </h3> 
