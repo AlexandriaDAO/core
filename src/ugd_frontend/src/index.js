@@ -40,12 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const root = createRoot(semanticLibraryRoot);
     root.render(
       // <React.StrictMode>
-        <AuthorProvider>
-          <SettingsProvider>
-            <App />
-          </SettingsProvider>
-        </AuthorProvider>
-      // </React.StrictMode>
+      <AuthorProvider>
+        <SettingsProvider>
+          <App />
+        </SettingsProvider>
+      </AuthorProvider>
+      // {/* </React.StrictMode> */}
     );
   }
 });

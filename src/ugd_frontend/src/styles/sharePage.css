@@ -1,0 +1,20 @@
+.mainSharePageContainer {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0px auto;
+}
+
+.innerSharePageContainer {
+  padding: 50px 0px;
+}
+
+.shareCardsMainContainer {
+  width: 98%;
+  margin: 0px auto;
+}
+
+.sharedCardsInnerContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 25px;
+}

@@ -31,12 +31,16 @@
   }
 } */
 
+:root {
+  --card-height: 320px;
+}
+
 /* ----------------------------------- MESSAGE CARD --------------------------- */
 
 .mainMessageCard {
-  margin-top: 50px;
-  width: 100%;
-  height: 300px;
+  margin: 50px auto 0px auto;
+  width: 80%;
+  height: var(--card-height);
   background: #fbfbf5;
   border-radius: 4px;
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
@@ -61,6 +65,17 @@
 .messageCardAuthorProfile {
   width: 100%;
   height: 75%;
+}
+
+.profileRatingTextPercentage {
+  padding: 4px 15px;
+  font-size: 0.8rem;
+  font-family: "Poppins";
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  background: #00b5ad;
+  color: #fff;
 }
 
 /* ---------------------------- AUTHOR CARD --------------------------------- */
@@ -135,7 +150,7 @@
 
 .messageCardCalltoActions {
   width: 100%;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 .innerMessageCardCalltoAction {
@@ -157,6 +172,8 @@
 .innerMessageCardCalltoAction button label {
   margin-left: 6px;
   cursor: pointer;
+  font-family: "Poppins";
+  font-size: 0.9rem;
 }
 
 .innerMessageCardCalltoAction button:hover {
@@ -183,7 +200,7 @@
   height: 40px;
   display: grid;
   grid-template-columns: 85% 15%;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .inputOutBtnBx {
@@ -250,7 +267,7 @@
 
 .messageMainCradDetails {
   width: 100%;
-  max-height: calc(300px - 70px);
+  max-height: calc(var(--card-height) - 70px);
   height: 100%;
   overflow: hidden;
 }
@@ -271,6 +288,12 @@
   transition: 0.2s linear;
 }
 
+.cardFetailsFilpper.flip .messageCardDetailsBack {
+  max-height: 1000px;
+  height: 100%;
+  transition: 0.2s linear;
+}
+
 /* FRONT CARD */
 .messageCardFrontDetails {
   width: 100%;
@@ -285,12 +308,35 @@
   font-family: "Poppins";
 }
 
+.messageCardFrontDetails p button {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #000;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+  width: 100%;
+  height: 45px;
+  margin: 15px 0px 5px 0px;
+  transition: 0.2s linear;
+}
+
+.messageCardFrontDetails p button:hover {
+  background: rgba(250, 250, 250);
+  transition: 0.2s linear;
+}
+
 /* BACK CARD */
 
 .messageCardDetailsBack {
   width: 100%;
   height: 100%;
+  max-height: 0px;
   overflow-y: auto;
+  transition: 0.2s linear;
 }
 
 .featureMessageCard {
@@ -356,4 +402,39 @@
     grid-template-columns: repeat(1, 1fr);
     grid-gap: 20px 0px;
   }
+}
+
+/* SHARED PAGE DESIGN ----------------------------------------- */
+
+.mainMessageCard.sharedCard {
+  height: auto;
+  width: 95%;
+  border-bottom: 2px solid #00b5ad;
+}
+
+.mainMessageCard.sharedCard .innerMessageCard {
+  width: 95%;
+  margin: 0px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.mainMessageCard.sharedCard .messageCardQuestion {
+  padding: 15px 0px;
+  margin: 15px 0px 5px 0px;
+}
+
+.mainMessageCard.sharedCard .messageMainCradDetails {
+  max-height: 400px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.mainMessageCard.sharedCard .messageCardFrontDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
 }

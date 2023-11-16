@@ -19,26 +19,24 @@ function Create() {
   // }, []);
 
   return (
-    <div className='h-full w-full relative'>
-        <SearchBar
-          selectedAuthors={selectedAuthors}
-          setSelectedAuthors={setSelectedAuthors}
-          selectedCategories={selectedCategories}
-          setSelectedCategories={setSelectedCategories}
+    <div className="h-full w-full relative">
+      <SearchBar
+        selectedAuthors={selectedAuthors}
+        setSelectedAuthors={setSelectedAuthors}
+        selectedCategories={selectedCategories}
+        setSelectedCategories={setSelectedCategories}
+      />
+      <div className="main-grid-container">
+        <AuthorPanel
+          authors={AUTHOR_INFO.filter(
+            (author) =>
+              selectedAuthors.includes(author.id) &&
+              (selectedCategories.length === 0 ||
+                selectedCategories.some((cat) => author.category.includes(cat)))
+          )}
         />
-        <div className="main-grid-container">
-          <AuthorPanel
-            authors={AUTHOR_INFO.filter(
-              (author) =>
-                selectedAuthors.includes(author.id) &&
-                (selectedCategories.length === 0 ||
-                  selectedCategories.some((cat) =>
-                    author.category.includes(cat)
-                  ))
-            )}
-          />
-        </div>
       </div>
+    </div>
   );
 }
 

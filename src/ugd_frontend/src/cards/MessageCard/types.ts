@@ -4,6 +4,11 @@ export interface Message {
   // ... other properties
 }
 
+export interface MainMessageCardProps {
+  isShared?: boolean;
+  AuthorId: string;
+}
+
 export interface MessageCardProps {
   messageData: Message;
   currentAuthorId: string | null;

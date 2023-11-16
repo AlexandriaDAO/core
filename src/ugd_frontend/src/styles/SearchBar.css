@@ -1,17 +1,27 @@
 .searchbar-wrapper {
-  max-width: 800px;
+  max-width: 1200px;
   width: 100%;
   padding: 20px;
-  margin: 0 auto; 
+  margin: 0 auto;
 }
 
 .searchbar {
+  max-width: 800px;
+  margin: 0px auto;
   position: relative;
   display: flex;
   align-items: center;
   padding: 2.5px;
   border-radius: 30px;
-  background: linear-gradient(to right, #5b4e81, #6f649c, #837bb7, #9e95ce, #b9b3e4, #d6cf9a);
+  background: linear-gradient(
+    to right,
+    #5b4e81,
+    #6f649c,
+    #837bb7,
+    #9e95ce,
+    #b9b3e4,
+    #d6cf9a
+  );
 }
 
 .searchbar-inner {
@@ -33,7 +43,8 @@
   background-color: #faf8ef;
 }
 
-.filter-icon-button, .search-icon-button {
+.filter-icon-button,
+.search-icon-button {
   width: 55px;
   height: 55px;
   border-radius: 50%;
@@ -47,11 +58,13 @@
   cursor: pointer;
 }
 
-.filter-icon-button:hover, .search-icon-button:hover {
+.filter-icon-button:hover,
+.search-icon-button:hover {
   background-color: rgba(25, 166, 159, 0.05);
 }
 
-.filter-icon-button:active, .search-icon-button:active {
+.filter-icon-button:active,
+.search-icon-button:active {
   transform: scale(0.95);
 }
 
@@ -63,7 +76,15 @@
 
 .search-icon-button:hover svg {
   color: #e78466;
-  background: linear-gradient(to right, #7f00ff, #483d8b, #4682b4, #20b2aa, #a3be8c, #d08770),
+  background: linear-gradient(
+    to right,
+    #7f00ff,
+    #483d8b,
+    #4682b4,
+    #20b2aa,
+    #a3be8c,
+    #d08770
+  );
 }
 
 .filter-icon-button svg {
@@ -83,9 +104,9 @@
   margin-left: 10px;
 }
 
-
 @media (max-width: 480px) {
-  .filter-icon-button svg, .search-icon-button svg {
+  .filter-icon-button svg,
+  .search-icon-button svg {
     font-size: 5vw;
   }
 
@@ -98,7 +119,8 @@
     padding: 1vw 4vw 1vw 2vw;
   }
 
-  .filter-icon-button, .search-icon-button {
+  .filter-icon-button,
+  .search-icon-button {
     width: 8vw;
     height: 8vw;
     font-size: 5vw;
@@ -123,10 +145,10 @@
 
 @keyframes spin {
   0% {
-      transform: rotate(0deg);
+    transform: rotate(0deg);
   }
   100% {
-      transform: rotate(360deg);
+    transform: rotate(360deg);
   }
 }
 
