@@ -1,0 +1,284 @@
+.mainCardCreationPanel_Container {
+  padding: 50px 0px;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: #f6f7fb;
+}
+
+.innerCardCreationPanel {
+  width: 95%;
+  max-width: 1400px;
+  margin: 0px auto;
+}
+
+.cardCreationPanelHeader {
+  width: 100%;
+  padding: 20px;
+  background: #fff;
+  margin: 20px auto;
+  border: 2px solid rgba(245, 245, 245);
+  border-radius: 8px;
+}
+
+.innerHeaderContainer {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.innerHeaderContainer h2 {
+  font-size: 1.8rem;
+  color: #000;
+  font-weight: 600;
+}
+
+.innerHeaderctaBtns {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.innerHeaderctaBtns button {
+  padding: 10px 35px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #fff;
+  background: #00b5ad;
+  outline: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: "poppins";
+  margin-left: 15px;
+}
+
+.innerHeaderctaBtns button:nth-child(1) {
+  background: black;
+}
+
+.cardCreationPanel_InnerContainer {
+  display: grid;
+  grid-template-columns: 35% 65%;
+  margin-bottom: 20px;
+  place-items: flex-start;
+}
+
+/* ------------------------------------------ SELECTED CARDS -------------------------- */
+
+.cardCreation_selectedCards,
+.cardCreation_searchedCards {
+  width: 95%;
+  border: 2px solid rgba(245, 245, 245);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.header_selected_cards,
+.header_searched_cards {
+  text-align: center;
+  padding: 10px 0px;
+  margin: 10px;
+  background: linear-gradient(
+    to right,
+    rgb(127, 0, 255),
+    rgb(72, 61, 139),
+    rgb(70, 130, 180),
+    rgb(32, 178, 170),
+    rgb(163, 190, 140),
+    rgb(208, 135, 112)
+  );
+  border-radius: 2px;
+}
+
+.header_selected_cards h2,
+.header_searched_cards h2 {
+  color: #fff;
+  font-weight: 600;
+  font-family: "Poppins";
+}
+
+/* ---------------------------------- SEARCHED CARD -------------------------------- */
+
+.cardCreation_searchedCards {
+  width: 100%;
+}
+
+.inner_body_selecetd_cards {
+  padding: 0px 10px 10px 10px;
+}
+
+.selectedCardBx {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
+  border: 1px solid rgba(245, 245, 245);
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.selectedCardBx:last-child {
+  margin: 0px;
+}
+
+.selectedCardImg {
+  min-width: 50px;
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-right: 10px;
+}
+
+.selectedCardImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.selectedCardBody {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selectedBodyCardText {
+  width: 100%;
+}
+
+.selectedBodyCardText h2 {
+  font-size: 1.2rem;
+  color: #000;
+  font-weight: 600;
+}
+
+.selectedBodyCardText p {
+  font-size: 0.9rem;
+  color: gray;
+}
+
+.selectedBodyCardBtns label {
+  height: 34px;
+  min-width: 34px;
+  width: 34px;
+  border-radius: 4px;
+  border: 1px solid rgba(240, 240, 240);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+  cursor: pointer;
+}
+
+.selectedBodyCardBtns label:hover {
+  background: red;
+  border-color: red;
+  color: #fff;
+  transition: 0.2s linear;
+}
+
+/* MAIN SEARCHED CARDS ---------------------------------------------------- */
+
+.innerSearchedCardsContainer {
+  padding: 10px 20px;
+}
+
+.searchedCardBx {
+  width: 100%;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  margin-bottom: 20px;
+  padding: 12px;
+}
+
+.searchedCardBx:last-child {
+  margin-bottom: 10px;
+}
+
+.innerSaerchedCardBx {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 160px;
+}
+
+.searchedCardimg {
+  min-width: 180px;
+  width: 180px;
+  height: 100%;
+  margin-right: 15px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.searchedCardimg img {
+  width: 100%;
+  height: 100%;
+}
+
+.searchecCardText {
+  width: 100%;
+  height: 100%;
+}
+
+.innerSearchedTextData {
+  width: 100%;
+  height: 100%;
+}
+
+.innerSearchedTextData h2 {
+  height: 40px;
+  width: 90%;
+  max-width: 430px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.innerSearchedTextData p {
+  font-size: 1rem;
+  color: gray;
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.showSerachedCardsActionBtns {
+  width: 72.5%;
+  margin: 15px 0px 0px auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+}
+
+.showSerachedCardsActionBtns button {
+  width: 100%;
+  height: 45px;
+  border: 1px solid rgba(240, 240, 240);
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  font-size: 1.1rem;
+  color: gray;
+  font-weight: 600;
+}
+
+.showSerachedCardsActionBtns button label {
+  margin-right: 10px;
+}
+
+.showSerachedCardsActionBtns button:nth-child(1) {
+  color: #fff;
+  border-color: #00b5ad;
+  background: #00b5ad;
+}
