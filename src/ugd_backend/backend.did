@@ -1,76 +1,3 @@
-// type MessageCard = record {
-//     user_query: text;
-//     message: text;
-// };
-
-// service : {
-//     "stable_get": (nat) -> (opt record { nat; nat; }) query;
-//     "stable_insert": (nat, nat, nat) -> (opt record { nat; nat; });
-//     "save_message_card": (text, text) -> ();
-//     "get_message_card": (text) -> (opt MessageCard) query;
-// }
-
-
-
-
-
-
-// type MessageCard = record {
-//     user_query: text;
-//     message: text;
-//     likes: nat;
-//     bookmarks: nat;
-// };
-
-// service : {
-//     "save_message_card": (text, text, nat, nat) -> ();
-//     "get_message_card": (text) -> (opt MessageCard) query;
-//     "get_all_message_cards": () -> (opt vec MessageCard) query;
-//     // "get_all_message_cards": () -> (vec record { text; MessageCard }) query;
-// }
-
-
-
-
-
-
-
-
-
-// type Post = record {
-//   id : nat64;
-//   status : PostStatus;
-//   share_count : nat64;
-//   hashtags : vec text;
-//   description : text;
-//   created_at : SystemTime;
-//   likes : vec principal;
-//   video_uid : text;
-//   home_feed_score : FeedScore;
-//   view_stats : PostViewStatistics;
-//   hot_or_not_details : opt HotOrNotDetails;
-//   creator_consent_for_inclusion_in_hot_or_not : bool;
-// };
-// type PostStatus = variant {
-//   BannedForExplicitness;
-//   BannedDueToUserReporting;
-//   Uploaded;
-//   CheckingExplicitness;
-//   ReadyToView;
-//   Transcoding;
-//   Deleted;
-// };
-// type PostViewStatistics = record {
-//   total_view_count : nat64;
-//   average_watch_percentage : nat8;
-//   threshold_view_count : nat64;
-// };
-
-
-
-
-
-
 // OG
 type MessageCard = record {
     user_query : text;
@@ -86,64 +13,25 @@ service message_card_service : {
 
 
 
-// // Stable memory of natural numbers (quickstart)
-// service : {
-//     "stable_get": (nat) -> (opt nat) query;
-//     "stable_insert": (nat, nat) -> (opt nat);
-// }
 
 
-// // storing 2 vals, Working without custom types.
-// service : {
-//     "stable_get": (nat) -> (opt record { nat; nat; }) query;
-//     "stable_insert": (nat, nat, nat) -> (opt record { nat; nat; });
-// }
+// // Source Cards Real Rudimentary Backend
 
-
-
-// // Custom Types Example (User Profile)
-// // This works because the types are explicit in Rust
-// type UserProfile = record {
-//     age: nat8;
-//     name: text;
-// };
-
-// service : {
-//     "get": (nat64) -> (opt UserProfile) query;
-//     "insert": (nat64, UserProfile) -> (opt UserProfile);
+// type SourceCard = record {
+//     post_id : text;
+//     user_query : text;
+//     title : text;
+//     heading : text;
+//     content : text;
+//     // bookmark tbd (0 or 1)
+//     // Author? (from cluster name)
 // }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // Example Reference
 // service : {
-//   "inc": () -> ();
-//   "read": () -> (nat) query;
-//   "write": (nat) -> ();
+//     "get_weaviate_query": (text, nat8, text) -> (text);
+//     "save_source_card" : (text, text, text, text) -> ();
+//     "get_source_card" : (text) -> (opt SourceCard) query;
 // }
 
-
-// service : {
-//     "mc_front": (text) -> (text) query;
-// }
