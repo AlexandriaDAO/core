@@ -13,7 +13,7 @@ const MessageCard: React.FC<MainMessageCardProps> = ({ isShared, AuthorId }) => 
 
   const context = useContext(MessageContext);
   const messageData = context?.message || { user_query: 'Hello', message: 'Nyc Job Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aperiam aliquid nostrum earum enim ipsum rem, error iure optio placeat! Molestias. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aperiam aliquid nostrum earum enim ipsum rem, error iure optio placeat! Molestias. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aperiam aliquid nostrum earum enim ipsum rem, error iure optio placeat! Molestias. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aperiam aliquid nostrum earum enim ipsum rem, error iure optio placeat! Molestias.' };
-  const currentAuthorId = context?.currentAuthorId || AuthorId;
+  const currentAuthorId = AuthorId || context?.currentAuthorId;
 
   const handleClick = () => {
     setCardFlipped(!cardFlipped);
@@ -45,13 +45,6 @@ const MessageCard: React.FC<MainMessageCardProps> = ({ isShared, AuthorId }) => 
         </div>
       </div>
     </div>
-
-    // <div className={`message-card-wrapper ${cardFlipped ? 'cardFlipped' : ''}`}>
-    //   <div className="message-card">
-    //     <CardFront messageData={messageData} onFlip={handleClick} currentAuthorId={currentAuthorId} />
-    //     <CardBack onFlip={handleClick} currentAuthorId={currentAuthorId} />
-    //   </div>
-    // </div>
   );
 };
 

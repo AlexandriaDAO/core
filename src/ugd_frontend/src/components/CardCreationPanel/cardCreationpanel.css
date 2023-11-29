@@ -78,6 +78,11 @@
   background: #fff;
 }
 
+.cardCreation_selectedCards {
+  position: sticky;
+  top: 12%;
+}
+
 .header_selected_cards,
 .header_searched_cards {
   text-align: center;
@@ -157,11 +162,21 @@
   font-size: 1.2rem;
   color: #000;
   font-weight: 600;
+  height: 30px;
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .selectedBodyCardText p {
   font-size: 0.9rem;
   color: gray;
+  height: 30px;
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .selectedBodyCardBtns label {
@@ -192,10 +207,11 @@
 
 .searchedCardBx {
   width: 100%;
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   border-radius: 4px;
   margin-bottom: 20px;
   padding: 12px;
+  position: relative;
 }
 
 .searchedCardBx:last-child {
@@ -234,10 +250,10 @@
 }
 
 .innerSearchedTextData h2 {
-  height: 40px;
-  width: 90%;
+  height: 45px;
+  width: 80%;
   max-width: 430px;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -245,7 +261,7 @@
 }
 
 .innerSearchedTextData p {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: gray;
   width: 100%;
   height: 120px;
@@ -254,31 +270,132 @@
 }
 
 .showSerachedCardsActionBtns {
-  width: 72.5%;
-  margin: 15px 0px 0px auto;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 20px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
-.showSerachedCardsActionBtns button {
-  width: 100%;
-  height: 45px;
-  border: 1px solid rgba(240, 240, 240);
-  border-radius: 4px;
+.showSerachedCardsActionBtns label {
+  height: 38px;
+  width: 38px;
+  border-radius: 50px;
+  border: 1px solid rgba(0, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin: 0px 0px 0px 10px;
   cursor: pointer;
+  color: black;
+  transition: 0.2s linear;
+}
+
+.showSerachedCardsActionBtns label:hover {
+  border-color: #000;
+  background: #000;
+  color: #fff;
+}
+
+.showSerachedCardsActionBtns label:last-child {
+  border-color: #00b5ad;
+  color: #00b5ad;
+}
+
+.showSerachedCardsActionBtns label:last-child:hover {
+  border-color: #00b5ad;
+  background: #00b5ad;
+  color: #fff;
+}
+
+/* ------------------------------------- PREVIEW CARDS -------------------------- */
+
+.mainPreviewCardsContainer {
+  width: 100%;
+  background: #f6f7fb;
+  padding-top: 50px;
+}
+
+.innerPreviewContainer {
+  width: 95%;
+  max-width: 1400px;
+  margin: 0px auto;
+  background: #fff;
+  border-radius: 10px;
+}
+
+.previewContainerHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.previewContainerHeader h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.previewContainerHeader button {
+  height: 40px;
+  width: 40px;
+  border-radius: 50px;
+  color: #fff;
+  background: #000;
   outline: none;
-  font-size: 1.1rem;
-  color: gray;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.innerPreviewCardsContainerBx {
+  width: 100%;
+  border-top: 1px solid rgba(240, 240, 240);
+  max-width: 10000px;
+  transition: 0.2s linear;
+}
+
+.innerPreviewCardsContainerBx.hide {
+  max-height: 0px;
+  transition: 0.2s linear;
+  border: none;
+  overflow: hidden;
+  transition: 0.2s linear;
+}
+
+.PreviewCardsContainerBx {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 70% 30%;
+}
+
+.previewCardCta {
+  padding: 0px 20px;
+}
+
+.previewCardCta button {
+  width: 100%;
+  height: 48px;
+  background: #00b5ad;
+  color: #fff;
+  border-radius: 4px;
+  margin: 5px;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 
-.showSerachedCardsActionBtns button label {
-  margin-right: 10px;
+.previewCardCta button:nth-child(2) {
+  background: #c09b7a;
 }
-
-.showSerachedCardsActionBtns button:nth-child(1) {
-  color: #fff;
-  border-color: #00b5ad;
-  background: #00b5ad;
+.previewCardCta button:nth-child(3) {
+  background: #467bb0;
+}
+.previewCardCta button:nth-child(4) {
+  background: #6b15d6;
 }

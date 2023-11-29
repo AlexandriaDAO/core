@@ -5,6 +5,16 @@
   margin: 0 auto;
 }
 
+.searchbar-wrapper.sticky {
+  max-width: 1400px;
+  position: sticky;
+  top: 0;
+  left: 0;
+  background: transparent;
+  z-index: 9999;
+  padding: 10px 20px;
+}
+
 .searchbar {
   max-width: 800px;
   margin: 0px auto;

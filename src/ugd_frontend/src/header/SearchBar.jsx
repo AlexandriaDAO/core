@@ -73,7 +73,7 @@ const SearchBar = ({
     );
 
   return (
-    <div className="searchbar-wrapper">
+    <div className={message ? "searchbar-wrapper sticky" : "searchbar-wrapper"}>
       <div className="searchbar">
         <div className="searchbar-inner">
           <AuthorFilter
@@ -98,15 +98,16 @@ const SearchBar = ({
           </button>
         </div>
       </div>
-      {isLoading ? (
-        <div className="loading-indicator">
-          <div className="loader"></div>
-        </div>
-      ) : error ? (
-        <div className="error-message">{error}</div>
-      ) : (
-        message && <MessageCard />
-      )}
+      {
+        isLoading ? (
+          <div className="loading-indicator">
+            <div className="loader"></div>
+          </div>
+        ) : error ? (
+          <div className="error-message">{error}</div>
+        ) : null
+        // message && <MessageCard />
+      }
     </div>
   );
 };
