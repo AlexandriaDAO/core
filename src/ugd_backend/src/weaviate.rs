@@ -1,14 +1,7 @@
-
 use crate::save_source_card;
 
-use ic_cdk::api::management_canister::http_request::{
-  http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod, HttpResponse, TransformArgs,
-};
-
-use ic_cdk_macros::{self, query, update};
+use ic_cdk::api::management_canister::http_request::{http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod};
 use serde::{Serialize, Deserialize};
-use serde_json::{self, Value};
-
 
 
 #[derive(Serialize, Deserialize)]
@@ -60,15 +53,14 @@ pub async fn get_weaviate_query(user_query: String, breadth: u8, scope: String) 
         let str_body = String::from_utf8(response.body)
             .expect("Response is not UTF-8 encoded.");
 
-        // Parse the JSON response
         let parsed_response: Vec<BookSearchResponse> = serde_json::from_str(&str_body)
             .expect("Failed to parse JSON");
 
         for item in parsed_response {
-            // Convert heading to string if necessary
+            // ToDo: Updated weaviate cluster, heading should be CFI link, and string by default.
             let heading_str = item.heading.to_string();
 
-            // Save each source card
+            // This is the only link to the rest of the app.
             save_source_card(user_query.clone(), item.title, heading_str, item.content);
         }
 
@@ -79,3 +71,4 @@ pub async fn get_weaviate_query(user_query: String, breadth: u8, scope: String) 
     }
   }
 }
+

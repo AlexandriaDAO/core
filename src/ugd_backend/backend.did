@@ -1,37 +1,32 @@
-// OG
-type MessageCard = record {
-    user_query : text;
-    message : text;
-}
-
-
-service message_card_service : {
-    mc_front: (user_query : text) -> (opt MessageCard) query;
-}
-
-
-
-
-
-
-
-// // Source Cards Real Rudimentary Backend
-
 // type SourceCard = record {
-//     post_id : text;
+//     post_id : nat64;
 //     user_query : text;
 //     title : text;
 //     heading : text;
 //     content : text;
-//     // bookmark tbd (0 or 1)
-//     // Author? (from cluster name)
 // }
-
-
 
 // service : {
 //     "get_weaviate_query": (text, nat8, text) -> (text);
 //     "save_source_card" : (text, text, text, text) -> ();
-//     "get_source_card" : (text) -> (opt SourceCard) query;
+//     "get_source_card" : (nat64) -> (opt SourceCard) query;
+//     // Additional methods here if any
 // }
 
+
+type SourceCard = record {
+    post_id : nat64;
+    user_query : text;
+    title : text;
+    heading : text;
+    content : text;
+    bookmarked : bool; // Added field for bookmark status
+};
+
+service : {
+    "get_weaviate_query": (text, nat8, text) -> (text);
+    "save_source_card" : (text, text, text, text) -> ();
+    "get_source_card" : (nat64) -> (opt SourceCard) query;
+    "toggle_bookmark" : (nat64) -> (); // New method for toggling the bookmark
+    // Additional methods here if any
+};
