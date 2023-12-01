@@ -3,6 +3,8 @@ import './bookscard.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faExternalLink } from '@fortawesome/free-solid-svg-icons'
 import Resizer from 'react-image-file-resizer'
+import BookModal from './BookModal'
+import { Modal } from 'antd'
 
 
 interface CardProps {
@@ -17,7 +19,22 @@ interface CardProps {
 
 const BooksCard: React.FC<CardProps> = ({ image, title, description, flipped, onCardClick, onReadBookClick }) => {
     const [compressedImageSrc, setCompressedImageSrc] = useState<string>("");
+    const [isBookModalVisible, setIsBookModalVisible] = useState(false);
 
+    // Function to show the modal
+    const showBookModal = () => {
+        setIsBookModalVisible(true);
+    };
+
+    // Function to handle when the user clicks OK in the modal
+    const handleOk = () => {
+        setIsBookModalVisible(false);
+    };
+
+    // Function to handle when the user clicks Cancel in the modal
+    const handleCancel = () => {
+        setIsBookModalVisible(false);
+    };
 
     if (image) {
         fetch(image)
@@ -67,7 +84,27 @@ const BooksCard: React.FC<CardProps> = ({ image, title, description, flipped, on
                     </div>
                     <div className="BooksCardCta">
                         <button onClick={onCardClick}><FontAwesomeIcon icon={faChevronLeft} color='gray' size='sm' /></button>
-                        <button onClick={onReadBookClick}>Read More <label><FontAwesomeIcon icon={faExternalLink} color='gray' size='sm' /></label></button>
+                        {/* <button onClick={onReadBookClick}>Read More <label><FontAwesomeIcon icon={faExternalLink} color='gray' size='sm' /></label></button> */}
+                        <button onClick={showBookModal}>Read More <label><FontAwesomeIcon icon={faExternalLink} color='gray' size='sm' /></label></button>
+                        {/* <Modal
+                            trigger={<button>Read More <label><FontAwesomeIcon icon={faExternalLink} color='gray' size='sm' /></label></button>}
+                            header='Reminder!'
+                            content='Call Benjamin regarding the reports.'
+                            actions={['Snooze', { key: 'done', content: 'Done', positive: true }]}
+                        /> */}
+                         <Modal
+                            centered
+                            open={isBookModalVisible}
+                            onCancel={handleCancel}
+                            footer={null}
+                            closable={false}
+                            
+                            width={'70rem'}
+                            // width={'md:aspect-video aspect-[3/4] w-full h-full'}
+                            classNames={{ content: '!p-0', }}
+                        >
+                            <BookModal />
+                        </Modal>
                     </div>
                 </div>
             </div>
