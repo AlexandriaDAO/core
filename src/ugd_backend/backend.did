@@ -4,29 +4,48 @@
 //     title : text;
 //     heading : text;
 //     content : text;
-// }
+//     bookmarked : bool; // Added field for bookmark status
+// };
 
 // service : {
 //     "get_weaviate_query": (text, nat8, text) -> (text);
-//     "save_source_card" : (text, text, text, text) -> ();
-//     "get_source_card" : (nat64) -> (opt SourceCard) query;
+//     "save_sc" : (text, text, text, text) -> ();
+//     "get_sc" : (nat64) -> (opt SourceCard) query;
+//     "bookmark_sc" : (nat64) -> ();
 //     // Additional methods here if any
-// }
+// };
+
+
+
+
+
+
+// OG
+type MessageCard = record {
+    user_query : text;
+    message : text;
+};
 
 
 type SourceCard = record {
     post_id : nat64;
     user_query : text;
+    author : text;
     title : text;
     heading : text;
     content : text;
-    bookmarked : bool; // Added field for bookmark status
+    bookmarked : bool;
 };
 
+
 service : {
-    "get_weaviate_query": (text, nat8, text) -> (text);
-    "save_source_card" : (text, text, text, text) -> ();
-    "get_source_card" : (nat64) -> (opt SourceCard) query;
-    "toggle_bookmark" : (nat64) -> (); // New method for toggling the bookmark
-    // Additional methods here if any
+    "get_weaviate_query": (user_query : text, breadth : nat8, scope : text) -> (text);
+    "save_sc" : (user_query : text, author : text, title : text, heading : text, content : text) -> ();
+    "get_sc" : (post_id : nat64) -> (opt SourceCard) query;
+    "delete_sc" : (post_id : nat64) -> ();
+    "bookmark_sc" : (post_id : nat64) -> ();
+
+
+    // OG Demo Response One
+    "mc_front" : (user_query : text) -> (opt MessageCard) query;
 };
