@@ -20,6 +20,7 @@ interface SourceCard {
   title: string;
   heading: string;
   content: string;
+  summary: string;
   bookmarked: boolean;
 };
 
@@ -57,22 +58,22 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
   // Example of new functions with hard-coded inputs
   const testSourceCards = async () => {
 
-    const postId: bigint = BigInt(16);  // Post_id is a u64 +1 counter that starts at 1 (but resets to 1 on upgrades for now)
+    const postId: bigint = BigInt(3);  // Post_id is a u64 +1 counter that starts at 1 (but resets to 1 on upgrades for now)
     console.log("Current Post ID", postId)
     try {
-      // const weaviateQueryResponse = await ugd_backend.get_weaviate_query("Sample Query", 1, "The_Bible"); // "The_Bible" here is the 'cluster' element of the 'author_data.ts' object.
+      // const weaviateQueryResponse = await ugd_backend.get_weaviate_query("Sample Query", 1, "The_Bible"); // "The_Bible" here is the 'cluster' element of the 'author_data.ts' object. The 1 is how many to return.
       // console.log("Weaviate Query Response: ", weaviateQueryResponse);
 
-      // await ugd_backend.save_sc("Example Query", "Example Author", "Example Title", "Example Heading", "Example Content");
+      // await ugd_backend.save_sc("Example Query", "Example Author", "Example Title", "Example Heading", "Example Content", "Example Summary");
       // console.log("SourceCard saved successfully");
 
-      const sourceCardResponse = await ugd_backend.get_sc(postId);
-      console.log("SourceCard Response: ", sourceCardResponse);
+      // const sourceCardResponse = await ugd_backend.get_sc(postId);
+      // console.log("SourceCard Response: ", sourceCardResponse);
 
       // await ugd_backend.delete_sc(postId);
       // console.log("SourceCard deleted successfully");
 
-      // await ugd_backend.bookmark_sc(1);
+      // await ugd_backend.bookmark_sc(postId);
       // console.log("SourceCard bookmarked successfully");
 
     } catch (error) {

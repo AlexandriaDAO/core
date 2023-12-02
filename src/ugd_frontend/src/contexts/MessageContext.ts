@@ -26,6 +26,7 @@ interface SourceCard {
   title: string;
   heading: string;
   content: string;
+  summary: string;
   bookmarked: boolean;
 };
 
