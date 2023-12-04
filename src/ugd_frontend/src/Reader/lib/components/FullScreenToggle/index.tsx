@@ -55,7 +55,7 @@ const FullScreenToggle: React.FC<FullScreenToggleProps> = ({
 				<BiExitFullscreen
 					onClick={toggleFullScreen}
 					size={40}
-					className="absolute right-3 top-3 cursor-pointer text-gray-500 hover:text-gray-700"
+					className="cursor-pointer p-1 hover:bg-indigo-50 text-gray-600"
 				/>
 			) : (
 				<BiFullscreen

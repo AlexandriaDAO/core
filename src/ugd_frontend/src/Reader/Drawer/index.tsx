@@ -40,8 +40,8 @@ export const Drawer: React.FC<DrawerProps> = ({
 	};
 
 	return (
-		<div>
-			<div className="absolute inset-0 z-10 flex p-2">
+		<div className="font-sans">
+			<div className="absolute inset-0 z-40 flex p-2">
 				<div className="absolute inset-0 bg-black opacity-50"></div>
 				<div className="bg-gradient-to-t from-indigo-100 to-indigo-50 text-indigo-800 w-10/12 sm:w-8/12 md:w-4/12 rounded-md shadow-md z-20 p-1 text-base">
 					{renderTabContent()}

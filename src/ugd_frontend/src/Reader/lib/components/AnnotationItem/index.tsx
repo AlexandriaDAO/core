@@ -26,14 +26,14 @@ export const AnnotationItem: React.FC<IAnnotationItemProps> = ({
 	const { setSidebar } = useSidebar();
 
 	const handleAnnotationItemClick = (i: AnnotationItemObject) => {
-		rendition.current && rendition.current.display(i.cfiRange);
+		rendition.current && rendition.current.display(i.selection.cfiRange);
 		setSidebar(null);
 	};
 
 	const handleRemoveAnnotationItemClick = (i: AnnotationItemObject) => {
 		rendition.current &&
-			rendition.current.annotations.remove(i.cfiRange, "highlight");
-		removeAnnotation(i.cfiRange);
+			rendition.current.annotations.remove(i.selection.cfiRange, "highlight");
+		removeAnnotation(i.selection.cfiRange);
 	};
 
 	return (
@@ -44,7 +44,9 @@ export const AnnotationItem: React.FC<IAnnotationItemProps> = ({
 					style={annotationItemStyles.itemButton}
 					className="text-gray-500 hover:text-gray-700 px-0"
 				>
-					{annotationItem.text}
+					{
+						annotationItem.label ? annotationItem.label : annotationItem.selection.text 
+					}
 				</button>
 				<p className="text-indigo-500">
 					Added On: {annotationItem.time}

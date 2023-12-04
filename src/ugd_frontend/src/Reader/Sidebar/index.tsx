@@ -1,5 +1,5 @@
 // src/Sidebar/index.tsx
-import React from "react";
+import React, { useState } from "react";
 
 import {
 	SidebarStyle as defaultSidebarStyles,
@@ -8,6 +8,7 @@ import {
 import { Tabs } from "../lib/hooks/useSidebarState";
 import { useSidebar } from "../lib/hooks/useReaderContext";
 
+import { CiMenuFries } from "react-icons/ci";
 import { MdMenuBook } from "react-icons/md";
 import { MdOutlineBookmarks } from "react-icons/md";
 import { HiOutlineAnnotation } from "react-icons/hi";
@@ -23,6 +24,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
 	sidebarStyles = defaultSidebarStyles,
 }) => {
+	const [visible, setVisible] = useState(false);
 	const { sidebar, setSidebar } = useSidebar();
 
 	const handleSidebarClick = (tab: Tabs) => {
@@ -34,57 +36,81 @@ export const Sidebar: React.FC<SidebarProps> = ({
 	};
 
 	return (
-		<ul className=" px-1.5 border border-stone-300 bg-stone-100 rounded h-full flex flex-col shadow-sm items-center justify-center">
-			<SidebarItem
-				icon={
-					<MdMenuBook
-						size={30}
-						onClick={() => handleSidebarClick(Tabs.TableOfContents)}
+		<>
+			{visible ? (
+				<ul onMouseLeave={() => setVisible(false)} className="absolute z-50 top-12 px-1.5  rounded h-full flex flex-col shadow-sm items-center justify-start">
+					<SidebarItem
+						icon={
+							<MdMenuBook
+								size={30}
+								onClick={() =>
+									handleSidebarClick(Tabs.TableOfContents)
+								}
+							/>
+						}
+						active={sidebar === Tabs.TableOfContents ? true : false}
+						tooltip="Table Of Contents"
 					/>
-				}
-				active={sidebar === Tabs.TableOfContents ? true : false}
-				tooltip="Table Of Contents"
-			/>
-			<SidebarItem
-				icon={
-					<MdOutlineBookmarks
-						size={30}
-						onClick={() => handleSidebarClick(Tabs.Bookmarks)}
+					<SidebarItem
+						icon={
+							<MdOutlineBookmarks
+								size={30}
+								onClick={() =>
+									handleSidebarClick(Tabs.Bookmarks)
+								}
+							/>
+						}
+						active={sidebar === Tabs.Bookmarks ? true : false}
+						tooltip="Bookmarks"
 					/>
-				}
-				active={sidebar === Tabs.Bookmarks ? true : false}
-				tooltip="Bookmarks"
-			/>
-			<SidebarItem
-				icon={
-					<HiOutlineAnnotation
-						size={30}
-						onClick={() => handleSidebarClick(Tabs.Annotations)}
+					<SidebarItem
+						icon={
+							<HiOutlineAnnotation
+								size={30}
+								onClick={() =>
+									handleSidebarClick(Tabs.Annotations)
+								}
+							/>
+						}
+						active={sidebar === Tabs.Annotations ? true : false}
+						tooltip="Annotations"
 					/>
-				}
-				active={sidebar === Tabs.Annotations ? true : false}
-				tooltip="Annotations"
-			/>
-			<SidebarItem
-				icon={
-					<MdOutlineSearch
-						size={30}
-						onClick={() => handleSidebarClick(Tabs.Search)}
+					<SidebarItem
+						icon={
+							<MdOutlineSearch
+								size={30}
+								onClick={() => handleSidebarClick(Tabs.Search)}
+							/>
+						}
+						active={sidebar === Tabs.Search ? true : false}
+						tooltip="Search"
 					/>
-				}
-				active={sidebar === Tabs.Search ? true : false}
-				tooltip="Search"
-			/>
-			<SidebarItem
-				icon={
-					<MdOutlineSettings
-						size={30}
-						onClick={() => handleSidebarClick(Tabs.Settings)}
+					<SidebarItem
+						icon={
+							<MdOutlineSettings
+								size={30}
+								onClick={() =>
+									handleSidebarClick(Tabs.Settings)
+								}
+							/>
+						}
+						active={sidebar === Tabs.Settings ? true : false}
+						tooltip="Settings"
 					/>
-				}
-				active={sidebar === Tabs.Settings ? true : false}
-				tooltip="Settings"
-			/>
-		</ul>
+				</ul>
+			) : (
+				<ul onMouseEnter={() => setVisible(true)} className="absolute z-50 top-12 px-1.5  h-full flex flex-col items-center justify-start">
+					<SidebarItem
+						icon={
+							<CiMenuFries
+								size={30}
+							/>
+						}
+						active={false}
+						tooltip="Expand"
+					/>
+				</ul>
+			)}
+		</>
 	);
 };

@@ -27,7 +27,7 @@ function ContentView(props: IContentViewProps) {
 		setCurrentLocation,
 		fullScreen,
 	} = useReader();
-	const { addAnnotation } = useAnnotation();
+	const { addAnnotation, currentSelection, setCurrentSelection } = useAnnotation();
 
 	const next = useCallback(async () => {
 		// book?.rendition.next();
@@ -57,25 +57,13 @@ function ContentView(props: IContentViewProps) {
 	const handleSelection = useCallback(
 		(cfiRange: string, contents: Contents) => {
 			if (rendition.current) {
-				addAnnotation({
+				const selection = {
 					text: rendition.current.getRange(cfiRange).toString(),
-					cfiRange,
-				});
-				rendition.current.annotations.add(
-					"highlight",
-					cfiRange,
-					{},
-					undefined,
-					"hl",
-					{
-						fill: "yellow",
-						"fill-opacity": "0.5",
-						"mix-blend-mode": "multiply",
-					}
-				);
-				const selection = contents.window.getSelection();
-				selection?.removeAllRanges();
+					cfiRange
+				}
+				setCurrentSelection(selection);
 			} else {
+				setCurrentSelection(null);
 				console.error(
 					"Unable to store annotation, Current Rendition is undefined"
 				);
@@ -83,6 +71,27 @@ function ContentView(props: IContentViewProps) {
 		},
 		[rendition, addAnnotation]
 	);
+
+	const handleClick = (e: any) => {
+		// console.log('inside', e);
+		// const iframe = renderLocation.current?.querySelector('iframe');
+		// if (!iframe) return;
+	
+		// const iframeWin = iframe.contentWindow;
+		// if (!iframeWin) return;
+	
+		// const selection = iframeWin.getSelection();
+
+		// console.log(selection);
+		// if (!selection || selection.isCollapsed) {
+
+		// 	const selectionText = selection?.toString();
+		// 	console.log(selectionText);
+		
+		// 	// The selection is empty or collapsed, handle the deselection
+		// }
+		setCurrentSelection(null);
+	};
 
 	useEffect(() => {
 		const currentRendition = rendition.current;
@@ -95,6 +104,8 @@ function ContentView(props: IContentViewProps) {
 		currentRendition.on("locationChanged", handleLocationChanged);
 
 		currentRendition.on("selected", handleSelection);
+	
+		currentRendition.on("click", handleClick);
 
 		return () => {
 			if (currentRendition) {
@@ -103,12 +114,12 @@ function ContentView(props: IContentViewProps) {
 
 				currentRendition.off("locationChanged", handleLocationChanged);
 				currentRendition.off("selected", handleSelection);
+				currentRendition.off("click", handleClick);
 				// currentRendition.destroy()
 				console.log("Rendition was destroyed");
-				// no need to destroy as book.destroy() already does that
-			}
+			}			
 		};
-	}, [rendition, handleKeyPress, handleLocationChanged, handleSelection]);
+	}, [rendition, handleKeyPress, handleLocationChanged, handleSelection, handleClick]);
 
 	const { contentViewStyles = defaultContentViewStyles } = props;
 
@@ -117,10 +128,10 @@ function ContentView(props: IContentViewProps) {
 			<IoIosArrowBack
 				size={30}
 				onClick={prev}
-				className="absolute left-2 top-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
+				className="absolute left-12 z-30 top-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
 			/>
 
-			{fullScreen && <FullScreenToggle />}
+			{/* {fullScreen && <FullScreenToggle />} */}
 
 			<div style={contentViewStyles.reader}>
 				<div style={contentViewStyles.viewHolder}>
@@ -141,7 +152,7 @@ function ContentView(props: IContentViewProps) {
 			<IoIosArrowForward
 				size={30}
 				onClick={next}
-				className="absolute right-3 top-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
+				className="absolute right-12 top-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
 			/>
 		</>
 	);

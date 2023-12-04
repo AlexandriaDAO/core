@@ -39,10 +39,14 @@ export const Search: React.FC<ISearchProps> = ({
 				book.loaded?.spine.then(async (spine) => {
 					const contents: ContentList = [];
 
+					console.log('spine',spine);
+					
 					for (let item of (spine as any).items) {
 						if (!item.href) continue;
 
+						console.log('item',item);
 						const doc = await book.load(item.href);
+						console.log('doc',doc);
 						const innerHTML = (doc as Document).documentElement
 							.innerHTML;
 						const innerText = convert(innerHTML);
@@ -52,6 +56,7 @@ export const Search: React.FC<ISearchProps> = ({
 							text: innerText.split(/\n+/),
 						});
 					}
+					console.log(contents);
 					setContents(contents);
 				});
 			};
