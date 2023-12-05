@@ -21,6 +21,8 @@ struct BookSearchResponse {
 #[ic_cdk::update]
 pub async fn get_weaviate_query(user_query: String, breadth: u8, scope: String) -> String {
 
+  let mut post_ids = Vec::new();
+
   let author_str = scope.clone();
   let summary_str = "This is a demo summary that will be replaced with a pre-generated 1-liner that describes the source content.".to_string();
   let query_for_request = user_query.clone();
@@ -62,11 +64,13 @@ pub async fn get_weaviate_query(user_query: String, breadth: u8, scope: String) 
             // ToDo: Updated weaviate cluster, heading should be CFI link, and string by default.
             let heading_str = item.heading.to_string();
 
-            // This is the only link to the rest of thle app.
-            save_sc(user_query.clone(), author_str.clone(), item.title, heading_str, item.content, summary_str.clone());
+            // save_sc(user_query.clone(), author_str.clone(), item.title, heading_str, item.content, summary_str.clone());
+            let post_id = save_sc(user_query.clone(), author_str.clone(), item.title, heading_str, item.content, summary_str.clone());
+
+            post_ids.push(post_id);
         }
 
-        "Source cards populated successfully".to_string()
+        format!("Source cards populated successfully with post IDs: {:?}", post_ids)
     }
     Err((r, m)) => {
         format!("HTTP request error. Code: {r:?}, Message: {m}")

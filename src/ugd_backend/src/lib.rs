@@ -1,5 +1,5 @@
 // ToDo // Not urgent
-// Persisted counter.
+// Persisted counter. I can use this guide, and use the initialization number as 1+ the last post# https://internetcomputer.org/docs/current/developer-docs/backend/rust/counter
 // Learn VirtualMemory vs. MemoryManager
 
 mod weaviate;
@@ -79,7 +79,7 @@ thread_local! {
 
 
 #[ic_cdk_macros::update]
-pub fn save_sc(user_query: String, author: String, title: String, heading: String, content: String, summary: String) {
+pub fn save_sc(user_query: String, author: String, title: String, heading: String, content: String, summary: String) -> u64 {
     let post_id = POST_ID_COUNTER.fetch_add(1, Ordering::SeqCst) as u64;
     let card = SourceCard {
         post_id,
@@ -93,6 +93,8 @@ pub fn save_sc(user_query: String, author: String, title: String, heading: Strin
     };
 
     SC.with(|cards| cards.borrow_mut().insert(post_id, card));
+
+    post_id
 }
 
 #[ic_cdk_macros::update]

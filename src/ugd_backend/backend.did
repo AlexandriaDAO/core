@@ -18,7 +18,7 @@ type SourceCard = record {
 
 service : {
     "get_weaviate_query": (user_query : text, breadth : nat8, scope : text) -> (text);
-    "save_sc" : (user_query : text, author : text, title : text, heading : text, content : text, summary : text) -> ();
+    "save_sc" : (user_query : text, author : text, title : text, heading : text, content : text, summary : text) -> (nat64);
     "get_sc" : (post_id : nat64) -> (opt SourceCard) query;
     "delete_sc" : (post_id : nat64) -> ();
     "bookmark_sc" : (post_id : nat64) -> ();
