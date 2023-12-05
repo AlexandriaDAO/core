@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { ugd_backend } from '../declarations/ugd_backend';
 import MessageContext from '../contexts/MessageContext';
+import { string } from 'slate';
 
 interface MessageProviderProps {
   children: React.ReactNode;
@@ -55,12 +56,43 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
     }
   };
 
-  // Example of new functions with hard-coded inputs
+
+
+  async function queryWeaviate(clusters: any) {
+    try {
+        const response = await ugd_backend.get_weaviate_query("Sample Query", 2, clusters);
+        console.log(`Weaviate Query Response for ${clusters}: `, response);
+
+        const jsonResponse = JSON.parse(response);
+        const postIds = jsonResponse.post_ids;
+
+        for (const id of postIds) {
+            const sc_key = BigInt(id);
+            const sourceCard = await ugd_backend.get_sc(sc_key);
+            console.log("Source Card Key: ", sc_key, "—Full sourcecard data from get_sc()", sourceCard);
+        }
+
+    } catch (error) {
+        console.error(`Error querying ${clusters}: `, error);
+    }
+}
+
+async function processQueries() {
+    const clusters = ["The_Bible", "Carl_Jung", "Benjamin_Franklin"];
+
+    const queryPromises = clusters.map(clusters => queryWeaviate(clusters));
+    await Promise.allSettled(queryPromises);
+}
+
+// // Leave this commented while not testing queries.
+// processQueries();
+
   const testSourceCards = async () => {
 
-    const postId: bigint = BigInt(3);  // Post_id is a u64 +1 counter that starts at 1 (but resets to 1 on upgrades for now)
-    console.log("Current Post ID", postId)
+    const postId: bigint = BigInt(14);
+  
     try {
+
       // const weaviateQueryResponse = await ugd_backend.get_weaviate_query("Sample Query", 1, "The_Bible"); // "The_Bible" here is the 'cluster' element of the 'author_data.ts' object. The 1 is how many to return.
       // console.log("Weaviate Query Response: ", weaviateQueryResponse);
 

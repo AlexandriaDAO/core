@@ -1,5 +1,7 @@
 use crate::save_sc;
 
+use serde_json::{json, Value};
+
 use ic_cdk::api::management_canister::http_request::{http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod};
 use serde::{Serialize, Deserialize};
 
@@ -70,7 +72,11 @@ pub async fn get_weaviate_query(user_query: String, breadth: u8, scope: String) 
             post_ids.push(post_id);
         }
 
-        format!("Source cards populated successfully with post IDs: {:?}", post_ids)
+        let json_response = json!({ "post_ids": post_ids });
+        let json_string = serde_json::to_string(&json_response)
+            .expect("Failed to serialize JSON");
+    
+        json_string
     }
     Err((r, m)) => {
         format!("HTTP request error. Code: {r:?}, Message: {m}")
