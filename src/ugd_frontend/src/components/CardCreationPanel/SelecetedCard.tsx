@@ -10,7 +10,6 @@ interface SelectedCards {
 }
 
 const SelecetedCard: React.FC<SelectedCards> = ({ item, RemoveSourceCard }) => {
-
     const [compressedImageSrc, setCompressedImageSrc] = useState<string>("");
 
 
@@ -54,7 +53,7 @@ const SelecetedCard: React.FC<SelectedCards> = ({ item, RemoveSourceCard }) => {
             <div className="selectedCardBody">
                 <div className="selectedBodyCardText">
                     <h2>{item.title}</h2>
-                    <p>{item.description}</p>
+                    <p>{item.content}</p>
                 </div>
                 <div className="selectedBodyCardBtns">
                     <label onClick={() => RemoveSourceCard(item)}> <FontAwesomeIcon icon={faXmark} size='1x' /> </label>

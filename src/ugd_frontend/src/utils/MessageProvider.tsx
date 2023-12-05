@@ -1,6 +1,6 @@
 // OG
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ugd_backend } from '../declarations/ugd_backend';
 import MessageContext from '../contexts/MessageContext';
 
@@ -25,33 +25,35 @@ interface SourceCard {
 };
 
 const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
+  let limitCards = [1, 2, 3, 4, 5]
   const [message, setMessage] = useState<MessageCard | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [currentAuthorId, setRandomAuthorId] = useState<string | null>(null);
+  const [sourceCards, setSourceCards] = useState<any[]>([])
 
-  
+
   const updateMessage = async (user_query: string) => {
     setIsLoading(true);
     try {
-        const response: MessageCard[] = await ugd_backend.mc_front(user_query);
-        
-        if (response && response.length > 0) {
-          const firstResponse = response[0];
-          setMessage({
-              user_query: firstResponse?.user_query ?? "",
-              message: firstResponse?.message ?? "",
-          });
-          setError(null);
-          console.log("Response recieved: ", message)
+      const response: MessageCard[] = await ugd_backend.mc_front(user_query);
+
+      if (response && response.length > 0) {
+        const firstResponse = response[0];
+        setMessage({
+          user_query: firstResponse?.user_query ?? "",
+          message: firstResponse?.message ?? "",
+        });
+        setError(null);
+        console.log("Response recieved: ", message)
       } else {
-          setError("No response received from the backend");
+        setError("No response received from the backend");
       }
 
     } catch (error) {
-        setError(`Failed to fetch the message`);
+      setError(`Failed to fetch the message`);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -82,11 +84,45 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
   };
 
   // Calls every time for demo.
-  testSourceCards();
+  // testSourceCards();
+
+
+  const GetQueriedSourceCards = async ({ query }: any) => {
+    setIsLoading(true)
+    try {
+      const weaviateQueryResponse = await ugd_backend.get_weaviate_query(query, limitCards.length, "The_Bible"); // "The_Bible" here is the 'cluster' element of the 'author_data.ts' object. The 1 is how many to return.
+      console.log("Weaviate Query Response: ", weaviateQueryResponse);
+
+      limitCards.map(async (item) => {
+        await GetSourceCards({ postId: BigInt(item) })
+      })
+
+    } catch (error) {
+      setIsLoading(false)
+      setError(`Failed to fetch the message`);
+      console.log(`Error while fetching queried source cards: ${error}`);
+    }
+  }
+
+
+  const GetSourceCards = async ({ postId }: any) => {
+    console.log(`PostId ${postId}`);
+    setIsLoading(true)
+    try {
+      const sourceCardResponse = await ugd_backend.get_sc(postId);
+      setSourceCards((prev) => ([...prev, ...sourceCardResponse]))
+      setIsLoading(false)
+    } catch (error) {
+      setIsLoading(false)
+      setError(`Failed to fetch the message`);
+      console.log(`Error while fetching queried source cards: ${error}`);
+    }
+  }
+
 
 
   return (
-    <MessageContext.Provider value={{ message, updateMessage, isLoading, error, currentAuthorId, setRandomAuthorId }}>
+    <MessageContext.Provider value={{ message, updateMessage, isLoading, error, currentAuthorId, setRandomAuthorId, GetQueriedSourceCards, sourceCards }}>
       {children}
     </MessageContext.Provider>
   );

@@ -7,7 +7,7 @@ import Resizer from 'react-image-file-resizer'
 interface SharedCardsInterface {
     item: any
     isHideCta?: boolean
-    SelectSourceCard?: (newItem?: any) => void
+    SelectSourceCard?: (newItem?: any) => void,
 }
 
 const SearchedCards: React.FC<SharedCardsInterface> = ({ item, isHideCta, SelectSourceCard }) => {
@@ -60,7 +60,7 @@ const SearchedCards: React.FC<SharedCardsInterface> = ({ item, isHideCta, Select
                 <div className="searchecCardText">
                     <div className="innerSearchedTextData">
                         <h2>{item.title}</h2>
-                        <p>{item.description}</p>
+                        <p>{item.content} ...</p>
                     </div>
                 </div>
             </div>

@@ -30,17 +30,33 @@ const SearchBar = ({
     throw new Error("SearchBar must be used within a MessageProvider");
   }
 
-  const { message, updateMessage, isLoading, error, setRandomAuthorId } =
-    messageContext;
+  const {
+    message,
+    updateMessage,
+    isLoading,
+    error,
+    setRandomAuthorId,
+    GetQueriedSourceCards,
+  } = messageContext;
 
-  const handleSearchSubmit = useCallback(() => {
+  // const handleSearchSubmit = useCallback(() => {
+  //   if (searchValue.trim()) {
+  //     const randomIndex = Math.floor(Math.random() * authors.length);
+  //     const randomAuthor = authors[randomIndex];
+  //     setRandomAuthorId(randomAuthor.id);
+  //     updateMessage(searchValue);
+  //   }
+  // }, [searchValue, updateMessage]);
+
+  const handleSearchSubmit = () => {
     if (searchValue.trim()) {
       const randomIndex = Math.floor(Math.random() * authors.length);
       const randomAuthor = authors[randomIndex];
       setRandomAuthorId(randomAuthor.id);
+      GetQueriedSourceCards({ query: searchValue });
       updateMessage(searchValue);
     }
-  }, [searchValue, updateMessage]);
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {

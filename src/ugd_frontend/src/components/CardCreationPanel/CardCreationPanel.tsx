@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import './cardCreationpanel.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
@@ -6,6 +6,7 @@ import useAuthorBooks from '@/utils/useAuthorBooks'
 import SearchedCards from './SearchedCards'
 import PreviewCard from './PreviewCard'
 import SelecetedCard from './SelecetedCard'
+import MessageContext from '@/contexts/MessageContext'
 
 interface CardCreationPanelInterface {
     currentAuthorId: any
@@ -14,6 +15,10 @@ interface CardCreationPanelInterface {
 const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthorId }) => {
     const [selectedSourceCards, setSelectedSourceCards] = useState<any[]>([])
     const books = useAuthorBooks(currentAuthorId);
+    const messageContext = useContext(MessageContext);
+
+
+    console.log(books?.filter((item) => item.title))
 
 
 
@@ -64,12 +69,19 @@ const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthor
                             </div>
 
                             <div className="innerSearchedCardsContainer">
-                                {books.slice(0, 8).map((item, idx) => {
+                                {messageContext?.sourceCards.map((item, idx) => {
                                     return (
                                         <SearchedCards item={item} key={idx} SelectSourceCard={SelectSourceCard} />
                                     )
                                 })}
                             </div>
+                            {/* <div className="innerSearchedCardsContainer">
+                                {books.slice(0, 8).map((item, idx) => {
+                                    return (
+                                        <SearchedCards item={item} key={idx} SelectSourceCard={SelectSourceCard} />
+                                    )
+                                })}
+                            </div> */}
                         </div>
                     </div>
                 </div>
