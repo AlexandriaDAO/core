@@ -1,6 +1,7 @@
+import GetOneBook from '@/utils/GetOneBook'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Resizer from 'react-image-file-resizer'
 
 
@@ -11,38 +12,39 @@ interface SelectedCards {
 
 const SelecetedCard: React.FC<SelectedCards> = ({ item, RemoveSourceCard }) => {
     const [compressedImageSrc, setCompressedImageSrc] = useState<string>("");
+    const singleBook = GetOneBook(item.author.replace('_', ' '), item.title)
 
-
-    if (item.imagePath) {
-        fetch(item.imagePath)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network Response was not okay');
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                Resizer.imageFileResizer(
-                    blob,
-                    300,
-                    300,
-                    'PNG',
-                    90,
-                    0,
-                    (uri) => {
-                        if (typeof uri === 'string') {
-                            setCompressedImageSrc(uri);
-                        }
-                    },
-                    'base64'
-                );
-            })
-            .catch(error => {
-                console.error('There was a problem fetching the image: ', error);
-                console.log('Failed image URL:', item.imagePath);
-            });
-    }
-
+    useEffect(() => {
+        if (singleBook?.imagePath) {
+            fetch(singleBook.imagePath)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network Response was not okay');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    Resizer.imageFileResizer(
+                        blob,
+                        300,
+                        300,
+                        'PNG',
+                        90,
+                        0,
+                        (uri) => {
+                            if (typeof uri === 'string') {
+                                setCompressedImageSrc(uri);
+                            }
+                        },
+                        'base64'
+                    );
+                })
+                .catch(error => {
+                    console.error('There was a problem fetching the image: ', error);
+                    console.log('Failed image URL:', singleBook?.imagePath);
+                });
+        }
+    }, [singleBook?.imagePath])
 
 
     return (

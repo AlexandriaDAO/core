@@ -1,12 +1,13 @@
 import React, { useState, useContext } from 'react'
 import './cardCreationpanel.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faChevronDown, faChevronUp, faXmark } from '@fortawesome/free-solid-svg-icons'
 import useAuthorBooks from '@/utils/useAuthorBooks'
 import SearchedCards from './SearchedCards'
 import PreviewCard from './PreviewCard'
 import SelecetedCard from './SelecetedCard'
 import MessageContext from '@/contexts/MessageContext'
+import SkeltonLoading from './SkeltonLoading'
 
 interface CardCreationPanelInterface {
     currentAuthorId: any
@@ -14,13 +15,8 @@ interface CardCreationPanelInterface {
 
 const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthorId }) => {
     const [selectedSourceCards, setSelectedSourceCards] = useState<any[]>([])
-    const books = useAuthorBooks(currentAuthorId);
     const messageContext = useContext(MessageContext);
-
-
-    console.log(books?.filter((item) => item.title))
-
-
+    const [isOpened, setIsOpened] = useState(true)
 
     const SelectSourceCard = (newItem?: any) => {
         let isSourceCardSelected = selectedSourceCards.find((item) => item?.title === newItem.title)
@@ -34,7 +30,7 @@ const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthor
 
     return (
         <>
-            {selectedSourceCards?.length ? <PreviewCard selectedSourceCards={selectedSourceCards} /> : null}
+            {selectedSourceCards?.length ? <PreviewCard selectedSourceCards={selectedSourceCards} setSelectedSourceCards={setSelectedSourceCards} /> : null}
             <div className='mainCardCreationPanel_Container'>
                 <div className="innerCardCreationPanel">
                     <div className="cardCreationPanelHeader">
@@ -43,23 +39,33 @@ const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthor
                             <div className="innerHeaderctaBtns">
                                 <button>Save Private</button>
                                 <button>Publish</button>
+                                <button className='dropDown_btn' onClick={() => setIsOpened(!isOpened)}><FontAwesomeIcon icon={isOpened ? faChevronUp : faChevronDown} size='sm' /></button>
                             </div>
                         </div>
                     </div>
 
 
-                    <div className="cardCreationPanel_InnerContainer">
+                    <div className={isOpened ? "cardCreationPanel_InnerContainer active" : "cardCreationPanel_InnerContainer"}>
                         <div className="cardCreation_selectedCards">
                             <div className="header_selected_cards">
                                 <h2>Selecetd Cards</h2>
 
                             </div>
                             <div className="inner_body_selecetd_cards">
-                                {selectedSourceCards.map((item) => {
+                                {messageContext?.isLoading ? [1, 2, 3].map((item) => {
                                     return (
-                                        <SelecetedCard item={item} RemoveSourceCard={RemoveSourceCard} />
+                                        <SkeltonLoading key={item} />
                                     )
-                                })}
+                                }) : <>
+
+                                    {selectedSourceCards.map((item) => {
+                                        return (
+                                            <SelecetedCard item={item} RemoveSourceCard={RemoveSourceCard} />
+                                        )
+                                    })}
+                                </>}
+
+
                             </div>
                         </div>
                         <div className="cardCreation_searchedCards">
@@ -69,19 +75,18 @@ const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthor
                             </div>
 
                             <div className="innerSearchedCardsContainer">
-                                {messageContext?.sourceCards.map((item, idx) => {
+                                {messageContext?.isLoading ? [1, 2, 3].map((item) => {
                                     return (
-                                        <SearchedCards item={item} key={idx} SelectSourceCard={SelectSourceCard} />
+                                        <SkeltonLoading key={item} isSearched={true} />
                                     )
-                                })}
+                                }) : <>
+                                    {messageContext?.sourceCards.map((item, idx) => {
+                                        return (
+                                            <SearchedCards item={item} key={idx} SelectSourceCard={SelectSourceCard} />
+                                        )
+                                    })}
+                                </>}
                             </div>
-                            {/* <div className="innerSearchedCardsContainer">
-                                {books.slice(0, 8).map((item, idx) => {
-                                    return (
-                                        <SearchedCards item={item} key={idx} SelectSourceCard={SelectSourceCard} />
-                                    )
-                                })}
-                            </div> */}
                         </div>
                     </div>
                 </div>

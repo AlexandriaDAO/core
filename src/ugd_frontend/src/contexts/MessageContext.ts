@@ -9,12 +9,13 @@ interface MessageCard {
 
 interface MessageCardContext {
   message: MessageCard | null;
+  isQuery: string | undefined;
   currentAuthorId: string | null;
   updateMessage: (user_query: string) => void;
   isLoading: boolean;
   error: string | null;
   setRandomAuthorId: React.Dispatch<React.SetStateAction<string | null>>;
-  GetQueriedSourceCards: ({ query }: any) => {};
+  GetQueriedSourceCards: (query: any) => {};
   sourceCards: SourceCardInterface[] | [];
 }
 

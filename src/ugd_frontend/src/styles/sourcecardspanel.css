@@ -1,0 +1,38 @@
+.header_bookkmarkedSourceCards {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.innerBookmarked_header {
+  width: 95%;
+  padding: 20px;
+  background: #fff;
+  margin: 0px auto;
+  border: 2px solid rgba(245, 245, 245);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.innerBookmarked_header h2 {
+  font-size: 1.6rem;
+  color: #000;
+  font-weight: 600;
+}
+
+.innerBookmarked_header button {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: #fff;
+}

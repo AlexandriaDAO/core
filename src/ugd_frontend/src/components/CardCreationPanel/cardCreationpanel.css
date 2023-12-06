@@ -42,6 +42,14 @@
   justify-content: flex-end;
 }
 
+.innerHeaderctaBtns .dropDown_btn {
+  height: 45px !important;
+  width: 45px !important;
+  padding: 0px;
+  border-radius: 50%;
+  background: #000;
+}
+
 .innerHeaderctaBtns button {
   padding: 10px 35px;
   border: none;
@@ -66,8 +74,16 @@
   grid-template-columns: 35% 65%;
   margin-bottom: 20px;
   place-items: flex-start;
+  max-height: 0px;
+  overflow: hidden;
+  transition: 0.5s linear;
 }
 
+.cardCreationPanel_InnerContainer.active {
+  max-height: 1500px;
+  transition: 0.5s linear;
+  overflow: unset;
+}
 /* ------------------------------------------ SELECTED CARDS -------------------------- */
 
 .cardCreation_selectedCards,
@@ -80,7 +96,7 @@
 
 .cardCreation_selectedCards {
   position: sticky;
-  top: 12%;
+  top: 1%;
 }
 
 .header_selected_cards,
@@ -398,4 +414,82 @@
 }
 .previewCardCta button:nth-child(4) {
   background: #6b15d6;
+}
+
+/* --------------------------------------------------- SKELTON CARDS  */
+
+.skelton_card_source_loding {
+  width: 100%;
+  height: 180px;
+  border-radius: 2px;
+  display: grid;
+  grid-template-columns: 28% 68%;
+  margin-bottom: 20px;
+  padding: 12px;
+}
+
+.skelton_card_source_loding:last-child {
+  margin-bottom: 0px;
+}
+
+.image_skelton_loading {
+  width: 100%;
+  height: 100%;
+  background: gray;
+  border-radius: 4px;
+}
+
+.data_skelton_loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-left: 4%;
+}
+
+.heading_skelton_loading {
+  width: 100%;
+  height: 18%;
+  background: gray;
+  border-radius: 4px;
+}
+
+.description_skelton_loading {
+  width: 100%;
+  height: 78%;
+  background: gray;
+  border-radius: 4px;
+}
+
+.skeleton {
+  display: inline-block !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background-color: #dddbdd !important;
+}
+
+.skeleton::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(#fff, 0) 0,
+    rgba(#fff, 0.2) 20%,
+    rgba(#fff, 0.5) 60%,
+    rgba(#fff, 0)
+  );
+  animation: shimmer 5s infinite;
+  content: "";
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }

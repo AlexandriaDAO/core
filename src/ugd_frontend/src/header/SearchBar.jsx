@@ -53,8 +53,7 @@ const SearchBar = ({
       const randomIndex = Math.floor(Math.random() * authors.length);
       const randomAuthor = authors[randomIndex];
       setRandomAuthorId(randomAuthor.id);
-      GetQueriedSourceCards({ query: searchValue });
-      updateMessage(searchValue);
+      GetQueriedSourceCards(searchValue);
     }
   };
 
