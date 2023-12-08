@@ -30,7 +30,6 @@ const Tabs = () => {
         minWidth: "280px",
         margin: "0 auto",
       }}
-      className="mainHeaderTabsContainer"
     >
       <div
         style={{
@@ -50,7 +49,6 @@ const Tabs = () => {
           background:
             "linear-gradient(to right, #7f00ff, #483d8b, #4682b4, #20b2aa, #a3be8c, #d08770)",
         }}
-        className="innnerHeaderContainer"
       >
         <div
           style={{

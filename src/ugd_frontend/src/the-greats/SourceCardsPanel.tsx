@@ -11,7 +11,7 @@ const SourceCardsPanel: React.FC = ({ authors }: any) => {
   return (
     <div
       className="shareCardsMainContainer"
-      style={{ background: "#f6f7fb", paddingBottom: "20px" }}
+      style={{ paddingBottom: "20px" }}
     >
       <div className="header_bookkmarkedSourceCards">
         <div className="innerBookmarked_header">

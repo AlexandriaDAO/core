@@ -1,11 +1,10 @@
 import React, { useState, useContext } from 'react'
 import './cardCreationpanel.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faChevronUp, faXmark } from '@fortawesome/free-solid-svg-icons'
-import useAuthorBooks from '@/utils/useAuthorBooks'
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
 import SearchedCards from './SearchedCards'
 import PreviewCard from './PreviewCard'
-import SelecetedCard from './SelecetedCard'
+import SelectedCard from './SelectedCard'
 import MessageContext from '@/contexts/MessageContext'
 import SkeltonLoading from './SkeltonLoading'
 
@@ -37,8 +36,6 @@ const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthor
                         <div className="innerHeaderContainer">
                             <h2>Create Your Own Card</h2>
                             <div className="innerHeaderctaBtns">
-                                <button>Save Private</button>
-                                <button>Publish</button>
                                 <button className='dropDown_btn' onClick={() => setIsOpened(!isOpened)}><FontAwesomeIcon icon={isOpened ? faChevronUp : faChevronDown} size='sm' /></button>
                             </div>
                         </div>
@@ -60,7 +57,7 @@ const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthor
 
                                     {selectedSourceCards.map((item) => {
                                         return (
-                                            <SelecetedCard item={item} RemoveSourceCard={RemoveSourceCard} />
+                                            <SelectedCard item={item} RemoveSourceCard={RemoveSourceCard} />
                                         )
                                     })}
                                 </>}

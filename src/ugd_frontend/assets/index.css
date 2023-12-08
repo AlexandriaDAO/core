@@ -1,67 +1,60 @@
 body {
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 1.5rem;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 1.5rem;
 }
 
 img {
-    display: block;
-    margin: auto;
+  display: block;
+  margin: auto;
 }
 
 form {
-    display: flex;
-    justify-content: center;
-    gap: 0.5em;
-    flex-flow: row wrap;
-    max-width: 40vw;
-    margin: auto;
-    align-items: baseline;
+  display: flex;
+  justify-content: center;
+  gap: 0.5em;
+  flex-flow: row wrap;
+  max-width: 40vw;
+  margin: auto;
+  align-items: baseline;
 }
 
 button[type="submit"] {
-    padding: 5px 20px;
-    margin: 10px auto;
-    float: right;
+  padding: 5px 20px;
+  margin: 10px auto;
+  float: right;
 }
 
 #greeting {
-    margin: 10px auto;
-    padding: 10px 60px;
-    border: 1px solid #222;
+  margin: 10px auto;
+  padding: 10px 60px;
+  border: 1px solid #222;
 }
 
 #greeting:empty {
-    display: none;
+  display: none;
 }
 
-
-
 .image-container {
-    /* portrait- I like these greys, but it's maybe a bit plain */
-    background: #8e9eab;
-    background: -webkit-linear-gradient(to top, #eef2f3, #8e9eab);
-    background: linear-gradient(to top, #eef2f3, #8e9eab)
+  /* portrait- I like these greys, but it's maybe a bit plain */
+  background: #8e9eab;
+  background: -webkit-linear-gradient(to top, #eef2f3, #8e9eab);
+  background: linear-gradient(to top, #eef2f3, #8e9eab);
 
-    /* earthly- It's nice but the yellow's too bright, and the green is maybe just too potent or unmatched here.  */
-    /* background: #649173;
+  /* earthly- It's nice but the yellow's too bright, and the green is maybe just too potent or unmatched here.  */
+  /* background: #649173;
     background: -webkit-linear-gradient(to bottom, #DBD5A4, #649173);
     background: linear-gradient(to bottom, #DBD5A4, #649173); */
 
-    /* metallic toad - this looks really good, but the white is too bright and plain. */
-    /* background: #abbaab;
+  /* metallic toad - this looks really good, but the white is too bright and plain. */
+  /* background: #abbaab;
     background: -webkit-linear-gradient(to top, #ffffff, #abbaab);
     background: linear-gradient(to top, #ffffff, #abbaab); */
 
-    /* sirius tamed - this is realy nice but the yellow's too bright. */
-    /* background: #EFEFBB;
+  /* sirius tamed - this is realy nice but the yellow's too bright. */
+  /* background: #EFEFBB;
     background: -webkit-linear-gradient(to bottom, #D4D3DD, #EFEFBB);
     background: linear-gradient(to bottom, #D4D3DD, #EFEFBB); */
 }
-
-
-
-
-
 
 /* .main-grid-container {
     display: flex;

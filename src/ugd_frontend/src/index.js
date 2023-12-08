@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import "./styles/tailwind.css";
 import "./styles/main.css";
+import "../assets/index.css";
 
 WebFont.load({
   google: {
@@ -39,13 +40,13 @@ document.addEventListener("DOMContentLoaded", () => {
   if (semanticLibraryRoot) {
     const root = createRoot(semanticLibraryRoot);
     root.render(
-      // <React.StrictMode>
-      <AuthorProvider>
-        <SettingsProvider>
-          <App />
-        </SettingsProvider>
-      </AuthorProvider>
-      // {/* </React.StrictMode> */}
+      <React.StrictMode>
+        <AuthorProvider>
+          <SettingsProvider>
+            <App />
+          </SettingsProvider>
+        </AuthorProvider>
+      </React.StrictMode>
     );
   }
 });

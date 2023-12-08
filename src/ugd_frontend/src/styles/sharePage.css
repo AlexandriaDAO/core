@@ -21,11 +21,11 @@
   margin: 0px auto;
   max-height: 0px;
   overflow: hidden;
-  transition: 0.5s linear;
+  transition: 0.2s linear;
 }
 
 .sharedCardsInnerContainer.active {
   max-height: 4000px;
   overflow: unset;
-  transition: 0.5s linear;
+  transition: 0.2s linear;
 }
