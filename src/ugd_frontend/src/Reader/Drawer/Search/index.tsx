@@ -2,10 +2,10 @@
 import React, { useEffect, type KeyboardEventHandler } from "react";
 import { SearchStyle as defaultSearchStyles, type ISearchStyle } from "./style";
 import { useContent, useReader, useSearch } from "../../lib/hooks/useReaderContext";
-import { ContentList } from "../../lib/hooks/useReaderState/useContentState";
-import { convert } from "html-to-text";
+import { Content, ContentList } from "../../lib/hooks/useReaderState/useContentState";
 import { MdOutlineSearch } from "react-icons/md";
 import { SearchItem } from "../../lib/components/SearchItem";
+import { EpubCFI } from "epubjs";
 
 interface ISearchProps {
 	searchStyle?: ISearchStyle;
@@ -15,7 +15,7 @@ export const Search: React.FC<ISearchProps> = ({
 	searchStyle = defaultSearchStyles,
 }) => {
 	const { book } = useReader();
-	const { searchContents } = useContent();
+	const { setContents,searchContents } = useContent();
 	const { searchText, setSearchText, searches, setSearches } = useSearch();
 
 	const onSearchBookContents = async () => {
@@ -30,37 +30,64 @@ export const Search: React.FC<ISearchProps> = ({
 		}
 	};
 
-	const { setContents } = useContent();
-
 	useEffect(() => {
 		if (book) {
-			const loadContents = async () => {
-				// book.spine should be accessible as we already await for book.ready in useReader
-				book.loaded?.spine.then(async (spine) => {
-					const contents: ContentList = [];
+			// const loadContents = async () => {
+			// 	// book.spine should be accessible as we already await for book.ready in useReader
+			// 	book.loaded?.spine.then(async (spine) => {
+			// 		const contents: ContentList = [];
 
-					console.log('spine',spine);
+			// 		console.log('spine',spine);
 					
-					for (let item of (spine as any).items) {
-						if (!item.href) continue;
+			// 		for (let item of (spine as any).items) {
+			// 			if (!item.href) continue;
 
-						console.log('item',item);
-						const doc = await book.load(item.href);
-						console.log('doc',doc);
-						const innerHTML = (doc as Document).documentElement
-							.innerHTML;
-						const innerText = convert(innerHTML);
+			// 			console.log('item',item);
+			// 			const doc = await book.load(item.href);
+			// 			console.log('doc',doc);
+			// 			const innerHTML = (doc as Document).documentElement
+			// 				.innerHTML;
+			// 			const innerText = convert(innerHTML);
 
-						contents.push({
-							href: item.href,
-							text: innerText.split(/\n+/),
-						});
-					}
-					console.log(contents);
-					setContents(contents);
-				});
-			};
-			loadContents();
+			// 			contents.push({
+			// 				href: item.href,
+			// 				text: innerText.split(/\n+/),
+			// 			});
+			// 		}
+			// 		setContents(contents);
+			// 	});
+			// };
+			// loadContents();
+
+			const processBook = async ( )=> {
+				await book.ready;  // Ensure the book is ready
+				const spine = book.spine;
+
+				const contents: ContentList = [];
+
+				for (let item of (spine as any).items) {
+					if (!item.href) return;
+					const doc = await book.load(item.href);
+					const innerHTML = (doc as Document).documentElement.innerHTML;
+					const parsedDoc = new DOMParser().parseFromString(innerHTML, "text/html");
+
+					const paragraphs = parsedDoc.querySelectorAll("p");
+
+					paragraphs.forEach(paragraph => {
+						const text = paragraph.textContent?.trim() ?? "";
+						if (text.length < 1) return;
+
+						const cfi = new EpubCFI(paragraph, item.cfiBase);
+						const content: Content = {
+							cfi,
+							text
+						}  
+						contents.push(content);
+					});
+				}
+				setContents(contents)
+			}
+			processBook();
 		}
 	}, [book, setContents]);
 
@@ -90,7 +117,7 @@ export const Search: React.FC<ISearchProps> = ({
 				<p>Result: Total {searches.length} Record</p>
 			</div>
 			<div className="p-4 flex-grow overflow-auto">
-				{searches?.map((item, i) => (
+				{searches?.map((item:Content, i:number) => (
 					<SearchItem key={i} item={item} />
 				))}
 				{searches.length === 0 && <div>Search Something</div>}

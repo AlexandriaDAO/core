@@ -1,18 +1,18 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { Searches } from "./useReaderState/useContentState";
+import { ContentList } from "./useReaderState/useContentState";
 
 // Define the shape of the search state
 export interface ISearchState {
 	searchText: string;
 	setSearchText: Dispatch<SetStateAction<string>>;
 
-	searches: Searches;
-	setSearches: Dispatch<SetStateAction<Searches>>;
+	searches: ContentList;
+	setSearches: Dispatch<SetStateAction<ContentList>>;
 }
 
 export default function useSearchState(): ISearchState {
 	const [searchText, setSearchText] = useState("");
-	const [searches, setSearches] = useState<Searches>([]);
+	const [searches, setSearches] = useState<ContentList>([]);
 
 	return {
 		searchText,

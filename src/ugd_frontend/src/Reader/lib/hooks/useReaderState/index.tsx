@@ -137,7 +137,7 @@ export const useReaderState = (): IReaderState => {
 
 	useEffect(() => {
 		if (url === "") return;
-		let newBook = Epub(url);
+		let newBook = Epub(url, {openAs:'epub'});
 		newBook.ready.then(() => {
 			setIsLoaded(true);
 			setBook(newBook);

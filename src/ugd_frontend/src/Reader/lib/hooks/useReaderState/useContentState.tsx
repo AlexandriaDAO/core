@@ -1,23 +1,18 @@
 // useReaderState.tsx
 
+import { EpubCFI } from "epubjs";
 import { Dispatch, SetStateAction, useState } from "react";
 
 export type Content = {
-	href: string;
-	text: string[];
+	text:string,   //paragraph text
+	cfi:EpubCFI,   
 };
 
 export type ContentList = Array<Content>;
 
-export type SearchItemObject = {
-	paragraph: string;
-	href: string;
-};
-export type Searches = Array<SearchItemObject>;
-
 export interface searchContentsFn {
 	// (annotation: Omit<AnnotationItemObject, "time">): void;
-	(searchString: string): Searches;
+	(searchString: string): ContentList;
 }
 
 // Define the shape of the context data
@@ -33,19 +28,17 @@ export const useContentState = (): IContentState => {
 
 	const searchContents: searchContentsFn = (
 		searchString: string
-	): Searches => {
+	): ContentList => {
 		const regexp = new RegExp(searchString, "ig");
 
-		let res: Searches = [];
+		let res: ContentList = [];
 		for (let content of contents) {
-			for (let paragraph of content.text) {
-				if (paragraph.match(regexp) !== null) {
-					let searchItem: SearchItemObject = {
-						paragraph,
-						href: content.href,
-					};
-					res.push(searchItem);
-				}
+			if (content.text.match(regexp) !== null) {
+				let searchItem: Content = {
+					text: content.text,
+					cfi: content.cfi,
+				};
+				res.push(searchItem);
 			}
 		}
 

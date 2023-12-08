@@ -5,11 +5,12 @@ import {
 	type ISearchItemStyle,
 } from "./style";
 
-import { SearchItemObject } from "../../hooks/useReaderState/useContentState";
+import { Content } from "../../hooks/useReaderState/useContentState";
 import { useReader, useSearch, useSidebar } from "../../hooks/useReaderContext";
+import { clipParagraph, highlightText } from "../../utils/search";
 
 type ISearchItemProps = {
-	item: SearchItemObject;
+	item: Content;
 	searchItemStyles?: ISearchItemStyle;
 };
 
@@ -21,49 +22,32 @@ export const SearchItem: React.FC<ISearchItemProps> = ({
 	const { setSidebar } = useSidebar();
 	const { searchText } = useSearch();
 
-	// onListItemClick(
-	// 	item?.href,
-	// 	item?.paragraph
-	// );
-
 	const handleSearchItemClick = async () => {
 		if (!rendition.current) return;
-		await rendition.current.display(item.href);
-
-		// to mark the text inside book view
-		// not fully functional
-		const win = document.querySelector("iframe")?.contentWindow;
-		if (win) {
-			const body = win.document.documentElement.querySelector("body");
-			if (body) {
-				const regExp = new RegExp(
-					`(<[\w\d]+>)?.*(${searchText}).*<\/?[\w\d]+>`,
-					"ig"
-				);
-				body.innerHTML = body.innerHTML.replace(
-					regExp,
-					(match, sub1, sub2) => {
-						return match.replace(sub2, `<mark>${sub2}</mark>`);
-					}
-				);
-
-				// body.innerHTML = body.innerHTML.replace(
-				//   paragraph,
-				//   `<span class="highlight" style="color:orange;">${paragraph}</span>`
-				// )
-				// const regExp = new RegExp(searchText, 'ig')
-				// body.innerHTML = body.innerHTML.replace(paragraph, `<span class="highlight">${paragraph}</span>`)
-				// body.innerHTML = body.innerHTML.replace(regExp, (match) => {
-				//   return `<mark>${match}</mark>`
-				// })
-			}
-		}
-
+		await rendition.current.display(item.cfi.toString());
 		setSidebar(null);
-
 		setCurrentLocation(rendition.current.location);
+
+		// snippet to highlight the search needle
+
+		// const iframe = document.querySelector("iframe");
+		// if (!iframe) return;
+	
+		// const win = iframe.contentWindow;
+		// if (!win) return;
+	
+		// const body = win.document.body;
+		// if (!body) return;
+	
+		// // Function to recursively highlight text in a node
+		// highlightText(body,searchText);
 	};
 
+	const formatedText = () => {
+		return clipParagraph(
+			item.text.replace( new RegExp(searchText, "ig"), '<span style="color: red;">' + searchText + "</span>"
+	  	), searchText)
+	}
 	return (
 		<div
 			style={searchItemStyles.item}
@@ -74,15 +58,7 @@ export const SearchItem: React.FC<ISearchItemProps> = ({
 				style={searchItemStyles.itemButton}
 				className="text-gray-500 hover:text-gray-700 px-0 border-b border-b-gray-500"
 				dangerouslySetInnerHTML={{
-					__html:
-						item && item.paragraph
-							? item.paragraph.replace(
-									new RegExp(searchText, "ig"),
-									'<span style="color: red;">' +
-										searchText +
-										"</span>"
-							  )
-							: "",
+					__html: item && item.text ? formatedText() : ""
 				}}
 			></p>
 		</div>
