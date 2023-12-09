@@ -1,6 +1,6 @@
 use crate::save_sc;
 
-use serde_json::{json, Value};
+use serde_json::{json};
 
 use ic_cdk::api::management_canister::http_request::{http_request, CanisterHttpRequestArgument, HttpHeader, HttpMethod};
 use serde::{Serialize, Deserialize};
