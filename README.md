@@ -28,7 +28,7 @@ npm start
 
 ### Typical Prereq Commands:
 (WSL Ubuntu)
-- Install DFX
+- Install DFX: `sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)`
 - Install NVM: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash` | `nvm install --lts`
 - Install Node & NPM: `sudo apt install nodejs npm`
 - Update them: `sudo apt-get update
