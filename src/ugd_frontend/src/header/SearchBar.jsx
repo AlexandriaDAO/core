@@ -30,17 +30,32 @@ const SearchBar = ({
     throw new Error("SearchBar must be used within a MessageProvider");
   }
 
-  const { message, updateMessage, isLoading, error, setRandomAuthorId } =
-    messageContext;
+  const {
+    message,
+    updateMessage,
+    isLoading,
+    error,
+    setRandomAuthorId,
+    GetQueriedSourceCards,
+  } = messageContext;
 
-  const handleSearchSubmit = useCallback(() => {
+  // const handleSearchSubmit = useCallback(() => {
+  //   if (searchValue.trim()) {
+  //     const randomIndex = Math.floor(Math.random() * authors.length);
+  //     const randomAuthor = authors[randomIndex];
+  //     setRandomAuthorId(randomAuthor.id);
+  //     updateMessage(searchValue);
+  //   }
+  // }, [searchValue, updateMessage]);
+
+  const handleSearchSubmit = () => {
     if (searchValue.trim()) {
       const randomIndex = Math.floor(Math.random() * authors.length);
       const randomAuthor = authors[randomIndex];
       setRandomAuthorId(randomAuthor.id);
-      updateMessage(searchValue);
+      GetQueriedSourceCards(searchValue);
     }
-  }, [searchValue, updateMessage]);
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -73,7 +88,7 @@ const SearchBar = ({
     );
 
   return (
-    <div className="searchbar-wrapper">
+    <div className={message ? "searchbar-wrapper sticky" : "searchbar-wrapper"}>
       <div className="searchbar">
         <div className="searchbar-inner">
           <AuthorFilter
@@ -98,15 +113,16 @@ const SearchBar = ({
           </button>
         </div>
       </div>
-      {isLoading ? (
-        <div className="loading-indicator">
-          <div className="loader"></div>
-        </div>
-      ) : error ? (
-        <div className="error-message">{error}</div>
-      ) : (
-        message && <MessageCard />
-      )}
+      {
+        isLoading ? (
+          <div className="loading-indicator">
+            <div className="loader"></div>
+          </div>
+        ) : error ? (
+          <div className="error-message">{error}</div>
+        ) : null
+        // message && <MessageCard />
+      }
     </div>
   );
 };

@@ -11,7 +11,6 @@ import "../styles/react-grid-layout.css";
 
 function AuthorPanel({ authors }) {
   const { stats, shelf } = useAuthors();
-
   const [numCols, setNumCols] = useState(1);
 
   const CARD_WIDTH = 300;
@@ -104,8 +103,8 @@ function AuthorPanel({ authors }) {
         rowHeight={CARD_HEIGHT}
         containerPadding={[0, 0]}
         margin={[0, 0]}
-        autoSize={true}
         isDraggable={true}
+        autoSize={true}
         isResizable={false}
       >
         {authors.map((author) => (
