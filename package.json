@@ -18,9 +18,9 @@
     "generate": "dfx generate ugd_backend"
   },
   "dependencies": {
-    "@dfinity/agent": "^0.19.2",
-    "@dfinity/candid": "^0.19.2",
-    "@dfinity/principal": "^0.19.2",
+    "@dfinity/agent": "^0.20.2",
+    "@dfinity/candid": "^0.20.2",
+    "@dfinity/principal": "^0.20.2",
     "@emotion/css": "^11.11.2",
     "@emotion/react": "^11.11.1",
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
@@ -78,7 +78,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "engines": {
-    "node": "^12 || ^14 || ^16 || ^18"
+    "node": "^12 || ^14 || ^16 || ^18 || ^20"
   },
   "browserslist": [
     "last 2 chrome version",
