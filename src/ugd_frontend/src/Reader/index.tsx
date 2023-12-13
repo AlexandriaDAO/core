@@ -65,25 +65,19 @@ export const Reader: React.FC<IReaderProps> = ({
 	}, []);
 
 	return (
-		<div className="md:aspect-video aspect-[3/4] w-full h-full flex gap-1 flex-col overflow-hidden bg-white rounded relative" ref={bookLocation}>
-			{showToolbar && !sidebar && <Toolbar title={title} />}
-			<div className="flex w-full h-full gap-1" >
-				{showSidebar && !sidebar && <Sidebar />}
-
-				<div className="flex-grow rounded">
-					<div style={readerStyles.container}>
-						<div style={readerStyles.readerArea}>
-							{external && (
-								<GoLinkExternal
-									size={25}
-									onClick={external}
-									className="absolute right-5 top-5 cursor-pointer text-gray-500 hover:text-gray-700"
-								/>
-							)}
-							<ContentView />
-						</div>
-						{showSidebar  && sidebar && <Drawer />}
-					</div>
+		<div className="md:aspect-video aspect-[3/4] w-full h-full flex gap-1 overflow-hidden bg-white rounded relative" ref={bookLocation}>
+			{showToolbar && <Toolbar />}
+			{showSidebar && <Sidebar />}
+			<div style={readerStyles.container} className="rounded w-full h-full">
+				<div style={readerStyles.readerArea}>
+					{external && (
+						<GoLinkExternal
+							size={25}
+							onClick={external}
+							className="absolute right-5 top-5 cursor-pointer text-gray-500 hover:text-gray-700"
+						/>
+					)}
+					<ContentView />
 				</div>
 			</div>
 		</div>

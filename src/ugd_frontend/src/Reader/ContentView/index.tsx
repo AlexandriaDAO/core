@@ -128,7 +128,7 @@ function ContentView(props: IContentViewProps) {
 			<IoIosArrowBack
 				size={30}
 				onClick={prev}
-				className="absolute left-12 z-30 top-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
+				className="absolute left-2 z-30 top-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
 			/>
 
 			{/* {fullScreen && <FullScreenToggle />} */}
@@ -152,7 +152,7 @@ function ContentView(props: IContentViewProps) {
 			<IoIosArrowForward
 				size={30}
 				onClick={next}
-				className="absolute right-12 top-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
+				className="absolute right-2 top-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
 			/>
 		</>
 	);

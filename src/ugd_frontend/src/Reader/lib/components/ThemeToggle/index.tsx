@@ -41,14 +41,14 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({
 			{theme === "dark" ? (
 				<MdOutlineDarkMode
 					onClick={toggleTheme}
-					size={35}
-					className="cursor-pointer p-1 text-indigo-800"
+					size={30}
+					className="cursor-pointer p-0.5 text-indigo-800 hover:text-gray-500"
 				/>
 			) : (
 				<MdDarkMode
 					onClick={toggleTheme}
-					size={35}
-					className="cursor-pointer p-1  hover:bg-indigo-50 text-gray-600"
+					size={30}
+					className="cursor-pointer p-0.5 hover:text-indigo-800 text-gray-500"
 				/>
 			)}
 		</>
