@@ -31,6 +31,6 @@
     "src/ugd_frontend/utils/useAuthorBooks.jsx",
     "src/ugd_frontend/src/components/ReactSlider/ReactSlider.jsx",
     "src/ugd_frontend/src/pages/Book.jsx"
-  ],
+, "src/ugd_frontend/src/utils/AuthProvider.js"  ],
   "exclude": ["node_modules", "src/ugd_frontend/src/Reader/**/*.js"]
 }

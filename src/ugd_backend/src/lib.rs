@@ -5,6 +5,6 @@ mod weaviate;
 pub use weaviate::get_weaviate_query;
 
 #[ic_cdk::query]
-fn whoami(name: String) -> String {
-    format!("Hello there, {}!", name)
+pub fn whoami(name: String) -> String {
+    format!("Logged in with Principal: {}!", name)
 }
