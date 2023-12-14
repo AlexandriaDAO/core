@@ -7,6 +7,7 @@ import Share from './Share';
 import Post from './Post';
 import Author from './Author';
 import EReader from './EReader';
+import BookContent from './BookContent';
 import NotFound from "./NotFound";
 import '../styles/main.css';
 
@@ -34,6 +35,7 @@ const Layout = () => {
                     <Route path="post" element={<Post />} />
                     <Route path="author" element={<Author />} />
                     <Route path="ereader" element={<EReader />} />
+                    <Route path="book-content" element={<BookContent />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
             </div>
