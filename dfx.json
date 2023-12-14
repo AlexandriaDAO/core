@@ -5,6 +5,10 @@
       "package": "ugd_backend",
       "type": "rust"
     },
+    "internet_identity" : {
+      "type": "pull",
+      "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+    },
     "ugd_frontend": {
       "dependencies": [
         "ugd_backend"

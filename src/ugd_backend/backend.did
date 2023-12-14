@@ -11,10 +11,11 @@ type SourceCard = record {
 
 
 service : {
+    "whoami" : (text) -> (text) query;
+
     "get_weaviate_query": (user_query : text, breadth : nat8, scope : text) -> (text);
     "get_sc" : (post_id : nat64) -> (opt SourceCard) query;
     "delete_sc" : (post_id : nat64) -> ();
     "bookmark_sc" : (post_id : nat64) -> ();
-    // "get_bookmarks" : () -> (vec nat64) query;
     "get_bookmarks" : () -> (vec opt SourceCard) query;
 };
