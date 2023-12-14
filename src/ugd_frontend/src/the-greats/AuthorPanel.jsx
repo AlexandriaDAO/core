@@ -3,6 +3,7 @@ import AuthorCards from "../components/AuthorCards/AuthorCards";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import Shelf from "../components/Author/Shelf";
 import Stats from "../components/Author/Stats";
+import BookModal from "../components/BooksCard/BookModal";
 import { useAuthors } from "../contexts/AuthorContext";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -10,7 +11,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 import "../styles/react-grid-layout.css";
 
 function AuthorPanel({ authors }) {
-  const { stats, shelf } = useAuthors();
+  const { stats, shelf, book } = useAuthors();
 
   const [numCols, setNumCols] = useState(1);
 
@@ -86,13 +87,13 @@ function AuthorPanel({ authors }) {
       x: 0,
       y: yPosition,
       w: numCols,
-      h: stats ? 1 : shelf ? 1 : 0,
+      h: stats ? 1 : shelf ? book ? 3 : 1 : 0,
     });
 
     return layouts;
   };
 
-  const layouts = useMemo(generateLayout, [stats, shelf, authors, numCols]);
+  const layouts = useMemo(generateLayout, [stats, shelf, book, authors, numCols]);
 
   return (
     <div ref={containerRef} className="my-10">
@@ -133,6 +134,7 @@ function AuthorPanel({ authors }) {
             style={{ gridColumnStart: 1, gridColumnEnd: -1 }}
           >
             <Shelf />
+            {book && <BookModal />}
           </div>
         )}
       </ResponsiveGridLayout>

@@ -9,6 +9,8 @@ interface AuthorContextProps {
   setStats: React.Dispatch<React.SetStateAction<any>>,
   shelf: any,
   setShelf: React.Dispatch<React.SetStateAction<any>>,  
+  book: any,
+  setBook: React.Dispatch<React.SetStateAction<any>>,  
 }
 
 const AuthorContext = createContext<AuthorContextProps | undefined>(undefined);
@@ -21,8 +23,10 @@ export const AuthorProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   // shelf contains author id or null
   const [shelf, setShelf] = useState(null);
 
+  const [book, setBook] = useState(null);
+
   return (
-    <AuthorContext.Provider value={{ authors, stats, setStats, shelf, setShelf }}>
+    <AuthorContext.Provider value={{ authors, stats, setStats, shelf, setShelf, book, setBook }}>
       {children}
     </AuthorContext.Provider>
   );
