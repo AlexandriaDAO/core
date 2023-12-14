@@ -1,12 +1,23 @@
 import MessageCard from '@/cards/MessageCard/MessageCard';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import '../styles/sourcecardspanel.css'
 
-const SourceCardsPanel: React.FC = ({ authors }: any) => {
-
+const SourceCardsPanel: React.FC = () => {
   const [isOpened, setIsOpened] = useState(true)
+  const [sourceCards, setSourceCards] = useState<any[]>()
+
+
+  useEffect(() => {
+    const getBookmarkedSources = async () => {
+      try {
+
+      } catch (error) {
+        console.log(`Error while fetching bookmarked source  cards: ${error}`)
+      }
+    }
+  }, [])
 
   return (
     <div
@@ -20,13 +31,7 @@ const SourceCardsPanel: React.FC = ({ authors }: any) => {
         </div>
       </div>
       <div className={isOpened ? "sharedCardsInnerContainer active" : "sharedCardsInnerContainer"}>
-        {authors?.map((item: any) => {
-          return (
-            <div key={item.id}>
-              <MessageCard AuthorId={item.id} isShared={true} />
-            </div>
-          );
-        })}
+
       </div>
     </div>
   )

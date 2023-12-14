@@ -30,11 +30,7 @@ function Create() {
       />
       {isQuery && <CardCreationPanel currentAuthorId={currentAuthorId} />}
       <div className="main-grid-container">
-        {isQuery ? (
-          <SourceCardsPanel authors={authors} />
-        ) : (
-          <AuthorPanel authors={authors} />
-        )}
+        {!isQuery ? <AuthorPanel authors={authors} /> : null}
       </div>
     </div>
   );

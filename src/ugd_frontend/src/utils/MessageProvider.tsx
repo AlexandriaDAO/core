@@ -90,6 +90,16 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
     await Promise.allSettled(queryPromises);
   }
 
+  // FIND ALL BOOKMARKED CARDS THE SOURCE CARDS -----------------------------------------------------
+
+  // const getBookmarkedSources = async () => {
+  //   try {
+  //     // const res = await ugd_backend.get_bookmarks()
+  //   } catch (error) {
+  //     console.log(`Error while fetching bookmarked source cards: ${error}`)
+  //   }
+  // }
+
 
   return (
     <MessageContext.Provider value={{ message, updateMessage, isQuery, isLoading, error, currentAuthorId, setRandomAuthorId, GetQueriedSourceCards, sourceCards }}>

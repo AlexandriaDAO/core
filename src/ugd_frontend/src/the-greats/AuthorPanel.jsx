@@ -12,6 +12,7 @@ import "../styles/react-grid-layout.css";
 function AuthorPanel({ authors }) {
   const { stats, shelf } = useAuthors();
   const [numCols, setNumCols] = useState(1);
+  const [isDraggable, setIsDraggable] = useState(false);
 
   const CARD_WIDTH = 300;
   const CARD_HEIGHT = 400;
@@ -93,6 +94,12 @@ function AuthorPanel({ authors }) {
 
   const layouts = useMemo(generateLayout, [stats, shelf, authors, numCols]);
 
+  // HANDLE DRAG STATUS ( FUNCTION )
+
+  const HandleDragStatus = (dragStatus) => {
+    setIsDraggable(dragStatus);
+  };
+
   return (
     <div ref={containerRef} className="my-10">
       <ResponsiveGridLayout
@@ -103,7 +110,7 @@ function AuthorPanel({ authors }) {
         rowHeight={CARD_HEIGHT}
         containerPadding={[0, 0]}
         margin={[0, 0]}
-        isDraggable={true}
+        isDraggable={isDraggable}
         autoSize={true}
         isResizable={false}
       >
@@ -113,7 +120,11 @@ function AuthorPanel({ authors }) {
             className="flex justify-center items-start h-full"
             style={{ width: CARD_WIDTH }}
           >
-            <AuthorCards author={author} />
+            <AuthorCards
+              author={author}
+              HandleDragStatus={HandleDragStatus}
+              isDraggable={isDraggable}
+            />
           </div>
         ))}
         {stats && (
