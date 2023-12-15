@@ -92,13 +92,13 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
 
   // FIND ALL BOOKMARKED CARDS THE SOURCE CARDS -----------------------------------------------------
 
-  // const getBookmarkedSources = async () => {
-  //   try {
-  //     // const res = await ugd_backend.get_bookmarks()
-  //   } catch (error) {
-  //     console.log(`Error while fetching bookmarked source cards: ${error}`)
-  //   }
-  // }
+  const getBookmarkedSources = async () => {
+    try {
+      const response = await ugd_backend.get_bookmarks()
+    } catch (error) {
+      console.log(`Error while fetching bookmarked source cards: ${error}`)
+    }
+  }
 
 
   return (

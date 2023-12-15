@@ -10,13 +10,7 @@ const SourceCardsPanel: React.FC = () => {
 
 
   useEffect(() => {
-    const getBookmarkedSources = async () => {
-      try {
 
-      } catch (error) {
-        console.log(`Error while fetching bookmarked source  cards: ${error}`)
-      }
-    }
   }, [])
 
   return (
