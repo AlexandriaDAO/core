@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import './bookscard.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft, faExternalLink } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDown, faAngleUp, faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import Resizer from 'react-image-file-resizer'
+import { useAuthors } from '@/contexts/AuthorContext'
 
 
 interface CardProps {
@@ -17,7 +18,13 @@ interface CardProps {
 
 const BooksCard: React.FC<CardProps> = ({ image, title, description, flipped, onCardClick, onReadBookClick }) => {
     const [compressedImageSrc, setCompressedImageSrc] = useState<string>("");
+    const { book, setBook } = useAuthors();
 
+    // Function to show the modal
+    const showBookModal = () => {
+        if(book) setBook(null)
+        else setBook(title);
+    };
 
     if (image) {
         fetch(image)
@@ -67,7 +74,7 @@ const BooksCard: React.FC<CardProps> = ({ image, title, description, flipped, on
                     </div>
                     <div className="BooksCardCta">
                         <button onClick={onCardClick}><FontAwesomeIcon icon={faChevronLeft} color='gray' size='sm' /></button>
-                        <button onClick={onReadBookClick}>Read More <label><FontAwesomeIcon icon={faExternalLink} color='gray' size='sm' /></label></button>
+                        <button onClick={showBookModal} className='cursor-pointer'>Read More <label><FontAwesomeIcon icon={book ? faAngleUp : faAngleDown} color='gray' size='sm' /></label></button>
                     </div>
                 </div>
             </div>

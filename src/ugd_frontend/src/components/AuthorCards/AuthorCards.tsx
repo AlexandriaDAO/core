@@ -12,7 +12,7 @@ interface AuthorCardsInterface {
 }
 
 const AuthorCards: React.FC<AuthorCardsInterface> = ({ author }) => {
-    const { stats, setStats, shelf, setShelf } = useAuthors();
+    const { stats, setStats, shelf, setShelf, setBook } = useAuthors();
 
     if (!author) {
         return null;
@@ -36,6 +36,7 @@ const AuthorCards: React.FC<AuthorCardsInterface> = ({ author }) => {
         setFlipped(!flipped)
         setStats(null);
         setShelf(null);
+        setBook(null);
     }
 
 
