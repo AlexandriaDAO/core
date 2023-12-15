@@ -13,8 +13,8 @@ interface AuthorCardsInterface {
     isDraggable: boolean,
 }
 
-const AuthorCards: React.FC<AuthorCardsInterface> = ({ author, HandleDragStatus, isDraggable }) => {
-    const { stats, setStats, shelf, setShelf } = useAuthors();
+const AuthorCards: React.FC<AuthorCardsInterface> = ({ author, HandleDragStatus }) => {
+    const { stats, setStats, shelf, setShelf, setBook } = useAuthors();
 
     if (!author) {
         return null;
@@ -38,6 +38,7 @@ const AuthorCards: React.FC<AuthorCardsInterface> = ({ author, HandleDragStatus,
         setFlipped(!flipped)
         setStats(null);
         setShelf(null);
+        setBook(null);
     }
 
 

@@ -34,7 +34,19 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
   const updateMessage = async (user_query: string) => {
     setIsLoading(true);
     try {
-      const response: MessageCard[] = await ugd_backend.mc_front(user_query);
+
+      // // This bullshit and all it's downstream freinds gotta go.
+      // const response: MessageCard[] = await ugd_backend.mc_front(user_query);
+      const response: MessageCard[] = [
+        {
+          user_query: "some query",
+          message: "fhgjhkjljk;"
+        },
+        {
+          user_query: "another query",
+          message: "bru"
+        }
+      ];
 
       if (response && response.length > 0) {
         const firstResponse = response[0];

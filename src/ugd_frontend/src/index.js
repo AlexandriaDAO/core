@@ -9,6 +9,25 @@ import Layout from "./pages/Layout";
 import "./styles/tailwind.css";
 import "./styles/main.css";
 import "../assets/index.css";
+import { useAuth } from "./utils/AuthProvider";
+
+const App = () => {
+  const { handleLogin, handleLogout, UID } = useAuth();
+
+  return (
+    <MessageProvider>
+      <BrowserRouter>
+        <button onClick={handleLogin}>Login</button>
+        {UID && <span>{UID}</span>} 
+        <button onClick={handleLogout}>Logout</button> 
+        <Routes>
+          <Route path="*" element={<Layout />} />
+        </Routes>
+      </BrowserRouter>
+    </MessageProvider>
+  );
+};
+
 
 WebFont.load({
   google: {
@@ -23,17 +42,6 @@ WebFont.load({
   },
 });
 
-const App = () => {
-  return (
-    <MessageProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="*" element={<Layout />} />
-        </Routes>
-      </BrowserRouter>
-    </MessageProvider>
-  );
-};
 
 document.addEventListener("DOMContentLoaded", () => {
   const semanticLibraryRoot = document.getElementById("semantic-library-root");
@@ -50,3 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 });
+
+
+
+
+
+
+

@@ -15,47 +15,115 @@
 │   │   │   ├── lib.rs
 │   │   │   ├── message_card/
 │   │   │   │   └── mod.rs
-│   │   │   └── types.rs
+│   │   │   ├── references/
+│   │   │   │   ├── memory.rs
+│   │   │   │   ├── stable_memory_examples.rs
+│   │   │   │   └── types.rs
+│   │   │   ├── source_cards.rs
+│   │   │   ├── weaviate.rs
+│   │   └── stablemem_examples.did
 │   ├── ugd_frontend/
 │   │   ├── src/
-│   │   │   ├── .ic-assets.json5
+│   │   │   ├── RatingCard/
+│   │   │   │   └── RatingCard.tsx
+│   │   │   ├── Reader/
+│   │   │   │   ├── content.js
+│   │   │   │   ├── main.js
+│   │   │   │   ├── panels/
+│   │   │   │   │   ├── annotations_panel.js
+│   │   │   │   │   ├── bookmarks_panel.js
+│   │   │   │   │   ├── metadata_panel.js
+│   │   │   │   │   ├── search_panel.js
+│   │   │   │   │   ├── settings_panel.js
+│   │   │   │   │   └── toc_panel.js
+│   │   │   │   ├── reader.js
+│   │   │   │   ├── sidebar.js
+│   │   │   │   ├── storage.js
+│   │   │   │   ├── strings.js
+│   │   │   │   ├── toolbar.js
+│   │   │   │   └── ui.js
 │   │   │   ├── cards/
 │   │   │   │   ├── AuthorCard.tsx
-│   │   │   │   ├── AuthorCards.tsx
 │   │   │   │   ├── BookCard.tsx
 │   │   │   │   ├── BookCards.tsx
-│   │   │   │   └── MessageCard.jsx
+│   │   │   │   └── MessageCard/
+│   │   │   │       ├── CardDetailsBack.tsx
+│   │   │   │       ├── CardDetailsFront.tsx
+│   │   │   │       ├── DetailsHeader.tsx
+│   │   │   │       ├── MessageCard.tsx
+│   │   │   │       ├── UserProfile.tsx
+│   │   │   │       └── types.ts
+│   │   │   ├── components/
+│   │   │   │   ├── Author/
+│   │   │   │   │   ├── Shelf.tsx
+│   │   │   │   │   ├── Stats.tsx
+│   │   │   │   │   └── author.css
+│   │   │   │   ├── AuthorCards/
+│   │   │   │   │   ├── AuthorCards.tsx
+│   │   │   │   │   └── authorcards.css
+│   │   │   │   ├── BooksCard/
+│   │   │   │   │   ├── BooksCard.tsx
+│   │   │   │   │   └── bookscard.css
+│   │   │   │   ├── CardCreationPanel/
+│   │   │   │   │   ├── CardCreationPanel.tsx
+│   │   │   │   │   ├── PreviewCard.tsx
+│   │   │   │   │   ├── SearchedCards.tsx
+│   │   │   │   │   ├── SelectedCard.tsx
+│   │   │   │   │   ├── SkeltonLoading.tsx
+│   │   │   │   │   └── cardCreationpanel.css
+│   │   │   │   ├── ReactSlider/
+│   │   │   │   │   └── ReactSlider.jsx
+│   │   │   │   └── Read/
+│   │   │   │       └── index.tsx
 │   │   │   ├── contexts/
-│   │   │   │   └── CardStateContext.tsx
+│   │   │   │   ├── AuthorContext.tsx
+│   │   │   │   ├── MessageContext.ts
+│   │   │   │   └── SettingsContext.tsx
+│   │   │   ├── dashboards/
+│   │   │   │   └── textbox.tsx
 │   │   │   ├── header/
-│   │   │   │   ├── AuthorFilter.jsx
 │   │   │   │   ├── SearchBar.jsx
-│   │   │   │   └── Tabs.jsx
+│   │   │   │   ├── Tabs.jsx
+│   │   │   │   └── settings/
+│   │   │   │       └── AuthorFilter.jsx
 │   │   │   ├── index.html
 │   │   │   ├── index.js
-│   │   │   ├── semantic-library/
-│   │   │   │   └── VirtualBookshelf.tsx
+│   │   │   ├── pages/
+│   │   │   ├── styles/
+│   │   │   │   ├── AuthorCard.css
+│   │   │   │   ├── AuthorFilter.css
+│   │   │   │   ├── AuthorPanel.css
+│   │   │   │   ├── AuthorShelf.css
+│   │   │   │   ├── AuthorStats.css
+│   │   │   │   ├── BookCard.css
+│   │   │   │   ├── MessageCard/
+│   │   │   │   │   ├── CardBack.css
+│   │   │   │   │   ├── CardFront.css
+│   │   │   │   │   └── MessageCard.css
+│   │   │   │   ├── Scaler.css
+│   │   │   │   ├── SearchBar.css
+│   │   │   │   ├── SemanticLibraryPage.css
+│   │   │   │   ├── VirtualBookshelf.css
+│   │   │   │   ├── headerTabs.css
+│   │   │   │   ├── main.css
+│   │   │   │   ├── react-grid-layout.css
+│   │   │   │   ├── sharePage.css
+│   │   │   │   ├── sourcecardspanel.css
+│   │   │   │   └── tailwind.css
 │   │   │   ├── the-greats/
-│   │   │   │   └── AuthorPanel.jsx
-│   │   ├── styles/
-│   │   │   ├── AuthorCards.css
-│   │   │   ├── AuthorFilter.css
-│   │   │   ├── AuthorPanel.css
-│   │   │   ├── BookCard.css
-│   │   │   ├── Scaler.css
-│   │   │   ├── SearchBar.css
-│   │   │   ├── SemanticLibraryPage.css
-│   │   │   ├── VirtualBookshelf.css
-│   │   │   ├── main.css
-│   │   │   └── tailwind.css
-│   │   ├── types/
-│   │   │   └── react-grid-layout.d.ts
-│   │   ├── utils/
-│   │   │   ├── MessageReciever.tsx
-│   │   │   ├── Scaler.jsx
-│   │   │   ├── Stream.tsx
-│   │   │   ├── handleReadBookClick.ts
-│   │   │   └── useBackgroundPosition.js
+│   │   │   │   ├── AuthorPanel.jsx
+│   │   │   │   └── SourceCardsPanel.tsx
+│   │   │   ├── types/
+│   │   │   │   └── react-grid-layout.d.ts
+│   │   │   ├── utils/
+│   │   │   │   ├── CompressBookCardImage.tsx
+│   │   │   │   ├── GetOneBook.tsx
+│   │   │   │   ├── MessageProvider.tsx
+│   │   │   │   ├── Scaler.jsx
+│   │   │   │   ├── Stream.tsx
+│   │   │   │   ├── handleReadBookClick.ts
+│   │   │   │   ├── useAuthorBooks.ts
+│   │   │   │   └── useBackgroundPosition.js
 ├── tailwind.config.js
 ├── tsconfig.json
 ├── webpack.config.js
