@@ -29,6 +29,7 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const [currentAuthorId, setRandomAuthorId] = useState<string | null>(null);
   const [sourceCards, setSourceCards] = useState<any[]>([])
+  const [bookmarkedSourceCards, setbookmarkedSourceCards] = useState<any[]>()
 
 
   const updateMessage = async (user_query: string) => {
@@ -102,15 +103,7 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
     await Promise.allSettled(queryPromises);
   }
 
-  // FIND ALL BOOKMARKED CARDS THE SOURCE CARDS -----------------------------------------------------
 
-  const getBookmarkedSources = async () => {
-    try {
-      const response = await ugd_backend.get_bookmarks()
-    } catch (error) {
-      console.log(`Error while fetching bookmarked source cards: ${error}`)
-    }
-  }
 
 
   return (

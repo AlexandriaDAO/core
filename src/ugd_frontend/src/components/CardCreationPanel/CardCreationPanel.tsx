@@ -7,7 +7,7 @@ import PreviewCard from './PreviewCard'
 import SelectedCard from './SelectedCard'
 import MessageContext from '@/contexts/MessageContext'
 import SkeltonLoading from './SkeltonLoading'
-import SourceCardsPanel from '@/the-greats/SourceCardsPanel'
+import BookmarkedSourceCards from './BookmarkedSourceCards'
 
 interface CardCreationPanelInterface {
     currentAuthorId: any
@@ -90,7 +90,7 @@ const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthor
                 </div>
             </div>
 
-            <SourceCardsPanel />
+            <BookmarkedSourceCards SelectSourceCard={SelectSourceCard} />
         </>
     )
 }

@@ -10,24 +10,26 @@ import "./styles/tailwind.css";
 import "./styles/main.css";
 import "../assets/index.css";
 import { useAuth } from "./utils/AuthProvider";
+import { BookMarkedSourceCardProvider } from "./utils/BookMarkedSourceCardProvider";
 
 const App = () => {
   const { handleLogin, handleLogout, UID } = useAuth();
 
   return (
     <MessageProvider>
-      <BrowserRouter>
-        <button onClick={handleLogin}>Login</button>
-        {UID && <span>{UID}</span>} 
-        <button onClick={handleLogout}>Logout</button> 
-        <Routes>
-          <Route path="*" element={<Layout />} />
-        </Routes>
-      </BrowserRouter>
+      <BookMarkedSourceCardProvider>
+        <BrowserRouter>
+          {/* <button onClick={handleLogin}>Login</button>
+          {UID && <span>{UID}</span>}
+          <button onClick={handleLogout}>Logout</button> */}
+          <Routes>
+            <Route path="*" element={<Layout />} />
+          </Routes>
+        </BrowserRouter>
+      </BookMarkedSourceCardProvider>
     </MessageProvider>
   );
 };
-
 
 WebFont.load({
   google: {
@@ -41,7 +43,6 @@ WebFont.load({
     ],
   },
 });
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const semanticLibraryRoot = document.getElementById("semantic-library-root");
@@ -58,10 +59,3 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 });
-
-
-
-
-
-
-
