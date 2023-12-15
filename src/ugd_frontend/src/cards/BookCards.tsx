@@ -4,6 +4,7 @@ import useStreamingText from '../utils/Stream';
 import { handleReadBookClick } from '../utils/handleReadBookClick';
 import { useAuthors } from '../contexts/AuthorContext';
 import BooksCard from '@/components/BooksCard/BooksCard';
+import { useNavigate } from 'react-router-dom';
 
 interface BookCardsProps {
   book: {
@@ -16,6 +17,8 @@ interface BookCardsProps {
 }
 
 const BookCards: React.FC<BookCardsProps> = ({ book }) => {
+  const navigate = useNavigate();
+  
   const { authors } = useAuthors();
   const [flipped, setFlipped] = useState(false);
 
@@ -27,7 +30,10 @@ const BookCards: React.FC<BookCardsProps> = ({ book }) => {
 
   const onReadBookClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    handleReadBookClick(book.author, book.title);
+
+    // navigation can't be used inside non component files 
+    // Create a navigation utility using the history package or pass down the navigation 
+    handleReadBookClick(book.author, book.title, navigate);
   };
 
   let bookDescription = "Description not found";

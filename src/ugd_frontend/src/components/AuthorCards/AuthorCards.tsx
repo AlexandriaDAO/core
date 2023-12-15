@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { MouseEventHandler, useEffect, useState } from 'react'
 import './authorcards.css'
 import RatingCard from '../../RatingCard/RatingCard'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBook, faChevronDown, faChevronUp, faDollarSign, faHeart, faRotateForward } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faChevronDown, faChevronUp, faDollarSign, faHamburger, faHeart, faRotateForward } from '@fortawesome/free-solid-svg-icons'
 import { faHeart as faRegularHeart } from '@fortawesome/free-regular-svg-icons'
 import { useAuthors } from '@/contexts/AuthorContext'
 import useStreamingText from '@/utils/Stream'
@@ -39,16 +39,19 @@ const AuthorCards: React.FC<AuthorCardsInterface> = ({ author }) => {
         setBook(null);
     }
 
+
+
     return (
-        <div className={`mainAuthorCard ${flipped ? 'flipped' : ''}`}>
+        <div className={`mainAuthorCard ${flipped ? 'flipped' : ''}`} >
             <div className="AuthorInnerCardDetails">
                 <div className="innerAuthorCard flip-front">
-                    <div className="AuthorCardImage">
+                    <div className="AuthorCardImage" >
                         <img src={`/images/authors/${author.id}.png`} alt="" />
 
                         <div className="favouriteButton">
                             <button onClick={() => setIsFavourite(!isFavourite)}><FontAwesomeIcon icon={isFavourite ? faHeart : faRegularHeart} color={isFavourite ? '#D7080D' : 'gray'} type="regular" size="sm" /></button>
                         </div>
+
                     </div>
                     <div className="authorCardDetails">
                         <h2>{author.id}</h2>

@@ -26,11 +26,15 @@ const UserProfile: React.FC<UserProfileInterface> = ({ currentAuthorId, InputMes
             <h2>{author.id}</h2>
             <p><span>Published :</span> 2 days ago</p>
 
-            <div className="profileRatingStars">
+            <label className="profileRatingTextPercentage">
+              87% Agree
+            </label>
+            {/* <div className="profileRatingStars">
               <RatingCard />
-            </div>
+            </div> */}
           </div>
         </div>
+
         <div className="messageCardCalltoActions">
           <div className="innerMessageCardCalltoAction">
             <button> <FontAwesomeIcon icon={faHeart} size="sm" color="red" /> <label>20 Likes</label>  </button>

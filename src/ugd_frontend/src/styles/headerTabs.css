@@ -1,0 +1,9 @@
+.innnerHeaderContainer {
+  border-radius: 50px !important;
+}
+
+.mainHeaderTabsContainer .item {
+  padding: 12px 20px;
+  font-size: 1.3rem !important;
+  text-transform: uppercase;
+}

@@ -1,6 +1,8 @@
 // Later will point to canisters. Right now it's AWS Lambda and S3 buckets.
 
-export const handleReadBookClick = (authorId: string, title: string) => {
+import { NavigateFunction } from "react-router-dom";
+
+export const handleReadBookClick = (authorId: string, title: string, navigate: NavigateFunction) => {
     const titleClustered = title.split(" ").join("_");
     const authorLink = authorId.split(" ").join("_");
 
@@ -12,11 +14,12 @@ export const handleReadBookClick = (authorId: string, title: string) => {
         window.open("https://www.semantic-library.com/?bookPath=https%3A%2F%2Funcensoredgreatsebooks.s3.us-east-2.amazonaws.com%2FThe_Bible%2FThe_Bible%40%40The_Bible.epub", '_blank');
     } else {
         const bookUrl = `https://uncensoredgreatsebooks.s3.us-east-2.amazonaws.com/${authorLink}/${authorLink}@@${titleClustered}.epub`;
-        const readerAppUrl = "https://www.semantic-library.com";
-        const url = new URL(readerAppUrl);
-        url.searchParams.set("bookPath", bookUrl);
-        window.open(url.href, '_blank');
-        console.log(bookUrl);
+        // const readerAppUrl = "https://www.semantic-library.com";
+        // const url = new URL(readerAppUrl);
+        // url.searchParams.set("bookPath", bookUrl);
+        // window.open(url.href, '_blank');
+        // console.log(bookUrl);
+        navigate(`/book/?bookPath=${bookUrl}`)
     }
 };
 

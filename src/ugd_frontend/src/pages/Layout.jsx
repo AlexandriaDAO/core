@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Tabs from '../header/Tabs';
 import Create from './Create';
@@ -9,7 +9,7 @@ import Author from './Author';
 import EReader from './EReader';
 import BookContent from './BookContent';
 import NotFound from "./NotFound";
-import '../styles/main.css';
+import "../styles/main.css";
 
 const Layout = () => {
     return (

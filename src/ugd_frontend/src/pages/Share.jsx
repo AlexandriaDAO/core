@@ -1,16 +1,45 @@
-import React from 'react';
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import MessageCard from "../cards/MessageCard/MessageCard";
+import AUTHOR_INFO from "../data/author_data";
+import "../styles/sharePage.css";
 
 const Share = () => {
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-            <Link to="/post">
-                <button className="mt-4 px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-                    Create A Post
-                </button>
-            </Link>
+  const [selectedAuthors, setSelectedAuthors] = useState(
+    AUTHOR_INFO.map((author) => author.id)
+  );
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  let authors = AUTHOR_INFO.filter(
+    (author) =>
+      selectedAuthors.includes(author.id) &&
+      (selectedCategories.length === 0 ||
+        selectedCategories.some((cat) => author.category.includes(cat)))
+  );
+
+  return (
+    <div className="mainSharePageContainer">
+      <div className="innerSharePageContainer">
+        {/* HEADER CONTAINER */}
+        <div className="sharePageHeaderContainer"></div>
+        {/* HEADER CONTAINER */}
+
+        {/* MAIN BODY  */}
+
+        <div className="shareCardsMainContainer">
+          <div className="sharedCardsInnerContainer">
+            {authors?.map((item) => {
+              return (
+                <div key={item.id}>
+                  <MessageCard AuthorId={item.id} isShared={true} />
+                </div>
+              );
+            })}
+          </div>
         </div>
-    );
+
+        {/* MAIN BODY  */}
+      </div>
+    </div>
+  );
 };
 
 export default Share;
