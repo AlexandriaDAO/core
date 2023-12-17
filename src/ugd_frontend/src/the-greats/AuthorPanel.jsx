@@ -94,9 +94,7 @@ function AuthorPanel({ authors }) {
   };
 
   const layouts = useMemo(generateLayout, [stats, shelf, book, authors, numCols]);
-
-  // HANDLE DRAG STATUS ( FUNCTION )
-
+  
   const HandleDragStatus = (dragStatus) => {
     setIsDraggable(dragStatus);
   };

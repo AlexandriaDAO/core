@@ -31,6 +31,7 @@ const App = () => {
   );
 };
 
+
 WebFont.load({
   google: {
     families: [
@@ -59,3 +60,10 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 });
+
+
+
+
+
+
+
