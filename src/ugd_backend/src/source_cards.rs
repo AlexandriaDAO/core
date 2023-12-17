@@ -95,7 +95,6 @@ pub fn get_sc(post_id: u64) -> Option<SourceCard> {
 }
 
 #[ic_cdk_macros::query]
-
 pub fn get_bookmarks() -> Vec<Option<SourceCard>> {
   SC.with(|sc| {
       sc.borrow()

@@ -36,3 +36,26 @@
   cursor: pointer;
   color: #fff;
 }
+
+.bookmarkedCardsInnerContainer {
+  width: 95%;
+  margin: 20px auto;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  max-height: 0px;
+  overflow: hidden;
+  transition: 0.2s linear;
+}
+
+.bookmarkedCardsInnerContainer.active {
+  transition: 0.2s linear;
+  overflow: unset;
+  max-height: 5000px;
+}
+
+.bookmarkedCardsInnerContainer .searchedCardBx {
+  background: #fff;
+}
+.bookmarkedCardsInnerContainer .innerSearchedTextData h2 {
+  max-width: 900px;
+}

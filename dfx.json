@@ -5,7 +5,7 @@
       "package": "ugd_backend",
       "type": "rust"
     },
-    "internet_identity" : {
+    "internet_identity": {
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
     },

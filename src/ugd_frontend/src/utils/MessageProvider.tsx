@@ -29,6 +29,7 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const [currentAuthorId, setRandomAuthorId] = useState<string | null>(null);
   const [sourceCards, setSourceCards] = useState<any[]>([])
+  const [bookmarkedSourceCards, setbookmarkedSourceCards] = useState<any[]>()
 
 
   const updateMessage = async (user_query: string) => {
@@ -101,6 +102,8 @@ const MessageProvider: React.FC<MessageProviderProps> = ({ children }) => {
     const queryPromises = clusters.map(clusters => queryWeaviate(clusters, query));
     await Promise.allSettled(queryPromises);
   }
+
+
 
 
   return (

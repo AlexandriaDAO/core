@@ -2,16 +2,18 @@ import React, { MouseEventHandler, useEffect, useState } from 'react'
 import './authorcards.css'
 import RatingCard from '../../RatingCard/RatingCard'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBook, faChevronDown, faChevronUp, faDollarSign, faHamburger, faHeart, faRotateForward } from '@fortawesome/free-solid-svg-icons'
+import { faBook, faChevronDown, faChevronUp, faClose, faDollarSign, faHamburger, faHeart, faNavicon, faRotateForward } from '@fortawesome/free-solid-svg-icons'
 import { faHeart as faRegularHeart } from '@fortawesome/free-regular-svg-icons'
 import { useAuthors } from '@/contexts/AuthorContext'
 import useStreamingText from '@/utils/Stream'
 
 interface AuthorCardsInterface {
     author: any
+    HandleDragStatus: (dragStatus: boolean) => {},
+    isDraggable: boolean,
 }
 
-const AuthorCards: React.FC<AuthorCardsInterface> = ({ author }) => {
+const AuthorCards: React.FC<AuthorCardsInterface> = ({ author, HandleDragStatus }) => {
     const { stats, setStats, shelf, setShelf, setBook } = useAuthors();
 
     if (!author) {
@@ -49,6 +51,12 @@ const AuthorCards: React.FC<AuthorCardsInterface> = ({ author }) => {
                         <img src={`/images/authors/${author.id}.png`} alt="" />
 
                         <div className="favouriteButton">
+
+                            <button onMouseEnter={() => HandleDragStatus(true)} onTouchStart={() => HandleDragStatus(true)} onMouseLeave={() => HandleDragStatus(false)} onTouchEnd={() => {
+                                setTimeout(() => {
+                                    HandleDragStatus(false)
+                                }, 1000);
+                            }}><FontAwesomeIcon icon={faNavicon} color={'gray'} type="regular" size="sm" /></button>
                             <button onClick={() => setIsFavourite(!isFavourite)}><FontAwesomeIcon icon={isFavourite ? faHeart : faRegularHeart} color={isFavourite ? '#D7080D' : 'gray'} type="regular" size="sm" /></button>
                         </div>
 

@@ -326,6 +326,12 @@
   color: #fff;
 }
 
+.showSerachedCardsActionBtns label:last-child.active {
+  border-color: #00b5ad;
+  background: #00b5ad;
+  color: #fff;
+}
+
 /* ------------------------------------- PREVIEW CARDS -------------------------- */
 
 .mainPreviewCardsContainer {

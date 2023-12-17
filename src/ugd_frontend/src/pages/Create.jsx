@@ -4,7 +4,7 @@ import AuthorPanel from "../the-greats/AuthorPanel";
 import AUTHOR_INFO from "../data/author_data";
 import CardCreationPanel from "../components/CardCreationPanel/CardCreationPanel";
 import MessageContext from "../contexts/MessageContext";
-import SourceCardsPanel from "../the-greats/SourceCardsPanel";
+import SourceCardsPanel from "../components/CardCreationPanel/BookmarkedSourceCards";
 
 function Create() {
   const [selectedAuthors, setSelectedAuthors] = useState(
@@ -30,11 +30,7 @@ function Create() {
       />
       {isQuery && <CardCreationPanel currentAuthorId={currentAuthorId} />}
       <div className="main-grid-container">
-        {isQuery ? (
-          <SourceCardsPanel authors={authors} />
-        ) : (
-          <AuthorPanel authors={authors} />
-        )}
+        {!isQuery ? <AuthorPanel authors={authors} /> : null}
       </div>
     </div>
   );

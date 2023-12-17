@@ -474,6 +474,7 @@ service : (opt InternetIdentityInit) -> {
     // A client decoding a response as `null` indicates outdated type information
     // and should be treated as an error.
 
+
     // Returns information about the identity with the given number.
     // Requires authentication.
     identity_info: (IdentityNumber) -> (opt IdentityInfoResponse);
