@@ -89,38 +89,76 @@ Users own and self-host these uploaded ebooks, and earn when others use them. If
 
 ### Tokenomics
 
-$UCG employs purely ‘hard money’ tokenomics, i.e., its intrinsic value is calculable, and fixed to the amount of revenue it is expected to generate for holders.
+UncensoredGreats will have a native token, UC with a fixed supply of 21 Million.
 
-$UCG's utility is restricted to staking and governance. The only rewards for staking and governance participation come from fees generated in ecosystem tokens like $ICP and $ckBTC. 
+We honor Satoshi’s example concerning the hard cap, supply distribution, minting mechanism, and general philosophy of hard money (we hope).
 
-$UCG will have a capped supply, and emit as rewards from the DAO treasury to users at a steadily declining rate, much like Bitcoin.
+#### Distribution
 
-$ICP and $ckBTC will be collected in the DAO treasury to pay the cost of computation, and all excess will go to stakes on a regular basis.
+Rewards Pool: 19.95M (95%)
+Initial Liquidity (Team): 1.05M (5%)
 
-There is no overlap in these pools, i.e., platform payment or staking rewards are never denominated in $UCG, and user rewards happen behind the scenes and are only in $UCG.
+The token has no guarantee of utility/intrinsic value and should not be expected to increase in value.
 
-#### Revenue Generation and Distribution
+The following plans are speculative, have no guarantee of being implemented, and will remain subject to change while project development is under centralized control.
 
-Any user who participates in UCG DAO will need to fill up their app native wallet with some ICP to use premium features (the ability to call into AI functions and generate message cards). Fees will be deducted from their wallet in automatic nano-payments as they call on functions.
+#### Utility
 
-Author and Book cards NFT trading: 5% goes to UCG Treasury.
-Fees users pay to query Author and Book Cards: 40% goes to UCG Treasury.
-Cost to create Author and Book Cards: 100% goes to UCG Treasury.
-Fees on functions to AI to create Message Cards: 100% goes to UCG Treasury.
+Out of the gate, UCG will have zero utility or intrinsic value.
 
-This revenue is collected and converted to cycles to pay for the cost of computation.
+UCG's intended utility is only relevant as UncensoredGreats moves toward architectural decentralization. 
 
-100% of the surplus is distributed to $UCG stakers on a regular interval.
+As UncensoredGreats moves towards DAO form, UCG's utility will be restricted to staking and governance.
 
-There is a TBD mechanism for retroactive pay to all authors who’ve had their books pirated, so they can reclaim whatever money was earned from their book.
+In staking, holders will have full rights to revenue earned on the platform.
 
-#### How UCG is Distributed
+In governance, voters will have full rights over platform code changes.
 
-$UCG will have a fixed supply of 21 Million tokens. Apart from the initial distribution, all remaining $UCG will emit exclusively to owners of Message and Source Cards, based on their number of accrued ‘likes’ and ‘bookmarks’, respectively.
+Staking and voting may be related/intertwined, or not.
 
-The rewards merited for ‘likes’ on message cards will decrease quadratically over time until it is empty, e.g., 10 UCG/like to start, then 7, then 5, etc. 
+UCG will have no other purpose. No platform perks, payment, or other in-app functions.
 
-Any user can like/bookmark cards an infinite amount of times, but their count of likes/bookmarks that have merit to rewards is fixed to the amount they’ve paid for platform use. In this way, if no one uses the platform in a way that generates the revenue to offset devaluation by token inflation, the token supply simply will not grow.
+#### Revenue
+
+Premium features are paid with the app-native UCG wallet. These will be autonomous nano payments in $ICP and potentially other hard assets like $ckBTC.
+
+4 actions require payment.
+
+Semantic search results, charged per result.
+AI functions, charged per 1k-tokens of the given model.
+Royalties on NFT Trading, of course.
+Minting NFTs, charged based on file size (.epub).
+
+New users will receive a 0.1 ICP sign-up bonus which should be plenty to get them going as the price of such actions is in the fractions of a penny. Read access to all data, including posts and Ebooks themselves, is always free.
+
+The revenue from these actions will either go to the NFT owner as a reward or the UncensoredGreats Team. Later, this team share is aimed at being distributed as revenue to DAO Stakers and the Cycles Wallets that pay for computation.
+
+Semantic Search: 40% Team / 60% NFT Owner.
+Fees on AI Functions: 60% Team / 40% NFT Owner.
+Ebook NFT trading: 5% Team / 95% NFT Owner.
+Cost to Mint Ebook NFTs: 100% to Team.
+
+There is a TBD DAO mechanism for retroactive pay to all authors who’ve had their books pirated, so they can reclaim whatever money was earned from their book, as well as ownership of that book.
+
+#### Rewards
+
+95% of the supply is locked in a rewards pool exclusively accessible with a bookmarked() function, the sole mechanism for releasing UCG. 
+
+`bookmarked()`’s job is simple. It moves 1UCG from the pool to the wallet of the owner of a post that some other user just bookmarked. That’s it!
+
+Since a new user has the freedom to bookmark endless posts, the value-bearing bookmark actions are only triggered when certain conditions are met by in-app spending.
+
+When a user spends a threshold amount (~1 cent), one of their future bookmarking actions, of another’s post will trigger `bookmarked()`.
+
+Users accrue these value-bearing bookmarks with organic platform spending only (not NFT Minting/Trading). Randomness and decay rules are applied to users' bookmarking actions to prevent gaming of the system.
+
+Why 1 cent? Well, the planned launch will be with 5% of the supply (team share), and 1,000 ICP which would set the initial price of UCG at 1 cent (at $10 ICP). This sets a ‘floor’ for what can trigger `bookmarked()` function and maintains sustainability throughout the emissions.
+
+Initially, the team retains control of that threshold. It can be 1/50th of a cent spent, or 50 cents, to release 1 UCG. So the team indirectly controls the rewards emissions rate, but never to whom it’s distributed. That decision is completely left to high-value users who bookmark stuff. Eventually, this spending threshold will be set to match an exponential emissions curve, just like BTC’s mining rewards.
+
+In this way, UCG is a completely fair launch based on intellectual (not monetary) contribution. If no one uses the platform in a way that generates the revenue required to offset token devaluation, the token supply will simply not devalue. 
+
+So instead of raising money by launching a token to build a product, we built a product that launches a token as it raises money. We plan to set a new standard for fair launches.
 
 ### Inspiration
 
