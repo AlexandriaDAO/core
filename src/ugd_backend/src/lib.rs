@@ -10,50 +10,37 @@ pub fn whoami(name: String) -> String {
 }
 
 
+// Now I have to serialize the books in the frontend, and pass it here as a u8 vector.
 
-// Notes on Whitepaper Outline with respect to Rust Backend Implementation
+// Proposed methodology for how you can store ebook assets using a BTreeMap.
+use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
+use ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap};
+use std::cell::RefCell;
 
-// Current Litepaper Structure:
-// LitePaper
-//   Project Concept
-//     Problem
-//     Solution
-//     Then Internet of Books 
+type Memory = VirtualMemory<DefaultMemoryImpl>;
 
-//   Tokenomics
-//     Distribution
-//     Utility
-//     Revenue
-//     Rewards
+thread_local! {
+    // The memory manager is used for simulating multiple memories. Given a `MemoryId` it can
+    // return a memory that can be used by stable structures.
+    static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> =
+        RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
 
-//   Inspiration
+    // Initialize a V2 BTreeMap that supports unbounded keys and values.
+    static ASSETS: RefCell<StableBTreeMap<String, Vec<u8>, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(0))),
+        )
+    );
+}
 
+/// Retrieves the value associated with the given key if it exists.
+#[ic_cdk_macros::query]
+fn get(key: String) -> Option<Vec<u8>> {
+    ASSETS.with(|p| p.borrow().get(&key))
+}
 
-
-// I need to introduce a user flow section. 
-// Books are uploaded as NFTs. 
-// User starts with a search bar, semantically searches all book snippets as a result.
-// These book snippets are combined with AI to create posts.
-
-// These happen to be the 4 main components that need to be built out.
-
-// So for how this works:
-// Brief overview of what the user sees.
-// 1. Books (NFTs)
-//   - a raw .epub of course.
-//   - Upgradable metadata (title, author, cover image, categories, description, usage stats.)
-//   - a .csv with all the metadata from an epub.js parser
-// 2. Search (Vector DB)
-//   - A vector db with all the book nft csvs. Filters configured to these different VectorDBs.
-//   - A complex algorithmic setup that decides what book/category databases to query. This will likely look like some kind of heirarchy of centroid/quantized vectorDBs.
-// 3. Post Creator (AI)
-//   - Adaptable Cansiter or set of canisters.
-//   - A set of AI models that designed to 'decorate' Posts with upgrades.
-// 4. Posts (SBTs).
-//   - Like an NFT but adds special attributes unique to you, always adaptable as you add and change stuff.
-//   - Upgradable build your own kind of thing (UI Challenge).
-
-
-
-// Offchain Endevour: 
-// - Everything to Epub converter portal.
+/// Inserts an asset's name and value in the map, returning the previous value.
+#[ic_cdk_macros::update]
+fn insert(key: String, value: Vec<u8>) -> Option<Vec<u8>> {
+    ASSETS.with(|p| p.borrow_mut().insert(key, value))
+}

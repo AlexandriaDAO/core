@@ -17,4 +17,8 @@ service : {
     "bookmark_sc" : (post_id : nat64) -> ();
     "get_bookmarks" : () -> (vec opt SourceCard) query;
     "whoami" : (text) -> (text) query;
+
+
+    "get": (text) -> (opt blob) query;
+    "insert": (text, blob) -> (opt blob);
 };
