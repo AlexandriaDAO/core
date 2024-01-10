@@ -4,10 +4,54 @@ pub use source_cards::{save_sc, bookmark_sc, delete_sc, get_sc, get_bookmarks};
 mod weaviate;
 pub use weaviate::get_weaviate_query;
 
-#[ic_cdk::query]
+use ic_cdk_macros::{query};
+
+
+#[query]
 pub fn whoami(name: String) -> String {
     format!("Logged in with Principal: {}!", name)
 }
+
+
+
+
+// Satilites now introduced as a package from juno.
+// So instead of a collection key being the name of the juno account, it could be the principal of the uploader. 
+// In this way each uploader has their own collection. That's the plan at least, for now.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Now I have to serialize the books in the frontend, and pass it here as a u8 vector.

@@ -1,5 +1,7 @@
 [workspace]
 members = [
     "src/ugd_backend",
+    "src/ugd_backend/db/satellite",
+    "src/ugd_backend/db/shared",
 ]
 resolver = "2"
