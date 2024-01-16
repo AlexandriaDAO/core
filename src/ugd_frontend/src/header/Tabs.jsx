@@ -81,25 +81,23 @@ const Tabs = () => {
                   : "64.5%",
             }}
           ></div>
-          {tabs.map((tab) => (
-            <>
-              <Menu.Item
-                key={tab}
-                name={tab}
-                active={activeItem === tab.toLowerCase()}
-                onClick={() => handleItemClick(tab)}
-                style={{
-                  fontSize: "28px",
-                  fontWeight: "bold",
-                  fontFamily: "Arial",
-                  color: "white",
-                  flex: 1,
-                  textAlign: "center",
-                  borderRadius: "10px 10px 0 0",
-                }}
-              />
-            </>
-          ))}
+          {tabs.map((tab) =>
+            <Menu.Item
+              key={tab}
+              name={tab}
+              active={activeItem === tab.toLowerCase()}
+              onClick={() => handleItemClick(tab)}
+              style={{
+                fontSize: "28px",
+                fontWeight: "bold",
+                fontFamily: "Arial",
+                color: "white",
+                flex: 1,
+                textAlign: "center",
+                borderRadius: "10px 10px 0 0",
+              }}
+            />
+          )}
         </div>
       </div>
     </>
