@@ -42,50 +42,139 @@ sudo apt-get upgrade nodejs`
 
 ### Project Concept
 
-UncensoredGreats imagines a world where digital information, instead of being scattered across hyperlinked web pages, is unified in a single-page application, powered by AI, with humans guiding the process. This model reimagines the internet as a collection of standardized, interconnected html pages, akin to ebooks, navigated through intuitive UI cards that call AI functions on a drag-and-drop whiteboard.
+We imagine an Internet where search and social, instead of being scattered across divergent hyperlinks; all flow from one hub of linearly-linked, AI-retrievable, primary sources.
 
-This paradigm allows for seamless access, organization, and sharing of global information on one platform, fostering an ecosystem where data is not just consumed but interacted with, challenged, and contributed to by users. It's a bold step towards an interconnected digital realm, where knowledge is not just passively received but actively shaped and owned by its contributors.
+UncensoredGreats shares the core functionality of the Big Tech Search and Social but with a few key distinctions.
+
+Differences from Search:
+
+- All source material is in Ebooks instead of Webpages (linear HTML instead of divergent HTML).
+- Search engine keyword matching of webpage metadata (e.g., Google Search) is replaced with vector similarity applied to book snippets (search by semantic meaning).
+- All data has an owner: Ebooks are owned as Non-Fungible Tokens (NFTs) and content generated from them is owned as Soul-Bound Tokens (SBTs).
+
+Differences from Social:
+
+- Posts are templated and AI-assisted. Users have complete freedom to use any source material but are limited in that they must use source material (books).
+- Every content post is created from, and fixed to its primary source(s), accessible without the ‘infinite scroll’ or compulsive tab switching we’re used to.
+- Sorting algorithms steeply deprioritize recency. It’s a ‘Timeless Media’ where posts are about timeless ideas, sorted by category, and ranked by popularity, regardless of whether it’s been 5 minutes or 5 years.
+
+Since of course, all platform data is hosted on-chain and owned by someone, there are the typical Web3-native attributes like DAO Governance and Token Incentives. It costs something to host—and rewards something when used, which is our natural quality filter. While the potential scale of content is infinite, only the best source material is worth persisting.
+
+In short, UncensoredGreats is a distraction-free digital home with content ownership at its core.
+
+Web2 belonged to those companies best at capturing and leveraging user data. Web3 will belong to those best at parsing and reclaiming it for the user. 
+
+UncensoredGreats is tackling the ‘Web3 data economy’ on a scale and with a generality of data types that is wholly unfamiliar to crypto, and comprehensible only in relationship to the historical context of its Big Tech counterparts.
 
 #### Problem
 
-Hyperlinks, the 1960s invention that immortalized Web surfing as we know it; is insufficient in effectively traversing the quality, quantity, and variety of digital information that exists today.
+Hyperlinks, the 1960s invention that immortalized Web surfing as we know it; are a suboptimal medium for effectively traversing the quality, quantity, and variety of digital information that exists today.
 
 Just ask yourself, what does it take to get a nuanced overview of any subject on the Internet? 
 
-You generally need to click around and pass through a combination of web pages, podcasts, blogs, YouTube videos, etc. At each step, you pass through a hyperlink; leave all the findings from the last hyperlink behind, and have to sort through the irrelevant information of the next one to get new findings. Every hyperlink that you click has been curated for you by advertisers and proprietary services, and the content of each generally comes from an anonymous owner who doesn’t cite sources.
+You generally need to click around and pass through a combination of web pages, podcasts, blogs, YouTube videos, etc. At each step, you pass through a hyperlink; leave all the findings from the last hyperlink behind, and have to sort through the irrelevant information of the next one to get new findings.
 
-Despite having a sea of endless information at our fingertips, just carving out some virtual space to aggregate a single coherent and cross-referenced argument is impracticable.
+Every hyperlink that you click has been curated for you by advertisers and proprietary services, and the content of each generally comes from some random guy, whose reputation you have to guess while reading/listening.
 
-LLMs like ChatGPT implement a partial fix by letting machines be the aggregators. They give quick answers but with no primary sources or ability to convey what internal bias may inform their answers. Since their training data is a mixed bag, LLMs are poorly equipped to represent the position of a particular person or group, and their precision diminishes in the abstract.
+Despite having a sea of endless information at our fingertips, we are no closer to knowing what is True.
 
-The Internet’s hyperlink design, paywalls, disparate hosting, and proprietary aggregators have made us completely accustomed to the shattered means through which we interface with digital information. It’s time to bring the world’s data to a single-page application, and put humans at the helm of these machine aggregators.
+LLMs like ChatGPT implement a partial fix by letting machines be the aggregators. They give quick answers but with limited knowledge of their input sources or ability to convey whatever internal bias may be at play. Since their training data is a mixed bag, LLMs are poorly equipped to represent the position of a particular person or group, and their precision diminishes in the abstract.
+
+The Internet’s hyperlink design, paywalls, disparate hosting, and proprietary aggregators have made us completely accustomed to the shattered means through which we interface with digital information. It’s time to bring the world’s data to a single hub, and put humans at the helm of its machine aggregators. It’s time for people to have not just The Web, but Their Web.
 
 #### Solution
 
-The Internet today could be thought of as disparate html pages (static sites) using custom javascript (dynamic platforms), connected via hyperlinks, and accessible through keyword-based search engines.
+The Internet from a user perspective could be thought of as disparate HTML (static sites) using custom javascript (dynamic platforms), connected via hyperlinks, and accessible through keyword-based search engines.
 
-UncensoredGreats could be thought of as uniform html pages (.epubs), using standardized javascript (epub.js), connected via UI cards, and accessible through a single AI search engine.
+UncensoredGreats could be thought of as uniform HTML (.epubs), using standardized javascript (epub.js), consecutively linked as pages, and accessible through a single AI search engine.
 
-Instead of clicking through many pages across many tabs—access, save, sort, and share the world’s information on a single page.
-Instead of copy/paste/reorg of site snippets in a doc—bookmark findings in a whiteboard and reorg with AI.
-Instead of citing sources for your work, or simply ignoring it—have perfect providence tracking by default.
-Instead of referencing the posts/links of others in your own content—edit, fork, interact, or refute the originals of others on the public dashboard.
+- Instead of clicking through many pages across many tabs—access, save, sort, and share the world’s information on a single page.
+- Instead of copy/paste/reorg of site snippets in a text editor—bookmark findings in a whiteboard and reorg with AI.
+- Instead of citing sources for your work, or intentionally omitting them—have perfect providence tracking by default.
+- Instead of referencing the posts/links of others in your own content—edit, fork, interact, or refute the originals of others on the public dashboard.
 
-These capabilities arise because all app data, stored entirely on-chain, has an owner at every level of abstraction. Consequently, everything from the ebook to a concise AI-generated summary is both owned by its creator and freely accessible to all.
+These capabilities arise because all app data, stored entirely on-chain, has an owner at every level of abstraction.
 
-The use of AI is restricted to the models and prompt specs of DAO Canisters only. In this way, the AI has no knowledge of what the user asks or wants, and so its output cannot be biased by the input. Rather, UncensoredGreats AI uses information from and about the books you’ve pulled from to generate replies based purely on the words of authors.
+Consequently, everything from the ebook to a concise AI-generated summary is both owned by its creator and freely accessible to all. This contrasts strongly with the Web2 paradigm whereby data is treated as if owned by whoever decides to copy it.
+
+The use of AI is restricted to pre-prompted models in DAO-approved Canisters. In this way, the AI does not know what the user asks or wants, its output cannot be biased by the user, and its authenticity can be ensured. 
+
+That said, UncensoredGreats AI lets you choose input from limitless source material and does everything to limit model censorship in the process. In other words, if the information you’re looking for is not in our database, and it exists somewhere, you can format it, add it, and use it without delay or permission.
+
+The only condition though, is that source material must be an ebook (.epub), but not necessarily books in the traditional sense.
 
 ### The Internet of Books
 
-Because the whole internet is based on hyperlinking, migrating everything into ebook format sounds counterintuitive. Here’s why and how it’s done.
+Because the Internet is based on hyperlinking, migrating everything into ebook format sounds counterintuitive, but this does not exclude audio/video/etc. It supercharges it, allowing a universal search engine (if the content of Bing/YouTube/Spotify/etc. fell under the same roof). Here’s why and how it’s done.
 
-Ebooks, or the epub file standard, has little to do with books. That’s just their primary use case. A 100-page ebook is better thought of as 100 threaded hyperlinks. It can host audio and video embeddings like any website, but that content is logically indexed and categorically segmented so it can be read linearly.
+The epub file standard, while having books as its primary use case, is more of an information formatting paradigm than a universal standard for digital books. Consider the concept of the codex, or the stack of pages in a single binding that we now think of as a book. Before the first century AD, every book was a scroll, and every scroll was a book. To reference something in a book, you had to find the right scroll on the right shelf and unravel it on a long table. With the codex, you could now just flip through pages. Plus you got to write on both sides of the page!
 
-This contrasts strongly with the html pages of today, which are threaded together semi-randomly as fragments, hence the names Web and Net. Ebooks only thread html pages in a straight line, ensuring all data retains the logical coherence of a monograph.
+In our Internet of Books, a webpage (.html) is to a scroll as a book (.epub) is to a codex. The word book is arbitrary here in the sense that .epub files can embed audio and video like any webpage. Still, it’s helpful in the same sense as the codex: The format imposes a standard for indexing and categorizing the information inside, which in turn, makes it way easier to reference.
 
-The DAO will provide an epub conversion service suite whereby members grow the epub database database, e.g., if someone wants to learn about a subject that isn’t in the existing database, they can aggregate a number of websites, podcasts, youtube videos, and of course books; and upload them to our service suite which then converts and refines all that data into ebooks.
+This contrasts strongly with the html pages of today, which are threaded together semi-randomly as fragments, hence the names Web and Net. Ebooks only thread html pages consecutively. This forces some level of logical coherence on the part of the author, which is also the reason there’s more ‘weight’ in reading/writing a book than in a blog or podcast of the same content.
 
-Users own and self-host these uploaded ebooks, and earn when others use them. If they are not the rightful owner of that intellectual property, it’s true author can reclaim ownership via a DAO proposal, at which point they are also paid retroactively for all revenue generated from their book.
+To make this transition easy enough for anyone to participate, UncensoredGreats will provide an epub conversion suite whereby members grow the epub database with any information they like. If someone wants to learn about a subject that isn’t in the existing database, they can aggregate websites, podcasts, videos, and of course books and upload them in a bundle to our service suite. What they receive back is an accordingly formatted ebook, where the original content type (audio/video) is preserved, but under the hood is converted text that makes video clips and podcast moments searchable just like any other paragraph of the book.
+
+Users own and self-host these uploaded ebooks, including all the data and assets they contain, 100% on-chain as NFTs. These book NFTs earn revenue when others search/use/download/trade them.
+
+If they are not the rightful owner of that intellectual property, its true author can reclaim ownership through a governance mechanism, at which point they can claim retroactive pay for all revenue generated from their content.
+
+While UncensoredGreats remains centralized and without DAO governance, we’ll stick to the use of conventional ebooks with embedded metadata such as publisher, ISBN, and publication date to avoid pirating copyrighted content.
+
+### How it Works
+
+When you arrive on UncensoredGreats.com, you’ll see a search box with a grid of categories below that represent the active database you’re searching.
+
+Each category opens into a library of Ebooks that you can save and read—just like Kindle, but with no downloads or payment.
+
+As you type in the search box, or meddle with settings, the category grid reorganizes in real time; always reflecting the active part of the database you’re searching.
+
+Your search results return the most related sources from various books. These sources can be collected, customized, and always point to an E-book location; much like the annotation feature of a typical e-reader.
+
+You can add a group of collected sources in a post using pre-prompted AI functions that analyze the text. 
+
+You can use different AI functions to ‘decorate’ your group of sources with different summarization/sentiment-analysis techniques. Making these posts public turns them into Soul-Bound-Tokens that rewards you when others interact with it.
+
+The underpinnings of this high-level experience can be understood as four low-level components:
+
+Read (NFTs)
+Search (Vector DB)
+Create (AI)
+Post (SBTs)
+
+#### Read
+UncensoredGreats is first and foremost a library. All its books are available to read on-site.
+
+These books come from a portal where a user uploads an ebook and mints it as an NFT.
+
+These book NFTs contain (1) the .epub file itself, (2) an autogenerated .csv of the book’s parsed data, (3) and the embedded metadata (title, author, publisher, ISBN, etc.).
+
+The associated .csv file is converted to a vector database cluster, of which the Book NFT becomes the key through which it is accessed.
+
+#### Search
+The associated .csv file is separated by paragraph and added to a Qdrant-based VectorDB, of which the Book NFT is the access key.
+
+The main site search bar navigates the VectorDB and returns the series of sources with the closest semantic meaning to the input query. These are distinct UI cards, about a paragraph in length.
+
+Sources open into the highlighted ebook section via the ebook. Users can change this highlighted section to adjust the source, making these like e-reader annotations/bookmarks that can be saved and shared as the site’s base content unit.
+
+#### Create
+Sources can be gathered and combined with pre-configured AI functions build-your-own-post kind of fashion.
+
+Posts take a variety of user-selected input sources, from any combination of books, and use pre-prompted AI functions to populate the post with a title, description, summary, sentiment analysis, etc.
+
+The structure and style of posts will change over time to match different use cases, but the core idea is to have AI take a series of ideas, related or unrelated, uniform or contradictory, literal or allegorical, and provide the insights that offer an unbias glimpse into what the provided sources convey.
+
+Posts can be bookmarked by others, which rewards UCG, and can also be commented on by others, but there are no other attributes, e.g., likes/dislikes/flag, and of course, no censorship.
+
+#### Post
+Posts are built around this idea of leveled abstraction for infinite ideas. At the highest level, a single headline. At the lowest level, all the parts of all the primary sources that idea comes from.
+
+Users are free to stay as shallow or go as deep as they like, all in a single place.
+
+This abstractive hierarchy is also applied to where posts are contained as well in a manner inspired by icebergcharts.com: Where a given subject is ‘the iceberg meme’, and hyperlinks to its constituent topics are added to iceberg based on perceived ‘depth’. Except here, we use posts instead of hyperlinks.
+
+These charts can be either public and collaborative or completely private. Their search visibility is fixed alone to popularity (#bookmarks) and the raw text content itself (visibility does not decay with time).
 
 ### Tokenomics
 
@@ -94,16 +183,15 @@ UncensoredGreats will have a native token, UC with a fixed supply of 21 Million.
 We honor Satoshi’s example concerning the hard cap, supply distribution, minting mechanism, and general philosophy of hard money (we hope).
 
 #### Distribution
+21 Million UCG, or 100% of the supply, will be initially allocated to the rewards pool, and have to be ‘mined’.
 
-Rewards Pool: 19.95M (95%)
-Initial Liquidity (Team): 1.05M (5%)
+The UCG treasury will have tapering emissions based on interactions with books and posts to those who created them. It’s similar to Bitcoin’s proof of work mining, except the ‘work’ is done by humans who make, read, and synthesize books (instead of computers that solve math puzzles).
 
-The token has no guarantee of utility/intrinsic value and should not be expected to increase in value.
+The token has no initial utility or function and has no reason to increase in value.
 
-The following plans are speculative, have no guarantee of being implemented, and will remain subject to change while project development is under centralized control.
+The following token-related plans are speculative, have no guarantee of being implemented, and will remain subject to change while project development is under centralized control.
 
 #### Utility
-
 Out of the gate, UCG will have zero utility or intrinsic value.
 
 UCG's intended utility is only relevant as UncensoredGreats moves toward architectural decentralization. 
@@ -122,21 +210,23 @@ UCG will have no other purpose. No platform perks, payment, or other in-app func
 
 Premium features are paid with the app-native UCG wallet. These will be autonomous nano payments in $ICP and potentially other hard assets like $ckBTC.
 
-4 actions require payment.
+4 actions require payment:
 
-Semantic search results, charged per result.
-AI functions, charged per 1k-tokens of the given model.
-Royalties on NFT Trading, of course.
-Minting NFTs, charged based on file size (.epub).
+- Semantic search results, charged per result.
+- AI functions, charged per 1k-tokens of the given model.
+- Royalties on NFT Trading, of course.
+- Minting NFTs, charged based on file size (.epub).
 
 New users will receive a 0.1 ICP sign-up bonus which should be plenty to get them going as the price of such actions is in the fractions of a penny. Read access to all data, including posts and Ebooks themselves, is always free.
 
 The revenue from these actions will either go to the NFT owner as a reward or the UncensoredGreats Team. Later, this team share is aimed at being distributed as revenue to DAO Stakers and the Cycles Wallets that pay for computation.
 
-Semantic Search: 40% Team / 60% NFT Owner.
-Fees on AI Functions: 60% Team / 40% NFT Owner.
-Ebook NFT trading: 5% Team / 95% NFT Owner.
-Cost to Mint Ebook NFTs: 100% to Team.
+- Semantic Search: 40% Team / 60% NFT Owner.
+- Fees on AI Functions: 60% Team / 40% NFT Owner.
+- Ebook NFT trading: 5% Team / 95% NFT Owner.
+- Cost to Mint Ebook NFTs: 100% to Team.
+
+The Team will be responsible for the payment for hosting all this data and platform upkeep while the project is in the Beta (centralized) phase. All team revenue allocations and expenses are aimed going completely to the DAO after this phase.
 
 There is a TBD DAO mechanism for retroactive pay to all authors who’ve had their books pirated, so they can reclaim whatever money was earned from their book, as well as ownership of that book.
 
@@ -144,7 +234,9 @@ There is a TBD DAO mechanism for retroactive pay to all authors who’ve had the
 
 95% of the supply is locked in a rewards pool exclusively accessible with a bookmarked() function, the sole mechanism for releasing UCG. 
 
-`bookmarked()`’s job is simple. It moves 1UCG from the pool to the wallet of the owner of a post that some other user just bookmarked. That’s it!
+`bookmarked()`’s job is simple. It moves UCG from the pool to the wallet of the owner of a post that some other user just bookmarked. That’s it!
+
+The amount of UCG released each time `bookmarked()` is called will start off high and decrease overtime in a taper effect similar to that of Bitcoin Mining.
 
 Since a new user has the freedom to bookmark endless posts, the value-bearing bookmark actions are only triggered when certain conditions are met by in-app spending.
 
@@ -161,7 +253,6 @@ In this way, UCG is a completely fair launch based on intellectual (not monetary
 So instead of raising money by launching a token to build a product, we built a product that launches a token as it raises money. We plan to set a new standard for fair launches.
 
 ### Inspiration
-
 In 1968, Doug Engelbart and his team presented “A Research Center for Augmenting Human Intellect” in San Francisco’s Civic Auditorium. It introduced:
 
 (1) A responsive human-machine interface.
@@ -174,12 +265,12 @@ Most remember this as the “Mother of all Demos” for obvious reasons. What mo
 
 During the 1950s and 60s, the entire CS field was convinced otherwise: That the primary use case of computation would be restricted to autonomous machines and artificial intelligence. Despite the last 70 years of evidence to the contrary, the modern equivalent of popular opinion seems to have not budged an inch. 
 
-AI research since then has been seen with the goal of emulating the human brain. That is, until the Transformer Model breakthrough from 2017’s Attention is All You Need. While most see this moment as the stepping stone to AGI, we see, through Engelbarts eyes, history repeating itself.
+AI research since then has proceeded intending to emulate the human brain. That is until the Transformer Model breakthrough from 2017’s Attention is All You Need Paper. While most see this moment as the stepping stone to AGI, we see, through Engelbart's eyes, history repeating itself.
 
 UncensoredGreats is not an AI startup. We don’t seek to change the field, but use it to do with the ‘AI’ of today what Engelbart did with the ‘AI’ of his day: Create a unified virtual sphere for human collaboration on anything and everything.
 
 Engelbart’s 50-year-old design was first a single page used by two people. It now extends to 200 million sites and 3.5 billion people. Along the way, hyperlinks became immortalized at the root, search engines their gateway; and the Internet, an infinite sea, explorable one click at a time.
 
-We now have the means to host, store, access, and transform all the Internet’s high-quality data in one single-page application with AI as the aggregator. Along the way, ebooks become immortalized at the root, vector search their gateway; explorable through LLM synthesizers.
+We now have the means to host, store, access, and transform all the Internet’s high-quality data in one single-page application. Along the way, ebooks become immortalized at the root, vector search their gateway; and LLMs, the perfect navigators to guide us through the infinite sea.
 
 ![Mother of all Demos (1968)](https://www.darpa.mil/DDM_Gallery/19968b_MOAD_619x316.jpg)
