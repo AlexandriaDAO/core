@@ -1,5 +1,6 @@
 ## Running the project locally
 
+
 ```bash
 # Starts the replica, running in the background
 dfx start --background
