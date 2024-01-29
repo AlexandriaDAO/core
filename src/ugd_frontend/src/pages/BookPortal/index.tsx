@@ -1,14 +1,13 @@
-import Epub, { EpubCFI } from "epubjs";
-import React, { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 
 import { FaGripVertical } from "react-icons/fa";
 import { FaGripHorizontal } from "react-icons/fa";
-import { ImSpinner11 } from "react-icons/im";
-import { CSVLink } from "react-csv";
-import BookUpload from "./BookUpload";
 import { initJuno, listDocs } from "@junobuild/core";
-import NFTCard from "./NFTCard";
+import Grid from "./Grid";
+import List from "./List";
+import NoBooks from "./NoBooks";
+import Loading from "./Loading";
+import Mint from "./Mint";
 
 const BookPortal = () => {
 	const [limit, setLimit] = useState<any>(1);
@@ -42,6 +41,19 @@ const BookPortal = () => {
 	}, [limit]);
 
 	const getTotalPages = () => Math.ceil(Number(data.matches_length) / limit);
+	const renderContent = () => {
+		// Show loading component while data is being fetched
+		if (loading) return <Loading />
+
+		// Check if there are items to display
+		if (data?.items?.length > 0) {
+			// Choose between grid or list view based on the 'view' state
+			return view === "grid" ? <Grid books={data.items}/> : <List books={data.items}/>;
+		}
+
+		// Display NoBooks component if there are no items
+		return <NoBooks />;
+	};
 
 	return (
 		<div className="relative h-full w-full min-h-screen p-4 font-sans">
@@ -59,7 +71,8 @@ const BookPortal = () => {
 						</select>
 
 						<div className="flex gap-2 ml-auto">
-							<BookUpload />
+							{/* <BookUpload /> */}
+							<Mint />
 
 							<FaGripVertical
 								onClick={() => setView("grid")}
@@ -79,130 +92,7 @@ const BookPortal = () => {
 							/>
 						</div>
 					</div>
-					{loading ? (
-						<div className="flex items-center mt-6 text-center border border-gray-800 rounded-lg h-auto py-10 bg-blue-200">
-							<div className="flex flex-col w-full px-4 mx-auto">
-								<div className="p-3 mx-auto text-blue-500 bg-blue-100 rounded-full ">
-									<ImSpinner11 className="animate-spin" />
-								</div>
-								<h1 className="mt-3 text-lg font-semibold text-gray-800 ">
-									Loading
-								</h1>
-								<p className="mt-2 text-base text-gray-500 ">
-									Please wait while we are loading your NFT's
-								</p>
-							</div>
-						</div>
-					) : data?.items.length > 0 ? (
-						<div className="transition duration-300">
-							{view == "grid" ? (
-								<div className="grid md:grid-cols-4 grid-cols-2 gap-6">
-									{data &&
-										data.items.length > 0 &&
-										data.items.map(
-											(
-												{ data: book }: any,
-												index: number
-											) => (
-												<NFTCard
-													bookData={book}
-													key={index}
-												/>
-											)
-										)}
-								</div>
-							) : (
-								<div className="flex items-start mt-6 justify-center border rounded overflow-x-auto h-auto">
-									<table className="w-full text-sm text-left text-gray-500 h-full">
-										<thead className="text-xs text-gray-700 uppercase bg-gray-50 ">
-											<tr>
-												<th
-													scope="col"
-													className="py-3 px-6"
-												>
-												
-												</th>
-												<th
-													scope="col"
-													className="py-3 px-6"
-												>
-													Title
-												</th>
-												<th
-													scope="col"
-													className="py-3 px-6"
-												>
-													Author
-												</th>
-												<th
-													scope="col"
-													className="py-3 px-6 text-center"
-												>
-													Status
-												</th>
-												<th
-													scope="col"
-													className="py-3 px-6 text-center"
-												>
-													Data
-												</th>
-												<th
-													scope="col"
-													className="py-3 px-6"
-												>
-													Actions
-												</th>
-											</tr>
-										</thead>
-										<tbody>
-										{data &&
-											data.items.length > 0 &&
-											data.items.map(
-												(
-													{ data: book }: any,
-													index: number
-												) => (
-													<NFTCard
-														bookData={book}
-														view="list"
-														key={index}
-													/>
-												)
-											)}
-										</tbody>
-									</table>
-								</div>
-							)}
-						</div>
-					) : (
-						<div className="flex items-center mt-6 text-center border border-gray-800 rounded-lg h-auto py-10 bg-blue-200">
-							<div className="flex flex-col w-full px-4 mx-auto">
-								<div className="p-3 mx-auto text-blue-500 bg-blue-100 rounded-full ">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-										strokeWidth="1.5"
-										stroke="currentColor"
-										className="w-6 h-6"
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-										/>
-									</svg>
-								</div>
-								<h1 className="mt-3 text-lg font-semibold text-gray-800 ">
-									No Books found
-								</h1>
-								<p className="mt-2 text-base text-gray-500 ">
-									You haven't uploaded any file yet. Feel
-									free to upload an ebook. Thank You!
-								</p>
-							</div>
-						</div>
-					)}
+					{renderContent()}
 
 					{data && data?.items.length > 0 && (
 						<div className="mt-6 sm:flex gap-4 sm:items-center sm:justify-between ">
@@ -227,7 +117,8 @@ const BookPortal = () => {
 							<div className="flex items-center ml-auto mt-4 gap-x-4 sm:mt-0">
 								<button
 									className={`flex items-center justify-center w-1/2 px-5 py-2 text-sm capitalize transition-colors duration-200 border border-gray-300  rounded-md sm:w-auto gap-x-2  ${
-										currentPage >= getTotalPages() || loading
+										currentPage >= getTotalPages() ||
+										loading
 											? "text-gray-800 bg-gray-300 "
 											: "text-gray-800 bg-white hover:bg-gray-100"
 									}`}
@@ -237,7 +128,10 @@ const BookPortal = () => {
 												?.key
 										)
 									}
-									disabled={currentPage >= getTotalPages() || loading}
+									disabled={
+										currentPage >= getTotalPages() ||
+										loading
+									}
 								>
 									<span>Go To Next Page</span>
 
