@@ -6,16 +6,6 @@ pub use weaviate::get_weaviate_query;
 
 use ic_cdk_macros::{query};
 
-// use satellite::storage::store::{
-//   commit_batch, count_assets as count_assets_store, create_batch, create_chunk, delete_asset,
-//   delete_assets, delete_domain, get_config as get_storage_config, get_content_chunks,
-//   get_custom_domains, get_public_asset, init_certified_assets, list_assets as list_assets_store,
-//   set_config as set_storage_config, set_domain,
-// };
-// use satellite::storage::types::interface::{
-//   AssetNoContent, CommitBatch, InitAssetKey, InitUploadResult, UploadChunk, UploadChunkResult,
-// };
-
 
 #[query]
 pub fn whoami(name: String) -> String {

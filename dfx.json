@@ -5,17 +5,6 @@
       "package": "ugd_backend",
       "type": "rust"
     },
-    "satellite": {
-			"candid": "src/ugd_backend/db/satellite/satellite.did",
-			"package": "satellite",
-			"type": "rust",
-			"declarations": {
-				"node_compatibility": true
-			},
-			"optimize": "cycles",
-      "gzip": true,
-			"metadata": [{ "name": "supported_certificate_versions", "content": "1,2" }]
-		},
     "internet_identity": {
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
