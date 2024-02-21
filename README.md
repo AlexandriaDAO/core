@@ -1,3 +1,45 @@
+For understanding Zeeshans Book Portal:
+
+- So, if I understand we store 3 things in juno (1) the .epub stored with `uploadfile()` (secondary storage 'stable/slow' storage) (2) the metadata .json stored with `setdoc()` ('fast/heap' storage). 
+
+(3) .CSV is created and parsed in real-time.
+(4) Book Covers is extracted in realtime.
+- How do you make/store the link that retreives the .epub?
+- We need better error handling for varied or incompatable book types. Right now I get a 'cannot use toLowerCase() because the field is empty' on a book I cannot find. (this will later need to be built into the mint function).
+
+If this is the case we just need to switch the store from the (1) .epub store to 'web3disk' (2) and the metadata to the nft mint function description field. Plus individual title/cover/etc. feilds (maybe).
+
+The Current NFT Mint Params I think we'll be going with: 
+"""
+description = {
+"title":"Alice's Adventures in Wonderland",
+"author":"Lewis Carroll",
+"description":"Some user-entered description…",
+"Pubyear":"1876", (we’re going to need to enforce with a slider to standardize format from range [-10,000-10,000] or something).
+"publisher":"User can write anything, but the metadata is usually preset.",
+"rights":"Public domain in the USA.",
+"language":"en",
+"mint":"2023-10-01T07:32:26Z",
+"modified":"2023-10-01T07:32:26Z", (last modified)
+"fiction":True
+"type":"e.g., [1,6,7]" (can be from 1-5 depending on how the subtypes are spread)
+"subtype":"e.g., [11, 17, 64, 72, 73]" (must always be 5)
+"ISBN":"The Actual ISBN, if any",
+}
+token_logo = "possibly_a_link_to the epub"
+token_name = "title I guess?"
+"""
+
+
+
+
+
+
+
+
+
+
+
 ## Running the project locally
 
 

@@ -6,14 +6,31 @@ pub use weaviate::get_weaviate_query;
 
 use ic_cdk_macros::{query};
 
+use std::error::Error;
+use std::fs::File;
+use std::path::Path;
+use csv::Reader;
 
 #[query]
 pub fn whoami(name: String) -> String {
     format!("Logged in with Principal: {}!", name)
 }
 
+fn read_csv<P: AsRef<Path>>(path: P) -> Result<Reader<File>, Box<dyn Error>> {
+  let file = File::open(path)?;
+  let reader = Reader::from_reader(file);
+  Ok(reader)
+}
 
+// I want to read the csv file from here: https://xo3nl-yaaaa-aaaap-abl4q-cai.icp0.io/csv/romeo-and-juliet.csv
 
+#[ic_cdk::query]
+fn greet() -> String {
+    match read_csv("src/ucg_search_backend/src/romeo-and-juliet_Contents.csv") {
+        Ok(rows) => format!("The first 5 rows are: {:?}", rows),
+        Err(e) => format!("Error: {}", e),
+    }
+}
 
 // Satilites now introduced as a package from juno.
 // So instead of a collection key being the name of the juno account, it could be the principal of the uploader. 

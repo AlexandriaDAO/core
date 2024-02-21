@@ -21,4 +21,6 @@ service : {
 
     "get": (text) -> (opt blob) query;
     "insert": (text, blob) -> (opt blob);
+
+    "greet" : () -> (text);
 };
