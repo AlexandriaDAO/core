@@ -161,3 +161,5 @@ const DDC: DDCType = {
     }
   }
 }
+
+export default DDC;

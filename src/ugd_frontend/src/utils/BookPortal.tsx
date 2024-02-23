@@ -1,10 +1,17 @@
 export const titleToFileName = (title: string) => {
-	return title
-		.toLowerCase() // convert to lowercase
-		.replace(/['"]/g, "") // remove apostrophes and quotes
-		.replace(/\s+/g, "-") // replace spaces with hyphens
-		.replace(/[^\w-]/g, ""); // remove any non-word (excluding hyphens) characters
+  // Check if 'title' is not a string or if it's undefined/null
+  if (typeof title !== 'string' || title == null) {
+      console.error('title must be a string and cannot be undefined or null');
+      return ''; // Return a default value or handle the error as appropriate
+  }
+
+  return title
+      .toLowerCase() // convert to lowercase
+      .replace(/['"]/g, "") // remove apostrophes and quotes
+      .replace(/\s+/g, "-") // replace spaces with hyphens
+      .replace(/[^\w-]/g, ""); // remove any non-word (excluding hyphens) characters
 }
+
 
 export const removeNewLines = (text: string) => {
 	return text.replace(/\r?\n|\r/g, "");
@@ -17,16 +24,24 @@ export const handleJSONDownload = (bookData:any) => {
     const blob = new Blob(
         [
             JSON.stringify({
-                title: bookData.title,
-                creator: bookData.creator,
-                description: bookData.description,
-                pubdate: bookData.pubdate,
-                publisher: bookData.publisher,
-                identifier: bookData.identifier,
-                language: bookData.language,
-                rights: bookData.rights,
-                modified_date: bookData.modified_date,
-            }),
+              title: bookData.title,
+              author: bookData.author,
+              description: bookData.description,
+              fiction: bookData.fiction,
+              type: bookData.type,
+              subtype: bookData.subtype,
+              pubyear: bookData.pubyear,
+              language: bookData.language,
+              publisher: bookData.publisher,
+              rights: bookData.rights,
+              isbn: bookData.isbn,
+
+              // not filled by user. Preset by backend.
+              asset: bookData.asset,
+              ucbg: bookData.ucbg,
+              minted: bookData.minted,
+              modified: bookData.modified,
+            })
         ],
         { type: "application/json" }
     );

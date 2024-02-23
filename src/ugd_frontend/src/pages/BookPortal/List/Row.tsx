@@ -114,7 +114,7 @@ const Row = ({ bookData }: any) => {
                 )}
             </td>
             <td className="py-4 px-6">{bookData.title}</td>
-            <td className="py-4 px-6">{bookData.creator}</td>
+            <td className="py-4 px-6">{bookData.author}</td>
             <td className="py-4 px-6">
                 <div className="relative grid items-center justify-center font-sans font-bold uppercase whitespace-nowrap select-none bg-green-500/20 text-green-900 py-1 px-2 text-xs rounded-md">
                     <span className="">Minted</span>

@@ -47,7 +47,6 @@ thread_local! {
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(1))),
         )
     );
-
 }
 
 

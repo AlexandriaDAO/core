@@ -137,9 +137,9 @@ const Card = ({ bookData }: any) => {
             </div>
             <div className="py-2 px-4 flex-grow flex flex-col justify-center">
                 <h4 className=" font-mono font-semibold text-md pt-1 text-gray-800 hover:text-blue-500 transition">
-                    {bookData.creator && bookData.creator.length > 20
-                        ? bookData.creator.substring(0, 20) + "..."
-                        : bookData.creator}
+                    {bookData.author && bookData.author.length > 20
+                        ? bookData.author.substring(0, 20) + "..."
+                        : bookData.author}
                 </h4>
                 <p className="font-mono font-regular text-base text-gray-600 hover:text-blue-500 transition">
                     {bookData.title && bookData.title.length > 40

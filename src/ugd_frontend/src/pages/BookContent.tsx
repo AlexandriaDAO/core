@@ -1,33 +1,35 @@
 import Epub, { EpubCFI } from "epubjs";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { titleToFileName } from "../utils/BookPortal"
 
 import { CSVLink } from "react-csv";
 
 const metadataHeaders = [
-	{label: "Title", key:"title"},
-	{label: "Creator", key:"creator"},
-	{label: "Description", key:"description"},
-	{label: "Published Date", key:"pubdate"},
-	{label: "Publisher", key:"publisher"},
-	{label: "Identifier", key:"identifier"},
-	{label: "Language", key:"language"},
-	{label: "Rights", key:"rights"},
-	{label: "Modified Date", key:"modified_date"},
+  {label: "Title", key: "title"},
+  {label: "Author", key: "author"},
+  {label: "Description", key: "description"},
+  {label: "Fiction", key: "fiction"},
+  {label: "Type", key: "type"},
+  {label: "Subtype", key: "subtype"},
+  {label: "Publication Year", key: "pubyear"},
+  {label: "Language", key: "language"},
+
+  {label: "Publisher", key: "publisher"},
+  {label: "Rights", key: "rights"},
+  {label: "ISBN", key: "isbn"},
+  // {label: "Asset ID", key: "asset"},
+  // {label: "UGBN", key: "ugbn"},
+  // {label: "Minted On", key: "minted"},
+  // {label: "Last Modified", key: "modified"},
 ];
+
 
 const contentHeaders = [
 	{label: "cfi", key:"cfi"},
 	{label: "text", key:"text"},
 ];
 
-function titleToFileName(title:string) {
-    return title
-        .toLowerCase() // convert to lowercase
-        .replace(/['"]/g, '') // remove apostrophes and quotes
-        .replace(/\s+/g, '-') // replace spaces with hyphens
-        .replace(/[^\w-]/g, ''); // remove any non-word (excluding hyphens) characters
-}
 function removeNewLines(text:string) {
 	return text.replace(/\r?\n|\r/g, "");
 }

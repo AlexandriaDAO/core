@@ -8,10 +8,10 @@ export class MetadataPanel extends UIPanel {
 		super.setId('metadata');
 
 		this.title = new UIText().setId('book-title');
-		this.creator = new UIText().setId('book-creator');
+		this.author = new UIText().setId('book-author');
 		this.separator = new UIText().setId('book-title-separator');
 
-		super.add([this.title, this.separator, this.creator]);
+		super.add([this.title, this.separator, this.author]);
 
 		//-- events --//
 
@@ -23,10 +23,10 @@ export class MetadataPanel extends UIPanel {
 
 	init(meta) {
 
-		document.title = meta.title + " – " + meta.creator;
+		document.title = meta.title + " – " + meta.author;
 
 		this.title.setValue(meta.title);
-		this.creator.setValue(meta.creator);
+		this.author.setValue(meta.author);
 		this.separator.dom.style.display = 'inline-block';
 	}
 }

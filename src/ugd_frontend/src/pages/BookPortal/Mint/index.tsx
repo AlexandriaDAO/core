@@ -45,17 +45,27 @@ const Mint = () => {
 
 		if (book) {
 			book.loaded.metadata.then((metadata: any) => {
-				setMetadata({
-                    "title": metadata?.title,
-                    "creator": metadata?.creator,
-                    "description": metadata?.description,
-                    "pubdate": metadata?.pubdate,
-                    "publisher": metadata?.publisher,
-                    "identifier": metadata?.identifier,
-                    "language": metadata?.language,
-                    "rights": metadata?.rights,
-                    "modified_date": metadata?.modified_date,
-                });
+        setMetadata({
+          "title": metadata?.title,
+          "author": metadata?.author,
+          "description": metadata?.description,
+          "fiction": metadata?.fiction,
+          "types": metadata?.type,
+          "subtypes": metadata?.subtype,
+          "pubyear": metadata?.pubyear,
+          "language": metadata?.language,
+
+          // Advanced Options (usually preset but the user can change)
+          "publisher": metadata?.publisher,
+          "rights": metadata?.rights,
+          "isbn": metadata?.isbn,
+
+          // Preset (user cannot set)
+          "asset": metadata?.asset,
+          "ugbn": metadata?.ugbn,
+          "minted": metadata?.minted,
+          "modified": metadata?.modified_date,
+        });
 			});
 			book.loaded.cover.then((coverPath: string) => {
 				book.archive.createUrl(coverPath).then((url: string) => {
