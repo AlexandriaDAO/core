@@ -8,6 +8,8 @@ import SelectedCard from './SelectedCard'
 import MessageContext from '@/contexts/MessageContext'
 import SkeltonLoading from './SkeltonLoading'
 import BookmarkedSourceCards from './BookmarkedSourceCards'
+import Preview from './Preview'
+import { AIProvider } from '@/contexts/AIContext'
 
 interface CardCreationPanelInterface {
     currentAuthorId: any
@@ -30,7 +32,13 @@ const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthor
 
     return (
         <>
-            {selectedSourceCards?.length ? <PreviewCard selectedSourceCards={selectedSourceCards} setSelectedSourceCards={setSelectedSourceCards} /> : null}
+            {
+                selectedSourceCards?.length > 0 &&
+                    <AIProvider>
+                        <Preview selectedSourceCards={selectedSourceCards} setSelectedSourceCards={setSelectedSourceCards} />
+                    </AIProvider>
+            }
+            {/* {selectedSourceCards?.length ? <PreviewCard selectedSourceCards={selectedSourceCards} setSelectedSourceCards={setSelectedSourceCards} /> : null} */}
             <div className='mainCardCreationPanel_Container'>
                 <div className="innerCardCreationPanel">
                     <div className="cardCreationPanelHeader">
@@ -43,7 +51,7 @@ const CardCreationPanel: React.FC<CardCreationPanelInterface> = ({ currentAuthor
                     </div>
 
 
-                    <div className={isOpened ? "cardCreationPanel_InnerContainer active" : "cardCreationPanel_InnerContainer"}>
+                    <div className={`${isOpened ? "cardCreationPanel_InnerContainer active" : "cardCreationPanel_InnerContainer"} !overflow-auto`}>
                         <div className="cardCreation_selectedCards">
                             <div className="header_selected_cards">
                                 <h2>Selecetd Cards</h2>

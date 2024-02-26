@@ -52,6 +52,13 @@ const PreviewCard: React.FC<PreviewCardInterface> = ({ selectedSourceCards, setS
         padding: grid,
     });
 
+
+
+
+    const summarize = ()=>{
+        console.log(selectedSourceCards);
+    }
+
     return (
         <div className='mainPreviewCardsContainer' >
             <div className="innerPreviewContainer">
@@ -103,8 +110,8 @@ const PreviewCard: React.FC<PreviewCardInterface> = ({ selectedSourceCards, setS
                         </div>
                         <div className="previewCardCta">
 
-                            <button>Sumarize</button>
-                            <button>Ai Output</button>
+                            <button onClick={summarize}>Sumarize</button>
+                            <button >Ai Output</button>
                             <button>Rating</button>
                             <button>Optimze Results</button>
                         </div>
