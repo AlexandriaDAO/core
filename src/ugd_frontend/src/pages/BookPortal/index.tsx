@@ -10,7 +10,7 @@ import Loading from "./Loading";
 import Mint from "./Mint";
 
 const BookPortal = () => {
-	const [limit, setLimit] = useState<any>(1);
+	const [limit, setLimit] = useState<any>(10);
 	const [view, setView] = useState("grid");
 	const [data, setData] = useState<any>(undefined);
 	const [currentPage, setCurrentPage] = useState<any>(undefined);
@@ -61,13 +61,13 @@ const BookPortal = () => {
 				<div className="col-span-3">
 					<div className="flex items-center mb-4">
 						<select
+              defaultValue="10"
 							onChange={(e) => setLimit(e.target.value)}
 							className="w-44 text-sm text-gray-600 py-3 px-4 cursor-pointer border-r-8 border-r-transparent shadow-sm rounded focus:ring-0 focus:outline-0"
 						>
-							<option value="1">1 Record Per Page</option>
-							<option value="3">3 Records Per Page</option>
-							<option value="5">5 Records Per Page</option>
+							<option value="5">5 Record Per Page</option>
 							<option value="10">10 Records Per Page</option>
+							<option value="20">20 Records Per Page</option>
 						</select>
 
 						<div className="flex gap-2 ml-auto">

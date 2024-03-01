@@ -9,6 +9,7 @@ import Author from './Author';
 import EReader from './EReader';
 import BookContent from './BookContent';
 import BookPortal from './BookPortal';
+import Manager from './Manager';
 import BookSummary from './BookSummary';
 import NotFound from "./NotFound";
 import "../styles/main.css";
@@ -39,6 +40,8 @@ const Layout = () => {
                     <Route path="ereader" element={<EReader />} />
                     <Route path="book-content" element={<BookContent />} />
                     <Route path="book-portal" element={<BookPortal />} />
+                    <Route path="book-portal" element={<BookPortal />} />
+                    <Route path="manager" element={<Manager />} />
                     <Route path="book-summary" element={<BookSummary />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>

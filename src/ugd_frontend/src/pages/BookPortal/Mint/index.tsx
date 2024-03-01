@@ -48,14 +48,14 @@ const Mint = () => {
         setMetadata({
           "title": metadata?.title,
           "author": metadata?.author,
-          "description": metadata?.description,
           "fiction": metadata?.fiction,
           "types": metadata?.type,
           "subtypes": metadata?.subtype,
           "pubyear": metadata?.pubyear,
-          "language": metadata?.language,
-
+          
           // Advanced Options (usually preset but the user can change)
+          "description": metadata?.description,
+          "language": metadata?.language,   // defaults to en
           "publisher": metadata?.publisher,
           "rights": metadata?.rights,
           "isbn": metadata?.isbn,
