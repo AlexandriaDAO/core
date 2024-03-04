@@ -5,15 +5,20 @@ import { CSVLink } from "react-csv";
 
 import { PiFileCsvThin } from "react-icons/pi";
 import { BsCart2, BsFiletypeJson } from "react-icons/bs";
+import { FaRegTrashCan } from "react-icons/fa6";
 import { Modal } from "antd";
 import BookModal from "@/components/BooksCard/BookModal";
 import { handleJSONDownload, removeNewLines, titleToFileName } from "@/utils/BookPortal";
+import { deleteAsset, deleteDoc, listDocs } from "@junobuild/core";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 
-const Card = ({ bookData }: any) => {
+const Card = ({item}: any) => {
+    const { data: bookData} = item;
 	const bookAreaRef = useRef(null);
 
 	const [book, setBook] = useState<any>(null);
+    const [deleting, setDeleting] = useState(false);
 	const [contents, setContents] = useState<any>([]);
 	const [cover, setCover] = useState<any>(null);
 	const [isBookModalVisible, setIsBookModalVisible] = useState(false);
@@ -73,6 +78,40 @@ const Card = ({ bookData }: any) => {
 			});
 		}
 	}, [book]);
+
+    const deleteBook = async () => {
+        setDeleting(true);
+
+        try {
+            const books = await listDocs({
+                collection: "books",
+            });
+            let related:any = []
+            if(books.items.length>0){
+                related = books.items.filter( (book:any)=> book.data.url == bookData.url );
+            }
+
+            if(related.length <=1){
+                await deleteAsset({
+                    collection: "uploads",
+                    fullPath: bookData.url.split("icp0.io")[1]
+                })
+            }
+
+            await deleteDoc({
+                collection: "books",
+                doc: item
+            })
+
+            alert('book deleted')
+            window.location.reload();
+        } catch (error) {
+            alert('an error occured while deleting');
+            console.error(error);
+        } finally {
+            setDeleting(false);
+        }
+    }
 
 	return (
         <div className="bg-white shadow rounded overflow-hidden flex flex-col justify-between">
@@ -183,6 +222,14 @@ const Card = ({ bookData }: any) => {
                     <BsCart2 size={18} />
                     Sell in Marketplace
                 </button>
+                { deleting ?
+                    <button disabled className="spin px-2 py-1 rounded-tl rounded-bl transition flex-grow bg-red-300 text-white font-bold rounded flex justify-center items-center gap-1" >
+                        <AiOutlineLoading3Quarters className="animate-spin" /> Deleting Book
+                    </button> :
+                    <button onClick={deleteBook} className="px-2 py-1 rounded-tl rounded-bl transition flex-grow bg-red-500 hover:bg-red-700 text-white font-bold rounded flex justify-center items-center gap-1" >
+                        <FaRegTrashCan size={18} /> Delete Book
+                    </button>
+                }
             </div>
         </div>
 	);

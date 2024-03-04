@@ -40,7 +40,6 @@ const Layout = () => {
                     <Route path="ereader" element={<EReader />} />
                     <Route path="book-content" element={<BookContent />} />
                     <Route path="book-portal" element={<BookPortal />} />
-                    <Route path="book-portal" element={<BookPortal />} />
                     <Route path="manager" element={<Manager />} />
                     <Route path="book-summary" element={<BookSummary />} />
                     <Route path="*" element={<NotFound />} />
