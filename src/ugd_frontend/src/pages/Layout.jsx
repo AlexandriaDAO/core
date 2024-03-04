@@ -9,10 +9,11 @@ import Author from './Author';
 import EReader from './EReader';
 import BookContent from './BookContent';
 import BookPortal from './BookPortal';
-import Manager from './Manager';
+import MeiliManager from './MeiliManager';
 import BookSummary from './BookSummary';
 import NotFound from "./NotFound";
 import "../styles/main.css";
+
 
 const Layout = () => {
     return (
@@ -41,7 +42,7 @@ const Layout = () => {
                     <Route path="book-content" element={<BookContent />} />
                     <Route path="book-portal" element={<BookPortal />} />
                     <Route path="book-portal" element={<BookPortal />} />
-                    <Route path="manager" element={<Manager />} />
+                    <Route path="manager" element={<MeiliManager />} />
                     <Route path="book-summary" element={<BookSummary />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
