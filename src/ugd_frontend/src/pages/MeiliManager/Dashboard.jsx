@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import client from '../../utils/MeiliSearchClient';
 import useMeiliUtils from './MeiliUtils';
+import SetFilters from './SetFilters';
 
 const Dashboard = () => {
   const {
@@ -23,7 +24,7 @@ const Dashboard = () => {
     fetchStats,
     fetchIndexSettings,
     fetchFilterableAttributes,
-    updateFilterableAttributes,
+    updateFilters,
   } = useMeiliUtils();
 
   useEffect(() => {
@@ -44,6 +45,32 @@ const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [currentView, setCurrentView] = useState(null);
 
+
+
+
+
+  // Options for Filter updating.
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const allowedFields = ['fiction', 'type', 'subtype', 'pubyear', 'id', 'title', 'author'];
+
+  const openModal = (index) => {
+    setActiveIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleConfirm = async (fields) => {
+    if (!activeIndex) return;
+    console.log(`Updating ${activeIndex} with fields:`, fields);
+    await updateFilters(activeIndex, fields);
+    closeModal();
+  };
+
+
   return (
     <div>
       <label style={{ marginBottom: '8px', display: 'block' }}>
@@ -60,14 +87,14 @@ const Dashboard = () => {
         <button onClick={createIndex} style={{ marginRight: '8px', backgroundColor: 'green' }}>Create Index</button>
       </div>
 
-      <button onClick={() => fetchTasks()}>Fetch Tasks</button>
+      <button onClick={() => fetchTasks()}>Recent Tasks</button>
       <button onClick={() => fetchStats()}>Cluster Statistics</button>
 
       <div>
         <ul style={{ listStyleType: 'none', padding: 0 }}>
           {tasks.map((task, index) => (
             <li key={index} style={{ marginBottom: '8px' }}>
-              Task ID: {task.uid}, Status: {task.status}
+              Task ID: {task.uid}, Status: {task.status}, type: {task.type}
             </li>
           ))}
         </ul>
@@ -94,6 +121,7 @@ const Dashboard = () => {
             <button onClick={() => { setActiveIndex(index); setCurrentView('settings'); fetchIndexSettings(index); }}>Show Settings</button>
             <button onClick={() => { setActiveIndex(index); setCurrentView('filters'); fetchFilterableAttributes(index); }}>Show Available Filters</button>
             <button onClick={() => { setActiveIndex(index); setCurrentView('stats'); fetchStats(index); }}>Show Stats</button>
+            <button onClick={() => { setActiveIndex(index); setCurrentView('modal'); openModal(index); }}>Update Filters</button>
           </div>
 
           {activeIndex === index && currentView === 'settings' && (
@@ -120,8 +148,19 @@ const Dashboard = () => {
               <pre>{JSON.stringify(indexStats, null, 2)}</pre>
             </div>
           )}
+
+          {activeIndex === index && currentView === 'modal' && (
+            <SetFilters isOpen={isModalOpen} onClose={closeModal} onConfirm={handleConfirm} allowedFields={allowedFields} />
+          )}
+
+          {/* <button onClick={() => openModal(index)}>Update Filterable Attributes</button> */}
+        
+        
         </div>
       ))}
+
+      {/* <SetFilters isOpen={isModalOpen} onClose={closeModal} onConfirm={handleConfirm} allowedFields={allowedFields} /> */}
+
     </div>
   );
 };

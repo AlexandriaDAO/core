@@ -92,15 +92,13 @@ const useMeiliUtils = (selectedIndex) => {
     setFilterableAttributes(attributes);
   };
 
-  const updateFilterableAttributes = async (index) => {
-    await client.index(index).updateFilterableAttributes([
-      'fiction',
-      'type',
-      'subtype',
-      'pubyear',
-      // User can optionally remove these or add title, author, id.
-    ]);
-    fetchFilterableAttributes();
+  const updateFilters = async (index, fields = ['fiction', 'type', 'subtype', 'pubyear', 'id', 'title', 'author']) => {
+    // Ensure only allowed fields are updated
+    const allowedFields = ['fiction', 'type', 'subtype', 'pubyear', 'id', 'title', 'author'];
+    const filteredFields = fields.filter(field => allowedFields.includes(field));
+  
+    await client.index(index).updateFilterableAttributes(filteredFields);
+    fetchFilterableAttributes(index);
   };
 
   useEffect(() => {
@@ -135,7 +133,7 @@ const useMeiliUtils = (selectedIndex) => {
     fetchStats,
     fetchIndexSettings,
     fetchFilterableAttributes,
-    updateFilterableAttributes,
+    updateFilters,
   };
 };
 
