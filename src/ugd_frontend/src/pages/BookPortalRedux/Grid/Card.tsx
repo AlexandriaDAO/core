@@ -48,6 +48,10 @@ const Card = ({item}: any) => {
 
 			book.loaded.spine.then(async (spine: any) => {
 				const contents: any = [];
+                // contents.push({
+                //     "cfi": 'metadata',
+                //     'text': JSON.stringify(bookData)
+                // })
 
 				for (let item of (spine as any).items) {
 					if (!item.href) return;
@@ -121,7 +125,7 @@ const Card = ({item}: any) => {
                 {cover ? (
                     <img
                         src={cover}
-                        alt={bookData.title}
+                        alt={bookData?.title}
                         className="w-full h-52 object-cover"
                     />
                 ) : (
@@ -183,25 +187,33 @@ const Card = ({item}: any) => {
                 <p className="font-mono font-regular text-base text-gray-600 hover:text-blue-500 transition">
                     {bookData.title && bookData.title.length > 40
                         ? bookData.title.substring(0, 40) + "..."
-                        : bookData.title}
+                        : bookData?.title}
                 </p>
             </div>
             <div className="flex flex-wrap justify-between items-center w-full rounded text-sm font-semibold gap-2 p-2">
-                <button
+                {/* <button
                     onClick={()=>handleJSONDownload(bookData)}
                     className="px-2 py-1 rounded-tl rounded-bl transition flex-grow bg-blue-500 hover:bg-blue-700 text-white font-bold rounded flex justify-center items-center gap-1"
                 >
                     <BsFiletypeJson size={18} />
                     Metadata
-                </button>
+                </button> */}
+                { deleting ?
+                    <button disabled className="spin px-2 py-1 rounded-tl rounded-bl transition flex-grow bg-red-300 text-white font-bold rounded flex justify-center items-center gap-1" >
+                        <AiOutlineLoading3Quarters className="animate-spin" /> Deleting Book
+                    </button> :
+                    <button onClick={deleteBook} className="px-2 py-1 rounded-tl rounded-bl transition flex-grow bg-red-500 hover:bg-red-700 text-white font-bold rounded flex justify-center items-center gap-1" >
+                        <FaRegTrashCan size={18} /> Delete Book
+                    </button>
+                }
                 <CSVLink
                     filename={
                         titleToFileName(bookData.title) +
                         "_Contents.csv"
                     }
                     headers={[
-                        { label: "cfi", key: "cfi" },
-                        { label: "text", key: "text" },
+                        { label: "metadata", key: "cfi" },
+                        { label: JSON.stringify(bookData), key: "text" },
                     ]}
                     data={contents}
                     className={`px-2 py-1 rounded-tr rounded-br transition flex-grow font-bold rounded flex justify-center items-center gap-1 ${
@@ -222,14 +234,7 @@ const Card = ({item}: any) => {
                     <BsCart2 size={18} />
                     Sell in Marketplace
                 </button>
-                { deleting ?
-                    <button disabled className="spin px-2 py-1 rounded-tl rounded-bl transition flex-grow bg-red-300 text-white font-bold rounded flex justify-center items-center gap-1" >
-                        <AiOutlineLoading3Quarters className="animate-spin" /> Deleting Book
-                    </button> :
-                    <button onClick={deleteBook} className="px-2 py-1 rounded-tl rounded-bl transition flex-grow bg-red-500 hover:bg-red-700 text-white font-bold rounded flex justify-center items-center gap-1" >
-                        <FaRegTrashCan size={18} /> Delete Book
-                    </button>
-                }
+                
             </div>
         </div>
 	);

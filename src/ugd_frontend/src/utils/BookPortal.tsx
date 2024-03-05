@@ -1,6 +1,6 @@
 export const titleToFileName = (title: string) => {
   // Check if 'title' is not a string or if it's undefined/null
-  if (typeof title !== 'string' || title == null) {
+  if (typeof title !== 'string' || title == null || title == undefined) {
       console.error('title must be a string and cannot be undefined or null');
       return ''; // Return a default value or handle the error as appropriate
   }
