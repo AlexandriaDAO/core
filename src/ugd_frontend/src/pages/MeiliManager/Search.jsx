@@ -1,7 +1,10 @@
+// Basic search for If/When we want to add, but this will likely be replaced with instantsearch.
+
+
 import React, { useState, useEffect } from 'react';
 import client from '../../utils/MeiliSearchClient'; // Adjust the path as necessary
 
-const SearchComponent = ({ selectedIndex }) => {
+const Search = ({ selectedIndex }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
@@ -37,4 +40,4 @@ const SearchComponent = ({ selectedIndex }) => {
   );
 };
 
-export default SearchComponent;
+export default Search;

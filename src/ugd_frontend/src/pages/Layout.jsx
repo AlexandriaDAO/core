@@ -10,10 +10,11 @@ import EReader from './EReader';
 import BookContent from './BookContent';
 import BookPortal from './BookPortal';
 import BookPortalRedux from './BookPortalRedux';
-import Manager from './Manager';
+import MeiliManager from './MeiliManager';
 import BookSummary from './BookSummary';
 import NotFound from "./NotFound";
 import "../styles/main.css";
+
 
 const Layout = () => {
     return (
