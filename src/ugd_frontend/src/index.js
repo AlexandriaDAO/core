@@ -1,5 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
+import store from './store'
+import { Provider } from 'react-redux'
 import WebFont from "webfontloader";
 import MessageProvider from "./utils/MessageProvider";
 import { AuthorProvider } from "./contexts/AuthorContext";
@@ -51,11 +53,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const root = createRoot(semanticLibraryRoot);
     root.render(
       <React.StrictMode>
-        <AuthorProvider>
-          <SettingsProvider>
-            <App />
-          </SettingsProvider>
-        </AuthorProvider>
+        <Provider store={store}>
+          <AuthorProvider>
+            <SettingsProvider>
+              <App />
+            </SettingsProvider>
+          </AuthorProvider>
+        </Provider>
       </React.StrictMode>
     );
   }

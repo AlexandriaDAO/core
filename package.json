@@ -30,6 +30,7 @@
     "@hello-pangea/dnd": "^16.3.0",
     "@junobuild/core": "^0.0.44",
     "@mlc-ai/web-llm": "^0.2.18",
+    "@reduxjs/toolkit": "^2.2.1",
     "@types/react-star-rating-component": "^1.4.3",
     "antd": "^5.8.5",
     "autoprefixer": "^10.4.16",
