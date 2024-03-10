@@ -43,7 +43,7 @@ const Layout = () => {
                     <Route path="book-content" element={<BookContent />} />
                     <Route path="book-portal" element={<BookPortal />} />
                     <Route path="book-portal-redux" element={<BookPortalRedux />} />
-                    <Route path="manager" element={<Manager />} />
+                    <Route path="manager" element={<MeiliManager />} />
                     <Route path="book-summary" element={<BookSummary />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>

@@ -1,11 +1,17 @@
 // MetaData.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import languages from "@/data/languages";
 import CategorySelect from "./Fields/CategorySelect";
 
 const MetaData = ({ metadata, setMetadata }: any) => {
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [selectedMainCategory, setSelectedMainCategory] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (metadata.fiction === undefined) {
+      setMetadata({ ...metadata, fiction: false });
+    }
+  }, []);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setMetadata({ ...metadata, language: e.target.value });

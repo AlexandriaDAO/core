@@ -93,16 +93,16 @@ const Card = ({item}: any) => {
             let related:any = []
             if(books.items.length>0){
                 related = books.items.filter( (book:any)=> book.data.url == bookData.url );
-            }
-
-            if(related.length <=1){
+              }
+              
+              if(related.length <=1){
                 await deleteAsset({
-                    collection: "uploads",
-                    fullPath: bookData.url.split("icp0.io")[1]
+                  collection: "uploads",
+                  fullPath: bookData.url.split("icp0.io")[1]
                 })
-            }
+              }
 
-            await deleteDoc({
+              await deleteDoc({
                 collection: "books",
                 doc: item
             })

@@ -3,6 +3,7 @@ import client from '../../utils/MeiliSearchClient';
 
 const useMeiliUtils = (selectedIndex) => {
   const [indexName, setIndexName] = useState('');
+  const [bookCSV, setBookCSV] = useState(''); // [csvContent, setCSVContent
   const [primaryKey, setPrimaryKey] = useState('id');
   const [tasks, setTasks] = useState([]);
   const [filter, setFilter] = useState('');
@@ -11,7 +12,6 @@ const useMeiliUtils = (selectedIndex) => {
   const [healthStatus, setHealthStatus] = useState('checking'); // 'checking', 'available', 'unavailable'
   const [indexSettings, setIndexSettings] = useState({});
   const [filterableAttributes, setFilterableAttributes] = useState([]);
-
 
   const createIndex = async () => {
     try {
@@ -22,6 +22,45 @@ const useMeiliUtils = (selectedIndex) => {
       alert('Failed to create index');
     }
   };
+
+  const addBook = (bookCSV) => {
+    try {
+      client.index(indexName).addDocuments(bookCSV);
+      alert('Book added successfully');
+      fetchTasks();
+    } catch (error) {
+      alert('Failed to add book');
+    }
+  }
+
+  // const addBook = (bookCSV) => {
+  //   try {
+  //     // Parse the CSV data using a CSV parsing library (e.g., Papa Parse)
+  //     const results = Papa.parse(bookCSV, {
+  //       header: true,
+  //       skipEmptyLines: true,
+  //       transformHeader: (header) => header.trim(),
+  //     });
+  
+  //     // Convert the parsed data to an array of objects
+  //     const documents = results.data.map((row) => ({
+  //       ...row,
+  //     }));
+  
+  //     // Add documents to Meilisearch index
+  //     client.index(indexName).addDocuments(documents);
+  //     alert('Book added successfully');
+  //     fetchTasks();
+  //   } catch (error) {
+  //     console.error('Failed to add book:', error);
+  //     alert('Failed to add book');
+  //   }
+  // };
+
+
+
+
+
 
   const fetchTasks = async () => {
     try {
@@ -114,6 +153,9 @@ const useMeiliUtils = (selectedIndex) => {
   return {
     indexName,
     setIndexName,
+    addBook,
+    bookCSV,
+    setBookCSV,
     primaryKey,
     setPrimaryKey,
     tasks,
