@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import client from '../../utils/MeiliSearchClient';
+import Papa from 'papaparse'
 
 const useMeiliUtils = (selectedIndex) => {
   const [indexName, setIndexName] = useState('');
-  const [bookCSV, setBookCSV] = useState(''); // [csvContent, setCSVContent
+  const [bookCSV, setBookCSV] = useState('');
   const [primaryKey, setPrimaryKey] = useState('id');
   const [tasks, setTasks] = useState([]);
   const [filter, setFilter] = useState('');
@@ -23,44 +24,23 @@ const useMeiliUtils = (selectedIndex) => {
     }
   };
 
-  const addBook = (bookCSV) => {
-    try {
-      client.index(indexName).addDocuments(bookCSV);
-      alert('Book added successfully');
-      fetchTasks();
-    } catch (error) {
-      alert('Failed to add book');
-    }
+  const addBook = (file, indexName) => {
+    Papa.parse(file, {
+      complete: function(results) {
+        const documents = results.data;
+        client.index(indexName).addDocuments(documents)
+          .then(() => {
+            alert('Book added successfully');
+            fetchTasks();
+          })
+          .catch((error) => {
+            console.error('Failed to add book:', error);
+            alert('Failed to add book');
+          });
+      },
+      header: true
+    });
   }
-
-  // const addBook = (bookCSV) => {
-  //   try {
-  //     // Parse the CSV data using a CSV parsing library (e.g., Papa Parse)
-  //     const results = Papa.parse(bookCSV, {
-  //       header: true,
-  //       skipEmptyLines: true,
-  //       transformHeader: (header) => header.trim(),
-  //     });
-  
-  //     // Convert the parsed data to an array of objects
-  //     const documents = results.data.map((row) => ({
-  //       ...row,
-  //     }));
-  
-  //     // Add documents to Meilisearch index
-  //     client.index(indexName).addDocuments(documents);
-  //     alert('Book added successfully');
-  //     fetchTasks();
-  //   } catch (error) {
-  //     console.error('Failed to add book:', error);
-  //     alert('Failed to add book');
-  //   }
-  // };
-
-
-
-
-
 
   const fetchTasks = async () => {
     try {

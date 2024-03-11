@@ -21,9 +21,6 @@ const App = () => {
     <MessageProvider>
       <BookMarkedSourceCardProvider>
         <BrowserRouter>
-          {/* <button onClick={handleLogin}>Login</button>
-          {UID && <span>{UID}</span>}
-          <button onClick={handleLogout}>Logout</button> */}
           <Routes>
             <Route path="*" element={<Layout />} />
           </Routes>
@@ -64,10 +61,3 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 });
-
-
-
-
-
-
-
