@@ -1,45 +1,3 @@
-For understanding Zeeshans Book Portal:
-
-- So, if I understand we store 3 things in juno (1) the .epub stored with `uploadfile()` (secondary storage 'stable/slow' storage) (2) the metadata .json stored with `setdoc()` ('fast/heap' storage). 
-
-(3) .CSV is created and parsed in real-time.
-(4) Book Covers is extracted in realtime.
-- How do you make/store the link that retreives the .epub?
-- We need better error handling for varied or incompatable book types. Right now I get a 'cannot use toLowerCase() because the field is empty' on a book I cannot find. (this will later need to be built into the mint function).
-
-If this is the case we just need to switch the store from the (1) .epub store to 'web3disk' (2) and the metadata to the nft mint function description field. Plus individual title/cover/etc. feilds (maybe).
-
-The Current NFT Mint Params I think we'll be going with: 
-"""
-description = {
-"title":"Alice's Adventures in Wonderland",
-"author":"Lewis Carroll",
-"description":"Some user-entered description…",
-"Pubyear":"1876", (we’re going to need to enforce with a slider to standardize format from range [-10,000-10,000] or something).
-"publisher":"User can write anything, but the metadata is usually preset.",
-"rights":"Public domain in the USA.",
-"language":"en",
-"mint":"2023-10-01T07:32:26Z",
-"modified":"2023-10-01T07:32:26Z", (last modified)
-"fiction":True
-"type":"e.g., [1,6,7]" (can be from 1-5 depending on how the subtypes are spread)
-"subtype":"e.g., [11, 17, 64, 72, 73]" (must always be 5)
-"ISBN":"The Actual ISBN, if any",
-}
-token_logo = "possibly_a_link_to the epub"
-token_name = "title I guess?"
-"""
-
-
-
-
-
-
-
-
-
-
-
 ## Running the project locally
 
 
@@ -81,31 +39,30 @@ sudo apt-get upgrade nodejs`
 
 # UncensoredGreats DAO LitePaper
 
-### Project Concept
+### Concept
 
 We imagine an Internet where search and social, instead of being scattered across divergent hyperlinks; all flow from one hub of linearly-linked, AI-retrievable, primary sources.
 
 UncensoredGreats shares the core functionality of the Big Tech Search and Social but with a few key distinctions.
 
 Differences from Search:
-
-- All source material is in Ebooks instead of Webpages (linear HTML instead of divergent HTML).
-- Search engine keyword matching of webpage metadata (e.g., Google Search) is replaced with vector similarity applied to book snippets (search by semantic meaning).
-- All data has an owner: Ebooks are owned as Non-Fungible Tokens (NFTs) and content generated from them is owned as Soul-Bound Tokens (SBTs).
+There are many customizable search engines, each created, curated, and hosted soverignly by a single user.
+All their source material is from Ebooks instead of Webpages (linear HTML instead of divergent HTML).
+All Ebooks are owned and self-hosted by individuals as Non-Fungible Tokens (NFTs), and content generated from them owned as Soul-Bound Tokens (SBTs).
 
 Differences from Social:
 
-- Posts are templated and AI-assisted. Users have complete freedom to use any source material but are limited in that they must use source material (books).
-- Every content post is created from, and fixed to its primary source(s), accessible without the ‘infinite scroll’ or compulsive tab switching we’re used to.
-- Sorting algorithms steeply deprioritize recency. It’s a ‘Timeless Media’ where posts are about timeless ideas, sorted by category, and ranked by popularity, regardless of whether it’s been 5 minutes or 5 years.
+Posts are templated and AI-assisted. Users have complete freedom to use any source material but are limited in that they must use source material (ebooks).
+Every content post is created from, and fixed to its primary source(s), accessible on a single page through search (no ‘infinite scroll’ or compulsive tab switching nessasary).
+The content is timeless and ranking algorithms do not regaurd recency.
 
-Since of course, all platform data is hosted on-chain and owned by someone, there are the typical Web3-native attributes like DAO Governance and Token Incentives. It costs something to host—and rewards something when used, which is our natural quality filter. While the potential scale of content is infinite, only the best source material is worth persisting.
+All raw data is hosted on-chain and owned by someone. This leads to typical Web3-native attributes like DAO Governance and Token Incentives. It costs something to host—and rewards something when used, which acts as a natural quality filter. While the potential scale of content is infinite, only the best source material is worth persisting.
 
 In short, UncensoredGreats is a distraction-free digital home with content ownership at its core.
 
-Web2 belonged to those companies best at capturing and leveraging user data. Web3 will belong to those best at parsing and reclaiming it for the user. 
+The first 20 years of the Internet belonged to those companies best at capturing and leveraging user data. The next 20 will belong to whoever’s best at sorting it.
 
-UncensoredGreats is tackling the ‘Web3 data economy’ on a scale and with a generality of data types that is wholly unfamiliar to crypto, and comprehensible only in relationship to the historical context of its Big Tech counterparts.
+UncensoredGreats is tackling the ‘Web3 data economy’ on a scale and with a generality of data that is wholly unfamiliar to crypto, and comprehensible only in relationship to the historical context of its Big Tech counterparts. Our approach to re-indexing the Internet is by giving individuals a place to do it and a reason to do so.
 
 #### Problem
 
@@ -115,24 +72,26 @@ Just ask yourself, what does it take to get a nuanced overview of any subject on
 
 You generally need to click around and pass through a combination of web pages, podcasts, blogs, YouTube videos, etc. At each step, you pass through a hyperlink; leave all the findings from the last hyperlink behind, and have to sort through the irrelevant information of the next one to get new findings.
 
-Every hyperlink that you click has been curated for you by advertisers and proprietary services, and the content of each generally comes from some random guy, whose reputation you have to guess while reading/listening.
+Every hyperlink that you click has been curated for you by advertisers and proprietary services, and the content of each generally comes from an unknown source with a reputation you have to guess.
 
 Despite having a sea of endless information at our fingertips, we are no closer to knowing what is True.
 
 LLMs like ChatGPT implement a partial fix by letting machines be the aggregators. They give quick answers but with limited knowledge of their input sources or ability to convey whatever internal bias may be at play. Since their training data is a mixed bag, LLMs are poorly equipped to represent the position of a particular person or group, and their precision diminishes in the abstract.
 
-The Internet’s hyperlink design, paywalls, disparate hosting, and proprietary aggregators have made us completely accustomed to the shattered means through which we interface with digital information. It’s time to bring the world’s data to a single hub, and put humans at the helm of its machine aggregators. It’s time for people to have not just The Web, but Their Web.
+The Internet’s hyperlink design, paywalls, disparate hosting, and proprietary aggregators have made us completely accustomed to the shattered means through which we interface with digital information. It’s time to bring the world’s data to a single hub, and put humans at the helm of its machine aggregators. 
+
+No matter how advanced our search and discoverty techniques get, we cannot circumvent the 1960s setup of diparite ownership whereby you cannot make full use of a hyperlink before digitally travelling to it. People need not just The Web, but Their Web.
 
 #### Solution
 
 The Internet from a user perspective could be thought of as disparate HTML (static sites) using custom javascript (dynamic platforms), connected via hyperlinks, and accessible through keyword-based search engines.
 
-UncensoredGreats could be thought of as uniform HTML (.epubs), using standardized javascript (epub.js), consecutively linked as pages, and accessible through a single AI search engine.
+UncensoredGreats could be thought of as uniform HTML (.epubs), using standardized javascript (epub.js), consecutively linked as pages, accessible through advanced full-text and vector search.
 
-- Instead of clicking through many pages across many tabs—access, save, sort, and share the world’s information on a single page.
-- Instead of copy/paste/reorg of site snippets in a text editor—bookmark findings in a whiteboard and reorg with AI.
-- Instead of citing sources for your work, or intentionally omitting them—have perfect providence tracking by default.
-- Instead of referencing the posts/links of others in your own content—edit, fork, interact, or refute the originals of others on the public dashboard.
+Instead of clicking through many pages across many tabs—access, save, sort, and share the world’s information on a single page.
+Instead of copy/paste/reorg of site snippets in a text editor—interphase with them with whiteboards, iceberg charts, and AI.
+Instead of citing sources for your work, or intentionally omitting them—have perfect providence tracking by default.
+Instead of referencing the posts/links of others in your content—edit, fork, interact, or refute the originals of others on the public dashboard.
 
 These capabilities arise because all app data, stored entirely on-chain, has an owner at every level of abstraction.
 
