@@ -2,7 +2,7 @@ import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useContext, useEffect, useState } from 'react'
 import '../../styles/sourcecardspanel.css'
-import { ugd_backend } from '../../declarations/ugd_backend';
+import { ugd_backend } from '../../../../declarations/ugd_backend';
 import { BookMarkedSourceCardContext } from '@/utils/BookMarkedSourceCardProvider';
 import SearchedCards from '@/components/CardCreationPanel/SearchedCards';
 

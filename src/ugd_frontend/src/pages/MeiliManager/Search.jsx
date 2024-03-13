@@ -2,7 +2,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import client from '../../utils/MeiliSearchClient'; // Adjust the path as necessary
+import client from '../../utils/MeiliSearchClient';
 
 const Search = ({ selectedIndex }) => {
   const [searchTerm, setSearchTerm] = useState('');

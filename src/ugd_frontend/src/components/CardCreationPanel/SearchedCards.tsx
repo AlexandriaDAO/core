@@ -5,7 +5,7 @@ import { faBookmark, faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useContext, useEffect, useState } from 'react'
 import Resizer from 'react-image-file-resizer'
-import { ugd_backend } from '../../declarations/ugd_backend';
+import { ugd_backend } from '../../../../declarations/ugd_backend';
 import { BookMarkedSourceCardContext } from '@/utils/BookMarkedSourceCardProvider'
 
 interface SharedCardsInterface {

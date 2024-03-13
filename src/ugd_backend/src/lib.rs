@@ -1,71 +1,43 @@
 mod source_cards;
 pub use source_cards::{save_sc, bookmark_sc, delete_sc, get_sc, get_bookmarks};
 
+mod meilisearch;
+pub use meilisearch::{whoami, save_meilisearch_keys, get_meilisearch_keys};
+
 mod weaviate;
 pub use weaviate::get_weaviate_query;
 
-use ic_cdk_macros::{query};
-
-use std::error::Error;
-use std::fs::File;
-use std::path::Path;
-use csv::Reader;
-
-#[query]
-pub fn whoami(name: String) -> String {
-    format!("Logged in with Principal: {}!", name)
-}
-
-fn read_csv<P: AsRef<Path>>(path: P) -> Result<Reader<File>, Box<dyn Error>> {
-  let file = File::open(path)?;
-  let reader = Reader::from_reader(file);
-  Ok(reader)
-}
-
-// I want to read the csv file from here: https://xo3nl-yaaaa-aaaap-abl4q-cai.icp0.io/csv/romeo-and-juliet.csv
-
-#[ic_cdk::query]
-fn greet() -> String {
-    match read_csv("src/ucg_search_backend/src/romeo-and-juliet_Contents.csv") {
-        Ok(rows) => format!("The first 5 rows are: {:?}", rows),
-        Err(e) => format!("Error: {}", e),
-    }
-}
-
-// Satilites now introduced as a package from juno.
-// So instead of a collection key being the name of the juno account, it could be the principal of the uploader. 
-// In this way each uploader has their own collection. That's the plan at least, for now.
 
 
 
 
+// // Example of the keys that will be accepted.
+// // MEILI_DOMAIN = 'https://app-uncensoredgreats-dev-001.azurewebsites.net/',
+// // MEILI_MASTER_KEY = '85238b14-cf2f-4066-a822-bd2b4dd18de0',
 
 
+// #[query]
+// pub fn whoami(name: String) -> String {
+  //     format!("Logged in with Principal: {}!", name)
+  // }
 
+  // #[update]
+// fn save_meilisearch_keys(name: String, MEILI_DOMAIN: String, MEILI_MASTER_KEY: String) -> () {
+  //   Save MEILI_DOMAIN: String, MEILI_MASTER_KEY: String associated with that principal.
+  // }
+  
+// #[query]
+// fn get_meilisearch_keys(name: String) -> {
+  //   return MEILI_DOMAIN: String, MEILI_MASTER_KEY: String
+  // }
+  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
 
 
 

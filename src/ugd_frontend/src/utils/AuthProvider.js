@@ -1,5 +1,5 @@
 
-import { ugd_backend } from '../declarations/ugd_backend';
+import { ugd_backend } from '../../../declarations/ugd_backend'
 import { useState, useEffect } from 'react';
 import { AuthClient } from "@dfinity/auth-client";
 

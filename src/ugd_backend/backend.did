@@ -1,26 +1,28 @@
 type SourceCard = record {
-    post_id : nat64;
-    user_query : text;
-    author : text;
-    title : text;
-    heading : text;
-    content : text;
-    summary : text;
-    bookmarked : bool;
+  post_id : nat64;
+  user_query : text;
+  author : text;
+  title : text;
+  heading : text;
+  content : text;
+  summary : text;
+  bookmarked : bool;
 };
 
+type MeiliSearchKeys = record {
+  meili_domain : text;
+  meili_key : text;
+  slot : nat8;
+};
 
 service : {
-    "get_weaviate_query": (user_query : text, breadth : nat8, scope : text) -> (text);
-    "get_sc" : (post_id : nat64) -> (opt SourceCard) query;
-    "delete_sc" : (post_id : nat64) -> ();
-    "bookmark_sc" : (post_id : nat64) -> ();
-    "get_bookmarks" : () -> (vec opt SourceCard) query;
-    "whoami" : (text) -> (text) query;
+  "get_weaviate_query": (user_query : text, breadth : nat8, scope : text) -> (text);
+  "get_sc" : (post_id : nat64) -> (opt SourceCard) query;
+  "delete_sc" : (post_id : nat64) -> ();
+  "bookmark_sc" : (post_id : nat64) -> ();
+  "get_bookmarks" : () -> (vec opt SourceCard) query;
 
-
-    "get": (text) -> (opt blob) query;
-    "insert": (text, blob) -> (opt blob);
-
-    "greet" : () -> (text);
+  "whoami": (principal_text: text) -> (text) query;
+  "save_meilisearch_keys": (principal_text: text, meili_domain: text, meili_key: text, slot_index: nat8) -> (variant { Ok; Err: text });
+  "get_meilisearch_keys": (principal_text: text) -> (vec MeiliSearchKeys) query;
 };
