@@ -8,9 +8,10 @@ import { AuthorProvider } from "./contexts/AuthorContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
+import Home from "./pages/Home";
 import "./styles/tailwind.css";
-import "./styles/main.css";
-import "../assets/index.css";
+// import "./styles/main.css";
+// import "../assets/index.css";
 import { useAuth } from "./utils/AuthProvider";
 import { BookMarkedSourceCardProvider } from "./utils/BookMarkedSourceCardProvider";
 
@@ -34,12 +35,14 @@ const App = () => {
 WebFont.load({
   google: {
     families: [
-      "Georgia",
-      "Lobster",
-      "Lexend",
-      "Roboto:300,400,700",
-      "Times New Roman",
-      "Nunito",
+      // "Georgia",
+      // "Lobster",
+      // "Lexend",
+      // "Roboto:300,400,700",
+      // "Times New Roman",
+      // "Nunito",
+      "Syne",
+      "Roboto Condensed"
     ],
   },
 });
@@ -51,11 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
     root.render(
       <React.StrictMode>
         <Provider store={store}>
-          <AuthorProvider>
+          <Home />
+        {/*   <AuthorProvider>
             <SettingsProvider>
               <App />
             </SettingsProvider>
-          </AuthorProvider>
+          </AuthorProvider> */}
         </Provider>
       </React.StrictMode>
     );
