@@ -1,4 +1,4 @@
-// Saves Meilisearch Access keys for a user based on their principal.
+// Saves Meilisearch Access keys for a user based on their principal, but manually entering the principal.
 
 use candid::{CandidType, Decode, Deserialize, Encode, Principal};
 use ic_cdk::export::candid;
@@ -140,78 +140,19 @@ pub fn get_meilisearch_keys(principal_text: String) -> Vec<MeiliSearchKeys> {
 
 
 
-// #[ic_cdk_macros::update]
-// pub fn save_meilisearch_keys(
-//     principal_text: String,
-//     meili_domain: String,
-//     meili_key: String,
-// ) -> Result<(), String> {
-//     let principal = Principal::from_text(principal_text).unwrap();
-//     let keys = MeiliSearchKeys {
-//         meili_domain,
-//         meili_key,
-//     };
-
-//     KEYS_MAP.with(|m| {
-//         let mut map = m.borrow_mut();
-//         let user_keys = match map.get(&PrincipalWrapper(principal)) {
-//             Some(keys_vec) => {
-//                 let mut updated_keys_vec = keys_vec.clone();
-//                 if updated_keys_vec.0.len() < MAX_KEYS_PER_USER {
-//                     updated_keys_vec.0.push(keys);
-//                     map.insert(PrincipalWrapper(principal), updated_keys_vec);
-//                     Ok(())
-//                 } else {
-//                     Err(format!("Maximum number of keys ({}) reached for this user", MAX_KEYS_PER_USER))
-//                 }
-//             }
-//             None => {
-//                 let new_keys_vec = MeiliSearchKeysVec(vec![keys]);
-//                 map.insert(PrincipalWrapper(principal), new_keys_vec);
-//                 Ok(())
-//             }
-//         };
-//         user_keys
-//     })
-// }
 
 
 
 
 
-    // thread_local! {
-    //   static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
-    //   static KEYS_MAP: RefCell<StableBTreeMap<PrincipalWrapper, MeiliSearchKeys, Memory>> = RefCell::new(
-    //     StableBTreeMap::init(
-    //       MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(0))),
-    //     )
-    //   );
-    // }
 
-// #[ic_cdk_macros::query]
-// pub fn whoami(principal_text: String) -> String {
-//     format!("Logged in with Principal: {}!", principal_text)
-// }
 
-// #[ic_cdk_macros::update]
-// pub fn save_meilisearch_keys(
-//   principal_text: String,
-//   meili_domain: String,
-//   meili_key: String,
-// ) -> () {
-//   let principal = Principal::from_text(principal_text).unwrap();
-//   let keys = MeiliSearchKeys {
-//     meili_domain,
-//     meili_key,
-//   };
-//   KEYS_MAP.with(|m| m.borrow_mut().insert(PrincipalWrapper(principal), keys));
-// }
 
-// #[ic_cdk_macros::query]
-// pub fn get_meilisearch_keys(principal_text: String) -> Option<MeiliSearchKeys> {
-//   let principal = Principal::from_text(principal_text).unwrap();
-//   KEYS_MAP.with(|m| m.borrow().get(&PrincipalWrapper(principal)).map(|keys| keys.clone()))
-// }
+
+
+
+
+
 
 
 

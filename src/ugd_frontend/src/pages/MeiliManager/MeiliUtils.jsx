@@ -16,7 +16,7 @@ const useMeiliUtils = (selectedIndex) => {
 
   const createIndex = async () => {
     try {
-      await client.createIndex(indexName, { primaryKey: primaryKey });
+      await createIndex(indexName, { primaryKey: primaryKey });
       alert('Index created successfully');
       fetchTasks();
     } catch (error) {
