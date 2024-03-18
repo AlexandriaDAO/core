@@ -1,10 +1,12 @@
-
 // // src/components/KeyManager.jsx
 // import React, { useState, useEffect } from 'react';
-// import MeiliSearchClient, { MeiliSearchKeys } from '../../utils/MeiliSearchClient';
+// import { MeiliSearch } from 'meilisearch';
+// import MeiliSearchClient from '../../utils/MeiliSearchClient';
+// import useAuth from '../../utils/AuthProvider';
 
-// const KeyManager = () => {
-//   const { saveMeiliSearchKeys, getMeiliSearchKeys } = MeiliSearchClient();
+// const KeyManager = ({ onClientInitialized }) => {
+//   const { principal } = useAuth();
+//   const { saveMeiliSearchKeys, getMeiliSearchKeys, initializeMeiliSearchClient } = MeiliSearchClient();
 //   const [meiliDomain, setMeiliDomain] = useState('');
 //   const [meiliKey, setMeiliKey] = useState('');
 //   const [slotIndex, setSlotIndex] = useState(0);
@@ -12,12 +14,20 @@
 //   const [selectedSlot, setSelectedSlot] = useState(null);
 
 //   useEffect(() => {
-//     fetchKeys();
-//   }, []);
+//     if (principal) {
+//       fetchKeys();
+//     }
+//   }, [principal]);
+
+//   useEffect(() => {
+//     if (selectedSlot !== null) {
+//       initializeMeiliSearchClient();
+//     }
+//   }, [selectedSlot]);
 
 //   const fetchKeys = async () => {
 //     try {
-//       const fetchedKeys = await getMeiliSearchKeys();
+//       const fetchedKeys = await getMeiliSearchKeys(principal);
 //       console.log("saved keys", fetchedKeys);
 //       setKeys(fetchedKeys);
 //     } catch (error) {
@@ -27,7 +37,7 @@
 
 //   const handleSaveKeys = async () => {
 //     try {
-//       await saveMeiliSearchKeys(meiliDomain, meiliKey, slotIndex);
+//       await saveMeiliSearchKeys(principal, meiliDomain, meiliKey, slotIndex);
 //       fetchKeys();
 //     } catch (error) {
 //       console.error('Error saving keys:', error);
@@ -36,6 +46,16 @@
 
 //   const handleSlotChange = (slot) => {
 //     setSelectedSlot(slot);
+//     initializeClient(slot);
+//   };
+
+//   const initializeClient = (slot) => {
+//     const selectedKey = keys.find(key => key.slot === slot);
+  
+//     if (selectedKey) {
+//       const client = initializeMeiliSearchClient(selectedKey.meili_domain, selectedKey.meili_key);
+//       onClientInitialized(client);
+//     }
 //   };
 
 //   return (
@@ -79,45 +99,49 @@
 
 // src/components/KeyManager.jsx
 import React, { useState, useEffect } from 'react';
-import { MeiliSearch } from 'meilisearch';
 import MeiliSearchClient from '../../utils/MeiliSearchClient';
 import useAuth from '../../utils/AuthProvider';
 
 const KeyManager = ({ onClientInitialized }) => {
   const { principal } = useAuth();
-  const { saveMeiliSearchKeys, getMeiliSearchKeys, initializeMeiliSearchClient } = MeiliSearchClient();
+  const { saveMeiliSearchKeys, getMeiliSearchKeys } = MeiliSearchClient();
   const [meiliDomain, setMeiliDomain] = useState('');
   const [meiliKey, setMeiliKey] = useState('');
   const [slotIndex, setSlotIndex] = useState(0);
   const [keys, setKeys] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchKeys = async () => {
+      try {
+        const fetchedKeys = await getMeiliSearchKeys(principal);
+        console.log("saved keys", fetchedKeys);
+        setKeys(fetchedKeys);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching keys:', error);
+      }
+    };
+
     if (principal) {
       fetchKeys();
     }
   }, [principal]);
 
   useEffect(() => {
-    if (selectedSlot !== null) {
-      initializeMeiliSearchClient();
+    if (selectedSlot !== null && !loading) {
+      initializeClient(selectedSlot);
     }
-  }, [selectedSlot]);
-
-  const fetchKeys = async () => {
-    try {
-      const fetchedKeys = await getMeiliSearchKeys(principal);
-      console.log("saved keys", fetchedKeys);
-      setKeys(fetchedKeys);
-    } catch (error) {
-      console.error('Error fetching keys:', error);
-    }
-  };
+  }, [selectedSlot, loading]);
 
   const handleSaveKeys = async () => {
     try {
       await saveMeiliSearchKeys(principal, meiliDomain, meiliKey, slotIndex);
-      fetchKeys();
+      setKeys(prevKeys => [...prevKeys, { meili_domain: meiliDomain, meili_key: meiliKey, slot: slotIndex }]);
+      setMeiliDomain('');
+      setMeiliKey('');
+      setSlotIndex(0);
     } catch (error) {
       console.error('Error saving keys:', error);
     }
@@ -125,15 +149,13 @@ const KeyManager = ({ onClientInitialized }) => {
 
   const handleSlotChange = (slot) => {
     setSelectedSlot(slot);
-    initializeClient(slot);
   };
 
   const initializeClient = (slot) => {
     const selectedKey = keys.find(key => key.slot === slot);
-  
+
     if (selectedKey) {
-      const client = initializeMeiliSearchClient(selectedKey.meili_domain, selectedKey.meili_key);
-      onClientInitialized(client);
+      onClientInitialized(selectedKey.meili_domain, selectedKey.meili_key);
     }
   };
 

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import client from '../../utils/MeiliSearchClient';
+// import client from '../../utils/MeiliSearchClient';
+import useMeiliSearchClient from '../../utils/MeiliSearchClient';
 import Papa from 'papaparse'
 
 const useMeiliUtils = (selectedIndex) => {
+  const { client, loading } = useMeiliSearchClient();
   const [indexName, setIndexName] = useState('');
   const [bookCSV, setBookCSV] = useState('');
   const [primaryKey, setPrimaryKey] = useState('id');
@@ -160,3 +162,17 @@ const useMeiliUtils = (selectedIndex) => {
 };
 
 export default useMeiliUtils;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
