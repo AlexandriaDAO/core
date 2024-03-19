@@ -103,29 +103,33 @@ export default function BooksCarousel() {
                         prevEl: leftRef.current,
                         nextEl: rightRef.current,
                     }}
-                    spaceBetween={30}
-                    // breakpoints={{
-                    //     1000: {
-                    //         slidesPerView: 5,
-                    //         spaceBetween: 15,
-                    //     },
+                    spaceBetween={10}
+                    breakpoints={{
+						1280: {
+                            slidesPerView: 6,
+                            spaceBetween: 30,
+						},
+                        1025: {
+                            slidesPerView: 5,
+                            spaceBetween: 20,
+                        },
 
-                    //     750: {
-                    //         slidesPerView: 4,
-                    //         spaceBetween: 15,
-                    //     },
+                        768: {
+                            slidesPerView: 4,
+                            spaceBetween: 15,
+                        },
 
-                    //     550: {
-                    //         slidesPerView: 2,
-                    //         spaceBetween: 15,
-                    //     },
+                        640: {
+                            slidesPerView: 3,
+                            spaceBetween: 12,
+                        },
 
-                    //     250: {
-                    //         slidesPerView: 1,
-                    //         spaceBetween: 20,
-                    //     },
-                    // }}
-                    slidesPerView={6}
+                        480: {
+                            slidesPerView: 2,
+                            spaceBetween: 10,
+                        },
+                    }}
+                    slidesPerView={1}
                     pagination={{ clickable: true }}
                     onBeforeInit={(swip:any) => {
                         swip.params.navigation.prevEl = leftRef.current;
@@ -136,7 +140,7 @@ export default function BooksCarousel() {
                         <SwiperSlide key={book.key}>
                             <div className={`flex flex-col justify-between gap-3 items-start cursor-pointer transition-all duration-500 ${selectedBook && selectedBook.key === book.key ? 'p-2 bg-black text-white':''}`} onClick={()=>handleBookClick(book)}>
                                 <img
-                                    className="rounded-lg h-96 object-cover"
+                                    className="rounded-lg h-80 object-fill"
                                     src={`images/books/${book.image}`}
                                     alt={book.title}
                                 />

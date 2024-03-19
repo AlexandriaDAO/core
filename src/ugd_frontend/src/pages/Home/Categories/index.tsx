@@ -5,7 +5,7 @@ import React, {
 } from "react";
 import BookModal from "./BookModal";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { setselectedCategory } from "@/features/home/homeSlice";
+import { setSelectedCategory } from "@/features/home/homeSlice";
 import BooksCarousel from "./BookCarousel";
 
 
@@ -52,7 +52,7 @@ function Categories() {
 	const bookCarouselRef = useRef<HTMLDivElement>(null); // Ref for the container div
 
 	const handleCategoryClick = (category: any) => {
-        dispatch(setselectedCategory(category))
+        dispatch(setSelectedCategory(category))
 	};
 
     useEffect(()=>{
@@ -68,7 +68,7 @@ function Categories() {
 	const hideSelectedCategory = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		e.stopPropagation();
-		dispatch(setselectedCategory(null));
+		dispatch(setSelectedCategory(null));
 	};
 
     useEffect(()=>{
@@ -103,15 +103,15 @@ function Categories() {
             {categories.map((category) => (
                 <div
                     key={category.title}
-                    className={`${
+                    className={`flex flex-col  ${
                         selectedCategory &&
                         selectedCategory.key == category.key
                             ? "basis-full order-first"
-                            : "basis-1/5 order-none"
+                            : "basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 order-none"
                     }`}
                 >
                     <div
-                        className={`flex-grow-0 flex-shrink-0 h-[780px] border text-center cursor-pointer bg-cover bg-center flex flex-col justify-end relative`}
+                        className={`flex-grow flex-shrink-0 basis-[780px] border text-center cursor-pointer bg-cover bg-center flex flex-col justify-end relative`}
                         onClick={() => handleCategoryClick(category)}
                         style={{
                             backgroundImage: `url(images/categories/${category.image})`,
@@ -139,14 +139,15 @@ function Categories() {
                             )}
 
                         <div
-                            className={`p-6 ${
+                            className={`md:p-6 p-4 ${
                                 selectedCategory &&
                                 selectedCategory.key === category.key
                                     ? "w-1/5"
-                                    : ""
+                                    : "w-full"
                             } flex flex-col justify-between items-center  gap-6`}
                         >
-                            <h1 className="font-syne text-5xl basis-20">
+                            {/* <h1 className=" font-syne text-2xl lg:text-3xl xl:text-4xl basis-20"> */}
+                            <h1 className="text-[5vw] sm:text-[4vw] md:text-[3vw] lg:text-[2vw]  font-syne basis-20">
                                 {category.title}
                             </h1>
                             <span className="font-roboto-condensed text-2xl self-end">
@@ -155,7 +156,7 @@ function Categories() {
                         </div>
                     </div>
 
-                    {selectedCategory && selectedCategory.key === category.key && <div ref={bookCarouselRef} > <BooksCarousel/></div>}
+                    {selectedCategory && selectedCategory.key === category.key && <div ref={bookCarouselRef} className="" > <BooksCarousel/></div>}
 
                     {selectedBook && selectedCategory && selectedCategory.key === category.key && <div ref={bookModalRef}> <BookModal /> </div> }
 

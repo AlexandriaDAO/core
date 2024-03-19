@@ -10,6 +10,7 @@ interface HomeState {
 
     selectedCategory: any;
     selectedBook: any;
+	selectedSearchedBook: any;
 }
 
 // Define the initial state using the PortalState interface
@@ -20,6 +21,8 @@ const initialState: HomeState = {
 
     selectedCategory : null,
     selectedBook : null,
+    selectedSearchedBook : null,
+
 };
 
 const homeSlice = createSlice({
@@ -42,16 +45,19 @@ const homeSlice = createSlice({
 			state.filter = action.payload;
 		},
 
-        setselectedCategory: (state, action: PayloadAction<any>) => {
+        setSelectedCategory: (state, action: PayloadAction<any>) => {
 			state.selectedCategory = action.payload;
 		},
 
         setSelectedBook: (state, action: PayloadAction<any>) => {
 			state.selectedBook = action.payload;
 		},
+        setSelectedSearchedBook: (state, action: PayloadAction<any>) => {
+			state.selectedSearchedBook = action.payload;
+		},
 	},
 });
 
-export const { setView, setSearch, setFilter, setselectedCategory, setSelectedBook } = homeSlice.actions;
+export const { setView, setSearch, setFilter, setSelectedCategory, setSelectedBook, setSelectedSearchedBook } = homeSlice.actions;
 
 export default homeSlice.reducer;

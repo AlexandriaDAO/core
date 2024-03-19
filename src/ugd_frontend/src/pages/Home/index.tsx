@@ -11,13 +11,13 @@ function Home() {
     const {view} =  useAppSelector(state=>state.home)
     useEffect(()=>{
         (async()=>{
-            await new Promise(p=> setTimeout(p,1000))
+            // await new Promise(p=> setTimeout(p,1000))
 
-            dispatch(setView('home'));
+            dispatch(setView('search'));
         })()
     },[])
 	return (
-		<div className="h-screen w-screen flex flex-col bg-[#f4f4f4]">
+		<div className="min-h-screen min-w-screen flex flex-col bg-[#f4f4f4]">
 
             <Header />
 
