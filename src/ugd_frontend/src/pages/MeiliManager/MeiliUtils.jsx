@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-// import client from '../../utils/MeiliSearchClient';
+import React, { useEffect, useState } from 'react';
 import useMeiliSearchClient from '../../utils/MeiliSearchClient';
 import Papa from 'papaparse'
+
 
 const useMeiliUtils = (selectedIndex) => {
   const { client, loading } = useMeiliSearchClient();
@@ -15,14 +15,19 @@ const useMeiliUtils = (selectedIndex) => {
   const [healthStatus, setHealthStatus] = useState('checking'); // 'checking', 'available', 'unavailable'
   const [indexSettings, setIndexSettings] = useState({});
   const [filterableAttributes, setFilterableAttributes] = useState([]);
+  // const [activeIndex, setActiveIndex] = useState(null);
 
-  const createIndex = async () => {
+
+  // This is failing right now and I don't know why. I think it works on azure and not meilisearch because of a serialization issue but not totally sure.
+  const createIndex = async (indexName) => {
     try {
-      await createIndex(indexName, { primaryKey: primaryKey });
+      await client.createIndex(indexName, { primaryKey: primaryKey });
       alert('Index created successfully');
       fetchTasks();
+      setIndexName('');
     } catch (error) {
       alert('Failed to create index');
+      console.error('Error creating index:', error);
     }
   };
 
@@ -94,6 +99,7 @@ const useMeiliUtils = (selectedIndex) => {
   };
 
   const fetchStats = async (index) => {
+    if (loading) return;
     if (index) {
       const indexStats = await client.index(index).getStats();
       setIndexStats({ [index]: indexStats });
@@ -104,11 +110,13 @@ const useMeiliUtils = (selectedIndex) => {
   };
 
   const fetchIndexSettings = async (index) => {
+    if (loading) return;
     const settings = await client.index(index).getSettings();
     setIndexSettings(settings);
   };
 
   const fetchFilterableAttributes = async (index) => {
+    if (loading) return;
     const attributes = await client.index(index).getFilterableAttributes();
     setFilterableAttributes(attributes);
   };

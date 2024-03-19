@@ -36,6 +36,7 @@
     "antd": "^5.8.5",
     "autoprefixer": "^10.4.16",
     "epubjs": "^0.3.93",
+    "flatted": "^3.3.1",
     "html-to-text": "^9.0.5",
     "instantsearch.css": "^8.1.0",
     "instantsearch.js": "^4.66.0",
