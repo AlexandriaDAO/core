@@ -50,9 +50,9 @@ const BookPortalRedux = () => {
 		if (data && data?.items?.length > 0) {
 			// Choose between grid or list view based on the 'view' state
 			return view === "grid" ? (
-				<Grid books={data.items} />
+				<Grid />
 			) : (
-				<List books={data.items} />
+				<List />
 			);
 		}
 
