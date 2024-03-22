@@ -54,12 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
     root.render(
       <React.StrictMode>
         <Provider store={store}>
-          <Home />
-        {/*   <AuthorProvider>
+          {/* <Home /> */}
+          <AuthorProvider>
             <SettingsProvider>
               <App />
             </SettingsProvider>
-          </AuthorProvider> */}
+          </AuthorProvider>
         </Provider>
       </React.StrictMode>
     );

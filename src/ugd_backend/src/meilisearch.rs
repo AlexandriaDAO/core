@@ -7,6 +7,8 @@ use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, S
 use std::borrow::Cow;
 use std::cell::RefCell;
 
+use ic_cdk::api::caller;
+
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 const MAX_VALUE_SIZE: u32 = 1000;
@@ -84,6 +86,12 @@ pub fn whoami(principal_text: String) -> String {
     format!("Principal: {}!", principal_text)
 }
 
+#[ic_cdk_macros::query]
+pub fn cdk_caller() -> String {
+    let principal_from_caller: Principal = caller();
+    format!("Caller IC CDK: {}", principal_from_caller)
+}
+
 // Save to a particular slot that gets overridden.
 #[ic_cdk_macros::update]
 pub fn save_meilisearch_keys(
@@ -98,7 +106,6 @@ pub fn save_meilisearch_keys(
         meili_key,
         slot: slot_index,
     };
-
     KEYS_MAP.with(|m| {
         let mut map = m.borrow_mut();
         let user_keys = match map.get(&PrincipalWrapper(principal)) {
@@ -136,6 +143,8 @@ pub fn get_meilisearch_keys(principal_text: String) -> Vec<MeiliSearchKeys> {
             .unwrap_or_default()
     })
 }
+
+
 
 
 

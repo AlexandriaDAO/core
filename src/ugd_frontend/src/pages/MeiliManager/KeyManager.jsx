@@ -17,6 +17,7 @@ const KeyManager = ({ onClientInitialized }) => {
     const fetchKeys = async () => {
       try {
         const fetchedKeys = await getMeiliSearchKeys(principal);
+
         console.log("saved keys", fetchedKeys);
         setKeys(fetchedKeys);
         setLoading(false);
@@ -39,6 +40,7 @@ const KeyManager = ({ onClientInitialized }) => {
   const handleSaveKeys = async () => {
     try {
       await saveMeiliSearchKeys(principal, meiliDomain, meiliKey, slotIndex);
+      await saveMeiliSearchKeys(meiliDomain, meiliKey, slotIndex);
       setKeys(prevKeys => [...prevKeys, { meili_domain: meiliDomain, meili_key: meiliKey, slot: slotIndex }]);
       setMeiliDomain('');
       setMeiliKey('');
