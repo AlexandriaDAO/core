@@ -23,11 +23,10 @@ interface MeiliSearchClientHook {
   client: any;
   loading: any;
   saveMeiliSearchKeys: (
-    principal: any,
     meiliDomain: string,
     meiliKey: string,
     slotIndex: number
-  ) => Promise<void>;
+  ) => Promise<boolean>;
   getMeiliSearchKeys: (principal: any) => Promise<MeiliSearchKeys[]>;
   initializeMeiliSearchClient: () => Promise<MeiliSearch | null>;
 }
@@ -53,30 +52,33 @@ const useMeiliSearchClient = (): MeiliSearchClientHook => {
 
 
   const saveMeiliSearchKeys = async (
-    principal: any,
     meiliDomain: string,
     meiliKey: string,
     slotIndex: number
-  ): Promise<void> => {
+  ): Promise<boolean> => {
     if (!principal) {
+      alert('Login to save keys')
       console.error('User not authenticated');
-      return;
+      return false;
     }
+
     try {
       const result = await ugd_backend.save_meilisearch_keys(
-        principal.toString(),
+        principal,
         meiliDomain,
         meiliKey,
         Number(slotIndex)
       );
       if ('Ok' in result) {
         console.log('MeiliSearch keys saved successfully');
+        return true;
       } else {
         console.error('Error saving MeiliSearch keys:', result.Err);
       }
     } catch (error) {
       console.error('Error saving MeiliSearch keys:', error);
     }
+    return false;
   };
 
   const getMeiliSearchKeys = async (principal: any): Promise<MeiliSearchKeys[]> => {

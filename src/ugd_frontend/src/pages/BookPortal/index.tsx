@@ -8,8 +8,11 @@ import List from "./List";
 import NoBooks from "./NoBooks";
 import Loading from "./Loading";
 import Mint from "./Mint";
+import useAuth from "@/utils/AuthProvider";
 
 const BookPortal = () => {
+	const { UID } = useAuth();
+
 	const [limit, setLimit] = useState<any>(10);
 	const [view, setView] = useState("grid");
 	const [data, setData] = useState<any>(undefined);
@@ -31,7 +34,7 @@ const BookPortal = () => {
 
 	useEffect(() => {
 		const init = async () => {
-			await initJuno({ satelliteId: "kh5oj-myaaa-aaaal-admga-cai" });
+			await initJuno({ satelliteId: "kh5oj-myaaa-aaaal-admga-cai" , internetIdentityId: UID });
 		};
 		init();
 	}, []);

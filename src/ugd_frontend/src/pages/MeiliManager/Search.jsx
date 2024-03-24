@@ -9,6 +9,10 @@ const Search = ({ selectedIndex }) => {
   const [searchResults, setSearchResults] = useState([]);
 
   const handleSearch = async () => {
+    if(!searchTerm) {
+      alert('Type something to search...')
+      return;
+    }
     const results = await client.index(selectedIndex).search(searchTerm);
     setSearchResults(results.hits);
   };
@@ -19,19 +23,22 @@ const Search = ({ selectedIndex }) => {
   }, [selectedIndex]);
 
   return (
-    <div>
+    <div className='flex flex-col items-start gap-1'>
       <input
         type="text"
         placeholder="Search term"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <button onClick={handleSearch}>Search</button>
-      <div>
+      <button onClick={handleSearch} disabled={!searchTerm} className={`${!searchTerm ? 'bg-green-200 border-green-500 border': 'bg-green-400 hover:bg-green-300'} text-black  px-2 transition-all duration-300 rounded`}>Search</button>
+      <div className='flex flex-col gap-4'>
         {searchResults.map((result, index) => (
           <div key={index}>
             {Object.keys(result).map((key) => (
-              <p key={key}>{`${key}: ${result[key]}`}</p>
+              <div key={key} className='flex gap-2'>
+                <span className='font-semibold'>{key}</span>
+                <span>{result[key]}</span>
+              </div>
             ))}
           </div>
         ))}

@@ -30,23 +30,27 @@ const Layout = () => {
                 opacity: '0.5',
                 zIndex: -1,
             }} />
-            <div style={{ paddingTop: '25px' }}>
-                <Tabs />
-                <Routes>
-                    <Route path="/" element={<Navigate to="/create" />} />
-                    <Route path="create" element={<Create />} />
-                    <Route path="earn" element={<Earn />} />
-                    <Route path="share" element={<Share />} />
-                    <Route path="post" element={<Post />} />
-                    <Route path="author" element={<Author />} />
-                    <Route path="ereader" element={<EReader />} />
-                    <Route path="book-content" element={<BookContent />} />
-                    <Route path="book-portal" element={<BookPortal />} />
-                    <Route path="book-portal-redux" element={<BookPortalRedux />} />
-                    <Route path="manager" element={<MeiliManager />} />
-                    <Route path="book-summary" element={<BookSummary />} />
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
+            <div className="pt-6 flex flex-col justify-between items-stretch gap-2">
+                <div className="px-2">
+                    <Tabs />
+                </div>
+                <div className="flex-grow">
+                    <Routes>
+                        <Route path="/" element={<Navigate to="/create" />} />
+                        <Route path="create" element={<Create />} />
+                        <Route path="earn" element={<Earn />} />
+                        <Route path="share" element={<Share />} />
+                        <Route path="post" element={<Post />} />
+                        <Route path="author" element={<Author />} />
+                        <Route path="ereader" element={<EReader />} />
+                        <Route path="book-content" element={<BookContent />} />
+                        <Route path="book-portal" element={<BookPortal />} />
+                        <Route path="book-portal-redux" element={<BookPortalRedux />} />
+                        <Route path="manager" element={<MeiliManager />} />
+                        <Route path="book-summary" element={<BookSummary />} />
+                        <Route path="*" element={<NotFound />} />
+                    </Routes>
+                </div>
             </div>
         </div>
     );
