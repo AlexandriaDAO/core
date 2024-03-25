@@ -46,8 +46,8 @@ const CreateCSV = ({ books, onCSVCreated }) => {
   };
 
   return (
-    <div>
-      <h2>Book CSV Converter</h2>
+    <div className='flex flex-col gap-1 items-start'>
+      <span className='font-semibold text-lg'>Book CSV Converter</span>
       <div>
         <label htmlFor="bookSelect">Select a book:</label>
         <select id="bookSelect" value={selectedBook} onChange={handleBookChange}>
@@ -60,13 +60,13 @@ const CreateCSV = ({ books, onCSVCreated }) => {
             ))}
         </select>
       </div>
-      <button onClick={handleConvertClick} disabled={!selectedBook || isLoading}>
+      <button onClick={handleConvertClick} disabled={!selectedBook || isLoading} className={`${!selectedBook || isLoading ? 'bg-green-200 border-green-500 border': 'bg-green-400 hover:bg-green-300'} text-black  px-2 transition-all duration-300 rounded`}>
         {isLoading ? 'Converting...' : 'Convert to CSV'}
       </button>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {csvData && (
         <div>
-          <button onClick={handleDownloadClick}>Download CSV</button>
+          <button onClick={handleDownloadClick} className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded'>Download CSV</button>
         </div>
       )}
     </div>

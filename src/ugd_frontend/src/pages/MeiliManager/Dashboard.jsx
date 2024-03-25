@@ -73,8 +73,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchBooks = async () => {
-      await initJuno({ satelliteId: "kh5oj-myaaa-aaaal-admga-cai" });
       try {
+        await initJuno({ satelliteId: "kh5oj-myaaa-aaaal-admga-cai" });
         const bookData = await listDocs({ collection: 'books' });
         setBooks(bookData.items);
       } catch (error) {
@@ -105,53 +105,69 @@ const Dashboard = () => {
       alert('Please select an index to add the book to.');
       return;
     }
-    await addBook(bookCSV, activeIndex);
+    if (!bookCSV) {
+      alert('bookCSV empty.');
+      return;
+    }
+    addBook(bookCSV, activeIndex);
   };
 
+
+  const handleAddIndex = async()=>{
+    if (indexName.length <=0 ) {
+      alert('Index Name is required.');
+      return;
+    }
+    createIndex(indexName)
+  }
   
   if (loading) {
     return <p>Log in to access the dashboard.</p>;
   }
 
   return (
-    <div>
-     
-      <div style={{ marginBottom: '8px' }}>
-        <input
-          type="text"
-          value={indexName}
-          onChange={(e) => setIndexName(e.target.value)}
-          placeholder="Enter index name"
-          style={{ marginRight: '8px' }}
-        />
-        <button onClick={createIndex} style={{ marginRight: '8px', backgroundColor: 'green' }}>
-          Create New Index
-        </button>
+    <div className='p-10 font-roboto-condensed text-base flex flex-col md:flex-row gap-2'>
+      <div className='flex flex-col gap-4 w-1/2 md:w-full'>
+        <div className='flex flex-col items-start gap-2'>
+          <span className='font-bold text-lg'>Create Index</span>
+          <div className='flex items-center justify-start gap-1'>
+            <input
+              id='create-index'
+              type="text"
+              value={indexName}
+              onChange={(e) => setIndexName(e.target.value)}
+              placeholder="Enter index name"
+            />
+            <button onClick={handleAddIndex} className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded'>
+              Create New Index
+            </button>
+          </div>
+        </div>
+
+        <KeyManager onClientInitialized={(e)=>console.log('in',e)} />
+
+        <div className='flex flex-col items-start gap-2'>
+          <span className='font-bold text-lg'>Recent Tasks</span>
+          <ul style={{ listStyleType: 'none', padding: 0 }}>
+            {tasks.map((task, index) => (
+              <li key={index} style={{ marginBottom: '8px' }}>
+                Task ID: {task.uid}, Status: {task.status}, type: {task.type}
+              </li>
+            ))}
+          </ul>
+          <button onClick={() => fetchTasks()} className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded'>Fetch Tasks</button>
+        </div>
+
+        <div className='flex flex-col items-start gap-2'>
+          <span className='font-bold text-lg'>Cluster Statistics</span>
+          <pre>{JSON.stringify(generalStats, null, 2)}</pre>
+          <button onClick={() => fetchStats()} className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded'>Fetch Stats</button>
+        </div>
+
       </div>
-
-      <KeyManager />
-
-      <button onClick={() => fetchTasks()}>Recent Tasks</button>
-      <button onClick={() => fetchStats()}>Cluster Statistics</button>
-
-      <div>
-        <ul style={{ listStyleType: 'none', padding: 0 }}>
-          {tasks.map((task, index) => (
-            <li key={index} style={{ marginBottom: '8px' }}>
-              Task ID: {task.uid}, Status: {task.status}, type: {task.type}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <h4>Cluster Stats:</h4>
-        <pre>{JSON.stringify(generalStats, null, 2)}</pre>
-      </div>
-
-      <div style={{ display: 'flex' }}>
-        <div style={{ width: '30%', marginRight: '8px' }}>
-          <h4>Indexes</h4>
+      <div className='flex flex-col gap-4 w-1/2 md:w-full'>
+        <div className='flex flex-col'>
+          <span className='font-bold text-lg'>Indexes List</span>
           <ul style={{ listStyleType: 'none', padding: 0 }}>
             {indexes.map((index) => (
               <li
@@ -170,31 +186,40 @@ const Dashboard = () => {
           </ul>
         </div>
 
-        <div style={{ width: '70%' }}>
+        <div>
           {activeIndex && (
-            <div>
-              <h4>Selected Index: {activeIndex}</h4>
-              <div>Primary Key: {primaryKey}</div>
-
-              <div style={{ marginTop: '8px' }}>
-                <button onClick={() => deleteIndex(activeIndex)} style={{ marginRight: '8px', backgroundColor: 'red', color: 'white' }}>Delete</button>
-                <button onClick={() => deleteAllDocuments(activeIndex)} style={{ marginRight: '8px' }}>Delete All Docs</button>
-                <button onClick={() => { setCurrentView('settings'); fetchIndexSettings(activeIndex); }}>Show Settings</button>
-                <button onClick={() => { setCurrentView('filters'); fetchFilterableAttributes(activeIndex); }}>Show Available Filters</button>
-                <button onClick={() => { setCurrentView('stats'); fetchStats(activeIndex); }}>Show Stats</button>
-                <button onClick={() => openModal(activeIndex)}>Update Filters</button>
+            <div className='flex flex-col items-start justify-between gap-2'>
+              <div className='flex items-center gap-2'>
+                <span className='font-semibold text-lg'>Selected Index:</span>
+                <span>{activeIndex}</span>
               </div>
+              <div className='flex items-center gap-2'>
+                <span className='font-semibold text-lg'>Primary Key:</span>
+                <span>{primaryKey}</span>
+              </div>
+              <div>
+                <span className='font-semibold text-lg'>Index Actions</span>
+                <div className='flex flex-wrap gap-2'>
+                  <button className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded' onClick={() => deleteIndex(activeIndex)} >Delete</button>
+                  <button className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded' onClick={() => deleteAllDocuments(activeIndex)} >Delete All Docs</button>
+                  <button className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded' onClick={() => { setCurrentView('settings'); fetchIndexSettings(activeIndex); }}>Show Settings</button>
+                  <button className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded' onClick={() => { setCurrentView('filters'); fetchFilterableAttributes(activeIndex); }}>Show Available Filters</button>
+                  <button className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded' onClick={() => { setCurrentView('stats'); fetchStats(activeIndex); }}>Show Stats</button>
+                  <button className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded' onClick={() => openModal(activeIndex)}>Update Filters</button>
+                </div>
+              </div>
+
 
               {currentView === 'settings' && (
                 <div>
-                  <h4>Index Settings:</h4>
+                  <span className='font-semibold text-lg'>Index Settings:</span>
                   <pre>{JSON.stringify(indexSettings, null, 2)}</pre>
                 </div>
               )}
 
               {currentView === 'filters' && (
                 <div>
-                  <h4>Available Filters:</h4>
+                  <span className='font-semibold text-lg'>Available Filters</span>
                   <ul>
                     {filterableAttributes.map((attribute, idx) => (
                       <li key={idx}>{attribute}</li>
@@ -205,15 +230,15 @@ const Dashboard = () => {
 
               {currentView === 'stats' && (
                 <div>
-                  <h4>Index Stats:</h4>
+                  <span className='font-semibold text-lg'>Index Stats</span>
                   <pre>{JSON.stringify(indexStats, null, 2)}</pre>
                 </div>
               )}
 
               <SetFilters isOpen={isModalOpen} onClose={closeModal} onConfirm={handleConfirm} allowedFields={allowedFields} />
-
               <CreateCSV books={books} onCSVCreated={(csvData) => setBookCSV(csvData)} />
-              <button onClick={handleAddBook} disabled={!activeIndex}>Add Book to Selected Index</button>
+              <button onClick={handleAddBook} disabled={!activeIndex || !bookCSV} className={`${!activeIndex || !bookCSV ? 'bg-green-200 border-green-500 border': 'bg-green-400 hover:bg-green-300'} text-black  px-2 transition-all duration-300 rounded`}>Add Book's CSV to Selected Index</button>
+
               <Search selectedIndex={activeIndex} />
             </div>
           )}

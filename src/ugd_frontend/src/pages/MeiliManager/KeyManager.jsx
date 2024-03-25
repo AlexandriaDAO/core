@@ -39,12 +39,15 @@ const KeyManager = ({ onClientInitialized }) => {
 
   const handleSaveKeys = async () => {
     try {
-      await saveMeiliSearchKeys(principal, meiliDomain, meiliKey, slotIndex);
-      await saveMeiliSearchKeys(meiliDomain, meiliKey, slotIndex);
-      setKeys(prevKeys => [...prevKeys, { meili_domain: meiliDomain, meili_key: meiliKey, slot: slotIndex }]);
-      setMeiliDomain('');
-      setMeiliKey('');
-      setSlotIndex(0);
+      const success = await saveMeiliSearchKeys(meiliDomain, meiliKey, slotIndex);
+      if(success){
+        setKeys(prevKeys => [...prevKeys, { meili_domain: meiliDomain, meili_key: meiliKey, slot: slotIndex }]);
+        setMeiliDomain('');
+        setMeiliKey('');
+        setSlotIndex(0);
+      }else{
+        alert('Unable to store keys, Try again!!!')
+      }
     } catch (error) {
       console.error('Error saving keys:', error);
     }
@@ -63,33 +66,34 @@ const KeyManager = ({ onClientInitialized }) => {
   };
 
   return (
-    <div>
-      <h2>Key Manager</h2>
-      <div>
+    <div className='flex flex-col gap-2'>
+      <div className='grid grid-cols-[auto_1fr] gap-2 w-96 justify-items-start'>
+        <span className='col-span-full font-semibold text-lg'>Store New Key</span>
         <label>MeiliSearch Domain:</label>
-        <input type="text" value={meiliDomain} onChange={(e) => setMeiliDomain(e.target.value)} />
-      </div>
-      <div>
+        <input type="text" className='w-full' value={meiliDomain} onChange={(e) => setMeiliDomain(e.target.value)} />
         <label>MeiliSearch Key:</label>
-        <input type="text" value={meiliKey} onChange={(e) => setMeiliKey(e.target.value)} />
-      </div>
-      <div>
+        <input type="text" className='w-full' value={meiliKey} onChange={(e) => setMeiliKey(e.target.value)} />
         <label>Slot Index:</label>
-        <input type="number" value={slotIndex} onChange={(e) => setSlotIndex(Number(e.target.value))} />
+        <input type="number" className='w-full' value={slotIndex} onChange={(e) => setSlotIndex(Number(e.target.value))} />
+        <button onClick={handleSaveKeys} className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded col-span-full self-center'>
+          Submit
+        </button>
       </div>
-      <button onClick={handleSaveKeys}>Save Keys</button>
-      <h3>Saved Keys:</h3>
-      <ul>
-        {keys.map((key, index) => (
-          <li key={index}>
-            Domain: {key.meili_domain}, Key: {key.meili_key}, Slot: {key.slot}
-            <button onClick={() => handleSlotChange(key.slot)}>Select</button>
-          </li>
-        ))}
-      </ul>
-      {selectedSlot !== null && (
-        <p>Selected Slot: {selectedSlot}</p>
-      )}
+
+      <div>
+        <span className='font-semibold text-lg'>Previously Stored Keys</span>
+        <ul>
+          {keys.map((key, index) => (
+            <li key={index}>
+              Domain: {key.meili_domain}, Key: {key.meili_key}, Slot: {key.slot}
+              <button onClick={() => handleSlotChange(key.slot)}>Select</button>
+            </li>
+          ))}
+        </ul>
+        {selectedSlot !== null && (
+          <p>Selected Slot: {selectedSlot}</p>
+        )}
+      </div>
     </div>
   );
 };
