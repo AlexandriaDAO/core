@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import { FaGripVertical } from "react-icons/fa";
 import { FaGripHorizontal } from "react-icons/fa";
 import { initJuno, listDocs } from "@junobuild/core";
@@ -8,11 +7,8 @@ import List from "./List";
 import NoBooks from "./NoBooks";
 import Loading from "./Loading";
 import Mint from "./Mint";
-import useAuth from "@/utils/AuthProvider";
 
 const BookPortal = () => {
-	const { UID } = useAuth();
-
 	const [limit, setLimit] = useState<any>(10);
 	const [view, setView] = useState("grid");
 	const [data, setData] = useState<any>(undefined);
@@ -34,7 +30,7 @@ const BookPortal = () => {
 
 	useEffect(() => {
 		const init = async () => {
-			await initJuno({ satelliteId: "kh5oj-myaaa-aaaal-admga-cai" , internetIdentityId: UID });
+			await initJuno({ satelliteId: "kh5oj-myaaa-aaaal-admga-cai" , internetIdentityId: '123456' });
 		};
 		init();
 	}, []);

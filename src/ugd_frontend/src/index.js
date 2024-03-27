@@ -12,11 +12,11 @@ import Home from "./pages/Home";
 import "./styles/tailwind.css";
 // import "./styles/main.css";
 // import "../assets/index.css";
-import { useAuth } from "./utils/AuthProvider";
+// import { useAuth } from "./utils/AuthProvider";
 import { BookMarkedSourceCardProvider } from "./utils/BookMarkedSourceCardProvider";
 
 const App = () => {
-  const { handleLogin, handleLogout, UID } = useAuth();
+  // const { handleLogin, handleLogout, UID } = useAuth();
 
   return (
     <MessageProvider>

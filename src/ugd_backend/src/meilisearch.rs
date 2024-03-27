@@ -53,7 +53,7 @@ impl Storable for PrincipalWrapper {
     
     const BOUND: Bound = Bound::Bounded {
       max_size: 29,
-        is_fixed_size: true,
+        is_fixed_size: false,
       };
     }
 
@@ -80,27 +80,22 @@ thread_local! {
         )
     );
 }
-  
-#[ic_cdk_macros::query]
-pub fn whoami(principal_text: String) -> String {
-    format!("Principal: {}!", principal_text)
-}
 
 #[ic_cdk_macros::query]
-pub fn cdk_caller() -> String {
+pub fn whoami() -> String {
     let principal_from_caller: Principal = caller();
-    format!("Caller IC CDK: {}", principal_from_caller)
+    // format!("Caller IC CDK: {}", principal_from_caller)
+    principal_from_caller.to_text()
 }
 
-// Save to a particular slot that gets overridden.
+// Save keys with cdk::caller()
 #[ic_cdk_macros::update]
 pub fn save_meilisearch_keys(
-    principal_text: String,
     meili_domain: String,
     meili_key: String,
     slot_index: u8,
 ) -> Result<(), String> {
-    let principal = Principal::from_text(principal_text).unwrap();
+    let principal =  ic_cdk::api::caller();
     let keys = MeiliSearchKeys {
         meili_domain,
         meili_key,
@@ -134,8 +129,8 @@ pub fn save_meilisearch_keys(
 }
 
 #[ic_cdk_macros::query]
-pub fn get_meilisearch_keys(principal_text: String) -> Vec<MeiliSearchKeys> {
-    let principal = Principal::from_text(principal_text).unwrap();
+pub fn get_meilisearch_keys() -> Vec<MeiliSearchKeys> {
+    let principal = ic_cdk::api::caller();
     KEYS_MAP.with(|m| {
         m.borrow()
             .get(&PrincipalWrapper(principal))
@@ -143,6 +138,163 @@ pub fn get_meilisearch_keys(principal_text: String) -> Vec<MeiliSearchKeys> {
             .unwrap_or_default()
     })
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // Save keys by adding principal to the call
+// #[ic_cdk_macros::update]
+// pub fn save_meilisearch_keys(
+//     principal_text: String,
+//     meili_domain: String,
+//     meili_key: String,
+//     slot_index: u8,
+// ) -> Result<(), String> {
+//     let principal = Principal::from_text(principal_text).unwrap();
+//     let keys = MeiliSearchKeys {
+//         meili_domain,
+//         meili_key,
+//         slot: slot_index,
+//     };
+//     KEYS_MAP.with(|m| {
+//         let mut map = m.borrow_mut();
+//         let user_keys = match map.get(&PrincipalWrapper(principal)) {
+//             Some(keys_vec) => {
+//                 let mut updated_keys_vec = keys_vec.clone();
+//                 if slot_index < MAX_KEYS_PER_USER as u8 {
+//                     let slot_exists = updated_keys_vec.0.iter().any(|k| k.slot == slot_index);
+//                     if slot_exists {
+//                         updated_keys_vec.0.retain(|k| k.slot != slot_index);
+//                     }
+//                     updated_keys_vec.0.push(keys);
+//                     map.insert(PrincipalWrapper(principal), updated_keys_vec);
+//                     Ok(())
+//                 } else {
+//                     Err(format!("Invalid slot index. Maximum number of keys per user is {}", MAX_KEYS_PER_USER))
+//                 }
+//             }
+//             None => {
+//                 let new_keys_vec = MeiliSearchKeysVec(vec![keys]);
+//                 map.insert(PrincipalWrapper(principal), new_keys_vec);
+//                 Ok(())
+//             }
+//         };
+//         user_keys
+//     })
+// }
+
+// #[ic_cdk_macros::query]
+// pub fn get_meilisearch_keys(principal_text: String) -> Vec<MeiliSearchKeys> {
+//     let principal = Principal::from_text(principal_text).unwrap();
+//     KEYS_MAP.with(|m| {
+//         m.borrow()
+//             .get(&PrincipalWrapper(principal))
+//             .map(|keys| keys.0.clone())
+//             .unwrap_or_default()
+//     })
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // OG
+  
+// #[ic_cdk_macros::query]
+// pub fn whoami(principal_text: String) -> String {
+//     format!("Principal: {}!", principal_text)
+// }
+
+// #[ic_cdk_macros::query]
+// pub fn cdk_caller() -> String {
+//     let principal_from_caller: Principal = caller();
+//     format!("Caller IC CDK: {}", principal_from_caller)
+// }
+
+// // Save to a particular slot that gets overridden.
+// #[ic_cdk_macros::update]
+// pub fn save_meilisearch_keys(
+//     principal_text: String,
+//     meili_domain: String,
+//     meili_key: String,
+//     slot_index: u8,
+// ) -> Result<(), String> {
+//     let principal = Principal::from_text(principal_text).unwrap();
+//     let keys = MeiliSearchKeys {
+//         meili_domain,
+//         meili_key,
+//         slot: slot_index,
+//     };
+//     KEYS_MAP.with(|m| {
+//         let mut map = m.borrow_mut();
+//         let user_keys = match map.get(&PrincipalWrapper(principal)) {
+//             Some(keys_vec) => {
+//                 let mut updated_keys_vec = keys_vec.clone();
+//                 if slot_index < MAX_KEYS_PER_USER as u8 {
+//                     let slot_exists = updated_keys_vec.0.iter().any(|k| k.slot == slot_index);
+//                     if slot_exists {
+//                         updated_keys_vec.0.retain(|k| k.slot != slot_index);
+//                     }
+//                     updated_keys_vec.0.push(keys);
+//                     map.insert(PrincipalWrapper(principal), updated_keys_vec);
+//                     Ok(())
+//                 } else {
+//                     Err(format!("Invalid slot index. Maximum number of keys per user is {}", MAX_KEYS_PER_USER))
+//                 }
+//             }
+//             None => {
+//                 let new_keys_vec = MeiliSearchKeysVec(vec![keys]);
+//                 map.insert(PrincipalWrapper(principal), new_keys_vec);
+//                 Ok(())
+//             }
+//         };
+//         user_keys
+//     })
+// }
+
+// #[ic_cdk_macros::query]
+// pub fn get_meilisearch_keys(principal_text: String) -> Vec<MeiliSearchKeys> {
+//     let principal = Principal::from_text(principal_text).unwrap();
+//     KEYS_MAP.with(|m| {
+//         m.borrow()
+//             .get(&PrincipalWrapper(principal))
+//             .map(|keys| keys.0.clone())
+//             .unwrap_or_default()
+//     })
+// }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

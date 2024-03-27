@@ -11,8 +11,7 @@ import KeyManager from './KeyManager';
 const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   
-  const selectedIndex = 'asdf';
-  // const activeIndex = 'asdf';
+  const selectedIndex = '';
   const { client, loading } = useMeiliSearchClient(selectedIndex);
   const [indexes, setIndexes] = useState([]);
   const [currentView, setCurrentView] = useState(null);
