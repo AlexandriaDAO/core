@@ -2,34 +2,25 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
 import "../styles/headerTabs.css";
-import { useAuth } from "../utils/AuthProvider";
+import { useAuth } from "../contexts/AuthContext";
 
-// function formatPrincipal(principal) {
-//   if (principal.length <= 10) {
-//     return principal;
-//   }
+function formatPrincipal(principal) {
+  if (principal.length <= 10) {
+    return principal;
+  }
 
-//   const split = principal.split('-');
-//   console.log(split);
-//   if(split.length>2){
-//     return `${split[0]}....${split[split.length-1]}`;
-//   }else{
-//     // Take the first 5 characters, add ellipsis, and then append the last 3 characters
-//     return `${principal.slice(0, 5)}....${principal.slice(-4)}`;
-//   }
-// }
+  const split = principal.split('-');
+  console.log(split);
+  if(split.length>2){
+    return `${split[0]}....${split[split.length-1]}`;
+  }else{
+    // Take the first 5 characters, add ellipsis, and then append the last 3 characters
+    return `${principal.slice(0, 5)}....${principal.slice(-4)}`;
+  }
+}
 
 const Tabs = () => {
-  const { actor, UID, login, logout } = useAuth();
-
-  const handleLogin = async (e) => {
-    await login(e);
-  };
-
-  const handleLogout = async (e) => {
-    await logout(e);
-  };
-
+  const { UID, login, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const tabs = [
@@ -102,11 +93,11 @@ const Tabs = () => {
       </div>
       <div className="authTab my-0">
         <div className="innerAuthTab">
-          {UID && <label className="border-right">{UID}</label>}
+          {UID && <label className="border-right">{formatPrincipal(UID)}</label>}
           {UID ? (
-            <label onClick={handleLogout}>Logout</label>
+            <label onClick={logout}>Logout</label>
           ) : (
-            <label onClick={handleLogin}>Login</label>
+            <label onClick={login}>Login</label>
           )}
         </div>
       </div>

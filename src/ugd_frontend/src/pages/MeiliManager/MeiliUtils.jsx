@@ -15,7 +15,7 @@ const useMeiliUtils = (selectedIndex) => {
   const [healthStatus, setHealthStatus] = useState('checking'); // 'checking', 'available', 'unavailable'
   const [indexSettings, setIndexSettings] = useState({});
   const [filterableAttributes, setFilterableAttributes] = useState([]);
-  // const [activeIndex, setActiveIndex] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(null);
 
 
   // This is failing right now and I don't know why. I think it works on azure and not meilisearch because of a serialization issue but not totally sure.
@@ -26,6 +26,7 @@ const useMeiliUtils = (selectedIndex) => {
       fetchTasks();
       setIndexName('');
     } catch (error) {
+      console.log("Existing client stats: ", await client.getStats())
       alert('Failed to create index');
       console.error('Error creating index:', error);
     }

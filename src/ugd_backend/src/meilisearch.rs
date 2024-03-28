@@ -1,4 +1,4 @@
-// Saves Meilisearch Access keys for a user based on their principal, but manually entering the principal.
+// Saves Meilisearch Access keys for a user based on their principal
 
 use candid::{CandidType, Decode, Deserialize, Encode, Principal};
 use ic_cdk::export::candid;

@@ -1,6 +1,7 @@
 // pages/MeiliManager/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import useMeiliSearchClient from '../../utils/MeiliSearchClient';
+import { useAuth } from '@/contexts/AuthContext';
 import useMeiliUtils from './MeiliUtils';
 import SetFilters from './SetFilters';
 import CreateCSV from './CreateCSV';
@@ -10,9 +11,9 @@ import KeyManager from './KeyManager';
 
 const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(null);
-  
+  const { UID } = useAuth();
   const selectedIndex = '';
-  const { client, loading } = useMeiliSearchClient(selectedIndex);
+  const { client } = useMeiliSearchClient(selectedIndex);
   const [indexes, setIndexes] = useState([]);
   const [currentView, setCurrentView] = useState(null);
   const [books, setBooks] = useState([]);
@@ -120,10 +121,11 @@ const Dashboard = () => {
     createIndex(indexName)
   }
   
-  if (loading) {
+  if ([null, '2vxsx-fae'].includes(UID)) {
     return <p>Log in to access the dashboard.</p>;
   }
 
+  
   return (
     <div className='p-10 font-roboto-condensed text-base flex flex-col md:flex-row gap-2'>
       <div className='flex flex-col gap-4 w-1/2 md:w-full'>

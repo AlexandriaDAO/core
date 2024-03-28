@@ -4,6 +4,7 @@ import store from './store'
 import { Provider } from 'react-redux'
 import WebFont from "webfontloader";
 import MessageProvider from "./utils/MessageProvider";
+import { AuthProvider } from "./contexts/AuthContext";
 import { AuthorProvider } from "./contexts/AuthorContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -12,7 +13,6 @@ import Home from "./pages/Home";
 import "./styles/tailwind.css";
 // import "./styles/main.css";
 // import "../assets/index.css";
-// import { useAuth } from "./utils/AuthProvider";
 import { BookMarkedSourceCardProvider } from "./utils/BookMarkedSourceCardProvider";
 
 const App = () => {
@@ -57,7 +57,9 @@ document.addEventListener("DOMContentLoaded", () => {
           {/* <Home /> */}
           <AuthorProvider>
             <SettingsProvider>
-              <App />
+              <AuthProvider>
+                <App />
+              </AuthProvider>
             </SettingsProvider>
           </AuthorProvider>
         </Provider>
