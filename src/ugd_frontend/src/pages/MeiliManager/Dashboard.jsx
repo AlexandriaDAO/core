@@ -4,7 +4,8 @@ import useMeiliSearchClient from '../../utils/MeiliSearchClient';
 import useMeiliUtils from './MeiliUtils';
 import SetFilters from './SetFilters';
 import CreateCSV from './CreateCSV';
-import { initJuno, listDocs } from '@junobuild/core';
+import { listDocs } from '@junobuild/core';
+import { initJuno } from '@/utils/Juno';
 import Search from './Search';
 import KeyManager from './KeyManager';
 
