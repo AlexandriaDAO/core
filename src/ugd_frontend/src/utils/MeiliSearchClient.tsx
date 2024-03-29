@@ -9,6 +9,7 @@ import { AiOutlineConsoleSql } from 'react-icons/ai';
 interface MeiliSearchClientHook {
   client: any;
   loading: any;
+  indexes: any;
   saveMeiliSearchKeys: (
     meiliDomain: string,
     meiliKey: string,
@@ -22,6 +23,7 @@ const useMeiliSearchClient = (): MeiliSearchClientHook => {
   const { UID } = useAuth();
   const [client, setClient] = useState<MeiliSearch | null>(null);
   const [loading, setLoading] = useState(true);
+  const [indexes, setIndexes] = useState<string[]>([]);
   
   useEffect(() => {
     const initializeClient = async () => {
@@ -34,9 +36,25 @@ const useMeiliSearchClient = (): MeiliSearchClientHook => {
     };
 
     initializeClient();
-  }, []);
+  }, [UID]);
 
-
+  useEffect(() => {
+    const fetchIndexes = async () => {
+      if (!client) {
+        console.error('MeiliSearch client not initialized');
+        return;
+      }
+      try {
+        const stats = await client.getStats();
+        const indexNames = Object.keys(stats.indexes);
+        setIndexes(indexNames);
+      } catch (error) {
+        console.error('Failed to fetch indexes:', error);
+      }
+    };
+    
+    fetchIndexes();
+  }, [client]);
 
   const saveMeiliSearchKeys = async (
     meiliDomain: string,
@@ -116,6 +134,7 @@ const useMeiliSearchClient = (): MeiliSearchClientHook => {
   return {
     client,
     loading,
+    indexes,
     saveMeiliSearchKeys,
     getMeiliSearchKeys,
     initializeMeiliSearchClient,

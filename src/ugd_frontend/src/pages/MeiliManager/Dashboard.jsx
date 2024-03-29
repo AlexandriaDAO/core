@@ -13,16 +13,11 @@ const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const { UID } = useAuth();
   const selectedIndex = '';
-  const { client } = useMeiliSearchClient(selectedIndex);
-  const [indexes, setIndexes] = useState([]);
+  const { indexes } = useMeiliSearchClient();
   const [currentView, setCurrentView] = useState(null);
   const [books, setBooks] = useState([]);
-
-  // For filter modal: 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const allowedFields = ['fiction', 'type', 'subtype', 'pubyear', 'id', 'title', 'author'];
-
-  // For creating a new index: 
   const [indexName, setIndexName] = useState('');
 
   const {
@@ -49,28 +44,6 @@ const Dashboard = () => {
     updateFilters,
   } = useMeiliUtils(selectedIndex);
 
-  
-  useEffect(() => {
-    const fetchIndexes = async () => {
-      if (!client) {
-        console.error('MeiliSearch client not initialized');
-        return;
-      }
-      
-      console.log('Fetching indexes with client:', client);
-
-      try {
-        const stats = await client.getStats();
-        const indexNames = Object.keys(stats.indexes);
-        setIndexes(indexNames);
-      } catch (error) {
-        console.error('Failed to fetch indexes:', error);
-      }
-    };
-    
-    fetchIndexes();
-  }, [client]);
-
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -95,6 +68,7 @@ const Dashboard = () => {
 
   const handleConfirm = async (fields) => {
     if (!activeIndex) return;
+
     console.log(`Updating ${activeIndex} with fields:`, fields);
     await updateFilters(activeIndex, fields);
     closeModal();

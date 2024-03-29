@@ -100,6 +100,9 @@ const useMeiliUtils = (selectedIndex) => {
   };
 
   const fetchStats = async (index) => {
+    console.log("FetchStats has been Called!")
+    console.log("Client right now", client)
+    console.log("loading right now", loading)
     if (loading) return;
     if (index) {
       const indexStats = await client.index(index).getStats();
