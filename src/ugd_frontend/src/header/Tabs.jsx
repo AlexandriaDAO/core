@@ -10,7 +10,6 @@ function formatPrincipal(principal) {
   }
 
   const split = principal.split('-');
-  console.log(split);
   if(split.length>2){
     return `${split[0]}....${split[split.length-1]}`;
   }else{

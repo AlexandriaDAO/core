@@ -1,8 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import store from './store'
-import { Provider } from 'react-redux'
 import WebFont from "webfontloader";
+import ReduxProvider from "./store/provider";
 import MessageProvider from "./utils/MessageProvider";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AuthorProvider } from "./contexts/AuthorContext";
@@ -24,6 +23,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="*" element={<Layout />} />
+            <Route path="/home" element={<Home />} />
           </Routes>
         </BrowserRouter>
       </BookMarkedSourceCardProvider>
@@ -53,16 +53,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const root = createRoot(semanticLibraryRoot);
     root.render(
       <React.StrictMode>
-        <Provider store={store}>
-          {/* <Home /> */}
-          <AuthorProvider>
-            <SettingsProvider>
-              <AuthProvider>
-                <App />
-              </AuthProvider>
-            </SettingsProvider>
-          </AuthorProvider>
-        </Provider>
+          <ReduxProvider >
+            <AuthorProvider>
+              <SettingsProvider>
+                <AuthProvider>
+                  <App />
+                </AuthProvider>
+              </SettingsProvider>
+            </AuthorProvider>
+          </ReduxProvider>
       </React.StrictMode>
     );
   }

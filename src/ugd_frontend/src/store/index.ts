@@ -1,15 +1,16 @@
-import { configureStore } from '@reduxjs/toolkit';
-import portalReducer from '@/features/portal/portalSlice';
-import homeReducer from '@/features/home/homeSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import portalReducer from "@/features/portal/portalSlice";
+import homeReducer from "@/features/home/homeSlice";
 
-const store = configureStore({
-  reducer: {
-    portal: portalReducer,
-    home: homeReducer,
-  },
-});
+export const makeStore = () => {
+	return configureStore({
+		reducer: {
+			portal: portalReducer,
+			home: homeReducer,
+		}
+	});
+};
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
-
-export default store;
+export type AppStore = ReturnType<typeof makeStore>;
+export type RootState = ReturnType<AppStore["getState"]>;
+export type AppDispatch = AppStore["dispatch"];

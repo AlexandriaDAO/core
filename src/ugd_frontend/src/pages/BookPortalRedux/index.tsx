@@ -36,7 +36,7 @@ const BookPortalRedux = () => {
 	}, [dispatch, limit]);
 
 	const getTotalPages = () =>
-		data ? Math.ceil(Number(data.matches_length) / limit) : 0;
+		data ? Math.ceil(data.matches_length / limit) : 0;
 
 	const renderContent = () => {
 		// If there was an error, show an error message
