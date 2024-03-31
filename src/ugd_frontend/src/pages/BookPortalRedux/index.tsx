@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { FaGripVertical } from "react-icons/fa";
 import { FaGripHorizontal } from "react-icons/fa";
-import { initJuno, listDocs } from "@junobuild/core";
+import { listDocs,initJuno } from "@junobuild/core";
 import Grid from "./Grid";
 import List from "./List";
 import NoBooks from "./NoBooks";

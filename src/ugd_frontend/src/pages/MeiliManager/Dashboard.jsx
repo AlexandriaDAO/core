@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import useMeiliUtils from './MeiliUtils';
 import SetFilters from './SetFilters';
 import CreateCSV from './CreateCSV';
-import { initJuno, listDocs } from '@junobuild/core';
+import { listDocs,initJuno } from '@junobuild/core';
 import Search from './Search';
 import KeyManager from './KeyManager';
 
