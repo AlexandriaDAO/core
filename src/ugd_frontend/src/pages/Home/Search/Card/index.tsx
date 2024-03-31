@@ -1,5 +1,6 @@
 import { setSelectedSearchedBook } from "@/features/home/homeSlice";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useState } from "react";
 import { BiBookAlt, BiPlus } from "react-icons/bi";
 import { HiOutlinePlus } from "react-icons/hi";
@@ -123,18 +124,16 @@ const Card: React.FC<Props> = ({ item }) => {
                 />
                 <span> 1,2k</span>
             </div>
-			<div
-               
-            >
+			<div>
 				<p className="font-roboto-condensed font-normal text-xl ">
 					{expanded
 						? item.description
 						: truncateText(item.description, 100)}
 				</p>
                 {item.description.length > 100 && (
-                    <div 
-                    className="cursor-pointer hover:text-gray-500 font-roboto-condensed text-xl font-medium flex justify-center items-center"
-                    onClick={toggleExpand}
+                    <div
+						className="cursor-pointer hover:text-gray-500 font-roboto-condensed text-xl font-medium flex justify-center items-center"
+						onClick={toggleExpand}
                     >
                         {expanded ? (
                             <span> Show Less</span>

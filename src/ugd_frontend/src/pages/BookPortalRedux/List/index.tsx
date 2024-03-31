@@ -1,6 +1,6 @@
 import React from "react";
 import Row from "./Row";
-import { useAppSelector } from "@/store/hooks";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 const List = () => {
     const {data} =useAppSelector(state=>state.portal)

@@ -1,9 +1,8 @@
-import { RootState } from "@/store";
-import { Doc, ListResults, listDocs } from "@junobuild/core";
+import { RootState } from "@/store/storeTypes";
+import { listDocs } from "@junobuild/core";
 import {
 	createSlice,
 	createAsyncThunk,
-	configureStore,
 	PayloadAction,
 } from "@reduxjs/toolkit";
 

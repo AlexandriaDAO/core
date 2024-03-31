@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import WebFont from "webfontloader";
-import ReduxProvider from "./store/provider";
+import ReduxProvider from "./store/ReduxProvider";
 import MessageProvider from "./utils/MessageProvider";
 import { AuthProvider } from "./contexts/AuthContext";
 import { AuthorProvider } from "./contexts/AuthorContext";

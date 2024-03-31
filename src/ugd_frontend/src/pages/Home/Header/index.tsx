@@ -1,9 +1,10 @@
 import AuthButton from "@/components/ui/AuthButton";
 import FilterButton from "@/components/ui/FilterButton";
 import SearchField from "@/components/ui/SearchField";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import React from "react";
 import Filter from "./Filter";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 function Header() {
 	const dispatch = useAppDispatch();

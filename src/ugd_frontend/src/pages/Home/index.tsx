@@ -2,9 +2,10 @@
 import React, { useEffect } from "react";
 import Header from "./Header";
 import Categories from "./Categories";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import Search from "./Search";
 import { setView } from "@/features/home/homeSlice";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 function Home() {
     const dispatch = useAppDispatch();

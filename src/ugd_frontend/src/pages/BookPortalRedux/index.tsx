@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import { FaGripVertical } from "react-icons/fa";
 import { FaGripHorizontal } from "react-icons/fa";
-import { listDocs,initJuno } from "@junobuild/core";
+import { initJuno } from "@junobuild/core";
 import Grid from "./Grid";
 import List from "./List";
 import NoBooks from "./NoBooks";
 import Loading from "./Loading";
 import Mint from "./Mint";
-import { RootState } from "@/store";
 import { fetchBooks, setLimit, setView } from "@/features/portal/portalSlice";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 const BookPortalRedux = () => {
 	const dispatch = useAppDispatch();
@@ -21,7 +21,7 @@ const BookPortalRedux = () => {
 		loading, // Boolean indicating loading state
 		error, // Error information
 		currentPage, // Current page of the book list
-	} = useAppSelector((state: RootState) => state.portal);
+	} = useAppSelector(state => state.portal);
 
 	useEffect(() => {
 		const init = async () => {

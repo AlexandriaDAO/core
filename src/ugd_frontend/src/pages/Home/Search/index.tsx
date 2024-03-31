@@ -1,8 +1,8 @@
 import React from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import Card from "./Card";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import Read from "./Read";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 type Props = {};
 const cards = [
@@ -83,8 +83,6 @@ const cards = [
 ];
 
 const Search = (props: Props) => {
-
-	const dispatch = useAppDispatch();
     const {selectedSearchedBook} =  useAppSelector(state=>state.home)
 
 	return (

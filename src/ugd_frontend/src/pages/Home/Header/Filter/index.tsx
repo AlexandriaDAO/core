@@ -1,5 +1,6 @@
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React from "react";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 const categories = [
 	{

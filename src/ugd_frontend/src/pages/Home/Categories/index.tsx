@@ -4,9 +4,10 @@ import React, {
 	useRef,
 } from "react";
 import BookModal from "./BookModal";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setSelectedCategory } from "@/features/home/homeSlice";
 import BooksCarousel from "./BookCarousel";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 
 const categories = [

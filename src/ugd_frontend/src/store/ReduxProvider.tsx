@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { Provider } from "react-redux";
-import { makeStore, AppStore } from ".";
+import { AppStore } from "./storeTypes";
+import { makeStore } from ".";
 // import { fetchAuth } from "@/features/auth/authSlice";
 
 export default function ReduxProvider({

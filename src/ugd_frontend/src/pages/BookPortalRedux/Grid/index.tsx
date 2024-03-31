@@ -1,6 +1,6 @@
 import React from "react";
 import Card from "./Card";
-import { useAppSelector } from "@/store/hooks";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 const Grid = () => {
     const {data} =useAppSelector(state=>state.portal)

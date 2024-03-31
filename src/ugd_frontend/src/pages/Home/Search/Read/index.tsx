@@ -1,9 +1,10 @@
 import { setSelectedSearchedBook } from "@/features/home/homeSlice";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import React, { useEffect, useRef, useState } from "react";
 import { HiOutlinePlus } from "react-icons/hi";
 import { SlEye, SlPlus } from "react-icons/sl";
 import { RxCross2 } from "react-icons/rx";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 interface Item {
 	id: number;
@@ -44,7 +45,6 @@ const Read: React.FC<Props> = ({ item }) => {
             <div
                 className="m-4 p-4 text-black shadow-xl border border-solid border-black rounded-lg transition-all duration-500 flex gap-1"
             >
-                
                 <div className="flex-shrink-0 flex flex-col basis-1/3 gap-1">
                     <div className="flex">
                         <div
