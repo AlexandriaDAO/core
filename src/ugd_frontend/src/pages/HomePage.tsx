@@ -1,36 +1,31 @@
 
 import React, { useEffect } from "react";
-import Header from "./Header";
-import Categories from "./Categories";
-import Search from "./Search";
 import { setView } from "@/features/home/homeSlice";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import Header from "@/components/Header";
+import Categories from "@/features/categories";
+import Search from "@/features/search";
+import Loading from "@/features/loading";
+import MainLayout from "@/layouts/MainLayout";
 
-function Home() {
+function HomePage() {
     const dispatch = useAppDispatch();
     const {view} =  useAppSelector(state=>state.home)
     useEffect(()=>{
         (async()=>{
             // await new Promise(p=> setTimeout(p,1000))
 
-            dispatch(setView('search'));
+            dispatch(setView('home'));
         })()
     },[])
 	return (
-		<div className="min-h-screen min-w-screen flex flex-col bg-[#f4f4f4]">
-
-            <Header />
-
+        <MainLayout>
 			{ view === 'home' && <Categories /> }
-			{ view === 'loading' && <div className="w-full h-full flex justify-center items-center">
-                loading...
-            </div> }
+			{ view === 'loading' && <Loading /> }
 			{ view === 'search' && <Search /> }
-
-
-		</div>
+        </MainLayout>
 	);
 }
 
-export default Home;
+export default HomePage;

@@ -23,19 +23,15 @@ class AuthService{
         return this.client?.isAuthenticated() ?? false;
     }
 
-    public async getUID(): Promise<string | null> {
-        if (!this.client) await this.initialize();
-
-        if (!await this.isAuthenticated()) return null;
-
+    public async getPrincipal(): Promise<string | null> {
         try {
-            const identity = this.client!.getIdentity();
-            const agent = new HttpAgent({ identity });
-            const actor = createActor(process.env.CANISTER_ID_UGD_BACKEND!, { agent });
+            if (!this.client) await this.initialize();
+            if (!await this.isAuthenticated()) throw new Error("User is not Authenticated");
 
-            return await actor.whoami();
+            const identity = this.client!.getIdentity();
+            return identity.getPrincipal().toString();
         } catch (error) {
-            console.error("Error getting UID", error);
+            console.error("Error getting Principal", error);
             return null;
         }
     }
@@ -44,23 +40,19 @@ class AuthService{
     public async login(): Promise<string | null> {
         try {
             if (!this.client) {
-                await this.initialize(); // Ensure there's an initialize method that creates the AuthClient instance
+                await this.initialize();
             }
 
-            await new Promise<void>((resolve, reject) => {
+            return await new Promise<string|null>((resolve, reject) => {
                 this.client!.login({
                     identityProvider: process.env.DFX_NETWORK === "ic" ? "https://identity.ic0.app" : `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`,
                     // maxTimeToLive: BigInt (7) * BigInt(24) * BigInt(3_600_000_000_000), // 1 week
+                    // default maxTimeToLive is 8 hours
                     windowOpenerFeatures: "toolbar=0,location=0,menubar=0,width=500,height=500,left=100,top=100",
-                    onSuccess: resolve,
+                    onSuccess: ()=>resolve(this.getPrincipal()),
                     onError: () => reject(new Error("Could not authenticate")),
                 });
             });
-
-            const identity = this.client!.getIdentity();
-            const agent = new HttpAgent({ identity });
-            const actor = createActor(process.env.CANISTER_ID_UGD_BACKEND!, { agent });
-            return await actor.whoami();
         } catch (error) {
             console.error("Login failed", error);
             return null;

@@ -1,10 +1,10 @@
 import FilterButton from "@/components/ui/FilterButton";
 import SearchField from "@/components/ui/SearchField";
 import React from "react";
-import Filter from "./Filter";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Auth from "@/features/auth";
+import Filter from "@/features/filter";
 
 function Header() {
 	const {filter} = useAppSelector(state=>state.home);

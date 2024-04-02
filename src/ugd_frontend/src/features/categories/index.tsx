@@ -3,9 +3,9 @@ import React, {
     useEffect,
 	useRef,
 } from "react";
-import BookModal from "./BookModal";
+import BookModal from "./components/BookModal";
 import { setSelectedCategory } from "@/features/home/homeSlice";
-import BooksCarousel from "./BookCarousel";
+import BooksCarousel from "./components/BookCarousel";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 

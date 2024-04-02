@@ -1,7 +1,7 @@
 import React from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import Card from "./Card";
-import Read from "./Read";
+import Card from "./components/Card";
+import Read from "./components/Read";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 type Props = {};

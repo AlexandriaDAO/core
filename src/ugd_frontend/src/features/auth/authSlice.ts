@@ -25,7 +25,7 @@ export const initialize = createAsyncThunk<
 	{ rejectValue: string }
 >("auth/initialize", async (_, { rejectWithValue, fulfillWithValue }) => {
 	try {
-		return fulfillWithValue(await AuthService.getUID());
+		return fulfillWithValue(await AuthService.getPrincipal());
 	} catch (error) {
 		if (error instanceof Error) {
 			return rejectWithValue(error.message);
