@@ -21,10 +21,9 @@
         "ugd_backend"
       ],
       "frontend": {
-        "entrypoint": "src/ugd_frontend/src/index.html"
+        "entrypoint": "src/ugd_frontend/public/index.html"
       },
       "source": [
-        "src/ugd_frontend/assets",
         "dist/ugd_frontend/"
       ],
       "type": "assets"

@@ -1,13 +1,12 @@
-import AuthButton from "@/components/ui/AuthButton";
 import FilterButton from "@/components/ui/FilterButton";
 import SearchField from "@/components/ui/SearchField";
 import React from "react";
 import Filter from "./Filter";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import Auth from "@/features/auth";
 
 function Header() {
-	const dispatch = useAppDispatch();
 	const {filter} = useAppSelector(state=>state.home);
 
 	return (
@@ -15,7 +14,7 @@ function Header() {
 			<div className="flex-grow-0 flex-shrink-0 flex basis-40 justify-between items-center">
 				<FilterButton />
 				<SearchField />
-				<AuthButton />
+				<Auth />
 			</div>
 			{filter && <Filter />}
 		</div>

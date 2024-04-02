@@ -107,7 +107,7 @@ const Card: React.FC<Props> = ({ item }) => {
 							"Fossils & prehistoric life",
 							"Classical and modern Greek literatures",
 						].map((subCategory) => (
-							<div className="truncate px-4 py-1 flex justify-center items-center border border-black rounded-full font-roboto-condensed text-sm font-normal cursor-pointer hover:bg-black hover:text-white transition-all duration-300 ease-in">
+							<div key={subCategory} className="truncate px-4 py-1 flex justify-center items-center border border-black rounded-full font-roboto-condensed text-sm font-normal cursor-pointer hover:bg-black hover:text-white transition-all duration-300 ease-in">
 								{subCategory}
 							</div>
 						))}

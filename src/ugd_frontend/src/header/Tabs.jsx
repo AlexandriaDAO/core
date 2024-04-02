@@ -23,13 +23,10 @@ const Tabs = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const tabs = [
-    {name: "Earn", url: 'earn'},
-    {name: "Create", url: 'create'},
-    {name: "Share", url: 'share'},
-    {name: "Manager", url: 'manager'},
-    {name: "Book Portal", url: 'book-portal'},
+    {name: "Home", url: '/'},
+    {name: "Meili", url: 'meili'},
+    {name: "Book Portal", url: 'portal'},
   ];
-  const containerWidth = "900px";
 
   const [activeItem, setActiveItem] = useState();
 
@@ -45,7 +42,7 @@ const Tabs = () => {
   return (
     <div className="flex justify-between items-center">
       <div 
-        className="relative gap-10 px-10 basis-2/3 flex-shrink-0 flex justify-around items-center bg-white border border-solid border-gray-300 rounded-3xl"
+        className="m-auto relative gap-10 px-10 flex-shrink-0 flex justify-around items-center bg-white border border-solid border-gray-300 rounded-3xl"
         style={{
           boxShadow:
             "0 0 3px rgba(0, 0, 0, .1), 0 0 6px rgba(0, 0, 0, .1), 0 0 9px rgba(0, 0, 0, .1), 0 0 12px rgba(0, 0, 0, .1), 0 0 15px rgba(0, 0, 0, .1)",

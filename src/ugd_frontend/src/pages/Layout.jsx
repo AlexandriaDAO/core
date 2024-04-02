@@ -1,24 +1,15 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Tabs from '../header/Tabs';
-import Create from './Create';
-import Earn from './Earn';
-import Share from './Share';
-import Post from './Post';
-import Author from './Author';
-import EReader from './EReader';
-import BookContent from './BookContent';
-import BookPortal from './BookPortal';
-import BookPortalRedux from './BookPortalRedux';
-import MeiliManager from './MeiliManager';
-import BookSummary from './BookSummary';
+import Portal from './Portal';
+import Meili from './Meili';
+
 import NotFound from "./NotFound";
-import "../styles/main.css";
 
 
 const Layout = () => {
     return (
-        <div style={{ position: 'relative', minHeight: '100vh' }}>
+        <div className="relative min-h-full min-w-full">
             <div id="imageContainer" className="image-container" style={{
                 backgroundSize: 'cover',
                 backgroundAttachment: 'fixed',
@@ -30,27 +21,13 @@ const Layout = () => {
                 opacity: '0.5',
                 zIndex: -1,
             }} />
-            <div className="pt-6 flex flex-col justify-between items-stretch gap-2">
-                <div className="px-2">
-                    <Tabs />
-                </div>
-                <div className="flex-grow">
-                    <Routes>
-                        <Route path="/" element={<Navigate to="/create" />} />
-                        <Route path="create" element={<Create />} />
-                        <Route path="earn" element={<Earn />} />
-                        <Route path="share" element={<Share />} />
-                        <Route path="post" element={<Post />} />
-                        <Route path="author" element={<Author />} />
-                        <Route path="ereader" element={<EReader />} />
-                        <Route path="book-content" element={<BookContent />} />
-                        <Route path="book-portal" element={<BookPortal />} />
-                        <Route path="book-portal-redux" element={<BookPortalRedux />} />
-                        <Route path="manager" element={<MeiliManager />} />
-                        <Route path="book-summary" element={<BookSummary />} />
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
-                </div>
+            <div className="container m-auto pt-6 flex flex-col justify-between items-stretch gap-4">
+                <Tabs />
+                <Routes>
+                    <Route path="portal" element={<Portal />} />
+                    <Route path="meili" element={<Meili />} />
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
             </div>
         </div>
     );
