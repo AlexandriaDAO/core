@@ -13,7 +13,7 @@ import KeyManager from './KeyManager';
 const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const { UID } = useAuth();
-  const selectedIndex = '';
+  const selectedIndex = ''; // There's probably a better way to do this but it allows us to reset things when activeIndex changes.
   const { indexes } = useMeiliSearchClient();
   const [currentView, setCurrentView] = useState(null);
   const [books, setBooks] = useState([]);
