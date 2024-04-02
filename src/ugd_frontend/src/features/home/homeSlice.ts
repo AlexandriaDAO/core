@@ -1,5 +1,3 @@
-import { RootState } from "@/store";
-import { Doc, ListResults, listDocs } from "@junobuild/core";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Define the interface for your portal state

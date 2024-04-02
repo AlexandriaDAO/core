@@ -1,0 +1,15 @@
+html, body, #root {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 1.5rem;
+}
+
+.image-container {
+  background: #8e9eab;
+  background: -webkit-linear-gradient(to top, #eef2f3, #8e9eab);
+  background: linear-gradient(to top, #eef2f3, #8e9eab);
+}

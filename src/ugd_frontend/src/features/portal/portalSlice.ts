@@ -1,11 +1,22 @@
-import { RootState } from "@/store";
-import { Doc, ListResults, listDocs } from "@junobuild/core";
+import { RootState } from "@/store/storeTypes";
+import { listDocs } from "@junobuild/core";
 import {
 	createSlice,
 	createAsyncThunk,
-	configureStore,
 	PayloadAction,
 } from "@reduxjs/toolkit";
+
+function convertBigInts(obj:any) {
+    for (const key in obj) {
+        if (typeof obj[key] === 'bigint') {
+            // Converting BigInt to number may result in precision loss if the data is too big
+			// In our case we don't have a very huge data
+            obj[key] = Number(obj[key]);
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+            convertBigInts(obj[key]); // Recursively process nested objects
+        }
+    }
+}
 
 // Define the structure of a book document
 interface Book {
@@ -30,13 +41,11 @@ interface Book {
 	modified?: string;
 }
 
-type BookListResults = ListResults<Doc<Book>>;
-
 // Define the interface for your portal state
 interface PortalState {
 	limit: number;
 	view: "grid" | "list";
-	data?: BookListResults;
+	data?: any;
 	currentPage: number;
 	loading: boolean;
 	error: string | undefined;
@@ -54,10 +63,10 @@ const initialState: PortalState = {
 
 // Define the async thunk
 export const fetchBooks = createAsyncThunk<
-	BookListResults, // This is the return type of the thunk's payload
+	any, // This is the return type of the thunk's payload
 	string | undefined, //Argument that we pass to fetchBooks
 	{ rejectValue: string; state: RootState }
->("books/fetchBooks", async (from, { rejectWithValue, getState }) => {
+>("books/fetchBooks", async (from, { rejectWithValue, fulfillWithValue, getState }) => {
 	try {
 		// Get the current state
 		const state = getState();
@@ -73,8 +82,8 @@ export const fetchBooks = createAsyncThunk<
 			collection: "books",
 			filter: { paginate },
 		});
-
-		return collection;
+		convertBigInts(collection)
+		return fulfillWithValue(collection)
 	} catch (error) {
 		return rejectWithValue("Failed to fetch documents");
 	}

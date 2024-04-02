@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         identityProvider:
           process.env.DFX_NETWORK === "ic"
             ? "https://identity.ic0.app"
-            : `http://rdmx6-jaaaa-aaaaa-aaadq-cai.localhost:4943`,
+            : `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`,
         onSuccess: () => resolve(),
       });
     });
