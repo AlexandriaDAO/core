@@ -9,6 +9,28 @@
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
     },
+    "icp_ledger_canister": {
+      "type": "custom",
+      "candid": "src/icp_ledger/icp_ledger.did",
+      "wasm": "src/icp_ledger/icp_ledger.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+        }
+      }
+    },
+    "xrc": {
+      "type": "custom",
+      "candid": "src/xrc/xrc.did",
+      "wasm": "src/xrc/xrc.wasm.gz",
+      "optimize": "cycles",
+      "gzip": true,
+      "remote": {
+        "id": {
+          "ic": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
+        }
+      }
+    },
     "ugd_frontend": {
       "dependencies": [
         "ugd_backend"
