@@ -5,8 +5,11 @@ import { Principal } from "@dfinity/principal";
 const E8S_PER_ICP = 100_000_000;
 
 const LedgerService = () => {
-  const shortPrincipal = (principal: Principal): string => {
-    const principalText = principal.toText();
+  const shortPrincipal = (UID: Principal | null): string => {
+    if (UID === null) {
+      return "";
+    }
+    const principalText = UID.toString();
     return `${principalText.slice(0, 5)}...${principalText.slice(-3)}`;
   };
 
@@ -16,7 +19,7 @@ const LedgerService = () => {
   };
 
   const e8sToIcp = (e8s: bigint): number => {
-    return Number(e8s / BigInt(E8S_PER_ICP)) + Number(e8s % BigInt(E8S_PER_ICP)) / E8S_PER_ICP;
+    return Number(e8s) / E8S_PER_ICP;
   };
 
   const displayIcp = (icp: number): string => {
@@ -37,3 +40,10 @@ const LedgerService = () => {
 };
 
 export default LedgerService;
+
+
+
+
+
+
+

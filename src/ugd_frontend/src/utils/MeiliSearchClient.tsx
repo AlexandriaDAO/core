@@ -4,7 +4,7 @@ import { MeiliSearch } from 'meilisearch';
 import { ugd_backend } from '../../../declarations/ugd_backend';
 import { useAuth } from './../contexts/AuthContext'
 import { AiOutlineConsoleSql } from 'react-icons/ai';
-
+import { Principal } from '@dfinity/principal';
 
 interface MeiliSearchClientHook {
   client: any;
@@ -21,13 +21,14 @@ interface MeiliSearchClientHook {
 
 const useMeiliSearchClient = (): MeiliSearchClientHook => {
   const { UID } = useAuth();
+  const UIDText = UID ? (UID as Principal).toText() : null;
   const [client, setClient] = useState<MeiliSearch | null>(null);
   const [loading, setLoading] = useState(true);
   const [indexes, setIndexes] = useState<string[]>([]);
   
   useEffect(() => {
     const initializeClient = async () => {
-      if (!([null, '2vxsx-fae'].includes(UID))) {
+      if (!([null, '2vxsx-fae'].includes(UIDText))) {
         setLoading(true);
         const initializedClient = await initializeMeiliSearchClient();
         setClient(initializedClient);
@@ -61,7 +62,7 @@ const useMeiliSearchClient = (): MeiliSearchClientHook => {
     meiliKey: string,
     slotIndex: number
   ): Promise<boolean> => {
-    if ([null, '2vxsx-fae'].includes(UID)) {
+    if ([null, '2vxsx-fae'].includes(UIDText)) {
       alert('Login to save keys')
       console.error('User not authenticated');
       return false;
@@ -87,7 +88,7 @@ const useMeiliSearchClient = (): MeiliSearchClientHook => {
 
   const getMeiliSearchKeys = async () => {
     console.log('getMeiliSearchKeys called');
-    if ([null, '2vxsx-fae'].includes(UID)) {
+    if ([null, '2vxsx-fae'].includes(UIDText)) {
       console.error('User not authenticated');
       return [];
     }
@@ -102,7 +103,7 @@ const useMeiliSearchClient = (): MeiliSearchClientHook => {
   };
 
   const initializeMeiliSearchClient = async (): Promise<MeiliSearch | null> => {
-    if ([null, '2vxsx-fae'].includes(UID)) {
+    if ([null, '2vxsx-fae'].includes(UIDText)) {
       console.error('User not authenticated');
       return null;
     }

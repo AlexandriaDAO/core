@@ -82,10 +82,9 @@ thread_local! {
 }
 
 #[ic_cdk_macros::query]
-pub fn whoami() -> String {
+pub fn whoami() -> Principal {
     let principal_from_caller: Principal = caller();
-    // format!("Caller IC CDK: {}", principal_from_caller)
-    principal_from_caller.to_text()
+    principal_from_caller
 }
 
 // Save keys with cdk::caller()

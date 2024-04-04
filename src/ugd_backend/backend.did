@@ -22,12 +22,13 @@ service : {
   "bookmark_sc" : (post_id : nat64) -> ();
   "get_bookmarks" : () -> (vec opt SourceCard) query;
 
+  "whoami": () -> (principal) query;
+  "save_meilisearch_keys": (meili_domain: text, meili_key: text, slot_index: nat8) -> (variant { Ok; Err: text });
+  "get_meilisearch_keys": () -> (vec MeiliSearchKeys) query;
   // "whoami": (principal_text: text) -> (text) query;
   // "save_meilisearch_keys": (principal_text: text, meili_domain: text, meili_key: text, slot_index: nat8) -> (variant { Ok; Err: text });
   // "get_meilisearch_keys": (principal_text: text) -> (vec MeiliSearchKeys) query;
-  "whoami": () -> (text) query;
-  "save_meilisearch_keys": (meili_domain: text, meili_key: text, slot_index: nat8) -> (variant { Ok; Err: text });
-  "get_meilisearch_keys": () -> (vec MeiliSearchKeys) query;
+  // "whoami": () -> (text) query;
 };
 
   // // Uses the actual loggedin principal:
