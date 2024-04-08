@@ -1,0 +1,32 @@
+type BookMark = record {
+  post_id : nat64;
+  user_query : text;
+  author : text;
+  title : text;
+  heading : text;
+  content : text;
+  summary : text;
+  bookmarked : bool;
+};
+
+type UserBalance = record {
+  credit_balance: nat64;
+};
+
+type DepositResult = variant {
+  Ok: null;
+  Err: text;
+};
+
+
+service : {
+  "get_weaviate_query": (user_query : text, breadth : nat8, scope : text) -> (text);
+  "get_bm" : (post_id : nat64) -> (opt BookMark) query;
+  "delete_bm" : (post_id : nat64) -> ();
+  "bookmark_bm" : (post_id : nat64) -> ();
+  "get_bms" : () -> (vec opt BookMark) query;
+
+  // "whoami": () -> (principal) query;
+  "deposit_icp": (user_principal: principal, icp_amount: nat64) -> (result: DepositResult);
+  "get_credit_balance": (user_principal: principal) -> (credit_balance: nat64);
+};

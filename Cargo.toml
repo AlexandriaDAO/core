@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "src/ugd_backend",
+    "src/bookmarks",
 ]
 resolver = "2"

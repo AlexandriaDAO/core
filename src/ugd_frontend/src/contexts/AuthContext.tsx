@@ -3,7 +3,6 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import { createActor, ugd_backend } from '../../../declarations/ugd_backend';
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
-import LedgerService from '@/utils/LedgerService';
 import { Principal } from '@dfinity/principal';
 import { AccountIdentifier, LedgerCanister } from '@dfinity/ledger-icp';
 
