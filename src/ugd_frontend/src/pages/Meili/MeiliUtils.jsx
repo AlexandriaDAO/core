@@ -7,6 +7,7 @@ const useMeiliUtils = (selectedIndex) => {
   const { client, loading } = useMeiliSearchClient();
   const [indexName, setIndexName] = useState('');
   const [bookCSV, setBookCSV] = useState('');
+  const [bookJSON, setBookJSON] = useState('');
   const [primaryKey, setPrimaryKey] = useState('id');
   const [tasks, setTasks] = useState([]);
   const [filter, setFilter] = useState('');
@@ -48,6 +49,18 @@ const useMeiliUtils = (selectedIndex) => {
       },
       header: true
     });
+  }
+
+  const addBookJSON = (file, indexName) => {
+    client.index(indexName).addDocuments(file)
+      .then(() => {
+        alert('Book added successfully');
+        fetchTasks();
+      })
+      .catch((error) => {
+        console.error('Failed to add book:', error);
+        alert('Failed to add book');
+      });
   }
 
   const fetchTasks = async () => {
@@ -148,8 +161,11 @@ const useMeiliUtils = (selectedIndex) => {
     indexName,
     setIndexName,
     addBook,
+    addBookJSON,
     bookCSV,
     setBookCSV,
+    bookJSON,
+    setBookJSON,
     primaryKey,
     setPrimaryKey,
     tasks,
