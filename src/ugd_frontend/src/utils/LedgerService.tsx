@@ -1,5 +1,6 @@
+// With ICP sending logic (incomplete, need to make the caller of send ICP the owner)
 // src/ugd_frontend/src/utils/LedgerService.tsx
-import { AccountIdentifier } from "@dfinity/ledger-icp";
+import { AccountIdentifier, LedgerCanister } from "@dfinity/ledger-icp";
 import { Principal } from "@dfinity/principal";
 
 const E8S_PER_ICP = 100_000_000;
@@ -30,16 +31,39 @@ const LedgerService = () => {
     return displayIcp(e8sToIcp(e8s));
   };
 
+  const sendIcp = async (amount: number, to: string): Promise<bigint> => {
+    const ledgerCanister = LedgerCanister.create();
+  
+    const toAccountIdentifier = AccountIdentifier.fromHex(to);
+  
+    const transferRequest = {
+      to: toAccountIdentifier,
+      amount: BigInt(amount * E8S_PER_ICP),
+    };
+  
+    const blockHeight = await ledgerCanister.transfer(transferRequest);
+    return blockHeight;
+  };
+
   return {
     shortPrincipal,
     shortAccountId,
     e8sToIcp,
     displayIcp,
     displayE8sAsIcp,
+    sendIcp,
   };
 };
 
 export default LedgerService;
+
+
+
+
+
+
+
+
 
 
 

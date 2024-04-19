@@ -1,6 +1,7 @@
-import { HttpAgent } from "@dfinity/agent";
+// import { HttpAgent } from "@dfinity/agent";
+// import { createActor } from "../../../../declarations/ugd_backend";
 import { AuthClient } from "@dfinity/auth-client";
-import { createActor } from "../../../../declarations/ugd_backend";
+
 class AuthService{
     private static instance: AuthService;
     static getInstance(): AuthService {
