@@ -26,7 +26,6 @@ dist/
 .env
 
 package-lock.json
-canister_ids.json
 juno.json
 deps
 data.ms

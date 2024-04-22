@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
+import Modal from "react-modal";
 import "../styles/headerTabs.css";
 import { useAuth } from "../contexts/AuthContext";
 import LedgerService from "@/utils/LedgerService";
@@ -15,9 +16,13 @@ const Tabs = () => {
     {name: "Meili", url: 'meili'},
     {name: "Book Portal", url: 'portal'},
   ];
-
+  
   const [activeItem, setActiveItem] = useState();
   const [copiedText, setCopiedText] = useState("");
+  
+  const [sendAmount, setSendAmount] = useState("");
+  const [recipientAccountId, setRecipientAccountId] = useState("");
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
 
   useEffect(() => {
     setActiveItem(location.pathname.slice(1));
@@ -40,6 +45,32 @@ const Tabs = () => {
     }
   };
 
+
+  const openSendModal = () => {
+    setIsSendModalOpen(true);
+  };
+  
+  const closeSendModal = () => {
+    setIsSendModalOpen(false);
+    setSendAmount("");
+    setRecipientAccountId("");
+  };
+
+  const handleSendIcp = async (e) => {
+    e.preventDefault();
+    console.log("handleSendICP Triggered.");
+    if (sendAmount && recipientAccountId) {
+      try {
+        const blockHeight = await ledgerService.sendIcp(
+          Number(sendAmount),
+          recipientAccountId
+        );
+        console.log("Transfer successful. Block height:", blockHeight);
+      } catch (error) {
+        console.error("Error sending ICP:", error);
+      }
+    }
+  };
 
   const ledgerService = LedgerService();
 
@@ -116,6 +147,7 @@ const Tabs = () => {
               <label className="border-right">
                 {ledgerService.displayE8sAsIcp(balanceE8s)}
               </label>
+              <button onClick={openSendModal}>Send ICP</button>
             </>
           )}
           {UID ? (
@@ -128,11 +160,41 @@ const Tabs = () => {
           <div className="copied-text">{copiedText} copied to clipboard!</div>
         )}
       </div>
+      <Modal
+        isOpen={isSendModalOpen}
+        onRequestClose={closeSendModal}
+        contentLabel="Send ICP Modal"
+      >
+      <h2>Send ICP</h2>
+        <form onSubmit={handleSendIcp}>
+          <input
+            type="number"
+            placeholder="Amount (ICP)"
+            value={sendAmount}
+            onChange={(e) => setSendAmount(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Recipient Account ID"
+            value={recipientAccountId}
+            onChange={(e) => setRecipientAccountId(e.target.value)}
+          />
+          <button type="submit">Send</button>
+          <button type="button" onClick={closeSendModal}>
+            Cancel
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 };
 
 export default Tabs;
+
+
+
+
+
 
 
 

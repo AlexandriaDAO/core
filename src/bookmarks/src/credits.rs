@@ -8,10 +8,22 @@
 //     let principal_from_caller: Principal = caller();
 //     principal_from_caller
 // }
+
+
+
+
+
+
+
+
+// This is no longer relevant and will follow the Tokenomics Repo?
+// Removing cycles management, and manual principal input to caller()
+
 use candid::{CandidType, Deserialize, Principal};
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable};
 use std::{borrow::Cow, cell::RefCell};
+use ic_cdk::api::caller;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -68,17 +80,8 @@ thread_local! {
 }
 
 #[ic_cdk_macros::update]
-pub fn deposit_icp(user_principal: Principal, icp_amount: u64) -> Result<(), String> {
-    let cycles_received = ic_cdk::api::call::msg_cycles_available();
-    let icp_received = cycles_received / 100_000_000; // Convert cycles to ICP (1 ICP = 100,000,000 cycles)
-
-    if icp_received != icp_amount {
-        return Err(format!(
-            "Incorrect ICP amount received. Expected: {}, Received: {}",
-            icp_amount, icp_received
-        ));
-    }
-
+pub fn deposit_icp(icp_amount: u64) {
+    let user_principal = caller();
     let credits_to_mint = icp_amount * EXCHANGE_RATE;
 
     BALANCE_STORE.with(|balance_store| {
@@ -96,15 +99,11 @@ pub fn deposit_icp(user_principal: Principal, icp_amount: u64) -> Result<(), Str
 
         balance_store.insert(storable_principal, updated_balance);
     });
-
-    Ok(())
 }
 
-
-
-
 #[ic_cdk_macros::query]
-pub fn get_credit_balance(user_principal: Principal) -> u64 {
+pub fn get_credit_balance() -> u64 {
+    let user_principal = caller();
     BALANCE_STORE.with(|balance_store| {
         balance_store
             .borrow()
@@ -113,3 +112,8 @@ pub fn get_credit_balance(user_principal: Principal) -> u64 {
             .unwrap_or(0)
     })
 }
+
+
+
+
+
