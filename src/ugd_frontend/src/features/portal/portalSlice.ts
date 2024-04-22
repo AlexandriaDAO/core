@@ -1,4 +1,4 @@
-import { RootState } from "@/store/storeTypes";
+import { RootState } from "@/store";
 import { listDocs } from "@junobuild/core";
 import {
 	createSlice,

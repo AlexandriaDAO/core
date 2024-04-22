@@ -1,15 +1,16 @@
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React from "react";
-import LogOut from "./components/Logout";
-import LogIn from "./components/Login";
-import { login, logout } from "./authSlice";
+import logout from "./thunks/logout";
+import login from "./thunks/login";
+import { ImSpinner8 } from "react-icons/im";
+import { AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
 
 export default function Auth() {
 	const dispatch = useAppDispatch();
 
     const {filter} = useAppSelector((state) => state.home);
-    const {user} = useAppSelector((state) => state.auth);
+    const {user, loading} = useAppSelector((state) => state.auth);
 
 
     const handleAuthClick = ()=>{
@@ -18,12 +19,18 @@ export default function Auth() {
     }
 	return (
 		<div
-            onClick={handleAuthClick}
+			onClick={handleAuthClick}
 			className={`flex-shrink h-auto flex justify-between items-center gap-2.5 p-4 border border-solid ${
 				filter ? "border-white text-white" : "border-black"
 			} rounded-full cursor-pointer duration-300 transition-all hover:bg-gray-200`}
 		>
-			{user ? <LogOut /> : <LogIn />}
+			{loading ? (
+				<ImSpinner8 size={18} className="animate animate-spin" />
+			) : user ? (
+				<AiOutlineLogin size={20} className="rotate-180" />
+			) : (
+				<AiOutlineLogin size={20} />
+			)}
 		</div>
 	);
 }
