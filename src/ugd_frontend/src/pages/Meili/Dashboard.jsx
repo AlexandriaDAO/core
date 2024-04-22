@@ -22,8 +22,11 @@ const Dashboard = () => {
 
   const {
     addBook,
+    addBookJSON,
     bookCSV,
     setBookCSV,
+    bookJSON,
+    setBookJSON,
     primaryKey,
     tasks,
     filter,
@@ -74,7 +77,7 @@ const Dashboard = () => {
     closeModal();
   };
 
-  const handleAddBook = async () => {
+  const handleAddBookAsCSV = async () => {
     if (!activeIndex) {
       alert('Please select an index to add the book to.');
       return;
@@ -84,6 +87,18 @@ const Dashboard = () => {
       return;
     }
     addBook(bookCSV, activeIndex);
+  };
+
+  const handleAddBookAsJSON = async () => {
+    if (!activeIndex) {
+      alert('Please select an index to add the book to.');
+      return;
+    }
+    if (!bookJSON) {
+      alert('bookJSON empty.');
+      return;
+    }
+    addBookJSON(bookJSON, activeIndex);
   };
 
 
@@ -211,8 +226,9 @@ const Dashboard = () => {
               )}
 
               <SetFilters isOpen={isModalOpen} onClose={closeModal} onConfirm={handleConfirm} allowedFields={allowedFields} />
-              <CreateCSV books={books} onCSVCreated={(csvData) => setBookCSV(csvData)} />
-              <button onClick={handleAddBook} disabled={!activeIndex || !bookCSV} className={`${!activeIndex || !bookCSV ? 'bg-green-200 border-green-500 border': 'bg-green-400 hover:bg-green-300'} text-black  px-2 transition-all duration-300 rounded`}>Add Book's CSV to Selected Index</button>
+              <CreateCSV books={books} onCSVCreated={(csvData) => setBookCSV(csvData)} onJSONCreated={(jsonData) => setBookJSON(jsonData)} />
+              <button onClick={handleAddBookAsCSV} disabled={!activeIndex || !bookCSV} className={`${!activeIndex || !bookCSV ? 'bg-green-200 border-green-500 border': 'bg-green-400 hover:bg-green-300'} text-black  px-2 transition-all duration-300 rounded`}>Add Book's CSV to Selected Index</button>
+              <button onClick={handleAddBookAsJSON} disabled={!activeIndex || !bookJSON} className={`${!activeIndex || !bookJSON ? 'bg-green-200 border-green-500 border': 'bg-green-400 hover:bg-green-300'} text-black  px-2 transition-all duration-300 rounded`}>Add Book's JSON to Selected Index</button>
 
               <Search selectedIndex={activeIndex} />
             </div>

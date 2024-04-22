@@ -100,8 +100,11 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: `src/${frontendDirectory}/src/public/data/.ic-assets.json*`,
-          to: ".ic-assets.json5",
+          from: path.resolve(__dirname, `src/${frontendDirectory}/public`),
+          to: path.resolve(__dirname, "dist", frontendDirectory),
+          globOptions: {
+            ignore: ["**/index.html"], // Exclude index.html if it's already handled by HtmlWebpackPlugin
+          },
           noErrorOnMissing: true,
         },
       ],

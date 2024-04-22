@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import ReduxProvider from "./store/ReduxProvider";
+import ReduxProvider from "./providers/ReduxProvider";
 import { AuthProvider } from "./contexts/AuthContext";
 
 import Layout from "./pages/Layout";

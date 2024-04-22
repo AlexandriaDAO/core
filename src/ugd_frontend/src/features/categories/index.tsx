@@ -8,40 +8,7 @@ import { setSelectedCategory } from "@/features/home/homeSlice";
 import BooksCarousel from "./components/BookCarousel";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-
-
-const categories = [
-	{
-		key: 1,
-		title: "Generalities And IT",
-		image: "generalities-and-it.png",
-		books: 2014,
-	},
-	{ key: 2, title: "Philosophy", image: "philosophy.png", books: 519 },
-	{ key: 3, title: "Religion", image: "religion.png", books: 1300 },
-	{
-		key: 4,
-		title: "Social Sciences",
-		image: "social-sciences.png",
-		books: 2014,
-	},
-	{ key: 5, title: "Language", image: "language.png", books: 405 },
-	{ key: 6, title: "Science", image: "science.png", books: 780 },
-	{ key: 7, title: "Technology", image: "technology.png", books: 1900 },
-	{
-		key: 8,
-		title: "Art and Recreation",
-		image: "art-and-recreation.png",
-		books: 3400,
-	},
-	{ key: 9, title: "Literature", image: "literature.png", books: 4750 },
-	{
-		key: 10,
-		title: "History and Geography",
-		image: "history-and-geography.png",
-		books: 2713,
-	},
-];
+import DDC from "@/data/categories";
 
 function Categories() {
 
@@ -96,17 +63,17 @@ function Categories() {
         }
     } , [selectedBook])
 
-	return (    
+	return (
         <div
             className="flex-grow flex flex-wrap items-stretch text-white"
             ref={categoryRef}
         >
-            {categories.map((category) => (
+            {Object.values(DDC).map((category) => (
                 <div
-                    key={category.title}
+                    key={category.type}
                     className={`flex flex-col  ${
                         selectedCategory &&
-                        selectedCategory.key == category.key
+                        selectedCategory.type == category.type
                             ? "basis-full order-first"
                             : "basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 order-none"
                     }`}
@@ -119,7 +86,7 @@ function Categories() {
                         }}
                     >
                         {selectedCategory &&
-                            selectedCategory.key === category.key && (
+                            selectedCategory.type === category.type && (
                                 <div
                                     onClick={hideSelectedCategory}
                                     className="flex justify-between items-center p-2 border border-solid border-white rounded-full absolute top-8 right-8"
@@ -142,24 +109,24 @@ function Categories() {
                         <div
                             className={`md:p-6 p-4 ${
                                 selectedCategory &&
-                                selectedCategory.key === category.key
+                                selectedCategory.type === category.type
                                     ? "w-1/5"
                                     : "w-full"
                             } flex flex-col justify-between items-center  gap-6`}
                         >
                             {/* <h1 className=" font-syne text-2xl lg:text-3xl xl:text-4xl basis-20"> */}
                             <h1 className="text-[5vw] sm:text-[4vw] md:text-[3vw] lg:text-[2vw]  font-syne basis-20">
-                                {category.title}
+                                {category.type}
                             </h1>
                             <span className="font-roboto-condensed text-2xl self-end">
-                                {category.books} books
+                                101 books
                             </span>
                         </div>
                     </div>
 
-                    {selectedCategory && selectedCategory.key === category.key && <div ref={bookCarouselRef} className="" > <BooksCarousel/></div>}
+                    {selectedCategory && selectedCategory.type === category.type && <div ref={bookCarouselRef} className="" > <BooksCarousel/></div>}
 
-                    {selectedBook && selectedCategory && selectedCategory.key === category.key && <div ref={bookModalRef}> <BookModal /> </div> }
+                    {selectedBook && selectedCategory && selectedCategory.type === category.type && <div ref={bookModalRef}> <BookModal /> </div> }
 
                 </div>
             ))}

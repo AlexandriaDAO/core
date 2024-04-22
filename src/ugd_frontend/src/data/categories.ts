@@ -5,6 +5,7 @@ type Category = {
 type DDCType = {
   [key: number]: {
     type: string;
+    image: string;
     category: Category;
   };
 };
@@ -12,6 +13,7 @@ type DDCType = {
 const DDC: DDCType = {
   0 : {
     "type": "Generalities and Information Technology",
+		"image": "generalities-and-it.png",
     "category": {
       0: "Computer science, knowledge & systems",
       1: "Bibliographies",
@@ -27,6 +29,7 @@ const DDC: DDCType = {
   },
   1: {
     "type": "Philosophy",
+    "image": "philosophy.png",
     "category": {
       10: "Philosophy & theory of knowledge",
       11: "Metaphysics",
@@ -40,8 +43,9 @@ const DDC: DDCType = {
       19: "Modern western philosophy",
     }
   },
-  "2": {
+  2: {
     "type": "Religion",
+    "image": "religion.png",
     "category": {
       20: "Religion",
       21: "Natural theology",
@@ -57,6 +61,7 @@ const DDC: DDCType = {
   },
   3: {
     "type": "Social Sciences",
+    "image": "social-sciences.png",
     "category": {
       30: "Social sciences, sociology & anthropology",
       31: "Statistics",
@@ -72,6 +77,7 @@ const DDC: DDCType = {
   },
   4: {
     "type": "Language",
+    "image": "language.png",
     "category": {
       40: "Linguistics",
       41: "Writing systems",
@@ -87,6 +93,7 @@ const DDC: DDCType = {
   },
   5: {
     "type": "Science",
+    "image": "science.png",
     "category": {
       50: "Science",
       51: "Mathematics",
@@ -102,6 +109,7 @@ const DDC: DDCType = {
   },
   6: {
     "type": "Technology",
+    "image": "technology.png",
     "category": {
       60: "Computing",
       61: "Medicine & health",
@@ -117,6 +125,7 @@ const DDC: DDCType = {
   },
   7: {
     "type": "Arts and Recreation",
+    "image": "art-and-recreation.png",
     "category": {
       70: "The arts",
       71: "Landscaping and area planning",
@@ -132,6 +141,7 @@ const DDC: DDCType = {
   },
   8: {
     "type": "Literature",
+    "image": "literature.png",
     "category": {
       80: "Literature, rhetoric & criticism",
       81: "American literature in English",
@@ -147,6 +157,7 @@ const DDC: DDCType = {
   },
   9: {
     "type": "History and Geography",
+    "image": "history-and-geography.png",
     "category": {
       90: "History",
       91: "Geography & travel",
