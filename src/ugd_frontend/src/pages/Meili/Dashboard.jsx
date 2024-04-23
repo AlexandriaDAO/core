@@ -13,7 +13,7 @@ const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const { UID } = useAuth();
   const selectedIndex = ''; // There's probably a better way to do this but it allows us to reset things when activeIndex changes.
-  const { indexes } = useMeiliSearchClient();
+  const { indexes, client } = useMeiliSearchClient();
   const [currentView, setCurrentView] = useState(null);
   const [books, setBooks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -156,6 +156,19 @@ const Dashboard = () => {
 
       </div>
       <div className='flex flex-col gap-4 w-1/2 md:w-full'>
+        <div className='flex flex-col'>
+          <span className='font-bold text-lg'>Initialized Client</span>
+          {client ? <div className='flex flex-col gap-1'>
+            <div className='flex gap-1'>
+              <span className='font-bold'>Host</span>
+              <span>{client?.config?.host}</span>
+            </div>
+            <div className='flex gap-1'>
+              <span className='font-bold'>Key</span>
+              <span>{client?.config?.apiKey}</span>
+            </div>
+          </div> : <div>No Client Initialized, Check Your keys.</div> }
+        </div>
         <div className='flex flex-col'>
           <span className='font-bold text-lg'>Indexes List</span>
           <ul style={{ listStyleType: 'none', padding: 0 }}>

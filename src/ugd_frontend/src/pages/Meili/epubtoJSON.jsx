@@ -7,14 +7,15 @@ async function epubToJSON(bookData) {
     const onlineBook = Epub(epubUrl, { openAs: "epub" });
 
     const contents = [];
+    console.log(bookData);
 
     // Extract metadata from bookData
     const metadata = {
       title: bookData.title,
       author: bookData.author,
       fiction: bookData.fiction,
-      type: JSON.parse(bookData.type),
-      subtype: JSON.parse(bookData.subtype),
+      type: bookData.type ? JSON.parse(bookData.type): [],
+      subtype: bookData.subtype ? JSON.parse(bookData.subtype) : [],
       pubyear: bookData.pubyear,
     };
 

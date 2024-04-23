@@ -17,12 +17,19 @@ export const getClient = async(): Promise<MeiliSearch | null> => {
         const userKeys = await getKeys();
         for(let count = 0 ; count< userKeys.length ; count ++){
             let key = userKeys[count];
-            const client = new MeiliSearch({
-                host: key.meili_domain,
-                apiKey: key.meili_key,
-            });
-            if(await client.isHealthy()){
-                return client;
+            try{
+                const client = new MeiliSearch({
+                    host: key.meili_domain,
+                    apiKey: key.meili_key,
+                });
+    
+                if(await client.isHealthy()){
+                  console.log('Client ('+key.meili_domain+') initialized successfully');
+                  return client;
+                }
+                console.log('Host('+key.meili_domain+') is not healthy');
+            }catch(error){
+                console.error('Host('+key.meili_domain+') is not working, error: ', error);
             }
         }
         console.log("No working key available");

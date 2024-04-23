@@ -52,8 +52,8 @@ const CreateCSV = ({ books, onCSVCreated, onJSONCreated }) => {
           throw new Error('Selected book not found.');
         }
       } catch (error) {
-        console.error('Error converting book to CSV:', error);
-        setError('An error occurred while converting the book to CSV.');
+        console.error('Error converting book to JSON:', error);
+        setError('An error occurred while converting the book to JSON.');
       }
 
       setIsLoading(false);
