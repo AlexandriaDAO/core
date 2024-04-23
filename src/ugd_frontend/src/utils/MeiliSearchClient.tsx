@@ -111,19 +111,22 @@ const useMeiliSearchClient = (): MeiliSearchClientHook => {
     try {
       const userKeys = await getMeiliSearchKeys();
       if (userKeys.length > 0) {
-        const { meili_domain, meili_key } = userKeys[0];
-        const client = new MeiliSearch({
-          host: meili_domain,
-          apiKey: meili_key,
-        });
+        for(let count = 0 ; count< userKeys.length ; count ++){
+          let key = userKeys[count];
+          try{
+            const client = new MeiliSearch({
+                host: key.meili_domain,
+                apiKey: key.meili_key,
+            });
 
-        // Test the client connection
-        try {
-          await client.health();
-          console.log('MeiliSearch client initialized successfully');
-          return client;
-        } catch (error) {
-          console.error('Error testing MeiliSearch client connection:', error);
+            if(await client.isHealthy()){
+              console.log('Client ('+key.meili_domain+') initialized successfully');
+              return client;
+            }
+            console.log('Host('+key.meili_domain+') is not healthy');
+          }catch(error){
+            console.error('Host('+key.meili_domain+') is not working, error: ', error);
+          }
         }
       }
     } catch (error) {

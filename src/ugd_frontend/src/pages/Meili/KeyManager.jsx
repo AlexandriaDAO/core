@@ -80,16 +80,27 @@ const KeyManager = ({ onClientInitialized }) => {
         </button>
       </div>
 
-      <div>
-        <span className='font-semibold text-lg'>Previously Stored Keys</span>
-        <ul>
-          {keys.map((key, index) => (
-            <li key={index}>
-              Domain: {key.meili_domain}, Key: {key.meili_key}, Slot: {key.slot}
-              <button onClick={() => handleSlotChange(key.slot)}>Select</button>
-            </li>
-          ))}
-        </ul>
+      <div className='flex flex-col gap-1'>
+        <span className='font-semibold text-lg mb-1'>Previously Stored Keys</span>
+        {keys.length>0 ? keys.map((key,index)=> <div key={index} className='p-2 border border-solid border-gray-500 shadow rounded flex items-center'>
+            <div className='flex flex-col'>
+              <div className='flex gap-1'>
+                <span className='font-bold'>Domain</span>
+                <span>{key.meili_domain}</span>
+              </div>
+              <div className='flex gap-1'>
+                <span className='font-bold'>Key</span>
+                <span>{key.meili_key}</span>
+              </div>
+              <div className='flex gap-1'>
+                <span className='font-bold'>Slot</span>
+                <span>{key.slot}</span>
+              </div>
+            </div>
+            <div className='flex justify-center items-center flex-grow'>
+              <button className='bg-green-400 text-black hover:bg-green-300 px-2 transition-all duration-300 rounded' onClick={() => handleSlotChange(key.slot)}>Select</button>
+            </div>
+          </div>) : <div>No Client Initialized, Check Your keys.</div> }
         {selectedSlot !== null && (
           <p>Selected Slot: {selectedSlot}</p>
         )}
