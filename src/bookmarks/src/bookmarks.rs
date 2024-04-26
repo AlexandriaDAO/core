@@ -10,11 +10,28 @@
 
 
 
-use candid::{CandidType, Deserialize, Encode, Decode};
+
+
+//   [
+//     "owner", (principal from whoami.)
+//     "ugbn", (interger)
+//     "cfi", (string)
+//     "text", (string)
+//     "title", (string)
+//     "author", (string)
+//     "accruedBookmarks", (interger)
+//     "claimableBookmarks", (interger)
+//   ]
+
+
+
+
+use candid::{CandidType, Deserialize, Encode, Decode, Principal};
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable};
 use std::{borrow::Cow, cell::RefCell};
 use std::sync::atomic::{AtomicUsize, Ordering};
+use ic_cdk::api::caller;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -23,13 +40,15 @@ const MAX_BM_SIZE: u32 = 50000;
 #[derive(CandidType, Deserialize)]
 pub struct BookMark {
     pub post_id: u64,
-    pub user_query: String,
+    pub ugbn: u64,
     pub author: String,
     pub title: String,
-    pub heading: String,
     pub content: String,
-    pub summary: String,
+    pub cfi: String,
     pub bookmarked: bool,
+    pub owner: String,
+    pub accrued_bookmarks: u64,
+    pub claimable_bookmarks: u64,
 }
 
 static BM_COUNTER: AtomicUsize = AtomicUsize::new(1);
@@ -61,19 +80,27 @@ thread_local! {
     );
 }
 
+#[ic_cdk_macros::query]
+pub fn whoami() -> Principal {
+    let principal_from_caller: Principal = caller();
+    principal_from_caller
+}
 
 #[ic_cdk_macros::update]
-pub fn save_bm(user_query: String, author: String, title: String, heading: String, content: String, summary: String) -> u64 {
+pub fn save_bm(ugbn: u64, author: String, title: String, content: String, cfi: String) -> u64 {
     let post_id = BM_COUNTER.fetch_add(1, Ordering::SeqCst) as u64;
+    let owner = whoami().to_string();
     let card = BookMark {
         post_id,
-        user_query,
+        ugbn,
         author,
         title,
-        heading,
         content,
-        summary,
+        cfi,
         bookmarked: false,
+        owner,
+        accrued_bookmarks: 0,
+        claimable_bookmarks: 0,
     };
 
     BM.with(|cards| cards.borrow_mut().insert(post_id, card));

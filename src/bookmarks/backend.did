@@ -1,32 +1,52 @@
 type BookMark = record {
   post_id : nat64;
-  user_query : text;
+  ugbn : nat64;
   author : text;
   title : text;
-  heading : text;
   content : text;
-  summary : text;
+  cfi : text;
   bookmarked : bool;
+  owner : text;
+  accrued_bookmarks : nat64;
+  claimable_bookmarks : nat64;
 };
-
-type UserBalance = record {
-  credit_balance: nat64;
-};
-
-type DepositResult = variant {
-  Ok: null;
-  Err: text;
-};
-
 
 service : {
-  "get_weaviate_query": (user_query : text, breadth : nat8, scope : text) -> (text);
+  "whoami": () -> (principal) query;
+  "save_bm" : (nat64, text, text, text, text) -> (nat64);
   "get_bm" : (post_id : nat64) -> (opt BookMark) query;
   "delete_bm" : (post_id : nat64) -> ();
   "bookmark_bm" : (post_id : nat64) -> ();
   "get_bms" : () -> (vec opt BookMark) query;
-
-  // "whoami": () -> (principal) query;
-  "deposit_icp": (user_principal: principal, icp_amount: nat64) -> (result: DepositResult);
-  "get_credit_balance": (user_principal: principal) -> (credit_balance: nat64);
 };
+
+
+
+
+
+
+
+
+
+
+
+// type BookMark = record {
+//   // owner : principal;
+//   ugbn : nat64;
+//   cfi : text;
+//   content : text;
+//   title : text;
+//   author : text;
+//   accrued_bookmarks : nat64;
+//   claimable_bookmarks : nat64;
+// };
+
+// service : {
+//   "whoami": () -> (principal) query;
+//   "save_bm" : (cfi : text, content : text, title : text, author : text) -> (nat64);
+//   "get_bm" : (ugbn : nat64) -> (opt BookMark) query;
+//   // "delete_bm" : (ugbn : nat64) -> ();
+//   // "update_accrued_bookmarks" : (ugbn : nat64) -> ();
+//   // "update_claimable_bookmarks" : (ugbn : nat64, amount : nat64) -> ();
+// };
+//   // "get_bms_by_owner" : (owner : principal) -> (vec opt BookMark) query;
