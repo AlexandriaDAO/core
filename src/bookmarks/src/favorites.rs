@@ -8,6 +8,7 @@
 // (2) a function that lets users query all their favorited bookmarks.
 
 
+// First thing is to get the token burn working. Right now the call is failing because I haven't set up the right arguments/types to icrc1_transfer call.
 
 // The problem right now is if someone removes and adds the favorite again, it's an easy bot attack.
 
@@ -15,13 +16,18 @@
 
 
 
+
+
+
+
+
+
 use candid::{CandidType, Deserialize, Principal};
 use std::collections::HashMap;
-// use std::result;
-use crate::bookmarks::{BookMark, get_bm, BM};
-use ic_cdk::api::caller;
+use ic_cdk::api::{call::CallResult, caller};
 
-use ic_cdk::api::call::CallResult;
+use crate::bookmarks::{BookMark, get_bm, BM};
+
 const MINTING_ADDRESS: &str = "ie5gv-y6hbb-ll73p-q66aj-4oyzt-tbcuh-odt6h-xkpl7-bwssd-lgzgw-5qe";
 
 #[derive(CandidType, Deserialize)]
@@ -34,27 +40,57 @@ thread_local! {
     static USER_FAVORITES: std::cell::RefCell<HashMap<Principal, UserFavorites>> = std::cell::RefCell::new(HashMap::new());
 }
 
+#[derive(CandidType, Deserialize)]
+pub struct TransferArgs {
+    to: TransferDestination,
+    from: Principal,
+    fee: Option<candid::Nat>,
+    memo: Option<Vec<u8>>,
+    from_subaccount: Option<Vec<u8>>,
+    created_at_time: Option<u64>,
+    amount: candid::Nat,
+}
+
+#[derive(CandidType, Deserialize)]
+pub struct TransferDestination {
+    owner: Principal,
+    subaccount: Option<Vec<u8>>,
+}
+
 #[ic_cdk_macros::update]
 pub async fn favorite(post_id: u64) -> CallResult<()> {
     let user_principal = caller();
     ic_cdk::print(format!("User principal: {}", user_principal));
 
-    let transfer_args = candid::encode_args((
-        candid::Nat::from(1_000_000),
-        Principal::from_text(MINTING_ADDRESS).unwrap(),
-    )).unwrap();
+    let transfer_args = TransferArgs {
+      to: TransferDestination {
+          owner: Principal::from_text(MINTING_ADDRESS).unwrap(),
+          subaccount: None,
+      },
+      from: user_principal,
+      fee: None,
+      memo: None,
+      from_subaccount: None,
+      created_at_time: None,
+      amount: candid::Nat::from(1_000_000),
+    };
 
     let transfer_result = ic_cdk::api::call::call_raw(
         Principal::from_text("hdtfn-naaaa-aaaam-aciva-cai").unwrap(),
         "icrc1_transfer",
-        &transfer_args,
+        &candid::encode_args((&transfer_args,)).unwrap(),
         0,
-    ).await;
+    )
+    .await;
 
     match transfer_result {
         Ok(result) => {
             let result_tuple: (candid::Nat,) = candid::decode_one(&result).unwrap();
-            ic_cdk::print(format!("Token transfer successful with result: {:?}", result_tuple.0));
+            ic_cdk::print(format!(
+                "Token transfer successful with result: {:?}",
+                result_tuple.0
+            ));
+
             USER_FAVORITES.with(|favorites| {
                 let mut favorites = favorites.borrow_mut();
                 let user_favorites = favorites.entry(user_principal).or_insert(UserFavorites {
@@ -75,14 +111,29 @@ pub async fn favorite(post_id: u64) -> CallResult<()> {
                     });
                 }
             });
+
             Ok(())
         }
         Err((code, message)) => {
-            ic_cdk::print(format!("Token transfer failed with code: {:?}, message: {}", code, message));
+            ic_cdk::print(format!(
+                "Token transfer failed with code: {:?}, message: {}",
+                code, message
+            ));
             Err((code, message))
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 // // OG no token burn reqiured for favoriting.
 

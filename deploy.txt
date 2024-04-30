@@ -60,3 +60,10 @@ STEP 4: CHECK BALANCES (minting account will always be zero)
 dfx canister call LBRY icrc1_balance_of '(record { owner = principal "mxtax-xmovu-wu5th-gdf4k-vfkdn-ffsxn-e67ju-sidls-4dr2i-3mqoe-tae" })'
 
 dfx canister call LBRY icrc1_balance_of '(record { owner = principal "ie5gv-y6hbb-ll73p-q66aj-4oyzt-tbcuh-odt6h-xkpl7-bwssd-lgzgw-5qe" })'
+
+
+STEP 5: SAVE A BOOKMARK and FAVORITE IT
+
+dfx canister call bookmarks save_bm '(1, "author", "title", "content", "cfi")'
+
+dfx canister call bookmarks favorite '(1)'
