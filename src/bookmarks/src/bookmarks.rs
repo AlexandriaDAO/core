@@ -1,28 +1,6 @@
-// BM stands for "BookMark"
-
-// PRD
-
-// Bookmarking: Allow bookmark to be associated with one principal.
-// Allow liking of bookmarks by any principal, and add it as a count.
-
+// TODO
 // Require deduction of a bookmark (payment in ICP) to call it.
 // Attribute that bookmark credit deduction to the principal of the book owner.
-
-
-
-
-
-//   [
-//     "owner", (principal from whoami.)
-//     "ugbn", (interger)
-//     "cfi", (string)
-//     "text", (string)
-//     "title", (string)
-//     "author", (string)
-//     "accruedBookmarks", (interger)
-//     "claimableBookmarks", (interger)
-//   ]
-
 
 
 
@@ -32,12 +10,13 @@ use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, S
 use std::{borrow::Cow, cell::RefCell};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use ic_cdk::api::caller;
+use ic_cdk_macros::{update, query};
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 const MAX_BM_SIZE: u32 = 50000;
 
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct BookMark {
     pub post_id: u64,
     pub ugbn: u64,
@@ -45,7 +24,6 @@ pub struct BookMark {
     pub title: String,
     pub content: String,
     pub cfi: String,
-    pub bookmarked: bool,
     pub owner: String,
     pub accrued_bookmarks: u64,
     pub claimable_bookmarks: u64,
@@ -80,13 +58,13 @@ thread_local! {
     );
 }
 
-#[ic_cdk_macros::query]
+#[query]
 pub fn whoami() -> Principal {
     let principal_from_caller: Principal = caller();
     principal_from_caller
 }
 
-#[ic_cdk_macros::update]
+#[update]
 pub fn save_bm(ugbn: u64, author: String, title: String, content: String, cfi: String) -> u64 {
     let post_id = BM_COUNTER.fetch_add(1, Ordering::SeqCst) as u64;
     let owner = whoami().to_string();
@@ -97,7 +75,6 @@ pub fn save_bm(ugbn: u64, author: String, title: String, content: String, cfi: S
         title,
         content,
         cfi,
-        bookmarked: false,
         owner,
         accrued_bookmarks: 0,
         claimable_bookmarks: 0,
@@ -108,37 +85,38 @@ pub fn save_bm(ugbn: u64, author: String, title: String, content: String, cfi: S
     post_id
 }
 
-#[ic_cdk_macros::update]
-pub fn bookmark_bm(post_id: u64) {
-    BM.with(|bm| {
-        let mut bm = bm.borrow_mut();
-        if let Some(mut c) = bm.remove(&post_id) {
-            c.bookmarked = !c.bookmarked;
-            bm.insert(post_id, c);
-        }
-    });
-}
 
-#[ic_cdk_macros::update]
+#[update]
 pub fn delete_bm(post_id: u64) {
-    BM.with(|bm| {
+  BM.with(|bm| {
         let mut bm = bm.borrow_mut();
         bm.remove(&post_id);
     });
-}
+  }
 
-#[ic_cdk_macros::query]
+#[query]
 pub fn get_bm(post_id: u64) -> Option<BookMark> { 
-    BM.with(|bm| bm.borrow().get(&post_id))
+  BM.with(|bm| bm.borrow().get(&post_id))
 }
 
-#[ic_cdk_macros::query]
-pub fn get_bms() -> Vec<Option<BookMark>> {
+#[query]
+pub fn get_bm_by_title(title: String) -> Vec<BookMark> {
+    BM.with(|bm| {
+        let bm = bm.borrow();
+        bm.iter()
+            .map(|(_, bookmark)| bookmark.clone())
+            .filter(|bookmark| bookmark.title == title)
+            .collect()
+    })
+}
+
+#[query]
+pub fn get_bm_by_author(author: String) -> Vec<BookMark> {
   BM.with(|bm| {
-      bm.borrow()
-          .iter()
-          .filter(|(_key, card)| card.bookmarked)
-          .map(|(key, _card)| get_bm(key))
-          .collect()
+    let bm = bm.borrow();
+    bm.iter()
+      .map(|(_, bookmark)| bookmark.clone())
+      .filter(|bookmark| bookmark.author == author)
+      .collect()
   })
 }
