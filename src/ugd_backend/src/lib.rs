@@ -7,8 +7,19 @@ pub use meilisearch::{whoami, save_meilisearch_keys, get_meilisearch_keys};
 mod weaviate;
 pub use weaviate::get_weaviate_query;
 
-
-
+mod engine;
+pub use engine::{
+  add_engine,
+  add_my_engine,
+  update_engine_status,
+  delete_engine,
+  get_engines,
+  get_engines_by_owner,
+  get_engine_by_id,
+  get_my_engines,
+  get_engines_not_owned_by,
+  get_engines_not_owned_by_me
+};
 
 
 // // Example of the keys that will be accepted.

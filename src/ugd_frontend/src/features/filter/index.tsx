@@ -3,13 +3,45 @@ import Types from "./components/Types";
 import SubTypes from "./components/SubTypes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import useMeili from "@/hooks/useMeili";
+import useSession from "@/hooks/useSession";
+import { message } from "antd";
+import performSearch from "../search/thunks/performSearch";
 
 function Filter() {
-	const {performSearch} = useMeili();
+	const { meiliClient, meiliIndex } = useSession();
+	const dispatch = useAppDispatch();
+	const { user } = useAppSelector((state) => state.auth);
+	const { searchText } = useAppSelector((state) => state.search);
+
+
 	const {types, subTypes} = useAppSelector(state=>state.filter)
+	const search = async()=>{
+		if(searchText.length > 0 ){
+			if( !user ){
+				message.error("Login to perform searches on your engines");
+				return;
+			}
+			if(!meiliClient){
+				message.error("Add a working client to perform searches");
+				return;
+			}
+
+			if(!await meiliClient.isHealthy()){
+				message.error("Client not available");
+				return;
+			}
+
+			if(!meiliIndex){
+				message.error("Index not available");
+				return;
+			}
+
+			dispatch( performSearch({index: meiliIndex}))
+		}
+
+	}
 	useEffect(() => {
-	  performSearch()
+	  search()
 	}, [types, subTypes])
 
 	return (

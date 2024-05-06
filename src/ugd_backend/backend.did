@@ -15,6 +15,22 @@ type MeiliSearchKeys = record {
   slot : nat8;
 };
 
+type EngineStatus = variant {
+  Draft;
+  Published;
+};
+
+type Engine = record {
+  id: text;
+  owner: text;
+  title: text;
+  host: text;
+  key: text;
+  index: text;
+  status: EngineStatus;
+};
+
+
 service : {
   "get_weaviate_query": (user_query : text, breadth : nat8, scope : text) -> (text);
   "get_sc" : (post_id : nat64) -> (opt SourceCard) query;
@@ -29,6 +45,18 @@ service : {
   // "save_meilisearch_keys": (principal_text: text, meili_domain: text, meili_key: text, slot_index: nat8) -> (variant { Ok; Err: text });
   // "get_meilisearch_keys": (principal_text: text) -> (vec MeiliSearchKeys) query;
   // "whoami": () -> (text) query;
+
+
+  add_engine: (owner: text, title: text, host: text, key: text, index: text, status: opt nat8) -> (Engine);
+  add_my_engine: (title: text, host: text, key: text, index: text, status: opt nat8) -> (variant { Ok: Engine; Err: text });
+  update_engine_status: (engine_id: text, new_status: nat8) -> (variant { Ok: Engine; Err: text });
+  delete_engine: (engine_id: text) -> (bool);
+  get_engines: () -> (vec Engine) query;
+  get_engines_by_owner: (owner: text) -> (vec Engine) query;
+  get_engine_by_id: (engine_id: text) -> (opt Engine) query;
+  get_my_engines: () -> (vec Engine) query;
+  get_engines_not_owned_by: (owner: text) -> (vec Engine) query;
+  get_engines_not_owned_by_me: () -> (vec Engine) query;
 };
 
   // // Uses the actual loggedin principal:

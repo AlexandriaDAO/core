@@ -1,5 +1,6 @@
-import useMeiliSearchClient from "@/utils/MeiliSearchClient";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
+import performSearch from "./thunks/performSearch";
+import { message } from "antd";
 
 // Define the interface for our search state
 interface SearchState {
@@ -19,8 +20,6 @@ const initialState: SearchState = {
 	error: null,
 };
 
-
-
 const searchSlice = createSlice({
 	name: "search",
 	initialState,
@@ -39,6 +38,25 @@ const searchSlice = createSlice({
             state.error = action.payload
         }
     },
+    extraReducers: (builder: ActionReducerMapBuilder<SearchState>) => {
+		builder
+			.addCase(performSearch.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(performSearch.fulfilled, (state, action) => {
+				state.loading = false;
+				state.error = null;
+				state.searchResults = action.payload;
+			})
+			.addCase(performSearch.rejected, (state, action) => {
+				message.error(action.payload)
+
+				state.loading = false;
+				state.searchResults = [];
+				state.error = action.payload as string;
+			})
+		}
 });
 
 export const {setSearchText, setSearchResults, setLoading, setError} = searchSlice.actions;

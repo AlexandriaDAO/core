@@ -1,18 +1,16 @@
 import { RootState } from "@/store";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getClient } from "../services/authService";
+import { AuthClient } from "@dfinity/auth-client";
 
 // Define the async thunk
 const logout = createAsyncThunk<
     void, // This is the return type of the thunk's payload
-    void, //Argument that we pass to initialize
+    AuthClient, //Argument that we pass to initialize
     { rejectValue: string, state: RootState }
->("auth/logout", async (_, { rejectWithValue }) => {
+>("auth/logout", async (client, { rejectWithValue }) => {
     try {
-        const client = await getClient();
-
         if (await client.isAuthenticated()){
-            client.logout();
+            await client.logout();
         }
     } catch (error) {
         console.error("Failed to logout User:", error);

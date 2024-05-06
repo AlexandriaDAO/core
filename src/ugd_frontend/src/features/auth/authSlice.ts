@@ -3,7 +3,7 @@ import { buildAuthExtraReducers } from "./authExtraReducers";
 
 // Define the interface for our auth state
 export interface AuthState {
-	user: string | null;
+	user: string;
 
 	loading: boolean;
 	error: string | null;
@@ -11,7 +11,7 @@ export interface AuthState {
 
 // Define the initial state using the AuthState interface
 const initialState: AuthState = {
-	user: null,
+	user: '',
 
 	loading: false,
 	error: null,
@@ -21,10 +21,14 @@ const initialState: AuthState = {
 const authSlice = createSlice({
 	name: "auth",
 	initialState,
-	reducers: {},
+	reducers: {
+		setUser: (state, action)=>{
+			state.user = action.payload;
+		}
+	},
 	extraReducers: buildAuthExtraReducers
 });
 
-export const {} = authSlice.actions;
+export const {setUser} = authSlice.actions;
 
 export default authSlice.reducer;
