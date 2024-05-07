@@ -1,29 +1,40 @@
 ## Running the project locally
 
-
+Deploy the LBRY token.
 ```bash
-# Starts the replica, running in the background
-dfx start --background
-
-# Deploys your canisters to the replica and generates your candid interface
-dfx deploy
+dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
+  (variant {
+    Init = record {
+      token_name = "LBRYs";
+      token_symbol = "LBRY";
+      minting_account = record {
+        owner = principal "'${DEFAULT}'";
+      };
+      initial_balances = vec {
+        record {
+          record {
+            owner = principal "'${MINTER}'";
+          };
+          100_000_000_000;
+        };
+      };
+      metadata = vec {};
+      transfer_fee = 10_000;
+      archive_options = record {
+        trigger_threshold = 2000;
+        num_blocks_to_archive = 1000;
+        controller_id = principal "'${DEFAULT}'";
+      };
+      feature_flags = opt record {
+        icrc2 = true;
+      };
+    }
+  })
+'
 ```
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
+Dfx deploy.
 
-If you have made changes to your backend canister, you can generate a new candid interface with
-
-```bash
-npm run generate
-```
-
-at any time. This is recommended before starting the frontend development server, and will be run automatically any time you run `dfx deploy`.
-
-If you are making frontend changes, you can start a development server with
-
-```bash
-npm start
-```
 
 ### Typical Prereq Commands:
 (WSL Ubuntu)

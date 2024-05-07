@@ -1,3 +1,33 @@
+CARGO
+
+[package]
+name = "bookmarks"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = "0.8.2"
+ciborium = "0.2.1"
+ic-ledger-types = "0.8.0"
+ic-cdk = "0.7.0"
+ic-cdk-macros = "0.7.1"
+ic-cdk-timers = "0.1"
+serde_json = "1.0"
+ic-stable-structures = "0.6.0"
+serde = { version = "1.0", features = ["derive"] }
+
+
+
+
+
+
+
+
+
+
 STEP 1: DEPLOY LBRY
 
 dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
@@ -60,3 +90,19 @@ STEP 4: CHECK BALANCES (minting account will always be zero)
 dfx canister call LBRY icrc1_balance_of '(record { owner = principal "mxtax-xmovu-wu5th-gdf4k-vfkdn-ffsxn-e67ju-sidls-4dr2i-3mqoe-tae" })'
 
 dfx canister call LBRY icrc1_balance_of '(record { owner = principal "ie5gv-y6hbb-ll73p-q66aj-4oyzt-tbcuh-odt6h-xkpl7-bwssd-lgzgw-5qe" })'
+
+
+STEP 5: SAVE A BOOKMARK and FAVORITE IT
+
+dfx canister call bookmarks save_bm '(1, "author", "title", "content", "cfi")'
+
+dfx canister call bookmarks favorite '(1)'
+
+
+
+
+APPROVALS
+
+dfx canister call LBRY icrc2_approve "(record { amount = 9_000_000; spender = record{owner = principal \"sklez-7aaaa-aaaan-qlrva-cai\";} })"
+
+dfx canister call LBRY icrc2_allowance "(record { account = record{owner = principal \"mxtax-xmovu-wu5th-gdf4k-vfkdn-ffsxn-e67ju-sidls-4dr2i-3mqoe-tae\";}; spender = record{owner = principal \"sklez-7aaaa-aaaan-qlrva-cai\";} })"
