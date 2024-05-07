@@ -8,10 +8,6 @@ interface ReduxProviderProps {
 }
 
 const ReduxProvider: React.FC<ReduxProviderProps> = ({ children }) => {
-	useEffect(()=>{
-		store.dispatch(principal())
-	},[])
-
 	return <Provider store={store}>{children}</Provider>;
 };
 

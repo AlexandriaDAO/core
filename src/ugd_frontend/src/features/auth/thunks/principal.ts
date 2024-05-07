@@ -1,21 +1,18 @@
 import { RootState } from "@/store";
 import { AuthClient } from "@dfinity/auth-client";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getClient, getPrincipal } from "../services/authService";
+import { getPrincipal } from "../utils/authUtils";
 
 // Define the async thunk
 const principal = createAsyncThunk<
     string, // This is the return type of the thunk's payload
-    void, //Argument that we pass to initialize
+    AuthClient, //Argument that we pass to initialize
     { rejectValue: string }
->("auth/principal", async (_, { rejectWithValue }) => {
+>("auth/principal", async (client, { rejectWithValue }) => {
     try {
-        const client = await getClient();
-
         if (!await client.isAuthenticated()) throw new Error("User is not Authenticated");
 
         return getPrincipal(client);
-
     } catch (error) {
         console.error("Failed to retrieve or authenticate client:", error);
 

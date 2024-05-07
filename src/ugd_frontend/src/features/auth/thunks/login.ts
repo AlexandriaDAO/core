@@ -1,16 +1,15 @@
 import { RootState } from "@/store";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getClient, getPrincipal } from "../services/authService";
+import { AuthClient } from "@dfinity/auth-client";
+import { getPrincipal } from "../utils/authUtils";
 
 // Define the async thunk
 const login = createAsyncThunk<
     string, // This is the return type of the thunk's payload
-    void, //Argument that we pass to initialize
+    AuthClient, //Argument that we pass to initialize
     { rejectValue: string, state: RootState }
->("auth/login", async (_, { rejectWithValue }) => {
+>("auth/login", async (client, { rejectWithValue }) => {
     try {
-        const client = await getClient();
-
         if (await client.isAuthenticated()){
             return getPrincipal(client);
         }
@@ -18,8 +17,9 @@ const login = createAsyncThunk<
         return await new Promise<string>((resolve, reject) => {
             client.login({
                 identityProvider: process.env.DFX_NETWORK === "ic" ? "https://identity.ic0.app" : `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`,
-                // maxTimeToLive: BigInt (7) * BigInt(24) * BigInt(3_600_000_000_000), // 1 week
+                maxTimeToLive: BigInt (7) * BigInt(24) * BigInt(3_600_000_000_000), // 1 week
                 // default maxTimeToLive is 8 hours
+                // maxTimeToLive:  BigInt(60_000_000_000), // 1 minute
                 windowOpenerFeatures: "toolbar=0,location=0,menubar=0,width=500,height=500,left=100,top=100",
                 onSuccess: ()=>resolve(getPrincipal(client)),
                 onError: () => reject(new Error("Could not authenticate")),

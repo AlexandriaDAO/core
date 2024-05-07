@@ -17,7 +17,7 @@ export const buildAuthExtraReducers = (builder: ActionReducerMapBuilder<AuthStat
         })
         .addCase(principal.rejected, (state, action) => {
             state.loading = false;
-            state.user = null;
+            state.user = '';
             state.error = action.payload as string;
         })
 
@@ -32,7 +32,7 @@ export const buildAuthExtraReducers = (builder: ActionReducerMapBuilder<AuthStat
         })
         .addCase(login.rejected, (state, action) => {
             state.loading = false;
-            state.user = null;
+            state.user = '';
             state.error = action.payload as string;
         })
 
@@ -43,7 +43,7 @@ export const buildAuthExtraReducers = (builder: ActionReducerMapBuilder<AuthStat
         .addCase(logout.fulfilled, (state) => {
             state.loading = false;
             state.error = null;
-            state.user = null;
+            state.user = '';
         })
         .addCase(logout.rejected, (state, action) => {
             state.loading = false;

@@ -1,35 +1,60 @@
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { ChangeEvent, KeyboardEvent, useEffect } from "react";
-import { IoIosSearch } from "react-icons/io";
 import { RxCross1 } from "react-icons/rx";
 import { setSearchResults, setSearchText } from "./searchSlice";
 
-import useMeili from "@/hooks/useMeili";
 import { ImSpinner8 } from "react-icons/im";
+import FilterButton from "@/components/ui/FilterButton";
+import useSession from "@/hooks/useSession";
+import { message } from "antd";
+import performSearch from "./thunks/performSearch";
 
 export default function Search() {
-	const { performSearch } = useMeili();
+	const { meiliClient, meiliIndex } = useSession();
 	const dispatch = useAppDispatch();
-	const { filter } = useAppSelector((state) => state.home);
+	const { user } = useAppSelector((state) => state.auth);
 	const { searchText, loading } = useAppSelector((state) => state.search);
 
 	const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
 		dispatch(setSearchText(e.target.value));
 	};
 
-	useEffect(()=>{
-		if(searchText.length > 0){
-			performSearch()
+	const search = async()=>{
+		if(searchText.length > 0 ){
+			if( !user ){
+				message.error("Login to perform searches on your engines");
+				return;
+			}
+			if(!meiliClient){
+				message.error("Add a working client to perform searches");
+				return;
+			}
+
+			if(!await meiliClient.isHealthy()){
+				message.error("Client not available");
+				return;
+			}
+
+			if(!meiliIndex){
+				message.error("Index not available");
+				return;
+			}
+
+			dispatch( performSearch({index: meiliIndex}))
 		}else{
 			handleClearSearchInput()
 		}
+
+	}
+	useEffect(()=>{
+		search();
 	},[searchText])
 
-	// Handler for key down events
+	// // Handler for key down events
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
 		// Check if the Enter key was pressed
-		if (e.key === "Enter") performSearch();
+		if (e.key === "Enter") search();
 	};
 	const handleClearSearchInput = () => {
 		dispatch(setSearchText(""));
@@ -38,30 +63,26 @@ export default function Search() {
 
 	return (
 		<div
-			className={`basis-[800px] flex-shrink h-auto flex justify-between items-center gap-2.5 p-4 border-b border-solid ${
-				filter
-					? "border-b-white text-white"
-					: "border-b-black text-gray-600"
-			}`}
+			className="basis-[750px] flex-shrink h-auto flex justify-between items-center gap-2.5 p-4 bg-[#D2D2D2] rounded"
 		>
-			<input
-				className="bg-transparent flex-grow text-2xl font-syne font-bold leading-7  tracking-wider ring-0 focus:ring-0 outline-none"
-				placeholder="Ask me anything..."
-				value={searchText}
-				onKeyDown={handleKeyDown}
-				onChange={handleSearchInput}
-			/>
-			{loading ? (
-				<ImSpinner8 size={30} className="animate animate-spin" />
-			) : searchText.length > 0 ? (
-				<RxCross1
-					onClick={handleClearSearchInput}
-					className="cursor-pointer"
-					size={30}
+			<div className="flex-grow flex justify-between items-center border-r border-solid border-black pr-2">
+				<input
+					className="text-[#717171] bg-transparent flex-grow text-2xl font-syne font-bold leading-7  tracking-wider ring-0 focus:ring-0 outline-none"
+					placeholder="Ask me anything..."
+					value={searchText}
+					onKeyDown={handleKeyDown}
+					onChange={handleSearchInput}
 				/>
-			) : (
-				<IoIosSearch size={30} />
-			)}
+				{loading && <ImSpinner8 size={24} className="animate animate-spin" />}
+				{!loading && searchText.length > 0 && (
+					<RxCross1
+						onClick={handleClearSearchInput}
+						className="cursor-pointer"
+						size={24}
+					/>
+				)}
+			</div>
+			<FilterButton />
 		</div>
 	);
 }
