@@ -1,8 +1,42 @@
-mod bookmarks;
-pub use bookmarks::{*};
 
-mod favorites;
-pub use favorites::{*};
+// mod bookmarks;
+// pub use bookmarks::{*};
+
+// mod favorites;
+// pub use favorites::{*};
+
+
+
+
+
+
+
+// // The cargo.toml with conflicting packgage that we need to use `mod favorites`
+
+// [package]
+// name = "bookmarks"
+// version = "0.1.0"
+// edition = "2021"
+
+// [lib]
+// crate-type = ["cdylib"]
+
+// [dependencies]
+// candid = "0.10.8"
+// ciborium = "0.2.2"
+// ic-ledger-types = "0.10.0"
+// icrc-ledger-types = "0.1.5"
+// ic-cdk = "0.13.2"
+// ic-cdk-macros = "0.13.2"
+// ic-cdk-timers = "0.7.0"
+// serde_json = "1.0"
+// ic-stable-structures = "0.6.4"
+// serde = { version = "1.0", features = ["derive"] }
+
+
+
+
+
 
 
 

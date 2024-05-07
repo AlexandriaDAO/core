@@ -18,8 +18,6 @@ service : {
   "get_bm_by_title" : (title : text) -> (vec BookMark);
   "get_bm_by_author" : (author : text) -> (vec BookMark);
 
-  "init_favorite" : (post_id : nat64) -> ();
-
   "favorite" : (post_id : nat64) -> ();
   "remove_favorite" : (post_id : nat64) -> ();
   "get_user_favorites" : () -> (vec opt BookMark) query;
