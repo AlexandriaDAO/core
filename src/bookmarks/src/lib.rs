@@ -1,6 +1,5 @@
-
-// mod bookmarks;
-// pub use bookmarks::{*};
+mod bookmarks;
+pub use bookmarks::{*};
 
 // mod favorites;
 // pub use favorites::{*};
@@ -118,9 +117,8 @@ USER_FAVORITES = "HashMap storing each user's favorite posts"
 
 
 
-  
-  
-  
+
+
 
 
 

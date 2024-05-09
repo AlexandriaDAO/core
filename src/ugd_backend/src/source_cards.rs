@@ -3,6 +3,7 @@ use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemor
 use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable};
 use std::{borrow::Cow, cell::RefCell};
 use std::sync::atomic::{AtomicUsize, Ordering};
+use ic_cdk::{query, update};
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -50,7 +51,7 @@ thread_local! {
 }
 
 
-#[ic_cdk_macros::update]
+#[update]
 pub fn save_sc(user_query: String, author: String, title: String, heading: String, content: String, summary: String) -> u64 {
     let post_id = SC_COUNTER.fetch_add(1, Ordering::SeqCst) as u64;
     let card = SourceCard {
@@ -69,7 +70,7 @@ pub fn save_sc(user_query: String, author: String, title: String, heading: Strin
     post_id
 }
 
-#[ic_cdk_macros::update]
+#[update]
 pub fn bookmark_sc(post_id: u64) {
     SC.with(|sc| {
         let mut sc = sc.borrow_mut();
@@ -80,7 +81,7 @@ pub fn bookmark_sc(post_id: u64) {
     });
 }
 
-#[ic_cdk_macros::update]
+#[update]
 pub fn delete_sc(post_id: u64) {
     SC.with(|sc| {
         let mut sc = sc.borrow_mut();
@@ -88,12 +89,12 @@ pub fn delete_sc(post_id: u64) {
     });
 }
 
-#[ic_cdk_macros::query]
+#[query]
 pub fn get_sc(post_id: u64) -> Option<SourceCard> { 
     SC.with(|sc| sc.borrow().get(&post_id))
 }
 
-#[ic_cdk_macros::query]
+#[query]
 pub fn get_bookmarks() -> Vec<Option<SourceCard>> {
   SC.with(|sc| {
       sc.borrow()

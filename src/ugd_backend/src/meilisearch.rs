@@ -1,11 +1,11 @@
 // Saves Meilisearch Access keys for a user based on their principal
 
 use candid::{CandidType, Decode, Deserialize, Encode, Principal};
-use ic_cdk::export::candid;
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable};
 use std::borrow::Cow;
 use std::cell::RefCell;
+use ic_cdk::{query, update};
 
 use ic_cdk::api::caller;
 
@@ -81,14 +81,14 @@ thread_local! {
     );
 }
 
-#[ic_cdk_macros::query]
+#[query]
 pub fn whoami() -> Principal {
     let principal_from_caller: Principal = caller();
     principal_from_caller
 }
 
 // Save keys with cdk::caller()
-#[ic_cdk_macros::update]
+#[update]
 pub fn save_meilisearch_keys(
     meili_domain: String,
     meili_key: String,
@@ -127,7 +127,7 @@ pub fn save_meilisearch_keys(
     })
 }
 
-#[ic_cdk_macros::query]
+#[query]
 pub fn get_meilisearch_keys() -> Vec<MeiliSearchKeys> {
     let principal = ic_cdk::api::caller();
     KEYS_MAP.with(|m| {

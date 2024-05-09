@@ -32,7 +32,7 @@ use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::{NumTokens, TransferArg, TransferError};
 
 use crate::bookmarks::{BookMark, get_bm, BM};
-use ic_cdk_macros::{update, query};
+use ic_cdk::{update, query};
 
 const MINTING_ADDRESS: &str = "ie5gv-y6hbb-ll73p-q66aj-4oyzt-tbcuh-odt6h-xkpl7-bwssd-lgzgw-5qe";
 

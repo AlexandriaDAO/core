@@ -4,9 +4,6 @@ pub use source_cards::{save_sc, bookmark_sc, delete_sc, get_sc, get_bookmarks};
 mod meilisearch;
 pub use meilisearch::{whoami, save_meilisearch_keys, get_meilisearch_keys};
 
-mod weaviate;
-pub use weaviate::get_weaviate_query;
-
 mod engine;
 pub use engine::{
   add_engine,

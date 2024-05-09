@@ -1,6 +1,6 @@
-use candid::{CandidType, Deserialize};
-use ic_cdk::{api::caller, export::Principal};
-use ic_cdk_macros::{query, update};
+use candid::{CandidType, Deserialize, Principal};
+use ic_cdk::api::caller;
+use ic_cdk::{query, update};
 use std::cell::RefCell;
 use std::convert::TryFrom;
 

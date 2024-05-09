@@ -8,7 +8,7 @@ use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, S
 use std::{borrow::Cow, cell::RefCell};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use ic_cdk::api::caller;
-use ic_cdk_macros::{update, query};
+use ic_cdk::{update, query};
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 

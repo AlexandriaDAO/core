@@ -1,129 +1,228 @@
+├── .idea/
+│   ├── core.iml
+│   ├── misc.xml
+│   ├── modules.xml
+│   ├── vcs.xml
+│   ├── workspace.xml
 ├── Cargo.lock
 ├── Cargo.toml
+├── Technical Whitepaper.docx
+├── Technical Whitepaper.docx:Zone.Identifier
 ├── canister_ids.json
+├── deploy.txt
+├── deps/
+│   ├── candid/
+│   │   └── rdmx6-jaaaa-aaaaa-aaadq-cai.did
+│   ├── init.json
+│   └── pulled.json
 ├── dfx.json
 ├── postcss.config.js
+├── scripts/
+│   └── build-local.sh
 ├── src/
+│   ├── bookmarks/
+│   │   ├── Cargo.toml
+│   │   ├── backend.did
+│   │   └── src/
+│   │       ├── bookmarks.rs
+│   │       ├── credits.rs
+│   │       ├── favorites.rs
+│   │       └── lib.rs
 │   ├── ugd_backend/
 │   │   ├── Cargo.toml
 │   │   ├── backend.did
-│   │   ├── src/
-│   │   │   ├── author_card/
-│   │   │   │   └── mod.rs
-│   │   │   ├── book_card/
-│   │   │   │   └── mod.rs
-│   │   │   ├── lib.rs
-│   │   │   ├── message_card/
-│   │   │   │   └── mod.rs
-│   │   │   ├── references/
-│   │   │   │   ├── memory.rs
-│   │   │   │   ├── stable_memory_examples.rs
-│   │   │   │   └── types.rs
-│   │   │   ├── source_cards.rs
-│   │   │   ├── weaviate.rs
-│   │   └── stablemem_examples.did
+│   │   └── src/
+│   │       ├── engine.rs
+│   │       ├── lib.rs
+│   │       ├── meilisearch.rs
+│   │       ├── source_cards.rs
 │   ├── ugd_frontend/
 │   │   ├── src/
+│   │   │   ├── App.tsx
 │   │   │   ├── RatingCard/
 │   │   │   │   └── RatingCard.tsx
 │   │   │   ├── Reader/
-│   │   │   │   ├── content.js
-│   │   │   │   ├── main.js
-│   │   │   │   ├── panels/
-│   │   │   │   │   ├── annotations_panel.js
-│   │   │   │   │   ├── bookmarks_panel.js
-│   │   │   │   │   ├── metadata_panel.js
-│   │   │   │   │   ├── search_panel.js
-│   │   │   │   │   ├── settings_panel.js
-│   │   │   │   │   └── toc_panel.js
-│   │   │   │   ├── reader.js
-│   │   │   │   ├── sidebar.js
-│   │   │   │   ├── storage.js
-│   │   │   │   ├── strings.js
-│   │   │   │   ├── toolbar.js
-│   │   │   │   └── ui.js
-│   │   │   ├── cards/
-│   │   │   │   ├── AuthorCard.tsx
-│   │   │   │   ├── BookCard.tsx
-│   │   │   │   ├── BookCards.tsx
-│   │   │   │   └── MessageCard/
-│   │   │   │       ├── CardDetailsBack.tsx
-│   │   │   │       ├── CardDetailsFront.tsx
-│   │   │   │       ├── DetailsHeader.tsx
-│   │   │   │       ├── MessageCard.tsx
-│   │   │   │       ├── UserProfile.tsx
-│   │   │   │       └── types.ts
+│   │   │   │   ├── ContentView/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── style.ts
+│   │   │   │   ├── Drawer/
+│   │   │   │   │   ├── Annotations/
+│   │   │   │   │   │   ├── Accordion.tsx
+│   │   │   │   │   │   ├── ColorSelector.tsx
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── Bookmarks/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── Search/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── Setting/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── TableOfContents/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── style.ts
+│   │   │   │   ├── Sidebar/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── style.ts
+│   │   │   │   ├── Toolbar/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── style.ts
+│   │   │   │   ├── index.tsx
+│   │   │   │   ├── lib/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── AnnotationItem/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── BookmarkItem/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── BookmarkToggle/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── FullScreenToggle/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── ScrollToggle/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── SearchItem/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── SidebarItem.tsx
+│   │   │   │   │   │   ├── Spinner.tsx
+│   │   │   │   │   │   ├── ThemeToggle/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   └── TocItem/
+│   │   │   │   │   │       ├── index.tsx
+│   │   │   │   │   │       └── style.ts
+│   │   │   │   │   ├── contexts/
+│   │   │   │   │   │   └── ReaderContext.tsx
+│   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   ├── useAnnotationState.tsx
+│   │   │   │   │   │   ├── useBookmarkState.tsx
+│   │   │   │   │   │   ├── useReaderContext.tsx
+│   │   │   │   │   │   ├── useReaderState/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── useContentState.tsx
+│   │   │   │   │   │   ├── useSearchDrawer.tsx
+│   │   │   │   │   │   ├── useSearchState.tsx
+│   │   │   │   │   │   ├── useSidebarState.tsx
+│   │   │   │   │   │   └── useSnackbar.tsx
+│   │   │   │   │   ├── providers/
+│   │   │   │   │   │   └── ReaderProvider.tsx
+│   │   │   │   │   └── utils/
+│   │   │   │   │       ├── annotations.ts
+│   │   │   │   │       ├── date.ts
+│   │   │   │   │       ├── index.ts
+│   │   │   │   │       ├── search.ts
+│   │   │   │   │       └── url.ts
+│   │   │   │   └── style.ts
 │   │   │   ├── components/
-│   │   │   │   ├── Author/
-│   │   │   │   │   ├── Shelf.tsx
-│   │   │   │   │   ├── Stats.tsx
-│   │   │   │   │   └── author.css
-│   │   │   │   ├── AuthorCards/
-│   │   │   │   │   ├── AuthorCards.tsx
-│   │   │   │   │   └── authorcards.css
-│   │   │   │   ├── BooksCard/
-│   │   │   │   │   ├── BooksCard.tsx
-│   │   │   │   │   └── bookscard.css
-│   │   │   │   ├── CardCreationPanel/
-│   │   │   │   │   ├── CardCreationPanel.tsx
-│   │   │   │   │   ├── PreviewCard.tsx
-│   │   │   │   │   ├── SearchedCards.tsx
-│   │   │   │   │   ├── SelectedCard.tsx
-│   │   │   │   │   ├── SkeltonLoading.tsx
-│   │   │   │   │   └── cardCreationpanel.css
+│   │   │   │   ├── BookModal.tsx
+│   │   │   │   ├── Header.tsx
 │   │   │   │   ├── ReactSlider/
 │   │   │   │   │   └── ReactSlider.jsx
-│   │   │   │   └── Read/
-│   │   │   │       └── index.tsx
+│   │   │   │   ├── Read/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   └── ui/
 │   │   │   ├── contexts/
-│   │   │   │   ├── AuthorContext.tsx
-│   │   │   │   ├── MessageContext.ts
-│   │   │   │   └── SettingsContext.tsx
-│   │   │   ├── dashboards/
-│   │   │   │   └── textbox.tsx
+│   │   │   │   ├── AuthContext.tsx
+│   │   │   │   └── SessionContext.tsx
+│   │   │   ├── features/
+│   │   │   │   ├── auth/
+│   │   │   │   │   ├── authExtraReducers.ts
+│   │   │   │   │   ├── authSlice.ts
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── thunks/
+│   │   │   │   │   │   ├── login.ts
+│   │   │   │   │   │   ├── logout.ts
+│   │   │   │   │   │   └── principal.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       └── authUtils.ts
+│   │   │   │   ├── categories/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── BookCarousel.tsx
+│   │   │   │   │   │   └── BookModal.tsx
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── engine-books/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   └── BookUpload.tsx
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── engine-filters/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── engine-overview/
+│   │   │   │   │   ├── engineOverviewSlice.ts
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       └── updateEngineStatus.ts
+│   │   │   │   ├── engine-stats/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── engine-tasks/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── filter/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── SubTypes.tsx
+│   │   │   │   │   │   └── Types.tsx
+│   │   │   │   │   ├── filterSlice.ts
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── home/
+│   │   │   │   │   └── homeSlice.ts
+│   │   │   │   ├── loading/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── my-engines/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── AddEngine.tsx
+│   │   │   │   │   │   └── EngineItem.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── myEnginesSlice.ts
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       ├── addEngine.ts
+│   │   │   │   │       └── fetchMyEngines.ts
+│   │   │   │   ├── portal/
+│   │   │   │   │   └── portalSlice.ts
+│   │   │   │   ├── search/
+│   │   │   │   │   ├── SearchResult.tsx
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── Card.tsx
+│   │   │   │   │   │   └── Read.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── searchSlice.ts
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       └── performSearch.ts
 │   │   │   ├── header/
-│   │   │   │   ├── SearchBar.jsx
-│   │   │   │   ├── Tabs.jsx
-│   │   │   │   └── settings/
-│   │   │   │       └── AuthorFilter.jsx
-│   │   │   ├── index.html
+│   │   │   │   └── Tabs.jsx
+│   │   │   ├── hooks/
+│   │   │   │   └── useSession.tsx
 │   │   │   ├── index.js
+│   │   │   ├── layouts/
+│   │   │   │   └── MainLayout.tsx
 │   │   │   ├── pages/
+│   │   │   ├── providers/
+│   │   │   │   ├── ReduxProvider.tsx
+│   │   │   │   └── SessionProvider.tsx
+│   │   │   ├── services/
+│   │   │   │   └── meiliService.ts
+│   │   │   ├── store/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── useAppDispatch.ts
+│   │   │   │   │   ├── useAppSelector.ts
+│   │   │   │   │   └── useAppStore.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── rootReducer.ts
 │   │   │   ├── styles/
-│   │   │   │   ├── AuthorCard.css
-│   │   │   │   ├── AuthorFilter.css
-│   │   │   │   ├── AuthorPanel.css
-│   │   │   │   ├── AuthorShelf.css
-│   │   │   │   ├── AuthorStats.css
-│   │   │   │   ├── BookCard.css
-│   │   │   │   ├── MessageCard/
-│   │   │   │   │   ├── CardBack.css
-│   │   │   │   │   ├── CardFront.css
-│   │   │   │   │   └── MessageCard.css
-│   │   │   │   ├── Scaler.css
-│   │   │   │   ├── SearchBar.css
-│   │   │   │   ├── SemanticLibraryPage.css
-│   │   │   │   ├── VirtualBookshelf.css
 │   │   │   │   ├── headerTabs.css
 │   │   │   │   ├── main.css
-│   │   │   │   ├── react-grid-layout.css
-│   │   │   │   ├── sharePage.css
-│   │   │   │   ├── sourcecardspanel.css
 │   │   │   │   └── tailwind.css
-│   │   │   ├── the-greats/
-│   │   │   │   ├── AuthorPanel.jsx
-│   │   │   │   └── SourceCardsPanel.tsx
-│   │   │   ├── types/
-│   │   │   │   └── react-grid-layout.d.ts
 │   │   │   ├── utils/
-│   │   │   │   ├── CompressBookCardImage.tsx
-│   │   │   │   ├── GetOneBook.tsx
-│   │   │   │   ├── MessageProvider.tsx
-│   │   │   │   ├── Scaler.jsx
-│   │   │   │   ├── Stream.tsx
-│   │   │   │   ├── handleReadBookClick.ts
-│   │   │   │   ├── useAuthorBooks.ts
-│   │   │   │   └── useBackgroundPosition.js
+│   │   │   │   ├── Juno.ts
+│   │   │   │   ├── LedgerService.tsx
+│   │   │   │   ├── MeiliSearchClient.tsx
+│   │   │   │   └── Portal.ts
 ├── tailwind.config.js
 ├── tsconfig.json
 ├── webpack.config.js
