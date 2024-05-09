@@ -11,35 +11,6 @@
 
 
 
-// // The cargo.toml with conflicting packgage that we need to use `mod favorites`
-
-// [package]
-// name = "bookmarks"
-// version = "0.1.0"
-// edition = "2021"
-
-// [lib]
-// crate-type = ["cdylib"]
-
-// [dependencies]
-// candid = "0.10.8"
-// ciborium = "0.2.2"
-// ic-ledger-types = "0.10.0"
-// icrc-ledger-types = "0.1.5"
-// ic-cdk = "0.13.2"
-// ic-cdk-macros = "0.13.2"
-// ic-cdk-timers = "0.7.0"
-// serde_json = "1.0"
-// ic-stable-structures = "0.6.4"
-// serde = { version = "1.0", features = ["derive"] }
-
-
-
-
-
-
-
-
 // Storage Canister PsuedoCode
 /*
 BM stands for "BookMark"
@@ -86,7 +57,7 @@ USER_FAVORITES = "HashMap storing each user's favorite posts"
 
 
 
-// // Token transfer code. I meant to use this to test a transfer call of a user that approved tokens to this canister, but there are insurmountable cargo.toml conflicts right now.
+// // Token transfer code. Should be usable now that cargo.toml is fixed.
 
 // use candid::{CandidType, Deserialize, Principal};
 // use icrc_ledger_types::icrc1::account::Account;

@@ -2,8 +2,6 @@
 // Require deduction of a bookmark (payment in ICP) to call it.
 // Attribute that bookmark credit deduction to the principal of the book owner.
 
-
-
 use candid::{CandidType, Deserialize, Encode, Decode, Principal};
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable};

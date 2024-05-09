@@ -26,10 +26,13 @@ use candid::{CandidType, Deserialize, Nat, Principal};
 use std::collections::HashMap;
 use ic_cdk::api::{call::CallResult, caller};
 
+use ic_ledger_types::{AccountIdentifier, BlockIndex, Memo, Subaccount, Tokens};
+
 use icrc_ledger_types::icrc1::account::Account;
-use icrc_ledger_types::icrc1::transfer::{BlockIndex, NumTokens, TransferArg, TransferError};
+use icrc_ledger_types::icrc1::transfer::{NumTokens, TransferArg, TransferError};
 
 use crate::bookmarks::{BookMark, get_bm, BM};
+use ic_cdk_macros::{update, query};
 
 const MINTING_ADDRESS: &str = "ie5gv-y6hbb-ll73p-q66aj-4oyzt-tbcuh-odt6h-xkpl7-bwssd-lgzgw-5qe";
 
@@ -52,7 +55,7 @@ pub fn principal_to_subaccount(principal_id: &Principal) -> Subaccount {
   Subaccount(subaccount)
 }
 
-#[ic_cdk_macros::update]
+#[update]
 pub async fn init_favorite(post_id: u64) -> Result<BlockIndex, String> {
   let caller = caller();
   let canister_id: Principal = ic_cdk::api::id();
@@ -65,7 +68,7 @@ pub async fn init_favorite(post_id: u64) -> Result<BlockIndex, String> {
 
   ic_cdk::println!("Caller sub-account for deducting LBRY is {}", account);
   burn_lbry(transfer_args).await?;
-  ic_ckd::println!("1 LBRY burned! Now favoriting the post.");
+  ic_cdk::println!("1 LBRY burned! Now favoriting the post.");
   favorite(post_id).await?;
   Ok(44)
 }
@@ -102,7 +105,7 @@ async fn burn_lbry(args: TransferArgs) -> Result<BlockIndex, String> {
   }
 
 
-#[ic_cdk_macros::update]
+#[update]
 pub fn favorite(post_id: u64) {
     let caller = caller();
     USER_FAVORITES.with(|favorites| {
@@ -127,7 +130,7 @@ pub fn favorite(post_id: u64) {
     });
 }
 
-#[ic_cdk_macros::update]
+#[update]
 pub fn remove_favorite(post_id: u64) {
     let caller = caller();
     USER_FAVORITES.with(|favorites| {
@@ -149,7 +152,7 @@ pub fn remove_favorite(post_id: u64) {
     });
 }
 
-#[ic_cdk_macros::query]
+#[query]
 pub fn get_user_favorites() -> Vec<Option<BookMark>> {
     let caller = caller();
     USER_FAVORITES.with(|favorites| {
@@ -162,7 +165,7 @@ pub fn get_user_favorites() -> Vec<Option<BookMark>> {
     })
 }
 
-#[ic_cdk_macros::query]
+#[query]
 pub fn query_bookmarks_by_title(title: String) -> Vec<Option<BookMark>> {
     let caller = caller();
     USER_FAVORITES.with(|favorites| {
