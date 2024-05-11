@@ -1,4 +1,12 @@
-STEP 1: DEPLOY LBRY
+STEP 1: Config users and DEPLOY LBRY
+
+dfx identity use minter
+export MINTER=$(dfx identity get-principal)
+export MINTER_ACCOUNT_ID=$(dfx ledger account-id)
+
+dfx identity use default
+export DEFAULT=$(dfx identity get-principal)
+export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
 
 dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
   (variant {
@@ -6,15 +14,22 @@ dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
       token_name = "LBRYs";
       token_symbol = "LBRY";
       minting_account = record {
-        owner = principal "'ie5gv-y6hbb-ll73p-q66aj-4oyzt-tbcuh-odt6h-xkpl7-bwssd-lgzgw-5qe'";
+        owner = principal "'${MINTER}'";
       };
-      initial_balances = vec {};
+      initial_balances = vec {
+        record {
+          record {
+            owner = principal "'${DEFAULT}'";
+          };
+          100_000_000_000;
+        };
+      };
       metadata = vec {};
       transfer_fee = 10_000;
       archive_options = record {
         trigger_threshold = 2000;
         num_blocks_to_archive = 1000;
-        controller_id = principal "'ie5gv-y6hbb-ll73p-q66aj-4oyzt-tbcuh-odt6h-xkpl7-bwssd-lgzgw-5qe'";
+        controller_id = principal "'${MINTER}'";
       };
       feature_flags = opt record {
         icrc2 = true;

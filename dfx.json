@@ -6,13 +6,18 @@
       "type": "rust"
     },
     "bookmarks": {
-      "candid": "src/bookmarks/backend.did",
+      "candid": "src/bookmarks/bookmarks.did",
       "package": "bookmarks",
       "type": "rust"
     },
     "internet_identity": {
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+    },
+    "LBRY": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/2e3589427cd9648d4edaebc1b96b5daf8fdd94d8/rs/rosetta-api/icrc1/ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/2e3589427cd9648d4edaebc1b96b5daf8fdd94d8/canisters/ic-icrc1-ledger.wasm.gz"
     },
     "ugd_frontend": {
       "dependencies": [

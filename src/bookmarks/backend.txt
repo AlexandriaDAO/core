@@ -1,0 +1,25 @@
+// type BookMark = record {
+//   post_id : nat64;
+//   ugbn : nat64;
+//   author : text;
+//   title : text;
+//   content : text;
+//   cfi : text;
+//   owner : text;
+//   accrued_bookmarks : nat64;
+//   claimable_bookmarks : nat64;
+// };
+
+// service : {
+//   "whoami": () -> (caller : principal) query;
+//   "save_bm" : (ucbg : nat64, author : text, title : text, content : text, cfi : text) -> (nat64);
+//   "get_bm" : (post_id : nat64) -> (opt BookMark) query;
+//   "delete_bm" : (post_id : nat64) -> ();
+//   "get_bm_by_title" : (title : text) -> (vec BookMark);
+//   "get_bm_by_author" : (author : text) -> (vec BookMark);
+
+//   "favorite" : (post_id : nat64) -> ();
+//   "remove_favorite" : (post_id : nat64) -> ();
+//   "get_user_favorites" : () -> (vec opt BookMark) query;
+//   "query_bookmarks_by_title" : (title : text) -> (vec opt BookMark) query;
+// };

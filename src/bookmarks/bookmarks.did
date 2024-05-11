@@ -1,0 +1,26 @@
+type BookMark = record {
+  cfi : text;
+  title : text;
+  post_id : nat64;
+  content : text;
+  owner : text;
+  claimable_bookmarks : nat64;
+  ugbn : nat64;
+  author : text;
+  accrued_bookmarks : nat64;
+};
+type Result = variant { Ok : nat64; Err : text };
+service : {
+  burn_lbry : (principal) -> (Result);
+  delete_bm : (nat64) -> ();
+  favorite : (nat64) -> ();
+  get_bm : (nat64) -> (opt BookMark) query;
+  get_bm_by_author : (text) -> (vec BookMark) query;
+  get_bm_by_title : (text) -> (vec BookMark) query;
+  get_user_favorites : () -> (vec opt BookMark) query;
+  init_favorite : (nat64) -> (Result);
+  query_bookmarks_by_title : (text) -> (vec opt BookMark) query;
+  remove_favorite : (nat64) -> ();
+  save_bm : (nat64, text, text, text, text) -> (nat64);
+  whoami : () -> (principal) query;
+}

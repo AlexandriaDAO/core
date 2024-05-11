@@ -8,12 +8,12 @@ dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
       token_name = "LBRYs";
       token_symbol = "LBRY";
       minting_account = record {
-        owner = principal "'${DEFAULT}'";
+        owner = principal "'${MINTER}'";
       };
       initial_balances = vec {
         record {
           record {
-            owner = principal "'${MINTER}'";
+            owner = principal "'${DEFAULT}'";
           };
           100_000_000_000;
         };
@@ -23,7 +23,7 @@ dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
       archive_options = record {
         trigger_threshold = 2000;
         num_blocks_to_archive = 1000;
-        controller_id = principal "'${DEFAULT}'";
+        controller_id = principal "'${MINTER}'";
       };
       feature_flags = opt record {
         icrc2 = true;
