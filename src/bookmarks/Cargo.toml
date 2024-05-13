@@ -15,7 +15,6 @@ ic-cdk-timers = "0.6"
 ic-ledger-types = "0.10"
 ic-stable-structures = "0.6.4"
 icrc-ledger-types = "0.1.5"
-num-bigint = "0.4.5"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-
+sha2 = "0.10.8"

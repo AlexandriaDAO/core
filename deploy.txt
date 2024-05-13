@@ -1,5 +1,14 @@
 STEP 1: Config users and DEPLOY LBRY
 
+dfx start --clean --background
+
+cargo build --release --target wasm32-unknown-unknown --package bookmarks
+candid-extractor target/wasm32-unknown-unknown/release/bookmarks.wasm > ./src/bookmarks/bookmarks.did
+
+dfx deps init
+dfx deps pull
+dfx deps deploy
+
 dfx identity use minter
 export MINTER=$(dfx identity get-principal)
 export MINTER_ACCOUNT_ID=$(dfx ledger account-id)

@@ -2,11 +2,11 @@ use ic_cdk;
 use candid::Principal;
 use ic_ledger_types::BlockIndex;
 
-mod bookmarks;
-pub use bookmarks::{*};
+mod queries;
+pub use queries::{*};
 
-mod favorites;
-pub use favorites::{*};
+mod updates;
+pub use updates::{*};
 
 
 ic_cdk::export_candid!();
