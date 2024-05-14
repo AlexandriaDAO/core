@@ -11,14 +11,12 @@ type BookMark = record {
 };
 type Result = variant { Ok : nat64; Err : text };
 service : {
-  burn_lbry : (principal) -> (Result);
+  burn_lbry : (principal, nat64) -> (Result);
   delete_bm : (nat64) -> ();
   favorite : (nat64) -> ();
-  get_bm : (nat64) -> (opt BookMark) query;
-  get_user_favorites : () -> (vec opt BookMark) query;
+  get_bm : (vec nat64) -> (vec opt BookMark) query;
+  init_bookmark : (nat64, text, text, text, text) -> (Result);
   init_favorite : (nat64) -> (Result);
-  query_bookmarks_by_title : (text) -> (vec opt BookMark) query;
   remove_favorite : (nat64) -> ();
   save_bm : (nat64, text, text, text, text) -> (nat64);
-  whoami : () -> (principal) query;
 }

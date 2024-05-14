@@ -7,13 +7,12 @@
 // - Claimable bookmarks will be used to distribute ICP to token holder, so at the end of the 24 hours, all the non-zero claimable bookmarks will be queried,
 //    and factored into the ICP distribution of that day, and then reset. So every favorite action of that day grants a share of that day's ICP dispersment to some book owner.
 
-use crate::queries::{BM, BookMark};
+use crate::queries::{BM, BookMark, USER_FAVORITES, UserFavorites};
 
-use std::collections::HashMap;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use sha2::{Sha256, Digest};
 
-use candid::{CandidType, Deserialize, Nat, Principal};
+use candid::{Nat, Principal};
 use ic_ledger_types::{BlockIndex, Subaccount};
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::{TransferArg, TransferError};
@@ -22,16 +21,6 @@ use ic_cdk::api::caller;
 use ic_cdk::update;
 
 static BM_COUNTER: AtomicUsize = AtomicUsize::new(1);
-
-#[derive(CandidType, Deserialize)]
-pub struct UserFavorites {
-    pub caller: Principal,
-    pub favorite_ids: Vec<u64>,
-}
-
-thread_local! {
-    static USER_FAVORITES: std::cell::RefCell<HashMap<Principal, UserFavorites>> = std::cell::RefCell::new(HashMap::new());
-}
 
 #[update]
 pub async fn init_bookmark(ugbn: u64, author: String, title: String, content: String, cfi: String) -> Result<BlockIndex, String> {
@@ -98,93 +87,96 @@ async fn burn_lbry(caller: Principal, amount: u64) -> Result<BlockIndex, String>
 }
   
 // This is a public function so I can test without LBRY burn. It will be private.
-
-#[update]
-fn favorite(post_id: u64) {
-  // We use caller directly here, and not a hash, because the favorites are private to that user.
-  let caller = caller();
-  USER_FAVORITES.with(|favorites| {
-    let mut favorites = favorites.borrow_mut();
-    let user_favorites = favorites.entry(caller).or_insert(UserFavorites {
-      caller,
-      favorite_ids: Vec::new(),
-    });
-    
-    if !user_favorites.favorite_ids.contains(&post_id) {
-      user_favorites.favorite_ids.push(post_id);
-      
-      BM.with(|bm| {
-        let mut bm = bm.borrow_mut();
-        if let Some(mut bookmark) = bm.remove(&post_id) {
-                  bookmark.accrued_bookmarks += 1;
-                  bookmark.claimable_bookmarks += 1;
-                  bm.insert(post_id, bookmark);
-                }
-              });
-            }
-          });
-}
-
-// This is a public function so I can test without LBRY burn. It will be private.
 #[update]
 pub fn save_bm(ugbn: u64, author: String, title: String, content: String, cfi: String) -> u64 {
-    let post_id = BM_COUNTER.fetch_add(1, Ordering::SeqCst) as u64;
-    let owner_hash = hash_principal(caller());
-
-    // Stop anything that requires excessive storage.
-    assert!(ugbn.to_string().len() <= 20);
-    assert!(author.len() <= 200);
-    assert!(title.len() <= 250);
+  let post_id = BM_COUNTER.fetch_add(1, Ordering::SeqCst) as u64;
+  let owner_hash = hash_principal(caller());
+  
+  // Stop anything that requires excessive storage.
+  assert!(ugbn.to_string().len() <= 20);
+  assert!(author.len() <= 200);
+  assert!(title.len() <= 250);
     assert!(content.len() <= 4000);
     assert!(cfi.len() <= 500);
-
+    
     let card = BookMark {
-        post_id,
-        ugbn,
-        author,
-        title,
-        content,
+      post_id,
+      ugbn,
+      author,
+      title,
+      content,
         cfi,
         owner_hash,
         accrued_bookmarks: 0,
         claimable_bookmarks: 0,
-    };
-
-    BM.with(|cards| cards.borrow_mut().insert(post_id, card));
+      };
+      
+      BM.with(|cards| cards.borrow_mut().insert(post_id, card));
 
     post_id
+  }
+  
+  // This is a public function so I can test without LBRY burn. It will be private.
+  #[update]
+  pub fn favorite(post_id: u64) {
+    let caller = caller();
+    USER_FAVORITES.with(|favorites| {
+        let mut favorites = favorites.borrow_mut();
+        let user_favorites = match favorites.get(&caller) {
+            Some(user_favorites) => user_favorites.clone(),
+            None => UserFavorites {
+                caller,
+                favorite_ids: Vec::new(),
+            },
+        };
+
+        if !user_favorites.favorite_ids.contains(&post_id) {
+            let mut updated_user_favorites = user_favorites.clone();
+            updated_user_favorites.favorite_ids.push(post_id);
+            favorites.insert(caller, updated_user_favorites);
+
+            BM.with(|bm| {
+                let mut bm = bm.borrow_mut();
+                if let Some(mut bookmark) = bm.remove(&post_id) {
+                    bookmark.accrued_bookmarks += 1;
+                    bookmark.claimable_bookmarks += 1;
+                    bm.insert(post_id, bookmark);
+                }
+            });
+        }
+    });
 }
 
+// This is a public function so I can test without LBRY burn. It will be private.
 #[update]
 pub fn remove_favorite(post_id: u64) {
-  let caller = caller();
-  USER_FAVORITES.with(|favorites| {
+    let caller = caller();
+    USER_FAVORITES.with(|favorites| {
         let mut favorites = favorites.borrow_mut();
-        if let Some(user_favorites) = favorites.get_mut(&caller) {
-          if let Some(index) = user_favorites.favorite_ids.iter().position(|&id| id == post_id) {
-            user_favorites.favorite_ids.remove(index);
-            
-            BM.with(|bm| {
-              let mut bm = bm.borrow_mut();
-              if let Some(mut bookmark) = bm.remove(&post_id) {
+        if let Some(user_favorites) = favorites.get(&caller) {
+            let mut updated_user_favorites = user_favorites.clone();
+            if let Some(index) = updated_user_favorites.favorite_ids.iter().position(|&id| id == post_id) {
+                updated_user_favorites.favorite_ids.remove(index);
+                favorites.insert(caller, updated_user_favorites);
+
+                BM.with(|bm| {
+                    let mut bm = bm.borrow_mut();
+                    if let Some(mut bookmark) = bm.remove(&post_id) {
                         bookmark.accrued_bookmarks = bookmark.accrued_bookmarks.saturating_sub(1);
                         bookmark.claimable_bookmarks = bookmark.claimable_bookmarks.saturating_sub(1);
                         bm.insert(post_id, bookmark);
-                      }
-                    });
-                  }
-                }
-              });
-  }
-
-
+                    }
+                });
+            }
+        }
+    });
+}
 
 
 
 
 
 // Utility Functions
-
 fn principal_to_subaccount(principal_id: &Principal) -> Subaccount {
   let mut subaccount = [0; std::mem::size_of::<Subaccount>()];
   let principal_id = principal_id.as_slice();

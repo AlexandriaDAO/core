@@ -1,11 +1,11 @@
 // TODO
-use candid::{CandidType, Deserialize, Encode, Decode};
+// 
+
+use candid::{CandidType, Deserialize, Encode, Decode, Principal};
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable};
 use std::{borrow::Cow, cell::RefCell};
 use ic_cdk::{update, query};
-// use ic_cdk::api::caller;
-// use sha2::{Sha256, Digest};
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -22,6 +22,12 @@ pub struct BookMark {
     pub claimable_bookmarks: u64,
 }
 
+#[derive(CandidType, Deserialize, Clone)]
+pub struct UserFavorites {
+  pub caller: Principal,
+  pub favorite_ids: Vec<u64>,
+}
+
 impl Storable for BookMark {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
@@ -34,6 +40,18 @@ impl Storable for BookMark {
     const BOUND: Bound = Bound::Unbounded;
 }
 
+impl Storable for UserFavorites {
+  fn to_bytes(&self) -> Cow<[u8]> {
+      Cow::Owned(Encode!(self).unwrap())
+  }
+
+  fn from_bytes(bytes: Cow<[u8]>) -> Self {
+      Decode!(bytes.as_ref(), Self).unwrap()
+  }
+
+  const BOUND: Bound = Bound::Unbounded;
+}
+
 thread_local! {
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> =
         RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
@@ -41,6 +59,12 @@ thread_local! {
     pub static BM: RefCell<StableBTreeMap<u64, BookMark, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(1))),
+        )
+    );
+
+    pub static USER_FAVORITES: RefCell<StableBTreeMap<Principal, UserFavorites, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(2))),
         )
     );
 }
@@ -54,23 +78,23 @@ pub fn delete_bm(post_id: u64) {
     });
   }
 
-// #[query]
-// pub fn get_bm(post_id: u64) -> Option<BookMark> { 
-//   BM.with(|bm| bm.borrow().get(&post_id))
-// }
-
-#[query]
-pub fn get_bm(post_ids: Vec<u64>) -> Vec<Option<BookMark>> {
+  
+  #[query]
+  pub fn get_bm(post_ids: Vec<u64>) -> Vec<Option<BookMark>> {
     assert!(post_ids.len() <= 25, "Maximum of 25 post IDs allowed");
 
     BM.with(|bm| {
-        post_ids
-            .iter()
-            .map(|post_id| bm.borrow().get(post_id))
-            .collect()
+      post_ids
+      .iter()
+      .map(|post_id| bm.borrow().get(post_id))
+      .collect()
     })
-}
-
+  }
+  
+  // #[query]
+  // pub fn get_bm(post_id: u64) -> Option<BookMark> { 
+  //   BM.with(|bm| bm.borrow().get(&post_id))
+  // }
 
 
 
