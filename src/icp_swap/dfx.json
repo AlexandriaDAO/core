@@ -1,0 +1,33 @@
+{
+  "canisters": {
+    "icp_transfer_backend": {
+      "candid": "src/icp_transfer_backend/icp_transfer_backend.did",
+      "package": "icp_transfer_backend",
+      "type": "rust"
+    },
+    "icp_ledger_canister": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/f58424c4ba894ab8a12c8e223655d5d378fb1010/rs/rosetta-api/icp_ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/f58424c4ba894ab8a12c8e223655d5d378fb1010/canisters/ledger-canister.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+        }
+      }
+    },
+    "icrc1_ledger_canister": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/f58424c4ba894ab8a12c8e223655d5d378fb1010/rs/rosetta-api/icrc1/ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/f58424c4ba894ab8a12c8e223655d5d378fb1010/canisters/ic-icrc1-ledger.wasm.gz",
+      "specified_id": "mxzaz-hqaaa-aaaar-qaada-cai"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
