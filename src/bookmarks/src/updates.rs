@@ -7,7 +7,7 @@
 // - Claimable bookmarks will be used to distribute ICP to token holder, so at the end of the 24 hours, all the non-zero claimable bookmarks will be queried,
 //    and factored into the ICP distribution of that day, and then reset. So every favorite action of that day grants a share of that day's ICP dispersment to some book owner.
 
-use crate::queries::{BM, BookMark, USER_FAVORITES, UserFavorites};
+use crate::queries::*;
 
 use std::sync::atomic::{AtomicUsize, Ordering};
 use sha2::{Sha256, Digest};
@@ -96,36 +96,53 @@ pub fn save_bm(ugbn: u64, author: String, title: String, content: String, cfi: S
   assert!(ugbn.to_string().len() <= 20);
   assert!(author.len() <= 200);
   assert!(title.len() <= 250);
-    assert!(content.len() <= 4000);
-    assert!(cfi.len() <= 500);
-    
-    let card = BookMark {
-      post_id,
-      ugbn,
-      author,
-      title,
-      content,
-        cfi,
-        owner_hash,
-        accrued_bookmarks: 0,
-        claimable_bookmarks: 0,
-      };
-      
-      BM.with(|cards| cards.borrow_mut().insert(post_id, card));
-
-    post_id
-  }
+  assert!(content.len() <= 4000);
+  assert!(cfi.len() <= 500);
   
-  // This is a public function so I can test without LBRY burn. It will be private.
-  #[update]
-  pub fn favorite(post_id: u64) {
+  let card = BookMark {
+    post_id,
+    ugbn,
+    author,
+    title,
+    content,
+    cfi,
+    owner_hash,
+    accrued_bookmarks: 0,
+    claimable_bookmarks: 0,
+  };
+    
+  BM.with(|cards| cards.borrow_mut().insert(post_id, card));
+
+  // Update the UGBN field with the post_id
+  UGBN.with(|ugbn_map| {
+    let mut ugbn_map = ugbn_map.borrow_mut();
+    if let Some(ugbn_entry) = ugbn_map.get(&ugbn) {
+        // If the UGBN entry exists, add post_id to the list.
+        let mut updated_ugbn = ugbn_entry.clone();
+        updated_ugbn.ugbn.push(post_id);
+        ugbn_map.insert(ugbn, updated_ugbn);
+    } else {
+        // If the UGBN entry doesn't exist, create a new entry with the post_id
+        let new_ugbn_entry = UGBN {
+            ugbn: vec![post_id],
+        };
+        ugbn_map.insert(ugbn, new_ugbn_entry);
+    }
+  });
+
+  post_id
+}
+  
+// This is a public function so I can test without LBRY burn. It will be private.
+#[update]
+pub fn favorite(post_id: u64) {
     let caller = caller();
     USER_FAVORITES.with(|favorites| {
         let mut favorites = favorites.borrow_mut();
+
         let user_favorites = match favorites.get(&caller) {
             Some(user_favorites) => user_favorites.clone(),
             None => UserFavorites {
-                caller,
                 favorite_ids: Vec::new(),
             },
         };
@@ -146,33 +163,6 @@ pub fn save_bm(ugbn: u64, author: String, title: String, content: String, cfi: S
         }
     });
 }
-
-// This is a public function so I can test without LBRY burn. It will be private.
-#[update]
-pub fn remove_favorite(post_id: u64) {
-    let caller = caller();
-    USER_FAVORITES.with(|favorites| {
-        let mut favorites = favorites.borrow_mut();
-        if let Some(user_favorites) = favorites.get(&caller) {
-            let mut updated_user_favorites = user_favorites.clone();
-            if let Some(index) = updated_user_favorites.favorite_ids.iter().position(|&id| id == post_id) {
-                updated_user_favorites.favorite_ids.remove(index);
-                favorites.insert(caller, updated_user_favorites);
-
-                BM.with(|bm| {
-                    let mut bm = bm.borrow_mut();
-                    if let Some(mut bookmark) = bm.remove(&post_id) {
-                        bookmark.accrued_bookmarks = bookmark.accrued_bookmarks.saturating_sub(1);
-                        bookmark.claimable_bookmarks = bookmark.claimable_bookmarks.saturating_sub(1);
-                        bm.insert(post_id, bookmark);
-                    }
-                });
-            }
-        }
-    });
-}
-
-
 
 
 
@@ -201,4 +191,42 @@ fn hash_principal(principal: Principal) -> u64 {
     let mut bytes = [0u8; 8];
     bytes.copy_from_slice(&hash[..8]); // Turn the first 8 bytes into a u64.
     u64::from_be_bytes(bytes)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // // This is a public function so I can test without LBRY burn. It will be private.
+    // #[update]
+    // pub fn remove_favorite(post_id: u64) {
+    //     let caller = caller();
+    //     USER_FAVORITES.with(|favorites| {
+    //         let mut favorites = favorites.borrow_mut();
+    //         if let Some(user_favorites) = favorites.get(&caller) {
+    //             let mut updated_user_favorites = user_favorites.clone();
+    //             if let Some(index) = updated_user_favorites.favorite_ids.iter().position(|&id| id == post_id) {
+    //                 updated_user_favorites.favorite_ids.remove(index);
+    //                 favorites.insert(caller, updated_user_favorites);
+    
+    //                 BM.with(|bm| {
+    //                     let mut bm = bm.borrow_mut();
+    //                     if let Some(mut bookmark) = bm.remove(&post_id) {
+    //                         bookmark.accrued_bookmarks = bookmark.accrued_bookmarks.saturating_sub(1);
+    //                         bookmark.claimable_bookmarks = bookmark.claimable_bookmarks.saturating_sub(1);
+    //                         bm.insert(post_id, bookmark);
+    //                     }
+    //                 });
+    //             }
+    //         }
+    //     });
+    // }
 }

@@ -17,6 +17,5 @@ service : {
   get_bm : (vec nat64) -> (vec opt BookMark) query;
   init_bookmark : (nat64, text, text, text, text) -> (Result);
   init_favorite : (nat64) -> (Result);
-  remove_favorite : (nat64) -> ();
   save_bm : (nat64, text, text, text, text) -> (nat64);
 }
