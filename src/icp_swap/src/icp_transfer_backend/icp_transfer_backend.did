@@ -1,0 +1,10 @@
+type Result = variant { Ok : text; Err : text };
+type Tokens = record { e8s : nat64 };
+
+service : {
+  canister_account : () -> (vec nat8) query;
+  swap : () -> (Result);
+  burn : () -> (Result);
+
+}
+
