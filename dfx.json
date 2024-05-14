@@ -10,6 +10,11 @@
       "package": "bookmarks",
       "type": "rust"
     },
+    "icp_swap": {
+      "candid": "src/icp_swap/icp_swap.did",
+      "package": "icp_swap",
+      "type": "rust"
+    },
     "internet_identity": {
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
