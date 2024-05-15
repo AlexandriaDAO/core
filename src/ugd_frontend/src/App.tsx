@@ -7,6 +7,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Layout from "./pages/Layout";
 import HomePage from "./pages/HomePage";
 import "./styles/tailwind.css";
+import BookPortalPage from "./pages/BookPortalPage";
 import ManagerPage from "./pages/ManagerPage";
 import SessionProvider from "./providers/SessionProvider";
 
@@ -25,6 +26,7 @@ export default function App() {
 							}
 						/>
 						<Route path="/" element={<HomePage />} />
+						<Route path="/book-portal" element={<BookPortalPage />} />
 						<Route path="/manager" element={<ManagerPage />} />
 					</Routes>
 				</BrowserRouter>

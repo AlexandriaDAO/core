@@ -8,6 +8,11 @@ import filterReducer from "@/features/filter/filterSlice";
 import myEnginesReducer from "@/features/my-engines/myEnginesSlice";
 import publicEnginesReducer from "@/features/public-engines/publicEnginesSlice";
 import engineOverviewReducer from "@/features/engine-overview/engineOverviewSlice";
+import portalCategoryReducer from "@/features/portal-category/portalCategorySlice";
+import portalLanguageReducer from "@/features/portal-language/portalLanguageSlice";
+import portalTypeReducer from "@/features/portal-type/portalTypeSlice";
+import portalPublicationYearReducer from "@/features/portal-publication-year/portalPublicationYearSlice";
+import portalFilterReducer from "@/features/portal-filter/portalFilterSlice";
 
 const rootReducer = combineReducers({
 	portal: portalReducer,
@@ -19,6 +24,13 @@ const rootReducer = combineReducers({
 	myEngines: myEnginesReducer,
 	publicEngines: publicEnginesReducer,
 	engineOverview: engineOverviewReducer,
+
+	portalCategory: portalCategoryReducer,
+	portalLanguage: portalLanguageReducer,
+	portalType: portalTypeReducer,
+	portalPublicationYear: portalPublicationYearReducer,
+
+	portalFilter: portalFilterReducer,
 });
 
 export default rootReducer;
