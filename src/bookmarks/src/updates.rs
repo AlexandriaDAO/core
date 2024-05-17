@@ -7,90 +7,90 @@
 // - Claimable bookmarks will be used to distribute ICP to token holder, so at the end of the 24 hours, all the non-zero claimable bookmarks will be queried,
 //    and factored into the ICP distribution of that day, and then reset. So every favorite action of that day grants a share of that day's ICP dispersment to some book owner.
 
-
-// Efficiency improvements todo
-// Favorites and bm shouldn't have to look up if the user's list exists each time. We should have a separate function that populates an empty array in all bTrees when a user signs up.
-// Cloning overhead in the favorites, especially when the favorite_ids vector gets really big.
-
-
-use super::utils::{principal_to_subaccount, get_swap_canister_principal, get_swap_canister_subaccount, hash_principal};
-use crate::queries::*;
+use super::utils::hash_principal;
+use crate::storage::*;
 
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 use candid::{Nat, Principal};
-use ic_ledger_types::BlockIndex;
-use icrc_ledger_types::icrc1::account::Account;
-use icrc_ledger_types::icrc1::transfer::{TransferArg, TransferError};
+// use ic_ledger_types::BlockIndex;
+// use icrc_ledger_types::icrc1::account::Account;
+use icrc_ledger_types::icrc2::transfer_from::{TransferFromArgs, TransferFromError};
+use icrc_ledger_types::icrc1::{account::Account, transfer::BlockIndex};
+// use icrc_ledger_types::icrc1::transfer::{TransferArg, TransferError};
 
 use ic_cdk::api::caller;
 use ic_cdk::update;
 
 static BM_COUNTER: AtomicUsize = AtomicUsize::new(1);
 
+use num_bigint::BigUint;
+
+
 #[update]
-pub async fn init_bookmark(ugbn: u64, author: String, title: String, content: String, cfi: String) -> Result<BlockIndex, String> {
+pub async fn init_bm(ugbn: u64, author: String, title: String, content: String, cfi: String) -> Result<String, String> {
   let caller = caller();
   let amount: u64 = 1000000;
   ic_cdk::println!("Deducting LBRY");
   burn_lbry(caller, amount).await?; // Amount is passed first as u64 because candid doesn't recognize it as Nat, and it must be Nat in transferargs.
   ic_cdk::println!("1 LBRY burned! Now saving the post.");
   save_bm(ugbn, author, title, content, cfi);
-  Ok(44)
+  Ok("Success!".to_string())
 }
 
 #[update]
-pub async fn init_favorite(post_id: u64) -> Result<BlockIndex, String> {
+pub async fn init_favorite(post_id: u64) -> Result<String, String> {
   let caller = caller();
   let amount: u64 = 2000000;
   ic_cdk::println!("Deducting LBRY");
   burn_lbry(caller, amount).await?;
   ic_cdk::println!("2 LBRY burned! Now favoriting the post.");
   favorite(post_id);
-  Ok(44)
+  Ok("Success!".to_string())
 }
 
 #[ic_cdk::update]
 async fn burn_lbry(caller: Principal, amount: u64) -> Result<BlockIndex, String> {
-    let account: Account = Account {
-        owner: get_swap_canister_principal(), // This assumes the swap canister wallet is the LBRY mint/burn address.
-        subaccount: Some(get_swap_canister_subaccount().0),
-    };
-    ic_cdk::println!("Swap canister account: {:?}", account);
+    //No need of subaccount
+    ic_cdk::println!("Caller id is {}", caller);
 
-    let caller_subaccount = principal_to_subaccount(&caller).0;
-    ic_cdk::println!("Caller subaccount: {:?}", caller_subaccount);
+    let canister_id: Principal = ic_cdk::api::id();
+    ic_cdk::println!("Canister id is {}", canister_id);
 
-    let fee: u64 = 10000;
+    // let fee: u64 = 10000;
+    let big_int_amount: BigUint = BigUint::from(amount);
+    let amount: Nat = Nat(big_int_amount);
 
-    let transfer_args: TransferArg = TransferArg {
+    let transfer_from_args = TransferFromArgs {
+        // the account we want to transfer tokens from (in this case we assume the caller approved the canister to spend funds on their behalf)
+        from: Account::from(ic_cdk::caller()),
         memo: None,
-        amount: Nat::from(amount),
-        from_subaccount: Some(caller_subaccount),
-        fee: Some(Nat::from(fee)),
-        to: account,
+        // the amount we want to transfer
+        amount: amount,
+        spender_subaccount: None,
+        fee: None,
+        // the account we want to transfer tokens to
+        to: canister_id.into(),
         created_at_time: None,
     };
-    ic_cdk::println!("Transfer arguments: {:?}", transfer_args);
+
+    ic_cdk::println!("Transfer arguments: {:?}", transfer_from_args);
 
     let icrc_canister_id = Principal::from_text("hdtfn-naaaa-aaaam-aciva-cai")
         .expect("Could not decode the principal.");
     ic_cdk::println!("ICRC Token Canister ID: {:?}", icrc_canister_id);
 
-    let result = ic_cdk::call::<(TransferArg,), (Result<BlockIndex, TransferError>,)>(
+    ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
         icrc_canister_id,
-        "icrc1_transfer",
-        (transfer_args,),
+        "icrc2_transfer_from",
+        (transfer_from_args,),
     )
-    .await;
-
-    ic_cdk::println!("Transfer result: {:?}", result);
-
-    match result {
-        Ok(res) => res.0.map_err(|e| format!("ledger transfer error: {:?}", e)),
-        Err(e) => Err(format!("Failed to call ledger: {:?}", e)),
-    }
+    .await
+    .map_err(|e| format!("failed to call ledger: {:?}", e))?
+    .0
+    .map_err(|e| format!("ledger transfer error {:?}", e))
 }
+  
   
 // This is a public function so I can test without LBRY burn. It will be private.
 #[update]

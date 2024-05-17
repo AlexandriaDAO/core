@@ -9,7 +9,8 @@ type BookMark = record {
   accrued_bookmarks : nat64;
   owner_hash : nat64;
 };
-type Result = variant { Ok : nat64; Err : text };
+type Result = variant { Ok : nat; Err : text };
+type Result_1 = variant { Ok : text; Err : text };
 service : {
   burn_lbry : (principal, nat64) -> (Result);
   favorite : (nat64) -> ();
@@ -17,8 +18,8 @@ service : {
   get_ugbn_posts : (nat64, nat64, opt nat64) -> (vec opt BookMark, nat64) query;
   get_user_bms : (nat64, opt nat64) -> (vec opt BookMark, nat64) query;
   get_user_favorites : (nat64, opt nat64) -> (vec opt BookMark, nat64) query;
-  init_bookmark : (nat64, text, text, text, text) -> (Result);
-  init_favorite : (nat64) -> (Result);
+  init_bookmark : (nat64, text, text, text, text) -> (Result_1);
+  init_favorite : (nat64) -> (Result_1);
   remove_bm : (nat64) -> ();
   save_bm : (nat64, text, text, text, text) -> (nat64);
 }
