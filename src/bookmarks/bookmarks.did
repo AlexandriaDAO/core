@@ -9,17 +9,28 @@ type BookMark = record {
   accrued_bookmarks : nat64;
   owner_hash : nat64;
 };
-type Result = variant { Ok : nat; Err : text };
-type Result_1 = variant { Ok : text; Err : text };
+type Result = variant { Ok; Err : text };
+type Result_1 = variant { Ok : nat; Err : text };
+type Result_2 = variant { Ok : vec UserFolder; Err : text };
+type Result_3 = variant { Ok : text; Err : text };
+type UserFolder = record { post_ids : vec nat64; name : text };
 service : {
-  burn_lbry : (principal, nat64) -> (Result);
+  add_bm_to_folder : (text, nat64) -> (Result);
+  burn_lbry : (principal, nat64) -> (Result_1);
+  create_folder : (text) -> (Result);
+  delete_folder : (text) -> (Result);
   favorite : (nat64) -> ();
   get_bms : (vec nat64) -> (vec opt BookMark) query;
   get_ugbn_posts : (nat64, nat64, opt nat64) -> (vec opt BookMark, nat64) query;
   get_user_bms : (nat64, opt nat64) -> (vec opt BookMark, nat64) query;
   get_user_favorites : (nat64, opt nat64) -> (vec opt BookMark, nat64) query;
-  init_bookmark : (nat64, text, text, text, text) -> (Result_1);
-  init_favorite : (nat64) -> (Result_1);
+  get_user_folder_posts : (text, nat64, opt nat64) -> (
+      vec opt BookMark,
+      nat64,
+    ) query;
+  get_user_folders : () -> (Result_2) query;
+  init_bm : (nat64, text, text, text, text) -> (Result_3);
+  init_favorite : (nat64) -> (Result_3);
   remove_bm : (nat64) -> ();
   save_bm : (nat64, text, text, text, text) -> (nat64);
 }

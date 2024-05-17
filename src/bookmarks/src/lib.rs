@@ -7,6 +7,9 @@ use icrc_ledger_types::icrc1::{
   transfer::BlockIndex,
 };
 
+mod folders;
+pub use folders::{*};
+
 mod storage;
 pub use storage::{*};
 

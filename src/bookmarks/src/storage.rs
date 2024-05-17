@@ -4,7 +4,7 @@
 Storage Structs:
   - Favorites - post_id vec
   - UGBN - post_id vec
-  - Onwer_hash - post_id vec
+  - Owner_hash - post_id vec
   - folders???
   - categories - K: 0-99 | Val: post_ids
 
