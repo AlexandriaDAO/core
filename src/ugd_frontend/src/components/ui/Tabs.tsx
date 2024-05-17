@@ -14,13 +14,13 @@ export default function Tabs() {
                 Home
 			</button>
 			<button
-				onClick={()=>navigate('book-portal')}
+				onClick={()=>navigate('/book-portal')}
 				className={`transition-all duration-100 cursor-pointer font-syne font-medium text-xl leading-7 text-center tracking-wider flex items-center ${location.pathname == '/book-portal' ? 'text-white':'text-[#8E8E8E] hover:text-white'} `}
 			>
                 Book Portal
 			</button>
 			<button
-				onClick={()=>navigate('manager')}
+				onClick={()=>navigate('/manager')}
 				className={`transition-all duration-100 cursor-pointer font-syne font-medium text-xl leading-7 text-center tracking-wider flex items-center ${location.pathname == '/manager' ? 'text-white':'text-[#8E8E8E] hover:text-white'} `}
 			>
                 Manager
