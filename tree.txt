@@ -22,11 +22,17 @@
 ├── src/
 │   ├── bookmarks/
 │   │   ├── Cargo.toml
-│   │   ├── backend.did
+│   │   ├── backend.txt
+│   │   ├── bookmarks.did
 │   │   └── src/
-│   │       ├── bookmarks.rs
-│   │       ├── credits.rs
-│   │       ├── favorites.rs
+│   │       ├── lib.rs
+│   │       ├── queries.rs
+│   │       ├── updates.rs
+│   │       └── utils.rs
+│   ├── icp_swap/
+│   │   ├── Cargo.toml
+│   │   ├── icp_swap.did
+│   │   └── src/
 │   │       └── lib.rs
 │   ├── ugd_backend/
 │   │   ├── Cargo.toml

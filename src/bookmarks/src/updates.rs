@@ -7,13 +7,19 @@
 // - Claimable bookmarks will be used to distribute ICP to token holder, so at the end of the 24 hours, all the non-zero claimable bookmarks will be queried,
 //    and factored into the ICP distribution of that day, and then reset. So every favorite action of that day grants a share of that day's ICP dispersment to some book owner.
 
+
+// Efficiency improvements todo
+// Favorites and bm shouldn't have to look up if the user's list exists each time. We should have a separate function that populates an empty array in all bTrees when a user signs up.
+// Cloning overhead in the favorites, especially when the favorite_ids vector gets really big.
+
+
+use super::utils::{principal_to_subaccount, get_swap_canister_principal, get_swap_canister_subaccount, hash_principal};
 use crate::queries::*;
 
 use std::sync::atomic::{AtomicUsize, Ordering};
-use sha2::{Sha256, Digest};
 
 use candid::{Nat, Principal};
-use ic_ledger_types::{BlockIndex, Subaccount};
+use ic_ledger_types::BlockIndex;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::{TransferArg, TransferError};
 
@@ -113,13 +119,13 @@ pub fn save_bm(ugbn: u64, author: String, title: String, content: String, cfi: S
     
   BM.with(|cards| cards.borrow_mut().insert(post_id, card));
 
-  // Update the UGBN field with the post_id
+  // Add the post_id to the UGBN BTree
   UGBN.with(|ugbn_map| {
     let mut ugbn_map = ugbn_map.borrow_mut();
     if let Some(ugbn_entry) = ugbn_map.get(&ugbn) {
-        // If the UGBN entry exists, add post_id to the list.
+        // If the UGBN entry exists, insert post_id at the beginning of the list.
         let mut updated_ugbn = ugbn_entry.clone();
-        updated_ugbn.ugbn.push(post_id);
+        updated_ugbn.ugbn.insert(0, post_id);
         ugbn_map.insert(ugbn, updated_ugbn);
     } else {
         // If the UGBN entry doesn't exist, create a new entry with the post_id
@@ -127,6 +133,23 @@ pub fn save_bm(ugbn: u64, author: String, title: String, content: String, cfi: S
             ugbn: vec![post_id],
         };
         ugbn_map.insert(ugbn, new_ugbn_entry);
+    }
+  });
+
+  // Add the post_id to the USER_SAVES BTree
+  USER_SAVES.with(|user_saves| {
+    let mut user_saves = user_saves.borrow_mut();
+    if let Some(user_entry) = user_saves.get(&owner_hash) {
+        // If the user entry exists, insert post_id at the beginning of the list.
+        let mut updated_user_saves = user_entry.clone();
+        updated_user_saves.post_id.insert(0, post_id);
+        user_saves.insert(owner_hash, updated_user_saves);
+    } else {
+        // If the user entry doesn't exist, create a new entry with the post_id
+        let new_user_entry = UserSaves {
+            post_id: vec![post_id],
+        };
+        user_saves.insert(owner_hash, new_user_entry);
     }
   });
 
@@ -149,7 +172,7 @@ pub fn favorite(post_id: u64) {
 
         if !user_favorites.favorite_ids.contains(&post_id) {
             let mut updated_user_favorites = user_favorites.clone();
-            updated_user_favorites.favorite_ids.push(post_id);
+            updated_user_favorites.favorite_ids.insert(0, post_id);
             favorites.insert(caller, updated_user_favorites);
 
             BM.with(|bm| {
@@ -166,31 +189,6 @@ pub fn favorite(post_id: u64) {
 
 
 
-// Utility Functions
-fn principal_to_subaccount(principal_id: &Principal) -> Subaccount {
-  let mut subaccount = [0; std::mem::size_of::<Subaccount>()];
-  let principal_id = principal_id.as_slice();
-  subaccount[0] = principal_id.len().try_into().unwrap();
-  subaccount[1..1 + principal_id.len()].copy_from_slice(principal_id);
-
-  Subaccount(subaccount)
-}
-
-fn get_swap_canister_principal() -> Principal {
-  Principal::from_text("ie5gv-y6hbb-ll73p-q66aj-4oyzt-tbcuh-odt6h-xkpl7-bwssd-lgzgw-5qe")
-      .expect("Could not decode the principal.")
-}
-
-fn get_swap_canister_subaccount() -> Subaccount {
-  principal_to_subaccount(&get_swap_canister_principal())
-}
-
-// This is important so we don't ever reveal the user's principal, and only in knowing a principal can a user access stuff.
-fn hash_principal(principal: Principal) -> u64 {
-    let hash = Sha256::digest(principal.as_slice());
-    let mut bytes = [0u8; 8];
-    bytes.copy_from_slice(&hash[..8]); // Turn the first 8 bytes into a u64.
-    u64::from_be_bytes(bytes)
 
 
 
@@ -200,33 +198,3 @@ fn hash_principal(principal: Principal) -> u64 {
 
 
 
-
-
-
-
-
-    // // This is a public function so I can test without LBRY burn. It will be private.
-    // #[update]
-    // pub fn remove_favorite(post_id: u64) {
-    //     let caller = caller();
-    //     USER_FAVORITES.with(|favorites| {
-    //         let mut favorites = favorites.borrow_mut();
-    //         if let Some(user_favorites) = favorites.get(&caller) {
-    //             let mut updated_user_favorites = user_favorites.clone();
-    //             if let Some(index) = updated_user_favorites.favorite_ids.iter().position(|&id| id == post_id) {
-    //                 updated_user_favorites.favorite_ids.remove(index);
-    //                 favorites.insert(caller, updated_user_favorites);
-    
-    //                 BM.with(|bm| {
-    //                     let mut bm = bm.borrow_mut();
-    //                     if let Some(mut bookmark) = bm.remove(&post_id) {
-    //                         bookmark.accrued_bookmarks = bookmark.accrued_bookmarks.saturating_sub(1);
-    //                         bookmark.claimable_bookmarks = bookmark.claimable_bookmarks.saturating_sub(1);
-    //                         bm.insert(post_id, bookmark);
-    //                     }
-    //                 });
-    //             }
-    //         }
-    //     });
-    // }
-}

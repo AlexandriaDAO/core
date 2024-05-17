@@ -8,6 +8,7 @@ pub use queries::{*};
 mod updates;
 pub use updates::{*};
 
+pub mod utils;
 
 ic_cdk::export_candid!();
 
