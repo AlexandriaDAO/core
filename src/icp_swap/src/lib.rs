@@ -1,27 +1,75 @@
 use candid::{candid_method, Nat, Principal};
 use ic_cdk::api::call::call;
+use ic_cdk::api::canister_balance;
 use icrc_ledger_types::icrc2::transfer_from::{TransferFromArgs, TransferFromError};
 use serde::{Deserialize, Serialize};
 
+use candid::CandidType;
 use ic_cdk::{self, caller, update};
 use ic_ledger_types::{
     AccountIdentifier, BlockIndex as BlockIndexIC, Memo, Subaccount, Tokens, DEFAULT_SUBACCOUNT,
     MAINNET_LEDGER_CANISTER_ID,
 };
 use num_bigint::BigUint;
-use candid::{CandidType};
 
 use icrc_ledger_types::icrc1::{
     account::Account,
     transfer::{BlockIndex, TransferArg, TransferError},
 };
+use std::time::Duration;
+
+const N: Duration = Duration::from_secs(86400);//24hours in seconds
 
 #[derive(Serialize, Deserialize, CandidType, Debug)]
 struct CallerArgs {
     caller: Subaccount,
 }
 
+async fn transfer_treasurer() {
+    //Define your treasurer principal here
+    let treasurer = Principal::from_text("xswc6-jimwj-wnqog-3gmkv-hglw4-aedfy-bqmr2-5uyut-cnbbg-4wvsk-bqe")
+        .expect("Failed to decode Principal");
+    let canister_id: Principal = ic_cdk::api::id();
+    let from_account = AccountIdentifier::new(&canister_id, &DEFAULT_SUBACCOUNT);
 
+    let ledger_canister_id = Principal::from_text("ryjl3-tyaaa-aaaaa-aaaba-cai")
+        .map_err(|e| format!("Failed to decode MAINNET_LEDGER_CANISTER_ID: {:?}", e))
+        .expect("Failed to decode MAINNET_LEDGER_CANISTER_ID");
+
+    let balance_before_transfer = ic_ledger_types::account_balance(
+        ledger_canister_id,
+        ic_ledger_types::AccountBalanceArgs { account: from_account },
+    )
+    .await
+    .map_err(|e| {
+        ic_cdk::println!("Failed to get account balance: {:?}", e);
+    })
+    .ok();
+
+    if let Some(balance) = balance_before_transfer {
+        if balance > Tokens::from_e8s(0) {
+            if let Err(e) = send_icp(treasurer,balance-Tokens::from_e8s(10000) ).await {
+                ic_cdk::println!("Failed to send ICP: {:?}", e);
+            }
+        } else {
+            ic_cdk::println!("Low Balance: {:?}", balance);
+        }
+    }
+}
+
+fn treasurer_collection() {
+    ic_cdk::spawn(transfer_treasurer());
+}
+
+#[ic_cdk::init]
+fn init() {
+    let _timer_id = ic_cdk_timers::set_timer_interval(N, treasurer_collection);
+}
+
+#[ic_cdk::post_upgrade]
+fn post_upgrade() {
+    init();
+}
 #[ic_cdk::update]
 async fn mint_token(amount: u64) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
@@ -78,7 +126,8 @@ async fn mint_token(amount: u64) -> Result<BlockIndex, String> {
 pub async fn swap() -> Result<String, String> {
     let caller = caller();
     let canister_id: Principal = ic_cdk::api::id();
-    let account: AccountIdentifier = AccountIdentifier::new(&canister_id, &principal_to_subaccount(&caller));
+    let account: AccountIdentifier =
+        AccountIdentifier::new(&canister_id, &principal_to_subaccount(&caller));
     ic_cdk::println!("Caller ICP sub-account is {}", account);
     deposit_icp(caller).await?;
     ic_cdk::println!("******************Icp received by canister! Now Transfering the token*************************");
@@ -89,8 +138,8 @@ pub async fn swap() -> Result<String, String> {
 #[candid_method(update)]
 pub async fn burn() -> Result<String, String> {
     let caller: Principal = caller();
- 
-    send_icp(caller).await?;
+
+    send_icp(caller,Tokens::from_e8s(1)).await?;
     ic_cdk::println!(
         "******************Icp sent to caller! Now Burning the token*************************"
     );
@@ -122,18 +171,15 @@ async fn deposit_icp(caller: Principal) -> Result<BlockIndexIC, String> {
         .map_err(|e: ic_ledger_types::TransferError| format!("ledger transfer error {:?}", e))
 }
 #[update]
-async fn send_icp(caller: Principal) -> Result<BlockIndexIC, String> {
-
-    
-
-    ic_cdk::println!("Depositing Icp in {}", caller);
+async fn send_icp(destination:Principal ,amount:Tokens) -> Result<BlockIndexIC, String> {
+    ic_cdk::println!("Depositing Icp in {}", destination);
 
     let transfer_args: ic_ledger_types::TransferArgs = ic_ledger_types::TransferArgs {
         memo: Memo(0),
-        amount: Tokens::from_e8s(1),
+        amount: amount,
         fee: Tokens::from_e8s(10000),
         from_subaccount: None,
-        to: AccountIdentifier::new(&caller, &DEFAULT_SUBACCOUNT),
+        to: AccountIdentifier::new(&destination, &DEFAULT_SUBACCOUNT),
         created_at_time: None,
     };
 
@@ -154,11 +200,7 @@ async fn burn_token(amount: u64) -> Result<BlockIndex, String> {
     let big_int_amount: BigUint = BigUint::from(amount);
     let amount: Nat = Nat(big_int_amount);
 
-    ic_cdk::println!(
-        "Burning {} tokens from account {}",
-        amount,
-        caller
-    );
+    ic_cdk::println!("Burning {} tokens from account {}", amount, caller);
 
     let transfer_from_args = TransferFromArgs {
         // the account we want to transfer tokens from (in this case we assume the caller approved the canister to spend funds on their behalf)
@@ -197,7 +239,6 @@ async fn burn_token(amount: u64) -> Result<BlockIndex, String> {
     .0
     // 8. Use `map_err` again to transform any specific ledger transfer errors into a readable string format, facilitating error handling and debugging.
     .map_err(|e| format!("ledger transfer error {:?}", e))
-   
 }
 pub fn principal_to_subaccount(principal_id: &Principal) -> Subaccount {
     let mut subaccount = [0; std::mem::size_of::<Subaccount>()];
