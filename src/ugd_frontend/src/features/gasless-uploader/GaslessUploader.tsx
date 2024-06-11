@@ -33,7 +33,7 @@ interface FileWrapper {
 interface UploaderConfigProps {
 	showImageView?: boolean;
 	showReceiptView?: boolean;
-	blockchain: "EVM" | "SOL";
+	blockchain: "EVM";
 }
 
 export const GaslessUploader: React.FC<UploaderConfigProps> = ({
@@ -91,7 +91,7 @@ export const GaslessUploader: React.FC<UploaderConfigProps> = ({
 			for (const file of files) {
 				const tags: Tag[] = [{ name: "Content-Type", value: file.file.type }];
 				const uploadTxId = await gaslessFundAndUpload(file.file, tags, blockchain);
-
+				
 				file.id = uploadTxId;
 				file.isUploaded = true;
 				file.previewUrl = GATEWAY_BASE + uploadTxId;
@@ -242,3 +242,12 @@ export const GaslessUploader: React.FC<UploaderConfigProps> = ({
 };
 
 export default GaslessUploader;
+
+
+
+
+
+
+
+
+

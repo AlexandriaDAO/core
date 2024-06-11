@@ -2,6 +2,8 @@ import { WebIrys } from "@irys/sdk";
 import getIrys from "../utils/getIrys";
 import { TypedEthereumSigner } from "arbundles";
 
+import { useAuth } from "../../../contexts/AuthContext";
+// import { decryptKey } from './keyEncryption';
 
 type Tag = {
 	name: string;
@@ -9,10 +11,18 @@ type Tag = {
 };
 
 const gaslessFundAndUploadEVM = async (selectedFile: File, tags: Tag[]): Promise<string> => {
-	const pubKey = "must enter pub key";
-	const privateKey = "must enter private key";
+	// const { UID } = useAuth();
+	// Will now use sjcl library to obfuscate these, and the other engine keys.
+	const pubKey = "0xeDa20F6d64944Ad132dE51927Ae1A32cFCDD8998";
+	const privateKey = "1bda3c9bf8b1170093b4339835c01273766f30ec64077c07a7e174b0f67c5636";
 
-
+	// if (UID) {
+	// 	console.log("Heyyo");
+  //   // const pubKey = decryptKey(encryptedPubKey, UID.toText());
+  //   // const privateKey = decryptKey(encryptedPrivateKey, UID.toText());
+  // } else {
+  //   throw new Error('User not authenticated');
+  // }
   //@ts-ignore
   const signer = new TypedEthereumSigner(privateKey);
 
@@ -72,7 +82,7 @@ const gaslessFundAndUploadEVM = async (selectedFile: File, tags: Tag[]): Promise
 
 const gaslessFundAndUploadSOL = async (selectedFile: File, tags: Tag[]): Promise<string> => {
 	// Obtain the server's public key
-	const pubKeyRes = (await (await fetch("/api/publicKeySOL")).json()) as unknown as {
+	const pubKeyRes = (await (await fetch("/apihttps://entrepot.app//publicKeySOL")).json()) as unknown as {
 		pubKey: string;
 	};
 	const pubKey = Buffer.from(pubKeyRes.pubKey, "hex");
