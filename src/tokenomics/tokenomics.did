@@ -1,0 +1,10 @@
+type Result_1 = variant { Ok : text; Err : text };
+
+service : {
+    "greet": (text) -> (text) query;
+    "burn_n_mint" : (float64,principal) -> (Result_1);
+    get_totat_LBRY_burn : () -> (float64) query;
+    get_totat_UCG_minted: () -> (float64) query;
+    get_current_UCG_rate: () -> (float64) query;
+    get_current_LBRY_threshold: () -> (float64) query;
+}
