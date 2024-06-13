@@ -14,7 +14,7 @@ const principal = createAsyncThunk<
 
         return getPrincipal(client);
     } catch (error) {
-        console.error("Failed to retrieve or authenticate client:", error);
+        // console.error("Failed to retrieve or authenticate client:", error);
 
         if (error instanceof Error) {
             return rejectWithValue(error.message);

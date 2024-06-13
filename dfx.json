@@ -1,7 +1,7 @@
 {
   "canisters": {
     "ugd_backend": {
-      "candid": "src/ugd_backend/backend.did",
+      "candid": "src/ugd_backend/ugd_backend.did",
       "package": "ugd_backend",
       "type": "rust"
     },

@@ -9,6 +9,7 @@ import HomePage from "./pages/HomePage";
 import "./styles/tailwind.css";
 import BookPortalPage from "./pages/BookPortalPage";
 import ManagerPage from "./pages/ManagerPage";
+import ArWeavePage from "./pages/ArWeave";
 import SessionProvider from "./providers/SessionProvider";
 
 export default function App() {
@@ -28,6 +29,14 @@ export default function App() {
 						<Route path="/" element={<HomePage />} />
 						<Route path="/book-portal" element={<BookPortalPage />} />
 						<Route path="/manager" element={<ManagerPage />} />
+						<Route
+							path="/arweave"
+							element={
+								<AuthProvider>
+									<ArWeavePage />
+								</AuthProvider>
+							}
+						/>
 					</Routes>
 				</BrowserRouter>
 			</SessionProvider>
