@@ -1,0 +1,24 @@
+[package]
+name = "tokenomics"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = "0.10"
+ciborium = "0.2.2"
+ic-cdk = "0.13"
+ic-cdk-macros = "0.13.2"
+ic-cdk-timers = "0.7"
+ic-ledger-types = "0.10"
+ic-stable-structures = "0.6.4"
+icrc-ledger-types = "0.1.5"
+num-bigint = "0.4.4"
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+sha2 = "0.10.8"
+num-traits = "0.2.19"

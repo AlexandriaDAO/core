@@ -16,15 +16,10 @@ type Result_3 = variant { Ok : text; Err : text };
 type UserFolder = record { post_ids : vec nat64; name : text };
 service : {
   add_bm_to_folder : (text, nat64) -> (Result);
-  burn_lbry : (principal, nat64) -> (Result_1);
   create_folder : (text) -> (Result);
   delete_folder : (text) -> (Result);
   favorite : (nat64) -> ();
   get_bms : (vec nat64) -> (vec opt BookMark) query;
-  get_totat_LBRY_burn : () -> (float64) query;
-  get_totat_UCG_minted: () -> (float64) query;
-  get_current_UCG_rate: () -> (float64) query;
-  get_current_LBRY_threshold: () -> (float64) query;
   get_ugbn_posts : (nat64, nat64, opt nat64) -> (vec opt BookMark, nat64) query;
   get_user_bms : (nat64, opt nat64) -> (vec opt BookMark, nat64) query;
   get_user_favorites : (nat64, opt nat64) -> (vec opt BookMark, nat64) query;
