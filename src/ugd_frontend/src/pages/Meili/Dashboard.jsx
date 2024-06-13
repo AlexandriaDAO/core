@@ -7,7 +7,6 @@ import SetFilters from './SetFilters';
 import CreateCSV from './CreateCSV';
 import { listDocs,initJuno } from '@junobuild/core';
 import Search from './Search';
-// import KeyManager from './KeyManager';
 
 const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(null);

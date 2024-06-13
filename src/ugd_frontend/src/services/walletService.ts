@@ -45,3 +45,13 @@ export const getKeys = async(): Promise<Keys[]> => {
       }
     return [];
   };
+
+export const deleteKeys = async (slot: number): Promise<void> => {
+  try {
+    await ugd_backend.delete_keys(slot);
+    console.log(`Keys for slot index ${slot} deleted successfully`);
+  } catch (error) {
+    console.error('Error deleting keys:', error);
+    throw error;
+  }
+};

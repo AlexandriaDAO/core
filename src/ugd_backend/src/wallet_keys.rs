@@ -11,7 +11,7 @@ use ic_cdk::api::caller;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
-const MAX_VALUE_SIZE: u32 = 1000;
+const MAX_VALUE_SIZE: u32 = 5000;
 const MAX_KEYS_PER_USER: u8 = 10;
 
 #[derive(Clone, Debug, CandidType, Deserialize)]
@@ -124,6 +124,28 @@ pub fn save_keys(
             }
         };
         user_keys
+    })
+}
+
+#[update]
+pub fn delete_keys(slot_index: u8) -> Result<(), String> {
+    let principal = ic_cdk::api::caller();
+    KEYS_MAP.with(|m| {
+        let mut map = m.borrow_mut();
+        match map.remove(&PrincipalWrapper(principal)) {
+            Some(mut keys_vec) => {
+                let original_length = keys_vec.0.len();
+                keys_vec.0.retain(|k| k.slot != slot_index);
+                if keys_vec.0.len() < original_length {
+                    map.insert(PrincipalWrapper(principal), keys_vec);
+                    Ok(())
+                } else {
+                    map.insert(PrincipalWrapper(principal), keys_vec);
+                    Err(format!("No keys found for slot index {}", slot_index))
+                }
+            }
+            None => Err(format!("No keys found for user")),
+        }
     })
 }
 

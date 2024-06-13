@@ -26,6 +26,7 @@ service : {
   add_my_engine : (text, text, text, text, opt nat8) -> (Result);
   bookmark_sc : (nat64) -> ();
   delete_engine : (text) -> (bool);
+  delete_keys : (nat8) -> (Result_1);
   delete_sc : (nat64) -> ();
   get_bookmarks : () -> (vec opt SourceCard) query;
   get_engine_by_id : (text) -> (opt Engine) query;

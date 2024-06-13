@@ -2,19 +2,19 @@
 
 import React from "react";
 import { AiOutlineFileSearch } from "react-icons/ai";
-import Button from "./Button";
+import Button from "../components/Button";
 import { PiReceiptLight } from "react-icons/pi";
-import ReceiptJSONView from "./ReceiptJSONView";
-import Spinner from "./Spinner";
+import ReceiptJSONView from "../components/ReceiptJSONView";
+import Spinner from "../components/Spinner";
 // import fileReaderStream from "filereader-stream";
-import gaslessFundAndUpload from "./utils/gaslessFundAndUpload";
-import getIrys from "./utils/getIrys";
+import gaslessFundAndUpload from "../utils/gaslessFundAndUpload";
+// import getIrys from "../utils/getIrys";
 import { useCallback } from "react";
 import { useEffect } from "react";
 import { useMemo } from "react";
 import { useRef } from "react";
 import { useState } from "react";
-import getReceipt from "./utils/getReceipt";
+import getReceipt from "../utils/getReceipt";
 
 // Define the Tag type
 type Tag = {
