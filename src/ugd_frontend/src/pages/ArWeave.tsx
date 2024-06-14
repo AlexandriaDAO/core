@@ -1,17 +1,3 @@
-
-// For now we will be the default and only node provider.
-// The reason is to do a gas based uploader requires the user sign each transaction.
-
-
-// Config.js
-// module.exports = {
-//   network: "devnet",
-//   url: "https://devnet.irys.xyz",
-//   providerUrl: "https://ethereum-sepolia-rpc.publicnode.com",
-//   token: "ethereum",
-// };
-
-
 // Pages/ArWeave.tsx
 import React, { FC } from "react";
 import GaslessUploader from "../features/irys/arweave-uploader/GaslessUploader";
@@ -24,8 +10,14 @@ const ArWeavePage: FC = () => {
     <MainLayout>
       <div className="mx-auto py-10 bg-background text-text flex flex-col-reverse gap-10 md:flex-row justify-center items-start">
         <div className="p-10 w-full md:w-1/3 md:p-0">
-          <ArFunder />
+          <p>This lets people pay in LBRY to mint a Book NFT using another's funded node. </p>
           <GaslessUploader showImageView={true} showReceiptView={true} blockchain="EVM" />
+          
+          <p>This lets you fund a ArWeave node with ETH, however you must save those private key to this app. We'll maybe pay owners for this.</p>
+          <ArFunder />
+
+
+          <p>This is how someone submits the keys for a funded node that others can use.</p>
           <KeyManager />
         </div>
       </div>
@@ -142,7 +134,7 @@ export default ArWeavePage;
 //           "Funding the node will deduct 0.005 ETH from your wallet. Do you want to proceed?"
 //         );
 //         if (confirmation) {
-//           const fundTx = await webIrys.fund(webIrys.utils.toAtomic(0.005));
+//           const fundTx = await webIrys.fund(webIrys.utils.toAtomic(0.0001));
 //           console.log(
 //             `Successfully funded ${webIrys.utils.fromAtomic(fundTx.quantity)} ${
 //               webIrys.token
@@ -175,7 +167,7 @@ export default ArWeavePage;
 //           {balance !== null && (
 //             <div>
 //               <h3>Node Balance: {balance} ETH</h3>
-//               {balance <= 0.1 && (
+//               {balance <= 0.00001 && (
 //                 <p>Balance is within 10% of 0, please fund your node.</p>
 //               )}
 //             </div>

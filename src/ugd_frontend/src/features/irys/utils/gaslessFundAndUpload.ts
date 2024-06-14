@@ -1,4 +1,4 @@
-import getIrys from "./getIrys";
+import gaslessIrys from "./gaslessIrys";
 
 type Tag = {
   name: string;
@@ -6,7 +6,7 @@ type Tag = {
 };
 
 const gaslessFundAndUploadEVM = async (selectedFile: File, tags: Tag[]): Promise<string> => {
-  const irys = await getIrys();
+  const irys = await gaslessIrys();
 
   console.log("Uploading...");
   const tx = await irys.uploadFile(selectedFile, {

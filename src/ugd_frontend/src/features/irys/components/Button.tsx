@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// import { ethers } from "ethers";
 import Spinner from "./Spinner";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
