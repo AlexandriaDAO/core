@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { AiOutlineFileSearch } from "react-icons/ai";
 import Button from "../components/Button";

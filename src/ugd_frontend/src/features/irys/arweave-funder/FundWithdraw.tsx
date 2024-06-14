@@ -1,115 +1,122 @@
-import React, { useEffect, useState } from "react";
-import Button from "../components/MultiButton";
-import Spinner from "../components/Spinner";
-import getIrys from "../utils/getIrys";
-import BigNumber from "bignumber.js";
+// This is the version using the web wallet.
+import React, { useState, useEffect } from "react";
+import MainLayout from "@/layouts/MainLayout";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { ethers } from "ethers";
+import { WebIrys } from "@irys/sdk";
 
-interface FundWithdrawConfigProps {
-  fundOnly?: boolean;
-  withdrawOnly?: boolean;
-}
-
-export const FundWithdraw: React.FC<FundWithdrawConfigProps> = ({ fundOnly = false, withdrawOnly = false }) => {
-  const [amount, setAmount] = useState<string>("0.0");
-  const [isFunding, setIsFunding] = useState<boolean>(!withdrawOnly);
-  const [message, setMessage] = useState<string>("");
-  const [txProcessing, setTxProcessing] = useState<boolean>(false);
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value);
-
-  const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>) => setIsFunding(e.target.value === "fund");
+function FundWithdraw() {
+  const { user } = useAppSelector((state) => state.auth);
+  const [connectedAddress, setConnectedAddress] = useState("");
+  const [webIrys, setWebIrys] = useState<WebIrys | null>(null);
+  const [balance, setBalance] = useState<number | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
+	const [amount, setAmount] = useState("0.0001");
 
   useEffect(() => {
-    const getCurBalance = async () => {
-      try {
-        const irys = await getIrys();
-        const loadedBalance = await irys.getLoadedBalance();
-        if (!isFunding) setAmount(irys.utils.fromAtomic(loadedBalance).toString());
-      } catch (error) {
-        console.log("Error connecting to Irys:", error);
+    const fetchNodeDetails = async () => {
+      if (webIrys) {
+        try {
+          const atomicBalance = await webIrys.getLoadedBalance();
+          console.log("Atomic Balance: ", atomicBalance);
+          //@ts-ignore
+          const convertedBalance = parseFloat(webIrys.utils.fromAtomic(atomicBalance));
+          setBalance(convertedBalance);
+        } catch (error) {
+          console.error("Error fetching node details:", error);
+        }
       }
     };
-    getCurBalance();
-  }, [isFunding]);
 
-  const handleFundWithdraw = async () => {
-    setMessage("");
-    if (amount === "0") {
-      setMessage("Please enter an amount greater than 0");
-      return;
+    if (webIrys) {
+      fetchNodeDetails();
     }
+  }, [webIrys]);
 
-    const irys = await getIrys();
-		console.log("Irys object:", irys);
-
-    setTxProcessing(true);
-
-    if (isFunding) {
-      try {
-				console.log("Did not get into await_irys.fund");
-
-				// I'm getting stuck right here on this line with TypeError: provider.estimateGas is not a function
-        await irys.fund(irys.utils.toAtomic(new BigNumber(amount)));
-				console.log("Got into await_irys.fund");
-        setMessage("Funding successful");
-      } catch (e) {
-        setMessage("Error while funding: " + e);
-        console.log(e);
-      }
+  const getWebIrys = async () => {
+    let provider;
+    //@ts-ignore
+    if (window.ethereum == null) {
+      console.log("MetaMask not installed; using read-only defaults");
+      provider = ethers.getDefaultProvider();
     } else {
-      try {
-        await irys.withdrawBalance(irys.utils.toAtomic(new BigNumber(amount)));
-        setMessage("Withdraw successful");
-      } catch (e) {
-        setMessage("Error while withdrawing: " + e);
-        console.log(e);
-      }
+      //@ts-ignore
+      provider = new ethers.BrowserProvider(window.ethereum);
     }
-    setTxProcessing(false);
+    console.log("provider=", provider);
+    const network = "mainnet";
+    const token = "ethereum";
+
+    const wallet = { name: "ethersv6", provider: provider };
+    const webIrys = new WebIrys({ network, token, wallet });
+    await webIrys.ready();
+    setConnectedAddress(webIrys.address!);
+    setWebIrys(webIrys);
   };
 
-  return (
-    <div className="bg-white rounded-lg p-5 border w-full shadow-xl">
-      <input
-        type="number"
-        step="0.0000001"
-        className="block w-full mb-4 bg-transparent text-text rounded-md p-3 border border-gray-300 shadow-sm"
-        value={amount}
-        onChange={handleAmountChange}
-      />
-      {!fundOnly && !withdrawOnly && (
-        <div className="my-6 text-text flex items-center space-x-4">
-          <label className="inline-flex items-center">
-            <input
-              type="radio"
-              className="form-radio"
-              name="transactionType"
-              value="fund"
-              checked={isFunding}
-              onChange={handleOptionChange}
-            />
-            <span className="ml-2">Fund</span>
-          </label>
-          <label className="inline-flex items-center">
-            <input
-              type="radio"
-              className="form-radio"
-              name="transactionType"
-              value="withdraw"
-              checked={!isFunding}
-              onChange={handleOptionChange}
-            />
-            <span className="ml-2">Withdraw</span>
-          </label>
-        </div>
-      )}
-      {message && <div className="text-red-500">{message}</div>}
-      <Button onClick={handleFundWithdraw} disabled={txProcessing}>
-        {txProcessing ? <Spinner color="text-background" /> : isFunding ? "Fund Node" : "Withdraw From Node"}
-      </Button>
-    </div>
-  );
-};
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(e.target.value);
+  };
+
+  const fundNode = async () => {
+    if (webIrys) {
+      try {
+        const confirmation = window.confirm(
+          "Funding the node will deduct ${amount} ETH from your wallet. Do you want to proceed?"
+        );
+        if (confirmation) {
+          const fundTx = await webIrys.fund(webIrys.utils.toAtomic(0.0001));
+          console.log(
+            `Successfully funded ${webIrys.utils.fromAtomic(fundTx.quantity)} ${
+              webIrys.token
+            }`
+          );
+        }
+      } catch (e) {
+        console.log("Error funding node ", e);
+      }
+    }
+  };
+
+	return (
+		<div className="bg-white rounded-lg p-5 border w-full shadow-xl">
+			<h1>Irys Connection</h1>
+			{connectedAddress && connectedAddress.length > 0 && (
+				<h3>Connected from: {connectedAddress}</h3>
+			)}
+			<button onClick={getWebIrys} className="mb-4 bg-blue-500 text-white px-4 py-2 rounded">
+				Connect To Irys Node
+			</button>
+			{webIrys && (
+				<div>
+					<input
+						type="number"
+						step="0.0000001"
+						className="block w-full mb-4 bg-transparent text-text rounded-md p-3 border border-gray-300 shadow-sm"
+						value={amount}
+						onChange={handleAmountChange}
+					/>
+					<button onClick={fundNode} className="bg-blue-500 text-white px-4 py-2 rounded">
+						Fund Node
+					</button>
+				</div>
+			)}
+			{balance !== null && (
+				<div>
+					<h3>Node Balance: {balance} ETH</h3>
+					{balance <= 0.00001 && (
+						<p>Balance is within 10% of 0, please fund your node.</p>
+					)}
+				</div>
+			)}
+			{status && (
+				<div>
+					<h3>Node Status: {status}</h3>
+				</div>
+			)}
+		</div>
+	);
+}
 
 export default FundWithdraw;
 
@@ -130,6 +137,21 @@ export default FundWithdraw;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // Error while funding: Error: failed to post funding tx - 0xf189491df75b941a0b187a1992661d5ed617130bd193518d78237ca17c2472db - keep this id! - HTTP Error: Posting transaction 0xf189491df75b941a0b187a1992661d5ed617130bd193518d78237ca17c2472db information to the bundler: 400 Tx 0xf189491df75b941a0b187a1992661d5ed617130bd193518d78237ca17c2472db doesn't exist
 
 // import React from "react";
 // import { useEffect, useState } from "react";
