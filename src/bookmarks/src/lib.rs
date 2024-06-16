@@ -1,11 +1,6 @@
 use ic_cdk;
 use candid::Principal;
-// use ic_ledger_types::BlockIndex;
-// use ic_ledger_types::BlockIndex as BlockIndexIc;S
-use icrc_ledger_types::icrc1::{
-  // account::Account,
-  transfer::BlockIndex,
-};
+use icrc_ledger_types::icrc1::transfer::BlockIndex;
 
 mod folders;
 pub use folders::{*};

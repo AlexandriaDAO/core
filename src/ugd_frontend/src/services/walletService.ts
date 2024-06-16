@@ -3,11 +3,6 @@ import { ugd_backend } from '../../../declarations/ugd_backend';
 import sjcl from 'sjcl';
 import { Principal } from "@dfinity/principal";
 
-// // Example keys
-// const pubKey = "0xeDa20F6d64944Ad132dE51927Ae1A32cFCDD8998";
-// const privateKey = "1bda3c9bf8b1170093b4339835c01273766f30ec64077c07a7e174b0f67c5636";
-
-
 export const encryptKey = (rawKey: string, UID: string): string => {
   const encryptedKey = sjcl.encrypt(UID, rawKey);
   return JSON.stringify(encryptedKey);

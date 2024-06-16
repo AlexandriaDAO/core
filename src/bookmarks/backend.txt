@@ -1,4 +1,3 @@
-ukvtntnbije
 // type BookMark = record {
 //   post_id : nat64;
 //   ugbn : nat64;
