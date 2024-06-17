@@ -1,128 +1,44 @@
-import React from "react";
 import { WebIrys } from "@irys/sdk";
+import { TypedEthereumSigner } from "arbundles";
 import { ethers } from "ethers";
 
-import BigNumber from "bignumber.js";
-import getRpcUrl from "./getRpcUrl";
-import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
-import WalletConnectProvider from "@walletconnect/web3-provider";
+const getIrys = async () => {
+  const network = "mainnet";
+  const token = "ethereum";
+  const pubKey = "0xeDa20F6d64944Ad132dE51927Ae1A32cFCDD8998";
+  const privateKey = "1bda3c9bf8b1170093b4339835c01273766f30ec64077c07a7e174b0f67c5636";
 
-const checkEthersConnection = async () => {
-	try {
-    //@ts-ignore
-		if (window.ethereum) {
-			//@ts-ignore
-			const ethProvider = new ethers.BrowserProvider(window.ethereum);
-			const accounts = await ethProvider.listAccounts();
+  const signer = new TypedEthereumSigner(privateKey);
 
-			if (accounts.length > 0) {
-				return true; // Connected
-			}
-		}
-	} catch (error) {
-		console.error("Error checking Ethereum wallet connection:", error);
-	}
-	return false; // Not connected
-};
+  const provider = {
+    getPublicKey: async () => {
+      return Buffer.from(pubKey, "hex");
+    },
+    getSigner: () => {
+      return {
+        getAddress: () => pubKey,
+        _signTypedData: async (
+          _domain: never,
+          _types: never,
+          message: { address: string; "Transaction hash": Uint8Array },
+        ) => {
+          const convertedMsg = Buffer.from(message["Transaction hash"]);
+          const signature = await signer.sign(convertedMsg);
+          const bSig = Buffer.from(signature);
+          const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString("hex");
+          return pad;
+        },
+      };
+    },
+    _ready: () => {},
+  };
 
-// Check Solana
-const checkSolanaConnection = async () => {
-	try {
-    //@ts-ignore
-		if (window.solana && window.solana.isPhantom) {
-			// Attempt to connect (this is just a placeholder - adapt based on your Solana logic)
-      //@ts-ignore
-			const response = await window.solana.connect({ onlyIfTrusted: true });
-			if (response.publicKey) {
-				return true;
-			}
-		}
-	} catch (error) {
-		console.error("Error checking Solana wallet connection:", error);
-	}
-	return false;
-};
+  const wallet = { name: "ethersv5", provider: provider };
+  const irys = new WebIrys({ network, token, wallet });
 
-/**
- * Creates a new Irys object with the specified configuration.
- *
- * @param {string} url - The Irys network URL.
- * @param {string} currency - The currency to use (e.g., "ethereum").
- * @param {string} providerUrl - The provider URL for the Ethereum network.
- * @returns {Promise<WebIrys>} - A reference to the initialized Irys object.
- */
-const getIrysEvm = async (
-	network: string = process.env.NEXT_PUBLIC_NETWORK || "devnet",
-	token: string = process.env.NEXT_PUBLIC_TOKEN || "ethereum",
-): Promise<WebIrys> => {
-  //@ts-ignore
-	await window.ethereum.enable();
-  //@ts-ignore
-	const provider = new ethers.BrowserProvider(window.ethereum);
-	const wallet = { name: "ethersv6", provider: provider };
-	const webIrys = new WebIrys({ network, token, wallet });
-	//@ts-ignore
-	webIrys.tokenConfig.getFee = async (): Promise<any> => {
-		return 0;
-	};
-	await webIrys.ready();
+  await irys.ready();
 
-	console.log(`Connected to webIrys from ${webIrys.address}`);
-	return webIrys;
-};
-
-const getIrysSol = async (
-	network: string = process.env.NEXT_PUBLIC_NETWORK || "devnet",
-	token: string = process.env.NEXT_PUBLIC_TOKEN || "ethereum",
-): Promise<WebIrys> => {
-  //@ts-ignore
-	await window.solana.connect();
-	const provider = new PhantomWalletAdapter();
-	await provider.connect();
-	let wallet;
-	if (network === "devnet") {
-		wallet = { rpcUrl: process.env.NEXT_PUBLIC_RPC_SOLANA, name: "solana", provider };
-	} else {
-		wallet = { name: "solana", provider };
-	}
-
-	const webIrys = new WebIrys({
-		network: process.env.NEXT_PUBLIC_NETWORK || "devnet",
-		token: "solana",
-		wallet,
-	});
-	await webIrys.ready();
-
-	return webIrys;
-};
-
-const getIrysNear = async (
-	network: string = process.env.NEXT_PUBLIC_NETWORK || "devnet",
-	token: string = process.env.NEXT_PUBLIC_TOKEN || "ethereum",
-): Promise<WebIrys> => {
-  //@ts-ignore
-	await window.ethereum.enable();
-  //@ts-ignore
-	const provider = new ethers.BrowserProvider(window.ethereum);
-	const wallet = { name: "ethersv6", provider: provider };
-	//@ts-ignore
-	const webIrys = new WebIrys({ network, token, wallet });
-	await webIrys.ready();
-
-	console.log(`Connected to WebIrys from ${webIrys.address}`);
-	return webIrys;
-};
-
-const getIrys = async (
-	network: string = process.env.NEXT_PUBLIC_NETWORK || "devnet",
-	token: string = process.env.NEXT_PUBLIC_TOKEN || "ethereum",
-): Promise<WebIrys> => {
-	if (await checkSolanaConnection()) {
-		console.log("getIrys returning SOL");
-		return getIrysSol();
-	}
-	console.log("getIrys returning EVM");
-	return getIrysEvm();
+  return irys;
 };
 
 export default getIrys;

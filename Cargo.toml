@@ -3,6 +3,7 @@ members = [
     "src/ugd_backend",
     "src/bookmarks",
     "src/icp_swap",
-    "src/tokenomics"
+    "src/librarians",
+    "src/tokenomics",
 ]
 resolver = "2"

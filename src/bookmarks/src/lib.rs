@@ -1,9 +1,7 @@
 use ic_cdk;
 use candid::Principal;
+use icrc_ledger_types::icrc1::transfer::BlockIndex;
 
-use icrc_ledger_types::icrc1::{
-  transfer::BlockIndex,
-};
 
 mod folders;
 pub use folders::{*};
