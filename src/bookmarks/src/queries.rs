@@ -1,4 +1,3 @@
-use crate::{CURRENT_THRESHOLD, THRESHOLDS, TOTAL_LBRY_BURNED, TOTAL_UCG_MINTED, UCG_PER_THRESHOLD};
 use ic_cdk::api::caller;
 use ic_cdk::{query, update};
 
@@ -96,37 +95,4 @@ pub fn get_ugbn_posts(
             .map(|ugbn_entry| get_bookmarks_section(&ugbn_entry.ugbn, slot, amount))
             .unwrap_or_else(|| (Vec::new(), 0))
     })
-}
-#[query]
-pub fn get_totat_LBRY_burn() -> f64 {
-    TOTAL_LBRY_BURNED.with(|total_burned| {
-        let total_burned: std::sync::MutexGuard<f64> = total_burned.lock().unwrap();
-        *total_burned
-    })
-}
-
-#[query]
-pub fn get_totat_UCG_minted() -> f64 {
-    TOTAL_UCG_MINTED.with(|mint| {
-        let mint: std::sync::MutexGuard<f64> = mint.lock().unwrap();
-        *mint
-    })
-}
-
-#[query]
-pub fn get_current_UCG_rate() -> f64 {
-    let current_threshold = CURRENT_THRESHOLD.with(|current_threshold| {
-        let current_threshold = current_threshold.lock().unwrap();
-        *current_threshold
-    });
-    UCG_PER_THRESHOLD[current_threshold as usize]
-}
-#[query]
-pub fn get_current_LBRY_threshold() -> f64 {
-    let current_threshold = CURRENT_THRESHOLD.with(|current_threshold| {
-        let current_threshold = current_threshold.lock().unwrap();
-        *current_threshold
-    });
-    THRESHOLDS[current_threshold as usize]
-
 }

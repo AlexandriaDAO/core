@@ -8,7 +8,8 @@
     "bookmarks": {
       "candid": "src/bookmarks/bookmarks.did",
       "package": "bookmarks",
-      "type": "rust"
+      "type": "rust",
+      "id":"br5f7-7uaaa-aaaaa-qaaca-cai"
     },
     "icp_swap": {
       "candid": "src/icp_swap/icp_swap.did",
@@ -19,10 +20,16 @@
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
     },
+    "tokenomics": {
+      "candid": "src/tokenomics/tokenomics.did",
+      "package": "tokenomics",
+      "type": "rust",
+      "id": "bkyz2-fmaaa-aaaaa-qaaaq-cai"
+    },
     "LBRY": {
       "type": "custom",
-      "candid": "https://raw.githubusercontent.com/dfinity/ic/ec35ebd252d4ffb151d2cfceba3a86c4fb87c6d6/rs/rosetta-api/icrc1/ledger/ledger.did",
-      "wasm": "https://download.dfinity.systems/ic/ec35ebd252d4ffb151d2cfceba3a86c4fb87c6d6/canisters/ic-icrc1-ledger.wasm.gz",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
       "specified_id": "c5kvi-uuaaa-aaaaa-qaaia-cai"
     },
     "librarians": {
@@ -32,8 +39,8 @@
     },
     "UCG": {
       "type": "custom",
-      "candid": "https://raw.githubusercontent.com/dfinity/ic/ec35ebd252d4ffb151d2cfceba3a86c4fb87c6d6/rs/rosetta-api/icrc1/ledger/ledger.did",
-      "wasm": "https://download.dfinity.systems/ic/ec35ebd252d4ffb151d2cfceba3a86c4fb87c6d6/canisters/ic-icrc1-ledger.wasm.gz",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
       "specified_id": "cbopz-duaaa-aaaaa-qaaka-cai"
     },
     "ugd_frontend": {
