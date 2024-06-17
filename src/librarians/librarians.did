@@ -1,0 +1,6 @@
+type Result = variant { Ok; Err : text };
+service : {
+  delete_keys : () -> (Result);
+  get_keys : (nat64) -> (opt principal) query;
+  save_keys : () -> (Result);
+}
