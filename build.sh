@@ -8,6 +8,7 @@ dfx start --background --clean
 dfx deps pull
 dfx deps init
 dfx deps deploy
+dfx deps deploy internet_identity
 
 # Step 3: Configure Local Identities
 dfx identity new minter --storage-mode plaintext
@@ -79,5 +80,9 @@ dfx deploy UCG --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
   })
 '
 
-# Step 5: Deploy
-dfx deploy
+# Step 5: Deploy other canisters with specified IDs
+dfx deploy ugd_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
+dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
+dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
+dfx deploy librarians --specified-id ju4sh-3yaaa-aaaap-ahapa-cai
+dfx deploy ugd_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai

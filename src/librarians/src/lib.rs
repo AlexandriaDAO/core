@@ -1,12 +1,3 @@
-// Submit your principal here and become a librarian.
-// This will store your principal which will be used to decrypt api keys and wallet keys.
-
-// Setup:
-// We'll hash the user's principal, and allow access of the principal through the hash.
-// We'll allow adding and deleting oneself from the list of librarians, which will control access on the frontend.
-// We'll allow everyone to query by principal hash.
-
-
 use candid::{CandidType, Decode, Deserialize, Encode, Principal};
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable};
@@ -52,12 +43,20 @@ thread_local! {
 #[update]
 pub fn save_keys() -> Result<(), String> {
     let raw_principal = ic_cdk::api::caller();
-    let hashed_principal = hash_principal(raw_principal);
-    KEYS_MAP.with(|m| {
-        let mut map = m.borrow_mut();
-        map.insert(hashed_principal, raw_principal);
-        Ok(())
-    })
+    if raw_principal == Principal::anonymous() {
+        Err(format!("User must be logged in to save keys"))
+    } else {
+        let hashed_principal = hash_principal(raw_principal);
+        KEYS_MAP.with(|m| {
+            let mut map = m.borrow_mut();
+            if !map.contains_key(&hashed_principal) {
+                map.insert(hashed_principal, raw_principal);
+                Ok(())
+            } else {
+                Err(format!("Keys for user already exist"))
+            }
+        })
+    }
 }
 
 #[update]
@@ -74,7 +73,28 @@ pub fn delete_keys() -> Result<(), String> {
 }
 
 #[query]
-pub fn get_keys(hashed_principal: u64) -> Option<Principal> {
+pub fn is_librarian() -> bool {
+    let principal = ic_cdk::api::caller();
+    if principal == Principal::anonymous() {
+        false
+    } else {
+        let hashed_principal = hash_principal(principal);
+        get_librarian(hashed_principal).is_some()
+    }
+}
+
+#[query]
+pub fn get_hashes() -> Vec<u64> {
+    KEYS_MAP.with(|m| {
+        m.borrow()
+            .iter()
+            .map(|(hashed_principal, _)| hashed_principal)
+            .collect()
+    })
+}
+
+#[query]
+pub fn get_librarian(hashed_principal: u64) -> Option<Principal> {
     KEYS_MAP.with(|m| {
         m.borrow()
             .get(&hashed_principal)

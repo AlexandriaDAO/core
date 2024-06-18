@@ -2,6 +2,7 @@
 import React, { FC } from "react";
 import GaslessUploader from "../features/irys/arweave-uploader/GaslessUploader";
 import KeyManager from "../features/irys/arweave-uploader/KeyManager";
+import SaveLibrarian from "@/features/irys/arweave-funder/saveLibrarian";
 import ArFunder from "@/features/irys/arweave-funder/funder";
 import MainLayout from "@/layouts/MainLayout";
 
@@ -10,14 +11,19 @@ const ArWeavePage: FC = () => {
     <MainLayout>
       <div className="mx-auto py-10 bg-background text-text flex flex-col-reverse gap-10 md:flex-row justify-center items-start">
         <div className="p-10 w-full md:w-1/3 md:p-0">
+
+          <h1>This is the part everyone will use, and pay in icp.</h1>
           <p>This lets people pay in LBRY to mint a Book NFT using another's funded node. </p>
           <GaslessUploader showImageView={true} showReceiptView={true} blockchain="EVM" />
+          <h2>TBD: Section to pick a node to upload from.</h2>
           
-          <p>This lets you fund a ArWeave node with ETH, however you must save those private key to this app. We'll maybe pay owners for this.</p>
+          <h1>Area only for librarians.</h1>
+          <h2>TBD: First, become a librarian. and save your principal as a decryption key.</h2>
+          <SaveLibrarian />
+          <p>Then fund a ArWeave node with ETH:</p>
           <ArFunder />
 
-
-          <p>This is how someone submits the keys for a funded node that others can use.</p>
+          <p>Then submit the private keys for a funded node so others can use it.</p>
           <KeyManager />
         </div>
       </div>

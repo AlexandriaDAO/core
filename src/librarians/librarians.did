@@ -1,6 +1,8 @@
 type Result = variant { Ok; Err : text };
 service : {
   delete_keys : () -> (Result);
-  get_keys : (nat64) -> (opt principal) query;
+  get_hashes : () -> (vec nat64) query;
+  get_librarian : (nat64) -> (opt principal) query;
+  is_librarian : () -> (bool) query;
   save_keys : () -> (Result);
 }

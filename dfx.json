@@ -34,7 +34,7 @@
     },
     "librarians": {
       "candid": "src/librarians/librarians.did",
-      "package": "icp_swap",
+      "package": "librarians",
       "type": "rust"
     },
     "UCG": {
