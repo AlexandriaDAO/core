@@ -27,13 +27,21 @@ module.exports = {
     fallback: {
       assert: require.resolve("assert/"),
       buffer: require.resolve("buffer/"),
+      crypto: require.resolve("crypto-browserify"),
       events: require.resolve("events/"),
-      stream: require.resolve("stream-browserify/"),
+      http: require.resolve("stream-http"),
+      https: require.resolve("https-browserify"),
+      os: require.resolve("os-browserify"),
+      path: require.resolve("path-browserify"),
+      stream: require.resolve("stream-browserify"),
+      url: require.resolve("url"),
       util: require.resolve("util/"),
-      perf_hooks: false
+      vm: require.resolve("vm-browserify"),
+      zlib: require.resolve("browserify-zlib"),
     },
     alias: {
-      '@': path.resolve(__dirname, 'src', frontendDirectory, 'src'),
+      "@": path.resolve(__dirname, "src", frontendDirectory, "src"),
+      stream: "stream-browserify",
     },
   },
   output: {
@@ -94,8 +102,8 @@ module.exports = {
       }),
     ]),
     new webpack.ProvidePlugin({
-      Buffer: [require.resolve("buffer/"), "Buffer"],
-      process: require.resolve("process/browser"),
+      process: "process/browser.js",
+      Buffer: ["buffer", "Buffer"],
     }),
     new CopyPlugin({
       patterns: [

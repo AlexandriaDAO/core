@@ -1,3 +1,10 @@
+// ToDO. 
+// The engine should not expose user principals, but store the hash as the id.
+// Engine key needs to be encrypted. And maybe the host too.
+// I'm not sure how, but it's not clear to me how to change existing engines, or choose their slot. We may also want to put a cap on those slots.
+// Only the owner should be able to delete an engine.
+
+
 use candid::{CandidType, Deserialize, Principal};
 use ic_cdk::api::caller;
 use ic_cdk::{query, update};

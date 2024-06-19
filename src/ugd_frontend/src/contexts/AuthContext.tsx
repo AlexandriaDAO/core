@@ -1,13 +1,15 @@
 // src/ugd_frontend/src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { createActor, ugd_backend } from '../../../declarations/ugd_backend';
+import { createActor as createUgdActor, ugd_backend } from '../../../declarations/ugd_backend';
+import { createActor as createLibrariansActor, librarians } from '../../../declarations/librarians';
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
 import { Principal } from '@dfinity/principal';
 import { AccountIdentifier, LedgerCanister } from '@dfinity/ledger-icp';
 
 interface AuthContextProps {
-  actor: any;
+  ugdActor: any;
+  librariansActor: any;
   UID: Principal | null;
   accountIdentifier: AccountIdentifier | null;
   balanceE8s: bigint | null;
@@ -16,7 +18,8 @@ interface AuthContextProps {
 }
 
 export const AuthContext = createContext<AuthContextProps>({
-  actor: ugd_backend,
+  ugdActor: ugd_backend,
+  librariansActor: librarians,
   UID: null,
   accountIdentifier: null,
   balanceE8s: null,
@@ -33,7 +36,8 @@ interface AuthProviderProps {
 const LEDGER_CANISTER_ID = Principal.fromText("ryjl3-tyaaa-aaaaa-aaaba-cai");
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [actor, setActor] = useState(ugd_backend);
+  const [ugdActor, setUgdActor] = useState(ugd_backend);
+  const [librariansActor, setLibrariansActor] = useState(librarians);
   const [UID, setUID] = useState<Principal | null>(null);
   const accountIdentifier = useMemo(() => UID && AccountIdentifier.fromPrincipal({ principal: UID }), [UID]);
   const [balanceE8s, setBalanceE8s] = useState<bigint | null>(null);
@@ -53,7 +57,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     fetchBalance();
   }, [accountIdentifier]);
 
-
   useEffect(() => {
     const initializeAuth = async () => {
       const authClient = await AuthClient.create();
@@ -62,12 +65,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (isAuthenticated) {
         const identity = authClient.getIdentity();
         const agent = new HttpAgent({ identity });
-        const newActor = createActor(process.env.CANISTER_ID_UGD_BACKEND!, {
+        const newUgdActor = createUgdActor(process.env.CANISTER_ID_UGD_BACKEND!, {
+          agent,
+        });
+        const newLibrariansActor = createLibrariansActor(process.env.CANISTER_ID_LIBRARIANS!, {
           agent,
         });
 
-        setActor(newActor);
-        setUID(await newActor.whoami());
+        setUgdActor(newUgdActor);
+        setLibrariansActor(newLibrariansActor);
+        setUID(await newUgdActor.whoami());
       }
     };
 
@@ -94,25 +101,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const identity = authClient.getIdentity();
     // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
     const agent = new HttpAgent({ identity });
-    // Using the interface description of our webapp, we create an actor that we use to call the service methods.
-    const newActor = createActor(process.env.CANISTER_ID_UGD_BACKEND!, {
+    // Using the interface description of our webapp, we create actors that we use to call the service methods.
+    const newUgdActor = createUgdActor(process.env.CANISTER_ID_UGD_BACKEND!, {
+      agent,
+    });
+    const newLibrariansActor = createLibrariansActor(process.env.CANISTER_ID_LIBRARIANS!, {
       agent,
     });
 
-    setActor(newActor);
-    setUID(await newActor.whoami());
+    setUgdActor(newUgdActor);
+    setLibrariansActor(newLibrariansActor);
+    setUID(await newUgdActor.whoami());
   };
 
   const logout = async (e: React.FormEvent) => {
     e.preventDefault();
     let authClient = await AuthClient.create();
     await authClient.logout();
-    setActor(ugd_backend);
+    setUgdActor(ugd_backend);
+    setLibrariansActor(librarians);
     setUID(null);
   };
 
   return (
-    <AuthContext.Provider value={{ actor, UID, accountIdentifier, balanceE8s, login, logout  }}>
+    <AuthContext.Provider value={{ ugdActor, librariansActor, UID, accountIdentifier, balanceE8s, login, logout  }}>
       {children}
     </AuthContext.Provider>
   );

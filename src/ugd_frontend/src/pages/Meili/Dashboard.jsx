@@ -7,7 +7,6 @@ import SetFilters from './SetFilters';
 import CreateCSV from './CreateCSV';
 import { listDocs,initJuno } from '@junobuild/core';
 import Search from './Search';
-import KeyManager from './KeyManager';
 
 const Dashboard = () => {
   const [activeIndex, setActiveIndex] = useState(null);
@@ -134,7 +133,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <KeyManager onClientInitialized={(e)=>console.log('in',e)} />
+        {/* <KeyManager onClientInitialized={(e)=>console.log('in',e)} /> */}
 
         <div className='flex flex-col items-start gap-2'>
           <span className='font-bold text-lg'>Recent Tasks</span>
