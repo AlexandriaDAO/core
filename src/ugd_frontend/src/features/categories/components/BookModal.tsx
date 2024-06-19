@@ -2,6 +2,7 @@
 import { setSelectedBook } from "@/features/home/homeSlice";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import React from "react";
+import BookReader from "@/components/BookModal";
 
 
 function BookModal() {
@@ -14,9 +15,9 @@ function BookModal() {
 	};
 
 	return (
-        <div className="w-full h-[1000px] p-10 text-black scale-y-100 transition-all duration-500 flex flex-col justify-between">
-            <div className="text-black shadow-xl border border-solid rounded-t-lg bg-white scale-y-100 transition-all duration-500 flex-grow flex justify-center items-center">
-                Book Loading Modal
+        <div className="w-full p-10 text-black scale-y-100 transition-all duration-500 flex flex-col justify-between">
+            <BookReader />
+            {/* <div className="text-black shadow-xl border border-solid rounded-t-lg bg-white scale-y-100 transition-all duration-500 flex-grow flex justify-center items-center">
             </div>
             <div
             onClick={hideSelectedBook}
@@ -33,7 +34,7 @@ function BookModal() {
                         fill="white"
                     />
                 </svg>
-            </div>
+            </div> */}
         </div>
 	);
 }
