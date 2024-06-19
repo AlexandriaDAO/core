@@ -35,6 +35,7 @@ service : {
   get_engines_not_owned_by : (text) -> (vec Engine) query;
   get_engines_not_owned_by_me : () -> (vec Engine) query;
   get_keys : () -> (vec Keys) query;
+  get_librarian_keys : (principal) -> (vec Keys) query;
   get_my_engines : () -> (vec Engine) query;
   get_sc : (nat64) -> (opt SourceCard) query;
   save_keys : (text, text, nat8) -> (Result_1);

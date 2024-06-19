@@ -1,8 +1,13 @@
+type Librarian = record {
+  name : text;
+  raw_principal : principal;
+  hashed_principal : nat64;
+};
 type Result = variant { Ok; Err : text };
 service : {
-  delete_keys : () -> (Result);
-  get_hashes : () -> (vec nat64) query;
-  get_librarian : (nat64) -> (opt principal) query;
+  delete_librarian : () -> (Result);
+  get_hashes_and_names : () -> (vec record { nat64; text }) query;
+  get_librarian : (nat64) -> (opt Librarian) query;
   is_librarian : () -> (bool) query;
-  save_keys : () -> (Result);
+  save_librarian : (text) -> (Result);
 }

@@ -56,6 +56,19 @@ const KeyManager: FC = () => {
     }
   };
 
+  const handleRevealKeys = (publicKey: string, privateKey: string) => {
+    if (UID) {
+      try {
+        const decryptedPublicKey = decryptKey(publicKey, UID.toText());
+        const decryptedPrivateKey = decryptKey(privateKey, UID.toText());
+        alert(`Public Key: ${decryptedPublicKey}\nPrivate Key: ${decryptedPrivateKey}`);
+      } catch (error) {
+        console.error("Error decrypting keys:", error);
+        alert("Error decrypting keys. Please try again.");
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col text-xs space-y-1 items-start">
       <h1 className="text-2xl font-bold rounded-xl mb-3">Save your own wallet:</h1>
@@ -102,29 +115,23 @@ const KeyManager: FC = () => {
         <div className="mt-8">
           <h2 className="text-xl font-bold rounded-xl mb-3">Your Wallets:</h2>
           <ul>
-            {savedKeys.map((key, index) => {
-              let decryptedPublicKey = "";
-              let decryptedPrivateKey = "";
-              if (UID) {
-                try {
-                  decryptedPublicKey = decryptKey(key.public_key, UID.toText());
-                  decryptedPrivateKey = decryptKey(key.private_key, UID.toText());
-                } catch (error) {
-                  console.error("Error decrypting private key:", error);
-                }
-              }
-              return (
-                <li key={index}>
-                  Public Key: {decryptedPublicKey}, Private Key: {decryptedPrivateKey}, Slot Index: {key.slot}
-                  <button
-                    onClick={() => handleDeleteKeys(key.slot)}
-                    className="bg-red-500 text-white px-2 py-1 rounded ml-2"
-                  >
-                    Delete
-                  </button>
-                </li>
-              );
-            })}
+            {savedKeys.map((key, index) => (
+              <li key={index}>
+                Slot Index: {key.slot}
+                <button
+                  onClick={() => handleRevealKeys(key.public_key, key.private_key)}
+                  className="bg-blue-500 text-white px-2 py-1 rounded ml-2"
+                >
+                  Reveal Keys
+                </button>
+                <button
+                  onClick={() => handleDeleteKeys(key.slot)}
+                  className="bg-red-500 text-white px-2 py-1 rounded ml-2"
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
           </ul>
         </div>
       )}

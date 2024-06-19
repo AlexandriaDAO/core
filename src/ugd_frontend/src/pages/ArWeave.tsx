@@ -5,6 +5,8 @@ import KeyManager from "../features/irys/arweave-uploader/KeyManager";
 import SaveLibrarian from "@/features/irys/arweave-funder/saveLibrarian";
 import ArFunder from "@/features/irys/arweave-funder/funder";
 import MainLayout from "@/layouts/MainLayout";
+import { ActiveLibrarianProvider } from "@/contexts/LibrarianContext";
+import { KeysProvider } from "@/contexts/KeysContext";
 
 const ArWeavePage: FC = () => {
   return (
@@ -19,7 +21,14 @@ const ArWeavePage: FC = () => {
           
           <h1>Area only for librarians.</h1>
           <h2>TBD: First, become a librarian. and save your principal as a decryption key.</h2>
-          <SaveLibrarian />
+
+          <ActiveLibrarianProvider>
+            {/* <KeysProvider> */}
+              <SaveLibrarian /> 
+            {/* </KeysProvider> */}
+          </ActiveLibrarianProvider>
+
+
           <p>Then fund a ArWeave node with ETH:</p>
           <ArFunder />
 

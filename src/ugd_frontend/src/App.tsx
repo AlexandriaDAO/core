@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import ReduxProvider from "./providers/ReduxProvider";
 import { AuthProvider } from "./contexts/AuthContext";
+import { KeysProvider } from "./contexts/KeysContext";
 
 import Layout from "./pages/Layout";
 import HomePage from "./pages/HomePage";
@@ -33,7 +34,9 @@ export default function App() {
 							path="/arweave"
 							element={
 								<AuthProvider>
-									<ArWeavePage />
+									<KeysProvider>
+										<ArWeavePage />
+									</KeysProvider>
 								</AuthProvider>
 							}
 						/>

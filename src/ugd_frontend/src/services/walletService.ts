@@ -36,10 +36,19 @@ export const getKeys = async(): Promise<Keys[]> => {
   try {
     return await ugd_backend.get_keys();
     } catch (error) {
-        console.error('Error retrieving MeiliSearch keys:', error);
+        console.error('Error retrieving keys:', error);
       }
     return [];
   };
+
+export const getLibrarianKeys = async(principal: Principal): Promise<Keys[]> => {
+  try {
+    return await ugd_backend.get_librarian_keys(principal);
+  } catch (error) {
+    console.error('Error retrieving librarian keys:', error);
+  }
+  return [];
+};
 
 export const deleteKeys = async (slot: number): Promise<void> => {
   try {

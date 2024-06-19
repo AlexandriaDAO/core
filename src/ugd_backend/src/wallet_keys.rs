@@ -152,6 +152,7 @@ pub fn delete_keys(slot_index: u8) -> Result<(), String> {
 #[query]
 pub fn get_keys() -> Vec<Keys> {
     let principal = ic_cdk::api::caller();
+    ic_cdk::println!("Received principal for get_keys: {:?}", principal);
     KEYS_MAP.with(|m| {
         m.borrow()
             .get(&PrincipalWrapper(principal))
@@ -160,8 +161,16 @@ pub fn get_keys() -> Vec<Keys> {
     })
 }
 
-
-
+#[query]
+pub fn get_librarian_keys(principal: Principal) -> Vec<Keys> {
+    ic_cdk::println!("Received principal for get_librarian_keys: {:?}", principal);
+    KEYS_MAP.with(|m| {
+        m.borrow()
+            .get(&PrincipalWrapper(principal))
+            .map(|keys| keys.0.clone())
+            .unwrap_or_default()
+    })
+}
 
 
 
