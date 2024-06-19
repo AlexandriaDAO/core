@@ -1,5 +1,5 @@
-import { Reader } from "@/Reader";
-import { ReaderProvider } from "@/Reader/lib/providers/ReaderProvider";
+import { Reader } from "@/features/reader";
+import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
 import React from "react";
 
 type IBookModalProps = {
