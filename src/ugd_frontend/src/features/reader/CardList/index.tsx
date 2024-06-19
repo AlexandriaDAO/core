@@ -1,6 +1,6 @@
 // src/CardList/index.tsx
 import React, { useEffect, useRef, useState } from "react";
-import { useAnnotation, useCardList } from "../lib/hooks/useReaderContext";
+import { useAnnotation, useCardList, useReader } from "../lib/hooks/useReaderContext";
 import Card from "./Card";
 import DDC from "@/data/categories";
 
@@ -41,6 +41,7 @@ export const CardList: React.FC = () => {
 	const { showCardList, setShowCardList } = useCardList();
 
 	const { annotations } = useAnnotation();
+	const { metadata, coverUrl } = useReader();
 
 	return (
 		<div className="absolute inset-0 left-0 font-sans">
@@ -56,20 +57,21 @@ export const CardList: React.FC = () => {
 				}`}
 			>
 				<div className="flex">
-					<img
-						src="https://picsum.photos/300/100"
-						alt=""
-						className="w-36 h-48 object-cover object-center"
-					/>
-					<div className="flex-grow flex flex-col justify-between p-2">
+					{coverUrl && <img
+							src={coverUrl}
+							alt=""
+							className="w-36 h-48 object-cover object-center"
+						/>
+					}
+					{metadata && <div className="flex-grow flex flex-col justify-between p-2">
 						<span className="font-roboto-condensed text-base font-normal">
-							Yuval
+							{metadata.creator }
 						</span>
 						<span className="font-syne text-xl font-semibold">
-							Sapiens
+							{metadata.title}
 						</span>
 						<span className="font-roboto-condensed text-sm font-normal text-[#8E8E8E]">
-							Non Fiction . 2011
+							Non Fiction . {metadata.pubdate}
 						</span>
 						<div className="flex flex-wrap items-center gap-1">
 							{getTypes([0, 1])}
@@ -84,7 +86,7 @@ export const CardList: React.FC = () => {
 								</div>
 							))}
 						</div>
-					</div>
+					</div>}
 				</div>
 
 				<div className="flex flex-col overflow-auto gap-2">

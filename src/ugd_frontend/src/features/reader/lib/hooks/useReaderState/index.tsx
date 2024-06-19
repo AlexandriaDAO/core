@@ -11,6 +11,7 @@ import {
 	useState,
 } from "react";
 import { Location } from "epubjs/types/rendition";
+import { PackagingMetadataObject } from "epubjs/types/packaging";
 
 export interface IUserSettingsObject {
 	fontFamily: string;
@@ -32,6 +33,12 @@ export interface IReaderState {
 
 	book: Book | null;
 	setBook: Dispatch<SetStateAction<Book | null>>;
+
+	metadata: PackagingMetadataObject | null;
+	setMetadata: Dispatch<SetStateAction<PackagingMetadataObject | null>>;
+
+	coverUrl: string|null;
+	setCoverUrl: Dispatch<SetStateAction<string|null>>;
 
 	renderLocation: RefObject<HTMLDivElement>;
 	bookLocation: RefObject<HTMLDivElement>;
@@ -74,6 +81,8 @@ export const useReaderState = (): IReaderState => {
 	const [url, setUrl] = useState("");
 
 	const [book, setBook] = useState<Book | null>(null);
+	const [metadata, setMetadata] = useState<PackagingMetadataObject|null>(null)
+	const [coverUrl, setCoverUrl] = useState<string|null>(null)
 
 	const renderLocation = useRef<HTMLDivElement>(null);
 	const bookLocation = useRef<HTMLDivElement>(null);
@@ -162,6 +171,10 @@ export const useReaderState = (): IReaderState => {
 		newBook
 			.ready
 			.then(() => {
+				newBook.loaded.metadata.then(metadata=>setMetadata(metadata))
+
+				newBook.coverUrl().then(url=>setCoverUrl(url))
+
 				setIsLoaded(true);
 				setBook(newBook);
 			})
@@ -186,6 +199,13 @@ export const useReaderState = (): IReaderState => {
 
 		book,
 		setBook,
+
+		metadata,
+		setMetadata,
+
+		coverUrl,
+		setCoverUrl,
+
 		renderLocation,
 		bookLocation,
 		isLoaded,

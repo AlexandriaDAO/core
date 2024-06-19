@@ -43,7 +43,7 @@ export const Reader: React.FC<IReaderProps> = ({
 	showToolbar = true,
 	external = null,
 }: IReaderProps) => {
-	const { url, setUrl, book, rendition, bookLocation, currentPage, totalPages, percentage } = useReader();
+	const { url, setUrl, book, rendition, bookLocation, currentPage, totalPages, percentage, metadata } = useReader();
 
 	// bookLocation is used for Full Screen
 
@@ -83,7 +83,7 @@ export const Reader: React.FC<IReaderProps> = ({
 				<div className="flex gap-1 items-center justify-between">
 					<FullScreenToggle />
 				</div>
-				<span className="font-syne text-xl text-white">Sapiens</span>
+				{metadata &&  <span className="font-syne text-xl text-white">{metadata.title}</span> }
 				{showCardList ? (
 					<IoCloseOutline
 						size={30}
