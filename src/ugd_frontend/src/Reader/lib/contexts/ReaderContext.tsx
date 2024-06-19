@@ -5,6 +5,8 @@ import { IReaderState } from "../hooks/useReaderState";
 import { IContentState } from "../hooks/useReaderState/useContentState";
 import { ISearchState } from "../hooks/useSearchState";
 import { ISidebarState } from "../hooks/useSidebarState";
+import { ISettingState } from "../hooks/useSettingState";
+import { ICardListState } from "../hooks/useCardListState";
 
 // Define the shape of the context data
 export interface ReaderContextData {
@@ -15,6 +17,8 @@ export interface ReaderContextData {
 	bookmarkState: IBookmarkState;
 	searchState: ISearchState;
 	sidebarState: ISidebarState;
+	settingState: ISettingState
+	cardListState: ICardListState
 }
 
 // Create the context

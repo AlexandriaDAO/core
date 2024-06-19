@@ -57,15 +57,19 @@ const BookmarkToggle: React.FC<BookmarkToggleProps> = ({
 				<MdOutlineBookmarkAdded
 					onClick={onRemoveBookmark}
 					size={30}
-					className="cursor-pointer p-0.5 text-indigo-800 hover:text-gray-500"
+					color="#F6F930"
+					className={`cursor-pointer border border-solid border-[#F6F930] p-1 rounded-md`}
 				/>
 			) : (
 				<MdOutlineBookmarkAdd
 					onClick={onAddBookmark}
 					size={30}
-					className="cursor-pointer p-0.5 hover:text-indigo-800 text-gray-500"
+					color="#8E8E8E"
+					className={`cursor-pointer border border-solid border-[#8E8E8E] p-1 rounded-md`}
 				/>
 			)}
+
+
 		</>
 	);
 };

@@ -13,7 +13,8 @@ import {
 import { Location } from "epubjs/types/rendition";
 
 export interface IUserSettingsObject {
-	fontSize: string;
+	fontFamily: string;
+	fontSize: number;
 	theme: string;
 }
 export interface ILocationChangeProps {
@@ -46,14 +47,27 @@ export interface IReaderState {
 	currentLocation: Location | undefined;
 	setCurrentLocation: Dispatch<SetStateAction<Location | undefined>>;
 
+	currentPage: number;
+	setCurrentPage: Dispatch<SetStateAction<number>>;
+
+	totalPages: number;
+	setTotalPages: Dispatch<SetStateAction<number>>;
+
+	percentage: number;
+	setPercentage: Dispatch<SetStateAction<number>>;
+
+
 	userSettings: IUserSettingsObject;
 	setUserSettings: Dispatch<SetStateAction<IUserSettingsObject>>;
 
 	fullScreen: Boolean;
 	setFullScreen: Dispatch<SetStateAction<Boolean>>;
 
-	scroll: string;
-	setScroll: Dispatch<SetStateAction<string>>;
+	flow: string;
+	setFlow: Dispatch<SetStateAction<string>>;
+
+	spread: string;
+	setSpread: Dispatch<SetStateAction<string>>;
 }
 
 export const useReaderState = (): IReaderState => {
@@ -74,14 +88,20 @@ export const useReaderState = (): IReaderState => {
 		Location | undefined
 	>(undefined);
 
+	const [currentPage, setCurrentPage] = useState(0);
+	const [totalPages, setTotalPages] = useState(0);
+	const [percentage, setPercentage] = useState(0);
+
 	const [userSettings, setUserSettings] = useState<IUserSettingsObject>({
-		fontSize: "100%",
+		fontFamily: "auto",
+		fontSize: 18,
 		theme: "light",
 	});
 
 	const [fullScreen, setFullScreen] = useState<Boolean>(false);
 
-	const [scroll, setScroll] = useState<string>("paginated");
+	const [flow, setFlow] = useState<string>("paginated");
+	const [spread, setSpread] = useState<string>("auto");
 
 	useEffect(() => {
 		if (!book || !book.isOpen) return;
@@ -110,7 +130,6 @@ export const useReaderState = (): IReaderState => {
 	}, [isLoaded]);
 
 	useEffect(() => {
-		console.log(userSettings);
 		if (!rendition.current) return;
 		if (userSettings.theme === "dark") {
 			rendition.current.themes.override("color", "#fff");
@@ -120,7 +139,9 @@ export const useReaderState = (): IReaderState => {
 			rendition.current.themes.override("background", "#fff");
 		}
 
-		rendition.current?.themes.fontSize(userSettings.fontSize);
+		rendition.current.themes.fontSize(userSettings.fontSize + "px");
+		rendition.current.themes.font(userSettings.fontFamily);
+
 	}, [userSettings]);
 
 	// useEffect(() => {
@@ -138,10 +159,25 @@ export const useReaderState = (): IReaderState => {
 	useEffect(() => {
 		if (url === "") return;
 		let newBook = Epub(url, {openAs:'epub'});
-		newBook.ready.then(() => {
-			setIsLoaded(true);
-			setBook(newBook);
-		});
+		newBook
+			.ready
+			.then(() => {
+				setIsLoaded(true);
+				setBook(newBook);
+			})
+			.then(()=>{
+				const stored = localStorage.getItem(newBook.key() + '-locations');
+				if (stored) {
+					return newBook.locations.load(stored);
+				} else {
+					return newBook.locations.generate(1024);
+				}
+			})
+			.then(() => {
+				localStorage.setItem(newBook.key() + '-locations', newBook.locations.save());
+			}).catch((err) => {
+				console.log('Error while saving locations in localstorage',err);
+			});
 	}, [url, setIsLoaded, setBook]);
 
 	return {
@@ -162,13 +198,26 @@ export const useReaderState = (): IReaderState => {
 		currentLocation,
 		setCurrentLocation,
 
+
+		currentPage,
+		setCurrentPage,
+
+		totalPages,
+		setTotalPages,
+
+		percentage,
+		setPercentage,
+
 		userSettings,
 		setUserSettings,
 
 		fullScreen,
 		setFullScreen,
 
-		scroll,
-		setScroll,
+		flow,
+		setFlow,
+
+		spread,
+		setSpread,
 	};
 };

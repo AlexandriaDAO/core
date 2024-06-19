@@ -51,7 +51,7 @@ const FullScreenToggle: React.FC<FullScreenToggleProps> = ({
 
 	return (
 		<>
-			{fullScreen ? (
+			{/* {fullScreen ? (
 				<BiExitFullscreen
 					onClick={toggleFullScreen}
 					size={30}
@@ -63,6 +63,22 @@ const FullScreenToggle: React.FC<FullScreenToggleProps> = ({
 					size={30}
 					className="cursor-pointer p-0.5 hover:text-indigo-800 text-gray-500"
 				/>
+			)} */}
+
+			{fullScreen ? (
+				<button
+					onClick={toggleFullScreen}
+					className="font-roboto-condensed text-xl text-white underline"
+				>
+					Exit
+				</button>
+			) : (
+				<button
+					onClick={toggleFullScreen}
+					className="font-roboto-condensed text-xl text-white underline"
+				>
+					Full Screen
+				</button>
 			)}
 		</>
 	);

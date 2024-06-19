@@ -55,3 +55,56 @@ export const clashCfiRange = (baseCfiRange: string, targetCfiRange: string) => {
 	}
 	return false;
 };
+
+
+
+export const getAddPopupPosition = (viewer: any): { x: number; y: number; height: number; width: number } | null => {
+	const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
+
+	const iframeWidth = viewer.offsetWidth;
+	const iframeHeight = viewer.offsetHeight;
+
+	const scrollTop = viewer.querySelector('div').scrollTop;
+
+	const iframe = viewer.querySelector('iframe');
+	const selection_ = iframe && iframe.contentWindow && iframe.contentWindow.getSelection();
+	if (!selection_ || selection_.rangeCount === 0) return null;
+
+
+
+	const range = selection_.getRangeAt(0);
+	const { x: selectionX, y: selectionY, height: selectionHeight, width: selectionWidth } = range.getBoundingClientRect();
+
+	const x = ~~((selectionX % iframeWidth) );
+	const y = ~~(selectionY + selectionHeight - scrollTop);
+
+	return {
+		x,
+		y,
+		height: selectionHeight,
+		width: selectionWidth,
+	};
+};
+
+
+export const getRemovePopupPosition = (viewer: any, range: Range): { x: number; y: number; height: number; width: number } | null => {
+	const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
+
+	const iframeWidth = viewer.offsetWidth;
+	const iframeHeight = viewer.offsetHeight;
+
+	const scrollTop = viewer.querySelector('div').scrollTop;
+	if (!range) return null;
+
+	const { x: selectionX, y: selectionY, height: selectionHeight, width: selectionWidth } = range.getBoundingClientRect();
+
+	const x = ~~((selectionX % iframeWidth) );
+	const y = ~~(selectionY + selectionHeight - scrollTop);
+
+	return {
+		x,
+		y,
+		height: selectionHeight,
+		width: selectionWidth,
+	};
+};

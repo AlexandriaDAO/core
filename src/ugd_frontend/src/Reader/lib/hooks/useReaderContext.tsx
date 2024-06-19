@@ -7,6 +7,8 @@ import { IAnnotationState } from "./useAnnotationState";
 import { IBookmarkState } from "./useBookmarkState";
 import { ISearchState } from "./useSearchState";
 import { ISidebarState } from "./useSidebarState";
+import { ISettingState } from "./useSettingState";
+import { ICardListState } from "./useCardListState";
 
 export const useReader = (): IReaderState => {
 	const context = useContext(ReaderContext);
@@ -54,4 +56,21 @@ export const useSidebar = (): ISidebarState => {
 		throw new Error("useSidebar should be called inside ReaderContext");
 	}
 	return context.sidebarState;
+};
+
+
+export const useSetting = (): ISettingState => {
+	const context = useContext(ReaderContext);
+	if (!context) {
+		throw new Error("useSetting should be called inside ReaderContext");
+	}
+	return context.settingState;
+};
+
+export const useCardList = (): ICardListState => {
+	const context = useContext(ReaderContext);
+	if (!context) {
+		throw new Error("useSetting should be called inside ReaderContext");
+	}
+	return context.cardListState;
 };

@@ -6,6 +6,8 @@ import { useReaderState } from "../hooks/useReaderState/index";
 import { useContentState } from "../hooks/useReaderState/useContentState";
 import useSearch from "../hooks/useSearchState";
 import useSidebar from "../hooks/useSidebarState";
+import useSetting from "../hooks/useSettingState";
+import useCardList from "../hooks/useCardListState";
 
 // Define the props for the provider
 interface ReaderProviderProps {
@@ -21,6 +23,9 @@ export const ReaderProvider: React.FC<ReaderProviderProps> = ({ children }) => {
 	const searchState = useSearch();
 	const sidebarState = useSidebar();
 
+	const settingState = useSetting();
+	const cardListState = useCardList();
+
 	return (
 		<ReaderContext.Provider
 			value={{
@@ -30,6 +35,8 @@ export const ReaderProvider: React.FC<ReaderProviderProps> = ({ children }) => {
 				bookmarkState,
 				searchState,
 				sidebarState,
+				settingState,
+				cardListState
 			}}
 		>
 			{children}

@@ -29,7 +29,7 @@ export const TocItem = ({
 			<button
 				onClick={() => handleTocItemClick(tocItem)}
 				style={tocItemStyles.itemButton}
-				className="text-gray-500 hover:text-gray-700 px-0 py-1 "
+				className="text-white hover:text-gray-300 px-0 py-1 "
 			>
 				{tocItem.label}
 			</button>

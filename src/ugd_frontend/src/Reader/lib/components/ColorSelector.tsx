@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { colors } from "../../lib/hooks/useAnnotationState";
-import { useAnnotation } from "@/Reader/lib/hooks/useReaderContext";
 import { Tooltip } from "antd";
+import { colors } from "../hooks/useAnnotationState";
+import { useAnnotation } from "../hooks/useReaderContext";
 const ColorSelector = () => {
 	const { color, setColor } = useAnnotation();
 
 	return (
-		<div className="flex space-x-2 my-2">
+		<div className="flex space-x-1">
 			{colors.map(([key, value]) => (
 				<Tooltip key={key} title={key}>
 					<div
-						className={`h-6 w-6 rounded-full cursor-pointer ${
+						className={`h-4 w-4 rounded-full cursor-pointer ${
 							color === value
-								? "ring-2 ring-offset-2 ring-gray-400"
+								? "ring-1 ring-offset-1 ring-gray-400"
 								: ""
 						}`}
 						style={{ backgroundColor: value }}
