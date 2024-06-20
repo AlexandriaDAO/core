@@ -85,7 +85,14 @@ export const GaslessUploader: React.FC<UploaderConfigProps> = ({
 		setTxProcessing(true);
 		try {
 			for (const file of files) {
-				const tags: Tag[] = [{ name: "Content-Type", value: file.file.type }];
+				// const tags: Tag[] = [{ name: "Content-Type", value: file.file.type }];
+				const tags: Tag[] = [
+					{ name: "Content-Type", value: file.file.type },
+					{ name: "application-id", value: "UncensoredGreats" },
+					// Add more custom tags as needed
+					{ name: "category", value: "books" },
+					{ name: "author", value: "John Doe" },
+				];
 				const uploadTxId = await gaslessFundAndUpload(file.file, tags, blockchain);
 				
 				file.id = uploadTxId;
