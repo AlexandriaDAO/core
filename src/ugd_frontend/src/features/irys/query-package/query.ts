@@ -7,9 +7,10 @@ export async function fetchTransactions() {
     .tags([
       // { name: "Content-Type", values: ["image/png"] },
       { name: "application-id", values: ["UncensoredGreats"] },
-      // Add more tag filters as needed
+      // { name: "author", values: ["Noone"] },
     ])    
     .sort("ASC")
     .limit(20);
   return results;
 }
+

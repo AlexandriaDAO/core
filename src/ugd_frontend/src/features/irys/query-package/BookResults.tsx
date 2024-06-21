@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { fetchTransactions } from "./query";
 
+interface Tag {
+  name: string;
+  value: string;
+}
+
 interface Transaction {
   id: string;
-  amount: number;
-  // Add more fields as needed
+  tags: Tag[];
 }
 
 const BookResults: React.FC = () => {
@@ -24,10 +28,24 @@ const BookResults: React.FC = () => {
       <h2>Transaction Results</h2>
       {transactions.map((transaction, index) => (
         <div key={index}>
-          {/* Display the relevant transaction data */}
           <p>Transaction ID: {transaction.id}</p>
-          <p>Amount: {transaction.amount}</p>
-          {/* Add more fields as needed */}
+          <iframe
+            src={`https://node1.irys.xyz/${transaction.id}`}
+            title={`Transaction ${transaction.id}`}
+            width="100%"
+            height="400px"
+            frameBorder="0"
+          ></iframe>
+          <div>
+            <h3>Tags:</h3>
+            <ul>
+              {transaction.tags.map((tag, tagIndex) => (
+                <li key={tagIndex}>
+                  {tag.name}: {tag.value}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       ))}
     </div>
