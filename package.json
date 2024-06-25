@@ -15,7 +15,7 @@
     "start": "webpack serve --mode development --env development",
     "deploy:local": "dfx deploy --network=local",
     "deploy:ic": "dfx deploy --network=ic",
-    "generate": "dfx generate ugd_backend"
+    "generate": "dfx generate ucg_backend"
   },
   "dependencies": {
     "@dfinity/agent": "^1.2.0",
