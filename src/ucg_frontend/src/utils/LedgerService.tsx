@@ -1,5 +1,5 @@
 // With ICP sending logic (incomplete, need to make the caller of send ICP the owner)
-// src/ugd_frontend/src/utils/LedgerService.tsx
+// src/ucg_frontend/src/utils/LedgerService.tsx
 import { AccountIdentifier, LedgerCanister } from "@dfinity/ledger-icp";
 import { Principal } from "@dfinity/principal";
 

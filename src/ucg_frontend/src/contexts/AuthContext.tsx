@@ -1,6 +1,6 @@
-// src/ugd_frontend/src/contexts/AuthContext.tsx
+// src/ucg_frontend/src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { createActor as createUgdActor, ucg_backend } from '../../../declarations/ucg_backend';
+import { createActor as createUcgActor, ucg_backend } from '../../../declarations/ucg_backend';
 import { createActor as createLibrariansActor, librarians } from '../../../declarations/librarians';
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
@@ -8,7 +8,7 @@ import { Principal } from '@dfinity/principal';
 import { AccountIdentifier, LedgerCanister } from '@dfinity/ledger-icp';
 
 interface AuthContextProps {
-  ugdActor: any;
+  ucgActor: any;
   librariansActor: any;
   UID: Principal | null;
   accountIdentifier: AccountIdentifier | null;
@@ -18,7 +18,7 @@ interface AuthContextProps {
 }
 
 export const AuthContext = createContext<AuthContextProps>({
-  ugdActor: ucg_backend,
+  ucgActor: ucg_backend,
   librariansActor: librarians,
   UID: null,
   accountIdentifier: null,
@@ -36,7 +36,7 @@ interface AuthProviderProps {
 const LEDGER_CANISTER_ID = Principal.fromText("ryjl3-tyaaa-aaaaa-aaaba-cai");
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [ugdActor, setUgdActor] = useState(ucg_backend);
+  const [ucgActor, setUcgActor] = useState(ucg_backend);
   const [librariansActor, setLibrariansActor] = useState(librarians);
   const [UID, setUID] = useState<Principal | null>(null);
   const accountIdentifier = useMemo(() => UID && AccountIdentifier.fromPrincipal({ principal: UID }), [UID]);
@@ -65,16 +65,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (isAuthenticated) {
         const identity = authClient.getIdentity();
         const agent = new HttpAgent({ identity });
-        const newUgdActor = createUgdActor(process.env.CANISTER_ID_UCG_BACKEND!, {
+        const newUcgActor = createUcgActor(process.env.CANISTER_ID_UCG_BACKEND!, {
           agent,
         });
         const newLibrariansActor = createLibrariansActor(process.env.CANISTER_ID_LIBRARIANS!, {
           agent,
         });
 
-        setUgdActor(newUgdActor);
+        setUcgActor(newUcgActor);
         setLibrariansActor(newLibrariansActor);
-        setUID(await newUgdActor.whoami());
+        setUID(await newUcgActor.whoami());
       }
     };
 
@@ -102,29 +102,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
     const agent = new HttpAgent({ identity });
     // Using the interface description of our webapp, we create actors that we use to call the service methods.
-    const newUgdActor = createUgdActor(process.env.CANISTER_ID_UCG_BACKEND!, {
+    const newUcgActor = createUcgActor(process.env.CANISTER_ID_UCG_BACKEND!, {
       agent,
     });
     const newLibrariansActor = createLibrariansActor(process.env.CANISTER_ID_LIBRARIANS!, {
       agent,
     });
 
-    setUgdActor(newUgdActor);
+    setUcgActor(newUcgActor);
     setLibrariansActor(newLibrariansActor);
-    setUID(await newUgdActor.whoami());
+    setUID(await newUcgActor.whoami());
   };
 
   const logout = async (e: React.FormEvent) => {
     e.preventDefault();
     let authClient = await AuthClient.create();
     await authClient.logout();
-    setUgdActor(ucg_backend);
+    setUcgActor(ucg_backend);
     setLibrariansActor(librarians);
     setUID(null);
   };
 
   return (
-    <AuthContext.Provider value={{ ugdActor, librariansActor, UID, accountIdentifier, balanceE8s, login, logout  }}>
+    <AuthContext.Provider value={{ ucgActor, librariansActor, UID, accountIdentifier, balanceE8s, login, logout  }}>
       {children}
     </AuthContext.Provider>
   );

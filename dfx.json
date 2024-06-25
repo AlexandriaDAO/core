@@ -52,12 +52,12 @@
       "optimize": "cycles",
       "type": "rust"
     },
-    "ugd_frontend": {
+    "ucg_frontend": {
       "dependencies": ["ucg_backend"],
       "frontend": {
-        "entrypoint": "src/ugd_frontend/public/index.html"
+        "entrypoint": "src/ucg_frontend/public/index.html"
       },
-      "source": ["dist/ugd_frontend/"],
+      "source": ["dist/ucg_frontend/"],
       "type": "assets"
     }
   },

@@ -42,7 +42,7 @@
 │   │       ├── lib.rs
 │   │       ├── meilisearch.rs
 │   │       ├── source_cards.rs
-│   ├── ugd_frontend/
+│   ├── ucg_frontend/
 │   │   ├── src/
 │   │   │   ├── App.tsx
 │   │   │   ├── RatingCard/
