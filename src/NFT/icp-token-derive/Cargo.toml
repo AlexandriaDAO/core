@@ -1,0 +1,17 @@
+[package]
+name = "icp-token-derive"
+version = "0.0.1"
+edition = "2021"
+
+[features]
+default = []
+
+[lib]
+name = "icp_token_derive"
+proc-macro = true
+
+[dependencies]
+proc-macro2 = { version = "1.0.74", default-features = false, features = ["proc-macro"] }
+quote = { version = "1.0.35", default-features = false, features = ["proc-macro"] }
+syn = { version = "2.0.46", default-features = false, features = ["clone-impls", "derive", "parsing", "printing", "proc-macro"] }
+darling = "0.20"

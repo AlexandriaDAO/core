@@ -43,6 +43,15 @@
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
       "specified_id": "cbopz-duaaa-aaaaa-qaaka-cai"
     },
+    "ucg_nft": {
+      "candid": "src/NFT/examples/ucg_nft/ucg_nft.did",
+      "package": "ucg_nft",
+      "declarations": {
+        "node_compatibility": true
+      },
+      "optimize": "cycles",
+      "type": "rust"
+    },
     "ugd_frontend": {
       "dependencies": ["ugd_backend"],
       "frontend": {

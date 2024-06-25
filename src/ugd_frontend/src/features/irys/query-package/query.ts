@@ -7,7 +7,9 @@ export async function fetchTransactions() {
     .tags([
       // { name: "Content-Type", values: ["image/png"] },
       { name: "application-id", values: ["UncensoredGreats"] },
+
       // { name: "author", values: ["Noone"] },
+      { name: "author", values: ["AAA"] },
     ])    
     .sort("ASC")
     .limit(20);
