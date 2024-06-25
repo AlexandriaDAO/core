@@ -1,6 +1,6 @@
 import React from "react";
-import MainLayout from "src/ucg_frontend/src/layouts/MainLayout";
-import BookModal from "src/ucg_frontend/src/components/BookModal";
+import MainLayout from "@/layouts/MainLayout";
+import BookModal from "@/components/BookModal";
 function ReaderPage() {
 	return (
 		<MainLayout>

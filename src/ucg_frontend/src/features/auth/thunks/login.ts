@@ -1,4 +1,4 @@
-import { RootState } from "src/ucg_frontend/src/store";
+import { RootState } from "@/store";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AuthClient } from "@dfinity/auth-client";
 import { getPrincipal } from "../utils/authUtils";

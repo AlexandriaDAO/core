@@ -7,10 +7,10 @@ import { PiFileCsvThin } from "react-icons/pi";
 import { BsCart2, BsFiletypeJson } from "react-icons/bs";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { Modal } from "antd";
-import { removeNewLines, titleToFileName } from "src/ucg_frontend/src/utils/Portal";
+import { removeNewLines, titleToFileName } from "@/utils/Portal";
 import { deleteAsset, deleteDoc, listDocs } from "@junobuild/core";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
-import BookModal from "src/ucg_frontend/src/components/BookModal";
+import BookModal from "@/components/BookModal";
 
 const Card = ({ item }: any) => {
 	const { data: bookData } = item;

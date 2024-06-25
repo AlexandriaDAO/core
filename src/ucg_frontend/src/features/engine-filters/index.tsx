@@ -1,5 +1,5 @@
-import { initializeClient } from "src/ucg_frontend/src/services/meiliService";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { initializeClient } from "@/services/meiliService";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { message } from "antd";
 import MeiliSearch from "meilisearch";
 import React, { ChangeEvent, useEffect, useState } from "react";

@@ -1,4 +1,4 @@
-import SessionContext from 'src/ucg_frontend/src/contexts/SessionContext';
+import SessionContext from '@/contexts/SessionContext';
 import { useContext } from 'react';
 
 const useSession = () => useContext(SessionContext);

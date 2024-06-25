@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAnnotation, useCardList, useReader } from "../lib/hooks/useReaderContext";
 import Card from "./Card";
-import DDC from "src/ucg_frontend/src/data/categories";
+import DDC from "@/data/categories";
 
 const getTypes = (types: Array<number> = []) => {
 	return types

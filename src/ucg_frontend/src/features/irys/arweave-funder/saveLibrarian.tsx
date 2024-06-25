@@ -4,7 +4,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { useActiveLibrarian } from '../../../contexts/LibrarianContext'; 
 import { useKeys } from "../../../contexts/KeysContext";
 import { getLibrarianByHash } from "../../../services/librarianService";
-import { getLibrarianKeys } from "src/ucg_frontend/src/services/walletService";
+import { getLibrarianKeys } from "@/services/walletService";
 
 const SaveLibrarian: FC = () => {
   const { librariansActor } = useAuth();

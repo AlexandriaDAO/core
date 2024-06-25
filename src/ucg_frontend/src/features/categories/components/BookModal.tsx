@@ -1,8 +1,8 @@
 
-import { setSelectedBook } from "src/ucg_frontend/src/features/home/homeSlice";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
+import { setSelectedBook } from "@/features/home/homeSlice";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import React from "react";
-import BookReader from "src/ucg_frontend/src/components/BookModal";
+import BookReader from "@/components/BookModal";
 
 
 function BookModal() {

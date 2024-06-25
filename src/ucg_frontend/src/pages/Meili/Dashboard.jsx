@@ -1,7 +1,7 @@
 // pages/MeiliManager/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import useMeiliSearchClient from '../../utils/MeiliSearchClient';
-import { useAuth } from 'src/ucg_frontend/src/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import useMeiliUtils from './MeiliUtils';
 import SetFilters from './SetFilters';
 import CreateCSV from './CreateCSV';

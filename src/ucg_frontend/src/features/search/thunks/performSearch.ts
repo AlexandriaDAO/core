@@ -2,7 +2,7 @@ import { ActorSubclass } from '@dfinity/agent';
 import { Engine, _SERVICE } from '../../../../../declarations/ucg_backend/ucg_backend.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import MeiliSearch, { Index } from 'meilisearch';
-import { RootState } from 'src/ucg_frontend/src/store';
+import { RootState } from '@/store';
 
 // Define the async thunk
 const performSearch = createAsyncThunk<

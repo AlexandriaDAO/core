@@ -5,12 +5,12 @@ import { BiPlus } from "react-icons/bi";
 import { ImSpinner8 } from "react-icons/im";
 import { LiaSaveSolid } from "react-icons/lia";
 import * as Yup from "yup";
-import { EngineStatus } from "src/ucg_frontend/src/features/engine-overview/thunks/updateEngineStatus";
-import useSession from "src/ucg_frontend/src/hooks/useSession";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { EngineStatus } from "@/features/engine-overview/thunks/updateEngineStatus";
+import useSession from "@/hooks/useSession";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import addEngine from "../thunks/addEngine";
-import logout from "src/ucg_frontend/src/features/auth/thunks/logout";
+import logout from "@/features/auth/thunks/logout";
 import {
 	setNewEngine,
 	setNewEngineError,

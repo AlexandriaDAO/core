@@ -1,7 +1,7 @@
-import DDC from "src/ucg_frontend/src/data/categories";
-import { setSelectedSearchedBook } from "src/ucg_frontend/src/features/home/homeSlice";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import DDC from "@/data/categories";
+import { setSelectedSearchedBook } from "@/features/home/homeSlice";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useState } from "react";
 import { BiBookAlt, BiPlus } from "react-icons/bi";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";

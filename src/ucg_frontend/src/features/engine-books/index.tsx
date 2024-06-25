@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp, IoIosSearch } from "react-icons/io";
 import { RxCross1 } from "react-icons/rx";
 import BookUpload from "./components/BookUpload";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 const EngineBooks = () => {
 	const [expanded, setExpanded] = useState(false);

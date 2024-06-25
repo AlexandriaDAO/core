@@ -4,7 +4,7 @@ import { Menu } from "semantic-ui-react";
 import Modal from "react-modal";
 import "../styles/headerTabs.css";
 import { useAuth } from "../contexts/AuthContext";
-import LedgerService from "src/ucg_frontend/src/utils/LedgerService";
+import LedgerService from "@/utils/LedgerService";
 import { FaCopy } from "react-icons/fa";
 
 const Tabs = () => {

@@ -1,4 +1,4 @@
-import DDC from "src/ucg_frontend/src/data/categories";
+import DDC from "@/data/categories";
 
 export interface CategoryInterface {
     id: string;

@@ -1,9 +1,9 @@
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React from "react";
 
 import { Engine } from "../../../../../declarations/ucg_backend/ucg_backend.did";
-import { setActiveEngine } from "src/ucg_frontend/src/features/engine-overview/engineOverviewSlice";
+import { setActiveEngine } from "@/features/engine-overview/engineOverviewSlice";
 import { Button, Space } from "antd";
 
 interface EngineItemProps {

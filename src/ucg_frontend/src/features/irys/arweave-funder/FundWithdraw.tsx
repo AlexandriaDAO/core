@@ -1,7 +1,7 @@
 // This is the version using the web wallet.
 import React, { useState, useEffect } from "react";
-import MainLayout from "src/ucg_frontend/src/layouts/MainLayout";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import MainLayout from "@/layouts/MainLayout";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { ethers } from "ethers";
 import { WebIrys } from "@irys/sdk";
 

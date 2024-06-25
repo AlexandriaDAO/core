@@ -1,11 +1,11 @@
-import { setSelectedSearchedBook } from "src/ucg_frontend/src/features/home/homeSlice";
+import { setSelectedSearchedBook } from "@/features/home/homeSlice";
 import React, { useEffect, useRef, useState } from "react";
 import { HiOutlinePlus } from "react-icons/hi";
 import { SlEye, SlPlus } from "react-icons/sl";
 import { RxCross2 } from "react-icons/rx";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
-import BookModal from "src/ucg_frontend/src/components/BookModal";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import BookModal from "@/components/BookModal";
 
 interface Item {
 	id: number;

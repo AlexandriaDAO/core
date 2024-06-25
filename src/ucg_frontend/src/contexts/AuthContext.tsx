@@ -1,4 +1,4 @@
-// src/ucg_frontend/src/contexts/AuthContext.tsx
+// @/contexts/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { createActor as createUcgActor, ucg_backend } from '../../../declarations/ucg_backend';
 import { createActor as createLibrariansActor, librarians } from '../../../declarations/librarians';

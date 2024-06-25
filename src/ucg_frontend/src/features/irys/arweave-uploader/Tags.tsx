@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import languages from "src/ucg_frontend/src/data/languages";
+import languages from "@/data/languages";
 import CategorySelect from "./Fields/CategorySelect";
 
 interface TagsProps {

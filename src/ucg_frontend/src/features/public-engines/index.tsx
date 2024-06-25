@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { ImSpinner8 } from "react-icons/im";
 import { IoIosSearch } from "react-icons/io";
 import EngineItem from "./components/EngineItem";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchPublicEngines from "./thunks/fetchPublicEngines";
-import useSession from "src/ucg_frontend/src/hooks/useSession";
+import useSession from "@/hooks/useSession";
 import { ConfigProvider, Table } from "antd";
 import EngineItemAction from "./components/EngineItemAction";
 import { Engine } from "../../../../../src/declarations/ucg_backend/ucg_backend.did";

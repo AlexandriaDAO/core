@@ -6,8 +6,8 @@ import { CSVLink } from "react-csv";
 import { PiFileCsvThin } from "react-icons/pi";
 import { BsFiletypeJson } from "react-icons/bs";
 import { Modal } from "antd";
-import { handleJSONDownload, removeNewLines, titleToFileName } from "src/ucg_frontend/src/utils/Portal";
-import BookModal from "src/ucg_frontend/src/components/BookModal";
+import { handleJSONDownload, removeNewLines, titleToFileName } from "@/utils/Portal";
+import BookModal from "@/components/BookModal";
 
 const Row = ({ bookData }: any) => {
 	const bookAreaRef = useRef(null);

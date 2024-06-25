@@ -1,8 +1,8 @@
 import React from "react";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
-import Auth from "src/ucg_frontend/src/features/auth";
-import Filter from "src/ucg_frontend/src/features/filter";
-import Search from "src/ucg_frontend/src/features/search";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import Auth from "@/features/auth";
+import Filter from "@/features/filter";
+import Search from "@/features/search";
 import Logo from "./ui/Logo";
 import Tabs from "./ui/Tabs";
 

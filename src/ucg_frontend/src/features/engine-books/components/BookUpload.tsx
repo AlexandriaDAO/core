@@ -2,9 +2,9 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp, IoIosSearch } from "react-icons/io";
 import { RxCross1 } from "react-icons/rx";
 import { PiUploadSimple } from "react-icons/pi";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import MeiliSearch from "meilisearch";
-import { initializeClient } from "src/ucg_frontend/src/services/meiliService";
+import { initializeClient } from "@/services/meiliService";
 import { ImSpinner8 } from "react-icons/im";
 import { message } from "antd";
 

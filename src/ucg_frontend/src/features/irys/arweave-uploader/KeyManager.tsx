@@ -1,7 +1,7 @@
 // features/gasless-uploader/KeyManager.tsx
 import React, { FC, useState, useEffect } from "react";
 import { saveKeys, deleteKeys, getKeys, decryptKey } from "../../../services/walletService";
-import { useAuth } from "src/ucg_frontend/src/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const KeyManager: FC = () => {
   const [publicKey, setPublicKey] = useState("");

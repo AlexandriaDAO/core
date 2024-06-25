@@ -1,4 +1,4 @@
-import DDC from "src/ucg_frontend/src/data/categories";
+import DDC from "@/data/categories";
 import React, { useState } from "react";
 import { BiBookAlt, BiMinus, BiPlus } from "react-icons/bi";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";

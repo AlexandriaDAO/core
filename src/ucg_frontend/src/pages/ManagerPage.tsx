@@ -1,11 +1,11 @@
 import React from "react";
-import MainLayout from "src/ucg_frontend/src/layouts/MainLayout";
+import MainLayout from "@/layouts/MainLayout";
 import { MdEdit } from "react-icons/md";
 import { FaCopy } from "react-icons/fa";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
-import MyEngines from "src/ucg_frontend/src/features/my-engines";
-import EngineOverview from "src/ucg_frontend/src/features/engine-overview";
-import PublicEngines from "src/ucg_frontend/src/features/public-engines";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import MyEngines from "@/features/my-engines";
+import EngineOverview from "@/features/engine-overview";
+import PublicEngines from "@/features/public-engines";
 
 function ManagerPage() {
 	const { activeEngine } = useAppSelector(

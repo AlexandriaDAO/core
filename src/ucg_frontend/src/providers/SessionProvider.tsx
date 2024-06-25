@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { createActor, ucg_backend } from '../../../declarations/ucg_backend';
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
-import { useAppSelector } from 'src/ucg_frontend/src/store/hooks/useAppSelector';
-import SessionContext from 'src/ucg_frontend/src/contexts/SessionContext';
+import { useAppSelector } from '@/store/hooks/useAppSelector';
+import SessionContext from '@/contexts/SessionContext';
 import MeiliSearch, { Index } from 'meilisearch';
-import { initializeClient, initializeIndex } from 'src/ucg_frontend/src/services/meiliService';
-import { setUser } from 'src/ucg_frontend/src/features/auth/authSlice';
-import fetchMyEngines from 'src/ucg_frontend/src/features/my-engines/thunks/fetchMyEngines';
-import { useAppDispatch } from 'src/ucg_frontend/src/store/hooks/useAppDispatch';
-import principal from 'src/ucg_frontend/src/features/auth/thunks/principal';
-import { initializeActor } from 'src/ucg_frontend/src/features/auth/utils/authUtils';
+import { initializeClient, initializeIndex } from '@/services/meiliService';
+import { setUser } from '@/features/auth/authSlice';
+import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
+import { useAppDispatch } from '@/store/hooks/useAppDispatch';
+import principal from '@/features/auth/thunks/principal';
+import { initializeActor } from '@/features/auth/utils/authUtils';
 
 interface SessionProviderProps {
 	children: React.ReactNode;

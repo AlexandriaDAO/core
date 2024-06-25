@@ -4,7 +4,7 @@ import {
 	_SERVICE,
 } from "../../../../../declarations/ucg_backend/ucg_backend.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { EngineStatus } from "src/ucg_frontend/src/features/engine-overview/thunks/updateEngineStatus";
+import { EngineStatus } from "@/features/engine-overview/thunks/updateEngineStatus";
 
 // Define an interface for the engine parameters based on the Yup validation schema
 interface EngineInput {

@@ -1,7 +1,7 @@
 import React from "react";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
-import DDC from "src/ucg_frontend/src/data/categories";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import DDC from "@/data/categories";
 import { toggleType } from "../filterSlice";
 
 function Types() {

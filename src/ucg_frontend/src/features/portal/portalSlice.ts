@@ -1,4 +1,4 @@
-import { RootState } from "src/ucg_frontend/src/store";
+import { RootState } from "@/store";
 import { listDocs } from "@junobuild/core";
 import {
 	createSlice,

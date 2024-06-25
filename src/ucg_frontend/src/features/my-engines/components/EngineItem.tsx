@@ -1,12 +1,12 @@
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect, useState } from "react";
 
 import { Engine } from "../../../../../declarations/ucg_backend/ucg_backend.did";
 
-import { initializeClient } from "src/ucg_frontend/src/services/meiliService";
+import { initializeClient } from "@/services/meiliService";
 import MeiliSearch from "meilisearch";
-import { setActiveEngine } from "src/ucg_frontend/src/features/engine-overview/engineOverviewSlice";
+import { setActiveEngine } from "@/features/engine-overview/engineOverviewSlice";
 
 interface EngineItemProps {
 	engine: Engine

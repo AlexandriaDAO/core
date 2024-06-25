@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
-import Header from "src/ucg_frontend/src/components/Header";
-import Categories from "src/ucg_frontend/src/features/categories";
+import Header from "@/components/Header";
+import Categories from "@/features/categories";
 // Define the type for the component's props
 interface MainLayoutProps {
 	children: ReactNode;

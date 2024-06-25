@@ -1,14 +1,14 @@
 import React, { useRef, useState } from "react";
-import MainLayout from "src/ucg_frontend/src/layouts/MainLayout";
+import MainLayout from "@/layouts/MainLayout";
 import { IoIosSearch } from "react-icons/io";
-import PortalType from "src/ucg_frontend/src/features/portal-type";
-import PortalLanguage from "src/ucg_frontend/src/features/portal-language";
-import PortalPublicationYear from "src/ucg_frontend/src/features/portal-publication-year";
-import PortalCategory from "src/ucg_frontend/src/features/portal-category";
-import PortalFilter from "src/ucg_frontend/src/features/portal-filter";
-import PortalPagination from "src/ucg_frontend/src/features/portal-pagination";
+import PortalType from "@/features/portal-type";
+import PortalLanguage from "@/features/portal-language";
+import PortalPublicationYear from "@/features/portal-publication-year";
+import PortalCategory from "@/features/portal-category";
+import PortalFilter from "@/features/portal-filter";
+import PortalPagination from "@/features/portal-pagination";
 import { Pagination, PaginationProps } from "antd";
-import BookModal from "src/ucg_frontend/src/features/categories/components/BookModal";
+import BookModal from "@/features/categories/components/BookModal";
 
 // Sample data for the books
 const books = [

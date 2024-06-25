@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import Card from "./components/Card";
 import Read from "./components/Read";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 const SearchResult = () => {
 	const { selectedSearchedBook } = useAppSelector((state) => state.home);

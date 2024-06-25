@@ -1,12 +1,12 @@
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect } from "react";
 
 import { ImSpinner8 } from "react-icons/im";
 import AddEngine from "./components/AddEngine";
 import EngineItem from "./components/EngineItem";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchMyEngines from "./thunks/fetchMyEngines";
-import useSession from "src/ucg_frontend/src/hooks/useSession";
+import useSession from "@/hooks/useSession";
 import { ucg_backend } from "../../../../../src/declarations/ucg_backend";
 
 function MyEngines() {

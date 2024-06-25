@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import Types from "./components/Types";
 import SubTypes from "./components/SubTypes";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
-import useSession from "src/ucg_frontend/src/hooks/useSession";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import useSession from "@/hooks/useSession";
 import { message } from "antd";
 import performSearch from "../search/thunks/performSearch";
 

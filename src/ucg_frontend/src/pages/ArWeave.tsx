@@ -1,13 +1,13 @@
 // Pages/ArWeave.tsx
 import React, { FC } from "react";
 import GaslessUploader from "../features/irys/arweave-uploader/GaslessUploader";
-import BookResults from "src/ucg_frontend/src/features/irys/query-package/BookResults";
+import BookResults from "@/features/irys/query-package/BookResults";
 import KeyManager from "../features/irys/arweave-uploader/KeyManager";
-import SaveLibrarian from "src/ucg_frontend/src/features/irys/arweave-funder/saveLibrarian";
-import ArFunder from "src/ucg_frontend/src/features/irys/arweave-funder/funder";
-import MainLayout from "src/ucg_frontend/src/layouts/MainLayout";
-import { ActiveLibrarianProvider } from "src/ucg_frontend/src/contexts/LibrarianContext";
-import { KeysProvider } from "src/ucg_frontend/src/contexts/KeysContext";
+import SaveLibrarian from "@/features/irys/arweave-funder/saveLibrarian";
+import ArFunder from "@/features/irys/arweave-funder/funder";
+import MainLayout from "@/layouts/MainLayout";
+import { ActiveLibrarianProvider } from "@/contexts/LibrarianContext";
+import { KeysProvider } from "@/contexts/KeysContext";
 
 const ArWeavePage: FC = () => {
   return (

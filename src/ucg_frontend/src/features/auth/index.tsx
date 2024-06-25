@@ -1,11 +1,11 @@
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect } from "react";
 import logout from "./thunks/logout";
 import login from "./thunks/login";
 import { ImSpinner8 } from "react-icons/im";
 import { AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
-import useSession from "src/ucg_frontend/src/hooks/useSession";
+import useSession from "@/hooks/useSession";
 import principal from "./thunks/principal";
 import { MdLogin, MdLogout } from "react-icons/md";
 

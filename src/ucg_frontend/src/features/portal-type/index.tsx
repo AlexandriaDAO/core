@@ -1,5 +1,5 @@
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown, IoIosSearch } from "react-icons/io";
 import { setSelected, setVisible } from "./portalTypeSlice";

@@ -1,6 +1,6 @@
-import { setFilter } from "src/ucg_frontend/src/features/home/homeSlice";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { setFilter } from "@/features/home/homeSlice";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 

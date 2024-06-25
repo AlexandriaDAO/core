@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
-import { initializeClient } from "src/ucg_frontend/src/services/meiliService";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { initializeClient } from "@/services/meiliService";
 import EngineBooks from "../engine-books";
 import EngineFilters from "../engine-filters";
 import EngineTasks from "../engine-tasks";
 import EngineStats from "../engine-stats";
 import { EngineOverviewTab, setActiveEngine, setActiveTab } from "./engineOverviewSlice";
 import updateEngineStatus, { EngineStatus } from "./thunks/updateEngineStatus";
-import useSession from "src/ucg_frontend/src/hooks/useSession";
+import useSession from "@/hooks/useSession";
 import { ImSpinner8 } from "react-icons/im";
 
 function EngineOverview() {

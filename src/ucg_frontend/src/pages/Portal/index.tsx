@@ -8,9 +8,9 @@ import List from "./List";
 import NoBooks from "./NoBooks";
 import Loading from "./Loading";
 import Mint from "./Mint";
-import { fetchBooks, setLimit, setView } from "src/ucg_frontend/src/features/portal/portalSlice";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
+import { fetchBooks, setLimit, setView } from "@/features/portal/portalSlice";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 const Portal = () => {
 	const dispatch = useAppDispatch();

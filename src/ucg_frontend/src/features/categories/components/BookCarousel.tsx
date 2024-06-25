@@ -4,9 +4,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import { setSelectedBook } from "src/ucg_frontend/src/features/home/homeSlice";
-import { useAppSelector } from "src/ucg_frontend/src/store/hooks/useAppSelector";
-import { useAppDispatch } from "src/ucg_frontend/src/store/hooks/useAppDispatch";
+import { setSelectedBook } from "@/features/home/homeSlice";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 // Sample data for the books
 const books = [
 	{
