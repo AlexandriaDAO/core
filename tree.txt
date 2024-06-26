@@ -34,7 +34,7 @@
 │   │   ├── icp_swap.did
 │   │   └── src/
 │   │       └── lib.rs
-│   ├── ugd_backend/
+│   ├── ucg_backend/
 │   │   ├── Cargo.toml
 │   │   ├── backend.did
 │   │   └── src/
@@ -42,7 +42,7 @@
 │   │       ├── lib.rs
 │   │       ├── meilisearch.rs
 │   │       ├── source_cards.rs
-│   ├── ugd_frontend/
+│   ├── ucg_frontend/
 │   │   ├── src/
 │   │   │   ├── App.tsx
 │   │   │   ├── RatingCard/

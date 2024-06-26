@@ -13,8 +13,8 @@
 # dfx identity use default
 # export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
 
-# dfx deploy ugd_backend --argument '(false)'
-# export BACKEND_PRINCIPAL=$(dfx canister id ugd_backend)
+# dfx deploy ucg_backend --argument '(false)'
+# export BACKEND_PRINCIPAL=$(dfx canister id ucg_backend)
 # export BACKEND_ACCOUNT_ID=$(dfx ledger account-id --of-principal $BACKEND_PRINCIPAL)
 # echo -e "\nBackend account id: $BACKEND_ACCOUNT_ID\n"
 
