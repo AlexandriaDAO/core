@@ -7,7 +7,7 @@ type IBookModalProps = {
 };
 
 const BookModal:React.FC<IBookModalProps> = ({
-	bookUrl = "test.epub",
+	bookUrl = "https://gateway.irys.xyz/bM5J42-tzUUvkaO5Ry_H9mSrXzKeiaj4cdo8devs2h4",
 }: IBookModalProps) => {
 	return (
 		<ReaderProvider>

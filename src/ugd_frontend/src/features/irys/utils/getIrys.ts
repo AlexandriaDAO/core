@@ -77,7 +77,7 @@ import { TypedEthereumSigner } from "arbundles";
 // import { ethers } from "ethers";
 
 const getIrys = async () => {
-  const network = "mainnet";
+  const network = "devnet";
   const token = "ethereum";
 
   /*
@@ -85,8 +85,11 @@ const getIrys = async () => {
 
   When a user clicks on a named librarian, that queries their principal with this hash specifically to a helper function that populates these keys.
   */
-  const pubKey = "0xeDa20F6d64944Ad132dE51927Ae1A32cFCDD8998";
-  const privateKey = "1bda3c9bf8b1170093b4339835c01273766f30ec64077c07a7e174b0f67c5636";
+  // const pubKey = "0xeDa20F6d64944Ad132dE51927Ae1A32cFCDD8998";
+  // const privateKey = "1bda3c9bf8b1170093b4339835c01273766f30ec64077c07a7e174b0f67c5636";
+
+  const pubKey = "0x738b58fe508189A237427e69163bB7E2cd91C38c";
+  const privateKey = "0x54d8a539123e15c56028557bff8b0704728138fdc04c04363374ca80efa16084";
 
   const signer = new TypedEthereumSigner(privateKey);
 

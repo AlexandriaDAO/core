@@ -6,6 +6,8 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import MyEngines from "@/features/my-engines";
 import EngineOverview from "@/features/engine-overview";
 import PublicEngines from "@/features/public-engines";
+import Librarian from "@/features/librarian";
+import LibrarianProfile from "@/features/librarian-profile";
 
 function ManagerPage() {
 	const { activeEngine } = useAppSelector(
@@ -14,6 +16,9 @@ function ManagerPage() {
 	const { user } = useAppSelector(
 		(state) => state.auth
 	);
+	const {showProfile} = useAppSelector(
+		(state)=>state.librarianProfile
+	)
 	return (
 		<MainLayout>
 			<div className="flex-grow flex items-start p-4 gap-4">
@@ -42,10 +47,22 @@ function ManagerPage() {
 							<span className="uppercase font-roboto-condensed text-3xl font-bold">32.01 ICP</span>
 						</div>
 					</div>
-					{user!=='' && <MyEngines /> }
+					{
+						user !== "" && (
+							<>
+								<MyEngines />
+								<Librarian />
+							</>
+						)
+					}
+
 				</div>
 
-				{activeEngine ? <EngineOverview /> : <PublicEngines />}
+				<div className="flex-grow flex flex-col gap-4">
+					{showProfile && <LibrarianProfile />}
+
+					{activeEngine ? <EngineOverview /> : <PublicEngines />}
+				</div>
 
 			</div>
 		</MainLayout>

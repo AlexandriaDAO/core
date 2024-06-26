@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { ugd_backend } from '../../../declarations/ugd_backend';
+import { createActor, ugd_backend } from '../../../declarations/ugd_backend';
 import { AuthClient } from "@dfinity/auth-client";
+import { HttpAgent } from "@dfinity/agent";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import SessionContext from '@/contexts/SessionContext';
 import MeiliSearch, { Index } from 'meilisearch';
 import { initializeClient, initializeIndex } from '@/services/meiliService';
+import { setUser } from '@/features/auth/authSlice';
 import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';

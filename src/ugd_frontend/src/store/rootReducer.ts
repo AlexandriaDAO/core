@@ -13,6 +13,9 @@ import portalLanguageReducer from "@/features/portal-language/portalLanguageSlic
 import portalTypeReducer from "@/features/portal-type/portalTypeSlice";
 import portalPublicationYearReducer from "@/features/portal-publication-year/portalPublicationYearSlice";
 import portalFilterReducer from "@/features/portal-filter/portalFilterSlice";
+import librarianReducer from "@/features/librarian/librarianSlice";
+import librarianProfileReducer from "@/features/librarian-profile/librarianProfileSlice";
+import myNodesReducer from "@/features/my-nodes/myNodesSlice";
 
 const rootReducer = combineReducers({
 	portal: portalReducer,
@@ -29,8 +32,12 @@ const rootReducer = combineReducers({
 	portalLanguage: portalLanguageReducer,
 	portalType: portalTypeReducer,
 	portalPublicationYear: portalPublicationYearReducer,
-
 	portalFilter: portalFilterReducer,
+
+	librarian: librarianReducer,
+	librarianProfile: librarianProfileReducer,
+
+	myNodes: myNodesReducer,
 });
 
 export default rootReducer;

@@ -63,7 +63,7 @@ function EngineOverview() {
 		}
 	};
 	return (
-        <div className="flex-grow flex flex-col shadow-lg rounded-xl bg-white">
+        <div className="flex flex-col shadow-lg rounded-xl bg-white">
             <div className="flex flex-col gap-6 p-8">
                 <div className="flex justify-between">
                     <div className="flex items-center gap-2">
