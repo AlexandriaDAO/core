@@ -28,6 +28,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 		// console.log(wallet.address);
 
 	},[])
+    
 	return (
 		<div className="min-h-screen min-w-screen flex flex-col bg-[#f4f4f4]">
 			<Header />

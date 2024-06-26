@@ -32,6 +32,7 @@ const rootReducer = combineReducers({
 	portalLanguage: portalLanguageReducer,
 	portalType: portalTypeReducer,
 	portalPublicationYear: portalPublicationYearReducer,
+
 	portalFilter: portalFilterReducer,
 
 	librarian: librarianReducer,

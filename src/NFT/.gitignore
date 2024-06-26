@@ -1,0 +1,7 @@
+**/target
+**/Cargo.lock
+**/node_modules
+**/.next
+**/yarn.lock
+**/declarations
+**/out

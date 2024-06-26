@@ -9,6 +9,7 @@ import PublicEngines from "@/features/public-engines";
 import Librarian from "@/features/librarian";
 import LibrarianProfile from "@/features/librarian-profile";
 
+
 function ManagerPage() {
 	const { activeEngine } = useAppSelector(
 		(state) => state.engineOverview
@@ -16,9 +17,11 @@ function ManagerPage() {
 	const { user } = useAppSelector(
 		(state) => state.auth
 	);
+
 	const {showProfile} = useAppSelector(
 		(state)=>state.librarianProfile
 	)
+
 	return (
 		<MainLayout>
 			<div className="flex-grow flex items-start p-4 gap-4">
@@ -63,6 +66,10 @@ function ManagerPage() {
 
 					{activeEngine ? <EngineOverview /> : <PublicEngines />}
 				</div>
+<!-- This was my way (evan). Above is zeeshans way.					{user!=='' && <MyEngines /> }
+				</div>
+
+				{activeEngine ? <EngineOverview /> : <PublicEngines />} -->
 
 			</div>
 		</MainLayout>

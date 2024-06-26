@@ -8,6 +8,8 @@ export async function fetchTransactions() {
       // { name: "Content-Type", values: ["image/png"] },
       { name: "application-id", values: ["UncensoredGreats"] },
       // { name: "author", values: ["Noone"] },
+      // { name: "author", values: ["Noone"] },
+      { name: "author", values: ["AAA"] },
     ])    
     .sort("ASC")
     .limit(20);

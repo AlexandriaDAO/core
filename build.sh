@@ -10,6 +10,12 @@ dfx deps init
 dfx deps deploy
 dfx deps deploy internet_identity
 
+# # Step Misc: NFT stuff.
+# cd src/NFT/examples/ucg_nft
+cargo build --release --target wasm32-unknown-unknown --package ucg_nft
+candid-extractor target/wasm32-unknown-unknown/release/ucg_nft.wasm > src/NFT/examples/ucg_nft/ucg_nft.did
+
+
 # Step 3: Configure Local Identities
 dfx identity new minter --storage-mode plaintext
 dfx identity use minter
@@ -86,3 +92,17 @@ dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
 dfx deploy librarians --specified-id ju4sh-3yaaa-aaaap-ahapa-cai
 dfx deploy ucg_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
+dfx deploy ucg_nft --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai
+
+# Step 6: Mint a UCG NFT:
+dfx canister call ucg_nft create_token \
+    "(record{
+        token=record {
+                name=\"UncensoredGreats\";
+                symbol=\"UCG\";
+                description=opt\"This is the official Ebook NFT collection of UncensoredGreats\";
+                logo=\"https://devnet.irys.xyz/Ya0CPSbNRl4tf98cIK4DS_K315MfWxRDswp5FwHGn-c\"
+
+        };
+     })"
+# TBD: Adding other perameters like batch size, mutability, take value, etc.
