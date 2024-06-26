@@ -87,9 +87,6 @@ export const showReceipt = async (
 
 
 
-
-
-
 // // Version designed for folders, not files, for when we add separate image files.
 // // Uncomment this and gaslessFundAndUpload.ts and it will upload as folders instead of files.
 
