@@ -98,7 +98,11 @@ dfx deploy ucg_nft --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai
 dfx canister call ucg_nft create_token \
     "(record{
         token=record {
-                name=\"test\";
-                description=opt\"test description\"
+                name=\"UncensoredGreats\";
+                symbol=\"UCG\";
+                description=opt\"This is the official Ebook NFT collection of UncensoredGreats\";
+                logo=\"https://devnet.irys.xyz/Ya0CPSbNRl4tf98cIK4DS_K315MfWxRDswp5FwHGn-c\"
+
         };
      })"
+# TBD: Adding other perameters like batch size, mutability, take value, etc.

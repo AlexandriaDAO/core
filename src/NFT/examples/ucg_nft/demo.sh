@@ -21,6 +21,7 @@ dfx canister call ucg_nft create_token \
         };
      })"
 
+
 echo '(*) Metadata of the newly created Token:'
 dfx canister call ucg_nft icrc7_token_metadata \
     "(vec{1})"
