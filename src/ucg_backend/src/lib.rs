@@ -122,7 +122,6 @@ ic_cdk::export_candid!();
 // fn insert(key: String, value: Vec<u8>) -> Option<Vec<u8>> {
 //     ASSETS.with(|p| p.borrow_mut().insert(key, value))
 // }
-=======
   
 /*
 So I just need call this function with the token id of the arweave file.

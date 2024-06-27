@@ -66,10 +66,6 @@ function ManagerPage() {
 
 					{activeEngine ? <EngineOverview /> : <PublicEngines />}
 				</div>
-<!-- This was my way (evan). Above is zeeshans way.					{user!=='' && <MyEngines /> }
-				</div>
-
-				{activeEngine ? <EngineOverview /> : <PublicEngines />} -->
 
 			</div>
 		</MainLayout>
@@ -77,3 +73,9 @@ function ManagerPage() {
 }
 
 export default ManagerPage;
+
+
+// <!-- This was my way (evan). Above is zeeshans way.					{user!=='' && <MyEngines /> }
+// 				</div>
+
+// 				{activeEngine ? <EngineOverview /> : <PublicEngines />} -->
