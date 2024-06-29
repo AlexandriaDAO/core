@@ -1,0 +1,73 @@
+type ArchiveInitArgs = record {
+  max_records : nat;
+  index_type : IndexType;
+  first_index : nat;
+  max_pages : nat;
+};
+type ArchivedTransactionResponse = record {
+  args : vec TransactionRange;
+  callback : func (vec QueryBlock) -> (GetTransactionsResult) query;
+};
+type Block = variant {
+  Int : int;
+  Map : vec record { text; Value };
+  Nat : nat;
+  Nat64 : nat64;
+  Blob : vec nat8;
+  Text : text;
+  Array : vec Value;
+};
+type GetBlocksRequest = record { start : nat; length : nat };
+type GetBlocksResult = record {
+  log_length : nat;
+  blocks : vec QueryBlock;
+  archived_blocks : vec ArchivedTransactionResponse;
+};
+type GetTransactionsResult = record {
+  log_length : nat;
+  blocks : Vec;
+  archived_blocks : vec nat8;
+};
+type IndexType = variant { Stable; StableTyped; Managed };
+type QueryBlock = record { id : nat; block : Block };
+type TransactionRange = record { start : nat; length : nat };
+type Value = variant {
+  Int : int;
+  Map : vec record { text; Value };
+  Nat : nat;
+  Nat64 : nat64;
+  Blob : vec nat8;
+  Text : text;
+  Array : vec Value;
+};
+type Vec = vec record {
+  args : vec record { start : nat; length : nat };
+  callback : func (
+      vec record {
+        id : nat;
+        block : variant {
+          Int : int;
+          Map : vec record { text; Value };
+          Nat : nat;
+          Nat64 : nat64;
+          Blob : vec nat8;
+          Text : text;
+          Array : vec Value;
+        };
+      },
+    ) -> (
+      record { log_length : nat; blocks : Vec; archived_blocks : vec nat8 },
+    ) query;
+};
+type WalletReceiveResult = record { accepted : nat64 };
+service : (ArchiveInitArgs) -> {
+  __get_candid_interface_tmp_hack : () -> (text) query;
+  append_blocks : (vec Block) -> ();
+  get_owner : () -> (principal) query;
+  get_transaction : (nat) -> (opt Block) query;
+  icrc3_get_blocks : (vec GetBlocksRequest) -> (GetBlocksResult) query;
+  remaining_capacity : () -> (nat64) query;
+  update_owner : (principal) -> (bool);
+  wallet_balance : () -> (nat) query;
+  wallet_receive : () -> (WalletReceiveResult);
+}

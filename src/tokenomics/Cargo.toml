@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 [dependencies]
 candid = "0.10"
 ciborium = "0.2.2"
-ic-cdk = "0.13"
+ic-cdk = "0.13.2"
 ic-cdk-macros = "0.13.2"
 ic-cdk-timers = "0.7"
 ic-ledger-types = "0.10"

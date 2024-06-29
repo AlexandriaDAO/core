@@ -5,6 +5,7 @@ members = [
     "src/icp_swap",
     "src/librarians",
     "src/tokenomics",
-    "src/NFT/examples/ucg_nft",
+    "src/icrc7",
+    "src/icrc7_archive",
 ]
 resolver = "2"

@@ -16,6 +16,17 @@
       "package": "icp_swap",
       "type": "rust"
     },
+    "icrc7": {
+      "candid": "src/icrc7/icrc7.did",
+      "package": "icrc7",
+      "optimize": "cycles",
+      "type": "rust"
+    },
+    "icrc7_archive": {
+      "candid": "src/icrc7_archive/icrc7_archive.did",
+      "package": "icrc7_archive",
+      "type": "rust"
+    },
     "internet_identity": {
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
@@ -42,15 +53,6 @@
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
       "specified_id": "cbopz-duaaa-aaaaa-qaaka-cai"
-    },
-    "ucg_nft": {
-      "candid": "src/NFT/examples/ucg_nft/ucg_nft.did",
-      "package": "ucg_nft",
-      "declarations": {
-        "node_compatibility": true
-      },
-      "optimize": "cycles",
-      "type": "rust"
     },
     "ucg_frontend": {
       "dependencies": ["ucg_backend"],

@@ -12,8 +12,8 @@ dfx deps deploy internet_identity
 
 # # Step Misc: NFT stuff.
 # cd src/NFT/examples/ucg_nft
-cargo build --release --target wasm32-unknown-unknown --package ucg_nft
-candid-extractor target/wasm32-unknown-unknown/release/ucg_nft.wasm > src/NFT/examples/ucg_nft/ucg_nft.did
+# cargo build --release --target wasm32-unknown-unknown --package ucg_nft
+# candid-extractor target/wasm32-unknown-unknown/release/ucg_nft.wasm > src/NFT/examples/ucg_nft/ucg_nft.did
 
 
 # Step 3: Configure Local Identities
@@ -86,23 +86,32 @@ dfx deploy UCG --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
   })
 '
 
+dfx deploy icrc7 --argument '(record{                                 
+minting_account = opt record {
+   owner = principal "xj2l7-vyaaa-aaaap-abl4a-cai";                                    
+   subaccount = opt blob "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00";
+ };                 
+icrc7_supply_cap = null;
+icrc7_description = opt "The official Ebook NFT collection of the UncensoredGreats Project.";
+tx_window = opt 86_400;
+permitted_drift = opt 100;
+icrc7_max_take_value = opt 100;
+icrc7_max_memo_size = opt 256;
+icrc7_symbol = "UCG";
+icrc7_max_update_batch_size = opt 10;
+icrc7_max_query_batch_size = opt 5;
+icrc7_atomic_batch_transfers = opt true;
+icrc7_default_take_value = opt 20;
+icrc7_logo = null;
+icrc7_name = "UncensoredGreats";
+approval_init = null;
+archive_init = null
+})'
+
+
 # Step 5: Deploy other canisters with specified IDs
 dfx deploy ucg_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
 dfx deploy librarians --specified-id ju4sh-3yaaa-aaaap-ahapa-cai
 dfx deploy ucg_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
-dfx deploy ucg_nft --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai
-
-# Step 6: Mint a UCG NFT:
-dfx canister call ucg_nft create_token \
-    "(record{
-        token=record {
-                name=\"UncensoredGreats\";
-                symbol=\"UCG\";
-                description=opt\"This is the official Ebook NFT collection of UncensoredGreats\";
-                logo=\"https://devnet.irys.xyz/Ya0CPSbNRl4tf98cIK4DS_K315MfWxRDswp5FwHGn-c\"
-
-        };
-     })"
-# TBD: Adding other perameters like batch size, mutability, take value, etc.
