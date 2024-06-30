@@ -4,9 +4,8 @@ use crate::engine::Engine;
 use crate::librarian::Librarian;
 use crate::node::Node;
 
-
 use ic_cdk;
-use candid::Principal;
+use candid::{Nat, Principal};
 
 mod source_cards;
 pub use source_cards::{save_sc, bookmark_sc, delete_sc, get_sc, get_bookmarks};
@@ -52,6 +51,9 @@ pub use node::{
   get_nodes_not_owned_by,
   get_nodes_not_owned_by_me
 };
+
+mod nft;
+pub use nft::mint_nft;
 
 ic_cdk::export_candid!();
 

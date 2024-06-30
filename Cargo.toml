@@ -3,7 +3,6 @@ members = [
     "src/ucg_backend",
     "src/bookmarks",
     "src/icp_swap",
-    "src/librarians",
     "src/tokenomics",
     "src/icrc7",
     "src/icrc7_archive",

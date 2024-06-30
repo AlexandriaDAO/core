@@ -86,7 +86,7 @@ dfx deploy UCG --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
   })
 '
 
-dfx deploy icrc7 --argument '(record{                                 
+dfx deploy icrc7 --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai --argument '(record{                                 
 minting_account = opt record {
    owner = principal "xj2l7-vyaaa-aaaap-abl4a-cai";                                    
    subaccount = opt blob "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00";

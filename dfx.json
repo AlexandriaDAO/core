@@ -43,11 +43,6 @@
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
       "specified_id": "c5kvi-uuaaa-aaaaa-qaaia-cai"
     },
-    "librarians": {
-      "candid": "src/librarians/librarians.did",
-      "package": "librarians",
-      "type": "rust"
-    },
     "UCG": {
       "type": "custom",
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
