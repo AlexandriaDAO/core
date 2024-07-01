@@ -16,6 +16,8 @@ import portalFilterReducer from "@/features/portal-filter/portalFilterSlice";
 import librarianReducer from "@/features/librarian/librarianSlice";
 import librarianProfileReducer from "@/features/librarian-profile/librarianProfileSlice";
 import myNodesReducer from "@/features/my-nodes/myNodesSlice";
+import nodesReducer from "@/features/nodes/nodesSlice";
+import mintReducer from "@/features/mint/mintSlice";
 
 const rootReducer = combineReducers({
 	portal: portalReducer,
@@ -39,6 +41,10 @@ const rootReducer = combineReducers({
 	librarianProfile: librarianProfileReducer,
 
 	myNodes: myNodesReducer,
+
+	mint: mintReducer,
+
+	nodes: nodesReducer,
 });
 
 export default rootReducer;

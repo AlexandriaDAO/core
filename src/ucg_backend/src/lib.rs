@@ -3,6 +3,7 @@ use crate::source_cards::SourceCard;
 use crate::engine::Engine;
 use crate::librarian::Librarian;
 use crate::node::Node;
+use crate::book::Book;
 
 
 use ic_cdk;
@@ -52,6 +53,20 @@ pub use node::{
   get_nodes_not_owned_by,
   get_nodes_not_owned_by_me
 };
+
+mod book;
+pub use book::{
+  add_book,
+  add_cover,
+  add_metadata,
+  get_books,
+  get_books_by_owner,
+  get_book_by_id,
+  get_my_books,
+  get_books_not_owned_by,
+  get_books_not_owned_by_me
+};
+
 
 ic_cdk::export_candid!();
 

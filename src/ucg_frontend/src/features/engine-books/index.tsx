@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp, IoIosSearch } from "react-icons/io";
 import { RxCross1 } from "react-icons/rx";
-import BookUpload from "./components/BookUpload";
+import BookJSONUpload from "./components/BookJSONUpload";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import Mint from "../mint";
 
 const EngineBooks = () => {
 	const [expanded, setExpanded] = useState(false);
@@ -33,7 +34,8 @@ const EngineBooks = () => {
 									className="font-roboto-condensed font-normal text-base flex-grow rounded border-0 ring-0 focus:ring-0 outline-none"
 								/>
 							</div>
-							<BookUpload />
+							<BookJSONUpload />
+							<Mint />
 						</div>
 					</>
 				)}

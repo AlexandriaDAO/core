@@ -8,7 +8,7 @@ import { initializeClient } from "@/services/meiliService";
 import { ImSpinner8 } from "react-icons/im";
 import { message } from "antd";
 
-const BookUpload = () => {
+const BookJSONUpload = () => {
 	const { activeEngine } = useAppSelector((state) => state.engineOverview);
 	const [client, setClient] = useState<MeiliSearch | null>(null);
 
@@ -109,4 +109,4 @@ const BookUpload = () => {
 	);
 };
 
-export default BookUpload;
+export default BookJSONUpload;

@@ -1,30 +1,4 @@
-type Engine = record {
-  id : text;
-  key : text;
-  status : EngineStatus;
-  title : text;
-  owner : text;
-  host : text;
-  index : text;
-};
-type EngineStatus = variant { Draft; Published };
 type Keys = record { public_key : text; slot : nat8; private_key : text };
-type Librarian = record {
-  name : text;
-  raw_principal : principal;
-  hashed_principal : nat64;
-};
-type Node = record {
-  id : text;
-  status : NodeStatus;
-  owner : text;
-  pvt_key : text;
-  pub_key : text;
-};
-type NodeStatus = variant { Active; InActive };
-type Result = variant { Ok : Engine; Err : text };
-type Result_1 = variant { Ok : Node; Err : text };
-type Result_2 = variant { Ok; Err : text };
 type SourceCard = record {
   title : text;
   user_query : text;
@@ -35,41 +9,113 @@ type SourceCard = record {
   summary : text;
   bookmarked : bool;
 };
+
+// Engine Type
+type Engine = record {
+  id : text;
+  key : text;
+  status : variant { Draft; Published };
+  title : text;
+  owner : text;
+  host : text;
+  index : text;
+};
+
+// Librarian Type
+type Librarian = record {
+  name : text;
+  raw_principal : principal;
+  hashed_principal : nat64;
+};
+
+// Node Type
+type Node = record {
+  id : text;
+  status : variant { Active; InActive };
+  owner : text;
+  pvt_key : text;
+  pub_key : text;
+};
+
+
+type BookStatus = variant { Draft; Published };
+
+// Book Type
+type Book = record {
+  id: text;
+  owner: text;
+  engine_id: opt text;
+  asset_id: opt text;
+  asset_node_id: opt text;
+  cover_id: opt text;
+  cover_node_id: opt text;
+  book_type: opt nat8;
+  categories: vec nat8;
+  title: text;
+  author: text;
+  description: text;
+  fiction: bool;
+  pubyear: nat16;
+  language: text;
+  publisher: text;
+  rights: text;
+  isbn: text;
+  status: BookStatus;
+};
+
 service : {
-  add_engine : (text, text, text, text, text, opt nat8) -> (Engine);
-  add_my_engine : (text, text, text, text, opt nat8) -> (Result);
-  add_my_node : (text, text, opt nat8) -> (Result_1);
-  add_node : (text, text, text, opt nat8) -> (Node);
   bookmark_sc : (nat64) -> ();
-  delete_engine : (text) -> (bool);
-  delete_keys : (nat8) -> (Result_2);
-  delete_librarian : () -> (Result_2);
-  delete_node : (text) -> (bool);
+  delete_keys : (nat8) -> (variant { Ok; Err : text });
   delete_sc : (nat64) -> ();
-  get_all_librarians : () -> (vec Librarian) query;
   get_bookmarks : () -> (vec opt SourceCard) query;
+  get_keys : () -> (vec Keys) query;
+  get_sc : (nat64) -> (opt SourceCard) query;
+  save_keys : (text, text, nat8) -> (variant { Ok; Err : text });
+  save_sc : (text, text, text, text, text, text) -> (nat64);
+  whoami : () -> (principal) query;
+
+  // Engine Service
+  add_engine : (text, text, text, text, text, opt nat8) -> (Engine);
+  add_my_engine : (text, text, text, text, opt nat8) -> (variant { Ok : Engine; Err : text });
+  delete_engine : (text) -> (bool);
   get_engine_by_id : (text) -> (opt Engine) query;
   get_engines : () -> (vec Engine) query;
   get_engines_by_owner : (text) -> (vec Engine) query;
   get_engines_not_owned_by : (text) -> (vec Engine) query;
   get_engines_not_owned_by_me : () -> (vec Engine) query;
-  get_hashes_and_names : () -> (vec record { nat64; text }) query;
-  get_keys : () -> (vec Keys) query;
-  get_librarian : (nat64) -> (opt Librarian) query;
-  get_librarian_keys : (principal) -> (vec Keys) query;
   get_my_engines : () -> (vec Engine) query;
+  update_engine_status : (text, nat8) -> (variant { Ok : Engine; Err : text });
+
+  // Librarian Service
+  delete_librarian : () -> (variant { Ok; Err : text });
+  get_all_librarians : () -> (vec Librarian) query;
+  get_librarian : (nat64) -> (opt Librarian) query;
+  get_hashes_and_names : () -> (vec record { nat64; text }) query;
+  get_librarian_keys : (principal) -> (vec Keys) query;
+  is_librarian : () -> (bool) query;
+  save_librarian : (text) -> (variant { Ok; Err : text });
+
+  // Node Service
+  add_my_node : (text, text, opt nat8) -> (variant { Ok : Node; Err : text });
+  add_node : (text, text, text, opt nat8) -> (Node);
+  delete_node : (text) -> (bool);
   get_my_nodes : () -> (vec Node) query;
   get_node_by_id : (text) -> (opt Node) query;
   get_nodes : () -> (vec Node) query;
   get_nodes_by_owner : (text) -> (vec Node) query;
   get_nodes_not_owned_by : (text) -> (vec Node) query;
   get_nodes_not_owned_by_me : () -> (vec Node) query;
-  get_sc : (nat64) -> (opt SourceCard) query;
-  is_librarian : () -> (bool) query;
-  save_keys : (text, text, nat8) -> (Result_2);
-  save_librarian : (text) -> (Result_2);
-  save_sc : (text, text, text, text, text, text) -> (nat64);
-  update_engine_status : (text, nat8) -> (Result);
-  update_node_status : (text, nat8) -> (Result_1);
-  whoami : () -> (principal) query;
+  update_node_status : (text, nat8) -> (variant { Ok : Node; Err : text });
+
+  // Book Service
+  add_book: (text, text, text) -> (variant { Ok:Book; Err : text });
+  add_cover: (text, text, text) -> (variant { Ok: Book; Err: text });
+  add_metadata: (text, nat8, vec nat8, text, text, text, bool, nat16, text, text, text) -> (variant { Ok: Book; Err: text });
+  delete_book: (text) -> (bool);
+  get_books: () -> (vec Book) query;
+  get_books_by_owner: (text) -> (vec Book) query;
+  get_book_by_id: (text) -> (opt Book) query;
+  get_my_books: () -> (vec Book) query;
+  get_books_not_owned_by: (text) -> (vec Book) query;
+  get_books_not_owned_by_me: () -> (vec Book) query;
 }

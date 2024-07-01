@@ -17,6 +17,7 @@ const BookResults: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       const results = await fetchTransactions();
+      console.log(results);
       setTransactions(results as unknown as Transaction[]);
     };
 
