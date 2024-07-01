@@ -26,6 +26,7 @@ type Result = variant { Ok : Engine; Err : text };
 type Result_1 = variant { Ok : Node; Err : text };
 type Result_2 = variant { Ok : nat; Err : text };
 type Result_3 = variant { Ok; Err : text };
+type Result_4 = variant { Ok : text; Err : text };
 type SourceCard = record {
   title : text;
   user_query : text;
@@ -68,7 +69,7 @@ service : {
   get_nodes_not_owned_by_me : () -> (vec Node) query;
   get_sc : (nat64) -> (opt SourceCard) query;
   is_librarian : () -> (bool) query;
-  mint_nft : (text) -> (Result_2);
+  mint_nft : (text) -> (Result_4);
   save_keys : (text, text, nat8) -> (Result_3);
   save_librarian : (text) -> (Result_3);
   save_sc : (text, text, text, text, text, text) -> (nat64);
