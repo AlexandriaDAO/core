@@ -703,6 +703,7 @@ impl State {
             }
             let mut token = self.tokens.get(&arg.token_id).unwrap();
             token.burn(burn_address.clone());
+            self.tokens.insert(arg.token_id, token);
             let tid = self.log_transaction(
                 TransactionType::Burn {
                     tid: arg.token_id,

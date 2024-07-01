@@ -90,7 +90,7 @@ async fn mint_UCG(minted_ucg: f64, actual_caller: Principal) -> Result<BlockInde
         memo: None,
     };
     ic_cdk::call::<(TransferArg,), (Result<BlockIndex, TransferError>,)>(
-        Principal::from_text("cbopz-duaaa-aaaaa-qaaka-cai")
+        Principal::from_text("7hcrm-4iaaa-aaaak-akuka-cai")
             .expect("Could not decode the principal."),
         "icrc1_transfer",
         (transfer_args,),
@@ -117,7 +117,7 @@ async fn burn_lbry(burn_amount: f64, actual_caller: Principal) -> Result<BlockIn
         to: canister_id.into(),
         created_at_time: None,
     };
-    let icrc_canister_id = Principal::from_text("c5kvi-uuaaa-aaaaa-qaaia-cai")
+    let icrc_canister_id = Principal::from_text("hdtfn-naaaa-aaaam-aciva-cai")
         .expect("Could not decode the principal.");
     ic_cdk::println!("ICRC Token Canister ID: {:?}", icrc_canister_id);
 

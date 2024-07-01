@@ -1,33 +1,25 @@
 #!/bin/bash
 
+# There's this weird problem where the ./dfx/local/canisters folder empties after I run this 
+# so it needs to be copied from ./dfx/ic/canisters each time. 
+
 # Step 1: Start dfx
 dfx stop
 dfx start --background --clean
 
-# Step 2: Initialize DFX with Internet Identity
-dfx deps pull
-dfx deps init
-dfx deps deploy
-dfx deps deploy internet_identity
-
-
 # Step 3: Configure Local Identities
-dfx identity new minter --storage-mode plaintext
-dfx identity use minter
-export MINTER_ACCOUNT_ID=$(dfx ledger account-id)
-export MINTER_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 dfx identity use default
 export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
 export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 
-# Step 4: Deploy the ICRC Ledger with LBRY and UCG tokens
+# Step 4: Deploy the LBRY and UCG tokens
 dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
   (variant {
     Init = record {
       token_name = "LBRYs";
       token_symbol = "LBRY";
       minting_account = record {
-        owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
+        owner = principal "'5qx27-tyaaa-aaaal-qjafa-cai'";
       };
       initial_balances = vec {
         record {
@@ -42,14 +34,28 @@ dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
       archive_options = record {
         trigger_threshold = 2000;
         num_blocks_to_archive = 1000;
-        controller_id = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
+        controller_id = principal "'5qx27-tyaaa-aaaal-qjafa-cai'";
       };
       feature_flags = opt record {
         icrc2 = true;
       };
     }
   })
-'
+' --network ic
+
+# Test transfer some LBRY
+dfx canister call LBRY icrc1_transfer '(record {
+  to = record {
+    owner = principal "zzvai-vg3as-2ob6v-olrwr-ixgcm-uda5e-r3vz7-ijgk5-ry7gs-jk2gh-nqe";
+  };
+  from = record {
+    owner = principal "2jgt7-v33z4-tiosh-csi2v-66cge-4uu7j-v2nye-z27vc-d36pc-ctqai-bqe";
+  };
+  amount = 100000000;
+  fee = opt 100_000;
+})' --network ic
+
+
 
 dfx deploy UCG --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
   (variant {
@@ -57,7 +63,7 @@ dfx deploy UCG --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
       token_name = "UncensoredGreats Token";
       token_symbol = "UCG";
       minting_account = record {
-        owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
+        owner = principal "'uxyan-oyaaa-aaaap-qhezq-cai'";
       };
       initial_balances = vec {
         record {
@@ -68,19 +74,38 @@ dfx deploy UCG --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
         };
       };
       metadata = vec {};
-      transfer_fee = 10_000;
+      transfer_fee = 100_000;
       archive_options = record {
         trigger_threshold = 2000;
         num_blocks_to_archive = 1000;
-        controller_id = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
+        controller_id = principal "'uxyan-oyaaa-aaaap-qhezq-cai'";
       };
       feature_flags = opt record {
         icrc2 = true;
       };
     }
   })
-'
+' --network ic
 
+# Test transfer some UCG
+dfx canister call UCG icrc1_transfer '(record {
+  to = record {
+    owner = principal "zzvai-vg3as-2ob6v-olrwr-ixgcm-uda5e-r3vz7-ijgk5-ry7gs-jk2gh-nqe";
+  };
+  from = record {
+    owner = principal "2jgt7-v33z4-tiosh-csi2v-66cge-4uu7j-v2nye-z27vc-d36pc-ctqai-bqe";
+  };
+  amount = 100000000;
+  fee = opt 100_000;
+})' --network ic
+
+
+# Step 5: Generate Candid for remote canisters:
+wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/UCG/UCG.did
+wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/LBRY/LBRY.did
+
+
+# Step 6: Deploy NFTs
 dfx deploy icrc7 --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai --argument '(record{                                 
 minting_account = opt record {
    owner = principal "xj2l7-vyaaa-aaaap-abl4a-cai";                                    
@@ -101,12 +126,12 @@ icrc7_logo = null;
 icrc7_name = "UncensoredGreats";
 approval_init = null;
 archive_init = null
-})'
+})' --network ic
 
 
-# Step 5: Deploy other canisters with specified IDs
-dfx deploy ucg_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
-dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
-dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
-dfx deploy ucg_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
-dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
+# Step 7: Deploy our other logic canisters.
+dfx deploy ucg_backend --network ic
+dfx deploy bookmarks --network ic
+dfx deploy icp_swap --network ic
+dfx deploy ucg_frontend --network ic
+dfx deploy tokenomics --network ic

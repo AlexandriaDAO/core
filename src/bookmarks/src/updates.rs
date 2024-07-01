@@ -166,7 +166,7 @@ pub async fn mint_n_burn(lbry_amount: f64) -> Result<String, String> {
     ic_cdk::println!("Ok here am I ?");
     // 1. Asynchronously call another canister function using `ic_cdk::call`.
     let result = ic_cdk::call::<(f64,Principal,), (Result<String, String>,)>(
-        Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai")
+        Principal::from_text("uxyan-oyaaa-aaaap-qhezq-cai")
             .expect("Could not decode the principal."),
         "burn_n_mint",
         (lbry_amount,caller()),

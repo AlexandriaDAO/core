@@ -35,19 +35,23 @@
       "candid": "src/tokenomics/tokenomics.did",
       "package": "tokenomics",
       "type": "rust",
-      "id": "bkyz2-fmaaa-aaaaa-qaaaq-cai"
+      "id": "uxyan-oyaaa-aaaap-qhezq-cai"
     },
     "LBRY": {
       "type": "custom",
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
-      "specified_id": "c5kvi-uuaaa-aaaaa-qaaia-cai"
+      "remote": {
+        "id": { "ic": "hdtfn-naaaa-aaaam-aciva-cai" }
+      }
     },
     "UCG": {
       "type": "custom",
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
-      "specified_id": "cbopz-duaaa-aaaaa-qaaka-cai"
+      "remote": {
+        "id": { "ic": "7hcrm-4iaaa-aaaak-akuka-cai" }
+      }
     },
     "ucg_frontend": {
       "dependencies": ["ucg_backend"],
