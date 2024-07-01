@@ -1,79 +1,3 @@
-// use candid::{Nat, Principal};
-// use ic_cdk::api::call::CallResult;
-// use ic_cdk::caller;
-
-// #[derive(candid::CandidType)]
-// struct Account {
-//     owner: Principal,
-//     subaccount: Option<Vec<u8>>,
-// }
-
-// #[derive(candid::CandidType)]
-// struct MintArg {
-//     to: Account,
-//     token_id: Nat,
-//     memo: Option<Vec<u8>>,
-//     from_subaccount: Option<Vec<u8>>,
-//     token_description: Option<String>,
-//     token_logo: Option<String>,
-//     token_name: Option<String>,
-// }
-
-// #[ic_cdk::update]
-// pub async fn mint_nft(description: String) -> Result<Nat, String> {
-//     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
-//         .expect("Invalid ICRC7 canister ID");
-
-//     // Get the current total supply
-//     let total_supply = current_mint().await?;
-
-//     // Create the mint argument
-//     let mint_arg = MintArg {
-//         to: Account {
-//             owner: caller(),
-//             subaccount: Some(vec![0; 32]), // Default subaccount
-//         },
-//         token_id: total_supply + Nat::from(1u64),
-//         memo: None,
-//         from_subaccount: None,
-//         token_description: Some(description),
-//         token_logo: None,
-//         token_name: None,
-//     };
-
-//     // Call the mint function on the ICRC7 canister
-//     let call_result: CallResult<(Nat,)> = ic_cdk::call(
-//         icrc7_canister_id,
-//         "mint",
-//         (mint_arg,)
-//     ).await;
-
-//     match call_result {
-//         Ok((token_id,)) => Ok(token_id),
-//         Err((code, msg)) => Err(format!("Error calling mint: {:?} - {}", code, msg))
-//     }
-// }
-
-// #[ic_cdk::update]
-// async fn current_mint() -> Result<Nat, String> {
-//     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
-//         .expect("Invalid ICRC7 canister ID");
-
-//     let call_result: CallResult<(Nat,)> = ic_cdk::call(
-//         icrc7_canister_id,
-//         "icrc7_total_supply",
-//         ()
-//     ).await;
-
-//     match call_result {
-//         Ok((total_supply,)) => Ok(total_supply),
-//         Err((code, msg)) => Err(format!("Error calling icrc7_total_supply: {:?} - {}", code, msg))
-//     }
-// }
-
-
-
-
 use candid::{Nat, Principal};
 use ic_cdk::api::call::CallResult;
 use ic_cdk::caller;
@@ -100,18 +24,16 @@ pub async fn mint_nft(description: String) -> Result<String, String> {
     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
         .expect("Invalid ICRC7 canister ID");
 
-    // Get the current total supply
     let total_supply = current_mint().await?;
 
-    let new_token_id = total_supply.clone() + Nat::from(1u64);
+    let new_token_id = total_supply + Nat::from(1u64);
 
-    // Create the mint argument
     let mint_arg = MintArg {
         to: Account {
             owner: caller(),
             subaccount: Some(vec![0; 32]), // Default subaccount
         },
-        token_id: total_supply + Nat::from(1u64),
+        token_id: new_token_id.clone(),
         memo: None,
         from_subaccount: None,
         token_description: Some(description),
@@ -127,11 +49,10 @@ pub async fn mint_nft(description: String) -> Result<String, String> {
     ).await;
 
     match call_result {
-        Ok(()) => Ok(format!("NFT minted successfully with token ID: {}", new_token_id + Nat::from(1u64))),
+        Ok(()) => Ok(format!("NFT minted successfully with token ID: {}", new_token_id)),
         Err((code, msg)) => Err(format!("Error calling mint: {:?} - {}", code, msg))
     }
 }
-
 
 
 #[ic_cdk::update]
@@ -150,9 +71,6 @@ async fn current_mint() -> Result<Nat, String> {
         Err((code, msg)) => Err(format!("Error calling icrc7_total_supply: {:?} - {}", code, msg))
     }
 }
-
-// The current_mint function remains the same
-
 
 
 
