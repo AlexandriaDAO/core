@@ -23,4 +23,4 @@ ukvtntnbije
 //   "remove_favorite" : (post_id : nat64) -> ();
 //   "get_user_favorites" : () -> (vec opt BookMark) query;
 //   "query_bookmarks_by_title" : (title : text) -> (vec opt BookMark) query;
-// };
+// }
