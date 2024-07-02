@@ -1,5 +1,11 @@
+use std::collections::BTreeSet;
 use std::sync::Arc;
 use std::sync::Mutex;
+use std::cell::RefCell;
+
+use candid::Principal;
+type Users = BTreeSet<Principal>;
+
 pub const LBRY_THRESHOLDS: [f64; 23] = [
     100.0,
     200.0,
@@ -31,8 +37,9 @@ pub const UCG_PER_THRESHOLD: [f64; 23] = [
 ];
 
 thread_local! {
+    pub static ALLOWED_CALLERS: RefCell<Users> = RefCell::default();
       //Tokenomics
      pub static TOTAL_LBRY_BURNED: Arc<Mutex<f64>> = Arc::new(Mutex::new(0.0));
      pub static CURRENT_THRESHOLD: Arc<Mutex<u32>> = Arc::new(Mutex::new(0));
-     pub static TOTAL_UCG_MINTED: Arc<Mutex<f64>> = Arc::new(Mutex::new(0.00))
+     pub static TOTAL_UCG_MINTED: Arc<Mutex<f64>> = Arc::new(Mutex::new(0.00));
 }
