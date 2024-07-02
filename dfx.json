@@ -9,13 +9,13 @@
       "candid": "src/bookmarks/bookmarks.did",
       "package": "bookmarks",
       "type": "rust",
-      "specified_id": "be2us-64aaa-aaaaa-qaabq-cai"
+      "specified_id": "sklez-7aaaa-aaaan-qlrva-cai"
     },
     "icp_swap": {
       "candid": "src/icp_swap/icp_swap.did",
       "package": "icp_swap",
       "type": "rust",
-      "specified_id":"br5f7-7uaaa-aaaaa-qaaca-cai"
+      "specified_id":"5qx27-tyaaa-aaaal-qjafa-cai"
     },
     "icrc7": {
       "candid": "src/icrc7/icrc7.did",
@@ -61,17 +61,6 @@
       },
       "source": ["dist/ucg_frontend/"],
       "type": "assets"
-    },
-    "icp_ledger_canister": {
-      "type": "custom",
-      "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icp_ledger/ledger.did",
-      "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ledger-canister.wasm.gz",
-      "remote": {
-        "id": {
-          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
-        }
-      },
-      "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
     }
   },
   "defaults": {
