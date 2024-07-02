@@ -1,10 +1,32 @@
 type Result = variant { Ok : text; Err : text };
+type Principal = principal;
+
 type Tokens = record { e8s : nat64 };
+type Stake = record {
+    amount: nat64;
+    time: nat64;
+    reward_icp:nat64;
+};
 
 service : {
   canister_account : () -> (vec nat8) query;
-  swap : () -> (Result);
-  burn : () -> (Result);
+  swap : (nat64) -> (Result);
+  burn_LBRY : (nat64) -> (Result);
+  deduct_tokens:(nat64)->(Result);
+  stake_UCG:(nat64)->(Result);
+  un_stake_UCG:(nat64)->(Result);
+  set_ratio_LBRY_per_ICP:(nat64)->(Result);
+  set_staking_reward:(float64)->(Result);
+  distribute_reward:()->(Result);
+  claim_icp_reward:()->(Result);
+
+  get_all_stakes: () -> (vec record { principal; Stake }) query;
+  get_stake : (user : Principal) -> (float64) query;
+  get_totat_staked:()->(nat64) query;
+  caller_subaccount:()->(text) query;
+  get_current_LBRY_ratio : () -> (text) query;
+  get_current_staking_reward_percentage : () -> (text) query;
 
 }
+
 

@@ -56,12 +56,12 @@ Advanced Query Calls:
 */
 
 use candid::{CandidType, Decode, Deserialize, Encode, Principal};
+use ic_cdk::caller;
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
 use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable};
 use std::{borrow::Cow, cell::RefCell};
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
-
 
 #[derive(CandidType, Deserialize, Clone)]
 pub struct BookMark {
@@ -72,8 +72,30 @@ pub struct BookMark {
     pub content: String,
     pub cfi: String,
     pub owner_hash: u64,
+    owner_principal: Option<Principal>,
     pub accrued_bookmarks: u64,
     pub claimable_bookmarks: u64,
+}
+impl BookMark {
+    pub fn new(post_id: u64, ugbn: u64, author: String, title: String, content: String, cfi: String, owner_hash: u64) -> Self {
+        BookMark {
+            post_id,
+            ugbn,
+            author,
+            title,
+            content,
+            cfi,
+            owner_hash,
+            owner_principal: Some(caller()), // Wrap with Some
+            accrued_bookmarks: 0,
+            claimable_bookmarks: 0,
+        }
+    }
+}
+impl BookMark {
+    pub fn get_owner_principal(&self) -> Option<&Principal> {
+        self.owner_principal.as_ref()
+    }
 }
 
 #[derive(CandidType, Deserialize, Clone)]
