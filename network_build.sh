@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x 
+
 # There's this weird problem where the ./dfx/local/canisters folder empties after I run this 
 # so it needs to be copied from ./dfx/ic/canisters each time. 
 
@@ -105,6 +107,10 @@ wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797b
 wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/LBRY/LBRY.did
 
 
+# dfx canister uninstall-code fjqb7-6qaaa-aaaak-qc7gq-cai --network ic
+# dfx canister uninstall-code forhl-tiaaa-aaaak-qc7ga-cai --network ic
+
+
 # Step 6: Deploy NFTs
 dfx deploy icrc7 --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai --argument '(record{                                 
 minting_account = opt record {
@@ -125,13 +131,29 @@ icrc7_default_take_value = opt 20;
 icrc7_logo = null;
 icrc7_name = "UncensoredGreats";
 approval_init = null;
-archive_init = null
+archive_init= opt record {
+        maxRecordsToArchive= 2;
+        archiveIndexType= variant {Stable};
+        maxArchivePages= 3;
+        settleToRecords= 2;
+        archiveCycles= 1000000000000;
+        maxActiveRecords= 4;
+        maxRecordsInArchiveInstance= 4;
+        archiveControllers= null
+    }
 })' --network ic
+
 
 
 # Step 7: Deploy our other logic canisters.
 dfx deploy ucg_backend --network ic
 dfx deploy bookmarks --network ic
 dfx deploy icp_swap --network ic
-dfx deploy ucg_frontend --network ic
 dfx deploy tokenomics --network ic
+
+cd ./.dfx/
+rm -rf local/canisters/
+cp -r ic/canisters/ local/
+cd ..
+
+dfx deploy ucg_frontend --network ic

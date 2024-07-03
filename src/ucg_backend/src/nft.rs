@@ -124,7 +124,7 @@ Backend Psuedocode:
 ACTUALLY. For burning, transfering, and querying, the frontend can just call the canister directly. You only need this backend as the minting authority.    
   - burn(ugbn) -> ()
     - if ic-cdk::caller() == call icrc7 icrc7_owner_of(ugbn);
-      - call icrc7_burn(ugbn)
+      - call (ugbn)
     - else
       - you have no right.
 

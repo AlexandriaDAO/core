@@ -104,6 +104,16 @@ archive_init = null
 })'
 
 
+dfx deploy icrc7_archive --specified-id forhl-tiaaa-aaaak-qc7ga-cai --argument '(
+  record {
+    max_records = 1_000 : nat;
+    index_type = variant { Stable };
+    first_index = 1 : nat;
+    max_pages = 100 : nat;
+  },
+)'
+
+
 # Step 5: Deploy other canisters with specified IDs
 dfx deploy ucg_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai

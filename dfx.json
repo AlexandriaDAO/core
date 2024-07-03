@@ -20,8 +20,8 @@
     "icrc7": {
       "candid": "src/icrc7/icrc7.did",
       "package": "icrc7",
-      "optimize": "cycles",
-      "type": "rust"
+      "type": "rust",
+      "specified_id": "fjqb7-6qaaa-aaaak-qc7gq-cai"
     },
     "icrc7_archive": {
       "candid": "src/icrc7_archive/icrc7_archive.did",
@@ -61,6 +61,17 @@
       },
       "source": ["dist/ucg_frontend/"],
       "type": "assets"
+    },
+    "icp_ledger_canister": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icp_ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ledger-canister.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+        }
+      },
+      "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
     }
   },
   "defaults": {
