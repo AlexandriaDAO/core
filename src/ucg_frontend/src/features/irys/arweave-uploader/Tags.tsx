@@ -179,8 +179,7 @@ const Tags: React.FC<TagsProps> = ({ onTagsChange }) => {
           onChange={(e) => handleMetadataChange({ ...metadata, rights: e.target.value })}
         />
       </div>
-
-      {/* <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1">
         <label htmlFor="isbn">ISBN</label>
         <input
           className="w-full px-4 py-2 border border-gray-300 rounded-md"
@@ -190,7 +189,7 @@ const Tags: React.FC<TagsProps> = ({ onTagsChange }) => {
           value={metadata?.isbn || ""}
           onChange={(e) => handleMetadataChange({ ...metadata, isbn: e.target.value })}
         />
-      </div> */}
+      </div>
     </div>
   );
 };

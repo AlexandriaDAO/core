@@ -21,13 +21,6 @@ const SaveLibrarian: FC = () => {
     checkUserLibrarianStatus();
   }, [ucgActor]);
 
-
-  // const handleLibrarianClick = (hash: bigint, name: string) => {
-  //   console.log("HandleLibrarianClickCalled")
-  //   setActiveLibrarian({ hash, name });
-  // };
-
-
   const handleLibrarianClick = async (hash: bigint, name: string) => {
     setActiveLibrarian({ hash, name });
 
