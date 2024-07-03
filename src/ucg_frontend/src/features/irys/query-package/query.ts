@@ -5,11 +5,11 @@ export async function fetchTransactions() {
   const results = await myQuery
     .search("irys:transactions")
     .tags([
-      // { name: "Content-Type", values: ["image/png"] },
+      { name: "Content-Type", values: ["image/png"] },
       { name: "application-id", values: ["UncensoredGreats"] },
       // { name: "author", values: ["Noone"] },
-      // { name: "author", values: ["Noone"] },
-      { name: "author", values: ["AAA"] },
+      // { name: "author", values: ["AAA"] },
+      { name: "author", values: ["asdf"] },
     ])    
     .sort("ASC")
     .limit(20);
