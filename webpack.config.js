@@ -98,6 +98,7 @@ module.exports = {
       ...Object.keys(process.env).filter((key) => {
         if (key.includes("CANISTER")) return true;
         if (key.includes("DFX")) return true;
+        if (key.startsWith("ETH_")) return true;
         return false;
       }),
     ]),

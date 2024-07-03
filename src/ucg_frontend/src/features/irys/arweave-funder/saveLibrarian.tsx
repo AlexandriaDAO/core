@@ -7,7 +7,7 @@ import { getLibrarianByHash } from "../../../services/librarianService";
 import { getLibrarianKeys } from "@/services/walletService";
 
 const SaveLibrarian: FC = () => {
-  const { librariansActor } = useAuth();
+  const { ucgActor } = useAuth();
   const { activeLibrarian, setActiveLibrarian } = useActiveLibrarian();
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"success" | "error" | null>(null);
@@ -19,7 +19,7 @@ const SaveLibrarian: FC = () => {
   useEffect(() => {
     fetchLibrarians();
     checkUserLibrarianStatus();
-  }, [librariansActor]);
+  }, [ucgActor]);
 
 
   // const handleLibrarianClick = (hash: bigint, name: string) => {
@@ -32,7 +32,7 @@ const SaveLibrarian: FC = () => {
     setActiveLibrarian({ hash, name });
 
     try {
-      const librarian = await getLibrarianByHash(librariansActor, hash);
+      const librarian = await getLibrarianByHash(ucgActor, hash);
       console.log("Librarin var: ", librarian)
       if (librarian) {
         const keys = await getLibrarianKeys(librarian.raw_principal);
@@ -46,7 +46,7 @@ const SaveLibrarian: FC = () => {
 
   const fetchLibrarians = async () => {
     try {
-      const allLibrarians = await getLibrariansPublic(librariansActor);
+      const allLibrarians = await getLibrariansPublic(ucgActor);
       setLibrarians(allLibrarians || []);
     } catch (error) {
       console.error("Error retrieving librarians:", error);
@@ -55,7 +55,7 @@ const SaveLibrarian: FC = () => {
 
   const checkUserLibrarianStatus = async () => {
     try {
-      const isLibrarianUser = await isLibrarian(librariansActor);
+      const isLibrarianUser = await isLibrarian(ucgActor);
       setIsUserLibrarian(isLibrarianUser);
     } catch (error) {
       console.error("Error checking librarian status:", error);
@@ -67,7 +67,7 @@ const SaveLibrarian: FC = () => {
     setSaveStatus(null);
 
     try {
-      await saveLibrarian(librariansActor, librarianName);
+      await saveLibrarian(ucgActor, librarianName);
       setSaveStatus("success");
       setIsUserLibrarian(true);
       fetchLibrarians();
@@ -81,7 +81,7 @@ const SaveLibrarian: FC = () => {
 
   const handleDeleteLibrarian = async () => {
     try {
-      await deleteLibrarian(librariansActor);
+      await deleteLibrarian(ucgActor);
       setDeleteStatus("success");
       setIsUserLibrarian(false);
       fetchLibrarians();

@@ -1,7 +1,7 @@
 // src/ucg_frontend/src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { createActor as createUcgActor, ucg_backend } from '../../../declarations/ucg_backend';
-import { createActor as createLibrariansActor, librarians } from '../../../declarations/librarians';
+import { createActor as createIcrc7Actor, icrc7 } from '../../../declarations/icrc7';
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
 import { Principal } from '@dfinity/principal';
@@ -9,7 +9,7 @@ import { AccountIdentifier, LedgerCanister } from '@dfinity/ledger-icp';
 
 interface AuthContextProps {
   ucgActor: any;
-  librariansActor: any;
+  icrc7Actor: any;
   UID: Principal | null;
   accountIdentifier: AccountIdentifier | null;
   balanceE8s: bigint | null;
@@ -19,7 +19,7 @@ interface AuthContextProps {
 
 export const AuthContext = createContext<AuthContextProps>({
   ucgActor: ucg_backend,
-  librariansActor: librarians,
+  icrc7Actor: icrc7,
   UID: null,
   accountIdentifier: null,
   balanceE8s: null,
@@ -37,7 +37,7 @@ const LEDGER_CANISTER_ID = Principal.fromText("ryjl3-tyaaa-aaaaa-aaaba-cai");
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [ucgActor, setUcgActor] = useState(ucg_backend);
-  const [librariansActor, setLibrariansActor] = useState(librarians);
+  const [icrc7Actor, setIcrc7Actor] = useState(icrc7);
   const [UID, setUID] = useState<Principal | null>(null);
   const accountIdentifier = useMemo(() => UID && AccountIdentifier.fromPrincipal({ principal: UID }), [UID]);
   const [balanceE8s, setBalanceE8s] = useState<bigint | null>(null);
@@ -68,12 +68,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const newUcgActor = createUcgActor(process.env.CANISTER_ID_UCG_BACKEND!, {
           agent,
         });
-        const newLibrariansActor = createLibrariansActor(process.env.CANISTER_ID_LIBRARIANS!, {
+        const newIcrc7Actor = createIcrc7Actor(process.env.CANISTER_ID_ICRC7!, {
           agent,
         });
 
         setUcgActor(newUcgActor);
-        setLibrariansActor(newLibrariansActor);
+        setIcrc7Actor(newIcrc7Actor);
         setUID(await newUcgActor.whoami());
       }
     };
@@ -105,12 +105,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const newUcgActor = createUcgActor(process.env.CANISTER_ID_UCG_BACKEND!, {
       agent,
     });
-    const newLibrariansActor = createLibrariansActor(process.env.CANISTER_ID_LIBRARIANS!, {
+    const newIcrc7Actor = createIcrc7Actor(process.env.CANISTER_ID_ICRC7!, {
       agent,
     });
 
     setUcgActor(newUcgActor);
-    setLibrariansActor(newLibrariansActor);
+    setIcrc7Actor(newIcrc7Actor);
     setUID(await newUcgActor.whoami());
   };
 
@@ -119,12 +119,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     let authClient = await AuthClient.create();
     await authClient.logout();
     setUcgActor(ucg_backend);
-    setLibrariansActor(librarians);
+    setIcrc7Actor(icrc7);
     setUID(null);
   };
 
   return (
-    <AuthContext.Provider value={{ ucgActor, librariansActor, UID, accountIdentifier, balanceE8s, login, logout  }}>
+    <AuthContext.Provider value={{ ucgActor, icrc7Actor, UID, accountIdentifier, balanceE8s, login, logout  }}>
       {children}
     </AuthContext.Provider>
   );

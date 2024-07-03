@@ -6,9 +6,9 @@ export interface Librarian {
   name: string;
 }
 
-export const saveLibrarian = async (librariansActor: any, name: string): Promise<void> => {
+export const saveLibrarian = async (ucgActor: any, name: string): Promise<void> => {
   try {
-    await librariansActor.save_librarian(name);
+    await ucgActor.save_librarian(name);
     console.log('Librarian saved successfully');
   } catch (error) {
     console.error('Error saving librarian:', error);
@@ -16,9 +16,9 @@ export const saveLibrarian = async (librariansActor: any, name: string): Promise
   }
 };
 
-export const deleteLibrarian = async (librariansActor: any): Promise<void> => {
+export const deleteLibrarian = async (ucgActor: any): Promise<void> => {
   try {
-    await librariansActor.delete_librarian();
+    await ucgActor.delete_librarian();
     console.log('Librarian deleted successfully');
   } catch (error) {
     console.error('Error deleting librarian:', error);
@@ -26,9 +26,9 @@ export const deleteLibrarian = async (librariansActor: any): Promise<void> => {
   }
 };
 
-export const getLibrariansPublic = async (librariansActor: any): Promise<[bigint, string][] | undefined> => {
+export const getLibrariansPublic = async (ucgActor: any): Promise<[bigint, string][] | undefined> => {
   try {
-    const result = await librariansActor.get_hashes_and_names();
+    const result = await ucgActor.get_hashes_and_names();
     if (Array.isArray(result) && result.length > 0) {
       return result as [bigint, string][];
     } else {
@@ -40,9 +40,9 @@ export const getLibrariansPublic = async (librariansActor: any): Promise<[bigint
   }
 };
 
-export const getLibrarianByHash = async (librariansActor: any, hashedPrincipal: bigint): Promise<Librarian | undefined> => {
+export const getLibrarianByHash = async (ucgActor: any, hashedPrincipal: bigint): Promise<Librarian | undefined> => {
   try {
-    const result = await librariansActor.get_librarian(hashedPrincipal);
+    const result = await ucgActor.get_librarian(hashedPrincipal);
     console.log("result of getLibrarinByHas()", result);
     if (result && result.length > 0) {
       const librarianData = result[0];
@@ -62,9 +62,9 @@ export const getLibrarianByHash = async (librariansActor: any, hashedPrincipal: 
   }
 };
 
-export const isLibrarian = async (librariansActor: any): Promise<boolean> => {
+export const isLibrarian = async (ucgActor: any): Promise<boolean> => {
   try {
-    const librarian: boolean = await librariansActor.is_librarian();
+    const librarian: boolean = await ucgActor.is_librarian();
     console.log("IsLibrarian?: ", librarian)
     return librarian;
   } catch (error) {
