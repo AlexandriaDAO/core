@@ -92,12 +92,12 @@
   import { TypedEthereumSigner } from "arbundles";
   import { Buffer } from "buffer";
   
-  const network = "mainnet";
+  const network = "devnet";
   const token = "ethereum";
   
   const getIrys = async (): Promise<WebIrys> => {
-    const pubKey = process.env.ETH_PUBLIC_KEY;
-    const privateKey = process.env.ETH_PRIVATE_KEY;
+    const pubKey = "0x738b58fe508189A237427e69163bB7E2cd91C38c";
+    const privateKey = "0x54d8a539123e15c56028557bff8b0704728138fdc04c04363374ca80efa16084";
     console.log("pubKey", pubKey);
   
     if (typeof pubKey !== 'string' || typeof privateKey !== 'string') {
