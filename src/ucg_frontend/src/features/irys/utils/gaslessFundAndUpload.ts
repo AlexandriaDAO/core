@@ -36,6 +36,30 @@
 import getIrys from "./getIrys";
 import { randomBytes } from "crypto";
 
+
+
+// Helper function to read File as Buffer
+export const readFileAsBuffer = (file: File): Promise<Buffer> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (reader.result instanceof ArrayBuffer) {
+        const buffer = Buffer.from(reader.result);
+        resolve(buffer);
+      } else {
+        reject(new Error('Failed to read file as ArrayBuffer'));
+      }
+    };
+
+    reader.onerror = (error) => {
+      reject(error);
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+};
+
 type Tag = {
   name: string;
   value: string;
@@ -44,30 +68,46 @@ type Tag = {
 const gaslessFundAndUploadEVM = async (selectedFile: File, tags: Tag[]): Promise<string> => {
   const irys = await getIrys();
 
-  console.log("Creating transaction...");
-  
-  // Generate a deterministic anchor
-  const anchor = randomBytes(16).toString("hex");
+// Zeeshans approach
+  // Convert File to Buffer
+  const buffer = await readFileAsBuffer(selectedFile);
 
-  //@ts-ignore
-  const tx = irys.createTransaction(selectedFile, {
+  console.log("Uploading...");
+  const tx =  irys.createTransaction(buffer, {
+
+    // // Evan's approach before merge
+//   console.log("Creating transaction...");
+  
+//   // Generate a deterministic anchor
+//   const anchor = randomBytes(16).toString("hex");
+
+//   //@ts-ignore
+//   const tx = irys.createTransaction(selectedFile, {
     tags,
     anchor,
   });
 
-  // Sign the transaction to get the ID
   await tx.sign();
-  const txId = tx.id;
 
-  console.log(`Transaction created with ID: ${txId}`);
-  console.log("Uploading...");
+  const receipt = await tx.upload();
 
-  // Perform the actual upload
-  await tx.upload();
+  console.log(`Uploaded successfully. https://gateway.irys.xyz/${receipt.id}`);
 
-  console.log(`Uploaded successfully. https://gateway.irys.xyz/${txId}`);
+  return receipt.id;
+ // // Evan's stupid approach before merge
+//   // Sign the transaction to get the ID
+//   await tx.sign();
+//   const txId = tx.id;
 
-  return txId;
+//   console.log(`Transaction created with ID: ${txId}`);
+//   console.log("Uploading...");
+
+//   // Perform the actual upload
+//   await tx.upload();
+
+//   console.log(`Uploaded successfully. https://gateway.irys.xyz/${txId}`);
+
+//   return txId;
 };
 
 const gaslessFundAndUpload = async (selectedFile: File, tags: Tag[], blockchain: "EVM" | "SOL"): Promise<string> => {
