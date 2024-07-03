@@ -144,7 +144,7 @@ const Mint = () => {
 			message.success("Uploaded Successfully");
 			setUploadStatus(6);
 		} catch (err) {
-			message.error("Error while Minting: " + err);
+			message.error("Error while Minting: " + err); // Error while Minting: Error: 402 error: Not enough balance for transaction
 		}
 
 

@@ -86,7 +86,7 @@
   import { TypedEthereumSigner } from "arbundles";
   import { Buffer } from "buffer";
   
-  const network = "devnet";
+  const network = "mainnet";
   const token = "ethereum";
   
   const getIrys = async (): Promise<WebIrys> => {

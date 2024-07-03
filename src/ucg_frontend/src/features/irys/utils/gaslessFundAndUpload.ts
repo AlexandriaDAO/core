@@ -34,8 +34,6 @@
 
 
 import getIrys from "./getIrys";
-import { randomBytes } from "crypto";
-
 
 
 // Helper function to read File as Buffer
@@ -84,7 +82,7 @@ const gaslessFundAndUploadEVM = async (selectedFile: File, tags: Tag[]): Promise
 //   //@ts-ignore
 //   const tx = irys.createTransaction(selectedFile, {
     tags,
-    anchor,
+    // anchor,
   });
 
   await tx.sign();

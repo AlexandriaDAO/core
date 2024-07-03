@@ -13,7 +13,7 @@ export const getSimpleWebIrys = async (wallet: Wallet | null = null) => {
 	const provider = new ethers.BrowserProvider(window.ethereum);
 
 	const irys = new WebIrys({
-		network: "devnet",
+		network: "mainnet",
 		token: "ethereum",
 		wallet: {
 			name: "ethersv6",
@@ -66,7 +66,7 @@ export const getSigningWebIrys = async (wallet: Wallet | null = null) => {
 	};
 
 	const irys = new WebIrys({
-		network: "devnet",
+		network: "mainnet",
 		token: "ethereum",
 		wallet: {
 			name: "ethersv5",

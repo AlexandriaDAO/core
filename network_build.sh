@@ -2,6 +2,8 @@
 
 set -x 
 
+cp dfx_mainnet.json dfx.json
+
 # There's this weird problem where the ./dfx/local/canisters folder empties after I run this 
 # so it needs to be copied from ./dfx/ic/canisters each time. 
 
