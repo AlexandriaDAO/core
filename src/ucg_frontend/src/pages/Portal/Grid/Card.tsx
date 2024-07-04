@@ -11,9 +11,11 @@ import { removeNewLines, titleToFileName } from "@/utils/Portal";
 import { deleteAsset, deleteDoc, listDocs } from "@junobuild/core";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import BookModal from "@/components/BookModal";
+import { useBook } from "@/contexts/BookContext";
 
 const Card = ({ item }: any) => {
 	const { data: bookData } = item;
+	const { setSelectedBook } = useBook();
 	const bookAreaRef = useRef(null);
 
 	const [book, setBook] = useState<any>(null);
@@ -77,6 +79,17 @@ const Card = ({ item }: any) => {
 			});
 		}
 	}, [book]);
+
+	const handleQuickView = () => {
+		setSelectedBook({
+				key: item.key,
+				title: bookData.title,
+				author: bookData.author,
+				image: cover,
+				transactionId: bookData.url.split("icp0.io")[1],
+		});
+		setIsBookModalVisible(true);
+	};
 
 	const deleteBook = async () => {
 		setDeleting(true);
@@ -144,19 +157,19 @@ const Card = ({ item }: any) => {
 				)}
 				<div className="w-full h-full absolute inset-0 bg-gray-400 bg-opacity-40 opacity-0 group-hover:opacity-100 transition-all duration-500">
 					<button
-						onClick={() => setIsBookModalVisible(true)}
-						className="absolute left-0 bottom-0 w-full p-2 bg-gray-800 text-white text-base text-center leading-4 flex items-center justify-center"
-					>
-						<span className="text-white mr-1">
-							<svg width="20" height="20" viewBox="0 0 32 32">
-								<path
-									fill="currentColor"
-									d="M16 8C7.664 8 1.25 15.344 1.25 15.344L.656 16l.594.656s5.848 6.668 13.625 7.282c.371.046.742.062 1.125.062s.754-.016 1.125-.063c7.777-.613 13.625-7.28 13.625-7.28l.594-.657l-.594-.656S24.336 8 16 8zm0 2c2.203 0 4.234.602 6 1.406A6.89 6.89 0 0 1 23 15a6.995 6.995 0 0 1-6.219 6.969c-.02.004-.043-.004-.062 0c-.239.011-.477.031-.719.031c-.266 0-.523-.016-.781-.031A6.995 6.995 0 0 1 9 15c0-1.305.352-2.52.969-3.563h-.031C11.717 10.617 13.773 10 16 10zm0 2a3 3 0 1 0 .002 6.002A3 3 0 0 0 16 12zm-8.75.938A9.006 9.006 0 0 0 7 15c0 1.754.5 3.395 1.375 4.781A23.196 23.196 0 0 1 3.531 16a23.93 23.93 0 0 1 3.719-3.063zm17.5 0A23.93 23.93 0 0 1 28.469 16a23.196 23.196 0 0 1-4.844 3.781A8.929 8.929 0 0 0 25 15c0-.715-.094-1.398-.25-2.063z"
-								></path>
-							</svg>
-						</span>
-						Quick View
-					</button>
+                onClick={handleQuickView}
+                className="absolute left-0 bottom-0 w-full p-2 bg-gray-800 text-white text-base text-center leading-4 flex items-center justify-center"
+            >
+                <span className="text-white mr-1">
+                    <svg width="20" height="20" viewBox="0 0 32 32">
+                        <path
+                            fill="currentColor"
+                            d="M16...3z"
+                        ></path>
+                    </svg>
+                </span>
+                Quick View
+            </button>
 					<Modal
 						centered
 						open={isBookModalVisible}
@@ -167,7 +180,8 @@ const Card = ({ item }: any) => {
 						// width={'md:aspect-video aspect-[3/4] w-full h-full'}
 						classNames={{ content: "!p-0" }}
 					>
-						<BookModal bookUrl={bookData.url} />
+						{/* <BookModal bookUrl={bookData.url} /> */}
+						<BookModal />
 					</Modal>
 				</div>
 			</div>
@@ -184,13 +198,6 @@ const Card = ({ item }: any) => {
 				</p>
 			</div>
 			<div className="flex flex-wrap justify-between items-center w-full rounded text-sm font-semibold gap-2 p-2">
-				{/* <button
-					onClick={()=>handleJSONDownload(bookData)}
-					className="px-2 py-1 rounded-tl rounded-bl transition flex-grow bg-blue-500 hover:bg-blue-700 text-white font-bold rounded flex justify-center items-center gap-1"
-				>
-					<BsFiletypeJson size={18} />
-					Metadata
-				</button> */}
 				{deleting ? (
 					<button
 						disabled

@@ -183,7 +183,7 @@ const Row = ({ bookData }: any) => {
                     // width={'md:aspect-video aspect-[3/4] w-full h-full'}
                     classNames={{ content: "!p-0" }}
                 >
-                    <BookModal bookUrl={bookData.url} />
+                    <BookModal />
                 </Modal>
             </td>
         </tr>

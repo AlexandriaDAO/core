@@ -37,7 +37,8 @@ export const Reader: React.FC<IReaderProps> = ({
 
 	// bookUrl = "https://uncensoredgreatsebooks.s3.us-east-2.amazonaws.com/Benjamin_Franklin/Benjamin_Franklin@@The_Complete_Works_in_Philosophy,_Politics_and_Morals_of_the_late_Dr._Benjamin_Franklin,_Vol._1_[of_3].epub",
 	// bookUrl = "https://bafybeibfamdu25bcximdtzjlvhis3jygzg3mibymeel54yl4e2e2gnoh5q.ipfs.w3s.link",
-	bookUrl = "test.epub",
+	bookUrl = "https://node1.irys.xyz/bHGOLFr4KfXkrRESdD3bJAb3T5a8eROkVZG8G45i74k",
+	// bookUrl = "test.epub",
 
 	showSidebar = true,
 	showToolbar = true,

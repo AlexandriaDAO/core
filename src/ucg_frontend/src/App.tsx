@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ReduxProvider from "./providers/ReduxProvider";
 import { AuthProvider } from "./contexts/AuthContext";
 import { KeysProvider } from "./contexts/KeysContext";
+import { BookProvider } from "./contexts/BookContext";
 
 import Layout from "./pages/Layout";
 import HomePage from "./pages/HomePage";
@@ -15,36 +16,31 @@ import SessionProvider from "./providers/SessionProvider";
 import ReaderPage from "./pages/ReaderPage";
 
 export default function App() {
-	return (
-		<ReduxProvider>
-			<SessionProvider>
-				<BrowserRouter>
-					<Routes>
-						<Route
-							path="*"
-							element={
-								<AuthProvider>
-									<Layout />
-								</AuthProvider>
-							}
-						/>
-						<Route path="/" element={<HomePage />} />
-						<Route path="/book-portal" element={<BookPortalPage />} />
-						<Route path="/manager" element={<ManagerPage />} />
-						<Route path="/reader" element={<ReaderPage />} />
-						<Route
-							path="/arweave"
-							element={
-								<AuthProvider>
-									<KeysProvider>
-										<ArWeavePage />
-									</KeysProvider>
-								</AuthProvider>
-							}
-						/>
-					</Routes>
-				</BrowserRouter>
-			</SessionProvider>
-		</ReduxProvider>
-	);
+    return (
+        <ReduxProvider>
+            <SessionProvider>
+                <BrowserRouter>
+                    <AuthProvider>
+                        <BookProvider>
+                            <Routes>
+                                <Route path="*" element={<Layout />} />
+                                <Route path="/" element={<HomePage />} />
+                                <Route path="/book-portal" element={<BookPortalPage />} />
+                                <Route path="/manager" element={<ManagerPage />} />
+                                <Route path="/reader" element={<ReaderPage />} />
+                                <Route
+                                    path="/arweave"
+                                    element={
+                                        <KeysProvider>
+                                            <ArWeavePage />
+                                        </KeysProvider>
+                                    }
+                                />
+                            </Routes>
+                        </BookProvider>
+                    </AuthProvider>
+                </BrowserRouter>
+            </SessionProvider>
+        </ReduxProvider>
+    );
 }
