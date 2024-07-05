@@ -6,12 +6,13 @@ import PortalLanguage from "@/features/portal-language";
 import PortalPublicationYear from "@/features/portal-publication-year";
 import PortalCategory from "@/features/portal-category";
 import PortalFilter from "@/features/portal-filter";
-import { Pagination, PaginationProps } from "antd";
+import { Pagination, PaginationProps, Tooltip, Modal } from "antd";
 import BookModal from "@/features/categories/components/BookModal";
 import { fetchTransactions } from "@/features/irys/query-package/query";
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from "@/store";
 import { setSelectedBook, setIsModalOpen } from '@/features/home/homeSlice';
+import Epub from "epubjs";
 
 const ITEMS_PER_PAGE = 18;
 
@@ -20,31 +21,84 @@ interface Book {
     title: string;
     author: string;
     image: string;
+    coverUrl?: string | null;
     transactionId: string;
+    tags: {
+        name: string;
+        value: string;
+    }[];
 }
 
 function BookPortalPageContent() {
     const [books, setBooks] = useState<Book[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [infoModalVisible, setInfoModalVisible] = useState(false);
+    const [selectedBookInfo, setSelectedBookInfo] = useState<Book | null>(null);
     
     const dispatch = useDispatch();
     const { selectedBook, isModalOpen } = useSelector((state: RootState) => state.home);
     
-    useEffect(() => {
+    // useEffect(() => {
+    //     const loadBooks = async () => {
+    //         const transactions = await fetchTransactions();
+    //         const formattedBooks: Book[] = transactions.map((transaction, index) => ({
+    //             key: index + 1,
+    //             title: transaction.tags.find(tag => tag.name === "title")?.value || "Unknown Title",
+    //             author: transaction.tags.find(tag => tag.name === "author")?.value || "Unknown Author",
+    //             image: "default-book.png",
+    //             transactionId: transaction.id,
+    //             tags: transaction.tags
+    //         }));
+    //         setBooks(formattedBooks);
+    //     };
+    //     loadBooks();
+    // }, []);
+
+    async function getCoverUrl(transactionId: string): Promise<string | null> {
+        try {
+          const bookUrl = `https://node1.irys.xyz/${transactionId}`;
+          const book = Epub(bookUrl, { openAs: "epub" });
+      
+          // Wait for the book to be ready
+          await new Promise<void>((resolve) => {
+            book.ready.then(() => resolve());
+          });
+      
+          // Get the cover URL
+          const coverUrl = await book.coverUrl();
+      
+          // Destroy the book instance to free up resources
+          book.destroy();
+      
+          return coverUrl;
+        } catch (error) {
+          console.error("Error fetching cover URL:", error);
+          return null;
+        }
+      }
+
+
+      useEffect(() => {
         const loadBooks = async () => {
             const transactions = await fetchTransactions();
-            const formattedBooks: Book[] = transactions.map((transaction, index) => ({
-                key: index + 1,
-                title: transaction.tags.find(tag => tag.name === "title")?.value || "Unknown Title",
-                author: transaction.tags.find(tag => tag.name === "author")?.value || "Unknown Author",
-                image: "default-book.png",
-                transactionId: transaction.id
+            const formattedBooks: Book[] = await Promise.all(transactions.map(async (transaction, index) => {
+                const coverUrl = await getCoverUrl(transaction.id);
+                return {
+                    key: index + 1,
+                    title: transaction.tags.find(tag => tag.name === "title")?.value || "Unknown Title",
+                    author: transaction.tags.find(tag => tag.name === "author")?.value || "Unknown Author",
+                    image: "default-book.png",
+                    coverUrl: coverUrl, // This is now fine because coverUrl can be string | null
+                    transactionId: transaction.id,
+                    tags: transaction.tags
+                };
             }));
             setBooks(formattedBooks);
         };
         loadBooks();
     }, []);
+
 
     const handleBookClick = (book: Book) => {
         if (selectedBook && selectedBook.key === book.key) {
@@ -54,6 +108,12 @@ function BookPortalPageContent() {
             dispatch(setSelectedBook(book));
             dispatch(setIsModalOpen(true));
         }
+    };
+
+    const handleInfoClick = (book: Book, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setSelectedBookInfo(book);
+        setInfoModalVisible(true);
     };
 
     const handlePageChange = (page: number) => {
@@ -93,6 +153,7 @@ function BookPortalPageContent() {
 
         for (let i = 0; i < paginatedBooks.length; i++) {
             const book = paginatedBooks[i];
+
             const bookCard = (
                 <div
                     key={book.key}
@@ -103,15 +164,20 @@ function BookPortalPageContent() {
                     }`}
                     onClick={() => handleBookClick(book)}
                 >
-                    <div className="flex flex-col justify-between gap-3 items-start">
-                        <img
-                            className="rounded-lg h-80 object-fill"
-                            src={`images/books/${book.image}`}
-                            alt={book.title}
-                        />
-                        <span className="font-syne font-semibold text-xl leading-7">
-                            {book.title}
-                        </span>
+                    <div className="flex flex-col justify-between gap-3 items-start relative">
+                        {book.coverUrl ? (
+                            <img
+                                className="rounded-lg h-80 object-cover"
+                                src={book.coverUrl}
+                                alt={book.title}
+                            />
+                        ) : (
+                            <img
+                                className="rounded-lg h-80 object-fill"
+                                src={`images/books/${book.image}`}
+                                alt={book.title}
+                            />
+                        )}
                         <span
                             className={`font-roboto-condensed font-normal text-base leading-[18px] ${
                                 selectedBook && selectedBook.key === book.key
@@ -121,6 +187,14 @@ function BookPortalPageContent() {
                         >
                             {book.author}
                         </span>
+                        <Tooltip title="Click for more info">
+                            <button
+                                className="absolute top-2 right-2 bg-white text-black rounded-full w-6 h-6 flex items-center justify-center"
+                                onClick={(e) => handleInfoClick(book, e)}
+                            >
+                                i
+                            </button>
+                        </Tooltip>
                     </div>
                 </div>
             );
@@ -152,55 +226,74 @@ function BookPortalPageContent() {
         return content;
     };
 
-		return (
-			<MainLayout>
-				<div className="flex-grow p-6">
-					<div className="flex justify-between items-center gap-4 font-roboto-condensed text-black">
-						<div className="basis-1/2 border-b border-solid border-gray-500 flex items-center gap-2 py-1">
-							<IoIosSearch />
-							<input
-								type="text"
-								value={searchTerm}
-								onChange={(e)=>setSearchTerm(e.target.value)}
-								placeholder="Search"
-								className="bg-transparent font-normal text-xl flex-grow rounded border-0 ring-0 focus:ring-0 outline-none"
-							/>
-						</div>
-						<div className="basis-1/2 flex items-center justify-around gap-2 py-2">
-							<PortalCategory />
-							<PortalLanguage />
-							<PortalType />
-							<PortalPublicationYear />
-						</div>
-					</div>
-					<div className="font-roboto-condensed font-normal text-xl my-4 flex gap-4 items-center">
-						<span> Books: {books.length} </span>
-						<PortalFilter />
-					</div>
-					<div className="flex-grow grid grid-cols-6 grid-rows-[repeat(3, minmax(0,auto))] py-4 gap-4">
-						{ generateCards() }
-					</div>
-					{
-						totalPages > 1 &&
-						<div className="flex justify-center items-center my-10">
-							<Pagination
-								total={filteredBooks.length}
-								current={currentPage}
-								pageSize={ITEMS_PER_PAGE}
-								showLessItems={true}
-								onChange={handlePageChange}
-								itemRender={itemRender}
-							/>
-						</div>
-					}
-				</div>
-			</MainLayout>
-		);
-	}
-
-	function BookPortalPage() {
     return (
-            <BookPortalPageContent />
+        <MainLayout>
+            <div className="flex-grow p-6">
+                <div className="flex justify-between items-center gap-4 font-roboto-condensed text-black">
+                    <div className="basis-1/2 border-b border-solid border-gray-500 flex items-center gap-2 py-1">
+                        <IoIosSearch />
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e)=>setSearchTerm(e.target.value)}
+                            placeholder="Search"
+                            className="bg-transparent font-normal text-xl flex-grow rounded border-0 ring-0 focus:ring-0 outline-none"
+                        />
+                    </div>
+                    <div className="basis-1/2 flex items-center justify-around gap-2 py-2">
+                        <PortalCategory />
+                        <PortalLanguage />
+                        <PortalType />
+                        <PortalPublicationYear />
+                    </div>
+                </div>
+                <div className="font-roboto-condensed font-normal text-xl my-4 flex gap-4 items-center">
+                    <span> Books: {books.length} </span>
+                    <PortalFilter />
+                </div>
+                <div className="flex-grow grid grid-cols-6 grid-rows-[repeat(3, minmax(0,auto))] py-4 gap-4">
+                    { generateCards() }
+                </div>
+                {
+                    totalPages > 1 &&
+                    <div className="flex justify-center items-center my-10">
+                        <Pagination
+                            total={filteredBooks.length}
+                            current={currentPage}
+                            pageSize={ITEMS_PER_PAGE}
+                            showLessItems={true}
+                            onChange={handlePageChange}
+                            itemRender={itemRender}
+                        />
+                    </div>
+                }
+            </div>
+            <Modal
+                title="Book Information"
+                visible={infoModalVisible}
+                onCancel={() => setInfoModalVisible(false)}
+                footer={null}
+            >
+                {selectedBookInfo && (
+                    <div>
+                        <h2>{selectedBookInfo.title}</h2>
+                        <p>Author: {selectedBookInfo.author}</p>
+                        {selectedBookInfo.tags.map((tag) => (
+                            <p key={tag.name}>
+                                {tag.name}: {tag.value}
+                            </p>
+                        ))}
+                    </div>
+                )}
+            </Modal>
+        </MainLayout>
     );
 }
+
+function BookPortalPage() {
+    return (
+        <BookPortalPageContent />
+    );
+}
+
 export default BookPortalPage;
