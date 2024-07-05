@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ReduxProvider from "./providers/ReduxProvider";
 import { AuthProvider } from "./contexts/AuthContext";
 import { KeysProvider } from "./contexts/KeysContext";
-import { BookProvider } from "./contexts/BookContext";
 
 import Layout from "./pages/Layout";
 import HomePage from "./pages/HomePage";
@@ -21,7 +20,6 @@ export default function App() {
             <SessionProvider>
                 <BrowserRouter>
                     <AuthProvider>
-                        <BookProvider>
                             <Routes>
                                 <Route path="*" element={<Layout />} />
                                 <Route path="/" element={<HomePage />} />
@@ -37,7 +35,6 @@ export default function App() {
                                     }
                                 />
                             </Routes>
-                        </BookProvider>
                     </AuthProvider>
                 </BrowserRouter>
             </SessionProvider>

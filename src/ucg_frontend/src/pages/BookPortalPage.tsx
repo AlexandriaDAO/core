@@ -9,8 +9,9 @@ import PortalFilter from "@/features/portal-filter";
 import { Pagination, PaginationProps } from "antd";
 import BookModal from "@/features/categories/components/BookModal";
 import { fetchTransactions } from "@/features/irys/query-package/query";
-import { BookProvider, useBook } from "@/contexts/BookContext";
-
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from "@/store";
+import { setSelectedBook, setIsModalOpen } from '@/features/home/homeSlice';
 
 const ITEMS_PER_PAGE = 18;
 
@@ -24,11 +25,12 @@ interface Book {
 
 function BookPortalPageContent() {
     const [books, setBooks] = useState<Book[]>([]);
-    // const [selectedBook, setSelectedBook] = useState<Book | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-		const { selectedBook, setSelectedBook } = useBook();
-
+    
+    const dispatch = useDispatch();
+    const { selectedBook, isModalOpen } = useSelector((state: RootState) => state.home);
+    
     useEffect(() => {
         const loadBooks = async () => {
             const transactions = await fetchTransactions();
@@ -46,9 +48,11 @@ function BookPortalPageContent() {
 
     const handleBookClick = (book: Book) => {
         if (selectedBook && selectedBook.key === book.key) {
-            setSelectedBook(null);
+            dispatch(setSelectedBook(null));
+            dispatch(setIsModalOpen(false));
         } else {
-            setSelectedBook(book);
+            dispatch(setSelectedBook(book));
+            dispatch(setIsModalOpen(true));
         }
     };
 
@@ -123,13 +127,13 @@ function BookPortalPageContent() {
             content.push(bookCard);
 
             if ((i + 1) % 6 === 0 || i === paginatedBooks.length - 1) {
-                if (selectedBook && !insertedModal) {
+                if (selectedBook && isModalOpen && !insertedModal) {
                     const selectedBookIndex = paginatedBooks.findIndex(
                         (b) => b.key === selectedBook.key
                     );
                     const rowStart = Math.floor(selectedBookIndex / 6) * 6;
                     const rowEnd = rowStart + 5;
-
+    
                     if (i >= rowStart && i <= rowEnd) {
                         content.push(
                             <div
@@ -196,9 +200,7 @@ function BookPortalPageContent() {
 
 	function BookPortalPage() {
     return (
-        <BookProvider>
             <BookPortalPageContent />
-        </BookProvider>
     );
 }
 export default BookPortalPage;
