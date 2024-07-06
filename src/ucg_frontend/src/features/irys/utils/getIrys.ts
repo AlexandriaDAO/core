@@ -20,7 +20,6 @@
 
     const pubKey = cleanEnvVar(process.env.ETH_PUBLIC_KEY);
     const privateKey = cleanEnvVar(process.env.ETH_PRIVATE_KEY);
-    
     // const pubKey = "0xeDa20F6d64944Ad132dE51927Ae1A32cFCDD8998";
     // const privateKey = "1bda3c9bf8b1170093b4339835c01273766f30ec64077c07a7e174b0f67c5636";
   

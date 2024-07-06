@@ -24,7 +24,7 @@ const performSearch = createAsyncThunk<
 
         const config:any = {
             attributesToHighlight: ['text', 'title'],
-            highlightPreTag: '<span class="bg-yellow-300">',
+            highlightPreTag: '<span style="background:yellow;">',
             highlightPostTag: '</span>',
         }
 

@@ -17,6 +17,7 @@ import ContentList from "./ContentList";
 import { Setting } from "./Setting";
 import { CardList } from "./CardList";
 import FontSizeButton from "./lib/components/FontSizeButton";
+import { EpubCFI } from "epubjs";
 
 export type IReaderProps = {
 	title?: string;
@@ -27,6 +28,8 @@ export type IReaderProps = {
 
 	showSidebar?: boolean;
 	showToolbar?: Boolean;
+
+	cfi?: string;
 
 	external?: (() => void) | null;
 };
@@ -42,9 +45,12 @@ export const Reader: React.FC<IReaderProps> = ({
 
 	showSidebar = true,
 	showToolbar = true,
+
+	cfi= '',
+
 	external = null,
 }: IReaderProps) => {
-	const { url, setUrl, book, rendition, bookLocation, currentPage, totalPages, percentage, metadata } = useReader();
+	const { url, setUrl, book, rendition, firstPageLoaded, setCurrentLocation, bookLocation, currentPage, totalPages, percentage, metadata } = useReader();
 
 	// bookLocation is used for Full Screen
 
@@ -74,6 +80,33 @@ export const Reader: React.FC<IReaderProps> = ({
 			}
 		};
 	}, []);
+
+	useEffect(() => {
+		// rendition not available
+		if (!rendition || !rendition.current) return;
+
+		// book is not yet loaded
+		if (!firstPageLoaded) return;
+
+		// no default location/cfi is provided
+		if (cfi == '') return;
+
+		rendition.current.display(cfi).then(()=>{
+			// rendition is not available or maybe destroyed
+			if(!rendition || !rendition.current) return;
+
+			setCurrentLocation(rendition.current.location);
+
+			// Highlight the text
+			const range = rendition.current.getRange(cfi);
+			if (range && range.startContainer.nodeType === Node.ELEMENT_NODE) {
+				(range.startContainer as HTMLElement).style.color = 'red';
+			} else {
+				console.error('Range not found for CFI:', cfi);
+			}
+		});
+
+	}, [cfi, firstPageLoaded, setCurrentLocation]);
 
 	return (
 		<div

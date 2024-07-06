@@ -46,6 +46,9 @@ export interface IReaderState {
 	isLoaded: Boolean;
 	setIsLoaded: Dispatch<SetStateAction<Boolean>>;
 
+	firstPageLoaded: Boolean;
+	setFirstPageLoaded: Dispatch<SetStateAction<Boolean>>;
+
 	chapters: NavItem[];
 	setChapters: Dispatch<SetStateAction<NavItem[]>>;
 
@@ -88,6 +91,8 @@ export const useReaderState = (): IReaderState => {
 	const bookLocation = useRef<HTMLDivElement>(null);
 
 	const [isLoaded, setIsLoaded] = useState<Boolean>(false);
+
+	const [firstPageLoaded, setFirstPageLoaded] = useState<Boolean>(false);
 
 	const [chapters, setChapters] = useState<NavItem[]>([]);
 
@@ -134,7 +139,11 @@ export const useReaderState = (): IReaderState => {
 			// console.log(newRendition.location);
 			newRendition.display(newRendition.location?.start.cfi);
 
-			setCurrentLocation(newRendition.location);
+			newRendition.on('rendered', ()=>{
+				setCurrentLocation(newRendition.location);
+
+				setFirstPageLoaded(true);
+			})
 		}
 	}, [isLoaded]);
 
@@ -208,8 +217,13 @@ export const useReaderState = (): IReaderState => {
 
 		renderLocation,
 		bookLocation,
+
 		isLoaded,
 		setIsLoaded,
+
+		firstPageLoaded,
+		setFirstPageLoaded,
+
 		chapters,
 		setChapters,
 

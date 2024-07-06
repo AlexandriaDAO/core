@@ -45,7 +45,7 @@ const NodeItem = ({ node }: NodeItemProps) => {
 
 	const [wallet, setWallet] = useState<Wallet | null>(null);
 	const [webIrys, setWebIrys] = useState<WebIrys | null>(null);
-	const [balance, setBalance] = useState<number | null>(null);
+	const [balance, setBalance] = useState<number | null | undefined>(null);
 	const [amount, setAmount] = useState("0.0001");
 	const [loading, setLoading] = useState(false);
 
@@ -61,8 +61,18 @@ const NodeItem = ({ node }: NodeItemProps) => {
 		if (!wallet) return;
 
 		const setIrys = async () => {
-			const irys = await getSimpleWebIrys(wallet);
-			setWebIrys(irys);
+			try{
+				const irys = await getSimpleWebIrys(wallet);
+				setWebIrys(irys);
+			}catch(error){
+				if (error instanceof Error) {
+					message.error(error.message);
+				}else{
+					console.log('error loading irys', error);
+					message.error('unable to load wallet')
+				}
+				setBalance(undefined);
+			}
 		};
 
 		setIrys();
@@ -72,12 +82,23 @@ const NodeItem = ({ node }: NodeItemProps) => {
 		if (!webIrys) return;
 		setBalance(null);
 
-		const atomicBalance = await webIrys.getLoadedBalance();
+		try{
+			const atomicBalance = await webIrys.getLoadedBalance();
 
-		const convertedBalance = parseFloat(
-			webIrys.utils.fromAtomic(atomicBalance).toString()
-		);
-		setBalance(convertedBalance);
+			const convertedBalance = parseFloat(
+				webIrys.utils.fromAtomic(atomicBalance).toString()
+			);
+
+			setBalance(convertedBalance);
+		}catch(error){
+			if (error instanceof Error) {
+				message.error(error.message);
+			}else{
+				console.log('error loading balalnce', error);
+				message.error('unable to load balance')
+			}
+			setBalance(undefined);
+		}
 	};
 	useEffect(() => {
 		fetchBalance();
@@ -141,14 +162,10 @@ const NodeItem = ({ node }: NodeItemProps) => {
 				</div>
 
 				<span className="font-bold">
-					{balance === null ? (
-						<ImSpinner8
-							size={14}
-							className="animate animate-spin"
-						/>
-					) : (
-						balance + "ETH"
-					)}
+					{ balance === null ?
+						<ImSpinner8 size={14} className="animate animate-spin" />:
+						balance === undefined ? "NA" : (balance + "ETH")
+					}
 				</span>
 			</div>
 
@@ -157,10 +174,10 @@ const NodeItem = ({ node }: NodeItemProps) => {
 				<div className="flex gap-2">
 					<div className="relative flex justify-between items-center">
 						<input
-							disabled={loading}
+							disabled={loading || balance === null || balance === undefined}
 							type="number"
 							step="0.0001"
-							className={`py-1 pl-3 pr-10 text-text rounded-md border border-solid border-gray-300 shadow-sm ${loading ? 'bg-gray-200 cursor-not-allowed':'bg-white'}`}
+							className={`py-1 pl-3 pr-10 text-text rounded-md border border-solid border-gray-300 shadow-sm ${loading || balance === null || balance === undefined ? 'bg-gray-200 cursor-not-allowed':'bg-white'}`}
 							placeholder="0,0000"
 							value={amount}
 							onChange={(e) => setAmount(e.target.value)}
@@ -169,10 +186,10 @@ const NodeItem = ({ node }: NodeItemProps) => {
 					</div>
 
 					<button
-						disabled={loading}
+						disabled={loading|| balance === null || balance === undefined}
 						onClick={fundNode}
 						className={` text-white font-medium px-4 py-1 rounded ${
-							loading ? "cursor-not-allowed bg-gray-500" : "cursor-pointer bg-black"
+							loading|| balance === null || balance === undefined ? "cursor-not-allowed bg-gray-500" : "cursor-pointer bg-black"
 						}`}
 					>
 						{loading ? (
@@ -183,7 +200,7 @@ const NodeItem = ({ node }: NodeItemProps) => {
 									className="animate animate-spin"
 								/>
 							</span>
-						) : (
+						) : balance === null || balance === undefined ? "Disabled" : (
 							"Fund Node"
 						)}
 					</button>

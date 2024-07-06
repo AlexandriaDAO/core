@@ -1,4 +1,3 @@
-import DDC from "@/data/categories";
 import { setSelectedSearchedBook } from "@/features/home/homeSlice";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -6,9 +5,10 @@ import React, { useState } from "react";
 import { BiBookAlt, BiPlus } from "react-icons/bi";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { SlEye, SlPlus } from "react-icons/sl";
+import { getSubTypes, getTypes } from "../utils/properties";
 
 // Assuming the structure of your item includes `id`, `title`, and `description`
-interface Item {
+export interface BookCardItem {
 	id: string;
 	cfi: string;
 	text: string;
@@ -18,11 +18,12 @@ interface Item {
 	type: Array<number>;
 	subtype: Array<number>;
 	pubyear: number;
-	_formatted: Item
+	asset_id: string;
+	_formatted: BookCardItem
 }
 
 interface Props {
-	item: Item;
+	item: BookCardItem;
 }
 
 const Card: React.FC<Props> = ({ item }) => {
@@ -49,39 +50,6 @@ const Card: React.FC<Props> = ({ item }) => {
 			dispatch(setSelectedSearchedBook(null));
 		else dispatch(setSelectedSearchedBook(item));
 	};
-	const getTypes = () => {
-		const types = item.type
-			.map((type) => DDC[type])
-			.filter((type) => type !== undefined);
-		return types.map(({ type }, index, arr) => (
-			<React.Fragment key={type}>
-				<span className="font-roboto-condensed text-sm font-bold">
-					{type}
-				</span>
-				{index < arr.length - 1 && ( // Only add a dot if it's not the last item
-					<span className="font-roboto-condensed text-sm font-bold">
-						.
-					</span>
-				)}
-			</React.Fragment>
-		));
-	};
-
-	const getSubTypes = () => {
-		const subtypeTexts:Array<string> = [];
-
-		// Iterate over each type
-		Object.values(DDC).forEach(type => {
-			// Check each subtype in the category
-			Object.entries(type.category).forEach(([key, value]) => {
-			if (item.subtype.includes(parseInt(key))) {
-				subtypeTexts.push(value);
-			}
-			});
-		});
-
-		return subtypeTexts;
-	}
 
 	return (
 		<div className="p-4 text-black shadow-xl border border-solid rounded-lg bg-white transition-all duration-500 flex gap-1 flex-col justify-center items-stretch">
@@ -106,7 +74,18 @@ const Card: React.FC<Props> = ({ item }) => {
 							</span>
 							<div className="flex flex-wrap items-center gap-2">
 								<div className="flex justify-start flex-wrap item-center gap-2">
-									{getTypes()}
+									{getTypes(item.type).map(({ type }, index, arr)=>(
+										<React.Fragment key={type}>
+											<span className="font-roboto-condensed text-sm font-bold">
+												{type}
+											</span>
+											{index < arr.length - 1 && ( // Only add a dot if it's not the last item
+												<span className="font-roboto-condensed text-sm font-bold">
+													.
+												</span>
+											)}
+										</React.Fragment>
+									))}
 								</div>
 							</div>
 						</div>
@@ -123,7 +102,7 @@ const Card: React.FC<Props> = ({ item }) => {
 						</div>
 					</div>
 					<div className="flex justify-start flex-wrap item-center gap-2">
-						{getSubTypes().map((subType) => (
+						{getSubTypes(item.subtype).map((subType) => (
 							<div
 								key={subType}
 								className="truncate px-4 py-1 flex justify-center items-center border border-black rounded-full font-roboto-condensed text-sm font-normal cursor-pointer hover:bg-black hover:text-white transition-all duration-300 ease-in"

@@ -62,7 +62,7 @@ function ManagerPage() {
 				</div>
 
 				<div className="flex-grow flex flex-col gap-4">
-					{showProfile && <LibrarianProfile />}
+					{user !== "" && showProfile && <LibrarianProfile />}
 
 					{activeEngine ? <EngineOverview /> : <PublicEngines />}
 				</div>
