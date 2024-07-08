@@ -119,5 +119,11 @@ dfx deploy icrc7_archive --specified-id forhl-tiaaa-aaaak-qc7ga-cai --argument '
 dfx deploy ucg_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
-dfx deploy ucg_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
 dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
+
+cd ./.dfx/
+rm -rf local/canisters/
+cp -r ic/canisters/ local/
+cd ..
+
+dfx deploy ucg_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai

@@ -7,6 +7,7 @@ export async function fetchTransactions() {
     .tags([
       { name: "Content-Type", values: ["application/epub+zip"] },
       { name: "application-id", values: ["UncensoredGreats"] },
+      // { name: "minting_number", values: ["1"] },
     ])    
     .sort("ASC")
     .limit(20);

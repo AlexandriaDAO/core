@@ -39,22 +39,6 @@ function BookPortalPageContent() {
     const dispatch = useDispatch();
     const { selectedBook, isModalOpen } = useSelector((state: RootState) => state.home);
     
-    // useEffect(() => {
-    //     const loadBooks = async () => {
-    //         const transactions = await fetchTransactions();
-    //         const formattedBooks: Book[] = transactions.map((transaction, index) => ({
-    //             key: index + 1,
-    //             title: transaction.tags.find(tag => tag.name === "title")?.value || "Unknown Title",
-    //             author: transaction.tags.find(tag => tag.name === "author")?.value || "Unknown Author",
-    //             image: "default-book.png",
-    //             transactionId: transaction.id,
-    //             tags: transaction.tags
-    //         }));
-    //         setBooks(formattedBooks);
-    //     };
-    //     loadBooks();
-    // }, []);
-
     async function getCoverUrl(transactionId: string): Promise<string | null> {
         try {
           const bookUrl = `https://node1.irys.xyz/${transactionId}`;

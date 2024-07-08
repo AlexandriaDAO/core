@@ -124,7 +124,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ ucgActor, icrc7Actor, UID, accountIdentifier, balanceE8s, login, logout  }}>
+    <AuthContext.Provider value={{ ucgActor, icrc7Actor, UID, accountIdentifier, balanceE8s, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

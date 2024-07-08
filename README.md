@@ -1,3 +1,5 @@
+### Latest network deploy commit hash: ee8e39eec223d7d4f484b346d22ee3859d12b032
+
 ## Running the project locally
 
 run `./build.sh`
