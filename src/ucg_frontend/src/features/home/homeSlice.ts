@@ -1,46 +1,83 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// Define the interface for your portal state
-interface HomeState {
-	filter: boolean;
-
-    selectedCategory: any;
-    selectedBook: any;
-	selectedSearchedBook: any;
+interface Book {
+    key: number;
+    title: string;
+    author: string;
+    image: string;
+    transactionId: string;
+		bookUrl?: string;
 }
 
-// Define the initial state using the PortalState interface
+interface HomeState {
+    filter: boolean;
+    selectedCategory: any;
+    selectedBook: Book | null;
+    selectedSearchedBook: any;
+    isModalOpen: boolean;
+    bookUrl: string | null;
+}
+
 const initialState: HomeState = {
-	filter: false,
-
-    selectedCategory : null,
-    selectedBook : null,
-    selectedSearchedBook : null,
-
+    filter: false,
+    selectedCategory: null,
+    selectedBook: null,
+    selectedSearchedBook: null,
+    isModalOpen: false,
+    bookUrl: null,
 };
 
 const homeSlice = createSlice({
-	name: "portal",
-	initialState,
-	reducers: {
-		// You can add reducers here for other actions, such as updating the view or limit
-		setFilter: (state, action: PayloadAction<boolean>) => {
-			state.filter = action.payload;
-		},
-
+    name: "home",
+    initialState,
+    reducers: {
+        setFilter: (state, action: PayloadAction<boolean>) => {
+            state.filter = action.payload;
+        },
         setSelectedCategory: (state, action: PayloadAction<any>) => {
-			state.selectedCategory = action.payload;
-		},
+            state.selectedCategory = action.payload;
+        },
+        // setSelectedBook: (state, action: PayloadAction<Book | null>) => {
+        //     state.selectedBook = action.payload;
+        //     state.bookUrl = action.payload 
+        //         ? `https://node1.irys.xyz/${action.payload.transactionId}`
+        //         : null;
+        // },
+				setSelectedBook: (state, action: PayloadAction<Book | null>) => {
+					// Reset the state before setting the new book
+					state.selectedBook = null;
+					state.bookUrl = null;
 
-        setSelectedBook: (state, action: PayloadAction<any>) => {
-			state.selectedBook = action.payload;
-		},
+					// Set the new book if provided
+					if (action.payload) {
+							state.selectedBook = action.payload;
+							state.bookUrl = `https://node1.irys.xyz/${action.payload.transactionId}`;
+							state.isModalOpen = true;
+					} else {
+							state.isModalOpen = false;
+					}
+			},
         setSelectedSearchedBook: (state, action: PayloadAction<any>) => {
-			state.selectedSearchedBook = action.payload;
-		},
-	},
+            state.selectedSearchedBook = action.payload;
+        },
+        setIsModalOpen: (state, action: PayloadAction<boolean>) => {
+            state.isModalOpen = action.payload;
+        },
+        resetBookState: (state) => {
+					state.selectedBook = null;
+					state.bookUrl = null;
+					state.isModalOpen = false;
+				},
+    },
 });
 
-export const { setFilter, setSelectedCategory, setSelectedBook, setSelectedSearchedBook } = homeSlice.actions;
+export const { 
+    setFilter, 
+    setSelectedCategory, 
+    setSelectedBook, 
+    setSelectedSearchedBook,
+    setIsModalOpen,
+		resetBookState
+} = homeSlice.actions;
 
 export default homeSlice.reducer;

@@ -11,120 +11,124 @@ import { removeNewLines, titleToFileName } from "@/utils/Portal";
 import { deleteAsset, deleteDoc, listDocs } from "@junobuild/core";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import BookModal from "@/components/BookModal";
-import { useBook } from "@/contexts/BookContext";
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/store';
+import { setSelectedBook, setIsModalOpen } from '@/features/home/homeSlice';
+
 
 const Card = ({ item }: any) => {
 	const { data: bookData } = item;
-	const { setSelectedBook } = useBook();
+	const dispatch = useDispatch();
+	const { isModalOpen } = useSelector((state: RootState) => state.home);
 	const bookAreaRef = useRef(null);
 
 	const [book, setBook] = useState<any>(null);
 	const [deleting, setDeleting] = useState(false);
 	const [contents, setContents] = useState<any>([]);
 	const [cover, setCover] = useState<any>(null);
-	const [isBookModalVisible, setIsBookModalVisible] = useState(false);
 
 	useEffect(() => {
-		if (bookAreaRef.current) {
-			try {
-				let onlineBook = Epub(bookData.url, { openAs: "epub" });
-				// Render the book off-scr`een or hidden
-				onlineBook.renderTo(bookAreaRef.current, {
-					width: 0,
-					height: 0,
-				});
-				setBook(onlineBook);
-			} catch (error) {
-				console.error("error", error);
+			if (bookAreaRef.current) {
+					try {
+							let onlineBook = Epub(bookData.url, { openAs: "epub" });
+							// Render the book off-screen or hidden
+							onlineBook.renderTo(bookAreaRef.current, {
+									width: 0,
+									height: 0,
+							});
+							setBook(onlineBook);
+					} catch (error) {
+							console.error("error", error);
+					}
 			}
-		}
 	}, []);
 
 	useEffect(() => {
-		setContents([]);
-		setCover(null);
+			setContents([]);
+			setCover(null);
 
-		if (book) {
-			book.coverUrl().then((cover: any) => setCover(cover));
+			if (book) {
+					book.coverUrl().then((cover: any) => setCover(cover));
 
-			book.loaded.spine.then(async (spine: any) => {
-				const contents: any = [];
+					book.loaded.spine.then(async (spine: any) => {
+							const contents: any = [];
 
-				for (let item of (spine as any).items) {
-					if (!item.href) return;
-					const doc = await book.load(item.href);
-					const innerHTML = (doc as Document).documentElement
-						.innerHTML;
-					const parsedDoc = new DOMParser().parseFromString(
-						innerHTML,
-						"text/html"
-					);
+							for (let item of (spine as any).items) {
+									if (!item.href) return;
+									const doc = await book.load(item.href);
+									const innerHTML = (doc as Document).documentElement
+											.innerHTML;
+									const parsedDoc = new DOMParser().parseFromString(
+											innerHTML,
+											"text/html"
+									);
 
-					const paragraphs = parsedDoc.querySelectorAll("p");
+									const paragraphs = parsedDoc.querySelectorAll("p");
 
-					paragraphs.forEach((paragraph) => {
-						const text = paragraph.textContent?.trim() ?? "";
-						if (text.length < 1) return;
+									paragraphs.forEach((paragraph) => {
+											const text = paragraph.textContent?.trim() ?? "";
+											if (text.length < 1) return;
 
-						const cfi = new EpubCFI(paragraph, item.cfiBase);
-						const content: any = {
-							cfi,
-							text: removeNewLines(text),
-						};
-						contents.push(content);
+											const cfi = new EpubCFI(paragraph, item.cfiBase);
+											const content: any = {
+													cfi,
+													text: removeNewLines(text),
+											};
+											contents.push(content);
+									});
+							}
+
+							setContents(contents);
 					});
-				}
-
-				setContents(contents);
-			});
-		}
+			}
 	}, [book]);
 
 	const handleQuickView = () => {
-		setSelectedBook({
-				key: item.key,
-				title: bookData.title,
-				author: bookData.author,
-				image: cover,
-				transactionId: bookData.url.split("icp0.io")[1],
-		});
-		setIsBookModalVisible(true);
+			dispatch(setSelectedBook({
+					key: item.key,
+					title: bookData.title,
+					author: bookData.author,
+					image: cover,
+					transactionId: bookData.url.split("icp0.io")[1],
+					bookUrl: `https://node1.irys.xyz/${bookData.url.split("icp0.io")[1]}`,
+			}));
+			dispatch(setIsModalOpen(true));
 	};
 
 	const deleteBook = async () => {
-		setDeleting(true);
+			setDeleting(true);
 
-		try {
-			const books = await listDocs({
-				collection: "books",
-			});
-			let related: any = [];
-			if (books.items.length > 0) {
-				related = books.items.filter(
-					(book: any) => book.data.url == bookData.url
-				);
+			try {
+					const books = await listDocs({
+							collection: "books",
+					});
+					let related: any = [];
+					if (books.items.length > 0) {
+							related = books.items.filter(
+									(book: any) => book.data.url == bookData.url
+							);
+					}
+
+					if (related.length <= 1) {
+							await deleteAsset({
+									collection: "uploads",
+									fullPath: bookData.url.split("icp0.io")[1],
+							});
+					}
+
+					await deleteDoc({
+							collection: "books",
+							doc: item,
+					});
+
+					alert("book deleted");
+					window.location.reload();
+			} catch (error) {
+					alert("an error occurred while deleting");
+					console.error(error);
+			} finally {
+					setDeleting(false);
 			}
-
-			if (related.length <= 1) {
-				await deleteAsset({
-					collection: "uploads",
-					fullPath: bookData.url.split("icp0.io")[1],
-				});
-			}
-
-			await deleteDoc({
-				collection: "books",
-				doc: item,
-			});
-
-			alert("book deleted");
-			window.location.reload();
-		} catch (error) {
-			alert("an error occured while deleting");
-			console.error(error);
-		} finally {
-			setDeleting(false);
-		}
 	};
 
 	return (
@@ -172,15 +176,14 @@ const Card = ({ item }: any) => {
             </button>
 					<Modal
 						centered
-						open={isBookModalVisible}
-						onCancel={() => setIsBookModalVisible(false)}
+						open={isModalOpen}
+						onCancel={() => setIsModalOpen(false)}
 						footer={null}
 						closable={false}
 						width={"70rem"}
 						// width={'md:aspect-video aspect-[3/4] w-full h-full'}
 						classNames={{ content: "!p-0" }}
 					>
-						{/* <BookModal bookUrl={bookData.url} /> */}
 						<BookModal />
 					</Modal>
 				</div>

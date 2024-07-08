@@ -10,7 +10,7 @@ interface UploadReceipt {
 
 async function getReceipt(txId: string): Promise<UploadReceipt> {
 	try {
-		const network = process.env.NEXT_PUBLIC_NETWORK || "devnet";
+		const network = process.env.NEXT_PUBLIC_NETWORK || "mainnet";
 
 		const myQuery = new Query({ network });
 		const queryResults = await myQuery.search("irys:transactions");
