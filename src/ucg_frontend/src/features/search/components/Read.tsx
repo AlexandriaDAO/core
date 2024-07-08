@@ -5,17 +5,12 @@ import { SlEye, SlPlus } from "react-icons/sl";
 import { RxCross2 } from "react-icons/rx";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import BookModal from "@/components/BookModal";
-
-interface Item {
-	id: number;
-	title: string;
-	description: string;
-	image: string;
-}
+import { BookCardItem } from "./Card";
+import { getSubTypes, getTypes } from "../utils/properties";
+import BookModal from "./BookModal";
 
 interface Props {
-	item: Item;
+	item: BookCardItem;
 }
 
 const Read: React.FC<Props> = ({ item }) => {
@@ -51,28 +46,30 @@ const Read: React.FC<Props> = ({ item }) => {
                         <div
                             className="basis-[180px] flex-shrink-0 h-64"
                             style={{
-                                backgroundImage: `url(images/categories/${item.image})`,
+                                // backgroundImage: `url(images/categories/${item.image})`,
+        						backgroundImage: `url(https://picsum.photos/300/100)`,
                             }}
                         ></div>
                         <div className="flex-grow flex flex-col justify-between px-2 gap-2">
                             <div className="flex justify-between">
                                 <div className="flex flex-col">
                                     <span className="font-roboto-condensed text-xl font-medium">
-                                        ingo swann
+                                        {item.author}
                                     </span>
                                     <span className="font-syne text-2xl font-semibold">
-                                        Penetration
+                                        {item.title}
                                     </span>
                                     <span className="font-roboto-condensed text-sm font-normal text-[#8E8E8E]">
-                                        Non Fiction 2011
+                                        {item.fiction ? "Fiction" : "Non Fiction"}{" "}
+                                        &nbsp; {item.pubyear ? item.pubyear : ""}
                                     </span>
                                     <div className="flex flex-wrap items-center gap-2">
                                         <div className="flex justify-start flex-wrap item-center gap-2">
-                                            {["RELIGION", "GENERALITIES AND IT"].map(
-                                                (category, index, arr) => (
-                                                    <React.Fragment key={category}>
+                                            {getTypes(item.type).map(
+                                                ({type}, index, arr) => (
+                                                    <React.Fragment key={type}>
                                                         <span className="font-roboto-condensed text-sm font-bold">
-                                                            {category}
+                                                            {type}
                                                         </span>
                                                         {index < arr.length - 1 && ( // Only add a dot if it's not the last item
                                                             <span className="font-roboto-condensed text-sm font-bold">
@@ -87,14 +84,9 @@ const Read: React.FC<Props> = ({ item }) => {
                                 </div>
                             </div>
                             <div className="flex justify-start flex-wrap item-center gap-2">
-                                {[
-                                    "Metaphysics",
-                                    "Natural Theology",
-                                    "Fossils & prehistoric life",
-                                    "Classical and modern Greek literatures",
-                                ].map((subCategory) => (
+                                {getSubTypes(item.subtype).map((subType) => (
                                     <div className="truncate px-4 py-1 flex justify-center items-center border border-black rounded-full font-roboto-condensed text-sm font-normal cursor-pointer hover:bg-black hover:text-white transition-all duration-300 ease-in">
-                                        {subCategory}
+                                        {subType}
                                     </div>
                                 ))}
                             </div>
@@ -109,7 +101,7 @@ const Read: React.FC<Props> = ({ item }) => {
                 </div>
 
                 <div className="flex-grow font-roboto-condensed font-normal text-xl max-h-72 p-2 overflow-auto">
-                    {item.description}
+                    {item.text}
                 </div>
                 <div className="flex flex-col gap-2">
                     <RxCross2

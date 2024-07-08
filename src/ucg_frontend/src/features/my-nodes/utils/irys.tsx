@@ -9,21 +9,35 @@ export const getSimpleWebIrys = async (wallet: Wallet | null = null) => {
 	}
 
 	// Assuming metamask is installed, handle case otherwise
-	//@ts-ignore
-	const provider = new ethers.BrowserProvider(window.ethereum);
+	// let provider = ethers.getDefaultProvider();
+	let provider = null;
 
-	const irys = new WebIrys({
-		network: "mainnet",
-		token: "ethereum",
-		wallet: {
-			name: "ethersv6",
-			provider,
-		},
-	});
+    //@ts-ignore
+	if (window.ethereum) {
+		//@ts-ignore
+		provider = new ethers.BrowserProvider(window.ethereum);
+	}else{
+		throw new Error("MetaMask not installed")
+	}
 
-	await irys.ready();
+	try{
+		const irys = new WebIrys({
+			network: "mainnet",
+			token: "ethereum",
+			wallet: {
+				name: "ethersv6",
+				provider,
+			},
+		});
 
-	return irys;
+		await irys.ready();
+
+		return irys;
+	}catch(error){
+		console.log(error);
+	}
+
+	throw new Error('Unable to connect to wallet')
 };
 
 
