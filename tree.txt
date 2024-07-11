@@ -1,6 +1,5 @@
 ├── .idea/
 │   ├── core.iml
-│   ├── misc.xml
 │   ├── modules.xml
 │   ├── vcs.xml
 │   ├── workspace.xml
@@ -8,7 +7,10 @@
 ├── Cargo.toml
 ├── Technical Whitepaper.docx
 ├── Technical Whitepaper.docx:Zone.Identifier
+├── assetstorage.did
+├── build.sh
 ├── canister_ids.json
+├── chad.sh
 ├── deploy.txt
 ├── deps/
 │   ├── candid/
@@ -16,118 +18,110 @@
 │   ├── init.json
 │   └── pulled.json
 ├── dfx.json
+├── dfx_local.json
+├── dfx_mainnet.json
+├── keys.json
+├── network_build.sh
 ├── postcss.config.js
 ├── scripts/
 │   └── build-local.sh
+├── setup.md
 ├── src/
 │   ├── bookmarks/
 │   │   ├── Cargo.toml
 │   │   ├── backend.txt
 │   │   ├── bookmarks.did
 │   │   └── src/
+│   │       ├── folders.rs
 │   │       ├── lib.rs
 │   │       ├── queries.rs
+│   │       ├── storage.rs
 │   │       ├── updates.rs
 │   │       └── utils.rs
 │   ├── icp_swap/
 │   │   ├── Cargo.toml
 │   │   ├── icp_swap.did
 │   │   └── src/
+│   │       ├── guard.rs
+│   │       ├── lib.rs
+│   │       ├── queries.rs
+│   │       ├── script.rs
+│   │       ├── storage.rs
+│   │       ├── update.rs
+│   │       └── utils.rs
+│   ├── icrc7/
+│   │   ├── Cargo.toml
+│   │   ├── icrc7.did
+│   │   └── src/
+│   │       ├── archive.rs
+│   │       ├── candid_file_generator.rs
+│   │       ├── cycles.rs
+│   │       ├── errors.rs
+│   │       ├── guards.rs
+│   │       ├── icrc37_query_method.rs
+│   │       ├── icrc37_types.rs
+│   │       ├── icrc37_update_method.rs
+│   │       ├── icrc3_query_method.rs
+│   │       ├── icrc3_types.rs
+│   │       ├── icrc7_types.rs
+│   │       ├── init_method.rs
+│   │       ├── lib.rs
+│   │       ├── memory.rs
+│   │       ├── query_method.rs
+│   │       ├── state.rs
+│   │       ├── update_method.rs
+│   │       └── utils.rs
+│   ├── icrc7_archive/
+│   │   ├── Cargo.toml
+│   │   ├── icrc7_archive.did
+│   │   ├── src/
+│   │   │   ├── candid_file_generator.rs
+│   │   │   ├── cycles.rs
+│   │   │   ├── guards.rs
+│   │   │   ├── init_method.rs
+│   │   │   ├── lib.rs
+│   │   │   ├── query_method.rs
+│   │   │   ├── state.rs
+│   │   │   ├── types.rs
+│   │   │   └── update_method.rs
+│   │   └── wasm/
+│   │       ├── icrc7_archive.did
+│   │       ├── icrc7_archive.wasm
+│   │       └── icrc7_archive.wasm.gz
+│   ├── icrc7_types/
+│   │   ├── Cargo.toml
+│   │   └── src/
+│   │       ├── errors.rs
+│   │       ├── icrc37_types.rs
+│   │       ├── icrc3_types.rs
+│   │       ├── icrc7_types.rs
 │   │       └── lib.rs
+│   ├── tokenomics/
+│   │   ├── Cargo.toml
+│   │   ├── src/
+│   │   │   ├── guard.rs
+│   │   │   ├── lib.rs
+│   │   │   ├── queries.rs
+│   │   │   ├── storage.rs
+│   │   │   └── update.rs
+│   │   └── tokenomics.did
 │   ├── ucg_backend/
 │   │   ├── Cargo.toml
-│   │   ├── backend.did
-│   │   └── src/
-│   │       ├── engine.rs
-│   │       ├── lib.rs
-│   │       ├── meilisearch.rs
-│   │       ├── source_cards.rs
+│   │   ├── src/
+│   │   │   ├── engine.rs
+│   │   │   ├── lib.rs
+│   │   │   ├── librarian.rs
+│   │   │   ├── nft.rs
+│   │   │   ├── node.rs
+│   │   │   ├── source_cards.rs
+│   │   │   ├── utils.rs
+│   │   │   └── wallet_keys.rs
+│   │   └── ucg_backend.did
 │   ├── ucg_frontend/
 │   │   ├── src/
 │   │   │   ├── App.tsx
 │   │   │   ├── RatingCard/
 │   │   │   │   └── RatingCard.tsx
-│   │   │   ├── Reader/
-│   │   │   │   ├── ContentView/
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   └── style.ts
-│   │   │   │   ├── Drawer/
-│   │   │   │   │   ├── Annotations/
-│   │   │   │   │   │   ├── Accordion.tsx
-│   │   │   │   │   │   ├── ColorSelector.tsx
-│   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   └── style.ts
-│   │   │   │   │   ├── Bookmarks/
-│   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   └── style.ts
-│   │   │   │   │   ├── Search/
-│   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   └── style.ts
-│   │   │   │   │   ├── Setting/
-│   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   └── style.ts
-│   │   │   │   │   ├── TableOfContents/
-│   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   └── style.ts
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   └── style.ts
-│   │   │   │   ├── Sidebar/
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   └── style.ts
-│   │   │   │   ├── Toolbar/
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   └── style.ts
-│   │   │   │   ├── index.tsx
-│   │   │   │   ├── lib/
-│   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── AnnotationItem/
-│   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   ├── BookmarkItem/
-│   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   ├── BookmarkToggle/
-│   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   ├── FullScreenToggle/
-│   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   ├── ScrollToggle/
-│   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   ├── SearchItem/
-│   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   ├── SidebarItem.tsx
-│   │   │   │   │   │   ├── Spinner.tsx
-│   │   │   │   │   │   ├── ThemeToggle/
-│   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   └── TocItem/
-│   │   │   │   │   │       ├── index.tsx
-│   │   │   │   │   │       └── style.ts
-│   │   │   │   │   ├── contexts/
-│   │   │   │   │   │   └── ReaderContext.tsx
-│   │   │   │   │   ├── hooks/
-│   │   │   │   │   │   ├── useAnnotationState.tsx
-│   │   │   │   │   │   ├── useBookmarkState.tsx
-│   │   │   │   │   │   ├── useReaderContext.tsx
-│   │   │   │   │   │   ├── useReaderState/
-│   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   └── useContentState.tsx
-│   │   │   │   │   │   ├── useSearchDrawer.tsx
-│   │   │   │   │   │   ├── useSearchState.tsx
-│   │   │   │   │   │   ├── useSidebarState.tsx
-│   │   │   │   │   │   └── useSnackbar.tsx
-│   │   │   │   │   ├── providers/
-│   │   │   │   │   │   └── ReaderProvider.tsx
-│   │   │   │   │   └── utils/
-│   │   │   │   │       ├── annotations.ts
-│   │   │   │   │       ├── date.ts
-│   │   │   │   │       ├── index.ts
-│   │   │   │   │       ├── search.ts
-│   │   │   │   │       └── url.ts
-│   │   │   │   └── style.ts
 │   │   │   ├── components/
 │   │   │   │   ├── BookModal.tsx
 │   │   │   │   ├── Header.tsx
@@ -138,6 +132,8 @@
 │   │   │   │   └── ui/
 │   │   │   ├── contexts/
 │   │   │   │   ├── AuthContext.tsx
+│   │   │   │   ├── KeysContext.tsx
+│   │   │   │   ├── LibrarianContext.tsx
 │   │   │   │   └── SessionContext.tsx
 │   │   │   ├── features/
 │   │   │   │   ├── auth/
@@ -178,8 +174,61 @@
 │   │   │   │   │   └── index.tsx
 │   │   │   │   ├── home/
 │   │   │   │   │   └── homeSlice.ts
+│   │   │   │   ├── irys/
+│   │   │   │   │   ├── arweave-funder/
+│   │   │   │   │   │   ├── FundWithdraw.tsx
+│   │   │   │   │   │   ├── funder.tsx
+│   │   │   │   │   │   └── saveLibrarian.tsx
+│   │   │   │   │   ├── arweave-uploader/
+│   │   │   │   │   │   ├── BookContents.tsx
+│   │   │   │   │   │   ├── Fields/
+│   │   │   │   │   │   │   └── CategorySelect.tsx
+│   │   │   │   │   │   ├── GaslessUploader.tsx
+│   │   │   │   │   │   ├── KeyManager.tsx
+│   │   │   │   │   │   ├── Tags.tsx
+│   │   │   │   │   │   ├── UploadLogic.tsx
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── Button.tsx
+│   │   │   │   │   │   ├── ReceiptJSONView.tsx
+│   │   │   │   │   │   └── Spinner.tsx
+│   │   │   │   │   ├── query-package/
+│   │   │   │   │   │   ├── BookResults.tsx
+│   │   │   │   │   │   └── query.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       ├── gaslessFundAndUpload.ts
+│   │   │   │   │       ├── getIrys.ts
+│   │   │   │   │       ├── getReceipt.ts
+│   │   │   │   │       ├── getRpcUrl.ts
+│   │   │   │   │       └── titleCase.ts
+│   │   │   │   ├── librarian/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   └── LibrarianForm.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── librarianSlice.ts
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       ├── becomeLibrarian.ts
+│   │   │   │   │       └── checkLibrarian.ts
+│   │   │   │   ├── librarian-profile/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   └── NoNode.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── librarianProfileSlice.ts
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       └── updateEngineStatus.ts
 │   │   │   │   ├── loading/
 │   │   │   │   │   └── index.tsx
+│   │   │   │   ├── mint/
+│   │   │   │   │   ├── Fields/
+│   │   │   │   │   │   └── CategorySelect.tsx
+│   │   │   │   │   ├── Footer.tsx
+│   │   │   │   │   ├── Header.tsx
+│   │   │   │   │   ├── MetaData.tsx
+│   │   │   │   │   ├── Processing.tsx
+│   │   │   │   │   ├── Status.tsx
+│   │   │   │   │   ├── Upload.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── style.css
 │   │   │   │   ├── my-engines/
 │   │   │   │   │   ├── components/
 │   │   │   │   │   │   ├── AddEngine.tsx
@@ -189,17 +238,134 @@
 │   │   │   │   │   └── thunks/
 │   │   │   │   │       ├── addEngine.ts
 │   │   │   │   │       └── fetchMyEngines.ts
+│   │   │   │   ├── my-nodes/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── AddNode.tsx
+│   │   │   │   │   │   └── NodeItem.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── myNodesSlice.ts
+│   │   │   │   │   ├── thunks/
+│   │   │   │   │   │   ├── addNode.ts
+│   │   │   │   │   │   └── fetchMyNodes.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       ├── irys.tsx
+│   │   │   │   │       └── node.tsx
 │   │   │   │   ├── portal/
 │   │   │   │   │   └── portalSlice.ts
+│   │   │   │   ├── portal-category/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── portalCategorySlice.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       └── category.ts
+│   │   │   │   ├── portal-filter/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── portalFilterSlice.ts
+│   │   │   │   ├── portal-language/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── portalLanguageSlice.ts
+│   │   │   │   ├── portal-pagination/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── portal-publication-year/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── portalPublicationYearSlice.ts
+│   │   │   │   ├── portal-type/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── portalTypeSlice.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       └── type.ts
+│   │   │   │   ├── reader/
+│   │   │   │   │   ├── CardList/
+│   │   │   │   │   │   ├── Card.tsx
+│   │   │   │   │   │   └── index.tsx
+│   │   │   │   │   ├── ContentList/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── styles.css
+│   │   │   │   │   ├── ContentView/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── Drawer/
+│   │   │   │   │   │   ├── Bookmarks/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── Search/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── Setting/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── Sidebar/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── lib/
+│   │   │   │   │   │   ├── components/
+│   │   │   │   │   │   │   ├── AddAnnotationTooltip.tsx
+│   │   │   │   │   │   │   ├── AnnotationItem/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── BookmarkItem/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── BookmarkToggle/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── ColorSelector.tsx
+│   │   │   │   │   │   │   ├── FlowToggle.tsx
+│   │   │   │   │   │   │   ├── FontFamilySelect.tsx
+│   │   │   │   │   │   │   ├── FontSizeButton.tsx
+│   │   │   │   │   │   │   ├── FontSizeRange.tsx
+│   │   │   │   │   │   │   ├── FullScreenToggle/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── RemoveAnnotationTooltip.tsx
+│   │   │   │   │   │   │   ├── SearchItem/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── SidebarItem.tsx
+│   │   │   │   │   │   │   ├── Spinner.tsx
+│   │   │   │   │   │   │   ├── SpreadToggle.tsx
+│   │   │   │   │   │   │   ├── ThemeSelect.tsx
+│   │   │   │   │   │   │   └── TocItem/
+│   │   │   │   │   │   │       ├── index.tsx
+│   │   │   │   │   │   │       └── style.ts
+│   │   │   │   │   │   ├── contexts/
+│   │   │   │   │   │   │   └── ReaderContext.tsx
+│   │   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   │   ├── useAnnotationState.tsx
+│   │   │   │   │   │   │   ├── useBookmarkState.tsx
+│   │   │   │   │   │   │   ├── useCardListState.tsx
+│   │   │   │   │   │   │   ├── useReaderContext.tsx
+│   │   │   │   │   │   │   ├── useReaderState/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── useContentState.tsx
+│   │   │   │   │   │   │   ├── useSearchDrawer.tsx
+│   │   │   │   │   │   │   ├── useSearchState.tsx
+│   │   │   │   │   │   │   ├── useSettingState.tsx
+│   │   │   │   │   │   │   ├── useSidebarState.tsx
+│   │   │   │   │   │   │   └── useSnackbar.tsx
+│   │   │   │   │   │   ├── providers/
+│   │   │   │   │   │   │   └── ReaderProvider.tsx
+│   │   │   │   │   │   └── utils/
+│   │   │   │   │   │       ├── annotations.ts
+│   │   │   │   │   │       ├── date.ts
+│   │   │   │   │   │       ├── index.ts
+│   │   │   │   │   │       ├── search.ts
+│   │   │   │   │   │       └── url.ts
+│   │   │   │   │   └── style.ts
 │   │   │   │   ├── search/
 │   │   │   │   │   ├── SearchResult.tsx
 │   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── BookModal.tsx
 │   │   │   │   │   │   ├── Card.tsx
 │   │   │   │   │   │   └── Read.tsx
 │   │   │   │   │   ├── index.tsx
 │   │   │   │   │   ├── searchSlice.ts
-│   │   │   │   │   └── thunks/
-│   │   │   │   │       └── performSearch.ts
+│   │   │   │   │   ├── thunks/
+│   │   │   │   │   │   └── performSearch.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       └── properties.tsx
 │   │   │   ├── header/
 │   │   │   │   └── Tabs.jsx
 │   │   │   ├── hooks/
@@ -209,10 +375,14 @@
 │   │   │   │   └── MainLayout.tsx
 │   │   │   ├── pages/
 │   │   │   ├── providers/
+│   │   │   │   ├── ActorProvider.tsx
+│   │   │   │   ├── AuthProvider.tsx
 │   │   │   │   ├── ReduxProvider.tsx
 │   │   │   │   └── SessionProvider.tsx
 │   │   │   ├── services/
-│   │   │   │   └── meiliService.ts
+│   │   │   │   ├── librarianService.ts
+│   │   │   │   ├── meiliService.ts
+│   │   │   │   └── walletService.ts
 │   │   │   ├── store/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── useAppDispatch.ts

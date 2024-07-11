@@ -26,15 +26,11 @@ export const GaslessUploader: React.FC<UploaderConfigProps> = ({
   const [tags, setTags] = useState<Metadata>({
     title: "",
     author: "",
-    description: "",
     fiction: true,
     categories: [],
     mainCategory: null,
     pubyear: 0,
     language: "en",
-    publisher: "",
-    rights: "",
-    isbn: "",
   });
 
   useEffect(() => {

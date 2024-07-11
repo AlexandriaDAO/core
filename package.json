@@ -18,6 +18,7 @@
     "generate": "dfx generate ucg_backend"
   },
   "dependencies": {
+    "@apollo/client": "^3.10.8",
     "@dfinity/agent": "^1.2.0",
     "@dfinity/auth-client": "^1.2.0",
     "@dfinity/candid": "^1.2.0",

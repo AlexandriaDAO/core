@@ -48,17 +48,6 @@ const Tags: React.FC<TagsProps> = ({ onTagsChange }) => {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="description">Description</label>
-        <textarea
-          onChange={(e) => handleMetadataChange({ ...metadata, description: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
-          name="description"
-          id="description"
-          placeholder="Description"
-        ></textarea>
-      </div>
-
-      <div className="flex flex-col gap-1">
         <label htmlFor="fiction" className="flex items-center gap-2">
           <span>Fiction / Non-Fiction:</span>
           <div className="relative">
@@ -154,41 +143,6 @@ const Tags: React.FC<TagsProps> = ({ onTagsChange }) => {
             </option>
           ))}
         </select>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label htmlFor="publisher">Publisher</label>
-        <input
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
-          type="text"
-          id="publisher"
-          placeholder="Publisher"
-          value={metadata?.publisher || ""}
-          onChange={(e) => handleMetadataChange({ ...metadata, publisher: e.target.value })}
-        />
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label htmlFor="rights">Rights</label>
-        <input
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
-          type="text"
-          id="rights"
-          placeholder="Additional details regarding publication rights"
-          value={metadata?.rights || ""}
-          onChange={(e) => handleMetadataChange({ ...metadata, rights: e.target.value })}
-        />
-      </div>
-      <div className="flex flex-col gap-1">
-        <label htmlFor="isbn">ISBN</label>
-        <input
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
-          type="text"
-          id="isbn"
-          placeholder="ISBN"
-          value={metadata?.isbn || ""}
-          onChange={(e) => handleMetadataChange({ ...metadata, isbn: e.target.value })}
-        />
       </div>
     </div>
   );

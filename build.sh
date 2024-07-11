@@ -1,3 +1,5 @@
+set -x 
+
 #!/bin/bash
 cp dfx_local.json dfx.json
 

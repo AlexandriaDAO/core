@@ -26,13 +26,7 @@ interface Book {
 	types?: string;
 	subtypes?: string;
 	pubyear?: string;
-
-	// Advanced Options (usually preset but the user can change)
-	description?: string;
 	language?: string; // defaults to en
-	publisher?: string;
-	rights?: string;
-	isbn?: string;
 
 	// Preset (user cannot set)
 	asset?: string;

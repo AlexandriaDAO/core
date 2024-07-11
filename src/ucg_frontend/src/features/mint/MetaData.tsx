@@ -47,22 +47,6 @@ const MetaData = ({ metadata, setMetadata }: any) => {
           }
         />
       </div>
-      
-      <div className="flex flex-col gap-1 w-full justify-between items-start">
-        <label htmlFor="description">Description</label>
-        <textarea
-          onChange={(e) =>
-            setMetadata({
-              ...metadata,
-              description: e.target.value,
-            })
-          }
-          className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
-          name="description"
-          id="description"
-          placeholder="Description"
-        ></textarea>
-      </div>
 
       <div className="flex flex-col gap-1 w-full justify-between items-start">
         <label htmlFor="fiction" className="flex items-center gap-2">
@@ -163,60 +147,6 @@ const MetaData = ({ metadata, setMetadata }: any) => {
           ))}
         </select>
       </div>
-
-      {/*these one's are optional fields. */}
-
-			<div className="flex flex-col gap-1 w-full justify-between items-start">
-				<label htmlFor="publisher">Publisher</label>
-				<input
-					className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
-					type="text"
-					id="publisher"
-					placeholder="Publisher"
-					value={metadata?.publisher}
-					onChange={(e) =>
-						setMetadata({
-							...metadata,
-							publisher: e.target.value,
-						})
-					}
-				/>
-			</div>
-
-			<div className="flex flex-col gap-1 w-full justify-between items-start">
-				<label htmlFor="rights">Rights</label>
-				<input
-					className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
-					type="text"
-					id="rights"
-					placeholder="Additional details regarding publication rights"
-					value={metadata?.rights}
-					onChange={(e) =>
-						setMetadata({
-							...metadata,
-							rights: e.target.value,
-						})
-					}
-				/>
-			</div>
-
-			<div className="flex flex-col gap-1 w-full justify-between items-start">
-				<label htmlFor="isbn">ISBN</label>
-				<input
-					className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
-					type="text"
-					id="isbn"
-					placeholder="ISBN"
-					value={metadata?.isbn}
-					onChange={(e) =>
-						setMetadata({
-							...metadata,
-							isbn: e.target.value,
-						})
-					}
-				/>
-			</div>
-
 		</section>
 	);
 };

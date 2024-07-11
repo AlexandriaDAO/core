@@ -26,15 +26,11 @@ export const handleJSONDownload = (bookData:any) => {
             JSON.stringify({
               title: bookData.title,
               author: bookData.author,
-              description: bookData.description,
               fiction: bookData.fiction,
               type: bookData.type,
               subtype: bookData.subtype,
               pubyear: bookData.pubyear,
               language: bookData.language,
-              publisher: bookData.publisher,
-              rights: bookData.rights,
-              isbn: bookData.isbn,
 
               // not filled by user. Preset by backend.
               asset: bookData.asset,

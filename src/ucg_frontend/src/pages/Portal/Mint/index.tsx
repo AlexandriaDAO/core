@@ -52,13 +52,7 @@ const Mint = () => {
           "types": metadata?.type,
           "subtypes": metadata?.subtype,
           "pubyear": metadata?.pubyear,
-          
-          // Advanced Options (usually preset but the user can change)
-          "description": metadata?.description,
           "language": metadata?.language,   // defaults to en
-          "publisher": metadata?.publisher,
-          "rights": metadata?.rights,
-          "isbn": metadata?.isbn,
 
           // Preset (user cannot set)
           "asset": metadata?.asset,

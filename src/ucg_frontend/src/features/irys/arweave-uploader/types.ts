@@ -2,15 +2,11 @@
 export interface Metadata {
   title: string;
   author: string;
-  description: string;
   fiction: boolean;
   categories: number[];
   mainCategory: number | null;
   pubyear: number;
   language: string;
-  publisher: string;
-  rights: string;
-  isbn: string;
 }
 
 export type Tag = {
