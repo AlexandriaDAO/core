@@ -11,8 +11,9 @@ const ITEMS_PER_PAGE = 6;
 
 const Portal: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const { books, selectedBook, currentPage, searchTerm } =
-		useAppSelector((state) => state.portal);
+	const { books, selectedBook, currentPage, searchTerm } = useAppSelector(
+		(state) => state.portal
+	);
 	const bookModalRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -43,23 +44,6 @@ const Portal: React.FC = () => {
 		return originalElement;
 	};
 
-	const renderBookCards = () => {
-		if (filteredBooks.length === 0) {
-			return (
-				<div className="col-span-6 font-roboto-condensed font-normal text-base flex items-center justify-between p-2 border-b last:border-0 text-black">
-					No Results to show
-				</div>
-			);
-		}
-
-		return paginatedBooks.map((book, index) => (
-			<React.Fragment key={book.key}>
-				<BookCard book={book} />
-				{renderBookModal(index)}
-			</React.Fragment>
-		));
-	};
-
 	const renderBookModal = (index: number) => {
 		if (selectedBook && (index + 1) % 6 === 0) {
 			const selectedBookIndex = paginatedBooks.findIndex(
@@ -86,7 +70,18 @@ const Portal: React.FC = () => {
 	return (
 		<>
 			<div className="flex-grow grid grid-cols-6 grid-rows-[repeat(3, minmax(0,auto))] py-4 gap-4">
-				{renderBookCards()}
+				{filteredBooks.length === 0 ? (
+					<div className="col-span-6 font-roboto-condensed font-normal text-base flex items-center justify-between p-2 border-b last:border-0 text-black">
+						No Results to show
+					</div>
+				) : (
+					paginatedBooks.map((book, index) => (
+						<React.Fragment key={book.key}>
+							<BookCard book={book} />
+							{renderBookModal(index)}
+						</React.Fragment>
+					))
+				)}
 			</div>
 			{totalPages > 1 && (
 				<div className="flex justify-center items-center my-10">

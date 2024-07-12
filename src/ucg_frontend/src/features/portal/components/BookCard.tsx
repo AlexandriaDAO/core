@@ -61,7 +61,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 		>
 			<div className="flex flex-col justify-between gap-3 items-start relative">
 				<img
-					className="rounded-lg h-80 object-cover"
+					className={`rounded-lg h-80 object-cover ${!book.cover && 'animate-pulse'}`}
                     src={book.cover || 'images/default-cover.jpg'}
                     alt={book.title}
                     onError={() => console.error("Error loading image for "+book)}

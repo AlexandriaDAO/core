@@ -163,7 +163,6 @@ function ContentView(props: IContentViewProps) {
 				currentRendition.off("locationChanged", handleLocationChanged);
 				currentRendition.off("selected", handleSelection);
 				currentRendition.off("click", handleClick);
-				console.log("Rendition was destroyed");
 			}
 		};
 	}, [
