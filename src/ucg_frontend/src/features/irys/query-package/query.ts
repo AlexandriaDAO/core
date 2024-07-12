@@ -27,15 +27,24 @@
 
 
 /*
-type1:0-9
 
-(subtypes also 0-9)
-subtype0:bool
-subtype2:bool
-...
-subytype9:bool
 
-era: (1-15)
+PRD:
+type - Just takes 1 Character 0-9
+type1-10 feild take a 0-1. There should be 3 each, no more no less.
+pub-year witched to 1 of 15 eras.
+mint# needs to be appended by default.
+// minter (principal) needs to be added by default. (dont want to do this anymore).
+separate author first and last name.
+postQL filtering in the book-portal page.
+
+
+
+ToDo fixes:
+- Need to prevent uploads with less than 3 categories.
+- Need to enforce character limits.
+- 
+
 
 
 [
@@ -56,6 +65,7 @@ era: (1-15)
   [2000, 2020, "Early 21st Century"],
   [2020, 10000, "Contemporary"]
 ]
+
 
 */
 

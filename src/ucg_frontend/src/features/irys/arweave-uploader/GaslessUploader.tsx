@@ -7,7 +7,6 @@ import Spinner from "../components/Spinner";
 import { FileWrapper, UploaderConfigProps, Metadata } from "./types";
 import Tags from "./Tags";
 import {
-  GATEWAY_BASE,
   handleFileUpload,
   handleUpload,
   showReceipt,
@@ -25,11 +24,7 @@ export const GaslessUploader: React.FC<UploaderConfigProps> = ({
   const [message, setMessage] = useState<string>("");
   const [tags, setTags] = useState<Metadata>({
     title: "",
-    author: "",
     fiction: true,
-    categories: [],
-    mainCategory: null,
-    pubyear: 0,
     language: "en",
   });
 

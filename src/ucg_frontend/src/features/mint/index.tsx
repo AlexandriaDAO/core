@@ -60,12 +60,8 @@ const Mint = () => {
 			book.loaded.metadata.then((metadata: any) => {
 				setMetadata({
 					title: metadata?.title,
-					author: metadata?.author,
 					fiction: metadata?.fiction,
-					type: metadata?.type,
-					subtypes: metadata?.subtype,
-					pubyear: metadata?.pubyear,
-					language: metadata?.language, // defaults to en
+					language: metadata?.language,
 				});
 			});
 			book.loaded.cover.then((coverPath: string) => {
@@ -181,11 +177,7 @@ const Mint = () => {
 						cfi,
 						text,
 						title: metadata.title,
-						author: metadata.author,
 						fiction: metadata.fiction,
-						type: metadata.type,
-						subtype: metadata.subtype,
-						pubyear: metadata.pubyear,
 						asset_id: tx.id
 					});
 				});

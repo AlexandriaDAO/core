@@ -8,8 +8,6 @@ interface TagsProps {
 
 const Tags: React.FC<TagsProps> = ({ onTagsChange }) => {
   const [metadata, setMetadata] = useState<any>({});
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [selectedMainCategory, setSelectedMainCategory] = useState<number | null>(null);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setMetadata({ ...metadata, language: e.target.value });
@@ -36,15 +34,35 @@ const Tags: React.FC<TagsProps> = ({ onTagsChange }) => {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="author">Author</label>
-        <input
-          className="w-full px-4 py-2 border border-gray-300 rounded-md"
-          type="text"
-          id="author"
-          placeholder="Author"
-          value={metadata?.author || ""}
-          onChange={(e) => handleMetadataChange({ ...metadata, author: e.target.value })}
-        />
+        <label>Author</label>
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <input
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              type="text"
+              id="author_first"
+              placeholder="First Name"
+              value={metadata?.author_first || ""}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\s/g, ''); // Remove spaces
+                handleMetadataChange({ ...metadata, author_first: value })
+              }}
+            />
+          </div>
+          <div className="flex-1">
+            <input
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              type="text"
+              id="author_last"
+              placeholder="Last Name"
+              value={metadata?.author_last || ""}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\s/g, ''); // Remove spaces
+                handleMetadataChange({ ...metadata, author_last: value })
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col gap-1">
@@ -71,62 +89,9 @@ const Tags: React.FC<TagsProps> = ({ onTagsChange }) => {
 
       <div>
         <CategorySelect
-          selectedCategories={selectedCategories}
-          setSelectedCategories={setSelectedCategories}
-          selectedMainCategory={selectedMainCategory}
-          setSelectedMainCategory={setSelectedMainCategory}
           setMetadata={handleMetadataChange}
           metadata={metadata}
         />
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label htmlFor="pubyear">Publication Year</label>
-        <div className="flex items-center">
-          <button
-            type="button"
-            onClick={() => {
-              const currentYear = metadata?.pubyear ? parseInt(metadata.pubyear, 10) : 0;
-              if (currentYear > -6000) {
-                handleMetadataChange({ ...metadata, pubyear: currentYear - 1 });
-              }
-            }}
-            className="px-2 py-1 bg-gray-300 hover:bg-gray-400 rounded-l"
-          >
-            -
-          </button>
-          <input
-            className="w-full px-4 py-2 text-center border border-gray-300"
-            type="number"
-            id="pubyear"
-            placeholder="Year (e.g., 2022 or -500)"
-            min="-6000"
-            max="2050"
-            step="1"
-            value={metadata?.pubyear || ""}
-            onChange={(e) => {
-              const year = parseInt(e.target.value, 10);
-              if (!isNaN(year) && year >= -6000 && year <= 2050) {
-                handleMetadataChange({ ...metadata, pubyear: year });
-              }
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => {
-              const currentYear = metadata?.pubyear ? parseInt(metadata.pubyear, 10) : 0;
-              if (currentYear < 2050) {
-                handleMetadataChange({ ...metadata, pubyear: currentYear + 1 });
-              }
-            }}
-            className="px-2 py-1 bg-gray-300 hover:bg-gray-400 rounded-r"
-          >
-            +
-          </button>
-        </div>
-        <small className="text-gray-500">
-          Note: Enter negative years for BC (e.g., -500 for 500 BC).
-        </small>
       </div>
 
       <div className="flex flex-col gap-1">

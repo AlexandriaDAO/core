@@ -260,8 +260,6 @@ function BookPortalPageContent() {
             >
                 {selectedBookInfo && (
                     <div>
-                        <h2>{selectedBookInfo.title}</h2>
-                        <p>Author: {selectedBookInfo.author}</p>
                         {selectedBookInfo.tags.map((tag) => (
                             <p key={tag.name}>
                                 {tag.name}: {tag.value}

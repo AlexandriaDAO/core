@@ -1,35 +1,30 @@
-// MetaData.tsx
-import React, { useState } from "react";
+import React from "react";
 import languages from "@/data/languages";
 import CategorySelect from "./Fields/CategorySelect";
 
 const MetaData = ({ metadata, setMetadata }: any) => {
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [selectedMainCategory, setSelectedMainCategory] = useState<number | null>(null);
-
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setMetadata({ ...metadata, language: e.target.value });
   };
 
   return (
     <section className="flex-grow h-full overflow-auto p-4 w-full flex flex-col text-sm gap-2 items-start justify-start">
-
       <div className="flex flex-col gap-1 w-full justify-between items-start">
-          <label htmlFor="title">Title</label>
-          <input
-            className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
-            type="text"
-            id="title"
-            placeholder="Book Title"
-            value={metadata?.title}
-            onChange={(e) =>
-              setMetadata({
-                ...metadata,
-                title: e.target.value,
-              })
-            }
-          />
-        </div>
+        <label htmlFor="title">Title</label>
+        <input
+          className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
+          type="text"
+          id="title"
+          placeholder="Book Title"
+          value={metadata?.title}
+          onChange={(e) =>
+            setMetadata({
+              ...metadata,
+              title: e.target.value,
+            })
+          }
+        />
+      </div>
       
       <div className="flex flex-col gap-1 w-full justify-between items-start">
         <label htmlFor="author">Author</label>
@@ -74,12 +69,8 @@ const MetaData = ({ metadata, setMetadata }: any) => {
 
       <div>
         <CategorySelect 
-        selectedCategories={selectedCategories}
-        setSelectedCategories={setSelectedCategories}
-        selectedMainCategory={selectedMainCategory}
-        setSelectedMainCategory={setSelectedMainCategory}
-        setMetadata={setMetadata}
-        metadata={metadata}
+          setMetadata={setMetadata}
+          metadata={metadata}
         />
       </div>
 
@@ -147,9 +138,8 @@ const MetaData = ({ metadata, setMetadata }: any) => {
           ))}
         </select>
       </div>
-		</section>
-	);
+    </section>
+  );
 };
 
 export default MetaData;
-
