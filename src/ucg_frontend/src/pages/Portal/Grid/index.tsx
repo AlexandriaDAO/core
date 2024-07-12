@@ -3,7 +3,7 @@ import Card from "./Card";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 const Grid = () => {
-    const {data} =useAppSelector(state=>state.portal)
+    const {data} =useAppSelector(state=>state.junoPortal)
 	return (
         <div className="transition duration-300">
             <div className="grid md:grid-cols-4 grid-cols-2 gap-6">

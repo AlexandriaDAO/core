@@ -3,7 +3,7 @@ import Row from "./Row";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 const List = () => {
-    const {data} =useAppSelector(state=>state.portal)
+    const {data} =useAppSelector(state=>state.junoPortal)
 	return (
         <div className="transition duration-300">
             <div className="flex items-start mt-6 justify-center border rounded overflow-x-auto h-auto">

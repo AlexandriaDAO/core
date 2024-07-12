@@ -8,7 +8,7 @@ import List from "./List";
 import NoBooks from "./NoBooks";
 import Loading from "./Loading";
 import Mint from "./Mint";
-import { fetchBooks, setLimit, setView } from "@/features/portal/portalSlice";
+import { fetchBooks, setLimit, setView } from "@/features/juno-portal/junoPortalSlice";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
@@ -21,7 +21,7 @@ const Portal = () => {
 		loading, // Boolean indicating loading state
 		error, // Error information
 		currentPage, // Current page of the book list
-	} = useAppSelector(state => state.portal);
+	} = useAppSelector(state => state.junoPortal);
 
 	useEffect(() => {
 		const init = async () => {
