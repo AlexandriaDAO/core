@@ -1,22 +1,38 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import fetchBooks from "./thunks/fetchBooks";
 
-interface Book {
+export interface Book {
     key: number;
     title: string;
     author: string;
-    image: string;
+    cover: string;
     transactionId: string;
-    bookUrl?: string;
+    tags: {
+        name: string;
+        value: string;
+    }[];
 }
 
 interface PortalState {
     selectedBook: Book | null;
-    isModalOpen: boolean;
+    books: Book[];
+
+    currentPage: number,
+    searchTerm: string,
+
+    loading: boolean;
+	error: string | null;
 }
 
 const initialState: PortalState = {
     selectedBook: null,
-    isModalOpen: false,
+    books: [],
+
+    currentPage: 1,
+    searchTerm: '',
+
+    loading: false,
+	error: null,
 };
 
 const portalSlice = createSlice({
@@ -24,18 +40,43 @@ const portalSlice = createSlice({
     initialState,
     reducers: {
         setSelectedBook: (state, action: PayloadAction<Book | null>) => {
-            state.selectedBook = null;
+            state.selectedBook = action.payload;
         },
-        setIsModalOpen: (state, action: PayloadAction<boolean>) => {
-            state.isModalOpen = action.payload;
+        setCurrentPage: (state, action: PayloadAction<number>) => {
+            state.currentPage = action.payload;
         },
-        resetBookState: (state) => {
-            state.selectedBook = null;
-            state.isModalOpen = false;
+        setSearchTerm: (state, action: PayloadAction<string>) => {
+            state.searchTerm = action.payload;
+        },
+        setBooks: (state, action: PayloadAction<Book[]>) => {
+            state.books = action.payload;
+        },
+        updateBookCover: (state, action: PayloadAction<{ key: number; cover: string }>) => {
+            const book = state.books.find(b => b.key === action.payload.key);
+            if (book) {
+                book.cover = action.payload.cover;
+            }
         },
     },
+    extraReducers: (builder: ActionReducerMapBuilder<PortalState>) => {
+		builder
+			.addCase(fetchBooks.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchBooks.fulfilled, (state, action) => {
+				state.loading = false;
+				state.error = null;
+				state.books = action.payload;
+			})
+			.addCase(fetchBooks.rejected, (state, action) => {
+				state.loading = false;
+				state.books = [];
+				state.error = action.payload as string;
+			})
+		}
 });
 
-export const { setSelectedBook, setIsModalOpen, resetBookState } = portalSlice.actions;
+export const { setSelectedBook, setBooks, updateBookCover, setCurrentPage, setSearchTerm } = portalSlice.actions;
 
 export default portalSlice.reducer;
