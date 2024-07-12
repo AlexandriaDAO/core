@@ -1,7 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Tabs from '../header/Tabs';
-import Portal from './Portal';
 import Meili from './Meili';
 
 import NotFound from "./NotFound";
@@ -24,7 +23,6 @@ const Layout = () => {
             <div className="container m-auto pt-6 flex flex-col justify-between items-stretch gap-4">
                 <Tabs />
                 <Routes>
-                    <Route path="portal" element={<Portal />} />
                     <Route path="meili" element={<Meili />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>

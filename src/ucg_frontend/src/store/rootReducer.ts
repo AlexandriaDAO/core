@@ -1,5 +1,4 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import portalReducer from "@/features/portal/portalSlice";
 import homeReducer from "@/features/home/homeSlice";
 import authReducer from "@/features/auth/authSlice";
 import searchReducer from "@/features/search/searchSlice";
@@ -18,7 +17,6 @@ import librarianProfileReducer from "@/features/librarian-profile/librarianProfi
 import myNodesReducer from "@/features/my-nodes/myNodesSlice";
 
 const rootReducer = combineReducers({
-	portal: portalReducer,
 	home: homeReducer,
 	auth: authReducer,
 	search: searchReducer,

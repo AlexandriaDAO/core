@@ -87,6 +87,7 @@ const Tags: React.FC<TagsProps> = ({ onTagsChange }) => {
         </label>
       </div>
 
+
       <div>
         <CategorySelect
           setMetadata={handleMetadataChange}
