@@ -1,122 +1,82 @@
-// import { RootState } from "@/store";
-// import { listDocs } from "@junobuild/core";
-// import {
-// 	createSlice,
-// 	createAsyncThunk,
-// 	PayloadAction,
-// } from "@reduxjs/toolkit";
+import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import fetchBooks from "./thunks/fetchBooks";
 
-// function convertBigInts(obj:any) {
-//     for (const key in obj) {
-//         if (typeof obj[key] === 'bigint') {
-//             // Converting BigInt to number may result in precision loss if the data is too big
-// 			// In our case we don't have a very huge data
-//             obj[key] = Number(obj[key]);
-//         } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-//             convertBigInts(obj[key]); // Recursively process nested objects
-//         }
-//     }
-// }
+export interface Book {
+    key: number;
+    title: string;
+    author: string;
+    cover: string;
+    transactionId: string;
+    tags: {
+        name: string;
+        value: string;
+    }[];
+}
 
-// // Define the structure of a book document
-// interface Book {
-// 	title?: string;
-// 	author?: string;
-// 	fiction?: string;
-// 	types?: string;
-// 	subtypes?: string;
-// 	pubyear?: string;
-// 	language?: string; // defaults to en
+interface PortalState {
+    selectedBook: Book | null;
+    books: Book[];
 
-// 	// Preset (user cannot set)
-// 	asset?: string;
-// 	ugbn?: string;
-// 	minted?: string;
-// 	modified?: string;
-// }
+    currentPage: number,
+    searchTerm: string,
 
-// // Define the interface for your portal state
-// interface PortalState {
-// 	limit: number;
-// 	view: "grid" | "list";
-// 	data?: any;
-// 	currentPage: number;
-// 	loading: boolean;
-// 	error: string | undefined;
-// }
+    loading: boolean;
+	error: string | null;
+}
 
-// // Define the initial state using the PortalState interface
-// const initialState: PortalState = {
-// 	limit: 10,
-// 	view: "grid",
-// 	data: undefined,
-// 	currentPage: 0,
-// 	loading: false,
-// 	error: undefined,
-// };
+const initialState: PortalState = {
+    selectedBook: null,
+    books: [],
 
-// // Define the async thunk
-// export const fetchBooks = createAsyncThunk<
-// 	any, // This is the return type of the thunk's payload
-// 	string | undefined, //Argument that we pass to fetchBooks
-// 	{ rejectValue: string; state: RootState }
-// >("books/fetchBooks", async (from, { rejectWithValue, fulfillWithValue, getState }) => {
-// 	try {
-// 		// Get the current state
-// 		const state = getState();
+    currentPage: 1,
+    searchTerm: '',
 
-// 		// Access the limit from the portal state
-// 		const limit = state.portal.limit;
+    loading: false,
+	error: null,
+};
 
-// 		let paginate: any = { limit };
-// 		if (from) paginate.startAfter = from;
+const portalSlice = createSlice({
+    name: "portal",
+    initialState,
+    reducers: {
+        setSelectedBook: (state, action: PayloadAction<Book | null>) => {
+            state.selectedBook = action.payload;
+        },
+        setCurrentPage: (state, action: PayloadAction<number>) => {
+            state.currentPage = action.payload;
+        },
+        setSearchTerm: (state, action: PayloadAction<string>) => {
+            state.searchTerm = action.payload;
+        },
+        setBooks: (state, action: PayloadAction<Book[]>) => {
+            state.books = action.payload;
+        },
+        updateBookCover: (state, action: PayloadAction<{ key: number; cover: string }>) => {
+            const book = state.books.find(b => b.key === action.payload.key);
+            if (book) {
+                book.cover = action.payload.cover;
+            }
+        },
+    },
+    extraReducers: (builder: ActionReducerMapBuilder<PortalState>) => {
+		builder
+			.addCase(fetchBooks.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchBooks.fulfilled, (state, action) => {
+				state.loading = false;
+				state.error = null;
+				state.books = action.payload;
+			})
+			.addCase(fetchBooks.rejected, (state, action) => {
+				state.loading = false;
+				state.books = [];
+				state.error = action.payload as string;
+			})
+		}
+});
 
-// 		const collection = await listDocs<Book>({
-// 			// Specify the generic type <Book>
-// 			collection: "books",
-// 			filter: { paginate },
-// 		});
-// 		convertBigInts(collection)
-// 		return fulfillWithValue(collection)
-// 	} catch (error) {
-// 		return rejectWithValue("Failed to fetch documents");
-// 	}
-// });
+export const { setSelectedBook, setBooks, updateBookCover, setCurrentPage, setSearchTerm } = portalSlice.actions;
 
-// const portalSlice = createSlice({
-// 	name: "portal",
-// 	initialState,
-// 	reducers: {
-// 		// You can add reducers here for other actions, such as updating the view or limit
-// 		setView: (state, action: PayloadAction<'grid' | 'list'>) => {
-// 			state.view = action.payload;
-// 		},
-// 		setLimit: (state, action: PayloadAction<number>) => {
-// 			state.limit = action.payload;
-// 		},
-// 	},
-// 	extraReducers: (builder) => {
-// 		builder
-// 			.addCase(fetchBooks.pending, (state) => {
-// 				state.loading = true;
-// 				state.data = undefined;
-// 				state.error = undefined;
-// 			})
-// 			.addCase(fetchBooks.fulfilled, (state, action) => {
-// 				state.loading = false;
-
-// 				state.data = action.payload;
-
-// 				state.currentPage = Number(action.payload.items_page) + 1;
-// 			})
-// 			.addCase(fetchBooks.rejected, (state, action) => {
-// 				state.loading = false;
-// 				state.data = undefined;
-// 				state.error = action.payload;
-// 			});
-// 	},
-// });
-
-// export const { setLimit, setView}  =  portalSlice.actions;
-
-// export default portalSlice.reducer;
+export default portalSlice.reducer;

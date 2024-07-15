@@ -11,6 +11,7 @@ const categories = getCategories();
 function PortalCategory() {
 	const dispatch = useAppDispatch();
 	const { selected, visible } = useAppSelector((state) => state.portalCategory);
+	const { books } = useAppSelector(state => state.portal);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	function handleClick() {
@@ -26,7 +27,9 @@ function PortalCategory() {
             e.stopPropagation()
         }
 
-		const isSelected = selected.find(t=>t.id == category.id)
+		const isSelected = selected.find(selectedCategory=>{
+			return selectedCategory.id == category.id && selectedCategory.typeId == category.typeId
+		})
 
         if(isSelected === undefined) {
             dispatch(
@@ -35,7 +38,9 @@ function PortalCategory() {
                 )
             )
 		}else{
-            dispatch(setSelected(selected.filter(c=>c.id!== category.id)))
+            dispatch(setSelected(selected.filter(c=>{
+				return c.id!== category.id && c.typeId!== category.typeId
+			})))
         }
 
     };
@@ -101,19 +106,22 @@ function PortalCategory() {
 						/>
 					</div>
                     <ul className="basis-10/12 overflow-auto">
-                        {filteredCategories.length > 0 ? filteredCategories.map(category => (
-                            <li key={category.id} onClick={()=>handleCheckboxChange(category)} className="cursor-pointer font-roboto-condensed font-normal text-base flex items-center justify-between p-2 border-b last:border-0">
+                        {filteredCategories.length > 0 ? filteredCategories.map((category, index) => (
+                            <li key={category.id + '-' + category.typeId} onClick={()=>handleCheckboxChange(category)} className="cursor-pointer font-roboto-condensed font-normal text-base flex items-center justify-between p-2 border-b last:border-0">
                                 <div className="flex items-center gap-2">
                                     <input
                                         type="checkbox"
-                                        checked={selected.find(c=>c.id == category.id)!==undefined}
+                                        checked={selected.find(c=>(c.id == category.id && c.typeId == category.typeId))!==undefined}
                                         onChange={(e) => handleCheckboxChange(category, e)}
                                         className="w-5 h-5 min-w-5 min-h-5 max-w-5 max-h-5 cursor-pointer"
                                     />
                                     <span>{category.title}</span>
                                 </div>
                                 <div>
-                                    <span className="text-base font-roboto-condensed font-normal text-gray-300">101</span>
+                                    <span className="text-base font-roboto-condensed font-normal text-gray-300">
+										{/* {books.filter(book=> book.tags.find(b=>b.name == 'category' && b.value == category)).length} */}
+										NA
+									</span>
                                 </div>
                             </li>
                         )) : <li className="font-roboto-condensed font-normal text-base flex items-center justify-between p-2 border-b last:border-0 text-black">

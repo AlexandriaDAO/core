@@ -36,69 +36,44 @@ export type IReaderProps = {
 export const Reader: React.FC<IReaderProps> = ({
     title = "Title",
     readerStyles = defaultStyles,
+    bookUrl = "test.epub",
     showSidebar = true,
     showToolbar = true,
     cfi = '',
     external = null,
 }: IReaderProps) => {
-    const dispatch = useDispatch();
-    const { selectedBook, bookUrl } = useSelector((state: RootState) => state.home);
-    const { url, setUrl, book, rendition, firstPageLoaded, setCurrentLocation, bookLocation, currentPage, totalPages, percentage, metadata } = useReader();
+    const { url, setUrl, book, rendition, firstPageLoaded, setFirstPageLoaded, setIsLoaded, setCurrentLocation, bookLocation, currentPage, totalPages, percentage, metadata } = useReader();
 
     const { sidebar } = useSidebar();
     const { showSetting, setShowSetting } = useSetting();
     const { showCardList, setShowCardList } = useCardList();
-    
-    const hideSelectedBook = useCallback(() => {
-        dispatch(setSelectedBook(null));
-        dispatch(setIsModalOpen(false));
-    }, [dispatch]);
-
-    const cleanupBook = useCallback(() => {
-        try {
-            if (rendition) {
-                rendition.current?.destroy();
-            }
-
-            if (book) {
-                book.destroy();
-                console.log("Book was destroyed");
-            } else {
-                console.log("No Book to destroy");
-            }
-        } catch {
-            console.error("Error Destroying book");
-        }
-    }, [book, rendition, hideSelectedBook]);
 
     useEffect(() => {
-        if (bookUrl && bookUrl !== url) {
-            cleanupBook();
-            setUrl(bookUrl);
-        }
-    }, [bookUrl, url, setUrl, cleanupBook]);
-
-    useEffect(() => {
+		// if (url) return;
+		setUrl(bookUrl);
         return () => {
-            cleanupBook();
+        	try {
+        		if (rendition&& rendition.current) {
+        			rendition.current.destroy();
+                    console.log('Rendition was destroyed');
+        		}else{
+                    console.log('No Rendition to destroy');
+                }
+        		if (book) {
+        			book.destroy();
+        			console.log("Book was destroyed");
+        		} else {
+        			console.log("No Book to destroy");
+        		}
+
+                setCurrentLocation(undefined);
+                setIsLoaded(false);
+                setFirstPageLoaded(false);
+        	} catch {
+        		console.error("Error Destroying book");
+        	}
         };
-    }, [cleanupBook]);
-
-    useEffect(() => {
-        if (url) return;
-
-        if (bookUrl) {
-            setUrl(bookUrl);
-        } else if (selectedBook) {
-            const newBookUrl = `https://node1.irys.xyz/${selectedBook.transactionId}`;
-            dispatch(setSelectedBook({ ...selectedBook, bookUrl: newBookUrl }));
-            setUrl(newBookUrl);
-        }
-
-        return () => {
-            cleanupBook();
-        };
-    }, [selectedBook, bookUrl, url, setUrl, dispatch, cleanupBook]);
+	}, [bookUrl]);
 
     useEffect(() => {
         if (!rendition || !rendition.current) return;

@@ -3,11 +3,11 @@ import DDC from "@/data/categories";
 export interface CategoryInterface {
     id: string;
     title: string;
-    image: string;
+    typeId: string;
 }
 
 export const getCategories = (): CategoryInterface[] => {
-    let categories:any = [];
+    let categories:CategoryInterface[] = [];
 	Object.entries(DDC).forEach(([typeId, {category}])=>{
         Object.entries(category).forEach(([categoryId, categoryTitle])=>{
             categories.push({
