@@ -108,9 +108,7 @@ export async function fetchTransactions(): Promise<Transaction[]> {
 
 
 ToDo fixes:
-- Need to prevent uploads with less than 3 categories.
-- Need to enforce character limits.
-- Need to make the fiction/nonfiction thing look better.
+
 
 postQL filtering in the book-portal page.
 Dynamic filtering with UI peices.

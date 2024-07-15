@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 interface CategorySelectProps {
   setMetadata: (metadata: any) => void;
   metadata: any;
+  isSubmitAttempted: boolean;
 }
 
 const eras = [
-  { value: 1, label: "Prehistoric (-10000 to -2000)", range: [-10000, -2000] },
-  { value: 2, label: "Ancient (-2000 to -500)", range: [-2000, -500] },
-  { value: 3, label: "Classical Antiquity (-500 to 0)", range: [-500, 0] },
+  { value: 1, label: "Prehistoric (Before 2,000 BC)", range: [-10000, -2000] },
+  { value: 2, label: "Ancient (2000BC to 500BC)", range: [-2000, -500] },
+  { value: 3, label: "Classical Antiquity (500BC to 0)", range: [-500, 0] },
   { value: 4, label: "Late Antiquity and Early Middle Ages (0 to 500)", range: [0, 500] },
   { value: 5, label: "Early Medieval (500 to 1000)", range: [500, 1000] },
   { value: 6, label: "High Medieval (1000 to 1300)", range: [1000, 1300] },
@@ -25,12 +26,15 @@ const eras = [
   { value: 16, label: "Contemporary (2020 onwards)", range: [2020, 10000] },
 ];
 
+
 const CategorySelect: React.FC<CategorySelectProps> = ({
   setMetadata,
-  metadata
+  metadata,
+  isSubmitAttempted
 }) => {
   const [selectedMainCategory, setSelectedMainCategory] = useState<number | null>(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<number[]>([]);
+  const [errors, setErrors] = useState<{category?: string, subcategories?: string, era?: string}>({});
 
   useEffect(() => {
     // Initialize from metadata
@@ -48,7 +52,8 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
 
   useEffect(() => {
     updateMetadata();
-  }, [selectedMainCategory, selectedSubcategories]);
+    validateFields();
+  }, [selectedMainCategory, selectedSubcategories, metadata.era]);
 
   const updateMetadata = () => {
     if (selectedMainCategory !== null) {
@@ -61,6 +66,27 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
 
       setMetadata(newMetadata);
     }
+  };
+
+  const validateFields = () => {
+    const newErrors: {category?: string, subcategories?: string, era?: string} = {};
+
+    if (selectedMainCategory === null) {
+      newErrors.category = "Please select a main category";
+    }
+
+    if (selectedSubcategories.length !== 3) {
+      newErrors.subcategories = "Please select exactly 3 subcategories";
+    }
+
+    if (!metadata.era) {
+      newErrors.era = "Please select an era";
+    }
+
+    setErrors(newErrors);
+    
+    // Return true if there are no errors
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleMainCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -84,7 +110,6 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
     setMetadata({ ...metadata, era: value });
   };
 
-
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '500px', margin: 'auto' }}>
       <div style={{ marginBottom: '20px' }}>
@@ -99,6 +124,9 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
             <option key={key} value={key}>{value.type}</option>
           ))}
         </select>
+        {isSubmitAttempted && !selectedMainCategory && (
+          <p style={{ color: 'red' }}>Please select a category</p>
+        )}
       </div>
 
       {selectedMainCategory !== null && (
@@ -116,6 +144,9 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
               <label htmlFor={`subtype-${key}`} style={{ marginLeft: '5px' }}>{value}</label>
             </div>
           ))}
+          {isSubmitAttempted && selectedSubcategories.length !== 3 && (
+            <p style={{ color: 'red' }}>Please select exactly 3 subcategories</p>
+          )}
         </div>
       )}
 
@@ -143,6 +174,7 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
             </option>
           ))}
         </select>
+        {errors.era && <p style={{ color: 'red' }}>{errors.era}</p>}
       </div>
 
     </div>

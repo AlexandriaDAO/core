@@ -19,9 +19,8 @@ export const getSubTypes = (bookSubType: number[] = []) => {
     return subtypeTexts;
 }
 
-
-export const getTypes = (bookType:number[] = []) => {
-    if(bookType.length == 0 ) return [];
+export const getTypes = (bookType: number[] | undefined = []): any[] => {
+    if (!bookType || !Array.isArray(bookType) || bookType.length === 0) return [];
 
     return bookType.map((type) => DDC[type]).filter((type) => type !== undefined);
 };

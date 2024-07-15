@@ -72,7 +72,29 @@ const Mint = () => {
 		}
 	}, [book]);
 
+	const metadataRef = useRef<{ validateFields: () => boolean } | null>(null);
+
+  const validateSubmission = (): boolean => {
+    if (!file) {
+      message.error("Please upload a file");
+      return false;
+    }
+
+    if (!metadataRef.current || !metadataRef.current.validateFields()) {
+      message.error("Please fill out all required metadata fields correctly");
+      return false;
+    }
+
+    // Add any other necessary checks here
+
+    return true;
+  };
+
 	const handleSubmitClick = async () => {
+		if (!validateSubmission()) {
+			return;
+		}
+
 		next();
 		let tx = undefined;
 		try {
@@ -262,8 +284,9 @@ const Mint = () => {
 
 					{screen == 1 && (
 						<MetaData
-							metadata={metadata}
-							setMetadata={setMetadata}
+						ref={metadataRef}
+						setMetadata={setMetadata}
+						metadata={metadata}
 						/>
 					)}
 
