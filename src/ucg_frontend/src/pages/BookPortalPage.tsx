@@ -10,6 +10,7 @@ import Portal from "@/features/portal";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { setSearchTerm } from "@/features/portal/portalSlice";
+// import { Modal } from "idk"
 
 function BookPortalPage() {
 
@@ -43,6 +44,24 @@ function BookPortalPage() {
                 </div>
                 <Portal />
             </div>
+
+            <Modal
+                title="Book Information"
+                visible={infoModalVisible}
+                onCancel={() => setInfoModalVisible(false)}
+                footer={null}
+            >
+                {selectedBookInfo && (
+                    <div>
+                        {selectedBookInfo.tags.map((tag) => (
+                            <p key={tag.name}>
+                                {tag.name}: {tag.value}
+                            </p>
+                        ))}
+                    </div>
+                )}
+            </Modal>
+
         </MainLayout>
     );
 }

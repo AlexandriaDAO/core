@@ -1,155 +1,173 @@
 // MetaData.tsx
-import React, { useState } from "react";
+import React, { useEffect, forwardRef, useImperativeHandle, useState } from "react";
 import languages from "@/data/languages";
 import CategorySelect from "./Fields/CategorySelect";
 
-const MetaData = ({ metadata, setMetadata }: any) => {
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [selectedType, setSelectedType] = useState<number | null>(null);
+const MetaData = forwardRef(({ metadata, setMetadata }: any, ref) => {
+  const [errors, setErrors] = useState({
+    title: "",
+    author_first: "",
+    author_last: "",
+    fiction: "",
+    category: "",
+    language: ""
+  });
+  const [isSubmitAttempted, setIsSubmitAttempted] = useState(false);
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setMetadata({ ...metadata, language: e.target.value });
   };
 
+  useEffect(() => {
+    setMetadata({ ...metadata, fiction: null });
+  }, []);
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.slice(0, 150);
+    setMetadata({ ...metadata, title: value });
+  };
+
+  const handleAuthorChange = (field: 'author_first' | 'author_last', e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\s/g, '').slice(0, 50);
+    setMetadata({ ...metadata, [field]: value });
+  };
+
+  const validateFields = () => {
+    const newErrors = {
+      title: !metadata.title || metadata.title.length < 4 ? "Title must be at least 4 characters long" : "",
+      author_first: !metadata.author_first || metadata.author_first.length < 2 ? "First name must be at least 2 characters long" : "",
+      author_last: !metadata.author_last || metadata.author_last.length < 2 ? "Last name must be at least 2 characters long" : "",
+      fiction: metadata.fiction === null ? "Please select Fiction or Non-Fiction" : "",
+      category: !metadata.type ? "Please select a category" : "",
+      language: !metadata.language ? "Please select a language" : ""
+    };
+
+    setErrors(newErrors);
+    setIsSubmitAttempted(true);
+
+    return Object.values(newErrors).every(error => error === "");
+  };
+
+  useImperativeHandle(ref, () => ({
+    validateFields
+  }));
+
   return (
     <section className="flex-grow h-full overflow-auto p-4 w-full flex flex-col text-sm gap-2 items-start justify-start">
-
       <div className="flex flex-col gap-1 w-full justify-between items-start">
-          <label htmlFor="title">Title</label>
-          <input
-            className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
-            type="text"
-            id="title"
-            placeholder="Book Title"
-            value={metadata?.title}
-            onChange={(e) =>
-              setMetadata({
-                ...metadata,
-                title: e.target.value,
-              })
-            }
-          />
-        </div>
-      
-      <div className="flex flex-col gap-1 w-full justify-between items-start">
-        <label htmlFor="author">Author</label>
+        <label htmlFor="title">Title</label>
         <input
           className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
           type="text"
-          id="author"
-          placeholder="Author"
-          value={metadata?.author}
-          onChange={(e) =>
-            setMetadata({
-              ...metadata,
-              author: e.target.value,
-            })
-          }
+          id="title"
+          placeholder="Book Title"
+          value={metadata?.title || ""}
+          onChange={handleTitleChange}
+          minLength={4}
+          maxLength={150}
+          required
         />
+        {isSubmitAttempted && errors.title && (
+          <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+        )}
       </div>
 
       <div className="flex flex-col gap-1 w-full justify-between items-start">
-        <label htmlFor="fiction" className="flex items-center gap-2">
-          <span>Fiction / Non-Fiction:</span>
-          <div className="relative">
+        <label>Author</label>
+        <div className="flex gap-2 w-full">
+          <div className="flex-1">
             <input
-              type="checkbox"
-              id="fiction"
-              name="fiction"
-              checked={metadata.fiction === undefined ? true : metadata.fiction}
-              onChange={(e) => 
-                setMetadata({
-                  ...metadata,
-                  fiction: e.target.checked,
-                })
-              }
-              className="sr-only"
+              className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
+              type="text"
+              id="author_first"
+              placeholder="First Name"
+              value={metadata?.author_first || ""}
+              onChange={(e) => handleAuthorChange('author_first', e)}
+              minLength={2}
+              maxLength={50}
+              required
             />
-            <div className="block bg-gray-600 w-14 h-8 rounded-full"></div>
-            <div className="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform duration-300 ease-in-out" style={{ transform: metadata.fiction ? 'translateX(100%)' : 'translateX(0)' }}></div>
+            {isSubmitAttempted && errors.author_first && (
+              <p className="text-red-500 text-sm mt-1">{errors.author_first}</p>
+            )}
           </div>
-          <span>{metadata.fiction ? 'Fiction' : 'Non-Fiction'}</span>
-        </label>
+          <div className="flex-1">
+            <input
+              className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
+              type="text"
+              id="author_last"
+              placeholder="Last Name"
+              value={metadata?.author_last || ""}
+              onChange={(e) => handleAuthorChange('author_last', e)}
+              minLength={2}
+              maxLength={50}
+              required
+            />
+            {isSubmitAttempted && errors.author_last && (
+              <p className="text-red-500 text-sm mt-1">{errors.author_last}</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 w-full">
+        <label className="font-semibold text-gray-700">Fiction / Non-Fiction:</label>
+        <div className="flex w-full">
+          <button
+            onClick={() => setMetadata({...metadata, fiction: false})}
+            className={`flex-1 py-2 px-4 text-center font-medium transition-colors ${
+              metadata.fiction === false
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Non-Fiction
+          </button>
+          <button
+            onClick={() => setMetadata({...metadata, fiction: true})}
+            className={`flex-1 py-2 px-4 text-center font-medium transition-colors ${
+              metadata.fiction === true
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            Fiction
+          </button>
+        </div>
+        {isSubmitAttempted && errors.fiction && (
+          <p className="text-red-500 text-sm mt-1">{errors.fiction}</p>
+        )}
       </div>
 
       <div>
         <CategorySelect 
-          selectedCategories={selectedCategories}
-          setSelectedCategories={setSelectedCategories}
-          selectedType={selectedType}
-          setSelectedType={setSelectedType}
           setMetadata={setMetadata}
           metadata={metadata}
+          isSubmitAttempted={isSubmitAttempted}
         />
-      </div>
-
-      <div className="flex flex-col gap-1 w-full justify-between items-start">
-        <label htmlFor="pubyear">Publication Year</label>
-        <div className="flex items-center">
-          <button
-            type="button"
-            onClick={() => {
-              const currentYear = metadata?.pubyear ? parseInt(metadata.pubyear, 10) : 0;
-              if (currentYear > -6000) {
-                setMetadata({ ...metadata, pubyear: currentYear - 1 });
-              }
-            }}
-            className="px-2 py-1 bg-gray-300 hover:bg-gray-400 rounded-l"
-          >
-            -
-          </button>
-          <input
-            className="w-full py-1 px-2 text-center placeholder-gray-600 border border-gray-800"
-            type="number"
-            id="pubyear"
-            placeholder="Year (e.g., 2022 or -500)"
-            min="-6000"
-            max="2050"
-            step="1"
-            value={metadata?.pubyear || ''}
-            onChange={(e) => {
-              const year = parseInt(e.target.value, 10);
-              if (!isNaN(year) && year >= -6000 && year <= 2050) {
-                setMetadata({ ...metadata, pubyear: year });
-              }
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => {
-              const currentYear = metadata?.pubyear ? parseInt(metadata.pubyear, 10) : 0;
-              if (currentYear < 2050) {
-                setMetadata({ ...metadata, pubyear: currentYear + 1 });
-              }
-            }}
-            className="px-2 py-1 bg-gray-300 hover:bg-gray-400 rounded-r"
-          >
-            +
-          </button>
-        </div>
-        <small className="text-gray-600">
-          Note: Enter negative years for BC (e.g., -500 for 500 BC).
-        </small>
       </div>
 
       <div className="flex flex-col gap-1 w-full justify-between items-start">
         <label htmlFor="language">Language</label>
         <select
           id="language"
-          value={metadata.language || 'en'}
+          value={metadata.language || ''}
           onChange={handleLanguageChange}
           className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
         >
+          <option value="">Select a language</option>
           {languages.map((lang) => (
             <option key={lang.code} value={lang.code}>
               {lang.name}
             </option>
           ))}
         </select>
+        {isSubmitAttempted && errors.language && (
+          <p className="text-red-500 text-sm mt-1">{errors.language}</p>
+        )}
       </div>
-		</section>
-	);
-};
+    </section>
+  );
+});
 
 export default MetaData;
-

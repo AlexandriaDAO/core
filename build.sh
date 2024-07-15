@@ -23,7 +23,31 @@ dfx identity use default
 export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
 export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 
+
 # Step 4: Deploy the ICRC Ledger with LBRY and UCG tokens
+dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argument "  
+  (variant {  
+    Init = record {  
+      minting_account = \"$MINTER_ACCOUNT_ID\";  
+      initial_values = vec {  
+        record {  
+          \"$DEFAULT_ACCOUNT_ID\";  
+          record {  
+            e8s = 10_000_000_000 : nat64;  
+          };  
+        };  
+      };  
+      send_whitelist = vec {};  
+      transfer_fee = opt record {  
+        e8s = 10_000 : nat64;  
+      };  
+      token_symbol = opt \"LICP\";  
+      token_name = opt \"Local ICP\";  
+    }  
+  })  
+"
+
+
 dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
   (variant {
     Init = record {
@@ -127,5 +151,8 @@ cd ./.dfx/
 rm -rf local/canisters/
 cp -r ic/canisters/ local/
 cd ..
+
+mkdir -p .dfx/local/canisters/icp_ledger_canister
+curl https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icp_ledger/ledger.did -o .dfx/local/canisters/icp_ledger_canister/icp_ledger_canister.did
 
 dfx deploy ucg_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai

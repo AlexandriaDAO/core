@@ -26,39 +26,6 @@
 
 
 
-/*
-type1:0-9
-
-(subtypes also 0-9)
-subtype0:bool
-subtype2:bool
-...
-subytype9:bool
-
-era: (1-15)
-
-
-[
-  [-10000, -2000, "Prehistoric"],
-  [-2000, -500, "Ancient"],
-  [-500, 0, "Classical Antiquity"],
-  [0, 500, "Late Antiquity and Early Middle Ages"],
-  [500, 1000, "Early Medieval"],
-  [1000, 1300, "High Midieval"],
-  [1300, 1500, "Late Middle Age, Early Renaissance"],
-  [1500, 1700, "Renaissance"],
-  [1700, 1800, "Age of Enlightenment"],
-  [1800, 1850, "Early Industrial"],
-  [1850, 1900, "Late Industrial"],
-  [1900, 1950, "Early 20th Century"],
-  [1950, 1975, "Post-War"],
-  [1975, 2000, "Late 20th Century"],
-  [2000, 2020, "Early 21st Century"],
-  [2020, 10000, "Contemporary"]
-]
-
-*/
-
 
 import { ApolloClient, ApolloQueryResult, InMemoryCache, gql } from '@apollo/client';
 
@@ -83,45 +50,45 @@ export async function fetchTransactions(): Promise<Transaction[]> {
   try {
     const result = await client.query({
       query: gql`
-        query {
-          transactions(
-            first: 100,
-            tags: [
-              { name: "Content-Type", values: ["application/epub+zip"] },
-              { name: "application-id", values: ["UncensoredGreats"] },
+      query {
+        transactions(
+          first: 100,
+          tags: [
+            { name: "Content-Type", values: ["application/epub+zip"] },
+            { name: "application-id", values: ["UncensoredGreats"] },
             ]
-          ) {
-            edges {
-              node {
-                id
-                tags {
-                  name
-                  value
-                }
-                address
-                timestamp
-              }
-            }
-          }
-        }
-      `
-    });
-
-    const filterConditions = [
-      // { name: "author", values: ["William Shakespeare", "Agnes Giberne"] },
-      { name: "language", values: ["en"] },
-      { name: "type", values: ["1", "2", "3", "8"] }
-
-    ];
-
-    const filteredTransactions = result.data.transactions.edges.filter((edge: any) => {
+            ) {
+              edges {
+                node {
+                  id
+                  tags {
+                    name
+                    value
+                    }
+                    address
+                    timestamp
+                    }
+                    }
+                    }
+                    }
+                    `
+                  });
+                  
+                  const filterConditions = [
+                    // { name: "author", values: ["William Shakespeare", "Agnes Giberne"] },
+                    { name: "language", values: ["en"] },
+                    { name: "type", values: ["1", "2", "3", "8"] }
+                    
+                  ];
+                  
+                  const filteredTransactions = result.data.transactions.edges.filter((edge: any) => {
       const tags = edge.node.tags;
       return filterConditions.some(condition => {
         const matchingTag = tags.find((tag: { name: string; }) => tag.name === condition.name);
         return matchingTag && condition.values.includes(matchingTag.value);
       });
     });
-
+    
     return filteredTransactions.map((edge: any) => ({
       id: edge.node.id,
       tags: edge.node.tags,
@@ -268,3 +235,16 @@ export async function getQuery(): Promise<ApolloQueryResult<any>> {
 // }
 
 
+
+/*
+
+
+ToDo fixes:
+
+
+postQL filtering in the book-portal page.
+Dynamic filtering with UI peices.
+
+
+
+*/

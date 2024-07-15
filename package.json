@@ -33,7 +33,6 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@hello-pangea/dnd": "^16.3.0",
     "@irys/sdk": "^0.2.1",
-    "@junobuild/core": "github:zeeghazi/juno-core#main",
     "@meilisearch/instant-meilisearch": "^0.17.0",
     "@mlc-ai/web-llm": "^0.2.18",
     "@radix-ui/react-dialog": "^1.0.5",

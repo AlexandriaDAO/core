@@ -1,11 +1,7 @@
 
 export interface Metadata {
   title: string;
-  author: string;
   fiction: boolean;
-  categories: number[];
-  mainCategory: number | null;
-  pubyear: number;
   language: string;
 }
 

@@ -1,16 +1,16 @@
-import React from 'react';
-import Dashboard from './Dashboard';
+// import React from 'react';
+// import Dashboard from './Dashboard';
 
-const Meili: React.FC = () => {
-  return (
-    <div>
-      <Dashboard/>
-      {/* <Search/> */}
-    </div>
-  );
-}
+// const Meili: React.FC = () => {
+//   return (
+//     <div>
+//       <Dashboard/>
+//       {/* <Search/> */}
+//     </div>
+//   );
+// }
 
-export default Meili;
+// export default Meili;
 
 
 
