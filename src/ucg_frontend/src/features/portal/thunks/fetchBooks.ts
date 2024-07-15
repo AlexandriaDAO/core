@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchTransactions } from "@/features/irys/query-package/query";
+import { getQuery } from "@/features/irys/query-package/query";
 import { Book } from '../portalSlice';
 
 // Define the async thunk
@@ -9,11 +9,19 @@ const fetchBooks = createAsyncThunk<
     { rejectValue: string }
 >("portal/fetchBooks", async (_, { rejectWithValue }) => {
     try {
-        const transactions = await fetchTransactions();
-        const formattedBooks: Book[] = transactions.map((transaction, index) => ({
+        const queryResults = await getQuery();
+
+        const transactions = queryResults.data.transactions.edges.map((edge: any) => ({
+            id: edge.node.id,
+            tags: edge.node.tags,
+            address: edge.node.address,
+            timestamp: edge.node.timestamp
+        }))
+
+        const formattedBooks: Book[] = transactions.map((transaction: { tags: any[]; id: any; }, index: number) => ({
                 key: index + 1,
-                title: transaction.tags.find(tag => tag.name === "title")?.value || "Unknown Title",
-                author: transaction.tags.find(tag => tag.name === "author")?.value || "Unknown Author",
+                title: transaction.tags.find((tag: { name: string; }) => tag.name === "title")?.value || "Unknown Title",
+                author: transaction.tags.find((tag: { name: string; }) => tag.name === "author")?.value || "Unknown Author",
                 cover: '', // This is now fine because coverUrl can be string | null
                 transactionId: transaction.id,
                 tags: transaction.tags
@@ -28,7 +36,7 @@ const fetchBooks = createAsyncThunk<
         }
     }
     return rejectWithValue(
-        "An unknown error occurred while fetching Books"
+        "An unknown error occurred while fetching All Books"
     );
 });
 

@@ -1,16 +1,19 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Pagination, PaginationProps } from "antd";
-import { setCurrentPage } from "./portalSlice";
+import { Book, setCurrentPage } from "./portalSlice";
 import BookModal from "./components/BookModal";
 import BookCard from "./components/BookCard";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import fetchBooks from "./thunks/fetchBooks";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 12;
 
 const Portal: React.FC = () => {
 	const dispatch = useAppDispatch();
+	const { types, languages, categories, years, visible } = useAppSelector(
+		(state) => state.portalFilter
+	);
 	const { books, selectedBook, currentPage, searchTerm } = useAppSelector(
 		(state) => state.portal
 	);
@@ -20,9 +23,126 @@ const Portal: React.FC = () => {
 		dispatch(fetchBooks());
 	}, [dispatch]);
 
-	const filteredBooks = books.filter(({ title }) =>
-		title.toLowerCase().includes(searchTerm.toLowerCase())
-	);
+
+
+	const filteredBooks = books.filter(book =>{
+
+		if(book.title.toLowerCase().includes(searchTerm.toLowerCase())){
+			return true
+		}
+
+		// console.log(book);
+		// {
+		// 	"key": 29,
+		// 	"title": "Peter Pan",
+		// 	"author": "Unknown Author",
+		// 	"cover": "",
+		// 	"transactionId": "IoGPBqct_PHdtLf-Uo9dqVbvgxhYVNwAkLv6lWeaE1Q",
+		// 	"tags": [
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "Content-Type",
+		// 			"value": "application/epub+zip"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "application-id",
+		// 			"value": "UncensoredGreats"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "minting_number",
+		// 			"value": "10"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "title",
+		// 			"value": "Peter Pan"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "fiction",
+		// 			"value": "null"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "language",
+		// 			"value": "en"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "era",
+		// 			"value": "14"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type",
+		// 			"value": "3"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type0",
+		// 			"value": "0"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type1",
+		// 			"value": "0"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type2",
+		// 			"value": "0"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type3",
+		// 			"value": "0"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type4",
+		// 			"value": "0"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type5",
+		// 			"value": "1"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type6",
+		// 			"value": "0"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type7",
+		// 			"value": "0"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type8",
+		// 			"value": "0"
+		// 		},
+		// 		{
+		// 			"__typename": "Tag",
+		// 			"name": "type9",
+		// 			"value": "0"
+		// 		}
+		// 	]
+		// }
+
+
+		// TODO: Categories Filter
+
+		// TODO: Types Filter
+
+		// TODO: Languages Filter
+
+		// TODO: Publication Filter
+
+		return false;
+	});
 
 	const totalPages = Math.ceil(filteredBooks.length / ITEMS_PER_PAGE);
 	const paginatedBooks = filteredBooks.slice(

@@ -60,7 +60,7 @@ era: (1-15)
 */
 
 
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { ApolloClient, ApolloQueryResult, InMemoryCache, gql } from '@apollo/client';
 
 interface Tag {
   name: string;
@@ -134,5 +134,137 @@ export async function fetchTransactions(): Promise<Transaction[]> {
   }
 }
 
+
+export async function getQuery(): Promise<ApolloQueryResult<any>> {
+  try {
+    const query = await client.query({
+      query: gql`
+        query {
+          transactions(
+            first: 100,
+            tags: [
+              { name: "Content-Type", values: ["application/epub+zip"] },
+              { name: "application-id", values: ["UncensoredGreats"] },
+            ]
+          ) {
+            edges {
+              node {
+                id
+                tags {
+                  name
+                  value
+                }
+                address
+                timestamp
+              }
+            }
+          }
+        }
+      `
+    });
+    return query;
+  } catch (error) {
+    console.error('Error getting query results:', error);
+    throw error;
+  }
+}
+
+
+// export async function fetchAll(): Promise<Transaction[]> {
+//   console.log('fetchAll');
+//   try {
+//     const result = await client.query({
+//       query: gql`
+//         query {
+//           transactions(
+//             first: 100,
+//             tags: [
+//               { name: "Content-Type", values: ["application/epub+zip"] },
+//               { name: "application-id", values: ["UncensoredGreats"] },
+//             ]
+//           ) {
+//             edges {
+//               node {
+//                 id
+//                 tags {
+//                   name
+//                   value
+//                 }
+//                 address
+//                 timestamp
+//               }
+//             }
+//           }
+//         }
+//       `
+//     });
+
+//     return result.data.transactions.edges.map((edge: any) => ({
+//       id: edge.node.id,
+//       tags: edge.node.tags,
+//       address: edge.node.address,
+//       timestamp: edge.node.timestamp
+//     }));
+//   } catch (error) {
+//     console.error('Error fetching all transactions:', error);
+//     throw error;
+//   }
+// }
+
+// export async function fetchFiltered({types, languages}: {types: string[], languages: string[]} = {types: [], languages: []}): Promise<Transaction[]> {
+//   console.log('fetchFiltered');
+
+//   try {
+//     const result = await client.query({
+//       query: gql`
+//         query {
+//           transactions(
+//             first: 100,
+//             tags: [
+//               { name: "Content-Type", values: ["application/epub+zip"] },
+//               { name: "application-id", values: ["UncensoredGreats"] },
+//             ]
+//           ) {
+//             edges {
+//               node {
+//                 id
+//                 tags {
+//                   name
+//                   value
+//                 }
+//                 address
+//                 timestamp
+//               }
+//             }
+//           }
+//         }
+//       `
+//     });
+
+//     const filterConditions:any = [
+//       { name: "language", values: languages},
+//       { name: "type", values: types}
+//     ];
+
+//     console.log(filterConditions, 'filterconditions');
+//     const filteredTransactions = result.data.transactions.edges.filter((edge: any) => {
+//       const tags = edge.node.tags;
+//       return filterConditions.some((condition: { name: string; values: string | any[]; }) => {
+//         const matchingTag = tags.find((tag: { name: string; }) => tag.name === condition.name);
+//         return matchingTag && condition.values.includes(matchingTag.value);
+//       });
+//     });
+
+//     return filteredTransactions.map((edge: any) => ({
+//       id: edge.node.id,
+//       tags: edge.node.tags,
+//       address: edge.node.address,
+//       timestamp: edge.node.timestamp
+//     }));
+//   } catch (error) {
+//     console.error('Error fetching filtered transactions:', error);
+//     throw error;
+//   }
+// }
 
 

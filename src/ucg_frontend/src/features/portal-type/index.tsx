@@ -11,6 +11,7 @@ const types:TypeInterface[] = getTypes();
 function PortalType() {
 	const dispatch = useAppDispatch();
 	const { selected, visible } = useAppSelector((state) => state.portalType);
+	const { books } = useAppSelector(state => state.portal);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	function handleClick() {
@@ -115,7 +116,10 @@ function PortalType() {
                                     <span>{type.title}</span>
                                 </div>
                                 <div>
-                                    <span className="text-base font-roboto-condensed font-normal text-gray-300">101</span>
+                                    <span className="text-base font-roboto-condensed font-normal text-gray-300">
+										{/* {books.filter(book=> book.tags.find(b=>b.name == 'type' && b.value == type.id)).length} */}
+										NA
+									</span>
                                 </div>
                             </li>
                         )) : <li className="font-roboto-condensed font-normal text-base flex items-center justify-between p-2 border-b last:border-0 text-black">
