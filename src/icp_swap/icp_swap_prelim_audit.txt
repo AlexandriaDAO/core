@@ -1,0 +1,104 @@
+This review only concerns the update.rs.
+
+
+
+1. The swap function:
+
+There are no checks for a minimum ICP input.
+Problem: Someone can send 0.00...1 ICP. 
+This can be a spam attack, and potentially an interger overflow, since both amounts are u64 and minted amount is 1000X more than input.
+
+
+2. Mint LBRY function:
+
+3. burn_LBRY()
+Dividing by an interger is not prepped to handle a loss of percision. Will this round up, or down?
+This needs  a more precice calculation method (fixed-point arithmetic).
+There's also no minimum. You should have to send at least 0.001 LBRY (1 thousanth of 1 penny @$10 ICP).
+This is because there will likely be no action worth less than 1 hundreth of a penny, so if ICP 10Xs we're still okay.
+
+
+4. Mint_UCG()
+There's a lack of precision when dividing by
+
+5. Stake_UCG()
+There's no minimum stake.
+I think stakers should have no less than 1 UCG to participate.
+
+6. un_stake_UCG()
+Also needs to check for a minimum amount, that is 1UCG.
+I think we should also add a withdraw all function, as most of the time people will use this, and in-case there is less than >1UGC it'll have a cleaner withdraw.
+
+7. set_ratio_LBRY_per_ICP()
+I changed my mind. This is too complicated and can be very unfair if it is ever used.
+Let's keep a fixed and permanent 1000:1 ratio of LBRY:ICP for minting.
+And a 1000:0.5 ratio of LBRY:ICP for burning.
+LBRY should hold its value relative to ICP forever.
+We will make prices for things variable in the regular backend.
+
+8. set_staking_reward()
+Forget about this as well. 
+There's no checks to ensure that the percentages are in a reasonable range, and I see no reason we'll ever change this.
+A fixed 10% of the pool to be emmited daily is just fine.
+
+
+9. distribute_reward()
+- Division by zero error if there's no ICP?
+- You're mixing f64 and u64. This can cause precision errors and should be standardized.
+- Why is guard commented out, and what canister does it refer to? This should not be a public function, or anyone can stake a large amount and call it whenever they want.
+  This logic should be refined to trigger this as a private function with cdk::timers, with logic self countained in the canister.
+  e.g., just make it a private function and you wont' need the guard.
+- You don't update TOTAL_ICP_AVAILIBLE after distributing rewards.
+
+
+It also seems foolish to distribute if the amount is below a certain threshold.
+I would recommend ensureing that 10ICP exists in the pool before distributing rewards.
+This way, we don't ever distribute less than 1 ICP, and always have at least 9-10 ICP in the reserve pool for people to burn LBRY.
+
+I also generally disagree with your approach of collecting all the addresses to allocate to.
+You're checking if staking percentage is greater than 0, but don't set a minimum above zero. This 
+
+
+There needs to be a check that ensures these are balanced or at leasst a test that simulates multiple stakers and ensures:
+sum of rewards distributed *10 = initial rewards pool.
+I bet these would be off from eachother because you're mutliplying and dividing the many floats from stakers to calculate rewards distributions.
+
+It also needs to be answered how many stakers this could scale to, and why? Each day we're recalculating the stakes of each user.
+Can we do this with 10s of thousands fo stakers without calculation issues?
+
+I could be wrong in my scrutinizing of this function, but it's very complex and feels like there's much possibility for exploits.
+
+
+10. claim_icp_reward()
+- You don't confirm that the transfer is complete before resetting the stakers allocation to zero.
+- There needs to be a minimum claim amount. Perhaps 0.01 ICP.
+- Is it possible that there'd not be enough ICP to pay? There's no check for this, even if it's very unlikely.
+
+
+
+General quesion/problem. There are no state updates on the interior of functions when you call others.
+In other words, there assumes no possibility of re-entrency bugs which is a known issue on the IC.
+
+
+
+
+
+
+General recommended change:
+  - Get rid of all communication with other principals and canisters. Why do we need this? All logic here should be self-countained and as simple as possible.
+
+
+Questions: 
+1. Do we have to worry about a staking contract with no cooldown/lockup? Could people take advantage of this in some way?
+
+
+
+
+
+
+
+
+
+Why are we hardcoding fees here?
+
+In token burn, why wouldn't that canister be approved to spend the user's tokens. Isn't it set up that way by default.
