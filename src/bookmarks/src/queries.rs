@@ -2,7 +2,7 @@ use ic_cdk::api::caller;
 use ic_cdk::{query, update};
 
 use super::utils::hash_principal;
-use super::{BookMark, BM, UGBN, USER_FAVORITES, USER_SAVES};
+use super::{BookMark, BM, LBN, USER_FAVORITES, USER_SAVES};
 
 #[query]
 fn get_bms(post_ids: Vec<u64>) -> Vec<Option<BookMark>> {
@@ -80,19 +80,19 @@ pub fn get_user_favorites(slot: usize, amount: Option<usize>) -> (Vec<Option<Boo
 }
 
 #[query]
-pub fn get_ugbn_posts(
-    ugbn: u64,
+pub fn get_lbn_posts(
+    lbn: u64,
     slot: usize,
     amount: Option<usize>,
 ) -> (Vec<Option<BookMark>>, usize) {
     const MAX_AMOUNT: usize = 40;
     let amount = amount.unwrap_or(10).min(MAX_AMOUNT);
 
-    UGBN.with(|ugbn_map| {
-        ugbn_map
+    LBN.with(|lbn_map| {
+        lbn_map
             .borrow()
-            .get(&ugbn)
-            .map(|ugbn_entry| get_bookmarks_section(&ugbn_entry.ugbn, slot, amount))
+            .get(&lbn)
+            .map(|lbn_entry| get_bookmarks_section(&lbn_entry.lbn, slot, amount))
             .unwrap_or_else(|| (Vec::new(), 0))
     })
 }

@@ -3,12 +3,12 @@ type Result_1 = variant { Ok : text; Err : text };
 
 service : {
     "greet": (text) -> (text) query;
-    "mint_UCG" : (float64,principal) -> (Result_1);
+    "mint_ALEX" : (float64,principal) -> (Result_1);
     "add_caller":(principal)->(Result_1);
     "remove_caller":(principal)->(Result_1);
     get_totat_LBRY_burn : () -> (float64) query;
-    get_totat_UCG_minted: () -> (float64) query;
-    get_current_UCG_rate: () -> (float64) query;
+    get_totat_ALEX_minted: () -> (float64) query;
+    get_current_ALEX_rate: () -> (float64) query;
     get_current_LBRY_threshold: () -> (float64) query;
     get_allowed_callers: () -> (vec principal) query;
     your_principal:()-> (Result_1) query;

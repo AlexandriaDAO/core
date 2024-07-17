@@ -1,0 +1,94 @@
+I didn't have a great deal of time to do a deep audit. I think you can infer many things from my suggestions in the token_swap canister.
+
+The big issue is that we're trying to mix two separate ideas: 
+  - One is that actions burn library and reward the librarians/book-owners ALEX.
+  - One is that the librarians/book-owners are paid directly in LBRY, and anyone can mint ALEX by burning lbry.
+
+  I think those are both good ideas but need to be separated.
+
+I love how the tokenomics canister rewards 2 people, but don't like how both those people are the same for someone that simply burns library.
+I also don't like how hard it would be to track what librarian LBRY is burned on behalf of.
+
+The Solution!!!
+Instead of users burning library with in-app actions, we'll just have them send them to the NFT or Owner/Libraian Principal.
+Than anyone can separately burn LBRY, and get ICP & ALEX in return.
+
+Now, the big bonus. When ALEX is minted, you did a lot of work to ensure that it is minted to two different people.
+I'd suggest that every time someone burns LBRY to mint themselves ALEX, they also have to mint ALEX to a semi-random librarian.
+
+I added a get_random_librarian() function in the alex_backend canister for now that you can use.
+I'll later adjust the function to weight librarians based on how much user's like their books/engines/posts, etc.
+This way, if a whale trys to mint themsleves a bunch of tokens, they'll also have to mint a bunch to actual users/contributors.
+I will also flatten out the minting numbers so they're not so heavily weighted for early users.
+This is how we beat gaming/bot attacks and truly distribute via PoW!
+
+We should follow this up with a call. I'm at the end of day and have more to explain/detail but my brain is fried.
+
+
+
+
+I left some notes below, but those were before deciding here on how to change the specs so I think they'll be readjusted after we change the project a bit more.
+
+mint_ALEX()
+- This is actually really impressive how you handle multiple lbry at a time and split the calculation across reward blocks.
+I'd just be worried about what happens when mulitple people call at once, so we need a bot prevention mechanism.
+Here's one recommendation:
+  - For the first hour, you can only mint 1 LBRY at a time.
+  - For the next 12 hours, 
+
+
+Otherwise, the reason I find this very confusing is you also use mint_ALEX() in tokenomics, with the same name and a different purpose.
+When you use mint_ALEX() in token_swap, and use it to call mint_ALEX() in icp_swap, you the 'owner' and 'author' arguments are the same, so isn't that giving a double mint to the guy who burns the LBRY.
+
+
+// Requested general changes
+- Get rid of the admin rights. There should be no admin rights to add or remove callers. This is the most important canister to make autonomous and blackholed ASAP.
+- If you're going to use hardcoded canisters, please use our actual canister ids. We deploy with the canisters in canister_ids.json, so tokenomics is uxyan-oyaaa-aaaap-qhezq-cai. The build scripts, local and network, deploy with these as well.
+- Why do you use totat instead of total?
+This occurs in both the tokenomics and icp_swap canisters, 
+
+
+// Recommended Tests:
+- get_total_ALEX_minted === icrc7_total_supply
+
+
+
+
+
+There's a big fork in the road here.
+
+- In one direction, LBRY is sent to people to pay for stuff.
+- In the other direction, LBRY is burned on behalf of people to mint ALEX.
+
+We'll need to use this to our advantage to prevent bot attacks.
+
+
+
+
+
+Time perhaps for another plan to minting tokens.
+
+I like the nft-based wallets whereby owners are paid LBRY directly.
+ 
+I also like you can only get ALEX from value bearing platform actions.
+
+What if we just mint to people that spend LBRY.
+ - The problem with that is everyone will just perform a bunch of inauthentic actions.
+
+There has got to be a way around this?
+
+Nope. I think we have to keep it as is.
+
+Let's make the tokenomics and token_swap canister independent of one another.
+But can I make use of all the wonderful logic that mints two NFT owners as well?
+What if we used the minting logic to give the second mint to some random librarian out there as well?
+YES!! However, it shouldn't be any old librarian, but the books most used?
+YES!!! We can expand the long tail of the mint to reduce gaming.
+
+But how to select the lucky librarian?
+Whenever LBRY is sent to an
+
+
+We have:
+- A token_swap canister that burns LBRY and mints ALEX.
+- A tokenomics canister that mints ALEX to the LBRY burners.

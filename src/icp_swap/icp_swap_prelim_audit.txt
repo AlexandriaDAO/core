@@ -18,15 +18,15 @@ There's also no minimum. You should have to send at least 0.001 LBRY (1 thousant
 This is because there will likely be no action worth less than 1 hundreth of a penny, so if ICP 10Xs we're still okay.
 
 
-4. Mint_UCG()
-There's a lack of precision when dividing by
+4. Mint_ALEX()
+There's a lack of precision when dividing by (actually, I don't understand how you're dividing this. Maybe it's okay if it rounds to some decimal.)
 
-5. Stake_UCG()
+5. Stake_ALEX()
 There's no minimum stake.
-I think stakers should have no less than 1 UCG to participate.
+I think stakers should have no less than 1 ALEX to participate.
 
-6. un_stake_UCG()
-Also needs to check for a minimum amount, that is 1UCG.
+6. un_stake_ALEX()
+Also needs to check for a minimum amount, that is 1ALEX.
 I think we should also add a withdraw all function, as most of the time people will use this, and in-case there is less than >1UGC it'll have a cleaner withdraw.
 
 7. set_ratio_LBRY_per_ICP()

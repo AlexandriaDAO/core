@@ -1,5 +1,5 @@
 {
-  "ucg_backend": {
+  "alex_backend": {
     "ic": "xj2l7-vyaaa-aaaap-abl4a-cai"
   },
   "bookmarks": {
@@ -11,7 +11,7 @@
   "librarians": {
     "ic": "ju4sh-3yaaa-aaaap-ahapa-cai"
   },
-  "ucg_frontend": {
+  "alex_frontend": {
     "ic": "xo3nl-yaaaa-aaaap-abl4q-cai"
   },
   "internet_identity": {
@@ -23,7 +23,7 @@
   "LBRY": {
     "ic": "hdtfn-naaaa-aaaam-aciva-cai"
   },
-  "UCG": {
+  "ALEX": {
     "ic": "7hcrm-4iaaa-aaaak-akuka-cai"
   },
   "icrc7": {

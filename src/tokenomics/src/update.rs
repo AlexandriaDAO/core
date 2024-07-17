@@ -9,8 +9,8 @@ use icrc_ledger_types::icrc1::transfer::{BlockIndex, TransferArg, TransferError}
 use icrc_ledger_types::icrc2::transfer_from::{TransferFromArgs, TransferFromError};
 
 #[ic_cdk::update(guard = "is_allowed")]
-pub async fn mint_UCG(lbry_burn: f64, actual_caller: Principal,author:Principal) -> Result<String, String> {
-    let mut minted_ucg: f64 = 0.0;
+pub async fn mint_ALEX(lbry_burn: f64, actual_caller: Principal,author:Principal) -> Result<String, String> {
+    let mut minted_alex: f64 = 0.0;
     let mut current_threshold = CURRENT_THRESHOLD.with(|current_threshold| {
         let current_threshold: std::sync::MutexGuard<u32> = current_threshold.lock().unwrap();
         *current_threshold
@@ -20,45 +20,45 @@ pub async fn mint_UCG(lbry_burn: f64, actual_caller: Principal,author:Principal)
         *total_burned_lbry
     });
     if total_burned_lbry + lbry_burn > (LBRY_THRESHOLDS[current_threshold as usize]) {
-        let mint_ucg_with_current_threshold =
+        let mint_alex_with_current_threshold =
             (LBRY_THRESHOLDS[current_threshold as usize]) - total_burned_lbry;
-        let mint_ucg_with_incremented_threshold = lbry_burn - mint_ucg_with_current_threshold;
+        let mint_alex_with_incremented_threshold = lbry_burn - mint_alex_with_current_threshold;
         //minting phase 1
-        if mint_ucg_with_current_threshold > 0.0 {
-            let phase1_mint_ucg =
-                (UCG_PER_THRESHOLD[current_threshold as usize]) * mint_ucg_with_current_threshold;
-            mint_UCG_internal(phase1_mint_ucg/2.0, actual_caller).await?; //mint to actual_caller 
-            mint_UCG_internal(phase1_mint_ucg/2.0, author).await?; //mint to author 
+        if mint_alex_with_current_threshold > 0.0 {
+            let phase1_mint_alex =
+                (ALEX_PER_THRESHOLD[current_threshold as usize]) * mint_alex_with_current_threshold;
+            mint_ALEX_internal(phase1_mint_alex/2.0, actual_caller).await?; //mint to actual_caller 
+            mint_ALEX_internal(phase1_mint_alex/2.0, author).await?; //mint to author 
 
-            minted_ucg = phase1_mint_ucg;
+            minted_alex = phase1_mint_alex;
         }
         current_threshold += 1;
         if current_threshold > (LBRY_THRESHOLDS.len() as u32) - 1 {
             current_threshold = (LBRY_THRESHOLDS.len() as u32) - 1;
         }
         //minting phase 2
-        let phase2_mint_ucg =
-            (UCG_PER_THRESHOLD[current_threshold as usize]) * mint_ucg_with_incremented_threshold;
-        mint_UCG_internal(phase2_mint_ucg/2.0, actual_caller).await?;
-        mint_UCG_internal(phase2_mint_ucg/2.0, author).await?;
+        let phase2_mint_alex =
+            (ALEX_PER_THRESHOLD[current_threshold as usize]) * mint_alex_with_incremented_threshold;
+        mint_ALEX_internal(phase2_mint_alex/2.0, actual_caller).await?;
+        mint_ALEX_internal(phase2_mint_alex/2.0, author).await?;
 
 
-        minted_ucg = minted_ucg + phase2_mint_ucg;
+        minted_alex = minted_alex + phase2_mint_alex;
     } else {
-        minted_ucg = UCG_PER_THRESHOLD[current_threshold as usize] * lbry_burn;
-        mint_UCG_internal(minted_ucg/2.0, actual_caller).await?; //mint to actual_caller 
-        mint_UCG_internal(minted_ucg/2.0, author).await?; //mint to author 
+        minted_alex = ALEX_PER_THRESHOLD[current_threshold as usize] * lbry_burn;
+        mint_ALEX_internal(minted_alex/2.0, actual_caller).await?; //mint to actual_caller 
+        mint_ALEX_internal(minted_alex/2.0, author).await?; //mint to author 
     }
 
     ic_cdk::println!(
         "current threshold index is {} minted {}",
         current_threshold,
-        minted_ucg
+        minted_alex
     );
-    TOTAL_UCG_MINTED.with(|mint| {
+    TOTAL_ALEX_MINTED.with(|mint| {
         let mut mint: std::sync::MutexGuard<f64> = mint.lock().unwrap();
-        *mint += minted_ucg as f64;
-        ic_cdk::println!("Total UCG minted is {}", *mint)
+        *mint += minted_alex as f64;
+        ic_cdk::println!("Total ALEX minted is {}", *mint)
     });
     CURRENT_THRESHOLD.with(|threshold| {
         let mut threshold = threshold.lock().unwrap();
@@ -70,13 +70,13 @@ pub async fn mint_UCG(lbry_burn: f64, actual_caller: Principal,author:Principal)
         ic_cdk::println!("Total LBRY burned is  {}", *total_burned);
     });
 
-    Ok("Ok the value is ".to_string() + &minted_ucg.to_string())
+    Ok("Ok the value is ".to_string() + &minted_alex.to_string())
 }
 
 #[ic_cdk::update]
-async fn mint_UCG_internal(minted_ucg: f64, destinaion: Principal) -> Result<BlockIndex, String> {
-    ic_cdk::println!("minting to {}==>{}",minted_ucg,destinaion.to_string());
-    let amount = Nat::from((minted_ucg * pow(10.0, 8)) as u64);
+async fn mint_ALEX_internal(minted_alex: f64, destinaion: Principal) -> Result<BlockIndex, String> {
+    ic_cdk::println!("minting to {}==>{}",minted_alex,destinaion.to_string());
+    let amount = Nat::from((minted_alex * pow(10.0, 8)) as u64);
     let transfer_args: TransferArg = TransferArg {
         amount,
         //transfer tokens from the default subaccount of the canister

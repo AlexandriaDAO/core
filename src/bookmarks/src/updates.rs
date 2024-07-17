@@ -3,7 +3,7 @@
 // TODO:
 
 // The other thing is deciding how to claim:
-// - UCG should be distributed in real time for these actions, so no need to use claimable bookmarks.
+// - ALEX should be distributed in real time for these actions, so no need to use claimable bookmarks.
 // - Claimable bookmarks will be used to distribute ICP to token holder, so at the end of the 24 hours, all the non-zero claimable bookmarks will be queried,
 //    and factored into the ICP distribution of that day, and then reset. So every favorite action of that day grants a share of that day's ICP dispersment to some book owner.
 
@@ -27,13 +27,13 @@ const DECIMALS: usize=8;
 
 #[ic_cdk::update]
 pub async fn init_bm(
-    ugbn: u64,
+    lbn: u64,
     author: String,
     title: String,
     content: String,
     cfi: String,
 ) -> Result<String, String> {
-    match save_bm(ugbn, author, title, content, cfi).await {
+    match save_bm(lbn, author, title, content, cfi).await {
         Ok(post_id) => {
             ic_cdk::println!("Bookmark saved with post_id: {}", post_id);
             Ok("Success!".to_string())
@@ -54,7 +54,7 @@ pub async fn init_favorite(post_id: u64) -> Result<String, String> {
 // This is a public function so I can test without LBRY burn. It will be private.
 #[update]
 pub async fn save_bm(
-    ugbn: u64,
+    lbn: u64,
     author: String,
     title: String,
     content: String,
@@ -64,7 +64,7 @@ pub async fn save_bm(
     let owner_hash = hash_principal(caller());
 
     // Stop anything that requires excessive storage.
-    assert!(ugbn.to_string().len() <= 20);
+    assert!(lbn.to_string().len() <= 20);
     assert!(author.len() <= 200);
     assert!(title.len() <= 250);
     assert!(content.len() <= 4000);
@@ -77,24 +77,24 @@ pub async fn save_bm(
         Ok(success_msg) => ic_cdk::println!("{}", success_msg),
         Err(err_msg) => return Err(format!("Error during transfer_LBRY: {}", err_msg)),
     }
-    let card = BookMark::new(post_id, ugbn, author, title, content, cfi, owner_hash);
+    let card = BookMark::new(post_id, lbn, author, title, content, cfi, owner_hash);
 
     BM.with(|cards| cards.borrow_mut().insert(post_id, card));
 
-    // Add the post_id to the UGBN BTree
-    UGBN.with(|ugbn_map| {
-        let mut ugbn_map = ugbn_map.borrow_mut();
-        if let Some(ugbn_entry) = ugbn_map.get(&ugbn) {
-            // If the UGBN entry exists, insert post_id at the beginning of the list.
-            let mut updated_ugbn = ugbn_entry.clone();
-            updated_ugbn.ugbn.insert(0, post_id);
-            ugbn_map.insert(ugbn, updated_ugbn);
+    // Add the post_id to the LBN BTree
+    LBN.with(|lbn_map| {
+        let mut lbn_map = lbn_map.borrow_mut();
+        if let Some(lbn_entry) = lbn_map.get(&lbn) {
+            // If the LBN entry exists, insert post_id at the beginning of the list.
+            let mut updated_lbn = lbn_entry.clone();
+            updated_lbn.lbn.insert(0, post_id);
+            lbn_map.insert(lbn, updated_lbn);
         } else {
-            // If the UGBN entry doesn't exist, create a new entry with the post_id
-            let new_ugbn_entry: UGBN = UGBN {
-                ugbn: vec![post_id],
+            // If the LBN entry doesn't exist, create a new entry with the post_id
+            let new_lbn_entry: LBN = LBN {
+                lbn: vec![post_id],
             };
-            ugbn_map.insert(ugbn, new_ugbn_entry);
+            lbn_map.insert(lbn, new_lbn_entry);
         }
     });
 

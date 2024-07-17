@@ -100,7 +100,7 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
         *icp -= amount_icp;
     });
     ic_cdk::println!("******************ICP sent to caller account*************************");
-    mint_UCG(amount_lbry, caller).await?;
+    mint_ALEX(amount_lbry, caller).await?;
     Ok("Burn Successfully!".to_string())
 }
 
@@ -192,14 +192,14 @@ async fn burn_token(amount: u64) -> Result<BlockIndex, String> {
     .map_err(|e: TransferFromError| format!("ledger transfer error {:?}", e))
 }
 #[update]
-pub async fn mint_UCG(lbry_amount: u64, owner: Principal) -> Result<String, String> {
+pub async fn mint_ALEX(lbry_amount: u64, owner: Principal) -> Result<String, String> {
     ic_cdk::println!("Ok here am I , got this amount {} right?", lbry_amount);
     let amount = lbry_amount as f64 / (1*pow(10,DECIMALS)) as f64;
     // 1. Asynchronously call another canister function using `ic_cdk::call`.
     let result = ic_cdk::call::<(f64, Principal, Principal), (Result<String, String>,)>(
         Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai")
             .expect("Could not decode the principal."),
-        "mint_UCG",
+        "mint_ALEX",
         (amount, caller(), owner),
     )
     .await
@@ -250,7 +250,7 @@ async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
 }
 
 #[update]
-async fn stake_UCG(amount: u64) -> Result<String, String> {
+async fn stake_ALEX(amount: u64) -> Result<String, String> {
     // Proceed with transfer
     deposit_token(amount).await?;
     let new_stake = STAKES.with(|stakes: &RefCell<Stakes>| {
@@ -264,7 +264,7 @@ async fn stake_UCG(amount: u64) -> Result<String, String> {
         current_stake.amount += amount;
         current_stake.time = ic_cdk::api::time();
     });
-    TOTAL_UCG_STAKED.with(|total_staked| {
+    TOTAL_ALEX_STAKED.with(|total_staked| {
         let mut total_staked: std::sync::MutexGuard<u64> = total_staked.lock().unwrap();
         *total_staked += amount
     });
@@ -306,7 +306,7 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
     .map_err(|e| format!("ledger transfer error {:?}", e))
 }
 #[update]
-async fn un_stake_UCG(amount: u64) -> Result<String, String> {
+async fn un_stake_ALEX(amount: u64) -> Result<String, String> {
     // verify caller balance
     if verify_caller_balance(amount) == false {
         return Err("Insufficent funds".to_string());
@@ -322,7 +322,7 @@ async fn un_stake_UCG(amount: u64) -> Result<String, String> {
         });
         current_stake.amount -= amount;
     });
-    TOTAL_UCG_STAKED.with(|total_staked| {
+    TOTAL_ALEX_STAKED.with(|total_staked| {
         let mut total_staked: std::sync::MutexGuard<u64> = total_staked.lock().unwrap();
         *total_staked -= amount;
     });
@@ -370,17 +370,17 @@ pub fn distribute_reward() -> Result<String, String> {
         return Err("Low Icp balance,reward not possible".to_string());
     }
 
-    let total_staked_ucg: u64 = TOTAL_UCG_STAKED.with(|staked: &Arc<Mutex<u64>>| {
+    let total_staked_alex: u64 = TOTAL_ALEX_STAKED.with(|staked: &Arc<Mutex<u64>>| {
         let staked: std::sync::MutexGuard<u64> = staked.lock().unwrap();
         *staked
     });
-    let icp_reward_per_ucg = total_icp_allocated / total_staked_ucg;
-    ic_cdk::println!("the reward icp is {}", icp_reward_per_ucg);
+    let icp_reward_per_alex = total_icp_allocated / total_staked_alex;
+    ic_cdk::println!("the reward icp is {}", icp_reward_per_alex);
 
     STAKES.with(|stakes: &RefCell<Stakes>| {
         let mut stakes_mut = stakes.borrow_mut();
         for stake in stakes_mut.stakes.values_mut() {
-            let reward = stake.amount * icp_reward_per_ucg;
+            let reward = stake.amount * icp_reward_per_alex;
             stake.reward_icp += reward;
         }
     });
