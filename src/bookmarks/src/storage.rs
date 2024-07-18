@@ -3,7 +3,7 @@
 /*
 Storage Structs:
   - Favorites - post_id vec
-  - UGBN - post_id vec
+  - LBN - post_id vec
   - Owner_hash - post_id vec
   - folders???
   - categories - K: 0-99 | Val: post_ids
@@ -34,7 +34,7 @@ Query Calls:
 
   get_anothers_bms : using the principal only, they can get a user's full collection.
 
-  get_ugbn : get all for a particular book.
+  get_lbn : get all for a particular book.
   get_category : get all for a particular category
 
 Advanced Query Calls:
@@ -66,7 +66,7 @@ type Memory = VirtualMemory<DefaultMemoryImpl>;
 #[derive(CandidType, Deserialize, Clone)]
 pub struct BookMark {
     pub post_id: u64,
-    pub ugbn: u64,
+    pub lbn: u64,
     pub author: String,
     pub title: String,
     pub content: String,
@@ -77,10 +77,10 @@ pub struct BookMark {
     pub claimable_bookmarks: u64,
 }
 impl BookMark {
-    pub fn new(post_id: u64, ugbn: u64, author: String, title: String, content: String, cfi: String, owner_hash: u64) -> Self {
+    pub fn new(post_id: u64, lbn: u64, author: String, title: String, content: String, cfi: String, owner_hash: u64) -> Self {
         BookMark {
             post_id,
-            ugbn,
+            lbn,
             author,
             title,
             content,
@@ -109,8 +109,8 @@ pub struct UserFavorites {
 }
 
 #[derive(CandidType, Deserialize, Clone)]
-pub struct UGBN {
-    pub ugbn: Vec<u64>,
+pub struct LBN {
+    pub lbn: Vec<u64>,
 }
 
 impl Storable for UserSaves {
@@ -149,7 +149,7 @@ impl Storable for UserFavorites {
     const BOUND: Bound = Bound::Unbounded;
 }
 
-impl Storable for UGBN {
+impl Storable for LBN {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
@@ -186,8 +186,8 @@ thread_local! {
         )
     );
 
-    // K: UGBN | V: PostIDs
-    pub static UGBN: RefCell<StableBTreeMap<u64, UGBN, Memory>> = RefCell::new(
+    // K: LBN | V: PostIDs
+    pub static LBN: RefCell<StableBTreeMap<u64, LBN, Memory>> = RefCell::new(
       StableBTreeMap::init(
           MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(6))),
       )

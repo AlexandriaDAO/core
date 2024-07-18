@@ -96,7 +96,7 @@ async fn current_mint() -> Result<Nat, String> {
 Functional Goals:
 
 // Updates
-- Caller is able to mint an NFT with the ArWeave id as the description, and the post id as UGBN
+- Caller is able to mint an NFT with the ArWeave id as the description, and the post id as LBN
 - Caller is able to burn their own nft.
 - Caller is able to transfer their nft to someone else.
 
@@ -113,18 +113,16 @@ How:
 Backend Psuedocode:
 
 
-
-
-//   - ugbn == icrc7_total_supply() # Actually nah, just get arweavetx first, since this might change.
-  - mint(ugbn, arweave_tx) -> ()
+//   - lbn == icrc7_total_supply() # Actually nah, just get arweavetx first, since this might change.
+  - mint(lbn, arweave_tx) -> ()
     - call icrc7 icrc7_mint()
 
 
 
 ACTUALLY. For burning, transfering, and querying, the frontend can just call the canister directly. You only need this backend as the minting authority.    
-  - burn(ugbn) -> ()
-    - if ic-cdk::caller() == call icrc7 icrc7_owner_of(ugbn);
-      - call (ugbn)
+  - burn(lbn) -> ()
+    - if ic-cdk::caller() == call icrc7 icrc7_owner_of(lbn);
+      - call (lbn)
     - else
       - you have no right.
 
@@ -135,9 +133,9 @@ Frontend Psuedocode:
 
 Mint(): 
   - All ArWeave metadata parameters must be prepopulated, so .ebook, cover image, and title, author, etc., via the frontend flow. (We'll later add checks to ensure the quality of the ebook).
-  - The only peice of metadata you still need is the NFT_id's current count, so get that from the backend and populate the UGBN metadata field with that mint number.
+  - The only peice of metadata you still need is the NFT_id's current count, so get that from the backend and populate the LBN metadata field with that mint number.
   - Manually get the transaction in advance of the upload using this methodology: https://docs.irys.xyz/developer-docs/irys-sdk/manual-transaction
-  - Call the backend and mint the nft with the ArWeave tx_id as the description, and the current count (UGBN) as the NFT's "id". 
+  - Call the backend and mint the nft with the ArWeave tx_id as the description, and the current count (LBN) as the NFT's "id". 
     - If successfull, upload to ArWeave and the NFT is done!
     - If transaction fails, don't upload to arweave.
 

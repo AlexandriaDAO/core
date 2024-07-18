@@ -13,6 +13,7 @@ const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
 const icp_ledger_canister_id= process.env.CANISTER_ID_ICP_LEDGER_CANISTER!;
 const tokenomics_canister_id=process.env.CANISTER_ID_TOKENOMICS!;
 const lbry_canister_id=process.env.CANISTER_ID_LBRY!;
+
 export const getPrincipal = (client:AuthClient): string => {
     const identity = client.getIdentity();
     const principal = identity.getPrincipal().toString();

@@ -41,6 +41,7 @@ pub fn get_stake(principal: Principal) -> Option<Stake> {
     STAKES.with(|stakes| stakes.borrow().stakes.get(&principal).cloned())
 }
 #[query]
+
 pub fn get_total_staked() -> u64 {
     TOTAL_ALEX_STAKED.with(|staked| {
         let staked: std::sync::MutexGuard<u64> = staked.lock().unwrap();

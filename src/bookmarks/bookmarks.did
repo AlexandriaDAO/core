@@ -4,7 +4,7 @@ type BookMark = record {
   post_id : nat64;
   content : text;
   claimable_bookmarks : nat64;
-  ugbn : nat64;
+  lbn : nat64;
   author : text;
   accrued_bookmarks : nat64;
   owner_hash : nat64;
@@ -20,7 +20,7 @@ service : {
   delete_folder : (text) -> (Result);
   favorite : (nat64) -> (Result);
   get_bms : (vec nat64) -> (vec opt BookMark) query;
-  get_ugbn_posts : (nat64, nat64, opt nat64) -> (vec opt BookMark, nat64) query;
+  get_lbn_posts : (nat64, nat64, opt nat64) -> (vec opt BookMark, nat64) query;
   get_user_bms : (nat64, opt nat64) -> (vec opt BookMark, nat64) query;
   get_user_favorites : (nat64, opt nat64) -> (vec opt BookMark, nat64) query;
   get_user_folder_posts : (text, nat64, opt nat64) -> (

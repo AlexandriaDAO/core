@@ -26,7 +26,6 @@ export default function App() {
                                 <Route path="/manager" element={<ManagerPage />} />
                                 <Route path="/reader" element={<ReaderPage />} />
                                 <Route path="/swap" element={<SwapPage />} />
-
                             </Routes>
                     </AuthProvider>
                 </BrowserRouter>

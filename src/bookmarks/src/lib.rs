@@ -30,7 +30,7 @@ BM stands for "BookMark"
 ***[Functions]***
 
 whoami() = "Returns the Principal of the caller (for testing)"
-save_bm(ugbn, author, title, content, cfi) = "Creates a new BookMark and stores it in the BM map"   // Later will cost 1LBRY
+save_bm(lbn, author, title, content, cfi) = "Creates a new BookMark and stores it in the BM map"   // Later will cost 1LBRY
 delete_bm(post_id) = "Removes a BookMark from the BM map by its post_id"
 get_bm(post_id) = "Retrieves a BookMark from the BM map by its post_id"
 get_bm_by_title(title) = "Retrieves all BookMarks from the BM map with a matching title"
@@ -49,7 +49,7 @@ USER_FAVORITES = "HashMap storing each user's favorite posts"
   Key: "post_id" = (consecutive interger, each post ID created increases by 1)
   Value: "BookMark Struct" [
       "owner" = (principal of the creator.)
-      "ugbn" = (ID of the book NFT used)
+      "lbn" = (ID of the book NFT used)
       "cfi" = (book snippet location)
       "text" = (post content)
       "title" = (book title)

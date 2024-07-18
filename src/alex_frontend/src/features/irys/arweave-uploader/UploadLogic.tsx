@@ -35,7 +35,7 @@ export const handleUpload = async (
 
   const APP_ID = process.env.DFX_NETWORK === "ic" 
     ? "testingAlexandria" 
-    : "Alexandria";
+    : "UncensoredGreats";
 
   if (!APP_ID) {
     throw new Error("Application ID is not set in environment variables");

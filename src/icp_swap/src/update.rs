@@ -393,11 +393,14 @@ pub fn distribute_reward() -> Result<String, String> {
     });
     let icp_reward_per_alex = total_icp_allocated / total_staked_alex;
     ic_cdk::println!("the reward icp is {}", icp_reward_per_alex);
+
     let mut total_icp_reward: u64 = 0;
+
     STAKES.with(|stakes: &RefCell<Stakes>| {
         let mut stakes_mut = stakes.borrow_mut();
         for stake in stakes_mut.stakes.values_mut() {
             let reward = stake.amount * icp_reward_per_alex;
+
             total_icp_reward += reward;
             stake.reward_icp += reward;
         }

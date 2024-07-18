@@ -19,6 +19,7 @@ import myNodesReducer from "@/features/my-nodes/myNodesSlice";
 import swapReducer from "@/features/swap/swapSlice"
 import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
+
 const rootReducer = combineReducers({
 	home: homeReducer,
 	auth: authReducer,
@@ -43,8 +44,6 @@ const rootReducer = combineReducers({
 	swap:swapReducer,
 	icpLedger:icpLedgerReducer,
 	tokenomics:tokenomicsReducer,
-
-
 
 	portal: portalReducer,
 });

@@ -1,7 +1,7 @@
 ukvtntnbije
 // type BookMark = record {
 //   post_id : nat64;
-//   ugbn : nat64;
+//   lbn : nat64;
 //   author : text;
 //   title : text;
 //   content : text;

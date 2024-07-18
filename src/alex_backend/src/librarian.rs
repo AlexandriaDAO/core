@@ -118,6 +118,20 @@ pub fn get_all_librarians() -> Vec<Librarian> {
     })
 }
 
+#[query]
+pub fn get_random_librarian() -> Option<Librarian> {
+    LIBRARIAN_MAP.with(|m| {
+        let map = m.borrow();
+        let len = map.len();
+        if len == 0 {
+            None
+        } else {
+            let random_index = ic_cdk::api::time() % len;
+            map.iter().nth(random_index as usize).map(|(_, librarian)| librarian.clone())
+        }
+    })
+}
+
 fn hash_principal(principal: Principal) -> u64 {
     let hash = Sha256::digest(principal.as_slice());
     let mut bytes = [0u8; 8];

@@ -19,7 +19,7 @@ This is because there will likely be no action worth less than 1 hundreth of a p
 
 
 4. Mint_ALEX()
-There's a lack of precision when dividing by
+There's a lack of precision when dividing by (actually, I don't understand how you're dividing this. Maybe it's okay if it rounds to some decimal.)
 
 5. Stake_ALEX()
 There's no minimum stake.

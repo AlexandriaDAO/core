@@ -10,7 +10,9 @@ dfx start --clean
 ``` 
 dfx deploy tokenomics
 ```
+
 ### Let's deploy icp_swap canister  🚀
+
 
 ``` 
 dfx deploy icp_swap
