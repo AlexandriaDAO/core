@@ -22,11 +22,14 @@ service : {
 
   get_all_stakes: () -> (vec record { principal; Stake }) query;
   get_stake : (user : Principal) -> (float64) query;
-  get_totat_staked:()->(nat64) query;
+  get_total_staked:()->(nat64) query;
   caller_subaccount:()->(text) query;
   get_current_LBRY_ratio : () -> (text) query;
   get_current_staking_reward_percentage : () -> (text) query;
-
+  get_total_unclaimed_icp_reward:()->(nat64) query;
+  get_total_icp_avialable:()->(nat64) query;
+  get_maximum_LBRY_burn_allowed:()->(nat64) query;
 }
+
 
 

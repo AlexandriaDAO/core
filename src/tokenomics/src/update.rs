@@ -7,6 +7,9 @@ use crate::guard::*;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::{BlockIndex, TransferArg, TransferError};
 use icrc_ledger_types::icrc2::transfer_from::{TransferFromArgs, TransferFromError};
+const ucg_canister_id: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
+const icp_swap_canister_id: &str = "5qx27-tyaaa-aaaal-qjafa-cai";
+
 
 #[ic_cdk::update(guard = "is_allowed")]
 pub async fn mint_UCG(lbry_burn: f64, actual_caller: Principal,author:Principal) -> Result<String, String> {
@@ -87,7 +90,7 @@ async fn mint_UCG_internal(minted_ucg: f64, destinaion: Principal) -> Result<Blo
         memo: None,
     };
     ic_cdk::call::<(TransferArg,), (Result<BlockIndex, TransferError>,)>(
-        Principal::from_text("7hcrm-4iaaa-aaaak-akuka-cai")
+        Principal::from_text(ucg_canister_id)
             .expect("Could not decode the principal."),
         "icrc1_transfer",
         (transfer_args,),
@@ -98,36 +101,36 @@ async fn mint_UCG_internal(minted_ucg: f64, destinaion: Principal) -> Result<Blo
     .map_err(|e| format!("ledger transfer error {:?}", e))
 }
 
-#[ic_cdk::update]
-async fn burn_lbry(burn_amount: f64, actual_caller: Principal) -> Result<BlockIndex, String> {
-    let canister_id: Principal = ic_cdk::api::id(); //assume current current canister is minter
-    let amount = Nat::from((burn_amount * pow(10.0, 8)) as u64);
+// #[ic_cdk::update]
+// async fn burn_lbry(burn_amount: f64, actual_caller: Principal) -> Result<BlockIndex, String> {
+//     let canister_id: Principal = ic_cdk::api::id(); //assume current current canister is minter
+//     let amount = Nat::from((burn_amount * pow(10.0, 8)) as u64);
 
-    let transfer_from_args: TransferFromArgs = TransferFromArgs {
-        // the account we want to transfer tokens from (in this case we assume the caller approved the canister to spend funds on their behalf)
-        from: Account::from(actual_caller),
-        memo: None,
-        // the amount we want to burn
-        amount,
-        spender_subaccount: None,
-        fee: None,
-        to: canister_id.into(),
-        created_at_time: None,
-    };
-    let icrc_canister_id = Principal::from_text("hdtfn-naaaa-aaaam-aciva-cai")
-        .expect("Could not decode the principal.");
-    ic_cdk::println!("ICRC Token Canister ID: {:?}", icrc_canister_id);
+//     let transfer_from_args: TransferFromArgs = TransferFromArgs {
+//         // the account we want to transfer tokens from (in this case we assume the caller approved the canister to spend funds on their behalf)
+//         from: Account::from(actual_caller),
+//         memo: None,
+//         // the amount we want to burn
+//         amount,
+//         spender_subaccount: None,
+//         fee: None,
+//         to: canister_id.into(),
+//         created_at_time: None,
+//     };
+//     let icrc_canister_id = Principal::from_text("hdtfn-naaaa-aaaam-aciva-cai")
+//         .expect("Could not decode the principal.");
+//     ic_cdk::println!("ICRC Token Canister ID: {:?}", icrc_canister_id);
 
-    ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
-        icrc_canister_id,
-        "icrc2_transfer_from",
-        (transfer_from_args,),
-    )
-    .await
-    .map_err(|e| format!("failed to call ledger: {:?}", e))?
-    .0
-    .map_err(|e: TransferFromError| format!("ledger transfer error {:?}", e))
-}
+//     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
+//         icrc_canister_id,
+//         "icrc2_transfer_from",
+//         (transfer_from_args,),
+//     )
+//     .await
+//     .map_err(|e| format!("failed to call ledger: {:?}", e))?
+//     .0
+//     .map_err(|e: TransferFromError| format!("ledger transfer error {:?}", e))
+// }
 
 
 #[ic_cdk::update(guard = "is_admin")]
@@ -148,6 +151,6 @@ fn remove_caller(principal: Principal) -> Result<String, String> {
 }
 #[init]
 fn init() {
-    ALLOWED_CALLERS.with(|users| users.borrow_mut().insert(Principal::from_text("br5f7-7uaaa-aaaaa-qaaca-cai")
+    ALLOWED_CALLERS.with(|users| users.borrow_mut().insert(Principal::from_text(icp_swap_canister_id)
     .expect("Could not decode the principal.")));
 }

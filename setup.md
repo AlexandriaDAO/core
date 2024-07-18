@@ -10,11 +10,16 @@ dfx start --clean
 ``` 
 dfx deploy tokenomics
 ```
+### Let's deploy icp_swap canister  🚀
+
+``` 
+dfx deploy icp_swap
+```
 ###  Deploy UCG 🌐🔒👥
  
 
-```
-dfx identity use default
+
+```dfx identity use default
 export DEFAULT=$(dfx identity get-principal)
 dfx deploy UCG --argument "(variant { Init =
 record {
@@ -32,7 +37,6 @@ record {
  }
 })"
 ```
-
 ###  Deploy LBRY 🎟️
 
 ```

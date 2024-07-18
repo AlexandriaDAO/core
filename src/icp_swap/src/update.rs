@@ -17,7 +17,10 @@ use crate::guard::*;
 use crate::utils::*;
 use crate::{get_stake, storage::*};
 use num_bigint::BigUint;
-const DECIMALS: usize=8; 
+const DECIMALS: usize = 8;
+const ucg_canister_id: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
+const lbry_canister_id: &str = "hdtfn-naaaa-aaaam-aciva-cai";
+const tokenomics_canister_id: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 
 //swap
 #[update]
@@ -32,7 +35,10 @@ pub async fn swap(amount_icp: u64) -> Result<String, String> {
         let mut icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
         *icp += amount_icp;
     });
-    mint_LBRY(((amount_icp as f64) * (lbry_per_icp as f64 /(1*pow(10,DECIMALS)) as f64))as u64).await?;
+    mint_LBRY(
+        ((amount_icp as f64) * (lbry_per_icp as f64 / (1 * pow(10, DECIMALS)) as f64)) as u64,
+    )
+    .await?;
     Ok("Swap Successfully!".to_string())
 }
 #[update]
@@ -65,8 +71,7 @@ async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
     ic_cdk::call::<(TransferArg,), (Result<BlockIndex, TransferError>,)>(
         // 2. Convert a textual representation of a Principal into an actual `Principal` object. The principal is the one we specified in `dfx.json`.
         //    `expect` will panic if the conversion fails, ensuring the code does not proceed with an invalid principal.
-        Principal::from_text("c5kvi-uuaaa-aaaaa-qaaia-cai")
-            .expect("Could not decode the principal."),
+        Principal::from_text(lbry_canister_id).expect("Could not decode the principal."),
         // 3. Specify the method name on the target canister to be called, in this case, "icrc1_transfer".
         "icrc1_transfer",
         // 4. Provide the arguments for the call in a tuple, here `transfer_args` is encapsulated as a single-element tuple.
@@ -90,7 +95,22 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
         let ratio: std::sync::MutexGuard<u64> = ratio.lock().unwrap();
         *ratio
     });
-    let amount_icp = (amount_lbry / lbry_per_icp) / 2;
+    ic_cdk::println!("The ratio is {}", lbry_per_icp);
+    let amount_icp: u64 = (((amount_lbry as f64 / lbry_per_icp as f64) / 2.0) * 1000_000_00.0) as u64;
+    let total_icp_available = TOTAL_ICP_AVAILABLE.with(|icp| {
+        let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
+        *icp
+    });
+    let total_unclaimed_icp: u64 = TOTAL_UNCALIMED_ICP_REWARD.with(|icp| {
+        let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
+        *icp
+    });
+    // keeping 50% for staker pools 
+    let actual_available_icp: u64=(total_icp_available-total_unclaimed_icp)/2;
+    if  amount_icp > actual_available_icp {
+        return Err("Burning stoped, insufficent icp funds ".to_string());
+    }
+
     ic_cdk::println!("The amount is {}", amount_icp);
     burn_token(amount_lbry).await?;
     ic_cdk::println!("******************Token Burned*************************");
@@ -174,8 +194,7 @@ async fn burn_token(amount: u64) -> Result<BlockIndex, String> {
     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
         // 2. Convert a textual representation of a Principal into an actual `Principal` object. The principal is the one we specified in `dfx.json`.
         //    `expect` will panic if the conversion fails, ensuring the code does not proceed with an invalid principal.
-        Principal::from_text("c5kvi-uuaaa-aaaaa-qaaia-cai")
-            .expect("Could not decode the principal."),
+        Principal::from_text(lbry_canister_id).expect("Could not decode the principal."),
         // 3. Specify the method name on the target canister to be called, in this case, "icrc1_transfer".
         "icrc2_transfer_from",
         // 4. Provide the arguments for the call in a tuple, here `transfer_args` is encapsulated as a single-element tuple.
@@ -194,16 +213,16 @@ async fn burn_token(amount: u64) -> Result<BlockIndex, String> {
 #[update]
 pub async fn mint_UCG(lbry_amount: u64, owner: Principal) -> Result<String, String> {
     ic_cdk::println!("Ok here am I , got this amount {} right?", lbry_amount);
-    let amount = lbry_amount as f64 / (1*pow(10,DECIMALS)) as f64;
+    let amount = lbry_amount as f64 / (1 * pow(10, DECIMALS)) as f64;
     // 1. Asynchronously call another canister function using `ic_cdk::call`.
-    let result = ic_cdk::call::<(f64, Principal, Principal), (Result<String, String>,)>(
-        Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai")
-            .expect("Could not decode the principal."),
-        "mint_UCG",
-        (amount, caller(), owner),
-    )
-    .await
-    .map_err(|e| format!("failed to call ledger: {:?}", e));
+    let result: Result<(Result<String, String>,), String> =
+        ic_cdk::call::<(f64, Principal, Principal), (Result<String, String>,)>(
+            Principal::from_text(tokenomics_canister_id).expect("Could not decode the principal."),
+            "mint_UCG",
+            (amount, caller(), owner),
+        )
+        .await
+        .map_err(|e| format!("failed to call ledger: {:?}", e));
 
     match result {
         Ok((ledger_result,)) => match ledger_result {
@@ -238,8 +257,7 @@ async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
     };
 
     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
-        Principal::from_text("cbopz-duaaa-aaaaa-qaaka-cai")
-            .expect("Could not decode the principal."),
+        Principal::from_text(ucg_canister_id).expect("Could not decode the principal."),
         "icrc2_transfer_from",
         (transfer_from_args,),
     )
@@ -295,8 +313,7 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
     };
 
     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
-        Principal::from_text("cbopz-duaaa-aaaaa-qaaka-cai")
-            .expect("Could not decode the principal."),
+        Principal::from_text(ucg_canister_id).expect("Could not decode the principal."),
         "icrc2_transfer_from",
         (transfer_from_args,),
     )
@@ -376,13 +393,18 @@ pub fn distribute_reward() -> Result<String, String> {
     });
     let icp_reward_per_ucg = total_icp_allocated / total_staked_ucg;
     ic_cdk::println!("the reward icp is {}", icp_reward_per_ucg);
-
+    let mut total_icp_reward: u64 = 0;
     STAKES.with(|stakes: &RefCell<Stakes>| {
         let mut stakes_mut = stakes.borrow_mut();
         for stake in stakes_mut.stakes.values_mut() {
             let reward = stake.amount * icp_reward_per_ucg;
+            total_icp_reward += reward;
             stake.reward_icp += reward;
         }
+    });
+    TOTAL_UNCALIMED_ICP_REWARD.with(|icp| {
+        let mut icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
+        *icp += total_icp_reward;
     });
     Ok("Sucess".to_string())
 }
@@ -394,9 +416,12 @@ async fn claim_icp_reward() -> Result<String, String> {
         Some(stake) => {
             if stake.reward_icp <= 0 {
                 return Err("Insufficient rewards".to_string());
-            }            
+            }
             send_icp(caller(), stake.reward_icp).await?;
-        
+            TOTAL_UNCALIMED_ICP_REWARD.with(|icp| {
+                let mut icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
+                *icp -= stake.reward_icp;
+            });
             // make reward balance to 0
             STAKES.with(|stakes| {
                 let mut stakes = stakes.borrow_mut();
@@ -409,7 +434,6 @@ async fn claim_icp_reward() -> Result<String, String> {
             });
 
             Ok("success".to_string())
-            // Proceed with your operatio
         }
         None => {
             // User doesn't have a stake
