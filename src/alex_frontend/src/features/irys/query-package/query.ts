@@ -11,7 +11,7 @@
 //     .search("irys:transactions") 
 //     .tags([
 //       { name: "Content-Type", values: ["application/epub+zip"] },
-//       { name: "application-id", values: ["Alexandria"] },
+//       { name: "application-id", values: ["UncensoredGreats"] },
 //       { name: "title", values: ["true"] },
 //       { name: "author", values: ["Agnes Giberne"]},
 //       { name: "language", values: ["en"]},
@@ -46,6 +46,8 @@ const client = new ApolloClient({
   cache: new InMemoryCache()
 });
 
+const APP_ID = process.env.DFX_NETWORK === "ic" ? "testingAlexandria" : "UncensoredGreats";
+
 export async function fetchTransactions(): Promise<Transaction[]> {
   try {
     const result = await client.query({
@@ -55,7 +57,7 @@ export async function fetchTransactions(): Promise<Transaction[]> {
           first: 100,
           tags: [
             { name: "Content-Type", values: ["application/epub+zip"] },
-            { name: "application-id", values: ["Alexandria"] },
+            { name: "application-id", values: ["${APP_ID}"] },
             ]
             ) {
               edges {
@@ -78,7 +80,6 @@ export async function fetchTransactions(): Promise<Transaction[]> {
                     // { name: "author", values: ["William Shakespeare", "Agnes Giberne"] },
                     { name: "language", values: ["en"] },
                     { name: "type", values: ["1", "2", "3", "8"] }
-                    
                   ];
                   
                   const filteredTransactions = result.data.transactions.edges.filter((edge: any) => {
@@ -101,8 +102,9 @@ export async function fetchTransactions(): Promise<Transaction[]> {
   }
 }
 
-
 export async function getQuery(): Promise<ApolloQueryResult<any>> {
+  console.log("DFX_NETWORK:", process.env.DFX_NETWORK);
+  console.log("APP_ID: ", APP_ID);
   try {
     const query = await client.query({
       query: gql`
@@ -111,7 +113,7 @@ export async function getQuery(): Promise<ApolloQueryResult<any>> {
             first: 100,
             tags: [
               { name: "Content-Type", values: ["application/epub+zip"] },
-              { name: "application-id", values: ["Alexandria"] },
+              { name: "application-id", values: ["${APP_ID}"] },
             ]
           ) {
             edges {
@@ -137,6 +139,15 @@ export async function getQuery(): Promise<ApolloQueryResult<any>> {
 }
 
 
+
+
+
+
+
+
+
+
+
 // export async function fetchAll(): Promise<Transaction[]> {
 //   console.log('fetchAll');
 //   try {
@@ -147,7 +158,7 @@ export async function getQuery(): Promise<ApolloQueryResult<any>> {
 //             first: 100,
 //             tags: [
 //               { name: "Content-Type", values: ["application/epub+zip"] },
-//               { name: "application-id", values: ["Alexandria"] },
+//               { name: "application-id", values: ["UncensoredGreats"] },
 //             ]
 //           ) {
 //             edges {
@@ -189,7 +200,7 @@ export async function getQuery(): Promise<ApolloQueryResult<any>> {
 //             first: 100,
 //             tags: [
 //               { name: "Content-Type", values: ["application/epub+zip"] },
-//               { name: "application-id", values: ["Alexandria"] },
+//               { name: "application-id", values: ["UncensoredGreats"] },
 //             ]
 //           ) {
 //             edges {
