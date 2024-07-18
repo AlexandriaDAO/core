@@ -9,20 +9,25 @@ import getSubaccount from "./thunks/getSubaccount";
 import swapLbry from "./thunks/swapLbry";
 import getMaxLbryBurn from "./thunks/getMaxLbryBurn";
 import burnLbry from "./thunks/burnLBRY";
+import getLbryBalance from "./thunks/getLbryBalance";
 // Define the interface for our node state
 export interface SwapState {
   lbryRatio: string;
+  lbryBalance: string;
   subaccount: string;
   maxLbryBurn: Number;
   loading: boolean;
+  success: boolean;
   error: string | null;
 }
 
 // Define the initial state using the ManagerState interface
 const initialState: SwapState = {
   lbryRatio: "0",
+  lbryBalance: "0",
   subaccount: "",
   maxLbryBurn: 0,
+  success: false,
   loading: false,
   error: null,
 };
@@ -30,7 +35,13 @@ const initialState: SwapState = {
 const swapSlice = createSlice({
   name: "swap",
   initialState,
-  reducers: {},
+  reducers: {
+    flagHandler: (state) => {
+      state.error = "";
+      state.success = false;
+      state.error = null;
+    },
+  },
   extraReducers: (builder: ActionReducerMapBuilder<SwapState>) => {
     builder
       .addCase(getLBRYratio.pending, (state) => {
@@ -49,6 +60,23 @@ const swapSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
+      .addCase(getLbryBalance.pending, (state) => {
+        message.info("Fetching LBRY Balance");
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getLbryBalance.fulfilled, (state, action) => {
+        message.success("Fetched LBRY Balance.");
+        state.lbryBalance = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(getLbryBalance.rejected, (state, action) => {
+        message.error("Could not be fetched");
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
       .addCase(getSubaccount.pending, (state) => {
         message.info("Fetching subaccount ratio");
         state.loading = true;
@@ -71,15 +99,17 @@ const swapSlice = createSlice({
         state.error = null;
       })
       .addCase(swapLbry.fulfilled, (state, action) => {
-        message.success("Success.");
+        message.success("Successfully Swaped!");
         state.loading = false;
+        state.success = true;
         state.error = null;
       })
       .addCase(swapLbry.rejected, (state, action) => {
         message.error("Error while Swaping");
         state.loading = false;
         state.error = action.payload as string;
-      }).addCase(burnLbry.pending, (state) => {
+      })
+      .addCase(burnLbry.pending, (state) => {
         message.info("Burning Lbry");
         state.loading = true;
         state.error = null;
@@ -111,5 +141,5 @@ const swapSlice = createSlice({
       });
   },
 });
-
+export const { flagHandler } = swapSlice.actions;
 export default swapSlice.reducer;

@@ -10,10 +10,11 @@ import { setUser } from '@/features/auth/authSlice';
 import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
-import { initializeActor, initializeActorSwap,initializeIcpLedgerActor, initializeTokenomicsActor } from '@/features/auth/utils/authUtils';
+import { initializeActor, initializeActorSwap,initializeIcpLedgerActor, initializeLbryActor, initializeTokenomicsActor } from '@/features/auth/utils/authUtils';
 import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from "../../../declarations/icp_ledger_canister";
 import { tokenomics } from '../../../declarations/tokenomics';
+import { LBRY } from '../../../declarations/LBRY';
 interface SessionProviderProps {
 	children: React.ReactNode;
 }
@@ -28,6 +29,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const [actorSwap,setActorSwap]=useState(icp_swap);
 	const [actorIcpLedger, setIcpLedger] = useState(icp_ledger_canister);
 	const [actorTokenomics, setActorTokenomics] = useState(tokenomics);
+	const [actorLbry,setActorLbry]=useState(LBRY);
 
 
 	const [authClient, setAuthClient] = useState<AuthClient>();
@@ -64,6 +66,8 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 			setIcpLedger(actorIcpLedger);
 			const actorTokenomics=await initializeTokenomicsActor(authClient);
 			setActorTokenomics(actorTokenomics);
+			const actorLbry=await initializeLbryActor(authClient);
+			setActorLbry(actorLbry);
 		}
 		setupActor();
 	},[user])
@@ -99,7 +103,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	}, [actor,actorSwap,actorIcpLedger]);
 
 	return (
-		<SessionContext.Provider value={{ actor,actorSwap,actorIcpLedger,actorTokenomics, authClient, meiliClient, meiliIndex  }}>
+		<SessionContext.Provider value={{ actor,actorSwap,actorIcpLedger,actorTokenomics, actorLbry,authClient, meiliClient, meiliIndex  }}>
 			{children}
 		</SessionContext.Provider>
 	);

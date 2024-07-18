@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { useAppDispatch } from '../../../store/hooks/useAppDispatch';
-import { useAppSelector } from "../../../store/hooks/useAppSelector";
+import { useAppDispatch } from '../../../../store/hooks/useAppDispatch';
+import { useAppSelector } from "../../../../store/hooks/useAppSelector";
 import { ActorSubclass } from "@dfinity/agent";
 
-import getLBRYratio from "../thunks/getLBRYratio";
+import getLBRYratio from "../../thunks/getLBRYratio";
 import { ImSpinner8 } from "react-icons/im";
-import { _SERVICE as _SERVICESWAP } from '../../../../../declarations/icp_swap/icp_swap.did';
+import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
 interface LbryRatioProps {
     actorSwap: ActorSubclass<_SERVICESWAP>;
 }

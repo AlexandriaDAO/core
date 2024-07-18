@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useAppDispatch } from '../../../store/hooks/useAppDispatch';
-import { useAppSelector } from "../../../store/hooks/useAppSelector";
+import { useAppDispatch } from '../../../../store/hooks/useAppDispatch';
+import { useAppSelector } from "../../../../store/hooks/useAppSelector";
 import { ActorSubclass } from "@dfinity/agent";
 
-import getLBRYratio from "../thunks/getLBRYratio";
-import swapLbry from "../thunks/swapLbry";
+import getLBRYratio from "../../thunks/getLBRYratio";
+import swapLbry from "../../thunks/swapLbry";
 import { ImSpinner8 } from "react-icons/im";
-import { _SERVICE as _SERVICESWAP } from '../../../../../declarations/icp_swap/icp_swap.did';
+import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
+import { flagHandler } from "../../swapSlice";
+import getLbryBalance from "../../thunks/getLbryBalance";
 interface PerformSwapProps {
     actorSwap: ActorSubclass<_SERVICESWAP>;
 }
@@ -29,7 +31,14 @@ const PerformSwap: React.FC<PerformSwapProps> = ({ actorSwap }) => {
     }
     useEffect(() => {
         setLbryRatio(Number(swap.lbryRatio))
-    }, [swap])
+    }, [swap.lbryRatio])
+    useEffect(()=>{
+        if(swap.success===true)
+        {
+            alert("Success");
+            dispatch(flagHandler());
+        }
+    },[swap.success])
     return (<div>
         {swap.loading ? (
             <div className="flex gap-1 items-center text-[#828282]">

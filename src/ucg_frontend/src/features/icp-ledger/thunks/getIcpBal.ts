@@ -2,20 +2,29 @@ import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE as _SERVICEICPLEDGER } from "../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { number } from "yup";
+import LedgerService from "@/utils/LedgerService";
+import { Principal } from "@dfinity/principal";
 
 // Define the async thunk
 const getIcpBal = createAsyncThunk<
-  string, // This is the return type of the thunk's payload
+  {formatedAccountBal:string,formatedSubAccountBal:string}, // This is the return type of the thunk's payload
   {
     actor: ActorSubclass<_SERVICEICPLEDGER>;
-    account:string
+    subaccount: string;
+    account: string;
   },
   { rejectValue: string }
->("icp_ledger/getIcpBal", async ( {actor,account} , { rejectWithValue }) => {
+>("icp_ledger/getIcpBal", async ({ actor, subaccount,account }, { rejectWithValue }) => {
   try {
-    const result = await actor.account_balance_dfx({ account: account });
-    return ( Number( result.e8s) /(Number(100000000))).toString(); // Return the e8s value of the Tokens
-
+    let resultAccountBal = await actor.icrc1_balance_of({
+      owner: Principal.fromText(account),
+      subaccount: []
+    });
+    const resultSubAccountBal = await actor.account_balance_dfx({ account: subaccount });
+    const LedgerServices=LedgerService();
+    const formatedAccountBal=LedgerServices.e8sToIcp(resultAccountBal).toString();
+    const formatedSubAccountBal=LedgerServices.e8sToIcp(resultSubAccountBal.e8s).toString();
+    return ({formatedAccountBal,formatedSubAccountBal})
   } catch (error) {
     console.error("Failed to get LBRY_ratio:", error);
 
@@ -23,7 +32,9 @@ const getIcpBal = createAsyncThunk<
       return rejectWithValue(error.message);
     }
   }
-  return rejectWithValue("An unknown error occurred while fetching ICP balance");
+  return rejectWithValue(
+    "An unknown error occurred while fetching ICP balance"
+  );
 });
 
 export default getIcpBal;

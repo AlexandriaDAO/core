@@ -1,38 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { useAppDispatch } from '../../../store/hooks/useAppDispatch';
-import { useAppSelector } from "../../../store/hooks/useAppSelector";
+import { useAppDispatch } from '../../../../store/hooks/useAppDispatch';
+import { useAppSelector } from "../../../../store/hooks/useAppSelector";
 import { ActorSubclass } from "@dfinity/agent";
 
 import { ImSpinner8 } from "react-icons/im";
-import { _SERVICE as _SERVICESWAP } from '../../../../../declarations/icp_swap/icp_swap.did';
-import burnLbry from "../thunks/burnLBRY";
+import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
+import { _SERVICE as _SERVICELBRY } from '../../../../../../declarations/LBRY/LBRY.did';
+
+import burnLbry from "../../thunks/burnLBRY";
 interface PerformSwapProps {
     actorSwap: ActorSubclass<_SERVICESWAP>;
+    actorLbry: ActorSubclass<_SERVICELBRY>
 }
 
-const BurnSwap: React.FC<PerformSwapProps> = ({ actorSwap }) => {
+const BurnSwap: React.FC<PerformSwapProps> = ({ actorSwap, actorLbry }) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
     const tokenomics = useAppSelector((state) => state.tokenomics);
     const [amountLBRY, setAmountLBRY] = useState("0");
-    const [lbryRatio, setLbryRatio] = useState(0.0);
-    const [ucgMintRate, setUcgMintRate] = useState(Number);
     const [tentativeICP, setTentativeICP] = useState(Number);
     const [tentativeUCG, setTentativeUCG] = useState(Number);
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        dispatch(burnLbry({ actor: actorSwap, amount: amountLBRY }))
+        dispatch(burnLbry({ actorSwap, actorLbry, amount: amountLBRY }))
     }
     const handleAmountLBRYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAmountLBRY(e.target.value);
-        setTentativeICP((Number(e.target.value) / lbryRatio)/2);
+        setTentativeICP((Number(e.target.value) / Number(swap.lbryRatio)) / 2);
         setTentativeUCG(Number(e.target.value) * Number(tokenomics.ucgMintRate));
     }
-    useEffect(() => {
-        setLbryRatio(Number(swap.lbryRatio))
-        setUcgMintRate(Number(tokenomics.ucgMintRate));
-    }, [])
     return (<div>
         {swap.loading ? (
             <div className="flex gap-1 items-center text-[#828282]">

@@ -10,7 +10,7 @@ import { LBRY,createActor as createActorLbry } from "../../../../../declarations
 
 const backend_canister_id = process.env.CANISTER_ID_UCG_BACKEND!;
 const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
-const icp_ledger_canister_id= process.env.CANISTER_ID!;
+const icp_ledger_canister_id= process.env.CANISTER_ID_ICP_LEDGER_CANISTER!;
 const tokenomics_canister_id=process.env.CANISTER_ID_TOKENOMICS!;
 const lbry_canister_id=process.env.CANISTER_ID_LBRY!;
 export const getPrincipal = (client:AuthClient): string => {
@@ -83,5 +83,5 @@ export const initializeLbryActor = async(client:AuthClient)=>{
     }catch(error){
         console.error('Error initializing Lbry actor', error);
     }
-    return tokenomics;
+    return LBRY;
 }

@@ -7,14 +7,16 @@ import { message } from "antd";
 import getIcpBal from "./thunks/getIcpBal";
 // Define the interface for our node state
 export interface icpLedgerState {
-  balance:string;
+  accountBalance: string;
+  subAccountBalance: string;
   loading: boolean;
   error: string | null;
 }
 
 // Define the initial state using the ManagerState interface
 const initialState: icpLedgerState = {
-  balance: "",
+  accountBalance: "0",
+  subAccountBalance: "0",
   loading: false,
   error: null,
 };
@@ -32,7 +34,8 @@ const icpLedgerSlice = createSlice({
       })
       .addCase(getIcpBal.fulfilled, (state, action) => {
         message.success("Successfully fetched icp balance.");
-        state.balance = action.payload;
+        state.accountBalance = action.payload.formatedAccountBal;
+        state.subAccountBalance = action.payload.formatedSubAccountBal;
         state.loading = false;
         state.error = null;
       })

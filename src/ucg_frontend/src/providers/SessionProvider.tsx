@@ -67,7 +67,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 			const actorTokenomics=await initializeTokenomicsActor(authClient);
 			setActorTokenomics(actorTokenomics);
 			const actorLbry=await initializeLbryActor(authClient);
-			// setActorLbry(actorLbry);
+			setActorLbry(actorLbry);
 		}
 		setupActor();
 	},[user])
@@ -103,7 +103,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	}, [actor,actorSwap,actorIcpLedger]);
 
 	return (
-		<SessionContext.Provider value={{ actor,actorSwap,actorIcpLedger,actorTokenomics, authClient, meiliClient, meiliIndex  }}>
+		<SessionContext.Provider value={{ actor,actorSwap,actorIcpLedger,actorTokenomics, actorLbry,authClient, meiliClient, meiliIndex  }}>
 			{children}
 		</SessionContext.Provider>
 	);
