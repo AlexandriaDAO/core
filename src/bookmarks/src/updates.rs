@@ -3,7 +3,7 @@
 // TODO:
 
 // The other thing is deciding how to claim:
-// - UCG should be distributed in real time for these actions, so no need to use claimable bookmarks.
+// - ALEX should be distributed in real time for these actions, so no need to use claimable bookmarks.
 // - Claimable bookmarks will be used to distribute ICP to token holder, so at the end of the 24 hours, all the non-zero claimable bookmarks will be queried,
 //    and factored into the ICP distribution of that day, and then reset. So every favorite action of that day grants a share of that day's ICP dispersment to some book owner.
 

@@ -13,8 +13,8 @@ service : {
   swap : (nat64) -> (Result);
   burn_LBRY : (nat64) -> (Result);
   deduct_tokens:(nat64)->(Result);
-  stake_UCG:(nat64)->(Result);
-  un_stake_UCG:(nat64)->(Result);
+  stake_ALEX:(nat64)->(Result);
+  un_stake_ALEX:(nat64)->(Result);
   set_ratio_LBRY_per_ICP:(nat64)->(Result);
   set_staking_reward:(float64)->(Result);
   distribute_reward:()->(Result);

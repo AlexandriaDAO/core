@@ -6,7 +6,7 @@ use candid::Deserialize;
 
 thread_local! {
     pub static STAKES: RefCell<Stakes> = RefCell::new(Stakes { stakes: HashMap::new()});
-    pub static TOTAL_UCG_STAKED: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
+    pub static TOTAL_ALEX_STAKED: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
     pub static TOTAL_ICP_AVAILABLE: Arc<Mutex<u64>>=Arc::new(Mutex::new(0));
     pub static TOTAL_UNCALIMED_ICP_REWARD: Arc<Mutex<u64>>=Arc::new(Mutex::new(0));
     pub static LBRY_PER_ICP:Arc<Mutex<u64>>=Arc::new(Mutex::new(0));

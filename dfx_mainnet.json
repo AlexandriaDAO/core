@@ -1,8 +1,8 @@
 {
   "canisters": {
-    "ucg_backend": {
-      "candid": "src/ucg_backend/ucg_backend.did",
-      "package": "ucg_backend",
+    "alex_backend": {
+      "candid": "src/alex_backend/alex_backend.did",
+      "package": "alex_backend",
       "type": "rust"
     },
     "bookmarks": {
@@ -46,7 +46,7 @@
         "id": { "ic": "hdtfn-naaaa-aaaam-aciva-cai" }
       }
     },
-    "UCG": {
+    "ALEX": {
       "type": "custom",
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
@@ -54,12 +54,12 @@
         "id": { "ic": "7hcrm-4iaaa-aaaak-akuka-cai" }
       }
     },
-    "ucg_frontend": {
-      "dependencies": ["ucg_backend"],
+    "alex_frontend": {
+      "dependencies": ["alex_backend"],
       "frontend": {
-        "entrypoint": "src/ucg_frontend/public/index.html"
+        "entrypoint": "src/alex_frontend/public/index.html"
       },
-      "source": ["dist/ucg_frontend/"],
+      "source": ["dist/alex_frontend/"],
       "type": "assets"
     }
   },

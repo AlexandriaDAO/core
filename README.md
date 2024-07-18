@@ -19,13 +19,13 @@ sudo apt-get upgrade nodejs`
 - If in a new rust env: `Sudo apt install build-essential`
 
 
-# UncensoredGreats DAO LitePaper
+# Alexandria DAO LitePaper
 
 ### Concept
 
 We imagine an Internet where search and social, instead of being scattered across divergent hyperlinks; all flow from one hub of linearly-linked, AI-retrievable, primary sources.
 
-UncensoredGreats shares the core functionality of the Big Tech Search and Social but with a few key distinctions.
+Alexandria shares the core functionality of the Big Tech Search and Social but with a few key distinctions.
 
 Differences from Search:
 There are many customizable search engines, each created, curated, and hosted soverignly by a single user.
@@ -40,11 +40,11 @@ The content is timeless and ranking algorithms do not regaurd recency.
 
 All raw data is hosted on-chain and owned by someone. This leads to typical Web3-native attributes like DAO Governance and Token Incentives. It costs something to host—and rewards something when used, which acts as a natural quality filter. While the potential scale of content is infinite, only the best source material is worth persisting.
 
-In short, UncensoredGreats is a distraction-free digital home with content ownership at its core.
+In short, Alexandria is a distraction-free digital home with content ownership at its core.
 
 The first 20 years of the Internet belonged to those companies best at capturing and leveraging user data. The next 20 will belong to whoever’s best at sorting it.
 
-UncensoredGreats is tackling the ‘Web3 data economy’ on a scale and with a generality of data that is wholly unfamiliar to crypto, and comprehensible only in relationship to the historical context of its Big Tech counterparts. Our approach to re-indexing the Internet is by giving individuals a place to do it and a reason to do so.
+Alexandria is tackling the ‘Web3 data economy’ on a scale and with a generality of data that is wholly unfamiliar to crypto, and comprehensible only in relationship to the historical context of its Big Tech counterparts. Our approach to re-indexing the Internet is by giving individuals a place to do it and a reason to do so.
 
 #### Problem
 
@@ -68,7 +68,7 @@ No matter how advanced our search and discoverty techniques get, we cannot circu
 
 The Internet from a user perspective could be thought of as disparate HTML (static sites) using custom javascript (dynamic platforms), connected via hyperlinks, and accessible through keyword-based search engines.
 
-UncensoredGreats could be thought of as uniform HTML (.epubs), using standardized javascript (epub.js), consecutively linked as pages, accessible through advanced full-text and vector search.
+Alexandria could be thought of as uniform HTML (.epubs), using standardized javascript (epub.js), consecutively linked as pages, accessible through advanced full-text and vector search.
 
 Instead of clicking through many pages across many tabs—access, save, sort, and share the world’s information on a single page.
 Instead of copy/paste/reorg of site snippets in a text editor—interphase with them with whiteboards, iceberg charts, and AI.
@@ -81,7 +81,7 @@ Consequently, everything from the ebook to a concise AI-generated summary is bot
 
 The use of AI is restricted to pre-prompted models in DAO-approved Canisters. In this way, the AI does not know what the user asks or wants, its output cannot be biased by the user, and its authenticity can be ensured. 
 
-That said, UncensoredGreats AI lets you choose input from limitless source material and does everything to limit model censorship in the process. In other words, if the information you’re looking for is not in our database, and it exists somewhere, you can format it, add it, and use it without delay or permission.
+That said, Alexandria AI lets you choose input from limitless source material and does everything to limit model censorship in the process. In other words, if the information you’re looking for is not in our database, and it exists somewhere, you can format it, add it, and use it without delay or permission.
 
 The only condition though, is that source material must be an ebook (.epub), but not necessarily books in the traditional sense.
 
@@ -95,17 +95,17 @@ In our Internet of Books, a webpage (.html) is to a scroll as a book (.epub) is 
 
 This contrasts strongly with the html pages of today, which are threaded together semi-randomly as fragments, hence the names Web and Net. Ebooks only thread html pages consecutively. This forces some level of logical coherence on the part of the author, which is also the reason there’s more ‘weight’ in reading/writing a book than in a blog or podcast of the same content.
 
-To make this transition easy enough for anyone to participate, UncensoredGreats will provide an epub conversion suite whereby members grow the epub database with any information they like. If someone wants to learn about a subject that isn’t in the existing database, they can aggregate websites, podcasts, videos, and of course books and upload them in a bundle to our service suite. What they receive back is an accordingly formatted ebook, where the original content type (audio/video) is preserved, but under the hood is converted text that makes video clips and podcast moments searchable just like any other paragraph of the book.
+To make this transition easy enough for anyone to participate, Alexandria will provide an epub conversion suite whereby members grow the epub database with any information they like. If someone wants to learn about a subject that isn’t in the existing database, they can aggregate websites, podcasts, videos, and of course books and upload them in a bundle to our service suite. What they receive back is an accordingly formatted ebook, where the original content type (audio/video) is preserved, but under the hood is converted text that makes video clips and podcast moments searchable just like any other paragraph of the book.
 
 Users own and self-host these uploaded ebooks, including all the data and assets they contain, 100% on-chain as NFTs. These book NFTs earn revenue when others search/use/download/trade them.
 
 If they are not the rightful owner of that intellectual property, its true author can reclaim ownership through a governance mechanism, at which point they can claim retroactive pay for all revenue generated from their content.
 
-While UncensoredGreats remains centralized and without DAO governance, we’ll stick to the use of conventional ebooks with embedded metadata such as publisher, ISBN, and publication date to avoid pirating copyrighted content.
+While Alexandria remains centralized and without DAO governance, we’ll stick to the use of conventional ebooks with embedded metadata such as publisher, ISBN, and publication date to avoid pirating copyrighted content.
 
 ### How it Works
 
-When you arrive on UncensoredGreats.com, you’ll see a search box with a grid of categories below that represent the active database you’re searching.
+When you arrive on Alexandria.com, you’ll see a search box with a grid of categories below that represent the active database you’re searching.
 
 Each category opens into a library of Ebooks that you can save and read—just like Kindle, but with no downloads or payment.
 
@@ -125,7 +125,7 @@ Create (AI)
 Post (SBTs)
 
 #### Read
-UncensoredGreats is first and foremost a library. All its books are available to read on-site.
+Alexandria is first and foremost a library. All its books are available to read on-site.
 
 These books come from a portal where a user uploads an ebook and mints it as an NFT.
 
@@ -147,7 +147,7 @@ Posts take a variety of user-selected input sources, from any combination of boo
 
 The structure and style of posts will change over time to match different use cases, but the core idea is to have AI take a series of ideas, related or unrelated, uniform or contradictory, literal or allegorical, and provide the insights that offer an unbias glimpse into what the provided sources convey.
 
-Posts can be bookmarked by others, which rewards UCG, and can also be commented on by others, but there are no other attributes, e.g., likes/dislikes/flag, and of course, no censorship.
+Posts can be bookmarked by others, which rewards ALEX, and can also be commented on by others, but there are no other attributes, e.g., likes/dislikes/flag, and of course, no censorship.
 
 #### Post
 Posts are built around this idea of leveled abstraction for infinite ideas. At the highest level, a single headline. At the lowest level, all the parts of all the primary sources that idea comes from.
@@ -160,25 +160,25 @@ These charts can be either public and collaborative or completely private. Their
 
 ### Tokenomics
 
-UncensoredGreats will have a native token, UC with a fixed supply of 21 Million.
+Alexandria will have a native token, UC with a fixed supply of 21 Million.
 
 We honor Satoshi’s example concerning the hard cap, supply distribution, minting mechanism, and general philosophy of hard money (we hope).
 
 #### Distribution
-21 Million UCG, or 100% of the supply, will be initially allocated to the rewards pool, and have to be ‘mined’.
+21 Million ALEX, or 100% of the supply, will be initially allocated to the rewards pool, and have to be ‘mined’.
 
-The UCG treasury will have tapering emissions based on interactions with books and posts to those who created them. It’s similar to Bitcoin’s proof of work mining, except the ‘work’ is done by humans who make, read, and synthesize books (instead of computers that solve math puzzles).
+The ALEX treasury will have tapering emissions based on interactions with books and posts to those who created them. It’s similar to Bitcoin’s proof of work mining, except the ‘work’ is done by humans who make, read, and synthesize books (instead of computers that solve math puzzles).
 
 The token has no initial utility or function and has no reason to increase in value.
 
 The following token-related plans are speculative, have no guarantee of being implemented, and will remain subject to change while project development is under centralized control.
 
 #### Utility
-Out of the gate, UCG will have zero utility or intrinsic value.
+Out of the gate, ALEX will have zero utility or intrinsic value.
 
-UCG's intended utility is only relevant as UncensoredGreats moves toward architectural decentralization. 
+ALEX's intended utility is only relevant as Alexandria moves toward architectural decentralization. 
 
-As UncensoredGreats moves towards DAO form, UCG's utility will be restricted to staking and governance.
+As Alexandria moves towards DAO form, ALEX's utility will be restricted to staking and governance.
 
 In staking, holders will have full rights to revenue earned on the platform.
 
@@ -186,11 +186,11 @@ In governance, voters will have full rights over platform code changes.
 
 Staking and voting may be related/intertwined, or not.
 
-UCG will have no other purpose. No platform perks, payment, or other in-app functions.
+ALEX will have no other purpose. No platform perks, payment, or other in-app functions.
 
 #### Revenue
 
-Premium features are paid with the app-native UCG wallet. These will be autonomous nano payments in $ICP and potentially other hard assets like $ckBTC.
+Premium features are paid with the app-native ALEX wallet. These will be autonomous nano payments in $ICP and potentially other hard assets like $ckBTC.
 
 4 actions require payment:
 
@@ -201,7 +201,7 @@ Premium features are paid with the app-native UCG wallet. These will be autonomo
 
 New users will receive a 0.1 ICP sign-up bonus which should be plenty to get them going as the price of such actions is in the fractions of a penny. Read access to all data, including posts and Ebooks themselves, is always free.
 
-The revenue from these actions will either go to the NFT owner as a reward or the UncensoredGreats Team. Later, this team share is aimed at being distributed as revenue to DAO Stakers and the Cycles Wallets that pay for computation.
+The revenue from these actions will either go to the NFT owner as a reward or the Alexandria Team. Later, this team share is aimed at being distributed as revenue to DAO Stakers and the Cycles Wallets that pay for computation.
 
 - Semantic Search: 40% Team / 60% NFT Owner.
 - Fees on AI Functions: 60% Team / 40% NFT Owner.
@@ -214,11 +214,11 @@ There is a TBD DAO mechanism for retroactive pay to all authors who’ve had the
 
 #### Rewards
 
-95% of the supply is locked in a rewards pool exclusively accessible with a bookmarked() function, the sole mechanism for releasing UCG. 
+95% of the supply is locked in a rewards pool exclusively accessible with a bookmarked() function, the sole mechanism for releasing ALEX. 
 
-`bookmarked()`’s job is simple. It moves UCG from the pool to the wallet of the owner of a post that some other user just bookmarked. That’s it!
+`bookmarked()`’s job is simple. It moves ALEX from the pool to the wallet of the owner of a post that some other user just bookmarked. That’s it!
 
-The amount of UCG released each time `bookmarked()` is called will start off high and decrease overtime in a taper effect similar to that of Bitcoin Mining.
+The amount of ALEX released each time `bookmarked()` is called will start off high and decrease overtime in a taper effect similar to that of Bitcoin Mining.
 
 Since a new user has the freedom to bookmark endless posts, the value-bearing bookmark actions are only triggered when certain conditions are met by in-app spending.
 
@@ -226,11 +226,11 @@ When a user spends a threshold amount (~1 cent), one of their future bookmarking
 
 Users accrue these value-bearing bookmarks with organic platform spending only (not NFT Minting/Trading). Randomness and decay rules are applied to users' bookmarking actions to prevent gaming of the system.
 
-Why 1 cent? Well, the planned launch will be with 5% of the supply (team share), and 1,000 ICP which would set the initial price of UCG at 1 cent (at $10 ICP). This sets a ‘floor’ for what can trigger `bookmarked()` function and maintains sustainability throughout the emissions.
+Why 1 cent? Well, the planned launch will be with 5% of the supply (team share), and 1,000 ICP which would set the initial price of ALEX at 1 cent (at $10 ICP). This sets a ‘floor’ for what can trigger `bookmarked()` function and maintains sustainability throughout the emissions.
 
-Initially, the team retains control of that threshold. It can be 1/50th of a cent spent, or 50 cents, to release 1 UCG. So the team indirectly controls the rewards emissions rate, but never to whom it’s distributed. That decision is completely left to high-value users who bookmark stuff. Eventually, this spending threshold will be set to match an exponential emissions curve, just like BTC’s mining rewards.
+Initially, the team retains control of that threshold. It can be 1/50th of a cent spent, or 50 cents, to release 1 ALEX. So the team indirectly controls the rewards emissions rate, but never to whom it’s distributed. That decision is completely left to high-value users who bookmark stuff. Eventually, this spending threshold will be set to match an exponential emissions curve, just like BTC’s mining rewards.
 
-In this way, UCG is a completely fair launch based on intellectual (not monetary) contribution. If no one uses the platform in a way that generates the revenue required to offset token devaluation, the token supply will simply not devalue. 
+In this way, ALEX is a completely fair launch based on intellectual (not monetary) contribution. If no one uses the platform in a way that generates the revenue required to offset token devaluation, the token supply will simply not devalue. 
 
 So instead of raising money by launching a token to build a product, we built a product that launches a token as it raises money. We plan to set a new standard for fair launches.
 
@@ -249,7 +249,7 @@ During the 1950s and 60s, the entire CS field was convinced otherwise: That the 
 
 AI research since then has proceeded intending to emulate the human brain. That is until the Transformer Model breakthrough from 2017’s Attention is All You Need Paper. While most see this moment as the stepping stone to AGI, we see, through Engelbart's eyes, history repeating itself.
 
-UncensoredGreats is not an AI startup. We don’t seek to change the field, but use it to do with the ‘AI’ of today what Engelbart did with the ‘AI’ of his day: Create a unified virtual sphere for human collaboration on anything and everything.
+Alexandria is not an AI startup. We don’t seek to change the field, but use it to do with the ‘AI’ of today what Engelbart did with the ‘AI’ of his day: Create a unified virtual sphere for human collaboration on anything and everything.
 
 Engelbart’s 50-year-old design was first a single page used by two people. It now extends to 200 million sites and 3.5 billion people. Along the way, hyperlinks became immortalized at the root, search engines their gateway; and the Internet, an infinite sea, explorable one click at a time.
 

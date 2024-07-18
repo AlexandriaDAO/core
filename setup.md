@@ -15,16 +15,16 @@ dfx deploy tokenomics
 ``` 
 dfx deploy icp_swap
 ```
-###  Deploy UCG 🌐🔒👥
+###  Deploy ALEX 🌐🔒👥
  
 
 
 ```dfx identity use default
 export DEFAULT=$(dfx identity get-principal)
-dfx deploy UCG --argument "(variant { Init =
+dfx deploy ALEX --argument "(variant { Init =
 record {
-     token_symbol = \"UCG\";
-     token_name = \"UCG\";
+     token_symbol = \"ALEX\";
+     token_name = \"ALEX\";
      minting_account = record { owner = principal \"$(dfx canister id tokenomics)\" };
      transfer_fee = 0;
      metadata = vec {};
@@ -71,9 +71,9 @@ dfx canister call --identity default LBRY icrc2_approve "(
   }
 )"
 ```
-UCG Allowance 
+ALEX Allowance 
 ```
-dfx canister call --identity default UCG icrc2_approve "(
+dfx canister call --identity default ALEX icrc2_approve "(
   record {
     spender= record {
       owner = principal \"$(dfx canister id icp_swap)\";
@@ -119,7 +119,7 @@ dfx deploy bookmarks
 
 ### Let's test. ✔️
 lets call init_bm 
-It should burn 1 LBRY and mint 1000 UCG to the caller's account. 🔥💰
+It should burn 1 LBRY and mint 1000 ALEX to the caller's account. 🔥💰
 ```
 dfx canister call bookmarks init_bm '(1,"me","it_is_what_is_it","Thinking","TBD")'
 ```

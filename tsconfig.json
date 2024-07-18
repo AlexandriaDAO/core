@@ -16,7 +16,7 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/ucg_frontend/src/*"]
+      "@/*": ["src/alex_frontend/src/*"]
     }
   },
   "include": [

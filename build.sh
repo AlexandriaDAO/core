@@ -30,7 +30,7 @@ export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 
 
 
-# Step 5: Deploy the ICRC Ledger with LBRY and UCG tokens
+# Step 5: Deploy the ICRC Ledger with LBRY and ALEX tokens
 dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argument "  
   (variant {  
     Init = record {  
@@ -102,10 +102,10 @@ record {
 #     }
 #   })
 # '
-dfx deploy UCG --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '(variant { Init = 
+dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '(variant { Init = 
 record {
-     token_symbol = "UCG";
-     token_name = "UCG";
+     token_symbol = "ALEX";
+     token_name = "ALEX";
      minting_account = record { owner = principal "'$(dfx canister id tokenomics)'" };
      transfer_fee = 0;
      metadata = vec {};
@@ -121,11 +121,11 @@ record {
  }
 })'
 #// Evan code 
-# dfx deploy UCG --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
+# dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
 #   (variant {
 #     Init = record {
-#       token_name = "UncensoredGreats Token";
-#       token_symbol = "UCG";
+#       token_name = "Alexandria Token";
+#       token_symbol = "ALEX";
 #       minting_account = record {
 #         owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
 #       };
@@ -186,18 +186,18 @@ minting_account = opt record {
    subaccount = opt blob "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00";
  };             
 icrc7_supply_cap = null;
-icrc7_description = opt "The official Ebook NFT collection of the UncensoredGreats Project.";
+icrc7_description = opt "The official Ebook NFT collection of the Alexandria Project.";
 tx_window = opt 86_400;
 permitted_drift = opt 100;
 icrc7_max_take_value = opt 100;
 icrc7_max_memo_size = opt 256;
-icrc7_symbol = "UCG";
+icrc7_symbol = "ALEX";
 icrc7_max_update_batch_size = opt 10;
 icrc7_max_query_batch_size = opt 5;
 icrc7_atomic_batch_transfers = opt true;
 icrc7_default_take_value = opt 20;
 icrc7_logo = null;
-icrc7_name = "UncensoredGreats";
+icrc7_name = "Alexandria";
 approval_init = null;
 archive_init = null
 })'
@@ -214,7 +214,7 @@ dfx deploy icrc7_archive --specified-id forhl-tiaaa-aaaak-qc7ga-cai --argument '
 
 
 # Step 5: Deploy other canisters with specified IDs
-dfx deploy ucg_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
+dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
 
 cd ./.dfx/
@@ -225,4 +225,4 @@ cd ..
 mkdir -p .dfx/local/canisters/icp_ledger_canister
 curl https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icp_ledger/ledger.did -o .dfx/local/canisters/icp_ledger_canister/icp_ledger_canister.did
 
-dfx deploy ucg_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
+dfx deploy alex_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai

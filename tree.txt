@@ -105,7 +105,7 @@
 │   │   │   ├── storage.rs
 │   │   │   └── update.rs
 │   │   └── tokenomics.did
-│   ├── ucg_backend/
+│   ├── alex_backend/
 │   │   ├── Cargo.toml
 │   │   ├── src/
 │   │   │   ├── engine.rs
@@ -116,8 +116,8 @@
 │   │   │   ├── source_cards.rs
 │   │   │   ├── utils.rs
 │   │   │   └── wallet_keys.rs
-│   │   └── ucg_backend.did
-│   ├── ucg_frontend/
+│   │   └── alex_backend.did
+│   ├── alex_frontend/
 │   │   ├── src/
 │   │   │   ├── App.tsx
 │   │   │   ├── RatingCard/
