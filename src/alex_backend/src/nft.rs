@@ -113,8 +113,6 @@ How:
 Backend Psuedocode:
 
 
-
-
 //   - lbn == icrc7_total_supply() # Actually nah, just get arweavetx first, since this might change.
   - mint(lbn, arweave_tx) -> ()
     - call icrc7 icrc7_mint()

@@ -24,6 +24,8 @@ use num_traits::{pow};
 
 static BM_COUNTER: AtomicUsize = AtomicUsize::new(1);
 const DECIMALS: usize=8; 
+const lbry_canister_id: &str = "hdtfn-naaaa-aaaam-aciva-cai";
+const tokenomics_canister_id: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 
 #[ic_cdk::update]
 pub async fn init_bm(
@@ -69,7 +71,7 @@ pub async fn save_bm(
     assert!(title.len() <= 250);
     assert!(content.len() <= 4000);
     assert!(cfi.len() <= 500);
-    let default_nft_owner = match Principal::from_text("bkyz2-fmaaa-aaaaa-qaaaq-cai") {
+    let default_nft_owner = match Principal::from_text(tokenomics_canister_id) {
         Ok(p) => p,
         Err(e) => return Err(format!("Invalid principal: {}", e)),
     };
@@ -219,7 +221,7 @@ async fn transfer_LBRY(amount: u64,destination:Principal) -> Result<BlockIndex, 
     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
         // 2. Convert a textual representation of a Principal into an actual `Principal` object. The principal is the one we specified in `dfx.json`.
         //    `expect` will panic if the conversion fails, ensuring the code does not proceed with an invalid principal.
-        Principal::from_text("c5kvi-uuaaa-aaaaa-qaaia-cai")
+        Principal::from_text(lbry_canister_id)
             .expect("Could not decode the principal."),
         // 3. Specify the method name on the target canister to be called, in this case, "icrc1_transfer".
         "icrc2_transfer_from",

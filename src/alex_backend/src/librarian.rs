@@ -138,4 +138,3 @@ fn hash_principal(principal: Principal) -> u64 {
     bytes.copy_from_slice(&hash[..8]); // Turn the first 8 bytes into a u64.
     u64::from_be_bytes(bytes)
 }
-

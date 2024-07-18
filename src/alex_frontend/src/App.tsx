@@ -11,6 +11,7 @@ import BookPortalPage from "./pages/BookPortalPage";
 import ManagerPage from "./pages/ManagerPage";
 import SessionProvider from "./providers/SessionProvider";
 import ReaderPage from "./pages/ReaderPage";
+import SwapPage from "./pages/swap";
 
 export default function App() {
     return (
@@ -24,6 +25,7 @@ export default function App() {
                                 <Route path="/book-portal" element={<BookPortalPage />} />
                                 <Route path="/manager" element={<ManagerPage />} />
                                 <Route path="/reader" element={<ReaderPage />} />
+                                <Route path="/swap" element={<SwapPage />} />
                             </Routes>
                     </AuthProvider>
                 </BrowserRouter>

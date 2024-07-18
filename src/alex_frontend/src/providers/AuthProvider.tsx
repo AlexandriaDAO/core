@@ -15,7 +15,6 @@ import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from "../../../declarations/icp_ledger_canister";
 import { tokenomics } from '../../../declarations/tokenomics';
 import { LBRY } from '../../../declarations/LBRY';
-
 interface SessionProviderProps {
 	children: React.ReactNode;
 }
@@ -31,6 +30,8 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const [actorIcpLedger, setIcpLedger] = useState(icp_ledger_canister);
 	const [actorTokenomics, setActorTokenomics] = useState(tokenomics);
 	const [actorLbry,setActorLbry]=useState(LBRY);
+
+
 	const [authClient, setAuthClient] = useState<AuthClient>();
 
 	const [meiliClient, setMeiliClient] = useState<MeiliSearch>();
