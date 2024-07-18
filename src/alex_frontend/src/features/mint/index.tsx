@@ -109,8 +109,8 @@ const Mint = () => {
 			const irys = await getIrys();
 
 			const APP_ID = process.env.DFX_NETWORK === "ic" 
-    ? process.env.MAINNET_APP_ID 
-    : process.env.LOCAL_APP_ID;
+    ? "testingAlexandria" 
+    : "UncensoredGreats";
 
 			if (!APP_ID) {
 					throw new Error("Application ID is not set in environment variables");

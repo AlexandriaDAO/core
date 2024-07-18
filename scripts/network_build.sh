@@ -2,6 +2,13 @@
 
 set -x 
 
+
+# Navigate to the project root directory
+cd "$(dirname "$0")/.."
+
+# Print current working directory for debugging
+echo "Current working directory: $(pwd)"
+
 cp dfx_mainnet.json dfx.json
 
 # There's this weird problem where the ./dfx/local/canisters folder empties after I run this 
@@ -145,17 +152,25 @@ archive_init= opt record {
     }
 })' --network ic
 
-
-
 # Step 7: Deploy our other logic canisters.
 dfx deploy alex_backend --network ic
 dfx deploy bookmarks --network ic
 dfx deploy icp_swap --network ic
 dfx deploy tokenomics --network ic
 
+
+# You may need to run these manually based on sytem level access controls.
 cd ./.dfx/
 rm -rf local/canisters/
 cp -r ic/canisters/ local/
 cd ..
 
+mkdir -p .dfx/local/canisters/LBRY
+mkdir -p .dfx/local/canisters/ALEX
+touch .dfx/local/canisters/LBRY/LBRY.did
+touch .dfx/local/canisters/ALEX/ALEX.did
+
+cp .dfx/ic/canisters/alex_frontend/assetstorage.did .dfx/local/canisters/alex_frontend/
+
+npm i
 dfx deploy alex_frontend --network ic

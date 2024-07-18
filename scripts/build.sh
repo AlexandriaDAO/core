@@ -13,6 +13,8 @@ dfx deps init
 dfx deps deploy
 dfx deps deploy internet_identity
 
+cargo update
+
 
 # Step 3: Configure Local Identities
 dfx identity new minter --storage-mode plaintext
@@ -147,12 +149,13 @@ dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
 dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 
-cd ./.dfx/
-rm -rf local/canisters/
-cp -r ic/canisters/ local/
-cd ..
+mkdir -p .dfx/local/canisters/LBRY
+mkdir -p .dfx/local/canisters/ALEX
+touch .dfx/local/canisters/LBRY/LBRY.did
+touch .dfx/local/canisters/ALEX/ALEX.did
 
 mkdir -p .dfx/local/canisters/icp_ledger_canister
 curl https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icp_ledger/ledger.did -o .dfx/local/canisters/icp_ledger_canister/icp_ledger_canister.did
 
+npm i
 dfx deploy alex_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai

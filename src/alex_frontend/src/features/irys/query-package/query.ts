@@ -46,7 +46,7 @@ const client = new ApolloClient({
   cache: new InMemoryCache()
 });
 
-const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.MAINNET_APP_ID : process.env.LOCAL_APP_ID;
+const APP_ID = process.env.DFX_NETWORK === "ic" ? "testingAlexandria" : "UncensoredGreats";
 
 export async function fetchTransactions(): Promise<Transaction[]> {
   try {
@@ -103,6 +103,8 @@ export async function fetchTransactions(): Promise<Transaction[]> {
 }
 
 export async function getQuery(): Promise<ApolloQueryResult<any>> {
+  console.log("DFX_NETWORK:", process.env.DFX_NETWORK);
+  console.log("APP_ID: ", APP_ID);
   try {
     const query = await client.query({
       query: gql`
@@ -135,6 +137,15 @@ export async function getQuery(): Promise<ApolloQueryResult<any>> {
     throw error;
   }
 }
+
+
+
+
+
+
+
+
+
 
 
 // export async function fetchAll(): Promise<Transaction[]> {
