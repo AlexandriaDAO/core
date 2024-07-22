@@ -1,29 +1,24 @@
 #!/bin/bash
-
 set -x 
 
-
-# Navigate to the project root directory
+# Navigate to project root
 cd "$(dirname "$0")/.."
-
-# Print current working directory for debugging
 echo "Current working directory: $(pwd)"
 
+# Switch to mainnet deployment script.
 cp dfx_mainnet.json dfx.json
+# Note: ./dfx/local/canisters folder empties after this command, and will need to be regenerated manually with commands on the bottom of this script.
 
-# There's this weird problem where the ./dfx/local/canisters folder empties after I run this 
-# so it needs to be copied from ./dfx/ic/canisters each time. 
-
-# Step 1: Start dfx
+# (Re)Start dfx
 dfx stop
 dfx start --background --clean
 
-# Step 3: Configure Local Identities
+# Configure Local Identities
 dfx identity use default
 export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
 export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 
-# Step 4: Deploy the LBRY and ALEX tokens
+# Deploy the LBRY and ALEX tokens
 dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
   (variant {
     Init = record {
@@ -65,7 +60,6 @@ dfx canister call LBRY icrc1_transfer '(record {
   amount = 100000000;
   fee = opt 100_000;
 })' --network ic
-
 
 
 dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
@@ -111,16 +105,12 @@ dfx canister call ALEX icrc1_transfer '(record {
 })' --network ic
 
 
-# Step 5: Generate Candid for remote canisters:
-wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/ALEX/ALEX.did
-wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/LBRY/LBRY.did
-
-
+# If you want to reset the token canisters (will delete all token data). 
 # dfx canister uninstall-code fjqb7-6qaaa-aaaak-qc7gq-cai --network ic
 # dfx canister uninstall-code forhl-tiaaa-aaaak-qc7ga-cai --network ic
 
 
-# Step 6: Deploy NFTs
+# Deploy NFTs
 dfx deploy icrc7 --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai --argument '(record{                                 
 minting_account = opt record {
    owner = principal "xj2l7-vyaaa-aaaap-abl4a-cai";                                    
@@ -152,12 +142,15 @@ archive_init= opt record {
     }
 })' --network ic
 
-# Step 7: Deploy our other logic canisters.
+# Deploy backend logic canisters.
 dfx deploy alex_backend --network ic
 dfx deploy bookmarks --network ic
 dfx deploy icp_swap --network ic
 dfx deploy tokenomics --network ic
 
+# Exit and deploy frontend manually.
+echo "Backend canisters finished. Copy and paste remainerd of the build script manually to deploy on the network."
+exit 1
 
 # You may need to run these manually based on sytem level access controls.
 cd ./.dfx/
@@ -167,8 +160,9 @@ cd ..
 
 mkdir -p .dfx/local/canisters/LBRY
 mkdir -p .dfx/local/canisters/ALEX
-touch .dfx/local/canisters/LBRY/LBRY.did
-touch .dfx/local/canisters/ALEX/ALEX.did
+
+wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/ALEX/ALEX.did
+wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/LBRY/LBRY.did
 
 cp .dfx/ic/canisters/alex_frontend/assetstorage.did .dfx/local/canisters/alex_frontend/
 
