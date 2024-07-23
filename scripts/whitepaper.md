@@ -160,19 +160,22 @@ Since Alexandria best reflects a pan-industry platform of the Web’s core eleme
 
 New users are greeted with a homepage, inclining them to interact with domain-specific search engines. Each contains a curated set of books with real-time full-text-search on their aggregate contents. Results are returned as book paragraphs that point to their origin at the source.
 
-![][image1]
+![image](https://github.com/user-attachments/assets/d98026f2-0f12-4263-b479-628c7d903371)
 
 These search engines owned by other users we call *Librarians* (those who’ve registered their principal).  
-![][image2]
+
+![image](https://github.com/user-attachments/assets/13d6ee85-3f95-4d41-97a7-c4c040966c59)
 
 ### Read
 
 A first interaction with Alexandria might feel akin to Google Search for Kindle—except all the search engines are owned by users and all the books are free.  
-![][image3]
+
+![image](https://github.com/user-attachments/assets/7ed355c9-4345-441c-a5e3-9f3a3287bc12)
 
 All books used are owned as NFTs. Alexandria does not own or hold them. Rather, *Librarians* (NFT owners) ‘rent’ read access of their .epub file to our canisters, which is how we make them free to read.
 
-![][image4]  
+![image](https://github.com/user-attachments/assets/1287d30a-295d-4d60-b584-9b2c6915519c)
+
 Basic searching and reading is free, and does not require an account; but to save something on Alexandria is to ***own*** something, and so the remaining features do.
 
 ### Collect
@@ -249,14 +252,17 @@ NFT Mint Numbers, or UGBNs (Alexandria Book Numbers), are consecutive, so the fi
 Since NFTs are based on their ebook files, preventative measures are taken to prevent minting duplicate titles, but this still occurs with different book versions/editions. Still, the visibility, and thus value, of any Alexandria NFT, is weighted by the metadata it accrues from other’s use of it. In other words, readers only need one *Moby Dick*, and the site is designed such that once the first or most used one becomes the crowd favorite, it becomes unprofitable to continue hosting a duplicate.
 
 All data attributed to each Book NFT is listed as follows:  
-![][image5]
+
+<NFT SPECS IMAGE (TBD)>
 
 ### Aggregate
 
 With the ebook hosting handled with Drive, and file access handled by NFTs; aggregating that ebook data becomes simple.
 
 In the Librarian’s portal, a user can add or remove books from their custom search engine with a single click. When ready, it can be published and public to others, or optionally remain private to the creator.  
-![][image6]  
+
+![image](https://github.com/user-attachments/assets/7ba71795-bf65-4ebb-8ba8-6bb694418538)
+
 *Librarians* pay for their search engine hosting in ICP via the portal, and receive no direct reward for making the search engine. The incentive for hosting a search engine is that it gives visibility to the books it holds, indirectly generating revenue for those book owners.
 
 ### Share
@@ -284,7 +290,8 @@ In an upcoming iteration, Alexandria will add a bookmaker LibModule, where by Yo
 ### Tokenomics
 
 ALEX is the native token, and will mirror the distribution mechanism of Bitcoin:  
-![][image7]
+
+![image](https://github.com/user-attachments/assets/ba822105-c8f1-4ea4-af7b-61c0f18cba1b)
 
 Instead of block mining though, ALEX emits based on *favorites*. As a user spends/burns LBRY to save bookmarks, their *favorite* action becomes value-bearing. Users can favorite their own bookmarks, or the bookmarks of others, with caps and mechanisms to prevent bots.
 
