@@ -1,18 +1,20 @@
 # Alexandria WhitePaper
 
-The Internet has come to rely almost exclusively on Big Tech services as its information aggregators. This works well for current events, but leaves behind the content-rich information of the past. 95-99% of digital content is in the ‘deep web’, and inaccessible through conventional means. As a result, digital content that isn’t (1) search-engine optimized, (2) open-access, and (3) brand new, is basically lost forever.
+The Internet has come to rely almost exclusively on Big Tech services as its information aggregators. This works well for current events, but leaves behind the content-rich information of the past. 95-99% of digital content resides in the ‘deep web’, inaccessible through conventional means. Consequently, digital content that isn’t (1) search-engine optimized, (2) open-access, and (3) brand new, is basically lost forever.
 
 There’s a big ownership problem at the center of this that causes the Internet to be structured this way. Search engines don’t actually own what they point to, nor social platforms what they display, nor cloud providers what they host. Yet, they will leverage possession of such data to block others from using it, and ignoring the rights of its original creator. 
 
-Web3 is the dream of an Internet where digital information has intrinsic ownership. This has been achieved for money, e.g., Bitcoin; and to some extent for art with NFTs, but not yet for regular content.
+Web3 is the dream of an Internet where digital information has intrinsic ownership. This has been achieved for money, e.g., Bitcoin; and to some extent for art with NFTs, but not yet for generic content.
 
-The holdup is understandable. To give true ownership to a file, you must keep it as a fixed supply of one, while remaining able to distribute it infinitely. The only way to do this recreate from scratch the search, social, and hosting platforms that make that one copy usable—so that’s what we’re doing.
+The holdup is understandable. To give true ownership to a file or peice of text, you basically need to keep the original fixed supply of one while being able to distribute it infinitely. Put simply, you need to recreate the search, social, and hosting elements around making use of that original copy—so that’s what we’re doing.
 
 Alexandria is a library in cypherspace with all its information owned by individuals in the network, much like Bitcoin except for generic content instead of money. This begins with ebooks being owned and used as NFTs, but continues with any file type (video, audio, etc.), used in a suite of Open Internet Services.
 
 This whitepaper is broken into two parts. The first describes the network infrastructure itself, and the second describes how it's used in partner dapps.
 
 ## Contents
+
+intro
 
 ### Part 1: Network Infrastructure
 
@@ -23,16 +25,54 @@ Alexandria is the Web3 library we've been talking about. It indexes everything k
   - Users mint their principal and can then save different sets of keys (secured with VetKeys).
 
 - LibModules
-  - Define LibModules
-  - All are provided by and paid for by users. Alexandria is the protocol that defines and enforces the standards by which others can host LibModules. It does not itself provide any of these LibModules.
-  - Vetkeys secured
+  - Define LibModules - Building blocks that people use to do stuff in apps.
     - ArWeave (complete)
     - MeiliSearch (complete)
     - Qdrant (incomplete)
     - AI  (incomplete)
     - Bittorrent/IPFS (incomplete)
 
-### Part 2 ???  
+- Interplay between Librarians and Libmodules.
+  - Vetkeys secured
+  - All are provided by and paid for by users. Alexandria is the protocol that defines and enforces the standards by which others can host LibModules. It does not itself provide any of these LibModules.
+  - They're plug and play so anyone can not only use them but, build custom versions.
+  - Nanopayment system handled usage based payment in the background.
+
+
+### Part 2: Token Economics and Mechanics
+Two tokens. LBRY for payment, ALEX for revshare.
+
+- LBRY Mechanics
+  - Mint rules: 1:1000 ratio.
+  - Librarians have 2 accounts, etc.
+  - Paid LibModules, all of which goes to the provider.
+  - Paid NFTs and SBTs when used in submodules, all of which goes to the NFT itself.
+  - Burn rules: Each burn mines a block.
+
+- ALEX Distribution Mechanics
+  - Mining distribution. (Updated chart to come soon)
+  - LBRY mint mechanism. 
+    - Every burn mints one block to the burner, and one to a Librarian.
+  - Every time a librarian gets paid in library, their reputation increases.
+    - I don't know how we're going to track this just yet, but that's the idea. Ask Adil maybe?
+    - We'll apply a kind of points system that attributes reputation for their contributions.
+    - Perhaps we'll apply the same standard to regular users for creating/saving stuff? i.e., Everyone's a librarian.
+
+- Token Economics and Utility (TOKENOMICS SECTION maybe)
+  - It will take 50B actions for the supply to fully emit. Some words on decentralization
+  - There's no utility other than voting. There's no value other than staking.
+
+- Governance (GOVERNANCE SECTION)
+  - Initially it will just determine who owns what NFT.
+  - The development will remain admittedly centralized, based on sheer complexity.
+    - Things can go wrong, forks can occur, etc.
+    - But the token stuff will be fair, blackholed, and rightfully forkable (decentralized).
+  - SNS launch or fork are possibilies, but it's unclear what aditional canisters will be handed to the DAO, blackholed, or otherwise stay under centralized management.
+    - The road to decentralization is paved with hypocracy. At least I'm being honest about it.
+
+### Part 3: Non-Fungible Tokens Economics And Mechanics
+Every saved peice of content is owned by someone.
+
 - NFT & SBT Minter 
   - Protocol level minter that uses the ArWeave LibModule
   - Present stage (ebooks only).
@@ -46,45 +86,41 @@ Alexandria is the Web3 library we've been talking about. It indexes everything k
   - DAO approves controls key attributes of the NFT, and retains power to transfer.
   - I.e., pirated copy waits until owner comes to claim it, then transfers it, then verifies it and pays the true owner.
 
-- Decentralization
-  - This is a rudimentary DAO, and the only nessasary setup to decentralize now. The rest of the architecutre, variable pricing, and code updates, are not configured to this DAO. 
+- Decentralization (we might not need this. Just enough to explain copyright stuff.)
+  - This is a rudimentary DAO, and the only nessasary setup to decentralize now. The rest of the architecture, variable pricing, and code updates, are not configured to this DAO. 
   - The goal is to decentralize key elements with canister either by 'blackholing' and keeping Alexandria enforcably forkable at all times, or by canister control to the SNS or an SNS fork. At this stage though, it makes most sense to blackhole the token logic and leave the buisiness logic mutable because it will likely require years of itteration.
   - Explain why others can fork, or use their own version, and that's okay because they wouldn't want to.
 
-### Part 2: Token Economics
-Two tokens. LBRY for payment, ALEX for revshare.
+### Part 4: Ecosystem (basically the existing whitepaper).
 
-- LBRY Mechanics
-  - Mint rules: 1:1000 ratio.
-  - Burn rules: Each burn mines a block.
-- UCG Mechanics
-  - Mining distribution.
-  - LBRY mechanism.
-- Librarian Reputation System.
+- Becoming a Librarian
+  - First experience looks like an app store.
+  - Apps will each have their own buisiness models and onboarding, but the apps we start with will be directly connected to the Librarian system.
+  - COLLECT section (or part about authenticating librarians)
 
-
-
-
-
-
-
-### Part 3: Ecosystem
-
-Flagship App - Bibliotheca (library)
-  - Peruse
-  - Read
-  - Collect
-  - Earn
+- Flagship App - Bibliotheca (library)
+  - Peruse - New users see search engines.
+  - Read - New users search read stuff.
+  - Collect - Bullet part of this section about collecting stuff.
+  - Earn - Kindof make from scratch.
   - Aggregate
 
-Partner App - Syllogos (aggregate)
-- Uses fragments + search to create original content.
+- Partner App - Syllogos (aggregate)
+  - AGGREGATE SECTION
+  - SHARE SECTION
+  - CREATE SECTION
   - Whiteboards.
   - Blogs.
 
 Partner App - Dialectica (debate/reasoning):
 - Uses SBTs + AI LibModule.
-  - Debate Threads. Etc.
+  - Debate Threads.
+  - Sentiment analysis to discover truth.
+  - etc. from scratch.
+
+Partner App - Emporium (trading post): 
+  - NFT marketplace for all Alexandria NFTs.
+  - TRADE section.
 
 Partner App - Dialogos (conversation)
   - Chatbots with people based on their collected works.
@@ -94,10 +130,9 @@ D-app ecosystem - Anything you can imagine.
   - In this way the LibModule is built already for you, with a nice economic model that just works out of the box.
   - Of course people could fork this, and go do their own version, but in doing so they'll circumvent the economic model, loose network effects, and have to start from scratch in making their own building blocks.
 
-
-
-
-
+### Internet of Books
+conclusion.
+(and perhaps the OG inspiration section with some modifications, or maybe not. I just personally like it. Maybe we scratch that whitepaper though, as the stuff isn't even that relevant anymore.)
 
 
 
