@@ -1,13 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import { MdEdit } from "react-icons/md";
 import { FaCopy } from "react-icons/fa";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import MyEngines from "@/features/my-engines";
 import EngineOverview from "@/features/engine-overview";
 import PublicEngines from "@/features/public-engines";
-import Librarian from "@/features/librarian";
-import LibrarianProfile from "@/features/librarian-profile";
+import MyEngine from "@/components/MyEngine";
 
 
 function ManagerPage() {
@@ -17,10 +15,6 @@ function ManagerPage() {
 	const { user } = useAppSelector(
 		(state) => state.auth
 	);
-
-	const {showProfile} = useAppSelector(
-		(state)=>state.librarianProfile
-	)
 
 	return (
 		<MainLayout>
@@ -53,8 +47,9 @@ function ManagerPage() {
 					{
 						user !== "" && (
 							<>
-								<MyEngines />
-								<Librarian />
+								{/* <MyEngines /> */}
+								<MyEngine />
+								{/* <Librarian /> */}
 							</>
 						)
 					}
@@ -62,8 +57,6 @@ function ManagerPage() {
 				</div>
 
 				<div className="flex-grow flex flex-col gap-4">
-					{user !== "" && showProfile && <LibrarianProfile />}
-
 					{activeEngine ? <EngineOverview /> : <PublicEngines />}
 				</div>
 

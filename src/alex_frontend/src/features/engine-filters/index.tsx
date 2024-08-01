@@ -1,3 +1,4 @@
+import useSession from "@/hooks/useSession";
 import { initializeClient } from "@/services/meiliService";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { message } from "antd";
@@ -8,20 +9,22 @@ import { ImSpinner8 } from "react-icons/im";
 import { VscClearAll } from "react-icons/vsc";
 
 enum EngineFilter {
-	fiction = "Fiction",
-	type = "Type",
-	title = "Title",
-	subtype = "SubType",
-	pubyear = "PublicationYear",
-	author = "Author",
 	id = "Id",
+	text = "Text",
+	title = "Title",
+	fiction = "Fiction",
+	language = "Language",
+	author_first = "Author First Name",
+	author_last = "Author Last Name",
+	type = "Type",
+	era = "Publication Era",
+	asset_id = "Asset Id",
 }
 
 const EngineFilters = () => {
-	// Initial state with three checkboxes
+	const {meiliClient} = useSession();
 
 	const [loading, setLoading] = useState(true);
-	const [client, setClient] = useState<MeiliSearch | null>(null);
 
 	const [filters, setFilters] = useState<any[]>([]);
 
@@ -32,19 +35,15 @@ const EngineFilters = () => {
 		try {
 			setLoading(true);
 			setFilters([]);
-			setClient(null);
 
-			const client = await initializeClient(
-				activeEngine?.host,
-				activeEngine?.key
-			);
-			if (!client) throw new Error("Client not available");
+			if(!activeEngine) throw new Error('No engine selected');
 
-			const attributes = await client
-				.index(activeEngine!.index)
+			if(!meiliClient) throw new Error('Client not available');;
+
+			const attributes = await meiliClient
+				.index(activeEngine)
 				.getFilterableAttributes();
 
-			setClient(client);
 			setFilters(attributes);
 		} catch (ex) {
 			message.error("Error fetching filters" + ex)
@@ -62,9 +61,9 @@ const EngineFilters = () => {
 			newFilters.push(e.target.name);
 		}
 
-		if (client && activeEngine?.index) {
-			await client
-				.index(activeEngine.index)
+		if (meiliClient && activeEngine) {
+			await meiliClient
+				.index(activeEngine)
 				.updateFilterableAttributes(newFilters);
 			message.info("Update Filters task enqueued");
 			setFilters(newFilters);
@@ -74,8 +73,8 @@ const EngineFilters = () => {
 	};
 
 	const handleFilterReset = async () => {
-		if (client && activeEngine?.index) {
-			await client.index(activeEngine.index).resetFilterableAttributes();
+		if (meiliClient && activeEngine) {
+			await meiliClient.index(activeEngine).resetFilterableAttributes();
 			message.info("Update Filters task enqueued");
 			setFilters([]);
 		} else {
@@ -91,7 +90,7 @@ const EngineFilters = () => {
 				</span>
 
 				<div className="flex items-center text-gray-500">
-					{user == activeEngine?.owner && (
+					{user == activeEngine && (
 						<div
 							onClick={handleFilterReset}
 							className="px-2 flex items-center gap-1 cursor-pointer hover:text-gray-800 transition-all duration-100 border-r border-gray-500"
@@ -117,7 +116,7 @@ const EngineFilters = () => {
 					</div>
 				</div>
 			</div>
-			{user == activeEngine?.owner &&
+			{user == activeEngine &&
 			<span className="p-4 font-roboto-condensed text-base leading-[18px] text-gray-500 hover:text-gray-800">
 				Filters can take time to update, Check Recent tasks for status.
 			</span>}
@@ -128,7 +127,7 @@ const EngineFilters = () => {
 					Object.entries(EngineFilter).map(([key, value]) => (
 						<label
 							key={key}
-							className={`${user == activeEngine?.owner ? 'cursor-pointer':'cursor-not-allowed'} flex items-center gap-2.5 font-roboto-condensed text-base font-normal ${
+							className={`${user == activeEngine ? 'cursor-pointer':'cursor-not-allowed'} flex items-center gap-2.5 font-roboto-condensed text-base font-normal ${
 								value ? "text-black" : "text-[#8E8E8E]"
 							}`}
 						>
@@ -136,9 +135,9 @@ const EngineFilters = () => {
 								className="w-5 h-5"
 								type="checkbox"
 								name={key}
-								readOnly={user != activeEngine?.owner}
+								readOnly={user != activeEngine}
 								checked={filters.includes(key)}
-								onChange={user == activeEngine?.owner ? handleFilterCheck : ()=>{}}
+								onChange={user == activeEngine ? handleFilterCheck : ()=>{}}
 							/>
 							<span>{value}</span>
 						</label>

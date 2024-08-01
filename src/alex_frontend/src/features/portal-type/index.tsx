@@ -117,8 +117,7 @@ function PortalType() {
                                 </div>
                                 <div>
                                     <span className="text-base font-roboto-condensed font-normal text-gray-300">
-										{/* {books.filter(book=> book.tags.find(b=>b.name == 'type' && b.value == type.id)).length} */}
-										NA
+										{books.filter(book=> book.tags.find(b=>b.name == 'type' && b.value == type.id)).length}
 									</span>
                                 </div>
                             </li>

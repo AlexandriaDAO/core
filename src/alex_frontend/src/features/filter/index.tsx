@@ -17,10 +17,10 @@ function Filter() {
 	const {types, subTypes} = useAppSelector(state=>state.filter)
 	const search = async()=>{
 		if(searchText.length > 0 ){
-			if( !user ){
-				message.error("Login to perform searches on your engines");
-				return;
-			}
+			// if( !user ){
+			// 	message.error("Login to perform searches on your engines");
+			// 	return;
+			// }
 			if(!meiliClient){
 				message.error("Add a working client to perform searches");
 				return;
@@ -31,12 +31,14 @@ function Filter() {
 				return;
 			}
 
-			if(!meiliIndex){
-				message.error("Index not available");
-				return;
+			if(meiliIndex){
+				// message.error("Index not available");
+				// return;
+				dispatch( performSearch({indices: [meiliIndex]}))
+			}else{
+				const indices = await meiliClient.getIndexes();
+				dispatch( performSearch({indices: indices.results}))
 			}
-
-			dispatch( performSearch({index: meiliIndex}))
 		}
 
 	}
@@ -47,7 +49,7 @@ function Filter() {
 	return (
 		<div className="flex-grow flex flex-col gap-4 py-4 transition-all duration-200 ease-in">
 			<Types />
-			<SubTypes />
+			{/* <SubTypes /> */}
 		</div>
 	);
 }

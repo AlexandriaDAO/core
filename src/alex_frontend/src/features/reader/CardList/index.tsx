@@ -4,38 +4,36 @@ import { useAnnotation, useCardList, useReader } from "../lib/hooks/useReaderCon
 import Card from "./Card";
 import DDC from "@/data/categories";
 
-const getTypes = (types: Array<number> = []) => {
-	return types
-		.map((type) => DDC[type])
-		.filter((type) => type !== undefined)
-		.map(({ type, image }, index, arr) => (
-			<React.Fragment key={type}>
-				<img
-					className="w-5 h-5 rounded-full float-left"
-					src={`images/categories/${image}`}
-				/>
-				<span className="font-roboto-condensed text-sm font-bold">
-					{type}
-				</span>
-			</React.Fragment>
-		));
+const getType = (t: number = -1 ) => {
+	if(t<0 || t> 100) return null;
+
+	const type = DDC[t];
+	return <React.Fragment>
+		<img
+			className="w-5 h-5 rounded-full float-left"
+			src={`images/categories/${type.image}`}
+		/>
+		<span className="font-roboto-condensed text-sm font-bold">
+			{type.type}
+		</span>
+	</React.Fragment>
 };
 
-const getSubTypes = (subtypes: Array<number> = []) => {
-	const subtypeTexts: Array<string> = [];
+// const getSubTypes = (subtypes: Array<number> = []) => {
+// 	const subtypeTexts: Array<string> = [];
 
-	// Iterate over each type
-	Object.values(DDC).forEach((type) => {
-		// Check each subtype in the category
-		Object.entries(type.category).forEach(([key, value]) => {
-			if (subtypes.includes(parseInt(key))) {
-				subtypeTexts.push(value);
-			}
-		});
-	});
+// 	// Iterate over each type
+// 	Object.values(DDC).forEach((type) => {
+// 		// Check each subtype in the category
+// 		Object.entries(type.category).forEach(([key, value]) => {
+// 			if (subtypes.includes(parseInt(key))) {
+// 				subtypeTexts.push(value);
+// 			}
+// 		});
+// 	});
 
-	return subtypeTexts;
-};
+// 	return subtypeTexts;
+// };
 
 export const CardList: React.FC = () => {
 	const { showCardList, setShowCardList } = useCardList();
@@ -74,9 +72,9 @@ export const CardList: React.FC = () => {
 							Non Fiction . {metadata.pubdate}
 						</span>
 						<div className="flex flex-wrap items-center gap-1">
-							{getTypes([0, 1])}
+							{getType(1)}
 						</div>
-						<div className="flex justify-start flex-wrap item-center gap-2">
+						{/* <div className="flex justify-start flex-wrap item-center gap-2">
 							{getSubTypes([8, 12]).map((subType) => (
 								<div
 									key={subType}
@@ -85,7 +83,7 @@ export const CardList: React.FC = () => {
 									{subType}
 								</div>
 							))}
-						</div>
+						</div> */}
 					</div>}
 				</div>
 
@@ -104,11 +102,11 @@ export const CardList: React.FC = () => {
 									cfi: item.selection.cfiRange,
 									text: item.selection.text,
 									title: "Sapiens",
-									author: "Yuval Noah Harari",
+									author_first: "Yuval",
+									author_last: "Noah",
 									fiction: true,
-									type: [1,2],
-									subtype: [11, 20],
-									pubyear: 2011,
+									type: 1,
+									era: 1,
 								}}
 							/>
 						))

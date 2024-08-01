@@ -1,17 +1,6 @@
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import fetchBooks from "./thunks/fetchBooks";
-
-export interface Book {
-    key: number;
-    title: string;
-    author: string;
-    cover: string;
-    transactionId: string;
-    tags: {
-        name: string;
-        value: string;
-    }[];
-}
+import { Book } from "@/components/BookModal";
 
 interface PortalState {
     selectedBook: Book | null;
@@ -51,8 +40,8 @@ const portalSlice = createSlice({
         setBooks: (state, action: PayloadAction<Book[]>) => {
             state.books = action.payload;
         },
-        updateBookCover: (state, action: PayloadAction<{ key: number; cover: string }>) => {
-            const book = state.books.find(b => b.key === action.payload.key);
+        updateBookCover: (state, action: PayloadAction<{ id: string; cover: string }>) => {
+            const book = state.books.find(b => b.id === action.payload.id);
             if (book) {
                 book.cover = action.payload.cover;
             }

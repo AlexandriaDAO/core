@@ -1,9 +1,10 @@
 import React, { useEffect, useCallback } from "react";
-import Epub from "epubjs";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { Book, setSelectedBook, updateBookCover } from "../portalSlice";
+import { setSelectedBook, updateBookCover } from "../portalSlice";
 import BookInfo from "./BookInfo";
+import { getCover } from "@/utils/epub";
+import { Book } from "@/components/BookModal";
 
 interface IBookCardProps {
 	book: Book;
@@ -15,35 +16,30 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 	const dispatch = useAppDispatch();
 	const { selectedBook } = useAppSelector((state) => state.portal);
 
-    const getCover = useCallback(async () => {
+    const extractCover = useCallback(async () => {
         if (book.cover !== '') return; // If cover is not empty, we've already fetched it
 
         try {
-            const bookUrl = `https://node1.irys.xyz/${book.transactionId}`;
-            const ebook = Epub(bookUrl, { openAs: "epub" });
+            const coverUrl = await getCover(`https://gateway.irys.xyz/${book.id}`);
 
-            const coverUrl = await ebook.coverUrl();
-
-            if(!coverUrl) throw new Error('Cover not available');
+			if(!coverUrl) throw new Error('Cover not available');
 
             dispatch(updateBookCover({
-                key: book.key,
+                id: book.id,
                 cover: coverUrl || 'images/default-cover.jpg'
             }));
 
-            // throws error in console.
-            ebook.destroy();
         } catch (error) {
             console.error("Error fetching cover URL:", error);
         }
-    }, [book.key, book.cover, book.transactionId, dispatch]);
+    }, [book.id, book.cover, dispatch]);
 
     useEffect(() => {
-        getCover();
-    }, [getCover]);
+        extractCover();
+    }, [extractCover]);
 
 	const handleBookClick = (book: Book) => {
-		if (selectedBook && selectedBook.key === book.key) {
+		if (selectedBook && selectedBook.id === book.id) {
 			dispatch(setSelectedBook(null));
 		} else {
 			dispatch(setSelectedBook(book));
@@ -53,7 +49,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 	return (
 		<div
 			className={`flex justify-center items-center cursor-pointer transition-all duration-500 p-2 ${
-				selectedBook && selectedBook.key === book.key
+				selectedBook && selectedBook.id === book.id
 					? "bg-black text-white"
 					: "hover:border hover:border-solid hover:border-gray-300 hover:scale-[98%] hover:shadow-2xl hover:rounded-lg"
 			}`}
@@ -68,7 +64,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 				/>
 				<span
 					className={`font-roboto-condensed font-normal text-base leading-[18px] ${
-						selectedBook && selectedBook.key === book.key
+						selectedBook && selectedBook.id === book.id
 							? "pb-0.5 text-gray-300"
 							: ""
 					}`}

@@ -3,6 +3,7 @@ use crate::source_cards::SourceCard;
 use crate::engine::Engine;
 use crate::librarian::Librarian;
 use crate::node::Node;
+use crate::nft::TokenDetail;
 
 use ic_cdk;
 use candid::{Nat, Principal};
@@ -53,7 +54,11 @@ pub use node::{
 };
 
 mod nft;
-pub use nft::mint_nft;
+pub use nft::{
+  mint_nft,
+  get_nfts,
+  get_nfts_of,
+};
 
 ic_cdk::export_candid!();
 

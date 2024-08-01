@@ -99,6 +99,7 @@ module.exports = {
         if (key.includes("CANISTER")) return true;
         if (key.includes("DFX")) return true;
         if (key.startsWith("ETH_")) return true;
+        if (key.startsWith("REACT_")) return true;
         return false;
       }),
     ]),

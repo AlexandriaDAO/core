@@ -7,12 +7,12 @@ import { RootState } from '@/store';
 // Define the async thunk
 const performSearch = createAsyncThunk<
     any[], // This is the return type of the thunk's payload
-    {index:Index}, //Argument that we pass to initialize
+    {indices:Index[]}, //Argument that we pass to initialize
     { rejectValue: string, state: RootState }
->("search/performSearch", async ({index}, { rejectWithValue, getState }) => {
+>("search/performSearch", async ({indices}, { rejectWithValue, getState }) => {
     try {
 
-        const {search: {searchText}, filter: {types, subTypes}} = getState();
+        const {search: {searchText, limit}, filter: {types, subTypes}} = getState();
 
         const filter = [];
         if(types.length > 0){
@@ -26,14 +26,28 @@ const performSearch = createAsyncThunk<
             attributesToHighlight: ['text', 'title'],
             highlightPreTag: '<span style="background:yellow;">',
             highlightPostTag: '</span>',
+
+            limit,
         }
 
         if(filter.length>0 ){
             config.filter = filter;
         }
-        const results = await index.search(searchText, config)
 
-        return results.hits;
+        // if(index){
+        //     const results = await index.search(searchText, config)
+
+        //     return results.hits;
+        // }
+
+        const searchResults = await Promise.all(
+            indices.map(async (index: Index) => await index.search(searchText, config) )
+        );
+
+        // Flatten the results
+        const allHits = searchResults.flatMap((result: { hits: any; }) => result.hits);
+
+        return allHits;
     } catch (error) {
         console.error("Unable to perform search:", error);
 

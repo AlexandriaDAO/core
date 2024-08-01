@@ -46,6 +46,9 @@ export interface IReaderState {
 	isLoaded: Boolean;
 	setIsLoaded: Dispatch<SetStateAction<Boolean>>;
 
+	loadingProgress: number; // Add loading progress state
+	setLoadingProgress: Dispatch<SetStateAction<number>>;
+
 	firstPageLoaded: Boolean;
 	setFirstPageLoaded: Dispatch<SetStateAction<Boolean>>;
 
@@ -91,6 +94,7 @@ export const useReaderState = (): IReaderState => {
 	const bookLocation = useRef<HTMLDivElement>(null);
 
 	const [isLoaded, setIsLoaded] = useState<Boolean>(false);
+	const [loadingProgress, setLoadingProgress] = useState(0); // Initialize loading progress
 
 	const [firstPageLoaded, setFirstPageLoaded] = useState<Boolean>(false);
 
@@ -176,30 +180,61 @@ export const useReaderState = (): IReaderState => {
 
 	useEffect(() => {
 		if (url === "") return;
-		let newBook = Epub(url, {openAs:'epub'});
-		newBook
-			.ready
-			.then(() => {
-				newBook.loaded.metadata.then(metadata=>setMetadata(metadata))
 
-				newBook.coverUrl().then(url=>setCoverUrl(url))
+		const xhr = new XMLHttpRequest();
+		xhr.open("GET", url, true);
+		xhr.responseType = "blob";
+	
+		// Update progress
+		xhr.onprogress = (event) => {
+			if (event.lengthComputable) {
+				const percentComplete = (event.loaded / event.total) * 100;
+				setLoadingProgress(Math.round(percentComplete));
+			}
+		};
+	
+		// On load
+		xhr.onload = () => {
+			if (xhr.status === 200) {
+				const blobUrl = URL.createObjectURL(xhr.response);
+				let newBook = Epub(blobUrl, {openAs:'epub'});
+				newBook
+					.ready
+					.then(() => {
+						newBook.loaded.metadata.then(metadata=>setMetadata(metadata))
 
-				setIsLoaded(true);
-				setBook(newBook);
-			})
-			.then(()=>{
-				const stored = localStorage.getItem(newBook.key() + '-locations');
-				if (stored) {
-					return newBook.locations.load(stored);
-				} else {
-					return newBook.locations.generate(1024);
-				}
-			})
-			.then(() => {
-				localStorage.setItem(newBook.key() + '-locations', newBook.locations.save());
-			}).catch((err) => {
-				console.log('Error while saving locations in localstorage',err);
-			});
+						newBook.coverUrl().then(url=>setCoverUrl(url))
+
+						setIsLoaded(true);
+						setBook(newBook);
+					})
+					.then(()=>{
+						const stored = localStorage.getItem(newBook.key() + '-locations');
+						if (stored) {
+							return newBook.locations.load(stored);
+						} else {
+							return newBook.locations.generate(1024);
+						}
+					})
+					.then(() => {
+						localStorage.setItem(newBook.key() + '-locations', newBook.locations.save());
+					}).catch((err) => {
+						console.log('Error while saving locations in localstorage',err);
+					});
+			}
+		};
+	
+		// Handle errors
+		xhr.onerror = () => {
+		  	console.error("Error loading the EPUB file.");
+		};
+	
+		xhr.send();
+	
+		// Cleanup function
+		return () => {
+		  	xhr.abort();
+		};
 	}, [url, setIsLoaded, setBook]);
 
 	return {
@@ -220,6 +255,9 @@ export const useReaderState = (): IReaderState => {
 
 		isLoaded,
 		setIsLoaded,
+
+		loadingProgress, // Expose loading progress
+		setLoadingProgress,
 
 		firstPageLoaded,
 		setFirstPageLoaded,

@@ -10,7 +10,7 @@ import "./styles/tailwind.css";
 import BookPortalPage from "./pages/BookPortalPage";
 import ManagerPage from "./pages/ManagerPage";
 import SessionProvider from "./providers/SessionProvider";
-import ReaderPage from "./pages/ReaderPage";
+import FundNodePage from "./pages/FundNodePage";
 
 export default function App() {
     return (
@@ -23,7 +23,7 @@ export default function App() {
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/book-portal" element={<BookPortalPage />} />
                                 <Route path="/manager" element={<ManagerPage />} />
-                                <Route path="/reader" element={<ReaderPage />} />
+                                <Route path="/fund-node" element={<FundNodePage />} />
                             </Routes>
                     </AuthProvider>
                 </BrowserRouter>

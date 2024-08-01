@@ -139,13 +139,11 @@ const MetaData = forwardRef(({ metadata, setMetadata }: any, ref) => {
         )}
       </div>
 
-      <div>
-        <CategorySelect 
-          setMetadata={setMetadata}
-          metadata={metadata}
-          isSubmitAttempted={isSubmitAttempted}
-        />
-      </div>
+      <CategorySelect 
+        setMetadata={setMetadata}
+        metadata={metadata}
+        isSubmitAttempted={isSubmitAttempted}
+      />
 
       <div className="flex flex-col gap-1 w-full justify-between items-start">
         <label htmlFor="language">Language</label>

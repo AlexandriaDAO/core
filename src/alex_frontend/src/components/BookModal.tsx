@@ -1,32 +1,39 @@
-import React, { useEffect, useState } from "react";
 import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '@/store';
-import { resetBookState } from '@/features/home/homeSlice';
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import React, { useEffect } from "react";
 
-const BookModal = () => {
-    const { selectedBook, bookUrl } = useSelector((state: RootState) => state.home);
-    const dispatch = useDispatch();
-    const [key, setKey] = useState(Date.now());
+export interface Book {
+    id: string;
+    title: string;
+    author: string;
+    cover: string;
+    tags: {
+        name: string;
+        value: string;
+    }[];
+}
 
-    useEffect(() => {
-        if (selectedBook && bookUrl) {
-            setKey(Date.now());
-        }
-    }, [selectedBook, bookUrl]);
+interface IBookModalProps {
+	book: Book;
+}
 
-    if (!selectedBook || !bookUrl) return null;
+const BookModal: React.FC<IBookModalProps> = ({
+    book
+}: IBookModalProps) => {
+    if(!book) return;
 
-    return (
-        <ReaderProvider key={selectedBook?.transactionId}>
-            <div className="relative w-full p-2">
-                <div className="max-w-7xl m-auto grid grid-cols-1 gap-4">
-                    <Reader key={key} bookUrl={bookUrl} />
+	return (
+        <div className="w-full pb-5 text-black scale-y-100 transition-all duration-500 flex flex-col justify-between">
+            <ReaderProvider>
+                <div className="relative w-full p-2">
+                    <div className="max-w-7xl m-auto grid grid-cols-1 gap-4">
+                        <Reader bookUrl={`https://gateway.irys.xyz/${book.id}`} />
+                    </div>
                 </div>
-            </div>
-        </ReaderProvider>
-    );
-};
+            </ReaderProvider>
+        </div>
+	);
+}
 
 export default BookModal;

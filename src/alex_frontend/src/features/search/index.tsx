@@ -2,7 +2,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { ChangeEvent, KeyboardEvent, useEffect } from "react";
 import { RxCross1 } from "react-icons/rx";
-import { setSearchResults, setSearchText } from "./searchSlice";
+import { setLimit, setSearchResults, setSearchText } from "./searchSlice";
 
 import { ImSpinner8 } from "react-icons/im";
 import FilterButton from "@/components/ui/FilterButton";
@@ -14,7 +14,7 @@ export default function Search() {
 	const { meiliClient, meiliIndex } = useSession();
 	const dispatch = useAppDispatch();
 	const { user } = useAppSelector((state) => state.auth);
-	const { searchText, loading } = useAppSelector((state) => state.search);
+	const { searchText, limit, loading } = useAppSelector((state) => state.search);
 
 	const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
 		dispatch(setSearchText(e.target.value));
@@ -22,10 +22,10 @@ export default function Search() {
 
 	const search = async()=>{
 		if(searchText.length > 0 ){
-			if( !user ){
-				message.error("Login to perform searches on your engines");
-				return;
-			}
+			// if( !user ){
+			// 	message.error("Login to perform searches on your engines");
+			// 	return;
+			// }
 			if(!meiliClient){
 				message.error("Add a working client to perform searches");
 				return;
@@ -36,20 +36,19 @@ export default function Search() {
 				return;
 			}
 
-			if(!meiliIndex){
-				message.error("Index not available");
-				return;
+			if(meiliIndex){
+				dispatch( performSearch({indices: [meiliIndex]}))
+			}else{
+				const indices = await meiliClient.getIndexes();
+				dispatch( performSearch({indices: indices.results}))
 			}
-
-			dispatch( performSearch({index: meiliIndex}))
 		}else{
 			handleClearSearchInput()
 		}
-
 	}
 	useEffect(()=>{
 		search();
-	},[searchText])
+	},[searchText, limit])
 
 	// // Handler for key down events
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -59,6 +58,7 @@ export default function Search() {
 	const handleClearSearchInput = () => {
 		dispatch(setSearchText(""));
 		dispatch(setSearchResults([]));
+		dispatch(setLimit(20));
 	};
 
 	return (

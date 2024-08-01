@@ -5,7 +5,6 @@ import { useAppSelector } from '@/store/hooks/useAppSelector';
 import SessionContext from '@/contexts/SessionContext';
 import MeiliSearch, { Index } from 'meilisearch';
 import { initializeClient, initializeIndex } from '@/services/meiliService';
-import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
 import { initializeActor } from '@/features/auth/utils/authUtils';
@@ -18,7 +17,6 @@ interface SessionProviderProps {
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const dispatch = useAppDispatch();
 	const {user} = useAppSelector(state=>state.auth);
-	const {engines} = useAppSelector(state=>state.myEngines)
 
 	const [actor, setActor] = useState(alex_backend);
 	const [authClient, setAuthClient] = useState<AuthClient>();
@@ -32,8 +30,23 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		setAuthClient(authClient);
 	}
 
+	const initializeMeiliClient = async () => {
+		const host = process.env.REACT_MEILI_HOST;
+		const key = process.env.REACT_MEILI_KEY;
+
+		const client = await initializeClient(host, key);
+		// if(client){
+		// 	const {results} = await client.getIndexes()
+		// 	results.forEach(index=>{
+		// 		client.deleteIndexIfExists(index.uid)
+		// 	})
+		// }
+		if(client) setMeiliClient(client)
+	}
+
 	useEffect(()=>{
 		initializeAuthClient()
+		initializeMeiliClient()
 	},[])
 
 
@@ -54,34 +67,17 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	},[user])
 
 	useEffect(()=>{
-		if(engines.length <1 ) {
-			setMeiliClient(undefined);
-			return;
+		setMeiliIndex(undefined)
+		if(!user || !meiliClient) return;
+
+		const setupMeiliIndex = async()=>{
+
+			const index = await initializeIndex(meiliClient, user)
+
+			if(index) setMeiliIndex(index)
 		}
-		const setupMeili = async()=>{
-			engines.find(async (engine) => {
-				const client = await initializeClient(engine.host, engine.key);
-				if(!client) return false;
-
-				setMeiliClient(client)
-
-				const index = await initializeIndex(client, engine.index)
-				if(index){
-					setMeiliIndex(index)
-				}
-
-				return true;
-			})
-		}
-		setupMeili();
-	},[engines])
-
-
-	useEffect(() => {
-		if (actor!=alex_backend){
-			dispatch(fetchMyEngines(actor));
-		}
-	}, [actor]);
+		setupMeiliIndex();
+	},[user, meiliClient])
 
 	return (
 		<SessionContext.Provider value={{ actor, authClient, meiliClient, meiliIndex  }}>

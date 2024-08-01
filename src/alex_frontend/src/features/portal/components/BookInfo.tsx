@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Tooltip, Modal } from "antd";
-import { Book } from "../portalSlice";
+import { Book } from "@/components/BookModal";
 
 interface IBookInfoProps {
     book?: Book;

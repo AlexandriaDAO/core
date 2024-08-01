@@ -11,7 +11,7 @@
   import { TypedEthereumSigner } from "arbundles";
   import { Buffer } from "buffer";
   
-  const network = "mainnet";
+  const network = process.env.DFX_NETWORK === "ic" ? "mainnet":"devnet";
   const token = "ethereum";
   
   const getIrys = async (): Promise<WebIrys> => {
@@ -26,8 +26,6 @@
   
     // const pubKey = cleanEnvVar("0x738b58fe508189A237427e69163bB7E2cd91C38c");
     // const privateKey = cleanEnvVar("0x54d8a539123e15c56028557bff8b0704728138fdc04c04363374ca80efa16084");
-
-    console.log(pubKey);
 
     if (typeof pubKey !== 'string' || typeof privateKey !== 'string') {
       throw new Error('ETH_PUBLIC_KEY or ETH_PRIVATE_KEY is not defined or is not a string');

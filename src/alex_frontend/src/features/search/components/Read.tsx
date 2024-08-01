@@ -8,6 +8,9 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { BookCardItem } from "./Card";
 import { getSubTypes, getTypes } from "../utils/properties";
 import BookModal from "./BookModal";
+import eras from "@/data/eras";
+import DDC from "@/data/categories";
+import { getCover } from "@/utils/epub";
 
 interface Props {
 	item: BookCardItem;
@@ -16,6 +19,8 @@ interface Props {
 const Read: React.FC<Props> = ({ item }) => {
 	const dispatch = useAppDispatch();
 	const { selectedSearchedBook } = useAppSelector((state) => state.home);
+
+    const [cover, setCover] = useState('images/default-cover.jpg')
 
     const expandModalRef = useRef<HTMLDivElement>(null);
 
@@ -36,6 +41,24 @@ const Read: React.FC<Props> = ({ item }) => {
         }
     }, [item]);
 
+
+    const extractCover = async () => {
+        try {
+            const coverUrl = await getCover(`https://gateway.irys.xyz/${item.asset_id}`);
+
+			if(!coverUrl) throw new Error('Cover not available');
+
+			setCover(coverUrl)
+        } catch (error) {
+            console.error("Error fetching cover URL:", error);
+        }
+    }
+
+    useEffect(() => {
+        extractCover();
+    }, []);
+
+
 	return (
         <div ref={expandModalRef} className="flex flex-col gap-2 bg-white shadow-lg rounded-lg">
             <div
@@ -43,29 +66,36 @@ const Read: React.FC<Props> = ({ item }) => {
             >
                 <div className="flex-shrink-0 flex flex-col basis-1/3 gap-1">
                     <div className="flex">
-                        <div
+                        {/* <div
                             className="basis-[180px] flex-shrink-0 h-64"
                             style={{
                                 // backgroundImage: `url(images/categories/${item.image})`,
         						backgroundImage: `url(https://picsum.photos/300/100)`,
+                            }}
+                        ></div> */}
+                        <div
+                            className={`basis-[180px] flex-shrink-0 h-64 bg-no-repeat ${cover == 'images/default-cover.jpg' ? 'animate-pulse':''}`}
+                            style={{
+                                backgroundImage: `url(${cover})`,
+                                backgroundSize: "100% 100%",
                             }}
                         ></div>
                         <div className="flex-grow flex flex-col justify-between px-2 gap-2">
                             <div className="flex justify-between">
                                 <div className="flex flex-col">
                                     <span className="font-roboto-condensed text-xl font-medium">
-                                        {item.author}
+                                        {item.author_first + ' ' + item.author_last}
                                     </span>
                                     <span className="font-syne text-2xl font-semibold">
                                         {item.title}
                                     </span>
                                     <span className="font-roboto-condensed text-sm font-normal text-[#8E8E8E]">
-                                        {item.fiction ? "Fiction" : "Non Fiction"}{" "}
-                                        &nbsp; {item.pubyear ? item.pubyear : ""}
+                                        {item.fiction ? "Fiction" : "Non Fiction"} &nbsp;
+                                        {item.era ? eras.find(era=>era.value == item.era)?.label ??'Unknown Era' : ''}
                                     </span>
                                     <div className="flex flex-wrap items-center gap-2">
                                         <div className="flex justify-start flex-wrap item-center gap-2">
-                                            {getTypes(item.type).map(
+                                            {/* {getTypes(item.type).map(
                                                 ({type}, index, arr) => (
                                                     <React.Fragment key={type}>
                                                         <span className="font-roboto-condensed text-sm font-bold">
@@ -78,18 +108,21 @@ const Read: React.FC<Props> = ({ item }) => {
                                                         )}
                                                     </React.Fragment>
                                                 )
-                                            )}
+                                            )} */}
+                                            <span className="font-roboto-condensed text-sm font-bold">
+                                                {item.type && DDC[item.type]?.type}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex justify-start flex-wrap item-center gap-2">
+                            {/* <div className="flex justify-start flex-wrap item-center gap-2">
                                 {getSubTypes(item.subtype).map((subType) => (
                                     <div className="truncate px-4 py-1 flex justify-center items-center border border-black rounded-full font-roboto-condensed text-sm font-normal cursor-pointer hover:bg-black hover:text-white transition-all duration-300 ease-in">
                                         {subType}
                                     </div>
                                 ))}
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                     <div className="text-[#8E8E8E] flex justify-start items-center font-roboto-condensed text-sm font-normal gap-2 ">

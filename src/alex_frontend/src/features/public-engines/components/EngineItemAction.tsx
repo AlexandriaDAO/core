@@ -7,7 +7,7 @@ import { setActiveEngine } from "@/features/engine-overview/engineOverviewSlice"
 import { Button, Space } from "antd";
 
 interface EngineItemProps {
-	engine: Engine
+	engine: string
 };
 
 const EngineItemAction: React.FC<EngineItemProps> = ({engine}) => {
@@ -16,8 +16,8 @@ const EngineItemAction: React.FC<EngineItemProps> = ({engine}) => {
 	const { activeEngine } = useAppSelector((state) => state.engineOverview);
 
 	const handleEngineClick = () => {
-		if (activeEngine?.id == engine.id) {
-			dispatch(setActiveEngine(null));
+		if (activeEngine == engine) {
+			dispatch(setActiveEngine(''));
 		} else {
 			dispatch(setActiveEngine(engine));
 		}

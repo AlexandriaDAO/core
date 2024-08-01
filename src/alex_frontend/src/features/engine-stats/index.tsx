@@ -1,3 +1,4 @@
+import useSession from "@/hooks/useSession";
 import { initializeClient } from "@/services/meiliService";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { message } from "antd";
@@ -8,9 +9,11 @@ import { ImSpinner8 } from "react-icons/im";
 import { VscClearAll } from "react-icons/vsc";
 
 const EngineStats = () => {
+	const {meiliClient} = useSession();
+
 	const [loading, setLoading] = useState(true);
 	const [stats, setStats] = useState<any>(null);
-	const [client, setClient] = useState<MeiliSearch | null>(null);
+
 	const { activeEngine } = useAppSelector(
 		(state) => state.engineOverview
 	);
@@ -18,8 +21,8 @@ const EngineStats = () => {
 		(state) => state.auth
 	);
 	const handleClearAll = async () => {
-		if (client && activeEngine?.index) {
-			await client.index(activeEngine.index).deleteAllDocuments();
+		if (meiliClient && activeEngine) {
+			await meiliClient.index(activeEngine).deleteAllDocuments();
 			message.info("Clear document task enqueued");
 			await fetchStats()
 		} else {
@@ -30,19 +33,13 @@ const EngineStats = () => {
 		try{
 			setLoading(true);
 			setStats(null);
-			setClient(null);
 
 			if(!activeEngine) throw new Error('No engine selected');
 
-			const client = await initializeClient(
-				activeEngine.host,
-				activeEngine.key
-			)
-			if(!client) throw new Error('Client not available');;
+			if(!meiliClient) throw new Error('Client not available');
 
-			const stats = await client.index(activeEngine.index).getStats();
+			const stats = await meiliClient.index(activeEngine).getStats();
 
-			setClient(client);
 			setStats(stats);
 		}catch(ex){
 			message.error("Error fetching filters" + ex)
@@ -61,7 +58,7 @@ const EngineStats = () => {
 					Cluster Stats
 				</span>
 				<div className="flex items-center text-gray-500">
-				{user == activeEngine?.owner && 
+				{user == activeEngine &&
 					<div onClick={handleClearAll} className="px-2 flex items-center gap-1 cursor-pointer hover:text-gray-800 transition-all duration-100 border-r border-gray-500">
 						<VscClearAll size={22} />
 						<span className="font-roboto-condensed text-base leading-[18px] ">
@@ -80,7 +77,7 @@ const EngineStats = () => {
 					</div>
 				</div>
 			</div>
-			{user == activeEngine?.owner &&
+			{user == activeEngine &&
 			<span className="p-4 font-roboto-condensed text-base leading-[18px] text-gray-500 hover:text-gray-800">
 				Document deletion can take time, Check Recent tasks for status.
 			</span>}
