@@ -108,6 +108,36 @@ const Mint = () => {
 			await mintNFT(transactions.manifest.id);
 			await uploadToArweave(irys, transactions);
 
+        // Master version before Zeeshan separated upload into a folder.
+<!-- 			const APP_ID = process.env.DFX_NETWORK === "ic" 
+    ? "testingAlexandria" 
+    : "UncensoredGreats";
+
+			if (!APP_ID) {
+					throw new Error("Application ID is not set in environment variables");
+			}
+
+			// Convert File to Buffer
+			const buffer = await readFileAsBuffer(file);
+
+			console.log("Uploading...");
+			tx = irys.createTransaction(buffer, {
+				tags: [
+					{ name: "Content-Type", value: file.type },
+					{ name: "application-id", value: APP_ID },
+					{ name: "minting_number", value: mintingNumber.toString() },
+					...Object.entries(metadata).map(([key, value]) => ({
+						name: key,
+						value:
+							typeof value === "string" ? value : String(value),
+					})),
+				],
+			});
+			await tx.sign();
+
+			message.success("Transaction Created Successfully"); -->
+
+
 			dispatch(fetchEngineBooks({ actor, engine: activeEngine }));
 			setTimeout(() => next(3), 2000);
 		} catch (error) {

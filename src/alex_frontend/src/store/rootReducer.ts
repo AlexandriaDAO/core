@@ -13,6 +13,13 @@ import portalLanguageReducer from "@/features/portal-language/portalLanguageSlic
 import portalTypeReducer from "@/features/portal-type/portalTypeSlice";
 import portalEraReducer from "@/features/portal-era/portalEraSlice";
 import portalFilterReducer from "@/features/portal-filter/portalFilterSlice";
+// import librarianReducer from "@/features/librarian/librarianSlice";
+// import librarianProfileReducer from "@/features/librarian-profile/librarianProfileSlice";
+// import myNodesReducer from "@/features/my-nodes/myNodesSlice";
+// import swapReducer from "@/features/swap/swapSlice"
+// import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
+// import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
+
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -30,6 +37,14 @@ const rootReducer = combineReducers({
 	portalEra: portalEraReducer,
 
 	portalFilter: portalFilterReducer,
+
+// 	librarian: librarianReducer,
+// 	librarianProfile: librarianProfileReducer,
+
+// 	myNodes: myNodesReducer,
+// 	swap:swapReducer,
+// 	icpLedger:icpLedgerReducer,
+// 	tokenomics:tokenomicsReducer,
 
 	portal: portalReducer,
 });

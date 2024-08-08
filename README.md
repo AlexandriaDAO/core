@@ -1,10 +1,13 @@
-### Latest network deploy commit hash: ee8e39eec223d7d4f484b346d22ee3859d12b032
+### Latest network deploy: 
+07/18
 
 ## Running the project locally
 
-run `./build.sh`
+run `./scripts/build.sh`
 
 For frontend only: `npm run dev`
+
+Or on mainnet: Switch canister_ids.json with your own canisters and run `./scripts/network_build.sh`
 
 #### Common Prerequisites if this fails:
 (Linux)

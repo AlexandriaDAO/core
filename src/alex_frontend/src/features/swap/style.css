@@ -1,0 +1,80 @@
+.swap-container-wrapper{
+    margin: 60px auto;
+}
+.swap-container{
+    width: 100%;
+    padding: 30px 30px 100px;
+    max-width: 490px;
+    border-radius: 30px;
+    font-family: Syne, sans-serif;
+    position: relative;
+}
+.custom-container .icp-wrapper.one{
+    margin-top: 95px;
+}
+.custom-container h1{
+    font-size: 40px;
+    line-height: 1.3;
+}
+.swap-container .header{
+    margin-bottom: 20px;
+}
+.custom-container h3, .custom-container label{
+    font-size: 23px;
+    line-height: 1.3;
+}
+.swap-container .swap-account{
+    word-break: break-all;
+}
+.swap-container .account-wrapper{
+    margin-bottom: 20px;
+}
+.swap-container .icp-wrapper .label-wrapper{
+    padding: 20px;
+    background-color: rgb(224 224 224);
+    border-radius: 15px;
+}
+
+.swap-container .empty-container{
+    background-color: #ffffff;
+    border-radius: 8px;
+    height: 50px;
+    width: 200px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+}
+.swap-container input::-webkit-outer-spin-button,
+.swap-container input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.swap-container input[type=number] {
+  -moz-appearance: textfield;
+}
+.swap-container .bottom-btn{
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    width: calc(100% - 60px);
+    transform: translateX(-50%);
+}
+.account-container{
+    max-width: 90%;
+    margin: 60px auto;
+    padding: 30px 30px;
+    border-radius: 30px;
+    font-family: Syne, sans-serif;
+}
+
+.account-container .subaccount-wrapper{
+    font-size: 20px;
+    line-height: 1.3;
+}
+
+.balance-wrapper .address{
+    padding: 5px 10px;
+    /* background-color: grey; */
+    border-radius: 10px;
+    font-size: 18px;
+}

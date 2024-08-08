@@ -1,7 +1,6 @@
 use candid::Principal;
 use serde::{Deserialize, Serialize};
 
-use candid::CandidType;
 use ic_cdk;
 use ic_ledger_types::{
      BlockIndex as BlockIndexIC, Subaccount

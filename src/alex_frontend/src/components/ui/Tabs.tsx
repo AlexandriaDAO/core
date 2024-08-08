@@ -25,6 +25,12 @@ export default function Tabs() {
 			>
                 Manager
 			</button>
+			<button
+				onClick={()=>navigate('/swap')}
+				className={`transition-all duration-100 cursor-pointer font-syne font-medium text-xl leading-7 text-center tracking-wider flex items-center ${location.pathname == '/manager' ? 'text-white':'text-[#8E8E8E] hover:text-white'} `}
+			>
+                Swap
+			</button>
 		</div>
 	);
 }
