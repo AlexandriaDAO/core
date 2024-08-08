@@ -8,6 +8,7 @@ import { initializeClient, initializeIndex } from '@/services/meiliService';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
 import { initializeActor } from '@/features/auth/utils/authUtils';
+import fetchBooks from '@/features/portal/thunks/fetchBooks';
 
 interface SessionProviderProps {
 	children: React.ReactNode;
@@ -17,6 +18,7 @@ interface SessionProviderProps {
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const dispatch = useAppDispatch();
 	const {user} = useAppSelector(state=>state.auth);
+	const { books } = useAppSelector(state=>state.portal);
 
 	const [actor, setActor] = useState(alex_backend);
 	const [authClient, setAuthClient] = useState<AuthClient>();
@@ -78,6 +80,12 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		}
 		setupMeiliIndex();
 	},[user, meiliClient])
+
+	// Load all books on App Start
+	useEffect(() => {
+		if(!actor) return;
+		dispatch(fetchBooks(actor));
+	}, [actor, dispatch]);
 
 	return (
 		<SessionContext.Provider value={{ actor, authClient, meiliClient, meiliIndex  }}>

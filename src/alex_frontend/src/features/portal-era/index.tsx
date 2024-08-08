@@ -96,7 +96,7 @@ function PortalEra() {
                                 </div>
                                 <div>
                                     <span className="text-base font-roboto-condensed font-normal text-gray-500">
-										{books.filter(book=> book.tags.find(tag=>tag.name == 'era' && tag.value == era.value+'')).length}
+										{books.filter(book=> book.era == era.value).length}
 									</span>
                                 </div>
                             </li>

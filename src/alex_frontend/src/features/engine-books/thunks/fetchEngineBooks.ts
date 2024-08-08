@@ -1,17 +1,22 @@
 import { ActorSubclass } from '@dfinity/agent';
-import { Engine, TokenDetail, _SERVICE } from '../../../../../declarations/alex_backend/alex_backend.did';
+import { _SERVICE } from '../../../../../declarations/alex_backend/alex_backend.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { RootState } from '@/store';
+import { getBooks } from '@/utils/irys';
+import { Book } from '@/features/portal/portalSlice';
 
 // Define the async thunk
 const fetchEngineBooks = createAsyncThunk<
-    TokenDetail[], // This is the return type of the thunk's payload
+    Book[], // This is the return type of the thunk's payload
     {
         actor: ActorSubclass<_SERVICE>,
         engine: string
     }, //Argument that we pass to initialize
-    { rejectValue: string }
->("engineBooks/fetchEngineBooks", async ({actor, engine}, { rejectWithValue }) => {
+    { rejectValue: string, state: RootState }
+>("engineBooks/fetchEngineBooks", async ({actor, engine}, { rejectWithValue, getState }) => {
     try {
+        const {portal: {books}} = getState();
+
         // Ensure activeEngine is a valid principal string
         if (typeof engine !== 'string' || !engine) {
             throw new Error('Invalid engine provided');
@@ -19,11 +24,21 @@ const fetchEngineBooks = createAsyncThunk<
 
         const result = await actor.get_nfts_of(engine);
 
-        if ('Ok' in result) {
-            return result.Ok
+        if ('Err' in result) {
+            console.log('Error fetching NFTs', result.Err);
+            throw new Error('Error fetching NFTs');
         }
 
-        throw new Error(result.Err ?? 'Unknown Error Occured');
+        if('Ok' in result){
+            if(books.length>0){
+                const manifestIds = result.Ok.map(token=>token.description)
+                return books.filter(book=> manifestIds.includes(book.manifest));
+            }
+
+            return await getBooks(result.Ok)
+        }
+
+        return [];
     } catch (error) {
         console.error("Failed to Fetch My Engines:", error);
 

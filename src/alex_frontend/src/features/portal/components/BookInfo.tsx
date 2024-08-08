@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Tooltip, Modal } from "antd";
-import { Book } from "@/components/BookModal";
+import { Book } from "../portalSlice";
 
 interface IBookInfoProps {
     book?: Book;
@@ -36,12 +36,16 @@ const BookInfo: React.FC<IBookInfoProps> = ({
             >
                 <div>
                     <h2>{book.title}</h2>
-                    <p>Author: {book.author}</p>
-                    {book.tags.map((tag) => (
+                    <p>Author: {book.author_first + " " + book.author_last}</p>
+                    {/* {book.tags.map((tag) => (
                         <p key={tag.name}>
                             {tag.name}: {tag.value}
                         </p>
-                    ))}
+                    ))} */}
+
+                    <pre className="font-roboto-condensed font-normal text-sm overflow-auto bg-gray-600 text-white p-5">
+						<code>{JSON.stringify(book, null, 2)}</code>
+					</pre>
                 </div>
             </Modal>
 

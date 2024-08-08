@@ -76,8 +76,8 @@ const EngineBooks = () => {
 						expanded ? "h-auto" : "max-h-96 overflow-auto"
 					}`}
 				>
-					{books.slice(0, expanded ? books.length : TO_DISPLAY).map(token => (
-						<MintedBook key={token.token_id} token={token} />
+					{books.slice(0, expanded ? books.length : TO_DISPLAY).map(book => (
+						<MintedBook key={book.manifest} book={book} />
 					))}
 				</div>
 				{books.length > TO_DISPLAY && (

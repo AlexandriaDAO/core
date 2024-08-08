@@ -98,7 +98,7 @@ async fn get_tokens() -> Result<Vec<Nat>, String> {
 
     match tokens_call_result {
         Ok((ids,)) => {
-            ic_cdk::println!("Retrieved token IDs: {:?}", ids);
+            // ic_cdk::println!("Retrieved token IDs: {:?}", ids);
             Ok(ids)
         },
         Err((code, msg)) => {

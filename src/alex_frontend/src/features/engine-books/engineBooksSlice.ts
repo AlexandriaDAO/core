@@ -1,12 +1,11 @@
-import { ActionReducerMapBuilder, PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Engine, TokenDetail } from '../../../../declarations/alex_backend/alex_backend.did';
+import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import fetchEngineBooks from "./thunks/fetchEngineBooks";
-import { message } from "antd";
+import { Book } from "../portal/portalSlice";
 
 
 // Define the interface for our engine state
 export interface EngineBooksState {
-	books: TokenDetail[];			//holds currently selected engine
+	books: Book[];			//holds currently selected engine
 
 	expanded: boolean;
 	loading: boolean;

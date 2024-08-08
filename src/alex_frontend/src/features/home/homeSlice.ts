@@ -1,11 +1,12 @@
-import { Book } from "@/components/BookModal";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Book } from "../portal/portalSlice";
+import { BookCardItem } from "../search/components/Card";
 
 interface HomeState {
     filter: boolean;
     selectedType: number;
     selectedBook: Book | null;
-    selectedSearchedBook: any;
+    selectedSearchedBook: BookCardItem|null;
     isModalOpen: boolean;
     bookUrl: string | null;
 }
@@ -33,7 +34,7 @@ const homeSlice = createSlice({
             // Reset the state before setting the new book
             state.selectedBook = action.payload
         },
-        setSelectedSearchedBook: (state, action: PayloadAction<any>) => {
+        setSelectedSearchedBook: (state, action: PayloadAction<BookCardItem|null>) => {
             state.selectedSearchedBook = action.payload;
         },
         setIsModalOpen: (state, action: PayloadAction<boolean>) => {
@@ -47,13 +48,13 @@ const homeSlice = createSlice({
     },
 });
 
-export const { 
-    setFilter, 
-    setSelectedType, 
-    setSelectedBook, 
+export const {
+    setFilter,
+    setSelectedType,
+    setSelectedBook,
     setSelectedSearchedBook,
     setIsModalOpen,
-		resetBookState
+    resetBookState
 } = homeSlice.actions;
 
 export default homeSlice.reducer;

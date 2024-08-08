@@ -1,20 +1,17 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Pagination, PaginationProps } from "antd";
-import { setCurrentPage } from "./portalSlice";
+import { Book, setCurrentPage } from "./portalSlice";
 import BookCard from "./components/BookCard";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import fetchBooks from "./thunks/fetchBooks";
-import useSession from "@/hooks/useSession";
 import { ImSpinner8 } from "react-icons/im";
-import BookModal, { Book } from "@/components/BookModal";
+import BookModal from "@/components/BookModal";
 
 const ITEMS_PER_PAGE = 12;
 
 const Portal: React.FC = () => {
-	const {actor} = useSession();
 	const dispatch = useAppDispatch();
-	const { types, languages, eras } = useAppSelector(
+	const { types, categories, languages, eras } = useAppSelector(
 		(state) => state.portalFilter
 	);
 	const { books, selectedBook, currentPage, searchTerm, loading, error } = useAppSelector(
@@ -27,17 +24,11 @@ const Portal: React.FC = () => {
     const [totalPages, setTotalPages] = useState<number>(0);
     const [paginatedBooks, setPaginatedBooks] = useState<Book[]>([]);
 
-    useEffect(() => {
-		if(books.length > 0 || !actor) return;
-		dispatch(fetchBooks(actor));
-	}, [books, actor, dispatch]);
-
 	useEffect(() => {
         // Calculate total pages
         const pages = Math.ceil(filteredBooks.length / ITEMS_PER_PAGE);
         setTotalPages(pages);
     }, [filteredBooks]);
-
 
 	useEffect(() => {
 		// update paginated books
@@ -56,24 +47,29 @@ const Portal: React.FC = () => {
             // if search is empty, allow all books
             const matchesTitle = searchTerm.trim() === '' || book.title.toLowerCase().includes(searchTerm.toLowerCase());
 
-            // if eras is empty allow books with any era
-            const era = book.tags.find(tag => tag.name === 'era');
-            const matchesEra = eras.length === 0 || (era && eras.some(er => era.value === er.value.toString()));
-
-            // if languages is empty allow books with any language
-            const language = book.tags.find(tag => tag.name === 'language');
-            const matchesLanguage = languages.length === 0 || (language && languages.some(lang => language.value === lang.code));
-
             // if type is empty allow books with any type
-            const type = book.tags.find(tag => tag.name === 'type');
-            const matchesType = types.length === 0 || (type && types.some(t => type.value === t.id));
+            const matchesType = types.length === 0 || types.some(type => book.type === type.id);
+
+			// if categories is empty allow books with any category
+			const matchesCategory =
+				categories.length === 0 || (
+					Array.isArray(book.categories) &&
+					book.categories.length > 0 &&
+					book.categories.some(bookCategory => categories.some(category => category.id === bookCategory))
+				);
+
+			// if eras is empty allow books with any era
+			const matchesEra = eras.length === 0 || eras.some(era => book.era === era.value);
+
+			// if languages is empty allow books with any language
+			const matchesLanguage = languages.length === 0 || languages.some(lang => book.language === lang.code);
 
             // Return true if any of the conditions match
-            return matchesTitle && matchesType && matchesEra && matchesLanguage;
+            return matchesTitle && matchesType && matchesCategory && matchesEra && matchesLanguage;
         });
 
         setFilteredBooks(newFilteredBooks);
-    }, [books, searchTerm, types, languages, eras]); // Dependencies include all relevant filter criteria
+    }, [books, searchTerm, types, categories, languages, eras]); // Dependencies include all relevant filter criteria
 
 	const handlePageChange = (page: number) => {
 		dispatch(setCurrentPage(page));
@@ -92,7 +88,7 @@ const Portal: React.FC = () => {
 	const renderBookModal = (index: number) => {
 		if (selectedBook) {
 			const selectedBookIndex = paginatedBooks.findIndex(
-				(b) => b.id === selectedBook.id
+				(b) => b.manifest === selectedBook.manifest
 			);
 			const isLastItem = index === paginatedBooks.length - 1;
 			const isEndOfRow = (index + 1) % 6 === 0;
@@ -144,7 +140,7 @@ const Portal: React.FC = () => {
 					</div>
 				) : (
 					paginatedBooks.map((book, index) => (
-						<React.Fragment key={book.id}>
+						<React.Fragment key={book.manifest}>
 							<BookCard book={book} />
 							{renderBookModal(index)}
 						</React.Fragment>

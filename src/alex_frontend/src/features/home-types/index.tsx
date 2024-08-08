@@ -119,7 +119,7 @@ function Types() {
                                 {type}
                             </h1>
                             <span className="font-roboto-condensed text-2xl self-end">
-                                {books.filter(book=> book.tags.find(tag=>tag.name == 'type' && tag.value == index.toString())).length}
+                                {books.filter(book=> book.type === index).length}
                             </span>
                         </div>
                     </div>

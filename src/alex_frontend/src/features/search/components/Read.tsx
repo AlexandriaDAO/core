@@ -6,7 +6,7 @@ import { RxCross2 } from "react-icons/rx";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { BookCardItem } from "./Card";
-import { getSubTypes, getTypes } from "../utils/properties";
+import { getSubTypes } from "../utils/properties";
 import BookModal from "./BookModal";
 import eras from "@/data/eras";
 import DDC from "@/data/categories";
@@ -20,8 +20,6 @@ const Read: React.FC<Props> = ({ item }) => {
 	const dispatch = useAppDispatch();
 	const { selectedSearchedBook } = useAppSelector((state) => state.home);
 
-    const [cover, setCover] = useState('images/default-cover.jpg')
-
     const expandModalRef = useRef<HTMLDivElement>(null);
 
     const handleReadBookClick = ()=>{
@@ -30,6 +28,20 @@ const Read: React.FC<Props> = ({ item }) => {
         else
             dispatch(setSelectedSearchedBook(item))
     }
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [imageSrc, setImageSrc] = useState('images/default-cover.jpg');
+
+    useEffect(() => {
+        const img = new Image();
+        img.src = `https://gateway.irys.xyz/${item.manifest}/cover`;
+        img.onload = () => {
+            setImageSrc(img.src);
+            setImageLoaded(true);
+        };
+        img.onerror = () => {
+            setImageLoaded(true); // Consider the loading as complete even if it failed
+        };
+    }, [item.manifest]);
 
 
     useEffect(() => {
@@ -42,23 +54,6 @@ const Read: React.FC<Props> = ({ item }) => {
     }, [item]);
 
 
-    const extractCover = async () => {
-        try {
-            const coverUrl = await getCover(`https://gateway.irys.xyz/${item.asset_id}`);
-
-			if(!coverUrl) throw new Error('Cover not available');
-
-			setCover(coverUrl)
-        } catch (error) {
-            console.error("Error fetching cover URL:", error);
-        }
-    }
-
-    useEffect(() => {
-        extractCover();
-    }, []);
-
-
 	return (
         <div ref={expandModalRef} className="flex flex-col gap-2 bg-white shadow-lg rounded-lg">
             <div
@@ -66,17 +61,10 @@ const Read: React.FC<Props> = ({ item }) => {
             >
                 <div className="flex-shrink-0 flex flex-col basis-1/3 gap-1">
                     <div className="flex">
-                        {/* <div
-                            className="basis-[180px] flex-shrink-0 h-64"
-                            style={{
-                                // backgroundImage: `url(images/categories/${item.image})`,
-        						backgroundImage: `url(https://picsum.photos/300/100)`,
-                            }}
-                        ></div> */}
                         <div
-                            className={`basis-[180px] flex-shrink-0 h-64 bg-no-repeat ${cover == 'images/default-cover.jpg' ? 'animate-pulse':''}`}
+                            className={`basis-[180px] flex-shrink-0 min-h-64 h-full bg-no-repeat ${!imageLoaded ? 'animate-pulse' : ''}`}
                             style={{
-                                backgroundImage: `url(${cover})`,
+                                backgroundImage: `url(${imageSrc})`,
                                 backgroundSize: "100% 100%",
                             }}
                         ></div>
@@ -95,20 +83,6 @@ const Read: React.FC<Props> = ({ item }) => {
                                     </span>
                                     <div className="flex flex-wrap items-center gap-2">
                                         <div className="flex justify-start flex-wrap item-center gap-2">
-                                            {/* {getTypes(item.type).map(
-                                                ({type}, index, arr) => (
-                                                    <React.Fragment key={type}>
-                                                        <span className="font-roboto-condensed text-sm font-bold">
-                                                            {type}
-                                                        </span>
-                                                        {index < arr.length - 1 && ( // Only add a dot if it's not the last item
-                                                            <span className="font-roboto-condensed text-sm font-bold">
-                                                                .
-                                                            </span>
-                                                        )}
-                                                    </React.Fragment>
-                                                )
-                                            )} */}
                                             <span className="font-roboto-condensed text-sm font-bold">
                                                 {item.type && DDC[item.type]?.type}
                                             </span>
@@ -116,13 +90,13 @@ const Read: React.FC<Props> = ({ item }) => {
                                     </div>
                                 </div>
                             </div>
-                            {/* <div className="flex justify-start flex-wrap item-center gap-2">
-                                {getSubTypes(item.subtype).map((subType) => (
+                            <div className="flex justify-start flex-wrap item-center gap-2">
+                                {getSubTypes(item.categories).map((subType) => (
                                     <div className="truncate px-4 py-1 flex justify-center items-center border border-black rounded-full font-roboto-condensed text-sm font-normal cursor-pointer hover:bg-black hover:text-white transition-all duration-300 ease-in">
                                         {subType}
                                     </div>
                                 ))}
-                            </div> */}
+                            </div>
                         </div>
                     </div>
                     <div className="text-[#8E8E8E] flex justify-start items-center font-roboto-condensed text-sm font-normal gap-2 ">

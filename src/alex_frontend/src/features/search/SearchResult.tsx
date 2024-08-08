@@ -12,17 +12,15 @@ const SearchResult = () => {
 
 	const dispatch = useAppDispatch();
 
-	const resetLimit = ()=>{
-		dispatch(setLimit(20))
-	}
-	useEffect(()=> resetLimit, [])
+	const resetLimit = () => {
+		dispatch(setLimit(20));
+	};
+	useEffect(() => resetLimit, []);
 
-
-
-	const loadMore = async()=>{
+	const loadMore = async () => {
 		const newLimit = limit + 20; // Increment the limit
-        dispatch(setLimit(newLimit)); // Dispatch the new offset
-	}
+		dispatch(setLimit(newLimit)); // Dispatch the new offset
+	};
 	return (
 		<>
 			{searchResults.length < 1 ? (
@@ -42,18 +40,20 @@ const SearchResult = () => {
 						<Masonry gutter="25px">
 							{searchResults.map(
 								(card) =>
-									card.id !== selectedSearchedBook?.id && (
-										<Card key={card.id} item={card} />
+									card.manifest !== selectedSearchedBook?.manifest && (
+										<Card key={card.manifest} item={card} />
 									)
 							)}
 						</Masonry>
 					</ResponsiveMasonry>
-					{limit < 1000 && <button
-						onClick={loadMore}
+					{limit < 1000 && (
+						<button
+							onClick={loadMore}
 							className="self-center mt-5 cursor-pointer flex justify-center items-center gap-1 px-2 py-1 bg-black rounded text-[#F6F930] font-medium font-roboto-condensed text-base"
 						>
-						<span>Load More</span>
-					</button>}
+							<span>Load More</span>
+						</button>
+					)}
 				</div>
 			)}
 		</>

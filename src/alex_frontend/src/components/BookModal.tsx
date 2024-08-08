@@ -1,18 +1,8 @@
+import { Book } from "@/features/portal/portalSlice";
 import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect } from "react";
-
-export interface Book {
-    id: string;
-    title: string;
-    author: string;
-    cover: string;
-    tags: {
-        name: string;
-        value: string;
-    }[];
-}
 
 interface IBookModalProps {
 	book: Book;
@@ -28,7 +18,7 @@ const BookModal: React.FC<IBookModalProps> = ({
             <ReaderProvider>
                 <div className="relative w-full p-2">
                     <div className="max-w-7xl m-auto grid grid-cols-1 gap-4">
-                        <Reader bookUrl={`https://gateway.irys.xyz/${book.id}`} />
+                        <Reader bookUrl={`https://gateway.irys.xyz/${book.manifest}/book`} />
                     </div>
                 </div>
             </ReaderProvider>

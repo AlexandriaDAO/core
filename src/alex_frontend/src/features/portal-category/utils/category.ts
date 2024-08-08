@@ -1,9 +1,9 @@
 import DDC from "@/data/categories";
 
 export interface CategoryInterface {
-    id: string;
+    id: number;
     title: string;
-    typeId: string;
+    typeId: number;
 }
 
 export const getCategories = (): CategoryInterface[] => {
@@ -11,8 +11,8 @@ export const getCategories = (): CategoryInterface[] => {
 	Object.entries(DDC).forEach(([typeId, {category}])=>{
         Object.entries(category).forEach(([categoryId, categoryTitle])=>{
             categories.push({
-                id: categoryId,
-                typeId: typeId,
+                id: Number(categoryId),
+                typeId: Number(typeId),
                 title: categoryTitle,
             })
         })

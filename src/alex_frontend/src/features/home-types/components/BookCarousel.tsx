@@ -4,61 +4,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import { setSelectedBook } from "@/features/home/homeSlice";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import BookCard from "./BookCard";
-// Sample data for the books
-// const books = [
-// 	{
-//         key: 1,
-// 		title: "Sapiens",
-// 		author: "Yuval Noah Harari",
-// 		image: "sapiens.png",
-// 	},
-// 	{
-//         key: 2,
-// 		title: "Brave New World",
-// 		author: "Aldous Huxley",
-// 		image: "brave-new-world.png",
-// 	},
-// 	{
-//         key: 3,
-// 		title: "Meditations",
-// 		author: "Marcus Aurelius",
-// 		image: "meditations.png",
-// 	},
-// 	{
-//         key: 4,
-// 		title: "1984",
-// 		author: "George Orwell",
-// 		image: "1984.png",
-// 	},
-// 	{
-//         key: 5,
-// 		title: "Sapiens",
-// 		author: "Yuval Noah Harari",
-// 		image: "sapiens.png",
-// 	},
-// 	{
-//         key: 6,
-// 		title: "1984",
-// 		author: "George Orwell",
-// 		image: "1984.png",
-// 	},
-// 	{
-//         key: 7 ,
-// 		title: "lorem",
-// 		author: "Drake Bins",
-// 		image: "brave-new-world.png",
-// 	},
-// 	{
-//         key: 8,
-// 		title: "Meditations",
-// 		author: "Marcus Aurelius",
-// 		image: "placeholder-cover.png",
-// 	},
-// ];
 
 export default function BooksCarousel() {
 
@@ -69,22 +17,10 @@ export default function BooksCarousel() {
 		(state) => state.portal
 	);
 
-    const handleBookClick = (book:any)=>{
-        if (selectedBook && selectedBook.id == book.id) {
-			dispatch(setSelectedBook(null));
-		} else {
-			dispatch(setSelectedBook(book));
-		}
-    }
-
 	const leftRef = useRef<HTMLButtonElement>(null);
 	const rightRef = useRef<HTMLButtonElement>(null);
 
-	const filteredBooks = books.filter(book => {
-        // Check if the book has a tag with the name 'type' and if its value matches the selectedType
-        const type = book.tags.find(tag => tag.name === 'type');
-        return type ? type.value === selectedType.toString() : false;
-    });
+	const filteredBooks = books.filter(book => book.type === selectedType);
 
     if (filteredBooks.length === 0) {
         return <div className="flex justify-center items-center bg-white py-16 px-10 font-roboto-condensed text-lg leading-[18px] text-black font-semibold">
@@ -170,7 +106,7 @@ export default function BooksCarousel() {
                 >
                     {filteredBooks
 						.map((book, index) => (
-							<SwiperSlide key={book.id}>
+							<SwiperSlide key={book.manifest}>
 								<BookCard book={book} />
 							</SwiperSlide>
                     ))}

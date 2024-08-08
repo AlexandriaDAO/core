@@ -1,83 +1,37 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { IoIosArrowDown, IoIosArrowUp, IoIosSearch } from "react-icons/io";
-import { RxCross1 } from "react-icons/rx";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { TokenDetail } from "../../../../../../src/declarations/alex_backend/alex_backend.did";
-import { getSingleIrysBooks } from "@/utils/irys";
-import { getCover } from "@/utils/epub";
-import { CiCirclePlus } from "react-icons/ci";
 import useSession from "@/hooks/useSession";
 import { message } from "antd";
-import { getAllDocumentsByAssetId } from "../utils/utilities";
 import { EnqueuedTask } from "meilisearch";
 import { waitForTaskCompletion } from "@/services/meiliService";
 import Epub, { EpubCFI } from "epubjs";
 import { v4 as uuidv4 } from "uuid";
 import { ImSpinner8 } from "react-icons/im";
-import { Book } from "@/components/BookModal";
+import { Book } from "@/features/portal/portalSlice";
+import { getAllDocumentsByManifest } from "../utils/utilities";
 
 interface MintedBookProps {
-	token: TokenDetail;
+	book: Book;
 }
 
-const MintedBook: React.FC<MintedBookProps> = ({ token }) => {
+const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
+	if(!book || !book.manifest) return <></>;
+
 	const { meiliClient } = useSession();
 	const { activeEngine } = useAppSelector((state) => state.engineOverview);
 	const { user } = useAppSelector((state) => state.auth);
 
-	const [book, setBook] = useState<Book>({
-		id: "",
-		title: "loading...",
-		author: "loading...",
-		cover: "",
-		tags: [],
-	});
-
-	const populateBook = useCallback(async () => {
-		if (!token.description) return;
-
-		try {
-			const loadedBook = await getSingleIrysBooks(token.description);
-
-			setBook(loadedBook);
-		} catch (error) {
-			console.error("Error populating Book:", error);
-		}
-	}, [token]);
-
-	useEffect(() => {
-		populateBook();
-	}, [populateBook]);
-
-	const extractCover = useCallback(async () => {
-		if (!book.id || book.cover !== "") return; // If cover is not empty, we've already fetched it
-
-		try {
-			const coverUrl = await getCover(
-				`https://gateway.irys.xyz/${book.id}`
-			);
-
-			if (!coverUrl) throw new Error("Cover not available");
-
-			setBook({ ...book, cover: coverUrl });
-		} catch (error) {
-			console.error("Error fetching cover URL:", error);
-		}
-	}, [book.id, book.cover]);
-
-	useEffect(() => {
-		extractCover();
-	}, [extractCover]);
+	const [imageLoaded, setImageLoaded] = useState(false);
 
 	const [added, setAdded] = useState(false);
 	const [processing, setProcessing] = useState(true);
 
 	const checkIfAdded = useCallback(async () => {
-		if (!book.id || !meiliClient || !activeEngine) return;
+		if (!meiliClient || !activeEngine) return;
 
-		const documents = await getAllDocumentsByAssetId(
+		const documents = await getAllDocumentsByManifest(
 			meiliClient.index(activeEngine),
-			book.id
+			book.manifest
 		);
 
 		if (documents.length > 0) {
@@ -85,25 +39,25 @@ const MintedBook: React.FC<MintedBookProps> = ({ token }) => {
 		}
 
 		setProcessing(false);
-	}, [book.id]);
+	}, [book.manifest]);
 
 	useEffect(() => {
 		checkIfAdded();
 	}, [checkIfAdded]);
 
 	const handleRemoveBook = async () => {
-		if (!book.id || !meiliClient || !activeEngine) return;
+		if ( !meiliClient || !activeEngine) return;
 
 		try {
 			setProcessing(true);
 
-			const documents = await getAllDocumentsByAssetId(
+			const documents = await getAllDocumentsByManifest(
 				meiliClient.index(activeEngine),
-				book.id
+				book.manifest
 			);
 
 			if (documents.length === 0) {
-				throw new Error("No documents found with for this asset id");
+				throw new Error("No documents found with for this manifest id");
 			}
 
 			const documentIds = documents.map((doc: any) => doc.id);
@@ -118,7 +72,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ token }) => {
 			message.success("Documents deleted successfully.");
 
 			console.log(
-				`Deleted ${documentIds.length} documents with asset id: ${book.id}`
+				`Deleted ${documentIds.length} documents with manifest id: ${book.manifest}`
 			);
 
 			setAdded(false);
@@ -132,7 +86,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ token }) => {
 	};
 
 	const handleAddBook = async () => {
-		if (!book.id || !meiliClient || !activeEngine) return;
+		if ( !meiliClient || !activeEngine) return;
 
 		let contents: any = [];
 
@@ -141,7 +95,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ token }) => {
 
 			message.info("Converting Epub to JSON");
 
-			const onlineBook = Epub(`https://gateway.irys.xyz/${book.id}`, {
+			const onlineBook = Epub(`https://gateway.irys.xyz/${book.manifest}/book`, {
 				openAs: "epub",
 			});
 
@@ -164,39 +118,13 @@ const MintedBook: React.FC<MintedBookProps> = ({ token }) => {
 					if (text.length < 1) return;
 					const cfi = new EpubCFI(paragraph, item.cfiBase).toString();
 					const id = uuidv4();
-					// {
-					//     title: '1984',
-					//     fiction: false,
-					//     language: 'en',
-					//     author_first: 'George',
-					//     author_last: 'Orwell',
-					//     type: 9,
-					//     type0: '1',
-					//     type1: '0',
-					//     type2: '0',
-					//     type3: '1',
-					//     type4: '1',
-					//     type5: '0',
-					//     type6: '0',
-					//     type7: '0',
-					//     type8: '0',
-					//     type9: '0',
-					//     era: 14
-					// }
 
 					contents.push({
 						id,
 						cfi,
 						text,
 
-                        title: book.title,
-						fiction: book.tags.find((tag) => tag.name == "fiction")?.value ?? false,
-                        language: book.tags.find((tag)=> tag.name == "language")?.value ?? '',
-                        author_first: book.tags.find((tag)=> tag.name == "author_first")?.value ?? '',
-                        author_last: book.tags.find((tag)=> tag.name == "author_last")?.value ?? '',
-                        type: book.tags.find((tag)=> tag.name == "type")?.value ?? 0,
-                        era: book.tags.find((tag)=> tag.name == "era")?.value ?? 1,
-						asset_id: book.id,
+						...book
 					});
 				});
 			}
@@ -224,13 +152,22 @@ const MintedBook: React.FC<MintedBookProps> = ({ token }) => {
 
 	return (
 		<div className="flex justify-between gap-2 items-stretch text-black bg-[#F4F4F4] rounded-lg p-2">
+			{!imageLoaded && (
+				<img
+					className="rounded-lg h-12 w-12 object-fill animate-pulse"
+					src="/images/default-cover.jpg"
+					alt="Loading..."
+				/>
+			)}
 			<img
-				className={`rounded-lg h-12 w-12 object-fill ${
-					!book.cover && "animate-pulse"
-				}`}
-				src={book.cover || "images/default-cover.jpg"}
+				className={`rounded-lg h-12 w-12 object-fill ${imageLoaded ? '' : 'hidden'}`}
+				src={`https://gateway.irys.xyz/${book.manifest}/cover`}
 				alt={book.title}
-				onError={() => console.error("Error loading image for " + book)}
+				onLoad={() => setImageLoaded(true)}
+				onError={() => {
+					console.error("Error loading image for "+book.manifest);
+					setImageLoaded(true);
+				}}
 			/>
 			<div className="flex-grow flex flex-col justify-between">
 				<div className="flex justify-start items-center gap-1">
@@ -238,7 +175,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ token }) => {
 						Author :
 					</span>
 					<span className="font-roboto-condensed text-base leading-[18px] font-medium ">
-						{book.author}
+						{book.author_first + " " + book.author_last}
 					</span>
 				</div>
 				<div className="flex justify-start items-center gap-1">
@@ -250,7 +187,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ token }) => {
 					</span>
 				</div>
 			</div>
-			{user === token.owner && (
+			{user === book.owner && (
 				<div className="flex gap-2 align-center justify-between self-center">
 					{processing ? (
 						<button

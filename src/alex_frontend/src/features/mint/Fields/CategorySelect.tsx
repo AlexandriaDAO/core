@@ -23,13 +23,12 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
     if (metadata.type !== undefined) {
       setSelectedMainCategory(parseInt(metadata.type, 10));
     }
-    const initialSubcategories = [];
-    for (let i = 0; i < 10; i++) {
-      if (metadata[`type${i}`] === '1') {
-        initialSubcategories.push(i);
-      }
+
+    if(Array.isArray(metadata['categories'])){
+      setSelectedSubcategories(metadata['categories']);
+    }else{
+      setSelectedSubcategories([]);
     }
-    setSelectedSubcategories(initialSubcategories);
   }, []);
 
   useEffect(() => {
@@ -42,10 +41,11 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
       const newMetadata = { ...metadata };
       newMetadata.type = selectedMainCategory;
       
-      for (let i = 0; i < 10; i++) {
-        newMetadata[`type${i}`] = selectedSubcategories.includes(i) ? '1' : '0';
-      }
+      // for (let i = 0; i < 10; i++) {
+      //   newMetadata[`type${i}`] = selectedSubcategories.includes(i) ? '1' : '0';
+      // }
 
+      newMetadata['categories'] = selectedSubcategories
       setMetadata(newMetadata);
     }
   };
