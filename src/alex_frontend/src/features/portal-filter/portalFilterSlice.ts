@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { TypeInterface } from "../portal-type/utils/type";
 import { CategoryInterface } from "../portal-category/utils/category";
 import { Language } from "../portal-language/portalLanguageSlice";
-import { PublicationYear } from "../portal-publication-year/portalPublicationYearSlice";
+import { Era } from "@/data/eras";
 
 // Define the interface for our engine state
 export interface PortalFilterSlice {
@@ -10,7 +10,7 @@ export interface PortalFilterSlice {
 	types: TypeInterface[],
 	categories: CategoryInterface[],
 	languages: Language[],
-	years: PublicationYear[],
+	eras: Era[],
 
 	loading: boolean;
 	error: string | null;
@@ -22,7 +22,7 @@ const initialState: PortalFilterSlice = {
     types: [],
 	categories: [],
 	languages: [],
-	years: [],
+	eras: [],
 
 	loading: false,
 	error: null,
@@ -45,12 +45,12 @@ const portalFilterSlice = createSlice({
 		setCategories: (state, action: PayloadAction<CategoryInterface[]>) => {
 			state.categories = action.payload;
 		},
-		setYears: (state, action: PayloadAction<PublicationYear[]>) => {
-			state.years = action.payload;
+		setEras: (state, action: PayloadAction<Era[]>) => {
+			state.eras = action.payload;
 		},
 	},
 });
 
-export const {setVisible, setTypes, setLanguages, setCategories, setYears } = portalFilterSlice.actions;
+export const {setVisible, setTypes, setLanguages, setCategories, setEras } = portalFilterSlice.actions;
 
 export default portalFilterSlice.reducer;

@@ -1,154 +1,75 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Pagination, PaginationProps } from "antd";
 import { Book, setCurrentPage } from "./portalSlice";
-import BookModal from "./components/BookModal";
 import BookCard from "./components/BookCard";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import fetchBooks from "./thunks/fetchBooks";
+import { ImSpinner8 } from "react-icons/im";
+import BookModal from "@/components/BookModal";
 
 const ITEMS_PER_PAGE = 12;
 
 const Portal: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const { types, languages, categories, years, visible } = useAppSelector(
+	const { types, categories, languages, eras } = useAppSelector(
 		(state) => state.portalFilter
 	);
-	const { books, selectedBook, currentPage, searchTerm } = useAppSelector(
+	const { books, selectedBook, currentPage, searchTerm, loading, error } = useAppSelector(
 		(state) => state.portal
 	);
 	const bookModalRef = useRef<HTMLDivElement>(null);
 
+	// State to hold filtered books
+    const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
+    const [totalPages, setTotalPages] = useState<number>(0);
+    const [paginatedBooks, setPaginatedBooks] = useState<Book[]>([]);
+
 	useEffect(() => {
-		dispatch(fetchBooks());
-	}, [dispatch]);
+        // Calculate total pages
+        const pages = Math.ceil(filteredBooks.length / ITEMS_PER_PAGE);
+        setTotalPages(pages);
+    }, [filteredBooks]);
+
+	useEffect(() => {
+		// update paginated books
+        const paginated = filteredBooks.slice(
+            (currentPage - 1) * ITEMS_PER_PAGE,
+            currentPage * ITEMS_PER_PAGE
+        );
+        setPaginatedBooks(paginated);
+    }, [filteredBooks, currentPage]);
 
 
+	useEffect(() => {
 
-	const filteredBooks = books.filter(book =>{
+        // Filter books based on searchTerm, eras, languages, etc.
+        const newFilteredBooks = books.filter((book:Book) => {
+            // if search is empty, allow all books
+            const matchesTitle = searchTerm.trim() === '' || book.title.toLowerCase().includes(searchTerm.toLowerCase());
 
-		if(book.title.toLowerCase().includes(searchTerm.toLowerCase())){
-			return true
-		}
+            // if type is empty allow books with any type
+            const matchesType = types.length === 0 || types.some(type => book.type === type.id);
 
-		// console.log(book);
-		// {
-		// 	"key": 29,
-		// 	"title": "Peter Pan",
-		// 	"author": "Unknown Author",
-		// 	"cover": "",
-		// 	"transactionId": "IoGPBqct_PHdtLf-Uo9dqVbvgxhYVNwAkLv6lWeaE1Q",
-		// 	"tags": [
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "Content-Type",
-		// 			"value": "application/epub+zip"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "application-id",
-		// 			"value": "UncensoredGreats"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "minting_number",
-		// 			"value": "10"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "title",
-		// 			"value": "Peter Pan"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "fiction",
-		// 			"value": "null"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "language",
-		// 			"value": "en"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "era",
-		// 			"value": "14"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type",
-		// 			"value": "3"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type0",
-		// 			"value": "0"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type1",
-		// 			"value": "0"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type2",
-		// 			"value": "0"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type3",
-		// 			"value": "0"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type4",
-		// 			"value": "0"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type5",
-		// 			"value": "1"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type6",
-		// 			"value": "0"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type7",
-		// 			"value": "0"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type8",
-		// 			"value": "0"
-		// 		},
-		// 		{
-		// 			"__typename": "Tag",
-		// 			"name": "type9",
-		// 			"value": "0"
-		// 		}
-		// 	]
-		// }
+			// if categories is empty allow books with any category
+			const matchesCategory =
+				categories.length === 0 || (
+					Array.isArray(book.categories) &&
+					book.categories.length > 0 &&
+					book.categories.some(bookCategory => categories.some(category => category.id === bookCategory))
+				);
 
+			// if eras is empty allow books with any era
+			const matchesEra = eras.length === 0 || eras.some(era => book.era === era.value);
 
-		// TODO: Categories Filter
+			// if languages is empty allow books with any language
+			const matchesLanguage = languages.length === 0 || languages.some(lang => book.language === lang.code);
 
-		// TODO: Types Filter
+            // Return true if any of the conditions match
+            return matchesTitle && matchesType && matchesCategory && matchesEra && matchesLanguage;
+        });
 
-		// TODO: Languages Filter
-
-		// TODO: Publication Filter
-
-		return false;
-	});
-
-	const totalPages = Math.ceil(filteredBooks.length / ITEMS_PER_PAGE);
-	const paginatedBooks = filteredBooks.slice(
-		(currentPage - 1) * ITEMS_PER_PAGE,
-		currentPage * ITEMS_PER_PAGE
-	);
+        setFilteredBooks(newFilteredBooks);
+    }, [books, searchTerm, types, categories, languages, eras]); // Dependencies include all relevant filter criteria
 
 	const handlePageChange = (page: number) => {
 		dispatch(setCurrentPage(page));
@@ -165,27 +86,50 @@ const Portal: React.FC = () => {
 	};
 
 	const renderBookModal = (index: number) => {
-		if (selectedBook && (index + 1) % 6 === 0) {
+		if (selectedBook) {
 			const selectedBookIndex = paginatedBooks.findIndex(
-				(b) => b.key === selectedBook.key
+				(b) => b.manifest === selectedBook.manifest
 			);
-			const rowStart = Math.floor(selectedBookIndex / 6) * 6;
-			const rowEnd = rowStart + 5;
+			const isLastItem = index === paginatedBooks.length - 1;
+			const isEndOfRow = (index + 1) % 6 === 0;
 
-			if (index >= rowStart && index <= rowEnd) {
-				return (
-					<div
-						key="book-modal"
-						ref={bookModalRef}
-						className="col-span-6"
-					>
-						<BookModal />
-					</div>
-				);
+			if (isLastItem || isEndOfRow) {
+				const rowStart = Math.floor(selectedBookIndex / 6) * 6;
+				const rowEnd = Math.min(rowStart + 5, paginatedBooks.length - 1);
+
+				if (index >= rowStart && index <= rowEnd) {
+					return (
+						<div
+							key="book-modal"
+							ref={bookModalRef}
+							className="col-span-6"
+						>
+							<BookModal book={selectedBook} />
+						</div>
+					);
+				}
 			}
 		}
 		return null;
 	};
+
+	if(loading){
+		return <div className="flex gap-1 justify-start items-center font-roboto-condensed text-base leading-[18px] text-black font-normal">
+			<span>Loading Books</span>
+			<ImSpinner8
+				size={14}
+				className="animate animate-spin"
+			/>
+		</div>
+
+	}
+
+	if(error){
+		return <div className="flex flex-col gap-2 justify-start items-start font-roboto-condensed text-base leading-[18px] text-black font-normal">
+			<span>Error loading books</span>
+			<span>{error}</span>
+		</div>
+	}
 
 	return (
 		<>
@@ -196,7 +140,7 @@ const Portal: React.FC = () => {
 					</div>
 				) : (
 					paginatedBooks.map((book, index) => (
-						<React.Fragment key={book.key}>
+						<React.Fragment key={book.manifest}>
 							<BookCard book={book} />
 							{renderBookModal(index)}
 						</React.Fragment>

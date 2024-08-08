@@ -23,7 +23,28 @@
 // }
 
 
-
+// Content-Type: application/epub+zip 
+// application-id: UncensoredGreats 
+// minting_number: 6 
+// title: The Divine Comedy 
+// fiction: true 
+// language: en 
+// author_first: Dante 
+// author_last: Alighieri 
+// type: 2 
+// type0: 0 
+// type1: 0 
+// type2: 0 
+// type3: 1 
+// type4: 0 
+// type5: 0 
+// type6: 0 
+// type7: 0 
+// type8: 0 
+// type9: 0 
+// era: 6
+// The type field ranges from 0-9 and can only be one of them. The types1, type2, ... are a zero or 1 and each book has three 1s and seven 0s, as they represent 3 subcategories that a user must choose.
+// Then era is a number from 1-16, and the rest should be pretty self explanatory.
 
 
 

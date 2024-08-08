@@ -40,7 +40,7 @@ export const initializeClient = async (host:string = '', key: string = ''): Prom
     return null;
 }
 
-async function waitForTaskCompletion(client: MeiliSearch, taskUid: number): Promise<void> {
+export async function waitForTaskCompletion(client: MeiliSearch, taskUid: number): Promise<void> {
     let task = await client.getTask(taskUid);
     while (task.status !== 'succeeded') {
         if (task.status === 'failed') {

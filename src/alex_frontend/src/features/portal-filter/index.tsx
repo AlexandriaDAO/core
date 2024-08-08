@@ -7,18 +7,18 @@ import {
 	setLanguages,
 	setTypes,
 	setVisible,
-	setYears,
+	setEras,
 } from "./portalFilterSlice";
 import { CircleFlag } from "react-circle-flags";
 import { RxCross1 } from "react-icons/rx";
 import { TypeInterface } from "../portal-type/utils/type";
 import { Language } from "../portal-language/portalLanguageSlice";
 import { CategoryInterface } from "../portal-category/utils/category";
-import { PublicationYear } from "../portal-publication-year/portalPublicationYearSlice";
+import { Era } from "@/data/eras";
 
 function PortalFilter() {
 	const dispatch = useAppDispatch();
-	const { types, languages, categories, years, visible } = useAppSelector(
+	const { types, languages, categories, eras, visible } = useAppSelector(
 		(state) => state.portalFilter
 	);
 	const dropdownRef = useRef<HTMLDivElement>(null);
@@ -31,7 +31,7 @@ function PortalFilter() {
 		dispatch(setTypes([]));
 		dispatch(setLanguages([]));
 		dispatch(setCategories([]));
-		dispatch(setYears([]));
+		dispatch(setEras([]));
 	};
 
 	useEffect(() => {
@@ -51,7 +51,7 @@ function PortalFilter() {
 	}, [dispatch]);
 
 	const filtersCount = () =>
-		types.length + languages.length + categories.length + years.length;
+		types.length + languages.length + categories.length + eras.length;
 
 	function handleRemoveType(type: TypeInterface): void {
 		dispatch(setTypes(types.filter((t) => t.id !== type.id)));
@@ -67,16 +67,10 @@ function PortalFilter() {
 		dispatch(setCategories(categories.filter((t) => t.id !== category.id)));
 	}
 
-	function handleRemoveYear(pubyear: PublicationYear): void {
+	function handleRemoveEra(era: Era): void {
 		dispatch(
-			setYears(
-				years.filter(
-					(year) =>
-						!(
-							pubyear.start == year.start &&
-							pubyear.end == year.end
-						)
-				)
+			setEras(
+				eras.filter( (er) => !( er.value== era.value))
 			)
 		);
 	}
@@ -184,25 +178,24 @@ function PortalFilter() {
 									</div>
 								)}
 
-								{years.length > 0 && (
+								{eras.length > 0 && (
 									<div className="flex flex-col gap-2">
 										<span className="font-roboto-condensed font-normal text-xl">
-											Publication Year
+											Publication Era
 										</span>
 										<div className="flex flex-wrap gap-2">
-											{years.map((pubyear, index) => (
+											{eras.map(era => (
 												<div
-													key={index}
+													key={era.value}
 													className="flex items-center justify-between gap-2 border border-solid border-black px-2 py-1 rounded-full"
 												>
 													<span className="text-base">
-														{pubyear.start}-
-														{pubyear.end}
+														{era.label}
 													</span>
 													<RxCross1
 														onClick={() =>
-															handleRemoveYear(
-																pubyear
+															handleRemoveEra(
+																era
 															)
 														}
 														className="cursor-pointer"

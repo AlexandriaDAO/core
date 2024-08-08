@@ -3,10 +3,8 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown, IoIosSearch } from "react-icons/io";
 import { setSelected, setVisible } from "./portalTypeSlice";
-import { TypeInterface, getTypes } from "./utils/type";
+import { TypeInterface, types } from "./utils/type";
 import { setTypes } from "../portal-filter/portalFilterSlice";
-
-const types:TypeInterface[] = getTypes();
 
 function PortalType() {
 	const dispatch = useAppDispatch();
@@ -117,8 +115,7 @@ function PortalType() {
                                 </div>
                                 <div>
                                     <span className="text-base font-roboto-condensed font-normal text-gray-300">
-										{/* {books.filter(book=> book.tags.find(b=>b.name == 'type' && b.value == type.id)).length} */}
-										NA
+										{books.filter(book=> book.type === type.id).length}
 									</span>
                                 </div>
                             </li>

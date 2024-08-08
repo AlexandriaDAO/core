@@ -8,7 +8,9 @@ const BookModal: React.FC = () => {
 
     const { selectedSearchedBook } = useAppSelector(state => state.home);
 
-    const bookUrl = `https://gateway.irys.xyz/${selectedSearchedBook.asset_id}`;
+    if(!selectedSearchedBook || !selectedSearchedBook.manifest ) return <></>
+
+    const bookUrl = `https://gateway.irys.xyz/${selectedSearchedBook.manifest}/book`;
 
 	return (
         <div className="w-full pb-5 text-black scale-y-100 transition-all duration-500 flex flex-col justify-between">

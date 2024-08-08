@@ -6,8 +6,11 @@ import { RxCross2 } from "react-icons/rx";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { BookCardItem } from "./Card";
-import { getSubTypes, getTypes } from "../utils/properties";
+import { getSubTypes } from "../utils/properties";
 import BookModal from "./BookModal";
+import eras from "@/data/eras";
+import DDC from "@/data/categories";
+import { getCover } from "@/utils/epub";
 
 interface Props {
 	item: BookCardItem;
@@ -25,6 +28,20 @@ const Read: React.FC<Props> = ({ item }) => {
         else
             dispatch(setSelectedSearchedBook(item))
     }
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [imageSrc, setImageSrc] = useState('images/default-cover.jpg');
+
+    useEffect(() => {
+        const img = new Image();
+        img.src = `https://gateway.irys.xyz/${item.manifest}/cover`;
+        img.onload = () => {
+            setImageSrc(img.src);
+            setImageLoaded(true);
+        };
+        img.onerror = () => {
+            setImageLoaded(true); // Consider the loading as complete even if it failed
+        };
+    }, [item.manifest]);
 
 
     useEffect(() => {
@@ -36,6 +53,7 @@ const Read: React.FC<Props> = ({ item }) => {
         }
     }, [item]);
 
+
 	return (
         <div ref={expandModalRef} className="flex flex-col gap-2 bg-white shadow-lg rounded-lg">
             <div
@@ -44,47 +62,36 @@ const Read: React.FC<Props> = ({ item }) => {
                 <div className="flex-shrink-0 flex flex-col basis-1/3 gap-1">
                     <div className="flex">
                         <div
-                            className="basis-[180px] flex-shrink-0 h-64"
+                            className={`basis-[180px] flex-shrink-0 min-h-64 h-full bg-no-repeat ${!imageLoaded ? 'animate-pulse' : ''}`}
                             style={{
-                                // backgroundImage: `url(images/categories/${item.image})`,
-        						backgroundImage: `url(https://picsum.photos/300/100)`,
+                                backgroundImage: `url(${imageSrc})`,
+                                backgroundSize: "100% 100%",
                             }}
                         ></div>
                         <div className="flex-grow flex flex-col justify-between px-2 gap-2">
                             <div className="flex justify-between">
                                 <div className="flex flex-col">
                                     <span className="font-roboto-condensed text-xl font-medium">
-                                        {item.author}
+                                        {item.author_first + ' ' + item.author_last}
                                     </span>
                                     <span className="font-syne text-2xl font-semibold">
                                         {item.title}
                                     </span>
                                     <span className="font-roboto-condensed text-sm font-normal text-[#8E8E8E]">
-                                        {item.fiction ? "Fiction" : "Non Fiction"}{" "}
-                                        &nbsp; {item.pubyear ? item.pubyear : ""}
+                                        {item.fiction ? "Fiction" : "Non Fiction"} &nbsp;
+                                        {item.era ? eras.find(era=>era.value == item.era)?.label ??'Unknown Era' : ''}
                                     </span>
                                     <div className="flex flex-wrap items-center gap-2">
                                         <div className="flex justify-start flex-wrap item-center gap-2">
-                                            {getTypes(item.type).map(
-                                                ({type}, index, arr) => (
-                                                    <React.Fragment key={type}>
-                                                        <span className="font-roboto-condensed text-sm font-bold">
-                                                            {type}
-                                                        </span>
-                                                        {index < arr.length - 1 && ( // Only add a dot if it's not the last item
-                                                            <span className="font-roboto-condensed text-sm font-bold">
-                                                                .
-                                                            </span>
-                                                        )}
-                                                    </React.Fragment>
-                                                )
-                                            )}
+                                            <span className="font-roboto-condensed text-sm font-bold">
+                                                {item.type && DDC[item.type]?.type}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div className="flex justify-start flex-wrap item-center gap-2">
-                                {getSubTypes(item.subtype).map((subType) => (
+                                {getSubTypes(item.categories).map((subType) => (
                                     <div className="truncate px-4 py-1 flex justify-center items-center border border-black rounded-full font-roboto-condensed text-sm font-normal cursor-pointer hover:bg-black hover:text-white transition-all duration-300 ease-in">
                                         {subType}
                                     </div>

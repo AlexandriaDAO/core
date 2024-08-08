@@ -6,7 +6,13 @@ import { useAppSelector } from '@/store/hooks/useAppSelector';
 import SessionContext from '@/contexts/SessionContext';
 import MeiliSearch, { Index } from 'meilisearch';
 import { initializeClient, initializeIndex } from '@/services/meiliService';
-import { setUser } from '@/features/auth/authSlice';
+import { useAppDispatch } from '@/store/hooks/useAppDispatch';
+import principal from '@/features/auth/thunks/principal';
+import { initializeActor } from '@/features/auth/utils/authUtils';
+import fetchBooks from '@/features/portal/thunks/fetchBooks';
+
+        // Master version before separating into folders
+<!-- import { setUser } from '@/features/auth/authSlice';
 import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
@@ -14,7 +20,8 @@ import { initializeActor, initializeActorSwap,initializeIcpLedgerActor, initiali
 import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from "../../../declarations/icp_ledger_canister";
 import { tokenomics } from '../../../declarations/tokenomics';
-import { LBRY } from '../../../declarations/LBRY';
+import { LBRY } from '../../../declarations/LBRY'; -->
+
 
 interface SessionProviderProps {
 	children: React.ReactNode;
@@ -24,7 +31,7 @@ interface SessionProviderProps {
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const dispatch = useAppDispatch();
 	const {user} = useAppSelector(state=>state.auth);
-	const {engines} = useAppSelector(state=>state.myEngines)
+	const { books } = useAppSelector(state=>state.portal);
 
 	const [actor, setActor] = useState(alex_backend);
 	const [actorSwap,setActorSwap]=useState(icp_swap);
@@ -42,8 +49,23 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		setAuthClient(authClient);
 	}
 
+	const initializeMeiliClient = async () => {
+		const host = process.env.REACT_MEILI_HOST;
+		const key = process.env.REACT_MEILI_KEY;
+
+		const client = await initializeClient(host, key);
+		// if(client){
+		// 	const {results} = await client.getIndexes()
+		// 	results.forEach(index=>{
+		// 		client.deleteIndexIfExists(index.uid)
+		// 	})
+		// }
+		if(client) setMeiliClient(client)
+	}
+
 	useEffect(()=>{
 		initializeAuthClient()
+		initializeMeiliClient()
 	},[])
 
 
@@ -72,34 +94,31 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	},[user])
 
 	useEffect(()=>{
-		if(engines.length <1 ) {
-			setMeiliClient(undefined);
-			return;
+		setMeiliIndex(undefined)
+		if(!user || !meiliClient) return;
+
+		const setupMeiliIndex = async()=>{
+
+			const index = await initializeIndex(meiliClient, user)
+
+			if(index) setMeiliIndex(index)
 		}
-		const setupMeili = async()=>{
-			engines.find(async (engine) => {
-				const client = await initializeClient(engine.host, engine.key);
-				if(!client) return false;
+		setupMeiliIndex();
+	},[user, meiliClient])
 
-				setMeiliClient(client)
-
-				const index = await initializeIndex(client, engine.index)
-				if(index){
-					setMeiliIndex(index)
-				}
-
-				return true;
-			})
-		}
-		setupMeili();
-	},[engines])
-
-
+	// Load all books on App Start
 	useEffect(() => {
-		if (actor!=alex_backend){
+		if(!actor) return;
+		dispatch(fetchBooks(actor));
+	}, [actor, dispatch]);
+
+        
+       // Master versions before separating books into folders
+<!-- 		if (actor!=alex_backend){
 			dispatch(fetchMyEngines(actor));
 		}
-	}, [actor,actorSwap,actorIcpLedger]);
+	}, [actor,actorSwap,actorIcpLedger]); -->
+
 
 	return (
 		<SessionContext.Provider value={{ actor,actorSwap,actorIcpLedger,actorTokenomics, actorLbry,authClient, meiliClient, meiliIndex  }}>

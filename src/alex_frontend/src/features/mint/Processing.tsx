@@ -54,38 +54,10 @@ const Processing = ({ uploadStatus }: any) => {
 							icon: uploadStatus == 5 ? <LoadingOutlined /> : "",
 						},
 						{
-							title: "Conversion to JSON",
+							title: "Mint Success",
 							description:
-								"Converting your Epub file to JSON documents",
-							status:
-								uploadStatus < 7
-									? "wait"
-									: uploadStatus == 7
-									? "process"
-									: uploadStatus > 7
-									? "finish"
-									: "error",
-							icon: uploadStatus == 7 ? <LoadingOutlined /> : "",
-						},
-						{
-							title: "Storing Docs to Engine",
-							description:
-								"Converting your Epub file to JSON documents",
-							status:
-								uploadStatus < 9
-									? "wait"
-									: uploadStatus == 9
-									? "process"
-									: uploadStatus > 9
-									? "finish"
-									: "error",
-							icon: uploadStatus == 9 ? <LoadingOutlined /> : "",
-						},
-						{
-							title: "Upload Success",
-							description:
-								"Your data has been saved successfully",
-							status: uploadStatus < 10 ? "wait" : "finish",
+								"Your book has been uploaded",
+							status: uploadStatus < 6 ? "wait" : "finish",
 						},
 					]}
 				/>

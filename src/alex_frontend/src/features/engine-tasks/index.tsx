@@ -1,3 +1,4 @@
+import useSession from "@/hooks/useSession";
 import { initializeClient } from "@/services/meiliService";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Table, message } from "antd";
@@ -25,20 +26,24 @@ const columns = [
 	},
 ];
 const EngineTasks = () => {
+	const {meiliClient} = useSession();
+
 	const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
 
 	const [loading, setLoading] = useState(true);
-	const [client, setClient] = useState<MeiliSearch | null>(null);
+
 	const [tasks, setTasks] = useState<any>(null);
 	const { activeEngine } = useAppSelector((state) => state.engineOverview);
 	const { user } = useAppSelector((state) => state.auth);
 
 	const clearSelectedTasks = async () => {
 		try {
-			if (!client) throw new Error("Client not available");
+			if(!activeEngine) throw new Error('No engine selected');
 
-			console.log(selectedRowKeys);
-			await client.deleteTasks({ uids: selectedRowKeys });
+			if(!meiliClient) throw new Error('Client not available');;
+
+
+			await meiliClient.deleteTasks({ uids: selectedRowKeys, indexUids:[activeEngine] });
 
 			fetchTasks();
 		} catch (ex) {
@@ -48,10 +53,13 @@ const EngineTasks = () => {
 
 	const clearAllTasks = async () => {
 		try {
-			if (!client) throw new Error("Client not available");
+			if(!activeEngine) throw new Error('No engine selected');
 
-			await client.deleteTasks({
+			if(!meiliClient) throw new Error('Client not available');;
+
+			await meiliClient.deleteTasks({
 				uids: tasks.map((task: any) => task.uid),
+				indexUids: [activeEngine]
 			});
 
 			fetchTasks();
@@ -63,18 +71,15 @@ const EngineTasks = () => {
 	const fetchTasks = async () => {
 		try {
 			setLoading(true);
-			setClient(null);
 			setTasks(null);
 
-			const client = await initializeClient(
-				activeEngine?.host,
-				activeEngine?.key
-			);
-			if (!client) throw new Error("Client not available");
+			if(!activeEngine) throw new Error('No engine selected');
 
-			const { results } = await client.getTasks();
+			if(!meiliClient) throw new Error('Client not available');;
 
-			setClient(client);
+			const { results } = await meiliClient.getTasks({indexUids:[activeEngine]});
+
+
 			setTasks(results);
 		} catch (ex) {
 			message.error("Error fetching filters" + ex)
@@ -110,7 +115,7 @@ const EngineTasks = () => {
 							? `Selected ${selectedRowKeys.length} items`
 							: ""}
 					</span>
-					{user == activeEngine?.owner && (
+					{user == activeEngine && (
 						<>
 							<div
 								onClick={clearSelectedTasks}

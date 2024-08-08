@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { BiBookAlt, BiMinus, BiPlus } from "react-icons/bi";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { useAnnotation, useCardList, useReader } from "../lib/hooks/useReaderContext";
+import { BookCardItem } from "@/features/search/components/Card";
 
 // Assuming the structure of your item includes `id`, `title`, and `description`
 interface Item {
@@ -10,14 +11,15 @@ interface Item {
 	cfi: string;
 	text: string;
 	title: string;
-	author: string;
+	author_first: string;
+	author_last: string;
 	fiction: boolean;
-	type: Array<number>;
-	subtype: Array<number>;
-	pubyear: number;
+	type: number;
+	era: number;
 }
 
 interface Props {
+	// item: BookCardItem;
 	item: Item;
 }
 
@@ -39,35 +41,6 @@ const Card: React.FC<Props> = ({ item }) => {
 		}
 		return text;
 	};
-
-	const getTypes = () => {
-		const types = item.type
-			.map((type) => DDC[type])
-			.filter((type) => type !== undefined);
-		console.log(types);
-		return types.map(({ type, image }, index, arr) => (
-			<React.Fragment key={type}>
-				<img className="w-5 h-5 rounded-full float-left" src={`images/categories/${image}`}/>
-				<span className="font-roboto-condensed text-sm font-bold">{type}</span>
-			</React.Fragment>
-		));
-	};
-
-	const getSubTypes = () => {
-		const subtypeTexts:Array<string> = [];
-
-		// Iterate over each type
-		Object.values(DDC).forEach(type => {
-			// Check each subtype in the category
-			Object.entries(type.category).forEach(([key, value]) => {
-			if (item.subtype.includes(parseInt(key))) {
-				subtypeTexts.push(value);
-			}
-			});
-		});
-
-		return subtypeTexts;
-	}
 
 	function handleNavigateCard() {
 		rendition.current && rendition.current.display(item.cfi);
@@ -94,11 +67,12 @@ const Card: React.FC<Props> = ({ item }) => {
 				<div className="flex-grow flex justify-between gap-1">
 					<div className="px-1 flex-grow flex flex-col justify-between">
 						<span className="font-roboto-condensed text-base font-normal">
-							{item.author}
+							{item.author_first + " " +item.author_last}
 						</span>
 						<span className="font-syne text-xl font-semibold">{item.title}</span>
 						<div className="flex flex-wrap items-center gap-1">
-							{getTypes()}
+							<img className="w-5 h-5 rounded-full float-left" src={`images/categories/${DDC[item.type].image}`}/>
+							<span className="font-roboto-condensed text-sm font-bold">{DDC[item.type].type}</span>
 						</div>
 					</div>
 					<div className="flex flex-col gap-2">
@@ -115,7 +89,7 @@ const Card: React.FC<Props> = ({ item }) => {
 					</div>
 				</div>
 			</div>
-			<div className="flex justify-start flex-wrap item-center gap-2">
+			{/* <div className="flex justify-start flex-wrap item-center gap-2">
 				{getSubTypes().map((subType) => (
 					<div
 						key={subType}
@@ -124,7 +98,7 @@ const Card: React.FC<Props> = ({ item }) => {
 						{subType}
 					</div>
 				))}
-			</div>
+			</div> */}
 
 			<div>
 				<p className="font-roboto-condensed font-normal text-base">{expanded ? item.text : truncateText(item.text, 200)}</p>

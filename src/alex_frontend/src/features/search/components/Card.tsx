@@ -1,27 +1,22 @@
 import { setSelectedSearchedBook } from "@/features/home/homeSlice";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiBookAlt, BiPlus } from "react-icons/bi";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { SlEye, SlPlus } from "react-icons/sl";
-import { getSubTypes, getTypes } from "../utils/properties";
+import { getSubTypes } from "../utils/properties";
+import eras from "@/data/eras";
+import DDC from "@/data/categories";
+import { Book } from "@/features/portal/portalSlice";
 
 // Assuming the structure of your item includes `id`, `title`, and `description`
-export interface BookCardItem {
-	id: string;
-	cfi: string;
-	text: string;
-	title: string;
-	author: string;
-	fiction: boolean;
-	type: Array<number>;
-	subtype: Array<number>;
-	pubyear: number;
-	asset_id: string;
-	_formatted: BookCardItem
+export type BookCardItem = Book & {
+    id: string;
+    cfi: string;
+    text: string;
+    _formatted: Omit<BookCardItem, '_formatted'>;
 }
-
 interface Props {
 	item: BookCardItem;
 }
@@ -31,6 +26,21 @@ const Card: React.FC<Props> = ({ item }) => {
 	const { selectedSearchedBook } = useAppSelector((state) => state.home);
 
 	const [expanded, setExpanded] = useState(false);
+
+	const [imageLoaded, setImageLoaded] = useState(false);
+    const [imageSrc, setImageSrc] = useState('images/default-cover.jpg');
+
+    useEffect(() => {
+        const img = new Image();
+        img.src = `https://gateway.irys.xyz/${item.manifest}/cover`;
+        img.onload = () => {
+            setImageSrc(img.src);
+            setImageLoaded(true);
+        };
+        img.onerror = () => {
+            setImageLoaded(true); // Consider the loading as complete even if it failed
+        };
+    }, [item.manifest]);
 
 	// Function to truncate the description
 	const truncateText = (text: string, maxLength: number): string => {
@@ -51,30 +61,31 @@ const Card: React.FC<Props> = ({ item }) => {
 		else dispatch(setSelectedSearchedBook(item));
 	};
 
+
 	return (
 		<div className="p-4 text-black shadow-xl border border-solid rounded-lg bg-white transition-all duration-500 flex gap-1 flex-col justify-center items-stretch">
 			<div className="flex">
 				<div
-					className="basis-[180px] flex-shrink-0 min-h-64 h-full bg-no-repeat bg-cover"
-					style={{
-						// backgroundImage: `url(images/categories/${item.image})`,
-						backgroundImage: `url(https://picsum.photos/300/100)`,
-					}}
-				></div>
+                    className={`basis-[180px] flex-shrink-0 min-h-64 h-full bg-no-repeat ${!imageLoaded ? 'animate-pulse' : ''}`}
+                    style={{
+                        backgroundImage: `url(${imageSrc})`,
+                        backgroundSize: "100% 100%",
+                    }}
+                ></div>
 				<div className="flex-grow flex flex-col justify-between p-2 gap-x-2 gap-y-1">
 					<div className="flex justify-between">
 						<div className="flex flex-col">
 							<span className="font-roboto-condensed text-xl font-medium">
-								{item.author}
+								{item.author_first} {item.author_last}
 							</span>
 							<span className="font-syne text-xl font-semibold" dangerouslySetInnerHTML={{ __html: item._formatted.title}}></span>
 							<span className="font-roboto-condensed text-sm font-normal text-[#8E8E8E]">
-								{item.fiction ? "Fiction" : "Non Fiction"}{" "}
-								&nbsp; {item.pubyear ? item.pubyear : ""}
+								{item.fiction ? "Fiction" : "Non Fiction"} &nbsp;
+								{eras.find(era=>era.value == item.era)?.label ?? 'Unknown Era' }
 							</span>
 							<div className="flex flex-wrap items-center gap-2">
 								<div className="flex justify-start flex-wrap item-center gap-2">
-									{getTypes(item.type).map(({ type }, index, arr)=>(
+									{/* {getTypes(item.type).map(({ type }, index, arr)=>(
 										<React.Fragment key={type}>
 											<span className="font-roboto-condensed text-sm font-bold">
 												{type}
@@ -85,7 +96,10 @@ const Card: React.FC<Props> = ({ item }) => {
 												</span>
 											)}
 										</React.Fragment>
-									))}
+									))} */}
+									<span className="font-roboto-condensed text-sm font-bold">
+										{item.type && DDC[item.type]?.type}
+									</span>
 								</div>
 							</div>
 						</div>
@@ -102,7 +116,7 @@ const Card: React.FC<Props> = ({ item }) => {
 						</div>
 					</div>
 					<div className="flex justify-start flex-wrap item-center gap-2">
-						{getSubTypes(item.subtype).map((subType) => (
+						{getSubTypes(item.categories).map((subType) => (
 							<div
 								key={subType}
 								className="truncate px-4 py-1 flex justify-center items-center border border-black rounded-full font-roboto-condensed text-sm font-normal cursor-pointer hover:bg-black hover:text-white transition-all duration-300 ease-in"

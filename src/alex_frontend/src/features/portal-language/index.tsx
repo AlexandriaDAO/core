@@ -176,7 +176,7 @@ function PortalLanguage() {
 								</div>
 								<div>
 									<span className="text-base font-roboto-condensed font-normal text-gray-500">
-										{books.filter(book=> book.tags.find(b=>b.name == 'language' && b.value == language.code)).length}
+										{books.filter(book=> book.language == language.code).length}
 									</span>
 								</div>
 							</li>

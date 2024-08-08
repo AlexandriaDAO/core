@@ -1,25 +1,15 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import Categories from "@/features/categories";
+import Types from "@/features/home-types";
 import SearchResult from "@/features/search/SearchResult";
-import Loading from "@/features/loading";
 import MainLayout from "@/layouts/MainLayout";
 
 function HomePage() {
-	const { searchText } = useAppSelector(
-		(state) => state.search
-	);
-	useEffect(()=>{
-		console.log(searchText);
-	},[searchText])
+	const { searchText } = useAppSelector((state) => state.search);
 
 	return (
 		<MainLayout>
-			{searchText.length > 0 ? (
-				<SearchResult />
-			) : (
-				<Categories />
-			)}
+			{searchText.length > 0 ? <SearchResult /> : <Types />}
 		</MainLayout>
 	);
 }

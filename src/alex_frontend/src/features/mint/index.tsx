@@ -9,20 +9,23 @@ import Header from "./Header";
 import useSession from "@/hooks/useSession";
 import getIrys from "../irys/utils/getIrys";
 import { readFileAsBuffer } from "../irys/utils/gaslessFundAndUpload";
-import Epub, { EpubCFI } from "epubjs";
-import { v4 as uuidv4 } from "uuid";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import MeiliSearch from "meilisearch";
-import { initializeClient } from "@/services/meiliService";
 import { useAuth } from "../../contexts/AuthContext";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import fetchEngineBooks from "../engine-books/thunks/fetchEngineBooks";
+import { PiUploadSimple } from "react-icons/pi";
+import { WebIrys } from "@irys/sdk";
+
+const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_ID : process.env.REACT_LOCAL_APP_ID;
 
 const Mint = () => {
 	const { icrc7Actor } = useAuth();
 
 	const { activeEngine } = useAppSelector((state) => state.engineOverview);
-	const [client, setClient] = useState<MeiliSearch | null>(null);
 
-	const { actor } = useSession();
+	const dispatch = useAppDispatch();
+
+	const { actor, meiliClient } = useSession();
 	const [bookLoadModal, setBookLoadModal] = useState(false);
 
 	const [file, setFile] = useState<File | undefined>(undefined);
@@ -75,40 +78,38 @@ const Mint = () => {
 	const metadataRef = useRef<{ validateFields: () => boolean } | null>(null);
 
   const validateSubmission = (): boolean => {
+	if (!APP_ID){
+		message.error("Application ID is not set.");
+		return false;
+	}
+
     if (!file) {
-      message.error("Please upload a file");
-      return false;
+		message.error("Please upload a file");
+		return false;
     }
 
     if (!metadataRef.current || !metadataRef.current.validateFields()) {
-      message.error("Please fill out all required metadata fields correctly");
-      return false;
+		message.error("Please fill out all required metadata fields correctly");
+		return false;
     }
-
-    // Add any other necessary checks here
 
     return true;
   };
 
 	const handleSubmitClick = async () => {
-		if (!validateSubmission()) {
-			return;
-		}
+		if (!validateSubmission()) return;
 
 		next();
-		let tx = undefined;
+
 		try {
-			setUploadStatus(1);
-			if (!file) return;
-
-			message.info("Creating Transaction");
-
-			const totalSupply = await icrc7Actor.icrc7_total_supply();
-			const mintingNumber = Number(totalSupply) + 1;
-
 			const irys = await getIrys();
+			const transactions = await createAllTransactions(irys);
 
-			const APP_ID = process.env.DFX_NETWORK === "ic" 
+			await mintNFT(transactions.manifest.id);
+			await uploadToArweave(irys, transactions);
+
+        // Master version before Zeeshan separated upload into a folder.
+<!-- 			const APP_ID = process.env.DFX_NETWORK === "ic" 
     ? "testingAlexandria" 
     : "UncensoredGreats";
 
@@ -134,137 +135,125 @@ const Mint = () => {
 			});
 			await tx.sign();
 
-			message.success("Transaction Created Successfully");
+			message.success("Transaction Created Successfully"); -->
 
-			setUploadStatus(2);
-		} catch (err) {
-			message.error("Error Creating Transaction: " + err);
+
+			dispatch(fetchEngineBooks({ actor, engine: activeEngine }));
+			setTimeout(() => next(3), 2000);
+		} catch (error) {
+			message.error(`Error: ${error}`);
 			next();
-			return;
 		}
+	};
 
-		try {
-			setUploadStatus(3);
-			message.info("Minting NFT via ICRC7 Protocol");
+	const createAllTransactions = async (irys: WebIrys) => {
+		setUploadStatus(1);
+		message.info("Creating Transactions");
 
-			const result = await actor.mint_nft(tx.id);
+		const bookTx = await createBookTransaction(irys);
+		const coverTx = await createCoverTransaction(irys);
+		const dataTx = await createMetadataTransaction(irys);
+		const manifestTx = await createManifestTransaction(irys, { bookTx, coverTx, dataTx });
 
-			if ("Err" in result) throw new Error(result.Err);
+		message.success("Transactions Created Successfully");
+		setUploadStatus(2);
 
-			// if('Ok' in result) return result.Ok;
+		return { book: bookTx, cover: coverTx, data: dataTx, manifest: manifestTx };
+	};
 
-			message.success("Minted Successfully");
-			setUploadStatus(4);
-		} catch (err) {
-			message.error("Error while Minting: " + err);
-		}
+	const createBookTransaction = async (irys: WebIrys) => {
+		const buffer = await readFileAsBuffer(file!);
+		const tx = irys.createTransaction(buffer, {
+		  	tags: [{ name: "Content-Type", value: file!.type }]
+		});
+		await tx.sign();
+		return tx;
+	};
 
-		try {
-			setUploadStatus(5);
-			message.info("Uploading file to Arweave");
+	const createCoverTransaction = async (irys: WebIrys) => {
+		const response = await fetch(cover ?? '/images/default-cover.jpg');
+		const coverBuffer = Buffer.from(await response.arrayBuffer());
+		const coverType = response.headers.get('Content-Type') || 'image/jpeg';
 
-			await tx.upload();
+		const tx = irys.createTransaction(coverBuffer, {
+			tags: [{ name: "Content-Type", value: coverType }]
+		});
+		await tx.sign();
+		return tx;
+	};
+	const createMetadataTransaction = async (irys: WebIrys) => {
+		const metadataJson = JSON.stringify(metadata, null, 2);
+		const tx = irys.createTransaction(metadataJson, {
+		  tags: [{ name: "Content-Type", value: "application/json" }]
+		});
+		await tx.sign();
+		return tx;
+	};
+	const createManifestTransaction = async (irys: WebIrys, txs: { bookTx: any, coverTx: any, dataTx: any }) => {
+		const totalSupply = await icrc7Actor.icrc7_total_supply();
+		const mintingNumber = Number(totalSupply) + 1;
 
-			message.success("Uploaded Successfully");
-			setUploadStatus(6);
-		} catch (err) {
-			message.error("Error while Minting: " + err);
-		}
+		const map = new Map([
+			["book", txs.bookTx.id],
+			["cover", txs.coverTx.id],
+			["metadata", txs.dataTx.id]
+		]);
 
+		const manifest = await irys.uploader.generateManifest({ items: map , indexFile: 'metadata'});
 
-		let contents: any = [];
+		const tx = irys.createTransaction(JSON.stringify(manifest, null, 2), {
+			tags: [
+				{ name: "Content-Type", value: "application/x.arweave-manifest+json" },
+				{ name: "application-id", value: APP_ID! },
+				{ name: "minting_number", value: mintingNumber.toString() },
+			]
+		});
+		await tx.sign();
+		return tx;
+	};
+	const mintNFT = async (transactionId: string) => {
+		setUploadStatus(3);
+		message.info("Minting NFT via ICRC7 Protocol");
 
-		try {
-			setUploadStatus(7);
-			message.info("Converting Epub to JSON");
+		const result = await actor.mint_nft(transactionId);
+		if ("Err" in result) throw new Error(result.Err);
 
-			const epubUrl = `https://gateway.irys.xyz/${tx.id}`;
-
-			const onlineBook = Epub(epubUrl, { openAs: "epub" });
-
-			// Fetch spine items
-			const spine = await onlineBook.loaded.spine;
-			//@ts-ignore
-			for (let item of spine.items) {
-				if (!item.href) continue;
-				const doc = await onlineBook.load(item.href);
-				//@ts-ignore
-				const innerHTML = doc.documentElement.innerHTML;
-				const parsedDoc = new DOMParser().parseFromString(
-					innerHTML,
-					"text/html"
-				);
-				const paragraphs = parsedDoc.querySelectorAll("p");
-
-				paragraphs.forEach((paragraph) => {
-					const text = paragraph.textContent?.trim() ?? "";
-					if (text.length < 1) return;
-					const cfi = new EpubCFI(paragraph, item.cfiBase).toString();
-					const id = uuidv4();
-
-					contents.push({
-						id,
-						cfi,
-						text,
-						title: metadata.title,
-						fiction: metadata.fiction,
-						asset_id: tx.id
-					});
-				});
-			}
-
-			message.success("Conversion Successfull");
-			setUploadStatus(8);
-		} catch (err) {
-			message.error("Error while Minting: " + err);
-		}
-
-
-		try {
-			if (!activeEngine) throw new Error("engine not selected");
-			if (!client) throw new Error("client not initialized");
-
-			setUploadStatus(9);
-			message.info("Storing JSON docs to Engine");
-
-			await client.index(activeEngine.index).addDocuments(contents, { primaryKey: 'id' });
-
-			message.success("Stored Successfully");
-			setUploadStatus(10);
-		} catch (err) {
-			message.error("Error while Minting: " + err);
-		}
-
-
-		setTimeout(() => {
-			next(3);
-		}, 2000);
+		message.success("Minted Successfully");
+		setUploadStatus(4);
 	};
 
 
-	useEffect(() => {
-		if (!activeEngine) return;
+	const uploadToArweave = async (irys: WebIrys, transactions: any) => {
+		setUploadStatus(5);
+		message.info("Uploading files to Arweave");
 
-		const init = async () => {
-			setClient(null);
+		// console.log(transactions.book.id, transactions.cover.id, transactions.data.id, transactions.manifest.id);
 
-			const client = await initializeClient(
-				activeEngine?.host,
-				activeEngine?.key
-			);
+		Promise.all([
+			transactions.book.upload(),
+			transactions.cover.upload(),
+			transactions.data.upload(),
+			transactions.manifest.upload(),
+		]).then(()=>{
+			message.success("Uploaded Successfully");
+			console.log(transactions.manifest.id);
+			setUploadStatus(6);
+		}).catch(err=>{
+			message.error("Uploaded Error");
+			console.error('Error while uploading assets to arweave');
+		})
 
-			setClient(client);
-		};
+		// console.log('uploaded', uploadReceipt, transactions);
+	};
 
-		init();
-	}, [activeEngine]);
+
 	return (
 		<>
 			<button
 				onClick={() => setBookLoadModal(true)}
-				className="innerAuthTab border-0 text-white font-bold px-4 rounded"
+				className="w-56 py-3 flex gap-2 justify-center items-center border border-black rounded-full font-roboto-condensed text-base leading-[18px] font-medium cursor-pointer hover:bg-black hover:text-white transition-all duration-100 ease-in"
 			>
-				Mint NFT
+				<PiUploadSimple size={20} /> <span>Upload New</span>
 			</button>
 
 			<Modal

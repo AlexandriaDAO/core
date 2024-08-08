@@ -24,6 +24,7 @@ function ContentView(props: IContentViewProps) {
 	const {
 		rendition,
 		isLoaded,
+		loadingProgress,
 		renderLocation,
 		setCurrentLocation,
 		currentLocation,
@@ -192,8 +193,11 @@ function ContentView(props: IContentViewProps) {
 							></div>
 						</>
 					) : (
-						<div className=" h-full w-full flex items-center justify-center ">
+						<div className=" h-full w-full flex flex-col gap-2 items-center justify-center font-roboto-condensed text-xl">
 							<Spinner text="Loading" />
+							<div className="w-60 bg-gray-300 rounded-full ">
+								<div className="bg-[#393939] text-xs font-medium text-white text-center p-0.5 leading-none rounded-full" style={{width: loadingProgress+"%"}}> {loadingProgress}%</div>
+							</div>
 						</div>
 					)}
 				</div>

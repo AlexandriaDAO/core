@@ -3,7 +3,7 @@ import MainLayout from "@/layouts/MainLayout";
 import { IoIosSearch } from "react-icons/io";
 import PortalType from "@/features/portal-type";
 import PortalLanguage from "@/features/portal-language";
-import PortalPublicationYear from "@/features/portal-publication-year";
+import PortalEra from "@/features/portal-era";
 import PortalCategory from "@/features/portal-category";
 import PortalFilter from "@/features/portal-filter";
 import Portal from "@/features/portal";
@@ -31,10 +31,10 @@ function BookPortalPage() {
                         />
                     </div>
                     <div className="basis-1/2 flex items-center justify-around gap-2 py-2">
+                        <PortalType />
                         <PortalCategory />
                         <PortalLanguage />
-                        <PortalType />
-                        <PortalPublicationYear />
+                        <PortalEra />
                     </div>
                 </div>
                 <div className="font-roboto-condensed font-normal text-xl my-4 flex gap-4 items-center">

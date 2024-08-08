@@ -117,11 +117,17 @@ function PortalCategory() {
                                     />
                                     <span>{category.title}</span>
                                 </div>
-                                <div>
-                                    <span className="text-base font-roboto-condensed font-normal text-gray-300">
-										{/* {books.filter(book=> book.tags.find(b=>b.name == 'category' && b.value == category)).length} */}
-										NA
-									</span>
+                                <div className="text-base font-roboto-condensed font-normal text-gray-300">
+									{
+										books.reduce((count, book) =>
+											(Array.isArray(book.categories) &&
+											book.categories.length > 0 &&
+											book.categories.includes(category.id))
+												? count + 1
+												: count,
+											0
+										)
+									}
                                 </div>
                             </li>
                         )) : <li className="font-roboto-condensed font-normal text-base flex items-center justify-between p-2 border-b last:border-0 text-black">

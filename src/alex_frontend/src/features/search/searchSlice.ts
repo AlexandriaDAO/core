@@ -7,6 +7,8 @@ interface SearchState {
 	searchResults: Array<any>;
 	searchText: string;
 
+	limit: number;
+
 	loading: boolean;
 	error: string | null;
 }
@@ -15,6 +17,8 @@ interface SearchState {
 const initialState: SearchState = {
 	searchResults: [],
 	searchText: "",
+
+	limit: 20,
 
 	loading: false,
 	error: null,
@@ -29,6 +33,9 @@ const searchSlice = createSlice({
         },
         setSearchResults(state, action){
             state.searchResults = action.payload
+        },
+		setLimit(state, action){
+            state.limit = action.payload
         },
 
         setLoading(state, action){
@@ -59,6 +66,6 @@ const searchSlice = createSlice({
 		}
 });
 
-export const {setSearchText, setSearchResults, setLoading, setError} = searchSlice.actions;
+export const {setSearchText, setSearchResults, setLimit, setLoading, setError} = searchSlice.actions;
 
 export default searchSlice.reducer;
