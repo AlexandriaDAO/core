@@ -8,19 +8,12 @@ import MeiliSearch, { Index } from 'meilisearch';
 import { initializeClient, initializeIndex } from '@/services/meiliService';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
-import { initializeActor } from '@/features/auth/utils/authUtils';
 import fetchBooks from '@/features/portal/thunks/fetchBooks';
-
-        // Master version before separating into folders
-<!-- import { setUser } from '@/features/auth/authSlice';
-import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
-import { useAppDispatch } from '@/store/hooks/useAppDispatch';
-import principal from '@/features/auth/thunks/principal';
 import { initializeActor, initializeActorSwap,initializeIcpLedgerActor, initializeLbryActor, initializeTokenomicsActor } from '@/features/auth/utils/authUtils';
 import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from "../../../declarations/icp_ledger_canister";
 import { tokenomics } from '../../../declarations/tokenomics';
-import { LBRY } from '../../../declarations/LBRY'; -->
+import { LBRY } from '../../../declarations/LBRY';
 
 
 interface SessionProviderProps {
@@ -111,14 +104,6 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		if(!actor) return;
 		dispatch(fetchBooks(actor));
 	}, [actor, dispatch]);
-
-        
-       // Master versions before separating books into folders
-<!-- 		if (actor!=alex_backend){
-			dispatch(fetchMyEngines(actor));
-		}
-	}, [actor,actorSwap,actorIcpLedger]); -->
-
 
 	return (
 		<SessionContext.Provider value={{ actor,actorSwap,actorIcpLedger,actorTokenomics, actorLbry,authClient, meiliClient, meiliIndex  }}>

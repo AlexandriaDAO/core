@@ -390,7 +390,7 @@ dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
 dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 
-echo "Backend canisters finished. Copy and paste remainerd of the build script manually to deploy on the network."
+echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."
 exit 1
 
 mkdir -p .dfx/local/canisters/LBRY
