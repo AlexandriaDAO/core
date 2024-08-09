@@ -1,5 +1,5 @@
 import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE as _SERVICELBRY } from "../../../../../declarations/LBRY/LBRY.did";
+import { _SERVICE as _SERVICELBRY } from "../../../../../../declarations/LBRY/LBRY.did";
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
@@ -28,7 +28,7 @@ const getLbryBalance = createAsyncThunk<
       return rejectWithValue(error.message);
     }
   }
-  return rejectWithValue("An unknown error occurred while Swaping");
+  return rejectWithValue("An unknown error occurred while getting LBRY balance");
 });
 
 export default getLbryBalance;

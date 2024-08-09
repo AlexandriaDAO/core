@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { createActor, alex_backend } from '../../../declarations/alex_backend';
+import { alex_backend } from '../../../declarations/alex_backend';
 import { AuthClient } from "@dfinity/auth-client";
-import { HttpAgent } from "@dfinity/agent";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import SessionContext from '@/contexts/SessionContext';
 import MeiliSearch, { Index } from 'meilisearch';
 import { initializeClient, initializeIndex } from '@/services/meiliService';
+// import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
 import fetchBooks from '@/features/portal/thunks/fetchBooks';
-import { initializeActor, initializeActorSwap,initializeIcpLedgerActor, initializeLbryActor, initializeTokenomicsActor } from '@/features/auth/utils/authUtils';
+import { initializeActor, initializeActorSwap,initializeIcpLedgerActor, initializeLbryActor, initializeTokenomicsActor,initializeAlexActor } from '@/features/auth/utils/authUtils';
 import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from "../../../declarations/icp_ledger_canister";
 import { tokenomics } from '../../../declarations/tokenomics';
 import { LBRY } from '../../../declarations/LBRY';
+import { ALEX } from '../../../declarations/ALEX';
 
 
 interface SessionProviderProps {
@@ -31,8 +32,9 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const [actorIcpLedger, setIcpLedger] = useState(icp_ledger_canister);
 	const [actorTokenomics, setActorTokenomics] = useState(tokenomics);
 	const [actorLbry,setActorLbry]=useState(LBRY);
-	const [authClient, setAuthClient] = useState<AuthClient>();
+	const [actorAlex,setActorAlex]=useState(ALEX);
 
+	const [authClient, setAuthClient] = useState<AuthClient>();
 	const [meiliClient, setMeiliClient] = useState<MeiliSearch>();
 	const [meiliIndex, setMeiliIndex] = useState<Index>();
 
@@ -82,6 +84,8 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 			setActorTokenomics(actorTokenomics);
 			const actorLbry=await initializeLbryActor(authClient);
 			setActorLbry(actorLbry);
+			const actorAlex=await initializeAlexActor(authClient);
+			setActorAlex(actorAlex);
 		}
 		setupActor();
 	},[user])
@@ -106,7 +110,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	}, [actor, dispatch]);
 
 	return (
-		<SessionContext.Provider value={{ actor,actorSwap,actorIcpLedger,actorTokenomics, actorLbry,authClient, meiliClient, meiliIndex  }}>
+		<SessionContext.Provider value={{ actor,actorSwap,actorIcpLedger,actorTokenomics, actorLbry,actorAlex,authClient, meiliClient, meiliIndex  }}>
 			{children}
 		</SessionContext.Provider>
 	);

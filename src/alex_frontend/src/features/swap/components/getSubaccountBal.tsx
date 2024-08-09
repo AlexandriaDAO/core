@@ -4,9 +4,8 @@ import { useAppSelector } from "../../../store/hooks/useAppSelector";
 import { ActorSubclass } from "@dfinity/agent";
 
 import getSubaccount from "../thunks/getSubaccount";
-import getLbryBalance from "../thunks/getLbryBalance";
+import getLbryBalance from "../thunks/lbryIcrc/getLbryBalance";
 
-import { ImSpinner8 } from "react-icons/im";
 import { _SERVICE as _SERVICESWAP } from '../../../../../declarations/icp_swap/icp_swap.did';
 import { _SERVICE as _SERVICELBRY } from '../../../../../declarations/LBRY/LBRY.did';
 interface LbryRatioProps {
@@ -14,7 +13,7 @@ interface LbryRatioProps {
     actorLbry: ActorSubclass<_SERVICELBRY>;
 }
 
-const GetSubaccount: React.FC<LbryRatioProps> = ({ actorSwap, actorLbry }) => {
+const GetSubaccountBal: React.FC<LbryRatioProps> = ({ actorSwap, actorLbry }) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
     const auth = useAppSelector((state) => state.auth);
@@ -30,4 +29,4 @@ const GetSubaccount: React.FC<LbryRatioProps> = ({ actorSwap, actorLbry }) => {
         LBRY Balance :{swap.lbryBalance}
     </div>);
 };
-export default GetSubaccount;
+export default GetSubaccountBal;

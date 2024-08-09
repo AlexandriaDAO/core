@@ -13,18 +13,25 @@ const getMaxLbryBurn = createAsyncThunk<
 >("icp_swap/getMaxLbryBurn", async ({ actor }, { rejectWithValue }) => {
   try {
     const result = await actor.get_maximum_LBRY_burn_allowed();
-    const LedgerServices=LedgerService();
-    const resultNumber= LedgerServices.e8sToIcp(result);
-    return resultNumber;
+
+    if ("Ok" in result) {
+        const LedgerServices = LedgerService();
+        const resultNumber = LedgerServices.e8sToIcp(result.Ok);
+        return resultNumber;
+    }
+    
+    if ("Err" in result) {
+        throw new Error(result.Err);
+    }
   } catch (error) {
-    console.error("Failed to get ALEX mint rate:", error);
+    console.error("Failed to get max LBRY:", error);
 
     if (error instanceof Error) {
       return rejectWithValue(error.message);
     }
   }
   return rejectWithValue(
-    "An unknown error occurred while fetching ALEX mint rate"
+    "An unknown error occurred while fetching max LBRY"
   );
 });
 export default getMaxLbryBurn;

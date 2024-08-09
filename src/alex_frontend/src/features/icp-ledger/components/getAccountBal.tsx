@@ -18,11 +18,23 @@ const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger }) => {
     const auth = useAppSelector((state) => state.auth);
 
     useEffect(() => {
-        dispatch(getIcpBal({
-            actor: actorIcpLedger,
-            subaccount: swap.subaccount,
-            account: auth.user
-        }));
+        if (auth.user !== "" && swap.subaccount !== "") {
+            dispatch(getIcpBal({
+                actor: actorIcpLedger,
+                subaccount: swap.subaccount,
+                account: auth.user
+            }));
+        }
+    }, [auth.user, swap.subaccount])
+    useEffect(() => {
+        if (swap.successClaimReward === true || swap.success == true
+        ) {
+            dispatch(getIcpBal({
+                actor: actorIcpLedger,
+                subaccount: swap.subaccount,
+                account: auth.user
+            }));
+        }
     }, [swap])
 
     return (<div>
@@ -55,7 +67,6 @@ const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger }) => {
                     <span className="address">
                         {(icpLedger?.subAccountBalance)}
                     </span>
-                    {/* {"Subaccount Acocunt:" + swap.subaccount + ":"} {(icpLedger?.subAccountBalance)} */}
                 </div>
 
             </div>)

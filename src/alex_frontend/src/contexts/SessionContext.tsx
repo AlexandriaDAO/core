@@ -7,19 +7,21 @@ import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from '../../../declarations/icp_ledger_canister';
 import { tokenomics } from '../../../declarations/tokenomics';
 import { LBRY } from '../../../declarations/LBRY';
+import { ALEX } from '../../../declarations/ALEX'
 import { _SERVICE } from '../../../declarations/alex_backend/alex_backend.did';
 import { _SERVICE as _SERVICESWAP } from '../../../declarations/icp_swap/icp_swap.did';
 import { _SERVICE as _SERVICEICPLEDGER } from '../../../declarations/icp_ledger_canister/icp_ledger_canister.did';
 import { _SERVICE as _SERVICETOKENOMICS } from '../../../declarations/tokenomics/tokenomics.did';
 import { _SERVICE as _SERVICELBRY } from '../../../declarations/LBRY/LBRY.did';
-
+import { _SERVICE as _SERVICEALEX } from "../../../declarations/ALEX/ALEX.did"
 
 interface SessionContextProps {
 	actor: ActorSubclass<_SERVICE>;
 	actorSwap: ActorSubclass<_SERVICESWAP>;
 	actorIcpLedger: ActorSubclass<_SERVICEICPLEDGER>;
 	actorTokenomics: ActorSubclass<_SERVICETOKENOMICS>;
-	actorLbry: ActorSubclass<_SERVICELBRY>
+	actorLbry: ActorSubclass<_SERVICELBRY>;
+	actorAlex: ActorSubclass<_SERVICEALEX>;
 	authClient: AuthClient | undefined;
 	meiliClient: MeiliSearch | undefined;
 	meiliIndex: Index | undefined;
@@ -31,6 +33,7 @@ const SessionContext = createContext<SessionContextProps>({
 	actorIcpLedger: icp_ledger_canister,
 	actorTokenomics: tokenomics,
 	actorLbry: LBRY,
+	actorAlex: ALEX,
 	authClient: undefined,
 	meiliClient: undefined,
 	meiliIndex: undefined,
