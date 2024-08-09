@@ -1,7 +1,7 @@
 use std::time::Duration;
 use crate::distribute_reward;
 
-const N: Duration = Duration::from_secs(86400);//24hours in seconds
+const N: Duration = Duration::from_secs(180);//3 min in seconds
 
 #[ic_cdk::init]
 fn init() {

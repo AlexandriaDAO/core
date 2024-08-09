@@ -3,24 +3,25 @@ import { _SERVICE as _SERVICESWAP } from "../../../../../declarations/icp_swap/i
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 // Define the async thunk
-const getLBRYratio = createAsyncThunk<
+const unstake = createAsyncThunk<
   string, // This is the return type of the thunk's payload
   {
     actor: ActorSubclass<_SERVICESWAP>;
   },
   { rejectValue: string }
->("icp_swap/getLBRYratio", async ({ actor }, { rejectWithValue }) => {
+>("icp_swap/unstake", async ({ actor }, { rejectWithValue }) => {
   try {
-    const result = await actor.get_current_LBRY_ratio();
-    return result;
+    const result = await actor.un_stake_all_ALEX();
+    if ("Ok" in result) return "success";
+    if ("Err" in result) throw new Error(result.Err);
   } catch (error) {
-    console.error("Failed to get LBRY_ratio:", error);
+    console.error(error);
 
     if (error instanceof Error) {
       return rejectWithValue(error.message);
     }
   }
-  return rejectWithValue("An unknown error occurred while fetching LBRY ratio");
+  return rejectWithValue("An unknown error occurred while unstaking!");
 });
 
-export default getLBRYratio;
+export default unstake;

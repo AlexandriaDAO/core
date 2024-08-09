@@ -1,7 +1,6 @@
 import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE as _SERVICEICPLEDGER } from "../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { number } from "yup";
 import LedgerService from "@/utils/LedgerService";
 import { Principal } from "@dfinity/principal";
 
@@ -26,7 +25,7 @@ const getIcpBal = createAsyncThunk<
     const formatedSubAccountBal=LedgerServices.e8sToIcp(resultSubAccountBal.e8s).toString();
     return ({formatedAccountBal,formatedSubAccountBal})
   } catch (error) {
-    console.error("Failed to get LBRY_ratio:", error);
+    console.error("Failed to get ICP Balance:", error);
 
     if (error instanceof Error) {
       return rejectWithValue(error.message);

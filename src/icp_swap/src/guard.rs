@@ -1,5 +1,5 @@
-use crate::{TOTAL_ICP_AVAILABLE, TOTAL_UNCALIMED_ICP_REWARD};
-
+use crate::storage::REENTRANCY_GUARD;
+use crate::{TOTAL_ICP_AVAILABLE, TOTAL_UNCLAIMED_ICP_REWARD};
 pub fn is_admin() -> Result<(), String> {
     if ic_cdk::api::caller().to_string()
         == "xswc6-jimwj-wnqog-3gmkv-hglw4-aedfy-bqmr2-5uyut-cnbbg-4wvsk-bqe"
@@ -16,14 +16,17 @@ pub fn is_canister() -> Result<(), String> {
         Err("You are unauthorized to call this method.".to_string())
     }
 }
-pub fn is_burning_allowed() -> Result<(), String> {
-    let total_icp_available= TOTAL_ICP_AVAILABLE.with(|icp| {
-        let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
-        *icp
+pub fn reentrancy<F, R>(f: F) -> R where F: FnOnce() -> R,
+{
+    REENTRANCY_GUARD.with(|guard| {
+        if guard.get() {
+            panic!("Reentrancy not allowed!");
+        }
+        guard.set(true);
     });
-    let total_unclaimed_icp: u64=TOTAL_UNCALIMED_ICP_REWARD.with(|icp| {
-        let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
-        *icp
+    let result = f();
+    REENTRANCY_GUARD.with(|guard| {
+        guard.set(false);
     });
-    Ok(())
+    result
 }

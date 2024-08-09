@@ -1,14 +1,30 @@
+use std::{cell::RefCell, sync::{Arc, Mutex}};
+
 use candid::Principal;
 use ic_cdk::{self, caller};
 use ic_ledger_types::Subaccount;
 
-use crate::get_stake;
+use crate::{get_stake, update, TOTAL_ICP_AVAILABLE};
+pub const LBRY_RATIO: u64 = 1000;
+pub const STAKING_REWARD_PERCENTAGE: u64 = 1000;   //multiply by 100 eg. 10% = 1000
+const DECIMALS: usize = 8;
+pub const ALEX_CANISTER_ID: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
+pub const LBRY_CANISTER_ID: &str = "hdtfn-naaaa-aaaam-aciva-cai";
+pub const TOKENOMICS_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
+pub const ICP_TRANSFER_FEE: u64 = 10_000;
 pub fn verify_caller_balance(amount: u64) -> bool {
-    ic_cdk::println!("the caller is {}", caller().to_string());
     let caller_stake = get_stake(caller());
     match caller_stake {
         Some(stake) => amount <= (stake.amount) as u64,
         None => false,
+    }
+}
+
+pub fn get_caller_stake_balance() -> u64 {
+    let caller_stake = get_stake(caller());
+    match caller_stake {
+        Some(stake) => return stake.amount,
+        None => return 0,
     }
 }
 

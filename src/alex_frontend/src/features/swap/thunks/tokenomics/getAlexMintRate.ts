@@ -1,9 +1,10 @@
 import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE as _SERVICETOKENOMICS } from "../../../../../../declarations/tokenomics/tokenomics.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import LedgerService from "@/utils/LedgerService";
 // Define the asyn thunk
 const getAlexMintRate = createAsyncThunk<
-  Number, // This is the return type of the thunk's payload
+  string, // This is the return type of the thunk's payload
   {
     actor: ActorSubclass<_SERVICETOKENOMICS>;
   },
@@ -11,10 +12,12 @@ const getAlexMintRate = createAsyncThunk<
 >("tokenomics/getAlexMintRate", async ({ actor }, { rejectWithValue }) => {
   try {
     const result = await actor.get_current_ALEX_rate();
-    return result;
+    const LedgerServices = LedgerService();
+    const fromatedBal = LedgerServices.e8sToIcp(
+      result * BigInt(10000)
+    ).toString();
+    return fromatedBal;
   } catch (error) {
-    console.error("Failed to get ALEX mint rate:", error);
-
     if (error instanceof Error) {
       return rejectWithValue(error.message);
     }
@@ -23,6 +26,5 @@ const getAlexMintRate = createAsyncThunk<
     "An unknown error occurred while fetching ALEX mint rate"
   );
 });
-
 
 export default getAlexMintRate;

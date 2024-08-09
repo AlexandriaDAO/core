@@ -19,6 +19,7 @@ import portalFilterReducer from "@/features/portal-filter/portalFilterSlice";
 import swapReducer from "@/features/swap/swapSlice"
 import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
+import alexReducer from "@/features/swap/alexSlice";
 
 
 const rootReducer = combineReducers({
@@ -45,8 +46,8 @@ const rootReducer = combineReducers({
 	swap:swapReducer,
 	icpLedger:icpLedgerReducer,
 	tokenomics:tokenomicsReducer,
-
 	portal: portalReducer,
+	alex:alexReducer,
 });
 
 export default rootReducer;
