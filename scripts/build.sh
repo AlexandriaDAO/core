@@ -308,7 +308,7 @@ dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
         };
       };
       metadata = vec {};
-      transfer_fee = 100_000;
+      transfer_fee = 4_000_000;
       archive_options = record {
         trigger_threshold = 2000;
         num_blocks_to_archive = 1000;

@@ -10,7 +10,7 @@ pub fn is_admin() -> Result<(), String> {
     }
 }
 pub fn is_canister() -> Result<(), String> {
-    if ic_cdk::api::caller().to_string() == "br5f7-7uaaa-aaaaa-qaaca-cai" {
+    if ic_cdk::api::caller().to_string() == "5qx27-tyaaa-aaaal-qjafa-cai" {
         Ok(())
     } else {
         Err("You are unauthorized to call this method.".to_string())

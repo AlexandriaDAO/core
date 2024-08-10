@@ -32,11 +32,17 @@ dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
           record {
             owner = principal "'${DEFAULT_ACCOUNT_PRINCIPAL}'";
           };
-          100_000_000_000;
+          1_000_000_000_000;
+        };
+        record {
+          record {
+            owner = principal "'zzvai-vg3as-2ob6v-olrwr-ixgcm-uda5e-r3vz7-ijgk5-ry7gs-jk2gh-nqe'";
+          };
+          1_000_000_000_000;  // You can adjust this amount as needed
         };
       };
       metadata = vec {};
-      transfer_fee = 100_000;
+      transfer_fee = 4_000_000;
       archive_options = record {
         trigger_threshold = 2000;
         num_blocks_to_archive = 1000;
@@ -52,13 +58,12 @@ dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
 # Test transfer some LBRY
 dfx canister call LBRY icrc1_transfer '(record {
   to = record {
-    owner = principal "zzvai-vg3as-2ob6v-olrwr-ixgcm-uda5e-r3vz7-ijgk5-ry7gs-jk2gh-nqe";
+    owner = principal "7ua4j-6yl27-53cku-vh62o-z5cop-gdg7q-vhqet-hwlbt-ewfja-xbokg-2qe";
   };
   from = record {
     owner = principal "2jgt7-v33z4-tiosh-csi2v-66cge-4uu7j-v2nye-z27vc-d36pc-ctqai-bqe";
   };
   amount = 100000000;
-  fee = opt 100_000;
 })' --network ic
 
 
@@ -95,17 +100,16 @@ dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
 # Test transfer some ALEX
 dfx canister call ALEX icrc1_transfer '(record {
   to = record {
-    owner = principal "zzvai-vg3as-2ob6v-olrwr-ixgcm-uda5e-r3vz7-ijgk5-ry7gs-jk2gh-nqe";
+    owner = principal "7ua4j-6yl27-53cku-vh62o-z5cop-gdg7q-vhqet-hwlbt-ewfja-xbokg-2qe";
   };
   from = record {
     owner = principal "2jgt7-v33z4-tiosh-csi2v-66cge-4uu7j-v2nye-z27vc-d36pc-ctqai-bqe";
   };
-  amount = 100000000;
-  fee = opt 100_000;
+  amount = 1000000;
 })' --network ic
 
 
-# If you want to reset the token canisters (will delete all token data). 
+# If you want to reset the NFT canisters (will delete all token data). 
 # dfx canister uninstall-code fjqb7-6qaaa-aaaak-qc7gq-cai --network ic
 # dfx canister uninstall-code forhl-tiaaa-aaaak-qc7ga-cai --network ic
 
@@ -149,7 +153,7 @@ dfx deploy icp_swap --network ic
 dfx deploy tokenomics --network ic
 
 # Exit and deploy frontend manually.
-echo "Backend canisters finished. Copy and paste remainerd of the build script manually to deploy on the network."
+echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."
 exit 1
 
 # You may need to run these manually based on sytem level access controls.
