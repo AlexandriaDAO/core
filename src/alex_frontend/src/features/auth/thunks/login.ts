@@ -17,6 +17,7 @@ const login = createAsyncThunk<
         return await new Promise<string>((resolve, reject) => {
             client.login({
                 identityProvider: process.env.DFX_NETWORK === "ic" ? "https://identity.ic0.app" : `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`,
+                derivationOrigin: "https://xo3nl-yaaaa-aaaap-abl4q-cai.icp0.io",
                 maxTimeToLive: BigInt (7) * BigInt(24) * BigInt(3_600_000_000_000), // 1 week
                 // default maxTimeToLive is 8 hours
                 // maxTimeToLive:  BigInt(60_000_000_000), // 1 minute
