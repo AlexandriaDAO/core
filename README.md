@@ -174,7 +174,7 @@ FDV is calculated as  21 million / (0.5cents * minting_reward):
 
 For example, for each LBRY you burn during the first reward epoch, you'll loose the 1 cent it's worth but get back 1/2 a cent in ICP, and get one of the three corresponding 5 ALEX mints, i.e., a tenth of a penny per ALEX, which is a $21,000 FDV
 
-![alt text](image-1.png)
+![image](https://github.com/user-attachments/assets/dc66a866-01f6-4076-b1db-9124fd9f54a3)
 
 From mints 0 to 1 Billion, the FDV is below $1B, but mints ~1 to 62 Billion are all made at the that $1B valuation. This means only ~15% of the supply is up for grabs at <$1B FDV, and 85% thereafter, ensureing there's garenteed and substantial ownership availible to Libriarians at least up until Alexandria reaches 'Unicorn' status.
 
@@ -184,7 +184,7 @@ Since each minting cycle rewards paries of a recent LBRY transaction, the way to
 
 The effectiveness of this strategy decreases as a function of (1) the LBRY transaction fee and (2) the number of transactions that occur between mints according to the following table:
 
-![alt text](image-2.png)
+![image](https://github.com/user-attachments/assets/8429805e-8b0f-4b7b-ac8f-181a73d67f90)
 
 LBRY uses a 0.04 universal transaction fee that is burned without reward to combat this.
 
@@ -357,7 +357,7 @@ AIs of different specializations can debate eachother with users steering the co
 
 A 3d exploration game of the literal library Alexandria where the goal is to get a bachelors degree using only a library card.
 
-![alt text](<Screenshot from 2024-08-10 15-15-33.png>)
+![image](https://github.com/user-attachments/assets/b9e0173d-6659-4d71-a5cb-0000fd1a179b)
 
 There are 100 rooms in the library, each dedicated to a category where they player needs to recruit the help of librarians to find in-book references to certain events and concepts.
 
@@ -381,25 +381,7 @@ The reason such apps are untouchable right now is because they're powered by dat
 
 ## Part 5: Architecture & Governance
 
-
-
-D-app ecosystem - Anything you can imagine.
-  - The point is along the way we make these services that power apps, easily pluggable.
-  - In this way the LibModule is built already for you, with a nice economic model that just works out of the box.
-  - Of course people could fork this, and go do their own version, but in doing so they'll circumvent the economic model, loose network effects, and have to start from scratch in making their own building blocks.
-
-- Governance (GOVERNANCE SECTION) SNS Deployment.
-  - Initially it will just determine who owns what NFT.
-  - The development will remain admittedly centralized, based on sheer complexity.
-    - Things can go wrong, forks can occur, etc.
-    - But the token stuff will be fair, blackholed, and rightfully forkable (decentralized).
-  - SNS launch or fork are possibilies, but it's unclear what aditional canisters will be handed to the DAO, blackholed, or otherwise stay under centralized management.
-    - The road to decentralization is paved with hypocracy. At least I'm being honest about it.
-
-
-- Team earnings.
-  - Earning of default librarian providers go to a wallet to pay the team, but it's totally optional and people can change their libmodule providers to whoever.
-
+This section is mainly TBD. We're finishing the architecture first.
 
 ### Governance
 
