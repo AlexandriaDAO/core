@@ -1,0 +1,28 @@
+[package]
+name = "icrc-nft-mo"
+version = "0.2.1"
+description = "icrc based nft example for motoko"
+repository = "https://github.com/PanIndustrial-Org/icrc_nft.mo"
+keywords = [ "nft" ]
+license = "MIT"
+
+[dependencies]
+base = "0.11.1"
+"base-0.7.3" = "https://github.com/dfinity/motoko-base#moc-0.7.3@aafcdee0c8328087aeed506e64aa2ff4ed329b47"
+map9 = "https://github.com/ZhenyaUsenko/motoko-hash-map#v9.0.1@10b68f6ea8df5e72dfa4c07a50c8bb60a916c233"
+candy_0_3_0 = "https://github.com/icdevs/candy_library#v0.3.0@907a4e7363aac6c6a4e114ebc73e3d3f21e138af"
+stablebuffer = "https://github.com/skilesare/StableBuffer#v0.2.0@110660769d11ba93c618dc4712525d20503bdc37"
+stablebuffer_1_3_0 = "https://github.com/canscale/StableBuffer#v1.3.0@acdde6bb5b939227997cebdbb8919d2e6da8691c"
+encoding_0_4_1 = "https://github.com/aviate-labs/encoding.mo#v0.4.1@2711d18727e954b11afc0d37945608512b5fbce2"
+stable-write-only = "https://github.com/skilesare/StableWriteOnly.mo#v0.1.0@02e9aac74bdbed86b52ebed985d82b6ef66a76d8"
+cert = "https://github.com/nomeata/ic-certification#v0.1.3@c403ffec0a60f658a1009976c785aa567ff0da77"
+vector = "0.2.0"
+rep-indy-hash = "0.1.1"
+icrc3-mo = "0.2.4"
+icrc37-mo = "0.4.1"
+icrc7-mo = "0.4.0"
+
+[dev-dependencies]
+test = "2.0.0"
+fuzz = "0.2.1"
+matchers = "https://github.com/kritzcreek/motoko-matchers#v1.3.0@3dac8a071b69e4e651b25a7d9683fe831eb7cffd"

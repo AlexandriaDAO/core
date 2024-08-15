@@ -4,7 +4,5 @@ members = [
     "src/bookmarks",
     "src/icp_swap",
     "src/tokenomics",
-    "src/icrc7",
-    "src/icrc7_archive",
 ]
 resolver = "2"
