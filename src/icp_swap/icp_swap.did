@@ -1,35 +1,30 @@
 type Result = variant { Ok : text; Err : text };
-type Result2 = variant { Ok : nat64; Err : text };
-
-type Principal = principal;
-
-type Tokens = record { e8s : nat64 };
-type Stake = record {
-    amount: nat64;
-    time: nat64;
-    reward_icp:nat64;
-};
-
-service : {
-  canister_account : () -> (vec nat8) query;
-  swap : (nat64) -> (Result);
+type Result_1 = variant { Ok : nat; Err : text };
+type Result_2 = variant { Ok : nat64; Err : text };
+type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
+service : () -> {
   burn_LBRY : (nat64) -> (Result);
-  stake_ALEX:(nat64)->(Result);
-  un_stake_all_ALEX:()->(Result);
-  un_stake_ALEX:(nat64)->(Result);
-  distribute_reward:()->(Result);
-  claim_icp_reward:()->(Result);
-
-  get_all_stakes: () -> (vec record { principal; Stake }) query;
-  get_stake : (user : Principal) -> (opt Stake) query;
-  get_total_staked:()->(nat64) query;
-  caller_subaccount:()->(text) query;
+  burn_token : (nat64) -> (Result_1);
+  caller_subaccount : () -> (text) query;
+  claim_icp_reward : () -> (Result);
+  deposit_icp_in_canister : (nat64) -> (Result_2);
+  deposit_token : (nat64) -> (Result_1);
+  distribute_reward : () -> (Result);
+  distribute_reward_wrapper : () -> ();
+  get_all_stakes : () -> (vec record { principal; Stake }) query;
   get_current_LBRY_ratio : () -> (text) query;
   get_current_staking_reward_percentage : () -> (text) query;
-  get_total_unclaimed_icp_reward:()->(nat64) query;
-  get_total_icp_avialable:()->(nat64) query;
-  get_maximum_LBRY_burn_allowed:()->(Result2) query;
+  get_maximum_LBRY_burn_allowed : () -> (Result_2) query;
+  get_stake : (principal) -> (opt Stake) query;
+  get_total_icp_avialable : () -> (nat64) query;
+  get_total_staked : () -> (nat64) query;
+  get_total_unclaimed_icp_reward : () -> (nat64) query;
+  mint_ALEX : (nat64, principal) -> (Result);
+  mint_LBRY : (nat64) -> (Result_1);
+  send_icp : (principal, nat64) -> (Result_2);
+  stake_ALEX : (nat64) -> (Result);
+  swap : (nat64) -> (Result);
+  un_stake_ALEX : (nat64) -> (Result);
+  un_stake_all_ALEX : () -> (Result);
+  withdraw_token : (nat64) -> (Result_1);
 }
-
-
-

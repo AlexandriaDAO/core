@@ -131,15 +131,15 @@ dfx canister call icrc7 icrcX_mint "(
             value = variant {
               Text = \"https://images-assets.nasa.gov/image/PIA18249/PIA18249~orig.jpg\"
             };
-            name = \"icrc7:metadata:uri:asset\";
+            name = \"icrc7:metadata:uri:transactionId\";
             immutable = true;
           };
           record {
             value = variant {
-              Text = \"true\"
+              Text = \"false\"
             };
             name = \"icrc7:metadata:verified\";
-            immutable = true;
+            immutable = false;
           };
         }
       };
