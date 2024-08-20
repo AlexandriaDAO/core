@@ -22,6 +22,12 @@
       "type": "motoko",
       "specified_id": "fjqb7-6qaaa-aaaak-qc7gq-cai"
     },
+    "nft_manager": {
+      "candid": "src/nft_manager/nft_manager.did",
+      "package": "nft_manager",
+      "type": "rust",
+      "specified_id":"forhl-tiaaa-aaaak-qc7ga-cai"
+    },
     "internet_identity": {
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"

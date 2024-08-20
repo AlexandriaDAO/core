@@ -1,5 +1,5 @@
 import { ActorSubclass } from '@dfinity/agent';
-import { _SERVICE } from '../../../../../declarations/alex_backend/alex_backend.did';
+import { _SERVICE as _SERVICENFTMANAGER } from '../../../../../declarations/nft_manager/nft_manager.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from '@/store';
 import { getBooks } from '@/utils/irys';
@@ -9,11 +9,11 @@ import { Book } from '@/features/portal/portalSlice';
 const fetchEngineBooks = createAsyncThunk<
     Book[], // This is the return type of the thunk's payload
     {
-        actor: ActorSubclass<_SERVICE>,
+        actorNftManager: ActorSubclass<_SERVICENFTMANAGER>,
         engine: string
     }, //Argument that we pass to initialize
     { rejectValue: string, state: RootState }
->("engineBooks/fetchEngineBooks", async ({actor, engine}, { rejectWithValue, getState }) => {
+>("engineBooks/fetchEngineBooks", async ({actorNftManager, engine}, { rejectWithValue, getState }) => {
     try {
         const {portal: {books}} = getState();
 
@@ -22,7 +22,7 @@ const fetchEngineBooks = createAsyncThunk<
             throw new Error('Invalid engine provided');
         }
 
-        const result = await actor.get_nfts_of(engine);
+        const result = await actorNftManager.get_nfts_of(engine);
 
         if ('Err' in result) {
             console.log('Error fetching NFTs', result.Err);
@@ -31,6 +31,7 @@ const fetchEngineBooks = createAsyncThunk<
 
         if('Ok' in result){
             if(books.length>0){
+                //@ts-ignore
                 const manifestIds = result.Ok.map(token=>token.description)
                 return books.filter(book=> manifestIds.includes(book.manifest));
             }

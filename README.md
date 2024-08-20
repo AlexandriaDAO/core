@@ -36,14 +36,23 @@ sudo apt-get upgrade nodejs`
     - [Minting Process](#minting-process)
     - [Distribution Mechanics](#distribution-mechanics)
     - [Utility](#utility)
-- [Part 3: Non-Fungible Tokens Economics And Mechanics](#part-3-non-fungible-tokens-economics-and-mechanics)
+- [Part 3: Non-Fungible Tokens Economics And Mechanics](#part-3-nft-economics-and-mechanics)
   - [NFTs](#nfts)
     - [Ebook NFTs](#ebook-nfts)
     - [Other NFTs](#other-nfts)
   - [SBTs](#sbts)
   - [References](#references)
 - [Part 4: Ecosystem](#part-4-ecosystem)
-  - [Becoming a Librarian](#becoming-a-librarian)
+  - [Bibliotheca (library)](#bibliotheca-library)
+  - [Syllogos (aggregate)](#syllogos-aggregate)
+  - [Lexigraph (write)](#lexigraph-write)
+  - [Dialectica (debate)](#dialectica-debate)
+  - [Alexandrian (explore)](#alexandrian-explore)
+  - [Emporium (trade)](#emporium-trade)
+- [Part 5: Architecture & Governance](#part-5-architecture--governance)
+  - [Governance](#governance)
+  - [Canister Architecture](#canister-architecture)
+  - [Internet of Books](#internet-of-books)
 
 
 ## Introduction
@@ -207,7 +216,7 @@ Staked ALEX is also used for DAO voting via our governance mechanism, but voting
 
 There's no utility other than voting. There's no value other than staking revshare.
 
-## Part 3: Non-Fungible Tokens Economics And Mechanics
+## Part 3: NFT Economics And Mechanics
 
 In Alexandria, everything you see is owned by someone in some way. This ownership is of three forms: 
 
@@ -397,6 +406,10 @@ This section will have lots more details at a future time.
 
 ### Canister Architecture
 
+Each of the following subsections are canisters in our codebase.
+
+*Eventually this will all be in a diagram, but things are changing too rapidly atm.*
+
 ALEX: Token canister (backholed)
 
 alex_backend: Main logic backend.
@@ -405,13 +418,46 @@ bookmarks: Main storage backend.
 
 icp_swap: LBRY management canister for swapping and staking tokens.
 
-icrc7: NFT canister.
 
 LBRY: Token canister (blackholed)
 
 Tokenomics: Logic controlling ALEX minting.
 
-DAO Canister: TBD.
+# icrc7
+*Status: Live & Complete | Current & Future Controller: nft_manager*
+
+Based on the icrc7 implementation by [PanIndustrial](https://github.com/PanIndustrial-Org/icrc_nft.mo), done in Motoko, chosen for it's extensibility with icrc3 and icrc37.
+
+Special features:
+  - Deployer is approved for mint and transfers of every NFT in the collection.
+  - NFTs are designed with mutability in mind, so NFTs can be changed and overwritten.
+
+While these features would normally be vulnerabilities for conventional collections, they are an asset for Alexandria NFTs because the 'deployer' is a DAO-controlled canister. This ability to transfer and change NFTs is exclusively delegated to a canister, which is what allows each NFT to control its own wallet, collect revenue, and disperse only to its true owner.
+
+icrc7 also includes its own archives, having a full record of transactions and their history.
+
+### nft_manager
+*Status: Incomplete | Current Controller: 2jgt...bqe | Future Controller: DAO/Blackholled???
+
+Sole controller of the icrc7 canister.
+
+Function: 
+  - Deploys and initializes the icrc7 canister at launch.
+  - Mints NFTs if propper LBRY is sent, and tx_id exists on ArWeave
+  - Has a voting process to verify NFTs.
+  - Updates NFTs if verfied by a vote.
+  - Transfers NFTs to a rightful owner if mandated by a vote.
+  - Creates and manages NFT wallets.
+  - Allowed verfied owners to withdraw funds from their NFT's wallets.
+
+It's like a MiniDAO just for the NFT collection.
+
+todo:
+- Move deployment from main backend to a new canister.
+- change setup to mint nfts through it, update nfts, transfer nfts.
+- Start working on the wallets, get a wallet for each NFT.
+- Get withdrawal working for verified NFTs.
+- Make a voting system for it.
 
 ## Internet of Books
 
@@ -422,3 +468,22 @@ It's like bittorrent and IPFS, except all the content is owned and incentivized.
 It's like Facebook and Google, except anyone can plug into and use it.
 
 It's the entire dream of Web3, in one project. What will you do with it?
+
+
+
+
+
+
+## Patterns and Standards (for contributions)
+
+
+### Accessing a new Canister from the Frontend.
+
+Add it to the following files with the existing patterns:
+    (1) src/alex_frontend/src/contexts/SessionContext.tsx
+    (2) src/alex_frontend/src/features/auth/utils/authUtils.tsx
+    (3) src/alex_frontend/src/providers/SessionProvider.tsx
+
+We use 2 patterns when calling actor functions: Implemented with `const { actor } = useSession();` via SessionContext.tsx or `createAsyncThunk`... via Redux? When should we use which? 
+
+todo before next push: Fix fetchBooks.ts, fetchEngineBooks.ts, and irys.tsx

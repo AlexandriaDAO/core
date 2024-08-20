@@ -4,5 +4,6 @@ members = [
     "src/bookmarks",
     "src/icp_swap",
     "src/tokenomics",
+    "src/nft_manager",
 ]
 resolver = "2"
