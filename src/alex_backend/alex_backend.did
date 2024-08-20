@@ -1,4 +1,3 @@
-type DeployResult = variant { Ok; Err : text };
 type Engine = record {
   id : text;
   key : text;
@@ -25,9 +24,7 @@ type Node = record {
 type NodeStatus = variant { Active; InActive };
 type Result = variant { Ok : Engine; Err : text };
 type Result_1 = variant { Ok : Node; Err : text };
-type Result_2 = variant { Ok : nat; Err : text };
-type Result_3 = variant { Ok; Err : text };
-type Result_4 = variant { Ok : text; Err : text };
+type Result_2 = variant { Ok; Err : text };
 type SourceCard = record {
   title : text;
   user_query : text;
@@ -44,13 +41,11 @@ service : {
   add_my_node : (text, text, opt nat8) -> (Result_1);
   add_node : (text, text, text, opt nat8) -> (Node);
   bookmark_sc : (nat64) -> ();
-  current_mint : () -> (Result_2);
   delete_engine : (text) -> (bool);
-  delete_keys : (nat8) -> (Result_3);
-  delete_librarian : () -> (Result_3);
+  delete_keys : (nat8) -> (Result_2);
+  delete_librarian : () -> (Result_2);
   delete_node : (text) -> (bool);
   delete_sc : (nat64) -> ();
-  deploy_icrc7 : () -> (DeployResult);
   get_all_librarians : () -> (vec Librarian) query;
   get_bookmarks : () -> (vec opt SourceCard) query;
   get_engine_by_id : (text) -> (opt Engine) query;
@@ -71,11 +66,9 @@ service : {
   get_nodes_not_owned_by_me : () -> (vec Node) query;
   get_random_librarian : () -> (opt Librarian) query;
   get_sc : (nat64) -> (opt SourceCard) query;
-  initialize_icrc7 : () -> (DeployResult);
   is_librarian : () -> (bool) query;
-  mint_nft : (text) -> (Result_4);
-  save_keys : (text, text, nat8) -> (DeployResult);
-  save_librarian : (text) -> (DeployResult);
+  save_keys : (text, text, nat8) -> (Result_2);
+  save_librarian : (text) -> (Result_2);
   save_sc : (text, text, text, text, text, text) -> (nat64);
   update_engine_status : (text, nat8) -> (Result);
   update_node_status : (text, nat8) -> (Result_1);

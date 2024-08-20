@@ -1,70 +1,9 @@
-// use candid::{Nat, Principal, CandidType};
-// use ic_cdk::api::call::CallResult;
-// use ic_cdk::caller;
-// use std::fmt::Debug;
-
-
-
-// #[derive(CandidType, serde::Deserialize, Clone, Debug)]
-// struct Account {
-//     owner: Principal,
-//     subaccount: Option<Vec<u8>>,
-// }
-
-// #[derive(CandidType)]
-// struct MintArg {
-//     to: Account,
-//     token_id: Nat,
-//     memo: Option<Vec<u8>>,
-//     from_subaccount: Option<Vec<u8>>,
-//     token_description: Option<String>,
-//     token_logo: Option<String>,
-//     token_name: Option<String>,
-// }
-
-// #[ic_cdk::update]
-// pub async fn mint_nft(description: String) -> Result<String, String> {
-//     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
-//         .expect("Invalid ICRC7 canister ID");
-
-//     let total_supply = current_mint().await?;
-
-//     let new_token_id = total_supply + Nat::from(1u64);
-
-//     let mint_arg = MintArg {
-//         to: Account {
-//             owner: caller(),
-//             subaccount: Some(vec![0; 32]), // Default subaccount
-//         },
-//         token_id: new_token_id.clone(),
-//         memo: None,
-//         from_subaccount: None,
-//         token_description: Some(description),
-//         token_logo: None,
-//         token_name: None,
-//     };
-
-//     // Call the mint function on the ICRC7 canister
-//     let call_result: CallResult<()> = ic_cdk::call(
-//         icrc7_canister_id,
-//         "icrcX_mint",
-//         (mint_arg,)
-//     ).await;
-
-//     match call_result {
-//         Ok(()) => Ok(format!("NFT minted successfully with token ID: {}", new_token_id)),
-//         Err((code, msg)) => Err(format!("Error calling mint: {:?} - {}", code, msg))
-//     }
-// }
-
-
-
-
-
 use candid::{Nat, Principal, CandidType, Encode, Decode};
 use ic_cdk::api::call::CallResult;
 use ic_cdk::caller;
 use serde::{Deserialize, Serialize};
+
+
 
 #[derive(CandidType, Serialize)]
 struct Account {
@@ -107,6 +46,13 @@ struct SetNFTItemRequest {
 enum SetNFTResult {
     Ok(Option<Nat>),
     Err(String), // Simplified error type, adjust as needed
+}
+
+#[derive(CandidType, serde::Deserialize, Debug, Clone)]
+pub struct TokenDetail {
+    token_id: u32,
+    owner: String,
+    description: String,
 }
 
 #[ic_cdk::update]
@@ -175,71 +121,6 @@ pub async fn mint_nft(description: String) -> Result<String, String> {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-// should mirror this: 
-
-// dfx canister call icrc7 icrcX_mint "(
-//     vec {
-//       record {
-//         token_id = 3 : nat;
-//         owner = opt record { owner = principal \"$BOB_PRINCIPAL\"; subaccount = null;};
-//         metadata = variant {
-//           Class = vec {
-//             record {
-//               value = variant {
-//                 Text = \"https://images-assets.nasa.gov/image/PIA18249/PIA18249~orig.jpg\"
-//               };
-//               name = \"icrc7:metadata:uri:transactionId\";
-//               immutable = true;
-//             };
-//             record {
-//               value = variant {
-//                 Text = \"false\"
-//               };
-//               name = \"icrc7:metadata:verified\";
-//               immutable = false;
-//             };
-//           }
-//         };
-//         override = true;
-//       };
-//     },
-//   )"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #[ic_cdk::update]
 async fn current_mint() -> Result<Nat, String> {
     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
@@ -259,20 +140,6 @@ async fn current_mint() -> Result<Nat, String> {
 
 
 
-
-
-// use std::collections::BTreeMap;
-// use icrc_ledger_types::icrc::generic_value::Value;
-
-
-
-
-// #[derive(CandidType, serde::Deserialize, Debug, Clone)]
-// pub struct TokenDetail {
-//     token_id: u32,
-//     owner: String,
-//     description: String,
-// }
 
 // // Function to get all token IDs
 // async fn get_tokens() -> Result<Vec<Nat>, String> {
@@ -424,13 +291,6 @@ async fn current_mint() -> Result<Nat, String> {
 //     // Return the array of matching NFTs
 //     Ok(matching_nfts)
 // }
-
-
-
-
-
-
-
 
 
 
