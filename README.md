@@ -442,7 +442,7 @@ icrc7 also includes its own archives, having a full record of transactions and t
 Sole controller of the icrc7 canister.
 
 Function: 
-  - Deploys and initializes the icrc7 canister at launch.
+  - DONE: Deploys and initializes the icrc7 canister at launch.
   - Mints NFTs if propper LBRY is sent, and tx_id exists on ArWeave
   - Has a voting process to verify NFTs.
   - Updates NFTs if verfied by a vote.
@@ -459,15 +459,33 @@ todo:
 - Get withdrawal working for verified NFTs.
 - Make a voting system for it.
 
-## Internet of Books
+### Inspiration
 
-Alexandria is a universal content bed for the Internet. 
+'AI' was kept out of this whitepaper entirely, despite it being at the core of Alexandria's founding vision.
 
-It's like bittorrent and IPFS, except all the content is owned and incentivized.
+This project was born out of pilot project called UncensoredGreats where you'd chat with great authors in an uncensored way. The great finding of this experiment: An AI fed an author's words directly and NOT the user's prompt was far more interesting. In other words, a technique was used to output particular human thoughs rather than aggregate ones from training data is far more condusive to discovery.
 
-It's like Facebook and Google, except anyone can plug into and use it.
+As AI models grow in size and complexity, the outputs will grow more generic, and our uncensored methodology more fruitful. This direction goes against the grain of the entire AI space, but it steadfast in what we see as a deeper truth about computer science, a principle exemplified by the story of one early internet legend.
 
-It's the entire dream of Web3, in one project. What will you do with it?
+#### The Hyperlink Paridigm
+
+In 1968, Doug Engelbart and his team presented “A Research Center for Augmenting Human Intellect” in San Francisco’s Civic Auditorium. It introduced:
+
+(1) A responsive human-machine interface.
+(2) The computer mouse.
+(3) Copy/paste and text re-organization.
+(4) Hyperlinks.
+(5) Real-time screen-sharing collaboration.
+
+Most remember this as the “Mother of all Demos” for obvious reasons. What most forget about Engelbart’s story though, is the two decades preceding this demo, where he was at best, refused help, and at worst outright ridiculed by colleagues for holding that computers would be “tools for collaboration and augmentation” instead of Artificial Intelligence.
+
+During the 1950s and 60s, the entire CS field was convinced that the primary use case of computation was autonomous machines ad AI, while Doug held that computers would be tools for humans to interphase with. Despite 70 years of evidence of the same trajectory, popular opinion has not budged an inch. We see recent breakthroughs in AI through Engelbart's eyes, as history repeating itself.
+
+Engelbart's design was one webpage and a hyperlink for two. It's now for 200 million sites and 3.5 billion people. The design couldn't be perfect: Webpages change, hyperlinks disappear, both can be lost, stolen, or hacked, and neither can be truly owned or trusted.
+
+Alexandria is not an AI startup, but a universal content bed for the internet with "tools for collaboration and augmentation." Really we're just upgrading Doug's stack to.
+
+![Mother of all Demos (1968)](https://www.darpa.mil/DDM_Gallery/19968b_MOAD_619x316.jpg)
 
 
 

@@ -1,3 +1,4 @@
+type Account = record { owner : principal; subaccount : opt blob };
 type DeployResult = variant { Ok; Err : text };
 type Result = variant { Ok : nat; Err : text };
 type Result_1 = variant { Ok : vec TokenDetail; Err : text };
@@ -7,6 +8,11 @@ type TokenDetail = record {
   owner : text;
   description : text;
 };
+type TransferArgs = record {
+  mint_number : nat64;
+  to_account : Account;
+  amount : nat;
+};
 service : {
   current_mint : () -> (Result);
   deploy_icrc7 : () -> (DeployResult);
@@ -14,4 +20,5 @@ service : {
   get_nfts_of : (text) -> (Result_1);
   initialize_icrc7 : () -> (DeployResult);
   mint_nft : (text) -> (Result_2);
+  transfer : (TransferArgs) -> (Result);
 }
