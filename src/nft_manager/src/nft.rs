@@ -140,23 +140,7 @@ async fn current_mint() -> Result<Nat, String> {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// TODO: This will have to switch to call icrc7_get_metadata from a range.
 // Function to get all token IDs
 async fn get_tokens() -> Result<Vec<Nat>, String> {
     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai").expect("Invalid ICRC7 canister ID");
@@ -177,7 +161,6 @@ async fn get_tokens() -> Result<Vec<Nat>, String> {
         }
     }
 }
-
 
 // Function to get metadata for a specific token ID
 async fn get_metadata(token_id: Nat) -> Result<Option<BTreeMap<String, Value>>, String> {
