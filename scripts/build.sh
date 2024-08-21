@@ -18,7 +18,7 @@ dfx deps deploy internet_identity
 # Step 3: Deploy nft_manager, which deploys icrc7
 
 dfx canister create icrc7 --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai
-dfx build icrc7
+cargo build --package icrc7 --target wasm32-unknown-unknown
 
 cargo build --release --target wasm32-unknown-unknown --package nft_manager
 candid-extractor target/wasm32-unknown-unknown/release/nft_manager.wasm > src/nft_manager/nft_manager.did

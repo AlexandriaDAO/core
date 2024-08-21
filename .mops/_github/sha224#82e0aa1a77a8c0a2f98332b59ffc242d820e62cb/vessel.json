@@ -1,0 +1,1 @@
+{"dependencies":[{"name":"base","repo":"https://github.com/dfinity/motoko-base#e0c95f909e17c431921f1be35800242a6ddd4a55","version":""},{"name":"sha256","repo":"https://github.com/enzoh/motoko-sha#9e2468f51ef060ae04fde8d573183191bda30189","version":""}],"dev-dependencies":[]}
