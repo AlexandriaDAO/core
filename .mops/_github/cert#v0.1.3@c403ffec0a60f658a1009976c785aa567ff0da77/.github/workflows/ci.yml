@@ -1,0 +1,47 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: "install wasmtime"
+      run: |
+       mkdir /home/runner/bin
+       echo "/home/runner/bin" >> $GITHUB_PATH
+       wget https://github.com/bytecodealliance/wasmtime/releases/download/v0.18.0/wasmtime-v0.18.0-x86_64-linux.tar.xz
+       tar xf wasmtime-v0.18.0-x86_64-linux.tar.xz
+       cp wasmtime-v0.18.0-x86_64-linux/wasmtime /home/runner/bin/wasmtime
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: "install vessel and mops"
+      run: |
+       wget --output-document /home/runner/bin/vessel https://github.com/dfinity/vessel/releases/download/v0.7.0/vessel-linux64
+       chmod +x /home/runner/bin/vessel
+       npm i -g ic-mops
+    - name: "check"
+      run: make check-strict
+    - name: "test"
+      run: make test
+    - name: "docs"
+      run: make docs
+
+    - name: Cache ~/.cabal/store
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cabal/store
+        key: cabal-${{ runner.os }}-${{ hashFiles('gen-tests/*.cabal', 'gen-tests/cabal.project.freeze') }}
+        restore-keys: cabal-${{ runner.os }}-
+    - uses: haskell/actions/setup@v2
+      with:
+        ghc-version: 9.2.8
+        cabal-version: '3.8'
+    - name: Build gen-tests
+      run: cd gen-tests; cabal build
+    - name: Run gen-tests
+      run: cd gen-tests; cabal run gen-tests
+

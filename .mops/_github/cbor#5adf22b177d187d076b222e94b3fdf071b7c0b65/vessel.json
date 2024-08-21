@@ -1,0 +1,1 @@
+{"dependencies":[{"name":"base","repo":"https://github.com/dfinity/motoko-base#494824a2787aee24ab4a5888aa519deb05ecfd60","version":""},{"name":"xtended-numbers","repo":"https://github.com/edjcase/motoko_numbers#v1.0.2","version":""}],"dev-dependencies":[]}

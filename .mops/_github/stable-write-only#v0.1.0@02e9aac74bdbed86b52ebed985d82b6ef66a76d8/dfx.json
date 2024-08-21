@@ -1,0 +1,23 @@
+{
+  "canisters": {
+ 
+      "test_runner": {
+          "main": "testActor/test_runner.mo",
+          "type": "motoko",
+          "gzip": true
+      }
+    
+    },
+
+    "defaults": {
+        "build": {
+            "args": "",
+            "packtool": "mops sources"
+        },
+        "replica": {
+            "subnet_type": "application"
+        }
+    },
+    "dfx": "0.15.1",
+    "version": 1
+}

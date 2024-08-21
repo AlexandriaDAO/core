@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "dfx": "0.12.1",
+  "canisters": {},
+  "defaults": {
+    "build": {
+      "packtool": "vessel sources",
+      "args": ""
+    }
+  }
+}

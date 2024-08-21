@@ -1,0 +1,10 @@
+[package]
+name = "fuzz"
+version = "0.2.1"
+description = "Random data generator"
+repository = "https://github.com/ZenVoich/fuzz"
+keywords = [ "fuzz", "fuzzing", "random", "rnd", "rand" ]
+license = "MIT"
+
+[dependencies]
+base = "0.10.2"
