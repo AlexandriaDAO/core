@@ -21,6 +21,10 @@ sudo apt-get upgrade nodejs`
 - Add wasm: `rustup target add wasm32-unknown-unknown`
 - If in a new rust env: `Sudo apt install build-essential`
 
+motoko stuff:
+- https://mops.one/docs/install
+- npm i -g ic-mops
+
 
 # Alexandria WhitePaper
 
@@ -57,7 +61,7 @@ sudo apt-get upgrade nodejs`
 
 ## Introduction
 
-The Internet has come to rely almost exclusively on Big Tech services as its information aggregators. This tweet summs up the effects from this that we all feel every day:
+The Internet has come to rely almost exclusively on Big Tech services as its information aggregators. This tweet sums up the daily effect we feel from this:
 
 https://x.com/Noahpinion/status/1818776478315954200
 
@@ -410,20 +414,74 @@ Each of the following subsections are canisters in our codebase.
 
 *Eventually this will all be in a diagram, but things are changing too rapidly atm.*
 
-ALEX: Token canister (backholed)
+BIG QUESTIONS: 
+- How is ALEX canister minting from the tokenomics canister if the minting account is a dfx prinicipal?
+  - Should we deploy the ALEX canister from the tokenomics canister, or should we deploy pre mint the full 21 million ALEX to the tokenomics canister with the minting address, or leave it open ended with a minting account? What's most secure?
+- Same questions for LBRY.
+- Need to create an issue that allows the alex_backend to refill canisters with the ICP in the staking pool.
 
-alex_backend: Main logic backend.
+### alex_frontend (Typescript: xo3nl-yaaaa-aaaap-abl4q-cai) | Current Controller: 2jgt...bqe | Future Controller: 2jgt...bqe or MultiSig Harware Wallet or DAO
 
-bookmarks: Main storage backend.
+It's the whole frontend. It changes too much right now and does not have a direct path to decentralization until Alexandria launches a DAO. 
 
-icp_swap: LBRY management canister for swapping and staking tokens.
+### alex_backend (Rust: xj2l7-vyaaa-aaaap-abl4a-cai) | Current Controller: 2jgt...bqe | Future Controller: 2jgt...bqe or MultiSig Harware Wallet or DAO
+
+Primary Functions:
+- Currently manages the storage of librarian principals, sbts, and wallet keys, but that will need to be moved to a storage canister with the vetkeys implementation.
+- Picks a random recent LBRY transaction which selects the sender and reciever accounts to mint ALEX to.
+- Handles cycles management by allowing use of staking pool funds to refill canister cycles.
+
+The purpose of alex_backend is to have mutable logic that will need to change with type contained and separated from data storage and immutable logic. For this reason it will remain under centralized control until we figure out how to put it under DAO control.
+
+### ALEX (7hcrm-4iaaa-aaaak-akuka-cai) | Current Controller: 2jgt...bqe | Future Controller: ???
+
+ALEX Token & Default NNS Implementation of ICRC1 and ICRC2
+
+Deploy params: 
+- token_name = "Alexandria"
+- token_symbol = "ALEX"
+- minting_account = ???
+- initial_balances = ??? (either none, or 21million to the tokenomics canister)
+- transfer_fee = 10_000
+- archive_options = record {
+    trigger_threshold = 2000;
+    num_blocks_to_archive = 1000;
+    controller_id = null;
+  };
+- icrc2 = true;
+
+### LBRY (hdtfn-naaaa-aaaam-aciva-cai) | Current Controller: 2jgt...bqe | Future Controller: ???
+
+LBRY Token & Default NNS Implementation of ICRC1 and ICRC2
+
+Deploy params: 
+- token_name = "Library Credits"
+- token_symbol = "LBRY"
+- minting_account = ???
+- initial_balances = null
+- transfer_fee =  4_000_000 (0.04 LBRY)
+- archive_options = record {
+    trigger_threshold = 2000;
+    num_blocks_to_archive = 1000;
+    controller_id = null;
+  };
+- icrc2 = true
 
 
-LBRY: Token canister (blackholed)
+### bookmarks (sklez-7aaaa-aaaan-qlrva-cai)
 
-Tokenomics: Logic controlling ALEX minting.
+storage and management for all the SBT ownership and payments. Details tbd but will follow much of the logic of the nft managment canister.
 
-# icrc7
+
+### icp_swap: (5qx27-tyaaa-aaaal-qjafa-cai) | Current controller: ... | Future Controller: ...
+
+Details being finalized.
+
+### tokenomics: (uxyan-oyaaa-aaaap-qhezq-cai) | Current controller: ... | Future Controller: ...
+
+Details being finalized.
+
+### icrc7
 *Status: Live & Complete | Current & Future Controller: nft_manager*
 
 Based on the icrc7 implementation by [PanIndustrial](https://github.com/PanIndustrial-Org/icrc_nft.mo), done in Motoko, chosen for it's extensibility with icrc3 and icrc37.
@@ -443,12 +501,12 @@ Sole controller of the icrc7 canister.
 
 Function: 
   - DONE: Deploys and initializes the icrc7 canister at launch.
-  - Mints NFTs if propper LBRY is sent, and tx_id exists on ArWeave
-  - Has a voting process to verify NFTs.
-  - Updates NFTs if verfied by a vote.
-  - Transfers NFTs to a rightful owner if mandated by a vote.
-  - Creates and manages NFT wallets.
-  - Allowed verfied owners to withdraw funds from their NFT's wallets.
+  - DONE: Creates NFT wallets and allows owners to widthraw from them.
+  - DONE: Allowed verfied owners to withdraw funds from their NFT's wallets.
+  - IP: Mints NFTs if propper LBRY is sent, and tx_id exists on ArWeave
+  - IP: Has a voting process to verify NFTs.
+  - IP: Updates NFTs if verfied by a vote.
+  - IP: Transfers NFTs to a rightful owner if mandated by a vote.
 
 It's like a MiniDAO just for the NFT collection.
 
@@ -463,9 +521,9 @@ todo:
 
 'AI' was kept out of this whitepaper entirely, despite it being at the core of Alexandria's founding vision.
 
-This project was born out of pilot project called UncensoredGreats where you'd chat with great authors in an uncensored way. The great finding of this experiment: An AI fed an author's words directly and NOT the user's prompt was far more interesting. In other words, a technique was used to output particular human thoughs rather than aggregate ones from training data is far more condusive to discovery.
+This project was born out of pilot project called UncensoredGreats where you'd chat with great authors in an uncensored way. There was one finding of this experiment that shaped Alexandria: When an AI is fed author words directly, and forced to answer without knowledge of the user's question, responses became far more interesting and honest. In other words, a technique to output particular human thoughts from training data rather than aggregate ones is far more condusive to discovery.
 
-As AI models grow in size and complexity, the outputs will grow more generic, and our uncensored methodology more fruitful. This direction goes against the grain of the entire AI space, but it steadfast in what we see as a deeper truth about computer science, a principle exemplified by the story of one early internet legend.
+As AI models grow in size and complexity, the outputs will grow more generic, and our uncensored methodology more fruitful. This direction goes against the grain of the entire AI space, but it steadfast in what we see as a longstanding principle of computer science, exemplified by the story of one early internet legend.
 
 #### The Hyperlink Paridigm
 
@@ -477,13 +535,13 @@ In 1968, Doug Engelbart and his team presented “A Research Center for Augmenti
 (4) Hyperlinks.
 (5) Real-time screen-sharing collaboration.
 
-Most remember this as the “Mother of all Demos” for obvious reasons. What most forget about Engelbart’s story though, is the two decades preceding this demo, where he was at best, refused help, and at worst outright ridiculed by colleagues for holding that computers would be “tools for collaboration and augmentation” instead of Artificial Intelligence.
+Most remember this as the “Mother of all Demos” for obvious reasons. What most forget about Engelbart’s experience in the two decades preceding this demo, where he was at best refused help, and at worst outright ridiculed for holding that computers would be “tools for collaboration and augmentation” instead of Artificial Intelligence (a story best told in *What the Dormouse Said*).
 
-During the 1950s and 60s, the entire CS field was convinced that the primary use case of computation was autonomous machines ad AI, while Doug held that computers would be tools for humans to interphase with. Despite 70 years of evidence of the same trajectory, popular opinion has not budged an inch. We see recent breakthroughs in AI through Engelbart's eyes, as history repeating itself.
+During the 1950s and 60s, the entire CS field was convinced that the primary use case of computation was autonomous machines ad AI, while Doug held that computers would be tools for humans to interphase with. Despite 70 years of evidence of that same trajectory, popular opinion has not budged an inch. As this decade of tech becomes the gold rush for blowing smoke with AI buzzwords, we see recent breakthroughs in AI through Engelbart's eyes, as history's next big tool that we need a human-centric interface for.
 
-Engelbart's design was one webpage and a hyperlink for two. It's now for 200 million sites and 3.5 billion people. The design couldn't be perfect: Webpages change, hyperlinks disappear, both can be lost, stolen, or hacked, and neither can be truly owned or trusted.
+Engelbart's design was one webpage and a hyperlink for two. It's now for 200 million sites and 3.5 billion people. The design isn't perfect: Webpages change, hyperlinks disappear, both can be lost, stolen, or hacked, and neither can be truly owned or trusted.
 
-Alexandria is not an AI startup, but a universal content bed for the internet with "tools for collaboration and augmentation." Really we're just upgrading Doug's stack to.
+Alexandria is a universal content bed for the internet. While the world works to make AI the perfect tool, like Dougs peers did with compute machines; we're building a control room that puts humans at their helm, just like Doug's "tools for collaboration and augmentation." Really we're just migrating Doug's stack to Web3.
 
 ![Mother of all Demos (1968)](https://www.darpa.mil/DDM_Gallery/19968b_MOAD_619x316.jpg)
 
