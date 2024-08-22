@@ -58,12 +58,17 @@ pub struct TokenDetail {
 
 
 #[ic_cdk::update]
-pub async fn mint_nft(description: String) -> Result<String, String> {
+// pub async fn mint_nft(description: String) -> Result<String, String> {
+pub async fn mint_nft(description: String, minting_number: Option<u64>) -> Result<String, String> {
     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
         .expect("Invalid ICRC7 canister ID");
 
     let total_supply = current_mint().await?;
-    let new_token_id = total_supply + Nat::from(1u64);
+    // let new_token_id = total_supply + Nat::from(1u64);
+    let new_token_id = match minting_number {
+        Some(number) => Nat::from(number),
+        None => total_supply + Nat::from(1u64),
+    };
 
     let nft_request = SetNFTItemRequest {
         token_id: new_token_id.clone(),
@@ -84,7 +89,7 @@ pub async fn mint_nft(description: String) -> Result<String, String> {
             },
         ]),
         memo: None,
-        override_: true,
+        override_: false,
         created_at_time: Some(ic_cdk::api::time()),
     };
 

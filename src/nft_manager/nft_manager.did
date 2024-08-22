@@ -1,24 +1,22 @@
-type Account = record { owner : principal; subaccount : opt blob };
 type DeployResult = variant { Ok; Err : text };
 type Result = variant { Ok : nat; Err : text };
 type Result_1 = variant { Ok : vec TokenDetail; Err : text };
-type Result_2 = variant { Ok : text; Err : text };
+type Result_2 = variant { Ok : TokenBalances; Err : text };
+type Result_3 = variant { Ok : text; Err : text };
+type Result_4 = variant { Ok : record { nat; nat }; Err : text };
+type TokenBalances = record { alex : nat; lbry : nat };
 type TokenDetail = record {
   token_id : nat32;
   owner : text;
   description : text;
-};
-type TransferArgs = record {
-  mint_number : nat64;
-  to_account : Account;
-  amount : nat;
 };
 service : {
   current_mint : () -> (Result);
   deploy_icrc7 : () -> (DeployResult);
   get_nfts : () -> (Result_1);
   get_nfts_of : (text) -> (Result_1);
+  get_token_balances : (nat) -> (Result_2);
   initialize_icrc7 : () -> (DeployResult);
-  mint_nft : (text) -> (Result_2);
-  transfer : (TransferArgs) -> (Result);
+  mint_nft : (text, opt nat64) -> (Result_3);
+  withdraw : (nat) -> (Result_4);
 }

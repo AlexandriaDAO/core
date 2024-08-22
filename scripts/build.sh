@@ -18,7 +18,7 @@ dfx deps deploy internet_identity
 # Step 3: Deploy nft_manager, which deploys icrc7
 
 dfx canister create icrc7 --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai
-cargo build --package icrc7 --target wasm32-unknown-unknown
+dfx build icrc7
 
 cargo build --release --target wasm32-unknown-unknown --package nft_manager
 candid-extractor target/wasm32-unknown-unknown/release/nft_manager.wasm > src/nft_manager/nft_manager.did
@@ -90,7 +90,7 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
 dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
   (variant {
     Init = record {
-      token_name = "LBRYs";
+      token_name = "Library Credits";
       token_symbol = "LBRY";
       minting_account = record {
         owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";

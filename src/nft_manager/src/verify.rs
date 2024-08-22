@@ -1,2 +1,1 @@
-// I need another mint function that changes the verifed field to true.
-
+// Change the verified field to true if the vote works out.
