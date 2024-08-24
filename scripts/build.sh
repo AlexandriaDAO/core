@@ -19,15 +19,12 @@ dfx deps deploy internet_identity
 
 dfx canister create icrc7 --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai
 dfx build icrc7
+dfx canister update-settings icrc7 --add-controller forhl-tiaaa-aaaak-qc7ga-cai
 
 cargo build --release --target wasm32-unknown-unknown --package nft_manager
 candid-extractor target/wasm32-unknown-unknown/release/nft_manager.wasm > src/nft_manager/nft_manager.did
 
 dfx deploy nft_manager --specified-id forhl-tiaaa-aaaak-qc7ga-cai
-dfx canister update-settings icrc7 --add-controller forhl-tiaaa-aaaak-qc7ga-cai
-
-dfx canister call nft_manager deploy_icrc7
-dfx canister call nft_manager initialize_icrc7
 
 # Step 4: Generate all other backend canisters.
 

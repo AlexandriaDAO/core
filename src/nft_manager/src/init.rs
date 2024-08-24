@@ -1,4 +1,7 @@
+use std::time::Duration;
+
 use candid::{Encode, CandidType, Principal};
+use ic_cdk_timers::set_timer;
 use serde::{Serialize, Deserialize};
 use ic_cdk::api::management_canister::main::{InstallCodeArgument, CanisterInstallMode};
 
@@ -18,8 +21,32 @@ pub enum DeployResult {
     Err(String),
 }
 
+
+// Triggers once, deploying icrc7, and never again.
+#[ic_cdk::init]
+fn init() {
+    set_timer(Duration::from_secs(1), post_init);
+}
+
 #[ic_cdk::update]
-pub async fn deploy_icrc7() -> DeployResult {
+fn post_init() {
+    ic_cdk::spawn(async {
+        match deploy_icrc7().await {
+            DeployResult::Ok => {
+                ic_cdk::println!("ICRC7 deployed successfully");
+                match initialize_icrc7().await {
+                    Ok(()) => ic_cdk::println!("ICRC7 initialized successfully"),
+                    Err(e) => ic_cdk::println!("Failed to initialize ICRC7: {}", e),
+                }
+            },
+            DeployResult::Err(e) => ic_cdk::println!("Failed to deploy ICRC7: {}", e),
+        }
+    });
+}
+
+
+#[ic_cdk::update]
+async fn deploy_icrc7() -> DeployResult {
     let canister_id = match Principal::from_text(ICRC7_CANISTER_ID) {
         Ok(id) => id,
         Err(e) => return DeployResult::Err(format!("Invalid canister ID: {}", e)),
@@ -40,7 +67,7 @@ pub async fn deploy_icrc7() -> DeployResult {
 
     // Install the ICRC7 code
     let install_args = InstallCodeArgument {
-        mode: CanisterInstallMode::Reinstall,
+        mode: CanisterInstallMode::Install,
         canister_id,
         wasm_module: ICRC7_WASM.to_vec(),
         arg: encoded_args,
@@ -53,7 +80,7 @@ pub async fn deploy_icrc7() -> DeployResult {
 }
 
 #[ic_cdk::update]
-pub async fn initialize_icrc7() -> Result<(), String> {
+async fn initialize_icrc7() -> Result<(), String> {
     let canister_id = Principal::from_text(ICRC7_CANISTER_ID)
         .map_err(|e| format!("Invalid canister ID: {:?}", e))?;
 
@@ -66,4 +93,3 @@ pub async fn initialize_icrc7() -> Result<(), String> {
         Err((code, msg)) => Err(format!("Failed to initialize ICRC7: {:?} - {}", code, msg)),
     }
 }
-
