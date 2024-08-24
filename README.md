@@ -28,6 +28,12 @@ motoko stuff:
 
 # Alexandria WhitePaper
 
+> *"There are lots of entrepreneurs and investors that want to build interesting new services. The problem is, often times those interesting new internet services would depend upon content, functionality, and user data owned that exists inside of proprietary services, owned and controlled by Big Tech."*
+> 
+> — Dominic Williams, DFINITY founder on ["The Internet Computer Vision"](https://youtu.be/DYVPq_vMB8w?si=w_jopM2o22UQjqwH)
+
+**tldr: Alexandria is the bridge and library for all Web2 content, functionality, and user data; so Web3 stacks don't have to start from scratch.**
+
 ## Table of Contents
 - [Introduction](#introduction)
 - [Project Overview](#project-overview)
@@ -67,16 +73,15 @@ https://x.com/Noahpinion/status/1818776478315954200
 
 The Static Web1 that was supposed to unlock the worlds information became buried by the Social Web2, sending 95-99% of digital content to the ‘deep web’ where it's inaccessible through conventional means. Today, digital content that isn’t (1) search-engine optimized, (2) open-access, and (3) brand new, is basically forever lost.
 
-This paradigm stems from the Internets' ownership problem. Search engines don’t actually own what they point to, nor social platforms what they display, nor cloud providers what they host. Yet, their survival dpends on leveraging data as their own, blocking others from using it, optimizing for engagement over searchability, and disregarding the rights of creators. 
-Web3 is an Internet where everything digital is owned by someone. This has been achieved for money, e.g., Bitcoin; and to some extent for art with NFTs, but nowhere else. It seems everyone has given up the purist vision.
+This paradigm stems from an ownership problem. Search engines don’t actually own what they point to, nor social platforms what they display or cloud providers what they host. Yet, their survival dpends on leveraging data as their own.
 
-To give true ownership to a peice of content, you basically need to keep the original fixed supply of one while being able to distribute it infinitely. Put simply, you need to recreate the search, social, and hosting elements around making use of that original copy—so that’s what we’re doing.
+Web3 is the vision of an Internet where everything digital is owned by someone. This has been achieved for money, e.g., Bitcoin; and to some extent for art with NFTs, but nowhere else.
+
+To give true ownership to a peice of content, you basically need to keep the original fixed supply of one while being able to distribute it infinitely. This requires that you recreate the search, social, and hosting elements around making use of that original copy—so that’s what we’re doing.
 
 Alexandria is a library in cypherspace with all its information owned by individuals in the network, much like Bitcoin except for generic content instead of money. This begins with ebooks being owned and used as NFTs, but continues with any file type (video, audio, etc.), used in a suite of Open Internet Services.
 
-Alexandria is not so much about building a 'new Internet', but going backwards with Web3-level tools to that time where Web1 became Web2. It's the place to opt-out for people who think we took the wrong fork in the road.
-
-## Project Overview
+## Overview
 
 Alexandria quite literally strives to be the world's largest public library. At its core, anyone can come in and put a book on the shelf (or movie, song, podcast, etc.) and anyone else can come pick it up.
 
@@ -497,6 +502,7 @@ icrc7 also includes its own archives, having a full record of transactions and t
 ### nft_manager
 *Status: Incomplete | Current Controller: 2jgt...bqe | Future Controller: DAO/Blackholled???
 
+
 Sole controller of the icrc7 canister.
 
 Function: 
@@ -508,14 +514,18 @@ Function:
   - IP: Updates NFTs if verfied by a vote.
   - IP: Transfers NFTs to a rightful owner if mandated by a vote.
 
-It's like a MiniDAO just for the NFT collection.
 
 todo:
-- Move deployment from main backend to a new canister.
-- change setup to mint nfts through it, update nfts, transfer nfts.
-- Start working on the wallets, get a wallet for each NFT.
-- Get withdrawal working for verified NFTs.
-- Make a voting system for it.
+- Handle athentication for withdrawals.
+- Do update nfts, transfer nfts, burn NFTs.
+- Make a voting system.
+
+Code Review:
+- Added init config to init.rs, so that icrc7 is only deployed on first canister install.
+-- next lets check to ensure the deploy args match up.
+
+init.rs:
+
 
 ### Inspiration
 
