@@ -17,7 +17,8 @@ service : () -> {
   get_nfts_of : (text) -> (Result_1);
   get_token_balances : (nat) -> (Result_2);
   initialize_icrc7 : () -> (DeployResult);
-  mint_nft : (text, opt nat64) -> (Result_3);
+  mint_nft : (text, opt nat) -> (Result_3);
   post_init : () -> ();
+  verify_nft : (nat) -> (Result_3);
   withdraw : (nat) -> (Result_4);
 }

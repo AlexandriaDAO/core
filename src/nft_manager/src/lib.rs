@@ -1,5 +1,4 @@
 use icrc_ledger_types::icrc1::transfer::BlockIndex;
-use icrc_ledger_types::icrc1::account::Subaccount;
 
 use ic_cdk;
 use candid::{Nat, Principal};
