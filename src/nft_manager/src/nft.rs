@@ -1,3 +1,13 @@
+// Decide how we're going to choose the minting number. We going to find the gaps or just always go up by 1?
+// I think we should give random 10 digit minting numbers if not specified. If you want a specific minting number, you can see if it's availible and maybe pay extra for it.
+
+// The only one who should be allowed to call the mint function is the frontend canister.
+// All the other functions also need their access controls.
+// We'll figure this out along with payment because I don't know how we'll allow callers to be the minters while hooking it up to the frontend UID minter. Maybe we'll separate the arweave thing with the nft mint.
+
+
+// Get_nfts() fails out of range if one large mint# nft is minted.
+
 use candid::{Nat, Principal, CandidType, Encode, Decode};
 use ic_cdk::api::call::CallResult;
 use ic_cdk::caller;
@@ -23,13 +33,11 @@ struct PropertyShared {
 enum CandyShared {
     Text(String),
     Bool(bool),
-    // Add other variants as needed
 }
 
 #[derive(CandidType, Serialize)]
 enum NFTInput {
     Class(Vec<PropertyShared>),
-    // Add other variants as needed
 }
 
 #[derive(CandidType, Serialize)]
@@ -37,7 +45,6 @@ struct SetNFTItemRequest {
     token_id: Nat,
     owner: Option<Account>,
     metadata: NFTInput,
-    memo: Option<Vec<u8>>,
     #[serde(rename = "override")]
     override_: bool,
     created_at_time: Option<u64>,
@@ -58,13 +65,11 @@ pub struct TokenDetail {
 
 
 #[ic_cdk::update]
-// pub async fn mint_nft(description: String) -> Result<String, String> {
-pub async fn mint_nft(description: String, minting_number: Option<u64>) -> Result<String, String> {
+pub async fn mint_nft(description: String, minting_number: Option<Nat>) -> Result<String, String> {
     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
         .expect("Invalid ICRC7 canister ID");
 
     let total_supply = current_mint().await?;
-    // let new_token_id = total_supply + Nat::from(1u64);
     let new_token_id = match minting_number {
         Some(number) => Nat::from(number),
         None => total_supply + Nat::from(1u64),
@@ -88,7 +93,6 @@ pub async fn mint_nft(description: String, minting_number: Option<u64>) -> Resul
                 immutable: false,
             },
         ]),
-        memo: None,
         override_: false,
         created_at_time: Some(ic_cdk::api::time()),
     };
@@ -127,6 +131,91 @@ pub async fn mint_nft(description: String, minting_number: Option<u64>) -> Resul
         Err((code, msg)) => Err(format!("Error calling icrcX_mint: {:?} - {}", code, msg))
     }
 }
+
+
+
+
+// First I have to check that it exists and has an owner, and the verified feild is false and immutable.
+#[ic_cdk::update]
+pub async fn verify_nft(minting_number: Nat) -> Result<String, String> {
+    let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
+        .expect("Invalid ICRC7 canister ID");
+
+    let existing_metadata = get_metadata(minting_number.clone()).await?;
+    let existing_owner = get_owner(minting_number.clone()).await?;
+
+    let description = existing_metadata
+    .and_then(|metadata| {
+        metadata.get("icrc7:metadata:uri:transactionId")
+            .and_then(|value| match value {
+                Value::Text(s) => Some(s.clone()),
+                _ => None,
+            })
+    })
+    .ok_or_else(|| "Description not found or not a string in existing metadata".to_string())?;
+
+
+
+    let owner = existing_owner.ok_or_else(|| format!("No owner found for NFT# {}", minting_number))?;
+
+    let nft_request = SetNFTItemRequest {
+        token_id: minting_number,
+        owner: Some(owner),
+        metadata: NFTInput::Class(vec![
+            PropertyShared {
+                name: "icrc7:metadata:uri:transactionId".to_string(),
+                value: CandyShared::Text(description),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "icrc7:metadata:verified".to_string(),
+                value: CandyShared::Bool(true),
+                immutable: true,
+            },
+        ]),
+        override_: true,
+        created_at_time: Some(ic_cdk::api::time()),
+    };
+
+    // Encode the argument
+    let arg = Encode!(&vec![nft_request]).expect("Failed to encode argument");
+
+    // Call the icrcX_mint function on the ICRC7 canister
+    let call_result: CallResult<Vec<u8>> = ic_cdk::api::call::call_raw(
+        icrc7_canister_id,
+        "icrcX_mint",
+        &arg,
+        0
+    ).await;
+
+    match call_result {
+        Ok(raw_response) => {
+            // Decode the raw response
+            match Decode!(&raw_response, Vec<SetNFTResult>) {
+                Ok(results) => {
+                    if results.iter().all(|r| matches!(r, SetNFTResult::Ok(_))) {
+                        Ok(format!("NFT successfully verified."))
+                    } else {
+                        let errors: Vec<String> = results.iter()
+                            .filter_map(|r| match r {
+                                SetNFTResult::Err(e) => Some(e.clone()),
+                                _ => None,
+                            })
+                            .collect();
+                        Err(format!("Some NFTs failed to mint: {:?}", errors))
+                    }
+                },
+                Err(e) => Err(format!("Failed to decode response: {}", e)),
+            }
+        },
+        Err((code, msg)) => Err(format!("Error calling icrcX_mint: {:?} - {}", code, msg))
+    }
+}
+
+
+
+
+
 
 #[ic_cdk::update]
 async fn current_mint() -> Result<Nat, String> {
