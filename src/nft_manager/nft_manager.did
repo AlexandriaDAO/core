@@ -1,24 +1,42 @@
+type Account = record { owner : principal; subaccount : opt blob };
 type DeployResult = variant { Ok; Err : text };
-type Result = variant { Ok : nat; Err : text };
-type Result_1 = variant { Ok : vec TokenDetail; Err : text };
-type Result_2 = variant { Ok : TokenBalances; Err : text };
-type Result_3 = variant { Ok : text; Err : text };
-type Result_4 = variant { Ok : record { opt nat; opt nat }; Err : text };
+type Result = variant { Ok : vec bool; Err : text };
+type Result_1 = variant { Ok : opt text; Err : text };
+type Result_10 = variant { Ok : record { opt nat; opt nat }; Err : text };
+type Result_2 = variant { Ok : opt vec record { text; Value }; Err : text };
+type Result_3 = variant { Ok : TokenBalances; Err : text };
+type Result_4 = variant { Ok : vec record { nat; opt text }; Err : text };
+type Result_5 = variant { Ok : opt Account; Err : text };
+type Result_6 = variant { Ok : vec nat; Err : text };
+type Result_7 = variant { Ok : bool; Err : text };
+type Result_8 = variant { Ok : text; Err : text };
+type Result_9 = variant { Ok : nat; Err : text };
 type TokenBalances = record { alex : nat; lbry : nat };
-type TokenDetail = record {
-  token_id : nat32;
-  owner : text;
-  description : text;
+type Value = variant {
+  Int : int;
+  Map : vec record { text; Value };
+  Nat : nat;
+  Nat64 : nat64;
+  Blob : blob;
+  Text : text;
+  Array : vec Value;
 };
 service : () -> {
-  current_mint : () -> (Result);
+  batch_is_verified : (vec nat) -> (Result);
+  batch_nft_exists : (vec nat) -> (Result);
   deploy_icrc7 : () -> (DeployResult);
-  get_nfts : () -> (Result_1);
-  get_nfts_of : (text) -> (Result_1);
-  get_token_balances : (nat) -> (Result_2);
+  get_description : (nat) -> (Result_1);
+  get_metadata : (nat) -> (Result_2);
+  get_nft_balances : (nat) -> (Result_3);
+  get_nfts_of : (text) -> (Result_4);
+  get_owner : (nat) -> (Result_5);
+  get_tokens : (opt nat, opt nat) -> (Result_6);
   initialize_icrc7 : () -> (DeployResult);
-  mint_nft : (text, opt nat) -> (Result_3);
+  is_verified : (nat) -> (Result_7);
+  mint_nft : (text, nat) -> (Result_8);
+  nft_exists : (nat) -> (Result_7);
   post_init : () -> ();
-  verify_nft : (nat) -> (Result_3);
-  withdraw : (nat) -> (Result_4);
+  total_supply : () -> (Result_9);
+  verify_nft : (nat) -> (Result_8);
+  withdraw : (nat) -> (Result_10);
 }
