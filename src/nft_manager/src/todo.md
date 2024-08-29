@@ -1,27 +1,32 @@
 todo.md
 
+
 # General
-- Force authorized callers:
-    // fn check_caller() {
-    //     let allowed_principal = Principal::self_authenticating(pk);
-    //     if caller() != allowed_principal {
-    //         ic_cdk::trap("Unauthorized caller");
-    //     }
-    // }
+
+*minor*
+
+- I think it's time to make all the queries a batch version.
+  - Two files. Queries, and batch_queries.
+  - Need to make sure to check the batch size in each.
+
+- Need to add the properites of the proposal to the verified nfts. 
+  - I'll need to carefully change property_shared, candy_shared, nft_input, and nft_output, but other than that it should be smooth.
+
+*features*
+
 - Need to add the fake burn and the real burn. Fakeburn if unverified, real burn if verified.
 - User Transfer
 - Manager/DAO Transfer
 - Voting Process/DAO.
 
-# Security
-- Set Canister Freezing Threshold (both manager, and icrc7)
-- Block all calls to the ICRC7 Canister.
-- Check bounds on all parameters. Ensure no space bombs.
 
-- Add a system level canister_inspect_message function with #[inspect_message] that:
-    - Possibly only allows frontend canister messages to make update calls.
-    - Possibly adds an extra layer of protection for the icrc7 canister.
+*ultra security checklist*
 
+- all nft_manager functions that cost money only require a non-anon caller.
+- all nft_manager functions that don't are only callable by the frontend canister.
+- And the ICRC7 Cansiter issue:
+  - Updates callable by nft_manager only.
+  - Queries callable by nft_manager and alex_frontend only.
 
 ## Wallets
 
@@ -29,34 +34,77 @@ Audit should check to ensure there's no possibility that a mint# can change or b
 
 - Auth to ensure caller is the only one who can withdraw.
 - Ensure only verified NFTs can be withdrawn.
-- Batch withdraw (atomic)
+- Batch withdraw_all (atomic)
 
 
 ## Updates
-- No Anon callers.
-- Payment in LBRY to call the function.
-- 
+
+*changes that require frontend help from zeeshan*
+- mint_nft()
+  - Check that the caller has enough LBRY to call the function.
+  - Payment in LBRY to call the function.
+    - Will pass the owner of the 'active_engine' used for the upload: `src/alex_frontend/src/features/mint/index.tsx` but that file will needs some changes:
+      - It now needs to pass the mint#, a random number greater than total_supply() and has nft_exists() returns false so there's no chance of collisions.
+      - It needs to pass the cost in LBRY (1 LBRY + 5LBRY/MB but we can change later in the frontend), so it needs to track the size of the file.
+
+
+
+- Fix verify_nft(): First I have to check that it exists, and the verified feild is false and immutable.
+- Turn verify_nft into batch version verify_nfts(). We'll only do a batch version for this.
+
+
+
+## DAO (canister)
+
+[costs 100 LBRY per NFT to trigger which goes to the address of the NFTs]
+
+struct proposal {
+  proposal_id: random uid
+  proposer: Account (ic_cdk::api:caller())
+  dispute_type: Bool (false unless you're doing for someone elses NFT)
+  mint_numbers: Vec<Nat> (max 20)
+  proposal_summary: String (X character limit)
+  adopt_count: 0 (vote count by stakers)
+  reject_count: 0 (vote count by stakers)
+}
+
+create_nft_proposal(mint_numbers: Vec<Nat>, desciption: string)
+  - If dispute_type = false:
+    - If you own all the mint numbers, and they're all unverified:
+      - Send 100LBRY/NFT to proper accounts.
+      - Initialize proposal type feilds.
+      - Store it.
+      - Set a timer that triggers settle_proposal() after 7 days.
+  - If dispute_type = true:
+    - If you don't own none of the mint numbers, and they're all unverified:
+      - Send 100LBRY/NFT to proper accounts.
+      - Initialize proposal type feilds.
+      - Store it.
+      - Set a timer that triggers settle_proposal() after 7 days.
+  - Else: 
+    - Reject proposal with propper logging of the reason.
+
+settle_proposal(proposal_number)
+  - If 'adopted' > 'rejected' (will complicate the consensus later).
+    - verifs_nfts(proposal)
+  - If 'rejected' > 'adopted'
+    - Transfer the nft to the manager_nft account.
+
+settle_dispute_proposal(proposal_id)
+  - If 'adopted' > rejected
+    - verify_nfts() (to the new owner if a dispute proposal, to the same owner if not)
+  - If 'adopted' < 'rejected
+    - do nothing.
 
 
 
 
-## Canister Settings:
 
 
-*dfx canister status nft_manager --network ic*
 
-Status: Running
-Controllers: 2jgt7-v33z4-tiosh-csi2v-66cge-4uu7j-v2nye-z27vc-d36pc-ctqai-bqe yog5q-6fxnl-g4zd4-s2nuh-f7fkw-ijb4e-z7dmo-jrarx-uoe2x-wx5sh-dae
-Memory allocation: 0
-Compute allocation: 0
-Freezing threshold: 2_592_000
-Memory Size: Nat(2196)
-Balance: 8_879_501_528_117 Cycles
-Reserved: 0 Cycles
-Reserved Cycles Limit: 5_000_000_000_000 Cycles
-WASM Memory Limit: 0 Bytes
-Module hash: None
-Number of queries: 52
-Instructions spent in queries: 3_103_930_401
-Total query request payload size (bytes): 19_903
-Total query response payload size (bytes): 53_077_063
+
+
+  
+
+
+

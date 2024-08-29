@@ -1,13 +1,14 @@
 use crate::{icrc7_principal, lbry_principal, alex_principal};
 use crate::utils::to_nft_subaccount;
 use crate::query::get_nft_balances;
-
+use crate::guard::not_anon;
+use ic_cdk::update;
 use candid::Nat;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::{BlockIndex, NumTokens, TransferArg, TransferError};
 
 
-#[ic_cdk::update]
+#[update(guard = "not_anon")]
 pub async fn withdraw(mint_number: Nat) -> Result<(Option<BlockIndex>, Option<BlockIndex>), String> {
     let caller = ic_cdk::api::caller();
 

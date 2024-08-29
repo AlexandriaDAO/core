@@ -2,10 +2,19 @@ use candid::{Nat, Principal};
 use icrc_ledger_types::icrc1::account::Subaccount;
 
 const MAX_QUERY_BATCH_SIZE: usize = 100;
+const MAX_UPDATE_BATCH_SIZE: usize = 20;
 
-pub fn check_batch_size<T>(batch: &Vec<T>) -> Result<(), String> {
+pub fn check_query_batch_size<T>(batch: &Vec<T>) -> Result<(), String> {
     if batch.len() > MAX_QUERY_BATCH_SIZE {
         Err(format!("Batch size exceeds maximum allowed ({})", MAX_QUERY_BATCH_SIZE))
+    } else {
+        Ok(())
+    }
+}
+
+pub fn check_update_batch_size<T>(batch: &Vec<T>) -> Result<(), String> {
+    if batch.len() > MAX_UPDATE_BATCH_SIZE {
+        Err(format!("Batch size exceeds maximum allowed ({})", MAX_UPDATE_BATCH_SIZE))
     } else {
         Ok(())
     }
