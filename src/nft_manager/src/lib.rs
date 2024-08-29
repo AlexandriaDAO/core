@@ -3,13 +3,13 @@ use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc::generic_value::Value;
 use std::collections::BTreeMap;
 
-use ic_cdk;
 use candid::{Nat, Principal};
 
 
 pub const ICRC7_CANISTER_ID: &str = "fjqb7-6qaaa-aaaak-qc7gq-cai";
 pub const LBRY_CANISTER_ID: &str = "hdtfn-naaaa-aaaam-aciva-cai";
 pub const ALEX_CANISTER_ID: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
+pub const FRONTEND_CANISTER_ID: &str = "xo3nl-yaaaa-aaaap-abl4q-cai";
 
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
@@ -25,6 +25,10 @@ pub fn lbry_principal() -> Principal {
 
 pub fn alex_principal() -> Principal {
     get_principal(ALEX_CANISTER_ID)
+}
+
+pub fn frontend_principal() -> Principal {
+    get_principal(FRONTEND_CANISTER_ID)
 }
 
 
@@ -43,9 +47,14 @@ pub use query::*;
 mod wallets;
 pub use wallets::*;
 
-
 mod update;
 pub use update::*;
+
+mod guard;
+pub use guard::*;
+
+mod playground;
+pub use playground::*;
 
 // mod tests;
 // pub use tests::*;

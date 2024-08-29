@@ -456,6 +456,7 @@ shared(_init_msg) actor class Example(_args : {
   };
 
   private stable var _init = false;
+
   public shared(msg) func init() : async () {
     //can only be called once
 

@@ -1,7 +1,9 @@
 use crate::{alex_principal, icrc7_principal, lbry_principal};
-use crate::utils::{check_batch_size, to_nft_subaccount};
+use crate::utils::{check_query_batch_size, to_nft_subaccount};
 use crate::types::TokenBalances;
+use crate::guard::is_frontend;
 
+use ic_cdk::update;
 use std::collections::BTreeMap;
 use candid::{Nat, Principal};
 use ic_cdk::api::call::CallResult;
@@ -12,7 +14,7 @@ const LBRY_FEE: u64 = 4_000_000;
 const ALEX_FEE: u64 = 10_000;
 
 
-#[ic_cdk::update]
+#[update(guard = "is_frontend")]
 pub async fn total_supply() -> Result<Nat, String> {
 
     let call_result: CallResult<(Nat,)> = ic_cdk::call(
@@ -28,23 +30,27 @@ pub async fn total_supply() -> Result<Nat, String> {
 }
 
 
-#[ic_cdk::update]
+#[update(guard = "is_frontend")]
 pub async fn get_tokens(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>, String> {
     let start = start.unwrap_or_else(|| Nat::from(0u64));
     let end = end.unwrap_or_else(|| {
-        let thousand = Nat::from(1000u64);
-        start.clone() + thousand
+        let nine_nine_nine = Nat::from(999u64);
+        start.clone() + nine_nine_nine
     });
 
-    let range = end.clone() - start.clone();
+    // Adjust the range calculation to be inclusive
+    let range = end.clone() - start.clone() + Nat::from(1u64);
     if range > Nat::from(1000u64) {
         return Err("Range must not exceed 1000".to_string());
     }
 
+    // Adjust the end parameter to be inclusive
+    let adjusted_end = end.clone() + Nat::from(1u64);
+
     let tokens_call_result: CallResult<(Vec<Nat>,)> = ic_cdk::call(
         icrc7_principal(),
         "icrc7_tokens",
-        (Some(start), Some(end))
+        (Some(start), Some(adjusted_end))
     ).await;
 
     match tokens_call_result {
@@ -60,7 +66,7 @@ pub async fn get_tokens(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>
 }
 
 
-#[ic_cdk::update]
+#[update(guard = "is_frontend")]
 pub async fn get_nft_balances(mint_number: Nat) -> Result<TokenBalances, String> {
     let account = Account {
         owner: ic_cdk::id(),
@@ -96,7 +102,7 @@ pub async fn get_nft_balances(mint_number: Nat) -> Result<TokenBalances, String>
     })
 }
 
-#[ic_cdk::update]
+#[update(guard = "is_frontend")]
 pub async fn nft_exists(token_id: Nat) -> Result<bool, String> {
 
   let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
@@ -119,9 +125,9 @@ pub async fn nft_exists(token_id: Nat) -> Result<bool, String> {
   }
 }
 
-#[ic_cdk::update]
+#[update(guard = "is_frontend")]
 pub async fn batch_nft_exists(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
-    check_batch_size(&token_ids)?;
+    check_query_batch_size(&token_ids)?;
 
     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
       icrc7_principal(),
@@ -143,7 +149,7 @@ pub async fn batch_nft_exists(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> 
 }
 
 
-#[ic_cdk::update]
+#[update(guard = "is_frontend")]
 pub async fn get_owner(token_id: Nat) -> Result<Option<Account>, String> {
 
     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
@@ -163,11 +169,8 @@ pub async fn get_owner(token_id: Nat) -> Result<Option<Account>, String> {
 }
 
 
-#[ic_cdk::update]
-pub async fn get_nfts_of(owner_principal: String) -> Result<Vec<(Nat, Option<String>)>, String> {
-    let owner = Principal::from_text(&owner_principal)
-        .map_err(|e| format!("Invalid principal: {}", e))?;
-
+#[update(guard = "is_frontend")]
+pub async fn get_nfts_of(owner: Principal) -> Result<Vec<(Nat, Option<String>)>, String> {
     let account = Account {
         owner,
         subaccount: None,
@@ -183,19 +186,19 @@ pub async fn get_nfts_of(owner_principal: String) -> Result<Vec<(Nat, Option<Str
         Ok((token_ids,)) => {
             let mut nfts = Vec::new();
             for token_id in token_ids {
-                let description = get_description(token_id.clone()).await?;
+                let description = get_nft_manifest(token_id.clone()).await?;
                 nfts.push((token_id, description));
             }
             Ok(nfts)
         },
         Err((code, msg)) => {
-            Err(format!("Error fetching tokens for owner {}: {:?} - {}", owner_principal, code, msg))
+            Err(format!("Error fetching tokens for owner {}: {:?} - {}", owner, code, msg))
         }
     }
 }
 
 
-#[ic_cdk::update]
+#[update(guard = "is_frontend")]
 pub async fn get_metadata(token_id: Nat) -> Result<Option<BTreeMap<String, Value>>, String> {
 
     let metadata_call_result: CallResult<(Vec<Option<BTreeMap<String, Value>>>,)> = ic_cdk::call(
@@ -215,10 +218,10 @@ pub async fn get_metadata(token_id: Nat) -> Result<Option<BTreeMap<String, Value
 }
 
 
-#[ic_cdk::update]
-pub async fn get_description(token_id: Nat) -> Result<Option<String>, String> {
+#[update(guard = "is_frontend")]
+pub async fn get_nft_manifest(token_id: Nat) -> Result<Option<String>, String> {
     if let Some(metadata) = get_metadata(token_id).await? {
-        if let Some(description_value) = metadata.get("Description") {
+        if let Some(description_value) = metadata.get("icrc7:metadata:uri:transactionId") {
             if let Value::Text(text) = description_value {
                 return Ok(Some(text.clone()));
             }
@@ -228,7 +231,7 @@ pub async fn get_description(token_id: Nat) -> Result<Option<String>, String> {
 }
 
 
-#[ic_cdk::update]
+#[update(guard = "is_frontend")]
 pub async fn is_verified(token_id: Nat) -> Result<bool, String> {
   ic_cdk::println!("Checking verification status for token_id: {}", token_id);
 
@@ -269,9 +272,9 @@ pub async fn is_verified(token_id: Nat) -> Result<bool, String> {
   }
 }
 
-#[ic_cdk::update]
+#[update(guard = "is_frontend")]
 pub async fn batch_is_verified(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
-    check_batch_size(&token_ids)?;
+    check_query_batch_size(&token_ids)?;
     ic_cdk::println!("Checking verification status for token_ids: {:?}", token_ids);
 
     let exists_results = batch_nft_exists(token_ids.clone()).await?;

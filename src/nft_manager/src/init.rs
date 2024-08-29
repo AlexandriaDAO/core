@@ -28,7 +28,7 @@ fn init() {
     set_timer(Duration::from_secs(1), post_init);
 }
 
-#[ic_cdk::update]
+// #[ic_cdk::update]
 fn post_init() {
     ic_cdk::spawn(async {
         match deploy_icrc7().await {
@@ -45,7 +45,7 @@ fn post_init() {
 }
 
 
-#[ic_cdk::update]
+// #[ic_cdk::update]
 async fn deploy_icrc7() -> DeployResult {
     let canister_id = match Principal::from_text(ICRC7_CANISTER_ID) {
         Ok(id) => id,
@@ -79,7 +79,7 @@ async fn deploy_icrc7() -> DeployResult {
     }
 }
 
-#[ic_cdk::update]
+// #[ic_cdk::update]
 async fn initialize_icrc7() -> Result<(), String> {
     let canister_id = Principal::from_text(ICRC7_CANISTER_ID)
         .map_err(|e| format!("Invalid canister ID: {:?}", e))?;
