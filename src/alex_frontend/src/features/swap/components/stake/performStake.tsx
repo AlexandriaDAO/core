@@ -8,12 +8,15 @@ import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swa
 import { _SERVICE as _SERVICEALEX } from "../../../../../../declarations/ALEX/ALEX.did";
 import { flagHandler } from "../../swapSlice";
 import stakeAlex from "../../thunks/stakeAlex";
+import Auth from "@/features/auth";
 interface PerformStakeProps {
     actorSwap: ActorSubclass<_SERVICESWAP>;
     actorAlex: ActorSubclass<_SERVICEALEX>;
+    isAuthenticated: boolean;
+
 }
 
-const PerformStake: React.FC<PerformStakeProps> = ({ actorSwap, actorAlex }) => {
+const PerformStake: React.FC<PerformStakeProps> = ({ actorSwap, actorAlex,isAuthenticated }) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
     const [amount, setAmount] = useState("0");
@@ -51,8 +54,10 @@ const PerformStake: React.FC<PerformStakeProps> = ({ actorSwap, actorAlex }) => 
                             }} className="w-full py-1.5 px-4 w-100 rounded-lg" onWheel={event => event.currentTarget.blur()} />
                         </div>
                     </div>
-                    <button type="submit" className="bottom-btn w-full rounded-lg text-white bg-blue-700 px-5 py-1.5 mt-8">Sake</button>
-                </form>
+                    * Fees will be charged in ALEX
+                    {isAuthenticated === true ?
+                        (<button type="submit" className="bottom-btn w-full rounded-lg text-white bg-blue-700 px-5 py-1.5 mt-8">stake</button>) :
+                        (<button type="button" className="bottom-btn w-full rounded-full text-center text-black border-solid border bg-black border-black mt-8"> <Auth /></button>)}                </form>
             </div>)
         }
 

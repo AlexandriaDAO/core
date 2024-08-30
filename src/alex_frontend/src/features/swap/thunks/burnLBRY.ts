@@ -4,6 +4,7 @@ import { _SERVICE as _SERVICELBRY } from "../../../../../declarations/LBRY/LBRY.
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
+import LedgerService from "@/utils/LedgerService";
 
 
 // Define the async thunk
@@ -12,19 +13,22 @@ const burnLbry = createAsyncThunk<
   {
     actorSwap: ActorSubclass<_SERVICESWAP>;
     actorLbry: ActorSubclass<_SERVICELBRY>;
-    amount:string
+    amount:Number
   },
   { rejectValue: string }
 >("icp_swap/burnLBRY", async ( {actorSwap,actorLbry,amount} , { rejectWithValue }) => {
   try {
     const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
-    let amountFormat: bigint = BigInt(Number(amount) * 10**8);
+    const ledgerServices=LedgerService();
+    let amountFormat: bigint = BigInt(Number(amount));
+    let amountFormate8s :bigint= BigInt(Number(amount) * 10 ** 8);
+
     const resultLbryApprove =await actorLbry.icrc2_approve({
       spender: {
         owner: Principal.fromText(icp_swap_canister_id),
         subaccount: []
       },
-      amount: amountFormat,
+      amount: amountFormate8s,
       fee: [],
       memo: [],
       from_subaccount: [],

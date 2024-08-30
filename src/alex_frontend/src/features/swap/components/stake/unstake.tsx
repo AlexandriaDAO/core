@@ -24,12 +24,12 @@ const Unstake: React.FC<LbryRatioProps> = ({ actorSwap }) => {
     }
     useEffect(() => {
         if (swap.unstakeSuccess === true) {
-            alert("Successfully unstaked");
+            alert("Successfully unstaked!");
             dispatch(flagHandler());
         }
 
 
-    }, [])
+    }, [swap])
     return (<div className="account-wrapper">
         <button
             className="rounded-lg text-white bg-blue-700 px-5 py-1.5 mt-8"

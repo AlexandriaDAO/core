@@ -76,8 +76,6 @@ This way, we don't ever distribute less than 1 ICP, and always have at least 9-1
 
 I also generally disagree with your approach of collecting all the addresses to allocate to.
 You're checking if staking percentage is greater than 0, but don't set a minimum above zero. This 
-// need to discuss with client  weight ki base py ?>>> kyaaaa ?
-weight ki base py reward ho raha hai percentage hashmap
 
 There needs to be a check that ensures these are balanced or at leasst a test that simulates multiple stakers and ensures:
 sum of rewards distributed *10 = initial rewards pool.
@@ -86,6 +84,7 @@ I bet these would be off from eachother because you're mutliplying and dividing 
 
 It also needs to be answered how many stakers this could scale to, and why? Each day we're recalculating the stakes of each user.
 Can we do this with 10s of thousands fo stakers without calculation issues?
+As the number of stakers increases, burn cycles will also increase to execute the transaction.
 
 I could be wrong in my scrutinizing of this function, but it's very complex and feels like there's much possibility for exploits.
 
@@ -117,7 +116,7 @@ General recommended change:
 Questions: 
 1. Do we have to worry about a staking contract with no cooldown/lockup? Could people take advantage of this in some way
 
-
+We need to define some rules for lockup time.Currently it's the most basic version of staking.
 
 
 
@@ -125,4 +124,5 @@ Questions:
 Why are we hardcoding fees here?
 
 In token burn, why wouldn't that canister be approved to spend the user's tokens. Isn't it set up that way by default.
-// need to discuss with client.
+
+icp_swap canister burn the token on user behalf, while tokens are approved from frontend side.

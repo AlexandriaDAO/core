@@ -42,17 +42,13 @@
       "type": "custom",
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
-      "remote": {
-        "id": { "ic": "hdtfn-naaaa-aaaam-aciva-cai" }
-      }
+      "id": "hdtfn-naaaa-aaaam-aciva-cai"
     },
     "ALEX": {
       "type": "custom",
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
-      "remote": {
-        "id": { "ic": "7hcrm-4iaaa-aaaak-akuka-cai" }
-      }
+      "id": "7hcrm-4iaaa-aaaak-akuka-cai"
     },
     "alex_frontend": {
       "dependencies": ["alex_backend"],
@@ -72,6 +68,17 @@
         }
       },
       "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+    },  "xrc": {
+      "type": "custom",
+      "candid": "src/xrc/xrc.did",
+      "wasm": "src/xrc/xrc.wasm.gz",
+      "remote": {
+        "candid": "src/xrc/xrc.did",
+        "id": {
+          "ic": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
+        }
+      },
+      "specified_id": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
     }
   },
   "defaults": {

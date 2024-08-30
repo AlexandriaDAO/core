@@ -1,5 +1,6 @@
 type Result_1 = variant { Ok : text; Err : text };
 
+type Result = variant { Ok; Err : text };
 
 service : {
     "mint_ALEX" : (nat64,principal) -> (Result_1);
@@ -8,5 +9,6 @@ service : {
     get_current_ALEX_rate: () -> (nat64) query;
     get_current_LBRY_threshold: () -> (nat64) query;
     get_allowed_callers: () -> (vec principal) query;
+    get_max_stats:()->(nat64,nat64) query;
     your_principal:()-> (Result_1) query;
 }

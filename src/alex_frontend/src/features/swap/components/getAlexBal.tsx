@@ -20,7 +20,7 @@ const GetAlexBal: React.FC<LbryRatioProps> = ({ actorAlex }) => {
         dispatch(getAccountAlexBalance({ actor:actorAlex, account: auth.user }))
     }, [auth.user])
     useEffect(() => {
-        if (swap.successStake === true||swap.unstakeSuccess === true) {
+        if (swap.successStake === true||swap.unstakeSuccess === true||swap.burnSuccess === true ||swap.successClaimReward===true) {
             dispatch(getAccountAlexBalance({ actor:actorAlex, account: auth.user }))
         }
     }, [swap])

@@ -47,7 +47,7 @@ As a Web3 library though, there are a few differences. Every book is guaranteed 
 
 Alexandria does provide template toolkits for advanced curation from the library's content through which people build apps.
 
-Users interaction with Alexandria will often be through apps in the app store, much like library branches. Anyone can build their own branch, doing so with pre-existing tooling and content.
+User interaction with Alexandria will often be through apps in the app store, much like library branches. Anyone can build their own branch, doing so with pre-existing tooling and content.
 
 Authorship and creator rights are perfectly preserved since every peice of content in the library is owned. When a book is used with paid features, the payment is sent to and stored in the book itself and remains there until the rightful author/creator comes to claim it.
 
@@ -57,17 +57,14 @@ Alexandria is the Web3 library we've been talking about. It indexes the entire l
 
 ### Librarians
 
-Alexandria runs on autonomous software so it's growth and expansion is powered by Librarians. 
+Alexandria, a self-contained place in cypherspace, is made navigable by porting open versions of the major 'Web Surfing' tools: Search, Social, Storage and AI. It has Librarians operating autonomous software, not users visiting a platform. 
 
-After signing up with a preferred method, each user is given the option of saving their Principal in the Librarian Canister Registry. Once saved, that Librarian is able to store encrypted secrets, as well as the right for Alexandria Cansiters to decrypt them (VetKeys).
-
-Stored API and wallet keys are usable in-app with ever exposing them to end users. These keys power in-app services called LibModules, which send revenue from paid features back to the Librarian providing the keys.
+After signing up with a Internet Identity, Google Auth, Ethereum, Solana, or NFID, each entrant is issued a Principal that identifies them as a Librarian.
 
 ### LibModules
 
-Alexandria, a self-contained place in cypherspace, is made navigable by porting open versions of the major 'Web Surfing' tools: Search, Social, Storage and AI.
 
-Librarians carry the weight of this by hosting pre-configured deployments of open-source packages called 'LibModules'. Technically, they're just nodes that provide pluggable API for developers, starting with the following:
+Librarians carry the weight of service hosting by deploying pre-configured, open-source packages called 'LibModules'. Technically, they're just nodes that provide pluggable API for developers, starting with the following:
 
 - ArWeave (completed): Uploads Alexandria-compatable books to the permaweb.
 - Meilisearch (completed): Creates keyword search engines from the contents of books.
@@ -79,9 +76,9 @@ Librarians carry the weight of this by hosting pre-configured deployments of ope
 
 (2) Compute-related LibModules are simply API keys, agnostic to where the Librarian hosts.
 
-In each case, the VetKeys secure access to LibModules. Functions can be called by sending dynamically priced nanopayments that pay Librarians.
+In each case, a Librarian can store the encrypted keys of a LibModule they host, as well as the right for Alexandria Cansiters to decrypt them with VetKeys. In this way, others can pay that Librarian to use the Libmodule without ever exposing their underlying keys to anyone.
 
-Alexandria provides no storage or compute resources for LibModules, but only saves keys and performs compatability checks on them. LibModules are otherwise entirely managed and maintained by the ecosystem of Librarians.
+Alexandria provides no storage or compute resources for LibModules, but only saves encrypted versions of the keys and performs compatability checks on them. LibModules are otherwise entirely managed and maintained by the ecosystem of Librarians.
 
 The ideal Librarian is someone immersed in the convergence of technology and literature, but the typical one is just trying to make money from the token mechanism.
 
@@ -93,9 +90,9 @@ LBRY is always mintable with ICP at a 1:1000 ratio, up to an infinite supply; an
 
 ### LBRY Token
 
-LBRY's supply is entirely managed by the "icp_swap" canister. To mint LBRY, users send 1 ICP to the canister, and get 1,000 newly minted LBRY to their main wallet.
+LBRY's supply is entirely managed by the "icp_swap" canister which uses the Exchange Rate Canister to keep the mint rate at at 1XDR:1000LBRY, or about 1.3 cents per LBRY. Librarians mint by sending ICP to the canister, and get newly minted tokens to their main wallet.
 
-Users have two wallets by default: A 'main' and 'spending' wallet. Use of LibModules pays LBRY to the Librarian that hosts it. Using a paid NFT/SBT feature automatically sends that LBRY to that NFT/SBT wallet. After sending LBRY to the spending wallet, Alexandria can sign microtransactions on your behalf so payment happens in the background. 
+Librarians have two wallets by default: A 'main' and 'spending' wallet. Use of LibModules pays LBRY to the Librarian that hosts it. Using a paid NFT/SBT feature automatically sends that LBRY to that NFT/SBT wallet. After sending LBRY to the spending wallet, Alexandria can sign microtransactions on your behalf so payment happens in the background. 
 
 Aftermarket LBRY can be spent again on other services or sold on secondary markets, but the key to retaining it's value is a burn mechanism that produces half of its inital purchase value, and mints the next block of ALEX.
 
@@ -109,44 +106,78 @@ A block is mined when someone sends 1 or more LBRY (whole numbers only) to the b
 
     (1) The sender who burned the LBRY is returned ICP at a 0.5:1000 ratio (1/2 the buy price), and one ALEX mint at the current minting rate.
 
-    (2) A recently active Librarian is rewarded one ALEX mint at the current minting rate.
+    (2) A recent LBRY sender is rewarded one ALEX mint at the current minting rate.
 
-    (3) A recently active user is rewarded one ALEX mint at the current minting rate.
+    (3) A recent LBRY reciever is rewarded one ALEX mint at the current minting rate.
 
-The selected user and Librarian are a the sending and recieving addresses of a randomly selected recent LBRY transaction (of the last ~100 transactions excluding those to the burn address). While this token swapping, burning, and minting logic is kept isolated and immutbable canisters, the method to select the random LBRY transaction is in the main backend cansiter and mutable, so it can adapt to only select for in-app payments and adapt to prevent gaming.
+The 'winning' Librarians are the sending and recieving addresses of a randomly selected recent LBRY transaction (random from the last ~100 transactions excluding those to and from the burn/mint address). While this token swapping, burning, and minting logic is kept isolated and immutbable canisters, the method to select the random LBRY transaction is in the main backend cansiter and mutable, so it can adapt to only select for in-app payments and adapt to prevent gaming.
 
-Spliting things this way keeps incentives balanced, i.e., each investment in the token is accompanied with two equal investment in some network contributors. Put another way, every time you use some paid app service, you're elible for an airdrop, and the allocation for airdrops is 100% of the token supply.
+Spliting things this way keeps incentives balanced, i.e., each investment in the token is accompanied with two equal investments in some network contributors. Put another way, every time you use some paid app service, you're elible for an airdrop, and the allocation for airdrops is 100% of the token supply.
 
 #### Distribution Mechanics
 
-***We'll need to fix this equation for total supply =***
+Bitcoin launched with a 50 BTC Block Reward that halves every 210,000 blocks. Alexandria uses a similar but flattened modification of that minting schedule: A 5 ALEX Reward, and the halving rate at 21,000. This normalization accounts for the decreased difficulty of burning LBRY when compared to mining Bitcoin Blocks.
 
-R_n = R_0 * (1/f)^n
+BTC blocks are mined at mostly fixed intervals, while ALEX mints increase proportional to network use. The minting mechanism accounts for this by doubling the number of mints for a reward drop after each halving.
 
-Where:
+The result is a much flatter distirbution that takes ~62 Billion burn actions to emit.
 
-R_n = minting rate at step n
-R_0 = 5.00 x 10^2 (initial minting rate)
-f   = 1.75 (rate drop factor)
-n   = step number (starting from 0)
+| LBRY Burned      | ALEX Reward | Total ALEX Minted | Fully Diluted Valuation (XDR) |
+|------------------|-------------|-------------------|-------------------------------|
+| 21,000.00        | 5.0000      | 315,000.00        | $21,000.00                    |
+| 42,000.00        | 2.5000      | 472,500.00        | $42,000.00                    |
+| 84,000.00        | 1.2500      | 630,000.00        | $84,000.00                    |
+| 168,000.00       | 0.6250      | 787,500.00        | $168,000.00                   |
+| 336,000.00       | 0.3125      | 945,000.00        | $336,000.00                   |
+| 672,000.00       | 0.1562      | 1,102,500.00      | $672,000.00                   |
+| 1,344,000.00     | 0.0781      | 1,260,000.00      | $1,344,000.00                 |
+| 2,688,000.00     | 0.0391      | 1,417,500.00      | $2,688,000.00                 |
+| 5,376,000.00     | 0.0195      | 1,575,000.00      | $5,376,000.00                 |
+| 10,752,000.00    | 0.0098      | 1,732,500.00      | $10,752,000.00                |
+| 21,504,000.00    | 0.0049      | 1,890,000.00      | $21,504,000.00                |
+| 43,008,000.00    | 0.0024      | 2,047,500.00      | $43,008,000.00                |
+| 86,016,000.00    | 0.0012      | 2,205,000.00      | $86,016,000.00                |
+| 172,032,000.00   | 0.0006      | 2,362,500.00      | $172,032,000.00               |
+| 344,064,000.00   | 0.0003      | 2,520,000.00      | $344,064,000.00               |
+| 688,128,000.00   | 0.0002      | 2,677,500.00      | $688,128,000.00               |
+| 1,376,256,000.00 | 0.0001      | 2,883,938.40      | $1,000,000,000.00             |
+| ...              | ...         | ...               | $1,000,000,000.00             |
+| 61,763,128,000.00| 0.0001      | 21,000,000.00     | $1,000,000,000.00             |
 
-Constraints:
+These numbers were chosen with respect to (1) the BTC mechanism and (2) the anticipated Fully Diluted Valuation at any given point.
 
-1. R_n >= 1.00 x 10^-4
-2. Total ALEX supply <= 2.10 x 10^7
-3. T_n = 2^n * T_0, where T_0 = 100
-   (T_n is the LBRY threshold at step n)
+FDV is calculated as  21 million / (0.5cents * minting_reward):
 
-![image](https://devnet.irys.xyz/nYIQwN_-EjFdmNCBSrfkD9E6-Sgixl8a0Zu3sj1gltQ)
+For example, for each LBRY you burn during the first reward epoch, you'll loose the 1 cent it's worth but get back 1/2 a cent in ICP, and get one of the three corresponding 5 ALEX mints, i.e., a tenth of a penny per ALEX, which is a $21,000 FDV
 
-- Token Economics and Utility (TOKENOMICS SECTION maybe)
-  - It will take 50B actions for the supply to fully emit. Some words on decentralization
+![alt text](image-1.png)
 
-***End of unfinished part***
+From mints 0 to 1 Billion, the FDV is below $1B, but mints ~1 to 62 Billion are all made at the that $1B valuation. This means only ~15% of the supply is up for grabs at <$1B FDV, and 85% thereafter, ensureing there's garenteed and substantial ownership availible to Libriarians at least up until Alexandria reaches 'Unicorn' status.
+
+#### Bots
+
+Since each minting cycle rewards paries of a recent LBRY transaction, the way to game this is a bot that constantly sends LBRY.
+
+The effectiveness of this strategy decreases as a function of (1) the LBRY transaction fee and (2) the number of transactions that occur between mints according to the following table:
+
+![alt text](image-2.png)
+
+LBRY uses a 0.04 universal transaction fee that is burned without reward to combat this.
+
+Let's look at an example. With a 0.04 LBRY fee, it takes 25 transactions to burn 1 LBRY. If one of those is selected, you'll get 2 ALEX mints (assuming you sent those transactions to yourself). At that point though, you could have just burned 2 LBRY to get the mints, and you'd also get the value of 1 LBRY back in ICP.
+
+In short, if there are 25+ LBRY total LBRY transactions between mints, than this strategy is not effective.
+
+Still, during times of more minting than transacting, this strategy is welcomed, as it has it's own checks and balances while burning mass amounts of LBRY, which ultimately returns value in ICP to stakers.
+
+LBRY burning returns half its initial XDR value so that even if the ALEX mint is not valuable enough to incentivize people to burn it, it eventually has to be burned to get that ICP back. This combined with the 0.05 LBRY transfer fee will balance secondary markets such that fresh LBRY will always need to be minted and burned.
+
+
+LBRY is designed to return half the minting value in XDR. This fact plus fee ensures that secondary market trading is not a replacement for the mint and burn mechanism. Even if all ALEX is minted, use of the platform will necessitate LBRY minting and burning, and thus platform revenue.
 
 #### Utility
 
-All the ICP used to mint LBRY is stored in the staking pool. 10% of the total ICP accrued in the staking pool is emmited to stakers proportionally every 24 hours.
+All the ICP used to mint LBRY is stored in the staking pool. 10% of the total ICP accrued in the staking pool is emmited to stakers proportionally every 24 hours (minus an small allocation used to top up canisters).
 
 Staked ALEX is also used for DAO voting via our governance mechanism, but voting is completely optional and carries no reward or penalty.
 
@@ -249,47 +280,87 @@ It is the pinnacle of the sharing economy, akin to an Internet where the creator
 
 ## Part 4: Ecosystem
 
+Alexandria apps are services already plugged into LibModules. Since LibModule functions can only be accessed with the proper LBRY payment, all partner apps are also aligned with our universal DeFi mechanism.
 
-### Becoming a Librarian
+As a Librarian, the lbry.app homepage will feel more like an app store than a Web3 tech stack. The apps registry consists of core apps native to the site, or external sites that have been approved by the DAO.
 
-- Becoming a Librarian
-  - First experience looks like an app store.
-  - Apps will each have their own buisiness models and onboarding, but the apps we start with will be directly connected to the Librarian system.
-  - COLLECT section (or part about authenticating librarians)
+The following is a list of core apps in the works.
 
-- Flagship App - Bibliotheca (library) - a kindle alternative.
-  - Read - New users read whatever book they want.
-  - Collect - Bullet part of this section about collecting stuff.
-  - Earn - Kindof make from scratch.
-  - Aggregate
+### Bibliotheca (library)
 
-- Partner App - Syllogos (aggregate)
-  - AGGREGATE SECTION
-  - SHARE SECTION
-  - CREATE SECTION
-  - Whiteboards.
-  - Blogs.
+A simple kindle clone where everyone can read any books they like for free.
 
-Partner App - Dialectica (debate/reasoning):
-- Uses SBTs + AI LibModule.
-  - Debate Threads.
-  - Sentiment analysis to discover truth.
-  - etc. from scratch.
+![image](https://github.com/user-attachments/assets/7ed355c9-4345-441c-a5e3-9f3a3287bc12)
 
-Partner App - Emporium (trading post): 
-  - NFT marketplace for all Alexandria NFTs.
-  - TRADE section.
+Special features:
+  - Save fragments (text snippets) as SBTs.
+  - Download books for a fee.
+  - Full text search on any book while reading.
+  - Cataloging of books you've read, are currently reading, and wish to read.
+  - Share reviews, book fragments, and comments with other readers.
 
-Partner App - Dialogos (conversation)
-  - Chatbots with people based on their collected works.
+It's GoodReads meets Kindle with an economy inside.
+
+![image](https://github.com/user-attachments/assets/1287d30a-295d-4d60-b584-9b2c6915519c)
+
+### Syllogos (aggregate)
+
+A app of custom search engines. Search through thousands of books with AI or keywords. If there's not one that fits your needs, make your own by clicking books you'd like to add to a new search engine. Save any results you might want to use later as SBTs.
+
+![image](https://github.com/user-attachments/assets/d98026f2-0f12-4263-b479-628c7d903371)
+
+These search engines are a modular and sometimes paid feature. Make a popular search engine, get paid for it as it gets integrated and used across other Alexandria apps.
+
+It's Google, but the search engines are customized and actually designed to find information.
+
+### Lexigraph (write)
+
+A blog-based app based around SBTs. All the text fragments you and others have collected here are used to create blogs and whiteboards that are attached to their primary sources.
+
+In addition to conventional blogs, Syllogos replicates the viral Iceberg format where a topic is broken into interactive layers of increasing obscurity. Instead of a blog of text, this is a chart decorated with topic fragments, each linking to a primary source in a book that expresses a point about some topic.
+
+Syllogos will employ various AI related LibModules to 'decorate' SBTs with titles, summaries, emojis indicating sentiment, badges indicating authenticity, and ratings from user feedback.
+
+It's a place where golden nuggets are lifted from a sea of endless pages and brought to life, as if a trading card or other in-game collectable. It's Medium meets IcebergCharts.org, except hyperlinks to external sites are replaced with app-native components.
+
+### Dialectica (debate)
+
+A character-based AI app where users can train an AI on a set of NFTs and SBTs so they can speak on behalf of that author or topic by referencing the primary sources of their training data.
+
+AIs of different specializations can debate eachother with users steering the conversations and ultimately evolving to consensus on which one is correct.
+
+### Alexandrian (explore)
+
+A 3d exploration game of the literal library Alexandria where the goal is to get a bachelors degree using only a library card.
+
+![alt text](<Screenshot from 2024-08-10 15-15-33.png>)
+
+There are 100 rooms in the library, each dedicated to a category where they player needs to recruit the help of librarians to find in-book references to certain events and concepts.
+
+For the more casual user, it's a metaverse where you can find things to read like you would in a real library.
+
+### Emporium (trade)
+
+An NFT marketplace for all Alexandria NFTs.
+
+NFTs are valued on a few displayed attributes. First is the mint#, early ones having a certain novelty, but there's also the accrued LBRY and ALEX over its lifetime and whether or not the NFT is verified. Since NFTs are money making assets, and also have money saved inside them, trades are about more than aquiring collectables.
+
+Emporium will empoloy a 5% trading royalty, all of which goes to the staking pool.
+
+### Beyond Books
+
+The following are simple app ideas with the current content type that is books.
+
+As the library comes to include movies, songs, podcasts, and videos at potentially infinite scale, anyone will be able to make the decentralized Netflix, Spotify, YouTube, etc., with an existing content base.
+
+The reason such apps are untouchable right now is because they're powered by data monopolies, but if we move all that data to a shared permaweb, than everyday devs have access to the same content scale as Big Tech through Alexandria.
+
+## Part 5: Architecture & Governance
 
 D-app ecosystem - Anything you can imagine.
   - The point is along the way we make these services that power apps, easily pluggable.
   - In this way the LibModule is built already for you, with a nice economic model that just works out of the box.
   - Of course people could fork this, and go do their own version, but in doing so they'll circumvent the economic model, loose network effects, and have to start from scratch in making their own building blocks.
-
-
-## Part 5: Canister Architecture & Governance
 
 - Governance (GOVERNANCE SECTION) SNS Deployment.
   - Initially it will just determine who owns what NFT.
@@ -298,6 +369,19 @@ D-app ecosystem - Anything you can imagine.
     - But the token stuff will be fair, blackholed, and rightfully forkable (decentralized).
   - SNS launch or fork are possibilies, but it's unclear what aditional canisters will be handed to the DAO, blackholed, or otherwise stay under centralized management.
     - The road to decentralization is paved with hypocracy. At least I'm being honest about it.
+
+
+- Team earnings.
+  - Earning of default librarian providers go to a wallet to pay the team, but it's totally optional and people can change their libmodule providers to whoever.
+
+
+##### Governance (OG version)
+
+UncensensoredGreats is currently a centrally developed and deployed project. It depends on an architecture of tentatively ‘blackholed’ canisters, so the renounching storage and token related smart contract over time. It is fully open-source, so the current state of decentralizion can be tracked on [Github](https://github.com/UncensoredGreats/).
+
+The frontend will be continuously developed, and so use of backend functions from blackholed canisters will remain mutable indefinitely. Nonetheless, anyone can fork the project with an alternative frontend that’s bound by the same code and data of Alexandria’ universal backend canisters.
+
+Since this model prioritizes immutability for the sake of permanence, governance is limited to matters involving NFT ownership. The governance mechanism allow proposals that can delete NFTs (if corrupted/inaccurate), or transfer the ownership (to any true author that claim it) with a simple majority and quorum of staked ALEX holders.
 
 
 - Decentralization (we might not need this. Just enough to explain copyright stuff.)
@@ -318,170 +402,7 @@ conclusion.
 
 
 
-### Structure
 
-Since Alexandria best reflects a pan-industry platform of the Web’s core elements, it’s as a P2P network with infinitely scalable compute and storage. As such, it has many branching elements. Each section describes the architecture and user experience for each:
-
-* Search Engine (Peruse)  
-* E-Reader (Read)  
-* Library (Collect)  
-* RevShare (Earn)  
-* NFT-Marketplace (Trade)  
-* Search Manager (Aggregate)  
-* AI/LLMs (Create)  
-* Social Media (Share)  
-* Publisher (Internet of Books)  
-* DeFI Suite (Tokenomics)  
-* DAO (Governance)
-
-### Peruse
-
-New users are greeted with a homepage, inclining them to interact with domain-specific search engines. Each contains a curated set of books with real-time full-text-search on their aggregate contents. Results are returned as book paragraphs that point to their origin at the source.
-
-![image](https://github.com/user-attachments/assets/d98026f2-0f12-4263-b479-628c7d903371)
-
-These search engines owned by other users we call *Librarians* (those who’ve registered their principal).  
-
-![image](https://github.com/user-attachments/assets/13d6ee85-3f95-4d41-97a7-c4c040966c59)
-
-### Read
-
-A first interaction with Alexandria might feel akin to Google Search for Kindle—except all the search engines are owned by users and all the books are free.  
-
-![image](https://github.com/user-attachments/assets/7ed355c9-4345-441c-a5e3-9f3a3287bc12)
-
-All books used are owned as NFTs. Alexandria does not own or hold them. Rather, *Librarians* (NFT owners) ‘rent’ read access of their .epub file to our canisters, which is how we make them free to read.
-
-![image](https://github.com/user-attachments/assets/1287d30a-295d-4d60-b584-9b2c6915519c)
-
-Basic searching and reading is free, and does not require an account; but to save something on Alexandria is to ***own*** something, and so the remaining features do.
-
-### Collect
-
-Attempts to save data to the the library of an unregistered user will prompt them to register with one of the following auth solutions:
-
-* Internet Identity (II)  
-* Google Auth SSO  
-* Ethereum Wallet  
-* Solana Wallet  
-* NFID
-
-After signup, a principal is generated and stored making that user a *Librarian*.
-
-Librarian’s have two in-app wallets by default:
-
-(1) Saving wallet: Stores ICP, ICRC1 tokens, and ICRC7 NFTs much like a typical wallet. Using it is totally optional, but a nice way for users to keep track of Alexandria-related assets.  
-(2) Spending wallet: Designed to store and spend LBRY without explicit signatures from the user for each transaction.
-
-The setup is simple. Librarians can always swap ICP for LBRY at a 1:1000 ratio, or if they don’t have ICP, they can buy some with a credit card using our proxy service.
-
-Once set up, librarians can start collecting items:
-
-* Ebook NFTs (by buying or minting them).  
-* Search Engines (by building them out of books).  
-* Fragments SBTs (by finding and saving book snippets).  
-* Iceberg SBTs (by creating content from fragments).
-
-The more ambitious librarians can also provide the services others use collect items:
-
-* NFT and SBT Minter (by providing an ArWeave node)  
-* Search Engine Maker (by providing a Meilisearch and/or Qdrant host)  
-* AI Generators (by providing LLM host).
-
-This setup process unavoidably asks a lot of people, and being a librarian isn’t for everyone. They will work with multiple wallets, multiple search engines, and multiple fragment types just in their personal library. 
-
-That’s why initial target market for Alexandria is self-custody enthusiasts. The kind of people who use Linux instead of Windows, a Bitcoin wallet instead of a bank, and locally stored books/movies/music instead of Kindle/Netflix/Spotify. 
-
-Like each of these examples, Alexandria will take some getting used to, but eventually replaces complexity of needing multiple services. The seasoned Alexandria user does not need YouTube, Facebook, or Google; but will just port that content to the library where it’s more readily usable.
-
-### Earn
-
-\- The main motivator is money.
-
-\- LBRY pays for:  
-\- Search engine creation.  
-\- Book NFT minting.  
-\- Fragment SBT saving.  
-\- Whiteboard/Iceberg Saves.  
-\- AI usage.
-
-Rates are variable. Everything on the site though, except for canisters which store a minimal amount of data, everything is hosted and paid for by users themselves.
-
-What do users get that spend the library?
-
-A system that tracks their outcomes in ALEX. As they get props, they get greater mints in ALEX.
-
-Tokenomics will probably have to be next but I don’t want to deal with that.
-
-Most Alexandria revenue comes from ICP used to mint LBRY. That revenue split is tentatively set at a 50/50 between (1) book owners and (2) ALEX Stakers minus canister cycles costs. This section concerns only ICP/LBRY flows, while the Tokenomics section alone explains ALEX distribution mechanics.
-
-To use paid features in Alexandria, users first top-up with LBRY at a 1 ICP:1000 LBRY Ratio. This 1:1000 LBRY minting rate is fixed in an immutable canister with zero initial allocations. The cost (in LBRY) for different on-site interactions will remain variable for the foreseeable future to counteract ICP’s volatility.
-
-Every paid interaction sends LBRY to a burn address, and credits the responsible book owner, e.g., when a user burns 1 LBRY to bookmark a *Moby Dick* snippet, the owner of the Moby Dick NFT is owed 0.0005 ICP by the Alexandria protocol (half of the cost to mint that LBRY). Librarians can mint and host as many book NFTs as they like, and claim their ICP rewards whenever they choose.
-
-The remaining ICP goes to canister top-ups, and then to ALEX stakers. ALEX staking grants voting rights, but voting is optional and does not impact rewards. ALEX is not used elsewhere in the app and has no function other than ownership, and rev-share.
-
-### Trade
-
-All that fall into the Alexandria collection are of the ICRC-7 standard, and fully mutable by their author with ICRC-37 extensibility. All Ebook NFTs are mintable on-site for a small fee, and tradable in an on-site marketplace for a 5% royalty. All of this revenue goes to ALEX stakers.
-
-NFT Mint Numbers, or UGBNs (Alexandria Book Numbers), are consecutive, so the first book minted has a UCBN of \#1, the second with \#2, and so on. Once these slots are taken, they can never be changed except by the owner; giving a certain novelty status to early minters.
-
-Since NFTs are based on their ebook files, preventative measures are taken to prevent minting duplicate titles, but this still occurs with different book versions/editions. Still, the visibility, and thus value, of any Alexandria NFT, is weighted by the metadata it accrues from other’s use of it. In other words, readers only need one *Moby Dick*, and the site is designed such that once the first or most used one becomes the crowd favorite, it becomes unprofitable to continue hosting a duplicate.
-
-All data attributed to each Book NFT is listed as follows:  
-
-<NFT SPECS IMAGE (TBD)>
-
-### Aggregate
-
-With the ebook hosting handled with Drive, and file access handled by NFTs; aggregating that ebook data becomes simple.
-
-In the Librarian’s portal, a user can add or remove books from their custom search engine with a single click. When ready, it can be published and public to others, or optionally remain private to the creator.  
-
-![image](https://github.com/user-attachments/assets/7ba71795-bf65-4ebb-8ba8-6bb694418538)
-
-*Librarians* pay for their search engine hosting in ICP via the portal, and receive no direct reward for making the search engine. The incentive for hosting a search engine is that it gives visibility to the books it holds, indirectly generating revenue for those book owners.
-
-### Share
-
-*Bookmarks* are customizable annotations that allow you to save any snippet from any book. What’s left are building blocks of knowledge that someone deemed valuable, and Alexandria simply adds the tools to make it easy to gear them toward answering a question people want the answer to.
-
-*Bookmarks* are pseudonymously public, once saved, so anyone can read and use those snippets. So in addition to full-text search on books, users can search the database of existing bookmarks by book(s). Each subsequent *favorite* of that bookmark rewards ALEX the original owner.
-
-### Create
-
-Using bookmarks as a building block, users aggregate and arrange them in combinations for use with AI. An ever-growing suite of on-chain AI tools can be used to summarize, condense, and analyze the perspectives of different authors in relationship to the user’s question.
-
-Such findings are designed to be saved and published to *Whiteboards*: A user-owned virtual space that can be either public or private, that aggregates *Boomarks* with AI outputs and reader notes.
-
-*Whiteboards* are intended to be a Single Source of Truth in the most literal sense. Whether for personal exploration or as the research foundation for a virtual presentation, there is no more comprehensive way to present a case built upon primary sources.
-
-### Internet of Books
-
-Ebooks, like all websites, are HTML pages. We commonly use .epub files with text alone, since they emulate books, but they can just as easily contain images, audio, video, etc. The .epub format shines over .html in organization and information density since their maker must order pages in a linear thread around a coherent subject or idea.
-
-From stone tablets to scrolls, to the codex; books have always been the universal means through which mankind preserves the written and spoken word. Webpages come and go, but for the ones that matter most, Alexandria hopes to be the publisher to bring the modern equivalent to a format of comparable permanence.
-
-In an upcoming iteration, Alexandria will add a bookmaker LibModule, where by YouTube Channels, Podcast RSS feeds, Social Profiles, etc., can be autonomously transcribed and formatted into Ebook NFTs; keeping the same searchability as raw text and the same ease of viewing as their native content platform.
-
-### Tokenomics
-
-ALEX is the native token, and will mirror the distribution mechanism of Bitcoin:  
-
-![image](https://github.com/user-attachments/assets/ba822105-c8f1-4ea4-af7b-61c0f18cba1b)
-
-Instead of block mining though, ALEX emits based on *favorites*. As a user spends/burns LBRY to save bookmarks, their *favorite* action becomes value-bearing. Users can favorite their own bookmarks, or the bookmarks of others, with caps and mechanisms to prevent bots.
-
-ALEX can be added to the staking pool to passively earn a share of Alexandria revenue. Staked ALEX also grants optional voting rights, but participation does not impact rewards. ALEX does not have any other utility or function.
-
-### Governance
-
-UncensensoredGreats is currently a centrally developed and deployed project. It depends on an architecture of tentatively ‘blackholed’ canisters, so the renounching storage and token related smart contract over time. It is fully open-source, so the current state of decentralizion can be tracked on [Github](https://github.com/UncensoredGreats/).
-
-The frontend will be continuously developed, and so use of backend functions from blackholed canisters will remain mutable indefinitely. Nonetheless, anyone can fork the project with an alternative frontend that’s bound by the same code and data of Alexandria’ universal backend canisters.
-
-Since this model prioritizes immutability for the sake of permanence, governance is limited to matters involving NFT ownership. The governance mechanism allow proposals that can delete NFTs (if corrupted/inaccurate), or transfer the ownership (to any true author that claim it) with a simple majority and quorum of staked ALEX holders.
 
 
 

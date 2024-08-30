@@ -22,10 +22,18 @@ const LbryBurnRatio: React.FC<LbryBurnRatioProps> = ({ actorSwap, actorTokenomic
     const tokenomics = useAppSelector((state) => state.tokenomics);
 
     useEffect(() => {
+
         dispatch(getLBRYratio({ actor: actorSwap }));
         dispatch(getMaxLbryBurn({ actor: actorSwap }));
         dispatch(getAlexMintRate({ actor: actorTokenomics }))
     }, [])
+    useEffect(() => {
+        if (swap.burnSuccess === true || swap.swapSuccess === true) {
+            dispatch(getLBRYratio({ actor: actorSwap }));
+            dispatch(getMaxLbryBurn({ actor: actorSwap }));
+            dispatch(getAlexMintRate({ actor: actorTokenomics }))
+        }
+    }, [swap])
 
     return (<div>
         {swap.loading ? (

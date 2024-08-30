@@ -9,7 +9,7 @@ import { initializeClient, initializeIndex } from '@/services/meiliService';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
 import fetchBooks from '@/features/portal/thunks/fetchBooks';
-import { initializeActor, initializeActorSwap,initializeIcpLedgerActor, initializeLbryActor, initializeTokenomicsActor,initializeAlexActor } from '@/features/auth/utils/authUtils';
+import { initializeActor, initializeActorSwap, initializeIcpLedgerActor, initializeLbryActor, initializeTokenomicsActor, initializeAlexActor } from '@/features/auth/utils/authUtils';
 import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from "../../../declarations/icp_ledger_canister";
 import { tokenomics } from '../../../declarations/tokenomics';
@@ -24,15 +24,15 @@ interface SessionProviderProps {
 // authClient > user > actor > my-engines > [meiliclient, meiliindex]
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const dispatch = useAppDispatch();
-	const {user} = useAppSelector(state=>state.auth);
-	const { books } = useAppSelector(state=>state.portal);
+	const { user } = useAppSelector(state => state.auth);
+	const { books } = useAppSelector(state => state.portal);
 
 	const [actor, setActor] = useState(alex_backend);
-	const [actorSwap,setActorSwap]=useState(icp_swap);
+	const [actorSwap, setActorSwap] = useState(icp_swap);
 	const [actorIcpLedger, setIcpLedger] = useState(icp_ledger_canister);
 	const [actorTokenomics, setActorTokenomics] = useState(tokenomics);
-	const [actorLbry,setActorLbry]=useState(LBRY);
-	const [actorAlex,setActorAlex]=useState(ALEX);
+	const [actorLbry, setActorLbry] = useState(LBRY);
+	const [actorAlex, setActorAlex] = useState(ALEX);
 
 	const [authClient, setAuthClient] = useState<AuthClient>();
 	const [meiliClient, setMeiliClient] = useState<MeiliSearch>();
@@ -55,62 +55,63 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		// 		client.deleteIndexIfExists(index.uid)
 		// 	})
 		// }
-		if(client) setMeiliClient(client)
+		if (client) setMeiliClient(client)
 	}
 
-	useEffect(()=>{
+	useEffect(() => {
 		initializeAuthClient()
 		initializeMeiliClient()
-	},[])
+	}, [])
 
 
-	useEffect(()=>{
-		if(!authClient) return;
+	useEffect(() => {
+		if (!authClient) return;
 
 		dispatch(principal(authClient))
-	},[authClient])
+	}, [authClient])
 
-	useEffect(()=>{
-		if(!authClient) return;
-
-		const setupActor = async()=>{
-			const actor = await initializeActor(authClient);
-			setActor(actor);
-			const actorSwap = await initializeActorSwap(authClient);
-			setActorSwap(actorSwap);
-			const actorIcpLedger = await initializeIcpLedgerActor(authClient);
-			setIcpLedger(actorIcpLedger);
-			const actorTokenomics=await initializeTokenomicsActor(authClient);
-			setActorTokenomics(actorTokenomics);
-			const actorLbry=await initializeLbryActor(authClient);
-			setActorLbry(actorLbry);
-			const actorAlex=await initializeAlexActor(authClient);
-			setActorAlex(actorAlex);
+	useEffect(() => {
+		if (!authClient || user === "") {return}
+		else {
+			const setupActor = async () => {
+				const actor = await initializeActor(authClient);
+				setActor(actor);
+				const actorSwap = await initializeActorSwap(authClient);
+				setActorSwap(actorSwap);
+				const actorIcpLedger = await initializeIcpLedgerActor(authClient);
+				setIcpLedger(actorIcpLedger);
+				const actorTokenomics = await initializeTokenomicsActor(authClient);
+				setActorTokenomics(actorTokenomics);
+				const actorLbry = await initializeLbryActor(authClient);
+				setActorLbry(actorLbry);
+				const actorAlex = await initializeAlexActor(authClient);
+				setActorAlex(actorAlex);
+			}
+			setupActor();
 		}
-		setupActor();
-	},[user])
+	}, [user, authClient])
 
-	useEffect(()=>{
+	useEffect(() => {
 		setMeiliIndex(undefined)
-		if(!user || !meiliClient) return;
+		if (!user || !meiliClient) return;
 
-		const setupMeiliIndex = async()=>{
+		const setupMeiliIndex = async () => {
 
 			const index = await initializeIndex(meiliClient, user)
 
-			if(index) setMeiliIndex(index)
+			if (index) setMeiliIndex(index)
 		}
 		setupMeiliIndex();
-	},[user, meiliClient])
+	}, [user, meiliClient])
 
 	// Load all books on App Start
 	useEffect(() => {
-		if(!actor) return;
+		if (!actor) return;
 		dispatch(fetchBooks(actor));
 	}, [actor, dispatch]);
 
 	return (
-		<SessionContext.Provider value={{ actor,actorSwap,actorIcpLedger,actorTokenomics, actorLbry,actorAlex,authClient, meiliClient, meiliIndex  }}>
+		<SessionContext.Provider value={{ actor, actorSwap, actorIcpLedger, actorTokenomics, actorLbry, actorAlex, authClient, meiliClient, meiliIndex }}>
 			{children}
 		</SessionContext.Provider>
 	);

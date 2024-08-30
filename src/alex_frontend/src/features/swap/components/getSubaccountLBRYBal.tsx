@@ -13,20 +13,26 @@ interface LbryRatioProps {
     actorLbry: ActorSubclass<_SERVICELBRY>;
 }
 
-const GetSubaccountBal: React.FC<LbryRatioProps> = ({ actorSwap, actorLbry }) => {
+const GetSubaccountLBRYBal: React.FC<LbryRatioProps> = ({ actorSwap, actorLbry }) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
     const auth = useAppSelector((state) => state.auth);
 
     useEffect(() => {
         dispatch(getSubaccount({ actor: actorSwap }));
-    }, [])
+    }, [actorSwap])
 
     useEffect(() => {
         dispatch(getLbryBalance({ actorLbry, account: auth.user }))
-    }, [swap.subaccount,swap.success])
+    }, [swap.subaccount])
+    useEffect(() => {
+        if (swap.successStake === true || swap.unstakeSuccess === true || swap.burnSuccess === true||swap.swapSuccess==true) {
+
+            dispatch(getLbryBalance({ actorLbry, account: auth.user }))
+        }
+    }, [swap])
     return (<div className="account-wrapper">
         LBRY Balance :{swap.lbryBalance}
     </div>);
 };
-export default GetSubaccountBal;
+export default GetSubaccountLBRYBal;
