@@ -12,7 +12,7 @@ dfx deps pull
 dfx deps init
 dfx deps deploy
 dfx deps deploy internet_identity
-
+dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
 # Step 3: Deploy tokenomics and icp_swap
 dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 
@@ -39,7 +39,7 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
         record {  
           \"$DEFAULT_ACCOUNT_ID\";  
           record {  
-            e8s = 10_000_000_000 : nat64;  
+            e8s = 8_681_981_000_000_000 : nat64;  
           };  
         };  
       };  
@@ -59,7 +59,7 @@ record {
      token_symbol = "LBRY";
      token_name = "LBRY";
      minting_account = record { owner = principal "'$(dfx canister id icp_swap)'" };
-     transfer_fee = 0;
+     transfer_fee = 10_000;
      metadata = vec {};
      initial_balances = vec { record { record { owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'" }; 0 } };
      archive_options = record {
