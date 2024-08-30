@@ -5,12 +5,24 @@ todo.md
 
 *minor*
 
-- I think it's time to make all the queries a batch version.
-  - Two files. Queries, and batch_queries.
-  - Need to make sure to check the batch size in each.
+- So get_nfts_of only returns 50 of them (unless you specifiy up to 1000 with icrc7_tokens_of()), but icrc7_balance_of() returns the total in someone's wallet, so we can use that.
+  - Maybe since access is limited to the frontend now, we can upgrade the max query values.
+    - Maybe change these to 100, and 20,000 and there's no problems. If you have more than 20,000 NFTs than you need to split wallets.
+      -   default_take_value = ?50; max_take_value = ?1000;
+
+- Change the withdraw_all() to first get all the non-zero balances of that owner, than do the withdraw. Clean up the rest of what we did on this list. 
+  - Need to ensure that it is verified, or which ones are verified are withdrawable.
+  - Need to get the ids from the owned_nfts()
+    - Need to make a function get_verified_nfts_of: get_nfts_of()
+
 
 - Need to add the properites of the proposal to the verified nfts. 
   - I'll need to carefully change property_shared, candy_shared, nft_input, and nft_output, but other than that it should be smooth.
+
+
+- Fix verify_nft(): First I have to check that it exists, and the verified feild is false and immutable.
+
+- get_nfts_of() is limited to 
 
 *features*
 
@@ -48,12 +60,6 @@ Audit should check to ensure there's no possibility that a mint# can change or b
       - It needs to pass the cost in LBRY (1 LBRY + 5LBRY/MB but we can change later in the frontend), so it needs to track the size of the file.
 
 
-
-- Fix verify_nft(): First I have to check that it exists, and the verified feild is false and immutable.
-- Turn verify_nft into batch version verify_nfts(). We'll only do a batch version for this.
-
-
-
 ## DAO (canister)
 
 [costs 100 LBRY per NFT to trigger which goes to the address of the NFTs]
@@ -64,6 +70,7 @@ struct proposal {
   dispute_type: Bool (false unless you're doing for someone elses NFT)
   mint_numbers: Vec<Nat> (max 20)
   proposal_summary: String (X character limit)
+  cost_to_download: Nat (in LBRY)
   adopt_count: 0 (vote count by stakers)
   reject_count: 0 (vote count by stakers)
 }

@@ -32,11 +32,16 @@ pub async fn total_supply() -> Result<Nat, String> {
 
 #[update(guard = "is_frontend")]
 pub async fn get_tokens(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>, String> {
-    let start = start.unwrap_or_else(|| Nat::from(0u64));
-    let end = end.unwrap_or_else(|| {
-        let nine_nine_nine = Nat::from(999u64);
-        start.clone() + nine_nine_nine
+    let total_supply = total_supply().await?;
+
+    let start = start.unwrap_or_else(|| {
+        if total_supply >= Nat::from(100u64) {
+            total_supply.clone() - Nat::from(100u64)
+        } else {
+            Nat::from(0u64)
+        }
     });
+    let end = end.unwrap_or_else(|| total_supply.clone());
 
     // Adjust the range calculation to be inclusive
     let range = end.clone() - start.clone() + Nat::from(1u64);
@@ -54,9 +59,8 @@ pub async fn get_tokens(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>
     ).await;
 
     match tokens_call_result {
-        Ok((mut ids,)) => {
-            ids.sort(); // Sort the IDs in ascending order
-            ic_cdk::println!("Retrieved and sorted token IDs: {:?}", ids);
+        Ok((ids,)) => {
+            ic_cdk::println!("Retrieved token IDs: {:?}", ids);
             Ok(ids)
         },
         Err((code, msg)) => {
@@ -67,66 +71,52 @@ pub async fn get_tokens(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>
 
 
 #[update(guard = "is_frontend")]
-pub async fn get_nft_balances(mint_number: Nat) -> Result<TokenBalances, String> {
-    let account = Account {
-        owner: ic_cdk::id(),
-        subaccount: Some(to_nft_subaccount(mint_number)),
-    };
+pub async fn get_nft_balances(mint_numbers: Vec<Nat>) -> Result<Vec<TokenBalances>, String> {
+    check_query_batch_size(&mint_numbers)?;
 
-    // Get the LBRY balance
-    let lbry_balance = ic_cdk::call::<(Account,), (NumTokens,)>(
-        lbry_principal(),
-        "icrc1_balance_of",
-        (account,),
-    )
-    .await
-    .map_err(|e| format!("Failed to get LBRY balance: {:?}", e))?
-    .0;
+    let mut results = Vec::new();
 
-    // Get the ALEX balance
-    let alex_balance = ic_cdk::call::<(Account,), (NumTokens,)>(
-        alex_principal(),
-        "icrc1_balance_of",
-        (account,),
-    )
-    .await
-    .map_err(|e| format!("Failed to get ALEX balance: {:?}", e))?
-    .0;
+    for mint_number in mint_numbers {
+        let account = Account {
+            owner: ic_cdk::id(),
+            subaccount: Some(to_nft_subaccount(mint_number.clone())),
+        };
 
-    let lbry_fee = NumTokens::from(LBRY_FEE);
-    let alex_fee = NumTokens::from(ALEX_FEE);
+        // Get the LBRY balance
+        let lbry_balance = ic_cdk::call::<(Account,), (NumTokens,)>(
+            lbry_principal(),
+            "icrc1_balance_of",
+            (account.clone(),),
+        )
+        .await
+        .map_err(|e| format!("Failed to get LBRY balance for NFT {}: {:?}", mint_number, e))?
+        .0;
 
-    Ok(TokenBalances {
-        lbry: if lbry_balance > lbry_fee { lbry_balance - lbry_fee } else { NumTokens::from(0u64) },
-        alex: if alex_balance > alex_fee { alex_balance - alex_fee } else { NumTokens::from(0u64) },
-    })
+        // Get the ALEX balance
+        let alex_balance = ic_cdk::call::<(Account,), (NumTokens,)>(
+            alex_principal(),
+            "icrc1_balance_of",
+            (account,),
+        )
+        .await
+        .map_err(|e| format!("Failed to get ALEX balance for NFT {}: {:?}", mint_number, e))?
+        .0;
+
+        let lbry_fee = NumTokens::from(LBRY_FEE);
+        let alex_fee = NumTokens::from(ALEX_FEE);
+
+        results.push(TokenBalances {
+            lbry: if lbry_balance > lbry_fee { lbry_balance - lbry_fee } else { NumTokens::from(0u64) },
+            alex: if alex_balance > alex_fee { alex_balance - alex_fee } else { NumTokens::from(0u64) },
+        });
+    }
+
+    Ok(results)
 }
 
-#[update(guard = "is_frontend")]
-pub async fn nft_exists(token_id: Nat) -> Result<bool, String> {
-
-  let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
-      icrc7_principal(),
-      "icrc7_owner_of",
-      (vec![token_id.clone()],)
-  ).await;
-
-  match owner_call_result {
-      Ok((owner_results,)) => {
-          if let Some(Some(_)) = owner_results.first() {
-              Ok(true)
-          } else {
-              Ok(false)
-          }
-      },
-      Err((code, msg)) => {
-          Err(format!("Error checking if NFT exists for token {}: {:?} - {}", token_id, code, msg))
-      }
-  }
-}
 
 #[update(guard = "is_frontend")]
-pub async fn batch_nft_exists(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
+pub async fn nfts_exist(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
     check_query_batch_size(&token_ids)?;
 
     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
@@ -184,11 +174,10 @@ pub async fn get_nfts_of(owner: Principal) -> Result<Vec<(Nat, Option<String>)>,
 
     match tokens_call_result {
         Ok((token_ids,)) => {
-            let mut nfts = Vec::new();
-            for token_id in token_ids {
-                let description = get_nft_manifest(token_id.clone()).await?;
-                nfts.push((token_id, description));
-            }
+            let manifests = get_manifest_ids(token_ids.clone()).await?;
+            let nfts = token_ids.into_iter()
+            .zip(manifests.into_iter())
+            .collect();
             Ok(nfts)
         },
         Err((code, msg)) => {
@@ -199,85 +188,51 @@ pub async fn get_nfts_of(owner: Principal) -> Result<Vec<(Nat, Option<String>)>,
 
 
 #[update(guard = "is_frontend")]
-pub async fn get_metadata(token_id: Nat) -> Result<Option<BTreeMap<String, Value>>, String> {
+pub async fn get_metadata(token_ids: Vec<Nat>) -> Result<Vec<Option<BTreeMap<String, Value>>>, String> {
+    check_query_batch_size(&token_ids)?;
 
     let metadata_call_result: CallResult<(Vec<Option<BTreeMap<String, Value>>>,)> = ic_cdk::call(
         icrc7_principal(),
         "icrc7_token_metadata",
-        (vec![token_id.clone()],)
+        (token_ids.clone(),)
     ).await;
 
     match metadata_call_result {
         Ok((metadata,)) => {
-            Ok(metadata.into_iter().next().unwrap_or(None))
+            Ok(metadata)
         },
         Err((code, msg)) => {
-            Err(format!("Error fetching metadata for token {}: {:?} - {}", token_id, code, msg))
+            Err(format!("Error fetching metadata for tokens {:?}: {:?} - {}", token_ids, code, msg))
         }
     }
 }
 
-
 #[update(guard = "is_frontend")]
-pub async fn get_nft_manifest(token_id: Nat) -> Result<Option<String>, String> {
-    if let Some(metadata) = get_metadata(token_id).await? {
-        if let Some(description_value) = metadata.get("icrc7:metadata:uri:transactionId") {
-            if let Value::Text(text) = description_value {
-                return Ok(Some(text.clone()));
-            }
-        }
-    }
-    Ok(None)
+pub async fn get_manifest_ids(token_ids: Vec<Nat>) -> Result<Vec<Option<String>>, String> {
+    let manifests = get_metadata(token_ids).await?.into_iter().map(|metadata| {
+        metadata.and_then(|m| {
+            m.get("icrc7:metadata:uri:transactionId")
+                .and_then(|value| {
+                    if let Value::Text(text) = value {
+                        Some(text.clone())
+                    } else {
+                        None
+                    }
+                })
+        })
+    }).collect();
+
+    Ok(manifests)
 }
 
 
-#[update(guard = "is_frontend")]
-pub async fn is_verified(token_id: Nat) -> Result<bool, String> {
-  ic_cdk::println!("Checking verification status for token_id: {}", token_id);
-
-  if !nft_exists(token_id.clone()).await? {
-      return Err(format!("NFT with token_id {} does not exist", token_id));
-  }
-
-  ic_cdk::println!("Calling icrc7_token_metadata for token_id: {}", token_id);
-  let metadata_call_result: CallResult<(Vec<Option<BTreeMap<String, Value>>>,)> = ic_cdk::call(
-      icrc7_principal(),
-      "icrc7_token_metadata",
-      (vec![token_id.clone()],)
-  ).await;
-
-  match metadata_call_result {
-      Ok((metadata,)) => {
-          ic_cdk::println!("Received raw metadata: {:?}", metadata);
-          if let Some(Some(token_metadata)) = metadata.into_iter().next() {
-              ic_cdk::println!("Token metadata for {}: {:?}", token_id, token_metadata);
-              if let Some(Value::Blob(blob)) = token_metadata.get("icrc7:metadata:verified") {
-                  ic_cdk::println!("Verification blob: {:?}", blob);
-                  let is_verified = !blob.is_empty() && blob[0] == 1;
-                  ic_cdk::println!("Parsed is_verified: {}", is_verified);
-                  Ok(is_verified)
-              } else {
-                  ic_cdk::println!("No 'icrc7:metadata:verified' field found in metadata");
-                  Ok(false)
-              }
-          } else {
-              ic_cdk::println!("No metadata found for token_id: {}", token_id);
-              Ok(false)
-          }
-      },
-      Err((code, msg)) => {
-          ic_cdk::println!("Error fetching metadata: code={:?}, msg={}", code, msg);
-          Err(format!("Error fetching metadata for token {}: {:?} - {}", token_id, code, msg))
-      }
-  }
-}
 
 #[update(guard = "is_frontend")]
-pub async fn batch_is_verified(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
+pub async fn is_verified(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
     check_query_batch_size(&token_ids)?;
     ic_cdk::println!("Checking verification status for token_ids: {:?}", token_ids);
 
-    let exists_results = batch_nft_exists(token_ids.clone()).await?;
+    let exists_results = nfts_exist(token_ids.clone()).await?;
     if exists_results.iter().any(|&exists| !exists) {
         return Err(format!("One or more NFTs in {:?} do not exist", token_ids));
     }

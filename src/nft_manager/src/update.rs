@@ -24,7 +24,7 @@ pub async fn mint_nft(description: String, minting_number: Nat) -> Result<String
         return Err("Minting number must not exceed 32 digits".to_string());
     }
 
-    if nft_exists(minting_number.clone()).await? {
+    if let Some(true) = nfts_exist(vec![minting_number.clone()]).await?.first() {
         return Err("NFT already exists".to_string());
     }
 
@@ -71,8 +71,8 @@ async fn verify_nfts(minting_numbers: Vec<Nat>, owner: Principal) -> Result<Stri
 
     let original_count = minting_numbers.len();
 
-    let exists_results = batch_nft_exists(minting_numbers.clone()).await?;
-    let verified_results = batch_is_verified(minting_numbers.clone()).await?;
+    let exists_results = nfts_exist(minting_numbers.clone()).await?;
+    let verified_results = is_verified(minting_numbers.clone()).await?;
 
     let valid_nfts: Vec<(Nat, bool)> = minting_numbers.into_iter()
         .zip(exists_results.into_iter())
