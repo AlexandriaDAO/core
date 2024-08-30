@@ -8,16 +8,21 @@ import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swa
 import { _SERVICE as _SERVICELBRY } from '../../../../../../declarations/LBRY/LBRY.did';
 
 import burnLbry from "../../thunks/burnLBRY";
+import Auth from "@/features/auth";
+import { flagHandler } from "../../swapSlice";
 interface PerformSwapProps {
     actorSwap: ActorSubclass<_SERVICESWAP>;
-    actorLbry: ActorSubclass<_SERVICELBRY>
+    actorLbry: ActorSubclass<_SERVICELBRY>;
+    isAuthenticated: boolean;
+
 }
 
-const BurnSwap: React.FC<PerformSwapProps> = ({ actorSwap, actorLbry }) => {
+const BurnSwap: React.FC<PerformSwapProps> = ({ actorSwap, actorLbry,isAuthenticated }) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
+    const fee=0.0004;
     const tokenomics = useAppSelector((state) => state.tokenomics);
-    const [amountLBRY, setAmountLBRY] = useState("0");
+    const [amountLBRY, setAmountLBRY] = useState(0);
     const [tentativeICP, setTentativeICP] = useState(Number);
     const [tentativeALEX, setTentativeALEX] = useState(Number);
 
@@ -26,10 +31,19 @@ const BurnSwap: React.FC<PerformSwapProps> = ({ actorSwap, actorLbry }) => {
         dispatch(burnLbry({ actorSwap, actorLbry, amount: amountLBRY }))
     }
     const handleAmountLBRYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setAmountLBRY(e.target.value);
+        setAmountLBRY(Number(e.target.value));
         setTentativeICP((Number(e.target.value) / Number(swap.lbryRatio)) / 2);
         setTentativeALEX(Number(e.target.value) * Number(tokenomics.alexMintRate));
     }
+    useEffect(()=>{
+        if(swap.burnSuccess===true)
+        {
+            alert("Burned successfully!")
+            dispatch(flagHandler())
+        }
+    },[swap.burnSuccess])
+
+
     return (<div>
         {swap.loading ? (
             <div className="flex gap-1 items-center text-[#828282]">
@@ -40,9 +54,9 @@ const BurnSwap: React.FC<PerformSwapProps> = ({ actorSwap, actorLbry }) => {
             </div>) : (<div className="icp-wrapper">
                 <form action="#" onSubmit={(e) => { handleSubmit(e) }}>
                     <div className="label-wrapper">
-                        <label htmlFor="icp">LBRY</label>
+                        <label htmlFor="lbry">LBRY</label>
                         <div className="input-wrapper mt-2">
-                            <input id="icp" alt="ICP" type="number" placeholder="Enter ICP Numbers" value={amountLBRY} defaultValue={0.0} onChange={(e) => {
+                            <input id="lbry" alt="LBRY" type="integer" placeholder="Enter " value={amountLBRY} defaultValue={0} onChange={(e) => {
                                 handleAmountLBRYChange(e)
                             }} className="w-full py-1.5 px-4 w-100 rounded-lg" onWheel={event => event.currentTarget.blur()} />
                         </div>
@@ -50,16 +64,19 @@ const BurnSwap: React.FC<PerformSwapProps> = ({ actorSwap, actorLbry }) => {
                     <div className="label-wrapper flex items-center justify-between rounded-lg mt-4">
                         <h3>ICP</h3>
                         <div className="empty-container">
-                            {tentativeICP}
+                            {tentativeICP.toFixed(4)}
                         </div>
                     </div>
                     <div className="label-wrapper flex items-center justify-between rounded-lg mt-4">
                         <h3>ALEX</h3>
                         <div className="empty-container">
-                            {tentativeALEX}
+                            {tentativeALEX.toFixed(4)}
                         </div>
                     </div>
-                    <button type="submit" className="bottom-btn w-full rounded-lg text-white bg-blue-700 px-5 py-1.5 mt-8">Burn</button>
+                    * Fees will be charged in LBRY
+                    {isAuthenticated===true ? 
+                    (<button type="submit" className="bottom-btn w-full rounded-lg text-white bg-blue-700 px-5 py-1.5 mt-8">Burn</button>) : 
+                    (<button type="button" className="bottom-btn w-full rounded-full text-center text-black border-solid border bg-black border-black mt-8"> <Auth/></button>)}
                 </form>
             </div>)
         }

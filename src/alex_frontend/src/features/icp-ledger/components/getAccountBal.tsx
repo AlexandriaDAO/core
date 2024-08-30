@@ -8,17 +8,17 @@ import { ImSpinner8 } from "react-icons/im";
 import { _SERVICE as _SERVICEICPLEDGER } from '../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did'
 interface getaccountBalProps {
     actorIcpLedger: ActorSubclass<_SERVICEICPLEDGER>;
-
+    isAuthenticated:Boolean
 }
 
-const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger }) => {
+const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger,isAuthenticated }) => {
     const dispatch = useAppDispatch();
     const icpLedger = useAppSelector((state) => state.icpLedger);
     const swap = useAppSelector((state) => state.swap);
     const auth = useAppSelector((state) => state.auth);
 
     useEffect(() => {
-        if (auth.user !== "" && swap.subaccount !== "") {
+        if (isAuthenticated) {
             dispatch(getIcpBal({
                 actor: actorIcpLedger,
                 subaccount: swap.subaccount,
@@ -27,7 +27,7 @@ const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger }) => {
         }
     }, [auth.user, swap.subaccount])
     useEffect(() => {
-        if (swap.successClaimReward === true || swap.success == true
+        if (swap.successClaimReward === true || swap.swapSuccess === true ||swap.burnSuccess===true 
         ) {
             dispatch(getIcpBal({
                 actor: actorIcpLedger,
@@ -61,7 +61,7 @@ const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger }) => {
                     <h2 className="text-3xl">Subaccount Acocunt:</h2>
                     <h3>Address</h3>
                     <span className="address">
-                        {swap.subaccount}
+                        {isAuthenticated===true?swap.subaccount:""}
                     </span>
                     <h3>Balance</h3>
                     <span className="address">

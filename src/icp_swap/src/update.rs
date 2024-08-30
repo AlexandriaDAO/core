@@ -1,10 +1,11 @@
-use candid::{Nat, Principal};
+use candid::{CandidType, Nat, Principal};
+use serde::Deserialize;
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex};
 
-use crate::guard::*;
 use crate::utils::*;
-use ic_cdk::{self, caller, update};
+use crate::{get_current_LBRY_ratio, guard::*};
+use ic_cdk::{self, caller, query, update};
 use ic_ledger_types::{
     AccountIdentifier, BlockIndex as BlockIndexIC, Memo, Tokens, DEFAULT_SUBACCOUNT,
     MAINNET_LEDGER_CANISTER_ID,
@@ -16,28 +17,77 @@ use icrc_ledger_types::icrc2::transfer_from::{TransferFromArgs, TransferFromErro
 use crate::{get_stake, storage::*};
 use num_bigint::BigUint;
 
+#[derive(CandidType, Deserialize, Debug)]
+pub struct Metadata {
+    decimals: u32,
+    forex_timestamp: Option<u64>,
+    quote_asset_num_received_rates: u64,
+    base_asset_num_received_rates: u64,
+    base_asset_num_queried_sources: u64,
+    standard_deviation: u64,
+    quote_asset_num_queried_sources: u64,
+}
+#[derive(CandidType, Deserialize, Debug)]
+pub struct ExchangeRateResponse {
+    metadata: Metadata,
+    rate: u64,
+    timestamp: u64,
+    quote_asset: Asset,
+    base_asset: Asset,
+}
+#[derive(CandidType, Deserialize, Debug)]
+pub enum AssetClass {
+    Cryptocurrency,
+    FiatCurrency,
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub struct Asset {
+    class: AssetClass,
+    symbol: String,
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub enum XRCResponse {
+    Ok(ExchangeRateResponse),
+    Err(ExchangeRateError),
+}
+#[derive(CandidType, Deserialize)]
+pub struct GetExchangeRateRequest {
+    base_asset: Asset,
+    quote_asset: Asset,
+    timestamp: Option<u64>,
+}
 //swap
 #[update]
 pub async fn swap(amount_icp: u64) -> Result<String, String> {
     reentrancy(|| async move{if amount_icp < 10_000_000 {
         return Err("Minimum amount is 0.1 ICP".to_string());
     }
+    let limit_result = within_max_limit(0).await; //check if limit max reached 
+    if limit_result==false
+    {
+        return Err("No swap allowed, max limit reached!".to_string());
+
+    }
     deposit_icp_in_canister(amount_icp).await?;
     ic_cdk::println!("******************Icp received by canister! Now Transfering the token*************************");
-    TOTAL_ICP_AVAILABLE.with(|icp| -> Result<(), String> {
-        let mut icp = icp
+    TOTAL_ICP_AVAILABLE.with(|icp: &Arc<Mutex<u64>>| -> Result<(), String> {
+        let mut icp: std::sync::MutexGuard<u64> = icp
             .lock()
             .map_err(|_| "Failed to lock TOTAL_ICP_AVAILABLE".to_string())?;
         *icp = icp
             .checked_add(amount_icp)
-            .ok_or("Arithmetic overflow occurred in TOTAL_ICP_AVAILABLE calculation")?;
+            .ok_or("Arithmetic overflow occurred in TOTAL_ICP_AVAILABLE.")?;
         Ok(())
     })?;
+    let icp_rate_in_cents: u64 = get_current_LBRY_ratio();
     let lbry_amount: u64 = amount_icp
-        .checked_mul(LBRY_RATIO)
-        .ok_or("Arithmetic overflow occurred in lbry_amount calculation")?;
+        .checked_mul(icp_rate_in_cents)
+        .ok_or("Arithmetic overflow occurred in lbry_amount.")?;
     mint_LBRY(lbry_amount).await?;
-    Ok("Swapped Successfully!".to_string())}).await
+    Ok("Swapped Successfully!".to_string())
+ }).await
 }
 #[update]
 async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
@@ -88,29 +138,32 @@ async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
 
 #[update]
 pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
-    if amount_lbry < 100000 {
-        return Err("Minimum 0.001 LBRY required!".to_string());
+    if amount_lbry < 1 {
+        return Err("Minimum 1 LBRY required!".to_string());
+    }
+    let limit_result = within_max_limit(amount_lbry).await;
+    if limit_result == false {
+        return Err("Max limit reached, LBRY burning stopped!".to_string());
     }
     let caller: Principal = caller();
-    // LBRY 0.00001  : 0.00000005
-    const ICP_PER_LBRY_4: u64 = 5; //e8s
-    let mut amount_icp: u64 = amount_lbry
-        .checked_mul(ICP_PER_LBRY_4)
-        .ok_or("Arithmetic overflow occurred in LBRY to ICP conversion")?;
-    amount_icp = amount_icp
-        .checked_div(10000)
-        .ok_or("Arithmetic overflow occurred in ICP conversion")?;
+    //Dynamic price
+    let mut icp_rate_in_cents: u64 = get_current_LBRY_ratio();
+    ic_cdk::println!("The rate is {}", icp_rate_in_cents);
+    ic_cdk::println!("The amount_lbry is {}", amount_lbry);
+    let mut amount_icp_e8s = amount_lbry
+        .checked_mul(100_000_000)
+        .ok_or("Arithmetic overflow occurred in amount_icp_e8s.")?;
+    icp_rate_in_cents = icp_rate_in_cents
+        .checked_mul(2)
+        .ok_or("Arithmetic overflow occurred in icp_rate_in_cents")?;
+    amount_icp_e8s = amount_icp_e8s
+        .checked_div(icp_rate_in_cents)
+        .ok_or("Division failed in amount_icp. Please verify the amount is valid and non-zero")?;
 
-    // Old method to calculate ICP amount
-    // const ICP_DECIMALS: u64 = 100_000_000; // 8 decimal places
-    // const BURN_RATIO: f64 = 0.5; // 50% burn ratio
-    // let amount_icp: u64 = (((amount_lbry as f64 / lbry_per_icp as f64) * BURN_RATIO)
-    //     * ICP_DECIMALS as f64) as u64;
-
-    if amount_icp == 0 {
+    if amount_icp_e8s == 0 {
         return Err("Calculated ICP amount is too small".to_string());
     }
-    let total_icp_available = TOTAL_ICP_AVAILABLE.with(|icp| {
+    let total_icp_available = TOTAL_ICP_AVAILABLE.with(|icp: &Arc<Mutex<u64>>| {
         let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
         *icp
     });
@@ -121,27 +174,29 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
 
     let remaining_icp: u64 = total_icp_available
         .checked_sub(total_unclaimed_icp)
-        .ok_or("Arithmetic overflow in TOTAL_ICP_AVAILABLE calculation")?;
+        .ok_or("Arithmetic underflow in remaining_icp.")?;
 
     // Calculate 50% of the remaining ICP (keeping 50% for staker pools)
     let actual_available_icp = remaining_icp
         .checked_div(2)
-        .ok_or("Division by zero error in calculating actual available ICP")?;
+        .ok_or("Division failed in actual_available_icp. Please verify the amount is valid and non-zero")?;
 
-    if amount_icp > actual_available_icp {
+    if amount_icp_e8s > actual_available_icp {
         return Err("Burning stopped, insufficent icp funds ".to_string());
     }
-
-    burn_token(amount_lbry).await?;
+    let amount_lbry_e8s = amount_lbry
+        .checked_mul(100_000_000)
+        .ok_or("Arithmetic overflow occurred in amount_lbry_e8s.")?;
+    burn_token(amount_lbry_e8s).await?;
     ic_cdk::println!("******************Token Burned*************************");
-    send_icp(caller, amount_icp).await?;
-    TOTAL_ICP_AVAILABLE.with(|icp| -> Result<(), String> {
+    send_icp(caller, amount_icp_e8s).await?;
+    TOTAL_ICP_AVAILABLE.with(|icp: &Arc<Mutex<u64>>| -> Result<(), String> {
         let mut icp = icp
             .lock()
             .map_err(|_| "Failed to lock TOTAL_ICP_AVAILABLE".to_string())?;
         *icp = icp
-            .checked_add(amount_icp)
-            .ok_or_else(|| "Overflow in TOTAL_ICP_AVAILABLE calculation".to_string())?;
+            .checked_sub(amount_icp_e8s)
+            .ok_or_else(|| "Arithmetic underflow in TOTAL_ICP_AVAILABLE.".to_string())?;
         Ok(())
     })?;
     ic_cdk::println!("******************ICP sent to caller account*************************");
@@ -306,7 +361,7 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
                 time: ic_cdk::api::time(),
                 reward_icp: 0,
             });
-            current_stake.amount = current_stake.amount.checked_add(amount).ok_or("3")?;
+            current_stake.amount = current_stake.amount.checked_add(amount).ok_or("Arithmetic Overflow occurred in current_stake.amount")?;
             current_stake.time = ic_cdk::api::time();
             Ok(())
         });
@@ -314,7 +369,7 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
         let mut total_staked: std::sync::MutexGuard<u64> = total_staked.lock().unwrap();
         *total_staked = total_staked
             .checked_add(amount)
-            .ok_or("Arithmetic Overflow occurred in TOTAL_ALEX_STAKED calculation")?;
+            .ok_or("Arithmetic Overflow occurred in TOTAL_ALEX_STAKED.")?;
         Ok(())
     })?;
     ic_cdk::println!("Staked Successfully!");
@@ -374,7 +429,7 @@ async fn un_stake_ALEX(amount: u64) -> Result<String, String> {
         current_stake.amount = current_stake
             .amount
             .checked_sub(amount)
-            .ok_or("Arithmetic underflow occurred in stake")?;
+            .ok_or("Arithmetic underflow occurred in STAKES.")?;
         Ok(())
     })?;
 
@@ -407,7 +462,7 @@ async fn un_stake_all_ALEX() -> Result<String, String> {
         current_stake.amount = current_stake
             .amount
             .checked_sub(staked_amount)
-            .ok_or_else(|| "Arithmetic underflow occurred in stake".to_string())?;
+            .ok_or_else(|| "Arithmetic underflow occurred in STAKES".to_string())?;
         Ok(())
     })?;
     TOTAL_ALEX_STAKED.with(|total_staked| -> Result<(), String> {
@@ -422,78 +477,6 @@ async fn un_stake_all_ALEX() -> Result<String, String> {
 }
 
 //Guard ensure call is only by canister.
-// #[update(guard = "is_canister")]
-// #[update]
-// pub fn distribute_reward() -> Result<String, String> {
-//     let staking_percentage = STAKING_REWARD_PERCENTAGE;
-//     let total_icp_available = TOTAL_ICP_AVAILABLE.with(|icp| {
-//         let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
-//         *icp
-//     });
-//     if total_icp_available <= 0 {
-//         return Err("Insufficient ICP balance for reward distribution".to_string());
-//     }
-//     let mut total_icp_allocated: u64 = total_icp_available
-//         .checked_mul(staking_percentage)
-//         .ok_or("Arithmetic overflow occurred in total_icp_available.")?;
-//     ic_cdk::println!("Allocated icp {}", total_icp_allocated);
-
-//     total_icp_allocated= total_icp_allocated.checked_div(10000).ok_or("Division by 10000 failed in ICP allocation. Please verify the amount is valid and non-zero")?;
-//     if total_icp_allocated <= 10 {
-//         return Err("Allocated Icp balance less than 10 for reward distribution".to_string());
-//     }
-//     let total_staked_alex =
-//         TOTAL_ALEX_STAKED.with(|staked: &Arc<Mutex<u64>>| *staked.lock().unwrap());
-//     if total_staked_alex == 0 {
-//         return Err("No ALEX staked,cannot distribute rewards".to_string());
-//     }
-//     ic_cdk::println!("Allocated icp2 {}", total_icp_allocated);
-//     ic_cdk::println!("total staked alex {}", total_staked_alex);
-
-//     let icp_reward_per_alex = total_icp_allocated
-//         .checked_div(total_staked_alex)
-//         .ok_or("Division by zero")?;
-
-//     ic_cdk::println!("ICP reward per alex is {} !", icp_reward_per_alex);
-
-//     let mut total_icp_reward: u64 = 0;
-
-//     STAKES.with(|stakes: &RefCell<Stakes>| -> Result<(), String> {
-//         let mut stakes_mut = stakes.borrow_mut();
-//         for stake in stakes_mut.stakes.values_mut() {
-//             // Use checked multiplication
-//             let reward = stake
-//                 .amount
-//                 .checked_mul(icp_reward_per_alex)
-//                 .ok_or_else(|| "Arithmetic overflow occured in reward calculation".to_string())?;
-
-//             // Use checked addition for total_icp_reward
-//             total_icp_reward = total_icp_reward.checked_add(reward).ok_or_else(|| {
-//                 "Arithmetic overflow occurred in total reward calculation".to_string()
-//             })?;
-
-//             // Use checked addition for stake.reward_icp
-//             stake.reward_icp = stake.reward_icp.checked_add(reward).ok_or_else(|| {
-//                 "Arithmetic overflow occurred in individual stake reward calculation".to_string()
-//             })?;
-//         }
-//         Ok(())
-//     })?;
-
-//     // Ensure we don't exceed the total_icp_allocated
-
-//     TOTAL_UNCLAIMED_ICP_REWARD.with(|icp: &Arc<Mutex<u64>>| -> Result<(), String> {
-//         let mut icp = icp
-//             .lock()
-//             .map_err(|_| "Failed to lock TOTAL_UNCLAIMED_ICP_REWARD".to_string())?;
-//         // Use checked addition for TOTAL_UNCLAIMED_ICP_REWARD
-//         *icp = icp
-//             .checked_add(total_icp_reward)
-//             .ok_or("Arithmetic overflow occurred in unclaimed reward calculation")?;
-//         Ok(())
-//     })?;
-//     Ok("Success".to_string())
-// }
 #[update(guard = "is_canister")]
 pub fn distribute_reward() -> Result<String, String> {
     const SCALING_FACTOR: u128 = 1_000_000; // Adjust based on your precision needs
@@ -503,16 +486,25 @@ pub fn distribute_reward() -> Result<String, String> {
         let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
         *icp
     });
-    if total_icp_available <= 0 {
+    let total_unclaimed_icp_reward = TOTAL_UNCLAIMED_ICP_REWARD.with(|icp| {
+        let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
+        *icp
+    });
+    ic_cdk::println!("The unclaimed reward is ,{}",total_unclaimed_icp_reward);
+    if total_icp_available <= 0 || total_icp_available < total_unclaimed_icp_reward {
         return Err("Insufficient ICP balance for reward distribution".to_string());
     }
-    let mut total_icp_allocated: u128 = (total_icp_available as u128)
+    let mut total_icp_allocated: u128 = total_icp_available
+        .checked_sub((total_unclaimed_icp_reward as u128).try_into().unwrap())
+        .ok_or("Arithmetic underflow occurred in total_icp_available.")?
+        .into();
+    total_icp_allocated = total_icp_allocated
         .checked_mul(staking_percentage as u128)
-        .ok_or("Arithmetic overflow occurred in total_icp_available.")?;
+        .ok_or("Arithmetic overflow occurred in total_icp_allocated.")?;
     ic_cdk::println!("Allocated icp {}", total_icp_allocated);
 
-    total_icp_allocated = total_icp_allocated.checked_div(10000).ok_or("Division by 10000 failed in ICP allocation. Please verify the amount is valid and non-zero")?;
-    if total_icp_allocated <= 1000_000_000 {
+    total_icp_allocated = total_icp_allocated.checked_div(10000).ok_or("Division failed in ICP allocation. Please verify the amount is valid and non-zero")?;
+    if total_icp_allocated < 1000_000_000 {
         return Err("Cannot distribute reward allocated Icp balance less than 10".to_string());
     }
     let total_staked_alex =
@@ -525,7 +517,7 @@ pub fn distribute_reward() -> Result<String, String> {
 
     let icp_reward_per_alex = (total_icp_allocated * SCALING_FACTOR)
         .checked_div(total_staked_alex)
-        .ok_or("Division by zero")?;
+        .ok_or("Division failed in icp_reward_per_alex. Please verify it's valid and non-zero")?;
 
     ic_cdk::println!("ICP reward per alex (scaled) is {} !", icp_reward_per_alex);
 
@@ -536,16 +528,16 @@ pub fn distribute_reward() -> Result<String, String> {
         for stake in stakes_mut.stakes.values_mut() {
             let reward = (stake.amount as u128)
                 .checked_mul(icp_reward_per_alex)
-                .ok_or_else(|| "Arithmetic overflow occurred in reward calculation".to_string())?
+                .ok_or_else(|| "Arithmetic overflow occurred in reward.".to_string())?
                 .checked_div(SCALING_FACTOR)
-                .ok_or_else(|| "Division by scaling factor failed".to_string())?;
+                .ok_or_else(|| "Division failed in reward. Please verify it's valid and non-zero".to_string())?;
 
             total_icp_reward = total_icp_reward.checked_add(reward).ok_or_else(|| {
-                "Arithmetic overflow occurred in total reward calculation".to_string()
+                "Arithmetic overflow occurred in total_icp_reward.".to_string()
             })?;
 
             stake.reward_icp = stake.reward_icp.checked_add(reward as u64).ok_or_else(|| {
-                "Arithmetic overflow occurred in individual stake reward calculation".to_string()
+                "Arithmetic overflow occurred in individual stake.reward_icp".to_string()
             })?;
         }
         Ok(())
@@ -557,7 +549,7 @@ pub fn distribute_reward() -> Result<String, String> {
             .map_err(|_| "Failed to lock TOTAL_UNCLAIMED_ICP_REWARD".to_string())?;
         *icp = icp
             .checked_add(total_icp_reward as u64)
-            .ok_or("Arithmetic overflow occurred in unclaimed reward calculation")?;
+            .ok_or("Arithmetic overflow occurred in TOTAL_UNCLAIMED_ICP_REWARD.")?;
         Ok(())
     })?;
     Ok("Success".to_string())
@@ -605,6 +597,68 @@ async fn claim_icp_reward() -> Result<String, String> {
         None => {
             // User doesn't have a stake
             return Err("No record found !".to_string());
+        }
+    }
+}
+
+#[update(guard = "is_canister")]
+pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
+    let request: GetExchangeRateRequest = GetExchangeRateRequest {
+        base_asset: Asset {
+            symbol: "ICP".to_string(),
+            class: AssetClass::Cryptocurrency,
+        },
+        quote_asset: Asset {
+            symbol: "USDT".to_string(),
+            class: AssetClass::Cryptocurrency,
+        },
+        timestamp: None,
+    };
+
+    // XRC canister ID
+    let xrc_canister_id = Principal::from_text(XRC_CANISTER_ID).unwrap();
+
+    // Prepare the call
+    let call_result: Result<Vec<u8>, (ic_cdk::api::call::RejectionCode, String)> =
+        ic_cdk::api::call::call_raw(
+            xrc_canister_id,
+            "get_exchange_rate",
+            &candid::encode_args((request,)).unwrap(),
+            10000000000, // payment fee
+        )
+        .await;
+
+    match call_result {
+        Ok(response_bytes) => match candid::decode_one::<XRCResponse>(&response_bytes) {
+            Ok(response) => {
+                println!("Decoded response: {:?}", response);
+                match response {
+                    XRCResponse::Ok(exchange_rate) => {
+                        let divisor: u64 = 10_u64.pow(exchange_rate.metadata.decimals - 2);
+                        let price_in_cents_es8 = exchange_rate.rate.checked_div(divisor).ok_or(
+                            "Division failed in price_in_cents_es8. Please verify it's valid and non-zero"
+                        )?;
+                        LBRY_RATIO.with(|ratio| {
+                            let mut ratio = ratio.borrow_mut();
+                            ratio.ratio = price_in_cents_es8;
+                            ratio.time = ic_cdk::api::time() / 1_000_000_000;
+                        });
+                        Ok(price_in_cents_es8)
+                    }
+                    XRCResponse::Err(err) => {
+                        println!("Error in XRC response: {:?}", err);
+                        Err("Error in XRC response".to_string())
+                    }
+                }
+            }
+            Err(e) => {
+                println!("Decoding error: {:?}", e);
+                Err("Error in decoding XRC response".to_string())
+            }
+        },
+        Err((rejection_code, msg)) => {
+            ic_cdk::println!("Call rejected: {:?}, {}", rejection_code, msg);
+            Err("Error call rejected".to_string())
         }
     }
 }

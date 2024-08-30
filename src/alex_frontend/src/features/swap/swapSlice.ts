@@ -1,7 +1,4 @@
-import {
-  ActionReducerMapBuilder,
-  createSlice,
-} from "@reduxjs/toolkit";
+import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import { message } from "antd";
 import getLBRYratio from "./thunks/getLBRYratio";
 import getSubaccount from "./thunks/getSubaccount";
@@ -27,13 +24,13 @@ export interface SwapState {
   maxLbryBurn: Number;
   stakeInfo: StakeInfo;
   loading: boolean;
-  success: boolean;
+  swapSuccess: boolean;
+  burnSuccess: boolean;
   successStake: boolean;
-  successClaimReward:boolean;
-  unstakeSuccess:boolean;
+  successClaimReward: boolean;
+  unstakeSuccess: boolean;
   error: string | null;
 }
-
 
 // Define the initial state using the ManagerState interface
 const initialState: SwapState = {
@@ -41,11 +38,12 @@ const initialState: SwapState = {
   lbryBalance: "0",
   subaccount: "",
   maxLbryBurn: 0,
-  stakeInfo: {stakedAlex:"0",rewardIcp:"0",unix_stake_time:"0"},
-  success: false,
+  stakeInfo: { stakedAlex: "0", rewardIcp: "0", unix_stake_time: "0" },
+  swapSuccess: false,
   successStake: false,
-  successClaimReward:false,
-  unstakeSuccess:false,
+  burnSuccess: false,
+  successClaimReward: false,
+  unstakeSuccess: false,
   loading: false,
   error: null,
 };
@@ -56,10 +54,11 @@ const swapSlice = createSlice({
   reducers: {
     flagHandler: (state) => {
       state.error = "";
-      state.success = false;
+      state.swapSuccess = false;
+      state.burnSuccess=false;
       state.successStake = false;
-      state.successClaimReward=false;
-      state.unstakeSuccess=false;
+      state.successClaimReward = false;
+      state.unstakeSuccess = false;
       state.error = null;
     },
   },
@@ -137,7 +136,7 @@ const swapSlice = createSlice({
       .addCase(swapLbry.fulfilled, (state, action) => {
         message.success("Successfully Swaped!");
         state.loading = false;
-        state.success = true;
+        state.swapSuccess = true;
         state.error = null;
       })
       .addCase(swapLbry.rejected, (state, action) => {
@@ -168,6 +167,7 @@ const swapSlice = createSlice({
       })
       .addCase(burnLbry.fulfilled, (state, action) => {
         message.success("Burned LBRY sucessfully!");
+        state.burnSuccess = true;
         state.loading = false;
         state.error = null;
       })
@@ -175,7 +175,8 @@ const swapSlice = createSlice({
         message.error("Error while burning!");
         state.loading = false;
         state.error = action.payload as string;
-      }) .addCase(claimReward.pending, (state) => {
+      })
+      .addCase(claimReward.pending, (state) => {
         message.info("Claiming!");
         state.loading = true;
         state.error = null;
@@ -188,9 +189,10 @@ const swapSlice = createSlice({
       })
       .addCase(claimReward.rejected, (state, action) => {
         message.error("Error while claiming!");
-        state.loading = false; 
+        state.loading = false;
         state.error = action.payload as string;
-      }).addCase(unstake.pending, (state) => {
+      })
+      .addCase(unstake.pending, (state) => {
         message.info("Unstaking!");
         state.loading = true;
         state.error = null;
@@ -203,7 +205,7 @@ const swapSlice = createSlice({
       })
       .addCase(unstake.rejected, (state, action) => {
         message.error("Error while unstaking!");
-        state.loading = false; 
+        state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(getMaxLbryBurn.pending, (state) => {

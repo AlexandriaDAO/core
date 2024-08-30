@@ -27,7 +27,7 @@ const ClaimReward: React.FC<LbryRatioProps> = ({ actorSwap }) => {
         }
 
 
-    }, [])
+    }, [swap])
     return (<div className="account-wrapper">
         <button
             onClick={(e) => handleClaim(e)}

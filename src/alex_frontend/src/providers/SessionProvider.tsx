@@ -26,8 +26,8 @@ interface SessionProviderProps {
 // authClient > user > actor > my-engines > [meiliclient, meiliindex]
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const dispatch = useAppDispatch();
-	const {user} = useAppSelector(state=>state.auth);
-	const { books } = useAppSelector(state=>state.portal);
+	const { user } = useAppSelector(state => state.auth);
+	const { books } = useAppSelector(state => state.portal);
 
 	const [actor, setActor] = useState(alex_backend);
 	const [actorIcrc7, setActorIcrc7] = useState(icrc7);
@@ -35,8 +35,8 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const [actorSwap,setActorSwap]=useState(icp_swap);
 	const [actorIcpLedger, setIcpLedger] = useState(icp_ledger_canister);
 	const [actorTokenomics, setActorTokenomics] = useState(tokenomics);
-	const [actorLbry,setActorLbry]=useState(LBRY);
-	const [actorAlex,setActorAlex]=useState(ALEX);
+	const [actorLbry, setActorLbry] = useState(LBRY);
+	const [actorAlex, setActorAlex] = useState(ALEX);
 
 	const [authClient, setAuthClient] = useState<AuthClient>();
 	const [meiliClient, setMeiliClient] = useState<MeiliSearch>();
@@ -62,17 +62,17 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		if(client) setMeiliClient(client)
 	}
 
-	useEffect(()=>{
+	useEffect(() => {
 		initializeAuthClient()
 		initializeMeiliClient()
-	},[])
+	}, [])
 
 
-	useEffect(()=>{
-		if(!authClient) return;
+	useEffect(() => {
+		if (!authClient) return;
 
 		dispatch(principal(authClient))
-	},[authClient])
+	}, [authClient])
 
 	useEffect(()=>{
 		if(!authClient) return;
@@ -98,18 +98,18 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		setupActor();
 	},[user])
 
-	useEffect(()=>{
+	useEffect(() => {
 		setMeiliIndex(undefined)
-		if(!user || !meiliClient) return;
+		if (!user || !meiliClient) return;
 
-		const setupMeiliIndex = async()=>{
+		const setupMeiliIndex = async () => {
 
 			const index = await initializeIndex(meiliClient, user)
 
-			if(index) setMeiliIndex(index)
+			if (index) setMeiliIndex(index)
 		}
 		setupMeiliIndex();
-	},[user, meiliClient])
+	}, [user, meiliClient])
 
 	// Load 10 books on app start.
 	useEffect(() => {
