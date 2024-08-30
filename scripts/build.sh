@@ -14,6 +14,7 @@ dfx deps pull
 dfx deps init
 dfx deps deploy
 dfx deps deploy internet_identity
+dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
 
 # Step 3: Deploy nft_manager, which deploys icrc7
 
@@ -69,7 +70,7 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
         record {  
           \"$DEFAULT_ACCOUNT_ID\";  
           record {  
-            e8s = 10_000_000_000 : nat64;  
+            e8s = 8_681_981_000_000_000 : nat64;  
           };  
         };  
       };  
@@ -83,66 +84,43 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
   })  
 "
 
-
-dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
-  (variant {
-    Init = record {
-      token_name = "Library Credits";
-      token_symbol = "LBRY";
-      minting_account = record {
-        owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      initial_balances = vec {
-        record {
-          record {
-            owner = principal "'${DEFAULT_ACCOUNT_PRINCIPAL}'";
-          };
-          100_000_000_000;
-        };
-      };
-      metadata = vec {};
-      transfer_fee = 4_000_000;
-      archive_options = record {
-        trigger_threshold = 2000;
-        num_blocks_to_archive = 1000;
-        controller_id = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      feature_flags = opt record {
+dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '(variant { Init = 
+record {
+     token_symbol = "LBRY";
+     token_name = "LBRY";
+     minting_account = record { owner = principal "'$(dfx canister id icp_swap)'" };
+     transfer_fee = 4_000_000;
+     metadata = vec {};
+     initial_balances = vec { record { record { owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'" }; 0 } };
+     archive_options = record {
+         num_blocks_to_archive = 1000;
+         trigger_threshold = 2000;
+         controller_id = principal "'$(dfx canister id icp_swap)'";
+     };
+     feature_flags = opt record {
         icrc2 = true;
-      };
-    }
-  })
-'
+     };
+ }
+})'
 
-dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
-  (variant {
-    Init = record {
-      token_name = "Alexandria";
-      token_symbol = "ALEX";
-      minting_account = record {
-        owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      initial_balances = vec {
-        record {
-          record {
-            owner = principal "'${DEFAULT_ACCOUNT_PRINCIPAL}'";
-          };
-          100_000_000_000;
-        };
-      };
-      metadata = vec {};
-      transfer_fee = 10_000;
-      archive_options = record {
-        trigger_threshold = 2000;
-        num_blocks_to_archive = 1000;
-        controller_id = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      feature_flags = opt record {
+dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '(variant { Init = 
+record {
+     token_symbol = "ALEX";
+     token_name = "ALEX";
+     minting_account = record { owner = principal "'$(dfx canister id tokenomics)'" };
+     transfer_fee = 10_000;
+     metadata = vec {};
+     initial_balances = vec { record { record { owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'" }; 0 } };
+     archive_options = record {
+         num_blocks_to_archive = 1000;
+         trigger_threshold = 2000;
+         controller_id = principal "'$(dfx canister id tokenomics)'";
+     };
+     feature_flags = opt record {
         icrc2 = true;
-      };
-    }
-  })
-'
+     };
+ }
+})'
 
 
 echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."
