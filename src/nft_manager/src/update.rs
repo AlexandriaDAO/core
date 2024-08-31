@@ -6,11 +6,16 @@ use crate::types::*;
 use crate::utils::*;
 use crate::query::*;
 
+use ic_cdk::api::time;
 use ic_cdk::update;
 use candid::{Nat, Principal};
 use ic_cdk::api::call::CallResult;
 use ic_cdk::caller;
 use icrc_ledger_types::{icrc::generic_value::Value, icrc1::account::Account};
+
+
+use candid::{CandidType, Deserialize};
+
 
 #[update(guard = "not_anon")]
 pub async fn mint_nft(description: String, minting_number: Nat) -> Result<String, String> {
@@ -153,6 +158,229 @@ async fn verify_nfts(minting_numbers: Vec<Nat>, owner: Principal) -> Result<Stri
         Err((code, msg)) => Err(format!("Error calling icrcX_mint: {:?} - {}", code, msg))
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+#[update(guard = "not_anon")]
+pub async fn transfer_nft(token_id: Nat, to: Principal, from_subaccount: Option<Vec<u8>>, memo: Option<Vec<u8>>) -> Result<Nat, String> {
+    let transfer_arg = TransferArg {
+        to: Account {
+            owner: to,
+            subaccount: None,
+        },
+        token_id,
+        memo,
+        from_subaccount,
+        created_at_time: Some(time()),
+    };
+
+    let call_result: CallResult<(Vec<Option<TransferResult>>,)> = ic_cdk::call(
+        icrc7_principal(),
+        "icrc7_transfer",
+        (vec![transfer_arg],)
+    ).await;
+
+    match call_result {
+        Ok((transfer_results,)) => match transfer_results.get(0).and_then(|r| r.as_ref()) {
+            Some(TransferResult::Ok(transaction_index)) => Ok(transaction_index.clone()),
+            Some(TransferResult::Err(transfer_error)) => Err(format!("Transfer failed: {:?}", transfer_error)),
+            None => Err("No transfer result returned".to_string()),
+        },
+        Err((code, msg)) => Err(format!("Error calling icrc7_transfer: {:?} - {}", code, msg)),
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+// This works like a charm.
+linus@Henry:~/alexandria/core$ dfx canister call icrc7 icrcX_burn '(
+    record {
+      memo = null;
+      tokens = vec { 2 : nat };
+      created_at_time = null;
+    }
+  )'
+
+// This does not work.
+dfx canister call nft_manager mint_nft '("asdf", 2)'
+
+dfx canister call nft_manager verify_nfts '(vec { 2 : nat }, principal "forhl-tiaaa-aaaak-qc7ga-cai")'
+
+dfx canister call nft_manager burn_nft '(2 : nat)'
+
+(
+  variant {
+    Err = "Error calling icrcX_burn: CanisterError - failed to decode canister response as (alloc::vec::Vec<nft_manager::update::BurnResult>,): Fail to decode argument 0"
+  },
+)
+*/
+
+
+
+#[derive(CandidType, Deserialize, Debug)]
+struct BurnRequest {
+    memo: Option<Vec<u8>>,
+    tokens: Vec<Nat>,
+    created_at_time: Option<u64>,
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub enum BurnError {
+    GenericError { message: String, error_code: Nat },
+    NonExistingTokenId,
+    InvalidBurn,
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub struct BurnOk {
+    pub token_id: Nat,
+    pub result: BurnResult,
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub enum BurnResult {
+    Ok(Nat),
+    Err(BurnError),
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub enum BurnResponse {
+    Ok(Vec<BurnOk>),
+    Err(BurnResponseError),
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub enum BurnResponseError {
+    GenericError { message: String, error_code: Nat },
+    Unauthorized,
+    CreatedInFuture { ledger_time: u64 },
+    TooOld,
+}
+
+use ic_cdk::println;
+
+#[update(guard = "not_anon")]
+pub async fn burn_nft(token_id: Nat) -> Result<BurnOk, String> {
+    println!("Attempting to burn NFT with token_id: {:?}", token_id);
+
+    if !is_verified(vec![token_id.clone()]).await?.first().unwrap_or(&false) {
+        println!("NFT verification failed for token_id: {:?}", token_id);
+        return Err("NFT is not verified".to_string());
+    }
+
+    let burn_request = BurnRequest {
+        memo: None,
+        tokens: vec![token_id.clone()],
+        created_at_time: None,
+    };
+
+    println!("Sending burn request: {:?}", burn_request);
+
+    let call_result: CallResult<(BurnResponse,)> = ic_cdk::call(
+        icrc7_principal(),
+        "icrcX_burn",
+        (burn_request,)
+    ).await;
+
+    println!("Received call result: {:?}", call_result);
+
+    match call_result {
+        Ok((burn_response,)) => {
+            println!("Burn response: {:?}", burn_response);
+            match burn_response {
+                BurnResponse::Ok(burn_results) => burn_results.into_iter().next()
+                    .ok_or_else(|| {
+                        println!("No burn result returned");
+                        "No burn result returned".to_string()
+                    }),
+                BurnResponse::Err(err) => {
+                    println!("Burn error: {:?}", err);
+                    Err(format!("Burn error: {:?}", err))
+                },
+            }
+        },
+        Err((code, msg)) => {
+            println!("Error calling icrcX_burn: {:?} - {}", code, msg);
+            Err(format!("Error calling icrcX_burn: {:?} - {}", code, msg))
+        },
+    }
+}
+
+// icrc7_official TransferArgs
+#[derive(CandidType, Deserialize)]
+pub struct TransferArg {
+    pub to: Account,
+    pub token_id: Nat,
+    pub memo: Option<Vec<u8>>,
+    pub from_subaccount: Option<Vec<u8>>,
+    pub created_at_time: Option<u64>,
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub enum TransferError {
+    GenericError { message: String, error_code: Nat },
+    Duplicate { duplicate_of: Nat },
+    NonExistingTokenId,
+    Unauthorized,
+    CreatedInFuture { ledger_time: u64 },
+    InvalidRecipient,
+    GenericBatchError { message: String, error_code: Nat },
+    TooOld,
+}
+
+#[derive(CandidType, Deserialize)]
+pub enum TransferResult {
+    Ok(Nat),
+    Err(TransferError),
+}
+
 
 
 

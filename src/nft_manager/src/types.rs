@@ -36,3 +36,31 @@ pub struct TokenBalances {
     pub lbry: NumTokens,
     pub alex: NumTokens,
 }
+
+// icrc7_official TransferArgs
+#[derive(candid::CandidType, serde::Deserialize)]
+pub struct TransferArg {
+    pub from_subaccount: Option<Vec<u8>>,
+    pub to: Account,
+    pub token_id: Nat,
+    pub memo: Option<Vec<u8>>,
+    pub created_at_time: Option<u64>,
+}
+
+#[derive(candid::CandidType, serde::Deserialize)]
+pub enum TransferResult {
+    Ok(Nat),
+    Err(TransferError),
+}
+
+#[derive(candid::CandidType, serde::Deserialize, Debug)]
+pub enum TransferError {
+    pubNonExistingTokenId,
+    InvalidRecipient,
+    Unauthorized,
+    TooOld,
+    CreatedInFuture { ledger_time: u64 },
+    Duplicate { duplicate_of: Nat },
+    GenericError { error_code: Nat, message: String },
+    GenericBatchError { error_code: Nat, message: String },
+}

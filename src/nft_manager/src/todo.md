@@ -3,26 +3,14 @@ todo.md
 
 # General
 
-*minor*
-
-- So get_nfts_of only returns 50 of them (unless you specifiy up to 1000 with icrc7_tokens_of()), but icrc7_balance_of() returns the total in someone's wallet, so we can use that.
-  - Maybe since access is limited to the frontend now, we can upgrade the max query values.
-    - Maybe change these to 100, and 20,000 and there's no problems. If you have more than 20,000 NFTs than you need to split wallets.
-      -   default_take_value = ?50; max_take_value = ?1000;
-
-- Change the withdraw_all() to first get all the non-zero balances of that owner, than do the withdraw. Clean up the rest of what we did on this list. 
-  - Need to ensure that it is verified, or which ones are verified are withdrawable.
-  - Need to get the ids from the owned_nfts()
-    - Need to make a function get_verified_nfts_of: get_nfts_of()
+- So apparently my canister is not authorized to burn NFTs. MFKR
+  - Maybe I just mint it to the zero address? (nope, doesn't delete it)
+  - Maybe I just transfer to the nft_manager and then burn? (invalid recipient)
+    - Maybe I just do a unverified_burn() to nft_manager, and a verified_burn() to the burn address. Then transfers() I'll leave open for owners to do themselves.
 
 
-- Need to add the properites of the proposal to the verified nfts. 
-  - I'll need to carefully change property_shared, candy_shared, nft_input, and nft_output, but other than that it should be smooth.
+- Also the big double-spend icrc7 bugg has been fixed and I need to update.
 
-
-- Fix verify_nft(): First I have to check that it exists, and the verified feild is false and immutable.
-
-- get_nfts_of() is limited to 
 
 *features*
 
@@ -32,6 +20,7 @@ todo.md
 - Voting Process/DAO.
 
 
+
 *ultra security checklist*
 
 - all nft_manager functions that cost money only require a non-anon caller.
@@ -39,6 +28,8 @@ todo.md
 - And the ICRC7 Cansiter issue:
   - Updates callable by nft_manager only.
   - Queries callable by nft_manager and alex_frontend only.
+- In withdraw functions, block unmatched callers (they're tring to ddos).
+
 
 ## Wallets
 
@@ -104,7 +95,15 @@ settle_dispute_proposal(proposal_id)
     - do nothing.
 
 
+- Need to add the properites of the proposal to the verified nfts. 
+  - I'll need to carefully change property_shared, candy_shared, nft_input, and nft_output, but other than that it should be smooth.
 
+
+
+*major for later*
+
+
+- I need to build a database that tracks the icrc7 balances in all the subaccounts. This is going to be an annoying mess, but it's better than doing all those inter-canister calls.
 
 
 

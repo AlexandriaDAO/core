@@ -45,8 +45,8 @@ pub async fn get_tokens(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>
 
     // Adjust the range calculation to be inclusive
     let range = end.clone() - start.clone() + Nat::from(1u64);
-    if range > Nat::from(1000u64) {
-        return Err("Range must not exceed 1000".to_string());
+    if range > Nat::from(20000u64) {
+        return Err("Range must not exceed 20000".to_string());
     }
 
     // Adjust the end parameter to be inclusive
@@ -72,6 +72,10 @@ pub async fn get_tokens(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>
 
 #[update(guard = "is_frontend")]
 pub async fn get_nft_balances(mint_numbers: Vec<Nat>) -> Result<Vec<TokenBalances>, String> {
+    if mint_numbers.len() >= 50 {
+        return Err("Cannot process more than 49 tokens at a time".to_string());
+    }
+    
     check_query_batch_size(&mint_numbers)?;
 
     let mut results = Vec::new();
@@ -140,7 +144,7 @@ pub async fn nfts_exist(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
 
 
 #[update(guard = "is_frontend")]
-pub async fn get_owner(token_id: Nat) -> Result<Option<Account>, String> {
+pub async fn owner_of(token_id: Nat) -> Result<Option<Account>, String> {
 
     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
         icrc7_principal(),
@@ -170,6 +174,7 @@ pub async fn get_nfts_of(owner: Principal) -> Result<Vec<(Nat, Option<String>)>,
         icrc7_principal(),
         "icrc7_tokens_of",
         (account, None::<Nat>, None::<Nat>)
+        // (account, Some(Nat::from(0u64)), Some(Nat::from(20_000u64)))
     ).await;
 
     match tokens_call_result {
@@ -268,4 +273,39 @@ pub async fn is_verified(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
             Err(format!("Error fetching metadata for tokens {:?}: {:?} - {}", token_ids, code, msg))
         }
     }
+}
+
+#[update(guard = "is_frontend")]
+pub async fn get_my_nft_balances(slot: Option<Nat>) -> Result<Vec<(Nat, TokenBalances)>, String> {
+    let caller = ic_cdk::api::caller();
+    
+    let nfts = get_nfts_of(caller).await
+        .map_err(|e| format!("Failed to get NFTs: {}", e))?;
+    
+    let token_ids: Vec<Nat> = nfts.into_iter().map(|(id, _)| id).collect();
+    let slot_size = 50;
+    let start_index = slot.unwrap_or_default().0.clone().try_into().unwrap_or(0) * slot_size;
+    let end_index = (start_index + slot_size).min(token_ids.len());
+    
+    if start_index >= token_ids.len() {
+        return Ok(Vec::new());
+    }
+    
+    let slot_token_ids = &token_ids[start_index..end_index];
+    
+    let batch_size = 49; // Maximum allowed by get_nft_balances
+    let mut result = Vec::with_capacity(slot_token_ids.len());
+    
+    for chunk in slot_token_ids.chunks(batch_size) {
+        match get_nft_balances(chunk.to_vec()).await {
+            Ok(balances) => {
+                result.extend(chunk.iter().cloned().zip(balances));
+            },
+            Err(e) => {
+                ic_cdk::println!("Error fetching balances for batch: {}", e);
+            }
+        }
+    }
+    
+    Ok(result)
 }

@@ -13,8 +13,8 @@ module{
         atomic_batch_transfers = true;
         max_query_batch_size = ?100;
         max_update_batch_size = ?20;
-        default_take_value = ?50;
-        max_take_value = ?1000;
+        default_take_value = ?100;
+        max_take_value = ?20000;
         max_memo_size = ?512;
         permitted_drift = null;
         tx_window = null;
