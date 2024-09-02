@@ -2,7 +2,7 @@
 // import Query from "@irys/query";
 
 import { Book } from "@/features/portal/portalSlice";
-import { TokenDetail } from "../../../../src/declarations/alex_backend/alex_backend.did";
+// import { TokenDetail } from "../../../../src/declarations/alex_backend/alex_backend.did";
 
 
 // function getTag(name: string, transaction:any): string {
@@ -92,7 +92,7 @@ import { TokenDetail } from "../../../../src/declarations/alex_backend/alex_back
 // }
 
 
-export const getBooks = async (nfts: TokenDetail[] = []): Promise<Book[]> => {
+export const getBooks = async (nfts: any[] = []): Promise<Book[]> => {
     const books: Book[] = [];
 
     await Promise.all(
