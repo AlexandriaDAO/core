@@ -7,16 +7,16 @@ type BurnError = variant {
 type BurnOk = record { result : BurnResult; token_id : nat };
 type BurnResult = variant { Ok : nat; Err : BurnError };
 type Result = variant { Ok : BurnOk; Err : text };
-type Result_1 = variant { Ok : vec opt text; Err : text };
+type Result_1 = variant { Ok : text; Err : text };
 type Result_10 = variant { Ok : nat; Err : text };
 type Result_11 = variant { Ok : record { opt nat; opt nat }; Err : text };
-type Result_2 = variant { Ok : vec opt vec record { text; Value }; Err : text };
-type Result_3 = variant { Ok : vec record { nat; TokenBalances }; Err : text };
-type Result_4 = variant { Ok : vec TokenBalances; Err : text };
-type Result_5 = variant { Ok : vec record { nat; opt text }; Err : text };
-type Result_6 = variant { Ok : vec nat; Err : text };
-type Result_7 = variant { Ok : vec bool; Err : text };
-type Result_8 = variant { Ok : text; Err : text };
+type Result_2 = variant { Ok : vec opt text; Err : text };
+type Result_3 = variant { Ok : vec opt vec record { text; Value }; Err : text };
+type Result_4 = variant { Ok : vec record { nat; TokenBalances }; Err : text };
+type Result_5 = variant { Ok : vec TokenBalances; Err : text };
+type Result_6 = variant { Ok : vec record { nat; opt text }; Err : text };
+type Result_7 = variant { Ok : vec nat; Err : text };
+type Result_8 = variant { Ok : vec bool; Err : text };
 type Result_9 = variant { Ok : opt Account; Err : text };
 type TokenBalances = record { alex : nat; lbry : nat };
 type Value = variant {
@@ -29,19 +29,19 @@ type Value = variant {
   Array : vec Value;
 };
 service : () -> {
-  burn_nft : (nat) -> (Result);
-  get_manifest_ids : (vec nat) -> (Result_1);
-  get_metadata : (vec nat) -> (Result_2);
-  get_my_nft_balances : (opt nat) -> (Result_3);
-  get_nft_balances : (vec nat) -> (Result_4);
-  get_nfts_of : (principal) -> (Result_5);
-  get_tokens : (opt nat, opt nat) -> (Result_6);
-  is_verified : (vec nat) -> (Result_7);
-  mint_nft : (text, nat) -> (Result_8);
-  nfts_exist : (vec nat) -> (Result_7);
+  burn_forever : (nat) -> (Result);
+  burn_to_lbry : (vec nat) -> (Result_1);
+  get_manifest_ids : (vec nat) -> (Result_2);
+  get_metadata : (vec nat) -> (Result_3);
+  get_my_nft_balances : (opt nat) -> (Result_4);
+  get_nft_balances : (vec nat) -> (Result_5);
+  get_nfts_of : (principal) -> (Result_6);
+  get_tokens : (opt nat, opt nat) -> (Result_7);
+  is_verified : (vec nat) -> (Result_8);
+  mint_nft : (text, nat) -> (Result_1);
+  nfts_exist : (vec nat) -> (Result_8);
   owner_of : (nat) -> (Result_9);
   total_supply : () -> (Result_10);
-  transfer_nft : (nat, principal, opt blob, opt blob) -> (Result_10);
-  verify_nfts : (vec nat, principal) -> (Result_8);
+  verify_nfts : (vec nat, principal) -> (Result_1);
   withdraw : (nat) -> (Result_11);
 }

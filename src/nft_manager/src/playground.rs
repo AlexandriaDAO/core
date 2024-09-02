@@ -252,3 +252,90 @@
     
 //     Ok(result)
 // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// We don't need transfer anymore because we'll leave that open on the icrc7 canister: 
+
+// #[update(guard = "not_anon")]
+// pub async fn transfer_nft(token_id: Nat, to: Principal, from_subaccount: Option<Vec<u8>>, memo: Option<Vec<u8>>) -> Result<Nat, String> {
+//     let transfer_arg = TransferArg {
+//         to: Account {
+//             owner: to,
+//             subaccount: None,
+//         },
+//         token_id,
+//         memo,
+//         from_subaccount,
+//         created_at_time: Some(time()),
+//     };
+
+//     let call_result: CallResult<(Vec<Option<TransferResult>>,)> = ic_cdk::call(
+//         icrc7_principal(),
+//         "icrc7_transfer",
+//         (vec![transfer_arg],)
+//     ).await;
+
+//     match call_result {
+//         Ok((transfer_results,)) => match transfer_results.get(0).and_then(|r| r.as_ref()) {
+//             Some(TransferResult::Ok(transaction_index)) => Ok(transaction_index.clone()),
+//             Some(TransferResult::Err(transfer_error)) => Err(format!("Transfer failed: {:?}", transfer_error)),
+//             None => Err("No transfer result returned".to_string()),
+//         },
+//         Err((code, msg)) => Err(format!("Error calling icrc7_transfer: {:?} - {}", code, msg)),
+//     }
+// }
+
+
+
+
+
+
+
+
+
+
+
+// // Old assign function, which apparently is useless and a regular transfer.
+
+// public shared(msg) func assign(token_id : Nat, account : Account) : async (Nat, Principal) {
+//   let apparent_owner = icrc7().get_state().owner;
+//   D.print("Caller: " # debug_show(msg.caller));
+//   D.print("Apparent owner: " # debug_show(apparent_owner));
+
+//   let transfer_result = switch(icrc7().transfer<system>(Principal.fromActor(this), [{
+//     from_subaccount = null;
+//     to = account;
+//     token_id = token_id;
+//     memo = null;
+//     created_at_time = null;
+//   }])[0]){
+//     case(?#Ok(val)) val;
+//     case(?#Err(err)) D.trap(debug_show(err));
+//     case(_) D.trap("unknown");
+//   };
+
+//   (transfer_result, apparent_owner)
+// };

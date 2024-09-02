@@ -440,7 +440,7 @@ shared(_init_msg) actor class Example(_args : {
   /////////
 
   public shared(msg) func icrcX_mint(tokens: ICRC7.SetNFTRequest) : async [ICRC7.SetNFTResult] {
-
+    // assert(msg.caller == Principal.fromText("forhl-tiaaa-aaaak-qc7ga-cai"));
     //for now we require an owner to mint.
     switch(icrc7().set_nfts<system>(msg.caller, tokens, true)){
       case(#ok(val)) val;
@@ -455,56 +455,60 @@ shared(_init_msg) actor class Example(_args : {
       };
   };
 
-  private stable var _init = false;
+  private stable var _init = true;
 
-  public shared(msg) func init() : async () {
-    //can only be called once
+//   public shared(msg) func init() : async () {
+//     //can only be called once
 
-    //Warning:  This is a test scenario and should not be used in production.  This creates an approval for the owner of the canister and this can be garbage collected if the max_approvals is hit.  We advise minting with the target owner in the metadata or creating an assign function (see assign)
-    if(_init == false){
-      //approve the deployer as a spender on all tokens...
-      let current_val = icrc37().get_state().ledger_info.collection_approval_requires_token;
-      let update = icrc37().update_ledger_info([#CollectionApprovalRequiresToken(false)]);
-      let result = icrc37().approve_collection<system>(Principal.fromActor(this), [{
-        approval_info={
-          from_subaccount = null;
-          spender = {owner = icrc7().get_state().owner; subaccount = null}; 
-          memo =  null;
-          expires_at = null;
-          created_at_time = null;}
-      }] );
-      let update2 = icrc37().update_ledger_info([#CollectionApprovalRequiresToken(current_val)]);
+//     //Warning:  This is a test scenario and should not be used in production.  This creates an approval for the owner of the canister and this can be garbage collected if the max_approvals is hit.  We advise minting with the target owner in the metadata or creating an assign function (see assign)
+//     if(_init == false){
+//       //approve the deployer as a spender on all tokens...
+//       let current_val = icrc37().get_state().ledger_info.collection_approval_requires_token;
+//       let update = icrc37().update_ledger_info([#CollectionApprovalRequiresToken(false)]);
+//       let result = icrc37().approve_collection<system>(Principal.fromActor(this), [{
+//         approval_info={
+//           from_subaccount = null;
+//           spender = {owner = icrc7().get_state().owner; subaccount = null}; 
+//           memo =  null;
+//           expires_at = null;
+//           created_at_time = null;}
+//       }] );
+//       let update2 = icrc37().update_ledger_info([#CollectionApprovalRequiresToken(current_val)]);
       
-      D.print("initialized" # debug_show(result,  {
-        from_subaccount = null;
-        spender = {owner = icrc7().get_state().owner; subaccount = null}; 
-        memo =  null;
-        expires_at = null;
-        created_at_time = null;
-      }));
-    };
-    _init := true;
-  };
+//       D.print("initialized" # debug_show(result,  {
+//         from_subaccount = null;
+//         spender = {owner = icrc7().get_state().owner; subaccount = null}; 
+//         memo =  null;
+//         expires_at = null;
+//         created_at_time = null;
+//       }));
+//     };
+//     _init := true;
+//   };
 
-  //this lets an admin assign a token to an account
-  public shared(msg) func assign(token_id : Nat, account : Account) : async Nat {
-    if(msg.caller != icrc7().get_state().owner) D.trap("Unauthorized");
 
-    switch(icrc7().transfer<system>(Principal.fromActor(this), [{
-      from_subaccount = null;
-      to = account;
-      token_id = token_id;
-      memo = null;
-      created_at_time = null;
-    }])[0]){
 
-      case(?#Ok(val)) val;
-      case(?#Err(err)) D.trap(debug_show(err));
-      case(_) D.trap("unknown");
+// // dfx canister call icrc7 icrc37_approve_collection "(vec {record { approval_info = record {from_subaccount = null; spender = record {owner = principal \"$ADMIN_PRINCIPAL\"; subaccount = null}; memo = null; expires_at = null; created_at_time = null }}})"
+
+//   //this lets an admin assign a token to an account
+//   public shared(msg) func assign(token_id : Nat, account : Account) : async Nat {
+//     // if(msg.caller != icrc7().get_state().owner) D.trap("Unauthorized");
+//     D.print("Apparent owner: " # debug_show(icrc7().get_state().owner));
+
+//     switch(icrc7().transfer<system>(Principal.fromActor(this), [{
+//       from_subaccount = null;
+//       to = account;
+//       token_id = token_id;
+//       memo = null;
+//       created_at_time = null;
+//     }])[0]){
+
+//       case(?#Ok(val)) val;
+//       case(?#Err(err)) D.trap(debug_show(err));
+//       case(_) D.trap("unknown");
 
       
-    };
-  };
-  
+//     };
+//   };
 
 };

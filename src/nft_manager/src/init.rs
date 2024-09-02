@@ -34,10 +34,10 @@ fn post_init() {
         match deploy_icrc7().await {
             DeployResult::Ok => {
                 ic_cdk::println!("ICRC7 deployed successfully");
-                match initialize_icrc7().await {
-                    Ok(()) => ic_cdk::println!("ICRC7 initialized successfully"),
-                    Err(e) => ic_cdk::println!("Failed to initialize ICRC7: {}", e),
-                }
+                // match initialize_icrc7().await {
+                //     Ok(()) => ic_cdk::println!("ICRC7 initialized successfully"),
+                //     Err(e) => ic_cdk::println!("Failed to initialize ICRC7: {}", e),
+                // }
             },
             DeployResult::Err(e) => ic_cdk::println!("Failed to deploy ICRC7: {}", e),
         }
@@ -80,16 +80,16 @@ async fn deploy_icrc7() -> DeployResult {
 }
 
 // #[ic_cdk::update]
-async fn initialize_icrc7() -> Result<(), String> {
-    let canister_id = Principal::from_text(ICRC7_CANISTER_ID)
-        .map_err(|e| format!("Invalid canister ID: {:?}", e))?;
+// async fn initialize_icrc7() -> Result<(), String> {
+//     let canister_id = Principal::from_text(ICRC7_CANISTER_ID)
+//         .map_err(|e| format!("Invalid canister ID: {:?}", e))?;
 
-    // Call the init function on the ICRC7 canister
-    let call_result: Result<(), (ic_cdk::api::call::RejectionCode, String)> = 
-        ic_cdk::api::call::call(canister_id, "init", ()).await;
+//     // Call the init function on the ICRC7 canister
+//     let call_result: Result<(), (ic_cdk::api::call::RejectionCode, String)> = 
+//         ic_cdk::api::call::call(canister_id, "init", ()).await;
 
-    match call_result {
-        Ok(()) => Ok(()),
-        Err((code, msg)) => Err(format!("Failed to initialize ICRC7: {:?} - {}", code, msg)),
-    }
-}
+//     match call_result {
+//         Ok(()) => Ok(()),
+//         Err((code, msg)) => Err(format!("Failed to initialize ICRC7: {:?} - {}", code, msg)),
+//     }
+// }

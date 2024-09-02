@@ -6,18 +6,13 @@ use crate::types::*;
 use crate::utils::*;
 use crate::query::*;
 
-use ic_cdk::api::time;
 use ic_cdk::update;
 use candid::{Nat, Principal};
 use ic_cdk::api::call::CallResult;
 use ic_cdk::caller;
 use icrc_ledger_types::{icrc::generic_value::Value, icrc1::account::Account};
 
-
-use candid::{CandidType, Deserialize};
-
-
-#[update(guard = "not_anon")]
+#[update(decoding_quota = 200, guard = "not_anon")]
 pub async fn mint_nft(description: String, minting_number: Nat) -> Result<String, String> {
     const MAX_DESCRIPTION_LENGTH: usize = 256;
 
@@ -57,7 +52,6 @@ pub async fn mint_nft(description: String, minting_number: Nat) -> Result<String
         created_at_time: Some(ic_cdk::api::time()),
     };
 
-
     let call_result: CallResult<()> = ic_cdk::call(
         icrc7_principal(),
         "icrcX_mint",
@@ -68,6 +62,50 @@ pub async fn mint_nft(description: String, minting_number: Nat) -> Result<String
         Ok(_) => Ok(format!("NFT minted successfully with token ID: {}", new_token_id)),
         Err((code, msg)) => Err(format!("Error calling icrcX_mint: {:?} - {}", code, msg))
     }
+}
+
+async fn fetch_metadata(valid_minting_numbers: Vec<Nat>) -> Result<Vec<Option<BTreeMap<String, Value>>>, String> {
+    let metadata_call_result: CallResult<(Vec<Option<BTreeMap<String, Value>>>,)> = ic_cdk::call(
+        icrc7_principal(),
+        "icrc7_token_metadata",
+        (valid_minting_numbers.clone(),)
+    ).await;
+
+    match metadata_call_result {
+        Ok((metadata,)) => Ok(metadata),
+        Err((code, msg)) => Err(format!("Error fetching metadata: {:?} - {}", code, msg)),
+    }
+}
+
+async fn prepare_nft_requests(valid_minting_numbers: Vec<Nat>, metadata: Vec<Option<BTreeMap<String, Value>>>, owner: Principal) -> Vec<SetNFTItemRequest> {
+    valid_minting_numbers.iter().zip(metadata.iter()).filter_map(|(token_id, token_metadata)| {
+        let description = token_metadata.as_ref().and_then(|metadata| {
+            metadata.get("icrc7:metadata:uri:transactionId")
+                .and_then(|value| match value {
+                    Value::Text(s) => Some(s.clone()),
+                    _ => None,
+                })
+        });
+
+        description.map(|desc| SetNFTItemRequest {
+            token_id: token_id.clone(),
+            owner: Some(Account::from(owner)),
+            metadata: NFTInput::Class(vec![
+                PropertyShared {
+                    name: "icrc7:metadata:uri:transactionId".to_string(),
+                    value: CandyShared::Text(desc),
+                    immutable: true,
+                },
+                PropertyShared {
+                    name: "icrc7:metadata:verified".to_string(),
+                    value: CandyShared::Bool(true),
+                    immutable: true,
+                },
+            ]),
+            override_: true,
+            created_at_time: Some(ic_cdk::api::time()),
+        })
+    }).collect()
 }
 
 #[update] // TODO: Must guard for DAO only, or make private.
@@ -97,45 +135,9 @@ async fn verify_nfts(minting_numbers: Vec<Nat>, owner: Principal) -> Result<Stri
 
     let valid_minting_numbers: Vec<Nat> = valid_nfts.iter().map(|(nft, _)| nft.clone()).collect();
 
-    let metadata_call_result: CallResult<(Vec<Option<BTreeMap<String, Value>>>,)> = ic_cdk::call(
-        icrc7_principal(),
-        "icrc7_token_metadata",
-        (valid_minting_numbers.clone(),)
-    ).await;
+    let metadata = fetch_metadata(valid_minting_numbers.clone()).await?;
 
-    let metadata = match metadata_call_result {
-        Ok((metadata,)) => metadata,
-        Err((code, msg)) => return Err(format!("Error fetching metadata: {:?} - {}", code, msg)),
-    };
-
-    let nft_requests: Vec<SetNFTItemRequest> = valid_minting_numbers.iter().zip(metadata.iter()).filter_map(|(token_id, token_metadata)| {
-        let description = token_metadata.as_ref().and_then(|metadata| {
-            metadata.get("icrc7:metadata:uri:transactionId")
-                .and_then(|value| match value {
-                    Value::Text(s) => Some(s.clone()),
-                    _ => None,
-                })
-        });
-
-        description.map(|desc| SetNFTItemRequest {
-            token_id: token_id.clone(),
-            owner: Some(Account::from(owner)),
-            metadata: NFTInput::Class(vec![
-                PropertyShared {
-                    name: "icrc7:metadata:uri:transactionId".to_string(),
-                    value: CandyShared::Text(desc),
-                    immutable: true,
-                },
-                PropertyShared {
-                    name: "icrc7:metadata:verified".to_string(),
-                    value: CandyShared::Bool(true),
-                    immutable: true,
-                },
-            ]),
-            override_: true,
-            created_at_time: Some(ic_cdk::api::time()),
-        })
-    }).collect();
+    let nft_requests = prepare_nft_requests(valid_minting_numbers, metadata, owner).await;
 
     if nft_requests.is_empty() {
         return Ok("No valid NFTs to verify after metadata check.".to_string());
@@ -161,153 +163,148 @@ async fn verify_nfts(minting_numbers: Vec<Nat>, owner: Principal) -> Result<Stri
 
 
 
+#[update(guard = "not_anon")] // TODO: Must guard for DAO only, or make private.
+async fn burn_to_lbry(minting_numbers: Vec<Nat>) -> Result<String, String> {
+    check_update_batch_size(&minting_numbers)?;
 
+    let original_count = minting_numbers.len();
+    let target_principal = Principal::from_text("forhl-tiaaa-aaaak-qc7ga-cai").unwrap();
 
+    let exists_results = nfts_exist(minting_numbers.clone()).await?;
+    let verified_results = is_verified(minting_numbers.clone()).await?;
 
+    let valid_nfts: Vec<(Nat, bool)> = minting_numbers.into_iter()
+        .zip(exists_results.into_iter())
+        .zip(verified_results.into_iter())
+        .filter_map(|((nft, exists), verified)| {
+            if exists && verified {
+                Some((nft, exists))
+            } else {
+                None
+            }
+        })
+        .collect();
 
+    if valid_nfts.is_empty() {
+        return Ok("No valid NFTs to verify.".to_string());
+    }
 
+    let valid_minting_numbers: Vec<Nat> = valid_nfts.iter().map(|(nft, _)| nft.clone()).collect();
 
+    let metadata = fetch_metadata(valid_minting_numbers.clone()).await?;
 
+    let nft_requests = prepare_nft_requests(valid_minting_numbers, metadata, target_principal).await;
 
+    if nft_requests.is_empty() {
+        return Ok("No valid NFTs to verify after metadata check.".to_string());
+    }
 
+    let nft_requests_count = nft_requests.len();
 
-#[update(guard = "not_anon")]
-pub async fn transfer_nft(token_id: Nat, to: Principal, from_subaccount: Option<Vec<u8>>, memo: Option<Vec<u8>>) -> Result<Nat, String> {
-    let transfer_arg = TransferArg {
-        to: Account {
-            owner: to,
-            subaccount: None,
-        },
-        token_id,
-        memo,
-        from_subaccount,
-        created_at_time: Some(time()),
-    };
-
-    let call_result: CallResult<(Vec<Option<TransferResult>>,)> = ic_cdk::call(
+    let call_result: CallResult<()> = ic_cdk::call(
         icrc7_principal(),
-        "icrc7_transfer",
-        (vec![transfer_arg],)
+        "icrcX_mint",
+        (nft_requests,)
     ).await;
 
     match call_result {
-        Ok((transfer_results,)) => match transfer_results.get(0).and_then(|r| r.as_ref()) {
-            Some(TransferResult::Ok(transaction_index)) => Ok(transaction_index.clone()),
-            Some(TransferResult::Err(transfer_error)) => Err(format!("Transfer failed: {:?}", transfer_error)),
-            None => Err("No transfer result returned".to_string()),
+        Ok(_) => {
+            let verified_count = nft_requests_count;
+            let skipped_count = original_count - verified_count;
+            Ok(format!("{} NFTs successfully verified. {} NFTs skipped (already verified or non-existent).", verified_count, skipped_count))
         },
-        Err((code, msg)) => Err(format!("Error calling icrc7_transfer: {:?} - {}", code, msg)),
+        Err((code, msg)) => Err(format!("Error calling icrcX_mint: {:?} - {}", code, msg))
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-// This works like a charm.
-linus@Henry:~/alexandria/core$ dfx canister call icrc7 icrcX_burn '(
-    record {
-      memo = null;
-      tokens = vec { 2 : nat };
-      created_at_time = null;
-    }
-  )'
-
-// This does not work.
-dfx canister call nft_manager mint_nft '("asdf", 2)'
-
-dfx canister call nft_manager verify_nfts '(vec { 2 : nat }, principal "forhl-tiaaa-aaaak-qc7ga-cai")'
-
-dfx canister call nft_manager burn_nft '(2 : nat)'
-
-(
-  variant {
-    Err = "Error calling icrcX_burn: CanisterError - failed to decode canister response as (alloc::vec::Vec<nft_manager::update::BurnResult>,): Fail to decode argument 0"
-  },
-)
-*/
-
-
-
-#[derive(CandidType, Deserialize, Debug)]
-struct BurnRequest {
-    memo: Option<Vec<u8>>,
-    tokens: Vec<Nat>,
-    created_at_time: Option<u64>,
-}
-
-#[derive(CandidType, Deserialize, Debug)]
-pub enum BurnError {
-    GenericError { message: String, error_code: Nat },
-    NonExistingTokenId,
-    InvalidBurn,
-}
-
-#[derive(CandidType, Deserialize, Debug)]
-pub struct BurnOk {
-    pub token_id: Nat,
-    pub result: BurnResult,
-}
-
-#[derive(CandidType, Deserialize, Debug)]
-pub enum BurnResult {
-    Ok(Nat),
-    Err(BurnError),
-}
-
-#[derive(CandidType, Deserialize, Debug)]
-pub enum BurnResponse {
-    Ok(Vec<BurnOk>),
-    Err(BurnResponseError),
-}
-
-#[derive(CandidType, Deserialize, Debug)]
-pub enum BurnResponseError {
-    GenericError { message: String, error_code: Nat },
-    Unauthorized,
-    CreatedInFuture { ledger_time: u64 },
-    TooOld,
-}
-
-use ic_cdk::println;
 
 #[update(guard = "not_anon")]
-pub async fn burn_nft(token_id: Nat) -> Result<BurnOk, String> {
+pub async fn burn_forever(token_id: Nat) -> Result<BurnOk, String> {
+    if !is_verified(vec![token_id.clone()]).await?.first().unwrap_or(&false) {
+        println!("NFT verification failed for token_id: {:?}", token_id);
+        return Err("NFT is not verified".to_string());
+    }
+
+    if owner_of(token_id.clone()).await?.unwrap().owner != caller() {
+        return Err("NFT is not owned by the caller".to_string());
+    }
+
+    let target_principal = Principal::from_text("forhl-tiaaa-aaaak-qc7ga-cai").unwrap();
+
+    let mint_request = SetNFTItemRequest {
+        token_id: token_id.clone(),
+        owner: Some(Account::from(target_principal)),
+        metadata: NFTInput::Class(vec![
+            PropertyShared {
+                name: "icrc7:metadata:uri:transactionId".to_string(),
+                value: CandyShared::Text("Burned forever".to_string()),
+                immutable: true,
+            },
+            PropertyShared {
+                name: "icrc7:metadata:verified".to_string(),
+                value: CandyShared::Bool(true),
+                immutable: true,
+            },
+        ]),
+        override_: true,
+        created_at_time: Some(ic_cdk::api::time()),
+    };
+
+    let mint_call_result: CallResult<()> = ic_cdk::call(
+        icrc7_principal(),
+        "icrcX_mint",
+        (vec![mint_request],)
+    ).await;
+
+    println!("Received mint call result: {:?}", mint_call_result);
+
+    match mint_call_result {
+        Ok(_) => {
+            println!("Minted NFT to burn forever with token_id: {:?}", token_id);
+            match burn_nft(token_id.clone()).await {
+                Ok(result) => Ok(result),
+                Err(err) => {
+                    println!("Error burning NFT: {}. Attempting to return NFT to caller.", err);
+                    let return_request = SetNFTItemRequest {
+                        token_id: token_id.clone(),
+                        owner: Some(Account::from(caller())),
+                        metadata: NFTInput::Class(vec![
+                            PropertyShared {
+                                name: "icrc7:metadata:uri:transactionId".to_string(),
+                                value: CandyShared::Text("Returned to caller".to_string()),
+                                immutable: true,
+                            },
+                            PropertyShared {
+                                name: "icrc7:metadata:verified".to_string(),
+                                value: CandyShared::Bool(true),
+                                immutable: true,
+                            },
+                        ]),
+                        override_: true,
+                        created_at_time: Some(ic_cdk::api::time()),
+                    };
+
+                    let return_call_result: CallResult<()> = ic_cdk::call(
+                        icrc7_principal(),
+                        "icrcX_mint",
+                        (vec![return_request],)
+                    ).await;
+
+                    match return_call_result {
+                        Ok(_) => Err("Failed to burn NFT, but returned it to caller.".to_string()),
+                        Err((code, msg)) => Err(format!("Failed to burn NFT and return it to caller: {:?} - {}", code, msg)),
+                    }
+                }
+            }
+        },
+        Err((code, msg)) => {
+            println!("Error calling icrcX_mint: {:?} - {}", code, msg);
+            Err(format!("Error calling icrcX_mint: {:?} - {}", code, msg))
+        },
+    }
+}
+
+async fn burn_nft(token_id: Nat) -> Result<BurnOk, String> {
     println!("Attempting to burn NFT with token_id: {:?}", token_id);
 
     if !is_verified(vec![token_id.clone()]).await?.first().unwrap_or(&false) {
@@ -352,35 +349,3 @@ pub async fn burn_nft(token_id: Nat) -> Result<BurnOk, String> {
         },
     }
 }
-
-// icrc7_official TransferArgs
-#[derive(CandidType, Deserialize)]
-pub struct TransferArg {
-    pub to: Account,
-    pub token_id: Nat,
-    pub memo: Option<Vec<u8>>,
-    pub from_subaccount: Option<Vec<u8>>,
-    pub created_at_time: Option<u64>,
-}
-
-#[derive(CandidType, Deserialize, Debug)]
-pub enum TransferError {
-    GenericError { message: String, error_code: Nat },
-    Duplicate { duplicate_of: Nat },
-    NonExistingTokenId,
-    Unauthorized,
-    CreatedInFuture { ledger_time: u64 },
-    InvalidRecipient,
-    GenericBatchError { message: String, error_code: Nat },
-    TooOld,
-}
-
-#[derive(CandidType, Deserialize)]
-pub enum TransferResult {
-    Ok(Nat),
-    Err(TransferError),
-}
-
-
-
-

@@ -64,3 +64,35 @@ dfx deploy nft_manager --specified-id forhl-tiaaa-aaaak-qc7ga-cai
 
 # dfx canister call LBRY icrc1_balance_of '(record { owner = principal "'${NFT_MANAGER_PRINCIPAL}'"; subaccount = opt vec {0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 1:nat8; 0:nat8; 2:nat8; 4:nat8; 0:nat8} })'
 # dfx canister call LBRY icrc1_balance_of '(record { owner = principal "'${DEFAULT_ACCOUNT_PRINCIPAL}'"; subaccount = opt vec {0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8; 0:nat8} })'
+
+
+
+
+
+
+
+
+
+
+
+# // This works like a charm.
+# linus@Henry:~/alexandria/core$ dfx canister call icrc7 icrcX_burn '(
+#     record {
+#       memo = null;
+#       tokens = vec { 2 : nat };
+#       created_at_time = null;
+#     }
+#   )'
+
+# // This does not work.
+# dfx canister call nft_manager mint_nft '("asdf", 2)'
+
+# dfx canister call nft_manager verify_nfts '(vec { 2 : nat }, principal "forhl-tiaaa-aaaak-qc7ga-cai")'
+
+# dfx canister call nft_manager burn_nft '(2 : nat)'
+
+# (
+#   variant {
+#     Err = "Error calling icrcX_burn: CanisterError - failed to decode canister response as (alloc::vec::Vec<nft_manager::update::BurnResult>,): Fail to decode argument 0"
+#   },
+# )

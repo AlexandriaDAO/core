@@ -64,3 +64,46 @@ pub enum TransferError {
     GenericError { error_code: Nat, message: String },
     GenericBatchError { error_code: Nat, message: String },
 }
+
+
+// burn_nft types:
+
+#[derive(CandidType, Deserialize, Debug)]
+pub struct BurnRequest {
+    pub memo: Option<Vec<u8>>,
+    pub tokens: Vec<Nat>,
+    pub created_at_time: Option<u64>,
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub enum BurnError {
+    GenericError { message: String, error_code: Nat },
+    NonExistingTokenId,
+    InvalidBurn,
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub struct BurnOk {
+    pub token_id: Nat,
+    pub result: BurnResult,
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub enum BurnResult {
+    Ok(Nat),
+    Err(BurnError),
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub enum BurnResponse {
+    Ok(Vec<BurnOk>),
+    Err(BurnResponseError),
+}
+
+#[derive(CandidType, Deserialize, Debug)]
+pub enum BurnResponseError {
+    GenericError { message: String, error_code: Nat },
+    Unauthorized,
+    CreatedInFuture { ledger_time: u64 },
+    TooOld,
+}

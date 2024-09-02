@@ -3,23 +3,13 @@ todo.md
 
 # General
 
-- So apparently my canister is not authorized to burn NFTs. MFKR
-  - Maybe I just mint it to the zero address? (nope, doesn't delete it)
-  - Maybe I just transfer to the nft_manager and then burn? (invalid recipient)
-    - Maybe I just do a unverified_burn() to nft_manager, and a verified_burn() to the burn address. Then transfers() I'll leave open for owners to do themselves.
-
-
-- Also the big double-spend icrc7 bugg has been fixed and I need to update.
-
+- frontend needs to be adapted to these changes.
 
 *features*
 
-- Need to add the fake burn and the real burn. Fakeburn if unverified, real burn if verified.
 - User Transfer
 - Manager/DAO Transfer
 - Voting Process/DAO.
-
-
 
 *ultra security checklist*
 
