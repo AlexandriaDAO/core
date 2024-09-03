@@ -7,28 +7,16 @@ todo.md
 
 *features*
 
-- User Transfer
 - Manager/DAO Transfer
 - Voting Process/DAO.
 
-*ultra security checklist*
+- Add money to all update calls (e.g., 1 lbry).
+- User Transfer (they'll use icrc7_transfer themseleves from the frontend).
 
-- all nft_manager functions that cost money only require a non-anon caller.
-- all nft_manager functions that don't are only callable by the frontend canister.
-- And the ICRC7 Cansiter issue:
-  - Updates callable by nft_manager only.
-  - Queries callable by nft_manager and alex_frontend only.
-- In withdraw functions, block unmatched callers (they're tring to ddos).
+## Current Vulnerabilities
 
-
-## Wallets
-
-Audit should check to ensure there's no possibility that a mint# can change or be lost so the money never gets lost.
-
-- Auth to ensure caller is the only one who can withdraw.
-- Ensure only verified NFTs can be withdrawn.
-- Batch withdraw_all (atomic)
-
+- Someone can call mint_nft() while another nft is being burned/verified/etc. with that mint#. 
+If it beats them to the punch, they steal the nft, so mint_nft() needs to be blocked, at least with that mint# while the others are happening.
 
 ## Updates
 
@@ -44,6 +32,9 @@ Audit should check to ensure there's no possibility that a mint# can change or b
 ## DAO (canister)
 
 [costs 100 LBRY per NFT to trigger which goes to the address of the NFTs]
+      - Send 100LBRY/NFT to canister account.
+      - if success, send it back.
+      - if rejected, keep it.
 
 struct proposal {
   proposal_id: random uid
@@ -58,25 +49,34 @@ struct proposal {
 
 create_nft_proposal(mint_numbers: Vec<Nat>, desciption: string)
   - If dispute_type = false:
-    - If you own all the mint numbers, and they're all unverified:
-      - Send 100LBRY/NFT to proper accounts.
+    - If you own all the mint numbers, and verified() is false for all of them:
       - Initialize proposal type feilds.
       - Store it.
       - Set a timer that triggers settle_proposal() after 7 days.
   - If dispute_type = true:
-    - If you don't own none of the mint numbers, and they're all unverified:
-      - Send 100LBRY/NFT to proper accounts.
+    - If you own none of the mint numbers, and they're all unverified:
       - Initialize proposal type feilds.
       - Store it.
       - Set a timer that triggers settle_proposal() after 7 days.
   - Else: 
-    - Reject proposal with propper logging of the reason.
+    - Reject proposal with propper logging of the reason (you cannot group mint numbers you own with mint numbers you dont | mint numbers are not all unverified).
+
+Voting on proposals: 
+  - Users with a stake can optionally vote once, and their vote weight is their stake.
+    - You can get the stake from this function which is call able in the icp_swap canister (5qx27-tyaaa-aaaal-qjafa-cai): 
+```
+#[query]
+pub fn get_stake(principal: Principal) -> Option<Stake> {
+    STAKES.with(|stakes| stakes.borrow().stakes.get(&principal).cloned())
+}
+```
+
 
 settle_proposal(proposal_number)
   - If 'adopted' > 'rejected' (will complicate the consensus later).
-    - verifs_nfts(proposal)
+    - verify_nfts(proposal)
   - If 'rejected' > 'adopted'
-    - Transfer the nft to the manager_nft account.
+    - Transfer the nft to the manager_nft account with burn_to_lbry()
 
 settle_dispute_proposal(proposal_id)
   - If 'adopted' > rejected

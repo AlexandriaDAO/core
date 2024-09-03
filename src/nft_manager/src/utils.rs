@@ -1,5 +1,6 @@
 use candid::{Nat, Principal};
 use icrc_ledger_types::icrc1::account::Subaccount;
+use ic_cdk::api::time;
 
 const MAX_QUERY_BATCH_SIZE: usize = 100;
 const MAX_UPDATE_BATCH_SIZE: usize = 20;

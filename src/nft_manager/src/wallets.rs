@@ -19,8 +19,6 @@ I have to create a display first so take:
 
 */
 
-
-
 #[update(guard = "not_anon")]
 pub async fn withdraw(mint_number: Nat) -> Result<(Option<BlockIndex>, Option<BlockIndex>), String> {
     let caller = ic_cdk::api::caller();

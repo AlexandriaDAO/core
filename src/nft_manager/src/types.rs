@@ -107,3 +107,12 @@ pub enum BurnResponseError {
     CreatedInFuture { ledger_time: u64 },
     TooOld,
 }
+
+
+// for get_stakes() from icp_swap
+#[derive(CandidType, Deserialize, Clone)]
+pub struct Stake {
+    pub amount: u64,
+    pub time: u64,
+    pub reward_icp: u64,
+}

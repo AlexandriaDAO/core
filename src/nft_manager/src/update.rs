@@ -109,7 +109,7 @@ async fn prepare_nft_requests(valid_minting_numbers: Vec<Nat>, metadata: Vec<Opt
 }
 
 #[update] // TODO: Must guard for DAO only, or make private.
-async fn verify_nfts(minting_numbers: Vec<Nat>, owner: Principal) -> Result<String, String> {
+pub async fn verify_nfts(minting_numbers: Vec<Nat>, owner: Principal) -> Result<String, String> {
     check_update_batch_size(&minting_numbers)?;
 
     let original_count = minting_numbers.len();
@@ -164,7 +164,7 @@ async fn verify_nfts(minting_numbers: Vec<Nat>, owner: Principal) -> Result<Stri
 
 
 #[update(guard = "not_anon")] // TODO: Must guard for DAO only, or make private.
-async fn burn_to_lbry(minting_numbers: Vec<Nat>) -> Result<String, String> {
+pub async fn burn_to_lbry(minting_numbers: Vec<Nat>) -> Result<String, String> {
     check_update_batch_size(&minting_numbers)?;
 
     let original_count = minting_numbers.len();
@@ -225,7 +225,7 @@ pub async fn burn_forever(token_id: Nat) -> Result<BurnOk, String> {
         return Err("NFT is not verified".to_string());
     }
 
-    if owner_of(token_id.clone()).await?.unwrap().owner != caller() {
+    if owner_of(vec![token_id.clone()]).await?.first().and_then(|o| o.as_ref()).map(|a| a.owner) != Some(caller()) {
         return Err("NFT is not owned by the caller".to_string());
     }
 

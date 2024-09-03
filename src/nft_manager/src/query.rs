@@ -143,21 +143,40 @@ pub async fn nfts_exist(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
 }
 
 
+// #[update(guard = "is_frontend")]
+// pub async fn owner_of(token_id: Nat) -> Result<Option<Account>, String> {
+
+//     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
+//         icrc7_principal(),
+//         "icrc7_owner_of",
+//         (vec![token_id.clone()],)
+//     ).await;
+
+//     match owner_call_result {
+//         Ok((owners,)) => {
+//             Ok(owners.into_iter().next().unwrap_or(None))
+//         },
+//         Err((code, msg)) => {
+//             Err(format!("Error fetching owner for token {}: {:?} - {}", token_id, code, msg))
+//         }
+//     }
+// }
+
+
 #[update(guard = "is_frontend")]
-pub async fn owner_of(token_id: Nat) -> Result<Option<Account>, String> {
+pub async fn owner_of(token_ids: Vec<Nat>) -> Result<Vec<Option<Account>>, String> {
+    check_query_batch_size(&token_ids)?;
 
     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
         icrc7_principal(),
         "icrc7_owner_of",
-        (vec![token_id.clone()],)
+        (token_ids.clone(),)
     ).await;
 
     match owner_call_result {
-        Ok((owners,)) => {
-            Ok(owners.into_iter().next().unwrap_or(None))
-        },
+        Ok((owners,)) => Ok(owners),
         Err((code, msg)) => {
-            Err(format!("Error fetching owner for token {}: {:?} - {}", token_id, code, msg))
+            Err(format!("Error fetching owners for tokens {:?}: {:?} - {}", token_ids, code, msg))
         }
     }
 }
