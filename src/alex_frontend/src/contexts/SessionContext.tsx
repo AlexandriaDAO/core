@@ -6,7 +6,8 @@ import { alex_backend } from '../../../declarations/alex_backend';
 import { alex_librarian } from '../../../declarations/alex_librarian';
 import { createActor, canisterId } from '../../../declarations/alex_wallet';
 import { vetkd } from '../../../declarations/vetkd';
-
+import { icrc7 } from '../../../declarations/icrc7';
+import { nft_manager } from '../../../declarations/nft_manager';
 import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from '../../../declarations/icp_ledger_canister';
 import { tokenomics } from '../../../declarations/tokenomics';
@@ -16,6 +17,8 @@ import { _SERVICE } from '../../../declarations/alex_backend/alex_backend.did';
 import { _SERVICE as _SERVICE_ALEX_LIBRARIAN} from '../../../declarations/alex_librarian/alex_librarian.did';
 import { _SERVICE as _SERVICE_ALEX_WALLET} from '../../../declarations/alex_wallet/alex_wallet.did';
 import { _SERVICE as _SERVICE_VETKD} from '../../../declarations/vetkd/vetkd.did';
+import { _SERVICE as _SERVICEICRC7 } from '../../../declarations/icrc7/icrc7.did';
+import { _SERVICE as _SERVICENFTMANAGER } from '../../../declarations/nft_manager/nft_manager.did';
 import { _SERVICE as _SERVICESWAP } from '../../../declarations/icp_swap/icp_swap.did';
 import { _SERVICE as _SERVICEICPLEDGER } from '../../../declarations/icp_ledger_canister/icp_ledger_canister.did';
 import { _SERVICE as _SERVICETOKENOMICS } from '../../../declarations/tokenomics/tokenomics.did';
@@ -27,6 +30,8 @@ interface SessionContextProps {
 	actorAlexLibrarian: ActorSubclass<_SERVICE_ALEX_LIBRARIAN>;
 	actorAlexWallet: ActorSubclass<_SERVICE_ALEX_WALLET>;
 	actorVetkd: ActorSubclass<_SERVICE_VETKD>;
+	actorIcrc7: ActorSubclass<_SERVICEICRC7>;
+	actorNftManager: ActorSubclass<_SERVICENFTMANAGER>;
 	actorSwap: ActorSubclass<_SERVICESWAP>;
 	actorIcpLedger: ActorSubclass<_SERVICEICPLEDGER>;
 	actorTokenomics: ActorSubclass<_SERVICETOKENOMICS>;
@@ -42,6 +47,8 @@ const SessionContext = createContext<SessionContextProps>({
 	actorAlexLibrarian: alex_librarian,
 	actorAlexWallet: createActor(canisterId),
 	actorVetkd: vetkd,
+	actorIcrc7: icrc7,
+	actorNftManager: nft_manager,
 	actorSwap: icp_swap,
 	actorIcpLedger: icp_ledger_canister,
 	actorTokenomics: tokenomics,

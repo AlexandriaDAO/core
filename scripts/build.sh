@@ -9,50 +9,49 @@ cp dfx_local.json dfx.json
 dfx stop
 dfx start --background --clean
 
-# Step 2: Initialize II and generate candid
+# Step 2: II Canister
 dfx deps pull
 dfx deps init
 dfx deps deploy
 dfx deps deploy internet_identity
+dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
 
+# Step 3: Deploy nft_manager, which deploys icrc7
 
-# Deploy backend, which deploys nfts.
 dfx canister create icrc7 --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai
 dfx build icrc7
-dfx canister update-settings icrc7 --add-controller xj2l7-vyaaa-aaaap-abl4a-cai
+dfx canister update-settings icrc7 --add-controller forhl-tiaaa-aaaak-qc7ga-cai
 
+cargo build --release --target wasm32-unknown-unknown --package nft_manager
+candid-extractor target/wasm32-unknown-unknown/release/nft_manager.wasm > src/nft_manager/nft_manager.did
+
+dfx deploy nft_manager --specified-id forhl-tiaaa-aaaak-qc7ga-cai
+
+# Step 4: Generate all other backend canisters.
+
+# For alex_backend
 cargo build --release --target wasm32-unknown-unknown --package alex_backend
 candid-extractor target/wasm32-unknown-unknown/release/alex_backend.wasm > src/alex_backend/alex_backend.did
-
-dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
-# dfx deploy icrc7 --argument 'record {icrc7_args = null; icrc37_args =null; icrc3_args =null;}' -y --mode reinstall
-# dfx canister call icrc7 init
-dfx canister call alex_backend deploy_icrc7
-dfx canister call alex_backend initialize_icrc7
-
-
 # For bookmarks
 cargo build --release --target wasm32-unknown-unknown --package bookmarks
 candid-extractor target/wasm32-unknown-unknown/release/bookmarks.wasm > src/bookmarks/bookmarks.did
-
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
-
 # For tokenomics
 cargo build --release --target wasm32-unknown-unknown --package tokenomics
 candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
 
 cargo update
 
-# Step x: Deploy other canisters with specified IDs
+dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
 dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 
 
 
-# Step 3: Configure Local Identities
+# Step 5: Configure Local Identities for token launches
 dfx identity new minter --storage-mode plaintext
 dfx identity use minter
 export MINTER_ACCOUNT_ID=$(dfx ledger account-id)
@@ -62,7 +61,7 @@ export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
 export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 
 
-# Step 4: Deploy the ICP & ICRC Ledger with LBRY and ALEX tokens
+# Step 6: Deploy the ICP & ICRC Ledger with LICP, LBRY, and ALEX tokens
 dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argument "  
   (variant {  
     Init = record {  
@@ -71,7 +70,7 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
         record {  
           \"$DEFAULT_ACCOUNT_ID\";  
           record {  
-            e8s = 10_000_000_000 : nat64;  
+            e8s = 8_681_981_000_000_000 : nat64;  
           };  
         };  
       };  
@@ -85,70 +84,49 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
   })  
 "
 
-
-dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
-  (variant {
-    Init = record {
-      token_name = "LBRYs";
-      token_symbol = "LBRY";
-      minting_account = record {
-        owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      initial_balances = vec {
-        record {
-          record {
-            owner = principal "'${DEFAULT_ACCOUNT_PRINCIPAL}'";
-          };
-          100_000_000_000;
-        };
-      };
-      metadata = vec {};
-      transfer_fee = 4_000_000;
-      archive_options = record {
-        trigger_threshold = 2000;
-        num_blocks_to_archive = 1000;
-        controller_id = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      feature_flags = opt record {
+dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '(variant { Init = 
+record {
+     token_symbol = "LBRY";
+     token_name = "LBRY";
+     minting_account = record { owner = principal "'$(dfx canister id icp_swap)'" };
+     transfer_fee = 4_000_000;
+     metadata = vec {};
+     initial_balances = vec { record { record { owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'" }; 0 } };
+     archive_options = record {
+         num_blocks_to_archive = 1000;
+         trigger_threshold = 2000;
+         controller_id = principal "'$(dfx canister id icp_swap)'";
+     };
+     feature_flags = opt record {
         icrc2 = true;
-      };
-    }
-  })
-'
+     };
+ }
+})'
 
-dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
-  (variant {
-    Init = record {
-      token_name = "Alexandria";
-      token_symbol = "ALEX";
-      minting_account = record {
-        owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      initial_balances = vec {
-        record {
-          record {
-            owner = principal "'${DEFAULT_ACCOUNT_PRINCIPAL}'";
-          };
-          100_000_000_000;
-        };
-      };
-      metadata = vec {};
-      transfer_fee = 10_000;
-      archive_options = record {
-        trigger_threshold = 2000;
-        num_blocks_to_archive = 1000;
-        controller_id = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      feature_flags = opt record {
+dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '(variant { Init = 
+record {
+     token_symbol = "ALEX";
+     token_name = "ALEX";
+     minting_account = record { owner = principal "'$(dfx canister id tokenomics)'" };
+     transfer_fee = 10_000;
+     metadata = vec {};
+     initial_balances = vec { record { record { owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'" }; 0 } };
+     archive_options = record {
+         num_blocks_to_archive = 1000;
+         trigger_threshold = 2000;
+         controller_id = principal "'$(dfx canister id tokenomics)'";
+     };
+     feature_flags = opt record {
         icrc2 = true;
-      };
-    }
-  })
-'
+     };
+ }
+})'
 
 
 echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."
 exit 1
+
+# Step 7: Deploy frontend Manually.
 
 mkdir -p .dfx/local/canisters/LBRY
 mkdir -p .dfx/local/canisters/ALEX

@@ -17,7 +17,7 @@ const stakeAlex = createAsyncThunk<
   try {
     const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
     let amountFormat: bigint = BigInt(Number(amount) * 10 ** 8);
-    const resultLbryApprove =await actorAlex.icrc2_approve({
+    const resultAlexApprove =await actorAlex.icrc2_approve({
       spender: {
         owner: Principal.fromText(icp_swap_canister_id),
         subaccount: []

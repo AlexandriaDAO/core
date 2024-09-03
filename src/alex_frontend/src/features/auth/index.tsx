@@ -28,7 +28,7 @@ export default function Auth() {
 	return (
 		<div
 			onClick={handleAuthClick}
-			className="flex-shrink h-auto flex justify-between items-center gap-2.5 p-3 border border-solid border-white text-white
+			className="flex-shrink h-auto flex justify-center items-center gap-2.5 p-2.5 border border-solid border-white text-white
 			rounded-full cursor-pointer duration-300 transition-all"
 		>
 			{loading ? (

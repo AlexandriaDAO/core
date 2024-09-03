@@ -1,6 +1,6 @@
 use crate::{
     storage::*,
-    utils::{principal_to_subaccount, LBRY_RATIO, STAKING_REWARD_PERCENTAGE},
+    utils::{principal_to_subaccount, STAKING_REWARD_PERCENTAGE},
 };
 use candid::Principal;
 use ic_cdk::{caller, query};
@@ -47,10 +47,7 @@ pub fn get_total_staked() -> u64 {
         *staked
     })
 }
-#[query]
-pub fn get_current_LBRY_ratio() -> String {
-    format!("{}", LBRY_RATIO)
-}
+
 #[query]
 pub fn get_total_unclaimed_icp_reward() -> u64 {
     TOTAL_UNCLAIMED_ICP_REWARD.with(|icp| {
@@ -67,13 +64,14 @@ pub fn get_total_icp_avialable() -> u64 {
 }
 #[query]
 pub fn get_current_staking_reward_percentage() -> String {
-    format!("Staking percentage {}% ICP", STAKING_REWARD_PERCENTAGE)
+    format!("Staking percentage {}", STAKING_REWARD_PERCENTAGE/100)
 }
 
 #[query]
-pub fn get_maximum_LBRY_burn_allowed() -> Result<u64, String> {
-    let lbry_per_icp: u64 = LBRY_RATIO;
-    // let amount_icp: u64 = (((amount_lbry as f64 / lbry_per_icp as f64) / 2.0) * 1000_000_00.0) as u64;
+pub async fn get_maximum_LBRY_burn_allowed() -> Result<u64, String> {
+    let lbry_per_icp: u64 = get_current_LBRY_ratio()
+        .checked_mul(2)
+        .ok_or("Arithmetic overflow in lbry_per_icp calculation")?;
     let total_icp_available: u64 = TOTAL_ICP_AVAILABLE.with(|icp| {
         let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
         *icp
@@ -94,17 +92,16 @@ pub fn get_maximum_LBRY_burn_allowed() -> Result<u64, String> {
     let mut actual_available_icp: u64 = total_icp_available
         .checked_sub(total_unclaimed_icp)
         .ok_or("Arithmetic underflow in actual_available_icp calculation")?;
-    actual_available_icp = actual_available_icp /2;
-
-    // LBRY 0.00001  : 0.00000005
-    const LBRY_PER_ICP_4: u64 = 10000; //e8s
-    let mut lbry_tokens: u64 = actual_available_icp
-        .checked_mul(LBRY_PER_ICP_4)
-        .ok_or("Arithmetic overflow occurred in ICP to LBRY conversion")?;
-    lbry_tokens = lbry_tokens
-        .checked_div(5)
+    actual_available_icp = actual_available_icp / 2;
+    let lbry_tokens = actual_available_icp
+        .checked_mul(lbry_per_icp)
         .ok_or("Arithmetic overflow occurred in LBRY conversion")?;
+
     return Ok(lbry_tokens);
-    // let actual_available_icp: u64 = (total_icp_available - total_unclaimed_icp) / 2;
-    // return actual_available_icp / lbry_per_icp;
+}
+
+#[query]
+pub fn get_current_LBRY_ratio() -> u64 {
+    let ratio: LbryRatio = LBRY_RATIO.with(|ratio| ratio.borrow().clone());
+    return ratio.ratio;
 }

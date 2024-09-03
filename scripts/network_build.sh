@@ -22,7 +22,7 @@ export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
   (variant {
     Init = record {
-      token_name = "LBRYs";
+      token_name = "Library Credits";
       token_symbol = "LBRY";
       minting_account = record {
         owner = principal "'5qx27-tyaaa-aaaal-qjafa-cai'";

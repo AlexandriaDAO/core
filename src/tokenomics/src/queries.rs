@@ -34,6 +34,13 @@ pub fn get_current_LBRY_threshold() -> u64 {
     });
     LBRY_THRESHOLDS[current_threshold as usize]
 }
+
+#[query]
+pub fn get_max_stats() -> (u64,u64) {
+    let max_threshold=  LBRY_THRESHOLDS[LBRY_THRESHOLDS.len() -1];
+    let total_burned = get_total_LBRY_burn();
+    (max_threshold, total_burned)
+}
 #[query]
 pub fn get_allowed_callers() -> Vec<Principal> {
     ALLOWED_CALLERS.with(|callers| callers.borrow().iter().cloned().collect())

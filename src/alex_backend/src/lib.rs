@@ -28,12 +28,12 @@ mod wallet_keys;
 pub use wallet_keys::*;
 
 
-mod nft_init;
-pub use nft_init::{initialize_icrc7, deploy_icrc7, DeployResult};
+// mod nft_init;
+// pub use nft_init::{initialize_icrc7, deploy_icrc7, DeployResult};
 
 
-mod nft;
-pub use nft::mint_nft;
+// mod nft;
+// pub use nft::*;
 
 ic_cdk::export_candid!();
 

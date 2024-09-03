@@ -12,8 +12,10 @@ service : () -> {
   distribute_reward : () -> (Result);
   distribute_reward_wrapper : () -> ();
   get_all_stakes : () -> (vec record { principal; Stake }) query;
-  get_current_LBRY_ratio : () -> (text) query;
+  get_current_LBRY_ratio : () -> (nat64) query;
   get_current_staking_reward_percentage : () -> (text) query;
+  get_icp_rate_cents_wrapper : () -> ();
+  get_icp_rate_in_cents : () -> (Result_2);
   get_maximum_LBRY_burn_allowed : () -> (Result_2) query;
   get_stake : (principal) -> (opt Stake) query;
   get_total_icp_avialable : () -> (nat64) query;

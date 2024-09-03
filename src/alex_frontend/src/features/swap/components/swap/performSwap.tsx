@@ -3,23 +3,23 @@ import { useAppDispatch } from '../../../../store/hooks/useAppDispatch';
 import { useAppSelector } from "../../../../store/hooks/useAppSelector";
 import { ActorSubclass } from "@dfinity/agent";
 
-import getLBRYratio from "../../thunks/getLBRYratio";
 import swapLbry from "../../thunks/swapLbry";
 import { ImSpinner8 } from "react-icons/im";
 import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
 import { flagHandler } from "../../swapSlice";
-import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
+import Auth from "@/features/auth";
 interface PerformSwapProps {
     actorSwap: ActorSubclass<_SERVICESWAP>;
+    isAuthenticated: boolean;
 }
 
-const PerformSwap: React.FC<PerformSwapProps> = ({ actorSwap }) => {
+const PerformSwap: React.FC<PerformSwapProps> = ({ actorSwap, isAuthenticated }) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
     const [amount, setAmount] = useState("0");
     const [lbryRatio, setLbryRatio] = useState(0.0);
     const [tentativeLBRY, setTentativeLBRY] = useState(Number);
- 
+
     const handleSubmit = (event: any) => {
         event.preventDefault();
         dispatch(swapLbry({ actor: actorSwap, amount }))
@@ -32,13 +32,12 @@ const PerformSwap: React.FC<PerformSwapProps> = ({ actorSwap }) => {
     useEffect(() => {
         setLbryRatio(Number(swap.lbryRatio))
     }, [swap.lbryRatio])
-    useEffect(()=>{
-        if(swap.success===true)
-        {
+    useEffect(() => {
+        if (swap.swapSuccess === true) {
             alert("Success");
             dispatch(flagHandler());
         }
-    },[swap.success])
+    }, [swap.swapSuccess])
     return (<div>
         {swap.loading ? (
             <div className="flex gap-1 items-center text-[#828282]">
@@ -62,7 +61,10 @@ const PerformSwap: React.FC<PerformSwapProps> = ({ actorSwap }) => {
                             {tentativeLBRY}
                         </div>
                     </div>
-                    <button type="submit" className="bottom-btn w-full rounded-lg text-white bg-blue-700 px-5 py-1.5 mt-8">Swap</button>
+                    * Fees will be charged in ICP
+                    {isAuthenticated===true ? 
+                    (<button type="submit" className="bottom-btn w-full rounded-lg text-white bg-blue-700 px-5 py-1.5 mt-8">Swap</button>) : 
+                    (<button type="button" className="bottom-btn w-full rounded-full text-center text-black border-solid border bg-black border-black mt-8"> <Auth/></button>)}
                 </form>
             </div>)
         }

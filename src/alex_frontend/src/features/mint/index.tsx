@@ -10,7 +10,7 @@ import useSession from "@/hooks/useSession";
 import getIrys, { getTypedIrys } from "../irys/utils/getIrys";
 import { readFileAsBuffer } from "../irys/utils/gaslessFundAndUpload";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useAuth } from "../../contexts/AuthContext";
+// import { useAuth } from "../../contexts/AuthContext";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchEngineBooks from "../engine-books/thunks/fetchEngineBooks";
 import { PiUploadSimple } from "react-icons/pi";
@@ -19,13 +19,12 @@ import { WebIrys } from "@irys/sdk";
 const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_ID : process.env.REACT_LOCAL_APP_ID;
 
 const Mint = () => {
-	const { icrc7Actor } = useAuth();
-
 	const { activeEngine } = useAppSelector((state) => state.engineOverview);
 
 	const dispatch = useAppDispatch();
 
 	const { actor, actorAlexWallet,actorAlexLibrarian, actorVetkd, meiliClient } = useSession();
+	const { actor, meiliClient, actorIcrc7, actorNftManager } = useSession();
 	const [bookLoadModal, setBookLoadModal] = useState(false);
 
 	const [file, setFile] = useState<File | undefined>(undefined);
@@ -111,6 +110,8 @@ const Mint = () => {
 			await uploadToArweave(irys, transactions);
 
 			dispatch(fetchEngineBooks({ actor, engine: activeEngine }));
+			dispatch(fetchEngineBooks({ actorNftManager, engine: activeEngine }));
+      
 			setTimeout(() => next(3), 2000);
 		} catch (error) {
 			message.error(`Error: ${error}`);
@@ -162,7 +163,7 @@ const Mint = () => {
 		return tx;
 	};
 	const createManifestTransaction = async (irys: WebIrys, txs: { bookTx: any, coverTx: any, dataTx: any }) => {
-		const totalSupply = await icrc7Actor.icrc7_total_supply();
+		const totalSupply = await actorIcrc7.icrc7_total_supply();
 		const mintingNumber = Number(totalSupply) + 1;
 
 		const map = new Map([
@@ -187,7 +188,7 @@ const Mint = () => {
 		setUploadStatus(3);
 		message.info("Minting NFT via ICRC7 Protocol");
 
-		const result = await actor.mint_nft(transactionId);
+		const result = await actorNftManager.mint_nft(transactionId);
 		if ("Err" in result) throw new Error(result.Err);
 
 		message.success("Minted Successfully");

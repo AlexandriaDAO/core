@@ -4,6 +4,7 @@ service : () -> {
   get_allowed_callers : () -> (vec principal) query;
   get_current_ALEX_rate : () -> (nat64) query;
   get_current_LBRY_threshold : () -> (nat64) query;
+  get_max_stats : () -> (nat64, nat64) query;
   get_total_ALEX_minted : () -> (nat64) query;
   get_total_LBRY_burn : () -> (nat64) query;
   mint_ALEX : (nat64, principal) -> (Result);

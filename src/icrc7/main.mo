@@ -1,4 +1,4 @@
-import Array "mo:base/Array";
+// import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import Vec "mo:vector";
 import Principal "mo:base/Principal";
@@ -10,17 +10,14 @@ import CertifiedData "mo:base/CertifiedData";
 import CertTree "mo:cert/CertTree";
 
 import ICRC7 "mo:icrc7-mo";
-import ICRC37 "mo:icrc37-mo";
 import ICRC3 "mo:icrc3-mo";
 
 import ICRC7Default "./initial_state/icrc7";
-import ICRC37Default "./initial_state/icrc37";
 import ICRC3Default "./initial_state/icrc3";
 
 
 shared(_init_msg) actor class Example(_args : {
   icrc7_args: ?ICRC7.InitArgs;
-  icrc37_args: ?ICRC37.InitArgs;
   icrc3_args: ICRC3.InitArgs;
 }) = this {
 
@@ -37,23 +34,6 @@ shared(_init_msg) actor class Example(_args : {
   type TransferError =                    ICRC7.Service.TransferError;
   type BalanceOfRequest =                 ICRC7.Service.BalanceOfRequest;
   type BalanceOfResponse =                ICRC7.Service.BalanceOfResponse;
-  type TokenApproval =                    ICRC37.Service.TokenApproval;
-  type CollectionApproval =               ICRC37.Service.CollectionApproval;
-  type ApprovalInfo =                     ICRC37.Service.ApprovalInfo;
-  type ApproveTokenResult =                 ICRC37.Service.ApproveTokenResult;
-  type ApproveTokenArg =                   ICRC37.Service.ApproveTokenArg; 
-  type ApproveCollectionArg =              ICRC37.Service.ApproveCollectionArg; 
-  type IsApprovedArg =                     ICRC37.Service.IsApprovedArg;
-
-  type ApproveCollectionResult =       ICRC37.Service.ApproveCollectionResult;
-  type RevokeTokenApprovalArg =                 ICRC37.Service.RevokeTokenApprovalArg;
-
-  type RevokeCollectionApprovalArg =             ICRC37.Service.RevokeCollectionApprovalArg;
-
-  type TransferFromArg =                 ICRC37.Service.TransferFromArg;
-  type TransferFromResult =             ICRC37.Service.TransferFromResult;
-  type RevokeTokenApprovalResult =             ICRC37.Service.RevokeTokenApprovalResult;
-  type RevokeCollectionApprovalResult =         ICRC37.Service.RevokeCollectionApprovalResult;
 
   stable var init_msg = _init_msg; //preserves original initialization;
 
@@ -68,17 +48,6 @@ shared(_init_msg) actor class Example(_args : {
 
   let #v0_1_0(#data(icrc7_state_current)) = icrc7_migration_state;
 
-  stable var icrc37_migration_state = ICRC37.init(
-    ICRC37.initialState() , 
-    #v0_1_0(#id), 
-    switch(_args.icrc37_args){
-      case(null) ICRC37Default.defaultConfig(init_msg.caller);
-      case(?val) val;
-      }, 
-    init_msg.caller);
-
-  let #v0_1_0(#data(icrc37_state_current)) = icrc37_migration_state;
-
   stable var icrc3_migration_state = ICRC3.init(
     ICRC3.initialState() ,
     #v0_1_0(#id), 
@@ -91,17 +60,13 @@ shared(_init_msg) actor class Example(_args : {
   let #v0_1_0(#data(icrc3_state_current)) = icrc3_migration_state;
 
   private var _icrc7 : ?ICRC7.ICRC7 = null;
-  private var _icrc37 : ?ICRC37.ICRC37 = null;
   private var _icrc3 : ?ICRC3.ICRC3 = null;
 
   private func get_icrc7_state() : ICRC7.CurrentState {
     return icrc7_state_current;
   };
 
-  private func get_icrc37_state() : ICRC37.CurrentState {
-    return icrc37_state_current;
-  };
-
+  //changed from private to public
   private func get_icrc3_state() : ICRC3.CurrentState {
     return icrc3_state_current;
   };
@@ -146,12 +111,6 @@ shared(_init_msg) actor class Example(_args : {
       };
     };
 
-    for(thisItem in icrc37().supported_blocktypes().vals()){
-      if(Buffer.indexOf<ICRC3.BlockType>({block_type = thisItem.0; url=thisItem.1;}, supportedBlocks, blockequal) == null){
-        supportedBlocks.add({block_type = thisItem.0; url = thisItem.1});
-      };
-    };
-
     icrc3Class.update_supported_blocks(Buffer.toArray(supportedBlocks));
   };
 
@@ -183,36 +142,11 @@ shared(_init_msg) actor class Example(_args : {
     };
   };
 
-  private func get_icrc37_environment() : ICRC37.Environment {
-    {
-      canister = get_canister;
-      get_time = get_time;
-      refresh_state = get_icrc37_state;
-      icrc7 = icrc7();
-      can_transfer_from = null;
-      can_approve_token = null;
-      can_approve_collection = null;
-      can_revoke_token_approval = null;
-      can_revoke_collection_approval = null;
-    };
-  };
-
   func icrc7() : ICRC7.ICRC7 {
     switch(_icrc7){
       case(null){
         let initclass : ICRC7.ICRC7 = ICRC7.ICRC7(?icrc7_migration_state, Principal.fromActor(this), get_icrc7_environment());
         _icrc7 := ?initclass;
-        initclass;
-      };
-      case(?val) val;
-    };
-  };
-
-  func icrc37() : ICRC37.ICRC37 {
-    switch(_icrc37){
-      case(null){
-        let initclass : ICRC37.ICRC37 = ICRC37.ICRC37(?icrc37_migration_state, Principal.fromActor(this), get_icrc37_environment());
-        _icrc37 := ?initclass;
         initclass;
       };
       case(?val) val;
@@ -288,10 +222,6 @@ shared(_init_msg) actor class Example(_args : {
     return icrc7().get_ledger_info().supply_cap;
   };
 
-  public query func icrc37_max_approvals_per_token_or_collection() : async ?Nat {
-    return icrc37().max_approvals_per_token_or_collection();
-  };
-
   public query func icrc7_max_query_batch_size() : async ?Nat {
     return icrc7().max_query_batch_size();
   };
@@ -312,18 +242,12 @@ shared(_init_msg) actor class Example(_args : {
     return icrc7().atomic_batch_transfers();
   };
 
-  public query func icrc37_max_revoke_approvals() : async ?Nat {
-    return ?icrc37().get_ledger_info().max_revoke_approvals;
-  };
-
   public query func icrc7_collection_metadata() : async [(Text, Value)] {
 
     let ledger_info = icrc7().collection_metadata();
-    let ledger_info37 = icrc37().metadata();
     let results = Vec.new<(Text, Value)>();
 
     Vec.addFromIter(results, ledger_info.vals());
-    Vec.addFromIter(results, ledger_info37.vals());
 
     ///add any addtional metadata here
     //Vec.addFromIter(results, [
@@ -332,7 +256,6 @@ shared(_init_msg) actor class Example(_args : {
     
     return Vec.toArray(results);
   };
-
 
   public query func icrc7_token_metadata(token_ids: [Nat]) : async [?[(Text, Value)]]{
      return icrc7().token_metadata(token_ids);
@@ -358,57 +281,12 @@ shared(_init_msg) actor class Example(_args : {
     return icrc7().get_tokens_of_paginated(account, prev, take);
   };
 
-  public query func icrc37_is_approved(args: [IsApprovedArg]) : async [Bool] {
-    return icrc37().is_approved(args);
-  };
-
-  public query func icrc37_get_token_approvals(token_ids: [Nat], prev: ?TokenApproval, take: ?Nat) : async [TokenApproval] {
-    
-    return icrc37().get_token_approvals(token_ids, prev, take);
-  };
-
-  public query func icrc37_get_collection_approvals(owner : Account, prev: ?CollectionApproval, take: ?Nat) : async [CollectionApproval] {
-    
-    return icrc37().get_collection_approvals(owner, prev, take);
-  };
-
   public query func icrc10_supported_standards() : async ICRC7.SupportedStandards {
-    //todo: figure this out
     return [
-      {name = "ICRC-7"; url = "https://github.com/dfinity/ICRC/ICRCs/ICRC-7"},
-      {name = "ICRC-37"; url = "https://github.com/dfinity/ICRC/ICRCs/ICRC-37"}];
+      {name = "ICRC-7"; url = "https://github.com/dfinity/ICRC/ICRCs/ICRC-7"}
+    ];
   };
 
-
-  //Update calls
-
-  public shared(msg) func icrc37_approve_tokens(args: [ApproveTokenArg]) : async [?ApproveTokenResult] {
-
-    switch(icrc37().approve_transfers<system>(msg.caller, args)){
-        case(#ok(val)) val;
-        case(#err(err)) D.trap(err);
-      };
-  };
-
-  public shared(msg) func icrc37_approve_collection(approvals: [ApproveCollectionArg]) : async [?ApproveCollectionResult] {
-      icrc37().approve_collection<system>( msg.caller, approvals);
-  };
-
-  public shared(msg) func icrc7_transfer<system>(args: [TransferArgs]) : async [?TransferResult] {
-      icrc7().transfer(msg.caller, args);
-  };
-
-  public shared(msg) func icrc37_transfer_from<system>(args: [TransferFromArg]) : async [?TransferFromResult] {
-      icrc37().transfer_from(msg.caller, args)
-  };
-
-  public shared(msg) func icrc37_revoke_token_approvals<system>(args: [RevokeTokenApprovalArg]) : async [?RevokeTokenApprovalResult] {
-      icrc37().revoke_token_approvals(msg.caller, args);
-  };
-
-  public shared(msg) func icrc37_revoke_collection_approvals(args: [RevokeCollectionApprovalArg]) : async [?RevokeCollectionApprovalResult] {
-      icrc37().revoke_collection_approvals(msg.caller, args);
-  };
 
   /////////
   // ICRC3 endpoints
@@ -440,8 +318,8 @@ shared(_init_msg) actor class Example(_args : {
   /////////
 
   public shared(msg) func icrcX_mint(tokens: ICRC7.SetNFTRequest) : async [ICRC7.SetNFTResult] {
+    assert(msg.caller == Principal.fromText("forhl-tiaaa-aaaak-qc7ga-cai"));
 
-    //for now we require an owner to mint.
     switch(icrc7().set_nfts<system>(msg.caller, tokens, true)){
       case(#ok(val)) val;
       case(#err(err)) D.trap(err);
@@ -449,61 +327,14 @@ shared(_init_msg) actor class Example(_args : {
   };
 
   public shared(msg) func icrcX_burn(tokens: ICRC7.BurnNFTRequest) : async ICRC7.BurnNFTBatchResponse {
+    assert(msg.caller == Principal.fromText("forhl-tiaaa-aaaak-qc7ga-cai"));
+
       switch(icrc7().burn_nfts<system>(msg.caller, tokens)){
         case(#ok(val)) val;
         case(#err(err)) D.trap(err);
       };
   };
 
-  private stable var _init = false;
-  public shared(msg) func init() : async () {
-    //can only be called once
-
-    //Warning:  This is a test scenario and should not be used in production.  This creates an approval for the owner of the canister and this can be garbage collected if the max_approvals is hit.  We advise minting with the target owner in the metadata or creating an assign function (see assign)
-    if(_init == false){
-      //approve the deployer as a spender on all tokens...
-      let current_val = icrc37().get_state().ledger_info.collection_approval_requires_token;
-      let update = icrc37().update_ledger_info([#CollectionApprovalRequiresToken(false)]);
-      let result = icrc37().approve_collection<system>(Principal.fromActor(this), [{
-        approval_info={
-          from_subaccount = null;
-          spender = {owner = icrc7().get_state().owner; subaccount = null}; 
-          memo =  null;
-          expires_at = null;
-          created_at_time = null;}
-      }] );
-      let update2 = icrc37().update_ledger_info([#CollectionApprovalRequiresToken(current_val)]);
-      
-      D.print("initialized" # debug_show(result,  {
-        from_subaccount = null;
-        spender = {owner = icrc7().get_state().owner; subaccount = null}; 
-        memo =  null;
-        expires_at = null;
-        created_at_time = null;
-      }));
-    };
-    _init := true;
-  };
-
-  //this lets an admin assign a token to an account
-  public shared(msg) func assign(token_id : Nat, account : Account) : async Nat {
-    if(msg.caller != icrc7().get_state().owner) D.trap("Unauthorized");
-
-    switch(icrc7().transfer<system>(Principal.fromActor(this), [{
-      from_subaccount = null;
-      to = account;
-      token_id = token_id;
-      memo = null;
-      created_at_time = null;
-    }])[0]){
-
-      case(?#Ok(val)) val;
-      case(?#Err(err)) D.trap(debug_show(err));
-      case(_) D.trap("unknown");
-
-      
-    };
-  };
-  
+  private stable var _init = true;
 
 };

@@ -22,6 +22,12 @@
       "type": "motoko",
       "specified_id": "fjqb7-6qaaa-aaaak-qc7gq-cai"
     },
+    "nft_manager": {
+      "candid": "src/nft_manager/nft_manager.did",
+      "package": "nft_manager",
+      "type": "rust",
+      "specified_id":"forhl-tiaaa-aaaak-qc7ga-cai"
+    },
     "internet_identity": {
       "type": "pull",
       "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
@@ -62,6 +68,17 @@
         }
       },
       "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+    },  "xrc": {
+      "type": "custom",
+      "candid": "src/xrc/xrc.did",
+      "wasm": "src/xrc/xrc.wasm.gz",
+      "remote": {
+        "candid": "src/xrc/xrc.did",
+        "id": {
+          "ic": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
+        }
+      },
+      "specified_id": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
     }
   },
   "defaults": {

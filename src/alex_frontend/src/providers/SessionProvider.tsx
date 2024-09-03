@@ -9,17 +9,19 @@ import { initializeClient, initializeIndex } from '@/services/meiliService';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
 import fetchBooks from '@/features/portal/thunks/fetchBooks';
-import {
-	initializeActor,
-	initializeActorSwap,
-	initializeIcpLedgerActor,
-	initializeLbryActor,
-	initializeTokenomicsActor,
-	initializeAlexActor,
-	initializeActorAlexLibrarian,
-	initializeActorAlexWallet
+import { initializeActor, 
+    initializeIcrc7Actor, 
+    initializeNftManagerActor, 
+    initializeActorSwap,
+    initializeIcpLedgerActor, 
+    initializeLbryActor, 
+    initializeTokenomicsActor,
+    initializeAlexActor,
+	  initializeActorAlexLibrarian,
+	  initializeActorAlexWallet
 } from '@/features/auth/utils/authUtils';
-
+import { icrc7 } from '../../../declarations/icrc7';
+import { nft_manager } from '../../../declarations/nft_manager';
 import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from "../../../declarations/icp_ledger_canister";
 import { tokenomics } from '../../../declarations/tokenomics';
@@ -38,20 +40,20 @@ interface SessionProviderProps {
 // authClient > user > actor > my-engines > [meiliclient, meiliindex]
 const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const dispatch = useAppDispatch();
-	const {user} = useAppSelector(state=>state.auth);
-	const { books } = useAppSelector(state=>state.portal);
+	const { user } = useAppSelector(state => state.auth);
+	const { books } = useAppSelector(state => state.portal);
 
 	const [actor, setActor] = useState(alex_backend);
-
 	const [actorAlexLibrarian, setActorAlexLibrarian] = useState(alex_librarian);
 	const [actorAlexWallet, setActorAlexWallet] = useState(createAlexWalletActor(alexWalletCanisterId));
 	const [actorVetkd, setActorVetkd] = useState(vetkd);
-
+	const [actorIcrc7, setActorIcrc7] = useState(icrc7);
+	const [actorNftManager, setActorNftManager] = useState(nft_manager);
 	const [actorSwap,setActorSwap]=useState(icp_swap);
 	const [actorIcpLedger, setIcpLedger] = useState(icp_ledger_canister);
 	const [actorTokenomics, setActorTokenomics] = useState(tokenomics);
-	const [actorLbry,setActorLbry]=useState(LBRY);
-	const [actorAlex,setActorAlex]=useState(ALEX);
+	const [actorLbry, setActorLbry] = useState(LBRY);
+	const [actorAlex, setActorAlex] = useState(ALEX);
 
 	const [authClient, setAuthClient] = useState<AuthClient>();
 	const [meiliClient, setMeiliClient] = useState<MeiliSearch>();
@@ -68,31 +70,32 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		const key = process.env.REACT_MEILI_KEY;
 
 		const client = await initializeClient(host, key);
-		// if(client){
-		// 	const {results} = await client.getIndexes()
-		// 	results.forEach(index=>{
-		// 		client.deleteIndexIfExists(index.uid)
-		// 	})
-		// }
+		if(client){
+			const {results} = await client.getIndexes()
+			results.forEach(index=>{
+				client.deleteIndexIfExists(index.uid)
+			})
+		}
 		if(client) setMeiliClient(client)
 	}
 
-	useEffect(()=>{
+	useEffect(() => {
 		initializeAuthClient()
 		initializeMeiliClient()
-	},[])
+	}, [])
 
 
-	useEffect(()=>{
-		if(!authClient) return;
+	useEffect(() => {
+		if (!authClient) return;
 
 		dispatch(principal(authClient))
-	},[authClient])
+	}, [authClient])
 
 	useEffect(()=>{
 		if(!authClient) return;
 
 		const setupActor = async()=>{
+
 			setActor(await initializeActor(authClient));
 
 			setActorAlexLibrarian(await initializeActorAlexLibrarian(authClient));
@@ -110,31 +113,36 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 			setActorLbry(await initializeLbryActor(authClient));
 
 			setActorAlex(await initializeAlexActor(authClient));
+        
+      setActorIcrc7(await initializeIcrc7Actor(authClient));
+        
+      setActorNftManager(await initializeNftManagerActor(authClient));
+        
 		}
 		setupActor();
 	},[user])
 
-	useEffect(()=>{
+	useEffect(() => {
 		setMeiliIndex(undefined)
-		if(!user || !meiliClient) return;
+		if (!user || !meiliClient) return;
 
-		const setupMeiliIndex = async()=>{
+		const setupMeiliIndex = async () => {
 
 			const index = await initializeIndex(meiliClient, user)
 
-			if(index) setMeiliIndex(index)
+			if (index) setMeiliIndex(index)
 		}
 		setupMeiliIndex();
-	},[user, meiliClient])
+	}, [user, meiliClient])
 
-	// Load all books on App Start
+	// Load 10 books on app start.
 	useEffect(() => {
-		if(!actor) return;
-		dispatch(fetchBooks(actor));
-	}, [actor, dispatch]);
+    if(!actor) return;
+    dispatch(fetchBooks(actorNftManager));
+}, [actor, dispatch]);
 
 	return (
-		<SessionContext.Provider value={{ actor, actorAlexLibrarian, actorAlexWallet, actorVetkd, actorSwap,actorIcpLedger,actorTokenomics, actorLbry,actorAlex,authClient, meiliClient, meiliIndex  }}>
+		<SessionContext.Provider value={{ actor, actorAlexLibrarian, actorAlexWallet, actorVetkd, actorSwap,actorIcpLedger,actorTokenomics, actorLbry, actorAlex, actorIcrc7, actorNftManager,authClient, meiliClient, meiliIndex  }}>
 			{children}
 		</SessionContext.Provider>
 	);

@@ -21,8 +21,18 @@ sudo apt-get upgrade nodejs`
 - Add wasm: `rustup target add wasm32-unknown-unknown`
 - If in a new rust env: `Sudo apt install build-essential`
 
+motoko stuff:
+- https://mops.one/docs/install
+- npm i -g ic-mops
+
 
 # Alexandria WhitePaper
+
+> *"There are lots of entrepreneurs and investors that want to build interesting new services. The problem is, often times those interesting new internet services would depend upon content, functionality, and user data that exists inside of proprietary services, owned and controlled by Big Tech."*
+> 
+> — Dominic Williams, DFINITY founder on ["The Internet Computer Vision"](https://youtu.be/DYVPq_vMB8w?si=w_jopM2o22UQjqwH)
+
+**tldr: Alexandria is the bridge and library for all Web2 content, functionality, and user data; so Web3 stacks don't have to start from scratch.**
 
 ## Table of Contents
 - [Introduction](#introduction)
@@ -36,34 +46,42 @@ sudo apt-get upgrade nodejs`
     - [Minting Process](#minting-process)
     - [Distribution Mechanics](#distribution-mechanics)
     - [Utility](#utility)
-- [Part 3: Non-Fungible Tokens Economics And Mechanics](#part-3-non-fungible-tokens-economics-and-mechanics)
+- [Part 3: Non-Fungible Tokens Economics And Mechanics](#part-3-nft-economics-and-mechanics)
   - [NFTs](#nfts)
     - [Ebook NFTs](#ebook-nfts)
     - [Other NFTs](#other-nfts)
   - [SBTs](#sbts)
   - [References](#references)
 - [Part 4: Ecosystem](#part-4-ecosystem)
-  - [Becoming a Librarian](#becoming-a-librarian)
+  - [Bibliotheca (library)](#bibliotheca-library)
+  - [Syllogos (aggregate)](#syllogos-aggregate)
+  - [Lexigraph (write)](#lexigraph-write)
+  - [Dialectica (debate)](#dialectica-debate)
+  - [Alexandrian (explore)](#alexandrian-explore)
+  - [Emporium (trade)](#emporium-trade)
+- [Part 5: Architecture & Governance](#part-5-architecture--governance)
+  - [Governance](#governance)
+  - [Canister Architecture](#canister-architecture)
+  - [Internet of Books](#internet-of-books)
 
 
 ## Introduction
 
-The Internet has come to rely almost exclusively on Big Tech services as its information aggregators. This tweet summs up the effects from this that we all feel every day:
+The Internet has come to rely almost exclusively on Big Tech services as its information aggregators. This tweet sums up the daily effect we feel from this:
 
 https://x.com/Noahpinion/status/1818776478315954200
 
 The Static Web1 that was supposed to unlock the worlds information became buried by the Social Web2, sending 95-99% of digital content to the ‘deep web’ where it's inaccessible through conventional means. Today, digital content that isn’t (1) search-engine optimized, (2) open-access, and (3) brand new, is basically forever lost.
 
-This paradigm stems from the Internets' ownership problem. Search engines don’t actually own what they point to, nor social platforms what they display, nor cloud providers what they host. Yet, their survival dpends on leveraging data as their own, blocking others from using it, optimizing for engagement over searchability, and disregarding the rights of creators. 
-Web3 is an Internet where everything digital is owned by someone. This has been achieved for money, e.g., Bitcoin; and to some extent for art with NFTs, but nowhere else. It seems everyone has given up the purist vision.
+This paradigm stems from an ownership problem. Search engines don’t actually own what they point to, nor social platforms what they display or cloud providers what they host. Yet, their survival dpends on leveraging data as their own.
 
-To give true ownership to a peice of content, you basically need to keep the original fixed supply of one while being able to distribute it infinitely. Put simply, you need to recreate the search, social, and hosting elements around making use of that original copy—so that’s what we’re doing.
+Web3 is the vision of an Internet where everything digital is owned by someone. This has been achieved for money, e.g., Bitcoin; and to some extent for art with NFTs, but nowhere else.
+
+To give true ownership to a peice of content, you basically need to keep the original fixed supply of one while being able to distribute it infinitely. This requires that you recreate the search, social, and hosting elements around making use of that original copy—so that’s what we’re doing.
 
 Alexandria is a library in cypherspace with all its information owned by individuals in the network, much like Bitcoin except for generic content instead of money. This begins with ebooks being owned and used as NFTs, but continues with any file type (video, audio, etc.), used in a suite of Open Internet Services.
 
-Alexandria is not so much about building a 'new Internet', but going backwards with Web3-level tools to that time where Web1 became Web2. It's the place to opt-out for people who think we took the wrong fork in the road.
-
-## Project Overview
+## Overview
 
 Alexandria quite literally strives to be the world's largest public library. At its core, anyone can come in and put a book on the shelf (or movie, song, podcast, etc.) and anyone else can come pick it up.
 
@@ -207,7 +225,7 @@ Staked ALEX is also used for DAO voting via our governance mechanism, but voting
 
 There's no utility other than voting. There's no value other than staking revshare.
 
-## Part 3: Non-Fungible Tokens Economics And Mechanics
+## Part 3: NFT Economics And Mechanics
 
 In Alexandria, everything you see is owned by someone in some way. This ownership is of three forms: 
 
@@ -225,18 +243,28 @@ The solution for more generic file types will likey use the same single "Alexand
 
 ### Ebook NFTs
 
-Alexandria NFTs use a Motoko implementation of the ICRC7 and ICRC37 standards, with default transfer, mint, burn, etc., functionality. There is no supply cap, and anyone can mint an NFT at an availible mint#, which starts at 1 and increases consecutively.
+Alexandria NFTs use a Motoko implementation of the ICRC7 and ICRC37 standards, with default transfer, mint, burn, etc., functionality. There is a practically infinite supply cap (10^32 -1), and anyone can mint an NFT at an availible mint#.
 
 The minting uses the ArWeave LibModule, where Librarians host a pre-paid node that can upload files to the permaweb.
 
 The cost to mint is an estimated 1 LBRY + 5LBRY/MB at a $10 ICP (1LBRY=1cent at $10 ICP). It costs Librarians $0.027/MB, so this is a breakeven price plus free ALEX mints for Librarians if they were to burn the LBRY, or a 2X margin at the LBRY purchase price.
 
-Let's look at an example. You are a Librarian with some LBRY and seek to mint a 10MB version of "The Bible" as the first NFT on Alexandria. After clicking "Mint NFT" on the manager page, you select the ArWeave Node of the Librarian you wish to use, upload the book, and populate/check some manual/autogenerated fields:
+Let's look at an example. You are a Librarian with some LBRY and seek to mint a 10MB version of "The Bible" as the first NFT on Alexandria. After clicking "Mint NFT" on the manager page, you select the ArWeave Node of the Librarian you wish to use, upload the book, and populate/check some manual/autogenerated fields. If the human readable version in the UI checks out, you submit to pay 51 LBRY and mint. That LBRY is sent to the chosen Librarian, their node upserts all this data to ArWeave, and then our backend mints the ICRC7 NFT with the following fields:
 
+```
+  icrc7 Canister:
+    mint#: 1
+    owner=principal {"2jgt7-v33z4-tiosh-csi2v-66cge-4uu7j-v2nye-z27vc-d36pc-ctqai-bqe", subaccount=null}
+    transactionId="nYIQwN_-EjFdmNCBSrfkD9E6-Sgixl8a0Zu3sj1gltQ"
+    verified={Blob=vec {0}}
+
+  Manifest_id (folder): 
     Files: [.epub file]
     Cover: [image uploaded by the minter]
-
-    tx_id: nYIQwN_-EjFdmNCBSrfkD9E6-Sgixl8a0Zu3sj1gltQ
+    ...additional files depending on the upload type.
+  
+  Arweave Metadata: 
+    manifest_id: nYIQwN_-EjFdmNCBSrfkD9E6-Sgixl8a0Zu3sj1gltQ
     Title: The Bible
     Author: God
     Content-Type: application/epub+zip
@@ -259,18 +287,7 @@ Let's look at an example. You are a Librarian with some LBRY and seek to mint a 
     type9: 0
     era: 1
 
-If the human readable version in the UI checks out, you submit to pay 51 LBRY and mint. That LBRY is sent to the chosen Librarian, their node upserts all this data to ArWeave, and then our backend mints the ICRC7 NFT with the following fields:
-
-    mint#: 1
-    tx_id: nYIQwN_-EjFdmNCBSrfkD9E6-Sgixl8a0Zu3sj1gltQ
-    owner: 2jgt7-v33z4-tiosh-csi2v-66cge-4uu7j-v2nye-z27vc-d36pc-ctqai-bqe
-    collected_lbry: 0
-    collected_alex: 0
-    verified: false
-
-The first set of fields is immutably stored on ArWeave. 
-
-Of the second set of feilds, the mint# and tx_id are immutably stored on ICP and map to the ArWeave data, while owner, collected_lbry, and verified are mutably stored on ICP to give Alexandria NFTs certain special features.
+```
 
 Alexandria employs an "nft_manager" canister to handle mutable metadata. It has several functions:
 
@@ -280,9 +297,9 @@ Alexandria employs an "nft_manager" canister to handle mutable metadata. It has 
 
 Let's continue with our example. After you minted "The Bible" as the first Alexandria NFT, others can now pay LBRY to use it in the various ways we'll soon see.
 
-LBRY paid use of this NFT #1 is put in subaccount "000...1" of the nft_manager canister. Since it's recieving LBRY payments, it's also eligable to recieve ALEX mints to that same account. In order for you, the owner, to claim this money, you must first verify yourself as a rightful owner by sumbiting a proposal to the DAO. Assuming the version of "The Bible" is Open Domain, you're able to use it as your own and the DAO will likey approve it, which instructs the nft_manager canister to change the verified field to 'true', at which point you can claim all rewards and no-one can ever reverse that NFT ownership.
+LBRY paid use of this NFT #1 is put in subaccount "000...1" of the nft_manager canister. Since it's recieving LBRY payments, it's also eligible to recieve ALEX mints to that same account. In order for you, the owner, to claim this money, you must first verify yourself as a rightful owner by sumbiting a proposal to the DAO. Assuming the version of "The Bible" is Open Domain, you're able to use it as your own and the DAO will likey approve it, which instructs the nft_manager canister to change the verified field to 'true', at which point you can claim all rewards and no-one can ever reverse that NFT ownership.
 
-Assuming you uploaded the latest James Patterson novel and went through the same steps, this would fail, and you'd not be able to gain any profit from the book. Rather, all the profit accrued from it's use will be 'stuck' there until James Patterson comes on the site and submits a DAO proposal, at which point, the nft_manager canister will transfer it to him and verify it so all funds can be claimed, and the book can be removed (burned) if he likes.
+Assuming you uploaded the latest James Patterson novel and went through the same steps, this would fail, and you'd not be able to gain any profit from the book. Rather, all the profit accrued from it's use will be 'locked' there until James Patterson comes on the site and submits a DAO proposal, at which point, the nft_manager canister will transfer it to him and verify it so all funds can be claimed, and the book can be removed (burned) if he likes.
 
 ### Other NFTs
 
@@ -397,28 +414,188 @@ This section will have lots more details at a future time.
 
 ### Canister Architecture
 
-ALEX: Token canister (backholed)
+Each of the following subsections are canisters in our codebase.
 
-alex_backend: Main logic backend.
+*Eventually this will all be in a diagram, but things are changing too rapidly atm.*
 
-bookmarks: Main storage backend.
+BIG QUESTIONS: 
+- How is ALEX canister minting from the tokenomics canister if the minting account is a dfx prinicipal?
+  - Should we deploy the ALEX canister from the tokenomics canister, or should we deploy pre mint the full 21 million ALEX to the tokenomics canister with the minting address, or leave it open ended with a minting account? What's most secure?
+- Same questions for LBRY.
+- Need to create an issue that allows the alex_backend to refill canisters with the ICP in the staking pool.
 
-icp_swap: LBRY management canister for swapping and staking tokens.
+### alex_frontend (Typescript: xo3nl-yaaaa-aaaap-abl4q-cai) | Current Controller: 2jgt...bqe | Future Controller: 2jgt...bqe or MultiSig Harware Wallet or DAO
 
-icrc7: NFT canister.
+It's the whole frontend. It changes too much right now and does not have a direct path to decentralization until Alexandria launches a DAO. 
 
-LBRY: Token canister (blackholed)
+### alex_backend (Rust: xj2l7-vyaaa-aaaap-abl4a-cai) | Current Controller: 2jgt...bqe | Future Controller: 2jgt...bqe or MultiSig Harware Wallet or DAO
 
-Tokenomics: Logic controlling ALEX minting.
+Primary Functions:
+- Currently manages the storage of librarian principals, sbts, and wallet keys, but that will need to be moved to a storage canister with the vetkeys implementation.
+- Picks a random recent LBRY transaction which selects the sender and reciever accounts to mint ALEX to.
+- Handles cycles management by allowing use of staking pool funds to refill canister cycles.
 
-DAO Canister: TBD.
+The purpose of alex_backend is to have mutable logic that will need to change with type contained and separated from data storage and immutable logic. For this reason it will remain under centralized control until we figure out how to put it under DAO control.
 
-## Internet of Books
+### ALEX (7hcrm-4iaaa-aaaak-akuka-cai) | Current Controller: 2jgt...bqe | Future Controller: ???
 
-Alexandria is a universal content bed for the Internet. 
+ALEX Token & Default NNS Implementation of ICRC1 and ICRC2
 
-It's like bittorrent and IPFS, except all the content is owned and incentivized.
+Deploy params: 
+- token_name = "Alexandria"
+- token_symbol = "ALEX"
+- minting_account = ???
+- initial_balances = ??? (either none, or 21million to the tokenomics canister)
+- transfer_fee = 10_000
+- archive_options = record {
+    trigger_threshold = 2000;
+    num_blocks_to_archive = 1000;
+    controller_id = null;
+  };
+- icrc2 = true;
 
-It's like Facebook and Google, except anyone can plug into and use it.
+### LBRY (hdtfn-naaaa-aaaam-aciva-cai) | Current Controller: 2jgt...bqe | Future Controller: ???
 
-It's the entire dream of Web3, in one project. What will you do with it?
+LBRY Token & Default NNS Implementation of ICRC1 and ICRC2
+
+Deploy params: 
+- token_name = "Library Credits"
+- token_symbol = "LBRY"
+- minting_account = ???
+- initial_balances = null
+- transfer_fee =  4_000_000 (0.04 LBRY)
+- archive_options = record {
+    trigger_threshold = 2000;
+    num_blocks_to_archive = 1000;
+    controller_id = null;
+  };
+- icrc2 = true
+
+
+### bookmarks (sklez-7aaaa-aaaan-qlrva-cai)
+
+storage and management for all the SBT ownership and payments. Details tbd but will follow much of the logic of the nft managment canister.
+
+
+### icp_swap: (5qx27-tyaaa-aaaal-qjafa-cai) | Current controller: ... | Future Controller: ...
+
+Details being finalized.
+
+### tokenomics: (uxyan-oyaaa-aaaap-qhezq-cai) | Current controller: ... | Future Controller: ...
+
+Details being finalized.
+
+### icrc7
+*Status: Live & Complete | Current & Future Controller: nft_manager*
+
+Based on the icrc7 implementation by [PanIndustrial](https://github.com/PanIndustrial-Org/icrc_nft.mo), done in Motoko, chosen for it's extensibility with icrc3 and icrc37.
+
+Special features:
+  - Deployer is approved for mint and transfers of every NFT in the collection.
+  - NFTs are designed with mutability in mind, so NFTs can be changed and overwritten.
+
+While these features would normally be vulnerabilities for conventional collections, they are an asset for Alexandria NFTs because the 'deployer' is a DAO-controlled canister. This ability to transfer and change NFTs is exclusively delegated to a canister, which is what allows each NFT to control its own wallet, collect revenue, and disperse only to its true owner.
+
+icrc7 also includes its own archives, having a full record of transactions and their history.
+
+### nft_manager
+*Status: Incomplete | Current Controller: 2jgt...bqe | Future Controller: DAO/Blackholled???
+
+
+Sole controller of the icrc7 canister.
+
+Function: 
+  - DONE: Deploys and initializes the icrc7 canister at launch.
+  - DONE: Creates NFT wallets and allows owners to widthraw from them.
+  - DONE: Allowed verfied owners to withdraw funds from their NFT's wallets.
+  - IP: Mints NFTs if propper LBRY is sent, and tx_id exists on ArWeave
+  - IP: Has a voting process to verify NFTs.
+  - IP: Updates NFTs if verfied by a vote.
+  - IP: Transfers NFTs to a rightful owner if mandated by a vote.
+
+
+todo:
+- Handle athentication for withdrawals.
+- Do update nfts, transfer nfts, burn NFTs.
+- Make a voting system.
+
+Code Review:
+- Added init config to init.rs, so that icrc7 is only deployed on first canister install.
+-- next lets check to ensure the deploy args match up.
+
+init.rs:
+
+
+### Inspiration
+
+'AI' was kept out of this whitepaper entirely, despite it being at the core of Alexandria's founding vision.
+
+This project was born out of pilot project called UncensoredGreats where you'd chat with great authors in an uncensored way. There was one finding of this experiment that shaped Alexandria: When an AI is fed author words directly, and forced to answer without knowledge of the user's question, responses became far more interesting and honest. In other words, a technique to output particular human thoughts from training data rather than aggregate ones is far more condusive to discovery.
+
+As AI models grow in size and complexity, the outputs will grow more generic, and our uncensored methodology more fruitful. This direction goes against the grain of the entire AI space, but it steadfast in what we see as a longstanding principle of computer science, exemplified by the story of one early internet legend.
+
+#### The Hyperlink Paridigm
+
+In 1968, Doug Engelbart and his team presented “A Research Center for Augmenting Human Intellect” in San Francisco’s Civic Auditorium. It introduced:
+
+(1) A responsive human-machine interface.
+(2) The computer mouse.
+(3) Copy/paste and text re-organization.
+(4) Hyperlinks.
+(5) Real-time screen-sharing collaboration.
+
+Most remember this as the “Mother of all Demos” for obvious reasons. What most forget about Engelbart’s experience though is in the two decades preceding this demo, where he was at best refused help, and at worst outright ridiculed for holding that computers would be “tools for collaboration and augmentation” instead of Artificial Intelligence (a story best told in *What the Dormouse Said*).
+
+During the 1950s and 60s, the entire CS field was convinced that the primary use case of computation was autonomous machines ad AI, while Doug held that computers would be tools for humans to interphase with. Despite 70 years of evidence of that same trajectory, popular opinion has not budged an inch. As this decade of tech becomes the gold rush for blowing smoke with AI buzzwords, we see recent breakthroughs in AI through Engelbart's eyes, as history's next big tool that we need a human-centric interface for.
+
+Engelbart's design was one webpage and a hyperlink for two. It's now for 200 million sites and 3.5 billion people. The design isn't perfect: Webpages change, hyperlinks disappear, both can be lost, stolen, or hacked, and neither can be truly owned or trusted.
+
+Alexandria is a universal content bed for the internet. While the world works to make AI the perfect tool, like Dougs peers did with compute machines; we're building a control room that puts humans at their helm, just like Doug's "tools for collaboration and augmentation." Really we're just migrating Doug's stack to Web3.
+
+![Mother of all Demos (1968)](https://www.darpa.mil/DDM_Gallery/19968b_MOAD_619x316.jpg)
+
+
+
+
+
+
+## Patterns and Standards (for contributions)
+
+
+### Accessing a new Canister from the Frontend.
+
+Add it to the following files with the existing patterns:
+    (1) src/alex_frontend/src/contexts/SessionContext.tsx
+    (2) src/alex_frontend/src/features/auth/utils/authUtils.tsx
+    (3) src/alex_frontend/src/providers/SessionProvider.tsx
+
+We use 2 patterns when calling actor functions: Implemented with `const { actor } = useSession();` via SessionContext.tsx or `createAsyncThunk`... via Redux? When should we use which? 
+
+todo before next push: Fix fetchBooks.ts, fetchEngineBooks.ts, and irys.tsx
+
+### Accessing canisters on the backend.
+
+Use nft_manager/src/lib.rs as a reference.
+
+Use this pattern: 
+
+```rust
+pub const ALEX_CANISTER_ID: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
+
+pub fn alex_principal() -> Principal {
+    get_principal(ALEX_CANISTER_ID)
+}
+```
+
+Then when you need to reference it: 
+```
+use crate::alex_principal;
+
+some_function(alex_principal(): Principal) {
+  ...
+}
+```
+
+Rationale: This methodology is the most consise, and having all the canister ids in each Lib.rs immediately tells you what canisters it interacts with.
+
+

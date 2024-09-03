@@ -1,4 +1,3 @@
-type DeployResult = variant { Ok; Err : text };
 type Engine = record {
   id : text;
   key : text;
@@ -28,7 +27,6 @@ service : {
   add_engine : (text, text, text, text, text, opt nat8) -> (Engine);
   add_my_engine : (text, text, text, text, opt nat8) -> (Result);
   bookmark_sc : (nat64) -> ();
-  current_mint : () -> (Result_2);
   delete_engine : (text) -> (bool);
   delete_keys : (nat8) -> (Result_3);
   delete_sc : (nat64) -> ();

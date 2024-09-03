@@ -15,6 +15,14 @@ import {
 } from "../../../../../declarations/alex_wallet";
 
 import {
+  createActor as createIcrc7Actor,
+  icrc7,
+} from "../../../../../declarations/icrc7";
+import {
+  createActor as createNftManagerActor,
+  nft_manager,
+} from "../../../../../declarations/nft_manager"
+import {
   icp_swap,
   createActor as createActorSwap,
 } from "../../../../../declarations/icp_swap";
@@ -36,6 +44,8 @@ import {
 } from "../../../../../declarations/ALEX";
 
 const backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
+const icrc7_canister_id = process.env.CANISTER_ID_ICRC7!;
+const nft_manager_canister_id = process.env.CANISTER_ID_NFT_MANAGER!;
 const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
 const icp_ledger_canister_id = process.env.CANISTER_ID_ICP_LEDGER_CANISTER!;
 const tokenomics_canister_id = process.env.CANISTER_ID_TOKENOMICS!;
@@ -66,6 +76,7 @@ export const initializeActor = async (client: AuthClient) => {
 };
 
 export const initializeActorAlexLibrarian = async (client: AuthClient) => {
+export const initializeIcrc7Actor = async (client: AuthClient) => {
   try {
     if (await client.isAuthenticated()) {
       const identity = client.getIdentity();
@@ -80,6 +91,15 @@ export const initializeActorAlexLibrarian = async (client: AuthClient) => {
 };
 
 export const initializeActorAlexWallet = async (client: AuthClient) => {
+      const actor = createIcrc7Actor(icrc7_canister_id, { agent });
+      return actor;
+    }
+  } catch (error) {
+    console.error("Error initializing ICRC7 actor", error);
+  }
+  return icrc7;
+};
+export const initializeNftManagerActor = async (client: AuthClient) => {
   try {
     if (await client.isAuthenticated()) {
       const identity = client.getIdentity();
@@ -94,6 +114,14 @@ export const initializeActorAlexWallet = async (client: AuthClient) => {
   return createAlexWalletActor(alex_wallet_canister_id);
 };
 
+      const actor = createNftManagerActor(nft_manager_canister_id, { agent });
+      return actor;
+    }
+  } catch (error) {
+    console.error("Error initializing NFT Manager actor", error);
+  }
+  return nft_manager;
+}
 export const initializeActorSwap = async (client: AuthClient) => {
   try {
     if (await client.isAuthenticated()) {
