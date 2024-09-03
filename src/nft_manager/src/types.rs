@@ -55,7 +55,7 @@ pub enum TransferResult {
 
 #[derive(candid::CandidType, serde::Deserialize, Debug)]
 pub enum TransferError {
-    pubNonExistingTokenId,
+    PubNonExistingTokenId,
     InvalidRecipient,
     Unauthorized,
     TooOld,
