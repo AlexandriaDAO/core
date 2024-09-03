@@ -51,6 +51,7 @@
     "flatted": "^3.3.1",
     "formik": "^2.4.6",
     "html-to-text": "^9.0.5",
+    "ic-vetkd-utils": "file:ic-vetkd-utils-0.1.0.tgz",
     "install": "^0.13.0",
     "instantsearch.css": "^8.1.0",
     "instantsearch.js": "^4.66.0",

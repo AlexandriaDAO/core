@@ -7,7 +7,7 @@ import Status from "./Status";
 import Footer from "./Footer";
 import Header from "./Header";
 import useSession from "@/hooks/useSession";
-import getIrys from "../irys/utils/getIrys";
+import getIrys, { getTypedIrys } from "../irys/utils/getIrys";
 import { readFileAsBuffer } from "../irys/utils/gaslessFundAndUpload";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAuth } from "../../contexts/AuthContext";
@@ -25,7 +25,7 @@ const Mint = () => {
 
 	const dispatch = useAppDispatch();
 
-	const { actor, meiliClient } = useSession();
+	const { actor, actorAlexWallet,actorAlexLibrarian, actorVetkd, meiliClient } = useSession();
 	const [bookLoadModal, setBookLoadModal] = useState(false);
 
 	const [file, setFile] = useState<File | undefined>(undefined);
@@ -102,41 +102,13 @@ const Mint = () => {
 		next();
 
 		try {
-			const irys = await getIrys();
+			// pass selected node TODO
+			// right now it will error out
+			const irys = await getTypedIrys(actorAlexWallet);
 			const transactions = await createAllTransactions(irys);
 
 			await mintNFT(transactions.manifest.id);
 			await uploadToArweave(irys, transactions);
-
-    //     // Master version before Zeeshan separated upload into a folder.
-    // const APP_ID = process.env.DFX_NETWORK === "ic" 
-    // ? "testingAlexandria" 
-    // : "UncensoredGreats";
-
-		// 	if (!APP_ID) {
-		// 			throw new Error("Application ID is not set in environment variables");
-		// 	}
-
-		// 	// Convert File to Buffer
-		// 	const buffer = await readFileAsBuffer(file);
-
-		// 	console.log("Uploading...");
-		// 	tx = irys.createTransaction(buffer, {
-		// 		tags: [
-		// 			{ name: "Content-Type", value: file.type },
-		// 			{ name: "application-id", value: APP_ID },
-		// 			{ name: "minting_number", value: mintingNumber.toString() },
-		// 			...Object.entries(metadata).map(([key, value]) => ({
-		// 				name: key,
-		// 				value:
-		// 					typeof value === "string" ? value : String(value),
-		// 			})),
-		// 		],
-		// 	});
-		// 	await tx.sign();
-
-		// 	message.success("Transaction Created Successfully");
-
 
 			dispatch(fetchEngineBooks({ actor, engine: activeEngine }));
 			setTimeout(() => next(3), 2000);

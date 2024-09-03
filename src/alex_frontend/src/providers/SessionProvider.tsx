@@ -9,12 +9,26 @@ import { initializeClient, initializeIndex } from '@/services/meiliService';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
 import fetchBooks from '@/features/portal/thunks/fetchBooks';
-import { initializeActor, initializeActorSwap,initializeIcpLedgerActor, initializeLbryActor, initializeTokenomicsActor,initializeAlexActor } from '@/features/auth/utils/authUtils';
+import {
+	initializeActor,
+	initializeActorSwap,
+	initializeIcpLedgerActor,
+	initializeLbryActor,
+	initializeTokenomicsActor,
+	initializeAlexActor,
+	initializeActorAlexLibrarian,
+	initializeActorAlexWallet
+} from '@/features/auth/utils/authUtils';
+
 import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from "../../../declarations/icp_ledger_canister";
 import { tokenomics } from '../../../declarations/tokenomics';
 import { LBRY } from '../../../declarations/LBRY';
 import { ALEX } from '../../../declarations/ALEX';
+import { alex_librarian } from '../../../declarations/alex_librarian';
+import { createActor as createAlexWalletActor, canisterId as alexWalletCanisterId }  from '../../../declarations/alex_wallet';
+import { vetkd } from '../../../declarations/vetkd';
+
 
 
 interface SessionProviderProps {
@@ -28,6 +42,11 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const { books } = useAppSelector(state=>state.portal);
 
 	const [actor, setActor] = useState(alex_backend);
+
+	const [actorAlexLibrarian, setActorAlexLibrarian] = useState(alex_librarian);
+	const [actorAlexWallet, setActorAlexWallet] = useState(createAlexWalletActor(alexWalletCanisterId));
+	const [actorVetkd, setActorVetkd] = useState(vetkd);
+
 	const [actorSwap,setActorSwap]=useState(icp_swap);
 	const [actorIcpLedger, setIcpLedger] = useState(icp_ledger_canister);
 	const [actorTokenomics, setActorTokenomics] = useState(tokenomics);
@@ -74,18 +93,23 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		if(!authClient) return;
 
 		const setupActor = async()=>{
-			const actor = await initializeActor(authClient);
-			setActor(actor);
-			const actorSwap = await initializeActorSwap(authClient);
-			setActorSwap(actorSwap);
-			const actorIcpLedger = await initializeIcpLedgerActor(authClient);
-			setIcpLedger(actorIcpLedger);
-			const actorTokenomics=await initializeTokenomicsActor(authClient);
-			setActorTokenomics(actorTokenomics);
-			const actorLbry=await initializeLbryActor(authClient);
-			setActorLbry(actorLbry);
-			const actorAlex=await initializeAlexActor(authClient);
-			setActorAlex(actorAlex);
+			setActor(await initializeActor(authClient));
+
+			setActorAlexLibrarian(await initializeActorAlexLibrarian(authClient));
+
+			setActorAlexWallet(await initializeActorAlexWallet(authClient));
+
+			// ommiting vetkd authorization. no need
+
+			setActorSwap(await initializeActorSwap(authClient));
+
+			setIcpLedger(await initializeIcpLedgerActor(authClient));
+
+			setActorTokenomics(await initializeTokenomicsActor(authClient));
+
+			setActorLbry(await initializeLbryActor(authClient));
+
+			setActorAlex(await initializeAlexActor(authClient));
 		}
 		setupActor();
 	},[user])
@@ -110,7 +134,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	}, [actor, dispatch]);
 
 	return (
-		<SessionContext.Provider value={{ actor,actorSwap,actorIcpLedger,actorTokenomics, actorLbry,actorAlex,authClient, meiliClient, meiliIndex  }}>
+		<SessionContext.Provider value={{ actor, actorAlexLibrarian, actorAlexWallet, actorVetkd, actorSwap,actorIcpLedger,actorTokenomics, actorLbry,actorAlex,authClient, meiliClient, meiliIndex  }}>
 			{children}
 		</SessionContext.Provider>
 	);

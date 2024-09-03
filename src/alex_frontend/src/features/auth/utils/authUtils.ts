@@ -4,6 +4,16 @@ import {
   createActor,
   alex_backend,
 } from "../../../../../declarations/alex_backend";
+
+import {
+  createActor as createAlexLibrarianActor,
+  alex_librarian
+} from "../../../../../declarations/alex_librarian";
+
+import {
+  createActor as createAlexWalletActor,
+} from "../../../../../declarations/alex_wallet";
+
 import {
   icp_swap,
   createActor as createActorSwap,
@@ -32,6 +42,9 @@ const tokenomics_canister_id = process.env.CANISTER_ID_TOKENOMICS!;
 const lbry_canister_id = process.env.CANISTER_ID_LBRY!;
 const alex_canister_id = process.env.CANISTER_ID_ALEX!;
 
+const alex_librarian_canister_id = process.env.CANISTER_ID_ALEX_LIBRARIAN!;
+const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
+
 export const getPrincipal = (client: AuthClient): string => {
   const identity = client.getIdentity();
   const principal = identity.getPrincipal().toString();
@@ -51,6 +64,36 @@ export const initializeActor = async (client: AuthClient) => {
   }
   return alex_backend;
 };
+
+export const initializeActorAlexLibrarian = async (client: AuthClient) => {
+  try {
+    if (await client.isAuthenticated()) {
+      const identity = client.getIdentity();
+      const agent = new HttpAgent({ identity });
+      const actor = createAlexLibrarianActor(alex_librarian_canister_id, { agent });
+      return actor;
+    }
+  } catch (error) {
+    console.error("Error initializing alex librarian actor", error);
+  }
+  return alex_librarian;
+};
+
+export const initializeActorAlexWallet = async (client: AuthClient) => {
+  try {
+    if (await client.isAuthenticated()) {
+      const identity = client.getIdentity();
+      const agent = new HttpAgent({ identity });
+      const actor = createAlexWalletActor(alex_wallet_canister_id, { agent });
+      return actor;
+    }
+  } catch (error) {
+    console.error("Error initializing alex librarian actor", error);
+  }
+  
+  return createAlexWalletActor(alex_wallet_canister_id);
+};
+
 export const initializeActorSwap = async (client: AuthClient) => {
   try {
     if (await client.isAuthenticated()) {
