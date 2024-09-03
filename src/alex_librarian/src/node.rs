@@ -34,8 +34,6 @@ pub struct Node {
     pub owner: String,  // Principal to which this node belongs
 
     pub pvt_key: String,
-    pub pub_key: String,
-
     pub status: NodeStatus,
 }
 
@@ -46,7 +44,7 @@ thread_local! {
 
 // Function to add a new node
 #[update]
-pub fn add_node(owner: String, pvt_key: String, pub_key: String, status: Option<u8>) -> Node {
+pub fn add_node(owner: String, pvt_key: String, status: Option<u8>) -> Node {
 
     // Step 1: Setup status for node
     let node_status = match status {
@@ -66,7 +64,6 @@ pub fn add_node(owner: String, pvt_key: String, pub_key: String, status: Option<
         id: new_id.clone(),  // Assign the new unique ID
         owner,
         pvt_key,
-        pub_key,
         status: node_status,
     };
 
@@ -81,7 +78,7 @@ pub fn add_node(owner: String, pvt_key: String, pub_key: String, status: Option<
 
 // Function to add a new node
 #[update]
-pub fn add_my_node(pvt_key: String, pub_key: String, status: Option<u8>) -> Result<Node, String> {
+pub fn add_my_node(pvt_key: String, status: Option<u8>) -> Result<Node, String> {
 
     // Step 1: Make sure its not an anonymous user trying to add node
     let caller_principal = caller();
@@ -92,10 +89,6 @@ pub fn add_my_node(pvt_key: String, pub_key: String, status: Option<u8>) -> Resu
     // Step 2: Basic field validations
     if pvt_key.trim().is_empty() {
         return Err("Private key is required.".to_string());
-    }
-
-    if pub_key.trim().is_empty() {
-        return Err("Public Key is required.".to_string());
     }
 
     // Step 3: Setup status for node
@@ -117,7 +110,6 @@ pub fn add_my_node(pvt_key: String, pub_key: String, status: Option<u8>) -> Resu
         id: new_id.clone(),  // Assign the new unique ID
         owner: caller_principal.to_text(),
         pvt_key,
-        pub_key,
         status: node_status,
     };
 

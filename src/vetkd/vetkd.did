@@ -1,0 +1,6 @@
+
+service : {
+  encryption_key : () -> (text);
+
+  wbe_decrypt : (text) -> (variant { Ok : text; Err : text });
+}

@@ -15,19 +15,19 @@ const fetchEngineBooks = createAsyncThunk<
     { rejectValue: string, state: RootState }
 >("engineBooks/fetchEngineBooks", async ({actorNftManager, engine}, { rejectWithValue, getState }) => {
     try {
-        const {portal: {books}} = getState();
+        // const {portal: {books}} = getState();
 
-        // Ensure activeEngine is a valid principal string
-        if (typeof engine !== 'string' || !engine) {
-            throw new Error('Invalid engine provided');
-        }
+        // // Ensure activeEngine is a valid principal string
+        // if (typeof engine !== 'string' || !engine) {
+        //     throw new Error('Invalid engine provided');
+        // }
 
         const result = await actorNftManager.get_nfts_of(engine);
 
-        if ('Err' in result) {
-            console.log('Error fetching NFTs', result.Err);
-            throw new Error('Error fetching NFTs');
-        }
+        // if ('Err' in result) {
+        //     console.log('Error fetching NFTs', result.Err);
+        //     throw new Error('Error fetching NFTs');
+        // }
 
         if('Ok' in result){
             if(books.length>0){
@@ -36,8 +36,8 @@ const fetchEngineBooks = createAsyncThunk<
                 return books.filter(book=> manifestIds.includes(book.manifest));
             }
 
-            return await getBooks(result.Ok)
-        }
+        //     return await getBooks(result.Ok)
+        // }
 
         return [];
     } catch (error) {

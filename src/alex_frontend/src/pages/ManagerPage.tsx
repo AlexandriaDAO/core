@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import MainLayout from "@/layouts/MainLayout";
 import { MdEdit } from "react-icons/md";
 import { FaCopy } from "react-icons/fa";
@@ -6,7 +6,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import EngineOverview from "@/features/engine-overview";
 import PublicEngines from "@/features/public-engines";
 import MyEngine from "@/components/MyEngine";
-
+import Librarian from "@/features/librarian";
 
 function ManagerPage() {
 	const { activeEngine } = useAppSelector(
@@ -47,28 +47,19 @@ function ManagerPage() {
 					{
 						user !== "" && (
 							<>
-								{/* <MyEngines /> */}
 								<MyEngine />
-								{/* <Librarian /> */}
+								<Librarian />
 							</>
 						)
 					}
-
 				</div>
 
 				<div className="flex-grow flex flex-col gap-4">
 					{activeEngine ? <EngineOverview /> : <PublicEngines />}
 				</div>
-
 			</div>
 		</MainLayout>
 	);
 }
 
 export default ManagerPage;
-
-
-// <!-- This was my way (evan). Above is zeeshans way.					{user!=='' && <MyEngines /> }
-// 				</div>
-
-// 				{activeEngine ? <EngineOverview /> : <PublicEngines />} -->

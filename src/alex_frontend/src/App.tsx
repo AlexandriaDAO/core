@@ -12,6 +12,7 @@ import ManagerPage from "./pages/ManagerPage";
 import SessionProvider from "./providers/SessionProvider";
 import FundNodePage from "./pages/FundNodePage";
 import SwapPage from "./pages/swap";
+import LibrarianPage from "./pages/LibrarianPage";
 
 export default function App() {
     return (
@@ -26,6 +27,7 @@ export default function App() {
                                 <Route path="/manager" element={<ManagerPage />} />
                                 <Route path="/fund-node" element={<FundNodePage />} />
                                 <Route path="/swap" element={<SwapPage />} />
+                                <Route path="/librarian" element={<LibrarianPage />} />
                             </Routes>
                     </AuthProvider>
                 </BrowserRouter>

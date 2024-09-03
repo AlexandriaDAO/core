@@ -7,7 +7,7 @@ import Status from "./Status";
 import Footer from "./Footer";
 import Header from "./Header";
 import useSession from "@/hooks/useSession";
-import getIrys from "../irys/utils/getIrys";
+import getIrys, { getTypedIrys } from "../irys/utils/getIrys";
 import { readFileAsBuffer } from "../irys/utils/gaslessFundAndUpload";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 // import { useAuth } from "../../contexts/AuthContext";
@@ -23,6 +23,7 @@ const Mint = () => {
 
 	const dispatch = useAppDispatch();
 
+	const { actor, actorAlexWallet,actorAlexLibrarian, actorVetkd, meiliClient } = useSession();
 	const { actor, meiliClient, actorIcrc7, actorNftManager } = useSession();
 	const [bookLoadModal, setBookLoadModal] = useState(false);
 
@@ -100,13 +101,17 @@ const Mint = () => {
 		next();
 
 		try {
-			const irys = await getIrys();
+			// pass selected node TODO
+			// right now it will error out
+			const irys = await getTypedIrys(actorAlexWallet);
 			const transactions = await createAllTransactions(irys);
 
 			await mintNFT(transactions.manifest.id);
 			await uploadToArweave(irys, transactions);
 
+			dispatch(fetchEngineBooks({ actor, engine: activeEngine }));
 			dispatch(fetchEngineBooks({ actorNftManager, engine: activeEngine }));
+      
 			setTimeout(() => next(3), 2000);
 		} catch (error) {
 			message.error(`Error: ${error}`);

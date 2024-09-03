@@ -86,6 +86,10 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /\.wasm$/,
+        type: "webassembly/async",
+      },
     ],
   },  
 
@@ -135,5 +139,8 @@ module.exports = {
     hot: true,
     watchFiles: [path.resolve(__dirname, "src", frontendDirectory, "src")],
     liveReload: true,
+  },
+  experiments: {
+    asyncWebAssembly: true,
   },
 };
