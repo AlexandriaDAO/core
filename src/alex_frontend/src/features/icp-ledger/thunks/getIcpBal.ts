@@ -22,7 +22,7 @@ const getIcpBal = createAsyncThunk<
     const resultSubAccountBal = await actor.account_balance_dfx({ account: subaccount });
     const LedgerServices=LedgerService();
     const formatedAccountBal=LedgerServices.e8sToIcp(resultAccountBal).toString();
-    const formatedSubAccountBal=LedgerServices.e8sToIcp(resultSubAccountBal.e8s).toString();
+    const formatedSubAccountBal=LedgerServices.e8sToIcp(resultSubAccountBal.e8s).toFixed(8).toString();
     return ({formatedAccountBal,formatedSubAccountBal})
   } catch (error) {
     console.error("Failed to get ICP Balance:", error);

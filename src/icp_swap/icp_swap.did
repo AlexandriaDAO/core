@@ -4,15 +4,23 @@ type Result_2 = variant { Ok : nat64; Err : text };
 type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
 service : () -> {
   burn_LBRY : (nat64) -> (Result);
+  stake_ALEX:(nat64)->(Result);
+  un_stake_all_ALEX:()->(Result);
+  un_stake_ALEX:(nat64)->(Result);
+  distribute_reward:()->(Result);
+  claim_icp_reward:()->(Result);
+  transfer_from_user_wallet:(nat64,text)->(Result);
+
+  get_all_stakes: () -> (vec record { principal; Stake }) query;
+  get_stake : (user : Principal) -> (opt Stake) query;
+  get_total_staked:()->(nat64) query;
+  caller_subaccount:()->(text) query;
+
   burn_token : (nat64) -> (Result_1);
-  caller_subaccount : () -> (text) query;
-  claim_icp_reward : () -> (Result);
   deposit_icp_in_canister : (nat64) -> (Result_2);
   deposit_token : (nat64) -> (Result_1);
-  distribute_reward : () -> (Result);
   distribute_reward_wrapper : () -> ();
-  get_all_stakes : () -> (vec record { principal; Stake }) query;
-  get_current_LBRY_ratio : () -> (nat64) query;
+  get_current_LBRY_ratio : () -> (text) query;
   get_current_staking_reward_percentage : () -> (text) query;
   get_icp_rate_cents_wrapper : () -> ();
   get_icp_rate_in_cents : () -> (Result_2);

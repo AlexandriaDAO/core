@@ -1,3 +1,4 @@
+
 use crate::storage::*;
 
 pub fn is_allowed() -> Result<(), String> {
@@ -8,4 +9,3 @@ pub fn is_allowed() -> Result<(), String> {
         Err("You are unauthorized to call this method. ".to_string())
     }
 }
-

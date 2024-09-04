@@ -10,6 +10,8 @@ import stakeAlex from "./thunks/stakeAlex";
 import getStakeInfo from "./thunks/getStakedInfo";
 import claimReward from "./thunks/claimReward";
 import unstake from "./thunks/unstake";
+import transferLBRY from "./thunks/lbryIcrc/transferLBRY";
+import transferICPFromUserWalletcanister from "./thunks/transferICPFromUserWallet";
 // Define the interface for our node state
 export interface StakeInfo {
   stakedAlex: string;
@@ -29,6 +31,7 @@ export interface SwapState {
   successStake: boolean;
   successClaimReward: boolean;
   unstakeSuccess: boolean;
+  transferSuccess:boolean;
   error: string | null;
 }
 
@@ -44,6 +47,7 @@ const initialState: SwapState = {
   burnSuccess: false,
   successClaimReward: false,
   unstakeSuccess: false,
+  transferSuccess:false,
   loading: false,
   error: null,
 };
@@ -53,12 +57,12 @@ const swapSlice = createSlice({
   initialState,
   reducers: {
     flagHandler: (state) => {
-      state.error = "";
       state.swapSuccess = false;
       state.burnSuccess=false;
       state.successStake = false;
       state.successClaimReward = false;
       state.unstakeSuccess = false;
+      state.transferSuccess=false;
       state.error = null;
     },
   },
@@ -222,7 +226,39 @@ const swapSlice = createSlice({
         message.error("Error while fethcing max burn LBRY!");
         state.loading = false;
         state.error = action.payload as string;
-      });
+      })
+      .addCase(transferLBRY.pending, (state) => {
+        message.info("Processing LBRY transfer!");
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(transferLBRY.fulfilled, (state, action) => {
+        message.success("Successfully transfered LBRY!");
+        state.transferSuccess = true;
+        state.loading=false;
+        state.error = null;
+      })
+      .addCase(transferLBRY.rejected, (state, action) => {
+        message.error("Error while transfering LBRY");
+        state.loading = false;
+        state.error = action.payload as string;
+      }).addCase(transferICPFromUserWalletcanister.pending, (state) => {
+        message.info("Processing ICP transfer from canister user wallet!");
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(transferICPFromUserWalletcanister.fulfilled, (state, action) => {
+        message.success("Successfully transfered ICP!");
+        state.transferSuccess = true;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(transferICPFromUserWalletcanister.rejected, (state, action) => {
+        message.error("Error while transfering from canister user wallet!");
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      ;
   },
 });
 export const { flagHandler } = swapSlice.actions;
