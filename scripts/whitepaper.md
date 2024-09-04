@@ -357,6 +357,8 @@ The reason such apps are untouchable right now is because they're powered by dat
 
 ## Part 5: Architecture & Governance
 
+
+
 D-app ecosystem - Anything you can imagine.
   - The point is along the way we make these services that power apps, easily pluggable.
   - In this way the LibModule is built already for you, with a nice economic model that just works out of the box.
@@ -375,24 +377,47 @@ D-app ecosystem - Anything you can imagine.
   - Earning of default librarian providers go to a wallet to pay the team, but it's totally optional and people can change their libmodule providers to whoever.
 
 
-##### Governance (OG version)
+### Governance
 
 UncensensoredGreats is currently a centrally developed and deployed project. It depends on an architecture of tentatively ‘blackholed’ canisters, so the renounching storage and token related smart contract over time. It is fully open-source, so the current state of decentralizion can be tracked on [Github](https://github.com/UncensoredGreats/).
 
 The frontend will be continuously developed, and so use of backend functions from blackholed canisters will remain mutable indefinitely. Nonetheless, anyone can fork the project with an alternative frontend that’s bound by the same code and data of Alexandria’ universal backend canisters.
 
-Since this model prioritizes immutability for the sake of permanence, governance is limited to matters involving NFT ownership. The governance mechanism allow proposals that can delete NFTs (if corrupted/inaccurate), or transfer the ownership (to any true author that claim it) with a simple majority and quorum of staked ALEX holders.
+Since this model prioritizes immutability for the sake of permanence, governance is initially limited to matters involving NFT ownership. The governance mechanism allow proposals that can delete NFTs (if corrupted/inaccurate), or transfer the ownership (to any true author that claim it) with a simple majority and quorum of staked ALEX holders.
 
+I honestly don't know how code changes will be governed in the future. It has not been figured out yet. The important thing is this gets to a working product where the immutable part is entirely forkable so anyone can build their own products independent of parts that are still under centralized developement.
 
-- Decentralization (we might not need this. Just enough to explain copyright stuff.)
-  - This is a rudimentary DAO, and the only nessasary setup to decentralize now. The rest of the architecture, variable pricing, and code updates, are not configured to this DAO. 
-  - The goal is to decentralize key elements with canister either by 'blackholing' and keeping Alexandria enforcably forkable at all times, or by canister control to the SNS or an SNS fork. At this stage though, it makes most sense to blackhole the token logic and leave the buisiness logic mutable because it will likely require years of itteration.
-  - Explain why others can fork, or use their own version, and that's okay because they wouldn't want to.
+This section will have lots more details at a future time.
 
+### Canister Architecture
+
+ALEX: Token canister (backholed)
+
+alex_backend: Main logic backend.
+
+bookmarks: Main storage backend.
+
+icp_swap: LBRY management canister for swapping and staking tokens.
+
+icrc7: NFT canister.
+
+LBRY: Token canister (blackholed)
+
+Tokenomics: Logic controlling ALEX minting.
+
+DAO Canister: TBD.
 
 ## Internet of Books
-conclusion.
-(and perhaps the OG inspiration section with some modifications, or maybe not. I just personally like it. Maybe we scratch that whitepaper though, as the stuff isn't even that relevant anymore.)
+
+Alexandria is a universal content bed for the Internet. 
+
+It's like bittorrent and IPFS, except all the content is owned and incentivized.
+
+It's like Facebook and Google, except anyone can plug into and use it.
+
+It's the entire dream of Web3, in one project. What will you do with it?
+
+
 
 
 

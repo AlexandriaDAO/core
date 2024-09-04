@@ -22,7 +22,7 @@ export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
   (variant {
     Init = record {
-      token_name = "LBRYs";
+      token_name = "Library Credits";
       token_symbol = "LBRY";
       minting_account = record {
         owner = principal "'5qx27-tyaaa-aaaal-qjafa-cai'";
@@ -164,6 +164,7 @@ cd ..
 
 mkdir -p .dfx/local/canisters/LBRY
 mkdir -p .dfx/local/canisters/ALEX
+mkdir -p .dfx/local/canisters/alex_frontend/
 
 wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/ALEX/ALEX.did
 wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/LBRY/LBRY.did

@@ -1,12 +1,3 @@
- /*
-  // The Plan.
-
-  When a user clicks on a named librarian, that queries their principal with this hash specifically to a helper function that populates these keys.
-  */
-
-
-
-
   import { WebIrys } from "@irys/sdk";
   import { TypedEthereumSigner } from "arbundles";
   import { Buffer } from "buffer";
@@ -20,12 +11,6 @@
 
     const pubKey = cleanEnvVar(process.env.ETH_PUBLIC_KEY);
     const privateKey = cleanEnvVar(process.env.ETH_PRIVATE_KEY);
-
-    // const pubKey = cleanEnvVar("0xeDa20F6d64944Ad1s32dE51927Ae1A32cFCDD8998");
-    // const privateKey = cleanEnvVar("1bda3c9bf8b1170093b4339835c01273766f30ec64077c07a7e174b0f67c5636");
-  
-    // const pubKey = cleanEnvVar("0x738b58fe508189A237427e69163bB7E2cd91C38c");
-    // const privateKey = cleanEnvVar("0x54d8a539123e15c56028557bff8b0704728138fdc04c04363374ca80efa16084");
 
     if (typeof pubKey !== 'string' || typeof privateKey !== 'string') {
       throw new Error('ETH_PUBLIC_KEY or ETH_PRIVATE_KEY is not defined or is not a string');
@@ -46,8 +31,10 @@
             message: { address: string; "Transaction hash": Uint8Array },
           ): Promise<string> => {
             const convertedMsg = Buffer.from(message["Transaction hash"]);
+            //@ts-ignore
             const signature = await signer.sign(convertedMsg);
             const bSig = Buffer.from(signature);
+            //@ts-ignore
             const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString("hex");
             return pad;
           },

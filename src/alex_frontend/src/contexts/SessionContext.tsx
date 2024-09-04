@@ -3,12 +3,16 @@ import { AuthClient } from "@dfinity/auth-client";
 import { ActorSubclass } from "@dfinity/agent";
 import MeiliSearch, { Index } from 'meilisearch';
 import { alex_backend } from '../../../declarations/alex_backend';
+import { icrc7 } from '../../../declarations/icrc7';
+import { nft_manager } from '../../../declarations/nft_manager';
 import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from '../../../declarations/icp_ledger_canister';
 import { tokenomics } from '../../../declarations/tokenomics';
 import { LBRY } from '../../../declarations/LBRY';
 import { ALEX } from '../../../declarations/ALEX'
 import { _SERVICE } from '../../../declarations/alex_backend/alex_backend.did';
+import { _SERVICE as _SERVICEICRC7 } from '../../../declarations/icrc7/icrc7.did';
+import { _SERVICE as _SERVICENFTMANAGER } from '../../../declarations/nft_manager/nft_manager.did';
 import { _SERVICE as _SERVICESWAP } from '../../../declarations/icp_swap/icp_swap.did';
 import { _SERVICE as _SERVICEICPLEDGER } from '../../../declarations/icp_ledger_canister/icp_ledger_canister.did';
 import { _SERVICE as _SERVICETOKENOMICS } from '../../../declarations/tokenomics/tokenomics.did';
@@ -17,6 +21,8 @@ import { _SERVICE as _SERVICEALEX } from "../../../declarations/ALEX/ALEX.did"
 
 interface SessionContextProps {
 	actor: ActorSubclass<_SERVICE>;
+	actorIcrc7: ActorSubclass<_SERVICEICRC7>;
+	actorNftManager: ActorSubclass<_SERVICENFTMANAGER>;
 	actorSwap: ActorSubclass<_SERVICESWAP>;
 	actorIcpLedger: ActorSubclass<_SERVICEICPLEDGER>;
 	actorTokenomics: ActorSubclass<_SERVICETOKENOMICS>;
@@ -29,6 +35,8 @@ interface SessionContextProps {
 
 const SessionContext = createContext<SessionContextProps>({
 	actor: alex_backend,
+	actorIcrc7: icrc7,
+	actorNftManager: nft_manager,
 	actorSwap: icp_swap,
 	actorIcpLedger: icp_ledger_canister,
 	actorTokenomics: tokenomics,

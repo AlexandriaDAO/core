@@ -24,9 +24,7 @@ type Node = record {
 type NodeStatus = variant { Active; InActive };
 type Result = variant { Ok : Engine; Err : text };
 type Result_1 = variant { Ok : Node; Err : text };
-type Result_2 = variant { Ok : nat; Err : text };
-type Result_3 = variant { Ok; Err : text };
-type Result_4 = variant { Ok : text; Err : text };
+type Result_2 = variant { Ok; Err : text };
 type SourceCard = record {
   title : text;
   user_query : text;
@@ -37,32 +35,15 @@ type SourceCard = record {
   summary : text;
   bookmarked : bool;
 };
-
-type Account = record {
-  owner : principal;
-  subaccount : opt vec nat8;
-};
-
-type TokenDetail = record {
-    token_id : nat32;
-    description : text;
-    owner : text;
-};
-type Value = variant {
-    Text : text;
-    // Add other variants as needed
-};
-
 service : {
   add_engine : (text, text, text, text, text, opt nat8) -> (Engine);
   add_my_engine : (text, text, text, text, opt nat8) -> (Result);
   add_my_node : (text, text, opt nat8) -> (Result_1);
   add_node : (text, text, text, opt nat8) -> (Node);
   bookmark_sc : (nat64) -> ();
-  current_mint : () -> (Result_2);
   delete_engine : (text) -> (bool);
-  delete_keys : (nat8) -> (Result_3);
-  delete_librarian : () -> (Result_3);
+  delete_keys : (nat8) -> (Result_2);
+  delete_librarian : () -> (Result_2);
   delete_node : (text) -> (bool);
   delete_sc : (nat64) -> ();
   get_all_librarians : () -> (vec Librarian) query;
@@ -83,20 +64,13 @@ service : {
   get_nodes_by_owner : (text) -> (vec Node) query;
   get_nodes_not_owned_by : (text) -> (vec Node) query;
   get_nodes_not_owned_by_me : () -> (vec Node) query;
+  get_random_librarian : () -> (opt Librarian) query;
   get_sc : (nat64) -> (opt SourceCard) query;
   is_librarian : () -> (bool) query;
-  mint_nft : (text) -> (Result_4);
-  save_keys : (text, text, nat8) -> (Result_3);
-  save_librarian : (text) -> (Result_3);
+  save_keys : (text, text, nat8) -> (Result_2);
+  save_librarian : (text) -> (Result_2);
   save_sc : (text, text, text, text, text, text) -> (nat64);
   update_engine_status : (text, nat8) -> (Result);
   update_node_status : (text, nat8) -> (Result_1);
   whoami : () -> (principal) query;
-
-  get_tokens : () -> (variant { Ok : vec nat; Err : text });
-  get_metadata : (nat) -> (variant { Ok : opt vec record { text; Value }; Err : text });
-  get_description : (nat) -> (variant { Ok : opt text; Err : text });
-  get_owner : (nat) -> (variant { Ok : opt Account; Err : text });
-  get_nfts : () -> (variant { Ok : vec TokenDetail; Err : text });
-  get_nfts_of : (owner_principal: text) -> (variant { Ok : vec TokenDetail; Err : text });
 }

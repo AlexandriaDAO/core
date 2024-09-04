@@ -3,7 +3,7 @@ use crate::source_cards::SourceCard;
 use crate::engine::Engine;
 use crate::librarian::Librarian;
 use crate::node::Node;
-use crate::nft::TokenDetail;
+// use crate::nft::TokenDetail;
 
 use ic_cdk;
 use candid::{Nat, Principal};
@@ -53,14 +53,15 @@ pub use node::{
   get_nodes_not_owned_by_me
 };
 
-mod nft;
-pub use nft::{
-  mint_nft,
-  get_nfts,
-  get_nfts_of,
-};
+// mod nft_init;
+// pub use nft_init::{initialize_icrc7, deploy_icrc7, DeployResult};
+
+
+// mod nft;
+// pub use nft::*;
 
 ic_cdk::export_candid!();
+
 
 
 // // Example of the keys that will be accepted.
@@ -83,63 +84,3 @@ ic_cdk::export_candid!();
   //   return MEILI_DOMAIN: String, MEILI_MASTER_KEY: String
   // }
   
-
-  
-  
-  
-  
-  
-  
-
-
-
-
-
-// // Now I have to serialize the books in the frontend, and pass it here as a u8 vector.
-
-// // Proposed methodology for how you can store ebook assets using a BTreeMap.
-// use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
-// use ic_stable_structures::{DefaultMemoryImpl, StableBTreeMap};
-// use std::cell::RefCell;
-
-// type Memory = VirtualMemory<DefaultMemoryImpl>;
-
-// thread_local! {
-//     // The memory manager is used for simulating multiple memories. Given a `MemoryId` it can
-//     // return a memory that can be used by stable structures.
-//     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> =
-//         RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
-
-//     // Initialize a V2 BTreeMap that supports unbounded keys and values.
-//     static ASSETS: RefCell<StableBTreeMap<String, Vec<u8>, Memory>> = RefCell::new(
-//         StableBTreeMap::init(
-//             MEMORY_MANAGER.with(|m| m.borrow().get(MemoryId::new(0))),
-//         )
-//     );
-// }
-
-// /// Retrieves the value associated with the given key if it exists.
-// #[ic_cdk_macros::query]
-// fn get(key: String) -> Option<Vec<u8>> {
-//     ASSETS.with(|p| p.borrow().get(&key))
-// }
-
-// /// Inserts an asset's name and value in the map, returning the previous value.
-// #[ic_cdk_macros::update]
-// fn insert(key: String, value: Vec<u8>) -> Option<Vec<u8>> {
-//     ASSETS.with(|p| p.borrow_mut().insert(key, value))
-// }
-  
-/*
-So I just need call this function with the token id of the arweave file.
-# Mint a token.
-dfx canister call alex_nft mint \
-    "(record{
-        token_id=1;
-        holders=vec{record{owner=principal\"$YOU\"}}
-    })"
-
-
-
-
-*/

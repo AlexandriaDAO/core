@@ -18,15 +18,15 @@
       "specified_id":"5qx27-tyaaa-aaaal-qjafa-cai"
     },
     "icrc7": {
-      "candid": "src/icrc7/icrc7.did",
-      "package": "icrc7",
-      "type": "rust",
+      "main": "src/icrc7/main.mo",
+      "type": "motoko",
       "specified_id": "fjqb7-6qaaa-aaaak-qc7gq-cai"
     },
-    "icrc7_archive": {
-      "candid": "src/icrc7_archive/icrc7_archive.did",
-      "package": "icrc7_archive",
-      "type": "rust"
+    "nft_manager": {
+      "candid": "src/nft_manager/nft_manager.did",
+      "package": "nft_manager",
+      "type": "rust",
+      "specified_id":"forhl-tiaaa-aaaak-qc7ga-cai"
     },
     "internet_identity": {
       "type": "pull",
@@ -84,7 +84,7 @@
   "defaults": {
     "build": {
       "args": "",
-      "packtool": ""
+      "packtool": "mops sources"
     }
   },
   "scripts": {

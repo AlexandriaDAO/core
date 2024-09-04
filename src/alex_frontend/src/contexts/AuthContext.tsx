@@ -86,16 +86,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     let authClient = await AuthClient.create();
 
-    // start the login process and wait for it to finish
     await new Promise<void>((resolve) => {
       authClient.login({
         identityProvider:
           process.env.DFX_NETWORK === "ic"
             ? "https://identity.ic0.app"
-            : `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`,
+            : `http://localhost:4943/?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}`,
+            derivationOrigin: "https://xo3nl-yaaaa-aaaap-abl4q-cai.icp0.io",
         onSuccess: () => resolve(),
       });
     });
+  
 
     // At this point we're authenticated, and we can get the identity from the auth client:
     const identity = authClient.getIdentity();

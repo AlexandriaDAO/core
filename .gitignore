@@ -11,6 +11,9 @@
 .dfx/
 .dfx/local/
 
+# Mops packages
+.mops/
+
 # generated files
 src/declarations/
 

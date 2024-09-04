@@ -50,14 +50,14 @@ dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
 STEP 2: MINT LBRY
 
 dfx canister call LBRY icrc1_transfer '(record {to = record {
-      owner = principal "'mxtax-xmovu-wu5th-gdf4k-vfkdn-ffsxn-e67ju-sidls-4dr2i-3mqoe-tae'";
+      owner = principal "'7ua4j-6yl27-53cku-vh62o-z5cop-gdg7q-vhqet-hwlbt-ewfja-xbokg-2qe'";
     };
 
     from = record {
-      owner = principal "'ie5gv-y6hbb-ll73p-q66aj-4oyzt-tbcuh-odt6h-xkpl7-bwssd-lgzgw-5qe'";
+      owner = principal "'2jgt7-v33z4-tiosh-csi2v-66cge-4uu7j-v2nye-z27vc-d36pc-ctqai-bqe'";
     };
     
-    amount = 9100000;
+    amount = 91000000;
     fee = null;
   }
 )'

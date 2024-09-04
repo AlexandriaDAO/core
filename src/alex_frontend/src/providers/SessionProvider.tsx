@@ -9,7 +9,9 @@ import { initializeClient, initializeIndex } from '@/services/meiliService';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
 import fetchBooks from '@/features/portal/thunks/fetchBooks';
-import { initializeActor, initializeActorSwap, initializeIcpLedgerActor, initializeLbryActor, initializeTokenomicsActor, initializeAlexActor } from '@/features/auth/utils/authUtils';
+import { initializeActor, initializeIcrc7Actor, initializeNftManagerActor, initializeActorSwap,initializeIcpLedgerActor, initializeLbryActor, initializeTokenomicsActor,initializeAlexActor } from '@/features/auth/utils/authUtils';
+import { icrc7 } from '../../../declarations/icrc7';
+import { nft_manager } from '../../../declarations/nft_manager';
 import { icp_swap } from '../../../declarations/icp_swap';
 import { icp_ledger_canister } from "../../../declarations/icp_ledger_canister";
 import { tokenomics } from '../../../declarations/tokenomics';
@@ -28,7 +30,9 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const { books } = useAppSelector(state => state.portal);
 
 	const [actor, setActor] = useState(alex_backend);
-	const [actorSwap, setActorSwap] = useState(icp_swap);
+	const [actorIcrc7, setActorIcrc7] = useState(icrc7);
+	const [actorNftManager, setActorNftManager] = useState(nft_manager);
+	const [actorSwap,setActorSwap]=useState(icp_swap);
 	const [actorIcpLedger, setIcpLedger] = useState(icp_ledger_canister);
 	const [actorTokenomics, setActorTokenomics] = useState(tokenomics);
 	const [actorLbry, setActorLbry] = useState(LBRY);
@@ -49,13 +53,13 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		const key = process.env.REACT_MEILI_KEY;
 
 		const client = await initializeClient(host, key);
-		// if(client){
-		// 	const {results} = await client.getIndexes()
-		// 	results.forEach(index=>{
-		// 		client.deleteIndexIfExists(index.uid)
-		// 	})
-		// }
-		if (client) setMeiliClient(client)
+		if(client){
+			const {results} = await client.getIndexes()
+			results.forEach(index=>{
+				client.deleteIndexIfExists(index.uid)
+			})
+		}
+		if(client) setMeiliClient(client)
 	}
 
 	useEffect(() => {
@@ -70,26 +74,29 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		dispatch(principal(authClient))
 	}, [authClient])
 
-	useEffect(() => {
-		if (!authClient || user === "") {return}
-		else {
-			const setupActor = async () => {
-				const actor = await initializeActor(authClient);
-				setActor(actor);
-				const actorSwap = await initializeActorSwap(authClient);
-				setActorSwap(actorSwap);
-				const actorIcpLedger = await initializeIcpLedgerActor(authClient);
-				setIcpLedger(actorIcpLedger);
-				const actorTokenomics = await initializeTokenomicsActor(authClient);
-				setActorTokenomics(actorTokenomics);
-				const actorLbry = await initializeLbryActor(authClient);
-				setActorLbry(actorLbry);
-				const actorAlex = await initializeAlexActor(authClient);
-				setActorAlex(actorAlex);
-			}
-			setupActor();
+	useEffect(()=>{
+		if(!authClient) return;
+
+		const setupActor = async()=>{
+			const actor = await initializeActor(authClient);
+			setActor(actor);
+			const actorIcrc7 = await initializeIcrc7Actor(authClient);
+			setActorIcrc7(actorIcrc7);
+			const actorNftManager = await initializeNftManagerActor(authClient);
+			setActorNftManager(actorNftManager);
+			const actorSwap = await initializeActorSwap(authClient);
+			setActorSwap(actorSwap);
+			const actorIcpLedger = await initializeIcpLedgerActor(authClient);
+			setIcpLedger(actorIcpLedger);
+			const actorTokenomics=await initializeTokenomicsActor(authClient);
+			setActorTokenomics(actorTokenomics);
+			const actorLbry=await initializeLbryActor(authClient);
+			setActorLbry(actorLbry);
+			const actorAlex=await initializeAlexActor(authClient);
+			setActorAlex(actorAlex);
 		}
-	}, [user, authClient])
+		setupActor();
+	},[user])
 
 	useEffect(() => {
 		setMeiliIndex(undefined)
@@ -104,14 +111,14 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		setupMeiliIndex();
 	}, [user, meiliClient])
 
-	// Load all books on App Start
+	// Load 10 books on app start.
 	useEffect(() => {
-		if (!actor) return;
-		dispatch(fetchBooks(actor));
-	}, [actor, dispatch]);
+    if(!actor) return;
+    dispatch(fetchBooks(actorNftManager));
+}, [actor, dispatch]);
 
 	return (
-		<SessionContext.Provider value={{ actor, actorSwap, actorIcpLedger, actorTokenomics, actorLbry, actorAlex, authClient, meiliClient, meiliIndex }}>
+		<SessionContext.Provider value={{ actor,actorIcrc7,actorNftManager,actorSwap,actorIcpLedger,actorTokenomics, actorLbry,actorAlex,authClient, meiliClient, meiliIndex  }}>
 			{children}
 		</SessionContext.Provider>
 	);
