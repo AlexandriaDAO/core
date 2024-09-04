@@ -63,16 +63,16 @@ const fetchBooks = createAsyncThunk<
     { rejectValue: string }
 >("portal/fetchBooks", async (actorNftManager, { rejectWithValue }) => {
     try {
-        const result = await actorNftManager.get_nfts();
+        const result = await actorNftManager.get_nfts([], []);
 
-        if ('Err' in result) {
-            console.log('Error fetching NFTs', result.Err);
-            throw new Error('Error fetching NFTs');
-        }
+        // if ('Err' in result) {
+        //     console.log('Error fetching NFTs', result.Err);
+        //     throw new Error('Error fetching NFTs');
+        // }
 
-        if('Ok' in result){
-            return await getBooks(result.Ok)
-        }
+        // if('Ok' in result){
+        //     return await getBooks(result.Ok)
+        // }
 
         return [];
 

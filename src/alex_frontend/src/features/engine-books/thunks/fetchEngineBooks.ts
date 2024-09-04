@@ -15,29 +15,34 @@ const fetchEngineBooks = createAsyncThunk<
     { rejectValue: string, state: RootState }
 >("engineBooks/fetchEngineBooks", async ({actorNftManager, engine}, { rejectWithValue, getState }) => {
     try {
-        const {portal: {books}} = getState();
+        // const {portal: {books}} = getState();
 
-        // Ensure activeEngine is a valid principal string
-        if (typeof engine !== 'string' || !engine) {
-            throw new Error('Invalid engine provided');
-        }
+        // // Ensure activeEngine is a valid principal string
+        // if (typeof engine !== 'string' || !engine) {
+        //     throw new Error('Invalid engine provided');
+        // }
 
-        const result = await actorNftManager.get_nfts_of(engine);
+        //@ts-ignore
+        const result = await actorNftManager.get_manifest_ids(BigInt(engine));
 
-        if ('Err' in result) {
-            console.log('Error fetching NFTs', result.Err);
-            throw new Error('Error fetching NFTs');
-        }
-
-        if('Ok' in result){
-            if(books.length>0){
-                //@ts-ignore
-                const manifestIds = result.Ok.map(token=>token.description)
-                return books.filter(book=> manifestIds.includes(book.manifest));
+        // if ('Err' in result) {
+        //     console.log('Error fetching NFTs', result.Err);
+        //     throw new Error('Error fetching NFTs');
+        // }
+        if ('Ok' in result) {
+            //@ts-ignore
+            const manifestIds = result.Ok.map(token => token.description);
+            const { portal: { books } } = getState();
+            
+            if (books.length > 0) {
+                return books.filter(book => manifestIds.includes(book.manifest));
             }
-
-            return await getBooks(result.Ok)
+            
+            return await getBooks(result.Ok);
         }
+
+        //     return await getBooks(result.Ok)
+        // }
 
         return [];
     } catch (error) {

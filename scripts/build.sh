@@ -14,6 +14,7 @@ dfx deps pull
 dfx deps init
 dfx deps deploy
 dfx deps deploy internet_identity
+dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
 
 # Step 3: Deploy nft_manager, which deploys icrc7
 
@@ -39,7 +40,19 @@ cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
 # For tokenomics
 cargo build --release --target wasm32-unknown-unknown --package tokenomics
-candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
+candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.
+
+
+
+
+# for alex_librarian
+cargo build --release --target wasm32-unknown-unknown --package alex_librarian
+candid-extractor target/wasm32-unknown-unknown/release/alex_librarian.wasm > src/alex_librarian/alex_librarian.did
+
+# for vetkd
+cargo build --release --target wasm32-unknown-unknown --package vetkd
+candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
+
 
 cargo update
 
@@ -47,6 +60,12 @@ dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
 dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
+
+dfx deploy alex_librarian
+dfx deploy vetkd
+dfx deploy system_api --specified-id s55qq-oqaaa-aaaaa-aaakq-cai
+
+dfx deploy alex_wallet
 
 
 
@@ -69,7 +88,7 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
         record {  
           \"$DEFAULT_ACCOUNT_ID\";  
           record {  
-            e8s = 10_000_000_000 : nat64;  
+            e8s = 8_681_981_000_000_000 : nat64;  
           };  
         };  
       };  
@@ -83,66 +102,43 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
   })  
 "
 
-
-dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '
-  (variant {
-    Init = record {
-      token_name = "Library Credits";
-      token_symbol = "LBRY";
-      minting_account = record {
-        owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      initial_balances = vec {
-        record {
-          record {
-            owner = principal "'${DEFAULT_ACCOUNT_PRINCIPAL}'";
-          };
-          100_000_000_000;
-        };
-      };
-      metadata = vec {};
-      transfer_fee = 4_000_000;
-      archive_options = record {
-        trigger_threshold = 2000;
-        num_blocks_to_archive = 1000;
-        controller_id = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      feature_flags = opt record {
+dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '(variant { Init = 
+record {
+     token_symbol = "LBRY";
+     token_name = "LBRY";
+     minting_account = record { owner = principal "'$(dfx canister id icp_swap)'" };
+     transfer_fee = 4_000_000;
+     metadata = vec {};
+     initial_balances = vec { record { record { owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'" }; 0 } };
+     archive_options = record {
+         num_blocks_to_archive = 1000;
+         trigger_threshold = 2000;
+         controller_id = principal "'$(dfx canister id icp_swap)'";
+     };
+     feature_flags = opt record {
         icrc2 = true;
-      };
-    }
-  })
-'
+     };
+ }
+})'
 
-dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '
-  (variant {
-    Init = record {
-      token_name = "Alexandria";
-      token_symbol = "ALEX";
-      minting_account = record {
-        owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      initial_balances = vec {
-        record {
-          record {
-            owner = principal "'${DEFAULT_ACCOUNT_PRINCIPAL}'";
-          };
-          100_000_000_000;
-        };
-      };
-      metadata = vec {};
-      transfer_fee = 10_000;
-      archive_options = record {
-        trigger_threshold = 2000;
-        num_blocks_to_archive = 1000;
-        controller_id = principal "'${MINTER_ACCOUNT_PRINCIPAL}'";
-      };
-      feature_flags = opt record {
+dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '(variant { Init = 
+record {
+     token_symbol = "ALEX";
+     token_name = "ALEX";
+     minting_account = record { owner = principal "'$(dfx canister id tokenomics)'" };
+     transfer_fee = 10_000;
+     metadata = vec {};
+     initial_balances = vec { record { record { owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'" }; 0 } };
+     archive_options = record {
+         num_blocks_to_archive = 1000;
+         trigger_threshold = 2000;
+         controller_id = principal "'$(dfx canister id tokenomics)'";
+     };
+     feature_flags = opt record {
         icrc2 = true;
-      };
-    }
-  })
-'
+     };
+ }
+})'
 
 
 echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."

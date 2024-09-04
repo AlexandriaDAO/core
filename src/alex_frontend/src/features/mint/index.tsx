@@ -7,7 +7,7 @@ import Status from "./Status";
 import Footer from "./Footer";
 import Header from "./Header";
 import useSession from "@/hooks/useSession";
-import getIrys from "../irys/utils/getIrys";
+import getIrys, { getTypedIrys } from "../irys/utils/getIrys";
 import { readFileAsBuffer } from "../irys/utils/gaslessFundAndUpload";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 // import { useAuth } from "../../contexts/AuthContext";
@@ -23,7 +23,7 @@ const Mint = () => {
 
 	const dispatch = useAppDispatch();
 
-	const { actor, meiliClient, actorIcrc7, actorNftManager } = useSession();
+	const { actorAlexWallet, actorAlexLibrarian, actorVetkd, actorIcrc7, actorNftManager, actor, meiliClient } = useSession();
 	const [bookLoadModal, setBookLoadModal] = useState(false);
 
 	const [file, setFile] = useState<File | undefined>(undefined);
@@ -100,13 +100,16 @@ const Mint = () => {
 		next();
 
 		try {
-			const irys = await getIrys();
+			// pass selected node TODO
+			// right now it will error out
+			const irys = await getTypedIrys(actorAlexWallet);
 			const transactions = await createAllTransactions(irys);
 
 			await mintNFT(transactions.manifest.id);
 			await uploadToArweave(irys, transactions);
 
 			dispatch(fetchEngineBooks({ actorNftManager, engine: activeEngine }));
+      
 			setTimeout(() => next(3), 2000);
 		} catch (error) {
 			message.error(`Error: ${error}`);
@@ -183,7 +186,8 @@ const Mint = () => {
 		setUploadStatus(3);
 		message.info("Minting NFT via ICRC7 Protocol");
 
-		const result = await actorNftManager.mint_nft(transactionId);
+		const randomMintNumber = Math.floor(Math.random() * 1000) + 1; // Random number between 1 and 1000
+		const result = await actorNftManager.mint_nft(transactionId, BigInt(randomMintNumber));
 		if ("Err" in result) throw new Error(result.Err);
 
 		message.success("Minted Successfully");

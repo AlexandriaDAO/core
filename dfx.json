@@ -1,5 +1,30 @@
 {
   "canisters": {
+    "vetkd": {
+      "type": "rust",
+      "package": "vetkd",
+      "candid": "src/vetkd/vetkd.did"
+    },
+    "system_api": {
+      "candid": "src/system_api/vetkd_system_api.did",
+      "package": "vetkd_system_api",
+      "type": "rust"
+    },
+    "alex_librarian": {
+      "type": "rust",
+      "package": "alex_librarian",
+      "candid": "src/alex_librarian/alex_librarian.did"
+    },
+    "alex_wallet": {
+      "type": "azle",
+      "package": "alex_wallet",
+      "main": "src/alex_wallet/src/main.ts",
+      "candid": "src/alex_wallet/alex_wallet.did",
+      "candid_gen": "automatic",
+      "declarations": {
+        "node_compatibility": true
+      }
+    },
     "alex_backend": {
       "candid": "src/alex_backend/alex_backend.did",
       "package": "alex_backend",

@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Number of NFTs to mint
-num_nfts=50000
+num_nfts=100
 
 # Loop to mint NFTs
-for ((i=5000; i<=num_nfts; i++))
+for ((i=0; i<=num_nfts; i++))
 do
     result=$(dfx canister call nft_manager mint_nft "(\"NFT #$i\", $i)")
     echo "Minted NFT #$i: $result"

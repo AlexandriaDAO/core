@@ -50,11 +50,14 @@ pub use wallets::*;
 mod update;
 pub use update::*;
 
+mod dao;
+pub use dao::*;
+
 mod guard;
 pub use guard::*;
 
-mod playground;
-pub use playground::*;
+// mod playground;
+// pub use playground::*;
 
 // mod tests;
 // pub use tests::*;
