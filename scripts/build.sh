@@ -53,10 +53,6 @@ candid-extractor target/wasm32-unknown-unknown/release/alex_librarian.wasm > src
 cargo build --release --target wasm32-unknown-unknown --package vetkd
 candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
 
-# for system_api
-cargo build --release --target wasm32-unknown-unknown --package vetkd_system_api
-candid-extractor target/wasm32-unknown-unknown/release/vetkd_system_api.wasm > src/system_api/vetkd_system_api.did
-
 
 cargo update
 
@@ -67,7 +63,7 @@ dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 
 dfx deploy alex_librarian
 dfx deploy vetkd
-dfx deploy system_api
+dfx deploy system_api --specified-id s55qq-oqaaa-aaaaa-aaakq-cai
 
 dfx deploy alex_wallet
 
