@@ -6,12 +6,16 @@ import { ActorSubclass } from "@dfinity/agent";
 import getIcpBal from "../thunks/getIcpBal";
 import { ImSpinner8 } from "react-icons/im";
 import { _SERVICE as _SERVICEICPLEDGER } from '../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did'
+import { _SERVICE as _SERVICESWAP } from "../../../../../declarations/icp_swap/icp_swap.did";
+
+import TransferToPrincipal from "@/features/swap/components/transfer/transferToPrincipal";
 interface getaccountBalProps {
     actorIcpLedger: ActorSubclass<_SERVICEICPLEDGER>;
-    isAuthenticated:Boolean
+    actorSwap: ActorSubclass<_SERVICESWAP>;
+    isAuthenticated: boolean
 }
 
-const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger,isAuthenticated }) => {
+const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger, actorSwap, isAuthenticated }) => {
     const dispatch = useAppDispatch();
     const icpLedger = useAppSelector((state) => state.icpLedger);
     const swap = useAppSelector((state) => state.swap);
@@ -27,7 +31,7 @@ const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger,isAuthenti
         }
     }, [auth.user, swap.subaccount])
     useEffect(() => {
-        if (swap.successClaimReward === true || swap.swapSuccess === true ||swap.burnSuccess===true 
+        if (swap.successClaimReward === true || swap.swapSuccess === true || swap.burnSuccess === true || swap.transferSuccess === true || icpLedger.transferSuccess === true
         ) {
             dispatch(getIcpBal({
                 actor: actorIcpLedger,
@@ -35,7 +39,7 @@ const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger,isAuthenti
                 account: auth.user
             }));
         }
-    }, [swap])
+    }, [swap, icpLedger])
 
     return (<div>
         {icpLedger.loading ? (
@@ -61,11 +65,11 @@ const GetaccountBal: React.FC<getaccountBalProps> = ({ actorIcpLedger,isAuthenti
                     <h2 className="text-3xl">Subaccount Acocunt:</h2>
                     <h3>Address</h3>
                     <span className="address">
-                        {isAuthenticated===true?swap.subaccount:""}
+                        {isAuthenticated === true ? swap.subaccount : ""}
                     </span>
                     <h3>Balance</h3>
                     <span className="address">
-                        {(icpLedger?.subAccountBalance)}
+                        {(icpLedger?.subAccountBalance)}  <TransferToPrincipal actorSwap={actorSwap} isAuthenticated={isAuthenticated} />
                     </span>
                 </div>
 

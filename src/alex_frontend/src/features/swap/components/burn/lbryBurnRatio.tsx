@@ -10,7 +10,6 @@ import { _SERVICE as _SERVICETOKENOMICS } from '../../../../../../declarations/t
 
 import getAlexMintRate from "../../thunks/tokenomics/getAlexMintRate";
 import getMaxLbryBurn from "../../thunks/getMaxLbryBurn";
-import { icp_swap } from "src/declarations/icp_swap";
 interface LbryBurnRatioProps {
     actorSwap: ActorSubclass<_SERVICESWAP>;
     actorTokenomics: ActorSubclass<_SERVICETOKENOMICS>;

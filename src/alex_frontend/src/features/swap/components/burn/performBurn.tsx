@@ -10,14 +10,15 @@ import { _SERVICE as _SERVICELBRY } from '../../../../../../declarations/LBRY/LB
 import burnLbry from "../../thunks/burnLBRY";
 import Auth from "@/features/auth";
 import { flagHandler } from "../../swapSlice";
-interface PerformSwapProps {
+import swapLbry from "../../thunks/swapLbry";
+interface BurnSwapProps {
     actorSwap: ActorSubclass<_SERVICESWAP>;
     actorLbry: ActorSubclass<_SERVICELBRY>;
     isAuthenticated: boolean;
 
 }
 
-const BurnSwap: React.FC<PerformSwapProps> = ({ actorSwap, actorLbry,isAuthenticated }) => {
+const BurnSwap: React.FC<BurnSwapProps> = ({ actorSwap, actorLbry,isAuthenticated }) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
     const fee=0.0004;
@@ -28,6 +29,7 @@ const BurnSwap: React.FC<PerformSwapProps> = ({ actorSwap, actorLbry,isAuthentic
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
+        dispatch(swapLbry({ actor: actorSwap, amount:"0.1".toString() }));
         dispatch(burnLbry({ actorSwap, actorLbry, amount: amountLBRY }))
     }
     const handleAmountLBRYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +40,7 @@ const BurnSwap: React.FC<PerformSwapProps> = ({ actorSwap, actorLbry,isAuthentic
     useEffect(()=>{
         if(swap.burnSuccess===true)
         {
-            alert("Burned successfully!")
+            //alert("Burned successfully!")
             dispatch(flagHandler())
         }
     },[swap.burnSuccess])

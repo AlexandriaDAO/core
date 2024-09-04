@@ -34,12 +34,12 @@ const PerformSwap: React.FC<PerformSwapProps> = ({ actorSwap, isAuthenticated })
     }, [swap.lbryRatio])
     useEffect(() => {
         if (swap.swapSuccess === true) {
-            alert("Success");
+            //alert("Success");
             dispatch(flagHandler());
         }
     }, [swap.swapSuccess])
     return (<div>
-        {swap.loading ? (
+        {swap.loading? (
             <div className="flex gap-1 items-center text-[#828282]">
                 <span className="text-base font-normal font-roboto-condensed tracking-wider">
                     Processing

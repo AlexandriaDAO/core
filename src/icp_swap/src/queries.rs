@@ -40,7 +40,6 @@ pub fn get_stake(principal: Principal) -> Option<Stake> {
     STAKES.with(|stakes| stakes.borrow().stakes.get(&principal).cloned())
 }
 #[query]
-
 pub fn get_total_staked() -> u64 {
     TOTAL_ALEX_STAKED.with(|staked| {
         let staked: std::sync::MutexGuard<u64> = staked.lock().unwrap();
@@ -68,7 +67,7 @@ pub fn get_current_staking_reward_percentage() -> String {
 }
 
 #[query]
-pub async fn get_maximum_LBRY_burn_allowed() -> Result<u64, String> {
+pub fn get_maximum_LBRY_burn_allowed() -> Result<u64, String> {
     let lbry_per_icp: u64 = get_current_LBRY_ratio()
         .checked_mul(2)
         .ok_or("Arithmetic overflow in lbry_per_icp calculation")?;
