@@ -10,9 +10,7 @@ type Engine = record {
 type EngineStatus = variant { Draft; Published };
 type Keys = record { public_key : text; slot : nat8; private_key : text };
 type Result = variant { Ok : Engine; Err : text };
-type Result_2 = variant { Ok : nat; Err : text };
-type Result_3 = variant { Ok; Err : text };
-type Result_4 = variant { Ok : text; Err : text };
+type Result_1 = variant { Ok; Err : text };
 type SourceCard = record {
   title : text;
   user_query : text;
@@ -28,9 +26,8 @@ service : {
   add_my_engine : (text, text, text, text, opt nat8) -> (Result);
   bookmark_sc : (nat64) -> ();
   delete_engine : (text) -> (bool);
-  delete_keys : (nat8) -> (Result_3);
+  delete_keys : (nat8) -> (Result_1);
   delete_sc : (nat64) -> ();
-  deploy_icrc7 : () -> (DeployResult);
   get_bookmarks : () -> (vec opt SourceCard) query;
   get_engine_by_id : (text) -> (opt Engine) query;
   get_engines : () -> (vec Engine) query;
@@ -41,9 +38,7 @@ service : {
   get_librarian_keys : (principal) -> (vec Keys) query;
   get_my_engines : () -> (vec Engine) query;
   get_sc : (nat64) -> (opt SourceCard) query;
-  initialize_icrc7 : () -> (DeployResult);
-  mint_nft : (text) -> (Result_4);
-  save_keys : (text, text, nat8) -> (DeployResult);
+  save_keys : (text, text, nat8) -> (Result_1);
   save_sc : (text, text, text, text, text, text) -> (nat64);
   update_engine_status : (text, nat8) -> (Result);
   whoami : () -> (principal) query;

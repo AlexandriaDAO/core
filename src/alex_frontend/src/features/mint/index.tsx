@@ -23,8 +23,7 @@ const Mint = () => {
 
 	const dispatch = useAppDispatch();
 
-	const { actor, actorAlexWallet,actorAlexLibrarian, actorVetkd, meiliClient } = useSession();
-	const { actor, meiliClient, actorIcrc7, actorNftManager } = useSession();
+	const { actorAlexWallet, actorAlexLibrarian, actorVetkd, actorIcrc7, actorNftManager, actor, meiliClient } = useSession();
 	const [bookLoadModal, setBookLoadModal] = useState(false);
 
 	const [file, setFile] = useState<File | undefined>(undefined);
@@ -109,7 +108,6 @@ const Mint = () => {
 			await mintNFT(transactions.manifest.id);
 			await uploadToArweave(irys, transactions);
 
-			dispatch(fetchEngineBooks({ actor, engine: activeEngine }));
 			dispatch(fetchEngineBooks({ actorNftManager, engine: activeEngine }));
       
 			setTimeout(() => next(3), 2000);
@@ -188,7 +186,8 @@ const Mint = () => {
 		setUploadStatus(3);
 		message.info("Minting NFT via ICRC7 Protocol");
 
-		const result = await actorNftManager.mint_nft(transactionId);
+		const randomMintNumber = Math.floor(Math.random() * 1000) + 1; // Random number between 1 and 1000
+		const result = await actorNftManager.mint_nft(transactionId, BigInt(randomMintNumber));
 		if ("Err" in result) throw new Error(result.Err);
 
 		message.success("Minted Successfully");

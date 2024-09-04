@@ -1,6 +1,6 @@
-
+type Result = variant { Ok : text; Err : text };
 service : {
   encryption_key : () -> (text);
-
-  wbe_decrypt : (text) -> (variant { Ok : text; Err : text });
+  greet : () -> (text) query;
+  wbe_decrypt : (text) -> (Result);
 }

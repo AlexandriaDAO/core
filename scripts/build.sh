@@ -40,7 +40,23 @@ cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
 # For tokenomics
 cargo build --release --target wasm32-unknown-unknown --package tokenomics
-candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
+candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.
+
+
+
+
+# for alex_librarian
+cargo build --release --target wasm32-unknown-unknown --package alex_librarian
+candid-extractor target/wasm32-unknown-unknown/release/alex_librarian.wasm > src/alex_librarian/alex_librarian.did
+
+# for vetkd
+cargo build --release --target wasm32-unknown-unknown --package vetkd
+candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
+
+# for system_api
+cargo build --release --target wasm32-unknown-unknown --package vetkd_system_api
+candid-extractor target/wasm32-unknown-unknown/release/vetkd_system_api.wasm > src/system_api/vetkd_system_api.did
+
 
 cargo update
 
@@ -48,6 +64,12 @@ dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
 dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
+
+dfx deploy alex_librarian
+dfx deploy vetkd
+dfx deploy system_api
+
+dfx deploy alex_wallet
 
 
 

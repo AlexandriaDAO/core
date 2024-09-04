@@ -25,6 +25,10 @@ motoko stuff:
 - https://mops.one/docs/install
 - npm i -g ic-mops
 
+install azle: [latest instructions](https://demergent-labs.github.io/azle/get_started.html#installation)
+- `DFX_VERSION=0.22.0 sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"`
+- `npx azle install-dfx-extension`
+
 
 # Alexandria WhitePaper
 

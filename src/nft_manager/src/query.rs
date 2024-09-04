@@ -31,7 +31,7 @@ pub async fn total_supply() -> Result<Nat, String> {
 
 
 #[update(guard = "is_frontend")]
-pub async fn get_tokens(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>, String> {
+pub async fn get_nfts(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>, String> {
     let total_supply = total_supply().await?;
 
     let start = start.unwrap_or_else(|| {

@@ -91,6 +91,7 @@
               console.log('message',message, convertedMsg);
 
               // Call the signTransaction method
+              //@ts-ignore
               const result = await actor.signData(convertedMsg, node);
 
               console.log('result',result);
