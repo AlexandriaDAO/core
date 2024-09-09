@@ -66,7 +66,6 @@ pub async fn swap(amount_icp: u64) -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller)?;
 
-
     if amount_icp < 10_000_000 {
         return Err("Minimum amount is 0.1 ICP".to_string());
     }
@@ -325,8 +324,8 @@ async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
     let mut caller_subaccount_bytes = [0u8; 32];
     let caller_slice = caller.as_slice();
     caller_subaccount_bytes[..caller_slice.len()].copy_from_slice(caller_slice);
-
-    let amount: Nat = Nat::from(amount);
+    //Todo
+    let amount: Nat = Nat::from(amount - ALEX_TRANSFER_FEE);
 
     ic_cdk::println!("Staking {} tokens caller account {}", amount, caller);
 
@@ -335,7 +334,7 @@ async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
         memo: None,
         amount,
         spender_subaccount: None,
-        fee: None,
+        fee: Some(Nat::from(ALEX_TRANSFER_FEE)),
         to: canister_id.into(),
         created_at_time: None,
     };
@@ -371,7 +370,7 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
             });
             current_stake.amount = current_stake
                 .amount
-                .checked_add(amount)
+                .checked_add(amount - ALEX_TRANSFER_FEE)
                 .ok_or("Arithmetic Overflow occurred in current_stake.amount")?;
             current_stake.time = ic_cdk::api::time();
             Ok(())
@@ -379,7 +378,7 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
     TOTAL_ALEX_STAKED.with(|total_staked: &Arc<Mutex<u64>>| -> Result<(), String> {
         let mut total_staked: std::sync::MutexGuard<u64> = total_staked.lock().unwrap();
         *total_staked = total_staked
-            .checked_add(amount)
+            .checked_add(amount - ALEX_TRANSFER_FEE)
             .ok_or("Arithmetic Overflow occurred in TOTAL_ALEX_STAKED.")?;
         Ok(())
     })?;
@@ -394,8 +393,8 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
     let mut caller_subaccount_bytes = [0u8; 32];
     let caller_slice = caller.as_slice();
     caller_subaccount_bytes[..caller_slice.len()].copy_from_slice(caller_slice);
-
-    let amount = Nat::from(amount);
+    //Todo
+    let amount = Nat::from(amount - ALEX_TRANSFER_FEE);
 
     ic_cdk::println!("Un staking {} tokens from account {}", amount, caller);
 
@@ -404,7 +403,7 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
         memo: None,
         amount,
         spender_subaccount: None,
-        fee: None,
+        fee: Some(Nat::from(ALEX_TRANSFER_FEE)),
         to: Account::from(ic_cdk::caller()),
         created_at_time: None,
     };
@@ -685,26 +684,31 @@ pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
 }
 
 #[update]
-pub async fn transfer_from_user_wallet(amount_icp: u64,destination: String) -> Result<String, String> {
+pub async fn transfer_from_user_wallet(
+    amount_icp: u64,
+    destination: String,
+) -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller)?;
- 
-    transfer_icp_from_user(amount_icp,destination).await?;
+
+    transfer_icp_from_user(amount_icp, destination).await?;
     ic_cdk::println!("******************Icp sent !*************************");
     Ok("Transfered Successfully!".to_string())
     //  }).await
 }
 
-
 #[update]
-async fn transfer_icp_from_user(amount: u64,destination: String) -> Result<BlockIndexIC, String> {
+async fn transfer_icp_from_user(amount: u64, destination: String) -> Result<BlockIndexIC, String> {
     let amount = Tokens::from_e8s(amount);
     let transfer_args: ic_ledger_types::TransferArgs = ic_ledger_types::TransferArgs {
         memo: Memo(0),
         amount,
         fee: Tokens::from_e8s(ICP_TRANSFER_FEE),
         from_subaccount: Some(principal_to_subaccount(&caller())),
-        to: AccountIdentifier::new(&Principal::from_text(destination).expect("Could not decode the principal."), &DEFAULT_SUBACCOUNT),
+        to: AccountIdentifier::new(
+            &Principal::from_text(destination).expect("Could not decode the principal."),
+            &DEFAULT_SUBACCOUNT,
+        ),
         created_at_time: None,
     };
 

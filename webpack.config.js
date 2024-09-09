@@ -126,15 +126,14 @@ module.exports = {
   ],
   devServer: {
     historyApiFallback: true,
-    proxy: {
-      "/api": {
-        target: "http://127.0.0.1:4943",
+    proxy: [
+      {
+        context: ["/api"],  // Set the context for the proxy
+        target: "http://127.0.0.1:4943",  // Your API server
         changeOrigin: true,
-        pathRewrite: {
-          "^/api": "/api",
-        },
+        pathRewrite: { "^/api": "/api" },
       },
-    },
+    ],
     static: path.resolve(__dirname, "src", frontendDirectory, "public"),
     hot: true,
     watchFiles: [path.resolve(__dirname, "src", frontendDirectory, "src")],

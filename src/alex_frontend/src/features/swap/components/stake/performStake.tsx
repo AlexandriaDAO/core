@@ -49,7 +49,7 @@ const PerformStake: React.FC<PerformStakeProps> = ({ actorSwap, actorAlex,isAuth
                     <div className="label-wrapper">
                         <label htmlFor="icp">ALEX</label>
                         <div className="input-wrapper mt-2">
-                            <input id="icp" alt="ICP" type="number" placeholder="Enter ALEX Numbers" value={amount} defaultValue={0.0} onChange={(e) => {
+                            <input id="icp" alt="ICP" type="text" placeholder="Enter ALEX Numbers" value={amount} onChange={(e) => {
                                 handleAmountChange(e)
                             }} className="w-full py-1.5 px-4 w-100 rounded-lg" onWheel={event => event.currentTarget.blur()} />
                         </div>

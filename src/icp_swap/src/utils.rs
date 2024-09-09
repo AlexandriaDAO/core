@@ -12,6 +12,8 @@ pub const LBRY_CANISTER_ID: &str = "hdtfn-naaaa-aaaam-aciva-cai";
 pub const TOKENOMICS_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 pub const XRC_CANISTER_ID:&str="uf6dk-hyaaa-aaaaq-qaaaq-cai";
 pub const ICP_TRANSFER_FEE: u64 = 10_000;
+pub const ALEX_TRANSFER_FEE: u64 = 10_000;
+
 pub const EXPIRY_INTERVAL:u64=8;//604800;
 
 
