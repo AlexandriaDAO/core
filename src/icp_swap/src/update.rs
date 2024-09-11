@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex};
 
 use crate::utils::*;
 use crate::{get_current_LBRY_ratio, guard::*};
-use ic_cdk::{self, caller, query, update};
+use ic_cdk::{self, caller, update};
 use ic_ledger_types::{
     AccountIdentifier, BlockIndex as BlockIndexIC, Memo, Tokens, DEFAULT_SUBACCOUNT,
     MAINNET_LEDGER_CANISTER_ID,
@@ -62,19 +62,13 @@ pub struct GetExchangeRateRequest {
 //swap
 #[update]
 pub async fn swap(amount_icp: u64) -> Result<String, String> {
-    // reentrancy(|| async move{
     let caller = ic_cdk::caller();
-    let _guard = CallerGuard::new(caller)?;
+    let _guard: CallerGuard = CallerGuard::new(caller)?;
 
     if amount_icp < 10_000_000 {
         return Err("Minimum amount is 0.1 ICP".to_string());
     }
-    let limit_result = within_max_limit(0).await; //check if limit max reached
-    if limit_result == false {
-        return Err("No swap allowed, max limit reached!".to_string());
-    }
     deposit_icp_in_canister(amount_icp).await?;
-    ic_cdk::println!("******************Icp received by canister! Now Transfering the token*************************");
     TOTAL_ICP_AVAILABLE.with(|icp: &Arc<Mutex<u64>>| -> Result<(), String> {
         let mut icp: std::sync::MutexGuard<u64> = icp
             .lock()
@@ -90,9 +84,7 @@ pub async fn swap(amount_icp: u64) -> Result<String, String> {
         .ok_or("Arithmetic overflow occurred in lbry_amount.")?;
     mint_LBRY(lbry_amount).await?;
     Ok("Swapped Successfully!".to_string())
-    //  }).await
 }
-#[update]
 async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let amount = Nat::from(amount);
@@ -100,8 +92,6 @@ async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
     let mut caller_subaccount_bytes = [0u8; 32];
     let caller_slice = caller.as_slice();
     caller_subaccount_bytes[..caller_slice.len()].copy_from_slice(caller_slice);
-
-    ic_cdk::println!("Transferring {} tokens to account {}", amount, caller);
 
     let transfer_args: TransferArg = TransferArg {
         // can be used to distinguish between transactions
@@ -153,8 +143,6 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
     }
     //Dynamic price
     let mut icp_rate_in_cents: u64 = get_current_LBRY_ratio();
-    ic_cdk::println!("The rate is {}", icp_rate_in_cents);
-    ic_cdk::println!("The amount_lbry is {}", amount_lbry);
     let mut amount_icp_e8s = amount_lbry
         .checked_mul(100_000_000)
         .ok_or("Arithmetic overflow occurred in amount_icp_e8s.")?;
@@ -193,7 +181,6 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
         .checked_mul(100_000_000)
         .ok_or("Arithmetic overflow occurred in amount_lbry_e8s.")?;
     burn_token(amount_lbry_e8s).await?;
-    ic_cdk::println!("******************Token Burned*************************");
     send_icp(caller, amount_icp_e8s).await?;
     TOTAL_ICP_AVAILABLE.with(|icp: &Arc<Mutex<u64>>| -> Result<(), String> {
         let mut icp = icp
@@ -204,12 +191,10 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
             .ok_or_else(|| "Arithmetic underflow in TOTAL_ICP_AVAILABLE.".to_string())?;
         Ok(())
     })?;
-    ic_cdk::println!("******************ICP sent to caller account*************************");
     mint_ALEX(amount_lbry, caller).await?;
     Ok("Burn Successfully!".to_string())
 }
 
-#[update]
 async fn deposit_icp_in_canister(amount: u64) -> Result<BlockIndexIC, String> {
     let canister_id: Principal = ic_cdk::api::id();
     let canister_account: AccountIdentifier =
@@ -230,11 +215,8 @@ async fn deposit_icp_in_canister(amount: u64) -> Result<BlockIndexIC, String> {
         .map_err(|e| format!("failed to call ledger: {:?}", e))?
         .map_err(|e: ic_ledger_types::TransferError| format!("ledger transfer error {:?}", e))
 }
-#[update]
 async fn send_icp(destination: Principal, amount: u64) -> Result<BlockIndexIC, String> {
     let amount = Tokens::from_e8s(amount);
-    ic_cdk::println!("Sending {} Icp to {}", amount, destination);
-
     let transfer_args: ic_ledger_types::TransferArgs = ic_ledger_types::TransferArgs {
         memo: Memo(0),
         amount,
@@ -248,15 +230,12 @@ async fn send_icp(destination: Principal, amount: u64) -> Result<BlockIndexIC, S
         .map_err(|e| format!("failed to call ledger: {:?}", e))?
         .map_err(|e: ic_ledger_types::TransferError| format!("ledger transfer error {:?}", e))
 }
-#[update]
 async fn burn_token(amount: u64) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let canister_id: Principal = ic_cdk::api::id();
 
     let big_int_amount: BigUint = BigUint::from(amount);
     let amount: Nat = Nat(big_int_amount);
-
-    ic_cdk::println!("Burning {} tokens from account {}", amount, caller);
 
     let transfer_from_args = TransferFromArgs {
         // the account we want to transfer tokens from (in this case we assume the caller approved the canister to spend funds on their behalf)
@@ -295,7 +274,7 @@ async fn burn_token(amount: u64) -> Result<BlockIndex, String> {
     // 8. Use `map_err` again to transform any specific ledger transfer errors into a readable string format, facilitating error handling and debugging.
     .map_err(|e: TransferFromError| format!("ledger transfer error {:?}", e))
 }
-#[update]
+
 async fn mint_ALEX(lbry_amount: u64, caller: Principal) -> Result<String, String> {
     // 1. Asynchronously call another canister function using `ic_cdk::call`.
     let result: Result<(Result<String, String>,), String> =
@@ -316,7 +295,6 @@ async fn mint_ALEX(lbry_amount: u64, caller: Principal) -> Result<String, String
     }
 }
 //stake
-#[update]
 async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let canister_id: Principal = ic_cdk::api::id();
@@ -324,11 +302,11 @@ async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
     let mut caller_subaccount_bytes = [0u8; 32];
     let caller_slice = caller.as_slice();
     caller_subaccount_bytes[..caller_slice.len()].copy_from_slice(caller_slice);
-    //Todo
-    let amount: Nat = Nat::from(amount - ALEX_TRANSFER_FEE);
 
-    ic_cdk::println!("Staking {} tokens caller account {}", amount, caller);
-
+    let amount: Nat = Nat::from(amount);
+    if amount < Nat::from(0 as u8) {
+        return Err("Amount is less than zero".to_string());
+    }
     let transfer_from_args: TransferFromArgs = TransferFromArgs {
         from: Account::from(ic_cdk::caller()),
         memo: None,
@@ -357,8 +335,11 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
     if amount < 100_000_000 {
         return Err("Minimum 1 Alex is required ".to_string());
     }
+    let post_fee_amount = amount
+        .checked_sub(ALEX_TRANSFER_FEE)
+        .ok_or("Arithmetic underflow occurred in post_fee_amount")?;
     // Proceed with transfer
-    deposit_token(amount).await?;
+    deposit_token(post_fee_amount).await?;
     let new_stake: Result<(), String> =
         STAKES.with(|stakes: &RefCell<Stakes>| -> Result<(), String> {
             let mut stakes: std::cell::RefMut<Stakes> = stakes.borrow_mut();
@@ -370,7 +351,7 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
             });
             current_stake.amount = current_stake
                 .amount
-                .checked_add(amount - ALEX_TRANSFER_FEE)
+                .checked_add(post_fee_amount)
                 .ok_or("Arithmetic Overflow occurred in current_stake.amount")?;
             current_stake.time = ic_cdk::api::time();
             Ok(())
@@ -378,14 +359,12 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
     TOTAL_ALEX_STAKED.with(|total_staked: &Arc<Mutex<u64>>| -> Result<(), String> {
         let mut total_staked: std::sync::MutexGuard<u64> = total_staked.lock().unwrap();
         *total_staked = total_staked
-            .checked_add(amount - ALEX_TRANSFER_FEE)
+            .checked_add(post_fee_amount)
             .ok_or("Arithmetic Overflow occurred in TOTAL_ALEX_STAKED.")?;
         Ok(())
     })?;
-    ic_cdk::println!("Staked Successfully!");
     Ok("Staked Successfully!".to_string())
 }
-#[update]
 async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let canister_id: Principal = ic_cdk::api::id();
@@ -393,11 +372,10 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
     let mut caller_subaccount_bytes = [0u8; 32];
     let caller_slice = caller.as_slice();
     caller_subaccount_bytes[..caller_slice.len()].copy_from_slice(caller_slice);
-    //Todo
-    let amount = Nat::from(amount - ALEX_TRANSFER_FEE);
-
-    ic_cdk::println!("Un staking {} tokens from account {}", amount, caller);
-
+    let amount: Nat = Nat::from(amount);
+    if amount < Nat::from(0 as u8) {
+        return Err("Amount is less than zero".to_string());
+    }
     let transfer_from_args: TransferFromArgs = TransferFromArgs {
         from: canister_id.into(),
         memo: None,
@@ -419,43 +397,6 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
     .map_err(|e| format!("ledger transfer error {:?}", e))
 }
 #[update]
-async fn un_stake_ALEX(amount: u64) -> Result<String, String> {
-    let caller = ic_cdk::caller();
-    let _guard = CallerGuard::new(caller)?;
-    if amount < 100_000_000 {
-        return Err("Minimum 1 Alex is required ".to_string());
-    }
-    // verify caller balance
-    if verify_caller_balance(amount) == false {
-        return Err("Insufficent funds".to_string());
-    }
-    // Proceed with transfer
-    withdraw_token(amount).await?;
-    STAKES.with(|stakes| -> Result<(), String> {
-        let mut stakes = stakes.borrow_mut();
-        let current_stake = stakes.stakes.entry(caller).or_insert(Stake {
-            amount: 0,
-            time: ic_cdk::api::time(),
-            reward_icp: 0,
-        });
-        current_stake.amount = current_stake
-            .amount
-            .checked_sub(amount)
-            .ok_or("Arithmetic underflow occurred in STAKES.")?;
-        Ok(())
-    })?;
-
-    TOTAL_ALEX_STAKED.with(|total_staked| -> Result<(), String> {
-        let mut total_staked: std::sync::MutexGuard<u64> = total_staked.lock().unwrap();
-        *total_staked = total_staked
-            .checked_sub(amount)
-            .ok_or("Arithmetic underflow occurred in TOTAL_ALEX_STAKED")?;
-        Ok(())
-    })?;
-    ic_cdk::println!("UnStaked Successfully!");
-    Ok("UnStaked Successfully!".to_string())
-}
-#[update]
 async fn un_stake_all_ALEX() -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller)?;
@@ -465,7 +406,11 @@ async fn un_stake_all_ALEX() -> Result<String, String> {
         return Err("Insufficent funds".to_string());
     }
     // Proceed with transfer.
-    withdraw_token(staked_amount).await?;
+    let post_fee_amount = staked_amount
+        .checked_sub(ALEX_TRANSFER_FEE)
+        .ok_or("Stake amount too low!")?;
+
+    withdraw_token(post_fee_amount).await?;
     STAKES.with(|stakes| -> Result<(), String> {
         let mut stakes = stakes.borrow_mut();
         let current_stake = stakes.stakes.entry(caller).or_insert(Stake {
@@ -486,7 +431,6 @@ async fn un_stake_all_ALEX() -> Result<String, String> {
             .ok_or("Arithmetic underflow occurred in TOTAL_ALEX_STAKED")?;
         Ok(())
     })?;
-    ic_cdk::println!("UnStaked Successfully!");
     Ok("UnStaked Successfully!".to_string())
 }
 
@@ -504,8 +448,7 @@ pub fn distribute_reward() -> Result<String, String> {
         let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
         *icp
     });
-    ic_cdk::println!("The unclaimed reward is ,{}", total_unclaimed_icp_reward);
-    if total_icp_available <= 0 || total_icp_available < total_unclaimed_icp_reward {
+    if total_icp_available == 0 || total_icp_available < total_unclaimed_icp_reward {
         return Err("Insufficient ICP balance for reward distribution".to_string());
     }
     let mut total_icp_allocated: u128 = total_icp_available
@@ -515,8 +458,6 @@ pub fn distribute_reward() -> Result<String, String> {
     total_icp_allocated = total_icp_allocated
         .checked_mul(staking_percentage as u128)
         .ok_or("Arithmetic overflow occurred in total_icp_allocated.")?;
-    ic_cdk::println!("Allocated icp {}", total_icp_allocated);
-
     total_icp_allocated = total_icp_allocated.checked_div(10000).ok_or(
         "Division failed in ICP allocation. Please verify the amount is valid and non-zero",
     )?;
@@ -528,14 +469,9 @@ pub fn distribute_reward() -> Result<String, String> {
     if total_staked_alex == 0 {
         return Err("No ALEX staked, cannot distribute rewards".to_string());
     }
-    ic_cdk::println!("Allocated icp2 {}", total_icp_allocated);
-    ic_cdk::println!("total staked alex {}", total_staked_alex);
-
     let icp_reward_per_alex = (total_icp_allocated * SCALING_FACTOR)
         .checked_div(total_staked_alex)
         .ok_or("Division failed in icp_reward_per_alex. Please verify it's valid and non-zero")?;
-
-    ic_cdk::println!("ICP reward per alex (scaled) is {} !", icp_reward_per_alex);
 
     let mut total_icp_reward: u128 = 0;
 
@@ -583,7 +519,7 @@ async fn claim_icp_reward() -> Result<String, String> {
             if stake.reward_icp <= 1000_000 {
                 return Err("Insufficient rewards".to_string());
             }
-            let total_icp_available = TOTAL_ICP_AVAILABLE.with(|icp| {
+            let total_icp_available: u64 = TOTAL_ICP_AVAILABLE.with(|icp| {
                 let icp: std::sync::MutexGuard<u64> = icp.lock().unwrap();
                 *icp
             });
@@ -635,16 +571,14 @@ pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
         timestamp: None,
     };
 
-    // XRC canister ID
     let xrc_canister_id = Principal::from_text(XRC_CANISTER_ID).unwrap();
 
-    // Prepare the call
     let call_result: Result<Vec<u8>, (ic_cdk::api::call::RejectionCode, String)> =
         ic_cdk::api::call::call_raw(
             xrc_canister_id,
             "get_exchange_rate",
             &candid::encode_args((request,)).unwrap(),
-            10000000000, // payment fee
+            BURN_CYCLE_FEE, // payment fee
         )
         .await;
 
@@ -654,15 +588,23 @@ pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
                 println!("Decoded response: {:?}", response);
                 match response {
                     XRCResponse::Ok(exchange_rate) => {
-                        let divisor: u64 = 10_u64.pow(exchange_rate.metadata.decimals - 2);
+                        let divisor: u64 =
+                            10_u64.pow(exchange_rate.metadata.decimals.checked_sub(2).ok_or(
+                                "Arithmetic underflow in exchange_rate.metadata.decimals",
+                            )?);
                         let price_in_cents_es8 = exchange_rate.rate.checked_div(divisor).ok_or(
                             "Division failed in price_in_cents_es8. Please verify it's valid and non-zero"
                         )?;
-                        LBRY_RATIO.with(|ratio| {
+
+                        // Update the closure to handle potential errors
+                        LBRY_RATIO.with(|ratio| -> Result<(), String> {
                             let mut ratio = ratio.borrow_mut();
                             ratio.ratio = price_in_cents_es8;
-                            ratio.time = ic_cdk::api::time() / 1_000_000_000;
-                        });
+                            ratio.time = ic_cdk::api::time().checked_div(1_000_000_000)
+                                .ok_or("Division failed in ratio.time. Please verify the amount is valid and non-zero")?;
+                            Ok(())
+                        }).map_err(|e| e.to_string())?; // Propagate any error from the closure
+
                         Ok(price_in_cents_es8)
                     }
                     XRCResponse::Err(err) => {
@@ -671,18 +613,17 @@ pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
                     }
                 }
             }
-            Err(e) => {
-                println!("Decoding error: {:?}", e);
+            Err(_e) => {
+                // println!("Decoding error: {:?}", e);
                 Err("Error in decoding XRC response".to_string())
             }
         },
-        Err((rejection_code, msg)) => {
-            ic_cdk::println!("Call rejected: {:?}, {}", rejection_code, msg);
+        Err((_rejection_code, _msg)) => {
+            // ic_cdk::println!("Call rejected: {:?}, {}", rejection_code, msg);
             Err("Error call rejected".to_string())
         }
     }
 }
-
 #[update]
 pub async fn transfer_from_user_wallet(
     amount_icp: u64,
@@ -692,12 +633,9 @@ pub async fn transfer_from_user_wallet(
     let _guard = CallerGuard::new(caller)?;
 
     transfer_icp_from_user(amount_icp, destination).await?;
-    ic_cdk::println!("******************Icp sent !*************************");
     Ok("Transfered Successfully!".to_string())
-    //  }).await
 }
 
-#[update]
 async fn transfer_icp_from_user(amount: u64, destination: String) -> Result<BlockIndexIC, String> {
     let amount = Tokens::from_e8s(amount);
     let transfer_args: ic_ledger_types::TransferArgs = ic_ledger_types::TransferArgs {

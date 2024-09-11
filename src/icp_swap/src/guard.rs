@@ -1,6 +1,6 @@
 use candid::Principal;
 
-use crate::{storage::REENTRANCY_GUARD, STATE};
+use crate::{ STATE};
 pub fn is_canister() -> Result<(), String> {
     if ic_cdk::api::caller().to_string() == "5qx27-tyaaa-aaaal-qjafa-cai" {
         Ok(())
@@ -8,22 +8,6 @@ pub fn is_canister() -> Result<(), String> {
         Err("You are unauthorized to call this method.".to_string())
     }
 }
-pub fn reentrancy<F, R>(f: F) -> R where F: FnOnce() -> R,
-{
-    REENTRANCY_GUARD.with(|guard| {
-        if guard.get() {
-            ic_cdk::println!("Reentrancy not allowed");
-            panic!("Reentrancy not allowed!");
-        }
-        guard.set(true);
-    });
-    let result = f();
-    REENTRANCY_GUARD.with(|guard| {
-        guard.set(false);
-    });
-    result
-}
-
 pub struct CallerGuard {
     principal: Principal,
 }

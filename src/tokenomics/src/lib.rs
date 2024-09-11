@@ -1,6 +1,5 @@
 use ic_cdk;
 use candid::Principal;
-use icrc_ledger_types::icrc1::transfer::BlockIndex;
 
 mod storage;
 pub use storage::*;
