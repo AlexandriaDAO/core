@@ -68,15 +68,15 @@ dfx deploy system_api --specified-id s55qq-oqaaa-aaaaa-aaakq-cai
 dfx deploy alex_wallet
 
 
-
-# Step 5: Configure Local Identities for token launches
-dfx identity new minter --storage-mode plaintext
-dfx identity use minter
-export MINTER_ACCOUNT_ID=$(dfx ledger account-id)
-export MINTER_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
-dfx identity use default
-export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
-export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+# # # Now covered in constants.sh.
+# # Step 5: Configure Local Identities for token launches
+# dfx identity new minter --storage-mode plaintext
+# dfx identity use minter
+# export MINTER_ACCOUNT_ID=$(dfx ledger account-id)
+# export MINTER_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+# dfx identity use default
+# export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
+# export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 
 
 # Step 6: Deploy the ICP & ICRC Ledger with LICP, LBRY, and ALEX tokens
@@ -151,8 +151,6 @@ mkdir -p .dfx/local/canisters/ALEX
 touch .dfx/local/canisters/LBRY/LBRY.did
 touch .dfx/local/canisters/ALEX/ALEX.did
 
-# mkdir -p .dfx/local/canisters/icp_ledger_canister
-# curl https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icp_ledger/ledger.did -o .dfx/local/canisters/icp_ledger_canister/icp_ledger_canister.did
-
 npm i
 dfx deploy alex_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
+
