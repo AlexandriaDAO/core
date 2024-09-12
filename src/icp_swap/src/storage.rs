@@ -1,6 +1,5 @@
 use candid::Deserialize;
 use candid::{CandidType, Principal};
-use std::cell::Cell;
 use std::cell::RefCell;
 use std::collections::{BTreeSet, HashMap};
 use std::sync::{Arc, Mutex};
@@ -14,7 +13,6 @@ thread_local! {
         ratio: 0,
         time: 0,
     });
-    pub static REENTRANCY_GUARD: Cell<bool> = Cell::new(false);
     pub static STATE: RefCell<State> = RefCell::new(State{pending_requests: BTreeSet::new()});
 
 }

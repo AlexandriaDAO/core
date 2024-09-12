@@ -1,14 +1,14 @@
 use crate::guard::*;
 use crate::storage::*;
-use candid::{Nat, Principal};
+use candid::{ Principal};
 
 use ic_cdk::init;
 use icrc_ledger_types::icrc1::transfer::{BlockIndex, TransferArg, TransferError};
 
-const alex_canister_id: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
-const icp_swap_canister_id: &str = "5qx27-tyaaa-aaaal-qjafa-cai";
-const librarian: &str = "xswc6-jimwj-wnqog-3gmkv-hglw4-aedfy-bqmr2-5uyut-cnbbg-4wvsk-bqe";
-const user: &str = "bct62-kglfp-ljyff-3uhhx-yhc2v-pg3ms-xviiq-dorhc-5iibd-fopgs-gae";
+const ALEX_CANISTER_ID: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
+const ICP_SWAP_CANISTER_ID: &str = "5qx27-tyaaa-aaaal-qjafa-cai";
+const LIBRARIAN: &str = "xswc6-jimwj-wnqog-3gmkv-hglw4-aedfy-bqmr2-5uyut-cnbbg-4wvsk-bqe";
+const USER: &str = "bct62-kglfp-ljyff-3uhhx-yhc2v-pg3ms-xviiq-dorhc-5iibd-fopgs-gae";
 
 #[ic_cdk::update(guard = "is_allowed")]
 pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<String, String> {
@@ -17,7 +17,11 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
         let total_burned_lbry: std::sync::MutexGuard<u64> = total_burned_lbry.lock().unwrap();
         *total_burned_lbry
     });
-    if (total_burned_lbry + lbry_burn) > LBRY_THRESHOLDS[LBRY_THRESHOLDS.len() - 1] {
+    if (total_burned_lbry
+        .checked_add(lbry_burn)
+        .ok_or("Arithmetic overflow occurred in total_burned_lbry.")?)
+        > LBRY_THRESHOLDS[LBRY_THRESHOLDS.len() - 1]
+    {
         return Err("Max ALEX reached,minting stopped !".to_string());
     }
     let mut current_threshold: u32 = CURRENT_THRESHOLD.with(|current_threshold| {
@@ -30,19 +34,13 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
     if tentative_total > (LBRY_THRESHOLDS[current_threshold as usize]) {
         let mut lbry_processed: u64 = 0;
         while tentative_total > (LBRY_THRESHOLDS[current_threshold as usize]) {
-            ic_cdk::println!("Current threshold {}", current_threshold);
-            ic_cdk::println!("Total burn LBRY is {}", total_burned_lbry);
             let mut lbry_mint_alex_with_current_threshold: u64 =
                 LBRY_THRESHOLDS[current_threshold as usize];
-            ic_cdk::println!(
-                "lbry_mint_alex_with_current_threshold is {}",
-                lbry_mint_alex_with_current_threshold
-            );
 
             lbry_mint_alex_with_current_threshold = lbry_mint_alex_with_current_threshold
                 .checked_sub(total_burned_lbry)
                 .ok_or("Arithmetic underflow occurred in lbry_mint_alex_with_current_threshold")?;
-           
+
             let mut phase_mint_alex: u64 = (ALEX_PER_THRESHOLD[current_threshold as usize])
                 .checked_mul(lbry_mint_alex_with_current_threshold)
                 .ok_or("Arithmetic overflow occurred in phase_mint_alex")?;
@@ -54,12 +52,12 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
             mint_ALEX_internal(phase_mint_alex, actual_caller).await?; //mint to actual caller
             mint_ALEX_internal(
                 phase_mint_alex,
-                Principal::from_text(librarian).expect("Could not decode the librarian principal."),
+                Principal::from_text(LIBRARIAN).expect("Could not decode the librarian principal."),
             )
             .await?; //mint  to librarian
             mint_ALEX_internal(
                 phase_mint_alex,
-                Principal::from_text(user).expect("Could not decode the principal."),
+                Principal::from_text(USER).expect("Could not decode the principal."),
             )
             .await?; //mint to user
             phase_mint_alex = phase_mint_alex
@@ -79,8 +77,6 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
             if current_threshold > (LBRY_THRESHOLDS.len() as u32) - 1 {
                 current_threshold = (LBRY_THRESHOLDS.len() as u32) - 1;
             }
-
-           
         }
         if lbry_burn > lbry_processed {
             let lbry_mint_alex_with_current_threshold: u64 = lbry_burn
@@ -96,12 +92,12 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
             mint_ALEX_internal(phase_mint_alex, actual_caller).await?; //mint to actual caller
             mint_ALEX_internal(
                 phase_mint_alex,
-                Principal::from_text(librarian).expect("Could not decode the librarian principal."),
+                Principal::from_text(LIBRARIAN).expect("Could not decode the librarian principal."),
             )
             .await?; //mint  to librarian
             mint_ALEX_internal(
                 phase_mint_alex,
-                Principal::from_text(user).expect("Could not decode the principal."),
+                Principal::from_text(USER).expect("Could not decode the principal."),
             )
             .await?; //mint to user
             phase_mint_alex = phase_mint_alex
@@ -125,13 +121,13 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
 
         mint_ALEX_internal(
             phase_mint_alex,
-            Principal::from_text(librarian).expect("Could not decode the librarian principal."),
+            Principal::from_text(LIBRARIAN).expect("Could not decode the librarian principal."),
         )
         .await?; //mint 1 unit to librarian
 
         mint_ALEX_internal(
             phase_mint_alex,
-            Principal::from_text(user).expect("Could not decode the principal."),
+            Principal::from_text(USER).expect("Could not decode the principal."),
         )
         .await?; //mint 1 unit to user
 
@@ -143,17 +139,12 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
             .ok_or("Arithmetic overflow occurred in minted_alex")?;
     }
 
-    ic_cdk::println!(
-        "current threshold index is {} minted {}",
-        current_threshold,
-        minted_alex
-    );
+
     TOTAL_ALEX_MINTED.with(|mint| -> Result<(), String> {
         let mut mint: std::sync::MutexGuard<u64> = mint.lock().unwrap();
         *mint = mint
             .checked_add(minted_alex)
             .ok_or("Arithmetic overflow occurred in TOTAL_ALEX_MINTED")?;
-        ic_cdk::println!("Total ALEX minted is {}", *mint);
         Ok(())
     })?;
 
@@ -167,7 +158,6 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
             *total_burned = total_burned
                 .checked_add(lbry_burn)
                 .ok_or("Arithmetic overflow occurred in total_burned")?;
-            ic_cdk::println!("Total LBRY burned is  {}", *total_burned);
             Ok(())
         },
     )?;
@@ -175,9 +165,7 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
     Ok("Minted ALEX ".to_string() + &minted_alex.to_string())
 }
 
-#[ic_cdk::update]
 async fn mint_ALEX_internal(minted_alex: u64, destinaion: Principal) -> Result<BlockIndex, String> {
-    ic_cdk::println!("minting to {}==>{}", minted_alex, destinaion.to_string());
     let transfer_args: TransferArg = TransferArg {
         amount: minted_alex.into(),
         //transfer tokens from the default subaccount of the canister
@@ -188,7 +176,7 @@ async fn mint_ALEX_internal(minted_alex: u64, destinaion: Principal) -> Result<B
         memo: None,
     };
     ic_cdk::call::<(TransferArg,), (Result<BlockIndex, TransferError>,)>(
-        Principal::from_text(alex_canister_id).expect("Could not decode the principal."),
+        Principal::from_text(ALEX_CANISTER_ID).expect("Could not decode the principal."),
         "icrc1_transfer",
         (transfer_args,),
     )
@@ -202,7 +190,7 @@ async fn mint_ALEX_internal(minted_alex: u64, destinaion: Principal) -> Result<B
 fn init() {
     ALLOWED_CALLERS.with(|users| {
         users.borrow_mut().insert(
-            Principal::from_text(icp_swap_canister_id).expect("Could not decode the principal."),
+            Principal::from_text(ICP_SWAP_CANISTER_ID).expect("Could not decode the principal."),
         )
     });
 }

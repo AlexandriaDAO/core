@@ -29,7 +29,6 @@ const BurnSwap: React.FC<BurnSwapProps> = ({ actorSwap, actorLbry,isAuthenticate
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        dispatch(swapLbry({ actor: actorSwap, amount:"0.1".toString() }));
         dispatch(burnLbry({ actorSwap, actorLbry, amount: amountLBRY }))
     }
     const handleAmountLBRYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
