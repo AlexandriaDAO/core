@@ -31,5 +31,23 @@
   },
   "nft_manager": {
     "ic": "forhl-tiaaa-aaaak-qc7ga-cai"
+  },
+  "xrc": {
+    "ic": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
+  },
+  "vetkd": {
+    "ic": "be2us-64aaa-aaaaa-qaabq-cai"
+  },
+  "system_api": {
+    "ic": "s55qq-oqaaa-aaaaa-aaakq-cai"
+  },
+  "icp_ledger_canister": {
+    "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+  },
+  "alex_wallet": {
+    "ic": "br5f7-7uaaa-aaaaa-qaaca-cai"
+  },
+  "alex_librarian": {
+    "ic": "bd3sg-teaaa-aaaaa-qaaba-cai"
   }
 }
