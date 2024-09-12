@@ -68,15 +68,14 @@ dfx deploy system_api --specified-id s55qq-oqaaa-aaaaa-aaakq-cai
 dfx deploy alex_wallet
 
 
-# # # Now covered in constants.sh.
-# # Step 5: Configure Local Identities for token launches
-# dfx identity new minter --storage-mode plaintext
-# dfx identity use minter
-# export MINTER_ACCOUNT_ID=$(dfx ledger account-id)
-# export MINTER_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
-# dfx identity use default
-# export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
-# export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+# Step 5: Configure Local Identities for token launches
+dfx identity new minter --storage-mode plaintext
+dfx identity use minter
+export MINTER_ACCOUNT_ID=$(dfx ledger account-id)
+export MINTER_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+dfx identity use default
+export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
+export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 
 
 # Step 6: Deploy the ICP & ICRC Ledger with LICP, LBRY, and ALEX tokens
@@ -141,8 +140,8 @@ record {
 })'
 
 
-echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."
-exit 1
+# echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."
+# exit 1
 
 # Step 7: Deploy frontend Manually.
 

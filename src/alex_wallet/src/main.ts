@@ -4,7 +4,7 @@ import { Canister, ic, Result, Void } from 'azle/src/lib';
 import { Node as TypeNode } from '../../../src/declarations/alex_librarian/alex_librarian.did';
 
 const librarianPrincipal = Principal.fromText('aax3a-h4aaa-aaaaa-qaahq-cai');
-const vetkdPrincipal = Principal.fromText('a4tbr-q4aaa-aaaaa-qaafq-cai')
+const vetkdPrincipal = Principal.fromText('a4tbr-q4aaa-aaaaa-qaafq-cai');
 
 // Define the Node struct
 const CandidNode = IDL.Record({
