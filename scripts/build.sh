@@ -153,3 +153,7 @@ touch .dfx/local/canisters/ALEX/ALEX.did
 npm i
 dfx deploy alex_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
 
+## Helpful extras for testing.
+# dfx ledger balance
+# dfx ledger transfer <to_account> --icp <amount> --memo 0
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal <principal>)

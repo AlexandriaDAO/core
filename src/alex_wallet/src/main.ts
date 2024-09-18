@@ -1,6 +1,6 @@
 import { caller, IDL, init, postUpgrade, Principal, query, toHexString, update, call } from 'azle';
 import { TypedEthereumSigner } from "arbundles";
-import { Canister, ic, Result, Void } from 'azle/src/lib';
+import { Canister, ic, Result, Void } from 'azle/experimental';
 import { Node as TypeNode } from '../../../src/declarations/alex_librarian/alex_librarian.did';
 
 const librarianPrincipal = Principal.fromText('aax3a-h4aaa-aaaaa-qaahq-cai');
@@ -132,26 +132,26 @@ export default class {
      }
 
 
-    @update([IDL.Text], IDL.Variant({
-        Ok: IDL.Text,
-        Err: IDL.Text
-    }))
-    async signData(txHash: string, node_id: string ): Promise<Result<string, string>> {
-        try {
-            ensureString(txHash)
-            const signer = await getSigner(node_id);
+    // @update([IDL.Text], IDL.Variant({
+    //     Ok: IDL.Text,
+    //     Err: IDL.Text
+    // }))
+    // async signData(txHash: string, node_id: string ): Promise<Result<string, string>> {
+    //     try {
+    //         ensureString(txHash)
+    //         const signer = await getSigner(node_id);
 
-            const convertedMsg = Buffer.from(txHash);
-            const signature = await signer.sign(convertedMsg);
-            const bSig = Buffer.from(signature);
-            const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString("hex");
+    //         const convertedMsg = Buffer.from(txHash);
+    //         const signature = await signer.sign(convertedMsg);
+    //         const bSig = Buffer.from(signature);
+    //         const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString("hex");
 
-            // Return the signature with no error
-            return { Ok: pad };
-        } catch (error) {
-            // Handle the error and return it
-            console.log('Error Signing: ', error);
-            return { Err: `Error Signing: ${error instanceof Error ? error.message : String(error)}` };
-        }
-    }
+    //         // Return the signature with no error
+    //         return { Ok: pad };
+    //     } catch (error) {
+    //         // Handle the error and return it
+    //         console.log('Error Signing: ', error);
+    //         return { Err: `Error Signing: ${error instanceof Error ? error.message : String(error)}` };
+    //     }
+    // }
 }
