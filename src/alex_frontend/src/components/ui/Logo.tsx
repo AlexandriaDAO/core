@@ -1,13 +1,24 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-function Logo() {
+interface LogoProps {
+  className?: string;
+}
+
+function Logo({ className = "" }: LogoProps) {
     const navigate = useNavigate();
-	return (
-        <span onClick={()=>navigate('/')} className="font-extrabold cursor-pointer text-white hover:text-[#8E8E8E] text-4xl leading-none font-syne">
-            UG
-        </span>
-	);
+    return (
+        <div
+            onClick={() => navigate('/whitepaper')}
+            className={`cursor-pointer hover:opacity-80 ${className}`}
+        >
+            <img
+                src="/images/logo.png"
+                alt="UG Logo"
+                className="h-8 w-auto"
+            />
+        </div>
+    );
 }
 
 export default Logo;
