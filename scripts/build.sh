@@ -6,8 +6,8 @@ set -x
 cp dfx_local.json dfx.json
 
 # # Step 1: Start dfx
-# dfx stop
-# dfx start --background --clean
+dfx stop
+dfx start --background --clean
 
 # Step 2: II Canister
 dfx deps pull

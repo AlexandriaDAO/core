@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import MainLayout from "@/layouts/MainLayout";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 interface App {
   name: string;
@@ -19,10 +20,17 @@ const apps: App[] = [
 
 const HomePage: React.FC = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const { user } = useAppSelector((state) => state.auth);
 
   const handleDiscover = () => {
     setIsPanelOpen(true);
   };
+
+  useEffect(() => {
+    if (user) {
+      setIsPanelOpen(true);
+    }
+  }, [user]);
 
   return (
     <MainLayout>
