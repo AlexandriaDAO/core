@@ -11,7 +11,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { setSearchTerm } from "@/features/portal/portalSlice";
 
-function BookPortalPage() {
+function Bibliotheca() {
 
     const dispatch = useAppDispatch();
     const {searchTerm, books} = useAppSelector(state=>state.portal)
@@ -47,4 +47,4 @@ function BookPortalPage() {
         </MainLayout>
     );
 }
-export default BookPortalPage;
+export default Bibliotheca;

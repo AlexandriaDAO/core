@@ -9,7 +9,7 @@ function Logo({ className = "" }: LogoProps) {
     const navigate = useNavigate();
     return (
         <div
-            onClick={() => navigate('/whitepaper')}
+            onClick={() => navigate('/')}
             className={`cursor-pointer hover:opacity-80 ${className}`}
         >
             <img
