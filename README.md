@@ -1,35 +1,3 @@
-### Latest network deploy: 
-08/10/24
-
-## Running the project locally
-
-run `./scripts/build.sh`
-
-For frontend only: `npm run dev`
-
-Or on mainnet: Switch canister_ids.json with your own canisters and run `./scripts/network_build.sh`
-
-#### Common Prerequisites if this fails:
-(Linux)
-- Install DFX: `sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)`
-- Install NVM: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash` | `nvm install --lts`
-- Install Node & NPM: `sudo apt install nodejs npm`
-- Update them: `sudo apt-get update
-sudo apt-get upgrade nodejs`
-- Ensure the latest versions: `nvm install --lts`
-- Install Cargo: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-- Add wasm: `rustup target add wasm32-unknown-unknown`
-- If in a new rust env: `Sudo apt install build-essential`
-
-motoko stuff:
-- https://mops.one/docs/install
-- npm i -g ic-mops
-
-install azle: [latest instructions](https://demergent-labs.github.io/azle/get_started.html#installation)
-- `DFX_VERSION=0.22.0 sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"`
-- `npx azle install-dfx-extension`
-
-
 # Alexandria WhitePaper
 
 > *"There are lots of entrepreneurs and investors that want to build interesting new services. The problem is, often times those interesting new internet services would depend upon content, functionality, and user data that exists inside of proprietary services, owned and controlled by Big Tech."*
@@ -71,23 +39,23 @@ install azle: [latest instructions](https://demergent-labs.github.io/azle/get_st
 
 ## Introduction
 
-The Internet has come to rely almost exclusively on Big Tech services as its information aggregators. This tweet sums up the daily effect we feel from this:
+The Internet has come to rely almost exclusively on Big Tech services as its information aggregators. This tweet sums up the daily effects we feel from this:
 
 https://x.com/Noahpinion/status/1818776478315954200
 
-The Static Web1 that was supposed to unlock the worlds information became buried by the Social Web2, sending 95-99% of digital content to the ‘deep web’ where it's inaccessible through conventional means. Today, digital content that isn’t (1) search-engine optimized, (2) open-access, and (3) brand new, is basically forever lost.
+The Static Web1 that was supposed to unlock the worlds information became buried by the Social Web2, sending 95-99% of digital content to the ‘deep web’ where it's inaccessible through conventional means, and force feeding the rest of it to us with black-box algorithms designed for addiction. Today, digital content that isn’t (1) search-engine optimized, (2) open-access, ***and*** (3) brand new, is basically lost forever.
 
 This paradigm stems from an ownership problem. Search engines don’t actually own what they point to, nor social platforms what they display or cloud providers what they host. Yet, their survival dpends on leveraging data as their own.
 
 Web3 is the vision of an Internet where everything digital is owned by someone. This has been achieved for money, e.g., Bitcoin; and to some extent for art with NFTs, but nowhere else.
 
-To give true ownership to a peice of content, you basically need to keep the original fixed supply of one while being able to distribute it infinitely. This requires that you recreate the search, social, and hosting elements around making use of that original copy—so that’s what we’re doing.
+To give true ownership to a peice of content, you basically need to keep the original fixed supply of one while being able to distribute it infinitely. This requires that you recreate the Web2 search, social, and hosting building blocks for Web3—so that’s what we’re doing.
 
 Alexandria is a library in cypherspace with all its information owned by individuals in the network, much like Bitcoin except for generic content instead of money. This begins with ebooks being owned and used as NFTs, but continues with any file type (video, audio, etc.), used in a suite of Open Internet Services.
 
 ## Overview
 
-Alexandria quite literally strives to be the world's largest public library. At its core, anyone can come in and put a book on the shelf (or movie, song, podcast, etc.) and anyone else can come pick it up.
+Alexandria quite literally strives to be the world's largest public library. At its core, anyone can come in and put a book on the shelf (or movie, image, song, podcast, etc.) and anyone else can come pick it up.
 
 As a Web3 library though, there are a few differences. Every book is guaranteed to last 'forever', and the upper limit on the number of books is infinity, so you'll likely not want to spend time in the main library, lest you never find what you're looking for.
 
@@ -561,10 +529,39 @@ Alexandria is a universal content bed for the internet. While the world works to
 
 
 
+# Part 6: Contributing (for devs only)
+
+The remander of this paper is for guidelines for open-source contributors.
+
+## Deploy locally
+
+#### Latest network deploy: 08/10/24
+
+run `./scripts/build.sh`
+
+For frontend only: `npm run dev`
+
+Or on mainnet: Switch canister_ids.json with your own canisters and run `./scripts/network_build.sh`
+
+#### Common Prerequisites if this fails:
+(Linux)
+- Install DFX: `sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)`
+- Install NVM: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash` | `nvm install --lts`
+- Install Node & NPM: `sudo apt install nodejs npm`
+- Update them: `sudo apt-get update
+sudo apt-get upgrade nodejs`
+- Ensure the latest versions: `nvm install --lts`
+- Install Cargo: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+- Add wasm: `rustup target add wasm32-unknown-unknown`
+- If in a new rust env: `Sudo apt install build-essential`
+- Install Motoko: https://mops.one/docs/install && npm i -g ic-mops
+- Install azle: [latest instructions](https://demergent-labs.github.io/azle/get_started.html#installation) | `DFX_VERSION=0.22.0 sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"` & `npx azle install-dfx-extension`
+
 
 
 ## Patterns and Standards (for contributions)
 
+Please follow these if you add stuff.
 
 ### Accessing a new Canister from the Frontend.
 
@@ -602,4 +599,43 @@ some_function(alex_principal(): Principal) {
 
 Rationale: This methodology is the most consise, and having all the canister ids in each Lib.rs immediately tells you what canisters it interacts with.
 
+### Adding an app.
 
+Add a `src/apps/your_app_name/index.tsx, and keep all supporting components in the apps folder. Eventually the good apps may move to different repos/subdomains, so the logic must be standalone. For this reason it's better to have duplicate code, that reusing/relying on parts of the main app which might have to be moved.
+
+
+
+
+
+#### Distinguishing Blocks/Channels, NFTs & SBTs.
+
+Looks like we've actually already figured this out.
+
+Blocks are NFTs, Channels are SBTs.
+
+So we'll have to make the Arweave Uploads more Generic. The app has to handle lots of different rendering methods, so we'll have the uploader preview how it displays in the block before uploading.
+
+It's free to create a channel and you can make money from it, but to add a block to the channel you must pay that block.
+
+Next steps - Let's just worry about making blocks and channels, not the experience yet.
+
+Primatives for Uploader in Main Pager:
+
+  Minting NFTs:
+  - Upload a file, pre-rendering he block visually.
+    - Mints as Auto-Verified: .png, .jpg, .gif, .md
+    - Mints as Unverified: .epub, video-files, audio-files.
+  - Configure the cost to upload, and mint the nft.
+  - Perfect the NFT/DAO canister to get it handling this kind of thing.
+
+  Minting SBTs (paying an nft for the right to use it as your own):
+  - A simple list of NFT ids that are assigned to you in a b-tree map. We'll make a separate SBT canister for this.
+    - You can use them forever and add them to channels and stuff later.
+
+Rules of engaagment for experience stuff:
+  - You pay the NFT to make it your own SBT.
+    - Benefits: 
+      - You can use it in your own profiles (e.g., channels)
+      - Adding content to your proifile make it more discoverable, more money making opportunity.
+      - Downloads to local as part of your personal data.
+  - You use SBTs (and your own NFTs) as blocks in your own channels.

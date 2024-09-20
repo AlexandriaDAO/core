@@ -117,6 +117,7 @@
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "5.6.0",
     "https-browserify": "^1.0.0",
+    "mops": "^3.0.2",
     "os-browserify": "^0.3.0",
     "postcss-loader": "^8.1.1",
     "postcss-nested": "^6.2.0",

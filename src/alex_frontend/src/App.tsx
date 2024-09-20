@@ -20,6 +20,8 @@ import Dialectica from "./apps/Dialectica";
 import Alexandrian from "./apps/Alexandrian";
 import Emporium from "./apps/Emporium";
 
+import MintPage from "./pages/MintPage";
+
 export default function App() {
     return (
         <ReduxProvider>
@@ -42,6 +44,9 @@ export default function App() {
                                 <Route path="/app/dialectica" element={<Dialectica />} />
                                 <Route path="/app/alexandrian" element={<Alexandrian />} />
                                 <Route path="/app/emporium" element={<Emporium />} />
+
+                                {/* experimental/temporary */}
+                                <Route path="/mint" element={<MintPage />} />
                             </Routes>
                     </AuthProvider>
                 </BrowserRouter>

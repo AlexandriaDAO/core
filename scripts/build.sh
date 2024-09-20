@@ -56,8 +56,8 @@ candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/ve
 
 cargo update
 
-dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
+dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
 dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 
