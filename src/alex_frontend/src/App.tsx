@@ -4,15 +4,23 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ReduxProvider from "./providers/ReduxProvider";
 import { AuthProvider } from "./contexts/AuthContext";
 
-import Layout from "./pages/Layout";
 import HomePage from "./pages/HomePage";
 import "./styles/tailwind.css";
-import BookPortalPage from "./pages/BookPortalPage";
 import ManagerPage from "./pages/ManagerPage";
 import SessionProvider from "./providers/SessionProvider";
 import FundNodePage from "./pages/FundNodePage";
 import SwapPage from "./pages/swap";
 import LibrarianPage from "./pages/LibrarianPage";
+import WhitepaperPage from "./pages/WhitepaperPage";
+
+import Bibliotheca from "./apps/Bibliotheca";
+import Syllogos from "./apps/Syllogos";
+import Lexigraph from "./apps/Lexigraph";
+import Dialectica from "./apps/Dialectica";
+import Alexandrian from "./apps/Alexandrian";
+import Emporium from "./apps/Emporium";
+
+import MintPage from "./pages/MintPage";
 
 export default function App() {
     return (
@@ -21,13 +29,24 @@ export default function App() {
                 <BrowserRouter>
                     <AuthProvider>
                             <Routes>
-                                <Route path="*" element={<Layout />} />
+                                {/* <Route path="*" element={<Layout />} /> */}
                                 <Route path="/" element={<HomePage />} />
-                                <Route path="/book-portal" element={<BookPortalPage />} />
                                 <Route path="/manager" element={<ManagerPage />} />
                                 <Route path="/fund-node" element={<FundNodePage />} />
                                 <Route path="/swap" element={<SwapPage />} />
                                 <Route path="/librarian" element={<LibrarianPage />} />
+                                <Route path="/whitepaper" element={<WhitepaperPage />} />
+
+                                {/* App routes */}
+                                <Route path="/app/bibliotheca" element={<Bibliotheca />} />
+                                <Route path="/app/syllogos" element={<Syllogos />} />
+                                <Route path="/app/lexigraph" element={<Lexigraph />} />
+                                <Route path="/app/dialectica" element={<Dialectica />} />
+                                <Route path="/app/alexandrian" element={<Alexandrian />} />
+                                <Route path="/app/emporium" element={<Emporium />} />
+
+                                {/* experimental/temporary */}
+                                <Route path="/mint" element={<MintPage />} />
                             </Routes>
                     </AuthProvider>
                 </BrowserRouter>

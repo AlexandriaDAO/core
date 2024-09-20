@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import MainLayout from "@/layouts/MainLayout";
+import AppLayout from "@/layouts/AppLayout";
 import { IoIosSearch } from "react-icons/io";
 import PortalType from "@/features/portal-type";
 import PortalLanguage from "@/features/portal-language";
@@ -11,13 +11,13 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { setSearchTerm } from "@/features/portal/portalSlice";
 
-function BookPortalPage() {
+function Bibliotheca() {
 
     const dispatch = useAppDispatch();
     const {searchTerm, books} = useAppSelector(state=>state.portal)
 
     return (
-        <MainLayout>
+        <AppLayout>
             <div className="flex-grow p-6">
                 <div className="flex justify-between items-center gap-4 font-roboto-condensed text-black">
                     <div className="basis-1/2 border-b border-solid border-gray-500 flex items-center gap-2 py-1">
@@ -44,7 +44,7 @@ function BookPortalPage() {
                 <Portal />
             </div>
 
-        </MainLayout>
+        </AppLayout>
     );
 }
-export default BookPortalPage;
+export default Bibliotheca;

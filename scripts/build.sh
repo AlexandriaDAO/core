@@ -6,8 +6,8 @@ set -x
 cp dfx_local.json dfx.json
 
 # # Step 1: Start dfx
-# dfx stop
-# dfx start --background --clean
+dfx stop
+dfx start --background --clean
 
 # Step 2: II Canister
 dfx deps pull
@@ -56,8 +56,8 @@ candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/ve
 
 cargo update
 
-dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
+dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
 dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 
@@ -157,3 +157,6 @@ dfx deploy alex_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
 # dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal <principal>)
+
+# Copy README.md to public directory
+cp README.md src/alex_frontend/public/
