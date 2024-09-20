@@ -22,7 +22,7 @@ const EngineBooks = () => {
 
     useEffect(() => {
 		// fetch once or when a new book is uploaded
-		if(books.length>0) return;
+		if(books.length>0 || !activeEngine) return;
         dispatch(fetchEngineBooks({
 			actorNftManager, engine: activeEngine
 		}));
@@ -39,7 +39,7 @@ const EngineBooks = () => {
 				</span>
 			</div> */}
 			<div className="flex flex-col gap-2">
-				{user == activeEngine && (
+				{user == activeEngine?.owner && (
 					<>
 						<span className="font-roboto-condensed text-base leading-[18px] text-black font-normal">
 							Add Book

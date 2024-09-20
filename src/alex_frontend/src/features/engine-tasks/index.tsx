@@ -1,11 +1,8 @@
 import useSession from "@/hooks/useSession";
-import { initializeClient } from "@/services/meiliService";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Table, message } from "antd";
-import MeiliSearch from "meilisearch";
 import React, { useEffect, useState } from "react";
 import { FiRefreshCcw } from "react-icons/fi";
-import { ImSpinner8 } from "react-icons/im";
 import { MdOutlineClear } from "react-icons/md";
 import { VscClearAll } from "react-icons/vsc";
 const columns = [
@@ -43,7 +40,7 @@ const EngineTasks = () => {
 			if(!meiliClient) throw new Error('Client not available');;
 
 
-			await meiliClient.deleteTasks({ uids: selectedRowKeys, indexUids:[activeEngine] });
+			await meiliClient.deleteTasks({ uids: selectedRowKeys, indexUids:[activeEngine.index] });
 
 			fetchTasks();
 		} catch (ex) {
@@ -59,7 +56,7 @@ const EngineTasks = () => {
 
 			await meiliClient.deleteTasks({
 				uids: tasks.map((task: any) => task.uid),
-				indexUids: [activeEngine]
+				indexUids: [activeEngine.index]
 			});
 
 			fetchTasks();
@@ -77,7 +74,7 @@ const EngineTasks = () => {
 
 			if(!meiliClient) throw new Error('Client not available');;
 
-			const { results } = await meiliClient.getTasks({indexUids:[activeEngine]});
+			const { results } = await meiliClient.getTasks({indexUids:[activeEngine.index]});
 
 
 			setTasks(results);
@@ -115,7 +112,7 @@ const EngineTasks = () => {
 							? `Selected ${selectedRowKeys.length} items`
 							: ""}
 					</span>
-					{user == activeEngine && (
+					{user == activeEngine?.owner && (
 						<>
 							<div
 								onClick={clearSelectedTasks}

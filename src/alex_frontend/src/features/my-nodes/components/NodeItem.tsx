@@ -1,16 +1,9 @@
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect, useState } from "react";
 
 import { Node } from "../../../../../declarations/alex_librarian/alex_librarian.did";
 
-import { initializeClient } from "@/services/meiliService";
-import MeiliSearch from "meilisearch";
-import FundWithdraw from "@/features/irys/arweave-funder/FundWithdraw";
-import { Wallet, ethers } from "ethers";
 import { WebIrys } from "@irys/sdk";
 import { getSimpleWebIrys } from "../utils/irys";
-import { shorten } from "../utils/node";
 import { ImSpinner8 } from "react-icons/im";
 import { Tooltip, message } from "antd";
 import { CiCircleInfo } from "react-icons/ci";

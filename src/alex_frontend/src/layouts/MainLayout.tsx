@@ -1,11 +1,16 @@
 import React, { ReactNode, useEffect } from "react";
 import Header from "@/components/Header";
+import { ibe_encrypt } from "@/features/my-nodes/utils/node";
+import useSession from "@/hooks/useSession";
 // Define the type for the component's props
 interface MainLayoutProps {
 	children: ReactNode;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+	const {actorVetkd} = useSession();
+
+
 	useEffect(()=>{
 		// const wallet = require('ethers').Wallet.createRandom();
 		// const pvt = wallet.privateKey
@@ -25,6 +30,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
 		// console.log(wallet);
 		// console.log(wallet.address);
+
+
+		// ibe_encrypt(actorVetkd, '9k3ZRQbtB2CQ4pagHmYSuFQNEP4ePTIfpdt41aM4McY', 'ahw5u-keaaa-aaaaa-qaaha-cai').then(console.log)
 
 	},[])
 

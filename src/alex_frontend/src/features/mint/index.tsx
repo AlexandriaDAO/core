@@ -15,6 +15,9 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchEngineBooks from "../engine-books/thunks/fetchEngineBooks";
 import { PiUploadSimple } from "react-icons/pi";
 import { WebIrys } from "@irys/sdk";
+import SelectNode from "./SelectNode";
+import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
+
 
 const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_ID : process.env.REACT_LOCAL_APP_ID;
 
@@ -23,7 +26,7 @@ const Mint = () => {
 
 	const dispatch = useAppDispatch();
 
-	const { actorAlexWallet, actorAlexLibrarian, actorVetkd, actorIcrc7, actorNftManager, actor, meiliClient } = useSession();
+	const { actorAlexWallet, actorAlexLibrarian, actorIcrc7, actorNftManager, actor, meiliClient } = useSession();
 	const [bookLoadModal, setBookLoadModal] = useState(false);
 
 	const [file, setFile] = useState<File | undefined>(undefined);
@@ -36,6 +39,8 @@ const Mint = () => {
 	const [uploadStatus, setUploadStatus] = useState(0);
 
 	const [screen, setScreen] = useState(0);
+
+	const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 
 	const next = (step: any = null) => {
 		if (step) {
@@ -75,41 +80,46 @@ const Mint = () => {
 
 	const metadataRef = useRef<{ validateFields: () => boolean } | null>(null);
 
-  const validateSubmission = (): boolean => {
-	if (!APP_ID){
-		message.error("Application ID is not set.");
-		return false;
-	}
+	const validateSubmission = (): boolean => {
+		if (!APP_ID){
+			message.error("Application ID is not set.");
+			return false;
+		}
 
-    if (!file) {
-		message.error("Please upload a file");
-		return false;
-    }
+		if (!file) {
+			message.error("Please upload a file");
+			return false;
+		}
 
-    if (!metadataRef.current || !metadataRef.current.validateFields()) {
-		message.error("Please fill out all required metadata fields correctly");
-		return false;
-    }
+		if (!metadataRef.current || !metadataRef.current.validateFields()) {
+			message.error("Please fill out all required metadata fields correctly");
+			return false;
+		}
 
-    return true;
-  };
+		return true;
+	};
 
 	const handleSubmitClick = async () => {
-		if (!validateSubmission()) return;
+		if (!selectedNode) {
+			message.error("Please select a node");
+			return;
+		}
 
 		next();
 
 		try {
-			// pass selected node TODO
-			// right now it will error out
-			const irys = await getTypedIrys(actorAlexWallet);
+			if(!selectedNode) {
+				message.error("Please select a node");
+				return;
+			}
+			const irys = await getTypedIrys(actorAlexWallet, selectedNode.id);
 			const transactions = await createAllTransactions(irys);
 
 			await mintNFT(transactions.manifest.id);
 			await uploadToArweave(irys, transactions);
 
-			dispatch(fetchEngineBooks({ actorNftManager, engine: activeEngine }));
-      
+			if(activeEngine) dispatch(fetchEngineBooks({ actorNftManager, engine: activeEngine }));
+
 			setTimeout(() => next(3), 2000);
 		} catch (error) {
 			message.error(`Error: ${error}`);
@@ -259,9 +269,17 @@ const Mint = () => {
 						/>
 					)}
 
-					{screen == 2 && <Processing uploadStatus={uploadStatus} />}
+					{screen == 2 && (
+						<SelectNode
+						setSelectedNode={setSelectedNode}
+						selectedNode={selectedNode}
+						/>
+					)}
 
-					{screen == 3 && <Status />}
+
+					{screen == 3 && <Processing uploadStatus={uploadStatus} />}
+
+					{screen == 4 && <Status />}
 
 					{/* sticky footer  */}
 					<Footer
@@ -270,6 +288,7 @@ const Mint = () => {
 						prev={prev}
 						handleSubmitClick={handleSubmitClick}
 						handleCancel={handleCancel}
+						validateSubmission={validateSubmission}
 						file={file}
 					/>
 				</main>

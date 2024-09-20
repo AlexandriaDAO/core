@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { initializeClient } from "@/services/meiliService";
 import EngineBooks from "../engine-books";
 import EngineFilters from "../engine-filters";
 import EngineTasks from "../engine-tasks";
@@ -21,32 +20,25 @@ function EngineOverview() {
 
     const { user } = useAppSelector(state => state.auth);
 
-    // useEffect(()=>{
-    //     const init = async ()=>{
-    //         const client = await initializeClient(activeEngine?.host, activeEngine?.key)
-    //     }
-    //     init();
-    // },[])
-
 	const handleTabClick = (t: EngineOverviewTab): void => {
 		dispatch(setActiveTab(t));
 	};
 
     const handleEngineOverviewCloseClick = ()=>{
-        dispatch(setActiveEngine(''))
+        dispatch(setActiveEngine(null))
     }
 
-    // const handleMoveToDraftClick = ()=>{
-    //     if(activeEngine){
-    //         dispatch(updateEngineStatus({actor, engineId: activeEngine.id, status: EngineStatus.Draft}))
-    //     }
-    // }
+    const handleMoveToDraftClick = ()=>{
+        if(activeEngine){
+            dispatch(updateEngineStatus({actor, engineId: activeEngine.id, status: EngineStatus.Draft}))
+        }
+    }
 
-    // const handlePublishEngine = ()=>{
-    //     if(activeEngine){
-    //         dispatch(updateEngineStatus({actor, engineId: activeEngine.id, status: EngineStatus.Published}))
-    //     }
-    // }
+    const handlePublishEngine = ()=>{
+        if(activeEngine){
+            dispatch(updateEngineStatus({actor, engineId: activeEngine.id, status: EngineStatus.Published}))
+        }
+    }
 
 
     const renderTabContent = () => {
@@ -76,7 +68,7 @@ function EngineOverview() {
                         )}
                     </div>
                     <div className="flex gap-1 items-center">
-                        {/* {user && user == activeEngine?.owner && <>
+                        {user && user == activeEngine?.owner && <>
                             { activeEngine?.status && 'Published' in activeEngine.status &&
                                 <button
                                     disabled={loading}
@@ -95,7 +87,7 @@ function EngineOverview() {
                                     Publish Engine
                                 </button>
                             }
-                        </>} */}
+                        </>}
                         <button
                             onClick={handleEngineOverviewCloseClick}
                             className="font-roboto-condensed text-base leading-[18px] font-normal text-gray-400 hover:text-gray-700 transition-all duration-100"
@@ -114,21 +106,21 @@ function EngineOverview() {
                         </span>
                     </div>
                     <div className="flex gap-[5vw] justify-between border-t border-solid border-black py-6">
-                        {/* <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2">
                             <span className="font-roboto-condensed text-base leading-[18px] font-normal">
                                 Created by
                             </span>
                             <span className="font-roboto-condensed text-base leading-[18px] font-medium">
                                 {activeEngine?.owner.slice(0, 5) + '...' + activeEngine?.owner.slice(-3)}
                             </span>
-                        </div> */}
+                        </div>
 
                         <div className="flex flex-col gap-2">
                             <span className="font-roboto-condensed text-base leading-[18px] font-normal">
                                 Index
                             </span>
                             <span className="font-roboto-condensed text-base leading-[18px] font-medium">
-                                {activeEngine}
+                                {activeEngine?.index}
                             </span>
                         </div>
 
@@ -159,7 +151,7 @@ function EngineOverview() {
                             </span>
                         </div>
 
-                        {/* <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2">
                             <span className="font-roboto-condensed text-base leading-[18px] font-normal">
                                 Status
                             </span>
@@ -179,7 +171,7 @@ function EngineOverview() {
                                     </span>
                                 </div>
                             }
-                        </div> */}
+                        </div>
                     </div>
                 </div>
                 <div className="flex gap-2 justify-start items-center">

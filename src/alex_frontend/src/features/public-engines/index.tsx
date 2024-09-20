@@ -2,51 +2,62 @@ import React, { useEffect, useState } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { IoIosSearch } from "react-icons/io";
 import useSession from "@/hooks/useSession";
-import { ConfigProvider, message, Table } from "antd";
+import { ConfigProvider, Table, TableColumnsType } from "antd";
 import EngineItemAction from "./components/EngineItemAction";
+import { Engine } from "../../../../../src/declarations/alex_backend/alex_backend.did";
+
 import './styles/table.module.css';
 import { Index } from "meilisearch";
-const columns = [
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import fetchPublicEngines from "./thunks/fetchPublicEngines";
+const columns: TableColumnsType<Engine> = [
 	{
-		title: "Engines",
-		key: "uid",
-		render: (_:any, record:Index)=> <span>{record.uid}</span>
+		title: "Name",
+		dataIndex: "title",
+		key: "title",
 	},
 	{
-		title: "",
+		title: "Creator",
+		key: "owner",
+		render: (_:any, record:Engine)=> <span>{record.owner.slice(0, 5) + '...' + record.owner.slice(-3)}</span>
+	},
+	{
+		title: "Actions",
 		key: "actions",
-		render: (_:any, record:Index) => <EngineItemAction engine={record.uid}/>,
+		align: "center",
+		render: (_:any, record:Engine) => <EngineItemAction engine={record}/>,
 	},
 ];
 function PublicEngines() {
-	const { meiliClient } = useSession();
+	const { actor } = useSession();
+	const dispatch = useAppDispatch();
 
-	const [engines, setEngines] = useState<Index<Record<string, any>>[]>([])
+	const { engines, loading } = useAppSelector((state) => state.publicEngines);
 
-	const { user } = useAppSelector((state) => state.auth);
+	useEffect(() => {
+		dispatch(fetchPublicEngines(actor));
+	}, [actor]);
 
-	const [loading, setLoading] = useState(true);
+	// useEffect(()=>{
+	// 	if(!meiliClient) return;
+	// 	const fetchEngines = async()=>{
+	// 		try{
+	// 			setLoading(true);
+	// 			setEngines([]);
 
-	useEffect(()=>{
-		if(!meiliClient) return;
-		const fetchEngines = async()=>{
-			try{
-				setLoading(true);
-				setEngines([]);
+	// 			const {results} = await meiliClient.getIndexes();
 
-				const {results} = await meiliClient.getIndexes();
+	// 			if(user) setEngines(results.filter(index=>index.uid !== user))
+	// 			else setEngines(results);
 
-				if(user) setEngines(results.filter(index=>index.uid !== user))
-				else setEngines(results);
-
-			}catch(ex){
-				message.error("Error fetching filters" + ex)
-			}finally{
-				setLoading(false)
-			}
-		}
-		fetchEngines();
-	},[user, meiliClient])
+	// 		}catch(ex){
+	// 			message.error("Error fetching filters" + ex)
+	// 		}finally{
+	// 			setLoading(false)
+	// 		}
+	// 	}
+	// 	fetchEngines();
+	// },[user, meiliClient])
 
 
 	return (
@@ -82,7 +93,7 @@ function PublicEngines() {
 						loading={loading}
 						dataSource={engines}
 						columns={columns}
-						rowKey="uid"
+						rowKey="id"
 						size="middle"
 					/>
 				</ConfigProvider>

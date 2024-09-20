@@ -16,6 +16,7 @@ use crate::utility::{IBECiphertext, TransportSecretKey};
 
 const VETKD_SYSTEM_API_CANISTER_ID: &str = "s55qq-oqaaa-aaaaa-aaakq-cai";
 const ALEX_WALLET_CANISTER_ID: &str = "ajuq4-ruaaa-aaaaa-qaaga-cai";
+const FRONTEND_CANISTER_ID: &str = "ahw5u-keaaa-aaaaa-qaaha-cai";
 
 #[update]
 pub async fn encryption_key() -> String {
@@ -111,10 +112,9 @@ pub async fn wbe_decrypt(encoded: String) -> Result<String, String> {
 
 
 async fn encrypted_wbe_decryption_key(encryption_public_key: Vec<u8>) -> String {
-    debug_println_caller("encrypted_ibe_decryption_key_for_caller");
+    debug_println_caller("encrypted_wbe_decryption_key_for_caller");
 
     let request = VetKDEncryptedKeyRequest {
-        // derivation_id: ic_cdk::caller().as_slice().to_vec(),
         derivation_id: alex_wallet_canister_id().as_slice().to_vec(),
         public_key_derivation_path: vec![b"encryption_key".to_vec()],
         key_id: bls12_381_test_key_1(),
@@ -133,6 +133,31 @@ async fn encrypted_wbe_decryption_key(encryption_public_key: Vec<u8>) -> String 
 }
 
 
+#[update]
+pub async fn encrypted_ibe_decryption_key(encryption_public_key: Vec<u8>) -> String {
+    debug_println_caller("encrypted_ibe_decryption_key_for_caller");
+
+    let request = VetKDEncryptedKeyRequest {
+        // derivation_id: ic_cdk::caller().as_slice().to_vec(),
+        derivation_id: frontend_canister_id().as_slice().to_vec(),
+        public_key_derivation_path: vec![b"encryption_key".to_vec()],
+        key_id: bls12_381_test_key_1(),
+        encryption_public_key,
+    };
+
+    let (response,): (VetKDEncryptedKeyReply,) = ic_cdk::api::call::call(
+        vetkd_system_api_canister_id(),
+        "vetkd_encrypted_key",
+        (request,),
+    )
+    .await
+    .expect("call to vetkd_encrypted_key failed");
+
+    hex::encode(response.encrypted_key)
+}
+
+
+
 fn bls12_381_test_key_1() -> VetKDKeyId {
     VetKDKeyId {
         curve: VetKDCurve::Bls12_381,
@@ -148,6 +173,9 @@ fn alex_wallet_canister_id() -> CanisterId {
     CanisterId::from_str(ALEX_WALLET_CANISTER_ID).expect("failed to create canister ID")
 }
 
+fn frontend_canister_id() -> CanisterId {
+    CanisterId::from_str(FRONTEND_CANISTER_ID).expect("failed to create canister ID")
+}
 
 fn debug_println_caller(method_name: &str) {
     ic_cdk::println!(

@@ -1,3 +1,4 @@
+import { message } from "antd";
 import React from "react";
 
 const Footer = ({
@@ -5,6 +6,7 @@ const Footer = ({
 	next,
 	prev,
 	handleSubmitClick,
+	validateSubmission,
 	handleCancel,
 	file,
 }: any) => {
@@ -28,6 +30,30 @@ const Footer = ({
 				<div className="flex justify-start gap-2 items-center">
 					<button
 						type="button"
+						onClick={()=>{
+							if(validateSubmission()){
+								next()
+							}
+						}}
+						className="rounded px-3 py-1 bg-blue-700 hover:bg-blue-500 text-white focus:shadow-outline focus:outline-none"
+					>
+						Next
+					</button>
+
+					<button
+						type="button"
+						onClick={() => prev()}
+						className="rounded px-3 py-1 bg-blue-700 hover:bg-blue-500 text-white focus:shadow-outline focus:outline-none"
+					>
+						Go Back
+					</button>
+				</div>
+			)}
+
+			{screen == 2 && (
+				<div className="flex justify-start gap-2 items-center">
+					<button
+						type="button"
 						onClick={handleSubmitClick}
 						className="rounded px-3 py-1 bg-blue-700 hover:bg-blue-500 text-white focus:shadow-outline focus:outline-none"
 					>
@@ -44,7 +70,7 @@ const Footer = ({
 				</div>
 			)}
 
-			{screen == 3 && (
+			{screen == 4 && (
 				<button
 					type="button"
 					onClick={() => window.location.reload()}

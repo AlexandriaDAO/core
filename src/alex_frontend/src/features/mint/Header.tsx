@@ -5,12 +5,14 @@ const Header = ({ screen }: any) => {
 	return (
 		<header className="p-4">
 			<Steps
+				size="small"
 				current={screen}
 				items={[
-					{ title: "Upload File" },
+					{ title: "Upload" },
 					{ title: "Metadata" },
-					{ title: "Processing" },
-					{ title: "Success" },
+					{ title: "Node" },
+					{ title: "Process" },
+					{ title: "Finalize" },
 				]}
 			/>
 		</header>
