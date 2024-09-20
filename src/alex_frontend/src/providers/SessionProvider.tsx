@@ -9,16 +9,17 @@ import { initializeClient, initializeIndex } from '@/services/meiliService';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import principal from '@/features/auth/thunks/principal';
 import fetchBooks from '@/features/portal/thunks/fetchBooks';
-import { initializeActor, 
-    initializeIcrc7Actor, 
-    initializeNftManagerActor, 
+import { initializeActor,
+    initializeIcrc7Actor,
+    initializeNftManagerActor,
     initializeActorSwap,
-    initializeIcpLedgerActor, 
-    initializeLbryActor, 
+    initializeIcpLedgerActor,
+    initializeLbryActor,
     initializeTokenomicsActor,
     initializeAlexActor,
-	  initializeActorAlexLibrarian,
-	  initializeActorAlexWallet
+	initializeActorAlexLibrarian,
+	initializeActorAlexWallet,
+	initializeActorVetkd
 } from '@/features/auth/utils/authUtils';
 import { icrc7 } from '../../../declarations/icrc7';
 import { nft_manager } from '../../../declarations/nft_manager';
@@ -30,7 +31,7 @@ import { ALEX } from '../../../declarations/ALEX';
 import { alex_librarian } from '../../../declarations/alex_librarian';
 import { createActor as createAlexWalletActor, canisterId as alexWalletCanisterId }  from '../../../declarations/alex_wallet';
 import { vetkd } from '../../../declarations/vetkd';
-
+import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
 
 
 interface SessionProviderProps {
@@ -42,6 +43,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const dispatch = useAppDispatch();
 	const { user } = useAppSelector(state => state.auth);
 	const { books } = useAppSelector(state => state.portal);
+	const {engines} = useAppSelector(state=>state.myEngines)
 
 	const [actor, setActor] = useState(alex_backend);
 	const [actorAlexLibrarian, setActorAlexLibrarian] = useState(alex_librarian);
@@ -69,28 +71,36 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		const host = process.env.REACT_MEILI_HOST;
 		const key = process.env.REACT_MEILI_KEY;
 
-		const client = await initializeClient(host, key);
-		if(client){
-			const {results} = await client.getIndexes()
-			results.forEach(index=>{
-				client.deleteIndexIfExists(index.uid)
-			})
+		const client = await initializeClient(host, key, actorVetkd);
+		// if(client){
+		// 	const {results} = await client.getIndexes()
+		// 	results.forEach(index=>{
+		// 		client.deleteIndexIfExists(index.uid)
+		// 	})
+		// }
+		if(client) {
+			setMeiliClient(client)
+
+			const index = await initializeIndex(client, user || 'anonymous')
+			if (index) setMeiliIndex(index)
 		}
-		if(client) setMeiliClient(client)
 	}
 
+	// setup auth client and default meiliclient
 	useEffect(() => {
 		initializeAuthClient()
 		initializeMeiliClient()
 	}, [])
 
 
+	// setup user principal when user login/logout
 	useEffect(() => {
 		if (!authClient) return;
 
 		dispatch(principal(authClient))
 	}, [authClient])
 
+	// setup different canister actors
 	useEffect(()=>{
 		if(!authClient) return;
 
@@ -102,7 +112,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 
 			setActorAlexWallet(await initializeActorAlexWallet(authClient));
 
-			// ommiting vetkd authorization. no need
+			setActorVetkd(await initializeActorVetkd(authClient));
 
 			setActorSwap(await initializeActorSwap(authClient));
 
@@ -113,33 +123,54 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 			setActorLbry(await initializeLbryActor(authClient));
 
 			setActorAlex(await initializeAlexActor(authClient));
-        
-      setActorIcrc7(await initializeIcrc7Actor(authClient));
-        
-      setActorNftManager(await initializeNftManagerActor(authClient));
-        
+
+			setActorIcrc7(await initializeIcrc7Actor(authClient));
+
+			setActorNftManager(await initializeNftManagerActor(authClient));
+
 		}
 		setupActor();
 	},[user])
 
-	useEffect(() => {
-		setMeiliIndex(undefined)
-		if (!user || !meiliClient) return;
-
-		const setupMeiliIndex = async () => {
-
-			const index = await initializeIndex(meiliClient, user)
-
-			if (index) setMeiliIndex(index)
-		}
-		setupMeiliIndex();
-	}, [user, meiliClient])
-
 	// Load 10 books on app start.
 	useEffect(() => {
-    if(!actor) return;
-    dispatch(fetchBooks(actorNftManager));
-}, [actor, dispatch]);
+		if(!actorNftManager) return;
+		dispatch(fetchBooks(actorNftManager));
+
+	}, [actorNftManager, dispatch]);
+
+	// Load user engines when actor changes / when user logs in
+	useEffect(() => {
+		// fetch logged in user engines
+		if (actor!=alex_backend){
+			dispatch(fetchMyEngines(actor));
+		}
+	}, [actor, dispatch]);
+
+
+	// setup meilisearch client when user engines change
+	useEffect(()=>{
+		const setupMeili = async()=>{
+			const engineAvailable = engines.find(async (engine) => {
+				// if engines exist, initialize meilisearch client with engines host and key
+
+				const client = await initializeClient(engine.host, engine.key, actorVetkd);
+				if(!client) return false;
+				setMeiliClient(client)
+
+				const index = await initializeIndex(client, engine.index)
+				if(index) setMeiliIndex(index)
+
+				return true;
+			})
+
+			if(!engineAvailable){
+				initializeMeiliClient();
+			}
+		}
+		setupMeili();
+	},[engines])
+
 
 	return (
 		<SessionContext.Provider value={{ actor, actorAlexLibrarian, actorAlexWallet, actorVetkd, actorSwap,actorIcpLedger,actorTokenomics, actorLbry, actorAlex, actorIcrc7, actorNftManager,authClient, meiliClient, meiliIndex  }}>

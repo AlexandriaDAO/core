@@ -20,6 +20,7 @@ const transferICPFromUserWalletcanister = createAsyncThunk<
     let amountFormatted8s: bigint = BigInt(Math.floor(Number(amount) * 10 ** 8));
     let fee= BigInt(10000);
     amountFormatted8s=amountFormatted8s-fee;
+    //@ts-ignore
     const result = await actorSwap.transfer_from_user_wallet(amountFormatted8s,destination);
     if('Ok' in result) return "success";
     if('Err' in result) throw new Error(result.Err)

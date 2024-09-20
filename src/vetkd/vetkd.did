@@ -3,4 +3,5 @@ service : {
   encryption_key : () -> (text);
   greet : () -> (text) query;
   wbe_decrypt : (text) -> (Result);
+  encrypted_ibe_decryption_key : (vec nat8) -> (text);
 }

@@ -5,6 +5,7 @@ import authReducer from "@/features/auth/authSlice";
 import searchReducer from "@/features/search/searchSlice";
 import filterReducer from "@/features/filter/filterSlice";
 
+import myEnginesReducer from "@/features/my-engines/myEnginesSlice";
 import engineBooksReducer from "@/features/engine-books/engineBooksSlice";
 import publicEnginesReducer from "@/features/public-engines/publicEnginesSlice";
 import engineOverviewReducer from "@/features/engine-overview/engineOverviewSlice";
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
 	search: searchReducer,
 	filter: filterReducer,
 
+	myEngines: myEnginesReducer,
 	engineBooks: engineBooksReducer,
 	publicEngines: publicEnginesReducer,
 	engineOverview: engineOverviewReducer,

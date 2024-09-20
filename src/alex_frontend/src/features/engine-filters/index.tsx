@@ -1,8 +1,6 @@
 import useSession from "@/hooks/useSession";
-import { initializeClient } from "@/services/meiliService";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { message } from "antd";
-import MeiliSearch from "meilisearch";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { FiRefreshCcw } from "react-icons/fi";
 import { ImSpinner8 } from "react-icons/im";
@@ -41,7 +39,7 @@ const EngineFilters = () => {
 			if(!meiliClient) throw new Error('Client not available');;
 
 			const attributes = await meiliClient
-				.index(activeEngine)
+				.index(activeEngine.index)
 				.getFilterableAttributes();
 
 			setFilters(attributes);
@@ -63,7 +61,7 @@ const EngineFilters = () => {
 
 		if (meiliClient && activeEngine) {
 			await meiliClient
-				.index(activeEngine)
+				.index(activeEngine.index)
 				.updateFilterableAttributes(newFilters);
 			message.info("Update Filters task enqueued");
 			setFilters(newFilters);
@@ -74,7 +72,7 @@ const EngineFilters = () => {
 
 	const handleFilterReset = async () => {
 		if (meiliClient && activeEngine) {
-			await meiliClient.index(activeEngine).resetFilterableAttributes();
+			await meiliClient.index(activeEngine.index).resetFilterableAttributes();
 			message.info("Update Filters task enqueued");
 			setFilters([]);
 		} else {
@@ -90,7 +88,7 @@ const EngineFilters = () => {
 				</span>
 
 				<div className="flex items-center text-gray-500">
-					{user == activeEngine && (
+					{user == activeEngine?.owner && (
 						<div
 							onClick={handleFilterReset}
 							className="px-2 flex items-center gap-1 cursor-pointer hover:text-gray-800 transition-all duration-100 border-r border-gray-500"
@@ -116,7 +114,7 @@ const EngineFilters = () => {
 					</div>
 				</div>
 			</div>
-			{user == activeEngine &&
+			{user == activeEngine?.owner &&
 			<span className="p-4 font-roboto-condensed text-base leading-[18px] text-gray-500 hover:text-gray-800">
 				Filters can take time to update, Check Recent tasks for status.
 			</span>}
@@ -127,7 +125,7 @@ const EngineFilters = () => {
 					Object.entries(EngineFilter).map(([key, value]) => (
 						<label
 							key={key}
-							className={`${user == activeEngine ? 'cursor-pointer':'cursor-not-allowed'} flex items-center gap-2.5 font-roboto-condensed text-base font-normal ${
+							className={`${user == activeEngine?.owner ? 'cursor-pointer':'cursor-not-allowed'} flex items-center gap-2.5 font-roboto-condensed text-base font-normal ${
 								value ? "text-black" : "text-[#8E8E8E]"
 							}`}
 						>
@@ -135,9 +133,9 @@ const EngineFilters = () => {
 								className="w-5 h-5"
 								type="checkbox"
 								name={key}
-								readOnly={user != activeEngine}
+								readOnly={user != activeEngine?.owner}
 								checked={filters.includes(key)}
-								onChange={user == activeEngine ? handleFilterCheck : ()=>{}}
+								onChange={user == activeEngine?.owner ? handleFilterCheck : ()=>{}}
 							/>
 							<span>{value}</span>
 						</label>

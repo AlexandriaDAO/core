@@ -12,7 +12,8 @@ mod types;
 mod ibe;
 pub use ibe::{
     encryption_key,
-    wbe_decrypt
+    wbe_decrypt,
+    encrypted_ibe_decryption_key,
 };
 
 ic_cdk::export_candid!();

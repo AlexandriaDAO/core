@@ -3,9 +3,9 @@ import MainLayout from "@/layouts/MainLayout";
 import { MdEdit } from "react-icons/md";
 import { FaCopy } from "react-icons/fa";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import MyEngines from "@/features/my-engines";
 import EngineOverview from "@/features/engine-overview";
 import PublicEngines from "@/features/public-engines";
-import MyEngine from "@/components/MyEngine";
 import Librarian from "@/features/librarian";
 
 function ManagerPage() {
@@ -47,7 +47,7 @@ function ManagerPage() {
 					{
 						user !== "" && (
 							<>
-								<MyEngine />
+								<MyEngines />
 								<Librarian />
 							</>
 						)
