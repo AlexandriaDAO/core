@@ -14,7 +14,7 @@ use ic_cdk::api::management_canister::main::raw_rand;
 use crate::utility::{IBECiphertext, TransportSecretKey};
 
 
-const VETKD_SYSTEM_API_CANISTER_ID: &str = "s55qq-oqaaa-aaaaa-aaakq-cai";
+const SYSTEM_API_CANISTER_ID: &str = "xhfe4-aqaaa-aaaak-akv4q-cai";
 const ALEX_WALLET_CANISTER_ID: &str = "ajuq4-ruaaa-aaaaa-qaaga-cai";
 const FRONTEND_CANISTER_ID: &str = "ahw5u-keaaa-aaaaa-qaaha-cai";
 
@@ -28,7 +28,7 @@ pub async fn encryption_key() -> String {
     };
 
     let (response,): (VetKDPublicKeyReply,) = ic_cdk::api::call::call(
-        vetkd_system_api_canister_id(),
+        system_api_canister_id(),
         "vetkd_public_key",
         (request,),
     )
@@ -122,7 +122,7 @@ async fn encrypted_wbe_decryption_key(encryption_public_key: Vec<u8>) -> String 
     };
 
     let (response,): (VetKDEncryptedKeyReply,) = ic_cdk::api::call::call(
-        vetkd_system_api_canister_id(),
+        system_api_canister_id(),
         "vetkd_encrypted_key",
         (request,),
     )
@@ -165,8 +165,8 @@ fn bls12_381_test_key_1() -> VetKDKeyId {
     }
 }
 
-fn vetkd_system_api_canister_id() -> CanisterId {
-    CanisterId::from_str(VETKD_SYSTEM_API_CANISTER_ID).expect("failed to create canister ID")
+fn system_api_canister_id() -> CanisterId {
+    CanisterId::from_str(SYSTEM_API_CANISTER_ID).expect("failed to create canister ID")
 }
 
 fn alex_wallet_canister_id() -> CanisterId {

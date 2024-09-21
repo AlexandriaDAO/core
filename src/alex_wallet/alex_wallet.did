@@ -3,5 +3,4 @@ service: () -> {
     isUserAnonymous: () -> (bool) query;
     pubKey: (text) -> (variant {Ok:text; Err:text});
     setMessage: (text) -> ();
-    signData: (text) -> (variant {Ok:text; Err:text});
 }

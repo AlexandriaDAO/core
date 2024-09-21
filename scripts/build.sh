@@ -42,13 +42,9 @@ candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_s
 cargo build --release --target wasm32-unknown-unknown --package tokenomics
 candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
 
-
-
-
 # for alex_librarian
 cargo build --release --target wasm32-unknown-unknown --package alex_librarian
 candid-extractor target/wasm32-unknown-unknown/release/alex_librarian.wasm > src/alex_librarian/alex_librarian.did
-
 # for vetkd
 cargo build --release --target wasm32-unknown-unknown --package vetkd
 candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
@@ -63,9 +59,9 @@ dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 
 dfx deploy alex_librarian
 dfx deploy vetkd
-dfx deploy system_api --specified-id s55qq-oqaaa-aaaaa-aaakq-cai
+dfx deploy system_api --specified-id xhfe4-aqaaa-aaaak-akv4q-cai
 
-dfx deploy alex_wallet
+dfx deploy alex_wallet --specified-id ju4sh-3yaaa-aaaap-ahapa-cai
 
 
 # Step 5: Configure Local Identities for token launches
@@ -108,7 +104,7 @@ record {
      minting_account = record { owner = principal "'$(dfx canister id icp_swap)'" };
      transfer_fee = 4_000_000;
      metadata = vec {};
-     initial_balances = vec { record { record { owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'" }; 0 } };
+     initial_balances = vec {};
      archive_options = record {
          num_blocks_to_archive = 1000;
          trigger_threshold = 2000;
@@ -120,6 +116,9 @@ record {
  }
 })'
 
+
+
+
 dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '(variant { Init = 
 record {
      token_symbol = "ALEX";
@@ -127,7 +126,7 @@ record {
      minting_account = record { owner = principal "'$(dfx canister id tokenomics)'" };
      transfer_fee = 10_000;
      metadata = vec {};
-     initial_balances = vec { record { record { owner = principal "'${MINTER_ACCOUNT_PRINCIPAL}'" }; 0 } };
+     initial_balances = vec {};
      archive_options = record {
          num_blocks_to_archive = 1000;
          trigger_threshold = 2000;

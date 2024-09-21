@@ -3,8 +3,8 @@ import { TypedEthereumSigner } from "arbundles";
 import { Canister, ic, Result, Void } from 'azle/experimental';
 import { Node as TypeNode } from '../../../src/declarations/alex_librarian/alex_librarian.did';
 
-const librarianPrincipal = Principal.fromText('aax3a-h4aaa-aaaaa-qaahq-cai');
-const vetkdPrincipal = Principal.fromText('a4tbr-q4aaa-aaaaa-qaafq-cai');
+const librarianPrincipal = Principal.fromText('rby3s-dqaaa-aaaak-qizqa-cai');
+const vetkdPrincipal = Principal.fromText('fzemm-saaaa-aaaan-qlsla-cai');
 
 // Define the Node struct
 const CandidNode = IDL.Record({

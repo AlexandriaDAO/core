@@ -8,7 +8,7 @@ import HomePage from "./pages/HomePage";
 import "./styles/tailwind.css";
 import ManagerPage from "./pages/ManagerPage";
 import SessionProvider from "./providers/SessionProvider";
-import FundNodePage from "./pages/FundNodePage";
+// import FundNodePage from "./pages/FundNodePage";
 import SwapPage from "./pages/swap";
 import LibrarianPage from "./pages/LibrarianPage";
 import WhitepaperPage from "./pages/WhitepaperPage";
@@ -32,7 +32,7 @@ export default function App() {
                                 {/* <Route path="*" element={<Layout />} /> */}
                                 <Route path="/" element={<HomePage />} />
                                 <Route path="/manager" element={<ManagerPage />} />
-                                <Route path="/fund-node" element={<FundNodePage />} />
+                                {/* <Route path="/fund-node" element={<FundNodePage />} /> */}
                                 <Route path="/swap" element={<SwapPage />} />
                                 <Route path="/librarian" element={<LibrarianPage />} />
                                 <Route path="/whitepaper" element={<WhitepaperPage />} />

@@ -563,6 +563,12 @@ sudo apt-get upgrade nodejs`
 
 Please follow these if you add stuff.
 
+## Adding a New Canister.
+
+Please use the existing Typescript or Rust patterns in dfx.json.
+
+Always name the folder, and .did file the same canister name, e.g.,
+
 ### Accessing a new Canister from the Frontend.
 
 Add it to the following files with the existing patterns:
@@ -574,7 +580,7 @@ We use 2 patterns when calling actor functions: Implemented with `const { actor 
 
 todo before next push: Fix fetchBooks.ts, fetchEngineBooks.ts, and irys.tsx
 
-### Accessing canisters on the backend.
+### Referencing canisters on the backend.
 
 Use nft_manager/src/lib.rs as a reference.
 

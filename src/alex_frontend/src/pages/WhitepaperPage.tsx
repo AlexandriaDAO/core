@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import ReactMarkdown from 'react-markdown';
-import { Container, Grid } from 'semantic-ui-react';
 import 'github-markdown-css/github-markdown.css';
 
 function WhitepaperPage() {
@@ -16,21 +15,13 @@ function WhitepaperPage() {
 
 	return (
 		<MainLayout>
-			<Container fluid style={{ padding: '2rem 0', backgroundColor: 'black', minHeight: '100vh' }}>
-				<Grid centered>
-					<Grid.Column width={14} style={{ maxWidth: '1200px' }}>
-						<div className="markdown-body" style={{
-							color: '#c9d1d9',
-							padding: '2rem',
-							borderRadius: '8px',
-							backgroundColor: '#0d1117',
-							margin: '0 auto',
-						}}>
-							<ReactMarkdown>{whitepaper}</ReactMarkdown>
-						</div>
-					</Grid.Column>
-				</Grid>
-			</Container>
+			<div className="flex-grow bg-[#0d1117] p-4 md:p-8 overflow-auto">
+				<div className="max-w-4xl mx-auto">
+					<div className="markdown-body bg-[#161b22] text-[#c9d1d9] p-4 md:p-8 rounded-lg shadow-lg">
+						<ReactMarkdown>{whitepaper}</ReactMarkdown>
+					</div>
+				</div>
+			</div>
 		</MainLayout>
 	);
 }
