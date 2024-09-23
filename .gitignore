@@ -11,6 +11,9 @@
 .dfx/
 .dfx/local/
 
+# azle files
+.azle/
+
 # Mops packages
 .mops/
 

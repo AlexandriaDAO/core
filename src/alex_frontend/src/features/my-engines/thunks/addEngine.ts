@@ -39,8 +39,9 @@ const addEngine = createAsyncThunk<
 		{ rejectWithValue }
 	) => {
 		try {
+			const frontend_canister_id = process.env.CANISTER_ID_ALEX_FRONTEND!;
 
-			const encrypted_key = await ibe_encrypt(actorVetkd, key);
+			const encrypted_key = await ibe_encrypt(actorVetkd, key, frontend_canister_id);
 
 			const result = await actorAlexBackend.add_my_engine(title, host, encrypted_key, index, [status]);
 
