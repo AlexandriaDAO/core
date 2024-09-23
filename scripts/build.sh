@@ -2,6 +2,9 @@
 
 set -x 
 
+# Make mops accessible:
+echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
+
 #!/bin/bash
 cp dfx_local.json dfx.json
 
@@ -156,6 +159,3 @@ dfx deploy alex_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
 # dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal <principal>)
-
-# Copy README.md to public directory
-cp README.md src/alex_frontend/public/

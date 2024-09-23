@@ -36,3 +36,5 @@ deps
 data.ms
 
 keys.json
+
+node_repl_history

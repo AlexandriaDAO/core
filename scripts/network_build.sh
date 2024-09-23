@@ -1,6 +1,8 @@
 #!/bin/bash
 set -x 
 
+echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
+
 # (Re)Start dfx
 dfx stop
 dfx start --background --clean
