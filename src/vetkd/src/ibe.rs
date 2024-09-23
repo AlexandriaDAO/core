@@ -146,7 +146,7 @@ pub async fn encrypted_ibe_decryption_key(encryption_public_key: Vec<u8>) -> Str
     };
 
     let (response,): (VetKDEncryptedKeyReply,) = ic_cdk::api::call::call(
-        vetkd_system_api_canister_id(),
+        system_api_canister_id(),
         "vetkd_encrypted_key",
         (request,),
     )

@@ -1,5 +1,5 @@
 import { ActionReducerMapBuilder, PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Engine } from '../../../../declarations/ucg_backend/ucg_backend.did';
+import { Engine } from '../../../../declarations/alex_backend/alex_backend.did';
 import fetchMyEngines from "./thunks/fetchMyEngines";
 import { message } from "antd";
 import addEngine from "./thunks/addEngine";
