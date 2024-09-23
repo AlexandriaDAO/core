@@ -32,11 +32,10 @@ export const hexEncode = (bytes: Uint8Array): string => {
 };
 
 
+const frontend_canister_id = process.env.CANISTER_ID_ALEX_FRONTEND!;
 
-export const ibe_decrypt =	 async(actor: ActorSubclass<_SERVICE>, encoded:string)=> {
+export const ibe_decrypt =	 async(actor: ActorSubclass<_SERVICE>, encoded:string, receiver:string = frontend_canister_id)=> {
 	const vetkd = await import('ic-vetkd-utils');
-
-	const frontend_canister_id = process.env.CANISTER_ID_ALEX_FRONTEND!;
 
 	const tsk_seed = window.crypto.getRandomValues(new Uint8Array(32));
 	const tsk = new vetkd.TransportSecretKey(tsk_seed);

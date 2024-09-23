@@ -57,8 +57,8 @@ dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
 dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 
-dfx deploy alex_librarian
-dfx deploy vetkd
+dfx deploy alex_librarian --specified-id rby3s-dqaaa-aaaak-qizqa-cai
+dfx deploy vetkd --specified-id fzemm-saaaa-aaaan-qlsla-cai
 dfx deploy system_api --specified-id xhfe4-aqaaa-aaaak-akv4q-cai
 
 dfx deploy alex_wallet --specified-id ju4sh-3yaaa-aaaap-ahapa-cai

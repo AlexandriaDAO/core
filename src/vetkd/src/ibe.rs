@@ -15,8 +15,8 @@ use crate::utility::{IBECiphertext, TransportSecretKey};
 
 
 const SYSTEM_API_CANISTER_ID: &str = "xhfe4-aqaaa-aaaak-akv4q-cai";
-const ALEX_WALLET_CANISTER_ID: &str = "ajuq4-ruaaa-aaaaa-qaaga-cai";
-const FRONTEND_CANISTER_ID: &str = "ahw5u-keaaa-aaaaa-qaaha-cai";
+const ALEX_WALLET_CANISTER_ID: &str = "ju4sh-3yaaa-aaaap-ahapa-cai";
+const FRONTEND_CANISTER_ID: &str = "xo3nl-yaaaa-aaaap-abl4q-cai";
 
 #[update]
 pub async fn encryption_key() -> String {
@@ -146,7 +146,7 @@ pub async fn encrypted_ibe_decryption_key(encryption_public_key: Vec<u8>) -> Str
     };
 
     let (response,): (VetKDEncryptedKeyReply,) = ic_cdk::api::call::call(
-        vetkd_system_api_canister_id(),
+        system_api_canister_id(),
         "vetkd_encrypted_key",
         (request,),
     )
