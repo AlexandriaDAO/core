@@ -66,8 +66,17 @@ All of these can also be done in block ranges.
 
 
 
-### Results
+### Plan:
 
-For the asset itself:
+Done so far:
+- Get and display a list of books, with their date and tags.
 
-Tags: 
+Tomorrow:
+- Do the same for images, then audio, then video.
+- Modularize everything.
+
+After that:
+- Reintegrate the search bar, putting query paramters in the hands of the user.
+
+Eventually:
+- Configure the nft minting solution, where they can add their own stuff (plan what the are.na style app will look like).
