@@ -30,8 +30,6 @@ export default function ContentList({ transactions, onSelectEpub }: ContentListP
 	return (
 		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
 			{transactions.map((transaction) => {
-				const title = transaction.tags.find((tag) => tag.name === "title")?.value || "Untitled";
-				const author = transaction.tags.find((tag) => tag.name === "author")?.value || "Unknown Author";
 				const hasCover = transaction.id in coverUrls;
 
 				return (
@@ -42,11 +40,14 @@ export default function ContentList({ transactions, onSelectEpub }: ContentListP
 					>
 						{!hasCover && (
 							<>
-								<h3 className="text-lg font-semibold text-white">{title}</h3>
-									<p className="text-sm text-gray-400">{author}</p>
-									<p className="text-xs text-gray-500 mt-2">
-										{new Date(transaction.block.timestamp * 1000).toLocaleDateString()}
+								{transaction.tags.map((tag, index) => (
+									<p key={index} className="text-sm text-gray-400">
+										<span className="font-semibold">{tag.name}:</span> {tag.value}
 									</p>
+								))}
+								<p className="text-xs text-gray-500 mt-2">
+									{new Date(transaction.block.timestamp * 1000).toLocaleDateString()}
+								</p>
 							</>
 						)}
 						{hasCover && (
