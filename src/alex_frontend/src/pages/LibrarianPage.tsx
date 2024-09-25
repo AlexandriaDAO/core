@@ -13,6 +13,7 @@ import LibrarianForm from "@/features/librarian/components/LibrarianForm";
 import { MdLockOutline } from "react-icons/md";
 import checkLibrarian from "@/features/librarian/thunks/checkLibrarian";
 import { setIsLibrarian } from "@/features/librarian/librarianSlice";
+import FundNode from "@/features/fund-node";
 
 function LibrarianPage() {
 	const { user } = useAppSelector((state) => state.auth);
@@ -85,6 +86,7 @@ function LibrarianPage() {
 								</span>
 							</div>
 						</div>
+						{!nodesLoading && nodes.length > 0 && <FundNode />}
 						<div className="w-full p-3 flex flex-col shadow-lg rounded-xl bg-white">
 							<div className="font-syne font-medium text-xl text-black mb-2">
 								Add New Node

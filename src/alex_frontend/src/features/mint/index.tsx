@@ -7,7 +7,7 @@ import Status from "./Status";
 import Footer from "./Footer";
 import Header from "./Header";
 import useSession from "@/hooks/useSession";
-import getIrys, { getTypedIrys } from "../irys/utils/getIrys";
+import { getServerIrys } from "@/services/irysService";
 import { readFileAsBuffer } from "../irys/utils/gaslessFundAndUpload";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 // import { useAuth } from "../../contexts/AuthContext";
@@ -112,7 +112,7 @@ const Mint = () => {
 				message.error("Please select a node");
 				return;
 			}
-			const irys = await getTypedIrys(actorAlexWallet, selectedNode.id);
+			const irys = await getServerIrys(actorAlexWallet, selectedNode.id);
 			const transactions = await createAllTransactions(irys);
 
 			await mintNFT(transactions.manifest.id);

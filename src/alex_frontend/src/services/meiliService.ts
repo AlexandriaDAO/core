@@ -1,7 +1,7 @@
-import { ibe_decrypt } from "@/features/my-nodes/utils/node";
 import MeiliSearch, { EnqueuedTask, Index } from "meilisearch";
 import { ActorSubclass } from '@dfinity/agent';
 import { _SERVICE } from '../../../declarations/vetkd/vetkd.did';
+import { ibe_decrypt } from "./vetkdService";
 
 // import { MeiliSearchKeys } from "src/declarations/alex_backend/alex_backend.did";
 // import { alex_backend } from '../../../declarations/alex_backend';
