@@ -65,16 +65,9 @@ function Alexandrian() {
 								</button>
 							</div>
 							<div className="h-full overflow-auto flex">
-								{coverUrl && (
-									<div className="w-1/3 pr-4">
-										<img src={coverUrl} alt="Book cover" className="w-full h-auto" />
-									</div>
-								)}
-								<div className={`${coverUrl ? 'w-2/3' : 'w-full'}`}>
 									<ReaderProvider>
 										<Reader bookUrl={`https://arweave.net/${selectedEpub}`} />
 									</ReaderProvider>
-								</div>
 							</div>
 						</div>
 					</div>
