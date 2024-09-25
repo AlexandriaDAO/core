@@ -22,7 +22,7 @@ export default function ContentList({ transactions, onSelectEpub }: ContentListP
 						<h3 className="text-lg font-semibold text-white">{title}</h3>
 						<p className="text-sm text-gray-400">{author}</p>
 						<p className="text-xs text-gray-500 mt-2">
-							{new Date(transaction.timestamp * 1000).toLocaleDateString()}
+							{new Date(transaction.block.timestamp * 1000).toLocaleDateString()}
 						</p>
 					</div>
 				);

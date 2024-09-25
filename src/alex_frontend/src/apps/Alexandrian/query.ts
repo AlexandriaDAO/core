@@ -8,45 +8,58 @@ export interface Tag {
 export interface Transaction {
   id: string;
   tags: Tag[];
-  address: string;
-  timestamp: number;
+  block: {
+    height: number;
+    timestamp: number;
+  };
+  data: {
+    size: number;
+    type: string;
+  };
 }
 
 const client = new ApolloClient({
-  uri: 'https://arweave.mainnet.irys.xyz/graphql',
+  uri: 'https://arweave-search.goldsky.com/graphql',
   cache: new InMemoryCache()
 });
 
-const APP_ID = process.env.DFX_NETWORK === "ic" ? "testingAlexandria" : "UncensoredGreats";
-
-export async function fetchTransactions(): Promise<Transaction[]> {
-  console.log("Fetching transactions with APP_ID:", APP_ID);
-  try {
-    const result = await client.query({
-      query: gql`
-      query {
-        transactions(
-          first: 100,
-          tags: [
-            { name: "Content-Type", values: ["application/epub+zip"] },
-            { name: "application-id", values: ["${APP_ID}"] },
-          ]
-        ) {
-          edges {
-            node {
-              id
-              tags {
-                name
-                value
-              }
-              address
-              timestamp
-            }
+const QUERY = gql`
+  query RecentTransactionsWithContentType {
+    transactions(
+      tags: [
+        { name: "Content-Type", values: ["application/epub+zip"] }
+      ]
+      first: 100
+      sort: HEIGHT_DESC
+    ) {
+      edges {
+        node {
+          id
+          block {
+            height
+            timestamp
+          }
+          tags {
+            name
+            value
+          }
+          data {
+            size
+            type
           }
         }
       }
-      `
-    });
+      pageInfo {
+        hasNextPage
+      }
+    }
+  }
+`;
+
+export async function fetchTransactions(): Promise<Transaction[]> {
+  console.log("Fetching transactions");
+  try {
+    const result = await client.query({ query: QUERY });
     
     console.log("GraphQL query result:", result);
 
@@ -55,15 +68,15 @@ export async function fetchTransactions(): Promise<Transaction[]> {
       return [];
     }
 
-    const filteredTransactions = result.data.transactions.edges.map((edge: any) => ({
+    const transactions = result.data.transactions.edges.map((edge: any) => ({
       id: edge.node.id,
       tags: edge.node.tags,
-      address: edge.node.address,
-      timestamp: edge.node.timestamp
+      block: edge.node.block,
+      data: edge.node.data
     }));
     
-    console.log("Filtered transactions:", filteredTransactions);
-    return filteredTransactions;
+    console.log("Filtered transactions:", transactions);
+    return transactions;
   } catch (error) {
     console.error('Error fetching transactions:', error);
     throw error;
@@ -71,34 +84,8 @@ export async function fetchTransactions(): Promise<Transaction[]> {
 }
 
 export async function getQuery(): Promise<ApolloQueryResult<any>> {
-  console.log("DFX_NETWORK:", process.env.DFX_NETWORK);
-  console.log("APP_ID: ", APP_ID);
   try {
-    const query = await client.query({
-      query: gql`
-        query {
-          transactions(
-            first: 100,
-            tags: [
-              { name: "Content-Type", values: ["application/epub+zip"] },
-              { name: "application-id", values: ["${APP_ID}"] },
-            ]
-          ) {
-            edges {
-              node {
-                id
-                tags {
-                  name
-                  value
-                }
-                address
-                timestamp
-              }
-            }
-          }
-        }
-      `
-    });
+    const query = await client.query({ query: QUERY });
     console.log("getQuery result:", query);
     return query;
   } catch (error) {

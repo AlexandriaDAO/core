@@ -4,11 +4,13 @@ import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
 import { fetchTransactions, Transaction } from "./query";
 import ContentList from "./ContentList";
+import { getCover } from "@/utils/epub";
 
 function Alexandrian() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [selectedEpub, setSelectedEpub] = useState<string | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [coverUrl, setCoverUrl] = useState<string | null>(null);
 
 	useEffect(() => {
 		const loadTransactions = async () => {
@@ -26,14 +28,22 @@ function Alexandrian() {
 
 	console.log("Current transactions state:", transactions);
 
-	const handleSelectEpub = (id: string) => {
+	const handleSelectEpub = async (id: string) => {
 		setSelectedEpub(id);
 		setIsModalOpen(true);
+		try {
+			const cover = await getCover(`https://arweave.net/${id}`);
+			setCoverUrl(cover);
+		} catch (error) {
+			console.error("Error fetching cover:", error);
+			setCoverUrl(null);
+		}
 	};
 
 	const closeModal = () => {
 		setIsModalOpen(false);
 		setSelectedEpub(null);
+		setCoverUrl(null);
 	};
 
 	return (
@@ -54,10 +64,17 @@ function Alexandrian() {
 									Close
 								</button>
 							</div>
-							<div className="h-full overflow-auto">
-								<ReaderProvider>
-									<Reader bookUrl={`https://arweave.net/${selectedEpub}`} />
-								</ReaderProvider>
+							<div className="h-full overflow-auto flex">
+								{coverUrl && (
+									<div className="w-1/3 pr-4">
+										<img src={coverUrl} alt="Book cover" className="w-full h-auto" />
+									</div>
+								)}
+								<div className={`${coverUrl ? 'w-2/3' : 'w-full'}`}>
+									<ReaderProvider>
+										<Reader bookUrl={`https://arweave.net/${selectedEpub}`} />
+									</ReaderProvider>
+								</div>
 							</div>
 						</div>
 					</div>
