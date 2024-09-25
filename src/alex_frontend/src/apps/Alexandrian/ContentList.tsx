@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { Transaction } from "./query";
 import { getCover } from "@/utils/epub";
-
 
 interface ContentListProps {
   transactions: Transaction[];
@@ -10,17 +9,36 @@ interface ContentListProps {
 
 export default function ContentList({ transactions, onSelectEpub }: ContentListProps) {
 	const [hoveredId, setHoveredId] = useState<string | null>(null);
-	const [coverUrl, setCoverUrl] = useState<string | null>(null);
+	const [coverUrls, setCoverUrls] = useState<Record<string, string>>({});
+	const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-	const handleMouseEnter = async (id: string) => {
-		setHoveredId(id);
-		const url = await getCover(`https://arweave.net/${id}`);
-		setCoverUrl(url);
-	};
+	const handleMouseEnter = useCallback((id: string) => {
+		// Clear any existing timer
+		if (hoverTimerRef.current) {
+			clearTimeout(hoverTimerRef.current);
+		}
+
+		// Set a new timer with a 300ms delay
+		hoverTimerRef.current = setTimeout(() => {
+			setHoveredId(id);
+			if (!coverUrls[id]) {
+				getCover(`https://arweave.net/${id}`)
+					.then(url => {
+						setCoverUrls(prev => ({ ...prev, [id]: url || "/images/default-cover.jpg" }));
+					})
+					.catch(error => {
+						console.error("Error loading cover for " + id);
+						setCoverUrls(prev => ({ ...prev, [id]: "/images/default-cover.jpg" }));
+					});
+			}
+		}, 300);
+	}, [coverUrls]);
 
 	const handleMouseLeave = () => {
+		if (hoverTimerRef.current) {
+			clearTimeout(hoverTimerRef.current);
+		}
 		setHoveredId(null);
-		setCoverUrl(null);
 	};
 
 	return (
@@ -28,11 +46,12 @@ export default function ContentList({ transactions, onSelectEpub }: ContentListP
 			{transactions.map((transaction) => {
 				const title = transaction.tags.find((tag) => tag.name === "title")?.value || "Untitled";
 				const author = transaction.tags.find((tag) => tag.name === "author")?.value || "Unknown Author";
+				const coverUrl = coverUrls[transaction.id] || "/images/default-cover.jpg";
 
 				return (
 					<div
 						key={transaction.id}
-						className="aspect-square border border-white rounded-lg p-4 cursor-pointer hover:bg-gray-900 flex flex-col items-center justify-center text-center relative"
+						className="aspect-square border border-white rounded-lg p-4 cursor-pointer hover:bg-gray-900 flex flex-col items-center justify-center text-center relative overflow-hidden"
 						onClick={() => onSelectEpub(transaction.id)}
 						onMouseEnter={() => handleMouseEnter(transaction.id)}
 						onMouseLeave={handleMouseLeave}
@@ -42,11 +61,20 @@ export default function ContentList({ transactions, onSelectEpub }: ContentListP
 						<p className="text-xs text-gray-500 mt-2">
 							{new Date(transaction.block.timestamp * 1000).toLocaleDateString()}
 						</p>
-						{hoveredId === transaction.id && coverUrl && (
-							<div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
-								<img src={coverUrl} alt="Book cover" className="max-w-full max-h-full object-contain" />
-							</div>
-						)}
+						<div 
+							className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 transition-opacity duration-500 ${
+								hoveredId === transaction.id ? 'opacity-100' : 'opacity-0'
+							}`}
+						>
+							<img 
+								src={coverUrl} 
+								alt="Book cover" 
+								className="max-w-full max-h-full object-contain"
+								onError={(e) => {
+									e.currentTarget.src = "/images/default-cover.jpg";
+								}}
+							/>
+						</div>
 					</div>
 				);
 			})}
