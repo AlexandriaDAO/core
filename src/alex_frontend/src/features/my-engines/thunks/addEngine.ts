@@ -8,7 +8,7 @@ import {
 } from "../../../../../declarations/vetkd/vetkd.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { EngineStatus } from "@/features/engine-overview/thunks/updateEngineStatus";
-import { ibe_encrypt } from "@/features/my-nodes/utils/node";
+import { ibe_encrypt } from "@/services/vetkdService";
 
 // Define an interface for the engine parameters based on the Yup validation schema
 interface EngineInput {

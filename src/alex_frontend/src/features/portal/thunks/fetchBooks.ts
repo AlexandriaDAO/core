@@ -52,7 +52,7 @@ import { ActorSubclass } from '@dfinity/agent';
 import { _SERVICE as _SERVICENFTMANAGER } from '../../../../../declarations/nft_manager/nft_manager.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Book } from '../portalSlice';
-import { getBooks } from '@/utils/irys';
+import { getBooks } from '@/services/bookService';
 
 
 

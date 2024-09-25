@@ -3,7 +3,7 @@ import { _SERVICE as _SERVICENFTMANAGER } from '../../../../../declarations/nft_
 import { Engine } from '../../../../../declarations/alex_backend/alex_backend.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from '@/store';
-import { getBooks } from '@/utils/irys';
+import { getBooks } from '@/services/bookService';
 import { Book } from '@/features/portal/portalSlice';
 
 // Define the async thunk

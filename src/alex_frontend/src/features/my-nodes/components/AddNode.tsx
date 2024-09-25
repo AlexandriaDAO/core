@@ -17,7 +17,6 @@ import {
 } from "../myNodesSlice";
 import { CiCircleCheck } from "react-icons/ci";
 import { AiOutlineCloseCircle } from "react-icons/ai";
-import { ibe_encrypt } from "../utils/node";
 
 // const ethPrivateKeyRegex = /^[a-fA-F0-9]{64}$/;
 // const ethPublicKeyRegex = /^0x[a-fA-F0-9]{128}$/;

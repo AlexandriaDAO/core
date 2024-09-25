@@ -3,11 +3,12 @@ import React, { useEffect, useState } from "react";
 import { Node } from "../../../../../declarations/alex_librarian/alex_librarian.did";
 
 import { WebIrys } from "@irys/sdk";
-import { getSimpleWebIrys } from "../utils/irys";
 import { ImSpinner8 } from "react-icons/im";
 import { Tooltip, message } from "antd";
-import { CiCircleInfo } from "react-icons/ci";
-import { getTypedIrys } from "@/features/irys/utils/getIrys";
+import { IoCopyOutline } from "react-icons/io5";
+import { SlInfo } from "react-icons/sl";
+import { getClientIrys, getNodeBalance, getServerIrys } from "@/services/irysService";
+import { shorten } from "@/utils/general";
 import useSession from "@/hooks/useSession";
 // import { setActiveEngine } from "@/features/engine-overview/engineOverviewSlice";
 
@@ -18,173 +19,126 @@ interface NodeItemProps {
 const NodeItem = ({ node }: NodeItemProps) => {
 	const {actorAlexWallet} = useSession();
 
-	const [webIrys, setWebIrys] = useState<WebIrys | null>(null);
-	const [balance, setBalance] = useState<number | null | undefined>(null);
+	const [irys, setIrys] = useState<WebIrys | null>(null);
 	const [amount, setAmount] = useState("0.0001");
+
 	const [loading, setLoading] = useState(false);
 
-	useEffect(() => {
-		// if (!wallet) return;
+	const [balance, setBalance] = useState<number>(-1);
+	const [balanceLoading, setBalanceLoading] = useState(false);
 
-		const setIrys = async () => {
-			try{
-				// const irys = await getSimpleWebIrys();
-				const irys = await getTypedIrys(actorAlexWallet, node.id);
-				setWebIrys(irys);
-			}catch(error){
-				if (error instanceof Error) {
-					message.error(error.message);
-				}else{
-					console.log('error loading irys', error);
-					message.error('unable to load wallet')
-				}
-				setBalance(undefined);
-			}
-		};
-
-		setIrys();
-	}, []);
-
-	const fetchBalance = async () => {
-		if (!webIrys) return;
-		setBalance(null);
-
+	const setServerIrys = async () => {
+		setLoading(true);
 		try{
-			const atomicBalance = await webIrys.getLoadedBalance();
-
-			const convertedBalance = parseFloat(
-				webIrys.utils.fromAtomic(atomicBalance).toString()
-			);
-
-			setBalance(convertedBalance);
+			const webIrys = await getServerIrys(actorAlexWallet, node.id);
+			setIrys(webIrys);
 		}catch(error){
 			if (error instanceof Error) {
 				message.error(error.message);
 			}else{
-				console.log('error loading balalnce', error);
-				message.error('unable to load balance')
+				console.log('error loading web irys', error);
+				message.error('unable to load wallet')
 			}
-			setBalance(undefined);
-		}
-	};
-	useEffect(() => {
-		fetchBalance();
-	}, [webIrys]);
-
-	const fundNode = async () => {
-		try {
-			setLoading(true);
-
-			// Problem:
-			// problem funding multiple nodes
-			// metamask will fund the connected node/wallets
-			const ethIrys = await getSimpleWebIrys();
-			if (!ethIrys) {
-				message.error("Irys is not available");
-				return;
-			}
-			const confirmation = window.confirm(
-				`Funding the node will deduct ${amount} ETH from your wallet. Do you want to proceed?`
-			);
-			if (confirmation) {
-				console.log('confirmed');
-				const fundTx = await ethIrys.fund(
-					ethIrys.utils.toAtomic(amount)
-				);
-				console.log(fundTx, 'fundTx');
-
-				message.success(
-					`Successfully funded ${ethIrys.utils.fromAtomic(
-						fundTx.quantity
-					)} ${ethIrys.token}`
-				);
-				fetchBalance();
-			}
-		} catch (e) {
-			message.error(
-				"Funding Failed, Try Again."
-			);
-			console.log("Error funding node ", e);
-		} finally {
+			setIrys(null);
+		}finally{
 			setLoading(false);
 		}
 	};
 
+	useEffect(() => {
+		if (!node) return;
+		setServerIrys();
+	}, [node]);
+
+	const setNodeBalance = async () => {
+		if(!irys) {
+			setBalance(-1);
+			return;
+		}
+
+		setBalanceLoading(true);
+		try {
+			const balance = await getNodeBalance(irys);
+			setBalance(balance);
+		} catch (error) {
+			console.error('Error fetching balance:', error);
+			message.error('Failed to fetch balance');
+			setBalance(-1);
+		} finally {
+		  	setBalanceLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		setNodeBalance();
+	}, [irys]);
+
 	return (
-		<div className="flex flex-col justify-between items-start p-2 shadow border border-solid rounded font-roboto-condensed font-normal text-base">
-			{/* <div className="flex gap-2 justify-start items-center">
-				<span>Private Key: </span>
-				<span>
-					{wallet && wallet.privateKey
-						? shorten(wallet.privateKey)
-						: "..."}
-				</span>
+		<div className={`relative ${loading ? 'cursor-not-allowed pointer-events-none' : ''}`}>
+			<div className={`flex flex-col gap-4 justify-between items-start p-2 shadow border border-solid rounded font-roboto-condensed font-normal text-base ${loading ? 'opacity-40' : ''}`}>
+				<table className="w-full">
+					<tbody>
+						<tr>
+							<td className="pr-4">Status</td>
+							<td>{'Active' in node.status ? 'Active' : 'InActive'}</td>
+						</tr>
+						<tr>
+							<td className="pr-4">Address</td>
+							<td className="flex items-center gap-2">
+								<span>{irys && irys.address ? shorten(irys.address) : "..."}</span>
+
+								<Tooltip title="Copy Address">
+									<span className={`${!(irys && irys.address) ? 'cursor-not-allowed' : ''}`}>
+										<IoCopyOutline
+											size={14}
+											onClick={() => {
+												if (irys && irys.address) {
+													navigator.clipboard.writeText(irys.address);
+													message.success('Copied to clipboard');
+												} else {
+													message.error('No address to copy');
+												}
+											}}
+											className={!(irys && irys.address) ? 'text-gray-400' : 'cursor-pointer'}
+										/>
+									</span>
+								</Tooltip>
+							</td>
+						</tr>
+						<tr>
+							<td className="pr-4">Balance</td>
+							<td>
+								{balanceLoading ? (
+									<ImSpinner8 size={14} className="animate-spin" />
+								) : balance === -1 ? (
+									"NA"
+								) : (
+									<div className="flex items-center gap-2">
+										<span className="font-bold">{balance}</span>
+
+										<Tooltip title="Showing the confirmed balance" className="cursor-pointer">
+											<span>
+												<SlInfo size={14} />
+											</span>
+										</Tooltip>
+									</div>
+								)}
+							</td>
+						</tr>
+						<tr>
+							<td className="pr-4">Token</td>
+							<td>{irys?.token ? irys.token : 'NA'}</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
-			<div className="flex gap-2 justify-start items-center">
-				<span>Address: </span>
-				<span>
-					{wallet && wallet.address ? shorten(wallet.address) : "..."}
-				</span>
-			</div> */}
-			<div className="flex gap-2 justify-start items-center">
-				<span>Status: </span>
-				<span>{'Active' in node.status ? 'Active' : 'InActive'}</span>
-			</div>
-			<div className="flex gap-2 justify-start items-center">
-				<div className="flex gap-1 items-center">
-					<span>Balance</span>
-					<Tooltip title="Showing the confirmed balance" className="flex items-center">
-						<CiCircleInfo size={14} />
-						<span>:</span>
-					</Tooltip>
+			{loading &&
+				<div className="w-full h-full absolute inset-0 backdrop-blur flex justify-center items-center border border-solid  border-gray-400 rounded">
+					<span className="bg-black/100 shadow rounded p-2">
+						<ImSpinner8 size={14} className="animate animate-spin text-white" />
+					</span>
 				</div>
-
-				<span className="font-bold">
-					{ balance === null ?
-						<ImSpinner8 size={14} className="animate animate-spin" />:
-						balance === undefined ? "NA" : (balance + "ETH")
-					}
-				</span>
-			</div>
-
-			<div className="flex flex-col gap-2 justify-start items-start">
-				<span>Fund Node</span>
-				<div className="flex gap-2">
-					<div className="relative flex justify-between items-center">
-						<input
-							disabled={loading || balance === null || balance === undefined}
-							type="number"
-							step="0.0001"
-							className={`py-1 pl-3 pr-10 text-text rounded-md border border-solid border-gray-300 shadow-sm ${loading || balance === null || balance === undefined ? 'bg-gray-200 cursor-not-allowed':'bg-white'}`}
-							placeholder="0,0000"
-							value={amount}
-							onChange={(e) => setAmount(e.target.value)}
-						/>
-						<span className="absolute right-3 font-bold">ETH</span>
-					</div>
-
-					<button
-						disabled={loading|| balance === null || balance === undefined}
-						onClick={fundNode}
-						className={` text-white font-medium px-4 py-1 rounded ${
-							loading|| balance === null || balance === undefined ? "cursor-not-allowed bg-gray-500" : "cursor-pointer bg-black"
-						}`}
-					>
-						{loading ? (
-							<span className="flex gap-1 items-center">
-								Processing{" "}
-								<ImSpinner8
-									size={14}
-									className="animate animate-spin"
-								/>
-							</span>
-						) : balance === null || balance === undefined ? "Disabled" : (
-							"Fund Node"
-						)}
-					</button>
-				</div>
-			</div>
-			{/* <FundWithdraw /> */}
+			}
 		</div>
 	);
 };

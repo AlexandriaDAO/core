@@ -1,38 +1,11 @@
+
 import { Principal } from "@dfinity/principal";
 import { ActorSubclass } from '@dfinity/agent';
-import { _SERVICE } from '../../../../../declarations/vetkd/vetkd.did';
-
-
-export const shorten = (
-	text: string,
-	startLength: number = 6,
-	endLength: number = 4
-): string => {
-	if (text.length <= startLength + endLength) {
-		return text;
-	}
-	return `${text.slice(0, startLength)}...${text.slice(-endLength)}`;
-};
-
-
-export const hexDecode = (hexString: string): Uint8Array => {
-	// Match pairs of hex characters and convert them to a Uint8Array
-	const byteArray = hexString.match(/.{1,2}/g);
-	if (!byteArray) {
-		throw new Error("Invalid hex string");
-	}
-	return Uint8Array.from(byteArray.map((byte) => parseInt(byte, 16)));
-};
-
-export const hexEncode = (bytes: Uint8Array): string => {
-	// Convert each byte to a hex string and concatenate
-	return Array.from(bytes)
-		.map((byte) => byte.toString(16).padStart(2, '0'))
-		.join('');
-};
-
+import { _SERVICE } from '../../../declarations/vetkd/vetkd.did';
+import { hexDecode, hexEncode } from "@/utils/vetkd";
 
 const frontend_canister_id = process.env.CANISTER_ID_ALEX_FRONTEND!;
+const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 
 export const ibe_decrypt =	 async(actor: ActorSubclass<_SERVICE>, encoded:string, receiver:string = frontend_canister_id)=> {
 	const vetkd = await import('ic-vetkd-utils');
@@ -56,9 +29,6 @@ export const ibe_decrypt =	 async(actor: ActorSubclass<_SERVICE>, encoded:string
 
 	return decoded;
 }
-
-const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
-
 export const ibe_encrypt = async(actor: ActorSubclass<_SERVICE>, message:string, receiver:string = alex_wallet_canister_id)=> {
 	if(message.length == 0) throw new Error("Message is empty");
 

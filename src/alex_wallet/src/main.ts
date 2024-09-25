@@ -132,26 +132,28 @@ export default class {
      }
 
 
-    // @update([IDL.Text], IDL.Variant({
-    //     Ok: IDL.Text,
-    //     Err: IDL.Text
-    // }))
-    // async signData(txHash: string, node_id: string ): Promise<Result<string, string>> {
-    //     try {
-    //         ensureString(txHash)
-    //         const signer = await getSigner(node_id);
+    @update([IDL.Text, IDL.Text], IDL.Variant({
+        Ok: IDL.Text,
+        Err: IDL.Text
+    }))
+    async signData(txHash: string, node_id: string ): Promise<Result<string, string>> {
+        try {
+            ensureString(txHash)
+            const signer = await getSigner(node_id);
 
-    //         const convertedMsg = Buffer.from(txHash);
-    //         const signature = await signer.sign(convertedMsg);
-    //         const bSig = Buffer.from(signature);
-    //         const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString("hex");
+            console.log('signer', signer);
+            const convertedMsg = Buffer.from(txHash);
+            const signature = await signer.sign(convertedMsg);
+            const bSig = Buffer.from(signature);
+            const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString("hex");
+            console.log('Signature: ', pad);
 
-    //         // Return the signature with no error
-    //         return { Ok: pad };
-    //     } catch (error) {
-    //         // Handle the error and return it
-    //         console.log('Error Signing: ', error);
-    //         return { Err: `Error Signing: ${error instanceof Error ? error.message : String(error)}` };
-    //     }
-    // }
+            // Return the signature with no error
+            return { Ok: pad };
+        } catch (error) {
+            // Handle the error and return it
+            console.log('Error Signing: ', error);
+            return { Err: `Error Signing: ${error instanceof Error ? error.message : String(error)}` };
+        }
+    }
 }
