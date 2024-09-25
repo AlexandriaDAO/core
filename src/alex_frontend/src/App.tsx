@@ -1,14 +1,11 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import ReduxProvider from "./providers/ReduxProvider";
-import { AuthProvider } from "./contexts/AuthContext";
 
 import HomePage from "./pages/HomePage";
 import "./styles/tailwind.css";
 import ManagerPage from "./pages/ManagerPage";
 import SessionProvider from "./providers/SessionProvider";
-// import FundNodePage from "./pages/FundNodePage";
 import SwapPage from "./pages/swap";
 import LibrarianPage from "./pages/LibrarianPage";
 import WhitepaperPage from "./pages/WhitepaperPage";
@@ -27,28 +24,25 @@ export default function App() {
         <ReduxProvider>
             <SessionProvider>
                 <BrowserRouter>
-                    <AuthProvider>
-                            <Routes>
-                                {/* <Route path="*" element={<Layout />} /> */}
-                                <Route path="/" element={<HomePage />} />
-                                <Route path="/manager" element={<ManagerPage />} />
-                                {/* <Route path="/fund-node" element={<FundNodePage />} /> */}
-                                <Route path="/swap" element={<SwapPage />} />
-                                <Route path="/librarian" element={<LibrarianPage />} />
-                                <Route path="/whitepaper" element={<WhitepaperPage />} />
+                    <Routes>
+                        {/* <Route path="*" element={<Layout />} /> */}
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/manager" element={<ManagerPage />} />
+                        <Route path="/swap" element={<SwapPage />} />
+                        <Route path="/librarian" element={<LibrarianPage />} />
+                        <Route path="/whitepaper" element={<WhitepaperPage />} />
 
-                                {/* App routes */}
-                                <Route path="/app/bibliotheca" element={<Bibliotheca />} />
-                                <Route path="/app/syllogos" element={<Syllogos />} />
-                                <Route path="/app/lexigraph" element={<Lexigraph />} />
-                                <Route path="/app/dialectica" element={<Dialectica />} />
-                                <Route path="/app/alexandrian" element={<Alexandrian />} />
-                                <Route path="/app/emporium" element={<Emporium />} />
+                        {/* App routes */}
+                        <Route path="/app/bibliotheca" element={<Bibliotheca />} />
+                        <Route path="/app/syllogos" element={<Syllogos />} />
+                        <Route path="/app/lexigraph" element={<Lexigraph />} />
+                        <Route path="/app/dialectica" element={<Dialectica />} />
+                        <Route path="/app/alexandrian" element={<Alexandrian />} />
+                        <Route path="/app/emporium" element={<Emporium />} />
 
-                                {/* experimental/temporary */}
-                                <Route path="/mint" element={<MintPage />} />
-                            </Routes>
-                    </AuthProvider>
+                        {/* experimental/temporary */}
+                        <Route path="/mint" element={<MintPage />} />
+                    </Routes>
                 </BrowserRouter>
             </SessionProvider>
         </ReduxProvider>

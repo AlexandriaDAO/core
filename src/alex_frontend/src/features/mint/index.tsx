@@ -10,7 +10,6 @@ import useSession from "@/hooks/useSession";
 import { getServerIrys } from "@/services/irysService";
 import { readFileAsBuffer } from "../irys/utils/gaslessFundAndUpload";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-// import { useAuth } from "../../contexts/AuthContext";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchEngineBooks from "../engine-books/thunks/fetchEngineBooks";
 import { PiUploadSimple } from "react-icons/pi";
@@ -209,8 +208,6 @@ const Mint = () => {
 		setUploadStatus(5);
 		message.info("Uploading files to Arweave");
 
-		// console.log(transactions.book.id, transactions.cover.id, transactions.data.id, transactions.manifest.id);
-
 		Promise.all([
 			transactions.book.upload(),
 			transactions.cover.upload(),
@@ -225,7 +222,6 @@ const Mint = () => {
 			console.error('Error while uploading assets to arweave');
 		})
 
-		// console.log('uploaded', uploadReceipt, transactions);
 	};
 
 
