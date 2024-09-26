@@ -28,12 +28,12 @@ const ClaimReward: React.FC<LbryRatioProps> = ({ actorSwap }) => {
 
 
     }, [swap])
-    return (<div className="account-wrapper">
+    return (
         <button
             onClick={(e) => handleClaim(e)}
-            className="rounded-lg text-white bg-blue-700 px-5 py-1.5 mt-8"
+            className="text-xl font-semibold text-white bg-radiocolor py-2 px-5 me-3 rounded-full"
         >            Claim
         </button>
-    </div>);
+   );
 };
 export default ClaimReward;

@@ -9,7 +9,6 @@ import transferICP from "./thunks/transferICP";
 // Define the interface for our node state
 export interface icpLedgerState {
   accountBalance: string;
-  subAccountBalance: string;
   loading: boolean;
   transferSuccess: boolean;
   error: string | null;
@@ -18,7 +17,6 @@ export interface icpLedgerState {
 // Define the initial state using the ManagerState interface
 const initialState: icpLedgerState = {
   accountBalance: "0",
-  subAccountBalance: "0",
   loading: false,
   transferSuccess: false,
   error: null,
@@ -44,7 +42,6 @@ const icpLedgerSlice = createSlice({
       .addCase(getIcpBal.fulfilled, (state, action) => {
         message.success("Successfully fetched icp balance.");
         state.accountBalance = action.payload.formatedAccountBal;
-        state.subAccountBalance = action.payload.formatedSubAccountBal;
         state.loading = false;
         state.error = null;
       })

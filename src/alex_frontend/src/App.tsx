@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ReduxProvider from "./providers/ReduxProvider";
 
 import HomePage from "./pages/HomePage";
-import "./styles/tailwind.css";
+import "../public/tailwind.css";
+// import BookPortalPage from "./pages/BookPortalPage";
 import ManagerPage from "./pages/ManagerPage";
 import SessionProvider from "./providers/SessionProvider";
 import SwapPage from "./pages/swap";
