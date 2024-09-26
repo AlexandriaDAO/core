@@ -73,6 +73,7 @@
     "react-image-file-resizer": "^0.4.8",
     "react-instantsearch-dom": "^6.40.4",
     "react-modal": "^3.16.1",
+    "react-qr-code": "^2.0.15",
     "react-rating-star-with-type": "^1.2.2",
     "react-responsive-masonry": "^2.3.0",
     "react-select": "^5.8.0",

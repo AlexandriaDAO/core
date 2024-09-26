@@ -5,7 +5,6 @@ import {
 import { message } from "antd";
 import getAccountAlexBalance from "./thunks/alexIcrc/getAccountAlexBalance";
 import transferALEX from "./thunks/alexIcrc/transferALEX";
-import transferICPFromUserWalletcanister from "./thunks/transferICPFromUserWallet";
 // Define the interface for our node state
 export interface AlexState {
   alexBal: string;
@@ -16,7 +15,7 @@ export interface AlexState {
 
 // Define the initial state using the ManagerState interface
 const initialState: AlexState = {
-  alexBal: "",
+  alexBal: "0",
   loading: false,
   transferSuccess:false,
   error: null,

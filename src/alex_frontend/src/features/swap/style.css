@@ -78,3 +78,9 @@
     border-radius: 10px;
     font-size: 18px;
 }
+
+/* new swap css */
+.white-auth-btn svg, .white-auth-btn span{
+    /* fill: #ffffff; */
+    color: #ffffff;
+}

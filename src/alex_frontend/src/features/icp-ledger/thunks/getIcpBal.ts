@@ -6,24 +6,22 @@ import { Principal } from "@dfinity/principal";
 
 // Define the async thunk
 const getIcpBal = createAsyncThunk<
-  {formatedAccountBal:string,formatedSubAccountBal:string}, // This is the return type of the thunk's payload
+  {formatedAccountBal:string}, // This is the return type of the thunk's payload
   {
     actor: ActorSubclass<_SERVICEICPLEDGER>;
-    subaccount: string;
     account: string;
   },
   { rejectValue: string }
->("icp_ledger/getIcpBal", async ({ actor, subaccount,account }, { rejectWithValue }) => {
+>("icp_ledger/getIcpBal", async ({ actor,account }, { rejectWithValue }) => {
   try {
     let resultAccountBal = await actor.icrc1_balance_of({
       owner: Principal.fromText(account),
       subaccount: []
     });
-    const resultSubAccountBal = await actor.account_balance_dfx({ account: subaccount });
     const LedgerServices=LedgerService();
-    const formatedAccountBal=LedgerServices.e8sToIcp(resultAccountBal).toString();
-    const formatedSubAccountBal=LedgerServices.e8sToIcp(resultSubAccountBal.e8s).toFixed(8).toString();
-    return ({formatedAccountBal,formatedSubAccountBal})
+    // const formatedAccountBal=LedgerServices.e8sToIcp(resultAccountBal).toFixed(4);
+    const formatedAccountBal = (Math.floor(LedgerServices.e8sToIcp(resultAccountBal) * 10 ** 4) / 10 ** 4).toFixed(4);
+    return ({formatedAccountBal})
   } catch (error) {
     console.error("Failed to get ICP Balance:", error);
 

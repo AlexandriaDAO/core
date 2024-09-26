@@ -4,10 +4,7 @@ import { useAppSelector } from "../../../../store/hooks/useAppSelector";
 import { ActorSubclass } from "@dfinity/agent";
 
 import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
-import getStakeInfo from "../../thunks/getStakedInfo";
-import claimReward from "../../thunks/claimReward";
 import { flagHandler } from "../../swapSlice";
-import getIcpBal from "@/features/icp-ledger/thunks/getIcpBal";
 import unstake from "../../thunks/unstake";
 interface LbryRatioProps {
     actorSwap: ActorSubclass<_SERVICESWAP>;
@@ -24,18 +21,16 @@ const Unstake: React.FC<LbryRatioProps> = ({ actorSwap }) => {
     }
     useEffect(() => {
         if (swap.unstakeSuccess === true) {
-            alert("Successfully unstaked!");
+            //alert("Successfully unstaked!");
             dispatch(flagHandler());
         }
-
-
     }, [swap])
-    return (<div className="account-wrapper">
+    return (
         <button
-            className="rounded-lg text-white bg-blue-700 px-5 py-1.5 mt-8"
+            className="text-xl font-semibold text-multycolor  border-2 border-[#FF9900] py-2 px-5 me-3 rounded-full"
             onClick={(e) => handleUnstake(e)}
         >Unstake
         </button>
-    </div>);
+    );
 };
 export default Unstake;

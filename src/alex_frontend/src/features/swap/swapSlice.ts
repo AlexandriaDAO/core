@@ -1,7 +1,6 @@
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import { message } from "antd";
 import getLBRYratio from "./thunks/getLBRYratio";
-import getSubaccount from "./thunks/getSubaccount";
 import swapLbry from "./thunks/swapLbry";
 import getMaxLbryBurn from "./thunks/getMaxLbryBurn";
 import burnLbry from "./thunks/burnLBRY";
@@ -12,6 +11,7 @@ import claimReward from "./thunks/claimReward";
 import unstake from "./thunks/unstake";
 import transferLBRY from "./thunks/lbryIcrc/transferLBRY";
 import transferICPFromUserWalletcanister from "./thunks/transferICPFromUserWallet";
+import getALlStakesInfo from "./thunks/getAllStakesInfo";
 // Define the interface for our node state
 export interface StakeInfo {
   stakedAlex: string;
@@ -22,9 +22,9 @@ export interface StakeInfo {
 export interface SwapState {
   lbryRatio: string;
   lbryBalance: string;
-  subaccount: string;
   maxLbryBurn: Number;
   stakeInfo: StakeInfo;
+  totalStaked:string;
   loading: boolean;
   swapSuccess: boolean;
   burnSuccess: boolean;
@@ -39,9 +39,9 @@ export interface SwapState {
 const initialState: SwapState = {
   lbryRatio: "0",
   lbryBalance: "0",
-  subaccount: "",
   maxLbryBurn: 0,
   stakeInfo: { stakedAlex: "0", rewardIcp: "0", unix_stake_time: "0" },
+  totalStaked:"0",
   swapSuccess: false,
   successStake: false,
   burnSuccess: false,
@@ -69,12 +69,12 @@ const swapSlice = createSlice({
   extraReducers: (builder: ActionReducerMapBuilder<SwapState>) => {
     builder
       .addCase(getLBRYratio.pending, (state) => {
-        message.info("Fetching LBRY ratio");
+        // message.info("Fetching LBRY ratio");
         state.loading = true;
         state.error = null;
       })
       .addCase(getLBRYratio.fulfilled, (state, action) => {
-        message.success("LBRY ratio fetched.");
+        // message.success("LBRY ratio fetched.");
         state.lbryRatio = action.payload;
         state.loading = false;
         state.error = null;
@@ -85,12 +85,12 @@ const swapSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(getLbryBalance.pending, (state) => {
-        message.info("Fetching LBRY balance!");
+        // message.info("Fetching LBRY balance!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getLbryBalance.fulfilled, (state, action) => {
-        message.success("Fetched LBRY balance!");
+        // message.success("Fetched LBRY balance!");
         state.lbryBalance = action.payload;
         state.loading = false;
         state.error = null;
@@ -115,20 +115,19 @@ const swapSlice = createSlice({
         message.error("Could not fetched staked info!");
         state.loading = false;
         state.error = action.payload as string;
-      })
-      .addCase(getSubaccount.pending, (state) => {
-        message.info("Fetching subaccount!");
+      }) .addCase(getALlStakesInfo.pending, (state) => {
+        // message.info("Fetching staked info!");
         state.loading = true;
         state.error = null;
       })
-      .addCase(getSubaccount.fulfilled, (state, action) => {
-        message.success("Fetched subaccount!");
-        state.subaccount = action.payload;
+      .addCase(getALlStakesInfo.fulfilled, (state, action) => {
+        message.success("Fetched all staked info!");
+        state.totalStaked = action.payload;
         state.loading = false;
         state.error = null;
       })
-      .addCase(getSubaccount.rejected, (state, action) => {
-        message.error("Subaccount could not be fetched!");
+      .addCase(getALlStakesInfo.rejected, (state, action) => {
+        message.error("Could not fetched all staked info!");
         state.loading = false;
         state.error = action.payload as string;
       })
@@ -213,12 +212,12 @@ const swapSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(getMaxLbryBurn.pending, (state) => {
-        message.info("Fetching max allowed LBRY burn!");
+        // message.info("Fetching max allowed LBRY burn!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getMaxLbryBurn.fulfilled, (state, action) => {
-        message.success("Successfully fetched max allowed burn!");
+        // message.success("Successfully fetched max allowed burn!");
         state.maxLbryBurn = action.payload;
         state.error = null;
       })
@@ -240,21 +239,6 @@ const swapSlice = createSlice({
       })
       .addCase(transferLBRY.rejected, (state, action) => {
         message.error("Error while transfering LBRY");
-        state.loading = false;
-        state.error = action.payload as string;
-      }).addCase(transferICPFromUserWalletcanister.pending, (state) => {
-        message.info("Processing ICP transfer from canister user wallet!");
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(transferICPFromUserWalletcanister.fulfilled, (state, action) => {
-        message.success("Successfully transfered ICP!");
-        state.transferSuccess = true;
-        state.loading = false;
-        state.error = null;
-      })
-      .addCase(transferICPFromUserWalletcanister.rejected, (state, action) => {
-        message.error("Error while transfering from canister user wallet!");
         state.loading = false;
         state.error = action.payload as string;
       })

@@ -6,7 +6,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 
 import Layout from "./pages/Layout";
 import HomePage from "./pages/HomePage";
-import "./styles/tailwind.css";
+import "../public/tailwind.css";
 import BookPortalPage from "./pages/BookPortalPage";
 import ManagerPage from "./pages/ManagerPage";
 import SessionProvider from "./providers/SessionProvider";

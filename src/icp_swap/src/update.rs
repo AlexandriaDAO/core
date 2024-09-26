@@ -1,4 +1,5 @@
 use candid::{CandidType, Nat, Principal};
+use ic_cdk::api::call::CallResult;
 use serde::Deserialize;
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex};
@@ -15,7 +16,7 @@ use icrc_ledger_types::icrc1::transfer::{BlockIndex, TransferArg, TransferError}
 use icrc_ledger_types::icrc2::transfer_from::{TransferFromArgs, TransferFromError};
 
 use crate::{get_stake, storage::*};
-use num_bigint::BigUint;
+use num_bigint::{BigUint, ToBigInt};
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct Metadata {
@@ -195,26 +196,67 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
     Ok("Burn Successfully!".to_string())
 }
 
-async fn deposit_icp_in_canister(amount: u64) -> Result<BlockIndexIC, String> {
-    let canister_id: Principal = ic_cdk::api::id();
-    let canister_account: AccountIdentifier =
-        AccountIdentifier::new(&canister_id, &DEFAULT_SUBACCOUNT);
-    let amount = Tokens::from_e8s(amount);
+// async fn deposit_icp_in_canister(amount: u64) -> Result<BlockIndexIC, String> {
+//     let canister_id: Principal = ic_cdk::api::id();
+//     let canister_account: AccountIdentifier =
+//         AccountIdentifier::new(&canister_id, &DEFAULT_SUBACCOUNT);
+//     let amount = Tokens::from_e8s(amount);
 
-    let transfer_args: ic_ledger_types::TransferArgs = ic_ledger_types::TransferArgs {
-        memo: Memo(0),
-        amount,
-        fee: Tokens::from_e8s(ICP_TRANSFER_FEE),
-        from_subaccount: Some(principal_to_subaccount(&caller())),
-        to: canister_account,
+//     let transfer_args: ic_ledger_types::TransferArgs = ic_ledger_types::TransferArgs {
+//         memo: Memo(0),
+//         amount,
+//         fee: Tokens::from_e8s(ICP_TRANSFER_FEE),
+//         from_subaccount: Some(principal_to_subaccount(&caller())),
+//         to: canister_account,
+//         created_at_time: None,
+//     };
+
+//     ic_ledger_types::transfer(MAINNET_LEDGER_CANISTER_ID, transfer_args)
+//         .await
+//         .map_err(|e| format!("failed to call ledger: {:?}", e))?
+//         .map_err(|e: ic_ledger_types::TransferError| format!("ledger transfer error {:?}", e))
+// }
+
+async fn deposit_icp_in_canister(amount: u64) -> Result<BlockIndex, String> {
+    let canister_id = ic_cdk::api::id();
+    let caller = ic_cdk::caller();
+
+    let transfer_args = TransferFromArgs {
+        from: Account {
+            owner: caller,
+            subaccount: None,
+        },
+        to: Account {
+            owner: canister_id,
+            subaccount: None,
+        },
+        amount: amount.into(),
+        fee: None,
+        memo: None,
         created_at_time: None,
+        spender_subaccount: None,
     };
 
-    ic_ledger_types::transfer(MAINNET_LEDGER_CANISTER_ID, transfer_args)
-        .await
-        .map_err(|e| format!("failed to call ledger: {:?}", e))?
-        .map_err(|e: ic_ledger_types::TransferError| format!("ledger transfer error {:?}", e))
+    // let result: CallResult<(candid::Nat,)> = ic_cdk::call(MAINNET_LEDGER_CANISTER_ID, "icrc2_transfer_from", (transfer_args,)).await;
+
+    // match result {
+    //     Ok((block_index,)) => {
+    //         block_index.0.to_f64() .ok_or_else(|| "Block index too large to fit in u64".to_string())
+    //     },
+    //     Err((code, msg)) => Err(format!("Failed to call ICRC-2 ledger: {:?} - {}", code, msg)),
+    // }
+
+    ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
+        MAINNET_LEDGER_CANISTER_ID,
+        "icrc2_transfer_from",
+        (transfer_args,),
+    )
+    .await
+    .map_err(|e| format!("failed to call ledger: {:?}", e))?
+    .0
+    .map_err(|e: TransferFromError| format!("ledger transfer error {:?}", e))
 }
+
 async fn send_icp(destination: Principal, amount: u64) -> Result<BlockIndexIC, String> {
     let amount = Tokens::from_e8s(amount);
     let transfer_args: ic_ledger_types::TransferArgs = ic_ledger_types::TransferArgs {

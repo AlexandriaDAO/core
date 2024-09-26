@@ -13,22 +13,32 @@ const getLbryBalance = createAsyncThunk<
     account: string;
   },
   { rejectValue: string }
->("icp_swap/getLbryBalance", async ({ actorLbry, account }, { rejectWithValue }) => {
-  try {
-    const result = await actorLbry.icrc1_balance_of({
-      owner: Principal.fromText(account),
-      subaccount: [],
-    });
-    const LedgerServices=LedgerService();
-    const fromatedBal=LedgerServices.e8sToIcp(result).toString();
-  return fromatedBal;
-  } catch (error) {
-    console.error(error);
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
+>(
+  "icp_swap/getLbryBalance",
+  async ({ actorLbry, account }, { rejectWithValue }) => {
+    try {
+      const result = await actorLbry.icrc1_balance_of({
+        owner: Principal.fromText(account),
+        subaccount: [],
+      });
+      const LedgerServices = LedgerService();
+      // const fromatedBal=LedgerServices.e8sToIcp(result).toString();
+      const fromatedBal = (
+        Math.floor(LedgerServices.e8sToIcp(result) * 10 ** 4) /
+        10 ** 4
+      ).toFixed(4);
+
+      return fromatedBal;
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
     }
+    return rejectWithValue(
+      "An unknown error occurred while getting LBRY balance"
+    );
   }
-  return rejectWithValue("An unknown error occurred while getting LBRY balance");
-});
+);
 
 export default getLbryBalance;
