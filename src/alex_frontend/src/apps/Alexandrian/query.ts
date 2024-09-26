@@ -1,22 +1,5 @@
 import { ApolloClient, ApolloQueryResult, InMemoryCache, gql } from '@apollo/client';
-
-export interface Tag {
-  name: string;
-  value: string;
-}
-
-export interface Transaction {
-  id: string;
-  tags: Tag[];
-  block: {
-    height: number;
-    timestamp: number;
-  };
-  data: {
-    size: number;
-    type: string;
-  };
-}
+import { Transaction } from './types/queries';
 
 const client = new ApolloClient({
   uri: 'https://arweave-search.goldsky.com/graphql',
@@ -24,12 +7,12 @@ const client = new ApolloClient({
 });
 
 const QUERY = gql`
-  query RecentTransactionsWithContentType {
+  query RecentTransactionsWithContentType($contentType: String!, $first: Int!) {
     transactions(
       tags: [
-        { name: "Content-Type", values: ["application/epub+zip"] }
+        { name: "Content-Type", values: [$contentType] }
       ]
-      first: 100
+      first: $first
       sort: HEIGHT_DESC
     ) {
       edges {
@@ -56,13 +39,17 @@ const QUERY = gql`
   }
 `;
 
-export async function fetchTransactions(): Promise<Transaction[]> {
-  console.log("Fetching transactions");
+export async function fetchTransactions(contentType: string = "application/epub+zip", amount: number = 10): Promise<Transaction[]> {
+  console.log(`Fetching ${amount} transactions with content type: ${contentType}`);
   try {
-    const result = await client.query({ query: QUERY });
+    const result = await client.query({ 
+      query: QUERY,
+      variables: { 
+        contentType: contentType,
+        first: Math.min(amount, 100)
+      }
+    });
     
-    console.log("GraphQL query result:", result);
-
     if (!result.data || !result.data.transactions || !result.data.transactions.edges) {
       console.error("Unexpected response structure:", result);
       return [];
@@ -75,7 +62,6 @@ export async function fetchTransactions(): Promise<Transaction[]> {
       data: edge.node.data
     }));
     
-    console.log("Filtered transactions:", transactions);
     return transactions;
   } catch (error) {
     console.error('Error fetching transactions:', error);
@@ -83,10 +69,15 @@ export async function fetchTransactions(): Promise<Transaction[]> {
   }
 }
 
-export async function getQuery(): Promise<ApolloQueryResult<any>> {
+export async function getQuery(contentType: string = "application/epub+zip", amount: number = 10): Promise<ApolloQueryResult<any>> {
   try {
-    const query = await client.query({ query: QUERY });
-    console.log("getQuery result:", query);
+    const query = await client.query({ 
+      query: QUERY,
+      variables: { 
+        contentType: contentType,
+        first: Math.min(amount, 100) // Ensure we don't exceed 100
+      }
+    });
     return query;
   } catch (error) {
     console.error('Error getting query results:', error);
