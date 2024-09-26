@@ -40,6 +40,11 @@ import {
   createActor as createActorAlex,
 } from "../../../../../declarations/ALEX";
 
+import {
+  vetkd,
+  createActor as createActorVetkd,
+} from "../../../../../declarations/vetkd";
+
 const backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
 const icrc7_canister_id = process.env.CANISTER_ID_ICRC7!;
 const nft_manager_canister_id = process.env.CANISTER_ID_NFT_MANAGER!;
@@ -50,6 +55,7 @@ const lbry_canister_id = process.env.CANISTER_ID_LBRY!;
 const alex_canister_id = process.env.CANISTER_ID_ALEX!;
 const alex_librarian_canister_id = process.env.CANISTER_ID_ALEX_LIBRARIAN!;
 const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
+const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 
 export const getPrincipal = (client: AuthClient): string => {
   const identity = client.getIdentity();
@@ -115,3 +121,6 @@ export const initializeLbryActor = (client: AuthClient) =>
 
 export const initializeAlexActor = (client: AuthClient) =>
   createAuthenticatedActor(client, alex_canister_id, createActorAlex, ALEX);
+
+export const initializeActorVetkd = (client: AuthClient) =>
+  createAuthenticatedActor(client, vetkd_canister_id, createActorVetkd, vetkd);

@@ -1,53 +1,50 @@
 {
-  "alex_backend": {
-    "ic": "xj2l7-vyaaa-aaaap-abl4a-cai"
-  },
-  "bookmarks": {
-    "ic": "sklez-7aaaa-aaaan-qlrva-cai"
-  },
-  "icp_swap": {
-    "ic": "5qx27-tyaaa-aaaal-qjafa-cai"
-  },
-  "librarians": {
-    "ic": "ju4sh-3yaaa-aaaap-ahapa-cai"
-  },
-  "alex_frontend": {
-    "ic": "xo3nl-yaaaa-aaaap-abl4q-cai"
-  },
-  "internet_identity": {
-    "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
-  },
-  "tokenomics": {
-    "ic": "uxyan-oyaaa-aaaap-qhezq-cai"
+  "ALEX": {
+    "ic": "7hcrm-4iaaa-aaaak-akuka-cai"
   },
   "LBRY": {
     "ic": "hdtfn-naaaa-aaaam-aciva-cai"
   },
-  "ALEX": {
-    "ic": "7hcrm-4iaaa-aaaak-akuka-cai"
+  "alex_backend": {
+    "ic": "xj2l7-vyaaa-aaaap-abl4a-cai"
   },
-  "icrc7": {
-    "ic": "fjqb7-6qaaa-aaaak-qc7gq-cai"
+  "alex_frontend": {
+    "ic": "xo3nl-yaaaa-aaaap-abl4q-cai"
   },
-  "nft_manager": {
-    "ic": "forhl-tiaaa-aaaak-qc7ga-cai"
+  "alex_librarian": {
+    "ic": "rby3s-dqaaa-aaaak-qizqa-cai"
   },
-  "xrc": {
-    "ic": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
+  "alex_wallet": {
+    "ic": "ju4sh-3yaaa-aaaap-ahapa-cai"
   },
-  "vetkd": {
-    "ic": "be2us-64aaa-aaaaa-qaabq-cai"
-  },
-  "system_api": {
-    "ic": "s55qq-oqaaa-aaaaa-aaakq-cai"
+  "bookmarks": {
+    "ic": "sklez-7aaaa-aaaan-qlrva-cai"
   },
   "icp_ledger_canister": {
     "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
   },
-  "alex_wallet": {
-    "ic": "br5f7-7uaaa-aaaaa-qaaca-cai"
+  "icp_swap": {
+    "ic": "5qx27-tyaaa-aaaal-qjafa-cai"
   },
-  "alex_librarian": {
-    "ic": "bd3sg-teaaa-aaaaa-qaaba-cai"
+  "icrc7": {
+    "ic": "fjqb7-6qaaa-aaaak-qc7gq-cai"
+  },
+  "internet_identity": {
+    "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+  },
+  "nft_manager": {
+    "ic": "forhl-tiaaa-aaaak-qc7ga-cai"
+  },
+  "system_api": {
+    "ic": "xhfe4-aqaaa-aaaak-akv4q-cai"
+  },
+  "tokenomics": {
+    "ic": "uxyan-oyaaa-aaaap-qhezq-cai"
+  },
+  "vetkd": {
+    "ic": "fzemm-saaaa-aaaan-qlsla-cai"
+  },
+  "xrc": {
+    "ic": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
   }
 }

@@ -1,5 +1,6 @@
 type Result = variant { Ok : text; Err : text };
 service : {
+  encrypted_ibe_decryption_key : (blob) -> (text);
   encryption_key : () -> (text);
   greet : () -> (text) query;
   wbe_decrypt : (text) -> (Result);

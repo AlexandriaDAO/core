@@ -7,7 +7,7 @@ import {
 	_SERVICE as VetkdService,
 } from "../../../../../declarations/vetkd/vetkd.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { ibe_encrypt } from "../utils/node";
+import { ibe_encrypt } from "@/services/vetkdService";
 
 export enum NodeStatus {
     InActive = 0,

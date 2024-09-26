@@ -11,6 +11,9 @@
 .dfx/
 .dfx/local/
 
+# azle files
+.azle/
+
 # Mops packages
 .mops/
 
@@ -33,3 +36,5 @@ deps
 data.ms
 
 keys.json
+
+node_repl_history

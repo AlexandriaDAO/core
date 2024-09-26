@@ -1,4 +1,8 @@
 import MeiliSearch, { EnqueuedTask, Index } from "meilisearch";
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../declarations/vetkd/vetkd.did';
+import { ibe_decrypt } from "./vetkdService";
+
 // import { MeiliSearchKeys } from "src/declarations/alex_backend/alex_backend.did";
 // import { alex_backend } from '../../../declarations/alex_backend';
 
@@ -12,7 +16,7 @@ import MeiliSearch, { EnqueuedTask, Index } from "meilisearch";
 // };
 
 
-export const initializeClient = async (host:string = '', key: string = ''): Promise<MeiliSearch|null> => {
+export const initializeClient = async (host:string = '', key: string = '', actor: ActorSubclass<_SERVICE>): Promise<MeiliSearch|null> => {
     if( host === '' ){
         console.log("Host is empty");
         return null;
@@ -24,9 +28,11 @@ export const initializeClient = async (host:string = '', key: string = ''): Prom
     }
 
     try{
+        const decrypted = await ibe_decrypt(actor, key)
+
         const client = new MeiliSearch({
             host,
-            apiKey: key,
+            apiKey: decrypted,
         });
         if(await client.isHealthy()){
             console.log('Client ('+host+') is healthy');

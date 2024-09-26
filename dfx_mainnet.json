@@ -1,5 +1,33 @@
 {
   "canisters": {
+    "vetkd": {
+      "type": "rust",
+      "package": "vetkd",
+      "candid": "src/vetkd/vetkd.did"
+    },
+    "system_api": {
+      "candid": "src/system_api/system_api.did",
+      "package": "system_api",
+      "type": "rust"
+    },
+    "alex_librarian": {
+      "type": "rust",
+      "package": "alex_librarian",
+      "candid": "src/alex_librarian/alex_librarian.did"
+    },
+    "alex_wallet": {
+      "type": "azle",
+      "package": "alex_wallet",
+      "main": "src/alex_wallet/src/main.ts",
+      "candid": "src/alex_wallet/alex_wallet.did",
+      "candid_gen": "automatic",
+      "custom": {
+        "experimental": true
+      },
+      "declarations": {
+        "node_compatibility": true
+      }
+    },
     "alex_backend": {
       "candid": "src/alex_backend/alex_backend.did",
       "package": "alex_backend",
@@ -19,8 +47,15 @@
     },
     "icrc7": {
       "main": "src/icrc7/main.mo",
+      "candid": "src/declarations/icrc7/icrc7.did",
       "type": "motoko",
       "specified_id": "fjqb7-6qaaa-aaaak-qc7gq-cai"
+    },
+    "nft_manager": {
+      "candid": "src/nft_manager/nft_manager.did",
+      "package": "nft_manager",
+      "type": "rust",
+      "specified_id":"forhl-tiaaa-aaaak-qc7ga-cai"
     },
     "internet_identity": {
       "type": "pull",

@@ -6,8 +6,8 @@
       "candid": "src/vetkd/vetkd.did"
     },
     "system_api": {
-      "candid": "src/system_api/vetkd_system_api.did",
-      "package": "vetkd_system_api",
+      "candid": "src/system_api/system_api.did",
+      "package": "system_api",
       "type": "rust"
     },
     "alex_librarian": {
@@ -21,6 +21,9 @@
       "main": "src/alex_wallet/src/main.ts",
       "candid": "src/alex_wallet/alex_wallet.did",
       "candid_gen": "automatic",
+      "custom": {
+        "experimental": true
+      },
       "declarations": {
         "node_compatibility": true
       }
@@ -93,12 +96,12 @@
         }
       },
       "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
-    },  "xrc": {
+    },  
+    "xrc": {
       "type": "custom",
       "candid": "src/xrc/xrc.did",
       "wasm": "src/xrc/xrc.wasm.gz",
       "remote": {
-        "candid": "src/xrc/xrc.did",
         "id": {
           "ic": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
         }

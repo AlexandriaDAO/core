@@ -30,7 +30,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 		if (!meiliClient || !activeEngine) return;
 
 		const documents = await getAllDocumentsByManifest(
-			meiliClient.index(activeEngine),
+			meiliClient.index(activeEngine.index),
 			book.manifest
 		);
 
@@ -52,7 +52,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 			setProcessing(true);
 
 			const documents = await getAllDocumentsByManifest(
-				meiliClient.index(activeEngine),
+				meiliClient.index(activeEngine.index),
 				book.manifest
 			);
 
@@ -62,7 +62,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 
 			const documentIds = documents.map((doc: any) => doc.id);
 			const task: EnqueuedTask = await meiliClient
-				.index(activeEngine)
+				.index(activeEngine.index)
 				.deleteDocuments(documentIds);
 
 			message.info("Documents enqueued for deletion.");
@@ -133,7 +133,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 			message.info("Storing JSON docs to Engine");
 
 			const task: EnqueuedTask = await meiliClient
-				.index(activeEngine)
+				.index(activeEngine.index)
 				.addDocuments(contents, { primaryKey: "id" });
 
 			message.info("Documents enqueued for addition.");
