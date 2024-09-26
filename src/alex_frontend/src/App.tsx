@@ -4,7 +4,6 @@ import ReduxProvider from "./providers/ReduxProvider";
 
 import HomePage from "./pages/HomePage";
 import "../public/tailwind.css";
-// import BookPortalPage from "./pages/BookPortalPage";
 import ManagerPage from "./pages/ManagerPage";
 import SessionProvider from "./providers/SessionProvider";
 import SwapPage from "./pages/swap";

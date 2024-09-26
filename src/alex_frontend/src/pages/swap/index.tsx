@@ -5,11 +5,11 @@ import { useState } from 'react';
 import Swap from '@/features/swap';
 const SwapPage = () => {
   return (
-    // <MainLayout>
+    <MainLayout>
       <main>
         <Swap/>
       </main>
-    // </MainLayout>
+    </MainLayout>
   );
 }
 
