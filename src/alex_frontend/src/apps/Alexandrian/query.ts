@@ -1,4 +1,4 @@
-import { ApolloClient, ApolloQueryResult, InMemoryCache, gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { Transaction } from './types/queries';
 
 const client = new ApolloClient({
@@ -7,13 +7,16 @@ const client = new ApolloClient({
 });
 
 const QUERY = gql`
-  query RecentTransactionsWithContentType($contentType: String!, $first: Int!) {
+  query RecentTransactionsWithContentType($contentType: String!, $first: Int!, $maxHeight: Int) {
     transactions(
       tags: [
         { name: "Content-Type", values: [$contentType] }
       ]
       first: $first
       sort: HEIGHT_DESC
+      block: {
+        max: $maxHeight
+      }
     ) {
       edges {
         node {
@@ -39,15 +42,32 @@ const QUERY = gql`
   }
 `;
 
-export async function fetchTransactions(contentType: string = "application/epub+zip", amount: number = 10): Promise<Transaction[]> {
-  console.log(`Fetching ${amount} transactions with content type: ${contentType}`);
+// Estimate block height from timestamp
+// Arweave aims for 2-minute block times, but it's not exact
+const estimateBlockHeight = (timestamp: number) => {
+  const arweaveGenesisTimestamp = 1598280000; // 2020-08-24 14:00:00 UTC
+  const averageBlockTime = 120; // 2 minutes in seconds
+  return Math.floor((timestamp - arweaveGenesisTimestamp) / averageBlockTime);
+};
+
+export async function fetchTransactions(
+  contentType: string = "application/epub+zip", 
+  amount: number = 10,
+  minTimestamp?: number,
+  maxTimestamp?: number
+): Promise<Transaction[]> {
   try {
+    const variables = { 
+      contentType: contentType,
+      first: Math.min(amount, 100),
+      maxHeight: maxTimestamp ? estimateBlockHeight(maxTimestamp) : undefined
+    };
+
+    console.log("GraphQL query variables:", variables);
+
     const result = await client.query({ 
       query: QUERY,
-      variables: { 
-        contentType: contentType,
-        first: Math.min(amount, 100)
-      }
+      variables: variables
     });
     
     if (!result.data || !result.data.transactions || !result.data.transactions.edges) {
@@ -68,21 +88,4 @@ export async function fetchTransactions(contentType: string = "application/epub+
     throw error;
   }
 }
-
-export async function getQuery(contentType: string = "application/epub+zip", amount: number = 10): Promise<ApolloQueryResult<any>> {
-  try {
-    const query = await client.query({ 
-      query: QUERY,
-      variables: { 
-        contentType: contentType,
-        first: Math.min(amount, 100) // Ensure we don't exceed 100
-      }
-    });
-    return query;
-  } catch (error) {
-    console.error('Error getting query results:', error);
-    throw error;
-  }
-}
-
 
