@@ -1,6 +1,5 @@
 use candid::{Nat, Principal};
 use icrc_ledger_types::icrc1::account::Subaccount;
-use ic_cdk::api::time;
 
 const MAX_QUERY_BATCH_SIZE: usize = 100;
 const MAX_UPDATE_BATCH_SIZE: usize = 20;
@@ -21,14 +20,9 @@ pub fn check_update_batch_size<T>(batch: &Vec<T>) -> Result<(), String> {
     }
 }
 
-pub fn is_within_32_digits(number: &Nat) -> bool {
-  let max_32_digit = Nat::from(10u128.pow(32) - 1);
-  number <= &max_32_digit
-}
-
-pub fn batch_is_within_32_digits(numbers: &[Nat]) -> bool {
-  let max_32_digit = Nat::from(10u128.pow(32) - 1);
-  numbers.iter().all(|number| number <= &max_32_digit)
+pub fn is_within_100_digits(number: Nat) -> bool {
+    let digit_count = number.to_string().replace("_", "").len();
+    digit_count <= 100
 }
 
 pub fn principal(id: &str) -> Principal {

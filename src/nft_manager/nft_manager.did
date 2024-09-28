@@ -54,6 +54,7 @@ service : () -> {
   get_open_proposals : () -> (vec ProposalWithVoteStatus) query;
   get_stake : (principal) -> (Result_9);
   is_verified : (vec nat) -> (Result_10);
+  is_within_100_digits : (nat) -> (bool, nat64) query;
   mint_nft : (text, nat) -> (Result_1);
   nfts_exist : (vec nat) -> (Result_10);
   owner_of : (vec nat) -> (Result_11);

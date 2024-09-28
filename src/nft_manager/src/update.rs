@@ -20,7 +20,7 @@ pub async fn mint_nft(description: String, minting_number: Nat) -> Result<String
         return Err(format!("Description exceeds maximum length of {} bytes", MAX_DESCRIPTION_LENGTH));
     }
 
-    if !is_within_32_digits(&minting_number.clone()) {
+    if !is_within_100_digits(minting_number.clone()) {
         return Err("Minting number must not exceed 32 digits".to_string());
     }
 

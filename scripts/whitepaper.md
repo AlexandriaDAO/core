@@ -1,3 +1,12 @@
+Monday todo:
+- Remove metadata from nft minting. Change the minting number to the tx_id of arweave.
+    - If decided, remove the mutability attribute.
+- 
+
+
+
+
+
 # Alexandria WhitePaper
 
 ## Table of Contents

@@ -9,14 +9,11 @@ export interface Transaction {
   fee?: { ar: string };        // Add this if fee information is available
   data: {
     size: string;
-    // ... other data properties
   };
   block: {
     timestamp: number;
-    // ... other block properties
   };
   tags: Array<{ name: string; value: string }>;
-  // ... any other properties
 }
 
 export interface ContentListProps {
