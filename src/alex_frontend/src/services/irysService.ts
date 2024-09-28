@@ -71,11 +71,7 @@ export const getServerIrys = async (actor: ActorSubclass<_SERVICE>, node: string
           ): Promise<string> => {
               const convertedMsg = Buffer.from(message["Transaction hash"]).toString('hex')
 
-              console.log('message',message);
-
-			  console.log('convertedMsg', convertedMsg);
-
-			  console.log('node', node);
+              console.log('convertedMsg',convertedMsg);
 
               // Call the signTransaction method
               const result = await actor.signData(convertedMsg, node);

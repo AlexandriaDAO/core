@@ -42,6 +42,9 @@ const myEnginesSlice = createSlice({
 
 		setNewEngineError: (state, action)=>{
 			state.newEngine = action.payload;
+		},
+		setEngines: (state, action)=>{
+			state.engines = action.payload;
 		}
 
 	},
@@ -86,6 +89,6 @@ const myEnginesSlice = createSlice({
 		}
 });
 
-export const {setNewEngine, setNewEngineLoading, setNewEngineError} = myEnginesSlice.actions;
+export const {setNewEngine, setNewEngineLoading, setNewEngineError, setEngines} = myEnginesSlice.actions;
 
 export default myEnginesSlice.reducer;

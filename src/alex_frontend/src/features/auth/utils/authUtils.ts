@@ -72,7 +72,10 @@ const createAuthenticatedActor = async <T>(
   try {
     if (await client.isAuthenticated()) {
       const identity = client.getIdentity();
-      const agent = new HttpAgent({ identity });
+      // deprecated,
+      // causes signature verification error,
+      // const agent = new HttpAgent({ identity });
+      const agent = await HttpAgent.create({ identity})
       return createActorFn(canisterId, { agent });
     }
   } catch (error) {
@@ -87,19 +90,13 @@ export const initializeActor = (client: AuthClient) =>
 export const initializeActorAlexLibrarian = (client: AuthClient) =>
   createAuthenticatedActor(client, alex_librarian_canister_id, createAlexLibrarianActor, alex_librarian);
 
-export const initializeActorAlexWallet = async (client: AuthClient) => {
-  try {
-    if (await client.isAuthenticated()) {
-      const identity = client.getIdentity();
-      const agent = new HttpAgent({ identity });
-      const actor = createAlexWalletActor(alex_wallet_canister_id, { agent });
-      return actor;
-    }
-  } catch (error) {
-    console.error("Error initializing Alex Wallet actor", error);
-  }
-  return createAlexWalletActor(alex_wallet_canister_id);
-};
+export const initializeActorAlexWallet = async (client: AuthClient) =>{
+
+  // alex_wallet doesn't work for azle, unknown error occurs
+  const defaultAlexWalletActor = createAlexWalletActor(alex_wallet_canister_id)
+
+  return createAuthenticatedActor(client, alex_wallet_canister_id, createAlexWalletActor, defaultAlexWalletActor)
+}
 
 export const initializeIcrc7Actor = (client: AuthClient) =>
   createAuthenticatedActor(client, icrc7_canister_id, createIcrc7Actor, icrc7);

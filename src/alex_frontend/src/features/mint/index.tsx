@@ -119,7 +119,7 @@ const Mint = () => {
 
 			if(activeEngine) dispatch(fetchEngineBooks({ actorNftManager, engine: activeEngine }));
 
-			setTimeout(() => next(3), 2000);
+			setTimeout(() => next(4), 2000);
 		} catch (error) {
 			message.error(`Error: ${error}`);
 			next();
@@ -208,20 +208,29 @@ const Mint = () => {
 		setUploadStatus(5);
 		message.info("Uploading files to Arweave");
 
-		Promise.all([
-			transactions.book.upload(),
-			transactions.cover.upload(),
-			transactions.data.upload(),
-			transactions.manifest.upload(),
-		]).then(()=>{
-			message.success("Uploaded Successfully");
-			console.log(transactions.manifest.id);
-			setUploadStatus(6);
-		}).catch(err=>{
-			message.error("Uploaded Error");
-			console.error('Error while uploading assets to arweave');
-		})
+		try {
+			await uploadTransaction(transactions.book, "Book");
+			await uploadTransaction(transactions.cover, "Cover");
+			await uploadTransaction(transactions.data, "Metadata");
+			await uploadTransaction(transactions.manifest, "Manifest");
 
+			message.success("All files uploaded successfully");
+			console.log('transactions', transactions);
+			setUploadStatus(6);
+		} catch (error) {
+			message.error("Upload failed");
+			console.error('Error while uploading assets to Arweave:', error);
+			setUploadStatus(0); // Reset status or set to an error state
+		}
+	};
+
+	const uploadTransaction = async (transaction: any, name: string) => {
+		try {
+			await transaction.upload();
+			message.success(`${name} uploaded successfully`);
+		} catch (error) {
+			throw new Error(`Failed to upload ${name}: ${error}`);
+		}
 	};
 
 
