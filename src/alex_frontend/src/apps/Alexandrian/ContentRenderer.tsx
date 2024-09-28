@@ -1,6 +1,7 @@
 import React from "react";
 import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
+import { supportedMimeTypes } from "./types/files";
 
 interface ContentRendererProps {
   contentId: string;
@@ -10,26 +11,29 @@ interface ContentRendererProps {
 export default function ContentRenderer({ contentId, contentType }: ContentRendererProps) {
   const contentUrl = `https://arweave.net/${contentId}`;
 
-  switch (contentType) {
-    case "application/epub+zip":
-      return (
-        <ReaderProvider>
+  if (!supportedMimeTypes.includes(contentType)) {
+    return <p className="text-white">Unsupported content type: {contentType}</p>;
+  }
+
+  if (contentType === "application/epub+zip") {
+    return (
+      <ReaderProvider>
+        <div className="h-full pt-8">
           <Reader bookUrl={contentUrl} />
-        </ReaderProvider>
-      );
-    case "image/png":
-    case "image/jpeg":
-    case "image/gif":
-      return (
-        <div className="flex justify-center items-center mt-4">
-          <img
-            src={contentUrl}
-            alt="Selected content"
-            className="max-w-full max-h-[80vh] object-contain"
-          />
         </div>
-      );
-    default:
-      return <p>Unsupported content type: {contentType}</p>;
+      </ReaderProvider>
+    );
+  }
+
+  if (contentType.startsWith("image/")) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <img
+          src={contentUrl}
+          alt="Selected content"
+          className="max-w-full max-h-full object-contain"
+        />
+      </div>
+    );
   }
 }

@@ -1,5 +1,3 @@
-// Export types
-
 export interface Tag {
   name: string;
   value: string;
@@ -7,15 +5,18 @@ export interface Tag {
 
 export interface Transaction {
   id: string;
-  tags: Tag[];
-  block: {
-    height: number;
-    timestamp: number;
-  };
+  owner?: { address: string }; // Add this if owner information is available
+  fee?: { ar: string };        // Add this if fee information is available
   data: {
-    size: number;
-    type: string;
+    size: string;
+    // ... other data properties
   };
+  block: {
+    timestamp: number;
+    // ... other block properties
+  };
+  tags: Array<{ name: string; value: string }>;
+  // ... any other properties
 }
 
 export interface ContentListProps {

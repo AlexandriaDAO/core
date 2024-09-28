@@ -1,48 +1,79 @@
-#### Basic Query: 
-query {
-  transactions(ids: ["RSbHp9leGZ_fGpbkUYnrmUP-Db0D0FeVzMj-qgOo-Io"]) {
-    edges {
-      node {
-        tags {
-          name
-          value
-        }
-      }
+#### Query: 
+
+query TransactionsFor2023 {
+  transactions(
+    first: 5,
+    sort: HEIGHT_DESC,
+    tags: [
+      { name: "Content-Type", values: ["application/png"] }
+    ],
+    block: {
+      min: 0,  # In the begining, God said let there be light, and there was light.
+      max: 1704067199   # December 31, 2023 23:59:59 UTC
     }
-  }
-}
-
-
-More full query.
-
-query {
-  transactions(ids: ["RSbHp9leGZ_fGpbkUYnrmUP-Db0D0FeVzMj-qgOo-Io"]) {
+  ) {
     edges {
-      cursor
       node {
         id
         owner {
           address
-          key
         }
         data {
           size
           type
         }
+        block {
+          height
+          timestamp
+        }
         tags {
           name
           value
         }
+      }
+    }
+    pageInfo {
+      hasNextPage
+    }
+  }
+}query TransactionsFor2023 {
+  transactions(
+    first: 5,
+    sort: HEIGHT_DESC,
+    tags: [
+      { name: "Content-Type", values: ["application/png"] }
+    ],
+    block: {
+      min: 0,  # In the begining, God said let there be light, and there was light.
+      max: 1704067199   # December 31, 2023 23:59:59 UTC
+    }
+  ) {
+    edges {
+      node {
+        id
+        owner {
+          address
+        }
+        data {
+          size
+          type
+        }
         block {
-          id
-          timestamp
           height
-          previous
+          timestamp
+        }
+        tags {
+          name
+          value
         }
       }
     }
+    pageInfo {
+      hasNextPage
+    }
   }
 }
+
 
 #### Important Addons: 
 

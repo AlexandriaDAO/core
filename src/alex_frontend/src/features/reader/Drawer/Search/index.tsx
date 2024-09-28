@@ -32,6 +32,7 @@ export const Search: React.FC<ISearchProps> = ({
 
 	useEffect(() => {
 		if (book) {
+			// // MIght be a bit fister but was causing frequent this.loading errors.
 			// const loadContents = async () => {
 			// 	// book.spine should be accessible as we already await for book.ready in useReader
 			// 	book.loaded?.spine.then(async (spine) => {
@@ -60,7 +61,7 @@ export const Search: React.FC<ISearchProps> = ({
 			// loadContents();
 
 			const processBook = async ( )=> {
-				await book.ready;  // Ensure the book is ready
+				await book.ready;
 				const spine = book.spine;
 
 				const contents: ContentList = [];
