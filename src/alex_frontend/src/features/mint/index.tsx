@@ -6,6 +6,7 @@ import Processing from "./Processing";
 import Status from "./Status";
 import Footer from "./Footer";
 import Header from "./Header";
+import { arweaveIdToNat } from "@/utils/id_convert";
 import useSession from "@/hooks/useSession";
 import { getServerIrys } from "@/services/irysService";
 import { readFileAsBuffer } from "../irys/utils/gaslessFundAndUpload";
@@ -195,8 +196,9 @@ const Mint = () => {
 		setUploadStatus(3);
 		message.info("Minting NFT via ICRC7 Protocol");
 
-		const randomMintNumber = Math.floor(Math.random() * 1000) + 1; // Random number between 1 and 1000
-		const result = await actorNftManager.mint_nft(transactionId, BigInt(randomMintNumber));
+		const mintNumber = BigInt(arweaveIdToNat(transactionId));
+		const description = "test";
+		const result = await actorNftManager.mint_nft(mintNumber, [description]);
 		if ("Err" in result) throw new Error(result.Err);
 
 		message.success("Minted Successfully");

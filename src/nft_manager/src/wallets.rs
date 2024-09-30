@@ -2,45 +2,22 @@
 // If there's a ddoss problem we can just upgrade these to block the unmatched caller, since they're not using the frontend.
 // Can't do batch versions here because icrc4 is not finalized, and so batch transfers not ready.
 
-use crate::{icrc7_principal, lbry_principal, alex_principal};
+use crate::{lbry_principal, alex_principal};
 use crate::utils::to_nft_subaccount;
-use crate::query::{get_nft_balances, is_verified};
+use crate::query::{get_nft_balances, is_owner};
 use crate::guard::not_anon;
 use ic_cdk::update;
 use candid::Nat;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::{BlockIndex, NumTokens, TransferArg, TransferError};
 
-/*
-I have to create a display first so take: 
--- nfts_of() and then get_nft_balances()
-    This should return get_nft_bal
-
-
-*/
 
 #[update(guard = "not_anon")]
 pub async fn withdraw(mint_number: Nat) -> Result<(Option<BlockIndex>, Option<BlockIndex>), String> {
     let caller = ic_cdk::api::caller();
+    let is_owner_result = is_owner(vec![mint_number.clone()], caller).await?;
 
-    if !is_verified(vec![mint_number.clone()]).await?.get(0).unwrap_or(&false) {
-        return Err("NFT is not verified".to_string());
-    }
-
-    let ownership_result = ic_cdk::call::<(Vec<Nat>,), (Vec<Option<Account>>,)>(
-        icrc7_principal(),
-        "icrc7_owner_of",
-        (vec![mint_number.clone()],),
-    )
-    .await
-    .map_err(|e| format!("Failed to call icrc7_owner_of: {:?}", e))?;
-
-    let owner = ownership_result.0.get(0)
-    .ok_or("No ownership information returned")?
-    .as_ref()
-    .ok_or("NFT not found")?;
-
-    if owner.owner != caller {
+    if !is_owner_result.get(0).unwrap_or(&false) {
         return Err("Caller is not the owner of the NFT".to_string());
     }
 
