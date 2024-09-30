@@ -1,7 +1,23 @@
-Monday todo:
+Evan's Monday todo:
+
+NFT STUFF
 - Remove metadata from nft minting. Change the minting number to the tx_id of arweave.
     - If decided, remove the mutability attribute.
-- 
+- Change frontend components to match the new standard.
+
+- Talk to zeeshan about separting the upload and mint process. Right now it's too complex to upload books and mint them in the same transaction. What we should do is have a general minter with all those metadata attributes but have them being optional. Then people can make NFTs of them after they're stored in arweave.
+
+
+Arsplorer Stuff
+- Add more file types.
+- Make the file type filters more like checkboxes.
+- Make the date sorting nicer, check for accuracy.
+- Maybe a load more button. Standardize the query limit/size.
+- Display the tags nicer, and allow people to query by tags.
+- Add the NFT minting feature.
+
+- Then eventually the SBT stuff, and how these are organized into channels that are forkable/sharable/etc.
+
 
 
 
