@@ -29,7 +29,7 @@
   - [Syllogos (aggregate)](#syllogos-aggregate)
   - [Lexigraph (write)](#lexigraph-write)
   - [Dialectica (debate)](#dialectica-debate)
-  - [Alexandrian (explore)](#alexandrian-explore)
+  - [Permahunt (explore)](#permahunt-explore)
   - [Emporium (trade)](#emporium-trade)
 - [Part 5: Architecture & Governance](#part-5-architecture--governance)
   - [Governance](#governance)
@@ -304,7 +304,7 @@ A character-based AI app where users can train an AI on a set of NFTs and SBTs s
 
 AIs of different specializations can debate eachother with users steering the conversations and ultimately evolving to consensus on which one is correct.
 
-### Alexandrian (explore)
+### Permahunt (explore)
 
 A 3d exploration game of the literal library Alexandria where the goal is to get a bachelors degree using only a library card.
 

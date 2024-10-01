@@ -3,8 +3,9 @@ import { Transaction, ContentListProps } from "./types/queries";
 import { getCover } from "@/utils/epub";
 import ContentGrid from "./ContentGrid";
 import { supportedFileTypes } from "./types/files";
+import { mint_nft } from "./utils/mint";
+import useSession from "@/hooks/useSession";
 
-// Remove the Tag import as it's not exported from ./types/files
 
 const contentTypeHandlers: Record<string, (id: string) => Promise<string | null> | string> = {
   "application/epub+zip": async (id: string) => {
@@ -21,6 +22,7 @@ supportedFileTypes.forEach(type => {
 
 export default function ContentList({ transactions, onSelectContent, contentType }: ContentListProps) {
 	const [contentUrls, setContentUrls] = useState<Record<string, string | null>>({});
+	const { actorNftManager } = useSession();
 
 	useEffect(() => {
 		const loadContent = async () => {
@@ -41,6 +43,16 @@ export default function ContentList({ transactions, onSelectContent, contentType
 		loadContent();
 	}, [transactions, contentType]);
 
+	const handleMint = async (transactionId: string) => {
+		try {
+			await mint_nft(transactionId, actorNftManager);
+			alert("NFT minted successfully!");
+		} catch (error) {
+			console.error("Error minting NFT:", error);
+			alert("Failed to mint NFT. Please try again.");
+		}
+	};
+
 	const renderDetails = (transaction: Transaction) => (
 		<div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300">
 			<p><span className="font-semibold">ID:</span> {transaction.id}</p>
@@ -52,6 +64,15 @@ export default function ContentList({ transactions, onSelectContent, contentType
 					<span className="font-semibold">{tag.name}:</span> {tag.value}
 				</p>
 			))}
+			<button
+				onClick={(e) => {
+					e.stopPropagation();
+					handleMint(transaction.id);
+				}}
+				className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
+			>
+				+
+			</button>
 		</div>
 	);
 

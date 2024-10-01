@@ -4,7 +4,7 @@ import ContentList from "./ContentList";
 import ContentRenderer from "./ContentRenderer";
 import { Transaction } from "./types/queries";
 
-export default function Alexandrian() {
+export default function Permahunt() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [selectedContent, setSelectedContent] = useState<string | null>(null);
 	const [contentType, setContentType] = useState<string>("application/epub+zip");
