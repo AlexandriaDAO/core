@@ -29,30 +29,6 @@ const FundNode = () => {
 			setLoading(false);
 		}
 	};
-	useEffect(() => {
-		setWebIrys();
-	}, []);
-
-	if (!loading && (error || !irys)) {
-		return (
-			<div className="w-full p-3 flex flex-col shadow-lg rounded-xl bg-white">
-				<div className="font-syne font-medium text-xl text-black mb-2">
-					Error: Unable to Fund Library
-				</div>
-				<div className="bg-red-100 border-l-4 border-red-500 p-4 mb-4">
-					<p className="font-roboto-condensed text-sm text-red-700">
-						{error || "Irys is not available. Please make sure MetaMask is connected and try again."}
-					</p>
-				</div>
-				<button
-					onClick={setWebIrys}
-					className="font-syne font-bold text-base transition-all duration-100 ease-in text-white px-4 py-1 rounded bg-black cursor-pointer"
-				>
-					Retry Connection
-				</button>
-			</div>
-		);
-	}
 
 	const fund = async () => {
 		if(!irys) {
@@ -72,7 +48,7 @@ const FundNode = () => {
 				console.log(fundTx, 'fundTx');
 
 				message.success(
-					`Successfully funded ${irys.utils.fromAtomic(
+					`Transaction has been submitted for ${irys.utils.fromAtomic(
 						fundTx.quantity
 					)} ${irys.token}`
 				);
@@ -86,6 +62,36 @@ const FundNode = () => {
 			setFundLoading(false);
 		}
 	};
+
+	if (!irys) {
+		return (
+			<div className="w-full p-3 shadow-lg rounded-xl bg-white">
+				<div className="font-syne font-medium text-xl text-black mb-2">
+					Connect Wallet to Fund Library
+				</div>
+				<button
+					onClick={setWebIrys}
+					className="font-syne font-bold text-base transition-all duration-100 ease-in text-white px-4 py-1 rounded bg-black cursor-pointer"
+					disabled={loading}
+				>
+					{loading ? (
+						<span className="flex gap-1 items-center">
+							Connecting <ImSpinner8 size={14} className="animate animate-spin" />
+						</span>
+					) : (
+						"Connect Wallet"
+					)}
+				</button>
+				{error && (
+					<div className="bg-red-100 border-l-4 border-red-500 p-4 mt-4">
+						<p className="font-roboto-condensed text-sm text-red-700">
+							{error}
+						</p>
+					</div>
+				)}
+			</div>
+		);
+	}
 
 	return (
         <div className={`relative ${loading ? 'cursor-not-allowed pointer-events-none' : ''}`}>
