@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { fetchTransactions } from "./query";
-import { Transaction } from "./types/queries";
-import { supportedFileTypes } from "./types/files";
+import { Transaction } from "../helpers/ArWeave/types/queries";
+import { supportedFileTypes } from "../helpers/ArWeave/types/files";
 
 interface SearchProps {
   onTransactionsUpdate: (transactions: Transaction[]) => void;
