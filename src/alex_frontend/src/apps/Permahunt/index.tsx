@@ -1,24 +1,19 @@
 import React, { useState } from "react";
-import Search from "./Search";
-import ContentList from "../helpers/ArWeave/ContentList";
-import ContentRenderer from "../helpers/ArWeave/ContentRenderer";
-import { Transaction } from "../helpers/ArWeave/types/queries";
+import AppLayout from "@/layouts/AppLayout";
+import Search from "../modules/ArWeave/Search";
+import ContentList from "../modules/ArWeave/ContentList";
+import ContentRenderer from "../modules/ArWeave/ContentRenderer";
+import { Transaction } from "../modules/ArWeave/types/queries";
 
 export default function Permahunt() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
-	const [selectedContent, setSelectedContent] = useState<string | null>(null);
-	const [contentType, setContentType] = useState<string>("application/epub+zip");
+	const [selectedContent, setSelectedContent] = useState<{ id: string, type: string } | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [contentType, setContentType] = useState<string>("application/epub+zip");
 
 	const handleSelectContent = (id: string, type: string) => {
-		setSelectedContent(id);
+		setSelectedContent({ id, type });
 		setIsModalOpen(true);
-	};
-
-	const handleContentTypeChange = (newContentType: string) => {
-		setContentType(newContentType);
-		setSelectedContent(null);
-		setIsModalOpen(false);
 	};
 
 	const closeModal = () => {
@@ -27,31 +22,34 @@ export default function Permahunt() {
 	};
 
 	return (
-		<div className="relative">
-			<Search 
-				onTransactionsUpdate={setTransactions} 
-				onContentTypeChange={handleContentTypeChange}
-			/>
-			<ContentList 
-				transactions={transactions} 
-				onSelectContent={handleSelectContent}
-				contentType={contentType}
-			/>
-			{isModalOpen && selectedContent && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-					<div className="bg-gray-800 p-4 rounded-lg w-11/12 h-5/6 relative">
-						<button 
-							onClick={closeModal}
-							className="absolute top-2 right-2 text-white hover:text-gray-300 z-10"
-						>
-							Close
-						</button>
-						<div className="h-full overflow-auto">
-							<ContentRenderer contentId={selectedContent} contentType={contentType} />
+		<AppLayout>
+			<div className="relative">
+				<Search 
+					onTransactionsUpdate={setTransactions}
+					onContentTypeChange={setContentType}
+					mode="general"
+				/>
+				<ContentList 
+					transactions={transactions} 
+					onSelectContent={handleSelectContent}
+					showMintButton={true}
+				/>
+				{isModalOpen && selectedContent && (
+					<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+						<div className="bg-gray-800 p-4 rounded-lg w-11/12 h-5/6 relative">
+							<button 
+								onClick={closeModal}
+								className="absolute top-2 right-2 text-white hover:text-gray-300 z-10"
+							>
+								Close
+							</button>
+							<div className="h-full overflow-auto">
+								<ContentRenderer contentId={selectedContent.id} contentType={selectedContent.type} />
+							</div>
 						</div>
 					</div>
-				</div>
-			)}
-		</div>
+				)}
+			</div>
+		</AppLayout>
 	);
 }

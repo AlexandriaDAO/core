@@ -7,7 +7,9 @@ export const mint_nft = async (
   actorNftManager: ActorSubclass<NftManager>,
 ) => {
 
+  console.log("transactionId", transactionId);
   const mintNumber = BigInt(arweaveIdToNat(transactionId));
+  console.log("mintNumber", mintNumber);
   const description = "";
   const result = await actorNftManager.mint_nft(mintNumber, [description]);
   if ("Err" in result) throw new Error(result.Err);
