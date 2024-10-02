@@ -28,7 +28,7 @@
 //                 }),
 //                 metadata: NFTInput::Class(vec![
 //                     PropertyShared {
-//                         name: "icrc7:metadata:uri:transactionId".to_string(),
+//                         name: "icrc7:metadata:uri:description".to_string(),
 //                         value: CandyShared::Text(description),
 //                         immutable: true,
 //                     },

@@ -374,7 +374,7 @@ pub async fn burn_forever(token_id: Nat) -> Result<BurnOk, String> {
         owner: Some(Account::from(target_principal)),
         metadata: NFTInput::Class(vec![
             PropertyShared {
-                name: "icrc7:metadata:uri:transactionId".to_string(),
+                name: "icrc7:metadata:uri:description".to_string(),
                 value: CandyShared::Text("Burned forever".to_string()),
                 immutable: true,
             },
@@ -408,7 +408,7 @@ pub async fn burn_forever(token_id: Nat) -> Result<BurnOk, String> {
                         owner: Some(Account::from(caller())),
                         metadata: NFTInput::Class(vec![
                             PropertyShared {
-                                name: "icrc7:metadata:uri:transactionId".to_string(),
+                                name: "icrc7:metadata:uri:description".to_string(),
                                 value: CandyShared::Text("Returned to caller".to_string()),
                                 immutable: true,
                             },

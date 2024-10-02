@@ -34,7 +34,7 @@ pub async fn mint_nft(minting_number: Nat, description: Option<String>) -> Resul
 
     let metadata = vec![
         PropertyShared {
-            name: "icrc7:metadata:uri:transactionId".to_string(),
+            name: "icrc7:metadata:uri:description".to_string(),
             value: CandyShared::Text(description.unwrap_or_default()),
             immutable: true,
         },
@@ -79,7 +79,7 @@ async fn fetch_metadata(valid_minting_numbers: Vec<Nat>) -> Result<Vec<Option<BT
 async fn prepare_nft_requests(valid_minting_numbers: Vec<Nat>, metadata: Vec<Option<BTreeMap<String, Value>>>, owner: Principal) -> Vec<SetNFTItemRequest> {
     valid_minting_numbers.iter().zip(metadata.iter()).filter_map(|(token_id, token_metadata)| {
         let description = token_metadata.as_ref().and_then(|metadata| {
-            metadata.get("icrc7:metadata:uri:transactionId")
+            metadata.get("icrc7:metadata:uri:description")
                 .and_then(|value| match value {
                     Value::Text(s) => Some(s.clone()),
                     _ => None,
@@ -91,7 +91,7 @@ async fn prepare_nft_requests(valid_minting_numbers: Vec<Nat>, metadata: Vec<Opt
             owner: Some(Account::from(owner)),
             metadata: NFTInput::Class(vec![
                 PropertyShared {
-                    name: "icrc7:metadata:uri:transactionId".to_string(),
+                    name: "icrc7:metadata:uri:description".to_string(),
                     value: CandyShared::Text(desc),
                     immutable: true,
                 },

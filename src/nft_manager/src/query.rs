@@ -215,7 +215,7 @@ pub async fn get_metadata(token_ids: Vec<Nat>) -> Result<Vec<Option<BTreeMap<Str
 pub async fn get_manifest_ids(token_ids: Vec<Nat>) -> Result<Vec<Option<String>>, String> {
     let manifests = get_metadata(token_ids).await?.into_iter().map(|metadata| {
         metadata.and_then(|m| {
-            m.get("icrc7:metadata:uri:transactionId")
+            m.get("icrc7:metadata:uri:description")
                 .and_then(|value| {
                     if let Value::Text(text) = value {
                         Some(text.clone())
