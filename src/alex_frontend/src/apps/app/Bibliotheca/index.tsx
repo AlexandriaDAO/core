@@ -1,49 +1,50 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AppLayout from "@/layouts/AppLayout";
+import Search from "../../modules/ArWeave/Search";
 import ContentList from "../../modules/ArWeave/ContentList";
 import ContentRenderer from "../../modules/ArWeave/ContentRenderer";
 import { Transaction } from "../../modules/ArWeave/types/queries";
-import { icrc7 } from '../../../../../declarations/icrc7';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { natToArweaveId } from "@/utils/id_convert";
 import { Principal } from '@dfinity/principal';
+import { icrc7 } from '../../../../../declarations/icrc7';
 import { fetchTransactionsByIds } from '../../modules/ArWeave/ArweaveQueries';
-import Search from "../../modules/ArWeave/Search";
 
 export default function Bibliotheca() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
-	const [arweaveIds, setArweaveIds] = useState<string[]>([]);
 	const [selectedContent, setSelectedContent] = useState<{ id: string, type: string } | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [contentType, setContentType] = useState<string>("application/epub+zip");
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const principal = useSelector((state: RootState) => state.auth.user);
+	const [userTransactionIds, setUserTransactionIds] = useState<string[]>([]);
 
 	const fetchUserNFTs = useCallback(async () => {
 		if (principal) {
+			setIsLoading(true);
 			try {
 				const tokenIds = await icrc7.icrc7_tokens_of(
 					{
 						owner: Principal.fromText(principal),
-						subaccount: [], // Empty array represents null in Candid
+						subaccount: [],
 					},
-					[], // Empty array represents null in Candid
-					[] // Empty array represents null in Candid
+					[],
+					[]
 				);
 
-				console.log("Token IDs:", tokenIds);
-
-				// Convert NFT IDs to Arweave transaction IDs
-				const newArweaveIds = tokenIds.map(id => natToArweaveId(id));
-				console.log("Arweave Transaction IDs:", newArweaveIds);
-				setArweaveIds(newArweaveIds);
-
-				// Fetch transactions based on the Arweave transaction IDs
-				const fetchedTransactions = await fetchTransactionsByIds(newArweaveIds);
-				console.log("Fetched Transactions:", fetchedTransactions);
-				setTransactions(fetchedTransactions);
+				const arweaveIds = tokenIds.map(id => natToArweaveId(id));
+				setUserTransactionIds(arweaveIds);
+				if (arweaveIds.length > 0) {
+					const fetchedTransactions = await fetchTransactionsByIds(arweaveIds);
+					setTransactions(fetchedTransactions);
+				} else {
+					setTransactions([]);
+				}
 			} catch (error) {
 				console.error("Error fetching user NFTs:", error);
+			} finally {
+				setIsLoading(false);
 			}
 		}
 	}, [principal]);
@@ -51,6 +52,18 @@ export default function Bibliotheca() {
 	useEffect(() => {
 		fetchUserNFTs();
 	}, [fetchUserNFTs]);
+
+	const handleTransactionsUpdate = (newTransactions: Transaction[]) => {
+		setTransactions(newTransactions);
+	};
+
+	const handleContentTypeChange = (newContentType: string) => {
+		setContentType(newContentType);
+	};
+
+	const handleLoadingChange = (loading: boolean) => {
+		setIsLoading(loading);
+	};
 
 	const handleSelectContent = (id: string, type: string) => {
 		setSelectedContent({ id, type });
@@ -62,25 +75,34 @@ export default function Bibliotheca() {
 		setSelectedContent(null);
 	};
 
-	const handleContentTypeChange = (newContentType: string) => {
-		setContentType(newContentType);
-	};
-
 	return (
 		<AppLayout>
 			<div className="relative">
-				<h1 className="text-2xl font-bold mb-4">Your NFT Collection</h1>
-				<Search 
-					onTransactionsUpdate={setTransactions}
-					onContentTypeChange={handleContentTypeChange}
-					mode="user"
-					userTransactionIds={arweaveIds}
-					initialSearch={true}
-				/>
-				<ContentList 
-					transactions={transactions} 
-					onSelectContent={handleSelectContent}
-				/>
+				{principal ? (
+					<>
+						<Search
+							onTransactionsUpdate={handleTransactionsUpdate}
+							onContentTypeChange={handleContentTypeChange}
+							onLoadingChange={handleLoadingChange}
+							mode="user"
+							userTransactionIds={userTransactionIds}
+							initialSearch={false}
+						/>
+						{isLoading ? (
+							<div>Loading...</div>
+						) : transactions.length > 0 ? (
+							<ContentList
+								transactions={transactions}
+								onSelectContent={handleSelectContent}
+								showMintButton={false}
+							/>
+						) : (
+							<div>No NFTs Yet</div>
+						)}
+					</>
+				) : (
+					<div>Please connect your wallet to view your library.</div>
+				)}
 				{isModalOpen && selectedContent && (
 					<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
 						<div className="bg-gray-800 p-4 rounded-lg w-11/12 h-5/6 relative">

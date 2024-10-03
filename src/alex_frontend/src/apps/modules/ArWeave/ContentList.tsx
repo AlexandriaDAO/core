@@ -3,21 +3,32 @@ import { Transaction, ContentListProps } from "./types/queries";
 import { getCover } from "@/utils/epub";
 import ContentGrid from "./ContentGrid";
 import { supportedFileTypes } from "./types/files";
-import { mint_nft } from "../mint/mint";
+import { mint_nft } from "../NFT/mint";
 import useSession from "@/hooks/useSession";
+import { FaPlay, FaFileAlt, FaFilePdf, FaFileCode, FaFileAudio, FaImage } from 'react-icons/fa';
 
 const contentTypeHandlers: Record<string, (id: string) => Promise<string | null> | string> = {
   "application/epub+zip": async (id: string) => {
     const url = await getCover(`https://arweave.net/${id}`);
     return url || `https://arweave.net/${id}`; // Return the direct URL if cover extraction fails
   },
+  "application/pdf": (id: string) => `https://arweave.net/${id}`,
 };
 
 supportedFileTypes.forEach(type => {
-  if (type.mimeType.startsWith("image/")) {
+  if (type.mimeType.startsWith("image/") || type.mimeType.startsWith("video/")) {
     contentTypeHandlers[type.mimeType] = (id: string) => `https://arweave.net/${id}`;
   }
 });
+
+const getFileIcon = (contentType: string) => {
+  if (contentType.startsWith("image/")) return <FaImage />;
+  if (contentType.startsWith("video/")) return <FaPlay />;
+  if (contentType.startsWith("audio/")) return <FaFileAudio />;
+  if (contentType === "application/pdf") return <FaFilePdf />;
+  if (["text/plain", "text/markdown", "application/json", "text/html"].includes(contentType)) return <FaFileCode />;
+  return <FaFileAlt />;
+};
 
 export default function ContentList({ transactions, onSelectContent, showMintButton = false }: ContentListProps) {
 	const [contentUrls, setContentUrls] = useState<Record<string, string | null>>({});
@@ -56,6 +67,7 @@ export default function ContentList({ transactions, onSelectContent, showMintBut
 	const renderDetails = (transaction: Transaction) => (
 		<div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300">
 			<p><span className="font-semibold">ID:</span> {transaction.id}</p>
+			<p><span className="font-semibold">Owner:</span> {transaction.owner}</p>
 			{transaction.data && (
 				<p><span className="font-semibold">Size:</span> {transaction.data.size} bytes</p>
 			)}
@@ -82,6 +94,49 @@ export default function ContentList({ transactions, onSelectContent, showMintBut
 		</div>
 	);
 
+	const renderContent = (transaction: Transaction, contentUrl: string | null) => {
+		const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+
+		if (contentUrl) {
+			if (contentType.startsWith("video/")) {
+				return (
+					<div className="relative w-full h-full bg-gray-800 flex items-center justify-center">
+						<FaPlay className="text-white text-4xl" />
+						<video
+							src={contentUrl}
+							className="absolute inset-0 w-full h-full object-cover opacity-50"
+						/>
+					</div>
+				);
+			} else if (contentType.startsWith("image/") || contentType === "application/epub+zip") {
+				return (
+					<img 
+						src={contentUrl} 
+						alt={contentType === "application/epub+zip" ? "Book cover" : "Content image"}
+						className="absolute inset-0 w-full h-full object-cover"
+					/>
+				);
+			} else if (contentType === "application/pdf") {
+				return (
+					<div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
+						<FaFilePdf className="text-gray-500 text-4xl absolute" />
+						<embed
+							src={`${contentUrl}#view=FitH&page=1`}
+							type="application/pdf"
+							className="absolute inset-0 w-full h-full opacity-50"
+						/>
+					</div>
+				);
+			}
+		}
+
+		return (
+			<div className="w-full h-full bg-gray-200 flex items-center justify-center">
+				{getFileIcon(contentType)}
+			</div>
+		);
+	};
+
 	return (
 		<ContentGrid>
 			{transactions.map((transaction) => {
@@ -94,23 +149,8 @@ export default function ContentList({ transactions, onSelectContent, showMintBut
 						onClick={() => onSelectContent(transaction.id, contentType)}
 					>
 						<div className="group relative w-full h-full">
-							{contentUrl ? (
-								<>
-									<img 
-										src={contentUrl} 
-										alt={contentType === "application/epub+zip" ? "Book cover" : "Content image"}
-										className="absolute inset-0 w-full h-full object-cover"
-									/>
-									{renderDetails(transaction)}
-								</>
-							) : (
-								<div className="flex flex-col justify-center items-center h-full">
-									<p className="text-sm text-gray-400">
-										{contentType === "application/epub+zip" ? "eBook" : "No preview available"}
-									</p>
-									{renderDetails(transaction)}
-								</div>
-							)}
+							{renderContent(transaction, contentUrl)}
+							{renderDetails(transaction)}
 						</div>
 					</ContentGrid.Item>
 				);

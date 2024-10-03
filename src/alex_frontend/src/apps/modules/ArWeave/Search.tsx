@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { fetchRecentTransactions, fetchTransactionsByIds } from './ArweaveQueries';
 import { Transaction } from "./types/queries";
 import { supportedFileTypes } from "./types/files";
@@ -6,6 +6,7 @@ import { supportedFileTypes } from "./types/files";
 interface SearchProps {
   onTransactionsUpdate: (transactions: Transaction[]) => void;
   onContentTypeChange: (contentType: string) => void;
+  onLoadingChange: (isLoading: boolean) => void; // New prop
   mode: 'user' | 'general';
   userTransactionIds?: string[];
   initialSearch?: boolean;
@@ -14,6 +15,7 @@ interface SearchProps {
 export default function Search({ 
   onTransactionsUpdate, 
   onContentTypeChange, 
+  onLoadingChange, // New prop
   mode, 
   userTransactionIds = [],
   initialSearch = false
@@ -21,28 +23,51 @@ export default function Search({
   const [contentType, setContentType] = useState<string>(supportedFileTypes[0].mimeType);
   const [amount, setAmount] = useState<number>(10);
   const [filterDate, setFilterDate] = useState<string>("");
+  const [filterTime, setFilterTime] = useState<string>("00:00");
+  const [ownerFilter, setOwnerFilter] = useState<string>("");
 
-  useEffect(() => {
-    if (initialSearch && mode === 'user' && userTransactionIds.length > 0) {
-      handleSearch();
-    }
-  }, [initialSearch, mode, userTransactionIds]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [hasInitialSearched, setHasInitialSearched] = useState(false);
 
-  const handleSearch = async () => {
+  const fetchTransactions = useCallback(async () => {
+    setIsLoading(true);
+    onLoadingChange(true);
+    onTransactionsUpdate([]); // Clear previous results
+
     let fetchedTransactions: Transaction[] = [];
 
-    if (mode === 'user' && userTransactionIds.length > 0) {
-      fetchedTransactions = await fetchTransactionsByIds(userTransactionIds);
-    } else {
-      let maxTimestamp: number | undefined;
-      if (filterDate) {
-        maxTimestamp = Math.floor(new Date(filterDate).getTime() / 1000);
+    try {
+      if (mode === 'user' && userTransactionIds.length > 0) {
+        fetchedTransactions = await fetchTransactionsByIds(userTransactionIds);
+      } else {
+        let maxTimestamp: number | undefined;
+        if (filterDate) {
+          const dateTime = new Date(`${filterDate}T${filterTime}:00Z`);
+          maxTimestamp = Math.floor(dateTime.getTime() / 1000);
+        }
+        fetchedTransactions = await fetchRecentTransactions(contentType, amount, maxTimestamp, ownerFilter || undefined);
       }
-      fetchedTransactions = await fetchRecentTransactions(contentType, amount, maxTimestamp);
-    }
 
-    onTransactionsUpdate(fetchedTransactions);
-    onContentTypeChange(contentType);
+      onTransactionsUpdate(fetchedTransactions);
+      onContentTypeChange(contentType);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      // Optionally, you can add error handling here
+    } finally {
+      setIsLoading(false);
+      onLoadingChange(false);
+    }
+  }, [contentType, amount, filterDate, filterTime, ownerFilter, mode, userTransactionIds, onTransactionsUpdate, onContentTypeChange, onLoadingChange]);
+
+  useEffect(() => {
+    if (initialSearch && !hasInitialSearched) {
+      fetchTransactions();
+      setHasInitialSearched(true);
+    }
+  }, [initialSearch, hasInitialSearched, fetchTransactions]);
+
+  const handleSearch = () => {
+    fetchTransactions();
   };
 
   const styles = {
@@ -79,6 +104,11 @@ export default function Search({
     },
   };
 
+  const buttonStyle = {
+    ...styles.button,
+    backgroundColor: isLoading ? '#cccccc' : '#007bff',
+    cursor: isLoading ? 'not-allowed' : 'pointer',
+  };
 
   return (
     <div style={styles.container}>
@@ -108,7 +138,7 @@ export default function Search({
             />
           </div>
           <div>
-            <label style={styles.label}>Filter Date:</label>
+            <label style={styles.label}>Date:</label>
             <input
               type="date"
               value={filterDate}
@@ -116,10 +146,33 @@ export default function Search({
               style={styles.input}
             />
           </div>
+          <div>
+            <label style={styles.label}>Time:</label>
+            <input
+              type="time"
+              value={filterTime}
+              onChange={(e) => setFilterTime(e.target.value)}
+              style={styles.input}
+            />
+          </div>
+          <div>
+            <label style={styles.label}>Owner Address:</label>
+            <input
+              type="text"
+              value={ownerFilter}
+              onChange={(e) => setOwnerFilter(e.target.value)}
+              placeholder="Enter owner address"
+              style={styles.input}
+            />
+          </div>
         </>
       )}
-      <button onClick={handleSearch} style={styles.button}>
-        {mode === 'user' ? 'Refresh' : 'Search'}
+      <button 
+        onClick={handleSearch} 
+        style={buttonStyle}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Loading...' : (mode === 'user' ? 'Refresh' : 'Search')}
       </button>
     </div>
   );

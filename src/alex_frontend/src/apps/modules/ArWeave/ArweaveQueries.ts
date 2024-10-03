@@ -37,22 +37,23 @@ const FETCH_BY_IDS_QUERY = gql`
   }
 `;
 
-// Query for fetching recent transactions (used by Permahunt)
+// Update the FETCH_RECENT_QUERY to include owner information
 const FETCH_RECENT_QUERY = gql`
-  query RecentTransactionsWithContentType($contentType: String!, $first: Int!, $maxHeight: Int) {
+  query RecentTransactionsWithContentType($tags: [TagFilter!], $first: Int!, $ingested_at: RangeFilter, $owners: [String!]) {
     transactions(
-      tags: [
-        { name: "Content-Type", values: [$contentType] }
-      ]
+      tags: $tags
       first: $first
-      sort: HEIGHT_DESC
-      block: {
-        max: $maxHeight
-      }
+      sort: INGESTED_AT_DESC
+      ingested_at: $ingested_at
+      owners: $owners
     ) {
       edges {
+        cursor
         node {
           id
+          owner {
+            address
+          }
           block {
             height
             timestamp
@@ -65,6 +66,7 @@ const FETCH_RECENT_QUERY = gql`
             size
             type
           }
+          ingested_at
         }
       }
       pageInfo {
@@ -74,53 +76,41 @@ const FETCH_RECENT_QUERY = gql`
   }
 `;
 
-// Helper function to estimate block height from timestamp
-const estimateBlockHeight = (timestamp: number) => {
-  const arweaveGenesisTimestamp = 1598280000; // 2020-08-24 14:00:00 UTC
-  const averageBlockTime = 120; // 2 minutes in seconds
-  return Math.floor((timestamp - arweaveGenesisTimestamp) / averageBlockTime);
-};
-
 // Function to fetch transactions by IDs (for Bibliotheca)
-export async function fetchTransactionsByIds(ids: string[]): Promise<Transaction[]> {
+export const fetchTransactionsByIds = async (ids: string[]): Promise<Transaction[]> => {
+  const uniqueIds = [...new Set(ids)]; // Remove duplicates
+  const transactions: Transaction[] = [];
+
   try {
-    const result = await arweaveNetClient.query({
+    const { data } = await arweaveNetClient.query({
       query: FETCH_BY_IDS_QUERY,
-      variables: { ids }
+      variables: { ids: uniqueIds },
     });
 
-    if (!result.data || !result.data.transactions || !result.data.transactions.edges) {
-      console.error("Unexpected response structure:", result);
-      return [];
+    if (data && data.transactions && data.transactions.edges) {
+      transactions.push(...data.transactions.edges.map((edge: any) => edge.node));
     }
-
-    const transactions: Transaction[] = result.data.transactions.edges.map((edge: any) => ({
-      id: edge.node.id,
-      tags: edge.node.tags,
-      block: edge.node.block,
-      data: edge.node.data
-    }));
-
-    console.log(`Fetched ${transactions.length} out of ${ids.length} transactions`);
-
-    return transactions;
   } catch (error) {
     console.error('Error fetching transactions:', error);
-    throw error;
   }
-}
 
-// Function to fetch recent transactions (for Permahunt)
+  console.log(`Fetched ${transactions.length} out of ${uniqueIds.length} transactions`);
+  return transactions;
+};
+
+// Update fetchRecentTransactions function to include owner filter
 export async function fetchRecentTransactions(
   contentType: string = "application/epub+zip", 
   amount: number = 10,
-  maxTimestamp?: number
+  maxTimestamp?: number,
+  owner?: string
 ): Promise<Transaction[]> {
   try {
     const variables = { 
-      contentType: contentType,
+      tags: [{ name: "Content-Type", values: [contentType] }],
       first: Math.min(amount, 100),
-      maxHeight: maxTimestamp ? estimateBlockHeight(maxTimestamp) : undefined
+      ingested_at: maxTimestamp ? { max: maxTimestamp } : undefined,
+      owners: owner ? [owner] : undefined
     };
 
     console.log("GraphQL query variables:", variables);
@@ -137,9 +127,11 @@ export async function fetchRecentTransactions(
 
     return result.data.transactions.edges.map((edge: any) => ({
       id: edge.node.id,
+      owner: edge.node.owner.address,
       tags: edge.node.tags,
       block: edge.node.block,
-      data: edge.node.data
+      data: edge.node.data,
+      ingested_at: edge.node.ingested_at
     }));
   } catch (error) {
     console.error('Error fetching recent transactions:', error);
