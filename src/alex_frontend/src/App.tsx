@@ -10,12 +10,12 @@ import SwapPage from "./pages/swap";
 import LibrarianPage from "./pages/LibrarianPage";
 import WhitepaperPage from "./pages/WhitepaperPage";
 
-import Bibliotheca from "./apps/Bibliotheca";
-import Syllogos from "./apps/Syllogos";
-import Lexigraph from "./apps/Lexigraph";
-import Dialectica from "./apps/Dialectica";
-import Permahunt from "./apps/Permahunt";
-import Emporium from "./apps/Emporium";
+import Bibliotheca from "./apps/app/Bibliotheca";
+import Syllogos from "./apps/app/Syllogos";
+import Lexigraph from "./apps/app/Lexigraph";
+import Dialectica from "./apps/app/Dialectica";
+import Permahunt from "./apps/app/Permahunt";
+import Emporium from "./apps/app/Emporium";
 
 import MintPage from "./pages/MintPage";
 

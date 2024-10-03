@@ -3,7 +3,7 @@ import { Transaction, ContentListProps } from "./types/queries";
 import { getCover } from "@/utils/epub";
 import ContentGrid from "./ContentGrid";
 import { supportedFileTypes } from "./types/files";
-import { mint_nft } from "../../Permahunt/utils/mint";
+import { mint_nft } from "../mint/mint";
 import useSession from "@/hooks/useSession";
 
 const contentTypeHandlers: Record<string, (id: string) => Promise<string | null> | string> = {

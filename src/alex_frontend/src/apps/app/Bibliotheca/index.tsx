@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import AppLayout from "@/layouts/AppLayout";
-import ContentList from "../modules/ArWeave/ContentList";
-import ContentRenderer from "../modules/ArWeave/ContentRenderer";
-import { Transaction } from "../modules/ArWeave/types/queries";
-import { icrc7 } from '../../../../declarations/icrc7';
+import ContentList from "../../modules/ArWeave/ContentList";
+import ContentRenderer from "../../modules/ArWeave/ContentRenderer";
+import { Transaction } from "../../modules/ArWeave/types/queries";
+import { icrc7 } from '../../../../../declarations/icrc7';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { RootState } from '../../../store';
 import { natToArweaveId } from "@/utils/id_convert";
 import { Principal } from '@dfinity/principal';
-import { fetchTransactionsByIds } from '../modules/ArWeave/ArweaveQueries';
-import Search from "../modules/ArWeave/Search";
+import { fetchTransactionsByIds } from '../../modules/ArWeave/ArweaveQueries';
+import Search from "../../modules/ArWeave/Search";
 
 export default function Bibliotheca() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);

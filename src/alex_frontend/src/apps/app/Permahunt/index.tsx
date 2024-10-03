@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import AppLayout from "@/layouts/AppLayout";
-import Search from "../modules/ArWeave/Search";
-import ContentList from "../modules/ArWeave/ContentList";
-import ContentRenderer from "../modules/ArWeave/ContentRenderer";
-import { Transaction } from "../modules/ArWeave/types/queries";
+import Search from "../../modules/ArWeave/Search";
+import ContentList from "../../modules/ArWeave/ContentList";
+import ContentRenderer from "../../modules/ArWeave/ContentRenderer";
+import { Transaction } from "../../modules/ArWeave/types/queries";
 
 export default function Permahunt() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
