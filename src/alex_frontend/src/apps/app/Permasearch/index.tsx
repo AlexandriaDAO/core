@@ -5,7 +5,7 @@ import ContentList from "../../modules/ArWeave/ContentList";
 import ContentRenderer from "../../modules/ArWeave/ContentRenderer";
 import { Transaction } from "../../modules/ArWeave/types/queries";
 
-export default function Permahunt() {
+export default function Permasearch() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [selectedContent, setSelectedContent] = useState<{ id: string, type: string } | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);

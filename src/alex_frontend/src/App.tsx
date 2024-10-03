@@ -14,7 +14,7 @@ import Bibliotheca from "./apps/app/Bibliotheca";
 import Syllogos from "./apps/app/Syllogos";
 import Lexigraph from "./apps/app/Lexigraph";
 import Dialectica from "./apps/app/Dialectica";
-import Permahunt from "./apps/app/Permahunt";
+import Permasearch from "./apps/app/Permasearch";
 import Emporium from "./apps/app/Emporium";
 
 import MintPage from "./pages/MintPage";
@@ -37,7 +37,7 @@ export default function App() {
                         <Route path="/app/syllogos" element={<Syllogos />} />
                         <Route path="/app/lexigraph" element={<Lexigraph />} />
                         <Route path="/app/dialectica" element={<Dialectica />} />
-                        <Route path="/app/permahunt" element={<Permahunt />} />
+                        <Route path="/app/permasearch" element={<Permasearch />} />
                         <Route path="/app/emporium" element={<Emporium />} />
 
                         {/* experimental/temporary */}

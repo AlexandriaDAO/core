@@ -354,7 +354,7 @@ A character-based AI app where users can train an AI on a set of NFTs and SBTs s
 
 AIs of different specializations can debate eachother with users steering the conversations and ultimately evolving to consensus on which one is correct.
 
-### Permahunt (explore)
+### Permasearch (explore)
 
 A 3d exploration game of the literal library Alexandria where the goal is to get a bachelors degree using only a library card.
 
