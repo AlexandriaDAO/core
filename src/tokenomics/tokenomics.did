@@ -1,6 +1,5 @@
 type Result = variant { Ok : text; Err : text };
-service : () -> {
-  get_allowed_callers : () -> (vec principal) query;
+service : {
   get_current_ALEX_rate : () -> (nat64) query;
   get_current_LBRY_threshold : () -> (nat64) query;
   get_max_stats : () -> (nat64, nat64) query;
