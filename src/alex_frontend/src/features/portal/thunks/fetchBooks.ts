@@ -53,16 +53,18 @@ import { _SERVICE as _SERVICENFTMANAGER } from '../../../../../declarations/nft_
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Book } from '../portalSlice';
 import { getBooks } from '@/services/bookService';
+import { getNftManagerActor } from '@/features/auth/utils/authUtils';
 
 
 
 // Define the async thunk
 const fetchBooks = createAsyncThunk<
     Book[], // This is the return type of the thunk's payload
-    ActorSubclass<_SERVICENFTMANAGER>, //Argument that we pass to initialize
+    void, //Argument that we pass to initialize
     { rejectValue: string }
->("portal/fetchBooks", async (actorNftManager, { rejectWithValue }) => {
+>("portal/fetchBooks", async (_, { rejectWithValue }) => {
     try {
+        const actorNftManager = await getNftManagerActor();
         const result = await actorNftManager.get_nfts([], []);
 
         // if ('Err' in result) {

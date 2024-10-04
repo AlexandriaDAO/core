@@ -247,9 +247,11 @@ pub fn get_engines_not_owned_by(owner: String) -> Vec<Engine> {
 #[query]
 pub fn get_engines_not_owned_by_me() -> Vec<Engine> {
     let my_principal = caller();
-    if is_anonymous(my_principal) {
+    ic_cdk::println!("Caller principal: {:?}", my_principal);
+
+    let result = if is_anonymous(my_principal) {
         get_engines()
-    }else{
+    } else {
         ENGINES.with(|engines| {
             engines.borrow()
                 .iter()
@@ -257,5 +259,8 @@ pub fn get_engines_not_owned_by_me() -> Vec<Engine> {
                 .cloned()
                 .collect()
         })
-    }
+    };
+
+    ic_cdk::println!("Result length: {}", result.len());
+    result
 }

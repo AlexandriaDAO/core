@@ -1,21 +1,18 @@
+import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import React, { useEffect, useState } from "react";
 
 import { Engine } from "../../../../../declarations/alex_backend/alex_backend.did";
 
 import { initializeClient } from "@/services/meiliService";
 import MeiliSearch from "meilisearch";
 import { setActiveEngine } from "@/features/engine-overview/engineOverviewSlice";
-import useSession from "@/hooks/useSession";
 
 interface EngineItemProps {
 	engine: Engine
 };
 
 const EngineItem = ({ engine }: EngineItemProps) => {
-
-	const {actorVetkd} = useSession();
 
 	const [client, setClient] = useState<MeiliSearch | null | undefined>(undefined);
 	const dispatch = useAppDispatch();
@@ -31,7 +28,7 @@ const EngineItem = ({ engine }: EngineItemProps) => {
 	};
 	useEffect(() => {
 		const engineStatus = async () => {
-			const client = await initializeClient(engine.host, engine.key, actorVetkd);
+			const client = await initializeClient(engine.host, engine.key);
 			setClient(client);
 		};
 		engineStatus();

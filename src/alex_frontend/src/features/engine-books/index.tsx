@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { IoIosArrowDown, IoIosArrowUp, IoIosSearch } from "react-icons/io";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Mint from "../mint";
-import useSession from "@/hooks/useSession";
 import MintedBook from "./components/MintedBook";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchEngineBooks from "./thunks/fetchEngineBooks";
@@ -12,7 +11,6 @@ import { ImSpinner8 } from "react-icons/im";
 const TO_DISPLAY = 5;
 
 const EngineBooks = () => {
-  const {actorNftManager} = useSession();
 	const dispatch = useAppDispatch();
 
 	const { user } = useAppSelector((state) => state.auth);
@@ -23,9 +21,7 @@ const EngineBooks = () => {
     useEffect(() => {
 		// fetch once or when a new book is uploaded
 		if(books.length>0 || !activeEngine) return;
-        dispatch(fetchEngineBooks({
-			actorNftManager, engine: activeEngine
-		}));
+        dispatch(fetchEngineBooks(activeEngine));
     }, []);
 
 	return (

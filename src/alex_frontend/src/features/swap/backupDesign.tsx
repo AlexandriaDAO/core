@@ -17,8 +17,6 @@ import BalanceContent from './components/balance/balanceContent';
 
 const Home = () => {
     const auth = useAppSelector(state => state.auth);
-    const { actorSwap, actorIcpLedger, actorTokenomics, actorLbry, actorAlex } = useSession();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [activeTab, setActiveTab] = useState(1);
 
     const [selectedOption, setSelectedOption] = useState("Select an option");
@@ -50,21 +48,10 @@ const Home = () => {
 
 
 
-    useEffect(() => {
-        const checkIsAuth = async () => {
-            if (auth.user === "") {
-                setIsAuthenticated(false);
-            }
-            else {
-                setIsAuthenticated(true);
-            }
-        }
-        checkIsAuth();
-    }, [auth])
     return (
         <div className='tabs py-10 2xl:py-20 xl:py-16 lg:py-14 md:py-12 sm:py-10'>
             <div className='container px-3'>
-                <AccountCards actorIcpLedger={actorIcpLedger} actorSwap={actorSwap}isAuthenticated={isAuthenticated} />
+                <AccountCards />
                 <div className='tabs-content'>
                     {/* <div className="flex border-b mb-5 2xl:mb-10 xl:mb-7 lg:mb-7 md:mb-6 sm:mb-5 flex-wrap">
                         <button onClick={() => setActiveTab(1)}

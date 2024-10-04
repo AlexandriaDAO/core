@@ -2,17 +2,13 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect } from "react";
 import { ImSpinner8 } from "react-icons/im";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import useSession from "@/hooks/useSession";
-import { alex_librarian } from "../../../../../src/declarations/alex_librarian";
 import { MdLockOutline } from "react-icons/md";
 import checkLibrarian from "./thunks/checkLibrarian";
-import { setIsLibrarian } from "./librarianSlice";
 import { IoMdCheckmark } from "react-icons/io";
 import { RxCross1 } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
 
 function Librarian() {
-	const { actorAlexLibrarian } = useSession();
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 
@@ -21,14 +17,8 @@ function Librarian() {
 	);
 
 	useEffect(() => {
-		if (actorAlexLibrarian != alex_librarian) {
-			console.log("checking whether user is librarian or not");
-			dispatch(checkLibrarian(actorAlexLibrarian));
-		} else {
-			console.log("it's an anonymous user");
-			dispatch(setIsLibrarian(false));
-		}
-	}, [actorAlexLibrarian, dispatch]);
+		dispatch(checkLibrarian());
+	}, []);
 
 	const handleViewProfileClick = () => {
 		navigate("/librarian");

@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { IoIosSearch } from "react-icons/io";
-import useSession from "@/hooks/useSession";
 import { ConfigProvider, Table, TableColumnsType } from "antd";
 import EngineItemAction from "./components/EngineItemAction";
 import { Engine } from "../../../../../src/declarations/alex_backend/alex_backend.did";
 
 import './styles/table.module.css';
-import { Index } from "meilisearch";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchPublicEngines from "./thunks/fetchPublicEngines";
+import logout from "../auth/thunks/logout";
+import { getAuthClient } from "../auth/utils/authUtils";
+import useSession from "@/hooks/useSession";
 const columns: TableColumnsType<Engine> = [
 	{
 		title: "Name",
@@ -29,36 +30,19 @@ const columns: TableColumnsType<Engine> = [
 	},
 ];
 function PublicEngines() {
-	const { actor } = useSession();
+	const {checkAuthentication} = useSession();
 	const dispatch = useAppDispatch();
 
 	const { engines, loading } = useAppSelector((state) => state.publicEngines);
+	const {user} = useAppSelector(state=>state.auth)
 
 	useEffect(() => {
-		dispatch(fetchPublicEngines(actor));
-	}, [actor]);
+		checkAuthentication()
+	}, []);
 
-	// useEffect(()=>{
-	// 	if(!meiliClient) return;
-	// 	const fetchEngines = async()=>{
-	// 		try{
-	// 			setLoading(true);
-	// 			setEngines([]);
-
-	// 			const {results} = await meiliClient.getIndexes();
-
-	// 			if(user) setEngines(results.filter(index=>index.uid !== user))
-	// 			else setEngines(results);
-
-	// 		}catch(ex){
-	// 			message.error("Error fetching filters" + ex)
-	// 		}finally{
-	// 			setLoading(false)
-	// 		}
-	// 	}
-	// 	fetchEngines();
-	// },[user, meiliClient])
-
+	useEffect(() => {
+		dispatch(fetchPublicEngines())
+	}, [user]);
 
 	return (
 		<div className="flex-grow flex flex-col shadow-lg rounded-xl bg-white">

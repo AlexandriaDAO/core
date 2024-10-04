@@ -1,21 +1,18 @@
-import { ActorSubclass } from '@dfinity/agent';
-import { _SERVICE as _SERVICENFTMANAGER } from '../../../../../declarations/nft_manager/nft_manager.did';
 import { Engine } from '../../../../../declarations/alex_backend/alex_backend.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from '@/store';
 import { getBooks } from '@/services/bookService';
 import { Book } from '@/features/portal/portalSlice';
+// import { getNftManagerActor } from '@/features/auth/utils/authUtils';
 
 // Define the async thunk
 const fetchEngineBooks = createAsyncThunk<
     Book[], // This is the return type of the thunk's payload
-    {
-        actorNftManager: ActorSubclass<_SERVICENFTMANAGER>,
-        engine: Engine
-    }, //Argument that we pass to initialize
+    Engine, //Argument that we pass to initialize
     { rejectValue: string, state: RootState }
->("engineBooks/fetchEngineBooks", async ({actorNftManager, engine}, { rejectWithValue, getState }) => {
+>("engineBooks/fetchEngineBooks", async (engine, { rejectWithValue, getState }) => {
     try {
+        // const actorNftManager = await getNftManagerActor();
         // const {portal: {books}} = getState();
 
         // // Ensure activeEngine is a valid principal string

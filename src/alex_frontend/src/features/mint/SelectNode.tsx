@@ -1,19 +1,16 @@
-import useSession from "@/hooks/useSession";
 import React, { useEffect, useState } from "react";
 import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
 import { ImSpinner8 } from "react-icons/im";
 import { message } from "antd";
 import { WebIrys } from "@irys/sdk";
 import { getNodeBalance, getServerIrys } from "@/services/irysService";
-
+import { getActorAlexLibrarian } from "../auth/utils/authUtils";
 
 const NodeRow: React.FC<{
 	node: Node;
 	selectedNode: Node | null;
 	setSelectedNode: (node: Node) => void;
 }> = ({ node, selectedNode, setSelectedNode }) => {
-
-	const { actorAlexWallet } = useSession();
 
 	const [irys, setIrys] = useState<WebIrys | null>(null);
 	const [loading, setLoading] = useState(false);
@@ -47,7 +44,7 @@ const NodeRow: React.FC<{
 	const setServerIrys = async () => {
 		setLoading(true);
 		try{
-			const serverIrys = await getServerIrys(actorAlexWallet, node.id);
+			const serverIrys = await getServerIrys(node.id);
 			setIrys(serverIrys);
 		}catch(error){
 			if (error instanceof Error) {
@@ -120,22 +117,18 @@ const SelectNode: React.FC<SelectNodeProps> = ({
 	setSelectedNode,
 	selectedNode,
 }) => {
-	const { actorAlexLibrarian } = useSession();
 	const [nodes, setNodes] = useState<Node[]>([]); // State to hold nodes
 
 	useEffect(() => {
 		const fetchNodes = async () => {
-			if (!actorAlexLibrarian) return;
+			const actorAlexLibrarian = await getActorAlexLibrarian();
 
 			const nodes = await actorAlexLibrarian.get_nodes();
 
-			console.log("nodes", nodes);
-
 			setNodes(nodes);
 		};
-
 		fetchNodes();
-	}, [actorAlexLibrarian]);
+	}, []);
 
 	return (
 		<section className="flex-grow h-full overflow-auto p-4 w-full flex flex-col">

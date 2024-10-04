@@ -1,7 +1,7 @@
-import { HttpAgent } from "@dfinity/agent";
+import { HttpAgent, Identity } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
 import {
-  createActor,
+  createActor as createAlexBackendActor,
   alex_backend,
 } from "../../../../../declarations/alex_backend";
 import {
@@ -45,7 +45,9 @@ import {
   createActor as createActorVetkd,
 } from "../../../../../declarations/vetkd";
 
-const backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
+const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
+
+const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
 const icrc7_canister_id = process.env.CANISTER_ID_ICRC7!;
 const nft_manager_canister_id = process.env.CANISTER_ID_NFT_MANAGER!;
 const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
@@ -57,26 +59,45 @@ const alex_librarian_canister_id = process.env.CANISTER_ID_ALEX_LIBRARIAN!;
 const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 
-export const getPrincipal = (client: AuthClient): string => {
-  const identity = client.getIdentity();
-  const principal = identity.getPrincipal().toString();
-  return principal;
+export const getPrincipal = (client: AuthClient): string => client.getIdentity().getPrincipal().toString();
+
+export const getAuthClient = async (): Promise<AuthClient> => {
+  // create new client each time inspired by default react app
+  // https://gitlab.com/kurdy/dfx_base/-/blob/main/src/dfx_base_frontend/src/services/auth.ts?ref_type=heads
+
+  // reason for creating new client each time is
+  // if the user login has expired it will SPA will not know
+  // as same client's ( isAuthenticated ) will always return true even if user session is expired
+  const authClient = await AuthClient.create();
+
+  return authClient;
 };
 
-const createAuthenticatedActor = async <T>(
-  client: AuthClient,
+const getActor = async <T>(
   canisterId: string,
   createActorFn: (canisterId: string, options: { agent: HttpAgent }) => T,
   defaultActor: T
 ): Promise<T> => {
   try {
+    const client = await getAuthClient();
     if (await client.isAuthenticated()) {
       const identity = client.getIdentity();
-      // deprecated,
-      // causes signature verification error,
-      // const agent = new HttpAgent({ identity });
-      const agent = await HttpAgent.create({ identity})
-      return createActorFn(canisterId, { agent });
+      const agent = await HttpAgent.create({
+        identity,
+        host: isLocalDevelopment ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943` : "https://identity.ic0.app",
+      });
+      // Fetch root key for certificate validation during development
+      // dangerous on mainnet
+      if (isLocalDevelopment) {
+        await agent.fetchRootKey().catch(err => {
+          console.warn('Unable to fetch root key. Check to ensure that your local replica is running');
+          console.error(err);
+        });
+      }
+
+      return createActorFn(canisterId, {
+        agent,
+      });
     }
   } catch (error) {
     console.error(`Error initializing actor for ${canisterId}:`, error);
@@ -84,40 +105,24 @@ const createAuthenticatedActor = async <T>(
   return defaultActor;
 };
 
-export const initializeActor = (client: AuthClient) =>
-  createAuthenticatedActor(client, backend_canister_id, createActor, alex_backend);
+export const getActorAlexBackend = () => getActor(alex_backend_canister_id, createAlexBackendActor, alex_backend);
 
-export const initializeActorAlexLibrarian = (client: AuthClient) =>
-  createAuthenticatedActor(client, alex_librarian_canister_id, createAlexLibrarianActor, alex_librarian);
+export const getActorAlexLibrarian = () => getActor(alex_librarian_canister_id, createAlexLibrarianActor, alex_librarian);
 
-export const initializeActorAlexWallet = async (client: AuthClient) =>{
+export const getActorAlexWallet = async () => getActor(alex_wallet_canister_id, createAlexWalletActor, createAlexWalletActor(alex_wallet_canister_id));
 
-  // alex_wallet doesn't work for azle, unknown error occurs
-  const defaultAlexWalletActor = createAlexWalletActor(alex_wallet_canister_id)
+export const getIcrc7Actor = () => getActor(icrc7_canister_id, createIcrc7Actor, icrc7);
 
-  return createAuthenticatedActor(client, alex_wallet_canister_id, createAlexWalletActor, defaultAlexWalletActor)
-}
+export const getNftManagerActor = () => getActor(nft_manager_canister_id, createNftManagerActor, nft_manager);
 
-export const initializeIcrc7Actor = (client: AuthClient) =>
-  createAuthenticatedActor(client, icrc7_canister_id, createIcrc7Actor, icrc7);
+export const getActorSwap = () => getActor(icp_swap_canister_id, createActorSwap, icp_swap);
 
-export const initializeNftManagerActor = (client: AuthClient) =>
-  createAuthenticatedActor(client, nft_manager_canister_id, createNftManagerActor, nft_manager);
+export const getIcpLedgerActor = () => getActor(icp_ledger_canister_id, createActorIcpLedger, icp_ledger_canister);
 
-export const initializeActorSwap = (client: AuthClient) =>
-  createAuthenticatedActor(client, icp_swap_canister_id, createActorSwap, icp_swap);
+export const getTokenomicsActor = () => getActor(tokenomics_canister_id, createActorTokenomics, tokenomics);
 
-export const initializeIcpLedgerActor = (client: AuthClient) =>
-  createAuthenticatedActor(client, icp_ledger_canister_id, createActorIcpLedger, icp_ledger_canister);
+export const getLbryActor = () => getActor(lbry_canister_id, createActorLbry, LBRY);
 
-export const initializeTokenomicsActor = (client: AuthClient) =>
-  createAuthenticatedActor(client, tokenomics_canister_id, createActorTokenomics, tokenomics);
+export const getAlexActor = () => getActor(alex_canister_id, createActorAlex, ALEX);
 
-export const initializeLbryActor = (client: AuthClient) =>
-  createAuthenticatedActor(client, lbry_canister_id, createActorLbry, LBRY);
-
-export const initializeAlexActor = (client: AuthClient) =>
-  createAuthenticatedActor(client, alex_canister_id, createActorAlex, ALEX);
-
-export const initializeActorVetkd = (client: AuthClient) =>
-  createAuthenticatedActor(client, vetkd_canister_id, createActorVetkd, vetkd);
+export const getActorVetkd = () => getActor(vetkd_canister_id, createActorVetkd, vetkd);

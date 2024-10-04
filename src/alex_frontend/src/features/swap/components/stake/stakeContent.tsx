@@ -15,23 +15,17 @@ import StakedInfo from "./stakeInfo";
 import Auth from "@/features/auth";
 import { ImSpinner8 } from "react-icons/im";
 
-interface StakeContentProps {
-    actorSwap: ActorSubclass<_SERVICESWAP>;
-    actorAlex: ActorSubclass<_SERVICEALEX>;
-    isAuthenticated: boolean;
-
-}
-const StakeContent: React.FC<StakeContentProps> = ({ actorSwap, actorAlex, isAuthenticated }) => {
+const StakeContent = () => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
-    const auth = useAppSelector((state) => state.auth);
+    const {user} = useAppSelector((state) => state.auth);
     const alex = useAppSelector((state) => state.alex);
     const [amount, setAmount] = useState("0");
     let alexFee = 0.0001;
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        dispatch(stakeAlex({ actorSwap, actorAlex, amount }))
+        dispatch(stakeAlex( amount ))
     }
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (Number(e.target.value) < 0) {
@@ -52,19 +46,19 @@ const StakeContent: React.FC<StakeContentProps> = ({ actorSwap, actorAlex, isAut
     }, [swap])
 
     useEffect(() => {
-        if (isAuthenticated === true) {
-            dispatch(getAccountAlexBalance({ actor: actorAlex, account: auth.user }))
+        if (user !== '') {
+            dispatch(getAccountAlexBalance(user))
         }
-    }, [auth.user, isAuthenticated])
+    }, [user])
     useEffect(() => {
         if (swap.successStake === true || swap.unstakeSuccess === true || swap.burnSuccess === true || swap.successClaimReward === true) {
-            dispatch(getAccountAlexBalance({ actor: actorAlex, account: auth.user }))
+            dispatch(getAccountAlexBalance(user))
         }
     }, [swap])
     return (
         <>
             <div>
-                <div className='grid grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-7'>
+                <div className='grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-7'>
                     <div className='stake me-2'>
                         <div className="mb-4">
                             <label className="flex items-center text-radiocolor">
@@ -123,7 +117,7 @@ const StakeContent: React.FC<StakeContentProps> = ({ actorSwap, actorAlex, isAut
                             </div>
                         </div>
                         <div>
-                            {isAuthenticated === true ? <button
+                            {user !== '' ? <button
                                 type="button"
                                 className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2"
                                 disabled={parseFloat(amount) === 0 || swap.loading === true}
@@ -144,7 +138,7 @@ const StakeContent: React.FC<StakeContentProps> = ({ actorSwap, actorAlex, isAut
                     </div>
                 </div>
                 <div className="overflow-x-auto lg:overflow-x-auto">
-                    <StakedInfo actorSwap={actorSwap} isAuthenticated={isAuthenticated} />
+                    <StakedInfo />
                 </div>
             </div>
         </>

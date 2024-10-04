@@ -18,6 +18,7 @@ import {
 } from "../myEnginesSlice";
 import { CiCircleCheck } from "react-icons/ci";
 import { AiOutlineCloseCircle } from "react-icons/ai";
+import { getAuthClient } from "@/features/auth/utils/authUtils";
 
 const EngineSchema = Yup.object().shape({
 	title: Yup.string()
@@ -28,7 +29,7 @@ const EngineSchema = Yup.object().shape({
 		// .url("Host should be a valid url")
 		// not working for localhosts
 		.min(5, "Host is too short")
-		.max(50, "Host is too long")
+		.max(100, "Host is too long")
 		.required("Host is required"),
 	key: Yup.string()
 		.min(5, "Key is too short")
@@ -50,8 +51,6 @@ const AddEngine = () => {
 		(state) => state.myEngines
 	);
 
-	const { actor, actorVetkd, authClient } = useSession();
-
 	const [addEngineModal, setAddEngineModal] = useState(false);
 
 	const handleCancel = () => {
@@ -70,11 +69,12 @@ const AddEngine = () => {
 		validateOnBlur: true, // Validate form field on blur
 		validateOnChange: true, // Validate form field on change
 		onSubmit: async (values) => {
-			if (authClient) {
-				if (await authClient.isAuthenticated()) {
-					dispatch(addEngine({ actorAlexBackend: actor, actorVetkd: actorVetkd, engine: values }));
+			const client = await getAuthClient();
+			if (client) {
+				if (await client.isAuthenticated()) {
+					dispatch(addEngine(values));
 				} else {
-					dispatch(logout(authClient));
+					dispatch(logout(client));
 				}
 			}
 		},

@@ -3,18 +3,16 @@ import { _SERVICE as _SERVICESWAP } from "../../../../../declarations/icp_swap/i
 import {_SERVICE as _SERVICEALEX} from "../../../../../declarations/ALEX/ALEX.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
+import { getActorSwap, getAlexActor } from "@/features/auth/utils/authUtils";
 
 // Define the async thunk
 const stakeAlex = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  {
-    actorSwap: ActorSubclass<_SERVICESWAP>;
-    actorAlex:ActorSubclass<_SERVICEALEX>;
-    amount: string;
-  },
+  string,
   { rejectValue: string }
->("icp_swap/stakeAlex", async ({ actorSwap,actorAlex, amount }, { rejectWithValue }) => {
+>("icp_swap/stakeAlex", async ( amount , { rejectWithValue }) => {
   try {
+    const actorAlex = await getAlexActor();
     const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
     let amountFormat: bigint = BigInt(Number(Number(amount) * 10 ** 8).toFixed(0));
     const resultAlexApprove =await actorAlex.icrc2_approve({
@@ -30,6 +28,8 @@ const stakeAlex = createAsyncThunk<
       expected_allowance: [],
       expires_at: []
     });
+
+    const actorSwap = await getActorSwap();
     const result = await actorSwap.stake_ALEX(amountFormat);
     if ("Ok" in result) return "success";
     if ("Err" in result) throw new Error(result.Err);

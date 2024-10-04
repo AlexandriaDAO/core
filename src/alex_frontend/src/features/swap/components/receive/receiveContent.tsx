@@ -1,17 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { _SERVICE as _SERVICELBRY } from '../../../../../../declarations/LBRY/LBRY.did';
-import { _SERVICE as _SERVICEALEX } from '../../../../../../declarations/ALEX/ALEX.did';
-import { _SERVICE as _SERVICEICPLEDGER } from '../../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did'
 
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import CopyHelper from "../copyHelper";
 
-interface ReceiveContent {
-
-    isAuthenticated: boolean;
-}
-const ReceiveContent: React.FC<ReceiveContent> = ({ isAuthenticated }) => {
-
+const ReceiveContent = () => {
     const auth = useAppSelector((state) => state.auth);
     const [isOpen, setIsOpen] = useState(false);
     const [networkOpen, setNetworkOpen] = useState(false);

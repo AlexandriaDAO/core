@@ -1,23 +1,17 @@
-import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE as _SERVICESWAP } from "../../../../../declarations/icp_swap/icp_swap.did";
-import { _SERVICE as _SERVICEICPLEDGER } from "../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
-
+import { getActorSwap, getIcpLedgerActor } from "@/features/auth/utils/authUtils";
 // Define the async thunk
 const swapLbry = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  {
-    actorSwap: ActorSubclass<_SERVICESWAP>;
-    actorIcpLedger: ActorSubclass<_SERVICEICPLEDGER>;
-
-    amount: string;
-  },
+  string,
   { rejectValue: string }
 >(
   "icp_swap/swapLbry",
-  async ({ actorSwap, actorIcpLedger, amount }, { rejectWithValue }) => {
+  async ( amount, { rejectWithValue }) => {
     try {
+      const actorSwap = await getActorSwap();
+      const actorIcpLedger = await getIcpLedgerActor();
       let amountFormat: bigint = BigInt(
         Number(Number(amount) * 10 ** 8).toFixed(0)
       );

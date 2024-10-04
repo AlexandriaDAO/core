@@ -6,11 +6,8 @@ import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
 import claimReward from "../../thunks/claimReward";
 import { flagHandler } from "../../swapSlice";
-interface LbryRatioProps {
-    actorSwap: ActorSubclass<_SERVICESWAP>;
-}
 
-const ClaimReward: React.FC<LbryRatioProps> = ({ actorSwap }) => {
+const ClaimReward: React.FC = () => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
     const auth = useAppSelector((state) => state.auth);
@@ -18,7 +15,7 @@ const ClaimReward: React.FC<LbryRatioProps> = ({ actorSwap }) => {
     const handleClaim = (e: any) => {
         e.preventDefault();
         dispatch(
-            claimReward({ actor: actorSwap }))
+            claimReward())
     }
     useEffect(() => {
         if (swap.successClaimReward === true) {

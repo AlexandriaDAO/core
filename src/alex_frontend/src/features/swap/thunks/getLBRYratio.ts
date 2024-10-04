@@ -1,16 +1,14 @@
-import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE as _SERVICESWAP } from "../../../../../declarations/icp_swap/icp_swap.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { getActorSwap } from "@/features/auth/utils/authUtils";
 
 // Define the async thunk
 const getLBRYratio = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  {
-    actor: ActorSubclass<_SERVICESWAP>;
-  },
+  void,
   { rejectValue: string }
->("icp_swap/getLBRYratio", async ({ actor }, { rejectWithValue }) => {
+>("icp_swap/getLBRYratio", async (_, { rejectWithValue }) => {
   try {
+    const actor = await getActorSwap();
     const result = await actor.get_current_LBRY_ratio();
     return result.toString();
   } catch (error) {

@@ -1,14 +1,14 @@
 
 import { Principal } from "@dfinity/principal";
-import { ActorSubclass } from '@dfinity/agent';
-import { _SERVICE } from '../../../declarations/vetkd/vetkd.did';
 import { hexDecode, hexEncode } from "@/utils/vetkd";
+import { getActorVetkd } from "@/features/auth/utils/authUtils";
 
 const frontend_canister_id = process.env.CANISTER_ID_ALEX_FRONTEND!;
 const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 
-export const ibe_decrypt =	 async(actor: ActorSubclass<_SERVICE>, encoded:string, receiver:string = frontend_canister_id)=> {
+export const ibe_decrypt =	 async(encoded:string, receiver:string = frontend_canister_id)=> {
 	const vetkd = await import('ic-vetkd-utils');
+	const actor = await getActorVetkd();
 
 	const tsk_seed = window.crypto.getRandomValues(new Uint8Array(32));
 	const tsk = new vetkd.TransportSecretKey(tsk_seed);
@@ -29,10 +29,11 @@ export const ibe_decrypt =	 async(actor: ActorSubclass<_SERVICE>, encoded:string
 
 	return decoded;
 }
-export const ibe_encrypt = async(actor: ActorSubclass<_SERVICE>, message:string, receiver:string = alex_wallet_canister_id)=> {
+export const ibe_encrypt = async( message:string, receiver:string = alex_wallet_canister_id)=> {
 	if(message.length == 0) throw new Error("Message is empty");
 
 	const vetkd = await import('ic-vetkd-utils');
+	const actor = await getActorVetkd();
 
 	const pk_bytes_hex = await actor.encryption_key();
 

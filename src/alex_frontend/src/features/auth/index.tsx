@@ -1,31 +1,22 @@
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import React, { useEffect } from "react";
+import React from "react";
 import logout from "./thunks/logout";
 import login from "./thunks/login";
 import { ImSpinner8 } from "react-icons/im";
-import { AiOutlineLogin, AiOutlineLogout } from "react-icons/ai";
-import useSession from "@/hooks/useSession";
-import principal from "./thunks/principal";
 import { MdLogin, MdLogout } from "react-icons/md";
-import { faRightToBracket } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getAuthClient } from "./utils/authUtils";
 
 export default function Auth() {
-	const { authClient } = useSession();
 	const dispatch = useAppDispatch();
 
-	const { filter } = useAppSelector((state) => state.home);
 	const { user, loading } = useAppSelector((state) => state.auth);
 
-	const handleAuthClick = () => {
-		if (!authClient) {
-			console.error("Auth Client not initialized");
-			return;
-		}
+	const handleAuthClick = async () => {
+		const client = await getAuthClient();
 
-		if (user) dispatch(logout(authClient));
-		else dispatch(login(authClient));
+		if (user) dispatch(logout(client));
+		else dispatch(login(client));
 	};
 	return (
 		<div

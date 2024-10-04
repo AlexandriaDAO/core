@@ -17,6 +17,7 @@ import { PiUploadSimple } from "react-icons/pi";
 import { WebIrys } from "@irys/sdk";
 import SelectNode from "./SelectNode";
 import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
+import { getIcrc7Actor, getNftManagerActor } from "../auth/utils/authUtils";
 
 
 const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_ID : process.env.REACT_LOCAL_APP_ID;
@@ -26,7 +27,7 @@ const Mint = () => {
 
 	const dispatch = useAppDispatch();
 
-	const { actorAlexWallet, actorAlexLibrarian, actorIcrc7, actorNftManager, actor, meiliClient } = useSession();
+	const { meiliClient } = useSession();
 	const [bookLoadModal, setBookLoadModal] = useState(false);
 
 	const [file, setFile] = useState<File | undefined>(undefined);
@@ -112,13 +113,13 @@ const Mint = () => {
 				message.error("Please select a node");
 				return;
 			}
-			const irys = await getServerIrys(actorAlexWallet, selectedNode.id);
+			const irys = await getServerIrys(selectedNode.id);
 			const transactions = await createAllTransactions(irys);
 
 			await mintNFT(transactions.manifest.id);
 			await uploadToArweave(irys, transactions);
 
-			if(activeEngine) dispatch(fetchEngineBooks({ actorNftManager, engine: activeEngine }));
+			if(activeEngine) dispatch(fetchEngineBooks(activeEngine));
 
 			setTimeout(() => next(4), 2000);
 		} catch (error) {
@@ -171,6 +172,7 @@ const Mint = () => {
 		return tx;
 	};
 	const createManifestTransaction = async (irys: WebIrys, txs: { bookTx: any, coverTx: any, dataTx: any }) => {
+		const actorIcrc7 = await getIcrc7Actor();
 		const totalSupply = await actorIcrc7.icrc7_total_supply();
 		const mintingNumber = Number(totalSupply) + 1;
 
@@ -198,6 +200,7 @@ const Mint = () => {
 
 		const mintNumber = BigInt(arweaveIdToNat(transactionId));
 		const description = "test";
+		const actorNftManager = await getNftManagerActor();
 		const result = await actorNftManager.mint_nft(mintNumber, [description]);
 		if ("Err" in result) throw new Error(result.Err);
 

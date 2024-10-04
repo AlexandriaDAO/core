@@ -1,11 +1,8 @@
-import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE as NftManager } from "../../../../../declarations/nft_manager/nft_manager.did";
 import { arweaveIdToNat } from "@/utils/id_convert";
+import { getNftManagerActor } from "@/features/auth/utils/authUtils";
 
-export const mint_nft = async (
-  transactionId: string,
-  actorNftManager: ActorSubclass<NftManager>,
-) => {
+export const mint_nft = async ( transactionId: string ) => {
+  const actorNftManager = await getNftManagerActor();
 
   console.log("transactionId", transactionId);
   const mintNumber = BigInt(arweaveIdToNat(transactionId));

@@ -1,39 +1,24 @@
 import React, { useEffect } from "react";
-import { ActorSubclass } from "@dfinity/agent";
 
 import AlexBalanceCard from "./alexBalanceCard";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { _SERVICE as _SERVICEALEX } from '../../../../../../declarations/ALEX/ALEX.did'
-import { _SERVICE as _SERVICELBRY } from '../../../../../../declarations/LBRY/LBRY.did';
 
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import LbryBalanceCard from "./lbryBalanceCard";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 
-interface BalanceContentProps {
-    actorAlex: ActorSubclass<_SERVICEALEX>;
-    actorLbry: ActorSubclass<_SERVICELBRY>;
-    isAuthenticated: boolean;
-
-}
-const BalanceContent: React.FC<BalanceContentProps> = ({ actorAlex, actorLbry, isAuthenticated }) => {
+const BalanceContent: React.FC = () => {
     const dispatch = useAppDispatch();
-    const auth = useAppSelector((state) => state.auth);
+    const {user} = useAppSelector((state) => state.auth);
 
 
     useEffect(() => {
-        if (isAuthenticated === true) {
-            dispatch(getAccountAlexBalance({ actor: actorAlex, account: auth.user }))
+        if (user!=='') {
+            dispatch(getAccountAlexBalance(user))
+            dispatch(getLbryBalance(user))
         }
-    }, [auth.user, isAuthenticated])
-
-
-    useEffect(() => {
-        if (isAuthenticated === true) {
-            dispatch(getLbryBalance({ actorLbry, account: auth.user }))
-        }
-    }, [auth.user, isAuthenticated])
+    }, [user])
 
 
     return (

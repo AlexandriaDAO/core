@@ -21,7 +21,6 @@ supportedFileTypes.forEach(type => {
 
 export default function ContentList({ transactions, onSelectContent, showMintButton = false }: ContentListProps) {
 	const [contentUrls, setContentUrls] = useState<Record<string, string | null>>({});
-	const { actorNftManager } = useSession();
 
 	useEffect(() => {
 		const loadContent = async () => {
@@ -45,7 +44,7 @@ export default function ContentList({ transactions, onSelectContent, showMintBut
 
 	const handleMint = async (transactionId: string) => {
 		try {
-			await mint_nft(transactionId, actorNftManager);
+			await mint_nft(transactionId);
 			alert("NFT minted successfully!");
 		} catch (error) {
 			console.error("Error minting NFT:", error);

@@ -1,23 +1,17 @@
-import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE as _SERVICESWAP } from "../../../../../declarations/icp_swap/icp_swap.did";
-import { _SERVICE as _SERVICELBRY } from "../../../../../declarations/LBRY/LBRY.did";
-
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import LedgerService from "@/utils/LedgerService";
+import { getActorSwap, getLbryActor } from "@/features/auth/utils/authUtils";
 
 
 // Define the async thunk
 const burnLbry = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  {
-    actorSwap: ActorSubclass<_SERVICESWAP>;
-    actorLbry: ActorSubclass<_SERVICELBRY>;
-    amount:Number
-  },
+  Number,
   { rejectValue: string }
->("icp_swap/burnLBRY", async ( {actorSwap,actorLbry,amount} , { rejectWithValue }) => {
+>("icp_swap/burnLBRY", async (amount , { rejectWithValue }) => {
   try {
+    const actorLbry = await getLbryActor();
     const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
     const ledgerServices=LedgerService();
     let amountFormat: bigint = BigInt(Number(amount));
@@ -36,6 +30,7 @@ const burnLbry = createAsyncThunk<
       expected_allowance: [],
       expires_at: []
     });
+    const actorSwap = await getActorSwap();
     const result = await actorSwap.burn_LBRY(amountFormat);
     if('Ok' in result) return "success";
     if('Err' in result) throw new Error(result.Err)

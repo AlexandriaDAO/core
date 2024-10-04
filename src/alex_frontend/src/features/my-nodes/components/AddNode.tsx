@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Modal } from "antd";
 import { useFormik } from "formik";
-import { BiPlus } from "react-icons/bi";
 import { ImSpinner8 } from "react-icons/im";
 import { LiaSaveSolid } from "react-icons/lia";
 import * as Yup from "yup";
-import useSession from "@/hooks/useSession";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import addNode, { NodeStatus } from "../thunks/addNode";
@@ -17,6 +15,7 @@ import {
 } from "../myNodesSlice";
 import { CiCircleCheck } from "react-icons/ci";
 import { AiOutlineCloseCircle } from "react-icons/ai";
+import { getAuthClient } from "@/features/auth/utils/authUtils";
 
 // const ethPrivateKeyRegex = /^[a-fA-F0-9]{64}$/;
 // const ethPublicKeyRegex = /^0x[a-fA-F0-9]{128}$/;
@@ -37,8 +36,6 @@ const AddNode = () => {
 		(state) => state.myNodes
 	);
 
-	const { actorAlexLibrarian, actorVetkd, authClient } = useSession();
-
 	const [addNodeModal, setAddNodeModal] = useState(false);
 
 	const handleCancel = () => {
@@ -54,12 +51,11 @@ const AddNode = () => {
 		validateOnBlur: true, // Validate form field on blur
 		validateOnChange: true, // Validate form field on change
 		onSubmit: async (values) => {
-			if (authClient) {
-				if (await authClient.isAuthenticated()) {
-					dispatch(addNode({ librarianActor: actorAlexLibrarian, vetkdActor: actorVetkd, node: values }));
-				} else {
-					dispatch(logout(authClient));
-				}
+			const client = await getAuthClient();
+			if (await client.isAuthenticated()) {
+				dispatch(addNode(values));
+			} else {
+				dispatch(logout(client));
 			}
 		},
 	});

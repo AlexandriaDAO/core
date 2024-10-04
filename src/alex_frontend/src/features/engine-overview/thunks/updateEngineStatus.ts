@@ -1,7 +1,6 @@
-import { AuthClient } from "@dfinity/auth-client";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Engine, _SERVICE } from "../../../../../../src/declarations/alex_backend/alex_backend.did";
-import { ActorSubclass } from "@dfinity/agent";
+import { Engine } from "../../../../../../src/declarations/alex_backend/alex_backend.did";
+import { getActorAlexBackend } from "@/features/auth/utils/authUtils";
 
 export enum EngineStatus {
     Draft = 0,
@@ -13,14 +12,13 @@ export enum EngineStatus {
 const updateEngineStatus = createAsyncThunk<
     Engine, // This is the return type of the thunk's payload
     {
-        actor: ActorSubclass<_SERVICE>,
         engineId: string,
         status: EngineStatus
-    }, //Argument that we pass to initialize
+    },
     { rejectValue: string }
->("engineOverview/updateEngineStatus", async ({actor, engineId, status}, { rejectWithValue }) => {
+>("engineOverview/updateEngineStatus", async ({ engineId, status}, { rejectWithValue }) => {
     try {
-
+        const actor = await getActorAlexBackend();
         const result = await actor.update_engine_status(engineId, status);
 
         if('Ok' in result) return result.Ok;

@@ -7,11 +7,9 @@ import EngineTasks from "../engine-tasks";
 import EngineStats from "../engine-stats";
 import { EngineOverviewTab, setActiveEngine, setActiveTab } from "./engineOverviewSlice";
 import updateEngineStatus, { EngineStatus } from "./thunks/updateEngineStatus";
-import useSession from "@/hooks/useSession";
 import { ImSpinner8 } from "react-icons/im";
 
 function EngineOverview() {
-    const {actor} = useSession();
 	const dispatch = useAppDispatch();
 
 	const { activeTab, activeEngine, loading } = useAppSelector(
@@ -30,13 +28,13 @@ function EngineOverview() {
 
     const handleMoveToDraftClick = ()=>{
         if(activeEngine){
-            dispatch(updateEngineStatus({actor, engineId: activeEngine.id, status: EngineStatus.Draft}))
+            dispatch(updateEngineStatus({engineId: activeEngine.id, status: EngineStatus.Draft}))
         }
     }
 
     const handlePublishEngine = ()=>{
         if(activeEngine){
-            dispatch(updateEngineStatus({actor, engineId: activeEngine.id, status: EngineStatus.Published}))
+            dispatch(updateEngineStatus({engineId: activeEngine.id, status: EngineStatus.Published}))
         }
     }
 

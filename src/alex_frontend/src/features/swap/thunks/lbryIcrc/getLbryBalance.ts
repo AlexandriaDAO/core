@@ -4,20 +4,19 @@ import { _SERVICE as _SERVICELBRY } from "../../../../../../declarations/LBRY/LB
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import LedgerService from "@/utils/LedgerService";
+import { getLbryActor } from "@/features/auth/utils/authUtils";
 
 // Define the async thunk
 const getLbryBalance = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  {
-    actorLbry: ActorSubclass<_SERVICELBRY>;
-    account: string;
-  },
+  string,
   { rejectValue: string }
 >(
   "icp_swap/getLbryBalance",
-  async ({ actorLbry, account }, { rejectWithValue }) => {
+  async (account, { rejectWithValue }) => {
     try {
-      const result = await actorLbry.icrc1_balance_of({
+      const actor = await getLbryActor();
+      const result = await actor.icrc1_balance_of({
         owner: Principal.fromText(account),
         subaccount: [],
       });

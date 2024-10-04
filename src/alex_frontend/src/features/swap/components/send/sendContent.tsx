@@ -16,17 +16,14 @@ import { flagHandler } from "../../swapSlice";
 import { ImSpinner8 } from "react-icons/im";
 import Auth from "@/features/auth";
 
-interface SendContentProps {
-    actorIcpLedger: ActorSubclass<_SERVICEICPLEDGER>;
-    actorLbry: ActorSubclass<_SERVICELBRY>;
-    actorAlex: ActorSubclass<_SERVICEALEX>;
-    isAuthenticated: boolean;
-}
-const SendContent: React.FC<SendContentProps> = ({ actorIcpLedger, actorLbry, actorAlex, isAuthenticated }) => {
+const SendContent = () => {
+    const dispatch = useAppDispatch();
+
+    const { user } = useAppSelector( state => state.auth);
     const icpLedger = useAppSelector((state) => state.icpLedger);
     const alex = useAppSelector((state) => state.alex);
     const swap = useAppSelector((state) => state.swap);
-    const dispatch = useAppDispatch();
+
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState("Select an option");
     const [selectedImage, setSelectedImage] = useState("");
@@ -78,21 +75,13 @@ const SendContent: React.FC<SendContentProps> = ({ actorIcpLedger, actorLbry, ac
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         if (selectedOption === "ICP") {
-            dispatch(transferICP({ actor: actorIcpLedger, amount, destination: destinationPrincipal, accountType: "principal" }))
+            dispatch(transferICP({ amount, destination: destinationPrincipal, accountType: "principal" }))
         }
         else if (selectedOption === "ALEX") {
-            dispatch(transferALEX({
-                actorAlex: actorAlex,
-                amount: amount,
-                destination: destinationPrincipal,
-            }))
+            dispatch(transferALEX({ amount, destination: destinationPrincipal }))
         }
         else if (selectedOption === "LBRY") {
-            dispatch(transferLBRY({
-                actorLbry: actorLbry,
-                amount: amount,
-                destination: destinationPrincipal,
-            }))
+            dispatch(transferLBRY({ amount, destination: destinationPrincipal }))
         }
 
     }
@@ -125,7 +114,7 @@ const SendContent: React.FC<SendContentProps> = ({ actorIcpLedger, actorLbry, ac
             <div className='mb-5 2xl:mb-10 xl:mb-7 lg:mb-7 md:mb-6 sm:mb-5'>
                 <h3 className="text-tabsheading 2xl:text-xxltabsheading xl:text-xltabsheading lg:text-lgtabsheading md:text-mdtabsheading sm:text-smtabsheading font-bold">Send</h3>
             </div>
-            <div className='grid grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-12'>
+            <div className='grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-12'>
                 <div className='me-0 2xl:me-3 xl:me-3 lg:me-3 md:me-3 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-3 md:mb-3 sm:mb-3'>
                     <div className='flex items-center mb-3'>
                         <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>1</span>
@@ -178,14 +167,14 @@ const SendContent: React.FC<SendContentProps> = ({ actorIcpLedger, actorLbry, ac
                             </div>
                             <div className='flex justify-between'>
                                 <div className='flex items-center'>
-                                    <strong className='text-base text-multygray font-medium me-1 me-2'>Available Balance:<span className='text-base text-darkgray ms-2'>  {availableBalance}</span></strong>
+                                    <strong className='text-base text-multygray font-medium me-2'>Available Balance:<span className='text-base text-darkgray ms-2'>  {availableBalance}</span></strong>
                                     <img className='w-5 h-5' src="images/8-logo.png" alt="apple" />
                                 </div>
                                 <Link role="button" to="" className='text-multycolor underline text-base font-medium' onClick={() => { handleMax() }}>Max</Link>
                             </div>
                         </div>
                     </div>
-                    {isAuthenticated === true ? <button
+                    {user !== "" ? <button
                         type="button"
                         className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2"
                         disabled={parseFloat(amount) === 0 || swap.loading === true}
@@ -198,7 +187,7 @@ const SendContent: React.FC<SendContentProps> = ({ actorIcpLedger, actorLbry, ac
                             <>Send</>
                         )}
                     </button> : <div
-                        className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center text-white white-auth-btn"
+                        className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn"
                     >
                         <Auth />
                     </div>}

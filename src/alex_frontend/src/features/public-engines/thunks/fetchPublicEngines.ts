@@ -1,14 +1,15 @@
-import { ActorSubclass } from '@dfinity/agent';
-import { Engine, _SERVICE } from '../../../../../declarations/alex_backend/alex_backend.did';
+import { Engine } from '../../../../../declarations/alex_backend/alex_backend.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { getActorAlexBackend, getAuthClient } from '@/features/auth/utils/authUtils';
 
 // Define the async thunk
 const fetchPublicEngines = createAsyncThunk<
     Engine[], // This is the return type of the thunk's payload
-    ActorSubclass<_SERVICE>, //Argument that we pass to initialize
+    void, //Argument that we pass to initialize
     { rejectValue: string }
->("publicEngines/fetchPublicEngines", async (actor, { rejectWithValue }) => {
+>("publicEngines/fetchPublicEngines", async (_, { rejectWithValue }) => {
     try {
+        const actor = await getActorAlexBackend();
         return await actor.get_engines_not_owned_by_me()
     } catch (error) {
         console.error("Failed to Fetch Public Engines:", error);

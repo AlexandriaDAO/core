@@ -1,18 +1,14 @@
-import { ActorSubclass } from "@dfinity/agent";
-import {
-  _SERVICE as _SERVICEALEX,
-  TransferArg,
-} from "../../../../../../declarations/ALEX/ALEX.did";
+import { TransferArg } from "../../../../../../declarations/ALEX/ALEX.did";
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import { Account } from "@dfinity/ledger-icp";
+import { getAlexActor } from "@/features/auth/utils/authUtils";
 
 // Define the async thunk
 const transferALEX = createAsyncThunk<
   string, // This is the return type of the thunk's payload
   {
-    actorAlex: ActorSubclass<_SERVICEALEX>;
     amount: string;
     destination: string;
   },
@@ -20,10 +16,11 @@ const transferALEX = createAsyncThunk<
 >(
   "alex/transferALEX",
   async (
-    { actorAlex, amount, destination },
+    { amount, destination },
     { rejectWithValue }
   ) => {
     try {
+      const actorAlex = await getAlexActor();
       const amountFormat =  BigInt(Math.floor(Number(amount) * 10 ** 8));
       let recipientAccount: Account;
       recipientAccount = {

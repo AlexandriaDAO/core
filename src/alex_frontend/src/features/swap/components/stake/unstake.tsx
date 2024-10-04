@@ -6,18 +6,14 @@ import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
 import { flagHandler } from "../../swapSlice";
 import unstake from "../../thunks/unstake";
-interface LbryRatioProps {
-    actorSwap: ActorSubclass<_SERVICESWAP>;
-}
 
-const Unstake: React.FC<LbryRatioProps> = ({ actorSwap }) => {
+const Unstake = () => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
 
     const handleUnstake = (e: any) => {
         e.preventDefault();
-        dispatch(
-            unstake({ actor: actorSwap }))
+        dispatch(unstake())
     }
     useEffect(() => {
         if (swap.unstakeSuccess === true) {

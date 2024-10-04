@@ -7,6 +7,7 @@ import useSession from "@/hooks/useSession";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import logout from "@/features/auth/thunks/logout";
 import becomeLibrarian from "../thunks/becomeLibrarian";
+import { getAuthClient } from "@/features/auth/utils/authUtils";
 
 const LibrarianSchema = Yup.object().shape({
 	name: Yup.string()
@@ -20,8 +21,6 @@ const LibrarianSchema = Yup.object().shape({
 const LibrarianForm = () => {
 	const dispatch = useAppDispatch();
 
-	const { actorAlexLibrarian, authClient } = useSession();
-
 	const formik = useFormik({
 		initialValues: {
 			name: "",
@@ -31,12 +30,13 @@ const LibrarianForm = () => {
 		validateOnBlur: true, // Validate form field on blur
 		validateOnChange: true, // Validate form field on change
 		onSubmit: async (values) => {
-			if (authClient) {
-				if (await authClient.isAuthenticated()) {
-					dispatch(becomeLibrarian({ actor:actorAlexLibrarian, librarian: values }));
+			const client = await getAuthClient();
+			if (client) {
+				if (await client.isAuthenticated()) {
+					dispatch(becomeLibrarian(values));
 				} else {
 					message.error('Login to apply');
-					dispatch(logout(authClient));
+					dispatch(logout(client));
 				}
 			}
 		},

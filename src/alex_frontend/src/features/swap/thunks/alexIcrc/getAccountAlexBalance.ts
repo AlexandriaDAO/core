@@ -3,19 +3,18 @@ import { _SERVICE as _SERVICEALEX } from "../../../../../../declarations/ALEX/AL
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import LedgerService from "@/utils/LedgerService";
+import { getAlexActor } from "@/features/auth/utils/authUtils";
 
 // Define the asyn thunk
 const getAccountAlexBalance = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  {
-    actor: ActorSubclass<_SERVICEALEX>;
-    account: string;
-  },
+  string,
   { rejectValue: string }
 >(
   "alex/getAccountAlexBalance",
-  async ({ actor, account }, { rejectWithValue }) => {
+  async (account, { rejectWithValue }) => {
     try {
+      const actor = await getAlexActor();
       const result = await actor.icrc1_balance_of({
         owner: Principal.fromText(account),
         subaccount: [],

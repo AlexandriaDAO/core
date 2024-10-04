@@ -1,9 +1,5 @@
-import { ActorSubclass } from "@dfinity/agent";
-import {
-	Librarian,
-	_SERVICE,
-} from "../../../../../declarations/alex_librarian/alex_librarian.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { getActorAlexLibrarian } from "@/features/auth/utils/authUtils";
 
 // Define an interface for the librarian parameters based on the Yup validation schema
 interface LibrarianInput {
@@ -13,21 +9,16 @@ interface LibrarianInput {
 // Define the async thunk
 const becomeLibrarian = createAsyncThunk<
 	boolean, // This is the return type of the thunk's payload
-	{
-		actor: ActorSubclass<_SERVICE>;
-		librarian: LibrarianInput;
-	}, //Argument that we pass to initialize
+	LibrarianInput, //Argument that we pass to initialize
 	{ rejectValue: string }
 >(
 	"librarian/becomeLibrarian",
 	async (
-		{
-			actor,
-			librarian: { name  },
-		},
+		{ name  },
 		{ rejectWithValue }
 	) => {
 		try {
+			const actor = await getActorAlexLibrarian();
 			const result = await actor.save_librarian(name);
 
             if('Ok' in result) return true;

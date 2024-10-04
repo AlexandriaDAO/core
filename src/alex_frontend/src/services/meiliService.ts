@@ -1,22 +1,7 @@
 import MeiliSearch, { EnqueuedTask, Index } from "meilisearch";
-import { ActorSubclass } from '@dfinity/agent';
-import { _SERVICE } from '../../../declarations/vetkd/vetkd.did';
 import { ibe_decrypt } from "./vetkdService";
 
-// import { MeiliSearchKeys } from "src/declarations/alex_backend/alex_backend.did";
-// import { alex_backend } from '../../../declarations/alex_backend';
-
-// export const getKeys = async(): Promise<MeiliSearchKeys[]> => {
-//     try {
-//         return await alex_backend.get_meilisearch_keys();
-//     } catch (error) {
-//         console.error('Error retrieving MeiliSearch keys:', error);
-//     }
-//     return [];
-// };
-
-
-export const initializeClient = async (host:string = '', key: string = '', actor: ActorSubclass<_SERVICE>): Promise<MeiliSearch|null> => {
+export const initializeClient = async (host:string = '', key: string = ''): Promise<MeiliSearch|null> => {
     if( host === '' ){
         console.log("Host is empty");
         return null;
@@ -28,7 +13,7 @@ export const initializeClient = async (host:string = '', key: string = '', actor
     }
 
     try{
-        const decrypted = await ibe_decrypt(actor, key)
+        const decrypted = await ibe_decrypt(key)
 
         const client = new MeiliSearch({
             host,

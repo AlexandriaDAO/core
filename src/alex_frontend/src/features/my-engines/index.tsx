@@ -6,22 +6,29 @@ import AddEngine from "./components/AddEngine";
 import EngineItem from "./components/EngineItem";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchMyEngines from "./thunks/fetchMyEngines";
-import useSession from "@/hooks/useSession";
-import { alex_backend } from "../../../../../src/declarations/alex_backend";
+import logout from "../auth/thunks/logout";
+import { getAuthClient } from "../auth/utils/authUtils";
 
 function MyEngines() {
-	const {actor} = useSession();
 	const dispatch = useAppDispatch();
 
 	const { user } = useAppSelector((state) => state.auth);
 	const { engines, loading } = useAppSelector((state) => state.myEngines);
 
 	useEffect(()=>{
-		if(actor != alex_backend){
-			console.log('fetching my engines');
-			dispatch(fetchMyEngines(actor));
+		if(!user) return;
+		const fetchEngines = async ()=>{
+			const client = await getAuthClient()
+			const authenticated = await client.isAuthenticated()
+
+			if(authenticated){
+				dispatch(fetchMyEngines());
+			}else if(user!= ''){
+				dispatch(logout(client))
+			}
 		}
-	},[actor])
+		fetchEngines();
+	},[user])
 
 	return (
 		<div className="w-full p-3 flex gap-2 flex-col shadow-lg rounded-xl bg-white">

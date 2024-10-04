@@ -20,55 +20,36 @@ import ReceiveContent from './components/receive/receiveContent';
 
 const SwapMain = () => {
     const dispatch = useAppDispatch();
-    const auth = useAppSelector(state => state.auth);
     const swap = useAppSelector(state => state.swap);
 
-    const { actorSwap, actorIcpLedger, actorTokenomics, actorLbry, actorAlex } = useSession();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [activeTab, setActiveTab] = useState(1);
    
     const tabs = [
-        { id: 1, label: 'Balance', content: <BalanceContent actorAlex={actorAlex} isAuthenticated={isAuthenticated} actorLbry={actorLbry} /> },
-        { id: 2, label: 'Swap', content: <SwapContent actorSwap={actorSwap} actorIcpLedger={actorIcpLedger} isAuthenticated={isAuthenticated}  /> },
-        { id: 3, label: 'Send', content: <SendContent actorIcpLedger={actorIcpLedger} actorLbry={actorLbry} actorAlex={actorAlex} isAuthenticated={false} /> },
-        { id: 4, label: 'Receive', content: <ReceiveContent isAuthenticated={isAuthenticated}  /> },
-        { id: 5, label: 'Burn', content: <BurnContent actorSwap={actorSwap} isAuthenticated={isAuthenticated} actorLbry={actorLbry} /> },
-        { id: 6, label: 'Stake', content: <StakeContent actorAlex={actorAlex} actorSwap={actorSwap} isAuthenticated={isAuthenticated}  /> },
+        { id: 1, label: 'Balance', content: <BalanceContent /> },
+        { id: 2, label: 'Swap', content: <SwapContent /> },
+        { id: 3, label: 'Send', content: <SendContent /> },
+        { id: 4, label: 'Receive', content: <ReceiveContent /> },
+        { id: 5, label: 'Burn', content: <BurnContent /> },
+        { id: 6, label: 'Stake', content: <StakeContent /> },
         // { id: 7, label: 'Transaction history', content: < BalanceContent actorAlex={actorAlex} isAuthenticated={isAuthenticated} actorLbry={actorLbry} /> }
     ];
 
-  
-
-
     useEffect(() => {
-        const checkIsAuth = async () => {
-            if (auth.user === "") {
-                setIsAuthenticated(false);
-            }
-            else {
-                setIsAuthenticated(true);
-            }
-        }
-        checkIsAuth();
-    }, [auth])
-
-    useEffect(() => {
-
-        dispatch(getLBRYratio({ actor: actorSwap }));
-        dispatch(getMaxLbryBurn({ actor: actorSwap }));
-        dispatch(getAlexMintRate({ actor: actorTokenomics }))
+        dispatch(getLBRYratio());
+        dispatch(getMaxLbryBurn());
+        dispatch(getAlexMintRate())
     }, [])
     useEffect(() => {
         if (swap.burnSuccess === true || swap.swapSuccess === true) {
-            dispatch(getLBRYratio({ actor: actorSwap }));
-            dispatch(getMaxLbryBurn({ actor: actorSwap }));
-            dispatch(getAlexMintRate({ actor: actorTokenomics }))
+            dispatch(getLBRYratio());
+            dispatch(getMaxLbryBurn());
+            dispatch(getAlexMintRate())
         }
     }, [swap])
     return (
         <div className='tabs py-10 2xl:py-20 xl:py-16 lg:py-14 md:py-12 sm:py-10'>
             <div className='container px-3'>
-                <AccountCards actorIcpLedger={actorIcpLedger} actorSwap={actorSwap} isAuthenticated={isAuthenticated} />
+                <AccountCards />
                 <div className='tabs-content'>
                     <div className='tabs-content'>
                         <div className="flex border-b mb-5 flex-wrap">
@@ -89,8 +70,6 @@ const SwapMain = () => {
                             {tabs.find(tab => tab.id === activeTab)?.content}
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div >

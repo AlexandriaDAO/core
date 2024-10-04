@@ -15,15 +15,9 @@ import { ImSpinner8 } from "react-icons/im";
 import Auth from "@/features/auth";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 
-interface BurnContentProps {
-    actorSwap: ActorSubclass<_SERVICESWAP>;
-    actorLbry: ActorSubclass<_SERVICELBRY>;
-    isAuthenticated: boolean;
-
-}
-const BurnContent: React.FC<BurnContentProps> = ({ actorSwap, actorLbry, isAuthenticated }) => {
+const BurnContent = () => {
     const dispatch = useAppDispatch();
-    const auth = useAppSelector((state) => state.auth);
+    const {user} = useAppSelector((state) => state.auth);
     const swap = useAppSelector((state) => state.swap);
     const tokenomics = useAppSelector((state) => state.tokenomics);
     const lbryFee = 0.001;
@@ -34,7 +28,7 @@ const BurnContent: React.FC<BurnContentProps> = ({ actorSwap, actorLbry, isAuthe
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        dispatch(burnLbry({ actorSwap, actorLbry, amount: amountLBRY }))
+        dispatch(burnLbry(amountLBRY))
     }
     const handleAmountLBRYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -58,15 +52,15 @@ const BurnContent: React.FC<BurnContentProps> = ({ actorSwap, actorLbry, isAuthe
         if (swap.burnSuccess === true) {
            // alert("Burned successfully!")
             dispatch(flagHandler())
-            dispatch(getLbryBalance({ actorLbry, account: auth.user }))
+            dispatch(getLbryBalance(user))
 
         }
     }, [swap.burnSuccess])
     useEffect(() => {
-        if (isAuthenticated === true) {
-            dispatch(getLbryBalance({ actorLbry, account: auth.user }))
+        if (user !== '') {
+            dispatch(getLbryBalance(user))
         }
-    }, [auth.user, isAuthenticated])
+    }, [user])
 
     return (
         <>
@@ -74,7 +68,7 @@ const BurnContent: React.FC<BurnContentProps> = ({ actorSwap, actorLbry, isAuthe
                 <div className='mb-5 2xl:mb-10 xl:mb-7 lg:mb-7 md:mb-6 sm:mb-5'>
                     <h3 className="text-tabsheading 2xl:text-xxltabsheading xl:text-xltabsheading lg:text-lgtabsheading md:text-mdtabsheading sm:text-smtabsheading font-bold">Burn</h3>
                 </div>
-                <div className='grid grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-12'>
+                <div className='grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-12'>
                     <div className='me-0 2xl:me-3 xl:me-3 lg:me-3 md:me-3 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-3 md:mb-3 sm:mb-3'>
                         <div className=' border py-5 px-5 rounded-borderbox mb-7 '>
                             <div className='flex justify-between mb-3'>
@@ -118,7 +112,7 @@ const BurnContent: React.FC<BurnContentProps> = ({ actorSwap, actorLbry, isAuthe
                                 <h3 className='text-right text-2xl font-medium'>{tentativeALEX.toFixed(4)}</h3>
                             </div>
                         </div>
-                        {isAuthenticated === true ? <button
+                        {user !== '' ? <button
                             type="button"
                             className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2"
                             disabled={amountLBRY === 0 || swap.loading === true}

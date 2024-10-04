@@ -1,7 +1,7 @@
 import { WebIrys } from "@irys/sdk";
 import { ethers } from "ethers";
-import { ActorSubclass } from '@dfinity/agent';
 import { _SERVICE } from '../../../declarations/alex_wallet/alex_wallet.did';
+import { getActorAlexWallet } from "@/features/auth/utils/authUtils";
 
 const network = process.env.DFX_NETWORK === "ic" ? "mainnet":"devnet";
 const token = "ethereum";
@@ -39,13 +39,14 @@ export const getClientIrys = async () => {
 	throw new Error('Unable to connect to wallet')
 };
 
-export const getServerIrys = async (actor: ActorSubclass<_SERVICE>, node: string|null = null): Promise<WebIrys> => {
+export const getServerIrys = async (node: string|null = null): Promise<WebIrys> => {
     // node id of the selected node while uploading
     if (!node) {
       console.error("Please provide node");
       throw new Error('Node not provided');
     }
 
+    const actor = await getActorAlexWallet();
     // await actor.setMessage('msss')
     // console.log(await actor.getMessage(), await actor.isUserAnonymous());
 

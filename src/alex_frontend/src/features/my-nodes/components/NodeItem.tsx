@@ -18,8 +18,6 @@ interface NodeItemProps {
 }
 
 const NodeItem = ({ node }: NodeItemProps) => {
-	const {actorAlexWallet} = useSession();
-
 	const [irys, setIrys] = useState<WebIrys | null>(null);
 	const [amount, setAmount] = useState("0.0001");
 
@@ -31,7 +29,7 @@ const NodeItem = ({ node }: NodeItemProps) => {
 	const setServerIrys = async () => {
 		setLoading(true);
 		try{
-			const webIrys = await getServerIrys(actorAlexWallet, node.id);
+			const webIrys = await getServerIrys(node.id);
 			setIrys(webIrys);
 		}catch(error){
 			if (error instanceof Error) {

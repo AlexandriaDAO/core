@@ -1,35 +1,25 @@
 import React, { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import useSession from "@/hooks/useSession";
 import { ImSpinner8 } from "react-icons/im";
 import { setShowProfile } from "../librarian-profile/librarianProfileSlice";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import NoNode from "./components/NoNode";
-import { alex_librarian } from "../../../../../src/declarations/alex_librarian";
 import fetchMyNodes from "../my-nodes/thunks/fetchMyNodes";
 import AddNode from "../my-nodes/components/AddNode";
 import MyNodes from "../my-nodes";
 
 
 function LibrarianProfile() {
-	const { actorAlexLibrarian } = useSession();
 	const dispatch = useAppDispatch();
+	const { nodes, loading } = useAppSelector((state) => state.myNodes);
+
+	useEffect(()=>{
+		dispatch(fetchMyNodes());
+	},[])
 
 	const handleLibrarianProfileCloseClick = () => {
 		dispatch(setShowProfile(false));
 	};
-
-
-
-	const { nodes, loading } = useAppSelector((state) => state.myNodes);
-
-	useEffect(()=>{
-		if(actorAlexLibrarian != alex_librarian){
-			console.log('fetching my nodes');
-			dispatch(fetchMyNodes(actorAlexLibrarian));
-		}
-	},[actorAlexLibrarian])
-
 
 	return (
 		<div className="flex flex-col shadow-lg rounded-xl bg-white">
