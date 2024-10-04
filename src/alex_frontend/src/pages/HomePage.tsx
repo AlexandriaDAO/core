@@ -14,7 +14,7 @@ const apps: App[] = [
   { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos' },
   { name: 'Lexigraph', description: 'Write', path: '/app/lexigraph' },
   { name: 'Dialectica', description: 'Debate', path: '/app/dialectica' },
-  { name: 'Alexandrian', description: 'Explore', path: '/app/alexandrian' },
+  { name: 'Permasearch', description: 'Explore', path: '/app/permasearch' },
   { name: 'Emporium', description: 'Trade', path: '/app/emporium' },
 ];
 

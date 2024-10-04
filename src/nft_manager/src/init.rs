@@ -32,12 +32,16 @@ fn post_init() {
         match deploy_icrc7().await {
             DeployResult::Ok => {
                 ic_cdk::println!("ICRC7 deployed successfully");
+                // Call initialize_nfts() on the newly deployed canister
+                match call_initialize_nfts().await {
+                    Ok(_) => ic_cdk::println!("NFTs initialized successfully"),
+                    Err(e) => ic_cdk::println!("Failed to initialize NFTs: {}", e),
+                }
             },
             DeployResult::Err(e) => ic_cdk::println!("Failed to deploy ICRC7: {}", e),
         }
     });
 }
-
 
 async fn deploy_icrc7() -> DeployResult {
     let canister_id = match Principal::from_text(ICRC7_CANISTER_ID) {
@@ -70,4 +74,14 @@ async fn deploy_icrc7() -> DeployResult {
         Ok(_) => DeployResult::Ok,
         Err((code, msg)) => DeployResult::Err(format!("Failed to install Wasm module: error code {:?}, message: {}", code, msg)),
     }
+}
+
+async fn call_initialize_nfts() -> Result<(), String> {
+    let canister_id = Principal::from_text(ICRC7_CANISTER_ID).map_err(|e| e.to_string())?;
+    
+    // Call the initialize_nfts function on the ICRC7 canister
+    ic_cdk::call(canister_id, "initialize_nfts", ()).await
+        .map_err(|(code, msg)| format!("Error calling initialize_nfts: {:?} - {}", code, msg))?;
+    
+    Ok(())
 }

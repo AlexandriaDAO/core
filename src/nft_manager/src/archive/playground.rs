@@ -76,7 +76,7 @@
 // #[update(guard = "is_frontend")]
 // pub async fn get_nft_manifest(token_id: Nat) -> Result<Option<String>, String> {
 //     if let Some(metadata) = get_metadata(token_id).await? {
-//         if let Some(description_value) = metadata.get("icrc7:metadata:uri:transactionId") {
+//         if let Some(description_value) = metadata.get("icrc7:metadata:uri:description") {
 //             if let Value::Text(text) = description_value {
 //                 return Ok(Some(text.clone()));
 //             }

@@ -32,6 +32,7 @@ import { alex_librarian } from '../../../declarations/alex_librarian';
 import { createActor as createAlexWalletActor, canisterId as alexWalletCanisterId }  from '../../../declarations/alex_wallet';
 import { vetkd } from '../../../declarations/vetkd';
 import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
+import { setEngines } from '@/features/my-engines/myEnginesSlice';
 
 
 interface SessionProviderProps {
@@ -44,6 +45,7 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const { user } = useAppSelector(state => state.auth);
 	const { books } = useAppSelector(state => state.portal);
 	const {engines} = useAppSelector(state=>state.myEngines)
+	const {activeEngine} = useAppSelector(state=>state.engineOverview)
 
 	const [actor, setActor] = useState(alex_backend);
 	const [actorAlexLibrarian, setActorAlexLibrarian] = useState(alex_librarian);
@@ -103,6 +105,8 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	// setup different canister actors
 	useEffect(()=>{
 		if(!authClient) return;
+
+		// console.log('logged in ', authClient.isAuthenticated());
 
 		const setupActor = async()=>{
 
@@ -171,6 +175,13 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		setupMeili();
 	},[engines])
 
+
+	useEffect(()=>{
+		if(activeEngine){
+			const updatedEngines = engines.map(engine => engine.id === activeEngine.id ? activeEngine : engine);
+			dispatch(setEngines(updatedEngines));
+		}
+	},[activeEngine])
 
 	return (
 		<SessionContext.Provider value={{ actor, actorAlexLibrarian, actorAlexWallet, actorVetkd, actorSwap,actorIcpLedger,actorTokenomics, actorLbry, actorAlex, actorIcrc7, actorNftManager,authClient, meiliClient, meiliIndex  }}>

@@ -142,7 +142,7 @@ export default class {
             const signer = await getSigner(node_id);
 
             console.log('signer', signer);
-            const convertedMsg = Buffer.from(txHash);
+            const convertedMsg = Buffer.from(txHash, 'hex');
             const signature = await signer.sign(convertedMsg);
             const bSig = Buffer.from(signature);
             const pad = Buffer.concat([Buffer.from([0]), Buffer.from(bSig)]).toString("hex");

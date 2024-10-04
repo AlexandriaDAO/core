@@ -143,26 +143,6 @@ pub async fn nfts_exist(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
 }
 
 
-// #[update(guard = "is_frontend")]
-// pub async fn owner_of(token_id: Nat) -> Result<Option<Account>, String> {
-
-//     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
-//         icrc7_principal(),
-//         "icrc7_owner_of",
-//         (vec![token_id.clone()],)
-//     ).await;
-
-//     match owner_call_result {
-//         Ok((owners,)) => {
-//             Ok(owners.into_iter().next().unwrap_or(None))
-//         },
-//         Err((code, msg)) => {
-//             Err(format!("Error fetching owner for token {}: {:?} - {}", token_id, code, msg))
-//         }
-//     }
-// }
-
-
 #[update(guard = "is_frontend")]
 pub async fn owner_of(token_ids: Vec<Nat>) -> Result<Vec<Option<Account>>, String> {
     check_query_batch_size(&token_ids)?;
@@ -235,7 +215,7 @@ pub async fn get_metadata(token_ids: Vec<Nat>) -> Result<Vec<Option<BTreeMap<Str
 pub async fn get_manifest_ids(token_ids: Vec<Nat>) -> Result<Vec<Option<String>>, String> {
     let manifests = get_metadata(token_ids).await?.into_iter().map(|metadata| {
         metadata.and_then(|m| {
-            m.get("icrc7:metadata:uri:transactionId")
+            m.get("icrc7:metadata:uri:description")
                 .and_then(|value| {
                     if let Value::Text(text) = value {
                         Some(text.clone())
@@ -249,50 +229,6 @@ pub async fn get_manifest_ids(token_ids: Vec<Nat>) -> Result<Vec<Option<String>>
     Ok(manifests)
 }
 
-
-
-#[update(guard = "is_frontend")]
-pub async fn is_verified(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
-    check_query_batch_size(&token_ids)?;
-    ic_cdk::println!("Checking verification status for token_ids: {:?}", token_ids);
-
-    let exists_results = nfts_exist(token_ids.clone()).await?;
-    if exists_results.iter().any(|&exists| !exists) {
-        return Err(format!("One or more NFTs in {:?} do not exist", token_ids));
-    }
-
-    ic_cdk::println!("Calling icrc7_token_metadata for token_ids: {:?}", token_ids);
-    let metadata_call_result: CallResult<(Vec<Option<BTreeMap<String, Value>>>,)> = ic_cdk::call(
-        icrc7_principal(),
-        "icrc7_token_metadata",
-        (token_ids.clone(),)
-    ).await;
-
-    match metadata_call_result {
-        Ok((metadata,)) => {
-            ic_cdk::println!("Received raw metadata: {:?}", metadata);
-            let verified_statuses: Vec<bool> = metadata.into_iter()
-                .map(|token_metadata| {
-                    if let Some(token_metadata) = token_metadata {
-                        if let Some(Value::Blob(blob)) = token_metadata.get("icrc7:metadata:verified") {
-                            !blob.is_empty() && blob[0] == 1
-                        } else {
-                            false
-                        }
-                    } else {
-                        false
-                    }
-                })
-                .collect();
-            ic_cdk::println!("Parsed verified statuses: {:?}", verified_statuses);
-            Ok(verified_statuses)
-        },
-        Err((code, msg)) => {
-            ic_cdk::println!("Error fetching metadata: code={:?}, msg={}", code, msg);
-            Err(format!("Error fetching metadata for tokens {:?}: {:?} - {}", token_ids, code, msg))
-        }
-    }
-}
 
 #[update(guard = "is_frontend")]
 pub async fn get_my_nft_balances(slot: Option<Nat>) -> Result<Vec<(Nat, TokenBalances)>, String> {
@@ -327,4 +263,19 @@ pub async fn get_my_nft_balances(slot: Option<Nat>) -> Result<Vec<(Nat, TokenBal
     }
     
     Ok(result)
+}
+
+pub async fn is_owner(token_ids: Vec<Nat>, user: Principal) -> Result<Vec<bool>, String> {
+    let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
+        icrc7_principal(),
+        "icrc7_owner_of",
+        (token_ids,)
+    ).await;
+
+    match owner_call_result {
+        Ok((owners,)) => Ok(owners.into_iter().map(|owner| {
+            owner.map_or(false, |account| account.owner == user)
+        }).collect()),
+        Err((code, msg)) => Err(format!("Error checking ownership: {:?} - {}", code, msg)),
+    }
 }

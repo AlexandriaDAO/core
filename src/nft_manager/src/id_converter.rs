@@ -1,71 +1,63 @@
-use candid::{Nat, Principal};
-use icrc_ledger_types::icrc1::account::Subaccount;
+use ic_cdk::query;
+use candid::{CandidType, Deserialize};
+use serde::Serialize;
 
-const MAX_QUERY_BATCH_SIZE: usize = 100;
-const MAX_UPDATE_BATCH_SIZE: usize = 20;
+#[derive(Clone, PartialEq, Eq, CandidType, Deserialize, Serialize)]
+struct Nat(Vec<u8>);
 
-pub fn check_query_batch_size<T>(batch: &Vec<T>) -> Result<(), String> {
-    if batch.len() > MAX_QUERY_BATCH_SIZE {
-        Err(format!("Batch size exceeds maximum allowed ({})", MAX_QUERY_BATCH_SIZE))
-    } else {
-        Ok(())
+impl Nat {
+    fn from_bytes(bytes: Vec<u8>) -> Self {
+        Nat(bytes)
+    }
+
+    fn to_bytes(&self) -> &[u8] {
+        &self.0
+    }
+
+    fn to_decimal_string(&self) -> String {
+        let mut result = String::new();
+        let mut carry = 0u16;
+        let mut digits = vec![];
+
+        for &byte in self.0.iter().rev() {
+            carry = (carry << 8) | byte as u16;
+            digits.push(carry % 10);
+            carry /= 10;
+        }
+
+        while carry > 0 {
+            digits.push(carry % 10);
+            carry /= 10;
+        }
+
+        if digits.is_empty() {
+            digits.push(0);
+        }
+
+        for digit in digits.into_iter().rev() {
+            result.push_str(&digit.to_string());
+        }
+
+        result
     }
 }
 
-pub fn check_update_batch_size<T>(batch: &Vec<T>) -> Result<(), String> {
-    if batch.len() > MAX_UPDATE_BATCH_SIZE {
-        Err(format!("Batch size exceeds maximum allowed ({})", MAX_UPDATE_BATCH_SIZE))
-    } else {
-        Ok(())
-    }
-}
 
-pub fn is_within_100_digits(number: Nat) -> bool {
-    let digit_count = number.to_string().replace("_", "").len();
-    digit_count <= 100
-}
-
-pub fn principal(id: &str) -> Principal {
-    Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
-}
-
-pub fn to_nft_subaccount(id: Nat) -> Subaccount {
-    let mut subaccount = [0; 32];
-    let digits: Vec<u8> = id
-        .0
-        .to_string()
-        .chars()
-        .map(|c| c.to_digit(10).unwrap() as u8)
-        .collect();
-    
-    let start = 32 - digits.len().min(32);
-    subaccount[start..].copy_from_slice(&digits[digits.len().saturating_sub(32)..]);
-
-    subaccount
-}
-
-
-
-
-
-
-
-
-
-fn arweave_id_to_nat(arweave_id: &str) -> Vec<u8> {
+#[query]
+fn arweave_id_to_nat(arweave_id: String) -> Nat {
     let mut id = arweave_id.chars().take(43).collect::<String>();
     while id.len() % 4 != 0 {
         id.push('=');
     }
     id = id.replace('-', "+").replace('_', "/");
     
-    base64_decode(&id)
+    Nat::from_bytes(base64_decode(&id))
 }
 
-fn nat_to_arweave_id(num: &[u8]) -> String {
-    let mut id = base64_encode(num);
-    id = id.replace('+', "-").replace('/', "_");
-    id.trim_end_matches('=').to_string()
+#[query]
+fn nat_to_arweave_id(num: Nat) -> String {
+    let id = base64_encode(&num.to_bytes());
+    id.replace('+', "-").replace('/', "_").trim_end_matches('=').to_string()
 }
 
 fn base64_decode(input: &str) -> Vec<u8> {

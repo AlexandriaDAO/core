@@ -5,11 +5,12 @@ import { Node } from "../../../../../declarations/alex_librarian/alex_librarian.
 import { WebIrys } from "@irys/sdk";
 import { ImSpinner8 } from "react-icons/im";
 import { Tooltip, message } from "antd";
-import { IoCopyOutline } from "react-icons/io5";
+import { IoCopyOutline, IoRefreshOutline } from "react-icons/io5";
 import { SlInfo } from "react-icons/sl";
 import { getClientIrys, getNodeBalance, getServerIrys } from "@/services/irysService";
 import { shorten } from "@/utils/general";
 import useSession from "@/hooks/useSession";
+import { MdOutlineRefresh } from "react-icons/md";
 // import { setActiveEngine } from "@/features/engine-overview/engineOverviewSlice";
 
 interface NodeItemProps {
@@ -83,6 +84,10 @@ const NodeItem = ({ node }: NodeItemProps) => {
 							<td>{'Active' in node.status ? 'Active' : 'InActive'}</td>
 						</tr>
 						<tr>
+							<td className="pr-4">Token</td>
+							<td>{irys?.token ? irys.token : 'NA'}</td>
+						</tr>
+						<tr>
 							<td className="pr-4">Address</td>
 							<td className="flex items-center gap-2">
 								<span>{irys && irys.address ? shorten(irys.address) : "..."}</span>
@@ -108,26 +113,25 @@ const NodeItem = ({ node }: NodeItemProps) => {
 						<tr>
 							<td className="pr-4">Balance</td>
 							<td>
-								{balanceLoading ? (
-									<ImSpinner8 size={14} className="animate-spin" />
-								) : balance === -1 ? (
-									"NA"
-								) : (
-									<div className="flex items-center gap-2">
-										<span className="font-bold">{balance}</span>
+								<div className="flex items-center gap-2">
+									<span className={`font-bold ${balanceLoading ? 'text-gray-400' : ''}`}>{balance === -1 ? 'N/A' : balance}</span>
 
-										<Tooltip title="Showing the confirmed balance" className="cursor-pointer">
-											<span>
-												<SlInfo size={14} />
-											</span>
-										</Tooltip>
-									</div>
-								)}
+									<Tooltip title="Refresh Balance" className="cursor-pointer">
+										<span>
+											<MdOutlineRefresh className={`${balanceLoading ? 'animate-spin' : ''}`} size={18} onClick={setNodeBalance} />
+										</span>
+									</Tooltip>
+								</div>
 							</td>
 						</tr>
 						<tr>
-							<td className="pr-4">Token</td>
-							<td>{irys?.token ? irys.token : 'NA'}</td>
+							<td colSpan={2} className="p-2 shadow border border-solid rounded font-roboto-condensed font-normal text-base bg-yellow-100 border-l-4 border-yellow-500">
+								<ul className="list-disc pl-5 font-roboto-condensed text-sm">
+									<li>Showing the confirmed balance.</li>
+									<li>Deposits can take a few minutes to reflect.</li>
+									<li>Use the refresh button to fetch latest balance.</li>
+								</ul>
+							</td>
 						</tr>
 					</tbody>
 				</table>

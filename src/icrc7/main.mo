@@ -14,6 +14,7 @@ import ICRC3 "mo:icrc3-mo";
 
 import ICRC7Default "./initial_state/icrc7";
 import ICRC3Default "./initial_state/icrc3";
+import NFTArchive "./nft_archive";
 
 
 shared(_init_msg) actor class Example(_args : {
@@ -337,41 +338,10 @@ shared(_init_msg) actor class Example(_args : {
 
   private stable var _init = true;
 
-  // Function to initialize 3 example NFTs
-  public shared func initialize_nfts() {
-    let initial_nfts : [ICRC7.SetNFTItemRequest] = [
-      {
-        created_at_time = null;
-        memo = null;
-        metadata = #Map([( "description", #Text("-LdjHXYDaKmlyRTxYifARQ0MB5MsMOEqbgz3UHhiUmQ") )]);
-        override = false;
-        owner = ?{owner = Principal.fromText("forhl-tiaaa-aaaak-qc7ga-cai"); subaccount = null;};
-        token_id = 0;
-      },
-      {
-        created_at_time = null;
-        memo = null;
-        metadata = #Map([( "description", #Text("-eu2OTDgao-_JiGTLmNFHrltXLxPJWDHe7Cjmr0NJWI") )]);
-        override = false;
-        owner = ?{owner = Principal.fromText("forhl-tiaaa-aaaak-qc7ga-cai"); subaccount = null;};
-        token_id = 1;
-      },
-      {
-        created_at_time = null;
-        memo = null;
-        metadata = #Map([( "description", #Text("asdf") )]);
-        override = false;
-        owner = ?{owner = Principal.fromText("3dJqKLtezxKbQUBJy-wIQPugHSP6_CWjBmCO2mT3rkc"); subaccount = null;};
-        token_id = 2;
-      }
-    ];
-
-    let set_nft_request : ICRC7.SetNFTRequest = initial_nfts;
-
-    switch(icrc7().set_nfts<system>(init_msg.caller, set_nft_request, true)){
-      case(#ok(val)) D.print("Successfully initialized NFTs: " # debug_show(val));
-      case(#err(err)) D.trap("Failed to initialize NFTs: " # err);
-    };
+  // Function to initialize archived nfts.
+  public shared(msg) func initialize_nfts() : async () {
+    assert(msg.caller == Principal.fromText("forhl-tiaaa-aaaak-qc7ga-cai"));
+    await NFTArchive.initialize_nfts(icrc7(), init_msg.caller);
   };
 
 };
