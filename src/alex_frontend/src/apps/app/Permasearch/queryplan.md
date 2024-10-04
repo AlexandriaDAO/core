@@ -2,7 +2,7 @@
 
 - add back the mainlayout for both.
 
-**permahunt**
+**permasearch**
 owners: [String!] - helpful for finding content by owner
 tags: [TagFilter!] - find transactions using tags 
 data: - Really helpful for checking file size.

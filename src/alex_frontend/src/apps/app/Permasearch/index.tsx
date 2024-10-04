@@ -1,15 +1,28 @@
 import React, { useState } from "react";
 import AppLayout from "@/layouts/AppLayout";
-import Search from "../modules/ArWeave/Search";
-import ContentList from "../modules/ArWeave/ContentList";
-import ContentRenderer from "../modules/ArWeave/ContentRenderer";
-import { Transaction } from "../modules/ArWeave/types/queries";
+import Search from "../../modules/ArWeave/Search";
+import ContentList from "../../modules/ArWeave/ContentList";
+import ContentRenderer from "../../modules/ArWeave/ContentRenderer";
+import { Transaction } from "../../modules/ArWeave/types/queries";
 
-export default function Permahunt() {
+export default function Permasearch() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [selectedContent, setSelectedContent] = useState<{ id: string, type: string } | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [contentType, setContentType] = useState<string>("application/epub+zip");
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	const handleTransactionsUpdate = (newTransactions: Transaction[]) => {
+		setTransactions(newTransactions);
+	};
+
+	const handleContentTypeChange = (newContentType: string) => {
+		setContentType(newContentType);
+	};
+
+	const handleLoadingChange = (loading: boolean) => {
+		setIsLoading(loading);
+	};
 
 	const handleSelectContent = (id: string, type: string) => {
 		setSelectedContent({ id, type });
@@ -25,15 +38,20 @@ export default function Permahunt() {
 		<AppLayout>
 			<div className="relative">
 				<Search 
-					onTransactionsUpdate={setTransactions}
-					onContentTypeChange={setContentType}
+					onTransactionsUpdate={handleTransactionsUpdate}
+					onContentTypeChange={handleContentTypeChange}
+					onLoadingChange={handleLoadingChange}
 					mode="general"
 				/>
-				<ContentList 
-					transactions={transactions} 
-					onSelectContent={handleSelectContent}
-					showMintButton={true}
-				/>
+				{isLoading ? (
+					<div>Loading...</div>
+				) : (
+					<ContentList 
+						transactions={transactions} 
+						onSelectContent={handleSelectContent}
+						showMintButton={true}
+					/>
+				)}
 				{isModalOpen && selectedContent && (
 					<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
 						<div className="bg-gray-800 p-4 rounded-lg w-11/12 h-5/6 relative">

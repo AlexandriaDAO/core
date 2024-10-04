@@ -1,8 +1,4 @@
-use std::{
-    cell::RefCell,
-    string,
-    sync::{Arc, Mutex},
-};
+
 
 use candid::{CandidType, Principal};
 use ic_cdk::{self, caller};
@@ -17,8 +13,11 @@ pub const TOKENOMICS_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 pub const XRC_CANISTER_ID: &str = "uf6dk-hyaaa-aaaaq-qaaaq-cai";
 pub const ICP_TRANSFER_FEE: u64 = 10_000;
 pub const ALEX_TRANSFER_FEE: u64 = 10_000;
-pub const BURN_CYCLE_FEE: u64 = 10_000_000_000;
+pub const MAX_DAYS: u32 = 30;
+pub const SCALING_FACTOR: u128 = 1_000_000_00_00; // Adjust based on your precision needs
 
+
+pub const BURN_CYCLE_FEE: u64 = 10_000_000_000;
 pub const EXPIRY_INTERVAL: u64 = 8; //604800;
 
 pub fn verify_caller_balance(amount: u64) -> bool {
@@ -91,6 +90,7 @@ pub async fn tokenomics_burn_LBRY_stats() -> Result<(u64, u64), String> {
         }
     }
 }
+
 
 #[derive(CandidType, Deserialize, Debug)]
 pub enum ExchangeRateError {

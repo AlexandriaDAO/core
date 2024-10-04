@@ -2,10 +2,10 @@ use std::time::Duration;
 use ic_cdk::{self, init, update};
 
 use crate::{distribute_reward,get_icp_rate_in_cents};
-use crate::{guard::*};
+use crate::guard::*;
 
 const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(24*60*60); // 1 days in seconds
-const PRICE_FETCH_INTERVAL: Duration = Duration::from_secs(7*24*60*60); // 7 days in seconds
+const PRICE_FETCH_INTERVAL: Duration = Duration::from_secs(1*24*60*60); // 1 days in seconds
 
 #[init]
  fn init() {
