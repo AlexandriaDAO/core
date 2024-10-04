@@ -1,44 +1,47 @@
 import React, { useState, useEffect } from "react";
-import { Transaction } from "./query";
+import { Transaction, ContentListProps } from "./types/queries";
 import { getCover } from "@/utils/epub";
 
-interface ContentListProps {
-  transactions: Transaction[];
-  onSelectEpub: (id: string) => void;
-}
-
-export default function ContentList({ transactions, onSelectEpub }: ContentListProps) {
-	const [coverUrls, setCoverUrls] = useState<Record<string, string>>({});
+export default function ContentList({ transactions, onSelectContent, contentType }: ContentListProps) {
+	const [contentUrls, setContentUrls] = useState<Record<string, string>>({});
 
 	useEffect(() => {
-		const loadCovers = async () => {
+		const loadContent = async () => {
 			for (const transaction of transactions) {
 				try {
-					const url = await getCover(`https://arweave.net/${transaction.id}`);
-					if (url) {
-						setCoverUrls(prev => ({ ...prev, [transaction.id]: url }));
+					if (contentType === "application/epub+zip") {
+						const url = await getCover(`https://arweave.net/${transaction.id}`);
+						if (url) {
+							setContentUrls(prev => ({ ...prev, [transaction.id]: url }));
+						}
+					} else if (contentType === "image/png") {
+						setContentUrls(prev => ({ ...prev, [transaction.id]: `https://arweave.net/${transaction.id}` }));
+					} else if (contentType === "image/jpeg") {
+						setContentUrls(prev => ({ ...prev, [transaction.id]: `https://arweave.net/${transaction.id}` }));
+					} else if (contentType === "image/gif") {
+						setContentUrls(prev => ({ ...prev, [transaction.id]: `https://arweave.net/${transaction.id}` }));
 					}
 				} catch (error) {
-					console.error("Error loading cover for " + transaction.id);
+					console.error(`Error loading content for ${transaction.id}`);
 				}
 			}
 		};
 
-		loadCovers();
-	}, [transactions]);
+		loadContent();
+	}, [transactions, contentType]);
 
 	return (
 		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
 			{transactions.map((transaction) => {
-				const hasCover = transaction.id in coverUrls;
+				const hasContent = transaction.id in contentUrls;
 
 				return (
 					<div
 						key={transaction.id}
 						className="aspect-square border border-white rounded-lg p-4 cursor-pointer hover:bg-gray-900 flex flex-col items-center justify-center text-center relative overflow-hidden"
-						onClick={() => onSelectEpub(transaction.id)}
+						onClick={() => onSelectContent(transaction.id, contentType)}
 					>
-						{!hasCover && (
+						{!hasContent && (
 							<>
 								{transaction.tags.map((tag, index) => (
 									<p key={index} className="text-sm text-gray-400">
@@ -50,10 +53,10 @@ export default function ContentList({ transactions, onSelectEpub }: ContentListP
 								</p>
 							</>
 						)}
-						{hasCover && (
+						{hasContent && (
 							<img 
-								src={coverUrls[transaction.id]} 
-								alt="Book cover" 
+								src={contentUrls[transaction.id]} 
+								alt={contentType === "application/epub+zip" ? "Book cover" : "PNG image"}
 								className="absolute inset-0 w-full h-full object-cover"
 							/>
 						)}
