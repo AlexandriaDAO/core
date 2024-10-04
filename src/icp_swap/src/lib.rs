@@ -24,4 +24,5 @@ pub use script::{*};
 pub mod utils;
 
 
+
 ic_cdk::export_candid!();

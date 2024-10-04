@@ -1,6 +1,6 @@
 use candid::Principal;
 
-use crate::{ STATE};
+use crate::STATE;
 pub fn is_canister() -> Result<(), String> {
     if ic_cdk::api::caller().to_string() == "5qx27-tyaaa-aaaal-qjafa-cai" {
         Ok(())
@@ -30,5 +30,14 @@ impl Drop for CallerGuard {
         STATE.with(|state| {
             state.borrow_mut().pending_requests.remove(&self.principal);
         })
+    }
+}
+
+pub fn not_anon() -> Result<(), String> {
+    let caller = ic_cdk::api::caller();
+    if caller != Principal::anonymous() {
+        Ok(())
+    } else {
+        Err("Anonymous principal not allowed to make calls.".to_string())
     }
 }
