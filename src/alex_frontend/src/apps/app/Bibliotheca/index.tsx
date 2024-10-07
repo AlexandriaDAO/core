@@ -9,13 +9,11 @@ import { RootState } from '../../../store';
 import { natToArweaveId } from "@/utils/id_convert";
 import { Principal } from '@dfinity/principal';
 import { icrc7 } from '../../../../../declarations/icrc7';
-import { fetchTransactionsByIds } from '../../modules/ArWeave/ArweaveQueries';
 
 export default function Bibliotheca() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [selectedContent, setSelectedContent] = useState<{ id: string, type: string } | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [contentType, setContentType] = useState<string>("application/epub+zip");
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const principal = useSelector((state: RootState) => state.auth.user);
 	const [userTransactionIds, setUserTransactionIds] = useState<string[]>([]);
@@ -24,6 +22,7 @@ export default function Bibliotheca() {
 		if (principal) {
 			setIsLoading(true);
 			try {
+				console.log("Fetching user NFTs for principal:", principal);
 				const tokenIds = await icrc7.icrc7_tokens_of(
 					{
 						owner: Principal.fromText(principal),
@@ -34,13 +33,8 @@ export default function Bibliotheca() {
 				);
 
 				const arweaveIds = tokenIds.map(id => natToArweaveId(id));
+				
 				setUserTransactionIds(arweaveIds);
-				if (arweaveIds.length > 0) {
-					const fetchedTransactions = await fetchTransactionsByIds(arweaveIds);
-					setTransactions(fetchedTransactions);
-				} else {
-					setTransactions([]);
-				}
 			} catch (error) {
 				console.error("Error fetching user NFTs:", error);
 			} finally {
@@ -52,14 +46,6 @@ export default function Bibliotheca() {
 	useEffect(() => {
 		fetchUserNFTs();
 	}, [fetchUserNFTs]);
-
-	const handleTransactionsUpdate = (newTransactions: Transaction[]) => {
-		setTransactions(newTransactions);
-	};
-
-	const handleContentTypeChange = (newContentType: string) => {
-		setContentType(newContentType);
-	};
 
 	const handleLoadingChange = (loading: boolean) => {
 		setIsLoading(loading);
@@ -75,6 +61,11 @@ export default function Bibliotheca() {
 		setSelectedContent(null);
 	};
 
+	const handleTransactionsUpdate = (newTransactions: Transaction[]) => {
+		console.log("Transactions updated:", newTransactions);
+		setTransactions(newTransactions);
+	};
+
 	return (
 		<AppLayout>
 			<div className="relative">
@@ -82,11 +73,9 @@ export default function Bibliotheca() {
 					<>
 						<Search
 							onTransactionsUpdate={handleTransactionsUpdate}
-							onContentTypeChange={handleContentTypeChange}
 							onLoadingChange={handleLoadingChange}
 							mode="user"
 							userTransactionIds={userTransactionIds}
-							initialSearch={false}
 						/>
 						{isLoading ? (
 							<div>Loading...</div>
@@ -97,7 +86,7 @@ export default function Bibliotheca() {
 								showMintButton={false}
 							/>
 						) : (
-							<div>No NFTs Yet</div>
+							<div>No NFTs match the current filters</div>
 						)}
 					</>
 				) : (

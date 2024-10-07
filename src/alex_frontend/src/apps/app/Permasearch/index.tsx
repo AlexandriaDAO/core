@@ -9,20 +9,7 @@ export default function Permasearch() {
 	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [selectedContent, setSelectedContent] = useState<{ id: string, type: string } | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [contentType, setContentType] = useState<string>("application/epub+zip");
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-
-	const handleTransactionsUpdate = (newTransactions: Transaction[]) => {
-		setTransactions(newTransactions);
-	};
-
-	const handleContentTypeChange = (newContentType: string) => {
-		setContentType(newContentType);
-	};
-
-	const handleLoadingChange = (loading: boolean) => {
-		setIsLoading(loading);
-	};
 
 	const handleSelectContent = (id: string, type: string) => {
 		setSelectedContent({ id, type });
@@ -34,13 +21,16 @@ export default function Permasearch() {
 		setSelectedContent(null);
 	};
 
+	const handleTransactionsUpdate = (newTransactions: Transaction[]) => {
+		setTransactions(newTransactions);
+	};
+
 	return (
 		<AppLayout>
 			<div className="relative">
 				<Search 
 					onTransactionsUpdate={handleTransactionsUpdate}
-					onContentTypeChange={handleContentTypeChange}
-					onLoadingChange={handleLoadingChange}
+					onLoadingChange={setIsLoading}
 					mode="general"
 				/>
 				{isLoading ? (

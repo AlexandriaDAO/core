@@ -12,7 +12,7 @@ const goldSkyClient = new ApolloClient({
   cache: new InMemoryCache()
 });
 
-// Query for fetching transactions by IDs (used by Bibliotheca)
+// Update the FETCH_BY_IDS_QUERY
 const FETCH_BY_IDS_QUERY = gql`
   query GetTransactions($ids: [ID!]!) {
     transactions(ids: $ids, first: 1000) {
@@ -77,7 +77,7 @@ const FETCH_RECENT_QUERY = gql`
 `;
 
 // Function to fetch transactions by IDs (for Bibliotheca)
-export const fetchTransactionsByIds = async (ids: string[]): Promise<Transaction[]> => {
+export const fetchTransactionsByIds = async (ids: string[], contentType?: string, maxTimestamp?: number): Promise<Transaction[]> => {
   const uniqueIds = [...new Set(ids)]; // Remove duplicates
   const transactions: Transaction[] = [];
 
@@ -88,7 +88,18 @@ export const fetchTransactionsByIds = async (ids: string[]): Promise<Transaction
     });
 
     if (data && data.transactions && data.transactions.edges) {
-      transactions.push(...data.transactions.edges.map((edge: any) => edge.node));
+      transactions.push(...data.transactions.edges
+        .map((edge: any) => edge.node)
+        .filter((tx: Transaction) => {
+          if (contentType && !tx.tags.some(tag => tag.name === "Content-Type" && tag.value === contentType)) {
+            return false;
+          }
+          if (maxTimestamp && tx.block && tx.block.timestamp > maxTimestamp) {
+            return false;
+          }
+          return true;
+        })
+      );
     }
   } catch (error) {
     console.error('Error fetching transactions:', error);

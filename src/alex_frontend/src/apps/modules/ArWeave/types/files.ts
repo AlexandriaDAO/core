@@ -5,8 +5,9 @@ export interface FileTypeConfig {
 }
 
 export const supportedFileTypes: FileTypeConfig[] = [
-  { mimeType: "image/png", extension: "png", displayName: "PNG" },
   { mimeType: "image/jpeg", extension: "jpeg", displayName: "JPEG" },
+  { mimeType: "image/jpg", extension: "jpg", displayName: "JPG" },
+  { mimeType: "image/png", extension: "png", displayName: "PNG" },
   { mimeType: "application/epub+zip", extension: "epub", displayName: "EPUB" },
   { mimeType: "video/mp4", extension: "mp4", displayName: "MP4" },
   { mimeType: "video/webm", extension: "webm", displayName: "WebM" },

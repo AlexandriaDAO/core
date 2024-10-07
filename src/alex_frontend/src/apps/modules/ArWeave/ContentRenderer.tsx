@@ -14,7 +14,6 @@ export default function ContentRenderer({ contentId, contentType }: ContentRende
 
   useEffect(() => {
     if (!contentType) {
-      // Fetch content type if not provided
       fetch(contentUrl, { method: 'HEAD' })
         .then(response => {
           const fetchedContentType = response.headers.get('Content-Type');
@@ -23,7 +22,6 @@ export default function ContentRenderer({ contentId, contentType }: ContentRende
         .catch(error => console.error("Error fetching content type:", error));
     }
 
-    // Fetch content for text-based files
     if (actualContentType && ['text/plain', 'text/markdown', 'application/json', 'text/html'].includes(actualContentType)) {
       fetch(contentUrl)
         .then(response => response.text())
@@ -88,6 +86,7 @@ export default function ContentRenderer({ contentId, contentType }: ContentRende
     case "image/svg+xml":
     case "image/png":
     case "image/jpeg":
+    case "image/jpg":
     case "image/gif":
       return (
         <div className="flex justify-center items-center h-full">
