@@ -23,6 +23,8 @@ export default function Search({
   const [ownerFilter, setOwnerFilter] = useState<string>("");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [minBlock, setMinBlock] = useState<number | undefined>();
+  const [maxBlock, setMaxBlock] = useState<number | undefined>();
 
   const handleSearch = useCallback(async () => {
     setIsLoading(true);
@@ -30,17 +32,29 @@ export default function Search({
 
     try {
       let maxTimestamp: number | undefined;
+
       if (filterDate) {
-        maxTimestamp = new Date(`${filterDate}T${filterTime}:00Z`).getTime() / 1000;
+        const userDateTime = new Date(`${filterDate}T${filterTime || "00:00"}:00Z`);
+        maxTimestamp = Math.floor(userDateTime.getTime() / 1000);
       }
 
       let fetchedTransactions: Transaction[];
 
-      if (mode === 'user') {
-        console.log("Fetching user transactions with IDs:", userTransactionIds);
-        fetchedTransactions = await fetchTransactionsByIds(userTransactionIds, contentType, maxTimestamp);
+      if (mode === "user") {
+        fetchedTransactions = await fetchTransactionsByIds(
+          userTransactionIds,
+          contentType,
+          maxTimestamp
+        );
       } else {
-        fetchedTransactions = await fetchRecentTransactions(contentType, amount, maxTimestamp, ownerFilter || undefined);
+        fetchedTransactions = await fetchRecentTransactions(
+          contentType,
+          amount,
+          maxTimestamp,
+          ownerFilter || undefined,
+          minBlock,
+          maxBlock
+        );
       }
 
       console.log("Fetched transactions:", fetchedTransactions);
@@ -51,7 +65,19 @@ export default function Search({
       setIsLoading(false);
       onLoadingChange(false);
     }
-  }, [contentType, amount, filterDate, filterTime, ownerFilter, mode, userTransactionIds, onTransactionsUpdate, onLoadingChange]);
+  }, [
+    contentType,
+    amount,
+    filterDate,
+    filterTime,
+    ownerFilter,
+    mode,
+    userTransactionIds,
+    onTransactionsUpdate,
+    onLoadingChange,
+    minBlock,
+    maxBlock,
+  ]);
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 max-w-sm">

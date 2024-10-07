@@ -6,16 +6,15 @@ export interface Tag {
 export interface Transaction {
   id: string;
   owner: string;
-  tags: Tag[];
-  block?: {
+  tags: { name: string; value: string }[];
+  block: {
     height: number;
     timestamp: number;
+  } | null;
+  data: {
+    size: number;
+    type: string;
   };
-  data?: {
-    size: string;
-    type?: string;
-  };
-  ingested_at?: number;
 }
 
 export interface ContentListProps {
