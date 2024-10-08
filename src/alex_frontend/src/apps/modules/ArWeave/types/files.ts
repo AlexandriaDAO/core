@@ -24,3 +24,11 @@ export const supportedFileTypes: FileTypeConfig[] = [
 ];
 
 export const supportedMimeTypes = supportedFileTypes.map(type => type.mimeType);
+
+export const fileTypeCategories: Record<string, string[]> = {
+  images: ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/svg+xml"],
+  books: ["application/epub+zip"],
+  text: ["text/plain", "text/markdown", "application/json", "text/html", "application/pdf"],
+  video: ["video/mp4", "video/webm", "image/gif"],
+  audio: ["audio/mpeg", "audio/wav", "audio/ogg"],
+};

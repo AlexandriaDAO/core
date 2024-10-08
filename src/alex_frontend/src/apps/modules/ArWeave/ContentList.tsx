@@ -4,13 +4,12 @@ import { getCover } from "@/utils/epub";
 import ContentGrid from "./ContentGrid";
 import { supportedFileTypes } from "./types/files";
 import { mint_nft } from "../NFT/mint";
-import useSession from "@/hooks/useSession";
 import { FaPlay, FaFileAlt, FaFilePdf, FaFileCode, FaFileAudio, FaImage } from 'react-icons/fa';
 
 const contentTypeHandlers: Record<string, (id: string) => Promise<string | null> | string> = {
   "application/epub+zip": async (id: string) => {
     const url = await getCover(`https://arweave.net/${id}`);
-    return url || `https://arweave.net/${id}`; // Return the direct URL if cover extraction fails
+    return url || `https://arweave.net/${id}`;
   },
   "application/pdf": (id: string) => `https://arweave.net/${id}`,
 };
@@ -37,7 +36,8 @@ export default function ContentList({ transactions, onSelectContent, showMintBut
 		const loadContent = async () => {
 			for (const transaction of transactions) {
 				try {
-					const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+					const defaultContentType = "image/jpeg"; // Default to images
+					const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || defaultContentType;
 					const handler = contentTypeHandlers[contentType as keyof typeof contentTypeHandlers];
 					if (handler) {
 						const url = await handler(transaction.id);

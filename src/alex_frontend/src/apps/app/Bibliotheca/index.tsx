@@ -22,7 +22,6 @@ export default function Bibliotheca() {
 		if (principal) {
 			setIsLoading(true);
 			try {
-				console.log("Fetching user NFTs for principal:", principal);
 				const tokenIds = await icrc7.icrc7_tokens_of(
 					{
 						owner: Principal.fromText(principal),
@@ -62,7 +61,6 @@ export default function Bibliotheca() {
 	};
 
 	const handleTransactionsUpdate = (newTransactions: Transaction[]) => {
-		console.log("Transactions updated:", newTransactions);
 		setTransactions(newTransactions);
 	};
 

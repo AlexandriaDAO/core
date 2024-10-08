@@ -3,9 +3,8 @@ import { HttpLink } from '@apollo/client/link/http';
 import { ApolloLink } from '@apollo/client/link/core';
 import { Transaction } from './types/queries';
 import { getBlockHeightForTimestamp } from './ArweaveHelpers';
-import axios from 'axios'; // Make sure to import axios
+import axios from 'axios';
 
-// Create a custom middleware link to log the queries and variables
 const logLink = new ApolloLink((operation, forward) => {
   console.log('GraphQL Request:', {
     operationName: operation.operationName,
@@ -15,18 +14,15 @@ const logLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
-// Update the HTTP link for the Goldsky Arweave Search GraphQL endpoint
 const httpLink = new HttpLink({
-  uri: 'https://arweave-search.goldsky.com/graphql', // Updated URL
+  uri: 'https://arweave-search.goldsky.com/graphql',
 });
 
-// Create the Apollo Client with the custom logging link
 const arweaveNetClient = new ApolloClient({
   link: ApolloLink.from([logLink, httpLink]),
   cache: new InMemoryCache(),
 });
 
-// Update FETCH_RECENT_QUERY for Goldsky endpoint
 const FETCH_RECENT_QUERY = gql`
   query RecentTransactions($tags: [TagFilter!], $first: Int!, $after: String, $minBlock: Int, $maxBlock: Int, $owners: [String!]) {
     transactions(
@@ -93,7 +89,11 @@ const FETCH_BY_IDS_QUERY = gql`
 `;
 
 // Function to fetch transactions by IDs (for Bibliotheca)
-export const fetchTransactionsByIds = async (ids: string[], contentType?: string, maxTimestamp?: number): Promise<Transaction[]> => {
+export const fetchTransactionsByIds = async (
+  ids: string[],
+  contentTypes?: string[],
+  maxTimestamp?: number
+): Promise<Transaction[]> => {
   const uniqueIds = [...new Set(ids)]; // Remove duplicates
   const transactions: Transaction[] = [];
 
@@ -115,8 +115,10 @@ export const fetchTransactionsByIds = async (ids: string[], contentType?: string
           }))
           .filter((tx: Transaction) => {
             if (
-              contentType &&
-              !tx.tags.some((tag) => tag.name === 'Content-Type' && tag.value === contentType)
+              contentTypes &&
+              !tx.tags.some(
+                (tag) => tag.name === 'Content-Type' && contentTypes.includes(tag.value)
+              )
             ) {
               return false;
             }
@@ -137,7 +139,7 @@ export const fetchTransactionsByIds = async (ids: string[], contentType?: string
 
 // Update fetchRecentTransactions function
 export async function fetchRecentTransactions(
-  contentType?: string,
+  contentTypes?: string[],
   amount?: number,
   maxTimestamp?: number,
   owner?: string,
@@ -168,8 +170,8 @@ export async function fetchRecentTransactions(
 
     while (hasNextPage && (!amount || allTransactions.length < amount)) {
       const tags: any[] = [];
-      if (contentType) {
-        tags.push({ name: 'Content-Type', values: [contentType] });
+      if (contentTypes && contentTypes.length > 0) {
+        tags.push({ name: 'Content-Type', values: contentTypes });
       }
 
       const variables: any = {
@@ -205,7 +207,15 @@ export async function fetchRecentTransactions(
         data: edge.node.data,
       }));
 
-      allTransactions = [...allTransactions, ...newTransactions];
+      // Filter transactions by maxTimestamp if provided
+      const filteredTransactions = newTransactions.filter((tx: Transaction) => {
+        if (maxTimestamp && tx.block && tx.block.timestamp > maxTimestamp) {
+          return false;
+        }
+        return true;
+      });
+
+      allTransactions = [...allTransactions, ...filteredTransactions];
       hasNextPage = result.data.transactions.pageInfo.hasNextPage;
       afterCursor =
         result.data.transactions.edges[
