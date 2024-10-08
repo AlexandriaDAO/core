@@ -1,13 +1,12 @@
 import React from "react";
 import MainLayout from "@/layouts/MainLayout";
+import ArweaveSearch from "@/features/Arweave";
 
 function Dialectica() {
 
 	return (
 		<MainLayout>
-			<div>
-				<p>Coming soon...</p>
-			</div>
+				<ArweaveSearch />
 		</MainLayout>
 	);
 }
