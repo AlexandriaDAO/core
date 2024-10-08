@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Transaction, ContentListProps } from "./types/queries";
+import { Transaction, ContentListProps } from "../types/queries";
 import { getCover } from "@/utils/epub";
 import ContentGrid from "./ContentGrid";
-import { supportedFileTypes } from "./types/files";
-import { mint_nft } from "../NFT/mint";
+import { supportedFileTypes } from "../types/files";
+import { mint_nft } from "../../NFT/mint";
 import { FaPlay, FaFileAlt, FaFilePdf, FaFileCode, FaFileAudio, FaImage } from 'react-icons/fa';
 
 const contentTypeHandlers: Record<string, (id: string) => Promise<string | null> | string> = {

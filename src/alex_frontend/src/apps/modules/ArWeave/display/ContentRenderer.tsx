@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
-import { supportedMimeTypes } from "./types/files";
-import { ContentRendererProps } from "./types/queries";
+import { supportedMimeTypes } from "../types/files";
+import { ContentRendererProps } from "../types/queries";
 import ReactMarkdown from 'react-markdown';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';

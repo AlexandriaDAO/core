@@ -1,26 +1,33 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import AppLayout from "@/layouts/AppLayout";
-import Search from "../../modules/ArWeave/Search";
-import ContentList from "../../modules/ArWeave/ContentList";
-import ContentRenderer from "../../modules/ArWeave/ContentRenderer";
-import LoadMore from "../../modules/ArWeave/LoadMore";
-import { Transaction } from "../../modules/ArWeave/types/queries";
+import Search from "../../modules/ArWeave/search/Search";
+import ContentList from "../../modules/ArWeave/display/ContentList";
+import ContentRenderer from "../../modules/ArWeave/display/ContentRenderer";
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import { natToArweaveId } from "@/utils/id_convert";
 import { Principal } from '@dfinity/principal';
 import { icrc7 } from '../../../../../declarations/icrc7';
+import { useArweaveSearch } from "../../modules/ArWeave/hooks/useArweaveSearch";
 
 export default function Bibliotheca() {
-	const [transactions, setTransactions] = useState<Transaction[]>([]);
-	const [selectedContent, setSelectedContent] = useState<{ id: string, type: string } | null>(null);
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const principal = useSelector((state: RootState) => state.auth.user);
 	const [userTransactionIds, setUserTransactionIds] = useState<string[]>([]);
-	const [lastTimestamp, setLastTimestamp] = useState<number>(0);
-	const [contentTypes, setContentTypes] = useState<string[]>([]);
-	const [amount, setAmount] = useState<number>(12);
+
+	const {
+		transactions,
+		selectedContent,
+		isModalOpen,
+		isLoading,
+		lastTimestamp,
+		contentTypes,
+		amount,
+		handleSelectContent,
+		closeModal,
+		handleTransactionsUpdate,
+		handleInitialSearch,
+		setIsLoading,
+	} = useArweaveSearch({ mode: 'user', userTransactionIds });
 
 	const fetchUserNFTs = useCallback(async () => {
 		if (principal) {
@@ -44,37 +51,11 @@ export default function Bibliotheca() {
 				setIsLoading(false);
 			}
 		}
-	}, [principal]);
+	}, [principal, setIsLoading]);
 
 	useEffect(() => {
 		fetchUserNFTs();
 	}, [fetchUserNFTs]);
-
-	const handleLoadingChange = (loading: boolean) => {
-		setIsLoading(loading);
-	};
-
-	const handleSelectContent = (id: string, type: string) => {
-		setSelectedContent({ id, type });
-		setIsModalOpen(true);
-	};
-
-	const closeModal = () => {
-		setIsModalOpen(false);
-		setSelectedContent(null);
-	};
-
-	const handleTransactionsUpdate = (newTransactions: Transaction[], timestamp: number) => {
-		setTransactions(prevTransactions => [...prevTransactions, ...newTransactions]);
-		setLastTimestamp(timestamp);
-	};
-
-	const handleInitialSearch = (newTransactions: Transaction[], timestamp: number, newContentTypes: string[], newAmount: number) => {
-		setTransactions(newTransactions);
-		setLastTimestamp(timestamp);
-		setContentTypes(newContentTypes);
-		setAmount(newAmount);
-	};
 
 	return (
 		<AppLayout>
@@ -83,7 +64,7 @@ export default function Bibliotheca() {
 					<>
 						<Search
 							onTransactionsUpdate={handleInitialSearch}
-							onLoadingChange={handleLoadingChange}
+							onLoadingChange={setIsLoading}
 							mode="user"
 							userTransactionIds={userTransactionIds}
 						/>
@@ -95,14 +76,6 @@ export default function Bibliotheca() {
 									transactions={transactions}
 									onSelectContent={handleSelectContent}
 									showMintButton={false}
-								/>
-								<LoadMore
-									onTransactionsUpdate={handleTransactionsUpdate}
-									contentTypes={contentTypes}
-									amount={amount}
-									lastTimestamp={lastTimestamp}
-									mode="user"
-									userTransactionIds={userTransactionIds}
 								/>
 							</>
 						) : (

@@ -1,35 +1,54 @@
-import React, { useState, useCallback, useMemo } from "react";
-import { Transaction } from "./types/queries";
-import { supportedFileTypes, fileTypeCategories } from "./types/files";
+import { useCallback } from 'react';
 import { fetchRecentTransactions, fetchTransactionsByIds } from "./ArweaveQueries";
-import SearchForm from "./SearchForm";
+import { Transaction } from "../types/queries";
+import { fileTypeCategories } from "../types/files";
+import { Dispatch, SetStateAction } from 'react';
 
-interface SearchProps {
-  onTransactionsUpdate: (transactions: Transaction[], lastTimestamp: number, contentTypes: string[], amount: number, ownerFilter: string, minBlock?: number, maxBlock?: number) => void;
-  onLoadingChange: (isLoading: boolean) => void;
-  mode: 'user' | 'general';
-  userTransactionIds?: string[];
+interface SearchState {
+  contentType: string;
+  setContentType: Dispatch<SetStateAction<string>>;
+  amount: number;
+  setAmount: Dispatch<SetStateAction<number>>;
+  filterDate: string;
+  setFilterDate: Dispatch<SetStateAction<string>>;
+  filterTime: string;
+  setFilterTime: Dispatch<SetStateAction<string>>;
+  ownerFilter: string;
+  setOwnerFilter: Dispatch<SetStateAction<string>>;
+  isLoading: boolean;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
+  minBlock?: number;
+  setMinBlock: Dispatch<SetStateAction<number | undefined>>;
+  maxBlock?: number;
+  setMaxBlock: Dispatch<SetStateAction<number | undefined>>;
+  contentCategory: string;
+  setContentCategory: Dispatch<SetStateAction<string>>;
+  advancedOptionsOpen: boolean;
+  setAdvancedOptionsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function Search({ 
-  onTransactionsUpdate, 
-  onLoadingChange,
+interface UseHandleSearchParams {
+  state: SearchState;
+  mode: 'user' | 'general';
+  userTransactionIds: string[];
+  onTransactionsUpdate: (transactions: Transaction[], lastTimestamp: number, contentTypes: string[], amount: number, ownerFilter: string, minBlock?: number, maxBlock?: number) => void;
+  onLoadingChange: (isLoading: boolean) => void;
+}
+
+export default function useHandleSearch({
+  state,
   mode,
-  userTransactionIds = []
-}: SearchProps) {
-  const [contentType, setContentType] = useState<string>("");
-  const [amount, setAmount] = useState<number>(12);
-  const [filterDate, setFilterDate] = useState<string>("");
-  const [filterTime, setFilterTime] = useState<string>("00:00");
-  const [ownerFilter, setOwnerFilter] = useState<string>("");
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [minBlock, setMinBlock] = useState<number | undefined>();
-  const [maxBlock, setMaxBlock] = useState<number | undefined>();
-
-  // Add state for content category and advanced options
-  const [contentCategory, setContentCategory] = useState<string>("images");
-  const [advancedOptionsOpen, setAdvancedOptionsOpen] = useState<boolean>(false);
+  userTransactionIds,
+  onTransactionsUpdate,
+  onLoadingChange,
+}: UseHandleSearchParams) {
+  const { 
+    contentType, contentCategory, advancedOptionsOpen,
+    amount, filterDate, filterTime, ownerFilter,
+    isLoading, setIsLoading,
+    minBlock, maxBlock,
+    setFilterDate, setFilterTime,
+  } = state;
 
   const handleSearch = useCallback(async () => {
     if (!advancedOptionsOpen) {
@@ -117,38 +136,10 @@ export default function Search({
     onLoadingChange,
     minBlock,
     maxBlock,
-  ]);
-
-  const searchFormProps = useMemo(() => ({
-    contentCategory,
-    setContentCategory,
-    advancedOptionsOpen,
-    setAdvancedOptionsOpen,
-    amount,
-    setAmount,
-    filterDate,
     setFilterDate,
-    filterTime,
     setFilterTime,
-    ownerFilter,
-    setOwnerFilter,
-    contentType,
-    setContentType,
-    mode,
-    isLoading,
-    handleSearch,
-  }), [
-    contentCategory,
-    advancedOptionsOpen,
-    amount,
-    filterDate,
-    filterTime,
-    ownerFilter,
-    contentType,
-    mode,
-    isLoading,
-    handleSearch,
+    setIsLoading,
   ]);
 
-  return <SearchForm {...searchFormProps} />;
+  return { handleSearch };
 }
