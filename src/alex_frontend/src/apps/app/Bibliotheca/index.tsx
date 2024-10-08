@@ -3,6 +3,7 @@ import AppLayout from "@/layouts/AppLayout";
 import Search from "../../modules/ArWeave/Search";
 import ContentList from "../../modules/ArWeave/ContentList";
 import ContentRenderer from "../../modules/ArWeave/ContentRenderer";
+import LoadMore from "../../modules/ArWeave/LoadMore";
 import { Transaction } from "../../modules/ArWeave/types/queries";
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
@@ -17,6 +18,9 @@ export default function Bibliotheca() {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const principal = useSelector((state: RootState) => state.auth.user);
 	const [userTransactionIds, setUserTransactionIds] = useState<string[]>([]);
+	const [lastTimestamp, setLastTimestamp] = useState<number>(0);
+	const [contentTypes, setContentTypes] = useState<string[]>([]);
+	const [amount, setAmount] = useState<number>(12);
 
 	const fetchUserNFTs = useCallback(async () => {
 		if (principal) {
@@ -60,8 +64,16 @@ export default function Bibliotheca() {
 		setSelectedContent(null);
 	};
 
-	const handleTransactionsUpdate = (newTransactions: Transaction[]) => {
+	const handleTransactionsUpdate = (newTransactions: Transaction[], timestamp: number) => {
+		setTransactions(prevTransactions => [...prevTransactions, ...newTransactions]);
+		setLastTimestamp(timestamp);
+	};
+
+	const handleInitialSearch = (newTransactions: Transaction[], timestamp: number, newContentTypes: string[], newAmount: number) => {
 		setTransactions(newTransactions);
+		setLastTimestamp(timestamp);
+		setContentTypes(newContentTypes);
+		setAmount(newAmount);
 	};
 
 	return (
@@ -70,7 +82,7 @@ export default function Bibliotheca() {
 				{principal ? (
 					<>
 						<Search
-							onTransactionsUpdate={handleTransactionsUpdate}
+							onTransactionsUpdate={handleInitialSearch}
 							onLoadingChange={handleLoadingChange}
 							mode="user"
 							userTransactionIds={userTransactionIds}
@@ -78,11 +90,21 @@ export default function Bibliotheca() {
 						{isLoading ? (
 							<div>Loading...</div>
 						) : transactions.length > 0 ? (
-							<ContentList
-								transactions={transactions}
-								onSelectContent={handleSelectContent}
-								showMintButton={false}
-							/>
+							<>
+								<ContentList
+									transactions={transactions}
+									onSelectContent={handleSelectContent}
+									showMintButton={false}
+								/>
+								<LoadMore
+									onTransactionsUpdate={handleTransactionsUpdate}
+									contentTypes={contentTypes}
+									amount={amount}
+									lastTimestamp={lastTimestamp}
+									mode="user"
+									userTransactionIds={userTransactionIds}
+								/>
+							</>
 						) : (
 							<div>No NFTs match the current filters</div>
 						)}

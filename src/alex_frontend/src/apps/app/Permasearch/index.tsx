@@ -3,6 +3,7 @@ import AppLayout from "@/layouts/AppLayout";
 import Search from "../../modules/ArWeave/Search";
 import ContentList from "../../modules/ArWeave/ContentList";
 import ContentRenderer from "../../modules/ArWeave/ContentRenderer";
+import LoadMore from "../../modules/ArWeave/LoadMore";
 import { Transaction } from "../../modules/ArWeave/types/queries";
 
 export default function Permasearch() {
@@ -10,6 +11,12 @@ export default function Permasearch() {
 	const [selectedContent, setSelectedContent] = useState<{ id: string, type: string } | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [lastTimestamp, setLastTimestamp] = useState<number>(0);
+	const [contentTypes, setContentTypes] = useState<string[]>([]);
+	const [amount, setAmount] = useState<number>(12);
+	const [ownerFilter, setOwnerFilter] = useState<string>("");
+	const [minBlock, setMinBlock] = useState<number | undefined>();
+	const [maxBlock, setMaxBlock] = useState<number | undefined>();
 
 	const handleSelectContent = (id: string, type: string) => {
 		setSelectedContent({ id, type });
@@ -21,26 +28,51 @@ export default function Permasearch() {
 		setSelectedContent(null);
 	};
 
-	const handleTransactionsUpdate = (newTransactions: Transaction[]) => {
+	const handleTransactionsUpdate = (newTransactions: Transaction[], timestamp: number) => {
+		setTransactions(prevTransactions => [...prevTransactions, ...newTransactions]);
+		setLastTimestamp(timestamp);
+	};
+
+	const handleInitialSearch = (newTransactions: Transaction[], timestamp: number, newContentTypes: string[], newAmount: number, newOwnerFilter: string, newMinBlock?: number, newMaxBlock?: number) => {
 		setTransactions(newTransactions);
+		setLastTimestamp(timestamp);
+		setContentTypes(newContentTypes);
+		setAmount(newAmount);
+		setOwnerFilter(newOwnerFilter);
+		setMinBlock(newMinBlock);
+		setMaxBlock(newMaxBlock);
 	};
 
 	return (
 		<AppLayout>
 			<div className="relative">
 				<Search 
-					onTransactionsUpdate={handleTransactionsUpdate}
+					onTransactionsUpdate={handleInitialSearch}
 					onLoadingChange={setIsLoading}
 					mode="general"
 				/>
 				{isLoading ? (
 					<div>Loading...</div>
 				) : (
-					<ContentList 
-						transactions={transactions} 
-						onSelectContent={handleSelectContent}
-						showMintButton={true}
-					/>
+					<>
+						<ContentList 
+							transactions={transactions} 
+							onSelectContent={handleSelectContent}
+							showMintButton={true}
+						/>
+						{transactions.length > 0 && (
+							<LoadMore
+								onTransactionsUpdate={handleTransactionsUpdate}
+								contentTypes={contentTypes}
+								amount={amount}
+								lastTimestamp={lastTimestamp}
+								ownerFilter={ownerFilter}
+								minBlock={minBlock}
+								maxBlock={maxBlock}
+								mode="general"
+							/>
+						)}
+					</>
 				)}
 				{isModalOpen && selectedContent && (
 					<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
