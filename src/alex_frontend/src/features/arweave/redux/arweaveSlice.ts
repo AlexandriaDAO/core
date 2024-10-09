@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Transaction } from './types/queries';
+import { Transaction } from '../types/queries';
 
 // Update the SearchState interface to include the 'mode' property
 interface SearchState {

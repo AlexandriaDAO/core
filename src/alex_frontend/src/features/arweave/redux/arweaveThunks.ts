@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setTransactions, setIsLoading } from '../arweaveSlice';
-import { fetchRecentTransactions, fetchTransactionsByIds } from '../search/ArweaveQueries';
+import { setTransactions, setIsLoading } from './arweaveSlice';
+import { fetchRecentTransactions, fetchTransactionsByIds } from '../api/arweaveQueries';
 import { Transaction } from '../types/queries';
 import { fileTypeCategories } from '../types/files';
 import { RootState } from '@/store';

@@ -1,12 +1,12 @@
 import React from "react";
 import { useSelector } from 'react-redux';
 import AppLayout from "@/layouts/AppLayout";
-import SearchForm from "./search/SearchForm";
-import ContentList from "./display/ContentList";
-import ContentRenderer from "./display/ContentRenderer";
+import SearchForm from "./components/SearchForm";
+import ContentList from "./components/ContentList";
+import ContentRenderer from "./components/ContentRenderer";
 import { useArweaveSearch } from "./hooks/useArweaveSearch";
 import { RootState } from '@/store';
-import { useHandleSearch } from './search/useHandleSearch';
+import { useHandleSearch } from './hooks/useSearchHandlers';
 
 export default function Permasearch() {
 	const { transactions, isLoading } = useSelector((state: RootState) => state.arweave);
@@ -17,7 +17,7 @@ export default function Permasearch() {
 		closeModal,
 	} = useArweaveSearch({ mode: 'general' });
 
-	const { handleSearch } = useHandleSearch('general');
+	const { handleSearch } = useHandleSearch();
 
 	return (
 		<AppLayout>

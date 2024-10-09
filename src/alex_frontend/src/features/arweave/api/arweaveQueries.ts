@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { HttpLink } from '@apollo/client/link/http';
 import { ApolloLink } from '@apollo/client/link/core';
 import { Transaction } from '../types/queries';
-import { getBlockHeightForTimestamp } from './ArweaveHelpers';
+import { getBlockHeightForTimestamp } from './arweaveHelpers';
 import axios from 'axios';
 
 const logLink = new ApolloLink((operation, forward) => {

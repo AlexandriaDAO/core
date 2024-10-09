@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
-import { performSearch } from '../thunks/performSearch';
-import { setSearchState, setIsLoading } from '../arweaveSlice';
+import { performSearch } from '../redux/arweaveThunks';
+import { setSearchState, setIsLoading } from '../redux/arweaveSlice';
 
 export const useHandleSearch = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,7 +20,7 @@ export const useHandleSearch = () => {
     }
   }, [dispatch, searchState.mode]);
 
-  const handleSearchStateChange = useCallback((key: keyof SearchState, value: any) => {
+  const handleSearchStateChange = useCallback((key: keyof typeof searchState, value: any) => {
     dispatch(setSearchState({ [key]: value }));
   }, [dispatch]);
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { supportedFileTypes, fileTypeCategories } from "../types/files";
 import { SearchFormProps } from "../types/queries";
-import { useHandleSearch } from './useHandleSearch';
+import { useHandleSearch } from '../hooks/useSearchHandlers';
 
 const SearchForm: React.FC<SearchFormProps> = ({ mode }) => {
   const {
