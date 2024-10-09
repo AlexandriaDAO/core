@@ -6,7 +6,7 @@ import { fileTypeCategories } from '../types/files';
 import { RootState } from '@/store';
 
 interface SearchParams {
-  mode: 'random' | 'general';
+  mode: 'random' | 'general' | 'user';
   userTransactionIds?: string[];
 }
 
@@ -22,10 +22,7 @@ export const performSearch = createAsyncThunk(
       filterDate,
       filterTime,
       ownerFilter,
-      minBlock,
-      maxBlock,
-      advancedOptionsOpen
-    } = state.arweave;
+    } = state.arweave.searchState;
 
     dispatch(setIsLoading(true));
 
@@ -39,9 +36,9 @@ export const performSearch = createAsyncThunk(
 
       let contentTypes: string[] = [];
 
-      if (advancedOptionsOpen && contentType) {
+      if (contentType) {
         contentTypes = [contentType];
-      } else if (contentCategory && contentCategory !== "") {
+      } else if (contentCategory && contentCategory !== "all") {
         contentTypes = fileTypeCategories[contentCategory] || [];
       }
 
@@ -58,9 +55,7 @@ export const performSearch = createAsyncThunk(
           contentTypes,
           amount,
           maxTimestamp,
-          ownerFilter || undefined,
-          minBlock,
-          maxBlock
+          ownerFilter || undefined
         );
       }
 
@@ -73,8 +68,6 @@ export const performSearch = createAsyncThunk(
         contentTypes,
         amount,
         ownerFilter,
-        minBlock,
-        maxBlock
       };
     } catch (error) {
       console.error("Error fetching transactions:", error);

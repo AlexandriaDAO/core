@@ -1,23 +1,19 @@
 import React from "react";
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store';
 import { supportedFileTypes, fileTypeCategories } from "../types/files";
 import { SearchFormProps } from "../types/queries";
 import { useHandleSearch } from './useHandleSearch';
 
 const SearchForm: React.FC<SearchFormProps> = ({ mode }) => {
-  const searchState = useSelector((state: RootState) => state.arweave.searchState);
   const {
+    searchState,
     isLoading,
     handleSearch,
-    handleContentCategoryChange,
-    handleContentTypeChange,
-    handleAmountChange,
-    handleFilterDateChange,
-    handleFilterTimeChange,
-    handleOwnerFilterChange,
-    handleAdvancedOptionsToggle,
-  } = useHandleSearch(mode);
+    handleSearchStateChange,
+  } = useHandleSearch();
+
+  React.useEffect(() => {
+    handleSearchStateChange('mode', mode);
+  }, [mode, handleSearchStateChange]);
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 max-w-sm">
@@ -30,7 +26,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ mode }) => {
           <select 
             id="contentCategory"
             value={searchState.contentCategory} 
-            onChange={(e) => handleContentCategoryChange(e.target.value)}
+            onChange={(e) => handleSearchStateChange('contentCategory', e.target.value)}
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none 
                        focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           >
@@ -44,7 +40,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ mode }) => {
 
         {/* Advanced Options Toggle */}
         <button
-          onClick={() => handleAdvancedOptionsToggle(!searchState.advancedOptionsOpen)}
+          onClick={() => handleSearchStateChange('advancedOptionsOpen', !searchState.advancedOptionsOpen)}
           className="mt-2 text-sm text-indigo-600 hover:underline"
         >
           {searchState.advancedOptionsOpen ? 'Hide Advanced Options' : 'Show Advanced Options'}
@@ -63,7 +59,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ mode }) => {
                   id="amount"
                   type="range" 
                   value={searchState.amount} 
-                  onChange={(e) => handleAmountChange(parseInt(e.target.value))}
+                  onChange={(e) => handleSearchStateChange('amount', parseInt(e.target.value))}
                   min="1"
                   max="100"
                   className="mt-1 w-full"
@@ -81,7 +77,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ mode }) => {
                   id="filterDate"
                   type="date"
                   value={searchState.filterDate}
-                  onChange={(e) => handleFilterDateChange(e.target.value)}
+                  onChange={(e) => handleSearchStateChange('filterDate', e.target.value)}
                   className="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none 
                              focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 />
@@ -94,7 +90,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ mode }) => {
                   id="filterTime"
                   type="time"
                   value={searchState.filterTime}
-                  onChange={(e) => handleFilterTimeChange(e.target.value)}
+                  onChange={(e) => handleSearchStateChange('filterTime', e.target.value)}
                   className="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none 
                              focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 />
@@ -111,7 +107,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ mode }) => {
                   id="ownerFilter"
                   type="text"
                   value={searchState.ownerFilter}
-                  onChange={(e) => handleOwnerFilterChange(e.target.value)}
+                  onChange={(e) => handleSearchStateChange('ownerFilter', e.target.value)}
                   placeholder="Enter owner address"
                   className="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none
                              focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
@@ -127,7 +123,7 @@ const SearchForm: React.FC<SearchFormProps> = ({ mode }) => {
               <select
                 id="contentType"
                 value={searchState.contentType}
-                onChange={(e) => handleContentTypeChange(e.target.value)}
+                onChange={(e) => handleSearchStateChange('contentType', e.target.value)}
                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none 
                            focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
               >
