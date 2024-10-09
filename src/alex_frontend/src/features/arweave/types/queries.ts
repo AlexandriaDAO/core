@@ -46,23 +46,8 @@ export interface RandomContentProps {
 
 
 export interface SearchFormProps {
-  contentCategory: string;
-  setContentCategory: (category: string) => void;
-  advancedOptionsOpen: boolean;
-  setAdvancedOptionsOpen: (open: boolean) => void;
-  amount: number;
-  setAmount: (amount: number) => void;
-  filterDate: string;
-  setFilterDate: (date: string) => void;
-  filterTime: string;
-  setFilterTime: (time: string) => void;
-  ownerFilter: string;
-  setOwnerFilter: (owner: string) => void;
-  contentType: string;
-  setContentType: (type: string) => void;
-  mode: 'user' | 'general';
-  isLoading: boolean;
-  handleSearch: () => void;
+  mode: 'general' | 'random';
+  onSearch: () => void;
 }
 
 export interface SearchProps {

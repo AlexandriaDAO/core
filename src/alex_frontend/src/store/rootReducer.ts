@@ -21,7 +21,7 @@ import swapReducer from "@/features/swap/swapSlice"
 import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
 import alexReducer from "@/features/swap/alexSlice";
-
+import arweaveReducer from "@/features/arweave/arweaveSlice";
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -50,6 +50,7 @@ const rootReducer = combineReducers({
 	tokenomics:tokenomicsReducer,
 	portal: portalReducer,
 	alex:alexReducer,
+	arweave: arweaveReducer,
 });
 
 export default rootReducer;
