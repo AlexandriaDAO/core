@@ -28,32 +28,13 @@ export interface ContentRendererProps {
   contentType?: string;
 }
 
-
-export interface MainSearchProps {
-  onTransactionsUpdate: (transactions: Transaction[], lastTimestamp: number, contentTypes: string[], amount: number, ownerFilter: string, minBlock?: number, maxBlock?: number) => void;
-  onLoadingChange: (isLoading: boolean) => void;
-  mode: 'user' | 'general';
-  userTransactionIds?: string[];
-}
-
-export interface RandomContentProps {
-  onTransactionsUpdate: (transactions: Transaction[], lastTimestamp: number, contentTypes: string[], amount: number, ownerFilter: string, minBlock?: number, maxBlock?: number) => void;
-  onLoadingChange: (isLoading: boolean) => void;
-  mode: 'user' | 'general';
-  userTransactionIds?: string[];
-}
-
-
-
 export interface SearchFormProps {
-  mode: 'general' | 'random';
-  onSearch: () => void;
+  onSearch: () => Promise<void>;
 }
 
 export interface SearchProps {
   onTransactionsUpdate: (transactions: Transaction[], lastTimestamp: number, contentTypes: string[], amount: number, ownerFilter: string, minBlock?: number, maxBlock?: number) => void;
   onLoadingChange: (isLoading: boolean) => void;
-  mode: 'user' | 'general';
   userTransactionIds?: string[];
 }
 
@@ -66,6 +47,16 @@ export interface LoadMoreProps {
   ownerFilter?: string;
   minBlock?: number;
   maxBlock?: number;
-  mode: 'user' | 'general';
   userTransactionIds?: string[];
+}
+
+export interface SearchState {
+  contentCategory: string;
+  tags: string[];
+  amount: number;
+  filterDate: string;
+  filterTime: string;
+  ownerFilter: string;
+  advancedOptionsOpen: boolean;
+  maxTimestamp?: number;
 }

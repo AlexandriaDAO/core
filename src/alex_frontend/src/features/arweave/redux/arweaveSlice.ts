@@ -1,17 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Transaction } from '../types/queries';
-
-// Update the SearchState interface to include the 'mode' property
-interface SearchState {
-  mode: 'random' | 'general' | 'user';
-  contentCategory: string;
-  contentType: string;
-  amount: number;
-  filterDate: string;
-  filterTime: string;
-  ownerFilter: string;
-  advancedOptionsOpen: boolean;
-}
+import { Transaction, SearchState } from '../types/queries';
 
 interface ArweaveState {
   transactions: Transaction[];
@@ -24,14 +12,14 @@ const initialState: ArweaveState = {
   transactions: [],
   isLoading: false,
   searchState: {
-    mode: 'random',
-    contentCategory: 'all',
-    contentType: '',
-    amount: 10,
+    contentCategory: 'images',
+    tags: [],
+    amount: 12,
     filterDate: '',
     filterTime: '',
     ownerFilter: '',
     advancedOptionsOpen: false,
+    maxTimestamp: undefined,
   },
   selectedContent: null,
 };
@@ -52,6 +40,12 @@ const arweaveSlice = createSlice({
     setSelectedContent: (state, action: PayloadAction<{ id: string; type: string } | null>) => {
       state.selectedContent = action.payload;
     },
+    setFilterDate: (state, action: PayloadAction<string>) => {
+      state.searchState.filterDate = action.payload;
+    },
+    setFilterTime: (state, action: PayloadAction<string>) => {
+      state.searchState.filterTime = action.payload;
+    },
   },
 });
 
@@ -60,6 +54,8 @@ export const {
   setIsLoading,
   setSearchState,
   setSelectedContent,
+  setFilterDate,
+  setFilterTime,
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;

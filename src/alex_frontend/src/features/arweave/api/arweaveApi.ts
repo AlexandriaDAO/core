@@ -3,7 +3,6 @@ import { fetchRecentTransactions, fetchTransactionsByIds } from './arweaveClient
 import { getBlockHeightForTimestamp } from './arweaveHelpers';
 
 export const fetchTransactions = async (
-  mode: 'random' | 'general' | 'user',
   params: {
     userTransactionIds?: string[];
     contentTypes?: string[];
@@ -22,7 +21,7 @@ export const fetchTransactions = async (
     minBlock = Math.max(0, maxBlock - 50000);
   }
 
-  if (mode === 'random' && userTransactionIds) {
+  if (userTransactionIds && userTransactionIds.length > 0) {
     return fetchTransactionsByIds(userTransactionIds, contentTypes, maxTimestamp);
   } else {
     return fetchRecentTransactions(contentTypes, amount, maxTimestamp, ownerFilter, minBlock, maxBlock);

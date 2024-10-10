@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
 import { performSearch } from '../redux/arweaveThunks';
-import { setSearchState, setIsLoading } from '../redux/arweaveSlice';
+import { setSearchState, setIsLoading, setFilterDate, setFilterTime } from '../redux/arweaveSlice';
+import { SearchState } from '../types/queries';
 
 export const useHandleSearch = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -12,16 +13,32 @@ export const useHandleSearch = () => {
   const handleSearch = useCallback(async () => {
     dispatch(setIsLoading(true));
     try {
-      await dispatch(performSearch({ mode: searchState.mode }));
+      let updatedSearchState = { ...searchState };
+
+      if (searchState.filterDate && searchState.filterTime) {
+        const utcDate = new Date(`${searchState.filterDate}T${searchState.filterTime}:00Z`);
+        updatedSearchState.maxTimestamp = Math.floor(utcDate.getTime() / 1000);
+      }
+
+      await dispatch(performSearch({ searchState: updatedSearchState }));
     } catch (error) {
       console.error('Error performing search:', error);
     } finally {
       dispatch(setIsLoading(false));
     }
-  }, [dispatch, searchState.mode]);
+  }, [dispatch, searchState]);
 
-  const handleSearchStateChange = useCallback((key: keyof typeof searchState, value: any) => {
-    dispatch(setSearchState({ [key]: value }));
+  const handleSearchStateChange = useCallback((key: keyof SearchState, value: any) => {
+    switch (key) {
+      case 'filterDate':
+        dispatch(setFilterDate(value));
+        break;
+      case 'filterTime':
+        dispatch(setFilterTime(value));
+        break;
+      default:
+        dispatch(setSearchState({ [key]: value }));
+    }
   }, [dispatch]);
 
   return {

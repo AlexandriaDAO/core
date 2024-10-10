@@ -29,7 +29,7 @@ const getFileIcon = (contentType: string) => {
   return <FaFileAlt />;
 };
 
-export default function ContentList({ transactions, onSelectContent, showMintButton = false }: ContentListProps) {
+const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent, showMintButton }) => {
 	const [contentUrls, setContentUrls] = useState<Record<string, string | null>>({});
 
 	useEffect(() => {
@@ -71,7 +71,10 @@ export default function ContentList({ transactions, onSelectContent, showMintBut
 				<p><span className="font-semibold">Size:</span> {transaction.data.size} bytes</p>
 			)}
 			{transaction.block && (
-				<p><span className="font-semibold">Date:</span> {new Date(transaction.block.timestamp * 1000).toLocaleString()}</p>
+				<p>
+					<span className="font-semibold">Date (UTC):</span>{' '}
+					{new Date(transaction.block.timestamp * 1000).toUTCString()}
+				</p>
 			)}
 			<p className="font-semibold mt-2">Tags:</p>
 			{transaction.tags.map((tag, index) => (
@@ -156,4 +159,6 @@ export default function ContentList({ transactions, onSelectContent, showMintBut
 			})}
 		</ContentGrid>
 	);
-}
+};
+
+export default ContentList;

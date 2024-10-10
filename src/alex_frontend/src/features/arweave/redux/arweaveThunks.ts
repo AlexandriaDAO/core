@@ -2,50 +2,33 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setTransactions, setIsLoading } from './arweaveSlice';
 import { fetchTransactions } from '../api/arweaveApi';
 import { RootState } from '@/store';
+import { SearchState } from '../types/queries';
 
 interface SearchParams {
-  mode: 'random' | 'general' | 'user';
-  userTransactionIds?: string[];
+  searchState: SearchState;
 }
 
 export const performSearch = createAsyncThunk(
   'arweave/performSearch',
   async (params: SearchParams, { dispatch, getState }) => {
-    const { mode, userTransactionIds } = params;
+    const { searchState } = params;
     const state = getState() as RootState;
-    const {
-      contentCategory,
-      contentType,
-      amount,
-      filterDate,
-      filterTime,
-      ownerFilter,
-    } = state.arweave.searchState;
 
     dispatch(setIsLoading(true));
 
     try {
       let maxTimestamp: number | undefined;
 
-      if (filterDate) {
-        const userDateTime = new Date(`${filterDate}T${filterTime || "00:00"}:00Z`);
+      if (searchState.filterDate) {
+        const userDateTime = new Date(`${searchState.filterDate}T${searchState.filterTime || "00:00"}:00Z`);
         maxTimestamp = Math.floor(userDateTime.getTime() / 1000);
       }
 
-      let contentTypes: string[] = [];
-
-      if (contentType) {
-        contentTypes = [contentType];
-      } else if (contentCategory && contentCategory !== "all") {
-        contentTypes = [contentCategory];
-      }
-
-      const fetchedTransactions = await fetchTransactions(mode, {
-        userTransactionIds,
-        contentTypes,
-        amount,
+      const fetchedTransactions = await fetchTransactions({
+        contentTypes: searchState.tags,
+        amount: searchState.amount,
         maxTimestamp,
-        ownerFilter: ownerFilter || undefined,
+        ownerFilter: searchState.ownerFilter || undefined,
       });
 
       console.log("Fetched transactions:", fetchedTransactions);
@@ -54,15 +37,47 @@ export const performSearch = createAsyncThunk(
 
       return {
         transactions: fetchedTransactions,
-        contentTypes,
-        amount,
-        ownerFilter,
+        contentTypes: searchState.tags,
+        amount: searchState.amount,
+        ownerFilter: searchState.ownerFilter,
       };
     } catch (error) {
       console.error("Error fetching transactions:", error);
       throw error;
     } finally {
       dispatch(setIsLoading(false));
+    }
+  }
+);
+
+export const searchContent = createAsyncThunk(
+  'arweave/searchContent',
+  async (searchParams: SearchState, { rejectWithValue }) => {
+    try {
+      // Construct the query based on the searchParams
+      let query = `{
+        transactions(
+          tags: [
+            { name: "Content-Type", values: ${JSON.stringify(searchParams.tags)} }
+          ]
+          ${searchParams.filterDate ? `, block: { timestamp: { gt: "${searchParams.filterDate}T${searchParams.filterTime || '00:00'}:00Z" } }` : ''}
+          ${searchParams.ownerFilter ? `, owners: ["${searchParams.ownerFilter}"]` : ''}
+          first: ${searchParams.amount}
+        ) {
+          edges {
+            node {
+              id
+              owner { address }
+              data { size type }
+              tags { name value }
+            }
+          }
+        }
+      }`;
+
+      // ... (rest of the function remains the same)
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
     }
   }
 );
