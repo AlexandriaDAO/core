@@ -1,5 +1,5 @@
 import { Transaction } from '../types/queries';
-import { fetchRecentTransactions, fetchTransactionsByIds } from './arweaveQueries';
+import { fetchRecentTransactions, fetchTransactionsByIds } from './arweaveClient';
 import { getBlockHeightForTimestamp } from './arweaveHelpers';
 
 export const fetchTransactions = async (
