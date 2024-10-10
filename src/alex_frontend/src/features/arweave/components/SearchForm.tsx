@@ -1,9 +1,17 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { supportedFileTypes, fileTypeCategories } from "../types/files";
 import { SearchFormProps } from "../types/queries";
 import { useHandleSearch } from '../hooks/useSearchHandlers';
+import { loadModel, isModelLoaded } from './ContentValidator';
+import { setNsfwModelLoaded } from '../redux/arweaveSlice';
+import { RootState } from '@/store';
 
 const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
+  const dispatch = useDispatch();
+  const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
+  const [isLoadingModel, setIsLoadingModel] = useState(false);
+
   const {
     searchState,
     isLoading,
@@ -47,6 +55,20 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
     const hours = Math.floor(Math.random() * 24).toString().padStart(2, '0');
     const minutes = Math.floor(Math.random() * 60).toString().padStart(2, '0');
     return `${hours}:${minutes}`;
+  };
+
+  const handleLoadNsfwModel = async () => {
+    if (!isModelLoaded()) {
+      setIsLoadingModel(true);
+      try {
+        await loadModel();
+        dispatch(setNsfwModelLoaded(true));
+      } catch (error) {
+        console.error('Error loading NSFW model:', error);
+      } finally {
+        setIsLoadingModel(false);
+      }
+    }
   };
 
   return (
@@ -188,6 +210,24 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
             </div>
           </div>
         )}
+
+        {/* NSFW Model Status and Load Button */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-gray-700">
+            NSFW Model Status: {nsfwModelLoaded ? 'Loaded' : 'Not Loaded'}
+          </span>
+          <button
+            onClick={handleLoadNsfwModel}
+            disabled={nsfwModelLoaded || isLoadingModel}
+            className={`px-4 py-2 text-sm font-medium text-white rounded-md 
+                        ${nsfwModelLoaded || isLoadingModel
+                          ? 'bg-gray-400 cursor-not-allowed'
+                          : 'bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
+                        }`}
+          >
+            {isLoadingModel ? 'Loading...' : 'Load NSFW Model'}
+          </button>
+        </div>
 
         {/* Search Button */}
         <button 

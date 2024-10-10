@@ -6,6 +6,8 @@ interface ArweaveState {
   isLoading: boolean;
   searchState: SearchState;
   selectedContent: { id: string; type: string } | null;
+  mintableState: Record<string, boolean>;
+  nsfwModelLoaded: boolean;
 }
 
 const initialState: ArweaveState = {
@@ -22,6 +24,8 @@ const initialState: ArweaveState = {
     maxTimestamp: undefined,
   },
   selectedContent: null,
+  mintableState: {},
+  nsfwModelLoaded: false,
 };
 
 const arweaveSlice = createSlice({
@@ -30,6 +34,12 @@ const arweaveSlice = createSlice({
   reducers: {
     setTransactions: (state, action: PayloadAction<Transaction[]>) => {
       state.transactions = action.payload;
+      // Clear mintableState when setting new transactions
+      state.mintableState = {};
+    },
+    clearTransactionsAndMintableState: (state) => {
+      state.transactions = [];
+      state.mintableState = {};
     },
     setIsLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
@@ -46,16 +56,29 @@ const arweaveSlice = createSlice({
     setFilterTime: (state, action: PayloadAction<string>) => {
       state.searchState.filterTime = action.payload;
     },
+    setMintableState: (state, action: PayloadAction<{ id: string; mintable: boolean }>) => {
+      state.mintableState[action.payload.id] = action.payload.mintable;
+    },
+    setMintableStates: (state, action: PayloadAction<Record<string, boolean>>) => {
+      state.mintableState = action.payload;
+    },
+    setNsfwModelLoaded: (state, action: PayloadAction<boolean>) => {
+      state.nsfwModelLoaded = action.payload;
+    },
   },
 });
 
 export const {
   setTransactions,
+  clearTransactionsAndMintableState,
   setIsLoading,
   setSearchState,
   setSelectedContent,
   setFilterDate,
   setFilterTime,
+  setMintableState,
+  setMintableStates,
+  setNsfwModelLoaded,
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;

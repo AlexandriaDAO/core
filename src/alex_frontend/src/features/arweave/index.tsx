@@ -27,7 +27,6 @@ const ArweaveFeature: React.FC = () => {
 			<ContentList 
 				transactions={transactions} 
 				onSelectContent={handleSelectContent}
-				showMintButton={true} // Set this to true to show the minting button
 			/>
 			{selectedContent && (
 				<ContentRenderer 

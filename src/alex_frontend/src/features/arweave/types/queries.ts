@@ -20,7 +20,6 @@ export interface Transaction {
 export interface ContentListProps {
   transactions: Transaction[];
   onSelectContent: (id: string, type: string) => void;
-  showMintButton?: boolean;
 }
 
 export interface ContentRendererProps {
