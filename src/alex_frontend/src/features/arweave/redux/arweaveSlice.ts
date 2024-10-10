@@ -1,12 +1,17 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Transaction, SearchState } from '../types/queries';
+
+export interface MintableStateItem {
+  mintable: boolean;
+  predictions?: Record<string, number>;
+}
 
 interface ArweaveState {
   transactions: Transaction[];
   isLoading: boolean;
   searchState: SearchState;
   selectedContent: { id: string; type: string } | null;
-  mintableState: Record<string, boolean>;
+  mintableState: Record<string, MintableStateItem>;
   nsfwModelLoaded: boolean;
 }
 
@@ -14,19 +19,25 @@ const initialState: ArweaveState = {
   transactions: [],
   isLoading: false,
   searchState: {
-    contentCategory: 'images',
-    tags: [],
-    amount: 12,
+    searchTerm: '',
+    selectedTags: [],
     filterDate: '',
+    contentCategory: '',
+    tags: [],
+    amount: 0,
     filterTime: '',
     ownerFilter: '',
     advancedOptionsOpen: false,
-    maxTimestamp: undefined,
   },
   selectedContent: null,
   mintableState: {},
   nsfwModelLoaded: false,
 };
+
+// Action to set prediction results
+export const setPredictionResults = createAction<{ id: string; predictions: Record<string, number> }>(
+  'arweave/setPredictionResults'
+);
 
 const arweaveSlice = createSlice({
   name: 'arweave',
@@ -34,7 +45,6 @@ const arweaveSlice = createSlice({
   reducers: {
     setTransactions: (state, action: PayloadAction<Transaction[]>) => {
       state.transactions = action.payload;
-      // Clear mintableState when setting new transactions
       state.mintableState = {};
     },
     clearTransactionsAndMintableState: (state) => {
@@ -56,15 +66,27 @@ const arweaveSlice = createSlice({
     setFilterTime: (state, action: PayloadAction<string>) => {
       state.searchState.filterTime = action.payload;
     },
-    setMintableState: (state, action: PayloadAction<{ id: string; mintable: boolean }>) => {
-      state.mintableState[action.payload.id] = action.payload.mintable;
+    setMintableState: (state, action: PayloadAction<{ id: string; mintable: boolean; predictions?: Record<string, number> }>) => {
+      const { id, mintable, predictions } = action.payload;
+      state.mintableState[id] = { mintable, predictions };
     },
-    setMintableStates: (state, action: PayloadAction<Record<string, boolean>>) => {
-      state.mintableState = action.payload;
+    setMintableStates: (state, action: PayloadAction<Record<string, MintableStateItem>>) => {
+      state.mintableState = { ...state.mintableState, ...action.payload };
     },
     setNsfwModelLoaded: (state, action: PayloadAction<boolean>) => {
       state.nsfwModelLoaded = action.payload;
     },
+    resetTransactions: (state, action: PayloadAction<Transaction[]>) => {
+      state.transactions = action.payload;
+      state.mintableState = {};
+    },
+  },
+  extraReducers: (builder) => {
+    // Add case for setPredictionResults
+    builder.addCase(setPredictionResults, (state, action) => {
+      const { id, predictions } = action.payload;
+      state.mintableState[id] = { mintable: false, predictions };
+    });
   },
 });
 
@@ -79,6 +101,7 @@ export const {
   setMintableState,
   setMintableStates,
   setNsfwModelLoaded,
+  resetTransactions,
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;

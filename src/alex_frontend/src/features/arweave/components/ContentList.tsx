@@ -7,7 +7,7 @@ import { supportedFileTypes } from "../types/files";
 import { mint_nft } from "../../nft/mint";
 import { FaPlay, FaFileAlt, FaFilePdf, FaFileCode, FaFileAudio, FaImage, FaExclamationTriangle } from 'react-icons/fa';
 import { RootState } from "@/store";
-import { setMintableState, setMintableStates } from "../redux/arweaveSlice";
+import { setMintableStates, setMintableState, MintableStateItem } from "../redux/arweaveSlice";
 import ContentValidator, { loadModel, isModelLoaded } from './ContentValidator';
 import { setNsfwModelLoaded } from "../redux/arweaveSlice";
 
@@ -41,11 +41,15 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 	const mintableState = useSelector((state: RootState) => state.arweave.mintableState);
 
 	useEffect(() => {
-		// Immediately set all transactions' mintable states to false
+		// Reset contentUrls and renderErrors when transactions change
+		setContentUrls({});
+		setRenderErrors({});
+
+		// Set initial mintable states for new transactions
 		const initialMintableStates = transactions.reduce((acc, transaction) => {
-			acc[transaction.id] = false;
+			acc[transaction.id] = { mintable: false };
 			return acc;
-		}, {} as Record<string, boolean>);
+		}, {} as Record<string, MintableStateItem>);
 		dispatch(setMintableStates(initialMintableStates));
 
 		const loadContent = async () => {
@@ -124,6 +128,10 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 	const renderContent = (transaction: Transaction, contentUrl: string | null) => {
 		const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
 
+		const mintableStateItem = mintableState[transaction.id];
+		const isMintable = mintableStateItem?.mintable;
+		const predictions = mintableStateItem?.predictions;
+
 		if (renderErrors[transaction.id]) {
 			return (
 				<div className="w-full h-full bg-red-100 flex flex-col items-center justify-center text-red-500">
@@ -134,9 +142,8 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 		}
 
 		if (contentUrl) {
-			// Add ContentValidator
 			return (
-				<>
+				<div className="relative w-full h-full">
 					<ContentValidator
 						transactionId={transaction.id}
 						contentUrl={contentUrl}
@@ -169,7 +176,35 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 							/>
 						</div>
 					) : null}
-				</>
+
+					{/* Overlay stats if content is not mintable */}
+					{!isMintable && predictions && (
+						<div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white p-2">
+							<p className="text-lg font-bold mb-2">Content Not Mintable</p>
+							<p>Classification Results:</p>
+							<ul className="text-sm">
+								<li>Drawing: {(predictions['Drawing'] * 100).toFixed(2)}%</li>
+								<li>Hentai: {(predictions['Hentai'] * 100).toFixed(2)}%</li>
+								<li>Neutral: {(predictions['Neutral'] * 100).toFixed(2)}%</li>
+								<li>Porn: {(predictions['Porn'] * 100).toFixed(2)}%</li>
+								<li>Sexy: {(predictions['Sexy'] * 100).toFixed(2)}%</li>
+							</ul>
+						</div>
+					)}
+
+					{/* Mint button if content is mintable */}
+					{isMintable && (
+						<button
+							onClick={(e) => {
+								e.stopPropagation();
+								handleMint(transaction.id);
+							}}
+							className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
+						>
+							+
+						</button>
+					)}
+				</div>
 			);
 		}
 
@@ -194,17 +229,6 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 						<div className="group relative w-full h-full">
 							{renderContent(transaction, contentUrl)}
 							{renderDetails(transaction)}
-							{mintableState[transaction.id] && (
-								<button
-									onClick={(e) => {
-										e.stopPropagation();
-										handleMint(transaction.id);
-									}}
-									className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
-								>
-									+
-								</button>
-							)}
 						</div>
 					</ContentGrid.Item>
 				);

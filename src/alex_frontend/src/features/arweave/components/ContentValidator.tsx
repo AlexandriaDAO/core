@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import * as nsfwjs from 'nsfwjs';
 import { useDispatch, useSelector } from 'react-redux';
-import { setMintableState } from '../redux/arweaveSlice';
+import { setMintableState, setPredictionResults } from '../redux/arweaveSlice';
 import { RootState } from '@/store';
 
 // Load the model once and export it
@@ -26,90 +26,88 @@ interface ContentValidatorProps {
 
 const ContentValidator: React.FC<ContentValidatorProps> = ({ transactionId, contentUrl, contentType }) => {
   const dispatch = useDispatch();
-  const [isValidating, setIsValidating] = useState(true);
   const contentRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
 
-  useEffect(() => {
-    let isMounted = true;
+  // Function to validate the content after it has loaded
+  const validateContent = async () => {
+    if (!contentRef.current) return;
 
-    const validateContent = async () => {
-      if (!contentRef.current) return;
+    if (!nsfwModelLoaded) {
+      dispatch(setMintableState({ id: transactionId, mintable: true }));
+      return;
+    }
 
-      if (!nsfwModelLoaded) {
-        if (isMounted) {
-          dispatch(setMintableState({ id: transactionId, mintable: true }));
-          setIsValidating(false);
-        }
-        return;
-      }
+    try {
+      const model = await loadModel();
+      const predictions = await model.classify(contentRef.current!);
 
-      try {
-        const model = await loadModel(); // Use the cached model
-        const predictions = await model.classify(contentRef.current);
-        const pornPrediction = predictions.find(p => p.className === 'Porn');
-        const isPorn = pornPrediction && pornPrediction.probability > 0.7;
-        console.log("isPorn", isPorn);
-        console.log("pornPrediction", pornPrediction);
-        console.log("transactionId", transactionId);
+      const predictionResults = predictions.reduce((acc, prediction) => {
+        acc[prediction.className] = prediction.probability;
+        return acc;
+      }, {} as Record<string, number>);
 
+      const isPorn = predictionResults['Porn'] > 0.7 || predictionResults['Hentai'] > 0.7;
 
-        if (isMounted) {
-          dispatch(setMintableState({ id: transactionId, mintable: !isPorn }));
-          setIsValidating(false);
-        }
-      } catch (error) {
-        console.error('Error validating content:', error);
-        if (isMounted) {
-          dispatch(setMintableState({ id: transactionId, mintable: true }));
-          setIsValidating(false);
-        }
-      }
-    };
+      dispatch(setMintableState({ 
+        id: transactionId, 
+        mintable: !isPorn, 
+        predictions: predictionResults 
+      }));
 
-    validateContent();
+      console.log(`Content Classification Results for Transaction ID: ${transactionId}`);
+      console.log('----------------------------------------');
+      console.log(`Drawing: ${(predictionResults['Drawing'] * 100).toFixed(2)}%`);
+      console.log(`Hentai: ${(predictionResults['Hentai'] * 100).toFixed(2)}%`);
+      console.log(`Neutral: ${(predictionResults['Neutral'] * 100).toFixed(2)}%`);
+      console.log(`Porn: ${(predictionResults['Porn'] * 100).toFixed(2)}%`);
+      console.log(`Sexy: ${(predictionResults['Sexy'] * 100).toFixed(2)}%`);
+      console.log('----------------------------------------');
+      console.log(`Content is ${isPorn ? 'NOT ' : ''}mintable`);
+      console.log('----------------------------------------');
 
-    return () => {
-      isMounted = false;
-    };
-  }, [transactionId, contentUrl, contentType, dispatch, nsfwModelLoaded]);
-
-  const handleLoad = () => {
-    if (contentRef.current) {
-      contentRef.current.style.opacity = '0';
+      dispatch(setMintableState({ id: transactionId, mintable: !isPorn }));
+    } catch (error) {
+      console.error('Error validating content:', error);
       dispatch(setMintableState({ id: transactionId, mintable: true }));
     }
   };
 
-  const handleError = () => {
-    dispatch(setMintableState({ id: transactionId, mintable: false }));
-    setIsValidating(false);
+  const handleLoad = () => {
+    console.log(`Content loaded for Transaction ID: ${transactionId}, URL: ${contentUrl}`);
+    validateContent();
   };
 
-  if (contentType.startsWith('image/')) {
-    return (
-      <img
-        ref={contentRef as React.RefObject<HTMLImageElement>}
-        src={contentUrl}
-        alt="Content for validation"
-        onLoad={handleLoad}
-        onError={handleError}
-        style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0 }}
-      />
-    );
-  } else if (contentType.startsWith('video/')) {
-    return (
-      <video
-        ref={contentRef as React.RefObject<HTMLVideoElement>}
-        src={contentUrl}
-        onLoadedData={handleLoad}
-        onError={handleError}
-        style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0 }}
-      />
-    );
-  }
+  const handleError = () => {
+    console.error(`Error loading content for transaction ID: ${transactionId}`);
+    dispatch(setMintableState({ id: transactionId, mintable: false }));
+  };
 
-  return null;
+  return (
+    <>
+      {contentType.startsWith('image/') && (
+        <img
+          ref={contentRef as React.RefObject<HTMLImageElement>}
+          src={contentUrl}
+          alt="Content for validation"
+          crossOrigin="anonymous"  // <-- Added crossOrigin attribute
+          onLoad={handleLoad}
+          onError={handleError}
+          style={{ display: 'none' }}
+        />
+      )}
+      {contentType.startsWith('video/') && (
+        <video
+          ref={contentRef as React.RefObject<HTMLVideoElement>}
+          src={contentUrl}
+          crossOrigin="anonymous"  // <-- Added crossOrigin attribute
+          onLoadedData={handleLoad}
+          onError={handleError}
+          style={{ display: 'none' }}
+        />
+      )}
+    </>
+  );
 };
 
 export default ContentValidator;

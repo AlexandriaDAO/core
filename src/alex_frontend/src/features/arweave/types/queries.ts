@@ -37,7 +37,6 @@ export interface SearchProps {
   userTransactionIds?: string[];
 }
 
-
 export interface LoadMoreProps {
   onTransactionsUpdate: (transactions: Transaction[], lastTimestamp: number) => void;
   contentTypes: string[];
@@ -50,10 +49,12 @@ export interface LoadMoreProps {
 }
 
 export interface SearchState {
+  searchTerm: string;
+  selectedTags: string[];
+  filterDate: string;
   contentCategory: string;
   tags: string[];
   amount: number;
-  filterDate: string;
   filterTime: string;
   ownerFilter: string;
   advancedOptionsOpen: boolean;
