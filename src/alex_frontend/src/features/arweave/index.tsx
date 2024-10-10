@@ -1,23 +1,29 @@
-import React from "react";
-import { useSelector } from 'react-redux';
+import React, { useState } from "react";
+import { useSelector, useDispatch } from 'react-redux';
 import AppLayout from "@/layouts/AppLayout";
 import SearchForm from "./components/SearchForm";
 import ContentList from "./components/ContentList";
 import ContentRenderer from "./components/ContentRenderer";
-import { useArweaveSearch } from "./hooks/useArweaveSearch";
 import { RootState } from '@/store';
 import { useHandleSearch } from './hooks/useSearchHandlers';
+import { setSelectedContent } from './redux/arweaveSlice';
 
 export default function Permasearch() {
-	const { transactions, isLoading } = useSelector((state: RootState) => state.arweave);
-	const {
-		selectedContent,
-		isModalOpen,
-		handleSelectContent,
-		closeModal,
-	} = useArweaveSearch({ mode: 'general' });
+	const dispatch = useDispatch();
+	const { transactions, isLoading, selectedContent } = useSelector((state: RootState) => state.arweave);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const { handleSearch } = useHandleSearch();
+
+	const handleSelectContent = (id: string, type: string) => {
+		dispatch(setSelectedContent({ id, type }));
+		setIsModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setIsModalOpen(false);
+		dispatch(setSelectedContent(null));
+	};
 
 	return (
 		<AppLayout>

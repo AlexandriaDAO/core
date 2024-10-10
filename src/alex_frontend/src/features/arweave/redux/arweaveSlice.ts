@@ -17,6 +17,7 @@ interface ArweaveState {
   transactions: Transaction[];
   isLoading: boolean;
   searchState: SearchState;
+  selectedContent: { id: string; type: string } | null;
 }
 
 const initialState: ArweaveState = {
@@ -32,6 +33,7 @@ const initialState: ArweaveState = {
     ownerFilter: '',
     advancedOptionsOpen: false,
   },
+  selectedContent: null,
 };
 
 const arweaveSlice = createSlice({
@@ -47,6 +49,9 @@ const arweaveSlice = createSlice({
     setSearchState: (state, action: PayloadAction<Partial<SearchState>>) => {
       state.searchState = { ...state.searchState, ...action.payload };
     },
+    setSelectedContent: (state, action: PayloadAction<{ id: string; type: string } | null>) => {
+      state.selectedContent = action.payload;
+    },
   },
 });
 
@@ -54,6 +59,7 @@ export const {
   setTransactions,
   setIsLoading,
   setSearchState,
+  setSelectedContent,
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;

@@ -1,8 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setTransactions, setIsLoading } from './arweaveSlice';
-import { fetchRecentTransactions, fetchTransactionsByIds } from '../api/arweaveQueries';
-import { Transaction } from '../types/queries';
-import { fileTypeCategories } from '../types/files';
+import { fetchTransactions } from '../api/arweaveApi';
 import { RootState } from '@/store';
 
 interface SearchParams {
@@ -39,25 +37,16 @@ export const performSearch = createAsyncThunk(
       if (contentType) {
         contentTypes = [contentType];
       } else if (contentCategory && contentCategory !== "all") {
-        contentTypes = fileTypeCategories[contentCategory] || [];
+        contentTypes = [contentCategory];
       }
 
-      let fetchedTransactions: Transaction[];
-
-      if (mode === "random") {
-        fetchedTransactions = await fetchTransactionsByIds(
-          userTransactionIds || [],
-          contentTypes,
-          maxTimestamp
-        );
-      } else {
-        fetchedTransactions = await fetchRecentTransactions(
-          contentTypes,
-          amount,
-          maxTimestamp,
-          ownerFilter || undefined
-        );
-      }
+      const fetchedTransactions = await fetchTransactions(mode, {
+        userTransactionIds,
+        contentTypes,
+        amount,
+        maxTimestamp,
+        ownerFilter: ownerFilter || undefined,
+      });
 
       console.log("Fetched transactions:", fetchedTransactions);
 
