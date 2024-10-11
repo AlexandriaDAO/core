@@ -58,35 +58,3 @@ export const performSearch = createAsyncThunk(
     }
   }
 );
-
-export const searchContent = createAsyncThunk(
-  'arweave/searchContent',
-  async (searchParams: SearchState, { rejectWithValue }) => {
-    try {
-      // Construct the query based on the searchParams
-      let query = `{
-        transactions(
-          tags: [
-            { name: "Content-Type", values: ${JSON.stringify(searchParams.tags)} }
-          ]
-          ${searchParams.filterDate ? `, block: { timestamp: { gt: "${searchParams.filterDate}T${searchParams.filterTime || '00:00'}:00Z" } }` : ''}
-          ${searchParams.ownerFilter ? `, owners: ["${searchParams.ownerFilter}"]` : ''}
-          first: ${searchParams.amount}
-        ) {
-          edges {
-            node {
-              id
-              owner { address }
-              data { size type }
-              tags { name value }
-            }
-          }
-        }
-      }`;
-
-      // ... (rest of the function remains the same)
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
-    }
-  }
-);

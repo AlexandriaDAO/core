@@ -5,7 +5,6 @@ import { performSearch } from './redux/arweaveThunks';
 import SearchForm from './components/SearchForm';
 import ContentList from './components/ContentList';
 import ContentRenderer from './components/ContentRenderer';
-import { Transaction } from './types/queries';
 
 const ArweaveFeature: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();

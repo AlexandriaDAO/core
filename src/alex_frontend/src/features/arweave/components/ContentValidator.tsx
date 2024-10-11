@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import * as nsfwjs from 'nsfwjs';
 import { useDispatch, useSelector } from 'react-redux';
-import { setMintableState, setPredictionResults } from '../redux/arweaveSlice';
+import { setMintableState, setPredictionResults, PredictionResults } from '../redux/arweaveSlice';
 import { RootState } from '@/store';
 
 // Load the model once and export it
@@ -9,13 +9,39 @@ let modelPromise: Promise<nsfwjs.NSFWJS> | null = null;
 
 export const loadModel = () => {
   if (!modelPromise) {
-    modelPromise = nsfwjs.load();
+    modelPromise = nsfwjs.load("MobileNetV2Mid");
   }
   return modelPromise;
 };
 
 export const isModelLoaded = () => {
   return modelPromise !== null;
+};
+
+const MAX_IMAGE_SIZE = 2048; // Maximum size for any dimension
+
+const resizeImage = (img: HTMLImageElement): HTMLCanvasElement => {
+  const canvas = document.createElement('canvas');
+  let width = img.width;
+  let height = img.height;
+
+  if (width > height) {
+    if (width > MAX_IMAGE_SIZE) {
+      height *= MAX_IMAGE_SIZE / width;
+      width = MAX_IMAGE_SIZE;
+    }
+  } else {
+    if (height > MAX_IMAGE_SIZE) {
+      width *= MAX_IMAGE_SIZE / height;
+      height = MAX_IMAGE_SIZE;
+    }
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx!.drawImage(img, 0, 0, width, height);
+  return canvas;
 };
 
 interface ContentValidatorProps {
@@ -28,6 +54,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({ transactionId, cont
   const dispatch = useDispatch();
   const contentRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
+  const [isResized, setIsResized] = useState(false);
 
   // Function to validate the content after it has loaded
   const validateContent = async () => {
@@ -40,33 +67,55 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({ transactionId, cont
 
     try {
       const model = await loadModel();
-      const predictions = await model.classify(contentRef.current!);
+      let classificationTarget: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement = contentRef.current;
 
-      const predictionResults = predictions.reduce((acc, prediction) => {
-        acc[prediction.className] = prediction.probability;
-        return acc;
-      }, {} as Record<string, number>);
+      if (contentType.startsWith('image/') && !isResized) {
+        classificationTarget = resizeImage(contentRef.current as HTMLImageElement);
+        setIsResized(true);
+      }
 
-      const isPorn = predictionResults['Porn'] > 0.7 || predictionResults['Hentai'] > 0.7;
+      const predictions = await model.classify(classificationTarget);
 
-      dispatch(setMintableState({ 
-        id: transactionId, 
-        mintable: !isPorn, 
-        predictions: predictionResults 
-      }));
+      const predictionResults: PredictionResults = {
+        Drawing: 0,
+        Hentai: 0,
+        Neutral: 0,
+        Porn: 0,
+        Sexy: 0,
+        isPorn: false
+      };
 
-      console.log(`Content Classification Results for Transaction ID: ${transactionId}`);
-      console.log('----------------------------------------');
-      console.log(`Drawing: ${(predictionResults['Drawing'] * 100).toFixed(2)}%`);
-      console.log(`Hentai: ${(predictionResults['Hentai'] * 100).toFixed(2)}%`);
-      console.log(`Neutral: ${(predictionResults['Neutral'] * 100).toFixed(2)}%`);
-      console.log(`Porn: ${(predictionResults['Porn'] * 100).toFixed(2)}%`);
-      console.log(`Sexy: ${(predictionResults['Sexy'] * 100).toFixed(2)}%`);
-      console.log('----------------------------------------');
-      console.log(`Content is ${isPorn ? 'NOT ' : ''}mintable`);
-      console.log('----------------------------------------');
+/*
+Notes:
+ - It does a good job with Hentai.
 
-      dispatch(setMintableState({ id: transactionId, mintable: !isPorn }));
+- I'm pretty sure it considered a regular blurred out image to be porn, which is fine I guess. 
+
+
+*/
+
+
+      predictions.forEach(prediction => {
+        predictionResults[prediction.className as keyof Omit<PredictionResults, 'isPorn'>] = prediction.probability;
+      });
+
+      const isPorn = predictionResults.Porn > 0.7 || predictionResults.Hentai > 0.7;
+      predictionResults.isPorn = isPorn;
+
+      // Update the mintable state with all predictions for image and video content
+      if (contentType.startsWith('image/') || contentType.startsWith('video/')) {
+        dispatch(setMintableState({ 
+          id: transactionId, 
+          mintable: !isPorn, 
+          predictions: predictionResults
+        }));
+      } else {
+        dispatch(setMintableState({ 
+          id: transactionId, 
+          mintable: !isPorn
+        }));
+      }
+
     } catch (error) {
       console.error('Error validating content:', error);
       dispatch(setMintableState({ id: transactionId, mintable: true }));

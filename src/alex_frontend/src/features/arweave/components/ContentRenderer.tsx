@@ -8,33 +8,45 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 export default function ContentRenderer({ contentId, contentType }: ContentRendererProps) {
-  const [actualContentType, setActualContentType] = useState(contentType);
-  const [content, setContent] = useState<string | null>(null);
+  const [textContent, setTextContent] = useState<string | null>(null);
   const contentUrl = `https://arweave.net/${contentId}`;
 
   useEffect(() => {
-    if (!contentType) {
-      fetch(contentUrl, { method: 'HEAD' })
-        .then(response => {
-          const fetchedContentType = response.headers.get('Content-Type');
-          if (fetchedContentType) setActualContentType(fetchedContentType);
-        })
-        .catch(error => console.error("Error fetching content type:", error));
-    }
-
-    if (actualContentType && ['text/plain', 'text/markdown', 'application/json', 'text/html'].includes(actualContentType)) {
+    if (contentType && ['text/plain', 'text/markdown', 'application/json', 'text/html'].includes(contentType)) {
       fetch(contentUrl)
         .then(response => response.text())
-        .then(text => setContent(text))
+        .then(text => setTextContent(text))
         .catch(error => console.error("Error fetching content:", error));
     }
-  }, [contentId, contentType, contentUrl, actualContentType]);
+  }, [contentId, contentType, contentUrl]);
 
-  if (!actualContentType || !supportedMimeTypes.includes(actualContentType)) {
-    return <p className="text-white">Unsupported or unknown content type: {actualContentType}</p>;
+  if (!contentType) {
+    return <p className="text-white">Unknown content type</p>;
   }
 
-  switch (actualContentType) {
+  if (!supportedMimeTypes.includes(contentType)) {
+    return <p className="text-white">Unsupported content type: {contentType}</p>;
+  }
+
+  const renderTextContent = () => {
+    switch (contentType) {
+      case "text/plain":
+        return <pre>{textContent}</pre>;
+      case "text/markdown":
+        return <ReactMarkdown>{textContent || ''}</ReactMarkdown>;
+      case "application/json":
+      case "text/html":
+        return (
+          <SyntaxHighlighter language={contentType === "application/json" ? "json" : "html"} style={docco}>
+            {textContent || ''}
+          </SyntaxHighlighter>
+        );
+      default:
+        return null;
+    }
+  };
+
+  switch (contentType) {
     case "application/epub+zip":
       return (
         <ReaderProvider>
@@ -59,16 +71,12 @@ export default function ContentRenderer({ contentId, contentType }: ContentRende
       );
 
     case "text/plain":
-      return (
-        <div className="p-4 bg-white text-black overflow-auto h-full">
-          <pre>{content}</pre>
-        </div>
-      );
-
     case "text/markdown":
+    case "application/json":
+    case "text/html":
       return (
         <div className="p-4 bg-white text-black overflow-auto h-full">
-          <ReactMarkdown>{content || ''}</ReactMarkdown>
+          {renderTextContent()}
         </div>
       );
 
@@ -112,25 +120,7 @@ export default function ContentRenderer({ contentId, contentType }: ContentRende
         </div>
       );
 
-    case "application/json":
-      return (
-        <div className="p-4 bg-white text-black overflow-auto h-full">
-          <SyntaxHighlighter language="json" style={docco}>
-            {content || ''}
-          </SyntaxHighlighter>
-        </div>
-      );
-
-    case "text/html":
-      return (
-        <div className="p-4 bg-white text-black overflow-auto h-full">
-          <SyntaxHighlighter language="html" style={docco}>
-            {content || ''}
-          </SyntaxHighlighter>
-        </div>
-      );
-
     default:
-      return <p className="text-white">Unsupported content type: {actualContentType}</p>;
+      return <p className="text-white">Unsupported content type: {contentType}</p>;
   }
 }

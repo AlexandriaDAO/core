@@ -63,6 +63,7 @@
     "nanoid": "^5.0.7",
     "near-api-js": "^5.0.0",
     "npm": "^10.8.3",
+    "nsfwjs": "^4.1.0",
     "papaparse": "^5.4.1",
     "path": "^0.12.7",
     "path-browserify": "^1.0.1",

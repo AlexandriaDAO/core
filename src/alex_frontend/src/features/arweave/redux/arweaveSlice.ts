@@ -1,9 +1,18 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Transaction, SearchState } from '../types/queries';
 
+export interface PredictionResults {
+  Drawing: number;
+  Hentai: number;
+  Neutral: number;
+  Porn: number;
+  Sexy: number;
+  isPorn: boolean;
+}
+
 export interface MintableStateItem {
   mintable: boolean;
-  predictions?: Record<string, number>;
+  predictions?: PredictionResults;
 }
 
 interface ArweaveState {
@@ -22,9 +31,9 @@ const initialState: ArweaveState = {
     searchTerm: '',
     selectedTags: [],
     filterDate: '',
-    contentCategory: '',
+    contentCategory: 'images',
     tags: [],
-    amount: 0,
+    amount: 12,
     filterTime: '',
     ownerFilter: '',
     advancedOptionsOpen: false,
@@ -35,7 +44,7 @@ const initialState: ArweaveState = {
 };
 
 // Action to set prediction results
-export const setPredictionResults = createAction<{ id: string; predictions: Record<string, number> }>(
+export const setPredictionResults = createAction<{ id: string; predictions: PredictionResults }>(
   'arweave/setPredictionResults'
 );
 
@@ -66,7 +75,7 @@ const arweaveSlice = createSlice({
     setFilterTime: (state, action: PayloadAction<string>) => {
       state.searchState.filterTime = action.payload;
     },
-    setMintableState: (state, action: PayloadAction<{ id: string; mintable: boolean; predictions?: Record<string, number> }>) => {
+    setMintableState: (state, action: PayloadAction<{ id: string; mintable: boolean; predictions?: PredictionResults }>) => {
       const { id, mintable, predictions } = action.payload;
       state.mintableState[id] = { mintable, predictions };
     },
@@ -85,7 +94,11 @@ const arweaveSlice = createSlice({
     // Add case for setPredictionResults
     builder.addCase(setPredictionResults, (state, action) => {
       const { id, predictions } = action.payload;
-      state.mintableState[id] = { mintable: false, predictions };
+      if (state.mintableState[id]) {
+        state.mintableState[id].predictions = predictions;
+      } else {
+        state.mintableState[id] = { mintable: false, predictions };
+      }
     });
   },
 });
