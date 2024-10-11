@@ -54,11 +54,11 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({ transactionId, cont
   const dispatch = useDispatch();
   const contentRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
-  const [isResized, setIsResized] = useState(false);
+  const [isValidated, setIsValidated] = useState(false);
 
   // Function to validate the content after it has loaded
   const validateContent = async () => {
-    if (!contentRef.current) return;
+    if (!contentRef.current || isValidated) return;
 
     if (!nsfwModelLoaded) {
       dispatch(setMintableState({ id: transactionId, mintable: true }));
@@ -69,9 +69,16 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({ transactionId, cont
       const model = await loadModel();
       let classificationTarget: HTMLImageElement | HTMLVideoElement | HTMLCanvasElement = contentRef.current;
 
-      if (contentType.startsWith('image/') && !isResized) {
+      if (contentType.startsWith('image/')) {
         classificationTarget = resizeImage(contentRef.current as HTMLImageElement);
-        setIsResized(true);
+      } else if (contentType.startsWith('video/')) {
+        // For videos, we'll just classify the first frame
+        const video = contentRef.current as HTMLVideoElement;
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d')!.drawImage(video, 0, 0, canvas.width, canvas.height);
+        classificationTarget = canvas;
       }
 
       const predictions = await model.classify(classificationTarget);
@@ -84,17 +91,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({ transactionId, cont
         Sexy: 0,
         isPorn: false
       };
-
-/*
-Notes:
- - It does a good job with Hentai.
-
-- I'm pretty sure it considered a regular blurred out image to be porn, which is fine I guess. 
-
-
-*/
-
-
+      
       predictions.forEach(prediction => {
         predictionResults[prediction.className as keyof Omit<PredictionResults, 'isPorn'>] = prediction.probability;
       });
@@ -116,6 +113,7 @@ Notes:
         }));
       }
 
+      setIsValidated(true);
     } catch (error) {
       console.error('Error validating content:', error);
       dispatch(setMintableState({ id: transactionId, mintable: true }));
@@ -150,10 +148,12 @@ Notes:
           ref={contentRef as React.RefObject<HTMLVideoElement>}
           src={contentUrl}
           crossOrigin="anonymous"  // <-- Added crossOrigin attribute
-          onLoadedData={handleLoad}
+          onLoadedMetadata={handleLoad}
           onError={handleError}
           style={{ display: 'none' }}
-        />
+        >
+          <source src={contentUrl} type={contentType} />
+        </video>
       )}
     </>
   );

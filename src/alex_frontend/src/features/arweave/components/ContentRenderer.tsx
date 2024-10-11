@@ -9,16 +9,29 @@ import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 export default function ContentRenderer({ contentId, contentType }: ContentRendererProps) {
   const [textContent, setTextContent] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const contentUrl = `https://arweave.net/${contentId}`;
 
   useEffect(() => {
     if (contentType && ['text/plain', 'text/markdown', 'application/json', 'text/html'].includes(contentType)) {
       fetch(contentUrl)
-        .then(response => response.text())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.text();
+        })
         .then(text => setTextContent(text))
-        .catch(error => console.error("Error fetching content:", error));
+        .catch(error => {
+          console.error("Error fetching content:", error);
+          setError("Failed to load content. Please try again later.");
+        });
     }
   }, [contentId, contentType, contentUrl]);
+
+  if (error) {
+    return <p className="text-white">{error}</p>;
+  }
 
   if (!contentType) {
     return <p className="text-white">Unknown content type</p>;

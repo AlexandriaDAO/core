@@ -5,7 +5,7 @@ import { getCover } from "@/utils/epub";
 import ContentGrid from "./ContentGrid";
 import { supportedFileTypes } from "../types/files";
 import { mint_nft } from "../../nft/mint";
-import { FaPlay, FaFileAlt, FaFilePdf, FaFileCode, FaFileAudio, FaImage, FaExclamationTriangle } from 'react-icons/fa';
+import { FaPlay, FaFileAlt, FaFilePdf, FaFileCode, FaFileAudio, FaImage, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 import { RootState } from "@/store";
 import { setMintableStates, setMintableState, MintableStateItem } from "../redux/arweaveSlice";
 import ContentValidator, { loadModel, isModelLoaded } from './ContentValidator';
@@ -39,6 +39,7 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 	const [contentUrls, setContentUrls] = useState<Record<string, string | null>>({});
 	const [renderErrors, setRenderErrors] = useState<Record<string, boolean>>({});
 	const mintableState = useSelector((state: RootState) => state.arweave.mintableState);
+	const [showStats, setShowStats] = useState<Record<string, boolean>>({});
 
 	useEffect(() => {
 		// Reset contentUrls and renderErrors when transactions change
@@ -100,7 +101,7 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 	};
 
 	const renderDetails = (transaction: Transaction) => (
-		<div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300">
+		<div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300 z-10">
 			<p><span className="font-semibold">ID:</span> {transaction.id}</p>
 			<p><span className="font-semibold">Owner:</span> {transaction.owner}</p>
 			{transaction.data && (
@@ -173,11 +174,10 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 						</div>
 					) : null}
 
-					{/* Overlay stats if content is not mintable */}
-					{!isMintable && predictions && (
-						<div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white p-2">
-							<p className="text-lg font-bold mb-2">Content Not Mintable</p>
-							<p>Classification Results:</p>
+					{/* Stats overlay */}
+					{(showStats[transaction.id] || !isMintable) && predictions && (
+						<div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white p-2 z-20">
+							<p className="text-lg font-bold mb-2">Content Classification</p>
 							<ul className="text-sm">
 								<li>Drawing: {(predictions['Drawing'] * 100).toFixed(2)}%</li>
 								<li>Hentai: {(predictions['Hentai'] * 100).toFixed(2)}%</li>
@@ -185,20 +185,10 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 								<li>Porn: {(predictions['Porn'] * 100).toFixed(2)}%</li>
 								<li>Sexy: {(predictions['Sexy'] * 100).toFixed(2)}%</li>
 							</ul>
+							{!isMintable && (
+								<p className="mt-2 text-red-400">This content is not mintable.</p>
+							)}
 						</div>
-					)}
-
-					{/* Mint button if content is mintable */}
-					{isMintable && (
-						<button
-							onClick={(e) => {
-								e.stopPropagation();
-								handleMint(transaction.id);
-							}}
-							className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
-						>
-							+
-						</button>
 					)}
 				</div>
 			);
@@ -216,6 +206,9 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 			{transactions.map((transaction) => {
 				const contentUrl = contentUrls[transaction.id];
 				const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+				const mintableStateItem = mintableState[transaction.id];
+				const isMintable = mintableStateItem?.mintable;
+				const predictions = mintableStateItem?.predictions;
 
 				return (
 					<ContentGrid.Item
@@ -225,6 +218,32 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 						<div className="group relative w-full h-full">
 							{renderContent(transaction, contentUrl)}
 							{renderDetails(transaction)}
+							
+							{/* Stats button */}
+							{isMintable && predictions && (
+								<button
+									onClick={(e) => {
+										e.stopPropagation();
+										setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
+									}}
+									className="absolute top-2 left-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
+								>
+									<FaInfoCircle />
+								</button>
+							)}
+
+							{/* Mint button */}
+							{isMintable && (
+								<button
+									onClick={(e) => {
+										e.stopPropagation();
+										handleMint(transaction.id);
+									}}
+									className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
+								>
+									+
+								</button>
+							)}
 						</div>
 					</ContentGrid.Item>
 				);
