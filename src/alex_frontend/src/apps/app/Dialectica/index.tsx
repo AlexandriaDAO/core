@@ -1,10 +1,11 @@
 import React from "react";
-import ArweaveSearch from "@/features/arweave";
 
 function Dialectica() {
 
 	return (
-		<ArweaveSearch />
+		<div>
+			<h1>Work in Progress</h1>
+		</div>
 	);
 }
 

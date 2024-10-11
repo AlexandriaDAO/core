@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { supportedFileTypes, fileTypeCategories } from "../types/files";
 import { SearchFormProps } from "../types/queries";
 import { useHandleSearch } from '../hooks/useSearchHandlers';
-import { loadModel, isModelLoaded } from './ContentValidator';
+import { loadModel, unloadModel, isModelLoaded } from './ContentValidator';
 import { setNsfwModelLoaded } from '../redux/arweaveSlice';
 import { RootState } from '@/store';
 
@@ -69,6 +69,11 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
         setIsLoadingModel(false);
       }
     }
+  };
+
+  const handleUnloadNsfwModel = () => {
+    unloadModel();
+    dispatch(setNsfwModelLoaded(false));
   };
 
   return (
@@ -211,22 +216,32 @@ const SearchForm: React.FC<SearchFormProps> = ({ onSearch }) => {
           </div>
         )}
 
-        {/* NSFW Model Status and Load Button */}
+        {/* NSFW Model Status and Load/Unload Buttons */}
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-gray-700">
             NSFW Model Status: {nsfwModelLoaded ? 'Loaded' : 'Not Loaded'}
           </span>
-          <button
-            onClick={handleLoadNsfwModel}
-            disabled={nsfwModelLoaded || isLoadingModel}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-md 
-                        ${nsfwModelLoaded || isLoadingModel
-                          ? 'bg-gray-400 cursor-not-allowed'
-                          : 'bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
-                        }`}
-          >
-            {isLoadingModel ? 'Loading...' : 'Load NSFW Model'}
-          </button>
+          {nsfwModelLoaded ? (
+            <button
+              onClick={handleUnloadNsfwModel}
+              className="px-4 py-2 text-sm font-medium text-white rounded-md 
+                        bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              Unload NSFW Model
+            </button>
+          ) : (
+            <button
+              onClick={handleLoadNsfwModel}
+              disabled={isLoadingModel}
+              className={`px-4 py-2 text-sm font-medium text-white rounded-md 
+                          ${isLoadingModel
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
+                          }`}
+            >
+              {isLoadingModel ? 'Loading...' : 'Load NSFW Model'}
+            </button>
+          )}
         </div>
 
         {/* Search Button */}
