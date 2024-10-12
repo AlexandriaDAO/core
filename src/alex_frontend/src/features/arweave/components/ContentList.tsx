@@ -10,18 +10,19 @@ import { RootState } from "@/store";
 import { setMintableStates, setMintableState, MintableStateItem } from "../redux/arweaveSlice";
 import ContentValidator, { loadModel, isModelLoaded } from './ContentValidator';
 import { setNsfwModelLoaded } from "../redux/arweaveSlice";
+import { ARWEAVE_CONFIG, getProxiedArweaveUrl } from '../config/arweaveConfig';
 
 const contentTypeHandlers: Record<string, (id: string) => Promise<string | null> | string> = {
   "application/epub+zip": async (id: string) => {
-    const url = await getCover(`https://arweave.net/${id}`);
-    return url || `https://arweave.net/${id}`;
+    const url = await getCover(getProxiedArweaveUrl(id));
+    return url || getProxiedArweaveUrl(id);
   },
-  "application/pdf": (id: string) => `https://arweave.net/${id}`,
+  "application/pdf": (id: string) => getProxiedArweaveUrl(id),
 };
 
 supportedFileTypes.forEach(type => {
   if (type.mimeType.startsWith("image/") || type.mimeType.startsWith("video/")) {
-    contentTypeHandlers[type.mimeType] = (id: string) => `https://arweave.net/${id}`;
+    contentTypeHandlers[type.mimeType] = (id: string) => getProxiedArweaveUrl(id);
   }
 });
 
@@ -45,6 +46,9 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 		// Reset contentUrls and renderErrors when transactions change
 		setContentUrls({});
 		setRenderErrors({});
+
+		// Reset showStats when transactions change
+		setShowStats({});
 
 		// Set initial mintable states for new transactions
 		const initialMintableStates = transactions.reduce((acc, transaction) => {
@@ -161,6 +165,7 @@ const ContentList: React.FC<ContentListProps> = ({ transactions, onSelectContent
 							alt={contentType === "application/epub+zip" ? "Book cover" : "Content image"}
 							className="absolute inset-0 w-full h-full object-cover"
 							onError={() => handleRenderError(transaction.id)}
+							crossOrigin="anonymous"
 						/>
 					) : contentType === "application/pdf" ? (
 						<div className="relative w-full h-full bg-gray-200 flex items-center justify-center">

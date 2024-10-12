@@ -1,32 +1,29 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import * as nsfwjs from 'nsfwjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { setMintableState, PredictionResults } from '../redux/arweaveSlice';
 import { RootState } from '@/store';
 import * as tf from '@tensorflow/tfjs';
+import ContentFetcher from './ContentFetcher';
 
-// Load the model once and export it
-let modelPromise: Promise<nsfwjs.NSFWJS> | null = null;
+// Model loading should ideally be managed at a higher level if used in multiple components
+let nsfwModel: nsfwjs.NSFWJS | null = null;
 
-export const loadModel = () => {
-  if (!modelPromise) {
-    modelPromise = nsfwjs.load("MobileNetV2Mid");
+export const loadModel = async () => {
+  if (!nsfwModel) {
+    nsfwModel = await nsfwjs.load('MobileNetV2Mid');
   }
-  return modelPromise;
+  return nsfwModel;
 };
 
 export const unloadModel = () => {
-  if (modelPromise) {
-    modelPromise.then(model => {
-      // Clear the model reference
-      modelPromise = null;
-      // Note: NSFWJS doesn't have a built-in dispose method, so we're just clearing the reference
-    });
+  if (nsfwModel) {
+    nsfwModel = null;
   }
 };
 
 export const isModelLoaded = () => {
-  return modelPromise !== null;
+  return nsfwModel !== null;
 };
 
 const MAX_IMAGE_SIZE = 2048; // Maximum size for any dimension
@@ -78,14 +75,13 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   contentType,
 }) => {
   const dispatch = useDispatch();
-  const contentRef = useRef<HTMLImageElement | HTMLVideoElement>(null);
   const nsfwModelLoaded = useSelector(
     (state: RootState) => state.arweave.nsfwModelLoaded
   );
   const [isValidated, setIsValidated] = useState(false);
 
-  const validateContent = async () => {
-    if (!contentRef.current || isValidated) return;
+  const validateContent = async (element: HTMLImageElement | HTMLVideoElement) => {
+    if (isValidated) return;
 
     if (!nsfwModelLoaded) {
       dispatch(setMintableState({ id: transactionId, mintable: true }));
@@ -105,21 +101,21 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
       let predictions: nsfwjs.predictionType[];
 
       if (contentType.startsWith('image/')) {
-        tempCanvas = resizeImage(contentRef.current as HTMLImageElement);
-        const ctx = tempCanvas.getContext('2d');
-        if (ctx) {
-          const imgData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-          imgTensor = tf.browser.fromPixels(imgData);
-        }
+        tempCanvas = resizeImage(element as HTMLImageElement);
       } else if (contentType.startsWith('video/')) {
-        // For videos, we'll classify the first frame
         tempCanvas = document.createElement('canvas');
-        const video = contentRef.current as HTMLVideoElement;
+        const video = element as HTMLVideoElement;
         tempCanvas.width = video.videoWidth;
         tempCanvas.height = video.videoHeight;
         const ctx = tempCanvas.getContext('2d');
         if (ctx) {
           ctx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+        }
+      }
+
+      if (tempCanvas) {
+        const ctx = tempCanvas.getContext('2d');
+        if (ctx) {
           const imgData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
           imgTensor = tf.browser.fromPixels(imgData);
         }
@@ -127,14 +123,13 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
 
       if (imgTensor) {
         predictions = await model.classify(imgTensor);
-        imgTensor.dispose(); // Dispose of the tensor after classification
+        imgTensor.dispose();
       } else {
         console.error('Failed to create image tensor for classification');
         dispatch(setMintableState({ id: transactionId, mintable: true }));
         return;
       }
 
-      // Dispose of the temporary canvas after use
       if (tempCanvas) {
         disposeCanvas(tempCanvas);
       }
@@ -178,54 +173,18 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (contentRef.current && !isValidated) {
-      // Wait for the content to load before validating
-      const handleLoad = () => {
-        validateContent();
-      };
-
-      const currentContent = contentRef.current;
-
-      currentContent.addEventListener('load', handleLoad);
-      currentContent.addEventListener('loadedmetadata', handleLoad); // For videos
-
-      return () => {
-        currentContent.removeEventListener('load', handleLoad);
-        currentContent.removeEventListener('loadedmetadata', handleLoad);
-      };
-    }
-  }, [contentRef.current, isValidated]);
-
   const handleError = () => {
     console.error(`Error loading content for transaction ID: ${transactionId}`);
     dispatch(setMintableState({ id: transactionId, mintable: false }));
   };
 
   return (
-    <>
-      {contentType.startsWith('image/') && (
-        <img
-          ref={contentRef as React.RefObject<HTMLImageElement>}
-          src={contentUrl}
-          alt="Content for validation"
-          crossOrigin="anonymous"
-          onError={handleError}
-          style={{ display: 'none' }}
-        />
-      )}
-      {contentType.startsWith('video/') && (
-        <video
-          ref={contentRef as React.RefObject<HTMLVideoElement>}
-          src={contentUrl}
-          crossOrigin="anonymous"
-          onError={handleError}
-          style={{ display: 'none' }}
-        >
-          <source src={contentUrl} type={contentType} />
-        </video>
-      )}
-    </>
+    <ContentFetcher
+      contentUrl={contentUrl}
+      contentType={contentType}
+      onLoad={validateContent}
+      onError={handleError}
+    />
   );
 };
 

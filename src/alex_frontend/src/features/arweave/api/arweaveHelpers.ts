@@ -1,9 +1,10 @@
 import axios from 'axios';
+import { ARWEAVE_CONFIG } from '../config/arweaveConfig';
 
 // Function to get the block height closest to a given timestamp
 export async function getBlockHeightForTimestamp(timestamp: number): Promise<number> {
   // Get the current network info to determine the max block height
-  const { data: networkInfo } = await axios.get('https://arweave.net/info');
+  const { data: networkInfo } = await axios.get(`${ARWEAVE_CONFIG.GATEWAY_URL}/info`);
   let minHeight = 0;
   let maxHeight = parseInt(networkInfo.height, 10);
 
@@ -14,7 +15,7 @@ export async function getBlockHeightForTimestamp(timestamp: number): Promise<num
 
     // Fetch the block at midHeight
     try {
-      const { data: block } = await axios.get(`https://arweave.net/block/height/${midHeight}`);
+      const { data: block } = await axios.get(`${ARWEAVE_CONFIG.GATEWAY_URL}/block/height/${midHeight}`);
 
       if (block.timestamp < timestamp) {
         minHeight = midHeight + 1;

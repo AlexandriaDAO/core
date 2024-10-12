@@ -6,11 +6,12 @@ import { ContentRendererProps } from "../types/queries";
 import ReactMarkdown from 'react-markdown';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { ARWEAVE_CONFIG, getProxiedArweaveUrl } from '../config/arweaveConfig';
 
 export default function ContentRenderer({ contentId, contentType }: ContentRendererProps) {
   const [textContent, setTextContent] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const contentUrl = `https://arweave.net/${contentId}`;
+  const contentUrl = getProxiedArweaveUrl(contentId);
 
   useEffect(() => {
     if (contentType && ['text/plain', 'text/markdown', 'application/json', 'text/html'].includes(contentType)) {
@@ -58,7 +59,6 @@ export default function ContentRenderer({ contentId, contentType }: ContentRende
         return null;
     }
   };
-
   switch (contentType) {
     case "application/epub+zip":
       return (
@@ -115,6 +115,8 @@ export default function ContentRenderer({ contentId, contentType }: ContentRende
             src={contentUrl}
             alt="Selected content"
             className="max-w-full max-h-full object-contain"
+            loading="lazy" // Retain lazy loading
+            crossOrigin="anonymous" // Add this line
           />
         </div>
       );

@@ -89,6 +89,9 @@ const arweaveSlice = createSlice({
       state.transactions = action.payload;
       state.mintableState = {};
     },
+    resetMintableState(state) {
+      state.mintableState = {};
+    },
   },
   extraReducers: (builder) => {
     // Add case for setPredictionResults
@@ -115,6 +118,7 @@ export const {
   setMintableStates,
   setNsfwModelLoaded,
   resetTransactions,
+  resetMintableState,
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;
