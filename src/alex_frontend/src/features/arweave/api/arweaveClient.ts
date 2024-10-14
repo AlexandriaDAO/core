@@ -4,7 +4,7 @@ import { ApolloLink } from '@apollo/client/link/core';
 import { Transaction } from '../types/queries';
 import { getBlockHeightForTimestamp } from './arweaveHelpers';
 import axios from 'axios';
-import { ARWEAVE_CONFIG, getProxiedArweaveUrl } from '../config/arweaveConfig';
+import { ARWEAVE_CONFIG, getArweaveUrl } from '../config/arweaveConfig';
 
 const logLink = new ApolloLink((operation, forward) => {
   console.log('GraphQL Request:', {
@@ -98,6 +98,8 @@ export const fetchTransactionsByIds = async (
   const uniqueIds = [...new Set(ids)]; // Remove duplicates
   const transactions: Transaction[] = [];
 
+  console.log('Fetching transactions by IDs:', uniqueIds);
+
   try {
     const { data } = await arweaveNetClient.query({
       query: FETCH_BY_IDS_QUERY,
@@ -156,7 +158,7 @@ export async function fetchRecentTransactions(
     // If minBlock and maxBlock are provided, use them; otherwise, compute defaults
     if (minBlock === undefined || maxBlock === undefined) {
       // Fetch current network info to get the max block height
-      const { data: networkInfo } = await axios.get(getProxiedArweaveUrl('info'));
+      const { data: networkInfo } = await axios.get(getArweaveUrl('info'));
       const currentBlockHeight = parseInt(networkInfo.height, 10);
       
       if (maxTimestamp) {

@@ -67,12 +67,14 @@ interface ContentValidatorProps {
   transactionId: string;
   contentUrl: string;
   contentType: string;
+  imageObjectUrl: string | null;
 }
 
 const ContentValidator: React.FC<ContentValidatorProps> = ({
   transactionId,
   contentUrl,
   contentType,
+  imageObjectUrl,
 }) => {
   const dispatch = useDispatch();
   const nsfwModelLoaded = useSelector(
@@ -98,7 +100,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
 
       let tempCanvas: HTMLCanvasElement | null = null;
       let imgTensor: tf.Tensor3D | null = null;
-      let predictions: nsfwjs.PredictionType[];
+      let predictions: nsfwjs.predictionType[];
 
       if (contentType.startsWith('image/')) {
         tempCanvas = resizeImage(element as HTMLImageElement);
@@ -182,6 +184,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     <ContentFetcher
       contentUrl={contentUrl}
       contentType={contentType}
+      imageObjectUrl={imageObjectUrl}
       onLoad={validateContent}
       onError={handleError}
     />

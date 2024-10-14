@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from 'react';
 interface ContentFetcherProps {
   contentUrl: string;
   contentType: string;
+  imageObjectUrl: string | null;
   onLoad: (element: HTMLImageElement | HTMLVideoElement) => void;
   onError: () => void;
 }
@@ -10,6 +11,7 @@ interface ContentFetcherProps {
 const ContentFetcher: React.FC<ContentFetcherProps> = ({
   contentUrl,
   contentType,
+  imageObjectUrl,
   onLoad,
   onError,
 }) => {
@@ -37,12 +39,11 @@ const ContentFetcher: React.FC<ContentFetcherProps> = ({
 
   return (
     <>
-      {contentType.startsWith('image/') && (
+      {contentType.startsWith('image/') && imageObjectUrl && (
         <img
           ref={contentRef as React.RefObject<HTMLImageElement>}
-          src={contentUrl}
+          src={imageObjectUrl}
           alt="Content for validation"
-          crossOrigin="anonymous"
           onError={onError}
           style={{ display: 'none' }}
         />
