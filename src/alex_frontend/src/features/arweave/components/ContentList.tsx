@@ -130,14 +130,6 @@ const ContentList = ({ transactions, onSelectContent }: ContentListProps) => {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <FaSpinner className="animate-spin text-4xl text-gray-500" />
-      </div>
-    );
-  }
-
   return (
     <>
       <ContentGrid>
