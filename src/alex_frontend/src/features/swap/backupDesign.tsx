@@ -9,9 +9,6 @@ import { faClone } from '@fortawesome/free-regular-svg-icons';
 import { faArrowRightLong, faExclamation, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
-// import apple from "../../../public/images/apple.png"
-// import {Images} from "../../assets/assets"
-import appleImage from '../../assets/apple.png';
 import AccountCards from './components/balance/accountCards';
 import BalanceContent from './components/balance/balanceContent';
 
