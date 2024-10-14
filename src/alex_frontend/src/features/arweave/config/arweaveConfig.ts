@@ -3,8 +3,12 @@ export const ARWEAVE_CONFIG = {
   GRAPHQL_ENDPOINT: 'https://arweave-search.goldsky.com/graphql',
 };
 
-// Update the getProxiedArweaveUrl function to include a version parameter
-export const getProxiedArweaveUrl = (resourceId: string): string => {
-  const timestamp = Date.now(); // Generates a new timestamp each time
-  return `${ARWEAVE_CONFIG.GATEWAY_URL}/${resourceId}?v=${timestamp}`;
+export const getArweaveUrl = (resourceId: string): string => {
+  return `${ARWEAVE_CONFIG.GATEWAY_URL}/${resourceId}`;
 };
+
+export function loadArweaveAsset(url: string): Promise<string> {
+  return fetch(url, { cache: 'no-store' })
+    .then(response => response.blob())
+    .then(blob => URL.createObjectURL(blob));
+}
