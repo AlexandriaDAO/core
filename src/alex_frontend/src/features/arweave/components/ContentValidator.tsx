@@ -86,7 +86,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     if (isValidated) return;
 
     if (!nsfwModelLoaded) {
-      dispatch(setMintableState({ id: transactionId, mintable: true }));
+      dispatch(setMintableState({ id: transactionId, mintable: false }));
       return;
     }
 
@@ -94,7 +94,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
       const model = await loadModel();
       if (!model) {
         console.error('NSFW model not loaded');
-        dispatch(setMintableState({ id: transactionId, mintable: true }));
+        dispatch(setMintableState({ id: transactionId, mintable: false }));
         return;
       }
 
@@ -128,7 +128,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
         imgTensor.dispose();
       } else {
         console.error('Failed to create image tensor for classification');
-        dispatch(setMintableState({ id: transactionId, mintable: true }));
+        dispatch(setMintableState({ id: transactionId, mintable: false }));
         return;
       }
 
@@ -155,7 +155,8 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
       const isPorn =
         predictionResults.Porn > 0.5 ||
         (predictionResults.Sexy > 0.2 && predictionResults.Porn > 0.2) ||
-        predictionResults.Hentai > 0.25;
+        predictionResults.Hentai > 0.1 ||
+        predictionResults.Sexy > 0.6;
 
       predictionResults.isPorn = isPorn;
 
@@ -171,7 +172,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
       setIsValidated(true);
     } catch (error) {
       console.error('Error validating content:', error);
-      dispatch(setMintableState({ id: transactionId, mintable: true }));
+      dispatch(setMintableState({ id: transactionId, mintable: false }));
     }
   };
 

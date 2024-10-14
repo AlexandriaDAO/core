@@ -5,7 +5,6 @@
 
 8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
 UyuYSWQ67hUvJ1b4k56niVeN88dyanu1X8TsfXo_s5U
-njYq2ZawlguwCAjnQGoV02vzx-Dno2UT2Ut24K9qPwU
 -5VMrJ6SIbT2yQT0cl_ftRJlDj4AzEq0e8ew8rYCNsE 06/21
 
 
@@ -30,11 +29,15 @@ Initial Conditions:
 - If sexy and porn are both >20%
 - Hentai above 25%
 
+
 More Conditions: 
 
 - If porn >15% && sexy >2% && Hentai > 2%
 
+- If sexy by itself is >50? (or maybe find another condition to match with so we don't censor paintings/art)
+
 Or even lower for hentai. 10% or less. There's lots of anime porn getting through.
+Actually this is getting tricky. There's this beautiful painting that's considered hentai.
 
 
 
@@ -48,3 +51,6 @@ ID: X-3wJtKVFM0v_7QFcunRtR_y0k-GWkvrnMunEWXAJGY
 Owner: ukHhmGSDbyCRw04MySWBbQNOpZ2wufkTfuxPdVmDaug
 
 Size: 6630957 
+
+Some cool ai art: 
+jgin38TT9Bllu6F16nhq1mJvphLk5Rzg79cdZ5zpJFA (dec 3, 2023)
