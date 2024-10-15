@@ -41,7 +41,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 };
 
 const ContentList = ({ transactions, onSelectContent }: ContentListProps) => {
-  const { contentData, mintableState, handleRenderError, loading } = useContent(transactions);
+  const { contentData, mintableState, handleRenderError } = useContent(transactions);
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
 

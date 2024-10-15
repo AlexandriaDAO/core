@@ -16,7 +16,8 @@
     "jsx": "react",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/alex_frontend/src/*"]
+      "@/*": ["src/alex_frontend/src/*"],
+      "*": ["node_modules/*"]
     }
   },
   "include": [

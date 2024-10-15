@@ -100,7 +100,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
 
       let tempCanvas: HTMLCanvasElement | null = null;
       let imgTensor: tf.Tensor3D | null = null;
-      let predictions: nsfwjs.predictionType[];
+      let predictions: nsfwjs.PredictionType[];
 
       if (contentType.startsWith('image/')) {
         tempCanvas = resizeImage(element as HTMLImageElement);

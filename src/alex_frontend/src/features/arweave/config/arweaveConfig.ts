@@ -1,5 +1,5 @@
 export const ARWEAVE_CONFIG = {
-  GATEWAY_URL: 'https://g8way.io',
+  GATEWAY_URL: 'https://arweave.net',
   GRAPHQL_ENDPOINT: 'https://arweave-search.goldsky.com/graphql',
 };
 
