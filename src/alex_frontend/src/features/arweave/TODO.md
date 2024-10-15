@@ -1,7 +1,4 @@
-- Add rendering support for text, markdown, json, and html.
-  - Remove NSFW check for non image/video content.
-- Add nsfw results to redux state
-- Wipe the toggle states after each search.
+
 
 8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
 UyuYSWQ67hUvJ1b4k56niVeN88dyanu1X8TsfXo_s5U
