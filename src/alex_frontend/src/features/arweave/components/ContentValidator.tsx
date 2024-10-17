@@ -6,12 +6,11 @@ import { RootState } from '@/store';
 import * as tf from '@tensorflow/tfjs';
 import ContentFetcher from './ContentFetcher';
 
-// Model loading should ideally be managed at a higher level if used in multiple components
 let nsfwModel: nsfwjs.NSFWJS | null = null;
 
 export const loadModel = async () => {
   if (!nsfwModel) {
-    nsfwModel = await nsfwjs.load('MobileNetV2Mid');
+    nsfwModel = await nsfwjs.load('/models/mobilenet_v2_mid/model.json', { type: 'graph' });
   }
   return nsfwModel;
 };
