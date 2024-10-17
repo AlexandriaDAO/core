@@ -4,6 +4,8 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
@@ -21,6 +23,20 @@ module.exports = {
   optimization: {
     minimize: !isDevelopment,
     minimizer: [new TerserPlugin()],
+    splitChunks: {
+      chunks: 'all',
+      minSize: 10000,
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name(module) {
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            return `npm.${packageName.replace('@', '')}`;
+          },
+        },
+      },
+    },
+    runtimeChunk: 'single',
   },
   resolve: {
     extensions: [".js", ".ts", ".jsx", ".tsx"],
@@ -42,11 +58,18 @@ module.exports = {
     alias: {
       "@": path.resolve(__dirname, "src", frontendDirectory, "src"),
       stream: "stream-browserify",
+      './model_imports/inception_v3': 'null-loader',
+      './model_imports/mobilenet_v2': 'null-loader',
+      './model_imports/mobilenet_v2_mid': 'null-loader'
     },
   },
   output: {
-    filename: "index.js",
+    // filename: "index.js",
+    // path: path.join(__dirname, "dist", frontendDirectory),
+    filename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].js',
     path: path.join(__dirname, "dist", frontendDirectory),
+    publicPath: '/',
   },
 
   module: {
@@ -108,20 +131,12 @@ module.exports = {
         type: "webassembly/async",
       },
       { test: /\\.(png|jp(e*)g|svg|gif)$/, use: ['file-loader'], },
-      // {
-      //   test: /\.(png|jpe?g|gif)$/i,
-      //   use: [
-      //     {
-      //       loader: 'file-loader',
-      //       options: {
-      //         name: '[name].[ext]', // Use original file name
-      //         outputPath: 'images',
-      //       },
-      //     },
-      //   ],
-      // },
+      {
+        test: /nsfwjs[\\/]dist[\\/]esm[\\/](models|model_imports)[\\/].*\.(js|json)$/,
+        use: 'null-loader',
+      }
     ],
-  },  
+  },
 
   plugins: [
     new HtmlWebpackPlugin({
@@ -152,6 +167,36 @@ module.exports = {
           noErrorOnMissing: true,
         },
       ],
+    }),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/.*$/,
+      contextRegExp: /nsfwjs[\\/]dist[\\/]esm[\\/](models|model_imports)$/
+    }),
+    new webpack.DefinePlugin({
+      'require("./model_imports/inception_v3")': '{}',
+      'require("./model_imports/mobilenet_v2")': '{}',
+      'require("./model_imports/mobilenet_v2_mid")': '{}'
+    }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'server',
+      analyzerHost: 'localhost',
+      analyzerPort: 8888,
+      openAnalyzer: true,
+      generateStatsFile: true,
+      statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
+      statsOptions: {
+        all: false,
+        assets: true,
+        assetsSort: 'size',
+        chunks: true,
+        chunkModules: false,
+        entrypoints: true,
+        hash: true,
+        modules: false,
+        timings: true,
+        errors: true,
+        warnings: true,
+      },
     }),
   ],
   devServer: {

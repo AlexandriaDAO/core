@@ -72,6 +72,7 @@ record {
      };
      feature_flags = opt record {
         icrc2 = true;
+        icrc3 = true;
      };
  }
 })'
@@ -92,6 +93,7 @@ record {
      };
      feature_flags = opt record {
         icrc2 = true;
+        icrc3 = true;
      };
  }
 })'
