@@ -1,12 +1,12 @@
 {
-  "hash": "46a4e031337df06c62d5",
-  "time": 1305,
+  "hash": "3f9db0d58f9f37a2a6fe",
+  "time": 14782,
   "assetsByChunkName": {
     "index": [
-      "index.8ab30712907574803f8e.js"
+      "index.9353ef61d5dde6c4c8c0.js"
     ],
     "runtime": [
-      "runtime.c7a29ee5886594b1df46.js"
+      "runtime.55977a95c28d187c81b5.js"
     ],
     "tf-nsfwjs": [
       "tf-nsfwjs.8c19b58e99fd0ae70bf1.js"
@@ -745,8 +745,8 @@
     {
       "type": "assets by status",
       "cached": true,
-      "filteredChildren": 383,
-      "size": 123338803
+      "filteredChildren": 378,
+      "size": 123163281
     },
     {
       "type": "asset",
@@ -794,10 +794,9 @@
       "initial": true,
       "entry": false,
       "recorded": false,
-      "size": 761886.8,
+      "size": 761809.8,
       "sizes": {
-        "javascript": 761851.8,
-        "asset": 35
+        "javascript": 761809.8
       },
       "names": [
         "index"
@@ -807,14 +806,12 @@
         "runtime"
       ],
       "files": [
-        "index.8ab30712907574803f8e.js"
+        "index.9353ef61d5dde6c4c8c0.js"
       ],
       "auxiliaryFiles": [
-        "1b876a15ae4715c69361.png",
-        "images/apple.png",
-        "index.8ab30712907574803f8e.js.map"
+        "index.9353ef61d5dde6c4c8c0.js.map"
       ],
-      "hash": "fa25b0dbd7508502aea5",
+      "hash": "aa9b1678848af1eb0282",
       "childrenByOrder": {}
     },
     {
@@ -7640,12 +7637,12 @@
         "runtime"
       ],
       "files": [
-        "runtime.c7a29ee5886594b1df46.js"
+        "runtime.55977a95c28d187c81b5.js"
       ],
       "auxiliaryFiles": [
-        "runtime.c7a29ee5886594b1df46.js.map"
+        "runtime.55977a95c28d187c81b5.js.map"
       ],
-      "hash": "681ab7f15f789e3e1efe",
+      "hash": "2153542aabb5a3b5ef85",
       "childrenByOrder": {}
     },
     {
@@ -7682,7 +7679,7 @@
       "name": "index",
       "assets": [
         {
-          "name": "runtime.c7a29ee5886594b1df46.js",
+          "name": "runtime.55977a95c28d187c81b5.js",
           "size": 54060
         },
         {
@@ -8646,17 +8643,23 @@
           "size": 198307
         },
         {
-          "name": "index.8ab30712907574803f8e.js",
-          "size": 1271132
+          "name": "index.9353ef61d5dde6c4c8c0.js",
+          "size": 1270798
         }
       ],
       "filteredAssets": 0,
-      "assetsSize": 41857540,
-      "filteredAuxiliaryAssets": 244,
-      "auxiliaryAssetsSize": 42000270
+      "assetsSize": 41857206,
+      "filteredAuxiliaryAssets": 242,
+      "auxiliaryAssetsSize": 42000164
     }
   },
   "errors": [
+    {
+      "moduleIdentifier": "/home/linus/alexandria/core/node_modules/css-loader/dist/cjs.js!/home/linus/alexandria/core/node_modules/postcss-loader/dist/cjs.js!/home/linus/alexandria/core/src/alex_frontend/public/tailwind.css",
+      "moduleName": "./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js!./src/alex_frontend/public/tailwind.css",
+      "loc": "5:36-82",
+      "message": "Module not found: Error: Can't resolve './images/apple.png' in '/home/linus/alexandria/core/src/alex_frontend/public'"
+    },
     {
       "file": "/home/linus/alexandria/core/node_modules/azle/src/lib/experimental/fetch/response.ts",
       "loc": "29:8-20",
