@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect } from "react";
 import Header from "@/components/Header";
+import { Toaster } from "@/lib/components/toaster";
 // Define the type for the component's props
 interface MainLayoutProps {
 	children: ReactNode;
@@ -37,6 +38,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 		<div className="min-h-screen min-w-screen flex flex-col bg-[#f4f4f4]">
 			<Header />
 			{children}
+			<Toaster />
 		</div>
 	);
 };

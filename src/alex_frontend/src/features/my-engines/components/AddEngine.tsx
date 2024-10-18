@@ -20,6 +20,19 @@ import { CiCircleCheck } from "react-icons/ci";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import { getAuthClient } from "@/features/auth/utils/authUtils";
 
+
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/lib/components/dialog"
+import { Button } from "@/lib/components/button";
+
 const EngineSchema = Yup.object().shape({
 	title: Yup.string()
 		.min(2, "Title is too short")
@@ -50,12 +63,6 @@ const AddEngine = () => {
 	const { newEngineLoading, newEngine, newEngineError } = useAppSelector(
 		(state) => state.myEngines
 	);
-
-	const [addEngineModal, setAddEngineModal] = useState(false);
-
-	const handleCancel = () => {
-		setAddEngineModal(false);
-	};
 
 	const formik = useFormik({
 		initialValues: {
@@ -88,54 +95,57 @@ const AddEngine = () => {
 	}
 	useEffect(() => resetNewEngine, []);
 
-	useEffect(() => {
-		if(!addEngineModal && (newEngine || newEngineError)) resetNewEngine()
-	}, [addEngineModal]);
+	// useEffect(() => {
+	// 	if(!addEngineModal && (newEngine || newEngineError)) resetNewEngine()
+	// }, [addEngineModal]);
 
 	return (
 		<>
-			<BiPlus
-				onClick={() => setAddEngineModal(true)}
-				size={36}
-				className="p-2 border border-solid rounded-full cursor-pointer bg-black text-white hover:bg-white hover:text-black hover:border-black transition-all duration-100"
-			/>
-			<Modal
-				open={addEngineModal}
-				onCancel={handleCancel}
-				footer={null}
-				closable={false}
-				className="min-w-[600px]"
-				// classNames={{ content: '!p-0', }}
-			>
-				<main className="container h-full w-full flex flex-col flex-grow justify-between gap-4">
-					<span className="font-syne text-xl font-bold">
-						Add Engine
-					</span>
+			<Dialog>
+				<DialogTrigger asChild>
+					<BiPlus
+						// onClick={() => setAddEngineModal(true)}
+						size={36}
+						className="p-2 border border-solid rounded-full cursor-pointer bg-black text-white hover:bg-white hover:text-black hover:border-black transition-all duration-100"
+					/>
+				</DialogTrigger>
 
-					{newEngine ? (
-						<div className="flex justify-center items-center flex-col gap-3">
-							<CiCircleCheck
-								size={30}
-								className="text-green-400"
-							/>
-							<span className="mt-6 text-base leading-7 text-gray-600">
-								Engine has been added successfully
-							</span>
-						</div>
-					) : newEngineError ? (
-						<div className="flex justify-center items-center flex-col gap-3">
-							<AiOutlineCloseCircle
-								size={30}
-								className="text-red-400"
-							/>
-							<span className="text-base leading-7 text-gray-600">
-								An error Occurred while adding engine
-							</span>
-							<span className="text-base leading-7 text-gray-600">
-								{newEngineError}
-							</span>
-						</div>
-					) : (
+				{newEngine ? (
+					<DialogContent className="sm:max-w-[425px]">
+						<DialogHeader>
+							<DialogTitle>
+								<div className="flex gap-1 justify-start items-center">
+									<CiCircleCheck
+										size={24}
+										className="text-green-400"
+									/>
+									<span>Engine Added</span>
+								</div>
+							</DialogTitle>
+							<DialogDescription>Engine has been stored successfully.</DialogDescription>
+						</DialogHeader>
+					</DialogContent>
+				) : newEngineError ? (
+					<DialogContent className="sm:max-w-[425px]">
+						<DialogHeader>
+							<DialogTitle>
+								<div className="flex gap-1 justify-start items-center">
+									<AiOutlineCloseCircle
+										size={24}
+										className="text-red-400"
+									/>
+									<span>Engine Error</span>
+								</div>
+							</DialogTitle>
+							<DialogDescription>Error Occurred! {newEngineError}</DialogDescription>
+						</DialogHeader>
+					</DialogContent>
+				) : (
+					<DialogContent className="sm:max-w-[600px]">
+						<DialogHeader>
+							<DialogTitle>Add Engine</DialogTitle>
+							<DialogDescription>Add your Engine, It can be from Meili cloud or Akash Instance.</DialogDescription>
+						</DialogHeader>
 						<form
 							onSubmit={formik.handleSubmit}
 							className="flex flex-col gap-2 "
@@ -264,32 +274,26 @@ const AddEngine = () => {
 										</span>
 									)}
 							</div>
-
-							{newEngineLoading ? (
-								<button
-									type="button"
-									disabled={true}
-									className="w-44 py-3 self-center my-4 flex gap-2 justify-center items-center border border-black rounded-full font-roboto-condensed text-base leading-[18px] font-medium transition-all duration-100 ease-in bg-black text-white cursor-not-allowed"
-								>
-									<ImSpinner8
-										size={20}
-										className="animate animate-spin"
-									/>
-									<span>Saving Engine</span>
-								</button>
-							) : (
-								<button
-									type="submit"
-									className="w-44 py-3 self-center my-4 flex gap-2 justify-center items-center border border-black rounded-full font-roboto-condensed text-base leading-[18px] font-medium transition-all duration-100 ease-in text-black cursor-pointer hover:bg-black hover:text-white"
-								>
-									<LiaSaveSolid size={18} />
-									<span>Save Engine</span>
-								</button>
-							)}
+							<DialogFooter className="flex justify-center items-center my-4">
+								{newEngineLoading ? (
+									<Button type="button" disabled rounded={"full"}>
+									 	<ImSpinner8
+									 		size={18}
+									 		className="animate animate-spin"
+									 	/>
+										<span>Saving Engine</span>
+									</Button>
+								) : (
+									<Button type="submit" rounded={"full"}>
+										<LiaSaveSolid size={18} />
+										<span>Save Engine</span>
+									</Button>
+								)}
+							</DialogFooter>
 						</form>
-					)}
-				</main>
-			</Modal>
+					</DialogContent>
+				)}
+			</Dialog>
 		</>
 	);
 };
