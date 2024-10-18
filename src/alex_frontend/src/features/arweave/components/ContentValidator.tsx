@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
-import * as nsfwjs from 'nsfwjs';
 import { useDispatch, useSelector } from 'react-redux';
 import { setMintableState, PredictionResults } from '../redux/arweaveSlice';
 import { RootState } from '@/store';
-import * as tf from '@tensorflow/tfjs';
 import ContentFetcher from './ContentFetcher';
+import type { NSFWJS, PredictionType } from 'nsfwjs';
 
-let nsfwModel: nsfwjs.NSFWJS | null = null;
+// Add these type definitions at the top of the file
+type Tensor3D = import('@tensorflow/tfjs').Tensor3D;
+
+let nsfwModel: NSFWJS | null = null;
 
 export const loadModel = async () => {
   if (!nsfwModel) {
+    // Dynamically import only NSFWJS here
+    const nsfwjs = await import('nsfwjs');
     nsfwModel = await nsfwjs.load('/models/mobilenet_v2_mid/model.json', { type: 'graph' });
+    return nsfwModel;
   }
-  return nsfwModel;
 };
 
 export const unloadModel = () => {
@@ -90,16 +94,25 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     }
 
     try {
-      const model = await loadModel();
-      if (!model) {
+      // Dynamically import TensorFlow and NSFWJS
+      const [tf, nsfwjs] = await Promise.all([
+        import('@tensorflow/tfjs'),
+        import('nsfwjs')
+      ]);
+
+      if (!nsfwModel) {
+        nsfwModel = await nsfwjs.load('/models/mobilenet_v2_mid/model.json', { type: 'graph' });
+      }
+
+      if (!nsfwModel) {
         console.error('NSFW model not loaded');
         dispatch(setMintableState({ id: transactionId, mintable: false }));
         return;
       }
 
       let tempCanvas: HTMLCanvasElement | null = null;
-      let imgTensor: tf.Tensor3D | null = null;
-      let predictions: nsfwjs.PredictionType[];
+      let imgTensor: Tensor3D | null = null;
+      let predictions: PredictionType[];
 
       if (contentType.startsWith('image/')) {
         tempCanvas = resizeImage(element as HTMLImageElement);
@@ -118,12 +131,12 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
         const ctx = tempCanvas.getContext('2d');
         if (ctx) {
           const imgData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-          imgTensor = tf.browser.fromPixels(imgData);
+          imgTensor = tf.browser.fromPixels(imgData) as Tensor3D;  // Use type assertion here
         }
       }
 
       if (imgTensor) {
-        predictions = await model.classify(imgTensor);
+        predictions = await nsfwModel.classify(imgTensor);
         imgTensor.dispose();
       } else {
         console.error('Failed to create image tensor for classification');

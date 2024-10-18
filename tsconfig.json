@@ -25,6 +25,7 @@
     "src/**/*.tsx",
   ],
   "exclude": [
-    "**/node_modules/azle/**/*.ts"
+    "**/node_modules/azle/**/*.ts",
+    "**/node_modules/@dfinity/agent/lib/cjs/auth.js"
   ],
 }
