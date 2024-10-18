@@ -31,6 +31,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@irys/sdk": "^0.2.11",
     "@meilisearch/instant-meilisearch": "^0.20.0",
+    "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.2",
     "@reduxjs/toolkit": "^2.2.7",
