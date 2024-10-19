@@ -1,29 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Transaction, ContentListProps } from "../types/queries";
 import ContentGrid from "./ContentGrid";
 import { mint_nft } from "../../nft/mint";
-import { FaPlay, FaFileAlt, FaFilePdf, FaFileCode, FaFileAudio, FaImage, FaExclamationTriangle, FaInfoCircle, FaTimes, FaSpinner } from 'react-icons/fa';
+import { getCover } from "@/utils/epub";
+import { FaFilePdf, FaExclamationTriangle, FaInfoCircle, FaTimes, FaSpinner, FaBook, FaPlay, FaFileAlt, FaFileCode, FaFileAudio, FaImage } from 'react-icons/fa';
 import ContentValidator from './ContentValidator';
 import { useContent } from '../hooks/useContent';
+import { Reader } from "@/features/reader";
+import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
 }
-
-const getFileIcon = (contentType: string) => {
-  const iconMap = {
-    "image/": <FaImage />,
-    "video/": <FaPlay />,
-    "audio/": <FaFileAudio />,
-    "application/pdf": <FaFilePdf />,
-    "text/": <FaFileCode />,
-    "application/json": <FaFileCode />,
-  };
-
-  return Object.entries(iconMap).find(([key]) => contentType.startsWith(key))?.[1] || <FaFileAlt />;
-};
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
@@ -40,10 +30,80 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   );
 };
 
-const ContentList = ({ transactions, onSelectContent }: ContentListProps) => {
+interface ContentUrlInfo {
+  coverUrl: string | null;
+  fullUrl: string;
+}
+
+const contentTypeHandlers: Record<string, (id: string) => Promise<ContentUrlInfo> | ContentUrlInfo> = {
+  "application/epub+zip": async (id: string) => {
+    const coverUrl = await getCover(`https://arweave.net/${id}`);
+    return {
+      coverUrl: coverUrl || null,
+      fullUrl: `https://arweave.net/${id}`
+    };
+  },
+  "application/pdf": (id: string) => ({
+    coverUrl: null,
+    fullUrl: `https://arweave.net/${id}`
+  }),
+  "image/": (id: string) => ({
+    coverUrl: `https://arweave.net/${id}`,
+    fullUrl: `https://arweave.net/${id}`
+  }),
+  "video/": (id: string) => ({
+    coverUrl: null,
+    fullUrl: `https://arweave.net/${id}`
+  }),
+};
+
+const getFileIcon = (contentType: string) => {
+  if (contentType.startsWith("image/")) return <FaImage />;
+  if (contentType.startsWith("video/")) return <FaPlay />;
+  if (contentType.startsWith("audio/")) return <FaFileAudio />;
+  if (contentType === "application/pdf") return <FaFilePdf />;
+  if (["text/plain", "text/markdown", "application/json", "text/html"].includes(contentType)) return <FaFileCode />;
+  return <FaFileAlt />;
+};
+
+const ContentList = ({ transactions }: ContentListProps) => {
   const { contentData, mintableState, handleRenderError } = useContent(transactions);
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
+  const [contentUrls, setContentUrls] = useState<Record<string, ContentUrlInfo>>({});
+
+  useEffect(() => {
+    const loadContent = async () => {
+      for (const transaction of transactions) {
+        try {
+          const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+          const handler = Object.entries(contentTypeHandlers).find(([key]) => contentType.startsWith(key))?.[1];
+          if (handler) {
+            // Initialize with a loading state
+            setContentUrls(prev => ({
+              ...prev,
+              [transaction.id]: { coverUrl: null, fullUrl: `https://arweave.net/${transaction.id}` }
+            }));
+
+            const urlInfo = await handler(transaction.id);
+            // Update state for this specific transaction as soon as it's ready
+            setContentUrls(prev => ({
+              ...prev,
+              [transaction.id]: urlInfo
+            }));
+          }
+        } catch (error) {
+          console.warn(`Error loading content for ${transaction.id}:`, error);
+          setContentUrls(prev => ({
+            ...prev,
+            [transaction.id]: { coverUrl: null, fullUrl: `https://arweave.net/${transaction.id}` }
+          }));
+        }
+      }
+    };
+
+    loadContent();
+  }, [transactions]);
 
   const handleMint = async (transactionId: string) => {
     try {
@@ -73,18 +133,12 @@ const ContentList = ({ transactions, onSelectContent }: ContentListProps) => {
     const mintableStateItem = mintableState[transaction.id];
     const isMintable = mintableStateItem?.mintable;
     const predictions = mintableStateItem?.predictions;
+    const urlInfo = contentUrls[transaction.id] || { coverUrl: null, fullUrl: `https://arweave.net/${transaction.id}` };
 
-    if (!content) {
+    console.log("Rendering content:", { id: transaction.id, contentType, urlInfo, inModal });
+
+    if (!urlInfo.fullUrl) {
       return <div className="w-full h-full bg-gray-200 flex items-center justify-center"><FaSpinner className="animate-spin text-4xl text-gray-500" /></div>;
-    }
-
-    if (content.error) {
-      return (
-        <div className="w-full h-full bg-red-100 flex flex-col items-center justify-center text-red-500">
-          <FaExclamationTriangle className="text-4xl mb-2" />
-          <span className="text-sm">Failed to load</span>
-        </div>
-      );
     }
 
     const commonProps = {
@@ -92,27 +146,56 @@ const ContentList = ({ transactions, onSelectContent }: ContentListProps) => {
       onError: () => handleRenderError(transaction.id),
     };
 
+    if (contentType === "application/epub+zip") {
+      if (inModal) {
+        console.log("Rendering epub in modal:", urlInfo.fullUrl);
+        return (
+          <ReaderProvider>
+            <div className="h-full pt-8">
+              <Reader bookUrl={urlInfo.fullUrl} />
+            </div>
+          </ReaderProvider>
+        );
+      } else {
+        return (
+          <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
+            {urlInfo.coverUrl ? (
+              <img src={urlInfo.coverUrl} alt="Book cover" {...commonProps} crossOrigin="anonymous" />
+            ) : (
+              <>
+                <FaBook className="text-gray-500 text-4xl absolute" />
+                <FaSpinner className="animate-spin text-4xl text-gray-500" />
+              </>
+            )}
+          </div>
+        );
+      }
+    }
+
     const contentMap = {
-      "video/": <video src={content.url || ''} controls={inModal} {...commonProps} />,
-      "image/": <img src={content.imageObjectUrl || content.url || ''} alt="Content" {...commonProps} crossOrigin="anonymous" />,
-      "application/epub+zip": <img src={content.imageObjectUrl || content.url || ''} alt="Book cover" {...commonProps} crossOrigin="anonymous" />,
+      "video/": <video src={urlInfo.fullUrl} controls={inModal} {...commonProps} />,
+      "image/": <img src={urlInfo.coverUrl || urlInfo.fullUrl} alt="Content" {...commonProps} crossOrigin="anonymous" />,
       "application/pdf": (
         <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
           <FaFilePdf className="text-gray-500 text-4xl absolute" />
-          <embed src={`${content.url || ''}#view=FitH&page=1`} type="application/pdf" {...commonProps} />
+          <embed src={`${urlInfo.fullUrl}#view=FitH&page=1`} type="application/pdf" {...commonProps} />
         </div>
       ),
     };
 
-    const renderedContent = Object.entries(contentMap).find(([key]) => contentType.startsWith(key))?.[1] || null;
+    const renderedContent = Object.entries(contentMap).find(([key]) => contentType.startsWith(key))?.[1] || (
+      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+        {getFileIcon(contentType)}
+      </div>
+    );
 
     return (
       <div className={`relative ${inModal ? 'w-full h-full' : 'w-full h-full'}`}>
         <ContentValidator
           transactionId={transaction.id}
-          contentUrl={content.url || ''}
+          contentUrl={content?.url || urlInfo.fullUrl || ''}
           contentType={contentType}
-          imageObjectUrl={content.imageObjectUrl}
+          imageObjectUrl={content?.imageObjectUrl || ''}
         />
         {renderedContent}
         {(showStats[transaction.id] || !isMintable) && predictions && (
