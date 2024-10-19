@@ -1,0 +1,1 @@
+service : { get_registry_principal : (text) -> (principal) query }

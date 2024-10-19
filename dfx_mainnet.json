@@ -65,7 +65,7 @@
       "candid": "src/tokenomics/tokenomics.did",
       "package": "tokenomics",
       "type": "rust",
-      "id": "uxyan-oyaaa-aaaap-qhezq-cai"
+      "id": "chddw-rqaaa-aaaao-qevqq-cai"
     },
     "LBRY": {
       "type": "custom",
@@ -78,6 +78,12 @@
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
       "id": "7hcrm-4iaaa-aaaak-akuka-cai"
+    },
+    "registry": {
+      "candid": "src/registry/registry.did",
+      "package": "registry",
+      "type": "rust",
+      "id": "uxyan-oyaaa-aaaap-qhezq-cai"
     },
     "alex_frontend": {
       "dependencies": ["alex_backend"],

@@ -41,6 +41,9 @@ candid-extractor target/wasm32-unknown-unknown/release/bookmarks.wasm > src/book
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
+# For registry
+cargo build --release --target wasm32-unknown-unknown --package registry
+candid-extractor target/wasm32-unknown-unknown/release/registry.wasm > src/registry/registry.did
 # For tokenomics
 cargo build --release --target wasm32-unknown-unknown --package tokenomics
 candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
@@ -58,7 +61,8 @@ cargo update
 dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
 dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
 dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
-dfx deploy tokenomics --specified-id uxyan-oyaaa-aaaap-qhezq-cai
+dfx deploy registry --specified-id uxyan-oyaaa-aaaap-qhezq-cai
+dfx deploy tokenomics --specified-id chddw-rqaaa-aaaao-qevqq-cai
 
 dfx deploy alex_librarian --specified-id rby3s-dqaaa-aaaak-qizqa-cai
 dfx deploy vetkd --specified-id fzemm-saaaa-aaaan-qlsla-cai
@@ -159,3 +163,15 @@ dfx deploy alex_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
 # dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal <principal>)
+
+# Load canister IDs from canister_ids.json
+ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)
+LBRY_CANISTER_ID=$(jq -r '.LBRY.ic' canister_ids.json)
+TOKENOMICS_CANISTER_ID=$(jq -r '.tokenomics.ic' canister_ids.json)
+XRC_CANISTER_ID=$(jq -r '.xrc.ic' canister_ids.json)
+
+# Export canister IDs as environment variables
+export ALEX_CANISTER_ID
+export LBRY_CANISTER_ID
+export TOKENOMICS_CANISTER_ID
+export XRC_CANISTER_ID

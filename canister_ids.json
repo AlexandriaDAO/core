@@ -35,11 +35,14 @@
   "nft_manager": {
     "ic": "forhl-tiaaa-aaaak-qc7ga-cai"
   },
+  "registry": {
+    "ic": "uxyan-oyaaa-aaaap-qhezq-cai"
+  },
   "system_api": {
     "ic": "xhfe4-aqaaa-aaaak-akv4q-cai"
   },
   "tokenomics": {
-    "ic": "uxyan-oyaaa-aaaap-qhezq-cai"
+    "ic": "chddw-rqaaa-aaaao-qevqq-cai"
   },
   "vetkd": {
     "ic": "fzemm-saaaa-aaaan-qlsla-cai"

@@ -2,6 +2,7 @@ use candid::{CandidType, Nat, Principal};
 use serde::Deserialize;
 use std::cell::RefCell;
 
+use crate::get_canister_id;
 use crate::{get_current_LBRY_ratio, guard::*};
 use crate::{get_user_archive_balance, utils::*};
 use ic_cdk::{self, caller, update};
@@ -222,7 +223,7 @@ async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
     ic_cdk::call::<(TransferArg,), (Result<BlockIndex, TransferError>,)>(
         // 2. Convert a textual representation of a Principal into an actual `Principal` object. The principal is the one we specified in `dfx.json`.
         //    `expect` will panic if the conversion fails, ensuring the code does not proceed with an invalid principal.
-        Principal::from_text(LBRY_CANISTER_ID).expect("Could not decode the principal."),
+        get_canister_id("LBRY").await,
         // 3. Specify the method name on the target canister to be called, in this case, "icrc1_transfer".
         "icrc1_transfer",
         // 4. Provide the arguments for the call in a tuple, here `transfer_args` is encapsulated as a single-element tuple.
@@ -312,7 +313,7 @@ async fn burn_token(amount: u64) -> Result<BlockIndex, String> {
     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
         // 2. Convert a textual representation of a Principal into an actual `Principal` object. The principal is the one we specified in `dfx.json`.
         //    `expect` will panic if the conversion fails, ensuring the code does not proceed with an invalid principal.
-        Principal::from_text(LBRY_CANISTER_ID).expect("Could not decode the principal."),
+        get_canister_id("LBRY").await,
         // 3. Specify the method name on the target canister to be called, in this case, "icrc1_transfer".
         "icrc2_transfer_from",
         // 4. Provide the arguments for the call in a tuple, here `transfer_args` is encapsulated as a single-element tuple.
@@ -333,7 +334,7 @@ async fn mint_ALEX(lbry_amount: u64, caller: Principal) -> Result<String, String
     // 1. Asynchronously call another canister function using `ic_cdk::call`.
     let result: Result<(Result<String, String>,), String> =
         ic_cdk::call::<(u64, Principal), (Result<String, String>,)>(
-            Principal::from_text(TOKENOMICS_CANISTER_ID).expect("Could not decode the principal."),
+            get_canister_id("ALEX").await,
             "mint_ALEX",
             (lbry_amount, caller),
         )
@@ -372,7 +373,7 @@ async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
     };
 
     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
-        Principal::from_text(ALEX_CANISTER_ID).expect("Could not decode the principal."),
+        get_canister_id("ALEX").await,
         "icrc2_transfer_from",
         (transfer_from_args,),
     )
@@ -441,7 +442,7 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
     };
 
     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
-        Principal::from_text(ALEX_CANISTER_ID).expect("Could not decode the principal."),
+        get_canister_id("ALEX").await,
         "icrc2_transfer_from",
         (transfer_from_args,),
     )
@@ -641,7 +642,7 @@ pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
         timestamp: None,
     };
 
-    let xrc_canister_id = Principal::from_text(XRC_CANISTER_ID).unwrap();
+    let xrc_canister_id = get_canister_id("XRC").await;
 
     let call_result: Result<Vec<u8>, (ic_cdk::api::call::RejectionCode, String)> =
         ic_cdk::api::call::call_raw(

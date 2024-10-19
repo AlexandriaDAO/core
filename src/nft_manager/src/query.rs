@@ -1,4 +1,4 @@
-use crate::{alex_principal, icrc7_principal, lbry_principal};
+use crate::get_canister_id;
 use crate::utils::{check_query_batch_size, to_nft_subaccount};
 use crate::types::TokenBalances;
 use crate::guard::is_frontend;
@@ -18,7 +18,7 @@ const ALEX_FEE: u64 = 10_000;
 pub async fn total_supply() -> Result<Nat, String> {
 
     let call_result: CallResult<(Nat,)> = ic_cdk::call(
-        icrc7_principal(),
+        get_canister_id("ICRC7").await,
         "icrc7_total_supply",
         ()
     ).await;
@@ -53,7 +53,7 @@ pub async fn get_nfts(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>, 
     let adjusted_end = end.clone() + Nat::from(1u64);
 
     let tokens_call_result: CallResult<(Vec<Nat>,)> = ic_cdk::call(
-        icrc7_principal(),
+        get_canister_id("ICRC7").await,
         "icrc7_tokens",
         (Some(start), Some(adjusted_end))
     ).await;
@@ -88,7 +88,7 @@ pub async fn get_nft_balances(mint_numbers: Vec<Nat>) -> Result<Vec<TokenBalance
 
         // Get the LBRY balance
         let lbry_balance = ic_cdk::call::<(Account,), (NumTokens,)>(
-            lbry_principal(),
+            get_canister_id("LBRY").await,
             "icrc1_balance_of",
             (account.clone(),),
         )
@@ -98,7 +98,7 @@ pub async fn get_nft_balances(mint_numbers: Vec<Nat>) -> Result<Vec<TokenBalance
 
         // Get the ALEX balance
         let alex_balance = ic_cdk::call::<(Account,), (NumTokens,)>(
-            alex_principal(),
+            get_canister_id("ALEX").await,
             "icrc1_balance_of",
             (account,),
         )
@@ -124,7 +124,7 @@ pub async fn nfts_exist(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
     check_query_batch_size(&token_ids)?;
 
     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
-      icrc7_principal(),
+      get_canister_id("ICRC7").await,
       "icrc7_owner_of",
       (token_ids.clone(),)
   ).await;
@@ -148,7 +148,7 @@ pub async fn owner_of(token_ids: Vec<Nat>) -> Result<Vec<Option<Account>>, Strin
     check_query_batch_size(&token_ids)?;
 
     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
-        icrc7_principal(),
+        get_canister_id("ICRC7").await,
         "icrc7_owner_of",
         (token_ids.clone(),)
     ).await;
@@ -170,7 +170,7 @@ pub async fn get_nfts_of(owner: Principal) -> Result<Vec<(Nat, Option<String>)>,
     };
 
     let tokens_call_result: CallResult<(Vec<Nat>,)> = ic_cdk::call(
-        icrc7_principal(),
+        get_canister_id("ICRC7").await,
         "icrc7_tokens_of",
         (account, None::<Nat>, None::<Nat>)
         // (account, Some(Nat::from(0u64)), Some(Nat::from(20_000u64)))
@@ -196,7 +196,7 @@ pub async fn get_metadata(token_ids: Vec<Nat>) -> Result<Vec<Option<BTreeMap<Str
     check_query_batch_size(&token_ids)?;
 
     let metadata_call_result: CallResult<(Vec<Option<BTreeMap<String, Value>>>,)> = ic_cdk::call(
-        icrc7_principal(),
+        get_canister_id("ICRC7").await,
         "icrc7_token_metadata",
         (token_ids.clone(),)
     ).await;
@@ -267,7 +267,7 @@ pub async fn get_my_nft_balances(slot: Option<Nat>) -> Result<Vec<(Nat, TokenBal
 
 pub async fn is_owner(token_ids: Vec<Nat>, user: Principal) -> Result<Vec<bool>, String> {
     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
-        icrc7_principal(),
+        get_canister_id("ICRC7").await,
         "icrc7_owner_of",
         (token_ids,)
     ).await;

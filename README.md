@@ -51,11 +51,33 @@ todo before next push: Fix fetchBooks.ts, fetchEngineBooks.ts, and irys.tsx
 
 ### Referencing canisters on the backend.
 
-Use nft_manager/src/lib.rs as a reference.
+The registry canister handles all canister ids so they shouldn't be hardcoded anywhere.
 
 Use this pattern: 
 
-```rust
+```
+pub const REGISTRY_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
+
+pub async fn get_canister_id(canister_name: &str) -> Principal {
+    // Call get_registry_principal from registry canister
+    ic_cdk::call::<(String,), (Principal,)>(
+        Principal::from_text(REGISTRY_CANISTER_ID).unwrap(),
+        "get_registry_principal",
+        (canister_name.to_string(),),
+    )
+    .await
+    .expect("Failed to get canister ID")
+    .0
+}
+
+get_canister_id("TOKENOMICS").await
+```
+
+This way the only hardcoded canister id is the registry canister id, which will never change.
+
+It's preferable to put this in the lib.rs file so we know what canisters each canister interacts with very easily.
+
+<!-- ```rust
 pub const ALEX_CANISTER_ID: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
 
 pub fn alex_principal() -> Principal {
@@ -70,7 +92,7 @@ use crate::alex_principal;
 some_function(alex_principal(): Principal) {
   ...
 }
-```
+``` -->
 
 Rationale: This methodology is the most consise, and having all the canister ids in each Lib.rs immediately tells you what canisters it interacts with.
 

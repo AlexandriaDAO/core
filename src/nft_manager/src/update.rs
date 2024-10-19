@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::icrc7_principal;
+use crate::get_canister_id;
 use crate::guard::*;
 use crate::types::*;
 use crate::utils::*;
@@ -52,7 +52,7 @@ pub async fn mint_nft(minting_number: Nat, description: Option<String>) -> Resul
     };
 
     let call_result: CallResult<()> = ic_cdk::call(
-        icrc7_principal(),
+        get_canister_id("ICRC7").await,
         "icrcX_mint",
         (vec![nft_request],)
     ).await;
@@ -65,7 +65,7 @@ pub async fn mint_nft(minting_number: Nat, description: Option<String>) -> Resul
 
 async fn fetch_metadata(valid_minting_numbers: Vec<Nat>) -> Result<Vec<Option<BTreeMap<String, Value>>>, String> {
     let metadata_call_result: CallResult<(Vec<Option<BTreeMap<String, Value>>>,)> = ic_cdk::call(
-        icrc7_principal(),
+        get_canister_id("ICRC7").await,
         "icrc7_token_metadata",
         (valid_minting_numbers.clone(),)
     ).await;
@@ -139,7 +139,7 @@ pub async fn burn_to_lbry(minting_numbers: Vec<Nat>) -> Result<String, String> {
     let nft_requests_count = nft_requests.len();
 
     let call_result: CallResult<()> = ic_cdk::call(
-        icrc7_principal(),
+        get_canister_id("ICRC7").await,
         "icrcX_mint",
         (nft_requests,)
     ).await;

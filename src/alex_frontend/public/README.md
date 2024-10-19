@@ -415,7 +415,7 @@ storage and management for all the SBT ownership and payments. Details tbd but w
 
 Details being finalized.
 
-### tokenomics: (uxyan-oyaaa-aaaap-qhezq-cai) | Current controller: ... | Future Controller: ...
+### tokenomics: (chddw-rqaaa-aaaao-qevqq-cai) | Current controller: ... | Future Controller: ...
 
 Details being finalized.
 

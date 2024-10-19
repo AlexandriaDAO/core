@@ -2,7 +2,7 @@
 // If there's a ddoss problem we can just upgrade these to block the unmatched caller, since they're not using the frontend.
 // Can't do batch versions here because icrc4 is not finalized, and so batch transfers not ready.
 
-use crate::{lbry_principal, alex_principal};
+use crate::get_canister_id;
 use crate::utils::to_nft_subaccount;
 use crate::query::{get_nft_balances, is_owner};
 use crate::guard::not_anon;
@@ -47,7 +47,7 @@ pub async fn withdraw(mint_number: Nat) -> Result<(Option<BlockIndex>, Option<Bl
 
         // Withdraw LBRY
         match ic_cdk::call::<(TransferArg,), (Result<BlockIndex, TransferError>,)>(
-            lbry_principal(),
+            get_canister_id("LBRY").await,
             "icrc1_transfer",
             (lbry_transfer_args,),
         )
@@ -77,7 +77,7 @@ pub async fn withdraw(mint_number: Nat) -> Result<(Option<BlockIndex>, Option<Bl
 
         // Withdraw ALEX
         match ic_cdk::call::<(TransferArg,), (Result<BlockIndex, TransferError>,)>(
-            alex_principal(),
+            get_canister_id("ALEX").await,
             "icrc1_transfer",
             (alex_transfer_args,),
         )
