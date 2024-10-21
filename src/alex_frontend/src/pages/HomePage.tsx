@@ -10,6 +10,7 @@ interface App {
 }
 
 const apps: App[] = [
+  { name: 'Alexandrian', description: 'Library', path: '/app/alexandrian' },
   { name: 'Bibliotheca', description: 'Library', path: '/app/bibliotheca' },
   { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos' },
   { name: 'Lexigraph', description: 'Write', path: '/app/lexigraph' },

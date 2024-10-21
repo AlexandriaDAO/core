@@ -10,6 +10,7 @@ import SwapPage from "./pages/swap";
 import LibrarianPage from "./pages/LibrarianPage";
 import WhitepaperPage from "./pages/WhitepaperPage";
 
+import Alexandrian from "./apps/app/Alexandrian";
 import Bibliotheca from "./apps/app/Bibliotheca";
 import Syllogos from "./apps/app/Syllogos";
 import Lexigraph from "./apps/app/Lexigraph";
@@ -34,6 +35,7 @@ export default function App() {
 
                         {/* App routes */}
                         <Route path="/app/bibliotheca" element={<Bibliotheca />} />
+                        <Route path="/app/alexandrian" element={<Alexandrian />} />
                         <Route path="/app/syllogos" element={<Syllogos />} />
                         <Route path="/app/lexigraph" element={<Lexigraph />} />
                         <Route path="/app/dialectica" element={<Dialectica />} />
