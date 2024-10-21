@@ -5,23 +5,33 @@ use std::collections::BTreeMap;
 
 use candid::{Nat, Principal};
 
-pub const REGISTRY_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 
-pub async fn get_canister_id(canister_name: &str) -> Principal {
-    // Call get_registry_principal from registry canister
-    ic_cdk::call::<(String,), (Principal,)>(
-        Principal::from_text(REGISTRY_CANISTER_ID).unwrap(),
-        "get_registry_principal",
-        (canister_name.to_string(),),
-    )
-    .await
-    .expect("Failed to get canister ID")
-    .0
-}
+pub const ICRC7_CANISTER_ID: &str = "fjqb7-6qaaa-aaaak-qc7gq-cai";
+pub const LBRY_CANISTER_ID: &str = "hdtfn-naaaa-aaaam-aciva-cai";
+pub const ALEX_CANISTER_ID: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
+pub const FRONTEND_CANISTER_ID: &str = "xo3nl-yaaaa-aaaap-abl4q-cai";
 
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
 }
+
+pub fn icrc7_principal() -> Principal {
+    get_principal(ICRC7_CANISTER_ID)
+}
+
+pub fn alex_principal() -> Principal {
+    get_principal(ALEX_CANISTER_ID)
+}
+
+pub fn lbry_principal() -> Principal {
+    get_principal(LBRY_CANISTER_ID)
+}
+
+// use icrc_ledger_types::icrc1::account::Subaccount;
+pub fn frontend_principal() -> Principal {
+    get_principal(FRONTEND_CANISTER_ID)
+}
+
 
 mod init;
 pub use init::*;

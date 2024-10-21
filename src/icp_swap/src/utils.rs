@@ -1,15 +1,21 @@
+
+
 use candid::{CandidType, Principal};
 use ic_cdk::{self, caller};
 use ic_ledger_types::Subaccount;
 use serde::Deserialize;
 
-use crate::get_canister_id;
 use crate::get_stake;
 pub const STAKING_REWARD_PERCENTAGE: u64 = 1000; //multiply by 100 eg. 10% = 1000
+pub const ALEX_CANISTER_ID: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
+pub const LBRY_CANISTER_ID: &str = "hdtfn-naaaa-aaaam-aciva-cai";
+pub const TOKENOMICS_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
+pub const XRC_CANISTER_ID: &str = "uf6dk-hyaaa-aaaaq-qaaaq-cai";
 pub const ICP_TRANSFER_FEE: u64 = 10_000;
 pub const ALEX_TRANSFER_FEE: u64 = 10_000;
 pub const MAX_DAYS: u32 = 30;
-pub const SCALING_FACTOR: u128 = 1_000_000_00_00;
+pub const SCALING_FACTOR: u128 = 1_000_000_00_00; // Adjust based on your precision needs
+
 
 pub const BURN_CYCLE_FEE: u64 = 10_000_000_000;
 pub const EXPIRY_INTERVAL: u64 = 8; //604800;
@@ -41,8 +47,7 @@ pub fn principal_to_subaccount(principal_id: &Principal) -> Subaccount {
 
 pub async fn within_max_limit(burn_amount: u64) -> bool {
     let result: Result<(u64, u64), String> = ic_cdk::call::<(), (u64, u64)>(
-        // Principal::from_text(TOKENOMICS_CANISTER_ID).expect("Could not decode the principal."),
-        get_canister_id("TOKENOMICS").await,
+        Principal::from_text(TOKENOMICS_CANISTER_ID).expect("Could not decode the principal."),
         "get_max_stats",
         (),
     )
@@ -67,8 +72,7 @@ pub async fn within_max_limit(burn_amount: u64) -> bool {
 }
 pub async fn tokenomics_burn_LBRY_stats() -> Result<(u64, u64), String> {
     let result: Result<(u64, u64), String> = ic_cdk::call::<(), (u64, u64)>(
-        // Principal::from_text(TOKENOMICS_CANISTER_ID).expect("Could not decode the principal."),
-        get_canister_id("TOKENOMICS").await,
+        Principal::from_text(TOKENOMICS_CANISTER_ID).expect("Could not decode the principal."),
         "get_max_stats",
         (),
     )
