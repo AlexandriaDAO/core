@@ -1,5 +1,6 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Transaction, SearchState } from '../types/queries';
+import { fileTypeCategories, supportedMimeTypes } from '../types/files';
 
 export interface PredictionResults {
   Drawing: number;
@@ -22,12 +23,12 @@ interface ArweaveState {
   selectedContent: { id: string; type: string } | null;
   mintableState: Record<string, MintableStateItem>;
   nsfwModelLoaded: boolean;
-  searchFormOptions: {
-    showNftOwners: boolean;
-    showContentCategory: boolean;
-    showAdvancedOptions: boolean;
-    showNsfwModelControl: boolean;
-  };
+  // searchFormOptions: {
+  //   showNftOwners: boolean;
+  //   showContentCategory: boolean;
+  //   showAdvancedOptions: boolean;
+  //   showNsfwModelControl: boolean;
+  // };
 }
 
 const initialState: ArweaveState = {
@@ -38,8 +39,8 @@ const initialState: ArweaveState = {
     searchTerm: '',
     selectedTags: [],
     filterDate: '',
-    contentCategory: 'images',
-    tags: [],
+    contentCategory: 'favorites',
+    tags: supportedMimeTypes,
     amount: 12,
     filterTime: '',
     ownerFilter: '',
@@ -48,12 +49,12 @@ const initialState: ArweaveState = {
   selectedContent: null,
   mintableState: {},
   nsfwModelLoaded: false,
-  searchFormOptions: {
-    showNftOwners: false,
-    showContentCategory: false,
-    showAdvancedOptions: false,
-    showNsfwModelControl: false,
-  },
+  // searchFormOptions: {
+  //   showNftOwners: false,
+  //   showContentCategory: false,
+  //   showAdvancedOptions: false,
+  //   showNsfwModelControl: false,
+  // },
 };
 
 // Action to set prediction results
@@ -78,6 +79,15 @@ const arweaveSlice = createSlice({
     },
     setSearchState: (state, action: PayloadAction<Partial<SearchState>>) => {
       state.searchState = { ...state.searchState, ...action.payload };
+      
+      // If contentCategory is changed, update tags accordingly
+      if (action.payload.contentCategory) {
+        if (action.payload.contentCategory === 'all') {
+          state.searchState.tags = supportedMimeTypes;
+        } else {
+          state.searchState.tags = fileTypeCategories[action.payload.contentCategory] || [];
+        }
+      }
     },
     setSelectedContent: (state, action: PayloadAction<{ id: string; type: string } | null>) => {
       state.selectedContent = action.payload;
@@ -105,9 +115,9 @@ const arweaveSlice = createSlice({
     resetMintableState(state) {
       state.mintableState = {};
     },
-    setSearchFormOptions: (state, action: PayloadAction<Partial<ArweaveState['searchFormOptions']>>) => {
-      state.searchFormOptions = { ...state.searchFormOptions, ...action.payload };
-    },
+    // setSearchFormOptions: (state, action: PayloadAction<Partial<ArweaveState['searchFormOptions']>>) => {
+    //   state.searchFormOptions = { ...state.searchFormOptions, ...action.payload };
+    // },
   },
   extraReducers: (builder) => {
     // Add case for setPredictionResults
@@ -135,7 +145,7 @@ export const {
   setNsfwModelLoaded,
   resetTransactions,
   resetMintableState,
-  setSearchFormOptions,
+  // setSearchFormOptions,
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;

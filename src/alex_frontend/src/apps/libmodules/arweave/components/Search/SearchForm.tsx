@@ -1,60 +1,35 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { SearchFormProps } from "../../types/queries";
 import { useHandleSearch } from '../../hooks/useSearchHandlers';
-import { RootState } from '@/store';
-import { setSearchState } from '../../redux/arweaveSlice';
 
 
 import NftOwnerSelector from './NftOwnerSelector';
 import ContentCategorySelector from './ContentCategorySelector';
-import AdvancedOptions from './AdvancedOptions';
 import NsfwModelControl from './NsfwModelControl';
+import DateSelector from './DateSelector';
+import ArweaveOwnerSelector from './ArweaveOwnerSelector';
+import ContentTagsSelector from './ContentTagsSelector';
 
-interface SearchFormOptions {
-  showNftOwners?: boolean;
-  showContentCategory?: boolean;
-  showAdvancedOptions?: boolean;
-  showNsfwModelControl?: boolean;
-}
 
-const SearchForm: React.FC<SearchFormProps & SearchFormOptions> = ({ 
+const SearchForm: React.FC<SearchFormProps> = ({ 
   onSearch,
-  showNftOwners = true,
-  showContentCategory = true,
-  showAdvancedOptions = true,
-  showNsfwModelControl = true
 }) => {
-  const dispatch = useDispatch();
   const { isLoading } = useHandleSearch();
-  const { advancedOptionsOpen } = useSelector((state: RootState) => state.arweave.searchState);
-
-  const toggleAdvancedOptions = () => {
-    dispatch(setSearchState({ advancedOptionsOpen: !advancedOptionsOpen }));
-  };
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 max-w-sm">
       <div className="space-y-4">
-        {showNftOwners && <NftOwnerSelector />}
+        {/* {showNftOwners && <NftOwnerSelector />} */}
 
-        {showContentCategory && <ContentCategorySelector />}
+        {/* {showContentCategory && <ContentCategorySelector />} */}
 
-        {showAdvancedOptions && (
-          <>
-            <button
-              onClick={toggleAdvancedOptions}
-              className="mt-2 text-sm text-indigo-600 hover:underline"
-            >
-              {advancedOptionsOpen ? 'Hide Advanced Options' : 'Show Advanced Options'}
-            </button>
-
-            {advancedOptionsOpen && <AdvancedOptions />}
-          </>
-        )}
-
-        {showNsfwModelControl && <NsfwModelControl />}
-
+        {/* {showNsfwModelControl && <NsfwModelControl />} */}
+        <ContentCategorySelector />
+        <NftOwnerSelector />
+        <DateSelector />
+        <ArweaveOwnerSelector />
+        <ContentTagsSelector />
+        <NsfwModelControl />
         {/* Search Button */}
         <button 
           onClick={onSearch} 

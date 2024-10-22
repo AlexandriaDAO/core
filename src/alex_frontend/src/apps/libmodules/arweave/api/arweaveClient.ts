@@ -74,26 +74,8 @@ export async function fetchTransactions(
   try {
     const pageSize = 100;
     let allTransactions: Transaction[] = [];
-    let hasNextPage = true;
-    let afterCursor: string | null = null;
 
-    // If minBlock and maxBlock are provided, use them; otherwise, compute defaults
-    if (minBlock === undefined || maxBlock === undefined) {
-      // Fetch current network info to get the max block height
-      const { data: networkInfo } = await axios.get(getArweaveUrl('info'));
-      const currentBlockHeight = parseInt(networkInfo.height, 10);
-      
-      if (maxTimestamp) {
-        maxBlock = await getBlockHeightForTimestamp(maxTimestamp);
-      } else {
-        maxBlock = currentBlockHeight;
-      }
-      
-      // Default minBlock to a range of recent blocks if not provided
-      minBlock = Math.max(0, maxBlock - 50000);
-    }
-
-    // If nftIds is provided, fetch those transactions first
+    // If nftIds is provided, fetch only those transactions
     if (nftIds && nftIds.length > 0) {
       const idChunks = chunk(nftIds, pageSize);
       for (const idChunk of idChunks) {
@@ -128,17 +110,70 @@ export async function fetchTransactions(
           allTransactions = [...allTransactions, ...fetchedTransactions];
         }
       }
+
+      // Apply filters to the fetched transactions
+      allTransactions = allTransactions.filter((tx: Transaction) => {
+        // Filter by owner if specified
+        if (owner && tx.owner !== owner) {
+          return false;
+        }
+
+        // Filter by maxTimestamp if specified
+        if (maxTimestamp && tx.block && tx.block.timestamp > maxTimestamp) {
+          return false;
+        }
+
+        // Filter by contentTypes if specified
+        if (contentTypes && contentTypes.length > 0) {
+          const contentType = tx.tags.find(tag => tag.name === 'Content-Type')?.value;
+          if (!contentType || !contentTypes.includes(contentType)) {
+            return false;
+          }
+        }
+
+        // Filter by block range if specified
+        if (minBlock !== undefined && maxBlock !== undefined && tx.block) {
+          if (tx.block.height < minBlock || tx.block.height > maxBlock) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      // Limit the number of transactions if amount is specified
+      if (amount) {
+        allTransactions = allTransactions.slice(0, amount);
+      }
+
+      return allTransactions;
     }
 
-    while (hasNextPage && (!amount || allTransactions.length < amount)) {
+    // If no nftIds provided, use the existing logic for fetching transactions
+    if (minBlock === undefined || maxBlock === undefined) {
+      // Fetch current network info to get the max block height
+      const { data: networkInfo } = await axios.get(getArweaveUrl('info'));
+      const currentBlockHeight = parseInt(networkInfo.height, 10);
+      
+      if (maxTimestamp) {
+        maxBlock = await getBlockHeightForTimestamp(maxTimestamp);
+      } else {
+        maxBlock = currentBlockHeight;
+      }
+      
+      // Default minBlock to a range of recent blocks if not provided
+      minBlock = Math.max(0, maxBlock - 50000);
+    }
+
+    while (true) {
       const tags: any[] = [];
       if (contentTypes && contentTypes.length > 0) {
         tags.push({ name: 'Content-Type', values: contentTypes });
       }
 
       const variables: any = {
-        first: Math.min(pageSize, amount ? amount - allTransactions.length : pageSize),
-        after: afterCursor,
+        first: Math.min(pageSize, amount ? amount : pageSize),
+        after: null,
         tags: tags.length > 0 ? tags : undefined,
         minBlock: minBlock,
         maxBlock: maxBlock,
@@ -178,13 +213,8 @@ export async function fetchTransactions(
       });
 
       allTransactions = [...allTransactions, ...filteredTransactions];
-      hasNextPage = result.data.transactions.pageInfo.hasNextPage;
-      afterCursor =
-        result.data.transactions.edges[
-          result.data.transactions.edges.length - 1
-        ]?.cursor || null;
 
-      if (!hasNextPage || (amount && allTransactions.length >= amount)) {
+      if (amount && allTransactions.length >= amount) {
         break;
       }
     }

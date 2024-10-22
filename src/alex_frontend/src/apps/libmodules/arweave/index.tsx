@@ -9,7 +9,6 @@ const ArweaveFeature: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
 	const searchState = useSelector((state: RootState) => state.arweave.searchState);
 	const transactions = useSelector((state: RootState) => state.arweave.transactions);
-	const searchFormOptions = useSelector((state: RootState) => state.arweave.searchFormOptions);
 
 	const handleSearch = async () => {
 		await dispatch(performSearch({ searchState }));
@@ -19,10 +18,6 @@ const ArweaveFeature: React.FC = () => {
 		<div>
 			<SearchForm 
 				onSearch={handleSearch} 
-				showNftOwners={searchFormOptions.showNftOwners}
-				showContentCategory={searchFormOptions.showContentCategory}
-				showAdvancedOptions={searchFormOptions.showAdvancedOptions}
-				showNsfwModelControl={searchFormOptions.showNsfwModelControl}
 			/>
 			<ContentList 
 				transactions={transactions} 
