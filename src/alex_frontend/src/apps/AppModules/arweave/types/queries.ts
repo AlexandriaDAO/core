@@ -51,13 +51,11 @@ export interface LoadMoreProps {
 export interface SearchState {
   transactions: string[];
   searchTerm: string;
-  selectedTags: string[];
   filterDate: string;
   contentCategory: string;
   tags: string[];
   amount: number;
   filterTime: string;
   ownerFilter: string;
-  advancedOptionsOpen: boolean;
   maxTimestamp?: number;
 }

@@ -9,7 +9,7 @@ const ContentCategorySelector: React.FC = () => {
   const { contentCategory } = useSelector((state: RootState) => state.arweave.searchState);
 
   const handleCategoryChange = (value: string) => {
-    dispatch(setSearchState({ contentCategory: value, tags: [] }));
+    dispatch(setSearchState({ contentCategory: value }));
   };
 
   return (
@@ -24,8 +24,8 @@ const ContentCategorySelector: React.FC = () => {
         className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none 
                    focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
       >
-        <option value="all">All</option>
-        {Object.keys(fileTypeCategories).map((category) => (
+        <option value="favorites">Favorites</option>
+        {Object.keys(fileTypeCategories).filter(category => category !== 'favorites').map((category) => (
           <option key={category} value={category}>
             {category.charAt(0).toUpperCase() + category.slice(1)}
           </option>

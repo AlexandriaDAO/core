@@ -17,7 +17,7 @@ const ContentTagsSelector: React.FC = () => {
 
   // Filter content types based on the selected category
   const filteredContentTypes = useMemo(() => {
-    if (searchState.contentCategory === 'all') {
+    if (searchState.contentCategory === 'favorites') {
       return supportedFileTypes;
     }
     const categoryMimeTypes = fileTypeCategories[searchState.contentCategory] || [];

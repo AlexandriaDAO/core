@@ -3,6 +3,7 @@ import { SearchFormProps } from "../../types/queries";
 import { useHandleSearch } from '../../hooks/useSearchHandlers';
 
 
+import AmountSelector from './AmountSelector';
 import NftOwnerSelector from './NftOwnerSelector';
 import ContentCategorySelector from './ContentCategorySelector';
 import NsfwModelControl from './NsfwModelControl';
@@ -19,17 +20,15 @@ const SearchForm: React.FC<SearchFormProps> = ({
   return (
     <div className="bg-white shadow-md rounded-lg p-6 max-w-sm">
       <div className="space-y-4">
-        {/* {showNftOwners && <NftOwnerSelector />} */}
 
-        {/* {showContentCategory && <ContentCategorySelector />} */}
-
-        {/* {showNsfwModelControl && <NsfwModelControl />} */}
         <ContentCategorySelector />
+        <AmountSelector />
         <NftOwnerSelector />
         <DateSelector />
         <ArweaveOwnerSelector />
         <ContentTagsSelector />
         <NsfwModelControl />
+        
         {/* Search Button */}
         <button 
           onClick={onSearch} 

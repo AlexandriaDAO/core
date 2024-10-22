@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
-import ArweaveSearch from "@/apps/libmodules/arweave";
+import ArweaveSearch from "@/apps/AppModules/arweave";
 
 function Permasearch() {
 

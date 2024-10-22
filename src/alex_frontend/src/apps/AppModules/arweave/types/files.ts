@@ -23,8 +23,6 @@ export const supportedFileTypes: FileTypeConfig[] = [
   { mimeType: "image/gif", extension: "gif", displayName: "GIF" },
 ];
 
-export const supportedMimeTypes = supportedFileTypes.map(type => type.mimeType);
-
 export const fileTypeCategories: Record<string, string[]> = {
   favorites: ["image/jpeg", "application/jpeg", "image/jpg", "application/jpg", "application/epub+zip"],
   images: ["image/jpeg", "application/jpeg", "image/jpg", "application/jpg", "image/png", "application/png", "image/gif", "application/gif", "image/svg+xml", "application/svg+xml"],
