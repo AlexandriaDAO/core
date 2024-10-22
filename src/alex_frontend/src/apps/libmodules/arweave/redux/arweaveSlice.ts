@@ -22,12 +22,19 @@ interface ArweaveState {
   selectedContent: { id: string; type: string } | null;
   mintableState: Record<string, MintableStateItem>;
   nsfwModelLoaded: boolean;
+  searchFormOptions: {
+    showNftOwners: boolean;
+    showContentCategory: boolean;
+    showAdvancedOptions: boolean;
+    showNsfwModelControl: boolean;
+  };
 }
 
 const initialState: ArweaveState = {
   transactions: [],
   isLoading: false,
   searchState: {
+    transactions: [],
     searchTerm: '',
     selectedTags: [],
     filterDate: '',
@@ -41,6 +48,12 @@ const initialState: ArweaveState = {
   selectedContent: null,
   mintableState: {},
   nsfwModelLoaded: false,
+  searchFormOptions: {
+    showNftOwners: false,
+    showContentCategory: false,
+    showAdvancedOptions: false,
+    showNsfwModelControl: false,
+  },
 };
 
 // Action to set prediction results
@@ -92,6 +105,9 @@ const arweaveSlice = createSlice({
     resetMintableState(state) {
       state.mintableState = {};
     },
+    setSearchFormOptions: (state, action: PayloadAction<Partial<ArweaveState['searchFormOptions']>>) => {
+      state.searchFormOptions = { ...state.searchFormOptions, ...action.payload };
+    },
   },
   extraReducers: (builder) => {
     // Add case for setPredictionResults
@@ -119,6 +135,7 @@ export const {
   setNsfwModelLoaded,
   resetTransactions,
   resetMintableState,
+  setSearchFormOptions,
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;

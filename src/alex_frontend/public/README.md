@@ -2,9 +2,10 @@
 
 > *"There are lots of entrepreneurs and investors that want to build interesting new services. The problem is, often times those interesting new internet services would depend upon content, functionality, and user data that exists inside of proprietary services, owned and controlled by Big Tech."*
 > 
+>
 > — Dominic Williams, DFINITY founder on ["The Internet Computer Vision"](https://youtu.be/DYVPq_vMB8w?si=w_jopM2o22UQjqwH)
 
-**tldr: Alexandria is the bridge and library for all Web2 content, functionality, and user data; so Web3 stacks don't have to start from scratch.**
+**tldr: Alexandria is a tokenized bridge and for Web2's content, functionality, and user data; so Web3 stacks don't have to start from scratch.**
 
 ## Table of Contents
 - [Introduction](#introduction)
@@ -49,7 +50,7 @@ Alexandria is a Web3 fork of the Web2 paradigm with the vision of restoring that
 
 ## Part 1: Network Overview
 
-Alexandria has only 2 protocol level dependancies (excluding TCP/IP): ArWeave (for content) and ICP (for services). We hope you'll help this catch on as the 'AI Stack'. This allowed the introduction of several foundational innovations central to Alexandria's function, each of which are thought to be the first of their kind:
+Alexandria has only 2 protocol level dependancies (excluding TCP/IP): ArWeave (for content) and ICP (for services). The 'AI Stack', if you will. This allows the introduction of several foundational innovations central to Alexandria's functionality, each of which are thought to be the first of their kind:
 
   - VetKey Sharing - Alexandrians can 'borrow' eachother's Private Keys or API Keysanner without revealing them to anyone; allowing the community to bridge any Web2 service to their apps.
   - NFT Wallets - Everything on-site is an NFT, and it's own entity that must be paid when used, allowing the rightful owner to collect any revenue made from their assets.
@@ -75,6 +76,12 @@ Librarians carry the weight of service hosting by deploying standardized package
 
 Alexandria provides no storage or compute resources for LibModules, but only saves encrypted versions of the keys and performs compatability checks on them. LibModules are otherwise entirely managed and maintained by the ecosystem of Librarians.
 
+### AppModules
+
+For developers, LibModules are made accessible to partner apps as customizable building blocks. ArWeave for example will be used in many Alexandria apps for uploading, searching and displaying in content in various ways.
+
+These modules can be preloaded in any third party apps as template UIs, with all platform economics automatically preserved. Any developers can layer these toolkits as building blocks with custom parameters to create their desired features.
+
 ## Part 2: Token Economics and Mechanics
 
 Alexandria is a dual token economy of two ICRC1 tokens: LBRY as energy and payment; and ALEX for revshare and governance.
@@ -85,7 +92,7 @@ ALEX is mined when LBRY is burned, up to a hard cap of 21 Million.
 
 ### LBRY Token
 
-LBRY's supply is entirely managed by the "icp_swap" canister which uses the Exchange Rate Canister to keep the mint rate fixed at one cent per LBRY. Anyone can mint by sending ICP to the canister, which also serves as the staking contract.
+LBRY's supply is entirely managed by the "icp_swap" canister which uses the Exchange Rate Canister to keep the mint rate fixed at one cent per LBRY (unless ICP goes below $5 at which point it will stay at that fixed rate). Anyone can mint by sending ICP to the canister, which also serves as the staking contract.
 
 All view-only features are free, but once a user has some LBRY, they can use any LibModules by paying Librarian that hosts it. When storing or otherwise interact with other NFTs, LBRY automatically sends nanopayments to those NFTs as payment.
 
@@ -101,11 +108,11 @@ A block is mined when someone sends 1 or more LBRY to the burn address. For each
 
     (1) The sender who burned the LBRY is returned hald a cent worth of ICP (1/2 the buy price), and one ALEX mint at the current minting rate.
 
-    (2) A recent LBRY sender is rewarded one ALEX mint at the current minting rate.
+    (2) A recent LBRY sender is rewarded one ALEX mint at the current minting rate
 
     (3) A recent LBRY reciever is rewarded one ALEX mint at the current minting rate.
 
-The 'winning' Librarians are the sending and recieving addresses of a randomly selected recent LBRY transaction (random from the last ~100 transactions excluding those to and from the burn/mint address). While this token swapping, burning, and minting logic is kept in isolated and immutable canisters, the method to select the random LBRY transaction is in the main backend cansiter and mutable, so it can adapt to only select for in-app payments and adapt to prevent gaming.
+The 'winning' accounts are the sending and recieving addresses of a randomly selected recent LBRY transaction (random from the last ~100 transactions excluding those to and from the burn/mint address). While this token swapping, burning, and minting logic is kept in isolated and immutable canisters, the method to select the random LBRY transaction is in the main backend cansiter and mutable, so it can adapt to only select for in-app payments and adapt to prevent gaming.
 
 Spliting things this way keeps incentives balanced, i.e., each investment in the token is accompanied with two equal investments in some network contributors. Put another way, every time you use some paid app service, you're elible for an airdrop, and the allocation for airdrops is 100% of the token supply.
 
@@ -255,11 +262,17 @@ Apps are welcome to query content directly from ArWeave, or they can opt for gre
 
 ## Part 4: Ecosystem
 
-Alexandria apps are services already plugged into LibModules. Since LibModule functions can only be accessed with the proper LBRY payment, all partner apps are also aligned with our universal DeFi mechanism.
+Alexandria apps are services already plugged into LibModules. Since LibModule functions can only be accessed through AppModules that hold these LBRY payment mechanisms, all partner apps are also aligned with our universal DeFi mechanism.
 
 As a Librarian, the lbry.app homepage will feel more like an app store than a Web3 tech stack. The apps registry consists of core apps native to the site, or external sites that have been approved by the DAO.
 
 The following is a list of core apps in the works.
+
+### Alexandrian (flagship app)
+
+An exploratory social app where users collecte eachothers NFTs and arrange them in collaborative boards based on certain topics.
+
+It's a test case in using AppModules that reflect our incentive mechanism. You'll earn for minting NFT that others collect, or collecting NFTs on a profile that others borrow from. Put simply, a game theory experiment for good taste.
 
 ### Bibliotheca (library)
 
@@ -322,17 +335,17 @@ NFTs are valued on a few displayed attributes. First is the mint#, early ones ha
 
 Emporium will empoloy a 5% trading royalty, all of which goes to the staking pool.
 
-### Beyond Books
+### Taking on Big Tech
 
-The following are simple app ideas with the current content type that is books.
+The preceding are simple app ideas with that are in progress today.
 
-As the library comes to include movies, songs, podcasts, and videos at potentially infinite scale, anyone will be able to make the decentralized Netflix, Spotify, YouTube, etc., with an existing content base.
+As the library comes to include movies, songs, podcasts, and videos at potentially infinite scale and with better indexing, anyone will be able to make the decentralized Netflix, Spotify, YouTube, etc., with Alexandria's existing content base.
 
-The reason such apps are untouchable right now is because they're powered by data monopolies, but if we move all that data to a shared permaweb, than everyday devs have access to the same content scale as Big Tech through Alexandria.
+The reason such apps are untouchable right now is because they're powered by data monopolies, but if we move all that data to a shared permaweb, than everyday devs are elevated to the same playing field as Big Tech.
 
 ## Part 5: Architecture & Governance
 
-This section is mainly TBD. We're finishing the architecture first.
+Alexandria will remained centrally managed during the testnet phase. All code is unaudited and impractical to manage through the SNS at this stage. The current strategy is gradually delegating tasks to DAO canisters and preparing others to be blackholed, but this will occur mainly after the testing phase.
 
 ### Governance
 
@@ -342,123 +355,6 @@ The frontend will be continuously developed, and so use of backend functions fro
 
 Since this model prioritizes immutability for the sake of permanence, governance is initially limited to matters involving NFT ownership. The governance mechanism allow proposals that can delete NFTs (if corrupted/inaccurate), or transfer the ownership (to any true author that claim it) with a simple majority and quorum of staked ALEX holders.
 
-I honestly don't know how code changes will be governed in the future. It has not been figured out yet. The important thing is this gets to a working product where the immutable part is entirely forkable so anyone can build their own products independent of parts that are still under centralized developement.
-
-This section will have lots more details at a future time.
-
-### Canister Architecture
-
-Each of the following subsections are canisters in our codebase.
-
-*Eventually this will all be in a diagram, but things are changing too rapidly atm.*
-
-BIG QUESTIONS: 
-- How is ALEX canister minting from the tokenomics canister if the minting account is a dfx prinicipal?
-  - Should we deploy the ALEX canister from the tokenomics canister, or should we deploy pre mint the full 21 million ALEX to the tokenomics canister with the minting address, or leave it open ended with a minting account? What's most secure?
-- Same questions for LBRY.
-- Need to create an issue that allows the alex_backend to refill canisters with the ICP in the staking pool.
-
-### alex_frontend (Typescript: xo3nl-yaaaa-aaaap-abl4q-cai) | Current Controller: 2jgt...bqe | Future Controller: 2jgt...bqe or MultiSig Harware Wallet or DAO
-
-It's the whole frontend. It changes too much right now and does not have a direct path to decentralization until Alexandria launches a DAO. 
-
-### alex_backend (Rust: xj2l7-vyaaa-aaaap-abl4a-cai) | Current Controller: 2jgt...bqe | Future Controller: 2jgt...bqe or MultiSig Harware Wallet or DAO
-
-Primary Functions:
-- Currently manages the storage of librarian principals, sbts, and wallet keys, but that will need to be moved to a storage canister with the vetkeys implementation.
-- Picks a random recent LBRY transaction which selects the sender and reciever accounts to mint ALEX to.
-- Handles cycles management by allowing use of staking pool funds to refill canister cycles.
-
-The purpose of alex_backend is to have mutable logic that will need to change with type contained and separated from data storage and immutable logic. For this reason it will remain under centralized control until we figure out how to put it under DAO control.
-
-### ALEX (7hcrm-4iaaa-aaaak-akuka-cai) | Current Controller: 2jgt...bqe | Future Controller: ???
-
-ALEX Token & Default NNS Implementation of ICRC1 and ICRC2
-
-Deploy params: 
-- token_name = "Alexandria"
-- token_symbol = "ALEX"
-- minting_account = ???
-- initial_balances = ??? (either none, or 21million to the tokenomics canister)
-- transfer_fee = 10_000
-- archive_options = record {
-    trigger_threshold = 2000;
-    num_blocks_to_archive = 1000;
-    controller_id = null;
-  };
-- icrc2 = true;
-
-### LBRY (hdtfn-naaaa-aaaam-aciva-cai) | Current Controller: 2jgt...bqe | Future Controller: ???
-
-LBRY Token & Default NNS Implementation of ICRC1 and ICRC2
-
-Deploy params: 
-- token_name = "Library Credits"
-- token_symbol = "LBRY"
-- minting_account = ???
-- initial_balances = null
-- transfer_fee =  4_000_000 (0.04 LBRY)
-- archive_options = record {
-    trigger_threshold = 2000;
-    num_blocks_to_archive = 1000;
-    controller_id = null;
-  };
-- icrc2 = true
-
-
-### bookmarks (sklez-7aaaa-aaaan-qlrva-cai)
-
-storage and management for all the SBT ownership and payments. Details tbd but will follow much of the logic of the nft managment canister.
-
-
-### icp_swap: (5qx27-tyaaa-aaaal-qjafa-cai) | Current controller: ... | Future Controller: ...
-
-Details being finalized.
-
-### tokenomics: (chddw-rqaaa-aaaao-qevqq-cai) | Current controller: ... | Future Controller: ...
-
-Details being finalized.
-
-### icrc7
-*Status: Live & Complete | Current & Future Controller: nft_manager*
-
-Based on the icrc7 implementation by [PanIndustrial](https://github.com/PanIndustrial-Org/icrc_nft.mo), done in Motoko, chosen for it's extensibility with icrc3 and icrc37.
-
-Special features:
-  - Deployer is approved for mint and transfers of every NFT in the collection.
-  - NFTs are designed with mutability in mind, so NFTs can be changed and overwritten.
-
-While these features would normally be vulnerabilities for conventional collections, they are an asset for Alexandria NFTs because the 'deployer' is a DAO-controlled canister. This ability to transfer and change NFTs is exclusively delegated to a canister, which is what allows each NFT to control its own wallet, collect revenue, and disperse only to its true owner.
-
-icrc7 also includes its own archives, having a full record of transactions and their history.
-
-### nft_manager
-*Status: Incomplete | Current Controller: 2jgt...bqe | Future Controller: DAO/Blackholled???
-
-
-Sole controller of the icrc7 canister.
-
-Function: 
-  - DONE: Deploys and initializes the icrc7 canister at launch.
-  - DONE: Creates NFT wallets and allows owners to widthraw from them.
-  - DONE: Allowed verfied owners to withdraw funds from their NFT's wallets.
-  - IP: Mints NFTs if propper LBRY is sent, and tx_id exists on ArWeave
-  - IP: Has a voting process to verify NFTs.
-  - IP: Updates NFTs if verfied by a vote.
-  - IP: Transfers NFTs to a rightful owner if mandated by a vote.
-
-
-todo:
-- Handle athentication for withdrawals.
-- Do update nfts, transfer nfts, burn NFTs.
-- Make a voting system.
-
-Code Review:
-- Added init config to init.rs, so that icrc7 is only deployed on first canister install.
--- next lets check to ensure the deploy args match up.
-
-init.rs:
-
 
 ### Inspiration
 
@@ -466,7 +362,7 @@ init.rs:
 
 This project was born out of pilot project called UncensoredGreats where you'd chat with great authors in an uncensored way. There was one finding of this experiment that shaped Alexandria: When an AI is fed author words directly, and forced to answer without knowledge of the user's question, responses became far more interesting and honest. In other words, a technique to output particular human thoughts from training data rather than aggregate ones is far more condusive to discovery.
 
-As AI models grow in size and complexity, the outputs will grow more generic, and our uncensored methodology more fruitful. This direction goes against the grain of the entire AI space, but it steadfast in what we see as a longstanding principle of computer science, exemplified by the story of one early internet legend.
+As AI models grow in size and complexity, the outputs will grow more generic, and our people-first methodology more fruitful. This direction goes against the grain of the entire AI space, but it steadfast in what we see as a longstanding principle of computer science, exemplified by the story of one early internet legend.
 
 #### The Hyperlink Paridigm
 
@@ -484,6 +380,8 @@ During the 1950s and 60s, the entire CS field was convinced that the primary use
 
 Engelbart's design was one webpage and a hyperlink for two. It's now for 200 million sites and 3.5 billion people. The design isn't perfect: Webpages change, hyperlinks disappear, both can be lost, stolen, or hacked, and neither can be truly owned or trusted.
 
-Alexandria is a universal content bed for the internet. While the world works to make AI the perfect tool, like Dougs peers did with compute machines; we're building a control room that puts humans at their helm, just like Doug's "tools for collaboration and augmentation." Really we're just migrating Doug's stack to Web3.
+Alexandria is a universal content bed for the internet. While the world works to make AI the perfect tool, like Dougs peers did with compute machines; we're building a control room that puts humans at their helm, just like Doug's "tools for collaboration and augmentation." Really we're just migrating Doug's stack to Web3.cccc
+
+Alexandria is a social graph of NFTs. Instead of navigating hyperlinks through algorithms, you'll navigate permalinks through favorite stuff of the people you know. It's a simpler, humbler approach to the online experience, but where everything is uniquely yours which might be just what the internet needs right now.
 
 ![Mother of all Demos (1968)](https://www.darpa.mil/DDM_Gallery/19968b_MOAD_619x316.jpg)

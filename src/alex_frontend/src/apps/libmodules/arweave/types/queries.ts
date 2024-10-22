@@ -34,7 +34,7 @@ export interface SearchFormProps {
 export interface SearchProps {
   onTransactionsUpdate: (transactions: Transaction[], lastTimestamp: number, contentTypes: string[], amount: number, ownerFilter: string, minBlock?: number, maxBlock?: number) => void;
   onLoadingChange: (isLoading: boolean) => void;
-  userTransactionIds?: string[];
+  nftIds?: string[];
 }
 
 export interface LoadMoreProps {
@@ -45,10 +45,11 @@ export interface LoadMoreProps {
   ownerFilter?: string;
   minBlock?: number;
   maxBlock?: number;
-  userTransactionIds?: string[];
+  nftIds?: string[];
 }
 
 export interface SearchState {
+  transactions: string[];
   searchTerm: string;
   selectedTags: string[];
   filterDate: string;

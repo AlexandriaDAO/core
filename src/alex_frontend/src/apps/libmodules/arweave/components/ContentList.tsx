@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Transaction, ContentListProps } from "../types/queries";
 import ContentGrid from "./ContentGrid";
-import { mint_nft } from "../../nft/mint";
+import { mint_nft } from "../../../../features/nft/mint";
 import { getCover } from "@/utils/epub";
 import { FaFilePdf, FaExclamationTriangle, FaInfoCircle, FaTimes, FaSpinner, FaBook, FaPlay, FaFileAlt, FaFileCode, FaFileAudio, FaImage } from 'react-icons/fa';
 import ContentValidator from './ContentValidator';

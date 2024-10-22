@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setTransactions, setIsLoading, setMintableStates, clearTransactionsAndMintableState, MintableStateItem } from './arweaveSlice';
-import { fetchTransactions } from '../api/arweaveApi';
+import { fetchTransactionsApi } from '../api/arweaveApi';
 import { RootState } from '@/store';
 import { SearchState } from '../types/queries';
 
@@ -26,7 +26,8 @@ export const performSearch = createAsyncThunk(
         maxTimestamp = Math.floor(userDateTime.getTime() / 1000);
       }
 
-      const fetchedTransactions = await fetchTransactions({
+      const fetchedTransactions = await fetchTransactionsApi({
+        nftIds: searchState.transactions,
         contentTypes: searchState.tags,
         amount: searchState.amount,
         maxTimestamp,

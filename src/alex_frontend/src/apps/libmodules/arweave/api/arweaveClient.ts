@@ -1,9 +1,9 @@
+import axios from 'axios';
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { HttpLink } from '@apollo/client/link/http';
 import { ApolloLink } from '@apollo/client/link/core';
 import { Transaction } from '../types/queries';
 import { getBlockHeightForTimestamp } from './arweaveHelpers';
-import axios from 'axios';
 import { ARWEAVE_CONFIG, getArweaveUrl } from '../config/arweaveConfig';
 
 const logLink = new ApolloLink((operation, forward) => {
@@ -25,7 +25,7 @@ const arweaveNetClient = new ApolloClient({
 });
 
 const FETCH_RECENT_QUERY = gql`
-  query RecentTransactions($tags: [TagFilter!], $first: Int!, $after: String, $minBlock: Int, $maxBlock: Int, $owners: [String!]) {
+  query Transactions($tags: [TagFilter!], $first: Int!, $after: String, $minBlock: Int, $maxBlock: Int, $owners: [String!]) {
     transactions(
       tags: $tags,
       first: $first,
@@ -61,87 +61,9 @@ const FETCH_RECENT_QUERY = gql`
   }
 `;
 
-// Update FETCH_BY_IDS_QUERY for Goldsky endpoint
-const FETCH_BY_IDS_QUERY = gql`
-  query FetchTransactionsByIds($ids: [ID!]!) {
-    transactions(ids: $ids) {
-      edges {
-        node {
-          id
-          owner {
-            address
-          }
-          block {
-            height
-            timestamp
-          }
-          tags {
-            name
-            value
-          }
-          data {
-            size
-            type
-          }
-        }
-      }
-    }
-  }
-`;
-
-// Function to fetch transactions by IDs (for Bibliotheca)
-export const fetchTransactionsByIds = async (
-  ids: string[],
-  contentTypes?: string[],
-  maxTimestamp?: number
-): Promise<Transaction[]> => {
-  const uniqueIds = [...new Set(ids)]; // Remove duplicates
-  const transactions: Transaction[] = [];
-
-  console.log('Fetching transactions by IDs:', uniqueIds);
-
-  try {
-    const { data } = await arweaveNetClient.query({
-      query: FETCH_BY_IDS_QUERY,
-      variables: { ids: uniqueIds },
-    });
-
-    if (data && data.transactions && data.transactions.edges) {
-      transactions.push(
-        ...data.transactions.edges
-          .map((edge: any) => ({
-            id: edge.node.id,
-            owner: edge.node.owner.address,
-            tags: edge.node.tags,
-            block: edge.node.block,
-            data: edge.node.data,
-          }))
-          .filter((tx: Transaction) => {
-            if (
-              contentTypes &&
-              !tx.tags.some(
-                (tag) => tag.name === 'Content-Type' && contentTypes.includes(tag.value)
-              )
-            ) {
-              return false;
-            }
-            if (maxTimestamp && tx.block && tx.block.timestamp > maxTimestamp) {
-              return false;
-            }
-            return true;
-          })
-      );
-    }
-  } catch (error) {
-    console.error('Error fetching transactions:', error);
-  }
-
-  console.log(`Fetched ${transactions.length} out of ${uniqueIds.length} transactions`);
-  return transactions;
-};
-
-// Update fetchRecentTransactions function
-export async function fetchRecentTransactions(
+// Update fetchTransactions function
+export async function fetchTransactions(
+  nftIds?: string[],
   contentTypes?: string[],
   amount?: number,
   maxTimestamp?: number,
@@ -169,6 +91,43 @@ export async function fetchRecentTransactions(
       
       // Default minBlock to a range of recent blocks if not provided
       minBlock = Math.max(0, maxBlock - 50000);
+    }
+
+    // If nftIds is provided, fetch those transactions first
+    if (nftIds && nftIds.length > 0) {
+      const idChunks = chunk(nftIds, pageSize);
+      for (const idChunk of idChunks) {
+        const result = await arweaveNetClient.query({
+          query: gql`
+            query FetchTransactionsByIds($ids: [ID!]!) {
+              transactions(ids: $ids) {
+                edges {
+                  node {
+                    id
+                    owner { address }
+                    block { height timestamp }
+                    tags { name value }
+                    data { size type }
+                  }
+                }
+              }
+            }
+          `,
+          variables: { ids: idChunk },
+        });
+
+        if (result.data && result.data.transactions && result.data.transactions.edges) {
+          const fetchedTransactions = result.data.transactions.edges.map((edge: any) => ({
+            id: edge.node.id,
+            owner: edge.node.owner.address,
+            tags: edge.node.tags,
+            block: edge.node.block,
+            data: edge.node.data,
+          }));
+
+          allTransactions = [...allTransactions, ...fetchedTransactions];
+        }
+      }
     }
 
     while (hasNextPage && (!amount || allTransactions.length < amount)) {
@@ -230,9 +189,23 @@ export async function fetchRecentTransactions(
       }
     }
 
+    // Filter transactions by maxTimestamp if provided
+    if (maxTimestamp) {
+      allTransactions = allTransactions.filter((tx: Transaction) => 
+        !tx.block || tx.block.timestamp <= maxTimestamp
+      );
+    }
+
     return allTransactions.slice(0, amount);
   } catch (error) {
-    console.error('Error fetching recent transactions:', error);
+    console.error('Error fetching transactions:', error);
     throw error;
   }
+}
+
+// Helper function to chunk an array
+function chunk<T>(array: T[], size: number): T[][] {
+  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
+    array.slice(i * size, i * size + size)
+  );
 }
