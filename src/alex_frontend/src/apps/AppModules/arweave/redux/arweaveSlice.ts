@@ -1,5 +1,5 @@
 import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Transaction, SearchState } from '../types/queries';
+import { SearchState } from '../types/queries';
 import { fileTypeCategories } from '../types/files';
 
 export interface PredictionResults {
@@ -17,7 +17,6 @@ export interface MintableStateItem {
 }
 
 interface ArweaveState {
-  transactions: Transaction[];
   isLoading: boolean;
   searchState: SearchState;
   selectedContent: { id: string; type: string } | null;
@@ -26,7 +25,6 @@ interface ArweaveState {
 }
 
 const initialState: ArweaveState = {
-  transactions: [],
   isLoading: false,
   searchState: {
     searchTerm: '',
@@ -51,14 +49,6 @@ const arweaveSlice = createSlice({
   name: 'arweave',
   initialState,
   reducers: {
-    setTransactions: (state, action: PayloadAction<Transaction[]>) => {
-      state.transactions = action.payload;
-      state.mintableState = {};
-    },
-    clearTransactionsAndMintableState: (state) => {
-      state.transactions = [];
-      state.mintableState = {};
-    },
     setIsLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
@@ -89,10 +79,6 @@ const arweaveSlice = createSlice({
     setNsfwModelLoaded: (state, action: PayloadAction<boolean>) => {
       state.nsfwModelLoaded = action.payload;
     },
-    resetTransactions: (state, action: PayloadAction<Transaction[]>) => {
-      state.transactions = action.payload;
-      state.mintableState = {};
-    },
     resetMintableState(state) {
       state.mintableState = {};
     },
@@ -111,8 +97,6 @@ const arweaveSlice = createSlice({
 });
 
 export const {
-  setTransactions,
-  clearTransactionsAndMintableState,
   setIsLoading,
   setSearchState,
   setSelectedContent,
@@ -121,7 +105,6 @@ export const {
   setMintableState,
   setMintableStates,
   setNsfwModelLoaded,
-  resetTransactions,
   resetMintableState,
 } = arweaveSlice.actions;
 

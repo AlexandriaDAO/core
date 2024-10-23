@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 import { HttpLink } from '@apollo/client/link/http';
 import { ApolloLink } from '@apollo/client/link/core';
-import { Transaction } from '../types/queries';
+import { Transaction } from '@/apps/AppModules/arweave/types/queries';
 import { getBlockHeightForTimestamp } from './arweaveHelpers';
 import { ARWEAVE_CONFIG, getArweaveUrl } from '../config/arweaveConfig';
 

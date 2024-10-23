@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Transaction } from "../types/queries";
+import { Transaction } from "../arweave/types/queries";
 import { RootState } from "@/store";
-import { setMintableStates, setMintableState, MintableStateItem } from "../redux/arweaveSlice";
-import { getArweaveUrl, loadArweaveAsset } from '../config/arweaveConfig';
-import { loadModel, isModelLoaded } from '../components/ContentValidator';
-import { setNsfwModelLoaded } from "../redux/arweaveSlice";
-import { fileTypeCategories } from '../types/files';
+import { setMintableStates, setMintableState, MintableStateItem } from "../arweave/redux/arweaveSlice";
+import { getArweaveUrl, loadArweaveAsset } from '../arweave/config/arweaveConfig';
+import { loadModel, isModelLoaded } from '../arweave/components/ContentValidator';
+import { setNsfwModelLoaded } from "../arweave/redux/arweaveSlice";
+import { fileTypeCategories } from '../arweave/types/files';
 
 type ContentDataItem = {
   url: string | null;

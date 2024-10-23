@@ -20,4 +20,3 @@ const librarySlice = createSlice({
 
 export const { setSelectedArweaveIds } = librarySlice.actions;
 export default librarySlice.reducer;
-

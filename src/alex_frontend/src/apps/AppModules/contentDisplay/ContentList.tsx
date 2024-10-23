@@ -5,7 +5,7 @@ import { mint_nft } from "@/features/nft/mint";
 import { getCover } from "@/utils/epub";
 import { FaFilePdf, FaInfoCircle, FaTimes, FaSpinner, FaBook, FaPlay, FaFileAlt, FaFileCode, FaFileAudio, FaImage } from 'react-icons/fa';
 import ContentValidator from '@/apps/AppModules/arweave/components/ContentValidator';
-import { useContent } from '@/apps/AppModules/arweave/hooks/useContent';
+import { useContent } from '@/apps/AppModules/contentDisplay/useContent';
 import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
 
