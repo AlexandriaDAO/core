@@ -29,7 +29,6 @@ const initialState: ArweaveState = {
   transactions: [],
   isLoading: false,
   searchState: {
-    transactions: [],
     searchTerm: '',
     filterDate: '',
     contentCategory: 'favorites',

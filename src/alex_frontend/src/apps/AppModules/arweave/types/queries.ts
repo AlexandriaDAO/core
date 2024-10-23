@@ -19,7 +19,6 @@ export interface Transaction {
 
 export interface ContentListProps {
   transactions: Transaction[];
-  onSelectContent: (id: string, type: string) => void;
 }
 
 export interface ContentRendererProps {
@@ -49,7 +48,6 @@ export interface LoadMoreProps {
 }
 
 export interface SearchState {
-  transactions: string[];
   searchTerm: string;
   filterDate: string;
   contentCategory: string;

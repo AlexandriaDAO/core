@@ -4,7 +4,6 @@ import { useHandleSearch } from '../../hooks/useSearchHandlers';
 
 
 import AmountSelector from './AmountSelector';
-import NftOwnerSelector from './NftOwnerSelector';
 import ContentCategorySelector from './ContentCategorySelector';
 import NsfwModelControl from './NsfwModelControl';
 import DateSelector from './DateSelector';
@@ -23,7 +22,6 @@ const SearchForm: React.FC<SearchFormProps> = ({
 
         <ContentCategorySelector />
         <AmountSelector />
-        <NftOwnerSelector />
         <DateSelector />
         <ArweaveOwnerSelector />
         <ContentTagsSelector />
