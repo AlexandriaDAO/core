@@ -5,7 +5,7 @@ import { useHandleSearch } from '../../hooks/useSearchHandlers';
 
 import AmountSelector from './AmountSelector';
 import ContentCategorySelector from './ContentCategorySelector';
-import NsfwModelControl from './NsfwModelControl';
+import NsfwModelControl from '../nsfwjs/NsfwModelControl';
 import DateSelector from './DateSelector';
 import ArweaveOwnerSelector from './ArweaveOwnerSelector';
 import ContentTagsSelector from './ContentTagsSelector';

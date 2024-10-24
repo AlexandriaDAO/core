@@ -4,6 +4,7 @@ First of all the state managemnet for transactions is still a mess.
 - When using the library trnasactions, the query caps at 10 or so and I can't save the arweave data. 
 - The nsfw model runs on the library results by default. This needs to be independent and hopefully removed from the bundle by defaut.
 
+Lazy load the nsfw model so it's not in the bundle.
 
 I need to first find a better way to separate traction ids between appmodules, and decide if it should be shared or not; and go all the way with it.
 

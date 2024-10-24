@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { setNsfwModelLoaded } from '../../redux/arweaveSlice';
-import { loadModel, unloadModel, isModelLoaded } from '../ContentValidator';
+import { loadModel, unloadModel, isModelLoaded } from '@/apps/AppModules/arweave/components/nsfwjs/tensorflow';
 
 const NsfwModelControl: React.FC = () => {
   const dispatch = useDispatch();
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!isModelLoaded()) {
@@ -16,11 +17,14 @@ const NsfwModelControl: React.FC = () => {
 
   const handleToggleSafeSearch = async (enabled: boolean) => {
     if (enabled && !isModelLoaded()) {
+      setIsLoading(true);
       try {
         await loadModel();
         dispatch(setNsfwModelLoaded(true));
       } catch (error) {
         console.error('Error loading NSFW model:', error);
+      } finally {
+        setIsLoading(false);
       }
     } else if (!enabled && isModelLoaded()) {
       unloadModel();
@@ -38,11 +42,13 @@ const NsfwModelControl: React.FC = () => {
             className="sr-only peer"
             checked={nsfwModelLoaded}
             onChange={(e) => handleToggleSafeSearch(e.target.checked)}
+            disabled={isLoading}
           />
           <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
         </label>
       </div>
-      {!nsfwModelLoaded && (
+      {isLoading && <p className="text-xs text-blue-600">Loading SafeSearch model...</p>}
+      {!nsfwModelLoaded && !isLoading && (
         <p className="text-xs text-red-600">
           Warning: SafeSearch must be enabled to mint NFTs.
         </p>
@@ -50,5 +56,5 @@ const NsfwModelControl: React.FC = () => {
     </div>
   );
 };
-
 export default NsfwModelControl;
+

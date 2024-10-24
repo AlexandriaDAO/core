@@ -96,12 +96,13 @@ some_function(alex_principal(): Principal) {
 
 Rationale: This methodology is the most consise, and having all the canister ids in each Lib.rs immediately tells you what canisters it interacts with.
 
+### Dynamic Imports (webpack chunking)
+
+Use the pattern in nsfwjs/nsfwImports.tsx. It was used to dynamically import TensorFlow with much success.
+
 ### Adding an app.
 
 Add a `src/apps/your_app_name/index.tsx, and keep all supporting components in the apps folder. Eventually the good apps may move to different repos/subdomains, so the logic must be standalone. For this reason it's better to have duplicate code, that reusing/relying on parts of the main app which might have to be moved.
-
-
-
 
 
 #### Distinguishing Blocks/Channels, NFTs & SBTs.

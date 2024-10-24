@@ -28,12 +28,6 @@ module.exports = {
       maxInitialRequests: Infinity,
       minSize: 0,
       cacheGroups: {
-        tfVendor: {
-          test: /[\\/]node_modules[\\/](@tensorflow|nsfwjs)[\\/]/,
-          name: 'tf-nsfwjs',
-          chunks: 'all',
-          priority: 20,
-        },
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name(module) {
@@ -189,31 +183,35 @@ module.exports = {
       resourceRegExp: /^\.\/.*$/,
       contextRegExp: /nsfwjs[\\/]dist[\\/]esm[\\/]models[\\/]models[\\/]model_imports[\\/]inception_v3$/,
     }),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/,
+      contextRegExp: /moment$/,
+    }),
     new webpack.DefinePlugin({
       'require("./model_imports/inception_v3")': '{}',
       'require("./model_imports/mobilenet_v2")': '{}',
       'require("./model_imports/mobilenet_v2_mid")': '{}'
     }),
     // new BundleAnalyzerPlugin({
-      // analyzerMode: 'server',
-      // analyzerHost: 'localhost',
-      // analyzerPort: 8888,
-      // openAnalyzer: false,
-      // generateStatsFile: false,
-      // statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
-      // statsOptions: {
-      //   all: false,
-      //   assets: true,
-      //   assetsSort: 'size',
-      //   chunks: true,
-      //   chunkModules: false,
-      //   entrypoints: true,
-      //   hash: true,
-      //   modules: false,
-      //   timings: true,
-      //   errors: true,
-      //   warnings: true,
-      // },
+    //   analyzerMode: 'server',
+    //   analyzerHost: 'localhost',
+    //   analyzerPort: 8888,
+    //   openAnalyzer: true,
+    //   generateStatsFile: true,
+    //   statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
+    //   statsOptions: {
+    //     all: false,
+    //     assets: true,
+    //     assetsSort: 'size',
+    //     chunks: true,
+    //     chunkModules: false,
+    //     entrypoints: true,
+    //     hash: true,
+    //     modules: false,
+    //     timings: true,
+    //     errors: true,
+    //     warnings: true,
+    //   },
     // }),
   ],
   devServer: {
