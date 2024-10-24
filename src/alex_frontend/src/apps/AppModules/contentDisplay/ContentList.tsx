@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Transaction, ContentListProps } from "@/apps/AppModules/arweave/types/queries";
 import ContentGrid from "./ContentGrid";
 import { mint_nft } from "@/features/nft/mint";
@@ -36,13 +36,18 @@ interface ContentUrlInfo {
   fullUrl: string;
 }
 
+interface ContentTypeHandler {
+  [key: string]: (id: string) => Promise<ContentUrlInfo>;
+}
+
 const ContentList = ({ transactions }: ContentListProps) => {
   const { contentData, mintableState, handleRenderError } = useContent(transactions);
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
   const [contentUrls, setContentUrls] = useState<Record<string, ContentUrlInfo>>({});
+  const fetchPromises = useRef<Record<string, Promise<ContentUrlInfo>>>({});
 
-  const contentTypeHandlers = useCallback(() => ({
+  const contentTypeHandlers = useCallback((): ContentTypeHandler => ({
     "application/epub+zip": async (id: string) => {
       const coverUrl = await getCover(`https://arweave.net/${id}`);
       return {
@@ -51,22 +56,46 @@ const ContentList = ({ transactions }: ContentListProps) => {
         fullUrl: `https://arweave.net/${id}`
       };
     },
-    "application/pdf": (id: string) => ({
+    "application/pdf": async (id: string) => ({
       thumbnailUrl: null,
       coverUrl: null,
       fullUrl: `https://arweave.net/${id}`
     }),
-    "image/": (id: string) => ({
-      thumbnailUrl: `https://arweave.net/${id}`,
-      coverUrl: `https://arweave.net/${id}`,
-      fullUrl: `https://arweave.net/${id}`
-    }),
-    "video/": (id: string) => ({
+    "image/": async (id: string) => {
+      const content = contentData[id];
+      return {
+        thumbnailUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
+        coverUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
+        fullUrl: content?.imageObjectUrl || `https://arweave.net/${id}`
+      };
+    },
+    "video/": async (id: string) => ({
       thumbnailUrl: null,
       coverUrl: null,
       fullUrl: `https://arweave.net/${id}`
     }),
-  }), []);
+  }), [contentData]);
+
+  useEffect(() => {
+    const fetchContentUrls = async () => {
+      const newUrls: Record<string, ContentUrlInfo> = {};
+      for (const transaction of transactions) {
+        if (!fetchPromises.current[transaction.id] && !contentUrls[transaction.id]) {
+          const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+          const handler = contentTypeHandlers()[contentType];
+          if (handler) {
+            fetchPromises.current[transaction.id] = handler(transaction.id);
+            newUrls[transaction.id] = await fetchPromises.current[transaction.id];
+          }
+        }
+      }
+      if (Object.keys(newUrls).length > 0) {
+        setContentUrls(prev => ({...prev, ...newUrls}));
+      }
+    };
+
+    fetchContentUrls();
+  }, [transactions, contentTypeHandlers]); // Remove contentUrls from dependencies
 
   const getFileIcon = useCallback((contentType: string) => {
     if (contentType.startsWith("image/")) return <FaImage />;
@@ -76,35 +105,6 @@ const ContentList = ({ transactions }: ContentListProps) => {
     if (["text/plain", "text/markdown", "application/json", "text/html"].includes(contentType)) return <FaFileCode />;
     return <FaFileAlt />;
   }, []);
-
-  const loadContent = useCallback(async (transaction: Transaction) => {
-    try {
-      const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-      const handler = Object.entries(contentTypeHandlers()).find(([key]) => contentType.startsWith(key))?.[1];
-      
-      if (handler && !contentUrls[transaction.id]) {
-        const urlInfo = await handler(transaction.id);
-        setContentUrls(prev => ({
-          ...prev,
-          [transaction.id]: urlInfo
-        }));
-      }
-    } catch (error) {
-      console.warn(`Error loading content for ${transaction.id}:`, error);
-      setContentUrls(prev => ({
-        ...prev,
-        [transaction.id]: { thumbnailUrl: null, coverUrl: null, fullUrl: `https://arweave.net/${transaction.id}` }
-      }));
-    }
-  }, [contentUrls, contentTypeHandlers]);
-
-  useEffect(() => {
-    transactions.forEach(transaction => {
-      if (!contentUrls[transaction.id]) {
-        loadContent(transaction);
-      }
-    });
-  }, [transactions, loadContent, contentUrls]);
 
   const handleMint = useCallback(async (transactionId: string) => {
     try {
@@ -141,10 +141,10 @@ const ContentList = ({ transactions }: ContentListProps) => {
     const urlInfo = contentUrls[transaction.id] || { 
       thumbnailUrl: null, 
       coverUrl: null, 
-      fullUrl: `https://arweave.net/${transaction.id}` 
+      fullUrl: content?.url || `https://arweave.net/${transaction.id}` 
     };
 
-    if (!urlInfo.fullUrl) {
+    if (!content) {
       return <div className="w-full h-full bg-gray-200 flex items-center justify-center"><FaSpinner className="animate-spin text-4xl text-gray-500" /></div>;
     }
 
@@ -207,9 +207,9 @@ const ContentList = ({ transactions }: ContentListProps) => {
       <div className={`relative ${inModal ? 'w-full h-full' : 'w-full h-full'}`}>
         <ContentValidator
           transactionId={transaction.id}
-          contentUrl={content?.url || urlInfo.fullUrl || ''}
+          contentUrl={content.url || ''}
           contentType={contentType}
-          imageObjectUrl={content?.imageObjectUrl || ''}
+          imageObjectUrl={content.imageObjectUrl || ''}
         />
         {renderedContent}
         {(showStats[transaction.id] || !isMintable) && predictions && (
@@ -294,3 +294,4 @@ const ContentList = ({ transactions }: ContentListProps) => {
 };
 
 export default React.memo(ContentList);
+

@@ -35,7 +35,10 @@ export function useContent(transactions: Transaction[]) {
 
   const loadContent = useCallback(async (transaction: Transaction) => {
     const txId = transaction.id;
-    if (contentData[txId]) {
+    const existingContent = contentData[txId];
+
+    // Check if content is already loaded
+    if (existingContent && (existingContent.url || existingContent.imageObjectUrl || existingContent.textContent)) {
       return;
     }
 
