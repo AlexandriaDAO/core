@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Transaction } from "../arweave/types/queries";
 import { RootState } from "@/store";
 import { setMintableStates, setMintableState, MintableStateItem } from "../arweave/redux/arweaveSlice";
-import { getArweaveUrl, loadArweaveAsset } from '../arweave/config/arweaveConfig';
+import { getArweaveUrl } from '../arweave/config/arweaveConfig';
 import { loadModel, isModelLoaded } from '@/apps/AppModules/arweave/components/nsfwjs/tensorflow';
 import { setNsfwModelLoaded } from "../arweave/redux/arweaveSlice";
 import { fileTypeCategories } from '../arweave/types/files';
@@ -34,14 +34,22 @@ export function useContent(transactions: Transaction[]) {
   }, [dispatch, initialMintableStates]);
 
   const loadContent = useCallback(async (transaction: Transaction) => {
+    const txId = transaction.id;
+    if (contentData[txId]) {
+      return;
+    }
+
     try {
       const contentType = transaction.tags.find((tag) => tag.name === 'Content-Type')?.value || 'image/jpeg';
-      const url = getArweaveUrl(transaction.id);
+      const url = getArweaveUrl(txId);
 
       let newContentData: ContentDataItem;
 
       if (contentType.startsWith('image/') || contentType.startsWith('video/')) {
-        const objectUrl = await loadArweaveAsset(url);
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
         newContentData = {
           url,
           textContent: null,
@@ -67,12 +75,12 @@ export function useContent(transactions: Transaction[]) {
         };
       }
 
-      setContentData(prev => ({ ...prev, [transaction.id]: newContentData }));
+      setContentData(prev => ({ ...prev, [txId]: newContentData }));
     } catch (error) {
       console.warn(`Error loading content for ${transaction.id}:`, error);
       setContentData(prev => ({
         ...prev,
-        [transaction.id]: {
+        [txId]: {
           url: null,
           textContent: null,
           imageObjectUrl: null,
@@ -81,13 +89,17 @@ export function useContent(transactions: Transaction[]) {
       }));
       dispatch(setMintableState({ id: transaction.id, mintable: false }));
     }
-  }, [dispatch]);
+  }, [dispatch, contentData]);
 
   useEffect(() => {
     transactions.forEach(loadContent);
+    
     return () => {
+      // Clean up object URLs
       Object.values(contentData).forEach(data => {
-        if (data.imageObjectUrl) URL.revokeObjectURL(data.imageObjectUrl);
+        if (data.imageObjectUrl) {
+          URL.revokeObjectURL(data.imageObjectUrl);
+        }
       });
     };
   }, [transactions, loadContent]);

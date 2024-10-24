@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Transaction, ContentListProps } from "@/apps/AppModules/arweave/types/queries";
 import ContentGrid from "./ContentGrid";
 import { mint_nft } from "@/features/nft/mint";
@@ -31,40 +31,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 };
 
 interface ContentUrlInfo {
+  thumbnailUrl: string | null;
   coverUrl: string | null;
   fullUrl: string;
 }
-
-const contentTypeHandlers: Record<string, (id: string) => Promise<ContentUrlInfo> | ContentUrlInfo> = {
-  "application/epub+zip": async (id: string) => {
-    const coverUrl = await getCover(`https://arweave.net/${id}`);
-    return {
-      coverUrl: coverUrl || null,
-      fullUrl: `https://arweave.net/${id}`
-    };
-  },
-  "application/pdf": (id: string) => ({
-    coverUrl: null,
-    fullUrl: `https://arweave.net/${id}`
-  }),
-  "image/": (id: string) => ({
-    coverUrl: `https://arweave.net/${id}`,
-    fullUrl: `https://arweave.net/${id}`
-  }),
-  "video/": (id: string) => ({
-    coverUrl: null,
-    fullUrl: `https://arweave.net/${id}`
-  }),
-};
-
-const getFileIcon = (contentType: string) => {
-  if (contentType.startsWith("image/")) return <FaImage />;
-  if (contentType.startsWith("video/")) return <FaPlay />;
-  if (contentType.startsWith("audio/")) return <FaFileAudio />;
-  if (contentType === "application/pdf") return <FaFilePdf />;
-  if (["text/plain", "text/markdown", "application/json", "text/html"].includes(contentType)) return <FaFileCode />;
-  return <FaFileAlt />;
-};
 
 const ContentList = ({ transactions }: ContentListProps) => {
   const { contentData, mintableState, handleRenderError } = useContent(transactions);
@@ -72,40 +42,71 @@ const ContentList = ({ transactions }: ContentListProps) => {
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
   const [contentUrls, setContentUrls] = useState<Record<string, ContentUrlInfo>>({});
 
-  useEffect(() => {
-    const loadContent = async () => {
-      for (const transaction of transactions) {
-        try {
-          const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-          const handler = Object.entries(contentTypeHandlers).find(([key]) => contentType.startsWith(key))?.[1];
-          if (handler) {
-            // Initialize with a loading state
-            setContentUrls(prev => ({
-              ...prev,
-              [transaction.id]: { coverUrl: null, fullUrl: `https://arweave.net/${transaction.id}` }
-            }));
+  const contentTypeHandlers = useCallback(() => ({
+    "application/epub+zip": async (id: string) => {
+      const coverUrl = await getCover(`https://arweave.net/${id}`);
+      return {
+        thumbnailUrl: coverUrl,
+        coverUrl: coverUrl,
+        fullUrl: `https://arweave.net/${id}`
+      };
+    },
+    "application/pdf": (id: string) => ({
+      thumbnailUrl: null,
+      coverUrl: null,
+      fullUrl: `https://arweave.net/${id}`
+    }),
+    "image/": (id: string) => ({
+      thumbnailUrl: `https://arweave.net/${id}`,
+      coverUrl: `https://arweave.net/${id}`,
+      fullUrl: `https://arweave.net/${id}`
+    }),
+    "video/": (id: string) => ({
+      thumbnailUrl: null,
+      coverUrl: null,
+      fullUrl: `https://arweave.net/${id}`
+    }),
+  }), []);
 
-            const urlInfo = await handler(transaction.id);
-            // Update state for this specific transaction as soon as it's ready
-            setContentUrls(prev => ({
-              ...prev,
-              [transaction.id]: urlInfo
-            }));
-          }
-        } catch (error) {
-          console.warn(`Error loading content for ${transaction.id}:`, error);
-          setContentUrls(prev => ({
-            ...prev,
-            [transaction.id]: { coverUrl: null, fullUrl: `https://arweave.net/${transaction.id}` }
-          }));
-        }
+  const getFileIcon = useCallback((contentType: string) => {
+    if (contentType.startsWith("image/")) return <FaImage />;
+    if (contentType.startsWith("video/")) return <FaPlay />;
+    if (contentType.startsWith("audio/")) return <FaFileAudio />;
+    if (contentType === "application/pdf") return <FaFilePdf />;
+    if (["text/plain", "text/markdown", "application/json", "text/html"].includes(contentType)) return <FaFileCode />;
+    return <FaFileAlt />;
+  }, []);
+
+  const loadContent = useCallback(async (transaction: Transaction) => {
+    try {
+      const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+      const handler = Object.entries(contentTypeHandlers()).find(([key]) => contentType.startsWith(key))?.[1];
+      
+      if (handler && !contentUrls[transaction.id]) {
+        const urlInfo = await handler(transaction.id);
+        setContentUrls(prev => ({
+          ...prev,
+          [transaction.id]: urlInfo
+        }));
       }
-    };
+    } catch (error) {
+      console.warn(`Error loading content for ${transaction.id}:`, error);
+      setContentUrls(prev => ({
+        ...prev,
+        [transaction.id]: { thumbnailUrl: null, coverUrl: null, fullUrl: `https://arweave.net/${transaction.id}` }
+      }));
+    }
+  }, [contentUrls, contentTypeHandlers]);
 
-    loadContent();
-  }, [transactions]);
+  useEffect(() => {
+    transactions.forEach(transaction => {
+      if (!contentUrls[transaction.id]) {
+        loadContent(transaction);
+      }
+    });
+  }, [transactions, loadContent, contentUrls]);
 
-  const handleMint = async (transactionId: string) => {
+  const handleMint = useCallback(async (transactionId: string) => {
     try {
       await mint_nft(transactionId);
       alert("NFT minted successfully!");
@@ -113,9 +114,9 @@ const ContentList = ({ transactions }: ContentListProps) => {
       console.error("Error minting NFT:", error);
       alert("Failed to mint NFT. Please try again.");
     }
-  };
+  }, []);
 
-  const renderDetails = (transaction: Transaction) => (
+  const renderDetails = useCallback((transaction: Transaction) => (
     <div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300 z-10">
       <p><span className="font-semibold">ID:</span> {transaction.id}</p>
       <p><span className="font-semibold">Owner:</span> {transaction.owner}</p>
@@ -126,16 +127,22 @@ const ContentList = ({ transactions }: ContentListProps) => {
         <p key={index} className="ml-2"><span className="font-semibold">{tag.name}:</span> {tag.value}</p>
       ))}
     </div>
-  );
+  ), []);
 
-  const renderContent = (transaction: Transaction, content: typeof contentData[string] | undefined, inModal: boolean = false) => {
+  const renderContent = useCallback((
+    transaction: Transaction, 
+    content: typeof contentData[string] | undefined, 
+    inModal: boolean = false
+  ) => {
     const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
     const mintableStateItem = mintableState[transaction.id];
     const isMintable = mintableStateItem?.mintable;
     const predictions = mintableStateItem?.predictions;
-    const urlInfo = contentUrls[transaction.id] || { coverUrl: null, fullUrl: `https://arweave.net/${transaction.id}` };
-
-    console.log("Rendering content:", { id: transaction.id, contentType, urlInfo, inModal });
+    const urlInfo = contentUrls[transaction.id] || { 
+      thumbnailUrl: null, 
+      coverUrl: null, 
+      fullUrl: `https://arweave.net/${transaction.id}` 
+    };
 
     if (!urlInfo.fullUrl) {
       return <div className="w-full h-full bg-gray-200 flex items-center justify-center"><FaSpinner className="animate-spin text-4xl text-gray-500" /></div>;
@@ -148,7 +155,6 @@ const ContentList = ({ transactions }: ContentListProps) => {
 
     if (contentType === "application/epub+zip") {
       if (inModal) {
-        console.log("Rendering epub in modal:", urlInfo.fullUrl);
         return (
           <ReaderProvider>
             <div className="h-full pt-8">
@@ -159,8 +165,8 @@ const ContentList = ({ transactions }: ContentListProps) => {
       } else {
         return (
           <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
-            {urlInfo.coverUrl ? (
-              <img src={urlInfo.coverUrl} alt="Book cover" {...commonProps} crossOrigin="anonymous" />
+            {urlInfo.thumbnailUrl ? (
+              <img src={urlInfo.thumbnailUrl} alt="Book cover" {...commonProps} crossOrigin="anonymous" />
             ) : (
               <>
                 <FaBook className="text-gray-500 text-4xl absolute" />
@@ -173,12 +179,20 @@ const ContentList = ({ transactions }: ContentListProps) => {
     }
 
     const contentMap = {
-      "video/": <video src={urlInfo.fullUrl} controls={inModal} {...commonProps} />,
-      "image/": <img src={urlInfo.coverUrl || urlInfo.fullUrl} alt="Content" {...commonProps} crossOrigin="anonymous" />,
+      "video/": <video src={inModal ? urlInfo.fullUrl : undefined} controls={inModal} {...commonProps} />,
+      "image/": (
+        <img 
+          src={content?.imageObjectUrl || urlInfo.thumbnailUrl || urlInfo.fullUrl} 
+          alt="Content" 
+          decoding="async"
+          {...commonProps} 
+          crossOrigin="anonymous" 
+        />
+      ),
       "application/pdf": (
         <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
           <FaFilePdf className="text-gray-500 text-4xl absolute" />
-          <embed src={`${urlInfo.fullUrl}#view=FitH&page=1`} type="application/pdf" {...commonProps} />
+          {inModal && <embed src={`${urlInfo.fullUrl}#view=FitH&page=1`} type="application/pdf" {...commonProps} />}
         </div>
       ),
     };
@@ -211,7 +225,7 @@ const ContentList = ({ transactions }: ContentListProps) => {
         )}
       </div>
     );
-  };
+  }, [contentUrls, mintableState, handleRenderError, contentData, getFileIcon, showStats]);
 
   return (
     <>
@@ -279,4 +293,4 @@ const ContentList = ({ transactions }: ContentListProps) => {
   );
 };
 
-export default ContentList;
+export default React.memo(ContentList);
