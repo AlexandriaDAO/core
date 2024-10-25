@@ -30,9 +30,11 @@ Alexandrian transactions will have the nft owner state that decides how saves ar
 
 
 
+### Redux solutions.
 
-### Rendering multiple times problem: 
-- ContentList (ar-io url apparently important for nsfw model)
-- ContentList's loadContent() and useEffect that calls it.
-- ContentList's non-book img tag.
-- ContentFetcher's image tag, though it might be good since it uses the image obeject url.
+Right now permassearch/transactions isn't wiping its stuff on each search. It's also loading the transactions in parallel with the icrc7 requests.
+
+Let's just fix the library transactions state first, and configure 
+
+Well where are we going to perform the filtering operations? Probably a libmodule? Or in the library?
+

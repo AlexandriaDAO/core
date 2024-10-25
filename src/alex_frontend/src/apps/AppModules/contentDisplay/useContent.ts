@@ -3,129 +3,63 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Transaction } from "../arweave/types/queries";
 import { RootState } from "@/store";
 import { setMintableStates, setMintableState, MintableStateItem } from "../arweave/redux/arweaveSlice";
-import { getArweaveUrl } from '../arweave/config/arweaveConfig';
-import { loadModel, isModelLoaded } from '@/apps/AppModules/arweave/components/nsfwjs/tensorflow';
+import { loadModel, isModelLoaded } from '../arweave/components/nsfwjs/tensorflow';
 import { setNsfwModelLoaded } from "../arweave/redux/arweaveSlice";
 import { fileTypeCategories } from '../arweave/types/files';
-
-type ContentDataItem = {
-  url: string | null;
-  textContent: string | null;
-  imageObjectUrl: string | null;
-  error: string | null;
-};
+import { contentCache, CachedContent } from './services/contentCacheService';
 
 export function useContent(transactions: Transaction[]) {
   const dispatch = useDispatch();
-  const [contentData, setContentData] = useState<Record<string, ContentDataItem>>({});
+  const [contentData, setContentData] = useState<Record<string, CachedContent>>({});
   const mintableState = useSelector((state: RootState) => state.arweave.mintableState);
 
-  const initialMintableStates = useMemo(() => {
-    return transactions.reduce((acc, transaction) => {
+  // Initialize mintable states
+  useEffect(() => {
+    const initialStates = transactions.reduce((acc, transaction) => {
       const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "image/jpeg";
       const requiresValidation = [...fileTypeCategories.images, ...fileTypeCategories.video].includes(contentType);
       acc[transaction.id] = { mintable: !requiresValidation };
       return acc;
-    }, {} as Record<string, MintableStateItem>);
-  }, [transactions]);
+    }, {} as Record<string, MintableStateItem>); // Add type here
+    dispatch(setMintableStates(initialStates));
+  }, [transactions, dispatch]);
 
-  useEffect(() => {
-    dispatch(setMintableStates(initialMintableStates));
-  }, [dispatch, initialMintableStates]);
-
+  // Load content using cache service
   const loadContent = useCallback(async (transaction: Transaction) => {
-    const txId = transaction.id;
-    const existingContent = contentData[txId];
-
-    // Check if content is already loaded
-    if (existingContent && (existingContent.url || existingContent.imageObjectUrl || existingContent.textContent)) {
-      return;
-    }
-
     try {
-      const contentType = transaction.tags.find((tag) => tag.name === 'Content-Type')?.value || 'image/jpeg';
-      const url = getArweaveUrl(txId);
-
-      let newContentData: ContentDataItem;
-
-      if (contentType.startsWith('image/') || contentType.startsWith('video/')) {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const blob = await response.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        newContentData = {
-          url,
-          textContent: null,
-          imageObjectUrl: objectUrl,
-          error: null,
-        };
-      } else if (['text/plain', 'text/markdown', 'application/json', 'text/html'].includes(contentType)) {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const textContent = await response.text();
-        newContentData = {
-          url,
-          textContent,
-          imageObjectUrl: null,
-          error: null,
-        };
-      } else {
-        newContentData = {
-          url,
-          textContent: null,
-          imageObjectUrl: null,
-          error: null,
-        };
+      const content = await contentCache.loadContent(transaction);
+      setContentData(prev => ({ ...prev, [transaction.id]: content }));
+      if (content.error) {
+        dispatch(setMintableState({ id: transaction.id, mintable: false }));
       }
-
-      setContentData(prev => ({ ...prev, [txId]: newContentData }));
     } catch (error) {
-      console.warn(`Error loading content for ${transaction.id}:`, error);
-      setContentData(prev => ({
-        ...prev,
-        [txId]: {
-          url: null,
-          textContent: null,
-          imageObjectUrl: null,
-          error: 'Failed to load content. Please try again later.',
-        }
-      }));
-      dispatch(setMintableState({ id: transaction.id, mintable: false }));
+      console.error(`Error loading content for ${transaction.id}:`, error);
     }
-  }, [dispatch, contentData]);
+  }, [dispatch]);
 
   useEffect(() => {
     transactions.forEach(loadContent);
     
+    // Cleanup on unmount
     return () => {
-      // Clean up object URLs
-      Object.values(contentData).forEach(data => {
-        if (data.imageObjectUrl) {
-          URL.revokeObjectURL(data.imageObjectUrl);
-        }
-      });
+      contentCache.clearCache();
     };
   }, [transactions, loadContent]);
 
+  // Load NSFW model
   useEffect(() => {
     if (!isModelLoaded()) {
-      loadModel().then(() => {
-        dispatch(setNsfwModelLoaded(true));
-      }).catch(error => {
-        console.error("Failed to load NSFW model:", error);
-        dispatch(setNsfwModelLoaded(false));
-      });
+      loadModel()
+        .then(() => dispatch(setNsfwModelLoaded(true)))
+        .catch(error => {
+          console.error("Failed to load NSFW model:", error);
+          dispatch(setNsfwModelLoaded(false));
+        });
     }
   }, [dispatch]);
 
   const handleRenderError = useCallback((transactionId: string) => {
-    setContentData(prev => ({
-      ...prev,
-      [transactionId]: {
-        ...prev[transactionId],
-        error: "Failed to render content."
-      }
-    }));
+    contentCache.clearTransaction(transactionId);
     dispatch(setMintableState({ id: transactionId, mintable: false }));
   }, [dispatch]);
 

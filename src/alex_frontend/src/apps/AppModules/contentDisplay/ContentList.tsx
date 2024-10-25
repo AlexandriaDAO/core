@@ -294,4 +294,3 @@ const ContentList = ({ transactions }: ContentListProps) => {
 };
 
 export default React.memo(ContentList);
-
