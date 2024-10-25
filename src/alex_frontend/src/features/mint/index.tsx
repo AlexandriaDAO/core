@@ -18,6 +18,8 @@ import { WebIrys } from "@irys/sdk";
 import SelectNode from "./SelectNode";
 import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
 import { getIcrc7Actor, getNftManagerActor } from "../auth/utils/authUtils";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
+import { Button } from "@/lib/components/button";
 
 
 const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_ID : process.env.REACT_LOCAL_APP_ID;
@@ -240,22 +242,14 @@ const Mint = () => {
 
 
 	return (
-		<>
-			<button
-				onClick={() => setBookLoadModal(true)}
-				className="w-56 py-3 flex gap-2 justify-center items-center border border-black rounded-full font-roboto-condensed text-base leading-[18px] font-medium cursor-pointer hover:bg-black hover:text-white transition-all duration-100 ease-in"
-			>
-				<PiUploadSimple size={20} /> <span>Upload New</span>
-			</button>
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button rounded="full">
+					<PiUploadSimple size={20} /> <span>Upload New</span>
+				</Button>
+			</DialogTrigger>
 
-			<Modal
-				open={bookLoadModal}
-				onCancel={handleCancel}
-				footer={null}
-				closable={false}
-				className="min-w-[600px]"
-				// classNames={{ content: '!p-0', }}
-			>
+			<DialogContent closeIcon={null} className="sm:max-w-[600px]" onOpenAutoFocus={(e) => e.preventDefault()}>
 				<main className="container h-full w-full flex flex-col flex-grow justify-between">
 					<Header screen={screen} />
 
@@ -302,8 +296,9 @@ const Mint = () => {
 						file={file}
 					/>
 				</main>
-			</Modal>
-		</>
+
+			</DialogContent>
+		</Dialog>
 	);
 };
 

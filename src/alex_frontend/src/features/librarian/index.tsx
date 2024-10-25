@@ -7,6 +7,7 @@ import checkLibrarian from "./thunks/checkLibrarian";
 import { IoMdCheckmark } from "react-icons/io";
 import { RxCross1 } from "react-icons/rx";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/lib/components/button";
 
 function Librarian() {
 	const dispatch = useAppDispatch();
@@ -58,9 +59,12 @@ function Librarian() {
 						<span className="font-roboto-condensed font-medium text-base">
 							You are a Librarian, You can Add Nodes.
 						</span>
-						<button onClick={handleViewProfileClick} className="px-2 py-1 bg-black rounded cursor-pointer text-[#F6F930] font-medium font-roboto-condensed text-base">
+						<Button
+							variant={"link"}
+							size={"sm"}
+							onClick={handleViewProfileClick}>
 							View Profile
-						</button>
+						</Button>
 					</div>
 				) : (
 					<div className="flex flex-col items-center justify-between gap-3">
@@ -73,12 +77,12 @@ function Librarian() {
 							Become Librarian to create your personal nodes and
 							access librarian profile data
 						</span>
-						<button
-							onClick={() => navigate('/librarian')}
-							className="px-2 py-1 bg-black rounded cursor-pointer text-[#F6F930] font-medium font-roboto-condensed text-base"
-						>
-							Become Librarian
-						</button>
+						<Button
+							variant={"link"}
+							size={"sm"}
+							onClick={() => navigate('/librarian')}>
+							<span>Become Librarian</span>
+						</Button>
 					</div>
 				)}
 			</div>

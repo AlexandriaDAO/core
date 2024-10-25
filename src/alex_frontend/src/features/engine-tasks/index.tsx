@@ -1,4 +1,5 @@
 import useSession from "@/hooks/useSession";
+import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Table, message } from "antd";
 import React, { useEffect, useState } from "react";
@@ -114,42 +115,25 @@ const EngineTasks = () => {
 					</span>
 					{user == activeEngine?.owner && (
 						<>
-							<div
-								onClick={clearSelectedTasks}
-								className={`px-2 flex items-center gap-1 ${
-									selectedRowKeys.length > 0
-										? "cursor-pointer hover:text-gray-800"
-										: "cursor-not-allowed text-gray-400"
-								}  transition-all duration-100 border-r border-gray-500`}
-							>
+							<Button disabled={selectedRowKeys.length <= 0} variant='muted' onClick={clearSelectedTasks}>
 								<MdOutlineClear size={22} />
-								<span className="font-roboto-condensed text-base leading-[18px] ">
-									Clear Selected
-								</span>
-							</div>
-							<div
-								onClick={clearAllTasks}
-								className="px-2 flex items-center gap-1 cursor-pointer hover:text-gray-800 transition-all duration-100 border-r border-gray-500"
-							>
+								<span>Clear Selected</span>
+							</Button>
+							<div className="h-5 border-l border-gray-500"></div>
+							<Button variant='muted' onClick={clearAllTasks}>
 								<VscClearAll size={22} />
-								<span className="font-roboto-condensed text-base leading-[18px] ">
-									Clear All
-								</span>
-							</div>
+								<span>Clear All</span>
+							</Button>
 						</>
 					)}
-					<div
-						onClick={fetchTasks}
-						className="px-2 flex items-center gap-1 cursor-pointer hover:text-gray-800 transition-all duration-100 "
-					>
+					<div className="h-5 border-l border-gray-500"></div>
+					<Button variant='muted' onClick={fetchTasks}>
 						<FiRefreshCcw
 							size={18}
 							className={`${loading ? "animate-spin" : ""}`}
 						/>
-						<span className="font-roboto-condensed text-base leading-[18px] ">
-							Refresh
-						</span>
-					</div>
+						<span>Refresh</span>
+					</Button>
 				</div>
 			</div>
 			<div className="p-4">

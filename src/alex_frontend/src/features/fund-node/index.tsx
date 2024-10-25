@@ -3,6 +3,8 @@ import { WebIrys } from "@irys/sdk";
 import { ImSpinner8 } from "react-icons/im";
 import { message } from "antd";
 import { getClientIrys } from "@/services/irysService";
+import { LiaSaveSolid } from "react-icons/lia";
+import { Button } from "@/lib/components/button";
 
 const FundNode = () => {
 	const [irys, setIrys] = useState<WebIrys | null>(null);
@@ -69,11 +71,7 @@ const FundNode = () => {
 				<div className="font-syne font-medium text-xl text-black mb-2">
 					Connect Wallet to Fund Library
 				</div>
-				<button
-					onClick={setWebIrys}
-					className="font-syne font-bold text-base transition-all duration-100 ease-in text-white px-4 py-1 rounded bg-black cursor-pointer"
-					disabled={loading}
-				>
+				<Button onClick={setWebIrys} disabled={loading} variant="inverted">
 					{loading ? (
 						<span className="flex gap-1 items-center">
 							Connecting <ImSpinner8 size={14} className="animate animate-spin" />
@@ -81,7 +79,7 @@ const FundNode = () => {
 					) : (
 						"Connect Wallet"
 					)}
-				</button>
+				</Button>
 				{error && (
 					<div className="bg-red-100 border-l-4 border-red-500 p-4 mt-4">
 						<p className="font-roboto-condensed text-sm text-red-700">
@@ -109,7 +107,7 @@ const FundNode = () => {
                 </div>
 				<div className="flex flex-col gap-4 justify-between items-start p-2 shadow border border-solid rounded font-roboto-condensed font-normal text-base">
 					<div className="flex flex-col gap-2 justify-start items-start">
-						<div className="flex flex-col items-start gap-2">
+						<div className="flex justify-stretch items-center gap-2">
 							<div className="relative flex justify-between items-center">
 								<input
 									disabled={fundLoading}
@@ -122,18 +120,11 @@ const FundNode = () => {
 								/>
 								<span className="absolute right-3 font-bold">ETH</span>
 							</div>
-							<button
-								disabled={fundLoading}
-								onClick={fund}
-								className={`font-syne font-bold text-base transition-all duration-100 ease-in text-white px-4 py-1 rounded ${
-									fundLoading ? "cursor-not-allowed bg-gray-500" : "cursor-pointer bg-black"
-								}`}
-							>
+							<Button onClick={fund} size="sm" disabled={fundLoading} variant="inverted">
 								{fundLoading ? <span className="flex gap-1 items-center">
-									Processing{" "}
-									<ImSpinner8 size={14} className="animate animate-spin" />
+									Processing <ImSpinner8 size={14} className="animate animate-spin" />
 								</span> : "Deposit" }
-							</button>
+							</Button>
 						</div>
 					</div>
 				</div>

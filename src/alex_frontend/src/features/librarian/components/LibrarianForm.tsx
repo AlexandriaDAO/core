@@ -8,6 +8,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import logout from "@/features/auth/thunks/logout";
 import becomeLibrarian from "../thunks/becomeLibrarian";
 import { getAuthClient } from "@/features/auth/utils/authUtils";
+import { Button } from "@/lib/components/button";
 
 const LibrarianSchema = Yup.object().shape({
 	name: Yup.string()
@@ -99,13 +100,12 @@ const LibrarianForm = () => {
 							</span>
 						)}
 				</div>
-				<button
-					type="submit"
-					className="w-44 py-3 self-center my-4 flex gap-2 justify-center items-center border border-black rounded-full font-roboto-condensed text-base leading-[18px] font-medium transition-all duration-100 ease-in text-black cursor-pointer hover:bg-black hover:text-white"
-				>
-					<LiaSaveSolid size={18} />
-					<span>Save Form</span>
-				</button>
+				<div className="flex justify-center">
+					<Button type="submit" rounded={"full"}>
+						<LiaSaveSolid size={18} />
+						<span>Save Form</span>
+					</Button>
+				</div>
 			</form>
 		</>
 	);

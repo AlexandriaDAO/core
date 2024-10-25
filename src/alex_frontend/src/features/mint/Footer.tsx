@@ -1,3 +1,5 @@
+import { Button } from "@/lib/components/button";
+import { DialogClose } from "@/lib/components/dialog";
 import { message } from "antd";
 import React from "react";
 
@@ -79,13 +81,11 @@ const Footer = ({
 					Refresh
 				</button>
 			)}
-			<button
-				type="button"
-				onClick={handleCancel}
-				className="rounded px-3 py-1 ml-auto bg-gray-800 text-white hover:bg-gray-600 focus:shadow-outline focus:outline-none"
-			>
-				Close
-			</button>
+
+
+			<DialogClose asChild>
+				<Button type="button" variant="outline">Close</Button>
+			</DialogClose>
 		</footer>
 	);
 };

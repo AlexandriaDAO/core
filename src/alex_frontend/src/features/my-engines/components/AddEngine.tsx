@@ -93,194 +93,193 @@ const AddEngine = () => {
 		dispatch(setNewEngineError(""));
 		formik.resetForm()
 	}
-	useEffect(() => resetNewEngine, []);
+	useEffect(resetNewEngine, []);
 
 	// useEffect(() => {
 	// 	if(!addEngineModal && (newEngine || newEngineError)) resetNewEngine()
 	// }, [addEngineModal]);
 
 	return (
-		<>
-			<Dialog>
-				<DialogTrigger asChild>
-					<BiPlus
-						// onClick={() => setAddEngineModal(true)}
-						size={36}
-						className="p-2 border border-solid rounded-full cursor-pointer bg-black text-white hover:bg-white hover:text-black hover:border-black transition-all duration-100"
-					/>
-				</DialogTrigger>
+		<Dialog>
+			<DialogTrigger asChild>
+				<BiPlus
+					size={36}
+					className="p-2 border border-solid rounded-full cursor-pointer bg-black text-white hover:bg-white hover:text-black hover:border-black transition-all duration-100"
+				/>
+			</DialogTrigger>
 
-				{newEngine ? (
-					<DialogContent className="sm:max-w-[425px]">
-						<DialogHeader>
-							<DialogTitle>
-								<div className="flex gap-1 justify-start items-center">
-									<CiCircleCheck
-										size={24}
-										className="text-green-400"
-									/>
-									<span>Engine Added</span>
-								</div>
-							</DialogTitle>
-							<DialogDescription>Engine has been stored successfully.</DialogDescription>
-						</DialogHeader>
-					</DialogContent>
-				) : newEngineError ? (
-					<DialogContent className="sm:max-w-[425px]">
-						<DialogHeader>
-							<DialogTitle>
-								<div className="flex gap-1 justify-start items-center">
-									<AiOutlineCloseCircle
-										size={24}
-										className="text-red-400"
-									/>
-									<span>Engine Error</span>
-								</div>
-							</DialogTitle>
-							<DialogDescription>Error Occurred! {newEngineError}</DialogDescription>
-						</DialogHeader>
-					</DialogContent>
-				) : (
-					<DialogContent className="sm:max-w-[600px]">
-						<DialogHeader>
-							<DialogTitle>Add Engine</DialogTitle>
-							<DialogDescription>Add your Engine, It can be from Meili cloud or Akash Instance.</DialogDescription>
-						</DialogHeader>
-						<form
-							onSubmit={formik.handleSubmit}
-							className="flex flex-col gap-2 "
-						>
-							<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-								<label className="text-lg" htmlFor="title">
-									Title
-								</label>
-								<input
-									className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
-										formik.touched.title &&
-										formik.errors.title
-											? "border-red-500"
-											: ""
-									}`}
-									id="title"
-									name="title"
-									type="text"
-									onChange={formik.handleChange}
-									onBlur={formik.handleBlur}
-									value={formik.values.title}
+			{newEngine ? (
+				<DialogContent className="sm:max-w-[425px]">
+					<DialogHeader>
+						<DialogTitle>
+							<div className="flex gap-1 justify-start items-center">
+								<CiCircleCheck
+									size={24}
+									className="text-green-400"
 								/>
-								{formik.touched.title &&
-									formik.errors.title && (
-										<span className="text-red-400 text-sm">
-											{formik.errors.title}
-										</span>
-									)}
+								<span>Engine Added</span>
 							</div>
-							<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-								<label className="text-lg" htmlFor="host">
-									Host
-								</label>
-								<input
-									className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
-										formik.touched.host &&
-										formik.errors.host
-											? "border-red-500"
-											: ""
-									}`}
-									id="host"
-									name="host"
-									type="text"
-									onChange={formik.handleChange}
-									onBlur={formik.handleBlur}
-									value={formik.values.host}
+						</DialogTitle>
+						<DialogDescription>Engine has been stored successfully.</DialogDescription>
+					</DialogHeader>
+				</DialogContent>
+			) : newEngineError ? (
+				<DialogContent className="sm:max-w-[425px]">
+					<DialogHeader>
+						<DialogTitle>
+							<div className="flex gap-1 justify-start items-center">
+								<AiOutlineCloseCircle
+									size={24}
+									className="text-red-400"
 								/>
-								{formik.touched.host && formik.errors.host && (
+								<span>Engine Error</span>
+							</div>
+						</DialogTitle>
+						<DialogDescription>Error Occurred! {newEngineError}</DialogDescription>
+					</DialogHeader>
+				</DialogContent>
+			) : (
+				<DialogContent className="sm:max-w-[600px]" onOpenAutoFocus={(e) => e.preventDefault()}>
+					<DialogHeader>
+						<DialogTitle>Add Engine</DialogTitle>
+						<DialogDescription>Add your Engine, It can be from Meili cloud or Akash Instance.</DialogDescription>
+					</DialogHeader>
+					<form
+						onSubmit={formik.handleSubmit}
+						className="flex flex-col gap-2 "
+					>
+						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+							<label className="text-lg" htmlFor="title">
+								Title
+							</label>
+							<input
+								className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
+									formik.touched.title &&
+									formik.errors.title
+										? "border-red-500"
+										: ""
+								}`}
+								id="title"
+								name="title"
+								type="text"
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								value={formik.values.title}
+							/>
+							{formik.touched.title &&
+								formik.errors.title && (
 									<span className="text-red-400 text-sm">
-										{formik.errors.host}
+										{formik.errors.title}
 									</span>
 								)}
-							</div>
-							<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-								<label className="text-lg" htmlFor="key">
-									Key
-								</label>
-								<input
-									className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
-										formik.touched.key && formik.errors.key
-											? "border-red-500"
-											: ""
-									}`}
-									id="key"
-									name="key"
-									type="text"
-									onChange={formik.handleChange}
-									onBlur={formik.handleBlur}
-									value={formik.values.key}
-								/>
-								{formik.touched.key && formik.errors.key && (
+						</div>
+						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+							<label className="text-lg" htmlFor="host">
+								Host
+							</label>
+							<input
+								className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
+									formik.touched.host &&
+									formik.errors.host
+										? "border-red-500"
+										: ""
+								}`}
+								id="host"
+								name="host"
+								type="text"
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								value={formik.values.host}
+							/>
+							{formik.touched.host && formik.errors.host && (
+								<span className="text-red-400 text-sm">
+									{formik.errors.host}
+								</span>
+							)}
+						</div>
+						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+							<label className="text-lg" htmlFor="key">
+								Key
+							</label>
+							<input
+								className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
+									formik.touched.key && formik.errors.key
+										? "border-red-500"
+										: ""
+								}`}
+								id="key"
+								name="key"
+								type="text"
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								value={formik.values.key}
+							/>
+							{formik.touched.key && formik.errors.key && (
+								<span className="text-red-400 text-sm">
+									{formik.errors.key}
+								</span>
+							)}
+						</div>
+						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+							<label className="text-lg" htmlFor="index">
+								Index
+							</label>
+							<input
+								className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
+									formik.touched.index &&
+									formik.errors.index
+										? "border-red-500"
+										: ""
+								}`}
+								id="index"
+								name="index"
+								type="text"
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								value={formik.values.index}
+							/>
+							{formik.touched.index &&
+								formik.errors.index && (
 									<span className="text-red-400 text-sm">
-										{formik.errors.key}
+										{formik.errors.index}
 									</span>
 								)}
-							</div>
-							<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-								<label className="text-lg" htmlFor="index">
-									Index
-								</label>
-								<input
-									className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
-										formik.touched.index &&
-										formik.errors.index
-											? "border-red-500"
-											: ""
-									}`}
-									id="index"
-									name="index"
-									type="text"
-									onChange={formik.handleChange}
-									onBlur={formik.handleBlur}
-									value={formik.values.index}
-								/>
-								{formik.touched.index &&
-									formik.errors.index && (
-										<span className="text-red-400 text-sm">
-											{formik.errors.index}
-										</span>
-									)}
-							</div>
-							<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-								<label className="text-lg" htmlFor="status">
-									Status
-								</label>
-								<select
-									className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
-										formik.touched.status &&
-										formik.errors.status
-											? "border-red-500"
-											: ""
-									}`}
-									name="status"
-									id="status"
-									onChange={formik.handleChange}
-									onBlur={formik.handleBlur}
-									value={formik.values.status}
-								>
-									<option value="0">Draft</option>
-									<option value="1">Published</option>
-								</select>
-								{formik.touched.status &&
-									formik.errors.status && (
-										<span className="text-red-400 text-sm">
-											{formik.errors.status}
-										</span>
-									)}
-							</div>
-							<DialogFooter className="flex justify-center items-center my-4">
+						</div>
+						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+							<label className="text-lg" htmlFor="status">
+								Status
+							</label>
+							<select
+								className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
+									formik.touched.status &&
+									formik.errors.status
+										? "border-red-500"
+										: ""
+								}`}
+								name="status"
+								id="status"
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								value={formik.values.status}
+							>
+								<option value="0">Draft</option>
+								<option value="1">Published</option>
+							</select>
+							{formik.touched.status &&
+								formik.errors.status && (
+									<span className="text-red-400 text-sm">
+										{formik.errors.status}
+									</span>
+								)}
+						</div>
+						<div className="flex justify-center items-center my-4">
+							<DialogFooter>
 								{newEngineLoading ? (
 									<Button type="button" disabled rounded={"full"}>
-									 	<ImSpinner8
-									 		size={18}
-									 		className="animate animate-spin"
-									 	/>
+										<ImSpinner8
+											size={18}
+											className="animate animate-spin"
+										/>
 										<span>Saving Engine</span>
 									</Button>
 								) : (
@@ -290,11 +289,11 @@ const AddEngine = () => {
 									</Button>
 								)}
 							</DialogFooter>
-						</form>
-					</DialogContent>
-				)}
-			</Dialog>
-		</>
+						</div>
+					</form>
+				</DialogContent>
+			)}
+		</Dialog>
 	);
 };
 

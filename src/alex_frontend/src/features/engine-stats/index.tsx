@@ -1,4 +1,5 @@
 import useSession from "@/hooks/useSession";
+import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { message } from "antd";
 import React, { useEffect, useState } from "react";
@@ -56,23 +57,20 @@ const EngineStats = () => {
 					Cluster Stats
 				</span>
 				<div className="flex items-center text-gray-500">
-				{user == activeEngine?.owner &&
-					<div onClick={handleClearAll} className="px-2 flex items-center gap-1 cursor-pointer hover:text-gray-800 transition-all duration-100 border-r border-gray-500">
-						<VscClearAll size={22} />
-						<span className="font-roboto-condensed text-base leading-[18px] ">
-							Clear All Documents
-						</span>
-					</div>
-}
-					<div onClick={fetchStats} className="px-2 flex items-center gap-1 cursor-pointer hover:text-gray-800 transition-all duration-100 ">
+					{user == activeEngine?.owner && (
+						<Button variant='muted' onClick={handleClearAll}>
+							<VscClearAll size={22} />
+							<span>Clear All Documents</span>
+						</Button>
+					)}
+					<div className="h-5 border-l border-gray-500"></div>
+					<Button variant='muted' onClick={fetchStats}>
 						<FiRefreshCcw
 							size={18}
 							className={`${loading ? 'animate-spin':''}`}
 						/>
-						<span className="font-roboto-condensed text-base leading-[18px] ">
-							Refresh
-						</span>
-					</div>
+						<span>Refresh</span>
+					</Button>
 				</div>
 			</div>
 			{user == activeEngine?.owner &&

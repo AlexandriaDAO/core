@@ -1,4 +1,5 @@
 import useSession from "@/hooks/useSession";
+import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { message } from "antd";
 import React, { ChangeEvent, useEffect, useState } from "react";
@@ -89,29 +90,19 @@ const EngineFilters = () => {
 
 				<div className="flex items-center text-gray-500">
 					{user == activeEngine?.owner && (
-						<div
-							onClick={handleFilterReset}
-							className="px-2 flex items-center gap-1 cursor-pointer hover:text-gray-800 transition-all duration-100 border-r border-gray-500"
-						>
+						<Button variant='muted' onClick={handleFilterReset}>
 							<VscClearAll size={22} />
-							<span className="font-roboto-condensed text-base leading-[18px] ">
-								Clear All
-							</span>
-						</div>
+							<span>Clear All</span>
+						</Button>
 					)}
-
-					<div
-						onClick={fetchFilters}
-						className="px-2 flex items-center gap-1 cursor-pointer hover:text-gray-800 transition-all duration-100 "
-					>
+					<div className="h-5 border-l border-gray-500"></div>
+					<Button variant='muted' onClick={fetchFilters}>
 						<FiRefreshCcw
 							size={18}
 							className={`${loading ? "animate-spin" : ""}`}
 						/>
-						<span className="font-roboto-condensed text-base leading-[18px] ">
-							Refresh
-						</span>
-					</div>
+						<span>Refresh</span>
+					</Button>
 				</div>
 			</div>
 			{user == activeEngine?.owner &&
