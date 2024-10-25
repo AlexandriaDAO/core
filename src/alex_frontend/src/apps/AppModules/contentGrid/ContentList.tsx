@@ -3,32 +3,10 @@ import { Transaction, ContentListProps } from "@/apps/LibModules/arweaveSearch/t
 import ContentGrid from "./ContentGrid";
 import { mint_nft } from "@/features/nft/mint";
 import { getCover } from "@/utils/epub";
-import { FaFilePdf, FaInfoCircle, FaTimes, FaSpinner, FaBook, FaPlay, FaFileAlt, FaFileCode, FaFileAudio, FaImage } from 'react-icons/fa';
-import ContentValidator from '@/apps/LibModules/arweaveSearch/components/nsfwjs/ContentValidator';
-import { useContent } from '@/apps/AppModules/contentGrid/utils/useContent';
-import { Reader } from "@/features/reader";
-import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
-
-interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}
-
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-4 max-w-3xl max-h-[90vh] w-full relative overflow-auto">
-        <button onClick={onClose} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
-          <FaTimes />
-        </button>
-        {children}
-      </div>
-    </div>
-  );
-};
+import { FaInfoCircle } from 'react-icons/fa';
+import { useContent } from './utils/useContent';
+import Modal from './components/Modal';
+import ContentRenderer from './components/ContentRenderer';
 
 interface ContentUrlInfo {
   thumbnailUrl: string | null;
@@ -66,7 +44,7 @@ const ContentList = ({ transactions }: ContentListProps) => {
       return {
         thumbnailUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
         coverUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
-        fullUrl: content?.imageObjectUrl || `https://arweave.net/${id}`
+        fullUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
       };
     },
     "video/": async (id: string) => ({
@@ -95,16 +73,7 @@ const ContentList = ({ transactions }: ContentListProps) => {
     };
 
     fetchContentUrls();
-  }, [transactions, contentTypeHandlers]); // Remove contentUrls from dependencies
-
-  const getFileIcon = useCallback((contentType: string) => {
-    if (contentType.startsWith("image/")) return <FaImage />;
-    if (contentType.startsWith("video/")) return <FaPlay />;
-    if (contentType.startsWith("audio/")) return <FaFileAudio />;
-    if (contentType === "application/pdf") return <FaFilePdf />;
-    if (["text/plain", "text/markdown", "application/json", "text/html"].includes(contentType)) return <FaFileCode />;
-    return <FaFileAlt />;
-  }, []);
+  }, [transactions, contentTypeHandlers]);
 
   const handleMint = useCallback(async (transactionId: string) => {
     try {
@@ -129,104 +98,6 @@ const ContentList = ({ transactions }: ContentListProps) => {
     </div>
   ), []);
 
-  const renderContent = useCallback((
-    transaction: Transaction, 
-    content: typeof contentData[string] | undefined, 
-    inModal: boolean = false
-  ) => {
-    const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-    const mintableStateItem = mintableState[transaction.id];
-    const isMintable = mintableStateItem?.mintable;
-    const predictions = mintableStateItem?.predictions;
-    const urlInfo = contentUrls[transaction.id] || { 
-      thumbnailUrl: null, 
-      coverUrl: null, 
-      fullUrl: content?.url || `https://arweave.net/${transaction.id}` 
-    };
-
-    if (!content) {
-      return <div className="w-full h-full bg-gray-200 flex items-center justify-center"><FaSpinner className="animate-spin text-4xl text-gray-500" /></div>;
-    }
-
-    const commonProps = {
-      className: `${inModal ? 'w-full h-full object-contain' : 'absolute inset-0 w-full h-full object-cover'}`,
-      onError: () => handleRenderError(transaction.id),
-    };
-
-    if (contentType === "application/epub+zip") {
-      if (inModal) {
-        return (
-          <ReaderProvider>
-            <div className="h-full pt-8">
-              <Reader bookUrl={urlInfo.fullUrl} />
-            </div>
-          </ReaderProvider>
-        );
-      } else {
-        return (
-          <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
-            {urlInfo.thumbnailUrl ? (
-              <img src={urlInfo.thumbnailUrl} alt="Book cover" {...commonProps} crossOrigin="anonymous" />
-            ) : (
-              <>
-                <FaBook className="text-gray-500 text-4xl absolute" />
-                <FaSpinner className="animate-spin text-4xl text-gray-500" />
-              </>
-            )}
-          </div>
-        );
-      }
-    }
-
-    const contentMap = {
-      "video/": <video src={inModal ? urlInfo.fullUrl : undefined} controls={inModal} {...commonProps} />,
-      "image/": (
-        <img 
-          src={content?.imageObjectUrl || urlInfo.thumbnailUrl || urlInfo.fullUrl} 
-          alt="Content" 
-          decoding="async"
-          {...commonProps} 
-          crossOrigin="anonymous" 
-        />
-      ),
-      "application/pdf": (
-        <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
-          <FaFilePdf className="text-gray-500 text-4xl absolute" />
-          {inModal && <embed src={`${urlInfo.fullUrl}#view=FitH&page=1`} type="application/pdf" {...commonProps} />}
-        </div>
-      ),
-    };
-
-    const renderedContent = Object.entries(contentMap).find(([key]) => contentType.startsWith(key))?.[1] || (
-      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-        {getFileIcon(contentType)}
-      </div>
-    );
-
-    return (
-      <div className={`relative ${inModal ? 'w-full h-full' : 'w-full h-full'}`}>
-        <ContentValidator
-          transactionId={transaction.id}
-          contentUrl={content.url || ''}
-          contentType={contentType}
-          imageObjectUrl={content.imageObjectUrl || ''}
-        />
-        {renderedContent}
-        {(showStats[transaction.id] || !isMintable) && predictions && (
-          <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white p-2 z-20">
-            <p className="text-lg font-bold mb-2">Content Classification</p>
-            <ul className="text-sm">
-              {Object.entries(predictions).map(([key, value]) => (
-                <li key={key}>{key}: {(value * 100).toFixed(2)}%</li>
-              ))}
-            </ul>
-            {!isMintable && <p className="mt-2 text-red-400">This content is not mintable.</p>}
-          </div>
-        )}
-      </div>
-    );
-  }, [contentUrls, mintableState, handleRenderError, contentData, getFileIcon, showStats]);
-
   return (
     <>
       <ContentGrid>
@@ -235,7 +106,6 @@ const ContentList = ({ transactions }: ContentListProps) => {
           const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
           const mintableStateItem = mintableState[transaction.id];
           const isMintable = mintableStateItem?.mintable;
-          const predictions = mintableStateItem?.predictions;
 
           return (
             <ContentGrid.Item
@@ -243,31 +113,41 @@ const ContentList = ({ transactions }: ContentListProps) => {
               onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
             >
               <div className="group relative w-full h-full">
-                {renderContent(transaction, content)}
+                <ContentRenderer
+                  transaction={transaction}
+                  content={content}
+                  contentUrls={contentUrls[transaction.id] || {
+                    thumbnailUrl: null,
+                    coverUrl: null,
+                    fullUrl: content?.url || `https://arweave.net/${transaction.id}`
+                  }}
+                  showStats={showStats[transaction.id]}
+                  mintableState={mintableState}
+                  handleRenderError={handleRenderError}
+                />
                 {renderDetails(transaction)}
               
-                {isMintable && predictions && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
-                    }}
-                    className="absolute top-2 left-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
-                  >
-                    <FaInfoCircle />
-                  </button>
-                )}
-
                 {isMintable && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleMint(transaction.id);
-                    }}
-                    className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
-                  >
-                    +
-                  </button>
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
+                      }}
+                      className="absolute top-2 left-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
+                    >
+                      <FaInfoCircle />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMint(transaction.id);
+                      }}
+                      className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
+                    >
+                      +
+                    </button>
+                  </>
                 )}
               </div>
             </ContentGrid.Item>
@@ -281,14 +161,22 @@ const ContentList = ({ transactions }: ContentListProps) => {
       >
         {selectedContent && (
           <div className="w-full h-full">
-            {renderContent(
-              transactions.find(t => t.id === selectedContent.id)!,
-              contentData[selectedContent.id],
-              true
-            )}
+            <ContentRenderer
+              transaction={transactions.find(t => t.id === selectedContent.id)!}
+              content={contentData[selectedContent.id]}
+              contentUrls={contentUrls[selectedContent.id] || {
+                thumbnailUrl: null,
+                coverUrl: null,
+                fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
+              }}
+              inModal={true}
+              showStats={showStats[selectedContent.id]}
+              mintableState={mintableState}
+              handleRenderError={handleRenderError}
+            />
           </div>
         )}
-      </Modal>
+      </Modal> 
     </>
   );
 };

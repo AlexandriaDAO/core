@@ -8,6 +8,15 @@ import { setNsfwModelLoaded } from "../../../LibModules/arweaveSearch/redux/arwe
 import { fileTypeCategories } from '../../../LibModules/arweaveSearch/types/files';
 import { contentCache, CachedContent } from '../../../LibModules/contentDisplay/services/contentCacheService';
 
+const initialPredictions = {
+  Drawing: 0,
+  Hentai: 0,
+  Neutral: 0,
+  Porn: 0,
+  Sexy: 0,
+  isPorn: false
+};
+
 export function useContent(transactions: Transaction[]) {
   const dispatch = useDispatch();
   const [contentData, setContentData] = useState<Record<string, CachedContent>>({});
@@ -18,9 +27,12 @@ export function useContent(transactions: Transaction[]) {
     const initialStates = transactions.reduce((acc, transaction) => {
       const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "image/jpeg";
       const requiresValidation = [...fileTypeCategories.images, ...fileTypeCategories.video].includes(contentType);
-      acc[transaction.id] = { mintable: !requiresValidation };
+      acc[transaction.id] = { 
+        mintable: !requiresValidation,
+        predictions: initialPredictions  // Always include predictions
+      };
       return acc;
-    }, {} as Record<string, MintableStateItem>); // Add type here
+    }, {} as Record<string, MintableStateItem>);
     dispatch(setMintableStates(initialStates));
   }, [transactions, dispatch]);
 
