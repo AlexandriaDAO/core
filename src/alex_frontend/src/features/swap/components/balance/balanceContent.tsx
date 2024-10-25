@@ -7,6 +7,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import LbryBalanceCard from "./lbryBalanceCard";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
+import getIcpPrice from "../../../icp-ledger/thunks/getIcpPrice";
 
 const BalanceContent: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -17,6 +18,7 @@ const BalanceContent: React.FC = () => {
         if (user!=='') {
             dispatch(getAccountAlexBalance(user))
             dispatch(getLbryBalance(user))
+            
         }
     }, [user])
 

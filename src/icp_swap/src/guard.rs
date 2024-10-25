@@ -2,7 +2,7 @@ use candid::Principal;
 
 use crate::STATE;
 pub fn is_canister() -> Result<(), String> {
-    if ic_cdk::api::caller().to_string() == "5qx27-tyaaa-aaaal-qjafa-cai" {
+    if ic_cdk::api::caller() == ic_cdk::api::id() {
         Ok(())
     } else {
         Err("You are unauthorized to call this method.".to_string())
@@ -16,8 +16,11 @@ impl CallerGuard {
     pub fn new(principal: Principal) -> Result<Self, String> {
         STATE.with(|state| {
             let pending_requests = &mut state.borrow_mut().pending_requests;
-            if pending_requests.contains(&principal){
-                return Err(format!("Already processing a request for principal {:?}", principal.to_string()));
+            if pending_requests.contains(&principal) {
+                return Err(format!(
+                    "Already processing a request for principal {:?}",
+                    principal.to_string()
+                ));
             }
             pending_requests.insert(principal);
             Ok(Self { principal })

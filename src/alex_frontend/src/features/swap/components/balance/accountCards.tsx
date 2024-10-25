@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { ActorSubclass } from "@dfinity/agent";
 
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { _SERVICE as _SERVICESWAP } from "../../../../../../declarations/icp_swap/icp_swap.did";
@@ -9,18 +8,24 @@ import Auth from "@/features/auth";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getIcpBal from "@/features/icp-ledger/thunks/getIcpBal";
 import CopyHelper from "../copyHelper";
+import getAccountId from "@/features/icp-ledger/thunks/getAccountId";
+import getIcpPrice from "../../../icp-ledger/thunks/getIcpPrice";
 
 const AccountCards: React.FC = () => {
     const dispatch = useAppDispatch();
-    const {user} = useAppSelector((state) => state.auth);
+    const { user } = useAppSelector((state) => state.auth);
     const swap = useAppSelector((state) => state.swap);
     const icpLedger = useAppSelector((state) => state.icpLedger);
     const [formattedPrincipal, setFormattedPrincipal] = useState("");
+    const [formattedAccountId, setFormattedAccountId] = useState("");
+
 
     // icp ledger
     useEffect(() => {
         if (user !== '') {
-            dispatch( getIcpBal(user));
+            dispatch(getIcpBal(user));
+            dispatch(getAccountId(user));
+            dispatch(getIcpPrice());
         }
     }, [user]);
     useEffect(() => {
@@ -29,9 +34,10 @@ const AccountCards: React.FC = () => {
             swap.swapSuccess === true ||
             swap.burnSuccess === true ||
             swap.transferSuccess === true ||
+            swap.redeeemSuccess === true ||
             icpLedger.transferSuccess === true
         ) {
-            dispatch( getIcpBal(user) );
+            dispatch(getIcpBal(user));
         }
     }, [swap, icpLedger]);
 
@@ -42,10 +48,17 @@ const AccountCards: React.FC = () => {
                 setFormattedPrincipal(
                     user.slice(0, 3) + "..." + user.slice(-3)
                 );
+                setFormattedAccountId(
+                    icpLedger.accountId.slice(0, 3) + "..." + icpLedger.accountId.slice(-3)
+                );
             } else {
                 setFormattedPrincipal(
                     user.slice(0, 5) + "..." + user.slice(-20)
                 );
+                setFormattedAccountId(
+                    icpLedger.accountId.slice(0, 5) + "..." + icpLedger.accountId.slice(-20)
+                );
+
             }
         };
 
@@ -53,7 +66,7 @@ const AccountCards: React.FC = () => {
         window.addEventListener("resize", handleResize);
 
         return () => window.removeEventListener("resize", handleResize);
-    }, [user]);
+    }, [user,icpLedger.accountId]);
 
     return (
         <>
@@ -77,6 +90,20 @@ const AccountCards: React.FC = () => {
                                     </div>
                                     <CopyHelper account={user} />
                                 </div>
+                                <h4 className="text-2xl xl:text-xl font-medium mb-3  2xl:mb-3  xl:mb-3">
+                                    Account Id:
+                                </h4>
+                                <div className="flex justify-between mb-3 xxl:mb-3">
+                                    <div>
+                                        <strong className="text-xl font-medium me-3 xxl:text-xl xxl:me-3">
+                                            {formattedAccountId}
+                                        </strong>
+                                        <span className="text-base text-multycolor font-medium xxl:text-base">
+                                            (Connected)
+                                        </span>
+                                    </div>
+                                    <CopyHelper account={icpLedger.accountId} />
+                                </div>
                             </div>
                             <h4 className="text-2xl 2xl:text-2xl font-medium mb-3">
                                 Estimated Balance
@@ -89,7 +116,7 @@ const AccountCards: React.FC = () => {
                                 </div>
                                 <div className="mb-3 xxl:mb-3">
                                     <h4 className="text-2xl 2xl:text-2xl font-medium mb-3 text-multygray">
-                                        ≈ $ 10
+                                        ≈ $ {icpLedger?.accountBalanceUSD}
                                     </h4>
                                 </div>
                             </div>

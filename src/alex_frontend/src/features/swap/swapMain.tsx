@@ -17,13 +17,16 @@ import getMaxLbryBurn from './thunks/getMaxLbryBurn';
 import getAlexMintRate from './thunks/tokenomics/getAlexMintRate';
 import StakeContent from './components/stake/stakeContent';
 import ReceiveContent from './components/receive/receiveContent';
+import RedeemContent from './components/redeem/redeemContent';
+import { Transaction } from '@irys/sdk/build/cjs/common/transactions';
+import TransactionHistory from './components/transactionHistory/transactionHistory';
 
 const SwapMain = () => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector(state => state.swap);
 
     const [activeTab, setActiveTab] = useState(1);
-   
+
     const tabs = [
         { id: 1, label: 'Balance', content: <BalanceContent /> },
         { id: 2, label: 'Swap', content: <SwapContent /> },
@@ -31,7 +34,8 @@ const SwapMain = () => {
         { id: 4, label: 'Receive', content: <ReceiveContent /> },
         { id: 5, label: 'Burn', content: <BurnContent /> },
         { id: 6, label: 'Stake', content: <StakeContent /> },
-        // { id: 7, label: 'Transaction history', content: < BalanceContent actorAlex={actorAlex} isAuthenticated={isAuthenticated} actorLbry={actorLbry} /> }
+        { id: 8, label: 'Reedem', content: <RedeemContent /> },
+        { id: 7, label: 'Transaction history', content: <TransactionHistory/> }
     ];
 
     useEffect(() => {

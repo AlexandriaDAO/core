@@ -93,7 +93,7 @@ const StakeContent = () => {
                                 <li>
                                     <div className='flex justify-between'>
                                         <strong className='text-lg text-radiocolor font-semibold me-1'>Stakers</strong>
-                                        <strong className='text-lg text-radiocolor font-semibold me-1'>823</strong>
+                                        <strong className='text-lg text-radiocolor font-semibold me-1'>{swap.totalStakers}</strong>
                                     </div>
                                 </li>
                             </ul>

@@ -1,0 +1,129 @@
+dfx deploy icp_swap --argument '(
+  opt record {
+    stakes = opt vec {
+      record {
+   principal "x6263-qvrr3-vy2lr-npncu-ib2jk-32uu6-sdzw2-orbfc-rpaui-4x2ss-tae";
+        record {
+          amount = 1_00000_000;  
+          time = 1698019200;   // Example timestamp
+          reward_icp = 50_0000;
+        }
+      };
+      record {
+   principal "udymm-hs52j-wcuud-mzcav-iottd-4qw6p-hq67m-pa47o-lwq3b-4u6wy-aqe";
+        record {
+          amount = 500_0000;
+          time = 1698019200;
+          reward_icp = 25_000;
+        }
+      };
+    };
+    archived_transaction_log = opt vec {
+      record {
+    principal "x6263-qvrr3-vy2lr-npncu-ib2jk-32uu6-sdzw2-orbfc-rpaui-4x2ss-tae";
+        record { icp = 100_00000 };
+      };
+      record {
+  principal "udymm-hs52j-wcuud-mzcav-iottd-4qw6p-hq67m-pa47o-lwq3b-4u6wy-aqe";
+        record { icp = 50_000000 };
+      };
+    };
+    total_unclaimed_icp_reward = opt 175_000;
+    lbry_ratio = opt record {
+      ratio = 100_000;      // Represents ratio with precision
+      time = 1698019200;
+    };
+    total_archived_balance = opt 150_000;
+    apy = opt vec {
+      record {
+        1;  // day 1
+        record {
+          values = vec {
+            record { 1; 500_000 };   // 5% APY
+            record { 2; 550_000 };   // 5.5% APY
+          }
+        }
+      };
+      record {
+        2;  // day 2
+        record {
+          values = vec {
+            record { 1; 510_000 };
+            record { 2; 560_000 };
+          }
+        }
+      };
+    };
+    distribution_intervals = opt 86_400;  // Daily interval in seconds
+  }
+)'
+
+
+dfx canister install icp_swap --mode reinstall  --argument '(
+  opt record {
+    stakes = opt vec {
+      record {
+   principal "x6263-qvrr3-vy2lr-npncu-ib2jk-32uu6-sdzw2-orbfc-rpaui-4x2ss-tae";
+        record {
+          amount = 1_00000_000;  
+          time = 1698019200;   // Example timestamp
+          reward_icp = 50_0000;
+        }
+      };
+      record {
+   principal "udymm-hs52j-wcuud-mzcav-iottd-4qw6p-hq67m-pa47o-lwq3b-4u6wy-aqe";
+        record {
+          amount = 500_0000;
+          time = 1698019200;
+          reward_icp = 25_000;
+        }
+      };
+    };
+    archived_transaction_log = opt vec {
+      record {
+    principal "x6263-qvrr3-vy2lr-npncu-ib2jk-32uu6-sdzw2-orbfc-rpaui-4x2ss-tae";
+        record { icp = 100_00000 };
+      };
+      record {
+  principal "udymm-hs52j-wcuud-mzcav-iottd-4qw6p-hq67m-pa47o-lwq3b-4u6wy-aqe";
+        record { icp = 50_000000 };
+      };
+    };
+    total_unclaimed_icp_reward = opt 175_000;
+    lbry_ratio = opt record {
+      ratio = 100_000;      // Represents ratio with precision
+      time = 1698019200;
+    };
+    total_archived_balance = opt 150_000;
+    apy = opt vec {
+      record {
+        1;  // day 1
+        record {
+          values = vec {
+            record { 1; 500_000 };   // 5% APY
+            record { 2; 550_000 };   // 5.5% APY
+          }
+        }
+      };
+      record {
+        2;  // day 2
+        record {
+          values = vec {
+            record { 1; 510_000 };
+            record { 2; 560_000 };
+          }
+        }
+      };
+    };
+    distribution_intervals = opt 86_400;  // Daily interval in seconds
+  }
+)' 
+
+
+dfx deploy icp_swap --argument '(
+  opt record {
+   
+    total_archived_balance = opt (5000 : nat64);
+   
+  }
+)'
