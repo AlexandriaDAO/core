@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
-import { setSearchState } from '../../redux/arweaveSlice';
+import { setSearchState } from '@/apps/LibModules/arweaveSearch/redux/arweaveSlice';
 
 const AmountSelector: React.FC = () => {
   const dispatch = useDispatch();

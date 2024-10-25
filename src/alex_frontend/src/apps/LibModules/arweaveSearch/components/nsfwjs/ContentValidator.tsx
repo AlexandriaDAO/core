@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setMintableState } from '../../redux/arweaveSlice';
 import { RootState } from '@/store';
-import ContentFetcher from '../Search/ContentFetcher';
+import ContentFetcher from '../../../../AppModules/search/ContentFetcher';
 import { loadModel, unloadModel, isModelLoaded, validateContent, PredictionResults } from './tensorflow';
 
 interface ContentValidatorProps {

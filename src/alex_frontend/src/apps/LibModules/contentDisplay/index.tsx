@@ -1,5 +1,5 @@
 import React from 'react';
-import ContentList from './ContentList';
+import ContentList from '../../AppModules/contentGrid/ContentList';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 

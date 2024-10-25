@@ -1,4 +1,4 @@
-import { Transaction } from "../../arweave/types/queries";
+import { Transaction } from "../../arweaveSearch/types/queries";
 
 export type ContentDataItem = {
   url: string | null;

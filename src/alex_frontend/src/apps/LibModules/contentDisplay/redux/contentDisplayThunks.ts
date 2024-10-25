@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setTransactions, addTransactions, clearTransactions } from './contentDisplaySlice';
-import { fetchTransactionsApi } from '../../arweave/api/arweaveApi';
-import { setMintableStates, MintableStateItem } from '../../arweave/redux/arweaveSlice';
+import { fetchTransactionsApi } from '../../arweaveSearch/api/arweaveApi';
+import { setMintableStates, MintableStateItem } from '../../arweaveSearch/redux/arweaveSlice';
 
 export const updateTransactions = createAsyncThunk(
   'contentDisplay/updateTransactions',

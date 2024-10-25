@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Transaction } from '../../arweave/types/queries';
+import { Transaction } from '../../arweaveSearch/types/queries';
 
 interface ContentDisplayState {
   transactions: Transaction[];

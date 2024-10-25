@@ -1,5 +1,5 @@
-import { Transaction } from "../../arweave/types/queries";
-import { getArweaveUrl } from "../../arweave/config/arweaveConfig";
+import { Transaction } from "../../arweaveSearch/types/queries";
+import { getArweaveUrl } from "../../arweaveSearch/config/arweaveConfig";
 
 export type CachedContent = {
   url: string | null;

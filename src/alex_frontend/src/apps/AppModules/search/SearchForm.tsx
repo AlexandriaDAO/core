@@ -1,11 +1,10 @@
 import React from "react";
-import { SearchFormProps } from "../../types/queries";
-import { useHandleSearch } from '../../hooks/useSearchHandlers';
-
+import { SearchFormProps } from '@/apps/LibModules/arweaveSearch/types/queries';
+import { useHandleSearch } from '@/apps/LibModules/arweaveSearch/hooks/useSearchHandlers';
 
 import AmountSelector from './AmountSelector';
 import ContentCategorySelector from './ContentCategorySelector';
-import NsfwModelControl from '../nsfwjs/NsfwModelControl';
+import NsfwModelControl from '@/apps/LibModules/arweaveSearch/components/nsfwjs/NsfwModelControl';
 import DateSelector from './DateSelector';
 import ArweaveOwnerSelector from './ArweaveOwnerSelector';
 import ContentTagsSelector from './ContentTagsSelector';

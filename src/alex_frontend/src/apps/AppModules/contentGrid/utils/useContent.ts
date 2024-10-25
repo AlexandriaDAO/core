@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Transaction } from "../arweave/types/queries";
+import { Transaction } from "../../../LibModules/arweaveSearch/types/queries";
 import { RootState } from "@/store";
-import { setMintableStates, setMintableState, MintableStateItem } from "../arweave/redux/arweaveSlice";
-import { loadModel, isModelLoaded } from '../arweave/components/nsfwjs/tensorflow';
-import { setNsfwModelLoaded } from "../arweave/redux/arweaveSlice";
-import { fileTypeCategories } from '../arweave/types/files';
-import { contentCache, CachedContent } from './services/contentCacheService';
+import { setMintableStates, setMintableState, MintableStateItem } from "../../../LibModules/arweaveSearch/redux/arweaveSlice";
+import { loadModel, isModelLoaded } from '../../../LibModules/arweaveSearch/components/nsfwjs/tensorflow';
+import { setNsfwModelLoaded } from "../../../LibModules/arweaveSearch/redux/arweaveSlice";
+import { fileTypeCategories } from '../../../LibModules/arweaveSearch/types/files';
+import { contentCache, CachedContent } from '../../../LibModules/contentDisplay/services/contentCacheService';
 
 export function useContent(transactions: Transaction[]) {
   const dispatch = useDispatch();

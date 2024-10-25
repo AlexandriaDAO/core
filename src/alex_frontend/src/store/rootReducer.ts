@@ -22,9 +22,9 @@ import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
 import alexReducer from "@/features/swap/alexSlice";
 
-import contentDisplayReducer from "@/apps/AppModules/contentDisplay/redux/contentDisplaySlice";
-import arweaveReducer from "@/apps/AppModules/arweave/redux/arweaveSlice";
-import libraryReducer from "@/apps/AppModules/library/redux/librarySlice";
+import contentDisplayReducer from "@/apps/LibModules/contentDisplay/redux/contentDisplaySlice";
+import arweaveReducer from "@/apps/LibModules/arweaveSearch/redux/arweaveSlice";
+import libraryReducer from "@/apps/LibModules/nftSearch/redux/librarySlice";
 
 const rootReducer = combineReducers({
 	home: homeReducer,

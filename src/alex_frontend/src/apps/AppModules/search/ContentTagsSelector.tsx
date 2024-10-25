@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
-import { supportedFileTypes, fileTypeCategories } from '../../types/files';
-import { setSearchState } from '../../redux/arweaveSlice';
+import { supportedFileTypes, fileTypeCategories } from '@/apps/LibModules/arweaveSearch/types/files';
+import { setSearchState } from '@/apps/LibModules/arweaveSearch/redux/arweaveSlice';
 
 const ContentTagsSelector: React.FC = () => {
   const dispatch = useDispatch();

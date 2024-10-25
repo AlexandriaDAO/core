@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
-import { fileTypeCategories } from '../../types/files';
-import { setSearchState } from '../../redux/arweaveSlice';
+import { fileTypeCategories } from '@/apps/LibModules/arweaveSearch/types/files';
+import { setSearchState } from '@/apps/LibModules/arweaveSearch/redux/arweaveSlice';
 
 const ContentCategorySelector: React.FC = () => {
   const dispatch = useDispatch();

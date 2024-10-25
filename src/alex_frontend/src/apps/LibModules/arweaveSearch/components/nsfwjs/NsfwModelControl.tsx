@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { setNsfwModelLoaded } from '../../redux/arweaveSlice';
-import { loadModel, unloadModel, isModelLoaded } from '@/apps/AppModules/arweave/components/nsfwjs/tensorflow';
+import { loadModel, unloadModel, isModelLoaded } from '@/apps/LibModules/arweaveSearch/components/nsfwjs/tensorflow';
 
 const NsfwModelControl: React.FC = () => {
   const dispatch = useDispatch();

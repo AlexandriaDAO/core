@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
 import { performSearch } from './redux/arweaveThunks';
-import SearchForm from './components/Search/SearchForm';
+import SearchForm from '@/apps/AppModules/search/SearchForm';
 
 const ArweaveFeature: React.FC = () => {
 	const dispatch = useDispatch<AppDispatch>();
