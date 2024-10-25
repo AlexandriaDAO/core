@@ -8,6 +8,7 @@ import getStakeInfo from "../../thunks/getStakedInfo";
 import ClaimReward from "./claimReward";
 import Unstake from "./unstake";
 import getALlStakesInfo from "../../thunks/getAllStakesInfo";
+import getStakersCount from "../../thunks/getStakersCount";
 
 const StakedInfo = () => {
     const dispatch = useAppDispatch();
@@ -16,12 +17,15 @@ const StakedInfo = () => {
 
     useEffect(() => {
         dispatch(getStakeInfo(user))
+        dispatch(getStakersCount())
         dispatch(getALlStakesInfo())
     }, [user])
     useEffect(() => {
         if (swap.successStake === true || swap.unstakeSuccess === true || swap.successClaimReward === true) {
             dispatch( getStakeInfo(user))
             dispatch(getALlStakesInfo())
+            dispatch(getStakersCount())
+
         }
     }, [swap])
     return (

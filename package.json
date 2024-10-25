@@ -38,6 +38,7 @@
     "@tensorflow/tfjs": "^4.21.0",
     "antd": "^5.20.5",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.7.7",
     "azle": "^0.24.2-rc.46",
     "browserify-zlib": "^0.2.0",
     "class-variance-authority": "^0.7.0",

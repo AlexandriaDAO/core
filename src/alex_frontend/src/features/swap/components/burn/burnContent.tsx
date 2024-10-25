@@ -14,13 +14,13 @@ import burnLbry from "../../thunks/burnLBRY";
 import { ImSpinner8 } from "react-icons/im";
 import Auth from "@/features/auth";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
+import { lbry_fee } from "@/utils/utils";
 
 const BurnContent = () => {
     const dispatch = useAppDispatch();
     const {user} = useAppSelector((state) => state.auth);
     const swap = useAppSelector((state) => state.swap);
     const tokenomics = useAppSelector((state) => state.tokenomics);
-    const lbryFee = 0.001;
 
     const [amountLBRY, setAmountLBRY] = useState(0);
     const [tentativeICP, setTentativeICP] = useState(Number);
@@ -28,7 +28,7 @@ const BurnContent = () => {
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        dispatch(burnLbry(amountLBRY))
+        dispatch(burnLbry(amountLBRY));
     }
     const handleAmountLBRYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -39,7 +39,7 @@ const BurnContent = () => {
         setTentativeALEX(Number(e.target.value) * Number(tokenomics.alexMintRate));
     }
     const handleMaxLbry = () => {
-        const userBal = Math.max(0, Number(swap.lbryBalance) - lbryFee); // Ensure non-negative user balance
+        const userBal = Math.floor(Math.max(0, Number(swap.lbryBalance) - lbry_fee)); // Ensure non-negative user balance
         const lbryRatio = Number(swap.lbryRatio);
         const alexMintRate = Number(tokenomics.alexMintRate);
 
@@ -149,7 +149,7 @@ const BurnContent = () => {
                                 </li>
                                 <li className='flex justify-between'>
                                     <strong className='text-lg font-medium me-1 text-black'>Network Fees</strong>
-                                    <span className='text-lg font-medium text-black'><span className=' text-multycolor'>{lbryFee}</span> LBRY</span>
+                                    <span className='text-lg font-medium text-black'><span className=' text-multycolor'>{lbry_fee}</span> LBRY</span>
                                 </li>
                             </ul>
                         </div>

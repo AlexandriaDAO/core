@@ -1,21 +1,21 @@
-use crate::get_principal;
 use crate::guard::*;
 use crate::storage::*;
+use crate::update_log;
 use crate::ALEX_CANISTER_ID;
-use crate::LIBRARIAN;
 use crate::MAX_ALEX;
-use crate::USER;
+use crate::{
+    add_to_total_LBRY_burned, fetch_total_minted_ALEX, get_current_threshold_index, get_principal,
+    get_total_LBRY_burn, get_two_random_users, update_to_current_threshold,
+};
 use candid::Principal;
-use std::cell::RefCell;
 use icrc_ledger_types::icrc1::transfer::{BlockIndex, TransferArg, TransferError};
-
 
 #[ic_cdk::update(guard = "is_allowed")]
 pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<String, String> {
+    let random_users: (Principal, Principal);
     let mut minted_alex: u64 = 0;
     let mut phase_mint_alex: u64 = 0;
-    let mut total_burned_lbry: u64 =
-        TOTAL_LBRY_BURNED.with(|lbry: &RefCell<u64>| lbry.borrow().clone());
+    let mut total_burned_lbry: u64 = get_total_LBRY_burn();
 
     if total_burned_lbry
         .checked_add(lbry_burn)
@@ -25,25 +25,23 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
         return Err("Max ALEX reached,minting stopped !".to_string());
     }
 
-    let mut current_threshold: u32 = CURRENT_THRESHOLD
-        .with(|current_threshold: &RefCell<u32>| current_threshold.borrow().clone());
-
+    let mut current_threshold_index: u32 = get_current_threshold_index();
     let tentative_total: u64 = total_burned_lbry
         .checked_add(lbry_burn)
         .ok_or("Arithmetic overflow occurred in tentative_total")?;
 
-    if tentative_total > LBRY_THRESHOLDS[current_threshold as usize] {
+    if tentative_total > LBRY_THRESHOLDS[current_threshold_index as usize] {
         let mut lbry_processed: u64 = 0;
 
-        while tentative_total > LBRY_THRESHOLDS[current_threshold as usize] {
+        while tentative_total > LBRY_THRESHOLDS[current_threshold_index as usize] {
             let mut lbry_mint_alex_with_current_threshold: u64 =
-                LBRY_THRESHOLDS[current_threshold as usize];
+                LBRY_THRESHOLDS[current_threshold_index as usize];
 
             lbry_mint_alex_with_current_threshold = lbry_mint_alex_with_current_threshold
                 .checked_sub(total_burned_lbry)
                 .ok_or("Arithmetic underflow occurred in lbry_mint_alex_with_current_threshold")?;
 
-            let mut slot_mint = ALEX_PER_THRESHOLD[current_threshold as usize]
+            let mut slot_mint = ALEX_PER_THRESHOLD[current_threshold_index as usize]
                 .checked_mul(lbry_mint_alex_with_current_threshold)
                 .ok_or("Arithmetic overflow occurred in slot_mint.")?;
 
@@ -61,9 +59,9 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
                 .checked_add(lbry_mint_alex_with_current_threshold)
                 .ok_or("Arithmetic overflow occurred in total_burned_lbry")?;
 
-            current_threshold += 1;
-            if current_threshold > (LBRY_THRESHOLDS.len() as u32) - 1 {
-                current_threshold = (LBRY_THRESHOLDS.len() as u32) - 1;
+            current_threshold_index += 1;
+            if current_threshold_index > (LBRY_THRESHOLDS.len() as u32) - 1 {
+                current_threshold_index = (LBRY_THRESHOLDS.len() as u32) - 1;
             }
         }
 
@@ -72,7 +70,7 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
                 .checked_sub(lbry_processed)
                 .ok_or("Arithmetic underflow occurred in lbry_burn")?;
 
-            let mut slot_mint = ALEX_PER_THRESHOLD[current_threshold as usize]
+            let mut slot_mint = ALEX_PER_THRESHOLD[current_threshold_index as usize]
                 .checked_mul(lbry_mint_alex_with_current_threshold)
                 .ok_or("Arithmetic overflow occurred in slot_mint.")?;
 
@@ -89,7 +87,7 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
                 .ok_or("Arithmetic overflow occurred in lbry_processed")?;
         }
     } else {
-        phase_mint_alex = ALEX_PER_THRESHOLD[current_threshold as usize]
+        phase_mint_alex = ALEX_PER_THRESHOLD[current_threshold_index as usize]
             .checked_mul(lbry_burn)
             .ok_or("Arithmetic overflow occurred in phase_mint_alex")?;
         phase_mint_alex = phase_mint_alex
@@ -97,7 +95,7 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
             .ok_or("Arithmetic overflow occurred in phase_mint_alex.")?;
     }
 
-    let total_alex_minted = TOTAL_ALEX_MINTED.with(|total| total.borrow().clone());
+    let total_alex_minted = fetch_total_minted_ALEX().await?;
     let remaining_alex = MAX_ALEX
         .checked_sub(total_alex_minted)
         .ok_or("Arithmetic underflow occurred when calculating remaining ALEX")?;
@@ -114,7 +112,16 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
     let alex_per_recipient = alex_to_mint
         .checked_div(3)
         .ok_or("Arithmetic error occurred when calculating alex_per_recipient")?;
-
+    let fetched_random_principals = get_two_random_users().await;
+    match fetched_random_principals {
+        Ok((address1, address2)) => {
+            random_users = (address1, address2);
+            ic_cdk::println!("Address1 :{} Address2 :{}", address1, address2);
+        }
+        Err(_) => {
+            return Err("Filed to fetch random users".to_string());
+        }
+    }
     //Minting
     match mint_ALEX_internal(alex_per_recipient, actual_caller).await {
         Ok(_) => {
@@ -129,48 +136,34 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
         }
     } //mint to caller
 
-    match mint_ALEX_internal(alex_per_recipient,get_principal(LIBRARIAN),).await
-    {
-        Ok(_) => {
-            minted_alex = minted_alex
-                .checked_add(alex_per_recipient)
-                .ok_or("Arithmetic overflow occurred in minted_alex")?;
-            ic_cdk::println!("Successful mint to librarian");
-        }
-        Err(_) => ic_cdk::println!("Something went wrong, while minting to librarian."),
-    } //mint 1 unit to librarian
-
-    match mint_ALEX_internal(alex_per_recipient,get_principal(USER),).await
-    {
+    match mint_ALEX_internal(alex_per_recipient, random_users.0).await {
         Ok(_) => {
             minted_alex = minted_alex
                 .checked_add(alex_per_recipient)
                 .ok_or("Arithmetic overflow occurred in minted_alex")?;
             ic_cdk::println!("Successful mint to user");
         }
-        Err(_) => ic_cdk::println!("Something went wrong, while minting to user."),
-    } //mint 1 unit to user
+        Err(_) => update_log(&format!(
+            "Something went wrong while minting to random user 1. Pubkey: {}",
+            random_users.1
+        )), //mint 1 unit to random user 1
+    }
+    match mint_ALEX_internal(alex_per_recipient, random_users.1).await {
+        Ok(_) => {
+            minted_alex = minted_alex
+                .checked_add(alex_per_recipient)
+                .ok_or("Arithmetic overflow occurred in minted_alex")?;
+            ic_cdk::println!("Successful mint to user");
+        }
+        Err(_) => update_log(&format!(
+            "Something went wrong while minting to random user 2. Pubkey: {}",
+            random_users.1
+        )), //mint 1 unit to random user 2
+    }
 
-    TOTAL_ALEX_MINTED.with(|mint| -> Result<(), String> {
-        let mut mint = mint.borrow_mut();
-        *mint = mint
-            .checked_add(minted_alex)
-            .ok_or("Arithmetic overflow occurred in TOTAL_ALEX_MINTED")?;
-        Ok(())
-    })?;
+    update_to_current_threshold(current_threshold_index)?;
 
-    CURRENT_THRESHOLD.with(|threshold| {
-        let mut threshold = threshold.borrow_mut();
-        *threshold = current_threshold;
-    });
-
-    TOTAL_LBRY_BURNED.with(|total_burned: &RefCell<u64>| -> Result<(), String> {
-        let mut total_burned = total_burned.borrow_mut();
-        *total_burned = total_burned
-            .checked_add(lbry_burn)
-            .ok_or("Arithmetic underflow occurred in TOTAL_LBRY_BURNED")?;
-        Ok(())
-    })?;
+    add_to_total_LBRY_burned(lbry_burn)?;
 
     Ok("Minted ALEX ".to_string() + &minted_alex.to_string())
 }

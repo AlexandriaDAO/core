@@ -21,7 +21,7 @@ const LbryBalanceCard = () => {
                 </div>
                 <span className='text-base text-lightgray font-medium mb-1'>Balance</span>
                 <h4 className='text-2xl font-medium mb-1 text-white'>{icpSwap.lbryBalance}</h4>
-                <span className='text-base text-lightgray font-medium'>= $10</span>
+                {/* <span className='text-base text-lightgray font-medium'>= $10</span> */}
             </div>
         </div>
     </>)

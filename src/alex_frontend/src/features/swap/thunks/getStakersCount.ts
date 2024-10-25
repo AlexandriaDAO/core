@@ -4,24 +4,17 @@ import { getActorSwap } from "@/features/auth/utils/authUtils";
 
 
 // Define the async thunk
-const getALlStakesInfo = createAsyncThunk<
+const getStakersCount = createAsyncThunk<
   string,
   void,
   { rejectValue: string }
->("icp_swap/getALlStakesInfo", async (_, { rejectWithValue }) => {
+>("icp_swap/getTotalStakerCount", async (_, { rejectWithValue }) => {
   try {
     const actor = await getActorSwap();
-    const LedgerServices = LedgerService();
-
-    const result = await actor.get_total_alex_staked();
-    if ("Ok" in result) {
-      return LedgerServices.e8sToIcp(result.Ok).toFixed(4)
-    }
-
-    if ("Err" in result) {
-      throw new Error(result.Err);
-    }
-    ;
+   
+    const result = await actor.get_stakers_count();
+    
+    return result.toString();
   } catch (error) {
     if (error instanceof Error) {
       return rejectWithValue(error.message);
@@ -32,4 +25,7 @@ const getALlStakesInfo = createAsyncThunk<
   );
 });
 
-export default getALlStakesInfo;
+export default getStakersCount;
+
+
+// -Limit on icp price, Lbry should be not be minted less than 500.
