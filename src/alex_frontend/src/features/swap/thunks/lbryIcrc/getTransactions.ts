@@ -92,7 +92,7 @@ const getLBRYTransactions = createAsyncThunk<
           Array.isArray(transaction.transfer?.[0]?.fee) &&
           transaction.transfer[0].fee.length > 0
         ) {
-          feeAmount = transaction.transfer[0].fee[0];
+          feeAmount = transaction.transfer[0].fee[0] ?? 0n;
         }
 
         const formattedFee = LedgerServices.e8sToIcp(feeAmount).toString();
@@ -313,3 +313,4 @@ export default getLBRYTransactions;
 // );
 
 // export default getLBRYTransactions;
+
