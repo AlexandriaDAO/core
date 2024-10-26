@@ -61,7 +61,7 @@ function Librarian() {
 						</span>
 						<Button
 							variant={"link"}
-							size={"sm"}
+							scale={"sm"}
 							onClick={handleViewProfileClick}>
 							View Profile
 						</Button>
@@ -79,7 +79,7 @@ function Librarian() {
 						</span>
 						<Button
 							variant={"link"}
-							size={"sm"}
+							scale={"sm"}
 							onClick={() => navigate('/librarian')}>
 							<span>Become Librarian</span>
 						</Button>

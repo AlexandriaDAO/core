@@ -10,8 +10,8 @@ const labelVariants = cva(
     variants: {
       variant: {
         default: "text-primary",
-        error: "text-destructive",
-        success: "text-constructive",
+        destructive: "text-destructive",
+        constructive: "text-constructive",
         info: "text-info"
       },
       scale: {
@@ -23,7 +23,7 @@ const labelVariants = cva(
     },
     defaultVariants: {
       variant: "default",
-      scale: "default",
+      scale: "lg",
     },
   }
 )

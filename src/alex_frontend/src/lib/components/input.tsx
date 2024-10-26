@@ -18,13 +18,13 @@ const inputVariants = cva(
           // "focus-visible:ring-offset-background",
           "placeholder:text-muted-foreground",
         ],
-        error: [
+        destructive: [
           "border-destructive",
           "focus-visible:ring-destructive",
           "focus-visible:ring-offset-background",
           "placeholder:text-destructive/60",
         ],
-        success: [
+        constructive: [
           "border-constructive",
           "focus-visible:ring-constructive",
           "focus-visible:ring-offset-constructive/20",
@@ -56,15 +56,15 @@ const inputVariants = cva(
       rounded: {
         none: "rounded-none",
         default: "rounded",
-        small: "rounded-sm",
-        medium: "rounded-md",
-        large: "rounded-lg",
+        sm: "rounded-sm",
+        md: "rounded-md",
+        lg: "rounded-lg",
         full: "rounded-full",
       },
     },
     defaultVariants: {
       variant: "default",
-      scale: "default",
+      scale: "lg",
       rounded: 'default'
     },
   }

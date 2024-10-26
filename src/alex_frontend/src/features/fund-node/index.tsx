@@ -120,7 +120,7 @@ const FundNode = () => {
 								/>
 								<span className="absolute right-3 font-bold">ETH</span>
 							</div>
-							<Button onClick={fund} size="sm" disabled={fundLoading} variant="inverted">
+							<Button onClick={fund} scale="sm" disabled={fundLoading} variant="inverted">
 								{fundLoading ? <span className="flex gap-1 items-center">
 									Processing <ImSpinner8 size={14} className="animate animate-spin" />
 								</span> : "Deposit" }
