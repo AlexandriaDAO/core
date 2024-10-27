@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect } from "react";
 import Header from "@/components/Header";
-import { Toaster } from "@/lib/components/toaster";
+import { Toaster } from "@/lib/components/sonner";
 // Define the type for the component's props
 interface MainLayoutProps {
 	children: ReactNode;
