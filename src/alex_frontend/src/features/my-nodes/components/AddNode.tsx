@@ -17,8 +17,10 @@ import { CiCircleCheck } from "react-icons/ci";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import { getAuthClient } from "@/features/auth/utils/authUtils";
 import { Button } from "@/lib/components/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
 import { BiPlus } from "react-icons/bi";
+import { Label } from "@/lib/components/label";
+import { Input } from "@/lib/components/input";
 
 // const ethPrivateKeyRegex = /^[a-fA-F0-9]{64}$/;
 // const ethPublicKeyRegex = /^0x[a-fA-F0-9]{128}$/;
@@ -69,6 +71,9 @@ const AddNode = () => {
 	// 	if(!addNodeModal && (newNode || newNodeError)) resetNewNode()
 	// }, [addNodeModal]);
 
+	if (newNode) return <SuccessDialog />
+	if (newNodeError) return <ErrorDialog error={newNodeError} />
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -76,123 +81,137 @@ const AddNode = () => {
 					<span>Create A Node</span>
 				</Button>
 			</DialogTrigger>
+			<DialogContent className="sm:max-w-[600px]" onOpenAutoFocus={(e) => e.preventDefault()}>
+				<DialogHeader>
+					<DialogTitle>Add Node</DialogTitle>
+					<DialogDescription>Add your Node, It can be a private key of your ethereum wallet.</DialogDescription>
+				</DialogHeader>
+				<form
+					onSubmit={formik.handleSubmit}
+					className="flex flex-col gap-2 "
+				>
+					<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+						<Label htmlFor="pvt_key" variant={(formik.touched.pvt_key && formik.errors.pvt_key ? "destructive" : "default" ) }>
+							Private Key
+						</Label>
+						<Input
+							variant={(formik.touched.pvt_key ? formik.errors.pvt_key ? "destructive" : "constructive" : 'default' ) }
+							id="pvt_key"
+							name="pvt_key"
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							value={formik.values.pvt_key}
+						/>
+						{formik.touched.pvt_key &&
+							formik.errors.pvt_key && (
+								<span className="text-red-400 text-sm">
+									{formik.errors.pvt_key}
+								</span>
+							)}
+					</div>
 
-			{newNode ? (
-				<DialogContent className="sm:max-w-[425px]">
-					<DialogHeader>
-						<DialogTitle>
-							<div className="flex gap-1 justify-start items-center">
-								<CiCircleCheck
-									size={24}
-									className="text-green-400"
-								/>
-								<span>Node Added</span>
-							</div>
-						</DialogTitle>
-						<DialogDescription>Node has been stored successfully.</DialogDescription>
-					</DialogHeader>
-				</DialogContent>
-			) : newNodeError ? (
-				<DialogContent className="sm:max-w-[425px]">
-					<DialogHeader>
-						<DialogTitle>
-							<div className="flex gap-1 justify-start items-center">
-								<AiOutlineCloseCircle
-									size={24}
-									className="text-red-400"
-								/>
-								<span>Node Error</span>
-							</div>
-						</DialogTitle>
-						<DialogDescription>Error Occurred! {newNodeError}</DialogDescription>
-					</DialogHeader>
-				</DialogContent>
-			) : (
-				<DialogContent className="sm:max-w-[600px]" onOpenAutoFocus={(e) => e.preventDefault()}>
-					<DialogHeader>
-						<DialogTitle>Add Node</DialogTitle>
-						<DialogDescription>Add your Node, It can be a private key of your ethereum wallet.</DialogDescription>
-					</DialogHeader>
-					<form
-						onSubmit={formik.handleSubmit}
-						className="flex flex-col gap-2 "
-					>
-						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-							<label className="text-lg" htmlFor="pvt_key">
-								Private Key
-							</label>
-							<input
-								className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
-									formik.touched.pvt_key &&
-									formik.errors.pvt_key
-										? "border-red-500"
-										: ""
-								}`}
-								id="pvt_key"
-								name="pvt_key"
-								type="text"
-								onChange={formik.handleChange}
-								onBlur={formik.handleBlur}
-								value={formik.values.pvt_key}
-							/>
-							{formik.touched.pvt_key &&
-								formik.errors.pvt_key && (
-									<span className="text-red-400 text-sm">
-										{formik.errors.pvt_key}
-									</span>
-								)}
-						</div>
-
-						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-							<label className="text-lg" htmlFor="status">
-								Status
-							</label>
-							<select
-								className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
-									formik.touched.status &&
-									formik.errors.status
-										? "border-red-500"
-										: ""
-								}`}
-								name="status"
-								id="status"
-								onChange={formik.handleChange}
-								onBlur={formik.handleBlur}
-								value={formik.values.status}
-							>
-								<option value="0">InActive</option>
-								<option value="1">Active</option>
-							</select>
-							{formik.touched.status &&
-								formik.errors.status && (
-									<span className="text-red-400 text-sm">
-										{formik.errors.status}
-									</span>
-								)}
-						</div>
-						<div className="flex justify-center items-center my-4">
-							<DialogFooter>
-								{newNodeLoading ? (
-									<Button type="button" disabled rounded={"full"}>
-										<ImSpinner8
-											size={18}
-											className="animate animate-spin"
-										/>
-										<span>Saving Node</span>
-									</Button>
-								) : (
-									<Button type="submit" rounded={"full"}>
-										<LiaSaveSolid size={18} />
-										<span>Save Node</span>
-									</Button>
-								)}
-							</DialogFooter>
-						</div>
-					</form>
-				</DialogContent>
-			)}
+					<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+						<Label htmlFor="status" variant={(formik.touched.status && formik.errors.status ? "destructive" : "default" ) }>
+							Status
+						</Label>
+						<select
+							className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
+								formik.touched.status &&
+								formik.errors.status
+									? "border-red-500"
+									: ""
+							}`}
+							name="status"
+							id="status"
+							onChange={formik.handleChange}
+							onBlur={formik.handleBlur}
+							value={formik.values.status}
+						>
+							<option value="0">InActive</option>
+							<option value="1">Active</option>
+						</select>
+						{formik.touched.status &&
+							formik.errors.status && (
+								<span className="text-red-400 text-sm">
+									{formik.errors.status}
+								</span>
+							)}
+					</div>
+					<div className="flex justify-center items-center my-4">
+						<DialogFooter>
+							{newNodeLoading ? (
+								<Button type="button" disabled rounded={"full"}>
+									<ImSpinner8
+										size={18}
+										className="animate animate-spin"
+									/>
+									<span>Saving Node</span>
+								</Button>
+							) : (
+								<Button type="submit" rounded={"full"}>
+									<LiaSaveSolid size={18} />
+									<span>Save Node</span>
+								</Button>
+							)}
+						</DialogFooter>
+					</div>
+				</form>
+			</DialogContent>
 		</Dialog>
 	);
 };
+
+
+const SuccessDialog = () => (
+	<Dialog>
+		<DialogTrigger asChild>
+			<Button variant="info">
+				<span>Node Created</span>
+			</Button>
+		</DialogTrigger>
+		<DialogContent closeIcon={null} className="sm:max-w-[425px]">
+			<DialogHeader>
+				<DialogTitle>
+					<div className="flex gap-1 justify-start items-center">
+						<CiCircleCheck size={24} className="text-green-400" />
+						<span>Node Added</span>
+					</div>
+				</DialogTitle>
+				<DialogDescription>Node has been stored successfully.</DialogDescription>
+			</DialogHeader>
+			<DialogFooter className="sm:justify-start">
+				<DialogClose asChild>
+					<Button type="button" variant="outline">Close</Button>
+				</DialogClose>
+			</DialogFooter>
+		</DialogContent>
+	</Dialog>
+);
+
+const ErrorDialog = ({ error }: { error: string }) => (
+	<Dialog>
+		<DialogTrigger asChild>
+			<Button variant="destructive">
+				<span>Node Error</span>
+			</Button>
+		</DialogTrigger>
+		<DialogContent closeIcon={null} className="sm:max-w-[425px]">
+			<DialogHeader>
+				<DialogTitle>
+					<div className="flex gap-1 justify-start items-center">
+						<AiOutlineCloseCircle size={24} className="text-red-400" />
+						<span>Node Error</span>
+					</div>
+				</DialogTitle>
+				<DialogDescription>Error Occurred! {error}</DialogDescription>
+			</DialogHeader>
+			<DialogFooter className="sm:justify-start">
+				<DialogClose asChild>
+					<Button type="button" variant="outline">Close</Button>
+				</DialogClose>
+			</DialogFooter>
+		</DialogContent>
+	</Dialog>
+);
 
 export default AddNode;

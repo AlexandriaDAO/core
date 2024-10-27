@@ -1,5 +1,6 @@
 import DDC from '@/data/categories';
 import eras from '@/data/eras';
+import { Label } from '@/lib/components/label';
 import React, { useState, useEffect } from 'react';
 
 interface CategorySelectProps {
@@ -95,7 +96,13 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
   return (
     <>
       <div className="flex flex-col gap-1 w-full justify-between items-start">
-        <label htmlFor='type'>Type</label>
+        <Label
+          htmlFor="type"
+          scale="md"
+          variant={(isSubmitAttempted && selectedMainCategory<0 ? "destructive" : "default" ) }
+        >
+          Type
+        </Label>
         <select
           onChange={handleMainCategoryChange}
           value={selectedMainCategory}
@@ -113,7 +120,12 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
 
       {selectedMainCategory >= 0 && (
         <div>
-          <label style={{ display: 'block', marginBottom: '10px' }}>Subtypes (Select exactly 3)</label>
+          <Label
+            scale="md"
+            variant={(isSubmitAttempted && selectedSubcategories.length<0 ? "destructive" : "default" ) }
+          >
+            Subtypes (Select exactly 3)
+          </Label>
           {Object.entries(DDC[selectedMainCategory]?.category || {}).map(([key, value]) => (
             <div key={key} style={{ marginBottom: '5px' }}>
               <input
@@ -142,7 +154,13 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
       </div>)}
 
       <div className="flex flex-col gap-1 w-full justify-between items-start">
-        <label htmlFor="era">Historical Era</label>
+        <Label
+          htmlFor="era"
+          scale="md"
+          variant={(isSubmitAttempted && errors.era ? "destructive" : "default" ) }
+        >
+          Historical Era
+        </Label>
         <select
           id="era"
           value={metadata.era || ''}
@@ -156,7 +174,7 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
             </option>
           ))}
         </select>
-        {errors.era && <p style={{ color: 'red' }}>{errors.era}</p>}
+        {isSubmitAttempted && errors.era && <p style={{ color: 'red' }}>{errors.era}</p>}
       </div>
 
     </>
