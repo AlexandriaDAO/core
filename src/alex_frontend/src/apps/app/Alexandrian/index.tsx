@@ -1,7 +1,7 @@
 import React from "react";
 import MainLayout from "@/layouts/MainLayout";
-import Library from "@/apps/LibModules/nftSearch";
-import ContentDisplay from "@/apps/LibModules/contentDisplay";
+import Library from "@/apps/Modules/LibModules/nftSearch";
+import ContentDisplay from "@/apps/Modules/AppModules/contentGrid";
 
 function Alexandrian() {
 

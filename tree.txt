@@ -1,0 +1,1621 @@
+├── .azle/
+│   └── alex_wallet/
+│       ├── alex_wallet.wasm
+│       └── main.js
+├── .cursorignore
+├── .mops/
+│   ├── _github/
+│   │   ├── array#v0.2.1/
+│   │   │   ├── Makefile
+│   │   │   ├── src/
+│   │   │   │   ├── Array.mo
+│   │   │   │   └── Copy.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Array.mo
+│   │   │   │   └── Copy.mo
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   ├── base-0.7.3#moc-0.7.3@aafcdee0c8328087aeed506e64aa2ff4ed329b47/
+│   │   │   ├── NOTICE
+│   │   │   ├── doc/
+│   │   │   │   ├── antora.yml
+│   │   │   │   ├── design.md
+│   │   │   │   ├── make_docs.sh
+│   │   │   │   ├── module_graph.py
+│   │   │   │   ├── module_nav.py
+│   │   │   │   ├── modules/
+│   │   │   │   │   └── base-libraries/
+│   │   │   │   │       └── pages/
+│   │   │   ├── src/
+│   │   │   │   ├── Array.mo
+│   │   │   │   ├── AssocList.mo
+│   │   │   │   ├── Blob.mo
+│   │   │   │   ├── Bool.mo
+│   │   │   │   ├── Buffer.mo
+│   │   │   │   ├── CertifiedData.mo
+│   │   │   │   ├── Char.mo
+│   │   │   │   ├── Debug.mo
+│   │   │   │   ├── Deque.mo
+│   │   │   │   ├── Error.mo
+│   │   │   │   ├── ExperimentalCycles.mo
+│   │   │   │   ├── ExperimentalInternetComputer.mo
+│   │   │   │   ├── ExperimentalStableMemory.mo
+│   │   │   │   ├── Float.mo
+│   │   │   │   ├── Func.mo
+│   │   │   │   ├── Hash.mo
+│   │   │   │   ├── HashMap.mo
+│   │   │   │   ├── Heap.mo
+│   │   │   │   ├── Int.mo
+│   │   │   │   ├── Int16.mo
+│   │   │   │   ├── Int32.mo
+│   │   │   │   ├── Int64.mo
+│   │   │   │   ├── Int8.mo
+│   │   │   │   ├── Iter.mo
+│   │   │   │   ├── IterType.mo
+│   │   │   │   ├── List.mo
+│   │   │   │   ├── Nat.mo
+│   │   │   │   ├── Nat16.mo
+│   │   │   │   ├── Nat32.mo
+│   │   │   │   ├── Nat64.mo
+│   │   │   │   ├── Nat8.mo
+│   │   │   │   ├── None.mo
+│   │   │   │   ├── Option.mo
+│   │   │   │   ├── Order.mo
+│   │   │   │   ├── Prelude.mo
+│   │   │   │   ├── Principal.mo
+│   │   │   │   ├── RBTree.mo
+│   │   │   │   ├── Random.mo
+│   │   │   │   ├── Result.mo
+│   │   │   │   ├── Stack.mo
+│   │   │   │   ├── Text.mo
+│   │   │   │   ├── Time.mo
+│   │   │   │   ├── Trie.mo
+│   │   │   │   ├── TrieMap.mo
+│   │   │   │   └── TrieSet.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Makefile
+│   │   │   │   ├── RBTreeTest.mo
+│   │   │   │   ├── TrieExampleTest.mo
+│   │   │   │   ├── arrayTest.mo
+│   │   │   │   ├── bufTest.mo
+│   │   │   │   ├── charTest.mo
+│   │   │   │   ├── dequeTest.mo
+│   │   │   │   ├── floatTest.mo
+│   │   │   │   ├── funcTest.mo
+│   │   │   │   ├── hashMapTest.mo
+│   │   │   │   ├── heapTest.mo
+│   │   │   │   ├── int8Test.mo
+│   │   │   │   ├── intTest.mo
+│   │   │   │   ├── iterTest.mo
+│   │   │   │   ├── listTest.mo
+│   │   │   │   ├── natTest.mo
+│   │   │   │   ├── noneTest.mo
+│   │   │   │   ├── optionTest.mo
+│   │   │   │   ├── orderTest.mo
+│   │   │   │   ├── resultTest.mo
+│   │   │   │   ├── stackTest.mo
+│   │   │   │   ├── textTest.mo
+│   │   │   │   ├── trieMapTest.mo
+│   │   │   │   ├── trieSetTest.mo
+│   │   │   │   ├── vessel.dhall
+│   │   ├── candy_0_3_0#v0.3.0@907a4e7363aac6c6a4e114ebc73e3d3f21e138af/
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── ICRC16.md
+│   │   │   ├── Makefile
+│   │   │   ├── dfx.json
+│   │   │   ├── docs/
+│   │   │   │   ├── candid.html
+│   │   │   │   ├── clone.html
+│   │   │   │   ├── conversion.html
+│   │   │   │   ├── hex.html
+│   │   │   │   ├── index.html
+│   │   │   │   ├── json.html
+│   │   │   │   ├── properties.html
+│   │   │   │   ├── styles.css
+│   │   │   │   ├── types.html
+│   │   │   │   ├── upgrade.html
+│   │   │   │   └── workspace.html
+│   │   │   ├── mops.toml
+│   │   │   ├── old_package-set.dhall
+│   │   │   ├── old_vessel.dhall
+│   │   │   ├── src/
+│   │   │   │   ├── candid.mo
+│   │   │   │   ├── clone.mo
+│   │   │   │   ├── conversion.mo
+│   │   │   │   ├── json.mo
+│   │   │   │   ├── properties.mo
+│   │   │   │   ├── types.mo
+│   │   │   │   ├── upgrade.mo
+│   │   │   │   └── workspace.mo
+│   │   │   ├── test/
+│   │   │   │   ├── candid.test.mo
+│   │   │   │   ├── clone.test.mo
+│   │   │   │   ├── json.test.mo
+│   │   │   │   ├── properties.test.mo
+│   │   │   │   ├── types.test.mo
+│   │   │   │   ├── upgrade.test.mo
+│   │   │   │   └── workspaces.test.mo
+│   │   │   ├── test_runner.sh
+│   │   │   ├── tests/
+│   │   │   │   └── test_runner.mo
+│   │   ├── cbor#5adf22b177d187d076b222e94b3fdf071b7c0b65/
+│   │   │   └── .vscode/
+│   │   │       └── tasks.json
+│   │   ├── cert#v0.1.3@c403ffec0a60f658a1009976c785aa567ff0da77/
+│   │   │   ├── Developent.md
+│   │   │   ├── Makefile
+│   │   │   ├── demo/
+│   │   │   │   ├── ManagementCanister.mo
+│   │   │   │   ├── canister_ids.json
+│   │   │   │   ├── dfx.json
+│   │   │   │   ├── main.mo
+│   │   │   │   ├── vessel.dhall
+│   │   │   ├── flake.lock
+│   │   │   ├── flake.nix
+│   │   │   ├── gen-tests/
+│   │   │   │   ├── cabal.project.freeze
+│   │   │   │   ├── gen-tests.cabal
+│   │   │   │   ├── main.hs
+│   │   │   ├── mops.nix/
+│   │   │   │   ├── default.nix
+│   │   │   │   ├── node-env.nix
+│   │   │   │   └── node-packages.nix
+│   │   │   ├── mops.toml
+│   │   │   ├── src/
+│   │   │   │   ├── CanisterSigs.mo
+│   │   │   │   ├── CertTree.mo
+│   │   │   │   ├── Dyadic.mo
+│   │   │   │   ├── MerkleTree.mo
+│   │   │   │   └── ReqData.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Makefile
+│   │   │   │   ├── Test.mo
+│   │   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   ├── encoding#v0.4.1@2711d18727e954b11afc0d37945608512b5fbce2/
+│   │   │   ├── Makefile
+│   │   │   ├── src/
+│   │   │   │   ├── Base32.mo
+│   │   │   │   ├── Base64.mo
+│   │   │   │   ├── Binary.mo
+│   │   │   │   └── Hex.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Base32.mo
+│   │   │   │   ├── Base64.mo
+│   │   │   │   ├── Binary.mo
+│   │   │   │   ├── Hex.mo
+│   │   │   │   └── util.mo
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   ├── encoding_0_4_1#v0.4.1@2711d18727e954b11afc0d37945608512b5fbce2/
+│   │   │   ├── Makefile
+│   │   │   ├── src/
+│   │   │   │   ├── Base32.mo
+│   │   │   │   ├── Base64.mo
+│   │   │   │   ├── Binary.mo
+│   │   │   │   └── Hex.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Base32.mo
+│   │   │   │   ├── Base64.mo
+│   │   │   │   ├── Binary.mo
+│   │   │   │   ├── Hex.mo
+│   │   │   │   └── util.mo
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   ├── map9#v9.0.1@10b68f6ea8df5e72dfa4c07a50c8bb60a916c233/
+│   │   │   ├── dfx.json
+│   │   │   ├── mops.toml
+│   │   │   ├── src/
+│   │   │   │   ├── Map/
+│   │   │   │   │   ├── const.mo
+│   │   │   │   │   ├── lib.mo
+│   │   │   │   │   ├── modules/
+│   │   │   │   │   │   ├── clone.mo
+│   │   │   │   │   │   ├── find.mo
+│   │   │   │   │   │   ├── fromIter.mo
+│   │   │   │   │   │   ├── get.mo
+│   │   │   │   │   │   ├── init.mo
+│   │   │   │   │   │   ├── iterate.mo
+│   │   │   │   │   │   ├── put.mo
+│   │   │   │   │   │   ├── queue.mo
+│   │   │   │   │   │   ├── rehash.mo
+│   │   │   │   │   │   ├── remove.mo
+│   │   │   │   │   │   └── toArray.mo
+│   │   │   │   │   ├── types.mo
+│   │   │   │   │   └── utils.mo
+│   │   │   │   └── Set/
+│   │   │   │       ├── const.mo
+│   │   │   │       ├── lib.mo
+│   │   │   │       ├── modules/
+│   │   │   │       │   ├── clone.mo
+│   │   │   │       │   ├── find.mo
+│   │   │   │       │   ├── fromIter.mo
+│   │   │   │       │   ├── get.mo
+│   │   │   │       │   ├── init.mo
+│   │   │   │       │   ├── iterate.mo
+│   │   │   │       │   ├── put.mo
+│   │   │   │       │   ├── queue.mo
+│   │   │   │       │   ├── rehash.mo
+│   │   │   │       │   ├── remove.mo
+│   │   │   │       │   └── toArray.mo
+│   │   │   │       ├── types.mo
+│   │   │   │       └── utils.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Map.mo
+│   │   │   │   └── Set.mo
+│   │   │   ├── test.mo
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   ├── matchers#v1.3.0@3dac8a071b69e4e651b25a7d9683fe831eb7cffd/
+│   │   │   ├── src/
+│   │   │   │   ├── Canister.mo
+│   │   │   │   ├── Matchers.mo
+│   │   │   │   ├── Suite.mo
+│   │   │   │   ├── Testable.mo
+│   │   │   │   └── matchers/
+│   │   │   │       └── Hashmap.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Test.mo
+│   │   │   │   └── run_test.sh
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   ├── motoko_numbers#v1.1.0@773953141f976ccdfc2e6a2c451b841a53bb39a0/
+│   │   │   ├── Makefile
+│   │   │   ├── build.sh
+│   │   │   ├── dfx.json
+│   │   │   ├── mops.toml
+│   │   │   ├── samples/
+│   │   │   │   └── Sample.mo
+│   │   │   ├── src/
+│   │   │   │   ├── FloatX.mo
+│   │   │   │   ├── IntX.mo
+│   │   │   │   ├── NatX.mo
+│   │   │   │   └── Util.mo
+│   │   │   ├── test/
+│   │   │   │   ├── FloatXTests.mo
+│   │   │   │   ├── IntXTests.mo
+│   │   │   │   ├── Makefile
+│   │   │   │   ├── NatXTests.mo
+│   │   │   │   ├── TestUtil.mo
+│   │   │   │   └── Tests.mo
+│   │   │   ├── test.sh
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   ├── sha224#82e0aa1a77a8c0a2f98332b59ffc242d820e62cb/
+│   │   │   ├── Makefile
+│   │   │   ├── dfx.json
+│   │   │   ├── src/
+│   │   │   │   └── SHA224.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Makefile
+│   │   │   │   ├── Test.mo
+│   │   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   ├── sha256#9e2468f51ef060ae04fde8d573183191bda30189/
+│   │   │   ├── Makefile
+│   │   │   ├── NOTICE
+│   │   │   ├── dfx.json
+│   │   │   ├── run.sh
+│   │   │   ├── src/
+│   │   │   │   └── SHA256.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Makefile
+│   │   │   │   ├── Test.mo
+│   │   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   ├── stable-write-only#v0.1.0@02e9aac74bdbed86b52ebed985d82b6ef66a76d8/
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── dfx.json
+│   │   │   ├── mops.toml
+│   │   │   ├── src/
+│   │   │   │   └── lib.mo
+│   │   │   ├── test/
+│   │   │   │   └── lib.test.mo
+│   │   │   ├── testActor/
+│   │   │   │   ├── childv1.mo
+│   │   │   │   ├── childv2.mo
+│   │   │   │   └── test_runner.mo
+│   │   ├── stablebuffer#v0.2.0@110660769d11ba93c618dc4712525d20503bdc37/
+│   │   │   ├── Makefile
+│   │   │   ├── reference/
+│   │   │   │   └── Buffer.mo
+│   │   │   ├── src/
+│   │   │   │   └── StableBuffer.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Makefile
+│   │   │   │   ├── StableBufferTest.mo
+│   │   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   ├── stablebuffer_1_3_0#v1.3.0@acdde6bb5b939227997cebdbb8919d2e6da8691c/
+│   │   │   ├── Makefile
+│   │   │   ├── reference/
+│   │   │   │   └── Buffer.mo
+│   │   │   ├── src/
+│   │   │   │   └── StableBuffer.mo
+│   │   │   ├── test/
+│   │   │   │   ├── Makefile
+│   │   │   │   ├── StableBuffer.test.mo
+│   │   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.dhall
+│   │   │   ├── vessel.json
+│   │   └── xtended-numbers#v1.0.2/
+│   │       ├── build.sh
+│   │       ├── dfx.json
+│   │       ├── mops.toml
+│   │       ├── samples/
+│   │       │   └── Sample.mo
+│   │       ├── src/
+│   │       │   ├── FloatX.mo
+│   │       │   ├── IntX.mo
+│   │       │   ├── NatX.mo
+│   │       │   └── Util.mo
+│   │       ├── test/
+│   │       │   ├── FloatXTests.mo
+│   │       │   ├── IntXTests.mo
+│   │       │   ├── NatXTests.mo
+│   │       │   ├── TestUtil.mo
+│   │       │   └── Tests.mo
+│   │       ├── test.sh
+│   │       ├── vessel.dhall
+│   │       ├── vessel.json
+│   ├── base@0.11.1/
+│   │   ├── NOTICE
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── Array.mo
+│   │   │   ├── AssocList.mo
+│   │   │   ├── Blob.mo
+│   │   │   ├── Bool.mo
+│   │   │   ├── Buffer.mo
+│   │   │   ├── CertifiedData.mo
+│   │   │   ├── Char.mo
+│   │   │   ├── Debug.mo
+│   │   │   ├── Deque.mo
+│   │   │   ├── Error.mo
+│   │   │   ├── ExperimentalCycles.mo
+│   │   │   ├── ExperimentalInternetComputer.mo
+│   │   │   ├── ExperimentalStableMemory.mo
+│   │   │   ├── Float.mo
+│   │   │   ├── Func.mo
+│   │   │   ├── Hash.mo
+│   │   │   ├── HashMap.mo
+│   │   │   ├── Heap.mo
+│   │   │   ├── Int.mo
+│   │   │   ├── Int16.mo
+│   │   │   ├── Int32.mo
+│   │   │   ├── Int64.mo
+│   │   │   ├── Int8.mo
+│   │   │   ├── Iter.mo
+│   │   │   ├── IterType.mo
+│   │   │   ├── List.mo
+│   │   │   ├── Nat.mo
+│   │   │   ├── Nat16.mo
+│   │   │   ├── Nat32.mo
+│   │   │   ├── Nat64.mo
+│   │   │   ├── Nat8.mo
+│   │   │   ├── None.mo
+│   │   │   ├── Option.mo
+│   │   │   ├── Order.mo
+│   │   │   ├── Prelude.mo
+│   │   │   ├── Principal.mo
+│   │   │   ├── RBTree.mo
+│   │   │   ├── Random.mo
+│   │   │   ├── Region.mo
+│   │   │   ├── Result.mo
+│   │   │   ├── Stack.mo
+│   │   │   ├── Text.mo
+│   │   │   ├── Time.mo
+│   │   │   ├── Timer.mo
+│   │   │   ├── Trie.mo
+│   │   │   ├── TrieMap.mo
+│   │   │   └── TrieSet.mo
+│   ├── base@0.12.1/
+│   │   ├── NOTICE
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── Array.mo
+│   │   │   ├── AssocList.mo
+│   │   │   ├── Blob.mo
+│   │   │   ├── Bool.mo
+│   │   │   ├── Buffer.mo
+│   │   │   ├── CertifiedData.mo
+│   │   │   ├── Char.mo
+│   │   │   ├── Debug.mo
+│   │   │   ├── Deque.mo
+│   │   │   ├── Error.mo
+│   │   │   ├── ExperimentalCycles.mo
+│   │   │   ├── ExperimentalInternetComputer.mo
+│   │   │   ├── ExperimentalStableMemory.mo
+│   │   │   ├── Float.mo
+│   │   │   ├── Func.mo
+│   │   │   ├── Hash.mo
+│   │   │   ├── HashMap.mo
+│   │   │   ├── Heap.mo
+│   │   │   ├── Int.mo
+│   │   │   ├── Int16.mo
+│   │   │   ├── Int32.mo
+│   │   │   ├── Int64.mo
+│   │   │   ├── Int8.mo
+│   │   │   ├── Iter.mo
+│   │   │   ├── IterType.mo
+│   │   │   ├── List.mo
+│   │   │   ├── Nat.mo
+│   │   │   ├── Nat16.mo
+│   │   │   ├── Nat32.mo
+│   │   │   ├── Nat64.mo
+│   │   │   ├── Nat8.mo
+│   │   │   ├── None.mo
+│   │   │   ├── Option.mo
+│   │   │   ├── Order.mo
+│   │   │   ├── Prelude.mo
+│   │   │   ├── Principal.mo
+│   │   │   ├── RBTree.mo
+│   │   │   ├── Random.mo
+│   │   │   ├── Region.mo
+│   │   │   ├── Result.mo
+│   │   │   ├── Stack.mo
+│   │   │   ├── Text.mo
+│   │   │   ├── Time.mo
+│   │   │   ├── Timer.mo
+│   │   │   ├── Trie.mo
+│   │   │   ├── TrieMap.mo
+│   │   │   └── TrieSet.mo
+│   ├── cbor@1.0.0/
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── Decoder.mo
+│   │   │   ├── Encoder.mo
+│   │   │   ├── Types.mo
+│   │   │   └── Util.mo
+│   ├── fuzz@0.2.1/
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── Array.mo
+│   │   │   ├── Blob.mo
+│   │   │   ├── Bool.mo
+│   │   │   ├── Buffer.mo
+│   │   │   ├── Char.mo
+│   │   │   ├── Float.mo
+│   │   │   ├── ICRC1.mo
+│   │   │   ├── Int.mo
+│   │   │   ├── Int16.mo
+│   │   │   ├── Int32.mo
+│   │   │   ├── Int64.mo
+│   │   │   ├── Int8.mo
+│   │   │   ├── Nat.mo
+│   │   │   ├── Nat16.mo
+│   │   │   ├── Nat32.mo
+│   │   │   ├── Nat64.mo
+│   │   │   ├── Nat8.mo
+│   │   │   ├── Option.mo
+│   │   │   ├── Principal.mo
+│   │   │   ├── Text.mo
+│   │   │   ├── lib.mo
+│   │   │   ├── types.mo
+│   │   │   └── utils.mo
+│   ├── icrc3-mo@0.2.4/
+│   │   ├── example/
+│   │   │   └── main.mo
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── archive/
+│   │   │   │   └── lib.mo
+│   │   │   ├── helper.mo
+│   │   │   ├── lib.mo
+│   │   │   ├── migrations/
+│   │   │   │   ├── lib.mo
+│   │   │   │   ├── types.mo
+│   │   │   │   ├── v000_000_000/
+│   │   │   │   │   ├── lib.mo
+│   │   │   │   │   └── types.mo
+│   │   │   │   └── v000_001_000/
+│   │   │   │       ├── lib.mo
+│   │   │   │       └── types.mo
+│   │   │   └── service.mo
+│   │   ├── testActor/
+│   │   │   ├── fake.mo
+│   │   │   └── test_runner.mo
+│   ├── icrc3-mo@0.2.6/
+│   │   ├── example/
+│   │   │   └── main.mo
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── archive/
+│   │   │   │   └── lib.mo
+│   │   │   ├── helper.mo
+│   │   │   ├── lib.mo
+│   │   │   ├── migrations/
+│   │   │   │   ├── lib.mo
+│   │   │   │   ├── types.mo
+│   │   │   │   ├── v000_000_000/
+│   │   │   │   │   ├── lib.mo
+│   │   │   │   │   └── types.mo
+│   │   │   │   └── v000_001_000/
+│   │   │   │       ├── lib.mo
+│   │   │   │       └── types.mo
+│   │   │   └── service.mo
+│   │   ├── testActor/
+│   │   │   ├── fake.mo
+│   │   │   └── test_runner.mo
+│   ├── icrc37-mo@0.4.1/
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── lib.mo
+│   │   │   ├── migrations/
+│   │   │   │   ├── lib.mo
+│   │   │   │   ├── types.mo
+│   │   │   │   ├── v000_000_000/
+│   │   │   │   │   ├── lib.mo
+│   │   │   │   │   └── types.mo
+│   │   │   │   └── v000_001_000/
+│   │   │   │       ├── lib.mo
+│   │   │   │       └── types.mo
+│   │   │   └── service.mo
+│   ├── icrc37-mo@0.4.2/
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── lib.mo
+│   │   │   ├── migrations/
+│   │   │   │   ├── lib.mo
+│   │   │   │   ├── types.mo
+│   │   │   │   ├── v000_000_000/
+│   │   │   │   │   ├── lib.mo
+│   │   │   │   │   └── types.mo
+│   │   │   │   └── v000_001_000/
+│   │   │   │       ├── lib.mo
+│   │   │   │       └── types.mo
+│   │   │   └── service.mo
+│   ├── icrc7-mo@0.4.0/
+│   │   ├── example/
+│   │   │   └── main.mo
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── lib.mo
+│   │   │   ├── migrations/
+│   │   │   │   ├── lib.mo
+│   │   │   │   ├── types.mo
+│   │   │   │   ├── v000_000_000/
+│   │   │   │   │   ├── lib.mo
+│   │   │   │   │   └── types.mo
+│   │   │   │   └── v000_001_000/
+│   │   │   │       ├── lib.mo
+│   │   │   │       └── types.mo
+│   │   │   └── service.mo
+│   ├── icrc7-mo@0.4.1/
+│   │   ├── example/
+│   │   │   └── main.mo
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── lib.mo
+│   │   │   ├── migrations/
+│   │   │   │   ├── lib.mo
+│   │   │   │   ├── types.mo
+│   │   │   │   ├── v000_000_000/
+│   │   │   │   │   ├── lib.mo
+│   │   │   │   │   └── types.mo
+│   │   │   │   └── v000_001_000/
+│   │   │   │       ├── lib.mo
+│   │   │   │       └── types.mo
+│   │   │   └── service.mo
+│   ├── rep-indy-hash@0.1.1/
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   └── lib.mo
+│   ├── sha2@0.0.5/
+│   │   ├── NOTICE
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── Sha256.mo
+│   │   │   └── Sha512.mo
+│   ├── test@2.0.0/
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── async.mo
+│   │   │   ├── expect/
+│   │   │   │   ├── async.mo
+│   │   │   │   ├── expect-array.mo
+│   │   │   │   ├── expect-blob.mo
+│   │   │   │   ├── expect-bool.mo
+│   │   │   │   ├── expect-call.mo
+│   │   │   │   ├── expect-char.mo
+│   │   │   │   ├── expect-int.mo
+│   │   │   │   ├── expect-int16.mo
+│   │   │   │   ├── expect-int32.mo
+│   │   │   │   ├── expect-int64.mo
+│   │   │   │   ├── expect-int8.mo
+│   │   │   │   ├── expect-nat.mo
+│   │   │   │   ├── expect-nat16.mo
+│   │   │   │   ├── expect-nat32.mo
+│   │   │   │   ├── expect-nat64.mo
+│   │   │   │   ├── expect-nat8.mo
+│   │   │   │   ├── expect-option.mo
+│   │   │   │   ├── expect-principal.mo
+│   │   │   │   ├── expect-result.mo
+│   │   │   │   ├── expect-text.mo
+│   │   │   │   ├── lib.mo
+│   │   │   │   └── utils.mo
+│   │   │   └── lib.mo
+│   ├── vector@0.2.0/
+│   │   ├── NOTICE
+│   │   ├── mops.toml
+│   │   ├── src/
+│   │   │   ├── Class.mo
+│   │   │   └── lib.mo
+│   └── vector@0.4.0/
+│       ├── NOTICE
+│       ├── mops.toml
+│       ├── src/
+│       │   ├── Class.mo
+│       │   └── lib.mo
+├── Cargo.lock
+├── Cargo.toml
+├── bundle-stats-minimal.json
+├── canister_ids.json
+├── components.json
+├── deps/
+│   ├── candid/
+│   │   └── rdmx6-jaaaa-aaaaa-aaadq-cai.did
+│   ├── init.json
+│   └── pulled.json
+├── dfx.json
+├── dfx_local.json
+├── dfx_mainnet.json
+├── ic-vetkd-utils-0.1.0.tgz
+├── mops.toml
+├── postcss.config.js
+├── scripts/
+│   ├── build.sh
+│   ├── icp_swap_argument.txt
+│   ├── network_deploy.sh
+│   ├── network_deploy_frontend.sh
+│   ├── old_readme.md
+│   ├── test.sh
+│   ├── whitepaper.md
+├── src/
+│   ├── alex_backend/
+│   │   ├── Cargo.toml
+│   │   ├── alex_backend.did
+│   │   └── src/
+│   │       ├── engine.rs
+│   │       ├── lib.rs
+│   │       ├── nft.rs
+│   │       ├── nft_init.rs
+│   │       ├── source_cards.rs
+│   │       ├── utils.rs
+│   │       └── wallet_keys.rs
+│   ├── alex_frontend/
+│   │   ├── src/
+│   │   │   ├── App.tsx
+│   │   │   ├── apps/
+│   │   │   │   ├── AppModules/
+│   │   │   │   │   ├── contentGrid/
+│   │   │   │   │   │   ├── ContentGrid.tsx
+│   │   │   │   │   │   ├── ContentList.tsx
+│   │   │   │   │   │   ├── components/
+│   │   │   │   │   │   │   ├── ContentRenderer.tsx
+│   │   │   │   │   │   │   └── Modal.tsx
+│   │   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   │   └── useContentUrls.ts
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   ├── types/
+│   │   │   │   │   │   │   └── index.ts
+│   │   │   │   │   │   └── utils/
+│   │   │   │   │   │       ├── contentHelpers.tsx
+│   │   │   │   │   │       ├── contentTypeHandlers.ts
+│   │   │   │   │   │       ├── fileIcons.tsx
+│   │   │   │   │   │       └── useContent.ts
+│   │   │   │   │   ├── plan.md
+│   │   │   │   │   └── search/
+│   │   │   │   │       ├── AmountSelector.tsx
+│   │   │   │   │       ├── ArweaveOwnerSelector.tsx
+│   │   │   │   │       ├── ContentCategorySelector.tsx
+│   │   │   │   │       ├── ContentFetcher.tsx
+│   │   │   │   │       ├── ContentTagsSelector.tsx
+│   │   │   │   │       ├── DateSelector.tsx
+│   │   │   │   │       └── SearchForm.tsx
+│   │   │   │   ├── LibModules/
+│   │   │   │   │   ├── arweaveSearch/
+│   │   │   │   │   │   ├── api/
+│   │   │   │   │   │   │   ├── arweaveApi.ts
+│   │   │   │   │   │   │   ├── arweaveClient.ts
+│   │   │   │   │   │   │   └── arweaveHelpers.ts
+│   │   │   │   │   │   ├── components/
+│   │   │   │   │   │   │   └── nsfwjs/
+│   │   │   │   │   │   │       ├── ContentValidator.tsx
+│   │   │   │   │   │   │       ├── NsfwModelControl.tsx
+│   │   │   │   │   │   │       ├── nsfwImports.ts
+│   │   │   │   │   │   │       └── tensorflow.tsx
+│   │   │   │   │   │   ├── config/
+│   │   │   │   │   │   │   └── arweaveConfig.ts
+│   │   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   │   └── useSearchHandlers.ts
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   ├── redux/
+│   │   │   │   │   │   │   ├── arweaveSlice.ts
+│   │   │   │   │   │   │   └── arweaveThunks.ts
+│   │   │   │   │   │   └── types/
+│   │   │   │   │   │       ├── files.ts
+│   │   │   │   │   │       └── queries.ts
+│   │   │   │   │   ├── contentDisplay/
+│   │   │   │   │   │   ├── redux/
+│   │   │   │   │   │   │   ├── contentDisplaySlice.ts
+│   │   │   │   │   │   │   └── contentDisplayThunks.ts
+│   │   │   │   │   │   ├── services/
+│   │   │   │   │   │   │   ├── contentCacheService.ts
+│   │   │   │   │   │   │   └── contentTypeHandlers.ts
+│   │   │   │   │   │   └── types/
+│   │   │   │   │   │       └── content.types.ts
+│   │   │   │   │   └── nftSearch/
+│   │   │   │   │       ├── NftOwnerSelector.tsx
+│   │   │   │   │       ├── index.tsx
+│   │   │   │   │       └── redux/
+│   │   │   │   │           ├── librarySlice.ts
+│   │   │   │   │           └── libraryThunks.ts
+│   │   │   │   └── app/
+│   │   │   │       ├── Alexandrian/
+│   │   │   │       │   └── index.tsx
+│   │   │   │       ├── Bibliotheca/
+│   │   │   │       │   └── index.tsx
+│   │   │   │       ├── Dialectica/
+│   │   │   │       │   └── index.tsx
+│   │   │   │       ├── Emporium/
+│   │   │   │       │   └── index.tsx
+│   │   │   │       ├── Lexigraph/
+│   │   │   │       │   └── index.tsx
+│   │   │   │       ├── Permasearch/
+│   │   │   │       │   ├── index.tsx
+│   │   │   │       │   └── queryplan.md
+│   │   │   │       └── Syllogos/
+│   │   │   │           └── index.tsx
+│   │   │   ├── components/
+│   │   │   │   ├── AppHeader.tsx
+│   │   │   │   ├── BookModal.tsx
+│   │   │   │   ├── Header.tsx
+│   │   │   │   ├── ReactSlider/
+│   │   │   │   │   └── ReactSlider.jsx
+│   │   │   │   ├── Read/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   └── ui/
+│   │   │   ├── contexts/
+│   │   │   │   ├── KeysContext.tsx
+│   │   │   │   └── SessionContext.tsx
+│   │   │   ├── features/
+│   │   │   │   ├── auth/
+│   │   │   │   │   ├── authExtraReducers.ts
+│   │   │   │   │   ├── authSlice.ts
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── thunks/
+│   │   │   │   │   │   ├── login.ts
+│   │   │   │   │   │   ├── logout.ts
+│   │   │   │   │   │   └── principal.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       └── authUtils.ts
+│   │   │   │   ├── engine-books/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   └── MintedBook.tsx
+│   │   │   │   │   ├── engineBooksSlice.ts
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── thunks/
+│   │   │   │   │   │   └── fetchEngineBooks.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       └── utilities.ts
+│   │   │   │   ├── engine-filters/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── engine-overview/
+│   │   │   │   │   ├── engineOverviewSlice.ts
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       └── updateEngineStatus.ts
+│   │   │   │   ├── engine-stats/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── engine-tasks/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── filter/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── SubTypes.tsx
+│   │   │   │   │   │   └── Types.tsx
+│   │   │   │   │   ├── filterSlice.ts
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── fund-node/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── home/
+│   │   │   │   │   └── homeSlice.ts
+│   │   │   │   ├── home-types/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── BookCard.tsx
+│   │   │   │   │   │   └── BookCarousel.tsx
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── icp-ledger/
+│   │   │   │   │   ├── icpLedgerSlice.ts
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       ├── getAccountId.ts
+│   │   │   │   │       ├── getIcpBal.ts
+│   │   │   │   │       ├── getIcpPrice.ts
+│   │   │   │   │       └── transferICP.ts
+│   │   │   │   ├── irys/
+│   │   │   │   │   ├── arweave-funder/
+│   │   │   │   │   │   ├── FundWithdraw.tsx
+│   │   │   │   │   │   └── funder.tsx
+│   │   │   │   │   ├── arweave-uploader/
+│   │   │   │   │   │   ├── BookContents.tsx
+│   │   │   │   │   │   ├── Fields/
+│   │   │   │   │   │   │   └── CategorySelect.tsx
+│   │   │   │   │   │   ├── UploadLogic.tsx
+│   │   │   │   │   │   └── types.ts
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── Button.tsx
+│   │   │   │   │   │   ├── ReceiptJSONView.tsx
+│   │   │   │   │   │   └── Spinner.tsx
+│   │   │   │   │   ├── query-package/
+│   │   │   │   │   │   └── query.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       ├── gaslessFundAndUpload.ts
+│   │   │   │   │       ├── getIrys.ts
+│   │   │   │   │       ├── getReceipt.ts
+│   │   │   │   │       ├── getRpcUrl.ts
+│   │   │   │   │       └── titleCase.ts
+│   │   │   │   ├── librarian/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   └── LibrarianForm.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── librarianSlice.ts
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       ├── becomeLibrarian.ts
+│   │   │   │   │       └── checkLibrarian.ts
+│   │   │   │   ├── librarian-profile/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   └── NoNode.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── librarianProfileSlice.ts
+│   │   │   │   ├── loading/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── mint/
+│   │   │   │   │   ├── Fields/
+│   │   │   │   │   │   └── CategorySelect.tsx
+│   │   │   │   │   ├── Footer.tsx
+│   │   │   │   │   ├── Header.tsx
+│   │   │   │   │   ├── MetaData.tsx
+│   │   │   │   │   ├── Processing.tsx
+│   │   │   │   │   ├── SelectNode.tsx
+│   │   │   │   │   ├── Status.tsx
+│   │   │   │   │   ├── Upload.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── style.css
+│   │   │   │   ├── my-engines/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── AddEngine.tsx
+│   │   │   │   │   │   └── EngineItem.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── myEnginesSlice.ts
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       ├── addEngine.ts
+│   │   │   │   │       └── fetchMyEngines.ts
+│   │   │   │   ├── my-nodes/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── AddNode.tsx
+│   │   │   │   │   │   └── NodeItem.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── myNodesSlice.tsx
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       ├── addNode.ts
+│   │   │   │   │       └── fetchMyNodes.ts
+│   │   │   │   ├── nft/
+│   │   │   │   │   └── mint.ts
+│   │   │   │   ├── portal/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── BookCard.tsx
+│   │   │   │   │   │   └── BookInfo.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── portalSlice.ts
+│   │   │   │   │   └── thunks/
+│   │   │   │   │       └── fetchBooks.ts
+│   │   │   │   ├── portal-category/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── portalCategorySlice.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       └── category.ts
+│   │   │   │   ├── portal-era/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── portalEraSlice.ts
+│   │   │   │   ├── portal-filter/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── portalFilterSlice.ts
+│   │   │   │   ├── portal-language/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   └── portalLanguageSlice.ts
+│   │   │   │   ├── portal-pagination/
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── portal-type/
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── portalTypeSlice.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       └── type.ts
+│   │   │   │   ├── reader/
+│   │   │   │   │   ├── CardList/
+│   │   │   │   │   │   ├── Card.tsx
+│   │   │   │   │   │   └── index.tsx
+│   │   │   │   │   ├── ContentList/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── styles.css
+│   │   │   │   │   ├── ContentView/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── Drawer/
+│   │   │   │   │   │   ├── Bookmarks/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── Search/
+│   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── Setting/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── Sidebar/
+│   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── lib/
+│   │   │   │   │   │   ├── components/
+│   │   │   │   │   │   │   ├── AddAnnotationTooltip.tsx
+│   │   │   │   │   │   │   ├── AnnotationItem/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── BookmarkItem/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── BookmarkToggle/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── ColorSelector.tsx
+│   │   │   │   │   │   │   ├── FlowToggle.tsx
+│   │   │   │   │   │   │   ├── FontFamilySelect.tsx
+│   │   │   │   │   │   │   ├── FontSizeButton.tsx
+│   │   │   │   │   │   │   ├── FontSizeRange.tsx
+│   │   │   │   │   │   │   ├── FullScreenToggle/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── RemoveAnnotationTooltip.tsx
+│   │   │   │   │   │   │   ├── SearchItem/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── SidebarItem.tsx
+│   │   │   │   │   │   │   ├── Spinner.tsx
+│   │   │   │   │   │   │   ├── SpreadToggle.tsx
+│   │   │   │   │   │   │   ├── ThemeSelect.tsx
+│   │   │   │   │   │   │   └── TocItem/
+│   │   │   │   │   │   │       ├── index.tsx
+│   │   │   │   │   │   │       └── style.ts
+│   │   │   │   │   │   ├── contexts/
+│   │   │   │   │   │   │   └── ReaderContext.tsx
+│   │   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   │   ├── useAnnotationState.tsx
+│   │   │   │   │   │   │   ├── useBookmarkState.tsx
+│   │   │   │   │   │   │   ├── useCardListState.tsx
+│   │   │   │   │   │   │   ├── useReaderContext.tsx
+│   │   │   │   │   │   │   ├── useReaderState/
+│   │   │   │   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   │   │   └── useContentState.tsx
+│   │   │   │   │   │   │   ├── useSearchDrawer.tsx
+│   │   │   │   │   │   │   ├── useSearchState.tsx
+│   │   │   │   │   │   │   ├── useSettingState.tsx
+│   │   │   │   │   │   │   ├── useSidebarState.tsx
+│   │   │   │   │   │   │   └── useSnackbar.tsx
+│   │   │   │   │   │   ├── providers/
+│   │   │   │   │   │   │   └── ReaderProvider.tsx
+│   │   │   │   │   │   └── utils/
+│   │   │   │   │   │       ├── annotations.ts
+│   │   │   │   │   │       ├── date.ts
+│   │   │   │   │   │       ├── index.ts
+│   │   │   │   │   │       ├── search.ts
+│   │   │   │   │   │       └── url.ts
+│   │   │   │   │   └── style.ts
+│   │   │   │   ├── search/
+│   │   │   │   │   ├── SearchResult.tsx
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── BookModal.tsx
+│   │   │   │   │   │   ├── Card.tsx
+│   │   │   │   │   │   └── Read.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── searchSlice.ts
+│   │   │   │   │   ├── thunks/
+│   │   │   │   │   │   └── performSearch.ts
+│   │   │   │   │   └── utils/
+│   │   │   │   │       └── properties.tsx
+│   │   │   │   ├── swap/
+│   │   │   │   │   ├── alexSlice.ts
+│   │   │   │   │   ├── backup.tsx
+│   │   │   │   │   ├── backupDesign.tsx
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── balance/
+│   │   │   │   │   │   │   ├── accountCards.tsx
+│   │   │   │   │   │   │   ├── alexBalanceCard.tsx
+│   │   │   │   │   │   │   ├── balanceContent.tsx
+│   │   │   │   │   │   │   ├── getAlexBal.tsx
+│   │   │   │   │   │   │   └── lbryBalanceCard.tsx
+│   │   │   │   │   │   ├── burn/
+│   │   │   │   │   │   │   └── burnContent.tsx
+│   │   │   │   │   │   ├── copyHelper.tsx
+│   │   │   │   │   │   ├── receive/
+│   │   │   │   │   │   │   └── receiveContent.tsx
+│   │   │   │   │   │   ├── redeem/
+│   │   │   │   │   │   │   └── redeemContent.tsx
+│   │   │   │   │   │   ├── send/
+│   │   │   │   │   │   │   └── sendContent.tsx
+│   │   │   │   │   │   ├── stake/
+│   │   │   │   │   │   │   ├── claimReward.tsx
+│   │   │   │   │   │   │   ├── stakeContent.tsx
+│   │   │   │   │   │   │   ├── stakeInfo.tsx
+│   │   │   │   │   │   │   └── unstake.tsx
+│   │   │   │   │   │   ├── swap/
+│   │   │   │   │   │   │   └── swapContent.tsx
+│   │   │   │   │   │   └── transactionHistory/
+│   │   │   │   │   │       ├── transactionHistory.tsx
+│   │   │   │   │   │       └── transactionHistoryObj.tsx
+│   │   │   │   │   ├── fetchTransaction.tsx
+│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   ├── style.css
+│   │   │   │   │   ├── subHeader.tsx
+│   │   │   │   │   ├── swapMain.tsx
+│   │   │   │   │   ├── swapSlice.ts
+│   │   │   │   │   ├── thunks/
+│   │   │   │   │   │   ├── alexIcrc/
+│   │   │   │   │   │   │   ├── getAccountAlexBalance.ts
+│   │   │   │   │   │   │   └── transferALEX.ts
+│   │   │   │   │   │   ├── burnLBRY.ts
+│   │   │   │   │   │   ├── claimReward.ts
+│   │   │   │   │   │   ├── getAllStakesInfo.ts
+│   │   │   │   │   │   ├── getArchivedBal.ts
+│   │   │   │   │   │   ├── getLBRYratio.ts
+│   │   │   │   │   │   ├── getMaxLbryBurn.ts
+│   │   │   │   │   │   ├── getStakedInfo.ts
+│   │   │   │   │   │   ├── getStakersCount.ts
+│   │   │   │   │   │   ├── lbryIcrc/
+│   │   │   │   │   │   │   ├── getLbryBalance.ts
+│   │   │   │   │   │   │   ├── getTransactions.ts
+│   │   │   │   │   │   │   └── transferLBRY.ts
+│   │   │   │   │   │   ├── redeemArchivedBalance.ts
+│   │   │   │   │   │   ├── stakeAlex.ts
+│   │   │   │   │   │   ├── swapLbry.ts
+│   │   │   │   │   │   ├── tokenomics/
+│   │   │   │   │   │   │   └── getAlexMintRate.ts
+│   │   │   │   │   │   ├── transferICPFromUserWallet.ts
+│   │   │   │   │   │   └── unstake.ts
+│   │   │   │   │   └── tokenomicsSilce.ts
+│   │   │   ├── hooks/
+│   │   │   │   └── useSession.tsx
+│   │   │   ├── index.js
+│   │   │   ├── layouts/
+│   │   │   │   ├── AppLayout.tsx
+│   │   │   │   └── MainLayout.tsx
+│   │   │   ├── lib/
+│   │   │   │   ├── components/
+│   │   │   │   │   ├── alert.tsx
+│   │   │   │   │   ├── button.tsx
+│   │   │   │   │   ├── dialog.tsx
+│   │   │   │   │   ├── toast.tsx
+│   │   │   │   │   └── toaster.tsx
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── use-toast.ts
+│   │   │   │   └── utils.ts
+│   │   │   ├── pages/
+│   │   │   ├── providers/
+│   │   │   │   ├── ReduxProvider.tsx
+│   │   │   │   └── SessionProvider.tsx
+│   │   │   ├── services/
+│   │   │   │   ├── bookService.ts
+│   │   │   │   ├── irysService.ts
+│   │   │   │   ├── legacy_irysService.ts
+│   │   │   │   ├── librarianService.ts
+│   │   │   │   ├── meiliService.ts
+│   │   │   │   └── vetkdService.ts
+│   │   │   ├── store/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── useAppDispatch.ts
+│   │   │   │   │   ├── useAppSelector.ts
+│   │   │   │   │   └── useAppStore.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── rootReducer.ts
+│   │   │   ├── styles/
+│   │   │   │   └── tailwind.css
+│   │   │   ├── utils/
+│   │   │   │   ├── LedgerService.tsx
+│   │   │   │   ├── epub.tsx
+│   │   │   │   ├── general.ts
+│   │   │   │   ├── id_convert.ts
+│   │   │   │   ├── utils.tsx
+│   │   │   │   └── vetkd.ts
+│   ├── alex_librarian/
+│   │   ├── Cargo.toml
+│   │   ├── alex_librarian.did
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── librarian.rs
+│   │       └── node.rs
+│   ├── alex_wallet/
+│   │   ├── alex_wallet.did
+│   │   └── src/
+│   │       └── main.ts
+│   ├── bookmarks/
+│   │   ├── Cargo.toml
+│   │   ├── backend.txt
+│   │   ├── bookmarks.did
+│   │   └── src/
+│   │       ├── folders.rs
+│   │       ├── lib.rs
+│   │       ├── queries.rs
+│   │       ├── storage.rs
+│   │       ├── updates.rs
+│   │       └── utils.rs
+│   ├── icp_swap/
+│   │   ├── Cargo.toml
+│   │   ├── icp_swap.did
+│   │   ├── icp_swap_prelim_audit.txt
+│   │   └── src/
+│   │       ├── guard.rs
+│   │       ├── lib.rs
+│   │       ├── queries.rs
+│   │       ├── script.rs
+│   │       ├── storage.rs
+│   │       ├── update.rs
+│   │       └── utils.rs
+│   ├── icrc7/
+│   │   ├── custom_deploy.sh
+│   │   ├── deploy.sh
+│   │   ├── initial_state/
+│   │   │   ├── icrc3.mo
+│   │   │   ├── icrc37.mo
+│   │   │   └── icrc7.mo
+│   │   ├── main.mo
+│   │   └── nft_archive.mo
+│   ├── nft_manager/
+│   │   ├── Cargo.toml
+│   │   ├── nft_manager.did
+│   │   ├── nft_manager.sh
+│   │   ├── src/
+│   │   │   ├── archive/
+│   │   │   │   ├── dao.rs
+│   │   │   │   ├── extras.rs
+│   │   │   │   └── playground.rs
+│   │   │   ├── guard.rs
+│   │   │   ├── id_converter.rs
+│   │   │   ├── init.rs
+│   │   │   ├── lib.rs
+│   │   │   ├── query.rs
+│   │   │   ├── todo.md
+│   │   │   ├── types.rs
+│   │   │   ├── update.rs
+│   │   │   ├── utils.rs
+│   │   │   └── wallets.rs
+│   │   └── stress_test.sh
+│   ├── registry/
+│   │   ├── Cargo.toml
+│   │   ├── registry.did
+│   │   └── src/
+│   │       └── lib.rs
+│   ├── system_api/
+│   │   ├── Cargo.toml
+│   │   ├── src/
+│   │   │   ├── lib.rs
+│   │   │   └── types.rs
+│   │   └── system_api.did
+│   ├── tokenomics/
+│   │   ├── Cargo.toml
+│   │   ├── image.png
+│   │   ├── src/
+│   │   │   ├── guard.rs
+│   │   │   ├── lib.rs
+│   │   │   ├── queries.rs
+│   │   │   ├── storage.rs
+│   │   │   ├── update.rs
+│   │   │   └── utils.rs
+│   │   ├── tokenomics.
+│   │   ├── tokenomics.did
+│   │   └── tokenomics_audit.md
+│   ├── vetkd/
+│   │   ├── Cargo.toml
+│   │   ├── src/
+│   │   │   ├── ibe.rs
+│   │   │   ├── lib.rs
+│   │   │   ├── ro.rs
+│   │   │   ├── types.rs
+│   │   │   └── utility.rs
+│   │   └── vetkd.did
+│   ├── xrc/
+│   │   ├── xrc.did
+│   │   └── xrc.wasm.gz
+├── tailwind.config.js
+├── tsconfig.json
+├── webpack.config.js
+├── ~/
+│   └── .npm/
+│       ├── _cacache/
+│       │   ├── content-v2/
+│       │   │   └── sha512/
+│       │   │       ├── 0c/
+│       │   │       │   └── 48/
+│       │   │       │       └── cf477a4dc2c79e231a13d1fac5823c6ecd75a840e2906457bc9dea0eb52083751d979e73f353ce0c2dc2a6839863c5c32162caf265d54c39ce03251e5da5
+│       │   │       ├── 0e/
+│       │   │       │   └── 3d/
+│       │   │       │       └── 3548c53a530d01f9c08609a995ff8cbf922690bc2f591c5f6b99b4983f2c39f6a3d59c7e55448dc35cf2cf98e0a7e62564cb0bec4973d45564d26482c27f
+│       │   │       ├── 10/
+│       │   │       │   └── 15/
+│       │   │       │       └── 546fccea7e6c255fa21b684effdaf0eaa4cbe0dee1490651f271770038464bfc74199c0b07908a13b97b451a7e0a594623695f1100f54b630a80fa0796b1
+│       │   │       ├── 12/
+│       │   │       │   └── 81/
+│       │   │       │       └── 1d7d7136667dce487dca3983464882ccf1b0f82b2da0548be1cf5f2f7e85e156273eacaa16dd04cd649ca2815aa99ae6997ed7209ce8730c9e514245a559
+│       │   │       ├── 13/
+│       │   │       │   └── b5/
+│       │   │       │       └── 60c3bf08f77c1ee1959d6026f80c603045138690c21793bff2f3b52600d47e27aaac5aeb260b780bb741fe3b428eb797ba3b7f14f2825a9a06ee76b112ff
+│       │   │       ├── 14/
+│       │   │       │   └── 30/
+│       │   │       │       └── d5ac30131a097e5d44eacba24c15790cc87fb1a274b73dcef115bf0467e1c6ddf93cf0e6a9e743e166f97537f8410b4908bf55ec0a2cbb511c58dcda5931
+│       │   │       ├── 1a/
+│       │   │       │   ├── 01/
+│       │   │       │   │   └── d64856a014d8350f473a27a781101f28d6c1effdcdd61a6995cd59d7e449792eb8037f616ad98cabe16c90b49db95f6b32e5b2ec5ed7d26103cac3a038e4
+│       │   │       │   └── dd/
+│       │   │       │       └── 8ef8edae485d94d4660c26dc366aa9152ae74364aa6f4ffb9df823c268ebae93655e5d71702848d7438b5d04a0eedbd360048be4aba5a2f6eb5b33fd9951
+│       │   │       ├── 29/
+│       │   │       │   └── f0/
+│       │   │       │       └── 8324ae9d09025d0a387e2e17f2c8a494d00eb88f046e277cbeb58c21e2d397b723fd043d6686e5a5d7354b81c675bc28b5b9b129cb0017c20a317e61bb1e
+│       │   │       ├── 2d/
+│       │   │       │   └── 1b/
+│       │   │       │       └── 1ee5fd7e43016309ab2fd5114ded047e439dc60f3d7281c3e0a45e532e8895ce3ca34930a31490404b1227b79ce556fc1ea54c31727ebaac472eb9024825
+│       │   │       ├── 2f/
+│       │   │       │   └── f9/
+│       │   │       │       └── 437d36a8e0b46047001e48cf2f33d521ae37d7a2e6f631e3bcb6abe14c109a1762c229931f7d9fd9473891c1e10a207d915921486479a6e858f217f48e9c
+│       │   │       ├── 3f/
+│       │   │       │   └── aa/
+│       │   │       │       └── c01e3027ad9d3e2225ba0e3ac3846c518a611472df164a866755c931df09ed3dbaa37fad0f8a97b567cda93b04ec9fa733128605a6184a8eb89d1bcc8d46
+│       │   │       ├── 41/
+│       │   │       │   └── aa/
+│       │   │       │       └── 5854e17321c23c6861448df8bdf0f3b4f7758c7ab392b3013593d72350ba3256bb6a46a2ea6026f238d80a6f6a1d2999f61e3b302c23f81846e5de2e45d2
+│       │   │       ├── 47/
+│       │   │       │   └── 14/
+│       │   │       │       └── c8fe07306f9086ca3085e47c7bf427e609ea783e664c31d0eec0c582913b1f9f9b172548fe536c07430752aae5c0c82bb939b6c7ce0e05fefc5d46267898
+│       │   │       ├── 49/
+│       │   │       │   └── 6f/
+│       │   │       │       └── 5be6938f2b8df2f12d0c439bec9ba99437f02cfb15287a48718c7957b53b439112cf748f84d8d4671b2302671d543553e3bdd8c32dd23a022084ff777235
+│       │   │       ├── 4b/
+│       │   │       │   └── b3/
+│       │   │       │       └── ac19380b6740fa02b56a65ac449b438d17592a7d2892f12989ace3dce0c3a5307bd6e7f2e93ad20f0138279806db5d40d55acbc719119d019a41032f5fb2
+│       │   │       ├── 51/
+│       │   │       │   └── 08/
+│       │   │       │       └── 1258dea1ffa9772a985509613bc4b95e144104c6dbcced37b336b2753a0e338fca995ce97a98ce1dfc7edc3f46fa01c389b29830479bc8f540004bfe1ba1
+│       │   │       ├── 5a/
+│       │   │       │   └── 45/
+│       │   │       │       └── 4e369aa99d5130732b47ab7c54d9f82d7ccb0c2bd01b2475f0b9b16eee0afca27459c6b522ab1f1a4deddad7b80bca878c346134a1bf67a150bacf48b033
+│       │   │       ├── 5c/
+│       │   │       │   └── 8b/
+│       │   │       │       └── d5507494ab656141e347a135e6c13d7f235617ed91ab1bc968578517ca003d933c6ac45bc875ec41cc9e7f2c887aff580f70cfbc13033e46af17dc36dbf0
+│       │   │       ├── 5f/
+│       │   │       │   └── 01/
+│       │   │       │       └── a86476e7df6e9229f44f75a5f6ef87cbf228f58e349ddd7edf2bde2ce5b16ead9f85ef7058e67c2ff16d7a07f973fb9a6d3386f5688fa1670e456c3681a0
+│       │   │       ├── 61/
+│       │   │       │   └── 30/
+│       │   │       │       └── 273584a1a4e9e1f99881b130fba87ed42fa7a2279ea80e5d4aa5f04f778a4d5fdf63210b8a039fe8d072e4bd8c7d6e68e67fe1c0d8a31f378e01a3be61f6
+│       │   │       ├── 65/
+│       │   │       │   └── a9/
+│       │   │       │       └── ca6e7e61950cfec7fee8d96eee76b42462049f62f5fb2d1030ea29a8ec61174ef0be741207e3575c67791dbf745036e6060f8c92b3fb9eb14fd917418fd6
+│       │   │       ├── 66/
+│       │   │       │   └── e4/
+│       │   │       │       └── 6416b0326ee27c6311a214fa88096dc468ba09c24bfa04d1fbf33d15ea064fd724109b3bb62f00b82795cdc4a6da238bd3ba43055ae2a6b2250039dad7a7
+│       │   │       ├── 6d/
+│       │   │       │   └── 5d/
+│       │   │       │       └── b5ffd2d099c41e08f120dc10c5b6fc0be9cc224cc92c60d59043828ec4266290419a956b5e9e8674c028ae90920d9460888b6297c74d60e05a07fcbc69cd
+│       │   │       ├── 70/
+│       │   │       │   └── 49/
+│       │   │       │       └── b6c890255df5c2ca7d90465c76e836c5f98a4b8b1c1cb2603600cb5eef221d9cbfc75df10786cd9370741a693eba11085a9e185d2444f03017f2d5fc0a64
+│       │   │       ├── 71/
+│       │   │       │   └── 87/
+│       │   │       │       └── 28fa3161c2ef227712b34501afe2e0e59149895447f624e93ee1c6dafd2cbaec183e66eec34609993a73e18ad5aba3a8281d4d3ef109670325d4e3a20640
+│       │   │       ├── 7c/
+│       │   │       │   └── cc/
+│       │   │       │       └── 6797d0a5a92d335433bb8b837e9881447d926d665d6f5e11231baef9e4b6155fda7ad2d5c689b47a67c25cf9c11e07245b5b5229ad49eb3131f33b371b1c
+│       │   │       ├── 7d/
+│       │   │       │   └── 9f/
+│       │   │       │       └── 5b223f9ee5a18f7e7f507bb5ab123be67038d56de0c822db6bb3456621cc2d2c7db986baddd50becd357d9aae1deb3a3c12a93acf9edda23ed33b8c6287f
+│       │   │       ├── 84/
+│       │   │       │   └── 63/
+│       │   │       │       └── 7045871f70c81bebedb40dbef84dd9fe4f52d5e6412badce42cf3f765932e68bbe151ed10ccd3e366d1383af44b9543441cfe3577a4be6ed5b7099dd2f41
+│       │   │       ├── 86/
+│       │   │       │   ├── 49/
+│       │   │       │   │   └── 07d5a21ed69aa97414a1fa2d0111b0a6eccedd43d2e0f433834d3bc7c7703f184e914584e6e77ce9078dadda8a6c5a7444168872d8e8b738c7cf75f93add
+│       │   │       │   └── 6e/
+│       │   │       │       └── 3fe749182c6655fe85ad4f8a8f88d97aa7b5a973ffbb4bc34bee96a69fda6e9a623e05ea1ce854c509ee8cd567d784a43c6e7ba88a694a5de3f1ef98739b
+│       │   │       ├── 88/
+│       │   │       │   └── 80/
+│       │   │       │       └── 6eee6c24ab851019e30433c6cbc0d2bdeb69d7761a1d792717e2c95f42746110c333bd88af1e1bad08893cba88ef9804975cf0b658d123c3115693bd8eab
+│       │   │       ├── 8a/
+│       │   │       │   └── 79/
+│       │   │       │       └── ac39166991dab5cbc2eaab637d4203b1a68a9fbb6046f1995b4ce46dbd2b9a27e22adc790629d55ca4a279ce00324c9a1f0f0d9f45c9deb6277153e082dc
+│       │   │       ├── 91/
+│       │   │       │   └── c6/
+│       │   │       │       └── 84b8f23bb66e348ab28c23e13dbcc455794c807798257e136e7b62507c8e1a4b23b94d4cb06655190a60e99a90f3831fbfa0f6e60e34bce5c162b96c9729
+│       │   │       ├── 94/
+│       │   │       │   └── c1/
+│       │   │       │       └── 07605853ff6d37419e264c803f807ffab5a595bce3aa1ee7194931bdfe080db6acedda4c133286c487cda77e5e41b11a631235bad4aeab3a9765ce570ccc
+│       │   │       ├── a1/
+│       │   │       │   └── 95/
+│       │   │       │       └── 4b21bf79d3346deaa3a80de1969690ef469719b4819e8d6275f2823a74ad80a12b3ea65e59b1719119f15ade6bae2a4a9d0ab89154596871683c12d71cd8
+│       │   │       ├── a9/
+│       │   │       │   └── 81/
+│       │   │       │       └── a5f0bafeb01cd63336e1f477fb7928733650b99dc15c08fd3f5e30612e1c72f5de4fb9f8d701cc553671af53e5da018dc9479bc535b09c2575270b224dcd
+│       │   │       ├── ae/
+│       │   │       │   └── 94/
+│       │   │       │       └── 36907dbcd62099b7774f809a7649ef8bcb00498d3cd05c799b2b3a656e305f9501fdb3a4c5df775c5d65b14c0e061b9fb92b2a2af86b71869c40b726a96f
+│       │   │       ├── b3/
+│       │   │       │   ├── b2/
+│       │   │       │   │   └── 686a7ec38e981af1a5ec3d7f48c0c8f692088c69381c0e4787701715e92626c075b7002a9926e66613fb3d96b9e1bc2882e286a5bebc3aca382c36db8b30
+│       │   │       │   └── b3/
+│       │   │       │       └── ac7b8fa228264a943350693035a3a1b89855b4ba8698f70b773ccbc5159fec7f5c225ff01b6ddddd39f4d69c651270db98386a76227c8c86d138809c4347
+│       │   │       ├── ba/
+│       │   │       │   ├── a7/
+│       │   │       │   │   └── 8a4a2f6187cd7eea6583f6d9d18f4d8516f5274272a29ab4666f8f6525b7e3d6149860dcf2d47df1966b6a0877f2149f5e1dc1a91d569410cb616871900b
+│       │   │       │   └── d7/
+│       │   │       │       └── 7dc49c37af604ffd0b5a7b2c375688f7be9e0e9c012a71ff9852b6bfe30ce854ad13f8a5adcd8b23b2137bb47d3ff5447f2ec89c4a7f4d3a386acc5b03bf
+│       │   │       ├── bb/
+│       │   │       │   └── eb/
+│       │   │       │       └── 2bf714cfbea3481c439b96c4a1bbaace9496dbef9cb428390ce6fefaf814b445f192201d7573c32b933b874f469e0fcae10171b3decf2ce7320743f161ec
+│       │   │       ├── be/
+│       │   │       │   └── 40/
+│       │   │       │       └── 2c05f74418f011828bd9c9a15662cd0167dab7e41294acd1fc00174cbca60943a81662fb10f43ed370cb12a597aed9b408d94cb475a8ce9cd81d2f82cff2
+│       │   │       ├── c0/
+│       │   │       │   └── 11/
+│       │   │       │       └── 21cc185a4b5f0ece25a98951650ca30918312336a61fc10a39151a594c606e30f656301743fa9975823502c1cea49daa141906f2b4e80ca2517c576cc797
+│       │   │       ├── c4/
+│       │   │       │   └── ee/
+│       │   │       │       └── 99fe6fe1d1e7f7f4ad7d97969088d7373133ab91da42adef982dca171615580b0ac3c7cb4e5b433d3ee87e070c74b8b4431bdc05b0fe80a4bfc3197b3f3a
+│       │   │       ├── cc/
+│       │   │       │   └── e7/
+│       │   │       │       └── f068ba8f55eece7889a81c2bfc4142236b5cb1926ea6973285c47d808dabb853559e627f0ed3cb618a685d10fd2f53f4d7340f8b89ba134e6e1f942d180e
+│       │   │       ├── d1/
+│       │   │       │   └── 22/
+│       │   │       │       └── 5214f6546bbd83a9d9c728f29bbddd95f0bf398893c644ed1ce8135b06119ccb44b44d8407d1f90f7a0109590179ae9d437f5be43200b95b868c1c4cbbc5
+│       │   │       ├── d8/
+│       │   │       │   └── 90/
+│       │   │       │       └── cae4ab9f4e95fc6b7cf522577172026add13b311f0ced3170de2ad0e9f386836243776adf0740beb65212525c57f744ceaefbc3fedbb2cc974e8dd21f128
+│       │   │       ├── d9/
+│       │   │       │   └── 04/
+│       │   │       │       └── d875c5a3d407c47fe375b4e2334c5dab9e4b01fa1b56cdce137cb737b5fd6bf2917d9cc6f7db5570597c13f09954d1b2053ad894da717ca3707043a03cf7
+│       │   │       ├── e0/
+│       │   │       │   └── b8/
+│       │   │       │       └── e8cb8ce79f23066f611c3c83b1ee4f8d51395c893353cdd7d97d2d6bf24ca730892ca3d8423a9583589bc8911c5d5f9766599e7131a20cc7191e307915bb
+│       │   │       ├── e2/
+│       │   │       │   └── 52/
+│       │   │       │       └── 0b61ff1411e299d94c6873255a9bf7c3f7ee8234cd494b4f963de8cb161beedad6e57968c151f61ca1ebe0cfe80a004ddb144ba8e5c563939f1a26a65c9d
+│       │   │       ├── e8/
+│       │   │       │   └── dc/
+│       │   │       │       └── 73642c307037199623cbbe125cc1fcd9c035be47bcfe928fe8188ddda2b977b236196d3a331e6399f551ca1f71da4916c9781a3e6fc556b7b7b1e449411e
+│       │   │       ├── eb/
+│       │   │       │   └── ee/
+│       │   │       │       └── e795b3155ff3d50c2c1a210f274ce3ef78e7052d2b7c19c5ddc7c843d1bb77f6e5b1613f3cb97cea4dde1f4efaad6bba1e509aae75ea5aa4a36dd8360917
+│       │   │       ├── ed/
+│       │   │       │   ├── 27/
+│       │   │       │   │   └── 3e9c8f076885a6c50d15810fa993e56c34fafe77417f2f9d26bec78b785f758cae342f7e8414a863abdefb4803de30ecd6e60767ad6641acc432aa2fb6d2
+│       │   │       │   └── 64/
+│       │   │       │       └── 0622b50d5ec61a6f262dbb0d305ca4ec141a4d03aaf5a9ebea7ba6d5dac5db9a7b2ea0c83fe219f6da5e0db1a057e6bec0643025f2c823dde87cdd8abcbe
+│       │   │       ├── ee/
+│       │   │       │   ├── 33/
+│       │   │       │   │   └── f7e824995bfdf3a24ae350d26bd3b608ef1a032c4830c50f3714b3d748e8c707fde256cbffb30bc6affeb4c7e065dbb6e7a959128115278d951a97e0f900
+│       │   │       │   └── 61/
+│       │   │       │       └── c3389497b482883583978ed10289ffbf6502e4f0d8b01340f96cc0da09adbec5973a028f547b2ae3c49386922d8ace5d2bdc6b43261b04b971309888afee
+│       │   │       ├── ef/
+│       │   │       │   └── 09/
+│       │   │       │       └── c8fa642f66a7276e325e2bf30405c89b1348f35e6f9d8bd537e67b201a00dd50f1112913d7b9b2489e9e3beb848aff99803f6891c0adeb65a95392a23060
+│       │   │       ├── f0/
+│       │   │       │   └── d8/
+│       │   │       │       └── aa0e33c6a4ec322d03a532a2a3259e88a5ee27be43ca90bba6c63399064e1b8721a1593d9fcc93897ff623f530a0ae24f17177b66aa5fa2c9457854daf63
+│       │   │       ├── f1/
+│       │   │       │   └── fd/
+│       │   │       │       └── ed19ff40a38a68f47cb5f3a9e1a486ee99180daedd4cd6249b6380e371baca36fb873766b1ce07db1eaa6a35b6ef2201dfa5b20b424f315adf0276aa891f
+│       │   │       ├── f3/
+│       │   │       │   └── 33/
+│       │   │       │       └── d213d70f30280b89eab1360a5cdde261b7d5fed4eda6ac7fb2b0e9d073072f6d4595b6babe582d731d3e214963fa53010c83783a306dae92a974f9d160a8
+│       │   │       ├── f4/
+│       │   │       │   └── 77/
+│       │   │       │       └── 946ac61becf0e5555194dcb7c45a5bec44cda9804c4394ea00c2f895e385b68ad3a95048f5edd758fdfa2fb76c113666808ff60131f23a034c92414d6ab7
+│       │   │       ├── f7/
+│       │   │       │   └── 31/
+│       │   │       │       └── 12cce3b9683072be1200b0ecbd4dba59d14af60096d423b513ef791c5134b69b100c1ce05a6b5b2dfe303298da02b6fae2b7df649334f5159b9755c81f21
+│       │   │       └── f9/
+│       │   │           └── 5a/
+│       │   │               └── f62d82fbfb7b53e0a0d8a8577969418789bf92a605968d6252b9da232adb4540e70baedd33c734b08301e67afbbdcb3e15729552c5724121be4925e051e0
+│       │   ├── index-v5/
+│       │   │   ├── 01/
+│       │   │   │   └── 42/
+│       │   │   │       └── 5ab56300205e90088a3c844f44ab69f45b4ce44b16ef100151e08696f941
+│       │   │   ├── 04/
+│       │   │   │   └── 14/
+│       │   │   │       └── 3ed0d7df2af77def3bf8c511d9f432c7716e5ca46eb754508bbbf779b947
+│       │   │   ├── 06/
+│       │   │   │   ├── 5a/
+│       │   │   │   │   └── 98f8c4232b39b6ac68023a0bc186c128dffdec812a144648c26dac71f91a
+│       │   │   │   └── a7/
+│       │   │   │       └── 511d8eb35f809a442275d28590bc51e043208005ce13d7f1cacf087a01ae
+│       │   │   ├── 0a/
+│       │   │   │   └── 2f/
+│       │   │   │       └── 8fcd0e2c8539715ba99ae1353c95e91b68af2a4098a67691427ecc2c1f49
+│       │   │   ├── 14/
+│       │   │   │   └── bc/
+│       │   │   │       └── c00e68640bf92dbff552a3f834915e1cd123bc5e9ae74aad59f17cefca00
+│       │   │   ├── 17/
+│       │   │   │   └── a7/
+│       │   │   │       └── 55f55e99272a91992a0d1669be7ec61cfeabeb4556abbd332dcbd0d92ccc
+│       │   │   ├── 1a/
+│       │   │   │   └── ce/
+│       │   │   │       └── 81074d58a77282f7dd7953388ce20d4daba16ec3d5d76a4b98af4f0c6a81
+│       │   │   ├── 1c/
+│       │   │   │   └── b6/
+│       │   │   │       └── ced530248369e3a5117b08b2d0776f930f5d4eae186cec24b6f13de6169b
+│       │   │   ├── 30/
+│       │   │   │   └── c9/
+│       │   │   │       └── dee7204daaadce4118e6b791c57296ac55e0a8f3ce2e8da13932e2ee309e
+│       │   │   ├── 31/
+│       │   │   │   ├── 1a/
+│       │   │   │   │   └── c0024e91ab15ad89e489c606247e773bb08c82601da232ac9a27d2bf421f
+│       │   │   │   └── 55/
+│       │   │   │       └── d8072ee82382881804b11da269e754a9e81ec3f56ef76675b467f07e5b9e
+│       │   │   ├── 32/
+│       │   │   │   └── 94/
+│       │   │   │       └── e53ff195f3d55c4147935444ffed8bc1b2b622a9b0219d64f4a710df8de7
+│       │   │   ├── 33/
+│       │   │   │   └── 66/
+│       │   │   │       └── 2fb6363a3419edcc6fd16e5cb380274310a02356518c748e2846443ccfc8
+│       │   │   ├── 35/
+│       │   │   │   └── db/
+│       │   │   │       └── 7a08199a871e7a3094b3b521592eaf48174c2353e857f890a2c6dec1a054
+│       │   │   ├── 36/
+│       │   │   │   └── 5c/
+│       │   │   │       └── 82a375f2445f79e81218cde8e495db5f60feffc25fe4e7075decacafb472
+│       │   │   ├── 39/
+│       │   │   │   └── 50/
+│       │   │   │       └── f0cdb757fd9e75608d06f560aebd72684f5a59c224261dbac8c133a094db
+│       │   │   ├── 41/
+│       │   │   │   └── d0/
+│       │   │   │       └── 3d4c0f80d8a49fbd5ff2c9538100e8eb0672b9294dde6973d93cf538fef1
+│       │   │   ├── 43/
+│       │   │   │   └── 50/
+│       │   │   │       └── 6f323d33c93ebdecf8393bb1b8a3677fd4666d2488b0304da3c01d0df39e
+│       │   │   ├── 4b/
+│       │   │   │   ├── 63/
+│       │   │   │   │   └── 36333698a0f7165afaed3af7b5135df6d8831aa11c85569c62a7b9c9b915
+│       │   │   │   └── b3/
+│       │   │   │       └── 0fe367ebc64fa9db3d1e0c5bd70ee7c5f2fb16d4412438dcce64ec04e482
+│       │   │   ├── 4d/
+│       │   │   │   └── 2e/
+│       │   │   │       └── fdc98e4057ba46b6370a591cf33f2b5b0cb9c1d05731802a836e0431fd3a
+│       │   │   ├── 4f/
+│       │   │   │   └── 4a/
+│       │   │   │       └── c432dbdaabe4d1a0e47519ed9d0df6b9c9b672157e02a8e1549737c07958
+│       │   │   ├── 51/
+│       │   │   │   └── bd/
+│       │   │   │       └── 35fe1eaa8e91edc92b158f5daff369f06d9f6369fb871b15c921cfa7f8f7
+│       │   │   ├── 5b/
+│       │   │   │   └── 6b/
+│       │   │   │       └── 573afaa538f68981ac0471c5d2c06d0c4b67cee9cf03993502f3a358cb9d
+│       │   │   ├── 65/
+│       │   │   │   └── da/
+│       │   │   │       └── 07ae3e5f45e8ed76d52c60ed5c21f2f97f932627bf95dd5ecf91761f8738
+│       │   │   ├── 66/
+│       │   │   │   └── dc/
+│       │   │   │       └── 91ce4ba83e8b37347df1c0ee838f5e4353d22219c5d2aa9804507c18ec71
+│       │   │   ├── 67/
+│       │   │   │   └── 5f/
+│       │   │   │       └── 28c12321d8b73cabed8e5f6d334222738f3757d989855c298742f545c38d
+│       │   │   ├── 69/
+│       │   │   │   └── bf/
+│       │   │   │       └── 42a44b6a9a8a0ef578592d949dfaf7567180f84060768a026be66d9e7824
+│       │   │   ├── 6e/
+│       │   │   │   └── ba/
+│       │   │   │       └── 43c1ea925224aadb46190086c50557eba228e1371ca21dc4e9b211f3fe15
+│       │   │   ├── 73/
+│       │   │   │   └── 6c/
+│       │   │   │       └── 5dd8fa256fac410e61ff2039a89ee244d71885b9137545ba3aae32374613
+│       │   │   ├── 79/
+│       │   │   │   └── 33/
+│       │   │   │       └── 8a7ef4c50bc61b5227b7a2e213cbed3123809387343f87e623627e6c2467
+│       │   │   ├── 7d/
+│       │   │   │   └── e8/
+│       │   │   │       └── 5446c5cdae0493e4ad3b10347b77c8df4b17b5fbe14834f5c6b06faa9f95
+│       │   │   ├── 83/
+│       │   │   │   ├── 5b/
+│       │   │   │   │   └── 3989599fc48e8ff9c9345a0ba36230378df35db8caee370df762ee60ee12
+│       │   │   │   └── c0/
+│       │   │   │       └── 47707762219f5461b31c00203865ba837a6d8a384cb06508c6f008114cfe
+│       │   │   ├── 85/
+│       │   │   │   └── 58/
+│       │   │   │       └── 0cf89a6a053fa39329a141423674cb8cba852dc3018d3f69c4ff51cfcbbb
+│       │   │   ├── 87/
+│       │   │   │   └── 56/
+│       │   │   │       └── 444ae6dbf44e17b7e179384ba2b5f6c7373ef54261b7c0f6b385199a3f95
+│       │   │   ├── 96/
+│       │   │   │   └── 54/
+│       │   │   │       └── 0f844d95f7b87d91745c6f39468915b60c46288c839690a1cbccdecc11bf
+│       │   │   ├── 98/
+│       │   │   │   └── f2/
+│       │   │   │       └── b821772aae78a7cc4aebf09dcceac3e1a5f5efe02d2d15a291b886ebe1fb
+│       │   │   ├── ab/
+│       │   │   │   └── 3c/
+│       │   │   │       └── cafcfa29966a9a567277e8d3a35a9be36265edb85754251f4de035bf9648
+│       │   │   ├── ae/
+│       │   │   │   └── 0f/
+│       │   │   │       └── ec158a4e6ebc07168973c69dbfd12a2a53a7c1a98fa8ee45dce3c84e575f
+│       │   │   ├── b4/
+│       │   │   │   └── 5d/
+│       │   │   │       └── 48ef635ca329f81733cae0361f9ae818208df2c0f9cb7c52d44f52728895
+│       │   │   ├── b5/
+│       │   │   │   └── be/
+│       │   │   │       └── f0f36dbfd9c4f7c2a6d81b18c872001f83c409c4b6b2a73876fc09846060
+│       │   │   ├── b7/
+│       │   │   │   └── a1/
+│       │   │   │       └── c0aa354414d965a99d6ab8e774b97ea9fcecf2b2be79e85660fa77ffad2d
+│       │   │   ├── b9/
+│       │   │   │   └── 85/
+│       │   │   │       └── a61e4faf2fa57d9503508bed591c594eb5609999d7fe0d23f010cd1c4cc5
+│       │   │   ├── bb/
+│       │   │   │   ├── 05/
+│       │   │   │   │   └── 9ea99e384765a0cfad84314003b3fbf44e7681f69126db3c93b0a4bc4f6f
+│       │   │   │   └── cb/
+│       │   │   │       └── 6bb39caac6d9b1278dc3d132f5e1890b979416ca5c6352265491a9588724
+│       │   │   ├── bd/
+│       │   │   │   └── 60/
+│       │   │   │       └── efeb4f4ed3fca5576f46eb72240af350e5a29266379393f9e46520d6e46d
+│       │   │   ├── be/
+│       │   │   │   └── 29/
+│       │   │   │       └── 05ea53868d6594ece5c171889bb6ddac962da5683b811903db2c02a1fb11
+│       │   │   ├── c5/
+│       │   │   │   └── 0b/
+│       │   │   │       └── cfa21cdb89d8cac30e2edc66871243a65cdbaabfdf6c964eb6ca77a8313e
+│       │   │   ├── ca/
+│       │   │   │   └── 52/
+│       │   │   │       └── d72c8c6698e5e213d7049bcaedb6f02a1b342dcf57a975af7bca90ed2a6a
+│       │   │   ├── d2/
+│       │   │   │   └── 48/
+│       │   │   │       └── ae9280cb91125c455fd099d8af48da17f30c96306d8c328783a7d5424b12
+│       │   │   ├── d4/
+│       │   │   │   └── b0/
+│       │   │   │       └── 5d5e77b032a8de773a7c1da6169348e34c32ec9aca2e0efa84fc06523f01
+│       │   │   ├── d5/
+│       │   │   │   └── 4b/
+│       │   │   │       └── e7e3758c2d19e1b8cf9a59f9a3bb013c0f8040f12ec62bfaa7fb9f279066
+│       │   │   ├── d6/
+│       │   │   │   └── a6/
+│       │   │   │       └── 362c443d777791cf688016b04e0ff051b05ecab2f7e240b56a0ef0dec0d1
+│       │   │   ├── dd/
+│       │   │   │   └── 6b/
+│       │   │   │       └── f105963fcd5840510d524df2465bd347fcdf28f8e7a31a447dfbb8851962
+│       │   │   ├── e0/
+│       │   │   │   └── 3b/
+│       │   │   │       └── 55e56e6f53ffe7a3aa682cb279b0f1f907be037ece0730687bb49a730313
+│       │   │   ├── e8/
+│       │   │   │   └── 6e/
+│       │   │   │       └── 5f8b0a320233e4897efae25c37ac6f4d72bb49a70a3f4f6710d543a7b281
+│       │   │   ├── ef/
+│       │   │   │   ├── 7e/
+│       │   │   │   │   └── 138d06536fa4ad47a86841653c3ff37ac8a889bfd425926c5c32d3489804
+│       │   │   │   └── 9e/
+│       │   │   │       └── ab1f2c89fe59f0afa23753d34db9ef01e6313f68781bf16125695e72406b
+│       │   │   ├── f5/
+│       │   │   │   ├── 6e/
+│       │   │   │   │   └── 8af0017f01532978567dea7acea12bc6a07f9506fa1d239298d284f8d058
+│       │   │   │   └── a5/
+│       │   │   │       └── 7d5d86ebb323790697c817efe41ba75b28a42c738435a746ee2d9b8b686d
+│       │   │   ├── fc/
+│       │   │   │   └── e0/
+│       │   │   │       └── 2b4dfa55fa981cae589ed1c43ceb6d6257fc5509d526f76d88f043c9ba7c
+│       │   │   ├── fd/
+│       │   │   │   └── 40/
+│       │   │   │       └── 4fc393cac4e8d2fefcf2fe58a33bc687e6cc8acb57e333edc37e02dcfecf
+│       │   │   └── fe/
+│       │   │       └── bd/
+│       │   │           └── b8162c544435f4c62cf223981d5fe6072fd0b5778f162c167db3a1964606
+│       │   └── tmp/
+│       ├── _logs/
+│       │   └── 2024-09-21T16_33_30_087Z-debug-0.log
+│       └── _update-notifier-last-checked

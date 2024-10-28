@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
-import ArweaveSearch from "@/apps/LibModules/arweaveSearch";
-import ContentDisplay from "@/apps/LibModules/contentDisplay";
+import ArweaveSearch from "@/apps/Modules/LibModules/arweaveSearch";
+import ContentDisplay from "@/apps/Modules/AppModules/contentGrid";
 
 function Permasearch() {
 
