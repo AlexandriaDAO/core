@@ -1,6 +1,6 @@
 import { Button } from "@/lib/components/button";
 import { DialogClose } from "@/lib/components/dialog";
-import { message } from "antd";
+import { toast } from "sonner";
 import React from "react";
 
 const Footer = ({

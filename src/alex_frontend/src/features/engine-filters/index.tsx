@@ -1,7 +1,7 @@
 import useSession from "@/hooks/useSession";
 import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { message } from "antd";
+import { toast } from "sonner";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { FiRefreshCcw } from "react-icons/fi";
 import { ImSpinner8 } from "react-icons/im";
@@ -45,7 +45,7 @@ const EngineFilters = () => {
 
 			setFilters(attributes);
 		} catch (ex) {
-			message.error("Error fetching filters" + ex)
+			toast.error("Error fetching filters" + ex)
 		} finally {
 			setLoading(false);
 		}
@@ -64,20 +64,20 @@ const EngineFilters = () => {
 			await meiliClient
 				.index(activeEngine.index)
 				.updateFilterableAttributes(newFilters);
-			message.info("Update Filters task enqueued");
+			toast.info("Update Filters task enqueued");
 			setFilters(newFilters);
 		} else {
-			message.error("client not available, unable to update filters.");
+			toast.error("client not available, unable to update filters.");
 		}
 	};
 
 	const handleFilterReset = async () => {
 		if (meiliClient && activeEngine) {
 			await meiliClient.index(activeEngine.index).resetFilterableAttributes();
-			message.info("Update Filters task enqueued");
+			toast.info("Update Filters task enqueued");
 			setFilters([]);
 		} else {
-			message.error("client not available, unable to update filters.");
+			toast.error("client not available, unable to update filters.");
 		}
 	};
 

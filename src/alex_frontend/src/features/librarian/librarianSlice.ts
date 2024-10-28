@@ -1,5 +1,5 @@
 import { ActionReducerMapBuilder, PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { message } from "antd";
+import { toast } from "sonner";
 import checkLibrarian from "./thunks/checkLibrarian";
 import becomeLibrarian from "./thunks/becomeLibrarian";
 
@@ -46,20 +46,20 @@ const librarianSlice = createSlice({
 			})
 
 			.addCase(becomeLibrarian.pending, (state) => {
-				message.info('Adding Librarian')
+				toast.info('Adding Librarian')
 
 				state.loading = true;
 				state.error = null;
 			})
 			.addCase(becomeLibrarian.fulfilled, (state, action) => {
-				message.success('You are a Librarian Now.')
+				toast.success('You are a Librarian Now.')
 
 				state.isLibrarian = action.payload;
 				state.loading = false;
 				state.error = null;
 			})
 			.addCase(becomeLibrarian.rejected, (state, action) => {
-				message.error('Librarian Could not be added')
+				toast.error('Librarian Could not be added')
 
 				state.loading = false;
 				state.error = action.payload as string;

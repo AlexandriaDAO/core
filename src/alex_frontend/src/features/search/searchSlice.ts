@@ -1,6 +1,6 @@
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import performSearch from "./thunks/performSearch";
-import { message } from "antd";
+import { toast } from "sonner";
 
 // Define the interface for our search state
 interface SearchState {
@@ -57,7 +57,7 @@ const searchSlice = createSlice({
 				state.searchResults = action.payload;
 			})
 			.addCase(performSearch.rejected, (state, action) => {
-				message.error(action.payload)
+				toast.error(action.payload)
 
 				state.loading = false;
 				state.searchResults = [];

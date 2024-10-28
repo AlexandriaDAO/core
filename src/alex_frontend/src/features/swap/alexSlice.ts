@@ -2,7 +2,7 @@ import {
   ActionReducerMapBuilder,
   createSlice,
 } from "@reduxjs/toolkit";
-import { message } from "antd";
+import { toast } from "sonner";
 import getAccountAlexBalance from "./thunks/alexIcrc/getAccountAlexBalance";
 import transferALEX from "./thunks/alexIcrc/transferALEX";
 // Define the interface for our node state
@@ -46,18 +46,18 @@ const alexSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(transferALEX.pending, (state) => {
-        message.info("Processing ALEX transfer!");
+        toast.info("Processing ALEX transfer!");
         state.loading = true;
         state.error = null;
       })
       .addCase(transferALEX.fulfilled, (state, action) => {
-        message.success("Successfully transfered!");
+        toast.success("Successfully transfered!");
         state.transferSuccess = true;
         state.loading = false;
         state.error = null;
       })
       .addCase(transferALEX.rejected, (state, action) => {
-        message.error("Error while transfering ALEX");
+        toast.error("Error while transfering ALEX");
         state.loading = false;
         state.error = action.payload as string;
       })

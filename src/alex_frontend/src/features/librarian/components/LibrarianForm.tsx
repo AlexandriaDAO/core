@@ -1,5 +1,5 @@
 import React from "react";
-import { message } from "antd";
+import { toast } from "sonner";
 import { useFormik } from "formik";
 import { LiaSaveSolid } from "react-icons/lia";
 import * as Yup from "yup";
@@ -38,7 +38,7 @@ const LibrarianForm = () => {
 				if (await client.isAuthenticated()) {
 					dispatch(becomeLibrarian(values));
 				} else {
-					message.error('Login to apply');
+					toast.error('Login to apply');
 					dispatch(logout(client));
 				}
 			}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { WebIrys } from "@irys/sdk";
 import { ImSpinner8 } from "react-icons/im";
-import { message } from "antd";
+import { toast } from "sonner";
 import { getClientIrys } from "@/services/irysService";
 import { LiaSaveSolid } from "react-icons/lia";
 import { Button } from "@/lib/components/button";
@@ -34,7 +34,7 @@ const FundNode = () => {
 
 	const fund = async () => {
 		if(!irys) {
-			message.error("Irys is not available");
+			toast.error("Irys is not available");
 			return;
 		}
 		setFundLoading(true);
@@ -49,14 +49,14 @@ const FundNode = () => {
 				);
 				console.log(fundTx, 'fundTx');
 
-				message.success(
+				toast.success(
 					`Transaction has been submitted for ${irys.utils.fromAtomic(
 						fundTx.quantity
 					)} ${irys.token}`
 				);
 			}
 		} catch (e) {
-			message.error(
+			toast.error(
 				"Funding Failed, Try Again."
 			);
 			console.log("Error funding node ", e);

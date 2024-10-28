@@ -4,7 +4,8 @@ import { Node } from "../../../../../declarations/alex_librarian/alex_librarian.
 
 import { WebIrys } from "@irys/sdk";
 import { ImSpinner8 } from "react-icons/im";
-import { Tooltip, message } from "antd";
+import { Tooltip } from "antd";
+import { toast } from "sonner";
 import { IoCopyOutline, IoRefreshOutline } from "react-icons/io5";
 import { SlInfo } from "react-icons/sl";
 import { getClientIrys, getNodeBalance, getServerIrys } from "@/services/irysService";
@@ -33,10 +34,10 @@ const NodeItem = ({ node }: NodeItemProps) => {
 			setIrys(webIrys);
 		}catch(error){
 			if (error instanceof Error) {
-				message.error(error.message);
+				toast.error(error.message);
 			}else{
 				console.log('error loading web irys', error);
-				message.error('unable to load wallet')
+				toast.error('unable to load wallet')
 			}
 			setIrys(null);
 		}finally{
@@ -61,7 +62,7 @@ const NodeItem = ({ node }: NodeItemProps) => {
 			setBalance(balance);
 		} catch (error) {
 			console.error('Error fetching balance:', error);
-			message.error('Failed to fetch balance');
+			toast.error('Failed to fetch balance');
 			setBalance(-1);
 		} finally {
 		  	setBalanceLoading(false);
@@ -97,9 +98,9 @@ const NodeItem = ({ node }: NodeItemProps) => {
 											onClick={() => {
 												if (irys && irys.address) {
 													navigator.clipboard.writeText(irys.address);
-													message.success('Copied to clipboard');
+													toast.success('Copied to clipboard');
 												} else {
-													message.error('No address to copy');
+													toast.error('No address to copy');
 												}
 											}}
 											className={!(irys && irys.address) ? 'text-gray-400' : 'cursor-pointer'}

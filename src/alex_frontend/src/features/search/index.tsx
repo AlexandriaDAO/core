@@ -7,7 +7,7 @@ import { setLimit, setSearchResults, setSearchText } from "./searchSlice";
 import { ImSpinner8 } from "react-icons/im";
 import FilterButton from "@/components/ui/FilterButton";
 import useSession from "@/hooks/useSession";
-import { message } from "antd";
+import { toast } from "sonner";
 import performSearch from "./thunks/performSearch";
 
 export default function Search() {
@@ -23,16 +23,16 @@ export default function Search() {
 	const search = async()=>{
 		if(searchText.length > 0 ){
 			// if( !user ){
-			// 	message.error("Login to perform searches on your engines");
+			// 	toast.error("Login to perform searches on your engines");
 			// 	return;
 			// }
 			if(!meiliClient){
-				message.error("Add a working client to perform searches");
+				toast.error("Add a working client to perform searches");
 				return;
 			}
 
 			if(!await meiliClient.isHealthy()){
-				message.error("Client not available");
+				toast.error("Client not available");
 				return;
 			}
 

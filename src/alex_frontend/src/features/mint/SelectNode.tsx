@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
 import { ImSpinner8 } from "react-icons/im";
-import { message } from "antd";
+import { toast } from "sonner";
 import { WebIrys } from "@irys/sdk";
 import { getNodeBalance, getServerIrys } from "@/services/irysService";
 import { getActorAlexLibrarian } from "../auth/utils/authUtils";
@@ -30,7 +30,7 @@ const NodeRow: React.FC<{
 			setBalance(balance);
 		} catch (error) {
 			console.error('Error fetching balance:', error);
-			message.error('Failed to fetch balance');
+			toast.error('Failed to fetch balance');
 			setBalance(-1);
 		} finally {
 		  	setBalanceLoading(false);
@@ -48,10 +48,10 @@ const NodeRow: React.FC<{
 			setIrys(serverIrys);
 		}catch(error){
 			if (error instanceof Error) {
-				message.error(error.message);
+				toast.error(error.message);
 			}else{
 				console.log('error loading web irys', error);
-				message.error('unable to load wallet')
+				toast.error('unable to load wallet')
 			}
 			setIrys(null);
 		}finally{

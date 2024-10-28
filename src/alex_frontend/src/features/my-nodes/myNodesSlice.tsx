@@ -1,7 +1,7 @@
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import { Node } from '../../../../declarations/alex_librarian/alex_librarian.did';
 import fetchMyNodes from "./thunks/fetchMyNodes";
-import { message } from "antd";
+import { toast } from "sonner";
 import addNode from "./thunks/addNode";
 
 // Define the interface for our node state
@@ -63,13 +63,13 @@ const myNodesSlice = createSlice({
 			})
 
 			.addCase(addNode.pending, (state) => {
-				message.info('Adding Node')
+				toast.info('Adding Node')
 
 				state.newNodeLoading = true;
 				state.newNodeError = null;
 			})
 			.addCase(addNode.fulfilled, (state, action) => {
-				message.success('Node Added')
+				toast.success('Node Added')
 
 				state.newNodeLoading = false;
 				state.newNodeError = null;
@@ -78,7 +78,7 @@ const myNodesSlice = createSlice({
 				state.nodes.push(action.payload);
 			})
 			.addCase(addNode.rejected, (state, action) => {
-				message.error('Node Could not be added')
+				toast.error('Node Could not be added')
 
 				state.newNodeLoading = false;
 				state.newNodeError = action.payload as string;

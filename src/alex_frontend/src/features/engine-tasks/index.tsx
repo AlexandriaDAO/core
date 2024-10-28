@@ -1,7 +1,8 @@
 import useSession from "@/hooks/useSession";
 import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { Table, message } from "antd";
+import { Table } from "antd";
+import { toast } from "sonner";
 import React, { useEffect, useState } from "react";
 import { FiRefreshCcw } from "react-icons/fi";
 import { MdOutlineClear } from "react-icons/md";
@@ -80,7 +81,7 @@ const EngineTasks = () => {
 
 			setTasks(results);
 		} catch (ex) {
-			message.error("Error fetching filters" + ex)
+			toast.error("Error fetching filters" + ex)
 		} finally {
 			setLoading(false);
 			setSelectedRowKeys([]);

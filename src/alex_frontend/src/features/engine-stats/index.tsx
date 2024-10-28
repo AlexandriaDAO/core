@@ -1,7 +1,7 @@
 import useSession from "@/hooks/useSession";
 import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { message } from "antd";
+import { toast } from "sonner";
 import React, { useEffect, useState } from "react";
 import { FiRefreshCcw } from "react-icons/fi";
 import { ImSpinner8 } from "react-icons/im";
@@ -22,10 +22,10 @@ const EngineStats = () => {
 	const handleClearAll = async () => {
 		if (meiliClient && activeEngine) {
 			await meiliClient.index(activeEngine.index).deleteAllDocuments();
-			message.info("Clear document task enqueued");
+			toast.info("Clear document task enqueued");
 			await fetchStats()
 		} else {
-			message.error("client not available, unable to clear documents.");
+			toast.error("client not available, unable to clear documents.");
 		}
 	};
 	const fetchStats = async()=>{
@@ -41,7 +41,7 @@ const EngineStats = () => {
 
 			setStats(stats);
 		}catch(ex){
-			message.error("Error fetching filters" + ex)
+			toast.error("Error fetching filters" + ex)
 		}finally{
 			setLoading(false)
 		}
