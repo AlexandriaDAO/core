@@ -1,3 +1,17 @@
+config is used in LibModules/AweaveSearch/arweaveHelpers and AppModules/contentGrid/utils/contentCacheService.ts.
+
+So these should be moved to LibModules/ArweaveSearch, but, contentCacheService is importent in useContent.ts which has none of it's own dependencies, so we should move it as well.
+
+But, useContent.ts is imported in AppModules/contentGrid/ContentList.tsx, so we need to migrate the part the uses `useContent.ts` as well.
+
+The goal here is to get all the logic out of AppModules and into LibModules, keep all the state in redux, and keep all the UI in AppModules.
+
+
+
+
+
+
+
 Ultimate Goal: 
 
 Every import from one module to another needs to be optional and with parameters that are set in some kind of config file.
@@ -9,33 +23,6 @@ In order to see how this works, let's map all the imports:
 - Permasearch/index.tsx imports ArweaveSearch
 
 
-
-- AppModules/contentGrid/ContentRenderer.tsx:
-  - import ContentValidator from '@/apps/Modules/LibModules/arweaveSearch/components/nsfwjs/ContentValidator';
-
-- AppModules/contentGrid/types/index.ts:
-  - import { PredictionResults } from "@/apps/Modules/LibModules/arweaveSearch/redux/arweaveSlice";
-
-- AppModules/contentGrid/utils/useContent.ts:
-  - import { setMintableStates, setMintableState, MintableStateItem } from "../../../LibModules/arweaveSearch/redux/arweaveSlice";
-  - import { loadModel, isModelLoaded } from '../../../LibModules/arweaveSearch/components/nsfwjs/tensorflow';
-  - import { setNsfwModelLoaded } from "../../../LibModules/arweaveSearch/redux/arweaveSlice";
-
-  - import { contentCache, CachedContent } from '../../../LibModules/contentDisplay/services/contentCacheService';
-  
-- AppModules/search/AmountSelector.tsx:
-  - import { setSearchState } from '@/apps/Modules/LibModules/arweaveSearch/redux/arweaveSlice';
-- AppModules/search/ArweaveOwnerSelector.tsx:
-  - import { setSearchState } from '@/apps/Modules/LibModules/arweaveSearch/redux/arweaveSlice';
-- AppModules/search/ContentCategorySelector.tsx:
-  - import { setSearchState } from '@/apps/Modules/LibModules/arweaveSearch/redux/arweaveSlice';
-
-  - import { setSearchState } from '@/apps/Modules/LibModules/arweaveSearch/redux/arweaveSlice';
-- AppModules/search/DateSelector.tsx:
-  - import { setSearchState } from '@/apps/Modules/LibModules/arweaveSearch/redux/arweaveSlice';
-  - import { useHandleSearch } from '@/apps/Modules/LibModules/arweaveSearch/hooks/useSearchHandlers';
-  - import NsfwModelControl from '@/apps/Modules/LibModules/arweaveSearch/components/nsfwjs/NsfwModelControl';
-
 ***AppModules***
 - Alexandrian/index.tsx imports ContentDisplay from AppModules/contentGrid
 - Permasearch/index.tsx imports ContentDisplay from AppModules/contentGrid
@@ -43,8 +30,6 @@ In order to see how this works, let's map all the imports:
 
 - Libmodules/arweaveSearch/index.tsx 
   - imports SearchForm from AppModules/search/SearchForm
-- Libmodules/arweaveSearch/components/nsfwjs/ContentValidator.tsx
-  - import ContentFetcher from '../../../../AppModules/search/ContentFetcher';
 
 
 

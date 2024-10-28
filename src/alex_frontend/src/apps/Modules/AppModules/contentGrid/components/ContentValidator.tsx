@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setMintableState } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
 import { RootState } from '@/store';
-import ContentFetcher from '@/apps/Modules/AppModules/search/ContentFetcher';
-import { loadModel, isModelLoaded, validateContent } from './tensorflow';
+import { setMintableState } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
+import { useContentValidation } from '@/apps/Modules/shared/services/contentValidation';
+import ContentFetcher from './ContentFetcher';
+import { ContentValidatorProps } from '../types';
 
-interface ContentValidatorProps {
-  transactionId: string;
-  contentUrl: string;
-  contentType: string;
-  imageObjectUrl: string | null;
-}
 
 const ContentValidator: React.FC<ContentValidatorProps> = ({
   transactionId,
@@ -23,6 +18,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     (state: RootState) => state.arweave.nsfwModelLoaded
   );
   const [isValidated, setIsValidated] = useState(false);
+  const { validateContent } = useContentValidation();
 
   const handleValidateContent = async (element: HTMLImageElement | HTMLVideoElement) => {
     if (isValidated) return;
@@ -33,10 +29,6 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     }
 
     try {
-      if (!isModelLoaded()) {
-        await loadModel();
-      }
-
       const predictionResults = await validateContent(element, contentType);
 
       if (predictionResults) {

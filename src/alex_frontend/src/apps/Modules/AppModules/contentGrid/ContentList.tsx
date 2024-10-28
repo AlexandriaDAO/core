@@ -1,81 +1,18 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Transaction, ContentListProps } from "@/apps/Modules/shared/types/queries";
 import ContentGrid from "./ContentGrid";
 import { mint_nft } from "@/features/nft/mint";
-import { getCover } from "@/utils/epub";
 import { FaInfoCircle } from 'react-icons/fa';
-import { useContent } from './utils/useContent';
 import Modal from './components/Modal';
 import ContentRenderer from './components/ContentRenderer';
-
-interface ContentUrlInfo {
-  thumbnailUrl: string | null;
-  coverUrl: string | null;
-  fullUrl: string;
-}
-
-interface ContentTypeHandler {
-  [key: string]: (id: string) => Promise<ContentUrlInfo>;
-}
+import { useAppContent } from './hooks/useAppContent';
 
 const ContentList = ({ transactions }: ContentListProps) => {
-  const { contentData, mintableState, handleRenderError } = useContent(transactions);
+  const { contentData, contentUrls, mintableState, handleRenderError } = useAppContent(transactions);
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
-  const [contentUrls, setContentUrls] = useState<Record<string, ContentUrlInfo>>({});
-  const fetchPromises = useRef<Record<string, Promise<ContentUrlInfo>>>({});
 
-  const contentTypeHandlers = useCallback((): ContentTypeHandler => ({
-    "application/epub+zip": async (id: string) => {
-      const coverUrl = await getCover(`https://arweave.net/${id}`);
-      return {
-        thumbnailUrl: coverUrl,
-        coverUrl: coverUrl,
-        fullUrl: `https://arweave.net/${id}`
-      };
-    },
-    "application/pdf": async (id: string) => ({
-      thumbnailUrl: null,
-      coverUrl: null,
-      fullUrl: `https://arweave.net/${id}`
-    }),
-    "image/": async (id: string) => {
-      const content = contentData[id];
-      return {
-        thumbnailUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
-        coverUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
-        fullUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
-      };
-    },
-    "video/": async (id: string) => ({
-      thumbnailUrl: null,
-      coverUrl: null,
-      fullUrl: `https://arweave.net/${id}`
-    }),
-  }), [contentData]);
-
-  useEffect(() => {
-    const fetchContentUrls = async () => {
-      const newUrls: Record<string, ContentUrlInfo> = {};
-      for (const transaction of transactions) {
-        if (!fetchPromises.current[transaction.id] && !contentUrls[transaction.id]) {
-          const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-          const handler = contentTypeHandlers()[contentType];
-          if (handler) {
-            fetchPromises.current[transaction.id] = handler(transaction.id);
-            newUrls[transaction.id] = await fetchPromises.current[transaction.id];
-          }
-        }
-      }
-      if (Object.keys(newUrls).length > 0) {
-        setContentUrls(prev => ({...prev, ...newUrls}));
-      }
-    };
-
-    fetchContentUrls();
-  }, [transactions, contentTypeHandlers]);
-
-  const handleMint = useCallback(async (transactionId: string) => {
+  const handleMint = async (transactionId: string) => {
     try {
       await mint_nft(transactionId);
       alert("NFT minted successfully!");
@@ -83,7 +20,7 @@ const ContentList = ({ transactions }: ContentListProps) => {
       console.error("Error minting NFT:", error);
       alert("Failed to mint NFT. Please try again.");
     }
-  }, []);
+  };
 
   const renderDetails = useCallback((transaction: Transaction) => (
     <div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300 z-10">

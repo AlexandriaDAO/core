@@ -23,3 +23,10 @@ export interface MintableStateItem {
 export interface MintableState {
   [key: string]: MintableStateItem;
 }
+
+export interface ContentValidatorProps {
+  transactionId: string;
+  contentUrl: string;
+  contentType: string;
+  imageObjectUrl: string | null;
+}

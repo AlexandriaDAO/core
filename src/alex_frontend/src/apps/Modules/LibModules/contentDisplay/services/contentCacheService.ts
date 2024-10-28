@@ -1,17 +1,39 @@
 import { Transaction } from "../../../shared/types/queries";
 import { getArweaveUrl } from "../../arweaveSearch/config/arweaveConfig";
-
-export type CachedContent = {
-  url: string | null;
-  textContent: string | null;
-  imageObjectUrl: string | null;
-  error: string | null;
-};
+import { CachedContent } from '../types';
 
 type ContentCache = Record<string, CachedContent>;
 
 class ContentCacheService {
+  private static instance: ContentCacheService;
+  private maxCacheSize: number;
   private cache: ContentCache = {};
+
+  private constructor(maxCacheSize = 100) {
+    this.maxCacheSize = maxCacheSize;
+    this.cache = {};
+  }
+
+  public static getInstance(): ContentCacheService {
+    if (!ContentCacheService.instance) {
+      ContentCacheService.instance = new ContentCacheService();
+    }
+    return ContentCacheService.instance;
+  }
+
+  private pruneCache() {
+    const entries = Object.entries(this.cache);
+    if (entries.length > this.maxCacheSize) {
+      // Remove oldest entries
+      const toRemove = entries.slice(0, entries.length - this.maxCacheSize);
+      toRemove.forEach(([txId, content]) => {
+        if (content.imageObjectUrl) {
+          URL.revokeObjectURL(content.imageObjectUrl);
+        }
+        delete this.cache[txId];
+      });
+    }
+  }
 
   async loadContent(transaction: Transaction): Promise<CachedContent> {
     const txId = transaction.id;
@@ -58,6 +80,7 @@ class ContentCacheService {
       }
 
       this.cache[txId] = content;
+      this.pruneCache();
       return content;
 
     } catch (error) {
@@ -96,4 +119,4 @@ class ContentCacheService {
 }
 
 // Export a singleton instance
-export const contentCache = new ContentCacheService();
+export const contentCache = ContentCacheService.getInstance();

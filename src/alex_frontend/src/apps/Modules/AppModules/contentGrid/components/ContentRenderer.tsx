@@ -2,7 +2,7 @@ import React from 'react';
 import { FaSpinner, FaBook, FaFilePdf } from 'react-icons/fa';
 import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
-import ContentValidator from '@/apps/Modules/LibModules/arweaveSearch/components/nsfwjs/ContentValidator';
+import ContentValidator from './ContentValidator';
 import { getFileIcon } from '../utils/fileIcons';
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { ContentUrlInfo, MintableState } from '../types';

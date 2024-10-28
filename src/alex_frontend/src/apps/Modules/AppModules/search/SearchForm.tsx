@@ -1,13 +1,13 @@
 import React from "react";
 import { SearchFormProps } from '@/apps/Modules/shared/types/queries';
-import { useHandleSearch } from '@/apps/Modules/LibModules/arweaveSearch/hooks/useSearchHandlers';
+import { useHandleSearch } from './hooks/useSearchHandlers';
 
-import AmountSelector from './AmountSelector';
-import ContentCategorySelector from './ContentCategorySelector';
-import NsfwModelControl from '@/apps/Modules/LibModules/arweaveSearch/components/nsfwjs/NsfwModelControl';
-import DateSelector from './DateSelector';
-import ArweaveOwnerSelector from './ArweaveOwnerSelector';
-import ContentTagsSelector from './ContentTagsSelector';
+import NsfwModelControl from './NsfwSelector';
+import AmountSelector from './selectors/AmountSelector';
+import ContentCategorySelector from './selectors/ContentCategorySelector';
+import DateSelector from './selectors/DateSelector';
+import ArweaveOwnerSelector from './selectors/ArweaveOwnerSelector';
+import ContentTagsSelector from './selectors/ContentTagsSelector';
 
 
 const SearchForm: React.FC<SearchFormProps> = ({ 
