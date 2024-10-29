@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { Transaction, ContentListProps } from "@/apps/Modules/shared/types/queries";
 import ContentGrid from "./ContentGrid";
 import { mint_nft } from "@/features/nft/mint";
-import { FaInfoCircle } from 'react-icons/fa';
+import { Info } from 'lucide-react';
 import Modal from './components/Modal';
 import ContentRenderer from './components/ContentRenderer';
 import { useAppContent } from './hooks/useAppContent';
@@ -73,7 +73,7 @@ const ContentList = ({ transactions }: ContentListProps) => {
                       }}
                       className="absolute top-2 left-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
                     >
-                      <FaInfoCircle />
+                      <Info />
                     </button>
                     <button
                       onClick={(e) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaSpinner, FaBook, FaFilePdf } from 'react-icons/fa';
+import { LoaderPinwheel, BookOpen, File } from 'lucide-react';
 import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
 import ContentValidator from './ContentValidator';
@@ -34,7 +34,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
   if (!content) {
     return (
       <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-        <FaSpinner className="animate-spin text-4xl text-gray-500" />
+        <LoaderPinwheel className="animate-spin text-4xl text-gray-500" />
       </div>
     );
   }
@@ -61,8 +61,8 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
             <img src={contentUrls.thumbnailUrl} alt="Book cover" {...commonProps} crossOrigin="anonymous" />
           ) : (
             <>
-              <FaBook className="text-gray-500 text-4xl absolute" />
-              <FaSpinner className="animate-spin text-4xl text-gray-500" />
+              <BookOpen className="text-gray-500 text-4xl absolute" />
+              <LoaderPinwheel className="animate-spin text-4xl text-gray-500" />
             </>
           )}
         </div>
@@ -82,7 +82,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
       ),
       "application/pdf": (
         <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
-          <FaFilePdf className="text-gray-500 text-4xl absolute" />
+          <File className="text-gray-500 text-4xl absolute" />
           {inModal && <embed src={`${contentUrls.fullUrl}#view=FitH&page=1`} type="application/pdf" {...commonProps} />}
         </div>
       ),

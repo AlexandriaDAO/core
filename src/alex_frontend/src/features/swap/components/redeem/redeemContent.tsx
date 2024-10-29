@@ -9,7 +9,7 @@ import { _SERVICE as _SERVICEICPLEDGER } from "../../../../../../declarations/ic
 import { Link } from "react-router-dom";
 import swapLbry from "../../thunks/swapLbry";
 import { flagHandler } from "../../swapSlice";
-import { ImSpinner8 } from "react-icons/im";
+import { LoaderPinwheel } from 'lucide-react';
 import Auth from "@/features/auth";
 import getArchivedBal from "../../thunks/getArchivedBal";
 import redeemArchivedBalance from "../../thunks/redeemArchivedBalance";
@@ -65,7 +65,8 @@ const RedeemContent: React.FC = () => {
               }}
             >
               {swap.loading ? (<>
-                <ImSpinner8 size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
+                <LoaderPinwheel className="animate-spin text-white mx-auto" />
+              </>) : (
                 <>Redeem</>
               )}
             </button> : <div

@@ -1,12 +1,12 @@
 {
-  "hash": "39926e92878e8d3968e3",
-  "time": 36633,
+  "hash": "ca51f60e52254c301b7f",
+  "time": 31495,
   "assetsByChunkName": {
     "index": [
-      "index.371310f2cd557724dca9.js"
+      "index.01489ee5ca15616a36c2.js"
     ],
     "runtime": [
-      "runtime.dd341aadcd3256025b1d.js"
+      "runtime.99bbdcefc150aa2372a8.js"
     ],
     "nsfwjs": [
       "nsfwjs.1cf342319aa99e2e5ec9.js"
@@ -27,7 +27,7 @@
       "npm.seedrandom.8d731c0ad85b944f79b0.js"
     ],
     "npm.antd": [
-      "npm.antd.acb99ea3dc2ff199ca58.js"
+      "npm.antd.9da22eec33b1327b0102.js"
     ],
     "npm.aptos-labs": [
       "npm.aptos-labs.bb788a8c64e8e22673dc.js"
@@ -68,6 +68,9 @@
     "npm.swiper": [
       "npm.swiper.95cc7caa5728cb58573b.js"
     ],
+    "npm.lucide-react": [
+      "npm.lucide-react.0a260acc2642cd8c1738.js"
+    ],
     "npm.near-js": [
       "npm.near-js.60456e747e1c3926db8c.js"
     ],
@@ -104,17 +107,14 @@
     "npm.graphql": [
       "npm.graphql.2f9530d9358f2be7de2e.js"
     ],
-    "npm.react-icons": [
-      "npm.react-icons.2573c74c59cb0f2fb4a0.js"
-    ],
-    "npm.radix-ui": [
-      "npm.radix-ui.f365fe88407959300dc3.js"
-    ],
     "npm.parse-asn1": [
       "npm.parse-asn1.c26a357a6eaccc910fdf.js"
     ],
     "npm.property-information": [
       "npm.property-information.bdb60ece6e7e6f71a369.js"
+    ],
+    "npm.radix-ui": [
+      "npm.radix-ui.899e847561bbf6f29ba6.js"
     ],
     "npm.webpack-dev-server": [
       "npm.webpack-dev-server.9ee85bc4be1b876d1722.js"
@@ -182,9 +182,6 @@
     "npm.rc-overflow": [
       "npm.rc-overflow.c689f134a6421c083865.js"
     ],
-    "npm.rc-notification": [
-      "npm.rc-notification.ceb0ccdf17da3af69532.js"
-    ],
     "npm.public-encrypt": [
       "npm.public-encrypt.2b287af2dc3f208d4ad6.js"
     ],
@@ -238,9 +235,6 @@
     ],
     "npm.prop-types": [
       "npm.prop-types.8aa20e6166dfc6d0befa.js"
-    ],
-    "npm.lucide-react": [
-      "npm.lucide-react.31427962af1aeccc3e28.js"
     ],
     "npm.diffie-hellman": [
       "npm.diffie-hellman.a8e9f1551adac09e7644.js"
@@ -428,6 +422,9 @@
     "npm.space-separated-tokens": [
       "npm.space-separated-tokens.c46d3c78feb00403d7c9.js"
     ],
+    "npm.sonner": [
+      "npm.sonner.4413dd7f2c05289f098c.js"
+    ],
     "npm.rpc-websockets": [
       "npm.rpc-websockets.7fd787f620f6d4016419.js"
     ],
@@ -451,6 +448,9 @@
     ],
     "npm.react-markdown": [
       "npm.react-markdown.35333b08f8db7d990271.js"
+    ],
+    "npm.next-themes": [
+      "npm.next-themes.a6af12c5d3ed4f79b10d.js"
     ],
     "npm.micromark-util-sanitize-uri": [
       "npm.micromark-util-sanitize-uri.20ee19da208ed4eb85d5.js"
@@ -3895,6 +3895,32 @@
     },
     {
       "type": "asset",
+      "name": "npm.next-themes.a6af12c5d3ed4f79b10d.js",
+      "size": 4982,
+      "emitted": true,
+      "comparedForEmit": false,
+      "cached": false,
+      "info": {
+        "immutable": true,
+        "contenthash": "a6af12c5d3ed4f79b10d",
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "npm.next-themes.a6af12c5d3ed4f79b10d.js.map"
+        },
+        "size": 4982
+      },
+      "chunkNames": [
+        "npm.next-themes"
+      ],
+      "chunkIdHints": [
+        "vendor"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1
+    },
+    {
+      "type": "asset",
       "name": "npm.micromark-util-sanitize-uri.20ee19da208ed4eb85d5.js",
       "size": 4987,
       "emitted": true,
@@ -4526,32 +4552,6 @@
     },
     {
       "type": "asset",
-      "name": "npm.lucide-react.31427962af1aeccc3e28.js",
-      "size": 7701,
-      "emitted": true,
-      "comparedForEmit": false,
-      "cached": false,
-      "info": {
-        "immutable": true,
-        "contenthash": "31427962af1aeccc3e28",
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "npm.lucide-react.31427962af1aeccc3e28.js.map"
-        },
-        "size": 7701
-      },
-      "chunkNames": [
-        "npm.lucide-react"
-      ],
-      "chunkIdHints": [
-        "vendor"
-      ],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1
-    },
-    {
-      "type": "asset",
       "name": "icons/search.svg",
       "size": 7704,
       "emitted": true,
@@ -4944,6 +4944,28 @@
       "chunkIdHints": [
         "vendor"
       ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1
+    },
+    {
+      "type": "asset",
+      "name": "src_alex_frontend_src_apps_Modules_LibModules_contentDisplay_services_contentService_ts.1b175e8a91e340af9619.js",
+      "size": 10722,
+      "emitted": true,
+      "comparedForEmit": false,
+      "cached": false,
+      "info": {
+        "immutable": true,
+        "contenthash": "1b175e8a91e340af9619",
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "src_alex_frontend_src_apps_Modules_LibModules_contentDisplay_services_contentService_ts.1b175e8a91e340af9619.js.map"
+        },
+        "size": 10722
+      },
+      "chunkNames": [],
+      "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1
@@ -5609,12 +5631,12 @@
     {
       "type": "asset",
       "name": "index.html",
-      "size": 18411,
+      "size": 18402,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
-        "size": 18411
+        "size": 18402
       },
       "chunkNames": [],
       "chunkIdHints": [],
@@ -6264,6 +6286,32 @@
     },
     {
       "type": "asset",
+      "name": "npm.sonner.4413dd7f2c05289f098c.js",
+      "size": 32563,
+      "emitted": true,
+      "comparedForEmit": false,
+      "cached": false,
+      "info": {
+        "immutable": true,
+        "contenthash": "4413dd7f2c05289f098c",
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "npm.sonner.4413dd7f2c05289f098c.js.map"
+        },
+        "size": 32563
+      },
+      "chunkNames": [
+        "npm.sonner"
+      ],
+      "chunkIdHints": [
+        "vendor"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1
+    },
+    {
+      "type": "asset",
       "name": "npm.rc-textarea.ae73d1652d43ff6ac332.js",
       "size": 32600,
       "emitted": true,
@@ -6576,32 +6624,6 @@
     },
     {
       "type": "asset",
-      "name": "npm.rc-notification.ceb0ccdf17da3af69532.js",
-      "size": 39301,
-      "emitted": true,
-      "comparedForEmit": false,
-      "cached": false,
-      "info": {
-        "immutable": true,
-        "contenthash": "ceb0ccdf17da3af69532",
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "npm.rc-notification.ceb0ccdf17da3af69532.js.map"
-        },
-        "size": 39301
-      },
-      "chunkNames": [
-        "npm.rc-notification"
-      ],
-      "chunkIdHints": [
-        "vendor"
-      ],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1
-    },
-    {
-      "type": "asset",
       "name": "npm.long.c2caad914d0a2b82640e.js",
       "size": 40471,
       "emitted": true,
@@ -6784,19 +6806,45 @@
     },
     {
       "type": "asset",
-      "name": "runtime.dd341aadcd3256025b1d.js",
-      "size": 55024,
+      "name": "npm.lucide-react.0a260acc2642cd8c1738.js",
+      "size": 50291,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "immutable": true,
-        "contenthash": "dd341aadcd3256025b1d",
+        "contenthash": "0a260acc2642cd8c1738",
         "javascriptModule": false,
         "related": {
-          "sourceMap": "runtime.dd341aadcd3256025b1d.js.map"
+          "sourceMap": "npm.lucide-react.0a260acc2642cd8c1738.js.map"
         },
-        "size": 55024
+        "size": 50291
+      },
+      "chunkNames": [
+        "npm.lucide-react"
+      ],
+      "chunkIdHints": [
+        "vendor"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1
+    },
+    {
+      "type": "asset",
+      "name": "runtime.99bbdcefc150aa2372a8.js",
+      "size": 55137,
+      "emitted": true,
+      "comparedForEmit": false,
+      "cached": false,
+      "info": {
+        "immutable": true,
+        "contenthash": "99bbdcefc150aa2372a8",
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "runtime.99bbdcefc150aa2372a8.js.map"
+        },
+        "size": 55137
       },
       "chunkNames": [
         "runtime"
@@ -7143,6 +7191,32 @@
       },
       "chunkNames": [
         "npm.tailwind-merge"
+      ],
+      "chunkIdHints": [
+        "vendor"
+      ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1
+    },
+    {
+      "type": "asset",
+      "name": "npm.radix-ui.899e847561bbf6f29ba6.js",
+      "size": 76464,
+      "emitted": true,
+      "comparedForEmit": false,
+      "cached": false,
+      "info": {
+        "immutable": true,
+        "contenthash": "899e847561bbf6f29ba6",
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "npm.radix-ui.899e847561bbf6f29ba6.js.map"
+        },
+        "size": 76464
+      },
+      "chunkNames": [
+        "npm.radix-ui"
       ],
       "chunkIdHints": [
         "vendor"
@@ -7671,32 +7745,6 @@
       },
       "chunkNames": [
         "npm.borc"
-      ],
-      "chunkIdHints": [
-        "vendor"
-      ],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1
-    },
-    {
-      "type": "asset",
-      "name": "npm.radix-ui.f365fe88407959300dc3.js",
-      "size": 120570,
-      "emitted": true,
-      "comparedForEmit": false,
-      "cached": false,
-      "info": {
-        "immutable": true,
-        "contenthash": "f365fe88407959300dc3",
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "npm.radix-ui.f365fe88407959300dc3.js.map"
-        },
-        "size": 120570
-      },
-      "chunkNames": [
-        "npm.radix-ui"
       ],
       "chunkIdHints": [
         "vendor"
@@ -9275,43 +9323,19 @@
     },
     {
       "type": "asset",
-      "name": "index.371310f2cd557724dca9.js",
-      "size": 1301347,
+      "name": "npm.antd.9da22eec33b1327b0102.js",
+      "size": 1291461,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "immutable": true,
-        "contenthash": "371310f2cd557724dca9",
+        "contenthash": "9da22eec33b1327b0102",
         "javascriptModule": false,
         "related": {
-          "sourceMap": "index.371310f2cd557724dca9.js.map"
+          "sourceMap": "npm.antd.9da22eec33b1327b0102.js.map"
         },
-        "size": 1301347
-      },
-      "chunkNames": [
-        "index"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1
-    },
-    {
-      "type": "asset",
-      "name": "npm.antd.acb99ea3dc2ff199ca58.js",
-      "size": 1326741,
-      "emitted": true,
-      "comparedForEmit": false,
-      "cached": false,
-      "info": {
-        "immutable": true,
-        "contenthash": "acb99ea3dc2ff199ca58",
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "npm.antd.acb99ea3dc2ff199ca58.js.map"
-        },
-        "size": 1326741
+        "size": 1291461
       },
       "chunkNames": [
         "npm.antd"
@@ -9319,6 +9343,30 @@
       "chunkIdHints": [
         "vendor"
       ],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 1
+    },
+    {
+      "type": "asset",
+      "name": "index.01489ee5ca15616a36c2.js",
+      "size": 1375530,
+      "emitted": true,
+      "comparedForEmit": false,
+      "cached": false,
+      "info": {
+        "immutable": true,
+        "contenthash": "01489ee5ca15616a36c2",
+        "javascriptModule": false,
+        "related": {
+          "sourceMap": "index.01489ee5ca15616a36c2.js.map"
+        },
+        "size": 1375530
+      },
+      "chunkNames": [
+        "index"
+      ],
+      "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1
@@ -9595,32 +9643,6 @@
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
       "filteredRelated": 1
-    },
-    {
-      "type": "asset",
-      "name": "npm.react-icons.2573c74c59cb0f2fb4a0.js",
-      "size": 21002920,
-      "emitted": true,
-      "comparedForEmit": false,
-      "cached": false,
-      "info": {
-        "immutable": true,
-        "contenthash": "2573c74c59cb0f2fb4a0",
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "npm.react-icons.2573c74c59cb0f2fb4a0.js.map"
-        },
-        "size": 21002920
-      },
-      "chunkNames": [
-        "npm.react-icons"
-      ],
-      "chunkIdHints": [
-        "vendor"
-      ],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1
     }
   ],
   "chunks": [
@@ -9629,10 +9651,10 @@
       "initial": true,
       "entry": false,
       "recorded": false,
-      "size": 778052.8,
+      "size": 807961.8,
       "sizes": {
         "runtime": 148,
-        "javascript": 777904.8
+        "javascript": 807813.8
       },
       "names": [
         "index"
@@ -9642,12 +9664,12 @@
         "runtime"
       ],
       "files": [
-        "index.371310f2cd557724dca9.js"
+        "index.01489ee5ca15616a36c2.js"
       ],
       "auxiliaryFiles": [
-        "index.371310f2cd557724dca9.js.map"
+        "index.01489ee5ca15616a36c2.js.map"
       ],
-      "hash": "50fa28472685c3015799",
+      "hash": "fe6c20efefa23a577f8f",
       "childrenByOrder": {
         "prefetch": [
           "npm.nsfwjs",
@@ -9776,9 +9798,9 @@
       "entry": false,
       "recorded": false,
       "reason": "split chunk (cache group: vendor) (name: npm.antd)",
-      "size": 877095,
+      "size": 853945,
       "sizes": {
-        "javascript": 877095
+        "javascript": 853945
       },
       "names": [
         "npm.antd"
@@ -9790,12 +9812,12 @@
         "runtime"
       ],
       "files": [
-        "npm.antd.acb99ea3dc2ff199ca58.js"
+        "npm.antd.9da22eec33b1327b0102.js"
       ],
       "auxiliaryFiles": [
-        "npm.antd.acb99ea3dc2ff199ca58.js.map"
+        "npm.antd.9da22eec33b1327b0102.js.map"
       ],
-      "hash": "085f3d5ceba52fec9dc8",
+      "hash": "ad69a635ad43b0346e24",
       "childrenByOrder": {}
     },
     {
@@ -12438,9 +12460,9 @@
       "entry": false,
       "recorded": false,
       "reason": "split chunk (cache group: vendor) (name: npm.lucide-react)",
-      "size": 3247,
+      "size": 21593,
       "sizes": {
-        "javascript": 3247
+        "javascript": 21593
       },
       "names": [
         "npm.lucide-react"
@@ -12452,12 +12474,12 @@
         "runtime"
       ],
       "files": [
-        "npm.lucide-react.31427962af1aeccc3e28.js"
+        "npm.lucide-react.0a260acc2642cd8c1738.js"
       ],
       "auxiliaryFiles": [
-        "npm.lucide-react.31427962af1aeccc3e28.js.map"
+        "npm.lucide-react.0a260acc2642cd8c1738.js.map"
       ],
-      "hash": "e156a964bbe58b789151",
+      "hash": "2602fda5c216b1ee7817",
       "childrenByOrder": {}
     },
     {
@@ -13333,6 +13355,34 @@
       "initial": true,
       "entry": false,
       "recorded": false,
+      "reason": "split chunk (cache group: vendor) (name: npm.next-themes)",
+      "size": 3592,
+      "sizes": {
+        "javascript": 3592
+      },
+      "names": [
+        "npm.next-themes"
+      ],
+      "idHints": [
+        "vendor"
+      ],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "npm.next-themes.a6af12c5d3ed4f79b10d.js"
+      ],
+      "auxiliaryFiles": [
+        "npm.next-themes.a6af12c5d3ed4f79b10d.js.map"
+      ],
+      "hash": "4002a1eb1f98e05d6cf9",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": true,
+      "initial": true,
+      "entry": false,
+      "recorded": false,
       "reason": "split chunk (cache group: vendor) (name: npm.noble)",
       "size": 306742,
       "sizes": {
@@ -13726,9 +13776,9 @@
       "entry": false,
       "recorded": false,
       "reason": "split chunk (cache group: vendor) (name: npm.radix-ui)",
-      "size": 82995,
+      "size": 49837,
       "sizes": {
-        "javascript": 82995
+        "javascript": 49837
       },
       "names": [
         "npm.radix-ui"
@@ -13740,12 +13790,12 @@
         "runtime"
       ],
       "files": [
-        "npm.radix-ui.f365fe88407959300dc3.js"
+        "npm.radix-ui.899e847561bbf6f29ba6.js"
       ],
       "auxiliaryFiles": [
-        "npm.radix-ui.f365fe88407959300dc3.js.map"
+        "npm.radix-ui.899e847561bbf6f29ba6.js.map"
       ],
-      "hash": "9d1e34ce8564bc9c5539",
+      "hash": "30b9782277ec11e7201c",
       "childrenByOrder": {}
     },
     {
@@ -14054,34 +14104,6 @@
         "npm.rc-motion.025aa002304e74284a12.js.map"
       ],
       "hash": "65a52ad0e3ceaaca12be",
-      "childrenByOrder": {}
-    },
-    {
-      "rendered": true,
-      "initial": true,
-      "entry": false,
-      "recorded": false,
-      "reason": "split chunk (cache group: vendor) (name: npm.rc-notification)",
-      "size": 24908,
-      "sizes": {
-        "javascript": 24908
-      },
-      "names": [
-        "npm.rc-notification"
-      ],
-      "idHints": [
-        "vendor"
-      ],
-      "runtime": [
-        "runtime"
-      ],
-      "files": [
-        "npm.rc-notification.ceb0ccdf17da3af69532.js"
-      ],
-      "auxiliaryFiles": [
-        "npm.rc-notification.ceb0ccdf17da3af69532.js.map"
-      ],
-      "hash": "4207ea7c84e92f9ee47b",
       "childrenByOrder": {}
     },
     {
@@ -14586,34 +14608,6 @@
         "npm.react-fast-compare.980c8778cc2a96787d2a.js.map"
       ],
       "hash": "fd44af841d0319388726",
-      "childrenByOrder": {}
-    },
-    {
-      "rendered": true,
-      "initial": true,
-      "entry": false,
-      "recorded": false,
-      "reason": "split chunk (cache group: vendor) (name: npm.react-icons)",
-      "size": 17841277,
-      "sizes": {
-        "javascript": 17841277
-      },
-      "names": [
-        "npm.react-icons"
-      ],
-      "idHints": [
-        "vendor"
-      ],
-      "runtime": [
-        "runtime"
-      ],
-      "files": [
-        "npm.react-icons.2573c74c59cb0f2fb4a0.js"
-      ],
-      "auxiliaryFiles": [
-        "npm.react-icons.2573c74c59cb0f2fb4a0.js.map"
-      ],
-      "hash": "d0ce28af9c14dfddf3b3",
       "childrenByOrder": {}
     },
     {
@@ -15482,6 +15476,34 @@
         "npm.solana.53000d46e0a05b2f0b45.js.map"
       ],
       "hash": "eaacab56a7501b213344",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": true,
+      "initial": true,
+      "entry": false,
+      "recorded": false,
+      "reason": "split chunk (cache group: vendor) (name: npm.sonner)",
+      "size": 29136,
+      "sizes": {
+        "javascript": 29136
+      },
+      "names": [
+        "npm.sonner"
+      ],
+      "idHints": [
+        "vendor"
+      ],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "npm.sonner.4413dd7f2c05289f098c.js"
+      ],
+      "auxiliaryFiles": [
+        "npm.sonner.4413dd7f2c05289f098c.js.map"
+      ],
+      "hash": "65889e7b762131ba47b6",
       "childrenByOrder": {}
     },
     {
@@ -16747,9 +16769,9 @@
       "initial": true,
       "entry": true,
       "recorded": false,
-      "size": 37033,
+      "size": 37146,
       "sizes": {
-        "runtime": 37033
+        "runtime": 37146
       },
       "names": [
         "runtime"
@@ -16759,12 +16781,36 @@
         "runtime"
       ],
       "files": [
-        "runtime.dd341aadcd3256025b1d.js"
+        "runtime.99bbdcefc150aa2372a8.js"
       ],
       "auxiliaryFiles": [
-        "runtime.dd341aadcd3256025b1d.js.map"
+        "runtime.99bbdcefc150aa2372a8.js.map"
       ],
-      "hash": "721f006be8c1269914a0",
+      "hash": "3385f628e7aa5aa788c9",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": true,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "reason": "reused as split chunk (cache group: default)",
+      "size": 7328,
+      "sizes": {
+        "javascript": 7328
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "src_alex_frontend_src_apps_Modules_LibModules_contentDisplay_services_contentService_ts.1b175e8a91e340af9619.js"
+      ],
+      "auxiliaryFiles": [
+        "src_alex_frontend_src_apps_Modules_LibModules_contentDisplay_services_contentService_ts.1b175e8a91e340af9619.js.map"
+      ],
+      "hash": "6123d33cd229c401767f",
       "childrenByOrder": {}
     }
   ],
@@ -16773,12 +16819,12 @@
       "name": "index",
       "assets": [
         {
-          "name": "runtime.dd341aadcd3256025b1d.js",
-          "size": 55024
+          "name": "runtime.99bbdcefc150aa2372a8.js",
+          "size": 55137
         },
         {
-          "name": "npm.antd.acb99ea3dc2ff199ca58.js",
-          "size": 1326741
+          "name": "npm.antd.9da22eec33b1327b0102.js",
+          "size": 1291461
         },
         {
           "name": "npm.aptos-labs.bb788a8c64e8e22673dc.js",
@@ -16833,6 +16879,10 @@
           "size": 447117
         },
         {
+          "name": "npm.lucide-react.0a260acc2642cd8c1738.js",
+          "size": 50291
+        },
+        {
           "name": "npm.near-js.60456e747e1c3926db8c.js",
           "size": 78284
         },
@@ -16881,20 +16931,16 @@
           "size": 147649
         },
         {
-          "name": "npm.react-icons.2573c74c59cb0f2fb4a0.js",
-          "size": 21002920
-        },
-        {
-          "name": "npm.radix-ui.f365fe88407959300dc3.js",
-          "size": 120570
-        },
-        {
           "name": "npm.parse-asn1.c26a357a6eaccc910fdf.js",
           "size": 153348
         },
         {
           "name": "npm.property-information.bdb60ece6e7e6f71a369.js",
           "size": 58980
+        },
+        {
+          "name": "npm.radix-ui.899e847561bbf6f29ba6.js",
+          "size": 76464
         },
         {
           "name": "npm.webpack-dev-server.9ee85bc4be1b876d1722.js",
@@ -16985,10 +17031,6 @@
           "size": 31480
         },
         {
-          "name": "npm.rc-notification.ceb0ccdf17da3af69532.js",
-          "size": 39301
-        },
-        {
           "name": "npm.public-encrypt.2b287af2dc3f208d4ad6.js",
           "size": 97399
         },
@@ -17059,10 +17101,6 @@
         {
           "name": "npm.prop-types.8aa20e6166dfc6d0befa.js",
           "size": 29370
-        },
-        {
-          "name": "npm.lucide-react.31427962af1aeccc3e28.js",
-          "size": 7701
         },
         {
           "name": "npm.diffie-hellman.a8e9f1551adac09e7644.js",
@@ -17313,6 +17351,10 @@
           "size": 1349
         },
         {
+          "name": "npm.sonner.4413dd7f2c05289f098c.js",
+          "size": 32563
+        },
+        {
           "name": "npm.rpc-websockets.7fd787f620f6d4016419.js",
           "size": 12871
         },
@@ -17343,6 +17385,10 @@
         {
           "name": "npm.react-markdown.35333b08f8db7d990271.js",
           "size": 12656
+        },
+        {
+          "name": "npm.next-themes.a6af12c5d3ed4f79b10d.js",
+          "size": 4982
         },
         {
           "name": "npm.micromark-util-sanitize-uri.20ee19da208ed4eb85d5.js",
@@ -17765,14 +17811,14 @@
           "size": 198307
         },
         {
-          "name": "index.371310f2cd557724dca9.js",
-          "size": 1301347
+          "name": "index.01489ee5ca15616a36c2.js",
+          "size": 1375530
         }
       ],
       "filteredAssets": 0,
-      "assetsSize": 40623580,
+      "assetsSize": 19656404,
       "filteredAuxiliaryAssets": 249,
-      "auxiliaryAssetsSize": 40469699
+      "auxiliaryAssetsSize": 19320446
     }
   },
   "errors": [],

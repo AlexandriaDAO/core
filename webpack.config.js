@@ -106,14 +106,6 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env', '@babel/preset-react'],
-            plugins: [
-              ['transform-imports', {
-                'react-icons': {
-                  transform: 'react-icons/lib/${member}',
-                  preventFullImport: true
-                }
-              }]
-            ]
           },
         },
       },
@@ -192,27 +184,27 @@ module.exports = {
       'require("./model_imports/mobilenet_v2")': '{}',
       'require("./model_imports/mobilenet_v2_mid")': '{}'
     }),
-    // new BundleAnalyzerPlugin({
-    //   analyzerMode: 'server',
-    //   analyzerHost: 'localhost',
-    //   analyzerPort: 8888,
-    //   openAnalyzer: true,
-    //   generateStatsFile: true,
-    //   statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
-    //   statsOptions: {
-    //     all: false,
-    //     assets: true,
-    //     assetsSort: 'size',
-    //     chunks: true,
-    //     chunkModules: false,
-    //     entrypoints: true,
-    //     hash: true,
-    //     modules: false,
-    //     timings: true,
-    //     errors: true,
-    //     warnings: true,
-    //   },
-    // }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'server',
+      analyzerHost: 'localhost',
+      analyzerPort: 8888,
+      openAnalyzer: true,
+      generateStatsFile: true,
+      statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
+      statsOptions: {
+        all: false,
+        assets: true,
+        assetsSort: 'size',
+        chunks: true,
+        chunkModules: false,
+        entrypoints: true,
+        hash: true,
+        modules: false,
+        timings: true,
+        errors: true,
+        warnings: true,
+      },
+    }),
   ],
   devServer: {
     historyApiFallback: true,

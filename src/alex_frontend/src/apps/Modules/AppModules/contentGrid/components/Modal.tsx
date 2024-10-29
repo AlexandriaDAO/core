@@ -1,6 +1,5 @@
 import React from 'react';
-import { FaTimes } from 'react-icons/fa';
-
+import { X } from 'lucide-react';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -17,7 +16,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
           onClick={onClose} 
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
         >
-          <FaTimes />
+          <X />
         </button>
         {children}
       </div>

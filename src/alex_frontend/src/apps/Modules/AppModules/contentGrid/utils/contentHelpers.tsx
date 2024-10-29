@@ -1,13 +1,13 @@
 import React from 'react';
-import { FaImage, FaPlay, FaFileAudio, FaFilePdf, FaFileCode, FaFileAlt } from 'react-icons/fa';
+import { Image, Play, FileAudio, FileCode, File } from 'lucide-react';
 
 export const getFileIcon = (contentType: string) => {
-  if (contentType.startsWith("image/")) return <FaImage />;
-  if (contentType.startsWith("video/")) return <FaPlay />;
-  if (contentType.startsWith("audio/")) return <FaFileAudio />;
-  if (contentType === "application/pdf") return <FaFilePdf />;
-  if (["text/plain", "text/markdown", "application/json", "text/html"].includes(contentType)) return <FaFileCode />;
-  return <FaFileAlt />;
+  if (contentType.startsWith("image/")) return <Image />;
+  if (contentType.startsWith("video/")) return <Play />;
+  if (contentType.startsWith("audio/")) return <FileAudio />;
+  if (contentType === "application/pdf") return <File />;
+  if (["text/plain", "text/markdown", "application/json", "text/html"].includes(contentType)) return <FileCode />;
+  return <File />;
 };
 
 export const isImageType = (contentType: string) => contentType.startsWith('image/');
