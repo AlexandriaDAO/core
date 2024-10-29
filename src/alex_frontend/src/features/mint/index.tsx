@@ -24,7 +24,13 @@ import { UploadIcon } from "lucide-react";
 
 const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_ID : process.env.REACT_LOCAL_APP_ID;
 
-const Mint = () => {
+type IMintProps = {
+    mint?: boolean;
+};
+
+const Mint: React.FC<IMintProps> = ({
+    mint = true,
+}: IMintProps) => {
 	const { activeEngine } = useAppSelector((state) => state.engineOverview);
 
 	const dispatch = useAppDispatch();
@@ -118,8 +124,13 @@ const Mint = () => {
 			const irys = await getServerIrys(selectedNode.id);
 			const transactions = await createAllTransactions(irys);
 
-			await mintNFT(transactions.manifest.id);
+			if(mint) {
+				await mintNFT(transactions.manifest.id);
+			}else{
+				setUploadStatus(4);
+			}
 			await uploadToArweave(irys, transactions);
+			console.log('transactions', transactions);
 
 			if(activeEngine) dispatch(fetchEngineBooks(activeEngine));
 
@@ -222,7 +233,7 @@ const Mint = () => {
 			await uploadTransaction(transactions.manifest, "Manifest");
 
 			toast.success("All files uploaded successfully");
-			console.log('transactions', transactions);
+			console.log('manifest id', transactions.manifest.id);
 			setUploadStatus(6);
 		} catch (error) {
 			toast.error("Upload failed");
@@ -245,7 +256,7 @@ const Mint = () => {
 		<Dialog>
 			<DialogTrigger asChild>
 				<Button rounded="full">
-					<UploadIcon size={20} /> <span>Upload New</span>
+					<UploadIcon size={20} /> <span>Upload {mint && <>&amp; Mint</>}</span>
 				</Button>
 			</DialogTrigger>
 
@@ -281,7 +292,7 @@ const Mint = () => {
 					)}
 
 
-					{screen == 3 && <Processing uploadStatus={uploadStatus} />}
+					{screen == 3 && <Processing uploadStatus={uploadStatus} mint={mint}/>}
 
 					{screen == 4 && <Status />}
 
