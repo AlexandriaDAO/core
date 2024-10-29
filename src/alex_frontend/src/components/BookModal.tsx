@@ -11,7 +11,7 @@ interface IBookModalProps {
 const BookModal: React.FC<IBookModalProps> = ({
     book
 }: IBookModalProps) => {
-    if(!book) return;
+    // if(!book) return;
 
 	return (
         <div className="w-full pb-5 text-black scale-y-100 transition-all duration-500 flex flex-col justify-between">

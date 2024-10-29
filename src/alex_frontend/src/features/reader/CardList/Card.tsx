@@ -1,9 +1,8 @@
 import DDC from "@/data/categories";
 import React, { useState } from "react";
-import { BiBookAlt, BiMinus, BiPlus } from "react-icons/bi";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { useAnnotation, useCardList, useReader } from "../lib/hooks/useReaderContext";
 import { BookCardItem } from "@/features/search/components/Card";
+import { Book, ChevronDown, ChevronUp, Minus } from "lucide-react";
 
 // Assuming the structure of your item includes `id`, `title`, and `description`
 interface Item {
@@ -76,12 +75,12 @@ const Card: React.FC<Props> = ({ item }) => {
 						</div>
 					</div>
 					<div className="flex flex-col gap-2">
-						<BiBookAlt
+						<Book
 							size={38}
 							onClick={handleNavigateCard}
 							className="p-2 text-white border border-solid bg-black rounded-full cursor-pointer duration-300 transition-all hover:bg-white hover:border-black hover:text-black "
 						/>
-						<BiMinus
+						<Minus
 							onClick={handleRemoveCard}
 							size={36}
 							className="p-2 border border-solid border-black rounded-full cursor-pointer duration-300 transition-all hover:bg-black hover:border-white hover:text-white "
@@ -113,7 +112,7 @@ const Card: React.FC<Props> = ({ item }) => {
 							<span>Show More </span>
 						)}
 
-						{expanded ? <IoIosArrowUp /> : <IoIosArrowDown />}
+						{expanded ? <ChevronUp /> : <ChevronDown />}
 					</div>
 				)}
 			</div>

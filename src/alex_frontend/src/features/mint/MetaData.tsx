@@ -2,6 +2,8 @@
 import React, { useEffect, forwardRef, useImperativeHandle, useState } from "react";
 import languages from "@/data/languages";
 import CategorySelect from "./Fields/CategorySelect";
+import { Label } from "@/lib/components/label";
+import { Input } from "@/lib/components/input";
 
 const MetaData = forwardRef(({ metadata, setMetadata }: any, ref) => {
   const [errors, setErrors] = useState({
@@ -39,6 +41,7 @@ const MetaData = forwardRef(({ metadata, setMetadata }: any, ref) => {
       author_last: !metadata.author_last || metadata.author_last.length < 2 ? "Last name must be at least 2 characters long" : "",
       fiction: metadata.fiction === null ? "Please select Fiction or Non-Fiction" : "",
       category: !metadata.type ? "Please select a category" : "",
+      // subcategories if not selected any will throw error,
       language: !metadata.language ? "Please select a language" : ""
     };
 
@@ -55,14 +58,20 @@ const MetaData = forwardRef(({ metadata, setMetadata }: any, ref) => {
   return (
     <section className="flex-grow h-full overflow-auto p-4 w-full flex flex-col text-sm gap-2 items-start justify-start">
       <div className="flex flex-col gap-1 w-full justify-between items-start">
-        <label htmlFor="title">Title</label>
-        <input
-          className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
-          type="text"
+        <Label
+          htmlFor="title"
+          scale="md"
+          variant={(isSubmitAttempted && errors.title ? "destructive" : "default" ) }
+        >
+          Title
+        </Label>
+        <Input
+          scale="md"
+          variant={(isSubmitAttempted ? errors.title ? "destructive" : "constructive" : 'default' ) }
           id="title"
           placeholder="Book Title"
-          value={metadata?.title || ""}
           onChange={handleTitleChange}
+          value={metadata?.title || ""}
           minLength={4}
           maxLength={150}
           required
@@ -73,12 +82,18 @@ const MetaData = forwardRef(({ metadata, setMetadata }: any, ref) => {
       </div>
 
       <div className="flex flex-col gap-1 w-full justify-between items-start">
-        <label>Author</label>
+        <Label
+          htmlFor="author_first"
+          scale="md"
+          variant={(isSubmitAttempted && (errors.author_first || errors.author_last) ? "destructive" : "default" ) }
+        >
+          Author
+        </Label>
         <div className="flex gap-2 w-full">
           <div className="flex-1">
-            <input
-              className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
-              type="text"
+            <Input
+              scale="md"
+              variant={(isSubmitAttempted ? errors.author_first ? "destructive" : "constructive" : 'default' ) }
               id="author_first"
               placeholder="First Name"
               value={metadata?.author_first || ""}
@@ -92,9 +107,9 @@ const MetaData = forwardRef(({ metadata, setMetadata }: any, ref) => {
             )}
           </div>
           <div className="flex-1">
-            <input
-              className="w-full py-1 px-2 placeholder-gray-600 border border-gray-800 rounded focus:shadow-outline"
-              type="text"
+            <Input
+              scale="md"
+              variant={(isSubmitAttempted ? errors.author_last ? "destructive" : "constructive" : 'default' ) }
               id="author_last"
               placeholder="Last Name"
               value={metadata?.author_last || ""}
@@ -111,7 +126,9 @@ const MetaData = forwardRef(({ metadata, setMetadata }: any, ref) => {
       </div>
 
       <div className="flex flex-col gap-2 w-full">
-        <label className="font-semibold text-gray-700">Fiction / Non-Fiction:</label>
+        <Label variant={(isSubmitAttempted && errors.fiction ? "destructive" : "default" ) } scale="md">
+          Fiction / Non-Fiction:
+        </Label>
         <div className="flex w-full">
           <button
             onClick={() => setMetadata({...metadata, fiction: false})}
@@ -146,7 +163,13 @@ const MetaData = forwardRef(({ metadata, setMetadata }: any, ref) => {
       />
 
       <div className="flex flex-col gap-1 w-full justify-between items-start">
-        <label htmlFor="language">Language</label>
+        <Label
+          htmlFor="language"
+          scale="md"
+          variant={(isSubmitAttempted && errors.language ? "destructive" : "default" ) }
+        >
+          Language
+        </Label>
         <select
           id="language"
           value={metadata.language || ''}

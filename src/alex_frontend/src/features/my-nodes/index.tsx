@@ -1,13 +1,9 @@
+import React from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import React, { useEffect } from "react";
-
-import { ImSpinner8 } from "react-icons/im";
 import NodeItem from "./components/NodeItem";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import useSession from "@/hooks/useSession";
 
 function MyNodes() {
-	const { nodes, loading } = useAppSelector((state) => state.myNodes);
+	const { nodes } = useAppSelector((state) => state.myNodes);
 
 
 	return (

@@ -2,13 +2,11 @@ import { setSelectedSearchedBook } from "@/features/home/homeSlice";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect, useState } from "react";
-import { BiBookAlt, BiPlus } from "react-icons/bi";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
-import { SlEye, SlPlus } from "react-icons/sl";
 import { getSubTypes } from "../utils/properties";
 import eras from "@/data/eras";
 import DDC from "@/data/categories";
 import { Book } from "@/features/portal/portalSlice";
+import { Book as BookIcon, ChevronDown, ChevronUp, CirclePlus, Eye, Plus } from "lucide-react";
 
 // Assuming the structure of your item includes `id`, `title`, and `description`
 export type BookCardItem = Book & {
@@ -104,12 +102,12 @@ const Card: React.FC<Props> = ({ item }) => {
 							</div>
 						</div>
 						<div className="flex flex-col gap-2">
-							<BiBookAlt
+							<BookIcon
 								size={38}
 								onClick={handleReadBookClick}
 								className="p-2 text-white border border-solid bg-black rounded-full cursor-pointer duration-300 transition-all hover:bg-white hover:border-black hover:text-black "
 							/>
-							<BiPlus
+							<Plus
 								size={36}
 								className="p-2 border border-solid border-black rounded-full"
 							/>
@@ -128,9 +126,9 @@ const Card: React.FC<Props> = ({ item }) => {
 				</div>
 			</div>
 			<div className="text-[#8E8E8E] flex justify-start items-center font-roboto-condensed text-sm font-normal gap-2 ">
-				<SlPlus size={20} />
+				<CirclePlus size={20} />
 				<span> 102 </span>
-				<SlEye size={20} />
+				<Eye size={20} />
 				<span> 1,2k</span>
 			</div>
 			<div>
@@ -146,7 +144,7 @@ const Card: React.FC<Props> = ({ item }) => {
 							<span>Show More </span>
 						)}
 
-						{expanded ? <IoIosArrowUp /> : <IoIosArrowDown />}
+						{expanded ? <ChevronUp /> : <ChevronDown />}
 					</div>
 				)}
 			</div>

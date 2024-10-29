@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import useSession from "@/hooks/useSession";
-import { message } from "antd";
+import { toast } from "sonner";
 import { EnqueuedTask } from "meilisearch";
 import { waitForTaskCompletion } from "@/services/meiliService";
 import Epub, { EpubCFI } from "epubjs";
 import { v4 as uuidv4 } from "uuid";
-import { ImSpinner8 } from "react-icons/im";
 import { Book } from "@/features/portal/portalSlice";
 import { getAllDocumentsByManifest } from "../utils/utilities";
+import { LoaderCircle } from "lucide-react";
 
 interface MintedBookProps {
 	book: Book;
@@ -65,11 +65,11 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 				.index(activeEngine.index)
 				.deleteDocuments(documentIds);
 
-			message.info("Documents enqueued for deletion.");
+			toast.info("Documents enqueued for deletion.");
 
 			await waitForTaskCompletion(meiliClient, task.taskUid);
 
-			message.success("Documents deleted successfully.");
+			toast.success("Documents deleted successfully.");
 
 			console.log(
 				`Deleted ${documentIds.length} documents with manifest id: ${book.manifest}`
@@ -77,7 +77,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 
 			setAdded(false);
 		} catch (error) {
-			message.error("Failed to remove book.");
+			toast.error("Failed to remove book.");
 
 			console.error("Error deleting documents from Meilisearch:", error);
 		} finally {
@@ -93,7 +93,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 		try {
 			setProcessing(true);
 
-			message.info("Converting Epub to JSON");
+			toast.info("Converting Epub to JSON");
 
 			const onlineBook = Epub(`https://gateway.irys.xyz/${book.manifest}/book`, {
 				openAs: "epub",
@@ -128,23 +128,23 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 					});
 				});
 			}
-			message.success("Conversion Successfull");
+			toast.success("Conversion Successfull");
 
-			message.info("Storing JSON docs to Engine");
+			toast.info("Storing JSON docs to Engine");
 
 			const task: EnqueuedTask = await meiliClient
 				.index(activeEngine.index)
 				.addDocuments(contents, { primaryKey: "id" });
 
-			message.info("Documents enqueued for addition.");
+			toast.info("Documents enqueued for addition.");
 
 			await waitForTaskCompletion(meiliClient, task.taskUid);
 
-			message.success("Stored Successfully");
+			toast.success("Stored Successfully");
 
 			setAdded(true);
 		} catch (err) {
-			message.error("Error while adding Book to engine: " + err);
+			toast.error("Error while adding Book to engine: " + err);
 		} finally {
 			setProcessing(false);
 		}
@@ -195,7 +195,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 							className="cursor-not-allowed opacity-50 flex justify-center items-center gap-1 px-2 py-1 bg-black rounded text-[#F6F930] font-medium font-roboto-condensed text-base"
 						>
 							<span>Waiting...</span>
-							<ImSpinner8
+							<LoaderCircle
 								size={14}
 								className="animate animate-spin"
 							/>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ColorSelector from "./ColorSelector";
 import { useAnnotation, useReader } from "../hooks/useReaderContext";
 import { clashCfiRange, getAddPopupPosition, getRemovePopupPosition } from "../utils/annotations";
-import { message } from "antd";
+import { toast } from "sonner";
 
 function AddAnnotationTooltip() {
 	const { rendition, currentLocation, renderLocation } = useReader();

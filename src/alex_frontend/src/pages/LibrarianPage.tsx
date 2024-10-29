@@ -2,16 +2,15 @@ import React, { useEffect } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { ImSpinner8 } from "react-icons/im";
 import MyNodes from "@/features/my-nodes";
 import AddNode from "@/features/my-nodes/components/AddNode";
 import NoNode from "@/features/librarian-profile/components/NoNode";
 import fetchMyNodes from "@/features/my-nodes/thunks/fetchMyNodes";
 import LibrarianForm from "@/features/librarian/components/LibrarianForm";
-import { MdLockOutline } from "react-icons/md";
 import checkLibrarian from "@/features/librarian/thunks/checkLibrarian";
 import FundNode from "@/features/fund-node";
 import useSession from "@/hooks/useSession";
+import { LoaderCircle, LockKeyhole } from "lucide-react";
 
 function LibrarianPage() {
 	const {checkAuthentication} = useSession();
@@ -52,7 +51,7 @@ function LoadingView() {
 	return (
 		<MainLayout>
 			<div className="flex-grow flex items-center justify-center">
-				<ImSpinner8 className="animate-spin text-4xl text-primary" />
+				<LoaderCircle className="animate-spin text-4xl text-primary" />
 			</div>
 		</MainLayout>
 	);
@@ -151,7 +150,7 @@ function LibrarianProfileHeader({ nodesLoading }: { nodesLoading: boolean }) {
 					Librarian Profile
 				</span>
 				{nodesLoading && (
-					<ImSpinner8
+					<LoaderCircle
 						size={20}
 						className="animate animate-spin"
 					/>
@@ -180,11 +179,9 @@ function NonLibrarianSidebar() {
 	return (
 		<div className="w-full p-3 flex gap-2 flex-col shadow-lg rounded-xl bg-white">
 			<div className="flex flex-col items-center justify-between gap-3">
-				<MdLockOutline
-					size={40}
-					color="black"
-					className="bg-[#D9D9D9] rounded-full border border-solid border-dark p-2"
-				/>
+				<div className="p-2 bg-muted border border-ring rounded-full">
+					<LockKeyhole size={22} className="text-primary"/>
+				</div>
 				<span className="font-roboto-condensed font-medium text-base">
 					Become Librarian to create your personal nodes and
 					access librarian profile data

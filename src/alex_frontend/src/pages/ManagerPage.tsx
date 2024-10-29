@@ -1,12 +1,11 @@
 import React from "react";
 import MainLayout from "@/layouts/MainLayout";
-import { MdEdit } from "react-icons/md";
-import { FaCopy } from "react-icons/fa";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import MyEngines from "@/features/my-engines";
 import EngineOverview from "@/features/engine-overview";
 import PublicEngines from "@/features/public-engines";
 import Librarian from "@/features/librarian";
+import { Copy, Edit2 } from "lucide-react";
 
 function ManagerPage() {
 	const { activeEngine } = useAppSelector(
@@ -23,20 +22,20 @@ function ManagerPage() {
 					<div className="w-full p-3 flex gap-2 flex-col shadow-lg rounded-xl bg-white">
 						<div className="flex justify-between items-center">
 							<div className="font-syne font-medium text-xl text-black">Manager Data</div>
-							<MdEdit/>
+							<Edit2/>
 						</div>
 						<div>
 							<span className="uppercase font-roboto-condensed text-base">Principal:</span>
 							<div className="flex gap-2 justify-start items-center">
 								<span className="uppercase font-roboto-condensed text-base">234fh567thgkl.456000thgkl.45</span>
-								<FaCopy size={16}/>
+								<Copy size={16}/>
 							</div>
 						</div>
 						<div>
 							<span className="uppercase font-roboto-condensed text-base">Wallet:</span>
 							<div className="flex gap-2 justify-start items-center">
 								<span className="uppercase font-roboto-condensed text-base">234fh567thgkl.45600034fh567</span>
-								<FaCopy size={16}/>
+								<Copy size={16}/>
 							</div>
 						</div>
 						<div className="bg-yellow-200 p-2 flex flex-col gap-1">

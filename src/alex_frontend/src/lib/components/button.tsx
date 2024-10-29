@@ -9,8 +9,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "border border-black text-black hover:text-white bg-white hover:bg-black",
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
+        primary: "border border-black text-black hover:text-white bg-white hover:bg-black",
+        inverted: "border border-black text-white hover:text-black bg-black hover:bg-white",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         constructive: "bg-constructive text-constructive-foreground hover:bg-constructive/90",
         info: "bg-info text-info-foreground hover:bg-info/90",
@@ -18,26 +18,28 @@ const buttonVariants = cva(
         outline: "border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "bg-primary text-primary-foreground hover:bg-primary/90",
+        muted: "text-muted-foreground hover:text-black",
       },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 px-3",
-        lg: "h-11 px-8",
-        icon: "h-10 w-10",
+      scale: {
+        sm: "h-8 px-2 text-sm",
+        default: "h-10 px-4",
+        md: "h-12 px-6 text-md",
+        lg: "h-14 px-8 text-lg",
+        icon: "p-1",
       },
       rounded: {
         none: "rounded-none",
         default: "rounded",
-        small: "rounded-sm",
-        medium: "rounded-md",
-        large: "rounded-lg",
+        sm: "rounded-sm",
+        md: "rounded-md",
+        lg: "rounded-lg",
         full: "rounded-full",
       },
     },
     defaultVariants: {
-      variant: "default",
-      size: "default",
+      variant: "primary",
+      scale: "default",
       rounded: "default",
     },
   }
@@ -50,11 +52,11 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, rounded, asChild = false, ...props }, ref) => {
+  ({ className, variant, scale, rounded, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, rounded, className }))}
+        className={cn(buttonVariants({ variant, scale, rounded, className }))}
         ref={ref}
         {...props}
       />

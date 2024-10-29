@@ -1,7 +1,6 @@
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import React, { useEffect, useRef, useState } from "react";
-import { IoIosArrowDown, IoIosSearch } from "react-icons/io";
+import React, { useEffect, useRef } from "react";
 import {
 	setCategories,
 	setLanguages,
@@ -10,11 +9,11 @@ import {
 	setEras,
 } from "./portalFilterSlice";
 import { CircleFlag } from "react-circle-flags";
-import { RxCross1 } from "react-icons/rx";
 import { TypeInterface } from "../portal-type/utils/type";
 import { Language } from "../portal-language/portalLanguageSlice";
 import { CategoryInterface } from "../portal-category/utils/category";
 import { Era } from "@/data/eras";
+import { X } from "lucide-react";
 
 function PortalFilter() {
 	const dispatch = useAppDispatch();
@@ -104,7 +103,7 @@ function PortalFilter() {
 													className="flex items-center justify-between gap-2 border border-solid border-black px-2 py-1 rounded-full"
 												>
 													<span className="text-base">{type.title}</span>
-													<RxCross1
+													<X
 														onClick={() =>
 															handleRemoveType(
 																type
@@ -136,7 +135,7 @@ function PortalFilter() {
 														className="h-5"
 													/>
 													<span className="text-base">{language.name}</span>
-													<RxCross1
+													<X
 														onClick={() =>
 															handleRemoveLanguage(
 																language
@@ -164,7 +163,7 @@ function PortalFilter() {
 													<span className="text-base">
 														{category.title}
 													</span>
-													<RxCross1
+													<X
 														onClick={() =>
 															handleRemoveCategory(
 																category
@@ -192,7 +191,7 @@ function PortalFilter() {
 													<span className="text-base">
 														{era.label}
 													</span>
-													<RxCross1
+													<X
 														onClick={() =>
 															handleRemoveEra(
 																era

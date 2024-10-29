@@ -1,4 +1,6 @@
-import { message } from "antd";
+import { Button } from "@/lib/components/button";
+import { DialogClose } from "@/lib/components/dialog";
+import { toast } from "sonner";
 import React from "react";
 
 const Footer = ({
@@ -13,79 +15,68 @@ const Footer = ({
 	return (
 		<footer className="flex justify-between items-center p-4 gap-2">
 			{screen == 0 && (
-				<button
-					type="button"
-					onClick={() => next()}
-					className={`rounded px-3 py-1 ${
-						!file
-							? "bg-blue-300 text-white cursor-not-allowed"
-							: "bg-blue-700 hover:bg-blue-500 text-white"
-					} focus:shadow-outline focus:outline-none`}
-					disabled={!file ? true : false}
-				>
+				<Button onClick={() => next()} type="button" disabled={!file} variant={!file ? "inverted" : "info"}>
 					Next
-				</button>
+				</Button>
 			)}
 			{screen == 1 && (
 				<div className="flex justify-start gap-2 items-center">
-					<button
+					<Button
 						type="button"
-						onClick={()=>{
+						disabled={!file}
+						variant={!file ? "inverted" : "info"}
+						onClick={() => {
 							if(validateSubmission()){
 								next()
 							}
-						}}
-						className="rounded px-3 py-1 bg-blue-700 hover:bg-blue-500 text-white focus:shadow-outline focus:outline-none"
-					>
+						}}>
 						Next
-					</button>
-
-					<button
+					</Button>
+					<Button
 						type="button"
+						disabled={!file}
+						variant="secondary"
 						onClick={() => prev()}
-						className="rounded px-3 py-1 bg-blue-700 hover:bg-blue-500 text-white focus:shadow-outline focus:outline-none"
 					>
-						Go Back
-					</button>
+						Previous
+					</Button>
 				</div>
 			)}
 
 			{screen == 2 && (
 				<div className="flex justify-start gap-2 items-center">
-					<button
+					<Button
 						type="button"
+						variant={!file ? "inverted" : "info"}
 						onClick={handleSubmitClick}
-						className="rounded px-3 py-1 bg-blue-700 hover:bg-blue-500 text-white focus:shadow-outline focus:outline-none"
 					>
 						Submit
-					</button>
-
-					<button
+					</Button>
+					<Button
 						type="button"
+						disabled={!file}
+						variant="secondary"
 						onClick={() => prev()}
-						className="rounded px-3 py-1 bg-blue-700 hover:bg-blue-500 text-white focus:shadow-outline focus:outline-none"
 					>
-						Go Back
-					</button>
+						Previous
+					</Button>
 				</div>
 			)}
 
 			{screen == 4 && (
-				<button
+				<Button
 					type="button"
+					variant="constructive"
 					onClick={() => window.location.reload()}
-					className={`rounded px-3 py-1 bg-blue-700 hover:bg-blue-500 text-white focus:shadow-outline focus:outline-none`}
 				>
 					Refresh
-				</button>
+				</Button>
 			)}
-			<button
-				type="button"
-				onClick={handleCancel}
-				className="rounded px-3 py-1 ml-auto bg-gray-800 text-white hover:bg-gray-600 focus:shadow-outline focus:outline-none"
-			>
-				Close
-			</button>
+
+
+			<DialogClose asChild>
+				<Button type="button" variant="outline">Close</Button>
+			</DialogClose>
 		</footer>
 	);
 };

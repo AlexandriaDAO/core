@@ -1,10 +1,10 @@
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import React, { useEffect, useRef, useState } from "react";
-import { IoIosArrowDown, IoIosSearch } from "react-icons/io";
+import React, { useEffect, useRef } from "react";
 import eras, { Era } from "@/data/eras";
 import { setSelected, setVisible } from "./portalEraSlice";
 import { setEras } from "../portal-filter/portalFilterSlice";
+import { ChevronDown } from "lucide-react";
 
 
 function PortalEra() {
@@ -73,7 +73,7 @@ function PortalEra() {
 						visible ? "rotate-180" : "rotate-0"
 					}`}
 				>
-					<IoIosArrowDown size={20} />
+					<ChevronDown size={20} />
 				</div>
 			</button>
 			<div

@@ -8,17 +8,9 @@ import {
 import { Tabs } from "../lib/hooks/useSidebarState";
 import { useSidebar } from "../lib/hooks/useReaderContext";
 
-import { CiMenuFries } from "react-icons/ci";
-import { MdMenuBook } from "react-icons/md";
-import { MdOutlineBookmarks } from "react-icons/md";
-import { HiOutlineAnnotation } from "react-icons/hi";
-import { MdOutlineSearch } from "react-icons/md";
-import { MdOutlineSettings } from "react-icons/md";
-
 import { SidebarItem } from "../lib/components/SidebarItem";
 import { Drawer } from "../Drawer";
-import { IoCloseCircleOutline } from "react-icons/io5";
-import { AiOutlineClose } from "react-icons/ai";
+import { AlignJustify, Bookmark, BookOpenCheck, CircleX, MessageSquare, Search, Settings } from "lucide-react";
 
 interface SidebarProps {
 	sidebarStyles?: ISidebarStyle;
@@ -62,12 +54,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 					<SidebarItem
 						icon={
 							<>
-								<CiMenuFries
+								<AlignJustify
 									size={25}
 									onClick={() => setVisible(true)}
 									className={`z-20 cursor-pointer text-gray-500 transition-all duration-300 ${visible ? 'opacity-0 invisible h-0' : 'opacity-100 visible h-auto'}`}
 								/>
-								<AiOutlineClose
+								<CircleX
 									size={25}
 									onClick={() => setVisible(false)}
 									className={`z-20 cursor-pointer text-gray-500 transition-all duration-300 ${!visible ? 'opacity-0 invisible h-0' : 'opacity-100 visible h-auto'}`}
@@ -79,7 +71,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 					<div className={`flex flex-col justify-between items-center gap-2 transition-all duration-300 ease-in-out origin-top transform ${visible ? 'translate-y-0 opacity-100 visible max-h-56' : '-translate-y-10 opacity-0 invisible max-h-0'}`}>
 						<SidebarItem
 							icon={
-								<MdMenuBook
+								<BookOpenCheck
 									size={25}
 									onClick={() =>
 										handleSidebarClick(Tabs.TableOfContents)
@@ -91,7 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 						/>
 						<SidebarItem
 							icon={
-								<MdOutlineBookmarks
+								<Bookmark
 									size={25}
 									onClick={() =>
 										handleSidebarClick(Tabs.Bookmarks)
@@ -103,7 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 						/>
 						<SidebarItem
 							icon={
-								<HiOutlineAnnotation
+								<MessageSquare
 									size={25}
 									onClick={() =>
 										handleSidebarClick(Tabs.Annotations)
@@ -115,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 						/>
 						<SidebarItem
 							icon={
-								<MdOutlineSearch
+								<Search
 									size={25}
 									onClick={() => handleSidebarClick(Tabs.Search)}
 								/>
@@ -125,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 						/>
 						<SidebarItem
 							icon={
-								<MdOutlineSettings
+								<Settings
 									size={25}
 									onClick={() =>
 										handleSidebarClick(Tabs.Settings)
@@ -137,14 +129,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 						/>
 					</div>
 				</div>
-				{sidebar && 
+				{sidebar &&
 					<div className="relative flex-grow flex z-20 px-1">
 						<Drawer />
 						<div
 							className="flex-grow flex justify-end cursor-pointer"
 							onClick={() => setSidebar(null)}
 						>
-							<IoCloseCircleOutline
+							<CircleX
 								size={40}
 								onClick={() => setSidebar(null)}
 								className="md:m-3 sm:m-1 text-gray-100 hover:text-gray-300 sm:hidden"

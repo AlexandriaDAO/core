@@ -1,5 +1,5 @@
 import React from "react";
-import { FaCopy } from "react-icons/fa";
+import { Copy } from "lucide-react";
 
 interface JSONNodeProps {
 	keyName?: string;
@@ -55,7 +55,7 @@ const ReceiptJSONView: React.FC<ReceiptJSONViewProps> = ({ data }) => {
 				className="absolute top-0 right-0 m-2 cursor-pointer transform transition-transform duration-150 hover:scale-105 active:scale-95"
 				onClick={handleCopy}
 			>
-				<FaCopy size={20} className="transition-colors duration-150 hover:text-blue-500" />
+				<Copy size={20} className="transition-colors duration-150 hover:text-blue-500" />
 			</div>
 			<JSONNode data={JSON.parse(data)} depth={1} />
 		</div>

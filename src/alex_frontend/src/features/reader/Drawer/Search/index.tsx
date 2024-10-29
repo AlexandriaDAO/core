@@ -3,9 +3,9 @@ import React, { useEffect, type KeyboardEventHandler } from "react";
 import { SearchStyle as defaultSearchStyles, type ISearchStyle } from "./style";
 import { useContent, useReader, useSearch } from "../../lib/hooks/useReaderContext";
 import { Content, ContentList } from "../../lib/hooks/useReaderState/useContentState";
-import { MdOutlineSearch } from "react-icons/md";
 import { SearchItem } from "../../lib/components/SearchItem";
 import { EpubCFI } from "epubjs";
+import { Search as SearchIcon } from "lucide-react";
 
 interface ISearchProps {
 	searchStyle?: ISearchStyle;
@@ -109,7 +109,7 @@ export const Search: React.FC<ISearchProps> = ({
 						//   style={{ border: '1px solid red', width: '50px' }}
 					/>
 
-					<MdOutlineSearch
+					<SearchIcon
 						size={30}
 						onClick={onSearchBookContents}
 						className="absolute right-2 top-2 cursor-pointer text-gray-500 hover:text-gray-700"

@@ -1,7 +1,7 @@
 import { ActionReducerMapBuilder, PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Engine } from '../../../../declarations/alex_backend/alex_backend.did';
 import fetchMyEngines from "./thunks/fetchMyEngines";
-import { message } from "antd";
+import { toast } from "sonner";
 import addEngine from "./thunks/addEngine";
 
 // Define the interface for our engine state
@@ -66,13 +66,13 @@ const myEnginesSlice = createSlice({
 			})
 
 			.addCase(addEngine.pending, (state) => {
-				message.info('Adding Engine')
+				toast.info('Adding Engine')
 
 				state.newEngineLoading = true;
 				state.newEngineError = null;
 			})
 			.addCase(addEngine.fulfilled, (state, action) => {
-				message.success('Engine Added')
+				toast.success('Engine Added')
 
 				state.newEngineLoading = false;
 				state.newEngineError = null;
@@ -81,7 +81,7 @@ const myEnginesSlice = createSlice({
 				state.engines.push(action.payload);
 			})
 			.addCase(addEngine.rejected, (state, action) => {
-				message.error('Engine Could not be added')
+				toast.error('Engine Could not be added')
 
 				state.newEngineLoading = false;
 				state.newEngineError = action.payload as string;

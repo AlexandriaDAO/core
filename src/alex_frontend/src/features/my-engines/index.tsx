@@ -1,13 +1,13 @@
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect } from "react";
 
-import { ImSpinner8 } from "react-icons/im";
 import AddEngine from "./components/AddEngine";
 import EngineItem from "./components/EngineItem";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchMyEngines from "./thunks/fetchMyEngines";
 import logout from "../auth/thunks/logout";
 import { getAuthClient } from "../auth/utils/authUtils";
+import { LoaderCircle } from "lucide-react";
 
 function MyEngines() {
 	const dispatch = useAppDispatch();
@@ -40,7 +40,7 @@ function MyEngines() {
 			</div>
 			<div className="flex flex-col gap-4 justify-start items-center">
 				{loading ? (
-					<ImSpinner8 size={30} className="animate animate-spin" />
+					<LoaderCircle size={30} className="animate animate-spin" />
 				) : engines.length <= 0 ? (
 					<span>No Engine Created</span>
 				) : (

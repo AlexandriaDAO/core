@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { WebIrys } from "@irys/sdk";
-import { ImSpinner8 } from "react-icons/im";
-import { message } from "antd";
+import { toast } from "sonner";
 import { getClientIrys } from "@/services/irysService";
+import { Button } from "@/lib/components/button";
+import { LoaderCircle } from "lucide-react";
 
 const FundNode = () => {
 	const [irys, setIrys] = useState<WebIrys | null>(null);
@@ -32,7 +33,7 @@ const FundNode = () => {
 
 	const fund = async () => {
 		if(!irys) {
-			message.error("Irys is not available");
+			toast.error("Irys is not available");
 			return;
 		}
 		setFundLoading(true);
@@ -47,14 +48,14 @@ const FundNode = () => {
 				);
 				console.log(fundTx, 'fundTx');
 
-				message.success(
+				toast.success(
 					`Transaction has been submitted for ${irys.utils.fromAtomic(
 						fundTx.quantity
 					)} ${irys.token}`
 				);
 			}
 		} catch (e) {
-			message.error(
+			toast.error(
 				"Funding Failed, Try Again."
 			);
 			console.log("Error funding node ", e);
@@ -69,19 +70,15 @@ const FundNode = () => {
 				<div className="font-syne font-medium text-xl text-black mb-2">
 					Connect Wallet to Fund Library
 				</div>
-				<button
-					onClick={setWebIrys}
-					className="font-syne font-bold text-base transition-all duration-100 ease-in text-white px-4 py-1 rounded bg-black cursor-pointer"
-					disabled={loading}
-				>
+				<Button onClick={setWebIrys} disabled={loading} variant="inverted">
 					{loading ? (
 						<span className="flex gap-1 items-center">
-							Connecting <ImSpinner8 size={14} className="animate animate-spin" />
+							Connecting <LoaderCircle size={14} className="animate animate-spin" />
 						</span>
 					) : (
 						"Connect Wallet"
 					)}
-				</button>
+				</Button>
 				{error && (
 					<div className="bg-red-100 border-l-4 border-red-500 p-4 mt-4">
 						<p className="font-roboto-condensed text-sm text-red-700">
@@ -109,7 +106,7 @@ const FundNode = () => {
                 </div>
 				<div className="flex flex-col gap-4 justify-between items-start p-2 shadow border border-solid rounded font-roboto-condensed font-normal text-base">
 					<div className="flex flex-col gap-2 justify-start items-start">
-						<div className="flex flex-col items-start gap-2">
+						<div className="flex justify-stretch items-center gap-2">
 							<div className="relative flex justify-between items-center">
 								<input
 									disabled={fundLoading}
@@ -122,18 +119,11 @@ const FundNode = () => {
 								/>
 								<span className="absolute right-3 font-bold">ETH</span>
 							</div>
-							<button
-								disabled={fundLoading}
-								onClick={fund}
-								className={`font-syne font-bold text-base transition-all duration-100 ease-in text-white px-4 py-1 rounded ${
-									fundLoading ? "cursor-not-allowed bg-gray-500" : "cursor-pointer bg-black"
-								}`}
-							>
+							<Button onClick={fund} scale="sm" disabled={fundLoading} variant="inverted">
 								{fundLoading ? <span className="flex gap-1 items-center">
-									Processing{" "}
-									<ImSpinner8 size={14} className="animate animate-spin" />
+									Processing <LoaderCircle size={14} className="animate animate-spin" />
 								</span> : "Deposit" }
-							</button>
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -141,7 +131,7 @@ const FundNode = () => {
             {loading &&
                 <div className="w-full h-full absolute inset-0 backdrop-blur flex justify-center items-center border border-solid  border-gray-400 rounded">
                     <span className="bg-black/100 shadow rounded p-2">
-                        <ImSpinner8 size={14} className="animate animate-spin text-white" />
+                        <LoaderCircle size={14} className="animate animate-spin text-white" />
                     </span>
                 </div>
             }

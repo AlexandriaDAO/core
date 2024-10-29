@@ -4,7 +4,7 @@ import SubTypes from "./components/SubTypes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import useSession from "@/hooks/useSession";
-import { message } from "antd";
+import { toast } from "sonner";
 import performSearch from "../search/thunks/performSearch";
 
 function Filter() {
@@ -18,21 +18,21 @@ function Filter() {
 	const search = async()=>{
 		if(searchText.length > 0 ){
 			// if( !user ){
-			// 	message.error("Login to perform searches on your engines");
+			// 	toast.error("Login to perform searches on your engines");
 			// 	return;
 			// }
 			if(!meiliClient){
-				message.error("Add a working client to perform searches");
+				toast.error("Add a working client to perform searches");
 				return;
 			}
 
 			if(!await meiliClient.isHealthy()){
-				message.error("Client not available");
+				toast.error("Client not available");
 				return;
 			}
 
 			if(meiliIndex){
-				// message.error("Index not available");
+				// toast.error("Index not available");
 				// return;
 				dispatch( performSearch({indices: [meiliIndex]}))
 			}else{

@@ -1,5 +1,5 @@
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
-import { message } from "antd";
+import { toast } from "sonner";
 import getLBRYratio from "./thunks/getLBRYratio";
 import swapLbry from "./thunks/swapLbry";
 import getMaxLbryBurn from "./thunks/getMaxLbryBurn";
@@ -84,50 +84,50 @@ const swapSlice = createSlice({
   extraReducers: (builder: ActionReducerMapBuilder<SwapState>) => {
     builder
       .addCase(getLBRYratio.pending, (state) => {
-        // message.info("Fetching LBRY ratio");
+        // toast.info("Fetching LBRY ratio");
         state.loading = true;
         state.error = null;
       })
       .addCase(getLBRYratio.fulfilled, (state, action) => {
-        // message.success("LBRY ratio fetched.");
+        // toast.success("LBRY ratio fetched.");
         state.lbryRatio = action.payload;
         state.loading = false;
         state.error = null;
       })
       .addCase(getLBRYratio.rejected, (state, action) => {
-        message.error("LBRY ratio could not be fetched!");
+        toast.error("LBRY ratio could not be fetched!");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(getLbryBalance.pending, (state) => {
-        // message.info("Fetching LBRY balance!");
+        // toast.info("Fetching LBRY balance!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getLbryBalance.fulfilled, (state, action) => {
-        // message.success("Fetched LBRY balance!");
+        // toast.success("Fetched LBRY balance!");
         state.lbryBalance = action.payload;
         state.loading = false;
         state.error = null;
       })
       .addCase(getLbryBalance.rejected, (state, action) => {
-        message.error("LBRY balance could not be fetched!");
+        toast.error("LBRY balance could not be fetched!");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(getStakeInfo.pending, (state) => {
-        message.info("Fetching staked info!");
+        toast.info("Fetching staked info!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getStakeInfo.fulfilled, (state, action) => {
-        message.success("Fetched staked info!");
+        toast.success("Fetched staked info!");
         state.stakeInfo = action.payload;
         state.loading = false;
         state.error = null;
       })
       .addCase(getStakeInfo.rejected, (state, action) => {
-        message.error("Could not fetched staked info!");
+        toast.error("Could not fetched staked info!");
         state.loading = false;
         state.error = action.payload as string;
       })
@@ -137,124 +137,124 @@ const swapSlice = createSlice({
         state.error = null;
       })
       .addCase(getALlStakesInfo.fulfilled, (state, action) => {
-        message.success("Fetched all staked info!");
+        toast.success("Fetched all staked info!");
         state.totalStaked = action.payload;
         state.loading = false;
         state.error = null;
       })
       .addCase(getALlStakesInfo.rejected, (state, action) => {
-        message.error("Could not fetched all staked info!");
+        toast.error("Could not fetched all staked info!");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(swapLbry.pending, (state) => {
-        message.info("Swapping!");
+        toast.info("Swapping!");
         state.loading = true;
         state.error = null;
       })
       .addCase(swapLbry.fulfilled, (state, action) => {
-        message.success("Successfully Swaped!");
+        toast.success("Successfully Swaped!");
         state.loading = false;
         state.swapSuccess = true;
         state.error = null;
       })
       .addCase(swapLbry.rejected, (state, action) => {
-        message.error("Error while Swaping!");
+        toast.error("Error while Swaping!");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(stakeAlex.pending, (state) => {
-        message.info("Staking!");
+        toast.info("Staking!");
         state.loading = true;
         state.error = null;
       })
       .addCase(stakeAlex.fulfilled, (state, action) => {
-        message.success("Successfully staked!");
+        toast.success("Successfully staked!");
         state.loading = false;
         state.successStake = true;
         state.error = null;
       })
       .addCase(stakeAlex.rejected, (state, action) => {
-        message.error("Error while staking!");
+        toast.error("Error while staking!");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(burnLbry.pending, (state) => {
-        message.info("Burning LBRY!");
+        toast.info("Burning LBRY!");
         state.loading = true;
         state.error = null;
       })
       .addCase(burnLbry.fulfilled, (state, action) => {
-        message.success("Burned LBRY sucessfully!");
+        toast.success("Burned LBRY sucessfully!");
         state.burnSuccess = true;
         state.loading = false;
         state.error = null;
       })
       .addCase(burnLbry.rejected, (state, action) => {
-        message.error("Error while burning!");
+        toast.error("Error while burning!");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(claimReward.pending, (state) => {
-        message.info("Claiming!");
+        toast.info("Claiming!");
         state.loading = true;
         state.error = null;
       })
       .addCase(claimReward.fulfilled, (state, action) => {
-        message.success("Successfully Claimed!");
+        toast.success("Successfully Claimed!");
         state.loading = false;
         state.successClaimReward = true;
         state.error = null;
       })
       .addCase(claimReward.rejected, (state, action) => {
-        message.error("Error while claiming!");
+        toast.error("Error while claiming!");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(unstake.pending, (state) => {
-        message.info("Unstaking!");
+        toast.info("Unstaking!");
         state.loading = true;
         state.error = null;
       })
       .addCase(unstake.fulfilled, (state, action) => {
-        message.success("Successfully unstaked!");
+        toast.success("Successfully unstaked!");
         state.loading = false;
         state.unstakeSuccess = true;
         state.error = null;
       })
       .addCase(unstake.rejected, (state, action) => {
-        message.error("Error while unstaking!");
+        toast.error("Error while unstaking!");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(getMaxLbryBurn.pending, (state) => {
-        // message.info("Fetching max allowed LBRY burn!");
+        // toast.info("Fetching max allowed LBRY burn!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getMaxLbryBurn.fulfilled, (state, action) => {
-        // message.success("Successfully fetched max allowed burn!");
+        // toast.success("Successfully fetched max allowed burn!");
         state.maxLbryBurn = action.payload;
         state.error = null;
       })
       .addCase(getMaxLbryBurn.rejected, (state, action) => {
-        message.error("Error while fethcing max burn LBRY!");
+        toast.error("Error while fethcing max burn LBRY!");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(transferLBRY.pending, (state) => {
-        message.info("Processing LBRY transfer!");
+        toast.info("Processing LBRY transfer!");
         state.loading = true;
         state.error = null;
       })
       .addCase(transferLBRY.fulfilled, (state, action) => {
-        message.success("Successfully transfered LBRY!");
+        toast.success("Successfully transfered LBRY!");
         state.transferSuccess = true;
         state.loading = false;
         state.error = null;
       })
       .addCase(transferLBRY.rejected, (state, action) => {
-        message.error("Error while transfering LBRY");
+        toast.error("Error while transfering LBRY");
         state.loading = false;
         state.error = action.payload as string;
       })

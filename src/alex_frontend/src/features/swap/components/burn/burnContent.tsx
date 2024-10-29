@@ -11,9 +11,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 import { flagHandler } from "../../swapSlice";
 import burnLbry from "../../thunks/burnLBRY";
-import { ImSpinner8 } from "react-icons/im";
 import Auth from "@/features/auth";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
+import { LoaderCircle } from "lucide-react";
 import { lbry_fee } from "@/utils/utils";
 
 const BurnContent = () => {
@@ -121,11 +121,11 @@ const BurnContent = () => {
                             }}
                         >
                             {swap.loading ? (<>
-                                <ImSpinner8 size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
+                                <LoaderCircle size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
                                 <>Burn</>
                             )}
                         </button> : <div
-                            className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center text-white white-auth-btn"
+                            className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn"
                         >
                             <Auth />
                         </div>}

@@ -4,11 +4,11 @@
 // import MeiliSearch from "meilisearch";
 // import { Wallet, ethers } from "ethers";
 // import { WebIrys } from "@irys/sdk";
-// import { ImSpinner8 } from "react-icons/im";
-// import { Tooltip, message } from "antd";
-// import { CiCircleInfo } from "react-icons/ci";
+// import { Tooltip } from "antd";
+// import { toast } from "sonner";
 // import MainLayout from "@/layouts/MainLayout";
 // import { getSimpleWebIrys } from "@/features/node/utils/irys";
+// import { Info, LoaderCircle } from "lucide-react";
 
 
 // const FundNodePage = () => {
@@ -25,10 +25,10 @@
 // 				setWebIrys(irys);
 // 			}catch(error){
 // 				if (error instanceof Error) {
-// 					message.error(error.message);
+// 					toast.error(error.message);
 // 				}else{
 // 					console.log('error loading irys', error);
-// 					message.error('unable to load wallet')
+// 					toast.error('unable to load wallet')
 // 				}
 // 				setBalance(undefined);
 // 			}
@@ -51,10 +51,10 @@
 // 			setBalance(convertedBalance);
 // 		}catch(error){
 // 			if (error instanceof Error) {
-// 				message.error(error.message);
+// 				toast.error(error.message);
 // 			}else{
 // 				console.log('error loading balalnce', error);
-// 				message.error('unable to load balance')
+// 				toast.error('unable to load balance')
 // 			}
 // 			setBalance(undefined);
 // 		}
@@ -67,7 +67,7 @@
 // 		try {
 // 			setLoading(true);
 // 			if (!webIrys) {
-// 				message.error("Node is not available");
+// 				toast.error("Node is not available");
 // 				return;
 // 			}
 // 			const confirmation = window.confirm(
@@ -78,7 +78,7 @@
 // 					webIrys.utils.toAtomic(amount)
 // 				);
 
-// 				message.success(
+// 				toast.success(
 // 					`Successfully funded ${webIrys.utils.fromAtomic(
 // 						fundTx.quantity
 // 					)} ${webIrys.token}`
@@ -86,7 +86,7 @@
 // 				fetchBalance();
 // 			}
 // 		} catch (e) {
-// 			message.error(
+// 			toast.error(
 // 				"Funding Failed, Try Again."
 // 			);
 // 			console.log("Error funding node ", e);
@@ -131,7 +131,7 @@
 
 // 						<span className="font-bold">
 // 							{ balance === null ?
-// 								<ImSpinner8 size={14} className="animate animate-spin" />:
+// 								<LoaderCircle size={14} className="animate animate-spin" />:
 // 								balance === undefined ? "NA" : (balance + "ETH")
 // 							}
 // 						</span>
@@ -163,7 +163,7 @@
 // 								{loading ? (
 // 									<span className="flex gap-1 items-center">
 // 										Processing{" "}
-// 										<ImSpinner8
+// 										<Info
 // 											size={14}
 // 											className="animate animate-spin"
 // 										/>

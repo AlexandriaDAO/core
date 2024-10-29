@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { IoIosSearch } from "react-icons/io";
 import { ConfigProvider, Table, TableColumnsType } from "antd";
 import EngineItemAction from "./components/EngineItemAction";
 import { Engine } from "../../../../../src/declarations/alex_backend/alex_backend.did";
@@ -8,9 +7,8 @@ import { Engine } from "../../../../../src/declarations/alex_backend/alex_backen
 import './styles/table.module.css';
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchPublicEngines from "./thunks/fetchPublicEngines";
-import logout from "../auth/thunks/logout";
-import { getAuthClient } from "../auth/utils/authUtils";
 import useSession from "@/hooks/useSession";
+import { Search } from "lucide-react";
 const columns: TableColumnsType<Engine> = [
 	{
 		title: "Name",
@@ -56,7 +54,7 @@ function PublicEngines() {
 					</span>
 				</div>
 				<div className="w-10/12 border-b-2 border-solid border-gray-500 flex items-center gap-2 px-2 py-2">
-					<IoIosSearch />
+					<Search />
 					<input
 						type="text"
 						placeholder="Search"

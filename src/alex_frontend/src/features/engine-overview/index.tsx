@@ -7,7 +7,8 @@ import EngineTasks from "../engine-tasks";
 import EngineStats from "../engine-stats";
 import { EngineOverviewTab, setActiveEngine, setActiveTab } from "./engineOverviewSlice";
 import updateEngineStatus, { EngineStatus } from "./thunks/updateEngineStatus";
-import { ImSpinner8 } from "react-icons/im";
+import { Button } from "@/lib/components/button";
+import { LoaderCircle } from "lucide-react";
 
 function EngineOverview() {
 	const dispatch = useAppDispatch();
@@ -62,36 +63,26 @@ function EngineOverview() {
                             Engine Overview
                         </span>
                         {loading && (
-                            <ImSpinner8 size={20} className="animate animate-spin" />
+                            <LoaderCircle size={20} className="animate animate-spin" />
                         )}
                     </div>
-                    <div className="flex gap-1 items-center">
+                    <div className="flex items-center">
                         {user && user == activeEngine?.owner && <>
                             { activeEngine?.status && 'Published' in activeEngine.status &&
-                                <button
-                                    disabled={loading}
-                                    onClick={handleMoveToDraftClick}
-                                    className={`px-2 font-roboto-condensed text-base leading-[18px] font-normal text-gray-400 ${loading ? 'cursor-not-allowed':'hover:text-gray-700'} transition-all duration-100 border-r border-gray-500`}
-                                >
-                                    Move To Drafts
-                                </button>
+                                <Button variant='muted' disabled={loading} onClick={handleMoveToDraftClick}>
+                                    Move To Draft
+                                </Button>
                             }
                             { activeEngine?.status && 'Draft' in activeEngine.status &&
-                                <button
-                                    disabled={loading}
-                                    onClick={handlePublishEngine}
-                                    className={`px-2 font-roboto-condensed text-base leading-[18px] font-normal text-gray-400 ${loading ? 'cursor-not-allowed':'hover:text-gray-700'} transition-all duration-100 border-r border-gray-500`}
-                                >
+                                <Button variant='muted' disabled={loading} onClick={handlePublishEngine}>
                                     Publish Engine
-                                </button>
+                                </Button>
                             }
                         </>}
-                        <button
-                            onClick={handleEngineOverviewCloseClick}
-                            className="font-roboto-condensed text-base leading-[18px] font-normal text-gray-400 hover:text-gray-700 transition-all duration-100"
-                        >
+                        <div className="h-5 border-l border-gray-500"></div>
+                        <Button variant='muted' onClick={handleEngineOverviewCloseClick}>
                             Close Overview
-                        </button>
+                        </Button>
                     </div>
                 </div>
                 <div className="flex flex-col items-start">
@@ -174,14 +165,15 @@ function EngineOverview() {
                 </div>
                 <div className="flex gap-2 justify-start items-center">
                     {Object.values(EngineOverviewTab).map((t) => (
-                        <button
+                        <Button
                             key={t}
-                            disabled={activeTab==t}
+                            rounded="full"
                             onClick={() => handleTabClick(t)}
-                            className={`w-44 py-3 flex justify-center items-center border border-black rounded-full font-roboto-condensed text-base leading-[18px] font-medium transition-all duration-100 ease-in ${activeTab == t ? 'bg-black text-white cursor-not-allowed':'text-black cursor-pointer hover:bg-black hover:text-white'}
-                            `}>
+                            variant={activeTab == t ? 'inverted':'primary'}
+                            className={activeTab == t ? 'pointer-events-none':''}
+                        >
                             {t}
-                        </button>
+                        </Button>
                     ))}
                 </div>
             </div>

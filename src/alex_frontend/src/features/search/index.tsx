@@ -1,19 +1,17 @@
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { ChangeEvent, KeyboardEvent, useEffect } from "react";
-import { RxCross1 } from "react-icons/rx";
 import { setLimit, setSearchResults, setSearchText } from "./searchSlice";
 
-import { ImSpinner8 } from "react-icons/im";
 import FilterButton from "@/components/ui/FilterButton";
 import useSession from "@/hooks/useSession";
-import { message } from "antd";
+import { toast } from "sonner";
 import performSearch from "./thunks/performSearch";
+import { LoaderCircle, X } from "lucide-react";
 
 export default function Search() {
 	const { meiliClient, meiliIndex } = useSession();
 	const dispatch = useAppDispatch();
-	const { user } = useAppSelector((state) => state.auth);
 	const { searchText, limit, loading } = useAppSelector((state) => state.search);
 
 	const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -23,16 +21,16 @@ export default function Search() {
 	const search = async()=>{
 		if(searchText.length > 0 ){
 			// if( !user ){
-			// 	message.error("Login to perform searches on your engines");
+			// 	toast.error("Login to perform searches on your engines");
 			// 	return;
 			// }
 			if(!meiliClient){
-				message.error("Add a working client to perform searches");
+				toast.error("Add a working client to perform searches");
 				return;
 			}
 
 			if(!await meiliClient.isHealthy()){
-				message.error("Client not available");
+				toast.error("Client not available");
 				return;
 			}
 
@@ -73,9 +71,9 @@ export default function Search() {
 					onKeyDown={handleKeyDown}
 					onChange={handleSearchInput}
 				/>
-				{loading && <ImSpinner8 size={24} className="animate animate-spin" />}
+				{loading && <LoaderCircle size={24} className="animate animate-spin" />}
 				{!loading && searchText.length > 0 && (
-					<RxCross1
+					<X
 						onClick={handleClearSearchInput}
 						className="cursor-pointer"
 						size={24}

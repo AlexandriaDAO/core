@@ -2,7 +2,7 @@ import {
   ActionReducerMapBuilder,
   createSlice,
 } from "@reduxjs/toolkit";
-import { message } from "antd";
+import { toast } from "sonner";
 import getAlexMintRate from "./thunks/tokenomics/getAlexMintRate";
 // Define the interface for our node state
 export interface SwapState {
@@ -25,18 +25,18 @@ const tokenomicsSlice = createSlice({
   extraReducers: (builder: ActionReducerMapBuilder<SwapState>) => {
     builder
       .addCase(getAlexMintRate.pending, (state) => {
-        message.info("Fetching ALEX mint rate!");
+        toast.info("Fetching ALEX mint rate!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getAlexMintRate.fulfilled, (state, action) => {
-        message.success("Fetched ALEX mint rate!");
+        toast.success("Fetched ALEX mint rate!");
         state.alexMintRate = action.payload;
         state.loading = false;
         state.error = null;
       })
       .addCase(getAlexMintRate.rejected, (state, action) => {
-        message.error("Could not fetched ALEX mint rate!");
+        toast.error("Could not fetched ALEX mint rate!");
         state.loading = false;
         state.error = action.payload as string;
       })

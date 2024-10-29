@@ -1,8 +1,7 @@
 import React from "react";
 
-import { PiBookOpenLight } from "react-icons/pi";
-import { LiaFileAlt } from "react-icons/lia";
 import { useReader } from "../hooks/useReaderContext";
+import { BookOpen, FileText } from "lucide-react";
 
 const SpreadToggle: React.FC = () => {
 	const { spread, setSpread, rendition, flow } = useReader();
@@ -21,13 +20,13 @@ const SpreadToggle: React.FC = () => {
 
 	return (
 		<div className="flex items-center justify-center gap-1">
-			<PiBookOpenLight
+			<BookOpen
 				onClick={toggleSpread}
 				size={30}
 				color={spread === "auto" && flow !== "scrolled" ? "#F6F930" : "#8E8E8E"}
 				className={`border border-solid ${flow === "scrolled" ? 'border-gray-400' : `border-[${spread === "auto" ? "#F6F930" : "#8E8E8E"}]`} p-1 rounded-md ${flow === "scrolled" ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
 			/>
-			<LiaFileAlt
+			<FileText
 				onClick={toggleSpread}
 				size={30}
 				color={spread === "none" && flow !== "scrolled" ? "#F6F930" : "#8E8E8E"}
