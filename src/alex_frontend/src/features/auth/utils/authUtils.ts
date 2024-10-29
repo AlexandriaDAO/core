@@ -45,6 +45,7 @@ import {
   createActor as createActorVetkd,
 } from "../../../../../declarations/vetkd";
 
+
 const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
 
 const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;

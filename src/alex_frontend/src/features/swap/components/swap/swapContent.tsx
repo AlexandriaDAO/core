@@ -10,6 +10,8 @@ import swapLbry from "../../thunks/swapLbry";
 import { flagHandler } from "../../swapSlice";
 import Auth from "@/features/auth";
 import { LoaderCircle } from "lucide-react";
+import { icp_fee } from "@/utils/utils";
+
 
 const SwapContent: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -19,7 +21,6 @@ const SwapContent: React.FC = () => {
   const [amount, setAmount] = useState("1");
   const [lbryRatio, setLbryRatio] = useState(0.0);
   const [tentativeLBRY, setTentativeLBRY] = useState(Number);
-  const fee = 0.0001;
   const handleSubmit = () => {
     // event.preventDefault();
     let amountAfterFees = (Number(amount)).toFixed(4)
@@ -29,9 +30,12 @@ const SwapContent: React.FC = () => {
   const handleMaxIcp = () => {
     const userBal = Math.max(
       0,
-      Number(icpLedger.accountBalance) - fee
+      Number(icpLedger.accountBalance) - 2*icp_fee
     ).toFixed(4);
     setAmount(userBal);
+
+    setTentativeLBRY(lbryRatio * Number(userBal));
+
   };
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(e.target.value);
@@ -134,7 +138,7 @@ const SwapContent: React.FC = () => {
                 Network Fees
               </strong>
               <span className="text-lg font-semibold text-radiocolor">
-                {fee} ICP
+                {icp_fee} ICP
               </span>
             </li>
             <li className="flex justify-between mb-5">

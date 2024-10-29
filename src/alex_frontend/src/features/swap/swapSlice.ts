@@ -10,8 +10,13 @@ import getStakeInfo from "./thunks/getStakedInfo";
 import claimReward from "./thunks/claimReward";
 import unstake from "./thunks/unstake";
 import transferLBRY from "./thunks/lbryIcrc/transferLBRY";
-import transferICPFromUserWalletcanister from "./thunks/transferICPFromUserWallet";
 import getALlStakesInfo from "./thunks/getAllStakesInfo";
+import getArchivedBal from "./thunks/getArchivedBal";
+import redeemArchivedBalance from "./thunks/redeemArchivedBalance";
+import getLBRYTransactions from "./thunks/lbryIcrc/getTransactions";
+
+import { TransactionType } from "./thunks/lbryIcrc/getTransactions";
+import getStakersCount from "./thunks/getStakersCount";
 // Define the interface for our node state
 export interface StakeInfo {
   stakedAlex: string;
@@ -22,16 +27,21 @@ export interface StakeInfo {
 export interface SwapState {
   lbryRatio: string;
   lbryBalance: string;
+  archivedBalance: string;
   maxLbryBurn: Number;
   stakeInfo: StakeInfo;
-  totalStaked:string;
+  totalStakers:string;
+  totalStaked: string;
   loading: boolean;
   swapSuccess: boolean;
   burnSuccess: boolean;
   successStake: boolean;
   successClaimReward: boolean;
   unstakeSuccess: boolean;
-  transferSuccess:boolean;
+  transferSuccess: boolean;
+  redeeemSuccess: boolean;
+  
+  transactions: TransactionType[];
   error: string | null;
 }
 
@@ -39,15 +49,19 @@ export interface SwapState {
 const initialState: SwapState = {
   lbryRatio: "0",
   lbryBalance: "0",
+  archivedBalance: "0",
   maxLbryBurn: 0,
   stakeInfo: { stakedAlex: "0", rewardIcp: "0", unix_stake_time: "0" },
-  totalStaked:"0",
+  totalStakers:"0",
+  totalStaked: "0",
   swapSuccess: false,
+  redeeemSuccess: false,
   successStake: false,
   burnSuccess: false,
   successClaimReward: false,
   unstakeSuccess: false,
-  transferSuccess:false,
+  transferSuccess: false,
+  transactions: [],
   loading: false,
   error: null,
 };
@@ -58,11 +72,12 @@ const swapSlice = createSlice({
   reducers: {
     flagHandler: (state) => {
       state.swapSuccess = false;
-      state.burnSuccess=false;
+      state.burnSuccess = false;
       state.successStake = false;
       state.successClaimReward = false;
       state.unstakeSuccess = false;
-      state.transferSuccess=false;
+      state.transferSuccess = false;
+      state.redeeemSuccess = false;
       state.error = null;
     },
   },
@@ -115,8 +130,9 @@ const swapSlice = createSlice({
         toast.error("Could not fetched staked info!");
         state.loading = false;
         state.error = action.payload as string;
-      }) .addCase(getALlStakesInfo.pending, (state) => {
-        // toast.info("Fetching staked info!");
+      })
+      .addCase(getALlStakesInfo.pending, (state) => {
+        // message.info("Fetching staked info!");
         state.loading = true;
         state.error = null;
       })
@@ -234,7 +250,7 @@ const swapSlice = createSlice({
       .addCase(transferLBRY.fulfilled, (state, action) => {
         toast.success("Successfully transfered LBRY!");
         state.transferSuccess = true;
-        state.loading=false;
+        state.loading = false;
         state.error = null;
       })
       .addCase(transferLBRY.rejected, (state, action) => {
@@ -242,7 +258,67 @@ const swapSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      ;
+      .addCase(getArchivedBal.pending, (state) => {
+        message.info("Fetching archived balance!");
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getArchivedBal.fulfilled, (state, action) => {
+        message.success("Successfully fetched archived balance!");
+        state.archivedBalance = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(getArchivedBal.rejected, (state, action) => {
+        message.error("Error while fetching archived balance");
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(redeemArchivedBalance.pending, (state) => {
+        message.info("Claiming!");
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(redeemArchivedBalance.fulfilled, (state, action) => {
+        message.success("Successfully redeem!");
+        state.loading = false;
+        state.redeeemSuccess = true;
+        state.error = null;
+      })
+      .addCase(redeemArchivedBalance.rejected, (state, action) => {
+        message.error("Error while claiming!");
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(getLBRYTransactions.pending, (state) => {
+        message.info("fetching!");
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getLBRYTransactions.fulfilled, (state, action) => {
+        message.success("Fetched Transactions!");
+        state.loading = false;
+        state.transactions = action.payload;
+        state.error = null;
+      })
+      .addCase(getLBRYTransactions.rejected, (state, action) => {
+        message.error("Error while fetching transactions!");
+        state.loading = false;
+        state.error = action.payload as string;
+      }).addCase(getStakersCount.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getStakersCount.fulfilled, (state, action) => {
+        state.loading = false;
+        state.totalStakers = action.payload;
+        state.error = null;
+      })
+      .addCase(getStakersCount.rejected, (state, action) => {
+        message.error("Error while fetching total stakers!");
+        state.loading = false;
+        state.error = action.payload as string;
+      });
   },
 });
 export const { flagHandler } = swapSlice.actions;

@@ -13,9 +13,15 @@ const getALlStakesInfo = createAsyncThunk<
     const actor = await getActorSwap();
     const LedgerServices = LedgerService();
 
-    const result = await actor.get_total_staked();
-    
-    return LedgerServices.e8sToIcp(result).toFixed(4);
+    const result = await actor.get_total_alex_staked();
+    if ("Ok" in result) {
+      return LedgerServices.e8sToIcp(result.Ok).toFixed(4)
+    }
+
+    if ("Err" in result) {
+      throw new Error(result.Err);
+    }
+    ;
   } catch (error) {
     if (error instanceof Error) {
       return rejectWithValue(error.message);
