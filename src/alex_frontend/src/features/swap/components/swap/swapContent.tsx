@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { ActorSubclass } from "@dfinity/agent";
 
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -9,8 +8,8 @@ import { _SERVICE as _SERVICEICPLEDGER } from "../../../../../../declarations/ic
 import { Link } from "react-router-dom";
 import swapLbry from "../../thunks/swapLbry";
 import { flagHandler } from "../../swapSlice";
-import { ImSpinner8 } from "react-icons/im";
 import Auth from "@/features/auth";
+import { LoaderCircle } from "lucide-react";
 
 const SwapContent: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -118,7 +117,7 @@ const SwapContent: React.FC = () => {
               }}
             >
               {swap.loading ? (<>
-                <ImSpinner8 size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
+                <LoaderCircle size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
                 <>Swap</>
               )}
             </button> : <div

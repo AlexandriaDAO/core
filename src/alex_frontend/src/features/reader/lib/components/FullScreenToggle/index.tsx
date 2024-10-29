@@ -5,9 +5,6 @@ import {
 } from "./style";
 import { useReader } from "../../hooks/useReaderContext";
 
-import { BiFullscreen } from "react-icons/bi";
-import { BiExitFullscreen } from "react-icons/bi";
-
 interface FullScreenToggleProps {
 	fullScreenToggleStyles?: IFullScreenToggleStyle;
 }

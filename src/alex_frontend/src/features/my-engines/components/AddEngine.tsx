@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Modal } from "antd";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
-import { BiPlus } from "react-icons/bi";
-import { ImSpinner8 } from "react-icons/im";
-import { LiaSaveSolid } from "react-icons/lia";
 import * as Yup from "yup";
 import { EngineStatus } from "@/features/engine-overview/thunks/updateEngineStatus";
-import useSession from "@/hooks/useSession";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import addEngine from "../thunks/addEngine";
@@ -16,8 +11,6 @@ import {
 	setNewEngineError,
 	setNewEngineLoading,
 } from "../myEnginesSlice";
-import { CiCircleCheck } from "react-icons/ci";
-import { AiOutlineCloseCircle } from "react-icons/ai";
 import { getAuthClient } from "@/features/auth/utils/authUtils";
 
 
@@ -34,7 +27,7 @@ import {
 import { Button } from "@/lib/components/button";
 import { Label } from "@/lib/components/label";
 import { Input } from "@/lib/components/input";
-import { Check, Info, Plus } from "lucide-react";
+import { Check, CheckCircle, Info, LoaderCircle, Plus, Save, XCircle } from "lucide-react";
 
 const EngineSchema = Yup.object().shape({
 	title: Yup.string()
@@ -278,7 +271,7 @@ const AddEngine = () => {
 						<DialogFooter>
 							{newEngineLoading ? (
 								<Button type="button" disabled rounded={"full"}>
-									<ImSpinner8
+									<LoaderCircle
 										size={18}
 										className="animate animate-spin"
 									/>
@@ -286,7 +279,7 @@ const AddEngine = () => {
 								</Button>
 							) : (
 								<Button type="submit" rounded={"full"}>
-									<LiaSaveSolid size={18} />
+									<Save size={18} />
 									<span>Save Engine</span>
 								</Button>
 							)}
@@ -309,7 +302,7 @@ const SuccessDialog = () => (
 			<DialogHeader>
 				<DialogTitle>
 					<div className="flex gap-1 justify-start items-center">
-						<CiCircleCheck size={24} className="text-green-400" />
+						<CheckCircle size={24} className="text-green-400" />
 						<span>Engine Added</span>
 					</div>
 				</DialogTitle>
@@ -335,7 +328,7 @@ const ErrorDialog = ({ error }: { error: string }) => (
 			<DialogHeader>
 				<DialogTitle>
 					<div className="flex gap-1 justify-start items-center">
-						<AiOutlineCloseCircle size={24} className="text-red-400" />
+						<XCircle size={24} className="text-red-400" />
 						<span>Engine Error</span>
 					</div>
 				</DialogTitle>

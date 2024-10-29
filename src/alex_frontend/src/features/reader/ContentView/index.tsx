@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 
 import {
 	ContentViewStyle as defaultContentViewStyles,
@@ -9,10 +9,9 @@ import { ILocationChangeProps } from "../lib/hooks/useReaderState";
 import { Contents } from "epubjs";
 
 import Spinner from "../lib/components/Spinner";
-import { BsArrowLeftCircle, BsArrowRightCircle } from "react-icons/bs";
-
 import AddAnnotationTooltip from "../lib/components/AddAnnotationTooltip";
 import RemoveAnnotationTooltip from "../lib/components/RemoveAnnotationTooltip";
+import { CircleArrowLeft, CircleArrowRight } from "lucide-react";
 
 export type IContentViewProps = {
 	contentViewStyles?: IContentViewStyle;
@@ -178,7 +177,7 @@ function ContentView(props: IContentViewProps) {
 
 	return (
 		<>
-			<BsArrowLeftCircle
+			<CircleArrowLeft
 				size={30}
 				onClick={prev}
 				className="absolute left-2 z-30 top-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
@@ -202,7 +201,7 @@ function ContentView(props: IContentViewProps) {
 					)}
 				</div>
 			</div>
-			<BsArrowRightCircle
+			<CircleArrowRight
 				size={30}
 				onClick={next}
 				className="absolute right-2 top-1/2 cursor-pointer text-gray-500 hover:text-gray-700"

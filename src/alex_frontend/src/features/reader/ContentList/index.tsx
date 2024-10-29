@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Dropdown, Menu } from "antd";
-import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import "./styles.css"; // Import the custom CSS
 import { useReader } from "../lib/hooks/useReaderContext";
 import { TocItem } from "../lib/components/TocItem";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const ContentList: React.FC = () => {
   const [dropUp, setDropUp] = useState(false);
@@ -38,7 +38,7 @@ const ContentList: React.FC = () => {
     >
       <div className="font-roboto-condensed font-medium text-base text-white p-2 rounded border border-solid border-white flex justify-between items-center gap-2">
         <span>Content List</span>
-        {dropUp ? <IoIosArrowDown size={20} />: <IoIosArrowUp size={20} />}
+        {dropUp ? <ChevronUp size={20} />: <ChevronDown size={20} />}
       </div>
     </Dropdown>
   );

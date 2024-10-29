@@ -7,8 +7,8 @@ import EngineTasks from "../engine-tasks";
 import EngineStats from "../engine-stats";
 import { EngineOverviewTab, setActiveEngine, setActiveTab } from "./engineOverviewSlice";
 import updateEngineStatus, { EngineStatus } from "./thunks/updateEngineStatus";
-import { ImSpinner8 } from "react-icons/im";
 import { Button } from "@/lib/components/button";
+import { LoaderCircle } from "lucide-react";
 
 function EngineOverview() {
 	const dispatch = useAppDispatch();
@@ -63,7 +63,7 @@ function EngineOverview() {
                             Engine Overview
                         </span>
                         {loading && (
-                            <ImSpinner8 size={20} className="animate animate-spin" />
+                            <LoaderCircle size={20} className="animate animate-spin" />
                         )}
                     </div>
                     <div className="flex items-center">

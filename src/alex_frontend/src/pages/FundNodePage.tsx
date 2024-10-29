@@ -4,12 +4,11 @@
 // import MeiliSearch from "meilisearch";
 // import { Wallet, ethers } from "ethers";
 // import { WebIrys } from "@irys/sdk";
-// import { ImSpinner8 } from "react-icons/im";
 // import { Tooltip } from "antd";
 // import { toast } from "sonner";
-// import { CiCircleInfo } from "react-icons/ci";
 // import MainLayout from "@/layouts/MainLayout";
 // import { getSimpleWebIrys } from "@/features/node/utils/irys";
+// import { Info, LoaderCircle } from "lucide-react";
 
 
 // const FundNodePage = () => {
@@ -132,7 +131,7 @@
 
 // 						<span className="font-bold">
 // 							{ balance === null ?
-// 								<ImSpinner8 size={14} className="animate animate-spin" />:
+// 								<LoaderCircle size={14} className="animate animate-spin" />:
 // 								balance === undefined ? "NA" : (balance + "ETH")
 // 							}
 // 						</span>
@@ -164,7 +163,7 @@
 // 								{loading ? (
 // 									<span className="flex gap-1 items-center">
 // 										Processing{" "}
-// 										<ImSpinner8
+// 										<Info
 // 											size={14}
 // 											className="animate animate-spin"
 // 										/>

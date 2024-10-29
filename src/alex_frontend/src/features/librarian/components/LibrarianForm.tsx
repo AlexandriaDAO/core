@@ -1,9 +1,7 @@
 import React from "react";
 import { toast } from "sonner";
 import { useFormik } from "formik";
-import { LiaSaveSolid } from "react-icons/lia";
 import * as Yup from "yup";
-import useSession from "@/hooks/useSession";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import logout from "@/features/auth/thunks/logout";
 import becomeLibrarian from "../thunks/becomeLibrarian";
@@ -11,6 +9,7 @@ import { getAuthClient } from "@/features/auth/utils/authUtils";
 import { Button } from "@/lib/components/button";
 import { Label } from "@/lib/components/label";
 import { Input } from "@/lib/components/input";
+import { Save } from "lucide-react";
 
 const LibrarianSchema = Yup.object().shape({
 	name: Yup.string()
@@ -100,7 +99,7 @@ const LibrarianForm = () => {
 				</div>
 				<div className="flex justify-center">
 					<Button type="submit" rounded={"full"}>
-						<LiaSaveSolid size={18} />
+						<Save size={18} />
 						<span>Save Form</span>
 					</Button>
 				</div>

@@ -3,9 +3,7 @@ import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { FiRefreshCcw } from "react-icons/fi";
-import { ImSpinner8 } from "react-icons/im";
-import { VscClearAll } from "react-icons/vsc";
+import { ListX, LoaderCircle, RefreshCcw } from "lucide-react";
 
 enum EngineFilter {
 	id = "Id",
@@ -91,13 +89,13 @@ const EngineFilters = () => {
 				<div className="flex items-center text-gray-500">
 					{user == activeEngine?.owner && (
 						<Button variant='muted' onClick={handleFilterReset}>
-							<VscClearAll size={22} />
+							<ListX size={22} />
 							<span>Clear All</span>
 						</Button>
 					)}
 					<div className="h-5 border-l border-gray-500"></div>
 					<Button variant='muted' onClick={fetchFilters}>
-						<FiRefreshCcw
+						<RefreshCcw
 							size={18}
 							className={`${loading ? "animate-spin" : ""}`}
 						/>
@@ -111,7 +109,7 @@ const EngineFilters = () => {
 			</span>}
 			<div className="p-4 grid gap-y-8 gap-x-10 grid-flow-col grid-rows-4 justify-start">
 				{loading ? (
-					<ImSpinner8 size={30} className="animate animate-spin" />
+					<LoaderCircle size={30} className="animate animate-spin" />
 				) : (
 					Object.entries(EngineFilter).map(([key, value]) => (
 						<label

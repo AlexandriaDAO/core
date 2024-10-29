@@ -1,6 +1,6 @@
 import React from "react";
 import { useReader } from "../hooks/useReaderContext";
-import { HiOutlineMinus, HiOutlinePlus } from "react-icons/hi";
+import { Plus, Minus } from "lucide-react";
 
 const FontSizeButton: React.FC = () => {
 	const { userSettings, setUserSettings } = useReader();
@@ -24,7 +24,7 @@ const FontSizeButton: React.FC = () => {
 	return (
 		<div className="flex items-center justify-between gap-1">
 
-			<HiOutlinePlus
+			<Plus
 				onClick={
 					userSettings.fontSize < 40
 						? handleIncrementFontSize
@@ -37,7 +37,7 @@ const FontSizeButton: React.FC = () => {
 						: "cursor-pointer hover:bg-white hover:text-black hover:border-black "
 				}`}
 			/>
-			<HiOutlineMinus
+			<Minus
 				onClick={
 					userSettings.fontSize > 10
 						? handleDecrementFontSize

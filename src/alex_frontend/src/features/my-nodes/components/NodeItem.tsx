@@ -3,16 +3,12 @@ import React, { useEffect, useState } from "react";
 import { Node } from "../../../../../declarations/alex_librarian/alex_librarian.did";
 
 import { WebIrys } from "@irys/sdk";
-import { ImSpinner8 } from "react-icons/im";
 import { Tooltip } from "antd";
 import { toast } from "sonner";
-import { IoCopyOutline, IoRefreshOutline } from "react-icons/io5";
-import { SlInfo } from "react-icons/sl";
-import { getClientIrys, getNodeBalance, getServerIrys } from "@/services/irysService";
+import { getNodeBalance, getServerIrys } from "@/services/irysService";
 import { shorten } from "@/utils/general";
-import useSession from "@/hooks/useSession";
-import { MdOutlineRefresh } from "react-icons/md";
-// import { setActiveEngine } from "@/features/engine-overview/engineOverviewSlice";
+
+import { Copy, LoaderCircle, RefreshCcw, RefreshCw, RefreshCwOff } from "lucide-react";
 
 interface NodeItemProps {
 	node: Node;
@@ -93,7 +89,7 @@ const NodeItem = ({ node }: NodeItemProps) => {
 
 								<Tooltip title="Copy Address">
 									<span className={`${!(irys && irys.address) ? 'cursor-not-allowed' : ''}`}>
-										<IoCopyOutline
+										<Copy
 											size={14}
 											onClick={() => {
 												if (irys && irys.address) {
@@ -117,7 +113,7 @@ const NodeItem = ({ node }: NodeItemProps) => {
 
 									<Tooltip title="Refresh Balance" className="cursor-pointer">
 										<span>
-											<MdOutlineRefresh className={`${balanceLoading ? 'animate-spin' : ''}`} size={18} onClick={setNodeBalance} />
+											<RefreshCcw className={`${balanceLoading ? 'animate-spin' : ''}`} size={18} onClick={setNodeBalance} />
 										</span>
 									</Tooltip>
 								</div>
@@ -138,7 +134,7 @@ const NodeItem = ({ node }: NodeItemProps) => {
 			{loading &&
 				<div className="w-full h-full absolute inset-0 backdrop-blur flex justify-center items-center border border-solid  border-gray-400 rounded">
 					<span className="bg-black/100 shadow rounded p-2">
-						<ImSpinner8 size={14} className="animate animate-spin text-white" />
+						<LoaderCircle size={14} className="animate animate-spin text-white" />
 					</span>
 				</div>
 			}

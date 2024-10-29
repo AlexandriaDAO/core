@@ -13,13 +13,13 @@ import { readFileAsBuffer } from "../irys/utils/gaslessFundAndUpload";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchEngineBooks from "../engine-books/thunks/fetchEngineBooks";
-import { PiUploadSimple } from "react-icons/pi";
 import { WebIrys } from "@irys/sdk";
 import SelectNode from "./SelectNode";
 import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
 import { getIcrc7Actor, getNftManagerActor } from "../auth/utils/authUtils";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
 import { Button } from "@/lib/components/button";
+import { UploadIcon } from "lucide-react";
 
 
 const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_ID : process.env.REACT_LOCAL_APP_ID;
@@ -245,7 +245,7 @@ const Mint = () => {
 		<Dialog>
 			<DialogTrigger asChild>
 				<Button rounded="full">
-					<PiUploadSimple size={20} /> <span>Upload New</span>
+					<UploadIcon size={20} /> <span>Upload New</span>
 				</Button>
 			</DialogTrigger>
 

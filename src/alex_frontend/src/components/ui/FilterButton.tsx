@@ -1,8 +1,8 @@
 import { setFilter } from "@/features/home/homeSlice";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import React from "react";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 export default function FilterButton() {
 	const dispatch = useAppDispatch();
@@ -20,7 +20,7 @@ export default function FilterButton() {
 			<span className="text-2xl leading-7 text-center tracking-wider">
 				Filter
 			</span>
-			{filter ? <IoIosArrowUp size={20}/> : <IoIosArrowDown size={20} />}
+			{filter ? <ChevronUp size={20}/> : <ChevronDown size={20} />}
 		</button>
 	);
 }

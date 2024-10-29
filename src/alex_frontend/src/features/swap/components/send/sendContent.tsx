@@ -13,8 +13,8 @@ import transferALEX from "../../thunks/alexIcrc/transferALEX";
 import transferLBRY from "../../thunks/lbryIcrc/transferLBRY";
 import { icpLedgerFlagHandler } from "@/features/icp-ledger/icpLedgerSlice";
 import { flagHandler } from "../../swapSlice";
-import { ImSpinner8 } from "react-icons/im";
 import Auth from "@/features/auth";
+import { LoaderCircle } from "lucide-react";
 
 const SendContent = () => {
     const dispatch = useAppDispatch();
@@ -183,7 +183,7 @@ const SendContent = () => {
                         }}
                     >
                         {swap.loading ? (<>
-                            <ImSpinner8 size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
+                            <LoaderCircle size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
                             <>Send</>
                         )}
                     </button> : <div

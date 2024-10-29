@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
-import { IoIosArrowDown, IoIosArrowUp, IoIosSearch } from "react-icons/io";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Mint from "../mint";
 import MintedBook from "./components/MintedBook";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchEngineBooks from "./thunks/fetchEngineBooks";
 import { setExpanded } from "./engineBooksSlice";
-import { ImSpinner8 } from "react-icons/im";
+import { ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
 
 const TO_DISPLAY = 5;
 
@@ -42,7 +41,7 @@ const EngineBooks = () => {
 						</span>
 						<div className="flex justify-between items-center gap-4">
 							<div className="flex-grow border border-solid border-gray-500 rounded-full flex items-center gap-2 px-4 py-2">
-								<IoIosSearch />
+								<Search />
 								<input
 									type="text"
 									placeholder="Search"
@@ -56,7 +55,7 @@ const EngineBooks = () => {
 				<div className="flex gap-1 justify-start items-center font-roboto-condensed text-base leading-[18px] text-black font-normal">
 					{loading &&	<span>Loading</span> }
 					<span>Minted Books</span>
-					{ loading && <ImSpinner8
+					{ loading && <LoaderCircle
 						size={14}
 						className="animate animate-spin"
 					/>}
@@ -87,7 +86,7 @@ const EngineBooks = () => {
 							<span>View All </span>
 						)}
 
-						{expanded ? <IoIosArrowUp /> : <IoIosArrowDown />}
+						{expanded ? <ChevronUp /> : <ChevronDown />}
 					</div>
 				)}
 			</div>

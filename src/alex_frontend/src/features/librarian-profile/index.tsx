@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { ImSpinner8 } from "react-icons/im";
 import { setShowProfile } from "../librarian-profile/librarianProfileSlice";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import NoNode from "./components/NoNode";
 import fetchMyNodes from "../my-nodes/thunks/fetchMyNodes";
 import AddNode from "../my-nodes/components/AddNode";
 import MyNodes from "../my-nodes";
+import { LoaderCircle } from "lucide-react";
 
 
 function LibrarianProfile() {
@@ -30,7 +30,7 @@ function LibrarianProfile() {
 							Librarian Profile
 						</span>
 						{loading && (
-							<ImSpinner8
+							<LoaderCircle
 								size={20}
 								className="animate animate-spin"
 							/>

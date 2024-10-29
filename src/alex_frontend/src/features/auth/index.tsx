@@ -3,16 +3,15 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React from "react";
 import logout from "./thunks/logout";
 import login from "./thunks/login";
-import { ImSpinner8 } from "react-icons/im";
-import { MdLogin, MdLogout } from "react-icons/md";
 import { getAuthClient } from "./utils/authUtils";
+import { LoaderCircle, LogIn, LogOut } from "lucide-react";
 
 const Processing = () => (
 	<div className="flex gap-1 items-center">
 		<span className="text-base font-normal font-roboto-condensed tracking-wider">
 			Processing
 		</span>
-		<ImSpinner8 size={18} className="animate animate-spin" />
+		<LoaderCircle size={18} className="animate animate-spin"/>
 	</div>
 );
 
@@ -21,7 +20,7 @@ const Logout = ({ user }: { user: string }) => (
 		<span className="text-base font-normal font-roboto-condensed tracking-wider">
 			{user.slice(0, 5) + "..." + user.slice(-3)}
 		</span>
-		<MdLogout size={20} />
+		<LogOut size={20} />
 	</div>
 );
 
@@ -30,7 +29,7 @@ const Login = () => (
 		<span className="text-base font-normal font-roboto-condensed tracking-wider">
 			Login
 		</span>
-		<MdLogin size={20} />
+		<LogIn size={20} />
 	</div>
 );
 

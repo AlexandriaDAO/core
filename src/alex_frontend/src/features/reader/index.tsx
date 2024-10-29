@@ -1,5 +1,5 @@
 // src/Reader/index.tsx
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect } from "react";
 import { ReaderStyle as defaultStyles, type IReaderStyle } from "./style";
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -10,10 +10,6 @@ import ContentView from "./ContentView";
 
 import { useCardList, useReader, useSetting, useSidebar } from "./lib/hooks/useReaderContext";
 
-import { IoCloseOutline, IoMenuOutline } from "react-icons/io5";
-import { MdOutlineSettings } from "react-icons/md";
-import { HiOutlineMinus, HiOutlinePlus } from "react-icons/hi";
-
 import BookmarkToggle from "./lib/components/BookmarkToggle";
 import FullScreenToggle from "./lib/components/FullScreenToggle";
 import SpreadToggle from "./lib/components/SpreadToggle";
@@ -22,6 +18,7 @@ import { Setting } from "./Setting";
 import { CardList } from "./CardList";
 import FontSizeButton from "./lib/components/FontSizeButton";
 import { EpubCFI } from "epubjs";
+import { AlignJustify, Settings, X } from "lucide-react";
 
 export type IReaderProps = {
     title?: string;
@@ -106,14 +103,14 @@ export const Reader: React.FC<IReaderProps> = ({
                 </div>
                 {metadata && <span className="font-syne text-xl text-white">{metadata.title}</span>}
                 {showCardList ? (
-                    <IoCloseOutline
+                    <X
                         size={30}
                         color="white"
                         onClick={() => setShowCardList(false)}
                         className="z-10 cursor-pointer border border-solid p-1 rounded-full"
                     />
                 ) : (
-                    <IoMenuOutline
+                    <AlignJustify
                         className="cursor-pointer border border-solid rounded-full p-1"
                         size={30}
                         color="white"
@@ -135,14 +132,14 @@ export const Reader: React.FC<IReaderProps> = ({
             <div className="w-full bg-[#393939] flex justify-between p-3">
                 <div className="flex items-center justify-between gap-4">
                     {showSetting ? (
-                        <IoCloseOutline
+                        <X
                             size={30}
                             color="white"
                             onClick={() => setShowSetting(false)}
                             className="z-10 cursor-pointer border border-solid p-1 rounded-full"
                         />
                     ) : (
-                        <MdOutlineSettings
+                        <Settings
                             size={30}
                             color="white"
                             onClick={() => setShowSetting(true)}

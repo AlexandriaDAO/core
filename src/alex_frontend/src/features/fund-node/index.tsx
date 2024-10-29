@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { WebIrys } from "@irys/sdk";
-import { ImSpinner8 } from "react-icons/im";
 import { toast } from "sonner";
 import { getClientIrys } from "@/services/irysService";
-import { LiaSaveSolid } from "react-icons/lia";
 import { Button } from "@/lib/components/button";
+import { LoaderCircle } from "lucide-react";
 
 const FundNode = () => {
 	const [irys, setIrys] = useState<WebIrys | null>(null);
@@ -74,7 +73,7 @@ const FundNode = () => {
 				<Button onClick={setWebIrys} disabled={loading} variant="inverted">
 					{loading ? (
 						<span className="flex gap-1 items-center">
-							Connecting <ImSpinner8 size={14} className="animate animate-spin" />
+							Connecting <LoaderCircle size={14} className="animate animate-spin" />
 						</span>
 					) : (
 						"Connect Wallet"
@@ -122,7 +121,7 @@ const FundNode = () => {
 							</div>
 							<Button onClick={fund} scale="sm" disabled={fundLoading} variant="inverted">
 								{fundLoading ? <span className="flex gap-1 items-center">
-									Processing <ImSpinner8 size={14} className="animate animate-spin" />
+									Processing <LoaderCircle size={14} className="animate animate-spin" />
 								</span> : "Deposit" }
 							</Button>
 						</div>
@@ -132,7 +131,7 @@ const FundNode = () => {
             {loading &&
                 <div className="w-full h-full absolute inset-0 backdrop-blur flex justify-center items-center border border-solid  border-gray-400 rounded">
                     <span className="bg-black/100 shadow rounded p-2">
-                        <ImSpinner8 size={14} className="animate animate-spin text-white" />
+                        <LoaderCircle size={14} className="animate animate-spin text-white" />
                     </span>
                 </div>
             }

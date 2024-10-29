@@ -4,9 +4,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Table } from "antd";
 import { toast } from "sonner";
 import React, { useEffect, useState } from "react";
-import { FiRefreshCcw } from "react-icons/fi";
-import { MdOutlineClear } from "react-icons/md";
-import { VscClearAll } from "react-icons/vsc";
+import { ListX, RefreshCcw, X } from "lucide-react";
 const columns = [
 	{
 		title: "Task UID",
@@ -117,19 +115,19 @@ const EngineTasks = () => {
 					{user == activeEngine?.owner && (
 						<>
 							<Button disabled={selectedRowKeys.length <= 0} variant='muted' onClick={clearSelectedTasks}>
-								<MdOutlineClear size={22} />
+								<X size={22} />
 								<span>Clear Selected</span>
 							</Button>
 							<div className="h-5 border-l border-gray-500"></div>
 							<Button variant='muted' onClick={clearAllTasks}>
-								<VscClearAll size={22} />
+								<ListX size={22} />
 								<span>Clear All</span>
 							</Button>
 						</>
 					)}
 					<div className="h-5 border-l border-gray-500"></div>
 					<Button variant='muted' onClick={fetchTasks}>
-						<FiRefreshCcw
+						<RefreshCcw
 							size={18}
 							className={`${loading ? "animate-spin" : ""}`}
 						/>

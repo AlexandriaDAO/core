@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
-import { ImSpinner8 } from "react-icons/im";
 import { toast } from "sonner";
 import { WebIrys } from "@irys/sdk";
 import { getNodeBalance, getServerIrys } from "@/services/irysService";
 import { getActorAlexLibrarian } from "../auth/utils/authUtils";
+import { LoaderCircle } from "lucide-react";
 
 const NodeRow: React.FC<{
 	node: Node;
@@ -70,7 +70,7 @@ const NodeRow: React.FC<{
 				<td colSpan={5} className="text-center p-4">
 					<div className="flex items-center justify-center gap-1">
 						<span className="text-md">Loading Node</span>
-						<ImSpinner8 size={12} className="animate-spin inline-block mr-2" />
+						<LoaderCircle size={12} className="animate-spin inline-block mr-2" />
 					</div>
 				</td>
 			</tr>
@@ -97,7 +97,7 @@ const NodeRow: React.FC<{
 			<td className="p-2">{irys?.token ? irys.token : 'NA'}</td>
 			<td className="p-2 flex items-center justify-center gap-1">
 				{balanceLoading ? (
-					<ImSpinner8 size={14} className="animate-spin" />
+					<LoaderCircle size={14} className="animate-spin" />
 				) : balance === -1 ? (
 					"NA"
 				) : (

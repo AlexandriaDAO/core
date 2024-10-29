@@ -10,7 +10,7 @@ import {
 	useReader,
 	useSidebar,
 } from "../../hooks/useReaderContext";
-import { PiTrashLight } from "react-icons/pi";
+import { Trash2 } from "lucide-react";
 
 type IAnnotationItemProps = {
 	annotationItem: AnnotationItemObject;
@@ -53,7 +53,7 @@ export const AnnotationItem: React.FC<IAnnotationItemProps> = ({
 				</p>
 			</div>
 			<div className="self-start ">
-				<PiTrashLight
+				<Trash2
 					size={30}
 					onClick={() =>
 						handleRemoveAnnotationItemClick(annotationItem)

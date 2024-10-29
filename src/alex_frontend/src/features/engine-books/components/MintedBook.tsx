@@ -6,9 +6,9 @@ import { EnqueuedTask } from "meilisearch";
 import { waitForTaskCompletion } from "@/services/meiliService";
 import Epub, { EpubCFI } from "epubjs";
 import { v4 as uuidv4 } from "uuid";
-import { ImSpinner8 } from "react-icons/im";
 import { Book } from "@/features/portal/portalSlice";
 import { getAllDocumentsByManifest } from "../utils/utilities";
+import { LoaderCircle } from "lucide-react";
 
 interface MintedBookProps {
 	book: Book;
@@ -195,7 +195,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 							className="cursor-not-allowed opacity-50 flex justify-center items-center gap-1 px-2 py-1 bg-black rounded text-[#F6F930] font-medium font-roboto-condensed text-base"
 						>
 							<span>Waiting...</span>
-							<ImSpinner8
+							<LoaderCircle
 								size={14}
 								className="animate animate-spin"
 							/>

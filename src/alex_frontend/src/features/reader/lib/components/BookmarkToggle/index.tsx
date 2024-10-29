@@ -4,9 +4,8 @@ import {
 	type IBookmarkToggleStyle,
 } from "./style";
 import { useBookmark, useReader } from "../../hooks/useReaderContext";
+import { BookmarkCheck, BookmarkPlus } from "lucide-react";
 
-import { MdOutlineBookmarkAdd } from "react-icons/md";
-import { MdOutlineBookmarkAdded } from "react-icons/md";
 
 interface BookmarkToggleProps {
 	bookmarkToggleStyles?: IBookmarkToggleStyle;
@@ -54,14 +53,14 @@ const BookmarkToggle: React.FC<BookmarkToggleProps> = ({
 	return (
 		<>
 			{isBookmarkAdded ? (
-				<MdOutlineBookmarkAdded
+				<BookmarkCheck
 					onClick={onRemoveBookmark}
 					size={30}
 					color="#F6F930"
 					className={`cursor-pointer border border-solid border-[#F6F930] p-1 rounded-md`}
 				/>
 			) : (
-				<MdOutlineBookmarkAdd
+				<BookmarkPlus
 					onClick={onAddBookmark}
 					size={30}
 					color="#8E8E8E"

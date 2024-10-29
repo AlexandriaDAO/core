@@ -3,9 +3,7 @@ import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import React, { useEffect, useState } from "react";
-import { FiRefreshCcw } from "react-icons/fi";
-import { ImSpinner8 } from "react-icons/im";
-import { VscClearAll } from "react-icons/vsc";
+import { ListX, LoaderCircle, RefreshCcw } from "lucide-react";
 
 const EngineStats = () => {
 	const {meiliClient} = useSession();
@@ -59,13 +57,13 @@ const EngineStats = () => {
 				<div className="flex items-center text-gray-500">
 					{user == activeEngine?.owner && (
 						<Button variant='muted' onClick={handleClearAll}>
-							<VscClearAll size={22} />
+							<ListX size={22} />
 							<span>Clear All Documents</span>
 						</Button>
 					)}
 					<div className="h-5 border-l border-gray-500"></div>
 					<Button variant='muted' onClick={fetchStats}>
-						<FiRefreshCcw
+						<RefreshCcw
 							size={18}
 							className={`${loading ? 'animate-spin':''}`}
 						/>
@@ -79,7 +77,7 @@ const EngineStats = () => {
 			</span>}
 			<div className="p-4">
 				{loading && (
-					<ImSpinner8 size={30} className="animate animate-spin" />
+					<LoaderCircle size={30} className="animate animate-spin" />
 				)}
 
 				{!loading && !stats && <span>Engine maybe down, Please check engine configurations</span>}

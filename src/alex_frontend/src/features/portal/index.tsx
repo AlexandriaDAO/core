@@ -4,8 +4,8 @@ import { Book, setCurrentPage } from "./portalSlice";
 import BookCard from "./components/BookCard";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { ImSpinner8 } from "react-icons/im";
 import BookModal from "@/components/BookModal";
+import { LoaderCircle } from "lucide-react";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -116,7 +116,7 @@ const Portal: React.FC = () => {
 	if(loading){
 		return <div className="flex gap-1 justify-start items-center font-roboto-condensed text-base leading-[18px] text-black font-normal">
 			<span>Loading Books</span>
-			<ImSpinner8
+			<LoaderCircle
 				size={14}
 				className="animate animate-spin"
 			/>

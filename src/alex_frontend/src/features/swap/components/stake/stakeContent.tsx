@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ActorSubclass } from "@dfinity/agent";
 import { Link } from "react-router-dom";
-
 
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -13,7 +11,7 @@ import { flagHandler } from "../../swapSlice";
 import stakeAlex from "../../thunks/stakeAlex";
 import StakedInfo from "./stakeInfo";
 import Auth from "@/features/auth";
-import { ImSpinner8 } from "react-icons/im";
+import { LoaderCircle } from "lucide-react";
 
 const StakeContent = () => {
     const dispatch = useAppDispatch();
@@ -109,7 +107,7 @@ const StakeContent = () => {
                                 </div>
                                 <div className='flex justify-between'>
                                     <div className='flex items-center'>
-                                        <strong className='text-base text-multygray font-medium me-1 me-2'>Available Balance:<span className='text-base text-darkgray ms-2'>{alex.alexBal} ALEX</span></strong>
+                                        <strong className='text-base text-multygray font-medium me-2'>Available Balance:<span className='text-base text-darkgray ms-2'>{alex.alexBal} ALEX</span></strong>
                                         <img className='w-5 h-5' src="images/8-logo.png" alt="apple" />
                                     </div>
                                     <Link to="" role="button" className='text-multycolor underline text-base font-bold' onClick={() => handleMaxAlex()} >Max</Link>
@@ -126,11 +124,11 @@ const StakeContent = () => {
                                 }}
                             >
                                 {swap.loading ? (<>
-                                    <ImSpinner8 size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
+                                    <LoaderCircle size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
                                     <>Stake</>
                                 )}
                             </button> : <div
-                                className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center text-white white-auth-btn"
+                                className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn"
                             >
                                 <Auth />
                             </div>}

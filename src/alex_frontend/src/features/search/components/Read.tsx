@@ -1,8 +1,5 @@
 import { setSelectedSearchedBook } from "@/features/home/homeSlice";
 import React, { useEffect, useRef, useState } from "react";
-import { HiOutlinePlus } from "react-icons/hi";
-import { SlEye, SlPlus } from "react-icons/sl";
-import { RxCross2 } from "react-icons/rx";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { BookCardItem } from "./Card";
@@ -11,6 +8,7 @@ import BookModal from "./BookModal";
 import eras from "@/data/eras";
 import DDC from "@/data/categories";
 import { getCover } from "@/utils/epub";
+import { CirclePlus, Eye, Plus, X } from "lucide-react";
 
 interface Props {
 	item: BookCardItem;
@@ -100,9 +98,9 @@ const Read: React.FC<Props> = ({ item }) => {
                         </div>
                     </div>
                     <div className="text-[#8E8E8E] flex justify-start items-center font-roboto-condensed text-sm font-normal gap-2 ">
-                        <SlPlus size={20} />
+                        <CirclePlus size={20} />
                         <span> 102 </span>
-                        <SlEye size={20} />
+                        <Eye  size={20} />
                         <span> 1,2k</span>
                     </div>
                 </div>
@@ -111,12 +109,12 @@ const Read: React.FC<Props> = ({ item }) => {
                     {item.text}
                 </div>
                 <div className="flex flex-col gap-2">
-                    <RxCross2
+                    <X
                         onClick={handleReadBookClick}
                         size={36}
                         className=" p-2 text-white border border-white bg-black rounded-full cursor-pointer duration-300 transition-all hover:bg-white hover:border-black hover:text-black "
                     />
-                    <HiOutlinePlus
+                    <Plus
                         size={36}
                         className="p-2 border border-solid border-black rounded-full"
                     />

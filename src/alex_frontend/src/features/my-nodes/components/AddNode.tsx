@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Modal } from "antd";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
-import { ImSpinner8 } from "react-icons/im";
-import { LiaSaveSolid } from "react-icons/lia";
 import * as Yup from "yup";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -13,14 +10,13 @@ import {
 	setNewNodeError,
 	setNewNodeLoading,
 } from "../myNodesSlice";
-import { CiCircleCheck } from "react-icons/ci";
-import { AiOutlineCloseCircle } from "react-icons/ai";
 import { getAuthClient } from "@/features/auth/utils/authUtils";
 import { Button } from "@/lib/components/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
-import { BiPlus } from "react-icons/bi";
 import { Label } from "@/lib/components/label";
 import { Input } from "@/lib/components/input";
+
+import { CheckCircle, LoaderCircle, Save, XCircle } from "lucide-react";
 
 // const ethPrivateKeyRegex = /^[a-fA-F0-9]{64}$/;
 // const ethPublicKeyRegex = /^0x[a-fA-F0-9]{128}$/;
@@ -140,8 +136,8 @@ const AddNode = () => {
 					<div className="flex justify-center items-center my-4">
 						<DialogFooter>
 							{newNodeLoading ? (
-								<Button type="button" disabled rounded={"full"}>
-									<ImSpinner8
+								<Button type="button" disabled rounded="full">
+									<LoaderCircle
 										size={18}
 										className="animate animate-spin"
 									/>
@@ -149,7 +145,7 @@ const AddNode = () => {
 								</Button>
 							) : (
 								<Button type="submit" rounded={"full"}>
-									<LiaSaveSolid size={18} />
+									<Save size={18} />
 									<span>Save Node</span>
 								</Button>
 							)}
@@ -173,7 +169,7 @@ const SuccessDialog = () => (
 			<DialogHeader>
 				<DialogTitle>
 					<div className="flex gap-1 justify-start items-center">
-						<CiCircleCheck size={24} className="text-green-400" />
+						<CheckCircle size={24} className="text-green-400" />
 						<span>Node Added</span>
 					</div>
 				</DialogTitle>
@@ -199,7 +195,7 @@ const ErrorDialog = ({ error }: { error: string }) => (
 			<DialogHeader>
 				<DialogTitle>
 					<div className="flex gap-1 justify-start items-center">
-						<AiOutlineCloseCircle size={24} className="text-red-400" />
+						<XCircle size={24} className="text-red-400" />
 						<span>Node Error</span>
 					</div>
 				</DialogTitle>

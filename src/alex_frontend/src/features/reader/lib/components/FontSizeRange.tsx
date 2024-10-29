@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from "react";
 import { useReader } from "../hooks/useReaderContext";
 import { Slider } from "antd";
-import { BiMinus, BiPlus } from "react-icons/bi";
+import { Minus, Plus } from "lucide-react";
 
 const FontSizeRange: React.FC = () => {
 	const { userSettings, setUserSettings } = useReader();
@@ -37,7 +37,7 @@ const FontSizeRange: React.FC = () => {
 			</label>
 
 			<div className="flex justify-between items-center gap-2">
-				<BiMinus
+				<Minus
 					onClick={userSettings.fontSize > 10 ? handleDecrementFontSize : undefined}
 					size={22}
 					className={`p-1 border border-solid border-black rounded-full duration-300 transition-all ${userSettings.fontSize <= 10 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-black hover:border-white hover:text-white'}`}
@@ -49,7 +49,7 @@ const FontSizeRange: React.FC = () => {
 					value={userSettings.fontSize}
 					onChange={onChangeComplete}
 				/>
-				<BiPlus
+				<Plus
 					onClick={userSettings.fontSize < 40 ? handleIncrementFontSize : undefined}
 					size={22}
 					className={`p-1 border border-solid border-black rounded-full duration-300 transition-all ${userSettings.fontSize >= 40 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-black hover:border-white hover:text-white'}`}

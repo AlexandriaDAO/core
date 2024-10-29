@@ -1,10 +1,10 @@
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect, useRef, useState } from "react";
-import { IoIosArrowDown, IoIosSearch } from "react-icons/io";
 import { setSelected, setVisible } from "./portalTypeSlice";
 import { TypeInterface, types } from "./utils/type";
 import { setTypes } from "../portal-filter/portalFilterSlice";
+import { ChevronDown, Search } from "lucide-react";
 
 function PortalType() {
 	const dispatch = useAppDispatch();
@@ -78,7 +78,7 @@ function PortalType() {
 						visible ? "rotate-180" : "rotate-0"
 					}`}
 				>
-					<IoIosArrowDown size={20} />
+					<ChevronDown size={20} />
 				</div>
 			</button>
 			<div
@@ -88,7 +88,7 @@ function PortalType() {
 			>
 				<div className="bg-white h-72 p-2 flex gap-2 flex-col shadow-xl rounded-md border border-solid border-gray-300">
 					<div className="basis-1/12 border-b border-solid border-gray-500 flex items-center gap-2 py-1">
-						<IoIosSearch size={18} />
+						<Search size={18} />
 						<input
                             value={searchTerm}
                             onChange={(e)=>setSearchTerm(e.target.value)}
