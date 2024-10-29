@@ -259,50 +259,50 @@ const swapSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(getArchivedBal.pending, (state) => {
-        message.info("Fetching archived balance!");
+        toast.info("Fetching archived balance!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getArchivedBal.fulfilled, (state, action) => {
-        message.success("Successfully fetched archived balance!");
+        toast.success("Successfully fetched archived balance!");
         state.archivedBalance = action.payload;
         state.loading = false;
         state.error = null;
       })
       .addCase(getArchivedBal.rejected, (state, action) => {
-        message.error("Error while fetching archived balance");
+        toast.error("Error while fetching archived balance");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(redeemArchivedBalance.pending, (state) => {
-        message.info("Claiming!");
+        toast.info("Claiming!");
         state.loading = true;
         state.error = null;
       })
       .addCase(redeemArchivedBalance.fulfilled, (state, action) => {
-        message.success("Successfully redeem!");
+        toast.success("Successfully redeem!");
         state.loading = false;
         state.redeeemSuccess = true;
         state.error = null;
       })
       .addCase(redeemArchivedBalance.rejected, (state, action) => {
-        message.error("Error while claiming!");
+        toast.error("Error while claiming!");
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(getLBRYTransactions.pending, (state) => {
-        message.info("fetching!");
+        toast.info("fetching!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getLBRYTransactions.fulfilled, (state, action) => {
-        message.success("Fetched Transactions!");
+        toast.success("Fetched Transactions!");
         state.loading = false;
         state.transactions = action.payload;
         state.error = null;
       })
       .addCase(getLBRYTransactions.rejected, (state, action) => {
-        message.error("Error while fetching transactions!");
+        toast.error("Error while fetching transactions!");
         state.loading = false;
         state.error = action.payload as string;
       }).addCase(getStakersCount.pending, (state) => {
@@ -315,7 +315,7 @@ const swapSlice = createSlice({
         state.error = null;
       })
       .addCase(getStakersCount.rejected, (state, action) => {
-        message.error("Error while fetching total stakers!");
+        toast.error("Error while fetching total stakers!");
         state.loading = false;
         state.error = action.payload as string;
       });

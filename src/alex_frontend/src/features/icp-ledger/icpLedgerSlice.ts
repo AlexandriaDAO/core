@@ -85,7 +85,7 @@ const icpLedgerSlice = createSlice({
         state.error = null;
       })
       .addCase(getAccountId.rejected, (state, action) => {
-        message.error("Error in accountId.");
+        toast.error("Error in accountId.");
         state.loading = false;
         state.error = action.payload as string;
       })
@@ -100,7 +100,7 @@ const icpLedgerSlice = createSlice({
         state.error = null;
       })
       .addCase(getIcpPrice.rejected, (state, action) => {
-        message.error("Error while fetching ICP price!");
+        toast.error("Error while fetching ICP price!");
         state.loading = false;
         state.error = action.payload as string;
       });
