@@ -1,4 +1,4 @@
-import { Transaction } from "../../../shared/types/queries";
+import { Transaction } from "./queries";
 
 export type ContentDataItem = {
   url: string | null;

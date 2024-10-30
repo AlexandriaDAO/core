@@ -9,11 +9,12 @@ const NsfwModelControl: React.FC = () => {
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (!isModelLoaded()) {
-      handleToggleSafeSearch(true);
-    }
-  }, []);
+  // // Add this if you want to autmatically turn SafeSearch on.
+  // useEffect(() => {
+  //   if (!isModelLoaded()) {
+  //     handleToggleSafeSearch(true);
+  //   }
+  // }, []);
 
   const handleToggleSafeSearch = async (enabled: boolean) => {
     if (enabled && !isModelLoaded()) {

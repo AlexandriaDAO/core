@@ -1,35 +1,7 @@
-config is used in LibModules/AweaveSearch/arweaveHelpers and AppModules/contentGrid/utils/contentCacheService.ts.
+The separation of imports is done. No inter-module dependencies.
 
-So these should be moved to LibModules/ArweaveSearch, but, contentCacheService is importent in useContent.ts which has none of it's own dependencies, so we should move it as well.
+Next let's deal with the mintable state, which is mentioned in like 10 different places. Let's get it to be a single source of truth.
 
-But, useContent.ts is imported in AppModules/contentGrid/ContentList.tsx, so we need to migrate the part the uses `useContent.ts` as well.
-
-The goal here is to get all the logic out of AppModules and into LibModules, keep all the state in redux, and keep all the UI in AppModules.
-
-
-
-
-
-
-
-Ultimate Goal: 
-
-Every import from one module to another needs to be optional and with parameters that are set in some kind of config file.
-
-In order to see how this works, let's map all the imports:
-
-***LibModules***
-- Alexandrian/index.tsx import's NFTSearch
-- Permasearch/index.tsx imports ArweaveSearch
-
-
-***AppModules***
-- Alexandrian/index.tsx imports ContentDisplay from AppModules/contentGrid
-- Permasearch/index.tsx imports ContentDisplay from AppModules/contentGrid
-
-
-- Libmodules/arweaveSearch/index.tsx 
-  - imports SearchForm from AppModules/search/SearchForm
 
 
 

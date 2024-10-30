@@ -1,16 +1,15 @@
 import React, { useState, useCallback } from "react";
 import { Transaction, ContentListProps } from "@/apps/Modules/shared/types/queries";
 import { toast } from "sonner";
-import { Alert, AlertDescription } from "@/lib/components/alert";
 import ContentGrid from "./ContentGrid";
 import { mint_nft } from "@/features/nft/mint";
 import { Info } from 'lucide-react';
 import Modal from './components/Modal';
 import ContentRenderer from './components/ContentRenderer';
-import { useAppContent } from './hooks/useAppContent';
+import { useContentGrid } from './hooks/useContentGrid';
 
 const ContentList = ({ transactions }: ContentListProps) => {
-  const { contentData, contentUrls, mintableState } = useAppContent(transactions);
+  const { contentData, contentUrls, mintableState, handleRenderError } = useContentGrid(transactions);
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
 
@@ -22,16 +21,6 @@ const ContentList = ({ transactions }: ContentListProps) => {
       console.error("Error minting NFT:", error);
       toast.error("Failed to mint NFT. Please try again.");
     }
-  };
-
-  const handleRenderError = (id: string) => {
-    toast.error(
-      <Alert variant="destructive">
-        <AlertDescription>
-          Error loading content for ID: {id}
-        </AlertDescription>
-      </Alert>
-    );
   };
 
   const renderDetails = useCallback((transaction: Transaction) => (

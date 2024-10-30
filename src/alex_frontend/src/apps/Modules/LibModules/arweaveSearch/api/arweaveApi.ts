@@ -21,7 +21,5 @@ export const fetchTransactionsApi = async (
     minBlock = Math.max(0, maxBlock - 500000);
   }
 
-  console.log("Fetching transactions with params: ", params);
-
   return fetchTransactions(nftIds, contentTypes, amount, maxTimestamp, ownerFilter, minBlock, maxBlock);
 };

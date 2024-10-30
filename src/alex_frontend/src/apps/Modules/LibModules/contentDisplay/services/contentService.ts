@@ -5,15 +5,6 @@ import { MintableStateItem } from "@/apps/Modules/shared/state/arweave/arweaveSl
 import { getCover } from "@/utils/epub";
 import { CachedContent, ContentUrlInfo } from '../types';
 
-const initialPredictions = {
-  Drawing: 0,
-  Hentai: 0,
-  Neutral: 0,
-  Porn: 0,
-  Sexy: 0,
-  isPorn: false
-};
-
 export class ContentService {
   private static contentTypeHandlers: Record<string, (id: string, content?: CachedContent) => Promise<ContentUrlInfo>> = {
     "application/epub+zip": async (id: string) => {
@@ -73,7 +64,6 @@ export class ContentService {
       const requiresValidation = [...fileTypeCategories.images, ...fileTypeCategories.video].includes(contentType);
       acc[transaction.id] = { 
         mintable: !requiresValidation,
-        predictions: initialPredictions
       };
       return acc;
     }, {} as Record<string, MintableStateItem>);

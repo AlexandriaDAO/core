@@ -5,15 +5,14 @@ import { RootState } from "@/store";
 import { setMintableStates, setMintableState } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import type { CachedContent, ContentUrlInfo } from '@/apps/Modules/LibModules/contentDisplay/types';
 
-// This hook acts as a facade between AppModules and LibModules
-export function useAppContent(transactions: Transaction[]) {
+export function useContentGrid(transactions: Transaction[]) {
   const dispatch = useDispatch();
   const [contentData, setContentData] = useState<Record<string, CachedContent>>({});
   const [contentUrls, setContentUrls] = useState<Record<string, ContentUrlInfo>>({});
   const mintableState = useSelector((state: RootState) => state.arweave.mintableState);
 
   useEffect(() => {
-    // Import dynamically to avoid circular dependencies
+    // Import ContentService directly from LibModules
     import('@/apps/Modules/LibModules/contentDisplay/services/contentService').then(
       ({ ContentService }) => {
         const initialStates = ContentService.getInitialMintableStates(transactions);
@@ -57,4 +56,4 @@ export function useAppContent(transactions: Transaction[]) {
     mintableState,
     handleRenderError
   };
-}
+} 
