@@ -1,5 +1,5 @@
-export type { NSFWJS } from 'nsfwjs';
-export type TensorFlow = typeof import('@tensorflow/tfjs');
+import type { NSFWJS } from 'nsfwjs';
+import type { TensorFlow } from './types';
 
 let tf: TensorFlow | null = null;
 let nsfwjs: typeof import('nsfwjs') | null = null;
@@ -17,13 +17,20 @@ export const setNsfwjs = (nsfwjsInstance: typeof import('nsfwjs') | null) => {
 export const getNsfwjs = () => nsfwjs;
 
 // Dynamic import functions
-export const importTensorFlow = () => import(
-  /* webpackChunkName: "tensorflow" */
-  /* webpackPrefetch: true */
-  '@tensorflow/tfjs'
-);
-export const importNSFWJS = () => import(
-  /* webpackChunkName: "nsfwjs" */
-  /* webpackPrefetch: true */
-  'nsfwjs'
-);
+export const importTensorFlow = async () => {
+  const tf = await import(
+    /* webpackChunkName: "tensorflow" */
+    /* webpackPreload: true */
+    '@tensorflow/tfjs'
+  );
+  return tf.default || tf;
+};
+
+export const importNSFWJS = async () => {
+  const nsfwjs = await import(
+    /* webpackChunkName: "nsfwjs" */
+    /* webpackPreload: true */
+    'nsfwjs'
+  );
+  return nsfwjs.default || nsfwjs;
+};

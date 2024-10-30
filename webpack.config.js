@@ -28,12 +28,34 @@ module.exports = {
       maxInitialRequests: Infinity,
       minSize: 0,
       cacheGroups: {
+        tensorflow: {
+          test: /[\\/]node_modules[\\/](@tensorflow|tfjs-core|tfjs-backend-.*|tfjs-converter)[\\/]/,
+          name: 'tensorflow-bundle',
+          chunks: 'async',
+          priority: 30,
+          enforce: true
+        },
+        tfjs: {
+          test: /[\\/]node_modules[\\/]@tensorflow[\\/]/,
+          name: 'tfjs-chunk',
+          chunks: 'async',
+          priority: 20,
+          enforce: true
+        },
+        nsfwjs: {
+          test: /[\\/]node_modules[\\/]nsfwjs[\\/]/,
+          name: 'nsfwjs-chunk',
+          chunks: 'async',
+          priority: 20,
+          enforce: true
+        },
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name(module) {
             const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
             return `npm.${packageName.replace('@', '')}`;
           },
+          priority: 10,
         },
       },
     },
@@ -184,27 +206,27 @@ module.exports = {
       'require("./model_imports/mobilenet_v2")': '{}',
       'require("./model_imports/mobilenet_v2_mid")': '{}'
     }),
-    new BundleAnalyzerPlugin({
-      analyzerMode: 'server',
-      analyzerHost: 'localhost',
-      analyzerPort: 8888,
-      openAnalyzer: true,
-      generateStatsFile: true,
-      statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
-      statsOptions: {
-        all: false,
-        assets: true,
-        assetsSort: 'size',
-        chunks: true,
-        chunkModules: false,
-        entrypoints: true,
-        hash: true,
-        modules: false,
-        timings: true,
-        errors: true,
-        warnings: true,
-      },
-    }),
+    // new BundleAnalyzerPlugin({
+    //   analyzerMode: 'server',
+    //   analyzerHost: 'localhost',
+    //   analyzerPort: 8888,
+    //   openAnalyzer: true,
+    //   generateStatsFile: true,
+    //   statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
+    //   statsOptions: {
+    //     all: false,
+    //     assets: true,
+    //     assetsSort: 'size',
+    //     chunks: true,
+    //     chunkModules: false,
+    //     entrypoints: true,
+    //     hash: true,
+    //     modules: false,
+    //     timings: true,
+    //     errors: true,
+    //     warnings: true,
+    //   },
+    // }),
   ],
   devServer: {
     historyApiFallback: true,

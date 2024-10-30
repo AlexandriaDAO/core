@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Principal } from "@dfinity/principal";
 import { icrc7 } from "../../../../../../../declarations/icrc7";
 import { natToArweaveId } from "@/utils/id_convert";
-import { addSelectedPrincipal, removeSelectedPrincipal } from './librarySlice';
+import { addSelectedPrincipal, removeSelectedPrincipal, addSelectedArweaveIds, removeSelectedArweaveIds } from './librarySlice';
 import { updateTransactions, appendTransactions } from '@/apps/Modules/shared/state/content/contentDisplayThunks';
 import { RootState } from '@/store';
 
@@ -23,11 +23,13 @@ export const togglePrincipalSelection = createAsyncThunk(
 
       if (selectedPrincipals.includes(principalId)) {
         dispatch(removeSelectedPrincipal(principalId));
+        dispatch(removeSelectedArweaveIds(arweaveIds));
         dispatch(updateTransactions(
           state.library.selectedArweaveIds.filter(id => !arweaveIds.includes(id))
         ));
       } else {
         dispatch(addSelectedPrincipal(principalId));
+        dispatch(addSelectedArweaveIds(arweaveIds));
         dispatch(appendTransactions(arweaveIds));
       }
       

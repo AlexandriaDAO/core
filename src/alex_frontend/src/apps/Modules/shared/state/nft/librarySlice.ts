@@ -30,6 +30,17 @@ const librarySlice = createSlice({
         (p) => p !== action.payload
       );
     },
+    addSelectedArweaveIds: (state, action: PayloadAction<string[]>) => {
+      const newIds = action.payload.filter(
+        id => !state.selectedArweaveIds.includes(id)
+      );
+      state.selectedArweaveIds.push(...newIds);
+    },
+    removeSelectedArweaveIds: (state, action: PayloadAction<string[]>) => {
+      state.selectedArweaveIds = state.selectedArweaveIds.filter(
+        id => !action.payload.includes(id)
+      );
+    },
   },
 });
 
@@ -38,5 +49,7 @@ export const {
   setSelectedPrincipals,
   addSelectedPrincipal,
   removeSelectedPrincipal,
+  addSelectedArweaveIds,
+  removeSelectedArweaveIds,
 } = librarySlice.actions;
 export default librarySlice.reducer;
