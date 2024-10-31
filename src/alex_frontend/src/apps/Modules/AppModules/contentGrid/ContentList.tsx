@@ -9,7 +9,6 @@ import ContentGrid from "./ContentGrid";
 import Modal from './components/Modal';
 import ContentRenderer from './components/ContentRenderer';
 import { mint_nft } from "@/features/nft/mint";
-import { loadContentForTransactions } from "@/apps/Modules/shared/state/content/contentDisplayThunks";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -23,10 +22,6 @@ const ContentList = () => {
   
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
-
-  useEffect(() => {
-    dispatch(loadContentForTransactions(transactions));
-  }, [transactions, dispatch]);
 
   const handleMint = async (transactionId: string) => {
     try {

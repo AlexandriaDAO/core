@@ -60,9 +60,6 @@ export const updateTransactions = createAsyncThunk(
       }, {} as Record<string, MintableStateItem>);
       dispatch(setMintableStates(newMintableStates));
 
-      // Load content for the fetched transactions
-      dispatch(loadContentForTransactions(fetchedTransactions));
-
     } catch (error) {
       console.error("Error fetching transactions:", error);
       throw error;
@@ -90,9 +87,6 @@ export const appendTransactions = createAsyncThunk(
         return acc;
       }, {} as Record<string, MintableStateItem>);
       dispatch(setMintableStates({ ...currentMintableStates, ...newMintableStates }));
-
-      // Load content for the new transactions
-      dispatch(loadContentForTransactions(fetchedTransactions));
 
     } catch (error) {
       console.error("Error fetching transactions:", error);

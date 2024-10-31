@@ -22,9 +22,10 @@ export const togglePrincipalSelection = createAsyncThunk(
           const principal = Principal.fromText(principalId);
           const nftIds = await icrc7.icrc7_tokens_of(
             { owner: principal, subaccount: [] },
-            [],
-            [BigInt(100)]
+            [], // A token id that it will start the search from.
+            [BigInt(10000)]
           );
+          console.log(nftIds);
           return nftIds.map(natToArweaveId);
         })
       );

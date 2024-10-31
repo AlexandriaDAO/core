@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/store";
 import { setSelectedPrincipals } from "../../shared/state/nft/librarySlice";
 import { togglePrincipalSelection } from '../../shared/state/nft/libraryThunks';
+import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
 
 const popularPrincipals = [
   "7ua4j-6yl27-53cku-vh62o-z5cop-gdg7q-vhqet-hwlbt-ewfja-xbokg-2qe",
@@ -14,7 +15,7 @@ export default function NftOwnerSelector() {
   const userPrincipal = useSelector((state: RootState) => state.auth.user);
   const selectedArweaveIds = useSelector((state: RootState) => state.library.selectedArweaveIds);
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
-  const [inputPrincipal, setInputPrincipal] = useState("");
+  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -26,15 +27,8 @@ export default function NftOwnerSelector() {
   const handleFetchArweaveIds = async (principalId: string) => {
     try {
       await dispatch(togglePrincipalSelection(principalId));
-      setInputPrincipal("");
     } catch (error) {
       console.error("Error fetching Arweave IDs:", error);
-    }
-  };
-
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && inputPrincipal) {
-      handleFetchArweaveIds(inputPrincipal);
     }
   };
 
@@ -66,22 +60,11 @@ export default function NftOwnerSelector() {
       </div>
 
       <div className="flex flex-wrap items-center space-x-2">
-        <div className="flex-grow flex flex-wrap items-center border border-gray-300 rounded-md p-2">
-          {renderSelectedPrincipals()}
-          <input
-            type="text"
-            value={inputPrincipal}
-            onChange={(e) => setInputPrincipal(e.target.value)}
-            onKeyDown={handleInputKeyDown}
-            placeholder="Enter principal ID"
-            className="flex-grow px-3 py-2 focus:outline-none"
-          />
-        </div>
         <button
-          onClick={() => inputPrincipal && handleFetchArweaveIds(inputPrincipal)}
+          onClick={() => dispatch(loadContentForTransactions(transactions))}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
         >
-          Fetch NFTs
+          Show NFTs
         </button>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -106,6 +89,9 @@ export default function NftOwnerSelector() {
             {principal.slice(0, 5)}...{principal.slice(-5)}
           </button>
         ))}
+        <div className="flex-grow flex flex-wrap items-center border border-gray-300 rounded-md p-2">
+          {renderSelectedPrincipals()}
+        </div>
       </div>
     </div>
   );
