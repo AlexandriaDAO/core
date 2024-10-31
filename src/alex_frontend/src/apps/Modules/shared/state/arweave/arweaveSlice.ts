@@ -19,7 +19,6 @@ export interface MintableStateItem {
 interface ArweaveState {
   isLoading: boolean;
   searchState: SearchState;
-  selectedContent: { id: string; type: string } | null;
   mintableState: Record<string, MintableStateItem>;
   nsfwModelLoaded: boolean;
 }
@@ -35,7 +34,6 @@ const initialState: ArweaveState = {
     filterTime: '',
     ownerFilter: '',
   },
-  selectedContent: null,
   mintableState: {},
   nsfwModelLoaded: false,
 };
@@ -59,9 +57,6 @@ const arweaveSlice = createSlice({
       if (action.payload.contentCategory !== undefined) {
         state.searchState.tags = fileTypeCategories[action.payload.contentCategory] || [];
       }
-    },
-    setSelectedContent: (state, action: PayloadAction<{ id: string; type: string } | null>) => {
-      state.selectedContent = action.payload;
     },
     setFilterDate: (state, action: PayloadAction<string>) => {
       state.searchState.filterDate = action.payload;
@@ -99,7 +94,6 @@ const arweaveSlice = createSlice({
 export const {
   setIsLoading,
   setSearchState,
-  setSelectedContent,
   setFilterDate,
   setFilterTime,
   setMintableState,

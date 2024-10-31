@@ -1,8 +1,10 @@
-The separation of imports is done. No inter-module dependencies.
 
 Next let's deal with the mintable state, which is mentioned in like 10 different places. Let's get it to be a single source of truth.
 
+Mintable state should move to contentDisplay (so 'transactions').
 
+
+That should be handled, but now we're not finished reading mintlable state so the mint-token and info buttons are not showing, but they should be there okay.
 
 
 

@@ -1,5 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setIsLoading, setMintableStates, MintableStateItem } from './arweaveSlice';
+import { setIsLoading, MintableStateItem } from './arweaveSlice';
+import { setMintableStates } from '../content/contentDisplaySlice';
+
 import { setTransactions, clearTransactions } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
 import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
 import { SearchState } from '../../../shared/types/queries';

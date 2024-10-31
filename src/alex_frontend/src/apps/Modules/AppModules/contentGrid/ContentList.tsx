@@ -1,17 +1,30 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Transaction, ContentListProps } from "@/apps/Modules/shared/types/queries";
+import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
-import ContentGrid from "./ContentGrid";
-import { mint_nft } from "@/features/nft/mint";
 import { Info } from 'lucide-react';
+import { setMintableState, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import ContentGrid from "./ContentGrid";
 import Modal from './components/Modal';
 import ContentRenderer from './components/ContentRenderer';
-import { useContentGrid } from './hooks/useContentGrid';
+import { mint_nft } from "@/features/nft/mint";
+import { loadContentForTransactions } from "@/apps/Modules/shared/state/content/contentDisplayThunks";
+
+// Create a typed dispatch hook
+const useAppDispatch = () => useDispatch<AppDispatch>();
 
 const ContentList = ({ transactions }: ContentListProps) => {
-  const { contentData, contentUrls, mintableState, handleRenderError } = useContentGrid(transactions);
+  const dispatch = useAppDispatch();
+  const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
+  const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
+  
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
+
+  useEffect(() => {
+    dispatch(loadContentForTransactions(transactions));
+  }, [transactions, dispatch]);
 
   const handleMint = async (transactionId: string) => {
     try {
@@ -22,6 +35,11 @@ const ContentList = ({ transactions }: ContentListProps) => {
       toast.error("Failed to mint NFT. Please try again.");
     }
   };
+
+  const handleRenderError = useCallback((transactionId: string) => {
+    dispatch(clearTransactionContent(transactionId));
+    dispatch(setMintableState({ id: transactionId, mintable: false }));
+  }, [dispatch]);
 
   const renderDetails = useCallback((transaction: Transaction) => (
     <div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300 z-10">
@@ -54,7 +72,7 @@ const ContentList = ({ transactions }: ContentListProps) => {
                 <ContentRenderer
                   transaction={transaction}
                   content={content}
-                  contentUrls={contentUrls[transaction.id] || {
+                  contentUrls={contentData[transaction.id]?.urls || {
                     thumbnailUrl: null,
                     coverUrl: null,
                     fullUrl: content?.url || `https://arweave.net/${transaction.id}`
@@ -102,7 +120,7 @@ const ContentList = ({ transactions }: ContentListProps) => {
             <ContentRenderer
               transaction={transactions.find(t => t.id === selectedContent.id)!}
               content={contentData[selectedContent.id]}
-              contentUrls={contentUrls[selectedContent.id] || {
+              contentUrls={contentData[selectedContent.id]?.urls || {
                 thumbnailUrl: null,
                 coverUrl: null,
                 fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
