@@ -61,6 +61,9 @@ const FETCH_RECENT_QUERY = gql`
   }
 `;
 
+// Add pageSize constant at the top of the file
+const PAGE_SIZE = 100;
+
 // Update fetchTransactions function
 export async function fetchTransactions(
   nftIds?: string[],
@@ -72,79 +75,54 @@ export async function fetchTransactions(
   maxBlock?: number
 ): Promise<Transaction[]> {
   try {
-    const pageSize = 100;
     let allTransactions: Transaction[] = [];
 
-    // If nftIds is provided, fetch only those transactions
+    // If nftIds is provided, fetch those transactions
     if (nftIds && nftIds.length > 0) {
-      const idChunks = chunk(nftIds, pageSize);
-      for (const idChunk of idChunks) {
-        const result = await arweaveNetClient.query({
-          query: gql`
-            query FetchTransactionsByIds($ids: [ID!]!) {
-              transactions(ids: $ids) {
-                edges {
-                  node {
-                    id
-                    owner { address }
-                    block { height timestamp }
-                    tags { name value }
-                    data { size type }
-                  }
+      const result = await arweaveNetClient.query({
+        query: gql`
+          query FetchTransactionsByIds($ids: [ID!]!) {
+            transactions(ids: $ids) {
+              edges {
+                node {
+                  id
+                  owner { address }
+                  block { height timestamp }
+                  tags { name value }
+                  data { size type }
                 }
               }
             }
-          `,
-          variables: { ids: idChunk },
-        });
-
-        if (result.data && result.data.transactions && result.data.transactions.edges) {
-          const fetchedTransactions = result.data.transactions.edges.map((edge: any) => ({
-            id: edge.node.id,
-            owner: edge.node.owner.address,
-            tags: edge.node.tags,
-            block: edge.node.block,
-            data: edge.node.data,
-          }));
-
-          allTransactions = [...allTransactions, ...fetchedTransactions];
-        }
-      }
-
-      // Apply filters to the fetched transactions
-      allTransactions = allTransactions.filter((tx: Transaction) => {
-        // Filter by owner if specified
-        if (owner && tx.owner !== owner) {
-          return false;
-        }
-
-        // Filter by maxTimestamp if specified
-        if (maxTimestamp && tx.block && tx.block.timestamp > maxTimestamp) {
-          return false;
-        }
-
-        // Filter by contentTypes if specified
-        if (contentTypes && contentTypes.length > 0) {
-          const contentType = tx.tags.find(tag => tag.name === 'Content-Type')?.value;
-          if (!contentType || !contentTypes.includes(contentType)) {
-            return false;
           }
-        }
-
-        // Filter by block range if specified
-        if (minBlock !== undefined && maxBlock !== undefined && tx.block) {
-          if (tx.block.height < minBlock || tx.block.height > maxBlock) {
-            return false;
-          }
-        }
-
-        return true;
+        `,
+        variables: { ids: nftIds },
       });
 
-      // Limit the number of transactions if amount is specified
-      if (amount) {
-        allTransactions = allTransactions.slice(0, amount);
+      if (result.data?.transactions?.edges) {
+        const fetchedTransactions = result.data.transactions.edges.map((edge: any) => ({
+          id: edge.node.id,
+          owner: edge.node.owner.address,
+          tags: edge.node.tags,
+          block: edge.node.block,
+          data: edge.node.data,
+        }));
+
+        allTransactions = [...allTransactions, ...fetchedTransactions];
       }
+
+      // Fix the contentTypes check in the filter
+      allTransactions = allTransactions.filter((tx: Transaction) => {
+        if (owner && tx.owner !== owner) return false;
+        if (maxTimestamp && tx.block && tx.block.timestamp > maxTimestamp) return false;
+        if (contentTypes && contentTypes.length > 0) {
+          const contentType = tx.tags.find(tag => tag.name === 'Content-Type')?.value;
+          return contentType ? contentTypes.includes(contentType) : false;
+        }
+        if (minBlock !== undefined && maxBlock !== undefined && tx.block) {
+          return tx.block.height >= minBlock && tx.block.height <= maxBlock;
+        }
+        return true;
+      });
 
       return allTransactions;
     }
@@ -172,15 +150,13 @@ export async function fetchTransactions(
       }
 
       const variables: any = {
-        first: Math.min(pageSize, amount ? amount : pageSize),
+        first: Math.min(PAGE_SIZE, amount ?? PAGE_SIZE),
         after: null,
         tags: tags.length > 0 ? tags : undefined,
         minBlock: minBlock,
         maxBlock: maxBlock,
         owners: owner ? [owner] : undefined,
       };
-
-      console.log('GraphQL query variables:', variables);
 
       const result = await arweaveNetClient.query({
         query: FETCH_RECENT_QUERY,

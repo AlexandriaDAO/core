@@ -14,8 +14,9 @@ import { loadContentForTransactions } from "@/apps/Modules/shared/state/content/
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
 
-const ContentList = ({ transactions }: ContentListProps) => {
+const ContentList = () => {
   const dispatch = useAppDispatch();
+  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
   const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
   const predictions = useSelector((state: RootState) => state.arweave.predictions);

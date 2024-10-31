@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from "@/store";
-import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { 
   setMintableStates, 
   setMintableState,
@@ -10,8 +9,9 @@ import {
 } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { ContentService } from './contentService';
 
-export function useContentLoader(transactions: Transaction[]) {
+export function useContentLoader() {
   const dispatch = useDispatch();
+  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
   const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
 
