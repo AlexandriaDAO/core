@@ -50,11 +50,14 @@ export default function NftOwnerSelector() {
     ));
   };
 
+  useEffect(() => {
+    console.log('Selected Principals updated:', selectedPrincipals);
+  }, [selectedPrincipals]);
+
   return (
     <div className="space-y-4">
-      {/* Debug display */}
-      <div className="text-sm text-gray-500 mb-2">
-        Selected Principals: {selectedPrincipals.length}
+      <div className="text-sm text-gray-700 mb-2 p-2 bg-gray-100 rounded">
+        <div>Selected Principals: {selectedPrincipals.length}</div>
         {selectedPrincipals.map(p => (
           <div key={p} className="text-xs">
             {p}

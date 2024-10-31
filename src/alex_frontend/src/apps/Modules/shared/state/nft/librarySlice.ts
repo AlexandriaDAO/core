@@ -41,6 +41,15 @@ const librarySlice = createSlice({
         id => !action.payload.includes(id)
       );
     },
+    togglePrincipal: (state, action: PayloadAction<string>) => {
+      const principal = action.payload;
+      const index = state.selectedPrincipals.indexOf(principal);
+      if (index === -1) {
+        state.selectedPrincipals.push(principal);
+      } else {
+        state.selectedPrincipals.splice(index, 1);
+      }
+    }
   },
 });
 
@@ -51,5 +60,6 @@ export const {
   removeSelectedPrincipal,
   addSelectedArweaveIds,
   removeSelectedArweaveIds,
+  togglePrincipal
 } = librarySlice.actions;
 export default librarySlice.reducer;

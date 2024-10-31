@@ -18,6 +18,7 @@ const ContentList = ({ transactions }: ContentListProps) => {
   const dispatch = useAppDispatch();
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
   const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
+  const predictions = useSelector((state: RootState) => state.arweave.predictions);
   
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
@@ -94,6 +95,15 @@ const ContentList = ({ transactions }: ContentListProps) => {
                     >
                       <Info />
                     </button>
+                    {showStats[transaction.id] && predictions[transaction.id] && (
+                      <div className="absolute top-10 left-2 bg-black/80 text-white p-2 rounded-md text-xs z-30">
+                        <div>Drawing: {(predictions[transaction.id].Drawing * 100).toFixed(1)}%</div>
+                        <div>Neutral: {(predictions[transaction.id].Neutral * 100).toFixed(1)}%</div>
+                        <div>Sexy: {(predictions[transaction.id].Sexy * 100).toFixed(1)}%</div>
+                        <div>Hentai: {(predictions[transaction.id].Hentai * 100).toFixed(1)}%</div>
+                        <div>Porn: {(predictions[transaction.id].Porn * 100).toFixed(1)}%</div>
+                      </div>
+                    )}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

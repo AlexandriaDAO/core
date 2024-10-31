@@ -1,7 +1,7 @@
 import { Transaction } from "../../../shared/types/queries";
 import { contentCache } from "./contentCacheService";
 import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
-import { MintableStateItem } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
+import { MintableStateItem } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { getCover } from "@/utils/epub";
 import { CachedContent, ContentUrlInfo } from '../types';
 

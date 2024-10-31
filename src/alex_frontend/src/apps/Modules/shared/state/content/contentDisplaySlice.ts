@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Transaction } from '../../../shared/types/queries';
 import { CachedContent, ContentUrlInfo } from '../../../LibModules/contentDisplay/types';
 
+// Simplify MintableStateItem back to just mintable
 export interface MintableStateItem {
   mintable: boolean;
 }

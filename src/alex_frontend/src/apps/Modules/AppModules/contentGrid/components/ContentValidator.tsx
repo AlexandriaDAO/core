@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
-import { setMintableState } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
+import { setPredictionResults } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
+import { setMintableState } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
 import { useContentValidation } from '@/apps/Modules/shared/services/contentValidation';
 import ContentFetcher from './ContentFetcher';
 import { ContentValidatorProps } from '../types';
@@ -30,13 +31,17 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
 
     try {
       const predictionResults = await validateContent(element, contentType);
-
+      
       if (predictionResults) {
+        dispatch(setPredictionResults({ 
+          id: transactionId, 
+          predictions: predictionResults 
+        }));
+
         dispatch(
           setMintableState({
             id: transactionId,
             mintable: !predictionResults.isPorn,
-            predictions: predictionResults,
           })
         );
       } else {

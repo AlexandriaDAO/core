@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Principal } from "@dfinity/principal";
 import { icrc7 } from "../../../../../../../declarations/icrc7";
 import { natToArweaveId } from "@/utils/id_convert";
-import { addSelectedPrincipal, removeSelectedPrincipal, addSelectedArweaveIds, removeSelectedArweaveIds } from './librarySlice';
+import { addSelectedPrincipal, removeSelectedPrincipal, addSelectedArweaveIds, removeSelectedArweaveIds, togglePrincipal } from './librarySlice';
 import { updateTransactions, appendTransactions } from '@/apps/Modules/shared/state/content/contentDisplayThunks';
 import { RootState } from '@/store';
 
@@ -10,32 +10,26 @@ export const togglePrincipalSelection = createAsyncThunk(
   'library/togglePrincipalSelection',
   async (principalId: string, { dispatch, getState }) => {
     try {
-      const state = getState() as RootState;
-      const { selectedPrincipals } = state.library;
+      dispatch(togglePrincipal(principalId));
       
-      const principal = Principal.fromText(principalId);
-      const nftIds = await icrc7.icrc7_tokens_of(
-        { owner: principal, subaccount: [] },
-        [],
-        [BigInt(100)]
-      );
-      const arweaveIds = nftIds.map(natToArweaveId);
-
+      const state = getState() as RootState;
+      const selectedPrincipals = state.library.selectedPrincipals;
+      
       if (selectedPrincipals.includes(principalId)) {
-        dispatch(removeSelectedPrincipal(principalId));
-        dispatch(removeSelectedArweaveIds(arweaveIds));
-        dispatch(updateTransactions(
-          state.library.selectedArweaveIds.filter(id => !arweaveIds.includes(id))
-        ));
-      } else {
-        dispatch(addSelectedPrincipal(principalId));
+        const principal = Principal.fromText(principalId);
+        const nftIds = await icrc7.icrc7_tokens_of(
+          { owner: principal, subaccount: [] },
+          [],
+          [BigInt(100)]
+        );
+        const arweaveIds = nftIds.map(natToArweaveId);
         dispatch(addSelectedArweaveIds(arweaveIds));
         dispatch(appendTransactions(arweaveIds));
       }
       
-      return { success: true };
+      return principalId;
     } catch (error) {
-      console.error("Error toggling principal selection:", error);
+      console.error('Error in togglePrincipalSelection:', error);
       throw error;
     }
   }

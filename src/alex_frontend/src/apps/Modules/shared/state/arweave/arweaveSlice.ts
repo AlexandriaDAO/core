@@ -1,6 +1,7 @@
-import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SearchState } from '../../../shared/types/queries';
 import { fileTypeCategories } from '../../../shared/types/files';
+import { setMintableState } from '../content/contentDisplaySlice';
 
 export interface PredictionResults {
   Drawing: number;
@@ -11,15 +12,10 @@ export interface PredictionResults {
   isPorn: boolean;
 }
 
-export interface MintableStateItem {
-  mintable: boolean;
-  predictions?: PredictionResults;
-}
-
 interface ArweaveState {
   isLoading: boolean;
   searchState: SearchState;
-  mintableState: Record<string, MintableStateItem>;
+  predictions: Record<string, PredictionResults>;
   nsfwModelLoaded: boolean;
 }
 
@@ -34,14 +30,9 @@ const initialState: ArweaveState = {
     filterTime: '',
     ownerFilter: '',
   },
-  mintableState: {},
+  predictions: {},
   nsfwModelLoaded: false,
 };
-
-// Action to set prediction results
-export const setPredictionResults = createAction<{ id: string; predictions: PredictionResults }>(
-  'arweave/setPredictionResults'
-);
 
 const arweaveSlice = createSlice({
   name: 'arweave',
@@ -64,42 +55,35 @@ const arweaveSlice = createSlice({
     setFilterTime: (state, action: PayloadAction<string>) => {
       state.searchState.filterTime = action.payload;
     },
-    setMintableState: (state, action: PayloadAction<{ id: string; mintable: boolean; predictions?: PredictionResults }>) => {
-      const { id, mintable, predictions } = action.payload;
-      state.mintableState[id] = { mintable, predictions };
-    },
-    setMintableStates: (state, action: PayloadAction<Record<string, MintableStateItem>>) => {
-      state.mintableState = { ...state.mintableState, ...action.payload };
+    setPredictionResults: (state, action: PayloadAction<{ id: string; predictions: PredictionResults }>) => {
+      const { id, predictions } = action.payload;
+      state.predictions[id] = predictions;
     },
     setNsfwModelLoaded: (state, action: PayloadAction<boolean>) => {
       state.nsfwModelLoaded = action.payload;
     },
-    resetMintableState(state) {
-      state.mintableState = {};
-    },
-  },
-  extraReducers: (builder) => {
-    // Add case for setPredictionResults
-    builder.addCase(setPredictionResults, (state, action) => {
-      const { id, predictions } = action.payload;
-      if (state.mintableState[id]) {
-        state.mintableState[id].predictions = predictions;
-      } else {
-        state.mintableState[id] = { mintable: false, predictions };
-      }
-    });
   },
 });
+
+// Create a thunk to handle prediction results and update mintable state
+export const updatePredictionResults = createAsyncThunk(
+  'arweave/updatePredictionResults',
+  async ({ id, predictions }: { id: string; predictions: PredictionResults }, { dispatch }) => {
+    dispatch(setPredictionResults({ id, predictions }));
+    
+    // Update mintable state based on predictions
+    const isMintable = !predictions.isPorn; // or whatever logic you use to determine mintability
+    dispatch(setMintableState({ id, mintable: isMintable }));
+  }
+);
 
 export const {
   setIsLoading,
   setSearchState,
   setFilterDate,
   setFilterTime,
-  setMintableState,
-  setMintableStates,
+  setPredictionResults,
   setNsfwModelLoaded,
-  resetMintableState,
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;

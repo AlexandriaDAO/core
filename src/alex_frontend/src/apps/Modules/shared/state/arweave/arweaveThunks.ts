@@ -1,10 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setIsLoading, MintableStateItem } from './arweaveSlice';
+import { setIsLoading } from './arweaveSlice';
 import { setMintableStates } from '../content/contentDisplaySlice';
-
-import { setTransactions, clearTransactions } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
+import { setTransactions, clearTransactions } from '../content/contentDisplaySlice';
 import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
 import { SearchState } from '../../../shared/types/queries';
+import { loadContentForTransactions } from '../content/contentDisplayThunks';
 
 interface SearchParams {
   searchState: SearchState;
@@ -42,8 +42,11 @@ export const performSearch = createAsyncThunk(
       const newMintableStates = fetchedTransactions.reduce((acc, transaction) => {
         acc[transaction.id] = { mintable: false };
         return acc;
-      }, {} as Record<string, MintableStateItem>);
+      }, {} as Record<string, { mintable: boolean }>);
       dispatch(setMintableStates(newMintableStates));
+
+      // Load content and URLs for the transactions
+      await dispatch(loadContentForTransactions(fetchedTransactions));
 
       return {
         transactions: fetchedTransactions,
