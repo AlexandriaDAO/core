@@ -64,25 +64,28 @@ const fetchBooks = createAsyncThunk<
     { rejectValue: string }
 >("portal/fetchBooks", async (_, { rejectWithValue }) => {
     try {
-        const actorNftManager = await getNftManagerActor();
-        const result = await actorNftManager.get_nfts([], []);
 
-        // if ('Err' in result) {
-        //     console.log('Error fetching NFTs', result.Err);
-        //     throw new Error('Error fetching NFTs');
-        // }
+        return await getBooks();
 
-        // if('Ok' in result){
-        //     return await getBooks(result.Ok)
-        // }
+        // const actorNftManager = await getNftManagerActor();
+        // const result = await actorNftManager.get_nfts([], []);
 
-        return [];
+        // // if ('Err' in result) {
+        // //     console.log('Error fetching NFTs', result.Err);
+        // //     throw new Error('Error fetching NFTs');
+        // // }
 
-        // const ids = results.Ok.map(nft=>nft.description);
+        // // if('Ok' in result){
+        // //     return await getBooks(result.Ok)
+        // // }
 
-        // const formattedBooks = await getMultipleIrysBooks(ids);
+        // return [];
 
-        // return formattedBooks;
+        // // const ids = results.Ok.map(nft=>nft.description);
+
+        // // const formattedBooks = await getMultipleIrysBooks(ids);
+
+        // // return formattedBooks;
     } catch (error) {
         console.error("Failed to Fetch Books:", error);
 

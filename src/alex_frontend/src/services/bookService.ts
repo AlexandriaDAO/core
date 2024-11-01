@@ -92,35 +92,73 @@ import { Book } from "@/features/portal/portalSlice";
 //     };
 // }
 
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 
-export const getBooks = async (nfts: any[] = []): Promise<Book[]> => {
+const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_ID : process.env.REACT_LOCAL_APP_ID;
+const network = process.env.DFX_NETWORK === "ic" ? 'mainnet':'devnet'
+
+const client = new ApolloClient({
+    uri: `https://${network}.irys.xyz/graphql`,
+    cache: new InMemoryCache()
+});
+
+export const fetchManifests = async (): Promise<string[]> => {
+    try {
+        const result = await client.query({
+        query: gql`
+            query {
+                transactions(
+                    order: DESC,
+                    first: 100,
+                    tags: [
+                        { name: "Content-Type", values: ["application/x.arweave-manifest+json"] },
+                        { name: "application-id", values: ["${APP_ID}"] },
+                    ],
+                ) {
+                    edges {
+                        node {
+                            id
+                        }
+                    }
+                }
+            }
+        `
+        });
+        return result.data.transactions.edges.map((edge:any)=>edge.node.id)
+    } catch (error) {
+        console.error('Error fetching all transactions:', error);
+        throw error;
+    }
+}
+
+export const getBooks = async (): Promise<Book[]> => {
+    const txIds = await fetchManifests();
     const books: Book[] = [];
 
     await Promise.all(
-        nfts.map(async nft => {
-            const manifestId = nft.description;
+        txIds.map(async id => {
             try {
-                const response = await fetch(`https://gateway.irys.xyz/${manifestId}`);
+                const response = await fetch(`https://gateway.irys.xyz/${id}`);
                 if (response.ok) {
                     const metadata = await response.json();
                     books.push({
                         ...metadata,
-                        manifest: manifestId,
-                        owner: nft.owner
+                        manifest: id,
+                        owner: 'NA'
                     });
                 } else {
                     // Handle non-ok responses, including 404
                     if (response.status === 404) {
-                        console.error(`Manifest not found for ID: ${manifestId}. Status: ${response.status}`);
+                        console.error(`Transaction Id not found: ${id}. Status: ${response.status}`);
                     } else {
-                        console.error(`Failed to fetch manifest for ID: ${manifestId}. Status: ${response.status}`);
+                        console.error(`Failed to fetch Transaction with Id: ${id}. Status: ${response.status}`);
                     }
                 }
             } catch (err) {
                 if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
-                    console.error(`Network error for manifest ID: ${manifestId}. The resource might not exist or there's a connection issue.`);
+                    console.error(`Network error for Transaction Id: ${id}. The resource might not exist or there's a connection issue.`);
                 } else {
-                    console.error(`Unable to fetch ${manifestId}. Error: ${err}`);
+                    console.error(`Unable to fetch ${id}. Error: ${err}`);
                 }
             }
         })
