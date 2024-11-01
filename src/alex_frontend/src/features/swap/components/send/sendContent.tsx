@@ -14,76 +14,87 @@ import transferLBRY from "../../thunks/lbryIcrc/transferLBRY";
 import { icpLedgerFlagHandler } from "@/features/icp-ledger/icpLedgerSlice";
 import { flagHandler } from "../../swapSlice";
 import Auth from "@/features/auth";
+import { options } from "@/utils/utils";
 import { LoaderCircle } from "lucide-react";
+import LoadingModal from "../loadingModal";
+import SuccessModal from "../successModal";
+import { alexFlagHandler } from "../../alexSlice";
+import getIcpBal from "@/features/icp-ledger/thunks/getIcpBal";
+import GetAlexBal from "../balance/getAlexBal";
+import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
+import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 
 const SendContent = () => {
     const dispatch = useAppDispatch();
 
-    const { user } = useAppSelector( state => state.auth);
+    const { user } = useAppSelector(state => state.auth);
     const icpLedger = useAppSelector((state) => state.icpLedger);
     const alex = useAppSelector((state) => state.alex);
     const swap = useAppSelector((state) => state.swap);
 
     const [isOpen, setIsOpen] = useState(false);
+    const [loadingModalV, setLoadingModalV] = useState(false);
+    const [successModalV, setSucessModalV] = useState(false);
     const [selectedOption, setSelectedOption] = useState("Select an option");
     const [selectedImage, setSelectedImage] = useState("");
     const [availableBalance, setAvailableBalnce] = useState("");
     const [destinationPrincipal, setDestinationPrincipal] = useState("");
     const [amount, setAmount] = useState("0");
+    const [fee, setFee] = useState();
 
-    const options = [
-        { value: "ICP", label: "ICP", img: "images/icp-logo.png", fee: 0.0001 },
-        { value: "ALEX", label: "ALEX", img: "images/icp-logo.png", fee: 0.0001 },
-        { value: "LBRY", label: "LBRY", img: "images/icp-logo.png", fee: 0.04 },
-    ];
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setAmount(e.target.value);
+        if (Number(e.target.value) >= 0) {
+            setAmount(e.target.value);
+        }
     };
     const handleDestinationPrincipalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setDestinationPrincipal(e.target.value);
     };
     const handleSelect = (option: any) => {
+        setFee(option.fee);
         setSelectedOption(option.label);
         setIsOpen(false);
         setSelectedImage(option.img);
     };
     const handleMax = () => {
-        console.log("hhh");
         if (selectedOption === "ICP") {
             const userBal = Math.max(
                 0,
-                Number(icpLedger.accountBalance) - (options.find(option => option.value === "ICP")?.fee ?? 0)
+                Number(icpLedger.accountBalance) - ((options.find(option => option.value === "ICP")?.fee ?? 0) * 2)
             ).toFixed(4);
             setAmount(userBal);
         }
         else if (selectedOption === "ALEX") {
             const userBal = Math.max(
                 0,
-                Number(alex.alexBal) - (options.find(option => option.value === "ALEX")?.fee ?? 0)
+                Number(alex.alexBal) - ((options.find(option => option.value === "ALEX")?.fee ?? 0) * 2)
             ).toFixed(4);
             setAmount(userBal);
         }
         else if (selectedOption === "LBRY") {
             const userBal = Math.max(
                 0,
-                Number(swap.lbryBalance) - (options.find(option => option.value === "LBRY")?.fee ?? 0)
+                Number(swap.lbryBalance) - ((options.find(option => option.value === "LBRY")?.fee ?? 0) * 2)
             ).toFixed(4);
             setAmount(userBal);
         }
     };
+    
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         if (selectedOption === "ICP") {
-            dispatch(transferICP({ amount, destination: destinationPrincipal, accountType: "principal" }))
+            dispatch(transferICP({ amount, destination: destinationPrincipal, accountType: "principal" }));
+
         }
         else if (selectedOption === "ALEX") {
-            dispatch(transferALEX({ amount, destination: destinationPrincipal }))
+            dispatch(transferALEX({ amount, destination: destinationPrincipal }));
         }
         else if (selectedOption === "LBRY") {
-            dispatch(transferLBRY({ amount, destination: destinationPrincipal }))
-        }
+            dispatch(transferLBRY({ amount, destination: destinationPrincipal }));
 
+        }
+        setLoadingModalV(true);
     }
 
     useEffect(() => {
@@ -97,18 +108,34 @@ const SendContent = () => {
             setAvailableBalnce(swap.lbryBalance + " " + selectedOption);
         }
     }, [selectedOption, icpLedger.accountBalance, alex.alexBal, swap.lbryBalance])
+
     useEffect(() => {
         if (icpLedger.transferSuccess === true) {
-            // alert("Success");
+            setLoadingModalV(false);
+            setSucessModalV(true);
+            dispatch(getIcpBal(user));
             dispatch(icpLedgerFlagHandler());
+
         }
-    }, [icpLedger.transferSuccess])
-    useEffect(() => {
-        if (swap.transferSuccess === true) {
-            //alert("Success");
-            dispatch(flagHandler());
+        else if (alex.transferSuccess === true) {
+            setLoadingModalV(false);
+            setSucessModalV(true);
+            dispatch(getAccountAlexBalance(user))
+
+            dispatch((alexFlagHandler()));
+
         }
-    }, [swap.transferSuccess])
+        else if (swap.transferSuccess === true) {
+            setLoadingModalV(false);
+            setSucessModalV(true);
+            dispatch(getLbryBalance(user))
+            dispatch((flagHandler()));
+        }
+        else if (swap.error || alex.error || icpLedger.error) {
+            setLoadingModalV(false);
+        }
+    }, [icpLedger, swap, alex])
+
     return (<>
         <div>
             <div className='mb-5 2xl:mb-10 xl:mb-7 lg:mb-7 md:mb-6 sm:mb-5'>
@@ -152,14 +179,14 @@ const SendContent = () => {
                         <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>2</span>
                         <strong className='text-2xl font-medium'>Enter the Principal ID</strong>
                     </div>
-                    <div className=' border background-color: #efefef; py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-3 2xl:px-5 xl:px-5 lg:px-4 md:px-3 sm:px-3 rounded-full mb-4' >
+                    <div className=' border bg-white py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-3 2xl:px-5 xl:px-5 lg:px-4 md:px-3 sm:px-3 rounded-full mb-4' >
                         <input className='text-multygray  bg-transparent text-2xl font-medium placeholder-multygray  focus:outline-none focus:border-transparent w-full' type='text' onChange={(e) => { handleDestinationPrincipalChange(e) }} value={destinationPrincipal} />
                     </div>
                     <div className='flex items-center mb-4'>
                         <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>3</span>
                         <strong className='text-2xl font-medium'>Enter the amount</strong>
                     </div>
-                    <div className=' border background-color: #efefef; py-5 px-5 rounded-borderbox mb-7 '>
+                    <div className=' border bg-white py-5 px-5 rounded-borderbox mb-7 '>
                         <div className='mb-3 w-full'>
                             <div className='flex justify-between mb-3'>
                                 <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>
@@ -170,20 +197,23 @@ const SendContent = () => {
                                     <strong className='text-base text-multygray font-medium me-2'>Available Balance:<span className='text-base text-darkgray ms-2'>  {availableBalance}</span></strong>
                                     <img className='w-5 h-5' src="images/8-logo.png" alt="apple" />
                                 </div>
-                                <Link role="button" to="" className='text-multycolor underline text-base font-medium' onClick={() => { handleMax() }}>Max</Link>
+                                <Link role="button" to="" className='text-[#A7B1D7] underline text-base  font-medium' onClick={() => { handleMax() }}>Max</Link>
                             </div>
                         </div>
                     </div>
                     {user !== "" ? <button
                         type="button"
-                        className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2"
+                        className={`w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2
+                            ${parseFloat(amount) === 0 || swap.loading ? 'text-[#808080] cursor-not-allowed' : 'bg-balancebox text-white cursor-pointer'}`} style={{
+                            backgroundColor: parseFloat(amount) === 0 || swap.loading ? '#525252' : '', // when disabled
+                        }}
                         disabled={parseFloat(amount) === 0 || swap.loading === true}
                         onClick={(e) => {
                             handleSubmit(e);
                         }}
                     >
                         {swap.loading ? (<>
-                            <LoaderCircle size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
+                            <LoaderCircle size={18} className="animate animate-spin mx-auto" /> </>) : (
                             <>Send</>
                         )}
                     </button> : <div
@@ -205,7 +235,7 @@ const SendContent = () => {
                             </li>
                             <li className='flex justify-between mb-5'>
                                 <strong className='text-lg font-semibold me-1 text-radiocolor'>Network Fees</strong>
-                                <span className='text-lg font-semibold text-radiocolor'><span className='text-multycolor'>0.0001</span> {selectedOption}</span>
+                                <span className='text-lg font-semibold text-radiocolor'><span className='text-multycolor'>{fee}</span> {selectedOption}</span>
                             </li>
                         </ul>
                     </div> : <></>}
@@ -213,6 +243,8 @@ const SendContent = () => {
 
                 </div>
             </div>
+            <LoadingModal show={loadingModalV} message1={"Transfer in Progress"} message2={"Your transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
+            <SuccessModal show={successModalV} setShow={setSucessModalV} />
         </div>
     </>)
 }

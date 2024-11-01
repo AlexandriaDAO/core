@@ -141,8 +141,8 @@ const Home = () => {
                             </div>
                             <div className='grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1'>
                                 <div className='me-0 2xl:me-2 xl:me-2 lg:me-2 md:me-0 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-3 sm:mb-3'>
-                                    <div className='block 2xl:flex xl:flex lg:flex md:flex sm:block justify-between mb-3 w-full'>
-                                        <div className='border border-gray-400 text-white py-5 px-7 rounded-borderbox me-0 2xl:me-2 xl:me-2 lg:me-2 md:me-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-3'>
+                                    <div className='block 2xl:flex xl:flex lg:flex md:flex sm:block justify-between mb-5 w-full'>
+                                        <div className='bg-white border border-gray-400 text-white py-5 px-7 rounded-borderbox me-0 2xl:me-2 xl:me-2 lg:me-2 md:me-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-3'>
                                             <div className='flex justify-between mb-5	'>
                                                 <h2 className='text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black'>ICP</h2>
                                                 <div>
@@ -150,17 +150,17 @@ const Home = () => {
                                                 </div>
                                             </div>
                                             <div className='flex justify-between 	'>
-                                                <strong className='text-base text-swaptext font-medium me-1'>Balance: 1.1</strong>
-                                                <Link to="/" className='text-base font-blod text-multycolor underline'>Max</Link>
+                                                <strong className='text-base text-[#353535] font-medium me-1'>Balance: 1.1</strong>
+                                                <Link to="/" className='text-base font-blod text-[#A7B1D7] underline'>Max</Link>
                                             </div>
                                         </div>
-                                        <div className='border border-gray-400 text-white py-5 px-7 rounded-borderbox me-0 2xl:ms-2 xl:ms-2 lg:ms-2 md:ms-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full'>
+                                        <div className='bg-white border border-gray-400 text-white py-5 px-7 rounded-borderbox me-0 2xl:ms-2 xl:ms-2 lg:ms-2 md:ms-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full'>
                                             <div className='flex justify-between mb-5'>
                                                 <h2 className='text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black'>LBRY</h2>
                                                 <h3 className='text-swapvalue text-right text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium'>1000</h3>
                                             </div>
                                             <div className='flex justify-between'>
-                                                <strong className='text-base text-swaptext font-medium me-1'>Balance: 1.1</strong>
+                                                <strong className='text-base text-[#353535] font-medium me-1'>Balance: 1.1</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -228,14 +228,14 @@ const Home = () => {
                                         <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>2</span>
                                         <strong className='text-2xl font-medium'>Enter the Principal ID</strong>
                                     </div>
-                                    <div className=' border background-color: #efefef; py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-3 2xl:px-5 xl:px-5 lg:px-4 md:px-3 sm:px-3 rounded-full mb-4' >
+                                    <div className=' border background-color: #fff; py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-3 2xl:px-5 xl:px-5 lg:px-4 md:px-3 sm:px-3 rounded-full mb-4' >
                                         <input className='text-multygray  bg-transparent text-2xl font-medium placeholder-multygray  focus:outline-none focus:border-transparent' type='text' placeholder='Principal ID' />
                                     </div>
                                     <div className='flex items-center mb-4'>
                                         <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>3</span>
                                         <strong className='text-2xl font-medium'>Enter the amount</strong>
                                     </div>
-                                    <div className=' border background-color: #efefef; py-5 px-5 rounded-borderbox mb-7 '>
+                                    <div className=' border bg-white py-5 px-5 rounded-borderbox mb-7 '>
                                         <div className='mb-3 w-full'>
                                             <div className='flex justify-between mb-3'>
                                                 <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>
@@ -386,7 +386,7 @@ const Home = () => {
                             </div>
                             <div className='grid grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-12'>
                                 <div className='me-0 2xl:me-3 xl:me-3 lg:me-3 md:me-3 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-3 md:mb-3 sm:mb-3'>
-                                    <div className=' border py-5 px-5 rounded-borderbox mb-7 '>
+                                    <div className='bg-white border py-5 px-5 rounded-borderbox mb-7 '>
                                         <div className='flex justify-between mb-3'>
                                             <h4 className='text-2xl font-medium text-multygray'>Amount</h4>
                                             <input className='text-2xl font-medium text-darkgray text-right bg-transparent w-full placeholder-darkgray  focus:outline-none focus:border-transparent' type='number' placeholder='0.0' />
@@ -500,7 +500,7 @@ const Home = () => {
                                     <div className='flex items-center mb-3'>
                                         <strong className='text-2xl font-medium'>Stake Amount</strong>
                                     </div>
-                                    <div className=' border background-color: #efefef; py-5 px-5 rounded-borderbox mb-7 '>
+                                    <div className=' border bg-white py-5 px-5 rounded-borderbox mb-7 '>
                                         <div className='mb-3'>
                                             <div className='flex justify-between mb-3'>
                                                 <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>

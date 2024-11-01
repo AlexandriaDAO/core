@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { ActorSubclass } from "@dfinity/agent";
-
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did'
@@ -15,28 +13,40 @@ import Auth from "@/features/auth";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import { LoaderCircle } from "lucide-react";
 import { lbry_fee } from "@/utils/utils";
+import getCanisterBal from "@/features/icp-ledger/thunks/getCanisterBal";
+import getCanisterArchivedBal from "../../thunks/getCanisterArchivedBal";
+import LoadingModal from "../loadingModal";
+import SuccessModal from "../successModal";
 
 const BurnContent = () => {
     const dispatch = useAppDispatch();
-    const {user} = useAppSelector((state) => state.auth);
+    const { user } = useAppSelector((state) => state.auth);
     const swap = useAppSelector((state) => state.swap);
+    const icpLedger = useAppSelector((state) => state.icpLedger);
     const tokenomics = useAppSelector((state) => state.tokenomics);
 
     const [amountLBRY, setAmountLBRY] = useState(0);
     const [tentativeICP, setTentativeICP] = useState(Number);
     const [tentativeALEX, setTentativeALEX] = useState(Number);
+    const [maxBurnAllowed, setMaxburnAllowed] = useState(Number);
+    const [loadingModalV, setLoadingModalV] = useState(false);
+    const [successModalV, setSucessModalV] = useState(false);
+
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
         dispatch(burnLbry(amountLBRY));
+        setLoadingModalV(true);
+
     }
     const handleAmountLBRYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-        if (Number(e.target.value) < 0) return;
+        if (Number(e.target.value) >= 0) {
 
-        setAmountLBRY(Number(e.target.value));
-        setTentativeICP((Number(e.target.value) / Number(swap.lbryRatio)) / 2);
-        setTentativeALEX(Number(e.target.value) * Number(tokenomics.alexMintRate));
+            setAmountLBRY(Number(e.target.value));
+            setTentativeICP((Number(e.target.value) / Number(swap.lbryRatio)) / 2);
+            setTentativeALEX(Number(e.target.value) * Number(tokenomics.alexMintRate));
+        }
     }
     const handleMaxLbry = () => {
         const userBal = Math.floor(Math.max(0, Number(swap.lbryBalance) - lbry_fee)); // Ensure non-negative user balance
@@ -50,17 +60,36 @@ const BurnContent = () => {
 
     useEffect(() => {
         if (swap.burnSuccess === true) {
-           // alert("Burned successfully!")
+            // alert("Burned successfully!")
             dispatch(flagHandler())
             dispatch(getLbryBalance(user))
-
+            setLoadingModalV(false);
+            setSucessModalV(true);
         }
     }, [swap.burnSuccess])
     useEffect(() => {
         if (user !== '') {
-            dispatch(getLbryBalance(user))
+            dispatch(getLbryBalance(user));
         }
+        dispatch(getCanisterBal());
+        dispatch(getCanisterArchivedBal());
     }, [user])
+    useEffect(() => {
+        let lbryPerIcp = Number(swap.lbryRatio) * 2;
+        let canisterBalance = Number(icpLedger.canisterBalance);
+        let totalArchivedBalance = Number(swap.canisterArchivedBal.canisterArchivedBal);
+        let totalUnclaimedBalance = Number(swap.canisterArchivedBal.canisterUnClaimedIcp);
+        let remainingBalance = canisterBalance - (totalUnclaimedBalance + totalArchivedBalance);
+        let actualAvailable = remainingBalance / 2; // 50% for stakers 
+        let maxAllowed = actualAvailable * lbryPerIcp;
+        setMaxburnAllowed(maxAllowed);
+    }, [swap.canisterArchivedBal, swap.lbryRatio, icpLedger.canisterBalance])
+    useEffect(() => {
+        if (swap.error) {
+            setLoadingModalV(false);
+        }
+    }, [swap])
+
 
     return (
         <>
@@ -70,7 +99,7 @@ const BurnContent = () => {
                 </div>
                 <div className='grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-12'>
                     <div className='me-0 2xl:me-3 xl:me-3 lg:me-3 md:me-3 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-3 md:mb-3 sm:mb-3'>
-                        <div className=' border py-5 px-5 rounded-borderbox mb-7 '>
+                        <div className='bg-white border py-5 px-5 rounded-borderbox mb-7 '>
                             <div className='flex justify-between mb-3'>
                                 <h4 className='text-2xl font-medium text-multygray'>Amount</h4>
                                 <input className='text-2xl font-medium text-darkgray text-right bg-transparent w-full placeholder-darkgray  focus:outline-none focus:border-transparent' type='integer' value={amountLBRY} defaultValue={0} min={0} onChange={(e) => {
@@ -82,7 +111,7 @@ const BurnContent = () => {
                                     <strong className='text-base text-multygray font-medium me-1'>Balance:<span className='text-darkgray ms-2'>{swap.lbryBalance} LBRY</span></strong>
                                     <img className='w-4 h-4' src="images/8-logo.png" alt="apple" />
                                 </div>
-                                <Link to="" role="button" className='text-multycolor underline text-base font-bold' onClick={() => handleMaxLbry()} >Max</Link>
+                                <Link to="" role="button" className='text-[#A7B1D7] underline text-base font-bold' onClick={() => handleMaxLbry()} >Max</Link>
                             </div>
                         </div>
                         <h5 className='text-xl font-medium mb-4'>you get</h5>
@@ -114,14 +143,17 @@ const BurnContent = () => {
                         </div>
                         {user !== '' ? <button
                             type="button"
-                            className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2"
+                            className={`bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 ${parseInt(amountLBRY.toString()) === 0 || swap.loading ? 'text-[#808080] cursor-not-allowed' : 'bg-balancebox text-white cursor-pointer'}`}
+                            style={{
+                                backgroundColor: parseInt(amountLBRY.toString()) === 0 || swap.loading ? '#525252' : '', // when disabled
+                            }}
                             disabled={amountLBRY === 0 || swap.loading === true}
                             onClick={(e) => {
                                 handleSubmit(e);
                             }}
                         >
                             {swap.loading ? (<>
-                                <LoaderCircle size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
+                                <LoaderCircle size={18} className="animate animate-spin mx-auto" /> </>) : (
                                 <>Burn</>
                             )}
                         </button> : <div
@@ -135,7 +167,7 @@ const BurnContent = () => {
                             <ul className='ps-0'>
                                 <li className='flex justify-between mb-5'>
                                     <strong className='text-lg font-medium me-1 text-black'>Max LBRY Burn allowed:</strong>
-                                    <span className='text-lg font-medium text-black'>{swap.maxLbryBurn.toFixed(4)} LBRY</span>
+                                    <span className='text-lg font-medium text-black'>{maxBurnAllowed.toFixed(4)} LBRY</span>
                                 </li>
                                 <li className='flex justify-between mb-5'>
                                     <strong className='text-lg font-medium  me-1 text-black'>{Number(swap.lbryRatio).toFixed(4)} LBRY
@@ -155,6 +187,8 @@ const BurnContent = () => {
                         </div>
                     </div>
                 </div>
+                <LoadingModal show={loadingModalV} message1={"Burn in Progress"} message2={"Burn transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
+                <SuccessModal show={successModalV} setShow={setSucessModalV} />
             </div>
         </>
     );

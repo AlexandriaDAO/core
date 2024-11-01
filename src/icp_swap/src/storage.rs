@@ -52,8 +52,6 @@ thread_local! {
     pub static DISTRIBUTION_INTERVALS: RefCell<StableBTreeMap<(), u32, Memory>> = RefCell::new(
         StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(DISTRIBUTION_INTERVALS_MEM_ID)))
     );
-
-
 }
 
 pub fn get_total_unclaimed_icp_reward_mem() -> StableBTreeMap<(), u64, Memory> {
@@ -88,10 +86,18 @@ pub struct Stake {
     pub reward_icp: u64,
 }
 
-#[derive(CandidType, Deserialize, Clone, Default)]
+#[derive(CandidType, Deserialize, Clone)]
 pub struct LbryRatio {
     pub ratio: u64,
     pub time: u64,
+}
+impl Default for LbryRatio {
+    fn default() -> Self {
+        LbryRatio {
+            ratio: 400,  // Default value set to 400
+            time: ic_cdk::api::time(), // Current timestamp
+        }
+    }
 }
 
 #[derive(CandidType, Deserialize, Clone, Default)]

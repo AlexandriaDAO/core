@@ -12,18 +12,25 @@ import stakeAlex from "../../thunks/stakeAlex";
 import StakedInfo from "./stakeInfo";
 import Auth from "@/features/auth";
 import { LoaderCircle } from "lucide-react";
+import LoadingModal from "../loadingModal";
+import SuccessModal from "../successModal";
+import { alex_fee } from "@/utils/utils";
 
 const StakeContent = () => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
-    const {user} = useAppSelector((state) => state.auth);
+    const { user } = useAppSelector((state) => state.auth);
     const alex = useAppSelector((state) => state.alex);
     const [amount, setAmount] = useState("0");
-    let alexFee = 0.0001;
+    const [loadingModalV, setLoadingModalV] = useState(false);
+    const [successModalV, setSucessModalV] = useState(false);
+    const [actionType, setActionType] = useState("Stake");
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        dispatch(stakeAlex( amount ))
+        dispatch(stakeAlex(amount));
+        setActionType("Stake");
+        setLoadingModalV(true);
     }
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (Number(e.target.value) < 0) {
@@ -32,27 +39,28 @@ const StakeContent = () => {
         setAmount(e.target.value);
     }
     const handleMaxAlex = () => {
-        const userBal = Math.max(0, Number(alex.alexBal) - alexFee).toFixed(4);
+        const userBal = Math.max(0, Number(alex.alexBal) - alex_fee).toFixed(4);
         setAmount(userBal);
     };
-
-    useEffect(() => {
-        if (swap.successStake === true) {
-            alert("Successfuly staked");
-            dispatch(flagHandler());
-        }
-    }, [swap])
-
     useEffect(() => {
         if (user !== '') {
             dispatch(getAccountAlexBalance(user))
         }
     }, [user])
     useEffect(() => {
+
         if (swap.successStake === true || swap.unstakeSuccess === true || swap.burnSuccess === true || swap.successClaimReward === true) {
+            dispatch(flagHandler());
             dispatch(getAccountAlexBalance(user))
+            setLoadingModalV(false);
+            setSucessModalV(true);
+        }
+        if (swap.error) {
+            setLoadingModalV(false);
         }
     }, [swap])
+
+
     return (
         <>
             <div>
@@ -60,14 +68,13 @@ const StakeContent = () => {
                     <div className='stake me-2'>
                         <div className="mb-4">
                             <label className="flex items-center text-radiocolor">
-                                <input type="radio" name="option" className="form-radio h-4 w-4 text-radiocolor" />
                                 <span className="ml-2 text-tabsheading 2xl:text-xxltabsheading xl:text-xltabsheading lg:text-lgtabsheading md:text-mdtabsheading sm:text-smtabsheading font-bold">Stake</span>
                             </label>
                         </div>
                         <div className='border text-white py-5 px-7 rounded-borderbox mb-3'>
                             <h2 className='text-2xl text-radiocolor flex justify-between mb-5'>
                                 <span className='flex font-extrabold '>Staked</span>
-                                <span className='font-semibold flex'>0 ALEX</span>
+                                <span className='font-semibold flex'>{swap.stakeInfo.stakedAlex} ALEX</span>
                             </h2>
                             <ul className='ps-0'>
                                 <li className='mb-4'>
@@ -99,7 +106,7 @@ const StakeContent = () => {
                         <div className='flex items-center mb-3'>
                             <strong className='text-2xl font-medium'>Stake Amount</strong>
                         </div>
-                        <div className=' border background-color: #efefef; py-5 px-5 rounded-borderbox mb-7 '>
+                        <div className=' border bg-white py-5 px-5 rounded-borderbox mb-7 '>
                             <div className='mb-3'>
                                 <div className='flex justify-between mb-3'>
                                     <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>
@@ -110,21 +117,24 @@ const StakeContent = () => {
                                         <strong className='text-base text-multygray font-medium me-2'>Available Balance:<span className='text-base text-darkgray ms-2'>{alex.alexBal} ALEX</span></strong>
                                         <img className='w-5 h-5' src="images/8-logo.png" alt="apple" />
                                     </div>
-                                    <Link to="" role="button" className='text-multycolor underline text-base font-bold' onClick={() => handleMaxAlex()} >Max</Link>
+                                    <Link to="" role="button" className='text-[#A7B1D7] underline text-base font-bold' onClick={() => handleMaxAlex()} >Max</Link>
                                 </div>
                             </div>
                         </div>
                         <div>
                             {user !== '' ? <button
                                 type="button"
-                                className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2"
+                                className={`bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 ${parseFloat(amount) === 0 || swap.loading ? 'text-[#808080] cursor-not-allowed' : 'bg-balancebox text-white cursor-pointer'}`}
+                                style={{
+                                  backgroundColor: parseFloat(amount) === 0 || swap.loading ? '#525252' : '', // when disabled
+                                }}
                                 disabled={parseFloat(amount) === 0 || swap.loading === true}
                                 onClick={(e) => {
                                     handleSubmit(e);
                                 }}
                             >
                                 {swap.loading ? (<>
-                                    <LoaderCircle size={18} className="animate animate-spin text-white mx-auto" /> </>) : (
+                                    <LoaderCircle size={18} className="animate animate-spin mx-auto" /> </>) : (
                                     <>Stake</>
                                 )}
                             </button> : <div
@@ -136,8 +146,10 @@ const StakeContent = () => {
                     </div>
                 </div>
                 <div className="overflow-x-auto lg:overflow-x-auto">
-                    <StakedInfo />
+                    <StakedInfo setLoadingModalV={setLoadingModalV} setActionType={setActionType} />
                 </div>
+                <LoadingModal show={loadingModalV} message1={`${actionType} in Progress`} message2={"Transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
+                <SuccessModal show={successModalV} setShow={setSucessModalV} />
             </div>
         </>
     );

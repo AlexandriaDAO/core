@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
-import useSession from '@/hooks/useSession';
 
 import "./style.css"
 
 import { useAppSelector } from '@/store/hooks/useAppSelector';
-
 import AccountCards from './components/balance/accountCards';
 import BalanceContent from './components/balance/balanceContent';
 import SwapContent from './components/swap/swapContent';
@@ -13,13 +11,13 @@ import SendContent from './components/send/sendContent';
 import BurnContent from './components/burn/burnContent';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import getLBRYratio from './thunks/getLBRYratio';
-import getMaxLbryBurn from './thunks/getMaxLbryBurn';
 import getAlexMintRate from './thunks/tokenomics/getAlexMintRate';
 import StakeContent from './components/stake/stakeContent';
 import ReceiveContent from './components/receive/receiveContent';
 import RedeemContent from './components/redeem/redeemContent';
-import { Transaction } from '@irys/sdk/build/cjs/common/transactions';
 import TransactionHistory from './components/transactionHistory/transactionHistory';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
 
 const SwapMain = () => {
     const dispatch = useAppDispatch();
@@ -28,27 +26,29 @@ const SwapMain = () => {
     const [activeTab, setActiveTab] = useState(1);
 
     const tabs = [
-        { id: 1, label: 'Balance', content: <BalanceContent /> },
-        { id: 2, label: 'Swap', content: <SwapContent /> },
-        { id: 3, label: 'Send', content: <SendContent /> },
-        { id: 4, label: 'Receive', content: <ReceiveContent /> },
-        { id: 5, label: 'Burn', content: <BurnContent /> },
-        { id: 6, label: 'Stake', content: <StakeContent /> },
-        { id: 8, label: 'Reedem', content: <RedeemContent /> },
-        { id: 7, label: 'Transaction history', content: <TransactionHistory/> }
+        { id: 1, label: 'Balance', hover: null, content: <BalanceContent /> },
+        { id: 2, label: 'Swap', hover: "A feature enabling users to exchange one token for another directly on the platform", content: <SwapContent /> },
+        { id: 3, label: 'Send', hover: null, content: <SendContent /> },
+        { id: 4, label: 'Receive', hover: null, content: <ReceiveContent /> },
+        { id: 5, label: 'Burn', hover: "Burn LBRY tokens instantly for ICP or ALEX tokens, reducing supply and enabling seamless exchange on the platform.", content: <BurnContent /> },
+        { id: 6, label: 'Stake', hover: null, content: <StakeContent /> },
+        { id: 8, label: 'Reedem', hover: null, content: <RedeemContent /> },
+        { id: 7, label: 'Transaction history', hover: null, content: <TransactionHistory /> }
     ];
 
     useEffect(() => {
         dispatch(getLBRYratio());
-        dispatch(getMaxLbryBurn());
-        dispatch(getAlexMintRate())
+        dispatch(getAlexMintRate());
+
     }, [])
     useEffect(() => {
-        if (swap.burnSuccess === true || swap.swapSuccess === true) {
+        if (swap.burnSuccess === true) {
             dispatch(getLBRYratio());
-            dispatch(getMaxLbryBurn());
-            dispatch(getAlexMintRate())
+
         }
+        // else if (swap.swapSuccess === true) {
+        //     dispatch(getAlexMintRate());
+        // }
     }, [swap])
     return (
         <div className='tabs py-10 2xl:py-20 xl:py-16 lg:py-14 md:py-12 sm:py-10'>
@@ -56,16 +56,21 @@ const SwapMain = () => {
                 <AccountCards />
                 <div className='tabs-content'>
                     <div className='tabs-content'>
-                        <div className="flex border-b mb-5 flex-wrap">
+                        <div className="flex mb-5 flex-wrap">
                             {tabs.map(tab => (
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`px-2 py-2 ${activeTab === tab.id
-                                        ? 'text-base 2xl:text-xl font-semibold text-multycolor border-b-2 border-multycolor'
-                                        : 'text-gray-500 hover:text-gray-500'} transition-colors duration-300 text-base font-semibold leading-6`}
+                                    className={`px-2 py-2 flex items-center ${activeTab === tab.id
+                                        ? 'text-base 2xl:text-xl text-white border-black bg-black px-5'
+                                        : 'bg-white'}transition-colors duration-300 text-base font-semibold leading-6 min-w-24 h-11 border border-gray-400 rounded-2xl mr-3  hover:bg-black text-black hover:text-white px-5`}
                                 >
                                     {tab.label}
+                                    {tab.hover === null ? (<></>) : (<div className='relative group'>
+                                        <FontAwesomeIcon icon={faQuestionCircle} className='text-[#cccccc] text-2xl ml-3 position-relative' />
+                                        <span className='bg-[#C5CFF9] text-black p-3 rounded-2xl absolute bottom-12 left-1/2 -translate-x-1/2 text-xs font-light w-52 z-10 opacity-0 group-hover:opacity-100 before:content-[" "] before:block before:absolute before:border-l-[10px] before:border-l-transparent before:border-r-[10px] before:border-r-transparent before:border-b-[20px] before:border-b-[#C5CFF9] before:rotate-180 before:-bottom-5 before:left-1/2 before:-translate-x-1/2'>{tab.hover}</span>
+                                    </div>)}
+
                                 </button>
                             ))}
                         </div>

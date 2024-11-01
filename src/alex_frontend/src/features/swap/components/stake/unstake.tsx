@@ -6,14 +6,19 @@ import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
 import { flagHandler } from "../../swapSlice";
 import unstake from "../../thunks/unstake";
-
-const Unstake = () => {
+interface UnstakeProps {
+    setLoadingModalV: any;
+    setActionType: any;
+}
+const Unstake: React.FC<UnstakeProps> = ({ setLoadingModalV,setActionType}) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
 
     const handleUnstake = (e: any) => {
         e.preventDefault();
-        dispatch(unstake())
+        dispatch(unstake());
+        setActionType("UnStake ICP");
+        setLoadingModalV(true);
     }
     useEffect(() => {
         if (swap.unstakeSuccess === true) {

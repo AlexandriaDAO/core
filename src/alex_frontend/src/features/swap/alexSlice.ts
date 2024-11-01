@@ -25,7 +25,7 @@ const alexSlice = createSlice({
   name: "alex",
   initialState,
   reducers: {
-    flagHandler: (state) => {
+    alexFlagHandler: (state) => {
       state.transferSuccess = false;
       state.error = null;
     },
@@ -63,5 +63,5 @@ const alexSlice = createSlice({
       })
   },
 });
-
+export const { alexFlagHandler } = alexSlice.actions;
 export default alexSlice.reducer;
