@@ -31,10 +31,14 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
   const isMintable = mintableStateItem?.mintable;
   const predictions = mintableStateItem?.predictions;
 
-  if (!content) {
+  const hasError = !content || content.error;
+  if (hasError) {
     return (
-      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-        <LoaderPinwheel className="animate-spin text-4xl text-gray-500" />
+      <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center gap-2">
+        <File className="text-gray-500 text-4xl" />
+        <span className="text-sm text-gray-600">
+          {content?.error || "Content failed to load"}
+        </span>
       </div>
     );
   }

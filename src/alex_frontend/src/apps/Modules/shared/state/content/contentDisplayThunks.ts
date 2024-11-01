@@ -1,7 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { 
   setTransactions, 
-  addTransactions, 
   clearTransactions,
   setMintableStates,
   setContentData,
@@ -11,6 +10,7 @@ import {
 import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 import { Transaction } from '../../../shared/types/queries';
+import { RootState } from '@/store';
 
 export const loadContentForTransactions = createAsyncThunk(
   'contentDisplay/loadContent',
@@ -45,13 +45,21 @@ export const loadContentForTransactions = createAsyncThunk(
 
 export const updateTransactions = createAsyncThunk(
   'contentDisplay/updateTransactions',
-  async (arweaveIds: string[], { dispatch }) => {
+  async (arweaveIds: string[], { dispatch, getState }) => {
     try {
+      const state = getState() as RootState;
+      const sortAsc = state.library.sortAsc;
+
       const fetchedTransactions = await fetchTransactionsApi({
         nftIds: arweaveIds,
       });
 
-      dispatch(setTransactions(fetchedTransactions));
+      // Apply sorting based on sortAsc
+      const sortedTransactions = sortAsc 
+        ? fetchedTransactions 
+        : [...fetchedTransactions].reverse();
+
+      dispatch(setTransactions(sortedTransactions));
 
       // Set initial mintable state for new transactions
       const newMintableStates = fetchedTransactions.reduce((acc, transaction) => {
@@ -59,34 +67,6 @@ export const updateTransactions = createAsyncThunk(
         return acc;
       }, {} as Record<string, MintableStateItem>);
       dispatch(setMintableStates(newMintableStates));
-
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-      throw error;
-    }
-  }
-);
-
-export const appendTransactions = createAsyncThunk(
-  'contentDisplay/appendTransactions',
-  async (arweaveIds: string[], { dispatch, getState }) => {
-    try {
-      const fetchedTransactions = await fetchTransactionsApi({
-        nftIds: arweaveIds,
-      });
-
-      dispatch(addTransactions(fetchedTransactions));
-
-      // Set initial mintable state for new transactions
-      const state = getState() as { contentDisplay: { mintableState: Record<string, MintableStateItem> } };
-      const currentMintableStates = state.contentDisplay.mintableState;
-      const newMintableStates = fetchedTransactions.reduce((acc, transaction) => {
-        if (!currentMintableStates[transaction.id]) {
-          acc[transaction.id] = { mintable: false };
-        }
-        return acc;
-      }, {} as Record<string, MintableStateItem>);
-      dispatch(setMintableStates({ ...currentMintableStates, ...newMintableStates }));
 
     } catch (error) {
       console.error("Error fetching transactions:", error);

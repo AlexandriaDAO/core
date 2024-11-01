@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setIsLoading } from './arweaveSlice';
 import { setMintableStates } from '../content/contentDisplaySlice';
-import { setTransactions, clearTransactions } from '../content/contentDisplaySlice';
+import { setTransactions } from '../content/contentDisplaySlice';
 import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
 import { SearchState } from '../../../shared/types/queries';
 import { loadContentForTransactions } from '../content/contentDisplayThunks';
@@ -16,8 +16,7 @@ export const performSearch = createAsyncThunk(
     const { searchState } = params;
 
     dispatch(setIsLoading(true));
-    // Clear previous transactions and mintable state before starting a new search
-    dispatch(clearTransactions());
+
 
     try {
       let maxTimestamp: number | undefined;

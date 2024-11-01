@@ -1,4 +1,4 @@
-import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SearchState } from '../../../shared/types/queries';
 import { fileTypeCategories } from '../../../shared/types/files';
 import { setMintableState } from '../content/contentDisplaySlice';
@@ -62,6 +62,9 @@ const arweaveSlice = createSlice({
     setNsfwModelLoaded: (state, action: PayloadAction<boolean>) => {
       state.nsfwModelLoaded = action.payload;
     },
+    clearPredictions: (state) => {
+      state.predictions = {};
+    },
   },
 });
 
@@ -72,7 +75,7 @@ export const updatePredictionResults = createAsyncThunk(
     dispatch(setPredictionResults({ id, predictions }));
     
     // Update mintable state based on predictions
-    const isMintable = !predictions.isPorn; // or whatever logic you use to determine mintability
+    const isMintable = !predictions.isPorn;
     dispatch(setMintableState({ id, mintable: isMintable }));
   }
 );
@@ -84,6 +87,7 @@ export const {
   setFilterTime,
   setPredictionResults,
   setNsfwModelLoaded,
+  clearPredictions,
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;

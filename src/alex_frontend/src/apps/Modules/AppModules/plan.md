@@ -1,14 +1,9 @@
+Filtering in the personal library needs to be handled next. 
+So basically another seach compontent, but for the local version that filters state with our own javascript logic.
 
-Next let's deal with the mintable state, which is mentioned in like 10 different places. Let's get it to be a single source of truth.
+&& Figuring out state cleanup for personal library setup.
 
-Mintable state should move to contentDisplay (so 'transactions').
-
-
-That should be handled, but now we're not finished reading mintlable state so the mint-token and info buttons are not showing, but they should be there okay.
-
-
-
-
+&& I just have to attach the 'reverse' thing to a redux state from the library.
 
 First of all the state managemnet for transactions is still a mess. 
 

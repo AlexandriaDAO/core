@@ -34,9 +34,6 @@ const contentDisplaySlice = createSlice({
     clearTransactions: (state) => {
       state.transactions = [];
     },
-    addTransactions: (state, action: PayloadAction<Transaction[]>) => {
-      state.transactions = [...state.transactions, ...action.payload];
-    },
     setMintableState: (state, action: PayloadAction<{ id: string; mintable: boolean }>) => {
       const { id, mintable } = action.payload;
       state.mintableState[id] = { mintable };
@@ -64,7 +61,6 @@ const contentDisplaySlice = createSlice({
 export const { 
   setTransactions, 
   clearTransactions, 
-  addTransactions,
   setMintableState,
   setMintableStates,
   resetMintableState,
