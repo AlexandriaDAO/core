@@ -19,7 +19,6 @@ service : (opt InitArgs) -> {
   claim_icp_reward : () -> (Result);
   distribute_reward : () -> (Result);
   distribute_reward_wrapper : () -> ();
-  fetch_canister_icp_balance : () -> (Result_1) query;
   get_all_apy_values : () -> (vec record { nat32; nat }) query;
   get_all_archive_balances : () -> (
       vec record { principal; ArchiveBalance },

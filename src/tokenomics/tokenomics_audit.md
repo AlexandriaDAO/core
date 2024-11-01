@@ -115,7 +115,7 @@ Here's how I do it (with the frontend canister in the NFT manager):
 
 ```
 // in lib.rs
-pub const FRONTEND_CANISTER_ID: &str = "xo3nl-yaaaa-aaaap-abl4q-cai";
+pub const FRONTEND_CANISTER_ID: &str = "yj5ba-aiaaa-aaaap-qkmoa-cai";
 
 pub fn frontend_principal() -> Principal {
     get_principal(FRONTEND_CANISTER_ID)

@@ -24,8 +24,8 @@ use num_traits::{pow};
 
 static BM_COUNTER: AtomicUsize = AtomicUsize::new(1);
 const DECIMALS: usize=8; 
-const LBRY_CANISTER_ID: &str = "hdtfn-naaaa-aaaam-aciva-cai";
-const TOKENOMICS_CANISTER_ID: &str = "chddw-rqaaa-aaaao-qevqq-cai";
+const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
+const TOKENOMICS_CANISTER_ID: &str = "5abki-kiaaa-aaaap-qkmsa-cai";
 
 #[ic_cdk::update]
 pub async fn init_bm(
@@ -184,7 +184,7 @@ let favorite_owner_principal: Option<candid::Principal> = BM.with(|bm| {
 //     ic_cdk::println!("Ok here am I ?");
 //     // 1. Asynchronously call another canister function using `ic_cdk::call`.
 //     let result = ic_cdk::call::<(f64,Principal,), (Result<String, String>,)>(
-//         Principal::from_text("chddw-rqaaa-aaaao-qevqq-cai")
+//         Principal::from_text("5abki-kiaaa-aaaap-qkmsa-cai")
 //             .expect("Could not decode the principal."),
 //         "burn_n_mint",
 //         (lbry_amount,caller()),

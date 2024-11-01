@@ -319,7 +319,7 @@ shared(_init_msg) actor class Example(_args : {
   /////////
 
   public shared(msg) func icrcX_mint(tokens: ICRC7.SetNFTRequest) : async [ICRC7.SetNFTResult] {
-    assert(msg.caller == Principal.fromText("forhl-tiaaa-aaaak-qc7ga-cai"));
+    assert(msg.caller == Principal.fromText("5sh5r-gyaaa-aaaap-qkmra-cai"));
 
     switch(icrc7().set_nfts<system>(msg.caller, tokens, true)){
       case(#ok(val)) val;
@@ -328,7 +328,7 @@ shared(_init_msg) actor class Example(_args : {
   };
 
   public shared(msg) func icrcX_burn(tokens: ICRC7.BurnNFTRequest) : async ICRC7.BurnNFTBatchResponse {
-    assert(msg.caller == Principal.fromText("forhl-tiaaa-aaaak-qc7ga-cai"));
+    assert(msg.caller == Principal.fromText("5sh5r-gyaaa-aaaap-qkmra-cai"));
 
       switch(icrc7().burn_nfts<system>(msg.caller, tokens)){
         case(#ok(val)) val;
@@ -340,7 +340,7 @@ shared(_init_msg) actor class Example(_args : {
 
   // Function to initialize archived nfts.
   public shared(msg) func initialize_nfts() : async () {
-    assert(msg.caller == Principal.fromText("forhl-tiaaa-aaaak-qc7ga-cai"));
+    assert(msg.caller == Principal.fromText("5sh5r-gyaaa-aaaap-qkmra-cai"));
     await NFTArchive.initialize_nfts(icrc7(), init_msg.caller);
   };
 

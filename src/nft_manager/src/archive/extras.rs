@@ -3,7 +3,7 @@
 
 // #[ic_cdk::update]
 // pub async fn batch_mint_nft(descriptions: Vec<String>, minting_numbers: Vec<Nat>) -> Result<String, String> {
-//     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
+//     let icrc7_canister_id = Principal::from_text("53ewn-qqaaa-aaaap-qkmqq-cai")
 //         .expect("Invalid ICRC7 canister ID");
 
 //     if descriptions.len() != minting_numbers.len() {

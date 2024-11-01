@@ -34,7 +34,7 @@ create_nft_proposal(mint_numbers: Vec<Nat>, desciption: string)
 
 Voting on proposals: 
   - Users with a stake can optionally vote once, and their vote weight is their stake.
-    - You can get the stake from this function which is call able in the icp_swap canister (5qx27-tyaaa-aaaal-qjafa-cai): 
+    - You can get the stake from this function which is call able in the icp_swap canister (54fqz-5iaaa-aaaap-qkmqa-cai): 
 ```
 #[query]
 pub fn get_stake(principal: Principal) -> Option<Stake> {
@@ -277,7 +277,7 @@ async fn settle_proposal(proposal_id: u64) {
 
 #[update(guard = "not_anon")]
 async fn get_stake(principal: Principal) -> Result<Nat, String> {
-    let icp_swap_canister = Principal::from_text("5qx27-tyaaa-aaaal-qjafa-cai").unwrap();
+    let icp_swap_canister = Principal::from_text("54fqz-5iaaa-aaaap-qkmqa-cai").unwrap();
     let call_result: CallResult<(Option<Stake>,)> = ic_cdk::call(
         icp_swap_canister,
         "get_stake",
@@ -367,7 +367,7 @@ pub async fn burn_forever(token_id: Nat) -> Result<BurnOk, String> {
         return Err("NFT is not owned by the caller".to_string());
     }
 
-    let target_principal = Principal::from_text("forhl-tiaaa-aaaak-qc7ga-cai").unwrap();
+    let target_principal = Principal::from_text("5sh5r-gyaaa-aaaap-qkmra-cai").unwrap();
 
     let mint_request = SetNFTItemRequest {
         token_id: token_id.clone(),

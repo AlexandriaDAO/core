@@ -7,7 +7,7 @@ module{
         symbol = ?"ALEX";
         name = ?"Alexandria";
         description = ?"The official NFT Collection of the Alexandria Project";
-        logo = ?"https://xo3nl-yaaaa-aaaap-abl4q-cai.icp0.io/images/logo.png";
+        logo = ?"https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io/images/logo.png";
         supply_cap = null;
         allow_transfers = null;
         atomic_batch_transfers = true;
@@ -29,7 +29,7 @@ module{
 // We use this burn_account with interenal logic of unverified nfts. If unverified NFTs are burned by their users, they belong to the NFT_manager canister until the DAO decides to burn it.
 // For actually burning to the null address, only owners of verified nfts are allowed to do this.
         // burn_account = ?{
-        //   owner = Principal.fromText("fjqb7-6qaaa-aaaak-qc7gq-cai");
+        //   owner = Principal.fromText("53ewn-qqaaa-aaaap-qkmqq-cai");
         //   subaccount = null;
         // };        
 
@@ -43,7 +43,7 @@ module{
 //         symbol = ?"ALEX";
 //         name = ?"Alexandria";
 //         description = ?"The official NFT Collection of the Alexandria Project";
-//         logo = ?"https://xo3nl-yaaaa-aaaap-abl4q-cai.icp0.io/images/logo.png";
+//         logo = ?"https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io/images/logo.png";
 //         supply_cap = null;
 //         allow_transfers = null;
 //         max_query_batch_size = ?100;

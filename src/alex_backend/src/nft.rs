@@ -57,7 +57,7 @@ pub struct TokenDetail {
 
 #[ic_cdk::update]
 pub async fn mint_nft(description: String) -> Result<String, String> {
-    let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
+    let icrc7_canister_id = Principal::from_text("53ewn-qqaaa-aaaap-qkmqq-cai")
         .expect("Invalid ICRC7 canister ID");
 
     let total_supply = current_mint().await?;
@@ -123,7 +123,7 @@ pub async fn mint_nft(description: String) -> Result<String, String> {
 
 #[ic_cdk::update]
 async fn current_mint() -> Result<Nat, String> {
-    let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai")
+    let icrc7_canister_id = Principal::from_text("53ewn-qqaaa-aaaap-qkmqq-cai")
         .expect("Invalid ICRC7 canister ID");
 
     let call_result: CallResult<(Nat,)> = ic_cdk::call(
@@ -143,7 +143,7 @@ async fn current_mint() -> Result<Nat, String> {
 
 // // Function to get all token IDs
 // async fn get_tokens() -> Result<Vec<Nat>, String> {
-//     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai").expect("Invalid ICRC7 canister ID");
+//     let icrc7_canister_id = Principal::from_text("53ewn-qqaaa-aaaap-qkmqq-cai").expect("Invalid ICRC7 canister ID");
 
 //     let tokens_call_result: CallResult<(Vec<Nat>,)> = ic_cdk::call(
 //         icrc7_canister_id,
@@ -165,7 +165,7 @@ async fn current_mint() -> Result<Nat, String> {
 
 // // Function to get metadata for a specific token ID
 // async fn get_metadata(token_id: Nat) -> Result<Option<BTreeMap<String, Value>>, String> {
-//     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai").expect("Invalid ICRC7 canister ID");
+//     let icrc7_canister_id = Principal::from_text("53ewn-qqaaa-aaaap-qkmqq-cai").expect("Invalid ICRC7 canister ID");
 
 //     let metadata_call_result: CallResult<(Vec<Option<BTreeMap<String, Value>>>,)> = ic_cdk::call(
 //         icrc7_canister_id,
@@ -199,7 +199,7 @@ async fn current_mint() -> Result<Nat, String> {
 
 // // Function to get the owner for a specific token ID
 // async fn get_owner(token_id: Nat) -> Result<Option<Account>, String> {
-//     let icrc7_canister_id = Principal::from_text("fjqb7-6qaaa-aaaak-qc7gq-cai").expect("Invalid ICRC7 canister ID");
+//     let icrc7_canister_id = Principal::from_text("53ewn-qqaaa-aaaap-qkmqq-cai").expect("Invalid ICRC7 canister ID");
 
 //     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
 //         icrc7_canister_id,

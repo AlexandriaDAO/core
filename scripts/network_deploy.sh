@@ -11,9 +11,9 @@ cp dfx_mainnet.json dfx.json
 
 # Step 1: Deploy NFT Stuff
 
-dfx canister create icrc7 --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai
+dfx canister create icrc7 --specified-id 53ewn-qqaaa-aaaap-qkmqq-cai
 dfx build icrc7
-dfx canister update-settings icrc7 --add-controller forhl-tiaaa-aaaak-qc7ga-cai --network ic
+dfx canister update-settings icrc7 --add-controller 5sh5r-gyaaa-aaaap-qkmra-cai --network ic
 
 cargo build --release --target wasm32-unknown-unknown --package nft_manager
 candid-extractor target/wasm32-unknown-unknown/release/nft_manager.wasm > src/nft_manager/nft_manager.did

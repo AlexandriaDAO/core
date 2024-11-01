@@ -9,9 +9,9 @@ use ic_ledger_types::AccountIdentifier;
 
 
 pub const STAKING_REWARD_PERCENTAGE: u64 = 1000; //multiply by 100 eg. 10% = 1000
-pub const ALEX_CANISTER_ID: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
-pub const LBRY_CANISTER_ID: &str = "hdtfn-naaaa-aaaam-aciva-cai";
-pub const TOKENOMICS_CANISTER_ID: &str = "chddw-rqaaa-aaaao-qevqq-cai";
+pub const ALEX_CANISTER_ID: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";
+pub const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
+pub const TOKENOMICS_CANISTER_ID: &str = "5abki-kiaaa-aaaap-qkmsa-cai";
 pub const XRC_CANISTER_ID: &str = "uf6dk-hyaaa-aaaaq-qaaaq-cai";
 pub const ICP_TRANSFER_FEE: u64 = 10_000;
 pub const ALEX_TRANSFER_FEE: u64 = 10_000;

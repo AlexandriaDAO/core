@@ -37,25 +37,25 @@
       "candid": "src/bookmarks/bookmarks.did",
       "package": "bookmarks",
       "type": "rust",
-      "specified_id": "sklez-7aaaa-aaaan-qlrva-cai"
+      "specified_id": "ya6k4-waaaa-aaaap-qkmpq-cai"
     },
     "icp_swap": {
       "candid": "src/icp_swap/icp_swap.did",
       "package": "icp_swap",
       "type": "rust",
-      "specified_id":"5qx27-tyaaa-aaaal-qjafa-cai"
+      "specified_id":"54fqz-5iaaa-aaaap-qkmqa-cai"
     },
     "icrc7": {
       "main": "src/icrc7/main.mo",
       "candid": "src/declarations/icrc7/icrc7.did",
       "type": "motoko",
-      "specified_id": "fjqb7-6qaaa-aaaak-qc7gq-cai"
+      "specified_id": "53ewn-qqaaa-aaaap-qkmqq-cai"
     },
     "nft_manager": {
       "candid": "src/nft_manager/nft_manager.did",
       "package": "nft_manager",
       "type": "rust",
-      "specified_id":"forhl-tiaaa-aaaak-qc7ga-cai"
+      "specified_id":"5sh5r-gyaaa-aaaap-qkmra-cai"
     },
     "internet_identity": {
       "type": "pull",
@@ -65,19 +65,19 @@
       "candid": "src/tokenomics/tokenomics.did",
       "package": "tokenomics",
       "type": "rust",
-      "id": "chddw-rqaaa-aaaao-qevqq-cai"
+      "id": "5abki-kiaaa-aaaap-qkmsa-cai"
     },
     "LBRY": {
       "type": "custom",
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
-      "id": "hdtfn-naaaa-aaaam-aciva-cai"
+      "id": "y33wz-myaaa-aaaap-qkmna-cai"
     },
     "ALEX": {
       "type": "custom",
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
-      "id": "7hcrm-4iaaa-aaaak-akuka-cai"
+      "id": "ysy5f-2qaaa-aaaap-qkmmq-cai"
     },
     "registry": {
       "candid": "src/registry/registry.did",

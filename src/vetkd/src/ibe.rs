@@ -14,9 +14,9 @@ use ic_cdk::api::management_canister::main::raw_rand;
 use crate::utility::{IBECiphertext, TransportSecretKey};
 
 
-const SYSTEM_API_CANISTER_ID: &str = "xhfe4-aqaaa-aaaak-akv4q-cai";
-const ALEX_WALLET_CANISTER_ID: &str = "ju4sh-3yaaa-aaaap-ahapa-cai";
-const FRONTEND_CANISTER_ID: &str = "xo3nl-yaaaa-aaaap-abl4q-cai";
+const SYSTEM_API_CANISTER_ID: &str = "5vg3f-laaaa-aaaap-qkmrq-cai";
+const ALEX_WALLET_CANISTER_ID: &str = "yh7mi-3yaaa-aaaap-qkmpa-cai";
+const FRONTEND_CANISTER_ID: &str = "yj5ba-aiaaa-aaaap-qkmoa-cai";
 
 #[update]
 pub async fn encryption_key() -> String {

@@ -78,7 +78,7 @@ This way the only hardcoded canister id is the registry canister id, which will 
 It's preferable to put this in the lib.rs file so we know what canisters each canister interacts with very easily.
 
 <!-- ```rust
-pub const ALEX_CANISTER_ID: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
+pub const ALEX_CANISTER_ID: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";
 
 pub fn alex_principal() -> Principal {
     get_principal(ALEX_CANISTER_ID)

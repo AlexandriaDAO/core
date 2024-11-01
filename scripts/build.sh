@@ -21,14 +21,14 @@ dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
 
 # Step 3: Deploy nft_manager, which deploys icrc7
 
-dfx canister create icrc7 --specified-id fjqb7-6qaaa-aaaak-qc7gq-cai
+dfx canister create icrc7 --specified-id 53ewn-qqaaa-aaaap-qkmqq-cai
 dfx build icrc7
-dfx canister update-settings icrc7 --add-controller forhl-tiaaa-aaaak-qc7ga-cai
+dfx canister update-settings icrc7 --add-controller 5sh5r-gyaaa-aaaap-qkmra-cai
 
 cargo build --release --target wasm32-unknown-unknown --package nft_manager
 candid-extractor target/wasm32-unknown-unknown/release/nft_manager.wasm > src/nft_manager/nft_manager.did
 
-dfx deploy nft_manager --specified-id forhl-tiaaa-aaaak-qc7ga-cai
+dfx deploy nft_manager --specified-id 5sh5r-gyaaa-aaaap-qkmra-cai
 
 # Step 4: Generate all other backend canisters.
 
@@ -58,17 +58,17 @@ candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/ve
 
 cargo update
 
-dfx deploy bookmarks --specified-id sklez-7aaaa-aaaan-qlrva-cai
-dfx deploy alex_backend --specified-id xj2l7-vyaaa-aaaap-abl4a-cai
-dfx deploy icp_swap --specified-id 5qx27-tyaaa-aaaal-qjafa-cai
+dfx deploy bookmarks --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
+dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
+dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
 dfx deploy registry --specified-id uxyan-oyaaa-aaaap-qhezq-cai
-dfx deploy tokenomics --specified-id chddw-rqaaa-aaaao-qevqq-cai
+dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
 
-dfx deploy alex_librarian --specified-id rby3s-dqaaa-aaaak-qizqa-cai
-dfx deploy vetkd --specified-id fzemm-saaaa-aaaan-qlsla-cai
-dfx deploy system_api --specified-id xhfe4-aqaaa-aaaak-akv4q-cai
+dfx deploy alex_librarian --specified-id yo4hu-nqaaa-aaaap-qkmoq-cai
+dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
+dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 
-dfx deploy alex_wallet --specified-id ju4sh-3yaaa-aaaap-ahapa-cai
+dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
 
 
 # Step 5: Configure Local Identities for token launches
@@ -104,7 +104,7 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
   })  
 "
 
-dfx deploy LBRY --specified-id hdtfn-naaaa-aaaam-aciva-cai --argument '(variant { Init = 
+dfx deploy LBRY --specified-id y33wz-myaaa-aaaap-qkmna-cai --argument '(variant { Init = 
 record {
      token_symbol = "LBRY";
      token_name = "LBRY";
@@ -126,7 +126,7 @@ record {
 
 
 
-dfx deploy ALEX --specified-id 7hcrm-4iaaa-aaaak-akuka-cai --argument '(variant { Init = 
+dfx deploy ALEX --specified-id ysy5f-2qaaa-aaaap-qkmmq-cai --argument '(variant { Init = 
 record {
      token_symbol = "ALEX";
      token_name = "ALEX";
@@ -157,7 +157,7 @@ touch .dfx/local/canisters/LBRY/LBRY.did
 touch .dfx/local/canisters/ALEX/ALEX.did
 
 npm i
-# dfx deploy alex_frontend --specified-id xo3nl-yaaaa-aaaap-abl4q-cai
+# dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 
 ## Helpful extras for testing.
 # dfx ledger balance

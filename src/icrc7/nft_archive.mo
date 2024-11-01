@@ -1,4 +1,3 @@
-// This backup taken at 2024-10-26 8:15am EST
 import ICRC7 "mo:icrc7-mo";
 import Principal "mo:base/Principal";
 import D "mo:base/Debug";
@@ -210,6 +209,8 @@ module {
       { token_id = 114_834_251_862_369_500_565_087_182_682_167_727_228_931_737_706_268_490_271_795_466_107_791_181_936_697; owner = Principal.fromText("7ua4j-6yl27-53cku-vh62o-z5cop-gdg7q-vhqet-hwlbt-ewfja-xbokg-2qe"); description = ""; },
       { token_id = 46_492_467_802_848_646_612_563_198_185_741_519_299_575_760_821_152_300_378_439_765_009_867_543_856_224; owner = Principal.fromText("7ua4j-6yl27-53cku-vh62o-z5cop-gdg7q-vhqet-hwlbt-ewfja-xbokg-2qe"); description = ""; },
       { token_id = 16_928_526_199_065_266_065_050_902_648_090_505_749_571_558_712_922_137_796_585_220_263_164_205_657_492; owner = Principal.fromText("7ua4j-6yl27-53cku-vh62o-z5cop-gdg7q-vhqet-hwlbt-ewfja-xbokg-2qe"); description = ""; },
+      { token_id = 29_376_166_666_557_040_961_478_920_331_715_921_042_800_570_521_755_047_895_467_867_214_718_779_130_231; owner = Principal.fromText("2vxsx-fae"); description = ""; },
+      { token_id = 23_488_611_310_657_419_238_046_794_413_934_876_814_112_419_328_749_130_577_747_181_376_576_938_241_310; owner = Principal.fromText("2vxsx-fae"); description = ""; },
     ];
 
     let initial_nfts = Array.map<NFTData, ICRC7.SetNFTItemRequest>(

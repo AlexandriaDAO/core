@@ -2,22 +2,22 @@ use ic_cdk::query;
 use candid::Principal;
 
 
-pub const ALEX: &str = "7hcrm-4iaaa-aaaak-akuka-cai";
-pub const LBRY: &str = "hdtfn-naaaa-aaaam-aciva-cai";
-pub const ALEX_BACKEND: &str = "xj2l7-vyaaa-aaaap-abl4a-cai";
-pub const ALEX_FRONTEND: &str = "xo3nl-yaaaa-aaaap-abl4q-cai";
-pub const ALEX_LIBRARIAN: &str = "rby3s-dqaaa-aaaak-qizqa-cai";
-pub const ALEX_WALLET: &str = "ju4sh-3yaaa-aaaap-ahapa-cai";
-pub const BOOKMARKS: &str = "sklez-7aaaa-aaaan-qlrva-cai";
+pub const ALEX: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";
+pub const LBRY: &str = "y33wz-myaaa-aaaap-qkmna-cai";
+pub const ALEX_BACKEND: &str = "y42qn-baaaa-aaaap-qkmnq-cai";
+pub const ALEX_FRONTEND: &str = "yj5ba-aiaaa-aaaap-qkmoa-cai";
+pub const ALEX_LIBRARIAN: &str = "yo4hu-nqaaa-aaaap-qkmoq-cai";
+pub const ALEX_WALLET: &str = "yh7mi-3yaaa-aaaap-qkmpa-cai";
+pub const BOOKMARKS: &str = "ya6k4-waaaa-aaaap-qkmpq-cai";
 pub const ICP_LEDGER: &str = "ryjl3-tyaaa-aaaaa-aaaba-cai";
-pub const ICP_SWAP: &str = "5qx27-tyaaa-aaaal-qjafa-cai";
-pub const ICRC7: &str = "fjqb7-6qaaa-aaaak-qc7gq-cai";
+pub const ICP_SWAP: &str = "54fqz-5iaaa-aaaap-qkmqa-cai";
+pub const ICRC7: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
 pub const INTERNET_IDENTITY: &str = "rdmx6-jaaaa-aaaaa-aaadq-cai";
-pub const NFT_MANAGER: &str = "forhl-tiaaa-aaaak-qc7ga-cai";
+pub const NFT_MANAGER: &str = "5sh5r-gyaaa-aaaap-qkmra-cai";
 pub const REGISTRY: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
-pub const SYSTEM_API: &str = "xhfe4-aqaaa-aaaak-akv4q-cai";
-pub const TOKENOMICS: &str = "chddw-rqaaa-aaaao-qevqq-cai";
-pub const VETKD: &str = "fzemm-saaaa-aaaan-qlsla-cai";
+pub const SYSTEM_API: &str = "5vg3f-laaaa-aaaap-qkmrq-cai";
+pub const TOKENOMICS: &str = "5abki-kiaaa-aaaap-qkmsa-cai";
+pub const VETKD: &str = "5ham4-hqaaa-aaaap-qkmsq-cai";
 pub const XRC: &str = "uf6dk-hyaaa-aaaaq-qaaaq-cai";
 
 #[query]

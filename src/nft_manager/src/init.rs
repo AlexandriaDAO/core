@@ -6,7 +6,7 @@ use serde::{Serialize, Deserialize};
 use ic_cdk::api::management_canister::main::{InstallCodeArgument, CanisterInstallMode};
 
 const ICRC7_WASM: &[u8] = include_bytes!("./../../../.dfx/local/canisters/icrc7/icrc7.wasm");
-const ICRC7_CANISTER_ID: &str = "fjqb7-6qaaa-aaaak-qc7gq-cai";
+const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
 
 #[derive(CandidType, Serialize, Deserialize)]
 struct DeployArgs {
