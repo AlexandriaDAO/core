@@ -37,8 +37,6 @@ const CopyHelper:React.FC<copyHelperProps> = ({account}) => {
         } catch (error: any) {
             console.error('Error copying to clipboard:', error);
             setSuccessfullyCopied(false);
-
-            // alert('Error copying to clipboard.');
         }
     }
 

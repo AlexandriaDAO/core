@@ -8,10 +8,12 @@ import getIcpBal from "./thunks/getIcpBal";
 import transferICP from "./thunks/transferICP";
 import getAccountId from "./thunks/getAccountId";
 import getIcpPrice from "./thunks/getIcpPrice";
+import getCanisterBal from "./thunks/getCanisterBal";
 // Define the interface for our node state
 export interface icpLedgerState {
   accountBalance: string;
-  accountBalanceUSD:string;
+  accountBalanceUSD: string;
+  canisterBalance: string;
   loading: boolean;
   transferSuccess: boolean;
   accountId: string;
@@ -22,11 +24,12 @@ export interface icpLedgerState {
 // Define the initial state using the ManagerState interface
 const initialState: icpLedgerState = {
   accountBalance: "0",
-  accountBalanceUSD:"0",
+  accountBalanceUSD: "0",
+  canisterBalance: "0",
   loading: false,
   transferSuccess: false,
   accountId: "N/A",
-  icpPrice:0,
+  icpPrice: 0,
   error: null,
 };
 
@@ -50,7 +53,9 @@ const icpLedgerSlice = createSlice({
       .addCase(getIcpBal.fulfilled, (state, action) => {
         toast.success("Successfully fetched icp balance.");
         state.accountBalance = action.payload.formatedAccountBal;
-        state.accountBalanceUSD=(Number(action.payload.formatedAccountBal)*Number(state.icpPrice)).toFixed(4);
+        state.accountBalanceUSD = (
+          Number(action.payload.formatedAccountBal) * Number(state.icpPrice)
+        ).toFixed(4);
         state.loading = false;
         state.error = null;
       })
@@ -96,11 +101,27 @@ const icpLedgerSlice = createSlice({
       .addCase(getIcpPrice.fulfilled, (state, action) => {
         state.loading = false;
         state.icpPrice = action.payload;
-        state.accountBalanceUSD=(Number(state.accountBalance)*Number(action.payload)).toFixed(4);
+        state.accountBalanceUSD = (
+          Number(state.accountBalance) * Number(action.payload)
+        ).toFixed(4);
         state.error = null;
       })
       .addCase(getIcpPrice.rejected, (state, action) => {
         toast.error("Error while fetching ICP price!");
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(getCanisterBal.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getCanisterBal.fulfilled, (state, action) => {
+        state.canisterBalance = action.payload.formatedAccountBal;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(getCanisterBal.rejected, (state, action) => {
+        toast.error("Canister balance could not be fetched!");
         state.loading = false;
         state.error = action.payload as string;
       });

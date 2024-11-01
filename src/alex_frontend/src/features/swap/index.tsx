@@ -7,8 +7,6 @@ const Swap = () => {
 
 	return (
 		<>
-			<SubHeader>
-			</SubHeader>
 			<SwapMain/>
 		</>
 	);

@@ -1,6 +1,6 @@
 use crate::{
-    fetch_canister_icp_balance, get_current_LBRY_ratio, get_distribution_interval,
-    get_total_alex_staked, get_total_archived_balance, get_total_unclaimed_icp_reward, guard::*,
+    get_current_LBRY_ratio, get_distribution_interval, get_total_archived_balance,
+    get_total_unclaimed_icp_reward, guard::*,
 };
 use crate::{get_stake, storage::*};
 use crate::{get_user_archive_balance, utils::*};
@@ -168,7 +168,7 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
 
     // Alex mint 21M only
     let limit_result = within_max_limit(amount_lbry).await;
-    if limit_result> 0 {
+    if limit_result > 0 {
         match mint_ALEX(limit_result, caller).await {
             Ok(result) => {
                 // Mint ALEX was successful
@@ -389,6 +389,7 @@ async fn un_stake_all_ALEX() -> Result<String, String> {
     Ok("UnStaked Successfully!".to_string())
 }
 //Guard ensure call is only by canister.
+//For testing using #[update]
 #[update(guard = "is_canister")]
 pub async fn distribute_reward() -> Result<String, String> {
     let intervals = get_distribution_interval();

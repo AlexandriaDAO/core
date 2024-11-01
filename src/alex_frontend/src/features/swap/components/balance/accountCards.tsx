@@ -71,8 +71,10 @@ const AccountCards: React.FC = () => {
     return (
         <>
             <div className="grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-3 2xl:mb-12 xl:mb-10 lg:mb-7 md:mb-6 sm:mb-5">
-                <div className="bg-balancebox text-white py-5 px-5 me-0 2xl:me-3 xl:me-3 lg:me-3 md:me-3 sm:me-0 rounded-3xl xxl:py-5 xxl:px-5 mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-3">
-                    <h4 className="text-2xl xl:text-xl font-medium mb-3  2xl:mb-3  xl:mb-3">
+                <div 
+                    style={{backgroundImage: 'url("images/gradient-bg.png")'}}
+                    className="bg-[#353535] text-white py-10 px-14 me-0 2xl:me-3 xl:me-3 lg:me-3 md:me-3 sm:me-0 rounded-3xl xxl:py-5 xxl:px-5 mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-3 ">
+                    <h4 className="account-box-bg text-2xl xl:text-xl font-medium mb-3  2xl:mb-3  xl:mb-3">
                         Principal Account
                     </h4>
 

@@ -2,7 +2,6 @@ import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import { toast } from "sonner";
 import getLBRYratio from "./thunks/getLBRYratio";
 import swapLbry from "./thunks/swapLbry";
-import getMaxLbryBurn from "./thunks/getMaxLbryBurn";
 import burnLbry from "./thunks/burnLBRY";
 import getLbryBalance from "./thunks/lbryIcrc/getLbryBalance";
 import stakeAlex from "./thunks/stakeAlex";
@@ -17,11 +16,17 @@ import getLBRYTransactions from "./thunks/lbryIcrc/getTransactions";
 
 import { TransactionType } from "./thunks/lbryIcrc/getTransactions";
 import getStakersCount from "./thunks/getStakersCount";
+import getCanisterArchivedBal from "./thunks/getCanisterArchivedBal";
+import getAverageApy from "./thunks/getAverageApy";
 // Define the interface for our node state
 export interface StakeInfo {
   stakedAlex: string;
   rewardIcp: string;
   unix_stake_time: string;
+}
+export interface CanisterArchived {
+  canisterArchivedBal: Number;
+  canisterUnClaimedIcp: Number;
 }
 
 export interface SwapState {
@@ -30,8 +35,9 @@ export interface SwapState {
   archivedBalance: string;
   maxLbryBurn: Number;
   stakeInfo: StakeInfo;
-  totalStakers:string;
+  totalStakers: string;
   totalStaked: string;
+  canisterArchivedBal: CanisterArchived;
   loading: boolean;
   swapSuccess: boolean;
   burnSuccess: boolean;
@@ -40,8 +46,8 @@ export interface SwapState {
   unstakeSuccess: boolean;
   transferSuccess: boolean;
   redeeemSuccess: boolean;
-  
   transactions: TransactionType[];
+  averageAPY: number;
   error: string | null;
 }
 
@@ -52,7 +58,8 @@ const initialState: SwapState = {
   archivedBalance: "0",
   maxLbryBurn: 0,
   stakeInfo: { stakedAlex: "0", rewardIcp: "0", unix_stake_time: "0" },
-  totalStakers:"0",
+  totalStakers: "0",
+  canisterArchivedBal: { canisterUnClaimedIcp: 0, canisterArchivedBal: 0 },
   totalStaked: "0",
   swapSuccess: false,
   redeeemSuccess: false,
@@ -63,6 +70,7 @@ const initialState: SwapState = {
   transferSuccess: false,
   transactions: [],
   loading: false,
+  averageAPY: 0,
   error: null,
 };
 
@@ -227,21 +235,7 @@ const swapSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      .addCase(getMaxLbryBurn.pending, (state) => {
-        // toast.info("Fetching max allowed LBRY burn!");
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(getMaxLbryBurn.fulfilled, (state, action) => {
-        // toast.success("Successfully fetched max allowed burn!");
-        state.maxLbryBurn = action.payload;
-        state.error = null;
-      })
-      .addCase(getMaxLbryBurn.rejected, (state, action) => {
-        toast.error("Error while fethcing max burn LBRY!");
-        state.loading = false;
-        state.error = action.payload as string;
-      })
+
       .addCase(transferLBRY.pending, (state) => {
         toast.info("Processing LBRY transfer!");
         state.loading = true;
@@ -305,7 +299,8 @@ const swapSlice = createSlice({
         toast.error("Error while fetching transactions!");
         state.loading = false;
         state.error = action.payload as string;
-      }).addCase(getStakersCount.pending, (state) => {
+      })
+      .addCase(getStakersCount.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -316,6 +311,34 @@ const swapSlice = createSlice({
       })
       .addCase(getStakersCount.rejected, (state, action) => {
         toast.error("Error while fetching total stakers!");
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(getCanisterArchivedBal.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getCanisterArchivedBal.fulfilled, (state, action) => {
+        state.loading = false;
+        state.canisterArchivedBal = action.payload;
+        state.error = null;
+      })
+      .addCase(getCanisterArchivedBal.rejected, (state, action) => {
+        toast.error("Error while fetching canister archived balance!");
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(getAverageApy.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAverageApy.fulfilled, (state, action) => {
+        state.loading = false;
+        state.averageAPY = action.payload;
+        state.error = null;
+      })
+      .addCase(getAverageApy.rejected, (state, action) => {
+        toast.error("Error while fetching canister average APY!");
         state.loading = false;
         state.error = action.payload as string;
       });

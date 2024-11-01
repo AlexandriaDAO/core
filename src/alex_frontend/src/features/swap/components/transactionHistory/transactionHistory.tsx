@@ -20,7 +20,7 @@ const TransactionHistory = ( ) => {
                     <tr>
                         <th className="py-3 text-left">
                             <div className='text-xl font-medium text-radiocolor items-center flex'>
-                                <span className='me-2 flex'>Timestemp</span>
+                                <span className='me-2 flex'>Timestamp</span>
                                 <div className='h-5 w-5 border-2 border-[#FF9900] flex justify-center items-center rounded-full '>
                                     <FontAwesomeIcon className='text-multycolor text-xs' icon={faExclamation} />
                                 </div>

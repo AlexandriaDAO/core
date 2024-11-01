@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
 import { useAppDispatch } from '../../../../store/hooks/useAppDispatch';
 import { useAppSelector } from "../../../../store/hooks/useAppSelector";
-import { ActorSubclass } from "@dfinity/agent";
 
 import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
 import { _SERVICE as _SERVICEALEX} from '../../../../../../declarations/ALEX/ALEX.did' 
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 
-const GetAlexBal = () => {
+const GetAlexBal = (user: string) => {
     const dispatch = useAppDispatch();
     const alex = useAppSelector((state) => state.alex);
     const auth = useAppSelector((state) => state.auth);

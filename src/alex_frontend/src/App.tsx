@@ -20,6 +20,8 @@ import Emporium from "./apps/app/Emporium";
 
 import MintPage from "./pages/MintPage";
 
+import "./styles/style.css";
+
 export default function App() {
     return (
         <ReduxProvider>
