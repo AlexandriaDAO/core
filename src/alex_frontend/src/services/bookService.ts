@@ -102,14 +102,21 @@ const client = new ApolloClient({
     cache: new InMemoryCache()
 });
 
-export const fetchManifests = async (): Promise<string[]> => {
+export type Manifest = {
+    id: string;
+    cursor: string;
+};
+
+
+export const fetchManifests = async (after = ''): Promise<Manifest[]> => {
     try {
         const result = await client.query({
         query: gql`
             query {
                 transactions(
+                    first: 6,
                     order: DESC,
-                    first: 100,
+                    after: "${after}",
                     tags: [
                         { name: "Content-Type", values: ["application/x.arweave-manifest+json"] },
                         { name: "application-id", values: ["${APP_ID}"] },
@@ -119,24 +126,24 @@ export const fetchManifests = async (): Promise<string[]> => {
                         node {
                             id
                         }
+                        cursor
                     }
                 }
             }
         `
         });
-        return result.data.transactions.edges.map((edge:any)=>edge.node.id)
+        return result.data.transactions.edges.map(({node, cursor}:any)=>({id: node.id, cursor}))
     } catch (error) {
         console.error('Error fetching all transactions:', error);
         throw error;
     }
 }
 
-export const getBooks = async (): Promise<Book[]> => {
-    const txIds = await fetchManifests();
+export const getBooks = async (manifests: Manifest[]): Promise<Book[]> => {
     const books: Book[] = [];
 
     await Promise.all(
-        txIds.map(async id => {
+        manifests.map(async ({ id }) => {
             try {
                 const response = await fetch(`https://gateway.irys.xyz/${id}`);
                 if (response.ok) {

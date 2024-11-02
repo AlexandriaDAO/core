@@ -4,10 +4,8 @@ import SessionContext from '@/contexts/SessionContext';
 import MeiliSearch, { Index } from 'meilisearch';
 import { initializeClient, initializeIndex } from '@/services/meiliService';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
-import fetchBooks from '@/features/portal/thunks/fetchBooks';
 import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
 import { setEngines } from '@/features/my-engines/myEnginesSlice';
-import { setUser } from '@/features/auth/authSlice';
 import { getAuthClient, getPrincipal } from '@/features/auth/utils/authUtils';
 import principal from '@/features/auth/thunks/principal';
 import logout from '@/features/auth/thunks/logout';
@@ -53,9 +51,6 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	useEffect(() => {
 		// Setup default meiliclient
 		initializeMeiliClient();
-
-		// Load 10 books on app start
-		dispatch(fetchBooks());
 
 		checkAuthentication();
 	}, [dispatch]);

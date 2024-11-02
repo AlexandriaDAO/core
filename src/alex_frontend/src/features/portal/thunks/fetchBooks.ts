@@ -52,20 +52,37 @@ import { ActorSubclass } from '@dfinity/agent';
 import { _SERVICE as _SERVICENFTMANAGER } from '../../../../../declarations/nft_manager/nft_manager.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Book } from '../portalSlice';
-import { getBooks } from '@/services/bookService';
+import { fetchManifests, getBooks } from '@/services/bookService';
 import { getNftManagerActor } from '@/features/auth/utils/authUtils';
-
+import { RootState } from '@/store';
 
 
 // Define the async thunk
 const fetchBooks = createAsyncThunk<
-    Book[], // This is the return type of the thunk's payload
+    {
+        books: Book[],
+        cursor: string,
+        load: boolean,
+    }, // This is the return type of the thunk's payload
     void, //Argument that we pass to initialize
-    { rejectValue: string }
->("portal/fetchBooks", async (_, { rejectWithValue }) => {
+    { rejectValue: string, state: RootState }
+>("portal/fetchBooks", async (_, { rejectWithValue, getState }) => {
     try {
+        const {portal: {cursor, books}} = getState();
 
-        return await getBooks();
+        const txs = await fetchManifests(cursor);
+
+        console.log(txs, txs.length);
+
+        const newBooks = await getBooks(txs);
+
+        const newCursor = txs.length > 0 ? txs[txs.length-1].cursor : '';
+
+        return {
+            books: [...books, ...newBooks],
+            cursor: newCursor,
+            load: txs.length < 6 ? false: true
+        }
 
         // const actorNftManager = await getNftManagerActor();
         // const result = await actorNftManager.get_nfts([], []);

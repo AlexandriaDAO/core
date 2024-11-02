@@ -33,16 +33,16 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 			}`}
 			onClick={() => handleBookClick(book)}
 		>
-			<div className="flex flex-col justify-between gap-3 items-start relative">
+			<div className="flex-grow flex flex-col justify-between gap-3 items-stretch relative">
 				{!imageLoaded && (
                     <img
-                        className="rounded-lg h-80 object-cover animate-pulse"
+                        className="rounded-lg h-80 object-fill animate-pulse"
                         src="/images/default-cover.jpg"
                         alt="Loading..."
                     />
                 )}
                 <img
-                    className={`rounded-lg h-80 object-cover ${imageLoaded ? '' : 'hidden'}`}
+                    className={`rounded-lg h-80 object-fill ${imageLoaded ? '' : 'hidden'}`}
                     src={`https://gateway.irys.xyz/${book.manifest}/cover`}
                     alt={book.title}
                     onLoad={() => setImageLoaded(true)}
