@@ -78,7 +78,11 @@ const Portal: React.FC = () => {
 						<div
 							key="book-modal"
 							ref={bookModalRef}
-							className="col-span-6"
+							className={`col-start-1 col-end-${ITEMS_PER_ROW + 1}`}
+							style={{
+								gridColumnStart: 1,
+								gridColumnEnd: ITEMS_PER_ROW + 1
+							}}
 						>
 							<BookModal book={selectedBook} />
 						</div>
@@ -109,10 +113,10 @@ const Portal: React.FC = () => {
 				<span>{error}</span>
 			</div>}
 			<div
-				className="grid py-4 gap-4"
+				className="w-full grid py-4 gap-4"
 				style={{
-					gridTemplateColumns: `repeat(${ITEMS_PER_ROW}, minmax(0, auto))`,
-					gridTemplateRows: `repeat(${books.length%ITEMS_PER_ROW}, minmax(0, auto))`,
+					gridTemplateColumns: `repeat(${ITEMS_PER_ROW}, minmax(0, 1fr))`,
+					gridTemplateRows: `repeat(${Math.ceil(books.length/ITEMS_PER_ROW)}, minmax(0, auto))`,
 					// grid-cols-${ITEMS_PER_ROW} grid-rows-[repeat(${books.length%ITEMS_PER_ROW}, minmax(0,auto))]
 				}}
 				>

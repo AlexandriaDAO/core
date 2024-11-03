@@ -23,6 +23,8 @@ interface PortalState {
     cursor: string,
     load: boolean,
 
+    limit: number,
+
     loading: boolean;
 	error: string | null;
 }
@@ -36,6 +38,7 @@ const initialState: PortalState = {
 
     // hide/show load more button
     load: true,
+    limit: 10,
 
     loading: false,
 	error: null,
@@ -59,6 +62,11 @@ const portalSlice = createSlice({
         },
         setLoad: (state, action:PayloadAction<boolean>)=>{
             state.load = action.payload
+        },
+        setLimit: (state, action:PayloadAction<number>)=>{
+            state.books = [];
+            state.cursor = '';
+            state.limit = action.payload
         }
     },
     extraReducers: (builder: ActionReducerMapBuilder<PortalState>) => {
@@ -84,6 +92,6 @@ const portalSlice = createSlice({
 		}
 });
 
-export const { setSelectedBook, setBooks, setSearchTerm, setCursor, setLoad } = portalSlice.actions;
+export const { setSelectedBook, setBooks, setSearchTerm, setCursor, setLoad, setLimit } = portalSlice.actions;
 
 export default portalSlice.reducer;

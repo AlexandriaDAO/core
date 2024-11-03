@@ -108,13 +108,13 @@ export type Manifest = {
 };
 
 
-export const fetchManifests = async (after = ''): Promise<Manifest[]> => {
+export const fetchManifests = async (after = '', limit = 10): Promise<Manifest[]> => {
     try {
         const result = await client.query({
         query: gql`
             query {
                 transactions(
-                    first: 6,
+                    first: ${limit},
                     order: DESC,
                     after: "${after}",
                     tags: [

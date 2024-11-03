@@ -10,6 +10,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { setSearchTerm } from "@/features/portal/portalSlice";
 import { Search } from "lucide-react";
+import PortalLimit from "@/features/portal-limit";
 
 function Bibliotheca() {
 
@@ -40,6 +41,7 @@ function Bibliotheca() {
                 <div className="font-roboto-condensed font-normal text-xl my-4 flex gap-4 items-center">
                     <span> Books: {books.length} </span>
                     <PortalFilter />
+                    <PortalLimit />
                 </div>
                 <Portal />
             </div>

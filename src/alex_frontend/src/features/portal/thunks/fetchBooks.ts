@@ -68,9 +68,9 @@ const fetchBooks = createAsyncThunk<
     { rejectValue: string, state: RootState }
 >("portal/fetchBooks", async (_, { rejectWithValue, getState }) => {
     try {
-        const {portal: {cursor, books}} = getState();
+        const {portal: {cursor, books, limit}} = getState();
 
-        const txs = await fetchManifests(cursor);
+        const txs = await fetchManifests(cursor, limit);
 
         console.log(txs, txs.length);
 
@@ -81,7 +81,7 @@ const fetchBooks = createAsyncThunk<
         return {
             books: [...books, ...newBooks],
             cursor: newCursor,
-            load: txs.length < 6 ? false: true
+            load: txs.length < limit ? false: true
         }
 
         // const actorNftManager = await getNftManagerActor();
