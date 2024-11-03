@@ -1,9 +1,9 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useState } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Book, setSelectedBook } from "../portalSlice";
 import BookInfo from "./BookInfo";
-import { getCover } from "@/utils/epub";
+import { TriangleAlert } from "lucide-react";
 
 interface IBookCardProps {
 	book: Book;
@@ -15,6 +15,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 	const dispatch = useAppDispatch();
 	const { selectedBook } = useAppSelector((state) => state.portal);
 	const [imageLoaded, setImageLoaded] = useState(false);
+	const [imageError, setImageError] = useState(false);
 
 	const handleBookClick = (book: Book) => {
 		if (selectedBook && selectedBook.manifest === book.manifest) {
@@ -34,20 +35,26 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 			onClick={() => handleBookClick(book)}
 		>
 			<div className="flex-grow flex flex-col justify-between gap-3 items-stretch relative">
-				{!imageLoaded && (
+				{!imageLoaded && !imageError && (
                     <img
                         className="rounded-lg h-80 object-fill animate-pulse"
                         src="/images/default-cover.jpg"
                         alt="Loading..."
                     />
                 )}
+                {imageError && (
+					<div className="rounded-lg text-muted-foreground h-80 flex justify-center items-center">
+						<TriangleAlert size={64} />
+					</div>
+                )}
                 <img
-                    className={`rounded-lg h-80 object-fill ${imageLoaded ? '' : 'hidden'}`}
+                    className={`rounded-lg h-80 object-fill ${!imageError && imageLoaded ? '' : 'hidden'}`}
                     src={`https://gateway.irys.xyz/${book.manifest}/cover`}
                     alt={book.title}
                     onLoad={() => setImageLoaded(true)}
-                    onError={() => {
+                    onError={(e) => {
                         console.error("Error loading image for "+book.manifest);
+                        setImageError(true);
                         setImageLoaded(true);
                     }}
                 />
