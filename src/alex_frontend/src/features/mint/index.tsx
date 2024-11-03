@@ -185,10 +185,6 @@ const Mint: React.FC<IMintProps> = ({
 		return tx;
 	};
 	const createManifestTransaction = async (irys: WebIrys, txs: { bookTx: any, coverTx: any, dataTx: any }) => {
-		const actorIcrc7 = await getIcrc7Actor();
-		const totalSupply = await actorIcrc7.icrc7_total_supply();
-		const mintingNumber = Number(totalSupply) + 1;
-
 		const map = new Map([
 			["book", txs.bookTx.id],
 			["cover", txs.coverTx.id],
@@ -197,13 +193,20 @@ const Mint: React.FC<IMintProps> = ({
 
 		const manifest = await irys.uploader.generateManifest({ items: map , indexFile: 'metadata'});
 
-		const tx = irys.createTransaction(JSON.stringify(manifest, null, 2), {
-			tags: [
-				{ name: "Content-Type", value: "application/x.arweave-manifest+json" },
-				{ name: "application-id", value: APP_ID! },
-				{ name: "minting_number", value: mintingNumber.toString() },
-			]
-		});
+		const tags = [
+			{ name: "Content-Type", value: "application/x.arweave-manifest+json" },
+			{ name: "application-id", value: APP_ID! }
+		]
+		if(mint){
+			const actorIcrc7 = await getIcrc7Actor();
+			const totalSupply = await actorIcrc7.icrc7_total_supply();
+			const mintingNumber = Number(totalSupply) + 1;
+
+			tags.push({ name: "minting_number", value: mintingNumber.toString() })
+		}
+
+		const tx = irys.createTransaction(JSON.stringify(manifest, null, 2), { tags });
+
 		await tx.sign();
 		return tx;
 	};
