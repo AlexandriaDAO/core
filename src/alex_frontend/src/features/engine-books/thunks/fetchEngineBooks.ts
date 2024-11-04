@@ -1,9 +1,11 @@
 import { Engine } from '../../../../../declarations/alex_backend/alex_backend.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from '@/store';
-import { getBooks } from '@/services/bookService';
+import { getBooks, Manifest } from '@/services/bookService';
 import { Book } from '@/features/portal/portalSlice';
-// import { getNftManagerActor } from '@/features/auth/utils/authUtils';
+import { getNftManagerActor } from '@/features/auth/utils/authUtils';
+import { natToArweaveId } from '@/utils/id_convert';
+import { Principal } from "@dfinity/principal";
 
 // Define the async thunk
 const fetchEngineBooks = createAsyncThunk<
@@ -12,39 +14,27 @@ const fetchEngineBooks = createAsyncThunk<
     { rejectValue: string, state: RootState }
 >("engineBooks/fetchEngineBooks", async (engine, { rejectWithValue, getState }) => {
     try {
-        // const actorNftManager = await getNftManagerActor();
-        // const {portal: {books}} = getState();
+        const actorNftManager = await getNftManagerActor();
 
-        // // Ensure activeEngine is a valid principal string
-        // if (typeof engine !== 'string' || !engine) {
-        //     throw new Error('Invalid engine provided');
-        // }
+        if (!engine) {
+            throw new Error('Engine Not Provided');
+        }
 
+        const result = await actorNftManager.get_nfts_of(Principal.fromText(engine.owner));
 
-        return [];
+        if ('Ok' in result) {
+            //@ts-ignore
+            const manifests:Manifest[] = result.Ok.map((token) => ({id: natToArweaveId(token[0])}) );
 
-        // below code needs to be fixed
-        // //@ts-ignore
-        // const result = await actorNftManager.get_manifest_ids(BigInt(engine.owner));
-
-        // if ('Ok' in result) {
-        //     //@ts-ignore
-        //     const manifestIds = result.Ok.map(token => token.description);
-        //     const { portal: { books } } = getState();
-
-        //     if (books.length > 0) {
-        //         return books.filter(book => manifestIds.includes(book.manifest));
-        //     }
-
-        //     return await getBooks(result.Ok);
-        // } else if ('Err' in result) {
-        //     console.log('Error fetching NFTs', result.Err);
-        //     // this will error out and eventually set books to [] array
-        //     throw new Error('Error fetching NFTs');
-        // }else{
-        //     // won't print errors
-        //     return [];
-        // }
+            return await getBooks(manifests);
+        } else if ('Err' in result) {
+            console.log('Error fetching NFTs', result.Err);
+            // this will error out and eventually set books to [] array
+            throw new Error('Error fetching NFTs');
+        }else{
+            // won't print errors
+            return [];
+        }
     } catch (error) {
         console.error("Failed to Fetch My Engines:", error);
 

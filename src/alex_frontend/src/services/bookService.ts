@@ -151,7 +151,6 @@ export const getBooks = async (manifests: Manifest[]): Promise<Book[]> => {
                     books.push({
                         ...metadata,
                         manifest: id,
-                        owner: 'NA'
                     });
                 } else {
                     // Handle non-ok responses, including 404

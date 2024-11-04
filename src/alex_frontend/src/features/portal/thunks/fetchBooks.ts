@@ -72,8 +72,6 @@ const fetchBooks = createAsyncThunk<
 
         const txs = await fetchManifests(cursor, limit);
 
-        console.log(txs, txs.length);
-
         const newBooks = await getBooks(txs);
 
         const newCursor = txs.length > 0 ? txs[txs.length-1].cursor : '';

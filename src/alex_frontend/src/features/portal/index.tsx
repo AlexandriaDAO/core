@@ -134,7 +134,7 @@ const Portal: React.FC = () => {
 					disabled={loading}
 					scale="sm">
 					{loading ? <div className="flex gap-2 justify-center items-center">
-						<LoaderCircle className="animate-spin" />
+						<LoaderCircle size={18} className="animate-spin" />
 						<span>Loading</span>
 					</div> : 'Show More'}
 				</Button>

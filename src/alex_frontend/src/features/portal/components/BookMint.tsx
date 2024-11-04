@@ -64,7 +64,7 @@ const BookMint: React.FC<IBookMintProps> = ({
         <div onClick={e=>e.stopPropagation()} className="absolute top-2 right-2">
             {minted == undefined && <Button variant="link" scale="icon" rounded="full" className="pointer-events-none"><LoaderCircle size={18} className="animate-spin" /></Button> }
             {minted && <Button onClick={()=>toast.success('Book is already minted.')} variant="link" scale="icon" rounded="full" ><Check size={18}/></Button>}
-            {user=='' && minted == false && <Button onClick={mintNFT} variant="link" scale="icon" rounded="full" ><Cloud size={18} /></Button>}
+            {user!=='' && minted == false && <Button onClick={mintNFT} variant="link" scale="icon" rounded="full" ><Cloud size={18} /></Button>}
         </div>
     );
 }

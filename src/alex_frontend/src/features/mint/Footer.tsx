@@ -9,7 +9,6 @@ const Footer = ({
 	prev,
 	handleSubmitClick,
 	validateSubmission,
-	handleCancel,
 	file,
 }: any) => {
 	return (
