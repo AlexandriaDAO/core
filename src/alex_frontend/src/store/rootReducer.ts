@@ -1,5 +1,6 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import portalReducer from "@/features/portal/portalSlice";
+import collectionReducer from "@/features/collection/collectionSlice";
 import homeReducer from "@/features/home/homeSlice";
 import authReducer from "@/features/auth/authSlice";
 import searchReducer from "@/features/search/searchSlice";
@@ -52,6 +53,7 @@ const rootReducer = combineReducers({
 	icpLedger:icpLedgerReducer,
 	tokenomics:tokenomicsReducer,
 	portal: portalReducer,
+	collection: collectionReducer,
 	alex:alexReducer,
 
 	arweave: arweaveReducer,

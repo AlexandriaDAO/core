@@ -11,11 +11,20 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { setSearchTerm } from "@/features/portal/portalSlice";
 import { Search } from "lucide-react";
 import PortalLimit from "@/features/portal-limit";
+import { Button } from "@/lib/components/button";
+import { useNavigate } from "react-router-dom";
 
 function Bibliotheca() {
 
     const dispatch = useAppDispatch();
     const {searchTerm, books} = useAppSelector(state=>state.portal)
+
+    const navigate = useNavigate();
+
+    const handleViewCollectionClick = () => {
+		navigate("/app/emporium/collection");
+	}
+
 
     return (
         <MainLayout>
@@ -38,10 +47,15 @@ function Bibliotheca() {
                         <PortalEra />
                     </div>
                 </div>
-                <div className="font-roboto-condensed font-normal text-xl my-4 flex gap-4 items-center">
-                    <span> Books: {books.length} </span>
-                    <PortalFilter />
-                    <PortalLimit />
+                <div className="my-4 flex justify-between items-center">
+                    <div className="font-roboto-condensed font-normal text-xl flex gap-4 items-center">
+                        <span> Books: {books.length} </span>
+                        <PortalFilter />
+                        <PortalLimit />
+                    </div>
+                    <Button variant='muted' onClick={handleViewCollectionClick}>
+                        My Collection
+                    </Button>
                 </div>
                 <Portal />
             </div>

@@ -104,7 +104,7 @@ const client = new ApolloClient({
 
 export type Manifest = {
     id: string;
-    cursor: string;
+    cursor?: string;
 };
 
 

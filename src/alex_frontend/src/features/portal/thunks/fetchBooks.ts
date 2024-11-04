@@ -74,7 +74,7 @@ const fetchBooks = createAsyncThunk<
 
         const newBooks = await getBooks(txs);
 
-        const newCursor = txs.length > 0 ? txs[txs.length-1].cursor : '';
+        const newCursor = txs.length > 0 ? (txs[txs.length-1].cursor || '') : '';
 
         return {
             books: [...books, ...newBooks],

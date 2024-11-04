@@ -19,6 +19,7 @@ import Permasearch from "./apps/app/Permasearch";
 import Emporium from "./apps/app/Emporium";
 
 import MintPage from "./pages/MintPage";
+import CollectionPage from "./apps/app/Emporium/CollectionPage";
 
 export default function App() {
     return (
@@ -41,6 +42,13 @@ export default function App() {
                         <Route path="/app/dialectica" element={<Dialectica />} />
                         <Route path="/app/permasearch" element={<Permasearch />} />
                         <Route path="/app/emporium" element={<Emporium />} />
+
+                        {/* Theke (/theke) - from Greek "θήκη" meaning repository or case */}
+                        {/* Pinax (/pinax) - from Greek "πίναξ" meaning register or catalog */}
+                        {/* Theke (/theke) - from Greek "θήκη" meaning repository or case */}
+
+                        {/* A place to display user nfts */}
+                        <Route path="/app/emporium/collection" element={<CollectionPage />} />
 
                         {/* experimental/temporary */}
                         <Route path="/mint" element={<MintPage />} />
