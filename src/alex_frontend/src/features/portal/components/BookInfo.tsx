@@ -2,6 +2,7 @@ import React from "react";
 import { Book } from "../portalSlice";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
 import { Info } from "lucide-react";
+import { Button } from "@/lib/components/button";
 
 interface IBookInfoProps {
     book?: Book;
@@ -16,9 +17,9 @@ const BookInfo: React.FC<IBookInfoProps> = ({
         <div onClick={e=>e.stopPropagation()}>
             <Dialog>
                 <DialogTrigger asChild>
-                    <div className="absolute top-2 left-2 bg-transparent hover:bg-muted rounded-full">
-                        <Info size={26} className="text-muted cursor-pointer hover:text-primary"/>
-                    </div>
+                    <Button variant="outline" scale="icon" rounded="full" className="absolute top-2 left-2 p-0">
+                        <Info size={26} />
+                    </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>

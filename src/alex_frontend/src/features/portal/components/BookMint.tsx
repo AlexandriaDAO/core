@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Book } from "../portalSlice";
 import { Check, Cloud, LoaderCircle } from "lucide-react";
 import { Button } from "@/lib/components/button";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import { arweaveIdToNat } from "@/utils/id_convert";
@@ -17,7 +16,6 @@ const BookMint: React.FC<IBookMintProps> = ({
 }: IBookMintProps) => {
     if(!book) return <></>
 
-    const dispatch = useAppDispatch();
 	const { user } = useAppSelector((state) => state.auth);
 	const [minted, setMinted] = useState<boolean|undefined>(undefined)
 
@@ -33,13 +31,12 @@ const BookMint: React.FC<IBookMintProps> = ({
 			const description = "test";
 			const actorNftManager = await getNftManagerActor();
 			const result = await actorNftManager.mint_nft(mintNumber, [description]);
-			console.log('result', result);
-			if ("Err" in result) throw new Error(result.Err);
+
+            if ("Err" in result) throw new Error(result.Err);
 
 			toast.success("Minted Successfully");
             setMinted(true)
 		}catch(error){
-			console.log('error', error);
 			toast.error(`Error: ${error}`);
             setMinted(false)
 		}
@@ -49,7 +46,7 @@ const BookMint: React.FC<IBookMintProps> = ({
 			const mintNumber = BigInt(arweaveIdToNat(book.manifest));
 			const actorNftManager = await getNftManagerActor();
 			const result = await actorNftManager.nfts_exist([mintNumber]);
-			console.log('result', result);
+
 			if ("Err" in result) throw new Error(result.Err);
 			setMinted(result.Ok[0]);
 		}catch(error){
