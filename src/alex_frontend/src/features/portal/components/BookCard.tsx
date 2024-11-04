@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Book, setSelectedBook } from "../portalSlice";
 import BookInfo from "./BookInfo";
 import { TriangleAlert } from "lucide-react";
+import BookMint from "./BookMint";
 
 interface IBookCardProps {
 	book: Book;
@@ -34,7 +35,9 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 			}`}
 			onClick={() => handleBookClick(book)}
 		>
-			<div className="flex-grow flex flex-col justify-between gap-3 items-stretch relative">
+			<div className="flex-grow flex flex-col justify-between items-stretch relative">
+				<BookInfo book={book} />
+				{imageLoaded && <BookMint book={book} /> }
 				{!imageLoaded && !imageError && (
                     <img
                         className="rounded-lg h-80 object-fill animate-pulse"
@@ -59,16 +62,14 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
                     }}
                 />
 				<span
-					className={`font-roboto-condensed font-normal text-base leading-[18px] ${
+					className={`mt-2 font-roboto-condensed font-normal text-base leading-[18px] ${
 						selectedBook && selectedBook.manifest === book.manifest
-							? "pb-0.5 text-gray-300"
+							? "text-muted-foreground"
 							: ""
 					}`}
 				>
 					{book.author_first + " " + book.author_last}
 				</span>
-
-				<BookInfo book={book} />
 			</div>
 		</div>
 	);

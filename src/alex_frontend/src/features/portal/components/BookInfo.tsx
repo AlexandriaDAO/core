@@ -16,8 +16,8 @@ const BookInfo: React.FC<IBookInfoProps> = ({
         <div onClick={e=>e.stopPropagation()}>
             <Dialog>
                 <DialogTrigger asChild>
-                    <div className="absolute top-2 right-2 bg-muted rounded-full">
-                        <Info size={26} className="text-primary"/>
+                    <div className="absolute top-2 left-2 bg-transparent hover:bg-muted rounded-full">
+                        <Info size={26} className="text-muted cursor-pointer hover:text-primary"/>
                     </div>
                 </DialogTrigger>
                 <DialogContent>
