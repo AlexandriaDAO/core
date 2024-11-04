@@ -1,5 +1,5 @@
 import React from "react";
-import NftOwnerSelector from "./NftOwnerSelector";
+import NftOwnerSelector from "./librarySearch";
 
 const Library: React.FC = () => {
 	return <NftOwnerSelector />;

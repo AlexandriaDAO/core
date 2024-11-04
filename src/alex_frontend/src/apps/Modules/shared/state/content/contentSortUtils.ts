@@ -1,15 +1,30 @@
+import { createSelector } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
 import { Transaction } from '../../../shared/types/queries';
 import { RootState } from '@/store';
 
-export const useSortedTransactions = (): Transaction[] => {
-  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
-  const sortAsc = useSelector((state: RootState) => state.library.sortAsc);
+// Memoized selector for filtered and sorted transactions
+export const selectFilteredAndSortedTransactions = createSelector(
+  [(state: RootState) => state.contentDisplay.transactions,
+   (state: RootState) => state.library.sortAsc,
+   (state: RootState) => state.library.tags],
+  (transactions, ascending, tags): Transaction[] => {
+    // First filter
+    const filteredTransactions = tags.length === 0 
+      ? transactions 
+      : transactions.filter(transaction => {
+          const contentTypeTag = transaction.tags.find(tag => tag.name === 'Content-Type');
+          return contentTypeTag && tags.includes(contentTypeTag.value);
+        });
 
-  return sortAsc ? [...transactions] : [...transactions].reverse();
-};
+    // Then sort
+    return ascending 
+      ? filteredTransactions 
+      : [...filteredTransactions].reverse();
+  }
+);
 
-// Pure function version for use in reducers/thunks
-export const sortTransactions = (transactions: Transaction[], ascending: boolean): Transaction[] => {
-  return ascending ? [...transactions] : [...transactions].reverse();
+// Hook for components to easily access sorted/filtered transactions
+export const useSortedTransactions = () => {
+  return useSelector(selectFilteredAndSortedTransactions);
 }; 

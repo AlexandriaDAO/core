@@ -1,5 +1,5 @@
 Filtering in the personal library needs to be handled next. 
-  - Move sort into its own organized component. 
+  - Move sort into its own organized component.
   - Apply other filters like sort.
 So basically another seach compontent, but for the local version that filters state with our own javascript logic.
 

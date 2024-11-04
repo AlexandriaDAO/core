@@ -7,37 +7,29 @@ import { updateTransactions } from '@/apps/Modules/shared/state/content/contentD
 import { RootState } from '@/store';
 import { toggleSortDirection } from './librarySlice';
 import { AppDispatch } from '@/store';
-import { setTransactions } from '../content/contentDisplaySlice';
-import { sortTransactions } from '../content/contentSortUtils';
 
 export const togglePrincipalSelection = createAsyncThunk(
   'library/togglePrincipalSelection',
   async (principalId: string, { dispatch, getState }) => {
     try {
-      // Toggle the principal first
       dispatch(togglePrincipal(principalId));
       
       const state = getState() as RootState;
       const selectedPrincipals = state.library.selectedPrincipals;
       
-      // Get all NFTs for currently selected principals
       const allArweaveIds = await Promise.all(
         selectedPrincipals.map(async (principalId) => {
           const principal = Principal.fromText(principalId);
           const nftIds = await icrc7.icrc7_tokens_of(
             { owner: principal, subaccount: [] },
-            [], // A token id that it will start the search from.
+            [],
             [BigInt(10000)]
           );
-          console.log(nftIds);
           return nftIds.map(natToArweaveId);
         })
       );
       
-      // Flatten the array of arrays into a single array of unique Arweave IDs
       const uniqueArweaveIds = [...new Set(allArweaveIds.flat())];
-      
-      // Update transactions with the complete set of Arweave IDs
       dispatch(updateTransactions(uniqueArweaveIds));
       
       return principalId;
@@ -48,17 +40,7 @@ export const togglePrincipalSelection = createAsyncThunk(
   }
 );
 
-export const toggleSort = () => (dispatch: AppDispatch, getState: () => RootState) => {
-  // First toggle the sort direction
+export const toggleSort = () => (dispatch: AppDispatch) => {
   dispatch(toggleSortDirection());
-  
-  // Get the updated state
-  const state = getState();
-  const transactions = state.contentDisplay.transactions;
-  const sortAsc = state.library.sortAsc;
-  
-  // Sort and update transactions
-  const sortedTransactions = sortTransactions(transactions, sortAsc);
-  dispatch(setTransactions(sortedTransactions));
 };
 

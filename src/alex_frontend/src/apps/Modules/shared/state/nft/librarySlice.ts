@@ -3,11 +3,13 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface LibraryState {
   selectedPrincipals: string[];
   sortAsc: boolean;
+  tags: string[];
 }
 
 const initialState: LibraryState = {
   selectedPrincipals: [],
-  sortAsc: false,
+  sortAsc: true,
+  tags: [],
 };
 
 const librarySlice = createSlice({
@@ -26,11 +28,25 @@ const librarySlice = createSlice({
     toggleSortDirection: (state) => {
       state.sortAsc = !state.sortAsc;
     },
+    setTags: (state, action: PayloadAction<string[]>) => {
+      state.tags = action.payload;
+    },
+    toggleTag: (state, action: PayloadAction<string>) => {
+      const tag = action.payload;
+      const index = state.tags.indexOf(tag);
+      if (index === -1) {
+        state.tags.push(tag);
+      } else {
+        state.tags.splice(index, 1);
+      }
+    },
   },
 });
 
 export const {
   togglePrincipal,
-  toggleSortDirection
+  toggleSortDirection,
+  setTags,
+  toggleTag
 } = librarySlice.actions;
 export default librarySlice.reducer;
