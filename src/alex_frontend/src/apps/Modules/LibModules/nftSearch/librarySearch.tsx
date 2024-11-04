@@ -6,7 +6,7 @@ import { wipe } from "../../shared/state/wiper";
 import PrincipalSelector from "./PrincipalSelector";
 import SortSelector from "./SortSelector";
 import ShowNFTsButton from "./ShowNFTsButton";
-import LibraryContentTagsSelector from "./LibraryContentTagsSelector";
+import LibraryContentTagsSelector from "./tagSelector";
 
 export default function librarySearch() {
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);

@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { supportedFileTypes, fileTypeCategories } from '@/apps/Modules/shared/types/files';
 import { setSearchState } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
+import { ContentTypeToggleGroup } from '@/apps/Modules/shared/components/ContentTypeToggleGroup';
 
 const ContentTagsSelector: React.FC = () => {
   const dispatch = useDispatch();
@@ -29,19 +30,11 @@ const ContentTagsSelector: React.FC = () => {
       <label className="block text-sm font-medium text-gray-700 mb-1">
         Content Tags:
       </label>
-      <div className="mt-2 space-y-2">
-        {filteredContentTypes.map(type => (
-          <label key={type.mimeType} className="inline-flex items-center mr-4">
-            <input
-              type="checkbox"
-              checked={searchState.tags.includes(type.mimeType)}
-              onChange={() => handleTagToggle(type.mimeType)}
-              className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
-            />
-            <span className="ml-2 text-sm text-gray-700">{type.displayName}</span>
-          </label>
-        ))}
-      </div>
+      <ContentTypeToggleGroup
+        selectedTags={searchState.tags}
+        onTagToggle={handleTagToggle}
+        filteredTypes={filteredContentTypes}
+      />
     </div>
   );
 };
