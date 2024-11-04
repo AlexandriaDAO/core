@@ -5,7 +5,7 @@ import { AppDispatch } from "@/store";
 import { togglePrincipalSelection } from '../../shared/state/nft/libraryThunks';
 import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
 import { wipe } from "../../shared/state/wiper";
-import { toggleSortDirection } from "../../shared/state/nft/librarySlice";
+import { toggleSort } from '../../shared/state/nft/libraryThunks';
 
 const popularPrincipals = [
   "7ua4j-6yl27-53cku-vh62o-z5cop-gdg7q-vhqet-hwlbt-ewfja-xbokg-2qe",
@@ -43,6 +43,9 @@ export default function NftOwnerSelector() {
     ));
   };
 
+  const handleSort = () => {
+    dispatch(toggleSort());
+  };
 
   return (
     <div className="space-y-4">
@@ -54,10 +57,7 @@ export default function NftOwnerSelector() {
           Show NFTs
         </button>
         <button
-          onClick={() => {
-            dispatch(toggleSortDirection());
-            dispatch(loadContentForTransactions(transactions));
-          }}
+          onClick={handleSort}
           className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
         >
           Sort {sortAsc ? "↑" : "↓"}

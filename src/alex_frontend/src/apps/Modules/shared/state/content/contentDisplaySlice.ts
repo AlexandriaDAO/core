@@ -2,12 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Transaction } from '../../../shared/types/queries';
 import { CachedContent, ContentUrlInfo } from '../../../LibModules/contentDisplay/types';
 
-// Simplify MintableStateItem back to just mintable
 export interface MintableStateItem {
   mintable: boolean;
 }
 
-// Combine CachedContent and ContentUrlInfo
 export interface ContentDataItem extends CachedContent {
   urls?: ContentUrlInfo;
 }
@@ -34,10 +32,6 @@ const contentDisplaySlice = createSlice({
     clearTransactions: (state) => {
       state.transactions = [];
     },
-    setMintableState: (state, action: PayloadAction<{ id: string; mintable: boolean }>) => {
-      const { id, mintable } = action.payload;
-      state.mintableState[id] = { mintable };
-    },
     setMintableStates: (state, action: PayloadAction<Record<string, MintableStateItem>>) => {
       state.mintableState = { ...state.mintableState, ...action.payload };
     },
@@ -61,12 +55,11 @@ const contentDisplaySlice = createSlice({
 export const { 
   setTransactions, 
   clearTransactions, 
-  setMintableState,
   setMintableStates,
   resetMintableState,
   setContentData,
   clearContentData,
-  clearTransactionContent
+  clearTransactionContent,
 } = contentDisplaySlice.actions;
 export default contentDisplaySlice.reducer;
 

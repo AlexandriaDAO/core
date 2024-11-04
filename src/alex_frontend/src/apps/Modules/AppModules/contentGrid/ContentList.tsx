@@ -4,7 +4,7 @@ import { Transaction, ContentListProps } from "@/apps/Modules/shared/types/queri
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
 import { Info } from 'lucide-react';
-import { setMintableState, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { setMintableStates, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import ContentGrid from "./ContentGrid";
 import Modal from './components/Modal';
 import ContentRenderer from './components/ContentRenderer';
@@ -24,6 +24,7 @@ const ContentList = () => {
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
 
   const handleMint = async (transactionId: string) => {
+    console.log("Minting NFT for transaction:", transactionId);
     try {
       await mint_nft(transactionId);
       toast.success("NFT minted successfully!");
@@ -35,7 +36,7 @@ const ContentList = () => {
 
   const handleRenderError = useCallback((transactionId: string) => {
     dispatch(clearTransactionContent(transactionId));
-    dispatch(setMintableState({ id: transactionId, mintable: false }));
+    dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
   }, [dispatch]);
 
   const renderDetails = useCallback((transaction: Transaction) => (

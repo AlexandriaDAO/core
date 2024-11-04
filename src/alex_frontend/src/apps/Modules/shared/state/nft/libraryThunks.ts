@@ -5,6 +5,10 @@ import { natToArweaveId } from "@/utils/id_convert";
 import { togglePrincipal } from './librarySlice';
 import { updateTransactions } from '@/apps/Modules/shared/state/content/contentDisplayThunks';
 import { RootState } from '@/store';
+import { toggleSortDirection } from './librarySlice';
+import { AppDispatch } from '@/store';
+import { setTransactions } from '../content/contentDisplaySlice';
+import { sortTransactions } from '../content/contentSortUtils';
 
 export const togglePrincipalSelection = createAsyncThunk(
   'library/togglePrincipalSelection',
@@ -43,4 +47,18 @@ export const togglePrincipalSelection = createAsyncThunk(
     }
   }
 );
+
+export const toggleSort = () => (dispatch: AppDispatch, getState: () => RootState) => {
+  // First toggle the sort direction
+  dispatch(toggleSortDirection());
+  
+  // Get the updated state
+  const state = getState();
+  const transactions = state.contentDisplay.transactions;
+  const sortAsc = state.library.sortAsc;
+  
+  // Sort and update transactions
+  const sortedTransactions = sortTransactions(transactions, sortAsc);
+  dispatch(setTransactions(sortedTransactions));
+};
 

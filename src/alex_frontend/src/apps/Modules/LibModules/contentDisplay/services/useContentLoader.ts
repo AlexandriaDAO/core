@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from "@/store";
 import { 
   setMintableStates, 
-  setMintableState,
   setContentData,
   clearTransactionContent 
 } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
@@ -28,7 +27,7 @@ export function useContentLoader() {
         dispatch(setContentData({ id: transaction.id, content: { ...content, urls } }));
 
         if (content.error) {
-          dispatch(setMintableState({ id: transaction.id, mintable: false }));
+          dispatch(setMintableStates({ [transaction.id]: { mintable: false } }));
         }
       } catch (error) {
         console.error('Error loading content:', error);
@@ -43,7 +42,7 @@ export function useContentLoader() {
   const handleRenderError = (transactionId: string) => {
     ContentService.clearTransaction(transactionId);
     dispatch(clearTransactionContent(transactionId));
-    dispatch(setMintableState({ id: transactionId, mintable: false }));
+    dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
   };
 
   return {

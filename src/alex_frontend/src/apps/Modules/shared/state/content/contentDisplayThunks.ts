@@ -4,7 +4,6 @@ import {
   clearTransactions,
   setMintableStates,
   setContentData,
-  setMintableState,
   MintableStateItem 
 } from './contentDisplaySlice';
 import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
@@ -34,7 +33,7 @@ export const loadContentForTransactions = createAsyncThunk(
         }));
 
         if (content.error) {
-          dispatch(setMintableState({ id: transaction.id, mintable: false }));
+          dispatch(setMintableStates({ [transaction.id]: { mintable: false } }));
         }
       } catch (error) {
         console.error('Error loading content:', error);

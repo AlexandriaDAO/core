@@ -1,19 +1,13 @@
 Filtering in the personal library needs to be handled next. 
+  - Move sort into its own organized component. 
+  - Apply other filters like sort.
 So basically another seach compontent, but for the local version that filters state with our own javascript logic.
 
-&& Figuring out state cleanup for personal library setup.
 
-&& I just have to attach the 'reverse' thing to a redux state from the library.
-
-First of all the state managemnet for transactions is still a mess. 
-
-- The permasearch and library transactions are mixed. 
-- When using the library trnasactions, the query caps at 10 or so and I can't save the arweave data. 
+We need to separate permasearch and alexandrian states:
+- The permasearch and library transactions are mixed.
 - The nsfw model runs on the library results by default.
 
-I need to first find a better way to separate traction ids between appmodules, and decide if it should be shared or not; and go all the way with it.
-
-Then I gotta pagnate the api queries that add transaction ids as input. It seems to limit them to 10 per id type, and so no alexandrian we need to first get all the data before rendering them, and start adding the searchablity feature.
 
 
 # Changes

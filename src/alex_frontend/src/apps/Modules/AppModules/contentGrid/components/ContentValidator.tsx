@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { setPredictionResults } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
-import { setMintableState } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
+import { setMintableStates } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
 import { useContentValidation } from '@/apps/Modules/shared/services/contentValidation';
 import ContentFetcher from './ContentFetcher';
 import { ContentValidatorProps } from '../types';
@@ -25,7 +25,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     if (isValidated) return;
 
     if (!nsfwModelLoaded) {
-      dispatch(setMintableState({ id: transactionId, mintable: false }));
+      dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
       return;
     }
 
@@ -39,25 +39,26 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
         }));
 
         dispatch(
-          setMintableState({
-            id: transactionId,
-            mintable: !predictionResults.isPorn,
+          setMintableStates({
+            [transactionId]: {
+              mintable: !predictionResults.isPorn,
+            }
           })
         );
       } else {
-        dispatch(setMintableState({ id: transactionId, mintable: false }));
+        dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
       }
 
       setIsValidated(true);
     } catch (error) {
       console.error('Error validating content:', error);
-      dispatch(setMintableState({ id: transactionId, mintable: false }));
+      dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
     }
   };
 
   const handleError = () => {
     console.error(`Error loading content for transaction ID: ${transactionId}`);
-    dispatch(setMintableState({ id: transactionId, mintable: false }));
+    dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
   };
 
   return (
