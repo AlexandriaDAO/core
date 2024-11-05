@@ -3,6 +3,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import BookInfo from "./BookInfo";
 import { TriangleAlert } from "lucide-react";
+import AddToEngine from "./AddToEngine";
 import { Book } from "@/features/portal/portalSlice";
 import { setSelectedBook } from "../collectionSlice";
 
@@ -37,6 +38,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 		>
 			<div className="flex-grow flex flex-col justify-between items-stretch relative">
 				<BookInfo book={book} />
+				{imageLoaded && <AddToEngine book={book} /> }
 				{!imageLoaded && !imageError && (
                     <img
                         className="rounded-lg h-80 object-fill animate-pulse"

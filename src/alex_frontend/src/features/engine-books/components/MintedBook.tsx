@@ -85,70 +85,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 		}
 	};
 
-	const handleAddBook = async () => {
-		if ( !meiliClient || !activeEngine) return;
-
-		let contents: any = [];
-
-		try {
-			setProcessing(true);
-
-			toast.info("Converting Epub to JSON");
-
-			const onlineBook = Epub(`https://gateway.irys.xyz/${book.manifest}/book`, {
-				openAs: "epub",
-			});
-
-			// Fetch spine items
-			const spine = await onlineBook.loaded.spine;
-			//@ts-ignore
-			for (let item of spine.items) {
-				if (!item.href) continue;
-				const doc = await onlineBook.load(item.href);
-				//@ts-ignore
-				const innerHTML = doc.documentElement.innerHTML;
-				const parsedDoc = new DOMParser().parseFromString(
-					innerHTML,
-					"text/html"
-				);
-				const paragraphs = parsedDoc.querySelectorAll("p");
-
-				paragraphs.forEach((paragraph) => {
-					const text = paragraph.textContent?.trim() ?? "";
-					if (text.length < 1) return;
-					const cfi = new EpubCFI(paragraph, item.cfiBase).toString();
-					const id = uuidv4();
-
-					contents.push({
-						id,
-						cfi,
-						text,
-
-						...book
-					});
-				});
-			}
-			toast.success("Conversion Successfull");
-
-			toast.info("Storing JSON docs to Engine");
-
-			const task: EnqueuedTask = await meiliClient
-				.index(activeEngine.index)
-				.addDocuments(contents, { primaryKey: "id" });
-
-			toast.info("Documents enqueued for addition.");
-
-			await waitForTaskCompletion(meiliClient, task.taskUid);
-
-			toast.success("Stored Successfully");
-
-			setAdded(true);
-		} catch (err) {
-			toast.error("Error while adding Book to engine: " + err);
-		} finally {
-			setProcessing(false);
-		}
-	};
+	if(added == false) return <></>
 
 	return (
 		<div className="flex justify-between gap-2 items-stretch text-black bg-[#F4F4F4] rounded-lg p-2">
@@ -187,7 +124,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 					</span>
 				</div>
 			</div>
-			{user === book.owner && (
+			{user === activeEngine?.owner && (
 				<div className="flex gap-2 align-center justify-between self-center">
 					{processing ? (
 						<button
@@ -200,19 +137,12 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 								className="animate animate-spin"
 							/>
 						</button>
-					) : added ? (
+					) : added && (
 						<button
 							onClick={handleRemoveBook}
 							className="flex justify-center items-center gap-1 px-2 py-1 bg-black rounded cursor-pointer text-[#F6F930] hover:text-yellow-100 font-medium font-roboto-condensed text-base"
 						>
 							<span>Remove From Engine</span>
-						</button>
-					) : (
-						<button
-							onClick={handleAddBook}
-							className="flex justify-center items-center gap-1 px-2 py-1 bg-black rounded cursor-pointer text-[#F6F930] hover:text-yellow-100 font-medium font-roboto-condensed text-base"
-						>
-							<span>Add To Engine</span>
 						</button>
 					)}
 				</div>
