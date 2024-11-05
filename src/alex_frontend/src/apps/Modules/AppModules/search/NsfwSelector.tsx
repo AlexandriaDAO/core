@@ -9,6 +9,17 @@ const NsfwModelControl: React.FC = () => {
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Add cleanup effect
+  useEffect(() => {
+    // Cleanup function that runs when component unmounts
+    return () => {
+      if (isModelLoaded()) {
+        unloadModel();
+        dispatch(setNsfwModelLoaded(false));
+      }
+    };
+  }, []); // Empty dependency array since we only want this to run on unmount
+
   // // Add this if you want to autmatically turn SafeSearch on.
   // useEffect(() => {
   //   if (!isModelLoaded()) {

@@ -2,6 +2,9 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { clearTransactions, clearContentData, resetMintableState } from './content/contentDisplaySlice';
 import { clearPredictions } from './arweave/arweaveSlice';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '@/store';
 
 export const wipe = createAsyncThunk(
   'wiper/wipeContentDisplayState',
@@ -20,5 +23,17 @@ export const wipe = createAsyncThunk(
     
     // Clear the ContentService cache
     ContentService.clearCache();
+
   }
 );
+
+// Custom hook to handle unmount wiping
+export const useWipeOnUnmount = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    return () => {
+      dispatch(wipe());
+    };
+  }, [dispatch]);
+};

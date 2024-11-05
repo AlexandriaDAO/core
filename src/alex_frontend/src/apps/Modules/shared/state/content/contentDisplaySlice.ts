@@ -4,6 +4,7 @@ import { CachedContent, ContentUrlInfo } from '../../../LibModules/contentDispla
 
 export interface MintableStateItem {
   mintable: boolean;
+  owner?: string | null;
 }
 
 export interface ContentDataItem extends CachedContent {
@@ -49,6 +50,14 @@ const contentDisplaySlice = createSlice({
       const id = action.payload;
       delete state.contentData[id];
     },
+    setOwner: (state, action: PayloadAction<{ id: string; owner: string | null }>) => {
+      const { id, owner } = action.payload;
+      state.mintableState[id] = {
+        ...state.mintableState[id],
+        owner,
+        mintable: true,
+      };
+    },
   },
 });
 
@@ -60,7 +69,6 @@ export const {
   setContentData,
   clearContentData,
   clearTransactionContent,
+  setOwner,
 } = contentDisplaySlice.actions;
 export default contentDisplaySlice.reducer;
-
-
