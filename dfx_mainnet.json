@@ -47,9 +47,13 @@
     },
     "icrc7": {
       "main": "src/icrc7/main.mo",
-      "candid": "src/declarations/icrc7/icrc7.did",
       "type": "motoko",
       "specified_id": "53ewn-qqaaa-aaaap-qkmqq-cai"
+    },
+    "icrc7_scion": {
+      "main": "src/icrc7_scion/main.mo",
+      "type": "motoko",
+      "specified_id": "uxyan-oyaaa-aaaap-qhezq-cai"
     },
     "nft_manager": {
       "candid": "src/nft_manager/nft_manager.did",

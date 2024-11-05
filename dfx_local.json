@@ -50,6 +50,11 @@
       "type": "motoko",
       "specified_id": "53ewn-qqaaa-aaaap-qkmqq-cai"
     },
+    "icrc7_scion": {
+      "main": "src/icrc7_scion/main.mo",
+      "type": "motoko",
+      "specified_id": "uxyan-oyaaa-aaaap-qhezq-cai"
+    },
     "nft_manager": {
       "candid": "src/nft_manager/nft_manager.did",
       "package": "nft_manager",
@@ -77,12 +82,6 @@
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
       "id": "ysy5f-2qaaa-aaaap-qkmmq-cai"
-    },
-    "registry": {
-      "candid": "src/registry/registry.did",
-      "package": "registry",
-      "type": "rust",
-      "id": "uxyan-oyaaa-aaaap-qhezq-cai"
     },
     "alex_frontend": {
       "dependencies": ["alex_backend"],

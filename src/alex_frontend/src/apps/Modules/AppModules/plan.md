@@ -1,26 +1,36 @@
-Filtering in the personal library needs to be handled next. 
-  - Move sort into its own organized component.
-  - Apply other filters like sort.
-So basically another seach compontent, but for the local version that filters state with our own javascript logic.
+
+MintNFT function:
 
 
-We need to separate permasearch and alexandrian states:
-- The permasearch and library transactions are mixed.
-- The nsfw model runs on the library results by default.
+
+Make a icrc7_scion (or spawn/scion/heir/twin) canister.
+Get NFT_manager to deploy it.
+
+
+Change the nft_manager to mint_nft function to mint the copy if the nft already exists; and figure out how to pay the 1-2 lbry depending on which one is triggered. (I don't know how we trigger the payment from the frontend. We could also make a flat fee, and just split it 50/50, but I don't think it's any easier.)
+
+
+
+
+- If caller already owns the NFT, stop and let them know.
+- If an NFT already exists, mint a parrellel NFT.
+  - This NFT has a mint# derived from the OG minte# and the user principal.
+
+  How do we distinguish this, and make quick reference to the original?
+    - The og mint# in the description metadata.
+    - The mint# is derived from the OG mint# and the user principal. (Must be repeatable so if someone goes to mint the original for the second time, it will fail.)
+      - If someone copies the copy, 1 lbry goes to the og, one to the copy.
+
+
+Then we'll let people do their own channels which are just regular stable structures and no economic incentive. 
+These channels could be open for everyone to edit, or only for the owner to edit.
+I think it'll be totally free to add nfts, but you can only add them if you own the original or copy.
+
+
 
 
 
 # Changes
-
-- The arweave/mintableState state with all the nsfw predictions is added to redux on the library page. This should not be related.
-- The contentDisplay state needs to be wiped when the page is changed.
-
-- It's good for the contentDisplay to have 'transactions' that come back from the arweave api, but the decorators on each will be separate (nsfw predictions, mintable, etc.)
-  - The only thing contentDisplay will hold is arweave transaction data.
-  - All others will hold no arweave data.
-
-- I should get all the icrc7 transactionIds first, and then get them from arweave, not do these requests in parallel.
-
 
 Alexandrian transactions will have the nft owner state that decides how saves are handled, and it's own version of mintable that handles the outcomes of saves.
 

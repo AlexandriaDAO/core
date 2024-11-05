@@ -1,3 +1,5 @@
+// This canister is not currently active, and likely not needed.
+
 use ic_cdk::query;
 use candid::Principal;
 
@@ -12,9 +14,9 @@ pub const BOOKMARKS: &str = "ya6k4-waaaa-aaaap-qkmpq-cai";
 pub const ICP_LEDGER: &str = "ryjl3-tyaaa-aaaaa-aaaba-cai";
 pub const ICP_SWAP: &str = "54fqz-5iaaa-aaaap-qkmqa-cai";
 pub const ICRC7: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
+pub const ICRC7_SCION: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
 pub const INTERNET_IDENTITY: &str = "rdmx6-jaaaa-aaaaa-aaadq-cai";
 pub const NFT_MANAGER: &str = "5sh5r-gyaaa-aaaap-qkmra-cai";
-pub const REGISTRY: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 pub const SYSTEM_API: &str = "5vg3f-laaaa-aaaap-qkmrq-cai";
 pub const TOKENOMICS: &str = "5abki-kiaaa-aaaap-qkmsa-cai";
 pub const VETKD: &str = "5ham4-hqaaa-aaaap-qkmsq-cai";
@@ -33,9 +35,9 @@ pub fn get_registry_principal(canister_name: String) -> Principal {
         "ICP_LEDGER" => get_principal(ICP_LEDGER),
         "ICP_SWAP" => get_principal(ICP_SWAP),
         "ICRC7" => get_principal(ICRC7),
+        "ICRC7_SCION" => get_principal(ICRC7_SCION),
         "INTERNET_IDENTITY" => get_principal(INTERNET_IDENTITY),
         "NFT_MANAGER" => get_principal(NFT_MANAGER),
-        "REGISTRY" => get_principal(REGISTRY),
         "SYSTEM_API" => get_principal(SYSTEM_API),
         "TOKENOMICS" => get_principal(TOKENOMICS),
         "VETKD" => get_principal(VETKD),

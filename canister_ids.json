@@ -29,14 +29,14 @@
   "icrc7": {
     "ic": "53ewn-qqaaa-aaaap-qkmqq-cai"
   },
+  "icrc7_scion": {
+    "ic": "uxyan-oyaaa-aaaap-qhezq-cai"
+  },
   "internet_identity": {
     "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
   },
   "nft_manager": {
     "ic": "5sh5r-gyaaa-aaaap-qkmra-cai"
-  },
-  "registry": {
-    "ic": "uxyan-oyaaa-aaaap-qhezq-cai"
   },
   "system_api": {
     "ic": "5vg3f-laaaa-aaaap-qkmrq-cai"
