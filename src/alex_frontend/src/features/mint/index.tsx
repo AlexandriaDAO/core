@@ -7,7 +7,6 @@ import Status from "./Status";
 import Footer from "./Footer";
 import Header from "./Header";
 import { arweaveIdToNat } from "@/utils/id_convert";
-import useSession from "@/hooks/useSession";
 import { getServerIrys } from "@/services/irysService";
 import { readFileAsBuffer } from "../irys/utils/gaslessFundAndUpload";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -17,7 +16,7 @@ import { WebIrys } from "@irys/sdk";
 import SelectNode from "./SelectNode";
 import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
 import { getIcrc7Actor, getNftManagerActor } from "../auth/utils/authUtils";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/lib/components/dialog";
 import { Button } from "@/lib/components/button";
 import { UploadIcon } from "lucide-react";
 
@@ -34,9 +33,6 @@ const Mint: React.FC<IMintProps> = ({
 	const { activeEngine } = useAppSelector((state) => state.engineOverview);
 
 	const dispatch = useAppDispatch();
-
-	const { meiliClient } = useSession();
-	const [bookLoadModal, setBookLoadModal] = useState(false);
 
 	const [file, setFile] = useState<File | undefined>(undefined);
 
@@ -61,10 +57,6 @@ const Mint: React.FC<IMintProps> = ({
 
 	const prev = () => {
 		setScreen(screen - 1);
-	};
-
-	const handleCancel = () => {
-		setBookLoadModal(false);
 	};
 
 	useEffect(() => {
@@ -185,10 +177,6 @@ const Mint: React.FC<IMintProps> = ({
 		return tx;
 	};
 	const createManifestTransaction = async (irys: WebIrys, txs: { bookTx: any, coverTx: any, dataTx: any }) => {
-		const actorIcrc7 = await getIcrc7Actor();
-		const totalSupply = await actorIcrc7.icrc7_total_supply();
-		const mintingNumber = Number(totalSupply) + 1;
-
 		const map = new Map([
 			["book", txs.bookTx.id],
 			["cover", txs.coverTx.id],
@@ -197,13 +185,20 @@ const Mint: React.FC<IMintProps> = ({
 
 		const manifest = await irys.uploader.generateManifest({ items: map , indexFile: 'metadata'});
 
-		const tx = irys.createTransaction(JSON.stringify(manifest, null, 2), {
-			tags: [
-				{ name: "Content-Type", value: "application/x.arweave-manifest+json" },
-				{ name: "application-id", value: APP_ID! },
-				{ name: "minting_number", value: mintingNumber.toString() },
-			]
-		});
+		const tags = [
+			{ name: "Content-Type", value: "application/x.arweave-manifest+json" },
+			{ name: "application-id", value: APP_ID! }
+		]
+		if(mint){
+			const actorIcrc7 = await getIcrc7Actor();
+			const totalSupply = await actorIcrc7.icrc7_total_supply();
+			const mintingNumber = Number(totalSupply) + 1;
+
+			tags.push({ name: "minting_number", value: mintingNumber.toString() })
+		}
+
+		const tx = irys.createTransaction(JSON.stringify(manifest, null, 2), { tags });
+
 		await tx.sign();
 		return tx;
 	};
@@ -302,7 +297,6 @@ const Mint: React.FC<IMintProps> = ({
 						next={next}
 						prev={prev}
 						handleSubmitClick={handleSubmitClick}
-						handleCancel={handleCancel}
 						validateSubmission={validateSubmission}
 						file={file}
 					/>

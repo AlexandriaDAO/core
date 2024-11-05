@@ -1,30 +1,28 @@
-import { Engine } from '../../../../../declarations/alex_backend/alex_backend.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from '@/store';
 import { getBooks, Manifest } from '@/services/bookService';
 import { Book } from '@/features/portal/portalSlice';
-import { getNftManagerActor } from '@/features/auth/utils/authUtils';
+import { getAuthClient, getNftManagerActor } from '@/features/auth/utils/authUtils';
 import { natToArweaveId } from '@/utils/id_convert';
-import { Principal } from "@dfinity/principal";
 
 // Define the async thunk
-const fetchEngineBooks = createAsyncThunk<
+const fetchMyBooks = createAsyncThunk<
     Book[], // This is the return type of the thunk's payload
-    Engine, //Argument that we pass to initialize
+    void, //Argument that we pass to initialize
     { rejectValue: string, state: RootState }
->("engineBooks/fetchEngineBooks", async (engine, { rejectWithValue, getState }) => {
+>("engineBooks/fetchEngineBooks", async (_, { rejectWithValue, getState }) => {
     try {
         const actorNftManager = await getNftManagerActor();
 
-        if (!engine) {
-            throw new Error('Engine Not Provided');
+        const authClient = await getAuthClient();
+        if (!await authClient.isAuthenticated()) {
+            throw new Error('You are not logged in.');
         }
 
-        const result = await actorNftManager.get_nfts_of(Principal.fromText(engine.owner));
+        const result = await actorNftManager.get_nfts_of(authClient.getIdentity().getPrincipal());
 
         if ('Ok' in result) {
-            //@ts-ignore
-            const manifests:Manifest[] = result.Ok.map((token) => ({id: natToArweaveId(token[0])}) );
+            const manifests:Manifest[] = result.Ok.map((token) => ({id: natToArweaveId(token[0]) }) );
 
             return await getBooks(manifests);
         } else if ('Err' in result) {
@@ -36,16 +34,16 @@ const fetchEngineBooks = createAsyncThunk<
             return [];
         }
     } catch (error) {
-        console.error("Failed to Fetch My Engines:", error);
+        console.error("Failed to Fetch My Books:", error);
 
         if (error instanceof Error) {
             return rejectWithValue(error.message);
         }
     }
     return rejectWithValue(
-        "An unknown error occurred while fetching an engine's books"
+        "An unknown error occurred while fetching a user's books"
     );
 });
 
 
-export default fetchEngineBooks;
+export default fetchMyBooks;

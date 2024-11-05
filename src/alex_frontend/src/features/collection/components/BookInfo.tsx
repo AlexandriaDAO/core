@@ -1,8 +1,8 @@
 import React from "react";
-import { Book } from "../portalSlice";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
 import { Info } from "lucide-react";
 import { Button } from "@/lib/components/button";
+import { Book } from "@/features/portal/portalSlice";
 
 interface IBookInfoProps {
     book?: Book;

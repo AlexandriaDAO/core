@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { Book, setSelectedBook } from "../portalSlice";
 import BookInfo from "./BookInfo";
 import { TriangleAlert } from "lucide-react";
-import BookMint from "./BookMint";
+import AddToEngine from "./AddToEngine";
+import { Book } from "@/features/portal/portalSlice";
+import { setSelectedBook } from "../collectionSlice";
 
 interface IBookCardProps {
 	book: Book;
@@ -14,7 +15,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 	if(!book || !book.manifest) return <></>;
 
 	const dispatch = useAppDispatch();
-	const { selectedBook } = useAppSelector((state) => state.portal);
+	const { selectedBook } = useAppSelector((state) => state.collection);
 	const [imageLoaded, setImageLoaded] = useState(false);
 	const [imageError, setImageError] = useState(false);
 
@@ -37,7 +38,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }: IBookCardProps) => {
 		>
 			<div className="flex-grow flex flex-col justify-between items-stretch relative">
 				<BookInfo book={book} />
-				{imageLoaded && <BookMint book={book} /> }
+				{imageLoaded && <AddToEngine book={book} /> }
 				{!imageLoaded && !imageError && (
                     <img
                         className="rounded-lg h-80 object-fill animate-pulse"

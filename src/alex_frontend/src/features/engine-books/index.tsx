@@ -6,10 +6,12 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchEngineBooks from "./thunks/fetchEngineBooks";
 import { setExpanded } from "./engineBooksSlice";
 import { ChevronDown, ChevronUp, LoaderCircle, Search } from "lucide-react";
+import useSession from "@/hooks/useSession";
 
 const TO_DISPLAY = 5;
 
 const EngineBooks = () => {
+	const {meiliIndex} = useSession();
 	const dispatch = useAppDispatch();
 
 	const { user } = useAppSelector((state) => state.auth);
@@ -18,8 +20,8 @@ const EngineBooks = () => {
 	const { expanded, loading, error, books } = useAppSelector((state) => state.engineBooks);
 
     useEffect(() => {
-		// fetch once or when a new book is uploaded
-		if(books.length>0 || !activeEngine) return;
+		if(!activeEngine) return;
+
         dispatch(fetchEngineBooks(activeEngine));
     }, []);
 
@@ -55,7 +57,7 @@ const EngineBooks = () => {
 				)}
 				<div className="flex gap-1 justify-start items-center font-roboto-condensed text-base leading-[18px] text-black font-normal">
 					{loading &&	<span>Loading</span> }
-					<span>Minted Books</span>
+					<span>Added Books</span>
 					{ loading && <LoaderCircle
 						size={14}
 						className="animate animate-spin"
