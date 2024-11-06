@@ -17,14 +17,14 @@ export interface TransactionType {
 }
 
 // Create the async thunk for fetching transactions
-const getLBRYTransactions = createAsyncThunk<
+const fetchTransaction = createAsyncThunk<
   TransactionType[], // Use the interface here for the return type of the thunk's payload
   string, // The argument type (account or principal string)
   { rejectValue: string }
->("icp_swap/getLBRYTransactions", async (account, { rejectWithValue }) => {
+>("icp_swap/fetchTransaction", async (account, { rejectWithValue }) => {
   try {
     const lbryActor = await getLbryActor();
-    const icpLedgerActor = getIcpLedgerActor();
+    // const icpLedgerActor = getIcpLedgerActor();
     const alexActor = await getAlexActor();
 
     // Retrieve LBRY transactions
@@ -57,21 +57,26 @@ const getLBRYTransactions = createAsyncThunk<
       ...lbryResult.transactions,
       ...alexResult.transactions,
     ];
-
+    console.log("ggg", allTransactions);
     // Filter transactions where the `to` or `from` owner matches the provided account
     const filteredTransactions = allTransactions.filter((transaction) => {
+      // Check for the owner in different transaction types
       const toOwner =
-        transaction.mint?.[0]?.to?.owner ||
-        transaction.transfer?.[0]?.to?.owner ||
-        transaction.approve?.[0]?.from?.owner;
+          transaction.mint?.[0]?.to?.owner ||
+          transaction.transfer?.[0]?.to?.owner ||
+          // transaction.approve?.[0]?.to?.owner ||
+          transaction.burn?.[0]?.spender[0]?.owner; 
+  
       const fromOwner =
-        transaction.transfer?.[0]?.from?.owner ||
-        transaction.approve?.[0]?.from?.owner;
-
+          transaction.transfer?.[0]?.from?.owner ||
+          transaction.approve?.[0]?.from?.owner ||
+          transaction.burn?.[0]?.from?.owner; // Include burn in fromOwner check
+  
       return (
-        toOwner?.toString() === account || fromOwner?.toString() === account
+          toOwner?.toString() === account || fromOwner?.toString() === account
       );
-    });
+  });
+    console.log("filtered", filteredTransactions);
 
     // Convert transactions to human-readable format
     const LedgerServices = LedgerService();
@@ -81,6 +86,7 @@ const getLBRYTransactions = createAsyncThunk<
           transaction.mint?.[0]?.amount ||
           transaction.transfer?.[0]?.amount ||
           transaction.approve?.[0]?.amount ||
+          transaction.burn?.[0]?.amount ||
           0n;
 
         const formattedAmount = LedgerServices.e8sToIcp(amount).toString();
@@ -88,22 +94,19 @@ const getLBRYTransactions = createAsyncThunk<
         let feeAmount = 0n;
 
         // Check if the fee is an array and contains a bigint
-        if (
-          Array.isArray(transaction.transfer?.[0]?.fee) &&
-          transaction.transfer[0].fee.length > 0
-        ) {
-          feeAmount = transaction.transfer[0].fee[0] ?? 0n;
+        if (transaction.approve[0]?.fee) {
+          feeAmount = transaction.approve[0]?.fee[0] ?? 0n;
+        } else if (transaction.transfer[0]?.fee) {
+          feeAmount = transaction.transfer[0]?.fee[0] ?? 0n;
         }
 
         const formattedFee = LedgerServices.e8sToIcp(feeAmount).toString();
 
         // Determine the fee label
         let feeLabel = "";
-        if (alexResult.transactions.includes(transaction) ) {
+        if (alexResult.transactions.includes(transaction)) {
           feeLabel = formattedFee + " ALEX";
-        } else if (
-          lbryResult.transactions.includes(transaction) 
-        ) {
+        } else if (lbryResult.transactions.includes(transaction)) {
           feeLabel = formattedFee + "LBRY";
         } else {
           feeLabel = "0";
@@ -121,10 +124,12 @@ const getLBRYTransactions = createAsyncThunk<
           transaction.mint?.[0]?.to?.owner ||
           transaction.transfer?.[0]?.to?.owner ||
           transaction.approve?.[0]?.from?.owner ||
+          transaction.burn?.[0]?.from?.owner ||
           "N/A";
         const from =
           transaction.transfer?.[0]?.from?.owner ||
           transaction.approve?.[0]?.from?.owner ||
+          transaction.burn?.[0]?.from?.owner ||
           "N/A";
         const timestamp = Number(transaction.timestamp / 1_000_000n);
 
@@ -155,7 +160,7 @@ const getLBRYTransactions = createAsyncThunk<
   );
 });
 
-export default getLBRYTransactions;
+export default fetchTransaction;
 
 // import { createAsyncThunk } from "@reduxjs/toolkit";
 // import LedgerService from "@/utils/LedgerService";
@@ -313,4 +318,3 @@ export default getLBRYTransactions;
 // );
 
 // export default getLBRYTransactions;
-

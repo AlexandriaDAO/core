@@ -2,16 +2,16 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { faCheck, faExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect } from "react";
-import getLBRYTransactions, { TransactionType } from "../../thunks/lbryIcrc/getTransactions";
+import fetchTransaction, { TransactionType } from "../../thunks/lbryIcrc/getTransactions";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import TransactionHistoryObj from "./transactionHistoryObj";
 
-const TransactionHistory = ( ) => {
+const TransactionHistory = () => {
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const swap = useAppSelector((state) => state.swap);
     useEffect(() => {
-        dispatch(getLBRYTransactions(user));
+        dispatch(fetchTransaction(user));
     }, [user]);
     return (<>
         <div className="overflow-x-auto lg:overflow-x-auto">
@@ -61,11 +61,11 @@ const TransactionHistory = ( ) => {
                     </tr>
                 </thead>
                 <tbody className="text-gray-600 text-sm font-light">
-                    {swap.transactions?.map((trx: TransactionType) => {
+                    {swap.transactions?.map((trx: TransactionType, i) => {
                         return (
-    
-                            <TransactionHistoryObj   key={trx.timestamp} timestamp={trx.timestamp} amount={trx.amount} type={trx.type} from={trx.from} to={trx.to} fee={trx.fee}/>
-                    
+
+                            <TransactionHistoryObj key={trx.timestamp} timestamp={trx.timestamp} amount={trx.amount} type={trx.type} from={trx.from} to={trx.to} fee={trx.fee} index={i} />
+
                         );
                     })}
                 </tbody>

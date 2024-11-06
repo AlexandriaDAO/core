@@ -12,7 +12,7 @@ import transferLBRY from "./thunks/lbryIcrc/transferLBRY";
 import getALlStakesInfo from "./thunks/getAllStakesInfo";
 import getArchivedBal from "./thunks/getArchivedBal";
 import redeemArchivedBalance from "./thunks/redeemArchivedBalance";
-import getLBRYTransactions from "./thunks/lbryIcrc/getTransactions";
+import fetchTransaction from "./thunks/lbryIcrc/getTransactions";
 
 import { TransactionType } from "./thunks/lbryIcrc/getTransactions";
 import getStakersCount from "./thunks/getStakersCount";
@@ -284,18 +284,18 @@ const swapSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      .addCase(getLBRYTransactions.pending, (state) => {
+      .addCase(fetchTransaction.pending, (state) => {
         toast.info("fetching!");
         state.loading = true;
         state.error = null;
       })
-      .addCase(getLBRYTransactions.fulfilled, (state, action) => {
+      .addCase(fetchTransaction.fulfilled, (state, action) => {
         toast.success("Fetched Transactions!");
         state.loading = false;
         state.transactions = action.payload;
         state.error = null;
       })
-      .addCase(getLBRYTransactions.rejected, (state, action) => {
+      .addCase(fetchTransaction.rejected, (state, action) => {
         toast.error("Error while fetching transactions!");
         state.loading = false;
         state.error = action.payload as string;

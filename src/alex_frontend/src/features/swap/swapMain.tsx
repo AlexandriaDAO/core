@@ -39,6 +39,10 @@ const SwapMain = () => {
     useEffect(() => {
         dispatch(getLBRYratio());
         dispatch(getAlexMintRate());
+        if (localStorage.getItem("tab")) {
+            setActiveTab(7);
+            localStorage.removeItem("tab");
+        }
 
     }, [])
     useEffect(() => {
@@ -46,9 +50,7 @@ const SwapMain = () => {
             dispatch(getLBRYratio());
 
         }
-        // else if (swap.swapSuccess === true) {
-        //     dispatch(getAlexMintRate());
-        // }
+
     }, [swap])
     return (
         <div className='tabs py-10 2xl:py-20 xl:py-16 lg:py-14 md:py-12 sm:py-10'>

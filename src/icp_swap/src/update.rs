@@ -389,7 +389,6 @@ async fn un_stake_all_ALEX() -> Result<String, String> {
     Ok("UnStaked Successfully!".to_string())
 }
 //Guard ensure call is only by canister.
-//For testing using #[update]
 #[update(guard = "is_canister")]
 pub async fn distribute_reward() -> Result<String, String> {
     let intervals = get_distribution_interval();
@@ -426,9 +425,8 @@ pub async fn distribute_reward() -> Result<String, String> {
     total_icp_allocated = total_icp_allocated.checked_div(10000).ok_or(
         "Division failed in ICP allocation. Please verify the amount is valid and non-zero",
     )?;
-    ic_cdk::println!("The is {}", total_icp_allocated);
-    if total_icp_allocated < 1000_000_000 {
-        return Err("Cannot distribute reward allocated Icp balance less than 10".to_string());
+    if total_icp_allocated < 100_000_000 {
+        return Err("Cannot distribute reward allocated Icp balance less than 1".to_string());
     }
 
     let total_staked_alex = get_total_alex_staked().await? as u128;
