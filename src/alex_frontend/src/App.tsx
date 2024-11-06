@@ -22,6 +22,7 @@ import MintPage from "./pages/MintPage";
 import CollectionPage from "./apps/app/Emporium/CollectionPage";
 
 import "./styles/style.css";
+import DetailTransaction from "./features/swap/components/transactionHistory/detailTransaction";
 
 export default function App() {
     return (
@@ -33,6 +34,8 @@ export default function App() {
                         <Route path="/" element={<HomePage />} />
                         <Route path="/manager" element={<ManagerPage />} />
                         <Route path="/swap" element={<SwapPage />} />
+                        <Route path="/swap/transaction" element={<DetailTransaction />} />
+
                         <Route path="/librarian" element={<LibrarianPage />} />
                         <Route path="/whitepaper" element={<WhitepaperPage />} />
 

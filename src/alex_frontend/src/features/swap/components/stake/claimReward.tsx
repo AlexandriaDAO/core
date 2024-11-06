@@ -22,7 +22,6 @@ const ClaimReward: React.FC<StakedInfoProps> = ({ setLoadingModalV,setActionType
     }
     useEffect(() => {
         if (swap.successClaimReward === true) {
-            alert("Successfully Claimed");
             dispatch(flagHandler());
         }
 

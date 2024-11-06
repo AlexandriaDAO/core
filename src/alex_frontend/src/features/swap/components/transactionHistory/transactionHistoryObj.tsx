@@ -1,7 +1,7 @@
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { TransactionType } from "../../thunks/lbryIcrc/getTransactions";
+import { useNavigate } from "react-router-dom";
 
 const TransactionHistoryObj: React.FC<{
     timestamp: string;
@@ -9,14 +9,23 @@ const TransactionHistoryObj: React.FC<{
     type: string;
     from: string;
     to: string;
-    fee:string;
-  }> = ({ timestamp, amount, type, from, to,fee }) => {
-  
+    fee: string;
+    index: number;
+}> = ({ timestamp, amount, type, from, to, fee, index }) => {
+    const navigate = useNavigate();
+
+    const handleClick = (id: any) => {
+        localStorage.setItem("tab", "trx");
+        navigate("transaction?id=" + id);
+    }
+
+
     return (<>
-        <tr className="border-b border-gray-300 hover:bg-gray-100">
+        <tr className="border-b border-gray-300 hover:bg-gray-100" role="button" onClick={() => { handleClick(index) }}>
             <td className="py-3 text-left text-base font-medium text-radiocolor">{timestamp}</td>
             <td className="py-3 px-6 text-left text-base font-medium text-radiocolor">
-                <button className='bg-sendbtnbg bg-opacity-30 px-3 rounded-bordertb'>{type}</button>
+                <button className={`${type === "mint" ? "bg-mintbtnbg" : "bg-sendbtnbg"} bg-opacity-30 px-3 rounded-bordertb`}>{type}</button>
+
             </td>
             <td className="py-3 px-6 text-left text-base font-medium text-radiocolor"><span>{amount}</span></td>
             <td className="py-3 px-6 text-left text-base font-medium text-radiocolor"><span>{fee}</span></td>
