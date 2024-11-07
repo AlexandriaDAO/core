@@ -1,11 +1,15 @@
 
+ToDo: 
+- mint.ts needs testing and refining of the if/else logic.
+- id_convert needs a solid audit to understand where the randomness is coming from and if there are edge cases.
+- nft_manager/update.rs mint functions should be combined into one, though able to mint either scion or icrc7.
+
+
 MintNFT function:
 
 
-
-Make a icrc7_scion (or spawn/scion/heir/twin) canister.
-Get NFT_manager to deploy it.
-
+- The minting function will probably be much fatser if we remove the nftExists() check, and it'll just fail anyway if you try to mint the same NFT twice.
+- Then we'll put check for which mint function is triggered in the frontend.
 
 Change the nft_manager to mint_nft function to mint the copy if the nft already exists; and figure out how to pay the 1-2 lbry depending on which one is triggered. (I don't know how we trigger the payment from the frontend. We could also make a flat fee, and just split it 50/50, but I don't think it's any easier.)
 
@@ -26,7 +30,9 @@ Then we'll let people do their own channels which are just regular stable struct
 These channels could be open for everyone to edit, or only for the owner to edit.
 I think it'll be totally free to add nfts, but you can only add them if you own the original or copy.
 
-
+*Security Todos*
+- Need to check that the minting number decodes to a valid arweave id (if possible, otherwise people can mint nothing nfts).
+  - Otherwise we need some general check that the nft corresponds to an arweave id. (This should replace the is_under_100_digits check.)
 
 
 

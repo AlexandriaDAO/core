@@ -7,6 +7,7 @@ use candid::{Nat, Principal};
 
 
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
+pub const ICRC7_SCION_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 pub const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
 pub const ALEX_CANISTER_ID: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";
 pub const FRONTEND_CANISTER_ID: &str = "yj5ba-aiaaa-aaaap-qkmoa-cai";
@@ -17,6 +18,10 @@ pub fn get_principal(id: &str) -> Principal {
 
 pub fn icrc7_principal() -> Principal {
     get_principal(ICRC7_CANISTER_ID)
+}
+
+pub fn icrc7_scion_principal() -> Principal {
+    get_principal(ICRC7_SCION_CANISTER_ID)
 }
 
 pub fn alex_principal() -> Principal {
