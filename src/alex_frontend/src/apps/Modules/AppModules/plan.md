@@ -1,4 +1,6 @@
 
+- Show NFTs button should go away and be used by default.
+
 ToDo: 
 - mint.ts needs testing and refining of the if/else logic.
 - id_convert needs a solid audit to understand where the randomness is coming from and if there are edge cases.

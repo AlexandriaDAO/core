@@ -4,6 +4,7 @@ import { useHandleSearch } from './hooks/useSearchHandlers';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { wipe } from '@/apps/Modules/shared/state/wiper';
+import { Button } from '@/lib/components/button';
 
 import NsfwModelControl from './NsfwSelector';
 import AmountSelector from './selectors/AmountSelector';
@@ -24,9 +25,8 @@ const SearchForm: React.FC<SearchFormProps> = ({
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 max-w-sm">
-      <div className="space-y-4">
-
+    <div className="flex flex-col items-center w-full max-w-[440px] p-4 gap-10 rounded-[20px] border border-[#CCC] bg-white">
+      <div className="w-full space-y-4">
         <ContentCategorySelector />
         <AmountSelector />
         <DateSelector />
@@ -34,16 +34,14 @@ const SearchForm: React.FC<SearchFormProps> = ({
         <ContentTagsSelector />
         <NsfwModelControl />
         
-        {/* Updated Search Button */}
-        <button 
-          onClick={handleSearchClick} 
+        <Button 
+          onClick={handleSearchClick}
           disabled={isLoading}
-          className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm 
-                      text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none 
-                      focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          variant="primary"
+          className="w-full"
         >
           {isLoading ? 'Loading...' : 'Search'}
-        </button>
+        </Button>
       </div>
     </div>
   );

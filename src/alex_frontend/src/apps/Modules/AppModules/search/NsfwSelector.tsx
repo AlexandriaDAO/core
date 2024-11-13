@@ -20,12 +20,12 @@ const NsfwModelControl: React.FC = () => {
     };
   }, []); // Empty dependency array since we only want this to run on unmount
 
-  // // Add this if you want to autmatically turn SafeSearch on.
-  // useEffect(() => {
-  //   if (!isModelLoaded()) {
-  //     handleToggleSafeSearch(true);
-  //   }
-  // }, []);
+  // Add this if you want to autmatically turn SafeSearch on.
+  useEffect(() => {
+    if (!isModelLoaded()) {
+      handleToggleSafeSearch(true);
+    }
+  }, []);
 
   const handleToggleSafeSearch = async (enabled: boolean) => {
     if (enabled && !isModelLoaded()) {
@@ -45,8 +45,8 @@ const NsfwModelControl: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col space-y-2">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col items-center w-full p-4 gap-4 rounded-[20px] border border-[#CCC] bg-white">
+      <div className="flex items-center justify-between w-full">
         <span className="text-sm font-medium text-gray-700">SafeSearch</span>
         <label className="relative inline-flex items-center cursor-pointer">
           <input
@@ -59,9 +59,11 @@ const NsfwModelControl: React.FC = () => {
           <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
         </label>
       </div>
-      {isLoading && <p className="text-xs text-blue-600">Loading SafeSearch model...</p>}
+      {isLoading && (
+        <p className="text-xs text-blue-600 w-full">Loading SafeSearch model...</p>
+      )}
       {!nsfwModelLoaded && !isLoading && (
-        <p className="text-xs text-red-600">
+        <p className="text-xs text-red-600 w-full">
           Warning: SafeSearch must be enabled to mint NFTs.
         </p>
       )}

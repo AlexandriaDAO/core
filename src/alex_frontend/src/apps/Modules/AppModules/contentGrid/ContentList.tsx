@@ -26,11 +26,11 @@ const ContentList = () => {
 
   const handleMint = async (transactionId: string) => {
     try {
-      await mint_nft(transactionId);
-      toast.success("NFT minted successfully!");
+      const message = await mint_nft(transactionId);
+      toast.success(message);
     } catch (error) {
       console.error("Error minting NFT:", error);
-      toast.error("Failed to mint NFT. Please try again.");
+      toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
     }
   };
 

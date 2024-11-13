@@ -2,12 +2,13 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { setPredictionResults } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
-import { setMintableStates, setOwner } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
+import { setMintableStates } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
 import { useContentValidation } from '@/apps/Modules/shared/services/contentValidation';
 import ContentFetcher from './ContentFetcher';
 import { ContentValidatorProps } from '../types';
 import { icrc7 } from '../../../../../../../declarations/icrc7';
 import { arweaveIdToNat } from "@/utils/id_convert";
+import { getAuthClient } from '@/features/auth/utils/authUtils';
 
 const ContentValidator: React.FC<ContentValidatorProps> = ({
   transactionId,
@@ -33,10 +34,17 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
       owner = null;
     }
     
-    // If there's an owner, it's already been minted once so it's automatically mintable
+    // If there's an owner, check authentication before setting mintable state
     if (owner) {
-      dispatch(setOwner({ id: transactionId, owner }));
-      dispatch(setMintableStates({ [transactionId]: { mintable: true, owner } }));
+      const client = await getAuthClient();
+      const isAuthenticated = await client.isAuthenticated();
+      
+      dispatch(setMintableStates({ 
+        [transactionId]: { 
+          mintable: isAuthenticated, 
+          owner 
+        } 
+      }));
       return;
     }
     
@@ -49,6 +57,8 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
 
     // Validate unminted content
     try {
+      const client = await getAuthClient();
+      const isAuthenticated = await client.isAuthenticated();
       const predictionResults = await validateContent(element, contentType);
       
       if (predictionResults) {
@@ -60,7 +70,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
         dispatch(
           setMintableStates({
             [transactionId]: {
-              mintable: !predictionResults.isPorn,
+              mintable: !predictionResults.isPorn && isAuthenticated,
               owner: null
             }
           })

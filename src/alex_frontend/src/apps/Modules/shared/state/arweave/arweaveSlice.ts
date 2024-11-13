@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SearchState } from '../../../shared/types/queries';
 import { fileTypeCategories } from '../../../shared/types/files';
 import { setMintableStates } from '../content/contentDisplaySlice';
+import { getAuthClient } from '@/features/auth/utils/authUtils';
 
 export interface PredictionResults {
   Drawing: number;
@@ -75,7 +76,9 @@ export const updatePredictionResults = createAsyncThunk(
     dispatch(setPredictionResults({ id, predictions }));
     
     // Update mintable state based on predictions
-    const isMintable = !predictions.isPorn;
+    const client = await getAuthClient();
+    const isAuthenticated = await client.isAuthenticated();
+    const isMintable = !predictions.isPorn && isAuthenticated;
     dispatch(setMintableStates({ [id]: { mintable: isMintable } }));
   }
 );

@@ -9,13 +9,18 @@ import {
 import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 import { Transaction } from '../../../shared/types/queries';
+import { getAuthClient } from "@/features/auth/utils/authUtils";
 import { RootState } from '@/store';
+
+
 
 export const loadContentForTransactions = createAsyncThunk(
   'contentDisplay/loadContent',
   async (transactions: Transaction[], { dispatch }) => {
+    const client = await getAuthClient();
     const initialStates = ContentService.getInitialMintableStates(transactions);
     dispatch(setMintableStates(initialStates));
+    console.log("client identity", client.getIdentity().getPrincipal().toString());
 
     // Load content for each transaction
     await Promise.all(transactions.map(async (transaction) => {
