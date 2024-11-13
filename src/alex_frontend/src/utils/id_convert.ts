@@ -1,3 +1,5 @@
+// // OG Conversions
+
 export function arweaveIdToNat(arweaveId: string): bigint {
     // Remove any potential extra character and padding
     let id = arweaveId.slice(0, 43);
@@ -13,7 +15,6 @@ export function arweaveIdToNat(arweaveId: string): bigint {
     // Decode Base64 to Uint8Array
     const idBytes = base64DecodeToUint8Array(id);
 
-    // Convert Uint8Array to BigInt
     return bytesToBigInt(idBytes);
 }
 
@@ -23,7 +24,6 @@ export function natToArweaveId(num: bigint): string {
 
     // Encode Uint8Array to Base64
     let id = base64Encode(idBytes);
-
     // Replace standard Base64 characters with URL-safe ones and remove padding
     return id.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
@@ -67,105 +67,44 @@ function base64Encode(input: Uint8Array): string {
 
 
 
+// // Scion Conversions (should be 96-97 bits, so below the 100-bit limit)
 
 
-
-
-
-
-
-// // Scion version:
-
-// Hash function for the principal to create a smaller fingerprint
+// Hash principal to a fixed-size number (returns a BigInt)
 function hashPrincipal(principal: string): bigint {
     let hash = BigInt(0);
     const prime = BigInt(31);
     
+    // Use a rolling hash function with prime numbers
     for (let i = 0; i < principal.length; i++) {
-        hash = (hash * prime + BigInt(principal.charCodeAt(i))) & ((BigInt(1) << BigInt(32)) - BigInt(1));
+        hash = hash * prime + BigInt(principal.charCodeAt(i));
     }
     
-    return hash;
+    // Ensure positive and fixed size (64 bits)
+    return hash & ((BigInt(1) << BigInt(64)) - BigInt(1));
 }
 
-export function ogToScionId(ogNum: bigint, principal: string): bigint {
-    // Get a 32-bit hash of the principal
+// Convert original number and principal to scion ID
+export function ogToScionId(ogNumber: bigint, principal: string): bigint {
+    // Get 64-bit hash of principal
     const principalHash = hashPrincipal(principal);
     
-    // XOR the principalHash with the first 32 bits of ogNum
-    const firstPart = ogNum >> BigInt(ogNum.toString(2).length - 32);
-    const xoredPart = firstPart ^ principalHash;
+    // Shift principal hash left by 256 bits to ensure first 32 digits are unique
+    // This puts the principal-based uniqueness at the start
+    const shiftedHash = principalHash << BigInt(256);
     
-    // Reconstruct the number with the XORed first part
-    const restMask = (BigInt(1) << BigInt(ogNum.toString(2).length - 32)) - BigInt(1);
-    const restPart = ogNum & restMask;
-    const maskedOgNum = (xoredPart << BigInt(ogNum.toString(2).length - 32)) | restPart;
-    
-    // Combine with hash as before
-    const scionId = (maskedOgNum << BigInt(32)) | principalHash;
-    
-    return scionId;
+    // Combine with original number to ensure uniqueness across different ogNumbers
+    // XOR maintains reversibility while mixing the values
+    return shiftedHash ^ ogNumber;
 }
 
+// Convert scion ID back to original number and principal hash
 export function scionToOgId(scionId: bigint): [bigint, bigint] {
-    // Extract the original number and principal hash
-    const principalHash = scionId & ((BigInt(1) << BigInt(32)) - BigInt(1));
-    const maskedOgNum = scionId >> BigInt(32);
+    // Extract principal hash (first 64 bits after shifting right)
+    const principalHash = (scionId >> BigInt(256)) & ((BigInt(1) << BigInt(64)) - BigInt(1));
     
-    // Get the length of the masked number
-    const maskedLength = maskedOgNum.toString(2).length;
+    // Reconstruct original number using the same XOR operation
+    const ogNumber = scionId ^ (principalHash << BigInt(256));
     
-    // Extract and un-XOR the first part
-    const firstPart = maskedOgNum >> BigInt(maskedLength - 32);
-    const originalFirstPart = firstPart ^ principalHash;
-    
-    // Reconstruct the original number
-    const restMask = (BigInt(1) << BigInt(maskedLength - 32)) - BigInt(1);
-    const restPart = maskedOgNum & restMask;
-    const ogNum = (originalFirstPart << BigInt(maskedLength - 32)) | restPart;
-    
-    return [ogNum, principalHash];
-}
-
-// Helper function to verify a scion belongs to a principal
-export function verifyScionOwnership(scionId: bigint, principal: string): boolean {
-    const [_, storedPrincipalHash] = scionToOgId(scionId);
-    const calculatedPrincipalHash = hashPrincipal(principal);
-    
-    return storedPrincipalHash === calculatedPrincipalHash;
-}
-
-// Example demonstrations
-export function demonstrateConversions() {
-    const examples = [
-        {
-            ogNumber: BigInt("12365768980998987654657687980909089786755678798090"),
-            principal: "aaaaa-aa"
-        },
-        {
-            ogNumber: BigInt("12365768980998987654657687980909089786755678798090"),
-            principal: "2vxsx-fae"
-        },
-        {
-            ogNumber: BigInt("12365768980998987654657687980909089786755678798090"),
-            principal: "rrkah-fqaaa-aaaaa-aaaaq-cai"
-        },
-        {
-            ogNumber: BigInt("412365768980998987654657687980909089786755678798090"),
-            principal: "rrkah-fqaaa-aaaaa-aaaaq-cai"
-        }
-    ];
-
-    for (const example of examples) {
-        const scionId = ogToScionId(example.ogNumber, example.principal);
-        const [recoveredOgNum, principalHash] = scionToOgId(scionId);
-        
-        console.log("\nExample:");
-        console.log(`Principal: ${example.principal}`);
-        console.log(`Principal Hash: ${hashPrincipal(example.principal)}`);
-        console.log(`Original Number: ${example.ogNumber}`);
-        console.log(`Scion ID: ${scionId}`);
-        console.log(`Recovered Original Number: ${recoveredOgNum}`);
-        console.log(`Is Valid: ${example.ogNumber === recoveredOgNum}`);
-    }
+    return [ogNumber, principalHash];
 }

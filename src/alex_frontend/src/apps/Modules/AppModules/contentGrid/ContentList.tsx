@@ -25,7 +25,6 @@ const ContentList = () => {
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
 
   const handleMint = async (transactionId: string) => {
-    console.log("Minting NFT for transaction:", transactionId);
     try {
       await mint_nft(transactionId);
       toast.success("NFT minted successfully!");

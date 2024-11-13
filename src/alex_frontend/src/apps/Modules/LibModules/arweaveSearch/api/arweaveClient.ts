@@ -7,11 +7,11 @@ import { getBlockHeightForTimestamp } from './arweaveHelpers';
 import { ARWEAVE_CONFIG, getArweaveUrl } from '../config/arweaveConfig';
 
 const logLink = new ApolloLink((operation, forward) => {
-  console.log('GraphQL Request:', {
-    operationName: operation.operationName,
-    query: operation.query.loc?.source.body,
-    variables: operation.variables,
-  });
+  // console.log('GraphQL Request:', {
+  //   operationName: operation.operationName,
+  //   query: operation.query.loc?.source.body,
+  //   variables: operation.variables,
+  // });
   return forward(operation);
 });
 
