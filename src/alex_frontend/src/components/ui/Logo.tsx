@@ -6,19 +6,27 @@ interface LogoProps {
 }
 
 function Logo({ className = "" }: LogoProps) {
-    const navigate = useNavigate();
-    return (
-        <div
-            onClick={() => navigate('/')}
-            className={`cursor-pointer hover:opacity-80 ${className}`}
-        >
-            <img
-                src="/images/logo.png"
-                alt="UG Logo"
-                className="h-8 w-auto"
-            />
-        </div>
-    );
+  const navigate = useNavigate();
+  
+  return (
+    <div
+      onClick={() => navigate('/')}
+      className={`cursor-pointer hover:opacity-80 ${className}`}
+    >
+      <span
+        style={{
+          color: 'var(--white, var(--Colors-LightMode-Text-text-100, #FFF))',
+          fontFamily: 'Syne',
+          fontSize: '24px',
+          fontStyle: 'normal',
+          fontWeight: 800,
+          lineHeight: 'normal'
+        }}
+      >
+        ALEX
+      </span>
+    </div>
+  );
 }
 
 export default Logo;
