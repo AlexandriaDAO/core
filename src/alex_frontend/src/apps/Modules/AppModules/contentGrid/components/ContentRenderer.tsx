@@ -36,9 +36,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
     return (
       <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center gap-2">
         <File className="text-gray-500 text-4xl" />
-        <span className="text-sm text-gray-600">
-          {content?.error || "Content failed to load"}
-        </span>
+        <LoaderPinwheel className="animate-spin text-4xl text-gray-500" />
       </div>
     );
   }
@@ -48,7 +46,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
     onError: () => handleRenderError(transaction.id),
   };
 
-  const renderContent = () => {
+  const renderContent = () => {    
     if (contentType === "application/epub+zip") {
       if (inModal) {
         return (
@@ -74,20 +72,34 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
     }
 
     const contentMap = {
-      "video/": <video src={inModal ? contentUrls.fullUrl : undefined} controls={inModal} {...commonProps} />,
+      "video/": (
+        <div className="relative w-full h-full">
+          <video 
+            src={inModal ? contentUrls.fullUrl : undefined} 
+            controls={inModal} 
+            {...commonProps}
+          />
+        </div>
+      ),
       "image/": (
         <img 
           src={content?.imageObjectUrl || contentUrls.thumbnailUrl || contentUrls.fullUrl} 
           alt="Content" 
           decoding="async"
-          {...commonProps} 
+          {...commonProps}
           crossOrigin="anonymous" 
         />
       ),
       "application/pdf": (
         <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
           <File className="text-gray-500 text-4xl absolute" />
-          {inModal && <embed src={`${contentUrls.fullUrl}#view=FitH&page=1`} type="application/pdf" {...commonProps} />}
+          {inModal && (
+            <embed 
+              src={`${contentUrls.fullUrl}#view=FitH&page=1`} 
+              type="application/pdf" 
+              {...commonProps}
+            />
+          )}
         </div>
       ),
     };

@@ -60,6 +60,10 @@ const ContentList = () => {
           const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
           const mintableStateItem = mintableState[transaction.id];
           const isMintable = mintableStateItem?.mintable;
+          const hasPredictions = !!predictions[transaction.id];
+          
+          // Only show blur when we have predictions and content is not mintable
+          const shouldShowBlur = hasPredictions && mintableStateItem && !isMintable;
 
           return (
             <ContentGrid.Item
@@ -79,38 +83,44 @@ const ContentList = () => {
                   mintableState={mintableState}
                   handleRenderError={handleRenderError}
                 />
+                {shouldShowBlur && (
+                  <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-20">
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
+                      Content Filtered
+                    </div>
+                  </div>
+                )}
                 {renderDetails(transaction)}
               
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
+                  }}
+                  className="absolute top-2 left-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
+                >
+                  <Info />
+                </button>
+                {showStats[transaction.id] && predictions[transaction.id] && (
+                  <div className="absolute top-10 left-2 bg-black/80 text-white p-2 rounded-md text-xs z-30">
+                    <div>Drawing: {(predictions[transaction.id].Drawing * 100).toFixed(1)}%</div>
+                    <div>Neutral: {(predictions[transaction.id].Neutral * 100).toFixed(1)}%</div>
+                    <div>Sexy: {(predictions[transaction.id].Sexy * 100).toFixed(1)}%</div>
+                    <div>Hentai: {(predictions[transaction.id].Hentai * 100).toFixed(1)}%</div>
+                    <div>Porn: {(predictions[transaction.id].Porn * 100).toFixed(1)}%</div>
+                  </div>
+                )}
+                
                 {isMintable && (
-                  <>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
-                      }}
-                      className="absolute top-2 left-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
-                    >
-                      <Info />
-                    </button>
-                    {showStats[transaction.id] && predictions[transaction.id] && (
-                      <div className="absolute top-10 left-2 bg-black/80 text-white p-2 rounded-md text-xs z-30">
-                        <div>Drawing: {(predictions[transaction.id].Drawing * 100).toFixed(1)}%</div>
-                        <div>Neutral: {(predictions[transaction.id].Neutral * 100).toFixed(1)}%</div>
-                        <div>Sexy: {(predictions[transaction.id].Sexy * 100).toFixed(1)}%</div>
-                        <div>Hentai: {(predictions[transaction.id].Hentai * 100).toFixed(1)}%</div>
-                        <div>Porn: {(predictions[transaction.id].Porn * 100).toFixed(1)}%</div>
-                      </div>
-                    )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleMint(transaction.id);
-                      }}
-                      className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
-                    >
-                      +
-                    </button>
-                  </>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMint(transaction.id);
+                    }}
+                    className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-30"
+                  >
+                    +
+                  </button>
                 )}
               </div>
             </ContentGrid.Item>

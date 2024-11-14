@@ -102,6 +102,8 @@
 
     "clsx": "^2.1.1",
 
+    "date-fns": "^3.6.0",
+
     "epubjs": "^0.3.93",
 
     "ethers": "^6.13.2",
@@ -147,6 +149,8 @@
     "react-circle-flags": "^0.0.20",
 
     "react-csv": "^2.2.2",
+
+    "react-day-picker": "^8.10.1",
 
     "react-dom": "^18.3.1",
 

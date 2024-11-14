@@ -16,12 +16,8 @@ export default function PrincipalSelector() {
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const dispatch = useDispatch<AppDispatch>();
 
-  const handlePrincipalToggle = async (principalId: string) => {
-    try {
-      await dispatch(togglePrincipalSelection(principalId));
-    } catch (error) {
-      console.error("Error toggling principal:", error);
-    }
+  const handlePrincipalSelect = (principalId: string) => {
+    dispatch(togglePrincipalSelection({ principalId, collection: 'icrc7' }));
   };
 
   return (
@@ -33,7 +29,7 @@ export default function PrincipalSelector() {
             value={userPrincipal}
             label="My Library"
             isSelected={selectedPrincipals.includes(userPrincipal)}
-            onToggle={handlePrincipalToggle}
+            onToggle={handlePrincipalSelect}
             variant="user"
           />
         )}
@@ -43,7 +39,7 @@ export default function PrincipalSelector() {
             key={principal}
             value={principal}
             isSelected={selectedPrincipals.includes(principal)}
-            onToggle={handlePrincipalToggle}
+            onToggle={handlePrincipalSelect}
           />
         ))}
         
@@ -53,7 +49,7 @@ export default function PrincipalSelector() {
               key={principal}
               value={principal}
               isSelected={true}
-              onToggle={handlePrincipalToggle}
+              onToggle={handlePrincipalSelect}
               variant="selected"
             />
           ))}

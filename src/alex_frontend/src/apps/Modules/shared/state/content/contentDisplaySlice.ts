@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { Transaction } from '../../../shared/types/queries';
 import { CachedContent, ContentUrlInfo } from '../../../LibModules/contentDisplay/types';
-import { getAuthClient } from '@/features/auth/utils/authUtils';
 
 export interface MintableStateItem {
   mintable: boolean;
