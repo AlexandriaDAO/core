@@ -1,13 +1,5 @@
 
-- Calendar should be shadcn.
-- Use the auth hook to clean up stuff in other files.
-
-
-
 MintNFT function:
-
-
-
 
 Change the nft_manager to mint_nft function to mint the copy if the nft already exists; and figure out how to pay the 1-2 lbry depending on which one is triggered. (I don't know how we trigger the payment from the frontend. We could also make a flat fee, and just split it 50/50, but I don't think it's any easier.)
 
