@@ -4,30 +4,72 @@ export interface FileTypeConfig {
   displayName: string;
 }
 
-export const supportedFileTypes: FileTypeConfig[] = [
-  { mimeType: "image/jpeg", extension: "jpeg", displayName: "JPEG" },
-  { mimeType: "image/jpg", extension: "jpg", displayName: "JPG" },
-  { mimeType: "image/png", extension: "png", displayName: "PNG" },
-  { mimeType: "application/epub+zip", extension: "epub", displayName: "EPUB" },
-  { mimeType: "video/mp4", extension: "mp4", displayName: "MP4" },
-  { mimeType: "video/webm", extension: "webm", displayName: "WebM" },
-  { mimeType: "application/pdf", extension: "pdf", displayName: "PDF" },
-  { mimeType: "text/plain", extension: "txt", displayName: "Text" },
-  { mimeType: "text/markdown", extension: "md", displayName: "Markdown" },
-  { mimeType: "audio/mpeg", extension: "mp3", displayName: "MP3" },
-  { mimeType: "audio/wav", extension: "wav", displayName: "WAV" },
-  { mimeType: "audio/ogg", extension: "ogg", displayName: "OGG" },
-  { mimeType: "image/svg+xml", extension: "svg", displayName: "SVG" },
-  { mimeType: "application/json", extension: "json", displayName: "JSON" },
-  { mimeType: "text/html", extension: "html", displayName: "HTML" },
-  { mimeType: "image/gif", extension: "gif", displayName: "GIF" },
+interface FileTypeGroup {
+  displayName: string;
+  extension: string;
+  mimeTypes: string[];
+}
+
+const fileTypeGroups: FileTypeGroup[] = [
+  {
+    displayName: "JPEG",
+    extension: "jpeg",
+    mimeTypes: ["image/jpeg", "application/jpeg", "image/jpg", "application/jpg"]
+  },
+  {
+    displayName: "PNG",
+    extension: "png",
+    mimeTypes: ["image/png", "application/png"]
+  },
+  {
+    displayName: "SVG",
+    extension: "svg",
+    mimeTypes: ["image/svg+xml", "application/svg+xml"]
+  },
+  {
+    displayName: "GIF",
+    extension: "gif",
+    mimeTypes: ["image/gif", "application/gif"]
+  },
+  { displayName: "EPUB", extension: "epub", mimeTypes: ["application/epub+zip"] },
+  { displayName: "MP4", extension: "mp4", mimeTypes: ["video/mp4"] },
+  { displayName: "WebM", extension: "webm", mimeTypes: ["video/webm"] },
+  { displayName: "PDF", extension: "pdf", mimeTypes: ["application/pdf"] },
+  { displayName: "Text", extension: "txt", mimeTypes: ["text/plain"] },
+  { displayName: "Markdown", extension: "md", mimeTypes: ["text/markdown"] },
+  { displayName: "MP3", extension: "mp3", mimeTypes: ["audio/mpeg"] },
+  { displayName: "WAV", extension: "wav", mimeTypes: ["audio/wav"] },
+  { displayName: "OGG", extension: "ogg", mimeTypes: ["audio/ogg"] },
+  { displayName: "JSON", extension: "json", mimeTypes: ["application/json"] },
+  { displayName: "HTML", extension: "html", mimeTypes: ["text/html"] },
 ];
 
+export const supportedFileTypes: FileTypeConfig[] = fileTypeGroups.flatMap(group => 
+  group.mimeTypes.map(mimeType => ({
+    mimeType,
+    extension: group.extension,
+    displayName: group.displayName
+  }))
+);
+
 export const fileTypeCategories: Record<string, string[]> = {
-  favorites: ["image/jpeg", "application/jpeg", "image/jpg", "application/jpg", "application/epub+zip"],
-  images: ["image/jpeg", "application/jpeg", "image/jpg", "application/jpg", "image/png", "application/png", "image/gif", "application/gif", "image/svg+xml", "application/svg+xml"],
-  books: ["application/epub+zip"],
-  text: ["text/plain", "text/markdown", "application/json", "text/html", "application/pdf"],
-  video: ["video/mp4", "video/webm", "image/gif"],
-  audio: ["audio/mpeg", "audio/wav", "audio/ogg"],
+  all: supportedFileTypes.map(type => type.mimeType),
+  favorites: fileTypeGroups
+    .filter(group => ["JPEG", "EPUB"].includes(group.displayName))
+    .flatMap(group => group.mimeTypes),
+  images: fileTypeGroups
+    .filter(group => ["JPEG", "PNG", "GIF", "SVG"].includes(group.displayName))
+    .flatMap(group => group.mimeTypes),
+  books: fileTypeGroups
+    .filter(group => ["EPUB"].includes(group.displayName))
+    .flatMap(group => group.mimeTypes),
+  text: fileTypeGroups
+    .filter(group => ["Text", "Markdown", "JSON", "HTML", "PDF"].includes(group.displayName))
+    .flatMap(group => group.mimeTypes),
+  video: fileTypeGroups
+    .filter(group => ["MP4", "WebM", "GIF"].includes(group.displayName))
+    .flatMap(group => group.mimeTypes),
+  audio: fileTypeGroups
+    .filter(group => ["MP3", "WAV", "OGG"].includes(group.displayName))
+    .flatMap(group => group.mimeTypes),
 };

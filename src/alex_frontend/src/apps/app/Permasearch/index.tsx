@@ -43,7 +43,7 @@ function Permasearch() {
 					Search for any asset on Arweave.
 				</Description>
 				<Hint>
-					Save it to your wallet as an NFT.
+					Save them as NFTs.
 				</Hint>
 				<ControlsContainer $isOpen={isFiltersOpen}>
 					<FiltersButton 
