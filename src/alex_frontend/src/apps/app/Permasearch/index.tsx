@@ -15,7 +15,8 @@ import {
 	ControlsContainer,
 	FiltersButton,
 	SearchButton,
-	FiltersIcon
+	FiltersIcon,
+	SearchFormContainer
 } from "./styles";
 import { ArrowUp } from "lucide-react";
 
@@ -44,7 +45,7 @@ function Permasearch() {
 				<Hint>
 					Save it to your wallet as an NFT.
 				</Hint>
-				<ControlsContainer>
+				<ControlsContainer $isOpen={isFiltersOpen}>
 					<FiltersButton 
 						onClick={toggleFilters}
 						$isOpen={isFiltersOpen}
@@ -59,7 +60,9 @@ function Permasearch() {
 						{isLoading ? 'Loading...' : 'Search'}
 					</SearchButton>
 				</ControlsContainer>
-				{isFiltersOpen && <SearchForm />}
+				<SearchFormContainer $isOpen={isFiltersOpen}>
+					<SearchForm />
+				</SearchFormContainer>
 			</PageContainer>
 			<ContentDisplay />
 		</MainLayout>

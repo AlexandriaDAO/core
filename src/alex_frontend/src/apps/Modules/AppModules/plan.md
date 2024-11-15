@@ -4,8 +4,7 @@
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 MintNFT function:
 
-
-- Turn the filters button into a transforming one that opens the search component.
+- Get rid of the gap between filters and the grid.
 - Improve the content category selector.
 
 Change the nft_manager to mint_nft function to mint the copy if the nft already exists; and figure out how to pay the 1-2 lbry depending on which one is triggered. (I don't know how we trigger the payment from the frontend. We could also make a flat fee, and just split it 50/50, but I don't think it's any easier.)

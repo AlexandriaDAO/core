@@ -10,7 +10,6 @@ export const FiltersIcon = styled(SlidersHorizontal)`
 
 export const PageContainer = styled.div`
   max-width: 1440px;
-  min-height: 100vh;
   width: 100%;
   margin: 0 auto;
   background: var(--Colors-LightMode-Text-text-100, #FFF);
@@ -49,10 +48,12 @@ export const Hint = styled(Description)`
   margin-bottom: 32px;
 `;
 
-export const ControlsContainer = styled.div`
+export const ControlsContainer = styled.div<{ $isOpen?: boolean }>`
   display: flex;
-  gap: 16px;
-  margin-bottom: 32px;
+  gap: 1rem;
+  margin-bottom: ${props => props.$isOpen ? '1rem' : '0'};
+  width: 100%;
+  max-width: 800px;
 `;
 
 export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
@@ -98,4 +99,14 @@ export const SearchButton = styled.button`
   cursor: pointer;
   font-family: Syne;
   font-size: 16px;
+`;
+
+export const SearchFormContainer = styled.div<{ $isOpen: boolean }>`
+  height: ${props => props.$isOpen ? 'auto' : '0'};
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  margin: 0;
+  padding: ${props => props.$isOpen ? '1rem 0' : '0'};
+  width: 100%;
+  max-width: 800px;
 `; 

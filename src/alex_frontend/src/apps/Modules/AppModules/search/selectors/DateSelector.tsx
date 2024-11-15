@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { setSearchState } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
 import { Calendar } from '@/lib/components/calendar';
+import { CalendarIcon } from 'lucide-react';
 
 const DateSelector: React.FC = () => {
   const dispatch = useDispatch();
@@ -67,18 +68,24 @@ const DateSelector: React.FC = () => {
         <div className="relative" ref={calendarRef}>
           <div className="flex h-[50px] px-3 items-center rounded-[30px] border border-[#F3F3F3] bg-white w-full">
             <input
-              type="date"
-              value={searchState.filterDate}
-              onChange={(e) => handleDateTimeChange('date', e.target.value)}
-              onClick={() => setShowCalendar(true)}
+              type="text"
+              value={searchState.filterDate ? formatDate(searchState.filterDate) : ''}
+              readOnly
               className="min-w-0 flex-1 text-black font-['Poppins'] text-base font-light bg-transparent border-none outline-none cursor-pointer"
             />
+            <button
+              onClick={() => setShowCalendar(true)}
+              className="mr-2 w-5 h-5 flex-shrink-0 flex items-center justify-center"
+              type="button"
+            >
+              <CalendarIcon className="h-4 w-4" />
+            </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleDateTimeChange('date', generateRandomDate());
               }}
-              className="ml-2 w-5 h-5 flex-shrink-0 flex items-center justify-center"
+              className="w-5 h-5 flex-shrink-0 flex items-center justify-center"
               type="button"
             >
               <ShuffleIcon />
@@ -89,6 +96,7 @@ const DateSelector: React.FC = () => {
               <Calendar
                 mode="single"
                 selected={searchState.filterDate ? new Date(searchState.filterDate) : undefined}
+                defaultMonth={searchState.filterDate ? new Date(searchState.filterDate) : new Date()}
                 onSelect={(date) => {
                   if (date) {
                     handleDateTimeChange('date', date.toISOString().split('T')[0]);
