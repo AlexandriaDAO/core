@@ -67,12 +67,11 @@ const DateSelector: React.FC = () => {
         <div className="relative" ref={calendarRef}>
           <div className="flex h-[50px] px-3 items-center rounded-[30px] border border-[#F3F3F3] bg-white w-full">
             <input
-              type="text"
-              readOnly
-              value={formatDate(searchState.filterDate)}
+              type="date"
+              value={searchState.filterDate}
+              onChange={(e) => handleDateTimeChange('date', e.target.value)}
               onClick={() => setShowCalendar(true)}
               className="min-w-0 flex-1 text-black font-['Poppins'] text-base font-light bg-transparent border-none outline-none cursor-pointer"
-              placeholder="Date"
             />
             <button
               onClick={(e) => {

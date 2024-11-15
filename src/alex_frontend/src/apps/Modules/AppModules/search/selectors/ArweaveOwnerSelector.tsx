@@ -2,6 +2,43 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { setSearchState } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
+import styled from 'styled-components';
+import { Search } from 'lucide-react';
+
+export const OwnerIcon = styled(Search)`
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+`;
+
+export const SearchBox = styled.div`
+  display: flex;
+  width: 100%;
+  max-width: 800px;
+  height: 60px;
+  padding: 16px 20px;
+  align-items: center;
+  border-radius: 30px;
+  border: 1px solid var(--black-grey-400, #CCC);
+  background: var(--Colors-LightMode-Text-text-100, #FFF);
+  margin-bottom: 24px;
+`;
+
+export const Input = styled.input`
+  flex: 1;
+  border: none;
+  outline: none;
+  color: var(--black-grey-300, #808080);
+  font-family: Syne;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+
+  &::placeholder {
+    color: var(--black-grey-300, #808080);
+  }
+`;
 
 const ArweaveOwnerSelector: React.FC = () => {
   const dispatch = useDispatch();
@@ -12,20 +49,14 @@ const ArweaveOwnerSelector: React.FC = () => {
   };
 
   return (
-    <div>
-      <label htmlFor="ownerFilter" className="block text-sm font-medium text-gray-700 mb-1">
-        Owner (ArWeave Uploader):
-      </label>
-      <input
-        id="ownerFilter"
-        type="text"
+    <SearchBox>
+      <OwnerIcon />
+      <Input
         value={searchState.ownerFilter}
         onChange={(e) => handleSearchStateChange(e.target.value)}
-        placeholder="Enter owner address"
-        className="mt-1 block w-full pl-3 pr-3 py-2 text-base border-gray-300 focus:outline-none
-                   focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        placeholder="Enter owner address or principal ID"
       />
-    </div>
+    </SearchBox>
   );
 };
 

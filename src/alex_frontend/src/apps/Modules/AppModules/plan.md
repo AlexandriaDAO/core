@@ -1,5 +1,12 @@
-
+06/3/2024 950AM
+8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
+93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I
+QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 MintNFT function:
+
+
+- Turn the filters button into a transforming one that opens the search component.
+- Improve the content category selector.
 
 Change the nft_manager to mint_nft function to mint the copy if the nft already exists; and figure out how to pay the 1-2 lbry depending on which one is triggered. (I don't know how we trigger the payment from the frontend. We could also make a flat fee, and just split it 50/50, but I don't think it's any easier.)
 

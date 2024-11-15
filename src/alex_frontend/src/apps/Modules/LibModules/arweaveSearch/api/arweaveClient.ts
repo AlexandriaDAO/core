@@ -140,7 +140,7 @@ export async function fetchTransactions(
       }
       
       // Default minBlock to a range of recent blocks if not provided
-      minBlock = Math.max(0, maxBlock - 50000);
+      minBlock = Math.max(0, maxBlock - 500);
     }
 
     while (true) {

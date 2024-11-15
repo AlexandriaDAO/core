@@ -148,12 +148,23 @@ export const validateContent = async (
         prediction.probability;
     });
 
-    // Conditions for determining inappropriate content
+    // // OG Conditions
+    // const isPorn =
+    //   predictionResults.Porn > 0.5 ||
+    //   (predictionResults.Sexy > 0.2 && predictionResults.Porn > 0.2) ||
+    //   (predictionResults.Hentai > 0.1 && (predictionResults.Porn > 0.05 || predictionResults.Sexy > 0.05)) ||
+    //   (predictionResults.Hentai > 0.3) ||
+    //   predictionResults.Sexy > 0.6;
+
+    // predictionResults.isPorn = isPorn;
+
+    // Closer to recommended conditions but not well tested.
     const isPorn =
-      predictionResults.Porn > 0.5 ||
+      predictionResults.Porn > 0.4 ||
       (predictionResults.Sexy > 0.2 && predictionResults.Porn > 0.2) ||
-      predictionResults.Hentai > 0.1 ||
-      predictionResults.Sexy > 0.6;
+      (predictionResults.Hentai > 0.1 && (predictionResults.Porn > 0.05 || predictionResults.Sexy > 0.05)) ||
+      (predictionResults.Hentai > 0.3) ||
+      predictionResults.Sexy > 0.8;
 
     predictionResults.isPorn = isPorn;
 

@@ -1,51 +1,67 @@
-import React from "react";
+import React, { useState } from "react";
 import MainLayout from "@/layouts/MainLayout";
-import ArweaveSearch from "@/apps/Modules/LibModules/arweaveSearch";
+import SearchForm from '@/apps/Modules/AppModules/search/SearchForm';
 import ContentDisplay from "@/apps/Modules/AppModules/contentGrid";
 import { useWipeOnUnmount } from "@/apps/Modules/shared/state/wiper";
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store';
+import { wipe } from '@/apps/Modules/shared/state/wiper';
+import { useHandleSearch } from '@/apps/Modules/AppModules/search/hooks/useSearchHandlers';
 import {
 	PageContainer,
 	Title,
 	Description,
 	Hint,
-	SearchBox,
-	Input,
 	ControlsContainer,
 	FiltersButton,
 	SearchButton,
-	OwnerIcon,
 	FiltersIcon
 } from "./styles";
+import { ArrowUp } from "lucide-react";
 
 function Permasearch() {
 	useWipeOnUnmount();
+	const dispatch = useDispatch<AppDispatch>();
+	const { isLoading, handleSearch } = useHandleSearch();
+	const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+	const handleSearchClick = async () => {
+		await dispatch(wipe());
+		handleSearch();
+	};
+
+	const toggleFilters = () => {
+		setIsFiltersOpen(!isFiltersOpen);
+	};
 
 	return (
 		<MainLayout>
 			<PageContainer>
 				<Title>Permasearch</Title>
 				<Description>
-					Welcome to Permasearch! Here, you can explore NFTs, search by owner address 
-					or principal ID, and use filters to find exactly what you're looking for.
+					Search for any asset on Arweave.
 				</Description>
 				<Hint>
-					Not sure where to start? Just hit 'Search' to see a random selection of 
-					NFTs and discover something new!
+					Save it to your wallet as an NFT.
 				</Hint>
-				<SearchBox>
-					<OwnerIcon />
-					<Input placeholder="Enter owner address or principal ID" />
-				</SearchBox>
 				<ControlsContainer>
-					<FiltersButton>
+					<FiltersButton 
+						onClick={toggleFilters}
+						$isOpen={isFiltersOpen}
+					>
 						Filters
-						<FiltersIcon />
+						{isFiltersOpen ? <ArrowUp size={20} /> : <FiltersIcon />}
 					</FiltersButton>
-					<SearchButton>Search</SearchButton>
+					<SearchButton 
+						onClick={handleSearchClick}
+						disabled={isLoading}
+					>
+						{isLoading ? 'Loading...' : 'Search'}
+					</SearchButton>
 				</ControlsContainer>
-				<ArweaveSearch />
-				<ContentDisplay />
+				{isFiltersOpen && <SearchForm />}
 			</PageContainer>
+			<ContentDisplay />
 		</MainLayout>
 	);
 }

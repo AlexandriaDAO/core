@@ -1,11 +1,5 @@
 import styled from "styled-components";
-import { Search, SlidersHorizontal } from "lucide-react";
-
-export const OwnerIcon = styled(Search)`
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
-`;
+import { SlidersHorizontal } from "lucide-react";
 
 export const FiltersIcon = styled(SlidersHorizontal)`
   transform: rotate(90deg);
@@ -55,51 +49,37 @@ export const Hint = styled(Description)`
   margin-bottom: 32px;
 `;
 
-export const SearchBox = styled.div`
-  display: flex;
-  width: 100%;
-  max-width: 800px;
-  height: 60px;
-  padding: 16px 20px;
-  align-items: center;
-  border-radius: 30px;
-  border: 1px solid var(--black-grey-400, #CCC);
-  background: var(--Colors-LightMode-Text-text-100, #FFF);
-  margin-bottom: 24px;
-`;
-
-export const Input = styled.input`
-  flex: 1;
-  border: none;
-  outline: none;
-  color: var(--black-grey-300, #808080);
-  font-family: Syne;
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-`;
-
 export const ControlsContainer = styled.div`
   display: flex;
   gap: 16px;
   margin-bottom: 32px;
 `;
 
-export const FiltersButton = styled.button`
+export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
   display: flex;
-  width: 221px;
+  width: 180px;
   height: 60px;
-  padding: 10px 24px;
+  padding: 10px var(--Fonts-Size-h2, 24px);
   justify-content: center;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
   border-radius: 30px;
-  border: 1px solid var(--black-grey-100, #353535);
-  background: transparent;
   cursor: pointer;
+  transition: all 0.3s ease;
   font-family: Syne;
   font-size: 16px;
+  
+  ${({ $isOpen }) => $isOpen ? `
+    background: var(--black-grey-100, #353535);
+    color: #F3F3F3;
+    border: none;
+    box-shadow: 0px 0px 4px 0px rgba(32, 0, 213, 0.25), 0px 0px 0px 4px rgba(197, 207, 249, 0.35);
+  ` : `
+    background: white;
+    color: #353535;
+    border: 1px solid #353535;
+  `}
 `;
 
 export const SearchButton = styled.button`
@@ -110,6 +90,7 @@ export const SearchButton = styled.button`
   align-items: center;
   gap: 10px;
   flex: 1 0 0;
+  min-width: 280px;
   border-radius: 30px;
   background: var(--black-grey-100, #353535);
   border: none;
