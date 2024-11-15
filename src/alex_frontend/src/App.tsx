@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ReduxProvider from "./providers/ReduxProvider";
+import RiskWarningModal from "./components/RiskWarningModal";
+import { useRiskWarning } from "./hooks/useRiskWarning";
 
 import HomePage from "./pages/HomePage";
 import "./styles/tailwind.css";
@@ -25,10 +27,13 @@ import "./styles/style.css";
 import DetailTransaction from "./features/swap/components/transactionHistory/detailTransaction";
 
 export default function App() {
+    const { showRiskWarning, handleCloseRiskWarning } = useRiskWarning();
+
     return (
         <ReduxProvider>
             <SessionProvider>
                 <BrowserRouter>
+                    {showRiskWarning && <RiskWarningModal onClose={handleCloseRiskWarning} open={showRiskWarning} />}
                     <Routes>
                         {/* <Route path="*" element={<Layout />} /> */}
                         <Route path="/" element={<HomePage />} />
