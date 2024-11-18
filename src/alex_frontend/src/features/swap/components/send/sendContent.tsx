@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ActorSubclass } from "@dfinity/agent";
 
 import transferICP from "@/features/icp-ledger/thunks/transferICP";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -20,9 +19,9 @@ import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
 import { alexFlagHandler } from "../../alexSlice";
 import getIcpBal from "@/features/icp-ledger/thunks/getIcpBal";
-import GetAlexBal from "../balance/getAlexBal";
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
+import ErrorModal from "../errorModal";
 
 const SendContent = () => {
     const dispatch = useAppDispatch();
@@ -35,6 +34,7 @@ const SendContent = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [loadingModalV, setLoadingModalV] = useState(false);
     const [successModalV, setSucessModalV] = useState(false);
+    const [errorModalV, setErrorModalV] = useState(false);
     const [selectedOption, setSelectedOption] = useState("Select an option");
     const [selectedImage, setSelectedImage] = useState("");
     const [availableBalance, setAvailableBalnce] = useState("");
@@ -68,19 +68,19 @@ const SendContent = () => {
         else if (selectedOption === "ALEX") {
             const userBal = Math.max(
                 0,
-                Number(alex.alexBal) - ((options.find(option => option.value === "ALEX")?.fee ?? 0) * 2)
+                Number(alex.alexBal) - (Number(alex.alexFee) * 2)
             ).toFixed(4);
             setAmount(userBal);
         }
         else if (selectedOption === "LBRY") {
             const userBal = Math.max(
                 0,
-                Number(swap.lbryBalance) - ((options.find(option => option.value === "LBRY")?.fee ?? 0) * 2)
+                Number(swap.lbryBalance) - (Number(swap.lbryFee) * 2)
             ).toFixed(4);
             setAmount(userBal);
         }
     };
-    
+
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         if (selectedOption === "ICP") {
@@ -133,6 +133,10 @@ const SendContent = () => {
         }
         else if (swap.error || alex.error || icpLedger.error) {
             setLoadingModalV(false);
+            setErrorModalV(true);
+            dispatch(flagHandler());
+
+
         }
     }, [icpLedger, swap, alex])
 
@@ -245,6 +249,8 @@ const SendContent = () => {
             </div>
             <LoadingModal show={loadingModalV} message1={"Transfer in Progress"} message2={"Your transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
             <SuccessModal show={successModalV} setShow={setSucessModalV} />
+            <ErrorModal show={errorModalV} setShow={setErrorModalV} />
+
         </div>
     </>)
 }

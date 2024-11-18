@@ -18,6 +18,7 @@ import { TransactionType } from "./thunks/lbryIcrc/getTransactions";
 import getStakersCount from "./thunks/getStakersCount";
 import getCanisterArchivedBal from "./thunks/getCanisterArchivedBal";
 import getAverageApy from "./thunks/getAverageApy";
+import getLbryFee from "./thunks/lbryIcrc/getLbryFee";
 // Define the interface for our node state
 export interface StakeInfo {
   stakedAlex: string;
@@ -32,6 +33,7 @@ export interface CanisterArchived {
 export interface SwapState {
   lbryRatio: string;
   lbryBalance: string;
+  lbryFee: string;
   archivedBalance: string;
   maxLbryBurn: Number;
   stakeInfo: StakeInfo;
@@ -54,6 +56,7 @@ export interface SwapState {
 // Define the initial state using the ManagerState interface
 const initialState: SwapState = {
   lbryRatio: "0",
+  lbryFee: "0",
   lbryBalance: "0",
   archivedBalance: "0",
   maxLbryBurn: 0,
@@ -339,6 +342,19 @@ const swapSlice = createSlice({
       })
       .addCase(getAverageApy.rejected, (state, action) => {
         toast.error("Error while fetching canister average APY!");
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(getLbryFee.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getLbryFee.fulfilled, (state, action) => {
+        state.lbryFee = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(getLbryFee.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

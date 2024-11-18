@@ -57,7 +57,6 @@ const fetchTransaction = createAsyncThunk<
       ...lbryResult.transactions,
       ...alexResult.transactions,
     ];
-    console.log("ggg", allTransactions);
     // Filter transactions where the `to` or `from` owner matches the provided account
     const filteredTransactions = allTransactions.filter((transaction) => {
       // Check for the owner in different transaction types

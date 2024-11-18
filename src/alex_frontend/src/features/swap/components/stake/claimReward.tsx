@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch } from '../../../../store/hooks/useAppDispatch';
 import { useAppSelector } from "../../../../store/hooks/useAppSelector";
 
@@ -12,7 +12,7 @@ interface StakedInfoProps {
 const ClaimReward: React.FC<StakedInfoProps> = ({ setLoadingModalV,setActionType}) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
-    const auth = useAppSelector((state) => state.auth);
+
 
     const handleClaim = (e: any) => {
         e.preventDefault();
@@ -24,6 +24,7 @@ const ClaimReward: React.FC<StakedInfoProps> = ({ setLoadingModalV,setActionType
         if (swap.successClaimReward === true) {
             dispatch(flagHandler());
         }
+     
 
 
     }, [swap])

@@ -14,7 +14,7 @@ import Auth from "@/features/auth";
 import { LoaderCircle } from "lucide-react";
 import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
-import { alex_fee } from "@/utils/utils";
+import ErrorModal from "../errorModal";
 
 const StakeContent = () => {
     const dispatch = useAppDispatch();
@@ -25,6 +25,7 @@ const StakeContent = () => {
     const [loadingModalV, setLoadingModalV] = useState(false);
     const [successModalV, setSucessModalV] = useState(false);
     const [actionType, setActionType] = useState("Stake");
+    const [errorModalV, setErrorModalV] = useState(false);
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
@@ -39,7 +40,7 @@ const StakeContent = () => {
         setAmount(e.target.value);
     }
     const handleMaxAlex = () => {
-        const userBal = Math.max(0, Number(alex.alexBal) - alex_fee).toFixed(4);
+        const userBal = Math.max(0, Number(alex.alexBal) - Number(alex.alexFee)).toFixed(4);
         setAmount(userBal);
     };
     useEffect(() => {
@@ -57,6 +58,10 @@ const StakeContent = () => {
         }
         if (swap.error) {
             setLoadingModalV(false);
+            setErrorModalV(true);
+            dispatch(flagHandler());
+
+
         }
     }, [swap])
 
@@ -154,6 +159,8 @@ const StakeContent = () => {
                 </div>
                 <LoadingModal show={loadingModalV} message1={`${actionType} in Progress`} message2={"Transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
                 <SuccessModal show={successModalV} setShow={setSucessModalV} />
+                <ErrorModal show={errorModalV} setShow={setErrorModalV}/>
+
             </div>
         </>
     );
