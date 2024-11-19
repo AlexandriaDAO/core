@@ -38,11 +38,6 @@ candid-extractor target/wasm32-unknown-unknown/release/bookmarks.wasm > src/book
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
-
-# We skip this for system-api since it's static and based on a dfinity repo.
-# For registry
-cargo build --release --target wasm32-unknown-unknown --package registry
-candid-extractor target/wasm32-unknown-unknown/release/registry.wasm > src/registry/registry.did
 # For tokenomics
 cargo build --release --target wasm32-unknown-unknown --package tokenomics
 candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
@@ -54,7 +49,6 @@ dfx deploy alex_backend --network ic
 dfx deploy alex_librarian --network ic
 dfx deploy bookmarks --network ic
 dfx deploy icp_swap --network ic
-dfx deploy registry --network ic
 dfx deploy system_api --network ic
 dfx deploy tokenomics --network ic
 dfx deploy vetkd --network ic

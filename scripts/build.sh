@@ -45,9 +45,6 @@ candid-extractor target/wasm32-unknown-unknown/release/bookmarks.wasm > src/book
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
-# For registry
-cargo build --release --target wasm32-unknown-unknown --package registry
-candid-extractor target/wasm32-unknown-unknown/release/registry.wasm > src/registry/registry.did
 # For tokenomics
 cargo build --release --target wasm32-unknown-unknown --package tokenomics
 candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
@@ -65,7 +62,6 @@ cargo update
 dfx deploy bookmarks --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
 dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
-dfx deploy registry --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
 
 dfx deploy alex_librarian --specified-id yo4hu-nqaaa-aaaap-qkmoq-cai

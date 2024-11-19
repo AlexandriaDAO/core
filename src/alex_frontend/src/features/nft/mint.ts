@@ -1,8 +1,13 @@
 import { arweaveIdToNat, ogToScionId, scionToOgId } from "@/utils/id_convert";
-import { getNftManagerActor } from "@/features/auth/utils/authUtils";
+import { getNftManagerActor, getAuthClient } from "@/features/auth/utils/authUtils";
 import { icrc7 } from "../../../../declarations/icrc7";
 import { icrc7_scion } from "../../../../declarations/icrc7_scion";
-import { getAuthClient } from "@/features/auth/utils/authUtils";
+import { nft_manager } from "../../../../declarations/nft_manager";
+import transferLBRY from "@/features/swap/thunks/lbryIcrc/transferLBRY";
+import { store } from "@/store";
+
+const BURN_ADDRESS = "54fqz-5iaaa-aaaap-qkmqa-cai";
+const LBRY_MINT_COST = "1";
 
 export const mint_nft = async (transactionId: string): Promise<string> => {
   try {
@@ -34,12 +39,21 @@ export const mint_nft = async (transactionId: string): Promise<string> => {
     let result: Result | undefined;
 
     if (!(await client.isAuthenticated())) {
-      // cannot mint if not authenticated
       throw new Error("You must be authenticated to mint an NFT");
     }
     // Case 1: No owner - mint original NFT
     else if (ownerPrincipalStr === null) {
-      console.log("minting original NFT");
+      // First burn 1 LBRY token
+      const burnResult = await store.dispatch(transferLBRY({
+        amount: LBRY_MINT_COST,
+        destination: BURN_ADDRESS
+      })).unwrap();
+      console.log("burnResult", burnResult);
+      if (burnResult !== "success") {
+        throw new Error("Failed to burn LBRY tokens");
+      }
+
+      console.log("LBRY burned successfully, minting original NFT");
       result = await actorNftManager.mint_nft(mintNumber, [""]);
       return "Original NFT minted successfully!";
     }

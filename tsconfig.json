@@ -23,9 +23,12 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
+    "src/alex_frontend/src/types/*.d.ts"
   ],
   "exclude": [
-    "**/node_modules/azle/**/*.ts",
-    "**/node_modules/@dfinity/agent/lib/cjs/auth.js"
+    "node_modules/azle/src/lib/experimental/fetch/response.ts",
+    "node_modules/azle/**/*.ts",
+    "node_modules/@dfinity/agent/lib/cjs/auth.js",
+    "src/alex_wallet/**/*.ts"
   ],
 }
