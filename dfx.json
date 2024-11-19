@@ -103,14 +103,9 @@
       "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
     },  
     "xrc": {
-      "type": "custom",
       "candid": "src/xrc/xrc.did",
-      "wasm": "src/xrc/xrc.wasm.gz",
-      "remote": {
-        "id": {
-          "ic": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
-        }
-      },
+      "package": "xrc",
+      "type": "rust",
       "specified_id": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
     }
   },

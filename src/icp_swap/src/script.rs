@@ -90,20 +90,26 @@ fn initialize_globals(args: InitArgs) {
 #[init]
 fn init(args: Option<InitArgs>) {
     ic_cdk::println!("Starting initialization...");
+    ic_cdk::println!("Setting up initial price fetch timer...");
 
     ic_cdk_timers::set_timer(Duration::from_secs(0), || {
+        ic_cdk::println!("Triggering initial price fetch...");
         ic_cdk::spawn(get_icp_rate_cents_wrapper());
     });
+
+    ic_cdk::println!("Setting up recurring timers...");
     let _reward_timer_id: ic_cdk_timers::TimerId =
         ic_cdk_timers::set_timer_interval(REWARD_DISTRIBUTION_INTERVAL, || {
+            ic_cdk::println!("Triggering scheduled reward distribution...");
             ic_cdk::spawn(distribute_reward_wrapper())
         });
     let _price_timer_id: ic_cdk_timers::TimerId =
         ic_cdk_timers::set_timer_interval(PRICE_FETCH_INTERVAL, || {
+            ic_cdk::println!("Triggering scheduled price fetch...");
             ic_cdk::spawn(get_icp_rate_cents_wrapper())
         });
+
     match args {
-        // Take ownership of args directly
         Some(init_args) => {
             ic_cdk::println!("Received init arguments!");
 
@@ -125,9 +131,12 @@ fn init(args: Option<InitArgs>) {
         }
         None => {
             ic_cdk::println!("No arguments provided (args is None), using defaults");
+            ic_cdk::println!("Initializing with default values...");
             initialize_globals(InitArgs::default());
+            ic_cdk::println!("Default initialization complete");
         }
     }
+    ic_cdk::println!("Initialization process completed");
 }
 
 #[update(guard = "is_canister")]
@@ -139,12 +148,15 @@ pub async fn distribute_reward_wrapper() {
 }
 #[update(guard = "is_canister")]
 pub async fn get_icp_rate_cents_wrapper() {
+    ic_cdk::println!("Starting ICP rate fetch...");
     match get_icp_rate_in_cents().await {
         Ok(price) => {
             ic_cdk::println!("ICP price fetched successfully: {} cents", price);
+            ic_cdk::println!("Price fetch completed without errors");
         },
         Err(e) => {
-            ic_cdk::println!("Error fetching ICP price: {}", e);
+            ic_cdk::println!("Error fetching ICP price. Error details: {:?}", e);
+            ic_cdk::println!("Stack trace or additional context: Price fetch failed during initialization");
         },
     }
 }

@@ -17,6 +17,11 @@ dfx deps pull
 dfx deps init
 dfx deps deploy
 dfx deps deploy internet_identity
+
+## xrc first because it's used in init functions of others.
+dfx canister create xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
+cargo build --release --target wasm32-unknown-unknown --package xrc
+candid-extractor target/wasm32-unknown-unknown/release/xrc.wasm > src/xrc/xrc.did
 dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
 
 # Step 3: Deploy nft_manager, which deploys icrc7
@@ -69,7 +74,6 @@ dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
 dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 
 dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
-
 
 # Step 5: Configure Local Identities for token launches
 dfx identity new minter --storage-mode plaintext
