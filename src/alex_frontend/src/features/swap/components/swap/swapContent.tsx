@@ -14,7 +14,7 @@ import { icp_fee, minimum_icp } from "@/utils/utils";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import SuccessModal from "../successModal";
 import LoadingModal from "../loadingModal";
-
+import ErrorModal from "../errorModal";
 
 const SwapContent: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -26,6 +26,8 @@ const SwapContent: React.FC = () => {
   const [tentativeLBRY, setTentativeLBRY] = useState(Number);
   const [loadingModalV, setLoadingModalV] = useState(false);
   const [successModalV, setSucessModalV] = useState(false);
+  const [errorModalV, setErrorModalV] = useState(false);
+
   const [shadow, setShadow] = useState('shadow-[0px_0px_13px_4px_#abbddb8a] border-[#C5CFF9] ');
 
   const handleSubmit = () => {
@@ -69,6 +71,9 @@ const SwapContent: React.FC = () => {
   useEffect(() => {
     if (swap.error) {
       setLoadingModalV(false);
+      setErrorModalV(true);
+      dispatch(flagHandler());
+
     }
   }, [swap])
   useEffect(() => {
@@ -222,6 +227,7 @@ const SwapContent: React.FC = () => {
 
       <LoadingModal show={loadingModalV} message1={"Swap in Progress"} message2={"Your transaction from ICP to LBRY is being processed. This may take a few moments."} setShow={setLoadingModalV} />
       <SuccessModal show={successModalV} setShow={setSucessModalV} />
+      <ErrorModal show={errorModalV} setShow={setErrorModalV}/>
     </div>
   );
 };

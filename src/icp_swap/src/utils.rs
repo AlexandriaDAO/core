@@ -1,12 +1,16 @@
+use crate::{
+    get_distribution_interval, get_distribution_interval_mem, get_lbry_ratio_mem, get_stake,
+    get_total_archived_balance, get_total_archived_balance_mem, get_total_unclaimed_icp_reward,
+    get_total_unclaimed_icp_reward_mem, ArchiveBalance, LbryRatio, ALEX_FEE,
+    ARCHIVED_TRANSACTION_LOG,
+};
 use candid::{CandidType, Nat, Principal};
-use ic_cdk::{self, caller};
-use ic_ledger_types::Subaccount;
-use serde::Deserialize;
 use ic_cdk::api::call::RejectionCode;
-use crate::{get_distribution_interval, get_distribution_interval_mem, get_lbry_ratio_mem, get_stake, get_total_archived_balance, get_total_archived_balance_mem, get_total_unclaimed_icp_reward, get_total_unclaimed_icp_reward_mem, ArchiveBalance, LbryRatio, ARCHIVED_TRANSACTION_LOG};
-use ic_ledger_types::{AccountBalanceArgs, Tokens, DEFAULT_SUBACCOUNT, MAINNET_LEDGER_CANISTER_ID};
+use ic_cdk::{self, caller};
 use ic_ledger_types::AccountIdentifier;
-
+use ic_ledger_types::Subaccount;
+use ic_ledger_types::{AccountBalanceArgs, Tokens, DEFAULT_SUBACCOUNT, MAINNET_LEDGER_CANISTER_ID};
+use serde::Deserialize;
 
 pub const STAKING_REWARD_PERCENTAGE: u64 = 1000; //multiply by 100 eg. 10% = 1000
 pub const ALEX_CANISTER_ID: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";
@@ -14,7 +18,6 @@ pub const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
 pub const TOKENOMICS_CANISTER_ID: &str = "5abki-kiaaa-aaaap-qkmsa-cai";
 pub const XRC_CANISTER_ID: &str = "uf6dk-hyaaa-aaaaq-qaaaq-cai";
 pub const ICP_TRANSFER_FEE: u64 = 10_000;
-pub const ALEX_TRANSFER_FEE: u64 = 10_000;
 pub const MAX_DAYS: u32 = 30;
 pub const SCALING_FACTOR: u128 = 1_000_000_000_000; // Adjust based on your precision needs
 pub const BURN_CYCLE_FEE: u64 = 10_000_000_000;
@@ -63,7 +66,7 @@ pub async fn within_max_limit(burn_amount: u64) -> u64 {
             if (burn_amount + total_burned) <= max_threshold {
                 return burn_amount;
             } else {
-                return max_threshold-total_burned;
+                return max_threshold - total_burned;
             }
         }
         Err(e) => {
@@ -154,8 +157,13 @@ pub(crate) fn update_current_LBRY_ratio(new_ratio: u64, current_time: u64) -> Re
     lbry_ratio_map.insert((), lbry_ratio);
     Ok(())
 }
-pub(crate)  
-fn archive_user_transaction(amount: u64) -> Result<String, String> {
+pub(crate) fn update_ALEX_fee(fee: u64) -> Result<(), String> {
+    ALEX_FEE.with(|fee_cell| {
+        *fee_cell.borrow_mut() = fee;
+    });
+    Ok(())
+}
+pub(crate) fn archive_user_transaction(amount: u64) -> Result<String, String> {
     let caller = ic_cdk::caller();
 
     ARCHIVED_TRANSACTION_LOG.with(|trxs| -> Result<(), String> {
@@ -175,7 +183,6 @@ fn archive_user_transaction(amount: u64) -> Result<String, String> {
 
     Ok("Transaction added successfully!".to_string())
 }
-
 
 pub(crate) async fn get_total_alex_staked() -> Result<u64, String> {
     let alex_canister_id: Principal = get_principal(ALEX_CANISTER_ID);
@@ -199,7 +206,7 @@ pub(crate) async fn get_total_alex_staked() -> Result<u64, String> {
         )),
     }
 }
-pub (crate) async fn fetch_canister_icp_balance() -> Result<u64, String> {
+pub(crate) async fn fetch_canister_icp_balance() -> Result<u64, String> {
     let canister_id = ic_cdk::api::id();
     let account_identifier = AccountIdentifier::new(&canister_id, &DEFAULT_SUBACCOUNT);
     let balance_args = AccountBalanceArgs {
@@ -216,12 +223,27 @@ pub (crate) async fn fetch_canister_icp_balance() -> Result<u64, String> {
     result.map(|tokens| tokens.e8s())
 }
 
+pub(crate) async fn get_alex_fee() -> Result<u64, String> {
+    let alex_canister_id: Principal = get_principal(ALEX_CANISTER_ID);
+    let result: Result<(Nat,), (RejectionCode, String)> =
+        ic_cdk::call(alex_canister_id, "icrc1_fee", ()).await;
+
+    match result {
+        Ok((fee,)) => fee
+            .0
+            .try_into()
+            .map_err(|_| "Fee exceeds u32 max value".to_string()),
+        Err((code, msg)) => Err(format!(
+            "Failed to call ALEX canister: {:?} - {}",
+            code, msg
+        )),
+    }
+}
 #[derive(CandidType)]
 struct BalanceOfArgs {
     owner: Principal,
     subaccount: Option<Vec<u8>>,
 }
-
 
 #[derive(CandidType, Deserialize, Debug)]
 pub enum ExchangeRateError {

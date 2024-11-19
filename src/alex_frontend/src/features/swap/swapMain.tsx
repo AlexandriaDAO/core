@@ -18,6 +18,8 @@ import RedeemContent from './components/redeem/redeemContent';
 import TransactionHistory from './components/transactionHistory/transactionHistory';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
+import getLbryFee from './thunks/lbryIcrc/getLbryFee';
+import getAlexFee from './thunks/alexIcrc/getAlexFee';
 
 const SwapMain = () => {
     const dispatch = useAppDispatch();
@@ -39,6 +41,8 @@ const SwapMain = () => {
     useEffect(() => {
         dispatch(getLBRYratio());
         dispatch(getAlexMintRate());
+        dispatch(getLbryFee());
+        dispatch(getAlexFee());
         if (localStorage.getItem("tab")) {
             setActiveTab(7);
             localStorage.removeItem("tab");

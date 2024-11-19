@@ -5,9 +5,11 @@ import {
 import { toast } from "sonner";
 import getAccountAlexBalance from "./thunks/alexIcrc/getAccountAlexBalance";
 import transferALEX from "./thunks/alexIcrc/transferALEX";
+import getAlexFee from "./thunks/alexIcrc/getAlexFee";
 // Define the interface for our node state
 export interface AlexState {
   alexBal: string;
+  alexFee:string;
   loading: boolean;
   transferSuccess:boolean;
   error: string | null;
@@ -18,6 +20,7 @@ const initialState: AlexState = {
   alexBal: "0",
   loading: false,
   transferSuccess:false,
+  alexFee:"0",
   error: null,
 };
 
@@ -58,6 +61,18 @@ const alexSlice = createSlice({
       })
       .addCase(transferALEX.rejected, (state, action) => {
         toast.error("Error while transfering ALEX");
+        state.loading = false;
+        state.error = action.payload as string;
+      }).addCase(getAlexFee.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAlexFee.fulfilled, (state, action) => {
+        state.alexFee = action.payload;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(getAlexFee.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })

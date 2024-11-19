@@ -12,11 +12,11 @@ import burnLbry from "../../thunks/burnLBRY";
 import Auth from "@/features/auth";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import { LoaderCircle } from "lucide-react";
-import { lbry_fee } from "@/utils/utils";
 import getCanisterBal from "@/features/icp-ledger/thunks/getCanisterBal";
 import getCanisterArchivedBal from "../../thunks/getCanisterArchivedBal";
 import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
+import ErrorModal from "../errorModal";
 
 const BurnContent = () => {
     const dispatch = useAppDispatch();
@@ -31,6 +31,8 @@ const BurnContent = () => {
     const [maxBurnAllowed, setMaxburnAllowed] = useState(Number);
     const [loadingModalV, setLoadingModalV] = useState(false);
     const [successModalV, setSucessModalV] = useState(false);
+    const [errorModalV, setErrorModalV] = useState(false);
+
 
 
     const handleSubmit = (event: any) => {
@@ -49,7 +51,7 @@ const BurnContent = () => {
         }
     }
     const handleMaxLbry = () => {
-        const userBal = Math.floor(Math.max(0, Number(swap.lbryBalance) - lbry_fee)); // Ensure non-negative user balance
+        const userBal = Math.floor(Math.max(0, Number(swap.lbryBalance) - Number(swap.lbryFee))); // Ensure non-negative user balance
         const lbryRatio = Number(swap.lbryRatio);
         const alexMintRate = Number(tokenomics.alexMintRate);
 
@@ -60,7 +62,6 @@ const BurnContent = () => {
 
     useEffect(() => {
         if (swap.burnSuccess === true) {
-            // alert("Burned successfully!")
             dispatch(flagHandler())
             dispatch(getLbryBalance(user))
             setLoadingModalV(false);
@@ -87,6 +88,9 @@ const BurnContent = () => {
     useEffect(() => {
         if (swap.error) {
             setLoadingModalV(false);
+            setErrorModalV(true);
+            dispatch(flagHandler());
+
         }
     }, [swap])
 
@@ -185,7 +189,7 @@ const BurnContent = () => {
                                 </li>
                                 <li className='flex justify-between'>
                                     <strong className='text-lg font-medium me-1 text-black'>Network Fees</strong>
-                                    <span className='text-lg font-medium text-black'><span className=' text-multycolor'>{lbry_fee}</span> LBRY</span>
+                                    <span className='text-lg font-medium text-black'><span className=' text-multycolor'>{swap.lbryFee}</span> LBRY</span>
                                 </li>
                             </ul>
                         </div>
@@ -193,6 +197,8 @@ const BurnContent = () => {
                 </div>
                 <LoadingModal show={loadingModalV} message1={"Burn in Progress"} message2={"Burn transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
                 <SuccessModal show={successModalV} setShow={setSucessModalV} />
+                <ErrorModal show={errorModalV} setShow={setErrorModalV}/>
+
             </div>
         </>
     );

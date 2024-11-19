@@ -15,6 +15,7 @@ import getArchivedBal from "../../thunks/getArchivedBal";
 import redeemArchivedBalance from "../../thunks/redeemArchivedBalance";
 import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
+import ErrorModal from "../errorModal";
 
 const RedeemContent: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -22,6 +23,7 @@ const RedeemContent: React.FC = () => {
   const swap = useAppSelector((state) => state.swap);
   const [loadingModalV, setLoadingModalV] = useState(false);
   const [successModalV, setSucessModalV] = useState(false);
+  const [errorModalV, setErrorModalV] = useState(false);
 
   const handleSubmit = () => {
     dispatch(redeemArchivedBalance());
@@ -39,6 +41,10 @@ const RedeemContent: React.FC = () => {
       setSucessModalV(true);
     } else if (swap.error) {
       setLoadingModalV(false);
+      setErrorModalV(true);
+      dispatch(flagHandler());
+
+
     }
 
   }, [swap]);
@@ -87,6 +93,8 @@ const RedeemContent: React.FC = () => {
       </div>
       <LoadingModal show={loadingModalV} message1={"Reedem transaction in Progress"} message2={"Redeem transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
       <SuccessModal show={successModalV} setShow={setSucessModalV} />
+      <ErrorModal show={errorModalV} setShow={setErrorModalV}/>
+
     </div>
   );
 };

@@ -298,17 +298,25 @@ async fn mint_ALEX(lbry_amount: u64, caller: Principal) -> Result<String, String
         Err(err) => Err(err),
     }
 }
-//stake
+//stake //
 
 #[update(guard = "not_anon")]
 async fn stake_ALEX(amount: u64) -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller)?;
+    let mut alex_fee = ALEX_FEE.with(|fee| *fee.borrow());
     if amount < 100_000_000 {
         return Err("Minimum 1 Alex is required ".to_string());
     }
+
+    if alex_fee == 0 {
+        let fee: u64 = get_alex_fee().await?;
+        update_ALEX_fee(fee)?;
+        alex_fee = fee;
+    }
+
     let post_fee_amount = amount
-        .checked_sub(ALEX_TRANSFER_FEE)
+        .checked_sub(alex_fee)
         .ok_or("Arithmetic underflow occurred in post_fee_amount")?;
     // Proceed with transfer
     deposit_token(post_fee_amount).await?;
@@ -345,6 +353,7 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
 async fn un_stake_all_ALEX() -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller)?;
+    let mut alex_fee = ALEX_FEE.with(|fee| *fee.borrow());
 
     let current_stake = STAKES
         .with(|stakes| {
@@ -353,6 +362,11 @@ async fn un_stake_all_ALEX() -> Result<String, String> {
         })
         .ok_or("Stake not found")?;
 
+    if alex_fee == 0 {
+        let fee: u64 = get_alex_fee().await?;
+        update_ALEX_fee(fee)?;
+        alex_fee = fee;
+    }
     let staked_amount = current_stake.amount;
 
     // Verify caller balance
@@ -360,8 +374,8 @@ async fn un_stake_all_ALEX() -> Result<String, String> {
         return Err("Insufficient funds".to_string());
     }
 
-    let post_fee_amount = staked_amount
-        .checked_sub(ALEX_TRANSFER_FEE)
+    let post_fee_amount: u64 = staked_amount
+        .checked_sub(alex_fee)
         .ok_or("Stake amount too low!")?;
 
     // Withdraw the token
@@ -661,6 +675,7 @@ async fn redeem() -> Result<String, String> {
 async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let canister_id: Principal = ic_cdk::api::id();
+    let alex_fee = ALEX_FEE.with(|fee| *fee.borrow());
 
     let mut caller_subaccount_bytes = [0u8; 32];
     let caller_slice: &[u8] = caller.as_slice();
@@ -674,7 +689,7 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
         memo: None,
         amount,
         spender_subaccount: None,
-        fee: Some(Nat::from(ALEX_TRANSFER_FEE)),
+        fee: Some(Nat::from(alex_fee)),
         to: Account::from(ic_cdk::caller()),
         created_at_time: None,
     };
@@ -693,6 +708,7 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
 async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let canister_id: Principal = ic_cdk::api::id();
+    let alex_fee = ALEX_FEE.with(|fee| *fee.borrow());
 
     let mut caller_subaccount_bytes = [0u8; 32];
     let caller_slice = caller.as_slice();
@@ -707,7 +723,7 @@ async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
         memo: None,
         amount,
         spender_subaccount: None,
-        fee: Some(Nat::from(ALEX_TRANSFER_FEE)),
+        fee: Some(Nat::from(alex_fee)),
         to: canister_id.into(),
         created_at_time: None,
     };

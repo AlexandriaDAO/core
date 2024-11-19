@@ -22,7 +22,6 @@ const Unstake: React.FC<UnstakeProps> = ({ setLoadingModalV,setActionType}) => {
     }
     useEffect(() => {
         if (swap.unstakeSuccess === true) {
-            //alert("Successfully unstaked!");
             dispatch(flagHandler());
         }
     }, [swap])
