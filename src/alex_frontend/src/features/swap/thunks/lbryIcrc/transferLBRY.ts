@@ -15,34 +15,33 @@ const transferLBRY = createAsyncThunk<
   {
     amount: string;
     destination: string;
-    account?: Account;
+    subaccount?: number[];
   },
   { rejectValue: string }
 >(
   "icp_swap/transferLBRY",
   async (
-    { amount, destination, account },
+    { amount, destination, subaccount },
     { rejectWithValue }
   ) => {
     try {
       const actorLbry = await getLbryActor();
       const amountFormat = BigInt(Math.floor(Number(amount) * 10 ** 8));
+      let recipientAccount: Account;
       
-      // Use provided account or create default one
-      let recipientAccount: Account = account || {
+      recipientAccount = {
         owner: Principal.fromText(destination),
-        subaccount: [],
+        subaccount: subaccount ? [subaccount] : [],
       };
 
       const transferArg: TransferArg = {
         to: recipientAccount,
-        fee: [], //default fee
+        fee: [],
         memo: [],
         from_subaccount: [],
         created_at_time: [],
         amount: amountFormat
       };
-      
       const result = await actorLbry.icrc1_transfer(transferArg);
       if ("Ok" in result) return "success";
       else {
