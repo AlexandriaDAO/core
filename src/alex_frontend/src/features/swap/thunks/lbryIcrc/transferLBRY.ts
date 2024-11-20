@@ -11,37 +11,39 @@ import { getLbryActor } from "@/features/auth/utils/authUtils";
 
 // Define the async thunk
 const transferLBRY = createAsyncThunk<
-  string, // This is the return type of the thunk's payload
+  string,
   {
     amount: string;
     destination: string;
+    account?: Account;
   },
   { rejectValue: string }
 >(
   "icp_swap/transferLBRY",
   async (
-    { amount, destination},
+    { amount, destination, account },
     { rejectWithValue }
   ) => {
     try {
       const actorLbry = await getLbryActor();
-      const amountFormat =  BigInt(Math.floor(Number(amount) * 10 ** 8));
-      let recipientAccount: Account;
-      // const recipientPrincipal = Principal.fromText(destination);
-      recipientAccount = {
+      const amountFormat = BigInt(Math.floor(Number(amount) * 10 ** 8));
+      
+      // Use provided account or create default one
+      let recipientAccount: Account = account || {
         owner: Principal.fromText(destination),
         subaccount: [],
       };
 
       const transferArg: TransferArg = {
         to: recipientAccount,
-        fee: [],//default fee
+        fee: [], //default fee
         memo: [],
         from_subaccount: [],
         created_at_time: [],
-        amount:amountFormat
+        amount: amountFormat
       };
-      const result= await actorLbry.icrc1_transfer(transferArg);
+      
+      const result = await actorLbry.icrc1_transfer(transferArg);
       if ("Ok" in result) return "success";
       else {
         console.log("error is ", result.Err);

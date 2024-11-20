@@ -1,5 +1,6 @@
 use crate::{alex_principal, icrc7_principal, lbry_principal};
-use crate::utils::{check_query_batch_size, to_nft_subaccount};
+use crate::utils::check_query_batch_size;
+use crate::id_converter::to_nft_subaccount;
 use crate::types::TokenBalances;
 use crate::guard::is_frontend;
 

@@ -34,6 +34,7 @@ service : () -> {
   nat_to_arweave_id : (nat) -> (text) query;
   nfts_exist : (vec nat) -> (Result_7);
   owner_of : (vec nat) -> (Result_8);
+  to_nft_subaccount : (nat) -> (blob) query;
   total_supply : () -> (Result_9);
   withdraw : (nat) -> (Result_10);
 }

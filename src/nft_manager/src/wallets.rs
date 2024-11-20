@@ -3,7 +3,7 @@
 // Can't do batch versions here because icrc4 is not finalized, and so batch transfers not ready.
 
 use crate::{lbry_principal, alex_principal};
-use crate::utils::to_nft_subaccount;
+use crate::id_converter::to_nft_subaccount;
 use crate::query::{get_nft_balances, is_owner};
 use crate::guard::not_anon;
 use ic_cdk::update;

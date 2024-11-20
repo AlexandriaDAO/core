@@ -1,6 +1,7 @@
 use ic_cdk::query;
 use candid::{CandidType, Deserialize};
 use serde::Serialize;
+use icrc_ledger_types::icrc1::account::Subaccount;
 
 #[derive(Clone, PartialEq, Eq, CandidType, Deserialize, Serialize)]
 struct Nat(Vec<u8>);
@@ -110,4 +111,22 @@ fn base64_encode(input: &[u8]) -> String {
     result.truncate(result.len() - padding);
 
     result
+}
+
+#[ic_cdk::query]
+pub fn to_nft_subaccount(id: candid::Nat) -> Subaccount {
+    let mut subaccount = [0; 32];
+    let num_str = id.to_string();
+    
+    // Convert string to individual digits
+    let digits: Vec<u8> = num_str
+        .chars()
+        .filter_map(|c| c.to_digit(10))  // Convert to digit, filtering out non-digits
+        .map(|d| d as u8)                // Convert u32 to u8
+        .collect();
+    
+    let start = 32 - digits.len().min(32);
+    subaccount[start..].copy_from_slice(&digits[digits.len().saturating_sub(32)..]);
+
+    subaccount
 }
