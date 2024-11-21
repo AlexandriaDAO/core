@@ -29,8 +29,8 @@ service : () -> {
   get_nft_balances : (vec nat) -> (Result_4);
   get_nfts : (opt nat, opt nat) -> (Result_5);
   get_nfts_of : (principal) -> (Result_6);
-  mint_nft : (nat, opt text) -> (Result);
-  mint_scion_nft : (nat, opt text) -> (Result);
+  mint_nft : (nat, principal, opt text) -> (Result);
+  mint_scion_nft : (nat, principal, opt text) -> (Result);
   nat_to_arweave_id : (nat) -> (text) query;
   nfts_exist : (vec nat) -> (Result_7);
   owner_of : (vec nat) -> (Result_8);

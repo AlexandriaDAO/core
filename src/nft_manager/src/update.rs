@@ -12,8 +12,8 @@ use ic_cdk::caller;
 use ic_cdk::api::call::CallResult;
 use icrc_ledger_types::{icrc::generic_value::Value, icrc1::account::Account};
 
-#[update(decoding_quota = 200, guard = "not_anon")]
-pub async fn mint_nft(minting_number: Nat, description: Option<String>) -> Result<String, String> {
+#[update(decoding_quota = 200, guard = "is_frontend")]
+pub async fn mint_nft(minting_number: Nat, owner: Principal, description: Option<String>) -> Result<String, String> {
     const MAX_DESCRIPTION_LENGTH: usize = 256;
 
     if let Some(desc) = &description {
@@ -39,7 +39,7 @@ pub async fn mint_nft(minting_number: Nat, description: Option<String>) -> Resul
     let nft_request = SetNFTItemRequest {
         token_id: new_token_id.clone(),
         owner: Some(Account {
-            owner: caller(),
+            owner,
             subaccount: None,
         }),
         metadata: NFTInput::Class(metadata),
@@ -59,8 +59,8 @@ pub async fn mint_nft(minting_number: Nat, description: Option<String>) -> Resul
     }
 }
 
-#[update(decoding_quota = 200, guard = "not_anon")]
-pub async fn mint_scion_nft(minting_number: Nat, description: Option<String>) -> Result<String, String> {
+#[update(decoding_quota = 200, guard = "is_frontend")]
+pub async fn mint_scion_nft(minting_number: Nat, owner: Principal, description: Option<String>) -> Result<String, String> {
     const MAX_DESCRIPTION_LENGTH: usize = 256;
 
     if let Some(desc) = &description {
@@ -86,7 +86,7 @@ pub async fn mint_scion_nft(minting_number: Nat, description: Option<String>) ->
     let nft_request = SetNFTItemRequest {
         token_id: new_token_id.clone(),
         owner: Some(Account {
-            owner: caller(),
+            owner,
             subaccount: None,
         }),
         metadata: NFTInput::Class(metadata),

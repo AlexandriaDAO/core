@@ -1,3 +1,26 @@
+/*
+The Plan:
+
+*this assumes that the minting keeps working well*
+- Get alexandrian to display Scion NFTs.
+- Start improving the grid and display.
+- Start displaying the wallets of each NFT, and add a claim button.
+- Start to look for bugs, exploits, possiblity of losing funds.
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 06/3/2024 950AM
 8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I
