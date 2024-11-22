@@ -23,7 +23,6 @@ type Value = variant {
 service : () -> {
   arweave_id_to_nat : (text) -> (nat) query;
   burn_to_lbry : (vec nat) -> (Result);
-  coordinate_mint : (nat, principal) -> (Result);
   get_manifest_ids : (vec nat) -> (Result_1);
   get_metadata : (vec nat) -> (Result_2);
   get_my_nft_balances : (opt nat) -> (Result_3);

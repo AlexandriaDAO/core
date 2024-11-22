@@ -32,6 +32,13 @@ sudo apt-get upgrade nodejs`
 
 Please follow these if you add stuff.
 
+### Auth
+
+import { getAuthClient } from "@/features/auth/utils/authUtils";
+
+const client = await getAuthClient();
+const principal = client.getIdentity().getPrincipal();
+
 ## Adding a New Canister.
 
 Please use the existing Typescript or Rust patterns in dfx.json.

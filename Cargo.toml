@@ -10,5 +10,6 @@ members = [
     "src/tokenomics",
     "src/nft_manager",
     "src/xrc",
+    "src/miner"
 ]
 resolver = "2"

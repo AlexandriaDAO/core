@@ -134,7 +134,7 @@ pub(crate) fn add_to_unclaimed_amount(amount: u64) -> Result<(), String> {
     Ok(())
 }
 pub(crate) fn sub_to_unclaimed_amount(amount: u64) -> Result<(), String> {
-    let current_total = get_total_unclaimed_icp_reward();
+    let current_total: u64 = get_total_unclaimed_icp_reward();
     let new_total = current_total
         .checked_sub(amount)
         .ok_or("Arithmetic overflow occurred in  fn sub_to_unclaimed_amount() ")?;

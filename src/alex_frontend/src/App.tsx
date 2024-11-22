@@ -25,6 +25,7 @@ import CollectionPage from "./apps/app/Emporium/CollectionPage";
 
 import "./styles/style.css";
 import DetailTransaction from "./features/swap/components/transactionHistory/detailTransaction";
+import Miner from "./apps/app/Miner";
 
 export default function App() {
     const { showRiskWarning, handleCloseRiskWarning } = useRiskWarning();
@@ -52,6 +53,7 @@ export default function App() {
                         <Route path="/app/dialectica" element={<Dialectica />} />
                         <Route path="/app/permasearch" element={<Permasearch />} />
                         <Route path="/app/emporium" element={<Emporium />} />
+                        <Route path="/app/miner" element={<Miner/>} />
 
                         {/* Theke (/theke) - from Greek "θήκη" meaning repository or case */}
                         {/* Pinax (/pinax) - from Greek "πίναξ" meaning register or catalog */}

@@ -15,7 +15,7 @@ import fetchEngineBooks from "../engine-books/thunks/fetchEngineBooks";
 import { WebIrys } from "@irys/sdk";
 import SelectNode from "./SelectNode";
 import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
-import { getIcrc7Actor, getNftManagerActor } from "../auth/utils/authUtils";
+import { getIcrc7Actor, getNftManagerActor, getAuthClient } from "../auth/utils/authUtils";
 import { Dialog, DialogContent, DialogTrigger } from "@/lib/components/dialog";
 import { Button } from "@/lib/components/button";
 import { UploadIcon } from "lucide-react";
@@ -209,7 +209,9 @@ const Mint: React.FC<IMintProps> = ({
 		const mintNumber = BigInt(arweaveIdToNat(transactionId));
 		const description = "test";
 		const actorNftManager = await getNftManagerActor();
-		const result = await actorNftManager.mint_nft(mintNumber, [description]);
+		const client = await getAuthClient();
+		const principal = client.getIdentity().getPrincipal();
+		const result = await actorNftManager.mint_nft(mintNumber, principal, [description]);
 		if ("Err" in result) throw new Error(result.Err);
 
 		toast.success("Minted Successfully");

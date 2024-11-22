@@ -61,6 +61,9 @@ candid-extractor target/wasm32-unknown-unknown/release/alex_librarian.wasm > src
 cargo build --release --target wasm32-unknown-unknown --package vetkd
 candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
 
+# For miner
+cargo build --release --target wasm32-unknown-unknown --package miner
+candid-extractor target/wasm32-unknown-unknown/release/miner.wasm > src/miner/miner.did
 
 cargo update
 

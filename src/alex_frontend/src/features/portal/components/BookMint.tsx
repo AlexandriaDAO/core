@@ -5,7 +5,7 @@ import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import { arweaveIdToNat } from "@/utils/id_convert";
-import { getNftManagerActor } from "@/features/auth/utils/authUtils";
+import { getNftManagerActor, getAuthClient } from "@/features/auth/utils/authUtils";
 
 interface IBookMintProps {
     book?: Book;
@@ -30,7 +30,9 @@ const BookMint: React.FC<IBookMintProps> = ({
 			const mintNumber = BigInt(arweaveIdToNat(book.manifest));
 			const description = "test";
 			const actorNftManager = await getNftManagerActor();
-			const result = await actorNftManager.mint_nft(mintNumber, [description]);
+			const client = await getAuthClient();
+			const principal = client.getIdentity().getPrincipal();
+			const result = await actorNftManager.mint_nft(mintNumber, principal, [description]);
 
             if ("Err" in result) throw new Error(result.Err);
 
