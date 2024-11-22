@@ -2,6 +2,13 @@
 The Plan:
 
 - Scratch all that. I have to move the NFT auth/payment/security stuff to the backend.
+  - Now that's done: 
+
+    -- I need to gracefully handle failed arweave calls.
+    -- There's a bug where you can mint the same scion NFT multiple times.
+    -- I also gotta lock up the security on the minting funcition guards.
+
+    Push to mainnet, and then move on to the next stuff in the UI:
 
 *this assumes that the minting keeps working well*
 - Get alexandrian to display Scion NFTs.

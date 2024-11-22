@@ -6,6 +6,7 @@ import "./style.css"
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import AccountCards from './components/balance/accountCards';
 import BalanceContent from './components/balance/balanceContent';
+import TopupContent from './components/topup/topupContent';
 import SwapContent from './components/swap/swapContent';
 import SendContent from './components/send/sendContent';
 import BurnContent from './components/burn/burnContent';
@@ -29,13 +30,14 @@ const SwapMain = () => {
 
     const tabs = [
         { id: 1, label: 'Balance', hover: null, content: <BalanceContent /> },
-        { id: 2, label: 'Swap', hover: "A feature enabling users to exchange one token for another directly on the platform", content: <SwapContent /> },
-        { id: 3, label: 'Send', hover: null, content: <SendContent /> },
-        { id: 4, label: 'Receive', hover: null, content: <ReceiveContent /> },
-        { id: 5, label: 'Burn', hover: "Burn LBRY tokens instantly for ICP or ALEX tokens, reducing supply and enabling seamless exchange on the platform.", content: <BurnContent /> },
-        { id: 6, label: 'Stake', hover: null, content: <StakeContent /> },
-        { id: 8, label: 'Reedem', hover: null, content: <RedeemContent /> },
-        { id: 7, label: 'Transaction history', hover: null, content: <TransactionHistory /> }
+        { id: 2, label: 'Swap', hover: "Swap ICP for LBRY", content: <SwapContent /> },
+        { id: 3, label: 'Topup', hover: "Allocate LBRY that can be spent in-app", content: <TopupContent /> },
+        { id: 4, label: 'Send', hover: null, content: <SendContent /> },
+        { id: 5, label: 'Receive', hover: null, content: <ReceiveContent /> },
+        { id: 6, label: 'Burn', hover: "Burn LBRY, get back ALEX and ICP", content: <BurnContent /> },
+        { id: 7, label: 'Stake', hover: null, content: <StakeContent /> },
+        { id: 8, label: 'Reedem', hover: "Redeem ICP if your swap fails", content: <RedeemContent /> },
+        { id: 9, label: 'Transaction history', hover: null, content: <TransactionHistory /> }
     ];
 
     useEffect(() => {
