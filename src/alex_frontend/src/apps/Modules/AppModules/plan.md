@@ -1,6 +1,8 @@
 /*
 The Plan:
 
+- Scratch all that. I have to move the NFT auth/payment/security stuff to the backend.
+
 *this assumes that the minting keeps working well*
 - Get alexandrian to display Scion NFTs.
 - Start improving the grid and display.

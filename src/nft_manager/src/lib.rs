@@ -12,6 +12,8 @@ pub const ICRC7_SCION_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 pub const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
 pub const ALEX_CANISTER_ID: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";
 pub const FRONTEND_CANISTER_ID: &str = "yj5ba-aiaaa-aaaap-qkmoa-cai";
+pub const ICP_SWAP: &str = "54fqz-5iaaa-aaaap-qkmqa-cai";
+pub const NFT_MANAGER: &str = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
@@ -38,6 +40,13 @@ pub fn frontend_principal() -> Principal {
     get_principal(FRONTEND_CANISTER_ID)
 }
 
+pub fn icp_swap_principal() -> Principal {
+    get_principal(ICP_SWAP)
+}
+
+pub fn nft_manager_principal() -> Principal {
+    get_principal(NFT_MANAGER)
+}
 
 mod init;
 pub use init::*;
@@ -62,6 +71,9 @@ pub use update::*;
 
 mod guard;
 pub use guard::*;
+
+mod coordinate_mint;
+pub use coordinate_mint::*;
 
 // mod dao;
 // pub use dao::*;
