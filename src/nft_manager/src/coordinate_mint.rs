@@ -7,7 +7,8 @@ use crate::id_converter::*;
 use crate::{icrc7_principal, icrc7_scion_principal, icp_swap_principal, nft_manager_principal, lbry_principal};
 
 const LBRY_MINT_COST: u64 = 1;
-const VERIFICATION_WINDOW_NANOS: u64 = 300_000_000_000; // 5 minutes in nanoseconds
+const LBRY_E8S: u64 = 100_000_000; // 10^8 for 8 decimal places
+const LBRY_MINT_COST_E8S: u64 = LBRY_MINT_COST * LBRY_E8S;
 
 #[ic_cdk::update]
 pub async fn coordinate_mint(
@@ -52,52 +53,54 @@ async fn get_nft_owner(token_id: Nat, canister: Principal) -> Result<Option<Prin
 async fn verify_lbry_payment(
     from: Principal,
     to: Principal,
-    subaccount: Option<Vec<u8>>,
+    to_subaccount: Option<Vec<u8>>,
 ) -> Result<bool, String> {
-    let from_account = Account {
-        owner: from,
-        subaccount: None,
+    // Get the user's subaccount for spending from NFT manager
+    let from_subaccount = principal_to_subaccount(from);
+
+    let transfer_arg = TransferArg {
+        to: Account {
+            owner: to,
+            subaccount: to_subaccount.map(|s| s.try_into().unwrap()),
+        },
+        fee: None,
+        memo: None,
+        // Set the from_subaccount to the user's spending account
+        from_subaccount: Some(from_subaccount),
+        created_at_time: None,
+        amount: Nat::from(LBRY_MINT_COST_E8S),
     };
 
-    let to_account = Account {
-        owner: to,
-        subaccount: subaccount.map(|s| s.try_into().unwrap()),
-    };
-
-    // Get recent transfers from the LBRY ledger
-    let transfers: CallResult<(Vec<(TransferArg, Option<TransferError>)>,)> = ic_cdk::call(
+    // Call LBRY canister to verify the transfer
+    let transfer_result: CallResult<(Result<Nat, TransferError>,)> = ic_cdk::call(
         lbry_principal(),
-        "get_recent_transfers",
-        (from_account, to_account, ic_cdk::api::time()),
+        "icrc1_transfer",
+        (transfer_arg,),
     ).await;
 
-    match transfers {
-        Ok((recent_transfers,)) => {
-            let current_time = ic_cdk::api::time();
-            
-            // Look for a successful transfer of LBRY_MINT_COST within the verification window
-            for (transfer, error) in recent_transfers {
-                if error.is_none() 
-                    && transfer.amount.0 == LBRY_MINT_COST.into() 
-                    && current_time - transfer.created_at_time.unwrap_or(0) <= VERIFICATION_WINDOW_NANOS {
-                    return Ok(true);
-                }
-            }
-            Ok(false)
+    match transfer_result {
+        Ok((result,)) => match result {
+            Ok(_) => Ok(true),
+            Err(e) => Err(format!("LBRY transfer failed: {:?}", e)),
         },
-        Err((code, msg)) => Err(format!("Error verifying LBRY payment: {:?} - {}", code, msg)),
+        Err((code, msg)) => Err(format!("Error calling LBRY canister: {:?} - {}", code, msg)),
     }
 }
 
 async fn mint_original(minting_number: Nat, caller: Principal) -> Result<String, String> {
     // Verify LBRY payment to ICP_SWAP
-    let icp_swap = icp_swap_principal();
-    if !verify_lbry_payment(caller, icp_swap, None).await? {
-        return Err("Failed to burn LBRY tokens".to_string());
+    let payment_result = verify_lbry_payment(
+        caller,
+        icp_swap_principal(),
+        None
+    ).await?;
+
+    if !payment_result {
+        return Err("Failed to transfer LBRY tokens to ICP_SWAP".to_string());
     }
 
     // Mint the original NFT
-    match super::update::mint_nft(minting_number, caller, None).await {
+    match super::update::mint_nft(minting_number, None).await {
         Ok(result) => Ok("Original NFT minted successfully!".to_string()),
         Err(e) => Err(format!("Mint failed: {}", e)),
     }
@@ -105,16 +108,21 @@ async fn mint_original(minting_number: Nat, caller: Principal) -> Result<String,
 
 async fn mint_scion_from_original(minting_number: Nat, caller: Principal) -> Result<String, String> {
     let nft_wallet = to_nft_subaccount(minting_number.clone());
-    let nft_manager = nft_manager_principal();
-
+    
     // Verify LBRY payment to NFT wallet
-    if !verify_lbry_payment(caller, nft_manager, Some(nft_wallet.to_vec())).await? {
-        return Err("Failed to transfer LBRY".to_string());
+    let payment_result = verify_lbry_payment(
+        caller,
+        nft_manager_principal(),
+        Some(nft_wallet.to_vec())
+    ).await?;
+
+    if !payment_result {
+        return Err("Failed to transfer LBRY to NFT wallet".to_string());
     }
 
     // Calculate new scion ID and mint
     let new_scion_id = og_to_scion_id(&minting_number, &caller);
-    match super::update::mint_scion_nft(new_scion_id, caller, None).await {
+    match super::update::mint_scion_nft(new_scion_id, None).await {
         Ok(result) => Ok("Scion NFT saved successfully!".to_string()),
         Err(e) => Err(format!("Mint failed: {}", e)),
     }
@@ -122,27 +130,38 @@ async fn mint_scion_from_original(minting_number: Nat, caller: Principal) -> Res
 
 async fn mint_scion_from_scion(minting_number: Nat, caller: Principal) -> Result<String, String> {
     let nft_wallet = to_nft_subaccount(minting_number.clone());
-    let nft_manager = nft_manager_principal();
-
+    
     // Verify LBRY payment to scion NFT wallet
-    if !verify_lbry_payment(caller, nft_manager, Some(nft_wallet.to_vec())).await? {
+    let scion_payment = verify_lbry_payment(
+        caller,
+        nft_manager_principal(),
+        Some(nft_wallet.to_vec())
+    ).await?;
+
+    if !scion_payment {
         return Err("Failed to transfer LBRY to the Scion NFT's wallet".to_string());
     }
 
     // Handle original NFT payment if it exists
     let og_id = scion_to_og_id(&minting_number);
-    let og_wallet = to_nft_subaccount(og_id.clone());
-    
     let og_exists = get_nft_owner(og_id.clone(), icrc7_principal()).await?.is_some();
+    
     if og_exists {
-        if !verify_lbry_payment(caller, nft_manager, Some(og_wallet.to_vec())).await? {
+        let og_wallet = to_nft_subaccount(og_id.clone());
+        let og_payment = verify_lbry_payment(
+            caller,
+            nft_manager_principal(),
+            Some(og_wallet.to_vec())
+        ).await?;
+
+        if !og_payment {
             return Err("Failed to transfer LBRY to the original NFT's wallet".to_string());
         }
     }
 
     // Calculate new scion ID and mint
     let new_scion_id = og_to_scion_id(&minting_number, &caller);
-    match super::update::mint_scion_nft(new_scion_id, caller, None).await {
+    match super::update::mint_scion_nft(new_scion_id, None).await {
         Ok(result) => Ok("Scion NFT saved successfully!".to_string()),
         Err(e) => Err(format!("Mint failed: {}", e)),
     }

@@ -63,8 +63,8 @@ pub use id_converter::*;
 mod query;
 pub use query::*;
 
-mod wallets;
-pub use wallets::*;
+mod nft_wallets;
+pub use nft_wallets::*;
 
 mod update;
 pub use update::*;

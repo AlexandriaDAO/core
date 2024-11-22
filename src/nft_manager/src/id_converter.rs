@@ -145,3 +145,70 @@ fn hash_principal(principal: &Principal) -> u64 {
     bytes.copy_from_slice(&result[0..8]);
     u64::from_be_bytes(bytes)
 }
+
+#[ic_cdk::query]
+pub fn principal_to_subaccount(principal: Principal) -> Subaccount {
+    let mut subaccount = [0u8; 32];
+    let principal_bytes = principal.as_slice();
+    
+    // First 28 bytes: principal bytes (padded with zeros if needed)
+    let principal_len = principal_bytes.len();
+    subaccount[..principal_len].copy_from_slice(principal_bytes);
+    
+    // Byte 28: length of the principal
+    subaccount[28] = principal_len as u8;
+    
+    // Last 3 bytes: CRC24 checksum of the principal
+    let checksum = calculate_crc24(principal_bytes);
+    subaccount[29] = ((checksum >> 16) & 0xFF) as u8;
+    subaccount[30] = ((checksum >> 8) & 0xFF) as u8;
+    subaccount[31] = (checksum & 0xFF) as u8;
+    
+    subaccount
+}
+
+#[ic_cdk::query]
+pub fn subaccount_to_principal(subaccount: Subaccount) -> Option<Principal> {
+    // Get the length of the principal from byte 28
+    let principal_len = subaccount[28] as usize;
+    
+    // Validate length
+    if principal_len > 28 {
+        return None;
+    }
+    
+    // Extract the principal bytes
+    let principal_bytes = &subaccount[..principal_len];
+    
+    // Verify checksum
+    let stored_checksum = ((subaccount[29] as u32) << 16) |
+                         ((subaccount[30] as u32) << 8) |
+                         (subaccount[31] as u32);
+    
+    let calculated_checksum = calculate_crc24(principal_bytes);
+    
+    if calculated_checksum != stored_checksum {
+        return None;
+    }
+    
+    // Create principal from bytes
+    Some(Principal::from_slice(principal_bytes))
+}
+
+// CRC24 implementation
+fn calculate_crc24(data: &[u8]) -> u32 {
+    const CRC24_POLY: u32 = 0x1864CFB; // CRC-24 polynomial
+    let mut crc: u32 = 0xB704CE;       // CRC-24 initial value
+    
+    for &byte in data {
+        crc ^= (byte as u32) << 16;
+        for _ in 0..8 {
+            crc <<= 1;
+            if (crc & 0x1000000) != 0 {
+                crc ^= CRC24_POLY;
+            }
+        }
+    }
+    
+    crc & 0xFFFFFF // Return 24 bits only
+}
