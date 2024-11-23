@@ -30,7 +30,7 @@ const BookMint: React.FC<IBookMintProps> = ({
 			const mintNumber = BigInt(arweaveIdToNat(book.manifest));
 			const description = "test";
 			const actorNftManager = await getNftManagerActor();
-			const result = await actorNftManager.mint_nft(mintNumber, [description]);
+            const result = await actorNftManager.coordinate_mint(mintNumber);
 
             if ("Err" in result) throw new Error(result.Err);
 

@@ -209,7 +209,7 @@ const Mint: React.FC<IMintProps> = ({
 		const mintNumber = BigInt(arweaveIdToNat(transactionId));
 		const description = "test";
 		const actorNftManager = await getNftManagerActor();
-		const result = await actorNftManager.mint_nft(mintNumber, [description]);
+		const result = await actorNftManager.coordinate_mint(mintNumber);
 		if ("Err" in result) throw new Error(result.Err);
 
 		toast.success("Minted Successfully");

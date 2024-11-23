@@ -23,15 +23,13 @@ type Value = variant {
 service : () -> {
   arweave_id_to_nat : (text) -> (nat) query;
   burn_to_lbry : (vec nat) -> (Result);
-  coordinate_mint : (nat, principal) -> (Result);
+  coordinate_mint : (nat) -> (Result);
   get_manifest_ids : (vec nat) -> (Result_1);
   get_metadata : (vec nat) -> (Result_2);
   get_my_nft_balances : (opt nat) -> (Result_3);
   get_nft_balances : (vec nat) -> (Result_4);
   get_nfts : (opt nat, opt nat) -> (Result_5);
   get_nfts_of : (principal) -> (Result_6);
-  mint_nft : (nat, opt text) -> (Result);
-  mint_scion_nft : (nat, opt text) -> (Result);
   nat_to_arweave_id : (nat) -> (text) query;
   nfts_exist : (vec nat) -> (Result_7);
   owner_of : (vec nat) -> (Result_8);

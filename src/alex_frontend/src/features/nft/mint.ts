@@ -9,15 +9,12 @@ export const mint_nft = async (transactionId: string): Promise<string> => {
       throw new Error("You must be authenticated to mint an NFT");
     }
 
-    // Get the caller's principal
-    const callerPrincipal = client.getIdentity().getPrincipal();
-
     // Calculate mint number from Arweave ID
     const mintNumber = BigInt(arweaveIdToNat(transactionId));
 
     // Call the backend coordinate_mint function
     const actorNftManager = await getNftManagerActor();
-    const result = await actorNftManager.coordinate_mint(mintNumber, callerPrincipal);
+    const result = await actorNftManager.coordinate_mint(mintNumber);
 
     // Handle the result
     if ("Err" in result) {

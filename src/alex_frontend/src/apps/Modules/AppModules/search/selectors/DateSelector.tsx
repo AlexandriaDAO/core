@@ -16,8 +16,18 @@ import { format, parse } from 'date-fns';
 const DATE_FORMAT = "MM/dd/yyyy hh:mm aa";
 
 const formatDateInput = (input: string): string => {
+  // Allow direct editing but clean up when losing focus
+  return input;
+};
+
+const formatTimeInput = (input: string): string => {
+  // Allow direct editing but clean up when losing focus
+  return input;
+};
+
+const cleanAndValidateDate = (dateStr: string): string => {
   // Remove all non-digits
-  const numbers = input.replace(/\D/g, '');
+  const numbers = dateStr.replace(/\D/g, '');
   
   // Format as MM/DD/YYYY
   if (numbers.length <= 2) return numbers;
@@ -25,13 +35,12 @@ const formatDateInput = (input: string): string => {
   return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
 };
 
-const formatTimeInput = (input: string): string => {
+const cleanAndValidateTime = (timeStr: string): string => {
   // Remove non-digits and convert to uppercase
-  const cleaned = input.toUpperCase();
+  const cleaned = timeStr.toUpperCase();
   const numbers = cleaned.replace(/[^0-9AP]/g, '');
   const ampm = cleaned.match(/[AP]M?$/)?.[0] || '';
   
-  // Format as hh:mm AM/PM
   let formatted = '';
   if (numbers.length > 0) {
     const hours = numbers.slice(0, 2);
@@ -41,7 +50,6 @@ const formatTimeInput = (input: string): string => {
     }
   }
   
-  // Append AM/PM
   if (ampm) {
     formatted += ' ' + (ampm.length === 1 ? ampm + 'M' : ampm);
   }
@@ -162,6 +170,48 @@ const DateSelector: React.FC = () => {
     return isSelected ? "primary" : "ghost";
   };
 
+  const handleDateBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const cleanedValue = cleanAndValidateDate(e.target.value);
+    setDateInputValue(cleanedValue);
+    
+    if (cleanedValue.length === 10 && isValidDate(cleanedValue)) {
+      try {
+        const currentTime = selectedDate ? format(selectedDate, "hh:mm aa") : format(new Date(), "hh:mm aa");
+        const parsedDate = parse(`${cleanedValue} ${currentTime}`, DATE_FORMAT, new Date());
+        
+        if (!isNaN(parsedDate.getTime())) {
+          handleDateTimeChange(parsedDate);
+        }
+      } catch (error) {
+        // Invalid date - revert to previous valid date
+        if (selectedDate) {
+          setDateInputValue(format(selectedDate, "MM/dd/yyyy"));
+        }
+      }
+    }
+  };
+
+  const handleTimeBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const cleanedValue = cleanAndValidateTime(e.target.value);
+    setTimeInputValue(cleanedValue);
+    
+    if (isValidTime(cleanedValue)) {
+      try {
+        const currentDate = selectedDate ? format(selectedDate, "MM/dd/yyyy") : format(new Date(), "MM/dd/yyyy");
+        const parsedDate = parse(`${currentDate} ${cleanedValue}`, DATE_FORMAT, new Date());
+        
+        if (!isNaN(parsedDate.getTime())) {
+          handleDateTimeChange(parsedDate);
+        }
+      } catch (error) {
+        // Invalid time - revert to previous valid time
+        if (selectedDate) {
+          setTimeInputValue(format(selectedDate, "hh:mm aa"));
+        }
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col gap-3 w-full">
       <span className="text-[#000] font-['Syne'] text-[20px] font-medium">
@@ -259,6 +309,7 @@ const DateSelector: React.FC = () => {
               type="text"
               value={dateInputValue}
               onChange={handleDateInputChange}
+              onBlur={handleDateBlur}
               className="w-[100px] bg-transparent border-none outline-none text-black font-['Poppins'] text-base font-light"
               placeholder="MM/DD/YYYY"
               maxLength={10}
@@ -268,6 +319,7 @@ const DateSelector: React.FC = () => {
               type="text"
               value={timeInputValue}
               onChange={handleTimeInputChange}
+              onBlur={handleTimeBlur}
               className="w-[90px] bg-transparent border-none outline-none text-black font-['Poppins'] text-base font-light"
               placeholder="hh:mm AA"
               maxLength={8}

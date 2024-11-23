@@ -14,13 +14,22 @@ const LBRY_MINT_COST_E8S: u64 = LBRY_MINT_COST * LBRY_E8S;
 #[ic_cdk::update(decoding_quota = 200, guard = "not_anon")]
 pub async fn coordinate_mint(
     minting_number: Nat,
-    caller: Principal,
 ) -> Result<String, String> {
+    let caller = ic_cdk::caller();
+    
     // Check ownership to prevent duplicate mints
     let [og_owner, scion_owner] = check_existing_ownership(&minting_number).await?;
     
     if og_owner == Some(caller) || scion_owner == Some(caller) {
         return Err("You already own this NFT".to_string());
+    }
+
+    // Check if caller already owns a scion NFT for this number
+    let potential_scion_id = og_to_scion_id(&minting_number, &caller);
+    let caller_scion = get_nft_owner(potential_scion_id, icrc7_scion_principal()).await?;
+    
+    if caller_scion.is_some() {
+        return Err("You have already minted a scion NFT from this number".to_string());
     }
 
     // Handle different minting scenarios
@@ -130,14 +139,6 @@ async fn mint_scion_from_original(minting_number: Nat, caller: Principal) -> Res
 }
 
 async fn mint_scion_from_scion(minting_number: Nat, caller: Principal) -> Result<String, String> {
-    // First check if this specific scion ID already exists
-    let new_scion_id = og_to_scion_id(&minting_number, &caller);
-    let scion_exists = get_nft_owner(new_scion_id.clone(), icrc7_scion_principal()).await?;
-    
-    if scion_exists.is_some() {
-        return Err("You have already minted a scion NFT from this number".to_string());
-    }
-
     let nft_wallet = to_nft_subaccount(minting_number.clone());
     
     // Verify LBRY payment to scion NFT wallet

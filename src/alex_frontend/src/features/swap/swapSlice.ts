@@ -14,6 +14,7 @@ import getArchivedBal from "./thunks/getArchivedBal";
 import redeemArchivedBalance from "./thunks/redeemArchivedBalance";
 import fetchTransaction from "./thunks/lbryIcrc/getTransactions";
 import getSpendingBalance from "./thunks/lbryIcrc/getSpendingBalance";
+import getAlexSpendingBalance from "./thunks/alexIcrc/getAlexSpendingBalance";
 
 import { TransactionType } from "./thunks/lbryIcrc/getTransactions";
 import getStakersCount from "./thunks/getStakersCount";
@@ -53,6 +54,7 @@ export interface SwapState {
   averageAPY: number;
   error: string | null;
   spendingBalance: string;
+  alexSpendingBalance: string;
 }
 
 // Define the initial state using the ManagerState interface
@@ -78,6 +80,7 @@ const initialState: SwapState = {
   averageAPY: 0,
   error: null,
   spendingBalance: '0',
+  alexSpendingBalance: "0",
 };
 
 const swapSlice = createSlice({
@@ -373,6 +376,17 @@ const swapSlice = createSlice({
       .addCase(getSpendingBalance.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(getAlexSpendingBalance.fulfilled, (state, action) => {
+        state.alexSpendingBalance = action.payload;
+        state.loading = false;
+      })
+      .addCase(getAlexSpendingBalance.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getAlexSpendingBalance.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to get ALEX spending balance";
       });
   },
 });

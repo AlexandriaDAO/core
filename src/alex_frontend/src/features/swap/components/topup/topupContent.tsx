@@ -13,6 +13,7 @@ import { Principal } from "@dfinity/principal";
 import getSpendingBalance from "../../thunks/lbryIcrc/getSpendingBalance";
 import topUpLBRY from "../../thunks/lbryIcrc/topUpLBRY";
 import { getNftManagerActor } from "@/features/auth/utils/authUtils";
+import getAlexSpendingBalance from "../../thunks/alexIcrc/getAlexSpendingBalance";
 
 const TopupContent = () => {
     const dispatch = useAppDispatch();
@@ -70,6 +71,7 @@ const TopupContent = () => {
     useEffect(() => {
         if (user) {
             dispatch(getSpendingBalance(user));
+            dispatch(getAlexSpendingBalance(user));
         }
     }, [dispatch, user]);
 
@@ -113,13 +115,23 @@ const TopupContent = () => {
                             <strong className='text-2xl font-medium'>Enter the amount</strong>
                         </div>
                         <div className='border bg-white py-3 px-5 rounded-borderbox mb-3'>
-                            <div className='flex justify-between items-center'>
-                                <h4 className='text-lg font-medium text-darkgray'>Spending Wallet Balance</h4>
+                            <div className='flex justify-between items-center mb-3'>
+                                <h4 className='text-lg font-medium text-darkgray'>LBRY Spending Wallet Balance</h4>
                                 <span className='text-lg font-medium text-darkgray'>
                                     {swap.loading ? (
                                         <LoaderCircle size={18} className="animate animate-spin" />
                                     ) : (
                                         `${swap.spendingBalance} LBRY`
+                                    )}
+                                </span>
+                            </div>
+                            <div className='flex justify-between items-center'>
+                                <h4 className='text-lg font-medium text-darkgray'>ALEX Spending Wallet Balance</h4>
+                                <span className='text-lg font-medium text-darkgray'>
+                                    {swap.loading ? (
+                                        <LoaderCircle size={18} className="animate animate-spin" />
+                                    ) : (
+                                        `${swap.alexSpendingBalance} ALEX`
                                     )}
                                 </span>
                             </div>

@@ -161,7 +161,7 @@ touch .dfx/local/canisters/LBRY/LBRY.did
 touch .dfx/local/canisters/ALEX/ALEX.did
 
 npm i
-# dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
+dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 
 ## Helpful extras for testing.
 # dfx ledger balance

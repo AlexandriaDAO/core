@@ -1,13 +1,19 @@
 /*
 The Plan:
 
-- Scratch all that. I have to move the NFT auth/payment/security stuff to the backend.
-  - Now that's done: 
 
-    -- There's a bug where you can mint the same scion NFT multiple times. (should be fixed)
-    -- I also gotta lock up the security on the minting funcition guards.
+- get_two_random_users only gets the principal, not the subaccount.
+- Problem is if the transaction call fails, it goes right to adils wallet.
 
-    Push to mainnet, and then move on to the next stuff in the UI:
+
+
+Bug; random librarian alex mints don't go to subaccounts or nfts.
+- Review tokenomics emissions schedule. Could it be better?
+- Should we proceed with this mining option, or perhaps use bot prevention by limiting the rewards to NFTs only? I.e., non-null subaccount transactors.
+
+
+
+- I need to add alex balance to the topup wallet and allow the user to claim it.
 
 *this assumes that the minting keeps working well*
 - Get alexandrian to display Scion NFTs.
@@ -20,6 +26,7 @@ Minor stuff to do:
 - Make changing date/time easier.
 - Make exploring an owner easier.
 - Need to blur blocked images when clicked on.
+- We need a more efficient way to get peoples library because it takes a long time if you have a lot of NFTs. Maybe add back the concurrent query calls.
 
 */
 
