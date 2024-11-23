@@ -12,7 +12,6 @@ use ic_cdk::caller;
 use ic_cdk::api::call::CallResult;
 use icrc_ledger_types::{icrc::generic_value::Value, icrc1::account::Account};
 
-#[update(decoding_quota = 200, guard = "is_frontend")]
 pub async fn mint_nft(minting_number: Nat, description: Option<String>) -> Result<String, String> {
     const MAX_DESCRIPTION_LENGTH: usize = 256;
 
@@ -60,7 +59,7 @@ pub async fn mint_nft(minting_number: Nat, description: Option<String>) -> Resul
     }
 }
 
-#[update(decoding_quota = 200, guard = "is_frontend")]
+
 pub async fn mint_scion_nft(minting_number: Nat, description: Option<String>) -> Result<String, String> {
     const MAX_DESCRIPTION_LENGTH: usize = 256;
 

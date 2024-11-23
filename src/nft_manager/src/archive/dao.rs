@@ -65,7 +65,7 @@ settle_dispute_proposal(proposal_id)
 use std::cell::RefCell;
 use std::time::Duration;
 
-use crate::guard::*;
+use crate::guard::not_anon;
 use crate::types::*;
 use crate::query::*;
 use crate::update::*;
@@ -492,7 +492,7 @@ async fn burn_nft(token_id: Nat) -> Result<BurnOk, String> {
 
 
 
-#[update(guard = "is_frontend")]
+#[update(guard = "not_anon")]
 pub async fn is_verified(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
     check_query_batch_size(&token_ids)?;
     ic_cdk::println!("Checking verification status for token_ids: {:?}", token_ids);

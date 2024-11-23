@@ -4,8 +4,7 @@ The Plan:
 - Scratch all that. I have to move the NFT auth/payment/security stuff to the backend.
   - Now that's done: 
 
-    -- I need to gracefully handle failed arweave calls.
-    -- There's a bug where you can mint the same scion NFT multiple times.
+    -- There's a bug where you can mint the same scion NFT multiple times. (should be fixed)
     -- I also gotta lock up the security on the minting funcition guards.
 
     Push to mainnet, and then move on to the next stuff in the UI:
@@ -15,6 +14,12 @@ The Plan:
 - Start improving the grid and display.
 - Start displaying the wallets of each NFT, and add a claim button.
 - Start to look for bugs, exploits, possiblity of losing funds.
+
+
+Minor stuff to do:
+- Make changing date/time easier.
+- Make exploring an owner easier.
+- Need to blur blocked images when clicked on.
 
 */
 

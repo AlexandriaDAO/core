@@ -2,7 +2,7 @@ use crate::{alex_principal, icrc7_principal, lbry_principal};
 use crate::utils::check_query_batch_size;
 use crate::id_converter::to_nft_subaccount;
 use crate::types::TokenBalances;
-use crate::guard::is_frontend;
+use crate::guard::not_anon;
 
 use ic_cdk::update;
 use std::collections::BTreeMap;
@@ -15,7 +15,7 @@ const LBRY_FEE: u64 = 4_000_000;
 const ALEX_FEE: u64 = 10_000;
 
 
-#[update(guard = "is_frontend")]
+#[update(guard = "not_anon")]
 pub async fn total_supply() -> Result<Nat, String> {
 
     let call_result: CallResult<(Nat,)> = ic_cdk::call(
@@ -31,7 +31,7 @@ pub async fn total_supply() -> Result<Nat, String> {
 }
 
 
-#[update(guard = "is_frontend")]
+#[update(guard = "not_anon")]
 pub async fn get_nfts(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>, String> {
     let total_supply = total_supply().await?;
 
@@ -71,7 +71,7 @@ pub async fn get_nfts(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>, 
 }
 
 
-#[update(guard = "is_frontend")]
+#[update(guard = "not_anon")]
 pub async fn get_nft_balances(mint_numbers: Vec<Nat>) -> Result<Vec<TokenBalances>, String> {
     if mint_numbers.len() >= 50 {
         return Err("Cannot process more than 49 tokens at a time".to_string());
@@ -120,7 +120,7 @@ pub async fn get_nft_balances(mint_numbers: Vec<Nat>) -> Result<Vec<TokenBalance
 }
 
 
-#[update(guard = "is_frontend")]
+#[update(guard = "not_anon")]
 pub async fn nfts_exist(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
     check_query_batch_size(&token_ids)?;
 
@@ -144,7 +144,7 @@ pub async fn nfts_exist(token_ids: Vec<Nat>) -> Result<Vec<bool>, String> {
 }
 
 
-#[update(guard = "is_frontend")]
+#[update(guard = "not_anon")]
 pub async fn owner_of(token_ids: Vec<Nat>) -> Result<Vec<Option<Account>>, String> {
     check_query_batch_size(&token_ids)?;
 
@@ -163,7 +163,7 @@ pub async fn owner_of(token_ids: Vec<Nat>) -> Result<Vec<Option<Account>>, Strin
 }
 
 
-#[update(guard = "is_frontend")]
+#[update(guard = "not_anon")]
 pub async fn get_nfts_of(owner: Principal) -> Result<Vec<(Nat, Option<String>)>, String> {
     let account = Account {
         owner,
@@ -192,7 +192,7 @@ pub async fn get_nfts_of(owner: Principal) -> Result<Vec<(Nat, Option<String>)>,
 }
 
 
-#[update(guard = "is_frontend")]
+#[update(guard = "not_anon")]
 pub async fn get_metadata(token_ids: Vec<Nat>) -> Result<Vec<Option<BTreeMap<String, Value>>>, String> {
     check_query_batch_size(&token_ids)?;
 
@@ -212,7 +212,7 @@ pub async fn get_metadata(token_ids: Vec<Nat>) -> Result<Vec<Option<BTreeMap<Str
     }
 }
 
-#[update(guard = "is_frontend")]
+#[update(guard = "not_anon")]
 pub async fn get_manifest_ids(token_ids: Vec<Nat>) -> Result<Vec<Option<String>>, String> {
     let manifests = get_metadata(token_ids).await?.into_iter().map(|metadata| {
         metadata.and_then(|m| {
@@ -231,7 +231,7 @@ pub async fn get_manifest_ids(token_ids: Vec<Nat>) -> Result<Vec<Option<String>>
 }
 
 
-#[update(guard = "is_frontend")]
+#[update(guard = "not_anon")]
 pub async fn get_my_nft_balances(slot: Option<Nat>) -> Result<Vec<(Nat, TokenBalances)>, String> {
     let caller = ic_cdk::api::caller();
     

@@ -3,6 +3,7 @@ use ic_cdk::api::call::CallResult;
 use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc1::transfer::{TransferArg, TransferError};
 
+use crate::guard::not_anon;
 use crate::id_converter::*;
 use crate::{icrc7_principal, icrc7_scion_principal, icp_swap_principal, nft_manager_principal, lbry_principal};
 
@@ -10,7 +11,7 @@ const LBRY_MINT_COST: u64 = 1;
 const LBRY_E8S: u64 = 100_000_000; // 10^8 for 8 decimal places
 const LBRY_MINT_COST_E8S: u64 = LBRY_MINT_COST * LBRY_E8S;
 
-#[ic_cdk::update]
+#[ic_cdk::update(decoding_quota = 200, guard = "not_anon")]
 pub async fn coordinate_mint(
     minting_number: Nat,
     caller: Principal,
@@ -101,7 +102,7 @@ async fn mint_original(minting_number: Nat, caller: Principal) -> Result<String,
 
     // Mint the original NFT
     match super::update::mint_nft(minting_number, None).await {
-        Ok(result) => Ok("Original NFT minted successfully!".to_string()),
+        Ok(_) => Ok("Original NFT minted successfully!".to_string()),
         Err(e) => Err(format!("Mint failed: {}", e)),
     }
 }
@@ -123,12 +124,20 @@ async fn mint_scion_from_original(minting_number: Nat, caller: Principal) -> Res
     // Calculate new scion ID and mint
     let new_scion_id = og_to_scion_id(&minting_number, &caller);
     match super::update::mint_scion_nft(new_scion_id, None).await {
-        Ok(result) => Ok("Scion NFT saved successfully!".to_string()),
+        Ok(_) => Ok("Scion NFT saved successfully!".to_string()),
         Err(e) => Err(format!("Mint failed: {}", e)),
     }
 }
 
 async fn mint_scion_from_scion(minting_number: Nat, caller: Principal) -> Result<String, String> {
+    // First check if this specific scion ID already exists
+    let new_scion_id = og_to_scion_id(&minting_number, &caller);
+    let scion_exists = get_nft_owner(new_scion_id.clone(), icrc7_scion_principal()).await?;
+    
+    if scion_exists.is_some() {
+        return Err("You have already minted a scion NFT from this number".to_string());
+    }
+
     let nft_wallet = to_nft_subaccount(minting_number.clone());
     
     // Verify LBRY payment to scion NFT wallet
@@ -162,7 +171,7 @@ async fn mint_scion_from_scion(minting_number: Nat, caller: Principal) -> Result
     // Calculate new scion ID and mint
     let new_scion_id = og_to_scion_id(&minting_number, &caller);
     match super::update::mint_scion_nft(new_scion_id, None).await {
-        Ok(result) => Ok("Scion NFT saved successfully!".to_string()),
+        Ok(_) => Ok("Scion NFT saved successfully!".to_string()),
         Err(e) => Err(format!("Mint failed: {}", e)),
     }
 }
