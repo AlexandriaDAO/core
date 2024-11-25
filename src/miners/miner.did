@@ -1,0 +1,13 @@
+type Miner = record {
+  status : MinerStatus;
+  balance : nat64;
+  time : nat64;
+  trnxs_count : nat64;
+};
+type MinerStatus = variant { Inactive; Active };
+type Result = variant { Ok : text; Err : text };
+service : {
+  end_mining : () -> (Result);
+  get_all_mining : () -> (vec record { principal; Miner }) query;
+  start_mining : (nat64) -> (Result);
+}
