@@ -65,6 +65,10 @@ candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/ve
 cargo build --release --target wasm32-unknown-unknown --package miner
 candid-extractor target/wasm32-unknown-unknown/release/miner.wasm > src/miner/miner.did
 
+# For emporium
+cargo build --release --target wasm32-unknown-unknown --package emporium
+candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/emporium/emporium.did
+
 cargo update
 
 dfx deploy bookmarks --specified-id ya6k4-waaaa-aaaap-qkmpq-cai

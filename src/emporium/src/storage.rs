@@ -12,14 +12,17 @@ use ic_stable_structures::{
     StableBTreeMap,
 };
 pub const LISTING_MEM_ID: MemoryId = MemoryId::new(0);
+
 thread_local! {
 
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
         MemoryManager::init(DefaultMemoryImpl::default())
     );
     
-    pub static LISTING_MEM_ID: RefCell<StableBTreeMap<Principal,Miner , Memory>> = RefCell::new(
-        StableBTreeMap::init(LISTING_MEM_ID.with(|m| m.borrow().get(LISTING_MEM_ID)))
+    pub static LISTINGS: RefCell<StableBTreeMap<u64, Listing, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(LISTING_MEM_ID))
+        )
     );
 }
 const MAX_VALUE_SIZE: u32 = 100;
@@ -35,5 +38,17 @@ struct Listing {
 }
 
 
+impl Storable for Listing {
+    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
 
-//
+    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Bounded { 
+        max_size: MAX_VALUE_SIZE, 
+        is_fixed_size: false 
+    };
+}

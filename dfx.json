@@ -112,6 +112,11 @@
       "candid": "src/miner/miner.did",
       "package": "miner",
       "type": "rust"
+    },
+    "emporium": {
+      "candid": "src/emporium/emporium.did",
+      "package": "emporium",
+      "type": "rust"
     }
   },
   "defaults": {

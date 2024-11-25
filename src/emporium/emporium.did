@@ -1,3 +1,2 @@
-service : {
-    "greet": (text) -> (text) query;
-}
+type Result = variant { Ok : text; Err : text };
+service : { list_nft : (nat64, nat64) -> (Result) }
