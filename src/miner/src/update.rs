@@ -102,4 +102,4 @@ async fn check_allowance(){
 // First approve token to miner canister.
 // Then call start minting.
 
-// chan
+// update to track git 
