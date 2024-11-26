@@ -4,15 +4,50 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import BookModal from "@/components/BookModal";
 import { LoaderCircle } from "lucide-react";
+import fetchMyBooks from "./thunks/fetchMyBooks";
+import useNftManager from "@/hooks/actors/useNftManager";
 
 const ITEMS_PER_ROW = 6;
 
 const Collection: React.FC = () => {
+	const {actor} = useNftManager();
+	const dispatch = useAppDispatch();
+	const bookModalRef = useRef<HTMLDivElement>(null);
 
+	const { user } = useAppSelector((state) => state.auth);
 	const { books, selectedBook, loading, error } = useAppSelector(
 		(state) => state.collection
 	);
-	const bookModalRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if(!actor || !user) return;
+		dispatch(fetchMyBooks({actor, user}));
+	}, [user, dispatch]);
+
+	if(loading) return (
+		<div className="flex justify-start items-center gap-1">
+			<span>Loading Collection</span>
+			<LoaderCircle size={20} className="animate animate-spin" />
+		</div>
+	)
+
+	if(error) return(
+		<div className="flex flex-col gap-2 justify-start items-start font-roboto-condensed text-base leading-[18px] text-black font-normal">
+			<span>Error loading books</span>
+			<span>{error}</span>
+		</div>
+	)
+
+	if(books.length <= 0) return (
+		<div className="flex flex-col items-center justify-start p-8 rounded-xl border border-ring">
+			<h2 className="font-syne text-2xl font-bold mb-4">
+				Empty Collection
+			</h2>
+			<p className="font-roboto-condensed text-lg">
+				Please visit our Shop Page to add assets to your collection.
+			</p>
+		</div>
+	)
 
 
 	const renderBookModal = (index: number) => {
@@ -31,7 +66,7 @@ const Collection: React.FC = () => {
 					return (
 						<div
 							key="book-modal"
-							ref={bookModalRef}
+							// ref={bookModalRef}
 							className={`col-start-1 col-end-${ITEMS_PER_ROW + 1}`}
 							style={{
 								gridColumnStart: 1,
@@ -49,23 +84,6 @@ const Collection: React.FC = () => {
 
 	return (
 		<div className="flex-grow flex flex-col items-start">
-			{loading ?
-				<div className="flex gap-1 justify-start items-center font-roboto-condensed text-base leading-[18px] text-black font-normal">
-					<span>Loading Books</span>
-					<LoaderCircle
-						size={14}
-						className="animate animate-spin"
-					/>
-				</div> :
-				books.length <= 0 && <div className="col-span-6 font-roboto-condensed font-normal text-base flex items-center justify-between p-2 border-b last:border-0 text-black">
-					No Results to show
-				</div>
-			}
-
-			{error && <div className="flex flex-col gap-2 justify-start items-start font-roboto-condensed text-base leading-[18px] text-black font-normal">
-				<span>Error loading books</span>
-				<span>{error}</span>
-			</div>}
 			<div
 				className="w-full grid py-4 gap-4"
 				style={{

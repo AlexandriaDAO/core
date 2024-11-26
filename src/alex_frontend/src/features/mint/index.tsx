@@ -14,11 +14,12 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchEngineBooks from "../engine-books/thunks/fetchEngineBooks";
 import { WebIrys } from "@irys/sdk";
 import SelectNode from "./SelectNode";
-import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
 import { getIcrc7Actor, getNftManagerActor } from "../auth/utils/authUtils";
 import { Dialog, DialogContent, DialogTrigger } from "@/lib/components/dialog";
 import { Button } from "@/lib/components/button";
 import { UploadIcon } from "lucide-react";
+import { SerializedNode } from "../my-nodes/myNodesSlice";
+import { useAlexWallet } from "@/hooks/actors";
 
 
 const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_ID : process.env.REACT_LOCAL_APP_ID;
@@ -30,6 +31,8 @@ type IMintProps = {
 const Mint: React.FC<IMintProps> = ({
     mint = true,
 }: IMintProps) => {
+	const {actor} = useAlexWallet();
+
 	const { activeEngine } = useAppSelector((state) => state.engineOverview);
 
 	const dispatch = useAppDispatch();
@@ -45,7 +48,7 @@ const Mint: React.FC<IMintProps> = ({
 
 	const [screen, setScreen] = useState(0);
 
-	const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+	const [selectedNode, setSelectedNode] = useState<SerializedNode | null>(null);
 
 	const next = (step: any = null) => {
 		if (step) {
@@ -113,7 +116,10 @@ const Mint: React.FC<IMintProps> = ({
 				toast.error("Please select a node");
 				return;
 			}
-			const irys = await getServerIrys(selectedNode.id);
+			if (!actor) {
+				throw new Error("No actor available");
+			}
+			const irys = await getServerIrys(selectedNode, actor);
 			const transactions = await createAllTransactions(irys);
 
 			if(mint) {

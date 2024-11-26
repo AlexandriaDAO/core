@@ -54,9 +54,9 @@ candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_s
 cargo build --release --target wasm32-unknown-unknown --package tokenomics
 candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
 
-# for alex_librarian
-cargo build --release --target wasm32-unknown-unknown --package alex_librarian
-candid-extractor target/wasm32-unknown-unknown/release/alex_librarian.wasm > src/alex_librarian/alex_librarian.did
+# for user
+cargo build --release --target wasm32-unknown-unknown --package user
+candid-extractor target/wasm32-unknown-unknown/release/user.wasm > src/user/user.did
 # for vetkd
 cargo build --release --target wasm32-unknown-unknown --package vetkd
 candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
@@ -71,7 +71,7 @@ dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
 dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
 dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
 
-dfx deploy alex_librarian --specified-id yo4hu-nqaaa-aaaap-qkmoq-cai
+dfx deploy user --specified-id bd3sg-teaaa-aaaaa-qaaba-cai
 dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
 dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 

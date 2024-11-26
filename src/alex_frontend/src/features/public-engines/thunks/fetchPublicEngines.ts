@@ -1,16 +1,19 @@
-import { Engine } from '../../../../../declarations/alex_backend/alex_backend.did';
+import { _SERVICE } from '../../../../../declarations/user/user.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getActorAlexBackend, getAuthClient } from '@/features/auth/utils/authUtils';
+import { ActorSubclass } from '@dfinity/agent';
+import { SerializedEngine } from '@/features/my-engines/myEnginesSlice';
+import { serializeEngine } from '@/features/my-engines/utils';
 
 // Define the async thunk
 const fetchPublicEngines = createAsyncThunk<
-    Engine[], // This is the return type of the thunk's payload
-    void, //Argument that we pass to initialize
+    SerializedEngine[], // This is the return type of the thunk's payload
+    ActorSubclass<_SERVICE>, //Argument that we pass to initialize
     { rejectValue: string }
->("publicEngines/fetchPublicEngines", async (_, { rejectWithValue }) => {
+>("publicEngines/fetchPublicEngines", async (actor, { rejectWithValue }) => {
     try {
-        const actor = await getActorAlexBackend();
-        return await actor.get_engines_not_owned_by_me()
+        const result = await actor.get_active_engines([]);
+
+        return result.map(engine => serializeEngine(engine));
     } catch (error) {
         console.error("Failed to Fetch Public Engines:", error);
 

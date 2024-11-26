@@ -1,20 +1,18 @@
-import { Engine } from '../../../../../declarations/alex_backend/alex_backend.did';
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../../../declarations/user/user.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getActorAlexBackend, getAuthClient } from '../../auth/utils/authUtils';
+import { SerializedEngine } from '../myEnginesSlice';
+import { serializeEngine } from '../utils';
 
 const fetchMyEngines = createAsyncThunk<
-    Engine[], // This is the return type of the thunk's payload
-    void, //Argument that we pass to initialize
+    SerializedEngine[], // This is the return type of the thunk's payload
+    ActorSubclass<_SERVICE>, //Argument that we pass to initialize
     { rejectValue: string }
->("myEngines/fetchMyEngines", async (_, { rejectWithValue }) => {
+>("myEngines/fetchMyEngines", async (actor, { rejectWithValue }) => {
     try {
-        const client = await getAuthClient();
-        if(await client.isAuthenticated()){
-            const actor = await getActorAlexBackend();
-            return await actor.get_my_engines()
-        }
+        const result = await actor.get_my_engines();
 
-        return rejectWithValue("User is not Authenticated");
+        return result.map(engine => serializeEngine(engine));
     } catch (error) {
         console.error("Failed to Fetch My Engines:", error);
 

@@ -1,7 +1,7 @@
 service: () -> {
     getMessage: () -> (text) query;
     isUserAnonymous: () -> (bool) query;
-    pubKey: (text) -> (variant {Ok:text; Err:text});
+    pubKey: (nat64) -> (variant {Ok:text; Err:text});
     setMessage: (text) -> ();
-    signData: (text, text) -> (variant {Ok:text; Err:text});
+    signData: (text, nat64) -> (variant {Ok:text; Err:text});
 }

@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import EngineRow from "./EngineRow";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchMyEngines from "@/features/my-engines/thunks/fetchMyEngines";
-import { Engine } from "../../../../../../src/declarations/alex_backend/alex_backend.did";
+import { SerializedEngine } from "@/features/my-engines/myEnginesSlice";
 
 interface IAddToEngineProps {
     book?: Book;
@@ -19,16 +19,16 @@ const AddToEngine: React.FC<IAddToEngineProps> = ({
     if(!book) return <></>
 
 	const dispatch = useAppDispatch();
-	const [publishedEngines, setPublishedEngines] = useState<Engine[]>([])
+	const [publishedEngines, setPublishedEngines] = useState<SerializedEngine[]>([])
 
 	const {engines, loading}  = useAppSelector(state => state.myEngines)
 
-	useEffect(() => {
-		dispatch(fetchMyEngines());
-	}, []);
+	// useEffect(() => {
+	// 	dispatch(fetchMyEngines());
+	// }, []);
 
 	useEffect(() => {
-		setPublishedEngines(engines.filter((engine) => 'Published' in engine.status ));
+		setPublishedEngines(engines.filter((engine) => engine.active ));
 	}, [engines]);
 
     return (

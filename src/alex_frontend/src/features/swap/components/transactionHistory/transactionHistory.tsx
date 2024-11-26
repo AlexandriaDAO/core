@@ -11,7 +11,8 @@ const TransactionHistory = () => {
     const { user } = useAppSelector((state) => state.auth);
     const swap = useAppSelector((state) => state.swap);
     useEffect(() => {
-        dispatch(fetchTransaction(user));
+        if(!user) return;
+        dispatch(fetchTransaction(user.principal));
     }, [user]);
     return (<>
         <div className="overflow-x-auto lg:overflow-x-auto">

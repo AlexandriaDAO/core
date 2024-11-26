@@ -14,10 +14,9 @@ const BalanceContent: React.FC = () => {
 
 
     useEffect(() => {
-        if (user!=='') {
-            dispatch(getAccountAlexBalance(user))
-            dispatch(getLbryBalance(user))
-            
+        if (user) {
+            dispatch(getAccountAlexBalance(user.principal))
+            dispatch(getLbryBalance(user.principal))
         }
     }, [user])
 

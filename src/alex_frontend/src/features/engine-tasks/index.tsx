@@ -112,7 +112,7 @@ const EngineTasks = () => {
 							? `Selected ${selectedRowKeys.length} items`
 							: ""}
 					</span>
-					{user == activeEngine?.owner && (
+					{user && activeEngine && user.principal == activeEngine.owner && (
 						<>
 							<Button disabled={selectedRowKeys.length <= 0} variant='muted' onClick={clearSelectedTasks}>
 								<X size={22} />

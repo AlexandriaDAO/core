@@ -1,0 +1,16 @@
+[package]
+name = "user"
+version = "0.0.1"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = "0.10.10"
+ic-cdk = "0.17.0"
+serde = "1.0.208"
+regex = "1.11.1"
+lazy_static = "1.5.0"
+url = "2.5.3"
+ic-cdk-macros = "0.17.0"

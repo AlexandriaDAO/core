@@ -4,11 +4,7 @@ import SessionContext from '@/contexts/SessionContext';
 import MeiliSearch, { Index } from 'meilisearch';
 import { initializeClient, initializeIndex } from '@/services/meiliService';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
-import fetchMyEngines from '@/features/my-engines/thunks/fetchMyEngines';
 import { setEngines } from '@/features/my-engines/myEnginesSlice';
-import { getAuthClient, getPrincipal } from '@/features/auth/utils/authUtils';
-import principal from '@/features/auth/thunks/principal';
-import logout from '@/features/auth/thunks/logout';
 
 
 interface SessionProviderProps {
@@ -25,15 +21,6 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 	const [meiliClient, setMeiliClient] = useState<MeiliSearch>();
 	const [meiliIndex, setMeiliIndex] = useState<Index>();
 
-	const checkAuthentication = async () => {
-		const client = await getAuthClient();
-		if (await client.isAuthenticated()) {
-			dispatch(principal());
-		} else {
-			dispatch(logout(client));
-		}
-	};
-
 	const initializeMeiliClient = async () => {
 		const host = process.env.REACT_MEILI_HOST;
 		const key = process.env.REACT_MEILI_KEY;
@@ -43,59 +30,58 @@ const SessionProvider: React.FC<SessionProviderProps> = ({ children }) => {
 		if(client) {
 			setMeiliClient(client)
 
-			const index = await initializeIndex(client, user || 'anonymous')
+			const index = await initializeIndex(client, user?.principal.toString() || 'anonymous')
 			if (index) setMeiliIndex(index)
 		}
 	}
 
 	useEffect(() => {
 		// Setup default meiliclient
-		initializeMeiliClient();
+		// initializeMeiliClient();
 
-		checkAuthentication();
 	}, [dispatch]);
 
 
 
 	useEffect(() => {
 		if(!user) dispatch(setEngines([]));
-		else dispatch(fetchMyEngines());
+		// else dispatch(fetchMyEngines());
 	}, [user]);
 
 
-	// setup meilisearch client when user engines change
-	useEffect(()=>{
-		const setupMeili = async()=>{
-			const engineAvailable = engines.find(async (engine) => {
-				// if engines exist, initialize meilisearch client with engines host and key
+	// // setup meilisearch client when user engines change
+	// useEffect(()=>{
+	// 	const setupMeili = async()=>{
+	// 		const engineAvailable = engines.find(async (engine) => {
+	// 			// if engines exist, initialize meilisearch client with engines host and key
 
-				const client = await initializeClient(engine.host, engine.key);
-				if(!client) return false;
-				setMeiliClient(client)
+	// 			const client = await initializeClient(engine.host, engine.key);
+	// 			if(!client) return false;
+	// 			setMeiliClient(client)
 
-				const index = await initializeIndex(client, engine.index)
-				if(index) setMeiliIndex(index)
+	// 			const index = await initializeIndex(client, engine.index)
+	// 			if(index) setMeiliIndex(index)
 
-				return true;
-			})
+	// 			return true;
+	// 		})
 
-			if(!engineAvailable){
-				initializeMeiliClient();
-			}
-		}
-		setupMeili();
-	},[engines])
+	// 		if(!engineAvailable){
+	// 			initializeMeiliClient();
+	// 		}
+	// 	}
+	// 	setupMeili();
+	// },[engines])
 
 
-	useEffect(()=>{
-		if(activeEngine){
-			const updatedEngines = engines.map(engine => engine.id === activeEngine.id ? activeEngine : engine);
-			dispatch(setEngines(updatedEngines));
-		}
-	},[activeEngine])
+	// useEffect(()=>{
+	// 	if(activeEngine){
+	// 		const updatedEngines = engines.map(engine => engine.id === activeEngine.id ? activeEngine : engine);
+	// 		dispatch(setEngines(updatedEngines));
+	// 	}
+	// },[activeEngine])
 
 	return (
-		<SessionContext.Provider value={{ meiliClient, meiliIndex, checkAuthentication }}>
+		<SessionContext.Provider value={{ meiliClient, meiliIndex }}>
 			{children}
 		</SessionContext.Provider>
 	);

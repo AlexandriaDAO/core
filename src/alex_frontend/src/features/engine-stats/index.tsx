@@ -55,7 +55,7 @@ const EngineStats = () => {
 					Cluster Stats
 				</span>
 				<div className="flex items-center text-gray-500">
-					{user == activeEngine?.owner && (
+					{user && activeEngine && user.principal == activeEngine.owner && (
 						<Button variant='muted' onClick={handleClearAll}>
 							<ListX size={22} />
 							<span>Clear All Documents</span>
@@ -71,7 +71,7 @@ const EngineStats = () => {
 					</Button>
 				</div>
 			</div>
-			{user == activeEngine?.owner &&
+			{user && activeEngine && user.principal == activeEngine.owner &&
 			<span className="p-4 font-roboto-condensed text-base leading-[18px] text-gray-500 hover:text-gray-800">
 				Document deletion can take time, Check Recent tasks for status.
 			</span>}

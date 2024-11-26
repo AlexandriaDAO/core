@@ -124,7 +124,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 					</span>
 				</div>
 			</div>
-			{user === activeEngine?.owner && (
+			{user && activeEngine && user.principal === activeEngine.owner && (
 				<div className="flex gap-2 align-center justify-between self-center">
 					{processing ? (
 						<button

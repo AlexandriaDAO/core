@@ -1,20 +1,19 @@
-import { caller, IDL, init, postUpgrade, Principal, query, toHexString, update, call } from 'azle';
+import { caller, IDL, Principal, query,  update, call } from 'azle';
 import { TypedEthereumSigner } from "arbundles";
-import { Canister, ic, Result, Void } from 'azle/experimental';
-import { Node as TypeNode } from '../../../src/declarations/alex_librarian/alex_librarian.did';
+import { Result} from 'azle/experimental';
+import { Node as TypeNode } from '../../../src/declarations/user/user.did';
 
-const librarianPrincipal = Principal.fromText('yo4hu-nqaaa-aaaap-qkmoq-cai');
+const userPrincipal = Principal.fromText('bd3sg-teaaa-aaaaa-qaaba-cai');
 const vetkdPrincipal = Principal.fromText('5ham4-hqaaa-aaaap-qkmsq-cai');
 
 // Define the Node struct
 const CandidNode = IDL.Record({
-    id: IDL.Text,
-    status: IDL.Variant({
-      Active: IDL.Null,
-      InActive: IDL.Null
-    }),
-    owner: IDL.Text,
-    pvt_key: IDL.Text
+    id: IDL.Nat64,
+    key: IDL.Text,
+    owner: IDL.Principal,
+    active: IDL.Bool,
+    created_at: IDL.Nat64,
+    updated_at: IDL.Nat64
 });
 
 
@@ -27,25 +26,33 @@ function ensureString($variable:any){
 
 
 
-async function getNode(node_id: string): Promise<TypeNode> {
-    ensureString(node_id);
+async function getNode(node_id: BigInt): Promise<TypeNode> {
 
     // Call the get_node_by_id function of alex_librarian
-    const node = await call(
-        librarianPrincipal,
-        'get_node_by_id',
+    const result = await call(
+        userPrincipal,
+        'get_nodes',
         {
-            paramIdlTypes: [IDL.Text],
-            returnIdlType: IDL.Opt(CandidNode),
-            args: [node_id],
+            paramIdlTypes: [IDL.Vec(IDL.Nat64)],
+            returnIdlType: IDL.Variant({
+                Ok: IDL.Vec(CandidNode),
+                Err: IDL.Text
+            }),
+            args: [[node_id]],
         },
     );
-    console.log(node,'node');
+    console.log(result,'node');
 
     // Handle the response
-    if (!node || !Array.isArray(node) || node.length === 0 ) throw new Error('Node not Found');
+    if ('Err' in result) {
+        throw new Error(result.Err);
+    }
 
-    return node[0];
+    if (!('Ok' in result) || !Array.isArray(result.Ok) || result.Ok.length === 0) {
+        throw new Error('Node not Found');
+    }
+
+    return result.Ok[0];
 }
 
 
@@ -78,10 +85,10 @@ async function decryptKey(encodedKey: string): Promise<string> {
 }
 
 
-async function getSigner(node_id: string){
+async function getSigner(node_id: BigInt){
     const node:TypeNode = await getNode(node_id);
 
-    const key = await decryptKey(node.pvt_key);
+    const key = await decryptKey(node.key);
 
     ensureString(key)
 
@@ -111,11 +118,11 @@ export default class {
         }
     }
 
-    @update([IDL.Text], IDL.Variant({
+    @update([IDL.Nat64], IDL.Variant({
         Ok: IDL.Text,
         Err: IDL.Text
     }))
-    async pubKey(node_id: string): Promise<Result<string, string>> {
+    async pubKey(node_id: BigInt): Promise<Result<string, string>> {
         try {
 
             const signer = await getSigner(node_id);
@@ -132,11 +139,11 @@ export default class {
      }
 
 
-    @update([IDL.Text, IDL.Text], IDL.Variant({
+    @update([IDL.Text, IDL.Nat64], IDL.Variant({
         Ok: IDL.Text,
         Err: IDL.Text
     }))
-    async signData(txHash: string, node_id: string ): Promise<Result<string, string>> {
+    async signData(txHash: string, node_id: BigInt ): Promise<Result<string, string>> {
         try {
             ensureString(txHash)
             const signer = await getSigner(node_id);

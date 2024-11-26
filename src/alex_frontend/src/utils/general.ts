@@ -1,3 +1,4 @@
+import { Principal } from "@dfinity/principal";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -14,4 +15,14 @@ export const shorten = (
 		return text;
 	}
 	return `${text.slice(0, startLength)}...${text.slice(-endLength)}`;
+};
+
+
+// Helper function to convert Principal string to Principal object
+// Returns null if principal string is empty/invalid
+export const getIcPrincipal = (principal: string) => principal ? Principal.fromText(principal) : null;
+
+// Helper function to convert IC timestamp (nanoseconds) to Date
+export const convertTimestamp = (timestamp: bigint): string => {
+    return new Date(Number(timestamp) / 1_000_000).toISOString(); // Convert nanoseconds to milliseconds
 };

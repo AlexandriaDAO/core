@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
 
-import { Node } from "../../../../../declarations/alex_librarian/alex_librarian.did";
-
 import { WebIrys } from "@irys/sdk";
 import { Tooltip } from "antd";
 import { toast } from "sonner";
 import { getNodeBalance, getServerIrys } from "@/services/irysService";
 import { shorten } from "@/utils/general";
 
-import { Copy, LoaderCircle, RefreshCcw, RefreshCw, RefreshCwOff } from "lucide-react";
+import { Copy, LoaderCircle, RefreshCcw } from "lucide-react";
+import { SerializedNode } from "../myNodesSlice";
+import { useAlexWallet } from "@/hooks/actors";
 
 interface NodeItemProps {
-	node: Node;
+	node: SerializedNode;
 }
 
 const NodeItem = ({ node }: NodeItemProps) => {
+	const {actor} = useAlexWallet();
 	const [irys, setIrys] = useState<WebIrys | null>(null);
-	const [amount, setAmount] = useState("0.0001");
 
 	const [loading, setLoading] = useState(false);
 
@@ -26,7 +26,10 @@ const NodeItem = ({ node }: NodeItemProps) => {
 	const setServerIrys = async () => {
 		setLoading(true);
 		try{
-			const webIrys = await getServerIrys(node.id);
+			if (!actor) {
+				throw new Error("No actor available");
+			}
+			const webIrys = await getServerIrys(node, actor);
 			setIrys(webIrys);
 		}catch(error){
 			if (error instanceof Error) {
@@ -42,9 +45,9 @@ const NodeItem = ({ node }: NodeItemProps) => {
 	};
 
 	useEffect(() => {
-		if (!node) return;
+		if (!node || !node) return;
 		setServerIrys();
-	}, [node]);
+	}, [node, actor]);
 
 	const setNodeBalance = async () => {
 		if(!irys) {
@@ -76,7 +79,7 @@ const NodeItem = ({ node }: NodeItemProps) => {
 					<tbody>
 						<tr>
 							<td className="pr-4">Status</td>
-							<td>{'Active' in node.status ? 'Active' : 'InActive'}</td>
+							<td>{node.active ? 'Active' : 'InActive'}</td>
 						</tr>
 						<tr>
 							<td className="pr-4">Token</td>

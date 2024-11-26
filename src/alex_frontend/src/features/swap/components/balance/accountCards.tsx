@@ -22,13 +22,14 @@ const AccountCards: React.FC = () => {
 
     // icp ledger
     useEffect(() => {
-        if (user !== '') {
-            dispatch(getIcpBal(user));
-            dispatch(getAccountId(user));
+        if (user) {
+            dispatch(getIcpBal(user.principal));
+            dispatch(getAccountId(user.principal));
             dispatch(getIcpPrice());
         }
     }, [user]);
     useEffect(() => {
+        if(!user) return;
         if (
             swap.successClaimReward === true ||
             swap.swapSuccess === true ||
@@ -37,23 +38,24 @@ const AccountCards: React.FC = () => {
             swap.redeeemSuccess === true ||
             icpLedger.transferSuccess === true
         ) {
-            dispatch(getIcpBal(user));
+            dispatch(getIcpBal(user.principal));
         }
-    }, [swap, icpLedger]);
+    }, [user, swap, icpLedger]);
 
     //style
     useEffect(() => {
+        if(!user || !icpLedger) return;
         const handleResize = () => {
             if (window.innerWidth < 1000) {
                 setFormattedPrincipal(
-                    user.slice(0, 3) + "..." + user.slice(-3)
+                    user.principal.slice(0, 3) + "..." + user.principal.slice(-3)
                 );
                 setFormattedAccountId(
                     icpLedger.accountId.slice(0, 3) + "..." + icpLedger.accountId.slice(-3)
                 );
             } else {
                 setFormattedPrincipal(
-                    user.slice(0, 5) + "..." + user.slice(-20)
+                    user.principal.slice(0, 5) + "..." + user.principal.slice(-20)
                 );
                 setFormattedAccountId(
                     icpLedger.accountId.slice(0, 5) + "..." + icpLedger.accountId.slice(-20)
@@ -66,7 +68,7 @@ const AccountCards: React.FC = () => {
         window.addEventListener("resize", handleResize);
 
         return () => window.removeEventListener("resize", handleResize);
-    }, [user,icpLedger.accountId]);
+    }, [user,icpLedger]);
 
     return (
         <>
@@ -78,7 +80,7 @@ const AccountCards: React.FC = () => {
                         Principal Account
                     </h4>
 
-                    {user !== '' ? (
+                    {user ? (
                         <>
                             <div className="mb-20 xxl:mb-20">
                                 <div className="flex justify-between mb-3 xxl:mb-3">
@@ -90,7 +92,7 @@ const AccountCards: React.FC = () => {
                                             (Connected)
                                         </span>
                                     </div>
-                                    <CopyHelper account={user} />
+                                    <CopyHelper account={user.principal} />
                                 </div>
                                 <h4 className="text-2xl xl:text-xl font-medium mb-3  2xl:mb-3  xl:mb-3">
                                     Account Id:

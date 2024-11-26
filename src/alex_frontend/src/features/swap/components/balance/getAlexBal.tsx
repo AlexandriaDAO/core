@@ -13,13 +13,15 @@ const GetAlexBal = (user: string) => {
     const swap = useAppSelector((state) => state.swap);
 
     useEffect(() => {
-        dispatch(getAccountAlexBalance(auth.user))
+        if(!auth.user) return;
+        dispatch(getAccountAlexBalance(auth.user.principal))
     }, [auth.user])
     useEffect(() => {
+        if(!auth.user) return;
         if (swap.successStake === true||swap.unstakeSuccess === true||swap.burnSuccess === true ||swap.successClaimReward===true) {
-            dispatch(getAccountAlexBalance(auth.user))
+            dispatch(getAccountAlexBalance(auth.user.principal))
         }
-    }, [swap])
+    }, [auth.user, swap])
     return (<div className="account-wrapper">
         Alex Balance :{alex.alexBal}
     </div>);

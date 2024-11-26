@@ -1,10 +1,10 @@
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
-import { Engine } from '../../../../declarations/alex_backend/alex_backend.did';
 import fetchPublicEngines from "./thunks/fetchPublicEngines";
+import { SerializedEngine } from "../my-engines/myEnginesSlice";
 
 // Define the interface for our engine state
 export interface PublicEnginesState {
-	engines: Engine[],		//holds all public engines
+	engines: SerializedEngine[],		//holds all public engines
 
 	loading: boolean;
 	error: string | null;

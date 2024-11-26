@@ -13,6 +13,10 @@ const frontendDirectory = "alex_frontend";
 
 const frontend_entry = path.join("src", frontendDirectory, "public", "index.html");
 
+const II_URL = process.env.DFX_NETWORK === "local"
+  ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`
+  : "https://identity.ic0.app";
+
 module.exports = {
   target: "web",
   mode: isDevelopment ? "development" : "production",
@@ -202,6 +206,7 @@ module.exports = {
       contextRegExp: /moment$/,
     }),
     new webpack.DefinePlugin({
+      'process.env.II_URL': JSON.stringify(II_URL),
       'require("./model_imports/inception_v3")': '{}',
       'require("./model_imports/mobilenet_v2")': '{}',
       'require("./model_imports/mobilenet_v2_mid")': '{}'

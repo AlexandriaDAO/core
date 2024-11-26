@@ -1,21 +1,19 @@
-import { getActorAlexLibrarian, getAuthClient } from '@/features/auth/utils/authUtils';
-import { Node } from '../../../../../declarations/alex_librarian/alex_librarian.did';
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../../../declarations/user/user.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { SerializedNode } from '../myNodesSlice';
+import { serializeNode } from '../utils';
 
 // Define the async thunk
 const fetchMyNodes = createAsyncThunk<
-    Node[], // This is the return type of the thunk's payload
-    void, //Argument that we pass to initialize
+    SerializedNode[], // This is the return type of the thunk's payload
+    ActorSubclass<_SERVICE>, //Argument that we pass to initialize
     { rejectValue: string }
->("myNodes/fetchMyNodes", async (_, { rejectWithValue }) => {
+>("myNodes/fetchMyNodes", async (actor, { rejectWithValue }) => {
     try {
-        const client = await getAuthClient();
-        if (await client.isAuthenticated()) {
-            const actor = await getActorAlexLibrarian();
-            return await actor.get_my_nodes()
-        }
+        const result = await actor.get_my_nodes()
 
-        return rejectWithValue("User is not Authenticated");
+        return result.map(node => serializeNode(node));
     } catch (error) {
         console.error("Failed to Fetch My Nodes:", error);
 

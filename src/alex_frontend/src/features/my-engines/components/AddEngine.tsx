@@ -1,18 +1,14 @@
 import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { EngineStatus } from "@/features/engine-overview/thunks/updateEngineStatus";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import addEngine from "../thunks/addEngine";
-import logout from "@/features/auth/thunks/logout";
 import {
 	setNewEngine,
 	setNewEngineError,
 	setNewEngineLoading,
 } from "../myEnginesSlice";
-import { getAuthClient } from "@/features/auth/utils/authUtils";
-
 
 import {
 	Dialog,
@@ -27,7 +23,8 @@ import {
 import { Button } from "@/lib/components/button";
 import { Label } from "@/lib/components/label";
 import { Input } from "@/lib/components/input";
-import { Check, CheckCircle, Info, LoaderCircle, Plus, Save, XCircle } from "lucide-react";
+import { Check, CheckCircle, Info, LoaderCircle, Plus, PlusCircle, Save, XCircle } from "lucide-react";
+import { useUser } from "@/hooks/actors";
 
 const EngineSchema = Yup.object().shape({
 	title: Yup.string()
@@ -48,13 +45,12 @@ const EngineSchema = Yup.object().shape({
 		.min(2, "Index is too short")
 		.max(50, "Index is too long")
 		.required("Index is required"),
-	status: Yup.number().oneOf(
-		[EngineStatus.Draft, EngineStatus.Published],
-		"Invalid Status"
-	),
+	active: Yup.boolean(),
 });
 
 const AddEngine = () => {
+	const {actor} = useUser();
+
 	const dispatch = useAppDispatch();
 	const { newEngineLoading, newEngine, newEngineError } = useAppSelector(
 		(state) => state.myEngines
@@ -66,19 +62,14 @@ const AddEngine = () => {
 			host: "",
 			key: "",
 			index: "",
-			status: EngineStatus.Draft,
+			active: false,
 		},
 		validationSchema: EngineSchema,
 		validateOnBlur: true, // Validate form field on blur
 		validateOnChange: true, // Validate form field on change
 		onSubmit: async (values) => {
-			const client = await getAuthClient();
-			if (client) {
-				if (await client.isAuthenticated()) {
-					dispatch(addEngine(values));
-				} else {
-					dispatch(logout(client));
-				}
+			if (actor) {
+				dispatch(addEngine({actor,values}));
 			}
 		},
 	});
@@ -100,8 +91,9 @@ const AddEngine = () => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button variant={'inverted'} rounded="full" scale="icon">
-					<Plus />
+				<Button variant={'inverted'} rounded="full" className="flex gap-1 justify-between items-center">
+					<span>Add Engine</span>
+					<PlusCircle />
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[600px]" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -238,32 +230,34 @@ const AddEngine = () => {
 							)}
 					</div>
 					<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-						<Label htmlFor="status" variant={(formik.touched.status && formik.errors.status ? "destructive" : "default" ) }>
+						<Label htmlFor="active" variant={(formik.touched.active && formik.errors.active ? "destructive" : "default" ) }>
 							Status
 						</Label>
-						{/* <label className="text-lg" htmlFor="status">
+						{/* <label className="text-lg" htmlFor="active">
 							Status
 						</label> */}
 						<select
 							className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
-								formik.touched.status &&
-								formik.errors.status
+								formik.touched.active &&
+								formik.errors.active
 									? "border-red-500"
 									: ""
 							}`}
-							name="status"
-							id="status"
-							onChange={formik.handleChange}
+							name="active"
+							id="active"
+							onChange={(e) => {
+								formik.setFieldValue('active', e.target.value === 'true')
+							}}
 							onBlur={formik.handleBlur}
-							value={formik.values.status}
+							value={formik.values.active.toString()}
 						>
-							<option value="0">Draft</option>
-							<option value="1">Published</option>
+							<option value="false">Draft</option>
+							<option value="true">Published</option>
 						</select>
-						{formik.touched.status &&
-							formik.errors.status && (
+						{formik.touched.active &&
+							formik.errors.active && (
 								<span className="text-red-400 text-sm">
-									{formik.errors.status}
+									{formik.errors.active}
 								</span>
 							)}
 					</div>

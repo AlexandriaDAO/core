@@ -112,19 +112,19 @@ const ReceiveContent = () => {
                     </div>
                     <div className="flex items-center">
                         <div style={{ height: "120px", marginRight: "20px", width: "120px" }}>
-                            <QRCode
+                            {auth.user && <QRCode
                                 size={256}
                                 style={{ height: "100%", maxWidth: "100%", width: "100%" }}
-                                value={auth.user}
+                                value={auth.user.principal}
                                 viewBox={`0 0 100% 100%`}
-                            />
+                            />}
                         </div>
                         <div className="w-[calc(100%-140px)]">
                             <label className='mb-2 text-xl font-medium'>ICP Address</label>
                             <div className='border border-gray-400 py-5 px-5 rounded-borderbox flex items-center justify-between'>
-                                <p className='truncate text-lg font-medium text-radiocolor me-5'>{auth.user}</p>
+                                <p className='truncate text-lg font-medium text-radiocolor me-5'>{auth.user?.principal.toString()}</p>
                                 <div>
-                                    <CopyHelper account={auth.user} />
+                                    {auth.user && <CopyHelper account={auth.user.principal} /> }
                                 </div>
                             </div>
                         </div>
