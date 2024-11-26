@@ -1,4 +1,14 @@
+#!/bin/bash
+set -x
+
+# Ensure script is run from project root
+if [ ! -d "src/tests" ] || [ ! -d "src/icp_swap" ]; then
+    echo "Error: This script must be run from the project root directory"
+    exit 1
+fi
+
 # # Step 1: Start dfx
+kill -9 $(lsof -t -i:4943)
 dfx stop
 dfx start --background --clean
 
@@ -24,55 +34,12 @@ dfx identity use minter
 export MINTER_ACCOUNT_ID=$(dfx ledger account-id)
 export MINTER_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 
-dfx identity use user_1
-export ALICE_ACCOUNT_ID=$(dfx ledger account-id)
-export ALICE_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
-dfx identity use user_2
-export BOB_ACCOUNT_ID=$(dfx ledger account-id)
-export BOB_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
-dfx identity use user_3
-export CHARLIE_ACCOUNT_ID=$(dfx ledger account-id)
-export CHARLIE_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
-
 dfx identity use default
 export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
 export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 
 
 # # Step 6: Deploy the ICP & ICRC Ledger with LICP, LBRY, and ALEX tokens
-# dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argument "  
-#   (variant {  
-#     Init = record {  
-#       minting_account = \"$MINTER_ACCOUNT_ID\";  
-#       initial_values = vec {  
-#         record {  
-#           \"$DEFAULT_ACCOUNT_ID\";  
-#           record {  
-#             e8s = 8_681_981_000_000_000 : nat64;  
-#           };  
-#           \"$ALICE_ACCOUNT_ID\";  
-#           record {  
-#             e8s = 1_000_000_000 : nat64;  
-#           };
-#           \"$BOB_ACCOUNT_ID\";
-#           record {
-#             e8s = 1_000_000_000 : nat64;
-#           };
-#           \"$CHARLIE_ACCOUNT_ID\";
-#           record {
-#             e8s = 1_000_000_000 : nat64;
-#           };
-#         };  
-#       };  
-#       send_whitelist = vec {};  
-#       transfer_fee = opt record {  
-#         e8s = 10_000 : nat64;  
-#       };  
-#       token_symbol = opt \"LICP\";  
-#       token_name = opt \"Local ICP\";  
-#     }  
-#   })  
-# "
 dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argument "  
   (variant {  
     Init = record {  
@@ -85,19 +52,19 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
           };  
         };
         record {  
-          \"$ALICE_ACCOUNT_ID\";  
+          \"f7520954c68e2b1f4ea36b185ffaf28f81bfea9635e869857cb046db9051493d\";  
           record {  
             e8s = 1_000_000_000 : nat64;  
           };
         };
         record {
-          \"$BOB_ACCOUNT_ID\";
+          \"ed67eb266efc6821fdfb308a250aaff760856d3dbbf22e0532bb825d1042b849\";
           record {
             e8s = 1_000_000_000 : nat64;
           };
         };
         record {
-          \"$CHARLIE_ACCOUNT_ID\";
+          \"bd94c1255016d7aca0028a3f29ffb546a7f8131962d5ea2a629e4fe99ebebcad\";
           record {
             e8s = 1_000_000_000 : nat64;
           };
@@ -118,14 +85,14 @@ dfx deploy LBRY --specified-id y33wz-myaaa-aaaap-qkmna-cai --argument '(variant 
 record {
      token_symbol = "LBRY";
      token_name = "LBRY";
-     minting_account = record { owner = principal "'$(dfx canister id icp_swap)'" };
+     minting_account = record { owner = principal "'54fqz-5iaaa-aaaap-qkmqa-cai'" };
      transfer_fee = 4_000_000;
      metadata = vec {};
      initial_balances = vec {};
      archive_options = record {
          num_blocks_to_archive = 1000;
          trigger_threshold = 2000;
-         controller_id = principal "'$(dfx canister id icp_swap)'";
+         controller_id = principal "'54fqz-5iaaa-aaaap-qkmqa-cai'";
      };
      feature_flags = opt record {
         icrc2 = true;
@@ -140,14 +107,14 @@ dfx deploy ALEX --specified-id ysy5f-2qaaa-aaaap-qkmmq-cai --argument '(variant 
 record {
      token_symbol = "ALEX";
      token_name = "ALEX";
-     minting_account = record { owner = principal "'$(dfx canister id tokenomics)'" };
+     minting_account = record { owner = principal "'5abki-kiaaa-aaaap-qkmsa-cai'" };
      transfer_fee = 10_000;
      metadata = vec {};
      initial_balances = vec {};
      archive_options = record {
          num_blocks_to_archive = 1000;
          trigger_threshold = 2000;
-         controller_id = principal "'$(dfx canister id tokenomics)'";
+         controller_id = principal "'5abki-kiaaa-aaaap-qkmsa-cai'";
      };
      feature_flags = opt record {
         icrc2 = true;

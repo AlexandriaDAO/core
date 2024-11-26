@@ -1,1 +1,16 @@
-service : { get_mock_user : () -> (principal) query }
+type RejectionCode = variant {
+  NoError;
+  CanisterError;
+  SysTransient;
+  DestinationInvalid;
+  Unknown;
+  SysFatal;
+  CanisterReject;
+};
+type Result = variant { Ok; Err : record { RejectionCode; text } };
+type TestAccounts = record { bob : text; alice : text; charlie : text };
+service : {
+  check_balances : (vec text) -> (vec float64);
+  get_test_accounts : () -> (TestAccounts) query;
+  swap_tokens : (text, nat64) -> (Result);
+}
