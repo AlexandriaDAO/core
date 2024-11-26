@@ -36,7 +36,7 @@ const EngineBooks = () => {
 				</span>
 			</div> */}
 			<div className="flex flex-col gap-2">
-				{user == activeEngine?.owner && (
+				{user && activeEngine && user.principal == activeEngine.owner && (
 					<>
 						<span className="font-roboto-condensed text-base leading-[18px] text-black font-normal">
 							Add Book

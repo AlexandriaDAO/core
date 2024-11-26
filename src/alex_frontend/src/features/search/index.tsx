@@ -3,16 +3,17 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { ChangeEvent, KeyboardEvent, useEffect } from "react";
 import { setLimit, setSearchResults, setSearchText } from "./searchSlice";
 
-import FilterButton from "@/components/ui/FilterButton";
 import useSession from "@/hooks/useSession";
 import { toast } from "sonner";
 import performSearch from "./thunks/performSearch";
-import { LoaderCircle, X } from "lucide-react";
+import { ChevronDown, ChevronUp, LoaderCircle, X } from "lucide-react";
+import { setFilter } from "../home/homeSlice";
 
 export default function Search() {
 	const { meiliClient, meiliIndex } = useSession();
 	const dispatch = useAppDispatch();
 	const { searchText, limit, loading } = useAppSelector((state) => state.search);
+	const { filter } = useAppSelector((state) => state.home);
 
 	const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
 		dispatch(setSearchText(e.target.value));
@@ -80,7 +81,15 @@ export default function Search() {
 					/>
 				)}
 			</div>
-			<FilterButton />
+			<button
+				onClick={()=>dispatch(setFilter(!filter))}
+				className="cursor-pointer px-4 gap-4 h-auto font-roboto-condensed font-normal text-base flex items-center text-black hover:text-gray-700"
+			>
+				<span className="text-2xl leading-7 text-center tracking-wider">
+					Filter
+				</span>
+				{filter ? <ChevronUp size={20}/> : <ChevronDown size={20} />}
+			</button>
 		</div>
 	);
 }

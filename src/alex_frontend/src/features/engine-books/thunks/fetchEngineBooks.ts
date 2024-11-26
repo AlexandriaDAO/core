@@ -1,4 +1,4 @@
-import { Engine } from '../../../../../declarations/alex_backend/alex_backend.did';
+import { Engine } from '../../../../../declarations/user/user.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from '@/store';
 import { getBooks, Manifest } from '@/services/bookService';
@@ -6,11 +6,12 @@ import { Book } from '@/features/portal/portalSlice';
 import { getNftManagerActor } from '@/features/auth/utils/authUtils';
 import { natToArweaveId } from '@/utils/id_convert';
 import { Principal } from "@dfinity/principal";
+import { SerializedEngine } from '@/features/my-engines/myEnginesSlice';
 
 // Define the async thunk
 const fetchEngineBooks = createAsyncThunk<
     Book[], // This is the return type of the thunk's payload
-    Engine, //Argument that we pass to initialize
+    SerializedEngine, //Argument that we pass to initialize
     { rejectValue: string, state: RootState }
 >("engineBooks/fetchEngineBooks", async (engine, { rejectWithValue, getState }) => {
     try {

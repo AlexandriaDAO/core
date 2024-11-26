@@ -1,27 +1,24 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Engine } from "../../../../../../src/declarations/alex_backend/alex_backend.did";
-import { getActorAlexBackend } from "@/features/auth/utils/authUtils";
-
-export enum EngineStatus {
-    Draft = 0,
-    Published = 1,
-}
+import { _SERVICE } from "../../../../../../src/declarations/user/user.did";
+import { ActorSubclass } from "@dfinity/agent";
+import { SerializedEngine } from "@/features/my-engines/myEnginesSlice";
+import { serializeEngine } from "@/features/my-engines/utils";
 
 
 // Define the async thunk
 const updateEngineStatus = createAsyncThunk<
-    Engine, // This is the return type of the thunk's payload
+    SerializedEngine, // This is the return type of the thunk's payload
     {
-        engineId: string,
-        status: EngineStatus
+        actor: ActorSubclass<_SERVICE>,
+        id: string,
+        active: boolean,
     },
     { rejectValue: string }
->("engineOverview/updateEngineStatus", async ({ engineId, status}, { rejectWithValue }) => {
+>("engineOverview/updateEngineStatus", async ({actor, id, active}, { rejectWithValue }) => {
     try {
-        const actor = await getActorAlexBackend();
-        const result = await actor.update_engine_status(engineId, status);
+        const result = await actor.update_engine_status({id: BigInt(id), active});
 
-        if('Ok' in result) return result.Ok;
+        if('Ok' in result) return serializeEngine(result.Ok);
 
         if('Err' in result) throw new Error(result.Err)
     } catch (error) {

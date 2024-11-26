@@ -1,6 +1,5 @@
 use crate::source_cards::SourceCard;
 // use crate::meilisearch::MeiliSearchKeys;
-use crate::engine::Engine;
 // use crate::nft::TokenDetail;
 
 use ic_cdk;
@@ -9,20 +8,6 @@ use candid::{Nat, Principal};
 mod source_cards;
 pub use source_cards::{save_sc, bookmark_sc, delete_sc, get_sc, get_bookmarks};
 
-
-mod engine;
-pub use engine::{
-  add_engine,
-  add_my_engine,
-  update_engine_status,
-  delete_engine,
-  get_engines,
-  get_engines_by_owner,
-  get_engine_by_id,
-  get_my_engines,
-  get_engines_not_owned_by,
-  get_engines_not_owned_by_me
-};
 
 mod wallet_keys;
 pub use wallet_keys::*;

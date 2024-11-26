@@ -31,11 +31,12 @@ const RedeemContent: React.FC = () => {
   };
 
   useEffect(() => {
-    dispatch(getArchivedBal(user))
+    if(!user) return;
+    dispatch(getArchivedBal(user.principal))
   }, [user]);
   useEffect(() => {
     if (swap.redeeemSuccess === true) {
-      dispatch(getArchivedBal(user));
+      if(user) dispatch(getArchivedBal(user.principal));
       dispatch(flagHandler());
       setLoadingModalV(false);
       setSucessModalV(true);
@@ -47,7 +48,7 @@ const RedeemContent: React.FC = () => {
 
     }
 
-  }, [swap]);
+  }, [user, swap]);
 
   return (
     <div>
@@ -70,7 +71,7 @@ const RedeemContent: React.FC = () => {
             </div>
           </div>
           <div>
-            {user !== '' ? <button
+            {user ? <button
               type="button"
               className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 mb-6 "
               onClick={() => {

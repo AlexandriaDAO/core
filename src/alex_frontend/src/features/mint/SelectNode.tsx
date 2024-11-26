@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Node } from "../../../../../src/declarations/alex_librarian/alex_librarian.did";
 import { toast } from "sonner";
 import { WebIrys } from "@irys/sdk";
 import { getNodeBalance, getServerIrys } from "@/services/irysService";
-import { getActorAlexLibrarian } from "../auth/utils/authUtils";
 import { LoaderCircle } from "lucide-react";
+import { useAlexWallet, useUser } from "@/hooks/actors";
+import { SerializedNode } from "../my-nodes/myNodesSlice";
+import { serializeNode } from "../my-nodes/utils";
 
 const NodeRow: React.FC<{
-	node: Node;
-	selectedNode: Node | null;
-	setSelectedNode: (node: Node) => void;
+	node: SerializedNode;
+	selectedNode: SerializedNode | null;
+	setSelectedNode: (node: SerializedNode) => void;
 }> = ({ node, selectedNode, setSelectedNode }) => {
+	const {actor} = useAlexWallet();
 
 	const [irys, setIrys] = useState<WebIrys | null>(null);
 	const [loading, setLoading] = useState(false);
@@ -44,7 +46,10 @@ const NodeRow: React.FC<{
 	const setServerIrys = async () => {
 		setLoading(true);
 		try{
-			const serverIrys = await getServerIrys(node.id);
+			if (!actor) {
+				throw new Error("No actor available");
+			}
+			const serverIrys = await getServerIrys(node, actor);
 			setIrys(serverIrys);
 		}catch(error){
 			if (error instanceof Error) {
@@ -60,9 +65,9 @@ const NodeRow: React.FC<{
 	};
 
 	useEffect(() => {
-		if (!node) return;
+		if (!node||!actor) return;
 		setServerIrys();
-	}, [node]);
+	}, [node, actor]);
 
 	if (loading) {
 		return (
@@ -93,7 +98,7 @@ const NodeRow: React.FC<{
 				/>
 			</td>
 			<td className="p-2">{node.id}</td>
-			<td className="p-2">{node.owner.slice(0, 5) + "..." + node.owner.slice(-3)}</td>
+			<td className="p-2">{node.owner.toString().slice(0, 5) + "..." + node.owner.toString().slice(-3)}</td>
 			<td className="p-2">{irys?.token ? irys.token : 'NA'}</td>
 			<td className="p-2 flex items-center justify-center gap-1">
 				{balanceLoading ? (
@@ -109,23 +114,23 @@ const NodeRow: React.FC<{
 };
 
 interface SelectNodeProps {
-	setSelectedNode: (node: Node) => void; // Function to set the selected node
-	selectedNode: Node | null; // Currently selected node
+	setSelectedNode: (node: SerializedNode) => void; // Function to set the selected node
+	selectedNode: SerializedNode | null; // Currently selected node
 }
 
 const SelectNode: React.FC<SelectNodeProps> = ({
 	setSelectedNode,
 	selectedNode,
 }) => {
-	const [nodes, setNodes] = useState<Node[]>([]); // State to hold nodes
+	const {actor} = useUser();
+	const [nodes, setNodes] = useState<SerializedNode[]>([]); // State to hold nodes
 
 	useEffect(() => {
+		if(!actor) return;
 		const fetchNodes = async () => {
-			const actorAlexLibrarian = await getActorAlexLibrarian();
+			const nodes = await actor.get_active_nodes([]);
 
-			const nodes = await actorAlexLibrarian.get_nodes();
-
-			setNodes(nodes);
+			setNodes(nodes.map(node => serializeNode(node)));
 		};
 		fetchNodes();
 	}, []);
@@ -155,7 +160,7 @@ const SelectNode: React.FC<SelectNodeProps> = ({
 							</thead>
 							<tbody>
 								{nodes.map((node) => {
-									if('Active' in node.status){
+									if(node.active){
 										return <NodeRow
 											key={node.id}
 											node={node}

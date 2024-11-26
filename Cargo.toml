@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "src/alex_backend",
-    "src/alex_librarian",
     "src/system_api",
     "src/vetkd",
     "src/bookmarks",
@@ -10,5 +9,6 @@ members = [
     "src/tokenomics",
     "src/nft_manager",
     "src/xrc",
+    "src/user",
 ]
 resolver = "2"

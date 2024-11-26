@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Engine } from "../../../../../../src/declarations/alex_backend/alex_backend.did";
 import { toast } from "sonner";
 import { Check, Info, LoaderCircle, Plus } from "lucide-react";
 import { getAllDocumentsByManifest } from "@/features/engine-books/utils/utilities";
@@ -11,9 +10,10 @@ import { v4 as uuidv4 } from "uuid";
 import { EnqueuedTask } from "meilisearch";
 import { waitForTaskCompletion } from "@/services/meiliService";
 import { Button } from "@/lib/components/button";
+import { SerializedEngine } from "@/features/my-engines/myEnginesSlice";
 
 const EngineRow: React.FC<{
-	engine: Engine;
+	engine: SerializedEngine;
 	book: Book;
 }> = ({ engine, book }) => {
 	if(!engine || !book) return <></>;
@@ -204,8 +204,8 @@ const EngineRow: React.FC<{
 
 	return (
 		<tr key={engine.id}>
-			<td className="p-2">{engine.id}</td>
-			<td className="p-2">{engine.owner.slice(0, 5) + "..." + engine.owner.slice(-3)}</td>
+			<td className="p-2">{Number(engine.id)}</td>
+			<td className="p-2">{engine.owner.toString().slice(0, 5) + "..." + engine.owner.toString().slice(-3)}</td>
 			<td className="p-2 flex items-center justify-center gap-1">
 				{renderActionButton()}
 			</td>

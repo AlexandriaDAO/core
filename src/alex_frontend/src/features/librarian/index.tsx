@@ -1,89 +1,56 @@
-import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect } from "react";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import Upgrade from "./Upgrade";
+import Sidebar from "./Sidebar";
+import Profile from "./Profile";
+import LibrarianCard from "@/components/LibrarianCard";
+import Loading from "@/components/Loading";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import checkLibrarian from "./thunks/checkLibrarian";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/lib/components/button";
-import { Check, LoaderCircle, LockKeyhole, X } from "lucide-react";
+import fetchMyNodes from "../my-nodes/thunks/fetchMyNodes";
+import { useUser } from "@/hooks/actors";
 
-function Librarian() {
+const Librarian = () => {
+	const {actor} = useUser();
+
 	const dispatch = useAppDispatch();
-	const navigate = useNavigate();
 
-	const { isLibrarian, loading, error } = useAppSelector(
-		(state) => state.librarian
-	);
+	const { user, librarianLoading } = useAppSelector((state) => state.auth);
+	const { loading: loginLoading } = useAppSelector((state) => state.login);
+	const { loading } = useAppSelector((state) => state.myNodes);
 
-	useEffect(() => {
-		dispatch(checkLibrarian());
-	}, []);
 
-	const handleViewProfileClick = () => {
-		navigate("/librarian");
-	}
+	useEffect(()=>{
+		if(!actor) return;
+		dispatch(fetchMyNodes(actor));
+	},[user])
 
-	return (
-		<div className="w-full p-3 flex gap-2 flex-col shadow-lg rounded-xl bg-white">
-			<div className="flex justify-between items-center">
-				<div className="font-syne font-medium text-xl text-black">
-					Librarian
-				</div>
+
+	if(loginLoading || loading || librarianLoading) return <Loading />
+
+	if(!user) return (
+		<div className="flex-grow flex justify-center items-center w-full h-full">
+			User Not Available
+		</div>
+	)
+
+
+    if(!user.librarian) return (
+		<div className="flex-grow flex items-start p-4 gap-4">
+			<div className="basis-1/4 flex flex-col items-start gap-4">
+				<LibrarianCard />
 			</div>
-			<div className="flex flex-col gap-4 justify-start items-center">
-				{loading ? (
-					<LoaderCircle size={30} className="animate animate-spin" />
-				) : error ? (
-					<div className="flex flex-col items-center justify-between gap-3">
-						<X
-							size={40}
-							color="red"
-							className="bg-[#D9D9D9] rounded-full border border-solid border-dark p-2"
-						/>
-						<span className="font-roboto-condensed font-medium text-base">
-							{error}
-						</span>
-						<Button
-							disabled
-							variant={"link"}
-							scale={"sm"}>
-							Try later !!!
-						</Button>
-					</div>
-				) : isLibrarian ? (
-					<div className="flex flex-col items-center justify-between gap-3">
-						<div className="p-2 bg-muted border border-ring rounded-full">
-							<Check size={22} className="text-constructive"/>
-						</div>
-						<span className="font-roboto-condensed font-medium text-base">
-							You are a Librarian, You can Add Nodes.
-						</span>
-						<Button
-							variant={"link"}
-							scale={"sm"}
-							onClick={handleViewProfileClick}>
-							View Profile
-						</Button>
-					</div>
-				) : (
-					<div className="flex flex-col items-center justify-between gap-3">
-						<div className="p-2 bg-muted border border-ring rounded-full">
-							<LockKeyhole size={22} className="text-primary"/>
-						</div>
-						<span className="font-roboto-condensed font-medium text-base">
-							Become Librarian to create your personal nodes and
-							access librarian profile data
-						</span>
-						<Button
-							variant={"link"}
-							scale={"sm"}
-							onClick={() => navigate('/librarian')}>
-							<span>Become Librarian</span>
-						</Button>
-					</div>
-				)}
+			<div className="basis-3/4 flex flex-col gap-6 p-8 shadow-lg rounded-xl bg-white">
+				<Upgrade/>
 			</div>
 		</div>
-	);
+	)
+
+    return (
+        <div className="flex-grow flex items-start p-4 gap-4">
+            <Sidebar />
+            <Profile />
+        </div>
+    )
 }
 
 export default Librarian;

@@ -61,13 +61,14 @@ const SwapContent: React.FC = () => {
     );
   }, [swap.lbryRatio]);
   useEffect(() => {
+    if(!user) return;
     if (swap.swapSuccess === true) {
-      dispatch(getLbryBalance(user));
+      dispatch(getLbryBalance(user.principal));
       dispatch(flagHandler());
       setLoadingModalV(false);
       setSucessModalV(true);
     }
-  }, [swap.swapSuccess]);
+  }, [user, swap.swapSuccess]);
   useEffect(() => {
     if (swap.error) {
       setLoadingModalV(false);
@@ -152,7 +153,7 @@ const SwapContent: React.FC = () => {
             <p className="text-lg font-semibold pr-5 text-[#525252] w-9/12">{parseFloat(amount) < minimum_icp ? <>Please enter at least the minimum amount to proceed</> : <></>}</p>
           </div>
           <div>
-            {user !== '' ? (
+            {user ? (
               <button
                 type="button"
                 className={`w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 mb-6 

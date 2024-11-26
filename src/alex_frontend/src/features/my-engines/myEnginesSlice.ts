@@ -1,13 +1,24 @@
 import { ActionReducerMapBuilder, PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Engine } from '../../../../declarations/alex_backend/alex_backend.did';
 import fetchMyEngines from "./thunks/fetchMyEngines";
 import { toast } from "sonner";
 import addEngine from "./thunks/addEngine";
 
+export interface SerializedEngine {
+	'id' : string,
+	'title' : string,
+	'host' : string,
+	'key' : string,
+	'index' : string,
+	'active' : boolean,
+	'owner' : string,
+	'created_at' : string,
+	'updated_at' : string,
+}
+
 // Define the interface for our engine state
 export interface MyEnginesState {
-	engines: Engine[];			//holds currently selected engine
-	newEngine: Engine|null;			//holds recently added engine
+	engines: SerializedEngine[];			//holds currently selected engine
+	newEngine: SerializedEngine|null;			//holds recently added engine
 
 	loading: boolean;
 	error: string | null;
@@ -21,7 +32,7 @@ const initialState: MyEnginesState = {
     engines: [],
 	newEngine: null,
 
-	loading: false,
+	loading: true,
 	error: null,
 
 	newEngineLoading: false,
@@ -54,7 +65,7 @@ const myEnginesSlice = createSlice({
 				state.loading = true;
 				state.error = null;
 			})
-			.addCase(fetchMyEngines.fulfilled, (state, action) => {
+			.addCase(fetchMyEngines.fulfilled, (state, action:PayloadAction<SerializedEngine[]>) => {
 				state.loading = false;
 				state.error = null;
 				state.engines = action.payload;
@@ -71,7 +82,7 @@ const myEnginesSlice = createSlice({
 				state.newEngineLoading = true;
 				state.newEngineError = null;
 			})
-			.addCase(addEngine.fulfilled, (state, action) => {
+			.addCase(addEngine.fulfilled, (state, action:PayloadAction<SerializedEngine>) => {
 				toast.success('Engine Added')
 
 				state.newEngineLoading = false;

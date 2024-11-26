@@ -10,19 +10,15 @@ import Collection from "@/features/collection";
 import fetchMyBooks from "@/features/collection/thunks/fetchMyBooks";
 
 function CollectionPage() {
-	const {checkAuthentication} = useSession();
 	const dispatch = useAppDispatch();
 
 	const { user, loading: userLoading } = useAppSelector((state) => state.auth);
 	const { books, loading: collectionLoading } = useAppSelector((state) => state.collection);
 
-	useEffect(() => {
-		checkAuthentication();
-	}, [dispatch]);
 
-	useEffect(() => {
-		dispatch(fetchMyBooks());
-	}, [user, dispatch]);
+	// useEffect(() => {
+	// 	dispatch(fetchMyBooks());
+	// }, [user, dispatch]);
 
 	if (userLoading) {
 		return <LoadingView />;

@@ -1,5 +1,5 @@
-import React, { ReactNode, useEffect } from "react";
-import Header from "@/components/AppHeader";
+import React, { ReactNode } from "react";
+import AppHeader from "./parts/AppHeader";
 interface MainLayoutProps {
 	children: ReactNode;
 }
@@ -7,7 +7,7 @@ interface MainLayoutProps {
 const AppLayout: React.FC<MainLayoutProps> = ({ children }) => {
 	return (
 		<div className="min-h-screen min-w-screen flex flex-col bg-[#f4f4f4]">
-			<Header />
+			<AppHeader />
 			{children}
 		</div>
 	);

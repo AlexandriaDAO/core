@@ -1,5 +1,5 @@
 import { ActorSubclass } from '@dfinity/agent';
-import { Engine, _SERVICE } from '../../../../../declarations/alex_backend/alex_backend.did';
+import { Engine, _SERVICE } from '../../../../../declarations/user/user.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import MeiliSearch, { Index } from 'meilisearch';
 import { RootState } from '@/store';

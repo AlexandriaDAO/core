@@ -1,13 +1,21 @@
-import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
-import { Node } from '../../../../declarations/alex_librarian/alex_librarian.did';
+import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import fetchMyNodes from "./thunks/fetchMyNodes";
 import { toast } from "sonner";
 import addNode from "./thunks/addNode";
 
+export interface SerializedNode {
+	'id' : string,
+	'key' : string,
+	'active' : boolean,
+	'owner' : string,
+	'created_at' : string,
+	'updated_at' : string,
+}
+
 // Define the interface for our node state
 export interface MyNodesState {
-	nodes: Node[];			//holds currently selected node
-	newNode: Node|null;			//holds recently added node
+	nodes: SerializedNode[];			//holds currently selected node
+	newNode: SerializedNode|null;			//holds recently added node
 
 	loading: boolean;
 	error: string | null;
@@ -51,7 +59,7 @@ const myNodesSlice = createSlice({
 				state.loading = true;
 				state.error = null;
 			})
-			.addCase(fetchMyNodes.fulfilled, (state, action) => {
+			.addCase(fetchMyNodes.fulfilled, (state, action:PayloadAction<SerializedNode[]>) => {
 				state.loading = false;
 				state.error = null;
 				state.nodes = action.payload;
@@ -68,7 +76,7 @@ const myNodesSlice = createSlice({
 				state.newNodeLoading = true;
 				state.newNodeError = null;
 			})
-			.addCase(addNode.fulfilled, (state, action) => {
+			.addCase(addNode.fulfilled, (state, action:PayloadAction<SerializedNode>) => {
 				toast.success('Node Added')
 
 				state.newNodeLoading = false;

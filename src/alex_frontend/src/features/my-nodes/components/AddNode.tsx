@@ -3,35 +3,32 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import addNode, { NodeStatus } from "../thunks/addNode";
-import logout from "@/features/auth/thunks/logout";
+import addNode from "../thunks/addNode";
 import {
 	setNewNode,
 	setNewNodeError,
 	setNewNodeLoading,
 } from "../myNodesSlice";
-import { getAuthClient } from "@/features/auth/utils/authUtils";
 import { Button } from "@/lib/components/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
 import { Label } from "@/lib/components/label";
 import { Input } from "@/lib/components/input";
 
 import { CheckCircle, LoaderCircle, Save, XCircle } from "lucide-react";
+import { useUser } from "@/hooks/actors";
 
 // const ethPrivateKeyRegex = /^[a-fA-F0-9]{64}$/;
 // const ethPublicKeyRegex = /^0x[a-fA-F0-9]{128}$/;
 
 const NodeSchema = Yup.object().shape({
-	pvt_key: Yup.string()
+	key: Yup.string()
 		// .matches(ethPrivateKeyRegex, 'Private key must be a 64 character hexadecimal string')
 		.required('Private key is required'),
-	status: Yup.number().oneOf(
-		[NodeStatus.InActive, NodeStatus.Active],
-		"Invalid Status"
-	),
+	active: Yup.boolean(),
 });
 
 const AddNode = () => {
+	const {actor} = useUser()
 	const dispatch = useAppDispatch();
 	const { newNodeLoading, newNode, newNodeError } = useAppSelector(
 		(state) => state.myNodes
@@ -39,19 +36,15 @@ const AddNode = () => {
 
 	const formik = useFormik({
 		initialValues: {
-			pvt_key: "",
-			status: NodeStatus.Active,
+			key: "",
+			active: true,
 		},
 		validationSchema: NodeSchema,
 		validateOnBlur: true, // Validate form field on blur
 		validateOnChange: true, // Validate form field on change
 		onSubmit: async (values) => {
-			const client = await getAuthClient();
-			if (await client.isAuthenticated()) {
-				dispatch(addNode(values));
-			} else {
-				dispatch(logout(client));
-			}
+			if(!actor) return;
+			dispatch(addNode({actor, input: values}));
 		},
 	});
 
@@ -87,49 +80,51 @@ const AddNode = () => {
 					className="flex flex-col gap-2 "
 				>
 					<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-						<Label htmlFor="pvt_key" variant={(formik.touched.pvt_key && formik.errors.pvt_key ? "destructive" : "default" ) }>
+						<Label htmlFor="key" variant={(formik.touched.key && formik.errors.key ? "destructive" : "default" ) }>
 							Private Key
 						</Label>
 						<Input
-							variant={(formik.touched.pvt_key ? formik.errors.pvt_key ? "destructive" : "constructive" : 'default' ) }
-							id="pvt_key"
-							name="pvt_key"
+							variant={(formik.touched.key ? formik.errors.key ? "destructive" : "constructive" : 'default' ) }
+							id="key"
+							name="key"
 							onChange={formik.handleChange}
 							onBlur={formik.handleBlur}
-							value={formik.values.pvt_key}
+							value={formik.values.key}
 						/>
-						{formik.touched.pvt_key &&
-							formik.errors.pvt_key && (
+						{formik.touched.key &&
+							formik.errors.key && (
 								<span className="text-red-400 text-sm">
-									{formik.errors.pvt_key}
+									{formik.errors.key}
 								</span>
 							)}
 					</div>
 
 					<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-						<Label htmlFor="status" variant={(formik.touched.status && formik.errors.status ? "destructive" : "default" ) }>
+						<Label htmlFor="active" variant={(formik.touched.active && formik.errors.active ? "destructive" : "default" ) }>
 							Status
 						</Label>
 						<select
 							className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
-								formik.touched.status &&
-								formik.errors.status
+								formik.touched.active &&
+								formik.errors.active
 									? "border-red-500"
 									: ""
 							}`}
-							name="status"
-							id="status"
-							onChange={formik.handleChange}
+							name="active"
+							id="active"
+							value={formik.values.active ? "1":"0"}
+							onChange={(e) => {
+								formik.setFieldValue('active', e.target.value === "1")
+							}}
 							onBlur={formik.handleBlur}
-							value={formik.values.status}
 						>
 							<option value="0">InActive</option>
 							<option value="1">Active</option>
 						</select>
-						{formik.touched.status &&
-							formik.errors.status && (
+						{formik.touched.active &&
+							formik.errors.active && (
 								<span className="text-red-400 text-sm">
-									{formik.errors.status}
+									{formik.errors.active}
 								</span>
 							)}
 					</div>

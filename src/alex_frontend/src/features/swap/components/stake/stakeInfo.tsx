@@ -20,7 +20,8 @@ const StakedInfo: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType
     const [estimateReward, setEstimatedReward] = useState(0);
 
     useEffect(() => {
-        dispatch(getStakeInfo(user));
+
+        if(user) dispatch(getStakeInfo(user.principal));
         dispatch(getStakersCount());
         dispatch(getALlStakesInfo());
         dispatch(getAverageApy());
@@ -28,11 +29,11 @@ const StakedInfo: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType
     }, [user])
     useEffect(() => {
         if (swap.successStake === true || swap.unstakeSuccess === true || swap.successClaimReward === true) {
-            dispatch(getStakeInfo(user))
+            if(user) dispatch(getStakeInfo(user.principal))
             dispatch(getALlStakesInfo())
             dispatch(getStakersCount())
         }
-    }, [swap])
+    }, [user, swap])
     useEffect(() => {
         setEstimatedReward(Number(swap.stakeInfo.stakedAlex) * swap.averageAPY)
 

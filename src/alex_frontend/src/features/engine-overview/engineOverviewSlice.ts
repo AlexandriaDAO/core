@@ -1,7 +1,8 @@
 import { ActionReducerMapBuilder, PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Engine } from '../../../../declarations/alex_backend/alex_backend.did';
 import updateEngineStatus from "./thunks/updateEngineStatus";
 import { toast } from "sonner";
+import { SerializedEngine } from "../my-engines/myEnginesSlice";
+import fetchEngine from "./thunks/fetchEngine";
 
 export enum EngineOverviewTab {
 	Books = "Books",
@@ -12,7 +13,7 @@ export enum EngineOverviewTab {
 
 // Define the interface for our engine state
 export interface EngineOverviewState {
-	activeEngine: Engine | null;			//holds currently selected engine
+	activeEngine: SerializedEngine | null;			//holds currently selected engine
 	activeTab: EngineOverviewTab;			//holds a selected tabs within engine overview page
 
 	loading: boolean;
@@ -33,7 +34,7 @@ const engineOverviewSlice = createSlice({
 	name: "engineOverview",
 	initialState,
 	reducers: {
-		setActiveEngine: (state, action: PayloadAction<Engine|null>) => {
+		setActiveEngine: (state, action: PayloadAction<SerializedEngine|null>) => {
 			state.activeEngine = action.payload;
 		},
 		setActiveTab: (state, action: PayloadAction<EngineOverviewTab>) => {
@@ -42,6 +43,26 @@ const engineOverviewSlice = createSlice({
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<EngineOverviewState>) => {
 		builder
+			// fetchEngine.ts
+			.addCase(fetchEngine.pending, (state) => {
+				toast.info('Fetching Engine')
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchEngine.fulfilled, (state, action) => {
+				toast.success('Fetched')
+
+				state.loading = false;
+				state.error = null;
+				state.activeEngine = action.payload
+			})
+			.addCase(fetchEngine.rejected, (state, action) => {
+				toast.error('Engine could not be fetched '+ action.payload)
+
+				state.loading = false;
+				state.error = action.payload as string;
+			})
+
 			.addCase(updateEngineStatus.pending, (state) => {
 				toast.info('Updating Status')
 				state.loading = true;

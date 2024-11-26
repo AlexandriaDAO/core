@@ -87,7 +87,7 @@ const EngineFilters = () => {
 				</span>
 
 				<div className="flex items-center text-gray-500">
-					{user == activeEngine?.owner && (
+					{user && activeEngine && user.principal == activeEngine.owner && (
 						<Button variant='muted' onClick={handleFilterReset}>
 							<ListX size={22} />
 							<span>Clear All</span>
@@ -103,7 +103,7 @@ const EngineFilters = () => {
 					</Button>
 				</div>
 			</div>
-			{user == activeEngine?.owner &&
+			{user && activeEngine && user.principal == activeEngine.owner  &&
 			<span className="p-4 font-roboto-condensed text-base leading-[18px] text-gray-500 hover:text-gray-800">
 				Filters can take time to update, Check Recent tasks for status.
 			</span>}
@@ -114,7 +114,7 @@ const EngineFilters = () => {
 					Object.entries(EngineFilter).map(([key, value]) => (
 						<label
 							key={key}
-							className={`${user == activeEngine?.owner ? 'cursor-pointer':'cursor-not-allowed'} flex items-center gap-2.5 font-roboto-condensed text-base font-normal ${
+							className={`${user && activeEngine && user.principal == activeEngine.owner  ? 'cursor-pointer':'cursor-not-allowed'} flex items-center gap-2.5 font-roboto-condensed text-base font-normal ${
 								value ? "text-black" : "text-[#8E8E8E]"
 							}`}
 						>
@@ -122,9 +122,9 @@ const EngineFilters = () => {
 								className="w-5 h-5"
 								type="checkbox"
 								name={key}
-								readOnly={user != activeEngine?.owner}
+								readOnly={user && activeEngine && user.principal != activeEngine.owner ? true: false}
 								checked={filters.includes(key)}
-								onChange={user == activeEngine?.owner ? handleFilterCheck : ()=>{}}
+								onChange={user && activeEngine && user.principal == activeEngine.owner  ? handleFilterCheck : ()=>{}}
 							/>
 							<span>{value}</span>
 						</label>

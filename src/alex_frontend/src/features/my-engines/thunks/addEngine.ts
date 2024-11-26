@@ -1,8 +1,9 @@
-import { Engine } from "../../../../../declarations/alex_backend/alex_backend.did";
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from "../../../../../declarations/user/user.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { EngineStatus } from "@/features/engine-overview/thunks/updateEngineStatus";
 import { ibe_encrypt } from "@/services/vetkdService";
-import { getActorAlexBackend } from "@/features/auth/utils/authUtils";
+import { SerializedEngine } from '../myEnginesSlice';
+import { serializeEngine } from '../utils';
 
 // Define an interface for the engine parameters based on the Yup validation schema
 interface EngineInput {
@@ -10,18 +11,21 @@ interface EngineInput {
 	host: string;
 	key: string;
 	index: string;
-	status?: EngineStatus; // Optional since it's not enforced by 'required' in Yup
+	active: boolean; // Optional since it's not enforced by 'required' in Yup
 }
 
 // Define the async thunk
 const addEngine = createAsyncThunk<
-	Engine, // This is the return type of the thunk's payload
-	EngineInput, //Argument that we pass to initialize
+	SerializedEngine, // This is the return type of the thunk's payload
+	{
+		actor:ActorSubclass<_SERVICE>,
+		values:EngineInput
+	},//Argument that we pass to initialize
 	{ rejectValue: string }
 >(
 	"myEngines/addEngine",
 	async (
-		{ title, host, key, index, status = EngineStatus.Draft  },
+		{ actor, values: {title, host, key, index, active = false } },
 		{ rejectWithValue }
 	) => {
 		try {
@@ -29,11 +33,9 @@ const addEngine = createAsyncThunk<
 
 			const encrypted_key = await ibe_encrypt( key, frontend_canister_id);
 
-			const actor = await getActorAlexBackend();
+			const result = await actor.create_engine({title, host, key:encrypted_key, index, active});
 
-			const result = await actor.add_my_engine(title, host, encrypted_key, index, [status]);
-
-            if('Ok' in result) return result.Ok;
+            if('Ok' in result) return serializeEngine(result.Ok);
 
             if('Err' in result) throw new Error(result.Err)
 		} catch (error) {

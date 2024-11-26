@@ -11,7 +11,7 @@ const defaultPrincipals = [
 ];
 
 export default function PrincipalSelector() {
-  const userPrincipal = useSelector((state: RootState) => state.auth.user);
+  const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const dispatch = useDispatch<AppDispatch>();
   const [showAllPrincipals, setShowAllPrincipals] = useState(false);

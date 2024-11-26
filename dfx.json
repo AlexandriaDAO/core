@@ -10,10 +10,10 @@
       "package": "system_api",
       "type": "rust"
     },
-    "alex_librarian": {
+    "user": {
       "type": "rust",
-      "package": "alex_librarian",
-      "candid": "src/alex_librarian/alex_librarian.did"
+      "package": "user",
+      "candid": "src/user/user.did"
     },
     "alex_wallet": {
       "type": "azle",

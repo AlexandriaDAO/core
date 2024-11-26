@@ -5,9 +5,9 @@ import {
   alex_backend,
 } from "../../../../../declarations/alex_backend";
 import {
-  createActor as createAlexLibrarianActor,
-  alex_librarian
-} from "../../../../../declarations/alex_librarian";
+  createActor as createUserActor,
+  user
+} from "../../../../../declarations/user";
 import {
   createActor as createAlexWalletActor,
 } from "../../../../../declarations/alex_wallet";
@@ -56,7 +56,7 @@ const icp_ledger_canister_id = process.env.CANISTER_ID_ICP_LEDGER_CANISTER!;
 const tokenomics_canister_id = process.env.CANISTER_ID_TOKENOMICS!;
 const lbry_canister_id = process.env.CANISTER_ID_LBRY!;
 const alex_canister_id = process.env.CANISTER_ID_ALEX!;
-const alex_librarian_canister_id = process.env.CANISTER_ID_ALEX_LIBRARIAN!;
+const user_canister_id = process.env.CANISTER_ID_USER!;
 const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 
@@ -108,7 +108,7 @@ const getActor = async <T>(
 
 export const getActorAlexBackend = () => getActor(alex_backend_canister_id, createAlexBackendActor, alex_backend);
 
-export const getActorAlexLibrarian = () => getActor(alex_librarian_canister_id, createAlexLibrarianActor, alex_librarian);
+export const getUser = () => getActor(user_canister_id, createUserActor, user);
 
 export const getActorAlexWallet = async () => getActor(alex_wallet_canister_id, createAlexWalletActor, createAlexWalletActor(alex_wallet_canister_id));
 
