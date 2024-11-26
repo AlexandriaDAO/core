@@ -4,7 +4,7 @@ use crate::{
 use candid::{CandidType, Nat, Principal};
 use ic_cdk::{
     api::call:: CallResult,
-    caller, query,
+    caller, query, update,
 };
 use serde::Deserialize;
 
@@ -105,7 +105,7 @@ pub fn get_max_stats() -> (u64, u64) {
     let total_burned = get_total_LBRY_burn();
     (max_threshold, total_burned)
 }
-#[query]
+#[update]
 pub async fn fetch_total_minted_ALEX() -> Result<u64, String> {
     let alex_canister_id = get_principal(ALEX_CANISTER_ID);
 
@@ -131,7 +131,7 @@ pub fn your_principal() -> Result<String, String> {
     Ok(caller().to_string())
 }
 
-#[ic_cdk::update]
+#[update]
 async fn get_latest_transfer_transactions() -> Vec<TransferRecord> {
     let token_canister_id = get_principal(LBRY_CANISTER_ID);
 
@@ -193,7 +193,7 @@ async fn get_latest_transfer_transactions() -> Vec<TransferRecord> {
     }
 }
 
-#[ic_cdk::query]
+#[query]
 pub async fn get_two_random_users() -> CallResult<(Principal, Principal)> {
     // First, get all latest transfer transactions
     let all_transfers = get_latest_transfer_transactions().await;
@@ -224,7 +224,7 @@ pub async fn get_two_random_users() -> CallResult<(Principal, Principal)> {
     Ok((address1, address2))
 }
 
-#[ic_cdk::query]
+#[query]
 fn get_logs() -> Vec<Logs> {
     LOGS.with(|logs| logs.borrow().clone())
 }

@@ -25,7 +25,7 @@ type TransferRecord = record {
   spender : opt Account;
 };
 service : {
-  fetch_total_minted_ALEX : () -> (Result) query;
+  fetch_total_minted_ALEX : () -> (Result);
   get_current_ALEX_rate : () -> (nat64) query;
   get_current_LBRY_threshold : () -> (nat64) query;
   get_current_threshold_index : () -> (nat32) query;

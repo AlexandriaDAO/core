@@ -344,4 +344,8 @@ shared(_init_msg) actor class Example(_args : {
     await NFTArchive.initialize_nfts(icrc7(), init_msg.caller);
   };
 
+  public shared(msg) func icrc7_transfer(args: [TransferArgs]) : async [?TransferResult] {
+    icrc7().transfer(msg.caller, args);
+  };
+
 };

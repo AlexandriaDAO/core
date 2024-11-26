@@ -1,0 +1,1 @@
+service : { get_mock_user : () -> (principal) query }

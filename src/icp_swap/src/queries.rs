@@ -46,6 +46,20 @@ pub fn get_stake(principal: Principal) -> Option<Stake> {
 pub fn get_total_unclaimed_icp_reward() -> u64 {
     let result = get_total_unclaimed_icp_reward_mem();
     result.get(&()).unwrap_or(0)
+    // // Alternative approach just using the canister balance, but this would only be fair if people claimed every day.
+    // pub async fn get_total_unclaimed_icp_reward() -> Result<u64, String> {
+    //     // Get total ICP in canister
+    //     let total_icp_available = fetch_canister_icp_balance().await?;
+        
+    //     // Get total archived balance (ICP that's waiting to be redeemed)
+    //     let total_archived_bal = get_total_archived_balance();
+        
+    //     // The unclaimed rewards are what remains after subtracting archived balances
+    //     let unclaimed_rewards = total_icp_available
+    //         .checked_sub(total_archived_bal)
+    //         .ok_or("Arithmetic underflow when calculating unclaimed rewards")?;
+    
+    //     Ok(unclaimed_rewards)
 }
 
 #[query]

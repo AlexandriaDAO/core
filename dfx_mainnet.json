@@ -96,6 +96,12 @@
       },
       "source": ["dist/alex_frontend/"],
       "type": "assets"
+    },
+    "tests": {
+      "type": "rust",
+      "package": "tests",
+      "candid": "src/tests/tests.did",
+      "specified_id": "yn33w-uaaaa-aaaap-qpk5q-cai"
     }
   },
   "defaults": {

@@ -60,7 +60,9 @@ candid-extractor target/wasm32-unknown-unknown/release/alex_librarian.wasm > src
 # for vetkd
 cargo build --release --target wasm32-unknown-unknown --package vetkd
 candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
-
+# for tests
+cargo build --release --target wasm32-unknown-unknown --package tests
+candid-extractor target/wasm32-unknown-unknown/release/tests.wasm > src/tests/tests.did
 
 cargo update
 
@@ -74,15 +76,29 @@ dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
 dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 
 dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
+dfx deploy tests --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 
 # Step 5: Configure Local Identities for token launches
 dfx identity new minter --storage-mode plaintext
 dfx identity use minter
 export MINTER_ACCOUNT_ID=$(dfx ledger account-id)
 export MINTER_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+
+dfx identity use user_1
+export ALICE_ACCOUNT_ID=$(dfx ledger account-id)
+export ALICE_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+dfx identity use user_2
+export BOB_ACCOUNT_ID=$(dfx ledger account-id)
+export BOB_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+dfx identity use user_3
+export CHARLIE_ACCOUNT_ID=$(dfx ledger account-id)
+export CHARLIE_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+
 dfx identity use default
 export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
 export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+
+
 
 
 # Step 6: Deploy the ICP & ICRC Ledger with LICP, LBRY, and ALEX tokens
@@ -96,6 +112,18 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
           record {  
             e8s = 8_681_981_000_000_000 : nat64;  
           };  
+          \"$ALICE_ACCOUNT_ID\";  
+          record {  
+            e8s = 1_000_000_000 : nat64;  
+          };
+          \"$BOB_ACCOUNT_ID\";
+          record {
+            e8s = 1_000_000_000 : nat64;
+          };
+          \"$CHARLIE_ACCOUNT_ID\";
+          record {
+            e8s = 1_000_000_000 : nat64;
+          };
         };  
       };  
       send_whitelist = vec {};  
@@ -107,6 +135,7 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
     }  
   })  
 "
+
 
 dfx deploy LBRY --specified-id y33wz-myaaa-aaaap-qkmna-cai --argument '(variant { Init = 
 record {

@@ -1,8 +1,9 @@
 use ic_cdk::query;
 use candid::{Nat, Principal};
 use icrc_ledger_types::icrc1::account::Subaccount;
-use sha2::{Sha256, Digest};
+use sha2::{Sha256, Sha224, Digest};
 use num_bigint::BigUint;
+use crc32fast::Hasher;
 
 #[query]
 fn arweave_id_to_nat(arweave_id: String) -> Nat {
@@ -211,4 +212,37 @@ fn calculate_crc24(data: &[u8]) -> u32 {
     }
     
     crc & 0xFFFFFF // Return 24 bits only
+}
+
+
+#[ic_cdk::query]
+pub fn principal_to_account(principal: Principal) -> String {
+    let mut hash_input = Vec::new();
+    
+    // Add domain separator
+    hash_input.extend_from_slice(b"\x0Aaccount-id");
+    
+    // Add principal
+    hash_input.extend_from_slice(principal.as_slice());
+    
+    // Add subaccount (null in this case, 32 bytes of zeros)
+    hash_input.extend_from_slice(&[0; 32]);
+    
+    // Calculate SHA224 hash
+    let mut hasher = Sha224::new();
+    hasher.update(&hash_input);
+    let hash = hasher.finalize();
+    
+    // Calculate CRC32 checksum
+    let mut crc = Hasher::new();
+    crc.update(&hash);
+    let checksum = crc.finalize();
+    
+    // Combine checksum and hash
+    let mut account_id = Vec::new();
+    account_id.extend_from_slice(&checksum.to_be_bytes());
+    account_id.extend_from_slice(&hash);
+    
+    // Convert to hex string
+    hex::encode(account_id)
 }
