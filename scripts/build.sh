@@ -82,6 +82,8 @@ dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 
 dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
 
+dfx deploy emporium --specified-id be2us-64aaa-aaaaa-qaabq-cai
+
 # Step 5: Configure Local Identities for token launches
 dfx identity new minter --storage-mode plaintext
 dfx identity use minter

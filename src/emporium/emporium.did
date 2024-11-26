@@ -1,2 +1,13 @@
+type Nft = record {
+  status : text;
+  token_id : nat64;
+  marked_price : nat64;
+  owner : principal;
+  buyer : principal;
+  sold_price : nat64;
+};
 type Result = variant { Ok : text; Err : text };
-service : { list_nft : (nat64, nat64) -> (Result) }
+service : {
+  get_all_mining : () -> (vec record { nat64; Nft }) query;
+  list_nft : (nat64, nat64) -> (Result);
+}

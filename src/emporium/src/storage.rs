@@ -19,7 +19,7 @@ thread_local! {
         MemoryManager::init(DefaultMemoryImpl::default())
     );
     
-    pub static LISTINGS: RefCell<StableBTreeMap<u64, Listing, Memory>> = RefCell::new(
+    pub static LISTING: RefCell<StableBTreeMap<u64, Nft, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(LISTING_MEM_ID))
         )
@@ -28,17 +28,15 @@ thread_local! {
 const MAX_VALUE_SIZE: u32 = 100;
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
-struct Listing {
-    owner: Principal,
-    buyer:Principal, // null by defualt
-    marked_price:u64,
-    sold_price: u64,  
-    token_id: u64,  
-    status: String, //replace with enums
+pub struct Nft {
+   pub owner: Principal,
+   pub price:u64,
+   pub token_id: u64,  
+   pub status: String, //replace with enums
 }
 
 
-impl Storable for Listing {
+impl Storable for Nft {
     fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }

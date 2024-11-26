@@ -3,7 +3,7 @@ use ic_cdk::api::call::CallResult;
 use serde::Deserialize;
 
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
-
+pub const EMPORIUM_CANISTER_ID: &str = "be2us-64aaa-aaaaa-qaabq-cai";
 
 #[derive(CandidType, Deserialize, Debug)]
 struct OwnerInfo {
@@ -17,7 +17,7 @@ pub async fn is_owner(principal: Principal, token_id: u64) -> Result<bool, Strin
     let args = vec![Nat::from(token_id)];
 
     let call_result: CallResult<(Vec<Option<OwnerInfo>>,)> =
-    ic_cdk::call(nft_canister, "icrc7_owner_of", (args,)).await;
+        ic_cdk::call(nft_canister, "icrc7_owner_of", (args,)).await;
     ic_cdk::println!("Result {:?}", call_result);
 
     match call_result {
@@ -31,7 +31,6 @@ pub async fn is_owner(principal: Principal, token_id: u64) -> Result<bool, Strin
         }
     }
 }
-
 
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
