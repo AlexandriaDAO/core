@@ -1,0 +1,79 @@
+type CreateEngineRequest = record {
+  key : text;
+  title : text;
+  active : bool;
+  host : text;
+  index : text;
+};
+type CreateNodeRequest = record { key : text };
+type Engine = record {
+  id : nat64;
+  key : text;
+  title : text;
+  updated_at : nat64;
+  active : bool;
+  owner : principal;
+  host : text;
+  created_at : nat64;
+  index : text;
+};
+type Node = record {
+  id : nat64;
+  key : text;
+  updated_at : nat64;
+  active : bool;
+  owner : principal;
+  created_at : nat64;
+};
+type Result = variant { Ok : UsernameAvailabilityResponse; Err : text };
+type Result_1 = variant { Ok : Engine; Err : text };
+type Result_2 = variant { Ok : Node; Err : text };
+type Result_3 = variant { Ok; Err : text };
+type Result_4 = variant { Ok : User; Err : text };
+type Result_5 = variant { Ok : vec Engine; Err : text };
+type Result_6 = variant { Ok : vec Node; Err : text };
+type SignupRequest = record { username : text };
+type UpdateEngineStatusRequest = record { id : nat64; active : bool };
+type UpdateNodeStatusRequest = record { id : nat64; active : bool };
+type UpdateUserRequest = record { name : opt text; avatar : opt text };
+type User = record {
+  updated_at : nat64;
+  "principal" : principal;
+  librarian : bool;
+  username : text;
+  name : text;
+  created_at : nat64;
+  avatar : text;
+};
+type UsernameAvailabilityResponse = record {
+  username : text;
+  available : bool;
+  message : text;
+};
+service : {
+  check_username_availability : (text) -> (Result) query;
+  create_engine : (CreateEngineRequest) -> (Result_1);
+  create_node : (CreateNodeRequest) -> (Result_2);
+  delete_engine : (nat64) -> (Result_3);
+  delete_node : (nat64) -> (Result_3);
+  get_active_engines : (opt principal) -> (vec Engine) query;
+  get_active_nodes : (opt principal) -> (vec Node) query;
+  get_current_user : () -> (Result_4) query;
+  get_engines : (vec nat64) -> (Result_5) query;
+  get_engines_strict : (vec nat64) -> (Result_5) query;
+  get_my_active_engines : () -> (vec Engine) query;
+  get_my_active_nodes : () -> (vec Node) query;
+  get_my_engines : () -> (vec Engine) query;
+  get_my_nodes : () -> (vec Node) query;
+  get_nodes : (vec nat64) -> (Result_6) query;
+  get_nodes_strict : (vec nat64) -> (Result_6) query;
+  get_user : (principal) -> (Result_4) query;
+  get_user_engines : (principal) -> (vec Engine) query;
+  get_user_nodes : (principal) -> (vec Node) query;
+  signup : (SignupRequest) -> (Result_4);
+  update_engine_status : (UpdateEngineStatusRequest) -> (Result_1);
+  update_node_status : (UpdateNodeStatusRequest) -> (Result_2);
+  update_profile : (UpdateUserRequest) -> (Result_4);
+  upgrade_to_librarian : () -> (Result_4);
+  whoami : () -> (principal) query;
+}

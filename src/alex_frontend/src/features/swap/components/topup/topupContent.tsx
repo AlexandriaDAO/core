@@ -53,7 +53,7 @@ const TopupContent = () => {
                 const nftManagerActor = await getNftManagerActor();
 
                 if (user) {
-                    const userPrincipal = Principal.fromText(user);
+                    const userPrincipal = Principal.fromText(user.toString());
                     const subaccountBlob = await nftManagerActor.principal_to_subaccount(userPrincipal);
                     const subaccountArray = Array.from(new Uint8Array(subaccountBlob as unknown as ArrayBuffer));
                     setSubaccount(subaccountArray);
@@ -70,8 +70,8 @@ const TopupContent = () => {
 
     useEffect(() => {
         if (user) {
-            dispatch(getSpendingBalance(user));
-            dispatch(getAlexSpendingBalance(user));
+            dispatch(getSpendingBalance(user.toString()));
+            dispatch(getAlexSpendingBalance(user.toString()));
         }
     }, [dispatch, user]);
 
@@ -81,7 +81,7 @@ const TopupContent = () => {
         
         dispatch(topUpLBRY({
             amount,
-            userPrincipal: user
+            userPrincipal: user.toString()
         }));
         setLoadingModalV(true);
     };
@@ -90,8 +90,10 @@ const TopupContent = () => {
         if (swap.transferSuccess === true) {
             setLoadingModalV(false);
             setSuccessModalV(true);
-            dispatch(getLbryBalance(user));
-            dispatch(getSpendingBalance(user));
+            if (user) {
+                dispatch(getLbryBalance(user.toString()));
+                dispatch(getSpendingBalance(user.toString()));
+            }
             dispatch(flagHandler());
         } else if (swap.error) {
             setLoadingModalV(false);

@@ -29,9 +29,9 @@ dfx deploy nft_manager --network ic
 # For alex_backend
 cargo build --release --target wasm32-unknown-unknown --package alex_backend
 candid-extractor target/wasm32-unknown-unknown/release/alex_backend.wasm > src/alex_backend/alex_backend.did
-# For alex_librarian
-cargo build --release --target wasm32-unknown-unknown --package alex_librarian
-candid-extractor target/wasm32-unknown-unknown/release/alex_librarian.wasm > src/alex_librarian/alex_librarian.did
+# For user
+cargo build --release --target wasm32-unknown-unknown --package user
+candid-extractor target/wasm32-unknown-unknown/release/user.wasm > src/user/user.did
 # For bookmarks
 cargo build --release --target wasm32-unknown-unknown --package bookmarks
 candid-extractor target/wasm32-unknown-unknown/release/bookmarks.wasm > src/bookmarks/bookmarks.did
@@ -46,7 +46,7 @@ cargo build --release --target wasm32-unknown-unknown --package vetkd
 candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
 
 dfx deploy alex_backend --network ic
-dfx deploy alex_librarian --network ic
+dfx deploy user --network ic
 dfx deploy bookmarks --network ic
 dfx deploy icp_swap --network ic
 dfx deploy system_api --network ic

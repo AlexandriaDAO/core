@@ -1,7 +1,7 @@
 import { caller, IDL, Principal, query,  update, call } from 'azle';
 import { TypedEthereumSigner } from "arbundles";
 import { Result} from 'azle/experimental';
-import { Node as TypeNode } from '../../../src/declarations/user/user.did';
+import { Node as TypeNode } from '../../../declarations/user/user.did';
 
 const userPrincipal = Principal.fromText('bd3sg-teaaa-aaaaa-qaaba-cai');
 const vetkdPrincipal = Principal.fromText('5ham4-hqaaa-aaaap-qkmsq-cai');
@@ -28,7 +28,7 @@ function ensureString($variable:any){
 
 async function getNode(node_id: BigInt): Promise<TypeNode> {
 
-    // Call the get_node_by_id function of alex_librarian
+    // Call the get_node_by_id function of user
     const result = await call(
         userPrincipal,
         'get_nodes',

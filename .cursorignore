@@ -2,6 +2,7 @@
 .mops
 .deps
 .dfx
+.azle
 node_modules
 dist
 target
