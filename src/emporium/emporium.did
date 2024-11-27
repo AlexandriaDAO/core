@@ -1,13 +1,35 @@
+type Block = record { id : nat; block : opt BlockVariant };
+type BlockVariant = variant { Map : vec MapEntry };
+type DynamicValue = variant {
+  Map : Vec;
+  Nat : nat;
+  Blob : blob;
+  Null;
+  Text : text;
+  Array : vec DynamicValue;
+};
+type MapEntry = record { key : text; value : DynamicValue };
 type Nft = record {
   status : text;
   token_id : nat64;
-  marked_price : nat64;
   owner : principal;
-  buyer : principal;
-  sold_price : nat64;
+  price : nat64;
 };
-type Result = variant { Ok : text; Err : text };
+type Result = variant { Ok : vec Block; Err : text };
+type Result_1 = variant { Ok : text; Err : text };
+type Vec = vec record {
+  key : text;
+  value : variant {
+    Map : Vec;
+    Nat : nat;
+    Blob : blob;
+    Null;
+    Text : text;
+    Array : vec DynamicValue;
+  };
+};
 service : {
-  get_all_mining : () -> (vec record { nat64; Nft }) query;
-  list_nft : (nat64, nat64) -> (Result);
+  get_listing : () -> (vec record { nat64; Nft }) query;
+  icrc3_get_blocks : (nat, nat) -> (Result) query;
+  list_nft : (nat64, nat64) -> (Result_1);
 }

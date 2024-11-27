@@ -22,11 +22,6 @@ ic_cdk::export_candid!();
 // Error from Canister 53ewn-qqaaa-aaaap-qkmqq-cai: Canister called `ic0.trap` with message: IDL error: unexpected IDL type when parsing [Nat].\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: http://internetcomputer.org/docs/current/references/execution-errors#trapped-explicitly"))
 
 
-// Explored the ICRC7 canister, but it does not have a transfer function, which was a blocker for me.
-// Explored docs of icrc7 example transfer, there depployed icrc7 was having icrc37 standard which has the required functions like transfer_from and approve. 
-
-// As discussed, we need to identify the previous owner by retrieving the most recent transaction using icrc3_get_blocks.I tested it through the candid ui.
-
 
 
 

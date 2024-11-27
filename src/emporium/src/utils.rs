@@ -35,3 +35,4 @@ pub async fn is_owner(principal: Principal, token_id: u64) -> Result<bool, Strin
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
 }
+
