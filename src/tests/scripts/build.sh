@@ -8,7 +8,7 @@ if [ ! -d "src/tests" ] || [ ! -d "src/icp_swap" ]; then
 fi
 
 # # Step 1: Start dfx
-kill -9 $(lsof -t -i:4943)
+# kill -9 $(lsof -t -i:4943)
 dfx stop
 dfx start --background --clean
 

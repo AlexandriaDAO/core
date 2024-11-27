@@ -14,7 +14,7 @@ type Result = variant { Ok : text; Err : text };
 type Result_1 = variant { Ok : nat64; Err : text };
 type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
 service : (opt InitArgs) -> {
-  burn_LBRY : (nat64) -> (Result);
+  burn_LBRY : (nat64, opt blob) -> (Result);
   caller_subaccount : () -> (text) query;
   claim_icp_reward : () -> (Result);
   distribute_reward : () -> (Result);
@@ -37,6 +37,6 @@ service : (opt InitArgs) -> {
   get_user_archive_balance : (principal) -> (opt ArchiveBalance) query;
   redeem : () -> (Result);
   stake_ALEX : (nat64) -> (Result);
-  swap : (nat64) -> (Result);
+  swap : (nat64, opt blob) -> (Result);
   un_stake_all_ALEX : () -> (Result);
 }

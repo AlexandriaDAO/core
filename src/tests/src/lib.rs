@@ -1,5 +1,4 @@
 use candid::Principal;
-use ic_cdk::api::call::CallResult;
 
 pub const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
 pub const ALEX_CANISTER_ID: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";

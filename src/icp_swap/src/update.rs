@@ -7,7 +7,7 @@ use crate::{get_user_archive_balance, utils::*};
 use candid::{CandidType, Nat, Principal};
 use ic_cdk::{self, caller, update};
 use ic_ledger_types::{
-    AccountIdentifier, BlockIndex as BlockIndexIC, Memo, Tokens, DEFAULT_SUBACCOUNT,
+    AccountIdentifier, BlockIndex as BlockIndexIC, Memo, Tokens, DEFAULT_SUBACCOUNT, Subaccount,
     MAINNET_LEDGER_CANISTER_ID,
 };
 use icrc_ledger_types::icrc1::account::Account;
@@ -15,6 +15,7 @@ use icrc_ledger_types::icrc1::transfer::{BlockIndex, TransferArg, TransferError}
 use icrc_ledger_types::icrc2::transfer_from::{TransferFromArgs, TransferFromError};
 use num_bigint::BigUint;
 use serde::Deserialize;
+
 #[warn(non_snake_case)]
 #[derive(CandidType, Deserialize, Debug)]
 pub struct Metadata {
@@ -60,19 +61,19 @@ pub struct GetExchangeRateRequest {
 
 //swap
 #[update(guard = "not_anon")]
-pub async fn swap(amount_icp: u64) -> Result<String, String> {
+pub async fn swap(amount_icp: u64, from_subaccount: Option<[u8; 32]>) -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard: CallerGuard = CallerGuard::new(caller)?;
 
     if amount_icp < 10_000_000 {
         return Err("Minimum amount is 0.1 ICP".to_string());
     }
-    deposit_icp_in_canister(amount_icp).await?;
+    deposit_icp_in_canister(amount_icp, from_subaccount).await?;
     let icp_rate_in_cents: u64 = get_current_LBRY_ratio()?;
     let lbry_amount: u64 = amount_icp
         .checked_mul(icp_rate_in_cents)
         .ok_or("Arithmetic overflow occurred in lbry_amount.")?;
-    match mint_LBRY(lbry_amount).await {
+    match mint_LBRY(lbry_amount, from_subaccount).await {
         Ok(block_index) => {
             // Mint was successful
             ic_cdk::println!("Successful, block index: {:?}", block_index);
@@ -90,9 +91,10 @@ pub async fn swap(amount_icp: u64) -> Result<String, String> {
 
     Ok("Swapped Successfully!".to_string())
 }
-#[warn(non_snake_case)]
+
+#[allow(non_snake_case)]
 #[update(guard = "not_anon")]
-pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
+pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller)?;
 
@@ -115,7 +117,8 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
     if amount_icp_e8s == 0 {
         return Err("Calculated ICP amount is too small".to_string());
     }
-    let mut total_icp_available: u64 = 0;
+
+    let mut total_icp_available: u64 = 0; // Correct and defensive against race conditions and undefined behavior.
 
     match fetch_canister_icp_balance().await {
         Ok(bal) => {
@@ -149,7 +152,7 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
         .ok_or("Arithmetic overflow occurred in amount_lbry_e8s.")?;
     burn_token(amount_lbry_e8s).await?;
 
-    match send_icp(caller, amount_icp_e8s).await {
+    match send_icp(caller, amount_icp_e8s, from_subaccount.map(|bytes| Subaccount(bytes))).await {
         Ok(block_index) => {
             // Burn was successful
             ic_cdk::println!("Successful, block index: {:?}", block_index);
@@ -188,7 +191,8 @@ pub async fn burn_LBRY(amount_lbry: u64) -> Result<String, String> {
     Ok("Burn Successfully!".to_string())
 }
 
-async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
+#[allow(non_snake_case)]
+async fn mint_LBRY(amount: u64, to_subaccount: Option<[u8; 32]>) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let amount = Nat::from(amount);
 
@@ -205,7 +209,10 @@ async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
         // if not specified, the default fee for the canister is used
         fee: None,
         // the account we want to transfer tokens to
-        to: caller.into(),
+        to: Account {
+            owner: caller,
+            subaccount: to_subaccount,
+        },
         // a timestamp indicating when the transaction was created by the caller; if it is not specified by the caller then this is set to the current ICP time
         created_at_time: None,
         memo: None,
@@ -232,14 +239,14 @@ async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
     .map_err(|e| format!("ledger transfer error {:?}", e))
 }
 
-async fn deposit_icp_in_canister(amount: u64) -> Result<BlockIndex, String> {
+async fn deposit_icp_in_canister(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<BlockIndex, String> {
     let canister_id = ic_cdk::api::id();
     let caller = ic_cdk::caller();
 
     let transfer_args = TransferFromArgs {
         from: Account {
             owner: caller,
-            subaccount: None,
+            subaccount: from_subaccount,
         },
         to: Account {
             owner: canister_id,
@@ -263,13 +270,13 @@ async fn deposit_icp_in_canister(amount: u64) -> Result<BlockIndex, String> {
     .map_err(|e: TransferFromError| format!("ledger transfer error {:?}", e))
 }
 
-async fn send_icp(destination: Principal, amount: u64) -> Result<BlockIndexIC, String> {
+async fn send_icp(destination: Principal, amount: u64, from_subaccount: Option<Subaccount>) -> Result<BlockIndexIC, String> {
     let amount = Tokens::from_e8s(amount);
     let transfer_args: ic_ledger_types::TransferArgs = ic_ledger_types::TransferArgs {
         memo: Memo(0),
         amount,
         fee: Tokens::from_e8s(ICP_TRANSFER_FEE),
-        from_subaccount: None,
+        from_subaccount,
         to: AccountIdentifier::new(&destination, &DEFAULT_SUBACCOUNT),
         created_at_time: None,
     };
@@ -279,6 +286,7 @@ async fn send_icp(destination: Principal, amount: u64) -> Result<BlockIndexIC, S
         .map_err(|e: ic_ledger_types::TransferError| format!("ledger transfer error {:?}", e))
 }
 
+#[allow(non_snake_case)]
 async fn mint_ALEX(lbry_amount: u64, caller: Principal) -> Result<String, String> {
     // 1. Asynchronously call another canister function using `ic_cdk::call`.
     let result: Result<(Result<String, String>,), String> =
@@ -299,7 +307,7 @@ async fn mint_ALEX(lbry_amount: u64, caller: Principal) -> Result<String, String
     }
 }
 //stake //
-
+#[allow(non_snake_case)]
 #[update(guard = "not_anon")]
 async fn stake_ALEX(amount: u64) -> Result<String, String> {
     let caller = ic_cdk::caller();
@@ -349,6 +357,7 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
     Ok("Staked Successfully!".to_string())
 }
 
+#[allow(non_snake_case)]
 #[update(guard = "not_anon")]
 async fn un_stake_all_ALEX() -> Result<String, String> {
     let caller = ic_cdk::caller();
@@ -532,7 +541,7 @@ async fn claim_icp_reward() -> Result<String, String> {
             if stake.reward_icp > total_icp_available {
                 return Err("Insufficient ICP Balance in canister".to_string());
             }
-            send_icp(caller, stake.reward_icp).await?;
+            send_icp(caller, stake.reward_icp, None).await?;
             sub_to_unclaimed_amount(stake.reward_icp)?;
 
             STAKES.with(|stakes| {
@@ -649,7 +658,7 @@ async fn redeem() -> Result<String, String> {
             if trx.icp > total_icp_available {
                 return Err("Insufficient ICP Balance in canister".to_string());
             }
-            send_icp(caller, trx.icp).await?;
+            send_icp(caller, trx.icp, None).await?;
             sub_to_total_archived_balance(trx.icp)?;
 
             // make  balance to 0

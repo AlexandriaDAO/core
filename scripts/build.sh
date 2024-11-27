@@ -9,7 +9,7 @@ echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.bashrc && source ~/.bashr
 cp dfx_local.json dfx.json
 
 # # Step 1: Start dfx
-kill -9 $(lsof -t -i:4943)
+# kill -9 $(lsof -t -i:4943)
 dfx stop
 dfx start --background --clean
 

@@ -178,21 +178,21 @@ let favorite_owner_principal: Option<candid::Principal> = BM.with(|bm| {
     
 }
 
-#[ic_cdk::update]
 //  // Evan's old code from Adils tokenomics merge conflict
 // pub async fn mint_n_burn(lbry_amount: f64) -> Result<String, String> {
-//     ic_cdk::println!("Ok here am I ?");
-//     // 1. Asynchronously call another canister function using `ic_cdk::call`.
-//     let result = ic_cdk::call::<(f64,Principal,), (Result<String, String>,)>(
-//         Principal::from_text("5abki-kiaaa-aaaap-qkmsa-cai")
-//             .expect("Could not decode the principal."),
-//         "burn_n_mint",
-//         (lbry_amount,caller()),
-//     )
-//     .await
-//     .map_err(|e| format!("failed to call ledger: {:?}", e));
-
-// Adils new code from tokenomics branch (I'm confused).
+    //     ic_cdk::println!("Ok here am I ?");
+    //     // 1. Asynchronously call another canister function using `ic_cdk::call`.
+    //     let result = ic_cdk::call::<(f64,Principal,), (Result<String, String>,)>(
+        //         Principal::from_text("5abki-kiaaa-aaaap-qkmsa-cai")
+        //             .expect("Could not decode the principal."),
+        //         "burn_n_mint",
+        //         (lbry_amount,caller()),
+        //     )
+        //     .await
+        //     .map_err(|e| format!("failed to call ledger: {:?}", e));
+        
+        // Adils new code from tokenomics branch (I'm confused).
+#[ic_cdk::update]
 async fn transfer_LBRY(amount: u64,destination:Principal) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let big_int_amount: BigUint = BigUint::from(amount);

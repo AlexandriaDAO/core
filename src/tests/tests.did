@@ -1,16 +1,8 @@
-type RejectionCode = variant {
-  NoError;
-  CanisterError;
-  SysTransient;
-  DestinationInvalid;
-  Unknown;
-  SysFatal;
-  CanisterReject;
-};
-type Result = variant { Ok; Err : record { RejectionCode; text } };
+type BalanceResult = record { icp : float64; alex : float64; lbry : float64 };
+type Result = variant { Ok : text; Err : text };
 type TestAccounts = record { bob : text; alice : text; charlie : text };
 service : {
-  check_balances : (vec text) -> (vec float64);
+  check_balances : (vec text) -> (vec BalanceResult);
   get_test_accounts : () -> (TestAccounts) query;
-  swap_tokens : (text, nat64) -> (Result);
+  test_swap : (text, nat64) -> (Result);
 }
