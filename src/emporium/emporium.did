@@ -15,8 +15,8 @@ type Nft = record {
   owner : principal;
   price : nat64;
 };
-type Result = variant { Ok : vec Block; Err : text };
-type Result_1 = variant { Ok : text; Err : text };
+type Result = variant { Ok : text; Err : text };
+type Result_1 = variant { Ok : vec Block; Err : text };
 type Vec = vec record {
   key : text;
   value : variant {
@@ -29,7 +29,8 @@ type Vec = vec record {
   };
 };
 service : {
+  cancel_nft_listing : (nat64) -> (Result);
   get_listing : () -> (vec record { nat64; Nft }) query;
-  icrc3_get_blocks : (nat, nat) -> (Result) query;
-  list_nft : (nat64, nat64) -> (Result_1);
+  icrc3_get_blocks : (nat, nat) -> (Result_1);
+  list_nft : (nat64, nat64) -> (Result);
 }

@@ -36,3 +36,45 @@ pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
 }
 
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct Account {
+    pub owner: Principal,
+    pub subaccount: Option<Vec<u8>>,
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct TransferFromArg {
+    pub spender_subaccount: Option<Vec<u8>>,
+    pub from: Account,
+    pub to: Account,
+    pub token_id: Nat,
+    pub memo: Option<Vec<u8>>,
+    pub created_at_time: Option<u64>,
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct TransferArg {
+    pub from_subaccount: Option<Vec<u8>>,
+    pub to: Account,
+    pub token_id: Nat,
+    pub memo: Option<Vec<u8>>,
+    pub created_at_time: Option<u64>,
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub enum TransferFromResult {
+    Ok(u64), // Transaction index for successful transfer
+    Err(TransferFromError),
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub enum TransferFromError {
+    InvalidRecipient,
+    Unauthorized,
+    NonExistingTokenId,
+    TooOld,
+    CreatedInFuture { ledger_time: u64 },
+    Duplicate { duplicate_of: u64 },
+    GenericError { error_code: u64, message: String },
+    GenericBatchError { error_code: u64, message: String },
+}

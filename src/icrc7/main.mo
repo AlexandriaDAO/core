@@ -6,6 +6,7 @@ import Time "mo:base/Time";
 import Nat "mo:base/Nat";
 import D "mo:base/Debug";
 import CertifiedData "mo:base/CertifiedData";
+import Array "mo:base/Array";
 
 import CertTree "mo:cert/CertTree";
 
@@ -43,6 +44,11 @@ shared (_init_msg) actor class Example(
 
   type TransferFromArg = ICRC37.Service.TransferFromArg;
   type TransferFromResult = ICRC37.Service.TransferFromResult;
+  type ApproveTokenArg = ICRC37.Service.ApproveTokenArg;
+  type ApproveTokenResult = ICRC37.Service.ApproveTokenResult;
+  type RevokeTokenApprovalArg = ICRC37.Service.RevokeTokenApprovalArg;
+  type RevokeTokenApprovalResult =             ICRC37.Service.RevokeTokenApprovalResult;
+
 
   stable var init_msg = _init_msg; //preserves original initialization;
 
@@ -435,16 +441,19 @@ shared (_init_msg) actor class Example(
   };
 
   //In progress
-  public shared (msg) func icrc37_transfer_from<system>(args : [TransferFromArg]) : async [?TransferFromResult] {
-    let allowedCanister : Principal = Principal.fromText("be2us-64aaa-aaaaa-qaabq-cai");
+  public shared (msg) func icrc37_approve_tokens(args : [ApproveTokenArg]) : async [?ApproveTokenResult] {
 
-    for (arg in args.vals()) {
-      if (arg.to.owner != allowedCanister) {
-        return ? #err(#notAuthorized("Transfer are for Emporium canister only"));
-      };
+    switch (icrc37().approve_transfers<system>(msg.caller, args)) {
+      case (#ok(val)) val;
+      case (#err(err)) D.trap(err);
     };
+  };
+  public shared (msg) func icrc37_transfer_from<system>(args : [TransferFromArg]) : async [?TransferFromResult] {
+    icrc37().transfer_from(msg.caller, args);
+  };
 
-    return icrc37().transfer_from(msg.caller, args);
+    public shared(msg) func icrc37_revoke_token_approvals<system>(args: [RevokeTokenApprovalArg]) : async [?RevokeTokenApprovalResult] {
+      icrc37().revoke_token_approvals(msg.caller, args);
   };
 
 };

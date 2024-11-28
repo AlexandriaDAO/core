@@ -31,3 +31,6 @@ To deposit the NFT from the user and save it in our listing simultaneously, we n
 For security reasons, we will add checks so that the transfer_from function will only be usable by the Emporium canister.
 
 https://internetcomputer.org/docs/current/tutorials/developer-journey/level-5/5.4-NFT-tutorial
+
+
+Spent time on RND for the behavior of icrc37_transfer_from. The function behaves as expected in Candid UI and CLI, returning Ok(token_id) on successful transfers. However, during inter-canister calls, it inconsistently returns OK([None]) for success. Errors, such as unauthorized NFT transfers, are correctly flagged. 
