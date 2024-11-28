@@ -32,6 +32,8 @@ pub use balances::*;
 mod swap;
 pub use swap::*;
 
+mod burn;
+pub use burn::*;
 
 
 ic_cdk::export_candid!();

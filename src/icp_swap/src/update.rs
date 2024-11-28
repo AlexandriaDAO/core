@@ -118,8 +118,7 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
         return Err("Calculated ICP amount is too small".to_string());
     }
 
-    let mut total_icp_available: u64 = 0; // Correct and defensive against race conditions and undefined behavior.
-
+    let mut total_icp_available: u64 = 0;
     match fetch_canister_icp_balance().await {
         Ok(bal) => {
             total_icp_available = bal;
@@ -139,14 +138,18 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
         .checked_sub(total_archived_bal)
         .ok_or("Arithmetic overflow occured in remaining_icp.")?;
 
-    // Calculate 50% of the remaining ICP (keeping 50% for staker pools)
-    let actual_available_icp = remaining_icp.checked_div(2).ok_or(
-        "Division failed in actual_available_icp. Please verify the amount is valid and non-zero",
-    )?;
+    ic_cdk::println!("Remaining ICP: {}", remaining_icp);
+    ic_cdk::println!("Amount ICP e8s: {}", amount_icp_e8s);
+    ic_cdk::println!("Total icp available: {}", total_icp_available);
+    ic_cdk::println!("Total archived bal: {}", total_archived_bal);
+    ic_cdk::println!("Total unclaimed icp: {}", total_unclaimed_icp);
 
-    if amount_icp_e8s > actual_available_icp {
-        return Err("Burning stopped, insufficent icp funds ".to_string());
+    // For burns, we only need to ensure we have enough ICP to pay out
+    // No need to reserve 50% since burning increases our ICP reserves
+    if amount_icp_e8s > remaining_icp {
+        return Err("Burning stopped, insufficient icp funds".to_string());
     }
+
     let amount_lbry_e8s = amount_lbry
         .checked_mul(100_000_000)
         .ok_or("Arithmetic overflow occurred in amount_lbry_e8s.")?;

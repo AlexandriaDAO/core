@@ -31,7 +31,7 @@ const burnLbry = createAsyncThunk<
       expires_at: []
     });
     const actorSwap = await getActorSwap();
-    const result = await actorSwap.burn_LBRY(amountFormat);
+    const result = await actorSwap.burn_LBRY(amountFormat, []);
     if('Ok' in result) return "success";
     if('Err' in result) throw new Error(result.Err)
   } catch (error) {

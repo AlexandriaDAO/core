@@ -7,15 +7,41 @@ use icrc_ledger_types::icrc1::account::Account;
 use candid::Nat;
 use ic_ledger_types::{BlockIndex, MAINNET_LEDGER_CANISTER_ID};
 use icrc_ledger_types::icrc2::allowance::{AllowanceArgs};
-use std::time::Duration;
 use candid::{CandidType, Deserialize};
-
+ 
 const E8S_PER_ICP: u64 = 100_000_000;
 const ICP_FEE: u64 = 10_000;
 const MIN_DELAY_NS: u64 = 2_000_000_000; // 2 seconds in nanoseconds
 
+#[derive(CandidType, Debug, Deserialize)]
+pub struct SwapRequest {
+    account_name: String,
+    amount_icp: u64,
+}
+
+#[derive(CandidType, Debug, Deserialize)]
+pub struct SwapResult {
+    account_name: String,
+    result: Result<String, String>,
+}
+
 #[update]
-pub async fn test_swap(account_name: String, amount_icp: u64) -> Result<String, String> {
+pub async fn test_swap_batch(requests: Vec<SwapRequest>) -> Vec<SwapResult> {
+    let mut results = Vec::with_capacity(requests.len());
+    
+    for request in requests {
+        let SwapRequest { account_name, amount_icp } = request;
+        let result = test_swap_single(account_name.clone(), amount_icp).await;
+        results.push(SwapResult {
+            account_name,
+            result,
+        });
+    }
+    
+    results
+}
+
+async fn test_swap_single(account_name: String, amount_icp: u64) -> Result<String, String> {
     let owner_id = ic_cdk::api::id();
     ic_cdk::println!("Starting test_swap with owner ID: {} ({:?})", owner_id, owner_id.as_slice());
     

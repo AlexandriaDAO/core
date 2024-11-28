@@ -4,8 +4,7 @@ use ic_cdk::{query, update, api::id};
 use crate::{lbry_principal, alex_principal};
 
 use ic_ledger_types::{
-    AccountIdentifier, Tokens,
-    MAINNET_LEDGER_CANISTER_ID,
+    AccountIdentifier, Subaccount, Tokens, MAINNET_LEDGER_CANISTER_ID
 };
 
 use candid::Nat;
@@ -140,4 +139,25 @@ pub async fn check_balances(account_names: Vec<String>) -> Vec<BalanceResult> {
     }
     
     balances
+}
+
+#[update]
+pub async fn check_swap_canister_balance() -> f64 {
+    let swap_canister_id = crate::icp_swap_principal();
+    
+    // Create account identifier for the swap canister
+    let account = AccountIdentifier::new(&swap_canister_id, &Subaccount([0; 32]));
+    let args = ic_ledger_types::AccountBalanceArgs { account };
+    
+    // Call the ledger canister to get ICP balance
+    let icp_balance: Result<(Tokens,), _> = ic_cdk::call(
+        MAINNET_LEDGER_CANISTER_ID,
+        "account_balance",
+        (args,)
+    ).await;
+
+    match icp_balance {
+        Ok((tokens,)) => e8s_to_icp(tokens.e8s()),
+        Err(err) => ic_cdk::trap(&format!("Failed to get ICP balance: {:?}", err)),
+    }
 }
