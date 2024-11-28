@@ -3,9 +3,16 @@ type BurnRequest = record { amount_lbry : nat64; account_name : text };
 type BurnResult = record { result : Result; account_name : text };
 type Result = variant { Ok : text; Err : text };
 type SwapRequest = record { amount_icp : nat64; account_name : text };
-type TestAccounts = record { bob : text; alice : text; charlie : text };
+type TestAccounts = record {
+  bob : text;
+  admin : text;
+  alice : text;
+  charlie : text;
+};
 service : {
+  burn_lbry : (nat64, opt blob) -> (Result);
   check_balances : (vec text) -> (vec BalanceResult);
+  check_lbry_allowance : (opt blob) -> (Result);
   check_swap_canister_balance : () -> (float64);
   get_test_accounts : () -> (TestAccounts) query;
   test_burn_batch : (vec BurnRequest) -> (vec BurnResult);

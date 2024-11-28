@@ -51,6 +51,12 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
             e8s = 8_681_981_000_000_000 : nat64;  
           };  
         };
+        record {
+          \"7ae46f4683825e60e72a330cbf750fa4626ebab39fdef11780b8eb671e4dd3ea\";
+          record {
+            e8s = 1_000_000_000 : nat64;
+          };
+        };
         record {  
           \"f7520954c68e2b1f4ea36b185ffaf28f81bfea9635e869857cb046db9051493d\";  
           record {  

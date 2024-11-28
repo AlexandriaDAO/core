@@ -1,3 +1,4 @@
+use crate::tests_principal;
 use candid::Principal;
 use ic_cdk::api::call::CallResult;
 use ic_cdk::update;
@@ -48,101 +49,32 @@ pub async fn test_burn_batch(requests: Vec<BurnRequest>) -> Vec<BurnResult> {
 
 async fn test_burn_single(account_name: String, amount_lbry: u64) -> Result<String, String> {
     let owner_id = ic_cdk::api::id();
-    ic_cdk::println!("Starting test_burn with owner ID: {} ({:?})", owner_id, owner_id.as_slice());
     
-    // Check swap canister balance first
-    let swap_balance: f64 = super::balances::check_swap_canister_balance().await;
-    ic_cdk::println!("Current swap canister balance: {} ICP", swap_balance);
-    
-    ic_cdk::println!("Testing burn for account: {}, amount: {} LBRY", account_name, amount_lbry);
-    
+    // Basic validation
     if amount_lbry < 1 {
         return Err("Minimum amount is 1 LBRY".to_string());
     }
     
-    // Approve with e8s amount
-    let approve_result = match approve_lbry_transfer(account_name.clone(), amount_lbry).await {
-        Ok(result) => result,
-        Err(e) => return Err(format!("LBRY approval failed: {:?}", e)),
-    };
-    ic_cdk::println!("LBRY approval successful! Block index: {}", approve_result);
-    
-    // Add a delay to ensure approval is processed
-    ic_cdk::println!("Waiting for approval to be processed...");
-    let _ = ic_cdk::api::call::call_raw(
-        Principal::from_text("aaaaa-aa").unwrap(),
-        "raw_rand",
-        &[],
-        MIN_DELAY_NS,
-    ).await;
-
-    // Add allowance verification after the delay
-    let allowance = match verify_allowance(account_name.clone(), amount_lbry).await {
-        Ok(allowance) => allowance,
-        Err(e) => return Err(format!("Failed to verify allowance: {:?}", e)),
-    };
-    
-    ic_cdk::println!("Current LBRY allowance: {}", allowance);
-    
-    if allowance < Nat::from(amount_lbry) {
-        return Err(format!("Insufficient allowance. Required: {}, Current: {}", amount_lbry, allowance));
-    }
-
-    // Call burn function on the swap canister
-    let swap_canister_id = crate::icp_swap_principal();
+    // Get test subaccount (needed to simulate different users)
     let subaccount = get_test_subaccount(account_name.clone())
         .map_err(|e| format!("Failed to get test subaccount: {:?}", e))?;
 
-    ic_cdk::println!("Subaccount for burn: {:?}", subaccount);
+    // Approve LBRY transfer (needed because we're simulating a user)
+    let amount_lbry_e8s = amount_lbry * E8S_PER_ICP;
+    let _ = approve_lbry_transfer(account_name.clone(), amount_lbry_e8s).await
+        .map_err(|e| format!("Approval failed: {:?}", e))?;
 
-    let swap_canister_id = crate::icp_swap_principal();
+    // Verify the allowance was set correctly
+    let allowance = verify_allowance(account_name.clone(), amount_lbry_e8s).await
+        .map_err(|e| format!("Failed to verify allowance: {:?}", e))?;
     
-    // Get current LBRY ratio and calculate expected ICP amount
-    let ratio_result: Result<(u64,), _> = ic_cdk::call(
-        swap_canister_id,
-        "get_current_LBRY_ratio",
-        (),
-    ).await;
-    
-    if let Ok((ratio,)) = ratio_result {
-        ic_cdk::println!("Current LBRY ratio: {} cents", ratio);
-        let expected_icp = (amount_lbry as f64 * 100_000_000.0) / (ratio as f64 * 2.0);
-        ic_cdk::println!("Expected ICP needed: {} ICP", expected_icp / 100_000_000.0);
+    if allowance != Nat::from(amount_lbry_e8s + LBRY_FEE) {
+        return Err(format!("Allowance verification failed. Expected: {}, Got: {}", 
+            amount_lbry_e8s + LBRY_FEE, allowance));
     }
 
-    let verify_args = AllowanceArgs {
-        account: Account {
-            owner: owner_id,
-            subaccount: Some(subaccount),
-        },
-        spender: Account {
-            owner: swap_canister_id,
-            subaccount: None,
-        },
-    };
-
-    // Double check allowance right before burn
-    let final_allowance: Result<(AllowanceResponse,), _> = ic_cdk::call(
-        crate::lbry_principal(),
-        "icrc2_allowance",
-        (verify_args,),
-    ).await;
-
-    match &final_allowance {
-        Ok((response,)) => {
-            ic_cdk::println!("Final allowance check before burn:");
-            ic_cdk::println!("  Allowance: {}", response.allowance);
-            ic_cdk::println!("  Expires at: {:?}", response.expires_at);
-        },
-        Err(e) => ic_cdk::println!("Failed to check final allowance: {:?}", e),
-    };
-
-    ic_cdk::println!("Burn parameters:");
-    ic_cdk::println!("Amount: {}", amount_lbry);
-    ic_cdk::println!("Owner: {}", owner_id);
-    ic_cdk::println!("Subaccount: {:?}", subaccount);
-    ic_cdk::println!("Swap canister: {}", swap_canister_id);
-
+    // Call burn function
+    let swap_canister_id = crate::icp_swap_principal();
     let burn_result: Result<(Result<String, String>,), _> = ic_cdk::call(
         swap_canister_id,
         "burn_LBRY",
@@ -158,31 +90,27 @@ async fn test_burn_single(account_name: String, amount_lbry: u64) -> Result<Stri
 
 async fn approve_lbry_transfer(account_name: String, amount_e8s: u64) -> CallResult<Nat> {
     let swap_canister_id = crate::icp_swap_principal();
-    let owner_id = ic_cdk::api::id();
-    
-    // Add buffer to approval amount for fees (similar to ICP swap)
-    let approve_amount = amount_e8s + LBRY_FEE * 2;
-    
     let subaccount = get_test_subaccount(account_name.clone())
         .map_err(|e| (e, "Failed to get test subaccount".to_string()))?;
+    
+    // Increase the buffer for fees
+    let approve_amount = amount_e8s + LBRY_FEE;
     
     let approve_args = ApproveArgs {
         spender: Account {
             owner: swap_canister_id,
-            subaccount: None,
+            subaccount: None  // Match frontend: no spender subaccount
         },
         amount: Nat::from(approve_amount),
-        fee: Some(Nat::from(LBRY_FEE)), // Add fee parameter
+        fee: Some(Nat::from(LBRY_FEE)),
         memo: None,
-        from_subaccount: Some(subaccount),
-        created_at_time: None,
-        expected_allowance: None,
-        expires_at: None,
+        from_subaccount: Some(subaccount),  // We need this for test accounts
+        created_at_time: None,  // Match frontend: no created_at_time
+        expected_allowance: None,  // Match frontend: no expected_allowance
+        expires_at: None,  // Match frontend: no expires_at
     };
 
-    ic_cdk::println!("Approving from canister principal: {}", ic_cdk::api::id());
-    ic_cdk::println!("Approving {} e8s for spender (raw principal): {:?}", amount_e8s, swap_canister_id.as_slice());
-    ic_cdk::println!("Approving {} e8s for spender (text format): {}", amount_e8s, swap_canister_id.to_text());
+    ic_cdk::println!("Approving {} e8s for spender: {}", approve_amount, swap_canister_id);
     ic_cdk::println!("From subaccount: {:?}", subaccount);
     ic_cdk::println!("Full approve args: {:?}", approve_args);
 
@@ -194,11 +122,11 @@ async fn approve_lbry_transfer(account_name: String, amount_e8s: u64) -> CallRes
 
     match approve_result {
         Ok((Ok(block_index),)) => {
-            ic_cdk::println!("Approval successful with block index: {}", block_index);
+            ic_cdk::println!("Approval successful! Block index: {}", block_index);
             Ok(block_index)
         },
         Ok((Err(e),)) => {
-            ic_cdk::println!("Approval returned error: {:?}", e);
+            ic_cdk::println!("Approval failed with error: {:?}", e);
             Err((ic_cdk::api::call::RejectionCode::Unknown, format!("{:?}", e)))
         },
         Err(e) => {

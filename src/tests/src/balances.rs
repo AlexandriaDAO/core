@@ -18,6 +18,7 @@ fn get_test_subaccount(index: u8) -> ic_ledger_types::Subaccount {
 
 #[derive(CandidType, Serialize, Deserialize)]
 pub struct TestAccounts {
+    pub admin: String,
     pub alice: String,
     pub bob: String,
     pub charlie: String,
@@ -29,11 +30,13 @@ pub fn get_test_accounts() -> TestAccounts {
     let canister_id = id();
     
     // Create account IDs using different subaccounts
+    let admin_account = ic_ledger_types::AccountIdentifier::new(&canister_id, &get_test_subaccount(0));
     let alice_account = ic_ledger_types::AccountIdentifier::new(&canister_id, &get_test_subaccount(1));
     let bob_account = ic_ledger_types::AccountIdentifier::new(&canister_id, &get_test_subaccount(2));
     let charlie_account = ic_ledger_types::AccountIdentifier::new(&canister_id, &get_test_subaccount(3));
     
     TestAccounts {
+        admin: admin_account.to_string(),
         alice: alice_account.to_string(),
         bob: bob_account.to_string(),
         charlie: charlie_account.to_string(),
@@ -75,6 +78,7 @@ pub async fn check_balances(account_names: Vec<String>) -> Vec<BalanceResult> {
     
     for name in account_names {
         let account_str = match name.to_lowercase().as_str() {
+            "admin" => test_accounts.admin.clone(),
             "alice" => test_accounts.alice.clone(),
             "bob" => test_accounts.bob.clone(),
             "charlie" => test_accounts.charlie.clone(),
@@ -87,6 +91,7 @@ pub async fn check_balances(account_names: Vec<String>) -> Vec<BalanceResult> {
         
         // Get the subaccount for ICRC1 tokens
         let subaccount = match name.to_lowercase().as_str() {
+            "admin" => get_test_subaccount(0),
             "alice" => get_test_subaccount(1),
             "bob" => get_test_subaccount(2),
             "charlie" => get_test_subaccount(3),

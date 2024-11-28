@@ -208,6 +208,7 @@ async fn verify_allowance(account_name: String, amount_e8s: u64) -> CallResult<N
 fn get_test_subaccount(account_name: String) -> Result<[u8; 32], ic_cdk::api::call::RejectionCode> {
     let mut subaccount = [0u8; 32];
     match account_name.to_lowercase().as_str() {
+        "admin" => subaccount[0] = 0,
         "alice" => subaccount[0] = 1,
         "bob" => subaccount[0] = 2,
         "charlie" => subaccount[0] = 3,

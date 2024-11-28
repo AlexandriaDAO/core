@@ -4,6 +4,7 @@ pub const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
 pub const ALEX_CANISTER_ID: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";
 pub const ICP_SWAP: &str = "54fqz-5iaaa-aaaap-qkmqa-cai";
 pub const TOKENOMICS: &str = "5abki-kiaaa-aaaap-qkmsa-cai";
+pub const TESTS: &str = "yn33w-uaaaa-aaaap-qpk5q-cai";
 
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
@@ -25,6 +26,10 @@ pub fn tokenomics_principal() -> Principal {
     get_principal(TOKENOMICS)
 }
 
+pub fn tests_principal() -> Principal {
+    get_principal(TESTS)
+}
+
 
 mod balances;
 pub use balances::*;
@@ -34,6 +39,9 @@ pub use swap::*;
 
 mod burn;
 pub use burn::*;
+
+mod burn_lbry;
+pub use burn_lbry::*;
 
 
 ic_cdk::export_candid!();
