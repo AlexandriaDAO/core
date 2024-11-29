@@ -40,9 +40,6 @@ pub use swap::*;
 mod burn;
 pub use burn::*;
 
-mod burn_lbry;
-pub use burn_lbry::*;
-
 
 ic_cdk::export_candid!();
 

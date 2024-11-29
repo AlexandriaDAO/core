@@ -11,7 +11,7 @@ type RejectionCode = variant {
 };
 type Result = variant { Ok : nat64; Err : text };
 type Result_1 = variant {
-  Ok : record { principal; principal };
+  Ok : record { record { principal; blob }; record { principal; blob } };
   Err : record { RejectionCode; text };
 };
 type Result_2 = variant { Ok : text; Err : text };
@@ -34,6 +34,6 @@ service : {
   get_max_stats : () -> (nat64, nat64) query;
   get_total_LBRY_burn : () -> (nat64) query;
   get_two_random_users : () -> (Result_1) query;
-  mint_ALEX : (nat64, principal) -> (Result_2);
+  mint_ALEX : (nat64, principal, opt blob) -> (Result_2);
   your_principal : () -> (Result_2) query;
 }

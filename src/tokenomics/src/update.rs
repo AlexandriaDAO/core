@@ -8,11 +8,13 @@ use crate::{
     get_total_LBRY_burn, get_two_random_users, update_to_current_threshold,
 };
 use candid::Principal;
+use ic_ledger_types::Subaccount;
 use icrc_ledger_types::icrc1::transfer::{BlockIndex, TransferArg, TransferError};
+use icrc_ledger_types::icrc1::account::Account;
 
 #[ic_cdk::update(guard = "is_allowed")]
-pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<String, String> {
-    let random_users: (Principal, Principal);
+pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal, to_subaccount: Option<Subaccount>) -> Result<String, String> {
+    let mut random_users: (Principal, Principal);
     let mut minted_alex: u64 = 0;
     let mut phase_mint_alex: u64 = 0;
     let mut total_burned_lbry: u64 = get_total_LBRY_burn();
@@ -114,51 +116,74 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
         .ok_or("Arithmetic error occurred when calculating alex_per_recipient")?;
     let fetched_random_principals = get_two_random_users().await;
     match fetched_random_principals {
-        Ok((address1, address2)) => {
-            random_users = (address1, address2);
-            ic_cdk::println!("Address1 :{} Address2 :{}", address1, address2);
+        Ok(((principal1, subaccount1), (principal2, subaccount2))) => {
+            random_users = (principal1, principal2);
+
+            let subaccount1_arr: Option<[u8; 32]> = if subaccount1.len() == 32 {
+                let mut arr = [0u8; 32];
+                arr.copy_from_slice(&subaccount1);
+                Some(arr)
+            } else {
+                None
+            };
+
+            let subaccount2_arr: Option<[u8; 32]> = if subaccount2.len() == 32 {
+                let mut arr = [0u8; 32];
+                arr.copy_from_slice(&subaccount2);
+                Some(arr)
+            } else {
+                None
+            };
+
+            ic_cdk::println!(
+                "Address1: {} (subaccount: {:?})\nAddress2: {} (subaccount: {:?})", 
+                principal1, 
+                subaccount1_arr, 
+                principal2, 
+                subaccount2_arr
+            );
+
+            match mint_ALEX_internal(alex_per_recipient, actual_caller, to_subaccount.map(|s| s.0)).await {
+                Ok(_) => {
+                    minted_alex = minted_alex
+                        .checked_add(alex_per_recipient)
+                        .ok_or("Arithmetic overflow occurred in minted_alex")?;
+                    ic_cdk::println!("Successful mint to caller");
+                }
+                Err(e) => {
+                    return Err(format!("Something went wrong while minting to caller: {}", e));
+                }
+            }
+
+            match mint_ALEX_internal(alex_per_recipient, random_users.0, subaccount1_arr).await {
+                Ok(_) => {
+                    minted_alex = minted_alex
+                        .checked_add(alex_per_recipient)
+                        .ok_or("Arithmetic overflow occurred in minted_alex")?;
+                    ic_cdk::println!("Successful mint to random user 1");
+                }
+                Err(e) => update_log(&format!(
+                    "Something went wrong while minting to random user 1. Principal: {}",
+                    random_users.0
+                )),
+            }
+
+            match mint_ALEX_internal(alex_per_recipient, random_users.1, subaccount2_arr).await {
+                Ok(_) => {
+                    minted_alex = minted_alex
+                        .checked_add(alex_per_recipient)
+                        .ok_or("Arithmetic overflow occurred in minted_alex")?;
+                    ic_cdk::println!("Successful mint to random user 2");
+                }
+                Err(e) => update_log(&format!(
+                    "Something went wrong while minting to random user 2. Principal: {}",
+                    random_users.1
+                )),
+            }
         }
         Err(_) => {
-            return Err("Filed to fetch random users".to_string());
+            return Err("Failed to fetch random users".to_string());
         }
-    }
-    //Minting
-    match mint_ALEX_internal(alex_per_recipient, actual_caller).await {
-        Ok(_) => {
-            minted_alex = minted_alex
-                .checked_add(alex_per_recipient)
-                .ok_or("Arithmetic overflow occurred in minted_alex")?;
-            ic_cdk::println!("Successful");
-        }
-
-        Err(_) => {
-            return Err("Something went wrong".to_string());
-        }
-    } //mint to caller
-
-    match mint_ALEX_internal(alex_per_recipient, random_users.0).await {
-        Ok(_) => {
-            minted_alex = minted_alex
-                .checked_add(alex_per_recipient)
-                .ok_or("Arithmetic overflow occurred in minted_alex")?;
-            ic_cdk::println!("Successful mint to user");
-        }
-        Err(_) => update_log(&format!(
-            "Something went wrong while minting to random user 1. Pubkey: {}",
-            random_users.1
-        )), //mint 1 unit to random user 1
-    }
-    match mint_ALEX_internal(alex_per_recipient, random_users.1).await {
-        Ok(_) => {
-            minted_alex = minted_alex
-                .checked_add(alex_per_recipient)
-                .ok_or("Arithmetic overflow occurred in minted_alex")?;
-            ic_cdk::println!("Successful mint to user");
-        }
-        Err(_) => update_log(&format!(
-            "Something went wrong while minting to random user 2. Pubkey: {}",
-            random_users.1
-        )), //mint 1 unit to random user 2
     }
 
     update_to_current_threshold(current_threshold_index)?;
@@ -168,12 +193,15 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal) -> Result<Strin
     Ok("Minted ALEX ".to_string() + &minted_alex.to_string())
 }
 
-async fn mint_ALEX_internal(minted_alex: u64, destinaion: Principal) -> Result<BlockIndex, String> {
+async fn mint_ALEX_internal(minted_alex: u64, destination: Principal, to_subaccount: Option<[u8; 32]>) -> Result<BlockIndex, String> {
     let transfer_args: TransferArg = TransferArg {
         amount: minted_alex.into(),
         from_subaccount: None,
         fee: None,
-        to: destinaion.into(),
+        to: Account {
+            owner: destination,
+            subaccount: to_subaccount,
+        },
         created_at_time: None,
         memo: None,
     };
