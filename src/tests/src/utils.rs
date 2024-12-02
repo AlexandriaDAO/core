@@ -1,9 +1,10 @@
-use candid::Principal;
 use ic_cdk::api::call::RejectionCode;
 
 pub const E8S_PER_ICP: u64 = 100_000_000;
 pub const ICP_FEE: u64 = 10_000;
 pub const LBRY_FEE: u64 = 4_000_000;
+pub const E8S_PER_ALEX: u64 = 1_000_000;
+pub const ALEX_FEE: u64 = 10_000;
 pub const MIN_DELAY_NS: u64 = 2_000_000_000; // 2 seconds in nanoseconds
 
 /// Gets a test subaccount based on a predefined account name

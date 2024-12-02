@@ -67,11 +67,9 @@ fn post_init() {
         // Deploy and initialize ICRC7
         match deploy_canister(ICRC7_CANISTER_ID, ICRC7_WASM).await {
             DeployResult::Ok => {
-                ic_cdk::println!("ICRC7 deployed successfully");
                 if let Err(e) = call_initialize_nfts(ICRC7_CANISTER_ID).await {
                     ic_cdk::println!("Failed to initialize ICRC7 NFTs: {}", e);
                 }
-                ic_cdk::println!("ICRC7 NFTs initialized successfully");
             },
             DeployResult::Err(e) => ic_cdk::println!("Failed to deploy ICRC7: {}", e),
         }
@@ -79,11 +77,8 @@ fn post_init() {
         // Deploy and initialize ICRC7_SCION independently
         match deploy_canister(ICRC7_SCION_CANISTER_ID, ICRC7_SCION_WASM).await {
             DeployResult::Ok => {
-                ic_cdk::println!("ICRC7_SCION deployed successfully");
                 if let Err(e) = call_initialize_nfts(ICRC7_SCION_CANISTER_ID).await {
                     ic_cdk::println!("Failed to initialize ICRC7_SCION NFTs: {}", e);
-                } else {
-                    ic_cdk::println!("ICRC7_SCION NFTs initialized successfully");
                 }
             },
             DeployResult::Err(e) => ic_cdk::println!("Failed to deploy ICRC7_SCION: {}", e),

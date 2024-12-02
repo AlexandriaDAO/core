@@ -1,14 +1,11 @@
-use candid::Principal;
 use ic_cdk::update;
 use icrc_ledger_types::icrc2::approve::{ApproveArgs, ApproveError};
-use icrc_ledger_types::icrc2::allowance::{AllowanceArgs};
 use icrc_ledger_types::icrc1::account::Account;
 use candid::Nat;
 use crate::utils::{get_test_subaccount, E8S_PER_ICP, LBRY_FEE};
 
 #[update]
 pub async fn burn(amount: u64, balance_name: String) -> Result<String, String> {
-    let owner_id = ic_cdk::api::id();
     let swap_canister_id = crate::icp_swap_principal();
     
     // Basic validation
@@ -37,10 +34,6 @@ pub async fn burn(amount: u64, balance_name: String) -> Result<String, String> {
         expected_allowance: None,
         expires_at: None,
     };
-
-    ic_cdk::println!("Approving {} e8s for spender: {}", approve_args.amount, swap_canister_id);
-    ic_cdk::println!("From balance: {}", balance_name);
-    ic_cdk::println!("Full approve args: {:?}", approve_args);
 
     // Call approve on LBRY ledger
     let approve_result: Result<(Result<Nat, ApproveError>,), _> = ic_cdk::call(

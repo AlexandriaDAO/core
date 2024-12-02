@@ -230,7 +230,6 @@ pub async fn get_two_random_users() -> CallResult<((Principal, Vec<u8>), (Princi
         all_transfers[index2].clone().to.subaccount.unwrap_or(vec![0; 32])
     );
 
-    ic_cdk::println!("random index are {},{}", index1, index2);
     // Return the two selected addresses with their subaccounts
     Ok((address1, address2))
 }

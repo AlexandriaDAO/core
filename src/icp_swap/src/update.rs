@@ -74,13 +74,9 @@ pub async fn swap(amount_icp: u64, from_subaccount: Option<[u8; 32]>) -> Result<
         .checked_mul(icp_rate_in_cents)
         .ok_or("Arithmetic overflow occurred in lbry_amount.")?;
     match mint_LBRY(lbry_amount, from_subaccount).await {
-        Ok(block_index) => {
-            // Mint was successful
-            ic_cdk::println!("Successful, block index: {:?}", block_index);
-        }
-        Err(e) => {
+        Ok(_) => {}
+        Err(_e) => {
             // If there was an error, log it in archive trx and return an error result
-            ic_cdk::println!("Mint Lbry failed: {:?}", e);
             let amount_icp_after_fee = amount_icp
                 .checked_sub(ICP_TRANSFER_FEE)
                 .ok_or("Arithmetic underflow in amount_icp_after_fee.")?;
@@ -149,15 +145,10 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
         .ok_or("Arithmetic overflow occurred in amount_lbry_e8s.")?;
     burn_token(amount_lbry_e8s, from_subaccount).await?;
 
-    ic_cdk::println!("Sending {:?} ICP to caller", amount_icp_e8s);
     // Is this the problem since from_subaccount is alice/bob/etc.?
     match send_icp(caller, amount_icp_e8s, None).await {
-        Ok(block_index) => {
-            // Burn was successful
-            ic_cdk::println!("Successful, block index: {:?}", block_index);
-        }
-        Err(e) => {
-            ic_cdk::println!("Send icp failed: {:?}", e);
+        Ok(_) => {}
+        Err(_e) => {
             let amount_icp_after_fee = amount_icp_e8s
                 .checked_mul(2)
                 .ok_or("Arithmetic overflow occurred in amount_icp_after_fee")?
@@ -172,12 +163,8 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
     let limit_result = within_max_limit(amount_lbry).await;
     if limit_result > 0 {
         match mint_ALEX(limit_result, caller, from_subaccount).await {
-            Ok(result) => {
-                // Mint ALEX was successful
-                ic_cdk::println!("Successful {}", result);
-            }
+            Ok(_) => {}
             Err(e) => {
-                ic_cdk::println!("Send icp failed: {:?}", e);
                 let amount_icp_after_fee = amount_icp_e8s
                     .checked_sub(ICP_TRANSFER_FEE)
                     .ok_or("Arithmetic underflow in amount_icp_after_fee.")?;
@@ -598,7 +585,6 @@ pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
     match call_result {
         Ok(response_bytes) => match candid::decode_one::<XRCResponse>(&response_bytes) {
             Ok(response) => {
-                println!("Decoded response: {:?}", response);
                 match response {
                     XRCResponse::Ok(exchange_rate) => {
                         let divisor: u64 =
@@ -618,18 +604,15 @@ pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
                         Ok(price_in_cents)
                     }
                     XRCResponse::Err(err) => {
-                        println!("Error in XRC response: {:?}", err);
                         Err("Error in XRC response".to_string())
                     }
                 }
             }
             Err(_e) => {
-                // println!("Decoding error: {:?}", e);
                 Err("Error in decoding XRC response".to_string())
             }
         },
         Err((_rejection_code, msg)) => {
-            ic_cdk::println!("Call rejected: {}", msg);
             Err("Error call rejected".to_string())
         }
     }
@@ -749,8 +732,6 @@ async fn deposit_token(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result
 }
 
 async fn burn_token(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<BlockIndex, String> {
-    ic_cdk::println!("Burning {:?} LBRY tokens", amount);
-    
     let canister_id: Principal = ic_cdk::api::id();
 
     let big_int_amount: BigUint = BigUint::from(amount);
@@ -774,9 +755,6 @@ async fn burn_token(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<Bl
         // a timestamp indicating when the transaction was created by the caller; if it is not specified by the caller then this is set to the current ICP time
         created_at_time: None,
     };
-
-    ic_cdk::println!("Transfer from args: {:?}", transfer_from_args);
-    ic_cdk::println!("Burning LBRY tokens second time got up to here.");
 
     // 1. Asynchronously call another canister function using `ic_cdk::call`.
     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(

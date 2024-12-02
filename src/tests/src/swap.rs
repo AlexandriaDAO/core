@@ -40,10 +40,6 @@ pub async fn test_swap_batch(requests: Vec<SwapRequest>) -> Vec<SwapResult> {
 
 async fn test_swap_single(account_name: &str, amount_icp: u64) -> Result<String, String> {
     let owner_id = ic_cdk::api::id();
-    ic_cdk::println!("Starting test_swap with owner ID: {} ({:?})", owner_id, owner_id.as_slice());
-    
-    ic_cdk::println!("Testing swap for account: {}, amount: {} ICP", account_name, amount_icp);
-    
     let amount_e8s = amount_icp * E8S_PER_ICP;
     
     if amount_e8s < 10_000_000 {
@@ -55,10 +51,8 @@ async fn test_swap_single(account_name: &str, amount_icp: u64) -> Result<String,
         Ok(result) => result,
         Err(e) => return Err(format!("Approval failed: {:?}", e)),
     };
-    ic_cdk::println!("ICP approval successful! Block index: {}", approve_result);
-    
+
     // Add a delay to ensure approval is processed
-    ic_cdk::println!("Waiting for approval to be processed...");
     let _ = ic_cdk::api::call::call_raw(
         Principal::from_text("aaaaa-aa").unwrap(),
         "raw_rand",
@@ -72,8 +66,6 @@ async fn test_swap_single(account_name: &str, amount_icp: u64) -> Result<String,
         Err(e) => return Err(format!("Failed to verify allowance: {:?}", e)),
     };
     
-    ic_cdk::println!("Current allowance: {}", allowance);
-    
     if allowance < Nat::from(amount_e8s) {
         return Err(format!("Insufficient allowance. Required: {}, Current: {}", amount_e8s, allowance));
     }
@@ -82,11 +74,6 @@ async fn test_swap_single(account_name: &str, amount_icp: u64) -> Result<String,
     let swap_canister_id = crate::icp_swap_principal();
     let subaccount = get_test_subaccount(account_name)
         .map_err(|e| format!("Failed to get test subaccount: {:?}", e))?;
-
-    ic_cdk::println!("Attempting swap with canister ID: {}", swap_canister_id);
-    ic_cdk::println!("Owner ID for transfer: {}", owner_id);
-    ic_cdk::println!("Owner ID raw bytes: {:?}", owner_id.as_slice());
-    ic_cdk::println!("Subaccount for transfer: {:?}", subaccount);
 
     let swap_result: Result<(Result<String, String>,), _> = ic_cdk::call(
         swap_canister_id,
@@ -104,10 +91,6 @@ async fn test_swap_single(account_name: &str, amount_icp: u64) -> Result<String,
 async fn approve_icp_transfer(account_name: &str, amount_e8s: u64) -> CallResult<Nat> {
     let swap_canister_id = crate::icp_swap_principal();
     let owner_id = ic_cdk::api::id();
-    
-    // Log the principals we're using
-    ic_cdk::println!("TEST CANISTER ID (owner): {} ({:?})", owner_id, owner_id.as_slice());
-    ic_cdk::println!("SWAP CANISTER ID (spender): {} ({:?})", swap_canister_id, swap_canister_id.as_slice());
     
     // Add buffer to approval amount for fees (similar to frontend)
     let approve_amount = amount_e8s + ICP_FEE * 2;
@@ -129,12 +112,6 @@ async fn approve_icp_transfer(account_name: &str, amount_e8s: u64) -> CallResult
         expires_at: None,
     };
 
-    ic_cdk::println!("Approving from canister principal: {}", ic_cdk::api::id());
-    ic_cdk::println!("Approving {} e8s for spender (raw principal): {:?}", approve_amount, swap_canister_id.as_slice());
-    ic_cdk::println!("Approving {} e8s for spender (text format): {}", approve_amount, swap_canister_id.to_text());
-    ic_cdk::println!("From subaccount: {:?}", subaccount);
-    ic_cdk::println!("Full approve args: {:?}", approve_args);
-
     let approve_result: Result<(Result<Nat, ApproveError>,), _> = ic_cdk::call(
         MAINNET_LEDGER_CANISTER_ID,
         "icrc2_approve",
@@ -143,7 +120,6 @@ async fn approve_icp_transfer(account_name: &str, amount_e8s: u64) -> CallResult
 
     match approve_result {
         Ok((Ok(block_index),)) => {
-            ic_cdk::println!("Approval successful with block index: {}", block_index);
             Ok(block_index)
         },
         Ok((Err(e),)) => {
@@ -174,9 +150,6 @@ async fn verify_allowance(account_name: &str, amount_e8s: u64) -> CallResult<Nat
         },
     };
 
-    ic_cdk::println!("Checking allowance with args: {:?}", args);
-    ic_cdk::println!("Required amount: {} e8s", amount_e8s);
-
     #[derive(CandidType, Deserialize, Debug)]
     struct AllowanceResponse {
         allowance: Nat,
@@ -191,13 +164,8 @@ async fn verify_allowance(account_name: &str, amount_e8s: u64) -> CallResult<Nat
 
     match allowance_result {
         Ok((allowance,)) => {
-            ic_cdk::println!("Allowance check successful");
-            ic_cdk::println!("Current allowance: {}", allowance.allowance);
-            ic_cdk::println!("Required amount: {} e8s", amount_e8s);
-            ic_cdk::println!("Expires at: {:?}", allowance.expires_at);
             
             if allowance.allowance < Nat::from(amount_e8s) {
-                ic_cdk::println!("Insufficient allowance");
                 return Err((
                     ic_cdk::api::call::RejectionCode::Unknown, 
                     format!("Insufficient allowance. Required: {}, Current: {}", amount_e8s, allowance.allowance)

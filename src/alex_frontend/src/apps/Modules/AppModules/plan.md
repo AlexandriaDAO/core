@@ -1,6 +1,7 @@
 /*
 The Plan:
 
+So stakes now works, but the problem is the stable storage does not have respect for subaccounts, so I gotta add subaccounts to all the data structures.
 
 - get_two_random_users only gets the principal, not the subaccount.
 - Problem is if the transaction call fails, it goes right to adils wallet.

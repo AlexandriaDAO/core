@@ -69,8 +69,7 @@ pub async fn within_max_limit(burn_amount: u64) -> u64 {
                 return max_threshold - total_burned;
             }
         }
-        Err(e) => {
-            // ic_cdk::println!("Error: {}", e);
+        Err(_e) => {
             return 0;
         }
     }
