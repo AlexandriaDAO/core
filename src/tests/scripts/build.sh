@@ -142,3 +142,7 @@ candid-extractor target/wasm32-unknown-unknown/release/tests.wasm > src/tests/te
 dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
 dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
 dfx deploy tests --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
+
+
+
+

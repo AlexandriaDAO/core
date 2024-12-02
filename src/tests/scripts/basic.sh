@@ -54,3 +54,27 @@ echo "Token balance after swap:"
 # dfx canister call icp_swap icrc1_balance_of "(record {owner=principal \"$ALICE_PRINCIPAL\"; subaccount=null})"
 
 # Check alice's balance
+
+
+
+
+
+
+
+
+#!/bin/bash
+
+# Perform swap batch operations for admin
+dfx canister call token_canister test_swap_batch "(vec {record {amount_icp=1:nat64; account_name=\"admin\"}})"
+
+# Perform swap batch operations for alice
+dfx canister call token_canister test_swap_batch "(vec {record {amount_icp=1:nat64; account_name=\"alice\"}})"
+
+# Burn tokens for admin
+dfx canister call token_canister burn "(50:nat64, \"admin\")"
+
+# Burn tokens for alice
+dfx canister call token_canister burn "(25:nat64, \"alice\")"
+
+# Check balances for multiple accounts
+dfx canister call token_canister check_balances "(vec {\"admin\"; \"alice\"; \"bob\"; \"charlie\"})"

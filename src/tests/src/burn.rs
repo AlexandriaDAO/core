@@ -1,15 +1,13 @@
 use candid::Principal;
 use ic_cdk::update;
-use icrc_ledger_types::icrc1::account::Account;
 use icrc_ledger_types::icrc2::approve::{ApproveArgs, ApproveError};
 use icrc_ledger_types::icrc2::allowance::{AllowanceArgs};
+use icrc_ledger_types::icrc1::account::Account;
 use candid::Nat;
-
-const E8S_PER_ICP: u64 = 100_000_000;
-const LBRY_FEE: u64 = 4_000_000;
+use crate::utils::{get_test_subaccount, E8S_PER_ICP, LBRY_FEE};
 
 #[update]
-pub async fn burn(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<String, String> {
+pub async fn burn(amount: u64, balance_name: String) -> Result<String, String> {
     let owner_id = ic_cdk::api::id();
     let swap_canister_id = crate::icp_swap_principal();
     
@@ -17,6 +15,10 @@ pub async fn burn(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<Stri
     if amount < 1 {
         return Err("Minimum amount is 1 LBRY".to_string());
     }
+
+    // Get subaccount from balance name
+    let from_subaccount = get_test_subaccount(&balance_name)
+        .map_err(|_| format!("Invalid balance name: {}. Must be one of: admin, alice, bob, charlie", balance_name))?;
 
     // Convert amount to e8s
     let amount_e8s = amount * E8S_PER_ICP;
@@ -30,14 +32,14 @@ pub async fn burn(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<Stri
         amount: Nat::from(amount_e8s + LBRY_FEE),
         fee: Some(Nat::from(LBRY_FEE)),
         memo: None,
-        from_subaccount,
+        from_subaccount: Some(from_subaccount),
         created_at_time: None,
         expected_allowance: None,
         expires_at: None,
     };
 
     ic_cdk::println!("Approving {} e8s for spender: {}", approve_args.amount, swap_canister_id);
-    ic_cdk::println!("From subaccount: {:?}", approve_args.from_subaccount);
+    ic_cdk::println!("From balance: {}", balance_name);
     ic_cdk::println!("Full approve args: {:?}", approve_args);
 
     // Call approve on LBRY ledger
@@ -53,7 +55,7 @@ pub async fn burn(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<Stri
             let burn_result: Result<(Result<String, String>,), _> = ic_cdk::call(
                 swap_canister_id,
                 "burn_LBRY",
-                (amount, from_subaccount),
+                (amount, Some(from_subaccount)),
             ).await;
 
             match burn_result {

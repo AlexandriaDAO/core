@@ -310,7 +310,7 @@ async fn mint_ALEX(lbry_amount: u64, caller: Principal, to_subaccount: Option<[u
 //stake //
 #[allow(non_snake_case)]
 #[update(guard = "not_anon")]
-async fn stake_ALEX(amount: u64) -> Result<String, String> {
+async fn stake_ALEX(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller)?;
     let mut alex_fee = ALEX_FEE.with(|fee| *fee.borrow());
@@ -328,7 +328,7 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
         .checked_sub(alex_fee)
         .ok_or("Arithmetic underflow occurred in post_fee_amount")?;
     // Proceed with transfer
-    deposit_token(post_fee_amount).await?;
+    deposit_token(post_fee_amount, from_subaccount).await?;
 
     let current_time = ic_cdk::api::time();
     STAKES.with(|stakes| -> Result<(), String> {
@@ -360,7 +360,7 @@ async fn stake_ALEX(amount: u64) -> Result<String, String> {
 
 #[allow(non_snake_case)]
 #[update(guard = "not_anon")]
-async fn un_stake_all_ALEX() -> Result<String, String> {
+async fn un_stake_all_ALEX(from_subaccount: Option<[u8; 32]>) -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller)?;
     let mut alex_fee = ALEX_FEE.with(|fee| *fee.borrow());
@@ -389,7 +389,7 @@ async fn un_stake_all_ALEX() -> Result<String, String> {
         .ok_or("Stake amount too low!")?;
 
     // Withdraw the token
-    withdraw_token(post_fee_amount).await?;
+    withdraw_token(post_fee_amount, from_subaccount).await?;
 
     // Update the stake amount
     let new_amount = current_stake
@@ -519,7 +519,7 @@ pub async fn distribute_reward() -> Result<String, String> {
 }
 
 #[update(guard = "not_anon")]
-async fn claim_icp_reward() -> Result<String, String> {
+async fn claim_icp_reward(from_subaccount: Option<[u8; 32]>) -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller)?;
     let caller_stake_reward: Option<Stake> = get_stake(caller);
@@ -542,7 +542,7 @@ async fn claim_icp_reward() -> Result<String, String> {
             if stake.reward_icp > total_icp_available {
                 return Err("Insufficient ICP Balance in canister".to_string());
             }
-            send_icp(caller, stake.reward_icp, None).await?;
+            send_icp(caller, stake.reward_icp, from_subaccount).await?;
             sub_to_unclaimed_amount(stake.reward_icp)?;
 
             STAKES.with(|stakes| {
@@ -636,7 +636,7 @@ pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
 }
 
 #[update(guard = "not_anon")]
-async fn redeem() -> Result<String, String> {
+async fn redeem(from_subaccount: Option<[u8; 32]>) -> Result<String, String> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller)?;
     let caller_archive_profile: Option<ArchiveBalance> = get_user_archive_balance(caller);
@@ -659,10 +659,10 @@ async fn redeem() -> Result<String, String> {
             if trx.icp > total_icp_available {
                 return Err("Insufficient ICP Balance in canister".to_string());
             }
-            send_icp(caller, trx.icp, None).await?;
+            send_icp(caller, trx.icp, from_subaccount).await?;
             sub_to_total_archived_balance(trx.icp)?;
 
-            // make  balance to 0
+            // make balance to 0
             ARCHIVED_TRANSACTION_LOG.with(|trxs| -> Result<(), String> {
                 let mut trxs = trxs.borrow_mut();
 
@@ -682,14 +682,11 @@ async fn redeem() -> Result<String, String> {
     }
 }
 
-async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
+async fn withdraw_token(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let canister_id: Principal = ic_cdk::api::id();
     let alex_fee = ALEX_FEE.with(|fee| *fee.borrow());
 
-    let mut caller_subaccount_bytes = [0u8; 32];
-    let caller_slice: &[u8] = caller.as_slice();
-    caller_subaccount_bytes[..caller_slice.len()].copy_from_slice(caller_slice);
     let amount: Nat = Nat::from(amount);
     if amount <= Nat::from(0 as u8) {
         return Err("Amount is zero".to_string());
@@ -700,7 +697,10 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
         amount,
         spender_subaccount: None,
         fee: Some(Nat::from(alex_fee)),
-        to: Account::from(ic_cdk::caller()),
+        to: Account {
+            owner: caller,
+            subaccount: from_subaccount,
+        },
         created_at_time: None,
     };
 
@@ -715,21 +715,20 @@ async fn withdraw_token(amount: u64) -> Result<BlockIndex, String> {
     .map_err(|e| format!("ledger transfer error {:?}", e))
 }
 
-async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
+async fn deposit_token(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let canister_id: Principal = ic_cdk::api::id();
     let alex_fee = ALEX_FEE.with(|fee| *fee.borrow());
-
-    let mut caller_subaccount_bytes = [0u8; 32];
-    let caller_slice = caller.as_slice();
-    caller_subaccount_bytes[..caller_slice.len()].copy_from_slice(caller_slice);
 
     let amount: Nat = Nat::from(amount);
     if amount < Nat::from(0 as u8) {
         return Err("Amount is less than zero".to_string());
     }
     let transfer_from_args: TransferFromArgs = TransferFromArgs {
-        from: Account::from(ic_cdk::caller()),
+        from: Account {
+            owner: caller,
+            subaccount: from_subaccount,
+        },
         memo: None,
         amount,
         spender_subaccount: None,

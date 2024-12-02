@@ -9,7 +9,7 @@ type TestAccounts = record {
   charlie : text;
 };
 service : {
-  burn : (nat64, opt blob) -> (Result);
+  burn : (nat64, text) -> (Result);
   check_balances : (vec text) -> (vec BalanceResult);
   check_swap_canister_balance : () -> (float64);
   get_test_accounts : () -> (TestAccounts) query;
