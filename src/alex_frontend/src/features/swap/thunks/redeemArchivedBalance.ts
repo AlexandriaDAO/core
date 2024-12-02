@@ -10,7 +10,7 @@ const redeemArchivedBalance = createAsyncThunk<
 >("icp_swap/redeemArchivedBalance", async (_, { rejectWithValue }) => {
   try {
     const actor = await getActorSwap();
-    const result = await actor.redeem();
+    const result = await actor.redeem([]);
     if ("Ok" in result) return "success";
     if ("Err" in result) throw new Error(result.Err);
   } catch (error) {

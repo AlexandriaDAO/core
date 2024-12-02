@@ -19,6 +19,7 @@ import {
 	SearchFormContainer
 } from "./styles";
 import { ArrowUp } from "lucide-react";
+import ArweaveOwnerSelector from '@/apps/Modules/AppModules/search/selectors/ArweaveOwnerSelector';
 
 function Permasearch() {
 	useWipeOnUnmount();
@@ -45,6 +46,7 @@ function Permasearch() {
 				<Hint>
 					Save them as NFTs.
 				</Hint>
+				<ArweaveOwnerSelector />
 				<ControlsContainer $isOpen={isFiltersOpen}>
 					<FiltersButton 
 						onClick={toggleFilters}

@@ -107,58 +107,61 @@ const ContentTagsSelector: React.FC = () => {
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <label className="text-sm font-medium text-gray-700">
-          Content Tags:
-        </label>
-        <div className="flex items-center gap-2">
-          {showAllTags && searchState.contentCategory !== 'all' && (
+    <div className="flex-1">
+      <span className="block mb-2 text-lg font-medium font-['Syne'] text-foreground">
+        Select Tags
+      </span>
+      <div className="p-[14px] rounded-2xl border border-input bg-background">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-2">
+            {showAllTags && searchState.contentCategory !== 'all' && (
+              <button
+                onClick={() => setShowAllCategories(!showAllCategories)}
+                className="text-xs text-gray-600 hover:text-gray-900"
+              >
+                {showAllCategories ? "Show category" : "Show all"}
+              </button>
+            )}
             <button
-              onClick={() => setShowAllCategories(!showAllCategories)}
-              className="text-xs text-gray-600 hover:text-gray-900"
+              onClick={() => setShowAllTags(!showAllTags)}
+              className="inline-flex items-center justify-center p-1 rounded-full hover:bg-gray-100"
             >
-              {showAllCategories ? "Show category" : "Show all"}
+              <span className="text-gray-600 text-sm">
+                {showAllTags ? "−" : "+"} {!showAllTags && filteredContentTypes.length - visibleContentTypes.length > 0 && 
+                  `(${filteredContentTypes.length - visibleContentTypes.length})`}
+              </span>
             </button>
-          )}
-          <button
-            onClick={() => setShowAllTags(!showAllTags)}
-            className="inline-flex items-center justify-center p-1 rounded-full hover:bg-gray-100"
-          >
-            <span className="text-gray-600 text-sm">
-              {showAllTags ? "−" : "+"} {!showAllTags && filteredContentTypes.length - visibleContentTypes.length > 0 && 
-                `(${filteredContentTypes.length - visibleContentTypes.length})`}
-            </span>
-          </button>
+          </div>
         </div>
-      </div>
-      <div className="relative">
-        <ContentTypeToggleGroup
-          selectedTags={searchState.tags}
-          onTagToggle={handleTagToggle}
-          filteredTypes={visibleContentTypes}
-        />
-        {showAllTags && (
-          isAddingCustom ? (
-            <input
-              type="text"
-              value={customTag}
-              onChange={(e) => setCustomTag(e.target.value)}
-              onKeyDown={handleCustomTagAdd}
-              onBlur={() => setIsAddingCustom(false)}
-              placeholder="Type MIME type and press Enter"
-              className="mt-2 w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-              autoFocus
-            />
-          ) : (
-            <button
-              onClick={() => setIsAddingCustom(true)}
-              className="mt-2 inline-flex items-center px-3 py-1.5 text-sm rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300"
-            >
-              <span className="mr-1">+</span> Add custom type
-            </button>
-          )
-        )}
+
+        <div className="relative">
+          <ContentTypeToggleGroup
+            selectedTags={searchState.tags}
+            onTagToggle={handleTagToggle}
+            filteredTypes={visibleContentTypes}
+          />
+          {showAllTags && (
+            isAddingCustom ? (
+              <input
+                type="text"
+                value={customTag}
+                onChange={(e) => setCustomTag(e.target.value)}
+                onKeyDown={handleCustomTagAdd}
+                onBlur={() => setIsAddingCustom(false)}
+                placeholder="Type MIME type and press Enter"
+                className="mt-2 w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                autoFocus
+              />
+            ) : (
+              <button
+                onClick={() => setIsAddingCustom(true)}
+                className="mt-2 inline-flex items-center px-3 py-1.5 text-sm rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300"
+              >
+                <span className="mr-1">+</span> Add custom type
+              </button>
+            )
+          )}
+        </div>
       </div>
     </div>
   );
