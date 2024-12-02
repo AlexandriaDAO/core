@@ -138,12 +138,6 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
         .checked_sub(total_archived_bal)
         .ok_or("Arithmetic overflow occured in remaining_icp.")?;
 
-    ic_cdk::println!("Remaining ICP: {}", remaining_icp);
-    ic_cdk::println!("Amount ICP e8s: {}", amount_icp_e8s);
-    ic_cdk::println!("Total icp available: {}", total_icp_available);
-    ic_cdk::println!("Total archived bal: {}", total_archived_bal);
-    ic_cdk::println!("Total unclaimed icp: {}", total_unclaimed_icp);
-
     // For burns, we only need to ensure we have enough ICP to pay out
     // No need to reserve 50% since burning increases our ICP reserves
     if amount_icp_e8s > remaining_icp {
@@ -153,9 +147,11 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
     let amount_lbry_e8s = amount_lbry
         .checked_mul(100_000_000)
         .ok_or("Arithmetic overflow occurred in amount_lbry_e8s.")?;
-    burn_token(amount_lbry_e8s).await?;
+    burn_token(amount_lbry_e8s, from_subaccount).await?;
 
-    match send_icp(caller, amount_icp_e8s, from_subaccount.map(|bytes| Subaccount(bytes))).await {
+    ic_cdk::println!("Sending {:?} ICP to caller", amount_icp_e8s);
+    // Is this the problem since from_subaccount is alice/bob/etc.?
+    match send_icp(caller, amount_icp_e8s, None).await {
         Ok(block_index) => {
             // Burn was successful
             ic_cdk::println!("Successful, block index: {:?}", block_index);
@@ -175,7 +171,7 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
     // Alex mint 21M only
     let limit_result = within_max_limit(amount_lbry).await;
     if limit_result > 0 {
-        match mint_ALEX(limit_result, caller).await {
+        match mint_ALEX(limit_result, caller, from_subaccount).await {
             Ok(result) => {
                 // Mint ALEX was successful
                 ic_cdk::println!("Successful {}", result);
@@ -273,14 +269,16 @@ async fn deposit_icp_in_canister(amount: u64, from_subaccount: Option<[u8; 32]>)
     .map_err(|e: TransferFromError| format!("ledger transfer error {:?}", e))
 }
 
-async fn send_icp(destination: Principal, amount: u64, from_subaccount: Option<Subaccount>) -> Result<BlockIndexIC, String> {
+async fn send_icp(destination: Principal, amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<BlockIndexIC, String> {
     let amount = Tokens::from_e8s(amount);
+    let from_subaccount = from_subaccount.map(Subaccount);
+    
     let transfer_args: ic_ledger_types::TransferArgs = ic_ledger_types::TransferArgs {
         memo: Memo(0),
         amount,
         fee: Tokens::from_e8s(ICP_TRANSFER_FEE),
         from_subaccount,
-        to: AccountIdentifier::new(&destination, &DEFAULT_SUBACCOUNT),
+        to: AccountIdentifier::new(&destination, &from_subaccount.unwrap_or(DEFAULT_SUBACCOUNT)),
         created_at_time: None,
     };
     ic_ledger_types::transfer(MAINNET_LEDGER_CANISTER_ID, transfer_args)
@@ -290,13 +288,13 @@ async fn send_icp(destination: Principal, amount: u64, from_subaccount: Option<S
 }
 
 #[allow(non_snake_case)]
-async fn mint_ALEX(lbry_amount: u64, caller: Principal) -> Result<String, String> {
+async fn mint_ALEX(lbry_amount: u64, caller: Principal, to_subaccount: Option<[u8; 32]>) -> Result<String, String> {
     // 1. Asynchronously call another canister function using `ic_cdk::call`.
     let result: Result<(Result<String, String>,), String> =
-        ic_cdk::call::<(u64, Principal), (Result<String, String>,)>(
+        ic_cdk::call::<(u64, Principal, Option<[u8; 32]>), (Result<String, String>,)>(
             Principal::from_text(TOKENOMICS_CANISTER_ID).expect("Could not decode the principal."),
             "mint_ALEX",
-            (lbry_amount, caller),
+            (lbry_amount, caller, to_subaccount),
         )
         .await
         .map_err(|e| format!("failed to call ledger: {:?}", e));
@@ -751,15 +749,19 @@ async fn deposit_token(amount: u64) -> Result<BlockIndex, String> {
     .map_err(|e| format!("ledger transfer error {:?}", e))
 }
 
-async fn burn_token(amount: u64) -> Result<BlockIndex, String> {
+async fn burn_token(amount: u64, from_subaccount: Option<[u8; 32]>) -> Result<BlockIndex, String> {
+    ic_cdk::println!("Burning {:?} LBRY tokens", amount);
+    
     let canister_id: Principal = ic_cdk::api::id();
 
     let big_int_amount: BigUint = BigUint::from(amount);
     let amount: Nat = Nat(big_int_amount);
 
     let transfer_from_args = TransferFromArgs {
-        // the account we want to transfer tokens from (in this case we assume the caller approved the canister to spend funds on their behalf)
-        from: Account::from(ic_cdk::caller()),
+        from: Account {
+            owner: ic_cdk::caller(),
+            subaccount: from_subaccount,
+        },
         // can be used to distinguish between transactions
         memo: None,
         // the amount we want to transfer
@@ -773,6 +775,9 @@ async fn burn_token(amount: u64) -> Result<BlockIndex, String> {
         // a timestamp indicating when the transaction was created by the caller; if it is not specified by the caller then this is set to the current ICP time
         created_at_time: None,
     };
+
+    ic_cdk::println!("Transfer from args: {:?}", transfer_from_args);
+    ic_cdk::println!("Burning LBRY tokens second time got up to here.");
 
     // 1. Asynchronously call another canister function using `ic_cdk::call`.
     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(

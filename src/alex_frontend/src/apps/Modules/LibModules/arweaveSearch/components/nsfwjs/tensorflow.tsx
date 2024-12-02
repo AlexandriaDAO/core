@@ -162,7 +162,7 @@ export const validateContent = async (
     const isPorn =
       predictionResults.Porn > 0.4 ||
       (predictionResults.Sexy > 0.2 && predictionResults.Porn > 0.2) ||
-      (predictionResults.Hentai > 0.1 && (predictionResults.Porn > 0.03 || predictionResults.Sexy > 0.05)) ||
+      (predictionResults.Hentai > 0.15 && (predictionResults.Porn > 0.03 || predictionResults.Sexy > 0.05)) || 
       (predictionResults.Hentai > 0.3) ||
       predictionResults.Sexy > 0.8;
 

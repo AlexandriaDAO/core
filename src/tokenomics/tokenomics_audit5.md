@@ -29,3 +29,7 @@ This means if minting fails for random users, the LBRY is still burned but not a
 
 
 -- If anything fails between burning LBRY and these updates, the system state becomes inconsistent. There's no rollback mechanism.
+
+
+- Everything is by principal, not account, so I have to add subaccount to everything.
+- Mint failure does not rollback the LBRY burn.
