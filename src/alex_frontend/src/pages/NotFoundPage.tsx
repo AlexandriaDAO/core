@@ -1,6 +1,6 @@
 import React from "react";
 import MainLayout from "@/layouts/MainLayout";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Button } from "@/lib/components/button";
 import { ArrowLeft, Home } from "lucide-react";
 
@@ -8,7 +8,7 @@ const NotFoundPage: React.FC = () => {
 	const navigate = useNavigate();
 
 	return (
-		<MainLayout>
+		<>
 			<div className="min-h-[80vh] flex items-center justify-center px-4">
 				<div className="text-center">
 					<h1 className="text-9xl font-bold text-gray-200">404</h1>
@@ -36,7 +36,7 @@ const NotFoundPage: React.FC = () => {
 					</div>
 				</div>
 			</div>
-		</MainLayout>
+		</>
 	);
 };
 

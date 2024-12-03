@@ -17,7 +17,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/lib/components/dropdown-menu";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import { useLogout } from "@/hooks/useLogout";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
@@ -26,13 +26,6 @@ export default function AuthMenu() {
 
 	const {user} = useAppSelector(state=>state.auth)
 
-	// show user avatar image if available
-	// fallback to username first letter capital
-
-	// const user ={
-	// 	username: 'fonso',
-	// 	avatar: 'https://picsum.photos/200/200'
-	// }
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>

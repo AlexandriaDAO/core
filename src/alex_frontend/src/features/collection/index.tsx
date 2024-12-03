@@ -1,28 +1,15 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import BookCard from "./components/BookCard";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import BookModal from "@/components/BookModal";
 import { LoaderCircle } from "lucide-react";
-import fetchMyBooks from "./thunks/fetchMyBooks";
-import useNftManager from "@/hooks/actors/useNftManager";
 
 const ITEMS_PER_ROW = 6;
 
 const Collection: React.FC = () => {
-	const {actor} = useNftManager();
-	const dispatch = useAppDispatch();
-	const bookModalRef = useRef<HTMLDivElement>(null);
-
-	const { user } = useAppSelector((state) => state.auth);
 	const { books, selectedBook, loading, error } = useAppSelector(
 		(state) => state.collection
 	);
-
-	useEffect(() => {
-		if(!actor || !user) return;
-		dispatch(fetchMyBooks({actor, user}));
-	}, [user, dispatch]);
 
 	if(loading) return (
 		<div className="flex justify-start items-center gap-1">

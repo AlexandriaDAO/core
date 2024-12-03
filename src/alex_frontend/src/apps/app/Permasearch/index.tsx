@@ -36,7 +36,7 @@ function Permasearch() {
 	};
 
 	return (
-		<MainLayout>
+		<>
 			<PageContainer>
 				<Title>Permasearch</Title>
 				<Description>
@@ -65,7 +65,7 @@ function Permasearch() {
 				</SearchFormContainer>
 			</PageContainer>
 			<ContentDisplay />
-		</MainLayout>
+		</>
 	);
 }
 

@@ -14,7 +14,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Label } from "@/lib/components/label";
 import { Input } from "@/lib/components/input";
 
-import { CheckCircle, LoaderCircle, Save, XCircle } from "lucide-react";
+import { CheckCircle, LoaderCircle, PlusCircle, Save, XCircle } from "lucide-react";
 import { useUser } from "@/hooks/actors";
 
 // const ethPrivateKeyRegex = /^[a-fA-F0-9]{64}$/;
@@ -66,8 +66,9 @@ const AddNode = () => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button type="button" variant={'inverted'}>
-					<span>Create A Node</span>
+				<Button variant={'inverted'} rounded="full" className="flex gap-1 justify-between items-center">
+					<span>Add Node</span>
+					<PlusCircle />
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[600px]" onOpenAutoFocus={(e) => e.preventDefault()}>

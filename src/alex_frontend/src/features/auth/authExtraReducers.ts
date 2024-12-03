@@ -42,12 +42,15 @@ export const buildAuthExtraReducers = (builder: ActionReducerMapBuilder<AuthStat
         })
         .addCase(upgrade.rejected, (state, action) => {
             state.librarianLoading = false;
-            state.user = null;
+            // state.user = null;
             state.librarianError = action.payload as string;
         })
 
         // login slice
         // login.ts
+        .addCase(login.pending, (state) => {
+            state.user = null
+        })
         .addCase(login.fulfilled, (state, action:PayloadAction<SerializedUser>) => {
             state.user = action.payload
         })

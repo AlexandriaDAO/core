@@ -1,17 +1,15 @@
 import React, { ReactNode, useEffect } from "react";
 import BaseLayout from "./BaseLayout";
 import Header from "./parts/Header";
+import { Outlet } from "react-router";
 // Define the type for the component's props
-interface MainLayoutProps {
-	children: ReactNode;
-}
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout = () => {
 	return (
-		<BaseLayout>
+		<>
 			<Header />
-			{children}
-		</BaseLayout>
+			<Outlet />
+		</>
 	);
 };
 

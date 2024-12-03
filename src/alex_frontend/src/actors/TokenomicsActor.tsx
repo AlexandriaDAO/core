@@ -8,19 +8,21 @@ import { ReactNode } from "react";
 import { useInternetIdentity } from "ic-use-internet-identity";
 import { TokenomicsContext } from "@/contexts/actors";
 import { useActorErrorHandler } from "@/hooks/actors";
+import { AnonymousIdentity } from "@dfinity/agent";
 
 export default function TokenomicsActor({ children }: { children: ReactNode }) {
     const { identity, clear } = useInternetIdentity();
-    const { errorToast, handleResponseError, handleRequest } = useActorErrorHandler(clear);
+    const { errorToast, handleResponseError, handleRequest , handleResponse} = useActorErrorHandler(clear);
 
 	return (
 		<ActorProvider<_SERVICE>
 			canisterId={canisterId}
 			context={TokenomicsContext}
-			identity={identity}
+			identity={identity || new AnonymousIdentity()}
 			idlFactory={idlFactory}
 			onRequest={handleRequest}
 			onRequestError={(error) => errorToast(error)}
+			onResponse={handleResponse}
 			onResponseError={handleResponseError}
 		>
 			{children}

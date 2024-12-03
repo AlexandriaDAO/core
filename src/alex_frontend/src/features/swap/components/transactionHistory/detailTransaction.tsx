@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
 import { faAngleLeft, faAngleRight, faCheck } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { TransactionType } from "../../thunks/lbryIcrc/getTransactions";
 import MainLayout from "@/layouts/MainLayout";
@@ -23,7 +23,7 @@ const DetailTransaction = () => {
     }, [searchParams])
 
     return (<>
-        <MainLayout>        <div className="overflow-x-auto lg:overflow-x-auto">
+        <>        <div className="overflow-x-auto lg:overflow-x-auto">
             <div className="container pt-10 px-3">
                 <div className="bread-crumbs">
                     <nav className="flex items-center space-x-2 text-gray-500">
@@ -111,7 +111,7 @@ const DetailTransaction = () => {
             </div>
         </div>
 
-        </MainLayout>
+        </>
     </>)
 }
 export default DetailTransaction;

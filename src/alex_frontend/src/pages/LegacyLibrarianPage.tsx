@@ -2,12 +2,10 @@ import React from "react";
 import MainLayout from "@/layouts/MainLayout";
 import Librarian from "@/features/librarian";
 
-function LibrarianPage() {
+function LegacyLibrarianPage() {
 	return (
-		<MainLayout>
-			<Librarian />
-		</MainLayout>
+		<Librarian />
 	)
 }
 
-export default LibrarianPage;
+export default LegacyLibrarianPage;

@@ -16,9 +16,7 @@ function MintPage() {
 	);
 
 	return (
-		<MainLayout>
       <Mint />
-		</MainLayout>
 	);
 }
 

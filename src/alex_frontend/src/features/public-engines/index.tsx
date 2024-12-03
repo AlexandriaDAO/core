@@ -1,54 +1,27 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { NavLink } from "react-router";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { ConfigProvider, Table, TableColumnsType } from "antd";
-import EngineItemAction from "./components/EngineItemAction";
 
 import './styles/table.module.css';
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import fetchPublicEngines from "./thunks/fetchPublicEngines";
-import { Search } from "lucide-react";
-import { useUser } from "@/hooks/actors";
-import { SerializedEngine } from "../my-engines/myEnginesSlice";
-const columns: TableColumnsType<SerializedEngine> = [
-	{
-		title: "Name",
-		dataIndex: "title",
-		key: "title",
-	},
-	{
-		title: "Creator",
-		key: "owner",
-		render: (_:any, record:SerializedEngine)=> <span>{record.owner.toString().slice(0, 5) + '...' + record.owner.toString().slice(-3)}</span>
-	},
-	{
-		title: "Actions",
-		key: "actions",
-		align: "center",
-		render: (_:any, record:SerializedEngine) => <EngineItemAction engine={record}/>,
-	},
-];
-function PublicEngines() {
-	const {actor} = useUser();
-	const dispatch = useAppDispatch();
+import { LoaderCircle, Search } from "lucide-react";
+import { TableBody, TableCell, TableCaption, TableHead, TableHeader, TableRow, Table } from "@/lib/components/table";
+import { Button } from "@/lib/components/button";
 
+function PublicEngines() {
 	const { engines, loading } = useAppSelector((state) => state.publicEngines);
 
-	useEffect(() => {
-		if(!actor) return;
-		dispatch(fetchPublicEngines(actor))
-	}, [actor]);
+	if(loading) return (
+		<div className="flex justify-start items-center gap-1">
+			<span>Loading Public Engines</span>
+			<LoaderCircle size={20} className="animate animate-spin" />
+		</div>
+	)
+
+	if(engines.length<=0) return <span>No Engines to display</span>
 
 	return (
-		<div className="flex flex-col gap-6 p-6">
-			<div className="flex flex-col">
-				<span className="font-syne text-xl font-bold">
-					Published Engines
-				</span>
-				<span className="font-roboto-condensed text-base leading-[18px] font-normal ">
-					Explore work of other ambitious users
-				</span>
-			</div>
-			<div className="w-10/12 border-b-2 border-solid border-gray-500 flex items-center gap-2 px-2 py-2">
+		<div className="flex flex-col gap-6">
+			<div className="border-b-2 border-solid border-gray-500 flex items-center gap-2 px-2 py-2">
 				<Search />
 				<input
 					type="text"
@@ -56,24 +29,31 @@ function PublicEngines() {
 					className="font-roboto-condensed font-normal text-base flex-grow rounded border-0 ring-0 focus:ring-0 outline-none"
 				/>
 			</div>
-			<ConfigProvider
-				theme={{
-					components: {
-						Table: {
-							headerBg: 'transparent',
-							rowHoverBg: 'transparent',
-						},
-					},
-				}}
-			>
-				<Table
-					loading={loading}
-					dataSource={engines}
-					columns={columns}
-					rowKey="id"
-					size="middle"
-				/>
-			</ConfigProvider>
+			<Table className="font-medium text-md">
+				<TableCaption>A list of Public Engines.</TableCaption>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Title</TableHead>
+						<TableHead>Creator</TableHead>
+						<TableHead>Date</TableHead>
+						<TableHead className="text-center">Action</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{engines.map((engine) => engine.active && (
+						<TableRow key={engine.id} >
+							<TableCell>{engine.title}</TableCell>
+							<TableCell>{engine.owner.slice(0, 6) + "..." + engine.owner.slice(-4)}</TableCell>
+							<TableCell>{engine.created_at}</TableCell>
+							<TableCell className="text-center">
+								<NavLink to={'/dashboard/engines/'+engine.id}>
+									<Button variant="inverted" scale="sm">View Engine</Button>
+								</NavLink>
+							</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
 		</div>
 	);
 }

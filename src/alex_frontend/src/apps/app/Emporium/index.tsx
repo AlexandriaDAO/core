@@ -12,7 +12,7 @@ import { setSearchTerm } from "@/features/portal/portalSlice";
 import { Search } from "lucide-react";
 import PortalLimit from "@/features/portal-limit";
 import { Button } from "@/lib/components/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 function Bibliotheca() {
 
@@ -27,7 +27,7 @@ function Bibliotheca() {
 
 
     return (
-        <MainLayout>
+        <>
             <div className="flex-grow p-6">
                 <div className="flex justify-between items-center gap-4 font-roboto-condensed text-black">
                     <div className="basis-1/2 border-b border-solid border-gray-500 flex items-center gap-2 py-1">
@@ -60,7 +60,7 @@ function Bibliotheca() {
                 <Portal />
             </div>
 
-        </MainLayout>
+        </>
     );
 }
 export default Bibliotheca;

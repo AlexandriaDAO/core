@@ -5,7 +5,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import useSession from "@/hooks/useSession";
 import { LoaderCircle } from "lucide-react";
 import { Button } from "@/lib/components/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import Collection from "@/features/collection";
 import fetchMyBooks from "@/features/collection/thunks/fetchMyBooks";
 
@@ -35,17 +35,17 @@ function CollectionPage() {
 
 function LoadingView() {
 	return (
-		<MainLayout>
+		<>
 			<div className="flex-grow flex items-center justify-center">
 				<LoaderCircle className="animate-spin text-4xl text-primary" />
 			</div>
-		</MainLayout>
+		</>
 	);
 }
 
 function LoginRequiredView() {
 	return (
-		<MainLayout>
+		<>
 			<div className="flex-grow flex items-center justify-center">
 				<div className="bg-white p-8 rounded-xl shadow-lg">
 					<h2 className="font-syne text-2xl font-bold mb-4">
@@ -56,7 +56,7 @@ function LoginRequiredView() {
 					</p>
 				</div>
 			</div>
-		</MainLayout>
+		</>
 	);
 }
 
@@ -68,7 +68,7 @@ function CollectionDashboard({ books, collectionLoading }: { books: any[], colle
 	}
 
 	return (
-		<MainLayout>
+		<>
 			<div className="flex-grow p-6">
                 <div className="my-4 flex justify-between items-center">
                     <div className="font-roboto-condensed font-normal text-xl flex gap-4 items-center">
@@ -80,13 +80,13 @@ function CollectionDashboard({ books, collectionLoading }: { books: any[], colle
                 </div>
                 <Collection />
             </div>
-		</MainLayout>
+		</>
 	);
 }
 
 function EmptyCollectionView() {
 	return (
-		<MainLayout>
+		<>
 			<div className="flex-grow flex items-center justify-center">
 				<div className="bg-white p-8 rounded-xl shadow-lg">
 					<h2 className="font-syne text-2xl font-bold mb-4">
@@ -97,7 +97,7 @@ function EmptyCollectionView() {
 					</p>
 				</div>
 			</div>
-		</MainLayout>
+		</>
 	);
 }
 
