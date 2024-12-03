@@ -230,52 +230,52 @@ pub async fn get_two_random_users() -> CallResult<((Principal, Vec<u8>), (Princi
         all_transfers[index2].clone().to.subaccount.unwrap_or(vec![0; 32])
     );
 
-    ic_cdk::println!("random index are {},{}", index1, index2);
     // Return the two selected addresses with their subaccounts
     Ok((address1, address2))
 }
 
 
-
-
-#[query]
-fn get_logs() -> Vec<Logs> {
-    LOGS.with(|logs| logs.borrow().clone())
-}
-
-
-
-
-
 // OG Get two random users without subaccounts.
-    
-    // #[query]
-    // pub async fn get_two_random_users() -> CallResult<(Principal, Principal)> {
+
+// #[query]
+// pub async fn get_two_random_users() -> CallResult<(Principal, Principal)> {
     //     // First, get all latest transfer transactions
     //     let all_transfers = get_latest_transfer_transactions().await;
     
     //     // If we have fewer than 1 transactions, return dummy random user
     //     if all_transfers.len() < 1 {
-    //         return Ok((get_principal(RANDOM_USER), get_principal(RANDOM_USER)));
-    //     }
-    
-    //     // Get random bytes
-    //     let (random_bytes,): (Vec<u8>,) =
-    //         ic_cdk::api::call::call(Principal::management_canister(), "raw_rand", ()).await?;
-    
-    //     // Use the first 16 bytes (128 bits) of randomness
-    //     let random_value = u128::from_le_bytes(random_bytes[0..16].try_into().unwrap());
-    
-    //     let index1 = (random_value % all_transfers.len() as u128) as usize;
-    //     let mut index2 = ((random_value >> 64) % all_transfers.len() as u128) as usize;
-    
-    //     // Ensure index2 is different from index1
-    //     if index2 == index1 {
-    //         index2 = (index2 + 1) % all_transfers.len();
-    //     }
-    //     let address1 = all_transfers[index1].clone().from.owner;
-    //     let address2 = all_transfers[index2].clone().to.owner;
-    //     ic_cdk::println!("random index are {},{}", index1, index2);
-    //     // Return the two selected
-    //     Ok((address1, address2))
-    // }
+        //         return Ok((get_principal(RANDOM_USER), get_principal(RANDOM_USER)));
+        //     }
+        
+        //     // Get random bytes
+        //     let (random_bytes,): (Vec<u8>,) =
+        //         ic_cdk::api::call::call(Principal::management_canister(), "raw_rand", ()).await?;
+        
+        //     // Use the first 16 bytes (128 bits) of randomness
+        //     let random_value = u128::from_le_bytes(random_bytes[0..16].try_into().unwrap());
+        
+        //     let index1 = (random_value % all_transfers.len() as u128) as usize;
+        //     let mut index2 = ((random_value >> 64) % all_transfers.len() as u128) as usize;
+        
+        //     // Ensure index2 is different from index1
+        //     if index2 == index1 {
+            //         index2 = (index2 + 1) % all_transfers.len();
+            //     }
+            //     let address1 = all_transfers[index1].clone().from.owner;
+            //     let address2 = all_transfers[index2].clone().to.owner;
+            //     ic_cdk::println!("random index are {},{}", index1, index2);
+            //     // Return the two selected
+            //     Ok((address1, address2))
+            
+            // }
+            
+            
+            
+            
+
+
+
+    #[query]
+    fn get_logs() -> Vec<Logs> {
+        LOGS.with(|logs| logs.borrow().clone())
+    }

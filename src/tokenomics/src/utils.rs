@@ -49,5 +49,4 @@ pub fn update_log(message: &str) {
                 .as_secs(),
         });
     });
-    ic_cdk::println!("Error Logged :{}", message);
 }

@@ -31,15 +31,16 @@ pub fn tests_principal() -> Principal {
 }
 
 
-mod balances;
-pub use balances::*;
-
+mod utils;
 mod swap;
-pub use swap::*;
-
 mod burn;
+mod stake;
+mod balances;
+pub use utils::*;
+pub use swap::*;
 pub use burn::*;
-
+pub use stake::*;
+pub use balances::*;
 
 ic_cdk::export_candid!();
 

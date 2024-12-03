@@ -11,7 +11,7 @@ const claimReward = createAsyncThunk<
 >("icp_swap/claimReward", async (_, { rejectWithValue }) => {
   try {
     const actor = await getActorSwap();
-    const result = await actor.claim_icp_reward();
+    const result = await actor.claim_icp_reward([]);
     if ("Ok" in result) return "success";
     if ("Err" in result) throw new Error(result.Err);
   } catch (error) {

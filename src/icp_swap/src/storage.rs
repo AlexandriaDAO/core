@@ -7,7 +7,7 @@ use ic_stable_structures::{
     StableBTreeMap,
 };
 use ic_stable_structures::{DefaultMemoryImpl, Storable};
-use std::borrow:: Cow;
+use std::borrow::Cow;
 use std::cell::RefCell;
 use std::collections::{BTreeSet, HashMap};
 
@@ -39,7 +39,7 @@ thread_local! {
     pub static ARCHIVED_TRANSACTION_LOG: RefCell<StableBTreeMap<Principal, ArchiveBalance, Memory>> = RefCell::new(
         StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(ARCHIVED_TRANSACTION_LOG_MEM_ID)))
     );
-    //
+
     pub static TOTAL_UNCLAIMED_ICP_REWARD: RefCell<StableBTreeMap<(), u64, Memory>> = RefCell::new(
         StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(TOTAL_UNCLAIMED_ICP_REWARD_MEM_ID)))
     );
@@ -96,7 +96,7 @@ pub struct LbryRatio {
 impl Default for LbryRatio {
     fn default() -> Self {
         LbryRatio {
-            ratio: 400,  // Default value set to 400
+            ratio: 400,                // Default value set to 400
             time: ic_cdk::api::time(), // Current timestamp
         }
     }
@@ -178,4 +178,3 @@ impl Storable for DailyValues {
         is_fixed_size: false,
     };
 }
-

@@ -135,20 +135,19 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal, to_subaccount: 
                 None
             };
 
-            ic_cdk::println!(
-                "Address1: {} (subaccount: {:?})\nAddress2: {} (subaccount: {:?})", 
-                principal1, 
-                subaccount1_arr, 
-                principal2, 
-                subaccount2_arr
-            );
+            // ic_cdk::println!(
+            //     "Address1: {} (subaccount: {:?})\nAddress2: {} (subaccount: {:?})", 
+            //     principal1, 
+            //     subaccount1_arr, 
+            //     principal2, 
+            //     subaccount2_arr
+            // );
 
             match mint_ALEX_internal(alex_per_recipient, actual_caller, to_subaccount.map(|s| s.0)).await {
                 Ok(_) => {
                     minted_alex = minted_alex
                         .checked_add(alex_per_recipient)
                         .ok_or("Arithmetic overflow occurred in minted_alex")?;
-                    ic_cdk::println!("Successful mint to caller");
                 }
                 Err(e) => {
                     return Err(format!("Something went wrong while minting to caller: {}", e));
@@ -160,9 +159,8 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal, to_subaccount: 
                     minted_alex = minted_alex
                         .checked_add(alex_per_recipient)
                         .ok_or("Arithmetic overflow occurred in minted_alex")?;
-                    ic_cdk::println!("Successful mint to random user 1");
                 }
-                Err(e) => update_log(&format!(
+                Err(_e) => update_log(&format!(
                     "Something went wrong while minting to random user 1. Principal: {}",
                     random_users.0
                 )),
@@ -173,9 +171,8 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal, to_subaccount: 
                     minted_alex = minted_alex
                         .checked_add(alex_per_recipient)
                         .ok_or("Arithmetic overflow occurred in minted_alex")?;
-                    ic_cdk::println!("Successful mint to random user 2");
                 }
-                Err(e) => update_log(&format!(
+                Err(_e) => update_log(&format!(
                     "Something went wrong while minting to random user 2. Principal: {}",
                     random_users.1
                 )),

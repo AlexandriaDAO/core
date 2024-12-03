@@ -16,7 +16,7 @@ type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
 service : (opt InitArgs) -> {
   burn_LBRY : (nat64, opt blob) -> (Result);
   caller_subaccount : () -> (text) query;
-  claim_icp_reward : () -> (Result);
+  claim_icp_reward : (opt blob) -> (Result);
   distribute_reward : () -> (Result);
   distribute_reward_wrapper : () -> ();
   get_all_apy_values : () -> (vec record { nat32; nat }) query;
@@ -35,8 +35,8 @@ service : (opt InitArgs) -> {
   get_total_archived_balance : () -> (nat64) query;
   get_total_unclaimed_icp_reward : () -> (nat64) query;
   get_user_archive_balance : (principal) -> (opt ArchiveBalance) query;
-  redeem : () -> (Result);
-  stake_ALEX : (nat64) -> (Result);
+  redeem : (opt blob) -> (Result);
+  stake_ALEX : (nat64, opt blob) -> (Result);
   swap : (nat64, opt blob) -> (Result);
-  un_stake_all_ALEX : () -> (Result);
+  un_stake_all_ALEX : (opt blob) -> (Result);
 }

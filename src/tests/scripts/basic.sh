@@ -12,45 +12,27 @@ COMMENT
 
 
 
-dfx identity use user_1
-export ALICE_ACCOUNT_ID=$(dfx ledger account-id)
-export ALICE_PRINCIPAL=$(dfx identity get-principal)
-dfx identity use user_2
-export BOB_ACCOUNT_ID=$(dfx ledger account-id)
-export BOB_PRINCIPAL=$(dfx identity get-principal)
-dfx identity use user_3
-export CHARLIE_ACCOUNT_ID=$(dfx ledger account-id)
-export CHARLIE_PRINCIPAL=$(dfx identity get-principal)
+#!/bin/bash
 
-# First verify the identity matches what we expect
-dfx identity use user_1
+# Perform swap batch operations for admin
+dfx canister call tests test_swap_batch "(vec {record {amount_icp=1:nat64; account_name=\"admin\"}})"
 
-# Verify ICP balance before swap
-dfx ledger balance
+# Perform swap batch operations for alice
+dfx canister call tests test_swap_batch "(vec {record {amount_icp=1:nat64; account_name=\"alice\"}})"
 
-# First approve the swap canister to spend ICP tokens
-dfx canister call icp_ledger_canister icrc2_approve '(record {
-    spender = record { 
-        owner = principal "'$(dfx canister id icp_swap)'"; 
-        subaccount = null 
-    };
-    amount = 100_010_000;
-    fee = opt 10_000;
-    memo = null;
-    from_subaccount = null;
-    created_at_time = null;
-    expected_allowance = null;
-    expires_at = null;
-})'
+# Burn tokens for admin
+dfx canister call tests burn "(50:nat64, \"admin\")"
 
-# Then make the swap call
-dfx canister call icp_swap swap "(100_000_000)"
+# Burn tokens for alice
+dfx canister call tests burn "(25:nat64, \"alice\")"
 
-# Check both ICP and token balances after swap
-echo "ICP balance after swap:"
-dfx ledger balance
+# Stake ALEX tokens for admin (100_000_000 = 1 ALEX)
+dfx canister call tests stake "(100000000:nat64, \"admin\")"
 
-echo "Token balance after swap:"
-# dfx canister call icp_swap icrc1_balance_of "(record {owner=principal \"$ALICE_PRINCIPAL\"; subaccount=null})"
+# Stake ALEX tokens for alice 
+dfx canister call tests stake "(100000000:nat64, \"alice\")"
 
-# Check alice's balance
+# Check balances for multiple accounts
+dfx canister call tests check_balances "(vec {\"admin\"; \"alice\"; \"bob\"; \"charlie\"})"
+
+dfx canister call icp_swap get_all_stakes

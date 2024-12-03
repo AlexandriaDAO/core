@@ -30,7 +30,7 @@ const stakeAlex = createAsyncThunk<
     });
 
     const actorSwap = await getActorSwap();
-    const result = await actorSwap.stake_ALEX(amountFormat);
+    const result = await actorSwap.stake_ALEX(amountFormat, []);
     if ("Ok" in result) return "success";
     if ("Err" in result) throw new Error(result.Err);
   } catch (error) {
