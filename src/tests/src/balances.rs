@@ -1,20 +1,13 @@
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
 use ic_cdk::{query, update, api::id};
-use crate::{lbry_principal, alex_principal};
+use crate::{lbry_principal, alex_principal, utils::{get_test_subaccount, E8S_PER_ICP}};
 
 use ic_ledger_types::{
     AccountIdentifier, Subaccount, Tokens, MAINNET_LEDGER_CANISTER_ID
 };
 
 use candid::Nat;
-
-// Helper function to create a deterministic subaccount from an index
-fn get_test_subaccount(index: u8) -> ic_ledger_types::Subaccount {
-    let mut subaccount = ic_ledger_types::Subaccount([0; 32]);
-    subaccount.0[0] = index;
-    subaccount
-}
 
 #[derive(CandidType, Serialize, Deserialize)]
 pub struct TestAccounts {
@@ -30,10 +23,22 @@ pub fn get_test_accounts() -> TestAccounts {
     let canister_id = id();
     
     // Create account IDs using different subaccounts
-    let admin_account = ic_ledger_types::AccountIdentifier::new(&canister_id, &get_test_subaccount(0));
-    let alice_account = ic_ledger_types::AccountIdentifier::new(&canister_id, &get_test_subaccount(1));
-    let bob_account = ic_ledger_types::AccountIdentifier::new(&canister_id, &get_test_subaccount(2));
-    let charlie_account = ic_ledger_types::AccountIdentifier::new(&canister_id, &get_test_subaccount(3));
+    let admin_account = ic_ledger_types::AccountIdentifier::new(
+        &canister_id, 
+        &Subaccount(get_test_subaccount("admin").unwrap())
+    );
+    let alice_account = ic_ledger_types::AccountIdentifier::new(
+        &canister_id, 
+        &Subaccount(get_test_subaccount("alice").unwrap())
+    );
+    let bob_account = ic_ledger_types::AccountIdentifier::new(
+        &canister_id, 
+        &Subaccount(get_test_subaccount("bob").unwrap())
+    );
+    let charlie_account = ic_ledger_types::AccountIdentifier::new(
+        &canister_id, 
+        &Subaccount(get_test_subaccount("charlie").unwrap())
+    );
     
     TestAccounts {
         admin: admin_account.to_string(),
@@ -45,7 +50,7 @@ pub fn get_test_accounts() -> TestAccounts {
 
 // Helper function to convert e8s to ICP (as f64)
 fn e8s_to_icp(e8s: u64) -> f64 {
-    e8s as f64 / 100_000_000.0
+    e8s as f64 / E8S_PER_ICP as f64
 }
 
 // Helper function to convert Nat to f64
@@ -90,13 +95,8 @@ pub async fn check_balances(account_names: Vec<String>) -> Vec<BalanceResult> {
         let args = ic_ledger_types::AccountBalanceArgs { account };
         
         // Get the subaccount for ICRC1 tokens
-        let subaccount = match name.to_lowercase().as_str() {
-            "admin" => get_test_subaccount(0),
-            "alice" => get_test_subaccount(1),
-            "bob" => get_test_subaccount(2),
-            "charlie" => get_test_subaccount(3),
-            _ => unreachable!(),
-        };
+        let subaccount = Subaccount(get_test_subaccount(&name)
+            .unwrap_or_else(|_| ic_cdk::trap(&format!("Unknown account name: {}", name))));
 
         // Call the ledger canister to get ICP balance
         let icp_balance: Result<(Tokens,), _> = ic_cdk::call(

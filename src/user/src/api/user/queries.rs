@@ -14,7 +14,6 @@ pub fn whoami() -> Principal {
 
 #[query]
 pub fn get_user(principal: Principal) -> Result<User, String> {
-    ic_cdk::println!("get_user called with principal: {}, {}", principal, Principal::anonymous());
     if principal == Principal::anonymous() {
         return Err(GeneralError::AnonymousNotAllowed.to_string())
     }
@@ -30,7 +29,6 @@ pub fn get_user(principal: Principal) -> Result<User, String> {
 
 #[query]
 pub fn get_current_user() -> Result<User, String> {
-    ic_cdk::println!("get_current_user called with principal: {}, {}", caller(), Principal::anonymous());
     get_user(caller())
 }
 

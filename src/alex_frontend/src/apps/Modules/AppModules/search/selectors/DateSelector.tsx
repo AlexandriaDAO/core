@@ -28,7 +28,7 @@ const formatTimeInput = (input: string): string => {
 const cleanAndValidateDate = (dateStr: string): string => {
   // Remove all non-digits
   const numbers = dateStr.replace(/\D/g, '');
-  
+
   // Format as MM/DD/YYYY
   if (numbers.length <= 2) return numbers;
   if (numbers.length <= 4) return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
@@ -40,7 +40,7 @@ const cleanAndValidateTime = (timeStr: string): string => {
   const cleaned = timeStr.toUpperCase();
   const numbers = cleaned.replace(/[^0-9AP]/g, '');
   const ampm = cleaned.match(/[AP]M?$/)?.[0] || '';
-  
+
   let formatted = '';
   if (numbers.length > 0) {
     const hours = numbers.slice(0, 2);
@@ -49,25 +49,25 @@ const cleanAndValidateTime = (timeStr: string): string => {
       formatted += ':' + numbers.slice(2, 4);
     }
   }
-  
+
   if (ampm) {
     formatted += ' ' + (ampm.length === 1 ? ampm + 'M' : ampm);
   }
-  
+
   return formatted;
 };
 
 const isValidDate = (dateStr: string): boolean => {
   const parts = dateStr.split('/');
   if (parts.length !== 3) return false;
-  
+
   const month = parseInt(parts[0], 10);
   const day = parseInt(parts[1], 10);
   const year = parseInt(parts[2], 10);
-  
+
   return month >= 1 && month <= 12 &&
-         day >= 1 && day <= 31 &&
-         year >= 1900 && year <= 9999;
+    day >= 1 && day <= 31 &&
+    year >= 1900 && year <= 9999;
 };
 
 const isValidTime = (timeStr: string): boolean => {
@@ -84,10 +84,10 @@ const DateSelector: React.FC = () => {
     }
     return new Date();
   });
-  const [dateInputValue, setDateInputValue] = useState(() => 
+  const [dateInputValue, setDateInputValue] = useState(() =>
     format(selectedDate || new Date(), "MM/dd/yyyy")
   );
-  const [timeInputValue, setTimeInputValue] = useState(() => 
+  const [timeInputValue, setTimeInputValue] = useState(() =>
     format(selectedDate || new Date(), "hh:mm aa")
   );
   const [isOpen, setIsOpen] = useState(false);
@@ -105,12 +105,12 @@ const DateSelector: React.FC = () => {
   const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = formatDateInput(e.target.value);
     setDateInputValue(newValue);
-    
+
     if (newValue.length === 10 && isValidDate(newValue)) {
       try {
         const currentTime = selectedDate ? format(selectedDate, "hh:mm aa") : format(new Date(), "hh:mm aa");
         const parsedDate = parse(`${newValue} ${currentTime}`, DATE_FORMAT, new Date());
-        
+
         if (!isNaN(parsedDate.getTime())) {
           handleDateTimeChange(parsedDate);
         }
@@ -123,12 +123,12 @@ const DateSelector: React.FC = () => {
   const handleTimeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = formatTimeInput(e.target.value);
     setTimeInputValue(newValue);
-    
+
     if (isValidTime(newValue)) {
       try {
         const currentDate = selectedDate ? format(selectedDate, "MM/dd/yyyy") : format(new Date(), "MM/dd/yyyy");
         const parsedDate = parse(`${currentDate} ${newValue}`, DATE_FORMAT, new Date());
-        
+
         if (!isNaN(parsedDate.getTime())) {
           handleDateTimeChange(parsedDate);
         }
@@ -173,12 +173,12 @@ const DateSelector: React.FC = () => {
   const handleDateBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const cleanedValue = cleanAndValidateDate(e.target.value);
     setDateInputValue(cleanedValue);
-    
+
     if (cleanedValue.length === 10 && isValidDate(cleanedValue)) {
       try {
         const currentTime = selectedDate ? format(selectedDate, "hh:mm aa") : format(new Date(), "hh:mm aa");
         const parsedDate = parse(`${cleanedValue} ${currentTime}`, DATE_FORMAT, new Date());
-        
+
         if (!isNaN(parsedDate.getTime())) {
           handleDateTimeChange(parsedDate);
         }
@@ -194,12 +194,12 @@ const DateSelector: React.FC = () => {
   const handleTimeBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const cleanedValue = cleanAndValidateTime(e.target.value);
     setTimeInputValue(cleanedValue);
-    
+
     if (isValidTime(cleanedValue)) {
       try {
         const currentDate = selectedDate ? format(selectedDate, "MM/dd/yyyy") : format(new Date(), "MM/dd/yyyy");
         const parsedDate = parse(`${currentDate} ${cleanedValue}`, DATE_FORMAT, new Date());
-        
+
         if (!isNaN(parsedDate.getTime())) {
           handleDateTimeChange(parsedDate);
         }
@@ -214,125 +214,132 @@ const DateSelector: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      <span className="text-[#000] font-['Syne'] text-[20px] font-medium">
-        Date & Time
-      </span>
-      
-      <div className="w-full relative">
-        <div className="relative flex items-center w-full h-[50px] px-3 rounded-[30px] border border-[#F3F3F3] bg-white">
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                className="h-8 w-8 p-0 mr-2"
-                onClick={() => setIsOpen(true)}
-              >
-                <CalendarIcon className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <div className="flex">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  defaultMonth={selectedDate || new Date()}
-                  onSelect={(date) => {
-                    if (date) {
-                      const newDate = new Date(date);
-                      if (selectedDate) {
-                        newDate.setHours(selectedDate.getHours());
-                        newDate.setMinutes(selectedDate.getMinutes());
+      <div className="flex justify-between gap-4">
+        {/* Date Section */}
+        <div className="flex-1">
+          <span className="block mb-2 text-lg font-medium font-['Syne'] text-foreground">
+            Select Date
+          </span>
+          <div className="flex items-center p-[14px] rounded-2xl border border-input bg-background">
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-8 w-8 p-0 mr-2"
+                  onClick={() => setIsOpen(true)}
+                >
+                  <CalendarIcon className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <div className="flex">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    defaultMonth={selectedDate || new Date()}
+                    onSelect={(date) => {
+                      if (date) {
+                        const newDate = new Date(date);
+                        if (selectedDate) {
+                          newDate.setHours(selectedDate.getHours());
+                          newDate.setMinutes(selectedDate.getMinutes());
+                        }
+                        handleDateTimeChange(newDate);
                       }
-                      handleDateTimeChange(newDate);
-                    }
-                    setIsOpen(false);
-                  }}
-                  initialFocus
-                />
-                <div className="flex flex-col h-[300px] divide-y">
-                  <ScrollArea className="w-auto">
-                    <div className="flex flex-col p-2">
-                      {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
+                      setIsOpen(false);
+                    }}
+                    initialFocus
+                  />
+                  <div className="flex flex-col h-[300px] divide-y">
+                    <ScrollArea className="w-auto">
+                      <div className="flex flex-col p-2">
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
+                          <Button
+                            key={hour}
+                            variant={getButtonVariant(
+                              selectedDate ? selectedDate.getHours() % 12 === hour % 12 : false
+                            )}
+                            className="w-full"
+                            onClick={() => handleTimeChange("hour", hour.toString())}
+                          >
+                            {hour}
+                          </Button>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                    <ScrollArea className="w-auto">
+                      <div className="flex flex-col p-2">
+                        {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
+                          <Button
+                            key={minute}
+                            variant={getButtonVariant(
+                              selectedDate ? selectedDate.getMinutes() === minute : false
+                            )}
+                            className="w-full"
+                            onClick={() => handleTimeChange("minute", minute.toString())}
+                          >
+                            {minute.toString().padStart(2, '0')}
+                          </Button>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                    <div className="p-2">
+                      {["AM", "PM"].map((ampm) => (
                         <Button
-                          key={hour}
+                          key={ampm}
                           variant={getButtonVariant(
-                            selectedDate ? selectedDate.getHours() % 12 === hour % 12 : false
-                          )}
-                          className="w-full"
-                          onClick={() => handleTimeChange("hour", hour.toString())}
-                        >
-                          {hour}
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  <ScrollArea className="w-auto">
-                    <div className="flex flex-col p-2">
-                      {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
-                        <Button
-                          key={minute}
-                          variant={getButtonVariant(
-                            selectedDate ? selectedDate.getMinutes() === minute : false
-                          )}
-                          className="w-full"
-                          onClick={() => handleTimeChange("minute", minute.toString())}
-                        >
-                          {minute.toString().padStart(2, '0')}
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  <div className="p-2">
-                    {["AM", "PM"].map((ampm) => (
-                      <Button
-                        key={ampm}
-                        variant={getButtonVariant(
-                          selectedDate
-                            ? (ampm === "AM" && selectedDate.getHours() < 12) ||
+                            selectedDate
+                              ? (ampm === "AM" && selectedDate.getHours() < 12) ||
                               (ampm === "PM" && selectedDate.getHours() >= 12)
-                            : false
-                        )}
-                        className="w-full"
-                        onClick={() => handleTimeChange("ampm", ampm)}
-                      >
-                        {ampm}
-                      </Button>
-                    ))}
+                              : false
+                          )}
+                          className="w-full"
+                          onClick={() => handleTimeChange("ampm", ampm)}
+                        >
+                          {ampm}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverContent>
+            </Popover>
 
-          <div className="flex flex-1 items-center">
             <input
               type="text"
               value={dateInputValue}
               onChange={handleDateInputChange}
               onBlur={handleDateBlur}
-              className="w-[100px] bg-transparent border-none outline-none text-black font-['Poppins'] text-base font-light"
+              className="flex-1 bg-transparent border-none outline-none text-black font-['Poppins'] text-base font-light"
               placeholder="MM/DD/YYYY"
               maxLength={10}
             />
-            <span className="mx-2 text-gray-400">|</span>
+          </div>
+        </div>
+
+        {/* Time Section */}
+        <div className="flex-1">
+          <span className="block mb-2 text-lg font-medium font-['Syne'] text-foreground">
+            Select Time
+          </span>
+          <div className="flex items-center p-[14px] rounded-2xl border border-input bg-background">
             <input
               type="text"
               value={timeInputValue}
               onChange={handleTimeInputChange}
               onBlur={handleTimeBlur}
-              className="w-[90px] bg-transparent border-none outline-none text-black font-['Poppins'] text-base font-light"
+              className="flex-1 bg-transparent border-none outline-none text-black font-['Poppins'] text-base font-light"
               placeholder="hh:mm AA"
               maxLength={8}
             />
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0 ml-2"
+              onClick={generateRandomDateTime}
+            >
+              <ShuffleIcon className="h-4 w-4" />
+            </Button>
           </div>
-
-          <Button
-            variant="ghost"
-            className="h-8 w-8 p-0 ml-2"
-            onClick={generateRandomDateTime}
-          >
-            <ShuffleIcon className="h-4 w-4" />
-          </Button>
         </div>
       </div>
     </div>

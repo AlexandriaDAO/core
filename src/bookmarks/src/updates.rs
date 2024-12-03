@@ -37,11 +37,9 @@ pub async fn init_bm(
 ) -> Result<String, String> {
     match save_bm(lbn, author, title, content, cfi).await {
         Ok(post_id) => {
-            ic_cdk::println!("Bookmark saved with post_id: {}", post_id);
-            Ok("Success!".to_string())
+            Ok("Success saving bookmark!".to_string())
         }
         Err(err_msg) => {
-            ic_cdk::println!("Error saving bookmark: {}", err_msg);
             Err(format!("Error saving bookmark: {}", err_msg))
         }
     }

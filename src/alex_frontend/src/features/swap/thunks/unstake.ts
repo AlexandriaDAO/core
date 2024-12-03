@@ -11,7 +11,7 @@ const unstake = createAsyncThunk<
 >("icp_swap/unstake", async (_, { rejectWithValue }) => {
   try {
     const actor = await getActorSwap();
-    const result = await actor.un_stake_all_ALEX();
+    const result = await actor.un_stake_all_ALEX([]);
     if ("Ok" in result) return "success";
     if ("Err" in result) throw new Error(result.Err);
   } catch (error) {

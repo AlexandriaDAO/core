@@ -61,7 +61,6 @@ pub async fn get_nfts(start: Option<Nat>, end: Option<Nat>) -> Result<Vec<Nat>, 
 
     match tokens_call_result {
         Ok((ids,)) => {
-            ic_cdk::println!("Retrieved token IDs: {:?}", ids);
             Ok(ids)
         },
         Err((code, msg)) => {

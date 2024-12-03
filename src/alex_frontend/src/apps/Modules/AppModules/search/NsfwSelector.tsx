@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { setNsfwModelLoaded } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
 import { loadModel, unloadModel, isModelLoaded } from '@/apps/Modules/LibModules/arweaveSearch/components/nsfwjs/tensorflow';
+import { Switch } from '@/lib/components/switch';
 
 const NsfwModelControl: React.FC = () => {
   const dispatch = useDispatch();
@@ -45,28 +46,29 @@ const NsfwModelControl: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full p-4 gap-4 rounded-[20px] border border-[#CCC] bg-white">
+    <div className="flex flex-col w-[290px] p-0 gap-4 min-h-[64px]">
       <div className="flex items-center justify-between w-full">
-        <span className="text-sm font-medium text-gray-700">SafeSearch</span>
-        <label className="relative inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            className="sr-only peer"
-            checked={nsfwModelLoaded}
-            onChange={(e) => handleToggleSafeSearch(e.target.checked)}
-            disabled={isLoading}
-          />
-          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-        </label>
+        <span className="text-lg font-['Syne'] font-medium text-foreground leading-none">
+          SafeSearch
+        </span>
+        <Switch
+          checked={nsfwModelLoaded}
+          onCheckedChange={handleToggleSafeSearch}
+          disabled={isLoading}
+        />
       </div>
-      {isLoading && (
-        <p className="text-xs text-blue-600 w-full">Loading SafeSearch model...</p>
-      )}
-      {!nsfwModelLoaded && !isLoading && (
-        <p className="text-xs text-red-600 w-full">
-          Warning: SafeSearch must be enabled to mint NFTs.
-        </p>
-      )}
+      <div className="relative h-5">
+        {isLoading && (
+          <p className="absolute text-sm font-['Syne'] text-muted-foreground leading-5 w-full">
+            Loading SafeSearch model...
+          </p>
+        )}
+        {!nsfwModelLoaded && !isLoading && (
+          <p className="absolute text-sm font-['Syne'] text-muted-foreground leading-5 w-full">
+            Warning: SafeSearch must be enabled to mint NFTs.
+          </p>
+        )}
+      </div>
     </div>
   );
 };
