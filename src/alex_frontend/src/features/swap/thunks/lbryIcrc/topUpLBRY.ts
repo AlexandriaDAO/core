@@ -14,6 +14,7 @@ const topUpLBRY = createAsyncThunk<
   "icp_swap/topUpLBRY",
   async ({ amount, userPrincipal }, { dispatch, rejectWithValue }) => {
     try {
+      console.log("user principal",userPrincipal);
       const nftManagerId = process.env.CANISTER_ID_NFT_MANAGER!;
       
       if (!nftManagerId) {

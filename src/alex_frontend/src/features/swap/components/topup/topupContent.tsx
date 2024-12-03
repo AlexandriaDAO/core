@@ -70,19 +70,19 @@ const TopupContent = () => {
 
     useEffect(() => {
         if (user) {
-            dispatch(getSpendingBalance(user.toString()));
-            dispatch(getAlexSpendingBalance(user.toString()));
+            dispatch(getSpendingBalance(user.principal.toString()));
+            dispatch(getAlexSpendingBalance(user.principal.toString()));
         }
     }, [dispatch, user]);
 
     const handleTopUp = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         if (!user) return;
-        
         dispatch(topUpLBRY({
             amount,
-            userPrincipal: user.toString()
+            userPrincipal: user.principal.toString()
         }));
+
         setLoadingModalV(true);
     };
 
@@ -142,11 +142,11 @@ const TopupContent = () => {
                             <div className='mb-3 w-full'>
                                 <div className='flex justify-between mb-3'>
                                     <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>
-                                    <input 
-                                        className='text-darkgray text-right bg-transparent text-2xl font-medium placeholder-darkgray focus:outline-none focus:border-transparent w-full' 
-                                        type='number' 
-                                        onChange={handleAmountChange} 
-                                        value={amount} 
+                                    <input
+                                        className='text-darkgray text-right bg-transparent text-2xl font-medium placeholder-darkgray focus:outline-none focus:border-transparent w-full'
+                                        type='number'
+                                        onChange={handleAmountChange}
+                                        value={amount}
                                     />
                                 </div>
                                 <div className='flex justify-between'>
@@ -158,7 +158,7 @@ const TopupContent = () => {
                                             </span>
                                         </strong>
                                     </div>
-                                    <button 
+                                    <button
                                         className='text-[#A7B1D7] underline text-base font-medium'
                                         onClick={handleMax}
                                     >
@@ -207,11 +207,11 @@ const TopupContent = () => {
                         </div>
                     </div>
                 </div>
-                <LoadingModal 
-                    show={loadingModalV} 
-                    message1="Top Up in Progress" 
-                    message2="Your transaction is being processed. This may take a few moments." 
-                    setShow={setLoadingModalV} 
+                <LoadingModal
+                    show={loadingModalV}
+                    message1="Top Up in Progress"
+                    message2="Your transaction is being processed. This may take a few moments."
+                    setShow={setLoadingModalV}
                 />
                 <SuccessModal show={successModalV} setShow={setSuccessModalV} />
                 <ErrorModal show={errorModalV} setShow={setErrorModalV} />

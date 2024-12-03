@@ -2,7 +2,7 @@ import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
 export interface EmporiumState {
   loading: boolean;
-  userTokens: string[];
+  userTokens: { tokenId: string; arweaveId: string }[];
   error: string | null;
 }
 
