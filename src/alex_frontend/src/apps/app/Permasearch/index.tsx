@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, forwardRef } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import SearchForm from '@/apps/Modules/AppModules/search/SearchForm';
 import ContentDisplay from "@/apps/Modules/AppModules/contentGrid";
@@ -21,11 +21,16 @@ import {
 import { ArrowUp } from "lucide-react";
 import ArweaveOwnerSelector from '@/apps/Modules/AppModules/search/selectors/ArweaveOwnerSelector';
 
+type ContentDisplayProps = {
+	ref?: React.RefObject<HTMLDivElement>;
+}
+
 function Permasearch() {
 	useWipeOnUnmount();
 	const dispatch = useDispatch<AppDispatch>();
 	const { isLoading, handleSearch } = useHandleSearch();
 	const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+	const contentRef = useRef<HTMLDivElement>(null);
 
 	const handleSearchClick = async () => {
 		await dispatch(wipe());
@@ -35,6 +40,17 @@ function Permasearch() {
 	const toggleFilters = () => {
 		setIsFiltersOpen(!isFiltersOpen);
 	};
+
+	useEffect(() => {
+		if (isLoading === false) {
+			setTimeout(() => {
+				contentRef.current?.scrollIntoView({ 
+					behavior: 'smooth',
+					block: 'start'
+				});
+			}, 100);
+		}
+	}, [isLoading]);
 
 	return (
 		<MainLayout>
@@ -66,7 +82,9 @@ function Permasearch() {
 					<SearchForm />
 				</SearchFormContainer>
 			</PageContainer>
-			<ContentDisplay />
+			<div ref={contentRef}>
+				<ContentDisplay />
+			</div>
 		</MainLayout>
 	);
 }

@@ -27,8 +27,6 @@ Bug; random librarian alex mints don't go to subaccounts or nfts.
 
 
 Minor stuff to do:
-- Make changing date/time easier.
-- Need to automatically slide down to images when the search is done.
 - Make exploring an owner easier.
 - Need to blur blocked images when clicked on.
 - We need a more efficient way to get peoples library because it takes a long time if you have a lot of NFTs. Maybe add back the concurrent query calls.
