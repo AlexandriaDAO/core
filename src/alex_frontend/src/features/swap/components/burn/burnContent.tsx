@@ -4,7 +4,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did'
 import { _SERVICE as _SERVICELBRY } from '../../../../../../declarations/LBRY/LBRY.did';
 
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 import { flagHandler } from "../../swapSlice";

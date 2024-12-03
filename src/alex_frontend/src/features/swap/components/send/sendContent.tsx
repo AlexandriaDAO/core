@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import transferICP from "@/features/icp-ledger/thunks/transferICP";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";

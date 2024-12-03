@@ -53,7 +53,7 @@ function Permasearch() {
 	}, [isLoading]);
 
 	return (
-		<MainLayout>
+		<>
 			<PageContainer>
 				<Title>Permasearch</Title>
 				<Description>

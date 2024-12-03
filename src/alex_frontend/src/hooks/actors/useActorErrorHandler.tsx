@@ -1,4 +1,4 @@
-import { InterceptorErrorData, InterceptorRequestData, isIdentityExpiredError } from "ic-use-actor";
+import { InterceptorErrorData, InterceptorRequestData, InterceptorResponseData, isIdentityExpiredError } from "ic-use-actor";
 import { toast } from "sonner";
 
 const useActorErrorHandler = (clear: () => void) => {
@@ -29,10 +29,16 @@ const useActorErrorHandler = (clear: () => void) => {
         return data.args;
     };
 
+    const handleResponse = (data: InterceptorResponseData) => {
+        console.log("onResponse", data.args, data.methodName, data.response);
+        return data.response;
+    };
+
     return {
         errorToast,
         handleResponseError,
         handleRequest,
+        handleResponse
     };
 };
 

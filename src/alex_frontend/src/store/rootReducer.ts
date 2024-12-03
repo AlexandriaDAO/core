@@ -27,6 +27,8 @@ import contentDisplayReducer from "@/apps/Modules/shared/state/content/contentDi
 import arweaveReducer from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import libraryReducer from "@/apps/Modules/shared/state/nft/librarySlice";
 
+import uploadBookReducer from "@/features/upload-book/uploadBookSlice";
+
 const rootReducer = combineReducers({
 	home: homeReducer,
 	auth: authReducer,
@@ -46,8 +48,9 @@ const rootReducer = combineReducers({
 	portalEra: portalEraReducer,
 
 	portalFilter: portalFilterReducer,
-
 	myNodes: myNodesReducer,
+
+	uploadBook: uploadBookReducer,
 
 	swap:swapReducer,
 	icpLedger:icpLedgerReducer,

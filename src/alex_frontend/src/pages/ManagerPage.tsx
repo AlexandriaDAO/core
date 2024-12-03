@@ -11,7 +11,7 @@ function ManagerPage() {
 		(state) => state.engineOverview
 	);
 	return (
-		<MainLayout>
+		<>
 			<div className="flex-grow flex items-start p-4 gap-4">
 				<div className="basis-1/4 flex flex-col items-start gap-10">
 					<MyEngines />
@@ -22,7 +22,7 @@ function ManagerPage() {
 					{activeEngine ? <EngineOverview /> : <PublicEngines />}
 				</div>
 			</div>
-		</MainLayout>
+		</>
 	);
 }
 

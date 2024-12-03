@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import MainLayout from "@/layouts/MainLayout";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
@@ -34,7 +34,7 @@ const HomePage: React.FC = () => {
   }, [user]);
 
   return (
-    <MainLayout>
+    <>
       <div style={{
         position: 'relative',
         overflow: 'hidden',
@@ -180,7 +180,7 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
-    </MainLayout>
+    </>
   );
 };
 

@@ -66,7 +66,7 @@ const FundNode = () => {
 
 	if (!irys) {
 		return (
-			<div className="w-full p-3 shadow-lg rounded-xl bg-white">
+			<div className="w-full p-3 border border-ring rounded-xl bg-white">
 				<div className="font-syne font-medium text-xl text-black mb-2">
 					Connect Wallet to Fund Library
 				</div>
@@ -92,7 +92,7 @@ const FundNode = () => {
 
 	return (
         <div className={`relative ${loading ? 'cursor-not-allowed pointer-events-none' : ''}`}>
-            <div className={`w-full p-3 flex flex-col shadow-lg rounded-xl bg-white ${loading ? 'opacity-40' : ''}`}>
+            <div className={`w-full p-3 flex flex-col border border-ring rounded-xl bg-white ${loading ? 'opacity-40' : ''}`}>
                 <div className="font-syne font-medium text-xl text-black mb-2">
                     Fund Your Library
                 </div>

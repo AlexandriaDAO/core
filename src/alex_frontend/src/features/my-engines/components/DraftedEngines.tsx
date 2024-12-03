@@ -3,7 +3,7 @@ import React from "react";
 
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/lib/components/table";
 import { Button } from "@/lib/components/button";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 
 
 function DraftedEngines() {
