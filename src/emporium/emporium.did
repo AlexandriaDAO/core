@@ -1,14 +1,3 @@
-type Block = record { id : nat; block : opt BlockVariant };
-type BlockVariant = variant { Map : vec MapEntry };
-type DynamicValue = variant {
-  Map : Vec;
-  Nat : nat;
-  Blob : blob;
-  Null;
-  Text : text;
-  Array : vec DynamicValue;
-};
-type MapEntry = record { key : text; value : DynamicValue };
 type Nft = record {
   status : NftStatus;
   token_id : nat64;
@@ -18,23 +7,10 @@ type Nft = record {
 };
 type NftStatus = variant { Listed; Unlisted; Reimbursed };
 type Result = variant { Ok : text; Err : text };
-type Result_1 = variant { Ok : vec Block; Err : text };
-type Vec = vec record {
-  key : text;
-  value : variant {
-    Map : Vec;
-    Nat : nat;
-    Blob : blob;
-    Null;
-    Text : text;
-    Array : vec DynamicValue;
-  };
-};
 service : {
   buy_nft : (nat64) -> (Result);
   cancel_nft_listing : (nat64) -> (Result);
   get_listing : () -> (vec record { nat64; Nft }) query;
-  icrc3_get_blocks : (nat, nat) -> (Result_1);
   list_nft : (nat64, nat64) -> (Result);
   update_nft_price : (nat64, nat64) -> (Result);
 }

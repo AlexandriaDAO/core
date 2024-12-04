@@ -12,14 +12,7 @@ const DiplayNfts = () => {
   const dispatch = useAppDispatch();
   const emporium = useAppSelector((state) => state.emporium);
 
-  useEffect(() => {
-  if(emporium?.userTokens.length>2){
-    const tokenIdBigInt = BigInt(emporium?.userTokens[3]?.tokenId); // Convert to bigint
-    console.log("fff0", natToArweaveId(tokenIdBigInt));
-  }
-     
-    
-  }, [emporium.userTokens]);
+
     return (
     <React.Fragment>
 

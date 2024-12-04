@@ -1,5 +1,6 @@
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
+import listNft from "./thunks/listNft";
 export interface EmporiumState {
   loading: boolean;
   userTokens: { tokenId: string; arweaveId: string }[];
@@ -34,6 +35,19 @@ const emporiumSlice = createSlice({
       })
       .addCase(getUserIcrc7Tokens.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(listNft.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(listNft.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(listNft.rejected, (state, action) => {
+        state.loading = false;
+        alert(action.payload);
         state.error = action.payload as string;
       });
   },

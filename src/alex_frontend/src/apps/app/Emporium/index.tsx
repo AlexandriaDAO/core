@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import MainLayout from "@/layouts/MainLayout";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import ListNft from "./listNft";
+import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 
 function Emporium() {
 
     const dispatch = useAppDispatch();
-
+    useEffect(() => {
+        setTransactions([])
+    }, [])
     return (
         <MainLayout>
 

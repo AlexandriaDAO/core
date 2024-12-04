@@ -6,27 +6,27 @@ import { useEffect, useState } from "react";
 import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import DisplayNfts from "./displayNfts";
+import { fetchTransactions } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveClient";
+import ContentDisplay from "@/apps/Modules/AppModules/contentGrid";
+import ContentListEmporium from "./contentListEmporium";
 
 const ListNft = () => {
     const client = getAuthClient();
+    const { user } = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
-    const emporium = useAppSelector((state) => state.emporium);
-    const [userPrincipal, setuserPrincipal] = useState<Principal>();
 
-
-    const getPrincipal = async () => {
-        const id = (await client).getIdentity().getPrincipal();
-        setuserPrincipal(id);
-    }
+    // const getPrincipal = async () => {
+    //     const id = (await client).getIdentity().getPrincipal();
+    //     setuserPrincipal(id);
+    // }
     const fetchUserNfts = () => {
-        dispatch(getUserIcrc7Tokens(userPrincipal));
+        if (user)
+            dispatch(getUserIcrc7Tokens(user?.principal));
     }
-    useEffect(() => {
-        getPrincipal();
-    }, [])
+ 
     return (<>
         List NFT
-        Owner {userPrincipal?.toString()}
+        Owner {user?.principal}
         <button onClick={() => {
             fetchUserNfts();
         }}>Fetch Nft</button>
@@ -35,7 +35,7 @@ const ListNft = () => {
             return (<td>{id}</td>)
         })} */}
 
-        <DisplayNfts />
+        <ContentListEmporium />
 
 
     </>)

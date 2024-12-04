@@ -65,6 +65,11 @@ candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/ve
 cargo build --release --target wasm32-unknown-unknown --package tests
 candid-extractor target/wasm32-unknown-unknown/release/tests.wasm > src/tests/tests.did
 
+# For Emporium
+cargo build --release --target wasm32-unknown-unknown --package emporium
+candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/emporium/emporium.did
+
+
 cargo update
 
 dfx deploy bookmarks --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
@@ -78,6 +83,8 @@ dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 
 dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
 dfx deploy tests --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
+
+dfx deploy emporium --specified-id be2us-64aaa-aaaaa-qaabq-cai
 
 # Step 5: Configure Local Identities for token launches
 dfx identity new minter --storage-mode plaintext
