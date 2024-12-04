@@ -1,45 +1,16 @@
 use candid::Principal;
 use ic_cdk::api::call::CallResult;
 use ic_cdk::update;
-use icrc_ledger_types::icrc2::transfer_from::{TransferFromArgs, TransferFromError};
 use icrc_ledger_types::icrc2::approve::{ApproveArgs, ApproveError};
 use icrc_ledger_types::icrc1::account::Account;
 use candid::Nat;
-use ic_ledger_types::{BlockIndex, MAINNET_LEDGER_CANISTER_ID};
+use ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
 use icrc_ledger_types::icrc2::allowance::{AllowanceArgs};
 use candid::{CandidType, Deserialize};
 use crate::utils::{get_test_subaccount, E8S_PER_ICP, ICP_FEE, MIN_DELAY_NS};
 
-#[derive(CandidType, Debug, Deserialize)]
-pub struct SwapRequest {
-    account_name: String,
-    amount_icp: u64,
-}
-
-#[derive(CandidType, Debug, Deserialize)]
-pub struct SwapResult {
-    account_name: String,
-    result: Result<String, String>,
-}
-
 #[update]
-pub async fn test_swap_batch(requests: Vec<SwapRequest>) -> Vec<SwapResult> {
-    let mut results = Vec::with_capacity(requests.len());
-    
-    for request in requests {
-        let SwapRequest { account_name, amount_icp } = request;
-        let result = test_swap_single(&account_name, amount_icp).await;
-        results.push(SwapResult {
-            account_name,
-            result,
-        });
-    }
-    
-    results
-}
-
-async fn test_swap_single(account_name: &str, amount_icp: u64) -> Result<String, String> {
-    let owner_id = ic_cdk::api::id();
+pub async fn swap(amount_icp: u64, account_name: String) -> Result<String, String> {
     let amount_e8s = amount_icp * E8S_PER_ICP;
     
     if amount_e8s < 10_000_000 {
@@ -47,7 +18,7 @@ async fn test_swap_single(account_name: &str, amount_icp: u64) -> Result<String,
     }
     
     // 1. First approve the swap canister to spend tokens
-    let approve_result = match approve_icp_transfer(account_name, amount_e8s).await {
+    let approve_result = match approve_icp_transfer(&account_name, amount_e8s).await {
         Ok(result) => result,
         Err(e) => return Err(format!("Approval failed: {:?}", e)),
     };
@@ -61,7 +32,7 @@ async fn test_swap_single(account_name: &str, amount_icp: u64) -> Result<String,
     ).await;
 
     // 2. Verify allowance
-    let allowance = match verify_allowance(account_name, amount_e8s).await {
+    let allowance = match verify_allowance(&account_name, amount_e8s).await {
         Ok(allowance) => allowance,
         Err(e) => return Err(format!("Failed to verify allowance: {:?}", e)),
     };
@@ -72,7 +43,7 @@ async fn test_swap_single(account_name: &str, amount_icp: u64) -> Result<String,
 
     // 3. Call swap function on the swap canister
     let swap_canister_id = crate::icp_swap_principal();
-    let subaccount = get_test_subaccount(account_name)
+    let subaccount = get_test_subaccount(&account_name)
         .map_err(|e| format!("Failed to get test subaccount: {:?}", e))?;
 
     let swap_result: Result<(Result<String, String>,), _> = ic_cdk::call(

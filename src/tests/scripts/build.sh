@@ -54,7 +54,7 @@ dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argu
         record {
           \"7ae46f4683825e60e72a330cbf750fa4626ebab39fdef11780b8eb671e4dd3ea\";
           record {
-            e8s = 1_000_000_000 : nat64;
+            e8s = 10_000_000_000  : nat64;
           };
         };
         record {  

@@ -36,11 +36,13 @@ mod swap;
 mod burn;
 mod stake;
 mod balances;
+pub mod claim;
 pub use utils::*;
 pub use swap::*;
 pub use burn::*;
 pub use stake::*;
 pub use balances::*;
+pub use claim::*;
 
 ic_cdk::export_candid!();
 

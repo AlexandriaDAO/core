@@ -436,7 +436,7 @@ pub async fn distribute_reward() -> Result<String, String> {
     total_icp_allocated = total_icp_allocated.checked_div(10000).ok_or(
         "Division failed in ICP allocation. Please verify the amount is valid and non-zero",
     )?;
-    if total_icp_allocated < 100_000_000 {
+    if total_icp_allocated < 1_000_000 {
         return Err("Cannot distribute reward allocated Icp balance less than 1".to_string());
     }
 

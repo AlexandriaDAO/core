@@ -1,7 +1,7 @@
 /*
 The Plan:
 
-So stakes now works, but the problem is the stable storage does not have respect for subaccounts, so I gotta add subaccounts to all the data structures.
+
 
 So here's the deal. I got to make canisters for different users, and it's just gotta be that way because stable storage doesnt work by subaccount.
 There's also no point in adding the complexity of making internal storage subaccount-specific.
@@ -9,6 +9,7 @@ There's also no point in adding the complexity of making internal storage subacc
 - get_two_random_users only gets the principal, not the subaccount.
 - Problem is if the transaction call fails, it goes right to adils wallet.
 
+- I also have to restore the staking timer on mainnet with the proper numbers and such.S
 
 
 Bug; random librarian alex mints don't go to subaccounts or nfts.

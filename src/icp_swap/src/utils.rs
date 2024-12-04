@@ -12,7 +12,8 @@ use ic_ledger_types::Subaccount;
 use ic_ledger_types::{AccountBalanceArgs, Tokens, DEFAULT_SUBACCOUNT, MAINNET_LEDGER_CANISTER_ID};
 use serde::Deserialize;
 
-pub const STAKING_REWARD_PERCENTAGE: u64 = 1000; //multiply by 100 eg. 10% = 1000
+// pub const STAKING_REWARD_PERCENTAGE: u64 = 1000; //multiply by 100 eg. 10% = 1000
+pub const STAKING_REWARD_PERCENTAGE: u64 = 100; // 1%
 pub const ALEX_CANISTER_ID: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";
 pub const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
 pub const TOKENOMICS_CANISTER_ID: &str = "5abki-kiaaa-aaaap-qkmsa-cai";

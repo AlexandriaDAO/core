@@ -157,6 +157,7 @@ const MetaData = forwardRef(({ metadata, setMetadata }: any, ref) => {
       </div>
 
       <CategorySelect 
+        // @ts-ignore
         setMetadata={setMetadata}
         metadata={metadata}
         isSubmitAttempted={isSubmitAttempted}

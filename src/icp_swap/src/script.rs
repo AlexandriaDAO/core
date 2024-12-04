@@ -6,7 +6,8 @@ use serde::Deserialize;
 use crate::{distribute_reward, get_icp_rate_in_cents, ArchiveBalance, DailyValues, LbryRatio, Stake, APY, ARCHIVED_TRANSACTION_LOG, DISTRIBUTION_INTERVALS, LBRY_RATIO, STAKES, TOTAL_ARCHIVED_BALANCE, TOTAL_UNCLAIMED_ICP_REWARD};
 use crate::guard::*;
 
-pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(1*24*60*60); // 1 days in seconds
+// pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(1*24*60*60); // 1 days in seconds
+pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(10); // 10 seconds
 pub const PRICE_FETCH_INTERVAL: Duration = Duration::from_secs(1*24*60*60); // 1 days in seconds
 
 //Old init
@@ -100,7 +101,7 @@ fn init(args: Option<InitArgs>) {
     ic_cdk::println!("Setting up recurring timers...");
     let _reward_timer_id: ic_cdk_timers::TimerId =
         ic_cdk_timers::set_timer_interval(REWARD_DISTRIBUTION_INTERVAL, || {
-            ic_cdk::println!("Triggering scheduled reward distribution...");
+            // ic_cdk::println!("Triggering scheduled reward distribution...");
             ic_cdk::spawn(distribute_reward_wrapper())
         });
     let _price_timer_id: ic_cdk_timers::TimerId =

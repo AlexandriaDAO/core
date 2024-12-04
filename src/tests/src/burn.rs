@@ -15,7 +15,7 @@ pub async fn burn(amount: u64, balance_name: String) -> Result<String, String> {
 
     // Get subaccount from balance name
     let from_subaccount = get_test_subaccount(&balance_name)
-        .map_err(|_| format!("Invalid balance name: {}. Must be one of: admin, alice, bob, charlie", balance_name))?;
+        .map_err(|_| format!("Invalid balance name: {}. Must be one of: root, one, two, three", balance_name))?;
 
     // Convert amount to e8s
     let amount_e8s = amount * E8S_PER_ICP;
