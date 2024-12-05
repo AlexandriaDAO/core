@@ -1,25 +1,36 @@
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
 import listNft from "./thunks/listNft";
+import { message } from "antd";
+import { toast } from "sonner";
+import getMarketListings from "./thunks/getMarketListings";
 export interface EmporiumState {
   loading: boolean;
+  depositNftSuccess: Boolean;
   userTokens: { tokenId: string; arweaveId: string }[];
+  marketPlace: Record<
+    string,
+    { tokenId: string; arweaveId: string; price: string }
+  >;
   error: string | null;
 }
 
 // Define the initial state
 const initialState: EmporiumState = {
   loading: false,
+  depositNftSuccess: false,
   error: null,
   userTokens: [],
+  marketPlace: {},
 };
 
 const emporiumSlice = createSlice({
   name: "emporium",
   initialState,
   reducers: {
-    flagHandler: (state) => {
+    flagHandlerEmporium: (state) => {
       state.error = null;
+      state.depositNftSuccess = false;
     },
   },
   extraReducers: (builder: ActionReducerMapBuilder<EmporiumState>) => {
@@ -32,10 +43,12 @@ const emporiumSlice = createSlice({
         state.userTokens = action.payload.length > 0 ? action.payload : [];
         state.loading = false;
         state.error = null;
+        toast.success("Fetched!");
       })
       .addCase(getUserIcrc7Tokens.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+        toast.error(action.payload);
       })
       .addCase(listNft.pending, (state) => {
         state.loading = true;
@@ -43,14 +56,32 @@ const emporiumSlice = createSlice({
       })
       .addCase(listNft.fulfilled, (state, action) => {
         state.loading = false;
+        state.depositNftSuccess = true;
         state.error = null;
+        toast.success("Listed!");
       })
       .addCase(listNft.rejected, (state, action) => {
         state.loading = false;
-        alert(action.payload);
+        toast.error(action.payload);
         state.error = action.payload as string;
+      })
+      .addCase(getMarketListings.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getMarketListings.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.marketPlace = action.payload; // Assign the object directly
+
+        toast.success("Fetched!");
+      })
+      .addCase(getMarketListings.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        toast.error(action.payload);
       });
   },
 });
-export const { flagHandler } = emporiumSlice.actions;
+export const { flagHandlerEmporium } = emporiumSlice.actions;
 export default emporiumSlice.reducer;

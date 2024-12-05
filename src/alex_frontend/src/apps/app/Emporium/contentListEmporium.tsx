@@ -10,20 +10,29 @@ import ContentRenderer from "@/apps/Modules/AppModules/contentGrid/components/Co
 import { mint_nft } from "@/features/nft/mint";
 import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
 import SellModal from "./sellModal";
+import BuyModal from "./buyModal";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
-
-const ContentListEmporium = () => {
+interface ContentListEmporiumProps {
+  type: string;
+}
+const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   const dispatch = useAppDispatch();
   const transactions = useSortedTransactions();
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
   const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
   const predictions = useSelector((state: RootState) => state.arweave.predictions);
+  const emporium = useAppSelector((state) => state.emporium);
+  
+  
 
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
   const [showSellModal, setShowSellModal] = useState({ arwaveId: "", show: false });
+  const [showBuyModal, setShowBuyModal] = useState({ arwaveId: "", show: false });
+  const [buttonType, setButtonType] = useState("");
 
   const handleRenderError = useCallback((transactionId: string) => {
     dispatch(clearTransactionContent(transactionId));
@@ -42,6 +51,23 @@ const ContentListEmporium = () => {
       ))}
     </div>
   ), []);
+  const buttontypeHandler = (transactionId: string) => {
+    if (buttonType === "Sell") {
+      setShowSellModal({ arwaveId: transactionId, show: true });
+    }
+    else if (buttonType === "Buy") {
+      setShowBuyModal({ arwaveId: transactionId, show: true });
+
+    }
+  }
+  useEffect(() => {
+    if (type === "userNfts") {
+      setButtonType("Sell");
+    }
+    else if (type === "marketPlace") {
+      setButtonType("Buy");
+    }
+  }, [type])
 
   return (
     <>
@@ -108,15 +134,17 @@ const ContentListEmporium = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setShowSellModal({ arwaveId: transaction.id, show: true });
+                    buttontypeHandler(transaction.id)
                   }}
                   className="absolute top-2 right-2 bg-green-500 hover:bg-pink-600 text-white rounded-full w-10 h-10 flex items-center justify-center z-[25]"
                 >
-                  Sell
-                </button>
+                  {buttonType}
 
+                </button>
+                {type === "marketPlace" &&<div className="text-white text-lg absolute bottom-0 bg-gray-600 w-full py-2">  Price { emporium.marketPlace[transaction.id]?.price} ICP</div>}
               </div>
             </ContentGrid.Item>
+
           );
         })}
       </ContentGrid>
@@ -147,11 +175,17 @@ const ContentListEmporium = () => {
 
       <SellModal
         showSellModal={showSellModal}
-        onClose={() => setShowSellModal({show:false,arwaveId:""})}
+        onClose={() => setShowSellModal({ show: false, arwaveId: "" })}
       >
 
       </SellModal>
 
+      <BuyModal
+        showBuyModal={showBuyModal}
+        onClose={() => setShowBuyModal({ show: false, arwaveId: "" })}
+      >
+
+      </BuyModal>
 
     </>
   );

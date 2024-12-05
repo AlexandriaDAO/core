@@ -16,12 +16,11 @@ const listNft = createAsyncThunk<
   { rejectValue: string } // Reject type
 >("emporium/listNft", async ({ nftArweaveId, price }, { rejectWithValue }) => {
   try {
-    console.log("ths ",natToArweaveId,price);
     const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
     const actorEmporium = await getActorEmporium();
     const actorIcrc7 = await getIcrc7Actor();
-    const ledgerServices = LedgerService();
     const tokenId = arweaveIdToNat(nftArweaveId);
+    const tokenIdStr = arweaveIdToNat(nftArweaveId).toString();
 
     // Format the price as BigInt
     const priceFormat: bigint = BigInt(
@@ -38,16 +37,20 @@ const listNft = createAsyncThunk<
           expires_at: [],
           spender: {
             owner: Principal.fromText(emporium_canister_id),
-            subaccount: []
-          }
+            subaccount: [],
+          },
         },
       },
     ]);
+    // const revoke=await actorIcrc7.icrc37_revoke_token_approvals([{
+    //   token_id: tokenId,
+    //   memo: [],
+    //   from_subaccount: [],
+    //   created_at_time: [],
+    //   spender: []
+    // }])
 
-    const result = await actorEmporium.list_nft(
-      arweaveIdToNat(nftArweaveId),
-      priceFormat
-    );
+    const result = await actorEmporium.list_nft(tokenId, priceFormat);
 
     // Handle success or error response
     if ("Ok" in result) {

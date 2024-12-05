@@ -24,7 +24,7 @@ const SellModal: React.FC<SellModalProps> = ({ showSellModal, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-4 max-w-3xl max-h-[90vh] w-full relative overflow-auto">
+      <div className="bg-white rounded-lg p-6 max-w-lg max-h-[90vh] w-full relative overflow-auto">
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
@@ -47,7 +47,7 @@ const SellModal: React.FC<SellModalProps> = ({ showSellModal, onClose }) => {
         </div>
         <button
           onClick={handleSell}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
+          className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl font-semibold me-5 hover:bg-white hover:text-[#353535]"
         >
           Confirm
         </button>

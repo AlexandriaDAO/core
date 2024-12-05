@@ -12,7 +12,7 @@ struct OwnerInfo {
     subaccount: Option<Vec<u8>>,
 }
 
-pub async fn is_owner(principal: Principal, token_id: u64) -> Result<bool, String> {
+pub async fn is_owner(principal: Principal, token_id: Nat) -> Result<bool, String> {
     let nft_canister = get_principal(ICRC7_CANISTER_ID);
 
     let args = vec![Nat::from(token_id)];
@@ -32,14 +32,14 @@ pub async fn is_owner(principal: Principal, token_id: u64) -> Result<bool, Strin
         }
     }
 }
-pub fn remove_nft_from_listing(token_id: u64) -> Result<String, String> {
+pub fn remove_nft_from_listing(token_id: Nat) -> Result<String, String> {
     LISTING.with(|nfts| -> Result<(), String> {
         let mut nft_map = nfts.borrow_mut();
 
         // Check exists
-        match nft_map.get(&token_id) {
+        match nft_map.get(&token_id.to_string()) {
             Some(_existing_nft_sale) => {
-                nft_map.remove(&token_id);
+                nft_map.remove(&token_id.to_string());
                 ic_cdk::println!("NFT with token_id {} removed from the listing.", token_id);
                 Ok(())
             }

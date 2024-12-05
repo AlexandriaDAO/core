@@ -1,8 +1,8 @@
-use ic_cdk::query;
 use crate::{Nft, LISTING};
+use ic_cdk::query;
 
 #[query]
-pub fn get_listing() -> Vec<(u64, Nft)> {
+pub fn get_listing() -> Vec<(String, Nft)> {
     LISTING.with(|nfts| {
         let nft_map = nfts.borrow();
         nft_map

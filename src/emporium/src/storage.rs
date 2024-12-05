@@ -1,4 +1,4 @@
-use candid::{CandidType, Principal};
+use candid::{CandidType, Nat, Principal};
 use candid::{Decode, Deserialize, Encode};
 use std::borrow::Cow;
 use std::cell::RefCell;
@@ -19,7 +19,7 @@ thread_local! {
         MemoryManager::init(DefaultMemoryImpl::default())
     );
     
-    pub static LISTING: RefCell<StableBTreeMap<u64, Nft, Memory>> = RefCell::new(
+    pub static LISTING: RefCell<StableBTreeMap<String, Nft, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(LISTING_MEM_ID))
         )
@@ -31,7 +31,7 @@ const MAX_VALUE_SIZE: u32 = 200;
 pub struct Nft {
    pub owner: Principal,
    pub price: u64,
-   pub token_id: u64,
+   pub token_id: Nat,
    pub status: NftStatus,  // Replaced String with NftStatus enum
    pub time: u64,
 }

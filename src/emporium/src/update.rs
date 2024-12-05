@@ -18,74 +18,75 @@ use icrc_ledger_types::icrc2::transfer_from::{
 
 use ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
 #[update]
-pub async fn list_nft(token_id: u64, icp_amount: u64) -> Result<String, String> {
+pub async fn list_nft(token_id: Nat, icp_amount: u64) -> Result<String, String> {
     //check ownership
     //desposit nft to canister
     //add record to listing
 
-    match is_owner(caller(), token_id).await {
+    match is_owner(caller(), token_id.clone()).await {
         Ok(true) => {}
         Ok(false) => return Err("You can't list this NFT, ownership proof failed!".to_string()),
         Err(_) => return Err("Something went wrong !".to_string()),
     };
 
     // ic_cdk::println!("Yees you are the owner!!! :D");
-    deposit_nft_to_canister(token_id).await?;
+    deposit_nft_to_canister(token_id.clone()).await?;
 
     LISTING.with(|nfts| -> Result<(), String> {
         let mut nft_map = nfts.borrow_mut();
-        let nft = match nft_map.get(&token_id) {
+        let nft = match nft_map.get(&token_id.to_string()) {
             Some(_existing_nft_sale) => {
                 return Err("Nft already on sale can't list ".to_string());
             }
             None => Nft {
                 owner: caller(),
                 price: icp_amount,
-                token_id,
+                token_id:token_id.clone(),
                 status: NftStatus::Listed, 
                 time: ic_cdk::api::time(),
             },
         };
 
-        nft_map.insert(token_id, nft);
+        nft_map.insert(token_id.clone().to_string(), nft);
         Ok(())
     })?;
 
     Ok("NFT added for sale".to_string())
 }
 #[update]
-pub async fn cancel_nft_listing(token_id: u64) -> Result<String, String> {
+pub async fn cancel_nft_listing(token_id: Nat) -> Result<String, String> {
     // Check if the caller is the owner
 
     let current_nft = LISTING
         .with(|nfts| {
             let nft_map = nfts.borrow();
-            nft_map.get(&token_id)
+            nft_map.get(&token_id.clone().to_string())
         })
         .ok_or("NFT doesn't exists")?;
     if current_nft.owner == caller() {
         // Transfer the NFT back to the owner
-        transfer_nft_from_canister(caller(), token_id).await?;
-        remove_nft_from_listing(token_id)?;
+        transfer_nft_from_canister(caller(), token_id.clone()).await?;
+        remove_nft_from_listing(token_id.clone())?;
     } else {
         return Err("Unauthorized !".to_string());
     }
     Ok("Successfully cancelled the NFT listing.".to_string())
 }
 #[update]
-pub async fn buy_nft(token_id: u64) -> Result<String, String> {
+pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
     // transfer ICP from caller to seller through tranfer approve
     // transfer NFT
     // delete record from sale
+
     let current_nft = LISTING
         .with(|nfts| {
             let nft_map = nfts.borrow();
-            nft_map.get(&token_id)
+            nft_map.get(&token_id.clone().to_string())
         })
         .ok_or("NFT doesn't exists")?;
 
     transfer_icp_to_seller(current_nft.price, current_nft.owner).await?;
-    match transfer_nft_from_canister(caller(), token_id).await {
+    match transfer_nft_from_canister(caller(), token_id.clone()).await {
         Ok(ok) => {}
         Err(err) => {
 
@@ -95,7 +96,7 @@ pub async fn buy_nft(token_id: u64) -> Result<String, String> {
                 let mut nft_map = nfts.borrow_mut();
 
                 // Retrieve the existing NFT
-                let updated_nft = match nft_map.get(&token_id) {
+                let updated_nft = match nft_map.get(&token_id.clone().to_string()) {
                     Some(existing_nft) => {
                         let mut updated = existing_nft.clone();
                         updated.owner = caller();
@@ -107,7 +108,7 @@ pub async fn buy_nft(token_id: u64) -> Result<String, String> {
                 };
 
                 // Updated
-                nft_map.insert(token_id, updated_nft);
+                nft_map.insert(token_id.clone().to_string(), updated_nft);
                 return Err("Nft transfer failed, ownership transfered.".to_string());
             })?;
         }
@@ -118,14 +119,15 @@ pub async fn buy_nft(token_id: u64) -> Result<String, String> {
     Ok("Success".to_string())
 }
 #[update]
-pub async fn update_nft_price(token_id: u64, new_price: u64) -> Result<String, String> {
-    let current_time: u64 = ic_cdk::api::time();
+pub async fn update_nft_price(token_id_str: String, new_price: u64) -> Result<String, String> {
+    let token_id: u64 = token_id_str.parse().map_err(|_| "Invalid token_id format.".to_string())?;
 
+    let current_time: u64 = ic_cdk::api::time();
     LISTING.with(|nfts| -> Result<(), String> {
         let mut nft_map = nfts.borrow_mut();
 
         // Retrieve the existing NFT
-        let updated_nft = match nft_map.get(&token_id) {
+        let updated_nft = match nft_map.get(&token_id.clone().to_string()) {
             Some(existing_nft) => {
                 if existing_nft.owner != caller() {
                     return Err("Only the owner of the NFT can update its price.".to_string());
@@ -139,7 +141,7 @@ pub async fn update_nft_price(token_id: u64, new_price: u64) -> Result<String, S
         };
 
         // Updated
-        nft_map.insert(token_id, updated_nft);
+        nft_map.insert(token_id.clone().to_string(), updated_nft);
         Ok(())
     })?;
 
@@ -180,7 +182,7 @@ async fn transfer_icp_to_seller(amount: u64, destination: Principal) -> Result<B
     .map_err(|e: TransferFromErrorIcrc| format!("ledger transfer error {:?}", e))
 }
 
-pub async fn deposit_nft_to_canister(token_id: u64) -> Result<String, String> {
+pub async fn deposit_nft_to_canister(token_id: Nat) -> Result<String, String> {
     let nft_canister: Principal = get_principal(ICRC7_CANISTER_ID);
 
     let transfer_arg = vec![TransferFromArg {
@@ -340,7 +342,7 @@ pub async fn deposit_nft_to_canister(token_id: u64) -> Result<String, String> {
 
 pub async fn transfer_nft_from_canister(
     destination: Principal,
-    token_id: u64,
+    token_id: Nat,
 ) -> Result<String, String> {
     let nft_canister: Principal = get_principal(ICRC7_CANISTER_ID);
 
