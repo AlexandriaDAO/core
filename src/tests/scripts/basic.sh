@@ -16,35 +16,78 @@ Timetable change is changed with:
 - Took a zero off of total_icp_allocated in update.rs
 COMMENT
 
+# Function to perform one cycle of operations
+perform_cycle() {
+    echo "=== Starting new cycle at $(date) ==="
+    
+    # Debug ICP balance before claim
+    echo "ICP Balance before claim:"
+    dfx canister call icp_ledger_canister icrc1_balance_of '(record { owner = principal "yn33w-uaaaa-aaaap-qpk5q-cai"; subaccount = null })'
+    
+    # CLAIM
+    echo "Attempting claim..."
+    dfx canister call tests claim_icp_reward "root"
+    
+    # Debug ICP balance after claim
+    echo "ICP Balance after claim:"
+    dfx canister call icp_ledger_canister icrc1_balance_of '(record { owner = principal "yn33w-uaaaa-aaaap-qpk5q-cai"; subaccount = null })'
 
+    # SWAP
+    ICP_BALANCE=$(dfx canister call icp_ledger_canister icrc1_balance_of '(record { owner = principal "yn33w-uaaaa-aaaap-qpk5q-cai"; subaccount = null })' | sed 's/[^0-9]*//g')
+    ICP_BALANCE_INT=$((ICP_BALANCE / 100000000))
+    echo "Attempting swap of $((ICP_BALANCE_INT - 1)) ICP..."
+    dfx canister call tests swap "($(($ICP_BALANCE_INT - 1)), \"root\")"
 
-#!/bin/bash
+    # Debug LBRY balance after swap
+    echo "LBRY Balance after swap:"
+    dfx canister call LBRY icrc1_balance_of '(record { owner = principal "yn33w-uaaaa-aaaap-qpk5q-cai"; subaccount = null })'
 
-# Store balance and verify we have enough (at least 1 ICP)
-ICP_BALANCE=$(dfx canister call icp_ledger_canister icrc1_balance_of '(record { owner = principal "yn33w-uaaaa-aaaap-qpk5q-cai"; subaccount = null })' | sed 's/[^0-9]*//g')
-ICP_BALANCE_INT=$((ICP_BALANCE / 100000000))
-dfx canister call tests swap "($ICP_BALANCE_INT, \"root\")"
+    # BURN
+    LBRY_BALANCE=$(dfx canister call LBRY icrc1_balance_of '(record { owner = principal "yn33w-uaaaa-aaaap-qpk5q-cai"; subaccount = null })' | sed 's/[^0-9]*//g')
+    TRANSFER_AMOUNT=$(echo "$LBRY_BALANCE * 0.05" | bc | sed 's/\..*$//')
+    LBRY_BALANCE_INT=$((LBRY_BALANCE / 100000000))
+    BURN_AMOUNT=$(echo "$LBRY_BALANCE_INT * 0.95" | bc | sed 's/\..*$//')
+    
+    echo "Attempting LBRY transfer of $TRANSFER_AMOUNT (raw amount)"
+    echo "LBRY balance before transfer: $LBRY_BALANCE"
+    
+    # # plain burn 5% // This will be implemented in the canister (which is the rightful controller of the funds.)
+    # dfx canister call LBRY icrc1_transfer "(record { 
+    #     from_subaccount = null;
+    #     to = record { owner = principal \"54fqz-5iaaa-aaaap-qkmqa-cai\"; subaccount = null };
+    #     amount = $TRANSFER_AMOUNT;
+    #     fee = null;
+    #     memo = null;
+    #     created_at_time = null;
+    # })"
 
+    # Debug LBRY balance after transfer
+    echo "LBRY Balance after transfer:"
+    dfx canister call LBRY icrc1_balance_of '(record { owner = principal "yn33w-uaaaa-aaaap-qpk5q-cai"; subaccount = null })'
 
-# First send 100 LBRY to the burn address.
-LBRY_BALANCE=$(dfx canister call LBRY icrc1_balance_of '(record { owner = principal "yn33w-uaaaa-aaaap-qpk5q-cai"; subaccount = null })' | sed 's/[^0-9]*//g')
-LBRY_BALANCE_INT=$((LBRY_BALANCE / 100000000))
-dfx canister call tests burn "($(($LBRY_BALANCE_INT - 100000)), \"root\")"
+    # swap burn 95%
+    dfx canister call tests burn "($BURN_AMOUNT, \"root\")"
 
-ALEX_BALANCE=$(dfx canister call ALEX icrc1_balance_of '(record { owner = principal "yn33w-uaaaa-aaaap-qpk5q-cai"; subaccount = null })' | sed 's/[^0-9]*//g')
-ALEX_BALANCE_INT=$((ALEX_BALANCE / 100000000))
-dfx canister call tests stake "($(($ALEX_BALANCE_INT - 100)), \"root\")"
+    # STAKE
+    ALEX_BALANCE=$(dfx canister call ALEX icrc1_balance_of '(record { owner = principal "yn33w-uaaaa-aaaap-qpk5q-cai"; subaccount = null })' | sed 's/[^0-9]*//g')
+    ALEX_BALANCE_INT=$((ALEX_BALANCE / 100000000))
+    dfx canister call tests stake "($(($ALEX_BALANCE_INT - 100)), \"root\")"
 
-# Check balances for multiple accounts
-dfx canister call tests check_balances '(vec { "root"; "one"; "two"; "three" })'
+    # Check balances for multiple accounts
+    dfx canister call tests check_balances '(vec { "root"; })'
+    dfx canister call icp_swap get_all_stakes
+    dfx canister call icp_swap get_total_unclaimed_icp_reward
+    dfx canister call ALEX icrc1_total_supply
 
-# Check stakes
-dfx canister call icp_swap get_all_stakes
-dfx canister call icp_swap get_total_unclaimed_icp_reward
+    echo "Cycle completed at $(date)"
+}
 
-# # Claim rewards for root
-dfx canister call tests claim_icp_reward "root"
-
+# Main loop
+echo "Starting cycles at $(date)"
+while true; do
+    perform_cycle
+    sleep 60
+done
 
 : <<'COMMENT'
 

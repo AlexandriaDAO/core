@@ -58,46 +58,46 @@ dfx deploy alex_wallet --network ic
 
 # Step 3: Deploy FTs (ALEX & LBRY).
 
-dfx deploy LBRY --network ic --argument '(variant { Init = 
-record {
-     token_symbol = "LBRY";
-     token_name = "LBRY";
-     minting_account = record { owner = principal "'$(dfx canister id icp_swap --network ic)'" };
-     transfer_fee = 4_000_000;
-     metadata = vec {};
-     initial_balances = vec {};
-     archive_options = record {
-         num_blocks_to_archive = 1000;
-         trigger_threshold = 2000;
-         controller_id = principal "'$(dfx canister id icp_swap --network ic)'";
-     };
-     feature_flags = opt record {
-        icrc2 = true;
-        icrc3 = true;
-     };
- }
-})'
+# dfx deploy LBRY --network ic --argument '(variant { Init = 
+# record {
+#      token_symbol = "LBRY";
+#      token_name = "LBRY";
+#      minting_account = record { owner = principal "'$(dfx canister id icp_swap --network ic)'" };
+#      transfer_fee = 4_000_000;
+#      metadata = vec {};
+#      initial_balances = vec {};
+#      archive_options = record {
+#          num_blocks_to_archive = 1000;
+#          trigger_threshold = 2000;
+#          controller_id = principal "'$(dfx canister id icp_swap --network ic)'";
+#      };
+#      feature_flags = opt record {
+#         icrc2 = true;
+#         icrc3 = true;
+#      };
+#  }
+# })'
 
 
-dfx deploy ALEX --network ic --argument '(variant { Init = 
-record {
-     token_symbol = "ALEX";
-     token_name = "ALEX";
-     minting_account = record { owner = principal "'$(dfx canister id tokenomics --network ic)'" };
-     transfer_fee = 10_000;
-     metadata = vec {};
-     initial_balances = vec {};
-     archive_options = record {
-         num_blocks_to_archive = 1000;
-         trigger_threshold = 2000;
-         controller_id = principal "'$(dfx canister id tokenomics --network ic)'";
-     };
-     feature_flags = opt record {
-        icrc2 = true;
-        icrc3 = true;
-     };
- }
-})'
+# dfx deploy ALEX --network ic --argument '(variant { Init = 
+# record {
+#      token_symbol = "ALEX";
+#      token_name = "ALEX";
+#      minting_account = record { owner = principal "'$(dfx canister id tokenomics --network ic)'" };
+#      transfer_fee = 10_000;
+#      metadata = vec {};
+#      initial_balances = vec {};
+#      archive_options = record {
+#          num_blocks_to_archive = 1000;
+#          trigger_threshold = 2000;
+#          controller_id = principal "'$(dfx canister id tokenomics --network ic)'";
+#      };
+#      feature_flags = opt record {
+#         icrc2 = true;
+#         icrc3 = true;
+#      };
+#  }
+# })'
 
 
 # # Exit and deploy frontend manually.
@@ -110,14 +110,13 @@ rm -rf local/canisters/
 cp -r ic/canisters/ local/
 cd ..
 
-# mkdir -p .dfx/local/canisters/LBRY
-# mkdir -p .dfx/local/canisters/ALEX
-# mkdir -p .dfx/local/canisters/alex_frontend/
-
-# wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/ALEX/ALEX.did
-# wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/LBRY/LBRY.did
-
 # cp .dfx/ic/canisters/alex_frontend/assetstorage.did .dfx/local/canisters/alex_frontend/
+mkdir -p .dfx/local/canisters/LBRY
+mkdir -p .dfx/local/canisters/ALEX
+mkdir -p .dfx/local/canisters/alex_frontend/
+
+wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/ALEX/ALEX.did
+wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/LBRY/LBRY.did
 
 npm i
 dfx deploy alex_frontend --network ic

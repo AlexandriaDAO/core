@@ -1,10 +1,14 @@
 /*
 The Plan:
 
+- First calculated who's owed what in this whole setup.
+- Backup for ICRC1 stuff and tokenomics outcomes.
+  - The idea here is to add a withdraw function that can be closed over time.
+  - Then withdraw everything and manually distribute to the rightful owners.
 
+- I really think I just need the amount staked for each person, and the amount of icp stored in the contract.
+- Then I just collect the ALEX and ICP from the staking contract, and distribute accordingly.
 
-So here's the deal. I got to make canisters for different users, and it's just gotta be that way because stable storage doesnt work by subaccount.
-There's also no point in adding the complexity of making internal storage subaccount-specific.
 
 - get_two_random_users only gets the principal, not the subaccount.
 - Problem is if the transaction call fails, it goes right to adils wallet.
@@ -31,6 +35,10 @@ Minor stuff to do:
 - Make exploring an owner easier.
 - Need to blur blocked images when clicked on.
 - We need a more efficient way to get peoples library because it takes a long time if you have a lot of NFTs. Maybe add back the concurrent query calls.
+- Need to add a minting check in rust that the NFT created is a real arweave id.
+- Get search to work by pressing enter.
+- Get thumbnails to show on video, and only load the first frame.
+- There's a bug where ebook searching gets the search button stuck in the loading state.
 
 */
 

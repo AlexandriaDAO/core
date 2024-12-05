@@ -513,7 +513,7 @@ async fn claim_icp_reward(from_subaccount: Option<[u8; 32]>) -> Result<String, S
     match caller_stake_reward {
         Some(stake) => {
             if stake.reward_icp <= 1000_000 {
-                return Err("Must have at least 1 ICP reward to claim".to_string());
+                return Err(format!("Must have at least 1 ICP reward to claim. You have {} ICP available.", stake.reward_icp).to_string());
             }
             let mut total_icp_available: u64 = 0;
 

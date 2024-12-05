@@ -1,14 +1,18 @@
-use std::time::Duration;
 use candid::{CandidType, Principal};
 use ic_cdk::{self, init, update};
 use serde::Deserialize;
+use std::time::Duration;
 
-use crate::{distribute_reward, get_icp_rate_in_cents, ArchiveBalance, DailyValues, LbryRatio, Stake, APY, ARCHIVED_TRANSACTION_LOG, DISTRIBUTION_INTERVALS, LBRY_RATIO, STAKES, TOTAL_ARCHIVED_BALANCE, TOTAL_UNCLAIMED_ICP_REWARD};
 use crate::guard::*;
+use crate::{
+    distribute_reward, get_icp_rate_in_cents, ArchiveBalance, DailyValues, LbryRatio, Stake, APY,
+    ARCHIVED_TRANSACTION_LOG, DISTRIBUTION_INTERVALS, LBRY_RATIO, STAKES, TOTAL_ARCHIVED_BALANCE,
+    TOTAL_UNCLAIMED_ICP_REWARD,
+};
 
 // pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(1*24*60*60); // 1 days in seconds
-pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(10); // 10 seconds
-pub const PRICE_FETCH_INTERVAL: Duration = Duration::from_secs(1*24*60*60); // 1 days in seconds
+pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(60); // 10 seconds
+pub const PRICE_FETCH_INTERVAL: Duration = Duration::from_secs(1 * 24 * 60 * 60); // 1 days in seconds
 
 //Old init
 // #[init]
@@ -19,7 +23,6 @@ pub const PRICE_FETCH_INTERVAL: Duration = Duration::from_secs(1*24*60*60); // 1
 //     let _reward_timer_id: ic_cdk_timers::TimerId = ic_cdk_timers::set_timer_interval(REWARD_DISTRIBUTION_INTERVAL, || ic_cdk::spawn(distribute_reward_wrapper()));
 //     let _price_timer_id: ic_cdk_timers::TimerId = ic_cdk_timers::set_timer_interval(PRICE_FETCH_INTERVAL, || ic_cdk::spawn(get_icp_rate_cents_wrapper()));
 // }
-
 
 #[derive(CandidType, Deserialize, Clone, Default)]
 pub struct InitArgs {
@@ -36,7 +39,6 @@ pub struct InitArgs {
 
 fn initialize_globals(args: InitArgs) {
     if let Some(stakes) = args.stakes {
-
         STAKES.with(|m| {
             let mut stakes_map = m.borrow_mut();
             for (principal, stake) in stakes {
@@ -91,22 +93,16 @@ fn initialize_globals(args: InitArgs) {
 #[init]
 fn init(args: Option<InitArgs>) {
     ic_cdk::println!("Starting initialization...");
-    ic_cdk::println!("Setting up initial price fetch timer...");
 
     ic_cdk_timers::set_timer(Duration::from_secs(0), || {
-        ic_cdk::println!("Triggering initial price fetch...");
         ic_cdk::spawn(get_icp_rate_cents_wrapper());
     });
-
-    ic_cdk::println!("Setting up recurring timers...");
     let _reward_timer_id: ic_cdk_timers::TimerId =
         ic_cdk_timers::set_timer_interval(REWARD_DISTRIBUTION_INTERVAL, || {
-            // ic_cdk::println!("Triggering scheduled reward distribution...");
             ic_cdk::spawn(distribute_reward_wrapper())
         });
     let _price_timer_id: ic_cdk_timers::TimerId =
         ic_cdk_timers::set_timer_interval(PRICE_FETCH_INTERVAL, || {
-            ic_cdk::println!("Triggering scheduled price fetch...");
             ic_cdk::spawn(get_icp_rate_cents_wrapper())
         });
 
@@ -143,22 +139,18 @@ fn init(args: Option<InitArgs>) {
 #[update(guard = "is_canister")]
 pub async fn distribute_reward_wrapper() {
     match distribute_reward().await {
-        Ok(_) => ic_cdk::println!("Rewards distributed successfully"),
+        Ok(_) => (),
         Err(e) => ic_cdk::println!("Error distributing rewards: {}", e),
     }
 }
 #[update(guard = "is_canister")]
 pub async fn get_icp_rate_cents_wrapper() {
-    ic_cdk::println!("Starting ICP rate fetch...");
     match get_icp_rate_in_cents().await {
         Ok(price) => {
-            ic_cdk::println!("ICP price fetched successfully: {} cents", price);
             ic_cdk::println!("Price fetch completed without errors");
-        },
+        }
         Err(e) => {
             ic_cdk::println!("Error fetching ICP price. Error details: {:?}", e);
-            ic_cdk::println!("Stack trace or additional context: Price fetch failed during initialization");
-        },
+        }
     }
 }
-

@@ -26,7 +26,19 @@ cargo build --release --target wasm32-unknown-unknown --package xrc
 candid-extractor target/wasm32-unknown-unknown/release/xrc.wasm > src/xrc/xrc.did
 dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
 
+# Step 3: Deploy nft_manager, which deploys icrc7
+dfx canister create icrc7 --specified-id 53ewn-qqaaa-aaaap-qkmqq-cai
+dfx build icrc7
+dfx canister update-settings icrc7 --add-controller 5sh5r-gyaaa-aaaap-qkmra-cai
 
+dfx canister create icrc7_scion --specified-id uxyan-oyaaa-aaaap-qhezq-cai
+dfx build icrc7_scion
+dfx canister update-settings icrc7_scion --add-controller 5sh5r-gyaaa-aaaap-qkmra-cai
+
+cargo build --release --target wasm32-unknown-unknown --package nft_manager
+candid-extractor target/wasm32-unknown-unknown/release/nft_manager.wasm > src/nft_manager/nft_manager.did
+
+dfx deploy nft_manager --specified-id 5sh5r-gyaaa-aaaap-qkmra-cai
 
 # Step 5: Configure Local Identities for token launches
 dfx identity new minter --storage-mode plaintext
