@@ -80,7 +80,7 @@ fn base64_encode(input: &[u8]) -> String {
     result
 }
 
-#[ic_cdk::query]
+#[query]
 pub fn to_nft_subaccount(id: Nat) -> Subaccount {
     let mut subaccount = [0u8; 32];
     let num_str = id.to_string();
@@ -104,12 +104,13 @@ pub fn to_nft_subaccount(id: Nat) -> Subaccount {
     subaccount
 }
 
-pub fn og_to_scion_id(og_number: &Nat, principal: &Principal) -> Nat {
+#[query]
+pub fn og_to_scion_id(og_number: Nat, principal: Principal) -> Nat {
     // Get 64-bit hash of principal
-    let principal_hash = hash_principal(principal);
+    let principal_hash = hash_principal(&principal);
     
     // Convert to BigUint for bitwise operations
-    let og_big: BigUint = og_number.0.clone();
+    let og_big: BigUint = og_number.0;
     let hash_big = BigUint::from(principal_hash);
     
     // Shift left 256 bits (multiply by 2^256)
@@ -119,9 +120,10 @@ pub fn og_to_scion_id(og_number: &Nat, principal: &Principal) -> Nat {
     Nat::from(result)
 }
 
-pub fn scion_to_og_id(scion_id: &Nat) -> Nat {
+#[query]
+pub fn scion_to_og_id(scion_id: Nat) -> Nat {
     // Convert to BigUint for bitwise operations
-    let scion_big: BigUint = scion_id.0.clone();
+    let scion_big: BigUint = scion_id.0;
     
     // Extract principal hash (first 64 bits after shifting right)
     let shifted = scion_big.clone() >> 256u32;

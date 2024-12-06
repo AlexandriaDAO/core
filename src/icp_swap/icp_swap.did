@@ -13,7 +13,7 @@ type LbryRatio = record { time : nat64; ratio : nat64 };
 type Result = variant { Ok : text; Err : text };
 type Result_1 = variant { Ok : nat64; Err : text };
 type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
-service : {
+service : (opt InitArgs) -> {
   burn_LBRY : (nat64, opt blob) -> (Result);
   caller_subaccount : () -> (text) query;
   claim_icp_reward : (opt blob) -> (Result);
@@ -35,7 +35,6 @@ service : {
   get_total_archived_balance : () -> (nat64) query;
   get_total_unclaimed_icp_reward : () -> (nat64) query;
   get_user_archive_balance : (principal) -> (opt ArchiveBalance) query;
-  init : (opt InitArgs) -> ();
   redeem : (opt blob) -> (Result);
   stake_ALEX : (nat64, opt blob) -> (Result);
   swap : (nat64, opt blob) -> (Result);

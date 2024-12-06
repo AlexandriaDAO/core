@@ -25,7 +25,7 @@ pub async fn coordinate_mint(
     }
 
     // Check if caller already owns a scion NFT for this number
-    let potential_scion_id = og_to_scion_id(&minting_number, &caller);
+    let potential_scion_id = og_to_scion_id(minting_number.clone(), caller);
     let caller_scion = get_nft_owner(potential_scion_id, icrc7_scion_principal()).await?;
     
     if caller_scion.is_some() {
@@ -131,7 +131,7 @@ async fn mint_scion_from_original(minting_number: Nat, caller: Principal) -> Res
     }
 
     // Calculate new scion ID and mint
-    let new_scion_id = og_to_scion_id(&minting_number, &caller);
+    let new_scion_id = og_to_scion_id(minting_number, caller);
     match super::update::mint_scion_nft(new_scion_id, None).await {
         Ok(_) => Ok("Scion NFT saved successfully!".to_string()),
         Err(e) => Err(format!("Mint failed: {}", e)),
@@ -153,11 +153,11 @@ async fn mint_scion_from_scion(minting_number: Nat, caller: Principal) -> Result
     }
 
     // Handle original NFT payment if it exists
-    let og_id = scion_to_og_id(&minting_number);
+    let og_id = scion_to_og_id(minting_number.clone());
     let og_exists = get_nft_owner(og_id.clone(), icrc7_principal()).await?.is_some();
     
     if og_exists {
-        let og_wallet = to_nft_subaccount(og_id.clone());
+        let og_wallet = to_nft_subaccount(og_id);
         let og_payment = verify_lbry_payment(
             caller,
             nft_manager_principal(),
@@ -170,7 +170,7 @@ async fn mint_scion_from_scion(minting_number: Nat, caller: Principal) -> Result
     }
 
     // Calculate new scion ID and mint
-    let new_scion_id = og_to_scion_id(&minting_number, &caller);
+    let new_scion_id = og_to_scion_id(minting_number, caller);
     match super::update::mint_scion_nft(new_scion_id, None).await {
         Ok(_) => Ok("Scion NFT saved successfully!".to_string()),
         Err(e) => Err(format!("Mint failed: {}", e)),

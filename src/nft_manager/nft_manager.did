@@ -32,9 +32,11 @@ service : () -> {
   get_nfts_of : (principal) -> (Result_6);
   nat_to_arweave_id : (nat) -> (text) query;
   nfts_exist : (vec nat) -> (Result_7);
+  og_to_scion_id : (nat, principal) -> (nat) query;
   owner_of : (vec nat) -> (Result_8);
   principal_to_account : (principal) -> (text) query;
   principal_to_subaccount : (principal) -> (blob) query;
+  scion_to_og_id : (nat) -> (nat) query;
   subaccount_to_principal : (blob) -> (opt principal) query;
   to_nft_subaccount : (nat) -> (blob) query;
   total_supply : () -> (Result_9);

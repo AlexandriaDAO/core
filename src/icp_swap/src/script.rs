@@ -1,5 +1,5 @@
 use candid::{CandidType, Principal};
-use ic_cdk::{self, init, update};
+use ic_cdk::{self, init, update, post_upgrade};
 use serde::Deserialize;
 use std::time::Duration;
 
@@ -93,19 +93,7 @@ fn initialize_globals(args: InitArgs) {
 #[init]
 fn init(args: Option<InitArgs>) {
     ic_cdk::println!("Starting initialization...");
-
-    ic_cdk_timers::set_timer(Duration::from_secs(0), || {
-        ic_cdk::spawn(get_icp_rate_cents_wrapper());
-    });
-    let _reward_timer_id: ic_cdk_timers::TimerId =
-        ic_cdk_timers::set_timer_interval(REWARD_DISTRIBUTION_INTERVAL, || {
-            ic_cdk::spawn(distribute_reward_wrapper())
-        });
-    let _price_timer_id: ic_cdk_timers::TimerId =
-        ic_cdk_timers::set_timer_interval(PRICE_FETCH_INTERVAL, || {
-            ic_cdk::spawn(get_icp_rate_cents_wrapper())
-        });
-
+    
     match args {
         Some(init_args) => {
             ic_cdk::println!("Received init arguments!");
@@ -123,17 +111,43 @@ fn init(args: Option<InitArgs>) {
                 ic_cdk::println!("LBRY ratio provided: {}", ratio.ratio);
             }
 
-            initialize_globals(init_args); // Move init_args directly
+            initialize_globals(init_args);
             ic_cdk::println!("Initialization with provided args complete");
         }
         None => {
-            ic_cdk::println!("No arguments provided (args is None), using defaults");
-            ic_cdk::println!("Initializing with default values...");
+            ic_cdk::println!("No arguments provided, using defaults");
             initialize_globals(InitArgs::default());
             ic_cdk::println!("Default initialization complete");
         }
     }
+    
+    setup_timers();
     ic_cdk::println!("Initialization process completed");
+}
+
+#[post_upgrade]
+fn post_upgrade() {
+    setup_timers();
+    ic_cdk::println!("Post-upgrade timer setup completed");
+}
+
+fn setup_timers() {
+    // Initial price fetch
+    ic_cdk_timers::set_timer(Duration::from_secs(0), || {
+        ic_cdk::spawn(get_icp_rate_cents_wrapper());
+    });
+    
+    // Periodic reward distribution
+    let _reward_timer_id: ic_cdk_timers::TimerId =
+        ic_cdk_timers::set_timer_interval(REWARD_DISTRIBUTION_INTERVAL, || {
+            ic_cdk::spawn(distribute_reward_wrapper())
+        });
+    
+    // Periodic price fetch
+    let _price_timer_id: ic_cdk_timers::TimerId =
+        ic_cdk_timers::set_timer_interval(PRICE_FETCH_INTERVAL, || {
+            ic_cdk::spawn(get_icp_rate_cents_wrapper())
+        });
 }
 
 #[update(guard = "is_canister")]
