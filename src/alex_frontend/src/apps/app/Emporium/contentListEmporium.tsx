@@ -12,6 +12,7 @@ import { useSortedTransactions } from '@/apps/Modules/shared/state/content/conte
 import SellModal from "./sellModal";
 import BuyModal from "./buyModal";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import Overlay from "./overlay";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -25,13 +26,11 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
   const predictions = useSelector((state: RootState) => state.arweave.predictions);
   const emporium = useAppSelector((state) => state.emporium);
-  
-  
 
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
   const [showSellModal, setShowSellModal] = useState({ arwaveId: "", show: false });
-  const [showBuyModal, setShowBuyModal] = useState({ arwaveId: "", show: false });
+  const [showBuyModal, setShowBuyModal] = useState({ arwaveId: "", show: false, price: "" });
   const [buttonType, setButtonType] = useState("");
 
   const handleRenderError = useCallback((transactionId: string) => {
@@ -51,15 +50,8 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
       ))}
     </div>
   ), []);
-  const buttontypeHandler = (transactionId: string) => {
-    if (buttonType === "Sell") {
-      setShowSellModal({ arwaveId: transactionId, show: true });
-    }
-    else if (buttonType === "Buy") {
-      setShowBuyModal({ arwaveId: transactionId, show: true });
 
-    }
-  }
+
   useEffect(() => {
     if (type === "userNfts") {
       setButtonType("Sell");
@@ -76,7 +68,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
           const content = contentData[transaction.id];
           const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
           const mintableStateItem = mintableState[transaction.id];
-          const isMintable = mintableStateItem?.mintable;
+          const isMintable = false;
           const hasPredictions = !!predictions[transaction.id];
 
           // Only show blur when we have predictions and content is not mintable
@@ -129,19 +121,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
                     <div>Porn: {(predictions[transaction.id].Porn * 100).toFixed(1)}%</div>
                   </div>
                 )}
-
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    buttontypeHandler(transaction.id)
-                  }}
-                  className="absolute top-2 right-2 bg-green-500 hover:bg-pink-600 text-white rounded-full w-10 h-10 flex items-center justify-center z-[25]"
-                >
-                  {buttonType}
-
-                </button>
-                {type === "marketPlace" &&<div className="text-white text-lg absolute bottom-0 bg-gray-600 w-full py-2">  Price { emporium.marketPlace[transaction.id]?.price} ICP</div>}
+                <Overlay transaction={transaction} type={type} buttonType={buttonType} showBuyModal={showBuyModal} showSellModal={showSellModal} setShowSellModal={setShowSellModal} setShowBuyModal={setShowBuyModal} />
               </div>
             </ContentGrid.Item>
 
@@ -177,14 +157,11 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
         showSellModal={showSellModal}
         onClose={() => setShowSellModal({ show: false, arwaveId: "" })}
       >
-
       </SellModal>
-
       <BuyModal
         showBuyModal={showBuyModal}
-        onClose={() => setShowBuyModal({ show: false, arwaveId: "" })}
+        onClose={() => setShowBuyModal({ show: false, arwaveId: "", price: "" })}
       >
-
       </BuyModal>
 
     </>

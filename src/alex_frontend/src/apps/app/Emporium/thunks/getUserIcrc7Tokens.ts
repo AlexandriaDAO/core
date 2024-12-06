@@ -15,6 +15,8 @@ const getUserIcrc7Tokens = createAsyncThunk<
   "emporium/getUserIcrc7Tokens",
   async (userPrincipal, { rejectWithValue, dispatch }) => {
     try {
+      dispatch(setTransactions([]));
+
       const actorIcrc7 = await getIcrc7Actor();
       const result = await actorIcrc7.icrc7_tokens_of(
         {

@@ -52,16 +52,8 @@ const buyNft = createAsyncThunk<
       }
       throw new Error(errorMessage);
     }
-    // const revoke=await actorIcrc7.icrc37_revoke_token_approvals([{
-    //   token_id: tokenId,
-    //   memo: [],
-    //   from_subaccount: [],
-    //   created_at_time: [],
-    //   spender: []
-    // }])
 
     const result = await actorEmporium.buy_nft(tokenId);
-
     // Handle success or error response
     if ("Ok" in result) {
       return "success";

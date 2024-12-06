@@ -4,13 +4,17 @@ import listNft from "./thunks/listNft";
 import { message } from "antd";
 import { toast } from "sonner";
 import getMarketListings from "./thunks/getMarketListings";
+import buyNft from "./thunks/buyNft";
+import cancelListedNft from "./thunks/cancelistedNft ";
 export interface EmporiumState {
   loading: boolean;
   depositNftSuccess: Boolean;
+  cancelListingSuccess: Boolean;
+  buyNftSuccess: Boolean;
   userTokens: { tokenId: string; arweaveId: string }[];
   marketPlace: Record<
     string,
-    { tokenId: string; arweaveId: string; price: string }
+    { tokenId: string; arweaveId: string; price: string; owner: string }
   >;
   error: string | null;
 }
@@ -19,6 +23,8 @@ export interface EmporiumState {
 const initialState: EmporiumState = {
   loading: false,
   depositNftSuccess: false,
+  buyNftSuccess: false,
+  cancelListingSuccess: false,
   error: null,
   userTokens: [],
   marketPlace: {},
@@ -31,6 +37,7 @@ const emporiumSlice = createSlice({
     flagHandlerEmporium: (state) => {
       state.error = null;
       state.depositNftSuccess = false;
+      state.cancelListingSuccess = false;
     },
   },
   extraReducers: (builder: ActionReducerMapBuilder<EmporiumState>) => {
@@ -61,6 +68,36 @@ const emporiumSlice = createSlice({
         toast.success("Listed!");
       })
       .addCase(listNft.rejected, (state, action) => {
+        state.loading = false;
+        toast.error(action.payload);
+        state.error = action.payload as string;
+      })
+      .addCase(cancelListedNft.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(cancelListedNft.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cancelListingSuccess = true;
+        state.error = null;
+        toast.success("Canceled!");
+      })
+      .addCase(cancelListedNft.rejected, (state, action) => {
+        state.loading = false;
+        toast.error(action.payload);
+        state.error = action.payload as string;
+      })
+      .addCase(buyNft.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(buyNft.fulfilled, (state, action) => {
+        state.loading = false;
+        state.buyNftSuccess = true;
+        state.error = null;
+        toast.success("Success, NFT transfered to your principal!");
+      })
+      .addCase(buyNft.rejected, (state, action) => {
         state.loading = false;
         toast.error(action.payload);
         state.error = action.payload as string;

@@ -5,13 +5,19 @@ import { getActorEmporium } from "@/features/auth/utils/authUtils";
 import { natToArweaveId } from "@/utils/id_convert";
 import LedgerService from "@/utils/LedgerService";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { Principal } from "azle";
 
 const getMarketListings = createAsyncThunk<
-  Record<string, { tokenId: string; arweaveId: string; price: string }>, // Return type
+  Record<
+    string,
+    { tokenId: string; arweaveId: string; price: string; owner: string }
+  >, // Return type
   void,
   { rejectValue: string }
 >("emporium/getMarketListings", async (_, { rejectWithValue, dispatch }) => {
   try {
+    dispatch(setTransactions([]));
+
     const actorEmporium = await getActorEmporium();
     const ledgerServices = LedgerService();
     const result = await actorEmporium.get_listing();
@@ -19,7 +25,10 @@ const getMarketListings = createAsyncThunk<
     console.log("Raw result:", result);
 
     const ids: string[] = [];
-    const tokensObject: Record<string, { tokenId: string; arweaveId: string; price: string }> = {};
+    const tokensObject: Record<
+      string,
+      { tokenId: string; arweaveId: string; price: string; owner: string }
+    > = {};
 
     if (Array.isArray(result)) {
       result.forEach((value) => {
@@ -31,6 +40,7 @@ const getMarketListings = createAsyncThunk<
           tokenId: value[0],
           arweaveId,
           price,
+          owner: value[1].owner.toString(),
         };
       });
     }
@@ -49,6 +59,5 @@ const getMarketListings = createAsyncThunk<
     );
   }
 });
-
 
 export default getMarketListings;

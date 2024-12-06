@@ -4,20 +4,23 @@ import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import listNft from './thunks/listNft';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
+import buyNft from './thunks/buyNft';
 
 interface BuyModalProps {
   showBuyModal: {
     show: boolean;
     arwaveId: string;
+    price:string;
   };
   onClose: () => void;
 }
 
 const BuyModal: React.FC<BuyModalProps> = ({ showBuyModal, onClose }) => {
   if (!showBuyModal.show) return null;
+  const dispatch=useAppDispatch();
   const emporium = useAppSelector((state) => state.emporium);
   const handleBuy = () => {
-    //  dispatch(listNft({ nftArweaveId: showSellModal.arwaveId, price: price }))
+      dispatch(buyNft({ nftArweaveId: showBuyModal.arwaveId, price: showBuyModal.price }))
     onClose();
   }
 
