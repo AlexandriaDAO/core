@@ -138,7 +138,7 @@ pub fn your_principal() -> Result<String, String> {
 }
 
 #[update]
-pub async fn get_two_random_users() -> CallResult<((Principal, Vec<u8>), (Principal, Vec<u8>))> {
+pub async fn get_two_random_nfts() -> CallResult<((Principal, Vec<u8>), (Principal, Vec<u8>))> {
     // Get total supply of Scion NFTs
     let icrc7 = get_principal("53ewn-qqaaa-aaaap-qkmqq-cai");
     let icrc7_scion = get_principal("uxyan-oyaaa-aaaap-qhezq-cai");
@@ -203,8 +203,8 @@ pub async fn get_two_random_users() -> CallResult<((Principal, Vec<u8>), (Princi
         ic_cdk::call(nft_manager, "to_nft_subaccount", (og_nft_id,)).await?;
 
     Ok((
-        (rand_nft_owner, scion_subaccount),
-        (og_nft_owner, og_subaccount)
+        (nft_manager, scion_subaccount),
+        (nft_manager, og_subaccount)
     ))
 }
 

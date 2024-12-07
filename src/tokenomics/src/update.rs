@@ -5,7 +5,7 @@ use crate::ALEX_CANISTER_ID;
 use crate::MAX_ALEX;
 use crate::{
     add_to_total_LBRY_burned, fetch_total_minted_ALEX, get_current_threshold_index, get_principal,
-    get_total_LBRY_burn, get_two_random_users, update_to_current_threshold,
+    get_total_LBRY_burn, get_two_random_nfts, update_to_current_threshold,
 };
 use candid::Principal;
 use ic_ledger_types::Subaccount;
@@ -114,7 +114,7 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal, to_subaccount: 
     let alex_per_recipient = alex_to_mint
         .checked_div(3)
         .ok_or("Arithmetic error occurred when calculating alex_per_recipient")?;
-    let fetched_random_principals = get_two_random_users().await;
+    let fetched_random_principals = get_two_random_nfts().await;
     match fetched_random_principals {
         Ok(((principal1, subaccount1), (principal2, subaccount2))) => {
             random_users = (principal1, principal2);

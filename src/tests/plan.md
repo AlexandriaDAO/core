@@ -38,11 +38,6 @@ rand_nft_subaccount = nft_manager.to_nft_subaccount(rand_nft_id)
 
 
 
-
-
-
-
-
 Bug; random librarian alex mints don't go to subaccounts or nfts.
 - Review tokenomics emissions schedule. Could it be better?
 
@@ -70,7 +65,9 @@ Minor stuff to do:
 */
 
 
-
+Bigger ones: 
+- Disable transfers and other irrelivant functions for scion NFTs.
+- 
 
 
 
@@ -79,6 +76,7 @@ Minor stuff to do:
 
 Metrics: 
 9.97T Cycles in ICP Swap at 830 am, and it's dispersing once per minute.
+9.765T Cycles at 7am the next day. (But it could also be that it's because it stopped distributing.)
 
 
 
