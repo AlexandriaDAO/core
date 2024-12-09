@@ -1,11 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getActorEmporium,
-  getIcrc7Actor,
 } from "@/features/auth/utils/authUtils";
-import { arweaveIdToNat, natToArweaveId } from "@/utils/id_convert";
-import LedgerService from "@/utils/LedgerService";
-import { Principal } from "@dfinity/principal";
+import {arweaveIdToNat} from "@/utils/id_convert";
 
 const cancelListedNft = createAsyncThunk<
   string, // Success return type
@@ -13,10 +10,8 @@ const cancelListedNft = createAsyncThunk<
   { rejectValue: string } // Reject type
 >("emporium/cancelistedNft", async (nftArweaveId, { rejectWithValue }) => {
   try {
-    const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
     const actorEmporium = await getActorEmporium();
     const tokenId = arweaveIdToNat(nftArweaveId);
-
     const result = await actorEmporium.cancel_nft_listing(tokenId);
 
     // Handle success or error response

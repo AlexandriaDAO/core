@@ -20,7 +20,6 @@ const listNft = createAsyncThunk<
     const actorEmporium = await getActorEmporium();
     const actorIcrc7 = await getIcrc7Actor();
     const tokenId = arweaveIdToNat(nftArweaveId);
-    const tokenIdStr = arweaveIdToNat(nftArweaveId).toString();
 
     // Format the price as BigInt
     const priceFormat: bigint = BigInt(

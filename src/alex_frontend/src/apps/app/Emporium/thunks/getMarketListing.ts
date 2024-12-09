@@ -5,24 +5,21 @@ import { getActorEmporium } from "@/features/auth/utils/authUtils";
 import { natToArweaveId } from "@/utils/id_convert";
 import LedgerService from "@/utils/LedgerService";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Principal } from "azle";
 
-const getMarketListings = createAsyncThunk<
+const getMarketListing = createAsyncThunk<
   Record<
     string,
     { tokenId: string; arweaveId: string; price: string; owner: string }
   >, // Return type
   void,
   { rejectValue: string }
->("emporium/getMarketListings", async (_, { rejectWithValue, dispatch }) => {
+>("emporium/getMarketListing", async (_, { rejectWithValue, dispatch }) => {
   try {
     dispatch(setTransactions([]));
 
     const actorEmporium = await getActorEmporium();
     const ledgerServices = LedgerService();
     const result = await actorEmporium.get_listing();
-
-    console.log("Raw result:", result);
 
     const ids: string[] = [];
     const tokensObject: Record<
@@ -46,11 +43,9 @@ const getMarketListings = createAsyncThunk<
     }
 
     const fetchedTransactions = await fetchTransactionsApi({ nftIds: ids });
-    console.log("transactions are ", fetchedTransactions);
     dispatch(setTransactions(fetchedTransactions));
     await dispatch(loadContentForTransactions(fetchedTransactions));
 
-    console.log("Tokens Object:", tokensObject);
     return tokensObject;
   } catch (error) {
     console.error("Error fetching ICRC7 tokens:", error);
@@ -60,4 +55,4 @@ const getMarketListings = createAsyncThunk<
   }
 });
 
-export default getMarketListings;
+export default getMarketListing;

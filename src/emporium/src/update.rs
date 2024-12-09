@@ -3,13 +3,11 @@ use crate::{
         get_principal, is_owner, remove_nft_from_listing, Account, TransferArg, TransferError,
         TransferFromArg, TransferFromError, TransferFromResult, TransferResult,
         EMPORIUM_CANISTER_ID, ICRC7_CANISTER_ID,
-    }, Nft, NftStatus, LISTING
+    },
+    Nft, NftStatus, LISTING,
 };
 use candid::{Nat, Principal};
-use ic_cdk::{
-    api::call::CallResult,
-    caller, update,
-};
+use ic_cdk::{api::call::CallResult, caller, update};
 use icrc_ledger_types::icrc1::account::Account as AccountIcrc;
 use icrc_ledger_types::icrc1::transfer::BlockIndex;
 use icrc_ledger_types::icrc2::transfer_from::{
@@ -41,8 +39,8 @@ pub async fn list_nft(token_id: Nat, icp_amount: u64) -> Result<String, String> 
             None => Nft {
                 owner: caller(),
                 price: icp_amount,
-                token_id:token_id.clone(),
-                status: NftStatus::Listed, 
+                token_id: token_id.clone(),
+                status: NftStatus::Listed,
                 time: ic_cdk::api::time(),
             },
         };
@@ -89,7 +87,6 @@ pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
     match transfer_nft_from_canister(caller(), token_id.clone()).await {
         Ok(ok) => {}
         Err(err) => {
-
             ic_cdk::println!("This I am here ");
             //incase of failure change the owner to caller
             LISTING.with(|nfts| -> Result<(), String> {
@@ -100,7 +97,7 @@ pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
                     Some(existing_nft) => {
                         let mut updated = existing_nft.clone();
                         updated.owner = caller();
-                        updated.status= NftStatus::Reimbursed;
+                        updated.status = NftStatus::Reimbursed;
                         updated.time = ic_cdk::api::time();
                         updated
                     }
@@ -119,9 +116,7 @@ pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
     Ok("Success".to_string())
 }
 #[update]
-pub async fn update_nft_price(token_id_str: String, new_price: u64) -> Result<String, String> {
-    let token_id: u64 = token_id_str.parse().map_err(|_| "Invalid token_id format.".to_string())?;
-
+pub async fn update_nft_price(token_id: Nat, new_price: u64) -> Result<String, String> {
     let current_time: u64 = ic_cdk::api::time();
     LISTING.with(|nfts| -> Result<(), String> {
         let mut nft_map = nfts.borrow_mut();
@@ -266,80 +261,6 @@ pub async fn deposit_nft_to_canister(token_id: Nat) -> Result<String, String> {
     }
 }
 
-// pub async fn transfer_nft_from_canister(
-//     destination: Principal,
-//     token_id: u64,
-// ) -> Result<String, String> {
-//     let nft_canister: Principal = get_principal(ICRC7_CANISTER_ID);
-
-//     let transfer_arg = vec![TransferArg {
-//         from_subaccount: None,
-//         to: Account {
-//             owner: destination,
-//             subaccount: None,
-//         },
-//         token_id: Nat::from(token_id),
-//         memo: None,
-//         created_at_time: Some(ic_cdk::api::time()),
-//     }];
-
-//     // Decode the result as a tuple containing a vector of optional TransferResults
-//     let call_result: CallResult<(Vec<Option<TransferResult>>,)> =
-//         ic_cdk::call(nft_canister, "icrc7_transfer", (transfer_arg,)).await;
-
-//     match call_result {
-//         Ok((response,)) => {
-//             // Check if the first element in the response is Some and unwrap it
-//             match response.get(0) {
-//                 Some(Some(TransferResult::Ok(transaction_index))) => Ok(format!(
-//                     "Successfully transferred. Transaction index: {}",
-//                     transaction_index
-//                 )),
-//                 Some(Some(TransferResult::Err(TransferError::Unauthorized))) => {
-//                     Err("Error: Unauthorized transfer.".to_string())
-//                 }
-//                 Some(Some(TransferResult::Err(TransferError::NonExistingTokenId))) => {
-//                     Err("Error: Non-existing token ID.".to_string())
-//                 }
-//                 Some(Some(TransferResult::Err(TransferError::InvalidRecipient))) => {
-//                     Err("Error: Invalid recipient.".to_string())
-//                 }
-//                 Some(Some(TransferResult::Err(TransferError::TooOld))) => {
-//                     Err("Error: Transfer too old.".to_string())
-//                 }
-//                 Some(Some(TransferResult::Err(TransferError::CreatedInFuture { ledger_time }))) => {
-//                     Err(format!(
-//                         "Error: Transfer created in the future (ledger time: {}).",
-//                         ledger_time
-//                     ))
-//                 }
-//                 Some(Some(TransferResult::Err(TransferError::Duplicate { duplicate_of }))) => {
-//                     Err(format!(
-//                         "Error: Duplicate transfer (duplicate of transaction {}).",
-//                         duplicate_of
-//                     ))
-//                 }
-//                 Some(Some(TransferResult::Err(TransferError::GenericError {
-//                     error_code,
-//                     message,
-//                 }))) => Err(format!(
-//                     "Error: Generic error (code: {}, message: {}).",
-//                     error_code, message
-//                 )),
-//                 Some(Some(TransferResult::Err(TransferError::GenericBatchError {
-//                     error_code,
-//                     message,
-//                 }))) => Err(format!(
-//                     "Error: Generic batch error (code: {}, message: {}).",
-//                     error_code, message
-//                 )),
-//                 _ => Err("Error: Unknown transfer failure.".to_string()),
-//             }
-//         }
-//         Err((code, msg)) => Err(format!("Call error {}: {}.", code as u8, msg)),
-//     }
-// }
-
 pub async fn transfer_nft_from_canister(
     destination: Principal,
     token_id: Nat,
@@ -362,45 +283,51 @@ pub async fn transfer_nft_from_canister(
         ic_cdk::call(nft_canister, "icrc7_transfer", (transfer_arg,)).await;
 
     match call_result {
-        Ok((response,)) => {
-            match response.get(0) {
-                Some(Some(TransferResult::Ok(transaction_index))) => Ok(format!(
-                    "Successfully transferred. Transaction index: {}",
-                    transaction_index
+        Ok((response,)) => match response.get(0) {
+            Some(Some(TransferResult::Ok(transaction_index))) => Ok(format!(
+                "Successfully transferred. Transaction index: {}",
+                transaction_index
+            )),
+            Some(Some(TransferResult::Err(error))) => match error {
+                TransferError::Unauthorized => Err("Unauthorized transfer attempt.".to_string()),
+                TransferError::NonExistingTokenId => Err("Non-existing token ID.".to_string()),
+                TransferError::InvalidRecipient => Err("Invalid recipient.".to_string()),
+                TransferError::TooOld => Err("Transaction too old.".to_string()),
+                TransferError::CreatedInFuture { ledger_time } => Err(format!(
+                    "Transfer created in the future (ledger time: {}).",
+                    ledger_time
                 )),
-                Some(Some(TransferResult::Err(error))) => match error {
-                    TransferError::Unauthorized => Err("Unauthorized transfer attempt.".to_string()),
-                    TransferError::NonExistingTokenId => Err("Non-existing token ID.".to_string()),
-                    TransferError::InvalidRecipient => Err("Invalid recipient.".to_string()),
-                    TransferError::TooOld => Err("Transaction too old.".to_string()),
-                    TransferError::CreatedInFuture { ledger_time } => Err(format!(
-                        "Transfer created in the future (ledger time: {}).",
-                        ledger_time
-                    )),
-                    TransferError::Duplicate { duplicate_of } => Err(format!(
-                        "Duplicate transaction (duplicate of {}).",
-                        duplicate_of
-                    )),
-                    TransferError::GenericError { error_code, message } => Err(format!(
-                        "Generic error (code: {}, message: {}).",
-                        error_code, message
-                    )),
-                    TransferError::GenericBatchError { error_code, message } => Err(format!(
-                        "Batch error (code: {}, message: {}).",
-                        error_code, message
-                    )),
-                },
-                _ => Err("Unknown transfer error.".to_string()),
-            }
-        }
+                TransferError::Duplicate { duplicate_of } => Err(format!(
+                    "Duplicate transaction (duplicate of {}).",
+                    duplicate_of
+                )),
+                TransferError::GenericError {
+                    error_code,
+                    message,
+                } => Err(format!(
+                    "Generic error (code: {}, message: {}).",
+                    error_code, message
+                )),
+                TransferError::GenericBatchError {
+                    error_code,
+                    message,
+                } => Err(format!(
+                    "Batch error (code: {}, message: {}).",
+                    error_code, message
+                )),
+            },
+            _ => Err("Unknown transfer error.".to_string()),
+        },
         Err((code, msg)) => {
             // Check if the canister is stopped, and handle it
             if msg.contains("is stopped") {
                 Err("Error: Target canister is stopped.".to_string())
             } else {
-                Err(format!("Canister call failed with code {}: {}.", code as u8, msg))
+                Err(format!(
+                    "Canister call failed with code {}: {}.",
+                    code as u8, msg
+                ))
             }
         }
     }
 }
-

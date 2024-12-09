@@ -1,5 +1,4 @@
 import { fetchTransactionsApi } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
-import { fetchTransactions } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveClient";
 import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { loadContentForTransactions } from "@/apps/Modules/shared/state/content/contentDisplayThunks";
 import { getIcrc7Actor } from "@/features/auth/utils/authUtils";
@@ -8,15 +7,17 @@ import { Principal } from "@dfinity/principal";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const getUserIcrc7Tokens = createAsyncThunk<
-  { tokenId: string; arweaveId: string }[], // structure
-  string,
+  { tokenId: string; arweaveId: string }[], // Return structure
+  string, // Argument type
   { rejectValue: string }
 >(
   "emporium/getUserIcrc7Tokens",
   async (userPrincipal, { rejectWithValue, dispatch }) => {
     try {
+      // Clear transactions in the store
       dispatch(setTransactions([]));
 
+      // Fetch the user's tokens
       const actorIcrc7 = await getIcrc7Actor();
       const result = await actorIcrc7.icrc7_tokens_of(
         {
@@ -26,26 +27,29 @@ const getUserIcrc7Tokens = createAsyncThunk<
         [],
         []
       );
-      console.log("Raw result:", result);
-      const ids = [""];
-      const tokens = Array.isArray(result)
-        ? result.map((value) => {
-            const arweaveId = natToArweaveId(value);
-            console.log("The value is", value);
-            console.log("Arware id is", arweaveId);
-            ids.push(arweaveId);
-            return {
-              tokenId: value.toString(),
-              arweaveId: arweaveId,
-            };
-          })
-        : [];
 
-      const fetchedTransactions = await fetchTransactionsApi({ nftIds: ids });
-      console.log("transactions are ", fetchedTransactions);
-      dispatch(setTransactions(fetchedTransactions));
+      if (!Array.isArray(result) || result.length === 0) {
+        console.warn("No tokens found for the specified user.");
+        return [];
+      }
 
-      await dispatch(loadContentForTransactions(fetchedTransactions));
+      const tokens = result.map((value) => ({
+        tokenId: value.toString(),
+        arweaveId: natToArweaveId(value),
+      }));
+
+      // Extract arweaveIds for transactions
+      const arweaveIds = tokens.map((token) => token.arweaveId);
+
+      // Fetch and dispatch transaction data
+      if (arweaveIds.length > 0) {
+        const fetchedTransactions = await fetchTransactionsApi({
+          nftIds: arweaveIds,
+        });
+        console.log("Fetched transactions:", fetchedTransactions);
+        dispatch(setTransactions(fetchedTransactions));
+        await dispatch(loadContentForTransactions(fetchedTransactions));
+      }
 
       return tokens;
     } catch (error) {
@@ -56,5 +60,4 @@ const getUserIcrc7Tokens = createAsyncThunk<
     }
   }
 );
-
 export default getUserIcrc7Tokens;

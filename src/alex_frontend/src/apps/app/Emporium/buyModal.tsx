@@ -7,7 +7,7 @@ import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import buyNft from './thunks/buyNft';
 
 interface BuyModalProps {
-  showBuyModal: {
+  buyModal: {
     show: boolean;
     arwaveId: string;
     price:string;
@@ -15,12 +15,12 @@ interface BuyModalProps {
   onClose: () => void;
 }
 
-const BuyModal: React.FC<BuyModalProps> = ({ showBuyModal, onClose }) => {
-  if (!showBuyModal.show) return null;
+const BuyModal: React.FC<BuyModalProps> = ({ buyModal, onClose }) => {
+  if (!buyModal.show) return null;
   const dispatch=useAppDispatch();
   const emporium = useAppSelector((state) => state.emporium);
   const handleBuy = () => {
-      dispatch(buyNft({ nftArweaveId: showBuyModal.arwaveId, price: showBuyModal.price }))
+      dispatch(buyNft({ nftArweaveId: buyModal.arwaveId, price: buyModal.price }))
     onClose();
   }
 
@@ -34,7 +34,7 @@ const BuyModal: React.FC<BuyModalProps> = ({ showBuyModal, onClose }) => {
           <X />
         </button>
         <div className='mb-3 text-xl'>
-          Price {emporium.marketPlace[showBuyModal.arwaveId]?.price}
+          Price {emporium.marketPlace[buyModal.arwaveId]?.price}
         </div>
         <button
           onClick={handleBuy}

@@ -1,21 +1,83 @@
 import React, { useEffect, useState } from "react";
-import MainLayout from "@/layouts/MainLayout";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import ListNft from "./emporiumNft";
 import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import MainLayout from "@/layouts/MainLayout";
+import {
+    PageContainer,
+    Title,
+    Description,
+    Hint,
+} from "./styles";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import getMarketListing from "./thunks/getMarketListing";
+import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
+import getUserListing from "./thunks/geUserListing";
+import { flagHandlerEmporium } from "./emporiumSlice";
+import ContentListEmporium from "./contentListEmporium";
 
 function Emporium() {
-
+    const [type, setType] = useState("");
+    const { user } = useAppSelector((state) => state.auth);
+    const emporium = useAppSelector((state) => state.emporium);
     const dispatch = useAppDispatch();
+
+
+    const fetchUserNfts = () => {
+        if (user) {
+            dispatch(getUserIcrc7Tokens(user?.principal));
+            setType("userNfts");
+        }
+    }
+    const fetchMarketListings = () => {
+        dispatch(getMarketListing());
+        setType("marketPlace");
+    }
+    const fetchUserListings = () => {
+        dispatch(getUserListing());
+        setType("marketPlace");
+    }
     useEffect(() => {
-        setTransactions([])
+        if (emporium.depositNftSuccess === true) {
+            dispatch(flagHandlerEmporium())
+            fetchUserNfts();
+        }
+
+        else if (emporium.buyNftSuccess === true || emporium.cancelListingSuccess === true || emporium.updateListingSuccess === true) {
+            dispatch(flagHandlerEmporium())
+            fetchMarketListings();
+        }
+
+    }, [emporium])
+
+    useEffect(() => {
+        dispatch(setTransactions([]))
+        //reset
     }, [])
     return (
         <MainLayout>
+            <PageContainer>
+                <Title>Emporium</Title>
+                <Description>
+                    Trade.
+                </Description>
+                <Hint>
 
-            <h2 className="text-center py-3 text-3xl">Emporium</h2>
+                </Hint>
+                <div className="pb-4 text-center">
+                    <button className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] font-semibold me-5 hover:bg-white hover:text-[#353535]" onClick={() => {
+                        fetchUserNfts();
+                    }}>My Nfts</button>
+                    <button className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] font-semibold me-5 hover:bg-white hover:text-[#353535]" onClick={() => {
+                        fetchMarketListings();
+                    }}>Market Place</button>
 
-            <ListNft />
+                    <button className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] font-semibold me-5 hover:bg-white hover:text-[#353535]" onClick={() => {
+                        fetchUserListings();
+                    }}>My Listing</button>
+                </div>
+            </PageContainer>
+            <ContentListEmporium type={type} />
+
         </MainLayout>
     );
 }
