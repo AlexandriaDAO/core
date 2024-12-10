@@ -51,12 +51,18 @@ export const updateTransactions = createAsyncThunk(
   'contentDisplay/updateTransactions',
   async (arweaveIds: string[], { dispatch, getState }) => {
     try {
+      if (arweaveIds.length === 0) {
+        dispatch(setTransactions([]));
+        return;
+      }
+
       const state = getState() as RootState;
       const sortAsc = state.library.sortAsc;
 
       const fetchedTransactions = await fetchTransactionsApi({
         nftIds: arweaveIds,
       });
+
 
       // Apply sorting based on sortAsc
       const sortedTransactions = sortAsc 

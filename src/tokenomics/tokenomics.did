@@ -22,7 +22,7 @@ service : {
   get_logs : () -> (vec Logs) query;
   get_max_stats : () -> (nat64, nat64) query;
   get_total_LBRY_burn : () -> (nat64) query;
-  get_two_random_users : () -> (Result_1);
+  get_two_random_nfts : () -> (Result_1);
   mint_ALEX : (nat64, principal, opt blob) -> (Result_2);
   your_principal : () -> (Result_2) query;
 }

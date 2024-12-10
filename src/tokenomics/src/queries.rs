@@ -1,5 +1,5 @@
 use crate::{
-    get_current_threshold_index_mem, get_principal, get_total_lbry_burned_mem, Logs, ALEX_CANISTER_ID, ALEX_PER_THRESHOLD, LBRY_CANISTER_ID, LBRY_THRESHOLDS, LOGS, RANDOM_USER
+    get_current_threshold_index_mem, get_principal, get_total_lbry_burned_mem, Logs, ALEX_CANISTER_ID, ALEX_PER_THRESHOLD, LBRY_THRESHOLDS, LOGS,
 };
 use candid::{CandidType, Nat, Principal};
 use ic_cdk::{

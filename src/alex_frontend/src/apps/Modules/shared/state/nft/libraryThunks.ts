@@ -8,14 +8,26 @@ import { AppDispatch } from '@/store';
 
 export const togglePrincipalSelection = createAsyncThunk(
   'library/togglePrincipalSelection',
-  async ({ principalId, collection }: { principalId: string, collection: string }, { dispatch, getState }) => {
+  async (principalId: string, { dispatch }) => {
     try {
       dispatch(togglePrincipal(principalId));
-      
+      return principalId;
+    } catch (error) {
+      console.error('Error in togglePrincipalSelection:', error);
+      throw error;
+    }
+  }
+);
+
+export const performSearch = createAsyncThunk(
+  'library/performSearch',
+  async (_, { getState, dispatch }) => {
+    try {
       const state = getState() as RootState;
       const selectedPrincipals = state.library.selectedPrincipals;
-      const { getTokensForPrincipal } = getNftOwner();
       
+      const collection = state.library.collection;
+      const { getTokensForPrincipal } = getNftOwner();
       const allArweaveIds = await Promise.all(
         selectedPrincipals.map(principal => getTokensForPrincipal(principal, collection))
       );
@@ -23,9 +35,9 @@ export const togglePrincipalSelection = createAsyncThunk(
       const uniqueArweaveIds = [...new Set(allArweaveIds.flat())];
       dispatch(updateTransactions(uniqueArweaveIds));
       
-      return principalId;
+      return uniqueArweaveIds;
     } catch (error) {
-      console.error('Error in togglePrincipalSelection:', error);
+      console.error('Error in performSearch:', error);
       throw error;
     }
   }

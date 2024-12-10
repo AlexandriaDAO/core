@@ -2,49 +2,6 @@
 The Plan:
 
 
-- get_two_random_users only gets the principal, not the subaccount.
-- Problem is if the transaction call fails, it goes right to adils wallet.
-
-
-**attack strategy:**
-
-# Get random scion nft
-total_supply = icrc7_scion.icrc7_total_supply()
-nft_id_block = Rand(1-1000 || Rand(1-total_supply) if total_supply < 1000)
-nft_block = total_supply - nft_id_block
-rand_nft_id = icrc7_scion.icrc7_tokens(nft_block)
-rand_nft_owner = icrc7_scion.icrc7_owner_of(rand_nft_id)
-
-# Find the OG NFT From the Scion NFT
-og_nft_id = nft_manager.scion_to_og_id(rand_nft_id, rand_nft_owner)
-og_nft_owner = get_nft_owner(og_nft_id, icrc7_scion)
-
-# Get the principal/subaccount combos.
-og_nft_subaccount = nft_manager.to_nft_subaccount(og_nft_id)
-rand_nft_subaccount = nft_manager.to_nft_subaccount(rand_nft_id)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Bug; random librarian alex mints don't go to subaccounts or nfts.
-- Review tokenomics emissions schedule. Could it be better?
-
-
-
-
-
 
 *this assumes that the minting keeps working well*
 - Get alexandrian to display Scion NFTs.
@@ -67,7 +24,9 @@ Minor stuff to do:
 
 Bigger ones: 
 - Disable transfers and other irrelivant functions for scion NFTs.
-- 
+- Review tokenomics emissions schedule. Could it be better?
+
+
 
 
 
@@ -91,3 +50,23 @@ Then we'll let people do their own channels which are just regular stable struct
 These channels could be open for everyone to edit, or only for the owner to edit.
 I think it'll be totally free to add nfts, but you can only add them if you own the original or copy.
 
+
+
+
+
+
+
+### Understanding Arweave ID Conversions.
+
+- id_convert.ts has arweaveIdToNat and natToArweaveId and ogToScionId and scionToOgId.
+- nft_manager/src/id_converter.rs has arweave_id_to_nat and nat_to_arweave_id.
+
+Currently, scion NFTs are not getting their asset links found correctly because they reference an original NFT that contains the information required to find the asset.
+
+The problem is with getNftOwner.ts, where arweaveIds = nftIds.map(natToArweaveId);, but icrc7_scion nfts are not readily converable to non-scion token ids.
+
+First, scion NFTs need to be converted to their og NFTs with scionToOgId.
+
+In the case where the collection is 'icrc7_scion', we need to convert the scion NFTs to their og NFTs with scionToOgId before passing the result. 
+
+Since we're dealing with an array of scion NFTs, we might find it beneficial to modify the function to take an array of scion NFTs instead of a single one.

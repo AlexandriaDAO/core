@@ -31,7 +31,7 @@ fn base64_decode(input: &str) -> Vec<u8> {
     let mut buf = 0u32;
     let mut buf_len = 0;
 
-    for c in input.bytes() {
+    for &c in input.as_bytes() {
         let val = match c {
             b'A'..=b'Z' => c - b'A',
             b'a'..=b'z' => c - b'a' + 26,

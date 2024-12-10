@@ -4,12 +4,14 @@ interface LibraryState {
   selectedPrincipals: string[];
   sortAsc: boolean;
   tags: string[];
+  collection: 'icrc7' | 'icrc7_scion';
 }
 
 const initialState: LibraryState = {
   selectedPrincipals: [],
   sortAsc: true,
   tags: [],
+  collection: 'icrc7',
 };
 
 const librarySlice = createSlice({
@@ -40,6 +42,9 @@ const librarySlice = createSlice({
         state.tags.splice(index, 1);
       }
     },
+    setCollection: (state, action: PayloadAction<'icrc7' | 'icrc7_scion'>) => {
+      state.collection = action.payload;
+    },
   },
 });
 
@@ -47,6 +52,7 @@ export const {
   togglePrincipal,
   toggleSortDirection,
   setTags,
-  toggleTag
+  toggleTag,
+  setCollection
 } = librarySlice.actions;
 export default librarySlice.reducer;
