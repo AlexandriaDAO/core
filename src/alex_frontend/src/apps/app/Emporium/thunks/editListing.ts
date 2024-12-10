@@ -1,11 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getActorEmporium,
-  getIcrc7Actor,
 } from "@/features/auth/utils/authUtils";
-import { arweaveIdToNat, natToArweaveId } from "@/utils/id_convert";
+import { arweaveIdToNat } from "@/utils/id_convert";
 
-const updateListing = createAsyncThunk<
+const editListing = createAsyncThunk<
   string, // Success return type
   {
     nftArweaveId: string;
@@ -13,7 +12,7 @@ const updateListing = createAsyncThunk<
   },
   { rejectValue: string } // Reject type
 >(
-  "emporium/updateListing",
+  "emporium/editListing",
   async ({ nftArweaveId, price }, { rejectWithValue }) => {
     try {
       const actorEmporium = await getActorEmporium();
@@ -42,4 +41,4 @@ const updateListing = createAsyncThunk<
   }
 );
 
-export default updateListing;
+export default editListing;

@@ -14,70 +14,90 @@ import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
 import getUserListing from "./thunks/geUserListing";
 import { flagHandlerEmporium } from "./emporiumSlice";
 import ContentListEmporium from "./contentListEmporium";
+import { Button } from "@/lib/components/button";
 
-function Emporium() {
+const Emporium = () => {
     const [type, setType] = useState("");
+    const [activeButton, setActiveButton] = useState(""); // Track active button
     const { user } = useAppSelector((state) => state.auth);
     const emporium = useAppSelector((state) => state.emporium);
     const dispatch = useAppDispatch();
-
 
     const fetchUserNfts = () => {
         if (user) {
             dispatch(getUserIcrc7Tokens(user?.principal));
             setType("userNfts");
         }
-    }
+    };
     const fetchMarketListings = () => {
         dispatch(getMarketListing());
         setType("marketPlace");
-    }
+    };
     const fetchUserListings = () => {
         dispatch(getUserListing());
         setType("marketPlace");
-    }
+    };
+
     useEffect(() => {
         if (emporium.depositNftSuccess === true) {
-            dispatch(flagHandlerEmporium())
+            dispatch(flagHandlerEmporium());
             fetchUserNfts();
-        }
-
-        else if (emporium.buyNftSuccess === true || emporium.cancelListingSuccess === true || emporium.updateListingSuccess === true) {
-            dispatch(flagHandlerEmporium())
+        } else if (
+            emporium.buyNftSuccess === true ||
+            emporium.removeListingSuccess === true ||
+            emporium.editListingSuccess === true
+        ) {
+            dispatch(flagHandlerEmporium());
             fetchMarketListings();
         }
-
-    }, [emporium])
+    }, [emporium]);
 
     useEffect(() => {
-        dispatch(setTransactions([]))
-        //reset
-    }, [])
+        dispatch(setTransactions([]));
+    }, []);
+
     return (
         <MainLayout>
             <PageContainer>
                 <Title>Emporium</Title>
-                <Description>
-                    Trade.
-                </Description>
-                <Hint>
-
-                </Hint>
+                <Description>Trade.</Description>
+                <Hint></Hint>
                 <div className="pb-4 text-center">
-                    <button className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] font-semibold me-5 hover:bg-white hover:text-[#353535]" onClick={() => {
-                        fetchUserNfts();
-                    }}>My Nfts</button>
-                    <button className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] font-semibold me-5 hover:bg-white hover:text-[#353535]" onClick={() => {
-                        fetchMarketListings();
-                    }}>Market Place</button>
-
-                    <button className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] font-semibold me-5 hover:bg-white hover:text-[#353535]" onClick={() => {
-                        fetchUserListings();
-                    }}>My Listing</button>
+                    <Button
+                        className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] ${activeButton === "userNfts" ? "bg-white text-[#353535]" : ""
+                            }`}
+                        disabled={!user?.principal}
+                        onClick={() => {
+                            fetchUserNfts();
+                            setActiveButton("userNfts");
+                        }}
+                    >
+                        My Nfts
+                    </Button>
+                    <Button
+                        className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] ${activeButton === "marketPlace" ? "bg-white text-[#353535]" : ""
+                            }`}
+                        onClick={() => {
+                            fetchMarketListings();
+                            setActiveButton("marketPlace");
+                        }}
+                    >
+                        MarketPlace
+                    </Button>
+                    <Button
+                        className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] ${activeButton === "userListings" ? "bg-white text-[#353535]" : ""
+                            }`}
+                        disabled={!user?.principal}
+                        onClick={() => {
+                            fetchUserListings();
+                            setActiveButton("userListings");
+                        }}
+                    >
+                        My Listing
+                    </Button>
                 </div>
             </PageContainer>
             <ContentListEmporium type={type} />
-
         </MainLayout>
     );
 }

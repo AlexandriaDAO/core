@@ -4,15 +4,15 @@ import listNft from "./thunks/listNft";
 import { toast } from "sonner";
 import getMarketListing from "./thunks/getMarketListing";
 import buyNft from "./thunks/buyNft";
-import cancelListedNft from "./thunks/cancelistedNft ";
-import updateListing from "./thunks/updateListing";
+import removeListedNft from "./thunks/removeListedNft";
+import editListing from "./thunks/editListing";
 import getUserListing from "./thunks/geUserListing";
 
 export interface EmporiumState {
   loading: boolean;
   depositNftSuccess: Boolean;
-  cancelListingSuccess: Boolean;
-  updateListingSuccess: Boolean;
+  removeListingSuccess: Boolean;
+  editListingSuccess: Boolean;
   buyNftSuccess: Boolean;
   userTokens: { tokenId: string; arweaveId: string }[];
   marketPlace: Record<
@@ -27,8 +27,8 @@ const initialState: EmporiumState = {
   loading: false,
   depositNftSuccess: false,
   buyNftSuccess: false,
-  updateListingSuccess: false,
-  cancelListingSuccess: false,
+  editListingSuccess: false,
+  removeListingSuccess: false,
   error: null,
   userTokens: [],
   marketPlace: {},
@@ -41,9 +41,9 @@ const emporiumSlice = createSlice({
     flagHandlerEmporium: (state) => {
       state.error = null;
       state.depositNftSuccess = false;
-      state.cancelListingSuccess = false;
+      state.removeListingSuccess = false;
       state.buyNftSuccess = false;
-      state.updateListingSuccess = false;
+      state.editListingSuccess = false;
     },
   
   },
@@ -57,7 +57,7 @@ const emporiumSlice = createSlice({
         state.userTokens = action.payload.length > 0 ? action.payload : [];
         state.loading = false;
         state.error = null;
-        toast.success("Fetched!");
+        //toast.success("Fetched!");
       })
       .addCase(getUserIcrc7Tokens.rejected, (state, action) => {
         state.loading = false;
@@ -85,37 +85,37 @@ const emporiumSlice = createSlice({
       .addCase(getUserListing.fulfilled, (state, action) => {
         state.loading = false;
         state.marketPlace = action.payload;
-        toast.success("Fetched!");
+       // toast.success("Fetched!");
       })
       .addCase(getUserListing.rejected, (state, action) => {
         state.loading = false;
         toast.error(action.payload);
         state.error = action.payload as string;
       })
-      .addCase(updateListing.pending, (state) => {
+      .addCase(editListing.pending, (state) => {
         state.loading = true;
       })
-      .addCase(updateListing.fulfilled, (state, action) => {
+      .addCase(editListing.fulfilled, (state, action) => {
         state.loading = false;
-        state.updateListingSuccess = true;
+        state.editListingSuccess = true;
         toast.success("updated!");
       })
-      .addCase(updateListing.rejected, (state, action) => {
+      .addCase(editListing.rejected, (state, action) => {
         state.loading = false;
         toast.error(action.payload);
         state.error = action.payload as string;
       })
-      .addCase(cancelListedNft.pending, (state) => {
+      .addCase(removeListedNft.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(cancelListedNft.fulfilled, (state, action) => {
+      .addCase(removeListedNft.fulfilled, (state, action) => {
         state.loading = false;
-        state.cancelListingSuccess = true;
+        state.removeListingSuccess = true;
         state.error = null;
-        toast.success("Canceled!");
+        toast.success("Removed!");
       })
-      .addCase(cancelListedNft.rejected, (state, action) => {
+      .addCase(removeListedNft.rejected, (state, action) => {
         state.loading = false;
         toast.error(action.payload);
         state.error = action.payload as string;
@@ -143,8 +143,7 @@ const emporiumSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.marketPlace = action.payload; // Assign the object directly
-
-        toast.success("Fetched!");
+       // toast.success("Fetched!");
       })
       .addCase(getMarketListing.rejected, (state, action) => {
         state.loading = false;

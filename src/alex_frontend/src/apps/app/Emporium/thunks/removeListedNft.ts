@@ -4,15 +4,15 @@ import {
 } from "@/features/auth/utils/authUtils";
 import {arweaveIdToNat} from "@/utils/id_convert";
 
-const cancelListedNft = createAsyncThunk<
+const removeListedNft = createAsyncThunk<
   string, // Success return type
   string,
   { rejectValue: string } // Reject type
->("emporium/cancelistedNft", async (nftArweaveId, { rejectWithValue }) => {
+>("emporium/removeListedNft", async (nftArweaveId, { rejectWithValue }) => {
   try {
     const actorEmporium = await getActorEmporium();
     const tokenId = arweaveIdToNat(nftArweaveId);
-    const result = await actorEmporium.cancel_nft_listing(tokenId);
+    const result = await actorEmporium.remove_nft_listing(tokenId);
 
     // Handle success or error response
     if ("Ok" in result) {
@@ -31,4 +31,4 @@ const cancelListedNft = createAsyncThunk<
   );
 });
 
-export default cancelListedNft;
+export default removeListedNft;

@@ -8,17 +8,26 @@ import ContentGrid from "@/apps/Modules/AppModules/contentGrid/ContentGrid";
 import Modal from "@/apps/Modules/AppModules/contentGrid/components/Modal";
 import ContentRenderer from "@/apps/Modules/AppModules/contentGrid/components/ContentRenderer";
 import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
-import SellModal from "./sellModal";
-import BuyModal from "./buyModal";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Overlay from "./overlay";
-import UpdateModal from "./updateModal";
+import CombinedModal from "./combineModal";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
 interface ContentListEmporiumProps {
   type: string;
 }
+const defaultTransaction: Transaction = {
+  id: "", // Example properties; replace these with actual fields in Transaction
+  owner: "",
+  tags: [],
+  data: {
+    size: 0,
+    type: ""
+  },
+  block: null,
+};
+
 const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   const dispatch = useAppDispatch();
   const transactions = useSortedTransactions();
@@ -29,11 +38,26 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
 
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
-  const [sellModal, setSellModal] = useState({ arwaveId: "", show: false });
-  const [buyModal, setBuyModal] = useState({ arwaveId: "", show: false, price: "" });
-  const [updateModal, setupdateModal] = useState({ arwaveId: "", show: false, price: "" });
-
   const [buttonType, setButtonType] = useState("");
+  const [modalType, setModalType] = useState<"sell" | "edit" | "remove" | "buy" | null>(null);
+  const [modalData, setModalData] = useState({
+    arwaveId: "",
+    price: "",
+    transaction: defaultTransaction,
+    show: false,
+
+  });
+
+  const handleOpenModal = (type: "sell" | "edit" | "remove" | "buy", data: any) => {
+    setModalType(type);
+    setModalData({ ...data, show: true });
+  };
+
+  const handleCloseModal = () => {
+    setModalData({ arwaveId: "", price: "", show: false, transaction: defaultTransaction });
+    setModalType(null);
+  };
+
 
   const handleRenderError = useCallback((transactionId: string) => {
     dispatch(clearTransactionContent(transactionId));
@@ -66,75 +90,76 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   return (
     <>
 
-    {emporium.loading == true ? (<div className="w-full h-full fixed bg-[#6f6f6fc9] flex flex-col items-center justify-center gap-2">
+      {emporium.loading == true ? (<div className="w-full h-full fixed bg-[#6f6f6fc9] flex flex-col items-center justify-center gap-2">
 
-      <LoaderPinwheel className="animate-spin text-4xl text-white w-14 h-14" />
+        <LoaderPinwheel className="animate-spin text-4xl text-white w-14 h-14" />
 
-    </div>) : (<ContentGrid>
-      {transactions.map((transaction) => {
-        const content = contentData[transaction.id];
-        const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-        const hasPredictions = !!predictions[transaction.id];
+      </div>) : (<ContentGrid>
+        {transactions.map((transaction) => {
+          const content = contentData[transaction.id];
+          const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+          const hasPredictions = !!predictions[transaction.id];
 
-        // Only show blur when we have predictions and content is not mintable
-        // const shouldShowBlur = hasPredictions && mintableStateItem && !isMintable;
-        // The trouble here is that if the user is not logged in, it's not mintable and blurred regardless. We have to use isPorn.
-        const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
+          // Only show blur when we have predictions and content is not mintable
+          // const shouldShowBlur = hasPredictions && mintableStateItem && !isMintable;
+          // The trouble here is that if the user is not logged in, it's not mintable and blurred regardless. We have to use isPorn.
+          const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 
-        return (
-          <ContentGrid.Item
-            key={transaction.id}
-            onClick={
-              () => setSelectedContent({ id: transaction.id, type: contentType })
-            }
-          >
-            <div className="group relative w-full h-full">
-              <ContentRenderer
-                transaction={transaction}
-                content={content}
-                contentUrls={contentData[transaction.id]?.urls || {
-                  thumbnailUrl: null,
-                  coverUrl: null,
-                  fullUrl: content?.url || `https://arweave.net/${transaction.id}`
-                }}
-                showStats={showStats[transaction.id]}
-                mintableState={mintableState}
-                handleRenderError={handleRenderError}
-              />
-              {shouldShowBlur && (
-                <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
-                    Content Filtered
+          return (
+            <ContentGrid.Item
+              key={transaction.id}
+              onClick={
+                () => setSelectedContent({ id: transaction.id, type: contentType })
+              }
+            >
+              <div className="group relative w-full h-full">
+                <ContentRenderer
+                  transaction={transaction}
+                  content={content}
+                  contentUrls={contentData[transaction.id]?.urls || {
+                    thumbnailUrl: null,
+                    coverUrl: null,
+                    fullUrl: content?.url || `https://arweave.net/${transaction.id}`
+                  }}
+                  showStats={showStats[transaction.id]}
+                  mintableState={mintableState}
+                  handleRenderError={handleRenderError}
+                />
+                {shouldShowBlur && (
+                  <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
+                      Content Filtered
+                    </div>
                   </div>
-                </div>
-              )}
-              {renderDetails(transaction)}
+                )}
+                {renderDetails(transaction)}
 
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
-                }}
-                className="absolute top-2 left-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-[25]"
-              >
-                <Info />
-              </button>
-              {showStats[transaction.id] && predictions[transaction.id] && (
-                <div className="absolute top-10 left-2 bg-black/80 text-white p-2 rounded-md text-xs z-[25]">
-                  <div>Drawing: {(predictions[transaction.id].Drawing * 100).toFixed(1)}%</div>
-                  <div>Neutral: {(predictions[transaction.id].Neutral * 100).toFixed(1)}%</div>
-                  <div>Sexy: {(predictions[transaction.id].Sexy * 100).toFixed(1)}%</div>
-                  <div>Hentai: {(predictions[transaction.id].Hentai * 100).toFixed(1)}%</div>
-                  <div>Porn: {(predictions[transaction.id].Porn * 100).toFixed(1)}%</div>
-                </div>
-              )}
-              <Overlay transaction={transaction} type={type} buttonType={buttonType} setSellModal={setSellModal} setBuyModal={setBuyModal} setUpdateModal={setupdateModal}/>
-            </div>
-          </ContentGrid.Item>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
+                  }}
+                  className="absolute top-2 left-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-[25]"
+                >
+                  <Info />
+                </button>
+                {showStats[transaction.id] && predictions[transaction.id] && (
+                  <div className="absolute top-10 left-2 bg-black/80 text-white p-2 rounded-md text-xs z-[25]">
+                    <div>Drawing: {(predictions[transaction.id].Drawing * 100).toFixed(1)}%</div>
+                    <div>Neutral: {(predictions[transaction.id].Neutral * 100).toFixed(1)}%</div>
+                    <div>Sexy: {(predictions[transaction.id].Sexy * 100).toFixed(1)}%</div>
+                    <div>Hentai: {(predictions[transaction.id].Hentai * 100).toFixed(1)}%</div>
+                    <div>Porn: {(predictions[transaction.id].Porn * 100).toFixed(1)}%</div>
+                  </div>
+                )}
+                <Overlay transaction={transaction} type={type} buttonType={buttonType} setModal={handleOpenModal}
+                />
+              </div>
+            </ContentGrid.Item>
 
-        );
-      })}
-    </ContentGrid>)}
+          );
+        })}
+      </ContentGrid>)}
 
 
       <Modal
@@ -160,22 +185,15 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
         )}
       </Modal>
 
+      <CombinedModal
+        type={modalType!}
+        modalData={modalData}
+        onClose={handleCloseModal}
+        handleRenderError={handleRenderError}
+        showStats={showStats}
+      />
 
-      <SellModal
-        sellModal={sellModal}
-        onClose={() => setSellModal({ show: false, arwaveId: "" })}
-      >
-      </SellModal>
-      <UpdateModal
-        updateModal={updateModal}
-        onClose={() => setupdateModal({ show: false, arwaveId: "", price: "" })}
-      >
-      </UpdateModal>
-      <BuyModal
-        buyModal={buyModal}
-        onClose={() => setBuyModal({ show: false, arwaveId: "", price: "" })}
-      >
-      </BuyModal>
+
 
     </>
   );

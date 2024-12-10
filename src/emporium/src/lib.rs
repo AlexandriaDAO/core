@@ -8,6 +8,11 @@ pub use update::*;
 mod queries;
 pub use queries::*;
 
+
+mod guard;
+pub use guard::{*};
+
+
 pub mod utils;
 use icrc_ledger_types::icrc1::transfer::BlockIndex;
 

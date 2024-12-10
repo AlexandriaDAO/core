@@ -1,3 +1,4 @@
+use crate::not_anon;
 use crate::{
     utils::{
         get_principal, is_owner, remove_nft_from_listing, Account, TransferArg, TransferError,
@@ -15,12 +16,15 @@ use icrc_ledger_types::icrc2::transfer_from::{
 };
 
 use ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
-#[update]
+
+#[update(guard = "not_anon")]
 pub async fn list_nft(token_id: Nat, icp_amount: u64) -> Result<String, String> {
     //check ownership
     //desposit nft to canister
     //add record to listing
-
+    if icp_amount < 1 {
+        return Err("Price should greater than 1 e8s ICP".to_string());
+    }
     match is_owner(caller(), token_id.clone()).await {
         Ok(true) => {}
         Ok(false) => return Err("You can't list this NFT, ownership proof failed!".to_string()),
@@ -51,8 +55,8 @@ pub async fn list_nft(token_id: Nat, icp_amount: u64) -> Result<String, String> 
 
     Ok("NFT added for sale".to_string())
 }
-#[update]
-pub async fn cancel_nft_listing(token_id: Nat) -> Result<String, String> {
+#[update(guard = "not_anon")]
+pub async fn remove_nft_listing(token_id: Nat) -> Result<String, String> {
     // Check if the caller is the owner
 
     let current_nft = LISTING
@@ -70,7 +74,7 @@ pub async fn cancel_nft_listing(token_id: Nat) -> Result<String, String> {
     }
     Ok("Successfully cancelled the NFT listing.".to_string())
 }
-#[update]
+#[update(guard = "not_anon")]
 pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
     // transfer ICP from caller to seller through tranfer approve
     // transfer NFT
@@ -115,8 +119,11 @@ pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
 
     Ok("Success".to_string())
 }
-#[update]
+#[update(guard = "not_anon")]
 pub async fn update_nft_price(token_id: Nat, new_price: u64) -> Result<String, String> {
+    if new_price < 1 {
+        return Err("Price should greater than 1 e8s ICP".to_string());
+    }
     let current_time: u64 = ic_cdk::api::time();
     LISTING.with(|nfts| -> Result<(), String> {
         let mut nft_map = nfts.borrow_mut();
