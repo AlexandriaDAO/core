@@ -6,11 +6,9 @@ import {
 } from "../../../../../declarations/alex_backend";
 import {
   createActor as createUserActor,
-  user
+  user,
 } from "../../../../../declarations/user";
-import {
-  createActor as createAlexWalletActor,
-} from "../../../../../declarations/alex_wallet";
+import { createActor as createAlexWalletActor } from "../../../../../declarations/alex_wallet";
 import {
   createActor as createIcrc7Actor,
   icrc7,
@@ -45,6 +43,10 @@ import {
   createActor as createActorVetkd,
 } from "../../../../../declarations/vetkd";
 
+import {
+  emporium,
+  createActor as createActorEmporium,
+} from "../../../../../declarations/emporium";
 
 const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
 
@@ -59,8 +61,10 @@ const alex_canister_id = process.env.CANISTER_ID_ALEX!;
 const user_canister_id = process.env.CANISTER_ID_USER!;
 const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
+const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 
-export const getPrincipal = (client: AuthClient): string => client.getIdentity().getPrincipal().toString();
+export const getPrincipal = (client: AuthClient): string =>
+  client.getIdentity().getPrincipal().toString();
 
 export const getAuthClient = async (): Promise<AuthClient> => {
   // create new client each time inspired by default react app
@@ -85,13 +89,17 @@ const getActor = async <T>(
       const identity = client.getIdentity();
       const agent = await HttpAgent.create({
         identity,
-        host: isLocalDevelopment ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943` : "https://identity.ic0.app",
+        host: isLocalDevelopment
+          ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`
+          : "https://identity.ic0.app",
       });
       // Fetch root key for certificate validation during development
       // dangerous on mainnet
       if (isLocalDevelopment) {
-        await agent.fetchRootKey().catch(err => {
-          console.warn('Unable to fetch root key. Check to ensure that your local replica is running');
+        await agent.fetchRootKey().catch((err) => {
+          console.warn(
+            "Unable to fetch root key. Check to ensure that your local replica is running"
+          );
           console.error(err);
         });
       }
@@ -106,24 +114,41 @@ const getActor = async <T>(
   return defaultActor;
 };
 
-export const getActorAlexBackend = () => getActor(alex_backend_canister_id, createAlexBackendActor, alex_backend);
+export const getActorAlexBackend = () =>
+  getActor(alex_backend_canister_id, createAlexBackendActor, alex_backend);
 
 export const getUser = () => getActor(user_canister_id, createUserActor, user);
 
-export const getActorAlexWallet = async () => getActor(alex_wallet_canister_id, createAlexWalletActor, createAlexWalletActor(alex_wallet_canister_id));
+export const getActorAlexWallet = async () =>
+  getActor(
+    alex_wallet_canister_id,
+    createAlexWalletActor,
+    createAlexWalletActor(alex_wallet_canister_id)
+  );
 
-export const getIcrc7Actor = () => getActor(icrc7_canister_id, createIcrc7Actor, icrc7);
+export const getIcrc7Actor = () =>
+  getActor(icrc7_canister_id, createIcrc7Actor, icrc7);
 
-export const getNftManagerActor = () => getActor(nft_manager_canister_id, createNftManagerActor, nft_manager);
+export const getNftManagerActor = () =>
+  getActor(nft_manager_canister_id, createNftManagerActor, nft_manager);
 
-export const getActorSwap = () => getActor(icp_swap_canister_id, createActorSwap, icp_swap);
+export const getActorSwap = () =>
+  getActor(icp_swap_canister_id, createActorSwap, icp_swap);
 
-export const getIcpLedgerActor = () => getActor(icp_ledger_canister_id, createActorIcpLedger, icp_ledger_canister);
+export const getIcpLedgerActor = () =>
+  getActor(icp_ledger_canister_id, createActorIcpLedger, icp_ledger_canister);
 
-export const getTokenomicsActor = () => getActor(tokenomics_canister_id, createActorTokenomics, tokenomics);
+export const getTokenomicsActor = () =>
+  getActor(tokenomics_canister_id, createActorTokenomics, tokenomics);
 
-export const getLbryActor = () => getActor(lbry_canister_id, createActorLbry, LBRY);
+export const getLbryActor = () =>
+  getActor(lbry_canister_id, createActorLbry, LBRY);
 
-export const getAlexActor = () => getActor(alex_canister_id, createActorAlex, ALEX);
+export const getAlexActor = () =>
+  getActor(alex_canister_id, createActorAlex, ALEX);
 
-export const getActorVetkd = () => getActor(vetkd_canister_id, createActorVetkd, vetkd);
+export const getActorVetkd = () =>
+  getActor(vetkd_canister_id, createActorVetkd, vetkd);
+
+export const getActorEmporium = () =>
+  getActor(emporium_canister_id, createActorEmporium, emporium);

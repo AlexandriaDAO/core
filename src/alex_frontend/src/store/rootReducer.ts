@@ -27,6 +27,8 @@ import contentDisplayReducer from "@/apps/Modules/shared/state/content/contentDi
 import arweaveReducer from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import libraryReducer from "@/apps/Modules/shared/state/nft/librarySlice";
 
+import emporiumReducer from "@/apps/app/Emporium/emporiumSlice";
+
 import uploadBookReducer from "@/features/upload-book/uploadBookSlice";
 
 const rootReducer = combineReducers({
@@ -62,6 +64,8 @@ const rootReducer = combineReducers({
 	arweave: arweaveReducer,
 	contentDisplay: contentDisplayReducer,
 	library: libraryReducer,
+
+	emporium:emporiumReducer,
 });
 
 export default rootReducer;

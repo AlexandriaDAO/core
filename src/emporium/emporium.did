@@ -1,0 +1,17 @@
+type Nft = record {
+  status : NftStatus;
+  token_id : nat;
+  owner : principal;
+  time : nat64;
+  price : nat64;
+};
+type NftStatus = variant { Listed; Unlisted; Reimbursed };
+type Result = variant { Ok : text; Err : text };
+service : {
+  buy_nft : (nat) -> (Result);
+  get_caller_listing : () -> (vec record { text; Nft }) query;
+  get_listing : () -> (vec record { text; Nft }) query;
+  list_nft : (nat, nat64) -> (Result);
+  remove_nft_listing : (nat) -> (Result);
+  update_nft_price : (nat, nat64) -> (Result);
+}
