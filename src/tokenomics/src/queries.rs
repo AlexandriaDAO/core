@@ -1,5 +1,5 @@
 use crate::{
-    get_current_threshold_index_mem, get_principal, get_total_lbry_burned_mem, Logs, ALEX_CANISTER_ID, ALEX_PER_THRESHOLD, LBRY_CANISTER_ID, LBRY_THRESHOLDS, LOGS, RANDOM_USER
+    get_current_threshold_index_mem, get_principal, get_total_lbry_burned_mem, Logs, ALEX_CANISTER_ID, ALEX_PER_THRESHOLD, LBRY_THRESHOLDS, LOGS,
 };
 use candid::{CandidType, Nat, Principal};
 use ic_cdk::{
@@ -77,6 +77,12 @@ struct GetTransactionsResponse {
     transactions: Vec<TransactionRecord>,
 }
 
+#[derive(CandidType, Deserialize)]
+struct GetTokensArgs {
+    start: Option<Nat>,
+    length: Option<Nat>,
+}
+
 #[query]
 pub fn get_total_LBRY_burn() -> u64 {
     let result = get_total_lbry_burned_mem();
@@ -132,150 +138,77 @@ pub fn your_principal() -> Result<String, String> {
 }
 
 #[update]
-async fn get_latest_transfer_transactions() -> Vec<TransferRecord> {
-    let token_canister_id = get_principal(LBRY_CANISTER_ID);
+pub async fn get_two_random_nfts() -> CallResult<((Principal, Vec<u8>), (Principal, Vec<u8>))> {
+    // Get total supply of Scion NFTs
+    let icrc7 = get_principal("53ewn-qqaaa-aaaap-qkmqq-cai");
+    let icrc7_scion = get_principal("uxyan-oyaaa-aaaap-qhezq-cai");
+    let nft_manager = get_principal("5sh5r-gyaaa-aaaap-qkmra-cai");
 
-    // First, get the total number of transactions
-    let initial_request = GetTransactionsRequest {
-        start: Nat::from(0 as u32),
-        length: Nat::from(1 as u32), // We only need one transaction to get the log_length
-    };
-
-    let total_transactions = match ic_cdk::call::<_, (GetTransactionsResponse,)>(
-        token_canister_id,
-        "get_transactions",
-        (initial_request,),
-    )
-    .await
-    {
-        Ok((response,)) => response.log_length,
-        Err(e) => {
-            ic_cdk::println!("Error calling get_transactions: {:?}", e);
-            return vec![];
-        }
-    };
-
-    // Calculate the start index for the latest 100 transactions
-    let start = if total_transactions > Nat::from(100 as u32) {
-        total_transactions - Nat::from(100 as u32)
-    } else {
-        Nat::from(0 as u32)
-    };
-
-    // Now, fetch the latest transactions
-    let request = GetTransactionsRequest {
-        start,
-        length: Nat::from(100 as u32),
-    };
-
-    match ic_cdk::call::<_, (GetTransactionsResponse,)>(
-        token_canister_id,
-        "get_transactions",
-        (request,),
-    )
-    .await
-    {
-        Ok((response,)) => response
-            .transactions
-            .into_iter()
-            .filter_map(|tx| {
-                if tx.kind == "transfer" {
-                    tx.transfer
-                } else {
-                    None
-                }
-            })
-            .collect(),
-        Err(e) => {
-            ic_cdk::println!("Error calling get_transactions: {:?}", e);
-            vec![]
-        }
+    let (total_supply,): (Nat,) = ic_cdk::call(icrc7_scion, "icrc7_total_supply", ()).await?;
+    
+    // Get random bytes for selecting NFT
+    let (random_bytes,): (Vec<u8>,) = 
+        ic_cdk::api::call::call(Principal::management_canister(), "raw_rand", ()).await?;
+    
+    let random_value = u128::from_le_bytes(random_bytes[0..16].try_into().unwrap());
+    let supply_u128: u128 = total_supply.0.try_into().unwrap_or(0);
+    
+    if supply_u128 == 0 {
+        return Err((ic_cdk::api::call::RejectionCode::CanisterError, "No NFTs minted yet".to_string()));
     }
+    
+    let max_index = std::cmp::min(supply_u128 - 1, 999);
+    let random_index = random_value % (max_index + 1);
+    
+    let tokens_call_result: CallResult<(Vec<Nat>,)> = ic_cdk::call(
+        icrc7_scion,
+        "icrc7_tokens",
+        (Some(Nat::from(random_index)), Some(Nat::from(1u32)),)
+    ).await;
+
+    let (tokens,) = tokens_call_result?;
+
+    if tokens.is_empty() {
+        return Err((ic_cdk::api::call::RejectionCode::CanisterError, "No tokens found".to_string()));
+    }
+
+    let rand_nft_id = tokens[0].clone();
+    
+    // Fix: Correct return type handling for icrc7_owner_of
+    let (rand_owners,): (Vec<Option<Account>>,) = 
+        ic_cdk::call(icrc7_scion, "icrc7_owner_of", (vec![rand_nft_id.clone()],)).await?;
+    
+    let rand_nft_owner = rand_owners
+        .get(0)
+        .and_then(|o| o.as_ref())
+        .map(|a| a.owner)
+        .ok_or((ic_cdk::api::call::RejectionCode::CanisterError, "No owner found for Scion NFT".to_string()))?;
+
+    let args = (rand_nft_id.clone(), rand_nft_owner);
+    let (og_nft_id,): (Nat,) = ic_cdk::call(nft_manager, "scion_to_og_id", args).await?;
+    
+    // Fix: Correct return type handling for icrc7_owner_of
+    let (og_owners,): (Vec<Option<Account>>,) = 
+        ic_cdk::call(icrc7, "icrc7_owner_of", (vec![og_nft_id.clone()],)).await?;
+    
+    let og_nft_owner = og_owners
+        .get(0)
+        .and_then(|o| o.as_ref())
+        .map(|a| a.owner)
+        .ok_or((ic_cdk::api::call::RejectionCode::CanisterError, "No owner found for OG NFT".to_string()))?;
+
+    let (scion_subaccount,): (Vec<u8>,) = 
+        ic_cdk::call(nft_manager, "to_nft_subaccount", (rand_nft_id,)).await?;
+    let (og_subaccount,): (Vec<u8>,) = 
+        ic_cdk::call(nft_manager, "to_nft_subaccount", (og_nft_id,)).await?;
+
+    Ok((
+        (nft_manager, scion_subaccount),
+        (nft_manager, og_subaccount)
+    ))
 }
 
 #[query]
-pub async fn get_two_random_users() -> CallResult<((Principal, Vec<u8>), (Principal, Vec<u8>))> {
-    // First, get all latest transfer transactions
-    let all_transfers = get_latest_transfer_transactions().await;
-
-    // If we have fewer than 1 transactions, return dummy random user with default subaccount
-    if all_transfers.len() < 1 {
-        return Ok((
-            (get_principal(RANDOM_USER), vec![0; 32]),
-            (get_principal(RANDOM_USER), vec![0; 32])
-        ));
-    }
-
-    // Get random bytes
-    let (random_bytes,): (Vec<u8>,) =
-        ic_cdk::api::call::call(Principal::management_canister(), "raw_rand", ()).await?;
-
-    // Use the first 16 bytes (128 bits) of randomness
-    let random_value = u128::from_le_bytes(random_bytes[0..16].try_into().unwrap());
-
-    let index1 = (random_value % all_transfers.len() as u128) as usize;
-    let mut index2 = ((random_value >> 64) % all_transfers.len() as u128) as usize;
-
-    // Ensure index2 is different from index1
-    if index2 == index1 {
-        index2 = (index2 + 1) % all_transfers.len();
-    }
-
-    let address1 = (
-        all_transfers[index1].clone().from.owner,
-        all_transfers[index1].clone().from.subaccount.unwrap_or(vec![0; 32])
-    );
-    let address2 = (
-        all_transfers[index2].clone().to.owner,
-        all_transfers[index2].clone().to.subaccount.unwrap_or(vec![0; 32])
-    );
-
-    // Return the two selected addresses with their subaccounts
-    Ok((address1, address2))
+fn get_logs() -> Vec<Logs> {
+    LOGS.with(|logs| logs.borrow().clone())
 }
-
-
-// OG Get two random users without subaccounts.
-
-// #[query]
-// pub async fn get_two_random_users() -> CallResult<(Principal, Principal)> {
-    //     // First, get all latest transfer transactions
-    //     let all_transfers = get_latest_transfer_transactions().await;
-    
-    //     // If we have fewer than 1 transactions, return dummy random user
-    //     if all_transfers.len() < 1 {
-        //         return Ok((get_principal(RANDOM_USER), get_principal(RANDOM_USER)));
-        //     }
-        
-        //     // Get random bytes
-        //     let (random_bytes,): (Vec<u8>,) =
-        //         ic_cdk::api::call::call(Principal::management_canister(), "raw_rand", ()).await?;
-        
-        //     // Use the first 16 bytes (128 bits) of randomness
-        //     let random_value = u128::from_le_bytes(random_bytes[0..16].try_into().unwrap());
-        
-        //     let index1 = (random_value % all_transfers.len() as u128) as usize;
-        //     let mut index2 = ((random_value >> 64) % all_transfers.len() as u128) as usize;
-        
-        //     // Ensure index2 is different from index1
-        //     if index2 == index1 {
-            //         index2 = (index2 + 1) % all_transfers.len();
-            //     }
-            //     let address1 = all_transfers[index1].clone().from.owner;
-            //     let address2 = all_transfers[index2].clone().to.owner;
-            //     ic_cdk::println!("random index are {},{}", index1, index2);
-            //     // Return the two selected
-            //     Ok((address1, address2))
-            
-            // }
-            
-            
-            
-            
-
-
-
-    #[query]
-    fn get_logs() -> Vec<Logs> {
-        LOGS.with(|logs| logs.borrow().clone())
-    }

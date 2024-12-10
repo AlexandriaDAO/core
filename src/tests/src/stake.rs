@@ -8,13 +8,9 @@ use crate::utils::{get_test_subaccount, E8S_PER_ALEX, ALEX_FEE};
 pub async fn stake(amount: u64, balance_name: String) -> Result<String, String> {
     let swap_canister_id = crate::icp_swap_principal();
 
-    if amount < 1 {
-        return Err("Minimum Stake is 1 ALEX".to_string());
-    }
-
     // get subaccount from balance name
     let from_subaccount = get_test_subaccount(&balance_name)
-        .map_err(|_| format!("Invalid balance name: {}. Must be one of: admin, alice, bob, charlie", balance_name))?;
+        .map_err(|_| format!("Invalid balance name: {}. Must be one of: root, one, two, three", balance_name))?;
 
     let amount_e8s = amount * E8S_PER_ALEX;
 
@@ -42,11 +38,11 @@ pub async fn stake(amount: u64, balance_name: String) -> Result<String, String> 
 
     match approve_result {
         Ok((Ok(_),)) => {
-            // Call stake function on swap canister
+            // Call stake function on swap canister with amount_e8s instead of amount
             let stake_result: Result<(Result<String, String>,), _> = ic_cdk::call(
                 swap_canister_id,
                 "stake_ALEX",
-                (amount, Some(from_subaccount)),
+                (amount_e8s, Some(from_subaccount)),
             ).await;
 
             match stake_result {
@@ -57,5 +53,27 @@ pub async fn stake(amount: u64, balance_name: String) -> Result<String, String> 
         },
         Ok((Err(e),)) => Err(format!("Approval failed: {:?}", e)),
         Err(e) => Err(format!("Approval call failed: {:?}", e)),
+    }
+}
+
+#[update]
+pub async fn unstake(balance_name: String) -> Result<String, String> {
+    let swap_canister_id = crate::icp_swap_principal();
+
+    // get subaccount from balance name
+    let from_subaccount = get_test_subaccount(&balance_name)
+        .map_err(|_| format!("Invalid balance name: {}. Must be one of: root, one, two, three", balance_name))?;
+
+    // Call unstake function on swap canister
+    let unstake_result: Result<(Result<String, String>,), _> = ic_cdk::call(
+        swap_canister_id,
+        "un_stake_all_ALEX",
+        (Some(from_subaccount),),
+    ).await;
+
+    match unstake_result {
+        Ok((Ok(message),)) => Ok(message),
+        Ok((Err(e),)) => Err(format!("Unstake error: {}", e)),
+        Err(e) => Err(format!("Unstake call failed: {:?}", e)),
     }
 }

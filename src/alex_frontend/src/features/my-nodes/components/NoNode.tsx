@@ -1,7 +1,7 @@
 import React from "react";
 
 const NoNode = () => (
-	<>
+	<div className="flex flex-col justify-between gap-2 items-center">
 		<svg
 			width="50"
 			height="50"
@@ -59,7 +59,7 @@ const NoNode = () => (
 		<span className="font-roboto-condensed font-bold text-base">
 			No nodes created
 		</span>
-	</>
+	</div>
 );
 
 export default NoNode;

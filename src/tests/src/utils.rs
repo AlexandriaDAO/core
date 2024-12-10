@@ -11,10 +11,10 @@ pub const MIN_DELAY_NS: u64 = 2_000_000_000; // 2 seconds in nanoseconds
 pub fn get_test_subaccount(account_name: &str) -> Result<[u8; 32], RejectionCode> {
     let mut subaccount = [0u8; 32];
     match account_name.to_lowercase().as_str() {
-        "admin" => subaccount[0] = 0,
-        "alice" => subaccount[0] = 1,
-        "bob" => subaccount[0] = 2,
-        "charlie" => subaccount[0] = 3,
+        "root" => subaccount[0] = 0,
+        "one" => subaccount[0] = 1,
+        "two" => subaccount[0] = 2,
+        "three" => subaccount[0] = 3,
         _ => {
             ic_cdk::println!("Unknown account name: {}", account_name);
             return Err(RejectionCode::Unknown);

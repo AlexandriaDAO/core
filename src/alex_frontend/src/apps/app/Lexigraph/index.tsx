@@ -4,11 +4,9 @@ import MainLayout from "@/layouts/MainLayout";
 function Lexigraph() {
 
 	return (
-		<MainLayout>
-			<div>
-				<p>Coming soon...</p>
-			</div>
-		</MainLayout>
+		<div>
+			<p>Coming soon...</p>
+		</div>
 	);
 }
 

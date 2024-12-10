@@ -44,11 +44,17 @@ const Emporium = () => {
             fetchUserNfts();
         } else if (
             emporium.buyNftSuccess === true ||
-            emporium.removeListingSuccess === true ||
-            emporium.editListingSuccess === true
+            emporium.removeListingSuccess === true
         ) {
             dispatch(flagHandlerEmporium());
             fetchMarketListings();
+        }
+        else if (emporium.editListingSuccess === true
+        ) {
+            dispatch(flagHandlerEmporium());
+            fetchUserListings();
+            setActiveButton("userListings");
+
         }
     }, [emporium]);
 
@@ -57,7 +63,7 @@ const Emporium = () => {
     }, []);
 
     return (
-        <MainLayout>
+        <>
             <PageContainer>
                 <Title>Emporium</Title>
                 <Description>Trade.</Description>
@@ -98,7 +104,7 @@ const Emporium = () => {
                 </div>
             </PageContainer>
             <ContentListEmporium type={type} />
-        </MainLayout>
+        </>
     );
 }
 export default Emporium;

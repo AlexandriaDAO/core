@@ -1,11 +1,11 @@
 import React from "react";
 import IIProvider from "./IIProvider";
 
-interface AuthenticationProviderProps {
+interface AuthProviderProps {
 	children: React.ReactNode;
 }
 
-const AuthenticationProvider: React.FC<AuthenticationProviderProps> = ({ children }) => {
+const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	return (
 		<IIProvider >
 			{children}
@@ -14,4 +14,4 @@ const AuthenticationProvider: React.FC<AuthenticationProviderProps> = ({ childre
 }
 
 
-export default AuthenticationProvider
+export default AuthProvider

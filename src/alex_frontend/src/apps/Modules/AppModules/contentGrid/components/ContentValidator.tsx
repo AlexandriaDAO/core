@@ -16,6 +16,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   imageObjectUrl,
 }) => {
   const dispatch = useDispatch();
+  const collection = 'icrc7';
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
   const { validateContent } = useContentValidation();
   const { checkAuthentication } = useAuth();
@@ -28,7 +29,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   };
 
   const handleValidateContent = async (element: HTMLImageElement | HTMLVideoElement) => {
-    const owner = await checkOwnership(transactionId, 'icrc7');
+    const owner = await checkOwnership(transactionId, collection);
     const isAuthenticated = await checkAuthentication();
 
     if (owner) {

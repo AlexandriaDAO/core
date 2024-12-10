@@ -6,7 +6,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { _SERVICE as _SERVICESWAP } from "../../../../../../declarations/icp_swap/icp_swap.did";
 import { _SERVICE as _SERVICEICPLEDGER } from "../../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import swapLbry from "../../thunks/swapLbry";
 import { flagHandler } from "../../swapSlice";
 import { LoaderPinwheel } from 'lucide-react';

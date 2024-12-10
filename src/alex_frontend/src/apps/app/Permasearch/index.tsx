@@ -53,7 +53,7 @@ function Permasearch() {
 	}, [isLoading]);
 
 	return (
-		<MainLayout>
+		<>
 			<PageContainer>
 				<Title>Permasearch</Title>
 				<Description>
@@ -85,8 +85,10 @@ function Permasearch() {
 			<div ref={contentRef}>
 				<ContentDisplay />
 			</div>
-		</MainLayout>
+		</>
 	);
 }
 
 export default Permasearch;
+
+

@@ -5,7 +5,9 @@ import { AppDispatch } from "@/store";
 import { wipe } from "../../shared/state/wiper";
 import PrincipalSelector from "./PrincipalSelector";
 import SortSelector from "./SortSelector";
+import CollectionSelector from "./collectionSelector";
 import LibraryContentTagsSelector from "./tagSelector";
+import SearchButton from "./searchButton";
 import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
 
 export default function librarySearch() {
@@ -38,11 +40,13 @@ export default function librarySearch() {
             </h3>
             
             <div className="space-y-4">
+
               {/* Sort Controls */}
               <div className="flex items-center space-x-2 pb-4 border-b border-gray-200 dark:border-gray-600">
                 <span className="text-sm text-gray-600 dark:text-gray-300 min-w-[80px]">
                   Sort by:
                 </span>
+                <CollectionSelector />
                 <SortSelector />
               </div>
 
@@ -60,6 +64,11 @@ export default function librarySearch() {
                   Filter by Tags:
                 </span>
                 <LibraryContentTagsSelector />
+              </div>
+
+              {/* Search Button */}
+              <div className="flex justify-end">
+                <SearchButton />
               </div>
             </div>
           </div>

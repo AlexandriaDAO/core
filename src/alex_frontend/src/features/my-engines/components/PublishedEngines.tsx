@@ -2,7 +2,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React from "react";
 
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/lib/components/table";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import { Button } from "@/lib/components/button";
 
 

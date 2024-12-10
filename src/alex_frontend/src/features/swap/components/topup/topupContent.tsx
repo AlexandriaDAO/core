@@ -9,10 +9,8 @@ import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
 import ErrorModal from "../errorModal";
 import { _SERVICE } from "../../../../../../declarations/nft_manager/nft_manager.did";
-import { Principal } from "@dfinity/principal";
 import getSpendingBalance from "../../thunks/lbryIcrc/getSpendingBalance";
 import topUpLBRY from "../../thunks/lbryIcrc/topUpLBRY";
-import { getNftManagerActor } from "@/features/auth/utils/authUtils";
 import getAlexSpendingBalance from "../../thunks/alexIcrc/getAlexSpendingBalance";
 
 const TopupContent = () => {
@@ -24,8 +22,6 @@ const TopupContent = () => {
     const [successModalV, setSuccessModalV] = useState(false);
     const [errorModalV, setErrorModalV] = useState(false);
     const [amount, setAmount] = useState("0");
-    const [subaccount, setSubaccount] = useState<number[] | null>(null);
-    const [nftManagerPrincipal, setNftManagerPrincipal] = useState("");
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (Number(e.target.value) >= 0) {
@@ -42,58 +38,48 @@ const TopupContent = () => {
     };
 
     useEffect(() => {
-        const getSubaccount = async () => {
-            try {
-                const nftManagerId = process.env.CANISTER_ID_NFT_MANAGER!;
-                if (!nftManagerId) {
-                    throw new Error("NFT Manager canister ID not found");
-                }
-                setNftManagerPrincipal(nftManagerId);
-
-                const nftManagerActor = await getNftManagerActor();
-
-                if (user) {
-                    const userPrincipal = Principal.fromText(user.toString());
-                    const subaccountBlob = await nftManagerActor.principal_to_subaccount(userPrincipal);
-                    const subaccountArray = Array.from(new Uint8Array(subaccountBlob as unknown as ArrayBuffer));
-                    setSubaccount(subaccountArray);
-                }
-            } catch (error) {
-                console.error("Failed to get subaccount:", error);
-            }
-        };
-
-        if (user) {
-            getSubaccount();
-        }
-    }, [user]);
-
-    useEffect(() => {
-        if (user) {
-            dispatch(getSpendingBalance(user.principal.toString()));
-            dispatch(getAlexSpendingBalance(user.principal.toString()));
+        if (user?.principal) {
+            dispatch(getSpendingBalance(user.principal));
+            dispatch(getAlexSpendingBalance(user.principal));
         }
     }, [dispatch, user]);
 
-    const handleTopUp = async (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        if (!user) return;
-        dispatch(topUpLBRY({
-            amount,
-            userPrincipal: user.principal.toString()
-        }));
-
-        setLoadingModalV(true);
+    const handleTopUp = async () => {
+        console.log("handleTopUp called", { user, amount });
+        
+        if (!user?.principal) {
+            console.log("User validation failed", { user });
+            return;
+        }
+        
+        try {
+            console.log("Dispatching topUpLBRY", { amount, userPrincipal: user.principal });
+            setLoadingModalV(true);
+            
+            const result = await dispatch(
+                topUpLBRY({
+                    amount: amount,
+                    userPrincipal: user.principal,
+                })
+            ).unwrap();
+            
+            console.log("topUpLBRY result:", result);
+        } catch (error) {
+            console.error("Failed to top up:", error);
+            setLoadingModalV(false);
+            setErrorModalV(true);
+            dispatch(flagHandler());
+        }
     };
 
     useEffect(() => {
+        if (!user?.principal) return;
+        
         if (swap.transferSuccess === true) {
             setLoadingModalV(false);
             setSuccessModalV(true);
-            if (user) {
-                dispatch(getLbryBalance(user.toString()));
-                dispatch(getSpendingBalance(user.toString()));
-            }
+            dispatch(getLbryBalance(user.principal));
+            dispatch(getSpendingBalance(user.principal));
             dispatch(flagHandler());
         } else if (swap.error) {
             setLoadingModalV(false);

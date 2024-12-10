@@ -11,10 +11,10 @@ use candid::Nat;
 
 #[derive(CandidType, Serialize, Deserialize)]
 pub struct TestAccounts {
-    pub admin: String,
-    pub alice: String,
-    pub bob: String,
-    pub charlie: String,
+    pub root: String,
+    pub one: String,
+    pub two: String,
+    pub three: String,
 }
 
 // Get account identifiers for test users
@@ -23,28 +23,28 @@ pub fn get_test_accounts() -> TestAccounts {
     let canister_id = id();
     
     // Create account IDs using different subaccounts
-    let admin_account = ic_ledger_types::AccountIdentifier::new(
+    let root_account = ic_ledger_types::AccountIdentifier::new(
         &canister_id, 
-        &Subaccount(get_test_subaccount("admin").unwrap())
+        &Subaccount(get_test_subaccount("root").unwrap())
     );
-    let alice_account = ic_ledger_types::AccountIdentifier::new(
+    let one_account = ic_ledger_types::AccountIdentifier::new(
         &canister_id, 
-        &Subaccount(get_test_subaccount("alice").unwrap())
+        &Subaccount(get_test_subaccount("one").unwrap())
     );
-    let bob_account = ic_ledger_types::AccountIdentifier::new(
+    let two_account = ic_ledger_types::AccountIdentifier::new(
         &canister_id, 
-        &Subaccount(get_test_subaccount("bob").unwrap())
+        &Subaccount(get_test_subaccount("two").unwrap())
     );
-    let charlie_account = ic_ledger_types::AccountIdentifier::new(
+    let three_account = ic_ledger_types::AccountIdentifier::new(
         &canister_id, 
-        &Subaccount(get_test_subaccount("charlie").unwrap())
+        &Subaccount(get_test_subaccount("three").unwrap())
     );
     
     TestAccounts {
-        admin: admin_account.to_string(),
-        alice: alice_account.to_string(),
-        bob: bob_account.to_string(),
-        charlie: charlie_account.to_string(),
+        root: root_account.to_string(),
+        one: one_account.to_string(),
+        two: two_account.to_string(),
+        three: three_account.to_string(),
     }
 }
 
@@ -83,10 +83,10 @@ pub async fn check_balances(account_names: Vec<String>) -> Vec<BalanceResult> {
     
     for name in account_names {
         let account_str = match name.to_lowercase().as_str() {
-            "admin" => test_accounts.admin.clone(),
-            "alice" => test_accounts.alice.clone(),
-            "bob" => test_accounts.bob.clone(),
-            "charlie" => test_accounts.charlie.clone(),
+            "root" => test_accounts.root.clone(),
+            "one" => test_accounts.one.clone(),
+            "two" => test_accounts.two.clone(),
+            "three" => test_accounts.three.clone(),
             _ => ic_cdk::trap(&format!("Unknown account name: {}", name)),
         };
         

@@ -6,7 +6,7 @@ const CreateNode = ()=> {
 	const { nodes } = useAppSelector((state) => state.myNodes);
 
 	return (
-		<div className="w-full p-3 flex flex-col shadow-lg rounded-xl bg-white">
+		<div className="w-full p-3 flex flex-col border border-ring rounded-xl bg-white">
 			<div className="font-syne font-medium text-xl text-black mb-2">
 				Add New Node
 			</div>
