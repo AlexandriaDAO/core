@@ -52,6 +52,28 @@ function Permasearch() {
 		}
 	}, [isLoading]);
 
+	useEffect(() => {
+		const handleKeyPress = (event: KeyboardEvent) => {
+			// Ignore if target is an input or textarea
+			if (
+				event.target instanceof HTMLInputElement || 
+				event.target instanceof HTMLTextAreaElement
+			) {
+				return;
+			}
+
+			if (event.key === 'Enter' && !isLoading) {
+				handleSearchClick();
+			}
+		};
+
+		document.addEventListener('keypress', handleKeyPress);
+
+		return () => {
+			document.removeEventListener('keypress', handleKeyPress);
+		};
+	}, [isLoading]);
+
 	return (
 		<>
 			<PageContainer>

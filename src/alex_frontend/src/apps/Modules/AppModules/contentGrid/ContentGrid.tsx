@@ -1,4 +1,5 @@
 import React from "react";
+import { Card } from "@/lib/components/card";
 
 interface ContentGridProps {
   children: React.ReactNode;
@@ -19,12 +20,12 @@ function ContentGrid({ children }: ContentGridProps) {
 
 function ContentGridItem({ children, onClick }: ContentGridItemProps) {
   return (
-    <div
-      className="aspect-square border border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-gray-800 flex flex-col items-center justify-center text-center relative overflow-hidden bg-gray-900"
+    <Card
+      className="aspect-square cursor-pointer hover:bg-gray-800 flex flex-col items-center justify-center text-center relative overflow-hidden bg-gray-900 border-gray-700"
       onClick={onClick}
     >
       {children}
-    </div>
+    </Card>
   );
 }
 

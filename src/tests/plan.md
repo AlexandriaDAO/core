@@ -4,8 +4,15 @@ The Plan:
 
 
 *this assumes that the minting keeps working well*
-- Get alexandrian to display Scion NFTs.
-- Start improving the grid and display.
+inside contentDiplay/ContentData Redux State I have to add the owner of the NFT and the money that's inside it (perhaps even the type, scion or OG).
+
+Maybe for now we could just display the money inside it and that's it. Intentionally leave the rest a mystery?
+
+Or maybe we do this totally in a separate app and never let the user's see who own's what or how much money is inside what.
+
+
+
+
 - Start displaying the wallets of each NFT, and add a claim button.
 - Start to look for bugs, exploits, possiblity of losing funds.
 
@@ -15,7 +22,6 @@ Minor stuff to do:
 - Need to blur blocked images when clicked on.
 - We need a more efficient way to get peoples library because it takes a long time if you have a lot of NFTs. Maybe add back the concurrent query calls.
 - Need to add a minting check in rust that the NFT created is a real arweave id.
-- Get search to work by pressing enter.
 - Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - The x should look nicer and be above the image.

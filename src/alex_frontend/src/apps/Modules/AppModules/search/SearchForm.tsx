@@ -3,7 +3,6 @@ import NsfwModelControl from './NsfwSelector';
 import AmountSelector from './selectors/AmountSelector';
 import ContentCategorySelector from './selectors/ContentCategorySelector';
 import DateSelector from './selectors/DateSelector';
-import ArweaveOwnerSelector from './selectors/ArweaveOwnerSelector';
 import ContentTagsSelector from './selectors/ContentTagsSelector';
 import styled from 'styled-components';
 

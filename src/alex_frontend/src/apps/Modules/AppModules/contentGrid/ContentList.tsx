@@ -10,6 +10,7 @@ import Modal from './components/Modal';
 import ContentRenderer from './components/ContentRenderer';
 import { mint_nft } from "@/features/nft/mint";
 import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
+import { Button } from "@/lib/components/button";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -94,15 +95,17 @@ const ContentList = () => {
                 )}
                 {renderDetails(transaction)}
               
-                <button
+                <Button
+                  variant="secondary"
+                  className="absolute top-2 left-2 z-[25] h-8 w-8 rounded-full bg-[#353535] hover:bg-[#454545] flex items-center justify-center p-0"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
                   }}
-                  className="absolute top-2 left-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-[25]"
                 >
-                  <Info />
-                </button>
+                  <Info className="h-4 w-4" />
+                </Button>
+
                 {showStats[transaction.id] && predictions[transaction.id] && (
                   <div className="absolute top-10 left-2 bg-black/80 text-white p-2 rounded-md text-xs z-[25]">
                     <div>Drawing: {(predictions[transaction.id].Drawing * 100).toFixed(1)}%</div>
@@ -114,15 +117,16 @@ const ContentList = () => {
                 )}
                 
                 {isMintable && (
-                  <button
+                  <Button
+                    variant="secondary"
+                    className="absolute top-2 right-2 z-[25] h-8 w-8 rounded-full bg-[#353535] hover:bg-[#454545] flex items-center justify-center p-0"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleMint(transaction.id);
                     }}
-                    className="absolute top-2 right-2 bg-green-500 hover:bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-[25]"
                   >
-                    +
-                  </button>
+                    <span className="text-lg">+</span>
+                  </Button>
                 )}
               </div>
             </ContentGrid.Item>
