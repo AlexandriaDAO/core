@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
-import { toggleTag } from '../../shared/state/nft/librarySlice';
+import { toggleTag } from '../../shared/state/librarySearch/librarySlice';
 import { ContentTypeToggleGroup } from '../../shared/components/ContentTypeToggleGroup';
 import { supportedFileTypes, FileTypeConfig, fileTypeCategories } from '../../shared/types/files';
 

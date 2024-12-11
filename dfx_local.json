@@ -102,6 +102,11 @@
       },
       "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
     },  
+    "emporium": {
+      "candid": "src/emporium/emporium.did",
+      "package": "emporium",
+      "type": "rust"
+    },
     "tests": {
       "type": "rust",
       "package": "tests",

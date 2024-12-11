@@ -30,7 +30,6 @@ service : () -> {
   get_nft_balances : (vec nat) -> (Result_4);
   get_nfts : (opt nat, opt nat) -> (Result_5);
   get_nfts_of : (principal) -> (Result_6);
-  mint_nft : (nat, opt text) -> (Result);
   nat_to_arweave_id : (nat) -> (text) query;
   nfts_exist : (vec nat) -> (Result_7);
   og_to_scion_id : (nat, principal) -> (nat) query;

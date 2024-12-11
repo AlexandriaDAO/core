@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
-import { setCollection } from '../../shared/state/nft/librarySlice';
+import { setCollection } from '../../shared/state/librarySearch/librarySlice';
 import { ToggleGroup, ToggleGroupItem } from "@/lib/components/toggle-group";
 
 export default function CollectionSelector() {

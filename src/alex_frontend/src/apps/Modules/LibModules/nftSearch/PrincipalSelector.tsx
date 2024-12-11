@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/store";
-import { togglePrincipalSelection } from '../../shared/state/nft/libraryThunks';
+import { togglePrincipalSelection } from '../../shared/state/librarySearch/libraryThunks';
 import { ToggleGroup, ToggleGroupItem } from "@/lib/components/toggle-group";
 import { Plus, Minus } from "lucide-react";
 

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
-import { performSearch } from '../../shared/state/nft/libraryThunks';
+import { performSearch } from '../../shared/state/librarySearch/libraryThunks';
 import { Button } from "@/lib/components/button";
 import { Search } from "lucide-react";
 

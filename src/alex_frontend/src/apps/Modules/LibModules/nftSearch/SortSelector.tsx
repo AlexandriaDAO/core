@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
-import { toggleSort } from '../../shared/state/nft/libraryThunks';
+import { toggleSort } from '../../shared/state/librarySearch/libraryThunks';
 import { Toggle } from "@/lib/components/toggle";
 import { ArrowUpDown } from "lucide-react";
 

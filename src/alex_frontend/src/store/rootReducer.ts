@@ -25,7 +25,8 @@ import alexReducer from "@/features/swap/alexSlice";
 
 import contentDisplayReducer from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import arweaveReducer from "@/apps/Modules/shared/state/arweave/arweaveSlice";
-import libraryReducer from "@/apps/Modules/shared/state/nft/librarySlice";
+import libraryReducer from "@/apps/Modules/shared/state/librarySearch/librarySlice";
+import nftDataReducer from "@/apps/Modules/shared/state/nftData/nftDataSlice";
 
 import emporiumReducer from "@/apps/app/Emporium/emporiumSlice";
 
@@ -64,7 +65,7 @@ const rootReducer = combineReducers({
 	arweave: arweaveReducer,
 	contentDisplay: contentDisplayReducer,
 	library: libraryReducer,
-
+	nftData: nftDataReducer,
 	emporium:emporiumReducer,
 });
 
