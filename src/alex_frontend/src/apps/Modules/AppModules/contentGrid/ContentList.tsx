@@ -72,6 +72,7 @@ const ContentList = () => {
             <ContentGrid.Item
               key={transaction.id}
               onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
+              id={transaction.id}
             >
               <div className="group relative w-full h-full">
                 <ContentRenderer

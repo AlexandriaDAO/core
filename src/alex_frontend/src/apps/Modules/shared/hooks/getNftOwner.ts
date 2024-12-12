@@ -16,8 +16,9 @@ export const getNftOwner = () => {
         throw new Error('Invalid collection');
       }
 
-      if (ownerPrincipals && ownerPrincipals.length > 0 && ownerPrincipals[0].length > 0) {
-        return ownerPrincipals[0].toString();
+      if (ownerPrincipals?.[0]?.[0]?.owner) {
+        // Extract the Principal and convert it to string
+        return ownerPrincipals[0][0].owner.toString();
       }
       return null;
     } catch (error) {

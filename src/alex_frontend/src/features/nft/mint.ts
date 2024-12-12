@@ -12,6 +12,25 @@ export const mint_nft = async (transactionId: string): Promise<string> => {
     // Calculate mint number from Arweave ID
     const mintNumber = BigInt(arweaveIdToNat(transactionId));
 
+    // First check if it's a scion nft.
+    /*
+
+    Actually, I should probably just do this in the backend.
+  Section Psuedocode:
+
+  const queried_nft_owner = (get the owner element of contentDisplaySlice and convert it bact to a principal from string.)
+  
+  if (queried_nft_owner != null) {
+    /// convert the transaction to a scion nft.
+    const scion_nft_mint_number = BigInt(arweaveIdToNat(queried_nft_owner));
+    actorNftManager.og_to_scion_id(og_number: Nat, principal: Principal);
+  }
+
+
+
+  */ 
+
+
     // Call the backend coordinate_mint function
     const actorNftManager = await getNftManagerActor();
     const result = await actorNftManager.coordinate_mint(mintNumber);

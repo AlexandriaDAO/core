@@ -1,7 +1,7 @@
 /*
 The Plan:
 
-
+Right now, I'm minting NFTs with the arweave id without respect to the individual scion that it could be, so I need to start sending the actual transaction id if it has one that was queried from the backend.
 
 *this assumes that the minting keeps working well*
 inside contentDiplay/ContentData Redux State I have to add the owner of the NFT and the money that's inside it (perhaps even the type, scion or OG).
