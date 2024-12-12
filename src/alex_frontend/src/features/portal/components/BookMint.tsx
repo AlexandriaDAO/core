@@ -27,10 +27,10 @@ const BookMint: React.FC<IBookMintProps> = ({
             setMinted(undefined)
 			toast.info("Minting NFT via ICRC7 Protocol");
 
-			const mintNumber = BigInt(arweaveIdToNat(book.manifest));
-			const description = "test";
+			// const mintNumber = BigInt(arweaveIdToNat(book.manifest));
+			// const description = "test";
 			const actorNftManager = await getNftManagerActor();
-            const result = await actorNftManager.coordinate_mint(mintNumber);
+            const result = await actorNftManager.coordinate_mint(book.manifest, []);
 
             if ("Err" in result) throw new Error(result.Err);
 

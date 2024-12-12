@@ -212,10 +212,10 @@ const Mint: React.FC<IMintProps> = ({
 		setUploadStatus(3);
 		toast.info("Minting NFT via ICRC7 Protocol");
 
-		const mintNumber = BigInt(arweaveIdToNat(transactionId));
-		const description = "test";
+		// const mintNumber = BigInt(arweaveIdToNat(transactionId));
+		// const description = "test";
 		const actorNftManager = await getNftManagerActor();
-		const result = await actorNftManager.coordinate_mint(mintNumber);
+		const result = await actorNftManager.coordinate_mint(transactionId, []);
 		if ("Err" in result) throw new Error(result.Err);
 
 		toast.success("Minted Successfully");

@@ -16,15 +16,15 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   imageObjectUrl,
 }) => {
   const dispatch = useDispatch();
-  const collection = 'icrc7';
+  const collection = useSelector((state: RootState) => state.library.collection);
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
   const { validateContent } = useContentValidation();
   const { checkAuthentication } = useAuth();
   const { checkOwnership } = getNftOwner();
 
   const updateMintableState = (mintable: boolean, owner: string | null) => {
-    dispatch(setMintableStates({ 
-      [transactionId]: { mintable, owner } 
+    dispatch(setMintableStates({
+      [transactionId]: { mintable, owner }
     }));
   };
 
@@ -32,7 +32,9 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     const owner = await checkOwnership(transactionId, collection);
     const isAuthenticated = await checkAuthentication();
 
-    if (owner) {
+    console.log('collection', collection);
+    console.log('owner', owner);
+    if (owner && collection === 'icrc7_scion') {
       updateMintableState(isAuthenticated, owner);
       return;
     }
