@@ -12,7 +12,7 @@ export const PageContainer = styled.div`
   max-width: 100%;
   width: 100%;
   margin: 0 auto;
-  background: var(--Colors-LightMode-Text-text-100, #FFF);
+  background: var(--Colors-LightMode-Text-text-100, #fff);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,7 +51,7 @@ export const Hint = styled(Description)`
 export const ControlsContainer = styled.div<{ $isOpen?: boolean }>`
   display: flex;
   gap: 1rem;
-  margin-bottom: ${props => props.$isOpen ? '1rem' : '0'};
+  margin-bottom: ${(props) => (props.$isOpen ? "1rem" : "0")};
   width: 100%;
   max-width: 800px;
 `;
@@ -70,13 +70,16 @@ export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
   transition: all 0.3s ease;
   font-family: Syne;
   font-size: 16px;
-  
-  ${({ $isOpen }) => $isOpen ? `
+
+  ${({ $isOpen }) =>
+    $isOpen
+      ? `
     background: var(--black-grey-100, #353535);
     color: #F3F3F3;
     border: none;
     box-shadow: 0px 0px 4px 0px rgba(32, 0, 213, 0.25), 0px 0px 0px 4px rgba(197, 207, 249, 0.35);
-  ` : `
+  `
+      : `
     background: white;
     color: #353535;
     border: 1px solid #353535;
@@ -102,11 +105,47 @@ export const SearchButton = styled.button`
 `;
 
 export const SearchFormContainer = styled.div<{ $isOpen: boolean }>`
-  height: ${props => props.$isOpen ? 'auto' : '0'};
+  height: ${(props) => (props.$isOpen ? "auto" : "0")};
   overflow: hidden;
   transition: all 0.3s ease-in-out;
   margin: 0;
-  padding: ${props => props.$isOpen ? '1rem 0' : '0'};
+  padding: ${(props) => (props.$isOpen ? "1rem 0" : "0")};
   width: 100%;
   max-width: 800px;
-`; 
+`;
+export const Paginate = styled.div<{ $isOpen?: boolean }>`
+  .pagination {
+    display: flex;
+    list-style: none;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .pagination li {
+    margin: 0 5px;
+  }
+
+  .pagination li a {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #007bff;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .pagination li a:hover {
+    background-color: #f1f1f1;
+  }
+
+  .pagination .selected a {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+
+  .pagination .disabled a {
+    color: #ddd;
+    cursor: not-allowed;
+  }
+`;

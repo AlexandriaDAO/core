@@ -6,6 +6,7 @@ import {
     Title,
     Description,
     Hint,
+    Paginate,
 } from "./styles";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -15,13 +16,17 @@ import getUserListing from "./thunks/geUserListing";
 import { flagHandlerEmporium } from "./emporiumSlice";
 import ContentListEmporium from "./contentListEmporium";
 import { Button } from "@/lib/components/button";
+import ReactPaginate from 'react-paginate';
+import PaginationComponent from "./component/PaginationComponent";
 
 const Emporium = () => {
-    const [type, setType] = useState("");
-    const [activeButton, setActiveButton] = useState(""); // Track active button
+    const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const emporium = useAppSelector((state) => state.emporium);
-    const dispatch = useAppDispatch();
+
+    const [type, setType] = useState("");
+    const [activeButton, setActiveButton] = useState(""); // Track active button
+    const [currentPage, setCurrentPage] = useState(1);
 
     const fetchUserNfts = () => {
         if (user) {
@@ -30,12 +35,24 @@ const Emporium = () => {
         }
     };
     const fetchMarketListings = () => {
-        dispatch(getMarketListing());
         setType("marketPlace");
+        dispatch(getMarketListing(1));
+        setCurrentPage(1);
     };
     const fetchUserListings = () => {
-        dispatch(getUserListing());
+        dispatch(getUserListing(1));
         setType("marketPlace");
+        setCurrentPage(1);
+    };
+    const handlePageClick = ({ selected }: { selected: number }) => {
+        if (activeButton === "marketPlace") {
+            setCurrentPage(selected);
+            dispatch(getMarketListing(selected + 1)); // Adjust for 1-based page index
+        }
+        else if (activeButton === "userListings") {
+            setCurrentPage(selected);
+            dispatch(getUserListing(selected + 1));
+        }
     };
 
     useEffect(() => {
@@ -104,6 +121,8 @@ const Emporium = () => {
                 </div>
             </PageContainer>
             <ContentListEmporium type={type} />
+            <PaginationComponent totalPages={emporium.totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
+
         </>
     );
 }

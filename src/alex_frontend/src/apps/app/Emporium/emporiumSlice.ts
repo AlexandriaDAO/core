@@ -10,6 +10,8 @@ import getUserListing from "./thunks/geUserListing";
 
 export interface EmporiumState {
   loading: boolean;
+  totalPages: number;
+  pageSize: number;
   depositNftSuccess: Boolean;
   removeListingSuccess: Boolean;
   editListingSuccess: Boolean;
@@ -29,6 +31,8 @@ const initialState: EmporiumState = {
   buyNftSuccess: false,
   editListingSuccess: false,
   removeListingSuccess: false,
+  totalPages: 0,
+  pageSize: 0,
   error: null,
   userTokens: [],
   marketPlace: {},
@@ -45,7 +49,6 @@ const emporiumSlice = createSlice({
       state.buyNftSuccess = false;
       state.editListingSuccess = false;
     },
-  
   },
   extraReducers: (builder: ActionReducerMapBuilder<EmporiumState>) => {
     builder
@@ -84,8 +87,12 @@ const emporiumSlice = createSlice({
       })
       .addCase(getUserListing.fulfilled, (state, action) => {
         state.loading = false;
-        state.marketPlace = action.payload;
-       // toast.success("Fetched!");
+        state.totalPages = Number(action.payload.totalPages);
+        state.pageSize = Number(action.payload.pageSize);
+        state.marketPlace = action.payload.nfts; // Assign the object directly
+        if (Number(action.payload.totalPages) === 0) {
+          toast.warning("No NFTs listed!");
+        };
       })
       .addCase(getUserListing.rejected, (state, action) => {
         state.loading = false;
@@ -142,8 +149,13 @@ const emporiumSlice = createSlice({
       .addCase(getMarketListing.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        state.marketPlace = action.payload; // Assign the object directly
-       // toast.success("Fetched!");
+        state.totalPages = Number(action.payload.totalPages);
+        state.pageSize = Number(action.payload.pageSize);
+        state.marketPlace = action.payload.nfts; // Assign the object directly
+        if (Number(action.payload.totalPages) === 0) {
+          toast.warning("No Nfts for sale!");
+        }
+        // toast.success("Fetched!");
       })
       .addCase(getMarketListing.rejected, (state, action) => {
         state.loading = false;

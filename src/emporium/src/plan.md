@@ -48,3 +48,5 @@ Updating NFT Price: The owner of an NFT listing can update the price, allows onl
 
 
 Buying an NFT: To purchase an NFT, the buyer approves the necessary ICP to the Emporium canister. The canister deducts the approved ICP from the buyer's account and transfers it to the seller. Simultaneously, the NFT is transferred to the buyer. In case of a failure, the buyer’s funds are deducted, but the NFT is not transferred. If the ownership of the NFT listing changes to the buyer, they may withdraw the NFT using the "cancel listing" function. If another user purchases the NFT, the buyer's funds are transferred to them.
+
+

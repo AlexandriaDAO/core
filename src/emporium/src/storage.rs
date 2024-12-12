@@ -18,7 +18,7 @@ thread_local! {
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
         MemoryManager::init(DefaultMemoryImpl::default())
     );
-    
+
     pub static LISTING: RefCell<StableBTreeMap<String, Nft, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(LISTING_MEM_ID))
@@ -29,11 +29,19 @@ const MAX_VALUE_SIZE: u32 = 200;
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
 pub struct Nft {
-   pub owner: Principal,
-   pub price: u64,
-   pub token_id: Nat,
-   pub status: NftStatus,  // Replaced String with NftStatus enum
-   pub time: u64,
+    pub owner: Principal,
+    pub price: u64,
+    pub token_id: Nat,
+    pub status: NftStatus, // Replaced String with NftStatus enum
+    pub time: u64,
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct Listing {
+    pub nfts: Vec<(String, Nft)>,
+    pub total_pages: u64,
+    pub current_page: u64,
+    pub page_size: u64,
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
@@ -52,8 +60,8 @@ impl Storable for Nft {
         Decode!(bytes.as_ref(), Self).unwrap()
     }
 
-    const BOUND: Bound = Bound::Bounded { 
-        max_size: MAX_VALUE_SIZE, 
-        is_fixed_size: false 
+    const BOUND: Bound = Bound::Bounded {
+        max_size: MAX_VALUE_SIZE,
+        is_fixed_size: false,
     };
 }

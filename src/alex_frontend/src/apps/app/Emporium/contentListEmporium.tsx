@@ -111,6 +111,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
               onClick={
                 () => setSelectedContent({ id: transaction.id, type: contentType })
               }
+              id={transaction.id}
             >
               <div className="group relative w-full h-full">
                 <ContentRenderer

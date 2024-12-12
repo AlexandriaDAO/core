@@ -172,6 +172,8 @@
 
     "react-markdown": "^9.0.1",
 
+    "react-paginate": "^8.2.0",
+
     "react-qr-code": "^2.0.15",
 
     "react-rating-star-with-type": "^1.2.2",
