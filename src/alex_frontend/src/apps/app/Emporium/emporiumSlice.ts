@@ -17,6 +17,7 @@ export interface EmporiumState {
   editListingSuccess: Boolean;
   buyNftSuccess: Boolean;
   userTokens: { tokenId: string; arweaveId: string }[];
+  search: { owner: string; pageSize: number; sort: string };
   marketPlace: Record<
     string,
     { tokenId: string; arweaveId: string; price: string; owner: string }
@@ -31,6 +32,7 @@ const initialState: EmporiumState = {
   buyNftSuccess: false,
   editListingSuccess: false,
   removeListingSuccess: false,
+  search: { owner: "", pageSize: 10, sort: "" },
   totalPages: 0,
   pageSize: 0,
   error: null,
@@ -49,6 +51,9 @@ const emporiumSlice = createSlice({
       state.buyNftSuccess = false;
       state.editListingSuccess = false;
     },
+    setSearchEmoprium: (state, action) => {
+      state.search = action.payload;
+    },
   },
   extraReducers: (builder: ActionReducerMapBuilder<EmporiumState>) => {
     builder
@@ -58,6 +63,7 @@ const emporiumSlice = createSlice({
       })
       .addCase(getUserIcrc7Tokens.fulfilled, (state, action) => {
         state.userTokens = action.payload.length > 0 ? action.payload : [];
+        state.totalPages = 0;
         state.loading = false;
         state.error = null;
         //toast.success("Fetched!");
@@ -92,7 +98,7 @@ const emporiumSlice = createSlice({
         state.marketPlace = action.payload.nfts; // Assign the object directly
         if (Number(action.payload.totalPages) === 0) {
           toast.warning("No NFTs listed!");
-        };
+        }
       })
       .addCase(getUserListing.rejected, (state, action) => {
         state.loading = false;
@@ -164,5 +170,6 @@ const emporiumSlice = createSlice({
       });
   },
 });
-export const { flagHandlerEmporium } = emporiumSlice.actions;
+export const { flagHandlerEmporium, setSearchEmoprium } =
+  emporiumSlice.actions;
 export default emporiumSlice.reducer;

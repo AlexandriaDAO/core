@@ -18,6 +18,16 @@ service : {
   get_caller_listing : (opt nat64, opt nat64) -> (Listing) query;
   get_listing : (opt nat64, opt nat64) -> (Listing) query;
   get_listing_total_count : () -> (nat64) query;
+  get_search_listing : (
+      opt nat64,
+      opt nat64,
+      opt text,
+      opt nat,
+      opt principal,
+    ) -> (Listing) query;
+  get_search_listing0 : (opt nat64, opt nat64, opt text, opt text) -> (
+      Listing,
+    ) query;
   list_nft : (nat, nat64) -> (Result);
   remove_nft_listing : (nat) -> (Result);
   update_nft_price : (nat, nat64) -> (Result);

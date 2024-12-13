@@ -28,7 +28,7 @@ const getUserListing = createAsyncThunk<
 
     const actorEmporium = await getActorEmporium();
     const ledgerServices = LedgerService();
-    const result = await actorEmporium.get_caller_listing([BigInt(page)],[BigInt(8)]);
+    const result = await actorEmporium.get_caller_listing([BigInt(page)],[BigInt(2)]);
     if (
       !result.nfts ||
       !Array.isArray(result.nfts) ||

@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
-import MainLayout from "@/layouts/MainLayout";
 import {
     PageContainer,
     Title,
     Description,
     Hint,
     Paginate,
+    ControlsContainer,
+    FiltersButton,
+    SearchButton,
+    SearchFormContainer,
+    FiltersIcon,
 } from "./styles";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -18,6 +22,12 @@ import ContentListEmporium from "./contentListEmporium";
 import { Button } from "@/lib/components/button";
 import ReactPaginate from 'react-paginate';
 import PaginationComponent from "./component/PaginationComponent";
+import SearchForm from "@/apps/Modules/AppModules/search/SearchForm";
+import { useHandleSearch } from "@/apps/Modules/AppModules/search/hooks/useSearchHandlers";
+import { wipe } from "@/apps/Modules/shared/state/wiper";
+import { ArrowUp } from "lucide-react";
+import EmporiumSearchForm from "./component/emporiumSearchForm";
+import SearchEmporium from "./component/searchEmporium";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
@@ -37,12 +47,12 @@ const Emporium = () => {
     const fetchMarketListings = () => {
         setType("marketPlace");
         dispatch(getMarketListing(1));
-        setCurrentPage(1);
+        setCurrentPage(0);
     };
     const fetchUserListings = () => {
         dispatch(getUserListing(1));
         setType("marketPlace");
-        setCurrentPage(1);
+        setCurrentPage(0);
     };
     const handlePageClick = ({ selected }: { selected: number }) => {
         if (activeButton === "marketPlace") {
@@ -54,6 +64,7 @@ const Emporium = () => {
             dispatch(getUserListing(selected + 1));
         }
     };
+
 
     useEffect(() => {
         if (emporium.depositNftSuccess === true) {
@@ -78,6 +89,18 @@ const Emporium = () => {
     useEffect(() => {
         dispatch(setTransactions([]));
     }, []);
+
+
+    //
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+    const handleSearchClick = async () => {
+    };
+
+    const toggleFilters = () => {
+        setIsFiltersOpen(!isFiltersOpen);
+    };
+
 
     return (
         <>
@@ -119,7 +142,28 @@ const Emporium = () => {
                         My Listing
                     </Button>
                 </div>
+                <SearchEmporium />
+                <ControlsContainer $isOpen={isFiltersOpen}>
+                    <FiltersButton
+                        onClick={toggleFilters}
+                        $isOpen={isFiltersOpen}
+                    >
+                        Filters
+                        {isFiltersOpen ? <ArrowUp size={20} /> : <FiltersIcon />}
+                    </FiltersButton>
+                    <SearchButton
+                        onClick={handleSearchClick}
+                        disabled={emporium.loading}
+                    >
+                        {emporium.loading ? 'Loading...' : 'Search'}
+                    </SearchButton>
+                </ControlsContainer>
+                <SearchFormContainer $isOpen={isFiltersOpen}>
+                    <EmporiumSearchForm />
+                </SearchFormContainer>
+
             </PageContainer>
+
             <ContentListEmporium type={type} />
             <PaginationComponent totalPages={emporium.totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
 

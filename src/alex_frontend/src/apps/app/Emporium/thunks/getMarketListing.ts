@@ -28,7 +28,7 @@ const getMarketListing = createAsyncThunk<
 
     const actorEmporium = await getActorEmporium();
     const ledgerServices = LedgerService();
-    const result = await actorEmporium.get_listing([BigInt(page)], [BigInt(2)]);
+    const result = await actorEmporium.get_search_listing([BigInt(page)], [BigInt(2)],[],[],[]);
     if (
       !result.nfts ||
       !Array.isArray(result.nfts) ||
