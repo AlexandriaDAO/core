@@ -6,7 +6,7 @@ use num_bigint::BigUint;
 use crc32fast::Hasher;
 
 #[query]
-fn arweave_id_to_nat(arweave_id: String) -> Nat {
+pub fn arweave_id_to_nat(arweave_id: String) -> Nat {
     let mut id = arweave_id.chars().take(43).collect::<String>();
     while id.len() % 4 != 0 {
         id.push('=');
@@ -19,7 +19,7 @@ fn arweave_id_to_nat(arweave_id: String) -> Nat {
 }
 
 #[query]
-fn nat_to_arweave_id(num: Nat) -> String {
+pub fn nat_to_arweave_id(num: Nat) -> String {
     let big_uint: BigUint = num.0;
     let bytes = big_uint.to_bytes_be();
     let id = base64_encode(&bytes);

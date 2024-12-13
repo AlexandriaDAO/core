@@ -5,9 +5,6 @@ import { RootState } from '@/store';
 import { toggleSortDirection } from './librarySlice';
 import { AppDispatch } from '@/store';
 import { fetchTokensForPrincipal } from '../nftData/nftDataThunks';
-import { natToArweaveId } from "@/utils/id_convert";
-import { nft_manager } from '../../../../../../../declarations/nft_manager';
-import { NftData } from '../nftData/nftDataSlice';
 
 export const togglePrincipalSelection = createAsyncThunk(
   'library/togglePrincipalSelection',
@@ -40,25 +37,14 @@ export const performSearch = createAsyncThunk(
       // Get the latest state after fetching
       const currentState = getState() as RootState;
       
-      // Process NFTs based on their type
-      const processedNftIds = await Promise.all(
-        selectedPrincipals.flatMap(principal => {
-          const nfts = Object.values(currentState.nftData.nfts)
-            .filter(nft => nft.principal === principal && nft.collection === collection);
-            
-          return Promise.all(nfts.map(async (nft: NftData) => {
-            if (nft.nftType === 'scion') {
-              // Convert string back to BigInt for the API call
-              const ogId = await nft_manager.scion_to_og_id(BigInt(nft.tokenId));
-              return natToArweaveId(ogId);
-            } else {
-              return natToArweaveId(BigInt(nft.tokenId));
-            }
-          }));
-        })
+      // Get arweave IDs from the NFT data
+      const arweaveIds = selectedPrincipals.flatMap(principal => 
+        Object.values(currentState.nftData.nfts)
+          .filter(nft => nft.principal === principal && nft.collection === collection)
+          .map(nft => nft.arweaveId)
       );
 
-      const uniqueArweaveIds = [...new Set(processedNftIds.flat())] as string[];
+      const uniqueArweaveIds = [...new Set(arweaveIds)] as string[];
       dispatch(updateTransactions(uniqueArweaveIds));
       
       return uniqueArweaveIds;

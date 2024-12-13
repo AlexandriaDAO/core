@@ -1,5 +1,6 @@
-import { arweaveIdToNat } from "@/utils/id_convert";
 import { getNftManagerActor, getAuthClient } from "@/features/auth/utils/authUtils";
+import { Principal } from '@dfinity/principal';
+import { store } from "@/store";
 
 export const mint_nft = async (transactionId: string): Promise<string> => {
   try {
@@ -9,31 +10,26 @@ export const mint_nft = async (transactionId: string): Promise<string> => {
       throw new Error("You must be authenticated to mint an NFT");
     }
 
-    // Calculate mint number from Arweave ID
-    const mintNumber = BigInt(arweaveIdToNat(transactionId));
+    // Get the owner from Redux state
+    const state = store.getState();
+    const mintableState = state.contentDisplay.mintableState[transactionId];
+    const ownerStr = mintableState?.owner;
 
-    // First check if it's a scion nft.
-    /*
-
-    Actually, I should probably just do this in the backend.
-  Section Psuedocode:
-
-  const queried_nft_owner = (get the owner element of contentDisplaySlice and convert it bact to a principal from string.)
-  
-  if (queried_nft_owner != null) {
-    /// convert the transaction to a scion nft.
-    const scion_nft_mint_number = BigInt(arweaveIdToNat(queried_nft_owner));
-    actorNftManager.og_to_scion_id(og_number: Nat, principal: Principal);
-  }
-
-
-
-  */ 
-
+    // Convert owner string to Principal if it exists
+    let ownerArg: [] | [Principal] = [];
+    if (ownerStr) {
+      try {
+        const owner = Principal.fromText(ownerStr);
+        ownerArg = [owner];
+      } catch (error) {
+        console.error("Error converting owner string to Principal:", error);
+        throw new Error("Invalid owner principal format");
+      }
+    }
 
     // Call the backend coordinate_mint function
     const actorNftManager = await getNftManagerActor();
-    const result = await actorNftManager.coordinate_mint(mintNumber);
+    const result = await actorNftManager.coordinate_mint(transactionId, ownerArg);
 
     // Handle the result
     if ("Err" in result) {

@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface NftData {
-  tokenId: string;
   collection: 'icrc7' | 'icrc7_scion';
-  nftType: 'og' | 'scion';
   principal: string;
+  arweaveId: string;
 }
 
 interface NftDataState {
@@ -26,10 +25,10 @@ const nftDataSlice = createSlice({
   reducers: {
     setNfts: (
       state,
-      action: PayloadAction<NftData[]>
+      action: PayloadAction<[string, NftData][]>
     ) => {
-      action.payload.forEach(nft => {
-        state.nfts[nft.tokenId] = nft;
+      action.payload.forEach(([tokenId, nft]) => {
+        state.nfts[tokenId] = nft;
       });
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
