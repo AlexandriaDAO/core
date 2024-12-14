@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { setPredictionResults } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
 import { setMintableStates } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
 import { useContentValidation } from '@/apps/Modules/shared/services/contentValidation';
 import { useAuth } from '@/apps/Modules/shared/hooks/useAuth';
-import { getNftOwner } from '@/apps/Modules/shared/hooks/getNftOwner';
+import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import ContentFetcher from './ContentFetcher';
 import { ContentValidatorProps } from '../types';
+import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 
 const ContentValidator: React.FC<ContentValidatorProps> = ({
   transactionId,
@@ -20,7 +21,29 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
   const { validateContent } = useContentValidation();
   const { checkAuthentication } = useAuth();
-  const { checkOwnership } = getNftOwner();
+  const { getNftData } = useNftData();
+  const [nftData, setNftData] = useState<NftDataResult | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNftData = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getNftData(transactionId);
+        setNftData(data);
+        
+        if (data?.principal && (data.collection === 'icrc7_scion' || data.collection === 'icrc7')) {
+          const isAuthenticated = await checkAuthentication();
+          updateMintableState(isAuthenticated, data.principal);
+        }
+      } catch (error) {
+        console.error('Error fetching NFT data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNftData();
+  }, [transactionId]);
 
   const updateMintableState = (mintable: boolean, owner: string | null) => {
     dispatch(setMintableStates({
@@ -29,13 +52,12 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   };
 
   const handleValidateContent = async (element: HTMLImageElement | HTMLVideoElement) => {
-    const owner = await checkOwnership(transactionId, collection);
+    if (isLoading) return;
+    
     const isAuthenticated = await checkAuthentication();
 
-    console.log('collection', collection);
-    console.log('owner', owner);
-    if (owner && collection === 'icrc7_scion') {
-      updateMintableState(isAuthenticated, owner);
+    if (nftData?.principal && (nftData.collection === 'icrc7_scion' || nftData.collection === 'icrc7')) {
+      updateMintableState(isAuthenticated, nftData.principal);
       return;
     }
 

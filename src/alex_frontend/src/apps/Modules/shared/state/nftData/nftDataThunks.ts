@@ -1,11 +1,15 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setNfts, setLoading, setError, NftData } from './nftDataSlice';
+import { setNfts, setLoading, setError, NftData, updateNftBalances } from './nftDataSlice';
 import { RootState } from '@/store';
 import { icrc7 } from '../../../../../../../declarations/icrc7';
 import { icrc7_scion } from '../../../../../../../declarations/icrc7_scion';
 import { nft_manager } from '../../../../../../../declarations/nft_manager';
+import { ALEX } from '../../../../../../../declarations/ALEX';
+import { LBRY } from '../../../../../../../declarations/LBRY';
 import { Principal } from '@dfinity/principal';
 import { natToArweaveId } from '@/utils/id_convert';
+
+const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
 export const fetchTokensForPrincipal = createAsyncThunk(
   'nftData/fetchTokensForPrincipal',
@@ -59,6 +63,28 @@ export const fetchTokensForPrincipal = createAsyncThunk(
       }
       
       dispatch(setNfts(nftEntries));
+
+      // Fetch balances for each NFT
+      await Promise.all(
+        nftEntries.map(async ([tokenId]) => {
+          const subaccount = await nft_manager.to_nft_subaccount(BigInt(tokenId));
+          const balanceParams = {
+            owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
+            subaccount: [Array.from(subaccount)] as [number[]]
+          };
+
+          const [alexBalance, lbryBalance] = await Promise.all([
+            ALEX.icrc1_balance_of(balanceParams),
+            LBRY.icrc1_balance_of(balanceParams)
+          ]);
+
+          dispatch(updateNftBalances({
+            tokenId,
+            alex: alexBalance.toString(),
+            lbry: lbryBalance.toString()
+          }));
+        })
+      );
       
       return nftEntries;
     } catch (error) {
