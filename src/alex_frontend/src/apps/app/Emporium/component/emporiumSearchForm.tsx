@@ -1,6 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from 'styled-components';
 import EmporiumPageSizeSelector from "./emporiumPageSizeSelector";
+import { ToggleGroup, ToggleGroupItem } from "@/lib/components/toggle-group";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { setSearchEmporium } from "../emporiumSlice";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import PriceSort from "./priceSort";
 
 const EmporiumSearchFormContainer = styled.div`
   display: flex;
@@ -16,12 +21,47 @@ const EmporiumSearchFormContainer = styled.div`
 `;
 
 const EmporiumSearchForm: React.FC = () => {
+  const dispatch = useAppDispatch();
+
+  const [searchMode, setSearchMode] = useState<"principal" | "token">("principal");
+  const search = useAppSelector((state) => state.emporium.search);
+
+  const handleSearchStateChange = (value: string) => {
+    dispatch(setSearchEmporium({ ...search, type: value }));
+  }
+  //
+
   return (
     <EmporiumSearchFormContainer>
-      <div className="flex justify-between gap-4 w-full">
-        <div className="flex flex-col gap-4 w-1/2">
-          <div className="flex gap-4 w-full">
+      <div className="w-full">
+        <div className="flex flex-col gap-4 
+        ">
+          <div className="flex gap-4 w-full justify-between">
+
             <EmporiumPageSizeSelector />
+            <div className="flex flex-col">
+              <span className="block mb-3 text-lg font-medium font-['Syne'] text-foreground">
+                Search by:
+              </span>
+              <ToggleGroup
+                type="single"
+                value={searchMode}
+                onValueChange={(value) => {
+                  if (value) setSearchMode(value as "principal" | "token");
+                  handleSearchStateChange(value); // Optionally reset the input value on mode change
+                }}
+                className="mb-4"
+              >
+                
+                <ToggleGroupItem className="!w-full !py-2 !px-3 !border !rounded-xl" value="principal" aria-label="Search by Principal ID">
+                  Principal
+                </ToggleGroupItem>
+                <ToggleGroupItem className="h-5 w-full rounded-xl p-[17px_13px] w-full max-w-full border border-solid" value="token" aria-label="Search by Token ID">
+                  Token ID
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+            <PriceSort />
           </div>
         </div>
       </div>

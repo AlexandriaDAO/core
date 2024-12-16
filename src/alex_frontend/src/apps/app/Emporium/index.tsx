@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import {
     PageContainer,
     Title,
     Description,
     Hint,
-    Paginate,
     ControlsContainer,
     FiltersButton,
     SearchButton,
@@ -15,19 +14,15 @@ import {
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketListing from "./thunks/getMarketListing";
-import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
 import getUserListing from "./thunks/geUserListing";
 import { flagHandlerEmporium } from "./emporiumSlice";
 import ContentListEmporium from "./contentListEmporium";
 import { Button } from "@/lib/components/button";
-import ReactPaginate from 'react-paginate';
-import PaginationComponent from "./component/PaginationComponent";
-import SearchForm from "@/apps/Modules/AppModules/search/SearchForm";
-import { useHandleSearch } from "@/apps/Modules/AppModules/search/hooks/useSearchHandlers";
-import { wipe } from "@/apps/Modules/shared/state/wiper";
 import { ArrowUp } from "lucide-react";
 import EmporiumSearchForm from "./component/emporiumSearchForm";
 import SearchEmporium from "./component/searchEmporium";
+import PaginationComponent from "./component/PaginationComponent";
+import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
@@ -41,27 +36,49 @@ const Emporium = () => {
     const fetchUserNfts = () => {
         if (user) {
             dispatch(getUserIcrc7Tokens(user?.principal));
+            setActiveButton("userNfts");
             setType("userNfts");
         }
+
     };
     const fetchMarketListings = () => {
+        setActiveButton("marketPlace");
         setType("marketPlace");
-        dispatch(getMarketListing(1));
-        setCurrentPage(0);
+        // dispatch(getMarketListing(1));
+        // setCurrentPage(0);
     };
     const fetchUserListings = () => {
-        dispatch(getUserListing(1));
+        setActiveButton("userListings");
         setType("marketPlace");
-        setCurrentPage(0);
+        //dispatch(getUserListing(1));
+        //setCurrentPage(0);
     };
     const handlePageClick = ({ selected }: { selected: number }) => {
         if (activeButton === "marketPlace") {
             setCurrentPage(selected);
-            dispatch(getMarketListing(selected + 1)); // Adjust for 1-based page index
+            dispatch(getMarketListing({
+                page: selected + 1,
+                searchStr: emporium.search.search,
+                pageSize: emporium.search.pageSize.toString(),
+                sort: emporium.search.sort,
+                type: emporium.search.type,
+                userPrincipal: ""
+            }));  // Adjust for 1-based page index
         }
         else if (activeButton === "userListings") {
+            if (!user)
+                return
             setCurrentPage(selected);
-            dispatch(getUserListing(selected + 1));
+
+            dispatch(getMarketListing({
+                page: selected + 1,
+                searchStr: emporium.search.search,
+                pageSize: emporium.search.pageSize.toString(),
+                sort: emporium.search.sort,
+                type: "userListings",
+                userPrincipal: user?.principal
+            }));
+            // dispatch(getUserListing(selected + 1));
         }
     };
 
@@ -95,12 +112,31 @@ const Emporium = () => {
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
     const handleSearchClick = async () => {
+        if (!user)
+            return;
+        let type = emporium.search.type;
+        if (activeButton === "userListings") {
+            type = "userListings";
+        }
+        else { //default case 
+            setActiveButton("marketPlace");
+            setType("marketPlace");
+        }
+        dispatch(getMarketListing({
+            page: 1,
+            searchStr: emporium.search.search,
+            pageSize: emporium.search.pageSize.toString(),
+            sort: emporium.search.sort,
+            type,
+            userPrincipal: user?.principal
+        }));  // 
+        setCurrentPage(0);
+
     };
 
     const toggleFilters = () => {
         setIsFiltersOpen(!isFiltersOpen);
     };
-
 
     return (
         <>
@@ -115,7 +151,7 @@ const Emporium = () => {
                         disabled={!user?.principal}
                         onClick={() => {
                             fetchUserNfts();
-                            setActiveButton("userNfts");
+
                         }}
                     >
                         My Nfts
@@ -125,7 +161,6 @@ const Emporium = () => {
                             }`}
                         onClick={() => {
                             fetchMarketListings();
-                            setActiveButton("marketPlace");
                         }}
                     >
                         MarketPlace
@@ -136,31 +171,33 @@ const Emporium = () => {
                         disabled={!user?.principal}
                         onClick={() => {
                             fetchUserListings();
-                            setActiveButton("userListings");
                         }}
                     >
                         My Listing
                     </Button>
                 </div>
-                <SearchEmporium />
-                <ControlsContainer $isOpen={isFiltersOpen}>
-                    <FiltersButton
-                        onClick={toggleFilters}
-                        $isOpen={isFiltersOpen}
-                    >
-                        Filters
-                        {isFiltersOpen ? <ArrowUp size={20} /> : <FiltersIcon />}
-                    </FiltersButton>
-                    <SearchButton
-                        onClick={handleSearchClick}
-                        disabled={emporium.loading}
-                    >
-                        {emporium.loading ? 'Loading...' : 'Search'}
-                    </SearchButton>
-                </ControlsContainer>
-                <SearchFormContainer $isOpen={isFiltersOpen}>
-                    <EmporiumSearchForm />
-                </SearchFormContainer>
+                {activeButton === "userNfts" ? <></> : <>
+                    <SearchEmporium />
+                    <ControlsContainer $isOpen={isFiltersOpen}>
+                        <FiltersButton
+                            onClick={toggleFilters}
+                            $isOpen={isFiltersOpen}
+                        >
+                            Filters
+                            {isFiltersOpen ? <ArrowUp size={20} /> : <FiltersIcon />}
+                        </FiltersButton>
+                        <SearchButton
+                            onClick={handleSearchClick}
+                            disabled={emporium.loading}
+                        >
+                            {emporium.loading ? 'Loading...' : 'Search'}
+                        </SearchButton>
+                    </ControlsContainer>
+                    <SearchFormContainer $isOpen={isFiltersOpen}>
+
+                        <EmporiumSearchForm />
+                    </SearchFormContainer>
+                </>}
 
             </PageContainer>
 

@@ -1,14 +1,15 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
-import { setSearchEmoprium } from '../emporiumSlice';
+import { setSearchEmporium } from '../emporiumSlice';
+import { useAppSelector } from '@/store/hooks/useAppSelector';
 
 const EmporiumPageSizeSelector: React.FC = () => {
   const dispatch = useDispatch();
-  const search = useSelector((state: RootState) => state.emporium.search);
+  const search = useAppSelector((state) => state.emporium.search);
 
   const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    dispatch(setSearchEmoprium({ ...search, pageSize: e.target.value }));
+    dispatch(setSearchEmporium({ ...search, pageSize: e.target.value }));
   };
 
   return (

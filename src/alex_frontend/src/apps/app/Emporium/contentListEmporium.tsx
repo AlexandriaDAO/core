@@ -96,6 +96,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
 
       </div>) : (<ContentGrid>
         {transactions.map((transaction) => {
+          console.log("Price is ",transaction.id);
           const content = contentData[transaction.id];
           const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
           const hasPredictions = !!predictions[transaction.id];

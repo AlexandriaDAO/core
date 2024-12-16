@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Search as icon } from 'lucide-react';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
-import { setSearchEmoprium } from '../emporiumSlice';
+import { setSearchEmporium } from '../emporiumSlice';
 
 export const OwnerIcon = styled(icon)`
   width: 24px;
@@ -47,9 +47,9 @@ const SearchEmporium = () => {
   const emporium =useAppSelector(state=>state.emporium);
   
   const handleSearchStateChange = (value: string) => {
-    dispatch(setSearchEmoprium({
+    dispatch(setSearchEmporium({
       ...emporium.search,
-      owner:value
+      search:value
     }));
   };
 
@@ -57,9 +57,9 @@ const SearchEmporium = () => {
     <SearchBox>
       <OwnerIcon />
       <Input
-        value={emporium.search.owner}
+        value={emporium.search.search}
         onChange={(e) => handleSearchStateChange(e.target.value)}
-        placeholder="Enter principal ID"
+        placeholder="Search"
       />
     </SearchBox>
   );

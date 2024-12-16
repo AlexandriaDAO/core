@@ -1,6 +1,6 @@
 use crate::{Listing, Nft, LISTING};
 use candid::{Nat, Principal};
-use ic_cdk::query;
+use ic_cdk::{caller, query};
 
 #[query]
 pub fn get_listing(page: Option<u64>, page_size: Option<u64>) -> Listing {
@@ -73,6 +73,7 @@ pub fn get_search_listing(
     sort_order: Option<String>,   // "asc" or "desc"
     token_id_filter: Option<Nat>, // Optional filter by token_id
     owner: Option<Principal>,
+    search_type: String,
 ) -> Listing {
     // search by nft owner, token_id and filter by price in assending or decending order
     let page: u64 = page.unwrap_or(1); // Default to 1 if None
@@ -84,7 +85,13 @@ pub fn get_search_listing(
         let mut nfts: Vec<(String, Nft)> = nft_map
             .iter()
             .filter(|(_, nft)| {
-                if let Some(ref token_id_filter) = token_id_filter {
+                if search_type == "userListings".to_string() {
+                    if let Some(ref token_id_filter) = token_id_filter {
+                        nft.token_id == *token_id_filter && nft.owner == caller()
+                    } else {
+                        nft.owner == caller()
+                    }
+                } else if let Some(ref token_id_filter) = token_id_filter {
                     nft.token_id == *token_id_filter
                 } else if let Some(ref owner) = owner {
                     nft.owner == *owner
