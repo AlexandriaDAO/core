@@ -1,6 +1,6 @@
 import React from "react";
 import { Dialog, DialogContent } from "@/lib/components/dialog";
-import { DialogTitle } from "@radix-ui/react-dialog";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 
 const Loading = () => (
     <Dialog open modal>
@@ -10,6 +10,8 @@ const Loading = () => (
             className="font-roboto-condensed outline-none mx-auto max-w-md bg-white p-8 text-[#828282]"
         >
             <DialogTitle className="sr-only">Loading</DialogTitle>
+            <DialogDescription className="text-center">Please wait while we load page.</DialogDescription>
+
             <div className="flex flex-col items-center gap-4">
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#828282]"></div>
                 <p className="text-lg font-medium">Loading...</p>

@@ -30,7 +30,8 @@ import nftDataReducer from "@/apps/Modules/shared/state/nftData/nftDataSlice";
 
 import emporiumReducer from "@/apps/app/Emporium/emporiumSlice";
 
-import uploadBookReducer from "@/features/upload-book/uploadBookSlice";
+import uploadReducer from "@/features/upload/uploadSlice";
+import assetReducer from "@/features/asset/assetSlice";
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -53,7 +54,8 @@ const rootReducer = combineReducers({
 	portalFilter: portalFilterReducer,
 	myNodes: myNodesReducer,
 
-	uploadBook: uploadBookReducer,
+	upload: uploadReducer,
+	asset: assetReducer,
 
 	swap:swapReducer,
 	icpLedger:icpLedgerReducer,

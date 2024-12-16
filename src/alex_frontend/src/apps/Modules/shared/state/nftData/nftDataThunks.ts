@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setNfts, setLoading, setError, NftData, updateNftBalances } from './nftDataSlice';
+import { setNfts, setLoading, setError, NftData, updateNftBalances, setTotalNfts } from './nftDataSlice';
 import { RootState } from '@/store';
 import { icrc7 } from '../../../../../../../declarations/icrc7';
 import { icrc7_scion } from '../../../../../../../declarations/icrc7_scion';
@@ -14,30 +14,42 @@ const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 export const fetchTokensForPrincipal = createAsyncThunk(
   'nftData/fetchTokensForPrincipal',
   async (
-    { principalId, collection }: { principalId: string; collection: 'icrc7' | 'icrc7_scion' },
+    { 
+      principalId, 
+      collection, 
+      range = { start: 0, end: 20 }
+    }: { 
+      principalId: string; 
+      collection: 'icrc7' | 'icrc7_scion';
+      range?: { start: number; end: number; }
+    },
     { dispatch, getState }
   ) => {
     try {
       dispatch(setLoading(true));
       dispatch(setError(null));
       
-      const state = getState() as RootState;
-      const existingNfts = Object.entries(state.nftData.nfts)
-        .filter(([_, nft]) => nft.principal === principalId && nft.collection === collection);
-      
-      if (existingNfts?.length) {
-        return existingNfts;
-      }
-
       const principal = Principal.fromText(principalId);
       const params = { owner: principal, subaccount: [] as [] };
-      const limit = [BigInt(10000)] as [bigint];
+      // First get total count with a large limit
+      const countLimit = [BigInt(10000)] as [bigint];
 
+      let allNftIds: bigint[] = [];
+      if (collection === 'icrc7') {
+        allNftIds = await icrc7.icrc7_tokens_of(params, [], countLimit);
+      } else if (collection === 'icrc7_scion') {
+        allNftIds = await icrc7_scion.icrc7_tokens_of(params, [], countLimit);
+      }
+
+      // Store total count
+      dispatch(setTotalNfts(allNftIds.length));
+
+      // Get the slice for the current page
+      const pageNftIds = allNftIds.slice(range.start, range.end);
       let nftEntries: [string, NftData][] = [];
 
       if (collection === 'icrc7') {
-        const nftIds = await icrc7.icrc7_tokens_of(params, [], limit);
-        nftEntries = nftIds.map(tokenId => [
+        nftEntries = pageNftIds.map(tokenId => [
           tokenId.toString(),
           {
             collection: 'icrc7',
@@ -46,9 +58,8 @@ export const fetchTokensForPrincipal = createAsyncThunk(
           }
         ]);
       } else if (collection === 'icrc7_scion') {
-        const scionNftIds = await icrc7_scion.icrc7_tokens_of(params, [], limit);
         nftEntries = await Promise.all(
-          scionNftIds.map(async (tokenId) => {
+          pageNftIds.map(async (tokenId) => {
             const ogId = await nft_manager.scion_to_og_id(tokenId);
             return [
               tokenId.toString(),
@@ -64,7 +75,11 @@ export const fetchTokensForPrincipal = createAsyncThunk(
       
       dispatch(setNfts(nftEntries));
 
-      // Fetch balances for each NFT
+      // Fetch balances for the current page
+      const convertE8sToToken = (e8sAmount: bigint): string => {
+        return (Number(e8sAmount) / 1e8).toString();
+      };
+
       await Promise.all(
         nftEntries.map(async ([tokenId]) => {
           const subaccount = await nft_manager.to_nft_subaccount(BigInt(tokenId));
@@ -80,8 +95,8 @@ export const fetchTokensForPrincipal = createAsyncThunk(
 
           dispatch(updateNftBalances({
             tokenId,
-            alex: alexBalance.toString(),
-            lbry: lbryBalance.toString()
+            alex: convertE8sToToken(alexBalance),
+            lbry: convertE8sToToken(lbryBalance)
           }));
         })
       );

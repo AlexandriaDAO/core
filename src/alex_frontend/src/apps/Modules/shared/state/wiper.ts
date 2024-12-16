@@ -1,57 +1,94 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { clearTransactions, clearContentData, resetMintableState } from './content/contentDisplaySlice';
+import { 
+  clearTransactions, 
+  clearContentData, 
+  resetMintableState 
+} from './content/contentDisplaySlice';
 import { clearPredictions } from './arweave/arweaveSlice';
-import { setNfts, setLoading, setError, clearNfts } from './nftData/nftDataSlice';
+import { 
+  clearNfts 
+} from './nftData/nftDataSlice';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '@/store';
 
-// Consolidated wipe function that handles both content and NFT data
+// Group related state clearing operations
+const contentStateOperations = [
+  clearTransactions,
+  clearContentData,
+  resetMintableState
+];
+
+const nftStateOperations = [
+  clearNfts
+];
+
+const predictionStateOperations = [
+  clearPredictions
+];
+
 export const wipe = createAsyncThunk(
   'wiper/wipeState',
-  async (_, { dispatch }) => {
-    // Clear content display state
-    dispatch(clearTransactions());
-    dispatch(clearContentData());
-    dispatch(resetMintableState());
-    dispatch(clearPredictions());
-    
-    // Clear NFT data state
-    dispatch(clearNfts());
-    
-    // Clear service caches
-    ContentService.clearCache();
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      // Clear content state
+      contentStateOperations.forEach(operation => dispatch(operation()));
+      
+      // Clear NFT state
+      nftStateOperations.forEach(operation => dispatch(operation()));
+      
+      // Clear prediction state
+      predictionStateOperations.forEach(operation => dispatch(operation()));
+      
+      // Clear service caches
+      ContentService.clearCache();
+      
+      return true;
+    } catch (error) {
+      return rejectWithValue('Failed to wipe state: ' + error);
+    }
   }
 );
 
-// Single hook to handle wiping on unmount or manual triggers
-export const useWiper = (triggerDeps: any[] = []) => {
-  const dispatch = useDispatch<AppDispatch>();
-
-  // Wipe on specified trigger dependencies
-  useEffect(() => {
-    dispatch(wipe());
-  }, triggerDeps);
-
-  // Wipe on unmount
-  useEffect(() => {
-    return () => {
-      dispatch(wipe());
-    };
-  }, [dispatch]);
-
-  // Return wipe function for manual triggers
-  return () => dispatch(wipe());
+type WipeConfig = {
+  wipeOnUnmount?: boolean;
+  triggerDeps?: unknown[];
 };
 
-// Keep the original hook for backward compatibility
-export const useWipeOnUnmount = () => {
+/**
+ * Unified hook for state wiping functionality
+ * @param config - Configuration object for wiping behavior
+ * @returns Function to manually trigger wipe
+ */
+export const useWiper = (config: WipeConfig = {}) => {
+  const { wipeOnUnmount = true, triggerDeps = [] } = config;
   const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    return () => {
-      dispatch(wipe());
-    };
+  const wipeFunction = useCallback(() => {
+    return dispatch(wipe());
   }, [dispatch]);
+
+  // Wipe on trigger dependencies if provided
+  useEffect(() => {
+    if (triggerDeps.length > 0) {
+      wipeFunction();
+    }
+  }, triggerDeps);
+
+  // Wipe on unmount if enabled
+  useEffect(() => {
+    if (wipeOnUnmount) {
+      return () => {
+        wipeFunction();
+      };
+    }
+  }, [wipeOnUnmount, wipeFunction]);
+
+  return wipeFunction;
+};
+
+// Deprecated - use useWiper instead
+export const useWipeOnUnmount = () => {
+  return useWiper({ wipeOnUnmount: true });
 };

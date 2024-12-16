@@ -6,8 +6,8 @@ uxyan-oyaaa-aaaap-qhezq-cai
 // Did this for every canister of ours.
 dfx canister stop vetkd --network ic
 dfx canister delete vetkd --network ic
-dfx canister create vetkd --next-to uxyan-oyaaa-aaaap-qhezq-cai --network ic  --with-cycles 10000000000000
-dfx canister update-settings vetkd --add-controller yog5q-6fxnl-g4zd4-s2nuh-f7fkw-ijb4e-z7dmo-jrarx-uoe2x-wx5sh-dae --network ic
+dfx canister create emporium --next-to uxyan-oyaaa-aaaap-qhezq-cai --network ic  --with-cycles 10000000000000
+dfx canister update-settings emporium --add-controller yog5q-6fxnl-g4zd4-s2nuh-f7fkw-ijb4e-z7dmo-jrarx-uoe2x-wx5sh-dae --network ic
 
 
 (2) Add nns as a controller: yog5q-6fxnl-g4zd4-s2nuh-f7fkw-ijb4e-z7dmo-jrarx-uoe2x-wx5sh-dae

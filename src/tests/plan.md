@@ -1,47 +1,10 @@
 /*
 The Plan:
 
-So right now, since I made the content load before the nftData state finished loading, the mintableState (mintable and owner) of contentGrid is now alway null because it's being set before the nftData state is loaded.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-- First display if it's a scion, or og nft if it has that state, and n/a if it's null.
-- Maybe display the owner principal.
-- Then display the LBRY and ALEX balances of the wallets.
+- One of the tokens on the test app got 2 LBRY. Is it possible we're sending the lbry before checking if it already is owned by the user?
+- We need a stop button for the loading state for when it gets stuck.
 - Then make the existing arweave data look nice.
 
 
@@ -55,7 +18,6 @@ So right now, since I made the content load before the nftData state finished lo
 Minor stuff to do:
 - Make exploring an owner easier.
 - Need to blur blocked images when clicked on.
-- We need a more efficient way to get peoples library because it takes a long time if you have a lot of NFTs. Maybe add back the concurrent query calls.
 - Need to add a minting check in rust that the NFT created is a real arweave id.
 - Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.

@@ -67,19 +67,14 @@ export const getServerIrys = async (node: SerializedNode, actor: ActorSubclass<_
           ): Promise<string> => {
               const convertedMsg = Buffer.from(message["Transaction hash"]).toString('hex')
 
-              console.log('convertedMsg',convertedMsg);
-
               // Call the signTransaction method
               const result = await actor.signData(convertedMsg, BigInt(node.id));
-
-              console.log('result',result);
 
               if ('Err' in result) {
                 console.log('Error Occured', result.Err);
                 throw new Error('Error while signing');
               }
               if('Ok' in result){
-                console.log('Result Ok', result.Ok);
                 return result.Ok
               }
 

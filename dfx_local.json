@@ -105,7 +105,8 @@
     "emporium": {
       "candid": "src/emporium/emporium.did",
       "package": "emporium",
-      "type": "rust"
+      "type": "rust",
+      "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
     },
     "tests": {
       "type": "rust",

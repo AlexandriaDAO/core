@@ -1,5 +1,6 @@
-import { InterceptorErrorData, InterceptorRequestData, InterceptorResponseData, isIdentityExpiredError } from "ic-use-actor";
+import { InterceptorErrorData, InterceptorRequestData, InterceptorResponseData } from "ic-use-actor";
 import { toast } from "sonner";
+import { isIdentityExpired } from "@/utils/general";
 
 const useActorErrorHandler = (clear: () => void) => {
     const errorToast = (error: unknown) => {
@@ -9,13 +10,13 @@ const useActorErrorHandler = (clear: () => void) => {
     };
 
     const handleResponseError = (data: InterceptorErrorData) => {
-        console.error("onResponseError", data.error);
-        if (isIdentityExpiredError(data.error)) {
-            toast.error("Login expired.");
+        console.error("onResponseError", data);
+        if (isIdentityExpired(data.error)) {
+            toast.error("Session expired.");
             setTimeout(() => {
                 clear();
                 window.location.reload();
-            }, 1000);
+            }, 2000);
             return;
         }
 
@@ -25,12 +26,12 @@ const useActorErrorHandler = (clear: () => void) => {
     };
 
     const handleRequest = (data: InterceptorRequestData) => {
-        console.log("onRequest", data.args, data.methodName);
+        // console.log("onRequest", data.args, data.methodName);
         return data.args;
     };
 
     const handleResponse = (data: InterceptorResponseData) => {
-        console.log("onResponse", data.args, data.methodName, data.response);
+        // console.log("onResponse", data.args, data.methodName, data.response);
         return data.response;
     };
 
