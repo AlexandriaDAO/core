@@ -1,6 +1,5 @@
-import React, { ReactNode, useEffect } from "react";
+import React from "react";
 import { Toaster } from "@/lib/components/sonner";
-import useInitAuth from "@/features/auth/hooks/useInitAuth";
 import { Outlet } from "react-router";
 import { useRiskWarning } from "@/hooks/useRiskWarning";
 import RiskWarningModal from "@/components/RiskWarningModal";

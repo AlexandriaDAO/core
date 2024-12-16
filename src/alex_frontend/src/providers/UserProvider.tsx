@@ -11,28 +11,32 @@ interface UserProviderProps {
 }
 
 const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-	const {identity} = useInternetIdentity();
+	const {identity, isInitializing} = useInternetIdentity();
     const {actor} = useUser();
 
     const dispatch = useAppDispatch();
     const {user} = useAppSelector(state=>state.auth);
 
-    // Handle auth state changes
+    // Handle authentication state changes and user synchronization
     useEffect(()=>{
+        // Skip any auth checks while Internet Identity is initializing
+        if(isInitializing) return;
 
-        if(!actor) return;
-
+        // Clear user data when there's no identity (user logged out)
         if(!identity){
             dispatch(setUser(null));
             return;
         }
 
-        // if(user?.principal !== identity.getPrincipal().toString()){
+        // Wait for the user actor to be available before proceeding
+        if(!actor) return;
+
+        // Attempt to login only if we don't have user data in the store
+        // This prevents unnecessary login attempts if the user is already authenticated
         if(!user){
             dispatch(login(actor));
-        };
-
-    }, [actor, identity, user, dispatch]);
+        }
+    }, [isInitializing, actor, identity, user, dispatch]);
 
 	return <> {children} </>
 }
