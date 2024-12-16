@@ -12,7 +12,9 @@ service : {
   check_swap_canister_balance : () -> (float64);
   claim_icp_reward : (text) -> (Result);
   get_test_accounts : () -> (TestAccounts) query;
+  init_automated_testing : () -> ();
   stake : (nat64, text) -> (Result);
   swap : (nat64, text) -> (Result);
+  test_logging : () -> ();
   unstake : (text) -> (Result);
 }
