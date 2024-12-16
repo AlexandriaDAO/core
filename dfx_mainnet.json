@@ -102,6 +102,12 @@
       "package": "tests",
       "candid": "src/tests/tests.did",
       "specified_id": "yn33w-uaaaa-aaaap-qpk5q-cai"
+    },
+    "emporium": {
+      "candid": "src/emporium/emporium.did",
+      "package": "emporium",
+      "type": "rust",
+      "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
     }
   },
   "defaults": {

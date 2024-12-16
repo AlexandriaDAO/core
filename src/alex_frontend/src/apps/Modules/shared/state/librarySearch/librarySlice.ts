@@ -1,10 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { performSearch } from './libraryThunks';
 
 interface LibraryState {
   selectedPrincipals: string[];
   sortAsc: boolean;
   tags: string[];
   collection: 'icrc7' | 'icrc7_scion';
+  isLoading: boolean;
 }
 
 const initialState: LibraryState = {
@@ -12,6 +14,7 @@ const initialState: LibraryState = {
   sortAsc: true,
   tags: [],
   collection: 'icrc7',
+  isLoading: false,
 };
 
 const librarySlice = createSlice({
@@ -19,12 +22,12 @@ const librarySlice = createSlice({
   initialState,
   reducers: {
     togglePrincipal: (state, action: PayloadAction<string>) => {
-      const principal = action.payload;
-      const index = state.selectedPrincipals.indexOf(principal);
-      if (index === -1) {
-        state.selectedPrincipals.push(principal);
+      const principalId = action.payload;
+      
+      if (state.selectedPrincipals[0] === principalId) {
+        state.selectedPrincipals = [];
       } else {
-        state.selectedPrincipals.splice(index, 1);
+        state.selectedPrincipals = [principalId];
       }
     },
     toggleSortDirection: (state) => {
@@ -45,6 +48,9 @@ const librarySlice = createSlice({
     setCollection: (state, action: PayloadAction<'icrc7' | 'icrc7_scion'>) => {
       state.collection = action.payload;
     },
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
   },
 });
 
@@ -53,6 +59,7 @@ export const {
   toggleSortDirection,
   setTags,
   toggleTag,
-  setCollection
+  setCollection,
+  setLoading
 } = librarySlice.actions;
 export default librarySlice.reducer;

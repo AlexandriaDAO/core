@@ -1,23 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
-import { wipe } from "../../shared/state/wiper";
 import PrincipalSelector from "./PrincipalSelector";
 import SortSelector from "./SortSelector";
 import CollectionSelector from "./collectionSelector";
 import LibraryContentTagsSelector from "./tagSelector";
-import SearchButton from "./searchButton";
 import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
+import { performSearch } from '../../shared/state/librarySearch/libraryThunks';
+import RangeSelector from './rangeSelector';
 
-export default function librarySearch() {
-  const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
+export default function LibrarySearch() {
   const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
   const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    dispatch(wipe());
-  }, [selectedPrincipals]);
+  const handleSearch = useCallback(() => {
+    dispatch(performSearch({ start: 0, end: 20 }));
+  }, [dispatch]);
 
   useEffect(() => {
     if (transactions.length > 0) {
@@ -25,12 +24,22 @@ export default function librarySearch() {
     }
   }, [transactions, dispatch]);
 
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        handleSearch();
+      }
+    };
+
+    document.addEventListener('keypress', handleKeyPress);
+    return () => {
+      document.removeEventListener('keypress', handleKeyPress);
+    };
+  }, [handleSearch]);
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
-          Library Collection
-        </h2>
         
         <div className="space-y-6">
           {/* Search Controls Section */}
@@ -66,10 +75,11 @@ export default function librarySearch() {
                 <LibraryContentTagsSelector />
               </div>
 
-              {/* Search Button */}
-              <div className="flex justify-end">
-                <SearchButton />
+              {/* Add RangeSelector */}
+              <div className="pb-4 border-b border-gray-200 dark:border-gray-600">
+                <RangeSelector />
               </div>
+
             </div>
           </div>
         </div>
