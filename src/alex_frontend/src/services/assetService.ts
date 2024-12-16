@@ -93,7 +93,7 @@ const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_
 const network = process.env.DFX_NETWORK === "ic" ? 'mainnet':'devnet'
 
 const client = new ApolloClient({
-    uri: `https://${network}.irys.xyz/graphql`,
+    uri: `https://arweave.${network}.irys.xyz/graphql`,
     cache: new InMemoryCache()
 });
 
