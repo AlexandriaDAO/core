@@ -22,6 +22,11 @@ Minor stuff to do:
 - Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - The x should look nicer and be above the image.
+- Move the mint and info buttons below the image.
+
+Alexandrian: 
+- Rank by token amounts.
+- Switch the reverse state to show most recent first.
 */
 
 

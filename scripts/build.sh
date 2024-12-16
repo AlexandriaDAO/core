@@ -77,7 +77,7 @@ dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
 dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
 dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
 
-dfx deploy user --specified-id bd3sg-teaaa-aaaaa-qaaba-cai
+dfx deploy user --specified-id yo4hu-nqaaa-aaaap-qkmoq-cai
 dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
 dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 
