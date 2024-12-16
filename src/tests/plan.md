@@ -1,14 +1,49 @@
 /*
 The Plan:
 
-Right now, I'm minting NFTs with the arweave id without respect to the individual scion that it could be, so I need to start sending the actual transaction id if it has one that was queried from the backend.
+So right now, since I made the content load before the nftData state finished loading, the mintableState (mintable and owner) of contentGrid is now alway null because it's being set before the nftData state is loaded.
 
-*this assumes that the minting keeps working well*
-inside contentDiplay/ContentData Redux State I have to add the owner of the NFT and the money that's inside it (perhaps even the type, scion or OG).
 
-Maybe for now we could just display the money inside it and that's it. Intentionally leave the rest a mystery?
 
-Or maybe we do this totally in a separate app and never let the user's see who own's what or how much money is inside what.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- First display if it's a scion, or og nft if it has that state, and n/a if it's null.
+- Maybe display the owner principal.
+- Then display the LBRY and ALEX balances of the wallets.
+- Then make the existing arweave data look nice.
+
 
 
 
