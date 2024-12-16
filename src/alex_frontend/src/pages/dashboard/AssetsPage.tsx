@@ -1,9 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router";
 import { Button } from "@/lib/components/button";
 import { CloudUpload } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/components/tabs";
+import { MyImages, MyAudios, MyVideos, MyBooks } from "@/features/asset";
+
+// import fetchMyAssets from "@/features/asset/thunks/fetchMyAssets";
+// import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 
 function AssetsPage() {
+	// const dispatch = useAppDispatch();
+
+	// useEffect(()=>{
+	// 	dispatch(fetchMyAssets());
+	// },[dispatch])
+
 	return (
 		<>
 			<div className="flex justify-between items-center mb-8">
@@ -18,7 +29,18 @@ function AssetsPage() {
 			<div className="font-roboto-condensed bg-white rounded-lg shadow-md p-6">
 				<div className="mb-6 text-gray-600 font-roboto-condensed">List of my uploaded content</div>
 
-				<div>My Assets main content</div>
+				<Tabs defaultValue="books" className="">
+					<TabsList>
+						<TabsTrigger value="images">Images</TabsTrigger>
+						<TabsTrigger value="videos">Videos</TabsTrigger>
+						<TabsTrigger value="audios">Audios</TabsTrigger>
+						<TabsTrigger value="books">Books</TabsTrigger>
+					</TabsList>
+					<TabsContent value="images" className="my-6"><MyImages /></TabsContent>
+					<TabsContent value="videos" className="my-6"><MyVideos /></TabsContent>
+					<TabsContent value="audios" className="my-6"><MyAudios /></TabsContent>
+					<TabsContent value="books" className="my-6"><MyBooks /></TabsContent>
+				</Tabs>
 			</div>
 		</>
 	);
