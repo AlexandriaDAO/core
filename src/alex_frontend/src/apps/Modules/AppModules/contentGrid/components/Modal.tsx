@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { Card, CardContent } from "@/lib/components/card";
 import { Button } from "@/lib/components/button";
 
 interface ModalProps {
@@ -12,17 +13,19 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-4 max-w-3xl max-h-[90vh] w-full relative overflow-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
+      <Card className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-background">
         <Button
-          variant="secondary"
-          className="absolute top-2 right-2 h-8 w-8 rounded-full bg-[#353535] hover:bg-[#454545] flex items-center justify-center p-0"
+          variant="ghost"
+          className="absolute right-4 top-4 z-[60] rounded-full hover:bg-gray-100"
           onClick={onClose}
         >
-          <X className="h-4 w-4" />
+          <X className="h-6 w-6" />
         </Button>
-        {children}
-      </div>
+        <CardContent className="p-6">
+          {children}
+        </CardContent>
+      </Card>
     </div>
   );
 };

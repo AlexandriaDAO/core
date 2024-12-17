@@ -13,9 +13,9 @@ use icrc_ledger_types::icrc1::transfer::{BlockIndex, NumTokens, TransferArg, Tra
 
 
 #[update(guard = "not_anon")]
-pub async fn withdraw(mint_number: Nat) -> Result<(Option<BlockIndex>, Option<BlockIndex>), String> {
+pub async fn withdraw(mint_number: Nat, collection: Option<String>) -> Result<(Option<BlockIndex>, Option<BlockIndex>), String> {
     let caller = ic_cdk::api::caller();
-    let is_owner_result = is_owner(vec![mint_number.clone()], caller).await?;
+    let is_owner_result = is_owner(vec![mint_number.clone()], caller, collection).await?;
 
     if !is_owner_result.get(0).unwrap_or(&false) {
         return Err("Caller is not the owner of the NFT".to_string());

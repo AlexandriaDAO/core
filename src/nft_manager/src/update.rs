@@ -149,14 +149,14 @@ async fn prepare_nft_requests(valid_minting_numbers: Vec<Nat>, metadata: Vec<Opt
 
 
 #[update(guard = "not_anon")] // TODO: Must guard for DAO only, or make private.
-pub async fn burn_to_lbry(minting_numbers: Vec<Nat>) -> Result<String, String> {
+pub async fn burn_to_lbry(minting_numbers: Vec<Nat>, collection: Option<String>) -> Result<String, String> {
     check_update_batch_size(&minting_numbers)?;
 
     let original_count = minting_numbers.len();
     let target_principal = Principal::from_text("5sh5r-gyaaa-aaaap-qkmra-cai").unwrap();
 
     let caller = caller();
-    let owner_results = is_owner(minting_numbers.clone(), caller).await?;
+    let owner_results = is_owner(minting_numbers.clone(), caller, collection).await?;
 
     let valid_nfts: Vec<Nat> = minting_numbers.into_iter()
         .zip(owner_results.into_iter())

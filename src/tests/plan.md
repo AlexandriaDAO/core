@@ -3,7 +3,8 @@ The Plan:
 
 
 
-- One of the tokens on the test app got 2 LBRY. Is it possible we're sending the lbry before checking if it already is owned by the user?
+
+
 - We need a stop button for the loading state for when it gets stuck.
 - Then make the existing arweave data look nice.
 
@@ -17,12 +18,10 @@ The Plan:
 
 Minor stuff to do:
 - Make exploring an owner easier.
-- Need to blur blocked images when clicked on.
 - Need to add a minting check in rust that the NFT created is a real arweave id.
 - Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
-- The x should look nicer and be above the image.
-- Move the mint and info buttons below the image.
+- Make the open view scrollable for long images.
 
 Alexandrian: 
 - Rank by token amounts.
@@ -38,54 +37,6 @@ Bigger ones:
 
 
 
-
-
-
-<!-- PRD for the test canister: 
-```
-type BalanceResult = record { icp : float64; alex : float64; lbry : float64 };
-type Result = variant { Ok : text; Err : text };
-type TestAccounts = record {
-  one : text;
-  two : text;
-  three : text;
-  root : text;
-};
-service : {
-  burn : (nat64, text) -> (Result);
-  check_balances : (vec text) -> (vec BalanceResult);
-  check_swap_canister_balance : () -> (float64);
-  claim_icp_reward : (text) -> (Result);
-  get_test_accounts : () -> (TestAccounts) query;
-  stake : (nat64, text) -> (Result);
-  swap : (nat64, text) -> (Result);
-  unstake : (text) -> (Result);
-}
-```
-
-Pseudocode for the test canister: 
-
-
-pub fn random_action(percentage_chance) -> bool
-
-- every 10 seconds, trigger a loop with ic_cdk_timers.
-  - Check_balances() | E.g.: › check_balances(vec {"root"}) -> (vec {record {icp=0; alex=0; lbry=0}})
-    - If ICP > 1
-      - random_action(50)
-      - Call the swap function to the nearest whole number balance rounded down: 
-        - E.g.: check_balances(vec {"root"})
-                (vec {record {icp=98.9997; alex=0; lbry=0}})
-                › swap(98, "root")
-                (variant {Ok="Swapped Successfully!"})
-    - If LBRY > 10
-      - random_action(50)
-      - burn(total LBRY balance -0.04 LBRY for the fee)
-    - If ALEX > 1
-      - stake(total ALEX balance, rounded down to the nearest whole number)
-  - random_action(10)
-    - unstake(root)
-  - random_action(35)
-    - claim_icp_reward(root) -->
 
 
 

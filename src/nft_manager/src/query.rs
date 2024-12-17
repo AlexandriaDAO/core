@@ -1,4 +1,4 @@
-use crate::{alex_principal, icrc7_principal, lbry_principal};
+use crate::{alex_principal, icrc7_principal, icrc7_scion_principal, lbry_principal};
 use crate::utils::check_query_batch_size;
 use crate::id_converter::to_nft_subaccount;
 use crate::types::TokenBalances;
@@ -10,6 +10,7 @@ use candid::{Nat, Principal};
 use ic_cdk::api::call::CallResult;
 use icrc_ledger_types::icrc1::transfer::NumTokens;
 use icrc_ledger_types::{icrc::generic_value::Value, icrc1::account::Account};
+// use ic_cdk::export::Principal;
 
 const LBRY_FEE: u64 = 4_000_000;
 const ALEX_FEE: u64 = 10_000;
@@ -265,9 +266,18 @@ pub async fn get_my_nft_balances(slot: Option<Nat>) -> Result<Vec<(Nat, TokenBal
     Ok(result)
 }
 
-pub async fn is_owner(token_ids: Vec<Nat>, user: Principal) -> Result<Vec<bool>, String> {
+pub fn get_collection_principal(collection: Option<String>) -> Principal {
+    match collection.as_deref() {
+        Some("icrc7_scion") => icrc7_scion_principal(),
+        _ => icrc7_principal()
+    }
+}
+
+pub async fn is_owner(token_ids: Vec<Nat>, user: Principal, collection: Option<String>) -> Result<Vec<bool>, String> {
+    let canister = get_collection_principal(collection);
+    
     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
-        icrc7_principal(),
+        canister,
         "icrc7_owner_of",
         (token_ids,)
     ).await;
