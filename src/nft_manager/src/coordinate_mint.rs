@@ -6,10 +6,7 @@ use icrc_ledger_types::icrc1::transfer::{TransferArg, TransferError};
 use crate::guard::not_anon;
 use crate::id_converter::*;
 use crate::{icrc7_principal, icrc7_scion_principal, icp_swap_principal, nft_manager_principal, lbry_principal};
-
-const LBRY_MINT_COST: u64 = 1;
-const LBRY_E8S: u64 = 100_000_000;
-const LBRY_MINT_COST_E8S: u64 = LBRY_MINT_COST * LBRY_E8S;
+use crate::action_fees::{burn_mint_fee, LBRY_MINT_COST_E8S};
 
 pub type MintResult = Result<String, String>;
 
@@ -96,14 +93,7 @@ pub async fn verify_lbry_payment(
 }
 
 pub async fn burn_lbry_tokens(from: Principal) -> Result<(), String> {
-    verify_lbry_payment(
-        from,
-        icp_swap_principal(),
-        None,
-        Nat::from(LBRY_MINT_COST_E8S)
-    )
-    .await
-    .map_err(|_| "Failed to burn LBRY tokens (transfer to ICP_SWAP failed)".to_string())
+    burn_mint_fee(from).await
 }
 
 async fn mint_original(minting_number: Nat, caller: Principal) -> MintResult {
