@@ -11,6 +11,9 @@ import ContentRenderer from './components/ContentRenderer';
 import { mint_nft } from "@/features/nft/mint";
 import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
 import { Button } from "@/lib/components/button";
+import { Card } from "@/lib/components/card";
+import { withdraw_nft } from "@/features/nft/withdraw";
+import type { NftData } from "@/apps/Modules/shared/state/nftData/nftDataSlice";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -21,6 +24,8 @@ const ContentList = () => {
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
   const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
   const predictions = useSelector((state: RootState) => state.arweave.predictions);
+  const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
+  const { user } = useSelector((state: RootState) => state.auth);
   
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
@@ -39,6 +44,33 @@ const ContentList = () => {
     dispatch(clearTransactionContent(transactionId));
     dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
   }, [dispatch]);
+
+  const handleWithdraw = async (transactionId: string) => {
+    try {
+      const nftId = arweaveToNftId[transactionId];
+      if (!nftId) {
+        throw new Error("Could not find NFT ID for this content");
+      }
+
+      const nftData = nfts[nftId];
+      if (!nftData) {
+        throw new Error("Could not find NFT data for this content");
+      }
+
+      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, nftData.collection);
+      if (lbryBlock === null && alexBlock === null) {
+        toast.info("No funds were available to withdraw");
+      } else {
+        let message = "Successfully withdrew";
+        if (lbryBlock !== null) message += " LBRY";
+        if (alexBlock !== null) message += (lbryBlock !== null ? " and" : "") + " ALEX";
+        toast.success(message);
+      }
+    } catch (error) {
+      console.error("Error withdrawing funds:", error);
+      toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
+    }
+  };
 
   const renderDetails = useCallback((transaction: Transaction) => (
     <div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300 z-[20]">
@@ -61,18 +93,40 @@ const ContentList = () => {
           const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
           const mintableStateItem = mintableState[transaction.id];
           const isMintable = mintableStateItem?.mintable;
-          const hasPredictions = !!predictions[transaction.id];
           
-          // Only show blur when we have predictions and content is not mintable
-          // const shouldShowBlur = hasPredictions && mintableStateItem && !isMintable;
-          // The trouble here is that if the user is not logged in, it's not mintable and blurred regardless. We have to use isPorn.
+          const nftId = arweaveToNftId[transaction.id];
+          const nftData = nftId ? nfts[nftId] : undefined;
+          const isOwned = nftData?.principal === user?.principal;
+          
+          const hasPredictions = !!predictions[transaction.id];
           const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
+
+          const hasWithdrawableBalance = nftData && (
+            parseFloat(nftData.alex || '0') > 0 || 
+            parseFloat(nftData.lbry || '0') > 0
+          );
 
           return (
             <ContentGrid.Item
               key={transaction.id}
               onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
               id={transaction.id}
+              showStats={showStats[transaction.id]}
+              onToggleStats={(e) => {
+                e.stopPropagation();
+                setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
+              }}
+              isMintable={isMintable}
+              isOwned={isOwned}
+              onMint={(e) => {
+                e.stopPropagation();
+                handleMint(transaction.id);
+              }}
+              onWithdraw={hasWithdrawableBalance ? (e) => {
+                e.stopPropagation();
+                handleWithdraw(transaction.id);
+              } : undefined}
+              predictions={predictions[transaction.id]}
             >
               <div className="group relative w-full h-full">
                 <ContentRenderer
@@ -95,38 +149,20 @@ const ContentList = () => {
                   </div>
                 )}
                 {renderDetails(transaction)}
-              
-                <Button
-                  variant="secondary"
-                  className="absolute top-2 left-2 z-[25] h-8 w-8 rounded-full bg-[#353535] hover:bg-[#454545] flex items-center justify-center p-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
-                  }}
-                >
-                  <Info className="h-4 w-4" />
-                </Button>
-
-                {showStats[transaction.id] && predictions[transaction.id] && (
-                  <div className="absolute top-10 left-2 bg-black/80 text-white p-2 rounded-md text-xs z-[25]">
-                    <div>Drawing: {(predictions[transaction.id].Drawing * 100).toFixed(1)}%</div>
-                    <div>Neutral: {(predictions[transaction.id].Neutral * 100).toFixed(1)}%</div>
-                    <div>Sexy: {(predictions[transaction.id].Sexy * 100).toFixed(1)}%</div>
-                    <div>Hentai: {(predictions[transaction.id].Hentai * 100).toFixed(1)}%</div>
-                    <div>Porn: {(predictions[transaction.id].Porn * 100).toFixed(1)}%</div>
+                {isOwned && (
+                  <div className="absolute top-0 right-0 bg-green-500 text-white px-2 py-1 text-xs z-30">
+                    Owned
                   </div>
                 )}
-                
-                {isMintable && (
+                {isOwned && hasWithdrawableBalance && (
                   <Button
-                    variant="secondary"
-                    className="absolute top-2 right-2 z-[25] h-8 w-8 rounded-full bg-[#353535] hover:bg-[#454545] flex items-center justify-center p-0"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleMint(transaction.id);
+                      handleWithdraw(transaction.id);
                     }}
+                    className="absolute bottom-2 right-2 z-30"
                   >
-                    <span className="text-lg">+</span>
+                    Withdraw
                   </Button>
                 )}
               </div>
@@ -154,6 +190,13 @@ const ContentList = () => {
               mintableState={mintableState}
               handleRenderError={handleRenderError}
             />
+            {selectedContent && predictions[selectedContent.id]?.isPorn && (
+              <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[55]">
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
+                  Content Filtered
+                </div>
+              </div>
+            )}
           </div>
         )}
       </Modal> 

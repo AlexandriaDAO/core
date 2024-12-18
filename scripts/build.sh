@@ -77,7 +77,7 @@ dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
 dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
 dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
 
-dfx deploy user --specified-id bd3sg-teaaa-aaaaa-qaaba-cai
+dfx deploy user --specified-id yo4hu-nqaaa-aaaap-qkmoq-cai
 dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
 dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 
@@ -203,7 +203,7 @@ dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal <principal>)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal yn33w-uaaaa-aaaap-qpk5q-cai)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)

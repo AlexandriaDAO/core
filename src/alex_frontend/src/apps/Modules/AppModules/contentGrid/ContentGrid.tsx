@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/lib/components/card";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Info, Loader2 } from "lucide-react";
 import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
-import { Loader2 } from "lucide-react";
+import { Button } from "@/lib/components/button";
+import { Badge } from "@/lib/components/badge";
 
 interface ContentGridProps {
   children: React.ReactNode;
@@ -13,12 +14,24 @@ interface ContentGridItemProps {
   children: React.ReactNode;
   onClick: () => void;
   id?: string;
+  showStats?: boolean;
+  onToggleStats?: (e: React.MouseEvent) => void;
+  isMintable?: boolean;
+  isOwned?: boolean;
+  onMint?: (e: React.MouseEvent) => void;
+  onWithdraw?: (e: React.MouseEvent) => void;
+  predictions?: any;
 }
 
-function NftDataFooter({ id }: { id: string }) {
+interface NftDataFooterProps {
+  id: string;
+}
+
+function NftDataFooter({ id }: NftDataFooterProps) {
   const { getNftData } = useNftData();
   const [nftData, setNftData] = useState<NftDataResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [copiedPrincipal, setCopiedPrincipal] = useState(false);
 
   useEffect(() => {
     const fetchNftData = async () => {
@@ -36,6 +49,17 @@ function NftDataFooter({ id }: { id: string }) {
     return `${principal.slice(0, 4)}...${principal.slice(-4)}`;
   };
 
+  const handleCopyPrincipal = async (e: React.MouseEvent, principal: string) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(principal);
+      setCopiedPrincipal(true);
+      setTimeout(() => setCopiedPrincipal(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
   const formatBalance = (balance: string | undefined) => {
     if (!balance) return '0';
     return balance;
@@ -50,32 +74,37 @@ function NftDataFooter({ id }: { id: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-2 w-full">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-500">Owner:</span>
-        <span className="text-sm text-gray-700">
-          {formatPrincipal(nftData?.principal || null)}
-        </span>
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-500">Collection:</span>
-        <span className="text-sm text-gray-700">{nftData?.collection || 'None'}</span>
+    <div className="flex flex-col gap-3 w-full">
+      <div className="flex flex-wrap gap-2">
+        {nftData?.principal && (
+          <Badge 
+            variant="default" 
+            className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+            onClick={(e) => handleCopyPrincipal(e, nftData.principal!)}
+          >
+            {formatPrincipal(nftData.principal)}
+            {copiedPrincipal ? (
+              <Check className="h-3 w-3" />
+            ) : (
+              <Copy className="h-3 w-3" />
+            )}
+          </Badge>
+        )}
+        {nftData?.collection && nftData.collection !== 'No Collection' && (
+          <Badge variant="default" className="text-xs">
+            {nftData.collection}
+          </Badge>
+        )}
       </div>
       {nftData?.balances && (
-        <>
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-500">ALEX:</span>
-            <span className="text-sm text-gray-700">
-              {formatBalance(nftData.balances.alex.toString())}
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-500">LBRY:</span>
-            <span className="text-sm text-gray-700">
-              {formatBalance(nftData.balances.lbry.toString())}
-            </span>
-          </div>
-        </>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" className="text-xs bg-white">
+            ALEX: {formatBalance(nftData.balances.alex.toString())}
+          </Badge>
+          <Badge variant="outline" className="text-xs bg-white">
+            LBRY: {formatBalance(nftData.balances.lbry.toString())}
+          </Badge>
+        </div>
       )}
     </div>
   );
@@ -89,7 +118,7 @@ function ContentGrid({ children }: ContentGridProps) {
   );
 }
 
-function ContentGridItem({ children, onClick, id }: ContentGridItemProps) {
+function ContentGridItem({ children, onClick, id, showStats, onToggleStats, isMintable, isOwned, onMint, onWithdraw, predictions }: ContentGridItemProps) {
   const [copied, setCopied] = useState(false);
 
   const formatId = (id: string) => {
@@ -136,7 +165,39 @@ function ContentGridItem({ children, onClick, id }: ContentGridItemProps) {
       </CardContent>
 
       <CardFooter className="flex flex-col items-start w-full rounded-lg border border-[--border] bg-[--card] mt-2 flex-grow min-h-[100px] p-4">
+        <div className="flex justify-between w-full mb-4">
+          <Button
+            variant="secondary"
+            className="h-8 w-8 rounded-full bg-[#353535] hover:bg-[#454545] flex items-center justify-center p-0"
+            onClick={onToggleStats}
+          >
+            <Info className="h-4 w-4" />
+          </Button>
+
+          <div className="flex gap-2">
+            {isMintable && onMint && (
+              <Button
+                variant="secondary"
+                className="h-8 w-8 rounded-full bg-[#353535] hover:bg-[#454545] flex items-center justify-center p-0"
+                onClick={onMint}
+              >
+                <span className="text-lg">+</span>
+              </Button>
+            )}
+          </div>
+        </div>
+
         {id && <NftDataFooter id={id} />}
+
+        {showStats && predictions && (
+          <div className="mt-2 p-2 bg-black/80 text-white rounded-md text-xs w-full">
+            <div>Drawing: {(predictions.Drawing * 100).toFixed(1)}%</div>
+            <div>Neutral: {(predictions.Neutral * 100).toFixed(1)}%</div>
+            <div>Sexy: {(predictions.Sexy * 100).toFixed(1)}%</div>
+            <div>Hentai: {(predictions.Hentai * 100).toFixed(1)}%</div>
+            <div>Porn: {(predictions.Porn * 100).toFixed(1)}%</div>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );

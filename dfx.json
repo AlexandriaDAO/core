@@ -83,12 +83,6 @@
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
       "id": "ysy5f-2qaaa-aaaap-qkmmq-cai"
     },
-    "registry": {
-      "candid": "src/registry/registry.did",
-      "package": "registry",
-      "type": "rust",
-      "id": "uxyan-oyaaa-aaaap-qhezq-cai"
-    },
     "alex_frontend": {
       "dependencies": ["alex_backend"],
       "frontend": {
@@ -97,17 +91,34 @@
       "source": ["dist/alex_frontend/"],
       "type": "assets"
     },
+    "icp_ledger_canister": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icp_ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ledger-canister.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+        }
+      },
+      "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+    },  
+    "emporium": {
+      "candid": "src/emporium/emporium.did",
+      "package": "emporium",
+      "type": "rust",
+      "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
+    },
     "tests": {
       "type": "rust",
       "package": "tests",
       "candid": "src/tests/tests.did",
       "specified_id": "yn33w-uaaaa-aaaap-qpk5q-cai"
     },
-    "emporium": {
-      "candid": "src/emporium/emporium.did",
-      "package": "emporium",
+    "xrc": {
+      "candid": "src/xrc/xrc.did",
+      "package": "xrc",
       "type": "rust",
-      "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
+      "specified_id": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
     }
   },
   "defaults": {

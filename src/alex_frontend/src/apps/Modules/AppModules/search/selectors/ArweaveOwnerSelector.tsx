@@ -40,21 +40,47 @@ export const Input = styled.input`
   }
 `;
 
+// Add validation helper
+const isValidArweaveAddress = (address: string): boolean => {
+  // Remove any whitespace and check if it's a valid Arweave address
+  const cleanAddress = address.trim();
+  const base64urlRegex = /^[a-zA-Z0-9_-]{43}$/;
+  return base64urlRegex.test(cleanAddress);
+};
+
 const ArweaveOwnerSelector: React.FC = () => {
   const dispatch = useDispatch();
   const { searchState } = useSelector((state: RootState) => state.arweave);
+  const [isValid, setIsValid] = React.useState(true);
 
   const handleSearchStateChange = (value: string) => {
-    dispatch(setSearchState({ ownerFilter: value }));
+    const cleanValue = value.trim();
+    
+    // Update the store with the cleaned value instead of the original
+    dispatch(setSearchState({ ownerFilter: cleanValue }));
+    
+    // Only validate if there's actual input
+    if (cleanValue) {
+      setIsValid(isValidArweaveAddress(cleanValue));
+    } else {
+      setIsValid(true); // Reset validation when input is empty
+    }
   };
+
+  // Update the styled Input component to show validation state
+  const StyledInput = styled(Input)<{ isValid: boolean }>`
+    color: ${props => props.isValid ? 'var(--black-grey-300, #808080)' : '#ff4444'};
+  `;
 
   return (
     <SearchBox>
       <OwnerIcon />
-      <Input
+      <StyledInput
+        isValid={isValid}
         value={searchState.ownerFilter}
         onChange={(e) => handleSearchStateChange(e.target.value)}
         placeholder="Enter owner address or principal ID"
+        title={!isValid ? "Please enter a valid Arweave address (43 characters)" : ""}
       />
     </SearchBox>
   );

@@ -33,10 +33,6 @@ export class ContentService {
   };
 
   static async loadContent(transaction: Transaction): Promise<CachedContent> {
-    console.log("loadContent called for transaction:", {
-      id: transaction.id,
-      contentType: transaction.tags.find(tag => tag.name === "Content-Type")?.value
-    });
     return contentCache.loadContent(transaction);
   }
 

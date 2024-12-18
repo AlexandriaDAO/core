@@ -9,12 +9,16 @@ const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
 export interface NftDataResult {
   principal: string | null;
-  collection: string | null;
+  collection?: string;
   balances?: {
-    alex: bigint;
-    lbry: bigint;
+    alex: string;
+    lbry: string;
   };
 }
+
+const convertE8sToToken = (e8sAmount: bigint): string => {
+  return (Number(e8sAmount) / 1e8).toString();
+};
 
 export const useNftData = () => {
   const nfts = useSelector((state: RootState) => state.nftData.nfts);
@@ -32,7 +36,7 @@ export const useNftData = () => {
         // Correct Account structure for ICRC-1 balance_of
         const balanceParams = {
           owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-          subaccount: [Array.from(subaccount)] // Convert to proper subaccount format
+          subaccount: [Array.from(subaccount)]
         };
 
         // Get balances from both ALEX and LBRY
@@ -47,30 +51,25 @@ export const useNftData = () => {
           })
         ]);
 
-        console.log(`Balances for NFT ${transactionId}:`, {
-          alex: alexBalance.toString(),
-          lbry: lbryBalance.toString()
-        });
-
         return {
           principal: nftEntry[1].principal,
           collection: nftEntry[1].collection,
           balances: {
-            alex: alexBalance,
-            lbry: lbryBalance
+            alex: convertE8sToToken(alexBalance),
+            lbry: convertE8sToToken(lbryBalance)
           }
         };
       }
 
       return {
         principal: null,
-        collection: null
+        collection: undefined
       };
     } catch (error) {
       console.error("Error finding NFT data in state:", error);
       return {
         principal: null,
-        collection: null
+        collection: undefined
       };
     }
   };

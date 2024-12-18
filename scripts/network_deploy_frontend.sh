@@ -39,4 +39,5 @@ wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797b
 # dfx canister snapshot create alex_frontend --network ic
 # dfx canister start alex_frontend --network ic
 
+dfx identity use mainnet
 dfx deploy alex_frontend --network ic

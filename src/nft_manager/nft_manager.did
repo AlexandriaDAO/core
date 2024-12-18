@@ -22,7 +22,7 @@ type Value = variant {
 };
 service : () -> {
   arweave_id_to_nat : (text) -> (nat) query;
-  burn_to_lbry : (vec nat) -> (Result);
+  burn_to_lbry : (vec nat, opt text) -> (Result);
   coordinate_mint : (text, opt principal) -> (Result);
   get_manifest_ids : (vec nat) -> (Result_1);
   get_metadata : (vec nat) -> (Result_2);
@@ -40,5 +40,5 @@ service : () -> {
   subaccount_to_principal : (blob) -> (opt principal) query;
   to_nft_subaccount : (nat) -> (blob) query;
   total_supply : () -> (Result_9);
-  withdraw : (nat) -> (Result_10);
+  withdraw : (nat, opt text) -> (Result_10);
 }

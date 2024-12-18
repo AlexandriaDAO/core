@@ -10,6 +10,7 @@ export interface NftData {
 
 interface NftDataState {
   nfts: Record<string, NftData>;
+  arweaveToNftId: Record<string, string>;
   loading: boolean;
   error: string | null;
   totalNfts: number;
@@ -17,6 +18,7 @@ interface NftDataState {
 
 const initialState: NftDataState = {
   nfts: {},
+  arweaveToNftId: {},
   loading: false,
   error: null,
   totalNfts: 0
@@ -29,8 +31,10 @@ const nftDataSlice = createSlice({
     setNfts: (state, action: PayloadAction<[string, NftData][]>) => {
       // Clear existing NFTs before setting new ones for pagination
       state.nfts = {};
+      state.arweaveToNftId = {};
       action.payload.forEach(([id, data]) => {
         state.nfts[id] = data;
+        state.arweaveToNftId[data.arweaveId] = id;
       });
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -54,6 +58,7 @@ const nftDataSlice = createSlice({
     },
     clearNfts: (state) => {
       state.nfts = {};
+      state.arweaveToNftId = {};
       state.loading = false;
       state.error = null;
       state.totalNfts = 0;

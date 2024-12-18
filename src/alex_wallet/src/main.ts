@@ -3,7 +3,7 @@ import { TypedEthereumSigner } from "arbundles";
 import { Result} from 'azle/experimental';
 import { Node as TypeNode } from '../../../declarations/user/user.did';
 
-const userPrincipal = Principal.fromText('bd3sg-teaaa-aaaaa-qaaba-cai');
+const userPrincipal = Principal.fromText('yo4hu-nqaaa-aaaap-qkmoq-cai');
 const vetkdPrincipal = Principal.fromText('5ham4-hqaaa-aaaap-qkmsq-cai');
 
 // Define the Node struct

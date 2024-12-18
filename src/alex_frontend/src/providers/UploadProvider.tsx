@@ -74,6 +74,8 @@ const UploadProvider: React.FC<UploadProviderProps> = ({ children }) => {
                 { name: "Version", value: "1.0" }
             ]
 
+            console.log(tags, 'tags');
+
             const tx = irys.createTransaction(JSON.stringify(manifest, null, 2), { tags });
 
             await tx.sign();

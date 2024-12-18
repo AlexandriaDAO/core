@@ -3,7 +3,8 @@ The Plan:
 
 
 
-- One of the tokens on the test app got 2 LBRY. Is it possible we're sending the lbry before checking if it already is owned by the user?
+
+
 - We need a stop button for the loading state for when it gets stuck.
 - Then make the existing arweave data look nice.
 
@@ -17,17 +18,50 @@ The Plan:
 
 Minor stuff to do:
 - Make exploring an owner easier.
-- Need to blur blocked images when clicked on.
 - Need to add a minting check in rust that the NFT created is a real arweave id.
 - Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
-- The x should look nicer and be above the image.
+- Make the open view scrollable for long images.
+
+Alexandrian: 
+- Rank by token amounts.
+- Switch the reverse state to show most recent first.
 */
 
 
 Bigger ones: 
 - Disable transfers and other irrelivant functions for scion NFTs.
 - Review tokenomics emissions schedule. Could it be better?
+  - I actually reserve that it's already pretty good, but we just need to put a max alex mint per call at 5 ALEX. So the cap is basically 1 LBRY per call in the beginning.
+
+
+
+
+
+
+
+
+Now that that's done we need to figure out how to replicate this for the more generic user that can freely call the functions from only this canister.
+- Also what are we going to do about NFTs?
+  - I should probably add the claim feature to the nfts first.
+  - Then maybe we allow you to send NFTs to the test canister and make money off of them.
+
+Wait. Maybe we have channels be these canisters?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -39,6 +73,7 @@ Bigger ones:
 Metrics: 
 9.97T Cycles in ICP Swap at 830 am, and it's dispersing once per minute.
 9.765T Cycles at 7am the next day. (But it could also be that it's because it stopped distributing.)
+9.470 Several days later (12/16), right before deploying tests canister. (the tests canister itself has 8.81T cycles at noon before deployment)
 
 
 
@@ -59,17 +94,3 @@ I think it'll be totally free to add nfts, but you can only add them if you own 
 
 
 
-### Understanding Arweave ID Conversions.
-
-- id_convert.ts has arweaveIdToNat and natToArweaveId and ogToScionId and scionToOgId.
-- nft_manager/src/id_converter.rs has arweave_id_to_nat and nat_to_arweave_id.
-
-Currently, scion NFTs are not getting their asset links found correctly because they reference an original NFT that contains the information required to find the asset.
-
-The problem is with getNftOwner.ts, where arweaveIds = nftIds.map(natToArweaveId);, but icrc7_scion nfts are not readily converable to non-scion token ids.
-
-First, scion NFTs need to be converted to their og NFTs with scionToOgId.
-
-In the case where the collection is 'icrc7_scion', we need to convert the scion NFTs to their og NFTs with scionToOgId before passing the result. 
-
-Since we're dealing with an array of scion NFTs, we might find it beneficial to modify the function to take an array of scion NFTs instead of a single one.
