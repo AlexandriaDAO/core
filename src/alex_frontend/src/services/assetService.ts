@@ -114,7 +114,7 @@ export const fetchAssets = async ({after = '', limit = 10, owner = '', type = un
             query {
                 transactions(
                     first: ${limit},
-                    ${isLocal ? 'order: DESC':'sort: HEIGHT_DESC'}
+                    ${isLocal ? 'order: DESC,':'sort: HEIGHT_DESC,'}
                     after: "${after}",
                     tags: [
                         { name: "Content-Type", values: ["application/x.arweave-manifest+json"] },
