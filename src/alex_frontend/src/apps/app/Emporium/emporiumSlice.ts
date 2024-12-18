@@ -17,7 +17,7 @@ export interface EmporiumState {
   editListingSuccess: Boolean;
   buyNftSuccess: Boolean;
   userTokens: { tokenId: string; arweaveId: string }[];
-  search: { search: string; pageSize: number; sort: string,type:string };
+  search: { search: string; pageSize: number; sort: string; type: string };
   marketPlace: Record<
     string,
     { tokenId: string; arweaveId: string; price: string; owner: string }
@@ -32,7 +32,7 @@ const initialState: EmporiumState = {
   buyNftSuccess: false,
   editListingSuccess: false,
   removeListingSuccess: false,
-  search: { search: "", pageSize: 6, sort: "" ,type:"principal"},
+  search: { search: "", pageSize: 6, sort: "", type: "principal" },
   totalPages: 0,
   pageSize: 0,
   error: null,
@@ -170,6 +170,5 @@ const emporiumSlice = createSlice({
       });
   },
 });
-export const { flagHandlerEmporium, setSearchEmporium } =
-  emporiumSlice.actions;
+export const { flagHandlerEmporium, setSearchEmporium } = emporiumSlice.actions;
 export default emporiumSlice.reducer;

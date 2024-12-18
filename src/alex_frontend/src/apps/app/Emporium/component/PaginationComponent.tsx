@@ -10,7 +10,7 @@ interface PaginationComponentProps {
 
 const PaginationComponent: React.FC<PaginationComponentProps> = ({ totalPages, currentPage, onPageChange }) => {
     return (
-            <Paginate>
+            <Paginate className='py-5'>
                 <ReactPaginate
                     breakLabel="..."
                     nextLabel="next >"

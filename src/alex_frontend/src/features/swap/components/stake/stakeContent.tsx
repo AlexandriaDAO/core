@@ -111,11 +111,11 @@ const StakeContent = () => {
                         <div className='flex items-center mb-3'>
                             <strong className='text-2xl font-medium'>Stake Amount</strong>
                         </div>
-                        <div className=' border bg-white py-5 px-5 rounded-borderbox mb-7 '>
+                        <div className=' border bg-white py-8 px-5 rounded-borderbox mb-7 '>
                             <div className='mb-3'>
-                                <div className='flex justify-between mb-3'>
+                                <div className='flex justify-between mb-5'>
                                     <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>
-                                    <input className='text-darkgray text-right bg-transparent text-2xl font-medium placeholder-darkgray w-full focus:outline-none focus:border-transparent' type='number' min={0} value={amount} onChange={(e) => { handleAmountChange(e) }} />
+                                    <input className='text-darkgray mr-[-10px] text-right bg-transparent text-2xl font-medium placeholder-darkgray w-full focus:outline-none focus:border-transparent' type='number' min={0} value={amount} onChange={(e) => { handleAmountChange(e) }} />
                                 </div>
                                 <div className='flex justify-between'>
                                     <div className='flex items-center'>

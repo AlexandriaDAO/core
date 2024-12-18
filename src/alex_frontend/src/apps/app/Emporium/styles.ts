@@ -127,25 +127,30 @@ export const Paginate = styled.div<{ $isOpen?: boolean }>`
 
   .pagination li a {
     padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    color: #007bff;
+    border: 1px solid #000000;
+    border-radius: 8px;
+    color: #000000;
     text-decoration: none;
     cursor: pointer;
   }
 
   .pagination li a:hover {
-    background-color: #f1f1f1;
+    background-color: #000000;
+    color: #ffffff;
   }
 
   .pagination .selected a {
-    background-color: #007bff;
+    background-color: #000000;
     color: white;
-    border-color: #007bff;
+    border-color: #000000;
   }
 
   .pagination .disabled a {
-    color: #ddd;
+    color:rgba(0, 0, 0, 0.35);
     cursor: not-allowed;
   }
+    .previous a {
+      border: none !importatn;
+    }
 `;
+

@@ -1,6 +1,7 @@
 use crate::{Listing, Nft, LISTING};
 use candid::{Nat, Principal};
 use ic_cdk::{caller, query};
+use icrc_ledger_types::icrc1::account::Subaccount;
 
 #[query]
 pub fn get_listing(page: Option<u64>, page_size: Option<u64>) -> Listing {
@@ -126,4 +127,44 @@ pub fn get_search_listing(
             page_size,
         }
     })
+}
+
+
+#[ic_cdk::query]
+pub fn principal_to_subaccount(principal: Principal) -> Subaccount {
+    let mut subaccount = [0u8; 32];
+    let principal_bytes = principal.as_slice();
+    
+    // First 28 bytes: principal bytes (padded with zeros if needed)
+    let principal_len = principal_bytes.len();
+    subaccount[..principal_len].copy_from_slice(principal_bytes);
+    
+    // Byte 28: length of the principal
+    subaccount[28] = principal_len as u8;
+    
+    // Last 3 bytes: CRC24 checksum of the principal
+    let checksum = calculate_crc24(principal_bytes);
+    subaccount[29] = ((checksum >> 16) & 0xFF) as u8;
+    subaccount[30] = ((checksum >> 8) & 0xFF) as u8;
+    subaccount[31] = (checksum & 0xFF) as u8;
+    
+    subaccount
+}
+
+// CRC24 implementation
+fn calculate_crc24(data: &[u8]) -> u32 {
+    const CRC24_POLY: u32 = 0x1864CFB; // CRC-24 polynomial
+    let mut crc: u32 = 0xB704CE;       // CRC-24 initial value
+    
+    for &byte in data {
+        crc ^= (byte as u32) << 16;
+        for _ in 0..8 {
+            crc <<= 1;
+            if (crc & 0x1000000) != 0 {
+                crc ^= CRC24_POLY;
+            }
+        }
+    }
+    
+    crc & 0xFFFFFF // Return 24 bits only
 }

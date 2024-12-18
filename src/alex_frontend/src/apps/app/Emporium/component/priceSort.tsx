@@ -26,6 +26,9 @@ const PriceSort = () => {
             handleSearchStateChange("");
             setSortOrder("asc"); // Reset sort order when deactivating sort
         }
+        else{
+            handleSearchStateChange(sortOrder);
+        }
     };
 
     const handleSearchStateChange = (value: string) => {
@@ -53,8 +56,8 @@ const PriceSort = () => {
                 disabled={!isSortActive} // Disable Button when sorting is inactive
             >
 
-                {sortOrder === "asc" && <ArrowUpNarrowWide className="h-4 w-4" />}
-                {sortOrder === "desc" && <ArrowDownNarrowWide className="h-4 w-4" />}
+                {sortOrder === "desc" && <ArrowUpNarrowWide className="h-4 w-4" />}
+                {sortOrder === "asc" && <ArrowDownNarrowWide className="h-4 w-4" />}
             </Button>
             </div>
         </div>

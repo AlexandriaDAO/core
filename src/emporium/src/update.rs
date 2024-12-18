@@ -1,4 +1,5 @@
-use crate::not_anon;
+use crate::utils::{verify_lbry_payment, LBRY_CANISTER_ID};
+use crate::{not_anon, principal_to_subaccount};
 use crate::{
     utils::{
         get_principal, is_owner, remove_nft_from_listing, Account, TransferArg, TransferError,
@@ -10,10 +11,10 @@ use crate::{
 use candid::{Nat, Principal};
 use ic_cdk::{api::call::CallResult, caller, update};
 use icrc_ledger_types::icrc1::account::Account as AccountIcrc;
-use icrc_ledger_types::icrc1::transfer::BlockIndex;
 use icrc_ledger_types::icrc2::transfer_from::{
     TransferFromArgs as TransferFromArgsIcrc, TransferFromError as TransferFromErrorIcrc,
 };
+use icrc_ledger_types::icrc1::transfer::{BlockIndex,TransferArg as TransferArgIcrc, TransferError as TransferErrorIcrc};
 
 use ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
 
@@ -30,6 +31,17 @@ pub async fn list_nft(token_id: Nat, icp_amount: u64) -> Result<String, String> 
         Ok(false) => return Err("You can't list this NFT, ownership proof failed!".to_string()),
         Err(_) => return Err("Something went wrong !".to_string()),
     };
+    //Deducting Lbry from subaccount
+    // It's failing we can't deduct from user subaccount in nft_manager
+    // let payment_result = verify_lbry_payment(
+    //     caller(),
+    //     get_principal(LBRY_CANISTER_ID),
+    //     None
+    // ).await?;
+
+    // if !payment_result {
+    //     return Err("Failed to transfer LBRY tokens to ICP_SWAP".to_string());
+    // }
 
     // ic_cdk::println!("Yees you are the owner!!! :D");
     deposit_nft_to_canister(token_id.clone()).await?;
@@ -338,3 +350,4 @@ pub async fn transfer_nft_from_canister(
         }
     }
 }
+

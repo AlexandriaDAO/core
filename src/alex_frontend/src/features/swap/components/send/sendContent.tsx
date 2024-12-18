@@ -159,7 +159,7 @@ const SendContent = () => {
                         >
                             <div className='flex items-center'>
                                 {selectedImage === "" ? <></> : <img className='h-5 w-5 me-3' src={selectedImage} />}
-                                <span className='text-2xl font-medium text-black'>{selectedOption}</span>
+                                <span className='text-xl font-medium text-black'>{selectedOption}</span>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -185,7 +185,7 @@ const SendContent = () => {
                         <strong className='text-2xl font-medium'>Enter the Principal ID</strong>
                     </div>
                     <div className=' border bg-white py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-3 2xl:px-5 xl:px-5 lg:px-4 md:px-3 sm:px-3 rounded-full mb-4' >
-                        <input className='text-multygray  bg-transparent text-2xl font-medium placeholder-multygray  focus:outline-none focus:border-transparent w-full' type='text' onChange={(e) => { handleDestinationPrincipalChange(e) }} value={destinationPrincipal} />
+                        <input className='text-multygray  bg-transparent text-xl font-medium placeholder-multygray  focus:outline-none focus:border-transparent w-full' type='text' onChange={(e) => { handleDestinationPrincipalChange(e) }} value={destinationPrincipal} />
                     </div>
                     <div className='flex items-center mb-4'>
                         <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>3</span>
@@ -195,7 +195,7 @@ const SendContent = () => {
                         <div className='mb-3 w-full'>
                             <div className='flex justify-between mb-3'>
                                 <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>
-                                <input className='text-darkgray text-right bg-transparent text-2xl font-medium placeholder-darkgray  focus:outline-none focus:border-transparent w-full' type='number' onChange={(e) => { handleAmountChange(e) }} value={amount} />
+                                <input className='text-darkgray mr-[-10px] text-right bg-transparent text-2xl font-medium placeholder-darkgray  focus:outline-none focus:border-transparent w-full' type='number' onChange={(e) => { handleAmountChange(e) }} value={amount} />
                             </div>
                             <div className='flex justify-between'>
                                 <div className='flex items-center'>

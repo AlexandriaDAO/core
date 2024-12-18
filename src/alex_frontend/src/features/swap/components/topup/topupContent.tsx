@@ -102,8 +102,8 @@ const TopupContent = () => {
                             <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>1</span>
                             <strong className='text-2xl font-medium'>Enter the amount</strong>
                         </div>
-                        <div className='border bg-white py-3 px-5 rounded-borderbox mb-3'>
-                            <div className='flex justify-between items-center mb-3'>
+                        <div className='border bg-white py-5 px-8 rounded-borderbox mb-3'>
+                            <div className='flex justify-between items-center mb-5'>
                                 <h4 className='text-lg font-medium text-darkgray'>LBRY Spending Wallet Balance</h4>
                                 <span className='text-lg font-medium text-darkgray'>
                                     {swap.loading ? (
@@ -129,7 +129,7 @@ const TopupContent = () => {
                                 <div className='flex justify-between mb-3'>
                                     <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>
                                     <input
-                                        className='text-darkgray text-right bg-transparent text-2xl font-medium placeholder-darkgray focus:outline-none focus:border-transparent w-full'
+                                        className='text-darkgray text-right mr-[-10px] bg-transparent text-2xl font-medium placeholder-darkgray focus:outline-none focus:border-transparent w-full'
                                         type='number'
                                         onChange={handleAmountChange}
                                         value={amount}

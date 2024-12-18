@@ -61,8 +61,8 @@ const RedeemContent: React.FC = () => {
         <div className="me-0 2xl:me-2 xl:me-2 lg:me-2 md:me-0 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-3 sm:mb-3">
           <div className="block 2xl:flex xl:flex lg:flex md:flex sm:block justify-between mb-5 w-full">
             <div className="bg-white border border-gray-400 text-white py-5 px-7 rounded-borderbox me-0 2xl:me-2 xl:me-2 lg:me-2 md:me-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-3">
-              <div className="flex justify-between mb-5	">
-                <h2 className="text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black">
+              <div className="flex justify-between">
+                <h2 className="text-swapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black">
                   Archived ICP {swap.archivedBalance}
                 </h2>
                 <div>

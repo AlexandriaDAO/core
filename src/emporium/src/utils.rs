@@ -1,10 +1,18 @@
 use candid::{CandidType, Nat, Principal};
 use ic_cdk::api::call::CallResult;
+use icrc_ledger_types::icrc1::account::Account as AccountIcrc;
+use icrc_ledger_types::icrc1::transfer::{
+    TransferArg as TransferArgIcrc, TransferError as TransferErrorIcrc,
+};
 use serde::Deserialize;
 
-use crate::LISTING;
+use crate::{principal_to_subaccount, LISTING};
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
 pub const EMPORIUM_CANISTER_ID: &str = "be2us-64aaa-aaaaa-qaabq-cai";
+pub const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
+const LBRY_LIST_COST: u64 = 1;
+const LBRY_E8S: u64 = 100_000_000; // 10^8 for 8 decimal places
+const LBRY_LISTING_COST_E8S: u64 = LBRY_LIST_COST * LBRY_E8S;
 
 #[derive(CandidType, Deserialize, Debug)]
 struct OwnerInfo {
@@ -50,6 +58,43 @@ pub fn remove_nft_from_listing(token_id: Nat) -> Result<String, String> {
 }
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
+}
+
+pub async fn verify_lbry_payment(
+    from: Principal,
+    to: Principal,
+    to_subaccount: Option<Vec<u8>>,
+) -> Result<bool, String> {
+    // Get the user's subaccount for spending from NFT manager
+    let from_subaccount = principal_to_subaccount(from);
+
+    let transfer_arg = TransferArgIcrc {
+        to: AccountIcrc {
+            owner: to,
+            subaccount: to_subaccount.map(|s| s.try_into().unwrap()),
+        },
+        fee: None,
+        memo: None,
+        // Set the from_subaccount to the user's spending account
+        from_subaccount: Some(from_subaccount),
+        created_at_time: None,
+        amount: Nat::from(LBRY_LISTING_COST_E8S),
+    };
+
+    let transfer_result: CallResult<(Result<Nat, TransferErrorIcrc>,)> = ic_cdk::call(
+        get_principal(LBRY_CANISTER_ID),
+        "icrc1_transfer",
+        (transfer_arg,),
+    )
+    .await;
+
+    match transfer_result {
+        Ok((result,)) => match result {
+            Ok(_) => Ok(true),
+            Err(e) => Err(format!("LBRY transfer failed: {:?}", e)),
+        },
+        Err((code, msg)) => Err(format!("Error calling LBRY canister: {:?} - {}", code, msg)),
+    }
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug)]

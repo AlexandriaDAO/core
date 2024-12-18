@@ -41,6 +41,7 @@ const listNft = createAsyncThunk<
         },
       },
     ]);
+    alert(resultApproveIcrc7);
     // const revoke=await actorIcrc7.icrc37_revoke_token_approvals([{
     //   token_id: tokenId,
     //   memo: [],
