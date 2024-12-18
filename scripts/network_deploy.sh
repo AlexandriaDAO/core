@@ -44,6 +44,14 @@ candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tok
 # For vetkd
 cargo build --release --target wasm32-unknown-unknown --package vetkd
 candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
+# for tests
+cargo build --release --target wasm32-unknown-unknown --package tests
+candid-extractor target/wasm32-unknown-unknown/release/tests.wasm > src/tests/tests.did
+# For Emporium
+cargo build --release --target wasm32-unknown-unknown --package emporium
+candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/emporium/emporium.did
+
+
 
 dfx deploy alex_backend --network ic
 dfx deploy user --network ic
@@ -52,6 +60,8 @@ dfx deploy icp_swap --network ic
 dfx deploy system_api --network ic
 dfx deploy tokenomics --network ic
 dfx deploy vetkd --network ic
+dfx deploy tests --network ic
+dfx deploy emporium --network ic
 
 # The one azle canister:
 dfx deploy alex_wallet --network ic

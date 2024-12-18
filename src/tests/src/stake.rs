@@ -22,7 +22,7 @@ pub async fn stake(amount: u64, balance_name: String) -> Result<String, String> 
             owner: swap_canister_id,
             subaccount: None,
         },
-        amount: Nat::from(LARGE_ALLOWANCE), // Use large allowance instead of exact amount
+        amount: Nat::from(LARGE_ALLOWANCE),
         fee: Some(Nat::from(ALEX_FEE)),
         memo: None,
         from_subaccount: Some(from_subaccount),
@@ -31,7 +31,7 @@ pub async fn stake(amount: u64, balance_name: String) -> Result<String, String> 
         expires_at: None,
     };
 
-    // Call approve on ALEX ledger
+    // Call approve on ALEX ledger with detailed error logging
     let approve_result: Result<(Result<Nat, ApproveError>,), _> = ic_cdk::call(
         crate::alex_principal(),
         "icrc2_approve",
@@ -39,8 +39,10 @@ pub async fn stake(amount: u64, balance_name: String) -> Result<String, String> 
     ).await;
 
     match approve_result {
-        Ok((Ok(_),)) => {
-            // Call stake function on swap canister with amount_e8s instead of amount
+        Ok((Ok(allowance),)) => {
+            println!("✅ Approval successful. Allowance: {}", allowance);
+            
+            // Call stake function on swap canister with amount_e8s
             let stake_result: Result<(Result<String, String>,), _> = ic_cdk::call(
                 swap_canister_id,
                 "stake_ALEX",
@@ -48,13 +50,28 @@ pub async fn stake(amount: u64, balance_name: String) -> Result<String, String> 
             ).await;
 
             match stake_result {
-                Ok((Ok(message),)) => Ok(message),
-                Ok((Err(e),)) => Err(format!("Stake error: {}", e)),
-                Err(e) => Err(format!("Stake call failed: {:?}", e)),
+                Ok((Ok(message),)) => {
+                    println!("✅ Stake operation completed successfully");
+                    Ok(message)
+                },
+                Ok((Err(e),)) => {
+                    println!("❌ Stake operation failed after approval: {}", e);
+                    Err(format!("Stake error after successful approval: {}", e))
+                },
+                Err(e) => {
+                    println!("❌ Stake call failed after approval: {:?}", e);
+                    Err(format!("Stake call failed after successful approval: {:?}", e))
+                },
             }
         },
-        Ok((Err(e),)) => Err(format!("Approval failed: {:?}", e)),
-        Err(e) => Err(format!("Approval call failed: {:?}", e)),
+        Ok((Err(e),)) => {
+            println!("❌ ALEX approval failed: {:?}", e);
+            Err(format!("Approval failed: {:?}", e))
+        },
+        Err(e) => {
+            println!("❌ ALEX approval call failed: {:?}", e);
+            Err(format!("Approval call failed: {:?}", e))
+        },
     }
 }
 

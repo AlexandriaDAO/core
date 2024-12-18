@@ -3,11 +3,13 @@ use std::time::Duration;
 use ic_cdk::spawn;
 use ic_cdk::api::management_canister::main::raw_rand;
 use ic_cdk::println;
+use ic_cdk::call;
+use candid::Principal;
 
-use crate::{check_balances, swap, burn, stake, unstake, claim_icp_reward};
+use crate::{check_balances, swap, stake, claim_icp_reward};
 
 // Constants for timer intervals
-pub const AUTOMATED_TEST_INTERVAL: Duration = Duration::from_secs(10);
+pub const AUTOMATED_TEST_INTERVAL: Duration = Duration::from_secs(30); // Increased interval
 
 async fn get_random_number() -> u8 {
     let result = raw_rand().await.expect("Failed to get randomness");
@@ -19,9 +21,24 @@ pub async fn random_action(percentage_chance: u8) -> bool {
     random_number < percentage_chance
 }
 
+#[derive(Debug, candid::CandidType, candid::Deserialize)]
+struct StakeInfo {
+    time: u64,
+    reward_icp: u64,
+    amount: u64,
+}
+
+async fn get_all_stakes() -> Vec<(Principal, StakeInfo)> {
+    match call(Principal::from_text("CANISTER_ID_HERE").unwrap(), "get_all_stakes", ()).await {
+        Ok((stakes,)) => stakes,
+        Err(e) => {
+            println!("❌ Failed to get stakes: {:?}", e);
+            vec![]
+        }
+    }
+}
+
 pub fn setup_automated_testing() {
-    println!("🤖 Setting up automated testing...");
-    
     let _timer_id = set_timer_interval(AUTOMATED_TEST_INTERVAL, || {
         println!("⏰ Timer triggered");
         let root_account = "root".to_string();
@@ -34,59 +51,41 @@ pub fn setup_automated_testing() {
                 println!("💰 Current balances - ICP: {}, LBRY: {}, ALEX: {}", 
                     balance.icp, balance.lbry, balance.alex);
 
-                // ICP Swap check
-                if balance.icp > 1.0 {
-                    if random_action(50).await {
-                        let amount = balance.icp.floor() as u64;
-                        println!("💱 Attempting to swap {} ICP", amount);
-                        match swap(amount, root_account.clone()).await {
-                            Ok(_) => println!("✅ Successfully swapped {} ICP", amount),
-                            Err(e) => println!("❌ Failed to swap ICP: {:?}", e),
-                        }
-                    }
-                }
-
-                // LBRY Burn check
-                if balance.lbry > 10.0 {
-                    if random_action(50).await {
-                        let amount = (balance.lbry - 0.04).floor() as u64;
-                        println!("🔥 Attempting to burn {} LBRY", amount);
-                        match burn(amount, root_account.clone()).await {
-                            Ok(_) => println!("✅ Successfully burned {} LBRY", amount),
-                            Err(e) => println!("❌ Failed to burn LBRY: {:?}", e),
-                        }
-                    }
-                }
-
                 // ALEX Stake check
                 if balance.alex > 1.0 {
                     let amount = balance.alex.floor() as u64;
                     println!("🔒 Attempting to stake {} ALEX", amount);
                     match stake(amount, root_account.clone()).await {
-                        Ok(_) => println!("✅ Successfully staked {} ALEX", amount),
+                        Ok(_) => {
+                            println!("✅ Successfully staked {} ALEX", amount);
+                            // Check stakes after staking
+                            let stakes = get_all_stakes().await;
+                            println!("📊 Current stakes: {:?}", stakes);
+                        },
                         Err(e) => println!("❌ Failed to stake ALEX: {:?}", e),
+                    }
+                }
+
+                // ICP Swap check with reduced frequency
+                if balance.icp > 1.0 && random_action(25).await {
+                    let amount = balance.icp.floor() as u64;
+                    println!("💱 Attempting to swap {} ICP", amount);
+                    match swap(amount, root_account.clone()).await {
+                        Ok(_) => println!("✅ Successfully swapped {} ICP", amount),
+                        Err(e) => println!("❌ Failed to swap ICP: {:?}", e),
+                    }
+                }
+
+                // Claim ICP reward with reduced frequency
+                if random_action(15).await {
+                    println!("🎁 Attempting to claim ICP reward");
+                    match claim_icp_reward(root_account.clone()).await {
+                        Ok(_) => println!("✅ Successfully claimed ICP reward"),
+                        Err(e) => println!("❌ Failed to claim ICP reward: {:?}", e),
                     }
                 }
             } else {
                 println!("⚠️ No balance information found for account: {}", root_account);
-            }
-
-            // Random unstake check
-            if random_action(10).await {
-                println!("🔓 Attempting to unstake ALEX");
-                match unstake(root_account.clone()).await {
-                    Ok(_) => println!("✅ Successfully unstaked ALEX"),
-                    Err(e) => println!("❌ Failed to unstake ALEX: {:?}", e),
-                }
-            }
-
-            // Random claim ICP reward check
-            if random_action(35).await {
-                println!("🎁 Attempting to claim ICP reward");
-                match claim_icp_reward(root_account.clone()).await {
-                    Ok(_) => println!("✅ Successfully claimed ICP reward"),
-                    Err(e) => println!("❌ Failed to claim ICP reward: {:?}", e),
-                }
             }
         });
     });
