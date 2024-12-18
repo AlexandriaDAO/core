@@ -89,11 +89,14 @@ import { AssetType } from "@/features/upload/uploadSlice";
 
 import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
 
-const APP_ID = process.env.DFX_NETWORK === "ic" ? process.env.REACT_MAINNET_APP_ID : process.env.REACT_LOCAL_APP_ID;
-const network = process.env.DFX_NETWORK === "ic" ? 'mainnet':'devnet'
+const isLocal = process.env.DFX_NETWORK !== "ic"
+
+const APP_ID = isLocal ? process.env.REACT_LOCAL_APP_ID : process.env.REACT_MAINNET_APP_ID;
+
+const uri = isLocal ? `https://arweave.devnet.irys.xyz/graphql` : `https://arweave.net/graphql`;
 
 const client = new ApolloClient({
-    uri: `https://arweave.${network}.irys.xyz/graphql`,
+    uri,
     cache: new InMemoryCache()
 });
 
@@ -111,7 +114,7 @@ export const fetchAssets = async ({after = '', limit = 10, owner = '', type = un
             query {
                 transactions(
                     first: ${limit},
-                    order: DESC,
+                    ${isLocal ? 'order: DESC':'sort: HEIGHT_DESC'}
                     after: "${after}",
                     tags: [
                         { name: "Content-Type", values: ["application/x.arweave-manifest+json"] },
