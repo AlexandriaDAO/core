@@ -4,6 +4,8 @@ use icrc_ledger_types::icrc1::account::Account;
 use candid::Nat;
 use crate::utils::{get_test_subaccount, E8S_PER_ALEX, ALEX_FEE};
 
+const LARGE_ALLOWANCE: u64 = 1_000_000_000 * E8S_PER_ALEX; // 1 billion ALEX worth of allowance
+
 #[update]
 pub async fn stake(amount: u64, balance_name: String) -> Result<String, String> {
     let swap_canister_id = crate::icp_swap_principal();
@@ -14,13 +16,13 @@ pub async fn stake(amount: u64, balance_name: String) -> Result<String, String> 
 
     let amount_e8s = amount * E8S_PER_ALEX;
 
-    // Approve ALEX transfer
+    // Approve ALEX transfer with a large allowance
     let approve_args = ApproveArgs {
         spender: Account {
             owner: swap_canister_id,
             subaccount: None,
         },
-        amount: Nat::from(amount_e8s + ALEX_FEE),
+        amount: Nat::from(LARGE_ALLOWANCE), // Use large allowance instead of exact amount
         fee: Some(Nat::from(ALEX_FEE)),
         memo: None,
         from_subaccount: Some(from_subaccount),

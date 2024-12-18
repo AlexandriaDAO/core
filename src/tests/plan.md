@@ -5,19 +5,10 @@ The Plan:
 
 
 
-- We need a stop button for the loading state for when it gets stuck.
-- Then make the existing arweave data look nice.
-
-
-
-
-
-- Start displaying the wallets of each NFT, and add a claim button.
-- Start to look for bugs, exploits, possiblity of losing funds.
 
 
 Minor stuff to do:
-- Make exploring an owner easier.
+
 - Need to add a minting check in rust that the NFT created is a real arweave id.
 - Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
