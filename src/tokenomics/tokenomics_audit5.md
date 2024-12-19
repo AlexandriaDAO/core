@@ -33,3 +33,58 @@ This means if minting fails for random users, the LBRY is still burned but not a
 
 - Everything is by principal, not account, so I have to add subaccount to everything.
 - Mint failure does not rollback the LBRY burn.
+
+
+
+
+
+
+
+Mainnet test resutlts: 
+
+
+
+Mainnet accuracy testing: /
+
+LBRY Burned: 674_288
+Burned 36,284.
+LBRY Burned: 710,572 
+Buring: 160715
+LBRY Burned: 871_287 
+...
+Burned: 87278
+Total burned: 958_565 
+Burned: 41435
+Total burned: 1_000_000
+Burned: 100_000
+Total burned: 1_100_000
+Burned: 150_000
+Total burned: 1_250_000
+Burned: 75_000
+Total burned: 1_325_000
+Burned 18987
+Total burned: 1_343_987
+Burned 10
+Total burned: 1_343_997
+The goal is to get to 1_344_000, the next threshold.
+
+
+So at 1_343_997 LBRY Burned, the current threshold is 1_344_000, the supply is 1_259_894.18930 ALEX, and the current mint rate is 781.
+
+
+At 1_343_999 LBRY Burned, the current threshold is 1_344_000, the supply is 1_259_895.79 ALEX, and the current mint rate is 781.
+
+At 1_344_000 LBRY Burned, the current threshold is 1_344_000, the supply is 1_259_894.89 ALEX, and the current mint rate is 781.
+
+
+1,260,000.00 ( so presumably we lost 105ish ALEX in transaction fees. )
+
+
+1_344_001
+
+100 / 0.0001 = 1000000
+
+
+
+
+

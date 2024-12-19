@@ -5,7 +5,7 @@ use icrc_ledger_types::icrc1::transfer::{TransferArg, TransferError};
 
 use crate::guard::not_anon;
 use crate::id_converter::*;
-use crate::{icrc7_principal, icrc7_scion_principal, icp_swap_principal, nft_manager_principal, lbry_principal};
+use crate::{icrc7_principal, icrc7_scion_principal, nft_manager_principal, lbry_principal};
 use crate::action_fees::{burn_mint_fee, LBRY_MINT_COST_E8S};
 
 pub type MintResult = Result<String, String>;
@@ -16,6 +16,11 @@ pub async fn coordinate_mint(
     owner_principal: Option<Principal>,
 ) -> MintResult {
     let caller = ic_cdk::caller();
+    
+    if !is_arweave_id(arweave_id.clone()) {
+        return Err("Invalid arweave ID".to_string());
+    }
+
     let minting_number = arweave_id_to_nat(arweave_id);
 
     // Check ownership and early returns for invalid states
@@ -33,17 +38,15 @@ pub async fn coordinate_mint(
 
     // Handle minting scenarios with pattern matching
     match (og_owner, scion_owner, owner_principal) {
-        // Mint from existing scion
+        // Mint from existing scion - must have matching owner_principal
         (_, Some(owner), Some(principal)) if owner == principal => {
             mint_scion_from_scion(minting_number, caller, owner).await
         },
-        // Mint original (no existing NFTs)
+        // Mint original - no existing NFTs
         (None, None, _) => mint_original(minting_number, caller).await,
         // Mint scion from original
         (Some(_), None, _) => mint_scion_from_original(minting_number, caller).await,
-        // Error states
-        (Some(_), Some(_), _) => Err("Both original and scion NFTs already exist".to_string()),
-        (None, Some(_), _) => Err("Invalid state: Scion exists without original".to_string()),
+        // Any other case is invalid
         _ => Err("Invalid minting scenario".to_string()),
     }
 }
