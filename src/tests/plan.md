@@ -7,19 +7,13 @@ The tests canister can't mint NFTs because it cant make a topup account? That'd 
 
 
 
-These are all the functions that take text (so arweave ids.)
-
-  arweave_id_to_nat : (text) -> (nat) query; (used once in coordinate_mint)
-  coordinate_mint : (text, opt principal) -> (Result);
-
-
 Minor stuff to do:
 
-- Bug where the date and time moves backward by a day, (and the time is broken after using the default search).
-- Get thumbnails to show on video, and only load the first frame.
-- There's a bug where ebook searching gets the search button stuck in the loading state.
-- Make the open view scrollable for long images.
+
+
 - A show more button, perhaps?
+
+
 
 Alexandrian: 
 - Rank by token amounts.
@@ -28,16 +22,15 @@ Alexandrian:
 
 
 Bigger ones: 
-- Disable transfers and other irrelivant functions for scion NFTs.
-- Review tokenomics emissions schedule. Could it be better?
-  - I actually reserve that it's already pretty good, but we just need to put a max alex mint per call at 5 ALEX. So the cap is basically 1 LBRY per call in the beginning.
+- Enable icrc37 transfers to ICRC7 with emporium guard on approvals()
+- 5 ALEX mint cap per call. So the cap is basically 1 LBRY per call in the beginning.
 
 
 
 
 
 
-### Using the Tests Canister for Mining
+### Test Canister Stuff
 
 Now that that's done we need to figure out how to replicate this for the more generic user that can freely call the functions from only this canister.
 - Also what are we going to do about NFTs?
@@ -54,19 +47,7 @@ Wait. Maybe we have channels be these canisters?
 
 
 
-
-
-
-
-
-
-
-
-
-
 ### Adding channels/blocks/collections to sort NFTs.
-
-
 
 Metrics: 
 9.97T Cycles in ICP Swap at 830 am, and it's dispersing once per minute.
@@ -80,6 +61,7 @@ NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
+
 MintNFT function:
 
 
@@ -92,4 +74,10 @@ I think it'll be totally free to add nfts, but you can only add them if you own 
 
 
 
+
+
+Low Priority: 
+
+- Get thumbnails to show on video, and only load the first frame.
+- There's a bug where ebook searching gets the search button stuck in the loading state.
 

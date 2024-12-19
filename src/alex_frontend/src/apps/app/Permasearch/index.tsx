@@ -3,6 +3,7 @@ import { SearchContainer } from '@/apps/Modules/shared/components/SearchContaine
 import SearchForm from '@/apps/Modules/AppModules/search/SearchForm';
 import ArweaveOwnerSelector from '@/apps/Modules/AppModules/search/selectors/ArweaveOwnerSelector';
 import { useHandleSearch } from '@/apps/Modules/AppModules/search/hooks/useSearchHandlers';
+import { toast } from 'sonner';
 
 function Permasearch() {
 	const { isLoading, handleSearch } = useHandleSearch();
@@ -12,7 +13,9 @@ function Permasearch() {
 			title="Permasearch"
 			description="Search for any asset on Arweave."
 			hint="Save them as NFTs."
-			onSearch={handleSearch}
+			onSearch={() => handleSearch().catch(error => {
+				toast.error(error.message || "An error occurred while searching");
+			})}
 			isLoading={isLoading}
 			topComponent={<ArweaveOwnerSelector />}
 			filterComponent={<SearchForm />}

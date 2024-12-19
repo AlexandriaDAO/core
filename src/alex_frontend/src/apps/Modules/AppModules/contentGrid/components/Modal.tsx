@@ -14,7 +14,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-      <Card className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-background">
+      <Card className="relative w-full max-w-4xl max-h-[90vh] bg-background">
         <Button
           variant="ghost"
           className="absolute right-4 top-4 z-[60] rounded-full hover:bg-gray-100"
@@ -22,7 +22,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
         >
           <X className="h-6 w-6" />
         </Button>
-        <CardContent className="p-6">
+        <CardContent className="p-6 overflow-y-auto max-h-[90vh]">
           {children}
         </CardContent>
       </Card>

@@ -40,8 +40,13 @@ export function SearchContainer({
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handleSearchClick = async () => {
-    await dispatch(wipe());
-    onSearch();
+    try {
+      await dispatch(wipe());
+      await new Promise(resolve => setTimeout(resolve, 50));
+      await onSearch();
+    } catch (error) {
+      console.error('Search error:', error);
+    }
   };
 
   useEffect(() => {
