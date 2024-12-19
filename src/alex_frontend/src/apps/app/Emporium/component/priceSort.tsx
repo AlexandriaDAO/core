@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowDownNarrowWide, ArrowUpNarrowWide, Filter } from "lucide-react";
+import { ArrowDownNarrowWide, ArrowDownWideNarrow } from "lucide-react";
 import { Button } from '@/lib/components/button';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
@@ -26,39 +26,39 @@ const PriceSort = () => {
             handleSearchStateChange("");
             setSortOrder("asc"); // Reset sort order when deactivating sort
         }
-        else{
+        else {
             handleSearchStateChange(sortOrder);
         }
     };
 
     const handleSearchStateChange = (value: string) => {
-         dispatch(setSearchEmporium({ ...search, sort: value }));
+        dispatch(setSearchEmporium({ ...search, sort: value }));
     }
     return (
         <div className="price-sort">
-                <span className="label mb-3 block">Price Sort</span>
-                <div className='flex gap-1'>
-            <div className="toggle-container">
+            <span className="label mb-3 block">Price Sort</span>
+            <div className='flex gap-1'>
+                <div className="toggle-container">
+                    <Button
+                        className={`toggle-Button  rounded-xl${isSortActive ? "active" : ""}`}
+                        onClick={toggleSortActivation}
+                        aria-label="Activate or deactivate sorting"
+                    >
+                        {isSortActive ? "Active" : "Inactive"}
+                    </Button>
+
+                </div>
+
                 <Button
-                    className={`toggle-Button  rounded-xl${isSortActive ? "active" : ""}`}
-                    onClick={toggleSortActivation}
-                    aria-label="Activate or deactivate sorting"
+                    className={`sort-Button rounded-xl ${isSortActive ? "" : "disabled"}`}
+                    onClick={toggleSortOrder}
+                    aria-label="Sort by price"
+                    disabled={!isSortActive} // Disable Button when sorting is inactive
                 >
-                    {isSortActive ? "Active" : "Inactive"}
+
+                    {sortOrder === "desc" && <ArrowDownWideNarrow  className="h-4 w-4" />}
+                    {sortOrder === "asc" && <ArrowDownNarrowWide className="h-4 w-4" />}
                 </Button>
-                
-            </div>
-
-            <Button
-                className={`sort-Button rounded-xl ${isSortActive ? "" : "disabled"}`}
-                onClick={toggleSortOrder}
-                aria-label="Sort by price"
-                disabled={!isSortActive} // Disable Button when sorting is inactive
-            >
-
-                {sortOrder === "desc" && <ArrowUpNarrowWide className="h-4 w-4" />}
-                {sortOrder === "asc" && <ArrowDownNarrowWide className="h-4 w-4" />}
-            </Button>
             </div>
         </div>
     )

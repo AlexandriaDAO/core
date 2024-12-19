@@ -176,6 +176,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
                         Cancel
                     </Button>
                 </div>
+                2 LBRY fee will be charged from spending wallet
             </div>
         </div>
     );

@@ -6,7 +6,6 @@ import getMarketListing from "./thunks/getMarketListing";
 import buyNft from "./thunks/buyNft";
 import removeListedNft from "./thunks/removeListedNft";
 import editListing from "./thunks/editListing";
-import getUserListing from "./thunks/geUserListing";
 
 export interface EmporiumState {
   loading: boolean;
@@ -88,30 +87,22 @@ const emporiumSlice = createSlice({
         toast.error(action.payload);
         state.error = action.payload as string;
       })
-      .addCase(getUserListing.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(getUserListing.fulfilled, (state, action) => {
-        state.loading = false;
-        state.totalPages = Number(action.payload.totalPages);
-        state.pageSize = Number(action.payload.pageSize);
-        state.marketPlace = action.payload.nfts; // Assign the object directly
-        if (Number(action.payload.totalPages) === 0) {
-          toast.warning("No NFTs listed!");
-        }
-      })
-      .addCase(getUserListing.rejected, (state, action) => {
-        state.loading = false;
-        toast.error(action.payload);
-        state.error = action.payload as string;
-      })
       .addCase(editListing.pending, (state) => {
         state.loading = true;
       })
       .addCase(editListing.fulfilled, (state, action) => {
         state.loading = false;
         state.editListingSuccess = true;
-        toast.success("updated!");
+      
+        const { nftArweaveId, price } = action.payload;
+      
+        if (state.marketPlace[nftArweaveId]) {
+          // Update the price in the marketplace
+          state.marketPlace[nftArweaveId].price = price;
+          toast.success("Price updated!");
+        } else {
+          toast.error("Listing not found!");
+        }
       })
       .addCase(editListing.rejected, (state, action) => {
         state.loading = false;

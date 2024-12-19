@@ -47,8 +47,7 @@ shared (_init_msg) actor class Example(
   type ApproveTokenArg = ICRC37.Service.ApproveTokenArg;
   type ApproveTokenResult = ICRC37.Service.ApproveTokenResult;
   type RevokeTokenApprovalArg = ICRC37.Service.RevokeTokenApprovalArg;
-  type RevokeTokenApprovalResult =             ICRC37.Service.RevokeTokenApprovalResult;
-
+  type RevokeTokenApprovalResult = ICRC37.Service.RevokeTokenApprovalResult;
 
   stable var init_msg = _init_msg; //preserves original initialization;
 
@@ -443,6 +442,16 @@ shared (_init_msg) actor class Example(
   //In progress
   public shared (msg) func icrc37_approve_tokens(args : [ApproveTokenArg]) : async [?ApproveTokenResult] {
 
+    let EMPORIUM_PRINCIPAL =Principal.fromText("zdcg2-dqaaa-aaaap-qpnha-cai");
+
+    // Check if all approval requests are for the emporium canister
+    for (arg in args.vals()) {
+      if (arg.approval_info.spender.owner != EMPORIUM_PRINCIPAL) {
+        D.trap("Approval only allowed for emporium canister");
+      };
+    };
+
+    // If all checks pass, proceed with approval
     switch (icrc37().approve_transfers<system>(msg.caller, args)) {
       case (#ok(val)) val;
       case (#err(err)) D.trap(err);
@@ -452,8 +461,8 @@ shared (_init_msg) actor class Example(
     icrc37().transfer_from(msg.caller, args);
   };
 
-    public shared(msg) func icrc37_revoke_token_approvals<system>(args: [RevokeTokenApprovalArg]) : async [?RevokeTokenApprovalResult] {
-      icrc37().revoke_token_approvals(msg.caller, args);
+  public shared (msg) func icrc37_revoke_token_approvals<system>(args : [RevokeTokenApprovalArg]) : async [?RevokeTokenApprovalResult] {
+    icrc37().revoke_token_approvals(msg.caller, args);
   };
 
 };

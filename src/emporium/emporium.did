@@ -27,6 +27,7 @@ service : {
       text,
     ) -> (Listing) query;
   list_nft : (nat, nat64) -> (Result);
+  principal_to_subaccount : (principal) -> (blob) query;
   remove_nft_listing : (nat) -> (Result);
   update_nft_price : (nat, nat64) -> (Result);
 }

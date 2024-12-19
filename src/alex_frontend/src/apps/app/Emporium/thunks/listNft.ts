@@ -41,14 +41,6 @@ const listNft = createAsyncThunk<
         },
       },
     ]);
-    alert(resultApproveIcrc7);
-    // const revoke=await actorIcrc7.icrc37_revoke_token_approvals([{
-    //   token_id: tokenId,
-    //   memo: [],
-    //   from_subaccount: [],
-    //   created_at_time: [],
-    //   spender: []
-    // }])
 
     const result = await actorEmporium.list_nft(tokenId, priceFormat);
 
@@ -56,12 +48,23 @@ const listNft = createAsyncThunk<
     if ("Ok" in result) {
       return "success";
     } else if ("Err" in result) {
+      const revoke = await actorIcrc7.icrc37_revoke_token_approvals([
+        {
+          token_id: tokenId,
+          memo: [],
+          from_subaccount: [],
+          created_at_time: [],
+          spender: [],
+        },
+      ]);
       return rejectWithValue(result?.Err); // Use rejectWithValue directly
     }
   } catch (error) {
     console.error("Error listing NFT:", error);
+
     return rejectWithValue("An error occurred while listing the NFT." + error);
   }
+  // Fallback for unknown issues
   return rejectWithValue(
     "An unknown error occurred while listing the NFT. Please try again."
   );

@@ -14,7 +14,6 @@ import {
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketListing from "./thunks/getMarketListing";
-import getUserListing from "./thunks/geUserListing";
 import { flagHandlerEmporium } from "./emporiumSlice";
 import ContentListEmporium from "./contentListEmporium";
 import { Button } from "@/lib/components/button";
@@ -32,6 +31,7 @@ const Emporium = () => {
     const [type, setType] = useState("");
     const [activeButton, setActiveButton] = useState(""); // Track active button
     const [currentPage, setCurrentPage] = useState(1);
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
     const fetchUserNfts = () => {
         if (user) {
@@ -39,19 +39,57 @@ const Emporium = () => {
             setActiveButton("userNfts");
             setType("userNfts");
         }
-
     };
     const fetchMarketListings = () => {
+        if (activeButton === "userNfts") {
+            dispatch(setTransactions([]));
+        }
         setActiveButton("marketPlace");
         setType("marketPlace");
-        // dispatch(getMarketListing(1));
-        // setCurrentPage(0);
+    };
+    const toggleFilters = () => {
+        setIsFiltersOpen(!isFiltersOpen);
     };
     const fetchUserListings = () => {
+        if (activeButton === "userNfts") {
+            dispatch(setTransactions([]));
+        }
         setActiveButton("userListings");
         setType("marketPlace");
-        //dispatch(getUserListing(1));
-        //setCurrentPage(0);
+
+    };
+    const handleSearchClick = async () => {
+        let type = emporium.search.type;
+        if (!user) {
+            dispatch(getMarketListing({
+                page: 1,
+                searchStr: emporium.search.search,
+                pageSize: emporium.search.pageSize.toString(),
+                sort: emporium.search.sort,
+                type,
+                userPrincipal: ""
+            }));  // 
+            setCurrentPage(0);
+            return;
+        }
+
+        if (activeButton === "userListings") {
+            type = "userListings";
+        }
+        else { //default case 
+            setActiveButton("marketPlace");
+            setType("marketPlace");
+        }
+        dispatch(getMarketListing({
+            page: 1,
+            searchStr: emporium.search.search,
+            pageSize: emporium.search.pageSize.toString(),
+            sort: emporium.search.sort,
+            type,
+            userPrincipal: user?.principal
+        }));  // 
+        setCurrentPage(0);
+
     };
     const handlePageClick = ({ selected }: { selected: number }) => {
         if (activeButton === "marketPlace") {
@@ -78,65 +116,37 @@ const Emporium = () => {
                 type: "userListings",
                 userPrincipal: user?.principal
             }));
-            // dispatch(getUserListing(selected + 1));
         }
     };
 
 
-    useEffect(() => {
-        if (emporium.depositNftSuccess === true) {
-            dispatch(flagHandlerEmporium());
-            fetchUserNfts();
-        } else if (
-            emporium.buyNftSuccess === true ||
-            emporium.removeListingSuccess === true
-        ) {
-            dispatch(flagHandlerEmporium());
-            fetchMarketListings();
-        }
-        else if (emporium.editListingSuccess === true
-        ) {
-            dispatch(flagHandlerEmporium());
-            fetchUserListings();
-            setActiveButton("userListings");
+    // useEffect(() => {
+    //     if (emporium.depositNftSuccess === true) {
+    //         dispatch(flagHandlerEmporium());
+    //         fetchUserNfts();
+    //     } else if (
+    //         emporium.buyNftSuccess === true ||
+    //         emporium.removeListingSuccess === true
+    //     ) {
+    //         dispatch(flagHandlerEmporium());
+    //         fetchMarketListings();
+     
+    //     }
+    //     else if (emporium.editListingSuccess === true
+    //     ) {
+    //         dispatch(flagHandlerEmporium());
+    //         fetchUserListings();
+    //         setActiveButton("userListings");
 
-        }
-    }, [emporium]);
+    //     }
+    // }, [emporium]);
 
     useEffect(() => {
         dispatch(setTransactions([]));
     }, []);
 
 
-    //
-    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-    const handleSearchClick = async () => {
-        if (!user)
-            return;
-        let type = emporium.search.type;
-        if (activeButton === "userListings") {
-            type = "userListings";
-        }
-        else { //default case 
-            setActiveButton("marketPlace");
-            setType("marketPlace");
-        }
-        dispatch(getMarketListing({
-            page: 1,
-            searchStr: emporium.search.search,
-            pageSize: emporium.search.pageSize.toString(),
-            sort: emporium.search.sort,
-            type,
-            userPrincipal: user?.principal
-        }));  // 
-        setCurrentPage(0);
-
-    };
-
-    const toggleFilters = () => {
-        setIsFiltersOpen(!isFiltersOpen);
-    };
 
     return (
         <>
