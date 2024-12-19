@@ -28,7 +28,7 @@ const RiskWarningModal: React.FC<RiskWarningModalProps> = ({ onClose, open }) =>
             <ScrollArea className={`${showDetails ? 'h-[60vh]' : 'h-auto max-h-[30vh]'} pr-4 transition-all duration-300`}>
               <div className="space-y-4">
                 <div className="font-medium">
-                  <p>IMPORTANT: This project is in pre-alpha. The code is not audited and we make no security guarantees for any assets on this site.</p>
+                  <p>IMPORTANT: This site is only for testing right now. We are not in pre-alpha yet. All tokens balances will be wiped! The code is not audited and we make no security guarantees for any assets on this site.</p>
                   <p className="mt-2">⚠️ WARNING: It is not recommended to store large amounts of ICP or trade native tokens (ALEX/LBRY) outside of lbry.app, as they may be lost at this stage.</p>
                   <p className="mt-2">All our code is <a href="https://github.com/AlexandriaDAO/core" className="text-blue-500 hover:underline">open-source</a> and is currently maintained by a small self-funded team. The codebase is rapidly evolving and everything is subject to change.</p>
                 </div>

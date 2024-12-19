@@ -46,7 +46,6 @@ const getUserIcrc7Tokens = createAsyncThunk<
         const fetchedTransactions = await fetchTransactionsApi({
           nftIds: arweaveIds,
         });
-        console.log("Fetched transactions:", fetchedTransactions);
         dispatch(setTransactions(fetchedTransactions));
         await dispatch(loadContentForTransactions(fetchedTransactions));
       }

@@ -33,8 +33,6 @@ export const performSearch = createAsyncThunk(
         ownerFilter: searchState.ownerFilter || undefined,
       });
 
-      console.log("Fetched transactions:", fetchedTransactions);
-
       dispatch(setTransactions(fetchedTransactions));
       
       // Set initial mintable state for new transactions

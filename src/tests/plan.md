@@ -2,22 +2,31 @@
 The Plan:
 
 
+Psuedocode for Adil's function in NFT Manager: 
+function deduct_marketplace_fee(actual_caller: Principal, fee_amount: nat):
+// Ensure only the "emporium" can call this function
+
+// Retrieve the subaccount associated with the actual caller
+subaccount = get_subaccount_for_principal(actual_caller)
+
+// Call the ICRC1 transfer function to deduct the fee
+transfer_result = icrc1_transfer(
+from_subaccount=subaccount,
+to_subaccount=MARKETPLACE_ACCOUNT or icp_swap canister id(incase of burn),
+amount=fee_amount
+)
+
+// Handle transfer result
+if transfer_result != SUCCESS:
+throw TransferError("Fee deduction failed. Error code: " + transfer_result)
+
+return "Marketplace fee successfully deducted."
 
 
-
-- We need a stop button for the loading state for when it gets stuck.
-- Then make the existing arweave data look nice.
-
-
-
-
-
-- Start displaying the wallets of each NFT, and add a claim button.
-- Start to look for bugs, exploits, possiblity of losing funds.
 
 
 Minor stuff to do:
-- Make exploring an owner easier.
+
 - Need to add a minting check in rust that the NFT created is a real arweave id.
 - Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.

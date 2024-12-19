@@ -14,7 +14,7 @@ import {
   Description,
   Hint,
 } from "../../../app/Permasearch/styles";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, LoaderPinwheel } from "lucide-react";
 
 interface SearchContainerProps {
   title: string;
@@ -95,7 +95,7 @@ export function SearchContainer({
             onClick={handleSearchClick}
             disabled={isLoading}
           >
-            {isLoading ? 'Loading...' : 'Search'}
+            {isLoading ? <LoaderPinwheel className="animate-spin" /> : 'Search'}
           </SearchButton>
         </ControlsContainer>
         {filterComponent && (
