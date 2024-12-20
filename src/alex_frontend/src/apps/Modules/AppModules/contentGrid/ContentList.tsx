@@ -134,7 +134,11 @@ const ContentList = () => {
               {transaction.block && (
                 <div className="flex justify-between">
                   <span className="text-gray-400">Date</span>
-                  <span>{new Date(transaction.block.timestamp * 1000).toLocaleString()}</span>
+                  <span>
+                    {new Date(transaction.block.timestamp * 1000).toLocaleString('en-US', {
+                      timeZone: 'UTC'
+                    })} UTC
+                  </span>
                 </div>
               )}
             </div>
@@ -178,12 +182,12 @@ const ContentList = () => {
           
           const nftId = arweaveToNftId[transaction.id];
           const nftData = nftId ? nfts[nftId] : undefined;
-          const isOwned = nftData?.principal === user?.principal;
+          const isOwned = user && nftData?.principal === user.principal;
           
           const hasPredictions = !!predictions[transaction.id];
           const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 
-          const hasWithdrawableBalance = nftData && (
+          const hasWithdrawableBalance = isOwned && nftData && (
             parseFloat(nftData.alex || '0') > 0 || 
             parseFloat(nftData.lbry || '0') > 0
           );
@@ -199,7 +203,7 @@ const ContentList = () => {
                 setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
               }}
               isMintable={isMintable}
-              isOwned={isOwned}
+              isOwned={isOwned || false}
               onMint={(e) => {
                 e.stopPropagation();
                 handleMint(transaction.id);

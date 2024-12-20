@@ -26,6 +26,25 @@ pub fn nat_to_arweave_id(num: Nat) -> String {
     id.replace('+', "-").replace('/', "_").trim_end_matches('=').to_string()
 }
 
+#[query]
+pub fn is_arweave_id(id: String) -> bool {
+    // Check length
+    if id.len() != 43 {
+        return false;
+    }
+
+    // Check characters
+    id.chars().all(|c| {
+        matches!(c,
+            'A'..='Z' |
+            'a'..='z' |
+            '0'..='9' |
+            '-' |
+            '_'
+        )
+    })
+}
+
 fn base64_decode(input: &str) -> Vec<u8> {
     let mut result = Vec::new();
     let mut buf = 0u32;

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { setSearchState } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
@@ -11,214 +11,240 @@ import {
 } from '@/lib/components/popover';
 import { Button } from '@/lib/components/button';
 import { ScrollArea } from '@/lib/components/scroll-area';
-import { format, parse } from 'date-fns';
+import { format, parse, isValid } from 'date-fns';
+import { cn } from "@/lib/utils";
 
-const DATE_FORMAT = "MM/dd/yyyy hh:mm aa";
+// Types
+interface TimeSelectionOptions {
+  hours: number[];
+  minutes: number[];
+  ampm: string[];
+}
 
-const formatDateInput = (input: string): string => {
-  // Allow direct editing but clean up when losing focus
-  return input;
+interface DateTimeValidation {
+  isValid: boolean;
+  value: string;
+}
+
+interface TimeInputProps {
+  value: Date;
+  onChange: (date: Date) => void;
+  className?: string;
+}
+
+// Constants
+const DATE_FORMAT = "MM/dd/yyyy";
+const TIME_FORMAT = "hh:mm aa";
+const MIN_DATE = new Date('2019-06-01');
+const MAX_DATE = new Date();
+
+const TIME_OPTIONS: TimeSelectionOptions = {
+  hours: Array.from({ length: 12 }, (_, i) => i + 1),
+  minutes: Array.from({ length: 60 }, (_, i) => i),
+  ampm: ["AM", "PM"]
 };
 
-const formatTimeInput = (input: string): string => {
-  // Allow direct editing but clean up when losing focus
-  return input;
+// Utility functions
+const validateAndFormatDate = (input: string): DateTimeValidation => {
+  const cleaned = input.replace(/\D/g, '');
+  let formatted = cleaned;
+  
+  if (cleaned.length > 2) formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
+  if (cleaned.length > 4) formatted = `${formatted.slice(0, 5)}/${cleaned.slice(4, 8)}`;
+  
+  try {
+    const date = parse(formatted, DATE_FORMAT, new Date());
+    return {
+      isValid: isValid(date) && date >= MIN_DATE && date <= MAX_DATE,
+      value: formatted
+    };
+  } catch {
+    return { isValid: false, value: formatted };
+  }
 };
 
-const cleanAndValidateDate = (dateStr: string): string => {
-  // Remove all non-digits
-  const numbers = dateStr.replace(/\D/g, '');
-
-  // Format as MM/DD/YYYY
-  if (numbers.length <= 2) return numbers;
-  if (numbers.length <= 4) return `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
-  return `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
+const createUTCDate = (date: Date): Date => {
+  return new Date(Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+    date.getUTCHours(),
+    date.getUTCMinutes(),
+    0,
+    0
+  ));
 };
 
-const cleanAndValidateTime = (timeStr: string): string => {
-  // Remove non-digits and convert to uppercase
-  const cleaned = timeStr.toUpperCase();
-  const numbers = cleaned.replace(/[^0-9AP]/g, '');
-  const ampm = cleaned.match(/[AP]M?$/)?.[0] || '';
+const TimeInput: React.FC<TimeInputProps> = ({ value, onChange, className }) => {
+  const [time, setTime] = useState(() => ({
+    hour: (value.getUTCHours() % 12 || 12).toString(),
+    minutes: value.getUTCMinutes().toString().padStart(2, '0'),
+    period: value.getUTCHours() >= 12 ? 'PM' : 'AM'
+  }));
 
-  let formatted = '';
-  if (numbers.length > 0) {
-    const hours = numbers.slice(0, 2);
-    formatted += hours;
-    if (numbers.length > 2) {
-      formatted += ':' + numbers.slice(2, 4);
+  const updateTime = useCallback((newTime: typeof time) => {
+    const newDate = new Date(value.getTime());
+    
+    let hours = parseInt(newTime.hour);
+    if (newTime.period === 'PM' && hours !== 12) hours += 12;
+    if (newTime.period === 'AM' && hours === 12) hours = 0;
+    
+    newDate.setUTCHours(hours, parseInt(newTime.minutes));
+    onChange(newDate);
+  }, [value, onChange]);
+
+  // Update handlers
+  const onHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newTime = { ...time, hour: e.target.value };
+    setTime(newTime);
+    updateTime(newTime);
+  };
+
+  const onMinuteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newTime = { ...time, minutes: e.target.value };
+    setTime(newTime);
+    updateTime(newTime);
+  };
+
+  const onPeriodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newTime = { ...time, period: e.target.value as 'AM' | 'PM' };
+    setTime(newTime);
+    updateTime(newTime);
+  };
+
+  // Only update local state when value prop changes significantly
+  useEffect(() => {
+    const newHour = (value.getUTCHours() % 12 || 12).toString();
+    const newMinutes = value.getUTCMinutes().toString().padStart(2, '0');
+    const newPeriod = value.getUTCHours() >= 12 ? 'PM' : 'AM';
+
+    if (
+      newHour !== time.hour ||
+      newMinutes !== time.minutes ||
+      newPeriod !== time.period
+    ) {
+      setTime({
+        hour: newHour,
+        minutes: newMinutes,
+        period: newPeriod
+      });
     }
-  }
+  }, [value]);
 
-  if (ampm) {
-    formatted += ' ' + (ampm.length === 1 ? ampm + 'M' : ampm);
-  }
-
-  return formatted;
-};
-
-const isValidDate = (dateStr: string): boolean => {
-  const parts = dateStr.split('/');
-  if (parts.length !== 3) return false;
-
-  const month = parseInt(parts[0], 10);
-  const day = parseInt(parts[1], 10);
-  const year = parseInt(parts[2], 10);
-
-  return month >= 1 && month <= 12 &&
-    day >= 1 && day <= 31 &&
-    year >= 1900 && year <= 9999;
-};
-
-const isValidTime = (timeStr: string): boolean => {
-  const match = timeStr.match(/^(0?[1-9]|1[0-2]):([0-5][0-9]) (AM|PM)$/i);
-  return match !== null;
+  return (
+    <div className={cn("flex items-center gap-2", className)}>
+      <select 
+        value={time.hour}
+        onChange={onHourChange}
+        className="bg-transparent border-none outline-none cursor-pointer"
+      >
+        {TIME_OPTIONS.hours.map(hour => (
+          <option key={hour} value={hour}>{hour}</option>
+        ))}
+      </select>
+      <span>:</span>
+      <select
+        value={time.minutes}
+        onChange={onMinuteChange}
+        className="bg-transparent border-none outline-none cursor-pointer"
+      >
+        {TIME_OPTIONS.minutes.map(minute => (
+          <option key={minute} value={minute.toString().padStart(2, '0')}>
+            {minute.toString().padStart(2, '0')}
+          </option>
+        ))}
+      </select>
+      <select
+        value={time.period}
+        onChange={onPeriodChange}
+        className="bg-transparent border-none outline-none cursor-pointer"
+      >
+        {TIME_OPTIONS.ampm.map(period => (
+          <option key={period} value={period}>{period}</option>
+        ))}
+      </select>
+    </div>
+  );
 };
 
 const DateSelector: React.FC = () => {
   const dispatch = useDispatch();
   const { searchState } = useSelector((state: RootState) => state.arweave);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => {
+  
+  // Initialize with UTC date
+  const [selectedDate, setSelectedDate] = useState<Date>(() => {
     if (searchState.filterDate && searchState.filterTime) {
-      return new Date(`${searchState.filterDate}T${searchState.filterTime}`);
+      const date = new Date(`${searchState.filterDate}T${searchState.filterTime}Z`);
+      return isValid(date) ? date : new Date();
     }
     return new Date();
   });
-  const [dateInputValue, setDateInputValue] = useState(() =>
-    format(selectedDate || new Date(), "MM/dd/yyyy")
-  );
-  const [timeInputValue, setTimeInputValue] = useState(() =>
-    format(selectedDate || new Date(), "hh:mm aa")
-  );
-  const [isOpen, setIsOpen] = useState(false);
 
-  const handleDateTimeChange = (date: Date) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [dateInputValue, setDateInputValue] = useState(() => 
+    format(selectedDate, DATE_FORMAT)
+  );
+
+  const handleDateTimeChange = useCallback((date: Date) => {
+    if (!isValid(date) || date < MIN_DATE || date > MAX_DATE) return;
+    
+    setSelectedDate(date);
+    setDateInputValue(format(date, DATE_FORMAT));
+    
+    // Format for Redux store using UTC values
     dispatch(setSearchState({
       filterDate: date.toISOString().split('T')[0],
-      filterTime: `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+      filterTime: `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`
     }));
-    setSelectedDate(date);
-    setDateInputValue(format(date, "MM/dd/yyyy"));
-    setTimeInputValue(format(date, "hh:mm aa"));
-  };
+  }, [dispatch]);
 
-  const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = formatDateInput(e.target.value);
-    setDateInputValue(newValue);
-
-    if (newValue.length === 10 && isValidDate(newValue)) {
-      try {
-        const currentTime = selectedDate ? format(selectedDate, "hh:mm aa") : format(new Date(), "hh:mm aa");
-        const parsedDate = parse(`${newValue} ${currentTime}`, DATE_FORMAT, new Date());
-
-        if (!isNaN(parsedDate.getTime())) {
-          handleDateTimeChange(parsedDate);
-        }
-      } catch (error) {
-        // Invalid date
-      }
+  const handleDateInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const validation = validateAndFormatDate(e.target.value);
+    setDateInputValue(validation.value);
+    
+    if (validation.isValid && validation.value.length === 10) {
+      const [month, day, year] = validation.value.split('/').map(Number);
+      const newDate = new Date(selectedDate);
+      newDate.setUTCFullYear(year);
+      newDate.setUTCMonth(month - 1);
+      newDate.setUTCDate(day);
+      handleDateTimeChange(newDate);
     }
-  };
+  }, [selectedDate, handleDateTimeChange]);
 
-  const handleTimeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = formatTimeInput(e.target.value);
-    setTimeInputValue(newValue);
+  const generateRandomDateTime = useCallback(() => {
+    const randomDate = new Date(
+      MIN_DATE.getTime() + Math.random() * (MAX_DATE.getTime() - MIN_DATE.getTime())
+    );
+    
+    // Set random minutes
+    const randomMinutes = Math.floor(Math.random() * 60);
+    randomDate.setUTCMinutes(randomMinutes);
+    
+    handleDateTimeChange(createUTCDate(randomDate));
+  }, [handleDateTimeChange]);
 
-    if (isValidTime(newValue)) {
-      try {
-        const currentDate = selectedDate ? format(selectedDate, "MM/dd/yyyy") : format(new Date(), "MM/dd/yyyy");
-        const parsedDate = parse(`${currentDate} ${newValue}`, DATE_FORMAT, new Date());
+  const getButtonVariant = useCallback((isSelected: boolean) => 
+    isSelected ? "primary" : "ghost"
+  , []);
 
-        if (!isNaN(parsedDate.getTime())) {
-          handleDateTimeChange(parsedDate);
-        }
-      } catch (error) {
-        // Invalid time
-      }
+  const handleCalendarSelect = useCallback((date: Date | undefined) => {
+    if (date) {
+      const newDate = new Date(date.getTime());
+      newDate.setUTCHours(selectedDate.getUTCHours());
+      newDate.setUTCMinutes(selectedDate.getUTCMinutes());
+      handleDateTimeChange(newDate);
     }
-  };
-
-  const handleTimeChange = (type: "hour" | "minute" | "ampm", value: string) => {
-    const currentDate = selectedDate || new Date();
-    let newDate = new Date(currentDate);
-
-    if (type === "hour") {
-      const hour = parseInt(value, 10);
-      newDate.setHours(newDate.getHours() >= 12 ? hour + 12 : hour);
-    } else if (type === "minute") {
-      newDate.setMinutes(parseInt(value, 10));
-    } else if (type === "ampm") {
-      const hours = newDate.getHours();
-      if (value === "AM" && hours >= 12) {
-        newDate.setHours(hours - 12);
-      } else if (value === "PM" && hours < 12) {
-        newDate.setHours(hours + 12);
-      }
-    }
-
-    handleDateTimeChange(newDate);
-  };
-
-  const generateRandomDateTime = () => {
-    const start = new Date('2019-06-01').getTime();
-    const end = Date.now();
-    const randomDate = new Date(start + Math.random() * (end - start));
-    handleDateTimeChange(randomDate);
-  };
-
-  const getButtonVariant = (isSelected: boolean) => {
-    return isSelected ? "primary" : "ghost";
-  };
-
-  const handleDateBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const cleanedValue = cleanAndValidateDate(e.target.value);
-    setDateInputValue(cleanedValue);
-
-    if (cleanedValue.length === 10 && isValidDate(cleanedValue)) {
-      try {
-        const currentTime = selectedDate ? format(selectedDate, "hh:mm aa") : format(new Date(), "hh:mm aa");
-        const parsedDate = parse(`${cleanedValue} ${currentTime}`, DATE_FORMAT, new Date());
-
-        if (!isNaN(parsedDate.getTime())) {
-          handleDateTimeChange(parsedDate);
-        }
-      } catch (error) {
-        // Invalid date - revert to previous valid date
-        if (selectedDate) {
-          setDateInputValue(format(selectedDate, "MM/dd/yyyy"));
-        }
-      }
-    }
-  };
-
-  const handleTimeBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const cleanedValue = cleanAndValidateTime(e.target.value);
-    setTimeInputValue(cleanedValue);
-
-    if (isValidTime(cleanedValue)) {
-      try {
-        const currentDate = selectedDate ? format(selectedDate, "MM/dd/yyyy") : format(new Date(), "MM/dd/yyyy");
-        const parsedDate = parse(`${currentDate} ${cleanedValue}`, DATE_FORMAT, new Date());
-
-        if (!isNaN(parsedDate.getTime())) {
-          handleDateTimeChange(parsedDate);
-        }
-      } catch (error) {
-        // Invalid time - revert to previous valid time
-        if (selectedDate) {
-          setTimeInputValue(format(selectedDate, "hh:mm aa"));
-        }
-      }
-    }
-  };
+    setIsOpen(false);
+  }, [selectedDate, handleDateTimeChange]);
 
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className="flex justify-between gap-4">
-        {/* Date Section */}
+        {/* Date Input Section */}
         <div className="flex-1">
           <span className="block mb-2 text-lg font-medium font-['Syne'] text-foreground">
-            Select Date
+            Select Date (UTC)
           </span>
           <div className="flex items-center p-[14px] rounded-2xl border border-input bg-background">
             <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -236,47 +262,48 @@ const DateSelector: React.FC = () => {
                   <Calendar
                     mode="single"
                     selected={selectedDate}
-                    defaultMonth={selectedDate || new Date()}
-                    onSelect={(date) => {
-                      if (date) {
-                        const newDate = new Date(date);
-                        if (selectedDate) {
-                          newDate.setHours(selectedDate.getHours());
-                          newDate.setMinutes(selectedDate.getMinutes());
-                        }
-                        handleDateTimeChange(newDate);
-                      }
-                      setIsOpen(false);
-                    }}
+                    defaultMonth={selectedDate}
+                    onSelect={handleCalendarSelect}
                     initialFocus
                   />
-                  <div className="flex flex-col h-[300px] divide-y">
-                    <ScrollArea className="w-auto">
+                  <div className="flex flex-col h-[300px] divide-y border-l">
+                    <ScrollArea className="w-[110px]">
                       <div className="flex flex-col p-2">
-                        {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
+                        {TIME_OPTIONS.hours.map((hour) => (
                           <Button
                             key={hour}
                             variant={getButtonVariant(
-                              selectedDate ? selectedDate.getHours() % 12 === hour % 12 : false
+                              selectedDate ? (selectedDate.getHours() % 12 || 12) === hour : false
                             )}
                             className="w-full"
-                            onClick={() => handleTimeChange("hour", hour.toString())}
+                            onClick={() => {
+                              const currentMinutes = selectedDate.getMinutes();
+                              const currentAmPm = selectedDate.getHours() >= 12 ? "PM" : "AM";
+                              const hours = hour % 12 + (currentAmPm === "PM" ? 12 : 0);
+                              const newDate = new Date(selectedDate);
+                              newDate.setHours(hours);
+                              handleDateTimeChange(newDate);
+                            }}
                           >
                             {hour}
                           </Button>
                         ))}
                       </div>
                     </ScrollArea>
-                    <ScrollArea className="w-auto">
+                    <ScrollArea className="w-[110px]">
                       <div className="flex flex-col p-2">
-                        {Array.from({ length: 12 }, (_, i) => i * 5).map((minute) => (
+                        {TIME_OPTIONS.minutes.map((minute) => (
                           <Button
                             key={minute}
                             variant={getButtonVariant(
                               selectedDate ? selectedDate.getMinutes() === minute : false
                             )}
                             className="w-full"
-                            onClick={() => handleTimeChange("minute", minute.toString())}
+                            onClick={() => {
+                              const newDate = new Date(selectedDate);
+                              newDate.setMinutes(minute);
+                              handleDateTimeChange(newDate);
+                            }}
                           >
                             {minute.toString().padStart(2, '0')}
                           </Button>
@@ -284,17 +311,27 @@ const DateSelector: React.FC = () => {
                       </div>
                     </ScrollArea>
                     <div className="p-2">
-                      {["AM", "PM"].map((ampm) => (
+                      {TIME_OPTIONS.ampm.map((ampm) => (
                         <Button
                           key={ampm}
                           variant={getButtonVariant(
                             selectedDate
                               ? (ampm === "AM" && selectedDate.getHours() < 12) ||
-                              (ampm === "PM" && selectedDate.getHours() >= 12)
+                                (ampm === "PM" && selectedDate.getHours() >= 12)
                               : false
                           )}
                           className="w-full"
-                          onClick={() => handleTimeChange("ampm", ampm)}
+                          onClick={() => {
+                            const newDate = new Date(selectedDate);
+                            const currentHours = newDate.getHours();
+                            const is12Hour = currentHours % 12 === 0;
+                            if (ampm === "PM" && currentHours < 12) {
+                              newDate.setHours(currentHours + 12);
+                            } else if (ampm === "AM" && currentHours >= 12) {
+                              newDate.setHours(currentHours - 12);
+                            }
+                            handleDateTimeChange(newDate);
+                          }}
                         >
                           {ampm}
                         </Button>
@@ -309,7 +346,6 @@ const DateSelector: React.FC = () => {
               type="text"
               value={dateInputValue}
               onChange={handleDateInputChange}
-              onBlur={handleDateBlur}
               className="flex-1 bg-transparent border-none outline-none text-black font-['Poppins'] text-base font-light"
               placeholder="MM/DD/YYYY"
               maxLength={10}
@@ -317,20 +353,16 @@ const DateSelector: React.FC = () => {
           </div>
         </div>
 
-        {/* Time Section */}
+        {/* Time Input Section */}
         <div className="flex-1">
           <span className="block mb-2 text-lg font-medium font-['Syne'] text-foreground">
-            Select Time
+            Select Time (UTC)
           </span>
           <div className="flex items-center p-[14px] rounded-2xl border border-input bg-background">
-            <input
-              type="text"
-              value={timeInputValue}
-              onChange={handleTimeInputChange}
-              onBlur={handleTimeBlur}
-              className="flex-1 bg-transparent border-none outline-none text-black font-['Poppins'] text-base font-light"
-              placeholder="hh:mm AA"
-              maxLength={8}
+            <TimeInput
+              value={selectedDate}
+              onChange={handleDateTimeChange}
+              className="flex-1"
             />
             <Button
               variant="ghost"
@@ -346,4 +378,4 @@ const DateSelector: React.FC = () => {
   );
 };
 
-export default DateSelector;
+export default React.memo(DateSelector);

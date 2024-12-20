@@ -1,12 +1,10 @@
 use ic_cdk_timers::set_timer_interval;
 use std::time::Duration;
-use ic_cdk::spawn;
+use ic_cdk::{call, spawn, println};
 use ic_cdk::api::management_canister::main::raw_rand;
-use ic_cdk::println;
-use ic_cdk::call;
 use candid::Principal;
 
-use crate::{check_balances, swap, stake, claim_icp_reward};
+use crate::{check_balances, swap, stake, claim_icp_reward, icp_swap_principal};
 
 // Constants for timer intervals
 pub const AUTOMATED_TEST_INTERVAL: Duration = Duration::from_secs(30); // Increased interval
@@ -28,12 +26,12 @@ struct StakeInfo {
     amount: u64,
 }
 
-async fn get_all_stakes() -> Vec<(Principal, StakeInfo)> {
-    match call(Principal::from_text("CANISTER_ID_HERE").unwrap(), "get_all_stakes", ()).await {
-        Ok((stakes,)) => stakes,
+async fn get_stake(principal: Principal) -> Option<StakeInfo> {
+    match call(icp_swap_principal(), "get_stake", (principal,)).await {
+        Ok((stake,)) => stake,
         Err(e) => {
-            println!("❌ Failed to get stakes: {:?}", e);
-            vec![]
+            println!("❌ Failed to get stake: {:?}", e);
+            None
         }
     }
 }
@@ -54,13 +52,17 @@ pub fn setup_automated_testing() {
                 // ALEX Stake check
                 if balance.alex > 1.0 {
                     let amount = balance.alex.floor() as u64;
+                    println!("📊Stake before action: {:?}", get_stake(ic_cdk::id()).await);
                     println!("🔒 Attempting to stake {} ALEX", amount);
                     match stake(amount, root_account.clone()).await {
                         Ok(_) => {
                             println!("✅ Successfully staked {} ALEX", amount);
-                            // Check stakes after staking
-                            let stakes = get_all_stakes().await;
-                            println!("📊 Current stakes: {:?}", stakes);
+                            // Check stake after staking
+                            if let Some(stake_info) = get_stake(ic_cdk::id()).await {
+                                println!("📊 Stake after action: {:?}", stake_info);
+                            } else {
+                                println!("⚠️ No stake information found");
+                            }
                         },
                         Err(e) => println!("❌ Failed to stake ALEX: {:?}", e),
                     }
