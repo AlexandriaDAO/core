@@ -10,23 +10,30 @@ export const useHandleSearch = () => {
   const searchState = useSelector((state: RootState) => state.arweave.searchState);
   const isLoading = useSelector((state: RootState) => state.arweave.isLoading);
 
-  const handleSearch = useCallback(async () => {
+  const handleSearch = useCallback(async (continueFromTimestamp?: number) => {
+    if (isLoading) return;
+    
     dispatch(setIsLoading(true));
     try {
       let updatedSearchState = { ...searchState };
 
-      if (searchState.filterDate && searchState.filterTime) {
+      if (continueFromTimestamp) {
+        updatedSearchState.maxTimestamp = continueFromTimestamp;
+      } else if (searchState.filterDate && searchState.filterTime) {
         const utcDate = new Date(`${searchState.filterDate}T${searchState.filterTime}:00Z`);
         updatedSearchState.maxTimestamp = Math.floor(utcDate.getTime() / 1000);
       }
 
-      await dispatch(performSearch({ searchState: updatedSearchState }));
+      await dispatch(performSearch({ 
+        searchState: updatedSearchState,
+        isContinuation: !!continueFromTimestamp 
+      }));
     } catch (error) {
       console.error('Error performing search:', error);
     } finally {
       dispatch(setIsLoading(false));
     }
-  }, [dispatch, searchState]);
+  }, [dispatch, searchState, isLoading]);
 
   const handleSearchStateChange = useCallback((key: keyof SearchState, value: any) => {
     switch (key) {

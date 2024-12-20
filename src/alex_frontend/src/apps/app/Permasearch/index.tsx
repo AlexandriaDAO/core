@@ -13,9 +13,11 @@ function Permasearch() {
 			title="Permasearch"
 			description="Search for any asset on Arweave."
 			hint="Save them as NFTs."
-			onSearch={() => handleSearch().catch(error => {
-				toast.error(error.message || "An error occurred while searching");
-			})}
+			onSearch={(continueFromTimestamp?: number) => 
+				handleSearch(continueFromTimestamp).catch(error => {
+					toast.error(error.message || "An error occurred while searching");
+				})
+			}
 			isLoading={isLoading}
 			topComponent={<ArweaveOwnerSelector />}
 			filterComponent={<SearchForm />}

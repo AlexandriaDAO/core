@@ -83,17 +83,19 @@ const TimeInput: React.FC<TimeInputProps> = ({ value, onChange, className }) => 
   }));
 
   const updateTime = useCallback((newTime: typeof time) => {
-    const newDate = new Date(value.getTime());
+    const newDate = new Date(value);
     
     let hours = parseInt(newTime.hour);
     if (newTime.period === 'PM' && hours !== 12) hours += 12;
     if (newTime.period === 'AM' && hours === 12) hours = 0;
     
-    newDate.setUTCHours(hours, parseInt(newTime.minutes));
+    newDate.setHours(hours);
+    newDate.setMinutes(parseInt(newTime.minutes));
+    
     onChange(newDate);
   }, [value, onChange]);
 
-  // Update handlers
+  // Update handlers to work directly with input values
   const onHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newTime = { ...time, hour: e.target.value };
     setTime(newTime);
@@ -185,30 +187,51 @@ const DateSelector: React.FC = () => {
     format(selectedDate, DATE_FORMAT)
   );
 
-  const handleDateTimeChange = useCallback((date: Date) => {
-    if (!isValid(date) || date < MIN_DATE || date > MAX_DATE) return;
+  const handleDateTimeChange = useCallback((date: Date, allowDateChange: boolean = false) => {
+    if (!isValid(date)) return;
     
-    setSelectedDate(date);
-    setDateInputValue(format(date, DATE_FORMAT));
+    // If allowDateChange is true, use the full date, otherwise only update time
+    const newDate = allowDateChange ? new Date(date) : new Date(selectedDate);
+    if (!allowDateChange) {
+      newDate.setHours(date.getHours());
+      newDate.setMinutes(date.getMinutes());
+    }
     
-    // Format for Redux store using UTC values
+    setSelectedDate(newDate);
+    setDateInputValue(format(newDate, DATE_FORMAT));
+    
     dispatch(setSearchState({
-      filterDate: date.toISOString().split('T')[0],
-      filterTime: `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`
+      filterDate: newDate.toISOString().split('T')[0],
+      filterTime: `${String(newDate.getHours()).padStart(2, '0')}:${String(newDate.getMinutes()).padStart(2, '0')}`
     }));
-  }, [dispatch]);
+  }, [dispatch, selectedDate]);
 
   const handleDateInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const validation = validateAndFormatDate(e.target.value);
-    setDateInputValue(validation.value);
+    const input = e.target.value;
+    // Allow typing by replacing any non-digit with empty string and adding slashes
+    const cleaned = input.replace(/\D/g, '');
+    let formatted = cleaned;
     
-    if (validation.isValid && validation.value.length === 10) {
-      const [month, day, year] = validation.value.split('/').map(Number);
+    if (cleaned.length > 2) formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
+    if (cleaned.length > 4) formatted = `${formatted.slice(0, 5)}/${cleaned.slice(4, 8)}`;
+    
+    setDateInputValue(formatted);
+    
+    // Only try to parse and update if we have a complete date
+    if (cleaned.length === 8) {
+      const month = parseInt(cleaned.slice(0, 2));
+      const day = parseInt(cleaned.slice(2, 4));
+      const year = parseInt(cleaned.slice(4, 8));
+      
       const newDate = new Date(selectedDate);
-      newDate.setUTCFullYear(year);
-      newDate.setUTCMonth(month - 1);
-      newDate.setUTCDate(day);
-      handleDateTimeChange(newDate);
+      newDate.setFullYear(year);
+      newDate.setMonth(month - 1);
+      newDate.setDate(day);
+      
+      if (isValid(newDate)) {
+        // Pass true to allow date changes when typing
+        handleDateTimeChange(newDate, true);
+      }
     }
   }, [selectedDate, handleDateTimeChange]);
 
@@ -219,9 +242,10 @@ const DateSelector: React.FC = () => {
     
     // Set random minutes
     const randomMinutes = Math.floor(Math.random() * 60);
-    randomDate.setUTCMinutes(randomMinutes);
+    randomDate.setMinutes(randomMinutes);
     
-    handleDateTimeChange(createUTCDate(randomDate));
+    // Pass true to allow date change for randomizer
+    handleDateTimeChange(randomDate, true);
   }, [handleDateTimeChange]);
 
   const getButtonVariant = useCallback((isSelected: boolean) => 
@@ -230,7 +254,8 @@ const DateSelector: React.FC = () => {
 
   const handleCalendarSelect = useCallback((date: Date | undefined) => {
     if (date) {
-      const newDate = new Date(date.getTime());
+      // Preserve the existing time when selecting a new date
+      const newDate = new Date(date);
       newDate.setUTCHours(selectedDate.getUTCHours());
       newDate.setUTCMinutes(selectedDate.getUTCMinutes());
       handleDateTimeChange(newDate);
