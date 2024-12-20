@@ -38,7 +38,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
 
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
-  const [buttonType, setButtonType] = useState("");
+  const [buttonType, setButtonType] = useState("Buy");
   const [modalType, setModalType] = useState<"sell" | "edit" | "remove" | "buy" | null>(null);
   const [modalData, setModalData] = useState({
     arwaveId: "",

@@ -19,6 +19,7 @@ const getMarketListing = createAsyncThunk<
       }
     >;
     totalPages: string;
+    totalCount: number;
     pageSize: string;
   },
   {
@@ -74,6 +75,7 @@ const getMarketListing = createAsyncThunk<
         return {
           nfts: {},
           totalPages: "0",
+          totalCount:0,
           pageSize: "0",
         };
       }
@@ -111,9 +113,9 @@ const getMarketListing = createAsyncThunk<
           nfts: tokensObject,
           totalPages: result.total_pages?.toString() || "0",
           pageSize: result.page_size?.toString() || "0",
+          totalCount: ids.length,
         };
       }
-      console.log("ids are ",ids);
 
       const fetchedTransactions = await fetchTransactionsApi({ nftIds: ids });
 
@@ -123,6 +125,7 @@ const getMarketListing = createAsyncThunk<
           nfts: tokensObject,
           totalPages: result.total_pages?.toString() || "0",
           pageSize: result.page_size?.toString() || "0",
+          totalCount: 0,
         };
       }
 
@@ -133,6 +136,7 @@ const getMarketListing = createAsyncThunk<
         nfts: tokensObject,
         totalPages: result.total_pages.toString(),
         pageSize: result.page_size.toString(),
+        totalCount: ids.length,
       };
     } catch (error) {
       console.error("Error fetching market listing:", error);

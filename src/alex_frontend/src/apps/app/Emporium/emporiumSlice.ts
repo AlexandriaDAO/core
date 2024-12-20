@@ -17,6 +17,7 @@ export interface EmporiumState {
   buyNftSuccess: Boolean;
   userTokens: { tokenId: string; arweaveId: string }[];
   search: { search: string; pageSize: number; sort: string; type: string };
+  totalCount: number;
   marketPlace: Record<
     string,
     { tokenId: string; arweaveId: string; price: string; owner: string }
@@ -31,6 +32,7 @@ const initialState: EmporiumState = {
   buyNftSuccess: false,
   editListingSuccess: false,
   removeListingSuccess: false,
+  totalCount: 0,
   search: { search: "", pageSize: 6, sort: "", type: "principal" },
   totalPages: 0,
   pageSize: 0,
@@ -52,6 +54,9 @@ const emporiumSlice = createSlice({
     },
     setSearchEmporium: (state, action) => {
       state.search = action.payload;
+    },
+    resetPagination: (state) => {
+      state.totalPages = 0;
     },
   },
   extraReducers: (builder: ActionReducerMapBuilder<EmporiumState>) => {
@@ -93,9 +98,9 @@ const emporiumSlice = createSlice({
       .addCase(editListing.fulfilled, (state, action) => {
         state.loading = false;
         state.editListingSuccess = true;
-      
+
         const { nftArweaveId, price } = action.payload;
-      
+
         if (state.marketPlace[nftArweaveId]) {
           // Update the price in the marketplace
           state.marketPlace[nftArweaveId].price = price;
@@ -118,6 +123,9 @@ const emporiumSlice = createSlice({
         state.removeListingSuccess = true;
         state.error = null;
         toast.success("Removed!");
+        if (state.totalCount === 1) {
+          state.totalPages = state.totalPages - 1;
+        }
       })
       .addCase(removeListedNft.rejected, (state, action) => {
         state.loading = false;
@@ -146,6 +154,7 @@ const emporiumSlice = createSlice({
       .addCase(getMarketListing.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
+        state.totalCount = action.payload.totalCount;
         state.totalPages = Number(action.payload.totalPages);
         state.pageSize = Number(action.payload.pageSize);
         state.marketPlace = action.payload.nfts; // Assign the object directly
@@ -161,5 +170,6 @@ const emporiumSlice = createSlice({
       });
   },
 });
-export const { flagHandlerEmporium, setSearchEmporium } = emporiumSlice.actions;
+export const { flagHandlerEmporium, setSearchEmporium, resetPagination } =
+  emporiumSlice.actions;
 export default emporiumSlice.reducer;

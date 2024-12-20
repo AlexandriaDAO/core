@@ -14,7 +14,7 @@ import {
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketListing from "./thunks/getMarketListing";
-import { flagHandlerEmporium } from "./emporiumSlice";
+import { flagHandlerEmporium, resetPagination } from "./emporiumSlice";
 import ContentListEmporium from "./contentListEmporium";
 import { Button } from "@/lib/components/button";
 import { ArrowUp } from "lucide-react";
@@ -27,7 +27,6 @@ const Emporium = () => {
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const emporium = useAppSelector((state) => state.emporium);
-
     const [type, setType] = useState("");
     const [activeButton, setActiveButton] = useState(""); // Track active button
     const [currentPage, setCurrentPage] = useState(1);
@@ -41,21 +40,50 @@ const Emporium = () => {
         }
     };
     const fetchMarketListings = () => {
-        if (activeButton === "userNfts") {
-            dispatch(setTransactions([]));
-        }
+        setCurrentPage(0);
+        dispatch(getMarketListing({
+            page: 1,
+            searchStr: emporium.search.search,
+            pageSize: emporium.search.pageSize.toString(),
+            sort: emporium.search.sort,
+            type,
+            userPrincipal: !user?.principal ? "" : user?.principal
+        }));  // 
         setActiveButton("marketPlace");
         setType("marketPlace");
-    };
+    }; 
+    // For instant search we can use this but send multiple calls on each search charcter 
+    // const fetchMarketListings = useCallback(() => {
+    //     setCurrentPage(0);
+    //     getListings({
+    //         page: 1,
+    //         searchStr: search.search,
+    //         pageSize: search.pageSize.toString(),
+    //         sort: search.sort,
+    //         type: emporium.search.type,
+    //         userPrincipal: user?.principal || ""
+    //     });
+    //     setActiveButton("marketPlace");
+    //     setDisplayType("marketPlace");
+    // }, [getListings, search, user?.principal]);
     const toggleFilters = () => {
         setIsFiltersOpen(!isFiltersOpen);
     };
     const fetchUserListings = () => {
-        if (activeButton === "userNfts") {
-            dispatch(setTransactions([]));
-        }
+        if (!user?.principal)
+            return;
+        dispatch(getMarketListing({
+            page: 1,
+            searchStr: emporium.search.search,
+            pageSize: emporium.search.pageSize.toString(),
+            sort: emporium.search.sort,
+            type: "userListings",
+            userPrincipal: user?.principal
+        }));
         setActiveButton("userListings");
         setType("marketPlace");
+        setCurrentPage(0);
+
 
     };
     const handleSearchClick = async () => {
@@ -119,34 +147,10 @@ const Emporium = () => {
         }
     };
 
-
-    // useEffect(() => {
-    //     if (emporium.depositNftSuccess === true) {
-    //         dispatch(flagHandlerEmporium());
-    //         fetchUserNfts();
-    //     } else if (
-    //         emporium.buyNftSuccess === true ||
-    //         emporium.removeListingSuccess === true
-    //     ) {
-    //         dispatch(flagHandlerEmporium());
-    //         fetchMarketListings();
-     
-    //     }
-    //     else if (emporium.editListingSuccess === true
-    //     ) {
-    //         dispatch(flagHandlerEmporium());
-    //         fetchUserListings();
-    //         setActiveButton("userListings");
-
-    //     }
-    // }, [emporium]);
-
+    // intial 
     useEffect(() => {
-        dispatch(setTransactions([]));
+        fetchMarketListings()
     }, []);
-
-
-
 
     return (
         <>
@@ -213,8 +217,7 @@ const Emporium = () => {
 
             <ContentListEmporium type={type} />
             <PaginationComponent totalPages={emporium.totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
-
         </>
     );
 }
-export default Emporium;
+export default React.memo(Emporium);
