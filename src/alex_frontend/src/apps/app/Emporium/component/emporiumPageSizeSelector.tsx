@@ -1,6 +1,5 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '@/store';
+import { useDispatch } from 'react-redux';
 import { setSearchEmporium } from '../emporiumSlice';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 

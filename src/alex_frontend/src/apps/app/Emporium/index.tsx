@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import {
     PageContainer,
     Title,
@@ -14,7 +13,6 @@ import {
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketListing from "./thunks/getMarketListing";
-import { flagHandlerEmporium, resetPagination } from "./emporiumSlice";
 import ContentListEmporium from "./contentListEmporium";
 import { Button } from "@/lib/components/button";
 import { ArrowUp } from "lucide-react";
@@ -156,7 +154,7 @@ const Emporium = () => {
         <>
             <PageContainer>
                 <Title>Emporium</Title>
-                <Description>Trade.</Description>
+                <Description>MarketPlace</Description>
                 <Hint></Hint>
                 <div className="pb-4 text-center">
                     <Button

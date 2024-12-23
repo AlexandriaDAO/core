@@ -5,8 +5,6 @@ import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swa
 import { _SERVICE as _SERVICELBRY } from '../../../../../../declarations/LBRY/LBRY.did';
 
 import { Link } from "react-router";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 import { flagHandler } from "../../swapSlice";
 import burnLbry from "../../thunks/burnLBRY";
 import Auth from "@/features/auth";
@@ -17,6 +15,8 @@ import getCanisterArchivedBal from "../../thunks/getCanisterArchivedBal";
 import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
 import ErrorModal from "../errorModal";
+import BurnInfo from "./burnInfo";
+import calculateMaxBurnAllowed from "./calculateMaxBurnAllowed";
 
 const BurnContent = () => {
     const dispatch = useAppDispatch();
@@ -28,10 +28,10 @@ const BurnContent = () => {
     const [amountLBRY, setAmountLBRY] = useState(0);
     const [tentativeICP, setTentativeICP] = useState(Number);
     const [tentativeALEX, setTentativeALEX] = useState(Number);
-    const [maxBurnAllowed, setMaxburnAllowed] = useState(Number);
     const [loadingModalV, setLoadingModalV] = useState(false);
     const [successModalV, setSucessModalV] = useState(false);
     const [errorModalV, setErrorModalV] = useState(false);
+    const [maxBurnAllowed, setMaxburnAllowed] = useState(Number);
 
 
 
@@ -61,14 +61,23 @@ const BurnContent = () => {
     };
 
     useEffect(() => {
-        if(!user) return;
+        if (!user) return;
         if (swap.burnSuccess === true) {
             dispatch(flagHandler())
             dispatch(getLbryBalance(user.principal))
             setLoadingModalV(false);
             setSucessModalV(true);
+            setMaxburnAllowed(calculateMaxBurnAllowed(swap.lbryRatio, icpLedger.canisterBalance, swap.canisterArchivedBal.canisterArchivedBal, swap.canisterArchivedBal.canisterUnClaimedIcp))
         }
-    }, [user, swap.burnSuccess])
+        if (swap.error) {
+            dispatch(getLbryBalance(user.principal));
+            setLoadingModalV(false);
+            setErrorModalV(true);
+            dispatch(flagHandler());
+
+        }
+    }, [user, swap])
+
     useEffect(() => {
         if (user) {
             dispatch(getLbryBalance(user.principal));
@@ -76,26 +85,11 @@ const BurnContent = () => {
         dispatch(getCanisterBal());
         dispatch(getCanisterArchivedBal());
     }, [user])
+
+
     useEffect(() => {
-        let lbryPerIcp = Number(swap.lbryRatio) * 2;
-        let canisterBalance = Number(icpLedger.canisterBalance);
-        let totalArchivedBalance = Number(swap.canisterArchivedBal.canisterArchivedBal);
-        let totalUnclaimedBalance = Number(swap.canisterArchivedBal.canisterUnClaimedIcp);
-        let remainingBalance = canisterBalance - (totalUnclaimedBalance + totalArchivedBalance);
-        let actualAvailable = remainingBalance / 2; // 50% for stakers 
-        let maxAllowed = actualAvailable * lbryPerIcp;
-        setMaxburnAllowed(maxAllowed);
+        setMaxburnAllowed(calculateMaxBurnAllowed(swap.lbryRatio, icpLedger.canisterBalance, swap.canisterArchivedBal.canisterArchivedBal, swap.canisterArchivedBal.canisterUnClaimedIcp))
     }, [swap.canisterArchivedBal, swap.lbryRatio, icpLedger.canisterBalance])
-    useEffect(() => {
-        if (swap.error) {
-            setLoadingModalV(false);
-            setErrorModalV(true);
-            dispatch(flagHandler());
-
-        }
-    }, [swap])
-
-
     return (
         <>
             <div>
@@ -171,34 +165,12 @@ const BurnContent = () => {
                             <p className="text-lg font-semibold pr-5 text-[#525252] w-9/12">If the transaction doesn’t complete as expected, please check the redeem page to locate your tokens.</p>
                         </div>
                     </div>
-                    <div className='ms-0 2xl:ms-3 xl:ms-3 lg:ms-3 md:ms-3 sm:ms-0'>
-                        <div className='border border-gray-400 text-white py-5 px-5 rounded-2xl'>
-                            <ul className='ps-0'>
-                                <li className='flex justify-between mb-5'>
-                                    <strong className='text-lg font-medium me-1 text-black'>Max LBRY Burn allowed:</strong>
-                                    <span className='text-lg font-medium text-black'>{maxBurnAllowed.toFixed(4)} LBRY</span>
-                                </li>
-                                <li className='flex justify-between mb-5'>
-                                    <strong className='text-lg font-medium  me-1 text-black'>{Number(swap.lbryRatio).toFixed(4)} LBRY
-                                        <span className='mx-2'><FontAwesomeIcon icon={faArrowRightLong} /></span>0.5 ICP
-                                    </strong>
-                                </li>
-                                <li className='flex justify-between mb-5'>
-                                    <strong className='text-lg font-medium me-1 text-black'>1 LBRY
-                                        <span className='mx-2'><FontAwesomeIcon icon={faArrowRightLong} /></span>{tokenomics.alexMintRate} ALEX
-                                    </strong>
-                                </li>
-                                <li className='flex justify-between'>
-                                    <strong className='text-lg font-medium me-1 text-black'>Network Fees</strong>
-                                    <span className='text-lg font-medium text-black'><span className=' text-multycolor'>{swap.lbryFee}</span> LBRY</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+                    <BurnInfo maxBurnAllowed={maxBurnAllowed} />
+
                 </div>
                 <LoadingModal show={loadingModalV} message1={"Burn in Progress"} message2={"Burn transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
                 <SuccessModal show={successModalV} setShow={setSucessModalV} />
-                <ErrorModal show={errorModalV} setShow={setErrorModalV}/>
+                <ErrorModal show={errorModalV} setShow={setErrorModalV} />
 
             </div>
         </>

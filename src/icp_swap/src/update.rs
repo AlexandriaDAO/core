@@ -69,7 +69,7 @@ pub async fn swap(amount_icp: u64, from_subaccount: Option<[u8; 32]>) -> Result<
         return Err("Minimum amount is 0.1 ICP".to_string());
     }
     deposit_icp_in_canister(amount_icp, from_subaccount).await?;
-    let icp_rate_in_cents: u64 = get_current_LBRY_ratio()?;
+    let icp_rate_in_cents: u64 = get_current_LBRY_ratio();
     let lbry_amount: u64 = amount_icp
         .checked_mul(icp_rate_in_cents)
         .ok_or("Arithmetic overflow occurred in lbry_amount.")?;
@@ -99,7 +99,7 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
     }
 
     //Dynamic price
-    let mut icp_rate_in_cents: u64 = get_current_LBRY_ratio()?;
+    let mut icp_rate_in_cents: u64 = get_current_LBRY_ratio();
     let mut amount_icp_e8s = amount_lbry
         .checked_mul(100_000_000)
         .ok_or("Arithmetic overflow occurred in amount_icp_e8s.")?;

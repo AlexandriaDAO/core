@@ -41,7 +41,7 @@ const EmporiumSearchForm: React.FC = () => {
             <EmporiumPageSizeSelector />
             <div className="flex flex-col">
               <span className="block mb-3 text-lg font-medium font-['Syne'] text-foreground">
-                Search by:
+                Search by
               </span>
               <ToggleGroup
                 type="single"

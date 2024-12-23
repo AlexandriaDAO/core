@@ -22,6 +22,8 @@ pub const ICP_TRANSFER_FEE: u64 = 10_000;
 pub const MAX_DAYS: u32 = 30;
 pub const SCALING_FACTOR: u128 = 1_000_000_000_000; // Adjust based on your precision needs
 pub const BURN_CYCLE_FEE: u64 = 10_000_000_000;
+pub const DEFAULT_LBRY_RATIO: u64 = 400;
+
 
 pub fn verify_caller_balance(amount: u64) -> bool {
     let caller_stake = get_stake(caller());

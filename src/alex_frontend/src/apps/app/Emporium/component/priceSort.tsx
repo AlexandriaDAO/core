@@ -36,7 +36,8 @@ const PriceSort = () => {
     }
     return (
         <div className="price-sort">
-            <span className="label mb-3 block">Price Sort</span>
+            <span className="block mb-3 text-lg font-medium font-['Syne'] text-foreground">
+                Price Sort</span>
             <div className='flex gap-1'>
                 <div className="toggle-container">
                     <Button
@@ -56,7 +57,7 @@ const PriceSort = () => {
                     disabled={!isSortActive} // Disable Button when sorting is inactive
                 >
 
-                    {sortOrder === "desc" && <ArrowDownWideNarrow  className="h-4 w-4" />}
+                    {sortOrder === "desc" && <ArrowDownWideNarrow className="h-4 w-4" />}
                     {sortOrder === "asc" && <ArrowDownNarrowWide className="h-4 w-4" />}
                 </Button>
             </div>

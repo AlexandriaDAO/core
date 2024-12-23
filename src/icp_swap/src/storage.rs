@@ -11,6 +11,8 @@ use std::borrow::Cow;
 use std::cell::RefCell;
 use std::collections::{BTreeSet, HashMap};
 
+use crate::utils::DEFAULT_LBRY_RATIO;
+
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 // Memory identifiers for each variable
 pub const TOTAL_UNCLAIMED_ICP_REWARD_MEM_ID: MemoryId = MemoryId::new(0);
@@ -96,7 +98,7 @@ pub struct LbryRatio {
 impl Default for LbryRatio {
     fn default() -> Self {
         LbryRatio {
-            ratio: 400,                // Default value set to 400
+            ratio: DEFAULT_LBRY_RATIO, // Default value 
             time: ic_cdk::api::time(), // Current timestamp
         }
     }
