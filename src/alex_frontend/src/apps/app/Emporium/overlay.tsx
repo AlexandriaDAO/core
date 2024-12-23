@@ -55,7 +55,7 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
             );
         } else {
             return (
-                <Button
+                 <Button
                     onClick={(e) => {
                         e.stopPropagation();
                         handleButtonClick(transaction.id, price);
@@ -65,6 +65,9 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
                 >
                     {buttonType}
                 </Button>
+
+        
+
             );
         }
     };

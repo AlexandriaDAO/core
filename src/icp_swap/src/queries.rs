@@ -1,9 +1,9 @@
 use crate::{
     storage::*,
-    utils::{ principal_to_subaccount, SCALING_FACTOR,STAKING_REWARD_PERCENTAGE,},
+    utils::{principal_to_subaccount, DEFAULT_LBRY_RATIO, SCALING_FACTOR, STAKING_REWARD_PERCENTAGE},
 };
 use candid::Principal;
-use ic_cdk::{api::caller,query,};
+use ic_cdk::{api::caller, query};
 use ic_ledger_types::AccountIdentifier;
 //swap
 #[query]
@@ -50,15 +50,15 @@ pub fn get_total_unclaimed_icp_reward() -> u64 {
     // pub async fn get_total_unclaimed_icp_reward() -> Result<u64, String> {
     //     // Get total ICP in canister
     //     let total_icp_available = fetch_canister_icp_balance().await?;
-        
+
     //     // Get total archived balance (ICP that's waiting to be redeemed)
     //     let total_archived_bal = get_total_archived_balance();
-        
+
     //     // The unclaimed rewards are what remains after subtracting archived balances
     //     let unclaimed_rewards = total_icp_available
     //         .checked_sub(total_archived_bal)
     //         .ok_or("Arithmetic underflow when calculating unclaimed rewards")?;
-    
+
     //     Ok(unclaimed_rewards)
 }
 
@@ -68,12 +68,12 @@ pub fn get_current_staking_reward_percentage() -> String {
 }
 
 #[query]
-pub fn get_current_LBRY_ratio() -> Result<u64, String> {
+pub fn get_current_LBRY_ratio() -> u64 {
     let lbry_ratio_map = get_lbry_ratio_mem();
 
     match lbry_ratio_map.get(&()) {
-        Some(lbry_ratio) => Ok(lbry_ratio.ratio), // Return the ratio if it exists
-        None => Err("No LBRY ratio found".to_string()),
+        Some(lbry_ratio) => return lbry_ratio.ratio, // Return the ratio if it exists
+        None => return DEFAULT_LBRY_RATIO,                          //defult case
     }
 }
 

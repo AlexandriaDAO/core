@@ -1,72 +1,160 @@
 import React, { useEffect, useState } from "react";
-import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
-import MainLayout from "@/layouts/MainLayout";
 import {
     PageContainer,
     Title,
     Description,
     Hint,
+    ControlsContainer,
+    FiltersButton,
+    SearchButton,
+    SearchFormContainer,
+    FiltersIcon,
 } from "./styles";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketListing from "./thunks/getMarketListing";
-import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
-import getUserListing from "./thunks/geUserListing";
-import { flagHandlerEmporium } from "./emporiumSlice";
 import ContentListEmporium from "./contentListEmporium";
 import { Button } from "@/lib/components/button";
+import { ArrowUp } from "lucide-react";
+import EmporiumSearchForm from "./component/emporiumSearchForm";
+import SearchEmporium from "./component/searchEmporium";
+import PaginationComponent from "./component/PaginationComponent";
+import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
 
 const Emporium = () => {
-    const [type, setType] = useState("");
-    const [activeButton, setActiveButton] = useState(""); // Track active button
+    const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const emporium = useAppSelector((state) => state.emporium);
-    const dispatch = useAppDispatch();
+    const [type, setType] = useState("");
+    const [activeButton, setActiveButton] = useState(""); // Track active button
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
     const fetchUserNfts = () => {
         if (user) {
             dispatch(getUserIcrc7Tokens(user?.principal));
+            setActiveButton("userNfts");
             setType("userNfts");
         }
     };
     const fetchMarketListings = () => {
-        dispatch(getMarketListing());
+        setCurrentPage(0);
+        dispatch(getMarketListing({
+            page: 1,
+            searchStr: emporium.search.search,
+            pageSize: emporium.search.pageSize.toString(),
+            sort: emporium.search.sort,
+            type,
+            userPrincipal: !user?.principal ? "" : user?.principal
+        }));  // 
+        setActiveButton("marketPlace");
         setType("marketPlace");
+    }; 
+    // For instant search we can use this but send multiple calls on each search charcter 
+    // const fetchMarketListings = useCallback(() => {
+    //     setCurrentPage(0);
+    //     getListings({
+    //         page: 1,
+    //         searchStr: search.search,
+    //         pageSize: search.pageSize.toString(),
+    //         sort: search.sort,
+    //         type: emporium.search.type,
+    //         userPrincipal: user?.principal || ""
+    //     });
+    //     setActiveButton("marketPlace");
+    //     setDisplayType("marketPlace");
+    // }, [getListings, search, user?.principal]);
+    const toggleFilters = () => {
+        setIsFiltersOpen(!isFiltersOpen);
     };
     const fetchUserListings = () => {
-        dispatch(getUserListing());
+        if (!user?.principal)
+            return;
+        dispatch(getMarketListing({
+            page: 1,
+            searchStr: emporium.search.search,
+            pageSize: emporium.search.pageSize.toString(),
+            sort: emporium.search.sort,
+            type: "userListings",
+            userPrincipal: user?.principal
+        }));
+        setActiveButton("userListings");
         setType("marketPlace");
+        setCurrentPage(0);
+
+
+    };
+    const handleSearchClick = async () => {
+        let type = emporium.search.type;
+        if (!user) {
+            dispatch(getMarketListing({
+                page: 1,
+                searchStr: emporium.search.search,
+                pageSize: emporium.search.pageSize.toString(),
+                sort: emporium.search.sort,
+                type,
+                userPrincipal: ""
+            }));  // 
+            setCurrentPage(0);
+            return;
+        }
+
+        if (activeButton === "userListings") {
+            type = "userListings";
+        }
+        else { //default case 
+            setActiveButton("marketPlace");
+            setType("marketPlace");
+        }
+        dispatch(getMarketListing({
+            page: 1,
+            searchStr: emporium.search.search,
+            pageSize: emporium.search.pageSize.toString(),
+            sort: emporium.search.sort,
+            type,
+            userPrincipal: user?.principal
+        }));  // 
+        setCurrentPage(0);
+
+    };
+    const handlePageClick = ({ selected }: { selected: number }) => {
+        if (activeButton === "marketPlace") {
+            setCurrentPage(selected);
+            dispatch(getMarketListing({
+                page: selected + 1,
+                searchStr: emporium.search.search,
+                pageSize: emporium.search.pageSize.toString(),
+                sort: emporium.search.sort,
+                type: emporium.search.type,
+                userPrincipal: ""
+            }));  // Adjust for 1-based page index
+        }
+        else if (activeButton === "userListings") {
+            if (!user)
+                return
+            setCurrentPage(selected);
+
+            dispatch(getMarketListing({
+                page: selected + 1,
+                searchStr: emporium.search.search,
+                pageSize: emporium.search.pageSize.toString(),
+                sort: emporium.search.sort,
+                type: "userListings",
+                userPrincipal: user?.principal
+            }));
+        }
     };
 
+    // intial 
     useEffect(() => {
-        if (emporium.depositNftSuccess === true) {
-            dispatch(flagHandlerEmporium());
-            fetchUserNfts();
-        } else if (
-            emporium.buyNftSuccess === true ||
-            emporium.removeListingSuccess === true
-        ) {
-            dispatch(flagHandlerEmporium());
-            fetchMarketListings();
-        }
-        else if (emporium.editListingSuccess === true
-        ) {
-            dispatch(flagHandlerEmporium());
-            fetchUserListings();
-            setActiveButton("userListings");
-
-        }
-    }, [emporium]);
-
-    useEffect(() => {
-        dispatch(setTransactions([]));
+        fetchMarketListings()
     }, []);
 
     return (
         <>
             <PageContainer>
                 <Title>Emporium</Title>
-                <Description>Trade.</Description>
+                <Description>MarketPlace</Description>
                 <Hint></Hint>
                 <div className="pb-4 text-center">
                     <Button
@@ -75,7 +163,7 @@ const Emporium = () => {
                         disabled={!user?.principal}
                         onClick={() => {
                             fetchUserNfts();
-                            setActiveButton("userNfts");
+
                         }}
                     >
                         My Nfts
@@ -85,7 +173,6 @@ const Emporium = () => {
                             }`}
                         onClick={() => {
                             fetchMarketListings();
-                            setActiveButton("marketPlace");
                         }}
                     >
                         MarketPlace
@@ -96,15 +183,39 @@ const Emporium = () => {
                         disabled={!user?.principal}
                         onClick={() => {
                             fetchUserListings();
-                            setActiveButton("userListings");
                         }}
                     >
                         My Listing
                     </Button>
                 </div>
+                {activeButton === "userNfts" ? <></> : <>
+                    <SearchEmporium />
+                    <ControlsContainer $isOpen={isFiltersOpen}>
+                        <FiltersButton
+                            onClick={toggleFilters}
+                            $isOpen={isFiltersOpen}
+                        >
+                            Filters
+                            {isFiltersOpen ? <ArrowUp size={20} /> : <FiltersIcon />}
+                        </FiltersButton>
+                        <SearchButton
+                            onClick={handleSearchClick}
+                            disabled={emporium.loading}
+                        >
+                            {emporium.loading ? 'Loading...' : 'Search'}
+                        </SearchButton>
+                    </ControlsContainer>
+                    <SearchFormContainer $isOpen={isFiltersOpen}>
+
+                        <EmporiumSearchForm />
+                    </SearchFormContainer>
+                </>}
+
             </PageContainer>
+
             <ContentListEmporium type={type} />
+            <PaginationComponent totalPages={emporium.totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
         </>
     );
 }
-export default Emporium;
+export default React.memo(Emporium);

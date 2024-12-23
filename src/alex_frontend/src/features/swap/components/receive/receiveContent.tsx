@@ -51,7 +51,7 @@ const ReceiveContent = () => {
                         >
                             <div className='flex items-center'>
                                 {selectedImage ? <img className='h-5 w-5 me-3' src={selectedImage} alt="Selected" /> : null}
-                                <span className='text-2xl font-medium text-black'>{selectedOption}</span>
+                                <span className='text-xl font-medium text-black'>{selectedOption}</span>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -83,7 +83,7 @@ const ReceiveContent = () => {
                         >
 
                             <div className='flex items-center'>
-                                <span className='text-2xl font-medium text-black'>{selectedNetwork}</span>
+                                <span className='text-xl font-medium text-black'>{selectedNetwork}</span>
 
 
                             </div>

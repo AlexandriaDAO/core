@@ -1,59 +1,54 @@
 import styled from "styled-components";
 import { SlidersHorizontal } from "lucide-react";
+import { Search } from "lucide-react";
 
-export const FiltersIcon = styled(SlidersHorizontal)`
-  transform: rotate(90deg);
-  width: 18px;
-  height: var(--Fonts-Size-body, 16px);
-  flex-shrink: 0;
+export const FiltersIcon = styled(Search)`
+  width: 20px;
+  height: 20px;
 `;
 
 export const PageContainer = styled.div`
-  max-width: 100%;
-  width: 100%;
-  margin: 0 auto;
-  background: var(--Colors-LightMode-Text-text-100, #FFF);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 40px 20px;
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
 `;
 
 export const Title = styled.h1`
-  width: 100%;
-  max-width: 1328px;
-  color: var(--Colors-LightMode-Text-text-500, #000);
+  color: var(--black-grey-100, #353535);
   text-align: center;
   font-family: Syne;
-  font-size: 54px;
-  font-style: normal;
+  font-size: 48px;
   font-weight: 700;
-  line-height: normal;
-  margin-bottom: 24px;
+  margin: 0;
 `;
 
 export const Description = styled.p`
-  color: var(--Colors-LightMode-Text-text-500, #000);
+  color: var(--black-grey-100, #353535);
   text-align: center;
-  font-family: Poppins;
-  font-size: 18px;
-  font-style: normal;
+  font-family: Syne;
+  font-size: 24px;
   font-weight: 400;
-  line-height: 150%;
-  margin-bottom: 16px;
+  margin: 0;
 `;
 
-export const Hint = styled(Description)`
-  font-weight: 700;
-  margin-bottom: 32px;
+export const Hint = styled.p`
+  color: var(--black-grey-300, #808080);
+  text-align: center;
+  font-family: Syne;
+  font-size: 18px;
+  font-weight: 400;
+  margin: 0;
 `;
 
-export const ControlsContainer = styled.div<{ $isOpen?: boolean }>`
+export const ControlsContainer = styled.div<{ $isOpen: boolean }>`
   display: flex;
-  gap: 1rem;
-  margin-bottom: ${props => props.$isOpen ? '1rem' : '0'};
   width: 100%;
-  max-width: 800px;
+  gap: 16px;
+  margin-bottom: ${props => props.$isOpen ? '24px' : '0'};
 `;
 
 export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
@@ -110,3 +105,44 @@ export const SearchFormContainer = styled.div<{ $isOpen: boolean }>`
   width: 100%;
   max-width: 800px;
 `; 
+export const Paginate = styled.div<{ $isOpen?: boolean }>`
+  .pagination {
+    display: flex;
+    list-style: none;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .pagination li {
+    margin: 0 5px;
+  }
+
+  .pagination li a {
+    padding: 8px 12px;
+    border: 1px solid #000000;
+    border-radius: 8px;
+    color: #000000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .pagination li a:hover {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .pagination .selected a {
+    background-color: #000000;
+    color: white;
+    border-color: #000000;
+  }
+
+  .pagination .disabled a {
+    color:rgba(0, 0, 0, 0.35);
+    cursor: not-allowed;
+  }
+    .previous a {
+      border: none !importatn;
+    }
+`;
+

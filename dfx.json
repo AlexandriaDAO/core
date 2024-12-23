@@ -43,7 +43,7 @@
       "candid": "src/icp_swap/icp_swap.did",
       "package": "icp_swap",
       "type": "rust",
-      "specified_id":"54fqz-5iaaa-aaaap-qkmqa-cai"
+      "specified_id": "54fqz-5iaaa-aaaap-qkmqa-cai"
     },
     "icrc7": {
       "main": "src/icrc7/main.mo",
@@ -59,7 +59,7 @@
       "candid": "src/nft_manager/nft_manager.did",
       "package": "nft_manager",
       "type": "rust",
-      "specified_id":"5sh5r-gyaaa-aaaap-qkmra-cai"
+      "specified_id": "5sh5r-gyaaa-aaaap-qkmra-cai"
     },
     "internet_identity": {
       "type": "pull",
@@ -108,6 +108,23 @@
       "package": "emporium",
       "type": "rust",
       "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
+    },
+    "icp_ledger_canister": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icp_ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ledger-canister.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+        }
+      },
+      "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+    },
+    "xrc": {
+      "candid": "src/xrc/xrc.did",
+      "package": "xrc",
+      "type": "rust",
+      "specified_id": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
     }
   },
   "defaults": {
