@@ -20,7 +20,6 @@ export const loadContentForTransactions = createAsyncThunk(
     const client = await getAuthClient();
     const initialStates = ContentService.getInitialMintableStates(transactions);
     dispatch(setMintableStates(initialStates));
-    console.log("client identity", client.getIdentity().getPrincipal().toString());
 
     // Load content for each transaction
     await Promise.all(transactions.map(async (transaction) => {

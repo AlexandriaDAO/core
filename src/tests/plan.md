@@ -10,14 +10,6 @@ The tests canister can't mint NFTs because it cant make a topup account? That'd 
 Minor stuff to do:
 
 
-
-- A show more button, perhaps?
-
-
-
-Alexandrian: 
-- Rank by token amounts.
-- Switch the reverse state to show most recent first.
 */
 
 
@@ -57,7 +49,7 @@ Metrics:
 
 
 
-NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
+NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g  09/18/2022
 8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
@@ -80,4 +72,7 @@ Low Priority:
 
 - Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
+- Add Milliseconds place to permasearch. 
+- Remove duplicates based on file size.
+- More advanced searching with tags and metadata.
 
