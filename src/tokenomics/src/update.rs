@@ -97,6 +97,13 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal, to_subaccount: 
             .ok_or("Arithmetic overflow occurred in phase_mint_alex.")?;
     }
 
+    if phase_mint_alex > 500_000 {
+        return Err(format!(
+            "This would mint {} ALEX which exceeds the maximum of 50 ALEX per transaction",
+            phase_mint_alex as f64 / 10000.0
+        ));
+    }
+
     let total_alex_minted = fetch_total_minted_ALEX().await?;
     let remaining_alex = MAX_ALEX
         .checked_sub(total_alex_minted)
@@ -134,14 +141,6 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal, to_subaccount: 
             } else {
                 None
             };
-
-            // ic_cdk::println!(
-            //     "Address1: {} (subaccount: {:?})\nAddress2: {} (subaccount: {:?})", 
-            //     principal1, 
-            //     subaccount1_arr, 
-            //     principal2, 
-            //     subaccount2_arr
-            // );
 
             match mint_ALEX_internal(alex_per_recipient, actual_caller, to_subaccount.map(|s| s.0)).await {
                 Ok(_) => {

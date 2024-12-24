@@ -10,8 +10,7 @@ use crate::{
     TOTAL_UNCLAIMED_ICP_REWARD,
 };
 
-// pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(1*24*60*60); // 1 days in seconds
-pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(60); // 10 seconds
+pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(60*60); // 1 hour.
 pub const PRICE_FETCH_INTERVAL: Duration = Duration::from_secs(1 * 24 * 60 * 60); // 1 days in seconds
 
 //Old init

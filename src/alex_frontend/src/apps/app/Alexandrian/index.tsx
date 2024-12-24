@@ -22,6 +22,7 @@ function Alexandrian() {
 			onSearch={handleSearch}
 			isLoading={isLoading}
 			filterComponent={<Library />}
+			showMoreEnabled={false}
 		/>
 	);
 }

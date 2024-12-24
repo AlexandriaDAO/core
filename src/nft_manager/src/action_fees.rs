@@ -6,7 +6,7 @@ use crate::coordinate_mint::verify_lbry_payment;
 
 // Make constants public so they can be used in other modules
 pub const LBRY_E8S: u64 = 100_000_000; // Base fee of 1 LBRY.
-pub const LBRY_MINT_COST: u64 = 1;
+pub const LBRY_MINT_COST: u64 = 10;
 pub const LBRY_MINT_COST_E8S: u64 = LBRY_MINT_COST * LBRY_E8S;
 
 // Only Emporium could call this, since it accesses the topup acccount.
