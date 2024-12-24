@@ -7,6 +7,7 @@ import { arweaveIdToNat, natToArweaveId } from "@/utils/id_convert";
 import LedgerService from "@/utils/LedgerService";
 import { Principal } from "@dfinity/principal";
 import { removeTransactionById } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { constrainedMemory } from "process";
 
 const listNft = createAsyncThunk<
   string, // Success return type
@@ -29,22 +30,37 @@ const listNft = createAsyncThunk<
         Math.round(Number(price) * 10 ** 8) // Convert to fixed-point format
       );
 
-      const resultApproveIcrc7 = await actorIcrc7.icrc37_approve_tokens([
+      const isApproved = await actorIcrc7.icrc37_is_approved([
         {
           token_id: tokenId,
-          approval_info: {
-            memo: [],
-            from_subaccount: [],
-            created_at_time: [],
-            expires_at: [],
-            spender: {
-              owner: Principal.fromText(emporium_canister_id),
-              subaccount: [],
-            },
+          from_subaccount: [],
+          spender: {
+            owner: Principal.fromText(emporium_canister_id),
+            subaccount: [],
           },
         },
       ]);
 
+      if (isApproved[0] === false) {
+        const resultApproveIcrc7 = await actorIcrc7.icrc37_approve_tokens([
+          {
+            token_id: tokenId,
+            approval_info: {
+              memo: [],
+              from_subaccount: [],
+              created_at_time: [],
+              expires_at: [],
+              spender: {
+                owner: Principal.fromText(emporium_canister_id),
+                subaccount: [],
+              },
+            },
+          },
+        ]);
+        if ("Err" in resultApproveIcrc7) {
+          return "Approval failed!";
+        }
+      }
       const result = await actorEmporium.list_nft(tokenId, priceFormat);
 
       // Handle success or error response
@@ -53,15 +69,16 @@ const listNft = createAsyncThunk<
 
         return "success";
       } else if ("Err" in result) {
-        const revoke = await actorIcrc7.icrc37_revoke_token_approvals([
-          {
-            token_id: tokenId,
-            memo: [],
-            from_subaccount: [],
-            created_at_time: [],
-            spender: [],
-          },
-        ]);
+        // const revoke = await actorIcrc7.icrc37_revoke_token_approvals([
+        //   {
+        //     token_id: tokenId,
+        //     memo: [],
+        //     from_subaccount: [],
+        //     created_at_time: [],
+        //     spender: [],
+        //   },
+        // ]);
+        // console.log("this is revoke",revoke);
         return rejectWithValue(result?.Err); // Use rejectWithValue directly
       }
     } catch (error) {

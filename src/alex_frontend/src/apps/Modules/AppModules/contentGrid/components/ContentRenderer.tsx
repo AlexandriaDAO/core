@@ -42,7 +42,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
   }
 
   const commonProps = {
-    className: `${inModal ? 'w-full h-full object-contain' : 'absolute inset-0 w-full h-full object-cover'}`,
+    className: `${inModal ? 'w-full h-full object-cover rounded-xl' : 'absolute inset-0 w-full h-full object-cover'}`,
     onError: () => handleRenderError(transaction.id),
   };
 

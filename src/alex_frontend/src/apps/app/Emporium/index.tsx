@@ -20,6 +20,7 @@ import EmporiumSearchForm from "./component/emporiumSearchForm";
 import SearchEmporium from "./component/searchEmporium";
 import PaginationComponent from "./component/PaginationComponent";
 import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
+import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
@@ -149,6 +150,13 @@ const Emporium = () => {
     useEffect(() => {
         fetchMarketListings()
     }, []);
+
+
+    useEffect(() => {
+        if (user?.principal) {
+            dispatch(getSpendingBalance(user.principal));
+        }
+    }, [dispatch, user]);
 
     return (
         <>
