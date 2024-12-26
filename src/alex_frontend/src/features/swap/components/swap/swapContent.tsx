@@ -31,8 +31,9 @@ const SwapContent: React.FC = () => {
   const [shadow, setShadow] = useState('shadow-[0px_0px_13px_4px_#abbddb8a] border-[#C5CFF9] ');
 
   const handleSubmit = () => {
+    if (!user?.principal) return;
     let amountAfterFees = (Number(amount)).toFixed(4);
-    dispatch(swapLbry(amountAfterFees));
+    dispatch(swapLbry({ amount: amountAfterFees, userPrincipal: user?.principal }));
     setLoadingModalV(true);
   };
 
@@ -61,7 +62,7 @@ const SwapContent: React.FC = () => {
     );
   }, [swap.lbryRatio]);
   useEffect(() => {
-    if(!user) return;
+    if (!user) return;
     if (swap.swapSuccess === true) {
       dispatch(getLbryBalance(user.principal));
       dispatch(flagHandler());
@@ -102,7 +103,7 @@ const SwapContent: React.FC = () => {
           <div className="block 2xl:flex xl:flex lg:flex md:flex sm:block justify-between mb-5 w-full">
             <div className={'bg-white border  text-white py-5 px-7 rounded-borderbox me-0 2xl:me-2 xl:me-2 lg:me-2 md:me-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-3 ' + shadow}>
               <div className="flex justify-between mb-5	">
-                <h2 className="text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black">
+                <h2 className="text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black me-2">
                   ICP
                 </h2>
                 <div>
@@ -134,7 +135,7 @@ const SwapContent: React.FC = () => {
               </div>
             </div>
             <div className="bg-white border border-[#bdbec4] text-white py-5 px-7 rounded-borderbox me-0 2xl:ms-2 xl:ms-2 lg:ms-2 md:ms-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full">
-              <div className="flex justify-between mb-5">
+              <div className="flex justify-between mb-5 flex-wrap break-all">
                 <h2 className="text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black">
                   LBRY
                 </h2>
@@ -197,7 +198,7 @@ const SwapContent: React.FC = () => {
               <strong className="text-lg font-semibold me-1 text-radiocolor">
                 Send
               </strong>
-              <span className="text-lg font-semibold text-radiocolor">
+              <span className="text-lg font-semibold text-radiocolor break-all">
                 {amount} ICP
               </span>
             </li>
@@ -205,7 +206,7 @@ const SwapContent: React.FC = () => {
               <strong className="text-lg font-semibold me-1 text-radiocolor">
                 Receive
               </strong>
-              <span className="text-lg font-semibold text-radiocolor">
+              <span className="text-lg font-semibold text-radiocolor break-all">
                 {tentativeLBRY.toFixed(4)} LBRY
               </span>
             </li>
@@ -228,7 +229,7 @@ const SwapContent: React.FC = () => {
 
       <LoadingModal show={loadingModalV} message1={"Swap in Progress"} message2={"Your transaction from ICP to LBRY is being processed. This may take a few moments."} setShow={setLoadingModalV} />
       <SuccessModal show={successModalV} setShow={setSucessModalV} />
-      <ErrorModal show={errorModalV} setShow={setErrorModalV}/>
+      <ErrorModal show={errorModalV} setShow={setErrorModalV} />
     </div>
   );
 };

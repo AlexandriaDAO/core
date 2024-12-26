@@ -108,6 +108,11 @@
       "type": "rust",
       "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
     },
+    "logCanister": {
+      "candid": "src/logCanister/logCanister.did",
+      "package": "logCanister",
+      "type": "rust"
+    },
     "tests": {
       "type": "rust",
       "package": "tests",

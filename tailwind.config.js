@@ -142,6 +142,9 @@ module.exports = {
       backgroundImage: {
         //  'account-box-bg': "url('/images/gradient-bg.png')",
       },
+      screens: {
+        'xs': '280px', // You can customize the xs breakpoint
+      },
     },
   },
   variants: {

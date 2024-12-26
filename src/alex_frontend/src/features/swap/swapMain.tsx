@@ -60,7 +60,7 @@ const SwapMain = () => {
     }, [swap])
     return (
         <div className='tabs py-10 2xl:py-20 xl:py-16 lg:py-14 md:py-12 sm:py-10'>
-            <div className='container px-3'>
+            <div className='container px-5'>
                 <AccountCards />
                 <div className='tabs-content'>
                     <div className='tabs-content'>
@@ -70,13 +70,13 @@ const SwapMain = () => {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`px-2 py-2 flex items-center ${activeTab === tab.id
-                                        ? 'text-base 2xl:text-xl text-white border-black bg-black px-5'
-                                        : 'bg-white'}transition-colors duration-300 text-base font-semibold leading-6 min-w-24 h-11 border border-gray-400 rounded-2xl mr-3  hover:bg-black text-black hover:text-white px-5`}
+                                        ? 'text-base 2xl:text-xl text-white border-black bg-black px-5' //active
+                                        : 'bg-white'}transition-colors duration-300 text-base font-semibold leading-6 min-w-24 h-11 border border-gray-400 rounded-2xl mr-3  hover:bg-black text-black hover:text-white px-5 mb-4 z-20`}
                                 >
                                     {tab.label}
                                     {tab.hover === null ? (<></>) : (<div className='relative group'>
                                         <FontAwesomeIcon icon={faQuestionCircle} className='text-[#cccccc] text-2xl ml-3 position-relative' />
-                                        <span className='bg-[#C5CFF9] text-black p-3 rounded-2xl absolute bottom-12 left-1/2 -translate-x-1/2 text-xs font-light w-52 z-10 opacity-0 group-hover:opacity-100 before:content-[" "] before:block before:absolute before:border-l-[10px] before:border-l-transparent before:border-r-[10px] before:border-r-transparent before:border-b-[20px] before:border-b-[#C5CFF9] before:rotate-180 before:-bottom-5 before:left-1/2 before:-translate-x-1/2'>{tab.hover}</span>
+                                        <span className='bg-[#C5CFF9] text-black p-3 rounded-2xl absolute bottom-12 left-1/2 -translate-x-1/2 text-xs font-light w-52 z-10 invisible group-hover:visible before:content-[" "] before:block before:absolute before:border-l-[10px] before:border-l-transparent before:border-r-[10px] before:border-r-transparent before:border-b-[20px] before:border-b-[#C5CFF9] before:rotate-180 before:-bottom-5 before:left-1/2 before:-translate-x-1/2'>{tab.hover}</span>
                                     </div>)}
 
                                 </button>

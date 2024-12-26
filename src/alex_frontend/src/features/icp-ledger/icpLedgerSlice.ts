@@ -46,12 +46,12 @@ const icpLedgerSlice = createSlice({
   extraReducers: (builder: ActionReducerMapBuilder<icpLedgerState>) => {
     builder
       .addCase(getIcpBal.pending, (state) => {
-        toast.info("Fetching ICP Balance");
+        // toast.info("Fetching ICP Balance");
         state.loading = true;
         state.error = null;
       })
       .addCase(getIcpBal.fulfilled, (state, action) => {
-        toast.success("Successfully fetched icp balance.");
+        // toast.success("Successfully fetched icp balance.");
         state.accountBalance = action.payload.formatedAccountBal;
         state.accountBalanceUSD = (
           Number(action.payload.formatedAccountBal) * Number(state.icpPrice)

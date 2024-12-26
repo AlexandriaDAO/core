@@ -4,7 +4,7 @@ import Account from "./components/Account";
 
 const Auth = () => {
 	return (
-        <div className="flex gap-2 justify-center items-center">
+        <div className="flex gap-2 items-center">
             <Account />
             <AuthMenu />
         </div>
