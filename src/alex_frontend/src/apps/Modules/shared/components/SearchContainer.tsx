@@ -25,6 +25,7 @@ interface SearchContainerProps {
   isLoading?: boolean;
   topComponent?: ReactNode;
   filterComponent?: ReactNode;
+  showMoreEnabled?: boolean;
 }
 
 export function SearchContainer({
@@ -34,7 +35,8 @@ export function SearchContainer({
   onSearch,
   isLoading = false,
   topComponent,
-  filterComponent
+  filterComponent,
+  showMoreEnabled = true
 }: SearchContainerProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -126,7 +128,7 @@ export function SearchContainer({
       </PageContainer>
       <div ref={contentRef}>
         <ContentDisplay />
-        {transactions.length > 0 && (
+        {showMoreEnabled && transactions.length > 0 && (
           <div className="flex justify-center mt-6 mb-8">
             <Button
               onClick={handleShowMore}

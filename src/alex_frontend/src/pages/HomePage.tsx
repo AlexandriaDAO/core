@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router';
-import MainLayout from "@/layouts/MainLayout";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 interface App {
   name: string;
   description: string;
   path: string;
+  logo?: string;
+  comingSoon?: boolean;
 }
 
 const apps: App[] = [
-  { name: 'Alexandrian', description: 'Library', path: '/app/alexandrian' },
-  { name: 'Bibliotheca', description: 'Library', path: '/app/bibliotheca' },
-  { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos' },
-  { name: 'Lexigraph', description: 'Write', path: '/app/lexigraph' },
-  { name: 'Dialectica', description: 'Debate', path: '/app/dialectica' },
-  { name: 'Permasearch', description: 'Explore', path: '/app/permasearch' },
-  { name: 'Emporium', description: 'Trade', path: '/app/emporium' },
+  { name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/permasearch.jpg' },
+  { name: 'Alexandrian', description: 'Library', path: '/app/alexandrian', logo: '/logos/alexandrian.jpg' },
+  { name: 'Emporium', description: 'Trade', path: '/app/emporium', logo: '/logos/emporium.jpg' },
+  { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos', logo: '/logos/syllogos.jpg' },
+  { name: 'Bibliotheca', description: 'Library', path: '/app/bibliotheca', comingSoon: true },
+  { name: 'Lexigraph', description: 'Write', path: '/app/lexigraph', comingSoon: true },
+  { name: 'Dialectica', description: 'Debate', path: '/app/dialectica', comingSoon: true },
 ];
 
 const HomePage: React.FC = () => {
@@ -131,30 +132,58 @@ const HomePage: React.FC = () => {
             marginTop: '40px',
           }}>
             {apps.map((app) => (
-              <Link to={app.path} key={app.name} style={{ textDecoration: 'none' }}>
+              <Link 
+                to={app.comingSoon ? '#' : app.path} 
+                key={app.name} 
+                style={{ textDecoration: 'none' }}
+                onClick={(e) => app.comingSoon && e.preventDefault()}
+              >
                 <div style={{
                   width: '194px',
                   height: '260px',
                   flexShrink: 0,
                   borderRadius: '24px',
-                  background: '#FFF',
+                  background: app.comingSoon ? '#F5F5F5' : '#FFF',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '10px',
                   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  cursor: 'pointer',
+                  cursor: app.comingSoon ? 'not-allowed' : 'pointer',
                   transition: 'transform 0.2s',
+                  opacity: app.comingSoon ? 0.7 : 1,
                 }}>
                   <div style={{
-                    color: '#036',
-                    fontFamily: 'Syne, sans-serif',
-                    fontSize: '24px',
-                    fontWeight: 800,
-                    lineHeight: 'normal',
+                    width: '150px',
+                    height: '150px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '10px 0',
                   }}>
-                    LOGO
+                    {app.comingSoon ? (
+                      <div style={{
+                        color: '#848484',
+                        fontFamily: 'Syne, sans-serif',
+                        fontSize: '18px',
+                        fontWeight: 600,
+                        textAlign: 'center',
+                      }}>
+                        COMING<br />SOON
+                      </div>
+                    ) : (
+                      <img 
+                        src={app.logo}
+                        alt={`${app.name} logo`}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain',
+                          padding: '12px',
+                        }}
+                      />
+                    )}
                   </div>
                   <div style={{
                     color: '#000',

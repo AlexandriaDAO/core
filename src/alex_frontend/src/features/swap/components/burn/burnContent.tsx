@@ -124,7 +124,9 @@ const BurnContent = () => {
                                         <h4 className='text-2xl font-medium'>ICP</h4>
                                     </div>
                                 </div>
-                                <h3 className='text-right text-2xl font-medium'>{tentativeICP.toFixed(4)}</h3>
+                                <h3 className={`text-right text-2xl font-medium ${amountLBRY > maxBurnAllowed ? 'text-red-500' : ''}`}>
+                                    {tentativeICP.toFixed(4)}
+                                </h3>
                             </div>
                         </div>
                         <div className=' border background-color: #efefef; py-4 px-5 rounded-full mb-4'>
@@ -137,7 +139,9 @@ const BurnContent = () => {
                                         <h4 className='text-2xl font-medium'>ALEX</h4>
                                     </div>
                                 </div>
-                                <h3 className='text-right text-2xl font-medium'>{tentativeALEX.toFixed(4)}</h3>
+                                <h3 className={`text-right text-2xl font-medium ${tentativeALEX > 50 ? 'text-red-500' : ''}`}>
+                                    {tentativeALEX.toFixed(4)}
+                                </h3>
                             </div>
                         </div>
                         {user ? <button

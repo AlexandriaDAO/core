@@ -16,8 +16,8 @@ function Permasearch() {
 	return (
 		<SearchContainer
 			title="Permasearch"
-			description="Search for any asset on Arweave."
-			hint="Save them as NFTs."
+			description="Search for Arweave assets. Save them as NFTs."
+			hint="Minting costs 10 LBRY (this will decrease over time)."
 			onSearch={(continueFromTimestamp?: number) =>
 				handleSearch(continueFromTimestamp).catch(error => {
 					toast.error(error.message || "An error occurred while searching");

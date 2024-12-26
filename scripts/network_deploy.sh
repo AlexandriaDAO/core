@@ -60,7 +60,7 @@ dfx deploy icp_swap --network ic
 dfx deploy system_api --network ic
 dfx deploy tokenomics --network ic
 dfx deploy vetkd --network ic
-dfx deploy tests --network ic
+# dfx deploy tests --network ic
 dfx deploy emporium --network ic
 
 # The one azle canister:
