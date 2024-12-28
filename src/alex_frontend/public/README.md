@@ -5,37 +5,41 @@
 >
 > — Dominic Williams, DFINITY founder on ["The Internet Computer Vision"](https://youtu.be/DYVPq_vMB8w?si=w_jopM2o22UQjqwH)
 
-**tldr: Alexandria is a tokenized bridge and for Web2's content, functionality, and user data; so Web3 stacks don't have to start from scratch.**
+**tldr: Alexandria is a tokenized bridge for Web2's content, functionality, and user data, enabling Web3 stacks to build upon existing digital assets rather than start from scratch. Our goal is to become the definitive content destination for discerning users.**
 
 ## Table of Contents
-- [Introduction](#introduction)
-- [Project Overview](#project-overview)
-- [Part 1: Network Architecture](#part-1-network-architecture)
-  - [Librarians](#librarians)
-  - [LibModules](#libmodules)
-- [Part 2: Token Economics and Mechanics](#part-2-token-economics-and-mechanics)
-  - [LBRY Token](#lbry-token)
-  - [ALEX Token](#alex-token)
-    - [Minting Process](#minting-process)
-    - [Distribution Mechanics](#distribution-mechanics)
-    - [Utility](#utility)
-- [Part 3: Non-Fungible Tokens Economics And Mechanics](#part-3-nft-economics-and-mechanics)
-  - [NFTs](#nfts)
-    - [Ebook NFTs](#ebook-nfts)
-    - [Other NFTs](#other-nfts)
-  - [SBTs](#sbts)
-  - [References](#references)
-- [Part 4: Ecosystem](#part-4-ecosystem)
-  - [Bibliotheca (library)](#bibliotheca-library)
-  - [Syllogos (aggregate)](#syllogos-aggregate)
-  - [Lexigraph (write)](#lexigraph-write)
-  - [Dialectica (debate)](#dialectica-debate)
-  - [Permasearch (explore)](#permasearch-explore)
-  - [Emporium (trade)](#emporium-trade)
-- [Part 5: Architecture & Governance](#part-5-architecture--governance)
-  - [Governance](#governance)
-  - [Canister Architecture](#canister-architecture)
-  - [Internet of Books](#internet-of-books)
+- [Alexandria WhitePaper](#alexandria-whitepaper)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Part 1: Network Overview](#part-1-network-overview)
+    - [Librarians](#librarians)
+    - [LibModules](#libmodules)
+    - [AppModules](#appmodules)
+  - [Part 2: Token Economics and Mechanics](#part-2-token-economics-and-mechanics)
+    - [LBRY Token](#lbry-token)
+    - [ALEX Token](#alex-token)
+      - [Minting Process](#minting-process)
+      - [Distribution Mechanics](#distribution-mechanics)
+      - [Long-Term Incentive Balancing.](#long-term-incentive-balancing)
+      - [Utility](#utility)
+  - [Part 3: NFT Economics And Mechanics](#part-3-nft-economics-and-mechanics)
+    - [Content Types](#content-types)
+      - [NFTs](#nfts)
+      - [SBTs](#sbts)
+      - [App \<\> Content Interaction](#app--content-interaction)
+  - [Part 4: Ecosystem](#part-4-ecosystem)
+    - [Alexandrian (flagship app)](#alexandrian-flagship-app)
+    - [Permasearch (explore)](#permasearch-explore)
+    - [Bibliotheca (library)](#bibliotheca-library)
+    - [Syllogos (aggregate)](#syllogos-aggregate)
+    - [Lexigraph (write)](#lexigraph-write)
+    - [Dialectica (debate)](#dialectica-debate)
+    - [Emporium (trade)](#emporium-trade)
+    - [Taking on Big Tech](#taking-on-big-tech)
+  - [Part 5: Architecture \& Governance](#part-5-architecture--governance)
+    - [Governance](#governance)
+    - [Inspiration](#inspiration)
+      - [The Hyperlink Paradigm](#the-hyperlink-paradigm)
 
 
 ## Introduction
@@ -50,9 +54,9 @@ Alexandria is a Web3 fork of the Web2 paradigm with the vision of restoring that
 
 ## Part 1: Network Overview
 
-Alexandria has only 2 protocol level dependancies (excluding TCP/IP): ArWeave (for content) and ICP (for services). The 'AI Stack', if you will. This allows the introduction of several foundational innovations central to Alexandria's functionality, each of which are thought to be the first of their kind:
+Alexandria has only 2 protocol level dependencies (excluding TCP/IP): ArWeave (for content) and ICP (for services) - essentially, the 'AI Stack'. This foundation enables several innovative features that appear to be first of their kind:
 
-  - VetKey Sharing - Alexandrians can 'borrow' eachother's Private Keys or API Keysanner without revealing them to anyone; allowing the community to bridge any Web2 service to their apps.
+  - VetKey Sharing - Alexandrians can 'borrow' eachother's Private Keys or API Keys without revealing them to anyone; allowing the community to bridge any Web2 service to their apps.
   - NFT Wallets - Everything on-site is an NFT, and it's own entity that must be paid when used, allowing the rightful owner to collect any revenue made from their assets.
   - Usage-based Fair-Launch - 21 Million tokens carefully emitted during an up to 60 billion platform actions that make whale and bot games economically unfavorable.
 
@@ -60,13 +64,11 @@ Interaction with Alexandria will often be through apps composed of 'free softwar
 
 ### Librarians
 
-Alexandria is a village in cypherspace, navigable with ported versions 'Web Surfing' tools: Search, Social, Storage and AI. These tools are on-boarded by librarians.
-
-After sign-in, a user has the option to become a librarian which store's their principal in-app. Librarians can store private keys and get paid when others use them.
+These are simply logged in users. Their principal allows them to store, share, and borrow private private keys and opens full access to the FT and NFT minting mechanisms.
 
 ### LibModules
 
-Librarians carry the weight of service hosting by deploying standardized packages called 'LibModules'. Technically, they're just nodes that provide pluggable API for developers, starting with the following:
+These are code bundles and pluggable APIs for app developers, typically powered by a set of Librarian keys that access Web2 services in a decentralized way, e.g.:
 
 - ArWeave (completed): Uploads Alexandria-compatable books to the permaweb.
 - Meilisearch (completed): Creates keyword search engines from the contents of books.
@@ -74,13 +76,13 @@ Librarians carry the weight of service hosting by deploying standardized package
 - Qdrant (incomplete): Creates vector search engines from the contents of books.
 - Whatever else we might be needed for new apps.
 
-Alexandria provides no storage or compute resources for LibModules, but only saves encrypted versions of the keys and performs compatability checks on them. LibModules are otherwise entirely managed and maintained by the ecosystem of Librarians.
+Alexandria provides the re-usable code bundles to interact with our smart contracts. LibModules' API-related compute is otherwise entirely managed by the ecosystem of Librarians.
 
 ### AppModules
 
-For developers, LibModules are made accessible to partner apps as customizable building blocks. ArWeave for example will be used in many Alexandria apps for uploading, searching and displaying in content in various ways.
+These make LibModules accessible to partner apps as customizable UI building blocks. ArWeave for example will be used in many Alexandria apps for uploading, searching and displaying in content in various ways, and a UI toolkit is provided with this functionality built-in.
 
-These modules can be preloaded in any third party apps as template UIs, with all platform economics automatically preserved. Any developers can layer these toolkits as building blocks with custom parameters to create their desired features.
+These modules can be preloaded in any third party apps as template UIs, with all platform economics automatically preserved. Any developers can layer these toolkits with custom parameters to create their desired features.
 
 ## Part 2: Token Economics and Mechanics
 
@@ -108,21 +110,21 @@ A block is mined when someone sends 1 or more LBRY to the burn address. For each
 
     (1) The sender who burned the LBRY is returned hald a cent worth of ICP (1/2 the buy price), and one ALEX mint at the current minting rate.
 
-    (2) A recent LBRY sender is rewarded one ALEX mint at the current minting rate
+    (2) A random scion NFT of the last 1000 minted is rewarded one ALEX mint at the current minting rate (these are minted by liking someone else's existing NFT).
 
-    (3) A recent LBRY reciever is rewarded one ALEX mint at the current minting rate.
+    (3) The original NFT of the selected scion NFT is rewarded one ALEX mint at the current minting rate.
 
-The 'winning' accounts are the sending and recieving addresses of a randomly selected recent LBRY transaction (random from the last ~100 transactions excluding those to and from the burn/mint address). While this token swapping, burning, and minting logic is kept in isolated and immutable canisters, the method to select the random LBRY transaction is in the main backend cansiter and mutable, so it can adapt to only select for in-app payments and adapt to prevent gaming.
+The 'winning' accounts are the NFTs themselves. The owners later claim those tokens, or sell the NFTs with the tokens in them.
 
-Spliting things this way keeps incentives balanced, i.e., each investment in the token is accompanied with two equal investments in some network contributors. Put another way, every time you use some paid app service, you're elible for an airdrop, and the allocation for airdrops is 100% of the token supply.
+Spliting things this way keeps incentives balanced, i.e., each investment in the token is accompanied with two equal investments in some network contributors. Put another way, every time you mint an NFT, you're elible for an airdrop, and the allocation for airdrops is 2/3rds of the total supply.
 
 #### Distribution Mechanics
 
-Bitcoin launched with a 50 BTC Block Reward that halves every 210,000 blocks. Alexandria uses a similar but flattened modification of that minting schedule: A 5 ALEX initial block reward, and the halving rate at 21,000.
+Bitcoin launched with a 50 BTC Block Reward that halves every 210,000 blocks. Alexandria uses a similar but flattened modification of that minting schedule: A 5 ALEX initial block reward, and the halving rate at 21,000 that consecutively doubles.
 
 BTC blocks are mined at mostly fixed intervals, while ALEX mints increase proportional to network use. The minting mechanism accounts for this by doubling the number of mints for a reward drop after each halving.
 
-The result is a much flatter distirbution that takes ~62 Billion burn actions to emit.
+The result is a much flatter distirbution that takes ~62 Billion burned LBRY to emit.
 
 | LBRY Burned      | ALEX Reward | Total ALEX Minted | Fully Diluted Valuation (XDR) |
 |------------------|-------------|-------------------|-------------------------------|
@@ -150,38 +152,25 @@ These numbers were chosen with respect to (1) the BTC mechanism and (2) the anti
 
 FDV is calculated as  21 million / (0.5cents * minting_reward):
 
-For example, for each LBRY you burn during the first reward epoch, you'll loose the 1 cent it's worth but get back 1/2 a cent in ICP, and get one of the three corresponding 5 ALEX mints, i.e., a tenth of a penny per ALEX, which is a $21,000 FDV
+For example, for each LBRY you burn during the first reward epoch, you'll loose the 1 cent it's worth but get back 1/2 a cent in ICP, and get one of the three corresponding 5 ALEX mints, i.e., a tenth of a penny per ALEX, which is a $21,000 FDV. Calls to mint are always capped at 50 ALEX, so during the first epoch, you can only burn 10 LBRY at a time, then 20 in the next, and so on.
 
 ![image](https://github.com/user-attachments/assets/dc66a866-01f6-4076-b1db-9124fd9f54a3)
 
-From mints 0 to 1 Billion, the FDV is below $1B, but mints ~1 to 62 Billion are all made at the that $1B valuation. This means only ~15% of the supply is up for grabs at <$1B FDV, and 85% thereafter, ensureing there's garenteed and substantial ownership availible to Libriarians at least up until Alexandria reaches 'Unicorn' status.
+From mints 0 to 1 Billion, the FDV is below $1B, but mints ~1 to 62 Billion are all made at the that $1B valuation. This means only ~15% of the supply is up for grabs at <$1B FDV, and 85% thereafter, ensuring there's guaranteed and substantial ownership available to Librarians at least up until Alexandria reaches 'Unicorn' status.
 
-#### Bots
+#### Long-Term Incentive Balancing.
 
-Since each minting cycle rewards paries of a recent LBRY transaction, the way to game this is a bot that constantly sends LBRY.
+A fair launch is pivotal to Alexandria's tokenomics, and incentives must be balanced in the early minting epochs as well as long after ALEX is fully minted.
 
-The effectiveness of this strategy decreases as a function of (1) the LBRY transaction fee and (2) the number of transactions that occur between mints according to the following table:
+The challenge in keeping the early epochs balanced is preventing bots. Preventative measures are discussed in the launch details post (add the link here), which outlines a zero-tolerance policy for bots and our retaliation strategy during early epochs. The initial NFT minting price of 10 LBRY (significantly higher than the eventual 1 LBRY target) will be periodically adjusted to match ALEX minting rates, making bot-based random NFT minting economically unfeasible.
 
-![image](https://github.com/user-attachments/assets/8429805e-8b0f-4b7b-ac8f-181a73d67f90)
-
-LBRY uses a 0.04 universal transaction fee that is burned without reward to combat this.
-
-Let's look at an example. With a 0.04 LBRY fee, it takes 25 transactions to burn 1 LBRY. If one of those is selected, you'll get 2 ALEX mints (assuming you sent those transactions to yourself). At that point though, you could have just burned 2 LBRY to get the mints, and you'd also get the value of 1 LBRY back in ICP.
-
-In short, if there are 25+ LBRY total LBRY transactions between mints, than this strategy is not effective.
-
-Still, during times of more minting than transacting, this strategy is welcomed, as it has it's own checks and balances while burning mass amounts of LBRY, which ultimately returns value in ICP to stakers.
-
-LBRY burning returns half its initial XDR value so that even if the ALEX mint is not valuable enough to incentivize people to burn it, it eventually has to be burned to get that ICP back. This combined with the 0.05 LBRY transfer fee will balance secondary markets such that fresh LBRY will always need to be minted and burned.
-
-
-LBRY is designed to return half the minting value in XDR. This fact plus fee ensures that secondary market trading is not a replacement for the mint and burn mechanism. Even if all ALEX is minted, use of the platform will necessitate LBRY minting and burning, and thus platform revenue.
+For incentives after all 21 Million ALEX are minted, LBRY remains a revenue driver for ALEX stakers. LBRY has a 0.04 universal transaction fee that is burned, and still returns half it's value in ICP if burned. As long as LBRY is being transacted (i.e.,the site is being used), LBRY is being burned, and revenue generated for stakers long after ALEX is fully minted.
 
 #### Utility
 
-All the ICP used to mint LBRY is stored in the staking pool. 10% of the total ICP accrued in the staking pool is emmited to stakers proportionally every 24 hours (minus an small allocation used to top up canisters).
+All the ICP used to mint LBRY is stored in the staking pool. 1% of the total ICP accrued in the staking pool is emitted to stakers proportionally every hour.
 
-Staked ALEX is also used for DAO voting via our governance mechanism, but voting is completely optional and carries no reward or penalty.
+Staked ALEX also represents a non-dilutive share in voting for any future DAO.
 
 There's no utility other than voting. There's no value other than staking revshare.
 
@@ -189,25 +178,25 @@ There's no utility other than voting. There's no value other than staking revsha
 
 In Alexandria, everything you see is owned by someone in some way. This ownership is of three forms: 
 
-(1) Non-Fungible Token (NFT) - Owned files that can be transfered.
-(2) Soul-Bount Token (SBT) - Owned content fragments that cannot be transfered.
-(3) Reference - A secondary copy of an SBT or NFT that cannot be transferred.
+(1) OG NFTS - Owned arweave files that can be transferred.
+(2) Scion NFTs (Soul-Bound Tokens, SBTs) - Owned copies of the original that cannot be transferred.
+(3) Boards (To be determined) - Collections of NFTs and SBTs grouped by topic or other user-defined criteria.
 
 ### Content Types
 
-All Alexandria content is tokenized ArWeave transactions, and ICP-native reverences that index them.
+All Alexandria content is tokenized ArWeave transactions, and ICP-native references that index them. These could be any data type/format: a book, a movie, a song, etc., all fall in the same collection.
 
-These assets we call 'Blocks' and they are collected in groupd called 'Boards'.
+OG NFTs' Mint# encodes a ArWeave Transaction Id. Scion NFTs (SBTs) mint# combines with the owner principal to encode the OG NFT minting number. Both allow for an optional and mutable description in metadata, but the mint# and the location of its underlying asset are immutable, and so anything on Alexandria is essentially guaranteed to share the lifespan of the Internet.
 
 #### NFTs
 
-Alexandria NFTs, or 'Blocks', use a Motoko implementation of the ICRC7 and ICRC37 standards, with default transfer, mint, burn, etc., functionality. There is a practically infinite supply cap (10^32 -1).
+Alexandria NFTs use a Motoko implementation of the ICRC7 and ICRC37 standards, with default transfer, mint, burn, etc., functionality. There is a practically infinite supply cap (10^32 -1).
 
 The minting uses the ArWeave LibModule, where Librarians host a pre-paid node that can upload files to the permaweb.
 
 The cost to mint an NFT of an asset already stored on ArWeave is 1 LBRY.
 
-The cost upload an asset to ArWeave is variable. Currently it's 1 LBRY + 5LBRY/MB at a $10 ICP (1LBRY=1cent at $10 ICP). It costs Librarians $0.027/MB, so this is a breakeven price plus free ALEX mints for Librarians if they were to burn the LBRY, or a 2X margin at the LBRY purchase price.
+The cost upload an asset to ArWeave is variable, and seeks to match 1.5X the going rate for ArWeave uploads so as to reward Librarians with a 50% margin in LBRY, but this is subject to change.
 
 Alexandria employs an "nft_manager" canister to manage all state changes to the NFT collection.
 
@@ -216,63 +205,37 @@ Alexandria employs an "nft_manager" canister to manage all state changes to the 
     (3) Burn NSFW NFTs if requested by a community vote.
     (4) Transfer an unverified NFT to its rightful owner if requested by a community vote.
 
-Currently, the "nft_manager" only serves the first two functions, allowing NFT owners to change and claim collected funds of their NFTs.
-
-A rudimentary DAO to trigger transfer an burn functions for ownership disputes is in progress. This has proven to be a really fine line that's hard to implement so its design is to be determined. Nonetheless, the plan is to allow everything except porn, and the underlying assets will remain uncensorable and forkable so any app-level censorship can be combated.
+Currently, the "nft_manager" only serves the first two functions, allowing NFT owners to change and claim collected funds of their NFTs. DAO goverance to manage bad behavior is not implemented yet.
 
 #### SBTs
 
-A content's value tends to be in relationship to the content around it, that is, where it came from, who is interested in it, and how it is found.
+A content's value tends to be in relationship to the content around it, that is, where it came from, who is interested in it, and how it is found. That's what SBTs are for.
 
-NFTs can be collected and arranged into public boards. These boards can contain their own content and descriptions, or just be titled with a topic that displays a bunch of related NFTs.
+Much like a 'like' on facebook or a 'retweet' on twitter, 
 
-### Content Primatives
+SBTs are a useful reference to some content, akin to 'like' and 'retweet' on social media with affixed rewards potential to the involved creator and aggregator.
 
-#### Embedded Content
-
-Assets (NFTs) - Hold an ArWeave Transaction Id and optional description in metadata.
-
-Boards (SBTs) - Hold a title, an optional description, and a list of NFTs.
-
-All descriptions are a markdown file.
-
-#### Profile Ownership
-
-Your Blocks (NFTs) - A list of Blocks you own.
-
-Your Boards (SBTs) - A list of Boards you've created and own.
-
-Your Blocks Library - A list of Blocks you've saved (which can be either owned by you or not).
-
-Your Boards Library - A list of Boards you've saved (which can be either owned by you or not).
-
-#### Revenue System
-
-Saving an NFT to your library requires a payment of 1 LBRY to that NFT.
-
-Once in your library, you can add it to your own boards.
-
-To save someone elses board, you must send 5 LBRY to it.
-
-These prices are subject to change.
+NFTs can be collected and arranged in arbitrary ways that can be iterated on in each Alexandria App.
 
 #### App <> Content Interaction
 
-Apps are welcome to query content directly from ArWeave, or they can opt for greature curation by using NFT and SBT primatives. In the latter case, the content displayed is to be inseparable from it's save functions so the economics of this social graph remain intact no-matter how it's implemented.
+Apps can either query content directly from ArWeave or curate from our NFT and SBT primitives. When using the latter approach, the displayed content remains inseparable from its owners and built-in economics, ensuring the social graph stays intact regardless of implementation.
 
 ## Part 4: Ecosystem
 
 Alexandria apps are services already plugged into LibModules. Since LibModule functions can only be accessed through AppModules that hold these LBRY payment mechanisms, all partner apps are also aligned with our universal DeFi mechanism.
 
-As a Librarian, the lbry.app homepage will feel more like an app store than a Web3 tech stack. The apps registry consists of core apps native to the site, or external sites that have been approved by the DAO.
-
-The following is a list of core apps in the works.
+As a Librarian, the lbry.app homepage will feel more like an app store than a Web3 tech stack. The following is a list of core apps in the works.
 
 ### Alexandrian (flagship app)
 
-An exploratory social app where users collecte eachothers NFTs and arrange them in collaborative boards based on certain topics.
+An exploratory social app where users explore and collect eachothers NFTs and arrange them in collaborative boards based on certain topics.
 
-It's a test case in using AppModules that reflect our incentive mechanism. You'll earn for minting NFT that others collect, or collecting NFTs on a profile that others borrow from. Put simply, a game theory experiment for good taste.
+It's a test case in using AppModules that reflect our incentive mechanism. You'll earn for minting NFT that others collect, or collecting NFTs on a profile that others borrow from. Here you could also collect any funds inside your NFTs. Put simply, a game theory experiment for where good taste is the desired commodity.
+
+### Permasearch (explore)
+
+A asset based block explorer for ArWeave where you can search for any content by its metadata and save it as an Alexandria NFT.
 
 ### Bibliotheca (library)
 
@@ -317,23 +280,13 @@ A character-based AI app where users can train an AI on a set of NFTs and SBTs s
 
 AIs of different specializations can debate eachother with users steering the conversations and ultimately evolving to consensus on which one is correct.
 
-### Permasearch (explore)
-
-A 3d exploration game of the literal library Alexandria where the goal is to get a bachelors degree using only a library card.
-
-![image](https://github.com/user-attachments/assets/b9e0173d-6659-4d71-a5cb-0000fd1a179b)
-
-There are 100 rooms in the library, each dedicated to a category where they player needs to recruit the help of librarians to find in-book references to certain events and concepts.
-
-For the more casual user, it's a metaverse where you can find things to read like you would in a real library.
-
 ### Emporium (trade)
 
 An NFT marketplace for all Alexandria NFTs.
 
 NFTs are valued on a few displayed attributes. First is the mint#, early ones having a certain novelty, but there's also the accrued LBRY and ALEX over its lifetime and whether or not the NFT is verified. Since NFTs are money making assets, and also have money saved inside them, trades are about more than aquiring collectables.
 
-Emporium will empoloy a 5% trading royalty, all of which goes to the staking pool.
+Emporium will employ a 5% trading royalty, all of which goes to the staking pool.
 
 ### Taking on Big Tech
 
@@ -349,9 +302,9 @@ Alexandria will remained centrally managed during the testnet phase. All code is
 
 ### Governance
 
-UncensensoredGreats is currently a centrally developed and deployed project. It depends on an architecture of tentatively ‘blackholed’ canisters, so the renounching storage and token related smart contract over time. It is fully open-source, so the current state of decentralizion can be tracked on [Github](https://github.com/UncensoredGreats/).
+UncensensoredGreats is currently a centrally developed and deployed project. It depends on an architecture of tentatively 'blackholed' canisters, so the renouncing storage and token related smart contract over time. It is fully open-source, so the current state of decentralizion can be tracked on [Github](https://github.com/UncensoredGreats/).
 
-The frontend will be continuously developed, and so use of backend functions from blackholed canisters will remain mutable indefinitely. Nonetheless, anyone can fork the project with an alternative frontend that’s bound by the same code and data of Alexandria’ universal backend canisters.
+The frontend will be continuously developed, and so use of backend functions from blackholed canisters will remain mutable indefinitely. Nonetheless, anyone can fork the project with an alternative frontend that's bound by the same code and data of Alexandria's universal backend canisters.
 
 Since this model prioritizes immutability for the sake of permanence, governance is initially limited to matters involving NFT ownership. The governance mechanism allow proposals that can delete NFTs (if corrupted/inaccurate), or transfer the ownership (to any true author that claim it) with a simple majority and quorum of staked ALEX holders.
 
@@ -360,13 +313,13 @@ Since this model prioritizes immutability for the sake of permanence, governance
 
 'AI' was kept out of this whitepaper entirely, despite it being at the core of Alexandria's founding vision.
 
-This project was born out of pilot project called UncensoredGreats where you'd chat with great authors in an uncensored way. There was one finding of this experiment that shaped Alexandria: When an AI is fed author words directly, and forced to answer without knowledge of the user's question, responses became far more interesting and honest. In other words, a technique to output particular human thoughts from training data rather than aggregate ones is far more condusive to discovery.
+This project was born out of pilot project called UncensoredGreats where you'd chat with great authors in an uncensored way. There was one finding of this experiment that shaped Alexandria: When an AI is fed author words directly, and forced to answer without knowledge of the user's question, responses became far more interesting and honest. In other words, a technique to output particular human thoughts from training data rather than aggregate ones is far more conducive to discovery.
 
 As AI models grow in size and complexity, the outputs will grow more generic, and our people-first methodology more fruitful. This direction goes against the grain of the entire AI space, but it steadfast in what we see as a longstanding principle of computer science, exemplified by the story of one early internet legend.
 
-#### The Hyperlink Paridigm
+#### The Hyperlink Paradigm
 
-In 1968, Doug Engelbart and his team presented “A Research Center for Augmenting Human Intellect” in San Francisco’s Civic Auditorium. It introduced:
+In 1968, Doug Engelbart and his team presented "A Research Center for Augmenting Human Intellect" in San Francisco's Civic Auditorium. It introduced:
 
 (1) A responsive human-machine interface.
 (2) The computer mouse.
@@ -374,13 +327,13 @@ In 1968, Doug Engelbart and his team presented “A Research Center for Augmenti
 (4) Hyperlinks.
 (5) Real-time screen-sharing collaboration.
 
-Most remember this as the “Mother of all Demos” for obvious reasons. What most forget about Engelbart’s experience though is in the two decades preceding this demo, where he was at best refused help, and at worst outright ridiculed for holding that computers would be “tools for collaboration and augmentation” instead of Artificial Intelligence (a story best told in *What the Dormouse Said*).
+Most remember this as the "Mother of all Demos" for obvious reasons. What most forget about Engelbart's experience though is in the two decades preceding this demo, where he was at best refused help, and at worst outright ridiculed for holding that computers would be "tools for collaboration and augmentation" instead of Artificial Intelligence (a story best told in *What the Dormouse Said*).
 
-During the 1950s and 60s, the entire CS field was convinced that the primary use case of computation was autonomous machines ad AI, while Doug held that computers would be tools for humans to interphase with. Despite 70 years of evidence of that same trajectory, popular opinion has not budged an inch. As this decade of tech becomes the gold rush for blowing smoke with AI buzzwords, we see recent breakthroughs in AI through Engelbart's eyes, as history's next big tool that we need a human-centric interface for.
+During the 1950s and 60s, the entire CS field was convinced that the primary use case of computation was autonomous machines ad AI, while Doug held that computers would be tools for humans to interface with. Despite 70 years of evidence of that same trajectory, popular opinion has not budged an inch. As this decade of tech becomes the gold rush for blowing smoke with AI buzzwords, we see recent breakthroughs in AI through Engelbart's eyes, as history's next big tool that we need a human-centric interface for.
 
 Engelbart's design was one webpage and a hyperlink for two. It's now for 200 million sites and 3.5 billion people. The design isn't perfect: Webpages change, hyperlinks disappear, both can be lost, stolen, or hacked, and neither can be truly owned or trusted.
 
-Alexandria is a universal content bed for the internet. While the world works to make AI the perfect tool, like Dougs peers did with compute machines; we're building a control room that puts humans at their helm, just like Doug's "tools for collaboration and augmentation." Really we're just migrating Doug's stack to Web3.cccc
+Alexandria is a universal content bed for the internet. While the world works to make AI the perfect tool, like Dougs peers did with compute machines; we're building a control room that puts humans at their helm, just like Doug's "tools for collaboration and augmentation." Really we're just migrating Doug's stack to Web3.
 
 Alexandria is a social graph of NFTs. Instead of navigating hyperlinks through algorithms, you'll navigate permalinks through favorite stuff of the people you know. It's a simpler, humbler approach to the online experience, but where everything is uniquely yours which might be just what the internet needs right now.
 

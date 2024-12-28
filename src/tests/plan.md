@@ -1,32 +1,11 @@
-/*
+
 The Plan:
 
 
 
 
-
-Minor stuff to do:
-- The timeslot won't allow you to select the time you want. It keeps changing it.
-- Remove duplicates based on file size.
-- Need to delete my old NFTs, or transfer them to another user.
-- Right principals added to alexandrian (maybe even from backend component).
-
-
-*/
-
-
-Bigger ones: 
-- Enable icrc37 transfers to ICRC7 with emporium guard on approvals()
-- Figure out how the transfer functions work.
-
-
-
-
-
-
-
-
-
+- Make the lorum ipsom conditions the signup conditions.
+- Add the link to the published bot attack post.
 
 
 
@@ -61,10 +40,11 @@ I think it'll be totally free to add nfts, but you can only add them if you own 
 
 
 Low Priority: 
-
+- White space between the greys on permasearch.
 - Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - Add Milliseconds place to permasearch. 
 - Remove duplicates based on file size.
 - More advanced searching with tags and metadata.
+- Take alexandrian principals from the backend Librarian profiles list.
 
