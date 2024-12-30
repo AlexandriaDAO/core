@@ -1,5 +1,5 @@
 [package]
-name = "logCanister"
+name = "logs"
 version = "0.1.0"
 edition = "2021"
 

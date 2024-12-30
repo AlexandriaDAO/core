@@ -147,13 +147,13 @@ candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_s
 # For tokenomics
 cargo build --release --target wasm32-unknown-unknown --package tokenomics
 candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
-# for tests
-cargo build --release --target wasm32-unknown-unknown --package tests
-candid-extractor target/wasm32-unknown-unknown/release/tests.wasm > src/tests/tests.did
+# for logs
+cargo build --release --target wasm32-unknown-unknown --package logs
+candid-extractor target/wasm32-unknown-unknown/release/logs.wasm > src/logs/logs.did
 
 dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
 dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
-dfx deploy tests --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
+dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 
 
 
