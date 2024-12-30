@@ -4,7 +4,6 @@ The Plan:
 
 
 
-- Make the lorum ipsom conditions the signup conditions.
 - Add the link to the published bot attack post.
 
 
