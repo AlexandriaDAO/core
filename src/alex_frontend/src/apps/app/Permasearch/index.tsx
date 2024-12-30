@@ -11,7 +11,7 @@ function Permasearch() {
 	const { isLoading, handleSearch } = useHandleSearch();
 	const dispatch = useAppDispatch();
 	useEffect(() => {
-		dispatch(setTransactions([]));
+		dispatch(setTransactions([])); //clear data from emporium 
 	}, [])
 	return (
 		<SearchContainer

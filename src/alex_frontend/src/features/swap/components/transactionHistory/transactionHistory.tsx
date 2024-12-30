@@ -36,7 +36,7 @@ const TransactionHistory = () => {
                                 <div className='relative h-5 w-5 group'>
                                     <div className='h-5 w-5 border-2 border-[#FF9900] flex justify-center items-center rounded-full '>
                                         <FontAwesomeIcon className='text-multycolor text-xs position-relative' icon={faExclamation} />
-                                        <span className="bg-[#C5CFF9] text-black p-3 rounded-2xl absolute bottom-0 left-full ml-3 text-xs font-light w-48 z-10 opacity-0 group-hover:opacity-100 before:content-[''] before:block before:absolute before:border-t-[10px] before:border-t-transparent before:border-b-[10px] before:border-b-transparent before:border-l-[20px] before:rotate-[164deg] before:border-l-[#C5CFF9] before:top-[70%] before:-translate-y-1/2 before:left-[-15px]">Transaction type</span>
+                                        <span className="bg-[#C5CFF9] text-black p-3 rounded-2xl absolute bottom-0 left-full ml-3 text-xs font-light w-48 z-10 opacity-0 group-hover:opacity-100 before:content-[''] before:block before:absolute before:border-t-[10px] before:border-t-transparent before:border-b-[10px] before:border-b-transparent before:border-l-[20px] before:rotate-[164deg] before:border-l-[#C5CFF9] before:top-[70%] before:-translate-y-1/2 before:left-[-15px] text-left">Transaction type</span>
                                     </div>
                                 </div>
                             </div>

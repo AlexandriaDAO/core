@@ -15,6 +15,9 @@ export const PageContainer = styled.div`
   gap: 24px;
   max-width: 800px;
   margin: 0 auto;
+  @media(max-width:575px){
+  max-width: 100%;
+  }
 `;
 
 export const Title = styled.h1`
@@ -49,6 +52,8 @@ export const ControlsContainer = styled.div<{ $isOpen: boolean }>`
   width: 100%;
   gap: 16px;
   margin-bottom: ${props => props.$isOpen ? '24px' : '0'};
+ flex-wrap:wrap;
+ justify-content:center;
 `;
 
 export const FiltersButton = styled.button<{ $isOpen?: boolean }>`

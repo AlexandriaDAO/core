@@ -18,7 +18,7 @@ export default function Tabs() {
     `;
 
     return (
-        <div className="flex items-center gap-6">
+        <div className="md:flex block  items-center gap-6 justify-center w-[calc(100%-170px)]">
             <button
                 onClick={() => navigate('/')}
                 className={`${baseStyles} ${location.pathname === '/' ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}

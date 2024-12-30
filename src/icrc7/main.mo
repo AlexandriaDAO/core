@@ -49,6 +49,8 @@ shared (_init_msg) actor class Example(
   type RevokeTokenApprovalArg = ICRC37.Service.RevokeTokenApprovalArg;
   type RevokeTokenApprovalResult = ICRC37.Service.RevokeTokenApprovalResult;
 
+  type IsApprovedArg =ICRC37.Service.IsApprovedArg;
+
   stable var init_msg = _init_msg; //preserves original initialization;
 
   stable var icrc7_migration_state = ICRC7.init(
@@ -442,7 +444,7 @@ shared (_init_msg) actor class Example(
   //In progress
   public shared (msg) func icrc37_approve_tokens(args : [ApproveTokenArg]) : async [?ApproveTokenResult] {
 
-    let EMPORIUM_PRINCIPAL =Principal.fromText("zdcg2-dqaaa-aaaap-qpnha-cai");
+    let EMPORIUM_PRINCIPAL = Principal.fromText("zdcg2-dqaaa-aaaap-qpnha-cai");
 
     // Check if all approval requests are for the emporium canister
     for (arg in args.vals()) {
@@ -463,6 +465,15 @@ shared (_init_msg) actor class Example(
 
   public shared (msg) func icrc37_revoke_token_approvals<system>(args : [RevokeTokenApprovalArg]) : async [?RevokeTokenApprovalResult] {
     icrc37().revoke_token_approvals(msg.caller, args);
+
   };
+
+  public query func icrc37_is_approved(args : [IsApprovedArg]) : async [Bool] {
+    return icrc37().is_approved(args);
+  };
+    public query func icrc37_max_approvals_per_token_or_collection() : async ?Nat {
+    return icrc37().max_approvals_per_token_or_collection();
+  };
+
 
 };

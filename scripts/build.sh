@@ -69,6 +69,11 @@ candid-extractor target/wasm32-unknown-unknown/release/tests.wasm > src/tests/te
 cargo build --release --target wasm32-unknown-unknown --package emporium
 candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/emporium/emporium.did
 
+# For LogCanister
+cargo build --release --target wasm32-unknown-unknown --package logCanister
+candid-extractor target/wasm32-unknown-unknown/release/logCanister.wasm > src/logCanister/logCanister.did
+
+
 
 cargo update
 

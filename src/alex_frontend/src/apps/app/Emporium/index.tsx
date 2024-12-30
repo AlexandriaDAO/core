@@ -20,6 +20,7 @@ import EmporiumSearchForm from "./component/emporiumSearchForm";
 import SearchEmporium from "./component/searchEmporium";
 import PaginationComponent from "./component/PaginationComponent";
 import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
+import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
@@ -150,15 +151,22 @@ const Emporium = () => {
         fetchMarketListings()
     }, []);
 
+
+    useEffect(() => {
+        if (user?.principal) {
+            dispatch(getSpendingBalance(user.principal));
+        }
+    }, [dispatch, user]);
+
     return (
         <>
-            <PageContainer>
+            <PageContainer className="">
                 <Title>Emporium</Title>
                 <Description>MarketPlace</Description>
                 <Hint></Hint>
                 <div className="pb-4 text-center">
                     <Button
-                        className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] ${activeButton === "userNfts" ? "bg-white text-[#353535]" : ""
+                        className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "userNfts" ? "bg-white text-[#353535]" : ""
                             }`}
                         disabled={!user?.principal}
                         onClick={() => {
