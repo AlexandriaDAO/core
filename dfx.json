@@ -108,9 +108,9 @@
       "type": "rust",
       "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
     },
-    "logCanister": {
-      "candid": "src/logCanister/logCanister.did",
-      "package": "logCanister",
+    "logs": {
+      "candid": "src/logs/logs.did",
+      "package": "logs",
       "type": "rust"
     },
     "tests": {

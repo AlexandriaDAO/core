@@ -37,7 +37,8 @@ const BurnContent = () => {
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        dispatch(burnLbry(amountLBRY));
+        if(!user?.principal) return;
+        dispatch(burnLbry({amount:amountLBRY.toString(),userPrincipal:user.principal}));
         setLoadingModalV(true);
 
     }

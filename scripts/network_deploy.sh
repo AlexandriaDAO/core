@@ -120,7 +120,7 @@ record {
      archive_options = record {
          num_blocks_to_archive = 3000;
          trigger_threshold = 6000;
-         controller_id = principal "'$(dfx canister id tokenomics --network ic)'";
+         controller_id = principal "'$(dfx cawnister id tokenomics --network ic)'";
          cycles_for_archive_creation = opt 10000000000000;
      };
      feature_flags = opt record {

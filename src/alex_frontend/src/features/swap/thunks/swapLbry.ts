@@ -34,7 +34,6 @@ const swapLbry = createAsyncThunk<
         },
       });
       if (checkApproval.allowance < amountFormatApprove) {
-        console.log("approval required!");
         const resultIcpApprove = await actorIcpLedger.icrc2_approve({
           spender: {
             owner: Principal.fromText(icp_swap_canister_id),

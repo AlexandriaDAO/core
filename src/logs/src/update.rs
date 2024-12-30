@@ -1,7 +1,7 @@
 use ic_cdk::update;
 
 use crate::{
-    utils::{get_alex_supply, get_lbry_supply},
+    utils::{get_alex_supply, get_lbry_supply, get_nft_supply},
     Log, LOGS,
 };
 
@@ -9,6 +9,7 @@ use crate::{
 pub async fn register_log() -> Result<String, String> {
     let alex_supply = get_alex_supply().await?;
     let lbry_supply = get_lbry_supply().await?;
+    let nft_supply = get_nft_supply().await?;
     let time = ic_cdk::api::time();
 
     LOGS.with(|logs| -> Result<(), String> {
@@ -20,6 +21,7 @@ pub async fn register_log() -> Result<String, String> {
             None => Log {
                 alex_supply,
                 lbry_supply,
+                nft_supply,
                 time,
             },
         };

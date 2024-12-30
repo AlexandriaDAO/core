@@ -11,6 +11,7 @@ pub use queries::*;
 
 pub mod utils;
 
-
+mod script;
+pub use script::{*};
 ic_cdk::export_candid!();
 

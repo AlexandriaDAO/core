@@ -82,7 +82,7 @@ const AccountCards: React.FC = () => {
 
                     {user ? (
                         <>
-                            <div className="mb-20 xxl:mb-20">
+                            <div className="md:mb-20 sm:mb-16 xs:mb-10">
                                 <div className="flex justify-between mb-3 xxl:mb-3">
                                     <div>
                                         <strong className="text-xl font-medium me-3 xxl:text-xl xxl:me-3">

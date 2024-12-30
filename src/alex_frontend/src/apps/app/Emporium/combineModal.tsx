@@ -148,7 +148,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
-            <div className="bg-white rounded-lg p-10 max-w-lg w-full relative">
+            <div className="bg-white rounded-lg sm:p-10 xs:p-4 max-w-lg w-full sm:w-full xs:w-11/12 relative">
                 <Button
                     onClick={onClose}
                     className="absolute top-1 right-1 text-gray-500 hover:text-white z-[1200]"
@@ -172,11 +172,11 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
                         handleRenderError={handleRenderError}
                     />
                 </div>
-                <div className="mt-4 flex justify-between gap-4 mb-4">
+                <div className="mt-4 flex justify-between mb-4">
                 
                     <Button
                         onClick={onClose}
-                        className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl me-5 hover:bg-white hover:text-[#353535]"
+                        className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl sm:me-5 xs:mb-2 hover:bg-white hover:text-[#353535]"
                     >
                         Cancel
                     </Button>

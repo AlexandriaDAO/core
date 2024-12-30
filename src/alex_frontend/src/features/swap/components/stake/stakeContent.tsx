@@ -29,7 +29,8 @@ const StakeContent = () => {
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        dispatch(stakeAlex(amount));
+        if(!user?.principal) return;
+        dispatch(stakeAlex({amount,userPrincipal:user?.principal}));
         setActionType("Stake");
         setLoadingModalV(true);
     }
@@ -77,33 +78,33 @@ const StakeContent = () => {
                             </label>
                         </div>
                         <div className='border text-white py-5 px-7 rounded-borderbox mb-3'>
-                            <h2 className='text-2xl text-radiocolor flex justify-between mb-5'>
+                            <h2 className='sm:text-2xl xs:text-xl text-radiocolor flex justify-between mb-5'>
                                 <span className='flex font-extrabold '>Staked</span>
                                 <span className='font-semibold flex'>{swap.stakeInfo.stakedAlex} ALEX</span>
                             </h2>
                             <ul className='ps-0'>
                                 <li className='mb-4'>
                                     <div className='flex justify-between'>
-                                        <strong className='text-lg text-radiocolor font-semibold me-1'>Daily earned</strong>
-                                        <strong className='text-lg text-radiocolor font-semibold me-1'>0 ALEX</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Daily earned</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>0 ALEX</strong>
                                     </div>
                                 </li>
                                 <li className='mb-4'>
                                     <div className='flex justify-between'>
-                                        <strong className='text-lg text-radiocolor font-semibold me-1'>Total earned</strong>
-                                        <strong className='text-lg text-radiocolor font-semibold me-1'>0 ALEX</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Total earned</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>0 ALEX</strong>
                                     </div>
                                 </li>
                                 <li className='mb-4'>
                                     <div className='flex justify-between'>
-                                        <strong className='text-lg text-radiocolor font-semibold me-1'>Total Staked</strong>
-                                        <strong className='text-lg text-radiocolor font-semibold me-1'>{swap.totalStaked} ALEX</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Total Staked</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{swap.totalStaked} ALEX</strong>
                                     </div>
                                 </li>
                                 <li>
                                     <div className='flex justify-between'>
-                                        <strong className='text-lg text-radiocolor font-semibold me-1'>Stakers</strong>
-                                        <strong className='text-lg text-radiocolor font-semibold me-1'>{swap.totalStakers}</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Stakers</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{swap.totalStakers}</strong>
                                     </div>
                                 </li>
                             </ul>
@@ -149,7 +150,7 @@ const StakeContent = () => {
                             </div>}
                             <div className="terms-condition-wrapper flex tems-baseline">
                                 <span className="text-[#FF37374D] mr-2 text-xl font-semibold">*</span>
-                                <p className="text-lg font-semibold pr-5 text-[#525252] w-9/12">If the transaction doesn’t complete as expected, please check the redeem page to locate your tokens.</p>
+                                <p className="sm:text-lg xs:text-sm font-semibold pr-5 text-[#525252] w-9/12">If the transaction doesn’t complete as expected, please check the redeem page to locate your tokens.</p>
                             </div>
                         </div>
                     </div>
