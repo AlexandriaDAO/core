@@ -96,6 +96,8 @@
 
     "@reduxjs/toolkit": "^2.2.7",
 
+    "@tanstack/react-query": "^5.62.8",
+
     "@tensorflow/tfjs": "^4.21.0",
 
     "antd": "^5.20.5",
@@ -133,6 +135,8 @@
     "ic-use-actor": "^0.1.0",
 
     "ic-use-internet-identity": "^0.1.0",
+
+    "ic-use-siwe-identity": "^0.1.2",
 
     "ic-vetkd-utils": "file:ic-vetkd-utils-0.1.0.tgz",
 
@@ -197,6 +201,10 @@
     "tailwindcss": "^3.4.10",
 
     "tailwindcss-animate": "^1.0.7",
+
+    "viem": "^2.21.56",
+
+    "wagmi": "^2.14.3",
 
     "webfontloader": "^1.6.28",
 

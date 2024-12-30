@@ -3,7 +3,7 @@ import Auth from "@/features/auth";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Logo from "@/components/Logo";
 import Tabs from "@/components/Tabs";
-import { useInternetIdentity } from "ic-use-internet-identity";
+import { useIdentity } from "@/hooks/useIdentity";
 import { InlineLogin } from "@/features/login";
 import { InlineSignup } from "@/features/signup";
 import Processing from "@/components/Processing";
@@ -11,7 +11,7 @@ import { useUser } from "@/hooks/actors";
 
 const Entry = () => {
 	const { actor } = useUser();
-	const { identity, isInitializing, isLoggingIn } = useInternetIdentity();
+	const { identity, isInitializing, isLoggingIn } = useIdentity();
 	const { user } = useAppSelector(state => state.auth);
 	const { loading } = useAppSelector(state => state.login);
 

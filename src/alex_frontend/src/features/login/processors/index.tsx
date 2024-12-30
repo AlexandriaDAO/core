@@ -1,11 +1,12 @@
 import React from 'react'
 import IIProcessor from './IIProcessor'
+import ETHProcessor from './ETHProcessor'
 
 const Processors = () => {
   return (
-    <div>
+    <div className='flex flex-col gap-2'>
         <IIProcessor />
-        {/* <ETHProcessor /> */}
+        <ETHProcessor />
         {/* <SOLProcessor /> */}
     </div>
   )

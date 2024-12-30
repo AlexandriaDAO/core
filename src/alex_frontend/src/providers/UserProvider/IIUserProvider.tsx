@@ -6,11 +6,11 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useInternetIdentity } from "ic-use-internet-identity";
 import React, { useEffect } from "react";
 
-interface UserProviderProps {
+interface IIUserProviderProps {
 	children: React.ReactNode;
 }
 
-const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
+const IIUserProvider: React.FC<IIUserProviderProps> = ({ children }) => {
 	const {identity, isInitializing} = useInternetIdentity();
     const {actor} = useUser();
 
@@ -42,4 +42,4 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 }
 
 
-export default UserProvider
+export default IIUserProvider
