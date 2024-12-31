@@ -3,7 +3,7 @@ use ic_cdk_macros::query;
 use candid::Principal;
 
 use crate::errors::general::GeneralError;
-use crate::store::STATE;
+use crate::store::{NODES, USER_NODES};
 use crate::models::node::Node;
 
 /// Retrieves multiple nodes by their ids
@@ -20,13 +20,12 @@ pub fn get_nodes(ids: Vec<u64>) -> Result<Vec<Node>, String> {
         return Err(GeneralError::InvalidInput("No node IDs provided".to_string()).to_string());
     }
 
-    STATE.with(|state| {
-        let state = state.borrow();
-        Ok(ids.iter()
-            .filter_map(|id| state.nodes.get(id))
-            .cloned()
-            .collect())
-    })
+    Ok(NODES.with(|nodes| {
+        let nodes = nodes.borrow();
+        ids.iter()
+            .filter_map(|id| nodes.get(id).map(|n| n.clone()))
+            .collect()
+    }))
 }
 
 /// Retrieves multiple nodes by their ids
@@ -43,34 +42,35 @@ pub fn get_nodes_strict(ids: Vec<u64>) -> Result<Vec<Node>, String> {
         return Err(GeneralError::InvalidInput("No node IDs provided".to_string()).to_string());
     }
 
-    STATE.with(|state| {
-        let state = state.borrow();
-
+    NODES.with(|nodes| {
+        let nodes = nodes.borrow();
+        
         // Check if all IDs exist first
-        if ids.iter().any(|id| !state.nodes.contains_key(id)) {
+        if ids.iter().any(|id| !nodes.contains_key(id)) {
             return Err(GeneralError::NotFound("One or more nodes not found".to_string()).to_string());
         }
 
         // Get all nodes (we know they exist)
         Ok(ids.iter()
-            .map(|id| state.nodes.get(id).unwrap().clone())
+            .map(|id| nodes.get(id).unwrap().clone())
             .collect())
     })
 }
 
 #[query]
 pub fn get_user_nodes(user: Principal) -> Vec<Node> {
-    STATE.with(|state| {
-        let state = state.borrow();
-        state.user_nodes
-            .get(&user)
-            .map(|node_ids| {
-                node_ids.iter()
-                    .filter_map(|id| state.nodes.get(id))
-                    .cloned()
-                    .collect()
-            })
-            .unwrap_or_default()
+    NODES.with(|nodes| {
+        let nodes = nodes.borrow();
+        USER_NODES.with(|user_nodes| {
+            user_nodes.borrow()
+                .get(&user)
+                .map(|list| {
+                    list.0.iter()
+                        .filter_map(|id| nodes.get(id).map(|n| n.clone()))
+                        .collect()
+                })
+                .unwrap_or_default()
+        })
     })
 }
 
@@ -82,29 +82,36 @@ pub fn get_my_nodes() -> Vec<Node> {
 /// Returns active nodes for a specific user or all active nodes if no user specified
 #[query]
 pub fn get_active_nodes(user: Option<Principal>) -> Vec<Node> {
-    STATE.with(|state| {
-        let state = state.borrow();
-        match user {
-            // Get specific user's active nodes using the index
-            Some(user) => state.user_nodes
-                .get(&user)
-                .map(|node_ids| {
-                    node_ids.iter()
-                        .filter_map(|id| state.nodes.get(id))
-                        .filter(|node| node.active)
-                        .cloned()
-                        .collect()
+    match user {
+        Some(user) => {
+            // Get specific user's active nodes
+            NODES.with(|nodes| {
+                let nodes = nodes.borrow();
+                USER_NODES.with(|user_nodes| {
+                    user_nodes.borrow()
+                        .get(&user)
+                        .map(|list| {
+                            list.0.iter()
+                                .filter_map(|id| nodes.get(id))
+                                .filter(|node| node.active)
+                                .map(|n| n.clone())
+                                .collect()
+                        })
+                        .unwrap_or_default()
                 })
-                .unwrap_or_default(),
-
+            })
+        },
+        None => {
             // Get all active nodes
-            None => state.nodes
-                .values()
-                .filter(|node| node.active)
-                .cloned()
-                .collect()
+            NODES.with(|nodes| {
+                nodes.borrow()
+                    .iter()
+                    .filter(|(_, node)| node.active)
+                    .map(|(_, node)| node.clone())
+                    .collect()
+            })
         }
-    })
+    }
 }
 
 #[query]

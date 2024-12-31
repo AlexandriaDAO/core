@@ -22,7 +22,7 @@ const BurnInfo: React.FC<BurnInfoProps> = ({ maxBurnAllowed }) => {
           </li>
           <li className='flex justify-between mb-5'>
             <strong className='text-lg font-medium  me-1 text-black'>{Number(swap.lbryRatio).toFixed(4)} LBRY
-              <span className='mx-2'><FontAwesomeIcon icon={faArrowRightLong} /></span>0.5 ICP
+              <span className='mx-2'><FontAwesomeIcon icon={faArrowRightLong} /></span>0.5 ICP/
             </strong>
           </li>
           <li className='flex justify-between mb-5'>

@@ -7,7 +7,7 @@ export const TermsContent: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="font-medium">
-        <p>IMPORTANT: The code operating this site is un-audited and we make no security guarantees for any stored assets.</p>
+        <p>IMPORTANT: The code operating this site is un-audited and we make no security guarantees for any stored assets. It is also not sutable for use on mobile at this time.</p>
         <p className="mt-2">⚠️ WARNING: It is not recommended to trade native tokens (ALEX/LBRY) outside of lbry.app, as they may be lost at this stage and off-site tokens will not be recoverable.</p>
         <p className="mt-2">All our code is <a href="https://github.com/AlexandriaDAO/core" className="text-blue-500 hover:underline">open-source</a> and is currently maintained by a small self-funded team. The codebase is rapidly evolving, under centralized control, and all plans are subject to change.</p>
       </div>
