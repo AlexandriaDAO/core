@@ -108,10 +108,10 @@
       "type": "rust",
       "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
     },
-    "tests": {
+    "logs": {
+      "candid": "src/logs/logs.did",
+      "package": "logs",
       "type": "rust",
-      "package": "tests",
-      "candid": "src/tests/tests.did",
       "specified_id": "yn33w-uaaaa-aaaap-qpk5q-cai"
     },
     "xrc": {

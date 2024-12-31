@@ -97,7 +97,8 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal, to_subaccount: 
             .ok_or("Arithmetic overflow occurred in phase_mint_alex.")?;
     }
 
-    if phase_mint_alex > 500_000 {
+    // Check for maximum ALEX per transaction (50 ALEX = 500_000 after multiplication by 10000)
+    if phase_mint_alex > 500_000_0000 {
         return Err(format!(
             "This would mint {} ALEX which exceeds the maximum of 50 ALEX per transaction",
             phase_mint_alex as f64 / 10000.0

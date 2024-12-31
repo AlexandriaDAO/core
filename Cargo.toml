@@ -8,7 +8,7 @@ members = [
     "src/registry",
     "src/tokenomics",
     "src/nft_manager",
-    "src/tests",
+    "src/logs",
     "src/xrc",
     "src/user",
     "src/emporium",

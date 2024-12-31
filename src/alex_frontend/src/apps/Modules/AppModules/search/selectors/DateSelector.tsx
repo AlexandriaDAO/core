@@ -76,60 +76,72 @@ const createUTCDate = (date: Date): Date => {
 };
 
 const TimeInput: React.FC<TimeInputProps> = ({ value, onChange, className }) => {
-  const [time, setTime] = useState(() => ({
-    hour: (value.getUTCHours() % 12 || 12).toString(),
-    minutes: value.getUTCMinutes().toString().padStart(2, '0'),
-    period: value.getUTCHours() >= 12 ? 'PM' : 'AM'
-  }));
+  // Initialize time state from UTC hours, but keep it simple
+  const [time, setTime] = useState(() => {
+    const hours = value.getUTCHours();
+    return {
+      hour: (hours % 12 || 12).toString(),
+      minutes: value.getUTCMinutes().toString().padStart(2, '0'),
+      period: hours >= 12 ? 'PM' : 'AM'
+    };
+  });
 
-  const updateTime = useCallback((newTime: typeof time) => {
+  // Each handler only updates its own slot and preserves all other date/time components
+  const onHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newHour = parseInt(e.target.value);
     const newDate = new Date(value);
     
-    let hours = parseInt(newTime.hour);
-    if (newTime.period === 'PM' && hours !== 12) hours += 12;
-    if (newTime.period === 'AM' && hours === 12) hours = 0;
+    // Calculate new hour while preserving AM/PM
+    const isPM = time.period === 'PM';
+    const hour24 = (newHour % 12) + (isPM && newHour !== 12 ? 12 : 0);
     
-    newDate.setHours(hours);
-    newDate.setMinutes(parseInt(newTime.minutes));
-    
+    newDate.setUTCHours(hour24);
+    setTime(prev => ({ ...prev, hour: newHour.toString() }));
     onChange(newDate);
-  }, [value, onChange]);
-
-  // Update handlers to work directly with input values
-  const onHourChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newTime = { ...time, hour: e.target.value };
-    setTime(newTime);
-    updateTime(newTime);
   };
 
   const onMinuteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newTime = { ...time, minutes: e.target.value };
-    setTime(newTime);
-    updateTime(newTime);
+    const newMinutes = parseInt(e.target.value);
+    const newDate = new Date(value);
+    newDate.setUTCMinutes(newMinutes);
+    setTime(prev => ({ ...prev, minutes: e.target.value }));
+    onChange(newDate);
   };
 
   const onPeriodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newTime = { ...time, period: e.target.value as 'AM' | 'PM' };
-    setTime(newTime);
-    updateTime(newTime);
+    const newPeriod = e.target.value as 'AM' | 'PM';
+    const newDate = new Date(value);
+    const currentHour = newDate.getUTCHours() % 12;
+    
+    // Simply add or subtract 12 hours without affecting the date
+    let newHour = currentHour;
+    if (newPeriod === 'PM') newHour += 12;
+    
+    // Use setUTCHours with a second parameter to prevent date rollover
+    newDate.setUTCHours(newHour, newDate.getUTCMinutes());
+    setTime(prev => ({ ...prev, period: newPeriod }));
+    onChange(newDate);
   };
 
-  // Only update local state when value prop changes significantly
+  // Only update local display state when UTC time changes significantly
   useEffect(() => {
-    const newHour = (value.getUTCHours() % 12 || 12).toString();
-    const newMinutes = value.getUTCMinutes().toString().padStart(2, '0');
-    const newPeriod = value.getUTCHours() >= 12 ? 'PM' : 'AM';
+    const hours = value.getUTCHours();
+    const minutes = value.getUTCMinutes();
+    const period = hours >= 12 ? 'PM' : 'AM';
+    
+    const newTime = {
+      hour: (hours % 12 || 12).toString(),
+      minutes: minutes.toString().padStart(2, '0'),
+      period
+    };
 
+    // Only update if there's an actual change
     if (
-      newHour !== time.hour ||
-      newMinutes !== time.minutes ||
-      newPeriod !== time.period
+      newTime.hour !== time.hour ||
+      newTime.minutes !== time.minutes ||
+      newTime.period !== time.period
     ) {
-      setTime({
-        hour: newHour,
-        minutes: newMinutes,
-        period: newPeriod
-      });
+      setTime(newTime);
     }
   }, [value]);
 
@@ -190,19 +202,29 @@ const DateSelector: React.FC = () => {
   const handleDateTimeChange = useCallback((date: Date, allowDateChange: boolean = false) => {
     if (!isValid(date)) return;
     
-    // If allowDateChange is true, use the full date, otherwise only update time
-    const newDate = allowDateChange ? new Date(date) : new Date(selectedDate);
-    if (!allowDateChange) {
-      newDate.setHours(date.getHours());
-      newDate.setMinutes(date.getMinutes());
+    const newDate = new Date(selectedDate);
+    
+    if (allowDateChange) {
+      // For date changes, preserve the exact hour and minute
+      const hours = selectedDate.getUTCHours();
+      const minutes = selectedDate.getUTCMinutes();
+      newDate.setUTCFullYear(date.getUTCFullYear());
+      newDate.setUTCMonth(date.getUTCMonth());
+      newDate.setUTCDate(date.getUTCDate());
+      // Restore the time after date change
+      newDate.setUTCHours(hours, minutes);
+    } else {
+      // For time changes, use setUTCHours with minutes to prevent date rollover
+      newDate.setUTCHours(date.getUTCHours(), date.getUTCMinutes());
     }
     
     setSelectedDate(newDate);
+    // Always format the display date from UTC to prevent display shifts
     setDateInputValue(format(newDate, DATE_FORMAT));
     
     dispatch(setSearchState({
       filterDate: newDate.toISOString().split('T')[0],
-      filterTime: `${String(newDate.getHours()).padStart(2, '0')}:${String(newDate.getMinutes()).padStart(2, '0')}`
+      filterTime: `${String(newDate.getUTCHours()).padStart(2, '0')}:${String(newDate.getUTCMinutes()).padStart(2, '0')}`
     }));
   }, [dispatch, selectedDate]);
 
