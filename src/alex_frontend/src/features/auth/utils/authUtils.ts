@@ -66,7 +66,7 @@ const user_canister_id = process.env.CANISTER_ID_USER!;
 const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
-const log_canister_id = process.env.CANISTER_LOG_CANISTER!;
+const log_canister_id = process.env.CANISTER_ID_LOGS!;
 
 export const getPrincipal = (client: AuthClient): string =>
   client.getIdentity().getPrincipal().toString();

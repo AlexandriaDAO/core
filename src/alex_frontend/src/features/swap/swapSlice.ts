@@ -56,7 +56,18 @@ export interface SwapState {
   error: string | null;
   spendingBalance: string;
   alexSpendingBalance: string;
-  logsData:  { chartData: { time: string; lbry: number; alex: number; nft: number }[] },
+  logsData:   {
+    chartData: {
+      time: string;
+      lbry: number;
+      alex: number;
+      nft: number;
+      totalAlexStaked: number;
+      stakerCount: number;
+      alexRate: number;
+      totalLbryBurn: number;
+    }[];
+   },
 
 }
 

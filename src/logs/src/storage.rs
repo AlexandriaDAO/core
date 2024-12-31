@@ -31,9 +31,13 @@ const MAX_VALUE_SIZE: u32 = 200;
 pub struct Log {
     pub alex_supply: Nat,
     pub lbry_supply: Nat,
-    pub nft_supply:Nat,
+    pub nft_supply: Nat,
+    pub total_lbry_burn: u64,
+    pub alex_rate: u64,
+    pub staker_count: u64,
+    pub total_alex_staked: Nat,
+    pub apy: Nat,
     pub time: u64,
-    
 }
 
 impl Storable for Log {

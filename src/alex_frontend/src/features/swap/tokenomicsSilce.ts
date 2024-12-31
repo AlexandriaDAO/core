@@ -25,12 +25,12 @@ const tokenomicsSlice = createSlice({
   extraReducers: (builder: ActionReducerMapBuilder<SwapState>) => {
     builder
       .addCase(getAlexMintRate.pending, (state) => {
-        toast.info("Fetching ALEX mint rate!");
+        // toast.info("Fetching ALEX mint rate!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getAlexMintRate.fulfilled, (state, action) => {
-        toast.success("Fetched ALEX mint rate!");
+        // toast.success("Fetched ALEX mint rate!");
         state.alexMintRate = action.payload;
         state.loading = false;
         state.error = null;

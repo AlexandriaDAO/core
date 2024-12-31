@@ -65,7 +65,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   }, [dispatch]);
 
   const renderDetails = useCallback((transaction: Transaction) => (
-    <div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300 z-[20]">
+    <div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300">
       <p><span className="font-semibold">ID:</span> {transaction.id}</p>
       <p><span className="font-semibold">Owner:</span> {transaction.owner}</p>
       {transaction.data && <p><span className="font-semibold">Size:</span> {transaction.data.size} bytes</p>}

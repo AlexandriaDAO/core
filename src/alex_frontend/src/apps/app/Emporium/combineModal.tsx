@@ -33,6 +33,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
     const dispatch = useAppDispatch();
     const contentData = useAppSelector((state) => state.contentDisplay.contentData);
     const mintableState = useAppSelector((state) => state.contentDisplay.mintableState);
+    const user=useAppSelector((state)=>state.auth);
     const emporium = useAppSelector((state) => state.emporium);
     const swap = useAppSelector((state) => state.swap);
     const [price, setPrice] = useState(modalData.price || "");
@@ -52,7 +53,11 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
                     dispatch(removeListedNft(modalData.arwaveId));
                     break;
                 case "buy":
-                    dispatch(buyNft({ nftArweaveId: modalData.arwaveId, price: modalData.price }));
+                    if (!user.user?.principal) return;
+                    dispatch(buyNft({
+                        nftArweaveId: modalData.arwaveId, price: modalData.price,
+                        userPrincipal: user.user?.principal
+                    }));
                     break;
             }
         } else {
