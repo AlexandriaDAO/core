@@ -42,6 +42,7 @@ const defaultPrincipals = [
   "e2mqm-f5kv2-wacvn-7sjl2-4wmrn-zumo5-l4g2v-ac752-2vgow-tnd7c-qae",
   "hlmbu-xmzcn-l526t-yyfet-xf2ix-hyo66-ter6l-pu2ad-6flhh-icaxp-iae",
   "hmwxd-ccrpr-hnoox-rio37-nft6a-anh7y-c7sli-3iqbm-kvbve-rhrhi-iae",
+  "2zf7e-ctv4z-lbpwc-an3f4-u53uo-wcam7-pur4v-2clio-s7isj-eehzy-mqe",
 
 
 ] as const;
