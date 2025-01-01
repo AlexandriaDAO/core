@@ -2,6 +2,7 @@ import { useInternetIdentity } from 'ic-use-internet-identity';
 import { useSiweIdentity } from 'ic-use-siwe-identity';
 import { AnonymousIdentity } from '@dfinity/agent';
 import useAuth from '@/hooks/useAuth';
+import { useSiwsIdentity } from 'ic-use-siws-identity';
 
 
 export function useIdentity() {
@@ -13,6 +14,10 @@ export function useIdentity() {
 
     if (provider === 'ETH') {
         return useSiweIdentity();
+    }
+
+    if (provider === 'SOL') {
+        return useSiwsIdentity();
     }
 
     return {

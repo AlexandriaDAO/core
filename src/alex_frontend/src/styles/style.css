@@ -45,3 +45,7 @@
 body {
     font-family: 'Syne';
 }
+
+.wallet-adapter-modal{
+    pointer-events: auto;
+}

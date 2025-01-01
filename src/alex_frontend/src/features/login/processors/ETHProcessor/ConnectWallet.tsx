@@ -46,8 +46,11 @@ export default function ConnectWallet() {
 					className="w-full justify-between"
 				>
 					<>
-						{ isConnecting && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> }
-						Connect Ethereum wallet
+						{ isConnecting ?
+							<LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> :
+							<img alt="Ethereum" className="inline-block w-3 h-3" src="/images/ethereum.svg" />
+						}
+						{isConnecting ? "Connecting" : "Connect Ethereum wallet"}
 					</>
 					<LogIn size={20}/>
 				</Button>
