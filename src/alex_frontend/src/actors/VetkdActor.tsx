@@ -5,14 +5,17 @@ import { canisterId, idlFactory } from "../../../declarations/vetkd";
 import { _SERVICE } from "../../../declarations/vetkd/vetkd.did";
 
 import { ReactNode } from "react";
-import { useInternetIdentity } from "ic-use-internet-identity";
+import { useIdentity } from "@/hooks/useIdentity";
 import { VetkdContext } from "@/contexts/actors";
 import { useActorErrorHandler } from "@/hooks/actors";
 import { AnonymousIdentity } from "@dfinity/agent";
 
 export default function VetkdActor({ children }: { children: ReactNode }) {
-    const { identity, clear } = useInternetIdentity();
-    const { errorToast, handleResponseError, handleRequest , handleResponse} = useActorErrorHandler(clear);
+    const { identity, clear, isInitializing, isLoggingIn } = useIdentity();
+    const { errorToast, handleRequest , handleResponse, handleResponseError} = useActorErrorHandler(clear);
+
+	// Don't render the ActorProvider until we know the identity state
+    if (isInitializing || isLoggingIn) return <>{children}</>;
 
 	return (
 		<ActorProvider<_SERVICE>

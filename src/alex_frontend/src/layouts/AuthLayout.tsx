@@ -1,5 +1,5 @@
 import React from "react";
-import { useInternetIdentity } from "ic-use-internet-identity";
+import { useIdentity } from "@/hooks/useIdentity";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Loading from "@/components/Loading";
 import { FullPageSignup } from "@/features/signup";
@@ -8,7 +8,7 @@ import { Outlet } from "react-router";
 
 
 const AuthLayout = () => {
-	const {identity, isInitializing} = useInternetIdentity();
+	const {identity, isInitializing} = useIdentity();
 
 	const {user} = useAppSelector(state=>state.auth);
 	const {loading, error} = useAppSelector(state=>state.login);

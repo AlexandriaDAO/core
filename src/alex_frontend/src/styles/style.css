@@ -45,8 +45,7 @@
 body {
     font-family: 'Syne';
 }
-input[type="number"] {
-    -moz-appearance: textfield; /* For Firefox */
-    -webkit-appearance: none; /* For Chrome and Safari */
-    appearance: none; /* Standard property */
-  }
+
+.wallet-adapter-modal{
+    pointer-events: auto;
+}
