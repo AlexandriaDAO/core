@@ -63,7 +63,7 @@ const getAllLogs = createAsyncThunk<
       nft: Number(logData.nft_supply),
       totalAlexStaked: Number(logData.total_alex_staked) / 100_000_000,
       stakerCount: Number(logData.staker_count),
-      alexRate: Number(logData.alex_rate),
+      alexRate: Number(logData.alex_rate)/10_000,
       totalLbryBurn: Number(logData.total_lbry_burn),
     }));
 

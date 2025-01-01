@@ -163,12 +163,13 @@ impl Storable for UserIdList {
 }
 
 // Helper functions for counters
-pub fn init_counters() {
+pub fn init_counters() -> Result<(), String> {
     ENGINE_COUNTER.with(|counter| {
         let mut counter = counter.borrow_mut();
         // Only initialize if it doesn't exist
         if counter.get(&()).is_none() {
-            counter.insert((), 0).expect("Failed to initialize engine counter");
+            counter.insert((), 0)
+                .ok_or_else(|| "Failed to initialize engine counter".to_string());
         }
     });
 
@@ -176,9 +177,11 @@ pub fn init_counters() {
         let mut counter = counter.borrow_mut();
         // Only initialize if it doesn't exist
         if counter.get(&()).is_none() {
-            counter.insert((), 0).expect("Failed to initialize node counter");
+            counter.insert((), 0)
+                .ok_or_else(|| "Failed to initialize node counter".to_string());
         }
     });
+    Ok(())
 }
 
 pub fn get_and_increment_engine_counter() -> u64 {

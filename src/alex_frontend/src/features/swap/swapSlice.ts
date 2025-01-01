@@ -223,7 +223,7 @@ const swapSlice = createSlice({
         state.error = null;
       })
       .addCase(burnLbry.rejected, (state, action) => {
-        toast.error("Error while burning!");
+        toast.error(action.payload);
         state.loading = false;
         state.error = action.payload as string;
       })

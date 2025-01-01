@@ -47,6 +47,7 @@ const burnLbry = createAsyncThunk<
         if ("TemporarilyUnavailable" in error) {
           errorMessage = "Service is temporarily unavailable";
         }
+  
         throw new Error(errorMessage);
       }
     }

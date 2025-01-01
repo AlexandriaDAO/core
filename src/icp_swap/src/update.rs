@@ -165,6 +165,7 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
         match mint_ALEX(limit_result, caller, from_subaccount).await {
             Ok(_) => {}
             Err(e) => {
+                ic_cdk::println!("error{}",e);
                 let amount_icp_after_fee = amount_icp_e8s
                     .checked_sub(ICP_TRANSFER_FEE)
                     .ok_or("Arithmetic underflow in amount_icp_after_fee.")?;
