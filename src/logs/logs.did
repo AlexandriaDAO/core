@@ -9,12 +9,9 @@ type Log = record {
   nft_supply : nat;
   total_lbry_burn : nat64;
 };
-type Result = variant { Ok : nat; Err : text };
-type Result_1 = variant { Ok : text; Err : text };
+type Result = variant { Ok : text; Err : text };
 service : () -> {
   get_all_logs : () -> (vec record { nat64; Log }) query;
-  get_apy_value : () -> (Result) query;
-  get_total_alex_staked : () -> (Result) query;
-  register_log : () -> (Result_1);
+  register_log : () -> (Result);
   register_log_wrapper : () -> ();
 }

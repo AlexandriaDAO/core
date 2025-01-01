@@ -1,9 +1,12 @@
 
 The Plan:
 
+- Block out the burn button if either value is red.
 - Block the manager page if it's not fixed by tomorrow.
+- ContentValidator is not making videos mintable.
+  
 
-Next Small Stuff: 
+Next Small Stuff:
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - Add Milliseconds place to permasearch. 
 - Remove duplicates based on file size.

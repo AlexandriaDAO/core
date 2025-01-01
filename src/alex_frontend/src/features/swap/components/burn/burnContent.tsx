@@ -147,11 +147,28 @@ const BurnContent = () => {
                         </div>
                         {user ? <button
                             type="button"
-                            className={`bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 mb-4 ${parseInt(amountLBRY.toString()) === 0 || swap.loading ? 'text-[#808080] cursor-not-allowed' : 'bg-balancebox text-white cursor-pointer'}`}
+                            className={`bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 mb-4 ${
+                                parseInt(amountLBRY.toString()) === 0 || 
+                                swap.loading || 
+                                amountLBRY > maxBurnAllowed ||
+                                tentativeALEX > 50 
+                                    ? 'text-[#808080] cursor-not-allowed' 
+                                    : 'bg-balancebox text-white cursor-pointer'
+                            }`}
                             style={{
-                                backgroundColor: parseInt(amountLBRY.toString()) === 0 || swap.loading ? '#525252' : '', // when disabled
+                                backgroundColor: parseInt(amountLBRY.toString()) === 0 || 
+                                    swap.loading || 
+                                    amountLBRY > maxBurnAllowed ||
+                                    tentativeALEX > 50 
+                                        ? '#525252' 
+                                        : '', // when disabled
                             }}
-                            disabled={amountLBRY === 0 || swap.loading === true}
+                            disabled={
+                                amountLBRY === 0 || 
+                                swap.loading === true || 
+                                amountLBRY > maxBurnAllowed ||
+                                tentativeALEX > 50
+                            }
                             onClick={(e) => {
                                 handleSubmit(e);
                             }}

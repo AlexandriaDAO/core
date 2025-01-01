@@ -186,7 +186,7 @@ record {
 
 
 # create and deploy sign in with ethereum provider
-dfx canister create ic_siwe_provider
+dfx canister create ic_siwe_provider --specified-id w4vlu-paaaa-aaaaj-azxyq-cai
 
 # opt 300000000000; /* 5 minutes */
 # opt 604800000000000; /* 1 week */
@@ -209,7 +209,7 @@ dfx deploy ic_siwe_provider --argument $'(
 )'
 
 # create and deploy sign in with solana provider
-dfx canister create ic_siws_provider
+dfx canister create ic_siws_provider --specified-id w3una-cyaaa-aaaaj-azxya-cai
 dfx deploy ic_siws_provider --argument $'(
     record {
         domain = "127.0.0.1";
@@ -245,7 +245,7 @@ dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 4uz75-osymt-bw2k6-pay77-zdzmh-lvn6o-c7knl-vozu3-zebzx-qjmds-6qe)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal zhsrt-lnrku-drydk-pt64m-p4o2v-5vac3-z246b-utrju-vmram-32yrf-5qe)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)
