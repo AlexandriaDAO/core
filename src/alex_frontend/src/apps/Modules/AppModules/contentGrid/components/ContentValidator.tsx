@@ -9,6 +9,7 @@ import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import ContentFetcher from './ContentFetcher';
 import { ContentValidatorProps } from '../types';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
+import { contentCache } from '@/apps/Modules/LibModules/contentDisplay/services/contentCacheService';
 
 const ContentValidator: React.FC<ContentValidatorProps> = ({
   transactionId,
@@ -51,9 +52,13 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     }));
   };
 
-  const handleValidateContent = async (element: HTMLImageElement | HTMLVideoElement) => {
+  const handleValidateContent = async (element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => {
     if (isLoading) return;
     
+    if (thumbnailUrl && contentType.startsWith('video/')) {
+      contentCache.updateThumbnail(transactionId, thumbnailUrl);
+    }
+
     const isAuthenticated = await checkAuthentication();
 
     if (nftData?.principal && (nftData.collection === 'icrc7_scion' || nftData.collection === 'icrc7')) {
@@ -62,13 +67,13 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     }
 
     if (!nsfwModelLoaded) {
-      console.log('nsfwModelLoaded', nsfwModelLoaded);
       updateMintableState(false, null);
       return;
     }
 
     try {
-      const predictionResults = await validateContent(element, contentType);
+      const elementToValidate = thumbnailUrl ? await createImageFromThumbnail(thumbnailUrl) : element;
+      const predictionResults = await validateContent(elementToValidate, contentType);
       if (predictionResults) {
         dispatch(setPredictionResults({ 
           id: transactionId, 
@@ -88,6 +93,16 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   const handleError = () => {
     console.error(`Error loading content for transaction ID: ${transactionId}`);
     updateMintableState(false, null);
+  };
+
+  const createImageFromThumbnail = (thumbnailUrl: string): Promise<HTMLImageElement> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = thumbnailUrl;
+      img.crossOrigin = "anonymous";
+    });
   };
 
   return (

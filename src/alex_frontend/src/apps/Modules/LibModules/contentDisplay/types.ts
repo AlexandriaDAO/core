@@ -2,6 +2,7 @@ export interface CachedContent {
   url: string | null;
   textContent: string | null;
   imageObjectUrl: string | null;
+  thumbnailUrl: string | null;
   error: string | null;
 }
 

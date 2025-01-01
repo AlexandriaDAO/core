@@ -1,5 +1,5 @@
 import React from 'react';
-import { LoaderPinwheel, BookOpen, File } from 'lucide-react';
+import { LoaderPinwheel, BookOpen, File, Play } from 'lucide-react';
 import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
 import ContentValidator from './ContentValidator';
@@ -74,11 +74,26 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
     const contentMap = {
       "video/": (
         <div className="relative w-full h-full">
-          <video 
-            src={inModal ? contentUrls.fullUrl : undefined} 
-            controls={inModal} 
-            {...commonProps}
-          />
+          {inModal ? (
+            <video 
+              src={contentUrls.fullUrl}
+              controls
+              {...commonProps}
+            />
+          ) : (
+            content?.thumbnailUrl ? (
+              <img
+                src={content.thumbnailUrl}
+                alt="Video thumbnail"
+                {...commonProps}
+                crossOrigin="anonymous"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                <Play className="text-gray-500 text-4xl" />
+              </div>
+            )
+          )}
         </div>
       ),
       "image/": (

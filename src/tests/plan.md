@@ -4,13 +4,12 @@ The Plan:
 - Block the manager page if it's not fixed by tomorrow.
 
 Next Small Stuff: 
-- Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - Add Milliseconds place to permasearch. 
 - Remove duplicates based on file size.
 - More advanced searching with tags and metadata.
 - Take alexandrian principals from the backend Librarian profiles list.
-- Try and get the NFT list to reflect the accounts list. (and figure out what canister that is so I dont delete it.)
+
 
 
 
