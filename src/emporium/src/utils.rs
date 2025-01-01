@@ -1,10 +1,14 @@
 use candid::{CandidType, Nat, Principal};
 use ic_cdk::api::call::CallResult;
+use ic_cdk::{call, caller};
 use serde::Deserialize;
 
 use crate::LISTING;
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
-pub const EMPORIUM_CANISTER_ID: &str = "be2us-64aaa-aaaaa-qaabq-cai";
+pub const EMPORIUM_CANISTER_ID: &str = "zdcg2-dqaaa-aaaap-qpnha-cai";
+pub const NFT_MANAGER_CANISTER_ID: &str = "5sh5r-gyaaa-aaaap-qkmra-cai";
+pub const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
+
 
 #[derive(CandidType, Deserialize, Debug)]
 struct OwnerInfo {
@@ -50,6 +54,32 @@ pub fn remove_nft_from_listing(token_id: Nat) -> Result<String, String> {
 }
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
+}
+
+pub async fn call_deduct_marketplace_fee() -> Result<String, String> {
+    let nft_manager = get_principal(NFT_MANAGER_CANISTER_ID);
+    let user = caller();
+
+    // Make the cross-canister call
+    match call::<(Principal,), (Result<String, String>,)>(
+        nft_manager,
+        "deduct_marketplace_fee",
+        (user,),
+    )
+    .await
+    {
+        Ok((result,)) => {
+            // Unwrap the inner Result
+            match result {
+                Ok(success_msg) => Ok(success_msg),
+                Err(error_msg) => Err(format!("NFT Manager returned error: {}", error_msg)),
+            }
+        }
+        Err((code, msg)) => Err(format!(
+            "NFT manager canister call failed with code {:?}: {}",
+            code, msg
+        )),
+    }
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug)]

@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import Auth from "@/features/auth";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Logo from "@/components/Logo";
@@ -40,14 +41,36 @@ const Entry = () => {
 };
 
 function Header() {
+		const [isMenuOpen, setIsMenuOpen] = useState(false);
+	  
+		const toggleMenu = () => {
+		  setIsMenuOpen(!isMenuOpen);
+		};
+
 	return (
 		<div className="flex-grow-0 flex-shrink-0 bg-[#353535] basis-24 flex flex-col justify-center items-stretch px-10">
-			<div className="flex-grow-0 flex-shrink-0 flex basis-24 justify-between items-center w-full">
-				<Logo />
-				<Tabs />
-				<Entry />
-			</div>
+      <div className="flex-grow-0 flex-shrink-0 flex basis-24 justify-between items-center w-full ">
+        <Logo />
+		<div className="md:flex sm:hidden xs:hidden w-full justify-between ">
+		<Tabs />
+		
+        <Entry  />
 		</div>
+        <div className="hidden md:hidden sm:block xs:block">
+          <button className="w-6" onClick={toggleMenu}>
+            <img src="images/menu.svg" alt="menu-icon" />
+          </button>
+        </div>
+      </div>
+      {isMenuOpen && (
+        <div className="flex flex-col p-4">
+          
+		   <Tabs />
+
+		   <Entry />
+        </div>
+      )}
+    </div>
 	);
 }
 

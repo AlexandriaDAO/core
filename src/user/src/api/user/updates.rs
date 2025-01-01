@@ -4,7 +4,7 @@ use candid::Principal;
 
 use crate::errors::general::GeneralError;
 use crate::errors::user::UserError;
-use crate::store::STATE;
+use crate::store::{USERS, USERNAMES};
 use crate::models::user::{SignupRequest, UpdateUserRequest, User};
 use crate::validations::user::{validate_username, validate_name, validate_avatar_url};
 
@@ -12,53 +12,62 @@ use crate::validations::user::{validate_username, validate_name, validate_avatar
 pub fn signup(request: SignupRequest) -> Result<User, String> {
     let caller = caller();
 
-    // Check for anonymous user
     if caller == Principal::anonymous() {
         return Err(GeneralError::AnonymousNotAllowed.to_string());
     }
 
     let username = request.username.trim().to_lowercase();
 
-    // Validate username
     if let Err(err) = validate_username(&username) {
         return Err(err.to_string());
     }
 
-    STATE.with(|state| {
-        let mut state = state.borrow_mut();
-
-        // Check if user already exists
-        if state.users.contains_key(&caller) {
+    // Check if user exists
+    USERS.with(|users| {
+        if users.borrow().contains_key(&caller) {
             return Err(GeneralError::AlreadyExists("User with this principal".to_string()).to_string());
         }
+        Ok::<(), String>(())
+    })?;
 
-        // Check if username is taken
-        if state.usernames.contains_key(&username) {
+    // Check if username is taken
+    USERNAMES.with(|usernames| {
+        if usernames.borrow().contains_key(&username) {
             return Err(UserError::UsernameTaken.to_string());
         }
+        Ok::<(), String>(())
+    })?;
 
-        let user = User::new(caller, username.clone());
+    let user = User::new(caller, username.clone());
 
-        state.usernames.insert(username, caller);
-        state.users.insert(caller, user.clone());
+    // Insert user data
+    USERS.with(|users| {
+        let mut users = users.borrow_mut();
+        users.insert(caller, user.clone());
+        Ok::<(), String>(())
+    })?;
 
-        Ok(user)
-    })
+    USERNAMES.with(|usernames| {
+        let mut usernames = usernames.borrow_mut();
+        usernames.insert(username.clone(), caller);
+        Ok::<(), String>(())
+    })?;
+
+    Ok(user)
 }
 
 #[update]
 pub fn update_profile(request: UpdateUserRequest) -> Result<User, String> {
     let caller = caller();
 
-    // Check for anonymous user
     if caller == Principal::anonymous() {
         return Err(GeneralError::AnonymousNotAllowed.to_string());
     }
 
-    STATE.with(|state| {
-        let mut state = state.borrow_mut();
-
-        let user = state.users.get_mut(&caller)
+    USERS.with(|users| {
+        let mut users = users.borrow_mut();
+        let mut user = users.get(&caller)
+            .map(|user| user.clone())
             .ok_or_else(|| GeneralError::NotFound("User".to_string()).to_string())?;
 
         // Update name if provided
@@ -80,7 +89,8 @@ pub fn update_profile(request: UpdateUserRequest) -> Result<User, String> {
         }
 
         user.updated_at = time();
-        Ok(user.clone())
+        users.insert(caller, user.clone());
+        Ok(user)
     })
 }
 
@@ -88,26 +98,21 @@ pub fn update_profile(request: UpdateUserRequest) -> Result<User, String> {
 pub fn upgrade_to_librarian() -> Result<User, String> {
     let caller = caller();
 
-    // Check for anonymous user
     if caller == Principal::anonymous() {
         return Err(GeneralError::AnonymousNotAllowed.to_string());
     }
 
-    STATE.with(|state| {
-        let mut state = state.borrow_mut();
-
-        let user = state.users.get_mut(&caller)
+    USERS.with(|users| {
+        let mut users = users.borrow_mut();
+        let mut user = users.get(&caller)
+            .map(|user| user.clone())
             .ok_or_else(|| GeneralError::NotFound("User".to_string()).to_string())?;
-
-        // You might want to add authorization check here
-        // if !is_authorized(caller) {
-        //     return Err(UserError::NotAuthorized.to_string());
-        // }
 
         user.librarian = true;
         user.updated_at = time();
-
-        Ok(user.clone())
+        users.insert(caller, user.clone());
+        
+        Ok(user)
     })
 }
 

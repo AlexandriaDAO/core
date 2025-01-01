@@ -29,4 +29,5 @@ export interface ContentValidatorProps {
   contentUrl: string;
   contentType: string;
   imageObjectUrl: string | null;
+  onLoad?: (element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => void;
 }

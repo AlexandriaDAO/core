@@ -1,0 +1,1 @@
+export const MARKETPLACE_LBRY_FEE= 20; // MarketPlace fee frontedn

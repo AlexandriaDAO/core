@@ -12,7 +12,6 @@ use ic_ledger_types::Subaccount;
 use ic_ledger_types::{AccountBalanceArgs, Tokens, DEFAULT_SUBACCOUNT, MAINNET_LEDGER_CANISTER_ID};
 use serde::Deserialize;
 
-// pub const STAKING_REWARD_PERCENTAGE: u64 = 1000; //multiply by 100 eg. 10% = 1000
 pub const STAKING_REWARD_PERCENTAGE: u64 = 100; // 1%
 pub const ALEX_CANISTER_ID: &str = "ysy5f-2qaaa-aaaap-qkmmq-cai";
 pub const LBRY_CANISTER_ID: &str = "y33wz-myaaa-aaaap-qkmna-cai";
@@ -22,6 +21,8 @@ pub const ICP_TRANSFER_FEE: u64 = 10_000;
 pub const MAX_DAYS: u32 = 30;
 pub const SCALING_FACTOR: u128 = 1_000_000_000_000; // Adjust based on your precision needs
 pub const BURN_CYCLE_FEE: u64 = 10_000_000_000;
+pub const DEFAULT_LBRY_RATIO: u64 = 400;
+
 
 pub fn verify_caller_balance(amount: u64) -> bool {
     let caller_stake = get_stake(caller());

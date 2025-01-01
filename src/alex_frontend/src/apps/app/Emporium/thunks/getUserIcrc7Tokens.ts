@@ -5,6 +5,7 @@ import { getIcrc7Actor } from "@/features/auth/utils/authUtils";
 import { natToArweaveId } from "@/utils/id_convert";
 import { Principal } from "@dfinity/principal";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { resetPagination } from "../emporiumSlice";
 
 const getUserIcrc7Tokens = createAsyncThunk<
   { tokenId: string; arweaveId: string }[], // Return structure
@@ -15,6 +16,7 @@ const getUserIcrc7Tokens = createAsyncThunk<
   async (userPrincipal, { rejectWithValue, dispatch }) => {
     try {
       // Clear transactions in the store
+      dispatch(resetPagination());
       dispatch(setTransactions([]));
 
       // Fetch the user's tokens

@@ -55,7 +55,7 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
             );
         } else {
             return (
-                <Button
+                 <Button
                     onClick={(e) => {
                         e.stopPropagation();
                         handleButtonClick(transaction.id, price);
@@ -65,6 +65,9 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
                 >
                     {buttonType}
                 </Button>
+
+        
+
             );
         }
     };
@@ -72,7 +75,7 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
     return (
         <>
             {type === "marketPlace" && emporium.marketPlace[transaction.id]?.price && (
-                <div className="text-white text-lg absolute bottom-0 bg-gray-600 w-full py-2">
+                <div className="text-white text-lg absolute bottom-0 bg-gray-600 w-full p-2">
                     Price {emporium.marketPlace[transaction.id]?.price} ICP
                 </div>
             )}

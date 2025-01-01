@@ -10,13 +10,7 @@ const getLBRYratio = createAsyncThunk<
   try {
     const actor = await getActorSwap();
     const result = await actor.get_current_LBRY_ratio();
-    if ("Ok" in result) {
-      return result.Ok.toString();
-    }
-
-    if ("Err" in result) {
-      throw new Error(result.Err);
-    }
+    return result.toString();
   } catch (error) {
     console.error("Failed to get LBRY_ratio:", error);
 

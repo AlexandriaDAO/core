@@ -82,13 +82,4 @@ pub use coordinate_mint::*;
 mod action_fees;
 pub use action_fees::*;
 
-// mod dao;
-// pub use dao::*;
-
-// mod playground;
-// pub use playground::*;
-
-// mod tests;
-// pub use tests::*;
-
 ic_cdk::export_candid!();

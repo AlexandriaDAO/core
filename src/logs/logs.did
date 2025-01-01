@@ -1,0 +1,6 @@
+type Log = record { lbry_supply : nat; alex_supply : nat; time : nat64 };
+type Result = variant { Ok : text; Err : text };
+service : {
+  get_all_logs : () -> (vec record { nat64; Log }) query;
+  register_log : () -> (Result);
+}

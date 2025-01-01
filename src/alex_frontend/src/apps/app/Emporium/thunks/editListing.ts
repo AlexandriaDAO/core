@@ -1,11 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  getActorEmporium,
-} from "@/features/auth/utils/authUtils";
+import { getActorEmporium } from "@/features/auth/utils/authUtils";
 import { arweaveIdToNat } from "@/utils/id_convert";
 
 const editListing = createAsyncThunk<
-  string, // Success return type
+  { nftArweaveId: string; price: string }, // Success return type
   {
     nftArweaveId: string;
     price: string;
@@ -26,7 +24,7 @@ const editListing = createAsyncThunk<
 
       // Handle success or error response
       if ("Ok" in result) {
-        return "success";
+        return { nftArweaveId, price };
       } else if ("Err" in result) {
         return rejectWithValue(result?.Err); // Use rejectWithValue directly
       }

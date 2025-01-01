@@ -17,7 +17,7 @@ pub mod utils;
 use icrc_ledger_types::icrc1::transfer::BlockIndex;
 
 use candid::{Nat, Principal};
-
+use ic_ledger_types::Subaccount;
 ic_cdk::export_candid!();
 
 // NFT

@@ -1,3 +1,9 @@
+type Listing = record {
+  page_size : nat64;
+  nfts : vec record { text; Nft };
+  total_pages : nat64;
+  current_page : nat64;
+};
 type Nft = record {
   status : NftStatus;
   token_id : nat;
@@ -9,8 +15,17 @@ type NftStatus = variant { Listed; Unlisted; Reimbursed };
 type Result = variant { Ok : text; Err : text };
 service : {
   buy_nft : (nat) -> (Result);
-  get_caller_listing : () -> (vec record { text; Nft }) query;
-  get_listing : () -> (vec record { text; Nft }) query;
+  get_caller_listing : (opt nat64, opt nat64) -> (Listing) query;
+  get_listing : (opt nat64, opt nat64) -> (Listing) query;
+  get_listing_total_count : () -> (nat64) query;
+  get_search_listing : (
+      opt nat64,
+      opt nat64,
+      opt text,
+      opt nat,
+      opt principal,
+      text,
+    ) -> (Listing) query;
   list_nft : (nat, nat64) -> (Result);
   remove_nft_listing : (nat) -> (Result);
   update_nft_price : (nat, nat64) -> (Result);

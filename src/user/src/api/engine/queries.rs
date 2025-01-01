@@ -3,7 +3,7 @@ use ic_cdk_macros::query;
 use candid::Principal;
 
 use crate::errors::general::GeneralError;
-use crate::store::STATE;
+use crate::store::{ENGINES, USER_ENGINES};
 use crate::models::engine::Engine;
 
 /// Retrieves multiple engines by their ids
@@ -20,13 +20,12 @@ pub fn get_engines(ids: Vec<u64>) -> Result<Vec<Engine>, String> {
         return Err(GeneralError::InvalidInput("No engine IDs provided".to_string()).to_string());
     }
 
-    STATE.with(|state| {
-        let state = state.borrow();
-        Ok(ids.iter()
-            .filter_map(|id| state.engines.get(id))
-            .cloned()
-            .collect())
-    })
+    Ok(ENGINES.with(|engines| {
+        let engines = engines.borrow();
+        ids.iter()
+            .filter_map(|id| engines.get(id).map(|e| e.clone()))
+            .collect()
+    }))
 }
 
 /// Retrieves multiple engines by their ids
@@ -43,34 +42,35 @@ pub fn get_engines_strict(ids: Vec<u64>) -> Result<Vec<Engine>, String> {
         return Err(GeneralError::InvalidInput("No engine IDs provided".to_string()).to_string());
     }
 
-    STATE.with(|state| {
-        let state = state.borrow();
-
+    ENGINES.with(|engines| {
+        let engines = engines.borrow();
+        
         // Check if all IDs exist first
-        if ids.iter().any(|id| !state.engines.contains_key(id)) {
+        if ids.iter().any(|id| !engines.contains_key(id)) {
             return Err(GeneralError::NotFound("One or more engines not found".to_string()).to_string());
         }
 
         // Get all engines (we know they exist)
         Ok(ids.iter()
-            .map(|id| state.engines.get(id).unwrap().clone())
+            .map(|id| engines.get(id).unwrap().clone())
             .collect())
     })
 }
 
 #[query]
 pub fn get_user_engines(user: Principal) -> Vec<Engine> {
-    STATE.with(|state| {
-        let state = state.borrow();
-        state.user_engines
-            .get(&user)
-            .map(|engine_ids| {
-                engine_ids.iter()
-                    .filter_map(|id| state.engines.get(id))
-                    .cloned()
-                    .collect()
-            })
-            .unwrap_or_default()
+    ENGINES.with(|engines| {
+        let engines = engines.borrow();
+        USER_ENGINES.with(|user_engines| {
+            user_engines.borrow()
+                .get(&user)
+                .map(|list| {
+                    list.0.iter()
+                        .filter_map(|id| engines.get(id).map(|e| e.clone()))
+                        .collect()
+                })
+                .unwrap_or_default()
+        })
     })
 }
 
@@ -82,29 +82,36 @@ pub fn get_my_engines() -> Vec<Engine> {
 /// Returns active engines for a specific user or all active engines if no user specified
 #[query]
 pub fn get_active_engines(user: Option<Principal>) -> Vec<Engine> {
-    STATE.with(|state| {
-        let state = state.borrow();
-        match user {
-            // Get specific user's active engines using the index
-            Some(user) => state.user_engines
-                .get(&user)
-                .map(|engine_ids| {
-                    engine_ids.iter()
-                        .filter_map(|id| state.engines.get(id))
-                        .filter(|engine| engine.active)
-                        .cloned()
-                        .collect()
+    match user {
+        Some(user) => {
+            // Get specific user's active engines
+            ENGINES.with(|engines| {
+                let engines = engines.borrow();
+                USER_ENGINES.with(|user_engines| {
+                    user_engines.borrow()
+                        .get(&user)
+                        .map(|list| {
+                            list.0.iter()
+                                .filter_map(|id| engines.get(id))
+                                .filter(|engine| engine.active)
+                                .map(|e| e.clone())
+                                .collect()
+                        })
+                        .unwrap_or_default()
                 })
-                .unwrap_or_default(),
-
+            })
+        },
+        None => {
             // Get all active engines
-            None => state.engines
-                .values()
-                .filter(|engine| engine.active)
-                .cloned()
-                .collect()
+            ENGINES.with(|engines| {
+                engines.borrow()
+                    .iter()
+                    .filter(|(_, engine)| engine.active)
+                    .map(|(_, engine)| engine.clone())
+                    .collect()
+            })
         }
-    })
+    }
 }
 
 #[query]

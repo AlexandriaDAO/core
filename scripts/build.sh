@@ -61,13 +61,13 @@ candid-extractor target/wasm32-unknown-unknown/release/user.wasm > src/user/user
 # for vetkd
 cargo build --release --target wasm32-unknown-unknown --package vetkd
 candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
-# for tests
-cargo build --release --target wasm32-unknown-unknown --package tests
-candid-extractor target/wasm32-unknown-unknown/release/tests.wasm > src/tests/tests.did
-
 # For Emporium
 cargo build --release --target wasm32-unknown-unknown --package emporium
 candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/emporium/emporium.did
+# For Logs
+cargo build --release --target wasm32-unknown-unknown --package logs
+candid-extractor target/wasm32-unknown-unknown/release/logs.wasm > src/logs/logs.did
+
 
 
 cargo update
@@ -82,9 +82,9 @@ dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
 dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 
 dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
-dfx deploy tests --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
+dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 
-dfx deploy emporium --specified-id be2us-64aaa-aaaaa-qaabq-cai
+dfx deploy emporium --specified-id zdcg2-dqaaa-aaaap-qpnha-cai
 
 # Step 5: Configure Local Identities for token launches
 dfx identity new minter --storage-mode plaintext
@@ -163,8 +163,6 @@ record {
      };
  }
 })'
-
-
 
 
 dfx deploy ALEX --specified-id ysy5f-2qaaa-aaaap-qkmmq-cai --argument '(variant { Init = 
@@ -247,7 +245,7 @@ dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal yn33w-uaaaa-aaaap-qpk5q-cai)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 4uz75-osymt-bw2k6-pay77-zdzmh-lvn6o-c7knl-vozu3-zebzx-qjmds-6qe)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)

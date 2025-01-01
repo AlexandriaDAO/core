@@ -94,7 +94,7 @@
 
     "@radix-ui/react-toggle-group": "^1.1.0",
 
-    "@reduxjs/toolkit": "^2.2.7",
+    "@reduxjs/toolkit": "^2.5.0",
 
     "@solana/wallet-adapter-base": "^0.9.23",
 
@@ -185,6 +185,8 @@
     "react-instantsearch-dom": "^6.40.4",
 
     "react-markdown": "^9.0.1",
+
+    "react-paginate": "^8.2.0",
 
     "react-qr-code": "^2.0.15",
 

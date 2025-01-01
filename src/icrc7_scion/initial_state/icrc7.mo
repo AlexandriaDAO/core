@@ -6,8 +6,8 @@ module{
       ?{
         symbol = ?"ALEX";
         name = ?"Alexandria";
-        description = ?"The official NFT Collection of the Alexandria Project";
-        logo = ?"https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io/images/logo.png";
+        description = ?"The Scion (secondary) NFT Collection of the Alexandria Project";
+        logo = ?"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iX9Cw0YBfMSIgZGF0YS1uYW1lPSLQqNCw0YAgMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmlld0JveD0iMCAwIDEyMDAgMTIwMCI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogIzM1MzUzNTsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiB1cmwoI1/RgNCw0LTRltGU0L3Rgl/QsdC10Ldf0L3QsNC30LLQuF8zKTsKICAgICAgfQogICAgPC9zdHlsZT4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iX9GA0LDQtNGW0ZTQvdGCX9Cx0LXQt1/QvdCw0LfQstC4XzMiIGRhdGEtbmFtZT0i0JPRgNCw0LTRltGU0L3RgiDQsdC10Lcg0L3QsNC30LLQuCAzIiB4MT0iNjAwIiB5MT0iMjYwLjMyIiB4Mj0iNjAwIiB5Mj0iOTQ2LjAzIiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDAgMTIwMy4xNykgc2NhbGUoMSAtMSkiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZjJmMmYyIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzg3OTc5NyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNjAwLDBoMGMzMzEuMzcsMCw2MDAsMjY4LjYzLDYwMCw2MDBoMGMwLDMzMS4zNy0yNjguNjMsNjAwLTYwMCw2MDBoMEMyNjguNjMsMTIwMCwwLDkzMS4zNywwLDYwMEgwQzAsMjY4LjYzLDI2OC42MywwLDYwMCwwWiIvPgogIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTI3OC41Nyw5NDIuODZMNjAwLDI1Ny4xNGwzMjEuNDMsNjg1LjcxSDI3OC41N1ptNTAxLjM5LTEwNC40bC0xNzkuOTYtNDU0Ljc1LTE3MC4yMywyOTEuOTMtNzUuNiwxMzMuNjEtNzUuNiwxMzMuNjEsNTAxLjM5LTEwNC40WiIvPgo8L3N2Zz4=";
         supply_cap = null;
         allow_transfers = null;
         atomic_batch_transfers = true;

@@ -149,7 +149,6 @@ const swapSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(getALlStakesInfo.pending, (state) => {
-        // message.info("Fetching staked info!");
         state.loading = true;
         state.error = null;
       })
@@ -294,7 +293,7 @@ const swapSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(fetchTransaction.pending, (state) => {
-        toast.info("fetching!");
+        toast.info("Fetching!");
         state.loading = true;
         state.error = null;
       })

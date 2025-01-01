@@ -1,9 +1,9 @@
 use crate::{
     storage::*,
-    utils::{ principal_to_subaccount, SCALING_FACTOR,STAKING_REWARD_PERCENTAGE,},
+    utils::{principal_to_subaccount, DEFAULT_LBRY_RATIO, SCALING_FACTOR, STAKING_REWARD_PERCENTAGE},
 };
 use candid::Principal;
-use ic_cdk::{api::caller,query,};
+use ic_cdk::{api::caller, query};
 use ic_ledger_types::AccountIdentifier;
 //swap
 #[query]
@@ -46,20 +46,6 @@ pub fn get_stake(principal: Principal) -> Option<Stake> {
 pub fn get_total_unclaimed_icp_reward() -> u64 {
     let result = get_total_unclaimed_icp_reward_mem();
     result.get(&()).unwrap_or(0)
-    // // Alternative approach just using the canister balance, but this would only be fair if people claimed every day.
-    // pub async fn get_total_unclaimed_icp_reward() -> Result<u64, String> {
-    //     // Get total ICP in canister
-    //     let total_icp_available = fetch_canister_icp_balance().await?;
-        
-    //     // Get total archived balance (ICP that's waiting to be redeemed)
-    //     let total_archived_bal = get_total_archived_balance();
-        
-    //     // The unclaimed rewards are what remains after subtracting archived balances
-    //     let unclaimed_rewards = total_icp_available
-    //         .checked_sub(total_archived_bal)
-    //         .ok_or("Arithmetic underflow when calculating unclaimed rewards")?;
-    
-    //     Ok(unclaimed_rewards)
 }
 
 #[query]
@@ -67,46 +53,13 @@ pub fn get_current_staking_reward_percentage() -> String {
     format!("Staking percentage {}", STAKING_REWARD_PERCENTAGE / 100)
 }
 
-// #[query]
-// pub async fn get_maximum_LBRY_burn_allowed() -> Result<u64, String> {
-//     let lbry_per_icp: u64 = get_current_LBRY_ratio()?
-//         .checked_mul(2)
-//         .ok_or("Arithmetic overflow in lbry_per_icp.")?;
-
-//     let total_icp_available: u64 = fetch_canister_icp_balance().await?;
-//     if total_icp_available == 0 || lbry_per_icp == 0 {
-//         return Ok(0);
-//     }
-
-//     let total_archived_bal: u64 = get_total_archived_balance();
-
-//     let total_unclaimed_icp: u64 = get_total_unclaimed_icp_reward();
-
-//     let mut remaining_icp: u64 = total_icp_available
-//         .checked_sub(total_unclaimed_icp)
-//         .ok_or("Arithmetic underflow in remaining_icp.")?;
-//     remaining_icp = remaining_icp
-//         .checked_sub(total_archived_bal)
-//         .ok_or("Arithmetic overflow occured in remaining_icp.")?;
-
-//     // keeping 50% for staker pools
-//     let mut actual_available_icp: u64 = remaining_icp.checked_div(2).ok_or(
-//         "Division failed in actual_available_icp. Please verify the amount is valid and non-zero",
-//     )?;
-//     let lbry_tokens = actual_available_icp
-//         .checked_mul(lbry_per_icp)
-//         .ok_or("Arithmetic overflow occurred in LBRY conversion")?;
-
-//     return Ok(lbry_tokens);
-// }
-
 #[query]
-pub fn get_current_LBRY_ratio() -> Result<u64, String> {
+pub fn get_current_LBRY_ratio() -> u64 {
     let lbry_ratio_map = get_lbry_ratio_mem();
 
     match lbry_ratio_map.get(&()) {
-        Some(lbry_ratio) => Ok(lbry_ratio.ratio), // Return the ratio if it exists
-        None => Err("No LBRY ratio found".to_string()),
+        Some(lbry_ratio) => return lbry_ratio.ratio, // Return the ratio if it exists
+        None => return DEFAULT_LBRY_RATIO,                          //defult case
     }
 }
 

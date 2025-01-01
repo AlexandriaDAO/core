@@ -25,6 +25,7 @@ interface SearchContainerProps {
   isLoading?: boolean;
   topComponent?: ReactNode;
   filterComponent?: ReactNode;
+  showMoreEnabled?: boolean;
 }
 
 export function SearchContainer({
@@ -34,7 +35,8 @@ export function SearchContainer({
   onSearch,
   isLoading = false,
   topComponent,
-  filterComponent
+  filterComponent,
+  showMoreEnabled = true
 }: SearchContainerProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -124,23 +126,21 @@ export function SearchContainer({
           </SearchFormContainer>
         )}
       </PageContainer>
-      <div ref={contentRef}>
-        <ContentDisplay />
-        {transactions.length > 0 && (
-          <div className="flex justify-center mt-6 mb-8">
-            <Button
-              onClick={handleShowMore}
-              disabled={isLoading}
-              className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
-            >
-              {isLoading ? (
-                <LoaderPinwheel className="animate-spin mr-2" />
-              ) : null}
-              Show More
-            </Button>
-          </div>
-        )}
-      </div>
+      <ContentDisplay />
+      {showMoreEnabled && transactions.length > 0 && (
+        <div className="flex justify-center mt-6 mb-8">
+          <Button
+            onClick={handleShowMore}
+            disabled={isLoading}
+            className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
+          >
+            {isLoading ? (
+              <LoaderPinwheel className="animate-spin mr-2" />
+            ) : null}
+            Show More
+          </Button>
+        </div>
+      )}
     </>
   );
 } 

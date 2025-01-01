@@ -1,3 +1,4 @@
+use crate::utils::call_deduct_marketplace_fee;
 use crate::not_anon;
 use crate::{
     utils::{
@@ -10,10 +11,10 @@ use crate::{
 use candid::{Nat, Principal};
 use ic_cdk::{api::call::CallResult, caller, update};
 use icrc_ledger_types::icrc1::account::Account as AccountIcrc;
-use icrc_ledger_types::icrc1::transfer::BlockIndex;
 use icrc_ledger_types::icrc2::transfer_from::{
     TransferFromArgs as TransferFromArgsIcrc, TransferFromError as TransferFromErrorIcrc,
 };
+use icrc_ledger_types::icrc1::transfer::BlockIndex;
 
 use ic_ledger_types::MAINNET_LEDGER_CANISTER_ID;
 
@@ -30,8 +31,8 @@ pub async fn list_nft(token_id: Nat, icp_amount: u64) -> Result<String, String> 
         Ok(false) => return Err("You can't list this NFT, ownership proof failed!".to_string()),
         Err(_) => return Err("Something went wrong !".to_string()),
     };
-
-    // ic_cdk::println!("Yees you are the owner!!! :D");
+    //Deducting Lbry from subaccount
+    call_deduct_marketplace_fee().await?;
     deposit_nft_to_canister(token_id.clone()).await?;
 
     LISTING.with(|nfts| -> Result<(), String> {
@@ -66,6 +67,7 @@ pub async fn remove_nft_listing(token_id: Nat) -> Result<String, String> {
         })
         .ok_or("NFT doesn't exists")?;
     if current_nft.owner == caller() {
+        call_deduct_marketplace_fee().await?;
         // Transfer the NFT back to the owner
         transfer_nft_from_canister(caller(), token_id.clone()).await?;
         remove_nft_from_listing(token_id.clone())?;
@@ -76,6 +78,7 @@ pub async fn remove_nft_listing(token_id: Nat) -> Result<String, String> {
 }
 #[update(guard = "not_anon")]
 pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
+    // deduct fee in LBRY
     // transfer ICP from caller to seller through tranfer approve
     // transfer NFT
     // delete record from sale
@@ -87,11 +90,11 @@ pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
         })
         .ok_or("NFT doesn't exists")?;
 
+    call_deduct_marketplace_fee().await?;
     transfer_icp_to_seller(current_nft.price, current_nft.owner).await?;
     match transfer_nft_from_canister(caller(), token_id.clone()).await {
         Ok(ok) => {}
         Err(err) => {
-            ic_cdk::println!("This I am here ");
             //incase of failure change the owner to caller
             LISTING.with(|nfts| -> Result<(), String> {
                 let mut nft_map = nfts.borrow_mut();
@@ -124,6 +127,7 @@ pub async fn update_nft_price(token_id: Nat, new_price: u64) -> Result<String, S
     if new_price < 1 {
         return Err("Price should greater than 1 e8s ICP".to_string());
     }
+    call_deduct_marketplace_fee().await?;
     let current_time: u64 = ic_cdk::api::time();
     LISTING.with(|nfts| -> Result<(), String> {
         let mut nft_map = nfts.borrow_mut();
@@ -338,3 +342,4 @@ pub async fn transfer_nft_from_canister(
         }
     }
 }
+
