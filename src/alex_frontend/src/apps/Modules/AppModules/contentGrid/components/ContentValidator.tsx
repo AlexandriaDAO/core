@@ -72,7 +72,10 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     }
 
     try {
-      const elementToValidate = thumbnailUrl ? await createImageFromThumbnail(thumbnailUrl) : element;
+      const elementToValidate = (!contentType.startsWith('video/') && thumbnailUrl) 
+        ? await createImageFromThumbnail(thumbnailUrl) 
+        : element;
+      
       const predictionResults = await validateContent(elementToValidate, contentType);
       if (predictionResults) {
         dispatch(setPredictionResults({ 

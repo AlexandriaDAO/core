@@ -1,9 +1,7 @@
 
 The Plan:
 
-- Block out the burn button if either value is red.
-- Block the manager page if it's not fixed by tomorrow.
-- ContentValidator is not making videos mintable.
+
   
 
 Next Small Stuff:

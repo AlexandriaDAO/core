@@ -55,7 +55,7 @@ export const supportedFileTypes: FileTypeConfig[] = fileTypeGroups.flatMap(group
 export const fileTypeCategories: Record<string, string[]> = {
   all: supportedFileTypes.map(type => type.mimeType),
   favorites: fileTypeGroups
-    .filter(group => ["JPEG", "EPUB"].includes(group.displayName))
+    .filter(group => ["JPEG", "EPUB", "MP4"].includes(group.displayName))
     .flatMap(group => group.mimeTypes),
   images: fileTypeGroups
     .filter(group => ["JPEG", "PNG", "GIF", "SVG"].includes(group.displayName))

@@ -245,7 +245,7 @@ dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal zhsrt-lnrku-drydk-pt64m-p4o2v-5vac3-z246b-utrju-vmram-32yrf-5qe)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal epfwr-zgmmh-g4r2d-tbn6k-wjhyv-ljuas-5rwsc-f5tod-6t5bs-sj3da-qae)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)

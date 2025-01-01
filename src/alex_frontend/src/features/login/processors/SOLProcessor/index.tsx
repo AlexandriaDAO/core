@@ -7,7 +7,10 @@ const SOLProcessor = () => {
 	const { publicKey, connected } = useWallet();
 
 	return (
-		<div className="flex flex-col items-stretch w-full gap-2 border border-ring p-2">
+		<div className="flex flex-col items-stretch w-full gap-2 border border-ring p-2 opacity-50 relative">
+			<div className="absolute inset-0 bg-background/50 flex items-center justify-center">
+				<span className="text-sm font-medium bg-background/90 px-3 py-1 rounded-full">Coming Soon</span>
+			</div>
 			<span className="text-base font-normal font-roboto-condensed tracking-wider">Sign in with Solana wallet</span>
 			<div className="flex items-center justify-start w-full gap-5">
 				<div className="items-center justify-center hidden w-8 h-8 text-xl font-bold rounded-full md:flex bg-zinc-300 text-zinc-800">
