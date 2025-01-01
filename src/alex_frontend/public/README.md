@@ -162,7 +162,7 @@ From mints 0 to 1 Billion, the FDV is below $1B, but mints ~1 to 62 Billion are 
 
 A fair launch is pivotal to Alexandria's tokenomics, and incentives must be balanced in the early minting epochs as well as long after ALEX is fully minted.
 
-The challenge in keeping the early epochs balanced is preventing bots. Preventative measures are discussed in the launch details post (add the link here), which outlines a zero-tolerance policy for bots and our retaliation strategy during early epochs. The initial NFT minting price of 10 LBRY (significantly higher than the eventual 1 LBRY target) will be periodically adjusted to match ALEX minting rates, making bot-based random NFT minting economically unfeasible.
+The challenge in keeping the early epochs balanced is preventing bots. Preventative measures are discussed in the [launch details post](https://nuance.xyz/evan/12057-434go-diaaa-aaaaf-qakwq-cai/everything-about-the-alexandria-alex-fair-launch), which outlines a zero-tolerance policy for bots and our retaliation strategy during early epochs. The initial NFT minting price of 10 LBRY (significantly higher than the eventual 1 LBRY target) will be periodically adjusted to match ALEX minting rates, making bot-based random NFT minting economically unfeasible.
 
 For incentives after all 21 Million ALEX are minted, LBRY remains a revenue driver for ALEX stakers. LBRY has a 0.04 universal transaction fee that is burned, and still returns half it's value in ICP if burned. As long as LBRY is being transacted (i.e.,the site is being used), LBRY is being burned, and revenue generated for stakers long after ALEX is fully minted.
 

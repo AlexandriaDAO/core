@@ -1,12 +1,7 @@
 
 The Plan:
 
-
-
-
-- Add the link to the published bot attack post.
-
-
+- Try and get the NFT list to reflect the accounts list. (and figure out what canister that is so I dont delete it.)
 
 
 ### Adding channels/blocks/collections to sort NFTs.
@@ -19,10 +14,13 @@ Metrics:
 
 
 XWKa-Q2gppignoX_Ngs7VJYZPN_yhiy1ToovQ1NBMFs
-NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g  09/18/2022
+NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8 
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I  09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
+
+
+
 
 MintNFT function:
 
@@ -39,7 +37,6 @@ I think it'll be totally free to add nfts, but you can only add them if you own 
 
 
 Low Priority: 
-- White space between the greys on permasearch.
 - Get thumbnails to show on video, and only load the first frame.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - Add Milliseconds place to permasearch. 

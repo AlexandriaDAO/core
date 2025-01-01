@@ -1,11 +1,9 @@
-use std::collections::HashSet;
-
 use ic_cdk::api::{caller, time};
 use ic_cdk_macros::update;
 use candid::Principal;
 
 use crate::errors::general::GeneralError;
-use crate::store::STATE;
+use crate::store::{NODES, USER_NODES, get_and_increment_node_counter, add_node_to_user};
 use crate::models::node::{Node, CreateNodeRequest, UpdateNodeStatusRequest};
 use crate::validations::node::validate_key;
 
@@ -23,23 +21,18 @@ pub fn create_node(request: CreateNodeRequest) -> Result<Node, String> {
         return Err(err.to_string());
     }
 
-    STATE.with(|state| {
-        let mut state = state.borrow_mut();
+    let node_id = get_and_increment_node_counter();
+    let node = Node::new(node_id, request.key, caller);
+    
+    // Store the node
+    NODES.with(|nodes| {
+        nodes.borrow_mut().insert(node_id, node.clone()).unwrap();
+    });
 
-        let node_id = state.node_counter;
-        state.node_counter += 1;
+    // Add to user's nodes
+    add_node_to_user(&caller, node_id);
 
-        let node = Node::new(node_id, request.key, caller);
-        state.nodes.insert(node_id, node.clone());
-
-        // Update the user index
-        state.user_nodes
-            .entry(caller)
-            .or_insert_with(HashSet::new)
-            .insert(node_id);
-
-        Ok(node)
-    })
+    Ok(node)
 }
 
 /// Updates an existing node's status
@@ -51,20 +44,22 @@ pub fn update_node_status(request: UpdateNodeStatusRequest) -> Result<Node, Stri
         return Err(GeneralError::AnonymousNotAllowed.to_string());
     }
 
-    STATE.with(|state| {
-        let mut state = state.borrow_mut();
-
-        let node = state.nodes.get_mut(&request.id)
+    NODES.with(|nodes| {
+        let mut nodes = nodes.borrow_mut();
+        
+        let node = nodes.get(&request.id)
             .ok_or_else(|| GeneralError::NotFound("Node".to_string()).to_string())?;
 
         if node.owner != caller {
             return Err(GeneralError::NotAuthorized.to_string());
         }
 
-        node.active = request.active;
-        node.updated_at = time();
+        let mut updated_node = node.clone();
+        updated_node.active = request.active;
+        updated_node.updated_at = time();
 
-        Ok(node.clone())
+        nodes.insert(request.id, updated_node.clone()).unwrap();
+        Ok(updated_node)
     })
 }
 
@@ -77,24 +72,30 @@ pub fn delete_node(id: u64) -> Result<(), String> {
         return Err(GeneralError::AnonymousNotAllowed.to_string());
     }
 
-    STATE.with(|state| {
-        let mut state = state.borrow_mut();
-
-        let node = state.nodes.get(&id)
+    // First check ownership
+    NODES.with(|nodes| {
+        let nodes = nodes.borrow();
+        let node = nodes.get(&id)
             .ok_or_else(|| GeneralError::NotFound("Node".to_string()).to_string())?;
 
         if node.owner != caller {
             return Err(GeneralError::NotAuthorized.to_string());
         }
-
-        // Remove from nodes
-        state.nodes.remove(&id);
-
-        // Remove from user index
-        if let Some(user_nodes) = state.user_nodes.get_mut(&caller) {
-            user_nodes.remove(&id);
-        }
-
         Ok(())
-    })
+    })?;
+
+    // Then delete the node
+    NODES.with(|nodes| {
+        nodes.borrow_mut().remove(&id);
+    });
+
+    // Remove from user's nodes
+    USER_NODES.with(|user_nodes| {
+        if let Some(mut list) = user_nodes.borrow_mut().get(&caller).map(|list| list.clone()) {
+            list.0.retain(|&x| x != id);
+            user_nodes.borrow_mut().insert(caller, list).unwrap();
+        }
+    });
+
+    Ok(())
 }

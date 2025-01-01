@@ -126,23 +126,21 @@ export function SearchContainer({
           </SearchFormContainer>
         )}
       </PageContainer>
-      <div ref={contentRef}>
-        <ContentDisplay />
-        {showMoreEnabled && transactions.length > 0 && (
-          <div className="flex justify-center mt-6 mb-8">
-            <Button
-              onClick={handleShowMore}
-              disabled={isLoading}
-              className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
-            >
-              {isLoading ? (
-                <LoaderPinwheel className="animate-spin mr-2" />
-              ) : null}
-              Show More
-            </Button>
-          </div>
-        )}
-      </div>
+      <ContentDisplay />
+      {showMoreEnabled && transactions.length > 0 && (
+        <div className="flex justify-center mt-6 mb-8">
+          <Button
+            onClick={handleShowMore}
+            disabled={isLoading}
+            className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
+          >
+            {isLoading ? (
+              <LoaderPinwheel className="animate-spin mr-2" />
+            ) : null}
+            Show More
+          </Button>
+        </div>
+      )}
     </>
   );
 } 

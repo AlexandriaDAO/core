@@ -45,6 +45,7 @@ type User = record {
   created_at : nat64;
   avatar : text;
 };
+type UserPrincipalInfo = record { "principal" : principal; username : text };
 type UsernameAvailabilityResponse = record {
   username : text;
   available : bool;
@@ -58,6 +59,7 @@ service : {
   delete_node : (nat64) -> (Result_3);
   get_active_engines : (opt principal) -> (vec Engine) query;
   get_active_nodes : (opt principal) -> (vec Node) query;
+  get_all_users : () -> (vec UserPrincipalInfo) query;
   get_current_user : () -> (Result_4) query;
   get_engines : (vec nat64) -> (Result_5) query;
   get_engines_strict : (vec nat64) -> (Result_5) query;

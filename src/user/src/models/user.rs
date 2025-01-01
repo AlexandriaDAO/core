@@ -88,3 +88,9 @@ pub struct UsernameAvailabilityResponse {
     pub available: bool,
     pub message: String,
 }
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct UserPrincipalInfo {
+    pub principal: Principal,
+    pub username: String,
+}
