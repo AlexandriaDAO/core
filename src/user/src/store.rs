@@ -162,49 +162,59 @@ impl Storable for UserIdList {
     };
 }
 
-// Helper functions for counters
-pub fn init_counters() -> Result<(), String> {
+
+//
+// Counter Management
+//
+
+/// Initialize counters for engines and nodes
+pub fn init_counters() {
     ENGINE_COUNTER.with(|counter| {
         let mut counter = counter.borrow_mut();
-        // Only initialize if it doesn't exist
-        if counter.get(&()).is_none() {
-            counter.insert((), 0)
-                .ok_or_else(|| "Failed to initialize engine counter".to_string());
-        }
+        let _ = counter.insert((), 0);
     });
 
     NODE_COUNTER.with(|counter| {
         let mut counter = counter.borrow_mut();
-        // Only initialize if it doesn't exist
-        if counter.get(&()).is_none() {
-            counter.insert((), 0)
-                .ok_or_else(|| "Failed to initialize node counter".to_string());
-        }
+        let _ = counter.insert((), 0);
     });
     Ok(())
 }
 
+/// Get and increment the engine counter, returning the current value
 pub fn get_and_increment_engine_counter() -> u64 {
     ENGINE_COUNTER.with(|counter| {
         let mut counter = counter.borrow_mut();
-        let current = counter.get(&()).unwrap_or_default();
+        let current = counter.get(&()).unwrap_or(0);
         let next = current + 1;
-        counter.insert((), next).unwrap();
+        let _ = counter.insert((), next);
         current
     })
 }
 
+/// Get and increment the node counter, returning the current value
 pub fn get_and_increment_node_counter() -> u64 {
     NODE_COUNTER.with(|counter| {
         let mut counter = counter.borrow_mut();
-        let current = counter.get(&()).unwrap_or_default();
+        let current = counter.get(&()).unwrap_or(0);
         let next = current + 1;
-        counter.insert((), next).unwrap();
+        let _ = counter.insert((), next);
         current
     })
 }
 
-// Helper function to get user's engine IDs
+// Add a debug function to check counter state
+pub fn debug_counter_state() -> (Option<u64>, Option<u64>) {
+    let engine_count = ENGINE_COUNTER.with(|counter| counter.borrow().get(&()));
+    let node_count = NODE_COUNTER.with(|counter| counter.borrow().get(&()));
+    (engine_count, node_count)
+}
+
+//
+// User Engine Management
+//
+
+/// Get all engine IDs associated with a user
 pub fn get_user_engine_ids(principal: &Principal) -> Vec<u64> {
     USER_ENGINES.with(|user_engines| {
         user_engines.borrow()
@@ -214,7 +224,7 @@ pub fn get_user_engine_ids(principal: &Principal) -> Vec<u64> {
     })
 }
 
-// Helper function to add engine ID to user's list
+/// Associate an engine ID with a user
 pub fn add_engine_to_user(principal: &Principal, engine_id: u64) {
     USER_ENGINES.with(|user_engines| {
         let mut user_engines = user_engines.borrow_mut();
@@ -227,7 +237,11 @@ pub fn add_engine_to_user(principal: &Principal, engine_id: u64) {
     });
 }
 
-// Similar helpers for nodes
+//
+// User Node Management
+//
+
+/// Get all node IDs associated with a user
 pub fn get_user_node_ids(principal: &Principal) -> Vec<u64> {
     USER_NODES.with(|user_nodes| {
         user_nodes.borrow()
@@ -237,6 +251,7 @@ pub fn get_user_node_ids(principal: &Principal) -> Vec<u64> {
     })
 }
 
+/// Associate a node ID with a user
 pub fn add_node_to_user(principal: &Principal, node_id: u64) {
     USER_NODES.with(|user_nodes| {
         let mut user_nodes = user_nodes.borrow_mut();

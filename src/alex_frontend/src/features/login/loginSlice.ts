@@ -4,12 +4,14 @@ import login from "./thunks/login";
 
 // Define the interface for our auth state
 export interface LoginState {
+	open: boolean;
 	loading: boolean;
 	error: string | null;
 }
 
 // Define the initial state using the LoginState interface
 const initialState: LoginState = {
+	open: false,
 	loading: false,
 	error: null,
 };
@@ -24,6 +26,9 @@ const loginSlice = createSlice({
 		},
 		setLoading: (state, action) => {
 			state.loading = action.payload;
+		},
+		setOpen: (state, action) => {
+			state.open = action.payload;
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<LoginState>) => {
@@ -44,6 +49,6 @@ const loginSlice = createSlice({
 		}
 });
 
-export const {setError, setLoading} = loginSlice.actions;
+export const {setError, setLoading, setOpen} = loginSlice.actions;
 
 export default loginSlice.reducer;

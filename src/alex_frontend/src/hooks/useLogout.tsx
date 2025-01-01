@@ -1,7 +1,7 @@
-import { useInternetIdentity } from 'ic-use-internet-identity';
+import { useIdentity } from './useIdentity';
 
 export function useLogout() {
-    const {clear} = useInternetIdentity();
+    const {clear} = useIdentity();
 
     const logout = async ()=>{
         await clear();

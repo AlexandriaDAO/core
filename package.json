@@ -96,6 +96,14 @@
 
     "@reduxjs/toolkit": "^2.5.0",
 
+    "@solana/wallet-adapter-base": "^0.9.23",
+
+    "@solana/wallet-adapter-react": "^0.15.35",
+
+    "@solana/wallet-adapter-react-ui": "^0.9.35",
+
+    "@tanstack/react-query": "^5.62.8",
+
     "@tensorflow/tfjs": "^4.21.0",
 
     "antd": "^5.20.5",
@@ -136,6 +144,10 @@
     "ic-use-actor": "^0.1.0",
 
     "ic-use-internet-identity": "^0.1.0",
+
+    "ic-use-siwe-identity": "^0.1.2",
+
+    "ic-use-siws-identity": "^0.0.1",
 
     "ic-vetkd-utils": "file:ic-vetkd-utils-0.1.0.tgz",
 
@@ -204,6 +216,10 @@
     "tailwindcss": "^3.4.10",
 
     "tailwindcss-animate": "^1.0.7",
+
+    "viem": "^2.21.56",
+
+    "wagmi": "^2.14.3",
 
     "webfontloader": "^1.6.28",
 

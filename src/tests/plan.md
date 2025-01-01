@@ -1,7 +1,29 @@
 
 The Plan:
 
-- Try and get the NFT list to reflect the accounts list. (and figure out what canister that is so I dont delete it.)
+- Block the manager page if it's not fixed by tomorrow.
+
+Next Small Stuff: 
+- There's a bug where ebook searching gets the search button stuck in the loading state.
+- Add Milliseconds place to permasearch. 
+- Remove duplicates based on file size.
+- More advanced searching with tags and metadata.
+- Take alexandrian principals from the backend Librarian profiles list.
+
+
+
+
+Next Big Stuff:
+Then we'll let people do their own channels which are just regular stable structures and no economic incentive. 
+These channels could be open for everyone to edit, or only for the owner to edit.
+I think it'll be totally free to add nfts, but you can only add them if you own the original or copy.
+
+
+
+
+
+
+
 
 
 ### Adding channels/blocks/collections to sort NFTs.
@@ -18,29 +40,4 @@ NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8 
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I  09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
-
-
-
-
-MintNFT function:
-
-
-Then we'll let people do their own channels which are just regular stable structures and no economic incentive. 
-These channels could be open for everyone to edit, or only for the owner to edit.
-I think it'll be totally free to add nfts, but you can only add them if you own the original or copy.
-
-
-
-
-
-
-
-
-Low Priority: 
-- Get thumbnails to show on video, and only load the first frame.
-- There's a bug where ebook searching gets the search button stuck in the loading state.
-- Add Milliseconds place to permasearch. 
-- Remove duplicates based on file size.
-- More advanced searching with tags and metadata.
-- Take alexandrian principals from the backend Librarian profiles list.
 

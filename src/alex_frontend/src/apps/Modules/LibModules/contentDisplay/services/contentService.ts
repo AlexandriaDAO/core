@@ -25,9 +25,9 @@ export class ContentService {
       coverUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
       fullUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
     }),
-    "video/": async (id: string) => ({
-      thumbnailUrl: null,
-      coverUrl: null,
+    "video/": async (id: string, content?: CachedContent) => ({
+      thumbnailUrl: content?.thumbnailUrl || null,
+      coverUrl: content?.thumbnailUrl || null,
       fullUrl: `https://arweave.net/${id}`
     }),
   };

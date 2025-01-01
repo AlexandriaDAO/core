@@ -4,7 +4,7 @@ interface ContentFetcherProps {
   contentUrl: string;
   contentType: string;
   imageObjectUrl: string | null;
-  onLoad: (element: HTMLImageElement | HTMLVideoElement) => void;
+  onLoad: (element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => void;
   onError: () => void;
 }
 
@@ -21,12 +21,34 @@ const ContentFetcher: React.FC<ContentFetcherProps> = ({
     if (contentRef.current) {
       const handleLoad = () => {
         if (contentRef.current) {
-          onLoad(contentRef.current);
+          if (contentType.startsWith('video/')) {
+            const video = contentRef.current as HTMLVideoElement;
+            // Seek to first frame
+            video.currentTime = 0;
+            // Wait for seek to complete
+            video.addEventListener('seeked', () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                // Convert to blob and create thumbnail URL
+                canvas.toBlob((blob) => {
+                  if (blob) {
+                    const thumbnailUrl = URL.createObjectURL(blob);
+                    onLoad(video, thumbnailUrl);
+                  }
+                }, 'image/jpeg');
+              }
+            }, { once: true });
+          } else {
+            onLoad(contentRef.current);
+          }
         }
       };
 
       const currentContent = contentRef.current;
-
       currentContent.addEventListener('load', handleLoad);
       currentContent.addEventListener('loadedmetadata', handleLoad); // For videos
 
@@ -35,7 +57,7 @@ const ContentFetcher: React.FC<ContentFetcherProps> = ({
         currentContent.removeEventListener('loadedmetadata', handleLoad);
       };
     }
-  }, [contentRef.current, onLoad]);
+  }, [contentRef.current, onLoad, contentType]);
 
   return (
     <>
