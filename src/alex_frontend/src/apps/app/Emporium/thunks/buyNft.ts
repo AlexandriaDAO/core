@@ -12,50 +12,56 @@ const buyNft = createAsyncThunk<
   string, // Success return type
   {
     nftArweaveId: string;
+    userPrincipal:string;
     price: string;
   },
   { rejectValue: string } // Reject type
 >(
   "emporium/buyNft",
-  async ({ nftArweaveId, price }, { dispatch, rejectWithValue }) => {
+  async ({ nftArweaveId, price,userPrincipal }, { dispatch, rejectWithValue }) => {
     try {
       const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
       const actorEmporium = await getActorEmporium();
       const actorIcpLedger = await getIcpLedgerActor();
 
       const tokenId = arweaveIdToNat(nftArweaveId);
-
-      // Format the price as BigInt
-      // const priceFormat: bigint = BigInt(
-      //   Math.round(Number(price) * 10 ** 8) // Convert to fixed-point format
-      // );
-
-      let priceFormat: bigint = BigInt(
+      let amountFormatApprove: bigint = BigInt(
         Number((Number(price) + 0.0001) * 10 ** 8).toFixed(0)
       );
-
-      const resultIcpApprove = await actorIcpLedger.icrc2_approve({
+      const checkApproval = await actorIcpLedger.icrc2_allowance({
+        account: {
+          owner: Principal.fromText(userPrincipal),
+          subaccount: [],
+        },
         spender: {
           owner: Principal.fromText(emporium_canister_id),
           subaccount: [],
         },
-        amount: priceFormat,
-        fee: [BigInt(10000)],
-        memo: [],
-        from_subaccount: [],
-        created_at_time: [],
-        expected_allowance: [],
-        expires_at: [],
       });
-      if ("Err" in resultIcpApprove) {
-        const error = resultIcpApprove.Err;
-        let errorMessage = "Unknown error"; // Default error message
-        if ("TemporarilyUnavailable" in error) {
-          errorMessage = "Service is temporarily unavailable";
-        }
-        throw new Error(errorMessage);
-      }
 
+      if (checkApproval.allowance < amountFormatApprove) {
+        const resultIcpApprove = await actorIcpLedger.icrc2_approve({
+          spender: {
+            owner: Principal.fromText(emporium_canister_id),
+            subaccount: [],
+          },
+          amount: amountFormatApprove,
+          fee: [BigInt(10000)],
+          memo: [],
+          from_subaccount: [],
+          created_at_time: [],
+          expected_allowance: [],
+          expires_at: [],
+        });
+        if ("Err" in resultIcpApprove) {
+          const error = resultIcpApprove.Err;
+          let errorMessage = "Unknown error"; // Default error message
+          if ("TemporarilyUnavailable" in error) {
+            errorMessage = "Service is temporarily unavailable";
+          }
+          throw new Error(errorMessage);
+        }
+      }
       const result = await actorEmporium.buy_nft(tokenId);
       // Handle success or error response
       if ("Ok" in result) {

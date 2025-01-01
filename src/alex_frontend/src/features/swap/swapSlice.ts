@@ -21,6 +21,7 @@ import getStakersCount from "./thunks/getStakersCount";
 import getCanisterArchivedBal from "./thunks/getCanisterArchivedBal";
 import getAverageApy from "./thunks/getAverageApy";
 import getLbryFee from "./thunks/lbryIcrc/getLbryFee";
+import getAllLogs from "./thunks/insights/getAllLogs";
 // Define the interface for our node state
 export interface StakeInfo {
   stakedAlex: string;
@@ -55,6 +56,19 @@ export interface SwapState {
   error: string | null;
   spendingBalance: string;
   alexSpendingBalance: string;
+  logsData:   {
+    chartData: {
+      time: string;
+      lbry: number;
+      alex: number;
+      nft: number;
+      totalAlexStaked: number;
+      stakerCount: number;
+      alexRate: number;
+      totalLbryBurn: number;
+    }[];
+   },
+
 }
 
 // Define the initial state using the ManagerState interface
@@ -79,8 +93,11 @@ const initialState: SwapState = {
   loading: false,
   averageAPY: 0,
   error: null,
-  spendingBalance: '0',
+  spendingBalance: "0",
   alexSpendingBalance: "0",
+  logsData: {
+    chartData: []
+  },
 };
 
 const swapSlice = createSlice({
@@ -133,12 +150,11 @@ const swapSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(getStakeInfo.pending, (state) => {
-        toast.info("Fetching staked info!");
+        // toast.info("Fetching staked info!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getStakeInfo.fulfilled, (state, action) => {
-        toast.success("Fetched staked info!");
         state.stakeInfo = action.payload;
         state.loading = false;
         state.error = null;
@@ -153,7 +169,7 @@ const swapSlice = createSlice({
         state.error = null;
       })
       .addCase(getALlStakesInfo.fulfilled, (state, action) => {
-        toast.success("Fetched all staked info!");
+        // toast.success("Fetched all staked info!");
         state.totalStaked = action.payload;
         state.loading = false;
         state.error = null;
@@ -164,7 +180,7 @@ const swapSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(swapLbry.pending, (state) => {
-        toast.info("Swapping!");
+        // toast.info("Swapping!");
         state.loading = true;
         state.error = null;
       })
@@ -207,12 +223,12 @@ const swapSlice = createSlice({
         state.error = null;
       })
       .addCase(burnLbry.rejected, (state, action) => {
-        toast.error("Error while burning!");
+        toast.error(action.payload);
         state.loading = false;
         state.error = action.payload as string;
       })
       .addCase(claimReward.pending, (state) => {
-        toast.info("Claiming!");
+        // toast.info("Claiming!");
         state.loading = true;
         state.error = null;
       })
@@ -228,7 +244,7 @@ const swapSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(unstake.pending, (state) => {
-        toast.info("Unstaking!");
+        // toast.info("Unstaking!");
         state.loading = true;
         state.error = null;
       })
@@ -261,12 +277,12 @@ const swapSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(getArchivedBal.pending, (state) => {
-        toast.info("Fetching archived balance!");
+        // toast.info("Fetching archived balance!");
         state.loading = true;
         state.error = null;
       })
       .addCase(getArchivedBal.fulfilled, (state, action) => {
-        toast.success("Successfully fetched archived balance!");
+        // toast.success("Successfully fetched archived balance!");
         state.archivedBalance = action.payload;
         state.loading = false;
         state.error = null;
@@ -293,12 +309,12 @@ const swapSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(fetchTransaction.pending, (state) => {
-        toast.info("Fetching!");
+        // toast.info("Fetching!");
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchTransaction.fulfilled, (state, action) => {
-        toast.success("Fetched Transactions!");
+        // toast.success("Fetched Transactions!");
         state.loading = false;
         state.transactions = action.payload;
         state.error = null;
@@ -386,6 +402,17 @@ const swapSlice = createSlice({
       .addCase(getAlexSpendingBalance.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to get ALEX spending balance";
+      })
+      .addCase(getAllLogs.fulfilled, (state, action) => {
+        state.logsData = action.payload;
+        state.loading = false;
+      })
+      .addCase(getAllLogs.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getAllLogs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to get log data";
       });
   },
 });

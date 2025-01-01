@@ -162,6 +162,7 @@ impl Storable for UserIdList {
     };
 }
 
+
 //
 // Counter Management
 //
@@ -177,6 +178,7 @@ pub fn init_counters() {
         let mut counter = counter.borrow_mut();
         let _ = counter.insert((), 0);
     });
+    Ok(())
 }
 
 /// Get and increment the engine counter, returning the current value

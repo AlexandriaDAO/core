@@ -2,6 +2,7 @@ use candid::{CandidType, Nat, Principal};
 use candid::{Decode, Deserialize, Encode};
 use std::borrow::Cow;
 use std::cell::RefCell;
+use std::collections::BTreeSet;
 
 use ic_stable_structures::memory_manager::VirtualMemory;
 use ic_stable_structures::storable::Bound;
@@ -18,6 +19,7 @@ thread_local! {
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
         MemoryManager::init(DefaultMemoryImpl::default())
     );
+    pub static STATE: RefCell<State> = RefCell::new(State{pending_requests: BTreeSet::new()});
 
     pub static LISTING: RefCell<StableBTreeMap<String, Nft, Memory>> = RefCell::new(
         StableBTreeMap::init(
@@ -64,4 +66,7 @@ impl Storable for Nft {
         max_size: MAX_VALUE_SIZE,
         is_fixed_size: false,
     };
+}
+pub struct State {
+    pub pending_requests: BTreeSet<Principal>,
 }

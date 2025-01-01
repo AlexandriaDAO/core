@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { RootState, AppDispatch } from "@/store";
-import { Info, LoaderPinwheel } from 'lucide-react';
+import { Copy, Info, LoaderPinwheel } from 'lucide-react';
 import { setMintableStates, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import ContentGrid from "@/apps/Modules/AppModules/contentGrid/ContentGrid";
 import Modal from "@/apps/Modules/AppModules/contentGrid/components/Modal";
@@ -11,7 +11,21 @@ import { useSortedTransactions } from '@/apps/Modules/shared/state/content/conte
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Overlay from "./overlay";
 import CombinedModal from "./combineModal";
+import { ScrollArea } from "@/lib/components/scroll-area";
+import { Badge } from "@/lib/components/badge";
+import { Separator } from "@/lib/components/separator";
+import { toast } from "sonner";
+import {
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/lib/components/card";
+import { Card } from "@/lib/components/card";
 
+const truncateMiddle = (str: string, startChars: number = 4, endChars: number = 4) => {
+  if (str.length <= startChars + endChars + 3) return str;
+  return `${str.slice(0, startChars)}...${str.slice(-endChars)}`;
+};
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
 interface ContentListEmporiumProps {
@@ -64,19 +78,102 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
     dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
   }, [dispatch]);
 
+  // const renderDetails = useCallback((transaction: Transaction) => (
+  //   <div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300">
+  //     <p><span className="font-semibold">ID:</span> {transaction.id}</p>
+  //     <p><span className="font-semibold">Owner:</span> {transaction.owner}</p>
+  //     {transaction.data && <p><span className="font-semibold">Size:</span> {transaction.data.size} bytes</p>}
+  //     {transaction.block && <p><span className="font-semibold">Date (UTC):</span> {new Date(transaction.block.timestamp * 1000).toUTCString()}</p>}
+  //     <p className="font-semibold mt-2">Tags:</p>
+  //     {transaction.tags.map((tag, index) => (
+  //       <p key={index} className="ml-2"><span className="font-semibold">{tag.name}:</span> {tag.value}</p>
+  //     ))}
+  //   </div>
+  // ), []);
+  const copyToClipboard = useCallback(async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`Copied ${label} to clipboard`);
+    } catch (err) {
+      toast.error('Failed to copy to clipboard');
+    }
+  }, []);
   const renderDetails = useCallback((transaction: Transaction) => (
-    <div className="absolute inset-0 bg-black bg-opacity-80 p-2 overflow-y-auto opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs text-gray-300 z-[20]">
-      <p><span className="font-semibold">ID:</span> {transaction.id}</p>
-      <p><span className="font-semibold">Owner:</span> {transaction.owner}</p>
-      {transaction.data && <p><span className="font-semibold">Size:</span> {transaction.data.size} bytes</p>}
-      {transaction.block && <p><span className="font-semibold">Date (UTC):</span> {new Date(transaction.block.timestamp * 1000).toUTCString()}</p>}
-      <p className="font-semibold mt-2">Tags:</p>
-      {transaction.tags.map((tag, index) => (
-        <p key={index} className="ml-2"><span className="font-semibold">{tag.name}:</span> {tag.value}</p>
-      ))}
-    </div>
-  ), []);
+    <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[20] pt-12">
+      <ScrollArea className="h-full">
+        <Card className="bg-transparent border-none text-gray-100 shadow-none">
+          <CardHeader className="p-3 pb-2">
+            <CardTitle className="text-sm font-medium">Content Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 p-3 pt-0 text-xs">
+            <div className="space-y-1">
+              <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     copyToClipboard(transaction.id, 'ID');
+                   }}>
+                <span className="text-gray-400">ID</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.id}</span>
+                  <Copy className="w-3 h-3 opacity-0 group-hover/item:opacity-100" />
+                </div>
+              </div>
+              <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     copyToClipboard(transaction.owner, 'Owner address');
+                   }}>
+                <span className="text-gray-400">Owner</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.owner}</span>
+                  <Copy className="w-3 h-3 opacity-0 group-hover/item:opacity-100" />
+                </div>
+              </div>
+              {transaction.data && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Size</span>
+                  <span>{(transaction.data.size / 1024).toFixed(2)} KB</span>
+                </div>
+              )}
+              {transaction.block && (
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Date</span>
+                  <span>
+                    {new Date(transaction.block.timestamp * 1000).toLocaleString('en-US', {
+                      timeZone: 'UTC'
+                    })} UTC
+                  </span>
+                </div>
+              )}
+            </div>
 
+            <Separator className="bg-gray-700" />
+            
+            <div className="space-y-2">
+              <span className="text-gray-400">Tags</span>
+              <div className="flex flex-wrap gap-2">
+                {transaction.tags.map((tag, index) => (
+                  <Badge 
+                    key={index} 
+                    variant="secondary" 
+                    title={`${tag.name}: ${tag.value}`}
+                    className="bg-gray-800 text-gray-200 cursor-pointer hover:bg-gray-700 group/badge flex items-center gap-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      copyToClipboard(`${tag.name}: ${tag.value}`, 'Tag');
+                    }}
+                  >
+                    {truncateMiddle(tag.name)}: {truncateMiddle(tag.value)}
+                    <Copy className="w-3 h-3 opacity-0 group-hover/badge:opacity-100" />
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </ScrollArea>
+    </div>
+  ), [copyToClipboard]);
 
   useEffect(() => {
     if (type === "userNfts") {
@@ -135,7 +232,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
                 )}
                 {renderDetails(transaction)}
 
-                <button
+                {/* <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
@@ -143,7 +240,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
                   className="absolute top-2 left-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center z-[25]"
                 >
                   <Info />
-                </button>
+                </button> */}
                 {showStats[transaction.id] && predictions[transaction.id] && (
                   <div className="absolute top-10 left-2 bg-black/80 text-white p-2 rounded-md text-xs z-[25]">
                     <div>Drawing: {(predictions[transaction.id].Drawing * 100).toFixed(1)}%</div>

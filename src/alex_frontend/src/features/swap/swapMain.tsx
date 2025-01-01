@@ -21,6 +21,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
 import getLbryFee from './thunks/lbryIcrc/getLbryFee';
 import getAlexFee from './thunks/alexIcrc/getAlexFee';
+import Insights from './components/insights/insights';
 
 const SwapMain = () => {
     const dispatch = useAppDispatch();
@@ -37,7 +38,9 @@ const SwapMain = () => {
         { id: 6, label: 'Burn', hover: "Burn LBRY, get back ALEX and ICP", content: <BurnContent /> },
         { id: 7, label: 'Stake', hover: null, content: <StakeContent /> },
         { id: 8, label: 'Reedem', hover: "Redeem ICP if your swap fails", content: <RedeemContent /> },
-        { id: 9, label: 'Transaction history', hover: null, content: <TransactionHistory /> }
+        { id: 9, label: 'Transaction history', hover: null, content: <TransactionHistory /> },
+        { id: 10, label: 'Insights', hover: null, content: <Insights /> }
+
     ];
 
     useEffect(() => {

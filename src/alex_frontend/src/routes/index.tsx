@@ -33,6 +33,7 @@ import LibrarianLayout from "@/layouts/LibrarianLayout";
 import LibrarianPage from "@/pages/librarian/";
 import NodesPage from "@/pages/librarian/NodesPage";
 import UploadPage from "@/pages/dashboard/UploadPage";
+import InsightsPage from "@/pages/swap/insightsPage";
 
 export const AppRoutes = () => {
 	return (
@@ -64,6 +65,7 @@ export const AppRoutes = () => {
                         <Route path="swap">
                             <Route index element={<SwapPage />} />
                             <Route path="transaction" element={<DetailTransaction />} />
+                            <Route path="insights" element={<InsightsPage />} />
                         </Route>
                         <Route path="mint" element={<MintPage />} />
 

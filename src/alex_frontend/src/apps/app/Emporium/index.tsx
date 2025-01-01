@@ -177,7 +177,7 @@ const Emporium = () => {
                         My Nfts
                     </Button>
                     <Button
-                        className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] ${activeButton === "marketPlace" ? "bg-white text-[#353535]" : ""
+                        className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "marketPlace" ? "bg-white text-[#353535]" : ""
                             }`}
                         onClick={() => {
                             fetchMarketListings();

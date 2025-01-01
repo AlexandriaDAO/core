@@ -1,5 +1,5 @@
 use crate::utils::call_deduct_marketplace_fee;
-use crate::not_anon;
+use crate::{not_anon, CallerGuard};
 use crate::{
     utils::{
         get_principal, is_owner, remove_nft_from_listing, Account, TransferArg, TransferError,
@@ -23,6 +23,7 @@ pub async fn list_nft(token_id: Nat, icp_amount: u64) -> Result<String, String> 
     //check ownership
     //desposit nft to canister
     //add record to listing
+    let _guard: CallerGuard = CallerGuard::new(ic_cdk::caller())?;
     if icp_amount < 1 {
         return Err("Price should greater than 1 e8s ICP".to_string());
     }
@@ -59,6 +60,7 @@ pub async fn list_nft(token_id: Nat, icp_amount: u64) -> Result<String, String> 
 #[update(guard = "not_anon")]
 pub async fn remove_nft_listing(token_id: Nat) -> Result<String, String> {
     // Check if the caller is the owner
+    let _guard: CallerGuard = CallerGuard::new(ic_cdk::caller())?;
 
     let current_nft = LISTING
         .with(|nfts| {
@@ -82,6 +84,7 @@ pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
     // transfer ICP from caller to seller through tranfer approve
     // transfer NFT
     // delete record from sale
+    let _guard: CallerGuard = CallerGuard::new(ic_cdk::caller())?;
 
     let current_nft = LISTING
         .with(|nfts| {
@@ -124,6 +127,8 @@ pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
 }
 #[update(guard = "not_anon")]
 pub async fn update_nft_price(token_id: Nat, new_price: u64) -> Result<String, String> {
+    let _guard: CallerGuard = CallerGuard::new(ic_cdk::caller())?;
+
     if new_price < 1 {
         return Err("Price should greater than 1 e8s ICP".to_string());
     }

@@ -47,6 +47,10 @@ import {
   emporium,
   createActor as createActorEmporium,
 } from "../../../../../declarations/emporium";
+import {
+  logs,
+  createActor as createActorLogs,
+} from "../../../../../declarations/logs";
 
 const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
 
@@ -62,6 +66,7 @@ const user_canister_id = process.env.CANISTER_ID_USER!;
 const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
+const log_canister_id = process.env.CANISTER_ID_LOGS!;
 
 export const getPrincipal = (client: AuthClient): string =>
   client.getIdentity().getPrincipal().toString();
@@ -152,3 +157,6 @@ export const getActorVetkd = () =>
 
 export const getActorEmporium = () =>
   getActor(emporium_canister_id, createActorEmporium, emporium);
+
+export const getLogs = () =>
+  getActor(log_canister_id, createActorLogs, logs);

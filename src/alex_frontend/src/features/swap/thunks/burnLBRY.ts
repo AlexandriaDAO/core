@@ -8,29 +8,51 @@ import getCanisterArchivedBal from "./getCanisterArchivedBal";
 // Define the async thunk
 const burnLbry = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  Number,
+  { amount: string; userPrincipal: string },
   { rejectValue: string }
->("icp_swap/burnLBRY", async (amount, { dispatch, rejectWithValue }) => {
+>("icp_swap/burnLBRY", async ({amount,userPrincipal}, { dispatch, rejectWithValue }) => {
   try {
     const actorLbry = await getLbryActor();
     const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
-    const ledgerServices = LedgerService();
     let amountFormat: bigint = BigInt(Number(amount));
     let amountFormate8s: bigint = BigInt(Number(amount) * 10 ** 8);
 
-    const resultLbryApprove = await actorLbry.icrc2_approve({
+    const checkApproval = await actorLbry.icrc2_allowance({
+      account: {
+        owner: Principal.fromText(userPrincipal),
+        subaccount: [],
+      },
       spender: {
         owner: Principal.fromText(icp_swap_canister_id),
         subaccount: [],
       },
-      amount: amountFormate8s,
-      fee: [],
-      memo: [],
-      from_subaccount: [],
-      created_at_time: [],
-      expected_allowance: [],
-      expires_at: [],
     });
+    if (checkApproval.allowance < amountFormate8s) {
+      const resultLbryApprove = await actorLbry.icrc2_approve({
+        spender: {
+          owner: Principal.fromText(icp_swap_canister_id),
+          subaccount: [],
+        },
+        amount: amountFormate8s,
+        fee: [],
+        memo: [],
+        from_subaccount: [],
+        created_at_time: [],
+        expected_allowance: [],
+        expires_at: [],
+      });
+      if ("Err" in resultLbryApprove) {
+        const error = resultLbryApprove.Err;
+        let errorMessage = "Unknown error"; // Default error message
+        if ("TemporarilyUnavailable" in error) {
+          errorMessage = "Service is temporarily unavailable";
+        }
+  
+        throw new Error(errorMessage);
+      }
+    }
+
+
     const actorSwap = await getActorSwap();
     const result = await actorSwap.burn_LBRY(amountFormat, []);
     if ("Ok" in result) {
