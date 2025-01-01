@@ -170,12 +170,12 @@ impl Storable for UserIdList {
 pub fn init_counters() {
     ENGINE_COUNTER.with(|counter| {
         let mut counter = counter.borrow_mut();
-        counter.insert((), 0);
+        let _ = counter.insert((), 0);
     });
 
     NODE_COUNTER.with(|counter| {
         let mut counter = counter.borrow_mut();
-        counter.insert((), 0);
+        let _ = counter.insert((), 0);
     });
 }
 
@@ -183,9 +183,9 @@ pub fn init_counters() {
 pub fn get_and_increment_engine_counter() -> u64 {
     ENGINE_COUNTER.with(|counter| {
         let mut counter = counter.borrow_mut();
-        let current = counter.get(&()).unwrap_or_default();
+        let current = counter.get(&()).unwrap_or(0);
         let next = current + 1;
-        counter.insert((), next).unwrap();
+        let _ = counter.insert((), next);
         current
     })
 }
@@ -194,11 +194,18 @@ pub fn get_and_increment_engine_counter() -> u64 {
 pub fn get_and_increment_node_counter() -> u64 {
     NODE_COUNTER.with(|counter| {
         let mut counter = counter.borrow_mut();
-        let current = counter.get(&()).unwrap_or_default();
+        let current = counter.get(&()).unwrap_or(0);
         let next = current + 1;
-        counter.insert((), next).unwrap();
+        let _ = counter.insert((), next);
         current
     })
+}
+
+// Add a debug function to check counter state
+pub fn debug_counter_state() -> (Option<u64>, Option<u64>) {
+    let engine_count = ENGINE_COUNTER.with(|counter| counter.borrow().get(&()));
+    let node_count = NODE_COUNTER.with(|counter| counter.borrow().get(&()));
+    (engine_count, node_count)
 }
 
 //
