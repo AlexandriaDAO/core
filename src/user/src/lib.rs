@@ -28,5 +28,6 @@ ic_cdk::export_candid!();
 
 #[init]
 fn init() {
+    ic_cdk::setup();
     init_counters();
 }
