@@ -52,12 +52,11 @@ cargo build --release --target wasm32-unknown-unknown --package emporium
 candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/emporium/emporium.did
 
 
-
 dfx deploy alex_backend --network ic
 dfx deploy user --network ic
 dfx deploy bookmarks --network ic
-dfx deploy icp_swap --network ic
 dfx deploy system_api --network ic
+dfx deploy icp_swap --network ic
 dfx deploy tokenomics --network ic
 dfx deploy vetkd --network ic
 dfx deploy logs --network ic
@@ -120,7 +119,7 @@ record {
      archive_options = record {
          num_blocks_to_archive = 3000;
          trigger_threshold = 6000;
-         controller_id = principal "'$(dfx cawnister id tokenomics --network ic)'";
+         controller_id = principal "'$(dfx canister id tokenomics --network ic)'";
          cycles_for_archive_creation = opt 10000000000000;
      };
      feature_flags = opt record {
@@ -132,8 +131,6 @@ record {
      max_memo_length = opt 32;
  }
 })'
-
-
 
 
 # opt 300000000000; /* 5 minutes */
@@ -149,9 +146,9 @@ dfx deploy ic_siwe_provider --argument $'(
         sign_in_expires_in = opt 300000000000;
         session_expires_in = opt 604800000000000;
         targets = opt vec {
-            "'$(dfx canister id ic_siwe_provider)'";
-            "'$(dfx canister id nft_manager)'";
-            "'$(dfx canister id user)'";
+            "'$(dfx canister id ic_siwe_provider --network ic)'";
+            "'$(dfx canister id nft_manager --network ic)'";
+            "'$(dfx canister id user --network ic)'";
         };
     }
 )' --network ic
@@ -167,9 +164,9 @@ dfx deploy ic_siws_provider --argument $'(
         sign_in_expires_in = opt 300000000000;
         session_expires_in = opt 604800000000000;
         targets = opt vec {
-            "'$(dfx canister id ic_siws_provider)'";
-            "'$(dfx canister id nft_manager)'";
-            "'$(dfx canister id user)'";
+            "'$(dfx canister id ic_siws_provider --network ic)'";
+            "'$(dfx canister id nft_manager --network ic)'";
+            "'$(dfx canister id user --network ic)'";
         };
     }
 )' --network ic
@@ -194,4 +191,4 @@ wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797b
 wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/LBRY/LBRY.did
 
 npm i
-dfx deploy alex_frontend --network ic
+# dfx deploy alex_frontend --network ic

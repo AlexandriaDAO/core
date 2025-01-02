@@ -8,10 +8,34 @@ import { Plus, Minus } from "lucide-react";
 import { Input } from "@/lib/components/input";
 import { Principal } from "@dfinity/principal";
 
+interface PrincipalData {
+  principal: string;
+  username: string;
+}
+
+const defaultPrincipals: PrincipalData[] = [
+  { principal: "2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe", username: "chadthechad" },
+  { principal: "n3br6-rkkdh-5jcq7-pbwsx-yeqm7-jbzqi-54j4d-3isk3-js4sp-vqct5-rae", username: "donghammer3000" },
+  { principal: "e2mqm-f5kv2-wacvn-7sjl2-4wmrn-zumo5-l4g2v-ac752-2vgow-tnd7c-qae", username: "marcorubio" },
+  { principal: "natns-ramsn-vlwsl-zeysw-4euz7-m5j53-bci2u-cclkg-2dqur-elpkk-hqe", username: "cholo1510" },
+  { principal: "yshkh-urigw-n2o44-nh27v-63lw4-tsura-tgmsp-suuel-wjkaw-z7vmo-hae", username: "retardio" },
+  { principal: "uiwhs-mrph5-4mzj2-hzu6d-m5sne-mrdzr-refcb-7lehx-57wsj-gllps-2qe", username: "lorddrilonious" },
+  { principal: "7j252-qctk3-qasf2-dmw2s-n674v-kjfst-niqcp-2yvu4-qeefd-zu4fm-2ae", username: "lmcfarland127" },
+  { principal: "tdzba-ydjns-745a7-c5jgy-dghly-b7peg-yaolt-enudk-3e7f3-fq62d-rqe", username: "engineergod" },
+  { principal: "nixig-flniw-flb7m-uvuxw-b62zk-mwxku-ozffc-arwb4-tyvjl-rp23u-oqe", username: "robinet" },
+  { principal: "7kq53-u5bs2-oc7qh-63fvm-65iif-hko6l-7ssjt-3mhhs-ay6nf-6rmsu-5qe", username: "drewb7" },
+  { principal: "shdrz-sn2bh-jgski-fn6fj-urnjc-mikll-47hui-o473u-4lgma-krexn-7ae", username: "lmcfaland127" },
+  { principal: "vg73m-a56hd-4p6ls-jfemc-hbea2-dxjfu-ag265-vp5xa-ugm7h-xwhyu-7ae", username: "cloudedlogic" },
+  { principal: "35ec5-pwhhd-x5f5c-pd3t3-y2oec-bs2a2-lztav-joc3b-4uhkw-5mbgu-cqe", username: "joemste" },
+  { principal: "fjn2f-o7ad2-6bfel-bjypx-azkct-o5aiv-qxucg-fymor-wtlmk-63adm-wae", username: "weebo9" },
+  { principal: "cin6n-lhr4e-poctw-b4e4c-r6xn2-mcjlh-d4apr-25y4i-amfn3-vflwz-aae", username: "tufnel" },
+];
+
 interface PrincipalItemProps {
   principalId: string;
   isSelected: boolean;
   label: string;
+  username?: string;
   onSelect: (principalId: string) => void;
 }
 
@@ -19,6 +43,7 @@ const PrincipalItem: React.FC<PrincipalItemProps> = ({
   principalId,
   isSelected,
   label,
+  username,
   onSelect,
 }) => (
   <ToggleGroupItem
@@ -31,21 +56,9 @@ const PrincipalItem: React.FC<PrincipalItemProps> = ({
         : 'bg-[#F3F3F3] text-black hover:bg-[#E5E5E5]'
     }`}
   >
-    {label}
+    {username || label}
   </ToggleGroupItem>
 );
-
-const defaultPrincipals = [
-  "2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe",
-  "n3br6-rkkdh-5jcq7-pbwsx-yeqm7-jbzqi-54j4d-3isk3-js4sp-vqct5-rae",
-  "iptxv-t4s22-c4wqj-npnvl-reyuz-holr7-kxjnr-fkllw-yxxhy-s6yjf-wae",
-  "e2mqm-f5kv2-wacvn-7sjl2-4wmrn-zumo5-l4g2v-ac752-2vgow-tnd7c-qae",
-  "hlmbu-xmzcn-l526t-yyfet-xf2ix-hyo66-ter6l-pu2ad-6flhh-icaxp-iae",
-  "hmwxd-ccrpr-hnoox-rio37-nft6a-anh7y-c7sli-3iqbm-kvbve-rhrhi-iae",
-  "2zf7e-ctv4z-lbpwc-an3f4-u53uo-wcam7-pur4v-2clio-s7isj-eehzy-mqe",
-
-
-] as const;
 
 export default function PrincipalSelector() {
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
@@ -66,7 +79,7 @@ export default function PrincipalSelector() {
     if (value.trim() === "") return;
     
     try {
-      Principal.fromText(value); // This will throw if invalid
+      Principal.fromText(value);
     } catch (error) {
       setInputError("Invalid principal format");
     }
@@ -128,10 +141,11 @@ export default function PrincipalSelector() {
             )}
             {visiblePrincipals.map((principal) => (
               <PrincipalItem
-                key={principal}
-                principalId={principal}
-                isSelected={selectedPrincipals[0] === principal}
-                label={`${principal.slice(0, 8)}...`}
+                key={principal.principal}
+                principalId={principal.principal}
+                isSelected={selectedPrincipals[0] === principal.principal}
+                label={`${principal.principal.slice(0, 8)}...`}
+                username={principal.username}
                 onSelect={handlePrincipalSelect}
               />
             ))}

@@ -36,12 +36,13 @@ pub async fn mint_ALEX(lbry_burn: u64, actual_caller: Principal, to_subaccount: 
         let mut lbry_processed: u64 = 0;
 
         while tentative_total > LBRY_THRESHOLDS[current_threshold_index as usize] {
-            let mut lbry_mint_alex_with_current_threshold: u64 =
-                LBRY_THRESHOLDS[current_threshold_index as usize];
-
-            lbry_mint_alex_with_current_threshold = lbry_mint_alex_with_current_threshold
-                .checked_sub(total_burned_lbry)
-                .ok_or("Arithmetic underflow occurred in lbry_mint_alex_with_current_threshold")?;
+            let lbry_mint_alex_with_current_threshold: u64 = 
+                if total_burned_lbry < LBRY_THRESHOLDS[current_threshold_index as usize] {
+                    LBRY_THRESHOLDS[current_threshold_index as usize] - total_burned_lbry
+                } else {
+                    lbry_burn.checked_sub(lbry_processed)
+                        .ok_or("Arithmetic underflow occurred in remaining burn calculation")?
+                };
 
             let mut slot_mint = ALEX_PER_THRESHOLD[current_threshold_index as usize]
                 .checked_mul(lbry_mint_alex_with_current_threshold)
