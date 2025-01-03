@@ -5,11 +5,10 @@ The Plan:
   
 
 Next Small Stuff:
+- Only 20 NFTs display on the first page of alexandrian.
 - Optimistic UI For minting NFTs.
 - Play button on videos by default.
-- Reverse the order of search results on alexandrian.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
-- Add Milliseconds place to permasearch. 
 - Remove duplicates based on file size.
 - More advanced searching with tags and metadata.
 - Take alexandrian principals from the backend Librarian profiles list.

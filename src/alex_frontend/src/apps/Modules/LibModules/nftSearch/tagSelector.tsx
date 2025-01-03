@@ -1,9 +1,16 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
-import { toggleTag } from '../../shared/state/librarySearch/librarySlice';
-import { ContentTypeToggleGroup } from '../../shared/components/ContentTypeToggleGroup';
+import { setTags } from '../../shared/state/librarySearch/librarySlice';
+import { ToggleGroup, ToggleGroupItem } from "@/lib/components/toggle-group";
 import { supportedFileTypes, FileTypeConfig, fileTypeCategories } from '../../shared/types/files';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/lib/components/select";
 
 const getUniqueDisplayTypes = (types: FileTypeConfig[]): FileTypeConfig[] => {
   const grouped = types.reduce((acc, type) => {
@@ -19,26 +26,15 @@ const getUniqueDisplayTypes = (types: FileTypeConfig[]): FileTypeConfig[] => {
 const TagSelector: React.FC = () => {
   const dispatch = useDispatch();
   const tags = useSelector((state: RootState) => state.library.tags);
-  const [showAllTags, setShowAllTags] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('favorites');
+  const [selectedCategory, setSelectedCategory] = React.useState('favorites');
 
-  const handleTagToggle = (mimeType: string) => {
-    const clickedType = supportedFileTypes.find(t => t.mimeType === mimeType);
-    if (!clickedType) return;
+  React.useEffect(() => {
+    if (tags.length === 0) {
+      const allMimeTypes = supportedFileTypes.map(type => type.mimeType);
+      dispatch(setTags(allMimeTypes));
+    }
+  }, [dispatch]);
 
-    // Find all related MIME types
-    const relatedTypes = supportedFileTypes.filter(t => 
-      t.displayName === clickedType.displayName
-    ).map(t => t.mimeType);
-
-    // If any related type is selected, remove all. Otherwise, add all.
-    const hasSelected = relatedTypes.some(type => tags.includes(type));
-    relatedTypes.forEach(type => {
-      dispatch(toggleTag(type));
-    });
-  };
-
-  // Filter content types based on the selected category
   const filteredContentTypes = useMemo(() => {
     if (selectedCategory === 'all') {
       return supportedFileTypes;
@@ -47,68 +43,60 @@ const TagSelector: React.FC = () => {
     return supportedFileTypes.filter(type => categoryMimeTypes.includes(type.mimeType));
   }, [selectedCategory]);
 
-  // Filter visible content types based on selection and showAllTags state
   const visibleContentTypes = useMemo(() => {
-    let types = showAllTags ? filteredContentTypes : filteredContentTypes.filter(type => 
-      tags.some((tag: string) => {
-        const matchingType = supportedFileTypes.find(st => st.mimeType === tag);
-        return matchingType?.displayName === type.displayName;
-      })
-    );
+    return getUniqueDisplayTypes(filteredContentTypes);
+  }, [filteredContentTypes]);
 
-    // Remove duplicates based on displayName
-    return getUniqueDisplayTypes(types);
-  }, [filteredContentTypes, tags, showAllTags]);
+  const handleTagToggle = (values: string[]) => {
+    if (values.length === 0) {
+      const allMimeTypes = supportedFileTypes.map(type => type.mimeType);
+      dispatch(setTags(allMimeTypes));
+      return;
+    }
+    dispatch(setTags(values));
+  };
 
   return (
-    <div className="space-y-4">
-      <div className="relative w-full">
-        <select 
-          value={selectedCategory} 
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="w-full h-[50px] px-5 py-4 rounded-[30px] border border-[#F3F3F3] bg-white
-                   text-black font-syne text-base font-normal appearance-none"
-        >
-          <option value="favorites">Popular</option>
-          {Object.keys(fileTypeCategories)
-            .filter(category => category !== 'favorites')
-            .map((category) => (
-              <option key={category} value={category}>
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </option>
-          ))}
-        </select>
-        
-        <div className="absolute right-[22px] top-1/2 transform -translate-y-1/2 pointer-events-none">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15.8721 4.25939C15.8721 4.12502 15.8189 3.9875 15.7158 3.88437C15.5096 3.67812 15.1721 3.67812 14.9658 3.88437L7.90645 10.9437L0.950195 3.9875C0.743945 3.78125 0.406446 3.78125 0.200195 3.9875C-0.00605488 4.19375 -0.00605488 4.53125 0.200195 4.7375L7.53145 12.0719C7.7377 12.2781 8.0752 12.2781 8.28145 12.0719L15.7158 4.6375C15.8221 4.53125 15.8721 4.39689 15.8721 4.25939Z" fill="black"/>
-          </svg>
-        </div>
+    <div className="p-[14px] rounded-2xl border border-input bg-background">
+      <div className="flex justify-center pb-3">
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="favorites">Popular</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
+            {Object.keys(fileTypeCategories)
+              .filter(category => !['favorites', 'all'].includes(category))
+              .map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      <div>
-        <div className="flex items-center justify-between mb-1">
-          <label className="text-sm font-medium text-gray-700">
-            Filter by Content Type:
-          </label>
-          <button
-            onClick={() => setShowAllTags(!showAllTags)}
-            className="inline-flex items-center justify-center p-1 rounded-full hover:bg-gray-100"
+      <ToggleGroup 
+        type="multiple" 
+        value={tags} 
+        onValueChange={handleTagToggle} 
+        className="flex flex-wrap gap-2"
+      >
+        {visibleContentTypes.map((type) => (
+          <ToggleGroupItem
+            key={type.mimeType}
+            value={type.mimeType}
+            variant="outline"
+            className={`px-4 py-2 rounded-full transition-colors
+              ${tags.includes(type.mimeType)
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'hover:bg-muted'}`}
           >
-            <span className="text-gray-600 text-sm">
-              {showAllTags ? "−" : "+"} {!showAllTags && filteredContentTypes.length - visibleContentTypes.length > 0 && 
-                `(${filteredContentTypes.length - visibleContentTypes.length})`}
-            </span>
-          </button>
-        </div>
-        <div className="relative">
-          <ContentTypeToggleGroup
-            selectedTags={tags}
-            onTagToggle={handleTagToggle}
-            filteredTypes={visibleContentTypes}
-          />
-        </div>
-      </div>
+            {type.displayName}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
     </div>
   );
 };

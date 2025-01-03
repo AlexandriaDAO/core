@@ -13,7 +13,6 @@ import { useSortedTransactions } from '@/apps/Modules/shared/state/content/conte
 import { Button } from "@/lib/components/button";
 import { Card } from "@/lib/components/card";
 import { withdraw_nft } from "@/features/nft/withdraw";
-import type { NftData } from "@/apps/Modules/shared/state/nftData/nftDataSlice";
 import {
   CardContent,
   CardHeader,
@@ -22,6 +21,7 @@ import {
 import { ScrollArea } from "@/lib/components/scroll-area";
 import { Badge } from "@/lib/components/badge";
 import { Separator } from "@/lib/components/separator";
+import { NFTData } from '@/apps/Modules/shared/types/nft';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -188,8 +188,8 @@ const ContentList = () => {
           const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 
           const hasWithdrawableBalance = isOwned && nftData && (
-            parseFloat(nftData.alex || '0') > 0 || 
-            parseFloat(nftData.lbry || '0') > 0
+            parseFloat(nftData.balances?.alex || '0') > 0 || 
+            parseFloat(nftData.balances?.lbry || '0') > 0
           );
 
           return (

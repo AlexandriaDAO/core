@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { AppDispatch } from '@/store';
@@ -13,6 +13,7 @@ export const usePagination = ({ defaultItemsPerPage, dependencies = [] }: UsePag
   const dispatch = useDispatch<AppDispatch>();
   const totalItems = useSelector((state: RootState) => state.nftData.totalNfts);
   const loading = useSelector((state: RootState) => state.nftData.loading);
+  const cachedPages = useSelector((state: RootState) => state.nftData.cachedPages);
   
   const [currentPage, setCurrentPage] = useState(1);
   const [pageInput, setPageInput] = useState('');
@@ -25,28 +26,34 @@ export const usePagination = ({ defaultItemsPerPage, dependencies = [] }: UsePag
     setPageInput('');
   }, [...dependencies, itemsPerPage]);
 
-  const handlePageChange = async (newPage: number) => {
+  const handlePageChange = useCallback(async (newPage: number) => {
     if (newPage < 1 || newPage > totalPages || loading) return;
     
     const start = (newPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
 
-    try {
-      await dispatch(performSearch({ start, end })).unwrap();
-      setCurrentPage(newPage);
-      setPageInput('');
-    } catch (error) {
-      console.error('Failed to change page:', error);
+    // Check if page is already cached
+    const pageKey = `${start}-${end}`;
+    if (!cachedPages[pageKey]) {
+      try {
+        await dispatch(performSearch({ start, end })).unwrap();
+      } catch (error) {
+        console.error('Failed to change page:', error);
+        return;
+      }
     }
-  };
 
-  const handleItemsPerPageChange = async (newItemsPerPage: number) => {
+    setCurrentPage(newPage);
+    setPageInput('');
+  }, [dispatch, itemsPerPage, totalPages, loading, cachedPages]);
+
+  const handleItemsPerPageChange = useCallback(async (newItemsPerPage: number) => {
     const newTotalPages = Math.ceil(totalItems / newItemsPerPage);
     const newCurrentPage = Math.min(currentPage, newTotalPages);
     
     setItemsPerPage(newItemsPerPage);
     await handlePageChange(newCurrentPage);
-  };
+  }, [currentPage, totalItems, handlePageChange]);
 
   return {
     currentPage,

@@ -78,6 +78,8 @@
 
     "@radix-ui/react-scroll-area": "^1.2.1",
 
+    "@radix-ui/react-select": "^2.1.4",
+
     "@radix-ui/react-separator": "^1.1.1",
 
     "@radix-ui/react-slider": "^1.2.1",
@@ -117,7 +119,6 @@
     "babel-loader": "^9.2.1",
 
     "browserify-zlib": "^0.2.0",
-
 
     "class-variance-authority": "^0.7.0",
 
@@ -176,8 +177,6 @@
     "postcss": "^8.4.45",
 
     "react": "^18.3.1",
-
-  
 
     "react-circle-flags": "^0.0.20",
 
