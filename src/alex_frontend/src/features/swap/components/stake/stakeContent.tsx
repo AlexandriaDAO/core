@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -18,19 +18,24 @@ import ErrorModal from "../errorModal";
 
 const StakeContent = () => {
     const dispatch = useAppDispatch();
+
     const swap = useAppSelector((state) => state.swap);
     const { user } = useAppSelector((state) => state.auth);
     const alex = useAppSelector((state) => state.alex);
+    const icpLedger = useAppSelector((state) => state.icpLedger);
+
     const [amount, setAmount] = useState("0");
     const [loadingModalV, setLoadingModalV] = useState(false);
     const [successModalV, setSucessModalV] = useState(false);
     const [actionType, setActionType] = useState("Stake");
     const [errorModalV, setErrorModalV] = useState(false);
+    const [userEstimateReward, setUserEstimatedReward] = useState(0);
+    const [apr, setApr] = useState("0");
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        if(!user?.principal) return;
-        dispatch(stakeAlex({amount,userPrincipal:user?.principal}));
+        if (!user?.principal) return;
+        dispatch(stakeAlex({ amount, userPrincipal: user?.principal }));
         setActionType("Stake");
         setLoadingModalV(true);
     }
@@ -44,16 +49,28 @@ const StakeContent = () => {
         const userBal = Math.max(0, Number(alex.alexBal) - Number(alex.alexFee)).toFixed(4);
         setAmount(userBal);
     };
+
+    useEffect(() => {
+        const estimatedUserRewardIcp = Number(swap.stakeInfo.stakedAlex) * swap.averageAPY;
+        setUserEstimatedReward(estimatedUserRewardIcp);
+
+        const estimatedRewardIcp= Number(swap.totalStaked) * swap.averageAPY;
+        const stakedUsd = Number(swap.totalStaked) * Number(alex.alexPriceUsd);
+        const aprPercentage = ((estimatedRewardIcp * Number(icpLedger.icpPrice)) / stakedUsd) * 100;
+        setApr(aprPercentage.toFixed(2));
+    }, [alex.alexPriceUsd, icpLedger.icpPrice, swap.averageAPY, swap.stakeInfo.stakedAlex])
+
     useEffect(() => {
         if (user) {
             dispatch(getAccountAlexBalance(user.principal))
         }
     }, [user])
+
     useEffect(() => {
 
         if (swap.successStake === true || swap.unstakeSuccess === true || swap.burnSuccess === true || swap.successClaimReward === true) {
             dispatch(flagHandler());
-            if(user) dispatch(getAccountAlexBalance(user.principal))
+            if (user) dispatch(getAccountAlexBalance(user.principal))
             setLoadingModalV(false);
             setSucessModalV(true);
         }
@@ -85,8 +102,8 @@ const StakeContent = () => {
                             <ul className='ps-0'>
                                 <li className='mb-4'>
                                     <div className='flex justify-between'>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Daily earned</strong>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>0 ALEX</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Estimated Hourly APR</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{apr}%</strong>
                                     </div>
                                 </li>
                                 <li className='mb-4'>
@@ -132,7 +149,7 @@ const StakeContent = () => {
                                 type="button"
                                 className={`bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 mb-6 ${parseFloat(amount) === 0 || swap.loading ? 'text-[#808080] cursor-not-allowed' : 'bg-balancebox text-white cursor-pointer'}`}
                                 style={{
-                                  backgroundColor: parseFloat(amount) === 0 || swap.loading ? '#525252' : '', // when disabled
+                                    backgroundColor: parseFloat(amount) === 0 || swap.loading ? '#525252' : '', // when disabled
                                 }}
                                 disabled={parseFloat(amount) === 0 || swap.loading === true}
                                 onClick={(e) => {
@@ -156,11 +173,11 @@ const StakeContent = () => {
                     </div>
                 </div>
                 <div className="overflow-x-auto lg:overflow-x-auto">
-                    <StakedInfo setLoadingModalV={setLoadingModalV} setActionType={setActionType} />
+                    <StakedInfo setLoadingModalV={setLoadingModalV} setActionType={setActionType} userEstimateReward={userEstimateReward} />
                 </div>
                 <LoadingModal show={loadingModalV} message1={`${actionType} in Progress`} message2={"Transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
                 <SuccessModal show={successModalV} setShow={setSucessModalV} />
-                <ErrorModal show={errorModalV} setShow={setErrorModalV}/>
+                <ErrorModal show={errorModalV} setShow={setErrorModalV} />
 
             </div>
         </>

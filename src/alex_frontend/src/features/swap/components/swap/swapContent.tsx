@@ -68,6 +68,8 @@ const SwapContent: React.FC = () => {
       dispatch(flagHandler());
       setLoadingModalV(false);
       setSucessModalV(true);
+      setAmount("");
+      setTentativeLBRY(0);
     }
   }, [user, swap.swapSuccess]);
   useEffect(() => {

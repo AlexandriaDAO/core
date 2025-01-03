@@ -12,12 +12,12 @@ import getAverageApy from "../../thunks/getAverageApy";
 interface StakedInfoProps {
     setLoadingModalV: any;
     setActionType: any;
+    userEstimateReward:number;
 }
-const StakedInfo: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType }) => {
+const StakedInfo: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType,userEstimateReward }) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
     const { user } = useAppSelector((state) => state.auth);
-    const [estimateReward, setEstimatedReward] = useState(0);
 
     useEffect(() => {
 
@@ -34,10 +34,7 @@ const StakedInfo: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType
             dispatch(getStakersCount())
         }
     }, [user, swap])
-    useEffect(() => {
-        setEstimatedReward(Number(swap.stakeInfo.stakedAlex) * swap.averageAPY)
 
-    }, [swap.averageAPY, swap.stakeInfo.stakedAlex])
     return (
         <div >
             <table className="min-w-full border-collapse">
@@ -62,7 +59,7 @@ const StakedInfo: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType
                         <td className="py-3 text-left text-base font-medium text-radiocolor whitespace-nowrap">{new Date(Number(swap.stakeInfo.unix_stake_time) / 1e6).toLocaleString()}</td>
                         <td className="py-3 px-6 text-left text-base font-medium text-radiocolor whitespace-nowrap">{swap.stakeInfo.stakedAlex} ALEX</td>
                         <td className="py-3 px-6 text-left text-base font-medium text-radiocolor whitespace-nowrap">{swap.stakeInfo.rewardIcp} ICP</td>
-                        <td className="py-3 px-6 text-left text-base font-medium text-radiocolor whitespace-nowrap">{estimateReward} ICP</td>
+                        <td className="py-3 px-6 text-left text-base font-medium text-radiocolor whitespace-nowrap">{userEstimateReward} ICP</td>
                         <th className="py-3 px-6 text-left">
                             <div className='stake-table whitespace-nowrap'>
                                 <ClaimReward setLoadingModalV={setLoadingModalV} setActionType={setActionType} />

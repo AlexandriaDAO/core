@@ -22,6 +22,7 @@ import getCanisterArchivedBal from "./thunks/getCanisterArchivedBal";
 import getAverageApy from "./thunks/getAverageApy";
 import getLbryFee from "./thunks/lbryIcrc/getLbryFee";
 import getAllLogs from "./thunks/insights/getAllLogs";
+import getAlexPrice from "./thunks/alexIcrc/getAlexPrice";
 // Define the interface for our node state
 export interface StakeInfo {
   stakedAlex: string;
@@ -67,7 +68,7 @@ export interface SwapState {
       alexRate: number;
       totalLbryBurn: number;
     }[];
-   },
+   }
 
 }
 
