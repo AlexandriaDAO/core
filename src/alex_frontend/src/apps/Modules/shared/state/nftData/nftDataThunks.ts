@@ -44,6 +44,9 @@ export const fetchTokensForPrincipal = createAsyncThunk(
       // Store total count
       dispatch(setTotalNfts(allNftIds.length));
 
+      // Reverse the array to show newest NFTs first
+      allNftIds = allNftIds.reverse();
+
       // Get the slice for the current page
       const pageNftIds = allNftIds.slice(range.start, range.end);
       let nftEntries: [string, NftData][] = [];

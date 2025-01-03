@@ -5,6 +5,9 @@ The Plan:
   
 
 Next Small Stuff:
+- Optimistic UI For minting NFTs.
+- Play button on videos by default.
+- Reverse the order of search results on alexandrian.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - Add Milliseconds place to permasearch. 
 - Remove duplicates based on file size.
@@ -15,7 +18,8 @@ Next Small Stuff:
 
 
 Next Big Stuff:
-Then we'll let people do their own channels which are just regular stable structures and no economic incentive. 
+- Apps page leaderboard of top NFTs (perhaps from a backup system off-chain)
+- Then we'll let people do their own channels which are just regular stable structures and no economic incentive. 
 These channels could be open for everyone to edit, or only for the owner to edit.
 I think it'll be totally free to add nfts, but you can only add them if you own the original or copy.
 
@@ -42,3 +46,12 @@ NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I  09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 
+
+
+
+
+
+
+Topup Records:
+- ALEX lost 10T cycles in the 15 hours after launch. I topped it up to 50T Cycles.
+- LBRY lost 10T cycles in the 15 hours after launch. I topped it up to 50T Cycles.

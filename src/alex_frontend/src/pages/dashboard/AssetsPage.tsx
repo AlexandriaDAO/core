@@ -19,12 +19,20 @@ function AssetsPage() {
 		<>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">My Assets</h1>
-				<Link to="upload">
-					<Button variant='link' scale="sm" className="flex justify-between gap-2 items-center">
+				<div className="relative group">
+					<Button 
+						variant='link' 
+						scale="sm" 
+						className="flex justify-between gap-2 items-center opacity-50 cursor-not-allowed"
+						disabled
+					>
 						<CloudUpload size={18}/>
 						<span>Upload Content</span>
 					</Button>
-				</Link>
+					<span className="absolute -bottom-8 right-0 text-xs text-gray-500 font-medium">
+						Coming Soon
+					</span>
+				</div>
 			</div>
 			<div className="font-roboto-condensed bg-white rounded-lg shadow-md p-6">
 				<div className="mb-6 text-gray-600 font-roboto-condensed">List of my uploaded content</div>

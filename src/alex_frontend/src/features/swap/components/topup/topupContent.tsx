@@ -12,6 +12,7 @@ import { _SERVICE } from "../../../../../../declarations/nft_manager/nft_manager
 import getSpendingBalance from "../../thunks/lbryIcrc/getSpendingBalance";
 import topUpLBRY from "../../thunks/lbryIcrc/topUpLBRY";
 import getAlexSpendingBalance from "../../thunks/alexIcrc/getAlexSpendingBalance";
+import { getNftManagerActor } from "@/features/auth/utils/authUtils";
 
 const TopupContent = () => {
     const dispatch = useAppDispatch();
@@ -22,6 +23,7 @@ const TopupContent = () => {
     const [successModalV, setSuccessModalV] = useState(false);
     const [errorModalV, setErrorModalV] = useState(false);
     const [amount, setAmount] = useState("0");
+    const [withdrawLoading, setWithdrawLoading] = useState(false);
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (Number(e.target.value) >= 0) {
@@ -87,6 +89,36 @@ const TopupContent = () => {
             dispatch(flagHandler());
         }
     }, [swap.transferSuccess, swap.error, dispatch, user]);
+
+    const handleWithdraw = async () => {
+        if (!user?.principal) {
+            console.log("User validation failed", { user });
+            return;
+        }
+
+        try {
+            setWithdrawLoading(true);
+            setLoadingModalV(true);
+
+            const nftManager = await getNftManagerActor();
+            const result = await nftManager.withdraw_topup();
+            
+            console.log("Withdraw result:", result);
+            
+            // Refresh balances after withdrawal
+            await dispatch(getSpendingBalance(user.principal));
+            await dispatch(getLbryBalance(user.principal));
+            
+            setLoadingModalV(false);
+            setSuccessModalV(true);
+        } catch (error) {
+            console.error("Failed to withdraw:", error);
+            setLoadingModalV(false);
+            setErrorModalV(true);
+        } finally {
+            setWithdrawLoading(false);
+        }
+    };
 
     return (
         <>
@@ -154,22 +186,38 @@ const TopupContent = () => {
                             </div>
                         </div>
                         {user ? (
-                            <button
-                                type="button"
-                                className={`w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2
-                                    ${parseFloat(amount) === 0 || swap.loading ? 'text-[#808080] cursor-not-allowed' : 'bg-balancebox text-white cursor-pointer'}`}
-                                style={{
-                                    backgroundColor: parseFloat(amount) === 0 || swap.loading ? '#525252' : '',
-                                }}
-                                disabled={parseFloat(amount) === 0 || swap.loading}
-                                onClick={handleTopUp}
-                            >
-                                {swap.loading ? (
-                                    <LoaderCircle size={18} className="animate animate-spin mx-auto" />
-                                ) : (
-                                    <>Top Up</>
-                                )}
-                            </button>
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    type="button"
+                                    className={`w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2
+                                        ${parseFloat(amount) === 0 || swap.loading ? 'text-[#808080] cursor-not-allowed' : 'bg-balancebox text-white cursor-pointer'}`}
+                                    style={{
+                                        backgroundColor: parseFloat(amount) === 0 || swap.loading ? '#525252' : '',
+                                    }}
+                                    disabled={parseFloat(amount) === 0 || swap.loading}
+                                    onClick={handleTopUp}
+                                >
+                                    {swap.loading ? (
+                                        <LoaderCircle size={18} className="animate animate-spin mx-auto" />
+                                    ) : (
+                                        <>Top Up</>
+                                    )}
+                                </button>
+                                
+                                <button
+                                    type="button"
+                                    className={`w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2
+                                        ${withdrawLoading ? 'text-[#808080] cursor-not-allowed' : 'bg-white text-balancebox border-2 border-balancebox cursor-pointer'}`}
+                                    disabled={withdrawLoading}
+                                    onClick={handleWithdraw}
+                                >
+                                    {withdrawLoading ? (
+                                        <LoaderCircle size={18} className="animate animate-spin mx-auto" />
+                                    ) : (
+                                        <>Withdraw All</>
+                                    )}
+                                </button>
+                            </div>
                         ) : (
                             <div className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn">
                                 <Auth />

@@ -70,6 +70,9 @@ pub use query::*;
 mod nft_wallets;
 pub use nft_wallets::*;
 
+mod topup_wallet;
+pub use topup_wallet::*;
+
 mod update;
 pub use update::*;
 

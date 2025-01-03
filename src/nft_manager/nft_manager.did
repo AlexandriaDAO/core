@@ -42,4 +42,5 @@ service : () -> {
   to_nft_subaccount : (nat) -> (blob) query;
   total_supply : () -> (Result_9);
   withdraw : (nat, opt text) -> (Result_10);
+  withdraw_topup : () -> (Result);
 }
