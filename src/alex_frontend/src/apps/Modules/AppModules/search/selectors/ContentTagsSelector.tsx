@@ -108,9 +108,6 @@ const ContentTagsSelector: React.FC = () => {
 
   return (
     <div className="flex-1">
-      <span className="block mb-2 text-lg font-medium font-['Syne'] text-foreground">
-        Select Tags
-      </span>
       <div className="p-[14px] rounded-2xl border border-input bg-background">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">

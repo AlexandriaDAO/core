@@ -2,10 +2,10 @@
 The Plan:
 
 
-  
+
 
 Next Small Stuff:
-- Only 20 NFTs display on the first page of alexandrian.
+
 - Optimistic UI For minting NFTs.
 - Play button on videos by default.
 - There's a bug where ebook searching gets the search button stuck in the loading state.

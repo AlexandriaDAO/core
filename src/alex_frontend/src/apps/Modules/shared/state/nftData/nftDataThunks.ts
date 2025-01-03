@@ -15,6 +15,7 @@ import { LBRY } from '../../../../../../../declarations/LBRY';
 import { Principal } from '@dfinity/principal';
 import { natToArweaveId } from '@/utils/id_convert';
 import type { NFTData } from '../../types/nft';
+import { setNoResults } from '../librarySearch/librarySlice';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -35,6 +36,7 @@ export const fetchTokensForPrincipal = createAsyncThunk(
     try {
       dispatch(setLoading(true));
       dispatch(setError(null));
+      dispatch(setNoResults(false));
       
       const principal = Principal.fromText(principalId);
       const params = { owner: principal, subaccount: [] as [] };
@@ -46,6 +48,11 @@ export const fetchTokensForPrincipal = createAsyncThunk(
         allNftIds = await icrc7.icrc7_tokens_of(params, [], countLimit);
       } else if (collection === 'icrc7_scion') {
         allNftIds = await icrc7_scion.icrc7_tokens_of(params, [], countLimit);
+      }
+
+      // Set no results state if the search returned empty
+      if (allNftIds.length === 0) {
+        dispatch(setNoResults(true));
       }
 
       // Store total count

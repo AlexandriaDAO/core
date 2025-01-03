@@ -7,6 +7,7 @@ interface LibraryState {
   tags: string[];
   collection: 'icrc7' | 'icrc7_scion';
   isLoading: boolean;
+  noResults: boolean;
 }
 
 const initialState: LibraryState = {
@@ -15,6 +16,7 @@ const initialState: LibraryState = {
   tags: [],
   collection: 'icrc7',
   isLoading: false,
+  noResults: false,
 };
 
 const librarySlice = createSlice({
@@ -51,6 +53,9 @@ const librarySlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
+    setNoResults: (state, action: PayloadAction<boolean>) => {
+      state.noResults = action.payload;
+    },
   },
 });
 
@@ -60,6 +65,7 @@ export const {
   setTags,
   toggleTag,
   setCollection,
-  setLoading
+  setLoading,
+  setNoResults
 } = librarySlice.actions;
 export default librarySlice.reducer;

@@ -6,6 +6,7 @@ import PrincipalSelector from "./PrincipalSelector";
 import SortSelector from "./SortSelector";
 import CollectionSelector from "./collectionSelector";
 import LibraryContentTagsSelector from "./tagSelector";
+import { Pagination } from "../../shared/components/Pagination";
 import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
 import { performSearch } from '../../shared/state/librarySearch/libraryThunks';
 import RangeSelector from './rangeSelector';
@@ -39,7 +40,7 @@ export default function LibrarySearch() {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="flex flex-col space-y-2">
             <PrincipalSelector />
@@ -51,6 +52,15 @@ export default function LibrarySearch() {
             <LibraryContentTagsSelector />
           </div>
         </div>
+        <Pagination
+          currentPage={1}
+          totalPages={10}
+          loading={false}
+          totalItems={100}
+          itemsPerPage={20}
+          onPageChange={async () => {}}
+          onItemsPerPageChange={async () => {}}
+        />
       </div>
     </div>
   );

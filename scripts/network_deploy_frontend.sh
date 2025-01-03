@@ -34,10 +34,6 @@ mkdir -p .dfx/local/canisters/alex_frontend/
 wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/ALEX/ALEX.did
 wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/LBRY/LBRY.did
 
-# # [optional]Take a snapshot
-# dfx canister stop alex_frontend --network ic
-# dfx canister snapshot create alex_frontend --network ic
-# dfx canister start alex_frontend --network ic
 
 dfx identity use mainnet
 dfx deploy alex_frontend --network ic
