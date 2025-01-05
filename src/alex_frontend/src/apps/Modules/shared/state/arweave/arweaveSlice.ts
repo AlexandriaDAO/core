@@ -24,11 +24,10 @@ const initialState: ArweaveState = {
   isLoading: false,
   searchState: {
     searchTerm: '',
-    filterDate: '',
+    timestamp: undefined,
     contentCategory: 'favorites',
     tags: fileTypeCategories.favorites,
-    amount: 12,
-    filterTime: '',
+    amount: 20,
     ownerFilter: '',
   },
   predictions: {},
@@ -49,12 +48,6 @@ const arweaveSlice = createSlice({
       if (action.payload.contentCategory !== undefined) {
         state.searchState.tags = fileTypeCategories[action.payload.contentCategory] || [];
       }
-    },
-    setFilterDate: (state, action: PayloadAction<string>) => {
-      state.searchState.filterDate = action.payload;
-    },
-    setFilterTime: (state, action: PayloadAction<string>) => {
-      state.searchState.filterTime = action.payload;
     },
     setPredictionResults: (state, action: PayloadAction<{ id: string; predictions: PredictionResults }>) => {
       const { id, predictions } = action.payload;
@@ -86,8 +79,6 @@ export const updatePredictionResults = createAsyncThunk(
 export const {
   setIsLoading,
   setSearchState,
-  setFilterDate,
-  setFilterTime,
   setPredictionResults,
   setNsfwModelLoaded,
   clearPredictions,

@@ -5,7 +5,7 @@ import { RootState } from '@/store';
 import { toggleSortDirection } from './librarySlice';
 import { AppDispatch } from '@/store';
 import { fetchTokensForPrincipal } from '../nftData/nftDataThunks';
-import { cachePage, clearCache } from '../nftData/nftDataSlice';
+import { cachePage, clearCache, clearNFTs } from '../nftData/nftDataSlice';
 
 export const togglePrincipalSelection = createAsyncThunk(
   'library/togglePrincipalSelection',
@@ -23,10 +23,10 @@ export const togglePrincipalSelection = createAsyncThunk(
 
 export const performSearch = createAsyncThunk(
   'library/performSearch',
-  async (
-    { start = 0, end = 20 }: { start?: number; end?: number },
-    { getState, dispatch }
-  ) => {
+  async ({ start, end }: { start: number; end: number }, { getState, dispatch }) => {
+    // Clear existing NFTs before performing new search
+    dispatch(clearNFTs());
+    
     try {
       const state = getState() as RootState;
       const selectedPrincipals = state.library.selectedPrincipals;

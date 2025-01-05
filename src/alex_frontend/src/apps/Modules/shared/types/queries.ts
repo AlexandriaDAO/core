@@ -49,11 +49,9 @@ export interface LoadMoreProps {
 
 export interface SearchState {
   searchTerm: string;
-  filterDate: string;
+  timestamp?: number; // UTC timestamp in milliseconds
   contentCategory: string;
   tags: string[];
   amount: number;
-  filterTime: string;
   ownerFilter: string;
-  maxTimestamp?: number;
 }

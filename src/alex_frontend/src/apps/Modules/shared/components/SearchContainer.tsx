@@ -68,7 +68,8 @@ export function SearchContainer({
     if (earliestTransaction?.block?.timestamp) {
       try {
         searchInProgress.current = true;
-        await onSearch(earliestTransaction.block.timestamp);
+        const timestampMs = earliestTransaction.block.timestamp * 1000;
+        await onSearch(timestampMs);
       } catch (error) {
         console.error('Show more error:', error);
       } finally {

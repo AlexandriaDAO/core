@@ -26,14 +26,16 @@ export default function RangeSelector() {
   if (!totalItems) return null;
 
   return (
-    <Pagination
-      currentPage={currentPage}
-      totalPages={totalPages}
-      loading={loading}
-      totalItems={totalItems}
-      itemsPerPage={itemsPerPage}
-      onPageChange={handlePageChange}
-      onItemsPerPageChange={handleItemsPerPageChange}
-    />
+    <div className="col-span-2 mt-4">
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        loading={loading}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
+      />
+    </div>
   );
 }
