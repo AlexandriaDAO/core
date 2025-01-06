@@ -12,12 +12,10 @@ export default function RangeSelector() {
   
   const {
     currentPage,
-    pageInput,
     totalPages,
     loading,
     totalItems,
     itemsPerPage,
-    setPageInput,
     handlePageChange,
     handleItemsPerPageChange
   } = usePagination({
@@ -31,12 +29,10 @@ export default function RangeSelector() {
     <Pagination
       currentPage={currentPage}
       totalPages={totalPages}
-      pageInput={pageInput}
       loading={loading}
       totalItems={totalItems}
       itemsPerPage={itemsPerPage}
       onPageChange={handlePageChange}
-      onPageInputChange={setPageInput}
       onItemsPerPageChange={handleItemsPerPageChange}
     />
   );

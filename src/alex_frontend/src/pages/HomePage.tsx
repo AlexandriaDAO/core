@@ -11,10 +11,10 @@ interface App {
 }
 
 const apps: App[] = [
-  { name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/permasearch.jpg' },
   { name: 'Alexandrian', description: 'Library', path: '/app/alexandrian', logo: '/logos/alexandrian.jpg' },
+  { name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/permasearch.jpg' },
   { name: 'Emporium', description: 'Trade', path: '/app/emporium', logo: '/logos/emporium.jpg' },
-  { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos', logo: '/logos/syllogos.jpg' },
+  { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos', logo: '/logos/syllogos.jpg', comingSoon: true },
   { name: 'Bibliotheca', description: 'Library', path: '/app/bibliotheca', comingSoon: true },
   { name: 'Lexigraph', description: 'Write', path: '/app/lexigraph', comingSoon: true },
   { name: 'Dialectica', description: 'Debate', path: '/app/dialectica', comingSoon: true },

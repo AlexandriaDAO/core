@@ -79,7 +79,7 @@ const ArweaveOwnerSelector: React.FC = () => {
         isValid={isValid}
         value={searchState.ownerFilter}
         onChange={(e) => handleSearchStateChange(e.target.value)}
-        placeholder="Enter owner address or principal ID"
+        placeholder="paste owner address"
         title={!isValid ? "Please enter a valid Arweave address (43 characters)" : ""}
       />
     </SearchBox>

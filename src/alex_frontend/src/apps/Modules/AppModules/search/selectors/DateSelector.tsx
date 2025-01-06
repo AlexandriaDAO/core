@@ -290,9 +290,6 @@ const DateSelector: React.FC = () => {
       <div className="flex justify-between gap-4">
         {/* Date Input Section */}
         <div className="flex-1">
-          <span className="block mb-2 text-lg font-medium font-['Syne'] text-foreground">
-            Select Date (UTC)
-          </span>
           <div className="flex items-center p-[14px] rounded-2xl border border-input bg-background">
             <Popover open={isOpen} onOpenChange={setIsOpen}>
               <PopoverTrigger asChild>
@@ -402,9 +399,6 @@ const DateSelector: React.FC = () => {
 
         {/* Time Input Section */}
         <div className="flex-1">
-          <span className="block mb-2 text-lg font-medium font-['Syne'] text-foreground">
-            Select Time (UTC)
-          </span>
           <div className="flex items-center p-[14px] rounded-2xl border border-input bg-background">
             <TimeInput
               value={selectedDate}
@@ -412,8 +406,7 @@ const DateSelector: React.FC = () => {
               className="flex-1"
             />
             <Button
-              variant="ghost"
-              className="h-8 w-8 p-0 ml-2"
+              className="ml-2 bg-black text-white hover:bg-[#FFEB3B] hover:text-black"
               onClick={generateRandomDateTime}
             >
               <ShuffleIcon className="h-4 w-4" />

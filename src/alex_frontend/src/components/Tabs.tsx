@@ -25,12 +25,12 @@ export default function Tabs() {
             >
                 APPS
             </button>
-            <button
+            {/* <button
                 onClick={() => navigate('/manager')}
                 className={`${baseStyles} ${location.pathname === '/manager' ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
             >
                 LBRY
-            </button>
+            </button> */}
             <button
                 onClick={() => navigate('/swap')}
                 className={`${baseStyles} ${location.pathname === '/swap' ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}

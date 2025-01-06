@@ -39,7 +39,7 @@ export function SearchContainer({
   showMoreEnabled = true
 }: SearchContainerProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
   const contentRef = useRef<HTMLDivElement>(null);
   const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
   const searchInProgress = useRef(false);

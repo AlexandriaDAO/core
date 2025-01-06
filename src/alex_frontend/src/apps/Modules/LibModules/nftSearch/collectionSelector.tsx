@@ -17,9 +17,6 @@ export default function CollectionSelector() {
 
   return (
     <div className="flex-1">
-      <span className="block mb-2 text-lg font-medium font-['Syne'] text-foreground">
-        Select Collection
-      </span>
       <div className="p-[14px] rounded-2xl border border-input bg-background">
         <ToggleGroup
           type="single"
@@ -34,7 +31,7 @@ export default function CollectionSelector() {
                 ? 'bg-[#2D55FF] text-white hover:bg-[#2D55FF]/90'
                 : 'bg-[#F3F3F3] text-black hover:bg-[#E5E5E5]'}`}
           >
-            ICRC-7
+            OG NFTs
           </ToggleGroupItem>
           <ToggleGroupItem
             value="icrc7_scion"
@@ -43,7 +40,7 @@ export default function CollectionSelector() {
                 ? 'bg-[#2D55FF] text-white hover:bg-[#2D55FF]/90'
                 : 'bg-[#F3F3F3] text-black hover:bg-[#E5E5E5]'}`}
           >
-            ICRC-7 Scion
+            Scion NFTs
           </ToggleGroupItem>
         </ToggleGroup>
       </div>

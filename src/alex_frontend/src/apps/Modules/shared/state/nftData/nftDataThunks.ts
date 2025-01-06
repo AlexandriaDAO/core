@@ -1,5 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setNfts, setLoading, setError, NftData, updateNftBalances, setTotalNfts } from './nftDataSlice';
+import { 
+  setNFTs as setNfts,
+  updateNftBalances,
+  setLoading,
+  setError,
+  setTotalNfts
+} from './nftDataSlice';
 import { RootState } from '@/store';
 import { icrc7 } from '../../../../../../../declarations/icrc7';
 import { icrc7_scion } from '../../../../../../../declarations/icrc7_scion';
@@ -8,6 +14,8 @@ import { ALEX } from '../../../../../../../declarations/ALEX';
 import { LBRY } from '../../../../../../../declarations/LBRY';
 import { Principal } from '@dfinity/principal';
 import { natToArweaveId } from '@/utils/id_convert';
+import type { NFTData } from '../../types/nft';
+import { setNoResults } from '../librarySearch/librarySlice';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -28,6 +36,7 @@ export const fetchTokensForPrincipal = createAsyncThunk(
     try {
       dispatch(setLoading(true));
       dispatch(setError(null));
+      dispatch(setNoResults(false));
       
       const principal = Principal.fromText(principalId);
       const params = { owner: principal, subaccount: [] as [] };
@@ -41,6 +50,11 @@ export const fetchTokensForPrincipal = createAsyncThunk(
         allNftIds = await icrc7_scion.icrc7_tokens_of(params, [], countLimit);
       }
 
+      // Set no results state if the search returned empty
+      if (allNftIds.length === 0) {
+        dispatch(setNoResults(true));
+      }
+
       // Store total count
       dispatch(setTotalNfts(allNftIds.length));
 
@@ -49,7 +63,7 @@ export const fetchTokensForPrincipal = createAsyncThunk(
 
       // Get the slice for the current page
       const pageNftIds = allNftIds.slice(range.start, range.end);
-      let nftEntries: [string, NftData][] = [];
+      let nftEntries: [string, NFTData][] = [];
 
       if (collection === 'icrc7') {
         nftEntries = pageNftIds.map(tokenId => [
@@ -76,7 +90,9 @@ export const fetchTokensForPrincipal = createAsyncThunk(
         );
       }
       
-      dispatch(setNfts(nftEntries));
+      // Convert entries array to record before dispatching
+      const nftRecord = Object.fromEntries(nftEntries);
+      dispatch(setNfts(nftRecord));
 
       // Fetch balances for the current page
       const convertE8sToToken = (e8sAmount: bigint): string => {
@@ -104,7 +120,7 @@ export const fetchTokensForPrincipal = createAsyncThunk(
         })
       );
       
-      return nftEntries;
+      return nftRecord;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       dispatch(setError(errorMessage));
