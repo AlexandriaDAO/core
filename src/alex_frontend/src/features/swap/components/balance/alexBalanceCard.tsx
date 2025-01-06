@@ -1,17 +1,26 @@
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import React, { useEffect, useMemo, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRotate } from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useState } from "react";
 import getAlexPrice from "../../thunks/alexIcrc/getAlexPrice";
+import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 
 const AlexBalanceCard = () => {
     const alex = useAppSelector(state => state.alex);
-    const swap = useAppSelector((state) => state.swap);
+    const auth = useAppSelector(state => state.auth);
     const dispatch = useAppDispatch();
     const [alexBalUsd, setAlexBalUsd] = useState(0);
+
+    const handleRefresh = () => {
+        if (!auth.user) return;
+        dispatch(getAccountAlexBalance(auth.user.principal))
+    }
+    // useEffect(() => {
+    //     dispatch(getAlexPrice())
+    // }, [])
+
     useEffect(() => {
-        dispatch(getAlexPrice())
-    }, [])
-    useMemo(() => {
         setAlexBalUsd(Number(alex.alexBal) * Number(alex.alexPriceUsd));
     }, [alex.alexBal, alex.alexPriceUsd])
     return (<>
@@ -28,11 +37,14 @@ const AlexBalanceCard = () => {
                         <img src="images/icp-logo.png" alt="icp-logo" />
                     </div>
                 </div>
-                <span className='text-base text-lightgray font-medium mb-1'>Balance</span>
+                <div className="flex justify-between items-center mb-3">
+                    <span className='text-base text-lightgray font-medium mb-1'>Balance</span>
+                    <FontAwesomeIcon className="text-lightgray" role="button" icon={faRotate} onClick={() => { handleRefresh() }} />
+                </div>
                 <div className="flex text-center justify-between">
 
                     <h4 className='text-2xl font-medium mb-1 text-white'>{alex.alexBal}</h4>
-                    <span className='text-base text-lightgray font-medium'> ≈ $ {alexBalUsd.toFixed(2)}</span>
+                    {/* <span className='text-base text-lightgray font-medium'> ≈ $ {alexBalUsd.toFixed(2)}</span> */}
                 </div>
             </div>
         </div>

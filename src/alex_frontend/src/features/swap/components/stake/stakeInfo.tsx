@@ -37,9 +37,9 @@ const StakedInfo: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType
 
     return (
         <div >
-            <table className="min-w-full border-collapse">
+            {/* <table className="min-w-full border-collapse">
                 <thead>
-                    <tr className="border-b border-gray-300 hover:bg-gray-100">
+                    <tr className="hidden md:table-row border-b border-gray-300 hover:bg-gray-100">
                         <th className="py-3 text-left text-lg font-semibold text-radiocolor whitespace-nowrap">
                             <span className='flex me-7'>Date</span>
                         </th>
@@ -68,7 +68,56 @@ const StakedInfo: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType
                         </th>
                     </tr>
                 </tbody>
-            </table>
+            </table> */}
+           <table className="min-w-full border-collapse">
+                <thead>
+                    {/* Header row hidden on small screens */}
+                    <tr className="hidden sm:table-row border-b border-gray-300 hover:bg-gray-100">
+                    <th className="py-3 text-left text-lg font-semibold text-radiocolor whitespace-nowrap">
+                        <span className="flex me-7">Date</span>
+                    </th>
+                    <th className="py-3 text-left text-lg font-semibold text-radiocolor whitespace-nowrap">
+                        <span className="flex me-7">Amount Staked</span>
+                    </th>
+                    <th className="py-3 text-left text-lg font-semibold text-radiocolor whitespace-nowrap">
+                        <span className="flex me-7">Amount Earned</span>
+                    </th>
+                    <th className="py-3 text-left text-lg font-semibold text-radiocolor whitespace-nowrap">
+                        <span className="flex me-7">Estimated Reward</span>
+                    </th>
+                    </tr>
+                </thead>
+                <tbody className="text-gray-600 text-sm font-light">
+                    {/* Each row switches between horizontal and vertical */}
+                    <tr className="block sm:table-row border-b border-gray-300 hover:bg-gray-100">
+                    <td className="block sm:table-cell py-3 text-left text-base font-medium text-radiocolor whitespace-nowrap">
+                        <span className="block sm:hidden font-semibold">Date:</span>
+                        {new Date(Number(swap.stakeInfo.unix_stake_time) / 1e6).toLocaleString()}
+                    </td>
+                    <td className="block sm:table-cell py-3 sm:px-6 xs:px-2 text-left text-base font-medium text-radiocolor whitespace-nowrap">
+                        <span className="block sm:hidden font-semibold">Amount Staked:</span>
+                        {swap.stakeInfo.stakedAlex} ALEX
+                    </td>
+                    <td className="block sm:table-cell py-3 sm:px-6 xs:px-2 text-left text-base font-medium text-radiocolor whitespace-nowrap">
+                        <span className="block sm:hidden font-semibold">Amount Earned:</span>
+                        {swap.stakeInfo.rewardIcp} ICP
+                    </td>
+                    <td className="block sm:table-cell py-3 sm:px-6 xs:px-2 text-left text-base font-medium text-radiocolor whitespace-nowrap">
+                        <span className="block sm:hidden font-semibold">Estimated Reward:</span>
+                        {userEstimateReward} ICP
+                    </td>
+                    <td className="block sm:table-cell py-3 sm:px-6 xs:px-2 text-left">
+                        <span className="block sm:hidden font-semibold">Actions:</span>
+                        <div className="stake-table whitespace-nowrap">
+                        <ClaimReward setLoadingModalV={setLoadingModalV} setActionType={setActionType} />
+                        <Unstake setLoadingModalV={setLoadingModalV} setActionType={setActionType} />
+                        </div>
+                    </td>
+                    </tr>
+                </tbody>
+           </table>
+
+
         </div>);
 };
 export default StakedInfo;

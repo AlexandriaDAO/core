@@ -8,7 +8,7 @@ import SOLAccount from "./components/SOLAccount";
 const Auth = () => {
     const {provider} = useAuth();
 	return (
-        <div className="flex gap-2 justify-center items-center">
+        <div className="flex gap-2 sm:justify-center xs:justify-start items-center">
             <ICPAccount />
             {provider === "ETH" && <ETHAccount />}
             {provider === "SOL" && <SOLAccount />}

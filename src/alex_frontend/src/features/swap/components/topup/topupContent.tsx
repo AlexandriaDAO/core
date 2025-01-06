@@ -13,6 +13,7 @@ import getSpendingBalance from "../../thunks/lbryIcrc/getSpendingBalance";
 import topUpLBRY from "../../thunks/lbryIcrc/topUpLBRY";
 import getAlexSpendingBalance from "../../thunks/alexIcrc/getAlexSpendingBalance";
 import { getNftManagerActor } from "@/features/auth/utils/authUtils";
+import { Entry } from "@/layouts/parts/Header";
 
 const TopupContent = () => {
     const dispatch = useAppDispatch();
@@ -136,8 +137,8 @@ const TopupContent = () => {
                         </div>
                         <div className='border bg-white py-5 px-8 rounded-borderbox mb-3'>
                             <div className='flex justify-between items-center mb-5'>
-                                <h4 className='text-lg font-medium text-darkgray'>LBRY Spending Wallet Balance</h4>
-                                <span className='text-lg font-medium text-darkgray'>
+                                <h4 className='lg:text-lg md:text-base sm:text-sm font-medium text-darkgray'>LBRY Spending Wallet Balance</h4>
+                                <span className='lg:text-lg md:text-base sm:text-sm font-medium text-darkgray'>
                                     {swap.loading ? (
                                         <LoaderCircle size={18} className="animate animate-spin" />
                                     ) : (
@@ -146,8 +147,8 @@ const TopupContent = () => {
                                 </span>
                             </div>
                             <div className='flex justify-between items-center'>
-                                <h4 className='text-lg font-medium text-darkgray'>ALEX Spending Wallet Balance</h4>
-                                <span className='text-lg font-medium text-darkgray'>
+                                <h4 className='lg:text-lg md:text-base sm:text-sm font-medium text-darkgray'>ALEX Spending Wallet Balance</h4>
+                                <span className='lg:text-lg md:text-base sm:text-sm font-medium text-darkgray'>
                                     {swap.loading ? (
                                         <LoaderCircle size={18} className="animate animate-spin" />
                                     ) : (
@@ -159,7 +160,7 @@ const TopupContent = () => {
                         <div className='border bg-white py-5 px-5 rounded-borderbox mb-7'>
                             <div className='mb-3 w-full'>
                                 <div className='flex justify-between mb-3'>
-                                    <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>
+                                    <h4 className='lg:text-2xl md:text-xl sm:text-lg font-medium text-darkgray'>Amount</h4>
                                     <input
                                         className='text-darkgray text-right mr-[-10px] bg-transparent text-2xl font-medium placeholder-darkgray focus:outline-none focus:border-transparent w-full'
                                         type='number'
@@ -220,7 +221,7 @@ const TopupContent = () => {
                             </div>
                         ) : (
                             <div className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn">
-                                <Auth />
+                                <Entry />
                             </div>
                         )}
                     </div>
@@ -228,12 +229,12 @@ const TopupContent = () => {
                         <div className='border border-gray-400 text-white py-5 px-5 rounded-2xl'>
                             <ul className='ps-0 pb-7'>
                                 <li className='flex justify-between mb-5'>
-                                    <strong className='text-lg font-semibold me-1 text-radiocolor'>Amount</strong>
+                                    <strong className='lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor'>Amount</strong>
                                     <span className='text-lg font-semibold text-radiocolor'>{amount} LBRY</span>
                                 </li>
                                 <li className='flex justify-between mb-5'>
-                                    <strong className='text-lg font-semibold me-1 text-radiocolor'>Network Fees</strong>
-                                    <span className='text-lg font-semibold text-radiocolor'>
+                                    <strong className='lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor'>Network Fees</strong>
+                                    <span className='lg:text-lg md:text-base sm:text-sm font-semibold text-radiocolor'>
                                         <span className='text-multycolor'>{swap.lbryFee}</span> LBRY
                                     </span>
                                 </li>

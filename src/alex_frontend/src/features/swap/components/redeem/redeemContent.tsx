@@ -6,16 +6,14 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { _SERVICE as _SERVICESWAP } from "../../../../../../declarations/icp_swap/icp_swap.did";
 import { _SERVICE as _SERVICEICPLEDGER } from "../../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 
-import { Link } from "react-router";
-import swapLbry from "../../thunks/swapLbry";
 import { flagHandler } from "../../swapSlice";
 import { LoaderPinwheel } from 'lucide-react';
-import Auth from "@/features/auth";
 import getArchivedBal from "../../thunks/getArchivedBal";
 import redeemArchivedBalance from "../../thunks/redeemArchivedBalance";
 import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
 import ErrorModal from "../errorModal";
+import { Entry } from "@/layouts/parts/Header";
 
 const RedeemContent: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -86,7 +84,7 @@ const RedeemContent: React.FC = () => {
             </button> : <div
               className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn mb-4"
             >
-              <Auth />
+              <Entry />
             </div>}
           </div>
         </div>

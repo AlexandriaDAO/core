@@ -10,11 +10,11 @@ import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import { flagHandler } from "../../swapSlice";
 import stakeAlex from "../../thunks/stakeAlex";
 import StakedInfo from "./stakeInfo";
-import Auth from "@/features/auth";
 import { LoaderCircle } from "lucide-react";
 import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
 import ErrorModal from "../errorModal";
+import { Entry } from "@/layouts/parts/Header";
 
 const StakeContent = () => {
     const dispatch = useAppDispatch();
@@ -102,12 +102,12 @@ const StakeContent = () => {
                             <ul className='ps-0'>
                                 <li className='mb-4'>
                                     <div className='flex justify-between'>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Estimated Hourly APR</strong>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{apr}%</strong>
+                                        {/* <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Estimated Hourly APR</strong> */}
+                                        {/* <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{apr}%</strong> */}
                                     </div>
                                 </li>
                                 <li className='mb-4'>
-                                    <div className='flex justify-between'>
+                                    <div className='flex justify-between border-b-2 pb-4'>
                                         <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Total earned</strong>
                                         <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>0 ALEX</strong>
                                     </div>
@@ -163,7 +163,7 @@ const StakeContent = () => {
                             </button> : <div
                                 className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn mb-4"
                             >
-                                <Auth />
+                                <Entry />
                             </div>}
                             <div className="terms-condition-wrapper flex tems-baseline">
                                 <span className="text-[#FF37374D] mr-2 text-xl font-semibold">*</span>

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-
+import React, {useState } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import CopyHelper from "../copyHelper";
 import { options } from "@/utils/utils";
@@ -41,17 +40,17 @@ const ReceiveContent = () => {
             <div className='grid grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-12'>
                 <div className='me-0 2xl:me-3 xl:me-3 lg:me-3 md:me-3 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-3 md:mb-3 sm:mb-3'>
                     <div className='flex items-center mb-3'>
-                        <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>1</span>
-                        <strong className='text-2xl font-medium'>Choose token</strong>
+                        <span className='flex lg:text-2xl md:text-xl sm:text-lg xs:text-base font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>1</span>
+                        <strong className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium'>Choose token</strong>
                     </div>
                     <div className="relative inline-block w-full mb-4">
                         <div
                             onClick={() => setIsOpen(!isOpen)}
-                            className="flex justify-between items-center border border-gray-300 rounded-full bg-white py-4 px-5 text-2xl font-semibold cursor-pointer"
+                            className="flex justify-between items-center border border-gray-300 rounded-full bg-white py-4 px-5 lg:text-2xl md:text-xl sm:text-lg xs:text-base font-semibold cursor-pointer"
                         >
                             <div className='flex items-center'>
                                 {selectedImage ? <img className='h-5 w-5 me-3' src={selectedImage} alt="Selected" /> : null}
-                                <span className='text-xl font-medium text-black'>{selectedOption}</span>
+                                <span className='lg:text-xl md:text-lg sm:text-sm font-medium text-black'>{selectedOption}</span>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -73,17 +72,17 @@ const ReceiveContent = () => {
                         )}
                     </div>
                     <div className='flex items-center mb-4'>
-                        <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>2</span>
-                        <strong className='text-2xl font-medium'>Choose network</strong>
+                        <span className='flex lg:text-2xl md:text-xl sm:text-lg xs:text-base font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>2</span>
+                        <strong className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium'>Choose network</strong>
                     </div>
                     <div className="relative inline-block w-full mb-4">
                         <div
                             onClick={() => setNetworkOpen(!networkOpen)}
-                            className="flex justify-between items-center border border-gray-300 rounded-full bg-white py-4 px-5 text-2xl font-semibold cursor-pointer"
+                            className="flex justify-between items-center border border-gray-300 rounded-full bg-white py-4 px-5 lg:text-2xl md:text-xl sm:text-lg xs:text-base font-semibold cursor-pointer"
                         >
 
                             <div className='flex items-center'>
-                                <span className='text-xl font-medium text-black'>{selectedNetwork}</span>
+                                <span className='lg:text-xl md:text-lg sm:text-sm font-medium text-black'>{selectedNetwork}</span>
 
 
                             </div>
@@ -107,8 +106,8 @@ const ReceiveContent = () => {
                         )}
                     </div>
                     <div className='flex items-center mb-7'>
-                        <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>3</span>
-                        <strong className='text-2xl font-medium'>Your Address</strong>
+                        <span className='flex lg:text-2xl md:text-xl sm:text-lg xs:text-base font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>3</span>
+                        <strong className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium'>Your Address</strong>
                     </div>
                     <div className="flex items-center">
                         <div style={{ height: "120px", marginRight: "20px", width: "120px" }}>
