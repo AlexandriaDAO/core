@@ -1,5 +1,4 @@
 import { ActionReducerMapBuilder, PayloadAction, createSlice } from "@reduxjs/toolkit";
-import updateEngineStatus from "./thunks/updateEngineStatus";
 import { toast } from "sonner";
 import { SerializedEngine } from "../my-engines/myEnginesSlice";
 import fetchEngine from "./thunks/fetchEngine";
@@ -58,25 +57,6 @@ const engineOverviewSlice = createSlice({
 			})
 			.addCase(fetchEngine.rejected, (state, action) => {
 				toast.error('Engine could not be fetched '+ action.payload)
-
-				state.loading = false;
-				state.error = action.payload as string;
-			})
-
-			.addCase(updateEngineStatus.pending, (state) => {
-				toast.info('Updating Status')
-				state.loading = true;
-				state.error = null;
-			})
-			.addCase(updateEngineStatus.fulfilled, (state, action) => {
-				toast.success('Status Updated')
-
-				state.loading = false;
-				state.error = null;
-				state.activeEngine = action.payload
-			})
-			.addCase(updateEngineStatus.rejected, (state, action) => {
-				toast.error('Status Could not be updated '+ action.payload)
 
 				state.loading = false;
 				state.error = action.payload as string;

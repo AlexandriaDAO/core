@@ -105,14 +105,16 @@ export type fetchAssetsProps = {
     limit?: number;
     owner?: string;
     type?: string;
+    ids?: string[];
 };
 
-export const fetchAssets = async ({after = '', limit = 10, owner = '', type = undefined}: fetchAssetsProps): Promise<Asset[]> => {
+export const fetchAssets = async ({after = '', limit = 10, owner = '', type = undefined, ids = []}: fetchAssetsProps): Promise<Asset[]> => {
     try {
         const result = await client.query({
         query: gql`
             query {
                 transactions(
+                    ${ids.length>0 ? `ids: [${ids.join(',')}],` : ''}
                     first: ${limit},
                     ${isLocal ? 'order: DESC,':'sort: HEIGHT_DESC,'}
                     after: "${after}",

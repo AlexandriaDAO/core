@@ -34,7 +34,7 @@ pub fn create_engine(request: CreateEngineRequest) -> Result<Engine, String> {
     
     // Store the engine
     ENGINES.with(|engines| {
-        engines.borrow_mut().insert(engine_id, engine.clone()).unwrap();
+        engines.borrow_mut().insert(engine_id, engine.clone());
     });
 
     // Add to user's engines

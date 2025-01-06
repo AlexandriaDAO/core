@@ -26,7 +26,7 @@ pub fn create_node(request: CreateNodeRequest) -> Result<Node, String> {
     
     // Store the node
     NODES.with(|nodes| {
-        nodes.borrow_mut().insert(node_id, node.clone()).unwrap();
+        nodes.borrow_mut().insert(node_id, node.clone());
     });
 
     // Add to user's nodes
@@ -72,28 +72,26 @@ pub fn delete_node(id: u64) -> Result<(), String> {
         return Err(GeneralError::AnonymousNotAllowed.to_string());
     }
 
-    // First check ownership
-    NODES.with(|nodes| {
-        let nodes = nodes.borrow();
+    // First check ownership and remove the node
+    let node_owner = NODES.with(|nodes| {
+        let mut nodes = nodes.borrow_mut();
         let node = nodes.get(&id)
             .ok_or_else(|| GeneralError::NotFound("Node".to_string()).to_string())?;
 
         if node.owner != caller {
             return Err(GeneralError::NotAuthorized.to_string());
         }
-        Ok(())
-    })?;
 
-    // Then delete the node
-    NODES.with(|nodes| {
-        nodes.borrow_mut().remove(&id);
-    });
+        nodes.remove(&id);
+        Ok(node.owner.clone())
+    })?;
 
     // Remove from user's nodes
     USER_NODES.with(|user_nodes| {
-        if let Some(mut list) = user_nodes.borrow_mut().get(&caller).map(|list| list.clone()) {
+        let mut user_nodes = user_nodes.borrow_mut();
+        if let Some(mut list) = user_nodes.remove(&node_owner) {
             list.0.retain(|&x| x != id);
-            user_nodes.borrow_mut().insert(caller, list).unwrap();
+            user_nodes.insert(node_owner, list);
         }
     });
 

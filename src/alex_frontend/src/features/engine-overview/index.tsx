@@ -4,7 +4,6 @@ import { LoaderCircle } from "lucide-react";
 import Overview from "./components/Overview";
 import OverviewTabs from "./components/OverviewTabs";
 import OverviewTabContent from "./components/OverviewTabContent";
-import OverviewActions from "./components/OverviewActions";
 
 function EngineOverview() {
 	const {activeEngine, error, loading} = useAppSelector(state=>state.engineOverview)
@@ -21,7 +20,6 @@ function EngineOverview() {
 	return (
         <>
             <div className="flex flex-col gap-6 p-8">
-                <OverviewActions />
                 <Overview />
                 <OverviewTabs />
             </div>

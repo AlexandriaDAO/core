@@ -49,6 +49,7 @@ const AssetMint: React.FC<IAssetMintProps> = ({
 			// const mintNumber = BigInt(arweaveIdToNat(asset.manifest));
 			// const description = "Book minted by Alex";
 			const actorNftManager = await getNftManagerActor();
+			// throws invalid arweave id error
             const result = await actorNftManager.coordinate_mint(asset.manifest, []);
 
             if ("Err" in result) throw new Error(result.Err);

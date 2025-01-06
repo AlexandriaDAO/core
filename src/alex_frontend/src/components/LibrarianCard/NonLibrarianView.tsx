@@ -12,16 +12,13 @@ function NonLibrarianView() {
                 <LockKeyhole size={22} className="text-primary"/>
             </div>
             <span className="font-roboto-condensed font-medium text-base">
-                COMING SOON, you will be able to save and share your own API keys to upload to Arweave, and use other Web2 APIs.
+                Become Librarian to create your personal nodes and
+                access librarian profile data
             </span>
             <Button
                 variant={"link"}
                 scale={"sm"}
-                // onClick={() => navigate('/dashboard/profile/upgrade')}>
-
-                disabled={true}
-                className="opacity-50 cursor-not-allowed"
-            >
+                onClick={() => navigate('/dashboard/profile/upgrade')}>
                 <span>Become Librarian</span>
             </Button>
         </div>

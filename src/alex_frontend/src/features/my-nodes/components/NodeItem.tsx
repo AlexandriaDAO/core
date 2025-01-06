@@ -6,16 +6,20 @@ import { toast } from "sonner";
 import { getNodeBalance, getServerIrys } from "@/services/irysService";
 import { shorten } from "@/utils/general";
 
-import { Copy, LoaderCircle, RefreshCcw } from "lucide-react";
+import { Copy, LoaderCircle, RefreshCcw, Trash2 } from "lucide-react";
 import { SerializedNode } from "../myNodesSlice";
-import { useAlexWallet } from "@/hooks/actors";
+import { useAlexWallet, useUser } from "@/hooks/actors";
+import { Button } from "@/lib/components/button";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 
 interface NodeItemProps {
 	node: SerializedNode;
 }
 
 const NodeItem = ({ node }: NodeItemProps) => {
+	const dispatch = useAppDispatch();
 	const {actor} = useAlexWallet();
+	const {actor: userActor} = useUser();
 	const [irys, setIrys] = useState<WebIrys | null>(null);
 
 	const [loading, setLoading] = useState(false);
@@ -71,6 +75,26 @@ const NodeItem = ({ node }: NodeItemProps) => {
 	useEffect(() => {
 		setNodeBalance();
 	}, [irys]);
+
+	const deleteNode = async () => {
+		try {
+			if(!userActor) {
+				throw new Error('No user actor available');
+			}
+
+			const result = await userActor.delete_node(BigInt(node.id));
+
+			if('Ok' in result){
+				window.location.reload();
+				toast.success('Node deleted successfully');
+			}else{
+				throw new Error(result.Err);
+			}
+		} catch (error) {
+			console.error('Error deleting node:', error);
+			toast.error('Failed to delete node');
+		}
+	};
 
 	return (
 		<div className={`relative ${loading ? 'cursor-not-allowed pointer-events-none' : ''}`}>
@@ -129,6 +153,18 @@ const NodeItem = ({ node }: NodeItemProps) => {
 									<li>Deposits can take a few minutes to reflect.</li>
 									<li>Use the refresh button to fetch latest balance.</li>
 								</ul>
+							</td>
+						</tr>
+						<tr>
+							<td colSpan={2} className="text-center py-2">
+								<Button
+									variant="destructive"
+									scale="sm"
+									onClick={deleteNode}
+								>
+									<Trash2 size={14} />
+									<span>Delete This Node</span>
+								</Button>
 							</td>
 						</tr>
 					</tbody>
