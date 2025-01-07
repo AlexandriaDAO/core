@@ -6,7 +6,6 @@ import PrincipalSelector from "./PrincipalSelector";
 import SortSelector from "./SortSelector";
 import CollectionSelector from "./collectionSelector";
 import LibraryContentTagsSelector from "./tagSelector";
-import { Pagination } from "../../shared/components/Pagination";
 import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
 import { performSearch } from '../../shared/state/librarySearch/libraryThunks';
 import RangeSelector from './rangeSelector';
@@ -45,22 +44,13 @@ export default function LibrarySearch() {
           <div className="flex flex-col space-y-2">
             <PrincipalSelector />
             <CollectionSelector />
-            <RangeSelector />
           </div>
           <div className="flex flex-col space-y-2">
             <SortSelector />
             <LibraryContentTagsSelector />
           </div>
+          <RangeSelector />
         </div>
-        <Pagination
-          currentPage={1}
-          totalPages={10}
-          loading={false}
-          totalItems={100}
-          itemsPerPage={20}
-          onPageChange={async () => {}}
-          onItemsPerPageChange={async () => {}}
-        />
       </div>
     </div>
   );

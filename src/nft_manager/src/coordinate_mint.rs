@@ -109,6 +109,10 @@ async fn mint_original(minting_number: Nat, caller: Principal) -> MintResult {
 }
 
 async fn mint_scion_from_original(minting_number: Nat, caller: Principal) -> MintResult {
+    // First burn tokens
+    burn_lbry_tokens(caller).await?;
+    
+    // Then pay the original NFT owner
     let nft_wallet = to_nft_subaccount(minting_number.clone());
     verify_lbry_payment(caller, nft_manager_principal(), Some(nft_wallet.to_vec()), Nat::from(LBRY_MINT_COST_E8S))
         .await
@@ -126,6 +130,10 @@ async fn mint_scion_from_scion(
     caller: Principal,
     scion_owner: Principal
 ) -> MintResult {
+    // First burn tokens
+    burn_lbry_tokens(caller).await?;
+    
+    // Then pay the scion NFT owner
     let existing_scion_id = og_to_scion_id(minting_number.clone(), scion_owner);
     let scion_wallet = to_nft_subaccount(existing_scion_id);
     

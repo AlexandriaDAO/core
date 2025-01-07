@@ -56,7 +56,13 @@ const nftDataSlice = createSlice({
       state.arweaveToNftId = {};
       state.cachedPages = {};
       state.totalNfts = 0;
+    },
+    clearNFTs: (state) => {
+      state.nfts = {};
     }
+  },
+  extraReducers: (builder) => {
+    // ... existing extra reducers
   }
 });
 
@@ -68,7 +74,8 @@ export const {
   setTotalNfts, 
   cachePage,
   clearCache,
-  clearNfts
+  clearNfts,
+  clearNFTs
 } = nftDataSlice.actions;
 
 export type { NFTData };

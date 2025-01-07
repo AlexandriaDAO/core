@@ -6,6 +6,9 @@ import ContentValidator from './ContentValidator';
 import { getFileIcon } from '../utils/fileIcons';
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { ContentUrlInfo, MintableState } from '../types';
+import { Progress } from "@/lib/components/progress";
+import { Skeleton } from "@/lib/components/skeleton";
+import { AspectRatio } from "@/lib/components/aspect-ratio";
 
 interface ContentRendererProps {
   transaction: Transaction;
@@ -34,9 +37,9 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
   const hasError = !content || content.error;
   if (hasError) {
     return (
-      <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center gap-2">
+      <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center gap-4">
         <File className="text-gray-500 text-4xl" />
-        <LoaderPinwheel className="animate-spin text-4xl text-gray-500" />
+        <Skeleton className="h-8 w-32" />
       </div>
     );
   }
@@ -60,11 +63,13 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
       return (
         <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
           {contentUrls.thumbnailUrl ? (
-            <img src={contentUrls.thumbnailUrl} alt="Book cover" {...commonProps} crossOrigin="anonymous" />
+            <AspectRatio ratio={1}>
+              <img src={contentUrls.thumbnailUrl} alt="Book cover" {...commonProps} crossOrigin="anonymous" />
+            </AspectRatio>
           ) : (
             <>
               <BookOpen className="text-gray-500 text-4xl absolute" />
-              <LoaderPinwheel className="animate-spin text-4xl text-gray-500" />
+              <Skeleton className="h-8 w-32" />
             </>
           )}
         </div>
@@ -82,12 +87,14 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
             />
           ) : (
             content?.thumbnailUrl ? (
-              <img
-                src={content.thumbnailUrl}
-                alt="Video thumbnail"
-                {...commonProps}
-                crossOrigin="anonymous"
-              />
+              <AspectRatio ratio={1}>
+                <img
+                  src={content.thumbnailUrl}
+                  alt="Video thumbnail"
+                  {...commonProps}
+                  crossOrigin="anonymous"
+                />
+              </AspectRatio>
             ) : (
               <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                 <Play className="text-gray-500 text-4xl" />
@@ -97,13 +104,15 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
         </div>
       ),
       "image/": (
-        <img 
-          src={content?.imageObjectUrl || contentUrls.thumbnailUrl || contentUrls.fullUrl} 
-          alt="Content" 
-          decoding="async"
-          {...commonProps}
-          crossOrigin="anonymous" 
-        />
+        <AspectRatio ratio={1}>
+          <img 
+            src={content?.imageObjectUrl || contentUrls.thumbnailUrl || contentUrls.fullUrl} 
+            alt="Content" 
+            decoding="async"
+            {...commonProps}
+            crossOrigin="anonymous" 
+          />
+        </AspectRatio>
       ),
       "application/pdf": (
         <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
@@ -136,14 +145,22 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
       />
       {renderContent()}
       {(showStats || !isMintable) && predictions && (
-        <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white p-2 z-20">
-          <p className="text-lg font-bold mb-2">Content Classification</p>
-          <ul className="text-sm">
+        <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white p-4 z-20">
+          <p className="text-lg font-bold mb-4">Content Classification</p>
+          <div className="space-y-3 w-full max-w-sm">
             {Object.entries(predictions).map(([key, value]) => (
-              <li key={key}>{key}: {typeof value === 'number' ? (value * 100).toFixed(2) : 0}%</li>
+              <div key={key} className="space-y-1">
+                <div className="flex justify-between text-sm">
+                  <span>{key}</span>
+                  <span>{(Number(value) * 100).toFixed(1)}%</span>
+                </div>
+                <Progress value={Number(value) * 100} className="h-1" />
+              </div>
             ))}
-          </ul>
-          {!isMintable && <p className="mt-2 text-red-400">This content is not mintable.</p>}
+          </div>
+          {!isMintable && (
+            <p className="mt-4 text-red-400 text-sm">This content is not mintable.</p>
+          )}
         </div>
       )}
     </div>

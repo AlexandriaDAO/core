@@ -13,6 +13,7 @@ import { useSortedTransactions } from '@/apps/Modules/shared/state/content/conte
 import { Button } from "@/lib/components/button";
 import { Card } from "@/lib/components/card";
 import { withdraw_nft } from "@/features/nft/withdraw";
+import { TooltipProvider } from "@/lib/components/tooltip";
 import {
   CardContent,
   CardHeader,
@@ -172,121 +173,122 @@ const ContentList = () => {
   ), [copyToClipboard]);
 
   return (
-    <>
-      <ContentGrid>
-        {transactions.map((transaction) => {
-          const content = contentData[transaction.id];
-          const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-          const mintableStateItem = mintableState[transaction.id];
-          const isMintable = mintableStateItem?.mintable;
-          
-          const nftId = arweaveToNftId[transaction.id];
-          const nftData = nftId ? nfts[nftId] : undefined;
-          const isOwned = user && nftData?.principal === user.principal;
-          
-          const hasPredictions = !!predictions[transaction.id];
-          const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
+    <TooltipProvider>
+      <>
+        <ContentGrid>
+          {transactions.map((transaction) => {
+            const content = contentData[transaction.id];
+            const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+            const mintableStateItem = mintableState[transaction.id];
+            const isMintable = mintableStateItem?.mintable;
+            
+            const nftId = arweaveToNftId[transaction.id];
+            const nftData = nftId ? nfts[nftId] : undefined;
+            const isOwned = user && nftData?.principal === user.principal;
+            
+            const hasPredictions = !!predictions[transaction.id];
+            const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 
-          const hasWithdrawableBalance = isOwned && nftData && (
-            parseFloat(nftData.balances?.alex || '0') > 0 || 
-            parseFloat(nftData.balances?.lbry || '0') > 0
-          );
+            const hasWithdrawableBalance = isOwned && nftData && (
+              parseFloat(nftData.balances?.alex || '0') > 0 || 
+              parseFloat(nftData.balances?.lbry || '0') > 0
+            );
 
-          return (
-            <ContentGrid.Item
-              key={transaction.id}
-              onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
-              id={transaction.id}
-              showStats={showStats[transaction.id]}
-              onToggleStats={(e) => {
-                e.stopPropagation();
-                setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
-              }}
-              isMintable={isMintable}
-              isOwned={isOwned || false}
-              onMint={(e) => {
-                e.stopPropagation();
-                handleMint(transaction.id);
-              }}
-              onWithdraw={hasWithdrawableBalance ? (e) => {
-                e.stopPropagation();
-                handleWithdraw(transaction.id);
-              } : undefined}
-              predictions={predictions[transaction.id]}
-            >
-              <div className="group relative w-full h-full">
-                <ContentRenderer
-                  transaction={transaction}
-                  content={content}
-                  contentUrls={contentData[transaction.id]?.urls || {
-                    thumbnailUrl: null,
-                    coverUrl: null,
-                    fullUrl: content?.url || `https://arweave.net/${transaction.id}`
-                  }}
-                  showStats={showStats[transaction.id]}
-                  mintableState={mintableState}
-                  handleRenderError={handleRenderError}
-                />
-                {shouldShowBlur && (
-                  <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
-                      Content Filtered
-                    </div>
-                  </div>
-                )}
-                {renderDetails(transaction)}
-                {isOwned && (
-                  <div className="absolute top-0 right-0 bg-green-500 text-white px-2 py-1 text-xs z-30">
-                    Owned
-                  </div>
-                )}
-                {isOwned && hasWithdrawableBalance && (
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleWithdraw(transaction.id);
+            return (
+              <ContentGrid.Item
+                key={transaction.id}
+                onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
+                id={transaction.id}
+                showStats={showStats[transaction.id]}
+                onToggleStats={(open) => {
+                  setShowStats(prev => ({ ...prev, [transaction.id]: open }));
+                }}
+                isMintable={isMintable}
+                isOwned={isOwned || false}
+                onMint={(e) => {
+                  e.stopPropagation();
+                  handleMint(transaction.id);
+                }}
+                onWithdraw={hasWithdrawableBalance ? (e) => {
+                  e.stopPropagation();
+                  handleWithdraw(transaction.id);
+                } : undefined}
+                predictions={predictions[transaction.id]}
+              >
+                <div className="group relative w-full h-full">
+                  <ContentRenderer
+                    transaction={transaction}
+                    content={content}
+                    contentUrls={contentData[transaction.id]?.urls || {
+                      thumbnailUrl: null,
+                      coverUrl: null,
+                      fullUrl: content?.url || `https://arweave.net/${transaction.id}`
                     }}
-                    className="absolute bottom-2 right-2 z-30"
-                  >
-                    Withdraw
-                  </Button>
-                )}
-              </div>
-            </ContentGrid.Item>
-          );
-        })}
-      </ContentGrid>
-
-      <Modal
-        isOpen={!!selectedContent}
-        onClose={() => setSelectedContent(null)}
-      >
-        {selectedContent && (
-          <div className="w-full h-full">
-            <ContentRenderer
-              transaction={transactions.find(t => t.id === selectedContent.id)!}
-              content={contentData[selectedContent.id]}
-              contentUrls={contentData[selectedContent.id]?.urls || {
-                thumbnailUrl: null,
-                coverUrl: null,
-                fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
-              }}
-              inModal={true}
-              showStats={showStats[selectedContent.id]}
-              mintableState={mintableState}
-              handleRenderError={handleRenderError}
-            />
-            {selectedContent && predictions[selectedContent.id]?.isPorn && (
-              <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[55]">
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
-                  Content Filtered
+                    showStats={showStats[transaction.id]}
+                    mintableState={mintableState}
+                    handleRenderError={handleRenderError}
+                  />
+                  {shouldShowBlur && (
+                    <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
+                        Content Filtered
+                      </div>
+                    </div>
+                  )}
+                  {renderDetails(transaction)}
+                  {isOwned && (
+                    <div className="absolute top-0 right-0 bg-green-500 text-white px-2 py-1 text-xs z-30">
+                      Owned
+                    </div>
+                  )}
+                  {isOwned && hasWithdrawableBalance && (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleWithdraw(transaction.id);
+                      }}
+                      className="absolute bottom-2 right-2 z-30"
+                    >
+                      Withdraw
+                    </Button>
+                  )}
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-      </Modal> 
-    </>
+              </ContentGrid.Item>
+            );
+          })}
+        </ContentGrid>
+
+        <Modal
+          isOpen={!!selectedContent}
+          onClose={() => setSelectedContent(null)}
+        >
+          {selectedContent && (
+            <div className="w-full h-full">
+              <ContentRenderer
+                transaction={transactions.find(t => t.id === selectedContent.id)!}
+                content={contentData[selectedContent.id]}
+                contentUrls={contentData[selectedContent.id]?.urls || {
+                  thumbnailUrl: null,
+                  coverUrl: null,
+                  fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
+                }}
+                inModal={true}
+                showStats={showStats[selectedContent.id]}
+                mintableState={mintableState}
+                handleRenderError={handleRenderError}
+              />
+              {selectedContent && predictions[selectedContent.id]?.isPorn && (
+                <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[55]">
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
+                    Content Filtered
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </Modal> 
+      </>
+    </TooltipProvider>
   );
 };
 

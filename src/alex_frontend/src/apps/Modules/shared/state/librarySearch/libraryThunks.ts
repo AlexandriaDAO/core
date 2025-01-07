@@ -4,8 +4,8 @@ import { updateTransactions } from '@/apps/Modules/shared/state/content/contentD
 import { RootState } from '@/store';
 import { toggleSortDirection } from './librarySlice';
 import { AppDispatch } from '@/store';
-import { fetchTokensForPrincipal } from '../nftData/nftDataThunks';
-import { cachePage, clearCache } from '../nftData/nftDataSlice';
+import { fetchTokensForPrincipal, FetchTokensParams } from '../nftData/nftDataThunks';
+import { cachePage, clearCache, clearNFTs } from '../nftData/nftDataSlice';
 
 export const togglePrincipalSelection = createAsyncThunk(
   'library/togglePrincipalSelection',
@@ -21,14 +21,18 @@ export const togglePrincipalSelection = createAsyncThunk(
   }
 );
 
-export const performSearch = createAsyncThunk(
+export const performSearch = createAsyncThunk<
+  void,
+  { start: number; end: number },
+  { state: RootState; dispatch: AppDispatch }
+>(
   'library/performSearch',
-  async (
-    { start = 0, end = 20 }: { start?: number; end?: number },
-    { getState, dispatch }
-  ) => {
+  async ({ start, end }, { getState, dispatch }) => {
+    // Clear existing NFTs before performing new search
+    dispatch(clearNFTs());
+    
     try {
-      const state = getState() as RootState;
+      const state = getState();
       const selectedPrincipals = state.library.selectedPrincipals;
       const collection = state.library.collection;
       const pageKey = `${start}-${end}`;
@@ -50,13 +54,15 @@ export const performSearch = createAsyncThunk(
       dispatch(setLoading(true));
 
       if (selectedPrincipals && selectedPrincipals.length > 0 && collection) {
-        await dispatch(fetchTokensForPrincipal({
+        const params: FetchTokensParams = {
           principalId: selectedPrincipals[0],
           collection,
           range: { start, end }
-        }));
+        };
+        
+        await dispatch(fetchTokensForPrincipal(params)).unwrap();
 
-        const currentState = getState() as RootState;
+        const currentState = getState();
         
         const arweaveIds = Object.values(currentState.nftData.nfts)
           .filter(nft => 

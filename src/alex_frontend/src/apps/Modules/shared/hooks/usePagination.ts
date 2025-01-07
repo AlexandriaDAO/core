@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { AppDispatch } from '@/store';
 import { performSearch } from '../state/librarySearch/libraryThunks';
+import { clearNFTs } from '../state/nftData/nftDataSlice';
 
 interface UsePaginationProps {
   defaultItemsPerPage: number;
@@ -27,6 +28,7 @@ export const usePagination = ({ defaultItemsPerPage, dependencies = [] }: UsePag
     const pageKey = `${start}-${end}`;
     if (!cachedPages[pageKey] && !loading) {
       try {
+        dispatch(clearNFTs());
         await dispatch(performSearch({ start, end })).unwrap();
       } catch (error) {
         console.error('Failed to fetch page:', error);

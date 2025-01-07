@@ -19,19 +19,65 @@ import { setNoResults } from '../librarySearch/librarySlice';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
-export const fetchTokensForPrincipal = createAsyncThunk(
+// Add this interface for the batch function
+interface BatchFetchParams {
+  tokenId: bigint;
+  collection: 'icrc7' | 'icrc7_scion';
+  principalId: string;
+}
+
+const fetchNFTBatch = async (params: BatchFetchParams[]) => {
+  const batchSize = 10;
+  const results: [string, NFTData][] = [];
+  
+  for (let i = 0; i < params.length; i += batchSize) {
+    const batch = params.slice(i, i + batchSize);
+    const batchResults = await Promise.all(
+      batch.map(async ({ tokenId, collection, principalId }) => {
+        if (collection === 'icrc7') {
+          return [
+            tokenId.toString(),
+            {
+              collection: 'icrc7',
+              principal: principalId,
+              arweaveId: natToArweaveId(tokenId)
+            }
+          ] as [string, NFTData];
+        } else {
+          const ogId = await nft_manager.scion_to_og_id(tokenId);
+          return [
+            tokenId.toString(),
+            {
+              collection: 'icrc7_scion',
+              principal: principalId,
+              arweaveId: natToArweaveId(ogId)
+            }
+          ] as [string, NFTData];
+        }
+      })
+    );
+    results.push(...batchResults);
+  }
+  
+  return results;
+};
+
+// Export the interface so it can be imported by other files
+export interface FetchTokensParams {
+  principalId: string;
+  collection: 'icrc7' | 'icrc7_scion';
+  range?: { start: number; end: number };
+}
+
+export const fetchTokensForPrincipal = createAsyncThunk<
+  Record<string, NFTData>,
+  FetchTokensParams,
+  { state: RootState }
+>(
   'nftData/fetchTokensForPrincipal',
   async (
-    { 
-      principalId, 
-      collection, 
-      range = { start: 0, end: 20 }
-    }: { 
-      principalId: string; 
-      collection: 'icrc7' | 'icrc7_scion';
-      range?: { start: number; end: number; }
-    },
-    { dispatch, getState }
+    { principalId, collection, range = { start: 0, end: 20 } },
+    { dispatch }
   ) => {
     try {
       dispatch(setLoading(true));
@@ -63,34 +109,17 @@ export const fetchTokensForPrincipal = createAsyncThunk(
 
       // Get the slice for the current page
       const pageNftIds = allNftIds.slice(range.start, range.end);
-      let nftEntries: [string, NFTData][] = [];
-
-      if (collection === 'icrc7') {
-        nftEntries = pageNftIds.map(tokenId => [
-          tokenId.toString(),
-          {
-            collection: 'icrc7',
-            principal: principalId,
-            arweaveId: natToArweaveId(tokenId)
-          }
-        ]);
-      } else if (collection === 'icrc7_scion') {
-        nftEntries = await Promise.all(
-          pageNftIds.map(async (tokenId) => {
-            const ogId = await nft_manager.scion_to_og_id(tokenId);
-            return [
-              tokenId.toString(),
-              {
-                collection: 'icrc7_scion',
-                principal: principalId,
-                arweaveId: natToArweaveId(ogId)
-              }
-            ];
-          })
-        );
-      }
       
-      // Convert entries array to record before dispatching
+      // Prepare batch params
+      const batchParams = pageNftIds.map(tokenId => ({
+        tokenId,
+        collection,
+        principalId
+      }));
+
+      // Use batched fetching
+      const nftEntries = await fetchNFTBatch(batchParams);
+      
       const nftRecord = Object.fromEntries(nftEntries);
       dispatch(setNfts(nftRecord));
 
