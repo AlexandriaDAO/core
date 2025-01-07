@@ -194,7 +194,7 @@ Alexandria NFTs use a Motoko implementation of the ICRC7 and ICRC37 standards, w
 
 The minting uses the ArWeave LibModule, where Librarians host a pre-paid node that can upload files to the permaweb.
 
-The cost to mint an NFT of an asset already stored on ArWeave is 1 LBRY.
+The cost to mint an NFT of an asset already stored on ArWeave is 10 LBRY for OG NFTs (burned) and 10 LBRY for Scion NFTs (10 burned, 10 to the OG NFT).
 
 The cost upload an asset to ArWeave is variable, and seeks to match 1.5X the going rate for ArWeave uploads so as to reward Librarians with a 50% margin in LBRY, but this is subject to change.
 

@@ -1,16 +1,25 @@
 
+
+
+
 The Plan:
 
+- Color code the tags.
+- Make it easier to select owner on permasearch.
+- Scion NFTs do not need a lbry balance.
+- Alexandria query. (Query token amounts, then only the amount on the page (rather than all at once))
+- Do not auto search ones own library on alexandria.
 
 
 Next Small Stuff:
 
 - Optimistic UI For minting NFTs.
-- Play button on videos by default.
+- Play button on videos by default. (fix broken videos)
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - Remove duplicates based on file size.
 - More advanced searching with tags and metadata.
 - Mint button has some load time issues on Alexandrian.
+- Rank by tokens in the NFT.
 
 
 
