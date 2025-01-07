@@ -4,13 +4,22 @@ import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
 import { togglePrincipalSelection } from '../../shared/state/librarySearch/libraryThunks';
 import { getUser } from "@/features/auth/utils/authUtils";
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/lib/components/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/lib/components/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/lib/components/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/lib/components/popover";
 
 interface PrincipalData {
   principal: string;
@@ -23,11 +32,14 @@ export default function PrincipalSelector() {
   const noResults = useSelector((state: RootState) => state.library.noResults);
   const dispatch = useDispatch<AppDispatch>();
   const [principals, setPrincipals] = React.useState<PrincipalData[]>([]);
+  const [open, setOpen] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   // Fetch principals from backend
   React.useEffect(() => {
     const fetchPrincipals = async () => {
       try {
+        setIsLoading(true);
         const userActor = await getUser();
         const result = await userActor.get_all_users();
         // Convert Principal objects to strings
@@ -38,6 +50,8 @@ export default function PrincipalSelector() {
         setPrincipals(formattedPrincipals);
       } catch (error) {
         console.error("Error fetching principals:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -52,6 +66,7 @@ export default function PrincipalSelector() {
 
   const handlePrincipalSelect = (principalId: string) => {
     dispatch(togglePrincipalSelection(principalId));
+    setOpen(false);
   };
 
   const getDisplayValue = (value: string) => {
@@ -63,31 +78,70 @@ export default function PrincipalSelector() {
 
   return (
     <div className="p-[14px] rounded-2xl border border-input bg-background">
-      <Select 
-        value={selectedPrincipals[0] || ''} 
-        onValueChange={handlePrincipalSelect}
-      >
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select library">
-            {getDisplayValue(selectedPrincipals[0] || '')}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          {userPrincipal && (
-            <SelectItem value={userPrincipal}>
-              My Library
-            </SelectItem>
-          )}
-          {principals.map((principal) => (
-            <SelectItem 
-              key={principal.principal} 
-              value={principal.principal}
-            >
-              {principal.username}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="flex items-center">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </div>
+            ) : (
+              <>
+                {getDisplayValue(selectedPrincipals[0] || '')}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </>
+            )}
+          </Button>
+        </PopoverTrigger>
+        {!isLoading && (
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder="Search library..." />
+              <CommandList>
+                <CommandEmpty>No library found.</CommandEmpty>
+                <CommandGroup>
+                  {userPrincipal && (
+                    <CommandItem
+                      value="My Library"
+                      onSelect={() => handlePrincipalSelect(userPrincipal)}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedPrincipals[0] === userPrincipal ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      My Library
+                    </CommandItem>
+                  )}
+                  {principals.map((principal) => (
+                    <CommandItem
+                      key={principal.principal}
+                      value={principal.username}
+                      onSelect={() => handlePrincipalSelect(principal.principal)}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedPrincipals[0] === principal.principal ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {principal.username}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        )}
+      </Popover>
       {noResults && (
         <div className="mt-2 text-sm text-muted-foreground">
           This user has no NFTs, try selecting another user
