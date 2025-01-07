@@ -9,12 +9,15 @@ export default function Tabs() {
         transition-all duration-100 
         cursor-pointer 
         font-syne 
-        text-[20px] 
+        md:text-[20px] 
         font-semibold 
         leading-normal 
         tracking-normal 
         flex items-center
         text-[#FFF]
+        py-2
+        sm:text-[15px] 
+
     `;
 
     return (

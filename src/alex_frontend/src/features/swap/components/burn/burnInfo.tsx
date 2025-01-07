@@ -17,22 +17,22 @@ const BurnInfo: React.FC<BurnInfoProps> = ({ maxBurnAllowed }) => {
       <div className='border border-gray-400 text-white py-5 px-5 rounded-2xl'>
         <ul className='ps-0'>
           <li className='flex justify-between mb-5'>
-            <strong className='text-lg font-medium me-1 text-black'>Max LBRY Burn allowed:</strong>
-            <span className='text-lg font-medium text-black'>{maxBurnAllowed.toFixed(4)} LBRY</span>
+            <strong className='lg:text-lg md:text-base sm:text-sm font-medium me-1 text-black'>Max LBRY Burn allowed:</strong>
+            <span className='lg:text-lg md:text-base sm:text-sm font-medium text-black'>{maxBurnAllowed.toFixed(4)} LBRY</span>
           </li>
           <li className='flex justify-between mb-5'>
-            <strong className='text-lg font-medium  me-1 text-black'>{Number(swap.lbryRatio).toFixed(4)} LBRY
+            <strong className='lg:text-lg md:text-base sm:text-sm font-medium  me-1 text-black'>{Number(swap.lbryRatio).toFixed(4)} LBRY
               <span className='mx-2'><FontAwesomeIcon icon={faArrowRightLong} /></span>0.5 ICP/
             </strong>
           </li>
           <li className='flex justify-between mb-5'>
-            <strong className='text-lg font-medium me-1 text-black'>1 LBRY
+            <strong className='lg:text-lg md:text-base sm:text-sm font-medium me-1 text-black'>1 LBRY
               <span className='mx-2'><FontAwesomeIcon icon={faArrowRightLong} /></span>{tokenomics.alexMintRate} ALEX
             </strong>
           </li>
           <li className='flex justify-between'>
-            <strong className='text-lg font-medium me-1 text-black'>Network Fees</strong>
-            <span className='text-lg font-medium text-black'><span className=' text-multycolor'>{swap.lbryFee}</span> LBRY</span>
+            <strong className='lg:text-lg md:text-base sm:text-sm font-medium me-1 text-black'>Network Fees</strong>
+            <span className='lg:text-lg md:text-base sm:text-sm font-medium text-black'><span className=' text-multycolor'>{swap.lbryFee}</span> LBRY</span>
           </li>
         </ul>
       </div>

@@ -75,7 +75,7 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
     return (
         <>
             {type === "marketPlace" && emporium.marketPlace[transaction.id]?.price && (
-                <div className="text-white text-lg absolute bottom-0 bg-gray-600 w-full p-2">
+                <div className="text-white lg:text-lg md:text-base sm:text-sm absolute bottom-0 bg-gray-600 w-full p-2">
                     Price {emporium.marketPlace[transaction.id]?.price} ICP
                 </div>
             )}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router';
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { size } from "viem/_types";
 
 interface App {
   name: string;
@@ -55,17 +56,22 @@ const HomePage: React.FC = () => {
           <h1 style={{
             color: '#1E1E1E',
             fontFamily: 'Syne, sans-serif',
-            fontSize: '80px',
+            // fontSize: '80px',
             fontWeight: 800,
             textTransform: 'uppercase',
             margin: '0 0 20px 0',
+            fontSize: 'clamp(25px, 6vw, 80px)',
+            
           }}>
+
             Alexandria
           </h1>
           <p style={{
             color: '#1E1E1E',
             fontFamily: 'Montserrat, sans-serif',
-            fontSize: '50px',
+            // fontSize: '50px',
+            fontSize: 'clamp(18px, 4vw, 50px)',
+
             fontWeight: 400,
             textTransform: 'lowercase',
             margin: '0 0 40px 0',
@@ -85,7 +91,8 @@ const HomePage: React.FC = () => {
               background: '#1E1E1E',
               color: '#FFF',
               fontFamily: 'Syne, sans-serif',
-              fontSize: '24px',
+              // fontSize: '24px',
+              fontSize: 'clamp(14px, 4vw, 24px)',
               fontWeight: 600,
               cursor: 'pointer',
             }}
@@ -95,6 +102,7 @@ const HomePage: React.FC = () => {
               <path d="M6.38909 0.192139C6.18752 0.192139 5.98125 0.271826 5.82656 0.426514C5.51719 0.735889 5.51719 1.24214 5.82656 1.55151L16.4156 12.1406L5.98125 22.575C5.67187 22.8843 5.67187 23.3906 5.98125 23.7C6.29062 24.0093 6.79688 24.0093 7.10625 23.7L18.1078 12.7031C18.4172 12.3937 18.4172 11.8875 18.1078 11.5781L6.95625 0.426514C6.79688 0.267139 6.59534 0.192139 6.38909 0.192139Z" fill="white"/>
             </svg>
           </button>
+          
         </div>
         {/* Second Panel */}
         <div style={{
@@ -116,10 +124,12 @@ const HomePage: React.FC = () => {
             alignSelf: 'stretch',
             color: '#1E1E1E',
             fontFamily: 'Syne, sans-serif',
-            fontSize: '60px',
+            // fontSize: '60px',
+            fontSize: 'clamp(30px, 6vw, 60px)',
             fontWeight: 600,
             lineHeight: 'normal',
             margin: 0,
+            textAlign:'center',
           }}>
             explore our apps
           </h2>

@@ -13,7 +13,7 @@ const LoadingModal: React.FC<SuccessModalProps> = ({ show, message1, message2, s
     if (!show) return null; // Only render modal if show is true
     return (
         <div className="bg-gray flex items-center justify-center min-h-screen w-full fixed z-50 top-0 left-0">
-            <div className="bg-white max-w-sm w-full h-[430px] rounded-2xl p-7 pb-14">
+            <div className="bg-white max-w-sm w-full h-[430px] rounded-2xl p-7 pb-14 w-11/12">
                 <div className="text-right mb-9">
                     <FontAwesomeIcon icon={faXmark} className="text-gray-400 text-2xl" onClick={() => { setShow(false) }} role="button" />
                 </div>
@@ -43,3 +43,5 @@ const LoadingModal: React.FC<SuccessModalProps> = ({ show, message1, message2, s
 };
 
 export default LoadingModal;
+
+

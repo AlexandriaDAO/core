@@ -22,6 +22,7 @@ import getIcpBal from "@/features/icp-ledger/thunks/getIcpBal";
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import ErrorModal from "../errorModal";
+import { Entry } from "@/layouts/parts/Header";
 
 const SendContent = () => {
     const dispatch = useAppDispatch();
@@ -150,7 +151,7 @@ const SendContent = () => {
                 <div className='me-0 2xl:me-3 xl:me-3 lg:me-3 md:me-3 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-3 md:mb-3 sm:mb-3'>
                     <div className='flex items-center mb-3'>
                         <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>1</span>
-                        <strong className='text-2xl font-medium'>Choose token</strong>
+                        <strong className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium'>Choose token</strong>
                     </div>
                     <div className="relative inline-block w-full mb-4">
                         <div
@@ -159,7 +160,7 @@ const SendContent = () => {
                         >
                             <div className='flex items-center'>
                                 {selectedImage === "" ? <></> : <img className='h-5 w-5 me-3' src={selectedImage} />}
-                                <span className='text-xl font-medium text-black'>{selectedOption}</span>
+                                <span className='lg:text-xl md:text-lg xs:text-base font-medium text-black'>{selectedOption}</span>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -182,20 +183,20 @@ const SendContent = () => {
                     </div>
                     <div className='flex items-center mb-4'>
                         <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>2</span>
-                        <strong className='text-2xl font-medium'>Enter the Principal ID</strong>
+                        <strong className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium'>Enter the Principal ID</strong>
                     </div>
                     <div className=' border bg-white py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-3 2xl:px-5 xl:px-5 lg:px-4 md:px-3 sm:px-3 rounded-full mb-4' >
                         <input className='text-multygray  bg-transparent text-xl font-medium placeholder-multygray  focus:outline-none focus:border-transparent w-full' type='text' onChange={(e) => { handleDestinationPrincipalChange(e) }} value={destinationPrincipal} />
                     </div>
                     <div className='flex items-center mb-4'>
                         <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>3</span>
-                        <strong className='text-2xl font-medium'>Enter the amount</strong>
+                        <strong className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium'>Enter the amount</strong>
                     </div>
                     <div className=' border bg-white py-5 px-5 rounded-borderbox mb-7 '>
                         <div className='mb-3 w-full'>
                             <div className='flex justify-between mb-3'>
-                                <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>
-                                <input className='text-darkgray mr-[-10px] text-right bg-transparent text-2xl font-medium placeholder-darkgray  focus:outline-none focus:border-transparent w-full' type='number' onChange={(e) => { handleAmountChange(e) }} value={amount} />
+                                <h4 className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-darkgray'>Amount</h4>
+                                <input className='text-darkgray mr-[-10px] text-right bg-transparent lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium placeholder-darkgray  focus:outline-none focus:border-transparent w-full' type='number' onChange={(e) => { handleAmountChange(e) }} value={amount} />
                             </div>
                             <div className='flex justify-between'>
                                 <div className='flex items-center'>
@@ -224,7 +225,7 @@ const SendContent = () => {
                     </button> : <div
                         className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn"
                     >
-                        <Auth />
+                        <Entry />
                     </div>}
                 </div>
                 <div className='ms-0 2xl:ms-3 xl:ms-3 lg:ms-3 md:ms-3 sm:ms-0'>

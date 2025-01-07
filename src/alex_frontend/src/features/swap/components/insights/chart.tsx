@@ -90,16 +90,23 @@ const LineChart:React.FC<ChartProps> = ({dataXaxis,dataYaxis,name,lineColor,gard
             </div>
             <div className='p-6 pb-0'>
                 {/* <h3 className='text-xl font-semibold w-full mb-2'>{name} </h3> */}
-                <p className='text-lg font-normal pr-5 text-[#525252] w-9/12'>Displaying {name} performance over the past </p>
+                <p className='lg:text-lg md:text-base sm:text-sm xs:text-xs font-normal md:pr-5 xs:pr-0 text-[#525252] md:w-9/12 xs:w-full'>Displaying {name} performance over the past </p>
             </div>
-            <div className='px-4'>
+            <div className='lg:px-4 overflow-auto'>
+            <div
+                    style={{
+                    overflowX: 'auto', // Enables horizontal scrolling
+                    whiteSpace: 'nowrap', // Prevents wrapping of child elements
+                    }}
+                   />
                 <div
                     ref={chartRef1}
                     style={{
                         height: 400,
-                        width: '100%',
+                        width: '400px',
                         background: '#fff',
-                        borderRadius: '8px'
+                        borderRadius: '8px',
+                        padding:'0 8px',
                     }}
                 />
                 {/* <div style={{ textAlign: 'left', color: '#333', fontSize: '14px', fontWeight: 'bold', padding: "10px 0 20px" }}>
