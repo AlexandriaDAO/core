@@ -67,7 +67,7 @@ dfx canister start icrc7_scion --network ic
 
 # nft_manager
 dfx canister stop nft_manager --network ic
-dfx canister snapshot create nft_manager --network ic
+dfx canister snapshot create nft_manager --replace 00000000000000000000000001f053220101 --network ic
 dfx canister start nft_manager --network ic
 
 # system_api

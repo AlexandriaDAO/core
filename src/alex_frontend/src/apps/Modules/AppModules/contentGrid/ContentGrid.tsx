@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/lib/components/card";
-import { Copy, Check, Info, Loader2 } from "lucide-react";
+import { Copy, Check, Info, Loader2, Flag } from "lucide-react";
 import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 import { Button } from "@/lib/components/button";
 import { Badge } from "@/lib/components/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
+import { Progress } from "@/lib/components/progress";
+import { AspectRatio } from "@/lib/components/aspect-ratio";
+import { Skeleton } from "@/lib/components/skeleton";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/lib/components/collapsible";
 
 interface ContentGridProps {
   children: React.ReactNode;
@@ -15,7 +20,7 @@ interface ContentGridItemProps {
   onClick: () => void;
   id?: string;
   showStats?: boolean;
-  onToggleStats?: (e: React.MouseEvent) => void;
+  onToggleStats?: (open: boolean) => void;
   isMintable?: boolean;
   isOwned?: boolean;
   onMint?: (e: React.MouseEvent) => void;
@@ -67,44 +72,43 @@ function NftDataFooter({ id }: NftDataFooterProps) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-[100px]">
-        <Loader2 className="h-4 w-4 animate-spin" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[200px]" />
+        <Skeleton className="h-4 w-[160px]" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3 w-full">
-      <div className="flex flex-wrap gap-2">
-        {nftData?.principal && (
-          <Badge 
-            variant="default" 
-            className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
-            onClick={(e) => handleCopyPrincipal(e, nftData.principal!)}
-          >
-            {formatPrincipal(nftData.principal)}
-            {copiedPrincipal ? (
-              <Check className="h-3 w-3" />
-            ) : (
-              <Copy className="h-3 w-3" />
-            )}
-          </Badge>
-        )}
-        {nftData?.collection && nftData.collection !== 'No Collection' && (
-          <Badge variant="default" className="text-xs">
-            {nftData.collection}
-          </Badge>
-        )}
-      </div>
+    <div className="flex flex-wrap gap-2 items-center">
+      {nftData?.principal && (
+        <Badge 
+          variant="default" 
+          className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+          onClick={(e) => handleCopyPrincipal(e, nftData.principal!)}
+        >
+          {formatPrincipal(nftData.principal)}
+          {copiedPrincipal ? (
+            <Check className="h-3 w-3" />
+          ) : (
+            <Copy className="h-3 w-3" />
+          )}
+        </Badge>
+      )}
+      {nftData?.collection && nftData.collection !== 'No Collection' && (
+        <Badge variant="default" className="text-xs">
+          {nftData.collection}
+        </Badge>
+      )}
       {nftData?.balances && (
-        <div className="flex flex-wrap gap-2">
+        <>
           <Badge variant="outline" className="text-xs bg-white">
             ALEX: {formatBalance(nftData.balances.alex.toString())}
           </Badge>
           <Badge variant="outline" className="text-xs bg-white">
             LBRY: {formatBalance(nftData.balances.lbry.toString())}
           </Badge>
-        </div>
+        </>
       )}
     </div>
   );
@@ -146,58 +150,77 @@ function ContentGridItem({ children, onClick, id, showStats, onToggleStats, isMi
         <div className="flex items-center gap-2 w-full">
           <span className="text-sm">ID: {id ? formatId(id) : 'N/A'}</span>
           {id && (
-            copied ? (
-              <Check className="h-4 w-4 text-green-500" />
-            ) : (
-              <Copy 
-                className="h-4 w-4 cursor-pointer hover:text-gray-600" 
-                onClick={(e) => handleCopy(e, id)}
-              />
-            )
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button onClick={(e) => handleCopy(e, id)}>
+                  {copied ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4 cursor-pointer hover:text-gray-600" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {copied ? "Copied!" : "Copy ID"}
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
       </CardHeader>
 
       <CardContent className="flex flex-col items-start gap-4 p-0">
-        <div className="aspect-square w-full flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden">
-          {children}
-        </div>
+        <AspectRatio ratio={1} className="w-full">
+          <div className="flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden h-full">
+            {children}
+          </div>
+        </AspectRatio>
       </CardContent>
 
-      <CardFooter className="flex flex-col items-start w-full rounded-lg border border-[--border] bg-[--card] mt-2 flex-grow min-h-[100px] p-4">
-        <div className="flex justify-between w-full mb-4">
-          <Button
-            variant="secondary"
-            className="h-8 w-8 rounded-full bg-[#353535] hover:bg-[#454545] flex items-center justify-center p-0"
-            onClick={onToggleStats}
-          >
-            <Info className="h-4 w-4" />
-          </Button>
-
-          <div className="flex gap-2">
+      <CardFooter className="flex flex-col w-full rounded-lg border border-[--border] bg-[--card] mt-2 p-3">
+        <div className="flex flex-wrap items-center gap-2 w-full">
+          <div className="flex items-center gap-2">
             {isMintable && onMint && (
               <Button
                 variant="secondary"
-                className="h-8 w-8 rounded-full bg-[#353535] hover:bg-[#454545] flex items-center justify-center p-0"
+                className="bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] px-4 py-2 rounded-md flex items-center gap-2 transition-all duration-200 font-medium shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)] shrink-0"
                 onClick={onMint}
               >
-                <span className="text-lg">+</span>
+                <span className="text-sm">Mint NFT</span>
+                <span className="text-lg text-red-500">+</span>
               </Button>
             )}
+
+            {predictions && Object.keys(predictions).length > 0 ? (
+              <Collapsible open={showStats} onOpenChange={onToggleStats}>
+                <CollapsibleTrigger asChild>
+                  <Button
+                    variant="secondary"
+                    className="h-8 px-3 bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 rounded-md flex items-center gap-1.5 transition-colors shrink-0 group"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Flag className="h-3.5 w-3.5" />
+                    <span className="text-xs font-medium">Stats</span>
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent onClick={(e) => e.stopPropagation()}>
+                  <div className="mt-4 space-y-3 w-full">
+                    {Object.entries(predictions).map(([key, value]) => (
+                      <div key={key} className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span>{key}</span>
+                          <span>{(Number(value) * 100).toFixed(1)}%</span>
+                        </div>
+                        <Progress value={Number(value) * 100} className="h-1" />
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            ) : null}
           </div>
+
+          {(!predictions || Object.keys(predictions).length === 0) && id && <NftDataFooter id={id} />}
         </div>
-
-        {id && <NftDataFooter id={id} />}
-
-        {showStats && predictions && (
-          <div className="mt-2 p-2 bg-black/80 text-white rounded-md text-xs w-full">
-            <div>Drawing: {(predictions.Drawing * 100).toFixed(1)}%</div>
-            <div>Neutral: {(predictions.Neutral * 100).toFixed(1)}%</div>
-            <div>Sexy: {(predictions.Sexy * 100).toFixed(1)}%</div>
-            <div>Hentai: {(predictions.Hentai * 100).toFixed(1)}%</div>
-            <div>Porn: {(predictions.Porn * 100).toFixed(1)}%</div>
-          </div>
-        )}
       </CardFooter>
     </Card>
   );

@@ -1,17 +1,26 @@
 import { Transaction } from "../../../shared/types/queries";
 import { getArweaveUrl } from "../../arweaveSearch/config/arweaveConfig";
 import { CachedContent } from '../types';
+import { LRUCache } from 'lru-cache';
 
 type ContentCache = Record<string, CachedContent>;
 
 class ContentCacheService {
   private static instance: ContentCacheService;
-  private maxCacheSize: number;
-  private cache: ContentCache = {};
+  private cache: LRUCache<string, CachedContent>;
 
   private constructor(maxCacheSize = 100) {
-    this.maxCacheSize = maxCacheSize;
-    this.cache = {};
+    this.cache = new LRUCache<string, CachedContent>({
+      max: maxCacheSize,
+      dispose(value: CachedContent) {
+        if (value?.imageObjectUrl) {
+          URL.revokeObjectURL(value.imageObjectUrl);
+        }
+        if (value?.thumbnailUrl) {
+          URL.revokeObjectURL(value.thumbnailUrl);
+        }
+      }
+    });
   }
 
   public static getInstance(): ContentCacheService {
@@ -19,20 +28,6 @@ class ContentCacheService {
       ContentCacheService.instance = new ContentCacheService();
     }
     return ContentCacheService.instance;
-  }
-
-  private pruneCache() {
-    const entries = Object.entries(this.cache);
-    if (entries.length > this.maxCacheSize) {
-      // Remove oldest entries
-      const toRemove = entries.slice(0, entries.length - this.maxCacheSize);
-      toRemove.forEach(([txId, content]) => {
-        if (content.imageObjectUrl) {
-          URL.revokeObjectURL(content.imageObjectUrl);
-        }
-        delete this.cache[txId];
-      });
-    }
   }
 
   private async generateVideoThumbnail(url: string): Promise<string | null> {
@@ -160,8 +155,9 @@ class ContentCacheService {
   async loadContent(transaction: Transaction): Promise<CachedContent> {
     const txId = transaction.id;
     
-    if (this.cache[txId]) {
-      return this.cache[txId];
+    const cached = this.cache.get(txId);
+    if (cached) {
+      return cached;
     }
 
     try {
@@ -180,13 +176,12 @@ class ContentCacheService {
         content = this.getDefaultContent(url);
       }
 
-      this.cache[txId] = content;
-      this.pruneCache();
+      this.cache.set(txId, content);
       return content;
 
     } catch (error) {
       const errorContent = this.getErrorContent();
-      this.cache[txId] = errorContent;
+      this.cache.set(txId, errorContent);
       return errorContent;
     }
   }
@@ -196,35 +191,26 @@ class ContentCacheService {
   }
 
   getContent(txId: string): CachedContent | undefined {
-    return this.cache[txId];
+    return this.cache.get(txId);
   }
 
-  clearCache() {
-    Object.values(this.cache).forEach(content => {
-      if (content.imageObjectUrl) {
-        URL.revokeObjectURL(content.imageObjectUrl);
-      }
-      if (content.thumbnailUrl) {
-        URL.revokeObjectURL(content.thumbnailUrl);
-      }
-    });
-    this.cache = {};
+  setContent(txId: string, content: CachedContent): void {
+    this.cache.set(txId, content);
   }
 
-  clearTransaction(txId: string) {
-    const content = this.cache[txId];
-    if (content?.imageObjectUrl) {
-      URL.revokeObjectURL(content.imageObjectUrl);
-    }
-    if (content?.thumbnailUrl) {
-      URL.revokeObjectURL(content.thumbnailUrl);
-    }
-    delete this.cache[txId];
+  clearCache(): void {
+    this.cache.clear();
   }
 
-  updateThumbnail(txId: string, thumbnailUrl: string) {
-    if (this.cache[txId]) {
-      this.cache[txId].thumbnailUrl = thumbnailUrl;
+  clearTransaction(txId: string): void {
+    this.cache.delete(txId);
+  }
+
+  updateThumbnail(txId: string, thumbnailUrl: string): void {
+    const content = this.cache.get(txId);
+    if (content) {
+      content.thumbnailUrl = thumbnailUrl;
+      this.cache.set(txId, content);
     }
   }
 }

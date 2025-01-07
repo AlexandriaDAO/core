@@ -6,6 +6,7 @@ import { useHandleSearch } from '@/apps/Modules/AppModules/search/hooks/useSearc
 import { toast } from 'sonner';
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
 
 function Permasearch() {
 	const { isLoading, handleSearch } = useHandleSearch();
@@ -24,7 +25,12 @@ function Permasearch() {
 				})
 			}
 			isLoading={isLoading}
-			topComponent={<ArweaveOwnerSelector />}
+			topComponent={
+				<>
+					<TopupBalanceWarning />
+					<ArweaveOwnerSelector />
+				</>
+			}
 			filterComponent={<SearchForm />}
 		/>
 	);

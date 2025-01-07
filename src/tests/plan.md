@@ -5,14 +5,12 @@ The Plan:
 
 Next Small Stuff:
 
-- Show more button on permasearch does not work on the default search.
-- Alexandrian Searching Needs to be more performant.
 - Optimistic UI For minting NFTs.
 - Play button on videos by default.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - Remove duplicates based on file size.
 - More advanced searching with tags and metadata.
-- Take alexandrian principals from the backend Librarian profiles list.
+- Mint button has some load time issues on Alexandrian.
 
 
 
