@@ -16,9 +16,9 @@ const AlexBalanceCard = () => {
         if (!auth.user) return;
         dispatch(getAccountAlexBalance(auth.user.principal))
     }
-    // useEffect(() => {
-    //     dispatch(getAlexPrice())
-    // }, [])
+    useEffect(() => {
+        dispatch(getAlexPrice())
+    }, [])
 
     useEffect(() => {
         setAlexBalUsd(Number(alex.alexBal) * Number(alex.alexPriceUsd));
@@ -44,7 +44,7 @@ const AlexBalanceCard = () => {
                 <div className="flex text-center justify-between">
 
                     <h4 className='text-2xl font-medium mb-1 text-white'>{alex.alexBal}</h4>
-                    {/* <span className='text-base text-lightgray font-medium'> ≈ $ {alexBalUsd.toFixed(2)}</span> */}
+                    <span className='text-base text-lightgray font-medium'> ≈ $ {alexBalUsd.toFixed(2)}</span>
                 </div>
             </div>
         </div>

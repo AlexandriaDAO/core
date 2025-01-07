@@ -102,8 +102,8 @@ const StakeContent = () => {
                             <ul className='ps-0'>
                                 <li className='mb-4'>
                                     <div className='flex justify-between'>
-                                        {/* <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Estimated Hourly APR</strong> */}
-                                        {/* <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{apr}%</strong> */}
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Estimated Hourly APR</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{apr}%</strong>
                                     </div>
                                 </li>
                                 <li className='mb-4'>
