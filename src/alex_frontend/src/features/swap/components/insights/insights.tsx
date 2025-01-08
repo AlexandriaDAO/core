@@ -21,7 +21,7 @@ const Insights: React.FC = () => {
                 <p className="lg:text-lg md:text-base xs:text-sm font-normal md:pr-5 xs:pr-0 text-[#525252] md:w-9/12 xs:w-full">Explore key platform metrics through detailed visual representations, including token performance, holder statistics, supply dynamics, and NFT minting trends.</p>
             </div>
             <div className='container px-3'>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='grid grid-cols-1 lg:grid-cols-2 md:grid-cols-1 gap-4'>
                     <LineChart name='ALEX Supply' dataXaxis={chartData.chartData.map((data) => data.time)} dataYaxis={chartData.chartData.map((data) => data.alex)} lineColor={'#5470C6'} gardientColor={'#75A0FD4D'} />
                     <LineChart name='LBRY Supply' dataXaxis={chartData.chartData.map((data) => data.time)} dataYaxis={chartData.chartData.map((data) => data.lbry)} lineColor={'#1A9442'} gardientColor={'#1A94424D'} />
                     <LineChart name='LBRY Burned' dataXaxis={chartData.chartData.map((data) => data.time)} dataYaxis={chartData.chartData.map((data) => data.totalLbryBurn)} lineColor={'#B325EB'} gardientColor={'#B325EB4D'} />
