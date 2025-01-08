@@ -34,12 +34,12 @@ const AlexBalanceCard = () => {
                         <span className='text-sm font-regular text-lightgray '>Alexandria Token</span>
                     </div>
                     <div>
-                        <img src="images/icp-logo.png" alt="icp-logo" />
+                        <img src="images/alex-logo.svg" alt="alex-logo" />
                     </div>
                 </div>
                 <div className="flex justify-between items-center mb-3">
                     <span className='text-base text-lightgray font-medium mb-1'>Balance</span>
-                    <FontAwesomeIcon className="text-lightgray" role="button" icon={faRotate} onClick={() => { handleRefresh() }} />
+                    <FontAwesomeIcon className="text-lightgray pe-2" role="button" icon={faRotate} onClick={() => { handleRefresh() }} />
                 </div>
                 <div className="flex text-center justify-between">
 
