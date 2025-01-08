@@ -1,4 +1,5 @@
 #!/bin/bash
+# dfx canister snapshot list <canister> --network ic
 
 set -x
 
@@ -22,7 +23,7 @@ dfx canister start alex_backend --network ic
 
 # alex_frontend
 dfx canister stop alex_frontend --network ic
-dfx canister snapshot create alex_frontend --network ic
+dfx canister snapshot create alex_frontend --replace 00000000000000000000000001f0531c0101 --network ic
 dfx canister start alex_frontend --network ic
 
 # alex_wallet
@@ -67,7 +68,7 @@ dfx canister start icrc7_scion --network ic
 
 # nft_manager
 dfx canister stop nft_manager --network ic
-dfx canister snapshot create nft_manager --replace 00000000000000000000000001f053220101 --network ic
+dfx canister snapshot create nft_manager --replace 00000000000000010000000001f053220101 --network ic
 dfx canister start nft_manager --network ic
 
 # system_api

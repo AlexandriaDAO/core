@@ -13,6 +13,7 @@ The Plan:
 
 Next Small Stuff:
 
+- Alexandrian search needs to use the state of the current page number.
 - Optimistic UI For minting NFTs.
 - Play button on videos by default. (fix broken videos)
 - There's a bug where ebook searching gets the search button stuck in the loading state.
