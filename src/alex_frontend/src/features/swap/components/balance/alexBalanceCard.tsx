@@ -34,7 +34,7 @@ const AlexBalanceCard = () => {
                         <span className='text-sm font-regular text-lightgray '>Alexandria Token</span>
                     </div>
                     <div>
-                        <img src="images/icp-logo.png" alt="icp-logo" />
+                        <img src="images/alex-logo.svg" alt="alex-logo" className="w-12 h-12" />
                     </div>
                 </div>
                 <div className="flex justify-between items-center mb-3">

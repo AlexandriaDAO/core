@@ -1,4 +1,5 @@
 #!/bin/bash
+# dfx canister snapshot list <canister> --network ic
 
 set -x
 
@@ -22,7 +23,7 @@ dfx canister start alex_backend --network ic
 
 # alex_frontend
 dfx canister stop alex_frontend --network ic
-dfx canister snapshot create alex_frontend --network ic
+dfx canister snapshot create alex_frontend --reokace 00000000000000000000000001f0531c0101 --network ic
 dfx canister start alex_frontend --network ic
 
 # alex_wallet

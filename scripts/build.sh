@@ -67,8 +67,6 @@ candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/empor
 # For Logs
 cargo build --release --target wasm32-unknown-unknown --package logs
 candid-extractor target/wasm32-unknown-unknown/release/logs.wasm > src/logs/logs.did
-# For icp_swap_factory
-dfx canister --network ic metadata ggzvv-5qaaa-aaaag-qck7a-cai candid:service > src/icp_swap_factory/icp_swap_factory.did
 
 cargo update
 
@@ -238,6 +236,10 @@ mkdir -p .dfx/local/canisters/LBRY
 mkdir -p .dfx/local/canisters/ALEX
 touch .dfx/local/canisters/LBRY/LBRY.did
 touch .dfx/local/canisters/ALEX/ALEX.did
+
+# For icp_swap_factory
+mkdir -p src/icp_swap_factory && dfx canister --network ic metadata ggzvv-5qaaa-aaaag-qck7a-cai candid:service > src/icp_swap_factory/icp_swap_factory.did
+
 
 npm i
 dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai

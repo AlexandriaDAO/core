@@ -43,7 +43,7 @@
       "candid": "src/icp_swap/icp_swap.did",
       "package": "icp_swap",
       "type": "rust",
-      "specified_id": "54fqz-5iaaa-aaaap-qkmqa-cai"
+      "specified_id":"54fqz-5iaaa-aaaap-qkmqa-cai"
     },
     "icrc7": {
       "main": "src/icrc7/main.mo",
@@ -59,7 +59,7 @@
       "candid": "src/nft_manager/nft_manager.did",
       "package": "nft_manager",
       "type": "rust",
-      "specified_id": "5sh5r-gyaaa-aaaap-qkmra-cai"
+      "specified_id":"5sh5r-gyaaa-aaaap-qkmra-cai"
     },
     "internet_identity": {
       "type": "pull",
@@ -76,7 +76,7 @@
       "candid": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.did",
       "wasm": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.wasm.gz",
       "specified_id": "w4vlu-paaaa-aaaaj-azxyq-cai"
-    },
+    },  
     "ic_siws_provider": {
       "type": "custom",
       "candid": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.did",
@@ -120,12 +120,6 @@
       "package": "emporium",
       "type": "rust",
       "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
-    },
-    "icp_swap_factory": {
-      "type": "rust",
-      "package": "icp_swap_factory",
-      "candid": "src/icp_swap_factory/icp_swap_factory.did",
-      "specified_id": "ggzvv-5qaaa-aaaag-qck7a-cai"
     }
   },
   "defaults": {
