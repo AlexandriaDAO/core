@@ -26,6 +26,7 @@ interface SearchContainerProps {
   topComponent?: ReactNode;
   filterComponent?: ReactNode;
   showMoreEnabled?: boolean;
+  isEmporium?:boolean;
 }
 
 export function SearchContainer({
@@ -36,7 +37,8 @@ export function SearchContainer({
   isLoading = false,
   topComponent,
   filterComponent,
-  showMoreEnabled = true
+  showMoreEnabled = true,
+  isEmporium=false
 }: SearchContainerProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
@@ -122,7 +124,7 @@ export function SearchContainer({
           </SearchFormContainer>
         )}
       </PageContainer>
-      <ContentDisplay />
+      <ContentDisplay isEmporium={isEmporium} />
       {showMoreEnabled && transactions.length > 0 && (
         <div className="flex justify-center mt-6 mb-8">
           <Button

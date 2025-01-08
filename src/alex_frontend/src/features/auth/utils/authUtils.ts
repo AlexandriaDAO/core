@@ -54,7 +54,7 @@ import {
 import {
   icp_swap_factory,
   createActor as createActorIcpSwapFactory,
-} from "../../../../../declarations/icp_swap_factory";
+} from "../../../../../icp_swap_factory";
 const isLocalDevelopment =process.env.DFX_NETWORK !== "ic";
 
 const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;

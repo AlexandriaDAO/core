@@ -67,8 +67,6 @@ candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/empor
 # For Logs
 cargo build --release --target wasm32-unknown-unknown --package logs
 candid-extractor target/wasm32-unknown-unknown/release/logs.wasm > src/logs/logs.did
-# For icp_swap_factory
-dfx canister --network ic metadata ggzvv-5qaaa-aaaag-qck7a-cai candid:service > src/icp_swap_factory/icp_swap_factory.did
 
 cargo update
 

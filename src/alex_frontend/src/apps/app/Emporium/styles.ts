@@ -56,32 +56,6 @@ export const ControlsContainer = styled.div<{ $isOpen: boolean }>`
  justify-content:center;
 `;
 
-export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
-  display: flex;
-  width: 180px;
-  height: 60px;
-  padding: 10px var(--Fonts-Size-h2, 24px);
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: Syne;
-  font-size: 16px;
-  
-  ${({ $isOpen }) => $isOpen ? `
-    background: var(--black-grey-100, #353535);
-    color: #F3F3F3;
-    border: none;
-    box-shadow: 0px 0px 4px 0px rgba(32, 0, 213, 0.25), 0px 0px 0px 4px rgba(197, 207, 249, 0.35);
-  ` : `
-    background: white;
-    color: #353535;
-    border: 1px solid #353535;
-  `}
-`;
 
 export const SearchButton = styled.button`
   display: flex;
