@@ -8,9 +8,10 @@ import { clearNFTs } from '../state/nftData/nftDataSlice';
 interface UsePaginationProps {
   defaultItemsPerPage: number;
   dependencies?: any[];
+  shouldAutoFetch?: boolean;
 }
 
-export const usePagination = ({ defaultItemsPerPage, dependencies = [] }: UsePaginationProps) => {
+export const usePagination = ({ defaultItemsPerPage, dependencies = [], shouldAutoFetch = false }: UsePaginationProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const totalItems = useSelector((state: RootState) => state.nftData.totalNfts);
   const loading = useSelector((state: RootState) => state.nftData.loading);
@@ -39,7 +40,9 @@ export const usePagination = ({ defaultItemsPerPage, dependencies = [] }: UsePag
   // Reset to first page when dependencies change
   useEffect(() => {
     setCurrentPage(1);
-    fetchPageData(1, itemsPerPage);
+    if (shouldAutoFetch) {
+      fetchPageData(1, itemsPerPage);
+    }
   }, [...dependencies, itemsPerPage]);
 
   const handlePageChange = useCallback(async (newPage: number) => {
@@ -64,6 +67,7 @@ export const usePagination = ({ defaultItemsPerPage, dependencies = [] }: UsePag
     totalItems,
     itemsPerPage,
     handlePageChange,
-    handleItemsPerPageChange
+    handleItemsPerPageChange,
+    fetchPageData
   };
 }; 

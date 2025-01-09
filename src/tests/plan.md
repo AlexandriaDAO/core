@@ -5,16 +5,12 @@
 The Plan:
 
 - Color code the tags.
-- Make it easier to select owner on permasearch.
-- Scion NFTs do not need a lbry balance.
 - Alexandria query. (Query token amounts, then only the amount on the page (rather than all at once))
-- Do not auto search ones own library on alexandria.
-
+- Delay in mint button on alexandrian is weird.
 
 Next Small Stuff:
 
 - Alexandrian search needs to use the state of the current page number.
-- Optimistic UI For minting NFTs.
 - Play button on videos by default. (fix broken videos)
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - Remove duplicates based on file size.
@@ -26,6 +22,8 @@ Next Small Stuff:
 
 
 Next Big Stuff:
+- Add the icrc3 canisters to the cycles manager.
+
 - Apps page leaderboard of top NFTs (perhaps from a backup system off-chain)
 - Then we'll let people do their own channels which are just regular stable structures and no economic incentive. 
 These channels could be open for everyone to edit, or only for the owner to edit.

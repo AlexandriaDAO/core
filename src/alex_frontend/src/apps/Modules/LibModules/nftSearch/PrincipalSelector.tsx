@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
+import { togglePrincipal } from '../../shared/state/librarySearch/librarySlice';
 import { togglePrincipalSelection } from '../../shared/state/librarySearch/libraryThunks';
 import { getUser } from "@/features/auth/utils/authUtils";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
@@ -26,7 +27,11 @@ interface PrincipalData {
   username: string;
 }
 
-export default function PrincipalSelector() {
+interface PrincipalSelectorProps {
+  shouldTriggerSearch?: boolean;
+}
+
+export default function PrincipalSelector({ shouldTriggerSearch = false }: PrincipalSelectorProps) {
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const noResults = useSelector((state: RootState) => state.library.noResults);
@@ -60,7 +65,7 @@ export default function PrincipalSelector() {
 
   React.useEffect(() => {
     if (userPrincipal && selectedPrincipals.length === 0) {
-      dispatch(togglePrincipalSelection(userPrincipal));
+      dispatch(togglePrincipal(userPrincipal));
     }
   }, [userPrincipal, selectedPrincipals.length, dispatch]);
 

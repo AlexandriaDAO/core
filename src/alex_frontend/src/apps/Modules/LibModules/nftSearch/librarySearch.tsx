@@ -42,7 +42,7 @@ export default function LibrarySearch() {
       <div className="max-w-7xl mx-auto space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="flex flex-col space-y-2">
-            <PrincipalSelector />
+            <PrincipalSelector shouldTriggerSearch={false} />
             <CollectionSelector />
           </div>
           <div className="flex flex-col space-y-2">
