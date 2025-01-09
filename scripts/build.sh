@@ -237,13 +237,17 @@ mkdir -p .dfx/local/canisters/ALEX
 touch .dfx/local/canisters/LBRY/LBRY.did
 touch .dfx/local/canisters/ALEX/ALEX.did
 
+# For icp_swap_factory
+mkdir -p src/icp_swap_factory && dfx canister --network ic metadata ggzvv-5qaaa-aaaag-qck7a-cai candid:service > src/icp_swap_factory/icp_swap_factory.did
+
+
 npm i
 dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 5r7uh-5e6j3-dt5jv-74zt2-tkdmr-gvq6u-ovpak-rus6s-mgoda-qjywh-mqe)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal tqcuu-cxhc5-befbi-i3d23-adgt7-h5n45-vn22x-4g6nw-wzayl-bw7m6-vqe)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)

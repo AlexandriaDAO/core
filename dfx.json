@@ -43,7 +43,7 @@
       "candid": "src/icp_swap/icp_swap.did",
       "package": "icp_swap",
       "type": "rust",
-      "specified_id": "54fqz-5iaaa-aaaap-qkmqa-cai"
+      "specified_id":"54fqz-5iaaa-aaaap-qkmqa-cai"
     },
     "icrc7": {
       "main": "src/icrc7/main.mo",
@@ -59,7 +59,7 @@
       "candid": "src/nft_manager/nft_manager.did",
       "package": "nft_manager",
       "type": "rust",
-      "specified_id": "5sh5r-gyaaa-aaaap-qkmra-cai"
+      "specified_id":"5sh5r-gyaaa-aaaap-qkmra-cai"
     },
     "internet_identity": {
       "type": "pull",
@@ -70,18 +70,6 @@
       "package": "tokenomics",
       "type": "rust",
       "id": "5abki-kiaaa-aaaap-qkmsa-cai"
-    },
-    "ic_siwe_provider": {
-      "type": "custom",
-      "candid": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.did",
-      "wasm": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.wasm.gz",
-      "specified_id": "w4vlu-paaaa-aaaaj-azxyq-cai"
-    },
-    "ic_siws_provider": {
-      "type": "custom",
-      "candid": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.did",
-      "wasm": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.wasm.gz",
-      "specified_id": "w3una-cyaaa-aaaaj-azxya-cai"
     },
     "LBRY": {
       "type": "custom",
@@ -95,12 +83,6 @@
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
       "id": "ysy5f-2qaaa-aaaap-qkmmq-cai"
     },
-    "registry": {
-      "candid": "src/registry/registry.did",
-      "package": "registry",
-      "type": "rust",
-      "id": "uxyan-oyaaa-aaaap-qhezq-cai"
-    },
     "alex_frontend": {
       "dependencies": ["alex_backend"],
       "frontend": {
@@ -108,18 +90,6 @@
       },
       "source": ["dist/alex_frontend/"],
       "type": "assets"
-    },
-    "logs": {
-      "candid": "src/logs/logs.did",
-      "package": "logs",
-      "type": "rust",
-      "specified_id": "yn33w-uaaaa-aaaap-qpk5q-cai"
-    },
-    "emporium": {
-      "candid": "src/emporium/emporium.did",
-      "package": "emporium",
-      "type": "rust",
-      "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
     },
     "icp_ledger_canister": {
       "type": "custom",
@@ -131,6 +101,42 @@
         }
       },
       "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+    },
+    "ic_siwe_provider": {
+      "type": "custom",
+      "candid": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.did",
+      "wasm": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.wasm.gz",
+      "specified_id": "w4vlu-paaaa-aaaaj-azxyq-cai"
+    },  
+    "ic_siws_provider": {
+      "type": "custom",
+      "candid": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.did",
+      "wasm": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.wasm.gz",
+      "specified_id": "w3una-cyaaa-aaaaj-azxya-cai"
+    },
+    "emporium": {
+      "candid": "src/emporium/emporium.did",
+      "package": "emporium",
+      "type": "rust",
+      "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
+    },
+    "logs": {
+      "candid": "src/logs/logs.did",
+      "package": "logs",
+      "type": "rust",
+      "specified_id": "yn33w-uaaaa-aaaap-qpk5q-cai"
+    },
+    "xrc": {
+      "candid": "src/xrc/xrc.did",
+      "package": "xrc",
+      "type": "rust",
+      "specified_id": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
+    },
+    "icp_swap_factory": {
+      "type": "rust",
+      "package": "icp_swap_factory",
+      "candid": "src/icp_swap_factory/icp_swap_factory.did",
+      "specified_id": "ggzvv-5qaaa-aaaag-qck7a-cai"
     }
   },
   "defaults": {

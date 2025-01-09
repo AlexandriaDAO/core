@@ -14,7 +14,7 @@ export const mint_nft = async (transactionId: string): Promise<string> => {
     const state = store.getState();
     const mintableState = state.contentDisplay.mintableState[transactionId];
     const ownerStr = mintableState?.owner;
-
+    
     // Convert owner string to Principal if it exists
     let ownerArg: [] | [Principal] = [];
     if (ownerStr) {
@@ -26,10 +26,11 @@ export const mint_nft = async (transactionId: string): Promise<string> => {
         throw new Error("Invalid owner principal format");
       }
     }
-
+    
     // Call the backend coordinate_mint function
     const actorNftManager = await getNftManagerActor();
     const result = await actorNftManager.coordinate_mint(transactionId, ownerArg);
+    console.log("OwnerArg", ownerArg);
 
     // Handle the result
     if ("Err" in result) {

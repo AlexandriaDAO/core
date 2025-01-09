@@ -26,12 +26,12 @@ const LbryBalanceCard = () => {
                         <span className='text-sm font-regular text-lightgray '>Librarian Token</span>
                     </div>
                     <div>
-                        <img src="images/icp-logo.png" alt="icp-logo" />
+                        <img src="images/lbry-logo.svg" alt="lbry-logo" />
                     </div>
                 </div>
                 <div className="flex justify-between items-center mb-3">
                     <span className='text-base text-lightgray font-medium mb-1'>Balance</span>                 
-                    <FontAwesomeIcon className="text-lightgray" role="button" icon={faRotate} onClick={() => { handleRefresh() }} />
+                    <FontAwesomeIcon className="text-lightgray pe-2" role="button" icon={faRotate} onClick={() => { handleRefresh() }} />
                 </div>
                 
 
