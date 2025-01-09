@@ -22,7 +22,7 @@ pub fn create_node(request: CreateNodeRequest) -> Result<Node, String> {
     }
 
     let node_id = get_and_increment_node_counter();
-    let node = Node::new(node_id, request.key, caller);
+    let node = Node::new(node_id, request.key, request.active, caller);
     
     // Store the node
     NODES.with(|nodes| {

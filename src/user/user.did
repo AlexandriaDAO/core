@@ -5,7 +5,7 @@ type CreateEngineRequest = record {
   host : text;
   index : text;
 };
-type CreateNodeRequest = record { key : text };
+type CreateNodeRequest = record { key : text; active : bool };
 type Engine = record {
   id : nat64;
   key : text;

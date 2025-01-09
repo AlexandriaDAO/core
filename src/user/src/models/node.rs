@@ -13,13 +13,13 @@ pub struct Node {
 }
 
 impl Node {
-    pub fn new(id: u64, key: String, owner: Principal) -> Self {
+    pub fn new(id: u64, key: String, active: bool, owner: Principal) -> Self {
         let now = time();
         Self {
             id,
             key,
             owner,
-            active: true,
+            active,
             created_at: now,
             updated_at: now,
         }
@@ -29,6 +29,7 @@ impl Node {
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct CreateNodeRequest {
     pub key: String,
+    pub active: bool,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]

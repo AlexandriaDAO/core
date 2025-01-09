@@ -37,6 +37,7 @@ const assetSlice = createSlice({
     name: "asset",
     initialState,
     reducers: {
+        resetAssets: () => initialState,
         setAssets: (state, action: PayloadAction<Asset[]>) => {
             state.assets = action.payload;
         },
@@ -147,6 +148,6 @@ const assetSlice = createSlice({
 		}
 });
 
-export const { setAssets, setCursor, setAudios, setBooks, setImages, setVideos } = assetSlice.actions;
+export const { resetAssets, setAssets, setCursor, setAudios, setBooks, setImages, setVideos } = assetSlice.actions;
 
 export default assetSlice.reducer;

@@ -1,14 +1,18 @@
 import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import fetchMyAssets from "./thunks/fetchMyAssets";
 import fetchMyBooks from "./thunks/fetchMyBooks";
 import fetchMyImages from "./thunks/fetchMyImages";
 import fetchMyAudios from "./thunks/fetchMyAudios";
 import fetchMyVideos from "./thunks/fetchMyVideos";
-import { Asset, Book, Image, Audio, Video } from "@/features/asset/types";
+import { Book, Image, Audio, Video } from "@/features/asset/types";
+import fetchMyCollection from "./thunks/fetchMyCollection";
 
 
 interface CollectionState {
-    assets: Asset[];
+    // array of arweave manifest ids that are stored as NFTs
+    collection: string[];
+    collectionLoading: boolean;
+    collectionError: string | null;
+
     books: Book[];
     images: Image[];
     audios: Audio[];
@@ -21,7 +25,10 @@ interface CollectionState {
 }
 
 const initialState: CollectionState = {
-    assets: [],
+    collection: [],
+    collectionLoading: false,
+    collectionError: null,
+
     books: [],
     images: [],
     audios: [],
@@ -37,8 +44,9 @@ const collectionSlice = createSlice({
     name: "collection",
     initialState,
     reducers: {
-        setAssets: (state, action: PayloadAction<Asset[]>) => {
-            state.assets = action.payload;
+        resetCollection: () => initialState,
+        setCollection: (state, action: PayloadAction<string[]>) => {
+            state.collection = action.payload;
         },
         setCursor: (state, action:PayloadAction<string>)=>{
             state.cursor = action.payload
@@ -58,22 +66,20 @@ const collectionSlice = createSlice({
     },
     extraReducers: (builder: ActionReducerMapBuilder<CollectionState>) => {
 		builder
-			.addCase(fetchMyAssets.pending, (state) => {
-				state.loading = true;
-				state.error = null;
+			.addCase(fetchMyCollection.pending, (state) => {
+				state.collectionLoading = true;
+				state.collectionError = null;
 			})
-			.addCase(fetchMyAssets.fulfilled, (state, action:PayloadAction<Asset[]>) => {
-				state.loading = false;
-				state.error = null;
+			.addCase(fetchMyCollection.fulfilled, (state, action:PayloadAction<string[]>) => {
+				state.collectionLoading = false;
+				state.collectionError = null;
 
-                state.assets = action.payload;
-				state.cursor = action.payload[action.payload.length-1]?.cursor ?? '';
+                state.collection = action.payload;
 			})
-			.addCase(fetchMyAssets.rejected, (state, action) => {
-				state.loading = false;
-				state.assets = [];
-                state.cursor = '';
-				state.error = action.payload as string;
+			.addCase(fetchMyCollection.rejected, (state, action) => {
+				state.collectionLoading = false;
+				state.collection = [];
+				state.collectionError = action.payload as string;
 			})
 
             .addCase(fetchMyBooks.pending, (state) => {
@@ -147,6 +153,6 @@ const collectionSlice = createSlice({
 		}
 });
 
-export const { setAssets, setCursor, setAudios, setBooks, setImages, setVideos } = collectionSlice.actions;
+export const { resetCollection, setCollection, setCursor, setAudios, setBooks, setImages, setVideos } = collectionSlice.actions;
 
 export default collectionSlice.reducer;

@@ -2,6 +2,8 @@ import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/to
 import fetchMyNodes from "./thunks/fetchMyNodes";
 import { toast } from "sonner";
 import addNode from "./thunks/addNode";
+import deleteNode from "./thunks/deleteNode";
+import updateNodeStatus from "./thunks/updateNodeStatus";
 
 export interface SerializedNode {
 	'id' : string,
@@ -17,6 +19,9 @@ export interface MyNodesState {
 	nodes: SerializedNode[];			//holds currently selected node
 	newNode: SerializedNode|null;			//holds recently added node
 
+	deleting: string;
+	updating: string;
+
 	loading: boolean;
 	error: string | null;
 
@@ -29,6 +34,9 @@ const initialState: MyNodesState = {
     nodes: [],
 	newNode: null,
 
+	deleting: '',
+	updating: '',
+
 	loading: false,
 	error: null,
 
@@ -40,6 +48,14 @@ const myNodesSlice = createSlice({
 	name: "myNodes",
 	initialState,
 	reducers: {
+		setDeleting: (state, action)=>{
+			state.deleting = action.payload;
+		},
+
+		setUpdating: (state, action)=>{
+			state.updating = action.payload;
+		},
+
 		setNewNode: (state, action)=>{
 			state.newNode = action.payload;
 		},
@@ -70,6 +86,52 @@ const myNodesSlice = createSlice({
 				state.error = action.payload as string;
 			})
 
+			.addCase(deleteNode.pending, (state) => {
+				toast.info('Deleting Node')
+				state.error = null;
+			})
+			.addCase(deleteNode.fulfilled, (state, action:PayloadAction<boolean>) => {
+				toast.success('Node Deleted')
+
+				if (action.payload) {
+					state.nodes = state.nodes.filter((node) => node.id !== state.deleting);
+				}
+
+				state.deleting = '';
+				state.error = null;
+			})
+			.addCase(deleteNode.rejected, (state, action) => {
+				toast.error('Node Could not be deleted '+ action.payload)
+
+				state.deleting = '';
+				state.error = action.payload as string;
+			})
+
+			.addCase(updateNodeStatus.pending, (state) => {
+				toast.info('Updating Status')
+				state.error = null;
+			})
+			.addCase(updateNodeStatus.fulfilled, (state, action) => {
+				toast.success('Status Updated')
+
+				state.nodes = state.nodes.map((node)=>{
+					if(node.id === action.payload.id){
+						return action.payload;
+					}
+					return node;
+				})
+
+				state.updating = '';
+				state.error = null;
+			})
+			.addCase(updateNodeStatus.rejected, (state, action) => {
+				toast.error('Status Could not be updated '+ action.payload)
+
+				state.updating = '';
+				state.error = action.payload as string;
+			})
+
+
 			.addCase(addNode.pending, (state) => {
 				toast.info('Adding Node')
 
@@ -94,6 +156,6 @@ const myNodesSlice = createSlice({
 		}
 });
 
-export const {setNewNode, setNewNodeLoading, setNewNodeError} = myNodesSlice.actions;
+export const {setUpdating, setDeleting, setNewNode, setNewNodeLoading, setNewNodeError} = myNodesSlice.actions;
 
 export default myNodesSlice.reducer;

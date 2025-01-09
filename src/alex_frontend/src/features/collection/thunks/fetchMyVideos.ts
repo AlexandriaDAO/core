@@ -5,8 +5,6 @@ import { AssetType } from "@/features/upload/uploadSlice";
 import { Video } from "@/features/asset/types";
 import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE } from "../../../../../../src/declarations/nft_manager/nft_manager.did";
-import { Principal } from "@dfinity/principal";
-import { natToArweaveId } from "@/utils/id_convert";
 
 // Define the async thunk
 const fetchMyVideos = createAsyncThunk<
@@ -19,16 +17,13 @@ const fetchMyVideos = createAsyncThunk<
 >("collection/fetchMyVideos", async ({actor}, { rejectWithValue, getState }) => {
     try {
 
-        const {collection: {cursor, videos }, auth: {user}} = getState();
+        const {collection: {collection, cursor, videos }, auth: {user}} = getState();
 
         if(!user || !user.principal) return { videos, cursor }
 
-        const result = await actor.get_nfts_of(Principal.fromText(user.principal));
+        if (collection.length > 0) {
 
-        if ('Ok' in result) {
-            const ids = result.Ok.map((token) => natToArweaveId(token[0]));
-
-            const txs = await fetchAssets({after: cursor, owner: user.principal, type: AssetType.Video, ids});
+            const txs = await fetchAssets({after: cursor, owner: user.principal, type: AssetType.Video, ids: collection});
 
             const newVideos = await getAssets<Video>(txs);
 
@@ -39,10 +34,6 @@ const fetchMyVideos = createAsyncThunk<
                 cursor: newCursor
             }
 
-        } else if ('Err' in result) {
-            console.log('Error fetching NFTs', result.Err);
-            // this will error out and eventually set videos to [] array
-            throw new Error('Error fetching NFTs');
         }
 
         return { videos, cursor }

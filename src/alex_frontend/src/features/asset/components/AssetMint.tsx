@@ -5,6 +5,9 @@ import { toast } from "sonner";
 import { arweaveIdToNat } from "@/utils/id_convert";
 import { getNftManagerActor } from "@/features/auth/utils/authUtils";
 import { Book, Video, Image, Audio } from "../types";
+import useNftManager from "@/hooks/actors/useNftManager";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { Principal } from "@dfinity/principal";
 
 interface IAssetMintProps {
     asset: Book|Video|Image|Audio
@@ -13,13 +16,18 @@ interface IAssetMintProps {
 const AssetMint: React.FC<IAssetMintProps> = ({
     asset
 }: IAssetMintProps) => {
+	const {actor} = useNftManager();
+	const {user} = useAppSelector(state => state.auth);
 	const [minted, setMinted] = useState<boolean|undefined>(undefined)
 
 	const isMinted = async () => {
 		try{
-			const mintNumber = BigInt(arweaveIdToNat(asset.manifest));
-			const actorNftManager = await getNftManagerActor();
-			const result = await actorNftManager.nfts_exist([mintNumber]);
+			if(!actor) throw new Error("Actor not found");
+			if(!user) throw new Error("User not found");
+
+			const tx = BigInt(arweaveIdToNat(asset.manifest));
+
+			const result = await actor.nfts_exist([tx]);
 
 			if ("Err" in result) throw new Error(result.Err);
 			setMinted(result.Ok[0]);
@@ -44,14 +52,15 @@ const AssetMint: React.FC<IAssetMintProps> = ({
 		e.stopPropagation();
 		try{
             setMinted(undefined)
+			if(!actor) throw new Error("Actor not found");
+			if(!user) throw new Error("User not found");
 			toast.info("Minting NFT via ICRC7 Protocol");
 
 			// const mintNumber = BigInt(arweaveIdToNat(asset.manifest));
 			// const description = "Book minted by Alex";
-			const actorNftManager = await getNftManagerActor();
+			// const actorNftManager = await getNftManagerActor();
 			// throws invalid arweave id error
-            const result = await actorNftManager.coordinate_mint(asset.manifest, []);
-
+            const result = await actor.coordinate_mint(asset.manifest, [Principal.fromText(user.principal)]);
             if ("Err" in result) throw new Error(result.Err);
 
 			toast.success("Minted Successfully");

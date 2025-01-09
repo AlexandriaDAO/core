@@ -6,21 +6,23 @@ import { toast } from "sonner";
 import { getNodeBalance, getServerIrys } from "@/services/irysService";
 import { shorten } from "@/utils/general";
 
-import { Copy, LoaderCircle, RefreshCcw, Trash2 } from "lucide-react";
+import { Copy, LoaderCircle, RefreshCcw } from "lucide-react";
 import { SerializedNode } from "../myNodesSlice";
-import { useAlexWallet, useUser } from "@/hooks/actors";
-import { Button } from "@/lib/components/button";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAlexWallet } from "@/hooks/actors";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import DeleteNode from "./DeleteNode";
+import UpdateNode from "./UpdateNode";
 
 interface NodeItemProps {
 	node: SerializedNode;
 }
 
 const NodeItem = ({ node }: NodeItemProps) => {
-	const dispatch = useAppDispatch();
+	if(!node) return null;
 	const {actor} = useAlexWallet();
-	const {actor: userActor} = useUser();
 	const [irys, setIrys] = useState<WebIrys | null>(null);
+
+	const {deleting} = useAppSelector((state) => state.myNodes);
 
 	const [loading, setLoading] = useState(false);
 
@@ -76,31 +78,15 @@ const NodeItem = ({ node }: NodeItemProps) => {
 		setNodeBalance();
 	}, [irys]);
 
-	const deleteNode = async () => {
-		try {
-			if(!userActor) {
-				throw new Error('No user actor available');
-			}
-
-			const result = await userActor.delete_node(BigInt(node.id));
-
-			if('Ok' in result){
-				window.location.reload();
-				toast.success('Node deleted successfully');
-			}else{
-				throw new Error(result.Err);
-			}
-		} catch (error) {
-			console.error('Error deleting node:', error);
-			toast.error('Failed to delete node');
-		}
-	};
-
 	return (
 		<div className={`relative ${loading ? 'cursor-not-allowed pointer-events-none' : ''}`}>
 			<div className={`flex flex-col gap-4 justify-between items-start p-2 shadow border border-solid rounded font-roboto-condensed font-normal text-base ${loading ? 'opacity-40' : ''}`}>
 				<table className="w-full">
 					<tbody>
+						<tr>
+							<td className="pr-4">ID</td>
+							<td>{node.id}</td>
+						</tr>
 						<tr>
 							<td className="pr-4">Status</td>
 							<td>{node.active ? 'Active' : 'InActive'}</td>
@@ -157,14 +143,10 @@ const NodeItem = ({ node }: NodeItemProps) => {
 						</tr>
 						<tr>
 							<td colSpan={2} className="text-center py-2">
-								<Button
-									variant="destructive"
-									scale="sm"
-									onClick={deleteNode}
-								>
-									<Trash2 size={14} />
-									<span>Delete This Node</span>
-								</Button>
+								<div className="flex justify-center items-center gap-2">
+									<UpdateNode node={node} />
+									<DeleteNode node={node} />
+								</div>
 							</td>
 						</tr>
 					</tbody>

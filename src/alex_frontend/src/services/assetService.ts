@@ -114,7 +114,7 @@ export const fetchAssets = async ({after = '', limit = 10, owner = '', type = un
         query: gql`
             query {
                 transactions(
-                    ${ids.length>0 ? `ids: [${ids.join(',')}],` : ''}
+                    ${ids.length>0 ? `ids: ${JSON.stringify(ids)},` : ''}
                     first: ${limit},
                     ${isLocal ? 'order: DESC,':'sort: HEIGHT_DESC,'}
                     after: "${after}",

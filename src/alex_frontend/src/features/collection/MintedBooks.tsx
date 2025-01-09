@@ -2,31 +2,35 @@ import React, { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import fetchMyBooks from "./thunks/fetchMyBooks";
-import { Info, LoaderCircle } from "lucide-react";
+import { BookOpen, Info, LoaderCircle } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/lib/components/table";
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
 import BookModal from "@/features/asset/components/BookModal";
 import { setBooks, setCursor } from "./collectionSlice";
 import useNftManager from "@/hooks/actors/useNftManager";
-// import AddToEngine from "./components/AddToEngine";
+import AssetInfo from "./components/AssetInfo";
 
 const MintedBooks = () => {
 	const {actor} = useNftManager();
 
 	const dispatch = useAppDispatch();
-	const { books, loading, error } = useAppSelector((state)=>state.collection);
+	const { collection, books, loading, error } = useAppSelector((state)=>state.collection);
 	const { user } = useAppSelector((state) => state.auth);
 
 	useEffect(() => {
-		if(!actor || !user) return;
-		dispatch(fetchMyBooks({actor}));
-
 		return () => {
 			dispatch(setCursor(''));
 			dispatch(setBooks([]));
 		}
-	}, [user, dispatch]);
+	}, [setCursor, setBooks, dispatch]);
+
+
+	useEffect(() => {
+		if(!user || !actor || collection.length<=0) return;
+		dispatch(fetchMyBooks({actor}));
+
+	}, [user, actor, collection, fetchMyBooks, dispatch]);
 
 	if(loading) return (
 		<div className="flex justify-start items-center gap-1">
@@ -60,7 +64,7 @@ const MintedBooks = () => {
 				<TableBody>
 					{books.map((book) => (
 						<TableRow key={book.manifest}>
-							<TableCell className="flex justify-center items-center">
+							<TableCell className="text-center">
 								<div className="flex items-center justify-center">
 									<LoaderCircle size={26} className="animate animate-spin"/>
 								</div>
@@ -70,7 +74,7 @@ const MintedBooks = () => {
 									className="w-0 h-0 hidden"
 									onLoad={(e) => {
 										(e.currentTarget.previousElementSibling as HTMLElement).style.display = 'none';
-										(e.currentTarget as HTMLImageElement).className = 'w-10 h-10 object-cover rounded block';
+										(e.currentTarget as HTMLImageElement).className = 'w-full h-10 object-scale-down rounded flex justify-center items-center';
 									}}
 									onError={(e) => {
 										(e.currentTarget as HTMLElement).style.display = 'none';
@@ -91,7 +95,8 @@ const MintedBooks = () => {
 									<Dialog >
 										<DialogTrigger asChild>
 											<Button variant="outline">
-												View Book
+												<BookOpen size={18} />
+												<span>Read Book</span>
 											</Button>
 										</DialogTrigger>
 										<DialogContent className="max-w-7xl font-roboto-condensed p-0 border-none" closeIcon={null} onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -101,7 +106,7 @@ const MintedBooks = () => {
 										</DialogContent>
 									</Dialog>
 									{/* <AddToEngine book={book}/> */}
-									{/* <BookInfo book={book}/> */}
+									<AssetInfo asset={book}/>
 								</div>
 							</TableCell>
 						</TableRow>

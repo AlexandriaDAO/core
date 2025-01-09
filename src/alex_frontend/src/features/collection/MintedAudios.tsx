@@ -4,7 +4,6 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import fetchMyAudios from "./thunks/fetchMyAudios";
 import { Info, LoaderCircle } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/lib/components/table";
-// import AssetMint from "./components/AssetMint";
 import { setCursor, setAudios } from "./collectionSlice";
 import useNftManager from "@/hooks/actors/useNftManager";
 
@@ -12,18 +11,21 @@ const MintedAudios = () => {
 	const {actor} = useNftManager();
 
 	const dispatch = useAppDispatch();
-	const { audios, loading, error } = useAppSelector((state)=>state.collection);
+	const { collection, audios, loading, error } = useAppSelector((state)=>state.collection);
 	const { user } = useAppSelector((state) => state.auth);
 
 	useEffect(() => {
-		if(!actor || !user) return;
-		dispatch(fetchMyAudios({actor}));
-
 		return () => {
 			dispatch(setCursor(''));
 			dispatch(setAudios([]));
 		}
-	}, [user, dispatch]);
+	}, [setCursor, setAudios, dispatch]);
+
+	useEffect(() => {
+		if(!user || !actor || collection.length<=0) return;
+
+		dispatch(fetchMyAudios({actor}));
+	}, [user, actor, collection, fetchMyAudios, dispatch]);
 
 
 	if(loading) return (
@@ -51,13 +53,12 @@ const MintedAudios = () => {
 						<TableHead className="text-center">Title</TableHead>
 						<TableHead className="text-center">Creator</TableHead>
 						<TableHead className="text-center"></TableHead>
-						<TableHead className="text-center">Actions</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
 					{audios.map((audio) => (
 						<TableRow key={audio.manifest}>
-							<TableCell className="flex justify-center items-center">
+							<TableCell className="text-center">
 								<div className="flex items-center justify-center">
 									<LoaderCircle size={26} className="animate animate-spin"/>
 								</div>
@@ -67,7 +68,7 @@ const MintedAudios = () => {
 									className="w-0 h-0 hidden"
 									onLoad={(e) => {
 										(e.currentTarget.previousElementSibling as HTMLElement).style.display = 'none';
-										(e.currentTarget as HTMLImageElement).className = 'w-10 h-10 object-cover rounded block';
+										(e.currentTarget as HTMLImageElement).className = 'w-full h-10 object-scale-down rounded flex justify-center items-center';
 									}}
 									onError={(e) => {
 										(e.currentTarget as HTMLElement).style.display = 'none';
@@ -87,10 +88,6 @@ const MintedAudios = () => {
 									className="h-10 w-full"
 									src={`https://gateway.irys.xyz/${audio.manifest}/asset`}
 								/>
-							</TableCell>
-							<TableCell className="text-center">
-								{/* <AssetMint asset={audio}/> */}
-								AssetMint
 							</TableCell>
 						</TableRow>
 					))}
