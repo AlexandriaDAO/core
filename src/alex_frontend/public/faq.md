@@ -96,9 +96,9 @@ You could share them, and collect ALEX and LBRY from them if they are liked by o
 
 Not yet, but very soon.
 
-4. What is a Scion NFT?
+4. What are SBTs?
 
-A Scion NFT is a copy of an original NFT that allows you to use it in Alexandria. It is a soul bound token, and so cannot be traded, but it can collect ALEX on your behalf if others like it.
+Soul-Bound Tokens, meaning they are part of your profile and cannot be transferred. On Alexandria, they are a copy of an original NFT that allows you to use that content as your own (since you paid for it, and auto-reference the original).
 
 5. Are my NFTs safe?
 

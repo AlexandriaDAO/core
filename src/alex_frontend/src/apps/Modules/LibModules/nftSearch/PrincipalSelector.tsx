@@ -82,33 +82,33 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
   };
 
   return (
-    <div className="p-[14px] rounded-2xl border border-input bg-background">
+    <div className="p-2 sm:p-[14px] rounded-2xl border border-input bg-background">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between"
+            className="w-full justify-between text-sm sm:text-base py-2 sm:py-3"
             disabled={isLoading}
           >
             {isLoading ? (
               <div className="flex items-center">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                 Loading...
               </div>
             ) : (
               <>
                 {getDisplayValue(selectedPrincipals[0] || '')}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                <ChevronsUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0 opacity-50" />
               </>
             )}
           </Button>
         </PopoverTrigger>
         {!isLoading && (
-          <PopoverContent className="w-full p-0">
+          <PopoverContent className="w-[calc(100vw-2rem)] sm:w-full p-0">
             <Command>
-              <CommandInput placeholder="Search library..." />
+              <CommandInput placeholder="Search library..." className="text-sm sm:text-base" />
               <CommandList>
                 <CommandEmpty>No library found.</CommandEmpty>
                 <CommandGroup>
@@ -116,10 +116,11 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
                     <CommandItem
                       value="My Library"
                       onSelect={() => handlePrincipalSelect(userPrincipal)}
+                      className="text-sm sm:text-base py-2 sm:py-3"
                     >
                       <Check
                         className={cn(
-                          "mr-2 h-4 w-4",
+                          "mr-2 h-3 w-3 sm:h-4 sm:w-4",
                           selectedPrincipals[0] === userPrincipal ? "opacity-100" : "opacity-0"
                         )}
                       />
@@ -131,10 +132,11 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
                       key={principal.principal}
                       value={principal.username}
                       onSelect={() => handlePrincipalSelect(principal.principal)}
+                      className="text-sm sm:text-base py-2 sm:py-3"
                     >
                       <Check
                         className={cn(
-                          "mr-2 h-4 w-4",
+                          "mr-2 h-3 w-3 sm:h-4 sm:w-4",
                           selectedPrincipals[0] === principal.principal ? "opacity-100" : "opacity-0"
                         )}
                       />
@@ -148,7 +150,7 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
         )}
       </Popover>
       {noResults && (
-        <div className="mt-2 text-sm text-muted-foreground">
+        <div className="mt-2 text-xs sm:text-sm text-muted-foreground">
           This user has no NFTs, try selecting another user
         </div>
       )}

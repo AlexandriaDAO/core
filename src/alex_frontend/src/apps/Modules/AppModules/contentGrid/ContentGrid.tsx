@@ -120,7 +120,7 @@ function NftDataFooter({ id }: NftDataFooterProps) {
 
 function ContentGrid({ children }: ContentGridProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 pb-16">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 p-2 sm:p-4 pb-16">
       {children}
     </div>
   );
@@ -174,28 +174,28 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
       className="cursor-pointer hover:bg-gray-50 flex flex-col relative overflow-hidden bg-white h-full"
       onClick={onClick}
     >
-      <CardHeader className="flex flex-col items-start px-4 py-2 gap-2">
-        <div className="flex items-center gap-2 w-full">
+      <CardHeader className="flex flex-col items-start p-2 sm:px-4 sm:py-2 gap-1 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 w-full">
           {owner && (
             <div 
-              className="flex items-center gap-1 group cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-md transition-colors"
+              className="flex items-center gap-1 group cursor-pointer hover:bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md transition-colors"
               onClick={(e) => handleOwnerClick(e, owner)}
             >
-              <User className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-600 group-hover:text-gray-900">
+              <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+              <span className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-900">
                 {formatId(owner)}
               </span>
               {searchTriggered ? (
-                <Check className="h-4 w-4 text-green-500" />
+                <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
               ) : (
-                <Search className="h-4 w-4 text-gray-500 group-hover:text-gray-600" />
+                <Search className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 group-hover:text-gray-600" />
               )}
             </div>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="flex flex-col items-start gap-4 p-0">
+      <CardContent className="flex flex-col items-start gap-2 sm:gap-4 p-0">
         <AspectRatio ratio={1} className="w-full">
           <div className="flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden h-full">
             {children}
@@ -203,26 +203,26 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
         </AspectRatio>
       </CardContent>
 
-      <CardFooter className="flex flex-col w-full rounded-lg border border-[--border] bg-[--card] mt-2 p-3">
-        <div className="flex flex-wrap items-center gap-2 w-full">
-          <div className="flex items-center gap-2">
+      <CardFooter className="flex flex-col w-full rounded-lg border border-[--border] bg-[--card] mt-2 p-2 sm:p-3">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
             {isMintable && onMint && (
               <Button
                 variant="secondary"
-                className={`bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] px-4 py-2 rounded-md flex items-center gap-2 transition-all duration-200 font-medium shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)] shrink-0 ${isMinting ? 'opacity-80' : ''}`}
+                className={`bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] px-2 sm:px-4 py-1 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 transition-all duration-200 text-xs sm:text-sm font-medium shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)] shrink-0 ${isMinting ? 'opacity-80' : ''}`}
                 onClick={onMint}
                 disabled={isMinting}
               >
-                <span className="text-sm flex items-center gap-2">
+                <span className="flex items-center gap-1 sm:gap-2">
                   {isMinting ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                       Minting
                     </>
                   ) : (
                     <>
                       Mint NFT
-                      <Plus className={`h-5 w-5 text-red-500 transition-all duration-200 ${isMinting ? 'scale-125 text-green-500' : ''}`} />
+                      <Plus className={`h-4 w-4 sm:h-5 sm:w-5 text-red-500 transition-all duration-200 ${isMinting ? 'scale-125 text-green-500' : ''}`} />
                     </>
                   )}
                 </span>
@@ -234,18 +234,18 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
                 <CollapsibleTrigger asChild>
                   <Button
                     variant="secondary"
-                    className="h-8 px-3 bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 rounded-md flex items-center gap-1.5 transition-colors shrink-0 group"
+                    className="h-6 sm:h-8 px-2 sm:px-3 bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 rounded-md flex items-center gap-1 sm:gap-1.5 transition-colors shrink-0 group"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <Flag className="h-3.5 w-3.5" />
-                    <span className="text-xs font-medium">Stats</span>
+                    <Flag className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <span className="text-[10px] sm:text-xs font-medium">Stats</span>
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent onClick={(e) => e.stopPropagation()}>
-                  <div className="mt-4 space-y-3 w-full">
+                  <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3 w-full">
                     {Object.entries(predictions).map(([key, value]) => (
                       <div key={key} className="space-y-1">
-                        <div className="flex justify-between text-xs">
+                        <div className="flex justify-between text-[10px] sm:text-xs">
                           <span>{key}</span>
                           <span>{(Number(value) * 100).toFixed(1)}%</span>
                         </div>
