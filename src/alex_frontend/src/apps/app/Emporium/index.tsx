@@ -214,7 +214,7 @@ const Emporium = () => {
             </PageContainer>
             <SearchContainer
                 title="Emporium"
-                description="Search the NFT Library of others, and manage your own."
+                description="MarketPlace"
                 onSearch={() => { }}
                 isLoading={emporium.loading}
                 topComponent={<TopupBalanceWarning />}

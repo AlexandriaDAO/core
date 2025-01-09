@@ -222,7 +222,7 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
             const nftId = arweaveToNftId[transaction.id];
             const nftData = nftId ? nfts[nftId] : undefined;
             const isOwned = user && nftData?.principal === user.principal;
-
+            console.log("isOwned is ",  nftData?.principal)
             const hasPredictions = !!predictions[transaction.id];
             const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 

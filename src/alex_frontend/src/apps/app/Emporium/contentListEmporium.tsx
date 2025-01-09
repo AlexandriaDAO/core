@@ -99,8 +99,9 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
       toast.error('Failed to copy to clipboard');
     }
   }, []);
+  // updated renderDetails it would be good if we have this seprate comp
   const renderDetails = useCallback((transaction: Transaction) => (
-    <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[20] pt-12">
+    <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[20]">
       <ScrollArea className="h-full">
         <Card className="bg-transparent border-none text-gray-100 shadow-none">
           <CardHeader className="p-3 pb-2">
@@ -109,10 +110,10 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
           <CardContent className="space-y-3 p-3 pt-0 text-xs">
             <div className="space-y-1">
               <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     copyToClipboard(transaction.id, 'ID');
-                   }}>
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyToClipboard(transaction.id, 'ID');
+                }}>
                 <span className="text-gray-400">ID</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.id}</span>
@@ -120,10 +121,10 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
                 </div>
               </div>
               <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     copyToClipboard(transaction.owner, 'Owner address');
-                   }}>
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyToClipboard(transaction.owner, 'Owner address');
+                }}>
                 <span className="text-gray-400">Owner</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.owner}</span>
@@ -149,14 +150,14 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
             </div>
 
             <Separator className="bg-gray-700" />
-            
+
             <div className="space-y-2">
               <span className="text-gray-400">Tags</span>
               <div className="flex flex-wrap gap-2">
                 {transaction.tags.map((tag, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="secondary" 
+                  <Badge
+                    key={index}
+                    variant="secondary"
                     title={`${tag.name}: ${tag.value}`}
                     className="bg-gray-800 text-gray-200 cursor-pointer hover:bg-gray-700 group/badge flex items-center gap-1"
                     onClick={(e) => {
