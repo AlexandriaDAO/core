@@ -18,7 +18,6 @@ export interface EmporiumState {
   userTokens: { tokenId: string; arweaveId: string }[];
   search: { search: string; pageSize: number; sort: string; type: string };
   totalCount: number;
-  type: string;
   marketPlace: Record<
     string,
     { tokenId: string; arweaveId: string; price: string; owner: string }
@@ -37,7 +36,6 @@ const initialState: EmporiumState = {
   search: { search: "", pageSize: 6, sort: "", type: "principal" },
   totalPages: 0,
   pageSize: 0,
-  type: "",
   error: null,
   userTokens: [],
   marketPlace: {},
@@ -60,9 +58,6 @@ const emporiumSlice = createSlice({
     resetPagination: (state) => {
       state.totalPages = 0;
     },
-    setType:(state,action)=>{
-      state.type=action.payload;
-    }
   },
   extraReducers: (builder: ActionReducerMapBuilder<EmporiumState>) => {
     builder
@@ -175,6 +170,6 @@ const emporiumSlice = createSlice({
       });
   },
 });
-export const { flagHandlerEmporium, setSearchEmporium, resetPagination,setType } =
+export const { flagHandlerEmporium, setSearchEmporium, resetPagination } =
   emporiumSlice.actions;
 export default emporiumSlice.reducer;

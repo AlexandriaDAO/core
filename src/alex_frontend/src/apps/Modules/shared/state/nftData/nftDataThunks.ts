@@ -20,13 +20,13 @@ import { setNoResults } from '../librarySearch/librarySlice';
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
 // Add this interface for the batch function
-export interface BatchFetchParams {
+interface BatchFetchParams {
   tokenId: bigint;
   collection: 'icrc7' | 'icrc7_scion';
   principalId: string;
 }
 
-export const fetchNFTBatch = async (params: BatchFetchParams[]) => {
+const fetchNFTBatch = async (params: BatchFetchParams[]) => {
   const batchSize = 10;
   const results: [string, NFTData][] = [];
   
