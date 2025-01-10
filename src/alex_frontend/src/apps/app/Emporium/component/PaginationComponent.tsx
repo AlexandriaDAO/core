@@ -12,10 +12,10 @@ const PaginationComponent: React.FC<PaginationComponentProps> = ({ totalPages, c
     return (
             <Paginate className='py-5'>
                 <ReactPaginate
-                    breakLabel="..."
+                    breakLabel="....."
                     nextLabel="next >"
                     onPageChange={onPageChange}
-                    pageRangeDisplayed={5}
+                    pageRangeDisplayed={1}
                     pageCount={totalPages}
                     previousLabel="< previous"
                     renderOnZeroPageCount={null}
@@ -23,9 +23,12 @@ const PaginationComponent: React.FC<PaginationComponentProps> = ({ totalPages, c
                     activeClassName="selected"
                     disabledClassName="disabled"
                     forcePage={currentPage}
+                    marginPagesDisplayed={1}
                 />
             </Paginate>
     );
 };
 
 export default PaginationComponent;
+
+

@@ -5,6 +5,7 @@ import { faRotate } from "@fortawesome/free-solid-svg-icons";
 import React, { useEffect, useState } from "react";
 import getAlexPrice from "../../thunks/alexIcrc/getAlexPrice";
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
+import { toast } from "sonner";
 
 const AlexBalanceCard = () => {
     const alex = useAppSelector(state => state.alex);
@@ -15,6 +16,8 @@ const AlexBalanceCard = () => {
     const handleRefresh = () => {
         if (!auth.user) return;
         dispatch(getAccountAlexBalance(auth.user.principal))
+        toast.info("Refreshing balance!")
+
     }
     useEffect(() => {
         dispatch(getAlexPrice())

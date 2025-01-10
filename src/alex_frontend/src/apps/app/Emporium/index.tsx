@@ -43,11 +43,11 @@ const Emporium = () => {
         dispatch(getMarketListing({
             page: 1,
             searchStr: emporium.search.search,
-            pageSize: emporium.search.pageSize.toString(),
+            pageSize: (emporium.search.pageSize-1).toString(),
             sort: emporium.search.sort,
             type,
             userPrincipal: !user?.principal ? "" : user?.principal
-        }));  // 
+        }));  
         setActiveButton("marketPlace");
         setType("marketPlace");
     }; 
@@ -161,12 +161,12 @@ const Emporium = () => {
     return (
         <>
             <PageContainer className="">
-                <Title>Emporium</Title>
+                <Title className="lg:text-5xl md:text-3xl sm:text-2xl xs:text-xl">Emporium</Title>
                 <Description>MarketPlace</Description>
                 <Hint></Hint>
                 <div className="pb-4 text-center">
                     <Button
-                        className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "userNfts" ? "bg-white text-[#353535]" : ""
+                        className={`bg-[#353535] lg:h-14 xs:h-10 lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "userNfts" ? "bg-white text-[#353535]" : ""
                             }`}
                         disabled={!user?.principal}
                         onClick={() => {
@@ -177,7 +177,7 @@ const Emporium = () => {
                         My Nfts
                     </Button>
                     <Button
-                        className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "marketPlace" ? "bg-white text-[#353535]" : ""
+                        className={`bg-[#353535] lg:h-14 xs:h-10 lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "marketPlace" ? "bg-white text-[#353535]" : ""
                             }`}
                         onClick={() => {
                             fetchMarketListings();
@@ -186,7 +186,7 @@ const Emporium = () => {
                         MarketPlace
                     </Button>
                     <Button
-                        className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] ${activeButton === "userListings" ? "bg-white text-[#353535]" : ""
+                        className={`bg-[#353535] lg:h-14 xs:h-10  lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] ${activeButton === "userListings" ? "bg-white text-[#353535]" : ""
                             }`}
                         disabled={!user?.principal}
                         onClick={() => {

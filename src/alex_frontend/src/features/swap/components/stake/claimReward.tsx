@@ -9,14 +9,15 @@ interface StakedInfoProps {
     setLoadingModalV: any;
     setActionType: any;
 }
-const ClaimReward: React.FC<StakedInfoProps> = ({ setLoadingModalV,setActionType}) => {
+const ClaimReward: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType }) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
 
 
     const handleClaim = (e: any) => {
         e.preventDefault();
-        dispatch(claimReward());
+       
+        dispatch(claimReward({reward:swap.stakeInfo.rewardIcp}));
         setActionType("Claiming ICP rewards");
         setLoadingModalV(true);
     }
@@ -24,7 +25,7 @@ const ClaimReward: React.FC<StakedInfoProps> = ({ setLoadingModalV,setActionType
         if (swap.successClaimReward === true) {
             dispatch(flagHandler());
         }
-     
+
 
 
     }, [swap])

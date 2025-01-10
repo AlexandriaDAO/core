@@ -4,6 +4,7 @@ import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "sonner";
 
 const LbryBalanceCard = () => {
     const dispatch = useAppDispatch();
@@ -13,6 +14,8 @@ const LbryBalanceCard = () => {
     const handleRefresh = () => {
         if (!auth.user) return;
         dispatch(getLbryBalance(auth.user.principal))
+        toast.info("Refreshing balance!")
+
     }
     return (<>
 

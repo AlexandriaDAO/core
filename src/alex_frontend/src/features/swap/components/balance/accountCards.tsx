@@ -12,6 +12,7 @@ import getIcpPrice from "../../../icp-ledger/thunks/getIcpPrice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
 import { Entry } from "@/layouts/parts/Header";
+import { toast } from "sonner";
 
 const AccountCards: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -25,6 +26,7 @@ const AccountCards: React.FC = () => {
         if (!user) return;
         dispatch(getIcpBal(user.principal));
         dispatch(getIcpPrice());
+        toast.info("Refreshing balance!")
     }
     // icp ledger
     useEffect(() => {

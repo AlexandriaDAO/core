@@ -120,7 +120,7 @@ function NftDataFooter({ id }: NftDataFooterProps) {
 
 function ContentGrid({ children }: ContentGridProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 p-2 sm:p-4 pb-16">
+    <div className="grid sm:grid-cols-2 xs:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 p-2 sm:p-4 pb-16">
       {children}
     </div>
   );

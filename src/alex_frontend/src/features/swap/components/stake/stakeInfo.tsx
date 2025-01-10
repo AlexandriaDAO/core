@@ -37,38 +37,6 @@ const StakedInfo: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType
 
     return (
         <div >
-            {/* <table className="min-w-full border-collapse">
-                <thead>
-                    <tr className="hidden md:table-row border-b border-gray-300 hover:bg-gray-100">
-                        <th className="py-3 text-left text-lg font-semibold text-radiocolor whitespace-nowrap">
-                            <span className='flex me-7'>Date</span>
-                        </th>
-                        <th className="py-3 text-left text-lg font-semibold text-radiocolor whitespace-nowrap">
-                            <span className='flex me-7'>Amount staked</span>
-                        </th>
-                        <th className="py-3 text-left text-lg font-semibold text-radiocolor whitespace-nowrap">
-                            <span className='flex me-7'>Amount earned</span>
-                        </th>
-                        <th className="py-3 text-left text-lg font-semibold text-radiocolor whitespace-nowrap">
-                            <span className='flex me-7'>Estimated Reward</span>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody className="text-gray-600 text-sm font-light">
-                    <tr className="border-b border-gray-300 hover:bg-gray-100">
-                        <td className="py-3 text-left text-base font-medium text-radiocolor whitespace-nowrap">{new Date(Number(swap.stakeInfo.unix_stake_time) / 1e6).toLocaleString()}</td>
-                        <td className="py-3 px-6 text-left text-base font-medium text-radiocolor whitespace-nowrap">{swap.stakeInfo.stakedAlex} ALEX</td>
-                        <td className="py-3 px-6 text-left text-base font-medium text-radiocolor whitespace-nowrap">{swap.stakeInfo.rewardIcp} ICP</td>
-                        <td className="py-3 px-6 text-left text-base font-medium text-radiocolor whitespace-nowrap">{userEstimateReward} ICP</td>
-                        <th className="py-3 px-6 text-left">
-                            <div className='stake-table whitespace-nowrap'>
-                                <ClaimReward setLoadingModalV={setLoadingModalV} setActionType={setActionType} />
-                                <Unstake setLoadingModalV={setLoadingModalV} setActionType={setActionType} />
-                            </div>
-                        </th>
-                    </tr>
-                </tbody>
-            </table> */}
            <table className="min-w-full border-collapse">
                 <thead>
                     {/* Header row hidden on small screens */}
