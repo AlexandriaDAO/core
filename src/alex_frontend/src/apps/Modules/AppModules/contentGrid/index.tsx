@@ -1,8 +1,10 @@
 import React from 'react';
 import ContentList from './ContentList';
-
-const ContentDisplay: React.FC = () => {
-	return <ContentList />;
+interface ContentDisplayProps {
+	isEmporium: boolean;
+}
+const ContentDisplay: React.FC<ContentDisplayProps> = ({ isEmporium }) => {
+	return <ContentList isEmporium={isEmporium} />;
 };
 
 export default ContentDisplay;
