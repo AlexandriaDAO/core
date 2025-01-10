@@ -6,11 +6,6 @@ import { natToArweaveId } from "@/utils/id_convert";
 import { Principal } from "@dfinity/principal";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { resetPagination } from "../emporiumSlice";
-import {
-  BatchFetchParams,
-  fetchNFTBatch,
-} from "@/apps/Modules/shared/state/nftData/nftDataThunks";
-import { setNFTs } from "@/apps/Modules/shared/state/nftData/nftDataSlice";
 
 const getUserIcrc7Tokens = createAsyncThunk<
   { tokenId: string; arweaveId: string }[], // Return structure
@@ -55,17 +50,6 @@ const getUserIcrc7Tokens = createAsyncThunk<
         });
         dispatch(setTransactions(fetchedTransactions));
         await dispatch(loadContentForTransactions(fetchedTransactions));
-        // Prepare batch params
-        const batchParams: BatchFetchParams[] = result.map((tokenId) => ({
-          tokenId: tokenId, // Convert to bigint
-          collection: "icrc7", // Explicitly specify the literal type
-          principalId: userPrincipal,
-        }));
-        // Use batched fetching
-        const nftEntries = await fetchNFTBatch(batchParams);
-
-        const nftRecord = Object.fromEntries(nftEntries);
-        dispatch(setNFTs(nftRecord));
       }
 
       return tokens;
@@ -77,8 +61,4 @@ const getUserIcrc7Tokens = createAsyncThunk<
     }
   }
 );
-
 export default getUserIcrc7Tokens;
-
-
-

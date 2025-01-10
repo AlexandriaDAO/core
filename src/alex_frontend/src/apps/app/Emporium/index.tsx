@@ -1,4 +1,15 @@
 import React, { useEffect, useState } from "react";
+import {
+    PageContainer,
+    Title,
+    Description,
+    Hint,
+    ControlsContainer,
+    FiltersButton,
+    SearchButton,
+    SearchFormContainer,
+    FiltersIcon,
+} from "./styles";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketListing from "./thunks/getMarketListing";
@@ -10,16 +21,12 @@ import SearchEmporium from "./component/searchEmporium";
 import PaginationComponent from "./component/PaginationComponent";
 import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
 import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
-import { ControlsContainer, Description, FiltersButton, FiltersIcon, PageContainer, SearchButton, SearchFormContainer, Title } from "../Permasearch/styles";
-import { SearchContainer } from "@/apps/Modules/shared/components/SearchContainer";
-import { TopupBalanceWarning } from "@/apps/Modules/shared/components/TopupBalanceWarning";
-import { setType } from "./emporiumSlice";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const emporium = useAppSelector((state) => state.emporium);
-    // const [type, setType] = useState("");
+    const [type, setType] = useState("");
     const [activeButton, setActiveButton] = useState(""); // Track active button
     const [currentPage, setCurrentPage] = useState(1);
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -28,7 +35,7 @@ const Emporium = () => {
         if (user) {
             dispatch(getUserIcrc7Tokens(user?.principal));
             setActiveButton("userNfts");
-            dispatch(setType("userNfts"));
+            setType("userNfts");
         }
     };
     const fetchMarketListings = () => {
@@ -38,13 +45,12 @@ const Emporium = () => {
             searchStr: emporium.search.search,
             pageSize: emporium.search.pageSize.toString(),
             sort: emporium.search.sort,
-            type: emporium.type,
+            type,
             userPrincipal: !user?.principal ? "" : user?.principal
         }));  // 
         setActiveButton("marketPlace");
-        dispatch(setType("marketPlace"))
-
-    };
+        setType("marketPlace");
+    }; 
     // For instant search we can use this but send multiple calls on each search charcter 
     // const fetchMarketListings = useCallback(() => {
     //     setCurrentPage(0);
@@ -74,7 +80,7 @@ const Emporium = () => {
             userPrincipal: user?.principal
         }));
         setActiveButton("userListings");
-        dispatch(setType("marketPlace"));
+        setType("marketPlace");
         setCurrentPage(0);
 
 
@@ -99,7 +105,7 @@ const Emporium = () => {
         }
         else { //default case 
             setActiveButton("marketPlace");
-            dispatch(setType("marketPlace"));
+            setType("marketPlace");
         }
         dispatch(getMarketListing({
             page: 1,
@@ -156,6 +162,8 @@ const Emporium = () => {
         <>
             <PageContainer className="">
                 <Title>Emporium</Title>
+                <Description>MarketPlace</Description>
+                <Hint></Hint>
                 <div className="pb-4 text-center">
                     <Button
                         className={`bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-[30px] me-5 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "userNfts" ? "bg-white text-[#353535]" : ""
@@ -188,7 +196,7 @@ const Emporium = () => {
                         My Listing
                     </Button>
                 </div>
-                {/* {activeButton === "userNfts" ? <></> : <>
+                {activeButton === "userNfts" ? <></> : <>
                     <SearchEmporium />
                     <ControlsContainer $isOpen={isFiltersOpen}>
                         <FiltersButton
@@ -209,25 +217,12 @@ const Emporium = () => {
 
                         <EmporiumSearchForm />
                     </SearchFormContainer>
-                </>} */}
+                </>}
 
             </PageContainer>
-            <SearchContainer
-                title="Emporium"
-                description="MarketPlace"
-                onSearch={() => { }}
-                isLoading={emporium.loading}
-                topComponent={<TopupBalanceWarning />}
-                filterComponent={<></>}
-                showMoreEnabled={false}
-                isEmporium={true}
-            />
-            {/* 
-            <ContentListEmporium type={type} /> */}
+
+            <ContentListEmporium type={type} />
             <PaginationComponent totalPages={emporium.totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
-
-
-
         </>
     );
 }

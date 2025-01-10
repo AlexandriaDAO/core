@@ -22,8 +22,6 @@ import {
 import { ScrollArea } from "@/lib/components/scroll-area";
 import { Badge } from "@/lib/components/badge";
 import { Separator } from "@/lib/components/separator";
-import { NFTData } from '@/apps/Modules/shared/types/nft';
-import Overlay from "@/apps/app/Emporium/overlay";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -32,20 +30,8 @@ const truncateMiddle = (str: string, startChars: number = 4, endChars: number = 
   if (str.length <= startChars + endChars + 3) return str;
   return `${str.slice(0, startChars)}...${str.slice(-endChars)}`;
 };
-const defaultTransaction: Transaction = {
-  id: "", // Example properties; replace these with actual fields in Transaction
-  owner: "",
-  tags: [],
-  data: {
-    size: 0,
-    type: ""
-  },
-  block: null,
-};
-interface ContentListProps {
-  isEmporium: boolean;
-}
-const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
+
+const ContentList = () => {
   const dispatch = useAppDispatch();
   const transactions = useSortedTransactions();
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
@@ -53,34 +39,10 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
   const predictions = useSelector((state: RootState) => state.arweave.predictions);
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
-  const emporium = useSelector((state: RootState) => state.emporium);
-
+  
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
-
-  const [buttonType, setButtonType] = useState("Buy");
-  const [modalType, setModalType] = useState<"sell" | "edit" | "remove" | "buy" | null>(null);
-  const [modalData, setModalData] = useState({
-    arwaveId: "",
-    price: "",
-    transaction: defaultTransaction,
-    show: false,
-  });
-
-  useEffect(() => {
-    setButtonType(emporium.type === "userNfts" ? "Sell" : "Buy");
-  }, [emporium.type]);
-
-  const handleOpenModal = (type: "sell" | "edit" | "remove" | "buy", data: any) => {
-    setModalType(type);
-    setModalData({ ...data, show: true });
-  };
-
-  const handleCloseModal = () => {
-    setModalData({ arwaveId: "", price: "", show: false, transaction: defaultTransaction });
-    setModalType(null);
-  };
 
   const handleMint = async (transactionId: string) => {
     try {
@@ -146,21 +108,21 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
           <CardContent className="space-y-3 p-3 pt-0 text-xs">
             <div className="space-y-1">
               <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  copyToClipboard(transaction.id, 'ID');
-                }}>
-                <span className="text-gray-400">ID</span>
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     copyToClipboard(transaction.id, 'ID');
+                   }}>
+                <span className="text-gray-400">Transaction ID</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.id}</span>
                   <Copy className="w-3 h-3 opacity-0 group-hover/item:opacity-100" />
                 </div>
               </div>
               <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  copyToClipboard(transaction.owner, 'Owner address');
-                }}>
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     copyToClipboard(transaction.owner, 'Owner address');
+                   }}>
                 <span className="text-gray-400">Owner</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.owner}</span>
@@ -186,14 +148,14 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
             </div>
 
             <Separator className="bg-gray-700" />
-
+            
             <div className="space-y-2">
               <span className="text-gray-400">Tags</span>
               <div className="flex flex-wrap gap-2">
                 {transaction.tags.map((tag, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
+                  <Badge 
+                    key={index} 
+                    variant="secondary" 
                     title={`${tag.name}: ${tag.value}`}
                     className="bg-gray-800 text-gray-200 cursor-pointer hover:bg-gray-700 group/badge flex items-center gap-1"
                     onClick={(e) => {
@@ -222,16 +184,16 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
             const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
             const mintableStateItem = mintableState[transaction.id];
             const isMintable = mintableStateItem?.mintable;
-
+            
             const nftId = arweaveToNftId[transaction.id];
             const nftData = nftId ? nfts[nftId] : undefined;
             const isOwned = user && nftData?.principal === user.principal;
-            console.log("isOwned is ",  nftData?.principal)
+            
             const hasPredictions = !!predictions[transaction.id];
             const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 
             const hasWithdrawableBalance = isOwned && nftData && (
-              parseFloat(nftData.balances?.alex || '0') > 0 ||
+              parseFloat(nftData.balances?.alex || '0') > 0 || 
               parseFloat(nftData.balances?.lbry || '0') > 0
             );
 
@@ -271,12 +233,6 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
                     mintableState={mintableState}
                     handleRenderError={handleRenderError}
                   />
-                  {isEmporium && <Overlay
-                    transaction={transaction}
-                    type={emporium.type}
-                    buttonType={buttonType}
-                    setModal={handleOpenModal}
-                  />}
                   {shouldShowBlur && (
                     <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
                       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
@@ -335,7 +291,7 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
               )}
             </div>
           )}
-        </Modal>
+        </Modal> 
       </>
     </TooltipProvider>
   );
