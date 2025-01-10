@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/lib/components/card";
-import { Copy, Check, Info, Loader2, Flag } from "lucide-react";
+import { Copy, Check, Info, Loader2, Flag, User, Search, Plus } from "lucide-react";
 import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 import { Button } from "@/lib/components/button";
@@ -10,6 +10,8 @@ import { Progress } from "@/lib/components/progress";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Skeleton } from "@/lib/components/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/lib/components/collapsible";
+import { useDispatch } from "react-redux";
+import { setSearchState } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 
 interface ContentGridProps {
   children: React.ReactNode;
@@ -19,6 +21,7 @@ interface ContentGridItemProps {
   children: React.ReactNode;
   onClick: () => void;
   id?: string;
+  owner?: string;
   showStats?: boolean;
   onToggleStats?: (open: boolean) => void;
   isMintable?: boolean;
@@ -26,6 +29,7 @@ interface ContentGridItemProps {
   onMint?: (e: React.MouseEvent) => void;
   onWithdraw?: (e: React.MouseEvent) => void;
   predictions?: any;
+  isMinting?: boolean;
 }
 
 interface NftDataFooterProps {
@@ -116,26 +120,50 @@ function NftDataFooter({ id }: NftDataFooterProps) {
 
 function ContentGrid({ children }: ContentGridProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 pb-16">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 p-2 sm:p-4 pb-16">
       {children}
     </div>
   );
 }
 
-function ContentGridItem({ children, onClick, id, showStats, onToggleStats, isMintable, isOwned, onMint, onWithdraw, predictions }: ContentGridItemProps) {
+function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStats, isMintable, isOwned, onMint, onWithdraw, predictions, isMinting }: ContentGridItemProps) {
   const [copied, setCopied] = useState(false);
+  const [copiedOwner, setCopiedOwner] = useState(false);
+  const [searchTriggered, setSearchTriggered] = useState(false);
+  const dispatch = useDispatch();
 
-  const formatId = (id: string) => {
+  const formatId = (id: string | undefined) => {
     if (!id) return 'N/A';
     return `${id.slice(0, 4)}...${id.slice(-4)}`;
   };
 
-  const handleCopy = async (e: React.MouseEvent, id: string) => {
+  const handleCopy = async (e: React.MouseEvent, text: string) => {
     e.stopPropagation();
     try {
-      await navigator.clipboard.writeText(id);
+      await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  const handleOwnerClick = (e: React.MouseEvent, owner: string | undefined) => {
+    e.stopPropagation();
+    if (owner) {
+      dispatch(setSearchState({ ownerFilter: owner }));
+      setSearchTriggered(true);
+      setTimeout(() => setSearchTriggered(false), 2000);
+    }
+  };
+
+  const handleCopyOwner = async (e: React.MouseEvent, owner: string | undefined) => {
+    e.stopPropagation();
+    if (!owner) return;
+    try {
+      await navigator.clipboard.writeText(owner);
+      setCopiedOwner(true);
+      setTimeout(() => setCopiedOwner(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
@@ -146,29 +174,28 @@ function ContentGridItem({ children, onClick, id, showStats, onToggleStats, isMi
       className="cursor-pointer hover:bg-gray-50 flex flex-col relative overflow-hidden bg-white h-full"
       onClick={onClick}
     >
-      <CardHeader className="flex flex-col items-start px-4 py-2 gap-2">
-        <div className="flex items-center gap-2 w-full">
-          <span className="text-sm">ID: {id ? formatId(id) : 'N/A'}</span>
-          {id && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button onClick={(e) => handleCopy(e, id)}>
-                  {copied ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <Copy className="h-4 w-4 cursor-pointer hover:text-gray-600" />
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {copied ? "Copied!" : "Copy ID"}
-              </TooltipContent>
-            </Tooltip>
+      <CardHeader className="flex flex-col items-start p-2 sm:px-4 sm:py-2 gap-1 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 w-full">
+          {owner && (
+            <div 
+              className="flex items-center gap-1 group cursor-pointer hover:bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md transition-colors"
+              onClick={(e) => handleOwnerClick(e, owner)}
+            >
+              <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
+              <span className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-900">
+                {formatId(owner)}
+              </span>
+              {searchTriggered ? (
+                <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
+              ) : (
+                <Search className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 group-hover:text-gray-600" />
+              )}
+            </div>
           )}
         </div>
       </CardHeader>
 
-      <CardContent className="flex flex-col items-start gap-4 p-0">
+      <CardContent className="flex flex-col items-start gap-2 sm:gap-4 p-0">
         <AspectRatio ratio={1} className="w-full">
           <div className="flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden h-full">
             {children}
@@ -176,17 +203,29 @@ function ContentGridItem({ children, onClick, id, showStats, onToggleStats, isMi
         </AspectRatio>
       </CardContent>
 
-      <CardFooter className="flex flex-col w-full rounded-lg border border-[--border] bg-[--card] mt-2 p-3">
-        <div className="flex flex-wrap items-center gap-2 w-full">
-          <div className="flex items-center gap-2">
+      <CardFooter className="flex flex-col w-full rounded-lg border border-[--border] bg-[--card] mt-2 p-2 sm:p-3">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
             {isMintable && onMint && (
               <Button
                 variant="secondary"
-                className="bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] px-4 py-2 rounded-md flex items-center gap-2 transition-all duration-200 font-medium shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)] shrink-0"
+                className={`bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] px-2 sm:px-4 py-1 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 transition-all duration-200 text-xs sm:text-sm font-medium shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)] shrink-0 ${isMinting ? 'opacity-80' : ''}`}
                 onClick={onMint}
+                disabled={isMinting}
               >
-                <span className="text-sm">Mint NFT</span>
-                <span className="text-lg text-red-500">+</span>
+                <span className="flex items-center gap-1 sm:gap-2">
+                  {isMinting ? (
+                    <>
+                      <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                      Minting
+                    </>
+                  ) : (
+                    <>
+                      Mint NFT
+                      <Plus className={`h-4 w-4 sm:h-5 sm:w-5 text-red-500 transition-all duration-200 ${isMinting ? 'scale-125 text-green-500' : ''}`} />
+                    </>
+                  )}
+                </span>
               </Button>
             )}
 
@@ -195,18 +234,18 @@ function ContentGridItem({ children, onClick, id, showStats, onToggleStats, isMi
                 <CollapsibleTrigger asChild>
                   <Button
                     variant="secondary"
-                    className="h-8 px-3 bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 rounded-md flex items-center gap-1.5 transition-colors shrink-0 group"
+                    className="h-6 sm:h-8 px-2 sm:px-3 bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 rounded-md flex items-center gap-1 sm:gap-1.5 transition-colors shrink-0 group"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <Flag className="h-3.5 w-3.5" />
-                    <span className="text-xs font-medium">Stats</span>
+                    <Flag className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                    <span className="text-[10px] sm:text-xs font-medium">Stats</span>
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent onClick={(e) => e.stopPropagation()}>
-                  <div className="mt-4 space-y-3 w-full">
+                  <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3 w-full">
                     {Object.entries(predictions).map(([key, value]) => (
                       <div key={key} className="space-y-1">
-                        <div className="flex justify-between text-xs">
+                        <div className="flex justify-between text-[10px] sm:text-xs">
                           <span>{key}</span>
                           <span>{(Number(value) * 100).toFixed(1)}%</span>
                         </div>

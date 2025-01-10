@@ -157,9 +157,15 @@ pub async fn get_two_random_nfts() -> CallResult<((Principal, Vec<u8>), (Princip
         return Err((ic_cdk::api::call::RejectionCode::CanisterError, "No NFTs minted yet".to_string()));
     }
     
-    let max_index = std::cmp::min(supply_u128 - 1, 999);
-    let random_index = random_value % (max_index + 1);
-    
+    // Calculate the starting index for the newest 1000 NFTs
+    let start_index = if supply_u128 > 1000 {
+        supply_u128 - 1000
+    } else {
+        0
+    };
+    let range = supply_u128 - start_index;
+    let random_index = start_index + (random_value % range);
+
     let tokens_call_result: CallResult<(Vec<Nat>,)> = ic_cdk::call(
         icrc7_scion,
         "icrc7_tokens",

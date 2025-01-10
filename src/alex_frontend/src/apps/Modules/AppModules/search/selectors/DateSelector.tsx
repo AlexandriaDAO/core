@@ -136,11 +136,11 @@ const DateSelector: React.FC = () => {
   }, [updateTimestamp]);
 
   return (
-    <div className="flex items-center gap-4 w-full p-[14px] rounded-2xl border border-input bg-background">
+    <div className="flex items-center gap-2 sm:gap-4 w-full p-2 sm:p-[14px] rounded-2xl border border-input bg-background">
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <CalendarIcon className="h-4 w-4" />
+          <Button variant="ghost" className="h-7 w-7 sm:h-8 sm:w-8 p-0">
+            <CalendarIcon className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
@@ -150,6 +150,7 @@ const DateSelector: React.FC = () => {
             onSelect={handleCalendarSelect}
             disabled={(date) => !isValidDate(date)}
             initialFocus
+            className="rounded-md border shadow-md"
           />
         </PopoverContent>
       </Popover>
@@ -159,14 +160,14 @@ const DateSelector: React.FC = () => {
         value={inputValue}
         onChange={handleInputChange}
         placeholder="MM/DD/YYYY HH:mm"
-        className="flex-1 bg-transparent border-none outline-none font-['Poppins'] text-base font-light"
+        className="flex-1 bg-transparent border-none outline-none font-['Poppins'] text-sm sm:text-base font-light"
       />
 
       <Button
-        className="bg-black text-white hover:bg-[#FFEB3B] hover:text-black"
+        className="h-7 w-7 sm:h-8 sm:w-8 p-0 bg-black text-white hover:bg-[#FFEB3B] hover:text-black"
         onClick={generateRandomDateTime}
       >
-        <ShuffleIcon className="h-4 w-4" />
+        <ShuffleIcon className="h-3 w-3 sm:h-4 sm:w-4" />
       </Button>
     </div>
   );

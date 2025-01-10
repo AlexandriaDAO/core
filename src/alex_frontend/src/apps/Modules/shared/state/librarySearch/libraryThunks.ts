@@ -9,10 +9,11 @@ import { cachePage, clearCache, clearNFTs } from '../nftData/nftDataSlice';
 
 export const togglePrincipalSelection = createAsyncThunk(
   'library/togglePrincipalSelection',
-  async (principalId: string, { dispatch }) => {
+  async (principalId: string, { dispatch, getState }) => {
     try {
       dispatch(clearCache());
       dispatch(togglePrincipal(principalId));
+      await dispatch(performSearch({ start: 0, end: 20 }) as any);
       return principalId;
     } catch (error) {
       console.error('Error in togglePrincipalSelection:', error);

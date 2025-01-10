@@ -31,7 +31,7 @@ export default function CollectionSelector() {
                 ? 'bg-[#2D55FF] text-white hover:bg-[#2D55FF]/90'
                 : 'bg-[#F3F3F3] text-black hover:bg-[#E5E5E5]'}`}
           >
-            OG NFTs
+            NFTs
           </ToggleGroupItem>
           <ToggleGroupItem
             value="icrc7_scion"
@@ -40,7 +40,7 @@ export default function CollectionSelector() {
                 ? 'bg-[#2D55FF] text-white hover:bg-[#2D55FF]/90'
                 : 'bg-[#F3F3F3] text-black hover:bg-[#E5E5E5]'}`}
           >
-            Scion NFTs
+            SBTs
           </ToggleGroupItem>
         </ToggleGroup>
       </div>

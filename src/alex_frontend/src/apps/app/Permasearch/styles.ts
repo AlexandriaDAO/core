@@ -10,60 +10,93 @@ export const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px;
-  gap: 24px;
+  padding: 20px 16px;
+  gap: 16px;
+  width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  box-sizing: border-box;
+
+  @media (min-width: 768px) {
+    padding: 40px 20px;
+    gap: 24px;
+  }
 `;
 
 export const Title = styled.h1`
   color: var(--black-grey-100, #353535);
   text-align: center;
   font-family: Syne;
-  font-size: 48px;
+  font-size: 32px;
   font-weight: 700;
   margin: 0;
+
+  @media (min-width: 768px) {
+    font-size: 48px;
+  }
 `;
 
 export const Description = styled.p`
   color: var(--black-grey-100, #353535);
   text-align: center;
   font-family: Syne;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 400;
   margin: 0;
+
+  @media (min-width: 768px) {
+    font-size: 24px;
+  }
 `;
 
 export const Hint = styled.p`
   color: var(--black-grey-300, #808080);
   text-align: center;
   font-family: Syne;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 400;
   margin: 0;
+
+  @media (min-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 export const ControlsContainer = styled.div<{ $isOpen: boolean }>`
   display: flex;
   width: 100%;
-  gap: 16px;
-  margin-bottom: ${props => props.$isOpen ? '24px' : '0'};
+  gap: 8px;
+  flex-direction: column;
+  margin-bottom: ${props => props.$isOpen ? '16px' : '0'};
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    gap: 16px;
+    margin-bottom: ${props => props.$isOpen ? '24px' : '0'};
+  }
 `;
 
 export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
   display: flex;
-  width: 180px;
-  height: 60px;
-  padding: 10px var(--Fonts-Size-h2, 24px);
+  width: 100%;
+  height: 50px;
+  padding: 8px 16px;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  flex-shrink: 0;
-  border-radius: 30px;
+  border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: Syne;
-  font-size: 16px;
+  font-size: 14px;
+  
+  @media (min-width: 768px) {
+    width: 180px;
+    height: 60px;
+    padding: 10px 24px;
+    font-size: 16px;
+    border-radius: 30px;
+  }
   
   ${({ $isOpen }) => $isOpen ? `
     background: var(--black-grey-100, #353535);
@@ -79,20 +112,33 @@ export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
 
 export const SearchButton = styled.button`
   display: flex;
-  height: 60px;
-  padding: 10px 24px;
+  height: 50px;
+  padding: 8px 16px;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  flex: 1 0 0;
-  min-width: 280px;
-  border-radius: 30px;
+  width: 100%;
+  border-radius: 25px;
   background: var(--black-grey-100, #353535);
   border: none;
   color: white;
   cursor: pointer;
   font-family: Syne;
-  font-size: 16px;
+  font-size: 14px;
+
+  @media (min-width: 768px) {
+    height: 60px;
+    padding: 10px 24px;
+    font-size: 16px;
+    flex: 1 0 0;
+    min-width: 280px;
+    border-radius: 30px;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 `;
 
 export const SearchFormContainer = styled.div<{ $isOpen: boolean }>`
@@ -100,7 +146,11 @@ export const SearchFormContainer = styled.div<{ $isOpen: boolean }>`
   overflow: hidden;
   transition: all 0.3s ease-in-out;
   margin: 0;
-  padding: ${props => props.$isOpen ? '1rem 0' : '0'};
+  padding: ${props => props.$isOpen ? '0.5rem 0' : '0'};
   width: 100%;
   max-width: 800px;
+
+  @media (min-width: 768px) {
+    padding: ${props => props.$isOpen ? '1rem 0' : '0'};
+  }
 `; 

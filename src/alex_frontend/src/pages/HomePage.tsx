@@ -23,7 +23,17 @@ const apps: App[] = [
 
 const HomePage: React.FC = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const { user } = useAppSelector((state) => state.auth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleDiscover = () => {
     setIsPanelOpen(true);
@@ -115,7 +125,7 @@ const HomePage: React.FC = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          padding: '40px',
+          padding: isMobile ? '20px 0' : '40px 0',
           transition: 'transform 0.5s ease-in-out',
           transform: isPanelOpen ? 'translateY(-100%)' : 'translateY(0)',
           overflowY: 'auto',
@@ -134,49 +144,51 @@ const HomePage: React.FC = () => {
             explore our apps
           </h2>
           <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '20px',
+            display: 'grid',
+            gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: isMobile ? '10px' : '20px',
+            width: '100%',
+            maxWidth: '1200px',
+            padding: '0 10px',
             marginTop: '40px',
           }}>
             {apps.map((app) => (
               <Link 
                 to={app.comingSoon ? '#' : app.path} 
                 key={app.name} 
-                style={{ textDecoration: 'none' }}
+                style={{ textDecoration: 'none', width: '100%' }}
                 onClick={(e) => app.comingSoon && e.preventDefault()}
               >
                 <div style={{
-                  width: '194px',
-                  height: '260px',
-                  flexShrink: 0,
-                  borderRadius: '24px',
+                  width: '100%',
+                  height: 'auto',
+                  minHeight: '140px',
+                  padding: '8px',
+                  borderRadius: '16px',
                   background: app.comingSoon ? '#F5F5F5' : '#FFF',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '10px',
+                  gap: '6px',
                   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   cursor: app.comingSoon ? 'not-allowed' : 'pointer',
                   transition: 'transform 0.2s',
                   opacity: app.comingSoon ? 0.7 : 1,
                 }}>
                   <div style={{
-                    width: '150px',
-                    height: '150px',
+                    width: isMobile ? '80px' : '120px',
+                    height: isMobile ? '80px' : '120px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    margin: '10px 0',
+                    margin: '4px 0',
                   }}>
                     {app.comingSoon ? (
                       <div style={{
                         color: '#848484',
                         fontFamily: 'Syne, sans-serif',
-                        fontSize: '18px',
+                        fontSize: '14px',
                         fontWeight: 600,
                         textAlign: 'center',
                       }}>
@@ -190,7 +202,7 @@ const HomePage: React.FC = () => {
                           width: '100%',
                           height: '100%',
                           objectFit: 'contain',
-                          padding: '12px',
+                          padding: '8px',
                         }}
                       />
                     )}
@@ -198,7 +210,7 @@ const HomePage: React.FC = () => {
                   <div style={{
                     color: '#000',
                     fontFamily: 'Syne, sans-serif',
-                    fontSize: '20px',
+                    fontSize: isMobile ? '14px' : '18px',
                     fontWeight: 700,
                     lineHeight: 'normal',
                   }}>
@@ -207,7 +219,7 @@ const HomePage: React.FC = () => {
                   <div style={{
                     color: '#848484',
                     fontFamily: 'Poppins, sans-serif',
-                    fontSize: '16px',
+                    fontSize: isMobile ? '12px' : '14px',
                     fontWeight: 400,
                     lineHeight: 'normal',
                   }}>

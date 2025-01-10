@@ -57,10 +57,10 @@ const TagSelector: React.FC = () => {
   };
 
   return (
-    <div className="p-[14px] rounded-2xl border border-input bg-background">
-      <div className="flex justify-center pb-3">
+    <div className="p-2 sm:p-[14px] rounded-2xl border border-input bg-background">
+      <div className="flex justify-center pb-2 sm:pb-3">
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-full max-w-[200px]">
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
           <SelectContent>
@@ -81,14 +81,14 @@ const TagSelector: React.FC = () => {
         type="multiple" 
         value={tags} 
         onValueChange={handleTagToggle} 
-        className="flex flex-wrap gap-2"
+        className="flex flex-wrap gap-1.5 sm:gap-2"
       >
         {visibleContentTypes.map((type) => (
           <ToggleGroupItem
             key={type.mimeType}
             value={type.mimeType}
             variant="outline"
-            className={`px-4 py-2 rounded-full transition-colors
+            className={`px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm rounded-full transition-colors
               ${tags.includes(type.mimeType)
                 ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                 : 'hover:bg-muted'}`}

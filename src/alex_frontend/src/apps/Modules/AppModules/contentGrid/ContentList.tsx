@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
-import { Info, Copy } from 'lucide-react';
+import { Copy } from 'lucide-react';
 import { setMintableStates, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import ContentGrid from "./ContentGrid";
 import Modal from './components/Modal';
@@ -57,6 +57,7 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
 
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
+  const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
 
   const [buttonType, setButtonType] = useState("Buy");
   const [modalType, setModalType] = useState<"sell" | "edit" | "remove" | "buy" | null>(null);
@@ -83,11 +84,14 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
 
   const handleMint = async (transactionId: string) => {
     try {
+      setMintingStates(prev => ({ ...prev, [transactionId]: true }));
       const message = await mint_nft(transactionId);
       toast.success(message);
     } catch (error) {
       console.error("Error minting NFT:", error);
       toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
+    } finally {
+      setMintingStates(prev => ({ ...prev, [transactionId]: false }));
     }
   };
 
@@ -236,6 +240,7 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
                 key={transaction.id}
                 onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
                 id={transaction.id}
+                owner={transaction.owner}
                 showStats={showStats[transaction.id]}
                 onToggleStats={(open) => {
                   setShowStats(prev => ({ ...prev, [transaction.id]: open }));
@@ -251,6 +256,7 @@ const ContentList: React.FC<ContentListProps> = ({ isEmporium }) => {
                   handleWithdraw(transaction.id);
                 } : undefined}
                 predictions={predictions[transaction.id]}
+                isMinting={mintingStates[transaction.id]}
               >
                 <div className="group relative w-full h-full">
                   <ContentRenderer
