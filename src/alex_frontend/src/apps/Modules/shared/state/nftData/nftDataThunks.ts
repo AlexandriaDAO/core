@@ -22,7 +22,7 @@ const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 // Add this interface for the batch function
 interface BatchFetchParams {
   tokenId: bigint;
-  collection: 'icrc7' | 'icrc7_scion';
+  collection: 'NFT' | 'SBT';
   principalId: string;
 }
 
@@ -34,11 +34,11 @@ const fetchNFTBatch = async (params: BatchFetchParams[]) => {
     const batch = params.slice(i, i + batchSize);
     const batchResults = await Promise.all(
       batch.map(async ({ tokenId, collection, principalId }) => {
-        if (collection === 'icrc7') {
+        if (collection === 'NFT') {
           return [
             tokenId.toString(),
             {
-              collection: 'icrc7',
+              collection: 'NFT',
               principal: principalId,
               arweaveId: natToArweaveId(tokenId)
             }
@@ -48,7 +48,7 @@ const fetchNFTBatch = async (params: BatchFetchParams[]) => {
           return [
             tokenId.toString(),
             {
-              collection: 'icrc7_scion',
+              collection: 'SBT',
               principal: principalId,
               arweaveId: natToArweaveId(ogId)
             }
@@ -65,7 +65,7 @@ const fetchNFTBatch = async (params: BatchFetchParams[]) => {
 // Export the interface so it can be imported by other files
 export interface FetchTokensParams {
   principalId: string;
-  collection: 'icrc7' | 'icrc7_scion';
+  collection: 'NFT' | 'SBT';
   range?: { start: number; end: number };
 }
 
@@ -90,9 +90,9 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       const countLimit = [BigInt(10000)] as [bigint];
 
       let allNftIds: bigint[] = [];
-      if (collection === 'icrc7') {
+      if (collection === 'NFT') {
         allNftIds = await icrc7.icrc7_tokens_of(params, [], countLimit);
-      } else if (collection === 'icrc7_scion') {
+      } else if (collection === 'SBT') {
         allNftIds = await icrc7_scion.icrc7_tokens_of(params, [], countLimit);
       }
 

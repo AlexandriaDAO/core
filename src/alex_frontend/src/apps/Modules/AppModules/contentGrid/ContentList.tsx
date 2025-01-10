@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { RootState, AppDispatch } from "@/store";
@@ -25,6 +25,11 @@ import { Separator } from "@/lib/components/separator";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
+
+// Map frontend collection names to backend collection names
+const mapCollectionToBackend = (collection: 'NFT' | 'SBT'): 'icrc7' | 'icrc7_scion' => {
+  return collection === 'NFT' ? 'icrc7' : 'icrc7_scion';
+};
 
 const truncateMiddle = (str: string, startChars: number = 4, endChars: number = 4) => {
   if (str.length <= startChars + endChars + 3) return str;
@@ -74,7 +79,7 @@ const ContentList = () => {
         throw new Error("Could not find NFT data for this content");
       }
 
-      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, nftData.collection);
+      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, mapCollectionToBackend(nftData.collection));
       if (lbryBlock === null && alexBlock === null) {
         toast.info("No funds were available to withdraw");
       } else {

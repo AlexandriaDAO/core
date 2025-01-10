@@ -1,6 +1,6 @@
 export interface NFTData {
   principal: string;
-  collection: 'icrc7' | 'icrc7_scion';
+  collection: 'NFT' | 'SBT';
   arweaveId: string;
   balances?: {
     alex: string;

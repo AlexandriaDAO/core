@@ -10,7 +10,7 @@ export default function CollectionSelector() {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleCollectionChange = (value: string) => {
-    if (value === 'icrc7' || value === 'icrc7_scion') {
+    if (value === 'NFT' || value === 'SBT') {
       dispatch(setCollection(value));
     }
   };
@@ -25,18 +25,18 @@ export default function CollectionSelector() {
           className="flex gap-2"
         >
           <ToggleGroupItem
-            value="icrc7"
+            value="NFT"
             className={`px-4 py-2 text-sm font-medium rounded-[30px] transition-colors
-              ${collection === 'icrc7'
+              ${collection === 'NFT'
                 ? 'bg-[#2D55FF] text-white hover:bg-[#2D55FF]/90'
                 : 'bg-[#F3F3F3] text-black hover:bg-[#E5E5E5]'}`}
           >
             NFTs
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="icrc7_scion"
+            value="SBT"
             className={`px-4 py-2 text-sm font-medium rounded-[30px] transition-colors
-              ${collection === 'icrc7_scion'
+              ${collection === 'SBT'
                 ? 'bg-[#2D55FF] text-white hover:bg-[#2D55FF]/90'
                 : 'bg-[#F3F3F3] text-black hover:bg-[#E5E5E5]'}`}
           >

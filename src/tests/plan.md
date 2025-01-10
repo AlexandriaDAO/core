@@ -6,12 +6,10 @@ The Plan:
 
 - Color code the tags.
 - Alexandria query. (Query token amounts, then only the amount on the page (rather than all at once))
-- Delay in mint button on alexandrian is weird.
 
 Next Small Stuff:
 
 - Alexandrian search needs to use the state of the current page number.
-- Play button on videos by default. (fix broken videos)
 - There's a bug where ebook searching gets the search button stuck in the loading state.
 - Remove duplicates based on file size.
 - More advanced searching with tags and metadata.

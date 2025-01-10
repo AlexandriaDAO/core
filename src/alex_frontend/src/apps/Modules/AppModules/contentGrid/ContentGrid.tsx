@@ -100,7 +100,11 @@ function NftDataFooter({ id }: NftDataFooterProps) {
         </Badge>
       )}
       {nftData?.collection && nftData.collection !== 'No Collection' && (
-        <Badge variant="default" className="text-xs">
+        <Badge variant="default" className={`text-xs ${
+          nftData.collection === 'NFT' 
+            ? 'bg-[#FFD700] text-black hover:bg-[#FFD700]/90' 
+            : 'bg-[#E6E6FA] text-black hover:bg-[#E6E6FA]/90'
+        }`}>
           {nftData.collection}
         </Badge>
       )}
