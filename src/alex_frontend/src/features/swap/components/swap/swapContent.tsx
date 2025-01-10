@@ -15,6 +15,7 @@ import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import SuccessModal from "../successModal";
 import LoadingModal from "../loadingModal";
 import ErrorModal from "../errorModal";
+import { Entry } from "@/layouts/parts/Header";
 
 const SwapContent: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -68,6 +69,8 @@ const SwapContent: React.FC = () => {
       dispatch(flagHandler());
       setLoadingModalV(false);
       setSucessModalV(true);
+      setAmount("");
+      setTentativeLBRY(0);
     }
   }, [user, swap.swapSuccess]);
   useEffect(() => {
@@ -175,7 +178,7 @@ const SwapContent: React.FC = () => {
               <div
                 className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn "
               >
-                <Auth />
+                <Entry />
               </div>
             )}
             <div className="terms-condition-wrapper flex tems-baseline">
@@ -187,38 +190,38 @@ const SwapContent: React.FC = () => {
         <div className="border border-gray-400 text-white py-5 px-5 rounded-2xl ms-3">
           <ul className="ps-0">
             <li className="flex justify-between mb-5">
-              <strong className="text-lg font-semibold me-1 text-radiocolor">
+              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor">
                 Network Fees
               </strong>
-              <span className="text-lg font-semibold text-radiocolor">
+              <span className="lg:text-lg md:text-base sm:text-sm font-semibold text-radiocolor">
                 {icp_fee} ICP
               </span>
             </li>
             <li className="flex justify-between mb-5">
-              <strong className="text-lg font-semibold me-1 text-radiocolor">
+              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor">
                 Send
               </strong>
-              <span className="text-lg font-semibold text-radiocolor break-all">
+              <span className="lg:text-lg md:text-base sm:text-sm font-semibold text-radiocolor break-all">
                 {amount} ICP
               </span>
             </li>
             <li className="flex justify-between mb-5">
-              <strong className="text-lg font-semibold me-1 text-radiocolor">
+              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor">
                 Receive
               </strong>
-              <span className="text-lg font-semibold text-radiocolor break-all">
+              <span className="lg:text-lg md:text-base sm:text-sm font-semibold text-radiocolor break-all">
                 {tentativeLBRY.toFixed(4)} LBRY
               </span>
             </li>
             <li className="flex justify-between mb-5">
-              <strong className="text-lg font-semibold me-1 text-radiocolor">
+              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor">
                 For each ICP you swap, you'll receive             <span className="text-[#FF9900]">{tentativeLBRY}</span> LBRY tokens.
 
               </strong>
 
             </li>
             <li>
-              <strong className="text-lg font-semibold me-1 text-radiocolor">
+              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor">
                 Please review the details carefully, as swaps are irreversible and cannot be undone once confirmed.
               </strong>
             </li>

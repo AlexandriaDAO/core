@@ -153,7 +153,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
-            <div className="bg-white rounded-lg sm:p-10 xs:p-4 max-w-lg w-full sm:w-full xs:w-11/12 relative">
+            <div className="bg-white rounded-lg sm:p-10 xs:p-4 max-w-lg w-full sm:w-full xs:w-11/12 relative flex flex-col">
                 <Button
                     onClick={onClose}
                     className="absolute top-1 right-1 text-gray-500 hover:text-white z-[1200]"
@@ -162,7 +162,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
                 </Button>
 
                 {renderModalContent()}
-                <div className="h-96 w-auto m-auto">
+                <div className="flex-1 h-80 w-auto m-auto overflow-hidden">
                     <ContentRenderer
                         transaction={modalData.transaction}
                         content={contentData[modalData.arwaveId]}
@@ -178,7 +178,6 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
                     />
                 </div>
                 <div className="mt-4 flex justify-between mb-4">
-                
                     <Button
                         onClick={onClose}
                         className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl sm:me-5 xs:mb-2 hover:bg-white hover:text-[#353535]"
@@ -192,7 +191,9 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
                         Confirm
                     </Button>
                 </div>
-                {MARKETPLACE_LBRY_FEE} LBRY fee will be charged from spending wallet
+                <div className="text-center text-sm text-gray-500">
+                    {MARKETPLACE_LBRY_FEE} LBRY fee will be charged from spending wallet
+                </div>
             </div>
         </div>
     );

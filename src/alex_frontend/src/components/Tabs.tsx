@@ -9,12 +9,15 @@ export default function Tabs() {
         transition-all duration-100 
         cursor-pointer 
         font-syne 
-        text-[20px] 
+        md:text-[20px] 
         font-semibold 
         leading-normal 
         tracking-normal 
         flex items-center
         text-[#FFF]
+        py-2
+        sm:text-[15px] 
+
     `;
 
     return (
@@ -25,12 +28,12 @@ export default function Tabs() {
             >
                 APPS
             </button>
-            <button
+            {/* <button
                 onClick={() => navigate('/manager')}
                 className={`${baseStyles} ${location.pathname === '/manager' ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
             >
                 LBRY
-            </button>
+            </button> */}
             <button
                 onClick={() => navigate('/swap')}
                 className={`${baseStyles} ${location.pathname === '/swap' ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { setPredictionResults } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
@@ -10,6 +10,7 @@ import ContentFetcher from './ContentFetcher';
 import { ContentValidatorProps } from '../types';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 import { contentCache } from '@/apps/Modules/LibModules/contentDisplay/services/contentCacheService';
+import { debounce } from 'lodash';
 
 const ContentValidator: React.FC<ContentValidatorProps> = ({
   transactionId,
@@ -33,9 +34,11 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
         const data = await getNftData(transactionId);
         setNftData(data);
         
-        if (data?.principal && (data.collection === 'icrc7_scion' || data.collection === 'icrc7')) {
+        if (data?.principal) {
           const isAuthenticated = await checkAuthentication();
           updateMintableState(isAuthenticated, data.principal);
+          setIsLoading(false);
+          return;
         }
       } catch (error) {
         console.error('Error fetching NFT data:', error);
@@ -52,16 +55,44 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
     }));
   };
 
+  const debouncedValidation = useCallback(
+    debounce(async (element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => {
+      if (isLoading) return;
+      
+      try {
+        if (nftData?.principal) {
+          return;
+        }
+
+        const elementToValidate = (!contentType.startsWith('video/') && thumbnailUrl) 
+          ? await createImageFromThumbnail(thumbnailUrl) 
+          : element;
+        
+        const predictionResults = await validateContent(elementToValidate, contentType);
+        if (predictionResults) {
+          dispatch(setPredictionResults({ 
+            id: transactionId, 
+            predictions: predictionResults 
+          }));
+
+          const isAuthenticated = await checkAuthentication();
+          updateMintableState(!predictionResults.isPorn && isAuthenticated, null);
+        }
+      } catch (error) {
+        console.error('Error in validation:', error);
+        updateMintableState(false, null);
+      }
+    }, 300),
+    [contentType, isLoading, transactionId, validateContent, checkAuthentication, nftData]
+  );
+
   const handleValidateContent = async (element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => {
-    if (isLoading) return;
-    
     if (thumbnailUrl && contentType.startsWith('video/')) {
       contentCache.updateThumbnail(transactionId, thumbnailUrl);
     }
 
-    const isAuthenticated = await checkAuthentication();
-
-    if (nftData?.principal && (nftData.collection === 'icrc7_scion' || nftData.collection === 'icrc7')) {
+    if (nftData?.principal) {
+      const isAuthenticated = await checkAuthentication();
       updateMintableState(isAuthenticated, nftData.principal);
       return;
     }
@@ -71,26 +102,7 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
       return;
     }
 
-    try {
-      const elementToValidate = (!contentType.startsWith('video/') && thumbnailUrl) 
-        ? await createImageFromThumbnail(thumbnailUrl) 
-        : element;
-      
-      const predictionResults = await validateContent(elementToValidate, contentType);
-      if (predictionResults) {
-        dispatch(setPredictionResults({ 
-          id: transactionId, 
-          predictions: predictionResults 
-        }));
-
-        updateMintableState(!predictionResults.isPorn && isAuthenticated, null);
-      } else {
-        updateMintableState(false, null);
-      }
-    } catch (error) {
-      console.error('Error validating content:', error);
-      updateMintableState(false, null);
-    }
+    await debouncedValidation(element, thumbnailUrl);
   };
 
   const handleError = () => {

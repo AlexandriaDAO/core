@@ -27,7 +27,7 @@ const Unstake: React.FC<UnstakeProps> = ({ setLoadingModalV,setActionType}) => {
     }, [swap])
     return (
         <button
-            className="text-xl font-semibold text-multycolor  border-2 border-[#FF9900] py-2 px-5 me-3 rounded-full"
+            className="lg:text-xl md:text-lg sm:text-base xs:text-xs font-semibold text-multycolor  border-2 border-[#FF9900] py-2 px-5 me-3 rounded-full"
             onClick={(e) => handleUnstake(e)}
         >Unstake
         </button>

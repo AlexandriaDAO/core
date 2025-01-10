@@ -18,34 +18,24 @@ export const performSearch = createAsyncThunk(
     dispatch(setIsLoading(true));
     console.log('Perform Search - Starting with params:', {
       searchState,
-      isContinuation
+      isContinuation,
+      timestamp: searchState.timestamp,
+      timestampDate: searchState.timestamp ? new Date(searchState.timestamp).toISOString() : null
     });
 
     try {
-      let maxTimestamp: number | undefined;
-
-      if (searchState.maxTimestamp) {
-        maxTimestamp = searchState.maxTimestamp;
-      } else if (searchState.filterDate) {
-        const userDateTime = new Date(`${searchState.filterDate}T${searchState.filterTime || "00:00"}:00Z`);
-        maxTimestamp = Math.floor(userDateTime.getTime() / 1000);
-      }
-
-      console.log('Perform Search - API call params:', {
-        contentTypes: searchState.tags,
-        amount: searchState.amount,
-        maxTimestamp,
-        ownerFilter: searchState.ownerFilter || undefined
-      });
-
       const fetchedTransactions = await fetchTransactionsApi({
         contentTypes: searchState.tags,
         amount: searchState.amount,
-        maxTimestamp,
+        timestamp: searchState.timestamp,
         ownerFilter: searchState.ownerFilter || undefined,
       });
 
-      console.log('Perform Search - Fetched transactions count:', fetchedTransactions.length);
+      console.log('Perform Search - Fetched transactions:', {
+        count: fetchedTransactions.length,
+        firstTimestamp: fetchedTransactions[0]?.block?.timestamp,
+        lastTimestamp: fetchedTransactions[fetchedTransactions.length - 1]?.block?.timestamp
+      });
 
       // Get existing transactions if continuing a search
       const state = getState() as RootState;

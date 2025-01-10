@@ -64,11 +64,17 @@
 
     "@meilisearch/instant-meilisearch": "^0.20.0",
 
+    "@radix-ui/react-accordion": "^1.2.2",
+
     "@radix-ui/react-alert-dialog": "^1.1.2",
+
+    "@radix-ui/react-aspect-ratio": "^1.1.1",
 
     "@radix-ui/react-checkbox": "^1.1.2",
 
-    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-collapsible": "^1.1.2",
+
+    "@radix-ui/react-dialog": "^1.1.4",
 
     "@radix-ui/react-dropdown-menu": "^2.1.2",
 
@@ -76,7 +82,11 @@
 
     "@radix-ui/react-popover": "^1.1.2",
 
+    "@radix-ui/react-progress": "^1.1.1",
+
     "@radix-ui/react-scroll-area": "^1.2.1",
+
+    "@radix-ui/react-select": "^2.1.4",
 
     "@radix-ui/react-separator": "^1.1.1",
 
@@ -93,6 +103,8 @@
     "@radix-ui/react-toggle": "^1.1.0",
 
     "@radix-ui/react-toggle-group": "^1.1.0",
+
+    "@radix-ui/react-tooltip": "^1.1.6",
 
     "@reduxjs/toolkit": "^2.5.0",
 
@@ -118,10 +130,11 @@
 
     "browserify-zlib": "^0.2.0",
 
-
     "class-variance-authority": "^0.7.0",
 
     "clsx": "^2.1.1",
+
+    "cmdk": "^1.0.0",
 
     "date-fns": "^3.6.0",
 
@@ -155,6 +168,10 @@
 
     "instantsearch.js": "^4.74.0",
 
+    "lodash": "^4.17.21",
+
+    "lru-cache": "^11.0.2",
+
     "lucide-react": "^0.452.0",
 
     "meilisearch": "^0.42.0",
@@ -176,8 +193,6 @@
     "postcss": "^8.4.45",
 
     "react": "^18.3.1",
-
-  
 
     "react-circle-flags": "^0.0.20",
 
@@ -202,6 +217,8 @@
     "react-responsive-masonry": "^2.3.0",
 
     "react-router": "^7.0.1",
+
+    "react-router-dom": "^7.1.1",
 
     "react-syntax-highlighter": "^15.5.0",
 
@@ -240,6 +257,8 @@
     "@types/antd": "^1.0.0",
 
     "@types/html-to-text": "^9.0.4",
+
+    "@types/lodash": "^4.17.14",
 
     "@types/pako": "^2.0.3",
 

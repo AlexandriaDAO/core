@@ -1,41 +1,40 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { NFTData, NFTBalances } from '../../types/nft';
 
-export interface NftData {
-  collection: 'icrc7' | 'icrc7_scion';
-  principal: string;
-  arweaveId: string;
-  alex?: string;
-  lbry?: string;
-}
-
-interface NftDataState {
-  nfts: Record<string, NftData>;
-  arweaveToNftId: Record<string, string>;
+interface NFTDataState {
+  nfts: Record<string, NFTData>;
   loading: boolean;
   error: string | null;
   totalNfts: number;
+  cachedPages: Record<string, boolean>;
+  arweaveToNftId: Record<string, string>;
 }
 
-const initialState: NftDataState = {
+const initialState: NFTDataState = {
   nfts: {},
-  arweaveToNftId: {},
   loading: false,
   error: null,
-  totalNfts: 0
+  totalNfts: 0,
+  cachedPages: {},
+  arweaveToNftId: {}
 };
 
 const nftDataSlice = createSlice({
   name: 'nftData',
   initialState,
   reducers: {
-    setNfts: (state, action: PayloadAction<[string, NftData][]>) => {
-      // Clear existing NFTs before setting new ones for pagination
-      state.nfts = {};
-      state.arweaveToNftId = {};
-      action.payload.forEach(([id, data]) => {
-        state.nfts[id] = data;
-        state.arweaveToNftId[data.arweaveId] = id;
+    setNFTs: (state, action: PayloadAction<Record<string, NFTData>>) => {
+      state.nfts = { ...state.nfts, ...action.payload };
+      // Update arweaveToNftId mapping
+      Object.entries(action.payload).forEach(([tokenId, nft]) => {
+        state.arweaveToNftId[nft.arweaveId] = tokenId;
       });
+    },
+    updateNftBalances: (state, action: PayloadAction<NFTBalances>) => {
+      const { tokenId, alex, lbry } = action.payload;
+      if (state.nfts[tokenId]) {
+        state.nfts[tokenId].balances = { alex, lbry };
+      }
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
@@ -46,33 +45,38 @@ const nftDataSlice = createSlice({
     setTotalNfts: (state, action: PayloadAction<number>) => {
       state.totalNfts = action.payload;
     },
-    updateNftBalances: (state, action: PayloadAction<{ tokenId: string; alex: string; lbry: string }>) => {
-      const { tokenId, alex, lbry } = action.payload;
-      if (state.nfts[tokenId]) {
-        state.nfts[tokenId] = {
-          ...state.nfts[tokenId],
-          alex,
-          lbry
-        };
-      }
+    cachePage: (state, action: PayloadAction<string>) => {
+      state.cachedPages[action.payload] = true;
+    },
+    clearCache: (state) => {
+      state.cachedPages = {};
     },
     clearNfts: (state) => {
       state.nfts = {};
       state.arweaveToNftId = {};
-      state.loading = false;
-      state.error = null;
+      state.cachedPages = {};
       state.totalNfts = 0;
+    },
+    clearNFTs: (state) => {
+      state.nfts = {};
     }
+  },
+  extraReducers: (builder) => {
+    // ... existing extra reducers
   }
 });
 
 export const { 
-  setNfts, 
+  setNFTs, 
+  updateNftBalances,
   setLoading, 
   setError, 
   setTotalNfts, 
-  updateNftBalances,
-  clearNfts 
+  cachePage,
+  clearCache,
+  clearNfts,
+  clearNFTs
 } = nftDataSlice.actions;
 
+export type { NFTData };
 export default nftDataSlice.reducer;

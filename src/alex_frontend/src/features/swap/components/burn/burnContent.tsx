@@ -7,7 +7,6 @@ import { _SERVICE as _SERVICELBRY } from '../../../../../../declarations/LBRY/LB
 import { Link } from "react-router";
 import { flagHandler } from "../../swapSlice";
 import burnLbry from "../../thunks/burnLBRY";
-import Auth from "@/features/auth";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import { LoaderCircle } from "lucide-react";
 import getCanisterBal from "@/features/icp-ledger/thunks/getCanisterBal";
@@ -17,6 +16,7 @@ import SuccessModal from "../successModal";
 import ErrorModal from "../errorModal";
 import BurnInfo from "./burnInfo";
 import calculateMaxBurnAllowed from "./calculateMaxBurnAllowed";
+import { Entry } from "@/layouts/parts/Header";
 
 const BurnContent = () => {
     const dispatch = useAppDispatch();
@@ -101,8 +101,8 @@ const BurnContent = () => {
                     <div className='me-0 2xl:me-3 xl:me-3 lg:me-3 md:me-3 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-3 md:mb-3 sm:mb-3'>
                         <div className='bg-white border py-5 px-5 rounded-borderbox mb-7 '>
                             <div className='flex justify-between mb-3'>
-                                <h4 className='text-2xl font-medium text-multygray'>Amount</h4>
-                                <input className='text-2xl font-medium text-darkgray text-right bg-transparent w-full placeholder-darkgray  focus:outline-none focus:border-transparent' type='integer' value={amountLBRY} defaultValue={0} min={0} onChange={(e) => {
+                                <h4 className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-multygray'>Amount</h4>
+                                <input className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-darkgray text-right bg-transparent w-full placeholder-darkgray  focus:outline-none focus:border-transparent' type='integer' value={amountLBRY} defaultValue={0} min={0} onChange={(e) => {
                                     handleAmountLBRYChange(e)
                                 }} />
                             </div>
@@ -122,10 +122,10 @@ const BurnContent = () => {
                                         <img className='w-6 h-6' src="images/8-logo.png" alt="apple" />
                                     </div>
                                     <div>
-                                        <h4 className='text-2xl font-medium'>ICP</h4>
+                                        <h4 className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium'>ICP</h4>
                                     </div>
                                 </div>
-                                <h3 className={`text-right text-2xl font-medium ${amountLBRY > maxBurnAllowed ? 'text-red-500' : ''}`}>
+                                <h3 className={`text-right  lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium ${amountLBRY > maxBurnAllowed ? 'text-red-500' : ''}`}>
                                     {tentativeICP.toFixed(4)}
                                 </h3>
                             </div>
@@ -137,10 +137,10 @@ const BurnContent = () => {
                                         <img className='w-6 h-6' src="images/8-logo.png" alt="apple" />
                                     </div>
                                     <div>
-                                        <h4 className='text-2xl font-medium'>ALEX</h4>
+                                        <h4 className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium'>ALEX</h4>
                                     </div>
                                 </div>
-                                <h3 className={`text-right text-2xl font-medium ${tentativeALEX > 50 ? 'text-red-500' : ''}`}>
+                                <h3 className={`text-right  lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium ${tentativeALEX > 50 ? 'text-red-500' : ''}`}>
                                     {tentativeALEX.toFixed(4)}
                                 </h3>
                             </div>
@@ -180,11 +180,11 @@ const BurnContent = () => {
                         </button> : <div
                             className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn mb-4"
                         >
-                            <Auth />
+                            <Entry />
                         </div>}
                         <div className="terms-condition-wrapper flex tems-baseline">
                             <span className="text-[#FF37374D] mr-2 text-xl font-semibold">*</span>
-                            <p className="text-lg font-semibold pr-5 text-[#525252] w-9/12">If the transaction doesn’t complete as expected, please check the redeem page to locate your tokens.</p>
+                            <p className="lg:text-lg md:text-base sm:text-sm font-semibold md:pr-5 xs:pr-0 text-[#525252] md:w-9/12 xs:w-full">If the transaction doesn’t complete as expected, please check the redeem page to locate your tokens.</p>
                         </div>
                     </div>
                     <BurnInfo maxBurnAllowed={maxBurnAllowed} />

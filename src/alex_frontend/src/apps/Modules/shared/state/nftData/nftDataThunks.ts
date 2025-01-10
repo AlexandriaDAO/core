@@ -1,5 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setNfts, setLoading, setError, NftData, updateNftBalances, setTotalNfts } from './nftDataSlice';
+import { 
+  setNFTs as setNfts,
+  updateNftBalances,
+  setLoading,
+  setError,
+  setTotalNfts
+} from './nftDataSlice';
 import { RootState } from '@/store';
 import { icrc7 } from '../../../../../../../declarations/icrc7';
 import { icrc7_scion } from '../../../../../../../declarations/icrc7_scion';
@@ -8,26 +14,75 @@ import { ALEX } from '../../../../../../../declarations/ALEX';
 import { LBRY } from '../../../../../../../declarations/LBRY';
 import { Principal } from '@dfinity/principal';
 import { natToArweaveId } from '@/utils/id_convert';
+import type { NFTData } from '../../types/nft';
+import { setNoResults } from '../librarySearch/librarySlice';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
-export const fetchTokensForPrincipal = createAsyncThunk(
+// Add this interface for the batch function
+interface BatchFetchParams {
+  tokenId: bigint;
+  collection: 'NFT' | 'SBT';
+  principalId: string;
+}
+
+const fetchNFTBatch = async (params: BatchFetchParams[]) => {
+  const batchSize = 10;
+  const results: [string, NFTData][] = [];
+  
+  for (let i = 0; i < params.length; i += batchSize) {
+    const batch = params.slice(i, i + batchSize);
+    const batchResults = await Promise.all(
+      batch.map(async ({ tokenId, collection, principalId }) => {
+        if (collection === 'NFT') {
+          return [
+            tokenId.toString(),
+            {
+              collection: 'NFT',
+              principal: principalId,
+              arweaveId: natToArweaveId(tokenId)
+            }
+          ] as [string, NFTData];
+        } else {
+          const ogId = await nft_manager.scion_to_og_id(tokenId);
+          return [
+            tokenId.toString(),
+            {
+              collection: 'SBT',
+              principal: principalId,
+              arweaveId: natToArweaveId(ogId)
+            }
+          ] as [string, NFTData];
+        }
+      })
+    );
+    results.push(...batchResults);
+  }
+  
+  return results;
+};
+
+// Export the interface so it can be imported by other files
+export interface FetchTokensParams {
+  principalId: string;
+  collection: 'NFT' | 'SBT';
+  range?: { start: number; end: number };
+}
+
+export const fetchTokensForPrincipal = createAsyncThunk<
+  Record<string, NFTData>,
+  FetchTokensParams,
+  { state: RootState }
+>(
   'nftData/fetchTokensForPrincipal',
   async (
-    { 
-      principalId, 
-      collection, 
-      range = { start: 0, end: 20 }
-    }: { 
-      principalId: string; 
-      collection: 'icrc7' | 'icrc7_scion';
-      range?: { start: number; end: number; }
-    },
-    { dispatch, getState }
+    { principalId, collection, range = { start: 0, end: 20 } },
+    { dispatch }
   ) => {
     try {
       dispatch(setLoading(true));
       dispatch(setError(null));
+      dispatch(setNoResults(false));
       
       const principal = Principal.fromText(principalId);
       const params = { owner: principal, subaccount: [] as [] };
@@ -35,10 +90,15 @@ export const fetchTokensForPrincipal = createAsyncThunk(
       const countLimit = [BigInt(10000)] as [bigint];
 
       let allNftIds: bigint[] = [];
-      if (collection === 'icrc7') {
+      if (collection === 'NFT') {
         allNftIds = await icrc7.icrc7_tokens_of(params, [], countLimit);
-      } else if (collection === 'icrc7_scion') {
+      } else if (collection === 'SBT') {
         allNftIds = await icrc7_scion.icrc7_tokens_of(params, [], countLimit);
+      }
+
+      // Set no results state if the search returned empty
+      if (allNftIds.length === 0) {
+        dispatch(setNoResults(true));
       }
 
       // Store total count
@@ -49,34 +109,19 @@ export const fetchTokensForPrincipal = createAsyncThunk(
 
       // Get the slice for the current page
       const pageNftIds = allNftIds.slice(range.start, range.end);
-      let nftEntries: [string, NftData][] = [];
-
-      if (collection === 'icrc7') {
-        nftEntries = pageNftIds.map(tokenId => [
-          tokenId.toString(),
-          {
-            collection: 'icrc7',
-            principal: principalId,
-            arweaveId: natToArweaveId(tokenId)
-          }
-        ]);
-      } else if (collection === 'icrc7_scion') {
-        nftEntries = await Promise.all(
-          pageNftIds.map(async (tokenId) => {
-            const ogId = await nft_manager.scion_to_og_id(tokenId);
-            return [
-              tokenId.toString(),
-              {
-                collection: 'icrc7_scion',
-                principal: principalId,
-                arweaveId: natToArweaveId(ogId)
-              }
-            ];
-          })
-        );
-      }
       
-      dispatch(setNfts(nftEntries));
+      // Prepare batch params
+      const batchParams = pageNftIds.map(tokenId => ({
+        tokenId,
+        collection,
+        principalId
+      }));
+
+      // Use batched fetching
+      const nftEntries = await fetchNFTBatch(batchParams);
+      
+      const nftRecord = Object.fromEntries(nftEntries);
+      dispatch(setNfts(nftRecord));
 
       // Fetch balances for the current page
       const convertE8sToToken = (e8sAmount: bigint): string => {
@@ -104,7 +149,7 @@ export const fetchTokensForPrincipal = createAsyncThunk(
         })
       );
       
-      return nftEntries;
+      return nftRecord;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       dispatch(setError(errorMessage));

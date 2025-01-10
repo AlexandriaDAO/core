@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Transaction, ContentListProps } from "@/apps/Modules/shared/types/queries";
+import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
-import { Info, Copy } from 'lucide-react';
+import { Copy } from 'lucide-react';
 import { setMintableStates, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import ContentGrid from "./ContentGrid";
 import Modal from './components/Modal';
@@ -13,7 +13,7 @@ import { useSortedTransactions } from '@/apps/Modules/shared/state/content/conte
 import { Button } from "@/lib/components/button";
 import { Card } from "@/lib/components/card";
 import { withdraw_nft } from "@/features/nft/withdraw";
-import type { NftData } from "@/apps/Modules/shared/state/nftData/nftDataSlice";
+import { TooltipProvider } from "@/lib/components/tooltip";
 import {
   CardContent,
   CardHeader,
@@ -25,6 +25,11 @@ import { Separator } from "@/lib/components/separator";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
+
+// Map frontend collection names to backend collection names
+const mapCollectionToBackend = (collection: 'NFT' | 'SBT'): 'icrc7' | 'icrc7_scion' => {
+  return collection === 'NFT' ? 'icrc7' : 'icrc7_scion';
+};
 
 const truncateMiddle = (str: string, startChars: number = 4, endChars: number = 4) => {
   if (str.length <= startChars + endChars + 3) return str;
@@ -42,14 +47,18 @@ const ContentList = () => {
   
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
+  const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
 
   const handleMint = async (transactionId: string) => {
     try {
+      setMintingStates(prev => ({ ...prev, [transactionId]: true }));
       const message = await mint_nft(transactionId);
       toast.success(message);
     } catch (error) {
       console.error("Error minting NFT:", error);
       toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
+    } finally {
+      setMintingStates(prev => ({ ...prev, [transactionId]: false }));
     }
   };
 
@@ -70,7 +79,7 @@ const ContentList = () => {
         throw new Error("Could not find NFT data for this content");
       }
 
-      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, nftData.collection);
+      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, mapCollectionToBackend(nftData.collection));
       if (lbryBlock === null && alexBlock === null) {
         toast.info("No funds were available to withdraw");
       } else {
@@ -108,7 +117,7 @@ const ContentList = () => {
                      e.stopPropagation();
                      copyToClipboard(transaction.id, 'ID');
                    }}>
-                <span className="text-gray-400">ID</span>
+                <span className="text-gray-400">Transaction ID</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.id}</span>
                   <Copy className="w-3 h-3 opacity-0 group-hover/item:opacity-100" />
@@ -172,121 +181,124 @@ const ContentList = () => {
   ), [copyToClipboard]);
 
   return (
-    <>
-      <ContentGrid>
-        {transactions.map((transaction) => {
-          const content = contentData[transaction.id];
-          const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-          const mintableStateItem = mintableState[transaction.id];
-          const isMintable = mintableStateItem?.mintable;
-          
-          const nftId = arweaveToNftId[transaction.id];
-          const nftData = nftId ? nfts[nftId] : undefined;
-          const isOwned = user && nftData?.principal === user.principal;
-          
-          const hasPredictions = !!predictions[transaction.id];
-          const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
+    <TooltipProvider>
+      <>
+        <ContentGrid>
+          {transactions.map((transaction) => {
+            const content = contentData[transaction.id];
+            const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+            const mintableStateItem = mintableState[transaction.id];
+            const isMintable = mintableStateItem?.mintable;
+            
+            const nftId = arweaveToNftId[transaction.id];
+            const nftData = nftId ? nfts[nftId] : undefined;
+            const isOwned = user && nftData?.principal === user.principal;
+            
+            const hasPredictions = !!predictions[transaction.id];
+            const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 
-          const hasWithdrawableBalance = isOwned && nftData && (
-            parseFloat(nftData.alex || '0') > 0 || 
-            parseFloat(nftData.lbry || '0') > 0
-          );
+            const hasWithdrawableBalance = isOwned && nftData && (
+              parseFloat(nftData.balances?.alex || '0') > 0 || 
+              parseFloat(nftData.balances?.lbry || '0') > 0
+            );
 
-          return (
-            <ContentGrid.Item
-              key={transaction.id}
-              onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
-              id={transaction.id}
-              showStats={showStats[transaction.id]}
-              onToggleStats={(e) => {
-                e.stopPropagation();
-                setShowStats(prev => ({ ...prev, [transaction.id]: !prev[transaction.id] }));
-              }}
-              isMintable={isMintable}
-              isOwned={isOwned || false}
-              onMint={(e) => {
-                e.stopPropagation();
-                handleMint(transaction.id);
-              }}
-              onWithdraw={hasWithdrawableBalance ? (e) => {
-                e.stopPropagation();
-                handleWithdraw(transaction.id);
-              } : undefined}
-              predictions={predictions[transaction.id]}
-            >
-              <div className="group relative w-full h-full">
-                <ContentRenderer
-                  transaction={transaction}
-                  content={content}
-                  contentUrls={contentData[transaction.id]?.urls || {
-                    thumbnailUrl: null,
-                    coverUrl: null,
-                    fullUrl: content?.url || `https://arweave.net/${transaction.id}`
-                  }}
-                  showStats={showStats[transaction.id]}
-                  mintableState={mintableState}
-                  handleRenderError={handleRenderError}
-                />
-                {shouldShowBlur && (
-                  <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
-                      Content Filtered
-                    </div>
-                  </div>
-                )}
-                {renderDetails(transaction)}
-                {isOwned && (
-                  <div className="absolute top-0 right-0 bg-green-500 text-white px-2 py-1 text-xs z-30">
-                    Owned
-                  </div>
-                )}
-                {isOwned && hasWithdrawableBalance && (
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleWithdraw(transaction.id);
+            return (
+              <ContentGrid.Item
+                key={transaction.id}
+                onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
+                id={transaction.id}
+                owner={transaction.owner}
+                showStats={showStats[transaction.id]}
+                onToggleStats={(open) => {
+                  setShowStats(prev => ({ ...prev, [transaction.id]: open }));
+                }}
+                isMintable={isMintable}
+                isOwned={isOwned || false}
+                onMint={(e) => {
+                  e.stopPropagation();
+                  handleMint(transaction.id);
+                }}
+                onWithdraw={hasWithdrawableBalance ? (e) => {
+                  e.stopPropagation();
+                  handleWithdraw(transaction.id);
+                } : undefined}
+                predictions={predictions[transaction.id]}
+                isMinting={mintingStates[transaction.id]}
+              >
+                <div className="group relative w-full h-full">
+                  <ContentRenderer
+                    transaction={transaction}
+                    content={content}
+                    contentUrls={contentData[transaction.id]?.urls || {
+                      thumbnailUrl: null,
+                      coverUrl: null,
+                      fullUrl: content?.url || `https://arweave.net/${transaction.id}`
                     }}
-                    className="absolute bottom-2 right-2 z-30"
-                  >
-                    Withdraw
-                  </Button>
-                )}
-              </div>
-            </ContentGrid.Item>
-          );
-        })}
-      </ContentGrid>
-
-      <Modal
-        isOpen={!!selectedContent}
-        onClose={() => setSelectedContent(null)}
-      >
-        {selectedContent && (
-          <div className="w-full h-full">
-            <ContentRenderer
-              transaction={transactions.find(t => t.id === selectedContent.id)!}
-              content={contentData[selectedContent.id]}
-              contentUrls={contentData[selectedContent.id]?.urls || {
-                thumbnailUrl: null,
-                coverUrl: null,
-                fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
-              }}
-              inModal={true}
-              showStats={showStats[selectedContent.id]}
-              mintableState={mintableState}
-              handleRenderError={handleRenderError}
-            />
-            {selectedContent && predictions[selectedContent.id]?.isPorn && (
-              <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[55]">
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
-                  Content Filtered
+                    showStats={showStats[transaction.id]}
+                    mintableState={mintableState}
+                    handleRenderError={handleRenderError}
+                  />
+                  {shouldShowBlur && (
+                    <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
+                        Content Filtered
+                      </div>
+                    </div>
+                  )}
+                  {renderDetails(transaction)}
+                  {isOwned && (
+                    <div className="absolute top-0 right-0 bg-green-500 text-white px-2 py-1 text-xs z-30">
+                      Owned
+                    </div>
+                  )}
+                  {isOwned && hasWithdrawableBalance && (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleWithdraw(transaction.id);
+                      }}
+                      className="absolute bottom-2 right-2 z-30"
+                    >
+                      Withdraw
+                    </Button>
+                  )}
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-      </Modal> 
-    </>
+              </ContentGrid.Item>
+            );
+          })}
+        </ContentGrid>
+
+        <Modal
+          isOpen={!!selectedContent}
+          onClose={() => setSelectedContent(null)}
+        >
+          {selectedContent && (
+            <div className="w-full h-full">
+              <ContentRenderer
+                transaction={transactions.find(t => t.id === selectedContent.id)!}
+                content={contentData[selectedContent.id]}
+                contentUrls={contentData[selectedContent.id]?.urls || {
+                  thumbnailUrl: null,
+                  coverUrl: null,
+                  fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
+                }}
+                inModal={true}
+                showStats={showStats[selectedContent.id]}
+                mintableState={mintableState}
+                handleRenderError={handleRenderError}
+              />
+              {selectedContent && predictions[selectedContent.id]?.isPorn && (
+                <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[55]">
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
+                    Content Filtered
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </Modal> 
+      </>
+    </TooltipProvider>
   );
 };
 

@@ -68,8 +68,6 @@ candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/empor
 cargo build --release --target wasm32-unknown-unknown --package logs
 candid-extractor target/wasm32-unknown-unknown/release/logs.wasm > src/logs/logs.did
 
-
-
 cargo update
 
 dfx deploy bookmarks --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
@@ -239,13 +237,17 @@ mkdir -p .dfx/local/canisters/ALEX
 touch .dfx/local/canisters/LBRY/LBRY.did
 touch .dfx/local/canisters/ALEX/ALEX.did
 
+# For icp_swap_factory
+mkdir -p src/icp_swap_factory && dfx canister --network ic metadata ggzvv-5qaaa-aaaag-qck7a-cai candid:service > src/icp_swap_factory/icp_swap_factory.did
+
+
 npm i
 dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal epfwr-zgmmh-g4r2d-tbn6k-wjhyv-ljuas-5rwsc-f5tod-6t5bs-sj3da-qae)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal yvgob-rq6mc-acyxa-xwmex-fc66h-cusu6-vp37y-oivkl-c4x4q-vj5xy-aqe)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)

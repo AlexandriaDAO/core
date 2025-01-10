@@ -6,22 +6,35 @@ import styled from 'styled-components';
 import { Search } from 'lucide-react';
 
 export const OwnerIcon = styled(Search)`
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+
+  @media (min-width: 768px) {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+  }
 `;
 
 export const SearchBox = styled.div`
   display: flex;
   width: 100%;
   max-width: 800px;
-  height: 60px;
-  padding: 16px 20px;
+  height: 50px;
+  padding: 12px 16px;
   align-items: center;
-  border-radius: 30px;
+  border-radius: 25px;
   border: 1px solid var(--black-grey-400, #CCC);
   background: var(--Colors-LightMode-Text-text-100, #FFF);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
+
+  @media (min-width: 768px) {
+    height: 60px;
+    padding: 16px 20px;
+    border-radius: 30px;
+    margin-bottom: 24px;
+  }
 `;
 
 export const Input = styled.input`
@@ -30,10 +43,14 @@ export const Input = styled.input`
   outline: none;
   color: var(--black-grey-300, #808080);
   font-family: Syne;
-  font-size: 18px;
+  font-size: 14px;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+
+  @media (min-width: 768px) {
+    font-size: 18px;
+  }
 
   &::placeholder {
     color: var(--black-grey-300, #808080);
@@ -79,7 +96,7 @@ const ArweaveOwnerSelector: React.FC = () => {
         isValid={isValid}
         value={searchState.ownerFilter}
         onChange={(e) => handleSearchStateChange(e.target.value)}
-        placeholder="Enter owner address or principal ID"
+        placeholder="paste owner address"
         title={!isValid ? "Please enter a valid Arweave address (43 characters)" : ""}
       />
     </SearchBox>

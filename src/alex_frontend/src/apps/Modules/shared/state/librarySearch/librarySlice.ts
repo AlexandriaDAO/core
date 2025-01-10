@@ -5,16 +5,18 @@ interface LibraryState {
   selectedPrincipals: string[];
   sortAsc: boolean;
   tags: string[];
-  collection: 'icrc7' | 'icrc7_scion';
+  collection: 'NFT' | 'SBT';
   isLoading: boolean;
+  noResults: boolean;
 }
 
 const initialState: LibraryState = {
   selectedPrincipals: [],
   sortAsc: true,
   tags: [],
-  collection: 'icrc7',
+  collection: 'NFT',
   isLoading: false,
+  noResults: false,
 };
 
 const librarySlice = createSlice({
@@ -45,11 +47,14 @@ const librarySlice = createSlice({
         state.tags.splice(index, 1);
       }
     },
-    setCollection: (state, action: PayloadAction<'icrc7' | 'icrc7_scion'>) => {
+    setCollection: (state, action: PayloadAction<'NFT' | 'SBT'>) => {
       state.collection = action.payload;
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
+    },
+    setNoResults: (state, action: PayloadAction<boolean>) => {
+      state.noResults = action.payload;
     },
   },
 });
@@ -60,6 +65,7 @@ export const {
   setTags,
   toggleTag,
   setCollection,
-  setLoading
+  setLoading,
+  setNoResults
 } = librarySlice.actions;
 export default librarySlice.reducer;

@@ -10,6 +10,17 @@ use crate::action_fees::{burn_mint_fee, LBRY_MINT_COST_E8S};
 
 pub type MintResult = Result<String, String>;
 
+async fn check_existing_ownership(minting_number: &Nat) -> Result<Option<Principal>, String> {
+    get_nft_owner(minting_number.clone(), icrc7_principal()).await
+}
+
+// Helper function to check if caller already has a scion NFT
+async fn check_caller_scion(minting_number: &Nat, caller: Principal) -> Result<bool, String> {
+    let potential_scion_id = og_to_scion_id(minting_number.clone(), caller);
+    let caller_scion = get_nft_owner(potential_scion_id, icrc7_scion_principal()).await?;
+    Ok(caller_scion.is_some())
+}
+
 #[ic_cdk::update(decoding_quota = 200, guard = "not_anon")]
 pub async fn coordinate_mint(
     arweave_id: String,
@@ -23,39 +34,39 @@ pub async fn coordinate_mint(
 
     let minting_number = arweave_id_to_nat(arweave_id);
 
-    // Check ownership and early returns for invalid states
-    let [og_owner, scion_owner] = check_existing_ownership(&minting_number).await?;
+    // Check original NFT ownership
+    let og_owner = check_existing_ownership(&minting_number).await?;
     
-    if og_owner == Some(caller) || scion_owner == Some(caller) {
+    if og_owner == Some(caller) {
         return Err("You already own this NFT".to_string());
     }
 
-    // Consolidate scion ownership checks
+    // Check if caller already has a scion NFT
     let caller_scion = check_caller_scion(&minting_number, caller).await?;
     if caller_scion {
         return Err("You have already minted a scion NFT from this number".to_string());
     }
 
-    // Handle minting scenarios with pattern matching
-    match (og_owner, scion_owner, owner_principal) {
-        // Mint from existing scion - must have matching owner_principal
-        (_, Some(owner), Some(principal)) if owner == principal => {
-            mint_scion_from_scion(minting_number, caller, owner).await
+    // Handle minting scenarios
+    match (og_owner, owner_principal) {
+        // No original NFT exists - mint original
+        (None, _) => mint_original(minting_number, caller).await,
+        
+        // Original exists and owner_principal provided - check for scion-from-scion
+        (Some(_), Some(owner)) => {
+            let scion_id = og_to_scion_id(minting_number.clone(), owner);
+            let scion_owner = get_nft_owner(scion_id, icrc7_scion_principal()).await?;
+            
+            if scion_owner == Some(owner) {
+                mint_scion_from_scion(minting_number, caller, owner).await
+            } else {
+                mint_scion_from_original(minting_number, caller).await
+            }
         },
-        // Mint original - no existing NFTs
-        (None, None, _) => mint_original(minting_number, caller).await,
-        // Mint scion from original
-        (Some(_), None, _) => mint_scion_from_original(minting_number, caller).await,
-        // Any other case is invalid
-        _ => Err("Invalid minting scenario".to_string()),
+        
+        // Original exists but no owner_principal - mint scion from original
+        (Some(_), None) => mint_scion_from_original(minting_number, caller).await,
     }
-}
-
-// Helper function to check if caller already has a scion NFT
-async fn check_caller_scion(minting_number: &Nat, caller: Principal) -> Result<bool, String> {
-    let potential_scion_id = og_to_scion_id(minting_number.clone(), caller);
-    let caller_scion = get_nft_owner(potential_scion_id, icrc7_scion_principal()).await?;
-    Ok(caller_scion.is_some())
 }
 
 pub async fn verify_lbry_payment(
@@ -109,6 +120,10 @@ async fn mint_original(minting_number: Nat, caller: Principal) -> MintResult {
 }
 
 async fn mint_scion_from_original(minting_number: Nat, caller: Principal) -> MintResult {
+    // First burn tokens
+    burn_lbry_tokens(caller).await?;
+    
+    // Then pay the original NFT owner
     let nft_wallet = to_nft_subaccount(minting_number.clone());
     verify_lbry_payment(caller, nft_manager_principal(), Some(nft_wallet.to_vec()), Nat::from(LBRY_MINT_COST_E8S))
         .await
@@ -126,9 +141,16 @@ async fn mint_scion_from_scion(
     caller: Principal,
     scion_owner: Principal
 ) -> MintResult {
-    let existing_scion_id = og_to_scion_id(minting_number.clone(), scion_owner);
-    let scion_wallet = to_nft_subaccount(existing_scion_id);
+    // First burn tokens
+    burn_lbry_tokens(caller).await?;
     
+    println!("Minting number: {}", minting_number.to_string());
+    // Then pay the scion NFT owner
+    let existing_scion_id = og_to_scion_id(minting_number.clone(), scion_owner);
+    println!("Existing scion ID: {}", existing_scion_id.to_string());
+    let scion_wallet = to_nft_subaccount(existing_scion_id);
+    println!("Scion wallet: {:?}", scion_wallet);
+
     verify_lbry_payment(caller, nft_manager_principal(), Some(scion_wallet.to_vec()), Nat::from(LBRY_MINT_COST_E8S))
         .await
         .map_err(|_| "Failed to transfer LBRY to the Scion NFT's wallet".to_string())?;
@@ -138,12 +160,6 @@ async fn mint_scion_from_scion(
         .await
         .map(|_| "Scion NFT saved successfully!".to_string())
         .map_err(|e| format!("Mint failed: {}", e))
-}
-
-async fn check_existing_ownership(minting_number: &Nat) -> Result<[Option<Principal>; 2], String> {
-    let og_owner = get_nft_owner(minting_number.clone(), icrc7_principal()).await?;
-    let scion_owner = get_nft_owner(minting_number.clone(), icrc7_scion_principal()).await?;
-    Ok([og_owner, scion_owner])
 }
 
 async fn get_nft_owner(token_id: Nat, canister: Principal) -> Result<Option<Principal>, String> {

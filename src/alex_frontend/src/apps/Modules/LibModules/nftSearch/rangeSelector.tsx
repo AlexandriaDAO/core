@@ -12,32 +12,32 @@ export default function RangeSelector() {
   
   const {
     currentPage,
-    pageInput,
     totalPages,
     loading,
     totalItems,
     itemsPerPage,
-    setPageInput,
     handlePageChange,
-    handleItemsPerPageChange
+    handleItemsPerPageChange,
+    fetchPageData
   } = usePagination({
     defaultItemsPerPage: DEFAULT_ITEMS_PER_PAGE,
-    dependencies: [selectedPrincipal, selectedCollection]
+    dependencies: [selectedPrincipal, selectedCollection],
+    shouldAutoFetch: false
   });
 
   if (!totalItems) return null;
 
   return (
-    <Pagination
-      currentPage={currentPage}
-      totalPages={totalPages}
-      pageInput={pageInput}
-      loading={loading}
-      totalItems={totalItems}
-      itemsPerPage={itemsPerPage}
-      onPageChange={handlePageChange}
-      onPageInputChange={setPageInput}
-      onItemsPerPageChange={handleItemsPerPageChange}
-    />
+    <div className="col-span-2 mt-4">
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        loading={loading}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
+      />
+    </div>
   );
 }

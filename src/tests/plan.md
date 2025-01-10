@@ -1,23 +1,27 @@
 
+
+
+
 The Plan:
 
-
-  
+- Color code the tags.
+- Alexandria query. (Query token amounts, then only the amount on the page (rather than all at once))
 
 Next Small Stuff:
-- Optimistic UI For minting NFTs.
-- Play button on videos by default.
-- Reverse the order of search results on alexandrian.
+
+- Alexandrian search needs to use the state of the current page number.
 - There's a bug where ebook searching gets the search button stuck in the loading state.
-- Add Milliseconds place to permasearch. 
 - Remove duplicates based on file size.
 - More advanced searching with tags and metadata.
-- Take alexandrian principals from the backend Librarian profiles list.
+- Mint button has some load time issues on Alexandrian.
+- Rank by tokens in the NFT.
 
 
 
 
 Next Big Stuff:
+- Add the icrc3 canisters to the cycles manager.
+
 - Apps page leaderboard of top NFTs (perhaps from a backup system off-chain)
 - Then we'll let people do their own channels which are just regular stable structures and no economic incentive. 
 These channels could be open for everyone to edit, or only for the owner to edit.

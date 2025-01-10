@@ -1,4 +1,4 @@
-import { HttpAgent, Identity } from "@dfinity/agent";
+import { Actor, HttpAgent, Identity } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
 import {
   createActor as createAlexBackendActor,
@@ -51,8 +51,11 @@ import {
   logs,
   createActor as createActorLogs,
 } from "../../../../../declarations/logs";
-
-const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
+import {
+  icp_swap_factory,
+  createActor as createActorIcpSwapFactory,
+} from "../../../../../icp_swap_factory";
+const isLocalDevelopment =process.env.DFX_NETWORK !== "ic";
 
 const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
 const icrc7_canister_id = process.env.CANISTER_ID_ICRC7!;
@@ -67,6 +70,7 @@ const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 const log_canister_id = process.env.CANISTER_ID_LOGS!;
+const icp_swap_factory_canister_id = "ggzvv-5qaaa-aaaag-qck7a-cai";
 
 export const getPrincipal = (client: AuthClient): string =>
   client.getIdentity().getPrincipal().toString();
@@ -92,12 +96,14 @@ const getActor = async <T>(
     const client = await getAuthClient();
     if (await client.isAuthenticated()) {
       const identity = client.getIdentity();
+
       const agent = await HttpAgent.create({
         identity,
         host: isLocalDevelopment
-          ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`
-          : "https://identity.ic0.app",
+          ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943` // Local development URL
+          : "https://identity.ic0.app", // Default to mainnet if neither condition is true
       });
+
       // Fetch root key for certificate validation during development
       // dangerous on mainnet
       if (isLocalDevelopment) {
@@ -158,5 +164,11 @@ export const getActorVetkd = () =>
 export const getActorEmporium = () =>
   getActor(emporium_canister_id, createActorEmporium, emporium);
 
-export const getLogs = () =>
-  getActor(log_canister_id, createActorLogs, logs);
+export const getLogs = () => getActor(log_canister_id, createActorLogs, logs);
+
+export const getIcpSwapFactoryCanister = () =>
+  getActor(
+    icp_swap_factory_canister_id,
+    createActorIcpSwapFactory,
+    icp_swap_factory
+  );

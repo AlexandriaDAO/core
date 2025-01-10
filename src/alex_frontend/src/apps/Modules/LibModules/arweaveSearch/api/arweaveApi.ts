@@ -6,22 +6,42 @@ export const fetchTransactionsApi = async (params: {
   nftIds?: string[];
   contentTypes?: string[];
   amount?: number;
-  maxTimestamp?: number;
+  timestamp?: number;
   ownerFilter?: string;
 }): Promise<Transaction[]> => {
   try {
-    const { nftIds, contentTypes, amount, maxTimestamp, ownerFilter } = params;
+    const { nftIds, contentTypes, amount, timestamp, ownerFilter } = params;
 
     let minBlock: number | undefined;
     let maxBlock: number | undefined;
 
-    // Calculate block range based on maxTimestamp if provided
+    // Convert milliseconds to seconds and ensure it's a valid number
+    const maxTimestamp = timestamp && !isNaN(timestamp) 
+      ? Math.floor(timestamp / 1000) 
+      : Math.floor(Date.now() / 1000);
+
+    console.log('ArweaveAPI - Processing request:', {
+      timestamp,
+      maxTimestamp,
+      params,
+      date: new Date(timestamp || Date.now()).toISOString()
+    });
+
     if (maxTimestamp) {
       try {
         maxBlock = await getBlockHeightForTimestamp(maxTimestamp);
-        minBlock = Math.max(0, maxBlock - 500000);
+        // Adjust the block range to be more reasonable
+        minBlock = Math.max(0, maxBlock - 50000); // Reduced from 500000 to 50000
+        
+        console.log('ArweaveAPI - Block range:', {
+          maxBlock,
+          minBlock,
+          maxTimestamp,
+          date: new Date(maxTimestamp * 1000).toISOString()
+        });
       } catch (error) {
         console.error("Error getting block height for timestamp:", error);
+        throw error; // Propagate the error instead of silently continuing
       }
     }
 

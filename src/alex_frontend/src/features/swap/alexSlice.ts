@@ -6,12 +6,14 @@ import { toast } from "sonner";
 import getAccountAlexBalance from "./thunks/alexIcrc/getAccountAlexBalance";
 import transferALEX from "./thunks/alexIcrc/transferALEX";
 import getAlexFee from "./thunks/alexIcrc/getAlexFee";
+import getAlexPrice from "./thunks/alexIcrc/getAlexPrice";
 // Define the interface for our node state
 export interface AlexState {
   alexBal: string;
   alexFee:string;
   loading: boolean;
   transferSuccess:boolean;
+  alexPriceUsd:string;
   error: string | null;
 }
 
@@ -19,6 +21,7 @@ export interface AlexState {
 const initialState: AlexState = {
   alexBal: "0",
   loading: false,
+  alexPriceUsd:"0",
   transferSuccess:false,
   alexFee:"0",
   error: null,
@@ -75,6 +78,16 @@ const alexSlice = createSlice({
       .addCase(getAlexFee.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      }).addCase(getAlexPrice.fulfilled, (state, action) => {
+        state.alexPriceUsd = action.payload;
+        state.loading = false;
+      })
+      .addCase(getAlexPrice.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getAlexPrice.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to get ALEX/USD price!";
       })
   },
 });

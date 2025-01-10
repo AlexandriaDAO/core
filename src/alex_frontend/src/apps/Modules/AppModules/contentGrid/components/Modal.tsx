@@ -12,12 +12,23 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
+      onClick={handleOverlayClick}
+    >
       <Card className="relative w-full max-w-4xl max-h-[90vh] bg-background">
         <Button
-          variant="ghost"
-          className="absolute right-4 top-4 z-[60] rounded-full hover:bg-gray-100"
+          variant="outline"
+          className="absolute right-4 top-4 z-[60] rounded-full p-3 
+            bg-primary text-primary-foreground hover:bg-primary/90
+            transition-colors"
           onClick={onClose}
         >
           <X className="h-6 w-6" />
