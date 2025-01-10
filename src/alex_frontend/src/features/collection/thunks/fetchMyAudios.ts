@@ -2,53 +2,53 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchAssets, getAssets } from '@/services/assetService';
 import { RootState } from "@/store";
 import { AssetType } from "@/features/upload/uploadSlice";
-import { Book } from "@/features/asset/types";
+import { Audio } from "@/features/asset/types";
 import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE } from "../../../../../../src/declarations/nft_manager/nft_manager.did";
 
 // Define the async thunk
-const fetchMyBooks = createAsyncThunk<
+const fetchMyAudios = createAsyncThunk<
     {
-        books: Book[],
+        audios: Audio[],
         cursor: string,
     }, // This is the return type of the thunk's payload
     {actor: ActorSubclass<_SERVICE>}, //Argument that we pass to initialize
     { rejectValue: string, state: RootState }
->("collection/fetchMyBooks", async ({actor}, { rejectWithValue, getState }) => {
+>("collection/fetchMyAudios", async ({actor}, { rejectWithValue, getState }) => {
     try {
 
-        const {collection: {collection, cursor, books }, auth: {user}} = getState();
+        const {collection: {collection, cursor, audios }, auth: {user}} = getState();
 
-        if(!user || !user.principal) return { books, cursor }
+        if(!user || !user.principal) return { audios, cursor }
 
         if (collection.length > 0) {
 
-            const txs = await fetchAssets({after: cursor, owner: user.principal, type: AssetType.Book, ids: collection});
+            const txs = await fetchAssets({after: cursor, owner: user.principal, type: AssetType.Audio, ids: collection});
 
-            const newBooks = await getAssets<Book>(txs);
+            const newAudios = await getAssets<Audio>(txs);
 
             const newCursor = txs[txs.length-1]?.cursor ?? '';
 
             return {
-                books: [...books, ...newBooks],
+                audios: [...audios, ...newAudios],
                 cursor: newCursor
             }
 
         }
 
-        return { books, cursor }
+        return { audios, cursor }
 
     } catch (error) {
-        console.error("Failed to Fetch My Minted Books:", error);
+        console.error("Failed to Fetch My Minted Audios:", error);
 
         if (error instanceof Error) {
             return rejectWithValue(error.message);
         }
     }
     return rejectWithValue(
-        "An unknown error occurred while fetching My Minted Books"
+        "An unknown error occurred while fetching My Minted Audios"
     );
 });
 
 
-export default fetchMyBooks;
+export default fetchMyAudios;

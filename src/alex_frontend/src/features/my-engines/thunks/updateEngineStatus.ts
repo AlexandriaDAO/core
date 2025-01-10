@@ -14,7 +14,7 @@ const updateEngineStatus = createAsyncThunk<
         active: boolean,
     },
     { rejectValue: string }
->("engineOverview/updateEngineStatus", async ({actor, id, active}, { rejectWithValue }) => {
+>("myEngines/updateEngineStatus", async ({actor, id, active}, { rejectWithValue }) => {
     try {
         const result = await actor.update_engine_status({id: BigInt(id), active});
 

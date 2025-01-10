@@ -29,7 +29,7 @@ const addNode = createAsyncThunk<
 		try {
 			const encrypted_key = await ibe_encrypt(key);
 
-			const result = await actor.create_node({key: encrypted_key});
+			const result = await actor.create_node({key: encrypted_key, active});
 
             if('Ok' in result) return serializeNode(result.Ok);
 

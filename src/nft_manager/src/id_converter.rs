@@ -7,6 +7,7 @@ use crc32fast::Hasher;
 
 #[query]
 pub fn arweave_id_to_nat(arweave_id: String) -> Nat {
+    // can be 44 locally
     let mut id = arweave_id.chars().take(43).collect::<String>();
     while id.len() % 4 != 0 {
         id.push('=');
@@ -29,6 +30,7 @@ pub fn nat_to_arweave_id(num: Nat) -> String {
 #[query]
 pub fn is_arweave_id(id: String) -> bool {
     // Check length
+    // can be 44 locally
     if id.len() != 43 {
         return false;
     }

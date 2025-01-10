@@ -9,14 +9,20 @@ import { shorten } from "@/utils/general";
 import { Copy, LoaderCircle, RefreshCcw } from "lucide-react";
 import { SerializedNode } from "../myNodesSlice";
 import { useAlexWallet } from "@/hooks/actors";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import DeleteNode from "./DeleteNode";
+import UpdateNode from "./UpdateNode";
 
 interface NodeItemProps {
 	node: SerializedNode;
 }
 
 const NodeItem = ({ node }: NodeItemProps) => {
+	if(!node) return null;
 	const {actor} = useAlexWallet();
 	const [irys, setIrys] = useState<WebIrys | null>(null);
+
+	const {deleting} = useAppSelector((state) => state.myNodes);
 
 	const [loading, setLoading] = useState(false);
 
@@ -78,6 +84,10 @@ const NodeItem = ({ node }: NodeItemProps) => {
 				<table className="w-full">
 					<tbody>
 						<tr>
+							<td className="pr-4">ID</td>
+							<td>{node.id}</td>
+						</tr>
+						<tr>
 							<td className="pr-4">Status</td>
 							<td>{node.active ? 'Active' : 'InActive'}</td>
 						</tr>
@@ -129,6 +139,14 @@ const NodeItem = ({ node }: NodeItemProps) => {
 									<li>Deposits can take a few minutes to reflect.</li>
 									<li>Use the refresh button to fetch latest balance.</li>
 								</ul>
+							</td>
+						</tr>
+						<tr>
+							<td colSpan={2} className="text-center py-2">
+								<div className="flex justify-center items-center gap-2">
+									<UpdateNode node={node} />
+									<DeleteNode node={node} />
+								</div>
 							</td>
 						</tr>
 					</tbody>

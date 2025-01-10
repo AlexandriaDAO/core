@@ -6,7 +6,7 @@ import useSession from "@/hooks/useSession";
 import { LoaderCircle } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { useNavigate } from "react-router";
-import Collection from "@/features/collection";
+import Collection from "@/features/collection/MintedBooks";
 import fetchMyBooks from "@/features/collection/thunks/fetchMyBooks";
 
 function CollectionPage() {

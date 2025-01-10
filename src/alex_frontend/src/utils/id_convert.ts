@@ -2,6 +2,7 @@
 
 export function arweaveIdToNat(arweaveId: string): bigint {
     // Remove any potential extra character and padding
+    // can be 44 locally
     let id = arweaveId.slice(0, 43);
 
     // Add padding if necessary

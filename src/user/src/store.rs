@@ -232,7 +232,7 @@ pub fn add_engine_to_user(principal: &Principal, engine_id: u64) {
             .map(|list| list.0)
             .unwrap_or_default();
         ids.push(engine_id);
-        user_engines.insert(*principal, UserIdList(ids)).unwrap();
+        user_engines.insert(*principal, UserIdList(ids));
     });
 }
 
@@ -259,6 +259,6 @@ pub fn add_node_to_user(principal: &Principal, node_id: u64) {
             .map(|list| list.0)
             .unwrap_or_default();
         ids.push(node_id);
-        user_nodes.insert(*principal, UserIdList(ids)).unwrap();
+        user_nodes.insert(*principal, UserIdList(ids));
     });
 }

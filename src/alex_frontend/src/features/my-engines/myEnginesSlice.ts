@@ -2,6 +2,8 @@ import { ActionReducerMapBuilder, PayloadAction, createSlice } from "@reduxjs/to
 import fetchMyEngines from "./thunks/fetchMyEngines";
 import { toast } from "sonner";
 import addEngine from "./thunks/addEngine";
+import updateEngineStatus from "./thunks/updateEngineStatus";
+
 
 export interface SerializedEngine {
 	'id' : string,
@@ -21,6 +23,7 @@ export interface MyEnginesState {
 	newEngine: SerializedEngine|null;			//holds recently added engine
 
 	loading: boolean;
+	updating: string;
 	error: string | null;
 
 	newEngineLoading: boolean;
@@ -34,6 +37,8 @@ const initialState: MyEnginesState = {
 
 	loading: true,
 	error: null,
+
+	updating: '',
 
 	newEngineLoading: false,
 	newEngineError: '',
@@ -56,8 +61,10 @@ const myEnginesSlice = createSlice({
 		},
 		setEngines: (state, action)=>{
 			state.engines = action.payload;
-		}
-
+		},
+		setUpdating: (state, action)=>{
+			state.updating = action.payload;
+		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<MyEnginesState>) => {
 		builder
@@ -97,9 +104,34 @@ const myEnginesSlice = createSlice({
 				state.newEngineLoading = false;
 				state.newEngineError = action.payload as string;
 			})
+
+			.addCase(updateEngineStatus.pending, (state) => {
+				toast.info('Updating Status')
+				state.error = null;
+			})
+			.addCase(updateEngineStatus.fulfilled, (state, action) => {
+				toast.success('Status Updated')
+
+				state.engines = state.engines.map((engine)=>{
+					if(engine.id === action.payload.id){
+						return action.payload;
+					}
+					return engine;
+				})
+
+				state.updating = '';
+				state.error = null;
+			})
+			.addCase(updateEngineStatus.rejected, (state, action) => {
+				toast.error('Status Could not be updated '+ action.payload)
+
+				state.updating = '';
+				state.error = action.payload as string;
+			})
+
 		}
 });
 
-export const {setNewEngine, setNewEngineLoading, setNewEngineError, setEngines} = myEnginesSlice.actions;
+export const {setNewEngine, setNewEngineLoading, setNewEngineError, setEngines, setUpdating} = myEnginesSlice.actions;
 
 export default myEnginesSlice.reducer;
