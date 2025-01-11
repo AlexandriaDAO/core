@@ -6,10 +6,13 @@ import { getActorSwap } from "@/features/auth/utils/authUtils";
 // Define the async thunk
 const claimReward = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  void,
+  {reward:string;},
   { rejectValue: string }
->("icp_swap/claimReward", async (_, { rejectWithValue }) => {
+>("icp_swap/claimReward", async ({reward}, { rejectWithValue }) => {
   try {
+    if (Number(reward) < 0.01) {
+      return rejectWithValue("Must have at least 0.01 ICP reward to claim!");
+    }
     const actor = await getActorSwap();
     const result = await actor.claim_icp_reward([]);
     if ("Ok" in result) return "success";

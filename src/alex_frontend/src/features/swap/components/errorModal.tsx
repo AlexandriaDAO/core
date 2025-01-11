@@ -5,9 +5,11 @@ import React from "react";
 interface ErrorModalProps {
     show: boolean;
     setShow: any;
+    title?:string;
+    message?:string;
 }
 
-const ErrorModal: React.FC<ErrorModalProps> = ({ show,setShow }) => {
+const ErrorModal: React.FC<ErrorModalProps> = ({ show,setShow,title="Something went wrong...",message="Please try again or seek help if needed" }) => {
     if (!show) return null; // Only render modal if show is true
     return (
         <div className="bg-gray flex items-center justify-center min-h-screen w-full fixed z-50 top-0 left-0">
@@ -19,9 +21,9 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ show,setShow }) => {
                     <div className="mb-5">
                         <img src="/images/error.png" className="m-auto" />
                     </div>
-                    <h4 className="text-2xl font-medium">Something went wrong...</h4>
+                    <h4 className="text-2xl font-medium">{title}</h4>
                     <p className="mb-4 text-base font-normal leading-6">
-                    Please try again or seek help if needed
+                   {message}
                     </p>
                     <button className="h-14 min-w-72 rounded-[44px] px-7 bg-black text-white text-2xl font-semibold" onClick={() => { setShow(false) }} >
                         Back

@@ -22,7 +22,7 @@ const EmporiumPageSizeSelector: React.FC = () => {
           onChange={handlePageSizeChange}
           className="w-full bg-transparent border-none outline-none text-black font-['Poppins'] text-base font-light appearance-none cursor-pointer"
         >
-          {[6, 12, 20, 30, 40, 50].map((value) => (
+          {[8, 12, 20, 30, 40, 50].map((value) => (
             <option key={value} value={value}>
               {value}
             </option>

@@ -29,6 +29,7 @@ const StakeContent = () => {
     const [successModalV, setSucessModalV] = useState(false);
     const [actionType, setActionType] = useState("Stake");
     const [errorModalV, setErrorModalV] = useState(false);
+    const [modalData, setModalData] = useState({ message: "Please try again or seek help if needed", title: "Something went wrong..." });
     const [userEstimateReward, setUserEstimatedReward] = useState(0);
     const [apr, setApr] = useState("0");
 
@@ -54,7 +55,7 @@ const StakeContent = () => {
         const estimatedUserRewardIcp = Number(swap.stakeInfo.stakedAlex) * swap.averageAPY;
         setUserEstimatedReward(estimatedUserRewardIcp);
 
-        const estimatedRewardIcp= Number(swap.totalStaked) * swap.averageAPY;
+        const estimatedRewardIcp = Number(swap.totalStaked) * swap.averageAPY;
         const stakedUsd = Number(swap.totalStaked) * Number(alex.alexPriceUsd);
         const aprPercentage = ((estimatedRewardIcp * Number(icpLedger.icpPrice)) / stakedUsd) * 100;
         setApr(aprPercentage.toFixed(2));
@@ -75,10 +76,15 @@ const StakeContent = () => {
             setSucessModalV(true);
         }
         if (swap.error) {
+            if (swap.error && swap.error.includes("Must have ")) {
+                setModalData({message:"Must have at least 0.01 ICP reward to claim.",title:"Insufficient Reward "})
+             }
+             else{
+                setModalData({message: "Please try again or seek help if needed", title: "Something went wrong..."})
+             }
             setLoadingModalV(false);
             setErrorModalV(true);
             dispatch(flagHandler());
-
 
         }
     }, [user, swap])
@@ -177,7 +183,7 @@ const StakeContent = () => {
                 </div>
                 <LoadingModal show={loadingModalV} message1={`${actionType} in Progress`} message2={"Transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
                 <SuccessModal show={successModalV} setShow={setSucessModalV} />
-                <ErrorModal show={errorModalV} setShow={setErrorModalV} />
+                <ErrorModal show={errorModalV} setShow={setErrorModalV} message={modalData.message} title={modalData.title} />
 
             </div>
         </>

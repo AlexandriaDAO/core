@@ -13,7 +13,7 @@ import transferLBRY from "../../thunks/lbryIcrc/transferLBRY";
 import { icpLedgerFlagHandler } from "@/features/icp-ledger/icpLedgerSlice";
 import { flagHandler } from "../../swapSlice";
 import Auth from "@/features/auth";
-import { options } from "@/utils/utils";
+import { icp_fee, options } from "@/utils/utils";
 import { LoaderCircle } from "lucide-react";
 import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
@@ -59,24 +59,26 @@ const SendContent = () => {
         setSelectedImage(option.img);
     };
     const handleMax = () => {
+        // since we dont need approval here 
         if (selectedOption === "ICP") {
-            const userBal = Math.max(
-                0,
-                Number(icpLedger.accountBalance) - ((options.find(option => option.value === "ICP")?.fee ?? 0) * 2)
-            ).toFixed(4);
+             const userBal = Math.max(
+                  0,
+                  Number(icpLedger.accountBalance) - 1 * icp_fee
+                ).toFixed(4);
+     
             setAmount(userBal);
         }
         else if (selectedOption === "ALEX") {
             const userBal = Math.max(
                 0,
-                Number(alex.alexBal) - (Number(alex.alexFee) * 2)
+                Number(alex.alexBal) - (Number(alex.alexFee) * 1)
             ).toFixed(4);
             setAmount(userBal);
         }
         else if (selectedOption === "LBRY") {
             const userBal = Math.max(
                 0,
-                Number(swap.lbryBalance) - (Number(swap.lbryFee) * 2)
+                Number(swap.lbryBalance) - (Number(swap.lbryFee) * 1)
             ).toFixed(4);
             setAmount(userBal);
         }

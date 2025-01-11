@@ -54,7 +54,13 @@ export const ControlsContainer = styled.div<{ $isOpen: boolean }>`
   margin-bottom: ${props => props.$isOpen ? '24px' : '0'};
  flex-wrap:wrap;
  justify-content:center;
+
+ @media(max-width:640px){
+   margin-bottom:10px;
+ }
+
 `;
+
 
 export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
   display: flex;
@@ -129,6 +135,10 @@ export const Paginate = styled.div<{ $isOpen?: boolean }>`
     color: #000000;
     text-decoration: none;
     cursor: pointer;
+    @media(max-width:767px){
+    font-size:11px;
+    padding:5px 7px;
+    }
   }
 
   .pagination li a:hover {
