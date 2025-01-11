@@ -1,5 +1,5 @@
 
-
+- Need to combine emporium with main app modules.
 - Authmenue.tsx open back up the dashboard and profile.
 
 The Plan:
@@ -70,7 +70,3 @@ Topup Records:
 CDN Plan:
 - So allow the user to upload all their files to an asset canister.
 - When we query by token id, we first query the asset canister. If it's not there move to the arweave gateway.
-
-
-
-

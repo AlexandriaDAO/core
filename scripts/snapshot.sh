@@ -53,7 +53,7 @@ dfx canister start ic_siwe_provider --network ic
 
 # icp_swap
 dfx canister stop icp_swap --network ic
-dfx canister snapshot create icp_swap --network ic
+dfx canister snapshot create icp_swap --replace 00000000000000000000000001f053200101 --network ic
 dfx canister start icp_swap --network ic
 
 # icrc7
