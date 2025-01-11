@@ -1,6 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { performSearch } from './libraryThunks';
 
+interface SearchParams {
+  start: number;
+  end: number;
+  pageSize: number;
+}
+
 interface LibraryState {
   selectedPrincipals: string[];
   sortAsc: boolean;
@@ -8,6 +14,8 @@ interface LibraryState {
   collection: 'NFT' | 'SBT';
   isLoading: boolean;
   noResults: boolean;
+  searchParams: SearchParams;
+  lastSearchTimestamp: number;
 }
 
 const initialState: LibraryState = {
@@ -17,6 +25,12 @@ const initialState: LibraryState = {
   collection: 'NFT',
   isLoading: false,
   noResults: false,
+  searchParams: {
+    start: 0,
+    end: 20,
+    pageSize: 20
+  },
+  lastSearchTimestamp: 0
 };
 
 const librarySlice = createSlice({
@@ -56,6 +70,16 @@ const librarySlice = createSlice({
     setNoResults: (state, action: PayloadAction<boolean>) => {
       state.noResults = action.payload;
     },
+    setSearchParams: (state, action: PayloadAction<Partial<SearchParams>>) => {
+      state.searchParams = { ...state.searchParams, ...action.payload };
+    },
+    updateLastSearchTimestamp: (state) => {
+      state.lastSearchTimestamp = Date.now();
+    },
+    resetSearch: (state) => {
+      state.searchParams = initialState.searchParams;
+      state.lastSearchTimestamp = 0;
+    }
   },
 });
 
@@ -66,6 +90,10 @@ export const {
   toggleTag,
   setCollection,
   setLoading,
-  setNoResults
+  setNoResults,
+  setSearchParams,
+  updateLastSearchTimestamp,
+  resetSearch
 } = librarySlice.actions;
+
 export default librarySlice.reducer;

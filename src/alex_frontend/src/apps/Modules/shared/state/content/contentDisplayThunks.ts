@@ -6,7 +6,7 @@ import {
   setContentData,
   MintableStateItem 
 } from './contentDisplaySlice';
-import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
+import { fetchTransactionsApi, fetchTransactionsForAlexandrian } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 import { Transaction } from '../../../shared/types/queries';
 import { getAuthClient } from "@/features/auth/utils/authUtils";
@@ -58,10 +58,8 @@ export const updateTransactions = createAsyncThunk(
       const state = getState() as RootState;
       const sortAsc = state.library.sortAsc;
 
-      const fetchedTransactions = await fetchTransactionsApi({
-        nftIds: arweaveIds,
-      });
-
+      // Use the direct Arweave client for Alexandrian app
+      const fetchedTransactions = await fetchTransactionsForAlexandrian(arweaveIds);
 
       // Apply sorting based on sortAsc
       const sortedTransactions = sortAsc 

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { togglePrincipal, setLoading } from './librarySlice';
+import { togglePrincipal, setLoading, setSearchParams, updateLastSearchTimestamp } from './librarySlice';
 import { updateTransactions } from '@/apps/Modules/shared/state/content/contentDisplayThunks';
 import { RootState } from '@/store';
 import { toggleSortDirection } from './librarySlice';
@@ -7,13 +7,20 @@ import { AppDispatch } from '@/store';
 import { fetchTokensForPrincipal, FetchTokensParams } from '../nftData/nftDataThunks';
 import { cachePage, clearCache, clearNFTs } from '../nftData/nftDataSlice';
 
-export const togglePrincipalSelection = createAsyncThunk(
+const DEBOUNCE_TIME = 300; // ms
+const DEFAULT_PAGE_SIZE = 20;
+
+export const togglePrincipalSelection = createAsyncThunk<
+  string,
+  string,
+  { state: RootState; dispatch: AppDispatch }
+>(
   'library/togglePrincipalSelection',
-  async (principalId: string, { dispatch, getState }) => {
+  async (principalId: string, { dispatch }) => {
     try {
       dispatch(clearCache());
       dispatch(togglePrincipal(principalId));
-      await dispatch(performSearch({ start: 0, end: 20 }) as any);
+      dispatch(performSearch());
       return principalId;
     } catch (error) {
       console.error('Error in togglePrincipalSelection:', error);
@@ -24,22 +31,32 @@ export const togglePrincipalSelection = createAsyncThunk(
 
 export const performSearch = createAsyncThunk<
   void,
-  { start: number; end: number },
+  void,
   { state: RootState; dispatch: AppDispatch }
 >(
   'library/performSearch',
-  async ({ start, end }, { getState, dispatch }) => {
-    // Clear existing NFTs before performing new search
+  async (_, { getState, dispatch }) => {
+    const state = getState();
+    const now = Date.now();
+    const timeSinceLastSearch = now - state.library.lastSearchTimestamp;
+    
+    if (timeSinceLastSearch < DEBOUNCE_TIME) {
+      return;
+    }
+
     dispatch(clearNFTs());
+    dispatch(updateLastSearchTimestamp());
+    dispatch(setLoading(true));
     
     try {
-      const state = getState();
-      const selectedPrincipals = state.library.selectedPrincipals;
-      const collection = state.library.collection;
-      const pageKey = `${start}-${end}`;
+      const { selectedPrincipals, collection, searchParams } = state.library;
+      const pageSize = searchParams.pageSize || DEFAULT_PAGE_SIZE;
+      const page = Math.floor(searchParams.start / pageSize) + 1;
+      const pageKey = `${searchParams.start}-${searchParams.end}`;
 
-      // Return early if page is already cached
-      if (state.nftData.cachedPages[pageKey]) {
+      // Only use cache for "Show More" operations
+      const isShowMore = searchParams.start > 0;
+      if (isShowMore && state.nftData.cachedPages[pageKey]) {
         const arweaveIds = Object.values(state.nftData.nfts)
           .filter(nft => 
             nft.principal === selectedPrincipals[0] && 
@@ -49,16 +66,16 @@ export const performSearch = createAsyncThunk<
 
         const uniqueArweaveIds = [...new Set(arweaveIds)] as string[];
         await dispatch(updateTransactions(uniqueArweaveIds));
+        dispatch(setLoading(false));
         return;
       }
-
-      dispatch(setLoading(true));
 
       if (selectedPrincipals && selectedPrincipals.length > 0 && collection) {
         const params: FetchTokensParams = {
           principalId: selectedPrincipals[0],
           collection,
-          range: { start, end }
+          page,
+          itemsPerPage: pageSize
         };
         
         await dispatch(fetchTokensForPrincipal(params)).unwrap();
@@ -75,21 +92,35 @@ export const performSearch = createAsyncThunk<
         const uniqueArweaveIds = [...new Set(arweaveIds)] as string[];
         await dispatch(updateTransactions(uniqueArweaveIds));
         
-        // Cache the page
-        dispatch(cachePage(pageKey));
+        // Only cache for "Show More" operations
+        if (isShowMore) {
+          dispatch(cachePage(pageKey));
+        }
       }
-      
-      dispatch(setLoading(false));
     } catch (error) {
       console.error('Error in performSearch:', error);
-      dispatch(setLoading(false));
       throw error;
+    } finally {
+      dispatch(setLoading(false));
     }
+  }
+);
+
+export const updateSearchParams = createAsyncThunk<
+  void,
+  { start?: number; end?: number; pageSize?: number },
+  { state: RootState; dispatch: AppDispatch }
+>(
+  'library/updateSearchParams',
+  async (params, { dispatch }) => {
+    dispatch(setSearchParams(params));
+    dispatch(performSearch());
   }
 );
 
 export const toggleSort = () => (dispatch: AppDispatch) => {
   dispatch(clearCache());
   dispatch(toggleSortDirection());
+  dispatch(performSearch());
 };
 

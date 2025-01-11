@@ -66,7 +66,8 @@ const fetchNFTBatch = async (params: BatchFetchParams[]) => {
 export interface FetchTokensParams {
   principalId: string;
   collection: 'NFT' | 'SBT';
-  range?: { start: number; end: number };
+  page: number;
+  itemsPerPage: number;
 }
 
 export const fetchTokensForPrincipal = createAsyncThunk<
@@ -76,7 +77,7 @@ export const fetchTokensForPrincipal = createAsyncThunk<
 >(
   'nftData/fetchTokensForPrincipal',
   async (
-    { principalId, collection, range = { start: 0, end: 20 } },
+    { principalId, collection, page, itemsPerPage },
     { dispatch }
   ) => {
     try {
@@ -86,10 +87,15 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       
       const principal = Principal.fromText(principalId);
       const params = { owner: principal, subaccount: [] as [] };
-      // First get total count with a large limit
+      
+      // Calculate range based on page and itemsPerPage
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      
+      // First get total count
       const countLimit = [BigInt(10000)] as [bigint];
-
       let allNftIds: bigint[] = [];
+      
       if (collection === 'NFT') {
         allNftIds = await icrc7.icrc7_tokens_of(params, [], countLimit);
       } else if (collection === 'SBT') {
@@ -104,11 +110,8 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       // Store total count
       dispatch(setTotalNfts(allNftIds.length));
 
-      // Reverse the array to show newest NFTs first
-      allNftIds = allNftIds.reverse();
-
-      // Get the slice for the current page
-      const pageNftIds = allNftIds.slice(range.start, range.end);
+      // Reverse the array to show newest NFTs first and get the page slice
+      const pageNftIds = allNftIds.reverse().slice(start, end);
       
       // Prepare batch params
       const batchParams = pageNftIds.map(tokenId => ({
@@ -119,8 +122,8 @@ export const fetchTokensForPrincipal = createAsyncThunk<
 
       // Use batched fetching
       const nftEntries = await fetchNFTBatch(batchParams);
-      
       const nftRecord = Object.fromEntries(nftEntries);
+      
       dispatch(setNfts(nftRecord));
 
       // Fetch balances for the current page

@@ -53,7 +53,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 });
 
 const httpLink = new HttpLink({
-  uri: ARWEAVE_CONFIG.GRAPHQL_ENDPOINT
+  uri: ARWEAVE_CONFIG.GOLDSKY_ENDPOINT
 });
 
 const arweaveNetClient = new ApolloClient({

@@ -1,6 +1,7 @@
 import { Transaction } from "../../../shared/types/queries";
 import { fetchTransactions } from "./arweaveClient";
 import { getBlockHeightForTimestamp } from "./arweaveHelpers";
+import { fetchTransactionsByIds } from "./directArweaveClient";
 
 export const fetchTransactionsApi = async (params: {
   nftIds?: string[];
@@ -77,6 +78,20 @@ export const fetchTransactionsApi = async (params: {
     );
   } catch (error) {
     console.error("Error in fetchTransactionsApi:", error);
+    return [];
+  }
+};
+
+export const fetchTransactionsForAlexandrian = async (nftIds: string[]): Promise<Transaction[]> => {
+  try {
+    if (!nftIds || nftIds.length === 0) {
+      return [];
+    }
+
+    // Use directArweaveClient to fetch transactions
+    return await fetchTransactionsByIds(nftIds);
+  } catch (error) {
+    console.error("Error in fetchTransactionsForAlexandrian:", error);
     return [];
   }
 };

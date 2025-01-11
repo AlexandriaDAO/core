@@ -1,6 +1,6 @@
 
 
-
+- Authmenue.tsx open back up the dashboard and profile.
 
 The Plan:
 
@@ -59,3 +59,18 @@ QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 Topup Records:
 - ALEX lost 10T cycles in the 15 hours after launch. I topped it up to 50T Cycles.
 - LBRY lost 10T cycles in the 15 hours after launch. I topped it up to 50T Cycles.
+
+
+
+
+
+
+
+
+CDN Plan:
+- So allow the user to upload all their files to an asset canister.
+- When we query by token id, we first query the asset canister. If it's not there move to the arweave gateway.
+
+
+
+

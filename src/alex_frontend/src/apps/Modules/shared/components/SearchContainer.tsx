@@ -22,6 +22,7 @@ interface SearchContainerProps {
   description?: string;
   hint?: string;
   onSearch: (continueFromTimestamp?: number) => Promise<void> | void;
+  onShowMore?: () => Promise<void> | void;
   isLoading?: boolean;
   topComponent?: ReactNode;
   filterComponent?: ReactNode;
@@ -33,46 +34,28 @@ export function SearchContainer({
   description,
   hint,
   onSearch,
+  onShowMore,
   isLoading = false,
   topComponent,
   filterComponent,
   showMoreEnabled = true
 }: SearchContainerProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
-  const searchInProgress = useRef(false);
 
-  const handleSearchClick = async () => {
-    if (searchInProgress.current) return;
-    
-    try {
-      searchInProgress.current = true;
+  const handleSearchClick = useCallback(async () => {
+    if (!isLoading) {
       await dispatch(wipe());
       await onSearch();
-    } finally {
-      searchInProgress.current = false;
     }
-  };
+  }, [isLoading, onSearch, dispatch]);
 
-  const handleShowMore = async () => {
-    if (searchInProgress.current || transactions.length === 0 || isLoading) return;
-
-    const earliestTransaction = transactions[transactions.length - 1];
-    
-    if (earliestTransaction?.block?.timestamp) {
-      try {
-        searchInProgress.current = true;
-        const timestampMs = earliestTransaction.block.timestamp * 1000;
-        await onSearch(timestampMs);
-      } catch (error) {
-        console.error('Show more error:', error);
-      } finally {
-        searchInProgress.current = false;
-      }
+  const handleShowMoreClick = useCallback(() => {
+    if (!isLoading && onShowMore) {
+      onShowMore();
     }
-  };
+  }, [isLoading, onShowMore]);
 
   const handleKeyPress = useCallback((event: KeyboardEvent) => {
     if (
@@ -126,7 +109,7 @@ export function SearchContainer({
       {showMoreEnabled && transactions.length > 0 && (
         <div className="flex justify-center mt-6 mb-8">
           <Button
-            onClick={handleShowMore}
+            onClick={handleShowMoreClick}
             disabled={isLoading}
             className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
           >

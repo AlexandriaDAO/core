@@ -13,7 +13,7 @@ interface App {
 
 const apps: App[] = [
   { name: 'Alexandrian', description: 'Library', path: '/app/alexandrian', logo: '/logos/alexandrian.jpg' },
-  { name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/permasearch.jpg' },
+  { name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/permasearch.jpg', comingSoon: true },
   { name: 'Emporium', description: 'Trade', path: '/app/emporium', logo: '/logos/emporium.jpg' },
   { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos', logo: '/logos/syllogos.jpg', comingSoon: true },
   { name: 'Bibliotheca', description: 'Library', path: '/app/bibliotheca', comingSoon: true },

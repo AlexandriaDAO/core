@@ -11,12 +11,10 @@ import { performSearch } from '../../shared/state/librarySearch/libraryThunks';
 import RangeSelector from './rangeSelector';
 
 export default function LibrarySearch() {
-  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
   const dispatch = useDispatch<AppDispatch>();
-
-  const handleSearch = useCallback(() => {
-    dispatch(performSearch({ start: 0, end: 20 }));
-  }, [dispatch]);
+  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
+  const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
+  const collection = useSelector((state: RootState) => state.library.collection);
 
   useEffect(() => {
     if (transactions.length > 0) {
@@ -25,17 +23,10 @@ export default function LibrarySearch() {
   }, [transactions, dispatch]);
 
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'Enter') {
-        handleSearch();
-      }
-    };
-
-    document.addEventListener('keypress', handleKeyPress);
-    return () => {
-      document.removeEventListener('keypress', handleKeyPress);
-    };
-  }, [handleSearch]);
+    if (selectedPrincipals.length > 0 && collection) {
+      dispatch(performSearch());
+    }
+  }, [selectedPrincipals, collection, dispatch]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-3">

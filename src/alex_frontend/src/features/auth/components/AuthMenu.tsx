@@ -64,7 +64,7 @@ export default function AuthMenu() {
 				<DropdownMenuLabel className="text-center">@{user?.username}</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
-					<NavLink to='/dashboard'>
+					{/* <NavLink to='/dashboard'>
 						<DropdownMenuItem className="cursor-pointer">
 							<LayoutDashboard />
 							<span>Dashboard</span>
@@ -81,7 +81,7 @@ export default function AuthMenu() {
 							<Settings />
 							<span>Settings</span>
 						</DropdownMenuItem>
-					</NavLink>
+					</NavLink> */}
 
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator />
