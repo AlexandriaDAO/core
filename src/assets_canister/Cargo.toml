@@ -1,0 +1,16 @@
+[package]
+name = "assets_canister"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = "0.10"
+ic-cdk = "0.16"
+ic-stable-structures = "0.6.1"
+serde = { version = "1.0.188", features = ["derive"] }
+
