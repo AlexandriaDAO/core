@@ -90,7 +90,7 @@ const RedeemContent: React.FC = () => {
         </div>
 
       </div>
-      <LoadingModal show={loadingModalV} message1={"Reedem transaction in Progress"} message2={"Redeem transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
+      <LoadingModal show={loadingModalV} message1={"Redeem transaction in Progress"} message2={"Redeem transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
       <SuccessModal show={successModalV} setShow={setSucessModalV} />
       <ErrorModal show={errorModalV} setShow={setErrorModalV}/>
 

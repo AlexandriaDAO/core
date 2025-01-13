@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
 import PrincipalSelector from "./PrincipalSelector";
-import SortSelector from "./SortSelector";
 import CollectionSelector from "./collectionSelector";
 import LibraryContentTagsSelector from "./tagSelector";
 import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
@@ -31,23 +30,14 @@ export default function LibrarySearch() {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-3">
       <div className="max-w-7xl mx-auto space-y-2 sm:space-y-3">
-        <div className="grid grid-cols-1 gap-2 sm:gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
           <div className="flex flex-col space-y-2">
             <PrincipalSelector shouldTriggerSearch={false} />
             <CollectionSelector />
           </div>
-          <div className="flex flex-col space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="flex-grow">
-                <LibraryContentTagsSelector />
-              </div>
-              <div className="flex-shrink-0">
-                <SortSelector />
-              </div>
-            </div>
-          </div>
-          <RangeSelector />
+          <LibraryContentTagsSelector />
         </div>
+        <RangeSelector />
       </div>
     </div>
   );

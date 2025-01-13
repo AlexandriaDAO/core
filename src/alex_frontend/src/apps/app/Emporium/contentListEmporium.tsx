@@ -100,7 +100,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
     }
   }, []);
   const renderDetails = useCallback((transaction: Transaction) => (
-    <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[20] pt-12">
+    <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:block group-hover:opacity-100 transition-opacity duration-200 z-[20] pt-12">
       <ScrollArea className="h-full">
         <Card className="bg-transparent border-none text-gray-100 shadow-none">
           <CardHeader className="p-3 pb-2">

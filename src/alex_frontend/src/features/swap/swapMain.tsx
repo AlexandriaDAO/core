@@ -37,7 +37,7 @@ const SwapMain = () => {
         { id: 5, label: 'Receive', hover: null, content: <ReceiveContent /> },
         { id: 6, label: 'Burn', hover: "Burn LBRY, get back ALEX and ICP", content: <BurnContent /> },
         { id: 7, label: 'Stake', hover: null, content: <StakeContent /> },
-        { id: 8, label: 'Reedem', hover: "Redeem ICP if your swap fails", content: <RedeemContent /> },
+        { id: 8, label: 'Redeem', hover: "Redeem ICP if your swap fails", content: <RedeemContent /> },
         { id: 9, label: 'Transaction history', hover: null, content: <TransactionHistory /> },
         { id: 10, label: 'Insights', hover: null, content: <Insights /> }
 

@@ -1,10 +1,12 @@
+- If the mint has succeded the mint button should go away.
+- Need more dynamic states for the like/mint/withdraw buttons.
+
 
 - Need to combine emporium with main app modules.
 - Authmenue.tsx open back up the dashboard and profile.
 
 The Plan:
 
-- Color code the tags.
 - Alexandria query. (Query token amounts, then only the amount on the page (rather than all at once))
 
 Next Small Stuff:

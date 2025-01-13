@@ -41,7 +41,7 @@ export function SearchContainer({
   showMoreEnabled = true
 }: SearchContainerProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
   const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
 
   const handleSearchClick = useCallback(async () => {

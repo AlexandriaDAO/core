@@ -41,11 +41,11 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
   const [isLoading, setIsLoading] = React.useState(true);
 
   // Test mapping for local development
-  // // Comment out when not needed
-  // const TEST_PRINCIPAL_MAPPING: PrincipalData = {
-  //   principal: "2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe",
-  //   username: "chadthechad"
-  // };
+  // Comment out when not needed
+  const TEST_PRINCIPAL_MAPPING: PrincipalData = {
+    principal: "2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe",
+    username: "chadthechad"
+  };
 
   // Fetch principals from backend
   React.useEffect(() => {
@@ -60,8 +60,8 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
           username: user.username
         }));
         // Add test mapping for local development
-        // setPrincipals([...formattedPrincipals, TEST_PRINCIPAL_MAPPING]);
-        setPrincipals(formattedPrincipals);
+        setPrincipals([...formattedPrincipals, TEST_PRINCIPAL_MAPPING]);
+        // setPrincipals(formattedPrincipals);
       } catch (error) {
         console.error("Error fetching principals:", error);
       } finally {
