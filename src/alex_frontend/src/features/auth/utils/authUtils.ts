@@ -55,7 +55,11 @@ import {
   icp_swap_factory,
   createActor as createActorIcpSwapFactory,
 } from "../../../../../icp_swap_factory";
-const isLocalDevelopment =process.env.DFX_NETWORK !== "ic";
+import {
+  assets_canister,
+  createActor as createActorAssetCanister,
+} from "../../../../../declarations/assets_canister";
+const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
 
 const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
 const icrc7_canister_id = process.env.CANISTER_ID_ICRC7!;
@@ -71,6 +75,7 @@ const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 const log_canister_id = process.env.CANISTER_ID_LOGS!;
 const icp_swap_factory_canister_id = "ggzvv-5qaaa-aaaag-qck7a-cai";
+const assets_canister_id = "uf6dk-hyaaa-aaaaq-qaaaq-cai";
 
 export const getPrincipal = (client: AuthClient): string =>
   client.getIdentity().getPrincipal().toString();
@@ -172,3 +177,5 @@ export const getIcpSwapFactoryCanister = () =>
     createActorIcpSwapFactory,
     icp_swap_factory
   );
+export const getAssetsCanister = () =>
+  getActor(assets_canister_id, createActorAssetCanister, assets_canister);
