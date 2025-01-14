@@ -20,6 +20,7 @@ import EngineOverviewPage from "../pages/dashboard/EngineOverviewPage";
 import PublicEnginesPage from "../pages/dashboard/PublicEnginesPage";
 import AssetsPage from "../pages/dashboard/AssetsPage";
 import CollectionPage from "../pages/dashboard/CollectionPage";
+import RequestsMonitor from "../resources/RequestsMonitor";
 
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
@@ -90,6 +91,7 @@ export const AppRoutes = () => {
                                 <Route path="upload" element={<UploadPage />} />
                             </Route>
                             <Route path="collection" element={<CollectionPage />} />
+                            <Route path="monitor" element={<RequestsMonitor />} />
                         </Route>
 
                         <Route path="librarian" element={<LibrarianLayout />}>
@@ -111,6 +113,8 @@ export const AppRoutes = () => {
                             <Route path="assets" element={<AssetsPage />} />
                             <Route path="collection" element={<CollectionPage />} /> */}
                         </Route>
+
+                        
 
                     </Route>
                 </Route>

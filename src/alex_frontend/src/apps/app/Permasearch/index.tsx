@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { useWiper } from '@/apps/Modules/shared/state/wiper';
 import { resetSearch } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
+import { nsfwService } from '@/apps/Modules/LibModules/arweaveSearch/services/nsfwService';
 
 function Permasearch() {
 	const { isLoading, handleSearch } = useHandleSearch();
@@ -20,7 +21,17 @@ function Permasearch() {
 
 	useEffect(() => {
 		dispatch(setTransactions([])); //clear data from emporium 
-	}, [])
+		
+		// Preload TensorFlow when component mounts
+		nsfwService.loadModel().catch(error => {
+			console.error('Failed to preload TensorFlow:', error);
+		});
+
+		return () => {
+			// Cleanup when component unmounts
+			nsfwService.unloadModel();
+		};
+	}, []);
 
 	const handleNewSearch = useCallback(async () => {
 		try {

@@ -298,6 +298,8 @@
 
     "https-browserify": "^1.0.0",
 
+    "imports-loader": "^5.0.0",
+
     "null-loader": "^4.0.1",
 
     "os-browserify": "^0.3.0",

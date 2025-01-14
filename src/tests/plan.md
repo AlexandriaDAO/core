@@ -1,3 +1,4 @@
+- Search button on permasearch wipes the owner state (and maybe other filter states)
 - If the mint has succeded the mint button should go away.
 - Need more dynamic states for the like/mint/withdraw buttons.
 
