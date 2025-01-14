@@ -6,15 +6,17 @@ import SessionProvider from "./providers/SessionProvider";
 
 import "./styles/style.css";
 
+import "nprogress/nprogress.css";
+
 import AuthProvider from "./providers/AuthProvider";
 import ActorProvider from "./providers/ActorProvider";
 import UserProvider from "./providers/UserProvider";
 import { AppRoutes } from "./routes";
-// import ErrorBoundary from "./components/ErrorBoundary";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
     return (
-        // <ErrorBoundary>
+        <ErrorBoundary>
             <AuthProvider>
                 <ActorProvider>
                     <ReduxProvider>
@@ -26,6 +28,6 @@ export default function App() {
                     </ReduxProvider>
                 </ActorProvider>
             </AuthProvider>
-        // </ErrorBoundary>
+        </ErrorBoundary>
     );
 }

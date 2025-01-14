@@ -1,8 +1,8 @@
 import React from "react";
 import IIUserProvider from "./IIUserProvider";
-import EthUserProvider from "./EthUserProvider";
-import useAuth from "@/hooks/useAuth";
-import SolUserProvider from "./SolUserProvider";
+// import EthUserProvider from "./EthUserProvider";
+// import useAuth from "@/hooks/useAuth";
+// import SolUserProvider from "./SolUserProvider";
 
 interface UserProviderProps {
 	children: React.ReactNode;
@@ -10,15 +10,17 @@ interface UserProviderProps {
 
 const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
-    const {provider} = useAuth();
+    // const {provider} = useAuth();
 
-    if (provider === 'II') return <IIUserProvider>{children}</IIUserProvider>;
+    // if (provider === 'II') return <IIUserProvider>{children}</IIUserProvider>;
 
-    if (provider === 'ETH') return <EthUserProvider>{children}</EthUserProvider>;
+    // if (provider === 'ETH') return <EthUserProvider>{children}</EthUserProvider>;
 
-    if (provider === 'SOL') return <SolUserProvider>{children}</SolUserProvider>;
+    // if (provider === 'SOL') return <SolUserProvider>{children}</SolUserProvider>;
 
-    return <> {children} </>
+    // return <> {children} </>
+
+    return <IIUserProvider>{children}</IIUserProvider>;
 }
 
 export default UserProvider
