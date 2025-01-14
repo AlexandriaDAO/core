@@ -1,16 +1,16 @@
 import React from "react";
 import ComposeProviders from "@/utils/ComposeProviders";
 import {
-	AlexBackendActor,
-	AlexActor,
+	// AlexBackendActor,
+	// AlexActor,
 	AlexWalletActor,
-	IcpLedgerActor,
-	IcpSwapActor,
-	Icrc7Actor,
-	LbryActor,
+	// IcpLedgerActor,
+	// IcpSwapActor,
+	// Icrc7Actor,
+	// LbryActor,
 	NftManagerActor,
-	TokenomicsActor,
-	VetkdActor,
+	// TokenomicsActor,
+	// VetkdActor,
 	UserActor,
 } from "@/actors";
 
@@ -22,16 +22,16 @@ const ActorProvider: React.FC<ActorProviderProps> = ({ children }) => {
 	return (
 		<ComposeProviders
 			providers={[
-				AlexBackendActor,
-				AlexActor,
+				// AlexBackendActor,
+				// AlexActor,
 				AlexWalletActor,
-				IcpLedgerActor,
-				IcpSwapActor,
-				Icrc7Actor,
-				LbryActor,
+				// IcpLedgerActor,
+				// IcpSwapActor,
+				// Icrc7Actor,
+				// LbryActor,
 				NftManagerActor,
-				TokenomicsActor,
-				VetkdActor,
+				// TokenomicsActor,
+				// VetkdActor,
 				UserActor,
 			]}
 			>
