@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/lib/components/card";
-import { Copy, Check, Info, Loader2, Flag, User, Search, Plus } from "lucide-react";
+import { Copy, Check, Info, Loader2, Flag, User, Search, Plus, Heart } from "lucide-react";
 import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 import { Button } from "@/lib/components/button";
@@ -124,7 +124,7 @@ function NftDataFooter({ id }: NftDataFooterProps) {
 
 function ContentGrid({ children }: ContentGridProps) {
   return (
-    <div className="grid sm:grid-cols-2 xs:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 p-2 sm:p-4 pb-16">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 p-2 sm:p-4 pb-16">
       {children}
     </div>
   );
@@ -135,6 +135,7 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
   const [copiedOwner, setCopiedOwner] = useState(false);
   const [searchTriggered, setSearchTriggered] = useState(false);
   const dispatch = useDispatch();
+  const isAlexandrian = window.location.pathname.includes('/alexandrian');
 
   const formatId = (id: string | undefined) => {
     if (!id) return 'N/A';
@@ -213,7 +214,10 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
             {isMintable && onMint && (
               <Button
                 variant="secondary"
-                className={`bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] px-2 sm:px-4 py-1 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 transition-all duration-200 text-xs sm:text-sm font-medium shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)] shrink-0 ${isMinting ? 'opacity-80' : ''}`}
+                className={`${isAlexandrian 
+                  ? 'bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200'
+                  : 'bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)]'
+                } px-2 sm:px-4 py-1 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 transition-all duration-200 text-xs sm:text-sm font-medium shrink-0 ${isMinting ? 'opacity-80' : ''}`}
                 onClick={onMint}
                 disabled={isMinting}
               >
@@ -221,12 +225,16 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
                   {isMinting ? (
                     <>
                       <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-                      Minting
+                      {isAlexandrian ? 'Liking...' : 'Minting'}
                     </>
                   ) : (
                     <>
-                      Mint NFT
-                      <Plus className={`h-4 w-4 sm:h-5 sm:w-5 text-red-500 transition-all duration-200 ${isMinting ? 'scale-125 text-green-500' : ''}`} />
+                      {isAlexandrian ? 'Like' : 'Mint NFT'}
+                      {isAlexandrian ? (
+                        <Heart className={`h-4 w-4 sm:h-5 sm:w-5 transition-all duration-200 ${isMinting ? 'scale-125' : ''}`} />
+                      ) : (
+                        <Plus className={`h-4 w-4 sm:h-5 sm:w-5 text-red-500 transition-all duration-200 ${isMinting ? 'scale-125 text-green-500' : ''}`} />
+                      )}
                     </>
                   )}
                 </span>

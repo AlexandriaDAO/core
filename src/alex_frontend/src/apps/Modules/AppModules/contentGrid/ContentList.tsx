@@ -22,6 +22,7 @@ import {
 import { ScrollArea } from "@/lib/components/scroll-area";
 import { Badge } from "@/lib/components/badge";
 import { Separator } from "@/lib/components/separator";
+import { Loader2 } from 'lucide-react';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -48,6 +49,7 @@ const ContentList = () => {
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
+  const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
 
   const handleMint = async (transactionId: string) => {
     try {
@@ -69,6 +71,7 @@ const ContentList = () => {
 
   const handleWithdraw = async (transactionId: string) => {
     try {
+      setWithdrawingStates(prev => ({ ...prev, [transactionId]: true }));
       const nftId = arweaveToNftId[transactionId];
       if (!nftId) {
         throw new Error("Could not find NFT ID for this content");
@@ -91,6 +94,8 @@ const ContentList = () => {
     } catch (error) {
       console.error("Error withdrawing funds:", error);
       toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
+    } finally {
+      setWithdrawingStates(prev => ({ ...prev, [transactionId]: false }));
     }
   };
 
@@ -104,7 +109,7 @@ const ContentList = () => {
   }, []);
 
   const renderDetails = useCallback((transaction: Transaction) => (
-    <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[20]">
+    <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:block group-hover:opacity-100 transition-opacity duration-200 z-[20]">
       <ScrollArea className="h-full">
         <Card className="bg-transparent border-none text-gray-100 shadow-none">
           <CardHeader className="p-3 pb-2">
@@ -258,8 +263,16 @@ const ContentList = () => {
                         handleWithdraw(transaction.id);
                       }}
                       className="absolute bottom-2 right-2 z-30"
+                      disabled={withdrawingStates[transaction.id]}
                     >
-                      Withdraw
+                      {withdrawingStates[transaction.id] ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Withdrawing...
+                        </>
+                      ) : (
+                        "Withdraw"
+                      )}
                     </Button>
                   )}
                 </div>

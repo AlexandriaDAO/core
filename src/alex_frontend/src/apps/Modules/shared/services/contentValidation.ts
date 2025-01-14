@@ -1,11 +1,8 @@
-import { loadModel, isModelLoaded, validateContent as nsfwValidateContent } from '@/apps/Modules/LibModules/arweaveSearch/components/nsfwjs/tensorflow';
+import { nsfwService } from '@/apps/Modules/LibModules/arweaveSearch/services/nsfwService';
 
 export const useContentValidation = () => {
   const validateContent = async (element: HTMLImageElement | HTMLVideoElement, contentType: string) => {
-    if (!isModelLoaded()) {
-      await loadModel();
-    }
-    return nsfwValidateContent(element, contentType);
+    return nsfwService.validateContent(element, contentType);
   };
 
   return { validateContent };

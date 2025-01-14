@@ -77,7 +77,8 @@ export const AppRoutes = () => {
 
 						<Route path="*" element={<Suspense fallback={<TopProgressBar />}><NotFoundPage /></Suspense>} />
 					</Route>
-					<Route element={<Suspense fallback={<TopProgressBar />}><AuthLayout /></Suspense>}>
+					
+          <Route element={<Suspense fallback={<TopProgressBar />}><AuthLayout /></Suspense>}>
 						<Route path="dashboard" element={<Suspense fallback={<TopProgressBar />}><DashboardLayout /></Suspense>}>
 							<Route index element={<Suspense fallback={<TopProgressBar />}><DashboardPage /></Suspense>} />
 							{/* <Route path="profile" element={<ProfilePage />} /> */}
@@ -85,7 +86,6 @@ export const AppRoutes = () => {
 								<Route index element={<Suspense fallback={<TopProgressBar />}><ProfilePage /></Suspense>} />
 								<Route path="upgrade" element={<Suspense fallback={<TopProgressBar />}><UpgradePage /></Suspense>} />
 							</Route>
-
 							<Route path="engines">
 								<Route index element={<Suspense fallback={<TopProgressBar />}><EnginesPage /></Suspense>} />
 								<Route path=":id" element={<Suspense fallback={<TopProgressBar />}><EngineOverviewPage /></Suspense>} />

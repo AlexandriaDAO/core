@@ -38,6 +38,7 @@ function Alexandrian() {
 		<SearchContainer
 			title="Alexandrian"
 			description="Search the NFT Library of others, and manage your own."
+			hint="Liking costs 20 LBRY (this will decrease over time)."
 			onSearch={handleSearch}
 			onShowMore={handleShowMore}
 			isLoading={isLoading}

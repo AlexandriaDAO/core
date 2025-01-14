@@ -85,11 +85,6 @@ module.exports = {
     alias: {
       "@": path.resolve(__dirname, "src", frontendDirectory, "src"),
       stream: "stream-browserify",
-      './model_imports/inception_v3': 'null-loader',
-      './model_imports/mobilenet_v2': 'null-loader',
-      './model_imports/mobilenet_v2_mid': 'null-loader',
-      '@tensorflow/tfjs': path.resolve(__dirname, 'node_modules/@tensorflow/tfjs'),
-      'nsfwjs': path.resolve(__dirname, 'node_modules/nsfwjs'),
     },
   },
   output: {
@@ -103,6 +98,10 @@ module.exports = {
 
   module: {
     rules: [
+      {
+        test: /[\\/]node_modules[\\/](@tensorflow|tfjs-core|tfjs-backend-.*|tfjs-converter)[\\/]/,
+        sideEffects: true,
+      },
       {
         test: /\.(png|jpe?g|gif)$/i,
         use: [
@@ -198,40 +197,33 @@ module.exports = {
       ],
     }),
     new webpack.IgnorePlugin({
-      resourceRegExp: /^\.\/.*$/,
-      contextRegExp: /nsfwjs[\\/]dist[\\/]esm[\\/]models[\\/]models[\\/]model_imports[\\/]inception_v3$/,
-    }),
-    new webpack.IgnorePlugin({
       resourceRegExp: /^\.\/locale$/,
       contextRegExp: /moment$/,
     }),
     new webpack.DefinePlugin({
       'process.env.II_URL': JSON.stringify(II_URL),
-      'require("./model_imports/inception_v3")': '{}',
-      'require("./model_imports/mobilenet_v2")': '{}',
-      'require("./model_imports/mobilenet_v2_mid")': '{}'
     }),
-    // new BundleAnalyzerPlugin({
-    //   analyzerMode: 'server',
-    //   analyzerHost: 'localhost',
-    //   analyzerPort: 8888,
-    //   openAnalyzer: true,
-    //   generateStatsFile: true,
-    //   statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
-    //   statsOptions: {
-    //     all: false,
-    //     assets: true,
-    //     assetsSort: 'size',
-    //     chunks: true,
-    //     chunkModules: false,
-    //     entrypoints: true,
-    //     hash: true,
-    //     modules: false,
-    //     timings: true,
-    //     errors: true,
-    //     warnings: true,
-    //   },
-    // }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'server',
+      analyzerHost: 'localhost',
+      analyzerPort: 8888,
+      openAnalyzer: true,
+      generateStatsFile: true,
+      statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
+      statsOptions: {
+        all: false,
+        assets: true,
+        assetsSort: 'size',
+        chunks: true,
+        chunkModules: false,
+        entrypoints: true,
+        hash: true,
+        modules: false,
+        timings: true,
+        errors: true,
+        warnings: true,
+      },
+    }),
   ],
   devServer: {
     

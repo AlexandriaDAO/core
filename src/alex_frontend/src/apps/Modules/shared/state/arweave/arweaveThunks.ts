@@ -6,6 +6,7 @@ import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/ap
 import { SearchState } from '../../../shared/types/queries';
 import { loadContentForTransactions } from '../content/contentDisplayThunks';
 import { RootState } from '@/store';
+import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 
 interface SearchParams {
   searchState: SearchState;
@@ -24,6 +25,12 @@ export const performSearch = createAsyncThunk(
     });
 
     try {
+      // Clear cache and transactions if this is a new search
+      if (!isContinuation) {
+        ContentService.clearCache();
+        dispatch(setTransactions([]));
+      }
+
       const fetchedTransactions = await fetchTransactionsApi({
         contentTypes: searchState.tags,
         amount: searchState.amount,
@@ -45,7 +52,7 @@ export const performSearch = createAsyncThunk(
 
       // Create a Set of existing transaction IDs for efficient lookup
       const existingIds = new Set(existingTransactions.map(t => t.id));
-      
+
       // Filter out any duplicates from the new transactions
       const uniqueNewTransactions = fetchedTransactions.filter(
         transaction => !existingIds.has(transaction.id)

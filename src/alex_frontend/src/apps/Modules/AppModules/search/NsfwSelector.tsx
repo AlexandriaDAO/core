@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { setNsfwModelLoaded } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
-import { loadModel, unloadModel, isModelLoaded } from '@/apps/Modules/LibModules/arweaveSearch/components/nsfwjs/tensorflow';
+import { nsfwService } from '@/apps/Modules/LibModules/arweaveSearch/services/nsfwService';
 import { Switch } from '@/lib/components/switch';
 
 const NsfwModelControl: React.FC = () => {
@@ -10,37 +10,34 @@ const NsfwModelControl: React.FC = () => {
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Add cleanup effect
   useEffect(() => {
-    // Cleanup function that runs when component unmounts
     return () => {
-      if (isModelLoaded()) {
-        unloadModel();
+      if (nsfwService.isModelLoaded()) {
+        nsfwService.unloadModel();
         dispatch(setNsfwModelLoaded(false));
       }
     };
-  }, []); // Empty dependency array since we only want this to run on unmount
+  }, []);
 
-  // Add this if you want to autmatically turn SafeSearch on.
   useEffect(() => {
-    if (!isModelLoaded()) {
+    if (!nsfwService.isModelLoaded()) {
       handleToggleSafeSearch(true);
     }
   }, []);
 
   const handleToggleSafeSearch = async (enabled: boolean) => {
-    if (enabled && !isModelLoaded()) {
+    if (enabled && !nsfwService.isModelLoaded()) {
       setIsLoading(true);
       try {
-        await loadModel();
-        dispatch(setNsfwModelLoaded(true));
+        const loaded = await nsfwService.loadModel();
+        dispatch(setNsfwModelLoaded(loaded));
       } catch (error) {
         console.error('Error loading NSFW model:', error);
       } finally {
         setIsLoading(false);
       }
-    } else if (!enabled && isModelLoaded()) {
-      unloadModel();
+    } else if (!enabled && nsfwService.isModelLoaded()) {
+      nsfwService.unloadModel();
       dispatch(setNsfwModelLoaded(false));
     }
   };
