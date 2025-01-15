@@ -1,38 +1,13 @@
 type Asset = record {
-  modified_at : nat64;
-  encoding : AssetEncoding;
-  owner : principal;
+  owner : text;
+  data : blob;
   content_type : text;
-  created_at : nat64;
+  chunks : vec blob;
 };
-type AssetEncoding = variant {
-  Raw : blob;
-  Chunked : record { chunks : vec blob; total_length : nat64 };
-};
-type ChunkUploadArgs = record { chunk_index : nat32; content : blob };
-type HttpHeader = record { value : text; name : text };
-type HttpRequest = record {
-  url : text;
-  method : text;
-  body : blob;
-  headers : vec record { text; text };
-};
-type HttpResponse = record {
-  status : nat16;
-  body : blob;
-  headers : vec HttpHeader;
-};
-type InitUploadArgs = record { total_chunks : nat32; content_type : text };
-type Result = variant { Ok : nat64; Err : text };
-type Result_1 = variant { Ok; Err : text };
-type StoreAssetArgs = record { content : blob; content_type : text };
-service : () -> {
-  finalize_upload : () -> (Result);
+service : {
+  add_asset_chunk : (nat64, blob) -> ();
   get_asset : (nat64) -> (opt Asset) query;
-  get_asset_content_type : (nat64) -> (opt text) query;
-  http_request : (HttpRequest) -> (HttpResponse) query;
-  init_chunked_upload : (InitUploadArgs) -> (Result_1);
-  is_owner : (nat64) -> (bool) query;
-  store_asset : (StoreAssetArgs) -> (nat64);
-  upload_chunk : (ChunkUploadArgs) -> (Result_1);
+  get_asset_ids : () -> (vec nat64) query;
+  get_owner : (nat64) -> (opt text) query;
+  store_asset_chunk : (blob, opt nat64) -> (nat64);
 }

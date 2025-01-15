@@ -143,6 +143,7 @@
       "package": "assets_canister",
       "type": "rust",
       "specified_id": "uf6dk-hyaaa-aaaaq-qaaaq-cai",
+      "source": ["assets"],
       "bindings": {
         "ic": {
           "http_requests": {
