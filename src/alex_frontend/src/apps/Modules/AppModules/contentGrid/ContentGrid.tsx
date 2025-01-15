@@ -211,7 +211,7 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
       <CardFooter className="flex flex-col w-full rounded-lg border border-[--border] bg-[--card] mt-2 p-2 sm:p-3">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
-            {isMintable && onMint && (
+            {isMintable && !isOwned && onMint && (
               <Button
                 variant="secondary"
                 className={`${isAlexandrian 

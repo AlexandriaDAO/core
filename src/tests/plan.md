@@ -1,6 +1,13 @@
-- Search button on permasearch wipes the owner state (and maybe other filter states)
+- Principal Selector, only show profiles that have NFTs/SBTs.
+
+
+
+
 - If the mint has succeded the mint button should go away.
 - Need more dynamic states for the like/mint/withdraw buttons.
+
+
+
 
 
 - Need to combine emporium with main app modules.

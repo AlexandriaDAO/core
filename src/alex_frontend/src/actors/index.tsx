@@ -4,6 +4,7 @@ export { default as AlexWalletActor } from './AlexWalletActor';
 export { default as IcpLedgerActor } from './IcpLedgerActor';
 export { default as IcpSwapActor } from './IcpSwapActor';
 export { default as Icrc7Actor } from './Icrc7Actor';
+export { default as Icrc7ScionActor } from './Icrc7ScionActor';
 export { default as LbryActor } from './LbryActor';
 export { default as NftManagerActor } from './NftManagerActor';
 export { default as TokenomicsActor } from './TokenomicsActor';

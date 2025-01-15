@@ -35,7 +35,6 @@ function Permasearch() {
 
 	const handleNewSearch = useCallback(async () => {
 		try {
-			await dispatch(resetSearch());
 			await dispatch(clearTransactions());
 			return handleSearch().catch(error => {
 				toast.error(error.message || "An error occurred while searching");

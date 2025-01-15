@@ -14,6 +14,10 @@ import {
   icrc7,
 } from "../../../../../declarations/icrc7";
 import {
+  createActor as createIcrc7ScionActor,
+  icrc7_scion,
+} from "../../../../../declarations/icrc7_scion";
+import {
   createActor as createNftManagerActor,
   nft_manager,
 } from "../../../../../declarations/nft_manager";
@@ -59,6 +63,7 @@ const isLocalDevelopment =process.env.DFX_NETWORK !== "ic";
 
 const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
 const icrc7_canister_id = process.env.CANISTER_ID_ICRC7!;
+const icrc7_scion_canister_id = process.env.CANISTER_ID_ICRC7_SCION!;
 const nft_manager_canister_id = process.env.CANISTER_ID_NFT_MANAGER!;
 const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
 const icp_ledger_canister_id = "ryjl3-tyaaa-aaaaa-aaaba-cai";
@@ -139,6 +144,9 @@ export const getActorAlexWallet = async () =>
 
 export const getIcrc7Actor = () =>
   getActor(icrc7_canister_id, createIcrc7Actor, icrc7);
+
+export const getIcrc7ScionActor = () =>
+  getActor(icrc7_scion_canister_id, createIcrc7ScionActor, icrc7_scion);
 
 export const getNftManagerActor = () =>
   getActor(nft_manager_canister_id, createNftManagerActor, nft_manager);

@@ -1,7 +1,5 @@
 import type { NSFWJS, PredictionType } from 'nsfwjs';
 import type { TensorFlow } from '../types/tensorflow';
-import * as tf from '@tensorflow/tfjs';
-import '@tensorflow/tfjs-backend-webgl';
 
 export type PredictionResults = {
   Drawing: number;
@@ -15,13 +13,15 @@ export type PredictionResults = {
 type ModelState = {
   nsfwjs: typeof import('nsfwjs') | null;
   model: NSFWJS | null;
+  tf: TensorFlow | null;
 };
 
 class NSFWService {
   private static instance: NSFWService;
   private state: ModelState = {
     nsfwjs: null,
-    model: null
+    model: null,
+    tf: null
   };
 
   private constructor() {}
@@ -33,20 +33,20 @@ class NSFWService {
     return NSFWService.instance;
   }
 
-  private async importNSFWJS() {
-    try {
-      const nsfwjs = await import(
-        /* webpackChunkName: "nsfwjs" */
-        /* webpackMode: "lazy" */
-        /* webpackPrefetch: true */
-        'nsfwjs'
-      ).then(m => m.default || m);
+  private async importTensorFlow() {
+    return import(
+      /* webpackChunkName: "tensorflow" */
+      /* webpackPreload: true */
+      '@tensorflow/tfjs'
+    ).then(m => m.default || m);
+  }
 
-      return nsfwjs;
-    } catch (error) {
-      console.error('Error importing NSFWJS:', error);
-      throw error;
-    }
+  private async importNSFWJS() {
+    return import(
+      /* webpackChunkName: "nsfwjs" */
+      /* webpackPreload: true */
+      'nsfwjs'
+    ).then(m => m.default || m);
   }
 
   async loadModel(): Promise<boolean> {
@@ -55,14 +55,17 @@ class NSFWService {
     }
 
     try {
-      // Initialize TensorFlow
-      await tf.ready();
+      // Load both modules in parallel like in the original working code
+      const [tf, nsfwjs] = await Promise.all([
+        this.importTensorFlow(),
+        this.importNSFWJS()
+      ]);
       
-      // Import and initialize NSFWJS
-      const nsfwjsModule = await this.importNSFWJS();
-      this.state.nsfwjs = nsfwjsModule;
+      this.state.tf = tf;
+      this.state.nsfwjs = nsfwjs;
       
-      this.state.model = await nsfwjsModule.load('/models/mobilenet_v2_mid/model.json', { type: 'graph' });
+      // Load the model
+      this.state.model = await nsfwjs.load('/models/mobilenet_v2_mid/model.json', { type: 'graph' });
       return true;
     } catch (error) {
       console.error('Error loading NSFW model:', error);
@@ -77,10 +80,11 @@ class NSFWService {
       this.state.model = null;
     }
     this.state.nsfwjs = null;
+    this.state.tf = null;
   }
 
   isModelLoaded(): boolean {
-    return this.state.model !== null;
+    return this.state.model !== null && this.state.tf !== null;
   }
 
   private disposeCanvas(canvas: HTMLCanvasElement): void {
@@ -146,11 +150,11 @@ class NSFWService {
         }
       }
 
-      if (tempCanvas) {
+      if (tempCanvas && this.state.tf) {
         const ctx = tempCanvas.getContext('2d');
         if (ctx) {
           const imgData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-          imgTensor = tf.browser.fromPixels(imgData);
+          imgTensor = this.state.tf.browser.fromPixels(imgData);
         }
       }
 

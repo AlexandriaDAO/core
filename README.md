@@ -100,6 +100,22 @@ Rationale: This methodology is the most consise, and having all the canister ids
 
 Use the pattern in nsfwjs/nsfwImports.tsx. It was used to dynamically import TensorFlow with much success.
 
+```
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-backend-webgl';
+```
+
+The key is that we import TensorFlow directly in the module where it's used (nsfwService), but webpack is still able to code-split it because:
+
+```
+{
+  test: /[\\/]node_modules[\\/](@tensorflow|tfjs-core|tfjs-backend-.*|tfjs-converter)[\\/]/,
+  sideEffects: true,
+}
+```
+
+The key insight was that we don't need to manually handle the dynamic import - webpack's code splitting handles that automatically when the module is only imported in code that's itself dynamically loaded (like the Permasearch component).
+
 ### Adding an app.
 
 Add a `src/apps/your_app_name/index.tsx, and keep all supporting components in the apps folder. Eventually the good apps may move to different repos/subdomains, so the logic must be standalone. For this reason it's better to have duplicate code, that reusing/relying on parts of the main app which might have to be moved.
