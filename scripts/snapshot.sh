@@ -3,7 +3,7 @@
 
 # # Load snapshot
 # dfx canister stop <canister-name> --network ic
-# dfx canister snapshot load <canister-name> <snapshot-id>
+# dfx canister snapshot load <canister-name> <snapshot-id> --network ic
 # dfx canister start <canister-name> --network ic
 
 set -x
@@ -23,7 +23,7 @@ dfx canister start LBRY --network ic
 
 # alex_backend
 dfx canister stop alex_backend --network ic
-dfx canister snapshot create alex_backend --network ic
+dfx canister snapshot create alex_backend --replace 00000000000000000000000001f0531b0101 --network ic
 dfx canister start alex_backend --network ic
 
 # alex_frontend
