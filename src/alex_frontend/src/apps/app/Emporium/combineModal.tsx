@@ -83,7 +83,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
                             <Input
                                 id="price"
                                 type="number"
-                                value={price}
+                                value={price+""}
                                 className={`w-full border rounded-md px-3 py-2 ${Number(price) === 0 ? "border-red-500" : "border-gray-300"
                                     }`}
                                 placeholder="Enter price"
@@ -116,7 +116,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
                             <Input
                                 id="price"
                                 type="number"
-                                value={price}
+                                value={price+""}
                                 className="w-full border border-gray-300 rounded-md px-3 py-2"
                                 placeholder="Enter updated price"
                                 onChange={(e) => {

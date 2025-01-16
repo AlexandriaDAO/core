@@ -98,8 +98,6 @@ const LineChart: React.FC<ChartProps> = ({
             </div>
             <div
                 style={{
-                    overflowX: 'auto',
-                    whiteSpace: 'nowrap',
                     display: 'flex',
                     alignItems: 'center',
                     padding: '10px',
@@ -107,7 +105,7 @@ const LineChart: React.FC<ChartProps> = ({
             >
                 <div
                     ref={chartRef1}
-                    className="h-[400px] min-w-[700px] bg-white rounded-lg"
+                    className="h-[400px] w-full bg-white rounded-lg"
                 />
             </div>
         </div>
