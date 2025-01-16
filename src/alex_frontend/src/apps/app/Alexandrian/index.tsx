@@ -8,7 +8,23 @@ import { performSearch, updateSearchParams } from '@/apps/Modules/shared/state/l
 import { resetSearch } from '@/apps/Modules/shared/state/librarySearch/librarySlice';
 import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
 import { getAssetsCanister } from "@/features/auth/utils/authUtils";
+import type { Principal } from '@dfinity/principal';
+import { arweaveIdToNat } from "@/utils/id_convert";
+const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+// Constants
+const MAX_CHUNK_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_ASSET_SIZE = 20 * 1024 * 1024; // 20MB
 
+
+
+interface AssetMetadata {
+	content_type: string;
+	total_size: number;
+	chunk_count: number;
+	owner: Principal;
+	created_at: bigint;
+	updated_at: bigint;
+}
 function Alexandrian() {
 	useWiper();
 	const dispatch = useDispatch<AppDispatch>();
@@ -35,212 +51,146 @@ function Alexandrian() {
 		}
 	}, [dispatch, searchParams]);
 
-	// testing 
-	// const uploadImage = async () => {
-	// 	try {
-	// 	  // Fetch the image from the URL
-	// 	  const response = await fetch('https://kxhfl53dccty27abfsifmcl6hg6yec4oeaqpwrihawzo3x4cscwa.arweave.net/Vc5V92MQp418ASyQVgl-Ob2CC44gIPtFBwWy7d-CkKw');
-	// 	  if (!response.ok) {
-	// 		throw new Error('Failed to fetch image');
-	// 	  }
-
-	// 	  // Get the blob from the response
-	// 	  const imageBlob = await response.blob();
-
-	// 	  // Get the content type
-	// 	  const contentType = imageBlob.type || 'image/jpeg'; // fallback to jpeg if type is not available
-
-	// 	  // Convert blob to array buffer
-	// 	  const arrayBuffer = await imageBlob.arrayBuffer();
-	// 	  const uint8Array = new Uint8Array(arrayBuffer);
-
-	// 	  // Get the actor
-	// 	  const actor = await getAssetsCanister();
-
-	// 	  // Store the asset
-	// 	  const assetId = await actor.store_asset(contentType, [...uint8Array]);
-	// 	  console.log("Asset uploaded successfully with ID:", assetId);
-	// 	  return assetId;
-	// 	} catch (error) {
-	// 	  console.error("Error uploading image:", error);
-	// 	  throw error;
-	// 	}
-	//   };
-
-	// Fetch the image from the URL
-
 	const upload = async () => {
 		try {
-			const imageUrl = 'https://kxhfl53dccty27abfsifmcl6hg6yec4oeaqpwrihawzo3x4cscwa.arweave.net/Vc5V92MQp418ASyQVgl-Ob2CC44gIPtFBwWy7d-CkKw'; // Replace with your image URL
+			const imageUrl = 'https://kxhfl53dccty27abfsifmcl6hg6yec4oeaqpwrihawzo3x4cscwa.arweave.net/Vc5V92MQp418ASyQVgl-Ob2CC44gIPtFBwWy7d-CkKw';
 
-			// Fetch the image from the URL
 			const response = await fetch(imageUrl);
 			if (!response.ok) {
 				throw new Error('Failed to fetch image');
 			}
 
-			// Get the blob from the response
 			const imageBlob = await response.blob();
-
-			// Convert the blob into an array buffer
 			const arrayBuffer = await imageBlob.arrayBuffer();
 			const uint8Array = new Uint8Array(arrayBuffer);
 
-			// Split the image into chunks (e.g., 1MB each)
-			const chunkSize = 1024 * 1024; // 1MB
-			const chunks = [];
+			if (uint8Array.length > 20 * 1024 * 1024) { // 20MB
+				throw new Error('Asset size exceeds maximum allowed size');
+			}
+
+			// Get an actor to interact with the canister
+			const actor = await getAssetsCanister();
+
+			// Transaction details (nft_token, owner, and tags)
+			const nftToken = "gzaYJl8IIz3UX4t3PXTe8ZWXFaUvutxyofiXYSD9LNk"; // Example NFT token
+			const owner = "NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g"; // Example owner address
+			const tags = [
+				{ name: "Content-Type", value: imageBlob.type || "image/jpeg" }
+			];
+			const id: bigint = arweaveIdToNat("gzaYJl8IIz3UX4t3PXTe8ZWXFaUvutxyofiXYSD9LNk");
+			// Initialize asset and handle Result type
+			const initResult = await actor.initialize_asset(
+				id,
+				imageBlob.type || 'image/jpeg', // content_type
+				BigInt(uint8Array.length), // total_size
+				nftToken, // nft_token
+				owner, // owner address
+				tags // tags
+			);
+
+			if ('Err' in initResult) {
+				throw new Error(`Failed to initialize asset: ${Object.keys(initResult.Err)[0]}`);
+			}
+
+			const assetId = initResult.Ok;
+
+			// Split and upload chunks
+			const chunkSize = 2 * 1024 * 1024; // 2MB
 			for (let i = 0; i < uint8Array.length; i += chunkSize) {
 				const chunk = uint8Array.slice(i, i + chunkSize);
-				chunks.push(chunk);
+				const chunkIndex = Math.floor(i / chunkSize);
+
+				const storeResult = await actor.store_chunk(
+					id, // Asset ID
+					BigInt(chunkIndex), // Chunk index
+					Array.from(chunk) // Chunk data as an array
+				);
+
+				if ('Err' in storeResult) {
+					throw new Error(`Failed to upload chunk ${chunkIndex}: ${Object.keys(storeResult.Err)[0]}`);
+				}
+
+				console.log(`Uploaded chunk ${chunkIndex + 1}`);
 			}
 
-			// Get the actor for storing the asset
-			const actor = await getAssetsCanister();
-
-			// Store the first chunk and get the asset ID (pass empty array for first chunk)
-			let assetId = await actor.store_asset_chunk(chunks[0], []);  // Pass `[]` for the first chunk
-
-			console.log("First chunk uploaded with ID:", assetId);
-
-			// Check if the assetId is a valid BigInt
-			if (typeof assetId === 'bigint') {
-				console.log("Asset ID is a valid BigInt:", assetId);
-			} else {
-				console.error("Invalid assetId type:", assetId);
-				throw new Error("Invalid assetId returned from the canister");
-			}
-
-			// Store subsequent chunks with the same asset ID (pass the correct asset ID as an array)
-			for (let i = 1; i < chunks.length; i++) {
-				await actor.store_asset_chunk(chunks[i], [BigInt(assetId)]);  // Pass the correct asset ID as an array with BigInt
-				console.log("Chunk uploaded with ID:", assetId);
-			}
-
-			console.log("All chunks uploaded successfully.");
+			console.log("Upload completed successfully with ID:", assetId.toString());
+			return assetId;
 		} catch (error) {
-			console.error("Error uploading image in chunks:", error);
+			console.error("Error uploading image:", error);
 			throw error;
 		}
 	};
 
 
-
-
-
-
-
-	// const upload = async () => {
-	// 	const actor = await getAssetsCanister();
-
-	// 	try {
-	// 		// Fetch the image from the URL
-	// 		const response = await fetch('https://kxhfl53dccty27abfsifmcl6hg6yec4oeaqpwrihawzo3x4cscwa.arweave.net/Vc5V92MQp418ASyQVgl-Ob2CC44gIPtFBwWy7d-CkKw');
-	// 		const imageBlob = await response.blob();
-
-	// 		// Convert blob to Uint8Array
-	// 		const arrayBuffer = await imageBlob.arrayBuffer();
-	// 		const uint8Array = new Uint8Array(arrayBuffer);
-
-	// 		// For small images, direct upload
-	// 		if (uint8Array.length < 2_000_000) { // Less than 2MB
-	// 			const result = await actor.store_asset({
-	// 				content_type: imageBlob.type,
-	// 				content: [...uint8Array]
-	// 			});
-	// 			console.log("Asset stored with ID:", result);
-	// 			return result;
-	// 		}
-
-	// 		// For larger images, use chunked upload
-	// 		const CHUNK_SIZE = 1_900_000; // Slightly less than 2MB to be safe
-	// 		const totalChunks = Math.ceil(uint8Array.length / CHUNK_SIZE);
-
-	// 		// Initialize chunked upload
-	// 		await actor.init_chunked_upload({
-	// 			content_type: imageBlob.type,
-	// 			total_chunks: totalChunks
-	// 		});
-
-	// 		// Upload chunks
-	// 		for (let i = 0; i < totalChunks; i++) {
-	// 			const start = i * CHUNK_SIZE;
-	// 			const end = Math.min(start + CHUNK_SIZE, uint8Array.length);
-	// 			const chunk = uint8Array.slice(start, end);
-
-	// 			await actor.upload_chunk({
-	// 				chunk_index: i,
-	// 				content: [...chunk]
-	// 			});
-	// 			console.log(`Uploaded chunk ${i + 1}/${totalChunks}`);
-	// 		}
-
-	// 		// Finalize upload
-	// 		const assetId = await actor.finalize_upload();
-	// 		console.log("Asset stored with ID:", assetId);
-	// 		return assetId;
-
-	// 	} catch (error) {
-	// 		console.error("Error uploading image:", error);
-	// 		throw error;
-	// 	}
-	// };
-	const getImage = async (assetId: any) => {
+	const getImage = async (assetId: bigint) => {
 		try {
-			// Get the actor for interacting with the canister
 			const actor = await getAssetsCanister();
 
-			// Retrieve the asset object, which includes the chunks
-			const asset = await actor.get_asset(assetId);
+			// Get metadata and handle Result type
+			const metadataResult = await actor.get_asset_metadata(assetId);
 
-			// Early return if no asset found or the chunks array is empty
-			if (!asset || !asset[0]?.chunks || asset[0].chunks.length === 0) {
-				console.log("No asset found");
-				return null;
+			if ('Err' in metadataResult) {
+				throw new Error(`Failed to get asset metadata: ${Object.keys(metadataResult.Err)[0]}`);
 			}
 
-			// Concatenate all the chunks to reconstruct the full image data
-			const fullImageData = new Uint8Array(asset[0]?.chunks.reduce((acc, chunk) => {
-				// Ensure `acc` is always a Uint8Array
-				const newArray = new Uint8Array(acc.length + chunk.length);
-				newArray.set(acc);
-				newArray.set(chunk, acc.length);
-				return newArray;
-			}, new Uint8Array(0)));
+			const metadata = metadataResult.Ok;
+			const chunks: Uint8Array[] = [];
 
-			// Check if image data exists
-			if (!fullImageData || fullImageData.length === 0) {
-				console.log("Asset has no data");
-				return null;
+			// Fetch all chunks
+			for (let i = 0; i < metadata.chunk_count; i++) {
+				const chunkResult = await actor.get_chunk(assetId, BigInt(i));
+
+				if ('Err' in chunkResult) {
+					throw new Error(`Failed to get chunk ${i}: ${Object.keys(chunkResult.Err)[0]}`);
+				}
+
+				chunks.push(new Uint8Array(chunkResult.Ok));
 			}
 
-			// Create a blob from the full image data
-			const blob = new Blob([fullImageData], { type: asset[0]?.content_type });
+			// Combine chunks
+			const fullImageData = new Uint8Array(Number(metadata.total_size));
+			let offset = 0;
+			for (const chunk of chunks) {
+				fullImageData.set(chunk, offset);
+				offset += chunk.length;
+			}
 
-			// Create an object URL for the blob
+			// Display image
+			const blob = new Blob([fullImageData], { type: metadata.content_type });
 			const imageUrl = URL.createObjectURL(blob);
-			console.log("Image URL is", imageUrl);
 
-			// Create an image element and set the source to the blob URL
-			const imgElement = document.createElement('img');
-			imgElement.src = imageUrl;
+			const container = document.getElementById('image-container');
+			if (container) {
+				container.innerHTML = '';
 
-			// Optionally set the alt text
-			imgElement.alt = "Asset Image";
+				// Create image element
+				const imgElement = document.createElement('img');
+				imgElement.src = imageUrl;
+				imgElement.alt = "Asset Image";
+				imgElement.style.maxWidth = '100%';
+				imgElement.style.height = 'auto';
 
-			// Optionally, you can style the image (for example, set a max width or height)
-			imgElement.style.maxWidth = '100%'; // This ensures the image scales to fit the container
-			imgElement.style.height = 'auto';
+				// Append image to container
+				container.appendChild(imgElement);
+				imgElement.onload = () => URL.revokeObjectURL(imageUrl);
 
-			// Append the image to a container (e.g., body or a div with id 'image-container')
-			document?.getElementById('image-container')?.appendChild(imgElement);
+				// Display additional metadata (e.g., NFT token, owner, tags)
+				const metadataInfo = document.createElement('div');
+				metadataInfo.innerHTML = `
+					<p><strong>Content Type:</strong> ${metadata.content_type}</p>
+					<p><strong>Owner:</strong> ${metadata.owner}</p>
+					<p><strong>NFT Token:</strong> ${metadata.nft_token}</p>
+					<p><strong>Created At:</strong> ${new Date(Number(metadata.created_at) * 1000).toLocaleString()}</p>
+				`;
 
+				// Append metadata info to container
+				container.appendChild(metadataInfo);
+			}
 		} catch (error) {
-			console.error("Error retrieving image:", error);
+			console.error("Error displaying image:", error);
 			throw error;
 		}
 	};
-
-
 
 	return (
 		<><div id="image-container"></div>
@@ -249,7 +199,7 @@ function Alexandrian() {
 				upload();
 			}}>Sync </button>
 			<button onClick={() => {
-				getImage(10);
+				getImage(arweaveIdToNat("gzaYJl8IIz3UX4t3PXTe8ZWXFaUvutxyofiXYSD9LNk"));
 			}}>get </button>
 			<SearchContainer
 				title="Alexandrian"

@@ -1,13 +1,35 @@
-type Asset = record {
-  owner : text;
-  data : blob;
+type AssetError = variant {
+  InvalidChunkIndex;
+  NotFound;
+  Unauthorized;
+  AlreadyExists;
+  AssetTooLarge;
+  ChunkTooLarge;
+};
+type AssetMetadata = record {
+  owner : principal;
+  transaction : Transaction;
   content_type : text;
-  chunks : vec blob;
+  nft_token : text;
+  created_at : nat64;
+  total_size : nat64;
+  chunk_count : nat64;
+};
+type Result = variant { Ok; Err : AssetError };
+type Result_1 = variant { Ok : AssetMetadata; Err : AssetError };
+type Result_2 = variant { Ok : blob; Err : AssetError };
+type Result_3 = variant { Ok : text; Err : AssetError };
+type Tag = record { value : text; name : text };
+type Transaction = record {
+  owner : text;
+  date : nat64;
+  size : nat64;
+  tags : vec Tag;
 };
 service : {
-  add_asset_chunk : (nat64, blob) -> ();
-  get_asset : (nat64) -> (opt Asset) query;
-  get_asset_ids : () -> (vec nat64) query;
-  get_owner : (nat64) -> (opt text) query;
-  store_asset_chunk : (blob, opt nat64) -> (nat64);
+  delete_asset : (nat) -> (Result);
+  get_asset_metadata : (nat) -> (Result_1) query;
+  get_chunk : (nat, nat64) -> (Result_2) query;
+  initialize_asset : (nat, text, nat64, text, text, vec Tag) -> (Result_3);
+  store_chunk : (nat, nat64, blob) -> (Result);
 }
