@@ -1,6 +1,6 @@
-import { Transaction } from "../../../shared/types/queries";
-import { getArweaveUrl } from "../../arweaveSearch/config/arweaveConfig";
-import { CachedContent } from '../types';
+import { Transaction } from "../types/queries";
+import { getArweaveUrl } from "../../LibModules/arweaveSearch/config/arweaveConfig";
+import { CachedContent } from '../../LibModules/contentDisplay/types';
 import { LRUCache } from 'lru-cache';
 
 type ContentCache = Record<string, CachedContent>;

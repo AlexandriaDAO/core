@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { setNsfwModelLoaded } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
-import { nsfwService } from '@/apps/Modules/LibModules/arweaveSearch/services/nsfwService';
+import { nsfwService } from '@/apps/Modules/shared/services/nsfwService';
 import { Switch } from '@/lib/components/switch';
 
 const NsfwModelControl: React.FC = () => {
