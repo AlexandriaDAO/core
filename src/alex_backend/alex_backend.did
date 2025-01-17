@@ -10,7 +10,14 @@ type SourceCard = record {
   summary : text;
   bookmarked : bool;
 };
-service : {
+type UserNFTInfo = record {
+  "principal" : principal;
+  username : text;
+  has_scion_nfts : bool;
+  last_updated : nat64;
+  has_nfts : bool;
+};
+service : () -> {
   bookmark_sc : (nat64) -> ();
   delete_keys : (nat8) -> (Result);
   delete_sc : (nat64) -> ();
@@ -18,6 +25,7 @@ service : {
   get_keys : () -> (vec Keys) query;
   get_librarian_keys : (principal) -> (vec Keys) query;
   get_sc : (nat64) -> (opt SourceCard) query;
+  get_stored_nft_users : () -> (vec UserNFTInfo) query;
   save_keys : (text, text, nat8) -> (Result);
   save_sc : (text, text, text, text, text, text) -> (nat64);
   whoami : () -> (principal) query;
