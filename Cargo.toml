@@ -13,5 +13,7 @@ members = [
     "src/user",
     "src/emporium",
     "src/logs",
+    "src/asset_canister",
+
 ]
 resolver = "2"
