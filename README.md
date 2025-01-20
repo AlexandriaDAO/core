@@ -38,7 +38,7 @@ Please use the existing Typescript or Rust patterns in dfx.json.
 
 Always name the folder, and .did file the same canister name, e.g.,
 
-### Accessing a new Canister from the Frontend.
+<!-- ### Accessing a new Canister from the Frontend.
 
 Add it to the following files with the existing patterns:
     (1) src/alex_frontend/src/contexts/SessionContext.tsx
@@ -47,7 +47,32 @@ Add it to the following files with the existing patterns:
 
 We use 2 patterns when calling actor functions: Implemented with `const { actor } = useSession();` via SessionContext.tsx or `createAsyncThunk`... via Redux? When should we use which? 
 
-todo before next push: Fix fetchBooks.ts, fetchEngineBooks.ts, and irys.tsx
+todo before next push: Fix fetchBooks.ts, fetchEngineBooks.ts, and irys.tsx -->
+
+### Creating and Using Actors
+
+To integrate actors into your project, follow these steps:
+
+1. **Create a Context:**
+   - Create a context in `src/contexts/actors/`.
+   - Re-export the context in `src/contexts/actors/index.tsx`.
+
+2. **Create a Helper Hook:**
+   - Create a helper hook in `hooks/actors/`.
+   - Re-export the hook in `hooks/actors/index.tsx`.
+
+3. **Create an Actor Provider Component:**
+   - Create an actor provider component in `src/actors/`.
+   - Re-export the actor provider component in `src/actors/index.tsx`.
+
+4. **Wrap Components with Actor Provider:**
+   - Wrap the component that needs the actor with the actor provider created in the previous step.
+   - An example can be seen in `src/providers/ActorProvider.tsx`, where instead of nesting the actors, we compose them, which is essentially the same thing.
+
+5. **Access the Actor in the Component:**
+   - Use the `useActor` hook you created in the second step to access the actor in your component.
+
+  Additionally, in order to access the actor in the redux thunks, common pattern would be to pass as argument to the thunk.
 
 ### Referencing canisters on the backend.
 

@@ -1,14 +1,17 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { useState } from "react";
-import Auth from "@/features/auth";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Logo from "@/components/Logo";
 import Tabs from "@/components/Tabs";
 import { useIdentity } from "@/hooks/useIdentity";
 import { InlineLogin } from "@/features/login";
-import { InlineSignup } from "@/features/signup";
 import Processing from "@/components/Processing";
 import { useUser } from "@/hooks/actors";
+
+import { lazy } from "react";
+
+const InlineSignup = lazy(()=>import("@/features/signup").then(module => ({ default: module.InlineSignup })));
+const Auth = lazy(()=>import("@/features/auth"));
 
 export const Entry = () => {
 	const { actor } = useUser();
@@ -34,10 +37,18 @@ export const Entry = () => {
 	if (loading) return <Processing message="Authenticating..." />;
 
 	// If we have identity and actor but no user, show signup
-	if (!user) return <InlineSignup />;
+	if (!user) return (
+		// load signup module only when needed
+		<Suspense fallback={<Processing message="Loading..." />}>
+			<InlineSignup />;
+		</Suspense>
+	)
 
 	// Finally, show the authenticated component
-	return <Auth />;
+	// load auth module only when needed
+	return <Suspense fallback={<Processing message="Loading..." />}>
+		<Auth />
+	</Suspense>
 };
 
 function Header() {
