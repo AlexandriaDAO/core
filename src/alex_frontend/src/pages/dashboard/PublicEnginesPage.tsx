@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
-import PublicEngines from "@/features/public-engines";
+import React, { Suspense, useEffect } from "react";
 import fetchPublicEngines from "@/features/public-engines/thunks/fetchPublicEngines";
 import { useUser } from "@/hooks/actors";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+
+const PublicEngines = React.lazy(()=>import("@/features/public-engines"));
 
 function PublicEnginesPage() {
 	const {actor} = useUser();
@@ -20,7 +21,9 @@ function PublicEnginesPage() {
 			</div>
 			<div className="font-roboto-condensed bg-white rounded-lg shadow-md p-6">
 				<div className="mb-6 text-gray-600 font-roboto-condensed">Explore work of other ambitious users</div>
-				<PublicEngines />
+				<Suspense fallback="Loading public engines">
+					<PublicEngines />
+				</Suspense>
 			</div>
 		</>
 	);

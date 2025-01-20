@@ -1,11 +1,12 @@
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import React from "react";
+import React, { lazy, Suspense } from "react";
 
 import { LoaderCircle } from "lucide-react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/components/tabs";
 import PublishedEngines from "./components/PublishedEngines";
-import DraftedEngines from "./components/DraftedEngines";
+
+const DraftedEngines = lazy(() =>import("./components/DraftedEngines"));
 
 function MyEngines() {
 	const { engines, loading } = useAppSelector((state) => state.myEngines);
@@ -26,7 +27,11 @@ function MyEngines() {
 				<TabsTrigger value="drafted">Drafted Engines</TabsTrigger>
 			</TabsList>
 			<TabsContent value="published" className="my-6"><PublishedEngines /></TabsContent>
-			<TabsContent value="drafted" className="my-6"><DraftedEngines /></TabsContent>
+			<TabsContent value="drafted" className="my-6">
+				<Suspense fallback={<span>Loading Drafted Engines...</span>}>
+					<DraftedEngines />
+				</Suspense>
+			</TabsContent>
 		</Tabs>
 	);
 }
