@@ -8,6 +8,8 @@ import BaseLayout from "@/layouts/BaseLayout";
 import MainLayout from "@/layouts/MainLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import MainPageSkeleton from "@/layouts/skeletons/MainPageSkeleton";
+import UnauthorizedPage from "@/pages/UnauthorizedPage";
+import Protected from "@/components/Protected";
 
 const HomePage = lazy(()=>import("@/pages/HomePage"));
 
@@ -76,39 +78,41 @@ export const AppRoutes = () => {
 						</Route>
 						<Route path="mint" element={<Suspense key="mint" fallback={<TopProgressBar />}><MintPage /></Suspense>} />
 
+						<Route path="401" element={<Suspense key="401" fallback={<TopProgressBar />}><UnauthorizedPage /></Suspense>} />
 						<Route path="*" element={<Suspense key="not_found" fallback={<TopProgressBar />}><NotFoundPage /></Suspense>} />
 					</Route>
 
-          			<Route element={<AuthLayout />}>
-						<Route path="dashboard" element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
-							<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><DashboardPage /></Suspense>} />
-							<Route path="profile">
-								<Route index element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
-								<Route path="upgrade" element={<Suspense key="upgrade" fallback={<MainPageSkeleton />}><UpgradePage /></Suspense>} />
+					<Route element={<AuthLayout />}>
+						<Route element={<Protected route />}>
+							<Route path="dashboard" element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
+								<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><DashboardPage /></Suspense>} />
+								<Route path="profile">
+									<Route index element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
+									<Route path="upgrade" element={<Suspense key="upgrade" fallback={<MainPageSkeleton />}><UpgradePage /></Suspense>} />
+								</Route>
+								<Route path="engines">
+									<Route index element={<Suspense key="engines" fallback={<MainPageSkeleton />}><EnginesPage /></Suspense>} />
+									<Route path=":id" element={<Suspense key="engine_overview" fallback={<MainPageSkeleton />}><EngineOverviewPage /></Suspense>} />
+									<Route path="public" element={<Suspense key="public_engines" fallback={<MainPageSkeleton />}><PublicEnginesPage /></Suspense>} />
+								</Route>
+								<Route path="assets">
+									<Route index element={<Suspense key="assets" fallback={<MainPageSkeleton />}><AssetsPage /></Suspense>} />
+									<Route path="upload" element={<Suspense key="upload" fallback={<MainPageSkeleton />}><UploadPage /></Suspense>} />
+								</Route>
+								<Route path="collection" element={
+									<Suspense key="collection" fallback={<MainPageSkeleton />}>
+										<CollectionPage />
+									</Suspense>
+								} />
 							</Route>
-							<Route path="engines">
-								<Route index element={<Suspense key="engines" fallback={<MainPageSkeleton />}><EnginesPage /></Suspense>} />
-								<Route path=":id" element={<Suspense key="engine_overview" fallback={<MainPageSkeleton />}><EngineOverviewPage /></Suspense>} />
-								<Route path="public" element={<Suspense key="public_engines" fallback={<MainPageSkeleton />}><PublicEnginesPage /></Suspense>} />
+
+							<Route path="librarian" element={<Suspense key="librarian" fallback={<LayoutSkeleton />}><LibrarianLayout /></Suspense>}>
+								<Route index element={<Suspense key="librarian" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
+								<Route path="nodes" element={<Suspense key="nodes" fallback={<MainPageSkeleton />}><NodesPage /></Suspense>} />
+
+								<Route path="profile" element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
 							</Route>
-							<Route path="assets">
-								<Route index element={<Suspense key="assets" fallback={<MainPageSkeleton />}><AssetsPage /></Suspense>} />
-								<Route path="upload" element={<Suspense key="upload" fallback={<MainPageSkeleton />}><UploadPage /></Suspense>} />
-							</Route>
-							<Route path="collection" element={
-								<Suspense key="collection" fallback={<MainPageSkeleton />}>
-									<CollectionPage />
-								</Suspense>
-							} />
 						</Route>
-
-						<Route path="librarian" element={<Suspense key="librarian" fallback={<LayoutSkeleton />}><LibrarianLayout /></Suspense>}>
-							<Route index element={<Suspense key="librarian" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
-							<Route path="nodes" element={<Suspense key="nodes" fallback={<MainPageSkeleton />}><NodesPage /></Suspense>} />
-
-							<Route path="profile" element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
-						</Route>
-
 					</Route>
 				</Route>
 			</Routes>
