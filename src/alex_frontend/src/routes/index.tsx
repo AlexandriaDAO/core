@@ -25,6 +25,7 @@ const InsightsPage = lazy(()=>import("@/pages/swap/insightsPage"));
 const ManagerPage = lazy(()=>import("@/pages/ManagerPage"));
 const LegacyLibrarianPage = lazy(()=>import("@/pages/LegacyLibrarianPage"));
 const WhitepaperPage = lazy(()=>import("@/pages/WhitepaperPage"));
+const FAQPage = lazy(()=>import("@/pages/FAQPage"));
 const Bibliotheca = lazy(()=>import("@/apps/app/Bibliotheca"));
 const Alexandrian = lazy(()=>import("@/apps/app/Alexandrian"));
 const Syllogos = lazy(()=>import("@/apps/app/Syllogos"));
@@ -53,7 +54,8 @@ export const AppRoutes = () => {
 						<Route index element={<Suspense key="home" fallback={<TopProgressBar />}><HomePage /></Suspense>} />
 						<Route path="manager" element={<Suspense key="manager" fallback={<TopProgressBar />}><ManagerPage /></Suspense>} />
 						<Route path="legacy_librarian" element={<Suspense key="legacy_librarian" fallback={<TopProgressBar />}><LegacyLibrarianPage /></Suspense>} />
-						<Route path="whitepaper" element={<Suspense key="" fallback={<TopProgressBar />}><WhitepaperPage /></Suspense>} />
+						<Route path="whitepaper" element={<Suspense key="whitepaper" fallback={<TopProgressBar />}><WhitepaperPage /></Suspense>} />
+						<Route path="faq" element={<Suspense key="faq" fallback={<TopProgressBar />}><FAQPage /></Suspense>} />
 
 						<Route path="app">
 							<Route path="bibliotheca" element={<Suspense key="bibliotheca" fallback={<TopProgressBar />}><Bibliotheca /></Suspense>} />
@@ -79,7 +81,7 @@ export const AppRoutes = () => {
 						<Route path="mint" element={<Suspense key="mint" fallback={<TopProgressBar />}><MintPage /></Suspense>} />
 
 						<Route path="401" element={<Suspense key="401" fallback={<TopProgressBar />}><UnauthorizedPage /></Suspense>} />
-						<Route path="*" element={<Suspense key="not_found" fallback={<TopProgressBar />}><NotFoundPage /></Suspense>} />
+						<Route path="*" element={<Suspense key="404" fallback={<TopProgressBar />}><NotFoundPage /></Suspense>} />
 					</Route>
 
 					<Route element={<AuthLayout />}>
