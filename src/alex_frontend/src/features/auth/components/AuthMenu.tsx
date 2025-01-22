@@ -20,6 +20,7 @@ import {
 import { NavLink } from "react-router";
 import { useLogout } from "@/hooks/useLogout";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import Protected from "@/components/Protected";
 
 export default function AuthMenu() {
 	const logout = useLogout();
@@ -63,27 +64,28 @@ export default function AuthMenu() {
 			<DropdownMenuContent className="w-40" side="bottom" align="end">
 				<DropdownMenuLabel className="text-center">@{user?.username}</DropdownMenuLabel>
 				<DropdownMenuSeparator />
-				<DropdownMenuGroup>
-					{/* <NavLink to='/dashboard'>
+				<Protected>
+					<DropdownMenuGroup>
+						<NavLink to='/dashboard'>
+							<DropdownMenuItem className="cursor-pointer">
+								<LayoutDashboard />
+								<span>Dashboard</span>
+							</DropdownMenuItem>
+						</NavLink>
+						<NavLink to='/dashboard/profile'>
 						<DropdownMenuItem className="cursor-pointer">
-							<LayoutDashboard />
-							<span>Dashboard</span>
+							<User />
+							<span>Profile</span>
 						</DropdownMenuItem>
-					</NavLink>
-					<NavLink to='/dashboard/profile'>
-					<DropdownMenuItem className="cursor-pointer">
-						<User />
-						<span>Profile</span>
-					</DropdownMenuItem>
-					</NavLink>
-					<NavLink to='/dashboard/settings'>
-						<DropdownMenuItem className="cursor-pointer">
-							<Settings />
-							<span>Settings</span>
-						</DropdownMenuItem>
-					</NavLink> */}
-
-				</DropdownMenuGroup>
+						</NavLink>
+						<NavLink to='/dashboard/settings'>
+							<DropdownMenuItem className="cursor-pointer">
+								<Settings />
+								<span>Settings</span>
+							</DropdownMenuItem>
+						</NavLink>
+					</DropdownMenuGroup>
+				</Protected>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem className="cursor-pointer" onClick={logout}>
 					<LogOut />

@@ -22,12 +22,12 @@ export default function Tabs() {
 
     return (
         <div className="md:flex block  items-center gap-6 justify-center w-[calc(100%-170px)]">
-            <button
+            {/* <button
                 onClick={() => navigate('/')}
                 className={`${baseStyles} ${location.pathname === '/' ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
             >
                 APPS
-            </button>
+            </button> */}
             {/* <button
                 onClick={() => navigate('/manager')}
                 className={`${baseStyles} ${location.pathname === '/manager' ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
@@ -41,10 +41,16 @@ export default function Tabs() {
                 SWAP
             </button>
             <button
+                onClick={() => navigate('/faq')}
+                className={`${baseStyles} ${location.pathname === '/faq' ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
+            >
+                FAQ
+            </button>
+            <button
                 onClick={() => navigate('/whitepaper')}
                 className={`${baseStyles} ${location.pathname === '/whitepaper' ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
             >
-                INFO
+                WHITEPAPER
             </button>
         </div>
     );

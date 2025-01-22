@@ -8,6 +8,8 @@ import BaseLayout from "@/layouts/BaseLayout";
 import MainLayout from "@/layouts/MainLayout";
 import AuthLayout from "@/layouts/AuthLayout";
 import MainPageSkeleton from "@/layouts/skeletons/MainPageSkeleton";
+import UnauthorizedPage from "@/pages/UnauthorizedPage";
+import Protected from "@/components/Protected";
 
 const HomePage = lazy(()=>import("@/pages/HomePage"));
 
@@ -23,6 +25,7 @@ const InsightsPage = lazy(()=>import("@/pages/swap/insightsPage"));
 const ManagerPage = lazy(()=>import("@/pages/ManagerPage"));
 const LegacyLibrarianPage = lazy(()=>import("@/pages/LegacyLibrarianPage"));
 const WhitepaperPage = lazy(()=>import("@/pages/WhitepaperPage"));
+const FAQPage = lazy(()=>import("@/pages/FAQPage"));
 const Bibliotheca = lazy(()=>import("@/apps/app/Bibliotheca"));
 const Alexandrian = lazy(()=>import("@/apps/app/Alexandrian"));
 const Syllogos = lazy(()=>import("@/apps/app/Syllogos"));
@@ -51,7 +54,8 @@ export const AppRoutes = () => {
 						<Route index element={<Suspense key="home" fallback={<TopProgressBar />}><HomePage /></Suspense>} />
 						<Route path="manager" element={<Suspense key="manager" fallback={<TopProgressBar />}><ManagerPage /></Suspense>} />
 						<Route path="legacy_librarian" element={<Suspense key="legacy_librarian" fallback={<TopProgressBar />}><LegacyLibrarianPage /></Suspense>} />
-						<Route path="whitepaper" element={<Suspense key="" fallback={<TopProgressBar />}><WhitepaperPage /></Suspense>} />
+						<Route path="whitepaper" element={<Suspense key="whitepaper" fallback={<TopProgressBar />}><WhitepaperPage /></Suspense>} />
+						<Route path="faq" element={<Suspense key="faq" fallback={<TopProgressBar />}><FAQPage /></Suspense>} />
 
 						<Route path="app">
 							<Route path="bibliotheca" element={<Suspense key="bibliotheca" fallback={<TopProgressBar />}><Bibliotheca /></Suspense>} />
@@ -76,39 +80,41 @@ export const AppRoutes = () => {
 						</Route>
 						<Route path="mint" element={<Suspense key="mint" fallback={<TopProgressBar />}><MintPage /></Suspense>} />
 
-						<Route path="*" element={<Suspense key="not_found" fallback={<TopProgressBar />}><NotFoundPage /></Suspense>} />
+						<Route path="401" element={<Suspense key="401" fallback={<TopProgressBar />}><UnauthorizedPage /></Suspense>} />
+						<Route path="*" element={<Suspense key="404" fallback={<TopProgressBar />}><NotFoundPage /></Suspense>} />
 					</Route>
 
-          			<Route element={<AuthLayout />}>
-						<Route path="dashboard" element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
-							<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><DashboardPage /></Suspense>} />
-							<Route path="profile">
-								<Route index element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
-								<Route path="upgrade" element={<Suspense key="upgrade" fallback={<MainPageSkeleton />}><UpgradePage /></Suspense>} />
+					<Route element={<AuthLayout />}>
+						<Route element={<Protected route />}>
+							<Route path="dashboard" element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
+								<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><DashboardPage /></Suspense>} />
+								<Route path="profile">
+									<Route index element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
+									<Route path="upgrade" element={<Suspense key="upgrade" fallback={<MainPageSkeleton />}><UpgradePage /></Suspense>} />
+								</Route>
+								<Route path="engines">
+									<Route index element={<Suspense key="engines" fallback={<MainPageSkeleton />}><EnginesPage /></Suspense>} />
+									<Route path=":id" element={<Suspense key="engine_overview" fallback={<MainPageSkeleton />}><EngineOverviewPage /></Suspense>} />
+									<Route path="public" element={<Suspense key="public_engines" fallback={<MainPageSkeleton />}><PublicEnginesPage /></Suspense>} />
+								</Route>
+								<Route path="assets">
+									<Route index element={<Suspense key="assets" fallback={<MainPageSkeleton />}><AssetsPage /></Suspense>} />
+									<Route path="upload" element={<Suspense key="upload" fallback={<MainPageSkeleton />}><UploadPage /></Suspense>} />
+								</Route>
+								<Route path="collection" element={
+									<Suspense key="collection" fallback={<MainPageSkeleton />}>
+										<CollectionPage />
+									</Suspense>
+								} />
 							</Route>
-							<Route path="engines">
-								<Route index element={<Suspense key="engines" fallback={<MainPageSkeleton />}><EnginesPage /></Suspense>} />
-								<Route path=":id" element={<Suspense key="engine_overview" fallback={<MainPageSkeleton />}><EngineOverviewPage /></Suspense>} />
-								<Route path="public" element={<Suspense key="public_engines" fallback={<MainPageSkeleton />}><PublicEnginesPage /></Suspense>} />
+
+							<Route path="librarian" element={<Suspense key="librarian" fallback={<LayoutSkeleton />}><LibrarianLayout /></Suspense>}>
+								<Route index element={<Suspense key="librarian" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
+								<Route path="nodes" element={<Suspense key="nodes" fallback={<MainPageSkeleton />}><NodesPage /></Suspense>} />
+
+								<Route path="profile" element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
 							</Route>
-							<Route path="assets">
-								<Route index element={<Suspense key="assets" fallback={<MainPageSkeleton />}><AssetsPage /></Suspense>} />
-								<Route path="upload" element={<Suspense key="upload" fallback={<MainPageSkeleton />}><UploadPage /></Suspense>} />
-							</Route>
-							<Route path="collection" element={
-								<Suspense key="collection" fallback={<MainPageSkeleton />}>
-									<CollectionPage />
-								</Suspense>
-							} />
 						</Route>
-
-						<Route path="librarian" element={<Suspense key="librarian" fallback={<LayoutSkeleton />}><LibrarianLayout /></Suspense>}>
-							<Route index element={<Suspense key="librarian" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
-							<Route path="nodes" element={<Suspense key="nodes" fallback={<MainPageSkeleton />}><NodesPage /></Suspense>} />
-
-							<Route path="profile" element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
-						</Route>
-
 					</Route>
 				</Route>
 			</Routes>
