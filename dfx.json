@@ -141,6 +141,11 @@
     "asset_canister": {
       "type": "assets",
       "source": ["src/asset_canister/assets"]
+    },
+    "asset_manager": {
+      "type": "rust",
+      "package": "asset_manager",
+      "candid": "src/asset_manager/asset_manager.did"
     }
   },
   "defaults": {

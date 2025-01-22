@@ -1,0 +1,6 @@
+type Result = variant { Ok : principal; Err : text };
+type Result_1 = variant { Ok; Err : text };
+service : {
+  create_asset_canister : () -> (Result);
+  install_asset_canister : (principal) -> (Result_1);
+}

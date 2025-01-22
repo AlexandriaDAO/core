@@ -78,7 +78,7 @@ const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 const log_canister_id = process.env.CANISTER_ID_LOGS!;
 const icp_swap_factory_canister_id = "ggzvv-5qaaa-aaaag-qck7a-cai";
-const asset_canister_id = "ahw5u-keaaa-aaaaa-qaaha-cai";
+const asset_canister_id = "purlq-cmaaa-aaaaa-qabcq-cai"//"ahw5u-keaaa-aaaaa-qaaha-cai";
 
 
 export const getPrincipal = (client: AuthClient): string =>
