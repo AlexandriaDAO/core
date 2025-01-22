@@ -26,6 +26,7 @@ const ManagerPage = lazy(()=>import("@/pages/ManagerPage"));
 const LegacyLibrarianPage = lazy(()=>import("@/pages/LegacyLibrarianPage"));
 const WhitepaperPage = lazy(()=>import("@/pages/WhitepaperPage"));
 const FAQPage = lazy(()=>import("@/pages/FAQPage"));
+const InfoPage = lazy(()=>import("@/pages/InfoPage"));
 const Bibliotheca = lazy(()=>import("@/apps/app/Bibliotheca"));
 const Alexandrian = lazy(()=>import("@/apps/app/Alexandrian"));
 const Syllogos = lazy(()=>import("@/apps/app/Syllogos"));
@@ -54,8 +55,12 @@ export const AppRoutes = () => {
 						<Route index element={<Suspense key="home" fallback={<TopProgressBar />}><HomePage /></Suspense>} />
 						<Route path="manager" element={<Suspense key="manager" fallback={<TopProgressBar />}><ManagerPage /></Suspense>} />
 						<Route path="legacy_librarian" element={<Suspense key="legacy_librarian" fallback={<TopProgressBar />}><LegacyLibrarianPage /></Suspense>} />
-						<Route path="whitepaper" element={<Suspense key="whitepaper" fallback={<TopProgressBar />}><WhitepaperPage /></Suspense>} />
-						<Route path="faq" element={<Suspense key="faq" fallback={<TopProgressBar />}><FAQPage /></Suspense>} />
+						
+						<Route path="info">
+							<Route index element={<Suspense key="info" fallback={<TopProgressBar />}><InfoPage /></Suspense>} />
+							<Route path="faq" element={<Suspense key="faq" fallback={<TopProgressBar />}><InfoPage /></Suspense>} />
+							<Route path="whitepaper" element={<Suspense key="whitepaper" fallback={<TopProgressBar />}><InfoPage /></Suspense>} />
+						</Route>
 
 						<Route path="app">
 							<Route path="bibliotheca" element={<Suspense key="bibliotheca" fallback={<TopProgressBar />}><Bibliotheca /></Suspense>} />

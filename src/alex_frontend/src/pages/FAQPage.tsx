@@ -64,35 +64,25 @@ function FAQPage() {
 	}, []) : [{title: 'Please wait...', items: []}];
 
 	return (
-		<>
-			<div className="flex-grow bg-[#0d1117] p-4 md:p-8 overflow-auto">
-				<div className="max-w-4xl mx-auto">
-					<div className="flex justify-between items-center mb-6">
-						<h1 className="text-3xl font-bold text-white">FAQs</h1>
-					</div>
-
-					<div className="space-y-6">
-						{sections.map((section, idx) => (
-							<div key={idx} className="bg-[#161b22] rounded-lg shadow-lg p-4 md:p-6">
-								<h2 className="text-xl font-semibold text-white mb-4">{section.title}</h2>
-								<Accordion type="single" collapsible className="space-y-2">
-									{section.items.map((item, itemIdx) => (
-										<AccordionItem key={itemIdx} value={`item-${idx}-${itemIdx}`}>
-											<AccordionTrigger className="text-white hover:text-white hover:no-underline">
-												{item.question}
-											</AccordionTrigger>
-											<AccordionContent className="text-[#c9d1d9] whitespace-pre-wrap">
-												<ReactMarkdown>{item.answer}</ReactMarkdown>
-											</AccordionContent>
-										</AccordionItem>
-									))}
-								</Accordion>
-							</div>
+		<div className="space-y-6">
+			{sections.map((section, idx) => (
+				<div key={idx} className="bg-[#161b22] rounded-lg shadow-lg p-4 md:p-6">
+					<h2 className="text-xl font-semibold text-white mb-4">{section.title}</h2>
+					<Accordion type="single" collapsible className="space-y-2">
+						{section.items.map((item, itemIdx) => (
+							<AccordionItem key={itemIdx} value={`item-${idx}-${itemIdx}`}>
+								<AccordionTrigger className="text-white hover:text-white hover:no-underline">
+									{item.question}
+								</AccordionTrigger>
+								<AccordionContent className="text-[#c9d1d9] whitespace-pre-wrap">
+									<ReactMarkdown>{item.answer}</ReactMarkdown>
+								</AccordionContent>
+							</AccordionItem>
 						))}
-					</div>
+					</Accordion>
 				</div>
-			</div>
-		</>
+			))}
+		</div>
 	);
 }
 

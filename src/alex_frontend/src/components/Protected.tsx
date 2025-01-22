@@ -29,7 +29,7 @@ interface ProtectedProps {
 const Protected = ({ children, route = false }: ProtectedProps) => {
 	const { user } = useAppSelector((state) => state.auth);
 
-	const allowed = user?.username === "chadwick";
+	const allowed = user?.username === "chadthechad" || user?.username === "zeeshan";
 
 	// if (!allowed)  return mode === 'route' ? <Navigate to="/401" replace /> : <></>;
 
