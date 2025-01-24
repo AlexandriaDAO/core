@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardContent, CardFooter } from "@/lib/components/card";
 import { Copy, Check, Info, Loader2, Flag, User, Search, Plus, Heart } from "lucide-react";
-import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
-import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 import { Button } from "@/lib/components/button";
-import { Badge } from "@/lib/components/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/components/tooltip";
 import { Progress } from "@/lib/components/progress";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
-import { Skeleton } from "@/lib/components/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/lib/components/collapsible";
 import { useDispatch } from "react-redux";
 import { setSearchState } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
+import { NftDataFooter } from "./components/NftDataFooter";
+import { copyToClipboard } from "./utils/clipboard";
 
 interface ContentGridProps {
   children: React.ReactNode;
@@ -32,96 +29,6 @@ interface ContentGridItemProps {
   isMinting?: boolean;
 }
 
-interface NftDataFooterProps {
-  id: string;
-}
-
-function NftDataFooter({ id }: NftDataFooterProps) {
-  const { getNftData } = useNftData();
-  const [nftData, setNftData] = useState<NftDataResult | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [copiedPrincipal, setCopiedPrincipal] = useState(false);
-
-  useEffect(() => {
-    const fetchNftData = async () => {
-      if (id) {
-        const data = await getNftData(id);
-        setNftData(data);
-        setIsLoading(false);
-      }
-    };
-    fetchNftData();
-  }, [id]);
-
-  const formatPrincipal = (principal: string | null) => {
-    if (!principal) return 'Not owned';
-    return `${principal.slice(0, 4)}...${principal.slice(-4)}`;
-  };
-
-  const handleCopyPrincipal = async (e: React.MouseEvent, principal: string) => {
-    e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(principal);
-      setCopiedPrincipal(true);
-      setTimeout(() => setCopiedPrincipal(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
-
-  const formatBalance = (balance: string | undefined) => {
-    if (!balance) return '0';
-    return balance;
-  };
-
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-[200px]" />
-        <Skeleton className="h-4 w-[160px]" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-wrap gap-2 items-center">
-      {nftData?.principal && (
-        <Badge 
-          variant="default" 
-          className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
-          onClick={(e) => handleCopyPrincipal(e, nftData.principal!)}
-        >
-          {formatPrincipal(nftData.principal)}
-          {copiedPrincipal ? (
-            <Check className="h-3 w-3" />
-          ) : (
-            <Copy className="h-3 w-3" />
-          )}
-        </Badge>
-      )}
-      {nftData?.collection && nftData.collection !== 'No Collection' && (
-        <Badge variant="default" className={`text-xs ${
-          nftData.collection === 'NFT' 
-            ? 'bg-[#FFD700] text-black hover:bg-[#FFD700]/90' 
-            : 'bg-[#E6E6FA] text-black hover:bg-[#E6E6FA]/90'
-        }`}>
-          {nftData.collection}
-        </Badge>
-      )}
-      {nftData?.balances && (
-        <>
-          <Badge variant="outline" className="text-xs bg-white">
-            ALEX: {formatBalance(nftData.balances.alex.toString())}
-          </Badge>
-          <Badge variant="outline" className="text-xs bg-white">
-            LBRY: {formatBalance(nftData.balances.lbry.toString())}
-          </Badge>
-        </>
-      )}
-    </div>
-  );
-}
-
 function ContentGrid({ children }: ContentGridProps) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 p-2 sm:p-4 pb-16">
@@ -131,9 +38,8 @@ function ContentGrid({ children }: ContentGridProps) {
 }
 
 function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStats, isMintable, isOwned, onMint, onWithdraw, predictions, isMinting }: ContentGridItemProps) {
-  const [copied, setCopied] = useState(false);
-  const [copiedOwner, setCopiedOwner] = useState(false);
   const [searchTriggered, setSearchTriggered] = useState(false);
+  const [copiedOwner, setCopiedOwner] = useState(false);
   const dispatch = useDispatch();
   const isAlexandrian = window.location.pathname.includes('/alexandrian');
 
@@ -142,35 +48,19 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
     return `${id.slice(0, 4)}...${id.slice(-4)}`;
   };
 
-  const handleCopy = async (e: React.MouseEvent, text: string) => {
-    e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
-
-  const handleOwnerClick = (e: React.MouseEvent, owner: string | undefined) => {
+  const handleOwnerClick = async (e: React.MouseEvent, owner: string | undefined) => {
     e.stopPropagation();
     if (owner) {
+      const copied = await copyToClipboard(owner);
+      if (copied) {
+        setCopiedOwner(true);
+        setTimeout(() => setCopiedOwner(false), 2000);
+      }
+
+      // Filter results
       dispatch(setSearchState({ ownerFilter: owner }));
       setSearchTriggered(true);
       setTimeout(() => setSearchTriggered(false), 2000);
-    }
-  };
-
-  const handleCopyOwner = async (e: React.MouseEvent, owner: string | undefined) => {
-    e.stopPropagation();
-    if (!owner) return;
-    try {
-      await navigator.clipboard.writeText(owner);
-      setCopiedOwner(true);
-      setTimeout(() => setCopiedOwner(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
     }
   };
 
@@ -190,7 +80,7 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
               <span className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-900">
                 {formatId(owner)}
               </span>
-              {searchTriggered ? (
+              {copiedOwner ? (
                 <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
               ) : (
                 <Search className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 group-hover:text-gray-600" />
