@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { Copy, Check, Link } from "lucide-react";
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
+import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
+import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 import { Badge } from "@/lib/components/badge";
 import { Skeleton } from "@/lib/components/skeleton";
-import { useNftData, NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
-import { CopyableText } from './CopyableText';
-
-const formatBalance = (balance?: string) => balance || '0';
-const formatPrincipal = (principal: string | null) => principal ? `${principal.slice(0, 4)}...${principal.slice(-4)}` : 'Not owned';
+import { copyToClipboard } from "../utils/clipboard";
 
 interface NftDataFooterProps {
   id: string;
@@ -13,8 +14,11 @@ interface NftDataFooterProps {
 
 export function NftDataFooter({ id }: NftDataFooterProps) {
   const { getNftData } = useNftData();
+  const nfts = useSelector((state: RootState) => state.nftData.nfts);
   const [nftData, setNftData] = useState<NftDataResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [copiedPrincipal, setCopiedPrincipal] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     const fetchNftData = async () => {
@@ -27,6 +31,42 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
     fetchNftData();
   }, [id]);
 
+
+  const formatPrincipal = (principal: string | null) => {
+    if (!principal) return 'Not owned';
+    return `${principal.slice(0, 4)}...${principal.slice(-4)}`;
+  };
+
+  const handleCopyPrincipal = async (e: React.MouseEvent, principal: string) => {
+    e.stopPropagation();
+    const copied = await copyToClipboard(principal);
+    if (copied) {
+      setCopiedPrincipal(true);
+      setTimeout(() => setCopiedPrincipal(false), 2000);
+    }
+  };
+
+  const handleCopyLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const nftEntry = Object.entries(nfts).find(([_, nft]) => 
+      nft && 'arweaveId' in nft && nft.arweaveId === id
+    );
+    if (!nftEntry) return;
+    
+    const tokenId = nftEntry[0];
+    const lbryUrl = `https://lbry.app/${tokenId}`;
+    const copied = await copyToClipboard(lbryUrl);
+    if (copied) {
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
+
+  const formatBalance = (balance: string | undefined) => {
+    if (!balance) return '0';
+    return balance;
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -38,12 +78,30 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
 
   return (
     <div className="flex flex-wrap gap-2 items-center">
+      <Badge 
+        variant="default" 
+        className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+        onClick={handleCopyLink}
+      >
+        {copiedLink ? (
+          <Check className="h-3 w-3" />
+        ) : (
+          <Link className="h-3 w-3" />
+        )}
+      </Badge>
       {nftData?.principal && (
-        <CopyableText text={nftData.principal}>
-          <Badge variant="default" className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1">
-            {formatPrincipal(nftData.principal)}
-          </Badge>
-        </CopyableText>
+        <Badge 
+          variant="default" 
+          className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+          onClick={(e) => handleCopyPrincipal(e, nftData.principal!)}
+        >
+          {formatPrincipal(nftData.principal)}
+          {copiedPrincipal ? (
+            <Check className="h-3 w-3" />
+          ) : (
+            <Copy className="h-3 w-3" />
+          )}
+        </Badge>
       )}
       {nftData?.collection && nftData.collection !== 'No Collection' && (
         <Badge variant="default" className={`text-xs ${
