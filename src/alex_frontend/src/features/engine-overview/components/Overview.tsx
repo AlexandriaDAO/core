@@ -42,7 +42,11 @@ function EngineOverview() {
                         Created on
                     </span>
                     <span className="font-roboto-condensed text-base leading-[18px] font-medium">
-                        {new Date(Number(activeEngine.created_at)).toLocaleDateString()}
+                        {new Date(activeEngine.created_at).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })}
                     </span>
                 </div>
 

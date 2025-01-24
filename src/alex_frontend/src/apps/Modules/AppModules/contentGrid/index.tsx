@@ -6,3 +6,9 @@ const ContentDisplay: React.FC = () => {
 };
 
 export default ContentDisplay;
+
+export { ContentGrid } from './components/ContentGrid';
+export { ContentGridItem } from './components/ContentGridItem';
+export { CopyableText } from './components/CopyableText';
+export { NftDataFooter } from './components/NftDataFooter';
+export type { ContentGridItemProps, CopyableTextProps, BaseProps } from './types/contentGrid.types';

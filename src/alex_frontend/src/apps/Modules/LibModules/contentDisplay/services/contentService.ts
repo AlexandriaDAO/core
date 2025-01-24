@@ -1,5 +1,5 @@
 import { Transaction } from "../../../shared/types/queries";
-import { contentCache } from "./contentCacheService";
+import { contentCache } from "../../../shared/services/contentCacheService";
 import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
 import { MintableStateItem } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { getCover } from "@/utils/epub";

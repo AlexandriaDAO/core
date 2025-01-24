@@ -9,7 +9,7 @@ import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import ContentFetcher from './ContentFetcher';
 import { ContentValidatorProps } from '../types';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
-import { contentCache } from '@/apps/Modules/LibModules/contentDisplay/services/contentCacheService';
+import { contentCache } from '@/apps/Modules/shared/services/contentCacheService';
 import { debounce } from 'lodash';
 
 const ContentValidator: React.FC<ContentValidatorProps> = ({

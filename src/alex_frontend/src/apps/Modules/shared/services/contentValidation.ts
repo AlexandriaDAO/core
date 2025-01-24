@@ -1,4 +1,4 @@
-import { nsfwService } from '@/apps/Modules/LibModules/arweaveSearch/services/nsfwService';
+import { nsfwService } from '@/apps/Modules/shared/services/nsfwService';
 
 export const useContentValidation = () => {
   const validateContent = async (element: HTMLImageElement | HTMLVideoElement, contentType: string) => {

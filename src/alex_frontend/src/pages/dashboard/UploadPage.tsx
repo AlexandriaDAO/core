@@ -1,9 +1,17 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/lib/components/button";
-import { UploadAudio, UploadBook, UploadImage, UploadVideo } from "@/features/upload";
-import UploadProvider from "@/providers/UploadProvider";
+import { lazyLoad } from "@/utils/lazyLoad";
+import AssetSkeleton from "@/features/upload/components/AssetSkeleton";
+
+// import UploadProvider from "@/providers/UploadProvider";
+const UploadProvider = lazyLoad(() => import("@/providers/UploadProvider"));
+
+const UploadBook = lazyLoad(() => import("@/features/upload/book"));
+const UploadImage = lazyLoad(() => import("@/features/upload/image"));
+const UploadAudio = lazyLoad(() => import("@/features/upload/audio"));
+const UploadVideo = lazyLoad(() => import("@/features/upload/video"));
 
 function UploadPage() {
 	const navigate = useNavigate();
@@ -19,12 +27,29 @@ function UploadPage() {
 			<div className="font-roboto-condensed bg-white rounded-lg shadow-md p-6">
 				<div className="mb-6 text-gray-600 font-roboto-condensed">Choose an asset type to upload</div>
 				<div className="flex gap-6 justify-center flex-wrap">
-					<UploadProvider>
-						<UploadBook />
-						<UploadImage />
-						<UploadAudio />
-						<UploadVideo />
-					</UploadProvider>
+					<Suspense fallback={
+						<>
+							<AssetSkeleton />
+							<AssetSkeleton />
+							<AssetSkeleton />
+							<AssetSkeleton />
+						</>
+					}>
+						<UploadProvider>
+							<Suspense fallback={<AssetSkeleton />}>
+								<UploadBook />
+							</Suspense>
+							<Suspense fallback={<AssetSkeleton />}>
+								<UploadImage />
+							</Suspense>
+							<Suspense fallback={<AssetSkeleton />}>
+								<UploadAudio />
+							</Suspense>
+							<Suspense fallback={<AssetSkeleton />}>
+								<UploadVideo />
+							</Suspense>
+						</UploadProvider>
+					</Suspense>
 				</div>
 			</div>
 		</>

@@ -38,7 +38,7 @@ const InlineSignup = () => {
             </Dialog>
             <div onClick={logout} className="flex-shrink h-auto flex justify-between gap-1 px-4 py-2 items-center border border-white text-[#828282] hover:text-white rounded-full cursor-pointer transition-all duration-300">
                 <span className="text-base font-normal font-roboto-condensed tracking-wider">
-                    Logout
+                    Disconnect
                 </span>
             </div>
         </div>

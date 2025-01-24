@@ -1,11 +1,28 @@
-- Principal Selector, only show profiles that have NFTs/SBTs.
+
+Tommorrow first things: Figure out a better way than that prop passing to contentItem in contentList.tsx.
+
+
+Feature Ideas:
+- Make every NFT its own link.
+- Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
+- Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
+- Figure out how we're going to sort by section.
+
+
+Immported Libmodules.
+1. In `AppModules/contentGrid/components/ContentValidator.tsx`:
+and nsfwselector.tsx
+
+
 
 
 
 
 - If the mint has succeded the mint button should go away.
 - Need more dynamic states for the like/mint/withdraw buttons.
-
+- If you go to the next page on alexandrian while a modal is open it throws an error.
+- On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.m
+- Put another amount selector by the show more button on permasearch.
 
 
 
@@ -17,10 +34,10 @@ The Plan:
 
 - Alexandria query. (Query token amounts, then only the amount on the page (rather than all at once))
 
+
+
 Next Small Stuff:
 
-- Alexandrian search needs to use the state of the current page number.
-- There's a bug where ebook searching gets the search button stuck in the loading state.
 - Remove duplicates based on file size.
 - More advanced searching with tags and metadata.
 - Mint button has some load time issues on Alexandrian.
@@ -31,6 +48,7 @@ Next Small Stuff:
 
 Next Big Stuff:
 - Add the icrc3 canisters to the cycles manager.
+- Index canisters.
 
 - Apps page leaderboard of top NFTs (perhaps from a backup system off-chain)
 - Then we'll let people do their own channels which are just regular stable structures and no economic incentive. 

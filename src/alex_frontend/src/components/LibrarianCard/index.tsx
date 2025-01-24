@@ -6,6 +6,10 @@ import NonLibrarianView from "./NonLibrarianView";
 function LibrarianCard() {
 	const { user } = useAppSelector(state => state.auth);
 
+	if (!user) {
+		return null;
+	}
+
 	return (
 		<div className="max-w-md p-3 flex gap-2 flex-col rounded-xl border border-ring bg-white">
 			<div className="flex justify-between items-center">
@@ -14,7 +18,7 @@ function LibrarianCard() {
 				</div>
 			</div>
 			<div className="flex flex-col gap-4 justify-start items-center">
-				{ user!.librarian ? <LibrarianView /> : <NonLibrarianView/> }
+				{user.librarian ? <LibrarianView /> : <NonLibrarianView/>}
 			</div>
 		</div>
 	);
