@@ -7,7 +7,7 @@ import { useContentValidation } from '@/apps/Modules/shared/services/contentVali
 import { useAuth } from '@/apps/Modules/shared/hooks/useAuth';
 import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import ContentFetcher from './ContentFetcher';
-import { ContentValidatorProps } from '../types';
+import { ContentValidatorProps } from './types';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 import { contentCache } from '@/apps/Modules/shared/services/contentCacheService';
 import { debounce } from 'lodash';
@@ -19,7 +19,6 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   imageObjectUrl,
 }) => {
   const dispatch = useDispatch();
-  const collection = useSelector((state: RootState) => state.library.collection);
   const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
   const { validateContent } = useContentValidation();
   const { checkAuthentication } = useAuth();

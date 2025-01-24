@@ -3,26 +3,45 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
 import { setMintableStates, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
-import ContentGrid from "./ContentGrid";
-import Modal from './components/Modal';
-import ContentRenderer from './components/ContentRenderer';
-import TransactionDetails from './components/TransactionDetails';
+import Modal from '@/apps/Modules/AppModules/contentGrid/components/Modal';
+import ContentRenderer from '@/apps/Modules/AppModules/safeRender/ContentRenderer';
+import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components/TransactionDetails';
 import { mint_nft } from "@/features/nft/mint";
 import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
 import { Button } from "@/lib/components/button";
 import { withdraw_nft } from "@/features/nft/withdraw";
 import { TooltipProvider } from "@/lib/components/tooltip";
 import { Loader2 } from 'lucide-react';
+import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
+
+export interface ContentGridProps {
+  children: React.ReactNode;
+}
+
+type ContentGridComponent = React.FC<ContentGridProps> & {
+  Item: typeof ContentCard;
+};
+
+export const ContentGrid: ContentGridComponent = Object.assign(
+  ({ children }: ContentGridProps) => {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 p-2 sm:p-4 pb-16">
+        {children}
+      </div>
+    );
+  },
+  { Item: ContentCard }
+);
 
 // Map frontend collection names to backend collection names
 const mapCollectionToBackend = (collection: 'NFT' | 'SBT'): 'icrc7' | 'icrc7_scion' => {
   return collection === 'NFT' ? 'icrc7' : 'icrc7_scion';
 };
 
-const ContentList = () => {
+const Grid = () => {
   const dispatch = useAppDispatch();
   const transactions = useSortedTransactions();
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
@@ -214,4 +233,4 @@ const ContentList = () => {
   );
 };
 
-export default React.memo(ContentList);
+export default React.memo(Grid);

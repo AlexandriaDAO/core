@@ -10,7 +10,7 @@ import { X } from 'lucide-react';
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
 import { Button } from "@/lib/components/button";
-import ContentRenderer from "@/apps/Modules/AppModules/contentGrid/components/ContentRenderer";
+import ContentRenderer from "@/apps/Modules/AppModules/safeRender/ContentRenderer";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { MARKETPLACE_LBRY_FEE } from "./utlis";
 import { toast } from "sonner";

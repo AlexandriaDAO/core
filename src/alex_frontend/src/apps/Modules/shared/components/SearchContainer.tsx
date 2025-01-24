@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, ReactNode, useCallback } from "reac
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
 import { wipe } from '@/apps/Modules/shared/state/wiper';
-import ContentDisplay from "@/apps/Modules/AppModules/contentGrid";
+import Grid from "@/apps/Modules/AppModules/contentGrid/Grid";
 import {
   PageContainer,
   ControlsContainer,
@@ -105,7 +105,7 @@ export function SearchContainer({
           </SearchFormContainer>
         )}
       </PageContainer>
-      <ContentDisplay />
+      <Grid />
       {showMoreEnabled && transactions.length > 0 && (
         <div className="flex justify-center mt-6 mb-8">
           <Button
