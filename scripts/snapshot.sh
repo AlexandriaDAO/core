@@ -88,7 +88,7 @@ dfx canister start logs --network ic
 
 # tokenomics
 dfx canister stop tokenomics --network ic
-dfx canister snapshot create tokenomics --replace 00000000000000000000000001f053240101 --network ic
+dfx canister snapshot create tokenomics --replace 00000000000000010000000001f053240101 --network ic
 dfx canister start tokenomics --network ic
 
 # user

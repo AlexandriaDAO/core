@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
-import { Copy } from 'lucide-react';
+import { Copy, Loader2 } from 'lucide-react';
 import { setMintableStates, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import ContentGrid from "./ContentGrid";
 import Modal from './components/Modal';
@@ -22,7 +22,6 @@ import {
 import { ScrollArea } from "@/lib/components/scroll-area";
 import { Badge } from "@/lib/components/badge";
 import { Separator } from "@/lib/components/separator";
-import { Loader2 } from 'lucide-react';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -36,6 +35,228 @@ const truncateMiddle = (str: string, startChars: number = 4, endChars: number = 
   if (str.length <= startChars + endChars + 3) return str;
   return `${str.slice(0, startChars)}...${str.slice(-endChars)}`;
 };
+
+// Add type definition for Tag
+type Tag = {
+  name: string;
+  value: string;
+};
+
+// Add interface for ContentItem props
+interface ContentItemProps {
+  transaction: Transaction;
+  content: any;
+  contentData: Record<string, any>;
+  mintableState: Record<string, { mintable: boolean }>;
+  showStats: Record<string, boolean>;
+  predictions: Record<string, any>;
+  mintingStates: Record<string, boolean>;
+  withdrawingStates: Record<string, boolean>;
+  user: { principal: string } | null;
+  nfts: Record<string, { 
+    principal: string;
+    collection: 'NFT' | 'SBT';
+    balances?: { 
+      alex?: string;
+      lbry?: string;
+    };
+  }>;
+  arweaveToNftId: Record<string, string>;
+  onContentSelect: (content: { id: string; type: string }) => void;
+  onToggleStats: (id: string, open: boolean) => void;
+  handleMint: (id: string) => Promise<void>;
+  handleWithdraw: (id: string) => Promise<void>;
+  handleRenderError: (id: string) => void;
+  copyToClipboard: (text: string, label: string) => Promise<void>;
+}
+
+// Extracted ContentDetails component
+const ContentDetails = React.memo(({ transaction, copyToClipboard }: { 
+  transaction: Transaction; 
+  copyToClipboard: (text: string, label: string) => Promise<void>;
+}) => (
+  <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:block group-hover:opacity-100 transition-opacity duration-200 z-[20]">
+    <ScrollArea className="h-full">
+      <Card className="bg-transparent border-none text-gray-100 shadow-none">
+        <CardHeader className="p-3 pb-2">
+          <CardTitle className="text-sm font-medium">Content Details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 p-3 pt-0 text-xs">
+          <div className="space-y-1">
+            <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   copyToClipboard(transaction.id, 'ID');
+                 }}>
+              <span className="text-gray-400">Transaction ID</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.id}</span>
+                <Copy className="w-3 h-3 opacity-0 group-hover/item:opacity-100" />
+              </div>
+            </div>
+            <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   copyToClipboard(transaction.owner, 'Owner address');
+                 }}>
+              <span className="text-gray-400">Owner</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.owner}</span>
+                <Copy className="w-3 h-3 opacity-0 group-hover/item:opacity-100" />
+              </div>
+            </div>
+            {transaction.data && (
+              <div className="flex justify-between">
+                <span className="text-gray-400">Size</span>
+                <span>{(transaction.data.size / 1024).toFixed(2)} KB</span>
+              </div>
+            )}
+            {transaction.block && (
+              <div className="flex justify-between">
+                <span className="text-gray-400">Date</span>
+                <span>
+                  {new Date(transaction.block.timestamp * 1000).toLocaleString('en-US', {
+                    timeZone: 'UTC'
+                  })} UTC
+                </span>
+              </div>
+            )}
+          </div>
+
+          <Separator className="bg-gray-700" />
+          
+          <div className="space-y-2">
+            <span className="text-gray-400">Tags</span>
+            <div className="flex flex-wrap gap-2">
+              {transaction.tags.map((tag: Tag, index) => (
+                <Badge 
+                  key={index} 
+                  variant="secondary" 
+                  title={`${tag.name}: ${tag.value}`}
+                  className="bg-gray-800 text-gray-200 cursor-pointer hover:bg-gray-700 group/badge flex items-center gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    copyToClipboard(`${tag.name}: ${tag.value}`, 'Tag');
+                  }}
+                >
+                  {truncateMiddle(tag.name)}: {truncateMiddle(tag.value)}
+                  <Copy className="w-3 h-3 opacity-0 group-hover/badge:opacity-100" />
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </ScrollArea>
+  </div>
+));
+
+// Extracted ContentItem component
+const ContentItem = React.memo(({ 
+  transaction,
+  content,
+  contentData,
+  mintableState,
+  showStats,
+  predictions,
+  mintingStates,
+  withdrawingStates,
+  user,
+  nfts,
+  arweaveToNftId,
+  onContentSelect,
+  onToggleStats,
+  handleMint,
+  handleWithdraw,
+  handleRenderError,
+  copyToClipboard
+}: ContentItemProps) => {
+  const contentType = transaction.tags.find((tag: Tag) => tag.name === "Content-Type")?.value || "application/epub+zip";
+  const mintableStateItem = mintableState[transaction.id];
+  const isMintable = mintableStateItem?.mintable;
+  
+  const nftId = arweaveToNftId[transaction.id];
+  const nftData = nftId ? nfts[nftId] : undefined;
+  const isOwned = user && nftData?.principal === user.principal;
+  
+  const hasPredictions = !!predictions[transaction.id];
+  const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
+
+  const hasWithdrawableBalance = isOwned && nftData && (
+    parseFloat(nftData.balances?.alex || '0') > 0 || 
+    parseFloat(nftData.balances?.lbry || '0') > 0
+  );
+
+  return (
+    <ContentGrid.Item
+      key={transaction.id}
+      onClick={() => onContentSelect({ id: transaction.id, type: contentType })}
+      id={transaction.id}
+      owner={transaction.owner}
+      showStats={showStats[transaction.id]}
+      onToggleStats={(open) => onToggleStats(transaction.id, open)}
+      isMintable={isMintable}
+      isOwned={isOwned || false}
+      onMint={(e) => {
+        e.stopPropagation();
+        handleMint(transaction.id);
+      }}
+      onWithdraw={hasWithdrawableBalance ? (e) => {
+        e.stopPropagation();
+        handleWithdraw(transaction.id);
+      } : undefined}
+      predictions={predictions[transaction.id]}
+      isMinting={mintingStates[transaction.id]}
+    >
+      <div className="group relative w-full h-full">
+        <ContentRenderer
+          transaction={transaction}
+          content={content}
+          contentUrls={contentData[transaction.id]?.urls || {
+            thumbnailUrl: null,
+            coverUrl: null,
+            fullUrl: content?.url || `https://arweave.net/${transaction.id}`
+          }}
+          showStats={showStats[transaction.id]}
+          mintableState={mintableState}
+          handleRenderError={handleRenderError}
+        />
+        {shouldShowBlur && (
+          <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
+              Content Filtered
+            </div>
+          </div>
+        )}
+        <ContentDetails transaction={transaction} copyToClipboard={copyToClipboard} />
+        {isOwned && (
+          <div className="absolute top-0 right-0 bg-green-500 text-white px-2 py-1 text-xs z-30">
+            Owned
+          </div>
+        )}
+        {isOwned && hasWithdrawableBalance && (
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleWithdraw(transaction.id);
+            }}
+            className="absolute bottom-2 right-2 z-30"
+            disabled={withdrawingStates[transaction.id]}
+          >
+            {withdrawingStates[transaction.id] ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Withdrawing...
+              </>
+            ) : (
+              "Withdraw"
+            )}
+          </Button>
+        )}
+      </div>
+    </ContentGrid.Item>
+  );
+});
 
 const ContentList = () => {
   const dispatch = useAppDispatch();
@@ -51,7 +272,7 @@ const ContentList = () => {
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
 
-  const handleMint = async (transactionId: string) => {
+  const handleMint = useCallback(async (transactionId: string) => {
     try {
       setMintingStates(prev => ({ ...prev, [transactionId]: true }));
       const message = await mint_nft(transactionId);
@@ -62,14 +283,14 @@ const ContentList = () => {
     } finally {
       setMintingStates(prev => ({ ...prev, [transactionId]: false }));
     }
-  };
+  }, []);
 
   const handleRenderError = useCallback((transactionId: string) => {
     dispatch(clearTransactionContent(transactionId));
     dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
   }, [dispatch]);
 
-  const handleWithdraw = async (transactionId: string) => {
+  const handleWithdraw = useCallback(async (transactionId: string) => {
     try {
       setWithdrawingStates(prev => ({ ...prev, [transactionId]: true }));
       const nftId = arweaveToNftId[transactionId];
@@ -97,7 +318,7 @@ const ContentList = () => {
     } finally {
       setWithdrawingStates(prev => ({ ...prev, [transactionId]: false }));
     }
-  };
+  }, [arweaveToNftId, nfts]);
 
   const copyToClipboard = useCallback(async (text: string, label: string) => {
     try {
@@ -108,177 +329,36 @@ const ContentList = () => {
     }
   }, []);
 
-  const renderDetails = useCallback((transaction: Transaction) => (
-    <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:block group-hover:opacity-100 transition-opacity duration-200 z-[20]">
-      <ScrollArea className="h-full">
-        <Card className="bg-transparent border-none text-gray-100 shadow-none">
-          <CardHeader className="p-3 pb-2">
-            <CardTitle className="text-sm font-medium">Content Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 p-3 pt-0 text-xs">
-            <div className="space-y-1">
-              <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     copyToClipboard(transaction.id, 'ID');
-                   }}>
-                <span className="text-gray-400">Transaction ID</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.id}</span>
-                  <Copy className="w-3 h-3 opacity-0 group-hover/item:opacity-100" />
-                </div>
-              </div>
-              <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     copyToClipboard(transaction.owner, 'Owner address');
-                   }}>
-                <span className="text-gray-400">Owner</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.owner}</span>
-                  <Copy className="w-3 h-3 opacity-0 group-hover/item:opacity-100" />
-                </div>
-              </div>
-              {transaction.data && (
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Size</span>
-                  <span>{(transaction.data.size / 1024).toFixed(2)} KB</span>
-                </div>
-              )}
-              {transaction.block && (
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Date</span>
-                  <span>
-                    {new Date(transaction.block.timestamp * 1000).toLocaleString('en-US', {
-                      timeZone: 'UTC'
-                    })} UTC
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <Separator className="bg-gray-700" />
-            
-            <div className="space-y-2">
-              <span className="text-gray-400">Tags</span>
-              <div className="flex flex-wrap gap-2">
-                {transaction.tags.map((tag, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="secondary" 
-                    title={`${tag.name}: ${tag.value}`}
-                    className="bg-gray-800 text-gray-200 cursor-pointer hover:bg-gray-700 group/badge flex items-center gap-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      copyToClipboard(`${tag.name}: ${tag.value}`, 'Tag');
-                    }}
-                  >
-                    {truncateMiddle(tag.name)}: {truncateMiddle(tag.value)}
-                    <Copy className="w-3 h-3 opacity-0 group-hover/badge:opacity-100" />
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </ScrollArea>
-    </div>
-  ), [copyToClipboard]);
+  const handleToggleStats = useCallback((transactionId: string, open: boolean) => {
+    setShowStats(prev => ({ ...prev, [transactionId]: open }));
+  }, []);
 
   return (
     <TooltipProvider>
       <>
         <ContentGrid>
-          {transactions.map((transaction) => {
-            const content = contentData[transaction.id];
-            const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-            const mintableStateItem = mintableState[transaction.id];
-            const isMintable = mintableStateItem?.mintable;
-            
-            const nftId = arweaveToNftId[transaction.id];
-            const nftData = nftId ? nfts[nftId] : undefined;
-            const isOwned = user && nftData?.principal === user.principal;
-            
-            const hasPredictions = !!predictions[transaction.id];
-            const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
-
-            const hasWithdrawableBalance = isOwned && nftData && (
-              parseFloat(nftData.balances?.alex || '0') > 0 || 
-              parseFloat(nftData.balances?.lbry || '0') > 0
-            );
-
-            return (
-              <ContentGrid.Item
-                key={transaction.id}
-                onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
-                id={transaction.id}
-                owner={transaction.owner}
-                showStats={showStats[transaction.id]}
-                onToggleStats={(open) => {
-                  setShowStats(prev => ({ ...prev, [transaction.id]: open }));
-                }}
-                isMintable={isMintable}
-                isOwned={isOwned || false}
-                onMint={(e) => {
-                  e.stopPropagation();
-                  handleMint(transaction.id);
-                }}
-                onWithdraw={hasWithdrawableBalance ? (e) => {
-                  e.stopPropagation();
-                  handleWithdraw(transaction.id);
-                } : undefined}
-                predictions={predictions[transaction.id]}
-                isMinting={mintingStates[transaction.id]}
-              >
-                <div className="group relative w-full h-full">
-                  <ContentRenderer
-                    transaction={transaction}
-                    content={content}
-                    contentUrls={contentData[transaction.id]?.urls || {
-                      thumbnailUrl: null,
-                      coverUrl: null,
-                      fullUrl: content?.url || `https://arweave.net/${transaction.id}`
-                    }}
-                    showStats={showStats[transaction.id]}
-                    mintableState={mintableState}
-                    handleRenderError={handleRenderError}
-                  />
-                  {shouldShowBlur && (
-                    <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
-                        Content Filtered
-                      </div>
-                    </div>
-                  )}
-                  {renderDetails(transaction)}
-                  {isOwned && (
-                    <div className="absolute top-0 right-0 bg-green-500 text-white px-2 py-1 text-xs z-30">
-                      Owned
-                    </div>
-                  )}
-                  {isOwned && hasWithdrawableBalance && (
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWithdraw(transaction.id);
-                      }}
-                      className="absolute bottom-2 right-2 z-30"
-                      disabled={withdrawingStates[transaction.id]}
-                    >
-                      {withdrawingStates[transaction.id] ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Withdrawing...
-                        </>
-                      ) : (
-                        "Withdraw"
-                      )}
-                    </Button>
-                  )}
-                </div>
-              </ContentGrid.Item>
-            );
-          })}
+          {transactions.map((transaction) => (
+            <ContentItem
+              key={transaction.id}
+              transaction={transaction}
+              content={contentData[transaction.id]}
+              contentData={contentData}
+              mintableState={mintableState}
+              showStats={showStats}
+              predictions={predictions}
+              mintingStates={mintingStates}
+              withdrawingStates={withdrawingStates}
+              user={user}
+              nfts={nfts}
+              arweaveToNftId={arweaveToNftId}
+              onContentSelect={setSelectedContent}
+              onToggleStats={handleToggleStats}
+              handleMint={handleMint}
+              handleWithdraw={handleWithdraw}
+              handleRenderError={handleRenderError}
+              copyToClipboard={copyToClipboard}
+            />
+          ))}
         </ContentGrid>
 
         <Modal

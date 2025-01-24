@@ -40,6 +40,25 @@ interface PrincipalSelectorProps {
   shouldTriggerSearch?: boolean;
 }
 
+const network = process.env.DFX_NETWORK === "ic" ? "mainnet" : "devnet";
+
+const TEST_PRINCIPALS: NFTUserInfo[] = [
+  {
+    principal: "2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe",
+    username: "chadthechad",
+    has_nfts: true,
+    has_scion_nfts: true,
+    last_updated: BigInt(0)
+  },
+  {
+    principal: "n3br6-rkkdh-5jcq7-pbwsx-yeqm7-jbzqi-54j4d-3isk3-js4sp-vqct5-rae",
+    username: "asdf",
+    has_nfts: true,
+    has_scion_nfts: true,
+    last_updated: BigInt(0)
+  }
+];
+
 export default function PrincipalSelector({ shouldTriggerSearch = false }: PrincipalSelectorProps) {
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
@@ -54,8 +73,14 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
   const fetchPrincipals = async () => {
     try {
       setIsLoading(true);
-      const alexBackend = await getActorAlexBackend();
-      const nftUsers: NFTUserInfo[] = await alexBackend.get_stored_nft_users();
+      let nftUsers: NFTUserInfo[];
+      
+      if (network === "devnet") {
+        nftUsers = TEST_PRINCIPALS;
+      } else {
+        const alexBackend = await getActorAlexBackend();
+        nftUsers = await alexBackend.get_stored_nft_users();
+      }
       
       const processedPrincipals = nftUsers.map((user: NFTUserInfo) => ({
         principal: user.principal.toString(),
