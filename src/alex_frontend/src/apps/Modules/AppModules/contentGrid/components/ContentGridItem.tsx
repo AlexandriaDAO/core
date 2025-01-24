@@ -1,67 +1,75 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from "@/lib/components/card";
-import { Copy, Check, Info, Loader2, Flag, User, Search, Plus, Heart } from "lucide-react";
+import { Loader2, Flag, User, Search, Plus, Heart, Check } from "lucide-react";
 import { Button } from "@/lib/components/button";
-import { Progress } from "@/lib/components/progress";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/lib/components/collapsible";
+import { Progress } from "@/lib/components/progress";
 import { useDispatch } from "react-redux";
 import { setSearchState } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
-import { NftDataFooter } from "./components/NftDataFooter";
-import { copyToClipboard } from "./utils/clipboard";
+import { ContentGridItemProps } from '../types/contentGrid.types';
+import { NftDataFooter } from './NftDataFooter';
 
-interface ContentGridProps {
-  children: React.ReactNode;
-}
+const formatId = (id?: string) => id ? `${id.slice(0, 4)}...${id.slice(-4)}` : 'N/A';
 
-interface ContentGridItemProps {
-  children: React.ReactNode;
-  onClick: () => void;
-  id?: string;
-  owner?: string;
-  showStats?: boolean;
-  onToggleStats?: (open: boolean) => void;
-  isMintable?: boolean;
-  isOwned?: boolean;
-  onMint?: (e: React.MouseEvent) => void;
-  onWithdraw?: (e: React.MouseEvent) => void;
-  predictions?: any;
-  isMinting?: boolean;
-}
-
-function ContentGrid({ children }: ContentGridProps) {
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 p-2 sm:p-4 pb-16">
-      {children}
-    </div>
-  );
-}
-
-function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStats, isMintable, isOwned, onMint, onWithdraw, predictions, isMinting }: ContentGridItemProps) {
+export function ContentGridItem({ 
+  children, 
+  onClick, 
+  id, 
+  owner, 
+  showStats, 
+  onToggleStats, 
+  isMintable, 
+  isOwned, 
+  onMint, 
+  predictions, 
+  isMinting 
+}: ContentGridItemProps) {
   const [searchTriggered, setSearchTriggered] = useState(false);
-  const [copiedOwner, setCopiedOwner] = useState(false);
   const dispatch = useDispatch();
   const isAlexandrian = window.location.pathname.includes('/alexandrian');
 
-  const formatId = (id: string | undefined) => {
-    if (!id) return 'N/A';
-    return `${id.slice(0, 4)}...${id.slice(-4)}`;
-  };
-
-  const handleOwnerClick = async (e: React.MouseEvent, owner: string | undefined) => {
+  const handleOwnerClick = (e: React.MouseEvent, ownerValue?: string) => {
     e.stopPropagation();
-    if (owner) {
-      const copied = await copyToClipboard(owner);
-      if (copied) {
-        setCopiedOwner(true);
-        setTimeout(() => setCopiedOwner(false), 2000);
-      }
-
-      // Filter results
-      dispatch(setSearchState({ ownerFilter: owner }));
+    if (ownerValue) {
+      dispatch(setSearchState({ ownerFilter: ownerValue }));
       setSearchTriggered(true);
       setTimeout(() => setSearchTriggered(false), 2000);
     }
+  };
+
+  const renderMintButton = () => {
+    if (!isMintable || isOwned || !onMint) return null;
+
+    return (
+      <Button
+        variant="secondary"
+        className={`${isAlexandrian 
+          ? 'bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200'
+          : 'bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)]'
+        } px-2 sm:px-4 py-1 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 transition-all duration-200 text-xs sm:text-sm font-medium shrink-0 ${isMinting ? 'opacity-80' : ''}`}
+        onClick={onMint}
+        disabled={isMinting}
+      >
+        <span className="flex items-center gap-1 sm:gap-2">
+          {isMinting ? (
+            <>
+              <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+              {isAlexandrian ? 'Liking...' : 'Minting'}
+            </>
+          ) : (
+            <>
+              {isAlexandrian ? 'Like' : 'Mint NFT'}
+              {isAlexandrian ? (
+                <Heart className={`h-4 w-4 sm:h-5 sm:w-5 transition-all duration-200 ${isMinting ? 'scale-125' : ''}`} />
+              ) : (
+                <Plus className={`h-4 w-4 sm:h-5 sm:w-5 text-red-500 transition-all duration-200 ${isMinting ? 'scale-125 text-green-500' : ''}`} />
+              )}
+            </>
+          )}
+        </span>
+      </Button>
+    );
   };
 
   return (
@@ -80,7 +88,7 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
               <span className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-900">
                 {formatId(owner)}
               </span>
-              {copiedOwner ? (
+              {searchTriggered ? (
                 <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
               ) : (
                 <Search className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 group-hover:text-gray-600" />
@@ -101,35 +109,7 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
       <CardFooter className="flex flex-col w-full rounded-lg border border-[--border] bg-[--card] mt-2 p-2 sm:p-3">
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
-            {isMintable && !isOwned && onMint && (
-              <Button
-                variant="secondary"
-                className={`${isAlexandrian 
-                  ? 'bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200'
-                  : 'bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)]'
-                } px-2 sm:px-4 py-1 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 transition-all duration-200 text-xs sm:text-sm font-medium shrink-0 ${isMinting ? 'opacity-80' : ''}`}
-                onClick={onMint}
-                disabled={isMinting}
-              >
-                <span className="flex items-center gap-1 sm:gap-2">
-                  {isMinting ? (
-                    <>
-                      <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-                      {isAlexandrian ? 'Liking...' : 'Minting'}
-                    </>
-                  ) : (
-                    <>
-                      {isAlexandrian ? 'Like' : 'Mint NFT'}
-                      {isAlexandrian ? (
-                        <Heart className={`h-4 w-4 sm:h-5 sm:w-5 transition-all duration-200 ${isMinting ? 'scale-125' : ''}`} />
-                      ) : (
-                        <Plus className={`h-4 w-4 sm:h-5 sm:w-5 text-red-500 transition-all duration-200 ${isMinting ? 'scale-125 text-green-500' : ''}`} />
-                      )}
-                    </>
-                  )}
-                </span>
-              </Button>
-            )}
+            {renderMintButton()}
 
             {predictions && Object.keys(predictions).length > 0 ? (
               <Collapsible open={showStats} onOpenChange={onToggleStats}>
@@ -165,13 +145,4 @@ function ContentGridItem({ children, onClick, id, owner, showStats, onToggleStat
       </CardFooter>
     </Card>
   );
-}
-
-// Attach the Item component to ContentGrid
-ContentGrid.Item = ContentGridItem;
-
-// Export the main component as default for backward compatibility
-export default ContentGrid;
-
-// Export other components for direct imports if needed
-export { ContentGridItem, CopyableText, NftDataFooter };
+} 

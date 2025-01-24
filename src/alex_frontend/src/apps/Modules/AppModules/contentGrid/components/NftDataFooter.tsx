@@ -31,6 +31,7 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
     fetchNftData();
   }, [id]);
 
+
   const formatPrincipal = (principal: string | null) => {
     if (!principal) return 'Not owned';
     return `${principal.slice(0, 4)}...${principal.slice(-4)}`;

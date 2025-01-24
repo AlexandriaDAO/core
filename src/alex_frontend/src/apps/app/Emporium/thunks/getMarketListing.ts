@@ -1,4 +1,4 @@
-import { fetchTransactionsApi } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
+import {  fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
 import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { loadContentForTransactions } from "@/apps/Modules/shared/state/content/contentDisplayThunks";
 import { getActorEmporium } from "@/features/auth/utils/authUtils";
@@ -117,7 +117,7 @@ const getMarketListing = createAsyncThunk<
         };
       }
 
-      const fetchedTransactions = await fetchTransactionsApi({ nftIds: ids });
+      const fetchedTransactions = await fetchTransactionsForAlexandrian(ids);
 
       if (!fetchedTransactions || fetchedTransactions.length === 0) {
         console.warn("No transactions found for the market listings");
@@ -128,7 +128,6 @@ const getMarketListing = createAsyncThunk<
           totalCount: 0,
         };
       }
-
       dispatch(setTransactions(fetchedTransactions));
       await dispatch(loadContentForTransactions(fetchedTransactions));
 

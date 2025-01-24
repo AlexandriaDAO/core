@@ -158,8 +158,8 @@ pub async fn get_two_random_nfts() -> CallResult<((Principal, Vec<u8>), (Princip
     }
     
     // Calculate the starting index for the newest 1000 NFTs
-    let start_index = if supply_u128 > 1000 {
-        supply_u128 - 1000
+    let start_index = if supply_u128 > 10000 {
+        supply_u128 - 10000
     } else {
         0
     };

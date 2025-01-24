@@ -1,4 +1,4 @@
-import { fetchTransactionsApi } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
+import {  fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
 import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { loadContentForTransactions } from "@/apps/Modules/shared/state/content/contentDisplayThunks";
 import { getIcrc7Actor } from "@/features/auth/utils/authUtils";
@@ -45,9 +45,8 @@ const getUserIcrc7Tokens = createAsyncThunk<
 
       // Fetch and dispatch transaction data
       if (arweaveIds.length > 0) {
-        const fetchedTransactions = await fetchTransactionsApi({
-          nftIds: arweaveIds,
-        });
+        const fetchedTransactions = await fetchTransactionsForAlexandrian(arweaveIds);
+        
         dispatch(setTransactions(fetchedTransactions));
         await dispatch(loadContentForTransactions(fetchedTransactions));
       }

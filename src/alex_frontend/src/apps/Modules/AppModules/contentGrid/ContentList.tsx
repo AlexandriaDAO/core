@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
@@ -36,7 +36,7 @@ const ContentList = () => {
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
 
-  const handleMint = async (transactionId: string) => {
+  const handleMint = useCallback(async (transactionId: string) => {
     try {
       setMintingStates(prev => ({ ...prev, [transactionId]: true }));
       const message = await mint_nft(transactionId);
@@ -47,14 +47,14 @@ const ContentList = () => {
     } finally {
       setMintingStates(prev => ({ ...prev, [transactionId]: false }));
     }
-  };
+  }, []);
 
   const handleRenderError = useCallback((transactionId: string) => {
     dispatch(clearTransactionContent(transactionId));
     dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
   }, [dispatch]);
 
-  const handleWithdraw = async (transactionId: string) => {
+  const handleWithdraw = useCallback(async (transactionId: string) => {
     try {
       setWithdrawingStates(prev => ({ ...prev, [transactionId]: true }));
       const nftId = arweaveToNftId[transactionId];
@@ -82,7 +82,7 @@ const ContentList = () => {
     } finally {
       setWithdrawingStates(prev => ({ ...prev, [transactionId]: false }));
     }
-  };
+  }, [arweaveToNftId, nfts]);
 
   return (
     <TooltipProvider>
