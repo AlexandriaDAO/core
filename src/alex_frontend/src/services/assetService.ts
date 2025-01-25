@@ -160,6 +160,7 @@ export const getAssets = async <T extends Book | Audio | Video | Image>(manifest
     await Promise.all(
         manifests.map(async ({ id, owner, timestamp, type }) => {
             try {
+                // const response = await fetch(`https://arweave.net/${id}`);
                 const response = await fetch(`https://gateway.irys.xyz/${id}`);
                 if (response.ok) {
                     const metadata = await response.json();

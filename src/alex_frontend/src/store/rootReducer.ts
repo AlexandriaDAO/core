@@ -22,6 +22,7 @@ import swapReducer from "@/features/swap/swapSlice"
 import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
 import alexReducer from "@/features/swap/alexSlice";
+import fileUploadReducer from "@/features/file-upload/fileUploadSlice";
 
 import contentDisplayReducer from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import arweaveReducer from "@/apps/Modules/shared/state/arweave/arweaveSlice";
@@ -56,6 +57,7 @@ const rootReducer = combineReducers({
 
 	upload: uploadReducer,
 	asset: assetReducer,
+	fileUpload: fileUploadReducer,
 
 	swap:swapReducer,
 	icpLedger:icpLedgerReducer,
