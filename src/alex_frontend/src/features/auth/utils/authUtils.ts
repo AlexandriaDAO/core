@@ -59,9 +59,17 @@ import {
   icp_swap_factory,
   createActor as createActorIcpSwapFactory,
 } from "../../../../../icp_swap_factory";
-import{createActor as createActorAssetCanister,asset_canister} from "../../../../../declarations/asset_canister";
+import {
+  createActor as createActorAssetCanister,
+  asset_canister,
+} from "../../../../../asset_canister"; //
 
-const isLocalDevelopment =process.env.DFX_NETWORK !== "ic";
+import {
+  asset_manager,
+  createActor as createActorAssetManager,
+} from "../../../../../declarations/asset_manager";
+
+const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
 
 const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
 const icrc7_canister_id = process.env.CANISTER_ID_ICRC7!;
@@ -78,8 +86,7 @@ const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 const log_canister_id = process.env.CANISTER_ID_LOGS!;
 const icp_swap_factory_canister_id = "ggzvv-5qaaa-aaaag-qck7a-cai";
-const asset_canister_id = "purlq-cmaaa-aaaaa-qabcq-cai"//"ahw5u-keaaa-aaaaa-qaaha-cai";
-
+const asset_manager_canister_id = process.env.CANISTER_ID_ASSET_MANAGER!;
 
 export const getPrincipal = (client: AuthClient): string =>
   client.getIdentity().getPrincipal().toString();
@@ -185,9 +192,8 @@ export const getIcpSwapFactoryCanister = () =>
     icp_swap_factory
   );
 
-  export const getAssetCanister = () =>
-    getActor(
-      asset_canister_id,
-      createActorAssetCanister,
-      asset_canister
-    );    
+export const getUserAssetCanister = (canisterId: string) =>
+  getActor(canisterId, createActorAssetCanister, asset_canister);
+
+export const getAssetManagerCanister = () =>
+  getActor(asset_manager_canister_id, createActorAssetManager, asset_manager);

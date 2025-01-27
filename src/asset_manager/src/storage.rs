@@ -35,6 +35,8 @@ pub struct UserCanisterRegistry {
     pub assigned_canister_id: Principal,
     pub status:Status,
     pub last_updated: u64,
+    pub last_payment:u64,
+    pub created_at:u64,
 }
 
 
@@ -58,6 +60,5 @@ impl Storable for UserCanisterRegistry {
 #[derive(Clone, Debug, PartialEq, Eq, CandidType, Deserialize)]
 pub enum Status {
     Active,
-    PaymentRequired,      
-    Suspended,
+    InActive,      
 }

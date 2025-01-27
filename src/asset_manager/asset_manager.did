@@ -1,10 +1,12 @@
 type PaymentEntry = record { timestamp : nat64; amount : nat64 };
 type Result = variant { Ok : principal; Err : text };
-type Status = variant { Terminated; Active; Suspended; PaymentRequired };
+type Status = variant { Active; InActive };
 type UserCanisterRegistry = record {
   status : Status;
   owner : principal;
   last_updated : nat64;
+  created_at : nat64;
+  last_payment : nat64;
   payment_details : vec PaymentEntry;
   assigned_canister_id : principal;
 };
@@ -13,4 +15,5 @@ service : {
   get_all_user_asset_canisters : () -> (
       vec record { principal; UserCanisterRegistry },
     ) query;
+  renew : (opt blob) -> (Result);
 }

@@ -87,6 +87,9 @@ dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 
 dfx deploy emporium --specified-id zdcg2-dqaaa-aaaap-qpnha-cai
 
+dfx deploy asset_manager --specified-id aax3a-h4aaa-aaaaa-qaahq-cai
+
+
 # Step 5: Configure Local Identities for token launches
 dfx identity new minter --storage-mode plaintext
 dfx identity use minter
