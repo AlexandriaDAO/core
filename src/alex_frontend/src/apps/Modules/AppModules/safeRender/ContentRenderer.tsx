@@ -1,5 +1,5 @@
 import React from 'react';
-import { LoaderPinwheel, BookOpen, File, Play } from 'lucide-react';
+import { BookOpen, File, Play } from 'lucide-react';
 import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
 import ContentValidator from './ContentValidator';

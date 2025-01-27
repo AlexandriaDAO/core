@@ -54,7 +54,7 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
     if (!nftEntry) return;
     
     const tokenId = nftEntry[0];
-    const lbryUrl = `https://lbry.app/${tokenId}`;
+    const lbryUrl = process.env.NODE_ENV === 'development' ? `http://localhost:8080/nft/${tokenId}` : `https://lbry.app/nft/${tokenId}`;
     const copied = await copyToClipboard(lbryUrl);
     if (copied) {
       setCopiedLink(true);

@@ -45,6 +45,7 @@ const EngineOverviewPage = lazy(()=>import("@/pages/dashboard/EngineOverviewPage
 const PublicEnginesPage = lazy(()=>import("@/pages/dashboard/PublicEnginesPage"));
 const AssetsPage = lazy(()=>import("@/pages/dashboard/AssetsPage"));
 const CollectionPage = lazy(()=>import("@/pages/dashboard/CollectionPage"));
+const SingleTokenView = lazy(() => import("@/apps/Modules/AppModules/contentGrid/SingleTokenView"));
 
 export const AppRoutes = () => {
 	return (
@@ -53,6 +54,7 @@ export const AppRoutes = () => {
 				<Route element={<BaseLayout />}>
 					<Route path="/" element={<MainLayout />}>
 						<Route index element={<Suspense key="home" fallback={<TopProgressBar />}><HomePage /></Suspense>} />
+						<Route path="nft/:tokenId" element={<Suspense key="nft" fallback={<TopProgressBar />}><SingleTokenView /></Suspense>} />
 						<Route path="manager" element={<Suspense key="manager" fallback={<TopProgressBar />}><ManagerPage /></Suspense>} />
 						<Route path="legacy_librarian" element={<Suspense key="legacy_librarian" fallback={<TopProgressBar />}><LegacyLibrarianPage /></Suspense>} />
 						
