@@ -114,7 +114,7 @@ const SwapContent: React.FC = () => {
                     className="text-black text-right text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading bg-transparent  placeholder-black  focus:outline-none focus:border-transparent w-full caret-[#D8DDF7]"
                     type="text"
                     defaultValue={amount}
-                    value={amount}
+                    value={amount+""}
                     min="0"
                     onChange={(e) => {
                       handleAmountChange(e);

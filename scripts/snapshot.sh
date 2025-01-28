@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 # dfx canister snapshot list alex_frontend --network ic
 
 # # Load snapshot
@@ -28,7 +28,7 @@ dfx canister start alex_backend --network ic
 
 # alex_frontend
 dfx canister stop alex_frontend --network ic
-dfx canister snapshot create alex_frontend --replace 00000000000000030000000001f0531c0101 --network ic
+dfx canister snapshot create alex_frontend --replace 00000000000000040000000001f0531c0101 --network ic
 dfx canister start alex_frontend --network ic
 
 # alex_wallet
@@ -88,12 +88,12 @@ dfx canister start logs --network ic
 
 # tokenomics
 dfx canister stop tokenomics --network ic
-dfx canister snapshot create tokenomics --replace 00000000000000000000000001f053240101 --network ic
+dfx canister snapshot create tokenomics --replace 00000000000000010000000001f053240101 --network ic
 dfx canister start tokenomics --network ic
 
 # user
 dfx canister stop user --network ic
-dfx canister snapshot create user --network ic
+dfx canister snapshot create user --replace 00000000000000000000000001f0531d0101 --network ic
 dfx canister start user --network ic
 
 # vetkd

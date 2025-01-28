@@ -41,8 +41,8 @@ export default function Tabs() {
                 SWAP
             </button>
             <button
-                onClick={() => navigate('/whitepaper')}
-                className={`${baseStyles} ${location.pathname === '/whitepaper' ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
+                onClick={() => navigate('/info')}
+                className={`${baseStyles} ${['/info', '/info/faq', '/info/whitepaper'].includes(location.pathname) ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
             >
                 INFO
             </button>

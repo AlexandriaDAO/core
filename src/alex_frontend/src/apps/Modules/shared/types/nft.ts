@@ -12,4 +12,5 @@ export interface NFTBalances {
   tokenId: string;
   alex: string;
   lbry: string;
+  collection?: 'NFT' | 'SBT';
 } 

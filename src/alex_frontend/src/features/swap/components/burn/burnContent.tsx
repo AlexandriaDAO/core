@@ -102,7 +102,7 @@ const BurnContent = () => {
                         <div className='bg-white border py-5 px-5 rounded-borderbox mb-7 '>
                             <div className='flex justify-between mb-3'>
                                 <h4 className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-multygray'>Amount</h4>
-                                <input className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-darkgray text-right bg-transparent w-full placeholder-darkgray  focus:outline-none focus:border-transparent' type='integer' value={amountLBRY} defaultValue={0} min={0} onChange={(e) => {
+                                <input className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-darkgray text-right bg-transparent w-full placeholder-darkgray  focus:outline-none focus:border-transparent' type='integer' value={amountLBRY+""} defaultValue={0} min={0} onChange={(e) => {
                                     handleAmountLBRYChange(e)
                                 }} />
                             </div>

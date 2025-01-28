@@ -25,7 +25,7 @@ export const TermsContent: React.FC = () => {
           {/* Rest of the content from RiskWarningModal */}
           <div>
             <h2 className="text-lg font-semibold mb-2">Development Roadmap</h2>
-            <p>pre-alpha → alpha → beta → release candidate → DAO/SNS</p>
+            <p>pre-alpha → alpha → beta → release → DAO/SNS</p>
           </div>
           
           {/* ... (rest of the existing content) ... */}

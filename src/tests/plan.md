@@ -1,5 +1,12 @@
 
+Tommorrow first things: Figure out a better way than that prop passing to contentItem in contentList.tsx.
 
+
+Feature Ideas:
+- Make every NFT its own link.
+- Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
+- Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
+- Figure out how we're going to sort by section.
 
 
 Immported Libmodules.
@@ -13,7 +20,9 @@ and nsfwselector.tsx
 
 - If the mint has succeded the mint button should go away.
 - Need more dynamic states for the like/mint/withdraw buttons.
-
+- If you go to the next page on alexandrian while a modal is open it throws an error.
+- On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.m
+- Put another amount selector by the show more button on permasearch.
 
 
 

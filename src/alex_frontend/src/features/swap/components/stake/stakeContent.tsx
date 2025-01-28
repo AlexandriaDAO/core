@@ -57,9 +57,16 @@ const StakeContent = () => {
 
         const estimatedRewardIcp = Number(swap.totalStaked) * swap.averageAPY;
         const stakedUsd = Number(swap.totalStaked) * Number(alex.alexPriceUsd);
-        const aprPercentage = ((estimatedRewardIcp * Number(icpLedger.icpPrice)) / stakedUsd) * 100;
-        setApr(aprPercentage.toFixed(2));
-    }, [alex.alexPriceUsd, icpLedger.icpPrice, swap.averageAPY, swap.stakeInfo.stakedAlex])
+
+        // Check if `stakedUsd` is valid before dividing
+        if (stakedUsd > 0) {
+            const aprPercentage = ((estimatedRewardIcp * Number(icpLedger.icpPrice)) / stakedUsd) * 100;
+            setApr(aprPercentage.toFixed(4)+"%");
+        } else {
+            setApr(''); // Fallback value if division by zero
+        }
+    }, [alex.alexPriceUsd, icpLedger.icpPrice, swap.averageAPY, swap.stakeInfo.stakedAlex]);
+
 
     useEffect(() => {
         if (user) {
@@ -77,11 +84,11 @@ const StakeContent = () => {
         }
         if (swap.error) {
             if (swap.error && swap.error.includes("Must have ")) {
-                setModalData({message:"Must have at least 0.01 ICP reward to claim.",title:"Insufficient Reward "})
-             }
-             else{
-                setModalData({message: "Please try again or seek help if needed", title: "Something went wrong..."})
-             }
+                setModalData({ message: "Must have at least 0.01 ICP reward to claim.", title: "Insufficient Reward " })
+            }
+            else {
+                setModalData({ message: "Please try again or seek help if needed", title: "Something went wrong..." })
+            }
             setLoadingModalV(false);
             setErrorModalV(true);
             dispatch(flagHandler());
@@ -109,18 +116,19 @@ const StakeContent = () => {
                                 <li className='mb-4'>
                                     <div className='flex justify-between'>
                                         <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Estimated Hourly APR</strong>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{apr}%</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{apr}</strong>
                                     </div>
                                 </li>
-                                <li className='mb-4'>
+                                {/* <li className='mb-4'>
                                     <div className='flex justify-between border-b-2 pb-4'>
                                         <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Total earned</strong>
                                         <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>0 ALEX</strong>
                                     </div>
-                                </li>
+                                </li> */}
                                 <li className='mb-4'>
                                     <div className='flex justify-between'>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Total Staked</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Cumulative Stake by Community
+                                        </strong>
                                         <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{swap.totalStaked} ALEX</strong>
                                     </div>
                                 </li>

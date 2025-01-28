@@ -49,23 +49,23 @@ const TopupContent = () => {
 
     const handleTopUp = async () => {
         console.log("handleTopUp called", { user, amount });
-        
+
         if (!user?.principal) {
             console.log("User validation failed", { user });
             return;
         }
-        
+
         try {
             console.log("Dispatching topUpLBRY", { amount, userPrincipal: user.principal });
             setLoadingModalV(true);
-            
+
             const result = await dispatch(
                 topUpLBRY({
                     amount: amount,
                     userPrincipal: user.principal,
                 })
             ).unwrap();
-            
+
             console.log("topUpLBRY result:", result);
         } catch (error) {
             console.error("Failed to top up:", error);
@@ -77,7 +77,7 @@ const TopupContent = () => {
 
     useEffect(() => {
         if (!user?.principal) return;
-        
+
         if (swap.transferSuccess === true) {
             setLoadingModalV(false);
             setSuccessModalV(true);
@@ -103,13 +103,13 @@ const TopupContent = () => {
 
             const nftManager = await getNftManagerActor();
             const result = await nftManager.withdraw_topup();
-            
+
             console.log("Withdraw result:", result);
-            
+
             // Refresh balances after withdrawal
             await dispatch(getSpendingBalance(user.principal));
             await dispatch(getLbryBalance(user.principal));
-            
+
             setLoadingModalV(false);
             setSuccessModalV(true);
         } catch (error) {
@@ -204,7 +204,7 @@ const TopupContent = () => {
                                         <>Top Up</>
                                     )}
                                 </button>
-                                
+
                                 <button
                                     type="button"
                                     className={`w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2
@@ -244,7 +244,7 @@ const TopupContent = () => {
                 </div>
                 <LoadingModal
                     show={loadingModalV}
-                    message1="Top Up in Progress"
+                    message1={` ${withdrawLoading ? "Withdrawal"  : "Top up"} in Progress `}
                     message2="Your transaction is being processed. This may take a few moments."
                     setShow={setLoadingModalV}
                 />

@@ -14,7 +14,7 @@ const ErrorFallback = ({ error }: { error: Error }) => {
             >
                 <DialogTitle className="sr-only">Error</DialogTitle>
                 <DialogDescription className="text-center">Something went wrong.</DialogDescription>
-                <pre style={{ color: "red" }}>{error.message}</pre>
+                <p style={{ color: "red" }}>{error.message}</p>
                 <Button variant="link" onClick={() => window.location.reload()}>Refresh Page</Button>
             </DialogContent>
         </Dialog>

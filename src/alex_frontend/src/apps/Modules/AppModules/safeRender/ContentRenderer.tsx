@@ -1,11 +1,11 @@
 import React from 'react';
-import { LoaderPinwheel, BookOpen, File, Play } from 'lucide-react';
+import { BookOpen, File, Play } from 'lucide-react';
 import { Reader } from "@/features/reader";
 import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
 import ContentValidator from './ContentValidator';
-import { getFileIcon } from '../utils/fileIcons';
+import { getFileIcon } from '@/apps/Modules/AppModules/safeRender/fileIcons';
 import { Transaction } from "@/apps/Modules/shared/types/queries";
-import { ContentUrlInfo, MintableState } from '../types';
+import { ContentUrlInfo, MintableState } from './types';
 import { Progress } from "@/lib/components/progress";
 import { Skeleton } from "@/lib/components/skeleton";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
