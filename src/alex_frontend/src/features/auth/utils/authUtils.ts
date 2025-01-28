@@ -191,9 +191,8 @@ export const getIcpSwapFactoryCanister = () =>
     createActorIcpSwapFactory,
     icp_swap_factory
   );
-
-export const getUserAssetCanister = (canisterId: string) =>
+export const getActorUserAssetCanister = (canisterId: string) =>
   getActor(canisterId, createActorAssetCanister, asset_canister);
 
-export const getAssetManagerCanister = () =>
+export const getActorAssetManager = () =>
   getActor(asset_manager_canister_id, createActorAssetManager, asset_manager);

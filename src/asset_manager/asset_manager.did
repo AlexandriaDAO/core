@@ -15,5 +15,5 @@ service : {
   get_all_user_asset_canisters : () -> (
       vec record { principal; UserCanisterRegistry },
     ) query;
-  renew : (opt blob) -> (Result);
+  get_caller_asset_canister : () -> (opt UserCanisterRegistry) query;
 }

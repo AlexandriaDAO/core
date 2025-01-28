@@ -23,17 +23,9 @@ thread_local! {
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
-pub struct PaymentEntry {
-    pub timestamp: u64,  
-    pub amount: u64,     // Payment amount
-}
-
-#[derive(CandidType, Deserialize, Clone, Debug)]
 pub struct UserCanisterRegistry {
     pub owner: Principal,
-    pub payment_details: Vec<PaymentEntry>,
     pub assigned_canister_id: Principal,
-    pub status:Status,
     pub last_updated: u64,
     pub last_payment:u64,
     pub created_at:u64,
@@ -57,8 +49,3 @@ impl Storable for UserCanisterRegistry {
     };
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, CandidType, Deserialize)]
-pub enum Status {
-    Active,
-    InActive,      
-}

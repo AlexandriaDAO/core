@@ -27,11 +27,14 @@ import contentDisplayReducer from "@/apps/Modules/shared/state/content/contentDi
 import arweaveReducer from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import libraryReducer from "@/apps/Modules/shared/state/librarySearch/librarySlice";
 import nftDataReducer from "@/apps/Modules/shared/state/nftData/nftDataSlice";
+import assetManagerReducer from "@/apps/Modules/shared/state/assetManager/assetManagerSlice";
+
 
 import emporiumReducer from "@/apps/app/Emporium/emporiumSlice";
 
 import uploadReducer from "@/features/upload/uploadSlice";
 import assetReducer from "@/features/asset/assetSlice";
+
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -69,6 +72,7 @@ const rootReducer = combineReducers({
 	library: libraryReducer,
 	nftData: nftDataReducer,
 	emporium:emporiumReducer,
+	assetManager:assetManagerReducer,
 });
 
 export default rootReducer;
