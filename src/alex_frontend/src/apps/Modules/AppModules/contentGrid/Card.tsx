@@ -23,9 +23,10 @@ interface ContentCardProps {
   onWithdraw?: (e: React.MouseEvent) => void;
   predictions?: any;
   isMinting?: boolean;
+  footer?: React.ReactNode;
 }
 
-export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isMintable, isOwned, onMint, onWithdraw, predictions, isMinting }: ContentCardProps) {
+export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isMintable, isOwned, onMint, onWithdraw, predictions, isMinting, footer }: ContentCardProps) {
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [copiedOwner, setCopiedOwner] = useState(false);
   const dispatch = useDispatch();
@@ -148,7 +149,8 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
             ) : null}
           </div>
 
-          {(!predictions || Object.keys(predictions).length === 0) && id && <NftDataFooter id={id} />}
+          {(!predictions || Object.keys(predictions).length === 0) && id && !footer && <NftDataFooter id={id} />}
+          {footer}
         </div>
       </CardFooter>
     </Card>

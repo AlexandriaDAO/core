@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ContentRenderer from '../safeRender/ContentRenderer';
-import { ContentCard } from './Card';
-import Modal from './components/Modal';
+import { ContentCard } from '@/apps/Modules/AppModules/contentGrid/Card';
+import Modal from '@/apps/Modules/AppModules/contentGrid/components/Modal';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
 import { toast } from "sonner";
@@ -13,12 +13,16 @@ import { ALEX } from '../../../../../../declarations/ALEX';
 import { LBRY } from '../../../../../../declarations/LBRY';
 import { nft_manager } from '../../../../../../declarations/nft_manager';
 import { updateNftBalances } from '../../shared/state/nftData/nftDataSlice';
-import { arweaveIdToNat, natToArweaveId } from '@/utils/id_convert';
+import { natToArweaveId } from '@/utils/id_convert';
 import { fetchTransactionById } from '../../LibModules/arweaveSearch/api/directArweaveClient';
 import { ContentService } from '../../LibModules/contentDisplay/services/contentService';
 import { setContentData } from '../../shared/state/content/contentDisplaySlice';
 import { Transaction } from '../../shared/types/queries';
 import { Badge } from "@/lib/components/badge";
+import { Copy, Check, Link } from "lucide-react";
+import { copyToClipboard } from '@/apps/Modules/AppModules/contentGrid/utils/clipboard';
+import { getNftOwnerInfo, UserInfo } from '../../shared/utils/nftOwner';
+import { setNFTs } from '../../shared/state/nftData/nftDataSlice';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -30,12 +34,25 @@ function SingleTokenView() {
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [contentUrls, setContentUrls] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
+  const [copiedPrincipal, setCopiedPrincipal] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [ownerInfo, setOwnerInfo] = useState<UserInfo | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
   const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
   const { nfts } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
+
+  const formatPrincipal = (principal: string | null) => {
+    if (!principal) return 'Not owned';
+    return `${principal.slice(0, 4)}...${principal.slice(-4)}`;
+  };
+
+  const formatBalance = (balance: string | undefined) => {
+    if (!balance) return '0';
+    return balance;
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -98,17 +115,28 @@ function SingleTokenView() {
           LBRY.icrc1_balance_of(balanceParams)
         ]);
 
-        console.log('Fetched balances:', { alex: alexBalance.toString(), lbry: lbryBalance.toString() });
-
         const convertE8sToToken = (e8sAmount: bigint): string => {
           return (Number(e8sAmount) / 1e8).toString();
         };
 
         if (mounted) {
+          const alexTokens = convertE8sToToken(alexBalance);
+          const lbryTokens = convertE8sToToken(lbryBalance);
+
+          // Initialize NFT data in the store
+          dispatch(setNFTs({
+            [tokenId]: {
+              collection: isSBT ? 'SBT' : 'NFT',
+              principal: '', // Using empty string instead of null
+              arweaveId: arweaveId,
+              balances: { alex: alexTokens, lbry: lbryTokens }
+            }
+          }));
+          
           dispatch(updateNftBalances({
             tokenId,
-            alex: convertE8sToToken(alexBalance),
-            lbry: convertE8sToToken(lbryBalance),
+            alex: alexTokens,
+            lbry: lbryTokens,
             collection: isSBT ? 'SBT' : 'NFT'
           }));
         }
@@ -128,6 +156,29 @@ function SingleTokenView() {
       mounted = false;
     };
   }, [tokenId, dispatch]);
+
+  useEffect(() => {
+    let mounted = true;
+    
+    async function loadOwnerInfo() {
+      if (!tokenId) return;
+      
+      try {
+        const info = await getNftOwnerInfo(tokenId);
+        if (mounted) {
+          setOwnerInfo(info);
+        }
+      } catch (error) {
+        console.error('Failed to load owner info:', error);
+      }
+    }
+    
+    loadOwnerInfo();
+    
+    return () => {
+      mounted = false;
+    };
+  }, [tokenId]);
 
   const handleRenderError = (transactionId: string) => {
     ContentService.clearTransaction(transactionId);
@@ -249,6 +300,90 @@ function SingleTokenView() {
   // Determine collection type based on tokenId length
   const collectionType = tokenId && tokenId.length > 80 ? 'SBT' : 'NFT';
 
+  const handleCopyPrincipal = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!nftData?.principal) return;
+    
+    const copied = await copyToClipboard(nftData.principal);
+    if (copied) {
+      setCopiedPrincipal(true);
+      setTimeout(() => setCopiedPrincipal(false), 2000);
+      toast.success('Copied principal to clipboard');
+    } else {
+      toast.error('Failed to copy principal');
+    }
+  };
+
+  const handleCopyLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!tokenId) return;
+    
+    const lbryUrl = process.env.NODE_ENV === 'development' 
+      ? `http://localhost:8080/nft/${tokenId}` 
+      : `https://lbry.app/nft/${tokenId}`;
+    const copied = await copyToClipboard(lbryUrl);
+    if (copied) {
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+      toast.success('Copied link to clipboard');
+    } else {
+      toast.error('Failed to copy link');
+    }
+  };
+
+  const CustomFooter = () => (
+    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
+        <Badge 
+          variant="default" 
+          className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+          onClick={handleCopyLink}
+        >
+          {copiedLink ? (
+            <Check className="h-3 w-3" />
+          ) : (
+            <Link className="h-3 w-3" />
+          )}
+        </Badge>
+        {nftData?.principal && (
+          <Badge 
+            variant="default" 
+            className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+            onClick={handleCopyPrincipal}
+          >
+            {formatPrincipal(nftData.principal)}
+            {copiedPrincipal ? (
+              <Check className="h-3 w-3" />
+            ) : (
+              <Copy className="h-3 w-3" />
+            )}
+          </Badge>
+        )}
+        {ownerInfo?.username && (
+          <Badge 
+            variant="default" 
+            className="text-xs bg-purple-100 text-purple-800 hover:bg-purple-200"
+          >
+            @{ownerInfo.username}
+          </Badge>
+        )}
+        <Badge variant="default" className={`text-xs ${
+          collectionType === 'NFT' 
+            ? 'bg-[#FFD700] text-black hover:bg-[#FFD700]/90' 
+            : 'bg-[#E6E6FA] text-black hover:bg-[#E6E6FA]/90'
+        }`}>
+          {collectionType}
+        </Badge>
+        <Badge variant="outline" className="text-xs bg-white">
+          ALEX: {formatBalance(nftData?.balances?.alex?.toString())}
+        </Badge>
+        <Badge variant="outline" className="text-xs bg-white">
+          LBRY: {formatBalance(nftData?.balances?.lbry?.toString())}
+        </Badge>
+      </div>
+    </div>
+  );
+
   return (
     <div className="container mx-auto p-4">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm">
@@ -263,6 +398,7 @@ function SingleTokenView() {
           onWithdraw={hasWithdrawableBalance ? handleWithdraw : undefined}
           predictions={undefined}
           isMinting={isMinting}
+          footer={<CustomFooter />}
         >
           <ContentRenderer
             transaction={transaction}
@@ -274,25 +410,6 @@ function SingleTokenView() {
             inModal={false}
           />
         </ContentCard>
-        <div className="flex flex-wrap gap-2 items-center p-2">
-          <Badge variant="default" className={`text-xs ${
-            collectionType === 'NFT' 
-              ? 'bg-[#FFD700] text-black hover:bg-[#FFD700]/90' 
-              : 'bg-[#E6E6FA] text-black hover:bg-[#E6E6FA]/90'
-          }`}>
-            {collectionType}
-          </Badge>
-          {nftData?.balances && (
-            <>
-              <Badge variant="outline" className="text-xs bg-white">
-                ALEX: {nftData.balances.alex}
-              </Badge>
-              <Badge variant="outline" className="text-xs bg-white">
-                LBRY: {nftData.balances.lbry}
-              </Badge>
-            </>
-          )}
-        </div>
       </div>
 
       <Modal

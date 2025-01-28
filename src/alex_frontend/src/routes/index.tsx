@@ -45,7 +45,7 @@ const EngineOverviewPage = lazy(()=>import("@/pages/dashboard/EngineOverviewPage
 const PublicEnginesPage = lazy(()=>import("@/pages/dashboard/PublicEnginesPage"));
 const AssetsPage = lazy(()=>import("@/pages/dashboard/AssetsPage"));
 const CollectionPage = lazy(()=>import("@/pages/dashboard/CollectionPage"));
-const SingleTokenView = lazy(() => import("@/apps/Modules/AppModules/contentGrid/SingleTokenView"));
+const SingleTokenView = lazy(() => import("@/apps/Modules/AppModules/blinks/SingleTokenView"));
 
 export const AppRoutes = () => {
 	return (
