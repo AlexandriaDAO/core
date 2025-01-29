@@ -49,8 +49,8 @@ function Alexandrian() {
 				filterComponent={<Library />}
 				showMoreEnabled={true}
 			/>
-      <div className="w-80 bg-white shadow-lg border-l border-gray-200 p-6 rounded-lg fixed top-20 right-4">
-	  <AssetManager />
+			<div className="w-80 bg-white shadow-lg border-l border-gray-200 p-6 rounded-lg fixed top-20 right-4">
+				<AssetManager />
 			</div>
 		</>
 	);
