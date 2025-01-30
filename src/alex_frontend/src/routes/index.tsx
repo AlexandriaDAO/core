@@ -19,6 +19,7 @@ const UpgradePage = lazy(()=>import("@/pages/dashboard/UpgradePage"));
 const LibrarianLayout = lazy(()=>import("@/layouts/LibrarianLayout"));
 const LibrarianPage = lazy(()=>import("@/pages/librarian/"));
 const NodesPage = lazy(()=>import("@/pages/librarian/NodesPage"));
+const FileUploadPage = lazy(()=>import("@/pages/dashboard/FileUploadPage"));
 const UploadPage = lazy(()=>import("@/pages/dashboard/UploadPage"));
 const InsightsPage = lazy(()=>import("@/pages/swap/insightsPage"));
 
@@ -108,6 +109,7 @@ export const AppRoutes = () => {
 									<Route index element={<Suspense key="assets" fallback={<MainPageSkeleton />}><AssetsPage /></Suspense>} />
 									<Route path="upload" element={<Suspense key="upload" fallback={<MainPageSkeleton />}><UploadPage /></Suspense>} />
 								</Route>
+								<Route path="file-upload" element={<Suspense key="file_upload" fallback={<MainPageSkeleton />}><FileUploadPage /></Suspense>} />
 								<Route path="collection" element={
 									<Suspense key="collection" fallback={<MainPageSkeleton />}>
 										<CollectionPage />

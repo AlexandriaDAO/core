@@ -41,17 +41,19 @@ export const getClientIrys = async () => {
 	throw new Error('Unable to connect to wallet')
 };
 
-export const getServerIrys = async (node: SerializedNode, actor: ActorSubclass<_SERVICE>): Promise<WebIrys> => {
-    // await actor.setMessage('msss')
-    // console.log(await actor.getMessage(), await actor.isUserAnonymous());
-
-
+export const getPublicKey = async (actor: ActorSubclass<_SERVICE>, node: SerializedNode) => {
     const pubKeyResponse = await actor.pubKey(BigInt(node.id));
     if ('Err' in pubKeyResponse) {
       throw new Error(`Error fetching public key: ${pubKeyResponse.Err}`);
     }
-    const public_key = pubKeyResponse.Ok;
+    return pubKeyResponse.Ok;
+}
 
+export const getServerIrys = async (node: SerializedNode, actor: ActorSubclass<_SERVICE>): Promise<WebIrys> => {
+    // await actor.setMessage('msss')
+    // console.log(await actor.getMessage(), await actor.isUserAnonymous());
+
+    const public_key = await getPublicKey(actor, node);
 
     const provider = {
       getPublicKey: async (): Promise<Buffer> => {
