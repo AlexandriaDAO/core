@@ -4,11 +4,14 @@ import {
   getIcpLedgerActor,
   getLbryActor,
   getIcrc7Actor,
+  getActorUserAssetCanister,
 } from "@/features/auth/utils/authUtils";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import { natToArweaveId } from "@/utils/id_convert";
 import { upload } from "./uploadToAssetCanister";
+import { loadContentForTransactions } from "../content/contentDisplayThunks";
+import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
 
 export const createAssetCanister = createAsyncThunk<
   string, // Success type
@@ -125,7 +128,7 @@ export const syncNfts = createAsyncThunk<
   "assetManager/syncNfts",
   async (
     { userPrincipal, userAssetCanister, setSyncProgress, syncProgress },
-    { rejectWithValue }
+    { dispatch, rejectWithValue }
   ) => {
     try {
       const actorIcrc7 = await getIcrc7Actor();
@@ -145,12 +148,13 @@ export const syncNfts = createAsyncThunk<
         console.warn("No tokens found for the specified user.");
       }
       const tokens = result.map((value) => natToArweaveId(value));
+
+      const fetchedTransactions = await fetchTransactionsForAlexandrian(tokens);
+      console.log("trnsaction ....", fetchedTransactions);
+      // now we need to store this to arweave
       console.log("tokens are ", tokens);
       tokens.reduce(async (prevPromise, token) => {
         await prevPromise; //  before starting the next one
-
-        console.log("https://arweave.net/" + token);
-
         const result = await upload({
           assetCanisterId: userAssetCanister,
           itemUrl: "https://arweave.net/" + token,
@@ -174,3 +178,85 @@ export const syncNfts = createAsyncThunk<
     }
   }
 );
+
+export const fetchUserNfts = createAsyncThunk<
+  string[],
+  {
+    userPrincipal: string;
+    userAssetCanister: string;
+  },
+  { rejectValue: string }
+>(
+  "assetManager/fetchNfts",
+  async ({ userPrincipal, userAssetCanister }, { rejectWithValue }) => {
+    try {
+      const actorIcrc7 = await getIcrc7Actor();
+      const assetActor = await getActorUserAssetCanister(userAssetCanister);
+
+      const countLimit = [BigInt(10000)] as [bigint];
+
+      // Fetch user's NFTs
+      const result = await actorIcrc7.icrc7_tokens_of(
+        {
+          owner: Principal.fromText(userPrincipal),
+          subaccount: [],
+        },
+        [],
+        countLimit
+      );
+
+      if (!Array.isArray(result) || result.length === 0) {
+        console.warn("No tokens found for the specified user.");
+      }
+      const tokens = result.map((value) => natToArweaveId(value));
+      console.log("tokens are ", tokens);
+
+      const urls = await Promise.all(
+        tokens.map(async (id) => {
+          const result = await fetchMedia(id, assetActor);
+          return result?.blob ? URL.createObjectURL(result.blob) : "";
+        })
+      );
+      console.log("urls", urls);
+
+      return urls;
+    } catch (error) {
+      console.error("Error fetching NFTs:", error);
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Unknown error occurred"
+      );
+    }
+  }
+);
+
+const fetchMedia = async (key: string, actor: any) => {
+  try {
+    // Query to get the file by key
+    const fileRecord = await actor.get({
+      key: key,
+      accept_encodings: ["identity"],
+    });
+
+    if (fileRecord) {
+      const { content, content_type } = fileRecord;
+
+      // Ensure content is properly handled as Uint8Array
+      const contentArray = Array.isArray(content)
+        ? new Uint8Array(content)
+        : content;
+
+      // Create blob with proper content type and streaming support
+      const blob = new Blob([contentArray], {
+        type: content_type,
+      });
+
+      return { blob, contentType: content_type };
+    } else {
+      console.log("File not found");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching file:", error);
+    return null;
+  }
+};

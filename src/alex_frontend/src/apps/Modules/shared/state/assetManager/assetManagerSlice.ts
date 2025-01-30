@@ -3,18 +3,20 @@ import {
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import { createAssetCanister, getAssetCanister } from "./assetManagerThunks";
+import { createAssetCanister, fetchUserNfts, getAssetCanister } from "./assetManagerThunks";
 import { toast } from "sonner";
 
 interface AssetManagerState {
   isLoading: boolean;
   error: string | null;
   userAssetCanister:string;
+  urls:string[];
 }
 
 const initialState: AssetManagerState = {
   isLoading: false,
   error:"",
+  urls:[""],
   userAssetCanister:""
 };
 
@@ -54,7 +56,23 @@ const assetManagerSlice = createSlice({
       state.isLoading = false;
       state.error = action.payload as string;
       toast.error(action.payload as string);
+    }).addCase(fetchUserNfts.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
     })
+    .addCase(fetchUserNfts.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.urls=action.payload;
+      state.error = null;
+    })
+    .addCase(fetchUserNfts.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload as string;
+      toast.error(action.payload as string);
+    })
+
+
+    
   },
 });
 

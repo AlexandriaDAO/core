@@ -38,6 +38,9 @@ function Alexandrian() {
 
 	return (
 		<>
+		  <div className="rounded-lg">
+				<AssetManager />
+			</div>
 			<SearchContainer
 				title="Alexandrian"
 				description="Search the NFT Library of others, and manage your own."
@@ -49,9 +52,7 @@ function Alexandrian() {
 				filterComponent={<Library />}
 				showMoreEnabled={true}
 			/>
-			<div className="w-80 bg-white shadow-lg border-l border-gray-200 p-6 rounded-lg fixed top-20 right-4">
-				<AssetManager />
-			</div>
+			
 		</>
 	);
 }
