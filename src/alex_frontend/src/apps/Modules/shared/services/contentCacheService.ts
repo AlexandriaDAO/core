@@ -187,7 +187,17 @@ class ContentCacheService {
   }
 
   private isTextContent(contentType: string): boolean {
-    return ['text/plain', 'text/markdown', 'application/json', 'text/html'].includes(contentType);
+    return [
+      'text/plain',
+      'text/markdown',
+      'application/json',
+      'text/html',
+      'text/csv',
+      'text/xml',
+      'application/xml',
+      'text/yaml',
+      'application/x-yaml'
+    ].includes(contentType);
   }
 
   getContent(txId: string): CachedContent | undefined {

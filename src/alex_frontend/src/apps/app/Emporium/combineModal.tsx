@@ -153,46 +153,48 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
-            <div className="bg-white rounded-lg sm:p-10 xs:p-4 max-w-lg w-full sm:w-full xs:w-11/12 relative flex flex-col">
+            <div className="bg-white rounded-lg sm:p-10 xs:p-4 max-w-lg w-full sm:w-full xs:w-11/12 relative flex flex-col max-h-[90vh]">
                 <Button
                     onClick={onClose}
-                    className="absolute top-1 right-1 text-gray-500 hover:text-white z-[1200]"
+                    className="absolute top-4 right-4 text-gray-500 hover:text-white z-[1200] bg-white hover:bg-gray-200"
                 >
                     <X />
                 </Button>
 
-                {renderModalContent()}
-                <div className="flex-1 h-80 w-auto m-auto overflow-hidden">
-                    <ContentRenderer
-                        transaction={modalData.transaction}
-                        content={contentData[modalData.arwaveId]}
-                        contentUrls={contentData[modalData.arwaveId]?.urls || {
-                            thumbnailUrl: null,
-                            coverUrl: null,
-                            fullUrl: contentData[modalData.arwaveId]?.url || `https://arweave.net/${modalData.arwaveId}`
-                        }}
-                        inModal={true}
-                        showStats={showStats[modalData.arwaveId]}
-                        mintableState={mintableState}
-                        handleRenderError={handleRenderError}
-                    />
-                </div>
-                <div className="mt-4 flex justify-between mb-4">
-                    <Button
-                        onClick={onClose}
-                        className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl sm:me-5 xs:mb-2 hover:bg-white hover:text-[#353535]"
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={handleAction}
-                        className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl hover:bg-white hover:text-[#353535]"
-                    >
-                        Confirm
-                    </Button>
-                </div>
-                <div className="text-center text-sm text-gray-500">
-                    {MARKETPLACE_LBRY_FEE} LBRY fee will be charged from spending wallet
+                <div className="flex flex-col h-full">
+                    {renderModalContent()}
+                    <div className="flex-shrink-0 overflow-hidden h-[300px] w-full relative">
+                        <ContentRenderer
+                            transaction={modalData.transaction}
+                            content={contentData[modalData.arwaveId]}
+                            contentUrls={contentData[modalData.arwaveId]?.urls || {
+                                thumbnailUrl: null,
+                                coverUrl: null,
+                                fullUrl: contentData[modalData.arwaveId]?.url || `https://arweave.net/${modalData.arwaveId}`
+                            }}
+                            inModal={true}
+                            showStats={showStats[modalData.arwaveId]}
+                            mintableState={mintableState}
+                            handleRenderError={handleRenderError}
+                        />
+                    </div>
+                    <div className="mt-4 flex justify-between mb-4 flex-shrink-0">
+                        <Button
+                            onClick={onClose}
+                            className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl sm:me-5 xs:mb-2 hover:bg-white hover:text-[#353535]"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleAction}
+                            className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl hover:bg-white hover:text-[#353535]"
+                        >
+                            Confirm
+                        </Button>
+                    </div>
+                    <div className="text-center text-sm text-gray-500 flex-shrink-0">
+                        {MARKETPLACE_LBRY_FEE} LBRY fee will be charged from spending wallet
+                    </div>
                 </div>
             </div>
         </div>

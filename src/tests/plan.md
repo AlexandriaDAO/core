@@ -4,11 +4,10 @@ Tommorrow first things: Figure out a better way than that prop passing to conten
 
 Feature Ideas:
 
-- Get rid of the NFT links on permasearch.
+
 - Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
 - Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
 - Figure out how we're going to sort by section.
-- Sandboxed card renderer so we can render permissive html/pdf stuff.
 
 
 Immported Libmodules.

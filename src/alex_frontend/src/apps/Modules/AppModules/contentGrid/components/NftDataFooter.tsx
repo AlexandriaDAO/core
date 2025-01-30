@@ -76,17 +76,19 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
 
   return (
     <div className="flex flex-wrap gap-2 items-center">
-      <Badge 
-        variant="default" 
-        className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
-        onClick={handleCopyLink}
-      >
-        {copiedLink ? (
-          <Check className="h-3 w-3" />
-        ) : (
-          <Link className="h-3 w-3" />
-        )}
-      </Badge>
+      {arweaveToNftId[id] && (
+        <Badge 
+          variant="default" 
+          className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+          onClick={handleCopyLink}
+        >
+          {copiedLink ? (
+            <Check className="h-3 w-3" />
+          ) : (
+            <Link className="h-3 w-3" />
+          )}
+        </Badge>
+      )}
       {nftData?.principal && (
         <Badge 
           variant="default" 

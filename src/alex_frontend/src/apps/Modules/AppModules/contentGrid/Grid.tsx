@@ -201,40 +201,31 @@ const Grid = () => {
         </ContentGrid>
 
         <Dialog open={!!selectedContent} onOpenChange={(open) => !open && setSelectedContent(null)}>
-          <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col" closeIcon={
+          <DialogContent className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background" closeIcon={
             <Button
               variant="outline"
-              className="absolute right-4 top-4 z-[60] rounded-full p-3 
+              className="absolute right-2 top-2 z-[60] rounded-full p-2 
                 bg-primary text-primary-foreground hover:bg-primary/90
                 transition-colors"
             >
-              <X className="h-6 w-6" />
+              <X className="h-4 w-4" />
             </Button>
           }>
             {selectedContent && (
-              <div className="w-full h-full overflow-y-auto">
-                <div className="p-6">
-                  <ContentRenderer
-                    transaction={transactions.find(t => t.id === selectedContent.id)!}
-                    content={contentData[selectedContent.id]}
-                    contentUrls={contentData[selectedContent.id]?.urls || {
-                      thumbnailUrl: null,
-                      coverUrl: null,
-                      fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
-                    }}
-                    inModal={true}
-                    showStats={showStats[selectedContent.id]}
-                    mintableState={mintableState}
-                    handleRenderError={handleRenderError}
-                  />
-                  {selectedContent && predictions[selectedContent.id]?.isPorn && (
-                    <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[55]">
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
-                        Content Filtered
-                      </div>
-                    </div>
-                  )}
-                </div>
+              <div className="w-full h-full">
+                <ContentRenderer
+                  transaction={transactions.find(t => t.id === selectedContent.id)!}
+                  content={contentData[selectedContent.id]}
+                  contentUrls={contentData[selectedContent.id]?.urls || {
+                    thumbnailUrl: null,
+                    coverUrl: null,
+                    fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
+                  }}
+                  inModal={true}
+                  showStats={showStats[selectedContent.id]}
+                  mintableState={mintableState}
+                  handleRenderError={handleRenderError}
+                />
               </div>
             )}
           </DialogContent>
