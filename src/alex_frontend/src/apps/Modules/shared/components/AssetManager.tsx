@@ -8,7 +8,7 @@ const AssetManager = () => {
   const user = useAppSelector((state) => state.auth);
   const nftData = useAppSelector((state) => state.nftData)
   const assetManager = useAppSelector((state) => state.assetManager);
-  const [userAssetCanister, setUserAssetCanister] = useState("");
+  const [userAssetCanister, setUserAssetCanister] = useState<string|null>(null);
   const [syncProgress, setSyncProgress] = useState<syncProgressInterface>({
     currentItem: "0",
     progress: 0,       // Default progress
@@ -16,7 +16,7 @@ const AssetManager = () => {
     currentProgress: 0,
   });
   const fetchNfts=async ()=>{
-    if (!user.user?.principal) return;
+    if (!user.user?.principal ||!assetManager.userAssetCanister) return;
     dispatch(fetchUserNfts({userPrincipal:user.user?.principal,userAssetCanister:assetManager.userAssetCanister}));
   }
   const createUserAssetCanister = () => {
@@ -24,7 +24,7 @@ const AssetManager = () => {
     dispatch(createAssetCanister({ userPrincipal: user.user.principal }))
   }
   const sync = () => {
-    if (!user.user?.principal) return;
+    if (!user.user?.principal ||!userAssetCanister) return;
     dispatch(syncNfts({
       userPrincipal: user.user.principal, syncProgress, setSyncProgress,
       userAssetCanister: userAssetCanister

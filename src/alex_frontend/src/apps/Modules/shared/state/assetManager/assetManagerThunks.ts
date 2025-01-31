@@ -149,9 +149,27 @@ export const syncNfts = createAsyncThunk<
       }
       const tokens = result.map((value) => natToArweaveId(value));
 
-      const fetchedTransactions = await fetchTransactionsForAlexandrian(tokens);
-      console.log("trnsaction ....", fetchedTransactions);
-      // now we need to store this to arweave
+      const fetchedTransactions = JSON.stringify(
+        await fetchTransactionsForAlexandrian(tokens)
+      );
+      
+// Step 1: Upload fetchedTransactions JSON first
+const transactionUploadResult = await upload({
+  assetCanisterId: userAssetCanister,
+  id: "ContentData",
+  setSyncProgress,
+  syncProgress,
+  contentData: fetchedTransactions, // Only sending JSON data first
+});
+
+if (!transactionUploadResult) {
+  throw new Error("Failed to upload transaction data.");
+}
+
+console.log("Transaction data uploaded successfully!");
+
+// Step 2: Upload NFTs one by one
+
       console.log("tokens are ", tokens);
       tokens.reduce(async (prevPromise, token) => {
         await prevPromise; //  before starting the next one
@@ -213,7 +231,7 @@ export const fetchUserNfts = createAsyncThunk<
 
       const urls = await Promise.all(
         tokens.map(async (id) => {
-          const result = await fetchMedia(id, assetActor);
+          const result = await fetchAssetFromUserCanister(id, assetActor);
           return result?.blob ? URL.createObjectURL(result.blob) : "";
         })
       );
@@ -229,7 +247,7 @@ export const fetchUserNfts = createAsyncThunk<
   }
 );
 
-const fetchMedia = async (key: string, actor: any) => {
+export const fetchAssetFromUserCanister = async (key: string, actor: any) => {
   try {
     // Query to get the file by key
     const fileRecord = await actor.get({

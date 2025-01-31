@@ -9,7 +9,7 @@ import { toast } from "sonner";
 interface AssetManagerState {
   isLoading: boolean;
   error: string | null;
-  userAssetCanister:string;
+  userAssetCanister:string|null;
   urls:string[];
 }
 
@@ -17,7 +17,7 @@ const initialState: AssetManagerState = {
   isLoading: false,
   error:"",
   urls:[""],
-  userAssetCanister:""
+  userAssetCanister:null
 };
 
 const assetManagerSlice = createSlice({

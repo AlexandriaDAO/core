@@ -47,10 +47,12 @@ interface MediaState {
 }
 interface uploadProps {
   assetCanisterId: string,
-  itemUrl: string,
+  itemUrl?: string,
+  contentData?: string;
   id: string,
   syncProgress: syncProgressInterface,
   setSyncProgress: React.Dispatch<React.SetStateAction<syncProgressInterface>>,
+
   // setUploadProgress: React.Dispatch<React.SetStateAction<{
   //   phase: string;
   //   progress: number;
@@ -96,10 +98,11 @@ const calculateSHA256 = async (data: Uint8Array): Promise<Uint8Array> => {
 
 export const upload = async ({
   assetCanisterId,
-  itemUrl,
   id,
   syncProgress,
-  setSyncProgress
+  setSyncProgress,
+  itemUrl,
+  contentData,
 }: uploadProps): Promise<boolean> => {
   let currentBatchId: bigint | null = null;
   const assetActor = await getActorUserAssetCanister(assetCanisterId);
@@ -107,14 +110,25 @@ export const upload = async ({
   try {
     setSyncProgress((prev) => ({ ...prev, currentItem: id, currentProgress: 0 }));
 
-    // Step 1: Fetch the file
-    const response = await fetch(itemUrl);
-    console.log("Fetching URL:", itemUrl);
-    if (!response.ok) throw new Error(`Failed to fetch file: ${response.statusText}`);
+    let fileData: Uint8Array;
+    let contentType = "application/json"; // Default to JSON if uploading content data
 
-    const contentType = response.headers.get("content-type") || "image/jpeg";
-    const blob = await response.blob();
-    const fileData = new Uint8Array(await blob.arrayBuffer());
+    if (itemUrl) {
+      // NFT Upload Case
+      const response = await fetch(itemUrl);
+      console.log("Fetching URL:", itemUrl);
+      if (!response.ok) throw new Error(`Failed to fetch file: ${response.statusText}`);
+
+      contentType = response.headers.get("content-type") || "image/jpeg";
+      const blob = await response.blob();
+      fileData = new Uint8Array(await blob.arrayBuffer());
+    } else if (contentData) {
+      // Transaction JSON Upload Case
+      fileData = new TextEncoder().encode(contentData);
+    } else {
+      throw new Error("Either `itemUrl` or `contentData` must be provided.");
+    }
+
     const totalChunks = Math.ceil(fileData.length / UPLOAD_CONSTANTS.CHUNK_SIZE);
 
     setSyncProgress((prev) => ({ ...prev, currentProgress: 10 }));
@@ -205,31 +219,7 @@ export const upload = async ({
 
   } catch (error: any) {
     console.error("Upload failed:", error);
-
-    let errorMessage = "Upload failed: ";
-
-    // "Asset Already Exists" and mark as success
-    if (error.message.includes("asset already exists")) {
-      toast.success(`"${id}" already exists. Marking as synced.`);
-
-      setSyncProgress((prev) => ({
-        ...prev,
-        totalSynced: (prev.totalSynced || 0) + 1,
-        currentProgress: 100,
-      }));
-
-      return true; // Considered a success
-    }
-
-    if (error.message.includes("IC0503")) {
-      errorMessage += "Asset creation failed. Please try again.";
-    } else if (error.message.includes("asset not found")) {
-      errorMessage += "Asset not found. Please ensure the asset is created before uploading.";
-    } else {
-      errorMessage += error.message;
-    }
-
-    toast.error(errorMessage);
+    toast.error("Upload failed: " + (error.message || "Unknown error"));
 
     // Cleanup on failure
     if (currentBatchId && assetActor) {
