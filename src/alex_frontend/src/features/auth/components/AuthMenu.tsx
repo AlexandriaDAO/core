@@ -20,7 +20,7 @@ import {
 import { NavLink } from "react-router";
 import { useLogout } from "@/hooks/useLogout";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import Protected from "@/components/Protected";
+import Protected from "@/guards/Protected";
 
 export default function AuthMenu() {
 	const logout = useLogout();
@@ -78,12 +78,12 @@ export default function AuthMenu() {
 							<span>Profile</span>
 						</DropdownMenuItem>
 						</NavLink>
-						<NavLink to='/dashboard/settings'>
+						{/* <NavLink to='/dashboard/settings'>
 							<DropdownMenuItem className="cursor-pointer">
 								<Settings />
 								<span>Settings</span>
 							</DropdownMenuItem>
-						</NavLink>
+						</NavLink> */}
 					</DropdownMenuGroup>
 				</Protected>
 				<DropdownMenuSeparator />

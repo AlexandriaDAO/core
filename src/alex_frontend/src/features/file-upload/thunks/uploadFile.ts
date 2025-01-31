@@ -20,19 +20,26 @@ const uploadFile = createAsyncThunk<
     try {
         const {auth: { user }} = getState();
 
-        // setIsUploading(true);
-		// setUploadStatus('uploading');
-
         const irys = await getServerIrys(node, actor);
 
-        // const receipt = await irys.uploadFile(file);
-
-        // console.log(receipt);
-
         const chunkedUploader = irys.uploader.chunkedUploader;
-        chunkedUploader.setBatchSize(1); // default is 5, make it 1 for sequential uploads
-        chunkedUploader.setChunkSize(512 * 1024); // 0.5mb chunks which is minimum
 
+        if (file.size >= 100 * 1024 * 1024) { // 100mb or above
+            chunkedUploader.setBatchSize(5);
+            chunkedUploader.setChunkSize(2 * 1024 * 1024); // 2MB chunks
+        } else if (file.size >= 50 * 1024 * 1024) { // 50mb or above
+            chunkedUploader.setBatchSize(4);
+            chunkedUploader.setChunkSize(1.5 * 1024 * 1024); // 1.5MB chunks
+        } else if (file.size >= 10 * 1024 * 1024) { // 10mb or above
+            chunkedUploader.setBatchSize(3);
+            chunkedUploader.setChunkSize(1 * 1024 * 1024); // 1MB chunks
+        } else if (file.size > 5 * 1024 * 1024) { // greater than 5mb
+            chunkedUploader.setBatchSize(2);
+            chunkedUploader.setChunkSize(768 * 1024); // 0.75MB chunks
+        } else {
+            chunkedUploader.setBatchSize(1); // default is 5, make it 1 for sequential uploads
+            chunkedUploader.setChunkSize(512 * 1024); // 0.5mb chunks which is minimum
+        }
 
         const handleChunkUpload = (chunkInfo: { totalUploaded: number }) => {
             const progress = Math.round((chunkInfo.totalUploaded / file.size) * 100);
@@ -44,14 +51,6 @@ const uploadFile = createAsyncThunk<
         const handleUploadDone = (finishRes: any) => {
             toast.success(`${file.name} uploaded successfully`);
             dispatch(setProgress(0));
-            // setUploadStatus('success');
-            // setLastUploadedFile(file || null);
-
-            // setLastUploadedTx(finishRes.data.id);
-
-            // setFile(null);
-            // dispatch(setNode(null));
-            // setIsUploading(false);
         };
 
         chunkedUploader.on("done", handleUploadDone);
@@ -78,7 +77,6 @@ const uploadFile = createAsyncThunk<
                 { name: "Version", value: "1.0" }
             ],
         });
-        // const res = await chunkedUploader.uploadData(await readFileAsBuffer(file));
 
         if(res.status === 200){
             return res.data.id;

@@ -10,7 +10,7 @@ const DashboardSidebar = () => {
     return (
         <div className="h-full flex flex-col justify-between p-4">
             <div className="flex flex-col gap-8">
-                {user?.librarian &&
+                {/* {user?.librarian &&
                     <NavLink
                         to="/librarian"
                         end
@@ -18,10 +18,10 @@ const DashboardSidebar = () => {
                     >
                         Librarian
                     </NavLink>
-                }
+                } */}
                 <div className="flex flex-col gap-3">
 
-                    <NavLink
+                    {/* <NavLink
                         to="/dashboard"
                         end
                         className={({ isActive }) => `
@@ -87,6 +87,31 @@ const DashboardSidebar = () => {
                     >
                         <Upload size={18} />
                         <span>File Upload</span>
+                    </NavLink> */}
+
+
+                    <NavLink
+                        to="/dashboard"
+                        end
+                        className={({ isActive }) => `
+                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border
+                            ${isActive ? 'text-primary-foreground bg-primary border-red' : 'text-gray-600 bg-muted border-gray-300 hover:text-primary hover:border hover:border-ring'}
+                        `}
+                    >
+                        <Home size={18} />
+                        <span>Home</span>
+                    </NavLink>
+
+                    <NavLink
+                        to="nodes"
+                        end
+                        className={({ isActive }) => `
+                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border
+                            ${isActive ? 'text-primary-foreground bg-primary border-red' : 'text-gray-600 bg-muted border-gray-300 hover:text-primary hover:border hover:border-ring'}
+                        `}
+                    >
+                        <LayoutList size={18}/>
+                        <span>My Nodes</span>
                     </NavLink>
 
                 </div>

@@ -114,7 +114,8 @@ const fileUploadSlice = createSlice({
 			})
 			.addCase(mintNFT.fulfilled, (state, action:PayloadAction<string>) => {
 				state.minting = false;
-				state.minted = action.payload;
+				// state.minted = action.payload;
+				state.minted = state.transaction;
 			})
 			.addCase(mintNFT.rejected, (state, action) => {
 				state.minting = false;

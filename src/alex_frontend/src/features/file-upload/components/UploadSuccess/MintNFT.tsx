@@ -1,10 +1,11 @@
 import React from "react";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowUpToLine, CheckCircle2, Loader2, LoaderPinwheel, RotateCcw } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import useNftManager from "@/hooks/actors/useNftManager";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import mintNFT from "../../thunks/mintNFT";
+import { Button } from "@/lib/components/button";
 
 const MintNFT: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -14,6 +15,11 @@ const MintNFT: React.FC = () => {
 
     const handleMint = async(e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
+        if(minted && minted == transaction) {
+            toast.success('NFT already minted');
+            return;
+        }
+
         if(!actor) {
             toast.error('Actor not available');
             return;
@@ -28,13 +34,26 @@ const MintNFT: React.FC = () => {
             <div className="flex items-center justify-between">
                 <div>
                     <h4 className="text-sm font-medium text-gray-900">
-                        Mint NFT
+                        NFT Mint
                     </h4>
                     <p className="text-sm text-gray-500">
-                        Create an NFT from your uploaded file
+                        {minting
+                            ? "Please wait while we are minting your file"
+                            : minted == transaction
+                                ? <span className="text-sm text-gray-500">Your file has been minted. <br /> It takes a few minutes to show up in PermaSearch.</span>
+                                : "Create an NFT from your uploaded file"}
                     </p>
                 </div>
-                <button
+
+                {
+
+                    minting ? <Button variant="outline" disabled={true}> <LoaderPinwheel size={18} className="animate-spin"/> Minting </Button> : 
+                        minted == transaction ? <Button variant="constructive" disabled={true}> <CheckCircle2 size={18}/> Minted </Button> : 
+                            mintError ? <Button variant="warning" onClick={handleMint}> <RotateCcw size={16}/> Try Again </Button> : <Button onClick={handleMint} variant="outline"> <ArrowUpToLine size={16}/> Mint NFT </Button>
+
+                }
+
+                {/* <button
                     onClick={handleMint}
                     disabled={minting || minted == transaction}
                     className={`
@@ -67,7 +86,7 @@ const MintNFT: React.FC = () => {
                     ) : (
                         mintError ? "Retry Minting" : "Mint NFT"
                     )}
-                </button>
+                </button> */}
             </div>
 
             {/* Minting Error */}

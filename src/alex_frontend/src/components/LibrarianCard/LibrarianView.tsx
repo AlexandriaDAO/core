@@ -16,8 +16,8 @@ function LibrarianView() {
             <Button
                 variant={"link"}
                 scale={"sm"}
-                onClick={()=>navigate("/librarian")}>
-                View Profile
+                onClick={()=>navigate("/dashboard")}>
+                View Home
             </Button>
         </div>
     )

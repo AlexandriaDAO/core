@@ -15,6 +15,7 @@ const apps: App[] = [
   { name: 'Alexandrian', description: 'Library', path: '/app/alexandrian', logo: '/logos/Alexandrian.svg' },
   { name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/Permasearch.svg' },
   { name: 'Emporium', description: 'Trade', path: '/app/emporium', logo: '/logos/Emporium.svg' },
+  { name: 'Pinax', description: 'Upload', path: '/app/pinax', logo: '/logos/Permasearch.svg' },
   { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos', logo: '/logos/Syllogos.svg', comingSoon: true },
   { name: 'Bibliotheca', description: 'Library', path: '/app/bibliotheca', comingSoon: true },
   { name: 'Lexigraph', description: 'Write', path: '/app/lexigraph', comingSoon: true },

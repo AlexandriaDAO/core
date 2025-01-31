@@ -6,27 +6,29 @@ import LayoutSkeleton from "@/layouts/skeletons/LayoutSkeleton";
 
 import BaseLayout from "@/layouts/BaseLayout";
 import MainLayout from "@/layouts/MainLayout";
-import AuthLayout from "@/layouts/AuthLayout";
+import AuthGuard from "@/guards/AuthGuard";
 import MainPageSkeleton from "@/layouts/skeletons/MainPageSkeleton";
 import UnauthorizedPage from "@/pages/UnauthorizedPage";
-import Protected from "@/components/Protected";
+import Protected from "@/guards/Protected";
+import LibrarianGuard from "@/guards/LibrarianGuard";
 
 const HomePage = lazy(()=>import("@/pages/HomePage"));
 
 const DashboardLayout = lazy(()=>import("@/layouts/DashboardLayout"));
 const NotFoundPage = lazy(()=>import("@/pages/NotFoundPage"));
 const UpgradePage = lazy(()=>import("@/pages/dashboard/UpgradePage"));
-const LibrarianLayout = lazy(()=>import("@/layouts/LibrarianLayout"));
+// const LibrarianLayout = lazy(()=>import("@/layouts/LibrarianLayout"));
 const LibrarianPage = lazy(()=>import("@/pages/librarian/"));
 const NodesPage = lazy(()=>import("@/pages/librarian/NodesPage"));
-const FileUploadPage = lazy(()=>import("@/pages/dashboard/FileUploadPage"));
-const UploadPage = lazy(()=>import("@/pages/dashboard/UploadPage"));
+// const FileUploadPage = lazy(()=>import("@/pages/dashboard/FileUploadPage"));
+const PinaxPage = lazy(()=>import("@/pages/PinaxPage"));
+// const UploadPage = lazy(()=>import("@/pages/dashboard/UploadPage"));
 const InsightsPage = lazy(()=>import("@/pages/swap/insightsPage"));
 
 const ManagerPage = lazy(()=>import("@/pages/ManagerPage"));
 const LegacyLibrarianPage = lazy(()=>import("@/pages/LegacyLibrarianPage"));
-const WhitepaperPage = lazy(()=>import("@/pages/WhitepaperPage"));
-const FAQPage = lazy(()=>import("@/pages/FAQPage"));
+// const WhitepaperPage = lazy(()=>import("@/pages/WhitepaperPage"));
+// const FAQPage = lazy(()=>import("@/pages/FAQPage"));
 const InfoPage = lazy(()=>import("@/pages/InfoPage"));
 const Bibliotheca = lazy(()=>import("@/apps/app/Bibliotheca"));
 const Alexandrian = lazy(()=>import("@/apps/app/Alexandrian"));
@@ -39,13 +41,13 @@ const LegacyCollectionPage = lazy(()=>import("@/apps/app/Emporium/CollectionPage
 const SwapPage = lazy(()=>import("@/pages/swap"));
 const DetailTransaction = lazy(()=>import("@/features/swap/components/transactionHistory/detailTransaction"));
 const MintPage = lazy(()=>import("@/pages/MintPage"));
-const DashboardPage = lazy(()=>import("@/pages/dashboard"));
+// const DashboardPage = lazy(()=>import("@/pages/dashboard"));
 const ProfilePage = lazy(()=>import("@/pages/dashboard/ProfilePage"));
-const EnginesPage = lazy(()=>import("@/pages/dashboard/EnginesPage"));
-const EngineOverviewPage = lazy(()=>import("@/pages/dashboard/EngineOverviewPage"));
-const PublicEnginesPage = lazy(()=>import("@/pages/dashboard/PublicEnginesPage"));
-const AssetsPage = lazy(()=>import("@/pages/dashboard/AssetsPage"));
-const CollectionPage = lazy(()=>import("@/pages/dashboard/CollectionPage"));
+// const EnginesPage = lazy(()=>import("@/pages/dashboard/EnginesPage"));
+// const EngineOverviewPage = lazy(()=>import("@/pages/dashboard/EngineOverviewPage"));
+// const PublicEnginesPage = lazy(()=>import("@/pages/dashboard/PublicEnginesPage"));
+// const AssetsPage = lazy(()=>import("@/pages/dashboard/AssetsPage"));
+// const CollectionPage = lazy(()=>import("@/pages/dashboard/CollectionPage"));
 const SingleTokenView = lazy(() => import("@/apps/Modules/AppModules/blinks/SingleTokenView"));
 
 export const AppRoutes = () => {
@@ -92,7 +94,26 @@ export const AppRoutes = () => {
 						<Route path="*" element={<Suspense key="404" fallback={<TopProgressBar />}><NotFoundPage /></Suspense>} />
 					</Route>
 
-					<Route element={<AuthLayout />}>
+					<Route element={<AuthGuard />}>
+						<Route element={<MainLayout />}>
+							<Route path="app/pinax" element={<Suspense key="pinax" fallback={<MainPageSkeleton />}><PinaxPage /></Suspense>} />
+						</Route>
+						<Route element={<Protected route />}>
+							<Route path="dashboard" element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
+								<Route element={<LibrarianGuard />}>
+									<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
+									<Route path="nodes" element={<Suspense key="nodes" fallback={<MainPageSkeleton />}><NodesPage /></Suspense>} />
+								</Route>
+
+								<Route path="profile">
+									<Route index element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
+									<Route path="upgrade" element={<Suspense key="upgrade" fallback={<MainPageSkeleton />}><UpgradePage /></Suspense>} />
+								</Route>
+							</Route>
+						</Route>
+					</Route>
+
+					{/* <Route element={<AuthLayout />}>
 						<Route element={<Protected route />}>
 							<Route path="dashboard" element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
 								<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><DashboardPage /></Suspense>} />
@@ -124,7 +145,7 @@ export const AppRoutes = () => {
 								<Route path="profile" element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
 							</Route>
 						</Route>
-					</Route>
+					</Route> */}
 				</Route>
 			</Routes>
 		</BrowserRouter>
