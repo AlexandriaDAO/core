@@ -123,6 +123,16 @@ export const upload = async ({
       const blob = await response.blob();
       fileData = new Uint8Array(await blob.arrayBuffer());
     } else if (contentData) {
+      // Check if ContentData exists in the asset list
+      const assetList = await assetActor.list({});
+      const contentDataExists = assetList.some(asset => asset.key === "ContentData");
+
+      // If ContentData exists, delete it first
+      if (contentDataExists) {
+        await assetActor.delete_asset({ key: "ContentData" });
+        console.log("Existing ContentData deleted successfully");
+      }
+
       // Transaction JSON Upload Case
       fileData = new TextEncoder().encode(contentData);
     } else {

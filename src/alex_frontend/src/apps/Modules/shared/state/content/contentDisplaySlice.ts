@@ -31,11 +31,16 @@ const contentDisplaySlice = createSlice({
     setTransactions: (state, action: PayloadAction<Transaction[]>) => {
       state.transactions = action.payload;
     },
+
     removeTransactionById: (state, action: PayloadAction<string>) => {
       state.transactions = state.transactions.filter(
         (transaction) => transaction.id !== action.payload
       );
     },
+    addTransaction: (state, action: PayloadAction<Transaction>) => {
+      state.transactions.push(action.payload); 
+    },
+
     clearTransactions: (state) => {
       state.transactions = [];
     },
@@ -67,6 +72,7 @@ export const {
   setContentData,
   clearContentData,
   clearTransactionContent,
-  removeTransactionById
+  removeTransactionById,
+  addTransaction
 } = contentDisplaySlice.actions;
 export default contentDisplaySlice.reducer;

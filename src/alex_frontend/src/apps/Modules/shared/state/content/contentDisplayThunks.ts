@@ -5,6 +5,7 @@ import {
   setMintableStates,
   setContentData,
   MintableStateItem,
+  addTransaction,
 } from "./contentDisplaySlice";
 import {
   fetchTransactionsApi,
@@ -61,67 +62,132 @@ export const loadContentForTransactions = createAsyncThunk(
 );
 
 export const updateTransactions = createAsyncThunk(
-  "contentDisplay/updateTransactions",
-  async (arweaveIds: string[], { dispatch, getState }) => {
-    try {
-      let fetchedTransactions: Transaction[] = []; 
-      if (arweaveIds.length === 0) {
-        dispatch(setTransactions([]));
-        return;
-      }
-
-      const state = getState() as RootState;
-      const sortAsc = state.library.sortAsc;
-      const userAssetCanister = state.assetManager.userAssetCanister;
-      if (userAssetCanister) {
-        const assetActor = await getActorUserAssetCanister(userAssetCanister);
-        const getContentData = await fetchAssetFromUserCanister(
-          "ContentData",
-          assetActor
-        );
-      
-        if (getContentData?.blob) {
-          // Convert Blob to JSON
-          const blobData = await getContentData.blob.arrayBuffer(); // Convert Blob to ArrayBuffer
-          const textData = new TextDecoder().decode(blobData); // Decode to text
-          try {
-            const jsonData = JSON.parse(textData); // Convert to JSON
-             fetchedTransactions=jsonData;
-            console.log("JSON Data:", jsonData);
-          } catch (error) {
-            console.error("Failed to parse JSON:", error);
-          }
-        } else {
-          console.warn("No data found in ContentData.");
+    "contentDisplay/updateTransactions",
+    async (arweaveIds: string[], { dispatch, getState }) => {
+      try {
+        let fetchedTransactions: Transaction[] = [];
+        if (arweaveIds.length === 0) {
+          dispatch(setTransactions([]));
+          return;
         }
+  
+        const state = getState() as RootState;
+        const sortAsc = state.library.sortAsc;
+        const userAssetCanister = state.assetManager.userAssetCanister;
+        if (userAssetCanister) {
+          const assetActor = await getActorUserAssetCanister(userAssetCanister);
+          const getContentData = await fetchAssetFromUserCanister(
+            "ContentData",
+            assetActor
+          );
+  
+          if (getContentData?.blob) {
+            try {
+              // Convert Blob to JSON
+              const blobData = await getContentData.blob.arrayBuffer();
+              const textData = new TextDecoder().decode(blobData);
+              const jsonData = JSON.parse(textData);
+          
+              // Assuming jsonData is an array of transactions with 'id' property
+              // If it's not an array, wrap it in an array
+              const transactions = Array.isArray(jsonData) ? jsonData : [jsonData];
+          
+              // Create an array of promises for fetching assets
+              // const fetchPromises = transactions.map(async (transaction) => {
+              //   try {
+              //     const result = await fetchAssetFromUserCanister(
+              //       transaction.id,
+              //       assetActor
+              //     );
+                  
+              //     // Create object URL if blob exists
+              //     const assetUrl = result?.blob ? URL.createObjectURL(result.blob) : "";
+                  
+              //     // Return a new object with all existing properties plus the asset URL
+              //     return {
+              //       ...transaction,
+              //       assetUrl
+              //     };
+              //   } catch (error) {
+              //     console.error(`Failed to fetch asset for transaction ${transaction.id}:`, error);
+              //     // Return original transaction without URL if fetch fails
+              //     return {
+              //       ...transaction,
+              //       assetUrl: ""
+              //     };
+              //   }
+              // });
+              const fetchPromises = transactions.map(async (transaction) => {
+                try {
+                  const result = await fetchAssetFromUserCanister(
+                    transaction.id,
+                    assetActor
+                  );
+                  
+                  // Create object URL if blob exists
+                  const assetUrl = result?.blob ? URL.createObjectURL(result.blob) : "";
+                  
+                  // Dispatch immediately for each transaction
+                  dispatch(addTransaction({
+                    ...transaction,
+                    assetUrl
+                  }));
+                } catch (error) {
+                  console.error(`Failed to fetch asset for transaction ${transaction.id}:`, error);
+                  
+                  // Dispatch with empty asset URL on error
+                  dispatch(addTransaction({
+                    ...transaction,
+                    assetUrl: ""
+                  }));
+                }
+              });
+              console.log(`[${new Date().toISOString()}] Before promise ...:(`);
+              // dispatch(addTransaction())
+              // Wait for all fetch operations to complete
+              const processedTransactions = await Promise.all(fetchPromises);
+              console.log(`[${new Date().toISOString()}] After promise ...:(`);
+
+              // Update fetchedTransactions with the processed data
+              // fetchedTransactions = processedTransactions;
+          
+              console.log("Processed Transactions:", fetchedTransactions);
+            } catch (error) {
+              console.error("Failed to process data:", error);
+              fetchedTransactions = [];
+            }
+          } else {
+            console.warn("No data found in ContentData.");
+            fetchedTransactions = [];
+          }
+        }
+  
+        // Use the direct Arweave client for Alexandrian app
+  
+        // / const fetchedTransactions://await fetchTransactionsForAlexandrian(arweaveIds);
+  
+        // Apply sorting based on sortAsc
+        const sortedTransactions = sortAsc
+          ? fetchedTransactions
+          : [...fetchedTransactions].reverse();
+  
+       // dispatch(setTransactions(sortedTransactions));
+  
+        // Set initial mintable state for new transactions
+        // const newMintableStates = fetchedTransactions.reduce(
+        //   (acc, transaction) => {
+        //     acc[transaction.id] = { mintable: false };
+        //     return acc;
+        //   },
+        //   {} as Record<string, MintableStateItem>
+        // );
+        // dispatch(setMintableStates(newMintableStates));
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+        throw error;
       }
-      
-      // Use the direct Arweave client for Alexandrian app
-
-    // / const fetchedTransactions://await fetchTransactionsForAlexandrian(arweaveIds);
-
-      // Apply sorting based on sortAsc
-      const sortedTransactions = sortAsc
-        ? fetchedTransactions
-        : [...fetchedTransactions].reverse();
-
-      dispatch(setTransactions(sortedTransactions));
-
-      // Set initial mintable state for new transactions
-      const newMintableStates = fetchedTransactions.reduce(
-        (acc, transaction) => {
-          acc[transaction.id] = { mintable: false };
-          return acc;
-        },
-        {} as Record<string, MintableStateItem>
-      );
-      dispatch(setMintableStates(newMintableStates));
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-      throw error;
     }
-  }
-);
+  );
 
 export const clearAllTransactions = createAsyncThunk(
   "contentDisplay/clearAllTransactions",

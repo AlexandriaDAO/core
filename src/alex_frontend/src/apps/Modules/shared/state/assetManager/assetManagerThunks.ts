@@ -113,6 +113,7 @@ export interface syncProgressInterface {
   currentProgress: number;
   // attempt?: number;
 }
+
 export const syncNfts = createAsyncThunk<
   string,
   {
@@ -246,35 +247,144 @@ export const fetchUserNfts = createAsyncThunk<
     }
   }
 );
+export const getAssetList = createAsyncThunk<
+  string,
+  void,
+  { rejectValue: string }
+>("assetManager/getAssetList", async (_, { rejectWithValue }) => {
+  try {
+    const actor = await getActorAssetManager();
+    const result = await actor.get_caller_asset_canister();
+    if (result[0]) {
+      const canisterId = result[0]?.assigned_canister_id;
+      if (!canisterId) {
+        return rejectWithValue("No canister ID found");
+      }
+      return canisterId.toString();
+    } else {
+      return rejectWithValue("No canister ID found");
+    }
+  } catch (error) {
+    console.error("Error fetching asset canister:", error);
+    return rejectWithValue(
+      error instanceof Error ? error.message : "Unknown error occurred"
+    );
+  }
+});
+// export const fetchAssetFromUserCanister = async (key: string, actor: any) => {
+//   try {
+//     // Query to get the file by key
+//     const fileRecord = await actor.get({
+//       key: key,
+//       accept_encodings: ["identity"],
+//     });
+
+//     if (fileRecord) {
+//       const { content, content_type } = fileRecord;
+
+//       // Ensure content is properly handled as Uint8Array
+//       const contentArray = Array.isArray(content)
+//         ? new Uint8Array(content)
+//         : content;
+
+//       // Create blob with proper content type and streaming support
+//       const blob = new Blob([contentArray], {
+//         type: content_type,
+//       });
+
+//       return { blob, contentType: content_type };
+//     } else {
+//       console.log("File not found");
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error("Error fetching file:", error);
+//     return null;
+//   }
+// };
 
 export const fetchAssetFromUserCanister = async (key: string, actor: any) => {
   try {
-    // Query to get the file by key
-    const fileRecord = await actor.get({
+    // Initial request to get first chunk and metadata
+    const initialResponse = await actor.get({
       key: key,
       accept_encodings: ["identity"],
     });
 
-    if (fileRecord) {
-      const { content, content_type } = fileRecord;
+    if (!initialResponse) {
+      throw new Error("File not found");
+    }
 
-      // Ensure content is properly handled as Uint8Array
-      const contentArray = Array.isArray(content)
-        ? new Uint8Array(content)
-        : content;
+    const {
+      content,
+      content_type,
+      content_encoding,
+      total_length,
+      sha256,
+    } = initialResponse;
 
-      // Create blob with proper content type and streaming support
-      const blob = new Blob([contentArray], {
-        type: content_type,
+    // Convert total_length from BigInt to number safely
+    const totalLengthNum = Number(total_length);
+    
+    // Convert initial content to Uint8Array
+    let firstChunk = Array.isArray(content) 
+      ? new Uint8Array(content)
+      : new Uint8Array(content.buffer);
+
+    // If the first chunk is the entire content, return it
+    if (firstChunk.length === totalLengthNum) {
+      const blob = new Blob([firstChunk], { type: content_type });
+      return { blob, contentType: content_type };
+    }
+
+    // Calculate number of additional chunks needed
+    const chunkSize = firstChunk.length;
+    const remainingLength = totalLengthNum - chunkSize;
+    const numberOfAdditionalChunks = Math.ceil(remainingLength / chunkSize);
+
+    // Initialize array to store all chunks
+    const chunks: Uint8Array[] = [firstChunk];
+
+    // Fetch remaining chunks
+    for (let i = 1; i <= numberOfAdditionalChunks; i++) {
+      const chunkResponse = await actor.get_chunk({
+        key: key,
+        content_encoding: content_encoding,
+        index: BigInt(i), // Convert index to BigInt for the API
+        sha256: sha256,
       });
 
-      return { blob, contentType: content_type };
-    } else {
-      console.log("File not found");
-      return null;
+      if (!chunkResponse || !chunkResponse.content) {
+        throw new Error(`Failed to fetch chunk ${i}`);
+      }
+
+      const chunkContent = Array.isArray(chunkResponse.content)
+        ? new Uint8Array(chunkResponse.content)
+        : new Uint8Array(chunkResponse.content.buffer);
+      
+      chunks.push(chunkContent);
     }
+
+    // Combine all chunks into a single Uint8Array
+    const combinedArray = new Uint8Array(totalLengthNum);
+    let offset = 0;
+    
+    for (const chunk of chunks) {
+      combinedArray.set(chunk, offset);
+      offset += chunk.length;
+    }
+
+    // Verify total length
+    if (combinedArray.length !== totalLengthNum) {
+      throw new Error(`Size mismatch: expected ${totalLengthNum} bytes but got ${combinedArray.length} bytes`);
+    }
+
+    // Create and return blob
+    const blob = new Blob([combinedArray], { type: content_type });
+    return { blob, contentType: content_type };
+
   } catch (error) {
     console.error("Error fetching file:", error);
-    return null;
+    throw error;
   }
 };

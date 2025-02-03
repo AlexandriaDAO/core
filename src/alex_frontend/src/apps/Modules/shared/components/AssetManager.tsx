@@ -41,7 +41,7 @@ const AssetManager = () => {
   return (<div className="bg-gray-100 flex flex-col items-center justify-center py-10 absolute right-[50px]">
     {/* <h1 className="text-4xl font-bold text-gray-700 mb-8">Asset Manager</h1> */}
     <button onClick={() => { fetchNfts()}}>Fetch</button>  {/*Just for testing image loading from asset canister*/ }
-    {userAssetCanister === "" ? (
+    {userAssetCanister ===null ? (
       <div className="bg-white shadow-md rounded-lg p-6 max-w-md w-full text-center">
         <h2 className="text-2xl font-semibold text-gray-700 mb-4">Create Asset Canister</h2>
         <button

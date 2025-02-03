@@ -51,7 +51,7 @@ const Grid = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
-  const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
+  const [selectedContent, setSelectedContent] = useState<{ id: string; type: string,assetUrl:string } | null>(null);
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
 
@@ -128,7 +128,7 @@ const Grid = () => {
             return (
               <ContentGrid.Item
                 key={transaction.id}
-                onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
+                onClick={() => setSelectedContent({ id: transaction.id, type: contentType ,assetUrl:transaction.assetUrl?transaction.assetUrl:""})}
                 id={transaction.id}
                 owner={transaction.owner}
                 showStats={showStats[transaction.id]}
@@ -152,14 +152,14 @@ const Grid = () => {
                   <ContentRenderer
                     transaction={transaction}
                     content={content}
-                    contentUrls={contentData[transaction.id]?.urls || {
+                    contentUrls={ {
                       thumbnailUrl: null,
                       coverUrl: null,
-                      fullUrl: content?.url || `https://arweave.net/${transaction.id}`
+                       fullUrl: transaction?.assetUrl?transaction?.assetUrl:"" //||content?.url// || `https://arweave.net/${transaction.id}`
                     }}
                     showStats={showStats[transaction.id]}
                     mintableState={mintableState}
-                    handleRenderError={handleRenderError}
+                    handleRenderError={()=>{}}//{handleRenderError}
                   />
                   {shouldShowBlur && (
                     <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
@@ -208,15 +208,15 @@ const Grid = () => {
               <ContentRenderer
                 transaction={transactions.find(t => t.id === selectedContent.id)!}
                 content={contentData[selectedContent.id]}
-                contentUrls={contentData[selectedContent.id]?.urls || {
+                contentUrls={ {
                   thumbnailUrl: null,
                   coverUrl: null,
-                  fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
+                  fullUrl: selectedContent.assetUrl // || `https://arweave.net/${selectedContent.id}`
                 }}
                 inModal={true}
                 showStats={showStats[selectedContent.id]}
                 mintableState={mintableState}
-                handleRenderError={handleRenderError}
+                handleRenderError={()=>{}}
               />
               {selectedContent && predictions[selectedContent.id]?.isPorn && (
                 <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[55]">
