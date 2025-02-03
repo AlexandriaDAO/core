@@ -1,4 +1,12 @@
 
+#### UI Fixes:
+- Smaller homepage, no scrolling.
+- Dropdown Menu from apps/swap.
+- Hover animmation on apps.
+- FAQ Page Consolidate.
+- Visibility of the login button.
+
+
 
 #### Features now:
 - Figure out a better way than that prop passing to contentItem in contentList.tsx.
