@@ -5,6 +5,7 @@ use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, S
 use std::borrow::Cow;
 use std::cell::RefCell;
 use std::collections::BTreeSet;
+use std::collections::BTreeMap;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -14,6 +15,13 @@ const USER_SHELVES_MEM_ID: MemoryId = MemoryId::new(1);
 const NFT_SHELVES_MEM_ID: MemoryId = MemoryId::new(2);
 
 const MAX_VALUE_SIZE: u32 = 1000; // Added constant for consistency
+
+// New wrapper types
+#[derive(CandidType, Deserialize, Clone, Debug, Default)]
+pub struct StringVec(pub Vec<String>);
+
+#[derive(CandidType, Deserialize, Clone, Debug, Default)]
+pub struct TimestampedShelves(pub BTreeSet<(u64, String)>);
 
 thread_local! {
     // Memory manager for stable storage
@@ -28,15 +36,15 @@ thread_local! {
         )
     );
 
-    // User shelves index: K: Principal, V: BTreeSet<(nanos, shelf_id)>
-    pub static USER_SHELVES: RefCell<StableBTreeMap<Principal, BTreeSet<(u64, String)>, Memory>> = RefCell::new(
+    // User shelves index: K: Principal, V: TimestampedShelves
+    pub static USER_SHELVES: RefCell<StableBTreeMap<Principal, TimestampedShelves, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(USER_SHELVES_MEM_ID))
         )
     );
 
-    // NFT shelves index: K: nft_id, V: Vec<shelf_id>
-    pub static NFT_SHELVES: RefCell<StableBTreeMap<String, Vec<String>, Memory>> = RefCell::new(
+    // NFT shelves index: K: nft_id, V: StringVec
+    pub static NFT_SHELVES: RefCell<StableBTreeMap<String, StringVec, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(NFT_SHELVES_MEM_ID))
         )
@@ -45,22 +53,28 @@ thread_local! {
 
 // Updated Shelf structure
 #[derive(CandidType, Deserialize, Clone, Debug)]
+pub enum SlotContent {
+    Nft(String), // NFT ID
+    Markdown(String), // Markdown text
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct Slot {
+    pub id: u32, // Unique slot ID
+    pub content: SlotContent,
+    pub position: u32, // Display order
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
 pub struct Shelf {
     pub shelf_id: String,
     pub title: String,
     pub description: Option<String>,
     pub owner: Principal,
-    pub nfts: Vec<String>,
-    pub blog_view: Option<Vec<BlogSlot>>,
+    pub slots: BTreeMap<u32, Slot>, // Slots stored by ID
+    pub slot_order: BTreeMap<u32, u32>, // Map: position -> slot_id
     pub created_at: u64,
     pub updated_at: u64,
-}
-
-// Blog slot structure
-#[derive(CandidType, Deserialize, Clone, Debug)]
-pub struct BlogSlot {
-    pub markdown: String,
-    pub position: u32, // Position relative to NFTs
 }
 
 // Updated Storable implementation using MAX_VALUE_SIZE
@@ -79,8 +93,7 @@ impl Storable for Shelf {
     };
 }
 
-// Implement Storable for BlogSlot
-impl Storable for BlogSlot {
+impl Storable for Slot {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
@@ -90,45 +103,117 @@ impl Storable for BlogSlot {
     }
 
     const BOUND: Bound = Bound::Bounded {
-        max_size: 512, // Adjust based on expected markdown size
+        max_size: 1024, // Adjust based on expected content size
         is_fixed_size: false,
     };
 }
 
-// Update store_shelf function to handle the renamed field
+impl Storable for StringVec {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Bounded {
+        max_size: MAX_VALUE_SIZE,
+        is_fixed_size: false,
+    };
+}
+
+impl Storable for TimestampedShelves {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Bounded {
+        max_size: MAX_VALUE_SIZE,
+        is_fixed_size: false,
+    };
+}
+
+impl Shelf {
+    pub fn insert_slot(&mut self, slot: Slot) -> Result<(), String> {
+        if self.slots.contains_key(&slot.id) {
+            return Err("Slot ID already exists".to_string());
+        }
+
+        // Find the next available position
+        let position = self.slot_order.keys().last().map_or(0, |&p| p + 1);
+
+        // Insert the slot
+        let slot_id = slot.id; // Store id before moving
+        self.slots.insert(slot_id, slot);
+        self.slot_order.insert(position, slot_id);
+        Ok(())
+    }
+
+    pub fn move_slot(&mut self, slot_id: u32, new_position: u32) -> Result<(), String> {
+        if !self.slots.contains_key(&slot_id) {
+            return Err("Slot not found".to_string());
+        }
+
+        // Remove the slot from its current position
+        let current_position = self.slot_order.iter()
+            .find(|(_, &id)| id == slot_id)
+            .map(|(&p, _)| p)
+            .ok_or("Slot position not found")?;
+
+        self.slot_order.remove(&current_position);
+
+        // Insert the slot at the new position
+        self.slot_order.insert(new_position, slot_id);
+        Ok(())
+    }
+
+    pub fn get_ordered_slots(&self) -> Vec<Slot> {
+        self.slot_order.iter()
+            .filter_map(|(_, &id)| self.slots.get(&id).cloned())
+            .collect()
+    }
+}
+
+// Update store_shelf function
 pub fn store_shelf(shelf: Shelf) -> Result<(), String> {
     let now = ic_cdk::api::time();
     
-    // Create a new shelf with updated timestamps
-    let mut shelf = shelf;
+    let mut shelf = shelf.clone(); // Clone the shelf
     shelf.created_at = now;
     shelf.updated_at = now;
 
+    // Store NFT references
+    for slot in shelf.slots.values() {
+        if let SlotContent::Nft(nft_id) = &slot.content {
+            NFT_SHELVES.with(|nft_shelves| {
+                let mut nft_map = nft_shelves.borrow_mut();
+                let mut shelves = nft_map.get(nft_id).unwrap_or_default();
+                shelves.0.push(shelf.shelf_id.clone());
+                nft_map.insert(nft_id.clone(), shelves);
+            });
+        }
+    }
+
     SHELVES.with(|shelves| {
-        let mut shelves_map = shelves.borrow_mut();
-        shelves_map.insert(shelf.shelf_id.clone(), shelf.clone());
+        shelves.borrow_mut().insert(shelf.shelf_id.clone(), shelf.clone());
     });
 
     USER_SHELVES.with(|user_shelves| {
         let mut user_map = user_shelves.borrow_mut();
         let mut user_shelves_set = user_map.get(&shelf.owner).unwrap_or_default();
-        user_shelves_set.insert((now, shelf.shelf_id.clone()));
+        user_shelves_set.0.insert((now, shelf.shelf_id.clone()));
         user_map.insert(shelf.owner, user_shelves_set);
     });
-
-    for nft_id in &shelf.nfts {
-        NFT_SHELVES.with(|nft_shelves| {
-            let mut nft_map = nft_shelves.borrow_mut();
-            let mut shelves = nft_map.get(nft_id).unwrap_or_default();
-            shelves.push(shelf.shelf_id.clone());
-            nft_map.insert(nft_id.clone(), shelves);
-        });
-    }
 
     Ok(())
 }
 
-// Update update_shelf function to handle optional description
+// Update update_shelf function
 pub fn update_shelf(shelf_id: String, updates: ShelfUpdate) -> Result<(), String> {
     SHELVES.with(|shelves| {
         let mut shelves_map = shelves.borrow_mut();
@@ -141,11 +226,49 @@ pub fn update_shelf(shelf_id: String, updates: ShelfUpdate) -> Result<(), String
                 shelf.title = title;
             }
             shelf.description = updates.description;
-            if let Some(nfts) = updates.nfts {
-                shelf.nfts = nfts;
-            }
-            if let Some(blog_view) = updates.blog_view {
-                shelf.blog_view = blog_view;
+
+            if let Some(new_slots) = updates.slots {
+                // Handle NFT reference updates
+                let old_nfts: Vec<String> = shelf.slots.values()
+                    .filter_map(|slot| match &slot.content {
+                        SlotContent::Nft(id) => Some(id.clone()),
+                        _ => None
+                    })
+                    .collect();
+
+                let new_nfts: Vec<String> = new_slots.iter()
+                    .filter_map(|slot| match &slot.content {
+                        SlotContent::Nft(id) => Some(id.clone()),
+                        _ => None
+                    })
+                    .collect();
+
+                // Remove old NFT references
+                for nft_id in old_nfts.iter().filter(|id| !new_nfts.contains(id)) {
+                    NFT_SHELVES.with(|nft_shelves| {
+                        let mut nft_map = nft_shelves.borrow_mut();
+                        if let Some(mut shelves) = nft_map.get(nft_id) {
+                            shelves.0.retain(|id| id != &shelf_id);
+                            nft_map.insert(nft_id.clone(), shelves);
+                        }
+                    });
+                }
+
+                // Add new NFT references
+                for nft_id in new_nfts.iter().filter(|id| !old_nfts.contains(id)) {
+                    NFT_SHELVES.with(|nft_shelves| {
+                        let mut nft_map = nft_shelves.borrow_mut();
+                        let mut shelves = nft_map.get(nft_id).unwrap_or_default();
+                        shelves.0.push(shelf.shelf_id.clone());
+                        nft_map.insert(nft_id.clone(), shelves);
+                    });
+                }
+
+                // Update slots
+                shelf.slots.clear();
+                for slot in new_slots {
+                    shelf.slots.insert(slot.id, slot);
+                }
             }
 
             shelf.updated_at = ic_cdk::api::time();
@@ -161,6 +284,5 @@ pub fn update_shelf(shelf_id: String, updates: ShelfUpdate) -> Result<(), String
 pub struct ShelfUpdate {
     pub title: Option<String>,
     pub description: Option<String>,
-    pub nfts: Option<Vec<String>>,
-    pub blog_view: Option<Vec<BlogSlot>>,
+    pub slots: Option<Vec<Slot>>,
 }

@@ -5,6 +5,7 @@ members = [
     "src/vetkd",
     "src/bookmarks",
     "src/icp_swap",
+    "src/lexigraph",
     "src/registry",
     "src/tokenomics",
     "src/nft_manager",

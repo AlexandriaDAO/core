@@ -55,6 +55,11 @@
       "type": "motoko",
       "specified_id": "uxyan-oyaaa-aaaap-qhezq-cai"
     },
+    "lexigraph": {
+      "candid": "src/lexigraph/lexigraph.did",
+      "package": "lexigraph",
+      "type": "rust"
+    },
     "nft_manager": {
       "candid": "src/nft_manager/nft_manager.did",
       "package": "nft_manager",
