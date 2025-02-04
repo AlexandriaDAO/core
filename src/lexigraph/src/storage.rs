@@ -6,6 +6,7 @@ use std::borrow::Cow;
 use std::cell::RefCell;
 use std::collections::BTreeSet;
 use std::collections::BTreeMap;
+use crate::utils;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -71,8 +72,8 @@ pub struct Shelf {
     pub title: String,
     pub description: Option<String>,
     pub owner: Principal,
-    pub slots: BTreeMap<u32, Slot>, // Slots stored by ID
-    pub slot_order: BTreeMap<u32, u32>, // Map: position -> slot_id
+    pub slots: BTreeMap<u32, Slot>,      // Slots stored by ID
+    pub slot_positions: BTreeMap<u32, f64>, // Map: slot_id -> position number
     pub created_at: u64,
     pub updated_at: u64,
 }
@@ -140,149 +141,114 @@ impl Storable for TimestampedShelves {
 
 impl Shelf {
     pub fn insert_slot(&mut self, slot: Slot) -> Result<(), String> {
-        if self.slots.contains_key(&slot.id) {
-            return Err("Slot ID already exists".to_string());
+        if self.slots.len() >= 500 {
+            return Err("Maximum slot limit reached (500)".to_string());
         }
-
-        // Find the next available position
-        let position = self.slot_order.keys().last().map_or(0, |&p| p + 1);
-
-        // Insert the slot
-        let slot_id = slot.id; // Store id before moving
+        
+        let slot_id = slot.id;
         self.slots.insert(slot_id, slot);
-        self.slot_order.insert(position, slot_id);
+        
+        // Initialize position at the end
+        let new_position = self.slot_positions.values()
+            .last()
+            .map_or(0.0, |pos| pos + 1.0);
+            
+        self.slot_positions.insert(slot_id, new_position);
         Ok(())
     }
 
-    pub fn move_slot(&mut self, slot_id: u32, new_position: u32) -> Result<(), String> {
-        if !self.slots.contains_key(&slot_id) {
-            return Err("Slot not found".to_string());
-        }
+    pub fn move_slot(&mut self, slot_id: u32, reference_slot_id: Option<u32>, before: bool) -> Result<(), String> {
+        let _ = self.slot_positions.get(&slot_id)
+            .ok_or("Slot not found")?;
 
-        // Remove the slot from its current position
-        let current_position = self.slot_order.iter()
-            .find(|(_, &id)| id == slot_id)
-            .map(|(&p, _)| p)
-            .ok_or("Slot position not found")?;
+        let new_position = match reference_slot_id {
+            Some(ref_id) => {
+                let reference_pos = self.slot_positions.get(&ref_id)
+                    .ok_or("Reference slot not found")?;
+                
+                // Calculate new position based on neighbor
+                if before {
+                    self.find_previous_position(*reference_pos)
+                } else {
+                    self.find_next_position(*reference_pos)
+                }
+            }
+            None => {
+                // Move to start/end
+                if before {
+                    self.slot_positions.values()
+                        .fold(f64::INFINITY, |a, &b| a.min(b)) - 1.0
+                } else {
+                    self.slot_positions.values()
+                        .fold(f64::NEG_INFINITY, |a, &b| a.max(b)) + 1.0
+                }
+            }
+        };
 
-        self.slot_order.remove(&current_position);
-
-        // Insert the slot at the new position
-        self.slot_order.insert(new_position, slot_id);
+        self.slot_positions.insert(slot_id, new_position);
         Ok(())
+    }
+
+    fn find_previous_position(&self, target: f64) -> f64 {
+        let prev = self.slot_positions.values()
+            .filter(|&&pos| pos < target)
+            .max_by(|a, b| a.partial_cmp(b).unwrap());
+            
+        match prev {
+            Some(prev_pos) => (prev_pos + target) / 2.0,
+            None => target - 1.0
+        }
+    }
+
+    fn find_next_position(&self, target: f64) -> f64 {
+        let next = self.slot_positions.values()
+            .filter(|&&pos| pos > target)
+            .min_by(|a, b| a.partial_cmp(b).unwrap());
+            
+        match next {
+            Some(next_pos) => (target + next_pos) / 2.0,
+            None => target + 1.0
+        }
     }
 
     pub fn get_ordered_slots(&self) -> Vec<Slot> {
-        self.slot_order.iter()
-            .filter_map(|(_, &id)| self.slots.get(&id).cloned())
+        let mut ordered: Vec<_> = self.slot_positions.iter().collect();
+        ordered.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap());
+        ordered.into_iter()
+            .filter_map(|(id, _)| self.slots.get(id).cloned())
             .collect()
     }
 }
 
-// Update store_shelf function
-pub fn store_shelf(shelf: Shelf) -> Result<(), String> {
+// Modified create_shelf to use caller principal
+pub async fn create_shelf(
+    title: String,
+    description: Option<String>,
+    slots: Vec<Slot>,
+) -> Result<Shelf, String> {
+    if slots.len() > 500 {
+        return Err("Cannot create shelf with more than 500 slots".to_string());
+    }
     let now = ic_cdk::api::time();
-    
-    let mut shelf = shelf.clone(); // Clone the shelf
-    shelf.created_at = now;
-    shelf.updated_at = now;
+    let owner = ic_cdk::caller();  // Get caller here
+    let shelf_id = utils::generate_shelf_id(&owner).await;
 
-    // Store NFT references
-    for slot in shelf.slots.values() {
-        if let SlotContent::Nft(nft_id) = &slot.content {
-            NFT_SHELVES.with(|nft_shelves| {
-                let mut nft_map = nft_shelves.borrow_mut();
-                let mut shelves = nft_map.get(nft_id).unwrap_or_default();
-                shelves.0.push(shelf.shelf_id.clone());
-                nft_map.insert(nft_id.clone(), shelves);
-            });
-        }
+    // Create shelf with generated ID
+    let mut shelf = Shelf {
+        shelf_id,
+        title,
+        description,
+        owner,  // Use derived owner
+        slots: BTreeMap::new(),
+        slot_positions: BTreeMap::new(),
+        created_at: now,
+        updated_at: now,
+    };
+
+    // Add slots with proper ordering
+    for slot in slots {
+        shelf.insert_slot(slot)?;
     }
 
-    SHELVES.with(|shelves| {
-        shelves.borrow_mut().insert(shelf.shelf_id.clone(), shelf.clone());
-    });
-
-    USER_SHELVES.with(|user_shelves| {
-        let mut user_map = user_shelves.borrow_mut();
-        let mut user_shelves_set = user_map.get(&shelf.owner).unwrap_or_default();
-        user_shelves_set.0.insert((now, shelf.shelf_id.clone()));
-        user_map.insert(shelf.owner, user_shelves_set);
-    });
-
-    Ok(())
-}
-
-// Update update_shelf function
-pub fn update_shelf(shelf_id: String, updates: ShelfUpdate) -> Result<(), String> {
-    SHELVES.with(|shelves| {
-        let mut shelves_map = shelves.borrow_mut();
-        if let Some(mut shelf) = shelves_map.get(&shelf_id) {
-            if shelf.owner != ic_cdk::caller() {
-                return Err("Unauthorized: Only shelf owner can update".to_string());
-            }
-
-            if let Some(title) = updates.title {
-                shelf.title = title;
-            }
-            shelf.description = updates.description;
-
-            if let Some(new_slots) = updates.slots {
-                // Handle NFT reference updates
-                let old_nfts: Vec<String> = shelf.slots.values()
-                    .filter_map(|slot| match &slot.content {
-                        SlotContent::Nft(id) => Some(id.clone()),
-                        _ => None
-                    })
-                    .collect();
-
-                let new_nfts: Vec<String> = new_slots.iter()
-                    .filter_map(|slot| match &slot.content {
-                        SlotContent::Nft(id) => Some(id.clone()),
-                        _ => None
-                    })
-                    .collect();
-
-                // Remove old NFT references
-                for nft_id in old_nfts.iter().filter(|id| !new_nfts.contains(id)) {
-                    NFT_SHELVES.with(|nft_shelves| {
-                        let mut nft_map = nft_shelves.borrow_mut();
-                        if let Some(mut shelves) = nft_map.get(nft_id) {
-                            shelves.0.retain(|id| id != &shelf_id);
-                            nft_map.insert(nft_id.clone(), shelves);
-                        }
-                    });
-                }
-
-                // Add new NFT references
-                for nft_id in new_nfts.iter().filter(|id| !old_nfts.contains(id)) {
-                    NFT_SHELVES.with(|nft_shelves| {
-                        let mut nft_map = nft_shelves.borrow_mut();
-                        let mut shelves = nft_map.get(nft_id).unwrap_or_default();
-                        shelves.0.push(shelf.shelf_id.clone());
-                        nft_map.insert(nft_id.clone(), shelves);
-                    });
-                }
-
-                // Update slots
-                shelf.slots.clear();
-                for slot in new_slots {
-                    shelf.slots.insert(slot.id, slot);
-                }
-            }
-
-            shelf.updated_at = ic_cdk::api::time();
-            shelves_map.insert(shelf_id, shelf);
-            Ok(())
-        } else {
-            Err("Shelf not found".to_string())
-        }
-    })
-}
-
-#[derive(CandidType, Deserialize)]
-pub struct ShelfUpdate {
-    pub title: Option<String>,
-    pub description: Option<String>,
-    pub slots: Option<Vec<Slot>>,
+    Ok(shelf)
 }

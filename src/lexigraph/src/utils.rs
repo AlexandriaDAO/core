@@ -1,7 +1,8 @@
 use ic_cdk::api::management_canister::main::raw_rand;
 use ic_cdk::api::time;
-use base58::ToBase58;
-use ic_cdk::export::Principal;
+use candid::Principal;
+use sha2::{Sha256, Digest};
+use bs58;
 
 pub async fn generate_shelf_id(caller: &Principal) -> String {
     // Get current timestamp in nanoseconds from IC
@@ -17,8 +18,10 @@ pub async fn generate_shelf_id(caller: &Principal) -> String {
     combined.extend_from_slice(&random_bytes);
     
     // Take first 12 bytes of hash and encode as base58
-    let hash = ic_cdk::api::crypto::sha256(&combined);
-    let id = &hash[..12].to_base58();
+    let mut hasher = Sha256::new();
+    hasher.update(&combined);
+    let hash = hasher.finalize();
+    let id = bs58::encode(&hash[..12]).into_string();
     
     // Add prefix
     format!("sh_{}", id)

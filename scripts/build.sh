@@ -45,9 +45,9 @@ dfx deploy nft_manager --specified-id 5sh5r-gyaaa-aaaap-qkmra-cai
 # For alex_backend
 cargo build --release --target wasm32-unknown-unknown --package alex_backend
 candid-extractor target/wasm32-unknown-unknown/release/alex_backend.wasm > src/alex_backend/alex_backend.did
-# For bookmarks
-cargo build --release --target wasm32-unknown-unknown --package bookmarks
-candid-extractor target/wasm32-unknown-unknown/release/bookmarks.wasm > src/bookmarks/bookmarks.did
+# For lexigraph
+cargo build --release --target wasm32-unknown-unknown --package lexigraph
+candid-extractor target/wasm32-unknown-unknown/release/lexigraph.wasm > src/lexigraph/lexigraph.did
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
@@ -70,7 +70,7 @@ candid-extractor target/wasm32-unknown-unknown/release/logs.wasm > src/logs/logs
 
 cargo update
 
-dfx deploy bookmarks --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
+dfx deploy lexigraph --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
 dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
 dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai

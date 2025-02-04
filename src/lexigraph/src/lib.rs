@@ -17,7 +17,13 @@ pub fn icrc7_scion_principal() -> Principal {
 }
 
 pub mod storage;
-pub use storage::{Shelf, ShelfUpdate, store_shelf, update_shelf};
+pub use storage::{Slot, Shelf};
+
+pub mod update;
+pub use update::{ShelfUpdate, update_shelf, store_shelf};
+
+pub mod utils;
+pub use utils::generate_shelf_id;
 
 ic_cdk::export_candid!();
 

@@ -21,12 +21,11 @@ Link navigation is always lbry.app/app/user/<shelf_id>/<nft_id>
 Blog View:
   - Switch from the table to show the markdown style blog with the NFTs inside.
 
-Should we have the published date, and last edited date?
 
 ### Future Possible Features
 
-- Shelf Appears In? 
-- Allowed to edit others users' shelves?
+- Shelf Appears In? YES
+- Allowed to edit others users' shelves? NO
 
 ## Design
 
@@ -57,44 +56,49 @@ verify_nft_owner(nft_id: Nat, collection: String) -> Result<(), Error>
 (V:2) title: String
 (V:3) description: Option<String>
 (V:4) owner: Principal
-(V:5) nfts: Vec<String>
-(V:6) blog_view: Option<Vec<BlogSlot>>
+(V:5) slots: BTreeMap<u32, Slot>  // Slots stored by ID
+(V:6) slot_order: BTreeMap<u32, u32>  // Map: position -> slot_id
 (V:7) created_at: u64
 (V:8) updated_at: u64
 
-### BlogSlot Structure
+### Slot Structure
 
-markdown: String
-position: u32  // Position relative to NFTs
+id: u32  // Unique slot ID
+content: SlotContent  // Either NFT(String) or Markdown(String)
+position: u32  // Display order
 
 ### Storage Maps
 
-(K:1) Principal -> BTreeSet<(nanos: u64, shelf_id)>  // USER_SHELVES
+(K:1) Principal -> TimestampedShelves(BTreeSet<(nanos: u64, shelf_id)>)  // USER_SHELVES
 (K:2) shelf_id -> Shelf  // SHELVES
-(K:3) nft_id -> Vec<shelf_id>  // NFT_SHELVES
+(K:3) nft_id -> StringVec(Vec<shelf_id>)  // NFT_SHELVES
 
 ### Functions
 
-store_shelf(shelf: Shelf) -> Result<(), String>
+store_shelf(owner: Principal, title: String, description: Option<String>, slots: Vec<Slot>) -> Result<(), String>
+  // Generate new shelf_id
+  // Create shelf with current timestamp
+  // Add slots with proper ordering
+  // Update NFT_SHELVES for any NFT slots
   // Store shelf in SHELVES map
   // Add to user's shelf set in USER_SHELVES
-  // Add shelf_id to each NFT's shelf list in NFT_SHELVES
-  // Set created_at and updated_at to current time
 
 update_shelf(shelf_id: String, updates: ShelfUpdate) -> Result<(), String>
   // Verify caller is shelf owner
   // Update title if provided
   // Update description if provided
-  // Update nfts if provided
-  // Update blog_view if provided
+  // If slots updated:
+    // Track NFT reference changes
+    // Remove old NFT references from NFT_SHELVES
+    // Add new NFT references to NFT_SHELVES
+    // Update shelf slots
   // Set updated_at to current time
 
 ### ShelfUpdate Structure
 
 title: Option<String>
 description: Option<String>
-nfts: Option<Vec<String>>
-blog_view: Option<Vec<BlogSlot>>
+slots: Option<Vec<Slot>>
 
 ## shelf.rs
 
