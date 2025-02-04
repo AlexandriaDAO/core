@@ -6,6 +6,7 @@ import mintNFT from "./thunks/mintNFT";
 import estimateCost from "./thunks/estimateCost";
 
 export interface FileUploadState {
+	textMode: boolean;
 	nodes: SerializedNode[];
 	node: SerializedNode | null;
 
@@ -30,6 +31,7 @@ export interface FileUploadState {
 }
 
 const initialState: FileUploadState = {
+	textMode: false,
 	nodes: [],
 	node: null,
 
@@ -68,6 +70,9 @@ const fileUploadSlice = createSlice({
 		},
 		setDetails: (state, action)=>{
 			state.details = action.payload
+		},
+		setTextMode: (state, action)=>{
+			state.textMode = action.payload
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<FileUploadState>) => {
@@ -143,7 +148,7 @@ const fileUploadSlice = createSlice({
 	}
 });
 
-export const { reset, setNode, setProgress, setDetails, setTransaction } = fileUploadSlice.actions;
+export const { reset, setNode, setProgress, setDetails, setTransaction, setTextMode } = fileUploadSlice.actions;
 
 export default fileUploadSlice.reducer;
 

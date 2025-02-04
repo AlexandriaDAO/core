@@ -24,7 +24,7 @@ export const FILE_TYPES = {
     types: [
         "video/mp4",
         "video/webm",
-        "audio/mpeg",
+        "audio/mpeg", // or mp3. There is also a video/mpeg which is not included
         "audio/wav",
         "audio/ogg"
     ],

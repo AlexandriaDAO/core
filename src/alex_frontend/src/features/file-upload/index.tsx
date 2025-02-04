@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import NodeSelector from "./components/NodeSelector";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { setTransaction } from "./fileUploadSlice";
+import { setTextMode, setTransaction } from "./fileUploadSlice";
 import FileSelector from "./components/FileSelector";
 import FilePreview from "./components/FilePreview";
 import UploadProgress from "./components/UploadProgress";
@@ -13,15 +13,15 @@ import FileUploader from "./components/FileUploader";
 import mintNFT from "./thunks/mintNFT";
 import useNftManager from "@/hooks/actors/useNftManager";
 import { Button } from "@/lib/components/button";
-import { ArrowUpToLine, CheckCircle2, Loader2, LoaderPinwheel } from "lucide-react";
-import { RotateCcw } from "lucide-react";
+import { ArrowUpToLine, FileText } from "lucide-react";
+import TextEditor from "./components/TextEditor";
 
 function FileUpload() {
     const dispatch = useAppDispatch();
     const {actor} = useNftManager();
     const [file, setFile] = useState<File | null>(null);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-    const { transaction, uploading, uploadError } = useAppSelector(state => state.fileUpload);
+    const { transaction, uploading, uploadError, textMode } = useAppSelector(state => state.fileUpload);
 
     useEffect(() => {
         if (!file) return;
@@ -55,7 +55,30 @@ function FileUpload() {
             </div>
         );
 
-        return <FileSelector setFile={setFile} />;
+        return (
+            <div className="space-y-4">
+                <div className="flex justify-center gap-4">
+                    <Button
+                        onClick={() => dispatch(setTextMode(false))}
+                        variant={!textMode ? "inverted" : "outline"}
+                        className="w-40"
+                    >
+                        <ArrowUpToLine className="mr-2 h-4 w-4" />
+                        Upload File
+                    </Button>
+                    <Button
+                        onClick={() => dispatch(setTextMode(true))}
+                        variant={textMode ? "inverted" : "outline"}
+                        className="w-40"
+                    >
+                        <FileText className="mr-2 h-4 w-4" />
+                        Create Text
+                    </Button>
+                </div>
+
+                {textMode ? <TextEditor setFile={setFile} /> : <FileSelector setFile={setFile} />}
+            </div>
+        );
     };
 
     return (

@@ -91,7 +91,8 @@ function FileSelector({ setFile }: FileSelectorProps) {
             >
                 <input
                     type="file"
-                    accept={allowedTypes.join(',')}
+                    // accept=""
+                    accept={[...allowedTypes, ".md"].join(',')}
                     onChange={handleFileChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
