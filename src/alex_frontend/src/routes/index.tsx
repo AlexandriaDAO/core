@@ -11,6 +11,7 @@ import MainPageSkeleton from "@/layouts/skeletons/MainPageSkeleton";
 import UnauthorizedPage from "@/pages/UnauthorizedPage";
 import Protected from "@/guards/Protected";
 import LibrarianGuard from "@/guards/LibrarianGuard";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const HomePage = lazy(()=>import("@/pages/HomePage"));
 
@@ -52,7 +53,7 @@ const SingleTokenView = lazy(() => import("@/apps/Modules/AppModules/blinks/Sing
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
-		<Route element={<BaseLayout />}>
+		<Route element={<ErrorBoundary><BaseLayout /></ErrorBoundary>}>
 			<Route path="/" element={<MainLayout />}>
 				<Route index element={<Suspense key="home" fallback={<TopProgressBar />}><HomePage /></Suspense>} />
 				<Route path="nft/:tokenId" element={<Suspense key="nft" fallback={<TopProgressBar />}><SingleTokenView /></Suspense>} />
