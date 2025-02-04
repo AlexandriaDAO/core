@@ -3,32 +3,39 @@ import { contentCache } from "../../../shared/services/contentCacheService";
 import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
 import { MintableStateItem } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { getCover } from "@/utils/epub";
-import { CachedContent, ContentUrlInfo } from '../types';
+import { CachedContent, ContentUrlInfo } from "../types";
 
 export class ContentService {
-  private static contentTypeHandlers: Record<string, (id: string, content?: CachedContent) => Promise<ContentUrlInfo>> = {
-    "application/epub+zip": async (id: string) => {
-      const coverUrl = await getCover(`https://arweave.net/${id}`);
+  private static contentTypeHandlers: Record<
+    string,
+    (
+      id: string,
+      url: string,
+      content?: CachedContent
+    ) => Promise<ContentUrlInfo>
+  > = {
+    "application/epub+zip": async (id: string,url:string) => {
+      const coverUrl = await getCover(url);
       return {
         thumbnailUrl: coverUrl,
         coverUrl: coverUrl,
-        fullUrl: `https://arweave.net/${id}`
+        fullUrl: url,
       };
     },
-    "application/pdf": async (id: string) => ({
+    "application/pdf": async (id: string,url:string) => ({
       thumbnailUrl: null,
       coverUrl: null,
-      fullUrl: `https://arweave.net/${id}`
+      fullUrl:url,
     }),
-    "image/": async (id: string, content?: CachedContent) => ({
-      thumbnailUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
-      coverUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
-      fullUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
+    "image/": async (id: string,url:string, content?: CachedContent) => ({
+      thumbnailUrl: content?.imageObjectUrl || url,
+      coverUrl: content?.imageObjectUrl || url,
+      fullUrl: content?.imageObjectUrl ||url,
     }),
-    "video/": async (id: string, content?: CachedContent) => ({
+    "video/": async (id: string,url:string, content?: CachedContent,) => ({
       thumbnailUrl: content?.thumbnailUrl || null,
       coverUrl: content?.thumbnailUrl || null,
-      fullUrl: `https://arweave.net/${id}`
+      fullUrl: url,
     }),
   };
 
@@ -37,32 +44,43 @@ export class ContentService {
   }
 
   static async getContentUrls(
-    transaction: Transaction, 
+    transaction: Transaction,
     content?: CachedContent
   ): Promise<ContentUrlInfo> {
-    const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-    
+    const contentType =
+      transaction.tags.find((tag) => tag.name === "Content-Type")?.value ||
+      "application/epub+zip";
+
     // Find the matching handler
-    const handler = Object.entries(this.contentTypeHandlers)
-      .find(([key]) => contentType.startsWith(key))?.[1];
+    const handler = Object.entries(this.contentTypeHandlers).find(([key]) =>
+      contentType.startsWith(key)
+    )?.[1];
 
     if (handler) {
-      return handler(transaction.id, content);
+      //Priority to asset canister 
+      return handler(transaction.id, transaction.assetUrl|| `https://arweave.net/${transaction.id}`, content);
     }
 
     // Default fallback
     return {
       thumbnailUrl: null,
       coverUrl: null,
-      fullUrl: `https://arweave.net/${transaction.id}`
+      fullUrl: transaction.assetUrl || `https://arweave.net/${transaction.id}`,
     };
   }
 
-  static getInitialMintableStates(transactions: Transaction[]): Record<string, MintableStateItem> {
+  static getInitialMintableStates(
+    transactions: Transaction[]
+  ): Record<string, MintableStateItem> {
     return transactions.reduce((acc, transaction) => {
-      const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "image/jpeg";
-      const requiresValidation = [...fileTypeCategories.images, ...fileTypeCategories.video].includes(contentType);
-      acc[transaction.id] = { 
+      const contentType =
+        transaction.tags.find((tag) => tag.name === "Content-Type")?.value ||
+        "image/jpeg";
+      const requiresValidation = [
+        ...fileTypeCategories.images,
+        ...fileTypeCategories.video,
+      ].includes(contentType);
+      acc[transaction.id] = {
         mintable: !requiresValidation,
       };
       return acc;

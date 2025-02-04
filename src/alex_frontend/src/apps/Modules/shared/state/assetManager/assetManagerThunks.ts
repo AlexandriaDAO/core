@@ -308,7 +308,7 @@ export const fetchAssetFromUserCanister = async (key: string, actor: any) => {
     // Initial request to get first chunk and metadata
     const initialResponse = await actor.get({
       key: key,
-      accept_encodings: ["identity"],
+      accept_encodings: ["gzip"],
     });
 
     if (!initialResponse) {

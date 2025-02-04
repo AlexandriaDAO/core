@@ -15,11 +15,12 @@ export default function LibrarySearch() {
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const collection = useSelector((state: RootState) => state.library.collection);
 
-  // useEffect(() => {
-  //   if (transactions.length > 0) {
-  //     dispatch(loadContentForTransactions(transactions));
-  //   }
-  // }, [transactions, dispatch]);
+  useEffect(() => {
+    if (transactions.length > 0) {
+      console.log("HERE!")
+      dispatch(loadContentForTransactions(transactions));
+    }
+  }, [transactions, dispatch]);
 
   useEffect(() => {
     if (selectedPrincipals.length > 0 && collection) {

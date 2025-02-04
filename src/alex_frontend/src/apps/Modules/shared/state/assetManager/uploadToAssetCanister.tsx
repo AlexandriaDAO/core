@@ -211,7 +211,7 @@ export const upload = async ({
               key: id,
               sha256: [sha256],
               chunk_ids: allChunkIds,
-              content_encoding: "identity",
+              content_encoding: "gzip",
             },
           },
         ],
