@@ -62,8 +62,8 @@ function ProfilePage() {
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">Profile</h1>
 			</div>
-			<div className="font-roboto-condensed bg-white rounded-lg shadow-md p-6">
-				<div className="mb-6 text-gray-600 font-roboto-condensed">Update your profile information below. Your name will be displayed across the platform, and you can set an avatar using a secure HTTPS URL.</div>
+			<div className="font-roboto-condensed bg-secondary rounded-lg shadow-md p-6">
+				<div className="mb-6 font-roboto-condensed">Update your profile information below. Your name will be displayed across the platform, and you can set an avatar using a secure HTTPS URL.</div>
 
 				<div className="flex items-center">
 					<form
@@ -71,7 +71,7 @@ function ProfilePage() {
 						className="basis-1/2 flex flex-col gap-3"
 					>
 						{error && <span className="text-destructive">{error}</span>}
-						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+						<div className="flex flex-col items-start font-roboto-condensed font-medium ">
 							<Label htmlFor="username">
 								Username
 							</Label>
@@ -83,7 +83,7 @@ function ProfilePage() {
 							/>
 						</div>
 
-						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+						<div className="flex flex-col items-start font-roboto-condensed font-medium">
 							<Label htmlFor="name" variant={(formik.touched.name && formik.errors.name ? "destructive" : "default" ) }>
 								Full Name
 							</Label>
@@ -94,6 +94,7 @@ function ProfilePage() {
 								onChange={formik.handleChange}
 								onBlur={formik.handleBlur}
 								value={formik.values.name}
+								placeholder="Enter your full name"
 							/>
 							{formik.touched.name &&
 								formik.errors.name && (
@@ -103,7 +104,7 @@ function ProfilePage() {
 								)}
 						</div>
 
-						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+						<div className="flex flex-col items-start font-roboto-condensed font-medium">
 							<Label htmlFor="avatar" variant={(formik.touched.avatar && formik.errors.avatar ? "destructive" : "default" ) }>
 								Avatar URL
 							</Label>
@@ -159,7 +160,7 @@ function ProfilePage() {
 								)}
 						</div>
 
-						<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+						<div className="flex flex-col items-start font-roboto-condensed font-medium">
 							<div className="flex items-center gap-2">
 								<input onChange={formik.handleChange} className="cursor-pointer w-4 h-4" type="checkbox" id="tnc" name="tnc" checked={formik.values.tnc} />
 								<Label htmlFor="tnc" variant={(formik.touched.tnc && formik.errors.tnc ? "destructive" : "default" ) }>

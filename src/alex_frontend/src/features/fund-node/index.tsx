@@ -66,8 +66,8 @@ const FundNode = () => {
 
 	if (!irys) {
 		return (
-			<div className="w-full p-3 border border-ring rounded-xl bg-white">
-				<div className="font-syne font-medium text-xl text-black mb-2">
+			<div className="w-full p-3 border rounded-xl bg-white dark:bg-background">
+				<div className="font-syne font-medium text-xl mb-2">
 					Connect Wallet to Fund Library
 				</div>
 				<Button onClick={setWebIrys} disabled={loading} variant="inverted">
@@ -92,11 +92,11 @@ const FundNode = () => {
 
 	return (
         <div className={`relative ${loading ? 'cursor-not-allowed pointer-events-none' : ''}`}>
-            <div className={`w-full p-3 flex flex-col border border-ring rounded-xl bg-white ${loading ? 'opacity-40' : ''}`}>
-                <div className="font-syne font-medium text-xl text-black mb-2">
+            <div className={`w-full p-3 flex flex-col border rounded-xl bg-white dark:bg-background ${loading ? 'opacity-40' : ''}`}>
+                <div className="font-syne font-medium text-xl mb-2">
                     Fund Your Library
                 </div>
-                <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4">
+                <div className="bg-primary-foreground text-primary border-l-4 border-yellow-500 p-4 mb-4">
                     <ul className="list-disc pl-5 font-roboto-condensed text-sm">
                         <li>Make sure you have added your node.</li>
                         <li>Make sure you are connected to right wallet, whose node you want to depost balance to.</li>
@@ -112,7 +112,7 @@ const FundNode = () => {
 									disabled={fundLoading}
 									type="number"
 									step="0.0001"
-									className={`py-1 pl-3 pr-10 text-text rounded-md border border-solid border-gray-300 shadow-sm ${fundLoading ? 'bg-gray-200 cursor-not-allowed':'bg-white'}`}
+									className={`py-1 pl-3 pr-10 text-text rounded-md border border-solid border-gray-300 shadow-sm ${fundLoading ? 'bg-gray-200 cursor-not-allowed':'bg-white dark:bg-background'}`}
 									placeholder="0,0000"
 									value={amount}
 									onChange={(e) => setAmount(e.target.value)}
@@ -129,7 +129,7 @@ const FundNode = () => {
 				</div>
             </div>
             {loading &&
-                <div className="w-full h-full absolute inset-0 backdrop-blur flex justify-center items-center border border-solid  border-gray-400 rounded">
+                <div className="w-full h-full absolute inset-0 backdrop-blur flex justify-center items-center border border-solid rounded">
                     <span className="bg-black/100 shadow rounded p-2">
                         <LoaderCircle size={14} className="animate animate-spin text-white" />
                     </span>

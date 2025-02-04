@@ -66,7 +66,7 @@ const AddNode = () => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button variant={'inverted'} rounded="full" className="flex gap-1 justify-between items-center">
+				<Button variant={'inverted'} className="flex gap-1 justify-between items-center">
 					<span>Add Node</span>
 					<PlusCircle />
 				</Button>
@@ -80,7 +80,7 @@ const AddNode = () => {
 					onSubmit={formik.handleSubmit}
 					className="flex flex-col gap-2 "
 				>
-					<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+					<div className="flex flex-col items-start font-roboto-condensed font-medium">
 						<Label htmlFor="key" variant={(formik.touched.key && formik.errors.key ? "destructive" : "default" ) }>
 							Private Key
 						</Label>
@@ -105,10 +105,10 @@ const AddNode = () => {
 							Status
 						</Label>
 						<select
-							className={`w-full border border-gray-400 focus:border-gray-700 p-1 rounded text-xl ${
+							className={`bg-background text-black dark:text-white w-full border p-1 rounded text-xl ${
 								formik.touched.active &&
 								formik.errors.active
-									? "border-red-500"
+									? "border-destructive"
 									: ""
 							}`}
 							name="active"

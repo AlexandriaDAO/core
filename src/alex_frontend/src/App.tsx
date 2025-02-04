@@ -13,9 +13,11 @@ import ActorProvider from "./providers/ActorProvider";
 import UserProvider from "./providers/UserProvider";
 import { AppRoutes } from "./routes";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { ThemeProvider } from "./providers/ThemeProvider";
 
 export default function App() {
     return (
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <ErrorBoundary>
             <AuthProvider>
                 <ActorProvider>
@@ -29,5 +31,6 @@ export default function App() {
                 </ActorProvider>
             </AuthProvider>
         </ErrorBoundary>
+        </ThemeProvider>
     );
 }

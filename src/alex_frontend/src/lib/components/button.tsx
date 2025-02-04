@@ -9,8 +9,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "border border-black text-black hover:text-white bg-white hover:bg-black",
-        inverted: "border border-black text-white hover:text-black bg-black hover:bg-white",
+        primary: "border border-black text-black hover:text-white bg-white hover:bg-black dark:border-white dark:text-white dark:hover:text-black dark:bg-black dark:hover:bg-white",
+        inverted: "border border-black text-white hover:text-black bg-black hover:bg-white dark:border-white dark:text-black dark:hover:text-white dark:bg-white dark:hover:bg-black",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         constructive: "bg-constructive text-constructive-foreground hover:bg-constructive/90",
         info: "bg-info text-info-foreground hover:bg-info/90",

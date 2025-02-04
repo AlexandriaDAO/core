@@ -55,7 +55,7 @@ export default function AuthMenu() {
 					</div>
 				) : (
 					<div className="w-[42px] h-[42px] border border-white rounded-full cursor-pointer bg-primary flex items-center justify-center">
-						<span className="text-white text-xl font-medium">
+						<span className="text-xl text-primary-foreground font-medium">
 							{user?.username.charAt(0).toUpperCase()}
 						</span>
 					</div>

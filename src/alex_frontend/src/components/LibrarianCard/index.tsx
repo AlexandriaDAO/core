@@ -11,9 +11,9 @@ function LibrarianCard() {
 	}
 
 	return (
-		<div className="max-w-md p-3 flex gap-2 flex-col rounded-xl border border-ring bg-white">
+		<div className="max-w-md p-3 flex gap-2 flex-col rounded-xl border">
 			<div className="flex justify-between items-center">
-				<div className="font-syne font-medium text-xl text-black">
+				<div className="font-syne font-medium text-xl">
 					Librarian
 				</div>
 			</div>

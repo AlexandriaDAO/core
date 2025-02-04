@@ -94,8 +94,8 @@ const DashboardSidebar = () => {
                         to="/dashboard"
                         end
                         className={({ isActive }) => `
-                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border
-                            ${isActive ? 'text-primary-foreground bg-primary border-red' : 'text-gray-600 bg-muted border-gray-300 hover:text-primary hover:border hover:border-ring'}
+                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border border-border/75
+                            ${isActive ? 'text-primary-foreground bg-primary' : 'text-primary/75 bg-muted hover:border-border hover:text-primary'}
                         `}
                     >
                         <Home size={18} />
@@ -106,8 +106,8 @@ const DashboardSidebar = () => {
                         to="nodes"
                         end
                         className={({ isActive }) => `
-                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border
-                            ${isActive ? 'text-primary-foreground bg-primary border-red' : 'text-gray-600 bg-muted border-gray-300 hover:text-primary hover:border hover:border-ring'}
+                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border border-border/75
+                            ${isActive ? 'text-primary-foreground bg-primary' : 'text-primary/75 bg-muted hover:border-border hover:text-primary'}
                         `}
                     >
                         <LayoutList size={18}/>
