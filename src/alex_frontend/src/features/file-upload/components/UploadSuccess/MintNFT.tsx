@@ -33,7 +33,7 @@ const MintNFT: React.FC = () => {
         <div className="mt-6 pt-4 border-t">
             <div className="flex items-center justify-between">
                 <div>
-                    <h4 className="text-sm font-medium text-gray-900">
+                    <h4 className="text-sm font-medium">
                         NFT Mint
                     </h4>
                     <p className="text-sm text-gray-500">
@@ -92,7 +92,7 @@ const MintNFT: React.FC = () => {
             {/* Minting Error */}
             {mintError && (
                 <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md">
-                    <p className="text-sm text-red-600">
+                    <p className="text-sm text-destructive">
                         {mintError}
                     </p>
                 </div>

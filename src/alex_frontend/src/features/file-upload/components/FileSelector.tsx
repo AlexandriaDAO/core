@@ -75,7 +75,7 @@ function FileSelector({ setFile }: FileSelectorProps) {
 	return (
         <>
             <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-700 mb-2">Upload File</h2>
+                <h2 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">Upload File</h2>
                 <p className="text-gray-600">Choose a file to upload or drag and drop it here</p>
             </div>
 
@@ -118,9 +118,9 @@ function FileSelector({ setFile }: FileSelectorProps) {
                     {/* File Type Categories */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
                         {Object.entries(FILE_TYPES).map(([key, category]) => (
-                            <div key={key} className="text-center p-3 bg-gray-50 rounded-lg">
+                            <div key={key} className="text-center p-3 bg-white dark:bg-transparent border rounded-lg">
                                 <div className="text-2xl mb-2">{category.icon}</div>
-                                <div className="text-sm font-medium text-gray-700">{category.label}</div>
+                                <div className="text-sm font-medium text-gray-700 dark:text-white">{category.label}</div>
                                 <div className="text-xs text-gray-500">
                                     Up to {formatFileSize(category.maxSize)}
                                 </div>
@@ -133,7 +133,7 @@ function FileSelector({ setFile }: FileSelectorProps) {
             {error && (
                 <div className="mt-4 space-y-4">
                     {/* Error Message with Chevron */}
-                    <div className="p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
+                    <div className="p-4 bg-white dark:bg-gray-300 text-destructive rounded-lg border border-destructive">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2 flex-1">
                                 <XCircle className="w-5 h-5 flex-shrink-0" />
@@ -158,22 +158,22 @@ function FileSelector({ setFile }: FileSelectorProps) {
                             showSupportedTypes ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
                         }`}
                     >
-                        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <h3 className="text-sm font-medium text-gray-700 mb-3">
+                        <div className="p-4 rounded-lg border">
+                            <h3 className="text-sm font-medium mb-3">
                                 Supported file types:
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2  gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {Object.entries(FILE_TYPES).map(([key, category]) => (
-                                    <div key={key} className="bg-white p-3 rounded-lg shadow-sm">
+                                    <div key={key} className="border bg-white dark:bg-transparent p-3 rounded-lg shadow-sm">
                                         <div className="flex items-center space-x-2 mb-2">
                                             <span className="text-xl">{category.icon}</span>
-                                            <span className="font-medium text-gray-700">
+                                            <span className="font-medium text-gray-700 dark:text-white">
                                                 {category.label}
                                             </span>
                                         </div>
-                                        <div className="text-xs text-gray-500 space-y-1">
-                                            <p>Max size: {formatFileSize(category.maxSize)}</p>
-                                            <div>
+                                        <div className="text-xs space-y-1">
+                                            <p className="text-gray-500">Max size: {formatFileSize(category.maxSize)}</p>
+                                            <div className="text-gray-500">
                                                 Formats:
                                                 <div className="mt-1 flex flex-wrap gap-1">
                                                     {category.types.map(type => (

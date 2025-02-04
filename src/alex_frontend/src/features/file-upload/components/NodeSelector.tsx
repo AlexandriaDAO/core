@@ -37,16 +37,16 @@ const NodeSelector = () => {
 	return (
 		<div className="space-y-2">
 			<div className="leading-none">
-				<h2 className="text-lg font-semibold text-gray-700">Select Source Node</h2>
-				<span className="text-sm text-gray-500">A node is a pre funded irys instance which is required to upload files.</span>
+				<h2 className="text-lg font-semibold ">Select Source Node</h2>
+				<span className="text-sm">A node is a pre funded irys instance which is required to upload files.</span>
 			</div>
 			<div className="flex justify-end items-center">
 				{cost && (
 					<>
-						<p className="text-right text-sm text-gray-500">
+						<p className="text-right text-sm text-muted-foreground">
 							Estimated Cost: {formatAmount(cost)}
 						</p>
-						<div className="border-l border-gray-300 h-6 mx-2"></div>
+						<div className="border-l h-6 mx-2"></div>
 					</>
 				)}
 				<Button

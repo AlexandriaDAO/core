@@ -110,8 +110,8 @@ const NodeItem: React.FC<{ item: SerializedNode }> = ({ item }) => {
             onClick={() => selectable() && dispatch(setNode(item))}
             className={`relative p-4 rounded-lg border transition-all ${selectable() ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'}
                 ${node?.id === item.id ? 'border-blue-500 bg-blue-50' : selectable()
-                    ? 'border-gray-200 hover:border-gray-300 bg-white'
-                    : 'border-gray-200 bg-gray-50'
+                    ? 'hover:border-gray-300 bg-white'
+                    : 'border-border/75 bg-gray-50'
                 }
             `}
         >

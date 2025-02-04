@@ -28,7 +28,7 @@ const UploadSuccess: React.FC<UploadSuccessProps> = ({
 	const txUrl = 'https://gateway.irys.xyz/tx/'+transaction;
 
 	return (
-		<div className="bg-white rounded-lg shadow-md">
+		<div className="bg-secondary rounded-lg shadow-md">
 			<Header file={file}/>
 
 			{/* Details Section */}
@@ -40,7 +40,7 @@ const UploadSuccess: React.FC<UploadSuccessProps> = ({
 							Tx Hash:
 						</span>
 						<div className="flex items-center space-x-2">
-							<code className="px-2 py-1 bg-gray-100 rounded text-sm font-mono">
+							<code className="px-2 py-1 border bg-white dark:bg-transparent rounded text-sm font-mono">
 								{transaction.substring(0, 20)}...
 							</code>
 							<button

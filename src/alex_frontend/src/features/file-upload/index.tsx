@@ -65,7 +65,7 @@ function FileUpload() {
 
                 {uploadError && file && <UploadError file={file}/>}
 
-                <div className="font-roboto-condensed bg-white rounded-lg shadow-md p-8">
+                <div className="font-roboto-condensed bg-secondary rounded-lg shadow-md p-8">
                     {renderContent()}
                 </div>
 

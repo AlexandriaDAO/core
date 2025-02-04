@@ -22,7 +22,7 @@ export const Header: React.FC<HeaderProps> = ({
                         strokeWidth={2}
                     />
                     <div>
-                        <h3 className="text-lg font-medium text-gray-900">
+                        <h3 className="text-lg font-medium">
                             Upload Successful
                         </h3>
                         <p className="text-sm text-gray-500">{file.name}</p>
