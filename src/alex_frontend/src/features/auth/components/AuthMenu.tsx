@@ -20,7 +20,7 @@ import {
 import { NavLink } from "react-router";
 import { useLogout } from "@/hooks/useLogout";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import Protected from "@/components/Protected";
+import Protected from "@/guards/Protected";
 
 export default function AuthMenu() {
 	const logout = useLogout();
@@ -55,7 +55,7 @@ export default function AuthMenu() {
 					</div>
 				) : (
 					<div className="w-[42px] h-[42px] border border-white rounded-full cursor-pointer bg-primary flex items-center justify-center">
-						<span className="text-white text-xl font-medium">
+						<span className="text-xl text-primary-foreground font-medium">
 							{user?.username.charAt(0).toUpperCase()}
 						</span>
 					</div>
@@ -78,12 +78,12 @@ export default function AuthMenu() {
 							<span>Profile</span>
 						</DropdownMenuItem>
 						</NavLink>
-						<NavLink to='/dashboard/settings'>
+						{/* <NavLink to='/dashboard/settings'>
 							<DropdownMenuItem className="cursor-pointer">
 								<Settings />
 								<span>Settings</span>
 							</DropdownMenuItem>
-						</NavLink>
+						</NavLink> */}
 					</DropdownMenuGroup>
 				</Protected>
 				<DropdownMenuSeparator />

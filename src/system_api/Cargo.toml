@@ -12,8 +12,8 @@ crate-type = ["cdylib"]
 candid = "0.8.4"
 ic-cdk = "0.7.1"
 serde = "1"
-ic-crypto-internal-bls12-381-vetkd = { git = "https://github.com/dfinity/ic" }
-ic-crypto-internal-bls12-381-type = { git = "https://github.com/dfinity/ic" }
+ic-crypto-internal-bls12-381-vetkd = { git = "https://github.com/dfinity/ic", branch = "rc-2024-10-11-14_35" }
+ic-crypto-internal-bls12-381-type = { git = "https://github.com/dfinity/ic", branch = "rc-2024-10-11-14_35" }
 rand = "0.8"
 rand_chacha = "0.3"
 lazy_static = "1.4"

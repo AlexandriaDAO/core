@@ -133,7 +133,7 @@ const NodeItem = ({ node }: NodeItemProps) => {
 							</td>
 						</tr>
 						<tr>
-							<td colSpan={2} className="p-2 shadow border border-solid rounded font-roboto-condensed font-normal text-base bg-yellow-100 border-l-4 border-yellow-500">
+							<td colSpan={2} className="p-2 shadow border border-solid rounded font-roboto-condensed font-normal text-base bg-primary-foreground text-primary border-l-4 border-yellow-500">
 								<ul className="list-disc pl-5 font-roboto-condensed text-sm">
 									<li>Showing the confirmed balance.</li>
 									<li>Deposits can take a few minutes to reflect.</li>
@@ -153,7 +153,7 @@ const NodeItem = ({ node }: NodeItemProps) => {
 				</table>
 			</div>
 			{loading &&
-				<div className="w-full h-full absolute inset-0 backdrop-blur flex justify-center items-center border border-solid  border-gray-400 rounded">
+				<div className="w-full h-full absolute inset-0 backdrop-blur flex justify-center items-center border border-solid rounded">
 					<span className="bg-black/100 shadow rounded p-2">
 						<LoaderCircle size={14} className="animate animate-spin text-white" />
 					</span>

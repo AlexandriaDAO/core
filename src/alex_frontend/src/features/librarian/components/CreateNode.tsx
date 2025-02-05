@@ -6,8 +6,8 @@ const CreateNode = ()=> {
 	const { nodes } = useAppSelector((state) => state.myNodes);
 
 	return (
-		<div className="w-full p-3 flex flex-col border border-ring rounded-xl bg-white">
-			<div className="font-syne font-medium text-xl text-black mb-2">
+		<div className="w-full p-3 flex flex-col border rounded-xl bg-white dark:bg-background">
+			<div className="font-syne font-medium text-xl mb-2">
 				Add New Node
 			</div>
 			<p className="font-roboto-condensed font-medium text-base mb-4">

@@ -19,7 +19,7 @@ function MyNodes() {
 	return (
 		<div className="w-full flex gap-2 flex-col">
 			<div className="flex justify-between items-center">
-				<div className="font-syne font-medium text-xl text-black">
+				<div className="font-syne font-medium text-xl">
 					Created Nodes
 				</div>
 			</div>
