@@ -116,6 +116,8 @@
 
     "@tanstack/react-query": "^5.62.8",
 
+    "@tanstack/react-virtual": "^3.12.0",
+
     "@tensorflow/tfjs": "^4.21.0",
 
     "@types/dompurify": "^3.0.5",
@@ -227,6 +229,8 @@
     "react-router-dom": "^7.1.1",
 
     "react-syntax-highlighter": "^15.5.0",
+
+    "root": "github:tanstack/react-virtual",
 
     "sonner": "^1.5.0",
 

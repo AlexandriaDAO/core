@@ -20,11 +20,19 @@ export class ContentService {
       coverUrl: null,
       fullUrl: `https://arweave.net/${id}`
     }),
-    "image/": async (id: string, content?: CachedContent) => ({
-      thumbnailUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
-      coverUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
-      fullUrl: content?.imageObjectUrl || `https://arweave.net/${id}`,
-    }),
+    "image/": async (id: string) => {
+      const arweaveUrl = `https://arweave.net/${id}`;
+      // Add a tiny version of the image (e.g. 20px wide) for initial blur-up effect
+      const thumbnailUrl = `https://arweave.net/${id}?ar-size=20`;
+      
+      return {
+        thumbnailUrl,  // Tiny version for blur-up
+        coverUrl: arweaveUrl,  // Full resolution version
+        fullUrl: arweaveUrl,
+        needsProcessing: false,
+        isProgressive: true  // Flag to indicate this should use progressive loading
+      };
+    },
     "video/": async (id: string, content?: CachedContent) => ({
       thumbnailUrl: content?.thumbnailUrl || null,
       coverUrl: content?.thumbnailUrl || null,
@@ -32,8 +40,46 @@ export class ContentService {
     }),
   };
 
+  private static requestQueue: Array<{
+    transaction: Transaction;
+    resolve: (value: CachedContent) => void;
+    reject: (error: unknown) => void;
+  }> = [];
+
+  private static isProcessing = false;
+
   static async loadContent(transaction: Transaction): Promise<CachedContent> {
-    return contentCache.loadContent(transaction);
+    // Check cache first
+    const cached = await contentCache.loadContent(transaction);
+    if (cached) return cached;
+
+    // For initial load, just get metadata without processing blobs
+    const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value;
+    
+    return {
+      url: `https://arweave.net/${transaction.id}`,
+      textContent: null,
+      imageObjectUrl: null,
+      thumbnailUrl: null,
+      error: null
+    };
+  }
+
+  private static async processQueue() {
+    if (this.isProcessing || this.requestQueue.length === 0) return;
+    
+    this.isProcessing = true;
+    const { transaction, resolve, reject } = this.requestQueue.shift()!;
+    
+    try {
+      const content = await contentCache.loadContent(transaction);
+      resolve(content);
+    } catch (error: unknown) {
+      reject(error);
+    } finally {
+      this.isProcessing = false;
+      this.processQueue();
+    }
   }
 
   static async getContentUrls(
@@ -41,20 +87,36 @@ export class ContentService {
     content?: CachedContent
   ): Promise<ContentUrlInfo> {
     const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+    const arweaveUrl = `https://arweave.net/${transaction.id}`;
+
+    // For images, return direct URLs initially
+    if (contentType.startsWith('image/')) {
+      return {
+        thumbnailUrl: arweaveUrl,
+        coverUrl: arweaveUrl,
+        fullUrl: arweaveUrl,
+        needsProcessing: false
+      };
+    }
     
-    // Find the matching handler
+    // For non-image content, process immediately since it's lightweight
     const handler = Object.entries(this.contentTypeHandlers)
-      .find(([key]) => contentType.startsWith(key))?.[1];
+      .find(([key]) => contentType.startsWith(key) && key !== 'image/')?.[1];
 
     if (handler) {
-      return handler(transaction.id, content);
+      const result = await handler(transaction.id, content);
+      return {
+        ...result,
+        needsProcessing: false
+      };
     }
 
     // Default fallback
     return {
       thumbnailUrl: null,
       coverUrl: null,
-      fullUrl: `https://arweave.net/${transaction.id}`
+      fullUrl: arweaveUrl,
+      needsProcessing: false
     };
   }
 
@@ -75,5 +137,16 @@ export class ContentService {
 
   static clearCache(): void {
     contentCache.clearCache();
+  }
+
+  // Simplify this method
+  static async processVisibleImage(id: string): Promise<ContentUrlInfo> {
+    const arweaveUrl = `https://arweave.net/${id}`;
+    return {
+      thumbnailUrl: arweaveUrl,
+      coverUrl: arweaveUrl,
+      fullUrl: arweaveUrl,
+      needsProcessing: false
+    };
   }
 }
