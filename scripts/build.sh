@@ -45,9 +45,9 @@ dfx deploy nft_manager --specified-id 5sh5r-gyaaa-aaaap-qkmra-cai
 # For alex_backend
 cargo build --release --target wasm32-unknown-unknown --package alex_backend
 candid-extractor target/wasm32-unknown-unknown/release/alex_backend.wasm > src/alex_backend/alex_backend.did
-# For bookmarks
-cargo build --release --target wasm32-unknown-unknown --package bookmarks
-candid-extractor target/wasm32-unknown-unknown/release/bookmarks.wasm > src/bookmarks/bookmarks.did
+# For lexigraph
+cargo build --release --target wasm32-unknown-unknown --package lexigraph
+candid-extractor target/wasm32-unknown-unknown/release/lexigraph.wasm > src/lexigraph/lexigraph.did
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
@@ -73,7 +73,7 @@ candid-extractor target/wasm32-unknown-unknown/release/asset_manager.wasm > src/
 
 cargo update
 
-dfx deploy bookmarks --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
+dfx deploy lexigraph --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
 dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
 dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
@@ -253,7 +253,7 @@ dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal d2i72-e3wkw-a6etl-47r7u-x3ovf-gytan-s5ili-wizsu-2hafh-q2hb2-rqe)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal naaip-5eykh-tinwp-rdq2x-itbqc-7bcbo-nce2i-cg3qk-m3emq-276ui-qqe)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
 import type { ECBasicOption } from 'echarts/types/dist/shared';
+import { useTheme } from '../../../../providers/ThemeProvider';
 
 interface ChartProps {
     dataXaxis: any;
@@ -18,17 +19,19 @@ const LineChart: React.FC<ChartProps> = ({
     gardientColor
 }) => {
     const chartRef1 = useRef<HTMLDivElement | null>(null);
+    const { theme } = useTheme();
+    const isDarkMode = theme === 'dark';
 
     useEffect(() => {
         if (chartRef1.current && dataYaxis.length) {
-            const myChart1 = echarts.init(chartRef1.current);
+            const myChart1 = echarts.init(chartRef1.current, isDarkMode ? 'dark' : undefined);
 
             const option1: ECBasicOption = {
                 title: {
                     text: '',
                     left: 'left',
                     textStyle: {
-                        color: '#333',
+                        color: isDarkMode ? '#fff' : '#333',
                         fontSize: 14
                     }
                 },
@@ -37,10 +40,16 @@ const LineChart: React.FC<ChartProps> = ({
                 },
                 xAxis: {
                     type: 'category',
-                    data: dataXaxis
+                    data: dataXaxis,
+                    axisLabel: {
+                        color: isDarkMode ? '#ccc' : '#666'
+                    }
                 },
                 yAxis: {
-                    type: 'value'
+                    type: 'value',
+                    axisLabel: {
+                        color: isDarkMode ? '#ccc' : '#666'
+                    }
                 },
                 dataZoom: [
                     {
@@ -65,7 +74,10 @@ const LineChart: React.FC<ChartProps> = ({
                         areaStyle: {
                             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                                 { offset: 0, color: gardientColor },
-                                { offset: 1, color: 'rgba(255, 255, 255, 0.3)' }
+                                { 
+                                    offset: 1, 
+                                    color: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)' 
+                                }
                             ])
                         }
                     }
@@ -84,15 +96,15 @@ const LineChart: React.FC<ChartProps> = ({
                 myChart1.dispose();
             };
         }
-    }, [dataYaxis]);
+    }, [dataYaxis, isDarkMode]);
 
     return (
-        <div className="w-full bg-[#FFF] rounded-3xl border border-[#F0F0F0]">
+        <div className={`w-full ${isDarkMode ? 'bg-gray-800' : 'bg-[#FFF]'} rounded-3xl border ${isDarkMode ? 'border-gray-700' : 'border-[#F0F0F0]'}`}>
             <div className="p-6 flex md:flex-row flex-col w-full border-b-2 items-center">
-                <h3 className="text-xl font-medium w-full">{name}</h3>
+                <h3 className={`text-xl font-medium w-full ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{name}</h3>
             </div>
             <div className="p-6 pb-0">
-                <p className="lg:text-lg md:text-base sm:text-sm xs:text-xs font-normal md:pr-5 xs:pr-0 text-[#525252] md:w-9/12 xs:w-full">
+                <p className={`lg:text-lg md:text-base sm:text-sm xs:text-xs font-normal md:pr-5 xs:pr-0 ${isDarkMode ? 'text-gray-300' : 'text-[#525252]'} md:w-9/12 xs:w-full`}>
                     Displaying {name} performance over the past
                 </p>
             </div>
@@ -105,7 +117,7 @@ const LineChart: React.FC<ChartProps> = ({
             >
                 <div
                     ref={chartRef1}
-                    className="h-[400px] w-full bg-white rounded-lg"
+                    className={`h-[400px] w-full ${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg`}
                 />
             </div>
         </div>

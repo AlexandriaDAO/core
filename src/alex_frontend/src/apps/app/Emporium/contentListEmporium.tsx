@@ -2,10 +2,10 @@ import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { RootState, AppDispatch } from "@/store";
-import { Copy, Info, LoaderPinwheel } from 'lucide-react';
+import { Copy, Info, LoaderPinwheel, X } from 'lucide-react';
 import { setMintableStates, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
-import Modal from "@/apps/Modules/AppModules/contentGrid/components/Modal";
+import { Dialog, DialogContent } from '@/lib/components/dialog';
 import ContentRenderer from "@/apps/Modules/AppModules/safeRender/ContentRenderer";
 import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -16,6 +16,7 @@ import { Badge } from "@/lib/components/badge";
 import { Separator } from "@/lib/components/separator";
 import { toast } from "sonner";
 import { TooltipProvider } from "@/lib/components/tooltip";
+import { Button } from "@/lib/components/button";
 import {
   CardContent,
   CardHeader,
@@ -259,28 +260,38 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
         </ContentGrid>)}
 
 
-        <Modal
-          isOpen={!!selectedContent}
-          onClose={() => setSelectedContent(null)}
-        >
-          {selectedContent && (
-            <div className="w-full h-full">
-              <ContentRenderer
-                transaction={transactions.find(t => t.id === selectedContent.id)!}
-                content={contentData[selectedContent.id]}
-                contentUrls={contentData[selectedContent.id]?.urls || {
-                  thumbnailUrl: null,
-                  coverUrl: null,
-                  fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
-                }}
-                inModal={true}
-                showStats={showStats[selectedContent.id]}
-                mintableState={mintableState}
-                handleRenderError={handleRenderError}
-              />
-            </div>
-          )}
-        </Modal>
+        <Dialog open={!!selectedContent} onOpenChange={(open) => !open && setSelectedContent(null)}>
+          <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col" closeIcon={
+            <Button
+              variant="outline"
+              className="absolute right-4 top-4 z-[60] rounded-full p-3 
+                bg-primary text-primary-foreground hover:bg-primary/90
+                transition-colors"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+          }>
+            {selectedContent && (
+              <div className="w-full h-full overflow-y-auto">
+                <div className="p-6">
+                  <ContentRenderer
+                    transaction={transactions.find(t => t.id === selectedContent.id)!}
+                    content={contentData[selectedContent.id]}
+                    contentUrls={contentData[selectedContent.id]?.urls || {
+                      thumbnailUrl: null,
+                      coverUrl: null,
+                      fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
+                    }}
+                    inModal={true}
+                    showStats={showStats[selectedContent.id]}
+                    mintableState={mintableState}
+                    handleRenderError={handleRenderError}
+                  />
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         <CombinedModal
           type={modalType!}

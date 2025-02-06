@@ -6,14 +6,16 @@ import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { TransactionType } from "../../thunks/lbryIcrc/getTransactions";
 import MainLayout from "@/layouts/MainLayout";
-
-
+import { useTheme } from "@/providers/ThemeProvider";
 
 const DetailTransaction = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const swap = useAppSelector(state => state.swap);
     const [transactaion, setTransaction] = useState<TransactionType>();
+    const { theme } = useTheme();
+    const isDark = theme === "dark";
+
     useEffect(() => {
         const id = searchParams.get("id");
         setTransaction(swap?.transactions[Number(id)] || null);
@@ -23,15 +25,16 @@ const DetailTransaction = () => {
     }, [searchParams])
 
     return (<>
-        <>        <div className="overflow-x-auto lg:overflow-x-auto">
+        <>        
+        <div className="overflow-x-auto lg:overflow-x-auto">
             <div className="container pt-10 px-3">
                 <div className="bread-crumbs">
-                    <nav className="flex items-center space-x-2 text-gray-500">
-                        <a href="/" className="hover:text-gray-600 color:black-gray-300">Home</a>
+                    <nav className="flex items-center space-x-2 text-foreground">
+                        <a href="/" className="hover:text-muted-foreground">Home</a>
                         <span className="w-1"><FontAwesomeIcon icon={faAngleRight} /></span>
-                        <a href="/category" className="hover:text-gray-600 color:black-gray-300">Transaction History</a>
+                        <a href="/category" className="hover:text-muted-foreground">Transaction History</a>
                         <span className="w-1"><FontAwesomeIcon icon={faAngleRight} /></span>
-                        <a href="/category/product" className="text-gray-600  color:black-gray-300">Transaction Info</a>
+                        <a href="/category/product" className="text-muted-foreground">Transaction Info</a>
                     </nav>
                 </div>
             </div>
@@ -42,67 +45,69 @@ const DetailTransaction = () => {
                     </span>
                     <a
                         href="/"
-                        className="color:black-gray-300 text-base"
+                        className="text-foreground text-base"
                         onClick={(e) => {
-                            e.preventDefault(); // Prevent the default anchor behavior
-                            window.history.back(); // Go back to the previous page
+                            e.preventDefault();
+                            window.history.back();
                         }}
                     >
                         Back
-                    </a>            </div>
+                    </a>            
+                </div>
                 <div className="table-wrapper">
                     <div className="table-content pb-5">
-                        <h4 className="text-2xl text-black">Transaction</h4>
+                        <h4 className="text-2xl text-foreground">Transaction</h4>
                     </div>
                     <div className="tranication-table overflow-x-auto lg:overflow-x-auto">
                         <table className="min-w-full border-collapse">
                             <tbody>
-                                <tr className="border-b border-gray-300 hover:bg-gray-100">
-                                    <th className="text-lg font-medium text-black items-center flex py-3 w-2/5 text-left">Timestamp
+                                <tr className={`border-b ${isDark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-300 hover:bg-gray-100'}`}>
+                                    <th className="text-lg font-medium text-foreground items-center flex py-3 w-2/5 text-left">Timestamp
                                         <FontAwesomeIcon icon={faQuestionCircle} className='text-[#cccccc] text-2xl ml-3 position-relative w-5' />
                                     </th>
-                                    <td className="text-base font-medium text-black-gray text-[#353535] w-9/12 text-left">{transactaion?.timestamp}</td>
+                                    <td className="text-base font-medium text-foreground w-9/12 text-left">{transactaion?.timestamp}</td>
                                 </tr>
-                                <tr className="border-b border-gray-300 hover:bg-gray-100">
-                                    <th className="text-lg font-medium text-black items-center flex py-3 w-2/5">Type
+                                <tr className={`border-b ${isDark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-300 hover:bg-gray-100'}`}>
+                                    <th className="text-lg font-medium text-foreground items-center flex py-3 w-2/5">Type
                                         <FontAwesomeIcon icon={faQuestionCircle} className='text-[#cccccc] text-2xl ml-3 position-relative w-5' />
                                     </th>
-                                    <td className="text-base font-medium text-black-gray w-9/12">
-                                        <span className={`${transactaion?.type === "mint" ? "bg-mintbtnbg" : "bg-sendbtnbg"} bg-opacity-30 px-3 rounded-bordertb`}>{transactaion?.type}</span></td>
+                                    <td className="text-base font-medium text-foreground w-9/12">
+                                        <span className={`${transactaion?.type === "mint" ? "bg-mintbtnbg" : "bg-sendbtnbg"} bg-opacity-30 px-3 rounded-bordertb`}>{transactaion?.type}</span>
+                                    </td>
                                 </tr>
-                                <tr className="border-b border-gray-300 hover:bg-gray-100">
-                                    <th className="text-lg font-medium text-black items-center flex py-3 w-2/5">Status
+                                <tr className={`border-b ${isDark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-300 hover:bg-gray-100'}`}>
+                                    <th className="text-lg font-medium text-foreground items-center flex py-3 w-2/5">Status
                                         <FontAwesomeIcon icon={faQuestionCircle} className='text-[#cccccc] text-2xl ml-3 position-relative w-5' />
                                     </th>
-                                    <td className="text-base font-medium text-black-gray text-[#353535] w-9/12">Completed
+                                    <td className="text-base font-medium text-foreground w-9/12">Completed
                                         <span className="ml-2">
                                             <FontAwesomeIcon icon={faCheck} />
                                         </span>
                                     </td>
                                 </tr>
-                                <tr className="border-b border-gray-300 hover:bg-gray-100">
-                                    <th className="text-lg font-medium text-black items-center flex py-3 w-2/5">From
+                                <tr className={`border-b ${isDark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-300 hover:bg-gray-100'}`}>
+                                    <th className="text-lg font-medium text-foreground items-center flex py-3 w-2/5">From
                                         <FontAwesomeIcon icon={faQuestionCircle} className='text-[#cccccc] text-2xl ml-3 position-relative w-5' />
                                     </th>
-                                    <td className="text-base font-medium text-black-gray text-[#353535] w-9/12">{transactaion?.from}</td>
+                                    <td className="text-base font-medium text-foreground w-9/12">{transactaion?.from}</td>
                                 </tr>
-                                <tr className="border-b border-gray-300 hover:bg-gray-100">
-                                    <th className="text-lg font-medium text-black items-center flex py-3">To
+                                <tr className={`border-b ${isDark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-300 hover:bg-gray-100'}`}>
+                                    <th className="text-lg font-medium text-foreground items-center flex py-3">To
                                         <FontAwesomeIcon icon={faQuestionCircle} className='text-[#cccccc] text-2xl ml-3 position-relative w-5 w-2/5' />
                                     </th>
-                                    <td className="text-base font-medium text-black-gray text-[#353535] w-9/12">{transactaion?.to}</td>
+                                    <td className="text-base font-medium text-foreground w-9/12">{transactaion?.to}</td>
                                 </tr>
-                                <tr className="border-b border-gray-300 hover:bg-gray-100">
-                                    <th className="text-lg font-medium text-black items-center flex py-3 w-2/5">Amount
+                                <tr className={`border-b ${isDark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-300 hover:bg-gray-100'}`}>
+                                    <th className="text-lg font-medium text-foreground items-center flex py-3 w-2/5">Amount
                                         <FontAwesomeIcon icon={faQuestionCircle} className='text-[#cccccc] text-2xl ml-3 position-relative w-5' />
                                     </th>
-                                    <td className="text-base font-medium text-black-gray text-[#353535] w-9/12">{transactaion?.amount}</td>
+                                    <td className="text-base font-medium text-foreground w-9/12">{transactaion?.amount}</td>
                                 </tr>
-                                <tr className="border-b border-gray-300 hover:bg-gray-100">
-                                    <th className="text-lg font-medium text-black items-center flex py-3 w-2/5">Fee
+                                <tr className={`border-b ${isDark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-300 hover:bg-gray-100'}`}>
+                                    <th className="text-lg font-medium text-foreground items-center flex py-3 w-2/5">Fee
                                         <FontAwesomeIcon icon={faQuestionCircle} className='text-[#cccccc] text-2xl ml-3 position-relative w-5' />
                                     </th>
-                                    <td className="text-base font-medium text-black-gray text-[#353535] w-9/12">{transactaion?.fee}</td>
+                                    <td className="text-base font-medium text-foreground w-9/12">{transactaion?.fee}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -110,7 +115,6 @@ const DetailTransaction = () => {
                 </div>
             </div>
         </div>
-
         </>
     </>)
 }

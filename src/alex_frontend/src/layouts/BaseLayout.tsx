@@ -9,7 +9,7 @@ const BaseLayout = () => {
     const { showRiskWarning, handleCloseRiskWarning } = useRiskWarning();
 
 	return (
-		<div className="min-h-screen min-w-screen flex flex-col bg-[#f4f4f4]">
+		<div className="min-h-screen min-w-screen flex flex-col bg-background">
 			{showRiskWarning && <RiskWarningModal onClose={handleCloseRiskWarning} open={showRiskWarning} />}
 
 			<Outlet />

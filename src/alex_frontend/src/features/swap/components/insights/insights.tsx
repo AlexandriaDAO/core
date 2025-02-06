@@ -16,10 +16,6 @@ const Insights: React.FC = () => {
     }, [])
     return (
         <>
-            <div className="container px-3 lg:mb-20 md:mb-16 sm:mb-14 xs:mb-4">
-                <h2 className="text-3xl font-bold mb-2">Insights</h2>
-                <p className="lg:text-lg md:text-base xs:text-sm font-normal md:pr-5 xs:pr-0 text-[#525252] md:w-9/12 xs:w-full">Explore key platform metrics through detailed visual representations, including token performance, holder statistics, supply dynamics, and NFT minting trends.</p>
-            </div>
             <div className='container px-3'>
                 <div className='grid grid-cols-1 lg:grid-cols-2 md:grid-cols-1 gap-4'>
                     <LineChart name='ALEX Supply' dataXaxis={chartData.chartData.map((data) => data.time)} dataYaxis={chartData.chartData.map((data) => data.alex)} lineColor={'#5470C6'} gardientColor={'#75A0FD4D'} />

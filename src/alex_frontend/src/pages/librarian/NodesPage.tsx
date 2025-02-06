@@ -24,7 +24,7 @@ function NodesPage() {
 				<h1 className="text-3xl font-bold">My Nodes</h1>
 				<AddNode />
 			</div>
-			<div className="font-roboto-condensed bg-white rounded-lg shadow-md p-6">
+			<div className="font-roboto-condensed bg-secondary rounded-lg shadow-md p-6">
 				<MyNodes />
 			</div>
 		</>

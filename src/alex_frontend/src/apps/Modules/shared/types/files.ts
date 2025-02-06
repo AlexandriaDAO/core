@@ -42,6 +42,9 @@ const fileTypeGroups: FileTypeGroup[] = [
   { displayName: "OGG", extension: "ogg", mimeTypes: ["audio/ogg"] },
   { displayName: "JSON", extension: "json", mimeTypes: ["application/json"] },
   { displayName: "HTML", extension: "html", mimeTypes: ["text/html"] },
+  { displayName: "CSV", extension: "csv", mimeTypes: ["text/csv"] },
+  { displayName: "XML", extension: "xml", mimeTypes: ["text/xml", "application/xml"] },
+  { displayName: "YAML", extension: "yaml", mimeTypes: ["application/x-yaml", "text/yaml"] },
 ];
 
 export const supportedFileTypes: FileTypeConfig[] = fileTypeGroups.flatMap(group => 
@@ -64,12 +67,15 @@ export const fileTypeCategories: Record<string, string[]> = {
     .filter(group => ["EPUB"].includes(group.displayName))
     .flatMap(group => group.mimeTypes),
   text: fileTypeGroups
-    .filter(group => ["Text", "Markdown", "JSON", "HTML", "PDF"].includes(group.displayName))
+    .filter(group => ["Text", "Markdown", "PDF", "HTML"].includes(group.displayName))
     .flatMap(group => group.mimeTypes),
   video: fileTypeGroups
     .filter(group => ["MP4", "WebM", "GIF"].includes(group.displayName))
     .flatMap(group => group.mimeTypes),
   audio: fileTypeGroups
     .filter(group => ["MP3", "WAV", "OGG"].includes(group.displayName))
+    .flatMap(group => group.mimeTypes),
+  data: fileTypeGroups
+    .filter(group => ["JSON", "CSV", "XML", "YAML"].includes(group.displayName))
     .flatMap(group => group.mimeTypes),
 };

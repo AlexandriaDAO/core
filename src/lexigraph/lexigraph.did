@@ -1,0 +1,12 @@
+type Result = variant { Ok; Err : text };
+type ShelfUpdate = record {
+  title : opt text;
+  description : opt text;
+  slots : opt vec Slot;
+};
+type Slot = record { id : nat32; content : SlotContent; position : nat32 };
+type SlotContent = variant { Nft : text; Markdown : text };
+service : {
+  store_shelf : (principal, text, opt text, vec Slot) -> (Result);
+  update_shelf : (text, ShelfUpdate) -> (Result);
+}

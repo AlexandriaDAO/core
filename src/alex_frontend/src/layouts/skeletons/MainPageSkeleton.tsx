@@ -12,12 +12,15 @@ const MainPageSkeleton = () => {
 		<>
 			<div className="flex-grow px-4 py-8">
 				<div className="flex justify-between items-center mb-8">
-					<div className="w-32 h-8 bg-gray-200 rounded animate-pulse" />{" "}
 					{/* Title */}
+					<div className="w-32 h-8 bg-secondary rounded animate-pulse" />
+
+					{/* Action */}
+					<div className="w-32 h-8 bg-secondary rounded animate-pulse" />
 				</div>
-				<div className="bg-white rounded-lg shadow-md p-6">
-					<div className="w-full h-32 bg-gray-100 rounded animate-pulse" />{" "}
+				<div className="bg-secondary rounded-lg shadow-md p-6">
 					{/* Content */}
+					{/* <div className="w-full h-32 bg-secondary-foreground rounded animate-pulse" />{" "} */}
 				</div>
 			</div>
 		</>

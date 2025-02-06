@@ -10,4 +10,12 @@ export interface ContentUrlInfo {
   thumbnailUrl: string | null;
   coverUrl: string | null;
   fullUrl: string;
+  needsProcessing?: boolean;
+}
+
+export interface ContentDataItem {
+  content?: string;
+  urls?: ContentUrlInfo;
+  error?: string;
+  needsProcessing?: boolean;
 }

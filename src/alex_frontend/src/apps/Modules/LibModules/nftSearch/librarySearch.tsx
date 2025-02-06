@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
@@ -14,13 +14,15 @@ export default function LibrarySearch() {
   const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const collection = useSelector((state: RootState) => state.library.collection);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (transactions.length > 0) {
-      console.log("HERE!")
-      dispatch(loadContentForTransactions(transactions));
+    if (transactions.length > 0 && !isLoading) {
+      setIsLoading(true);
+      dispatch(loadContentForTransactions(transactions))
+        .finally(() => setIsLoading(false));
     }
-  }, [transactions, dispatch]);
+  }, [transactions, dispatch, isLoading]);
 
   useEffect(() => {
     if (selectedPrincipals.length > 0 && collection) {

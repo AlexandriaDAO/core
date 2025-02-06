@@ -97,21 +97,21 @@ const SwapContent: React.FC = () => {
   return (
     <div>
       <div className="mb-5 2xl:mb-10 xl:mb-7 lg:mb-7 md:mb-6 sm:mb-5">
-        <h3 className="text-tabsheading 2xl:text-xxltabsheading xl:text-xltabsheading lg:text-lgtabsheading md:text-mdtabsheading sm:text-smtabsheading font-bold">
+        <h3 className="text-tabsheading 2xl:text-xxltabsheading xl:text-xltabsheading lg:text-lgtabsheading md:text-mdtabsheading sm:text-smtabsheading font-bold dark:text-gray-200">
           Swap
         </h3>
       </div>
       <div className="grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1">
         <div className="me-0 2xl:me-2 xl:me-2 lg:me-2 md:me-0 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-3 sm:mb-3">
           <div className="block 2xl:flex xl:flex lg:flex md:flex sm:block justify-between mb-5 w-full">
-            <div className={'bg-white border  text-white py-5 px-7 rounded-borderbox me-0 2xl:me-2 xl:me-2 lg:me-2 md:me-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-3 ' + shadow}>
-              <div className="flex justify-between mb-5	">
-                <h2 className="text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black me-2">
+            <div className={'bg-white dark:bg-gray-800 border dark:border-gray-700 py-5 px-7 rounded-borderbox me-0 2xl:me-2 xl:me-2 lg:me-2 md:me-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full mb-3 2xl:mb-0 xl:mb-0 lg:mb-0 md:mb-0 sm:mb-3 ' + shadow}>
+              <div className="flex justify-between mb-5">
+                <h2 className="text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black dark:text-gray-200 me-2">
                   ICP
                 </h2>
                 <div>
                   <input
-                    className="text-black text-right text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading bg-transparent  placeholder-black  focus:outline-none focus:border-transparent w-full caret-[#D8DDF7]"
+                    className="text-black dark:text-gray-200 text-right text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading bg-transparent placeholder-black dark:placeholder-gray-400 focus:outline-none focus:border-transparent w-full caret-[#D8DDF7] dark:caret-blue-400"
                     type="text"
                     defaultValue={amount}
                     value={amount+""}
@@ -122,14 +122,14 @@ const SwapContent: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="flex justify-between 	">
-                <strong className="text-base text-[#353535] font-medium me-1">
+              <div className="flex justify-between">
+                <strong className="text-base text-[#353535] dark:text-gray-300 font-medium me-1">
                   Balance:{icpLedger.accountBalance}
                 </strong>
 
                 <Link
                   role="button"
-                  className="text-base font-blod text-[#A7B1D7] underline"
+                  className="text-base font-blod text-[#A7B1D7] dark:text-blue-400 underline"
                   to={""}
                   onClick={() => handleMaxIcp()}
                 >
@@ -137,24 +137,24 @@ const SwapContent: React.FC = () => {
                 </Link>
               </div>
             </div>
-            <div className="bg-white border border-[#bdbec4] text-white py-5 px-7 rounded-borderbox me-0 2xl:ms-2 xl:ms-2 lg:ms-2 md:ms-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full">
+            <div className="bg-white dark:bg-gray-800 border border-[#bdbec4] dark:border-gray-700 py-5 px-7 rounded-borderbox me-0 2xl:ms-2 xl:ms-2 lg:ms-2 md:ms-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full">
               <div className="flex justify-between mb-5 flex-wrap break-all">
-                <h2 className="text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black">
+                <h2 className="text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium text-black dark:text-gray-200">
                   LBRY
                 </h2>
-                <h3 className="text-swapvalue text-right text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium">
+                <h3 className="text-swapvalue text-right text-swapheading 2xl:text-xxlswapheading xl:text-xlswapheading lg:text-lgswapheading md:text-mdswapheading ms:text-smswapheading font-medium dark:text-gray-200">
                   {tentativeLBRY.toFixed(4)}
                 </h3>
               </div>
               <div className="flex justify-between">
-                <strong className="text-base text-[#353535] font-medium me-1">
+                <strong className="text-base text-[#353535] dark:text-gray-300 font-medium me-1">
                   Balance: {swap.lbryBalance} LBRY
                 </strong>
               </div>
             </div>
           </div>
           <div className="terms-condition-wrapper flex tems-baseline mb-4">
-            <p className="text-lg font-semibold pr-5 text-[#525252] w-9/12">{parseFloat(amount) < minimum_icp ? <>Please enter at least the minimum amount to proceed</> : <></>}</p>
+            <p className="text-lg font-semibold pr-5 text-[#525252] dark:text-gray-300 w-9/12">{parseFloat(amount) < minimum_icp ? <>Please enter at least the minimum amount to proceed</> : <></>}</p>
           </div>
           <div>
             {user ? (
@@ -169,59 +169,57 @@ const SwapContent: React.FC = () => {
                 onClick={handleSubmit}
               >
                 {swap.loading ? (
-                  <LoaderCircle size={18} className="animate-spin  mx-auto " />
+                  <LoaderCircle size={18} className="animate-spin mx-auto" />
                 ) : (
                   <>Swap</>
                 )}
               </button>
             ) : (
               <div
-                className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn "
+                className="bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 flex items-center justify-center white-auth-btn"
               >
                 <Entry />
               </div>
             )}
             <div className="terms-condition-wrapper flex tems-baseline">
               <span className="text-[#FF37374D] mr-2 text-xl font-semibold">*</span>
-              <p className="text-lg font-semibold pr-5 text-[#525252] w-9/12">If the transaction doesn’t complete as expected, please check the redeem page to locate your tokens.</p>
+              <p className="text-lg font-semibold pr-5 text-[#525252] dark:text-gray-300 w-9/12">If the transaction doesn't complete as expected, please check the redeem page to locate your tokens.</p>
             </div>
           </div>
         </div>
-        <div className="border border-gray-400 text-white py-5 px-5 rounded-2xl ms-3">
+        <div className="border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 py-5 px-5 rounded-2xl ms-3">
           <ul className="ps-0">
             <li className="flex justify-between mb-5">
-              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor">
+              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor dark:text-gray-200">
                 Network Fees
               </strong>
-              <span className="lg:text-lg md:text-base sm:text-sm font-semibold text-radiocolor">
+              <span className="lg:text-lg md:text-base sm:text-sm font-semibold text-radiocolor dark:text-gray-200">
                 {icp_fee} ICP
               </span>
             </li>
             <li className="flex justify-between mb-5">
-              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor">
+              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor dark:text-gray-200">
                 Send
               </strong>
-              <span className="lg:text-lg md:text-base sm:text-sm font-semibold text-radiocolor break-all">
+              <span className="lg:text-lg md:text-base sm:text-sm font-semibold text-radiocolor dark:text-gray-200 break-all">
                 {amount} ICP
               </span>
             </li>
             <li className="flex justify-between mb-5">
-              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor">
+              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor dark:text-gray-200">
                 Receive
               </strong>
-              <span className="lg:text-lg md:text-base sm:text-sm font-semibold text-radiocolor break-all">
+              <span className="lg:text-lg md:text-base sm:text-sm font-semibold text-radiocolor dark:text-gray-200 break-all">
                 {tentativeLBRY.toFixed(4)} LBRY
               </span>
             </li>
             <li className="flex justify-between mb-5">
-              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor">
-                For each ICP you swap, you'll receive             <span className="text-[#FF9900]">{tentativeLBRY}</span> LBRY tokens.
-
+              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor dark:text-gray-200">
+                For each ICP you swap, you'll receive <span className="text-[#FF9900] dark:text-yellow-400">{tentativeLBRY}</span> LBRY tokens.
               </strong>
-
             </li>
             <li>
-              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor">
+              <strong className="lg:text-lg md:text-base sm:text-sm font-semibold me-1 text-radiocolor dark:text-gray-200">
                 Please review the details carefully, as swaps are irreversible and cannot be undone once confirmed.
               </strong>
             </li>

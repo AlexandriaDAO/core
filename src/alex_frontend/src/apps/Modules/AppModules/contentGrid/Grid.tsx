@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
 import { setMintableStates, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
-import Modal from '@/apps/Modules/AppModules/contentGrid/components/Modal';
+import { Dialog, DialogContent } from '@/lib/components/dialog';
 import ContentRenderer from '@/apps/Modules/AppModules/safeRender/ContentRenderer';
 import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components/TransactionDetails';
 import { mint_nft } from "@/features/nft/mint";
@@ -13,6 +13,7 @@ import { withdraw_nft } from "@/features/nft/withdraw";
 import { TooltipProvider } from "@/lib/components/tooltip";
 import { Loader2 } from 'lucide-react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
+import { X } from 'lucide-react';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -199,35 +200,36 @@ const Grid = () => {
           })}
         </ContentGrid>
 
-        <Modal
-          isOpen={!!selectedContent}
-          onClose={() => setSelectedContent(null)}
-        >
-          {selectedContent && (
-            <div className="w-full h-full">
-              <ContentRenderer
-                transaction={transactions.find(t => t.id === selectedContent.id)!}
-                content={contentData[selectedContent.id]}
-                contentUrls={ {
-                  thumbnailUrl: null,
-                  coverUrl: null,
-                  fullUrl: selectedContent.assetUrl // || `https://arweave.net/${selectedContent.id}`
-                }}
-                inModal={true}
-                showStats={showStats[selectedContent.id]}
-                mintableState={mintableState}
-                handleRenderError={()=>{}}
-              />
-              {selectedContent && predictions[selectedContent.id]?.isPorn && (
-                <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[55]">
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
-                    Content Filtered
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </Modal> 
+        <Dialog open={!!selectedContent} onOpenChange={(open) => !open && setSelectedContent(null)}>
+          <DialogContent className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background" closeIcon={
+            <Button
+              variant="outline"
+              className="absolute right-2 top-2 z-[60] rounded-full p-2 
+                bg-primary text-primary-foreground hover:bg-primary/90
+                transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          }>
+            {selectedContent && (
+              <div className="w-full h-full">
+                <ContentRenderer
+                  transaction={transactions.find(t => t.id === selectedContent.id)!}
+                  content={contentData[selectedContent.id]}
+                  contentUrls={contentData[selectedContent.id]?.urls || {
+                    thumbnailUrl: null,
+                    coverUrl: null,
+                    fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
+                  }}
+                  inModal={true}
+                  showStats={showStats[selectedContent.id]}
+                  mintableState={mintableState}
+                  handleRenderError={handleRenderError}
+                />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog> 
       </>
     </TooltipProvider>
   );

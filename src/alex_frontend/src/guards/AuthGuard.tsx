@@ -7,7 +7,7 @@ import { FullPageLogin } from "@/features/login";
 import { Outlet } from "react-router";
 
 
-const AuthLayout = () => {
+const AuthGuard = () => {
 	const {identity, isInitializing} = useIdentity();
 
 	const {user} = useAppSelector(state=>state.auth);
@@ -28,4 +28,4 @@ const AuthLayout = () => {
     return <Outlet/>
 };
 
-export default AuthLayout;
+export default AuthGuard;

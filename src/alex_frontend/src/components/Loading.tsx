@@ -7,7 +7,7 @@ const Loading = () => (
         <DialogContent
             closeIcon={null}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className="font-roboto-condensed outline-none mx-auto max-w-md bg-white p-8 text-[#828282]"
+            className="font-roboto-condensed outline-none mx-auto max-w-md p-8 border-gray-500"
         >
             <DialogTitle className="sr-only">Loading</DialogTitle>
             <DialogDescription className="text-center">Please wait while we load page.</DialogDescription>

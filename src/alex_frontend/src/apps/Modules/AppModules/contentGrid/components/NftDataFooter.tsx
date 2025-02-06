@@ -15,6 +15,7 @@ interface NftDataFooterProps {
 export function NftDataFooter({ id }: NftDataFooterProps) {
   const { getNftData } = useNftData();
   const nfts = useSelector((state: RootState) => state.nftData.nfts);
+  const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
   const [nftData, setNftData] = useState<NftDataResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [copiedPrincipal, setCopiedPrincipal] = useState(false);
@@ -48,12 +49,9 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
 
   const handleCopyLink = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const nftEntry = Object.entries(nfts).find(([_, nft]) => 
-      nft && 'arweaveId' in nft && nft.arweaveId === id
-    );
-    if (!nftEntry) return;
+    const tokenId = arweaveToNftId[id];
+    if (!tokenId) return;
     
-    const tokenId = nftEntry[0];
     const lbryUrl = process.env.NODE_ENV === 'development' ? `http://localhost:8080/nft/${tokenId}` : `https://lbry.app/nft/${tokenId}`;
     const copied = await copyToClipboard(lbryUrl);
     if (copied) {
@@ -78,17 +76,19 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
 
   return (
     <div className="flex flex-wrap gap-2 items-center">
-      <Badge 
-        variant="default" 
-        className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
-        onClick={handleCopyLink}
-      >
-        {copiedLink ? (
-          <Check className="h-3 w-3" />
-        ) : (
-          <Link className="h-3 w-3" />
-        )}
-      </Badge>
+      {arweaveToNftId[id] && (
+        <Badge 
+          variant="default" 
+          className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+          onClick={handleCopyLink}
+        >
+          {copiedLink ? (
+            <Check className="h-3 w-3" />
+          ) : (
+            <Link className="h-3 w-3" />
+          )}
+        </Badge>
+      )}
       {nftData?.principal && (
         <Badge 
           variant="default" 

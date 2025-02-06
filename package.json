@@ -116,7 +116,11 @@
 
     "@tanstack/react-query": "^5.62.8",
 
+    "@tanstack/react-virtual": "^3.12.0",
+
     "@tensorflow/tfjs": "^4.21.0",
+
+    "@types/dompurify": "^3.0.5",
 
     "antd": "^5.20.5",
 
@@ -138,7 +142,7 @@
 
     "date-fns": "^3.6.0",
 
-    "dompurify": "^3.2.4",
+    "dompurify": "^3.2.3",
 
     "echarts": "^5.6.0",
 
@@ -226,6 +230,8 @@
 
     "react-syntax-highlighter": "^15.5.0",
 
+    "root": "github:tanstack/react-virtual",
+
     "sonner": "^1.5.0",
 
     "styled-components": "^6.1.13",
@@ -233,6 +239,8 @@
     "swiper": "^11.1.12",
 
     "tailwind-merge": "^2.5.3",
+
+    "tailwind-scrollbar": "^3.1.0",
 
     "tailwindcss": "^3.4.10",
 

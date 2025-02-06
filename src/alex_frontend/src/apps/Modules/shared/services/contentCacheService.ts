@@ -190,10 +190,15 @@ class ContentCacheService {
 
   private isTextContent(contentType: string): boolean {
     return [
-      "text/plain",
-      "text/markdown",
-      "application/json",
-      "text/html",
+      'text/plain',
+      'text/markdown',
+      'application/json',
+      'text/html',
+      'text/csv',
+      'text/xml',
+      'application/xml',
+      'text/yaml',
+      'application/x-yaml'
     ].includes(contentType);
   }
 

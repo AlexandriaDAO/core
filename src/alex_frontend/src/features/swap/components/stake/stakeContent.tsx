@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
+import { useTheme } from "@/providers/ThemeProvider";
 
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -17,6 +18,7 @@ import ErrorModal from "../errorModal";
 import { Entry } from "@/layouts/parts/Header";
 
 const StakeContent = () => {
+    const { theme } = useTheme();
     const dispatch = useAppDispatch();
 
     const swap = useAppSelector((state) => state.swap);
@@ -32,6 +34,7 @@ const StakeContent = () => {
     const [modalData, setModalData] = useState({ message: "Please try again or seek help if needed", title: "Something went wrong..." });
     const [userEstimateReward, setUserEstimatedReward] = useState(0);
     const [apr, setApr] = useState("0");
+    const [annualizedApr, setAnnualizedApr] = useState("0");
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
@@ -60,10 +63,13 @@ const StakeContent = () => {
 
         // Check if `stakedUsd` is valid before dividing
         if (stakedUsd > 0) {
-            const aprPercentage = ((estimatedRewardIcp * Number(icpLedger.icpPrice)) / stakedUsd) * 100;
-            setApr(aprPercentage.toFixed(4)+"%");
+            const hourlyAprPercentage = ((estimatedRewardIcp * Number(icpLedger.icpPrice)) / stakedUsd) * 100;
+            const annualAprPercentage = hourlyAprPercentage * 24 * 365; // Convert hourly to annual
+            setApr(hourlyAprPercentage.toFixed(4)+"%");
+            setAnnualizedApr(annualAprPercentage.toFixed(2)+"%");
         } else {
             setApr(''); // Fallback value if division by zero
+            setAnnualizedApr('');
         }
     }, [alex.alexPriceUsd, icpLedger.icpPrice, swap.averageAPY, swap.stakeInfo.stakedAlex]);
 
@@ -99,24 +105,49 @@ const StakeContent = () => {
 
     return (
         <>
+            <style>
+                {`
+                /* Hide number input spinners for Chrome, Safari, Edge, Opera */
+                input[type="number"]::-webkit-inner-spin-button,
+                input[type="number"]::-webkit-outer-spin-button {
+                    -webkit-appearance: none;
+                    margin: 0;
+                }
+
+                /* Hide number input spinners for Firefox */
+                input[type="number"] {
+                    -moz-appearance: textfield;
+                }
+                `}
+            </style>
             <div>
                 <div className='grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-7'>
                     <div className='stake me-2'>
                         <div className="mb-4">
-                            <label className="flex items-center text-radiocolor">
-                                <span className="ml-2 text-tabsheading 2xl:text-xxltabsheading xl:text-xltabsheading lg:text-lgtabsheading md:text-mdtabsheading sm:text-smtabsheading font-bold">Stake</span>
+                            <label className="flex items-center text-radiocolor dark:text-white">
+                                <span className="ml-2 text-tabsheading 2xl:text-xxltabsheading xl:text-xltabsheading lg:text-lgtabsheading md:text-mdtabsheading sm:text-smtabsheading font-bold dark:text-white">Stake</span>
                             </label>
                         </div>
-                        <div className='border text-white py-5 px-7 rounded-borderbox mb-3'>
-                            <h2 className='sm:text-2xl xs:text-xl text-radiocolor flex justify-between mb-5'>
-                                <span className='flex font-extrabold '>Staked</span>
+                        <div className='border border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-800 text-black dark:text-white py-5 px-7 rounded-borderbox mb-3'>
+                            <h2 className='sm:text-2xl xs:text-xl text-radiocolor dark:text-white flex justify-between mb-5'>
+                                <span className='flex font-extrabold'>Staked</span>
                                 <span className='font-semibold flex'>{swap.stakeInfo.stakedAlex} ALEX</span>
                             </h2>
                             <ul className='ps-0'>
                                 <li className='mb-4'>
                                     <div className='flex justify-between'>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Estimated Hourly APR</strong>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{apr}</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor dark:text-white font-semibold me-1'>Estimated Returns</strong>
+                                        <div className='text-right'>
+                                            <div className='flex flex-col items-end'>
+                                                <div>
+                                                    <strong className='sm:text-lg xs:text-sm text-radiocolor dark:text-white font-semibold'>{apr}</strong>
+                                                    <span className='text-sm text-gray-500 dark:text-gray-400 ml-1'>per hour</span>
+                                                </div>
+                                                <div className='text-sm text-gray-500 dark:text-gray-400'>
+                                                    {annualizedApr} per year
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </li>
                                 {/* <li className='mb-4'>
@@ -127,34 +158,40 @@ const StakeContent = () => {
                                 </li> */}
                                 <li className='mb-4'>
                                     <div className='flex justify-between'>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Cumulative Stake by Community
-                                        </strong>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{swap.totalStaked} ALEX</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor dark:text-white font-semibold me-1'>Cumulative Stake by Community</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor dark:text-white font-semibold me-1'>{swap.totalStaked} ALEX</strong>
                                     </div>
                                 </li>
                                 <li>
                                     <div className='flex justify-between'>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>Stakers</strong>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor font-semibold me-1'>{swap.totalStakers}</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor dark:text-white font-semibold me-1'>Stakers</strong>
+                                        <strong className='sm:text-lg xs:text-sm text-radiocolor dark:text-white font-semibold me-1'>{swap.totalStakers}</strong>
                                     </div>
                                 </li>
                             </ul>
                         </div>
                         <div className='flex items-center mb-3'>
-                            <strong className='text-2xl font-medium'>Stake Amount</strong>
+                            <strong className='text-2xl font-medium dark:text-white'>Stake Amount</strong>
                         </div>
-                        <div className=' border bg-white py-8 px-5 rounded-borderbox mb-7 '>
+                        <div className='border border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-800 py-8 px-5 rounded-borderbox mb-7'>
                             <div className='mb-3'>
                                 <div className='flex justify-between mb-5'>
-                                    <h4 className='text-2xl font-medium text-darkgray'>Amount</h4>
-                                    <input className='text-darkgray mr-[-10px] text-right bg-transparent text-2xl font-medium placeholder-darkgray w-full focus:outline-none focus:border-transparent' type='number' min={0} value={amount} onChange={(e) => { handleAmountChange(e) }} />
+                                    <h4 className='text-2xl font-medium text-darkgray dark:text-white'>Amount</h4>
+                                    <input 
+                                        className='text-darkgray dark:text-white mr-[-10px] text-right bg-transparent text-2xl font-medium placeholder-darkgray dark:placeholder-gray-400 w-full focus:outline-none focus:border-transparent' 
+                                        type='number'
+                                        min={0}
+                                        value={amount}
+                                        onChange={(e) => { handleAmountChange(e) }}
+                                        step="any"
+                                    />
                                 </div>
                                 <div className='flex justify-between'>
                                     <div className='flex items-center'>
-                                        <strong className='text-base text-multygray font-medium me-2'>Available Balance:<span className='text-base text-darkgray ms-2'>{alex.alexBal} ALEX</span></strong>
+                                        <strong className='text-base text-multygray dark:text-gray-400 font-medium me-2'>Available Balance:<span className='text-base text-darkgray dark:text-white ms-2'>{alex.alexBal} ALEX</span></strong>
                                         <img className='w-5 h-5' src="images/8-logo.png" alt="apple" />
                                     </div>
-                                    <Link to="" role="button" className='text-[#A7B1D7] underline text-base font-bold' onClick={() => handleMaxAlex()} >Max</Link>
+                                    <Link to="" role="button" className='text-[#A7B1D7] dark:text-gray-400 underline text-base font-bold hover:text-[#8494C7] dark:hover:text-gray-300' onClick={() => handleMaxAlex()} >Max</Link>
                                 </div>
                             </div>
                         </div>
@@ -181,7 +218,7 @@ const StakeContent = () => {
                             </div>}
                             <div className="terms-condition-wrapper flex tems-baseline">
                                 <span className="text-[#FF37374D] mr-2 text-xl font-semibold">*</span>
-                                <p className="sm:text-lg xs:text-sm font-semibold pr-5 text-[#525252] w-9/12">If the transaction doesn’t complete as expected, please check the redeem page to locate your tokens.</p>
+                                <p className="sm:text-lg xs:text-sm font-semibold pr-5 text-[#525252] dark:text-gray-400 w-9/12">If the transaction doesn't complete as expected, please check the redeem page to locate your tokens.</p>
                             </div>
                         </div>
                     </div>

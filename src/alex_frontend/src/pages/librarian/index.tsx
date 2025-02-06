@@ -20,9 +20,9 @@ function LibrarianPage() {
 	return (
 		<>
 			<div className="flex justify-between items-center mb-8">
-				<h1 className="text-3xl font-bold">Librarian Home</h1>
+				<h1 className="text-3xl font-bold text-primary">Librarian Home</h1>
 			</div>
-			<div className="font-roboto-condensed bg-white rounded-lg shadow-md p-6">
+			<div className="font-roboto-condensed bg-secondary rounded-lg shadow-md p-6">
 				<Librarian />
 			</div>
 		</>

@@ -12,11 +12,11 @@ import AuthProvider from "./providers/AuthProvider";
 import ActorProvider from "./providers/ActorProvider";
 import UserProvider from "./providers/UserProvider";
 import { AppRoutes } from "./routes";
-import ErrorBoundary from "./components/ErrorBoundary";
+import { ThemeProvider } from "./providers/ThemeProvider";
 
 export default function App() {
     return (
-        <ErrorBoundary>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <AuthProvider>
                 <ActorProvider>
                     <ReduxProvider>
@@ -28,6 +28,6 @@ export default function App() {
                     </ReduxProvider>
                 </ActorProvider>
             </AuthProvider>
-        </ErrorBoundary>
+        </ThemeProvider>
     );
 }

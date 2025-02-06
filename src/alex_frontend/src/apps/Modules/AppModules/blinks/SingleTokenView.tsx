@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ContentRenderer from '../safeRender/ContentRenderer';
 import { ContentCard } from '@/apps/Modules/AppModules/contentGrid/Card';
-import Modal from '@/apps/Modules/AppModules/contentGrid/components/Modal';
+import { Dialog, DialogContent } from '@/lib/components/dialog';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
 import { toast } from "sonner";
@@ -19,10 +19,11 @@ import { ContentService } from '../../LibModules/contentDisplay/services/content
 import { setContentData } from '../../shared/state/content/contentDisplaySlice';
 import { Transaction } from '../../shared/types/queries';
 import { Badge } from "@/lib/components/badge";
-import { Copy, Check, Link } from "lucide-react";
+import { Copy, Check, Link, X } from "lucide-react";
 import { copyToClipboard } from '@/apps/Modules/AppModules/contentGrid/utils/clipboard';
 import { getNftOwnerInfo, UserInfo } from '../../shared/utils/nftOwner';
 import { setNFTs } from '../../shared/state/nftData/nftDataSlice';
+import { Button } from "@/lib/components/button";
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -412,22 +413,32 @@ function SingleTokenView() {
         </ContentCard>
       </div>
 
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-      >
-        <div className="w-full h-full">
-          <ContentRenderer
-            transaction={transaction}
-            content={content}
-            contentUrls={contentUrls}
-            inModal={true}
-            showStats={false}
-            mintableState={mintableState}
-            handleRenderError={handleRenderError}
-          />
-        </div>
-      </Modal>
+      <Dialog open={showModal} onOpenChange={(open) => !open && setShowModal(false)}>
+        <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col" closeIcon={
+          <Button
+            variant="outline"
+            className="absolute right-4 top-4 z-[60] rounded-full p-3 
+              bg-primary text-primary-foreground hover:bg-primary/90
+              transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </Button>
+        }>
+          <div className="w-full h-full overflow-y-auto">
+            <div className="p-6">
+              <ContentRenderer
+                transaction={transaction}
+                content={content}
+                contentUrls={contentUrls}
+                inModal={true}
+                showStats={false}
+                mintableState={mintableState}
+                handleRenderError={handleRenderError}
+              />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
