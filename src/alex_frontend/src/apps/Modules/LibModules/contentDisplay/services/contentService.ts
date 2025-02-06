@@ -3,29 +3,22 @@ import { contentCache } from "../../../shared/services/contentCacheService";
 import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
 import { MintableStateItem } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { getCover } from "@/utils/epub";
-import { CachedContent, ContentUrlInfo } from "../types";
+import { CachedContent, ContentUrlInfo } from '../types';
 
 export class ContentService {
-  private static contentTypeHandlers: Record<
-    string,
-    (
-      id: string,
-      url: string,
-      content?: CachedContent
-    ) => Promise<ContentUrlInfo>
-  > = {
-    "application/epub+zip": async (id: string,url:string) => {
-      const coverUrl = await getCover(url);
+  private static contentTypeHandlers: Record<string, (id: string, content?: CachedContent) => Promise<ContentUrlInfo>> = {
+    "application/epub+zip": async (id: string) => {
+      const coverUrl = await getCover(`https://arweave.net/${id}`);
       return {
         thumbnailUrl: coverUrl,
         coverUrl: coverUrl,
-        fullUrl: url,
+        fullUrl: `https://arweave.net/${id}`
       };
     },
-    "application/pdf": async (id: string,url:string) => ({
+    "application/pdf": async (id: string) => ({
       thumbnailUrl: null,
       coverUrl: null,
-      fullUrl:url,
+      fullUrl: `https://arweave.net/${id}`
     }),
     "image/": async (id: string) => {
       const arweaveUrl = `https://arweave.net/${id}`;
@@ -43,7 +36,7 @@ export class ContentService {
     "video/": async (id: string, content?: CachedContent) => ({
       thumbnailUrl: content?.thumbnailUrl || null,
       coverUrl: content?.thumbnailUrl || null,
-      fullUrl: url,
+      fullUrl: `https://arweave.net/${id}`
     }),
   };
 
@@ -90,7 +83,7 @@ export class ContentService {
   }
 
   static async getContentUrls(
-    transaction: Transaction,
+    transaction: Transaction, 
     content?: CachedContent
   ): Promise<ContentUrlInfo> {
     const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
@@ -127,18 +120,11 @@ export class ContentService {
     };
   }
 
-  static getInitialMintableStates(
-    transactions: Transaction[]
-  ): Record<string, MintableStateItem> {
+  static getInitialMintableStates(transactions: Transaction[]): Record<string, MintableStateItem> {
     return transactions.reduce((acc, transaction) => {
-      const contentType =
-        transaction.tags.find((tag) => tag.name === "Content-Type")?.value ||
-        "image/jpeg";
-      const requiresValidation = [
-        ...fileTypeCategories.images,
-        ...fileTypeCategories.video,
-      ].includes(contentType);
-      acc[transaction.id] = {
+      const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "image/jpeg";
+      const requiresValidation = [...fileTypeCategories.images, ...fileTypeCategories.video].includes(contentType);
+      acc[transaction.id] = { 
         mintable: !requiresValidation,
       };
       return acc;
