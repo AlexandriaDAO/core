@@ -3,21 +3,29 @@ import {
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import { createAssetCanister, fetchUserNfts, getAssetCanister } from "./assetManagerThunks";
+import {
+  createAssetCanister,
+  fetchUserNfts,
+  getCallerAssetCanister,
+  getAssetList,
+  syncNfts,
+} from "./assetManagerThunks";
 import { toast } from "sonner";
 
 interface AssetManagerState {
   isLoading: boolean;
   error: string | null;
-  userAssetCanister:string|null;
-  urls:string[];
+  userAssetCanister: string | null;
+  assetList: Array<{ key: string; content_type: string }>;
+  urls: string[];
 }
 
 const initialState: AssetManagerState = {
   isLoading: false,
-  error:"",
-  urls:[""],
-  userAssetCanister:null
+  error: "",
+  urls: [""],
+  assetList: [{ key: "", content_type: "" }],
+  userAssetCanister: null,
 };
 
 const assetManagerSlice = createSlice({
@@ -29,50 +37,78 @@ const assetManagerSlice = createSlice({
     },
   },
   extraReducers: (builder: ActionReducerMapBuilder<AssetManagerState>) => {
-    builder.addCase(createAssetCanister.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    })
-    .addCase(createAssetCanister.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.userAssetCanister=action.payload;
-      state.error = null;
-      toast.success("New asset canister created!");
-    })
-    .addCase(createAssetCanister.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload as string;
-      toast.error(action.payload as string);
-    }).addCase(getAssetCanister.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    })
-    .addCase(getAssetCanister.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.userAssetCanister=action.payload;
-      state.error = null;
-    })
-    .addCase(getAssetCanister.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload as string;
-      toast.error(action.payload as string);
-    }).addCase(fetchUserNfts.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    })
-    .addCase(fetchUserNfts.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.urls=action.payload;
-      state.error = null;
-    })
-    .addCase(fetchUserNfts.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload as string;
-      toast.error(action.payload as string);
-    })
-
-
-    
+    builder
+      .addCase(createAssetCanister.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(createAssetCanister.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.userAssetCanister = action.payload;
+        state.error = null;
+        toast.success("New asset canister created!");
+      })
+      .addCase(createAssetCanister.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+        toast.error(action.payload as string);
+      })
+      .addCase(getCallerAssetCanister.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getCallerAssetCanister.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.userAssetCanister = action.payload;
+        state.error = null;
+      })
+      .addCase(getCallerAssetCanister.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+        toast.error(action.payload as string);
+      })
+      .addCase(fetchUserNfts.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserNfts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.urls = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchUserNfts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+        toast.error(action.payload as string);
+      })
+      .addCase(getAssetList.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getAssetList.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.assetList = action.payload;
+        state.error = null;
+      })
+      .addCase(getAssetList.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+        toast.error(action.payload as string);
+      })
+      .addCase(syncNfts.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(syncNfts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success("Synced!")
+        state.error = null;
+      })
+      .addCase(syncNfts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+        toast.error(action.payload as string);
+      });;
   },
 });
 

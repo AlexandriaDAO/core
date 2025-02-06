@@ -12,6 +12,7 @@ import RangeSelector from './rangeSelector';
 export default function LibrarySearch() {
   const dispatch = useDispatch<AppDispatch>();
   const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
+  const istransactionUpdated = useSelector((state: RootState) => state.contentDisplay.isUpdated);
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const collection = useSelector((state: RootState) => state.library.collection);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +23,7 @@ export default function LibrarySearch() {
       dispatch(loadContentForTransactions(transactions))
         .finally(() => setIsLoading(false));
     }
-  }, [transactions, dispatch, isLoading]);
+  }, [istransactionUpdated, istransactionUpdated,dispatch, isLoading]);
 
   useEffect(() => {
     if (selectedPrincipals.length > 0 && collection) {

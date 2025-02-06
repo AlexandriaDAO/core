@@ -1,6 +1,8 @@
 import { getActorUserAssetCanister } from "@/features/auth/utils/authUtils";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from 'sonner';
 import { syncProgressInterface } from "./assetManagerThunks";
+import { RootState } from "@/store";
 
 interface CreateBatchResponse {
   batch_id: bigint;
@@ -52,6 +54,7 @@ interface uploadProps {
   id: string,
   syncProgress: syncProgressInterface,
   setSyncProgress: React.Dispatch<React.SetStateAction<syncProgressInterface>>,
+  assetList: Array<{ key: string; content_type: string }>;
 
   // setUploadProgress: React.Dispatch<React.SetStateAction<{
   //   phase: string;
@@ -96,25 +99,36 @@ const calculateSHA256 = async (data: Uint8Array): Promise<Uint8Array> => {
   return new Uint8Array(hashBuffer);
 };
 
-export const upload = async ({
+export const uploadAsset = async ({
   assetCanisterId,
   id,
   syncProgress,
   setSyncProgress,
   itemUrl,
   contentData,
+  assetList
 }: uploadProps): Promise<boolean> => {
   let currentBatchId: bigint | null = null;
   const assetActor = await getActorUserAssetCanister(assetCanisterId);
 
   try {
-    setSyncProgress((prev) => ({ ...prev, currentItem: id, currentProgress: 0 }));
+    setSyncProgress((prev) => ({ ...prev, currentItem: id, currentProgress: 5 }));
 
     let fileData: Uint8Array;
     let contentType = "application/json"; // Default to JSON if uploading content data
 
     if (itemUrl) {
       // NFT Upload Case
+
+      if (assetList.some(asset => asset.key === id)) {
+        setSyncProgress((prev) => ({
+          ...prev,
+          totalSynced: (prev.totalSynced || 0) + 1,
+          currentProgress: 100
+        }));
+        return true; // no need to upload again
+      }
+
       const response = await fetch(itemUrl);
       console.log("Fetching URL:", itemUrl);
       if (!response.ok) throw new Error(`Failed to fetch file: ${response.statusText}`);

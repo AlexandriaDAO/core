@@ -9,9 +9,10 @@ import {
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import { natToArweaveId } from "@/utils/id_convert";
-import { upload } from "./uploadToAssetCanister";
+import { uploadAsset } from "./uploadToAssetCanister";
 import { loadContentForTransactions } from "../content/contentDisplayThunks";
 import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
+import { RootState } from "@/store";
 
 export const createAssetCanister = createAsyncThunk<
   string, // Success type
@@ -81,11 +82,11 @@ export const createAssetCanister = createAsyncThunk<
   }
 );
 
-export const getAssetCanister = createAsyncThunk<
+export const getCallerAssetCanister = createAsyncThunk<
   string,
   void,
   { rejectValue: string }
->("assetManager/getAssetCanister", async (_, { rejectWithValue }) => {
+>("assetManager/getCallerAssetCanister", async (_, { rejectWithValue }) => {
   try {
     const actor = await getActorAssetManager();
     const result = await actor.get_caller_asset_canister();
@@ -106,6 +107,11 @@ export const getAssetCanister = createAsyncThunk<
     );
   }
 });
+
+
+
+
+
 export interface syncProgressInterface {
   currentItem: string;
   progress: number;
@@ -129,7 +135,7 @@ export const syncNfts = createAsyncThunk<
   "assetManager/syncNfts",
   async (
     { userPrincipal, userAssetCanister, setSyncProgress, syncProgress },
-    { dispatch, rejectWithValue }
+    { dispatch, getState, rejectWithValue }
   ) => {
     try {
       const actorIcrc7 = await getIcrc7Actor();
@@ -153,33 +159,38 @@ export const syncNfts = createAsyncThunk<
       const fetchedTransactions = JSON.stringify(
         await fetchTransactionsForAlexandrian(tokens)
       );
-      
-// Step 1: Upload fetchedTransactions JSON first
-const transactionUploadResult = await upload({
-  assetCanisterId: userAssetCanister,
-  id: "ContentData",
-  setSyncProgress,
-  syncProgress,
-  contentData: fetchedTransactions, // Only sending JSON data first
-});
+      const state = getState() as RootState;
+      const assetManager = state.assetManager;
+      const assetCanisterId = assetManager.userAssetCanister;
 
-if (!transactionUploadResult) {
-  throw new Error("Failed to upload transaction data.");
-}
+      // Step 1: Upload fetchedTransactions JSON first
+      const transactionUploadResult = await uploadAsset({
+        assetCanisterId: assetCanisterId || "",
+        id: "ContentData",
+        setSyncProgress,
+        syncProgress,
+        contentData: fetchedTransactions, // Only sending JSON data first
+        assetList: assetManager.assetList,
+      });
 
-console.log("Transaction data uploaded successfully!");
+      if (!transactionUploadResult) {
+        throw new Error("Failed to upload transaction data.");
+      }
 
-// Step 2: Upload NFTs one by one
+      console.log("Transaction data uploaded successfully!");
+
+      // Step 2: Upload NFTs one by one
 
       console.log("tokens are ", tokens);
       tokens.reduce(async (prevPromise, token) => {
         await prevPromise; //  before starting the next one
-        const result = await upload({
-          assetCanisterId: userAssetCanister,
+        const result = await uploadAsset({
+          assetCanisterId: assetCanisterId || "",
           itemUrl: "https://arweave.net/" + token,
           id: token,
           setSyncProgress,
           syncProgress,
+          assetList: assetManager.assetList,
         });
 
         // if (result === true) {
@@ -248,22 +259,28 @@ export const fetchUserNfts = createAsyncThunk<
   }
 );
 export const getAssetList = createAsyncThunk<
+  Array<{ key: string; content_type: string }>,
   string,
-  void,
   { rejectValue: string }
->("assetManager/getAssetList", async (_, { rejectWithValue }) => {
+>("assetManager/getAssetList", async (canisterId, { rejectWithValue }) => {
+  if (!canisterId) {
+    return rejectWithValue("No canister ID found");
+  }
+
   try {
-    const actor = await getActorAssetManager();
-    const result = await actor.get_caller_asset_canister();
-    if (result[0]) {
-      const canisterId = result[0]?.assigned_canister_id;
-      if (!canisterId) {
-        return rejectWithValue("No canister ID found");
-      }
-      return canisterId.toString();
-    } else {
-      return rejectWithValue("No canister ID found");
+    const assetActor = await getActorUserAssetCanister(canisterId);
+    const result = await assetActor.list({});
+
+    if (!result || typeof result.keys !== "function") {
+      return rejectWithValue("Invalid response from asset canister");
     }
+
+    const simplifiedList = Array.from(result.entries()).map(([key, value]) => ({
+      key: value.key,
+      content_type: value.content_type || "unknown",
+    }));
+
+    return simplifiedList;
   } catch (error) {
     console.error("Error fetching asset canister:", error);
     return rejectWithValue(
@@ -271,6 +288,7 @@ export const getAssetList = createAsyncThunk<
     );
   }
 });
+
 // export const fetchAssetFromUserCanister = async (key: string, actor: any) => {
 //   try {
 //     // Query to get the file by key
@@ -315,19 +333,14 @@ export const fetchAssetFromUserCanister = async (key: string, actor: any) => {
       throw new Error("File not found");
     }
 
-    const {
-      content,
-      content_type,
-      content_encoding,
-      total_length,
-      sha256,
-    } = initialResponse;
+    const { content, content_type, content_encoding, total_length, sha256 } =
+      initialResponse;
 
     // Convert total_length from BigInt to number safely
     const totalLengthNum = Number(total_length);
-    
+
     // Convert initial content to Uint8Array
-    let firstChunk = Array.isArray(content) 
+    let firstChunk = Array.isArray(content)
       ? new Uint8Array(content)
       : new Uint8Array(content.buffer);
 
@@ -361,14 +374,14 @@ export const fetchAssetFromUserCanister = async (key: string, actor: any) => {
       const chunkContent = Array.isArray(chunkResponse.content)
         ? new Uint8Array(chunkResponse.content)
         : new Uint8Array(chunkResponse.content.buffer);
-      
+
       chunks.push(chunkContent);
     }
 
     // Combine all chunks into a single Uint8Array
     const combinedArray = new Uint8Array(totalLengthNum);
     let offset = 0;
-    
+
     for (const chunk of chunks) {
       combinedArray.set(chunk, offset);
       offset += chunk.length;
@@ -376,13 +389,14 @@ export const fetchAssetFromUserCanister = async (key: string, actor: any) => {
 
     // Verify total length
     if (combinedArray.length !== totalLengthNum) {
-      throw new Error(`Size mismatch: expected ${totalLengthNum} bytes but got ${combinedArray.length} bytes`);
+      throw new Error(
+        `Size mismatch: expected ${totalLengthNum} bytes but got ${combinedArray.length} bytes`
+      );
     }
 
     // Create and return blob
     const blob = new Blob([combinedArray], { type: content_type });
     return { blob, contentType: content_type };
-
   } catch (error) {
     console.error("Error fetching file:", error);
     throw error;

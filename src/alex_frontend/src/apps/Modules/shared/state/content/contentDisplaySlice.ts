@@ -16,12 +16,14 @@ interface ContentDisplayState {
   mintableState: Record<string, MintableStateItem>;
   contentData: Record<string, ContentDataItem>;
   isAuthenticated?: boolean;
+  isUpdated:boolean;
 }
 
 const initialState: ContentDisplayState = {
   transactions: [],
   mintableState: {},
   contentData: {},
+  isUpdated:false,
 };
 
 const contentDisplaySlice = createSlice({
@@ -30,6 +32,8 @@ const contentDisplaySlice = createSlice({
   reducers: {
     setTransactions: (state, action: PayloadAction<Transaction[]>) => {
       state.transactions = action.payload;
+      state.isUpdated=!state.isUpdated;
+
     },
 
     removeTransactionById: (state, action: PayloadAction<string>) => {
@@ -40,9 +44,13 @@ const contentDisplaySlice = createSlice({
     addTransaction: (state, action: PayloadAction<Transaction>) => {
       state.transactions.push(action.payload); 
     },
+    commitAddTransaction: (state) => {
+      state.isUpdated=!state.isUpdated;
+    },
 
     clearTransactions: (state) => {
       state.transactions = [];
+      state.isUpdated=!state.isUpdated;
     },
     setMintableStates: (state, action: PayloadAction<Record<string, MintableStateItem>>) => {
       state.mintableState = { ...state.mintableState, ...action.payload };
@@ -73,6 +81,7 @@ export const {
   clearContentData,
   clearTransactionContent,
   removeTransactionById,
-  addTransaction
+  addTransaction,
+  commitAddTransaction
 } = contentDisplaySlice.actions;
 export default contentDisplaySlice.reducer;

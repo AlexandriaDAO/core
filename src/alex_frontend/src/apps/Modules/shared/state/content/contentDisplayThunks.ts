@@ -6,6 +6,7 @@ import {
   setContentData,
   MintableStateItem,
   addTransaction,
+  commitAddTransaction,
 } from "./contentDisplaySlice";
 import {
   fetchTransactionsApi,
@@ -19,6 +20,7 @@ import {
 } from "@/features/auth/utils/authUtils";
 import { RootState } from "@/store";
 import { fetchAssetFromUserCanister } from "../assetManager/assetManagerThunks";
+import { getAssetCanister } from "../assetManager/utlis";
 
 export const loadContentForTransactions = createAsyncThunk(
   "contentDisplay/loadContent",
@@ -62,132 +64,121 @@ export const loadContentForTransactions = createAsyncThunk(
 );
 
 export const updateTransactions = createAsyncThunk(
-    "contentDisplay/updateTransactions",
-    async (arweaveIds: string[], { dispatch, getState }) => {
-      try {
-        let fetchedTransactions: Transaction[] = [];
-        if (arweaveIds.length === 0) {
-          dispatch(setTransactions([]));
-          return;
-        }
-  
-        const state = getState() as RootState;
-        const sortAsc = state.library.sortAsc;
-        const userAssetCanister = state.assetManager.userAssetCanister;
-        if (userAssetCanister) {
-          const assetActor = await getActorUserAssetCanister(userAssetCanister);
-          const getContentData = await fetchAssetFromUserCanister(
-            "ContentData",
-            assetActor
-          );
-  
-          if (getContentData?.blob) {
-            try {
-              // Convert Blob to JSON
-              const blobData = await getContentData.blob.arrayBuffer();
-              const textData = new TextDecoder().decode(blobData);
-              const jsonData = JSON.parse(textData);
-          
-              // Assuming jsonData is an array of transactions with 'id' property
-              // If it's not an array, wrap it in an array
-              const transactions = Array.isArray(jsonData) ? jsonData : [jsonData];
-          
-              // Create an array of promises for fetching assets
-              // const fetchPromises = transactions.map(async (transaction) => {
-              //   try {
-              //     const result = await fetchAssetFromUserCanister(
-              //       transaction.id,
-              //       assetActor
-              //     );
-                  
-              //     // Create object URL if blob exists
-              //     const assetUrl = result?.blob ? URL.createObjectURL(result.blob) : "";
-                  
-              //     // Return a new object with all existing properties plus the asset URL
-              //     return {
-              //       ...transaction,
-              //       assetUrl
-              //     };
-              //   } catch (error) {
-              //     console.error(`Failed to fetch asset for transaction ${transaction.id}:`, error);
-              //     // Return original transaction without URL if fetch fails
-              //     return {
-              //       ...transaction,
-              //       assetUrl: ""
-              //     };
-              //   }
-              // });
-              const fetchPromises = transactions.map(async (transaction) => {
-                try {
-                  const result = await fetchAssetFromUserCanister(
-                    transaction.id,
-                    assetActor
-                  );
-                  
-                  // Create object URL if blob exists
-                  const assetUrl = result?.blob ? URL.createObjectURL(result.blob) : "";
-                  
-                  // Dispatch immediately for each transaction
-                  dispatch(addTransaction({
-                    ...transaction,
-                    assetUrl
-                  }));
-                } catch (error) {
-                  console.error(`Failed to fetch asset for transaction ${transaction.id}:`, error);
-                  
-                  // Dispatch with empty asset URL on error
-                  dispatch(addTransaction({
-                    ...transaction,
-                    assetUrl: ""
-                  }));
-                }
-              });
-              console.log(`[${new Date().toISOString()}] Before promise ...:(`);
-              // dispatch(addTransaction())
-              // Wait for all fetch operations to complete
-              const processedTransactions = await Promise.all(fetchPromises);
-              console.log(`[${new Date().toISOString()}] After promise ...:(`);
+  "contentDisplay/updateTransactions",
+  async (arweaveIds: string[], { dispatch, getState }) => {
+    try {
+      let fetchedTransactions: Transaction[] = [];
+      if (arweaveIds.length === 0) {
+        dispatch(setTransactions([]));
+        return;
+      }
 
-              // Update fetchedTransactions with the processed data
-              // fetchedTransactions = processedTransactions;
-          
-              console.log("Processed Transactions:", fetchedTransactions);
-            } catch (error) {
-              console.error("Failed to process data:", error);
-              fetchedTransactions = [];
-            }
-          } else {
-            console.warn("No data found in ContentData.");
+      const state = getState() as RootState;
+      const sortAsc = state.library.sortAsc;
+      const { selectedPrincipals } = state.library;
+      const userAssetCanister = state.assetManager.userAssetCanister;
+      let userAssetCanisterd = await getAssetCanister(selectedPrincipals[0]);
+
+      if (userAssetCanisterd) {
+        const assetActor = await getActorUserAssetCanister(userAssetCanisterd);
+        const getContentData = await fetchAssetFromUserCanister(
+          "ContentData",
+          assetActor
+        );
+
+        if (getContentData?.blob) {
+          try {
+            // Convert Blob to JSON
+            const blobData = await getContentData.blob.arrayBuffer();
+            const textData = new TextDecoder().decode(blobData);
+            const jsonData = JSON.parse(textData);
+
+            // Assuming jsonData is an array of transactions with 'id' property
+            // If it's not an array, wrap it in an array
+            const transactions = Array.isArray(jsonData)
+              ? jsonData
+              : [jsonData];
+            const fetchPromises = transactions.map(async (transaction) => {
+              try {
+                const result = await fetchAssetFromUserCanister(
+                  transaction.id,
+                  assetActor
+                );
+
+                // Create object URL if blob exists
+                const assetUrl = result?.blob
+                  ? URL.createObjectURL(result.blob)
+                  : "";
+
+                // Dispatch immediately for each transaction
+                dispatch(
+                  addTransaction({
+                    ...transaction,
+                    assetUrl,
+                  })
+                );
+              } catch (error) {
+                console.error(
+                  `Failed to fetch asset for transaction ${transaction.id}:`,
+                  error
+                );
+
+                // Dispatch with empty asset URL on error
+                dispatch(
+                  addTransaction({
+                    ...transaction,
+                    assetUrl: "",
+                  })
+                );
+              }
+            });
+            console.log(`[${new Date().toISOString()}] Before promise ...:(`);
+            // dispatch(addTransaction())
+            // Wait for all fetch operations to complete
+            const processedTransactions = await Promise.all(fetchPromises);
+            console.log(`[${new Date().toISOString()}] After promise ...:(`);
+            dispatch(commitAddTransaction())
+            // Update fetchedTransactions with the processed data
+            // fetchedTransactions = processedTransactions;
+
+            console.log("Processed Transactions:", fetchedTransactions);
+          } catch (error) {
+            console.error("Failed to process data:", error);
             fetchedTransactions = [];
           }
+        } else {
+          console.warn("No data found in ContentData.");
+          fetchedTransactions = [];
         }
-  
+      } else {
         // Use the direct Arweave client for Alexandrian app
-  
-        // / const fetchedTransactions://await fetchTransactionsForAlexandrian(arweaveIds);
-  
+        const fetchedTransactions = await fetchTransactionsForAlexandrian(
+          arweaveIds
+        );
+
         // Apply sorting based on sortAsc
         const sortedTransactions = sortAsc
           ? fetchedTransactions
           : [...fetchedTransactions].reverse();
-  
-       // dispatch(setTransactions(sortedTransactions));
-  
-        // Set initial mintable state for new transactions
-        // const newMintableStates = fetchedTransactions.reduce(
-        //   (acc, transaction) => {
-        //     acc[transaction.id] = { mintable: false };
-        //     return acc;
-        //   },
-        //   {} as Record<string, MintableStateItem>
-        // );
-        // dispatch(setMintableStates(newMintableStates));
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-        throw error;
+
+        dispatch(setTransactions(sortedTransactions));
       }
+
+      // Set initial mintable state for new transactions
+      const newMintableStates = fetchedTransactions.reduce(
+        (acc, transaction) => {
+          acc[transaction.id] = { mintable: false };
+          return acc;
+        },
+        {} as Record<string, MintableStateItem>
+      );
+      dispatch(setMintableStates(newMintableStates));
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      throw error;
     }
-  );
+  }
+);
 
 export const clearAllTransactions = createAsyncThunk(
   "contentDisplay/clearAllTransactions",
