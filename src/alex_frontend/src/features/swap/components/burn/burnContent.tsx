@@ -99,23 +99,23 @@ const BurnContent = () => {
                 </div>
                 <div className='grid grid-cols-1 2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 mb-12'>
                     <div className='me-0 2xl:me-3 xl:me-3 lg:me-3 md:me-3 sm:me-0 mb-3 2xl:mb-0 xl:mb-0 lg:mb-3 md:mb-3 sm:mb-3'>
-                        <div className='bg-white border py-5 px-5 rounded-borderbox mb-7 '>
+                        <div className='bg-white dark:bg-gray-800 border dark:border-gray-700 py-5 px-5 rounded-borderbox mb-7'>
                             <div className='flex justify-between mb-3'>
-                                <h4 className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-multygray'>Amount</h4>
-                                <input className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-darkgray text-right bg-transparent w-full placeholder-darkgray  focus:outline-none focus:border-transparent' type='integer' value={amountLBRY+""} defaultValue={0} min={0} onChange={(e) => {
+                                <h4 className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-multygray dark:text-gray-300'>Amount</h4>
+                                <input className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-darkgray dark:text-gray-200 text-right bg-transparent w-full placeholder-darkgray dark:placeholder-gray-400 focus:outline-none focus:border-transparent' type='integer' value={amountLBRY+""} defaultValue={0} min={0} onChange={(e) => {
                                     handleAmountLBRYChange(e)
                                 }} />
                             </div>
                             <div className='flex justify-between'>
                                 <div className='flex items-center'>
-                                    <strong className='text-base text-multygray font-medium me-1'>Balance:<span className='text-darkgray ms-2'>{swap.lbryBalance} LBRY</span></strong>
+                                    <strong className='text-base text-multygray dark:text-gray-300 font-medium me-1'>Balance:<span className='text-darkgray dark:text-gray-200 ms-2'>{swap.lbryBalance} LBRY</span></strong>
                                     <img className='w-4 h-4' src="images/8-logo.png" alt="apple" />
                                 </div>
-                                <Link to="" role="button" className='text-[#A7B1D7] underline text-base font-bold' onClick={() => handleMaxLbry()} >Max</Link>
+                                <Link to="" role="button" className='text-[#A7B1D7] dark:text-blue-400 underline text-base font-bold' onClick={() => handleMaxLbry()} >Max</Link>
                             </div>
                         </div>
-                        <h5 className='text-xl font-medium mb-4'>you get</h5>
-                        <div className=' border background-color: #efefef; py-4 px-5 rounded-full mb-4'>
+                        <h5 className='text-xl font-medium mb-4 dark:text-gray-200'>you get</h5>
+                        <div className='border dark:border-gray-700 bg-[#efefef] dark:bg-gray-800 py-4 px-5 rounded-full mb-4'>
                             <div className='flex justify-between'>
                                 <div className='flex items-center'>
                                     <div className='me-3'>
@@ -130,7 +130,7 @@ const BurnContent = () => {
                                 </h3>
                             </div>
                         </div>
-                        <div className=' border background-color: #efefef; py-4 px-5 rounded-full mb-4'>
+                        <div className='border dark:border-gray-700 bg-[#efefef] dark:bg-gray-800 py-4 px-5 rounded-full mb-4'>
                             <div className='flex justify-between'>
                                 <div className='flex items-center'>
                                     <div className='me-3'>
@@ -184,7 +184,7 @@ const BurnContent = () => {
                         </div>}
                         <div className="terms-condition-wrapper flex tems-baseline">
                             <span className="text-[#FF37374D] mr-2 text-xl font-semibold">*</span>
-                            <p className="lg:text-lg md:text-base sm:text-sm font-semibold md:pr-5 xs:pr-0 text-[#525252] md:w-9/12 xs:w-full">If the transaction doesn’t complete as expected, please check the redeem page to locate your tokens.</p>
+                            <p className="lg:text-lg md:text-base sm:text-sm font-semibold md:pr-5 xs:pr-0 text-[#525252] dark:text-gray-300 md:w-9/12 xs:w-full">If the transaction doesn't complete as expected, please check the redeem page to locate your tokens.</p>
                         </div>
                     </div>
                     <BurnInfo maxBurnAllowed={maxBurnAllowed} />

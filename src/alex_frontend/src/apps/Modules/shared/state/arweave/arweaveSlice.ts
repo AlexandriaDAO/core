@@ -59,10 +59,6 @@ const arweaveSlice = createSlice({
     clearPredictions: (state) => {
       state.predictions = {};
     },
-    resetSearch: (state) => {
-      state.searchState = initialState.searchState;
-      state.predictions = {};
-    }
   },
 });
 
@@ -86,7 +82,6 @@ export const {
   setPredictionResults,
   setNsfwModelLoaded,
   clearPredictions,
-  resetSearch
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;

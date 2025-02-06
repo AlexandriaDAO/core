@@ -10,7 +10,6 @@ import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalan
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { useWiper } from '@/apps/Modules/shared/state/wiper';
-import { resetSearch } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
 import { nsfwService } from '@/apps/Modules/shared/services/nsfwService';
 
 function Permasearch() {

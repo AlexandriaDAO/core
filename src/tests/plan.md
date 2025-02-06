@@ -1,58 +1,13 @@
+ToDo Before Next Frontend Deployment:
+- Dark Mode.
+- Out-of-order Alexandrian Results.
+- Look up how sendContent.tsx actually works.
+- Put the proper token logos throughout the swap tab.
 
 
 
-I have done some analysis of the code,
-
-following are the issues that I found, which are making our app slow
-
-
-The component LibrarySearch has a useEffect hook.
-Inside useEffect, on every transacation change it dispatches an action:
-dispatch(loadContentForTransactions(transactions));
-
-Function: loadContentForTransactions
-This function returns a Promise and iterates over all transactions using .map().
-
-Inside the mapping, two asynchronous calls are made:
-const content = await ContentService.loadContent(transaction);
-const urls = await ContentService.getContentUrls(transaction);
-
-Function: ContentService.loadContent(transaction)
-
-This function determines the type of content (image, video, etc.) and calls a corresponding function.
-If it's an image, it calls:
-const content = await ContentService.handleImageContent(url);
-
-Function: handleImageContent(url: string): Promise
-This function fetches content from the given URL.
-fetch(url) and response.blob() converts the data into a binary format.
-URL.createObjectURL(blob) generates a local URL for the fetched content.
-The function returns an object containing the generated object URL.
-
-Why are we using URL.createObjectURL(blob) instead of just url?
-By this apporach we are loading content before even displaying to the user it is causing extra time to load.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Dark Mode ToDo:
+- Swap page words are all black in dark mode.
 
 
 
