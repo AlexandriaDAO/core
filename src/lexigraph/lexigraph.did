@@ -7,6 +7,6 @@ type ShelfUpdate = record {
 type Slot = record { id : nat32; content : SlotContent; position : nat32 };
 type SlotContent = variant { Nft : text; Markdown : text };
 service : {
-  store_shelf : (principal, text, opt text, vec Slot) -> (Result);
+  store_shelf : (text, opt text, vec Slot) -> (Result);
   update_shelf : (text, ShelfUpdate) -> (Result);
 }

@@ -17,7 +17,8 @@ Dark Mode ToDo:
 
 
 
-
+#### Module Design Optimizations:
+- Can tagSelector.tsx and contentTagsSelector.tsx and contentTypeToggleGroup.tsx be combined?
 
 
 
