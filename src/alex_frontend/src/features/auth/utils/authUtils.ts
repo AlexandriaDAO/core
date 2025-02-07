@@ -62,7 +62,7 @@ import {
 import {
   createActor as createActorAssetCanister,
   asset_canister,
-} from "../../../../../asset_canister"; //
+} from "../../../../../asset_canister"; 
 
 import {
   asset_manager,

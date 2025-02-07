@@ -1,9 +1,10 @@
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import React, { useEffect, useState } from 'react';
-import { createAssetCanister, fetchUserNfts, getCallerAssetCanister, getAssetList, syncNfts, syncProgressInterface } from '../state/assetManager/assetManagerThunks';
-import { ArrowUp, LoaderPinwheel } from "lucide-react";
+import { createAssetCanister, getCallerAssetCanister, getAssetList, syncNfts, syncProgressInterface } from '../state/assetManager/assetManagerThunks';
+import {  LoaderPinwheel } from "lucide-react";
 import { Button } from '@/lib/components/button';
+import { Description, FiltersButton } from '@/apps/app/Permasearch/styles';
 
 const AssetManager = () => {
   const dispatch = useAppDispatch();
@@ -12,7 +13,7 @@ const AssetManager = () => {
   const assetManager = useAppSelector((state) => state.assetManager);
   const [userAssetCanister, setUserAssetCanister] = useState<string | null>(null);
   const [syncProgress, setSyncProgress] = useState<syncProgressInterface>({
-    currentItem: "0",
+    currentItem: "",
     progress: 0,       // Default progress
     totalSynced: 0,
     currentProgress: 0,
@@ -45,14 +46,15 @@ const AssetManager = () => {
   }, [])
 
 
-  return (<div className="bg-gray-100 flex flex-col items-center justify-center py-10 absolute right-[50px]">
+  return (<div className="border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 py-5 px-5 rounded-2xl absolute right-[50px] top-[150px] w-96">
     {userAssetCanister === null ? (
-      <div className="bg-white shadow-md rounded-lg p-6 max-w-md w-full text-center">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Create Asset Canister</h2>
+      <div className="p-6 max-w-md w-full text-center">
+        <Description>Asset Canister</Description>
         <Button
           onClick={() => createUserAssetCanister()}
           disabled={assetManager.isLoading}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300"
+          className="bg-gray-900 border border-gray-900 text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors mt-2     color: var(--brightyellow);
+"
         >
           Create {assetManager.isLoading ? (
             <LoaderPinwheel className="animate-spin mr-2" />
@@ -60,10 +62,10 @@ const AssetManager = () => {
         </Button>
       </div>
     ) : (
-      <div className="bg-white shadow-md rounded-lg p-6 max-w-md w-full text-center mb-4">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Asset Canister ID</h2>
+      <div className="p-0 max-w-md w-full text-center">
+        <Description>Asset Canister</Description>
         <p className="text-lg text-gray-600 mb-4">
-          <span className="font-mono font-semibold text-[#525252]">{assetManager.userAssetCanister}</span>
+          <span className="font-mono font-semibold text-[#7F8EA3]">{assetManager.userAssetCanister}</span>
         </p>
         <Button disabled={assetManager.isLoading} className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors" onClick={() => { sync() }} >
           Sync  {assetManager.isLoading ? (
@@ -72,12 +74,13 @@ const AssetManager = () => {
         </Button>
       </div>
     )}
-    <h1 className='text-xl'>Synced :{syncProgress.totalSynced}</h1>
 
-    {syncProgress?.currentItem && (
+    {syncProgress?.currentItem!="" && (
       <div className="w-full max-w-md space-y-3">
+        <h1 className='text-xl'>Synced :{syncProgress.totalSynced}</h1>
+
         {/*  Current Item Being Processed */}
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600 mb-2">
           {syncProgress.currentProgress === 100
             ? "Upload Complete"
             : `Uploading: ${syncProgress.currentItem}`}

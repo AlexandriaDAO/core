@@ -138,10 +138,6 @@
       "candid": "src/icp_swap_factory/icp_swap_factory.did",
       "specified_id": "ggzvv-5qaaa-aaaag-qck7a-cai"
     },
-    "asset_canister": {
-      "type": "assets",
-      "source": ["src/asset_canister/assets"]
-    },
     "asset_manager": {
       "type": "rust",
       "package": "asset_manager",

@@ -193,9 +193,7 @@ export const syncNfts = createAsyncThunk<
           assetList: assetManager.assetList,
         });
 
-        // if (result === true) {
-        //   setSyncedCount((prevCount) => prevCount + 1);
-        // }
+
       }, Promise.resolve()); // Initial value to start the chain
 
       //  upload({ assetCanisterId: assetManager.userAssetCanister, setUploadProgress })
@@ -247,7 +245,6 @@ export const fetchUserNfts = createAsyncThunk<
           return result?.blob ? URL.createObjectURL(result.blob) : "";
         })
       );
-      console.log("urls", urls);
 
       return urls;
     } catch (error) {

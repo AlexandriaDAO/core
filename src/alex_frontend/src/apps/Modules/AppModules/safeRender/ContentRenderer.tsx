@@ -39,12 +39,12 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
 
   return (
     <div className={`relative ${inModal ? 'w-full h-full' : 'w-full h-full'}`}>
-      {/* <ContentValidator
+      <ContentValidator
         transactionId={transaction.id}
         contentUrl={content.url || ''}
         contentType={contentType}
         imageObjectUrl={content.imageObjectUrl || ''}
-      /> */}
+      />
       <SandboxRenderer
         transaction={transaction}
         content={content}

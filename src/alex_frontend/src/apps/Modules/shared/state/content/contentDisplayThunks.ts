@@ -67,9 +67,9 @@ export const updateTransactions = createAsyncThunk(
   "contentDisplay/updateTransactions",
   async (arweaveIds: string[], { dispatch, getState }) => {
     try {
+      dispatch(setTransactions([]));
       let fetchedTransactions: Transaction[] = [];
       if (arweaveIds.length === 0) {
-        dispatch(setTransactions([]));
         return;
       }
 
@@ -78,7 +78,7 @@ export const updateTransactions = createAsyncThunk(
       const { selectedPrincipals } = state.library;
       const userAssetCanister = state.assetManager.userAssetCanister;
       let userAssetCanisterd = await getAssetCanister(selectedPrincipals[0]);
-
+      // user asset Canister exists
       if (userAssetCanisterd) {
         const assetActor = await getActorUserAssetCanister(userAssetCanisterd);
         const getContentData = await fetchAssetFromUserCanister(
@@ -93,11 +93,11 @@ export const updateTransactions = createAsyncThunk(
             const textData = new TextDecoder().decode(blobData);
             const jsonData = JSON.parse(textData);
 
-            // Assuming jsonData is an array of transactions with 'id' property
-            // If it's not an array, wrap it in an array
-            const transactions = Array.isArray(jsonData)
-              ? jsonData
-              : [jsonData];
+            let transactions = Array.isArray(jsonData) ? jsonData : [jsonData];
+            // Filter transactions that match the provided arweaveIds
+            transactions = transactions.filter(
+              (tx) => arweaveIds.includes(tx.id) // transaction has an 'id' field comparing with ids in asset Canister
+            );
             const fetchPromises = transactions.map(async (transaction) => {
               try {
                 const result = await fetchAssetFromUserCanister(
@@ -115,6 +115,24 @@ export const updateTransactions = createAsyncThunk(
                   addTransaction({
                     ...transaction,
                     assetUrl,
+                  })
+                );
+
+                // testing 
+                const content = await ContentService.loadContent(transaction);
+                const urls = await ContentService.getContentUrls(
+                  transaction,
+                  content
+                );
+
+                // Combine content and urls into a single dispatch
+                dispatch(
+                  setContentData({
+                    id: transaction.id,
+                    content: {
+                      ...content,
+                      urls,
+                    },
                   })
                 );
               } catch (error) {
@@ -137,7 +155,7 @@ export const updateTransactions = createAsyncThunk(
             // Wait for all fetch operations to complete
             const processedTransactions = await Promise.all(fetchPromises);
             console.log(`[${new Date().toISOString()}] After promise ...:(`);
-            dispatch(commitAddTransaction())
+         ///   dispatch(commitAddTransaction());
             // Update fetchedTransactions with the processed data
             // fetchedTransactions = processedTransactions;
 

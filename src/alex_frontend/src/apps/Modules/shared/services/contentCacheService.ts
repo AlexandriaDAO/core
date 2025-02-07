@@ -34,7 +34,6 @@ class ContentCacheService {
     return new Promise((resolve) => {
       const video = document.createElement("video");
       video.crossOrigin = "anonymous";
-
       // Add timeout to prevent hanging
       const timeout = setTimeout(() => {
         cleanup();
@@ -95,6 +94,7 @@ class ContentCacheService {
   }
 
   private async handleImageContent(url: string): Promise<CachedContent> {
+
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const blob = await response.blob();

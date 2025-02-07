@@ -23,7 +23,8 @@ export default function LibrarySearch() {
       dispatch(loadContentForTransactions(transactions))
         .finally(() => setIsLoading(false));
     }
-  }, [istransactionUpdated, istransactionUpdated,dispatch, isLoading]);
+
+  }, [istransactionUpdated,dispatch]); //  isLoading is removed, causing useEffect to execute infinte 
 
   useEffect(() => {
     if (selectedPrincipals.length > 0 && collection) {

@@ -65,7 +65,7 @@ const assetManagerSlice = createSlice({
       .addCase(getCallerAssetCanister.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-        toast.error(action.payload as string);
+      //  toast.error(action.payload as string);
       })
       .addCase(fetchUserNfts.pending, (state) => {
         state.isLoading = true;
