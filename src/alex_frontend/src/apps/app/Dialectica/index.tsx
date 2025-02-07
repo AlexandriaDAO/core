@@ -57,7 +57,7 @@ function Dialectica() {
 	const topComponent = (
 		<div className="pb-4 text-center">
 			<Button
-				className={`bg-[#353535] lg:h-14 xs:h-10 lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "userNfts" ? "bg-white text-[#353535]" : ""}`}
+				className={`bg-gray-900lg:h-14 xs:h-10 lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "userNfts" ? "bg-white text-[#353535]" : ""}`}
 				disabled={!user?.principal}
 				onClick={() => {
 					if (user) {
@@ -69,7 +69,7 @@ function Dialectica() {
 				My Nfts
 			</Button>
 			<Button
-				className={`bg-[#353535] lg:h-14 xs:h-10 lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "marketPlace" ? "bg-white text-[#353535]" : ""}`}
+				className={`bg-gray-900lg:h-14 xs:h-10 lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "marketPlace" ? "bg-white text-[#353535]" : ""}`}
 				onClick={() => {
 					setActiveButton("marketPlace");
 					handleSearch();
@@ -78,7 +78,7 @@ function Dialectica() {
 				MarketPlace
 			</Button>
 			<Button
-				className={`bg-[#353535] lg:h-14 xs:h-10 lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] ${activeButton === "userListings" ? "bg-white text-[#353535]" : ""}`}
+				className={`bg-gray-900lg:h-14 xs:h-10 lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] ${activeButton === "userListings" ? "bg-white text-[#353535]" : ""}`}
 				disabled={!user?.principal}
 				onClick={() => {
 					setActiveButton("userListings");

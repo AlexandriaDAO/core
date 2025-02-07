@@ -26,19 +26,15 @@ export default function CollectionSelector() {
         >
           <ToggleGroupItem
             value="NFT"
-            className={`px-4 py-2 text-sm font-medium rounded-[30px] transition-colors
-              ${collection === 'NFT'
-                ? 'bg-[#2D55FF] text-white hover:bg-[#2D55FF]/90'
-                : 'bg-[#F3F3F3] text-black hover:bg-[#E5E5E5]'}`}
+            variant="collection"
+            className="px-4 py-2 text-sm font-medium rounded-[30px] transition-colors"
           >
             NFTs
           </ToggleGroupItem>
           <ToggleGroupItem
             value="SBT"
-            className={`px-4 py-2 text-sm font-medium rounded-[30px] transition-colors
-              ${collection === 'SBT'
-                ? 'bg-[#2D55FF] text-white hover:bg-[#2D55FF]/90'
-                : 'bg-[#F3F3F3] text-black hover:bg-[#E5E5E5]'}`}
+            variant="collection"
+            className="px-4 py-2 text-sm font-medium rounded-[30px] transition-colors"
           >
             SBTs
           </ToggleGroupItem>

@@ -24,7 +24,7 @@ export const PageContainer = styled.div`
 `;
 
 export const Title = styled.h1`
-  color: var(--black-grey-100, #353535);
+  color: hsl(var(--foreground));
   text-align: center;
   font-family: Syne;
   font-size: 32px;
@@ -37,7 +37,7 @@ export const Title = styled.h1`
 `;
 
 export const Description = styled.p`
-  color: var(--black-grey-100, #353535);
+  color: hsl(var(--foreground));
   text-align: center;
   font-family: Syne;
   font-size: 18px;
@@ -50,7 +50,7 @@ export const Description = styled.p`
 `;
 
 export const Hint = styled.p`
-  color: var(--black-grey-300, #808080);
+  color: hsl(var(--muted-foreground));
   text-align: center;
   font-family: Syne;
   font-size: 14px;
@@ -99,14 +99,18 @@ export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
   }
   
   ${({ $isOpen }) => $isOpen ? `
-    background: var(--black-grey-100, #353535);
-    color: #F3F3F3;
+    background: var(--balancebox, #3A3630);
+    color: var(--brightyellow);
     border: none;
     box-shadow: 0px 0px 4px 0px rgba(32, 0, 213, 0.25), 0px 0px 0px 4px rgba(197, 207, 249, 0.35);
   ` : `
-    background: white;
-    color: #353535;
-    border: 1px solid #353535;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    &:hover {
+      background: var(--balancebox, #3A3630);
+      color: var(--brightyellow);
+    }
   `}
 `;
 
@@ -119,9 +123,9 @@ export const SearchButton = styled.button`
   gap: 10px;
   width: 100%;
   border-radius: 25px;
-  background: var(--black-grey-100, #353535);
+  background: var(--balancebox, #3A3630);
   border: none;
-  color: white;
+  color: var(--brightyellow);
   cursor: pointer;
   font-family: Syne;
   font-size: 14px;
@@ -138,6 +142,10 @@ export const SearchButton = styled.button`
   &:disabled {
     opacity: 0.7;
     cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: #2A2620;
   }
 `;
 

@@ -66,13 +66,13 @@ function Header() {
 		setIsMenuOpen(!isMenuOpen);
 	};
 
-	// bg-[#353535] 
+	// bg-gray-900
 
 	return (
-		<div className="flex-grow-0 flex-shrink-0 bg-[#2B2A28] basis-24 flex flex-col justify-center items-stretch lg:px-10 md:px-8 sm:px-6 xs:px-4">
-			<div className="flex-grow-0 flex-shrink-0 flex basis-24 justify-between items-center w-full ">
+		<div className="flex-grow-0 flex-shrink-0 bg-gray-900 basis-24 flex flex-col justify-center items-stretch lg:px-10 md:px-8 sm:px-6 xs:px-4">
+			<div className="flex-grow-0 flex-shrink-0 flex basis-24 justify-between items-center w-full">
 				<Logo />
-				<div className="md:flex sm:hidden xs:hidden w-full justify-between ">
+				<div className="md:flex sm:hidden xs:hidden w-full justify-between">
 					<Tabs />
 
 					<div className="flex gap-2 justify-between items-center">
@@ -81,7 +81,7 @@ function Header() {
 					</div>
 				</div>
 				<div className="hidden md:hidden sm:block xs:block">
-					<button className="w-6" onClick={toggleMenu}>
+					<button className="w-6 text-foreground" onClick={toggleMenu}>
 						<img src="images/menu.svg" alt="menu-icon" />
 					</button>
 				</div>

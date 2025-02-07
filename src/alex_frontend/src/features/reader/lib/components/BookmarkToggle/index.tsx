@@ -57,7 +57,7 @@ const BookmarkToggle: React.FC<BookmarkToggleProps> = ({
 					onClick={onRemoveBookmark}
 					size={30}
 					color="#F6F930"
-					className={`cursor-pointer border border-solid border-[#F6F930] p-1 rounded-md`}
+					className={`cursor-pointer border border-solid border-brightyellow p-1 rounded-md`}
 				/>
 			) : (
 				<BookmarkPlus
