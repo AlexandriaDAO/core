@@ -111,7 +111,7 @@ export function SearchContainer({
           <Button
             onClick={handleShowMoreClick}
             disabled={isLoading}
-            className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
+            className="bg-gray-900text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
           >
             {isLoading ? (
               <LoaderPinwheel className="animate-spin mr-2" />

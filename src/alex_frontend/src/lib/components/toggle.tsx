@@ -7,12 +7,14 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const toggleVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground",
+  "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground",
   {
     variants: {
       variant: {
-        default: "bg-transparent",
+        default: "bg-transparent hover:bg-muted hover:text-muted-foreground",
         outline: "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+        tag: "border border-input bg-transparent data-[state=off]:hover:bg-[#2A2620] data-[state=on]:bg-balancebox data-[state=on]:text-[#F6F930] data-[state=on]:hover:bg-[hsl(10,35%,20%)]",
+        collection: "border border-input bg-transparent data-[state=off]:hover:bg-[#2A2620] data-[state=on]:bg-balancebox data-[state=on]:text-[#F6F930] data-[state=on]:hover:bg-[hsl(10,35%,20%)]",
       },
       size: {
         default: "h-10 px-3",

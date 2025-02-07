@@ -87,11 +87,9 @@ const TagSelector: React.FC = () => {
           <ToggleGroupItem
             key={type.mimeType}
             value={type.mimeType}
-            variant="outline"
+            variant="tag"
             className={`px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm rounded-full transition-colors
-              ${tags.includes(type.mimeType)
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'hover:bg-muted'}`}
+              ${!tags.includes(type.mimeType) && 'hover:bg-muted'}`}
           >
             {type.displayName}
           </ToggleGroupItem>

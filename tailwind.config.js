@@ -52,6 +52,31 @@ module.exports = {
   			smswapheading: '24px'
   		},
   		colors: {
+			// //  OG from Zeeshan with the blue tone.
+  			// gray: {
+  			// 	50: 'rgb(249, 250, 251)',
+  			// 	100: 'rgb(243, 244, 246)',
+  			// 	200: 'rgb(229, 231, 235)',
+  			// 	300: 'rgb(209, 213, 219)',
+  			// 	400: 'rgb(156, 163, 175)',
+  			// 	500: 'rgb(107, 114, 128)',
+  			// 	600: 'rgb(75, 85, 99)',
+  			// 	700: 'rgb(55, 65, 81)',
+  			// 	800: 'rgb(31, 31, 31)',
+  			// 	900: 'rgb(17, 24, 39)',
+  			// },
+			  gray: {
+				50: 'rgb(253, 252, 249)',
+				100: 'rgb(249, 247, 242)',
+				200: 'rgb(240, 237, 229)',
+				300: 'rgb(224, 220, 208)',
+				400: 'rgb(194, 189, 173)',
+				500: 'rgb(161, 155, 136)',
+				600: 'rgb(127, 121, 104)',
+				700: 'rgb(96, 92, 79)',
+				800: 'rgb(66, 64, 58)',
+				900: 'rgb(53, 52, 48)',   
+			  },
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
@@ -98,16 +123,23 @@ module.exports = {
   				foreground: 'hsl(var(--card-foreground))'
   			},
   			multycolor: '#FF9900',
+			brightyellow: '#F6F930',
   			multygray: '#808080',
   			lightgray: '#CCCCCC',
   			radiocolor: '#353535',
   			swapinput: '#32524D',
   			swaptext: '#5C5C5C',
   			swapvalue: '#31524E',
-  			darkgray: '#525252'
+  			darkgray: '#525252',
+  			white: '#FFFFFF',
+  			black: '#000000',
+  			transparent: 'transparent',
+  			current: 'currentColor',
   		},
   		backgroundColor: {
-  			balancebox: '#353535',
+			  balancebox: '#3A3630', // I think it's a winner.
+  			// balancebox: '#353535',  // OG Grey
+			// balancebox: 'rgb(74, 72, 63)',
   			sendbtnbg: '#FF3737',
   			mintbtnbg: '#92FF71',
   			receive: '#92FF71'

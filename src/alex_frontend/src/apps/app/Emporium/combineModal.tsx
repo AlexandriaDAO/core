@@ -181,13 +181,13 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
                     <div className="mt-4 flex justify-between mb-4 flex-shrink-0">
                         <Button
                             onClick={onClose}
-                            className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl sm:me-5 xs:mb-2 hover:bg-white hover:text-[#353535]"
+                            className="bg-gray-900h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl sm:me-5 xs:mb-2 hover:bg-white hover:text-[#353535]"
                         >
                             Cancel
                         </Button>
                         <Button
                             onClick={handleAction}
-                            className="bg-[#353535] h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl hover:bg-white hover:text-[#353535]"
+                            className="bg-gray-900h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl hover:bg-white hover:text-[#353535]"
                         >
                             Confirm
                         </Button>

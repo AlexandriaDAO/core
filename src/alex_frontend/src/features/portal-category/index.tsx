@@ -80,7 +80,7 @@ function PortalCategory() {
 				className="py-1 text-xl flex items-center justify-between gap-4 border-b border-solid border-black"
 			>
 				<span>Category</span>
-				{selected.length > 0 && <span className="absolute top-0 right-4 w-4 h-4 p-[10px] flex justify-center items-center bg-black text-[#F6F930] font-roboto-condensed font-medium text-sm rounded-full">{selected.length}</span>}
+				{selected.length > 0 && <span className="absolute top-0 right-4 w-4 h-4 p-[10px] flex justify-center items-center bg-black text-brightyellow font-roboto-condensed font-medium text-sm rounded-full">{selected.length}</span>}
 				<div
 					className={`transform transition-transform duration-200 ${
 						visible ? "rotate-180" : "rotate-0"

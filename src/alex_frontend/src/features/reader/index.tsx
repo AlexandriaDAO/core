@@ -164,7 +164,7 @@ export const Reader: React.FC<IReaderProps> = ({
                     </div>
                     <div className="bg-[#828282] rounded-full h-3">
                         <div
-                            className="bg-[#F6F930] h-3 rounded-full"
+                            className="bg-brightyellow h-3 rounded-full"
                             style={{ width: percentage + "%" }}
                         ></div>
                     </div>
@@ -397,7 +397,7 @@ export const Reader: React.FC<IReaderProps> = ({
 // 					</div>
 // 					<div className="bg-[#828282] rounded-full h-3">
 // 						<div
-// 							className="bg-[#F6F930] h-3 rounded-full"
+// 							className="bg-brightyellow h-3 rounded-full"
 // 							style={{ width: percentage+"%" }}
 // 						></div>
 // 					</div>
@@ -512,7 +512,7 @@ export const Reader: React.FC<IReaderProps> = ({
 //                     </div>
 //                     <div className="bg-[#828282] rounded-full h-3">
 //                         <div
-//                             className="bg-[#F6F930] h-3 rounded-full"
+//                             className="bg-brightyellow h-3 rounded-full"
 //                             style={{ width: percentage+"%" }}
 //                         ></div>
 //                     </div>

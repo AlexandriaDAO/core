@@ -2,7 +2,7 @@ import React from "react";
 
 const HeaderSkeleton = () => {
 	return (
-        <div className="flex-grow-0 flex-shrink-0 bg-[#353535] basis-24">
+        <div className="flex-grow-0 flex-shrink-0 bg-gray-900basis-24">
             <div className="h-24 px-10 flex items-center justify-between">
                 <div className="w-32 h-8 bg-gray-600 rounded animate-pulse" />
                 {/* Logo */}

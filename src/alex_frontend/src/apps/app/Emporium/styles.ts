@@ -16,12 +16,12 @@ export const PageContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
   @media(max-width:575px){
-  max-width: 100%;
+    max-width: 100%;
   }
 `;
 
 export const Title = styled.h1`
-  color: var(--black-grey-100, #353535);
+  color: hsl(var(--foreground));
   text-align: center;
   font-family: Syne;
   font-size: 48px;
@@ -30,7 +30,7 @@ export const Title = styled.h1`
 `;
 
 export const Description = styled.p`
-  color: var(--black-grey-100, #353535);
+  color: hsl(var(--foreground));
   text-align: center;
   font-family: Syne;
   font-size: 24px;
@@ -39,7 +39,7 @@ export const Description = styled.p`
 `;
 
 export const Hint = styled.p`
-  color: var(--black-grey-300, #808080);
+  color: hsl(var(--muted-foreground));
   text-align: center;
   font-family: Syne;
   font-size: 18px;
@@ -52,15 +52,13 @@ export const ControlsContainer = styled.div<{ $isOpen: boolean }>`
   width: 100%;
   gap: 16px;
   margin-bottom: ${props => props.$isOpen ? '24px' : '0'};
- flex-wrap:wrap;
- justify-content:center;
+  flex-wrap: wrap;
+  justify-content: center;
 
- @media(max-width:640px){
-   margin-bottom:10px;
- }
-
+  @media(max-width:640px){
+    margin-bottom: 10px;
+  }
 `;
-
 
 export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
   display: flex;
@@ -78,14 +76,14 @@ export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
   font-size: 16px;
   
   ${({ $isOpen }) => $isOpen ? `
-    background: var(--black-grey-100, #353535);
-    color: #F3F3F3;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
     border: none;
     box-shadow: 0px 0px 4px 0px rgba(32, 0, 213, 0.25), 0px 0px 0px 4px rgba(197, 207, 249, 0.35);
   ` : `
-    background: white;
-    color: #353535;
-    border: 1px solid #353535;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
   `}
 `;
 
@@ -99,9 +97,9 @@ export const SearchButton = styled.button`
   flex: 1 0 0;
   min-width: 280px;
   border-radius: 30px;
-  background: var(--black-grey-100, #353535);
+  background: hsl(var(--primary));
   border: none;
-  color: white;
+  color: hsl(var(--primary-foreground));
   cursor: pointer;
   font-family: Syne;
   font-size: 16px;
@@ -116,6 +114,7 @@ export const SearchFormContainer = styled.div<{ $isOpen: boolean }>`
   width: 100%;
   max-width: 800px;
 `; 
+
 export const Paginate = styled.div<{ $isOpen?: boolean }>`
   .pagination {
     display: flex;
@@ -130,34 +129,35 @@ export const Paginate = styled.div<{ $isOpen?: boolean }>`
 
   .pagination li a {
     padding: 8px 12px;
-    border: 1px solid #000000;
+    border: 1px solid hsl(var(--border));
     border-radius: 8px;
-    color: #000000;
+    color: hsl(var(--foreground));
     text-decoration: none;
     cursor: pointer;
     @media(max-width:767px){
-    font-size:11px;
-    padding:5px 7px;
+      font-size: 11px;
+      padding: 5px 7px;
     }
   }
 
   .pagination li a:hover {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
   }
 
   .pagination .selected a {
-    background-color: #000000;
-    color: white;
-    border-color: #000000;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border-color: hsl(var(--primary));
   }
 
   .pagination .disabled a {
-    color:rgba(0, 0, 0, 0.35);
+    color: hsl(var(--muted-foreground));
     cursor: not-allowed;
   }
-    .previous a {
-      border: none !importatn;
-    }
+
+  .previous a {
+    border: none !important;
+  }
 `;
 

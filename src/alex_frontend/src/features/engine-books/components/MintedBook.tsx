@@ -129,7 +129,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 					{processing ? (
 						<button
 							disabled
-							className="cursor-not-allowed opacity-50 flex justify-center items-center gap-1 px-2 py-1 bg-black rounded text-[#F6F930] font-medium font-roboto-condensed text-base"
+							className="cursor-not-allowed opacity-50 flex justify-center items-center gap-1 px-2 py-1 bg-black rounded text-brightyellow font-medium font-roboto-condensed text-base"
 						>
 							<span>Waiting...</span>
 							<LoaderCircle
@@ -140,7 +140,7 @@ const MintedBook: React.FC<MintedBookProps> = ({ book }) => {
 					) : added && (
 						<button
 							onClick={handleRemoveBook}
-							className="flex justify-center items-center gap-1 px-2 py-1 bg-black rounded cursor-pointer text-[#F6F930] hover:text-yellow-100 font-medium font-roboto-condensed text-base"
+							className="flex justify-center items-center gap-1 px-2 py-1 bg-black rounded cursor-pointer text-brightyellow hover:text-yellow-100 font-medium font-roboto-condensed text-base"
 						>
 							<span>Remove From Engine</span>
 						</button>

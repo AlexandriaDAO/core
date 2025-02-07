@@ -49,7 +49,7 @@ const SearchResult = () => {
 					{limit < 1000 && (
 						<button
 							onClick={loadMore}
-							className="self-center mt-5 cursor-pointer flex justify-center items-center gap-1 px-2 py-1 bg-black rounded text-[#F6F930] font-medium font-roboto-condensed text-base"
+							className="self-center mt-5 cursor-pointer flex justify-center items-center gap-1 px-2 py-1 bg-black rounded text-brightyellow font-medium font-roboto-condensed text-base"
 						>
 							<span>Load More</span>
 						</button>
