@@ -1,12 +1,19 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setIsLoading } from './arweaveSlice';
-import { setMintableStates } from '../content/contentDisplaySlice';
+import { setIsLoading, setPredictionResults, PredictionResults } from './arweaveSlice';
 import { setTransactions } from '../content/contentDisplaySlice';
 import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
 import { SearchState } from '../../../shared/types/queries';
 import { loadContentForTransactions } from '../content/contentDisplayThunks';
 import { RootState } from '@/store';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
+
+// Create a thunk to handle prediction results
+export const updatePredictionResults = createAsyncThunk(
+  'arweave/updatePredictionResults',
+  async ({ id, predictions }: { id: string; predictions: PredictionResults }, { dispatch }) => {
+    dispatch(setPredictionResults({ id, predictions }));
+  }
+);
 
 interface SearchParams {
   searchState: SearchState;
@@ -62,13 +69,6 @@ export const performSearch = createAsyncThunk(
       const combinedTransactions = [...existingTransactions, ...uniqueNewTransactions];
       
       dispatch(setTransactions(combinedTransactions));
-      
-      // Set initial mintable state for new transactions only
-      const newMintableStates = uniqueNewTransactions.reduce((acc, transaction) => {
-        acc[transaction.id] = { mintable: false };
-        return acc;
-      }, {} as Record<string, { mintable: boolean }>);
-      dispatch(setMintableStates(newMintableStates));
 
       // Load content and URLs for the new transactions only
       await dispatch(loadContentForTransactions(uniqueNewTransactions));

@@ -1,11 +1,6 @@
-import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Transaction } from '../../../shared/types/queries';
 import { CachedContent, ContentUrlInfo } from '../../../LibModules/contentDisplay/types';
-
-export interface MintableStateItem {
-  mintable: boolean;
-  owner?: string | null;
-}
 
 export interface ContentDataItem extends CachedContent {
   urls?: ContentUrlInfo;
@@ -13,14 +8,12 @@ export interface ContentDataItem extends CachedContent {
 
 interface ContentDisplayState {
   transactions: Transaction[];
-  mintableState: Record<string, MintableStateItem>;
   contentData: Record<string, ContentDataItem>;
   isAuthenticated?: boolean;
 }
 
 const initialState: ContentDisplayState = {
   transactions: [],
-  mintableState: {},
   contentData: {},
 };
 
@@ -39,12 +32,6 @@ const contentDisplaySlice = createSlice({
     clearTransactions: (state) => {
       state.transactions = [];
     },
-    setMintableStates: (state, action: PayloadAction<Record<string, MintableStateItem>>) => {
-      state.mintableState = { ...state.mintableState, ...action.payload };
-    },
-    resetMintableState(state) {
-      state.mintableState = {};
-    },
     setContentData: (state, action: PayloadAction<{ id: string; content: ContentDataItem }>) => {
       const { id, content } = action.payload;
       state.contentData[id] = content;
@@ -62,8 +49,6 @@ const contentDisplaySlice = createSlice({
 export const { 
   setTransactions, 
   clearTransactions, 
-  setMintableStates,
-  resetMintableState,
   setContentData,
   clearContentData,
   clearTransactionContent,

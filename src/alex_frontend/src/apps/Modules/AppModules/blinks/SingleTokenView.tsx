@@ -41,7 +41,6 @@ function SingleTokenView() {
   const dispatch = useDispatch<AppDispatch>();
   
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
-  const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
   const { nfts } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -392,8 +391,6 @@ function SingleTokenView() {
           id={transaction.id}
           onClick={() => setShowModal(true)}
           owner={transaction.owner}
-          showStats={false}
-          isMintable={false}
           isOwned={isOwned}
           onMint={undefined}
           onWithdraw={hasWithdrawableBalance ? handleWithdraw : undefined}
@@ -405,8 +402,6 @@ function SingleTokenView() {
             transaction={transaction}
             content={content}
             contentUrls={contentUrls}
-            showStats={false}
-            mintableState={mintableState}
             handleRenderError={handleRenderError}
             inModal={false}
           />
@@ -431,8 +426,6 @@ function SingleTokenView() {
                 content={content}
                 contentUrls={contentUrls}
                 inModal={true}
-                showStats={false}
-                mintableState={mintableState}
                 handleRenderError={handleRenderError}
               />
             </div>

@@ -1,7 +1,14 @@
+Tommorrow first steps: 
+- Remove Optional Owner parameter from coordinate_mint.rs
+- Remove all traces of owner from redux and mint.ts.
+- Move on to simplifying all the places we use 'mintable'.
+
+
 Immediately when you come back, find out why the mintable state is everywhere, and start simplifying since we don't need it for alexandrian.
 
 
 ToDo Before Next Frontend Deployment:
+- Backend needs to not take the owner as an argument anymore, and we'll figure if it's a scion and get the owner in the backend.
 - Lone nft link bages are discolored.
 - Need a red, possibly moving, border around the alexandrian principal selector.
 - Maybe need a border on deselected alexandrian tags.
@@ -70,6 +77,7 @@ Dark Mode ToDo:
 - Index canisters.
 - Autonomous NFT Backup Canister (automate the backup repo logic in a timer autonomous canister.)
 - Likes tracker canister for NFTs. (and maybe secondary method for SBT.)
+- Make coordinate_mint.rs take the NFT_id instead of the arweave_id.
 
 #### Permasearch Specific:
 

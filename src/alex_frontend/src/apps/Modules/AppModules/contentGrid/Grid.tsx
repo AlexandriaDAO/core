@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
-import { setMintableStates, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { Dialog, DialogContent } from '@/lib/components/dialog';
 import ContentRenderer from '@/apps/Modules/AppModules/safeRender/ContentRenderer';
 import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components/TransactionDetails';
@@ -46,12 +46,10 @@ const Grid = () => {
   const dispatch = useAppDispatch();
   const transactions = useSortedTransactions();
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
-  const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
   const predictions = useSelector((state: RootState) => state.arweave.predictions);
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
   
-  const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
@@ -71,7 +69,6 @@ const Grid = () => {
 
   const handleRenderError = useCallback((transactionId: string) => {
     dispatch(clearTransactionContent(transactionId));
-    dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
   }, [dispatch]);
 
   const handleWithdraw = useCallback(async (transactionId: string) => {
@@ -111,8 +108,6 @@ const Grid = () => {
           {transactions.map((transaction) => {
             const content = contentData[transaction.id];
             const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-            const mintableStateItem = mintableState[transaction.id];
-            const isMintable = mintableStateItem?.mintable;
             
             const nftId = arweaveToNftId[transaction.id];
             const nftData = nftId ? nfts[nftId] : undefined;
@@ -132,11 +127,6 @@ const Grid = () => {
                 onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
                 id={transaction.id}
                 owner={transaction.owner}
-                showStats={showStats[transaction.id]}
-                onToggleStats={(open) => {
-                  setShowStats(prev => ({ ...prev, [transaction.id]: open }));
-                }}
-                isMintable={isMintable}
                 isOwned={isOwned || false}
                 onMint={(e) => {
                   e.stopPropagation();
@@ -158,8 +148,6 @@ const Grid = () => {
                       coverUrl: null,
                       fullUrl: content?.url || `https://arweave.net/${transaction.id}`
                     }}
-                    showStats={showStats[transaction.id]}
-                    mintableState={mintableState}
                     handleRenderError={handleRenderError}
                   />
                   {shouldShowBlur && (
@@ -222,8 +210,6 @@ const Grid = () => {
                     fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
                   }}
                   inModal={true}
-                  showStats={showStats[selectedContent.id]}
-                  mintableState={mintableState}
                   handleRenderError={handleRenderError}
                 />
               </div>

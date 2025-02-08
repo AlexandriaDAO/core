@@ -7,7 +7,7 @@ import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Skeleton } from "@/lib/components/skeleton";
 import { getFileIcon } from './fileIcons';
 import { Transaction } from "@/apps/Modules/shared/types/queries";
-import { ContentUrlInfo, MintableState } from './types';
+import { ContentUrlInfo } from './types';
 import ReactMarkdown from 'react-markdown';
 
 interface SandboxRendererProps {
@@ -15,8 +15,7 @@ interface SandboxRendererProps {
   content: any;
   inModal?: boolean;
   contentUrls: ContentUrlInfo;
-  showStats: boolean;
-  mintableState: MintableState;
+  showStats?: boolean;
   handleRenderError: (id: string) => void;
 }
 
@@ -25,15 +24,11 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
   content,
   inModal = false,
   contentUrls,
-  showStats,
-  mintableState,
+  showStats = false,
   handleRenderError,
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-  const mintableStateItem = mintableState[transaction.id];
-  const isMintable = mintableStateItem?.mintable;
-  const predictions = mintableStateItem?.predictions;
 
   const hasError = !content || content.error;
   if (hasError) {
@@ -431,30 +426,6 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
   return (
     <div className={`relative ${inModal ? 'w-full h-full' : 'w-full h-full'}`}>
       {renderContent()}
-      {(showStats || !isMintable) && predictions && (
-        <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white p-4 z-20">
-          <p className="text-lg font-bold mb-4">Content Classification</p>
-          <div className="space-y-3 w-full max-w-sm">
-            {Object.entries(predictions).map(([key, value]) => (
-              <div key={key} className="space-y-1">
-                <div className="flex justify-between text-sm">
-                  <span>{key}</span>
-                  <span>{(Number(value) * 100).toFixed(1)}%</span>
-                </div>
-                <div className="h-1 bg-gray-700 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-white rounded-full transition-all duration-300"
-                    style={{ width: `${Number(value) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-          {!isMintable && (
-            <p className="mt-4 text-red-400 text-sm">This content is not mintable.</p>
-          )}
-        </div>
-      )}
     </div>
   );
 };

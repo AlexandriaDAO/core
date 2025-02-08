@@ -19,7 +19,6 @@ interface ContentCardProps {
   owner?: string;
   showStats?: boolean;
   onToggleStats?: (open: boolean) => void;
-  isMintable?: boolean;
   isOwned?: boolean;
   onMint?: (e: React.MouseEvent) => void;
   onWithdraw?: (e: React.MouseEvent) => void;
@@ -28,11 +27,10 @@ interface ContentCardProps {
   footer?: React.ReactNode;
 }
 
-export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isMintable, isOwned, onMint, onWithdraw, predictions, isMinting, footer }: ContentCardProps) {
+export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, onMint, predictions, isMinting, footer }: ContentCardProps) {
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [copiedOwner, setCopiedOwner] = useState(false);
   const dispatch = useDispatch();
-  const isAlexandrian = window.location.pathname.includes('/alexandrian');
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
 
   const formatId = (id: string | undefined) => {

@@ -4,15 +4,13 @@ import { Skeleton } from "@/lib/components/skeleton";
 import ContentValidator from './ContentValidator';
 import SandboxRenderer from './SandboxRenderer';
 import { Transaction } from "@/apps/Modules/shared/types/queries";
-import { ContentUrlInfo, MintableState } from './types';
+import { ContentUrlInfo } from './types';
 
 interface ContentRendererProps {
   transaction: Transaction;
   content: any;
   inModal?: boolean;
   contentUrls: ContentUrlInfo;
-  showStats: boolean;
-  mintableState: MintableState;
   handleRenderError: (id: string) => void;
 }
 
@@ -21,8 +19,6 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
   content,
   inModal = false,
   contentUrls,
-  showStats,
-  mintableState,
   handleRenderError,
 }) => {
   const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
@@ -50,8 +46,6 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({
         content={content}
         inModal={inModal}
         contentUrls={contentUrls}
-        showStats={showStats}
-        mintableState={mintableState}
         handleRenderError={handleRenderError}
       />
     </div>

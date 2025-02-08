@@ -1,6 +1,8 @@
 import { PredictionResults } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
 
 export interface ContentUrlInfo {
+  url?: string;
+  type?: string;
   thumbnailUrl: string | null;
   coverUrl: string | null;
   fullUrl: string;
@@ -13,15 +15,6 @@ export interface ContentTypeHandler {
 export interface SelectedContent {
   id: string;
   type: string;
-}
-
-export interface MintableStateItem {
-  mintable: boolean;
-  predictions?: PredictionResults;
-}
-
-export interface MintableState {
-  [key: string]: MintableStateItem;
 }
 
 export interface ContentValidatorProps {

@@ -24,16 +24,14 @@ interface CombinedModalProps {
         show: boolean;
         transaction: Transaction
     };
-    showStats: Record<string, boolean>;
     onClose: () => void;
     handleRenderError: (transactionId: string) => void;
 }
 
-const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStats, onClose, handleRenderError }) => {
+const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose, handleRenderError }) => {
     const dispatch = useAppDispatch();
     const contentData = useAppSelector((state) => state.contentDisplay.contentData);
-    const mintableState = useAppSelector((state) => state.contentDisplay.mintableState);
-    const user=useAppSelector((state)=>state.auth);
+    const user = useAppSelector((state)=>state.auth);
     const emporium = useAppSelector((state) => state.emporium);
     const swap = useAppSelector((state) => state.swap);
     const [price, setPrice] = useState(modalData.price || "");
@@ -173,8 +171,6 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, showStat
                                 fullUrl: contentData[modalData.arwaveId]?.url || `https://arweave.net/${modalData.arwaveId}`
                             }}
                             inModal={true}
-                            showStats={showStats[modalData.arwaveId]}
-                            mintableState={mintableState}
                             handleRenderError={handleRenderError}
                         />
                     </div>

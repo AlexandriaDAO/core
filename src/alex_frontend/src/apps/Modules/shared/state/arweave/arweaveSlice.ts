@@ -1,8 +1,6 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { SearchState } from '../../../shared/types/queries';
 import { fileTypeCategories } from '../../../shared/types/files';
-import { setMintableStates } from '../content/contentDisplaySlice';
-import { getAuthClient } from '@/features/auth/utils/authUtils';
 
 export interface PredictionResults {
   Drawing: number;
@@ -61,20 +59,6 @@ const arweaveSlice = createSlice({
     },
   },
 });
-
-// Create a thunk to handle prediction results and update mintable state
-export const updatePredictionResults = createAsyncThunk(
-  'arweave/updatePredictionResults',
-  async ({ id, predictions }: { id: string; predictions: PredictionResults }, { dispatch }) => {
-    dispatch(setPredictionResults({ id, predictions }));
-    
-    // Update mintable state based on predictions
-    const client = await getAuthClient();
-    const isAuthenticated = await client.isAuthenticated();
-    const isMintable = !predictions.isPorn && isAuthenticated;
-    dispatch(setMintableStates({ [id]: { mintable: isMintable } }));
-  }
-);
 
 export const {
   setIsLoading,
