@@ -1,5 +1,11 @@
+Immediately when you come back, find out why the mintable state is everywhere, and start simplifying since we don't need it for alexandrian.
+
+
 ToDo Before Next Frontend Deployment:
-- Dark Mode.
+- Lone nft link bages are discolored.
+- Need a red, possibly moving, border around the alexandrian principal selector.
+- Maybe need a border on deselected alexandrian tags.
+- Why's the like button disappearing?
 - Out-of-order Alexandrian Results.
 - Look up how sendContent.tsx actually works.
 - Put the proper token logos throughout the swap tab.

@@ -5,11 +5,12 @@ import { Button } from "@/lib/components/button";
 import { Progress } from "@/lib/components/progress";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/lib/components/collapsible";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSearchState } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import { NftDataFooter } from "./components/NftDataFooter";
 import { copyToClipboard } from "./utils/clipboard";
 import { Badge } from "@/lib/components/badge";
+import { RootState } from "@/store";
 
 interface ContentCardProps {
   children: React.ReactNode;
@@ -32,6 +33,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
   const [copiedOwner, setCopiedOwner] = useState(false);
   const dispatch = useDispatch();
   const isAlexandrian = window.location.pathname.includes('/alexandrian');
+  const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
 
   const formatId = (id: string | undefined) => {
     if (!id) return 'N/A';
@@ -64,8 +66,8 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
           <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden h-full">
             {children}
           </div>
-          {/* Mint/Like button positioned absolutely */}
-          {isMintable && !isOwned && onMint && (
+          {/* Like button positioned absolutely */}
+          {id && arweaveToNftId[id] && (
             <div 
               className="absolute bottom-2 left-2 z-[30]" 
               onClick={(e) => {
@@ -75,14 +77,11 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
             >
               <Button
                 variant="secondary"
-                className={`${isAlexandrian 
-                  ? 'bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800'
-                  : 'bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)] dark:bg-zinc-900 dark:hover:bg-zinc-800'
-                } px-1.5 py-0.5 rounded-md flex items-center gap-0.5 text-xs font-medium ${isMinting ? 'opacity-80' : ''}`}
+                className="bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 text-xs font-medium"
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
-                  onMint(e);
+                  onMint?.(e);
                 }}
                 disabled={isMinting}
               >
@@ -90,16 +89,12 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
                   {isMinting ? (
                     <>
                       <Loader2 className="h-3 w-3 animate-spin" />
-                      {isAlexandrian ? 'Liking...' : 'Minting'}
+                      Liking...
                     </>
                   ) : (
                     <>
-                      {isAlexandrian ? 'Like' : 'Mint'}
-                      {isAlexandrian ? (
-                        <Heart className={`h-3 w-3 transition-all duration-200 ${isMinting ? 'scale-125' : ''}`} />
-                      ) : (
-                        <Plus className={`h-3 w-3 text-red-500 dark:text-red-400 transition-all duration-200 ${isMinting ? 'scale-125 text-green-500 dark:text-green-400' : ''}`} />
-                      )}
+                      Like
+                      <Heart className={`h-3 w-3 transition-all duration-200 ${isMinting ? 'scale-125' : ''}`} />
                     </>
                   )}
                 </span>

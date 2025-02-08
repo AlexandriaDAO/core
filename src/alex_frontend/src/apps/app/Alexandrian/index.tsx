@@ -45,6 +45,7 @@ function Alexandrian() {
 			topComponent={<TopupBalanceWarning />}
 			filterComponent={<Library />}
 			showMoreEnabled={true}
+			// useNsfw={false}
 		/>
 	);
 }
