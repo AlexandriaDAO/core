@@ -107,7 +107,7 @@ export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
 
 
 
-# Step 6: Deploy the ICP & ICRC Ledger with LICP, LBRY, and ALEX tokens
+# Step 6: Deploy the ICP & ICRC Ledger with LICP, LBRYs, and ALEX tokens
 dfx deploy --specified-id ryjl3-tyaaa-aaaaa-aaaba-cai icp_ledger_canister --argument "  
   (variant {  
     Init = record {  
@@ -247,7 +247,7 @@ dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal naaip-5eykh-tinwp-rdq2x-itbqc-7bcbo-nce2i-cg3qk-m3emq-276ui-qqe)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal d4qqt-2dxx5-og4yg-hlsl5-z6opa-ikfav-d6aw2-wvsut-qnyss-j2dpk-vqe)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)

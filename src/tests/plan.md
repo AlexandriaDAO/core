@@ -1,26 +1,14 @@
-Tommorrow first steps: 
-- Remove Optional Owner parameter from coordinate_mint.rs
-- Remove all traces of owner from redux and mint.ts.
-- Move on to simplifying all the places we use 'mintable'.
-
-
-Immediately when you come back, find out why the mintable state is everywhere, and start simplifying since we don't need it for alexandrian.
-
-
-ToDo Before Next Frontend Deployment:
-- Backend needs to not take the owner as an argument anymore, and we'll figure if it's a scion and get the owner in the backend.
-- Lone nft link bages are discolored.
-- Need a red, possibly moving, border around the alexandrian principal selector.
-- Maybe need a border on deselected alexandrian tags.
-- Why's the like button disappearing?
-- Out-of-order Alexandrian Results.
-- Look up how sendContent.tsx actually works.
-- Put the proper token logos throughout the swap tab.
-
+****
+- Alexandrian app loading really bad at 100 at a time. (should reduce to 20 for now)
+- Auth getting stuck in the loading state with no way to log out.
+- There's an issue where if you stumble upon an asset that won't render, it'll not render any more after it (try retardio's books.)
 
 
 Dark Mode ToDo:
-- Swap page words are all black in dark mode.
+- Swap page buttons are black when selected in dark mode.
+- Runtime Error modal not in dark mode.
+- FAQ section to match the styles.
+- HTML needs dark mode.
 
 
 
@@ -30,7 +18,8 @@ Dark Mode ToDo:
 
 
 
-#### Module Design Optimizations:
+
+#### Module Design Optimizations
 - Can tagSelector.tsx and contentTagsSelector.tsx and contentTypeToggleGroup.tsx be combined?
 
 
@@ -55,7 +44,6 @@ Dark Mode ToDo:
 
 
 #### Features now:
-- Figure out a better way than that prop passing to contentItem in contentList.tsx.
 - Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
 - Finish the channels.md plan, given the new text rendering setup.
 
@@ -67,7 +55,6 @@ Dark Mode ToDo:
 - On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.
 
 #### Bigger Features (lower priority):
-- Dark Mode.
 - Range selection for Alexandrian.
 - Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
 - Put another amount selector by the show more button on permasearch.

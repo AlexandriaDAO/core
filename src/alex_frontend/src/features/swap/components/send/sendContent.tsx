@@ -12,7 +12,6 @@ import transferALEX from "../../thunks/alexIcrc/transferALEX";
 import transferLBRY from "../../thunks/lbryIcrc/transferLBRY";
 import { icpLedgerFlagHandler } from "@/features/icp-ledger/icpLedgerSlice";
 import { flagHandler } from "../../swapSlice";
-import Auth from "@/features/auth";
 import { icp_fee, options } from "@/utils/utils";
 import { LoaderCircle } from "lucide-react";
 import LoadingModal from "../loadingModal";
@@ -23,6 +22,7 @@ import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import ErrorModal from "../errorModal";
 import { Entry } from "@/layouts/parts/Header";
+import { Principal } from "@dfinity/principal";
 
 const SendContent = () => {
     const dispatch = useAppDispatch();
@@ -40,23 +40,48 @@ const SendContent = () => {
     const [selectedImage, setSelectedImage] = useState("");
     const [availableBalance, setAvailableBalnce] = useState("");
     const [destinationPrincipal, setDestinationPrincipal] = useState("");
+    const [principalError, setPrincipalError] = useState("");
     const [amount, setAmount] = useState("0");
     const [fee, setFee] = useState();
 
+    const validatePrincipal = (principal: string): boolean => {
+        try {
+            if (!principal) {
+                setPrincipalError("Principal ID is required");
+                return false;
+            }
+            Principal.fromText(principal);
+            setPrincipalError("");
+            return true;
+        } catch (error) {
+            setPrincipalError("Invalid Principal ID format");
+            return false;
+        }
+    };
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (Number(e.target.value) >= 0) {
             setAmount(e.target.value);
         }
     };
+
     const handleDestinationPrincipalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setDestinationPrincipal(e.target.value);
+        const value = e.target.value;
+        setDestinationPrincipal(value);
+        validatePrincipal(value);
     };
+
     const handleSelect = (option: any) => {
         setFee(option.fee);
         setSelectedOption(option.label);
         setIsOpen(false);
-        setSelectedImage(option.img);
+        let img = "images/8-logo.png";
+        if (option.label === "ALEX") {
+            img = "images/alex-logo.svg";
+        } else if (option.label === "LBRY") {
+            img = "images/lbry-logo.svg";
+        }
+        setSelectedImage(img);
     };
     const handleMax = () => {
         // since we dont need approval here 
@@ -86,16 +111,17 @@ const SendContent = () => {
 
     const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
+        if (!validatePrincipal(destinationPrincipal)) {
+            return;
+        }
         if (selectedOption === "ICP") {
             dispatch(transferICP({ amount, destination: destinationPrincipal, accountType: "principal" }));
-
         }
         else if (selectedOption === "ALEX") {
             dispatch(transferALEX({ amount, destination: destinationPrincipal }));
         }
         else if (selectedOption === "LBRY") {
             dispatch(transferLBRY({ amount, destination: destinationPrincipal }));
-
         }
         setLoadingModalV(true);
     }
@@ -170,16 +196,24 @@ const SendContent = () => {
                         </div>
                         {isOpen && (
                             <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg">
-                                {options.map((option, index) => (
-                                    <div
-                                        key={index}
-                                        onClick={() => handleSelect(option)}
-                                        className="flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer dark:text-gray-200"
-                                    >
-                                        <img src={option.img} alt={option.label} className="h-5 w-5 mr-3" />
-                                        <span>{option.label}</span>
-                                    </div>
-                                ))}
+                                {options.map((option, index) => {
+                                    let logoSrc = "images/8-logo.png";
+                                    if (option.label === "ALEX") {
+                                        logoSrc = "images/alex-logo.svg";
+                                    } else if (option.label === "LBRY") {
+                                        logoSrc = "images/lbry-logo.svg";
+                                    }
+                                    return (
+                                        <div
+                                            key={index}
+                                            onClick={() => handleSelect(option)}
+                                            className="flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer dark:text-gray-200"
+                                        >
+                                            <img src={logoSrc} alt={option.label} className="h-5 w-5 mr-3" />
+                                            <span>{option.label}</span>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
@@ -188,8 +222,19 @@ const SendContent = () => {
                         <strong className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium dark:text-gray-200'>Enter the Principal ID</strong>
                     </div>
                     <div className='border bg-white dark:bg-gray-800 dark:border-gray-700 py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-3 2xl:px-5 xl:px-5 lg:px-4 md:px-3 sm:px-3 rounded-full mb-4' >
-                        <input className='text-multygray dark:text-gray-300 bg-transparent text-xl font-medium placeholder-multygray dark:placeholder-gray-400 focus:outline-none focus:border-transparent w-full' type='text' onChange={(e) => { handleDestinationPrincipalChange(e) }} value={destinationPrincipal} />
+                        <input 
+                            className={`text-multygray dark:text-gray-300 bg-transparent text-xl font-medium placeholder-multygray dark:placeholder-gray-400 focus:outline-none focus:border-transparent w-full ${principalError ? 'border-red-500' : ''}`} 
+                            type='text' 
+                            onChange={(e) => { handleDestinationPrincipalChange(e) }} 
+                            value={destinationPrincipal} 
+                            placeholder="Enter Principal ID"
+                        />
                     </div>
+                    {principalError && (
+                        <div className="text-red-500 text-sm mb-4 px-5">
+                            {principalError}
+                        </div>
+                    )}
                     <div className='flex items-center mb-4'>
                         <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>3</span>
                         <strong className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium dark:text-gray-200'>Enter the amount</strong>
@@ -203,7 +248,9 @@ const SendContent = () => {
                             <div className='flex justify-between'>
                                 <div className='flex items-center'>
                                     <strong className='text-base text-multygray dark:text-gray-300 font-medium me-2'>Available Balance:<span className='text-base text-darkgray dark:text-gray-200 ms-2'>{availableBalance}</span></strong>
-                                    <img className='w-5 h-5' src="images/8-logo.png" alt="apple" />
+                                    {selectedOption === "ICP" && <img className='w-5 h-5' src="images/8-logo.png" alt="icp" />}
+                                    {selectedOption === "ALEX" && <img className='w-5 h-5' src="images/alex-logo.svg" alt="alex" />}
+                                    {selectedOption === "LBRY" && <img className='w-5 h-5' src="images/lbry-logo.svg" alt="lbry" />}
                                 </div>
                                 <Link role="button" to="" className='text-[#A7B1D7] dark:text-blue-400 underline text-base font-medium' onClick={() => { handleMax() }}>Max</Link>
                             </div>

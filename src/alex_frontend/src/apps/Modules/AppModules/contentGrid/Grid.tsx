@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
 import { clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
-import { Dialog, DialogContent } from '@/lib/components/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import ContentRenderer from '@/apps/Modules/AppModules/safeRender/ContentRenderer';
 import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components/TransactionDetails';
 import { mint_nft } from "@/features/nft/mint";
@@ -13,7 +13,6 @@ import { withdraw_nft } from "@/features/nft/withdraw";
 import { TooltipProvider } from "@/lib/components/tooltip";
 import { Loader2 } from 'lucide-react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
-import { X } from 'lucide-react';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -101,11 +100,20 @@ const Grid = () => {
     }
   }, [arweaveToNftId, nfts]);
 
+  const handleDialogOpenChange = useCallback((open: boolean) => {
+    if (!open) {
+      setSelectedContent(null);
+    }
+  }, []);
+
+  // Memoize transactions to prevent unnecessary re-renders
+  const memoizedTransactions = useMemo(() => transactions, [transactions]);
+
   return (
     <TooltipProvider>
       <>
         <ContentGrid>
-          {transactions.map((transaction) => {
+          {memoizedTransactions.map((transaction) => {
             const content = contentData[transaction.id];
             const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
             
@@ -188,20 +196,18 @@ const Grid = () => {
           })}
         </ContentGrid>
 
-        <Dialog open={!!selectedContent} onOpenChange={(open) => !open && setSelectedContent(null)}>
-          <DialogContent className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background" closeIcon={
-            <Button
-              variant="outline"
-              className="absolute right-2 top-2 z-[60] rounded-full p-2 
-                bg-primary text-primary-foreground hover:bg-primary/90
-                transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          }>
-            {selectedContent && (
+        <Dialog open={!!selectedContent} onOpenChange={handleDialogOpenChange}>
+          <DialogContent 
+            className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"
+          >
+            <DialogTitle className="sr-only">
+              {selectedContent?.type.split('/')[0].toUpperCase()} Content Viewer
+            </DialogTitle>
+            
+            {selectedContent && contentData[selectedContent.id] && (
               <div className="w-full h-full">
                 <ContentRenderer
+                  key={selectedContent.id}
                   transaction={transactions.find(t => t.id === selectedContent.id)!}
                   content={contentData[selectedContent.id]}
                   contentUrls={contentData[selectedContent.id]?.urls || {

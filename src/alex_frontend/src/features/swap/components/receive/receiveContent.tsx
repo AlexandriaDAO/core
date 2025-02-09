@@ -23,7 +23,13 @@ const ReceiveContent = () => {
         setSelectedOption(option.label);
         setFee(option.fee);
         setIsOpen(false);
-        setSelectedImage(option.img);
+        let img = "images/8-logo.png";
+        if (option.label === "ALEX") {
+            img = "images/alex-logo.svg";
+        } else if (option.label === "LBRY") {
+            img = "images/lbry-logo.svg";
+        }
+        setSelectedImage(img);
     };
     const handleNetworkSelect = (option: any) => {
         setSelectedNetwork(option.label);
@@ -58,16 +64,24 @@ const ReceiveContent = () => {
                         </div>
                         {isOpen && (
                             <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
-                                {options.map((option, index) => (
-                                    <div
-                                        key={index}
-                                        onClick={() => handleSelect(option)}
-                                        className="flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer dark:text-white"
-                                    >
-                                        <img src={option.img} alt={option.label} className="h-5 w-5 mr-3" />
-                                        <span>{option.label}</span>
-                                    </div>
-                                ))}
+                                {options.map((option, index) => {
+                                    let logoSrc = "images/8-logo.png";
+                                    if (option.label === "ALEX") {
+                                        logoSrc = "images/alex-logo.svg";
+                                    } else if (option.label === "LBRY") {
+                                        logoSrc = "images/lbry-logo.svg";
+                                    }
+                                    return (
+                                        <div
+                                            key={index}
+                                            onClick={() => handleSelect(option)}
+                                            className="flex items-center py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer dark:text-white"
+                                        >
+                                            <img src={logoSrc} alt={option.label} className="h-5 w-5 mr-3" />
+                                            <span>{option.label}</span>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
@@ -140,11 +154,8 @@ const ReceiveContent = () => {
                                 <strong className='text-lg font-medium me-1 text-radiocolor dark:text-gray-300'>Network Fees:</strong>
                                 <span className='text-lg font-medium text-radiocolor dark:text-gray-300'><span className='text-multycolor'>{fee}</span> {selectedOption}</span>
                             </li>
-                            <li className='mb-5'>
-                                <p className='text-lg font-medium text-radiocolor dark:text-gray-300'>Any contributions less than the minimum amount will not be credited or refunded.</p>
-                            </li>
                             <li>
-                                <p className='text-lg font-medium text-radiocolor dark:text-gray-300'>Do not deposit assets other than ICP as this may result in irretrievability of deposited assets.</p>
+                                <p className='text-lg font-medium text-radiocolor dark:text-gray-300'>Do not deposit assets other than those listed as this may result in irretrievability of deposited assets.</p>
                             </li>
                         </ul>
                     </div>

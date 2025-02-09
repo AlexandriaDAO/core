@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, CardHeader, CardContent, CardFooter } from "@/lib/components/card";
+import { Card, CardContent, CardFooter } from "@/lib/components/card";
 import { Check, Loader2, Flag, User, Search, Plus, Heart } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Progress } from "@/lib/components/progress";
@@ -11,6 +11,12 @@ import { NftDataFooter } from "./components/NftDataFooter";
 import { copyToClipboard } from "./utils/clipboard";
 import { Badge } from "@/lib/components/badge";
 import { RootState } from "@/store";
+import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
+
+interface Transaction {
+  id: string;
+  tags: Array<{ name: string; value: string; }>;
+}
 
 interface ContentCardProps {
   children: React.ReactNode;
@@ -32,6 +38,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
   const [copiedOwner, setCopiedOwner] = useState(false);
   const dispatch = useDispatch();
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
+  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions as Transaction[]);
 
   const formatId = (id: string | undefined) => {
     if (!id) return 'N/A';
@@ -54,6 +61,28 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
     }
   };
 
+  const isMediaContent = (contentType: string | undefined) => {
+    if (!contentType) return false;
+    return [...fileTypeCategories.images, ...fileTypeCategories.video].includes(contentType);
+  };
+
+  const shouldShowMintButton = () => {
+    if (!id) return false;
+    
+    const transaction = transactions.find(t => t.id === id);
+    if (!transaction) return false;
+
+    const contentType = transaction.tags?.find(tag => tag.name === "Content-Type")?.value;
+    
+    // For non-media content (epub, pdf, txt, etc.), always allow minting
+    if (!isMediaContent(contentType)) {
+      return true;
+    }
+    
+    // For media content, require safety check
+    return predictions && predictions.isPorn === false;
+  };
+
   return (
     <Card
       className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative overflow-hidden bg-white dark:bg-gray-900 h-full"
@@ -64,18 +93,18 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
           <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden h-full">
             {children}
           </div>
-          {/* Like button positioned absolutely */}
-          {id && arweaveToNftId[id] && (
-            <div 
-              className="absolute bottom-2 left-2 z-[30]" 
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-              }}
-            >
+          {/* Action button - either Like or Mint */}
+          <div 
+            className="absolute bottom-2 left-2 z-[30]" 
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          >
+            {id && arweaveToNftId[id] ? (
               <Button
                 variant="secondary"
-                className="bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 text-xs font-medium"
+                className="bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black text-red-600 hover:text-red-500 border border-red-600/20 hover:border-red-600/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
@@ -83,22 +112,31 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
                 }}
                 disabled={isMinting}
               >
-                <span className="flex items-center gap-0.5">
-                  {isMinting ? (
-                    <>
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      Liking...
-                    </>
-                  ) : (
-                    <>
-                      Like
-                      <Heart className={`h-3 w-3 transition-all duration-200 ${isMinting ? 'scale-125' : ''}`} />
-                    </>
-                  )}
-                </span>
+                {isMinting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Heart className="h-4 w-4 transition-all duration-200 group-hover:scale-110" />
+                )}
               </Button>
-            </div>
-          )}
+            ) : shouldShowMintButton() && (
+              <Button
+                variant="secondary"
+                className="bg-black/90 hover:bg-black text-brightyellow border border-brightyellow/20 hover:border-brightyellow/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onMint?.(e);
+                }}
+                disabled={isMinting}
+              >
+                {isMinting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4 transition-all duration-200 group-hover:scale-110" />
+                )}
+              </Button>
+            )}
+          </div>
         </AspectRatio>
       </CardContent>
 

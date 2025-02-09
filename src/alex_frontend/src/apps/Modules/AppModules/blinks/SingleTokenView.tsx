@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ContentRenderer from '../safeRender/ContentRenderer';
 import { ContentCard } from '@/apps/Modules/AppModules/contentGrid/Card';
-import { Dialog, DialogContent } from '@/lib/components/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
 import { toast } from "sonner";
@@ -182,16 +182,6 @@ function SingleTokenView() {
 
   const handleRenderError = (transactionId: string) => {
     ContentService.clearTransaction(transactionId);
-    dispatch(setContentData({ 
-      id: transactionId, 
-      content: {
-        url: null,
-        textContent: null,
-        imageObjectUrl: null,
-        thumbnailUrl: null,
-        error: 'Failed to render content'
-      }
-    }));
   };
 
   if (!tokenId) {
@@ -335,49 +325,48 @@ function SingleTokenView() {
     <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
         <Badge 
-          variant="default" 
-          className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+          variant="secondary" 
+          className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
           onClick={handleCopyLink}
         >
           {copiedLink ? (
-            <Check className="h-3 w-3" />
+            <Check className="h-2.5 w-2.5" />
           ) : (
-            <Link className="h-3 w-3" />
+            <Link className="h-2.5 w-2.5" />
           )}
         </Badge>
         {nftData?.principal && (
           <Badge 
-            variant="default" 
-            className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+            variant="secondary" 
+            className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
             onClick={handleCopyPrincipal}
           >
             {formatPrincipal(nftData.principal)}
             {copiedPrincipal ? (
-              <Check className="h-3 w-3" />
+              <Check className="h-2.5 w-2.5" />
             ) : (
-              <Copy className="h-3 w-3" />
+              <Copy className="h-2.5 w-2.5" />
             )}
           </Badge>
         )}
         {ownerInfo?.username && (
           <Badge 
-            variant="default" 
-            className="text-xs bg-purple-100 text-purple-800 hover:bg-purple-200"
+            variant="secondary" 
+            className="text-[10px] py-0.5 px-1"
           >
             @{ownerInfo.username}
           </Badge>
         )}
-        <Badge variant="default" className={`text-xs ${
-          collectionType === 'NFT' 
-            ? 'bg-[#FFD700] text-black hover:bg-[#FFD700]/90' 
-            : 'bg-[#E6E6FA] text-black hover:bg-[#E6E6FA]/90'
-        }`}>
+        <Badge 
+          variant={collectionType === 'NFT' ? 'warning' : 'info'} 
+          className="text-[10px] py-0.5 px-1"
+        >
           {collectionType}
         </Badge>
-        <Badge variant="outline" className="text-xs bg-white">
+        <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">
           ALEX: {formatBalance(nftData?.balances?.alex?.toString())}
         </Badge>
-        <Badge variant="outline" className="text-xs bg-white">
+        <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">
           LBRY: {formatBalance(nftData?.balances?.lbry?.toString())}
         </Badge>
       </div>
@@ -409,25 +398,21 @@ function SingleTokenView() {
       </div>
 
       <Dialog open={showModal} onOpenChange={(open) => !open && setShowModal(false)}>
-        <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col" closeIcon={
-          <Button
-            variant="outline"
-            className="absolute right-4 top-4 z-[60] rounded-full p-3 
-              bg-primary text-primary-foreground hover:bg-primary/90
-              transition-colors"
-          >
-            <X className="h-6 w-6" />
-          </Button>
-        }>
+        <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col">
+          <DialogTitle className="sr-only">Content Viewer</DialogTitle>
+
           <div className="w-full h-full overflow-y-auto">
             <div className="p-6">
-              <ContentRenderer
-                transaction={transaction}
-                content={content}
-                contentUrls={contentUrls}
-                inModal={true}
-                handleRenderError={handleRenderError}
-              />
+              {content && transaction && (
+                <ContentRenderer
+                  key={transaction.id}
+                  transaction={transaction}
+                  content={content}
+                  contentUrls={contentUrls}
+                  inModal={true}
+                  handleRenderError={handleRenderError}
+                />
+              )}
             </div>
           </div>
         </DialogContent>

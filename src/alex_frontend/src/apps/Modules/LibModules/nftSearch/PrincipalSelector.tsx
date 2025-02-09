@@ -158,7 +158,10 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              className="w-full justify-between text-sm sm:text-base py-2 sm:py-3"
+              className={cn(
+                "w-full justify-between text-sm sm:text-base py-2 sm:py-3 border hover:bg-accent hover:text-accent-foreground",
+                selectedPrincipals.length === 0 ? "border-ring dark:border-ring" : "dark:border-gray-600"
+              )}
               disabled={isLoading}
             >
               {isLoading ? (
