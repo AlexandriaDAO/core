@@ -1,7 +1,5 @@
 import { Transaction } from "../../../shared/types/queries";
 import { contentCache } from "../../../shared/services/contentCacheService";
-import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
-import { MintableStateItem } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { getCover } from "@/utils/epub";
 import { CachedContent, ContentUrlInfo } from "../types";
 
@@ -129,24 +127,6 @@ export class ContentService {
       fullUrl: arweaveUrl,
       needsProcessing: false,
     };
-  }
-
-  static getInitialMintableStates(
-    transactions: Transaction[]
-  ): Record<string, MintableStateItem> {
-    return transactions.reduce((acc, transaction) => {
-      const contentType =
-        transaction.tags.find((tag) => tag.name === "Content-Type")?.value ||
-        "image/jpeg";
-      const requiresValidation = [
-        ...fileTypeCategories.images,
-        ...fileTypeCategories.video,
-      ].includes(contentType);
-      acc[transaction.id] = {
-        mintable: !requiresValidation,
-      };
-      return acc;
-    }, {} as Record<string, MintableStateItem>);
   }
 
   static clearTransaction(txId: string): void {

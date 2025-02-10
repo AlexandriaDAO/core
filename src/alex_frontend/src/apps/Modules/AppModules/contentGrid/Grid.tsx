@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
-import { setMintableStates, clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
-import { Dialog, DialogContent } from '@/lib/components/dialog';
+import { clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import ContentRenderer from '@/apps/Modules/AppModules/safeRender/ContentRenderer';
 import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components/TransactionDetails';
 import { mint_nft } from "@/features/nft/mint";
@@ -13,7 +13,6 @@ import { withdraw_nft } from "@/features/nft/withdraw";
 import { TooltipProvider } from "@/lib/components/tooltip";
 import { Loader2 } from 'lucide-react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
-import { X } from 'lucide-react';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -46,7 +45,6 @@ const Grid = () => {
   const dispatch = useAppDispatch();
   const transactions = useSortedTransactions();
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
-  const mintableState = useSelector((state: RootState) => state.contentDisplay.mintableState);
   const predictions = useSelector((state: RootState) => state.arweave.predictions);
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
@@ -71,7 +69,6 @@ const Grid = () => {
 
   const handleRenderError = useCallback((transactionId: string) => {
     dispatch(clearTransactionContent(transactionId));
-    dispatch(setMintableStates({ [transactionId]: { mintable: false } }));
   }, [dispatch]);
 
   const handleWithdraw = useCallback(async (transactionId: string) => {
@@ -104,15 +101,22 @@ const Grid = () => {
     }
   }, [arweaveToNftId, nfts]);
 
+  const handleDialogOpenChange = useCallback((open: boolean) => {
+    if (!open) {
+      setSelectedContent(null);
+    }
+  }, []);
+
+  // Memoize transactions to prevent unnecessary re-renders
+  const memoizedTransactions = useMemo(() => transactions, [transactions]);
+
   return (
     <TooltipProvider>
       <>
         <ContentGrid>
-          {transactions.map((transaction) => {
+          {memoizedTransactions.map((transaction) => {
             const content = contentData[transaction.id];
             const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-            const mintableStateItem = mintableState[transaction.id];
-            const isMintable = mintableStateItem?.mintable;
             
             const nftId = arweaveToNftId[transaction.id];
             const nftData = nftId ? nfts[nftId] : undefined;
@@ -132,11 +136,6 @@ const Grid = () => {
                 onClick={() => setSelectedContent({ id: transaction.id, type: contentType ,assetUrl:transaction.assetUrl?transaction.assetUrl:""})}
                 id={transaction.id}
                 owner={transaction.owner}
-                showStats={showStats[transaction.id]}
-                onToggleStats={(open) => {
-                  setShowStats(prev => ({ ...prev, [transaction.id]: open }));
-                }}
-                isMintable={isMintable}
                 isOwned={isOwned || false}
                 onMint={(e) => {
                   e.stopPropagation();
@@ -158,9 +157,7 @@ const Grid = () => {
                       coverUrl: null,
                        fullUrl: transaction?.assetUrl?transaction?.assetUrl:"" //||content?.url// || `https://arweave.net/${transaction.id}`
                     }}
-                    showStats={showStats[transaction.id]}
-                    mintableState={mintableState}
-                    handleRenderError={()=>{}}//{handleRenderError}
+                    handleRenderError={handleRenderError}
                   />
                   {shouldShowBlur && (
                     <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
@@ -200,20 +197,18 @@ const Grid = () => {
           })}
         </ContentGrid>
 
-        <Dialog open={!!selectedContent} onOpenChange={(open) => !open && setSelectedContent(null)}>
-          <DialogContent className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background" closeIcon={
-            <Button
-              variant="outline"
-              className="absolute right-2 top-2 z-[60] rounded-full p-2 
-                bg-primary text-primary-foreground hover:bg-primary/90
-                transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          }>
-            {selectedContent && (
+        <Dialog open={!!selectedContent} onOpenChange={handleDialogOpenChange}>
+          <DialogContent 
+            className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"
+          >
+            <DialogTitle className="sr-only">
+              {selectedContent?.type.split('/')[0].toUpperCase()} Content Viewer
+            </DialogTitle>
+            
+            {selectedContent && contentData[selectedContent.id] && (
               <div className="w-full h-full">
                 <ContentRenderer
+                  key={selectedContent.id}
                   transaction={transactions.find(t => t.id === selectedContent.id)!}
                   content={contentData[selectedContent.id]}
                   contentUrls={contentData[selectedContent.id]?.urls || {
@@ -222,8 +217,6 @@ const Grid = () => {
                     fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
                   }}
                   inModal={true}
-                  showStats={showStats[selectedContent.id]}
-                  mintableState={mintableState}
                   handleRenderError={handleRenderError}
                 />
               </div>

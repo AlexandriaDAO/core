@@ -75,52 +75,52 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
   }
 
   return (
-    <div className="flex flex-wrap gap-2 items-center">
+    <div className="flex flex-wrap items-center gap-1">
+      {/* Link badge first */}
       {arweaveToNftId[id] && (
         <Badge 
-          variant="default" 
-          className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+          variant="secondary" 
+          className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
           onClick={handleCopyLink}
         >
           {copiedLink ? (
-            <Check className="h-3 w-3" />
+            <Check className="h-2.5 w-2.5" />
           ) : (
-            <Link className="h-3 w-3" />
+            <Link className="h-2.5 w-2.5" />
           )}
         </Badge>
       )}
+      {/* Collection badge */}
+      {nftData?.collection && nftData.collection !== 'No Collection' && (
+        <Badge variant={nftData.collection === 'NFT' ? 'warning' : 'info'} className="text-[10px] py-0.5 px-1">
+          {nftData.collection}
+        </Badge>
+      )}
+      {/* Principal badge */}
       {nftData?.principal && (
         <Badge 
-          variant="default" 
-          className="text-xs cursor-pointer hover:bg-primary/80 transition-colors flex items-center gap-1"
+          variant="secondary" 
+          className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
           onClick={(e) => handleCopyPrincipal(e, nftData.principal!)}
         >
           {formatPrincipal(nftData.principal)}
           {copiedPrincipal ? (
-            <Check className="h-3 w-3" />
+            <Check className="h-2.5 w-2.5" />
           ) : (
-            <Copy className="h-3 w-3" />
+            <Copy className="h-2.5 w-2.5" />
           )}
         </Badge>
       )}
-      {nftData?.collection && nftData.collection !== 'No Collection' && (
-        <Badge variant="default" className={`text-xs ${
-          nftData.collection === 'NFT' 
-            ? 'bg-[#FFD700] text-black hover:bg-[#FFD700]/90' 
-            : 'bg-[#E6E6FA] text-black hover:bg-[#E6E6FA]/90'
-        }`}>
-          {nftData.collection}
-        </Badge>
-      )}
+      {/* Balance badges */}
       {nftData?.balances && (
-        <>
-          <Badge variant="outline" className="text-xs bg-white">
+        <div className="flex gap-0.5">
+          <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">
             ALEX: {formatBalance(nftData.balances.alex.toString())}
           </Badge>
-          <Badge variant="outline" className="text-xs bg-white">
+          <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">
             LBRY: {formatBalance(nftData.balances.lbry.toString())}
           </Badge>
-        </>
+        </div>
       )}
     </div>
   );

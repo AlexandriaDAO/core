@@ -1,8 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { 
   clearTransactions, 
-  clearContentData, 
-  resetMintableState 
+  clearContentData,
 } from './content/contentDisplaySlice';
 import { clearPredictions } from './arweave/arweaveSlice';
 import { 
@@ -17,7 +16,6 @@ import type { AppDispatch } from '@/store';
 const contentStateOperations = [
   clearTransactions,
   clearContentData,
-  resetMintableState
 ];
 
 const nftStateOperations = [

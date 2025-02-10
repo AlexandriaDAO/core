@@ -69,6 +69,7 @@ function Permasearch() {
 			}
 			filterComponent={<SearchForm />}
 			showMoreEnabled={true}
+			// useNsfw={true}
 		/>
 	);
 }

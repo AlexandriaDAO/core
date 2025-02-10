@@ -109,7 +109,7 @@ const BurnContent = () => {
                             <div className='flex justify-between'>
                                 <div className='flex items-center'>
                                     <strong className='text-base text-multygray dark:text-gray-300 font-medium me-1'>Balance:<span className='text-darkgray dark:text-gray-200 ms-2'>{swap.lbryBalance} LBRY</span></strong>
-                                    <img className='w-4 h-4' src="images/8-logo.png" alt="apple" />
+                                    <img className='w-4 h-4' src="images/lbry-logo.svg" alt="lbry" />
                                 </div>
                                 <Link to="" role="button" className='text-[#A7B1D7] dark:text-blue-400 underline text-base font-bold' onClick={() => handleMaxLbry()} >Max</Link>
                             </div>
@@ -119,7 +119,7 @@ const BurnContent = () => {
                             <div className='flex justify-between'>
                                 <div className='flex items-center'>
                                     <div className='me-3'>
-                                        <img className='w-6 h-6' src="images/8-logo.png" alt="apple" />
+                                        <img className='w-6 h-6' src="images/8-logo.png" alt="icp" />
                                     </div>
                                     <div>
                                         <h4 className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium'>ICP</h4>
@@ -134,7 +134,7 @@ const BurnContent = () => {
                             <div className='flex justify-between'>
                                 <div className='flex items-center'>
                                     <div className='me-3'>
-                                        <img className='w-6 h-6' src="images/8-logo.png" alt="apple" />
+                                        <img className='w-6 h-6' src="images/alex-logo.svg" alt="alex" />
                                     </div>
                                     <div>
                                         <h4 className=' lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium'>ALEX</h4>

@@ -7,7 +7,7 @@ import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Skeleton } from "@/lib/components/skeleton";
 import { getFileIcon } from './fileIcons';
 import { Transaction } from "@/apps/Modules/shared/types/queries";
-import { ContentUrlInfo, MintableState } from './types';
+import { ContentUrlInfo } from './types';
 import ReactMarkdown from 'react-markdown';
 
 interface SandboxRendererProps {
@@ -15,8 +15,7 @@ interface SandboxRendererProps {
   content: any;
   inModal?: boolean;
   contentUrls: ContentUrlInfo;
-  showStats: boolean;
-  mintableState: MintableState;
+  showStats?: boolean;
   handleRenderError: (id: string) => void;
 }
 
@@ -25,15 +24,11 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
   content,
   inModal = false,
   contentUrls,
-  showStats,
-  mintableState,
+  showStats = false,
   handleRenderError,
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
-  const mintableStateItem = mintableState[transaction.id];
-  const isMintable = mintableStateItem?.mintable;
-  const predictions = mintableStateItem?.predictions;
 
   const hasError = !content || content.error;
   if (hasError) {
@@ -254,19 +249,19 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
         </div>
       ),
       "text/markdown": (
-        <div className={`w-full h-full ${inModal ? 'w-[800px] max-w-[95vw] max-h-[90vh] overflow-auto bg-white p-6' : 'bg-gray-200'}`}>
+        <div className={`w-full h-full ${inModal ? 'w-[800px] max-w-[95vw] max-h-[90vh] overflow-auto bg-background p-6' : 'bg-background'}`}>
           {inModal ? (
-            <div className="prose max-w-none">
+            <div className="prose dark:prose-invert max-w-none">
               <ReactMarkdown>{content?.textContent}</ReactMarkdown>
             </div>
           ) : (
             <AspectRatio ratio={1}>
               <div className="w-full h-full p-4 flex flex-col">
                 <div className="w-full h-full overflow-hidden relative">
-                  <div className="text-sm text-gray-700 font-mono whitespace-pre-wrap break-words">
+                  <div className="text-sm text-foreground font-mono whitespace-pre-wrap break-words">
                     {content?.textContent}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-200" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
                 </div>
               </div>
             </AspectRatio>
@@ -320,19 +315,19 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
         </div>
       ),
       "text/plain": (
-        <div className={`w-full h-full ${inModal ? 'p-8 overflow-auto bg-white' : 'bg-gray-200'}`}>
+        <div className={`w-full h-full ${inModal ? 'p-8 overflow-auto bg-background' : 'bg-background'}`}>
           {inModal ? (
-            <div className="font-mono text-sm text-gray-800 whitespace-pre-wrap break-words">
+            <div className="font-mono text-sm text-foreground whitespace-pre-wrap break-words">
               {content?.textContent}
             </div>
           ) : (
             <AspectRatio ratio={1}>
               <div className="w-full h-full p-4 flex flex-col">
                 <div className="w-full h-full overflow-hidden relative">
-                  <div className="font-mono text-sm text-gray-700 whitespace-pre-wrap break-words">
+                  <div className="font-mono text-sm text-foreground whitespace-pre-wrap break-words">
                     {content?.textContent}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-200" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
                 </div>
               </div>
             </AspectRatio>
@@ -340,19 +335,19 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
         </div>
       ),
       "application/json": (
-        <div className={`w-full h-full ${inModal ? 'p-8 overflow-auto bg-white' : 'bg-gray-200'}`}>
+        <div className={`w-full h-full ${inModal ? 'p-8 overflow-auto bg-background' : 'bg-background'}`}>
           {inModal ? (
-            <div className="font-mono text-sm text-gray-800 whitespace-pre-wrap break-words">
+            <div className="font-mono text-sm text-foreground whitespace-pre-wrap break-words">
               {formatJSON(content?.textContent)}
             </div>
           ) : (
             <AspectRatio ratio={1}>
               <div className="w-full h-full p-4 flex flex-col">
                 <div className="w-full h-full overflow-hidden relative">
-                  <div className="font-mono text-sm text-gray-700 whitespace-pre-wrap break-words">
+                  <div className="font-mono text-sm text-foreground whitespace-pre-wrap break-words">
                     {formatJSON(content?.textContent)}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-200" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
                 </div>
               </div>
             </AspectRatio>
@@ -360,19 +355,19 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
         </div>
       ),
       "text/csv": (
-        <div className={`w-full h-full ${inModal ? 'p-8 overflow-auto bg-white' : 'bg-gray-200'}`}>
+        <div className={`w-full h-full ${inModal ? 'p-8 overflow-auto bg-background' : 'bg-background'}`}>
           {inModal ? (
-            <div className="font-mono text-sm text-gray-800 whitespace-pre-wrap break-words">
+            <div className="font-mono text-sm text-foreground whitespace-pre-wrap break-words">
               {content?.textContent}
             </div>
           ) : (
             <AspectRatio ratio={1}>
               <div className="w-full h-full p-4 flex flex-col">
                 <div className="w-full h-full overflow-hidden relative">
-                  <div className="font-mono text-sm text-gray-700 whitespace-pre-wrap break-words">
+                  <div className="font-mono text-sm text-foreground whitespace-pre-wrap break-words">
                     {content?.textContent}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-200" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
                 </div>
               </div>
             </AspectRatio>
@@ -380,19 +375,19 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
         </div>
       ),
       "text/xml": (
-        <div className={`w-full h-full ${inModal ? 'p-8 overflow-auto bg-white' : 'bg-gray-200'}`}>
+        <div className={`w-full h-full ${inModal ? 'p-8 overflow-auto bg-background' : 'bg-background'}`}>
           {inModal ? (
-            <div className="font-mono text-sm text-gray-800 whitespace-pre-wrap break-words">
+            <div className="font-mono text-sm text-foreground whitespace-pre-wrap break-words">
               {content?.textContent}
             </div>
           ) : (
             <AspectRatio ratio={1}>
               <div className="w-full h-full p-4 flex flex-col">
                 <div className="w-full h-full overflow-hidden relative">
-                  <div className="font-mono text-sm text-gray-700 whitespace-pre-wrap break-words">
+                  <div className="font-mono text-sm text-foreground whitespace-pre-wrap break-words">
                     {content?.textContent}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-200" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
                 </div>
               </div>
             </AspectRatio>
@@ -400,19 +395,19 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
         </div>
       ),
       "application/x-yaml": (
-        <div className={`w-full h-full ${inModal ? 'p-8 overflow-auto bg-white' : 'bg-gray-200'}`}>
+        <div className={`w-full h-full ${inModal ? 'p-8 overflow-auto bg-background' : 'bg-background'}`}>
           {inModal ? (
-            <div className="font-mono text-sm text-gray-800 whitespace-pre-wrap break-words">
+            <div className="font-mono text-sm text-foreground whitespace-pre-wrap break-words">
               {content?.textContent}
             </div>
           ) : (
             <AspectRatio ratio={1}>
               <div className="w-full h-full p-4 flex flex-col">
                 <div className="w-full h-full overflow-hidden relative">
-                  <div className="font-mono text-sm text-gray-700 whitespace-pre-wrap break-words">
+                  <div className="font-mono text-sm text-foreground whitespace-pre-wrap break-words">
                     {content?.textContent}
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-200" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
                 </div>
               </div>
             </AspectRatio>
@@ -431,30 +426,6 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
   return (
     <div className={`relative ${inModal ? 'w-full h-full' : 'w-full h-full'}`}>
       {renderContent()}
-      {(showStats || !isMintable) && predictions && (
-        <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white p-4 z-20">
-          <p className="text-lg font-bold mb-4">Content Classification</p>
-          <div className="space-y-3 w-full max-w-sm">
-            {Object.entries(predictions).map(([key, value]) => (
-              <div key={key} className="space-y-1">
-                <div className="flex justify-between text-sm">
-                  <span>{key}</span>
-                  <span>{(Number(value) * 100).toFixed(1)}%</span>
-                </div>
-                <div className="h-1 bg-gray-700 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-white rounded-full transition-all duration-300"
-                    style={{ width: `${Number(value) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-          {!isMintable && (
-            <p className="mt-4 text-red-400 text-sm">This content is not mintable.</p>
-          )}
-        </div>
-      )}
     </div>
   );
 };

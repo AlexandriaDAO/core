@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { useCallback } from 'react';
 import { RootState } from '@/store';
 import { ALEX } from '../../../../../../declarations/ALEX';
 import { LBRY } from '../../../../../../declarations/LBRY';
@@ -23,7 +24,7 @@ const convertE8sToToken = (e8sAmount: bigint): string => {
 export const useNftData = () => {
   const nfts = useSelector((state: RootState) => state.nftData.nfts);
 
-  const getNftData = async (transactionId: string): Promise<NftDataResult> => {
+  const getNftData = useCallback(async (transactionId: string): Promise<NftDataResult> => {
     try {
       const nftEntry = Object.entries(nfts).find(([_, nft]) => 
         nft.arweaveId === transactionId
@@ -72,7 +73,7 @@ export const useNftData = () => {
         collection: undefined
       };
     }
-  };
+  }, [nfts]);
 
   return { getNftData };
 }; 

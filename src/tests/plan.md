@@ -1,13 +1,14 @@
-ToDo Before Next Frontend Deployment:
-- Dark Mode.
-- Out-of-order Alexandrian Results.
-- Look up how sendContent.tsx actually works.
-- Put the proper token logos throughout the swap tab.
-
+****
+- Alexandrian app loading really bad at 100 at a time. (should reduce to 20 for now)
+- Auth getting stuck in the loading state with no way to log out.
+- There's an issue where if you stumble upon an asset that won't render, it'll not render any more after it (try retardio's books.)
 
 
 Dark Mode ToDo:
-- Swap page words are all black in dark mode.
+- Swap page buttons are black when selected in dark mode.
+- Runtime Error modal not in dark mode.
+- FAQ section to match the styles.
+- HTML needs dark mode.
 
 
 
@@ -18,6 +19,8 @@ Dark Mode ToDo:
 
 
 
+#### Module Design Optimizations
+- Can tagSelector.tsx and contentTagsSelector.tsx and contentTypeToggleGroup.tsx be combined?
 
 
 
@@ -41,7 +44,6 @@ Dark Mode ToDo:
 
 
 #### Features now:
-- Figure out a better way than that prop passing to contentItem in contentList.tsx.
 - Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
 - Finish the channels.md plan, given the new text rendering setup.
 
@@ -53,7 +55,6 @@ Dark Mode ToDo:
 - On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.
 
 #### Bigger Features (lower priority):
-- Dark Mode.
 - Range selection for Alexandrian.
 - Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
 - Put another amount selector by the show more button on permasearch.
@@ -63,6 +64,7 @@ Dark Mode ToDo:
 - Index canisters.
 - Autonomous NFT Backup Canister (automate the backup repo logic in a timer autonomous canister.)
 - Likes tracker canister for NFTs. (and maybe secondary method for SBT.)
+- Make coordinate_mint.rs take the NFT_id instead of the arweave_id.
 
 #### Permasearch Specific:
 

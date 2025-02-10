@@ -1,14 +1,22 @@
 import React, { useState } from "react";
-import { Card, CardHeader, CardContent, CardFooter } from "@/lib/components/card";
+import { Card, CardContent, CardFooter } from "@/lib/components/card";
 import { Check, Loader2, Flag, User, Search, Plus, Heart } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Progress } from "@/lib/components/progress";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/lib/components/collapsible";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSearchState } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import { NftDataFooter } from "./components/NftDataFooter";
 import { copyToClipboard } from "./utils/clipboard";
+import { Badge } from "@/lib/components/badge";
+import { RootState } from "@/store";
+import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
+
+interface Transaction {
+  id: string;
+  tags: Array<{ name: string; value: string; }>;
+}
 
 interface ContentCardProps {
   children: React.ReactNode;
@@ -17,7 +25,6 @@ interface ContentCardProps {
   owner?: string;
   showStats?: boolean;
   onToggleStats?: (open: boolean) => void;
-  isMintable?: boolean;
   isOwned?: boolean;
   onMint?: (e: React.MouseEvent) => void;
   onWithdraw?: (e: React.MouseEvent) => void;
@@ -26,11 +33,12 @@ interface ContentCardProps {
   footer?: React.ReactNode;
 }
 
-export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isMintable, isOwned, onMint, onWithdraw, predictions, isMinting, footer }: ContentCardProps) {
+export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, onMint, predictions, isMinting, footer }: ContentCardProps) {
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [copiedOwner, setCopiedOwner] = useState(false);
   const dispatch = useDispatch();
-  const isAlexandrian = window.location.pathname.includes('/alexandrian');
+  const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
+  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions as Transaction[]);
 
   const formatId = (id: string | undefined) => {
     if (!id) return 'N/A';
@@ -53,104 +61,138 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
     }
   };
 
+  const isMediaContent = (contentType: string | undefined) => {
+    if (!contentType) return false;
+    return [...fileTypeCategories.images, ...fileTypeCategories.video].includes(contentType);
+  };
+
+  const shouldShowMintButton = () => {
+    if (!id) return false;
+    
+    const transaction = transactions.find(t => t.id === id);
+    if (!transaction) return false;
+
+    const contentType = transaction.tags?.find(tag => tag.name === "Content-Type")?.value;
+    
+    // For non-media content (epub, pdf, txt, etc.), always allow minting
+    if (!isMediaContent(contentType)) {
+      return true;
+    }
+    
+    // For media content, require safety check
+    return predictions && predictions.isPorn === false;
+  };
+
   return (
     <Card
-      className="cursor-pointer hover:bg-gray-50 flex flex-col relative overflow-hidden bg-white h-full"
+      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative overflow-hidden bg-white dark:bg-gray-900 h-full"
       onClick={onClick}
     >
-      <CardHeader className="flex flex-col items-start p-2 sm:px-4 sm:py-2 gap-1 sm:gap-2">
-        <div className="flex items-center gap-1 sm:gap-2 w-full">
-          {owner && (
-            <div 
-              className="flex items-center gap-1 group cursor-pointer hover:bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md transition-colors"
-              onClick={(e) => handleOwnerClick(e, owner)}
-            >
-              <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500" />
-              <span className="text-xs sm:text-sm text-gray-600 group-hover:text-gray-900">
-                {formatId(owner)}
-              </span>
-              {copiedOwner ? (
-                <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" />
-              ) : (
-                <Search className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 group-hover:text-gray-600" />
-              )}
-            </div>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent className="flex flex-col items-start gap-2 sm:gap-4 p-0">
-        <AspectRatio ratio={1} className="w-full">
-          <div className="flex items-center justify-center bg-gray-50 rounded-lg overflow-hidden h-full">
+      <CardContent className="flex flex-col items-start p-0">
+        <AspectRatio ratio={1} className="w-full relative">
+          <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden h-full">
             {children}
+          </div>
+          {/* Action button - either Like or Mint */}
+          <div 
+            className="absolute bottom-2 left-2 z-[30]" 
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          >
+            {id && arweaveToNftId[id] ? (
+              <Button
+                variant="secondary"
+                className="bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black text-red-600 hover:text-red-500 border border-red-600/20 hover:border-red-600/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onMint?.(e);
+                }}
+                disabled={isMinting}
+              >
+                {isMinting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Heart className="h-4 w-4 transition-all duration-200 group-hover:scale-110" />
+                )}
+              </Button>
+            ) : shouldShowMintButton() && (
+              <Button
+                variant="secondary"
+                className="bg-black/90 hover:bg-black text-brightyellow border border-brightyellow/20 hover:border-brightyellow/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onMint?.(e);
+                }}
+                disabled={isMinting}
+              >
+                {isMinting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4 transition-all duration-200 group-hover:scale-110" />
+                )}
+              </Button>
+            )}
           </div>
         </AspectRatio>
       </CardContent>
 
-      <CardFooter className="flex flex-col w-full rounded-lg border border-[--border] bg-[--card] mt-2 p-2 sm:p-3">
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
-            {isMintable && !isOwned && onMint && (
-              <Button
-                variant="secondary"
-                className={`${isAlexandrian 
-                  ? 'bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200'
-                  : 'bg-black hover:bg-zinc-900 text-[#ffff00] hover:text-[#ffff33] border border-[#ffff00]/50 hover:border-[#ffff00] shadow-[0_0_10px_rgba(255,255,0,0.1)] hover:shadow-[0_0_15px_rgba(255,255,0,0.15)]'
-                } px-2 sm:px-4 py-1 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 transition-all duration-200 text-xs sm:text-sm font-medium shrink-0 ${isMinting ? 'opacity-80' : ''}`}
-                onClick={onMint}
-                disabled={isMinting}
-              >
-                <span className="flex items-center gap-1 sm:gap-2">
-                  {isMinting ? (
-                    <>
-                      <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-                      {isAlexandrian ? 'Liking...' : 'Minting'}
-                    </>
-                  ) : (
-                    <>
-                      {isAlexandrian ? 'Like' : 'Mint NFT'}
-                      {isAlexandrian ? (
-                        <Heart className={`h-4 w-4 sm:h-5 sm:w-5 transition-all duration-200 ${isMinting ? 'scale-125' : ''}`} />
-                      ) : (
-                        <Plus className={`h-4 w-4 sm:h-5 sm:w-5 text-red-500 transition-all duration-200 ${isMinting ? 'scale-125 text-green-500' : ''}`} />
-                      )}
-                    </>
-                  )}
-                </span>
-              </Button>
-            )}
-
-            {predictions && Object.keys(predictions).length > 0 ? (
-              <Collapsible open={showStats} onOpenChange={onToggleStats}>
-                <CollapsibleTrigger asChild>
-                  <Button
-                    variant="secondary"
-                    className="h-6 sm:h-8 px-2 sm:px-3 bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 rounded-md flex items-center gap-1 sm:gap-1.5 transition-colors shrink-0 group"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Flag className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                    <span className="text-[10px] sm:text-xs font-medium">Stats</span>
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent onClick={(e) => e.stopPropagation()}>
-                  <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3 w-full">
-                    {Object.entries(predictions).map(([key, value]) => (
-                      <div key={key} className="space-y-1">
-                        <div className="flex justify-between text-[10px] sm:text-xs">
-                          <span>{key}</span>
-                          <span>{(Number(value) * 100).toFixed(1)}%</span>
-                        </div>
-                        <Progress value={Number(value) * 100} className="h-1" />
-                      </div>
-                    ))}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            ) : null}
-          </div>
-
+      <CardFooter className="flex flex-col w-full bg-[--card] dark:border-gray-700 p-1.5">
+        <div className="flex flex-wrap items-center gap-1">
+          {/* NFT data or custom footer - now first */}
           {(!predictions || Object.keys(predictions).length === 0) && id && !footer && <NftDataFooter id={id} />}
           {footer}
+
+          {/* Owner badge */}
+          {owner && (
+            <Badge 
+              variant="secondary" 
+              className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
+              onClick={(e) => handleOwnerClick(e, owner)}
+            >
+              <User className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
+              <span className="text-gray-600 dark:text-gray-400">
+                {formatId(owner)}
+              </span>
+              {copiedOwner ? (
+                <Check className="h-2.5 w-2.5 text-green-500" />
+              ) : (
+                <Search className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
+              )}
+            </Badge>
+          )}
+
+          {/* Stats button */}
+          {predictions && Object.keys(predictions).length > 0 ? (
+            <Collapsible open={showStats} onOpenChange={onToggleStats}>
+              <CollapsibleTrigger asChild>
+                <Button
+                  variant="secondary"
+                  className="h-5 px-1.5 bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800 rounded-md flex items-center gap-0.5 transition-colors shrink-0 group"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Flag className="h-2.5 w-2.5" />
+                  <span className="text-[10px] font-medium">Stats</span>
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent onClick={(e) => e.stopPropagation()}>
+                <div className="mt-1.5 space-y-1 w-full">
+                  {Object.entries(predictions).map(([key, value]) => (
+                    <div key={key} className="space-y-0.5">
+                      <div className="flex justify-between text-[10px] dark:text-gray-300">
+                        <span>{key}</span>
+                        <span>{(Number(value) * 100).toFixed(1)}%</span>
+                      </div>
+                      <Progress value={Number(value) * 100} className="h-1" />
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ) : null}
         </div>
       </CardFooter>
     </Card>

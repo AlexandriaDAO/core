@@ -10,10 +10,13 @@ export const mint_nft = async (transactionId: string): Promise<string> => {
       throw new Error("You must be authenticated to mint an NFT");
     }
 
-    // Get the owner from Redux state
+    // Get the owner from NFT data
     const state = store.getState();
-    const mintableState = state.contentDisplay.mintableState[transactionId];
-    const ownerStr = mintableState?.owner;
+    const nfts = state.nftData.nfts;
+    const arweaveToNftId = state.nftData.arweaveToNftId;
+    const nftId = arweaveToNftId[transactionId];
+    const nftData = nftId ? nfts[nftId] : undefined;
+    const ownerStr = nftData?.principal;
     
     // Convert owner string to Principal if it exists
     let ownerArg: [] | [Principal] = [];

@@ -33,8 +33,8 @@ export const ContentTypeToggleGroup: React.FC<ContentTypeToggleGroupProps> = ({
         <ToggleGroupItem
           key={type.mimeType}
           value={type.mimeType}
-          variant="outline"
-          className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
+          variant="tag"
+          className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm rounded-full transition-colors"
           aria-label={type.displayName}
         >
           {type.displayName}

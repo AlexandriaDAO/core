@@ -73,7 +73,7 @@ const rootReducer = combineReducers({
 	contentDisplay: contentDisplayReducer,
 	library: libraryReducer,
 	nftData: nftDataReducer,
-	emporium:emporiumReducer,
+	emporium: emporiumReducer,
 	assetManager:assetManagerReducer,
 });
 

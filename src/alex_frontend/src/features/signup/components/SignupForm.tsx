@@ -18,6 +18,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { UsernameAvailabilityResponse } from "../../../../../../src/declarations/user/user.did";
 import signup from "../thunks/signup";
+import { useTheme } from "@/providers/ThemeProvider";
 
 const UserSchema = Yup.object().shape({
 	username: Yup.string()
@@ -37,6 +38,8 @@ const SignupForm = () => {
 	const { actor } = useUser();
 	const dispatch = useAppDispatch();
     const {error, loading} = useAppSelector(state=>state.signup);
+    const { theme } = useTheme();
+    const isDark = theme === "dark";
 
     const [availability, setAvailability] = useState<UsernameAvailabilityResponse | null>(null);
 
@@ -104,7 +107,7 @@ const SignupForm = () => {
 				onSubmit={formik.handleSubmit}
 				className="flex flex-col gap-4"
 			>
-				<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+				<div className="flex flex-col items-start font-roboto-condensed font-medium">
 					{/* <Label htmlFor="username" variant={(formik.touched.username && formik.errors.username ? "destructive" : "default" )}>
 						Username
 					</Label> */}
@@ -119,9 +122,10 @@ const SignupForm = () => {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						value={formik.values.username}
+						className={`${isDark ? 'bg-gray-800 text-foreground' : 'bg-white text-black'}`}
 					/>
 					{formik.touched.username && formik.errors.username && (
-						<span className="text-red-400 text-sm">
+						<span className="text-destructive text-sm">
 							{formik.errors.username}
 						</span>
 					)}
@@ -137,11 +141,11 @@ const SignupForm = () => {
 						</span>
 					)}
 				</div>
-				<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+				<div className="flex flex-col items-start font-roboto-condensed font-medium">
 					<div className="flex items-center gap-2">
 						<input
 							onChange={formik.handleChange}
-							className="cursor-pointer w-4 h-4"
+							className={`cursor-pointer w-4 h-4 ${isDark ? 'accent-primary' : ''}`}
 							type="checkbox"
 							id="agreeToTerms"
 							name="agreeToTerms"
@@ -155,6 +159,7 @@ const SignupForm = () => {
 									? "destructive"
 									: "default"
 							}
+							className={isDark ? 'text-muted-foreground' : 'text-black'}
 						>
 							I agree to the terms and conditions
 						</Label>
@@ -162,7 +167,7 @@ const SignupForm = () => {
 
 					{formik.touched.agreeToTerms &&
 						formik.errors.agreeToTerms && (
-							<span className="text-red-400 text-sm">
+							<span className="text-destructive text-sm">
 								{formik.errors.agreeToTerms}
 							</span>
 						)}

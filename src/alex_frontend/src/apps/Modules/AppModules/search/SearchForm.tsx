@@ -4,30 +4,14 @@ import AmountSelector from './selectors/AmountSelector';
 import ContentCategorySelector from './selectors/ContentCategorySelector';
 import DateSelector from './selectors/DateSelector';
 import ContentTagsSelector from './selectors/ContentTagsSelector';
-import styled from 'styled-components';
-
-const SearchFormContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 800px;
-  padding: 12px;
-  gap: 20px;
-  align-items: flex-start;
-  border-radius: 16px;
-  border: 1px solid var(--black-grey-400, #CCC);
-  background: var(--white, #FFF);
-
-  @media (min-width: 768px) {
-    padding: 16px 20px;
-    gap: 40px;
-    border-radius: 20px;
-  }
-`;
+import { useTheme } from '@/providers/ThemeProvider';
 
 const SearchForm: React.FC = () => {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
-    <SearchFormContainer>
+    <div className={`flex flex-col w-full max-w-[800px] p-3 md:p-5 gap-5 md:gap-10 items-start rounded-[16px] md:rounded-[20px] border ${isDark ? 'border-border bg-gray-900' : 'border-gray-300 bg-gray-50'}`}>
       <div className="flex flex-col sm:flex-row justify-between gap-4 w-full">
         <div className="flex flex-col gap-4 w-full sm:w-1/2">
           <div className="flex flex-col sm:flex-row gap-4 w-full">
@@ -45,7 +29,7 @@ const SearchForm: React.FC = () => {
         </div>
       </div>
       <DateSelector />
-    </SearchFormContainer>
+    </div>
   );
 };
 

@@ -21,6 +21,9 @@ async fn check_caller_scion(minting_number: &Nat, caller: Principal) -> Result<b
     Ok(caller_scion.is_some())
 }
 
+
+// OG_IDs 75-77 characters
+// SCION_IDs 95-97 characters
 #[ic_cdk::update(decoding_quota = 200, guard = "not_anon")]
 pub async fn coordinate_mint(
     arweave_id: String,
