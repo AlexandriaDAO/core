@@ -188,6 +188,8 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
                   () => setSelectedContent({ id: transaction.id, type: contentType })
                 }
                 id={transaction.id}
+                predictions={predictions[transaction.id]}
+
               >
                 <div className="group relative w-full h-full">
                   <ContentRenderer
@@ -216,36 +218,29 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
         </ContentGrid>)}
 
         <Dialog open={!!selectedContent} onOpenChange={(open) => !open && setSelectedContent(null)}>
-          <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col" closeIcon={
-            <Button
-              variant="outline"
-              className="absolute right-4 top-4 z-[60] rounded-full p-3 
-                bg-primary text-primary-foreground hover:bg-primary/90
-                transition-colors"
-            >
-              <X className="h-6 w-6" />
-            </Button>
-          }>
-            {selectedContent && (
-              <div className="w-full h-full overflow-y-auto">
-                <div className="p-6">
-                  <ContentRenderer
-                    transaction={transactions.find(t => t.id === selectedContent.id)!}
-                    content={contentData[selectedContent.id]}
-                    contentUrls={contentData[selectedContent.id]?.urls || {
-                      thumbnailUrl: null,
-                      coverUrl: null,
-                      fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
-                    }}
-                    inModal={true}
-                    handleRenderError={handleRenderError}
-                  />
-                </div>
+          <DialogContent 
+            className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"
+          >
+       
+            
+            {selectedContent && contentData[selectedContent.id] && (
+              <div className="w-full h-full">
+                <ContentRenderer
+                  key={selectedContent.id}
+                  transaction={transactions.find(t => t.id === selectedContent.id)!}
+                  content={contentData[selectedContent.id]}
+                  contentUrls={contentData[selectedContent.id]?.urls || {
+                    thumbnailUrl: null,
+                    coverUrl: null,
+                    fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
+                  }}
+                  inModal={true}
+                  handleRenderError={handleRenderError}
+                />
               </div>
             )}
           </DialogContent>
-        </Dialog>
-
+        </Dialog> 
         <CombinedModal
           type={modalType!}
           modalData={modalData}

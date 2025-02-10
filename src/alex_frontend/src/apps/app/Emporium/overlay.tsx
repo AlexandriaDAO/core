@@ -32,9 +32,9 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
 
         if (isUserListing && type === "marketPlace") {
             return (
-                <div className="md:flex items-center absolute top-2 right-2">
+                <div className="md:flex items-center absolute bottom-[50px] right-2">
                     <Button
-                        className="bg-red-700  text-white rounded-full w-24 h-10 flex items-center justify-center z-[25] md:me-3 md:mb-0 xs:mb-2"
+                        className="bg-[#B23A48] border-[#353430] text-white rounded-sm w-24 h-10 flex items-center justify-center z-[25] md:me-3 md:mb-0 xs:mb-2"
                         onClick={(e) => {
                             e.stopPropagation();
                             setModal("remove", { arwaveId: transaction.id, show: true, transaction });
@@ -43,7 +43,7 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
                         Remove
                     </Button>
                     <Button
-                        className="bg-blue-500 text-white rounded-full w-24 h-10 flex items-center justify-center z-[25]"
+                        className="bg-[#f3f3f2] text-[#353430] border-[#353430] rounded-sm w-24 h-10 flex items-center justify-center z-[25]"
                         onClick={(e) => {
                             e.stopPropagation();
                             setModal("edit", { arwaveId: transaction.id, show: true, price, transaction });
@@ -61,7 +61,9 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
                         handleButtonClick(transaction.id, price);
                     }}
                     disabled={!user?.principal}
-                    className="absolute top-2 right-2 bg-green-500 text-white rounded-full w-24 h-10 flex items-center justify-center z-[25]"
+                    className={`absolute ${buttonType === "Sell" ? "bottom-[10px]" : "bottom-[50px]"} right-2 
+            bg-green-500 text-white rounded-sm w-24 h-10 flex items-center justify-center z-[25]`}
+
                 >
                     {buttonType}
                 </Button>
