@@ -3,7 +3,6 @@ import {
   setTransactions,
   clearTransactions,
   setContentData,
-  MintableStateItem,
   addTransaction,
   commitAddTransaction,
 } from "./contentDisplaySlice";

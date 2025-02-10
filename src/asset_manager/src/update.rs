@@ -78,7 +78,7 @@ async fn create_asset_canister(from_subaccount: Option<[u8; 32]>) -> Result<Prin
         Principal::management_canister(),
         "install_code",
         (install_args,),
-        500_000_000_000, // Increased cycles
+        1000, // Increased cycles
     )
     .await
     .map_err(|e| format!("Installation failed: {:?}", e))?;
