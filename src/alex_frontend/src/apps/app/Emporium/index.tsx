@@ -15,7 +15,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketListing from "./thunks/getMarketListing";
 import ContentListEmporium from "./contentListEmporium";
 import { Button } from "@/lib/components/button";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Container } from "lucide-react";
 import EmporiumSearchForm from "./component/emporiumSearchForm";
 import SearchEmporium from "./component/searchEmporium";
 import PaginationComponent from "./component/PaginationComponent";
@@ -145,6 +145,7 @@ const Emporium = () => {
             }));
         }
     };
+    
 
     // intial 
     useEffect(() => {
@@ -164,38 +165,8 @@ const Emporium = () => {
                 <Title className="lg:text-5xl md:text-3xl sm:text-2xl xs:text-xl">Emporium</Title>
                 <Description>MarketPlace</Description>
                 <Hint></Hint>
-                <div className="pb-4 text-center">
-                    <Button
-                        className={`bg-gray-900lg:h-14 xs:h-10 lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "userNfts" ? "bg-white text-[#353535]" : ""
-                            }`}
-                        disabled={!user?.principal}
-                        onClick={() => {
-                            fetchUserNfts();
+               
 
-                        }}
-                    >
-                        My Nfts
-                    </Button>
-                    <Button
-                        className={`bg-gray-900lg:h-14 xs:h-10 lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] mb-2 ${activeButton === "marketPlace" ? "bg-white text-[#353535]" : ""
-                            }`}
-                        onClick={() => {
-                            fetchMarketListings();
-                        }}
-                    >
-                        MarketPlace
-                    </Button>
-                    <Button
-                        className={`bg-gray-900lg:h-14 xs:h-10  lg:px-7 xs-px-5 text-white lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[30px] lg:me-5 md:me-3 xs:me-2 hover:bg-white hover:text-[#353535] ${activeButton === "userListings" ? "bg-white text-[#353535]" : ""
-                            }`}
-                        disabled={!user?.principal}
-                        onClick={() => {
-                            fetchUserListings();
-                        }}
-                    >
-                        My Listing
-                    </Button>
-                </div>
                 {activeButton === "userNfts" ? <></> : <>
                     <SearchEmporium />
                     <ControlsContainer $isOpen={isFiltersOpen}>
@@ -220,9 +191,56 @@ const Emporium = () => {
                 </>}
 
             </PageContainer>
+            <div className="container">
+                <div className="pb-10">
+                        <Button
+                            className={
+                                `
+                                lg:h-10 xs:h-10 lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#E8D930] hover:dark:border-[#353535] mb-2 
+                                
+                                ${activeButton === "userNfts" ? "dark:text-[#0F172A] dark:bg-[#E8D930] dark:border-[#E8D930] text-[#E8D930] bg-gray-900" : ""
+                                }`}
+                            disabled={!user?.principal}
+                            onClick={() => {
+                                fetchUserNfts();
 
-            <ContentListEmporium type={type} />
-            <PaginationComponent totalPages={emporium.totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
+                            }}
+                        >
+                            My Nfts
+                        </Button>
+                        <Button
+                            className={
+                                `
+                                lg:h-10 xs:h-10 lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#E8D930] hover:dark:border-[#353535] mb-2
+                                
+                                ${activeButton === "marketPlace" ? "dark:text-[#0F172A] dark:bg-[#E8D930] dark:border-[#E8D930] text-[#E8D930] bg-gray-900" : ""
+                                }`}
+                            onClick={() => {
+                                fetchMarketListings();
+                            }}
+                        >
+                            MarketPlace
+                        </Button>
+                        <Button
+                            className=
+                            {
+                                `lg:h-10 xs:h-10  lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#E8D930] hover:dark:border-[#353535]
+                                ${activeButton === "userListings" ? "dark:text-[#0F172A] dark:bg-[#E8D930] dark:border-[#E8D930] border border-2 border-[#353535] text-[#E8D930] bg-gray-900 " : ""
+                                }`
+                            }
+                            disabled={!user?.principal}
+                            onClick={() => {
+                                fetchUserListings();
+                            }}
+                        >
+                            My Listing
+                        </Button>
+                </div>
+                <div className="mb-20">
+                <ContentListEmporium type={type}/>
+                </div>
+                <PaginationComponent totalPages={emporium.totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
+            </div>
         </>
     );
 }

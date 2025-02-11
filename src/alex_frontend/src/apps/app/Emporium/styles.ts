@@ -15,6 +15,7 @@ export const PageContainer = styled.div`
   gap: 24px;
   max-width: 800px;
   margin: 0 auto;
+  width:100%;
   @media(max-width:575px){
     max-width: 100%;
   }
@@ -62,14 +63,14 @@ export const ControlsContainer = styled.div<{ $isOpen: boolean }>`
 
 export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
   display: flex;
-  width: 180px;
-  height: 60px;
+  min-width: 120px;
+  height: 50px;
   padding: 10px var(--Fonts-Size-h2, 24px);
   justify-content: center;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
-  border-radius: 30px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: Syne;
@@ -89,20 +90,21 @@ export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
 
 export const SearchButton = styled.button`
   display: flex;
-  height: 60px;
-  padding: 10px 24px;
+  height: 50px;
+  padding: 10px 15px;
   justify-content: center;
   align-items: center;
   gap: 10px;
   flex: 1 0 0;
-  min-width: 280px;
-  border-radius: 30px;
+  min-width: 600px;
+  border-radius: 10px;
   background: hsl(var(--primary));
   border: none;
   color: hsl(var(--primary-foreground));
   cursor: pointer;
   font-family: Syne;
   font-size: 16px;
+  
 `;
 
 export const SearchFormContainer = styled.div<{ $isOpen: boolean }>`

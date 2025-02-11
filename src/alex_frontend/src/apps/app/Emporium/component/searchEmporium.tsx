@@ -15,13 +15,13 @@ export const SearchBox = styled.div`
   display: flex;
   width: 100%;
   max-width: 800px;
-  height: 60px;
+  height: 50px;
   padding: 16px 20px;
   align-items: center;
-  border-radius: 30px;
+  border-radius: 10px;
   border: 1px solid var(--black-grey-400, #CCC);
   background: var(--Colors-LightMode-Text-text-100, #FFF);
-  margin-bottom: 24px;
+
 `;
 
 export const Input = styled.input`
