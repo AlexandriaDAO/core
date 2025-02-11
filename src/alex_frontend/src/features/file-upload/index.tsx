@@ -55,30 +55,9 @@ function FileUpload() {
             </div>
         );
 
-        return (
-            <div className="space-y-4">
-                <div className="flex justify-center gap-4">
-                    <Button
-                        onClick={() => dispatch(setTextMode(false))}
-                        variant={!textMode ? "inverted" : "outline"}
-                        className="w-40"
-                    >
-                        <ArrowUpToLine className="mr-2 h-4 w-4" />
-                        Upload File
-                    </Button>
-                    <Button
-                        onClick={() => dispatch(setTextMode(true))}
-                        variant={textMode ? "inverted" : "outline"}
-                        className="w-40"
-                    >
-                        <FileText className="mr-2 h-4 w-4" />
-                        Create Text
-                    </Button>
-                </div>
+        if (textMode) return <TextEditor setFile={setFile} />;
 
-                {textMode ? <TextEditor setFile={setFile} /> : <FileSelector setFile={setFile} />}
-            </div>
-        );
+        return <FileSelector setFile={setFile} />;
     };
 
     return (
@@ -88,7 +67,7 @@ function FileUpload() {
 
                 {uploadError && file && <UploadError file={file}/>}
 
-                <div className="font-roboto-condensed bg-secondary rounded-lg shadow-md p-8">
+                <div className="font-roboto-condensed bg-secondary rounded-lg shadow-md p-8 border border-border">
                     {renderContent()}
                 </div>
 

@@ -31,7 +31,7 @@ const InlineSignup = () => {
                 <DialogContent
                     closeIcon={<X size={20} onClick={()=>setOpen(false)}/>}
                     onOpenAutoFocus={(e) => e.preventDefault()}
-                    className="font-roboto-condensed outline-none mx-auto max-w-md bg-white p-8 text-[#828282]"
+                    className="font-roboto-condensed outline-none mx-auto max-w-md p-8"
                 >
                     <SignupForm />
                 </DialogContent>

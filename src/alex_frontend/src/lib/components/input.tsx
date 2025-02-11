@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 const inputVariants = cva(
   // ending space is important
   "p-1 font-roboto-condensed font-medium "+
-  "flex w-full border bg-background " +
+  "flex w-full border bg-white text-black dark:bg-gray-800 dark:text-foreground " +
   "file:border-0 file:bg-transparent file:font-medium " +
   "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-offset-0 " +
   "disabled:cursor-not-allowed disabled:opacity-50",

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -9,7 +9,7 @@ import { useUser } from "@/hooks/actors";
 import upgrade from "@/features/auth/thunks/upgrade";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useNavigate } from "react-router";
-import { TermsContent } from '@/components/TermsContent';
+const TermsAndConditions = React.lazy(() => import('@/components/TermsAndConditions'));
 
 const LibrarianSchema = Yup.object().shape({
 	agreeToTerms: Yup.boolean()
@@ -48,21 +48,16 @@ const UpgradePage = () => {
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">Upgrade Profile</h1>
 			</div>
-			<div className="font-roboto-condensed bg-white rounded-lg shadow-md p-6">
-				<div className="mb-6 text-gray-600 font-roboto-condensed">Become a librarian and you will be able to add your nodes.</div>
+			<div className="font-roboto-condensed bg-secondary rounded-lg shadow-md p-6">
+				<div className="mb-6 font-roboto-condensed">Become a librarian and you will be able to add your nodes.</div>
 				{librarianError && <span className="text-destructive">{librarianError}</span>}
 				<form
 					onSubmit={formik.handleSubmit}
 					className="flex flex-col gap-4"
 				>
-					<div className="flex-grow font-roboto-condensed text-black">
-						<Label>
-							Terms and Conditions
-						</Label>
-						<div className="text-base max-h-60 overflow-auto text-justify leading-5 font-normal pr-1">
-							<TermsContent />
-						</div>
-					</div>
+					<Suspense fallback={<div>Loading...</div>}>
+						<TermsAndConditions />
+					</Suspense>
 
 					<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
 						<div className="flex items-center gap-2">
@@ -74,7 +69,7 @@ const UpgradePage = () => {
 
 						{formik.touched.agreeToTerms &&
 							formik.errors.agreeToTerms && (
-								<span className="text-red-400 text-sm">
+								<span className="text-destructive text-sm">
 									{formik.errors.agreeToTerms}
 								</span>
 							)}

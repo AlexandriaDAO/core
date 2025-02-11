@@ -45,7 +45,7 @@ function TextEditor({ setFile }: TextEditorProps) {
                 <select
                     value={fileType}
                     onChange={(e) => setFileType(e.target.value)}
-                    className="px-3 py-2 rounded-md bg-background text-black dark:text-white border"
+                    className="px-3 py-2 rounded-md bg-white text-black dark:bg-gray-800 dark:text-foreground border border-gray-400 focus-visible:ring-gray-700"
                 >
                     <option value="text/plain">Plain Text (.txt)</option>
                     <option value="text/markdown">Markdown (.md)</option>
@@ -56,7 +56,7 @@ function TextEditor({ setFile }: TextEditorProps) {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Enter your content here..."
-                className="w-full h-64 p-3 font-mono rounded-md bg-background text-black dark:text-white border"
+                className="w-full h-64 p-3 font-mono rounded-md bg-white text-black dark:bg-gray-800 dark:text-foreground border border-gray-400 focus-visible:ring-gray-700"
             />
             <div className="flex justify-end space-x-3">
                 <Button onClick={() => dispatch(setTextMode(false))} variant="muted">
