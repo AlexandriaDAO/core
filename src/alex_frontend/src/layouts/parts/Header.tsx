@@ -46,7 +46,7 @@ export const Entry = () => {
 		return (
 			// load signup module only when needed
 			<Suspense fallback={<Processing message="Loading..." />}>
-				<InlineSignup />;
+				<InlineSignup />
 			</Suspense>
 		);
 

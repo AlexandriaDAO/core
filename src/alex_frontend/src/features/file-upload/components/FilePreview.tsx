@@ -15,9 +15,9 @@ function FilePreview({ file }: FilePreviewProps) {
         <div>
             <h2 className="text-lg font-semibold">Selected File</h2>
 
-            <div className="p-6 bg-secondary rounded-lg shadow-sm border">
+            <div className="p-6 bg-secondary rounded shadow-sm border">
                 <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center border rounded-lg bg-white dark:bg-transparent">
+                    <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center border rounded bg-white dark:bg-transparent">
                         <span className="text-2xl">{typeInfo?.icon || '📁'}</span>
                     </div>
                     
@@ -38,9 +38,9 @@ function FilePreview({ file }: FilePreviewProps) {
                         </div>
                         
                         {typeInfo && (
-                            <div className="mt-2 h-1 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="mt-2 h-1 bg-gray-300 dark:bg-gray-500 rounded-full overflow-hidden">
                                 <div 
-                                    className="h-full bg-constructive rounded-full"
+                                    className="h-full bg-gray-700 dark:bg-info/50 rounded-full"
                                     style={{ 
                                         width: `${Math.min((file.size / typeInfo.maxSize) * 100, 100)}%`,
                                     }}

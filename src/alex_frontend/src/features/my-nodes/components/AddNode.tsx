@@ -100,12 +100,12 @@ const AddNode = () => {
 							)}
 					</div>
 
-					<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
+					<div className="flex flex-col items-start font-roboto-condensed font-medium">
 						<Label htmlFor="active" variant={(formik.touched.active && formik.errors.active ? "destructive" : "default" ) }>
 							Status
 						</Label>
 						<select
-							className={`bg-background text-black dark:text-white w-full border p-1 rounded text-xl ${
+							className={`w-full bg-white text-black dark:bg-gray-800 dark:text-foreground border border-gray-400 focus-visible:ring-gray-700 p-1 rounded text-xl ${
 								formik.touched.active &&
 								formik.errors.active
 									? "border-destructive"
@@ -124,7 +124,7 @@ const AddNode = () => {
 						</select>
 						{formik.touched.active &&
 							formik.errors.active && (
-								<span className="text-red-400 text-sm">
+								<span className="text-destructive text-sm">
 									{formik.errors.active}
 								</span>
 							)}

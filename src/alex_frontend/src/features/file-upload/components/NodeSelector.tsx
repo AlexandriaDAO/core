@@ -25,7 +25,7 @@ const NodeSelector = () => {
 	if(fetching) {
 		return (
 			<div className="space-y-2">
-				{[...Array(5)].map((_, index) => (
+				{[...Array(3)].map((_, index) => (
 					<NodeSkeleton key={index} />
 				))}
 			</div>
@@ -46,7 +46,7 @@ const NodeSelector = () => {
 						<p className="text-right text-sm text-muted-foreground">
 							Estimated Cost: {formatAmount(cost)}
 						</p>
-						<div className="border-l h-6 mx-2"></div>
+						<div className="border-l dark:border-l-gray-300 h-6 mx-2"></div>
 					</>
 				)}
 				<Button

@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import { FILE_TYPES, allowedTypes, getFileTypeInfo } from "../constants";
 import { formatFileSize } from "../utils";
 import { XCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Button } from "@/lib/components/button";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { setTextMode } from "../fileUploadSlice";
 
 interface FileSelectorProps {
     setFile: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
 function FileSelector({ setFile }: FileSelectorProps) {
+    const dispatch = useAppDispatch();
 	const [error, setError] = useState<string | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const [showSupportedTypes, setShowSupportedTypes] = useState(false);
@@ -73,17 +77,19 @@ function FileSelector({ setFile }: FileSelectorProps) {
 
 
 	return (
-        <>
+        <div className="space-y-4">
             <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-700 dark:text-white mb-2">Upload File</h2>
-                <p className="text-gray-600">Choose a file to upload or drag and drop it here</p>
+                <p className="text-gray-600">
+                    Choose a file to upload or <span className="cursor-pointer text-info hover:underline" onClick={() => dispatch(setTextMode(true))}>create your own text here.</span>
+                </p>
             </div>
 
             <div
-                className={`relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+                className={`relative border-2 rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
                     isDragging
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-border border-solid bg-secondary'
+                        : 'border-gray-300 border-dashed hover:border-gray-500'
                 }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -99,7 +105,7 @@ function FileSelector({ setFile }: FileSelectorProps) {
                 <div className="space-y-6">
                     <div className="flex justify-center">
                         <svg
-                            className={`w-16 h-16 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`}
+                            className={`w-16 h-16 ${isDragging ? 'text-primary' : 'text-gray-400'}`}
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -119,7 +125,7 @@ function FileSelector({ setFile }: FileSelectorProps) {
                     {/* File Type Categories */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
                         {Object.entries(FILE_TYPES).map(([key, category]) => (
-                            <div key={key} className="text-center p-3 bg-white dark:bg-transparent border rounded-lg">
+                            <div key={key} className="text-center p-3 bg-white dark:bg-transparent border rounded">
                                 <div className="text-2xl mb-2">{category.icon}</div>
                                 <div className="text-sm font-medium text-gray-700 dark:text-white">{category.label}</div>
                                 <div className="text-xs text-gray-500">
@@ -165,7 +171,7 @@ function FileSelector({ setFile }: FileSelectorProps) {
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {Object.entries(FILE_TYPES).map(([key, category]) => (
-                                    <div key={key} className="border bg-white dark:bg-transparent p-3 rounded-lg shadow-sm">
+                                    <div key={key} className="border bg-white dark:bg-transparent p-3 rounded shadow-sm">
                                         <div className="flex items-center space-x-2 mb-2">
                                             <span className="text-xl">{category.icon}</span>
                                             <span className="font-medium text-gray-700 dark:text-white">
@@ -195,7 +201,7 @@ function FileSelector({ setFile }: FileSelectorProps) {
                     </div>
                 </div>
             )}
-        </>
+        </div>
 	);
 }
 
