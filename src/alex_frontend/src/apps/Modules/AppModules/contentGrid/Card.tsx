@@ -31,15 +31,15 @@ interface ContentCardProps {
   predictions?: any;
   isMinting?: boolean;
   footer?: React.ReactNode;
+  component?:string;
 }
 
-export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, onMint, predictions, isMinting, footer }: ContentCardProps) {
+export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, onMint, predictions, isMinting, footer,component }: ContentCardProps) {
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [copiedOwner, setCopiedOwner] = useState(false);
   const dispatch = useDispatch();
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
   const transactions = useSelector((state: RootState) => state.contentDisplay.transactions as Transaction[]);
-
   const formatId = (id: string | undefined) => {
     if (!id) return 'N/A';
     return `${id.slice(0, 4)}...${id.slice(-4)}`;
@@ -85,12 +85,12 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
 
   return (
     <Card
-      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative overflow-hidden bg-white dark:bg-gray-900 h-full"
-      onClick={onClick}
+      className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative  bg-white dark:bg-gray-900 h-full ${component==="Emporium"?"mb-20 ":"overflow-hidden "}`}
+      onClick={onClick} 
     >
       <CardContent className="flex flex-col items-start p-0">
         <AspectRatio ratio={1} className="w-full relative">
-          <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden h-full">
+          <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg  ${component==="Emporium"?" border-gray-900 dark:border-gray-900":"overflow-hidden h-full "}`}  >
             {children}
           </div>
           {/* Action button - either Like or Mint */}

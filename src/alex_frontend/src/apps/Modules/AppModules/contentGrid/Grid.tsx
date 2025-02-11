@@ -28,7 +28,7 @@ type ContentGridComponent = React.FC<ContentGridProps> & {
 export const ContentGrid: ContentGridComponent = Object.assign(
   ({ children }: ContentGridProps) => {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 p-2 sm:p-4 pb-16">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 pb-16">
         {children}
       </div>
     );

@@ -32,7 +32,7 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
 
         if (isUserListing && type === "marketPlace") {
             return (
-                <div className="md:flex items-center absolute bottom-[50px] right-2">
+                <div className="md:flex items-center mt-4">
                     <Button
                         className="bg-[#B23A48] border-[#353430] text-white rounded-sm w-24 h-10 flex items-center justify-center z-[25] md:me-3 md:mb-0 xs:mb-2"
                         onClick={(e) => {
@@ -61,9 +61,10 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
                         handleButtonClick(transaction.id, price);
                     }}
                     disabled={!user?.principal}
-                    className={`absolute ${buttonType === "Sell" ? "bottom-[10px]" : "bottom-[50px]"} right-2 
-            bg-green-500 text-white rounded-sm w-24 h-10 flex items-center justify-center z-[25]`}
-
+                    className={` ${buttonType === "Sell" 
+                        ? " dark:bg-gray-600 dark:border-gray-600 mt-2 z-[25] relative" 
+                        : ""} ${buttonType==="Buy"&&"mt-2 dark:bg-gray-900 dark:border-gray-900 hover:bg-gray-600 hover:dark:bg-gray-600 hover:dark:text-white z-[25] relative" }
+                        right-2 bg-green-500 text-white rounded-sm w-24 h-10 flex items-center justify-center z-[25]`}
                 >
                     {buttonType}
                 </Button>
@@ -77,7 +78,7 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
     return (
         <>
             {type === "marketPlace" && emporium.marketPlace[transaction.id]?.price && (
-                <div className="text-white lg:text-lg md:text-base sm:text-sm absolute bottom-0 bg-gray-600 w-full p-2">
+                <div className="text-white lg:text-lg md:text-base sm:text-sm absolute bottom-[63px] bg-gray-600 w-[92%] p-2">
                     Price {emporium.marketPlace[transaction.id]?.price} ICP
                 </div>
             )}

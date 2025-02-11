@@ -72,10 +72,10 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
             case "sell":
                 return (
                     <>
-                        <h2 className="text-3xl font-semibold mb-2 text-gray-700">Sell</h2>
-                        <p className="mb-4 break-all text-gray-700">ID: {modalData.arwaveId}</p>
+                        <h2 className="text-3xl font-semibold mb-2 text-foreground">Sell</h2>
+                        <p className="mb-4 break-all text-foreground text-2xl font-medium">ID: {modalData.arwaveId}</p>
                         <div className="mb-4">
-                            <Label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+                            <Label htmlFor="price" className="block text-sm font-medium  mb-1 text-foreground">
                                 Price (in ICP)
                             </Label>
                             <Input
@@ -102,13 +102,13 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
             case "edit":
                 return (
                     <>
-                        <h2 className="text-3xl font-semibold mb-2 text-gray-700">Edit</h2>
-                        <p className="mb-4 break-all text-gray-700">ID: {modalData.arwaveId}</p>
+                        <h2 className="text-3xl font-semibold mb-2 text-foreground">Edit</h2>
+                        <p className="mb-4 break-all text-foreground text-2xl font-medium">ID: {modalData.arwaveId}</p>
                         <div className="mb-4">
-                            <Label className="block text-sm font-medium text-gray-700 mb-1">Current Price: {modalData.price} ICP</Label>
+                            <Label className="block text-sm font-medium text-foreground mb-1">Current Price: {modalData.price} ICP</Label>
                         </div>
                         <div className="mb-4">
-                            <Label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+                            <Label htmlFor="price" className="block text-sm font-medium text-foreground mb-1">
                                 Updated Price (in ICP)
                             </Label>
                             <Input
@@ -134,15 +134,15 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
             case "remove":
                 return (
                     <>
-                        <h2 className="text-3xl font-semibold mb-2 text-gray-700">Remove Item</h2>
-                        <p className="mb-4 break-all text-gray-700 ">ID: {modalData.arwaveId}</p>
+                        <h2 className="text-3xl font-semibold mb-2 text-foreground text-2xl">Remove Item</h2>
+                        <p className="mb-4 break-all text-foreground text-2xl font-medium">ID: {modalData.arwaveId}</p>
                         <p className="text-gray-700">Are you sure you want to remove this item from marketplace?</p>
                     </> 
                 );19
             case "buy":
                 return (
                     <>
-                        <h2 className="text-3xl font-semibold mb-2 text-gray-700">Buy</h2>
+                        <h2 className="text-3xl font-semibold mb-2 text-foreground">Buy</h2>
                         <p className="mb-4">Price: {emporium.marketPlace[modalData.arwaveId]?.price || "N/A"} ICP</p>
                     </>
                 );
@@ -151,7 +151,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]   ">
-            <div className="bg-white rounded-xl sm:p-10 xs:p-4 max-w-lg w-full sm:w-full xs:w-11/12 relative flex flex-col max-h-[90vh]">
+            <div className="bg-background rounded-xl sm:p-10 xs:p-4 max-w-lg w-full sm:w-full xs:w-11/12 relative flex flex-col max-h-[90vh] dark:bg-gray-900">
                 <Button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-gray-500 hover:text-white z-[1200] bg-white hover:bg-black"
@@ -178,18 +178,18 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
                     <div className="mt-4 flex justify-between mb-4 flex-shrink-0">
                         <Button
                             onClick={onClose}
-                            className="bg-gray-900 h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl sm:me-5 xs:mb-2 hover:bg-white hover:text-[#353535]"
+                            className="bg-gray-600 h-14 px-7 text-white text-xl border border-2 border-gray-600 rounded-xl sm:me-5 xs:mb-2 hover:bg-white hover:text-[#353535] dark:bg-gray-600 dark:border-gray-600 dark:text-white hover:dark:border-gray-600"
                         >
                             Cancel
                         </Button>
                         <Button
                             onClick={handleAction}
-                            className="bg-gray-900 h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl hover:bg-white hover:text-[#353535]"
+                            className="bg-gray-900 h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl hover:bg-white hover:text-[#353535] dark:bg-[#E8D930] dark:border-[#E8D930] dark:text-[#0F1F2A] hover:dark:border-[#E8D930] "
                         >
                             Confirm
                         </Button>
                     </div>
-                    <div className="text-center text-sm text-gray-500 flex-shrink-0">
+                    <div className="text-center text-sm text-foreground flex-shrink-0">
                         {MARKETPLACE_LBRY_FEE} LBRY fee will be charged from spending wallet
                     </div>
                 </div>
