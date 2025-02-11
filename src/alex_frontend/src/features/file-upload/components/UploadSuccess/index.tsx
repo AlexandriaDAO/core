@@ -66,7 +66,7 @@ const UploadSuccess: React.FC<UploadSuccessProps> = ({
 								href={fileUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-blue-500 hover:text-blue-600 flex items-center"
+								className="text-primary/80 hover:text-primary flex items-center"
 							>
 								View file
 								<ExternalLink
@@ -97,7 +97,7 @@ const UploadSuccess: React.FC<UploadSuccessProps> = ({
 								href={txUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-blue-500 hover:text-blue-600 flex items-center"
+								className="text-primary/80 hover:text-primary flex items-center"
 							>
 								View transaction
 								<ExternalLink
