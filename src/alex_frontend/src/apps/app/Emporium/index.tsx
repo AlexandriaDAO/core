@@ -191,8 +191,8 @@ const Emporium = () => {
                 </>}
 
             </PageContainer>
-            <div className="container">
-                <div className="pb-10">
+            <div className="container px-2">
+                <div className="lg:pb-10 md:pb-8 sm:pb-6 xs:pb-4">
                         <Button
                             className={
                                 `
@@ -236,7 +236,7 @@ const Emporium = () => {
                             My Listing
                         </Button>
                 </div>
-                <div className="mb-20">
+                <div className="lg:mb-20 md:mb-16 sm:mb-10 xs:mb-6">
                 <ContentListEmporium type={type}/>
                 </div>
                 <PaginationComponent totalPages={emporium.totalPages} onPageChange={handlePageClick} currentPage={currentPage} />

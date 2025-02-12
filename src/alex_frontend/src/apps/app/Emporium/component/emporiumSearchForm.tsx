@@ -17,7 +17,11 @@ const EmporiumSearchFormContainer = styled.div`
   align-items: flex-start;
   border-radius: 20px;
   border: 1px solid var(--black-grey-400, #CCC);
-  background: var(--white, #FFF);
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+
+
+  
 `;
 
 const EmporiumSearchForm: React.FC = () => {
@@ -29,10 +33,11 @@ const EmporiumSearchForm: React.FC = () => {
   const handleSearchStateChange = (value: string) => {
     dispatch(setSearchEmporium({ ...search, type: value }));
   }
+
   //
 
   return (
-    <EmporiumSearchFormContainer>
+    <EmporiumSearchFormContainer >
       <div className="w-full">
         <div className="flex flex-col gap-4 
         ">
@@ -40,7 +45,7 @@ const EmporiumSearchForm: React.FC = () => {
 
             <EmporiumPageSizeSelector />
             <div className="flex flex-col">
-              <span className="block mb-3 text-lg font-medium font-['Syne'] text-foreground">
+              <span className="block mb-3 text-lg font-medium font-['Syne'] text-foreground dark:text-white">
                 Search by
               </span>
               <ToggleGroup
@@ -52,7 +57,7 @@ const EmporiumSearchForm: React.FC = () => {
                 }}
                 className="mb-4"
               >
-                
+
                 <ToggleGroupItem className="!w-full !py-2 !px-3 !border !rounded-xl" value="principal" aria-label="Search by Principal ID">
                   Principal
                 </ToggleGroupItem>

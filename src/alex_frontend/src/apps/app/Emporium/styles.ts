@@ -16,8 +16,15 @@ export const PageContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
   width:100%;
-  @media(max-width:575px){
-    max-width: 100%;
+  @media(max-width:1399px){
+    max-width: 670px;
+  }
+  @media(max-width:768px){
+    max-width: 440px;
+  }
+  @media(max-width:640px){
+   padding: 40px 20px 15px;
+   gap: 14px;
   }
 `;
 
@@ -86,6 +93,13 @@ export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
     color: hsl(var(--foreground));
     border: 1px solid hsl(var(--border));
   `}
+   @media(max-width:1399px){
+    min-width: 100px;
+  }
+    @media(max-width:768px){
+    min-width: 90px;
+     height: 40px;
+  }
 `;
 
 export const SearchButton = styled.button`
@@ -104,6 +118,15 @@ export const SearchButton = styled.button`
   cursor: pointer;
   font-family: Syne;
   font-size: 16px;
+   @media(max-width:1399px){
+    min-width: 400px;
+  }
+    @media(max-width:768px){
+    @media(max-width:1399px){
+      min-width: 230px;
+       height: 40px;
+  }
+    }
   
 `;
 

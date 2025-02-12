@@ -154,7 +154,7 @@ const SandboxRenderer: React.FC<SandboxRendererProps> = ({
               src={content?.imageObjectUrl || contentUrls.thumbnailUrl || contentUrls.fullUrl} 
               alt="Content" 
               decoding="async"
-              className="max-w-[95vw] max-h-[90vh] w-auto h-auto object-contain"
+              className={`max-w-[95vw] max-h-[90vh] w-auto h-auto object-contain `}
               crossOrigin="anonymous" 
               onError={() => handleRenderError(transaction.id)}
             />

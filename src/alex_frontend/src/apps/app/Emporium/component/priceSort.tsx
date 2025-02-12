@@ -41,7 +41,7 @@ const PriceSort = () => {
             <div className='flex gap-1'>
                 <div className="toggle-container">
                     <Button
-                        className={`toggle-Button  rounded-xl${isSortActive ? "active" : ""}`}
+                        className={`toggle-Button  rounded-xl${isSortActive ? "active dark:bg-[#E8D930] dark:text-black dark:border-[#E8D930] rounded-xl " : ""}`}
                         onClick={toggleSortActivation}
                         aria-label="Activate or deactivate sorting"
                     >
@@ -51,14 +51,14 @@ const PriceSort = () => {
                 </div>
 
                 <Button
-                    className={`sort-Button rounded-xl ${isSortActive ? "" : "disabled"}`}
+                    className={`sort-Button rounded-xl dark:border-white dark:hover:bg-grey ${isSortActive ? "" : "disabled"}`}
                     onClick={toggleSortOrder}
                     aria-label="Sort by price"
                     disabled={!isSortActive} // Disable Button when sorting is inactive
                 >
 
-                    {sortOrder === "desc" && <ArrowDownWideNarrow className="h-4 w-4" />}
-                    {sortOrder === "asc" && <ArrowDownNarrowWide className="h-4 w-4" />}
+                    {sortOrder === "desc" && <ArrowDownWideNarrow className="h-4 w-4 dark:white" />}
+                    {sortOrder === "asc" && <ArrowDownNarrowWide className="h-4 w-4 dark:white" />}
                 </Button>
             </div>
         </div>
