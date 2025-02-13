@@ -12,14 +12,12 @@ import { RootState } from '@/store';
 export const loadContentForTransactions = createAsyncThunk(
   'contentDisplay/loadContent',
   async (transactions: Transaction[], { dispatch }) => {
-    
-    // Load content for each transaction
-    await Promise.all(transactions.map(async (transaction) => {
+    // Process each transaction independently without waiting for others
+    transactions.forEach(async (transaction) => {
       try {
         const content = await ContentService.loadContent(transaction);
         const urls = await ContentService.getContentUrls(transaction, content);
-        
-        // Combine content and urls into a single dispatch
+
         dispatch(setContentData({ 
           id: transaction.id, 
           content: {
@@ -29,9 +27,9 @@ export const loadContentForTransactions = createAsyncThunk(
         }));
 
       } catch (error) {
-        console.error('Error loading content:', error);
+        console.error('Error loading content for transaction', transaction.id, ':', error);
       }
-    }));
+    });
   }
 );
 

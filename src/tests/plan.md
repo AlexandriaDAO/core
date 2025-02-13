@@ -1,8 +1,5 @@
-Tomorrow. ShowMore button doesn't work on permasearch until the amount is increased.
-- The pornographic image shouldn't show when clicked on.
-
-
 ****
+- ShowMore button doesn't work on permasearch until the amount is increased.
 - Alexandrian app loading really bad at 100 at a time. (should reduce to 20 for now)
 - Auth getting stuck in the loading state with no way to log out.
 - There's an issue where if you stumble upon an asset that won't render, it'll not render any more after it (try retardio's books.)
@@ -39,11 +36,13 @@ Dark Mode ToDo:
 
 
 #### UI Fixes:
+- Lighter background on the app cards.
 - Smaller homepage, no scrolling.
 - Dropdown Menu from apps/swap.
 - Hover animmation on apps.
 - FAQ Page Consolidate.
 - Visibility of the login button.
+- Epub modal has two "close" buttons.
 
 
 
