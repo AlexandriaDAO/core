@@ -31,7 +31,7 @@ export default function LibrarySearch() {
   }, [selectedPrincipals, collection, dispatch]);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 sm:p-3">
+    <div className="bg-white dark:bg-gray-800 rounded-[8px] md:rounded-[12px] shadow-md p-2 sm:p-3">
       <div className="max-w-7xl mx-auto space-y-2 sm:space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
           <div className="flex flex-col space-y-2">

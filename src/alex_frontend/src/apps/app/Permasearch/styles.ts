@@ -16,10 +16,12 @@ export const PageContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
   box-sizing: border-box;
+  border-radius: 16px;
 
   @media (min-width: 768px) {
     padding: 40px 20px;
     gap: 24px;
+    border-radius: 20px;
   }
 `;
 

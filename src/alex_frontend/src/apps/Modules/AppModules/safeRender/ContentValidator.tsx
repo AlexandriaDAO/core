@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { setPredictionResults } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
 import { useContentValidation } from '@/apps/Modules/shared/services/contentValidation';
-import { useAuth } from '@/apps/Modules/shared/hooks/useAuth';
 import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import ContentFetcher from './ContentFetcher';
 import { ContentValidatorProps } from './types';

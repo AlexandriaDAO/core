@@ -3,8 +3,6 @@ import { getArweaveUrl } from "../../LibModules/arweaveSearch/config/arweaveConf
 import { CachedContent } from '../../LibModules/contentDisplay/types';
 import { LRUCache } from 'lru-cache';
 
-type ContentCache = Record<string, CachedContent>;
-
 class ContentCacheService {
   private static instance: ContentCacheService;
   private cache: LRUCache<string, CachedContent>;
