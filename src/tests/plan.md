@@ -1,3 +1,7 @@
+Tomorrow. ShowMore button doesn't work on permasearch until the amount is increased.
+- The pornographic image shouldn't show when clicked on.
+
+
 ****
 - Alexandrian app loading really bad at 100 at a time. (should reduce to 20 for now)
 - Auth getting stuck in the loading state with no way to log out.

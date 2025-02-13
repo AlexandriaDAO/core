@@ -56,6 +56,13 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
     has_nfts: true,
     has_scion_nfts: true,
     last_updated: BigInt(0)
+  },
+  {
+    principal: "yshkh-urigw-n2o44-nh27v-63lw4-tsura-tgmsp-suuel-wjkaw-z7vmo-hae",
+    username: "Retardio",
+    has_nfts: true,
+    has_scion_nfts: true,
+    last_updated: BigInt(0)
   }
 ];
 
