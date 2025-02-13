@@ -9,6 +9,7 @@ import { getFileIcon } from './fileIcons';
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { ContentUrlInfo } from './types';
 import ReactMarkdown from 'react-markdown';
+import { useTheme } from "@/providers/ThemeProvider";
 
 interface ContentTypeMapProps {
   transaction: Transaction;
@@ -45,6 +46,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   handleRenderError,
 }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const { theme } = useTheme();
   const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || 'application/octet-stream';
   const { fullUrl, coverUrl, thumbnailUrl } = contentUrls;
 
@@ -190,27 +192,62 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
       )
     ),
     "text/html": () => (
-      <div className={`w-full h-full ${inModal ? 'w-[800px] max-w-[95vw] max-h-[90vh] overflow-auto bg-white p-6' : 'bg-gray-200'}`}>
+      <div className={`w-full h-full ${inModal ? 'w-[800px] max-w-[95vw] max-h-[90vh] overflow-auto bg-background' : 'bg-background'}`}>
         <iframe
           ref={iframeRef}
           sandbox="allow-same-origin"
           className="w-full h-full"
           srcDoc={`
             <!DOCTYPE html>
-            <html>
+            <html class="${theme}">
               <head>
                 <style>
-                  body {
+                  :root {
+                    --foreground: 213 31% 91%;
+                    --background: 0 0% 9%;
+                  }
+
+                  :root.light {
+                    --foreground: 222.2 47.4% 11.2%;
+                    --background: 60 2% 95%;
+                  }
+
+                  html, body {
                     margin: 0;
                     padding: 0;
-                    color: rgb(31 41 55);
+                    width: 100%;
+                    height: 100%;
+                    color: hsl(var(--foreground));
+                    background: hsl(var(--background));
                     line-height: 1.5;
                     font-family: system-ui, -apple-system, sans-serif;
                   }
+
+                  .container {
+                    box-sizing: border-box;
+                    width: 100%;
+                    height: 100%;
+                    padding: 1.5rem;
+                    overflow-y: auto;
+                  }
+
                   .prose {
                     max-width: none;
+                    width: 100%;
                     font-size: 0.875rem;
+                    color: hsl(var(--foreground));
+                    margin: 0 auto;
                   }
+
+                  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6,
+                  .prose ul, .prose ol, .prose li, .prose p {
+                    color: hsl(var(--foreground));
+                    margin-left: 0;
+                    margin-right: 0;
+                    width: 100%;
+                    box-sizing: border-box;
+                  }
+
                   .prose h1 { font-size: 2em; margin: 0.67em 0; }
                   .prose h2 { font-size: 1.5em; margin: 0.75em 0; }
                   .prose h3 { font-size: 1.17em; margin: 0.83em 0; }
@@ -220,45 +257,54 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
                   .prose ul, .prose ol { padding-left: 2em; margin: 1em 0; }
                   .prose li { margin: 0.5em 0; }
                   .prose p { margin: 1em 0; }
+
+                  .gradient-overlay {
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(to bottom, transparent, transparent, hsl(var(--background)));
+                    pointer-events: none;
+                  }
                 </style>
               </head>
               <body>
-                <div class="prose">
-                  ${DOMPurify.sanitize(content?.textContent, {
-                    ALLOWED_TAGS: [
-                      'p', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                      'strong', 'em', 'b', 'i', 'u', 'strike',
-                      'ul', 'ol', 'li', 'br', 'hr'
-                    ],
-                    ALLOWED_ATTR: ['title'],
-                    ALLOW_DATA_ATTR: false,
-                    FORBID_TAGS: [
-                      'script', 'style', 'iframe', 'frame', 'object', 'embed', 'form',
-                      'base', 'link', 'meta', 'head', 'html', 'body', 'param', 'applet',
-                      'img', 'a', 'input', 'textarea', 'select', 'button', 'svg',
-                      'math', 'template'
-                    ],
-                    FORBID_ATTR: [
-                      'onerror', 'onload', 'onclick', 'onmouseover', 'onmouseout', 
-                      'onmouseenter', 'onmouseleave', 'onscroll', 'onsubmit', 'onreset',
-                      'onselect', 'onblur', 'onfocus', 'onchange', 'onkeydown', 'onkeypress',
-                      'onkeyup', 'ondrag', 'ondrop',
-                      'style', 'href', 'src', 'action', 'formaction', 'ping', 'target',
-                      'rel', 'srcdoc', 'sandbox', 'poster', 'preload', 'formtarget'
-                    ],
-                    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
-                    RETURN_DOM_FRAGMENT: false,
-                    RETURN_DOM: false,
-                    SANITIZE_DOM: true,
-                    KEEP_CONTENT: true,
-                    WHOLE_DOCUMENT: false,
-                    FORCE_BODY: true,
-                    USE_PROFILES: {html: true},
-                    SANITIZE_NAMED_PROPS: true,
-                    IN_PLACE: false
-                  })}
+                <div class="container">
+                  <div class="prose">
+                    ${DOMPurify.sanitize(content?.textContent, {
+                      ALLOWED_TAGS: [
+                        'p', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                        'strong', 'em', 'b', 'i', 'u', 'strike',
+                        'ul', 'ol', 'li', 'br', 'hr'
+                      ],
+                      ALLOWED_ATTR: ['title'],
+                      ALLOW_DATA_ATTR: false,
+                      FORBID_TAGS: [
+                        'script', 'style', 'iframe', 'frame', 'object', 'embed', 'form',
+                        'base', 'link', 'meta', 'head', 'html', 'body', 'param', 'applet',
+                        'img', 'a', 'input', 'textarea', 'select', 'button', 'svg',
+                        'math', 'template'
+                      ],
+                      FORBID_ATTR: [
+                        'onerror', 'onload', 'onclick', 'onmouseover', 'onmouseout', 
+                        'onmouseenter', 'onmouseleave', 'onscroll', 'onsubmit', 'onreset',
+                        'onselect', 'onblur', 'onfocus', 'onchange', 'onkeydown', 'onkeypress',
+                        'onkeyup', 'ondrag', 'ondrop',
+                        'style', 'href', 'src', 'action', 'formaction', 'ping', 'target',
+                        'rel', 'srcdoc', 'sandbox', 'poster', 'preload', 'formtarget'
+                      ],
+                      ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                      RETURN_DOM_FRAGMENT: false,
+                      RETURN_DOM: false,
+                      SANITIZE_DOM: true,
+                      KEEP_CONTENT: true,
+                      WHOLE_DOCUMENT: false,
+                      FORCE_BODY: true,
+                      USE_PROFILES: {html: true},
+                      SANITIZE_NAMED_PROPS: true,
+                      IN_PLACE: false
+                    })}
+                  </div>
                 </div>
-                ${!inModal ? '<div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, transparent, rgb(229 231 235));"></div>' : ''}
+                ${!inModal ? '<div class="gradient-overlay"></div>' : ''}
               </body>
             </html>
           `}

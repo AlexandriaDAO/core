@@ -6,9 +6,6 @@
 
 
 Dark Mode ToDo:
-- Swap page buttons are black when selected in dark mode.
-- Runtime Error modal not in dark mode.
-- FAQ section to match the styles.
 - HTML needs dark mode.
 
 
@@ -39,8 +36,6 @@ Dark Mode ToDo:
 - Lighter background on the app cards.
 - Smaller homepage, no scrolling.
 - Dropdown Menu from apps/swap.
-- Hover animmation on apps.
-- FAQ Page Consolidate.
 - Visibility of the login button.
 - Epub modal has two "close" buttons.
 
