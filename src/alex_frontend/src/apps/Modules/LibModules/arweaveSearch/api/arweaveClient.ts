@@ -112,15 +112,13 @@ export async function fetchTransactions(
   nftIds?: string[],
   contentTypes?: string[],
   amount?: number,
-  maxTimestamp?: number,
-  owner?: string,
-  minBlock?: number,
-  maxBlock?: number
+  ownerFilter?: string,
+  after?: string
 ): Promise<Transaction[]> {
   try {
     // Add validation
-    if (maxTimestamp && (isNaN(maxTimestamp) || maxTimestamp <= 0)) {
-      console.error('Invalid timestamp provided:', maxTimestamp);
+    if (amount && (isNaN(amount) || amount <= 0)) {
+      console.error('Invalid amount provided:', amount);
       return [];
     }
 
@@ -133,6 +131,7 @@ export async function fetchTransactions(
           query FetchTransactionsByIds($ids: [ID!]!) {
             transactions(ids: $ids) {
               edges {
+                cursor
                 node {
                   id
                   owner { address }
@@ -158,29 +157,11 @@ export async function fetchTransactions(
         tags: edge.node.tags,
         block: edge.node.block,
         data: edge.node.data,
+        cursor: edge.cursor
       }));
 
       allTransactions = [...allTransactions, ...fetchedTransactions];
       return allTransactions;
-    }
-
-    // If no nftIds provided, use the existing logic for fetching transactions
-    if (minBlock === undefined || maxBlock === undefined) {
-      try {
-        const { data: networkInfo } = await axios.get(getArweaveUrl('info'));
-        const currentBlockHeight = parseInt(networkInfo.height, 10);
-        
-        if (maxTimestamp) {
-          maxBlock = await getBlockHeightForTimestamp(maxTimestamp);
-        } else {
-          maxBlock = currentBlockHeight;
-        }
-        
-        minBlock = Math.max(0, maxBlock - 500);
-      } catch (error) {
-        console.error('Failed to fetch network info:', error);
-        return [];
-      }
     }
 
     const tags: any[] = [];
@@ -191,9 +172,8 @@ export async function fetchTransactions(
     const variables: any = {
       first: Math.min(PAGE_SIZE, amount ?? PAGE_SIZE),
       tags: tags.length > 0 ? tags : undefined,
-      minBlock: minBlock,
-      maxBlock: maxBlock,
-      owners: owner ? [owner] : undefined,
+      owners: ownerFilter ? [ownerFilter] : undefined,
+      after: after
     };
 
     const result = await arweaveNetClient.query({
@@ -211,13 +191,10 @@ export async function fetchTransactions(
       tags: edge.node.tags,
       block: edge.node.block,
       data: edge.node.data,
+      cursor: edge.cursor
     }));
 
-    // Filter by maxTimestamp if provided
-    allTransactions = newTransactions.filter((tx: Transaction) => 
-      !maxTimestamp || !tx.block || tx.block.timestamp <= maxTimestamp
-    );
-
+    allTransactions = [...allTransactions, ...newTransactions];
     return allTransactions.slice(0, amount);
 
   } catch (error) {
@@ -227,13 +204,11 @@ export async function fetchTransactions(
         nftIds,
         contentTypes,
         amount,
-        maxTimestamp,
-        owner,
-        minBlock,
-        maxBlock
+        ownerFilter,
+        after
       }
     });
-    throw error; // Propagate the error for better error handling
+    throw error;
   }
 }
 

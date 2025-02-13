@@ -1,22 +1,3 @@
-****
-- ShowMore button doesn't work on permasearch until the amount is increased.
-- Alexandrian app loading really bad at 100 at a time. (should reduce to 20 for now)
-- Auth getting stuck in the loading state with no way to log out.
-- There's an issue where if you stumble upon an asset that won't render, it'll not render any more after it (try retardio's books.)
-
-
-Dark Mode ToDo:
-- HTML needs dark mode.
-
-
-
-
-
-
-
-
-
-
 #### Module Design Optimizations
 - Can tagSelector.tsx and contentTagsSelector.tsx and contentTypeToggleGroup.tsx be combined?
 
@@ -33,8 +14,6 @@ Dark Mode ToDo:
 
 
 #### UI Fixes:
-- Lighter background on the app cards.
-- Smaller homepage, no scrolling.
 - Dropdown Menu from apps/swap.
 - Visibility of the login button.
 - Epub modal has two "close" buttons.
@@ -54,6 +33,7 @@ Dark Mode ToDo:
 
 #### Bigger Features (lower priority):
 - Range selection for Alexandrian.
+- Lazy loading all apps, and loading blur to clear instead of top to bottom.
 - Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
 - Put another amount selector by the show more button on permasearch.
 - Need to combine emporium with main app modules (eventually, not now.).

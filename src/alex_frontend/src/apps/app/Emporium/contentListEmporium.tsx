@@ -34,14 +34,14 @@ interface ContentListEmporiumProps {
   type: string;
 }
 const defaultTransaction: Transaction = {
-  id: "", // Example properties; replace these with actual fields in Transaction
+  id: "",
   owner: "",
   tags: [],
   data: {
     size: 0,
     type: ""
   },
-  block: null,
+  block: undefined,
 };
 
 const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {

@@ -16,6 +16,7 @@ interface ArweaveState {
   searchState: SearchState;
   predictions: Record<string, PredictionResults>;
   nsfwModelLoaded: boolean;
+  lastCursor: string | null;
 }
 
 const initialState: ArweaveState = {
@@ -30,6 +31,7 @@ const initialState: ArweaveState = {
   },
   predictions: {},
   nsfwModelLoaded: false,
+  lastCursor: null,
 };
 
 const arweaveSlice = createSlice({
@@ -57,6 +59,9 @@ const arweaveSlice = createSlice({
     clearPredictions: (state) => {
       state.predictions = {};
     },
+    setLastCursor: (state, action: PayloadAction<string | null>) => {
+      state.lastCursor = action.payload;
+    },
   },
 });
 
@@ -66,6 +71,7 @@ export const {
   setPredictionResults,
   setNsfwModelLoaded,
   clearPredictions,
+  setLastCursor,
 } = arweaveSlice.actions;
 
 export default arweaveSlice.reducer;

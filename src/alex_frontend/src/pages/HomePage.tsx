@@ -50,10 +50,10 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <div className="relative overflow-hidden h-screen">
+      <div className="relative h-screen">
         {/* First Panel */}
         <div className={cn(
-          "flex flex-col items-center justify-center h-full",
+          "absolute inset-0 flex flex-col items-center justify-center overflow-hidden touch-none",
           "transition-all duration-500 ease-in-out",
           "bg-background",
           isPanelOpen ? "-translate-y-full" : "translate-y-0"
@@ -135,11 +135,11 @@ const HomePage: React.FC = () => {
                   "transition-all duration-300",
                   "shadow-md dark:shadow-lg group",
                   app.comingSoon 
-                    ? "dark:bg-[#2A2A2A] bg-[#F5F5F5] cursor-not-allowed opacity-70"
+                    ? "dark:bg-gray-850 bg-gray-100 cursor-not-allowed opacity-70"
                     : [
-                        "dark:bg-[#333333] bg-white cursor-pointer opacity-100",
+                        "dark:bg-gray-800 bg-gray-50 cursor-pointer opacity-100",
                         "hover:shadow-xl dark:hover:shadow-2xl",
-                        "hover:bg-gray-50 dark:hover:bg-[#3D3D3D]"
+                        "hover:bg-gray-100 dark:hover:bg-gray-700"
                       ].join(" ")
                 )}>
                   <div className={cn(

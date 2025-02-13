@@ -7,14 +7,15 @@ export interface Transaction {
   id: string;
   owner: string;
   tags: { name: string; value: string }[];
-  block: {
+  block?: {
     height: number;
     timestamp: number;
-  } | null;
-  data: {
+  };
+  data?: {
     size: number;
     type: string;
   };
+  cursor?: string;
 }
 
 export interface ContentListProps {
