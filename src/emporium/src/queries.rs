@@ -1,4 +1,4 @@
-use crate::{Listing, Nft, LISTING};
+use crate::{Listing, Logs, Nft, LISTING, LOGS};
 use candid::{Nat, Principal};
 use ic_cdk::{caller, query};
 
@@ -128,3 +128,30 @@ pub fn get_search_listing(
     })
 }
 
+
+#[query]
+pub fn get_logs(page: Option<u64>, page_size: Option<u64>) -> Logs {
+    let page = page.unwrap_or(1); // Default to 1 if None
+    let page_size = page_size.unwrap_or(10); // Default to 10 if None
+
+    LOGS.with(|logs| {
+        let logs_map= logs.borrow();
+        let total_count = logs_map.len();
+        let total_pages = (total_count as f64 / page_size as f64).ceil() as u64;
+        let start_index = ((page - 1) * page_size) as usize;
+
+        let logs = logs_map
+        .iter()
+        .skip(start_index)  // Skip entries before the page start
+        .take(page_size as usize) // Take only `page_size` items
+        .map(|(timestamp, log)| (timestamp, log.clone())) // Clone log entry
+        .collect();
+
+            Logs {
+            logs,
+            total_pages,
+            current_page: page,
+            page_size,
+        }
+    })
+}

@@ -4,6 +4,26 @@ type Listing = record {
   total_pages : nat64;
   current_page : nat64;
 };
+type LogAction = variant {
+  Buy : record { seller : principal };
+  Listed;
+  Sold : record { buyer : principal };
+  PriceUpdate : record { new_price : nat64; old_price : nat64 };
+  Removed;
+  ReimbursedToBuyer : record { seller : principal; new_owner : principal };
+};
+type LogEntry = record {
+  action : LogAction;
+  token_id : nat;
+  owner : principal;
+  timestamp : nat64;
+};
+type Logs = record {
+  page_size : nat64;
+  logs : vec record { nat64; LogEntry };
+  total_pages : nat64;
+  current_page : nat64;
+};
 type Nft = record {
   status : NftStatus;
   token_id : nat;
@@ -11,13 +31,14 @@ type Nft = record {
   time : nat64;
   price : nat64;
 };
-type NftStatus = variant { Listed; Unlisted; Reimbursed };
+type NftStatus = variant { Listed; Reimbursed };
 type Result = variant { Ok : text; Err : text };
 service : {
   buy_nft : (nat) -> (Result);
   get_caller_listing : (opt nat64, opt nat64) -> (Listing) query;
   get_listing : (opt nat64, opt nat64) -> (Listing) query;
   get_listing_total_count : () -> (nat64) query;
+  get_logs : (opt nat64, opt nat64) -> (Logs) query;
   get_search_listing : (
       opt nat64,
       opt nat64,
