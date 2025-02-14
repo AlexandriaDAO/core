@@ -64,15 +64,8 @@ pub enum LogAction {
         old_price: u64,
         new_price: u64,
     },
-    Sold {
-        buyer: Principal,
-        seller: Principal,
-
-    },
-    ReimbursedToBuyer {
-        new_owner: Principal,
-        seller:Principal,
-    },
+    Sold ,
+    ReimbursedToBuyer ,
     Listed,
     Removed,
 

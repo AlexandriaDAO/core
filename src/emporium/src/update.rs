@@ -9,6 +9,7 @@ use crate::{
     Nft, NftStatus, LISTING,
 };
 use candid::{Nat, Principal};
+use ic_cdk::api::call;
 use ic_cdk::{api::call::CallResult, caller, update};
 use icrc_ledger_types::icrc1::account::Account as AccountIcrc;
 use icrc_ledger_types::icrc1::transfer::BlockIndex;
@@ -55,7 +56,7 @@ pub async fn list_nft(token_id: Nat, icp_amount: u64) -> Result<String, String> 
         nft_map.insert(token_id.clone().to_string(), nft);
         Ok(())
     })?;
-    add_log(timestamp, token_id, caller(), LogAction::Listed);
+    add_log(timestamp, token_id, caller(),Principal::anonymous(), LogAction::Listed);
     Ok("NFT added for sale".to_string())
 }
 #[update(guard = "not_anon")]
@@ -74,7 +75,7 @@ pub async fn remove_nft_listing(token_id: Nat) -> Result<String, String> {
         // Transfer the NFT back to the owner
         transfer_nft_from_canister(caller(), token_id.clone()).await?;
         remove_nft_from_listing(token_id.clone())?;
-        add_log(ic_cdk::api::time(), token_id, caller(), LogAction::Removed);
+        add_log(ic_cdk::api::time(), token_id, caller(),Principal::anonymous(), LogAction::Removed);
     } else {
         return Err("Unauthorized !".to_string());
     }
@@ -102,15 +103,10 @@ pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
             add_log(
                 ic_cdk::api::time(),
                 token_id.clone(),
-                seller,
-                LogAction::Sold { buyer: (caller()) },
+                seller,caller(),
+                LogAction::Sold ,
             ); //seller
-            add_log(
-                ic_cdk::api::time(),
-                token_id.clone(),
-                caller(),
-                LogAction::Buy { seller: (seller) },
-            ); //Buyer
+           
         }
         Err(err) => {
             //incase of failure change the owner to caller
@@ -134,21 +130,10 @@ pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
                 add_log(
                     ic_cdk::api::time(),
                     token_id.clone(),
-                    seller,
-                    LogAction::ReimbursedToBuyer {
-                        new_owner: (caller()),
-                        seller
-                    },
+                    seller,caller(),
+                    LogAction::ReimbursedToBuyer ,
                 ); // for seller
-                add_log(
-                    ic_cdk::api::time(),
-                    token_id.clone(),
-                    caller(),
-                    LogAction::ReimbursedToBuyer {
-                        new_owner: (caller()),
-                        seller
-                    },
-                ); // for buyer
+               
 
                 return Err("Nft transfer failed, ownership transfered.".to_string());
             })?;
@@ -195,6 +180,7 @@ pub async fn update_nft_price(token_id: Nat, new_price: u64) -> Result<String, S
         current_time,
         token_id.clone(),
         caller(),
+        Principal::anonymous(),
         LogAction::PriceUpdate { old_price: (old_price), new_price: (new_price) } 
     ); 
 
@@ -391,11 +377,12 @@ pub async fn transfer_nft_from_canister(
     }
 }
 
-pub fn add_log(time: u64, token_id: Nat, owner: Principal, action: LogAction) {
+pub fn add_log(time: u64, token_id: Nat, seller: Principal,buyer:Principal, action: LogAction) {
     let log_entry = LogEntry {
         timestamp: time,
         token_id,
-        owner,
+        seller,
+        buyer,
         action,
     };
 

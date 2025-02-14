@@ -14,13 +14,14 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketListing from "./thunks/getMarketListing";
 import ContentListEmporium from "./contentListEmporium";
-import { Button } from "@/lib/components/button";
 import { ArrowUp, Container } from "lucide-react";
 import EmporiumSearchForm from "./component/emporiumSearchForm";
 import SearchEmporium from "./component/searchEmporium";
 import PaginationComponent from "./component/PaginationComponent";
 import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
 import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
+import NavigationButton from "./component/navigationButtons";
+import getUserLogs from "./thunks/getUserLog";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
@@ -31,6 +32,17 @@ const Emporium = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
+    const fetchUserLogs = () => {
+        if (user) {
+            dispatch(getUserLogs({
+                page: 1,
+                searchStr: "",
+                pageSize: "20"
+            }));
+            setActiveButton("logs");
+ 
+        }
+    };
     const fetchUserNfts = () => {
         if (user) {
             dispatch(getUserIcrc7Tokens(user?.principal));
@@ -43,14 +55,14 @@ const Emporium = () => {
         dispatch(getMarketListing({
             page: 1,
             searchStr: emporium.search.search,
-            pageSize: (emporium.search.pageSize-1).toString(),
+            pageSize: (emporium.search.pageSize - 1).toString(),
             sort: emporium.search.sort,
             type,
             userPrincipal: !user?.principal ? "" : user?.principal
-        }));  
+        }));
         setActiveButton("marketPlace");
         setType("marketPlace");
-    }; 
+    };
     // For instant search we can use this but send multiple calls on each search charcter 
     // const fetchMarketListings = useCallback(() => {
     //     setCurrentPage(0);
@@ -118,6 +130,7 @@ const Emporium = () => {
         setCurrentPage(0);
 
     };
+
     const handlePageClick = ({ selected }: { selected: number }) => {
         if (activeButton === "marketPlace") {
             setCurrentPage(selected);
@@ -145,7 +158,7 @@ const Emporium = () => {
             }));
         }
     };
-    
+
 
     // intial 
     useEffect(() => {
@@ -158,6 +171,32 @@ const Emporium = () => {
             dispatch(getSpendingBalance(user.principal));
         }
     }, [dispatch, user]);
+    const navigationItems = [
+        {
+            label: 'My Nfts',
+            id: 'userNfts',
+            onClick: fetchUserNfts,
+            disabled: !user?.principal
+        },
+        {
+            label: 'MarketPlace',
+            id: 'marketPlace',
+            onClick: fetchMarketListings,
+            disabled: false
+        },
+        {
+            label: 'My Listing',
+            id: 'userListings',
+            onClick: fetchUserListings,
+            disabled: !user?.principal
+        },
+        {
+            label: 'Logs',
+            id: 'logs',
+            onClick: fetchUserLogs,
+            disabled: !user?.principal
+        },
+    ];
 
     return (
         <>
@@ -165,7 +204,7 @@ const Emporium = () => {
                 <Title className="lg:text-5xl md:text-3xl sm:text-2xl xs:text-xl">Emporium</Title>
                 <Description>MarketPlace</Description>
                 <Hint></Hint>
-               
+
 
                 {activeButton === "userNfts" ? <></> : <>
                     <SearchEmporium />
@@ -193,51 +232,18 @@ const Emporium = () => {
             </PageContainer>
             <div className="container">
                 <div className="pb-10">
-                        <Button
-                            className={
-                                `
-                                lg:h-10 xs:h-10 lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#E8D930] hover:dark:border-[#353535] mb-2 
-                                
-                                ${activeButton === "userNfts" ? "dark:text-[#0F172A] dark:bg-[#E8D930] dark:border-[#E8D930] text-[#E8D930] bg-gray-900" : ""
-                                }`}
-                            disabled={!user?.principal}
-                            onClick={() => {
-                                fetchUserNfts();
-
-                            }}
-                        >
-                            My Nfts
-                        </Button>
-                        <Button
-                            className={
-                                `
-                                lg:h-10 xs:h-10 lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#E8D930] hover:dark:border-[#353535] mb-2
-                                
-                                ${activeButton === "marketPlace" ? "dark:text-[#0F172A] dark:bg-[#E8D930] dark:border-[#E8D930] text-[#E8D930] bg-gray-900" : ""
-                                }`}
-                            onClick={() => {
-                                fetchMarketListings();
-                            }}
-                        >
-                            MarketPlace
-                        </Button>
-                        <Button
-                            className=
-                            {
-                                `lg:h-10 xs:h-10  lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#E8D930] hover:dark:border-[#353535]
-                                ${activeButton === "userListings" ? "dark:text-[#0F172A] dark:bg-[#E8D930] dark:border-[#E8D930] border border-2 border-[#353535] text-[#E8D930] bg-gray-900 " : ""
-                                }`
-                            }
-                            disabled={!user?.principal}
-                            onClick={() => {
-                                fetchUserListings();
-                            }}
-                        >
-                            My Listing
-                        </Button>
+                    {navigationItems.map(item => (
+                        <NavigationButton
+                            key={item.id}
+                            label={item.label}
+                            isActive={activeButton === item.id}
+                            onClick={item.onClick}
+                            disabled={item.disabled}
+                        />
+                    ))}
                 </div>
                 <div className="mb-20">
-                <ContentListEmporium type={type}/>
+                    <ContentListEmporium type={type} />
                 </div>
                 <PaginationComponent totalPages={emporium.totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
             </div>

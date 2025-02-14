@@ -6,6 +6,7 @@ import getMarketListing from "./thunks/getMarketListing";
 import buyNft from "./thunks/buyNft";
 import removeListedNft from "./thunks/removeListedNft";
 import editListing from "./thunks/editListing";
+import getUserLogs, { TransformedLog } from "./thunks/getUserLog";
 
 export interface EmporiumState {
   loading: boolean;
@@ -22,6 +23,7 @@ export interface EmporiumState {
     string,
     { tokenId: string; arweaveId: string; price: string; owner: string }
   >;
+  logs: TransformedLog[]; 
   error: string | null;
 }
 
@@ -39,6 +41,7 @@ const initialState: EmporiumState = {
   error: null,
   userTokens: [],
   marketPlace: {},
+  logs:[]
 };
 
 const emporiumSlice = createSlice({
@@ -164,6 +167,22 @@ const emporiumSlice = createSlice({
         // toast.success("Fetched!");
       })
       .addCase(getMarketListing.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        toast.error(action.payload);
+      })
+      .addCase(getUserLogs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getUserLogs.fulfilled, (state, action) => {
+        console.log("logs are ",action.payload);
+        state.logs=action.payload,
+        state.loading = false;
+        state.error = null;
+        //toast.success("Fetched!");
+      })
+      .addCase(getUserLogs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
         toast.error(action.payload);
