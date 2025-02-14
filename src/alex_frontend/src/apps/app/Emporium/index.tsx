@@ -196,9 +196,9 @@ const Emporium = () => {
                         <Button
                             className={
                                 `
-                                lg:h-10 xs:h-10 lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#E8D930] hover:dark:border-[#353535] mb-2 
+                                lg:h-10 xs:h-10 lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#FFFFFF] hover:dark:border-[#353535] mb-2 
                                 
-                                ${activeButton === "userNfts" ? "dark:text-[#0F172A] dark:bg-[#E8D930] dark:border-[#E8D930] text-[#E8D930] bg-gray-900" : ""
+                                ${activeButton === "userNfts" ? "dark:text-[#0F172A] dark:bg-[#FFFFFF] dark:border-[#FFFFFF] text-[#FFFFFF] bg-gray-900" : ""
                                 }`}
                             disabled={!user?.principal}
                             onClick={() => {
@@ -211,9 +211,9 @@ const Emporium = () => {
                         <Button
                             className={
                                 `
-                                lg:h-10 xs:h-10 lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#E8D930] hover:dark:border-[#353535] mb-2
+                                lg:h-10 xs:h-10 lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#FFFFFF] hover:dark:border-[#353535] mb-2
                                 
-                                ${activeButton === "marketPlace" ? "dark:text-[#0F172A] dark:bg-[#E8D930] dark:border-[#E8D930] text-[#E8D930] bg-gray-900" : ""
+                                ${activeButton === "marketPlace" ? "dark:text-[#0F172A] dark:bg-[#FFFFFF] dark:border-[#FFFFFF] text-[#FFFFFF] bg-gray-900" : ""
                                 }`}
                             onClick={() => {
                                 fetchMarketListings();
@@ -224,8 +224,8 @@ const Emporium = () => {
                         <Button
                             className=
                             {
-                                `lg:h-10 xs:h-10  lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#E8D930] hover:dark:border-[#353535]
-                                ${activeButton === "userListings" ? "dark:text-[#0F172A] dark:bg-[#E8D930] dark:border-[#E8D930] border border-2 border-[#353535] text-[#E8D930] bg-gray-900 " : ""
+                                `lg:h-10 xs:h-10  lg:px-7 xs-px-5 text-[#353535] lg:text-xl md:text-lg sm:text-base xs:text-sm border border-2 border-[#353535] rounded-[10px] lg:me-5 md:me-3 xs:me-2 hover:bg-gray-900 hover:text-[#F9F52F] hover:dark:bg-[#FFFFFF] hover:dark:border-[#353535]
+                                ${activeButton === "userListings" ? "dark:text-[#0F172A] dark:bg-[#FFFFFF] dark:border-[#FFFFFF] border border-2 border-[#353535] text-[#FFFFFF] bg-gray-900 " : ""
                                 }`
                             }
                             disabled={!user?.principal}

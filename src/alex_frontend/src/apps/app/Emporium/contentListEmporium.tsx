@@ -172,10 +172,11 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   return (
     <TooltipProvider>
       <>
-        {emporium.loading == true ? (<div className="w-screen h-screen fixed top-0 left-0 flex flex-col items-center justify-center gap-2">
+        {emporium.loading == true ? (<div className="w-screen h-screen fixed top-0 left-0 flex flex-col items-center justify-center gap-2 bg-black/70
+">
 
-          <LoaderPinwheel className="animate-spin text-4xl text-black w-14 h-14 dark:text-white" />
-        </div>) : 
+          <LoaderPinwheel className="animate-spin text-4xl text-white w-14 h-14  dark:grey" />
+          </div>) : 
         (<ContentGrid key="emporium">
           {transactions.map((transaction) => {
             const content = contentData[transaction.id];

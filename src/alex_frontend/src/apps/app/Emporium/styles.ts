@@ -15,16 +15,16 @@ export const PageContainer = styled.div`
   gap: 24px;
   max-width: 800px;
   margin: 0 auto;
-  width:100%;
-  @media(max-width:1399px){
+  width: 100%;
+  @media (max-width: 1399px) {
     max-width: 670px;
   }
-  @media(max-width:768px){
+  @media (max-width: 768px) {
     max-width: 440px;
   }
-  @media(max-width:640px){
-   padding: 40px 20px 15px;
-   gap: 14px;
+  @media (max-width: 640px) {
+    padding: 40px 20px 15px;
+    gap: 14px;
   }
 `;
 
@@ -59,11 +59,11 @@ export const ControlsContainer = styled.div<{ $isOpen: boolean }>`
   display: flex;
   width: 100%;
   gap: 16px;
-  margin-bottom: ${props => props.$isOpen ? '24px' : '0'};
+  margin-bottom: ${(props) => (props.$isOpen ? "24px" : "0")};
   flex-wrap: wrap;
   justify-content: center;
 
-  @media(max-width:640px){
+  @media (max-width: 640px) {
     margin-bottom: 10px;
   }
 `;
@@ -82,23 +82,26 @@ export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
   transition: all 0.3s ease;
   font-family: Syne;
   font-size: 16px;
-  
-  ${({ $isOpen }) => $isOpen ? `
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
+
+  ${({ $isOpen }) =>
+    $isOpen
+      ? `
+    background: var(--balancebox, #3A3630);
+  color: #fff;
     border: none;
     box-shadow: 0px 0px 4px 0px rgba(32, 0, 213, 0.25), 0px 0px 0px 4px rgba(197, 207, 249, 0.35);
-  ` : `
+  `
+      : `
     background: hsl(var(--background));
     color: hsl(var(--foreground));
     border: 1px solid hsl(var(--border));
   `}
-   @media(max-width:1399px){
+  @media(max-width:1399px) {
     min-width: 100px;
   }
-    @media(max-width:768px){
+  @media (max-width: 768px) {
     min-width: 90px;
-     height: 40px;
+    height: 40px;
   }
 `;
 
@@ -112,33 +115,32 @@ export const SearchButton = styled.button`
   flex: 1 0 0;
   min-width: 600px;
   border-radius: 10px;
-  background: hsl(var(--primary));
+  background: var(--balancebox, #3a3630);
   border: none;
-  color: hsl(var(--primary-foreground));
+  color: #fff;
   cursor: pointer;
   font-family: Syne;
   font-size: 16px;
-   @media(max-width:1399px){
+  @media (max-width: 1399px) {
     min-width: 400px;
   }
-    @media(max-width:768px){
-    @media(max-width:1399px){
+  @media (max-width: 768px) {
+    @media (max-width: 1399px) {
       min-width: 230px;
-       height: 40px;
-  }
+      height: 40px;
     }
-  
+  }
 `;
 
 export const SearchFormContainer = styled.div<{ $isOpen: boolean }>`
-  height: ${props => props.$isOpen ? 'auto' : '0'};
+  height: ${(props) => (props.$isOpen ? "auto" : "0")};
   overflow: hidden;
   transition: all 0.3s ease-in-out;
   margin: 0;
-  padding: ${props => props.$isOpen ? '1rem 0' : '0'};
+  padding: ${(props) => (props.$isOpen ? "1rem 0" : "0")};
   width: 100%;
   max-width: 800px;
-`; 
+`;
 
 export const Paginate = styled.div<{ $isOpen?: boolean }>`
   .pagination {
@@ -159,19 +161,19 @@ export const Paginate = styled.div<{ $isOpen?: boolean }>`
     color: hsl(var(--foreground));
     text-decoration: none;
     cursor: pointer;
-    @media(max-width:767px){
+    @media (max-width: 767px) {
       font-size: 11px;
       padding: 5px 7px;
     }
   }
 
   .pagination li a:hover {
-    background-color: hsl(var(--primary));
+    background-color:white;
     color: hsl(var(--primary-foreground));
   }
 
   .pagination .selected a {
-    background-color: hsl(var(--primary));
+  background: var(--balancebox, #3a3630);
     color: hsl(var(--primary-foreground));
     border-color: hsl(var(--primary));
   }
@@ -185,4 +187,3 @@ export const Paginate = styled.div<{ $isOpen?: boolean }>`
     border: none !important;
   }
 `;
-

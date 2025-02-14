@@ -207,7 +207,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
                         </Button>
                         <Button
                             onClick={handleAction}
-                            className="bg-[#0F172A] h-14 px-7 text-white text-lg border border-2 border-[#353535] rounded-xl hover:bg-white hover:text-[#353535] dark:bg-[#E8D930] dark:border-[#E8D930] dark:text-[#0F1F2A] hover:dark:border-[#E8D930] hover:dark:text-[#E8D930] hover:dark:bg-transparent "
+                            className="bg-[#0F172A] h-14 px-7 text-white text-lg border border-2 border-[#353535] rounded-xl hover:bg-white hover:text-[#353535] dark:bg-[#FFFFFF] dark:border-[#FFFFFF] dark:text-[#0F1F2A] hover:dark:border-[#FFFFFF] hover:dark:text-[#FFFFFF] hover:dark:bg-transparent "
                         >
                             Confirm
                         </Button>

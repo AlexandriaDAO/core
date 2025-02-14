@@ -62,8 +62,8 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
                     }}
                     disabled={!user?.principal}
                     className={` ${buttonType === "Sell" 
-                        ? "mt-2 z-[25] relative ml-2 dark:bg-[#E8D930] hover:dark:bg-[#7F7968] dark:border-[#E8D930] dark:text-[#0F172A] hover:dark:text-white" 
-                        : ""} ${buttonType==="Buy"&&"mt-2 dark:bg-[#E8D930] dark:border-[#E8D930] dark:text-[#0F172A] relative z-[30] hover:bg-gray-600 hover:dark:bg-gray-600 hover:dark:text-white relative ml-2" }
+                        ? "mt-2 z-[25] relative ml-2 dark:bg-[#FFFFFF] hover:dark:bg-[#7F7968] dark:border-[#FFFFFF] dark:text-[#0F172A] hover:dark:text-white" 
+                        : ""} ${buttonType==="Buy"&&"mt-2 dark:bg-[#FFFFFF] dark:border-[#FFFFFF] dark:text-[#0F172A] relative z-[30] hover:bg-gray-600 hover:dark:bg-gray-600 hover:dark:text-white relative ml-2" }
                         right-2 bg-green-500 text-white rounded-sm w-24 h-10 flex items-center justify-center relative z-[30] ml-2`}
                 >
                     {buttonType}

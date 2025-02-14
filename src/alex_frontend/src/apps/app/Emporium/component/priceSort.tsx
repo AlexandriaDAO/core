@@ -41,7 +41,7 @@ const PriceSort = () => {
             <div className='flex gap-1'>
                 <div className="toggle-container">
                     <Button
-                        className={`toggle-Button  rounded-xl${isSortActive ? "active dark:bg-[#E8D930] dark:text-black dark:border-[#E8D930] rounded-xl " : ""}`}
+                        className={`toggle-Button  rounded-xl${isSortActive ? "active dark:bg-[#FFFFFF] dark:text-black dark:border-[#FFFFFF] rounded-xl " : ""}`}
                         onClick={toggleSortActivation}
                         aria-label="Activate or deactivate sorting"
                     >

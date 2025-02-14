@@ -58,10 +58,10 @@ const EmporiumSearchForm: React.FC = () => {
                 className="mb-4"
               >
 
-                <ToggleGroupItem className="!w-full !py-2 !px-3 !border !rounded-xl" value="principal" aria-label="Search by Principal ID">
+                <ToggleGroupItem className="!w-full !py-2 !px-3 !border !rounded-xl data-[state=on]:bg-white data-[state=on]:text-black" value="principal" aria-label="Search by Principal ID">
                   Principal
                 </ToggleGroupItem>
-                <ToggleGroupItem className="h-5 w-full rounded-xl p-[17px_13px] w-full max-w-full border border-solid" value="token" aria-label="Search by Token ID">
+                <ToggleGroupItem className="h-5 w-full rounded-xl p-[17px_13px] w-full max-w-full border border-solid data-[state=on]:bg-white data-[state=on]:text-black" value="token" aria-label="Search by Token ID">
                   Token ID
                 </ToggleGroupItem>
               </ToggleGroup>
