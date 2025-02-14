@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setIsLoading, setPredictionResults, PredictionResults } from './arweaveSlice';
+import { setIsLoading, setPredictionResults, setLastCursor, PredictionResults } from './arweaveSlice';
 import { setTransactions } from '../content/contentDisplaySlice';
 import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
 import { SearchState } from '../../../shared/types/queries';
@@ -18,17 +18,17 @@ export const updatePredictionResults = createAsyncThunk(
 interface SearchParams {
   searchState: SearchState;
   isContinuation?: boolean;
+  after?: string;
 }
 
 export const performSearch = createAsyncThunk(
   'arweave/performSearch',
-  async ({ searchState, isContinuation = false }: SearchParams, { dispatch, getState }) => {
+  async ({ searchState, isContinuation = false, after }: SearchParams, { dispatch, getState }) => {
     dispatch(setIsLoading(true));
     console.log('Perform Search - Starting with params:', {
       searchState,
       isContinuation,
-      timestamp: searchState.timestamp,
-      timestampDate: searchState.timestamp ? new Date(searchState.timestamp).toISOString() : null
+      after
     });
 
     try {
@@ -41,14 +41,15 @@ export const performSearch = createAsyncThunk(
       const fetchedTransactions = await fetchTransactionsApi({
         contentTypes: searchState.tags,
         amount: searchState.amount,
-        timestamp: searchState.timestamp,
         ownerFilter: searchState.ownerFilter || undefined,
+        after
       });
 
       console.log('Perform Search - Fetched transactions:', {
         count: fetchedTransactions.length,
         firstTimestamp: fetchedTransactions[0]?.block?.timestamp,
-        lastTimestamp: fetchedTransactions[fetchedTransactions.length - 1]?.block?.timestamp
+        lastTimestamp: fetchedTransactions[fetchedTransactions.length - 1]?.block?.timestamp,
+        lastCursor: fetchedTransactions[fetchedTransactions.length - 1]?.cursor
       });
 
       // Get existing transactions if continuing a search
@@ -69,6 +70,12 @@ export const performSearch = createAsyncThunk(
       const combinedTransactions = [...existingTransactions, ...uniqueNewTransactions];
       
       dispatch(setTransactions(combinedTransactions));
+
+      // Update the last cursor if we have transactions
+      if (fetchedTransactions.length > 0) {
+        const lastCursor = fetchedTransactions[fetchedTransactions.length - 1].cursor;
+        dispatch(setLastCursor(lastCursor || null));
+      }
 
       // Load content and URLs for the new transactions only
       await dispatch(loadContentForTransactions(uniqueNewTransactions));

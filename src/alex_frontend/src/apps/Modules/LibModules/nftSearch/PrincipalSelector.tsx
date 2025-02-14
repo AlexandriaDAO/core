@@ -36,10 +36,6 @@ interface PrincipalData {
   hasNFTs: boolean;
 }
 
-interface PrincipalSelectorProps {
-  shouldTriggerSearch?: boolean;
-}
-
 const network = process.env.DFX_NETWORK === "ic" ? "mainnet" : "devnet";
 
 const TEST_PRINCIPALS: NFTUserInfo[] = [
@@ -66,7 +62,7 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
   }
 ];
 
-export default function PrincipalSelector({ shouldTriggerSearch = false }: PrincipalSelectorProps) {
+export default function PrincipalSelector() {
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const noResults = useSelector((state: RootState) => state.library.noResults);
