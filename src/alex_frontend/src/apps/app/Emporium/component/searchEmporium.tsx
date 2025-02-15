@@ -4,6 +4,7 @@ import { Search as icon } from 'lucide-react';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { setSearchEmporium } from '../emporiumSlice';
+import { useTheme } from '@/providers/ThemeProvider';
 
 export const OwnerIcon = styled(icon)`
   width: 24px;
@@ -20,7 +21,7 @@ export const SearchBox = styled.div`
   align-items: center;
   border-radius: 10px;
   border: 1px solid var(--black-grey-400, #CCC);
-  background: var(--Colors-LightMode-Text-text-100, #FFF);
+ 
 
 `;
 
@@ -45,6 +46,9 @@ export const Input = styled.input`
 const SearchEmporium = () => {
   const dispatch=useAppDispatch();
   const emporium =useAppSelector(state=>state.emporium);
+   const { theme } = useTheme();
+    const isDark = theme === "dark";
+  
   
   const handleSearchStateChange = (value: string) => {
     dispatch(setSearchEmporium({
@@ -54,12 +58,13 @@ const SearchEmporium = () => {
   };
 
   return (
-    <SearchBox>
+    <SearchBox className={isDark ? 'border-border bg-gray-900' : 'border-gray-300 bg-gray-50'}>
       <OwnerIcon />
       <Input
         value={emporium.search.search}
         onChange={(e) => handleSearchStateChange(e.target.value)}
-        placeholder="Search"
+        placeholder="Search" 
+        className={isDark ?  'border-border bg-gray-900' : 'border-gray-300 bg-gray-50'}
       />
     </SearchBox>
   );

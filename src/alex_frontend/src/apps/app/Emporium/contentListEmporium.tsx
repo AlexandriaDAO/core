@@ -53,7 +53,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
 
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
   const [buttonType, setButtonType] = useState("Buy");
-  const [modalType, setModalType] = useState<"sell" | "edit" | "remove" | "buy" | null>(null);
+  const [modalType, setModalType] = useState<"Sell" | "Edit" | "Remove" | "Buy" | null>(null);
   const [modalData, setModalData] = useState({
     arwaveId: "",
     price: "",
@@ -61,7 +61,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
     show: false,
   });
 
-  const handleOpenModal = (type: "sell" | "edit" | "remove" | "buy", data: any) => {
+  const handleOpenModal = (type: "Sell" | "Edit" | "Remove" | "Buy", data: any) => {
     setModalType(type);
     setModalData({ ...data, show: true });
   };
@@ -84,7 +84,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
     }
   }, []);
   const renderDetails = useCallback((transaction: Transaction) => (
-    <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:block group-hover:opacity-100 transition-opacity duration-200 z-[20] pt-12">
+    <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:block group-hover:opacity-100 transition-opacity duration-200 z-[20] pt-12 rounded-2xl">
       <ScrollArea className="h-full">
         <Card className="bg-transparent border-none text-gray-100 shadow-none">
           <CardHeader className="p-3 pb-2">
@@ -172,9 +172,11 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   return (
     <TooltipProvider>
       <>
-        {emporium.loading == true ? (<div className="w-full h-full fixed  flex flex-col items-center justify-center gap-2">
-          <LoaderPinwheel className="animate-spin text-4xl text-black w-14 h-14" />
-        </div>) : 
+        {emporium.loading == true ? (<div className="w-screen h-screen fixed top-0 left-0 flex flex-col items-center justify-center gap-2 bg-black/70
+">
+
+          <LoaderPinwheel className="animate-spin text-4xl text-white w-14 h-14  dark:grey" />
+          </div>) : 
         (<ContentGrid key="emporium">
           {transactions.map((transaction) => {
             const content = contentData[transaction.id];
