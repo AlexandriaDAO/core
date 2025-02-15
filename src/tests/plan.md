@@ -17,7 +17,7 @@
 - Dropdown Menu from apps/swap.
 - Visibility of the login button.
 - Epub modal has two "close" buttons.
-
+- Discover button, as per Nelia's request: ybe rgb 141 140 140? or rgb 217 217 217
 
 
 #### Features now:

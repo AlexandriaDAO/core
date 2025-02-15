@@ -3,7 +3,6 @@ use ic_cdk::{self, init, update, post_upgrade};
 use serde::Deserialize;
 use std::time::Duration;
 
-use crate::guard::*;
 use crate::{
     distribute_reward, get_icp_rate_in_cents, ArchiveBalance, DailyValues, LbryRatio, Stake, APY,
     ARCHIVED_TRANSACTION_LOG, DISTRIBUTION_INTERVALS, LBRY_RATIO, STAKES, TOTAL_ARCHIVED_BALANCE,
@@ -149,15 +148,13 @@ fn setup_timers() {
         });
 }
 
-#[update(guard = "is_canister")]
-pub async fn distribute_reward_wrapper() {
+async fn distribute_reward_wrapper() {
     match distribute_reward().await {
         Ok(_) => (),
         Err(e) => ic_cdk::println!("Error distributing rewards: {}", e),
     }
 }
-#[update(guard = "is_canister")]
-pub async fn get_icp_rate_cents_wrapper() {
+async fn get_icp_rate_cents_wrapper() {
     match get_icp_rate_in_cents().await {
         Ok(price) => {
             ic_cdk::println!("Price fetch completed without errors");

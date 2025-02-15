@@ -52,7 +52,7 @@ pub fn principal_to_subaccount(principal_id: &Principal) -> Subaccount {
     Subaccount(subaccount)
 }
 
-pub async fn within_max_limit(burn_amount: u64) -> u64 {
+pub async fn within_max_limit(burn_amount: u64) -> Result<u64, String> {
     let result: Result<(u64, u64), String> = ic_cdk::call::<(), (u64, u64)>(
         Principal::from_text(TOKENOMICS_CANISTER_ID).expect("Could not decode the principal."),
         "get_max_stats",
@@ -60,20 +60,18 @@ pub async fn within_max_limit(burn_amount: u64) -> u64 {
     )
     .await
     .map_err(|e: (ic_cdk::api::call::RejectionCode, String)| {
-        format!("failed to call ledger: {:?}", e)
+        format!("failed to call tokenomics canister: {:?}", e)
     });
 
     match result {
         Ok((max_threshold, total_burned)) => {
             if (burn_amount + total_burned) <= max_threshold {
-                return burn_amount;
+                Ok(burn_amount)
             } else {
-                return max_threshold - total_burned;
+                Ok(max_threshold - total_burned)
             }
         }
-        Err(_e) => {
-            return 0;
-        }
+        Err(e) => Err(e),
     }
 }
 pub async fn tokenomics_burn_LBRY_stats() -> Result<(u64, u64), String> {
@@ -92,7 +90,7 @@ pub async fn tokenomics_burn_LBRY_stats() -> Result<(u64, u64), String> {
             return Ok((max_threshold, total_burned));
         }
         Err(e) => {
-            return Err("Some {}".into());
+            return Err(e);
         }
     }
 }
@@ -265,3 +263,4 @@ pub enum ExchangeRateError {
     StablecoinRateNotFound,
     Pending,
 }
+
