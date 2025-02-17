@@ -182,8 +182,12 @@ pub fn get_caller_logs(
         let total_pages = (total_count as f64 / page_size as f64).ceil() as u64;
         let start_index = ((page - 1) * page_size) as usize;
 
-        // Apply pagination to filtered logs
-        let logs = filtered_logs
+        // Sort the logs by timestamp
+        let mut logs = filtered_logs;
+        logs.sort_by_key(|(timestamp, _)| std::cmp::Reverse(*timestamp)); // Sort by timestamp in descending order
+
+        // Apply pagination to sorted logs
+        logs = logs
             .into_iter()
             .skip(start_index)
             .take(page_size as usize)

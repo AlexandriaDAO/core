@@ -1,11 +1,7 @@
-
-import {getActorEmporium} from "@/features/auth/utils/authUtils";
+import { getActorEmporium } from "@/features/auth/utils/authUtils";
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  LogEntry,
-  
-} from "../../../../../../declarations/emporium/emporium.did";
+import { LogEntry } from "../../../../../../declarations/emporium/emporium.did";
 
 // Define specific action types
 type LogActionType =
@@ -36,8 +32,13 @@ interface TransformedLogEntry {
 }
 
 export interface TransformedLog {
+  // timestamp: string;
+  // log: TransformedLogEntry;
   timestamp: string;
-  log: TransformedLogEntry;
+  token_id: string;
+  buyer: string | null;
+  seller: string;
+  action: LogAction;
 }
 
 // Transform function with proper type checking
@@ -61,9 +62,10 @@ const transformLogEntry = (log: LogEntry): TransformedLogEntry => {
     timestamp: log.timestamp.toString(),
     token_id: log.token_id.toString(),
     seller: log.seller.toText(),
-    buyer: log.buyer.toString()==="2vxsx-fae" //anyomus principal 
-      ? null
-      : log.buyer.toString(),
+    buyer:
+      log.buyer.toString() === "2vxsx-fae" //anyomus principal
+        ? null
+        : log.buyer.toString(),
     action,
   };
 };
@@ -71,9 +73,9 @@ const transformLogEntry = (log: LogEntry): TransformedLogEntry => {
 const getUserLogs = createAsyncThunk<
   TransformedLog[],
   {
-    page: number;
-    searchStr: string;
-    pageSize: string;
+    page?: number;
+    searchStr?: string;
+    pageSize?: string;
   },
   { rejectValue: string }
 >(
@@ -92,8 +94,7 @@ const getUserLogs = createAsyncThunk<
 
       // Transform the logs
       const transformedLogs = logs.logs.map(([timestamp, log]) => ({
-        timestamp: timestamp.toString(),
-        log: transformLogEntry(log),
+        ...transformLogEntry(log), // Spread the transformed 
       }));
 
       return transformedLogs;

@@ -22,6 +22,7 @@ import getUserIcrc7Tokens from "./thunks/getUserIcrc7Tokens";
 import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
 import NavigationButton from "./component/navigationButtons";
 import getUserLogs from "./thunks/getUserLog";
+import UserEmporiumLogs from "./component/userEmporiumLogs";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
@@ -34,13 +35,14 @@ const Emporium = () => {
 
     const fetchUserLogs = () => {
         if (user) {
-            dispatch(getUserLogs({
-                page: 1,
-                searchStr: "",
-                pageSize: "20"
-            }));
+            dispatch(
+                getUserLogs({
+                    page: 1,
+                    searchStr: "",
+                    pageSize: "20",
+                })
+            );
             setActiveButton("logs");
- 
         }
     };
     const fetchUserNfts = () => {
@@ -52,18 +54,20 @@ const Emporium = () => {
     };
     const fetchMarketListings = () => {
         setCurrentPage(0);
-        dispatch(getMarketListing({
-            page: 1,
-            searchStr: emporium.search.search,
-            pageSize: (emporium.search.pageSize - 1).toString(),
-            sort: emporium.search.sort,
-            type,
-            userPrincipal: !user?.principal ? "" : user?.principal
-        }));
+        dispatch(
+            getMarketListing({
+                page: 1,
+                searchStr: emporium.search.search,
+                pageSize: (emporium.search.pageSize - 1).toString(),
+                sort: emporium.search.sort,
+                type,
+                userPrincipal: !user?.principal ? "" : user?.principal,
+            })
+        );
         setActiveButton("marketPlace");
         setType("marketPlace");
     };
-    // For instant search we can use this but send multiple calls on each search charcter 
+    // For instant search we can use this but send multiple calls on each search charcter
     // const fetchMarketListings = useCallback(() => {
     //     setCurrentPage(0);
     //     getListings({
@@ -81,90 +85,92 @@ const Emporium = () => {
         setIsFiltersOpen(!isFiltersOpen);
     };
     const fetchUserListings = () => {
-        if (!user?.principal)
-            return;
-        dispatch(getMarketListing({
-            page: 1,
-            searchStr: emporium.search.search,
-            pageSize: emporium.search.pageSize.toString(),
-            sort: emporium.search.sort,
-            type: "userListings",
-            userPrincipal: user?.principal
-        }));
-        setActiveButton("userListings");
-        setType("marketPlace");
-        setCurrentPage(0);
-
-
-    };
-    const handleSearchClick = async () => {
-        let type = emporium.search.type;
-        if (!user) {
-            dispatch(getMarketListing({
+        if (!user?.principal) return;
+        dispatch(
+            getMarketListing({
                 page: 1,
                 searchStr: emporium.search.search,
                 pageSize: emporium.search.pageSize.toString(),
                 sort: emporium.search.sort,
-                type,
-                userPrincipal: ""
-            }));  // 
+                type: "userListings",
+                userPrincipal: user?.principal,
+            })
+        );
+        setActiveButton("userListings");
+        setType("marketPlace");
+        setCurrentPage(0);
+    };
+    const handleSearchClick = async () => {
+        let type = emporium.search.type;
+        if (!user) {
+            dispatch(
+                getMarketListing({
+                    page: 1,
+                    searchStr: emporium.search.search,
+                    pageSize: emporium.search.pageSize.toString(),
+                    sort: emporium.search.sort,
+                    type,
+                    userPrincipal: "",
+                })
+            ); //
             setCurrentPage(0);
             return;
         }
 
         if (activeButton === "userListings") {
             type = "userListings";
-        }
-        else { //default case 
+        } else {
+            //default case
             setActiveButton("marketPlace");
             setType("marketPlace");
         }
-        dispatch(getMarketListing({
-            page: 1,
-            searchStr: emporium.search.search,
-            pageSize: emporium.search.pageSize.toString(),
-            sort: emporium.search.sort,
-            type,
-            userPrincipal: user?.principal
-        }));  // 
+        dispatch(
+            getMarketListing({
+                page: 1,
+                searchStr: emporium.search.search,
+                pageSize: emporium.search.pageSize.toString(),
+                sort: emporium.search.sort,
+                type,
+                userPrincipal: user?.principal,
+            })
+        ); //
         setCurrentPage(0);
-
     };
 
     const handlePageClick = ({ selected }: { selected: number }) => {
         if (activeButton === "marketPlace") {
             setCurrentPage(selected);
-            dispatch(getMarketListing({
-                page: selected + 1,
-                searchStr: emporium.search.search,
-                pageSize: emporium.search.pageSize.toString(),
-                sort: emporium.search.sort,
-                type: emporium.search.type,
-                userPrincipal: ""
-            }));  // Adjust for 1-based page index
-        }
-        else if (activeButton === "userListings") {
-            if (!user)
-                return
+            dispatch(
+                getMarketListing({
+                    page: selected + 1,
+                    searchStr: emporium.search.search,
+                    pageSize: emporium.search.pageSize.toString(),
+                    sort: emporium.search.sort,
+                    type: emporium.search.type,
+                    userPrincipal: "",
+                })
+            ); // Adjust for 1-based page index
+        } else if (activeButton === "userListings") {
+            if (!user) return;
             setCurrentPage(selected);
 
-            dispatch(getMarketListing({
-                page: selected + 1,
-                searchStr: emporium.search.search,
-                pageSize: emporium.search.pageSize.toString(),
-                sort: emporium.search.sort,
-                type: "userListings",
-                userPrincipal: user?.principal
-            }));
+            dispatch(
+                getMarketListing({
+                    page: selected + 1,
+                    searchStr: emporium.search.search,
+                    pageSize: emporium.search.pageSize.toString(),
+                    sort: emporium.search.sort,
+                    type: "userListings",
+                    userPrincipal: user?.principal,
+                })
+            );
         }
     };
 
-
-    // intial 
+    // intial
     useEffect(() => {
-        fetchMarketListings()
+        fetchMarketListings();
     }, []);
-
 
     useEffect(() => {
         if (user?.principal) {
@@ -173,66 +179,66 @@ const Emporium = () => {
     }, [dispatch, user]);
     const navigationItems = [
         {
-            label: 'My Nfts',
-            id: 'userNfts',
+            label: "My Nfts",
+            id: "userNfts",
             onClick: fetchUserNfts,
-            disabled: !user?.principal
+            disabled: !user?.principal,
         },
         {
-            label: 'MarketPlace',
-            id: 'marketPlace',
+            label: "MarketPlace",
+            id: "marketPlace",
             onClick: fetchMarketListings,
-            disabled: false
+            disabled: false,
         },
         {
-            label: 'My Listing',
-            id: 'userListings',
+            label: "My Listing",
+            id: "userListings",
             onClick: fetchUserListings,
-            disabled: !user?.principal
+            disabled: !user?.principal,
         },
         {
-            label: 'Logs',
-            id: 'logs',
+            label: "Logs",
+            id: "logs",
             onClick: fetchUserLogs,
-            disabled: !user?.principal
+            disabled: !user?.principal,
         },
     ];
 
     return (
         <>
             <PageContainer className="">
-                <Title className="lg:text-5xl md:text-3xl sm:text-2xl xs:text-xl">Emporium</Title>
+                <Title className="lg:text-5xl md:text-3xl sm:text-2xl xs:text-xl">
+                    Emporium
+                </Title>
                 <Description>MarketPlace</Description>
                 <Hint></Hint>
 
-
-                {activeButton === "userNfts" ? <></> : <>
-                    <SearchEmporium />
-                    <ControlsContainer $isOpen={isFiltersOpen}>
-                        <FiltersButton
-                            onClick={toggleFilters}
-                            $isOpen={isFiltersOpen}
-                        >
-                            Filters
-                            {isFiltersOpen ? <ArrowUp size={20} /> : <FiltersIcon />}
-                        </FiltersButton>
-                        <SearchButton
-                            onClick={handleSearchClick}
-                            disabled={emporium.loading}
-                        >
-                            {emporium.loading ? 'Loading...' : 'Search'}
-                        </SearchButton>
-                    </ControlsContainer>
-                    <SearchFormContainer $isOpen={isFiltersOpen}>
-
-                        <EmporiumSearchForm />
-                    </SearchFormContainer>
-                </>}
-
+                {activeButton === "userNfts" ? (
+                    <></>
+                ) : (
+                    <>
+                        <SearchEmporium />
+                        <ControlsContainer $isOpen={isFiltersOpen}>
+                            <FiltersButton onClick={toggleFilters} $isOpen={isFiltersOpen}>
+                                Filters
+                                {isFiltersOpen ? <ArrowUp size={20} /> : <FiltersIcon />}
+                            </FiltersButton>
+                            <SearchButton
+                                onClick={handleSearchClick}
+                                disabled={emporium.loading}
+                            >
+                                {emporium.loading ? "Loading..." : "Search"}
+                            </SearchButton>
+                        </ControlsContainer>
+                        <SearchFormContainer $isOpen={isFiltersOpen}>
+                            <EmporiumSearchForm />
+                        </SearchFormContainer>
+                    </>
+                )}
             </PageContainer>
             <div className="container px-2">
                 <div className="lg:pb-10 md:pb-8 sm:pb-6 xs:pb-4">
-                    {navigationItems.map(item => (
+                    {navigationItems.map((item) => (
                         <NavigationButton
                             key={item.id}
                             label={item.label}
@@ -242,12 +248,24 @@ const Emporium = () => {
                         />
                     ))}
                 </div>
-                <div className="lg:mb-20 md:mb-16 sm:mb-10 xs:mb-6">
-                <ContentListEmporium type={type}/>
-                </div>
-                <PaginationComponent totalPages={emporium.totalPages} onPageChange={handlePageClick} currentPage={currentPage} />
+                {activeButton === "logs" ? (
+                    <UserEmporiumLogs />
+
+                ) : (
+                    <>
+
+                        <div className="lg:mb-20 md:mb-16 sm:mb-10 xs:mb-6">
+                            <ContentListEmporium type={type} />
+                        </div>
+                        <PaginationComponent
+                            totalPages={emporium.totalPages}
+                            onPageChange={handlePageClick}
+                            currentPage={currentPage}
+                        />
+                    </>
+                )}
             </div>
         </>
     );
-}
+};
 export default React.memo(Emporium);
