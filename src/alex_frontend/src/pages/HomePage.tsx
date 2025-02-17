@@ -4,7 +4,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useTheme } from "@/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 
-interface App {
+export interface App {
   name: string;
   description: string;
   path: string;
@@ -12,7 +12,7 @@ interface App {
   comingSoon?: boolean;
 }
 
-const apps: App[] = [
+export const apps: App[] = [
   { name: 'Alexandrian', description: 'Library', path: '/app/alexandrian', logo: '/logos/Alexandrian.svg' },
   { name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/Permasearch.svg' },
   { name: 'Emporium', description: 'Trade', path: '/app/emporium', logo: '/logos/Emporium.svg' },
@@ -61,14 +61,14 @@ const HomePage: React.FC = () => {
           <h1 className={cn(
             "font-syne font-extrabold uppercase m-0 mb-5",
             "text-[clamp(25px,6vw,80px)]",
-            "text-foreground transition-colors duration-300"
+            "dark:text-gray-100 text-gray-900 transition-colors duration-300"
           )}>
             Alexandria
           </h1>
           <p className={cn(
             "font-montserrat font-normal lowercase m-0 mb-10",
             "text-[clamp(18px,4vw,50px)]",
-            "text-foreground transition-colors duration-300"
+            "dark:text-gray-100 text-gray-900 transition-colors duration-300"
           )}>
             a sane way to use the internet
           </p>
@@ -79,8 +79,8 @@ const HomePage: React.FC = () => {
               "rounded-full border",
               "font-syne text-[clamp(14px,4vw,24px)] font-semibold",
               "cursor-pointer transition-all duration-300",
-              "dark:border-white dark:text-black dark:bg-white",
-              "border-black text-white bg-black",
+              "dark:border-gray-100 dark:text-black dark:bg-gray-200",
+              "border-gray-900 text-white bg-gray-900",
               "hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white"
             )}
           >

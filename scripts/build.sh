@@ -230,7 +230,7 @@ dfx deploy ic_siws_provider --argument $'(
 # echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."
 # exit 1
 
-# Step 7: Deploy frontend Manually.
+# Step 7: Deploy frontend ManuallyS.
 
 mkdir -p .dfx/local/canisters/LBRY
 mkdir -p .dfx/local/canisters/ALEX
@@ -247,7 +247,7 @@ dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal d4qqt-2dxx5-og4yg-hlsl5-z6opa-ikfav-d6aw2-wvsut-qnyss-j2dpk-vqe)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal xvbog-ed7mm-p7nua-uvjoh-fsj7r-ryqkn-pepmx-gtjlc-jxcjt-guib6-pae)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)
