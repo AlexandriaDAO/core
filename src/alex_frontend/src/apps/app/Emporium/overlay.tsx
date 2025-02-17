@@ -34,7 +34,7 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
             return (
                 <div className="flex items-center mt-2">
                     <Button
-                        className="bg-[#B23A48] border-[#353430] text-white rounded-sm w-24 h-10 flex items-center justify-center z-[25] me-3 sm:mb-0"
+                        className="bg-[#B23A48] border-[#B23A48] text-white rounded-sm w-24 h-10 flex items-center justify-center z-[25] me-3 sm:mb-0 dark:bg-[#B23A48] dark:text-white dark:border-[#B23A48] hover:dark:bg-transparent hover:dark:text-[#B23A48]"
                         onClick={(e) => {
                             e.stopPropagation();
                             setModal("Remove", { arwaveId: transaction.id, show: true, transaction });
@@ -43,7 +43,7 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
                         Remove
                     </Button>
                     <Button
-                        className="bg-[#f3f3f2] text-[#353430] border-[#353430] rounded-sm w-24 h-10 flex items-center justify-center z-[25]"
+                        className="bg-[#808080] text-white border-[#808080] rounded-sm w-24 h-10 flex items-center justify-center z-[25] dark:bg-white hover:dark:bg-transparent dark:text-[#0F172A] hover:dark:text-white"
                         onClick={(e) => {
                             e.stopPropagation();
                             setModal("Edit", { arwaveId: transaction.id, show: true, price, transaction });
@@ -62,9 +62,9 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
                     }}
                     disabled={!user?.principal}
                     className={` ${buttonType === "Sell" 
-                        ? "mt-2 z-[25] relative ml-2 dark:bg-[#FFFFFF] hover:dark:bg-[#7F7968] dark:border-[#FFFFFF] dark:text-[#0F172A] hover:dark:text-white" 
-                        : ""} ${buttonType==="Buy"&&"mt-2 dark:bg-[#FFFFFF] dark:border-[#FFFFFF] dark:text-[#0F172A] relative z-[30] hover:bg-gray-600 hover:dark:bg-gray-600 hover:dark:text-white relative ml-2" }
-                        right-2 bg-green-500 text-white rounded-sm w-24 h-10 flex items-center justify-center relative z-[30] ml-2`}
+                        ? "mt-2 z-[25] relative ml-2 dark:bg-[#FFFFFF] hover:dark:bg-transparent dark:border-[#FFFFFF] dark:text-[#0F172A] hover:dark:text-white" 
+                        : ""} ${buttonType==="Buy"&&"mt-2 dark:bg-[#FFFFFF] dark:border-[#FFFFFF] dark:text-[#0F172A] relative z-[30] hover:bg-gray-600 hover:dark:bg-transparent hover:dark:text-white relative ml-2" }
+                        right-2 bg-[#808080] text-white border-[#808080] rounded-sm w-24 h-10 flex items-center justify-center relative z-[30] ml-2`}
                 >
                     {buttonType}
                 </Button>

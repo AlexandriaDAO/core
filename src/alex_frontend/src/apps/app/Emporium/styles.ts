@@ -158,7 +158,8 @@ export const Paginate = styled.div<{ $isOpen?: boolean }>`
     padding: 8px 12px;
     border: 1px solid hsl(var(--border));
     border-radius: 8px;
-    color: hsl(var(--foreground));
+    color: #0F172A
+    background:white
     text-decoration: none;
     cursor: pointer;
     @media (max-width: 767px) {
@@ -167,16 +168,17 @@ export const Paginate = styled.div<{ $isOpen?: boolean }>`
     }
   }
 
-  .pagination li a:hover {
-    background-color:white;
-    color: hsl(var(--primary-foreground));
-  }
+ 
 
   .pagination .selected a {
-  background: var(--balancebox, #3a3630);
-    color: hsl(var(--primary-foreground));
-    border-color: hsl(var(--primary));
+    background: #353230;
+    color: #fff;
   }
+    .dark .pagination .selected a{
+      background: white;
+      color: #0f172A;
+     } 
+
 
   .pagination .disabled a {
     color: hsl(var(--muted-foreground));
