@@ -47,7 +47,7 @@ function Permasearch() {
 		if (transactions.length > 0) {
 			const lastTransaction = transactions[transactions.length - 1];
 			const lastTimestamp = lastTransaction.block?.timestamp;
-			return handleSearch(lastTimestamp).catch(error => {
+			return handleSearch(lastTimestamp, 50).catch(error => {
 				toast.error(error.message || "An error occurred while loading more results");
 			});
 		}

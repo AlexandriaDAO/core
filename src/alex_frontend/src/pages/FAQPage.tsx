@@ -64,24 +64,39 @@ function FAQPage() {
 	}, []) : [{title: 'Please wait...', items: []}];
 
 	return (
-		<div className="space-y-6">
-			{sections.map((section, idx) => (
-				<div key={idx} className="bg-[#161b22] rounded-lg shadow-lg p-4 md:p-6">
-					<h2 className="text-xl font-semibold text-white mb-4">{section.title}</h2>
-					<Accordion type="single" collapsible className="space-y-2">
-						{section.items.map((item, itemIdx) => (
-							<AccordionItem key={itemIdx} value={`item-${idx}-${itemIdx}`}>
-								<AccordionTrigger className="text-white hover:text-white hover:no-underline">
-									{item.question}
-								</AccordionTrigger>
-								<AccordionContent className="text-[#c9d1d9] whitespace-pre-wrap">
-									<ReactMarkdown>{item.answer}</ReactMarkdown>
-								</AccordionContent>
-							</AccordionItem>
-						))}
-					</Accordion>
-				</div>
-			))}
+		<div className="container mx-auto px-4 py-8 max-w-4xl">
+			<h1 className="text-3xl md:text-4xl font-syne font-bold text-white mb-8 text-center">Frequently Asked Questions</h1>
+			<Accordion type="multiple" className="space-y-4">
+				{sections.map((section, idx) => (
+					<AccordionItem
+						key={idx}
+						value={`section-${idx}`}
+						className="bg-gray-700/50 backdrop-blur-sm rounded-xl shadow-lg border border-gray-600/50"
+					>
+						<AccordionTrigger className="px-6 py-4 text-2xl font-syne font-semibold text-white hover:text-brightyellow hover:no-underline transition-colors">
+							{section.title}
+						</AccordionTrigger>
+						<AccordionContent className="px-6 pb-6">
+							<Accordion type="single" collapsible className="space-y-4">
+								{section.items.map((item, itemIdx) => (
+									<AccordionItem 
+										key={itemIdx} 
+										value={`item-${idx}-${itemIdx}`} 
+										className="border border-gray-500/50 rounded-lg overflow-hidden bg-gray-600/50"
+									>
+										<AccordionTrigger className="px-4 py-3 text-lg font-roboto-condensed text-white hover:text-brightyellow hover:no-underline transition-colors">
+											{item.question}
+										</AccordionTrigger>
+										<AccordionContent className="px-4 py-3 text-white/90 prose dark:prose-invert max-w-none">
+											<ReactMarkdown>{item.answer}</ReactMarkdown>
+										</AccordionContent>
+									</AccordionItem>
+								))}
+							</Accordion>
+						</AccordionContent>
+					</AccordionItem>
+				))}
+			</Accordion>
 		</div>
 	);
 }

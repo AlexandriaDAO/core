@@ -73,8 +73,8 @@ const SwapMain = () => {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`px-2 py-2 flex items-center ${activeTab === tab.id
-                                        ? 'text-base 2xl:text-xl text-white border-black bg-black px-5' //active
-                                        : 'bg-white dark:bg-transparent dark:text-white'} transition-colors duration-300 text-base font-semibold leading-6 min-w-24 h-11 border border-gray-400 rounded-2xl mr-3 hover:bg-black hover:text-white px-5 mb-4 z-20`}
+                                        ? 'text-base 2xl:text-xl bg-black text-white dark:bg-white dark:text-black px-5' //active
+                                        : 'bg-white text-black dark:bg-black dark:text-white'} transition-colors duration-300 text-base font-semibold leading-6 min-w-24 h-11 border dark:border-gray-700 border-gray-400 rounded-2xl mr-3 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black px-5 mb-4 z-20`}
                                 >
                                     {tab.label}
                                     {tab.hover === null ? (<></>) : (<div className='relative group'>

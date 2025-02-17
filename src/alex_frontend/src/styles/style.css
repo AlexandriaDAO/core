@@ -43,9 +43,10 @@
     font-display: swap;
 }
 body {
-    font-family: 'Syne';
+    font-family: 'Syne' !important;
 }
 
 .wallet-adapter-modal{
     pointer-events: auto;
 }
+.font-roboto-condensed{font-family: unset !important;}

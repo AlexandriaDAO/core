@@ -135,10 +135,10 @@ const TopupContent = () => {
                             <span className='flex text-2xl font-bold w-circlewidth h-circleheight bg-balancebox rounded-full text-white justify-center items-center me-3'>1</span>
                             <strong className='text-2xl font-medium dark:text-gray-200'>Enter the amount</strong>
                         </div>
-                        <div className='border dark:border-gray-700 bg-white dark:bg-gray-800 py-5 px-8 rounded-borderbox mb-3'>
+                        <div className='border dark:border-gray-700 bg-white dark:bg-gray-800 py-8 px-5 rounded-borderbox mb-3'>
                             <div className='flex justify-between items-center mb-5'>
-                                <h4 className='lg:text-lg md:text-base sm:text-sm font-medium text-darkgray dark:text-gray-300'>LBRY Spending Wallet Balance</h4>
-                                <span className='lg:text-lg md:text-base sm:text-sm font-medium text-darkgray dark:text-gray-300'>
+                                <h4 className='lg:text-2xl md:text-xl sm:text-lg font-medium text-darkgray dark:text-gray-300'>LBRY Spending Wallet Balance</h4>
+                                <span className='lg:text-2xl md:text-xl sm:text-lg font-medium text-darkgray dark:text-gray-300'>
                                     {swap.loading ? (
                                         <LoaderCircle size={18} className="animate animate-spin" />
                                     ) : (
@@ -147,8 +147,8 @@ const TopupContent = () => {
                                 </span>
                             </div>
                             <div className='flex justify-between items-center'>
-                                <h4 className='lg:text-lg md:text-base sm:text-sm font-medium text-darkgray dark:text-gray-300'>ALEX Spending Wallet Balance</h4>
-                                <span className='lg:text-lg md:text-base sm:text-sm font-medium text-darkgray dark:text-gray-300'>
+                                <h4 className='lg:text-2xl md:text-xl sm:text-lg font-medium text-darkgray dark:text-gray-300'>ALEX Spending Wallet Balance</h4>
+                                <span className='lg:text-2xl md:text-xl sm:text-lg font-medium text-darkgray dark:text-gray-300'>
                                     {swap.loading ? (
                                         <LoaderCircle size={18} className="animate animate-spin" />
                                     ) : (
@@ -157,10 +157,10 @@ const TopupContent = () => {
                                 </span>
                             </div>
                         </div>
-                        <div className='border dark:border-gray-700 bg-white dark:bg-gray-800 py-5 px-5 rounded-borderbox mb-7'>
-                            <div className='mb-3 w-full'>
-                                <div className='flex justify-between mb-3'>
-                                    <h4 className='lg:text-2xl md:text-xl sm:text-lg font-medium text-darkgray dark:text-gray-300'>Amount</h4>
+                        <div className='border dark:border-gray-700 bg-white dark:bg-gray-800 py-8 px-5 rounded-borderbox mb-7'>
+                            <div className='mb-3'>
+                                <div className='flex justify-between mb-5'>
+                                    <h4 className='text-2xl font-medium text-darkgray dark:text-gray-300'>Amount</h4>
                                     <input
                                         className='text-darkgray dark:text-gray-200 text-right mr-[-10px] bg-transparent text-2xl font-medium placeholder-darkgray dark:placeholder-gray-400 focus:outline-none focus:border-transparent w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                                         type='number'
