@@ -18,11 +18,14 @@ import portalTypeReducer from "@/features/portal-type/portalTypeSlice";
 import portalEraReducer from "@/features/portal-era/portalEraSlice";
 import portalFilterReducer from "@/features/portal-filter/portalFilterSlice";
 import myNodesReducer from "@/features/my-nodes/myNodesSlice";
+import walletsReducer from "@/features/wallets/walletsSlice";
+import addWalletReducer from "@/features/add-wallet/addWalletSlice";
 import swapReducer from "@/features/swap/swapSlice"
 import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
 import alexReducer from "@/features/swap/alexSlice";
 import fileUploadReducer from "@/features/file-upload/fileUploadSlice";
+import arinaxReducer from "@/features/arinax/arinaxSlice";
 
 import contentDisplayReducer from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import arweaveReducer from "@/apps/Modules/shared/state/arweave/arweaveSlice";
@@ -54,10 +57,12 @@ const rootReducer = combineReducers({
 
 	portalFilter: portalFilterReducer,
 	myNodes: myNodesReducer,
-
+	wallets: walletsReducer,
+	addWallet: addWalletReducer,
 	upload: uploadReducer,
 	asset: assetReducer,
 	fileUpload: fileUploadReducer,
+	arinax: arinaxReducer,
 
 	swap:swapReducer,
 	icpLedger:icpLedgerReducer,

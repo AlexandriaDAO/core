@@ -21,8 +21,10 @@ const UpgradePage = lazy(()=>import("@/pages/dashboard/UpgradePage"));
 // const LibrarianLayout = lazy(()=>import("@/layouts/LibrarianLayout"));
 const LibrarianPage = lazy(()=>import("@/pages/librarian/"));
 const NodesPage = lazy(()=>import("@/pages/librarian/NodesPage"));
+const WalletsPage = lazy(()=>import("@/pages/librarian/WalletsPage"));
 // const FileUploadPage = lazy(()=>import("@/pages/dashboard/FileUploadPage"));
 const PinaxPage = lazy(()=>import("@/pages/PinaxPage"));
+const ArinaxPage = lazy(()=>import("@/pages/ArinaxPage"));
 // const UploadPage = lazy(()=>import("@/pages/dashboard/UploadPage"));
 const InsightsPage = lazy(()=>import("@/pages/swap/insightsPage"));
 
@@ -96,12 +98,14 @@ const router = createBrowserRouter(
 			<Route element={<AuthGuard />}>
 				<Route element={<MainLayout />}>
 					<Route path="app/pinax" element={<Suspense key="pinax" fallback={<MainPageSkeleton />}><PinaxPage /></Suspense>} />
+					<Route path="app/arinax" element={<Suspense key="arinax" fallback={<MainPageSkeleton />}><ArinaxPage /></Suspense>} />
 				</Route>
 				<Route element={<Protected route />}>
 					<Route path="dashboard" element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
 						<Route element={<LibrarianGuard />}>
 							<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
 							<Route path="nodes" element={<Suspense key="nodes" fallback={<MainPageSkeleton />}><NodesPage /></Suspense>} />
+							<Route path="wallets" element={<Suspense key="wallets" fallback={<MainPageSkeleton />}><WalletsPage /></Suspense>} />
 						</Route>
 
 						<Route path="profile">

@@ -113,6 +113,17 @@ const DashboardSidebar = () => {
                         <LayoutList size={18}/>
                         <span>My Nodes</span>
                     </NavLink>
+                    <NavLink
+                        to="wallets"
+                        end
+                        className={({ isActive }) => `
+                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border border-border/75
+                            ${isActive ? 'text-primary-foreground bg-primary' : 'text-primary/75 bg-muted hover:border-border hover:text-primary'}
+                        `}
+                    >
+                        <LayoutList size={18}/>
+                        <span>My Wallets</span>
+                    </NavLink>
 
                 </div>
             </div>
