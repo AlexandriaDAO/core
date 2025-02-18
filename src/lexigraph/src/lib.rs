@@ -20,7 +20,10 @@ pub mod storage;
 pub use storage::{Slot, Shelf};
 
 pub mod update;
-pub use update::{ShelfUpdate, update_shelf, store_shelf};
+pub use update::{ShelfUpdate, update_shelf, store_shelf, SlotReorderInput, reorder_shelf_slot};
+
+pub mod query;
+pub use query::*;
 
 pub mod utils;
 pub use utils::generate_shelf_id;

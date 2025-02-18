@@ -16,7 +16,7 @@
 - On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.
 
 #### Bigger Features (lower priority):
-- Range selection for Alexandrian.
+- Range selection for Alexandrian, e.g., query nfts of a person by 400-500 instead of starting from the latest.
 - Lazy loading all apps, and loading blur to clear instead of top to bottom.
 - Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
 - Put another amount selector by the show more button on permasearch.
@@ -39,6 +39,7 @@
 #### New Apps:
 - Arena style app, full design in channels.md.
 - Collection service for getting all the money from nfts.
+- Perpetua is a good name for one, latin for perpetual/eternal.
 
 
 

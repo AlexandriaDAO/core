@@ -117,4 +117,34 @@ pub struct ShelfUpdate {
     pub slots: Option<Vec<Slot>>,
 }
 
+#[derive(CandidType, Deserialize)]
+pub struct SlotReorderInput {
+    pub slot_id: u32,
+    pub reference_slot_id: Option<u32>,
+    pub before: bool,
+}
+
+#[ic_cdk::update]
+pub fn reorder_shelf_slot(shelf_id: String, reorder: SlotReorderInput) -> Result<(), String> {
+    SHELVES.with(|shelves| {
+        let mut shelves_map = shelves.borrow_mut();
+        if let Some(mut shelf) = shelves_map.get(&shelf_id) {
+            // Enforce owner check using caller
+            if shelf.owner != ic_cdk::caller() {
+                return Err("Unauthorized: Only shelf owner can reorder slots".to_string());
+            }
+
+            // Use the existing move_slot method to handle the reordering
+            shelf.move_slot(reorder.slot_id, reorder.reference_slot_id, reorder.before)?;
+            
+            // Update the timestamp and save
+            shelf.updated_at = ic_cdk::api::time();
+            shelves_map.insert(shelf_id, shelf);
+            Ok(())
+        } else {
+            Err("Shelf not found".to_string())
+        }
+    })
+}
+
 

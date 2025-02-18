@@ -59,6 +59,10 @@ import {
   icp_swap_factory,
   createActor as createActorIcpSwapFactory,
 } from "../../../../../icp_swap_factory";
+import {
+  lexigraph,
+  createActor as createActorLexigraph,
+} from "../../../../../declarations/lexigraph";
 const isLocalDevelopment =process.env.DFX_NETWORK !== "ic";
 
 const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
@@ -75,6 +79,7 @@ const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 const log_canister_id = process.env.CANISTER_ID_LOGS!;
+const lexigraph_canister_id = process.env.CANISTER_ID_LEXIGRAPH!;
 const icp_swap_factory_canister_id = "ggzvv-5qaaa-aaaag-qck7a-cai";
 
 export const getPrincipal = (client: AuthClient): string =>
@@ -171,6 +176,9 @@ export const getActorVetkd = () =>
 
 export const getActorEmporium = () =>
   getActor(emporium_canister_id, createActorEmporium, emporium);
+
+export const getActorLexigraph = () =>
+  getActor(lexigraph_canister_id, createActorLexigraph, lexigraph);
 
 export const getLogs = () => getActor(log_canister_id, createActorLogs, logs);
 

@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { performSearch } from './libraryThunks';
 
 interface SearchParams {
   start: number;
