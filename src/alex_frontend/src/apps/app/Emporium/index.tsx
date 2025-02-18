@@ -23,6 +23,8 @@ import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalan
 import NavigationButton from "./component/navigationButtons";
 import getUserLogs from "./thunks/getUserLog";
 import UserEmporiumLogs from "./component/userEmporiumLogs";
+import getEmporiumMarketLogs from "./thunks/getEmporiumMarketLogs";
+import EmporiumMarketLogs from "./component/emporiumLogs";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
@@ -39,11 +41,22 @@ const Emporium = () => {
                 getUserLogs({
                     page: 1,
                     searchStr: "",
-                    pageSize: "20",
+                    pageSize: "10",
                 })
             );
             setActiveButton("logs");
         }
+    };
+    const fetchMarketLogs = () => {
+
+        dispatch(
+            getEmporiumMarketLogs({
+                page: 1,
+                searchStr: "",
+                pageSize: "10",
+            })
+        );
+        setActiveButton("marketLogs");
     };
     const fetchUserNfts = () => {
         if (user) {
@@ -185,6 +198,12 @@ const Emporium = () => {
             disabled: !user?.principal,
         },
         {
+            label: "Logs",
+            id: "logs",
+            onClick: fetchUserLogs,
+            disabled: !user?.principal,
+        },
+        {
             label: "MarketPlace",
             id: "marketPlace",
             onClick: fetchMarketListings,
@@ -197,11 +216,12 @@ const Emporium = () => {
             disabled: !user?.principal,
         },
         {
-            label: "Logs",
-            id: "logs",
-            onClick: fetchUserLogs,
-            disabled: !user?.principal,
+            label: "Market Logs",
+            id: "marketLogs",
+            onClick: fetchMarketLogs,
+            disabled: false//!user?.principal,
         },
+
     ];
 
     return (
@@ -251,18 +271,20 @@ const Emporium = () => {
                 {activeButton === "logs" ? (
                     <UserEmporiumLogs />
 
-                ) : (
-                    <>
+                ) : (activeButton === "marketLogs" ? (<EmporiumMarketLogs/>) : (<>
 
-                        <div className="lg:mb-20 md:mb-16 sm:mb-10 xs:mb-6">
-                            <ContentListEmporium type={type} />
-                        </div>
-                        <PaginationComponent
-                            totalPages={emporium.totalPages}
-                            onPageChange={handlePageClick}
-                            currentPage={currentPage}
-                        />
-                    </>
+                    <div className="lg:mb-20 md:mb-16 sm:mb-10 xs:mb-6">
+                        <ContentListEmporium type={type} />
+                    </div>
+                    <PaginationComponent
+                        totalPages={emporium.totalPages}
+                        onPageChange={handlePageClick}
+                        currentPage={currentPage}
+                    />
+                </>)
+
+
+
                 )}
             </div>
         </>

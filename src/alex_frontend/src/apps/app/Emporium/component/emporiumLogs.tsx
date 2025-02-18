@@ -3,82 +3,111 @@ import { Table, Tag } from "antd"; // Using Ant Design for UI
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getUserLogs from "../thunks/getUserLog";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import getEmporiumMarketLogs from "../thunks/getEmporiumMarketLogs";
 
 // Define table columns
 const columns = [
     {
-        title: "Timestamp",
+        title: <div className="text-lg font-bold text-[#333] font-[Syne]">Timestamp</div>,
         dataIndex: "timestamp",
         key: "timestamp",
-        render: (timestamp: string) => 
-            new Date(parseInt(timestamp) / 1e6).toLocaleString(), // Convert to readable format
-    },
-    {
-        title: "Token ID",
-        dataIndex: "token_id",
-        key: "token_id",
-        render: (token_id: string) => token_id.slice(0, 10) + "..." // Shorten token ID for better UI
-    },
-    {
-        title: "Action",
-        dataIndex: "action",
-        key: "action",
-        render: (action: any, record: any) => {
-            let actionText = action?.type;
-            let color = "blue"; // Default color for tags
-
-            if (action?.type === "PriceUpdate" && action.oldPrice !== action.newPrice) {
-                actionText = `💰 Price Updated: ${Number(action.oldPrice) / 1e8} → ${Number(action.newPrice) / 1e8}`;
-                color = "orange";
-            } else if (action?.type === "Sold") {
-                actionText = `✅ Sold`;
-                color = "green";
-            } else if (action?.type === "Listed") {
-                actionText = `📌 Listed`;
-                color = "blue";
-            } else if (action?.type === "Removed") {
-                actionText = `❌ Removed`;
-                color = "red";
-            }
+        width: "19%",
+        render: (timestamp: string) => {
+            const formattedDate = new Date(parseInt(timestamp) / 1e6).toLocaleString(); // Convert timestamp to readable format
 
             return (
-                <div>
-                    <Tag color={color} style={{ fontSize: "14px", padding: "5px 10px" }}>
-                        {actionText}
-                    </Tag>
-                    {record.buyer && (
-                        <div style={{ marginTop: "5px", fontSize: "12px", color: "#555" }}>
-                            🛒 <b>Buyer:</b> <span style={{ color: "#333" }}>{record.buyer}</span>
-                        </div>
-                    )}
+                <div className="text-[15px]  p-0 whitespace-nowrap bg-[transparent] border-[0] font-medium font-[Syne]">
+                    🕒 {formattedDate}
                 </div>
             );
-        },
+        }
+    },
+    {
+        title: <div className="text-lg font-bold text-[#333] font-[Syne]">Token ID</div>,
+        dataIndex: "token_id",
+        key: "token_id",
+        width: "19%",
+        render: (token_id: string) => {
+
+            return (
+                <div className="text-[15px]  p-0 whitespace-nowrap bg-[transparent] border-[0] font-medium font-[Syne]">
+                    {token_id.slice(0, 10) + "..." + token_id.slice(-2)}
+                </div>
+            );
+        }
+
+    },
+    {
+        title: <div className="text-lg font-bold text-[#333] font-[Syne]">Seller</div>,
+        dataIndex: "seller",
+        key: "seller",
+        width: "19%",
+        render: (seller: string) => {
+
+            return (
+                <div className="text-[15px]  p-0 whitespace-nowrap bg-[transparent] border-[0] font-medium font-[Syne]">
+                    {seller}
+                </div>
+            );
+        }
+    },
+    {
+        title: <div className="text-lg font-bold text-[#333] font-[Syne]">Buyer</div>,
+        dataIndex: "buyer",
+        key: "buyer",
+        width: "15%",
+
+        render: (buyer: string | null) => {
+
+            return (
+                <div className="text-[15px]  p-0 whitespace-nowrap bg-[transparent] border-[0] font-medium font-[Syne]">
+                    {buyer ? buyer : ""}
+                </div>
+            );
+        }
+    },
+    {
+        title: <div className="text-lg font-bold text-[#333] font-[Syne]">Action</div>,
+        dataIndex: "action",
+        key: "action",
+        width: "19%",
+        render: (action: any) =>
+            action.type === "PriceUpdate"
+                ? `Price Updated: ${Number(action.oldPrice) / 1e8} → ${Number(action.newPrice) / 1e8} `
+                : action.type,
     },
 ];
 
-const EmporiumLogs: React.FC = () => {
+const EmporiumMarketLogs: React.FC = () => {
     const dispatch = useAppDispatch();
-    const logs = useAppSelector((state) => state.emporium.logs);
+    const logs = useAppSelector((state) => state.emporium.emporiumMarketLogs);
 
     useEffect(() => {
         dispatch(getUserLogs({}));
     }, [dispatch]);
 
     return (
-        <div style={{ padding: "20px", backgroundColor: "#fff", borderRadius: "8px", boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)" }}>
-            <h1 style={{ textAlign: "center", marginBottom: "20px", color: "#333" }}>📜 Marketplace Logs</h1>
-            {logs.length > 0 && (
+        <div className="p-10 bg-white rounded-[8px] shadow-[0px 2px 10px rgba(0, 0, 0, 0.1)] overflow-x-auto dark:bg-[#3A3630]">
+            <h1 className="text-center mb-[20px] text-[#333] dark-[text-white]">📜 Marketplace Logs</h1>
+            {logs.logs.length > 0 && (
                 <Table
                     columns={columns}
-                    dataSource={logs}
+                    dataSource={logs.logs}
                     rowKey="timestamp"
-                    pagination={{ pageSize: 8 }} // Add pagination for better UX
-                    bordered // Add table borders
+                    pagination={{
+                        total: Number(logs.totalPages) * 10,
+                        pageSize: 10,
+                        onChange: (page, pageSize) => {
+                            dispatch(getEmporiumMarketLogs({ page, pageSize: pageSize.toString() }));
+                        },
+                    }}
+                    bordered
+                    scroll={{ x: "max-content" }} 
+                    style={{ minWidth: "100%" }}
                 />
             )}
         </div>
     );
 }
 
-export default EmporiumLogs;
+export default EmporiumMarketLogs;

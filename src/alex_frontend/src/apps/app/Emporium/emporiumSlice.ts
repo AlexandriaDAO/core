@@ -6,7 +6,9 @@ import getMarketListing from "./thunks/getMarketListing";
 import buyNft from "./thunks/buyNft";
 import removeListedNft from "./thunks/removeListedNft";
 import editListing from "./thunks/editListing";
-import getUserLogs, { TransformedLog } from "./thunks/getUserLog";
+import getUserLogs from "./thunks/getUserLog";
+import { TransformedLog } from "./utlis";
+import getEmporiumLogs from "./thunks/getEmporiumMarketLogs";
 
 export interface EmporiumState {
   loading: boolean;
@@ -23,7 +25,19 @@ export interface EmporiumState {
     string,
     { tokenId: string; arweaveId: string; price: string; owner: string }
   >;
-  logs: TransformedLog[]; 
+  userLogs: {
+    logs: TransformedLog[];
+    pageSize: string;
+    totalPages: string;
+    currentPage: string;
+  };
+  emporiumMarketLogs: {
+    logs: TransformedLog[];
+    pageSize: string;
+    totalPages: string;
+    currentPage: string;
+  };
+
   error: string | null;
 }
 
@@ -41,7 +55,8 @@ const initialState: EmporiumState = {
   error: null,
   userTokens: [],
   marketPlace: {},
-  logs:[]
+  userLogs: { logs: [], pageSize: "0", totalPages: "0", currentPage: "0" },
+  emporiumMarketLogs: { logs: [], pageSize: "0", totalPages: "0", currentPage: "0" },
 };
 
 const emporiumSlice = createSlice({
@@ -176,13 +191,37 @@ const emporiumSlice = createSlice({
         state.error = null;
       })
       .addCase(getUserLogs.fulfilled, (state, action) => {
-        console.log("logs are ",action.payload);
-        state.logs=action.payload,
-        state.loading = false;
+        (state.userLogs = {
+          logs: action.payload.logs,
+          pageSize: action.payload.pageSize,
+          totalPages: action.payload.totalPages,
+          currentPage: action.payload.currentPage,
+        }),
+          (state.loading = false);
         state.error = null;
         //toast.success("Fetched!");
       })
       .addCase(getUserLogs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+        toast.error(action.payload);
+      })
+      .addCase(getEmporiumLogs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getEmporiumLogs.fulfilled, (state, action) => {
+        (state.emporiumMarketLogs = {
+          logs: action.payload.logs,
+          pageSize: action.payload.pageSize,
+          totalPages: action.payload.totalPages,
+          currentPage: action.payload.currentPage,
+        }),
+          (state.loading = false);
+        state.error = null;
+        //toast.success("Fetched!");
+      })
+      .addCase(getEmporiumLogs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
         toast.error(action.payload);
