@@ -28,7 +28,8 @@ export const performSearch = createAsyncThunk(
     console.log('Perform Search - Starting with params:', {
       searchState,
       isContinuation,
-      after
+      after,
+      timestamp: searchState.timestamp ? new Date(searchState.timestamp).toISOString() : null
     });
 
     try {
@@ -42,7 +43,8 @@ export const performSearch = createAsyncThunk(
         contentTypes: searchState.tags,
         amount: searchState.amount,
         ownerFilter: searchState.ownerFilter || undefined,
-        after
+        after,
+        timestamp: searchState.timestamp
       });
 
       console.log('Perform Search - Fetched transactions:', {

@@ -113,7 +113,9 @@ export async function fetchTransactions(
   contentTypes?: string[],
   amount?: number,
   ownerFilter?: string,
-  after?: string
+  after?: string,
+  minBlock?: number,
+  maxBlock?: number
 ): Promise<Transaction[]> {
   try {
     // Add validation
@@ -173,7 +175,9 @@ export async function fetchTransactions(
       first: Math.min(PAGE_SIZE, amount ?? PAGE_SIZE),
       tags: tags.length > 0 ? tags : undefined,
       owners: ownerFilter ? [ownerFilter] : undefined,
-      after: after
+      after: after,
+      minBlock,
+      maxBlock
     };
 
     const result = await arweaveNetClient.query({
@@ -205,7 +209,9 @@ export async function fetchTransactions(
         contentTypes,
         amount,
         ownerFilter,
-        after
+        after,
+        minBlock,
+        maxBlock
       }
     });
     throw error;

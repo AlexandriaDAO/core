@@ -9,9 +9,8 @@ export const useHandleSearch = () => {
   const dispatch = useDispatch<AppDispatch>();
   const searchState = useSelector((state: RootState) => state.arweave.searchState);
   const isLoading = useSelector((state: RootState) => state.arweave.isLoading);
-  const lastCursor = useSelector((state: RootState) => state.arweave.lastCursor);
 
-  const handleSearch = useCallback(async (continueFromTimestamp?: number, overrideAmount?: number) => {
+  const handleSearch = useCallback(async (continueFromTimestamp?: number, overrideAmount?: number, after?: string) => {
     if (isLoading) return;
     
     dispatch(setIsLoading(true));
@@ -22,17 +21,23 @@ export const useHandleSearch = () => {
         updatedSearchState.amount = overrideAmount;
       }
 
+      if (continueFromTimestamp) {
+        // Convert to milliseconds if it's in seconds
+        const timestampMs = continueFromTimestamp * (continueFromTimestamp < 1e12 ? 1000 : 1);
+        updatedSearchState.timestamp = timestampMs;
+      }
+
       await dispatch(performSearch({ 
         searchState: updatedSearchState,
-        isContinuation: !!continueFromTimestamp,
-        after: lastCursor || undefined
+        isContinuation: !!continueFromTimestamp || !!after,
+        after
       }));
     } catch (error) {
       console.error('Error performing search:', error);
     } finally {
       dispatch(setIsLoading(false));
     }
-  }, [dispatch, searchState, isLoading, lastCursor]);
+  }, [dispatch, searchState, isLoading]);
 
   const handleSearchStateChange = useCallback((key: keyof SearchState, value: any) => {
     dispatch(setSearchState({ [key]: value }));

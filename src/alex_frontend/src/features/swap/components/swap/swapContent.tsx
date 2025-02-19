@@ -8,7 +8,6 @@ import { _SERVICE as _SERVICEICPLEDGER } from "../../../../../../declarations/ic
 import { Link } from "react-router";
 import swapLbry from "../../thunks/swapLbry";
 import { flagHandler } from "../../swapSlice";
-import Auth from "@/features/auth";
 import { LoaderCircle } from "lucide-react";
 import { icp_fee, minimum_icp } from "@/utils/utils";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";

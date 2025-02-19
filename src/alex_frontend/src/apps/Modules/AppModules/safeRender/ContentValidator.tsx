@@ -9,6 +9,7 @@ import { ContentValidatorProps } from './types';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 import { contentCache } from '@/apps/Modules/shared/services/contentCacheService';
 import { debounce } from 'lodash';
+import { nsfwService } from '@/apps/Modules/shared/services/nsfwService';
 
 const ContentValidator: React.FC<ContentValidatorProps> = ({
   transactionId,
@@ -17,11 +18,14 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   imageObjectUrl,
 }) => {
   const dispatch = useDispatch();
-  const nsfwModelLoaded = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
   const { validateContent } = useContentValidation();
   const { getNftData } = useNftData();
   const [nftData, setNftData] = useState<NftDataResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [pendingValidation, setPendingValidation] = useState<{
+    element: HTMLImageElement | HTMLVideoElement;
+    thumbnailUrl?: string;
+  } | null>(null);
 
   // Handle NFT data fetching
   useEffect(() => {
@@ -42,7 +46,13 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
 
   const validateNewContent = useCallback(
     debounce(async (element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => {
-      if (isLoading || nftData?.principal || !nsfwModelLoaded) {
+      if (isLoading || nftData?.principal) {
+        return;
+      }
+
+      // If model is not loaded, store the element for later validation
+      if (!nsfwService.isModelLoaded()) {
+        setPendingValidation({ element, thumbnailUrl });
         return;
       }
 
@@ -62,8 +72,20 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
         console.error('Error in validation:', error);
       }
     }, 300),
-    [contentType, isLoading, nsfwModelLoaded, transactionId, validateContent, nftData, dispatch]
+    [contentType, isLoading, transactionId, validateContent, nftData, dispatch]
   );
+
+  // Effect to handle pending validations when model loads
+  useEffect(() => {
+    const checkAndValidate = async () => {
+      if (pendingValidation && nsfwService.isModelLoaded()) {
+        await validateNewContent(pendingValidation.element, pendingValidation.thumbnailUrl);
+        setPendingValidation(null);
+      }
+    };
+
+    checkAndValidate();
+  }, [pendingValidation, validateNewContent]);
 
   const handleValidateContent = async (element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => {
     if (thumbnailUrl && contentType.startsWith('video/')) {
