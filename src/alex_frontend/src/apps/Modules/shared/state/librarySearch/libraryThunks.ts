@@ -20,7 +20,6 @@ export const togglePrincipalSelection = createAsyncThunk<
     try {
       dispatch(clearCache());
       dispatch(togglePrincipal(principalId));
-      dispatch(performSearch());
       return principalId;
     } catch (error) {
       console.error('Error in togglePrincipalSelection:', error);

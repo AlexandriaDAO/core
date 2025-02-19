@@ -15,7 +15,7 @@ const SHELVES_MEM_ID: MemoryId = MemoryId::new(0);
 const USER_SHELVES_MEM_ID: MemoryId = MemoryId::new(1);
 const NFT_SHELVES_MEM_ID: MemoryId = MemoryId::new(2);
 
-const MAX_VALUE_SIZE: u32 = 1000; // Added constant for consistency
+const MAX_VALUE_SIZE: u32 = 8192; // 8kb should be good for a decent sized markdown file.
 
 // New wrapper types
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]

@@ -12,16 +12,6 @@ use crate::{
 pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(60*60); // 1 hour.
 pub const PRICE_FETCH_INTERVAL: Duration = Duration::from_secs(1 * 24 * 60 * 60); // 1 days in seconds
 
-//Old init
-// #[init]
-//  fn init() {
-//     ic_cdk_timers::set_timer(Duration::from_secs(0), || {
-//         ic_cdk::spawn(get_icp_rate_cents_wrapper());
-//     });
-//     let _reward_timer_id: ic_cdk_timers::TimerId = ic_cdk_timers::set_timer_interval(REWARD_DISTRIBUTION_INTERVAL, || ic_cdk::spawn(distribute_reward_wrapper()));
-//     let _price_timer_id: ic_cdk_timers::TimerId = ic_cdk_timers::set_timer_interval(PRICE_FETCH_INTERVAL, || ic_cdk::spawn(get_icp_rate_cents_wrapper()));
-// }
-
 #[derive(CandidType, Deserialize, Clone, Default)]
 pub struct InitArgs {
     pub stakes: Option<Vec<(Principal, Stake)>>,

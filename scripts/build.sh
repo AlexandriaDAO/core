@@ -45,44 +45,43 @@ dfx deploy nft_manager --specified-id 5sh5r-gyaaa-aaaap-qkmra-cai
 # For alex_backend
 cargo build --release --target wasm32-unknown-unknown --package alex_backend
 candid-extractor target/wasm32-unknown-unknown/release/alex_backend.wasm > src/alex_backend/alex_backend.did
+dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
 # For lexigraph
 cargo build --release --target wasm32-unknown-unknown --package lexigraph
 candid-extractor target/wasm32-unknown-unknown/release/lexigraph.wasm > src/lexigraph/lexigraph.did
+dfx deploy lexigraph --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
+dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
 # For tokenomics
 cargo build --release --target wasm32-unknown-unknown --package tokenomics
 candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
+dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
 
 # for user
 cargo build --release --target wasm32-unknown-unknown --package user
 candid-extractor target/wasm32-unknown-unknown/release/user.wasm > src/user/user.did
+dfx deploy user --specified-id yo4hu-nqaaa-aaaap-qkmoq-cai
 # for vetkd
 cargo build --release --target wasm32-unknown-unknown --package vetkd
 candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
+dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
 # For Emporium
 cargo build --release --target wasm32-unknown-unknown --package emporium
 candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/emporium/emporium.did
+dfx deploy emporium --specified-id zdcg2-dqaaa-aaaap-qpnha-cai
 # For Logs
 cargo build --release --target wasm32-unknown-unknown --package logs
 candid-extractor target/wasm32-unknown-unknown/release/logs.wasm > src/logs/logs.did
+dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 
 cargo update
 
-dfx deploy lexigraph --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
-dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
-dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
-dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
 
-dfx deploy user --specified-id yo4hu-nqaaa-aaaap-qkmoq-cai
-dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
 dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
-
 dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
-dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 
-dfx deploy emporium --specified-id zdcg2-dqaaa-aaaap-qpnha-cai
 
 # Step 5: Configure Local Identities for token launches
 dfx identity new minter --storage-mode plaintext
@@ -230,7 +229,7 @@ dfx deploy ic_siws_provider --argument $'(
 # echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."
 # exit 1
 
-# Step 7: Deploy frontend Manually.
+# Step 7: Deploy frontend ManuallyS.
 
 mkdir -p .dfx/local/canisters/LBRY
 mkdir -p .dfx/local/canisters/ALEX
@@ -247,7 +246,7 @@ dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal d4qqt-2dxx5-og4yg-hlsl5-z6opa-ikfav-d6aw2-wvsut-qnyss-j2dpk-vqe)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal xvbog-ed7mm-p7nua-uvjoh-fsj7r-ryqkn-pepmx-gtjlc-jxcjt-guib6-pae)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)

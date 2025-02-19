@@ -1,38 +1,22 @@
-#### Module Design Optimizations
-- Can tagSelector.tsx and contentTagsSelector.tsx and contentTypeToggleGroup.tsx be combined?
-
-
-
-
-
-
-
-
-
-
-
-
-
 #### UI Fixes:
-- Dropdown Menu from apps/swap.
-- Visibility of the login button.
 - Epub modal has two "close" buttons.
-- Discover button, as per Nelia's request: ybe rgb 141 140 140? or rgb 217 217 217
+
 
 
 #### Features now:
+- Sort by non-zero nft balances.
 - Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
 - Finish the channels.md plan, given the new text rendering setup.
 
 
 #### Bugs:
-- Need more dynamic states for the like/mint/withdraw buttons.
+- Need more dynamic states for the like/mint/withdraw buttons. (include in this singleTokenView.tsx which duplicates a lot of this logic.)
 - If the mint has succeded the mint button should go away.
 - If you go to the next page on alexandrian while a modal is open it throws an error.
 - On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.
 
 #### Bigger Features (lower priority):
-- Range selection for Alexandrian.
+- Range selection for Alexandrian, e.g., query nfts of a person by 400-500 instead of starting from the latest.
 - Lazy loading all apps, and loading blur to clear instead of top to bottom.
 - Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
 - Put another amount selector by the show more button on permasearch.
@@ -55,6 +39,7 @@
 #### New Apps:
 - Arena style app, full design in channels.md.
 - Collection service for getting all the money from nfts.
+- Perpetua is a good name for one, latin for perpetual/eternal.
 
 
 

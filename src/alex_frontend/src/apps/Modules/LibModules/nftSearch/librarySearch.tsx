@@ -6,7 +6,6 @@ import PrincipalSelector from "./PrincipalSelector";
 import CollectionSelector from "./collectionSelector";
 import LibraryContentTagsSelector from "./tagSelector";
 import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
-import { performSearch } from '../../shared/state/librarySearch/libraryThunks';
 import RangeSelector from './rangeSelector';
 
 export default function LibrarySearch() {
@@ -23,12 +22,6 @@ export default function LibrarySearch() {
         .finally(() => setIsLoading(false));
     }
   }, [transactions, dispatch, isLoading]);
-
-  useEffect(() => {
-    if (selectedPrincipals.length > 0 && collection) {
-      dispatch(performSearch());
-    }
-  }, [selectedPrincipals, collection, dispatch]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-[8px] md:rounded-[12px] shadow-md p-2 sm:p-3">
