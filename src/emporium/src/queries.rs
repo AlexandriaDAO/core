@@ -129,7 +129,7 @@ pub fn get_search_listing(
 }
 
 #[query]
-pub fn get_logs(page: Option<u64>, page_size: Option<u64>) -> Logs {
+pub fn get_logs(page: Option<u64>, page_size: Option<u64>, token_id_filter: Option<Nat>) -> Logs {
     let page = page.unwrap_or(1); // Default to 1 if None
     let page_size = page_size.unwrap_or(10); // Default to 10 if None
 
@@ -139,13 +139,21 @@ pub fn get_logs(page: Option<u64>, page_size: Option<u64>) -> Logs {
         let total_pages = (total_count as f64 / page_size as f64).ceil() as u64;
         let start_index = ((page - 1) * page_size) as usize;
 
-        let logs = logs_map
+        let filtered_logs: Vec<(u64, LogEntry)>= logs_map
             .iter()
+            .filter(|(_, log)| -> bool {
+                if token_id_filter.is_some() && token_id_filter != Some(log.token_id.clone()) {
+                    return false;
+                }
+                return true;
+            })
             .skip(start_index) // Skip entries before the page start
             .take(page_size as usize) // Take only `page_size` items
             .map(|(timestamp, log)| (timestamp, log.clone())) // Clone log entry
             .collect();
-
+        // Sort the logs by timestamp
+        let mut logs = filtered_logs;
+        logs.sort_by_key(|(timestamp, _)| std::cmp::Reverse(*timestamp)); // Sort by timestamp in descending order
         Logs {
             logs,
             total_pages,

@@ -14,6 +14,8 @@ import ContentRenderer from "@/apps/Modules/AppModules/safeRender/ContentRendere
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { MARKETPLACE_LBRY_FEE } from "./utlis";
 import { toast } from "sonner";
+import "./component/style.css"
+
 
 
 interface CombinedModalProps {
@@ -168,7 +170,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]   ">
-            <div className="bg-background bg-white rounded-xl sm:p-10 xs:p-4 lg:max-w-3xl md:max-w-2xl sm:max-w-xl xs:xs:w-11/12 w-full relative flex flex-col max-h-[90vh] dark:bg-gray-900">
+            <div className="bg-background bg-white rounded-xl sm:p-10 xs:p-4 lg:max-w-3xl md:max-w-2xl sm:max-w-xl xs:xs:w-11/12 w-full relative flex flex-col dark:bg-gray-900 max-h-[90vh]">
                 <div className="flex justify-between mb-8 items-baseline">
                     <h2 className="text-3xl font-semibold mb-2 text-foreground ms-2">{type}</h2>
                     <Button
@@ -180,7 +182,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
                 </div>
                 <p className="mb-4 break-all text-foreground text-medium font-medium mb-4">ID: {modalData.arwaveId}</p>
 
-                <div className="group relative w-full overflow-hidden h-[300px] mb-4 rounded-lg">
+                <div className="group custom-modal relative w-full h-[300px] mb-4 rounded-lg">
                     <ContentRenderer
                         transaction={modalData.transaction}
                         content={contentData[modalData.arwaveId]}
@@ -189,7 +191,7 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
                             coverUrl: null,
                             fullUrl: contentData[modalData.arwaveId]?.url || `https://arweave.net/${modalData.arwaveId}`
                         }}
-                        inModal={false}
+                        inModal={true}
                         handleRenderError={handleRenderError}
                     />
                 </div>

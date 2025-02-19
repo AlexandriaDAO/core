@@ -188,4 +188,7 @@ export const Paginate = styled.div<{ $isOpen?: boolean }>`
   .previous a {
     border: none !important;
   }
+
 `;
+
+

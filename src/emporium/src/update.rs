@@ -56,7 +56,7 @@ pub async fn list_nft(token_id: Nat, icp_amount: u64) -> Result<String, String> 
         nft_map.insert(token_id.clone().to_string(), nft);
         Ok(())
     })?;
-    add_log(timestamp, token_id, caller(),Principal::anonymous(), LogAction::Listed);
+    add_log(timestamp, token_id, caller(),Principal::anonymous(), LogAction::Listed{price:icp_amount});
     Ok("NFT added for sale".to_string())
 }
 #[update(guard = "not_anon")]
@@ -104,7 +104,7 @@ pub async fn buy_nft(token_id: Nat) -> Result<String, String> {
                 ic_cdk::api::time(),
                 token_id.clone(),
                 seller,caller(),
-                LogAction::Sold ,
+                LogAction::Sold{price:current_nft.price.clone()} ,
             ); //seller
            
         }

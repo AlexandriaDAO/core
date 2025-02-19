@@ -198,7 +198,7 @@ const Emporium = () => {
             disabled: !user?.principal,
         },
         {
-            label: "Logs",
+            label: "My Logs",
             id: "logs",
             onClick: fetchUserLogs,
             disabled: !user?.principal,

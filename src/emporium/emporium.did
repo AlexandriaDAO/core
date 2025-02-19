@@ -5,8 +5,8 @@ type Listing = record {
   current_page : nat64;
 };
 type LogAction = variant {
-  Listed;
-  Sold;
+  Listed : record { price : nat64 };
+  Sold : record { price : nat64 };
   PriceUpdate : record { new_price : nat64; old_price : nat64 };
   Removed;
   ReimbursedToBuyer;
@@ -39,7 +39,7 @@ service : {
   get_caller_logs : (opt nat64, opt nat64, opt nat) -> (Logs) query;
   get_listing : (opt nat64, opt nat64) -> (Listing) query;
   get_listing_total_count : () -> (nat64) query;
-  get_logs : (opt nat64, opt nat64) -> (Logs) query;
+  get_logs : (opt nat64, opt nat64, opt nat) -> (Logs) query;
   get_search_listing : (
       opt nat64,
       opt nat64,

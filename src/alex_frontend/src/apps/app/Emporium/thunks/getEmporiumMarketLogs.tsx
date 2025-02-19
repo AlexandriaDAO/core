@@ -25,13 +25,13 @@ const getEmporiumMarketLogs = createAsyncThunk<
       const actorEmporium = await getActorEmporium();
       const logs = await actorEmporium.get_logs(
         [BigInt(page)],
-        [BigInt(pageSize)],
+        [BigInt(pageSize)], []
 
       );
 
       // Transform the logs
       const transformedLogs = logs.logs.map(([timestamp, log]) => ({
-        ...transformLogEntry(log), // Spread the transformed
+        ...transformLogEntry(log,""), // Spread the transformed
       }));
 
       return { logs: transformedLogs, pageSize: logs.page_size.toString(), totalPages: logs.total_pages.toString(), currentPage: logs.current_page.toString() };

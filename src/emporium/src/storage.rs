@@ -60,15 +60,11 @@ pub enum NftStatus {
 }
 #[derive(CandidType, Deserialize, Clone, Debug)]
 pub enum LogAction {
-    PriceUpdate {
-        old_price: u64,
-        new_price: u64,
-    },
-    Sold ,
-    ReimbursedToBuyer ,
-    Listed,
+    PriceUpdate { old_price: u64, new_price: u64 },
+    Sold { price: u64 },
+    ReimbursedToBuyer,
+    Listed { price: u64 },
     Removed,
-
 }
 #[derive(CandidType, Deserialize, Clone, Debug)]
 pub struct LogEntry {
