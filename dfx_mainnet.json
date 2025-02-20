@@ -33,6 +33,12 @@
       "package": "alex_backend",
       "type": "rust"
     },
+    "asset_manager": {
+      "candid": "src/asset_manager/asset_manager.did",
+      "package": "asset_manager",
+      "type": "rust",
+      "specified_id": "zhcno-qqaaa-aaaap-qpv7a-cai"
+    },
     "lexigraph": {
       "candid": "src/lexigraph/lexigraph.did",
       "package": "lexigraph",

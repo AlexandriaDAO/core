@@ -55,16 +55,30 @@ async fn create_asset_canister(from_subaccount: Option<[u8; 32]>) -> Result<Prin
         }),
     };
 
-    let (create_result,): (CreateCanisterResult,) = ic_cdk::api::call::call(
+    let (create_result,): (CreateCanisterResult,) = ic_cdk::api::call::call_with_payment(
         Principal::management_canister(),
         "create_canister",
         (create_args,),
+        7_692_307_692, // Required cycles for canister creation
     )
     .await
     .map_err(|e| format!("Failed to create canister: {}", e.1))?;
 
     let asset_canister_id: Principal = create_result.canister_id;
     ic_cdk::println!("Created new asset canister with ID: {}", asset_canister_id);
+
+    // Deposit additional cycles to the new canister for installation and operation
+    let deposit_cycles_args = ic_cdk::api::management_canister::main::CanisterIdRecord {
+        canister_id: asset_canister_id,
+    };
+    ic_cdk::api::call::call_with_payment(
+        Principal::management_canister(),
+        "deposit_cycles",
+        (deposit_cycles_args,),
+        9_230_818_665, // Required cycles for installation and operation
+    )
+    .await
+    .map_err(|e| format!("Failed to deposit cycles: {}", e.1))?;
 
     // Step 2: Install the Wasm module on the new canister
     let install_args = InstallCodeArgument {

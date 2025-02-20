@@ -39,6 +39,12 @@
       "type": "rust",
       "specified_id": "ya6k4-waaaa-aaaap-qkmpq-cai"
     },
+    "asset_manager": {
+      "candid": "src/asset_manager/asset_manager.did",
+      "package": "asset_manager",
+      "type": "rust",
+      "specified_id": "zhcno-qqaaa-aaaap-qpv7a-cai"
+    },
     "icp_swap": {
       "candid": "src/icp_swap/icp_swap.did",
       "package": "icp_swap",

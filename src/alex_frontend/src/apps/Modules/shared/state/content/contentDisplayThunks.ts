@@ -24,48 +24,53 @@ export const loadContentForTransactions = createAsyncThunk(
   "contentDisplay/loadContent",
   async (transactions: Transaction[], { dispatch }) => {
 
-    // Adil asset-canister version
-    await Promise.all(
-      transactions.map(async (transaction) => {
-        try {
-          const content = await ContentService.loadContent(transaction);
-          const urls = await ContentService.getContentUrls(
-            transaction,
-            content
-          );
+  //   // Adil asset-canister version
+  //   await Promise.all(
+  //     transactions.map(async (transaction) => {
+  //       try {
+  //         const content = await ContentService.loadContent(transaction);
+  //         const urls = await ContentService.getContentUrls(
+  //           transaction,
+  //           content
+  //         );
 
-          // Combine content and urls into a single dispatch
-          dispatch(
-            setContentData({
-              id: transaction.id,
-              content: {
-                ...content,
-                urls,
-              },
-            })
-          );
+  //         // Combine content and urls into a single dispatch
+  //         dispatch(
+  //           setContentData({
+  //             id: transaction.id,
+  //             content: {
+  //               ...content,
+  //               urls,
+  //             },
+  //           })
+  //         );
+  //       } catch (error) {
+  //         console.error('Error loading content for transaction', transaction.id, ':', error);
+  //       }
+  //     })
+  //   );
+  // });
 
-//     // Evan master version  
-//     // Process each transaction independently without waiting for others
-//     transactions.forEach(async (transaction) => {
-//       try {
-//         const content = await ContentService.loadContent(transaction);
-//         const urls = await ContentService.getContentUrls(transaction, content);
+  // Evan master version  
+  // Process each transaction independently without waiting for others
+  transactions.forEach(async (transaction) => {
+    try {
+      const content = await ContentService.loadContent(transaction);
+      const urls = await ContentService.getContentUrls(transaction, content);
 
-//         dispatch(setContentData({ 
-//           id: transaction.id, 
-//           content: {
-//             ...content,
-//             urls
-//           }
-//         }));
+      dispatch(setContentData({ 
+        id: transaction.id, 
+        content: {
+          ...content,
+          urls
+        }
+      }));
 
-      } catch (error) {
-        console.error('Error loading content for transaction', transaction.id, ':', error);
-      }
-    });
-  }
-);
+    } catch (error) {
+      console.error('Error loading content for transaction', transaction.id, ':', error);
+    }
+  });
+});
 
 export const updateTransactions = createAsyncThunk(
   "contentDisplay/updateTransactions",

@@ -74,12 +74,14 @@ dfx deploy emporium --specified-id zdcg2-dqaaa-aaaap-qpnha-cai
 # For Logs
 cargo build --release --target wasm32-unknown-unknown --package logs
 candid-extractor target/wasm32-unknown-unknown/release/logs.wasm > src/logs/logs.did
+dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 
 # For Asset Manager canister
 cargo build --release --target wasm32-unknown-unknown --package asset_manager
 candid-extractor target/wasm32-unknown-unknown/release/asset_manager.wasm > src/asset_manager/asset_manager.did
+dfx deploy asset_manager --specified-id zhcno-qqaaa-aaaap-qpv7a-cai
+dfx ledger fabricate-cycles --canister zhcno-qqaaa-aaaap-qpv7a-cai --cycles 10000000000000000
 
-dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 
 
 cargo update
@@ -255,7 +257,7 @@ dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 ## Helpful extras for testing.
 # dfx ledger balance
 # dfx ledger transfer <to_account> --icp <amount> --memo 0
-# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal xvbog-ed7mm-p7nua-uvjoh-fsj7r-ryqkn-pepmx-gtjlc-jxcjt-guib6-pae)
+# dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal g6svr-nhi3o-7vctp-ovpnr-lcswx-vcnuo-x6yz5-az6p4-ozar7-5fepg-iae)
 
 # # Load canister IDs from canister_ids.json
 # ALEX_CANISTER_ID=$(jq -r '.ALEX.ic' canister_ids.json)
