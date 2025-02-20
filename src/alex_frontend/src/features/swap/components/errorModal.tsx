@@ -12,7 +12,7 @@ interface ErrorModalProps {
 const ErrorModal: React.FC<ErrorModalProps> = ({ show,setShow,title="Something went wrong...",message="Please try again or seek help if needed" }) => {
     if (!show) return null; // Only render modal if show is true
     return (
-        <div className="bg-background/80 flex items-center justify-center min-h-screen w-full fixed z-50 top-0 left-0">
+        <div className="bg-black/80 flex items-center justify-center min-h-screen w-full fixed z-50 top-0 left-0">
             <div className="bg-background border border-border max-w-sm w-full h-[430px] rounded-2xl p-7 pb-14 w-11/12">
                 <div className="text-right mb-9">
                     <FontAwesomeIcon icon={faXmark} className="text-muted-foreground text-2xl" onClick={() => { setShow(false) }} role="button" />
