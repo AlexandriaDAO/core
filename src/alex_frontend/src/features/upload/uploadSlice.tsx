@@ -6,7 +6,8 @@ import estimateCost from "./thunks/estimateCost";
 import { SerializedWallet } from "../wallets/walletsSlice";
 import fetchBalance from "./thunks/fetchBalance";
 import selectWallet from "./thunks/selectWallet";
-export interface ArinaxState {
+
+export interface UploadState {
 	textMode: boolean;
 	wallets: SerializedWallet[];
 	wallet: SerializedWallet | null;
@@ -33,7 +34,7 @@ export interface ArinaxState {
 	mintError: string | null;
 }
 
-const initialState: ArinaxState = {
+const initialState: UploadState = {
 	textMode: false,
 	wallets: [],
 	wallet: null,
@@ -58,8 +59,8 @@ const initialState: ArinaxState = {
 	mintError: null,
 };
 
-const arinaxSlice = createSlice({
-	name: "arinax",
+const uploadSlice = createSlice({
+	name: "upload",
 	initialState,
 	reducers: {
 		reset: ()=> initialState,
@@ -80,7 +81,7 @@ const arinaxSlice = createSlice({
 			state.textMode = action.payload
 		},
 	},
-	extraReducers: (builder: ActionReducerMapBuilder<ArinaxState>) => {
+	extraReducers: (builder: ActionReducerMapBuilder<UploadState>) => {
 		builder
 			.addCase(fetchWallets.pending, (state) => {
 				state.fetching = true;
@@ -197,6 +198,6 @@ const arinaxSlice = createSlice({
 	}
 });
 
-export const { reset, setWallet, setProgress, setDetails, setTransaction, setTextMode } = arinaxSlice.actions;
+export const { reset, setWallet, setProgress, setDetails, setTransaction, setTextMode } = uploadSlice.actions;
 
-export default arinaxSlice.reducer;
+export default uploadSlice.reducer;

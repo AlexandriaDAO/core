@@ -11,10 +11,10 @@ const selectWallet = createAsyncThunk<
     SerializedWallet, // This is the return type of the thunk's payload
     void, //Argument that we pass to initialize
     { rejectValue: string, state: RootState }
->("arinax/selectWallet", async (_, { rejectWithValue, getState }) => {
+>("upload/selectWallet", async (_, { rejectWithValue, getState }) => {
     try {
-        const cost = getState().arinax.cost;
-        const wallets = getState().arinax.wallets;
+        const cost = getState().upload.cost;
+        const wallets = getState().upload.wallets;
 
         if (!cost) return rejectWithValue("Uploading cost is not available.");
 

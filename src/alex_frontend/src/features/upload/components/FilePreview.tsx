@@ -10,7 +10,7 @@ interface FilePreviewProps {
 
 function FilePreview({ file }: FilePreviewProps) {
     if (!file) return null;
-	const {cost} = useAppSelector(state => state.arinax);
+	const {cost} = useAppSelector(state => state.upload);
 
     const typeInfo = getFileTypeInfo(file.type);
 

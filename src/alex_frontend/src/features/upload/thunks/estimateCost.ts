@@ -6,7 +6,7 @@ const estimateCost = createAsyncThunk<
     string, // This is the return type of the thunk's payload
     { file: File }, //Argument that we pass to initialize
     { rejectValue: string , dispatch: AppDispatch, state: RootState }
->("arinax/estimateCost", async ({ file }, { rejectWithValue, getState }) => {
+>("upload/estimateCost", async ({ file }, { rejectWithValue, getState }) => {
     try {
         const user = getState().auth.user;
 

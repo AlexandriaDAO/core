@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowUpToLine, CheckCircle2, Loader2, LoaderPinwheel, RotateCcw } from "lucide-react";
+import { ArrowUpToLine, CheckCircle2, LoaderPinwheel, RotateCcw } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import useNftManager from "@/hooks/actors/useNftManager";
@@ -9,7 +9,7 @@ import { Button } from "@/lib/components/button";
 
 const MintNFT: React.FC = () => {
     const dispatch = useAppDispatch();
-	const {transaction, minting, minted, mintError} = useAppSelector(state=>state.arinax);
+	const {transaction, minting, minted, mintError} = useAppSelector(state=>state.upload);
 
 	const {actor} = useNftManager();
 

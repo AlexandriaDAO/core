@@ -8,7 +8,7 @@ interface UploadProgressProps {
 }
 
 function UploadProgress({ file }: UploadProgressProps) {
-    const { progress, fetching, selecting, uploading } = useAppSelector(state => state.arinax);
+    const { progress, fetching, selecting, uploading } = useAppSelector(state => state.upload);
 
     if (!file) return null;
 

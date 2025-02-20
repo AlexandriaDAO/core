@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ExternalLink, Copy, CheckCircle2, ArrowUpToLine, LoaderPinwheel, RotateCw, Clock } from "lucide-react";
+import { ExternalLink, Copy, CheckCircle2, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { Header } from "./Header";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -15,7 +15,7 @@ interface UploadSuccessProps {
 const UploadSuccess: React.FC<UploadSuccessProps> = ({
 	file,
 }) => {
-	const { transaction,details} = useAppSelector(state=>state.arinax);
+	const { transaction,details} = useAppSelector(state=>state.upload);
 	const [status, setStatus] = useState<TransactionStatusResponse>();
 	const [loading, setLoading] = useState(false);
 

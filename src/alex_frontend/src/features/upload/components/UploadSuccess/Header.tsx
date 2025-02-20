@@ -2,7 +2,7 @@ import React from "react";
 import { CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { setDetails } from "../../arinaxSlice";
+import { setDetails } from "../../uploadSlice";
 
 interface HeaderProps {
 	file: File;
@@ -12,7 +12,7 @@ export const Header: React.FC<HeaderProps> = ({
 	file,
 }) => {
     const dispatch = useAppDispatch();
-    const {details} = useAppSelector(state=>state.arinax);
+    const {details} = useAppSelector(state=>state.upload);
 	return (
         <div className="p-4 border-b">
             <div className="flex items-center justify-between">

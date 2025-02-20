@@ -3,7 +3,7 @@ import { FILE_TYPES, allowedTypes, getFileTypeInfo } from "../constants";
 import { formatFileSize } from "../utils";
 import { XCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { setTextMode } from "../arinaxSlice";
+import { setTextMode } from "../uploadSlice";
 
 interface FileSelectorProps {
     setFile: React.Dispatch<React.SetStateAction<File | null>>;

@@ -4,7 +4,7 @@ import { useUser } from "@/hooks/actors";
 import { toast } from "sonner";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import uploadFile from "../thunks/uploadFile";
-import { reset } from "../arinaxSlice";
+import { reset } from "../uploadSlice";
 import { Button } from "@/lib/components/button";
 import fetchWallets from "../thunks/fetchWallets";
 import selectWallet from "../thunks/selectWallet";
@@ -18,7 +18,7 @@ function FileUploader({file, setFile}: FileUploaderProps) {
     const dispatch = useAppDispatch();
     const {actor} = useUser();
 
-    const {cost} = useAppSelector(state=>state.arinax)
+    const {cost} = useAppSelector(state=>state.upload)
 
     const handleFileUpload = async() => {
         if(!file){

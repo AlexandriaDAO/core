@@ -9,7 +9,7 @@ const fetchWallets = createAsyncThunk<
     SerializedWallet[], // This is the return type of the thunk's payload
     ActorSubclass<_SERVICE>, //Argument that we pass to initialize
     { rejectValue: string }
->("arinax/fetchWallets", async (actor, { rejectWithValue }) => {
+>("upload/fetchWallets", async (actor, { rejectWithValue }) => {
     try {
         const result = await actor.get_active_wallets([])
 

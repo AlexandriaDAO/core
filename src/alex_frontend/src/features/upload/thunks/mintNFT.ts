@@ -12,10 +12,10 @@ const mintNFT = createAsyncThunk<
         actor: ActorSubclass<_SERVICE>
     }, //Argument that we pass to initialize
     { rejectValue: string , dispatch: AppDispatch, state: RootState }
->("arinax/mintNFT", async ({actor}, { rejectWithValue, dispatch, getState }) => {
+>("upload/mintNFT", async ({actor}, { rejectWithValue, dispatch, getState }) => {
     try {
 
-        const {auth: { user }, arinax: {transaction}} = getState();
+        const {auth: { user }, upload: {transaction}} = getState();
 
         if(!user) throw new Error("User not found");
 

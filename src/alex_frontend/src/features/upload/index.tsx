@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { setTransaction } from "./arinaxSlice";
+import { setTransaction } from "./uploadSlice";
 import FileSelector from "./components/FileSelector";
 import FilePreview from "./components/FilePreview";
 import UploadProgress from "./components/UploadProgress";
@@ -12,12 +12,12 @@ import FileUploader from "./components/FileUploader";
 import mintNFT from "./thunks/mintNFT";
 import useNftManager from "@/hooks/actors/useNftManager";
 import TextEditor from "./components/TextEditor";
-function Arinax() {
+function Upload() {
     const dispatch = useAppDispatch();
     const {actor} = useNftManager();
     const [file, setFile] = useState<File | null>(null);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-    const { transaction, fetching, selecting, uploading, uploadError, textMode, fetchError, selectError } = useAppSelector(state => state.arinax);
+    const { transaction, fetching, selecting, uploading, uploadError, textMode, fetchError, selectError } = useAppSelector(state => state.upload);
 
     useEffect(() => {
         if (!file) return;
@@ -31,14 +31,11 @@ function Arinax() {
 
         setUploadedFile(file);
         setFile(null);
-    }, [transaction]);
 
-
-    useEffect(()=>{
-        if(!transaction || !actor) return;
-
-        dispatch(mintNFT({actor}));
-    }, [transaction, actor]);
+        if (actor) {
+            dispatch(mintNFT({actor}));
+        }
+    }, [transaction, actor, file, dispatch]);
 
     // Handle any error state
     if (uploadError || fetchError || selectError) {
@@ -66,4 +63,4 @@ function Arinax() {
     return <FileSelector setFile={setFile} />
 }
 
-export default Arinax;
+export default Upload;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/lib/components/button";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { setTextMode } from "../arinaxSlice";
+import { setTextMode } from "../uploadSlice";
 
 interface TextEditorProps {
     setFile: React.Dispatch<React.SetStateAction<File | null>>;

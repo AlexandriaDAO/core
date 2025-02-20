@@ -2,9 +2,8 @@ import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE } from "../../../../../declarations/user/user.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AppDispatch, RootState } from "@/store";
-import { setProgress } from "../arinaxSlice";
+import { setProgress } from "../uploadSlice";
 import { readFileAsBuffer } from "@/features/irys/utils/gaslessFundAndUpload";
-import { SerializedWallet } from "@/features/wallets/walletsSlice";
 import Arweave from "arweave";
 
 const uploadFile = createAsyncThunk<
@@ -15,14 +14,14 @@ const uploadFile = createAsyncThunk<
 	}, //Argument that we pass to initialize
 	{ rejectValue: string; dispatch: AppDispatch; state: RootState }
 >(
-	"arinaxSlice/uploadFile",
+	"upload/uploadFile",
 	async (
 		{ file, actor },
 		{ rejectWithValue, dispatch, getState }
 	) => {
 		try {
 			const user = getState().auth.user;
-			const wallet = getState().arinax.wallet;
+			const wallet = getState().upload.wallet;
 
 			if(!wallet) return rejectWithValue("No wallet available");
 

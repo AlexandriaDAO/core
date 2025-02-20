@@ -22,7 +22,7 @@ const UpgradePage = lazy(()=>import("@/pages/dashboard/UpgradePage"));
 const LibrarianPage = lazy(()=>import("@/pages/librarian/"));
 const WalletsPage = lazy(()=>import("@/pages/librarian/WalletsPage"));
 // const FileUploadPage = lazy(()=>import("@/pages/dashboard/FileUploadPage"));
-const ArinaxPage = lazy(()=>import("@/pages/ArinaxPage"));
+const PinaxPage = lazy(()=>import("@/pages/PinaxPage"));
 // const UploadPage = lazy(()=>import("@/pages/dashboard/UploadPage"));
 const InsightsPage = lazy(()=>import("@/pages/swap/insightsPage"));
 
@@ -84,7 +84,7 @@ const router = createBrowserRouter(
 
 			<Route element={<AuthGuard />}>
 				<Route element={<MainLayout />}>
-					<Route path="app/arinax" element={<Suspense key="arinax" fallback={<MainPageSkeleton />}><ArinaxPage /></Suspense>} />
+					<Route path="app/pinax" element={<Suspense key="pinax" fallback={<MainPageSkeleton />}><PinaxPage /></Suspense>} />
 				</Route>
 				<Route element={<Protected route />}>
 					<Route path="dashboard" element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
