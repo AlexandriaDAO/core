@@ -23,8 +23,8 @@ import { getAssetCanister } from "../assetManager/utlis";
 export const loadContentForTransactions = createAsyncThunk(
   "contentDisplay/loadContent",
   async (transactions: Transaction[], { dispatch }) => {
-    
-    // Load content for each transaction
+
+    // Adil asset-canister version
     await Promise.all(
       transactions.map(async (transaction) => {
         try {
@@ -45,10 +45,25 @@ export const loadContentForTransactions = createAsyncThunk(
             })
           );
 
+//     // Evan master version  
+//     // Process each transaction independently without waiting for others
+//     transactions.forEach(async (transaction) => {
+//       try {
+//         const content = await ContentService.loadContent(transaction);
+//         const urls = await ContentService.getContentUrls(transaction, content);
+
+//         dispatch(setContentData({ 
+//           id: transaction.id, 
+//           content: {
+//             ...content,
+//             urls
+//           }
+//         }));
+
       } catch (error) {
-        console.error('Error loading content:', error);
+        console.error('Error loading content for transaction', transaction.id, ':', error);
       }
-    }));
+    });
   }
 );
 

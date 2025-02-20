@@ -25,6 +25,7 @@ module.exports = {
   			center: true,
   			padding: {
   				default: '1rem',
+				xs: '2rem',
   				sm: '2rem',
   				lg: '1rem'
   			},
@@ -77,7 +78,8 @@ module.exports = {
 				600: 'rgb(127, 121, 104)',
 				700: 'rgb(96, 92, 79)',
 				800: 'rgb(66, 64, 58)',
-				900: 'rgb(53, 52, 48)',   
+				850: 'rgb(60, 58, 53)',
+				900: 'rgb(53, 52, 48)',
 			  },
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',

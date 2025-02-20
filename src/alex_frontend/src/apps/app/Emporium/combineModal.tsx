@@ -14,10 +14,12 @@ import ContentRenderer from "@/apps/Modules/AppModules/safeRender/ContentRendere
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { MARKETPLACE_LBRY_FEE } from "./utlis";
 import { toast } from "sonner";
+import "./component/style.css"
+
 
 
 interface CombinedModalProps {
-    type: "sell" | "edit" | "remove" | "buy";
+    type: "Sell" | "Edit" | "Remove" | "Buy";
     modalData: {
         arwaveId: string;
         price: string;
@@ -31,7 +33,7 @@ interface CombinedModalProps {
 const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose, handleRenderError }) => {
     const dispatch = useAppDispatch();
     const contentData = useAppSelector((state) => state.contentDisplay.contentData);
-    const user = useAppSelector((state)=>state.auth);
+    const user = useAppSelector((state) => state.auth);
     const emporium = useAppSelector((state) => state.emporium);
     const swap = useAppSelector((state) => state.swap);
     const [price, setPrice] = useState(modalData.price || "");
@@ -41,16 +43,16 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
     const handleAction = () => {
         if (Number(swap.spendingBalance) >= MARKETPLACE_LBRY_FEE) {
             switch (type) {
-                case "sell":
+                case "Sell":
                     dispatch(listNft({ nftArweaveId: modalData.arwaveId, price }));
                     break;
-                case "edit":
+                case "Edit":
                     dispatch(updateListing({ nftArweaveId: modalData.arwaveId, price }));
                     break;
-                case "remove":
+                case "Remove":
                     dispatch(removeListedNft(modalData.arwaveId));
                     break;
-                case "buy":
+                case "Buy":
                     if (!user.user?.principal) return;
                     dispatch(buyNft({
                         nftArweaveId: modalData.arwaveId, price: modalData.price,
@@ -69,20 +71,18 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
 
     const renderModalContent = () => {
         switch (type) {
-            case "sell":
+            case "Sell":
                 return (
                     <>
-                        <h2 className="text-3xl font-semibold mb-2">Sell</h2>
-                        <p className="mb-4">ID: {modalData.arwaveId}</p>
                         <div className="mb-4">
-                            <Label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-                                Price (in ICP)
+                            <Label htmlFor="price" className="block text-sm  font-medium  mb-4 text-foreground">
+                                <strong>Price (in ICP)</strong> <span className="text-red-500">*</span>:
                             </Label>
                             <Input
                                 id="price"
                                 type="number"
-                                value={price+""}
-                                className={`w-full border rounded-md px-3 py-2 ${Number(price) === 0 ? "border-red-500" : "border-gray-300"
+                                value={price + ""}
+                                className={`w-full border rounded-2xl px-3 py-2 ${Number(price) === 0 ? "border" : "border-gray-300"
                                     }`}
                                 placeholder="Enter price"
                                 onChange={(e) => {
@@ -97,26 +97,30 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
                             />
 
                         </div>
+                        <Label htmlFor="price" className="block text-sm font-normal mb-4 text-foreground text=[#64748B]">
+                            {MARKETPLACE_LBRY_FEE} LBRY fee will be charged from spending wallet
+                        </Label>
                     </>
                 );
-            case "edit":
+            case "Edit":
                 return (
                     <>
-                        <h2 className="text-3xl font-semibold mb-2">Edit</h2>
-                        <p className="mb-4">ID: {modalData.arwaveId}</p>
+                        {/* <h2 className="text-3xl font-semibold mb-6 text-foreground">Edit</h2>
+                        <p className="mb-4 break-all text-foreground text-sm font-medium">ID: {modalData.arwaveId}</p> */}
                         <div className="mb-4">
-                            <Label className="block text-sm font-medium text-gray-700 mb-1">Current Price: {modalData.price} ICP</Label>
+                            <Label className="block text-sm font-medium text-foreground mb-1"> <strong>Current Price: {modalData.price} ICP</strong></Label>
                         </div>
                         <div className="mb-4">
-                            <Label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-                                Updated Price (in ICP)
+                            <Label htmlFor="price" className="block text-sm font-medium text-foreground mb-4">
+                                <strong>NewPrice (in ICP)</strong><span className="text-red-500">*</span>:
                             </Label>
+
                             <Input
                                 id="price"
                                 type="number"
-                                value={price+""}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2"
-                                placeholder="Enter updated price"
+                                value={price + ""}
+                                className="w-full border border-gray-300 rounded-2xl px-3 py-2"
+                                placeholder="Enter new price"
                                 onChange={(e) => {
                                     const value = e.target.value;
                                     if (Number(e.target.value) < 0) {
@@ -128,69 +132,89 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
                                 }}
                             />
 
+
                         </div>
+                        <Label htmlFor="price" className="block text-sm font-normal mb-4 text-foreground text=[#64748B]">
+                            {MARKETPLACE_LBRY_FEE} LBRY fee will be charged from spending wallet
+                        </Label>
                     </>
                 );
-            case "remove":
+            case "Remove":
                 return (
                     <>
-                        <h2 className="text-3xl font-semibold mb-2">Remove Item</h2>
-                        <p className="mb-4">ID: {modalData.arwaveId}</p>
-                        <p>Are you sure you want to remove this item from marketplace?</p>
+                        <div className="text-center">
+                            {/* <h2 className="text-3xl font-semibold mb-2 text-foreground text-2xl">Remove Item</h2>
+                        <p className="mb-4 break-all text-foreground text-2xl font-medium">ID: {modalData.arwaveId}</p> */}
+                            <p className="text-gray-700 text-2xl mb-4 dark:text-white">Are you sure you want to remove this item from marketplace?</p>
+                            <Label htmlFor="price" className="block text-sm font-medium text-foreground mb-4">
+                                20 LBRY fee will be charged from your spending wallet
+                            </Label>
+                        </div>
+
                     </>
-                );
-            case "buy":
+                ); 19
+            case "Buy":
                 return (
                     <>
-                        <h2 className="text-3xl font-semibold mb-2">Buy</h2>
-                        <p className="mb-4">Price: {emporium.marketPlace[modalData.arwaveId]?.price || "N/A"} ICP</p>
+                        {/* <h2 className="text-3xl font-semibold mb-2 text-foreground">Buy</h2> */}
+
+                        <p className="mb-4 text-xl"> <strong>Price: {emporium.marketPlace[modalData.arwaveId]?.price || "N/A"} ICP </strong> </p>
+                        <p className="text-[#020617] text-xl font-medium mb-4 dark:text-white">Are you sure you want to buy this item </p>
+                        <Label htmlFor="price" className="block text-sm font-normal mb-4 text-foreground text=[#64748B]">
+                            {MARKETPLACE_LBRY_FEE} LBRY fee will be charged from spending wallet
+                        </Label>
                     </>
                 );
         }
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
-            <div className="bg-white rounded-lg sm:p-10 xs:p-4 max-w-lg w-full sm:w-full xs:w-11/12 relative flex flex-col max-h-[90vh]">
-                <Button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-white z-[1200] bg-white hover:bg-gray-200"
-                >
-                    <X />
-                </Button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]   ">
+            <div className="bg-background bg-white rounded-xl sm:p-10 xs:p-4 lg:max-w-3xl md:max-w-2xl sm:max-w-xl xs:xs:w-11/12 w-full relative flex flex-col dark:bg-gray-900 max-h-[90vh]">
+                <div className="flex justify-between mb-8 items-baseline">
+                    <h2 className="text-3xl font-semibold mb-2 text-foreground ms-2">{type}</h2>
+                    <Button
+                        onClick={onClose}
+                        className="text-gray-500 hover:text-white z-[1200] hover:bg-black border-0"
+                    >
+                        <X />
+                    </Button>
+                </div>
+                <p className="mb-4 break-all text-foreground text-medium font-medium mb-4">ID: {modalData.arwaveId}</p>
 
+                <div className="group custom-modal relative w-full h-[300px] mb-4 rounded-lg">
+                    <ContentRenderer
+                        transaction={modalData.transaction}
+                        content={contentData[modalData.arwaveId]}
+                        contentUrls={contentData[modalData.arwaveId]?.urls || {
+                            thumbnailUrl: null,
+                            coverUrl: null,
+                            fullUrl: contentData[modalData.arwaveId]?.url || `https://arweave.net/${modalData.arwaveId}`
+                        }}
+                        inModal={true}
+                        handleRenderError={handleRenderError}
+                    />
+                </div>
+
+                {renderModalContent()}
                 <div className="flex flex-col h-full">
-                    {renderModalContent()}
-                    <div className="flex-shrink-0 overflow-hidden h-[300px] w-full relative">
-                        <ContentRenderer
-                            transaction={modalData.transaction}
-                            content={contentData[modalData.arwaveId]}
-                            contentUrls={contentData[modalData.arwaveId]?.urls || {
-                                thumbnailUrl: null,
-                                coverUrl: null,
-                                fullUrl: contentData[modalData.arwaveId]?.url || `https://arweave.net/${modalData.arwaveId}`
-                            }}
-                            inModal={true}
-                            handleRenderError={handleRenderError}
-                        />
-                    </div>
+
+
                     <div className="mt-4 flex justify-between mb-4 flex-shrink-0">
                         <Button
                             onClick={onClose}
-                            className="bg-gray-900h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl sm:me-5 xs:mb-2 hover:bg-white hover:text-[#353535]"
+                            className="bg-[#F1F5F9] h-14 px-7 text-[#0F172A] text-lg border border-2 border-[#F1F5F9] rounded-xl sm:me-5 xs:mb-2 hover:bg-white hover:text-[#353535] dark:bg-gray-600 dark:border-gray-600 dark:text-white hover:dark:border-gray-600 hover:dark:bg-transparent hover:dark:text-white"
                         >
                             Cancel
                         </Button>
                         <Button
                             onClick={handleAction}
-                            className="bg-gray-900h-14 px-7 text-white text-xl border border-2 border-[#353535] rounded-xl hover:bg-white hover:text-[#353535]"
+                            className="bg-[#0F172A] h-14 px-7 text-white text-lg border border-2 border-[#353535] rounded-xl hover:bg-white hover:text-[#353535] dark:bg-[#FFFFFF] dark:border-[#FFFFFF] dark:text-[#0F1F2A] hover:dark:border-[#FFFFFF] hover:dark:text-[#FFFFFF] hover:dark:bg-transparent "
                         >
                             Confirm
                         </Button>
                     </div>
-                    <div className="text-center text-sm text-gray-500 flex-shrink-0">
-                        {MARKETPLACE_LBRY_FEE} LBRY fee will be charged from spending wallet
-                    </div>
+
                 </div>
             </div>
         </div>

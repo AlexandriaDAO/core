@@ -36,10 +36,6 @@ interface PrincipalData {
   hasNFTs: boolean;
 }
 
-interface PrincipalSelectorProps {
-  shouldTriggerSearch?: boolean;
-}
-
 const network = process.env.DFX_NETWORK === "ic" ? "mainnet" : "devnet";
 
 const TEST_PRINCIPALS: NFTUserInfo[] = [
@@ -56,10 +52,17 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
     has_nfts: true,
     has_scion_nfts: true,
     last_updated: BigInt(0)
+  },
+  {
+    principal: "yshkh-urigw-n2o44-nh27v-63lw4-tsura-tgmsp-suuel-wjkaw-z7vmo-hae",
+    username: "Retardio",
+    has_nfts: true,
+    has_scion_nfts: true,
+    last_updated: BigInt(0)
   }
 ];
 
-export default function PrincipalSelector({ shouldTriggerSearch = false }: PrincipalSelectorProps) {
+export default function PrincipalSelector() {
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const noResults = useSelector((state: RootState) => state.library.noResults);

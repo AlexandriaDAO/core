@@ -122,7 +122,6 @@ const SignupForm = () => {
 						onChange={formik.handleChange}
 						onBlur={formik.handleBlur}
 						value={formik.values.username}
-						className={`${isDark ? 'bg-gray-800 text-foreground' : 'bg-white text-black'}`}
 					/>
 					{formik.touched.username && formik.errors.username && (
 						<span className="text-destructive text-sm">

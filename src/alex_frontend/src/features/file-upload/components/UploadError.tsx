@@ -20,13 +20,13 @@ const UploadError: React.FC<UploadErrorProps> = ({
 							strokeWidth={2}
 						/>
 						<div>
-							<h3 className="text-lg font-medium text-destructive">
+							<h3 className="text-lg font-medium text-info">
 								Upload Failed
 							</h3>
 							<p className="text-sm text-gray-500">{file.name}</p>
 						</div>
 					</div>
-					<p className="text-sm text-destructive">{uploadError}</p>
+					<p className="text-sm text-info">{uploadError}</p>
 				</div>
 			</div>
 		</div>

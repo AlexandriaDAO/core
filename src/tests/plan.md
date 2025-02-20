@@ -1,61 +1,23 @@
-****
-- Alexandrian app loading really bad at 100 at a time. (should reduce to 20 for now)
-- Auth getting stuck in the loading state with no way to log out.
-- There's an issue where if you stumble upon an asset that won't render, it'll not render any more after it (try retardio's books.)
-
-
-Dark Mode ToDo:
-- Swap page buttons are black when selected in dark mode.
-- Runtime Error modal not in dark mode.
-- FAQ section to match the styles.
-- HTML needs dark mode.
-
-
-
-
-
-
-
-
-
-
-#### Module Design Optimizations
-- Can tagSelector.tsx and contentTagsSelector.tsx and contentTypeToggleGroup.tsx be combined?
-
-
-
-
-
-
-
-
-
-
-
-
-
 #### UI Fixes:
-- Smaller homepage, no scrolling.
-- Dropdown Menu from apps/swap.
-- Hover animmation on apps.
-- FAQ Page Consolidate.
-- Visibility of the login button.
-
+- Epub modal has two "close" buttons.
+- ContentGrid is 1 column on mobile.
 
 
 #### Features now:
+- Sort by non-zero nft balances.
 - Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
 - Finish the channels.md plan, given the new text rendering setup.
 
 
 #### Bugs:
-- Need more dynamic states for the like/mint/withdraw buttons.
+- Need more dynamic states for the like/mint/withdraw buttons. (include in this singleTokenView.tsx which duplicates a lot of this logic.)
 - If the mint has succeded the mint button should go away.
 - If you go to the next page on alexandrian while a modal is open it throws an error.
 - On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.
 
 #### Bigger Features (lower priority):
-- Range selection for Alexandrian.
+- Range selection for Alexandrian, e.g., query nfts of a person by 400-500 instead of starting from the latest.
+- Lazy loading all apps, and loading blur to clear instead of top to bottom.
 - Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
 - Put another amount selector by the show more button on permasearch.
 - Need to combine emporium with main app modules (eventually, not now.).
@@ -77,6 +39,7 @@ Dark Mode ToDo:
 #### New Apps:
 - Arena style app, full design in channels.md.
 - Collection service for getting all the money from nfts.
+- Perpetua is a good name for one, latin for perpetual/eternal.
 
 
 
@@ -111,6 +74,7 @@ NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8 
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I  09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
+bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
 
 
 

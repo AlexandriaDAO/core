@@ -11,14 +11,11 @@ type InitArgs = record {
 };
 type LbryRatio = record { time : nat64; ratio : nat64 };
 type Result = variant { Ok : text; Err : text };
-type Result_1 = variant { Ok : nat64; Err : text };
 type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
 service : (opt InitArgs) -> {
   burn_LBRY : (nat64, opt blob) -> (Result);
   caller_subaccount : () -> (text) query;
   claim_icp_reward : (opt blob) -> (Result);
-  distribute_reward : () -> (Result);
-  distribute_reward_wrapper : () -> ();
   get_all_apy_values : () -> (vec record { nat32; nat }) query;
   get_all_archive_balances : () -> (
       vec record { principal; ArchiveBalance },
@@ -27,8 +24,6 @@ service : (opt InitArgs) -> {
   get_current_LBRY_ratio : () -> (nat64) query;
   get_current_staking_reward_percentage : () -> (text) query;
   get_distribution_interval : () -> (nat32) query;
-  get_icp_rate_cents_wrapper : () -> ();
-  get_icp_rate_in_cents : () -> (Result_1);
   get_scaling_factor : () -> (nat) query;
   get_stake : (principal) -> (opt Stake) query;
   get_stakers_count : () -> (nat64) query;

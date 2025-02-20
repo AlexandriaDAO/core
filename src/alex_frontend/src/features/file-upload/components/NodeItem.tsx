@@ -10,6 +10,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { setNode } from "../fileUploadSlice";
 import NodeSkeleton from "./NodeSkeleton";
 import { formatAmount } from "../utils";
+import { Button } from "@/lib/components/button";
 
 const minimumBalance = 0.000000000001 // Default minimum balance in ETH
 const NodeItem: React.FC<{ item: SerializedNode }> = ({ item }) => {
@@ -103,15 +104,27 @@ const NodeItem: React.FC<{ item: SerializedNode }> = ({ item }) => {
         if (balance < minimumBalance) return false;
         if (cost && balance < cost) return false;
         return true;
-      };
+    };
+
+    const handleSelect = () => {
+        if (selectable()) {
+            if(node?.id === item.id){
+                dispatch(setNode(null));
+            }else{
+                dispatch(setNode(item));
+            }
+        }
+    };
 
     return (
         <div
-            onClick={() => selectable() && dispatch(setNode(item))}
-            className={`relative p-4 rounded-lg border transition-all ${selectable() ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'}
-                ${node?.id === item.id ? 'border-blue-500 bg-blue-50' : selectable()
-                    ? 'hover:border-gray-300 bg-white'
-                    : 'border-border/75 bg-gray-50'
+            onClick={handleSelect}
+            className={`relative p-4 rounded border transition-all ${selectable() ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'}
+                ${node?.id === item.id ? 'border-constructive dark:border-constructive bg-constructive/20 dark:bg-constructive/20' : selectable()
+                    ? 'bg-white border-ring/80 dark:bg-gray-800 dark:border-secondary hover:border-constructive/50 dark:hover:border-constructive/50 hover:bg-constructive/10 dark:hover:bg-constructive/10'
+                    // : 'border-ring/50 bg-gray-300'
+                    : 'bg-white border-ring/60 dark:bg-gray-800 opacity-35 dark:opacity-70'
+                    // : 'bg-destructive/10'
                 }
             `}
         >
@@ -119,8 +132,7 @@ const NodeItem: React.FC<{ item: SerializedNode }> = ({ item }) => {
                 <div className="flex items-center space-x-3">
                     <Server className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
                     <div>
-                        <h3 className="font-medium text-gray-900">{address && address.length > 15 ? address.toString().slice(0, 5) + "..." + address.toString().slice(-3): address}</h3>
-                        {/* // <h3 className="font-medium text-gray-900">{address && address.length > 15 ? item.owner.toString().slice(0, 5) + "..." + item.owner.toString().slice(-3)}</h3> */}
+                        <h3 className={`font-medium ${node?.id === item.id ? 'text-black dark:text-white' : selectable() ? 'text-black dark:text-white' : 'dark:text-white'}`}>{address && address.length > 15 ? address.toString().slice(0, 5) + "..." + address.toString().slice(-3): address}</h3>
                         {irys && balance > 0 && (
                             <p className={`text-sm ${balance < minimumBalance ? 'text-red-500' : 'text-gray-500'}`}>
                                 {/* Token: {irys.token} ||  */}
@@ -148,22 +160,23 @@ const NodeItem: React.FC<{ item: SerializedNode }> = ({ item }) => {
                 </div>
 
                 <div className="flex items-center space-x-2">
-                    <button
+                    <Button
+                        variant="muted"
                         onClick={(e) => {
                             e.stopPropagation();
                             setNodeBalance();
                         }}
                         disabled={balanceLoading || !irys}
-                        className={`bg-transparent rounded-md transition-all 
-                            ${balanceLoading || !irys
-                                ? 'text-gray-400 cursor-not-allowed'
-                                : 'text-gray-700 hover:text-gray-800'
-                            }`}
+                        // className={`bg-transparent rounded-md transition-all 
+                        //     ${balanceLoading || !irys
+                        //         ? 'text-gray-400 cursor-not-allowed'
+                        //         : 'text-gray-700 hover:text-gray-800'
+                        //     }`}
                         >
                         <RefreshCw className={`w-4 h-4 ${balanceLoading ? 'animate-spin' : ''}`} strokeWidth={2} />
-                    </button>
+                    </Button>
                     {node?.id === item.id && (
-                        <div className="text-blue-500">
+                        <div className="text-constructive">
                             <Check className="w-5 h-5" strokeWidth={2} />
                         </div>
                     )}

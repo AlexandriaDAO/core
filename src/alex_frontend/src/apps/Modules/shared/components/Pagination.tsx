@@ -65,7 +65,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   }, [currentPage]);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-lg border border-input bg-background w-full">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-[8px] md:rounded-[12px] border border-input bg-background w-full">
       <div className="text-sm">
         <p className="text-muted-foreground">
           Page <span className="font-medium text-foreground">{currentPage}</span> of{' '}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -9,8 +9,7 @@ import {
   AlertDialogAction,
 } from "@/lib/components/alert-dialog";
 import { ScrollArea } from "@/lib/components/scroll-area";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { TermsContent } from './TermsContent';
+import TermsAndConditions from '@/components/TermsAndConditions';
 
 interface RiskWarningModalProps {
   onClose: () => void;
@@ -21,14 +20,13 @@ const RiskWarningModal: React.FC<RiskWarningModalProps> = ({ onClose, open }) =>
   return (
     <AlertDialog open={open}>
       <AlertDialogContent className="max-w-3xl">
-        <AlertDialogHeader>
-          <AlertDialogTitle>Project Status: Pre-Alpha</AlertDialogTitle>
-          <AlertDialogDescription className="text-left">
-            <ScrollArea className="h-[60vh] pr-4">
-              <TermsContent />
-            </ScrollArea>
-          </AlertDialogDescription>
+        <AlertDialogHeader className='space-y-0'>
+          <AlertDialogTitle>Important Notice</AlertDialogTitle>
+          <AlertDialogDescription>Project Status: Pre-Alpha</AlertDialogDescription>
         </AlertDialogHeader>
+        <ScrollArea className="pr-4">
+          <TermsAndConditions />
+        </ScrollArea>
         <AlertDialogFooter>
           <AlertDialogAction onClick={onClose}>
             I Understand the Risks

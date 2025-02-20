@@ -10,12 +10,16 @@ export const useHandleSearch = () => {
   const searchState = useSelector((state: RootState) => state.arweave.searchState);
   const isLoading = useSelector((state: RootState) => state.arweave.isLoading);
 
-  const handleSearch = useCallback(async (continueFromTimestamp?: number) => {
+  const handleSearch = useCallback(async (continueFromTimestamp?: number, overrideAmount?: number, after?: string) => {
     if (isLoading) return;
     
     dispatch(setIsLoading(true));
     try {
       let updatedSearchState = { ...searchState };
+
+      if (overrideAmount) {
+        updatedSearchState.amount = overrideAmount;
+      }
 
       if (continueFromTimestamp) {
         // Convert to milliseconds if it's in seconds
@@ -25,7 +29,8 @@ export const useHandleSearch = () => {
 
       await dispatch(performSearch({ 
         searchState: updatedSearchState,
-        isContinuation: !!continueFromTimestamp 
+        isContinuation: !!continueFromTimestamp || !!after,
+        after
       }));
     } catch (error) {
       console.error('Error performing search:', error);

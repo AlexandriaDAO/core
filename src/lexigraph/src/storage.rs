@@ -15,7 +15,7 @@ const SHELVES_MEM_ID: MemoryId = MemoryId::new(0);
 const USER_SHELVES_MEM_ID: MemoryId = MemoryId::new(1);
 const NFT_SHELVES_MEM_ID: MemoryId = MemoryId::new(2);
 
-const MAX_VALUE_SIZE: u32 = 1000; // Added constant for consistency
+const MAX_VALUE_SIZE: u32 = 8192; // 8kb should be good for a decent sized markdown file.
 
 // New wrapper types
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
@@ -140,26 +140,33 @@ impl Storable for TimestampedShelves {
 }
 
 impl Shelf {
-    pub fn insert_slot(&mut self, slot: Slot) -> Result<(), String> {
+    pub fn insert_slot(&mut self, mut slot: Slot) -> Result<(), String> {
         if self.slots.len() >= 500 {
             return Err("Maximum slot limit reached (500)".to_string());
         }
         
         let slot_id = slot.id;
-        self.slots.insert(slot_id, slot);
         
         // Initialize position at the end
         let new_position = self.slot_positions.values()
-            .last()
+            .max_by(|a, b| a.partial_cmp(b).unwrap())
             .map_or(0.0, |pos| pos + 1.0);
             
+        // Update the float position
         self.slot_positions.insert(slot_id, new_position);
+        
+        // Set the integer position to the current number of slots
+        slot.position = self.slots.len() as u32;
+        self.slots.insert(slot_id, slot);
+        
         Ok(())
     }
 
     pub fn move_slot(&mut self, slot_id: u32, reference_slot_id: Option<u32>, before: bool) -> Result<(), String> {
-        let _ = self.slot_positions.get(&slot_id)
-            .ok_or("Slot not found")?;
+        // First verify the slot exists
+        if !self.slots.contains_key(&slot_id) {
+            return Err("Slot not found".to_string());
+        }
 
         let new_position = match reference_slot_id {
             Some(ref_id) => {
@@ -185,7 +192,17 @@ impl Shelf {
             }
         };
 
+        // Update the float position
         self.slot_positions.insert(slot_id, new_position);
+
+        // Update all slots' integer positions based on the current order
+        let ordered_slots = self.get_ordered_slots();
+        for (index, slot) in ordered_slots.into_iter().enumerate() {
+            if let Some(existing_slot) = self.slots.get_mut(&slot.id) {
+                existing_slot.position = index as u32;
+            }
+        }
+
         Ok(())
     }
 
@@ -214,8 +231,17 @@ impl Shelf {
     pub fn get_ordered_slots(&self) -> Vec<Slot> {
         let mut ordered: Vec<_> = self.slot_positions.iter().collect();
         ordered.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap());
+        
+        // Create a new vector with updated position values
         ordered.into_iter()
-            .filter_map(|(id, _)| self.slots.get(id).cloned())
+            .enumerate()
+            .filter_map(|(index, (id, _))| {
+                self.slots.get(id).map(|slot| {
+                    let mut new_slot = slot.clone();
+                    new_slot.position = index as u32;
+                    new_slot
+                })
+            })
             .collect()
     }
 }

@@ -34,14 +34,14 @@ interface ContentListEmporiumProps {
   type: string;
 }
 const defaultTransaction: Transaction = {
-  id: "", // Example properties; replace these with actual fields in Transaction
+  id: "",
   owner: "",
   tags: [],
   data: {
     size: 0,
     type: ""
   },
-  block: null,
+  block: undefined,
 };
 
 const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
@@ -53,7 +53,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
 
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
   const [buttonType, setButtonType] = useState("Buy");
-  const [modalType, setModalType] = useState<"sell" | "edit" | "remove" | "buy" | null>(null);
+  const [modalType, setModalType] = useState<"Sell" | "Edit" | "Remove" | "Buy" | null>(null);
   const [modalData, setModalData] = useState({
     arwaveId: "",
     price: "",
@@ -61,7 +61,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
     show: false,
   });
 
-  const handleOpenModal = (type: "sell" | "edit" | "remove" | "buy", data: any) => {
+  const handleOpenModal = (type: "Sell" | "Edit" | "Remove" | "Buy", data: any) => {
     setModalType(type);
     setModalData({ ...data, show: true });
   };
@@ -84,7 +84,7 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
     }
   }, []);
   const renderDetails = useCallback((transaction: Transaction) => (
-    <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:block group-hover:opacity-100 transition-opacity duration-200 z-[20] pt-12">
+    <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:block group-hover:opacity-100 transition-opacity duration-200 z-[20] pt-12 rounded-2xl">
       <ScrollArea className="h-full">
         <Card className="bg-transparent border-none text-gray-100 shadow-none">
           <CardHeader className="p-3 pb-2">
@@ -93,10 +93,10 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
           <CardContent className="space-y-3 p-3 pt-0 text-xs">
             <div className="space-y-1">
               <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     copyToClipboard(transaction.id, 'ID');
-                   }}>
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyToClipboard(transaction.id, 'ID');
+                }}>
                 <span className="text-gray-400">ID</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.id}</span>
@@ -104,10 +104,10 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
                 </div>
               </div>
               <div className="flex justify-between items-center group/item cursor-pointer hover:bg-gray-800/50 p-1 rounded"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     copyToClipboard(transaction.owner, 'Owner address');
-                   }}>
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyToClipboard(transaction.owner, 'Owner address');
+                }}>
                 <span className="text-gray-400">Owner</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono truncate ml-2 max-w-[180px]">{transaction.owner}</span>
@@ -133,14 +133,14 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
             </div>
 
             <Separator className="bg-gray-700" />
-            
+
             <div className="space-y-2">
               <span className="text-gray-400">Tags</span>
               <div className="flex flex-wrap gap-2">
                 {transaction.tags.map((tag, index) => (
-                  <Badge 
-                    key={index} 
-                    variant="secondary" 
+                  <Badge
+                    key={index}
+                    variant="secondary"
                     title={`${tag.name}: ${tag.value}`}
                     className="bg-gray-800 text-gray-200 cursor-pointer hover:bg-gray-700 group/badge flex items-center gap-1"
                     onClick={(e) => {
@@ -172,9 +172,12 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   return (
     <TooltipProvider>
       <>
-        {emporium.loading == true ? (<div className="w-full h-full fixed bg-[#6f6f6fc9] flex flex-col items-center justify-center gap-2">
-          <LoaderPinwheel className="animate-spin text-4xl text-white w-14 h-14" />
-        </div>) : (<ContentGrid>
+        {emporium.loading == true ? (<div className="w-screen h-screen fixed top-0 left-0 flex flex-col items-center justify-center gap-2 bg-black/70
+">
+
+          <LoaderPinwheel className="animate-spin text-4xl text-white w-14 h-14  dark:grey" />
+          </div>) : 
+        (<ContentGrid key="emporium">
           {transactions.map((transaction) => {
             const content = contentData[transaction.id];
             const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
@@ -188,18 +191,24 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
                   () => setSelectedContent({ id: transaction.id, type: contentType })
                 }
                 id={transaction.id}
+                predictions={predictions[transaction.id]}
+                component="Emporium"
+
               >
-                <div className="group relative w-full h-full">
-                  <ContentRenderer
-                    transaction={transaction}
-                    content={content}
-                    contentUrls={contentData[transaction.id]?.urls || {
-                      thumbnailUrl: null,
-                      coverUrl: null,
-                      fullUrl: content?.url || `https://arweave.net/${transaction.id}`
-                    }}
-                    handleRenderError={handleRenderError}
-                  />
+                <div className="group relative w-full p-4 rounded-lg">
+                  <div className="text-lg mb-4"></div>
+                    <ContentRenderer
+                      transaction={transaction}
+                      content={content}
+                      contentUrls={contentData[transaction.id]?.urls || {
+                        thumbnailUrl: null,
+                        coverUrl: null,
+                        fullUrl: content?.url || `https://arweave.net/${transaction.id}`
+                       
+                      }}
+                      handleRenderError={handleRenderError}
+                    />
+                  <Overlay transaction={transaction} type={type} buttonType={buttonType} setModal={handleOpenModal} />
                   {shouldShowBlur && (
                     <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
                       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
@@ -208,44 +217,37 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
                     </div>
                   )}
                   {renderDetails(transaction)}
-                  <Overlay transaction={transaction} type={type} buttonType={buttonType} setModal={handleOpenModal} />
                 </div>
               </ContentGrid.Item>
             );
           })}
         </ContentGrid>)}
+        
 
         <Dialog open={!!selectedContent} onOpenChange={(open) => !open && setSelectedContent(null)}>
-          <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col" closeIcon={
-            <Button
-              variant="outline"
-              className="absolute right-4 top-4 z-[60] rounded-full p-3 
-                bg-primary text-primary-foreground hover:bg-primary/90
-                transition-colors"
-            >
-              <X className="h-6 w-6" />
-            </Button>
-          }>
-            {selectedContent && (
-              <div className="w-full h-full overflow-y-auto">
-                <div className="p-6">
-                  <ContentRenderer
-                    transaction={transactions.find(t => t.id === selectedContent.id)!}
-                    content={contentData[selectedContent.id]}
-                    contentUrls={contentData[selectedContent.id]?.urls || {
-                      thumbnailUrl: null,
-                      coverUrl: null,
-                      fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
-                    }}
-                    inModal={true}
-                    handleRenderError={handleRenderError}
-                  />
-                </div>
+          <DialogContent
+            className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"
+          >
+
+
+            {selectedContent && contentData[selectedContent.id] && (
+              <div className="w-full h-full">
+                <ContentRenderer
+                  key={selectedContent.id}
+                  transaction={transactions.find(t => t.id === selectedContent.id)!}
+                  content={contentData[selectedContent.id]}
+                  contentUrls={contentData[selectedContent.id]?.urls || {
+                    thumbnailUrl: null,
+                    coverUrl: null,
+                    fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
+                  }}
+                  inModal={true}
+                  handleRenderError={handleRenderError}
+                />
               </div>
             )}
           </DialogContent>
         </Dialog>
-
         <CombinedModal
           type={modalType!}
           modalData={modalData}

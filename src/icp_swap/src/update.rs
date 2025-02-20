@@ -73,7 +73,7 @@ pub async fn swap(amount_icp: u64, from_subaccount: Option<[u8; 32]>) -> Result<
     let lbry_amount: u64 = amount_icp
         .checked_mul(icp_rate_in_cents)
         .ok_or("Arithmetic overflow occurred in lbry_amount.")?;
-    match mint_LBRY(lbry_amount, from_subaccount).await {
+    match mint_LBRY(lbry_amount).await {
         Ok(_) => {}
         Err(_e) => {
             // If there was an error, log it in archive trx and return an error result
@@ -160,7 +160,7 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
     }
 
     // Alex mint 21M only
-    let limit_result = within_max_limit(amount_lbry).await;
+    let limit_result = within_max_limit(amount_lbry).await?;
     if limit_result > 0 {
         match mint_ALEX(limit_result, caller, from_subaccount).await {
             Ok(_) => {}
@@ -179,13 +179,9 @@ pub async fn burn_LBRY(amount_lbry: u64, from_subaccount: Option<[u8; 32]>) -> R
 }
 
 #[allow(non_snake_case)]
-async fn mint_LBRY(amount: u64, to_subaccount: Option<[u8; 32]>) -> Result<BlockIndex, String> {
+async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
     let caller: Principal = caller();
     let amount = Nat::from(amount);
-
-    let mut caller_subaccount_bytes = [0u8; 32];
-    let caller_slice = caller.as_slice();
-    caller_subaccount_bytes[..caller_slice.len()].copy_from_slice(caller_slice);
 
     let transfer_args: TransferArg = TransferArg {
         // can be used to distinguish between transactions
@@ -198,7 +194,7 @@ async fn mint_LBRY(amount: u64, to_subaccount: Option<[u8; 32]>) -> Result<Block
         // the account we want to transfer tokens to
         to: Account {
             owner: caller,
-            subaccount: to_subaccount,
+            subaccount: None,
         },
         // a timestamp indicating when the transaction was created by the caller; if it is not specified by the caller then this is set to the current ICP time
         created_at_time: None,
@@ -401,7 +397,6 @@ async fn un_stake_all_ALEX(from_subaccount: Option<[u8; 32]>) -> Result<String, 
     Ok("UnStaked Successfully!".to_string())
 }
 //Guard ensure call is only by canister.
-#[update(guard = "is_canister")]
 pub async fn distribute_reward() -> Result<String, String> {
     let intervals = get_distribution_interval();
 
@@ -560,7 +555,6 @@ async fn claim_icp_reward(from_subaccount: Option<[u8; 32]>) -> Result<String, S
     }
 }
 
-#[update(guard = "is_canister")]
 pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
     let request: GetExchangeRateRequest = GetExchangeRateRequest {
         base_asset: Asset {

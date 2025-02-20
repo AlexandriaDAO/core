@@ -4,7 +4,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useTheme } from "@/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 
-interface App {
+export interface App {
   name: string;
   description: string;
   path: string;
@@ -12,11 +12,11 @@ interface App {
   comingSoon?: boolean;
 }
 
-const apps: App[] = [
+export const apps: App[] = [
   { name: 'Alexandrian', description: 'Library', path: '/app/alexandrian', logo: '/logos/Alexandrian.svg' },
   { name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/Permasearch.svg' },
   { name: 'Emporium', description: 'Trade', path: '/app/emporium', logo: '/logos/Emporium.svg' },
-  { name: 'Pinax', description: 'Upload', path: '/app/pinax', logo: '/logos/Permasearch.svg', comingSoon: true },
+  { name: 'Pinax', description: 'Upload', path: '/app/pinax', logo: '/logos/Pinax.svg', comingSoon: true },
   { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos', logo: '/logos/Syllogos.svg', comingSoon: true },
   { name: 'Bibliotheca', description: 'Library', path: '/app/bibliotheca', comingSoon: true },
   { name: 'Lexigraph', description: 'Write', path: '/app/lexigraph', comingSoon: true },
@@ -50,10 +50,10 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <div className="relative overflow-hidden h-screen">
+      <div className="relative h-screen">
         {/* First Panel */}
         <div className={cn(
-          "flex flex-col items-center justify-center h-full",
+          "absolute inset-0 flex flex-col items-center justify-center overflow-hidden touch-none",
           "transition-all duration-500 ease-in-out",
           "bg-background",
           isPanelOpen ? "-translate-y-full" : "translate-y-0"
@@ -61,14 +61,14 @@ const HomePage: React.FC = () => {
           <h1 className={cn(
             "font-syne font-extrabold uppercase m-0 mb-5",
             "text-[clamp(25px,6vw,80px)]",
-            "text-foreground transition-colors duration-300"
+            "dark:text-gray-100 text-gray-900 transition-colors duration-300"
           )}>
             Alexandria
           </h1>
           <p className={cn(
             "font-montserrat font-normal lowercase m-0 mb-10",
             "text-[clamp(18px,4vw,50px)]",
-            "text-foreground transition-colors duration-300"
+            "dark:text-gray-100 text-gray-900 transition-colors duration-300"
           )}>
             a sane way to use the internet
           </p>
@@ -79,8 +79,8 @@ const HomePage: React.FC = () => {
               "rounded-full border",
               "font-syne text-[clamp(14px,4vw,24px)] font-semibold",
               "cursor-pointer transition-all duration-300",
-              "dark:border-white dark:text-black dark:bg-white",
-              "border-black text-white bg-black",
+              "dark:border-gray-100 dark:text-black dark:bg-gray-200",
+              "border-gray-900 text-white bg-gray-900",
               "hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white"
             )}
           >
@@ -135,11 +135,11 @@ const HomePage: React.FC = () => {
                   "transition-all duration-300",
                   "shadow-md dark:shadow-lg group",
                   app.comingSoon 
-                    ? "dark:bg-[#2A2A2A] bg-[#F5F5F5] cursor-not-allowed opacity-70"
+                    ? "dark:bg-gray-850 bg-gray-100 cursor-not-allowed opacity-70"
                     : [
-                        "dark:bg-[#333333] bg-white cursor-pointer opacity-100",
+                        "dark:bg-gray-800 bg-gray-50 cursor-pointer opacity-100",
                         "hover:shadow-xl dark:hover:shadow-2xl",
-                        "hover:bg-gray-50 dark:hover:bg-[#3D3D3D]"
+                        "hover:bg-gray-100 dark:hover:bg-gray-700"
                       ].join(" ")
                 )}>
                   <div className={cn(

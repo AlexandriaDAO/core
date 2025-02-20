@@ -8,7 +8,7 @@ interface OverlayProps {
     transaction: Transaction;
     type: string;
     buttonType: string;
-    setModal: (type: "sell" | "edit" | "remove" | "buy", modal: { show: boolean; arwaveId: string; price?: string, transaction: Transaction }) => void;
+    setModal: (type: "Sell" | "Edit" | "Remove" | "Buy", modal: { show: boolean; arwaveId: string; price?: string, transaction: Transaction }) => void;
 }
 
 const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, type }) => {
@@ -21,9 +21,9 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
 
     const handleButtonClick = (transactionId: string, price?: string) => {
         if (buttonType === "Sell") {
-            setModal("sell", { arwaveId: transactionId, show: true, transaction });
+            setModal(buttonType, { arwaveId: transactionId, show: true, transaction });
         } else if (buttonType === "Buy" && price) {
-            setModal("buy", { arwaveId: transactionId, show: true, price, transaction });
+            setModal(buttonType, { arwaveId: transactionId, show: true, price, transaction });
         }
     };
 
@@ -32,21 +32,21 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
 
         if (isUserListing && type === "marketPlace") {
             return (
-                <div className="md:flex items-center absolute top-2 right-2">
+                <div className="flex items-center mt-2">
                     <Button
-                        className="bg-red-700  text-white rounded-full w-24 h-10 flex items-center justify-center z-[25] md:me-3 md:mb-0 xs:mb-2"
+                        className="bg-[#B23A48] border-[#B23A48] text-white rounded-sm w-24 h-10 flex items-center justify-center z-[25] me-3 sm:mb-0 dark:bg-[#B23A48] dark:text-white dark:border-[#B23A48] hover:dark:bg-transparent hover:dark:text-[#B23A48]"
                         onClick={(e) => {
                             e.stopPropagation();
-                            setModal("remove", { arwaveId: transaction.id, show: true, transaction });
+                            setModal("Remove", { arwaveId: transaction.id, show: true, transaction });
                         }}
                     >
                         Remove
                     </Button>
                     <Button
-                        className="bg-blue-500 text-white rounded-full w-24 h-10 flex items-center justify-center z-[25]"
+                        className="bg-[#808080] text-white border-[#808080] rounded-sm w-24 h-10 flex items-center justify-center z-[25] dark:bg-white hover:dark:bg-transparent dark:text-[#0F172A] hover:dark:text-white"
                         onClick={(e) => {
                             e.stopPropagation();
-                            setModal("edit", { arwaveId: transaction.id, show: true, price, transaction });
+                            setModal("Edit", { arwaveId: transaction.id, show: true, price, transaction });
                         }}
                     >
                         Edit
@@ -61,7 +61,10 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
                         handleButtonClick(transaction.id, price);
                     }}
                     disabled={!user?.principal}
-                    className="absolute top-2 right-2 bg-green-500 text-white rounded-full w-24 h-10 flex items-center justify-center z-[25]"
+                    className={` ${buttonType === "Sell" 
+                        ? "mt-2 z-[25] relative ml-2 dark:bg-[#FFFFFF] hover:dark:bg-transparent dark:border-[#FFFFFF] dark:text-[#0F172A] hover:dark:text-white" 
+                        : ""} ${buttonType==="Buy"&&"mt-2 dark:bg-[#FFFFFF] dark:border-[#FFFFFF] dark:text-[#0F172A] relative z-[30] hover:bg-gray-600 hover:dark:bg-transparent hover:dark:text-white relative ml-2" }
+                        right-2 bg-[#808080] text-white border-[#808080] rounded-sm w-24 h-10 flex items-center justify-center relative z-[30] ml-2`}
                 >
                     {buttonType}
                 </Button>
@@ -75,7 +78,7 @@ const Overlay: React.FC<OverlayProps> = ({ transaction, buttonType, setModal, ty
     return (
         <>
             {type === "marketPlace" && emporium.marketPlace[transaction.id]?.price && (
-                <div className="text-white lg:text-lg md:text-base sm:text-sm absolute bottom-0 bg-gray-600 w-full p-2">
+                <div className="text-white lg:text-lg md:text-base sm:text-sm absolute lg:bottom-[64px] lg:bottom-[64px] md:bottom-[63px] bg-gray-600 lg:min-w-[100px] sm:bottom-[63px] bottom-[64px] p-2">
                     Price {emporium.marketPlace[transaction.id]?.price} ICP
                 </div>
             )}

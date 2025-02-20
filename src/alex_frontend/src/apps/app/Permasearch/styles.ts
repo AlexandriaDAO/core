@@ -16,10 +16,12 @@ export const PageContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
   box-sizing: border-box;
+  border-radius: 16px;
 
   @media (min-width: 768px) {
     padding: 40px 20px;
     gap: 24px;
+    border-radius: 20px;
   }
 `;
 
@@ -102,7 +104,6 @@ export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
     background: var(--balancebox, #3A3630);
     color: var(--brightyellow);
     border: none;
-    box-shadow: 0px 0px 4px 0px rgba(32, 0, 213, 0.25), 0px 0px 0px 4px rgba(197, 207, 249, 0.35);
   ` : `
     background: hsl(var(--background));
     color: hsl(var(--foreground));
@@ -129,6 +130,8 @@ export const SearchButton = styled.button`
   cursor: pointer;
   font-family: Syne;
   font-size: 14px;
+  box-shadow: 0px 0px 13px 4px rgba(171, 189, 219, 0.54);
+  transition: all 0.3s ease;
 
   @media (min-width: 768px) {
     height: 60px;
