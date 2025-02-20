@@ -9,7 +9,7 @@ const fetchBalance = createAsyncThunk<
     string, // This is the return type of the thunk's payload
     SerializedWallet, //Argument that we pass to initialize
     { rejectValue: string }
->("wallets/fetchBalance", async (wallet, { rejectWithValue }) => {
+>("arinax/fetchBalance", async (wallet, { rejectWithValue }) => {
     try {
         const balance = await arweave.wallets.getBalance(wallet.address)
 

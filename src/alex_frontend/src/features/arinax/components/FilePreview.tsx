@@ -1,6 +1,8 @@
 import React from "react";
 import { formatFileSize } from "../utils";
 import { getFileTypeInfo } from "../constants";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { winstonToAr } from "@/features/wallets/utils";
 
 interface FilePreviewProps {
     file: File | null;
@@ -8,12 +10,18 @@ interface FilePreviewProps {
 
 function FilePreview({ file }: FilePreviewProps) {
     if (!file) return null;
+	const {cost} = useAppSelector(state => state.arinax);
 
     const typeInfo = getFileTypeInfo(file.type);
 
     return (
-        <div>
-            <h2 className="text-lg font-semibold">Selected File</h2>
+        <div className="font-roboto-condensed">
+            <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Selected File</h2>
+                <p className="text-right text-sm text-muted-foreground">
+                    Estimated Cost: {cost ? winstonToAr(cost) : 'Estimating...'}
+                </p>
+            </div>
 
             <div className="p-6 bg-secondary rounded shadow-sm border">
                 <div className="flex items-start space-x-4">
@@ -37,7 +45,7 @@ function FilePreview({ file }: FilePreviewProps) {
                             <span className="font-mono">{file.type}</span>
                         </div>
                         
-                        {typeInfo && (
+                        {/* {typeInfo && (
                             <div className="mt-2 h-1 bg-gray-300 dark:bg-gray-500 rounded-full overflow-hidden">
                                 <div 
                                     className="h-full bg-gray-700 dark:bg-info/50 rounded-full"
@@ -46,7 +54,7 @@ function FilePreview({ file }: FilePreviewProps) {
                                     }}
                                 />
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </div>
             </div>

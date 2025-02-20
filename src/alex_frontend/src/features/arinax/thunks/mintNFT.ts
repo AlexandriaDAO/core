@@ -17,7 +17,7 @@ const mintNFT = createAsyncThunk<
         actor: ActorSubclass<_SERVICE>
     }, //Argument that we pass to initialize
     { rejectValue: string , dispatch: AppDispatch, state: RootState }
->("arinaxSlice/mintNFT", async ({actor}, { rejectWithValue, dispatch, getState }) => {
+>("arinax/mintNFT", async ({actor}, { rejectWithValue, dispatch, getState }) => {
     try {
 
         const {auth: { user }, arinax: {transaction}} = getState();

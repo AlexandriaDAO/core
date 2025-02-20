@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { setAuto, setTransaction } from "./arinaxSlice";
+import { setTransaction } from "./arinaxSlice";
 import FileSelector from "./components/FileSelector";
 import FilePreview from "./components/FilePreview";
 import UploadProgress from "./components/UploadProgress";
@@ -12,14 +12,12 @@ import FileUploader from "./components/FileUploader";
 import mintNFT from "./thunks/mintNFT";
 import useNftManager from "@/hooks/actors/useNftManager";
 import TextEditor from "./components/TextEditor";
-import WalletManualSelector from "./components/Wallet/ManualSelector";
-import WalletAutoSelector from "./components/Wallet/AutoSelector";
 function Arinax() {
     const dispatch = useAppDispatch();
     const {actor} = useNftManager();
     const [file, setFile] = useState<File | null>(null);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-    const { transaction, uploading, uploadError, textMode, auto } = useAppSelector(state => state.arinax);
+    const { transaction, fetching, selecting, uploading, uploadError, textMode, fetchError, selectError } = useAppSelector(state => state.arinax);
 
     useEffect(() => {
         if (!file) return;
@@ -42,47 +40,30 @@ function Arinax() {
         dispatch(mintNFT({actor}));
     }, [transaction, actor]);
 
-    const renderContent = () => {
-        if (uploading) return <UploadProgress file={file} />;
+    // Handle any error state
+    if (uploadError || fetchError || selectError) {
+        return <UploadError file={file} error={uploadError || fetchError || selectError } />;
+    }
 
-        if (file) {
+    if (uploadedFile && transaction) return <UploadSuccess file={uploadedFile}/>;
 
-            if(auto) return (
-                <div className="space-y-10">
-                    <FilePreview file={file} />
-                    <WalletAutoSelector file={file}/>
-                </div>
-            )
-
-            return (
-                <div className="space-y-10">
-                    <FilePreview file={file} />
-                    <WalletManualSelector />
-                    <FileUploader file={file} setFile={setFile} />
-                </div>
-            );
-
-        }
-
-        if (textMode) return <TextEditor setFile={setFile} />;
-
-        return <FileSelector setFile={setFile} />;
-    };
-
-    return (
-        <div className="w-full">
-            <div className="space-y-6 max-w-2xl mx-auto">
-                {uploadedFile && transaction && <UploadSuccess file={uploadedFile}/>}
-
-                {uploadError && file && <UploadError file={file}/>}
-
-                <div className="font-roboto-condensed bg-secondary rounded-lg shadow-md p-8 border border-border">
-                    {renderContent()}
-                </div>
-
-            </div>
+    if(fetching || selecting || uploading) return (
+        <div className="space-y-10">
+            <FilePreview file={file} />
+            <UploadProgress file={file} />
         </div>
-	);
+    );
+
+    if(file) return (
+        <div className="space-y-6 font-roboto-condensed bg-secondary rounded shadow-sm p-8 border">
+            <FilePreview file={file} />
+            <FileUploader file={file} setFile={setFile} />
+        </div>
+    );
+
+    if(textMode) return <TextEditor setFile={setFile} />;
+
+    return <FileSelector setFile={setFile} />
 }
 
 export default Arinax;

@@ -6,7 +6,7 @@ const estimateCost = createAsyncThunk<
     string, // This is the return type of the thunk's payload
     { file: File }, //Argument that we pass to initialize
     { rejectValue: string , dispatch: AppDispatch, state: RootState }
->("arinaxSlice/estimateCost", async ({ file }, { rejectWithValue, getState }) => {
+>("arinax/estimateCost", async ({ file }, { rejectWithValue, getState }) => {
     try {
         const user = getState().auth.user;
 
@@ -19,8 +19,6 @@ const estimateCost = createAsyncThunk<
         const tagsBytes = calculateBytes(tags);
 
         const total = tagsBytes.total + file.size;
-
-        console.log('total',total);
 
         // Fetch price estimation from Arweave
         const response = await fetch(`https://arweave.net/price/${total}/`);

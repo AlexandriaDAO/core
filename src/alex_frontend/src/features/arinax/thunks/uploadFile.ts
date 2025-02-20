@@ -11,18 +11,20 @@ const uploadFile = createAsyncThunk<
 	string, // This is the return type of the thunk's payload
 	{
 		file: File;
-		wallet: SerializedWallet;
 		actor: ActorSubclass<_SERVICE>;
 	}, //Argument that we pass to initialize
 	{ rejectValue: string; dispatch: AppDispatch; state: RootState }
 >(
 	"arinaxSlice/uploadFile",
 	async (
-		{ file, wallet, actor },
+		{ file, actor },
 		{ rejectWithValue, dispatch, getState }
 	) => {
 		try {
-			const { auth: { user } } = getState();
+			const user = getState().auth.user;
+			const wallet = getState().arinax.wallet;
+
+			if(!wallet) return rejectWithValue("No wallet available");
 
 			const buffer = await readFileAsBuffer(file);
 
@@ -61,9 +63,6 @@ const uploadFile = createAsyncThunk<
 					await uploader.uploadChunk();
 					const progress = uploader.pctComplete;
 					dispatch(setProgress(progress));
-					console.log(
-						`${progress}% complete, ${uploader.uploadedChunks}/${uploader.totalChunks}`
-					);
 				}
 
 				if (uploader.isComplete) {

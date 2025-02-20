@@ -1,11 +1,13 @@
 import React from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useAlexWallet, useUser } from "@/hooks/actors";
+import { useUser } from "@/hooks/actors";
 import { toast } from "sonner";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import uploadFile from "../thunks/uploadFile";
-import { setWallet } from "../arinaxSlice";
+import { reset } from "../arinaxSlice";
 import { Button } from "@/lib/components/button";
+import fetchWallets from "../thunks/fetchWallets";
+import selectWallet from "../thunks/selectWallet";
 
 interface FileUploaderProps {
     file: File | null;
@@ -16,30 +18,47 @@ function FileUploader({file, setFile}: FileUploaderProps) {
     const dispatch = useAppDispatch();
     const {actor} = useUser();
 
-    const {wallet, fetching} = useAppSelector(state=>state.arinax)
-
-    if(!file) return null;
+    const {cost} = useAppSelector(state=>state.arinax)
 
     const handleFileUpload = async() => {
         if(!file){
             toast.error('File not available');
             return;
         }
-        if(!wallet) {
-            toast.error('Wallet not available');
-            return;
-        }
+
         if(!actor) {
             toast.error('Actor not available');
             return;
         }
 
-        dispatch(uploadFile({file, wallet, actor}));
+        try {
+            // Fetch wallets
+            const fetchedWallets = await dispatch(fetchWallets(actor)).unwrap();
+            if (fetchedWallets.length === 0) {
+                toast.error('No wallets available');
+                return;
+            }
+
+            // Select suitable wallet
+            const selectedWallet = await dispatch(selectWallet()).unwrap();
+            if (!selectedWallet) {
+                toast.error('No suitable wallet found');
+                return;
+            }
+
+            // Upload file
+            await dispatch(uploadFile({file, actor})).unwrap();
+        } catch (error: any) {
+            toast.error(error.message || 'Upload process failed');
+            // The error message is already handled in the slice reducers
+            // but we stop the sequential flow here
+            console.error('Upload process failed:', error);
+        }
     }
 
     const handleCancel = () => {
         setFile(null);
-        dispatch(setWallet(null));
+        dispatch(reset());
     }
 
 	return (
@@ -52,7 +71,7 @@ function FileUploader({file, setFile}: FileUploaderProps) {
             </Button>
             <Button
                 onClick={handleFileUpload}
-                disabled={!wallet || fetching}
+                disabled={!cost}
                 variant="inverted"
             >
                 Upload file

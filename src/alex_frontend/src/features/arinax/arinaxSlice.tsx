@@ -5,14 +5,11 @@ import mintNFT from "./thunks/mintNFT";
 import estimateCost from "./thunks/estimateCost";
 import { SerializedWallet } from "../wallets/walletsSlice";
 import fetchBalance from "./thunks/fetchBalance";
-
+import selectWallet from "./thunks/selectWallet";
 export interface ArinaxState {
 	textMode: boolean;
 	wallets: SerializedWallet[];
 	wallet: SerializedWallet | null;
-
-	// select wallet automatically
-	auto: boolean;
 
 	transaction: string | null;
 	details: boolean;
@@ -20,6 +17,7 @@ export interface ArinaxState {
 	progress: number;
 
 	fetching: boolean;
+	selecting: boolean;
 	uploading: boolean;
 
 	cost: string | null;
@@ -31,6 +29,7 @@ export interface ArinaxState {
 
 	uploadError: string | null;
 	fetchError: string | null;
+	selectError: string | null;
 	mintError: string | null;
 }
 
@@ -39,14 +38,13 @@ const initialState: ArinaxState = {
 	wallets: [],
 	wallet: null,
 
-	auto: true,
-
 	transaction: null,
 	details: true,
 	progress: 0,
 
 	fetching: false,
 	uploading: false,
+	selecting: false,
 	minting: false,
 	minted: null,
 
@@ -56,6 +54,7 @@ const initialState: ArinaxState = {
 
 	uploadError: null,
 	fetchError: null,
+	selectError: null,
 	mintError: null,
 };
 
@@ -70,9 +69,6 @@ const arinaxSlice = createSlice({
 		},
 		setWallet: (state, action)=>{
 			state.wallet = action.payload
-		},
-		setAuto: (state, action)=>{
-			state.auto = action.payload
 		},
 		setProgress: (state, action)=>{
 			state.progress = action.payload
@@ -182,9 +178,25 @@ const arinaxSlice = createSlice({
 				});
 			})
 
+			.addCase(selectWallet.pending, (state) => {
+				state.selecting = true;
+				state.selectError = null;
+				state.wallet = null;
+			})
+			.addCase(selectWallet.fulfilled, (state, action:PayloadAction<SerializedWallet>) => {
+				state.selecting = false;
+				state.selectError = null;
+				state.wallet = action.payload;
+			})
+			.addCase(selectWallet.rejected, (state, action) => {
+				state.selecting = false;
+				state.selectError = action.payload as string;
+				state.wallet = null;
+			})
+
 	}
 });
 
-export const { reset, setWallet, setAuto, setProgress, setDetails, setTransaction, setTextMode } = arinaxSlice.actions;
+export const { reset, setWallet, setProgress, setDetails, setTransaction, setTextMode } = arinaxSlice.actions;
 
 export default arinaxSlice.reducer;

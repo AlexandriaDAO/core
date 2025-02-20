@@ -1,15 +1,12 @@
 import React from "react";
 import { XCircle } from "lucide-react";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 interface UploadErrorProps {
-	file: File;
+	file: File | null;
+	error: string | null;
 }
 
-const UploadError: React.FC<UploadErrorProps> = ({
-	file,
-}) => {
-	const {uploadError} = useAppSelector(state=>state.arinax);
+const UploadError: React.FC<UploadErrorProps> = ({ file, error = "Unknown Error" }) => {
 	return (
 		<div className="bg-secondary rounded-lg shadow-md">
 			<div className="p-4 border-b">
@@ -23,10 +20,10 @@ const UploadError: React.FC<UploadErrorProps> = ({
 							<h3 className="text-lg font-medium text-info">
 								Upload Failed
 							</h3>
-							<p className="text-sm text-gray-500">{file.name}</p>
+							<p className="text-sm text-gray-500">{file?.name || 'An unknown error occurred'}</p>
 						</div>
 					</div>
-					<p className="text-sm text-info">{uploadError}</p>
+					<p className="text-sm text-info">{error}</p>
 				</div>
 			</div>
 		</div>

@@ -2,7 +2,6 @@ import { Wallet } from "../../../../../../src/declarations/user/user.did";
 import { convertTimestamp } from "@/utils/general";
 import { SerializedWallet } from "../walletsSlice";
 import Arweave from 'arweave';
-import { parseNumeric } from "@/features/arinax/utils";
 
 const arweave = Arweave.init({});
 
@@ -20,9 +19,20 @@ export const getWalletBalance = async (wallet: SerializedWallet) => {
 //     return address;
 // }
 
+export function isNumeric(str: string): boolean {
+    // Remove whitespace and check if empty
+    if (!str.trim()) return false;
+    // Convert to number and check if it's valid
+    return !isNaN(parseFloat(str)) && isFinite(Number(str));
+}
+
+export function parseNumeric(str: string): number | null {
+    if (!isNumeric(str)) return null;
+    return Number(str);
+}
 
 export const winstonToAr = (balance: string) => {
-    if(parseNumeric(balance)){
+    if(parseNumeric(balance)!==null){
         const ar = arweave.ar.winstonToAr(balance);
 
         return ar + ' AR';
