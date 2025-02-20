@@ -16,4 +16,7 @@ pub use guard::{*};
 mod script;
 pub use script::{*};
 pub mod utils;
+
+mod error;
+pub use error::{*};
 ic_cdk::export_candid!();
