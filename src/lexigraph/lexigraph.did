@@ -1,3 +1,8 @@
+type AddSlotInput = record {
+  content : SlotContent;
+  reference_slot_id : opt nat32;
+  before : bool;
+};
 type QueryError = variant {
   ShelfNotFound;
   UnauthorizedAccess;
@@ -5,10 +10,10 @@ type QueryError = variant {
   InvalidTimeRange;
   UserNotFound;
 };
-type Result = variant { Ok : Shelf; Err : QueryError };
-type Result_1 = variant { Ok : vec Slot; Err : QueryError };
-type Result_2 = variant { Ok : vec Shelf; Err : QueryError };
-type Result_3 = variant { Ok; Err : text };
+type Result = variant { Ok; Err : text };
+type Result_1 = variant { Ok : Shelf; Err : QueryError };
+type Result_2 = variant { Ok : vec Slot; Err : QueryError };
+type Result_3 = variant { Ok : vec Shelf; Err : QueryError };
 type Shelf = record {
   title : text;
   updated_at : nat64;
@@ -32,10 +37,12 @@ type SlotReorderInput = record {
   before : bool;
 };
 service : {
-  get_shelf : (text) -> (Result) query;
-  get_shelf_slots : (text) -> (Result_1) query;
-  get_user_shelves : (principal, opt nat64) -> (Result_2) query;
-  reorder_shelf_slot : (text, SlotReorderInput) -> (Result_3);
-  store_shelf : (text, opt text, vec Slot) -> (Result_3);
-  update_shelf : (text, ShelfUpdate) -> (Result_3);
+  add_shelf_slot : (text, AddSlotInput) -> (Result);
+  delete_shelf : (text) -> (Result);
+  get_shelf : (text) -> (Result_1) query;
+  get_shelf_slots : (text) -> (Result_2) query;
+  get_user_shelves : (principal, opt nat64) -> (Result_3) query;
+  reorder_shelf_slot : (text, SlotReorderInput) -> (Result);
+  store_shelf : (text, opt text, vec Slot) -> (Result);
+  update_shelf : (text, ShelfUpdate) -> (Result);
 }

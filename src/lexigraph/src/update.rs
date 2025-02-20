@@ -96,8 +96,11 @@ pub fn update_shelf(shelf_id: String, updates: ShelfUpdate) -> Result<(), String
 
                 // Update slots
                 shelf.slots.clear();
+                shelf.slot_positions.clear();
                 for slot in new_slots {
-                    shelf.slots.insert(slot.id, slot);
+                    shelf.slots.insert(slot.id, slot.clone());
+                    // Initialize position at slot.position as float
+                    shelf.slot_positions.insert(slot.id, slot.position as f64);
                 }
             }
 
@@ -144,6 +147,104 @@ pub fn reorder_shelf_slot(shelf_id: String, reorder: SlotReorderInput) -> Result
         } else {
             Err("Shelf not found".to_string())
         }
+    })
+}
+
+#[derive(CandidType, Deserialize)]
+pub struct AddSlotInput {
+    pub content: SlotContent,
+    pub reference_slot_id: Option<u32>,
+    pub before: bool,
+}
+
+#[ic_cdk::update]
+pub fn add_shelf_slot(shelf_id: String, input: AddSlotInput) -> Result<(), String> {
+    SHELVES.with(|shelves| {
+        let mut shelves_map = shelves.borrow_mut();
+        if let Some(mut shelf) = shelves_map.get(&shelf_id) {
+            // Enforce owner check using caller
+            if shelf.owner != ic_cdk::caller() {
+                return Err("Unauthorized: Only shelf owner can add slots".to_string());
+            }
+
+            // Generate new slot ID
+            let new_id = shelf.slots.keys()
+                .max()
+                .map_or(1, |max_id| max_id + 1);
+
+            // Create the new slot
+            let new_slot = Slot {
+                id: new_id,
+                content: input.content.clone(),
+                position: 0, // Will be updated by move_slot
+            };
+
+            // Add the slot
+            shelf.insert_slot(new_slot.clone())?;
+
+            // If reference slot is provided, position the new slot relative to it
+            if let Some(ref_id) = input.reference_slot_id {
+                shelf.move_slot(new_id, Some(ref_id), input.before)?;
+            }
+
+            // Handle NFT reference if the new slot contains an NFT
+            if let SlotContent::Nft(nft_id) = &input.content {
+                NFT_SHELVES.with(|nft_shelves| {
+                    let mut nft_map = nft_shelves.borrow_mut();
+                    let mut shelves = nft_map.get(nft_id).unwrap_or_default();
+                    shelves.0.push(shelf_id.clone());
+                    nft_map.insert(nft_id.to_string(), shelves);
+                });
+            }
+
+            shelf.updated_at = ic_cdk::api::time();
+            shelves_map.insert(shelf_id, shelf);
+            Ok(())
+        } else {
+            Err("Shelf not found".to_string())
+        }
+    })
+}
+
+#[ic_cdk::update]
+pub fn delete_shelf(shelf_id: String) -> Result<(), String> {
+    SHELVES.with(|shelves| {
+        let mut shelves_map = shelves.borrow_mut();
+        
+        // Get the shelf and verify ownership
+        let shelf = shelves_map.get(&shelf_id)
+            .ok_or_else(|| "Shelf not found".to_string())?;
+            
+        if shelf.owner != ic_cdk::caller() {
+            return Err("Unauthorized: Only shelf owner can delete".to_string());
+        }
+        
+        // Remove NFT references
+        for slot in shelf.slots.values() {
+            if let SlotContent::Nft(nft_id) = &slot.content {
+                NFT_SHELVES.with(|nft_shelves| {
+                    let mut nft_map = nft_shelves.borrow_mut();
+                    if let Some(mut shelves) = nft_map.get(nft_id) {
+                        shelves.0.retain(|id| id != &shelf_id);
+                        nft_map.insert(nft_id.clone(), shelves);
+                    }
+                });
+            }
+        }
+        
+        // Remove from user's shelf set
+        USER_SHELVES.with(|user_shelves| {
+            let mut user_map = user_shelves.borrow_mut();
+            if let Some(mut user_shelves_set) = user_map.get(&shelf.owner) {
+                user_shelves_set.0.retain(|(_, id)| id != &shelf_id);
+                user_map.insert(shelf.owner, user_shelves_set);
+            }
+        });
+        
+        // Remove the shelf itself
+        shelves_map.remove(&shelf_id);
+        
+        Ok(())
     })
 }
 
