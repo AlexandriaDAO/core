@@ -152,10 +152,10 @@ const Grid = () => {
                   <ContentRenderer
                     transaction={transaction}
                     content={content}
-                    contentUrls={ {
+                    contentUrls={content?.urls || {
                       thumbnailUrl: null,
                       coverUrl: null,
-                       fullUrl: transaction?.assetUrl?transaction?.assetUrl:"" //||content?.url// || `https://arweave.net/${transaction.id}`
+                      fullUrl: transaction?.assetUrl || `https://arweave.net/${transaction.id}`
                     }}
                     handleRenderError={handleRenderError}
                   />

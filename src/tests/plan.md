@@ -1,6 +1,7 @@
 #### UI Fixes:
 - Epub modal has two "close" buttons.
 - ContentGrid is 1 column on mobile.
+- Get rid of the blue dropdowns and blue everything.
 
 
 #### Features now:
