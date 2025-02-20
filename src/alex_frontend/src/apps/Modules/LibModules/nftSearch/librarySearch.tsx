@@ -11,6 +11,7 @@ import RangeSelector from './rangeSelector';
 export default function LibrarySearch() {
   const dispatch = useDispatch<AppDispatch>();
   const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
+  const istransactionUpdated = useSelector((state: RootState) => state.contentDisplay.isUpdated);
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const collection = useSelector((state: RootState) => state.library.collection);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +22,8 @@ export default function LibrarySearch() {
       dispatch(loadContentForTransactions(transactions))
         .finally(() => setIsLoading(false));
     }
-  }, [transactions, dispatch, isLoading]);
+
+  }, [istransactionUpdated,dispatch]); //  isLoading is removed, causing useEffect to execute infinte 
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-[8px] md:rounded-[12px] shadow-md p-2 sm:p-3">

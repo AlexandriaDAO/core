@@ -1,0 +1,15 @@
+type Result = variant { Ok : principal; Err : text };
+type UserCanisterRegistry = record {
+  owner : principal;
+  last_updated : nat64;
+  created_at : nat64;
+  last_payment : nat64;
+  assigned_canister_id : principal;
+};
+service : {
+  create_asset_canister : (opt blob) -> (Result);
+  get_all_user_asset_canisters : () -> (
+      vec record { principal; UserCanisterRegistry },
+    ) query;
+  get_caller_asset_canister : () -> (opt UserCanisterRegistry) query;
+}

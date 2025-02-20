@@ -74,13 +74,22 @@ dfx deploy emporium --specified-id zdcg2-dqaaa-aaaap-qpnha-cai
 # For Logs
 cargo build --release --target wasm32-unknown-unknown --package logs
 candid-extractor target/wasm32-unknown-unknown/release/logs.wasm > src/logs/logs.did
+
+# For Asset Manager canister
+cargo build --release --target wasm32-unknown-unknown --package asset_manager
+candid-extractor target/wasm32-unknown-unknown/release/asset_manager.wasm > src/asset_manager/asset_manager.did
+
 dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
+
 
 cargo update
 
 
 dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
+
+
+dfx deploy asset_manager --specified-id aax3a-h4aaa-aaaaa-qaahq-cai
 
 
 # Step 5: Configure Local Identities for token launches

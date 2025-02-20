@@ -49,7 +49,8 @@ const Grid = () => {
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
   
-  const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
+  const [showStats, setShowStats] = useState<Record<string, boolean>>({});
+  const [selectedContent, setSelectedContent] = useState<{ id: string; type: string,assetUrl:string } | null>(null);
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
 
@@ -132,7 +133,7 @@ const Grid = () => {
             return (
               <ContentGrid.Item
                 key={transaction.id}
-                onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
+                onClick={() => setSelectedContent({ id: transaction.id, type: contentType ,assetUrl:transaction.assetUrl?transaction.assetUrl:""})}
                 id={transaction.id}
                 owner={transaction.owner}
                 isOwned={isOwned || false}
@@ -151,10 +152,10 @@ const Grid = () => {
                   <ContentRenderer
                     transaction={transaction}
                     content={content}
-                    contentUrls={contentData[transaction.id]?.urls || {
+                    contentUrls={ {
                       thumbnailUrl: null,
                       coverUrl: null,
-                      fullUrl: content?.url || `https://arweave.net/${transaction.id}`
+                       fullUrl: transaction?.assetUrl?transaction?.assetUrl:"" //||content?.url// || `https://arweave.net/${transaction.id}`
                     }}
                     handleRenderError={handleRenderError}
                   />

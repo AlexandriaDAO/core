@@ -15,6 +15,7 @@ export interface Transaction {
     size: number;
     type: string;
   };
+  assetUrl?:string;
   cursor?: string;
 }
 

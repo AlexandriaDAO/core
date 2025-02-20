@@ -7,11 +7,12 @@ import { AppDispatch, RootState } from "@/store";
 import { performSearch, updateSearchParams } from '@/apps/Modules/shared/state/librarySearch/libraryThunks';
 import { resetSearch } from '@/apps/Modules/shared/state/librarySearch/librarySlice';
 import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
+import AssetManager from "@/apps/Modules/shared/components/AssetManager";
 
 function Alexandrian() {
 	useWiper();
 	const dispatch = useDispatch<AppDispatch>();
-	
+
 	const isLoading = useSelector((state: RootState) => state.library.isLoading);
 	const searchParams = useSelector((state: RootState) => state.library.searchParams);
 
@@ -34,19 +35,25 @@ function Alexandrian() {
 		}
 	}, [dispatch, searchParams]);
 
+
 	return (
-		<SearchContainer
-			title="Alexandrian"
-			description="Search the NFT Library of others, and manage your own."
-			hint="Liking costs 20 LBRY (this will decrease over time)."
-			onSearch={handleSearch}
-			onShowMore={handleShowMore}
-			isLoading={isLoading}
-			topComponent={<TopupBalanceWarning />}
-			filterComponent={<Library />}
-			showMoreEnabled={true}
-			// useNsfw={false}
-		/>
+		<>
+		  <div className="rounded-lg">
+				<AssetManager />
+			</div>
+			<SearchContainer
+				title="Alexandrian"
+				description="Search the NFT Library of others, and manage your own."
+				hint="Liking costs 20 LBRY (this will decrease over time)."
+				onSearch={handleSearch}
+				onShowMore={handleShowMore}
+				isLoading={isLoading}
+				topComponent={<TopupBalanceWarning />}
+				filterComponent={<Library />}
+				showMoreEnabled={true}
+			/>
+			
+		</>
 	);
 }
 

@@ -1,7 +1,7 @@
 import { Transaction } from "../types/queries";
 import { getArweaveUrl } from "../../LibModules/arweaveSearch/config/arweaveConfig";
-import { CachedContent } from '../../LibModules/contentDisplay/types';
-import { LRUCache } from 'lru-cache';
+import { CachedContent } from "../../LibModules/contentDisplay/types";
+import { LRUCache } from "lru-cache";
 
 class ContentCacheService {
   private static instance: ContentCacheService;
@@ -17,7 +17,7 @@ class ContentCacheService {
         if (value?.thumbnailUrl) {
           URL.revokeObjectURL(value.thumbnailUrl);
         }
-      }
+      },
     });
   }
 
@@ -30,9 +30,8 @@ class ContentCacheService {
 
   private async generateVideoThumbnail(url: string): Promise<string | null> {
     return new Promise((resolve) => {
-      const video = document.createElement('video');
+      const video = document.createElement("video");
       video.crossOrigin = "anonymous";
-      
       // Add timeout to prevent hanging
       const timeout = setTimeout(() => {
         cleanup();
@@ -40,9 +39,9 @@ class ContentCacheService {
       }, 10000); // 10 second timeout
 
       const cleanup = () => {
-        video.removeEventListener('timeupdate', timeupdate);
-        video.removeEventListener('loadeddata', loadeddata);
-        video.removeEventListener('error', handleError);
+        video.removeEventListener("timeupdate", timeupdate);
+        video.removeEventListener("loadeddata", loadeddata);
+        video.removeEventListener("error", handleError);
         clearTimeout(timeout);
       };
 
@@ -50,16 +49,16 @@ class ContentCacheService {
         cleanup();
         resolve(null);
       };
-      
+
       const timeupdate = () => {
         if (video.currentTime > 0) {
           cleanup();
-          
+
           try {
-            const canvas = document.createElement('canvas');
+            const canvas = document.createElement("canvas");
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext("2d");
             if (ctx) {
               ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
               canvas.toBlob((blob) => {
@@ -69,12 +68,12 @@ class ContentCacheService {
                 } else {
                   resolve(null);
                 }
-              }, 'image/jpeg');
+              }, "image/jpeg");
             } else {
               resolve(null);
             }
           } catch (error) {
-            console.error('Error generating thumbnail:', error);
+            console.error("Error generating thumbnail:", error);
             resolve(null);
           }
         }
@@ -84,15 +83,16 @@ class ContentCacheService {
         video.currentTime = 0.1;
       };
 
-      video.addEventListener('timeupdate', timeupdate);
-      video.addEventListener('loadeddata', loadeddata);
-      video.addEventListener('error', handleError);
+      video.addEventListener("timeupdate", timeupdate);
+      video.addEventListener("loadeddata", loadeddata);
+      video.addEventListener("error", handleError);
       video.src = url;
       video.load();
     });
   }
 
   private async handleImageContent(url: string): Promise<CachedContent> {
+
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const blob = await response.blob();
@@ -140,7 +140,9 @@ class ContentCacheService {
     };
   }
 
-  private getErrorContent(errorMessage: string = 'Failed to load content. Please try again later.'): CachedContent {
+  private getErrorContent(
+    errorMessage: string = "Failed to load content. Please try again later."
+  ): CachedContent {
     return {
       url: null,
       textContent: null,
@@ -152,21 +154,22 @@ class ContentCacheService {
 
   async loadContent(transaction: Transaction): Promise<CachedContent> {
     const txId = transaction.id;
-    
+
     const cached = this.cache.get(txId);
     if (cached) {
       return cached;
     }
 
     try {
-      const contentType = transaction.tags.find((tag) => tag.name === 'Content-Type')?.value || 'image/jpeg';
-      const url = getArweaveUrl(txId);
-
+      const contentType =
+        transaction.tags.find((tag) => tag.name === "Content-Type")?.value ||
+        "image/jpeg";
+      let url = transaction.assetUrl || getArweaveUrl(txId);
       let content: CachedContent;
 
-      if (contentType.startsWith('image/')) {
+      if (contentType.startsWith("image/")) {
         content = await this.handleImageContent(url);
-      } else if (contentType.startsWith('video/')) {
+      } else if (contentType.startsWith("video/")) {
         content = await this.handleVideoContent(url);
       } else if (this.isTextContent(contentType)) {
         content = await this.handleTextContent(url);
@@ -176,7 +179,6 @@ class ContentCacheService {
 
       this.cache.set(txId, content);
       return content;
-
     } catch (error) {
       const errorContent = this.getErrorContent();
       this.cache.set(txId, errorContent);
@@ -225,3 +227,6 @@ class ContentCacheService {
 
 // Export a singleton instance
 export const contentCache = ContentCacheService.getInstance();
+
+
+
