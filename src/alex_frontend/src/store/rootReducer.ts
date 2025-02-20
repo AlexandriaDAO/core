@@ -1,6 +1,5 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import portalReducer from "@/features/portal/portalSlice";
-import collectionReducer from "@/features/collection/collectionSlice";
 import homeReducer from "@/features/home/homeSlice";
 import authReducer from "@/features/auth/authSlice";
 import loginReducer from "@/features/login/loginSlice";
@@ -17,14 +16,12 @@ import portalLanguageReducer from "@/features/portal-language/portalLanguageSlic
 import portalTypeReducer from "@/features/portal-type/portalTypeSlice";
 import portalEraReducer from "@/features/portal-era/portalEraSlice";
 import portalFilterReducer from "@/features/portal-filter/portalFilterSlice";
-import myNodesReducer from "@/features/my-nodes/myNodesSlice";
 import walletsReducer from "@/features/wallets/walletsSlice";
 import addWalletReducer from "@/features/add-wallet/addWalletSlice";
 import swapReducer from "@/features/swap/swapSlice"
 import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
 import alexReducer from "@/features/swap/alexSlice";
-import fileUploadReducer from "@/features/file-upload/fileUploadSlice";
 import arinaxReducer from "@/features/arinax/arinaxSlice";
 
 import contentDisplayReducer from "@/apps/Modules/shared/state/content/contentDisplaySlice";
@@ -33,9 +30,6 @@ import libraryReducer from "@/apps/Modules/shared/state/librarySearch/librarySli
 import nftDataReducer from "@/apps/Modules/shared/state/nftData/nftDataSlice";
 
 import emporiumReducer from "@/apps/app/Emporium/emporiumSlice";
-
-import uploadReducer from "@/features/upload/uploadSlice";
-import assetReducer from "@/features/asset/assetSlice";
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -56,19 +50,14 @@ const rootReducer = combineReducers({
 	portalEra: portalEraReducer,
 
 	portalFilter: portalFilterReducer,
-	myNodes: myNodesReducer,
 	wallets: walletsReducer,
 	addWallet: addWalletReducer,
-	upload: uploadReducer,
-	asset: assetReducer,
-	fileUpload: fileUploadReducer,
 	arinax: arinaxReducer,
 
 	swap:swapReducer,
 	icpLedger:icpLedgerReducer,
 	tokenomics:tokenomicsReducer,
 	portal: portalReducer,
-	collection: collectionReducer,
 	alex:alexReducer,
 
 	arweave: arweaveReducer,

@@ -1,13 +1,8 @@
 import { ActorSubclass } from '@dfinity/agent';
 import { _SERVICE } from '../../../../../declarations/nft_manager/nft_manager.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { serializeNode } from '@/features/my-nodes/utils';
-import { SerializedNode } from '@/features/my-nodes/myNodesSlice';
 import { AppDispatch, RootState } from '@/store';
-import { getServerIrys } from '@/services/irysService';
-import { setProgress } from '../arinaxSlice';
 import { toast } from 'sonner';
-import { readFileAsBuffer } from '@/features/irys/utils/gaslessFundAndUpload';
 import { Principal } from '@dfinity/principal';
 
 // Define the async thunk
