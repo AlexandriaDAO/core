@@ -4,11 +4,12 @@ import {
   getActorSwap,
   getIcpLedgerActor,
 } from "@/features/auth/utils/authUtils";
+import { ErrorMessage, getErrorMessage } from "../utlis/erorrs";
 // Define the async thunk
 const swapLbry = createAsyncThunk<
   string, // This is the return type of the thunk's payload
   { amount: string; userPrincipal: string },
-  { rejectValue: string }
+  { rejectValue: ErrorMessage }
 >(
   "icp_swap/swapLbry",
   async ({ amount, userPrincipal }, { rejectWithValue }) => {
@@ -59,15 +60,18 @@ const swapLbry = createAsyncThunk<
 
       const result = await actorSwap.swap(amountFormat, []);
       if ("Ok" in result) return "success";
-      if ("Err" in result) throw new Error(result.Err);
+      if ("Err" in result) {
+        const errorMessage = getErrorMessage(result.Err);
+        return rejectWithValue(errorMessage);
+      }
     } catch (error) {
       console.error(error);
 
       if (error instanceof Error) {
-        return rejectWithValue(error.message);
+        return rejectWithValue({title:error.message,message:""});
       }
     }
-    return rejectWithValue("An unknown error occurred while Swaping");
+    return rejectWithValue({title:"An unknown error occurred while Swaping",message:""});
   }
 );
 

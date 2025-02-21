@@ -82,14 +82,11 @@ pub async fn swap(
         .map_err(|e| ExecutionError::TransferFailed {
             source: caller.to_string(),
             dest: "canister".to_string(),
+            token: "ICP".to_string(),
             amount: amount_icp,
-            details: e,
+            details: e.to_string(),
         })?;
     let icp_rate_in_cents: u64 = get_current_LBRY_ratio();
-
-    let lbry_amount: u64 = amount_icp
-        .checked_mul(icp_rate_in_cents)
-        .ok_or("Arithmetic overflow occurred in lbry_amount.")?;
 
     let lbry_amount =
         amount_icp
@@ -103,11 +100,22 @@ pub async fn swap(
         Ok(_) => {}
         Err(_e) => {
             // If there was an error, log it in archive trx and return an error result
-            let amount_icp_after_fee = amount_icp
-                .checked_sub(ICP_TRANSFER_FEE)
-                .ok_or("Arithmetic underflow in amount_icp_after_fee.")?;
-            archive_user_transaction(amount_icp_after_fee)?;
-            return Err("Mint Lbry failed".to_string());
+            let amount_icp_after_fee =
+                amount_icp.checked_sub(ICP_TRANSFER_FEE).ok_or_else(|| {
+                    ExecutionError::Underflow {
+                        operation: "fee calculation".to_string(),
+                        details: "subtracting transfer fee from ICP amount".to_string(),
+                    }
+                })?;
+
+            archive_user_transaction(amount_icp_after_fee)
+                .map_err(|e| ExecutionError::StateError(e))?;
+
+            return Err(ExecutionError::MintFailed {
+                token: "LBRY".to_string(),
+                amount: lbry_amount,
+                reason: "Check redeem to calim your icp back!".to_string(),
+            });
         }
     };
 
@@ -119,19 +127,21 @@ pub async fn swap(
 pub async fn burn_LBRY(
     amount_lbry: u64,
     from_subaccount: Option<[u8; 32]>,
-) -> Result<String, String> {
+) -> Result<String, ExecutionError> {
     let caller = ic_cdk::caller();
-    let _guard = CallerGuard::new(caller)?;
+    let _guard =
+        CallerGuard::new(caller).map_err(|e| ExecutionError::Unauthorized(e.to_string()))?;
 
     if amount_lbry < 1 {
-        return Err("Minimum 1 LBRY required!".to_string());
+        return Err(ExecutionError::MinimumRequired { required: 1, provided: amount_lbry, token: "LBRY".to_string() });
     }
 
     //Dynamic price
     let mut icp_rate_in_cents: u64 = get_current_LBRY_ratio();
     let mut amount_icp_e8s = amount_lbry
         .checked_mul(100_000_000)
-        .ok_or("Arithmetic overflow occurred in amount_icp_e8s.")?;
+        .ok_or_else(||ExecutionError::Overflow { operation: "LBRY amount calculation".to_string(), details: "".to_string() })?;
+    // todo 
     icp_rate_in_cents = icp_rate_in_cents
         .checked_mul(2)
         .ok_or("Arithmetic overflow occurred in icp_rate_in_cents")?;
@@ -254,7 +264,7 @@ async fn mint_LBRY(amount: u64) -> Result<BlockIndex, String> {
 async fn deposit_icp_in_canister(
     amount: u64,
     from_subaccount: Option<[u8; 32]>,
-) -> Result<BlockIndex, String> {
+) -> Result<BlockIndex, TransferFromError> {
     let canister_id = ic_cdk::api::id();
     let caller = ic_cdk::caller();
 
@@ -274,15 +284,18 @@ async fn deposit_icp_in_canister(
         spender_subaccount: None,
     };
 
-    ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
+    let (result,): (Result<BlockIndex, TransferFromError>,) = ic_cdk::call(
         MAINNET_LEDGER_CANISTER_ID,
         "icrc2_transfer_from",
         (transfer_args,),
     )
     .await
-    .map_err(|e| format!("failed to call ledger: {:?}", e))?
-    .0
-    .map_err(|e: TransferFromError| format!("ledger transfer error {:?}", e))
+    .map_err(|_| TransferFromError::GenericError {
+        message: "Call failed".to_string(),
+        error_code: Nat::from(0 as u32),
+    })?;
+
+    result // Return the inner Result<BlockIndex, TransferFromError>
 }
 
 async fn send_icp(

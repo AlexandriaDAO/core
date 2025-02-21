@@ -26,7 +26,7 @@ const SwapContent: React.FC = () => {
   const [tentativeLBRY, setTentativeLBRY] = useState(Number);
   const [loadingModalV, setLoadingModalV] = useState(false);
   const [successModalV, setSucessModalV] = useState(false);
-  const [errorModalV, setErrorModalV] = useState(false);
+  const [errorModalV, setErrorModalV] = useState({flag:false,title:"",message:""});
 
   const [shadow, setShadow] = useState('shadow-[0px_0px_13px_4px_#abbddb8a] border-[#C5CFF9] ');
 
@@ -75,7 +75,7 @@ const SwapContent: React.FC = () => {
   useEffect(() => {
     if (swap.error) {
       setLoadingModalV(false);
-      setErrorModalV(true);
+      setErrorModalV({flag:true,title:swap.error.title,message:swap.error.message});
       dispatch(flagHandler());
 
     }
@@ -229,7 +229,7 @@ const SwapContent: React.FC = () => {
 
       <LoadingModal show={loadingModalV} message1={"Swap in Progress"} message2={"Your transaction from ICP to LBRY is being processed. This may take a few moments."} setShow={setLoadingModalV} />
       <SuccessModal show={successModalV} setShow={setSucessModalV} />
-      <ErrorModal show={errorModalV} setShow={setErrorModalV} />
+      <ErrorModal show={errorModalV.flag} setShow={setErrorModalV} title={errorModalV.title} message={errorModalV.message} />
     </div>
   );
 };

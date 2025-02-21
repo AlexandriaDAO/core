@@ -1,5 +1,36 @@
 type ArchiveBalance = record { icp : nat64 };
 type DailyValues = record { values : vec record { nat32; nat } };
+type ExecutionError = variant {
+  Overflow : record { operation : text; details : text };
+  InvalidAmount : record { amount : nat64; reason : text };
+  Underflow : record { operation : text; details : text };
+  RateLookupFailed : record { details : text };
+  InsufficientBalance : record {
+    token : text;
+    available : nat64;
+    required : nat64;
+  };
+  BurnFailed : record { token : text; amount : nat64; reason : text };
+  CanisterCallFailed : record {
+    method : text;
+    canister : text;
+    details : text;
+  };
+  Unauthorized : text;
+  RewardNotReady : record { required_wait : nat64 };
+  InsufficientCanisterBalance : record { available : nat64; required : nat64 };
+  MinimumRequired : record { token : text; provided : nat64; required : nat64 };
+  TransferFailed : record {
+    token : text;
+    source : text;
+    dest : text;
+    details : text;
+    amount : nat64;
+  };
+  StateError : text;
+  MintFailed : record { token : text; amount : nat64; reason : text };
+  StakingLocked : record { until : nat64; current_time : nat64 };
+};
 type InitArgs = record {
   apy : opt vec record { nat32; DailyValues };
   stakes : opt vec record { principal; Stake };
@@ -11,6 +42,7 @@ type InitArgs = record {
 };
 type LbryRatio = record { time : nat64; ratio : nat64 };
 type Result = variant { Ok : text; Err : text };
+type Result_1 = variant { Ok : text; Err : ExecutionError };
 type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
 service : (opt InitArgs) -> {
   burn_LBRY : (nat64, opt blob) -> (Result);
@@ -32,6 +64,6 @@ service : (opt InitArgs) -> {
   get_user_archive_balance : (principal) -> (opt ArchiveBalance) query;
   redeem : (opt blob) -> (Result);
   stake_ALEX : (nat64, opt blob) -> (Result);
-  swap : (nat64, opt blob) -> (Result);
+  swap : (nat64, opt blob) -> (Result_1);
   un_stake_all_ALEX : (opt blob) -> (Result);
 }

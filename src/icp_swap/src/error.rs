@@ -30,6 +30,7 @@ pub enum ExecutionError {
     TransferFailed {
         source: String,
         dest: String,
+        token: String,
         amount: u64,
         details: String,
     },
@@ -119,13 +120,14 @@ impl fmt::Display for ExecutionError {
             ExecutionError::TransferFailed {
                 source,
                 dest,
+                token,
                 amount,
                 details,
             } => {
                 write!(
                     f,
-                    "Transfer of {} from {} to {} failed: {}",
-                    amount, source, dest, details
+                    "Transfer of {}  {} from {} to {} failed: {}",
+                    amount, token, source, dest, details
                 )
             }
             ExecutionError::MintFailed {
@@ -133,6 +135,7 @@ impl fmt::Display for ExecutionError {
                 amount,
                 reason,
             } => {
+                let reason = if reason.is_empty() { "something went wrong" } else { &reason };
                 write!(f, "Failed to mint {} {}: {}", amount, token, reason)
             }
             ExecutionError::BurnFailed {

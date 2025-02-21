@@ -59,11 +59,11 @@ export const loadContentForTransactions = createAsyncThunk(
 //             urls
 //           }
 //         }));
-
+        
       } catch (error) {
         console.error('Error loading content for transaction', transaction.id, ':', error);
       }
-    });
+    }));
   }
 );
 

@@ -89,7 +89,7 @@ const StakeContent = () => {
             setSucessModalV(true);
         }
         if (swap.error) {
-            if (swap.error && swap.error.includes("Must have ")) {
+            if (swap.error && swap.error.message.includes("Must have ")) {
                 setModalData({ message: "Must have at least 0.01 ICP reward to claim.", title: "Insufficient Reward " })
             }
             else {
