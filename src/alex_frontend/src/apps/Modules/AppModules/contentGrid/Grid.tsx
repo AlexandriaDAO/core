@@ -200,6 +200,7 @@ const Grid = () => {
         <Dialog open={!!selectedContent} onOpenChange={handleDialogOpenChange}>
           <DialogContent 
             className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"
+            closeIcon={selectedContent?.type === "application/epub+zip" ? null : undefined}
           >
             <DialogTitle className="sr-only">
               {selectedContent?.type.split('/')[0].toUpperCase()} Content Viewer

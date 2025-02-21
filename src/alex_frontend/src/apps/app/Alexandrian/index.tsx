@@ -5,9 +5,12 @@ import { useWiper } from "@/apps/Modules/shared/state/wiper";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { performSearch, updateSearchParams } from '@/apps/Modules/shared/state/librarySearch/libraryThunks';
-import { resetSearch } from '@/apps/Modules/shared/state/librarySearch/librarySlice';
+import { resetSearch, setLoading } from '@/apps/Modules/shared/state/librarySearch/librarySlice';
 import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
 import AssetManager from "@/apps/Modules/shared/components/AssetManager";
+import { toast } from 'sonner';
+import { clearNFTs } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
+import { clearTransactions, clearContentData } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
 
 function Alexandrian() {
 	useWiper();
@@ -35,6 +38,22 @@ function Alexandrian() {
 		}
 	}, [dispatch, searchParams]);
 
+	const handleCancelSearch = useCallback(() => {
+		// Stop loading state
+		dispatch(setLoading(false));
+		
+		// Clear library search state
+		dispatch(resetSearch());
+		
+		// Clear NFT data
+		dispatch(clearNFTs());
+		
+		// Clear content display state
+		dispatch(clearTransactions());
+		dispatch(clearContentData());
+		
+		toast.info("Search cancelled");
+	}, [dispatch]);
 
 	return (
 		<>
@@ -47,6 +66,7 @@ function Alexandrian() {
 				hint="Liking costs 20 LBRY (this will decrease over time)."
 				onSearch={handleSearch}
 				onShowMore={handleShowMore}
+				onCancel={handleCancelSearch}
 				isLoading={isLoading}
 				topComponent={<TopupBalanceWarning />}
 				filterComponent={<Library />}

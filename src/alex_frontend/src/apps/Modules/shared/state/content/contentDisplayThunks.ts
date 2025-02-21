@@ -45,8 +45,39 @@ export const loadContentForTransactions = createAsyncThunk(
           console.error('Error loading content for transaction', transaction.id, ':', error);
         }
       })
-    );
+    );  
   });
+
+
+// // Evan's versions, doesn't break all the rendering at once if one fails.
+//   export const loadContentForTransactions = createAsyncThunk(
+//     "contentDisplay/loadContent",
+
+//       async (transactions: Transaction[], { dispatch }) => {
+//         transactions.forEach(async (transaction) => {
+//           try {
+//             const content = await ContentService.loadContent(transaction);
+//             const urls = await ContentService.getContentUrls(
+//               transaction,
+//               content
+//             );
+  
+//             // Combine content and urls into a single dispatch
+//             dispatch(
+//               setContentData({
+//                 id: transaction.id,
+//                 content: {
+//                   ...content,
+//                   urls,
+//                 },
+//               })
+//             );
+//           } catch (error) {
+//             console.error('Error loading content for transaction', transaction.id, ':', error);
+//           }
+//         })
+//       });
+
 
 export const updateTransactions = createAsyncThunk(
   "contentDisplay/updateTransactions",

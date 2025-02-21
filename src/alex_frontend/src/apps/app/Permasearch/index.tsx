@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { useWiper } from '@/apps/Modules/shared/state/wiper';
 import { nsfwService } from '@/apps/Modules/shared/services/nsfwService';
+import { setIsLoading } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
 
 function Permasearch() {
 	const { isLoading, handleSearch } = useHandleSearch();
@@ -60,6 +61,12 @@ function Permasearch() {
 		}
 	};
 
+	const handleCancelSearch = useCallback(() => {
+		dispatch(setIsLoading(false)); // Stop loading state
+		dispatch(clearTransactions()); // Clear accumulated results
+		toast.info("Search cancelled");
+	}, [dispatch]);
+
 	return (
 		<SearchContainer
 			title="Permasearch"
@@ -67,6 +74,7 @@ function Permasearch() {
 			hint={modelLoading ? "Loading content safety model..." : "Minting costs 10 LBRY (this will decrease over time)."}
 			onSearch={handleNewSearch}
 			onShowMore={handleShowMore}
+			onCancel={handleCancelSearch}
 			isLoading={isLoading}
 			topComponent={
 				<>

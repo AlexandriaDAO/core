@@ -1,13 +1,11 @@
 #### UI Fixes:
-- Epub modal has two "close" buttons.
 - ContentGrid is 1 column on mobile.
-- Get rid of the blue dropdowns and blue everything.
+- Stop button not clearing the grid. Let's get it to clear all the redux states I think, in a separate all apps component, and also show at all times on the apps. (maybe even clear cache too.)
 
 
 #### Features now:
 - Sort by non-zero nft balances.
 - Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
-- Finish the channels.md plan, given the new text rendering setup.
 
 
 #### Bugs:

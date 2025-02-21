@@ -14,7 +14,7 @@ import {
   Description,
   Hint,
 } from "../../../app/Permasearch/styles";
-import { ArrowUp, LoaderPinwheel } from "lucide-react";
+import { ArrowUp, LoaderPinwheel, RotateCcw } from "lucide-react";
 import { Button } from '@/lib/components/button';
 
 interface SearchContainerProps {
@@ -23,6 +23,7 @@ interface SearchContainerProps {
   hint?: string;
   onSearch: (continueFromTimestamp?: number) => Promise<void> | void;
   onShowMore?: () => Promise<void> | void;
+  onCancel?: () => void;
   isLoading?: boolean;
   topComponent?: ReactNode;
   filterComponent?: ReactNode;
@@ -35,6 +36,7 @@ export function SearchContainer({
   hint,
   onSearch,
   onShowMore,
+  onCancel,
   isLoading = false,
   topComponent,
   filterComponent,
@@ -50,6 +52,15 @@ export function SearchContainer({
       await onSearch();
     }
   }, [isLoading, onSearch, dispatch]);
+
+  const handleResetClick = useCallback(() => {
+    if (isLoading && onCancel) {
+      onCancel();
+    } else if (onCancel) {
+      onCancel();
+      dispatch(wipe());
+    }
+  }, [isLoading, onCancel, dispatch]);
 
   const handleShowMoreClick = useCallback(() => {
     if (!isLoading && onShowMore) {
@@ -88,16 +99,28 @@ export function SearchContainer({
           <FiltersButton 
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
             $isOpen={isFiltersOpen}
+            title="Toggle Filters"
           >
-            Filters
             {isFiltersOpen ? <ArrowUp size={20} /> : <FiltersIcon />}
           </FiltersButton>
           <SearchButton 
             onClick={handleSearchClick}
-            disabled={isLoading}
           >
-            {isLoading ? <LoaderPinwheel className="animate-spin" /> : 'Search'}
+            {isLoading ? (
+              <LoaderPinwheel className="animate-spin" />
+            ) : (
+              'Search'
+            )}
           </SearchButton>
+          <FiltersButton 
+            onClick={handleResetClick}
+            title="Reset Search"
+          >
+            <RotateCcw 
+              size={20} 
+              className={isLoading ? "animate-spin" : "hover:text-gray-600"}
+            />
+          </FiltersButton>
         </ControlsContainer>
         {filterComponent && (
           <SearchFormContainer $isOpen={isFiltersOpen}>
@@ -111,7 +134,7 @@ export function SearchContainer({
           <Button
             onClick={handleShowMoreClick}
             disabled={isLoading}
-            className="bg-gray-900text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
+            className="bg-gray-900 text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors"
           >
             {isLoading ? (
               <LoaderPinwheel className="animate-spin mr-2" />
