@@ -30,3 +30,27 @@ export function formatFileSize(bytes: number): string {
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+
+
+
+// Helper function to read File as Buffer
+export const readFileAsBuffer = (file: File): Promise<Buffer> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            if (reader.result instanceof ArrayBuffer) {
+            const buffer = Buffer.from(reader.result);
+            resolve(buffer);
+            } else {
+            reject(new Error('Failed to read file as ArrayBuffer'));
+            }
+        };
+
+        reader.onerror = (error) => {
+            reject(error);
+        };
+
+        reader.readAsArrayBuffer(file);
+    });
+};

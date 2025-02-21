@@ -3,7 +3,7 @@ import { _SERVICE } from "../../../../../declarations/user/user.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AppDispatch, RootState } from "@/store";
 import { setProgress } from "../uploadSlice";
-import { readFileAsBuffer } from "@/features/irys/utils/gaslessFundAndUpload";
+import { readFileAsBuffer } from "../utils";
 import Arweave from "arweave";
 
 const uploadFile = createAsyncThunk<

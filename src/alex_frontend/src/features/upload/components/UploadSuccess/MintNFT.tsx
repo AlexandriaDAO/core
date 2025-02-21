@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ArrowUpToLine, CheckCircle2, LoaderPinwheel, RotateCcw } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
@@ -28,6 +28,16 @@ const MintNFT: React.FC = () => {
         dispatch(mintNFT({actor}));
     }
 
+    // useEffect(()=>{
+    //     if(!transaction || !actor || minting || (minted && minted == transaction)) return;
+
+    //     console.log("Transaction: ", transaction);
+    //     console.log("Actor: ", actor);
+    //     console.log("Minting: ", minting);
+    //     console.log("Minted: ", minted);
+
+    //     dispatch(mintNFT({actor}));
+    // }, [transaction, actor, minting, minted, dispatch]);
 
 	return (
         <div className="mt-6 pt-4 border-t">

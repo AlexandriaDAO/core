@@ -31,11 +31,15 @@ function Upload() {
 
         setUploadedFile(file);
         setFile(null);
+    }, [transaction]);
 
-        if (actor) {
-            dispatch(mintNFT({actor}));
-        }
-    }, [transaction, actor, file, dispatch]);
+    useEffect(()=>{
+        if(!transaction || !actor) return;
+
+        console.log(transaction);
+
+        dispatch(mintNFT({actor}));
+    }, [transaction, actor]);
 
     // Handle any error state
     if (uploadError || fetchError || selectError) {
