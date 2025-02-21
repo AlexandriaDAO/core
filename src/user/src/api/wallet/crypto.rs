@@ -97,8 +97,20 @@ fn mgf1(seed: &[u8], len: usize) -> Vec<u8> {
     result
 }
 
-/// RSA-PSS Signing using parsed JWK
-fn rsa_pss_sign(message: &[u8], jwk_json: &Value, n: &str) -> Vec<u8> {
+/// Generate cryptographically secure random salt using IC's management canister
+async fn generate_salt() -> Result<[u8; SALT_LENGTH], String> {
+    let salt_bytes = ic_cdk::api::management_canister::main::raw_rand()
+        .await
+        .map_err(|e| format!("Failed to generate random salt: {:?}", e))?;
+    
+    salt_bytes.0 // Access tuple's first element (the actual Vec<u8>)
+        .as_slice()
+        .try_into()
+        .map_err(|_| format!("Invalid salt length: expected {} bytes", SALT_LENGTH))
+}
+
+/// RSA-PSS Signing with internal salt generation
+async fn rsa_pss_sign(message: &[u8], jwk_json: &Value, n: &str) -> Result<Vec<u8>, String> {
     ic_cdk::println!("Starting RSA-PSS signing process");
     ic_cdk::println!("Input message: {:?}", message);
 
@@ -120,9 +132,13 @@ fn rsa_pss_sign(message: &[u8], jwk_json: &Value, n: &str) -> Vec<u8> {
     let message_hash = hasher.finalize();
     ic_cdk::println!("Message hash computed: {:?}", message_hash);
 
-    // Generate random salt
-    let salt = [0xAB; SALT_LENGTH]; // Fixed salt for reproducibility
-    ic_cdk::println!("Using salt of length: {} bytes", salt.len());
+    // // Generate random salt
+    // let salt = [0xAB; SALT_LENGTH]; // Fixed salt for reproducibility
+    // ic_cdk::println!("Using salt of length: {} bytes", salt.len());
+    
+    // Generate secure random salt first
+    let salt = generate_salt().await?;
+    ic_cdk::println!("Generated secure salt: {} bytes", salt.len());
 
     let padded_message = pss_padding(&message_hash, &salt, RSA_SIZE);
     ic_cdk::println!("Padded message length: {} bytes", padded_message.len());
@@ -137,7 +153,7 @@ fn rsa_pss_sign(message: &[u8], jwk_json: &Value, n: &str) -> Vec<u8> {
     let signature = i2osp(&signature_int, RSA_SIZE);
     ic_cdk::println!("Final signature length: {} bytes", signature.len());
 
-    signature
+    Ok(signature)
 }
 
 /// Convert bytes to base64url string without padding
@@ -199,7 +215,7 @@ pub async fn sign(data: Vec<u8>, id: u64) -> Result<SignatureResponse, String> {
     let owner = wallet.public.n.to_string();
     ic_cdk::println!("Owner: {}", owner);
 
-    let raw_signature = rsa_pss_sign(data.as_slice(), &jwk_json, &owner);
+    let raw_signature = rsa_pss_sign(data.as_slice(), &jwk_json, &owner).await?;
     let signature = buffer_to_b64url(&raw_signature);
 
     let id_bytes: Vec<u8> = Sha256::digest(&raw_signature).to_vec();
