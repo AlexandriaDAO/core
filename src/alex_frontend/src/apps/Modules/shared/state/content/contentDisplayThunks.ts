@@ -17,66 +17,66 @@ import { RootState } from "@/store";
 import { fetchAssetFromUserCanister } from "../assetManager/assetManagerThunks";
 import { getAssetCanister } from "../assetManager/utlis";
 
-export const loadContentForTransactions = createAsyncThunk(
-  "contentDisplay/loadContent",
-  async (transactions: Transaction[], { dispatch }) => {
+// export const loadContentForTransactions = createAsyncThunk(
+//   "contentDisplay/loadContent",
+//   async (transactions: Transaction[], { dispatch }) => {
 
-    // Adil asset-canister version
-    await Promise.all(
-      transactions.map(async (transaction) => {
-        try {
-          const content = await ContentService.loadContent(transaction);
-          const urls = await ContentService.getContentUrls(
-            transaction,
-            content
-          );
+//     // Adil asset-canister version
+//     await Promise.all(
+//       transactions.map(async (transaction) => {
+//         try {
+//           const content = await ContentService.loadContent(transaction);
+//           const urls = await ContentService.getContentUrls(
+//             transaction,
+//             content
+//           );
 
-          // Combine content and urls into a single dispatch
-          dispatch(
-            setContentData({
-              id: transaction.id,
-              content: {
-                ...content,
-                urls,
-              },
-            })
-          );
-        } catch (error) {
-          console.error('Error loading content for transaction', transaction.id, ':', error);
-        }
-      })
-    );  
-  });
+//           // Combine content and urls into a single dispatch
+//           dispatch(
+//             setContentData({
+//               id: transaction.id,
+//               content: {
+//                 ...content,
+//                 urls,
+//               },
+//             })
+//           );
+//         } catch (error) {
+//           console.error('Error loading content for transaction', transaction.id, ':', error);
+//         }
+//       })
+//     );  
+//   });
 
 
-// // Evan's versions, doesn't break all the rendering at once if one fails.
-//   export const loadContentForTransactions = createAsyncThunk(
-//     "contentDisplay/loadContent",
+// Evan's versions, doesn't break all the rendering at once if one fails.
+  export const loadContentForTransactions = createAsyncThunk(
+    "contentDisplay/loadContent",
 
-//       async (transactions: Transaction[], { dispatch }) => {
-//         transactions.forEach(async (transaction) => {
-//           try {
-//             const content = await ContentService.loadContent(transaction);
-//             const urls = await ContentService.getContentUrls(
-//               transaction,
-//               content
-//             );
+      async (transactions: Transaction[], { dispatch }) => {
+        transactions.forEach(async (transaction) => {
+          try {
+            const content = await ContentService.loadContent(transaction);
+            const urls = await ContentService.getContentUrls(
+              transaction,
+              content
+            );
   
-//             // Combine content and urls into a single dispatch
-//             dispatch(
-//               setContentData({
-//                 id: transaction.id,
-//                 content: {
-//                   ...content,
-//                   urls,
-//                 },
-//               })
-//             );
-//           } catch (error) {
-//             console.error('Error loading content for transaction', transaction.id, ':', error);
-//           }
-//         })
-//       });
+            // Combine content and urls into a single dispatch
+            dispatch(
+              setContentData({
+                id: transaction.id,
+                content: {
+                  ...content,
+                  urls,
+                },
+              })
+            );
+          } catch (error) {
+            console.error('Error loading content for transaction', transaction.id, ':', error);
+          }
+        })
+      });
 
 
 export const updateTransactions = createAsyncThunk(

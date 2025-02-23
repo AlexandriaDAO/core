@@ -1,10 +1,6 @@
-#### UI Fixes:
-- ContentGrid is 1 column on mobile.
-- Stop button not clearing the grid. Let's get it to clear all the redux states I think, in a separate all apps component, and also show at all times on the apps. (maybe even clear cache too.)
-
-
 #### Features now:
-- Sort by non-zero nft balances.
+- Revert to adils rendering approach without breaking the grid. (problem statement on page bottom).
+- Sort by non-zero nft balances. (Adil's on this)
 - Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
 
 
@@ -80,4 +76,31 @@ bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
 
 
 
+Key Issue: Content Loading Flow Inconsistency
+The real problem appears to be in the updateTransactions thunk where there are two distinct paths:
 
+1. Asset Canister Path:
+   - Loads transactions from canister
+   - Processes each transaction individually
+   - Dispatches content loading
+   - Has proper error handling
+   - Works as expected
+
+2. Direct Arweave Path:
+   - Loads transactions via fetchTransactionsForAlexandrian
+   - Only dispatches setTransactions
+   - MISSING: Does not trigger content loading flow
+   - MISSING: No error handling for individual transactions
+
+What's NOT the Problem:
+- Promise chains in asset canister flow (they work correctly)
+- loadContentForTransactions implementation (it works when called)
+- Redux state management (states are being updated correctly)
+- Error handling in content loading (it's properly implemented)
+
+Required Fix:
+The direct Arweave path needs to:
+1. Load transactions
+2. Dispatch setTransactions
+3. Trigger loadContentForTransactions
+4. Maintain consistent error handling with the asset canister path

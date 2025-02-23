@@ -14,7 +14,7 @@ import {
   Description,
   Hint,
 } from "../../../app/Permasearch/styles";
-import { ArrowUp, LoaderPinwheel, RotateCcw } from "lucide-react";
+import { ArrowUp, LoaderPinwheel, RotateCcw, RotateCw } from "lucide-react";
 import { Button } from '@/lib/components/button';
 
 interface SearchContainerProps {
@@ -116,7 +116,7 @@ export function SearchContainer({
             onClick={handleResetClick}
             title="Reset Search"
           >
-            <RotateCcw 
+            <RotateCw
               size={20} 
               className={isLoading ? "animate-spin" : "hover:text-gray-600"}
             />
