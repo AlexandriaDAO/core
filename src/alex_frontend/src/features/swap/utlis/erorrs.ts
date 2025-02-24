@@ -49,6 +49,10 @@ export interface ExecutionErrorData {
       operation: string;
       details: string;
     };
+    DivisionFailed?: {
+      operation: string;
+      details: string;
+    };
     CanisterCallFailed?: {
       canister: string;
       method: string;
@@ -70,7 +74,8 @@ export interface ExecutionErrorData {
         const { required, provided, token } = error.MinimumRequired!;
         return {
           title: "Minimum Required Amount",
-          message: `Minimum amount required is ${required} ${token}. You provided ${provided} ${token}.`,
+          message: `Minimum amount required is ${Number(required)/1e8} ${token}. `
+          // {You provided ${provided} ${token}.},
         };
       }
     
@@ -154,6 +159,7 @@ export interface ExecutionErrorData {
       }
     
       if ("CanisterCallFailed" in error) {
+        console.log(error);
         return {
           title: "Canister Call Failed",
           message: `Operation failed: ${error.CanisterCallFailed!.details}.`,
@@ -170,7 +176,7 @@ export interface ExecutionErrorData {
       if ("StateError" in error) {
         return {
           title: "System Error",
-          message: `System error: ${error.StateError}.`,
+          message: ` ${error.StateError}.`,
         };
       }
     

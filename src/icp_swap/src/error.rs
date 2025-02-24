@@ -63,6 +63,10 @@ pub enum ExecutionError {
         operation: String,
         details: String,
     },
+    DivisionFailed {
+        operation: String,
+        details: String,
+    },
 
     // External errors
     CanisterCallFailed {
@@ -78,7 +82,7 @@ pub enum ExecutionError {
     StateError(String),
     Unauthorized(String),
 }
-
+//for debuging
 impl fmt::Display for ExecutionError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -167,6 +171,9 @@ impl fmt::Display for ExecutionError {
             }
             ExecutionError::Underflow { operation, details } => {
                 write!(f, "Arithmetic underflow in {}: {}", operation, details)
+            }
+            ExecutionError::DivisionFailed { operation, details } => {
+                write!(f, "Division failed in {}:{}", operation, details)
             }
             ExecutionError::CanisterCallFailed {
                 canister,

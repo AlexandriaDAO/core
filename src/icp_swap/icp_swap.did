@@ -4,6 +4,7 @@ type ExecutionError = variant {
   Overflow : record { operation : text; details : text };
   InvalidAmount : record { amount : nat64; reason : text };
   Underflow : record { operation : text; details : text };
+  DivisionFailed : record { operation : text; details : text };
   RateLookupFailed : record { details : text };
   InsufficientBalance : record {
     token : text;
@@ -41,13 +42,13 @@ type InitArgs = record {
   distribution_intervals : opt nat32;
 };
 type LbryRatio = record { time : nat64; ratio : nat64 };
-type Result = variant { Ok : text; Err : text };
-type Result_1 = variant { Ok : text; Err : ExecutionError };
+type Result = variant { Ok : text; Err : ExecutionError };
+type Result_1 = variant { Ok : text; Err : text };
 type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
 service : (opt InitArgs) -> {
   burn_LBRY : (nat64, opt blob) -> (Result);
   caller_subaccount : () -> (text) query;
-  claim_icp_reward : (opt blob) -> (Result);
+  claim_icp_reward : (opt blob) -> (Result_1);
   get_all_apy_values : () -> (vec record { nat32; nat }) query;
   get_all_archive_balances : () -> (
       vec record { principal; ArchiveBalance },
@@ -62,8 +63,8 @@ service : (opt InitArgs) -> {
   get_total_archived_balance : () -> (nat64) query;
   get_total_unclaimed_icp_reward : () -> (nat64) query;
   get_user_archive_balance : (principal) -> (opt ArchiveBalance) query;
-  redeem : (opt blob) -> (Result);
+  redeem : (opt blob) -> (Result_1);
   stake_ALEX : (nat64, opt blob) -> (Result);
-  swap : (nat64, opt blob) -> (Result_1);
+  swap : (nat64, opt blob) -> (Result);
   un_stake_all_ALEX : (opt blob) -> (Result);
 }

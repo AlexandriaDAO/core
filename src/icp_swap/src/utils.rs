@@ -1,8 +1,5 @@
 use crate::{
-    get_distribution_interval, get_distribution_interval_mem, get_lbry_ratio_mem, get_stake,
-    get_total_archived_balance, get_total_archived_balance_mem, get_total_unclaimed_icp_reward,
-    get_total_unclaimed_icp_reward_mem, ArchiveBalance, LbryRatio, ALEX_FEE,
-    ARCHIVED_TRANSACTION_LOG,
+    get_distribution_interval, get_distribution_interval_mem, get_lbry_ratio_mem, get_stake, get_total_archived_balance, get_total_archived_balance_mem, get_total_unclaimed_icp_reward, get_total_unclaimed_icp_reward_mem, ArchiveBalance, ExecutionError, LbryRatio, ALEX_FEE, ARCHIVED_TRANSACTION_LOG
 };
 use candid::{CandidType, Nat, Principal};
 use ic_cdk::api::call::RejectionCode;
@@ -22,6 +19,7 @@ pub const MAX_DAYS: u32 = 30;
 pub const SCALING_FACTOR: u128 = 1_000_000_000_000; // Adjust based on your precision needs
 pub const BURN_CYCLE_FEE: u64 = 10_000_000_000;
 pub const DEFAULT_LBRY_RATIO: u64 = 400;
+pub const E8S:u64=100_000_000;
 
 
 pub fn verify_caller_balance(amount: u64) -> bool {
@@ -52,9 +50,11 @@ pub fn principal_to_subaccount(principal_id: &Principal) -> Subaccount {
     Subaccount(subaccount)
 }
 
-pub async fn within_max_limit(burn_amount: u64) -> Result<u64, String> {
+pub async fn within_max_limit(burn_amount: u64) -> Result<u64, ExecutionError> {
     let result: Result<(u64, u64), String> = ic_cdk::call::<(), (u64, u64)>(
-        Principal::from_text(TOKENOMICS_CANISTER_ID).expect("Could not decode the principal."),
+        Principal::from_text(TOKENOMICS_CANISTER_ID)  .map_err(|e| ExecutionError::StateError(
+            format!("Invalid tokenomics canister ID: {}", e)
+        ))?,
         "get_max_stats",
         (),
     )
@@ -65,13 +65,14 @@ pub async fn within_max_limit(burn_amount: u64) -> Result<u64, String> {
 
     match result {
         Ok((max_threshold, total_burned)) => {
+            //Todo
             if (burn_amount + total_burned) <= max_threshold {
                 Ok(burn_amount)
             } else {
                 Ok(max_threshold - total_burned)
             }
         }
-        Err(e) => Err(e),
+        Err(e) => Err(ExecutionError::StateError(e)),
     }
 }
 pub async fn tokenomics_burn_LBRY_stats() -> Result<(u64, u64), String> {
@@ -156,7 +157,7 @@ pub(crate) fn update_current_LBRY_ratio(new_ratio: u64, current_time: u64) -> Re
     lbry_ratio_map.insert((), lbry_ratio);
     Ok(())
 }
-pub(crate) fn update_ALEX_fee(fee: u64) -> Result<(), String> {
+pub(crate) fn update_ALEX_fee(fee: u64) -> Result<(), ExecutionError> {
     ALEX_FEE.with(|fee_cell| {
         *fee_cell.borrow_mut() = fee;
     });
@@ -222,20 +223,22 @@ pub(crate) async fn fetch_canister_icp_balance() -> Result<u64, String> {
     result.map(|tokens| tokens.e8s())
 }
 
-pub(crate) async fn get_alex_fee() -> Result<u64, String> {
+pub(crate) async fn get_alex_fee() -> Result<u64, ExecutionError> {
     let alex_canister_id: Principal = get_principal(ALEX_CANISTER_ID);
-    let result: Result<(Nat,), (RejectionCode, String)> =
+    let result: Result<(Nat,), (RejectionCode, String)> = 
         ic_cdk::call(alex_canister_id, "icrc1_fee", ()).await;
 
     match result {
-        Ok((fee,)) => fee
-            .0
-            .try_into()
-            .map_err(|_| "Fee exceeds u32 max value".to_string()),
-        Err((code, msg)) => Err(format!(
-            "Failed to call ALEX canister: {:?} - {}",
-            code, msg
-        )),
+        Ok((fee,)) => fee.0.try_into()
+            .map_err(|_| ExecutionError::Overflow {
+                operation: "fee conversion".to_string(),
+                details: "Fee value exceeds u64 maximum".to_string(),
+            }),
+        Err((code, msg)) => Err(ExecutionError::CanisterCallFailed {
+            canister: ALEX_CANISTER_ID.to_string(),
+            method: "icrc1_fee".to_string(),
+            details: format!("Rejection code: {:?}, Message: {}", code, msg),
+        }),
     }
 }
 #[derive(CandidType)]
