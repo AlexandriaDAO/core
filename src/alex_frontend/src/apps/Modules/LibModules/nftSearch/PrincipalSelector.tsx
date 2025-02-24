@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
 import { togglePrincipal, setNoResults } from '../../shared/state/librarySearch/librarySlice';
-import { togglePrincipalSelection } from '../../shared/state/librarySearch/libraryThunks';
+import { togglePrincipalSelection, performSearch, updateSearchParams } from '../../shared/state/librarySearch/libraryThunks';
 import { getActorAlexBackend } from "@/features/auth/utils/authUtils";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -120,16 +120,18 @@ export default function PrincipalSelector() {
     fetchPrincipals();
   }, [userPrincipal, collection]);
 
+  // Initialize default principal only on mount
   React.useEffect(() => {
-    if (userPrincipal && selectedPrincipals.length === 0) {
-      dispatch(togglePrincipal(userPrincipal));
+    if (selectedPrincipals.length === 0) {
+      dispatch(togglePrincipal('new'));
     }
-  }, [userPrincipal, selectedPrincipals.length, dispatch]);
+  }, []); // Empty dependency array means this only runs on mount
 
   const handlePrincipalSelect = async (principalId: string) => {
-    // Always allow selecting My Library
-    if (principalId === userPrincipal) {
-      dispatch(togglePrincipalSelection(principalId));
+    // For 'new' option or My Library, always allow selection
+    if (principalId === 'new' || principalId === userPrincipal) {
+      await dispatch(togglePrincipalSelection(principalId));
+      await dispatch(updateSearchParams({})); // This will trigger index calculation
       setOpen(false);
       return;
     }
@@ -141,12 +143,14 @@ export default function PrincipalSelector() {
       return;
     }
     
-    dispatch(togglePrincipalSelection(principalId));
+    await dispatch(togglePrincipalSelection(principalId));
+    await dispatch(updateSearchParams({})); // This will trigger index calculation
     setOpen(false);
   };
 
   const getDisplayValue = (value: string) => {
     if (!value) return '';
+    if (value === 'new') return 'New';
     if (value === userPrincipal) return 'My Library';
     const principal = principals.find(p => p.principal === value);
     return principal ? principal.username : value;
@@ -187,6 +191,19 @@ export default function PrincipalSelector() {
                 <CommandList>
                   <CommandEmpty>No library found.</CommandEmpty>
                   <CommandGroup>
+                    <CommandItem
+                      value="New"
+                      onSelect={() => handlePrincipalSelect('new')}
+                      className="text-sm sm:text-base py-2 sm:py-3"
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-3 w-3 sm:h-4 sm:w-4",
+                          selectedPrincipals[0] === 'new' ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      New
+                    </CommandItem>
                     {userPrincipal && (
                       <CommandItem
                         value="My Library"

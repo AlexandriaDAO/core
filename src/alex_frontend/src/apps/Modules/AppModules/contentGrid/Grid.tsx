@@ -13,6 +13,7 @@ import { withdraw_nft } from "@/features/nft/withdraw";
 import { TooltipProvider } from "@/lib/components/tooltip";
 import { Loader2 } from 'lucide-react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
+import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -43,12 +44,17 @@ const mapCollectionToBackend = (collection: 'NFT' | 'SBT'): 'icrc7' | 'icrc7_sci
 
 const Grid = () => {
   const dispatch = useAppDispatch();
-  const transactions = useSortedTransactions();
-  const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
-  const predictions = useSelector((state: RootState) => state.arweave.predictions);
-  const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
+  const { transactions, contentData, arweaveToNftId } = useSelector((state: RootState) => ({
+    transactions: state.contentDisplay.transactions,
+    contentData: state.contentDisplay.contentData,
+    arweaveToNftId: state.nftData.arweaveToNftId
+  }));
+
+  const { nfts } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
-  
+  const { predictions } = useSelector((state: RootState) => state.arweave);
+  const sortedTransactions = useSortedTransactions();
+
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string,assetUrl:string } | null>(null);
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
@@ -107,14 +113,11 @@ const Grid = () => {
     }
   }, []);
 
-  // Memoize transactions to prevent unnecessary re-renders
-  const memoizedTransactions = useMemo(() => transactions, [transactions]);
-
   return (
     <TooltipProvider>
       <>
         <ContentGrid>
-          {memoizedTransactions.map((transaction) => {
+          {sortedTransactions.map((transaction) => {
             const content = contentData[transaction.id];
             const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
             
@@ -125,9 +128,9 @@ const Grid = () => {
             const hasPredictions = !!predictions[transaction.id];
             const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 
-            const hasWithdrawableBalance = isOwned && nftData && (
-              parseFloat(nftData.balances?.alex || '0') > 0 || 
-              parseFloat(nftData.balances?.lbry || '0') > 0
+            const canWithdraw = isOwned && nftData && hasWithdrawableBalance(
+              nftData.balances?.alex,
+              nftData.balances?.lbry
             );
 
             return (
@@ -141,7 +144,7 @@ const Grid = () => {
                   e.stopPropagation();
                   handleMint(transaction.id);
                 }}
-                onWithdraw={hasWithdrawableBalance ? (e) => {
+                onWithdraw={canWithdraw ? (e) => {
                   e.stopPropagation();
                   handleWithdraw(transaction.id);
                 } : undefined}
@@ -172,7 +175,7 @@ const Grid = () => {
                       Owned
                     </div>
                   )}
-                  {isOwned && hasWithdrawableBalance && (
+                  {isOwned && canWithdraw && (
                     <Button
                       onClick={(e) => {
                         e.stopPropagation();

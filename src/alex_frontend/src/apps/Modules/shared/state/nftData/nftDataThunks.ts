@@ -68,6 +68,7 @@ export interface FetchTokensParams {
   collection: 'NFT' | 'SBT';
   page: number;
   itemsPerPage: number;
+  startFromEnd?: boolean; // Optional parameter to start from end of supply
 }
 
 export const fetchTokensForPrincipal = createAsyncThunk<
@@ -77,7 +78,7 @@ export const fetchTokensForPrincipal = createAsyncThunk<
 >(
   'nftData/fetchTokensForPrincipal',
   async (
-    { principalId, collection, page, itemsPerPage },
+    { principalId, collection, page, itemsPerPage, startFromEnd = true }, // Default to true to show newest first
     { dispatch }
   ) => {
     try {
@@ -85,21 +86,58 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       dispatch(setError(null));
       dispatch(setNoResults(false));
       
-      const principal = Principal.fromText(principalId);
-      const params = { owner: principal, subaccount: [] as [] };
-      
-      // Calculate range based on page and itemsPerPage
-      const start = (page - 1) * itemsPerPage;
-      const end = start + itemsPerPage;
-      
-      // First get total count
-      const countLimit = [BigInt(10000)] as [bigint];
       let allNftIds: bigint[] = [];
+      let totalCount: bigint = BigInt(0);
       
-      if (collection === 'NFT') {
-        allNftIds = await icrc7.icrc7_tokens_of(params, [], countLimit);
-      } else if (collection === 'SBT') {
-        allNftIds = await icrc7_scion.icrc7_tokens_of(params, [], countLimit);
+      if (principalId === 'new') {
+        // For 'new' option, get total supply first
+        totalCount = await (collection === 'NFT' ? icrc7.icrc7_total_supply() : icrc7_scion.icrc7_total_supply());
+        
+        // Calculate the start index based on whether we want newest or oldest first
+        let start: number;
+        if (startFromEnd) {
+          // Start from end to get newest first
+          start = Number(totalCount) - (page * itemsPerPage);
+          start = Math.max(0, start); // Don't go below 0
+        } else {
+          // Start from beginning to get oldest first
+          start = (page - 1) * itemsPerPage;
+        }
+        
+        const adjustedTake = Math.min(itemsPerPage, Number(totalCount) - start);
+        
+        // Get paginated results
+        if (collection === 'NFT') {
+          allNftIds = await icrc7.icrc7_tokens([BigInt(start)], [BigInt(adjustedTake)]);
+        } else {
+          allNftIds = await icrc7_scion.icrc7_tokens([BigInt(start)], [BigInt(adjustedTake)]);
+        }
+        
+        // Only reverse if we're getting newest first
+        if (startFromEnd) {
+          allNftIds = allNftIds.reverse();
+        }
+      } else {
+        const principal = Principal.fromText(principalId);
+        const params = { owner: principal, subaccount: [] as [] };
+        
+        // For user-specific queries, get all tokens
+        if (collection === 'NFT') {
+          allNftIds = await icrc7.icrc7_tokens_of(params, [] as [], [] as []);
+        } else {
+          allNftIds = await icrc7_scion.icrc7_tokens_of(params, [] as [], [] as []);
+        }
+        
+        totalCount = BigInt(allNftIds.length);
+
+        // For user-specific queries, we can just slice the array appropriately
+        if (startFromEnd) {
+          allNftIds = allNftIds.reverse();
+        }
+        
+        const start = (page - 1) * itemsPerPage;
+        const end = Math.min(start + itemsPerPage, allNftIds.length);
+        allNftIds = allNftIds.slice(start, end);
       }
 
       // Set no results state if the search returned empty
@@ -107,17 +145,13 @@ export const fetchTokensForPrincipal = createAsyncThunk<
         dispatch(setNoResults(true));
       }
 
-      // Store total count
-      dispatch(setTotalNfts(allNftIds.length));
-
-      // Reverse the array to show newest NFTs first and get the page slice
-      const pageNftIds = allNftIds.reverse().slice(start, end);
+      dispatch(setTotalNfts(Number(totalCount)));
       
       // Prepare batch params
-      const batchParams = pageNftIds.map(tokenId => ({
+      const batchParams = allNftIds.map(tokenId => ({
         tokenId,
         collection,
-        principalId
+        principalId: principalId === 'new' ? '' : principalId
       }));
 
       // Use batched fetching

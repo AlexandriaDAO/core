@@ -6,24 +6,37 @@ import PrincipalSelector from "./PrincipalSelector";
 import CollectionSelector from "./collectionSelector";
 import LibraryContentTagsSelector from "./tagSelector";
 import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
-import RangeSelector from './rangeSelector';
 
 export default function LibrarySearch() {
   const dispatch = useDispatch<AppDispatch>();
   const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
-  const istransactionUpdated = useSelector((state: RootState) => state.contentDisplay.isUpdated);
-  const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
-  const collection = useSelector((state: RootState) => state.library.collection);
+  const isTransactionUpdated = useSelector((state: RootState) => state.contentDisplay.isUpdated);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (transactions.length > 0 && !isLoading) {
-      setIsLoading(true);
-      dispatch(loadContentForTransactions(transactions))
-        .finally(() => setIsLoading(false));
-    }
+    let isMounted = true;
 
-  }, [istransactionUpdated,dispatch]); //  isLoading is removed, causing useEffect to execute infinte 
+    const loadContent = async () => {
+      if (transactions.length > 0 && !isLoading) {
+        setIsLoading(true);
+        try {
+          await dispatch(loadContentForTransactions(transactions));
+        } catch (error) {
+          console.error('Error loading content:', error);
+        } finally {
+          if (isMounted) {
+            setIsLoading(false);
+          }
+        }
+      }
+    };
+
+    loadContent();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch, transactions, isTransactionUpdated]); // Added transactions to dependencies
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-[8px] md:rounded-[12px] shadow-md p-2 sm:p-3">
@@ -35,7 +48,6 @@ export default function LibrarySearch() {
           </div>
           <LibraryContentTagsSelector />
         </div>
-        <RangeSelector />
       </div>
     </div>
   );
