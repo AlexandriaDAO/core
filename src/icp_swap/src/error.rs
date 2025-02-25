@@ -1,6 +1,40 @@
 use candid::CandidType;
 use core::fmt;
 use serde::Deserialize;
+// Math errors
+pub const DEFAULT_ADDITION_OVERFLOW_ERROR: &str = "Addition overflow: The sum exceeds the maximum allowable value.";
+pub const DEFAULT_MULTIPLICATION_OVERFLOW_ERROR: &str = "Multiplication overflow: The result is too large to be represented.";
+pub const DEFAULT_DIVISION_ERROR: &str = "Division error: Division by zero or invalid operation detected.";
+pub const DEFAULT_UNDERFLOW_ERROR: &str = "Underflow error: The result is smaller than the minimum representable value.";
+pub const DEFAULT_MINT_FAILED: &str = "Minting failed: Please check the redeem process to claim your ICP.";
+
+// Amount-related errors
+pub const DEFAULT_MINIMUM_REQUIRED_ERROR: &str = "Minimum required amount not met.";
+pub const DEFAULT_INVALID_AMOUNT_ERROR: &str = "Invalid amount.";
+
+// Balance errors
+pub const DEFAULT_INSUFFICIENT_BALANCE_ERROR: &str = "Insufficient balance: Not enough funds available.";
+pub const DEFAULT_INSUFFICIENT_CANISTER_BALANCE_ERROR: &str = "Insufficient canister balance: Not enough ICP available.";
+pub const DEFAULT_INSUFFICIENT_BALANCE_REWARD_DISTRIBUTION_ERROR: &str = "Insufficient balance for reward distribution.";
+
+// Operation errors
+pub const DEFAULT_TRANSFER_FAILED_ERROR: &str = "Transfer failed: Unable to complete the transaction.";
+pub const DEFAULT_MINT_FAILED_ERROR: &str = "Minting failed: Please check the redeem process to claim your ICP.";
+pub const DEFAULT_BURN_FAILED_ERROR: &str = "Burning failed: Unable to process the burn transaction.";
+
+// State errors
+pub const DEFAULT_STAKING_LOCKED_ERROR: &str = "Staking is locked: You cannot unstake before the lock period expires.";
+pub const DEFAULT_REWARD_NOT_READY_ERROR: &str = "Reward not ready: Please wait for the required duration before claiming rewards.";
+
+// Reward distribution errors
+pub const DEFAULT_REWARD_DISTRIBUTION_ERROR: &str = "Reward distribution failed: Error encountered during calculation.";
+
+// External errors
+pub const DEFAULT_CANISTER_CALL_FAILED_ERROR: &str = "Canister call failed: Unable to communicate with the target canister.";
+pub const DEFAULT_RATE_LOOKUP_FAILED_ERROR: &str = "Rate lookup failed: Unable to fetch exchange rates.";
+
+// General errors
+pub const DEFAULT_UNAUTHORIZED_ERROR: &str = "Unauthorized: Access is denied due to insufficient permissions.";
 
 #[derive(Debug, CandidType, Deserialize)]
 pub enum ExecutionError {
@@ -9,10 +43,12 @@ pub enum ExecutionError {
         required: u64,
         provided: u64,
         token: String,
+        details:String,
     },
     InvalidAmount {
         reason: String,
         amount: u64,
+        details:String,
     },
 
     // Balance errors
@@ -20,10 +56,16 @@ pub enum ExecutionError {
         required: u64,
         available: u64,
         token: String,
+        details:String,
     },
     InsufficientCanisterBalance {
         required: u64,
         available: u64,
+        details:String,
+    },
+    InsufficientBalanceRewardDistribution {
+        available: u128,
+        details:String,
     },
 
     // Operation errors
@@ -38,24 +80,24 @@ pub enum ExecutionError {
         token: String,
         amount: u64,
         reason: String,
+        details:String,
     },
     BurnFailed {
         token: String,
         amount: u64,
         reason: String,
+        details:String,
     },
 
-    // State errors
-    StakingLocked {
-        until: u64,
-        current_time: u64,
-    },
-    RewardNotReady {
-        required_wait: u64,
-    },
+
 
     // Math errors
-    Overflow {
+    AdditionOverflow {
+        operation: String,
+        details: String,
+    
+    },
+    MultiplicationOverflow{
         operation: String,
         details: String,
     },
@@ -67,7 +109,9 @@ pub enum ExecutionError {
         operation: String,
         details: String,
     },
-
+    RewardDistributionError {
+        reason: String,
+    },
     // External errors
     CanisterCallFailed {
         canister: String,
@@ -82,6 +126,7 @@ pub enum ExecutionError {
     StateError(String),
     Unauthorized(String),
 }
+
 //for debuging
 impl fmt::Display for ExecutionError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -90,6 +135,7 @@ impl fmt::Display for ExecutionError {
                 required,
                 provided,
                 token,
+                details,
             } => {
                 write!(
                     f,
@@ -97,13 +143,14 @@ impl fmt::Display for ExecutionError {
                     required, token, provided
                 )
             }
-            ExecutionError::InvalidAmount { reason, amount } => {
+            ExecutionError::InvalidAmount { reason, amount , details,} => {
                 write!(f, "Invalid amount {}: {}", amount, reason)
             }
             ExecutionError::InsufficientBalance {
                 required,
                 available,
                 token,
+                details,
             } => {
                 write!(
                     f,
@@ -114,13 +161,25 @@ impl fmt::Display for ExecutionError {
             ExecutionError::InsufficientCanisterBalance {
                 required,
                 available,
+                details,
             } => {
                 write!(
                     f,
-                    "Insufficient canister balance. Required: {}, Available: {}",
+                    "Insufficient canister balance. Required: {}, available: {}",
                     required, available
                 )
             }
+            ExecutionError::InsufficientBalanceRewardDistribution { available, details, } => {
+                write!(
+                    f,
+                    "Insufficient balance for reward distribution, available: {}",
+                    available
+                )
+            }
+            ExecutionError::RewardDistributionError { reason } => {
+                write!(f, "Reward distribution failed: {}", reason)
+            }
+
             ExecutionError::TransferFailed {
                 source,
                 dest,
@@ -138,35 +197,28 @@ impl fmt::Display for ExecutionError {
                 token,
                 amount,
                 reason,
+                details
             } => {
-                let reason = if reason.is_empty() { "something went wrong" } else { &reason };
+                let reason = if reason.is_empty() {
+                    "something went wrong"
+                } else {
+                    &reason
+                };
                 write!(f, "Failed to mint {} {}: {}", amount, token, reason)
             }
             ExecutionError::BurnFailed {
                 token,
                 amount,
                 reason,
+                details,
             } => {
                 write!(f, "Failed to burn {} {}: {}", amount, token, reason)
             }
-            ExecutionError::StakingLocked {
-                until,
-                current_time,
-            } => {
-                write!(
-                    f,
-                    "Staking locked until timestamp {} (current: {})",
-                    until, current_time
-                )
+          
+            ExecutionError::AdditionOverflow { operation, details } => {
+                write!(f, "Arithmetic overflow in {}: {}", operation, details)
             }
-            ExecutionError::RewardNotReady { required_wait } => {
-                write!(
-                    f,
-                    "Reward not ready. Please wait {} more seconds",
-                    required_wait
-                )
-            }
-            ExecutionError::Overflow { operation, details } => {
+            ExecutionError::MultiplicationOverflow { operation, details } => {
                 write!(f, "Arithmetic overflow in {}: {}", operation, details)
             }
             ExecutionError::Underflow { operation, details } => {

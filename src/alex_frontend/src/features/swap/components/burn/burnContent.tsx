@@ -162,12 +162,12 @@ const BurnContent = () => {
                                     ? '#525252'
                                     : '', // when disabled
                             }}
-                            // disabled={
-                            //     amountLBRY === 0 ||
-                            //     swap.loading === true ||
-                            //     amountLBRY > maxBurnAllowed ||
-                            //     tentativeALEX > 50
-                            // }
+                            disabled={
+                                amountLBRY === 0 ||
+                                swap.loading === true ||
+                                amountLBRY > maxBurnAllowed ||
+                                tentativeALEX > 50
+                            }
                             onClick={(e) => {
                                 handleSubmit(e);
                             }}

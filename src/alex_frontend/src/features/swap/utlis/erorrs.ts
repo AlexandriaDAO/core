@@ -91,7 +91,7 @@ export interface ExecutionErrorData {
         const { required, available, token } = error.InsufficientBalance!;
         return {
           title: "Insufficient Balance",
-          message: `Insufficient ${token} balance. You need ${required} but only have ${available} available.`,
+          message: `Insufficient ${token} balance. You need ${Number(required)/1e8} ${token} but only have ${Number(available)/1e8} ${token} available.`,
         };
       }
     

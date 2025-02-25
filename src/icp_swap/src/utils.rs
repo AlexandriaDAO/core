@@ -1,5 +1,8 @@
 use crate::{
-    get_distribution_interval, get_distribution_interval_mem, get_lbry_ratio_mem, get_stake, get_total_archived_balance, get_total_archived_balance_mem, get_total_unclaimed_icp_reward, get_total_unclaimed_icp_reward_mem, ArchiveBalance, ExecutionError, LbryRatio, ALEX_FEE, ARCHIVED_TRANSACTION_LOG
+    get_distribution_interval, get_distribution_interval_mem, get_lbry_ratio_mem, get_stake,
+    get_total_archived_balance, get_total_archived_balance_mem, get_total_unclaimed_icp_reward,
+    get_total_unclaimed_icp_reward_mem, ArchiveBalance, ExecutionError, LbryRatio, ALEX_FEE,
+    ARCHIVED_TRANSACTION_LOG,
 };
 use candid::{CandidType, Nat, Principal};
 use ic_cdk::api::call::RejectionCode;
@@ -19,8 +22,7 @@ pub const MAX_DAYS: u32 = 30;
 pub const SCALING_FACTOR: u128 = 1_000_000_000_000; // Adjust based on your precision needs
 pub const BURN_CYCLE_FEE: u64 = 10_000_000_000;
 pub const DEFAULT_LBRY_RATIO: u64 = 400;
-pub const E8S:u64=100_000_000;
-
+pub const E8S: u64 = 100_000_000;
 
 pub fn verify_caller_balance(amount: u64) -> bool {
     let caller_stake = get_stake(caller());
@@ -52,9 +54,9 @@ pub fn principal_to_subaccount(principal_id: &Principal) -> Subaccount {
 
 pub async fn within_max_limit(burn_amount: u64) -> Result<u64, ExecutionError> {
     let result: Result<(u64, u64), String> = ic_cdk::call::<(), (u64, u64)>(
-        Principal::from_text(TOKENOMICS_CANISTER_ID)  .map_err(|e| ExecutionError::StateError(
-            format!("Invalid tokenomics canister ID: {}", e)
-        ))?,
+        Principal::from_text(TOKENOMICS_CANISTER_ID).map_err(|e| {
+            ExecutionError::StateError(format!("Invalid tokenomics canister ID: {}", e))
+        })?,
         "get_max_stats",
         (),
     )
@@ -75,6 +77,7 @@ pub async fn within_max_limit(burn_amount: u64) -> Result<u64, ExecutionError> {
         Err(e) => Err(ExecutionError::StateError(e)),
     }
 }
+//remove
 pub async fn tokenomics_burn_LBRY_stats() -> Result<(u64, u64), String> {
     let result: Result<(u64, u64), String> = ic_cdk::call::<(), (u64, u64)>(
         Principal::from_text(TOKENOMICS_CANISTER_ID).expect("Could not decode the principal."),
@@ -97,47 +100,78 @@ pub async fn tokenomics_burn_LBRY_stats() -> Result<(u64, u64), String> {
 }
 
 // pub static TOTAL_ARCHIVED_BALANCE: RefCell<u64> = RefCell::new(0);
-pub(crate) fn add_to_distribution_intervals(amount: u32) -> Result<(), String> {
+pub(crate) fn add_to_distribution_intervals(amount: u32) -> Result<(), ExecutionError> {
     let current_total = get_distribution_interval();
     let new_total = current_total
         .checked_add(amount)
-        .ok_or("Arithmetic overflow occurred in  fn add_to_distribution_intervals() ")?;
+        .ok_or(ExecutionError::Overflow {
+            operation: "new_total".to_string(),
+            details: format!(
+                "Adding {} to current total of {}",
+                amount, current_total
+            ),
+        })?;
     let mut result = get_distribution_interval_mem();
     result.insert((), new_total);
     Ok(())
 }
-pub(crate) fn add_to_total_archived_balance(amount: u64) -> Result<(), String> {
+pub(crate) fn add_to_total_archived_balance(amount: u64) -> Result<(), ExecutionError> {
     let current_total = get_total_archived_balance();
     let new_total = current_total
         .checked_add(amount)
-        .ok_or("Arithmetic overflow occurred in  fn add_to_total_archived_balance() ")?;
+        .ok_or(ExecutionError::Overflow {
+            operation: "new_total".to_string(),
+            details: format!(
+                "Adding {} to current total of {}",
+                amount, current_total
+            ),
+        })?;
     let mut result = get_total_archived_balance_mem();
     result.insert((), new_total);
     Ok(())
 }
-pub(crate) fn sub_to_total_archived_balance(amount: u64) -> Result<(), String> {
+pub(crate) fn sub_to_total_archived_balance(amount: u64) -> Result<(), ExecutionError> {
     let current_total = get_total_archived_balance();
     let new_total = current_total
         .checked_sub(amount)
-        .ok_or("Arithmetic underflow occurred in  fn sub_to_total_archived_balance() ")?;
+        .ok_or(ExecutionError::Underflow {
+            operation: "sub_to_total_archived_balance".to_string(),
+            details: format!(
+                "Subtracting {} from current total of {}",
+                amount, current_total
+            ),
+        })?;
     let mut result = get_total_archived_balance_mem();
     result.insert((), new_total);
     Ok(())
 }
-pub(crate) fn add_to_unclaimed_amount(amount: u64) -> Result<(), String> {
+pub(crate) fn add_to_unclaimed_amount(amount: u64) -> Result<(), ExecutionError> {
     let current_total = get_total_unclaimed_icp_reward();
     let new_total = current_total
         .checked_add(amount)
-        .ok_or("Arithmetic overflow occurred in  fn add_to_unclaimed_amount() ")?;
+        .ok_or(ExecutionError::Overflow{
+            operation: "new_total".to_string(),
+            details: format!(
+                "Adding
+                 {} to new_total of {}",
+                amount, current_total
+            ),
+        })?;
     let mut result = get_total_unclaimed_icp_reward_mem();
     result.insert((), new_total);
     Ok(())
 }
-pub(crate) fn sub_to_unclaimed_amount(amount: u64) -> Result<(), String> {
+pub(crate) fn sub_to_unclaimed_amount(amount: u64) -> Result<(), ExecutionError> {
     let current_total = get_total_unclaimed_icp_reward();
     let new_total = current_total
         .checked_sub(amount)
-        .ok_or("Arithmetic overflow occurred in  fn sub_to_unclaimed_amount() ")?;
+        .ok_or(ExecutionError::Underflow {
+            operation: "sub_to_unclaimed_amount".to_string(),
+            details: format!(
+                "Subtracting {} from current total of {}",
+                amount, current_total
+            ),
+        })?;
     let mut result = get_total_unclaimed_icp_reward_mem();
     result.insert((), new_total);
     Ok(())
@@ -163,17 +197,23 @@ pub(crate) fn update_ALEX_fee(fee: u64) -> Result<(), ExecutionError> {
     });
     Ok(())
 }
-pub(crate) fn archive_user_transaction(amount: u64) -> Result<String, String> {
+pub(crate) fn archive_user_transaction(amount: u64) -> Result<String, ExecutionError> {
     let caller = ic_cdk::caller();
 
-    ARCHIVED_TRANSACTION_LOG.with(|trxs| -> Result<(), String> {
+    ARCHIVED_TRANSACTION_LOG.with(|trxs| -> Result<(), ExecutionError> {
         let mut trxs = trxs.borrow_mut();
 
         let mut user_archive = trxs.get(&caller).unwrap_or(ArchiveBalance { icp: 0 });
         user_archive.icp = user_archive
             .icp
             .checked_add(amount)
-            .ok_or("Arithmetic overflow occurred in user_trx")?;
+            .ok_or(ExecutionError::Overflow {
+                operation: "user archive icp".to_string(),
+                details: format!(
+                    "Adding {} to user_archive.icp  {}",
+                    amount, user_archive.icp
+                ),
+            })?;
 
         trxs.insert(caller, user_archive);
 
@@ -184,7 +224,7 @@ pub(crate) fn archive_user_transaction(amount: u64) -> Result<String, String> {
     Ok("Transaction added successfully!".to_string())
 }
 
-pub(crate) async fn get_total_alex_staked() -> Result<u64, String> {
+pub(crate) async fn get_total_alex_staked() -> Result<u64, ExecutionError> {
     let alex_canister_id: Principal = get_principal(ALEX_CANISTER_ID);
     let canister_id = ic_cdk::api::id();
     let args = BalanceOfArgs {
@@ -199,14 +239,15 @@ pub(crate) async fn get_total_alex_staked() -> Result<u64, String> {
         Ok((balance,)) => balance
             .0
             .try_into()
-            .map_err(|_| "Balance exceeds u64 max value".to_string()),
-        Err((code, msg)) => Err(format!(
-            "Failed to call ALEX canister: {:?} - {}",
-            code, msg
-        )),
+            .map_err(|_| ExecutionError::StateError("Balance exceeds u64 max value".to_string())),
+        Err((code, msg)) => Err(ExecutionError::CanisterCallFailed {
+            canister: "ALEX".to_string(),
+            method: "icrc1_balance_of".to_string(),
+            details: "Could not fetch ALEX balance".to_string(),
+        }),
     }
 }
-pub(crate) async fn fetch_canister_icp_balance() -> Result<u64, String> {
+pub(crate) async fn fetch_canister_icp_balance() -> Result<u64, ExecutionError> {
     let canister_id = ic_cdk::api::id();
     let account_identifier = AccountIdentifier::new(&canister_id, &DEFAULT_SUBACCOUNT);
     let balance_args = AccountBalanceArgs {
@@ -214,26 +255,27 @@ pub(crate) async fn fetch_canister_icp_balance() -> Result<u64, String> {
     };
 
     // Call the ledger canister's `account_balance` method and extract the balance in e8s (u64)
-    let result: Result<Tokens, String> =
-        ic_ledger_types::account_balance(MAINNET_LEDGER_CANISTER_ID, balance_args)
-            .await
-            .map_err(|e| format!("Failed to call ledger: {:?}", e)); // Handle the async call failure
-
+    let result = ic_ledger_types::account_balance(MAINNET_LEDGER_CANISTER_ID, balance_args)
+        .await
+        .map_err(|e| ExecutionError::CanisterCallFailed {
+            canister: MAINNET_LEDGER_CANISTER_ID.to_string(),
+            method: "account_balance".to_string(),
+            details: format!("Failed to call ledger: {:?}", e),
+        });
     // Convert the Tokens to u64 (in e8s) and return
     result.map(|tokens| tokens.e8s())
 }
 
 pub(crate) async fn get_alex_fee() -> Result<u64, ExecutionError> {
     let alex_canister_id: Principal = get_principal(ALEX_CANISTER_ID);
-    let result: Result<(Nat,), (RejectionCode, String)> = 
+    let result: Result<(Nat,), (RejectionCode, String)> =
         ic_cdk::call(alex_canister_id, "icrc1_fee", ()).await;
 
     match result {
-        Ok((fee,)) => fee.0.try_into()
-            .map_err(|_| ExecutionError::Overflow {
-                operation: "fee conversion".to_string(),
-                details: "Fee value exceeds u64 maximum".to_string(),
-            }),
+        Ok((fee,)) => fee.0.try_into().map_err(|_| ExecutionError::Overflow {
+            operation: "fee conversion".to_string(),
+            details: "Fee value exceeds u64 maximum".to_string(),
+        }),
         Err((code, msg)) => Err(ExecutionError::CanisterCallFailed {
             canister: ALEX_CANISTER_ID.to_string(),
             method: "icrc1_fee".to_string(),
@@ -266,4 +308,3 @@ pub enum ExchangeRateError {
     StablecoinRateNotFound,
     Pending,
 }
-
