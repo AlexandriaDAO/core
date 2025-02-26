@@ -6,6 +6,9 @@ import { toggleSortDirection } from './librarySlice';
 import { AppDispatch } from '@/store';
 import { fetchTokensForPrincipal, FetchTokensParams } from '../nftData/nftDataThunks';
 import { clearNfts } from '../nftData/nftDataSlice';
+import { icrc7 } from '../../../../../../../declarations/icrc7';
+import { icrc7_scion } from '../../../../../../../declarations/icrc7_scion';
+import { Principal } from '@dfinity/principal';
 
 const DEBOUNCE_TIME = 300; // ms
 const DEFAULT_PAGE_SIZE = 20;
@@ -16,10 +19,39 @@ export const togglePrincipalSelection = createAsyncThunk<
   { state: RootState; dispatch: AppDispatch }
 >(
   'library/togglePrincipalSelection',
-  async (principalId: string, { dispatch }) => {
+  async (principalId: string, { dispatch, getState }) => {
     try {
       dispatch(clearNfts());
       dispatch(togglePrincipal(principalId));
+
+      // Get current collection type
+      const state = getState();
+      const collection = state.library.collection;
+
+      // Get total NFT count for the selected principal
+      let totalCount: bigint;
+      if (principalId === 'new') {
+        totalCount = await (collection === 'NFT' ? icrc7.icrc7_total_supply() : icrc7_scion.icrc7_total_supply());
+      } else {
+        const principal = Principal.fromText(principalId);
+        const params = [{ owner: principal, subaccount: [] as [] }];
+        const balance = await (collection === 'NFT' 
+          ? icrc7.icrc7_balance_of(params)
+          : icrc7_scion.icrc7_balance_of(params));
+        totalCount = BigInt(balance[0]);
+      }
+
+      // Update total items in the store
+      dispatch(setTotalItems(Number(totalCount)));
+
+      // Reset search params to start from the beginning
+      const pageSize = state.library.searchParams.pageSize;
+      dispatch(setSearchParams({ 
+        start: 0,
+        end: Math.min(pageSize, Number(totalCount)),
+        pageSize
+      }));
+
       return principalId;
     } catch (error) {
       console.error('Error in togglePrincipalSelection:', error);
@@ -48,7 +80,7 @@ export const performSearch = createAsyncThunk<
     dispatch(setLoading(true));
     
     try {
-      const { selectedPrincipals, collection, searchParams } = state.library;
+      const { selectedPrincipals, collection, searchParams, totalItems } = state.library;
       const pageSize = searchParams.pageSize || DEFAULT_PAGE_SIZE;
 
       if (selectedPrincipals && selectedPrincipals.length > 0 && collection) {
@@ -57,18 +89,18 @@ export const performSearch = createAsyncThunk<
           collection,
           page: 1,
           itemsPerPage: pageSize,
-          startFromEnd: searchParams.start === undefined
+          startFromEnd: searchParams.startFromEnd,
+          totalItems // Pass through the total items for proper pagination
         };
 
         if (searchParams.start !== undefined) {
           params.page = Math.floor(searchParams.start / pageSize) + 1;
-          params.startFromEnd = false;
         }
         
         const result = await dispatch(fetchTokensForPrincipal(params)).unwrap();
         
         const currentState = getState();
-        dispatch(setTotalItems(currentState.nftData.totalNfts));
+        // Don't update totalItems here since we want to preserve the actual total from the contract
         
         const arweaveIds = Object.values(currentState.nftData.nfts)
           .filter(nft => 
@@ -95,8 +127,10 @@ export const updateSearchParams = createAsyncThunk<
   { state: RootState; dispatch: AppDispatch }
 >(
   'library/updateSearchParams',
-  async (params, { dispatch }) => {
-    dispatch(setSearchParams(params));
+  async (params, { dispatch, getState }) => {
+    const state = getState();
+    const currentStartFromEnd = state.library.searchParams.startFromEnd;
+    dispatch(setSearchParams({ ...params, startFromEnd: currentStartFromEnd }));
   }
 );
 

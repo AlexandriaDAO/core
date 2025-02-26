@@ -14,6 +14,7 @@ import { TooltipProvider } from "@/lib/components/tooltip";
 import { Loader2 } from 'lucide-react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
+import type { Transaction } from '../../shared/types/queries';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -44,16 +45,15 @@ const mapCollectionToBackend = (collection: 'NFT' | 'SBT'): 'icrc7' | 'icrc7_sci
 
 const Grid = () => {
   const dispatch = useAppDispatch();
-  const { transactions, contentData, arweaveToNftId } = useSelector((state: RootState) => ({
-    transactions: state.contentDisplay.transactions,
-    contentData: state.contentDisplay.contentData,
-    arweaveToNftId: state.nftData.arweaveToNftId
+  const { transactions, contentData } = useSelector((state: RootState) => ({
+    transactions: state.nftTransactions.transactions,
+    contentData: state.nftTransactions.contentData,
   }));
 
-  const { nfts } = useSelector((state: RootState) => state.nftData);
+  const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
   const { predictions } = useSelector((state: RootState) => state.arweave);
-  const sortedTransactions = useSortedTransactions();
+  const sortedTransactions = useMemo(() => transactions, [transactions]); // No need for sorting since they're already in order
 
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string,assetUrl:string } | null>(null);
@@ -117,9 +117,9 @@ const Grid = () => {
     <TooltipProvider>
       <>
         <ContentGrid>
-          {sortedTransactions.map((transaction) => {
+          {sortedTransactions.map((transaction: Transaction) => {
             const content = contentData[transaction.id];
-            const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+            const contentType = transaction.tags.find((tag: { name: string; value: string }) => tag.name === "Content-Type")?.value || "application/epub+zip";
             
             const nftId = arweaveToNftId[transaction.id];
             const nftData = nftId ? nfts[nftId] : undefined;
@@ -213,7 +213,7 @@ const Grid = () => {
               <div className="w-full h-full">
                 <ContentRenderer
                   key={selectedContent.id}
-                  transaction={transactions.find(t => t.id === selectedContent.id)!}
+                  transaction={transactions.find((t: Transaction) => t.id === selectedContent.id)!}
                   content={contentData[selectedContent.id]}
                   contentUrls={contentData[selectedContent.id]?.urls || {
                     thumbnailUrl: null,

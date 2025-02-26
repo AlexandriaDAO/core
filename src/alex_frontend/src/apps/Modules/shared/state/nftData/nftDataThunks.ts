@@ -16,6 +16,7 @@ import { Principal } from '@dfinity/principal';
 import { natToArweaveId } from '@/utils/id_convert';
 import type { NFTData } from '../../types/nft';
 import { setNoResults } from '../librarySearch/librarySlice';
+import { fetchNFTTransactions } from './nftTransactionsThunks';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -69,6 +70,7 @@ export interface FetchTokensParams {
   page: number;
   itemsPerPage: number;
   startFromEnd?: boolean; // Optional parameter to start from end of supply
+  totalItems?: number; // Optional parameter to specify total items for pagination
 }
 
 export const fetchTokensForPrincipal = createAsyncThunk<
@@ -78,7 +80,7 @@ export const fetchTokensForPrincipal = createAsyncThunk<
 >(
   'nftData/fetchTokensForPrincipal',
   async (
-    { principalId, collection, page, itemsPerPage, startFromEnd = true }, // Default to true to show newest first
+    { principalId, collection, page, itemsPerPage, startFromEnd = true, totalItems }, // Add totalItems to destructuring
     { dispatch }
   ) => {
     try {
@@ -87,11 +89,13 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       dispatch(setNoResults(false));
       
       let allNftIds: bigint[] = [];
-      let totalCount: bigint = BigInt(0);
+      let totalCount: bigint = totalItems ? BigInt(totalItems) : BigInt(0);
       
       if (principalId === 'new') {
-        // For 'new' option, get total supply first
-        totalCount = await (collection === 'NFT' ? icrc7.icrc7_total_supply() : icrc7_scion.icrc7_total_supply());
+        // For 'new' option, get total supply first if not provided
+        if (!totalItems) {
+          totalCount = await (collection === 'NFT' ? icrc7.icrc7_total_supply() : icrc7_scion.icrc7_total_supply());
+        }
         
         // Calculate the start index based on whether we want newest or oldest first
         let start: number;
@@ -159,6 +163,10 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       const nftRecord = Object.fromEntries(nftEntries);
       
       dispatch(setNfts(nftRecord));
+
+      // Fetch transactions for the NFTs
+      const arweaveIds = Object.values(nftRecord).map(nft => nft.arweaveId);
+      await dispatch(fetchNFTTransactions(arweaveIds)).unwrap();
 
       // Fetch balances for the current page
       const convertE8sToToken = (e8sAmount: bigint): string => {

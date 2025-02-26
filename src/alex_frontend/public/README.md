@@ -94,7 +94,7 @@ ALEX is mined when LBRY is burned, up to a hard cap of 21 Million.
 
 ### LBRY Token
 
-LBRY's supply is entirely managed by the "icp_swap" canister which uses the Exchange Rate Canister to keep the mint rate fixed at one cent per LBRY (unless ICP goes below $5 at which point it will stay at that fixed rate). Anyone can mint by sending ICP to the canister, which also serves as the staking contract.
+LBRY's supply is entirely managed by the "icp_swap" canister which uses the Exchange Rate Canister to keep the mint rate fixed at one cent per LBRY (unless ICP goes below $4 at which point it will stay at that fixed rate). Anyone can mint by sending ICP to the canister, which also serves as the staking contract.
 
 All view-only features are free, but once a user has some LBRY, they can use any LibModules by paying Librarian that hosts it. When storing or otherwise interact with other NFTs, LBRY automatically sends nanopayments to those NFTs as payment.
 

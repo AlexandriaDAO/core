@@ -1,6 +1,6 @@
 #### Features now:
+- Rounded corners on the nft assets?
 - Revert to adils rendering approach without breaking the grid. (problem statement on page bottom).
-- Sort by non-zero nft balances. (Adil's on this)
 - Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
 
 

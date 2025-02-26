@@ -4,7 +4,7 @@ interface SearchParams {
   start: number;
   end: number;
   pageSize: number;
-  searchTerm: string;
+  startFromEnd: boolean;
 }
 
 interface LibraryState {
@@ -30,7 +30,7 @@ const initialState: LibraryState = {
     start: 0,
     end: 20,
     pageSize: 20,
-    searchTerm: ''
+    startFromEnd: true
   },
   lastSearchTimestamp: 0,
   totalItems: 0
@@ -86,9 +86,9 @@ const librarySlice = createSlice({
         collection: state.collection,
         selectedPrincipals: state.selectedPrincipals,
         searchParams: {
-          ...initialState.searchParams,
-          pageSize: state.searchParams.pageSize
-        }
+          ...state.searchParams
+        },
+        totalItems: state.totalItems
       };
     },
     setTotalItems: (state, action: PayloadAction<number>) => {

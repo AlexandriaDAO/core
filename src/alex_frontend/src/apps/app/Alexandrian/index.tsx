@@ -7,7 +7,6 @@ import { AppDispatch, RootState } from "@/store";
 import { performSearch, updateSearchParams } from '@/apps/Modules/shared/state/librarySearch/libraryThunks';
 import { resetSearch } from '@/apps/Modules/shared/state/librarySearch/librarySlice';
 import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
-// import AssetManager from "@/apps/Modules/shared/components/AssetManager";
 import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
 import { clearTransactions, clearContentData } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
