@@ -1,7 +1,13 @@
 use std::fmt::format;
 
 use crate::{
-    get_current_LBRY_ratio, get_distribution_interval, get_total_archived_balance, get_total_unclaimed_icp_reward, guard::*, ExecutionError, DEFAULT_DIVISION_ERROR, DEFAULT_INSUFFICIENT_CANISTER_BALANCE_ERROR, DEFAULT_INVALID_AMOUNT_ERROR, DEFAULT_MINIMUM_REQUIRED_ERROR, DEFAULT_MINT_FAILED, DEFAULT_MULTIPLICATION_OVERFLOW_ERROR, DEFAULT_UNDERFLOW_ERROR
+    get_current_LBRY_ratio, get_distribution_interval, get_total_archived_balance,
+    get_total_unclaimed_icp_reward, guard::*, ExecutionError, DEFAULT_ADDITION_OVERFLOW_ERROR,
+    DEFAULT_BURN_FAILED_ERROR, DEFAULT_DIVISION_ERROR, DEFAULT_INSUFFICIENT_BALANCE_ERROR,
+    DEFAULT_INSUFFICIENT_BALANCE_REWARD_DISTRIBUTION_ERROR,
+    DEFAULT_INSUFFICIENT_CANISTER_BALANCE_ERROR, DEFAULT_INVALID_AMOUNT_ERROR,
+    DEFAULT_MINIMUM_REQUIRED_ERROR, DEFAULT_MINT_FAILED, DEFAULT_MULTIPLICATION_OVERFLOW_ERROR,
+    DEFAULT_TRANSFER_FAILED_ERROR, DEFAULT_UNDERFLOW_ERROR,
 };
 use crate::{get_stake, storage::*};
 use crate::{get_user_archive_balance, utils::*};
@@ -69,60 +75,98 @@ pub async fn swap(
     let caller = ic_cdk::caller();
     let _guard =
         CallerGuard::new(caller).map_err(|e| ExecutionError::Unauthorized(e.to_string()))?;
-
+    register_info_log(
+        caller,
+        "swap",
+        &format!("Swap initiated: {} ICP", amount_icp),
+    );
     if amount_icp < 10_000_000 {
-        return Err(ExecutionError::MinimumRequired {
-            required: 10_000_000,
-            provided: amount_icp,
-            token: "ICP".to_string(),
-            details: DEFAULT_MINIMUM_REQUIRED_ERROR.to_string(),
-        });
+        return Err(ExecutionError::new_with_log(
+            caller,
+            "swap",
+            ExecutionError::MinimumRequired {
+                required: 10_000_000,
+                provided: amount_icp,
+                token: "ICP".to_string(),
+                details: DEFAULT_MINIMUM_REQUIRED_ERROR.to_string(),
+            },
+        ));
     }
 
     deposit_icp_in_canister(amount_icp, from_subaccount)
         .await
-        .map_err(|e| ExecutionError::TransferFailed {
-            source: caller.to_string(),
-            dest: "canister".to_string(),
-            token: "ICP".to_string(),
-            amount: amount_icp,
-            details: e.to_string(),
+        .map_err(|e| {
+            ExecutionError::new_with_log(
+                caller,
+                "swap",
+                ExecutionError::TransferFailed {
+                    source: caller.to_string(),
+                    dest: "canister".to_string(),
+                    token: "ICP".to_string(),
+                    amount: amount_icp,
+                    details: e.to_string(),
+                    reason: DEFAULT_TRANSFER_FAILED_ERROR.to_string(),
+                },
+            )
         })?;
+    register_info_log(
+        caller,
+        "swap",
+        &format!("Successfully deposited {} ICP into canister", amount_icp),
+    );
     let icp_rate_in_cents: u64 = get_current_LBRY_ratio();
-
+    // checke here if return
     let lbry_amount: u64 = amount_icp.checked_mul(icp_rate_in_cents).ok_or_else(|| {
-        ExecutionError::MultiplicationOverflow {
-            operation: DEFAULT_MULTIPLICATION_OVERFLOW_ERROR.to_string(),
-            details: format!(
-                "amount_icp: {} with icp_rate_in_cents: {}",
-                amount_icp, icp_rate_in_cents
-            ),
-        }
+        ExecutionError::new_with_log(
+            caller,
+            "swap",
+            ExecutionError::MultiplicationOverflow {
+                operation: DEFAULT_MULTIPLICATION_OVERFLOW_ERROR.to_string(),
+                details: format!(
+                    "amount_icp: {} with icp_rate_in_cents: {}",
+                    amount_icp, icp_rate_in_cents
+                ),
+            },
+        )
     })?;
 
     match mint_LBRY(lbry_amount).await {
-        Ok(_) => {}
+        Ok(_) => {
+            register_info_log(
+                caller,
+                "swap",
+                &format!("Successfully minted {} LBRY tokens", lbry_amount),
+            );
+        }
         Err(e) => {
             // If there was an error, log it in archive trx and return an error result
             let amount_icp_after_fee =
                 amount_icp.checked_sub(ICP_TRANSFER_FEE).ok_or_else(|| {
-                    ExecutionError::Underflow {
-                        operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
-                        details: format!(
-                            "amount_icp: {} with ICP_TRANSFER_FEE: {}",
-                            amount_icp, ICP_TRANSFER_FEE
-                        ),
-                    }
+                    ExecutionError::new_with_log(
+                        caller,
+                        "swap",
+                        ExecutionError::Underflow {
+                            operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
+                            details: format!(
+                                "amount_icp: {} with ICP_TRANSFER_FEE: {}",
+                                amount_icp, ICP_TRANSFER_FEE
+                            ),
+                        },
+                    )
                 })?;
 
             archive_user_transaction(amount_icp_after_fee)?;
 
-            return Err(ExecutionError::MintFailed {
-                token: "LBRY".to_string(),
-                amount: lbry_amount,
-                reason: "LBRY".to_string() + DEFAULT_MINT_FAILED,
-                details: e.to_string(),
-            });
+            return Err(ExecutionError::new_with_log(
+                caller,
+                "swap",
+                ExecutionError::MintFailed {
+                    token: "LBRY".to_string(),
+                    amount: lbry_amount,
+                    reason: "LBRY ".to_string() + DEFAULT_MINT_FAILED,
+                    details: e.to_string(),
+                },
+            ));
         }
     };
 
@@ -177,7 +221,7 @@ pub async fn burn_LBRY(
         return Err(ExecutionError::InvalidAmount {
             amount: amount_icp_e8s,
             reason: DEFAULT_INVALID_AMOUNT_ERROR.to_string(),
-            details: format!("Calculated ICP amount:{} too small",amount_icp_e8s)
+            details: format!("Calculated ICP amount:{} too small", amount_icp_e8s),
         });
     }
 
@@ -186,9 +230,7 @@ pub async fn burn_LBRY(
         Ok(bal) => {
             total_icp_available = bal;
         }
-        Err(e) => {
-            return Err(e)
-        }
+        Err(e) => return Err(e),
     }
     let total_archived_bal: u64 = get_total_archived_balance();
 
@@ -197,31 +239,35 @@ pub async fn burn_LBRY(
     let mut remaining_icp: u64 = total_icp_available
         .checked_sub(total_unclaimed_icp)
         .ok_or_else(|| ExecutionError::Underflow {
-
             operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
-            details: format!("total_icp_available: {} with total_unclaimed_icp: {}", total_icp_available, total_unclaimed_icp),
-          
+            details: format!(
+                "total_icp_available: {} with total_unclaimed_icp: {}",
+                total_icp_available, total_unclaimed_icp
+            ),
         })?;
     remaining_icp = remaining_icp
         .checked_sub(total_archived_bal)
         .ok_or_else(|| ExecutionError::Underflow {
             operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
-            details: format!("remaining_icp: {} with total_archived_bal: {}", remaining_icp, total_archived_bal),
+            details: format!(
+                "remaining_icp: {} with total_archived_bal: {}",
+                remaining_icp, total_archived_bal
+            ),
         })?;
 
     // For burns, we only need to ensure we have enough ICP to pay out
     // No need to reserve 50% since burning increases our ICP reserves
     if amount_icp_e8s > remaining_icp {
         return Err(ExecutionError::InsufficientCanisterBalance {
-            required: amount_icp_e8s ,
-            available: remaining_icp ,
-            details:DEFAULT_INSUFFICIENT_CANISTER_BALANCE_ERROR.to_string()
+            required: amount_icp_e8s,
+            available: remaining_icp,
+            details: DEFAULT_INSUFFICIENT_CANISTER_BALANCE_ERROR.to_string(),
         });
     }
 
     let amount_lbry_e8s = amount_lbry
         .checked_mul(100_000_000) //todo
-        .ok_or_else(|| ExecutionError::MultiplicationOverflow  {
+        .ok_or_else(|| ExecutionError::MultiplicationOverflow {
             operation: DEFAULT_MULTIPLICATION_OVERFLOW_ERROR.to_string(),
             details: format!("amount_lbry: {} with {}", amount_lbry, 100_000_000),
         })?;
@@ -231,34 +277,37 @@ pub async fn burn_LBRY(
         .map_err(|e| ExecutionError::BurnFailed {
             token: "LBRY".to_string(),
             amount: amount_lbry,
-            reason: e.to_string(),
+            details: e.to_string(),
+            reason: DEFAULT_BURN_FAILED_ERROR.to_string(),
         })?;
 
     // Is this the problem since from_subaccount is alice/bob/etc.?
     match send_icp(caller, amount_icp_e8s, None).await {
         Ok(_) => {}
-        Err(_e) => {
+        Err(e) => {
             let amount_icp_after_fee = amount_icp_e8s
                 .checked_mul(2)
-                .ok_or_else(|| ExecutionError::Overflow {
-                    operation: "fee calculation".to_string(),
-                    details: "multiplying amount by 2".to_string(),
+                .ok_or_else(|| ExecutionError::MultiplicationOverflow {
+                    operation: DEFAULT_MULTIPLICATION_OVERFLOW_ERROR.to_string(),
+                    details: format!("amount_icp_e8s: {} with {}", amount_icp_e8s, 2),
                 })?
                 .checked_sub(ICP_TRANSFER_FEE)
                 .ok_or_else(|| ExecutionError::Underflow {
-                    operation: "fee calculation".to_string(),
-                    details: "subtracting transfer fee".to_string(),
+                    operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
+                    details: format!(
+                        "amount_icp_e8s: {} with ICP_TRANSFER_FEE: {}",
+                        amount_icp_e8s, ICP_TRANSFER_FEE
+                    ),
                 })?;
 
-            archive_user_transaction(amount_icp_after_fee).map_err(|e| {
-                ExecutionError::StateError(format!("Failed to archive transaction: {}", e))
-            })?;
+            archive_user_transaction(amount_icp_after_fee)?;
             return Err(ExecutionError::TransferFailed {
                 source: "canister".to_string(),
                 dest: caller.to_string(),
                 token: "ICP".to_string(),
                 amount: amount_icp_e8s,
-                details: "Check Redeem!".to_string(),
+                details: e,
+                reason: DEFAULT_TRANSFER_FAILED_ERROR.to_string(),
             });
         }
     }
@@ -275,16 +324,19 @@ pub async fn burn_LBRY(
                 let amount_icp_after_fee = amount_icp_e8s
                     .checked_sub(ICP_TRANSFER_FEE)
                     .ok_or_else(|| ExecutionError::Underflow {
-                        operation: "fee calculation".to_string(),
-                        details: "subtracting transfer fee".to_string(),
+                        operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
+                        details: format!(
+                            "amount_icp_e8s: {} with ICP_TRANSFER_FEE: {}",
+                            amount_icp_e8s, ICP_TRANSFER_FEE
+                        ),
                     })?;
-                archive_user_transaction(amount_icp_after_fee).map_err(|e| {
-                    ExecutionError::StateError(format!("Failed to archive transaction: {}", e))
-                })?;
+
+                archive_user_transaction(amount_icp_after_fee)?;
                 return Err(ExecutionError::MintFailed {
                     token: "ALEX".to_string(),
                     amount: limit_result,
-                    reason: e.to_string(),
+                    details: e,
+                    reason: DEFAULT_MINT_FAILED.to_string(),
                 });
             }
         }
@@ -447,18 +499,19 @@ async fn stake_ALEX(
         amount
             .checked_sub(alex_fee)
             .ok_or_else(|| ExecutionError::Underflow {
-                operation: "fee calculation".to_string(),
-                details: "Subtracting ALEX fee from stake amount".to_string(),
+                operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
+                details: format!("amount: {} with alex_fee: {}", amount, alex_fee),
             })?;
     // Proceed with transfer
     deposit_token(post_fee_amount, from_subaccount)
         .await
         .map_err(|e| ExecutionError::TransferFailed {
             source: caller.to_string(),
-            dest: "stake".to_string(),
+            dest: "canister".to_string(),
             token: "ALEX".to_string(),
             amount: post_fee_amount,
             details: e.to_string(),
+            reason: DEFAULT_TRANSFER_FAILED_ERROR.to_string(),
         })?;
     let current_time = ic_cdk::api::time();
     STAKES.with(|stakes| -> Result<(), ExecutionError> {
@@ -468,9 +521,12 @@ async fn stake_ALEX(
             Some(existing_stake) => {
                 let mut updated = existing_stake.clone();
                 updated.amount = updated.amount.checked_add(post_fee_amount).ok_or_else(|| {
-                    ExecutionError::Overflow {
-                        operation: "stake amount update".to_string(),
-                        details: "Adding new stake to existing stake amount".to_string(),
+                    ExecutionError::AdditionOverflow {
+                        operation: DEFAULT_ADDITION_OVERFLOW_ERROR.to_string(),
+                        details: format!(
+                            "updated.amount: {} with post_fee_amount: {}",
+                            updated.amount, post_fee_amount
+                        ),
                     }
                 })?;
                 updated.time = current_time;
@@ -519,6 +575,7 @@ async fn un_stake_all_ALEX(from_subaccount: Option<[u8; 32]>) -> Result<String, 
         return Err(ExecutionError::InsufficientBalance {
             required: alex_fee, //Minimum amount
             available: staked_amount,
+            details: DEFAULT_INSUFFICIENT_CANISTER_BALANCE_ERROR.to_string(),
             token: "ALEX".to_string(),
         });
     }
@@ -527,8 +584,11 @@ async fn un_stake_all_ALEX(from_subaccount: Option<[u8; 32]>) -> Result<String, 
         staked_amount
             .checked_sub(alex_fee)
             .ok_or_else(|| ExecutionError::Underflow {
-                operation: "fee calculation".to_string(),
-                details: "Stake amount less than fee".to_string(),
+                operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
+                details: format!(
+                    "staked_amount: {} with alex_fee: {}",
+                    staked_amount, alex_fee
+                ),
             })?;
 
     // Withdraw the token
@@ -539,6 +599,7 @@ async fn un_stake_all_ALEX(from_subaccount: Option<[u8; 32]>) -> Result<String, 
             dest: caller.to_string(),
             token: "ALEX".to_string(),
             amount: post_fee_amount,
+            reason: DEFAULT_TRANSFER_FAILED_ERROR.to_string(),
             details: e.to_string(),
         })?;
 
@@ -547,8 +608,11 @@ async fn un_stake_all_ALEX(from_subaccount: Option<[u8; 32]>) -> Result<String, 
         .amount
         .checked_sub(staked_amount)
         .ok_or_else(|| ExecutionError::Underflow {
-            operation: "stake amount update".to_string(),
-            details: "Subtracting total staked amount".to_string(),
+            operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
+            details: format!(
+                "current_stake.amount: {} with staked_amount: {}",
+                current_stake.amount, staked_amount
+            ),
         })?;
     // Update the stake
     STAKES.with(|stakes| {
@@ -586,29 +650,39 @@ pub async fn distribute_reward() -> Result<String, ExecutionError> {
 
     let unclaimed_icps: u64 = total_unclaimed_icp_reward
         .checked_add(total_archived_bal)
-        .ok_or_else(|| ExecutionError::Overflow {
-            operation: "Calculation in unclaimed_icps".to_string(),
-            details: "Updating unclaimed_icps with total_archived_bal".to_string(),
+        .ok_or_else(|| ExecutionError::AdditionOverflow {
+            operation: DEFAULT_ADDITION_OVERFLOW_ERROR.to_string(),
+            details: format!(
+                "total_unclaimed_icp_reward: {} with total_archived_bal: {}",
+                total_unclaimed_icp_reward, total_archived_bal
+            ),
         })?;
 
     if total_icp_available == 0 || total_icp_available < unclaimed_icps {
         return Err(ExecutionError::InsufficientCanisterBalance {
             required: 1, // required greater than 0
             available: total_icp_available,
+            details: DEFAULT_INSUFFICIENT_CANISTER_BALANCE_ERROR.to_string(),
         });
     }
     let mut total_icp_allocated: u128 = total_icp_available
         .checked_sub((unclaimed_icps as u128).try_into().unwrap())
         .ok_or_else(|| ExecutionError::Underflow {
-            operation: "Calculation in total_icp_allocated".to_string(),
-            details: "Updating total_icp_allocated with total_icp_available".to_string(),
+            operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
+            details: format!(
+                "total_icp_available: {} with unclaimed_icps: {}",
+                total_icp_available, unclaimed_icps
+            ),
         })?
         .into();
     total_icp_allocated = total_icp_allocated
         .checked_mul(staking_percentage as u128)
-        .ok_or_else(|| ExecutionError::Overflow {
-            operation: "total_icp_allocated calculation".to_string(),
-            details: "multiplying total_icp_allocated amount with rate".to_string(),
+        .ok_or_else(|| ExecutionError::MultiplicationOverflow {
+            operation: DEFAULT_MULTIPLICATION_OVERFLOW_ERROR.to_string(),
+            details: format!(
+                "total_icp_allocated: {} with staking_percentage: {}",
+                total_icp_allocated, staking_percentage
+            ),
         })?;
 
     total_icp_allocated =
@@ -621,7 +695,8 @@ pub async fn distribute_reward() -> Result<String, ExecutionError> {
 
     if total_icp_allocated < 1_000_000 {
         return Err(ExecutionError::InsufficientBalanceRewardDistribution {
-            available: total_icp_allocated, //
+            available: total_icp_allocated,
+            details: DEFAULT_INSUFFICIENT_BALANCE_REWARD_DISTRIBUTION_ERROR.to_string(),
         });
     }
 
@@ -634,14 +709,21 @@ pub async fn distribute_reward() -> Result<String, ExecutionError> {
     }
     let mut icp_reward_per_alex = total_icp_allocated
         .checked_mul(SCALING_FACTOR)
-        .ok_or_else(|| ExecutionError::Overflow {
-            operation: "icp_reward_per_alex calculation".to_string(),
-            details: "multiplying total_icp_allocated with SCALING_FACTOR".to_string(),
+        .ok_or_else(|| ExecutionError::MultiplicationOverflow {
+            operation: DEFAULT_MULTIPLICATION_OVERFLOW_ERROR.to_string(),
+            details: format!(
+                "total_icp_allocated: {} with SCALING_FACTOR: {}",
+                total_icp_allocated, SCALING_FACTOR
+            ),
         })?
         .checked_div(total_staked_alex)
         .ok_or_else(|| ExecutionError::DivisionFailed {
-            operation: "Total_staked_alex calculation".to_string(),
-            details: "Please verify the amount is valid and non-zero".to_string(),
+            operation: DEFAULT_DIVISION_ERROR.to_string(),
+            details: format!(
+                "total_icp_allocated * SCALING_FACTOR: {} divided by total_staked_alex: {}",
+                total_icp_allocated * SCALING_FACTOR,
+                total_staked_alex
+            ),
         })?;
 
     let mut total_icp_reward: u128 = 0;
@@ -658,29 +740,42 @@ pub async fn distribute_reward() -> Result<String, ExecutionError> {
             if let Some(mut stake) = stakes_map.get(&principal) {
                 let reward = (stake.amount as u128)
                     .checked_mul(icp_reward_per_alex)
-                    .ok_or_else(|| ExecutionError::Overflow {
-                        operation: "total_icp_allocated calculation".to_string(),
-                        details: "multiplying total_icp_allocated amount with rate".to_string(),
+                    .ok_or_else(|| ExecutionError::MultiplicationOverflow {
+                        operation: DEFAULT_MULTIPLICATION_OVERFLOW_ERROR.to_string(),
+                        details: format!(
+                            "stake.amount: {} with icp_reward_per_alex: {}",
+                            stake.amount, icp_reward_per_alex
+                        ),
                     })?
                     .checked_div(SCALING_FACTOR)
                     .ok_or_else(|| ExecutionError::DivisionFailed {
-                        operation: "reward calculation".to_string(),
-                        details: "Please verify the amount is valid and non-zero".to_string(),
+                        operation: DEFAULT_DIVISION_ERROR.to_string(),
+                        details: format!(
+                            "stake.amount*icp_reward_per_alex: {} with SCALING_FACTOR: {}",
+                            stake.amount as u128 * icp_reward_per_alex,
+                            SCALING_FACTOR
+                        ),
                     })?;
 
                 total_icp_reward =
                     total_icp_reward
                         .checked_add(total_icp_reward)
-                        .ok_or_else(|| ExecutionError::Overflow {
-                            operation: "Calculation in total_icp_reward".to_string(),
-                            details: "Updating total_icp_reward with total_icp_reward".to_string(),
+                        .ok_or_else(|| ExecutionError::AdditionOverflow {
+                            operation: DEFAULT_ADDITION_OVERFLOW_ERROR.to_string(),
+                            details: format!(
+                                "total_icp_reward: {} with total_icp_reward: {}",
+                                total_icp_reward, total_icp_reward
+                            ),
                         })?;
 
                 stake.reward_icp =
                     stake.reward_icp.checked_add(reward as u64).ok_or_else(|| {
-                        ExecutionError::Overflow {
-                            operation: "Calculation in reward_icp".to_string(),
-                            details: "Updating reward_icp with reward".to_string(),
+                        ExecutionError::AdditionOverflow {
+                            operation: DEFAULT_ADDITION_OVERFLOW_ERROR.to_string(),
+                            details: format!(
+                                "stake.reward_icp: {} with reward: {}",
+                                stake.reward_icp, reward
+                            ),
                         }
                     })?;
 
@@ -740,14 +835,20 @@ async fn claim_icp_reward(from_subaccount: Option<[u8; 32]>) -> Result<String, E
                 return Err(ExecutionError::InsufficientCanisterBalance {
                     required: stake.reward_icp,
                     available: total_icp_available,
+                    details: DEFAULT_INSUFFICIENT_CANISTER_BALANCE_ERROR.to_string(),
                 });
             }
-            let amount_after_fee = stake.reward_icp.checked_sub(ICP_TRANSFER_FEE).ok_or(
-                ExecutionError::Underflow {
-                    operation: "Calculate amount_after_fee".to_string(),
-                    details: "Reward amount cannot cover transfer fee".to_string(),
-                },
-            )?;
+            let amount_after_fee =
+                stake
+                    .reward_icp
+                    .checked_sub(ICP_TRANSFER_FEE)
+                    .ok_or_else(|| ExecutionError::Underflow {
+                        operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
+                        details: format!(
+                            "stake.reward_icp: {} with ICP_TRANSFER_FEE: {}",
+                            stake.reward_icp, ICP_TRANSFER_FEE
+                        ),
+                    })?;
             send_icp(caller, amount_after_fee, from_subaccount)
                 .await
                 .map_err(|e| ExecutionError::TransferFailed {
@@ -756,6 +857,7 @@ async fn claim_icp_reward(from_subaccount: Option<[u8; 32]>) -> Result<String, E
                     token: "ICP".to_string(),
                     amount: amount_after_fee,
                     details: e.to_string(),
+                    reason: DEFAULT_TRANSFER_FAILED_ERROR.to_string(),
                 })?;
 
             sub_to_unclaimed_amount(stake.reward_icp)?;
@@ -787,7 +889,7 @@ async fn claim_icp_reward(from_subaccount: Option<[u8; 32]>) -> Result<String, E
     }
 }
 
-pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
+pub async fn get_icp_rate_in_cents() -> Result<u64, ExecutionError> {
     let request: GetExchangeRateRequest = GetExchangeRateRequest {
         base_asset: Asset {
             symbol: "ICP".to_string(),
@@ -817,27 +919,56 @@ pub async fn get_icp_rate_in_cents() -> Result<u64, String> {
                 match response {
                     XRCResponse::Ok(exchange_rate) => {
                         let divisor: u64 =
-                            10_u64.pow(exchange_rate.metadata.decimals.checked_sub(2).ok_or(
-                                "Arithmetic underflow in exchange_rate.metadata.decimals",
+                            10_u64.pow(exchange_rate.metadata.decimals.checked_sub(2).ok_or_else(||
+                                ExecutionError::Underflow {
+                                    operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
+                                    details: format!(
+                                        "exchange_rate.metadata.decimals: {} with ICP_TRANSFER_FEE: {}",
+                                        exchange_rate.metadata.decimals, ICP_TRANSFER_FEE
+                                    ),
+                                },
                             )?);
-                        let mut price_in_cents = exchange_rate.rate.checked_div(divisor).ok_or(
-                            "Division failed in price_in_cents_es8. Please verify it's valid and non-zero"
-                        )?;
+                        let mut price_in_cents = exchange_rate
+                            .rate
+                            .checked_div(divisor)
+                            .ok_or_else(|| ExecutionError::DivisionFailed {
+                                operation: DEFAULT_DIVISION_ERROR.to_string(),
+                                details: format!(
+                                    "exchange_rate.rate: {} with divisor: {}",
+                                    exchange_rate.rate, divisor
+                                ),
+                            })?;
                         if price_in_cents < 400 {
                             price_in_cents = 400;
                         }
-                        let time = ic_cdk::api::time().checked_div(1_000_000_000).ok_or("Division failed in ratio.time. Please verify the amount is valid and non-zero")?;
+                        let time =
+                            ic_cdk::api::time()
+                                .checked_div(1_000_000_000)
+                                .ok_or_else(|| ExecutionError::DivisionFailed {
+                                    operation: DEFAULT_DIVISION_ERROR.to_string(),
+                                    details: format!(
+                                        "time: {} with divisor: {}",
+                                        ic_cdk::api::time(),
+                                        1_000_000_000
+                                    ),
+                                })?;
                         // Update the closure to handle potential errors
                         update_current_LBRY_ratio(price_in_cents, time)?;
 
                         Ok(price_in_cents)
                     }
-                    XRCResponse::Err(err) => Err("Error in XRC response".to_string()),
+                    XRCResponse::Err(err) => Err(ExecutionError::StateError(
+                        "Error in XRC response".to_string(),
+                    )),
                 }
             }
-            Err(_e) => Err("Error in decoding XRC response".to_string()),
+            Err(_e) => Err(ExecutionError::StateError(
+                "Error in decoding XRC response".to_string(),
+            )),
         },
-        Err((_rejection_code, msg)) => Err("Error call rejected".to_string()),
+        Err((_rejection_code, msg)) => Err(ExecutionError::StateError(
+            "Error call rejected".to_string(),
+        )),
     }
 }
 
@@ -854,6 +985,7 @@ async fn redeem(from_subaccount: Option<[u8; 32]>) -> Result<String, ExecutionEr
                     required: 1, //Minimum amount
                     available: trx.icp,
                     token: "ICP".to_string(),
+                    details: DEFAULT_INSUFFICIENT_BALANCE_ERROR.to_string(),
                 });
             }
             let mut total_icp_available: u64 = 0;
@@ -871,6 +1003,7 @@ async fn redeem(from_subaccount: Option<[u8; 32]>) -> Result<String, ExecutionEr
                 return Err(ExecutionError::InsufficientCanisterBalance {
                     required: trx.icp,
                     available: total_icp_available,
+                    details: DEFAULT_INSUFFICIENT_CANISTER_BALANCE_ERROR.to_string(),
                 });
             }
             send_icp(caller, trx.icp, from_subaccount)
@@ -881,6 +1014,7 @@ async fn redeem(from_subaccount: Option<[u8; 32]>) -> Result<String, ExecutionEr
                     token: "ICP".to_string(),
                     amount: trx.icp,
                     details: e.to_string(),
+                    reason: DEFAULT_TRANSFER_FAILED_ERROR.to_string(),
                 })?;
             sub_to_total_archived_balance(trx.icp)?;
 

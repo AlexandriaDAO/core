@@ -1,6 +1,8 @@
 use crate::{
     storage::*,
-    utils::{principal_to_subaccount, DEFAULT_LBRY_RATIO, SCALING_FACTOR, STAKING_REWARD_PERCENTAGE},
+    utils::{
+        principal_to_subaccount, DEFAULT_LBRY_RATIO, SCALING_FACTOR, STAKING_REWARD_PERCENTAGE,
+    },
 };
 use candid::Principal;
 use ic_cdk::{api::caller, query};
@@ -59,7 +61,7 @@ pub fn get_current_LBRY_ratio() -> u64 {
 
     match lbry_ratio_map.get(&()) {
         Some(lbry_ratio) => return lbry_ratio.ratio, // Return the ratio if it exists
-        None => return DEFAULT_LBRY_RATIO,                          //defult case
+        None => return DEFAULT_LBRY_RATIO,           //defult case
     }
 }
 
@@ -115,4 +117,16 @@ pub fn get_all_apy_values() -> Vec<(u32, u128)> {
 #[query]
 pub fn get_scaling_factor() -> u128 {
     return SCALING_FACTOR;
+}
+
+#[query]
+pub fn get_logs(limit: usize) -> Vec<Log> {
+    LOGS.with(|logs| {
+        logs.borrow()
+            .iter()
+            .rev()
+            .take(limit)
+            .map(|(_, log)| log.clone())
+            .collect()
+    })
 }

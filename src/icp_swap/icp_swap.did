@@ -1,36 +1,61 @@
 type ArchiveBalance = record { icp : nat64 };
 type DailyValues = record { values : vec record { nat32; nat } };
 type ExecutionError = variant {
-  Overflow : record { operation : text; details : text };
-  InvalidAmount : record { amount : nat64; reason : text };
+  InvalidAmount : record { details : text; amount : nat64; reason : text };
   Underflow : record { operation : text; details : text };
   DivisionFailed : record { operation : text; details : text };
+  MultiplicationOverflow : record { operation : text; details : text };
+  AdditionOverflow : record { operation : text; details : text };
+  RewardDistributionError : record { reason : text };
   RateLookupFailed : record { details : text };
   InsufficientBalance : record {
     token : text;
     available : nat64;
+    details : text;
     required : nat64;
   };
-  BurnFailed : record { token : text; amount : nat64; reason : text };
+  BurnFailed : record {
+    token : text;
+    details : text;
+    amount : nat64;
+    reason : text;
+  };
   CanisterCallFailed : record {
     method : text;
     canister : text;
     details : text;
   };
   Unauthorized : text;
-  RewardNotReady : record { required_wait : nat64 };
-  InsufficientCanisterBalance : record { available : nat64; required : nat64 };
-  MinimumRequired : record { token : text; provided : nat64; required : nat64 };
+  InsufficientCanisterBalance : record {
+    available : nat64;
+    details : text;
+    required : nat64;
+  };
+  MinimumRequired : record {
+    token : text;
+    provided : nat64;
+    details : text;
+    required : nat64;
+  };
   TransferFailed : record {
     token : text;
     source : text;
     dest : text;
     details : text;
     amount : nat64;
+    reason : text;
   };
   StateError : text;
-  MintFailed : record { token : text; amount : nat64; reason : text };
-  StakingLocked : record { until : nat64; current_time : nat64 };
+  MintFailed : record {
+    token : text;
+    details : text;
+    amount : nat64;
+    reason : text;
+  };
+  InsufficientBalanceRewardDistribution : record {
+    available : nat;
+    details : text;
+  };
 };
 type InitArgs = record {
   apy : opt vec record { nat32; DailyValues };
@@ -42,13 +67,22 @@ type InitArgs = record {
   distribution_intervals : opt nat32;
 };
 type LbryRatio = record { time : nat64; ratio : nat64 };
+type Log = record {
+  function : text;
+  log_type : LogType;
+  timestamp : nat64;
+  caller : principal;
+};
+type LogType = variant {
+  Error : record { error : ExecutionError };
+  Info : record { detail : text };
+};
 type Result = variant { Ok : text; Err : ExecutionError };
-type Result_1 = variant { Ok : text; Err : text };
 type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
 service : (opt InitArgs) -> {
   burn_LBRY : (nat64, opt blob) -> (Result);
   caller_subaccount : () -> (text) query;
-  claim_icp_reward : (opt blob) -> (Result_1);
+  claim_icp_reward : (opt blob) -> (Result);
   get_all_apy_values : () -> (vec record { nat32; nat }) query;
   get_all_archive_balances : () -> (
       vec record { principal; ArchiveBalance },
@@ -57,13 +91,14 @@ service : (opt InitArgs) -> {
   get_current_LBRY_ratio : () -> (nat64) query;
   get_current_staking_reward_percentage : () -> (text) query;
   get_distribution_interval : () -> (nat32) query;
+  get_logs : (nat64) -> (vec Log) query;
   get_scaling_factor : () -> (nat) query;
   get_stake : (principal) -> (opt Stake) query;
   get_stakers_count : () -> (nat64) query;
   get_total_archived_balance : () -> (nat64) query;
   get_total_unclaimed_icp_reward : () -> (nat64) query;
   get_user_archive_balance : (principal) -> (opt ArchiveBalance) query;
-  redeem : (opt blob) -> (Result_1);
+  redeem : (opt blob) -> (Result);
   stake_ALEX : (nat64, opt blob) -> (Result);
   swap : (nat64, opt blob) -> (Result);
   un_stake_all_ALEX : (opt blob) -> (Result);

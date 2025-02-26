@@ -1,6 +1,8 @@
-use candid::CandidType;
+use candid::{CandidType, Principal};
 use core::fmt;
 use serde::Deserialize;
+
+use crate::utils::register_error_log;
 // Math errors
 pub const DEFAULT_ADDITION_OVERFLOW_ERROR: &str = "Addition overflow: The sum exceeds the maximum allowable value.";
 pub const DEFAULT_MULTIPLICATION_OVERFLOW_ERROR: &str = "Multiplication overflow: The result is too large to be represented.";
@@ -19,12 +21,9 @@ pub const DEFAULT_INSUFFICIENT_BALANCE_REWARD_DISTRIBUTION_ERROR: &str = "Insuff
 
 // Operation errors
 pub const DEFAULT_TRANSFER_FAILED_ERROR: &str = "Transfer failed: Unable to complete the transaction.";
-pub const DEFAULT_MINT_FAILED_ERROR: &str = "Minting failed: Please check the redeem process to claim your ICP.";
+pub const DEFAULT_MINT_FAILED_ERROR: &str = " Minting failed: Please check the redeem process to claim your ICP.";
 pub const DEFAULT_BURN_FAILED_ERROR: &str = "Burning failed: Unable to process the burn transaction.";
 
-// State errors
-pub const DEFAULT_STAKING_LOCKED_ERROR: &str = "Staking is locked: You cannot unstake before the lock period expires.";
-pub const DEFAULT_REWARD_NOT_READY_ERROR: &str = "Reward not ready: Please wait for the required duration before claiming rewards.";
 
 // Reward distribution errors
 pub const DEFAULT_REWARD_DISTRIBUTION_ERROR: &str = "Reward distribution failed: Error encountered during calculation.";
@@ -36,7 +35,7 @@ pub const DEFAULT_RATE_LOOKUP_FAILED_ERROR: &str = "Rate lookup failed: Unable t
 // General errors
 pub const DEFAULT_UNAUTHORIZED_ERROR: &str = "Unauthorized: Access is denied due to insufficient permissions.";
 
-#[derive(Debug, CandidType, Deserialize)]
+#[derive(Debug, CandidType, Deserialize,Clone)]
 pub enum ExecutionError {
     // Amount related errors
     MinimumRequired {
@@ -75,6 +74,7 @@ pub enum ExecutionError {
         token: String,
         amount: u64,
         details: String,
+        reason:String,
     },
     MintFailed {
         token: String,
@@ -126,7 +126,16 @@ pub enum ExecutionError {
     StateError(String),
     Unauthorized(String),
 }
-
+fn log_error(caller: Principal, function: &str, error: &ExecutionError) {
+    register_error_log(caller, function, error.clone());
+}
+impl ExecutionError {
+    /// **Automatically logs the error and returns it**
+    pub fn new_with_log(caller: Principal, function: &str, error: ExecutionError) -> Self {
+        log_error(caller, function, &error);
+        error
+    }
+}
 //for debuging
 impl fmt::Display for ExecutionError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -186,6 +195,7 @@ impl fmt::Display for ExecutionError {
                 token,
                 amount,
                 details,
+                reason
             } => {
                 write!(
                     f,

@@ -1,8 +1,5 @@
 use crate::{
-    get_distribution_interval, get_distribution_interval_mem, get_lbry_ratio_mem, get_stake,
-    get_total_archived_balance, get_total_archived_balance_mem, get_total_unclaimed_icp_reward,
-    get_total_unclaimed_icp_reward_mem, ArchiveBalance, ExecutionError, LbryRatio, ALEX_FEE,
-    ARCHIVED_TRANSACTION_LOG,
+    get_distribution_interval, get_distribution_interval_mem, get_lbry_ratio_mem, get_stake, get_total_archived_balance, get_total_archived_balance_mem, get_total_unclaimed_icp_reward, get_total_unclaimed_icp_reward_mem, ArchiveBalance, ExecutionError, LbryRatio, Log, LogType, ALEX_FEE, ARCHIVED_TRANSACTION_LOG, DEFAULT_ADDITION_OVERFLOW_ERROR, DEFAULT_CANISTER_CALL_FAILED_ERROR, DEFAULT_MULTIPLICATION_OVERFLOW_ERROR, DEFAULT_UNDERFLOW_ERROR, LOGS
 };
 use candid::{CandidType, Nat, Principal};
 use ic_cdk::api::call::RejectionCode;
@@ -104,11 +101,11 @@ pub(crate) fn add_to_distribution_intervals(amount: u32) -> Result<(), Execution
     let current_total = get_distribution_interval();
     let new_total = current_total
         .checked_add(amount)
-        .ok_or(ExecutionError::Overflow {
-            operation: "new_total".to_string(),
+        .ok_or_else(|| ExecutionError::AdditionOverflow {
+            operation: DEFAULT_ADDITION_OVERFLOW_ERROR.to_string(),
             details: format!(
-                "Adding {} to current total of {}",
-                amount, current_total
+                "current_total: {} with amount: {}",
+                current_total, amount
             ),
         })?;
     let mut result = get_distribution_interval_mem();
@@ -119,11 +116,11 @@ pub(crate) fn add_to_total_archived_balance(amount: u64) -> Result<(), Execution
     let current_total = get_total_archived_balance();
     let new_total = current_total
         .checked_add(amount)
-        .ok_or(ExecutionError::Overflow {
-            operation: "new_total".to_string(),
+        .ok_or_else(|| ExecutionError::AdditionOverflow {
+            operation: DEFAULT_ADDITION_OVERFLOW_ERROR.to_string(),
             details: format!(
-                "Adding {} to current total of {}",
-                amount, current_total
+                "current_total: {} with amount: {}",
+                current_total, amount
             ),
         })?;
     let mut result = get_total_archived_balance_mem();
@@ -135,10 +132,10 @@ pub(crate) fn sub_to_total_archived_balance(amount: u64) -> Result<(), Execution
     let new_total = current_total
         .checked_sub(amount)
         .ok_or(ExecutionError::Underflow {
-            operation: "sub_to_total_archived_balance".to_string(),
+            operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
             details: format!(
-                "Subtracting {} from current total of {}",
-                amount, current_total
+                "current_total: {} with amount: {}",
+                current_total, amount
             ),
         })?;
     let mut result = get_total_archived_balance_mem();
@@ -149,12 +146,11 @@ pub(crate) fn add_to_unclaimed_amount(amount: u64) -> Result<(), ExecutionError>
     let current_total = get_total_unclaimed_icp_reward();
     let new_total = current_total
         .checked_add(amount)
-        .ok_or(ExecutionError::Overflow{
-            operation: "new_total".to_string(),
+        .ok_or_else(|| ExecutionError::AdditionOverflow {
+            operation: DEFAULT_ADDITION_OVERFLOW_ERROR.to_string(),
             details: format!(
-                "Adding
-                 {} to new_total of {}",
-                amount, current_total
+                "current_total: {} with amount: {}",
+                current_total, amount
             ),
         })?;
     let mut result = get_total_unclaimed_icp_reward_mem();
@@ -166,10 +162,10 @@ pub(crate) fn sub_to_unclaimed_amount(amount: u64) -> Result<(), ExecutionError>
     let new_total = current_total
         .checked_sub(amount)
         .ok_or(ExecutionError::Underflow {
-            operation: "sub_to_unclaimed_amount".to_string(),
+            operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
             details: format!(
-                "Subtracting {} from current total of {}",
-                amount, current_total
+                "current_total: {} with amount: {}",
+                current_total, amount
             ),
         })?;
     let mut result = get_total_unclaimed_icp_reward_mem();
@@ -177,7 +173,7 @@ pub(crate) fn sub_to_unclaimed_amount(amount: u64) -> Result<(), ExecutionError>
     Ok(())
 }
 
-pub(crate) fn update_current_LBRY_ratio(new_ratio: u64, current_time: u64) -> Result<(), String> {
+pub(crate) fn update_current_LBRY_ratio(new_ratio: u64, current_time: u64) -> Result<(), ExecutionError> {
     // Get the StableBTreeMap for LBRY ratio
     let mut lbry_ratio_map = get_lbry_ratio_mem();
 
@@ -207,11 +203,11 @@ pub(crate) fn archive_user_transaction(amount: u64) -> Result<String, ExecutionE
         user_archive.icp = user_archive
             .icp
             .checked_add(amount)
-            .ok_or(ExecutionError::Overflow {
-                operation: "user archive icp".to_string(),
+            .ok_or_else(|| ExecutionError::AdditionOverflow {
+                operation: DEFAULT_ADDITION_OVERFLOW_ERROR.to_string(),
                 details: format!(
-                    "Adding {} to user_archive.icp  {}",
-                    amount, user_archive.icp
+                    "user_archive.icp: {} with amount: {}",
+                    user_archive.icp, amount
                 ),
             })?;
 
@@ -243,7 +239,7 @@ pub(crate) async fn get_total_alex_staked() -> Result<u64, ExecutionError> {
         Err((code, msg)) => Err(ExecutionError::CanisterCallFailed {
             canister: "ALEX".to_string(),
             method: "icrc1_balance_of".to_string(),
-            details: "Could not fetch ALEX balance".to_string(),
+            details: format!("Rejection code: {:?}, Message: {}", code, msg),
         }),
     }
 }
@@ -260,7 +256,7 @@ pub(crate) async fn fetch_canister_icp_balance() -> Result<u64, ExecutionError> 
         .map_err(|e| ExecutionError::CanisterCallFailed {
             canister: MAINNET_LEDGER_CANISTER_ID.to_string(),
             method: "account_balance".to_string(),
-            details: format!("Failed to call ledger: {:?}", e),
+            details: format!("Rejection call failed: {:?}", e),
         });
     // Convert the Tokens to u64 (in e8s) and return
     result.map(|tokens| tokens.e8s())
@@ -272,8 +268,8 @@ pub(crate) async fn get_alex_fee() -> Result<u64, ExecutionError> {
         ic_cdk::call(alex_canister_id, "icrc1_fee", ()).await;
 
     match result {
-        Ok((fee,)) => fee.0.try_into().map_err(|_| ExecutionError::Overflow {
-            operation: "fee conversion".to_string(),
+        Ok((fee,)) => fee.0.try_into().map_err(|_| ExecutionError::MultiplicationOverflow  {
+            operation: DEFAULT_MULTIPLICATION_OVERFLOW_ERROR.to_string(),
             details: "Fee value exceeds u64 maximum".to_string(),
         }),
         Err((code, msg)) => Err(ExecutionError::CanisterCallFailed {
@@ -283,6 +279,34 @@ pub(crate) async fn get_alex_fee() -> Result<u64, ExecutionError> {
         }),
     }
 }
+// Function to register an info log
+pub fn register_info_log(caller: Principal, function: &str, detail: &str) {
+    let timestamp = ic_cdk::api::time();
+    let log_entry = Log {
+        timestamp,
+        caller,
+        function: function.to_string(),
+        log_type: LogType::Info {
+            detail: detail.to_string(),
+        },
+    };
+
+    LOGS.with(|logs| logs.borrow_mut().insert(timestamp, log_entry));
+}
+
+// Function to register an error log
+pub fn register_error_log(caller: Principal, function: &str, error: ExecutionError) {
+    let timestamp = ic_cdk::api::time();
+    let log_entry = Log {
+        timestamp,
+        caller,
+        function: function.to_string(),
+        log_type: LogType::Error { error },
+    };
+
+    LOGS.with(|logs| logs.borrow_mut().insert(timestamp, log_entry));
+}
+
 #[derive(CandidType)]
 struct BalanceOfArgs {
     owner: Principal,
