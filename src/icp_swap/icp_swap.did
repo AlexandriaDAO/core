@@ -70,6 +70,7 @@ type LbryRatio = record { time : nat64; ratio : nat64 };
 type Log = record {
   function : text;
   log_type : LogType;
+  log_id : nat64;
   timestamp : nat64;
   caller : principal;
 };
