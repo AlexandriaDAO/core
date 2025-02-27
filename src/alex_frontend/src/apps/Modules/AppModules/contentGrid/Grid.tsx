@@ -15,6 +15,7 @@ import { Loader2 } from 'lucide-react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import type { Transaction } from '../../shared/types/queries';
+import { useLocation } from 'react-router-dom';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -43,12 +44,39 @@ const mapCollectionToBackend = (collection: 'NFT' | 'SBT'): 'icrc7' | 'icrc7_sci
   return collection === 'NFT' ? 'icrc7' : 'icrc7_scion';
 };
 
-const Grid = () => {
+export type GridDataSource = 'contentDisplay' | 'nftTransactions';
+
+interface GridProps {
+  dataSource?: GridDataSource;
+}
+
+const Grid = ({ dataSource }: GridProps = {}) => {
   const dispatch = useAppDispatch();
-  const { transactions, contentData } = useSelector((state: RootState) => ({
-    transactions: state.nftTransactions.transactions,
-    contentData: state.nftTransactions.contentData,
-  }));
+  const location = useLocation();
+  
+  // Determine which data source to use based on props or route
+  let effectiveDataSource: GridDataSource = dataSource || 'contentDisplay';
+  
+  // If no dataSource prop is provided, try to infer from the route
+  if (!dataSource) {
+    const isAlexandrianRoute = location.pathname.includes('/alexandrian');
+    effectiveDataSource = isAlexandrianRoute ? 'nftTransactions' : 'contentDisplay';
+  }
+  
+  // Select the appropriate state based on the determined data source
+  const { transactions, contentData } = useSelector((state: RootState) => {
+    if (effectiveDataSource === 'nftTransactions') {
+      return {
+        transactions: state.nftTransactions.transactions,
+        contentData: state.nftTransactions.contentData,
+      };
+    } else {
+      return {
+        transactions: state.contentDisplay.transactions,
+        contentData: state.contentDisplay.contentData,
+      };
+    }
+  });
 
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);

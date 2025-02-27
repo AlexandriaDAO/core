@@ -2,7 +2,7 @@ import React, { useState, useEffect, ReactNode, useCallback } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
 import { wipe } from '@/apps/Modules/shared/state/wiper';
-import Grid from "@/apps/Modules/AppModules/contentGrid/Grid";
+import Grid, { GridDataSource } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import {
   PageContainer,
   ControlsContainer,
@@ -28,6 +28,7 @@ interface SearchContainerProps {
   topComponent?: ReactNode;
   filterComponent?: ReactNode;
   showMoreEnabled?: boolean;
+  dataSource?: GridDataSource;
 }
 
 export function SearchContainer({
@@ -40,11 +41,19 @@ export function SearchContainer({
   isLoading = false,
   topComponent,
   filterComponent,
-  showMoreEnabled = true
+  showMoreEnabled = true,
+  dataSource
 }: SearchContainerProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
-  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
+  
+  // Select transactions from the appropriate state slice based on dataSource
+  const transactions = useSelector((state: RootState) => {
+    if (dataSource === 'nftTransactions') {
+      return state.nftTransactions.transactions;
+    }
+    return state.contentDisplay.transactions;
+  });
 
   const handleSearchClick = useCallback(async () => {
     if (!isLoading) {
@@ -128,7 +137,7 @@ export function SearchContainer({
           </SearchFormContainer>
         )}
       </PageContainer>
-      <Grid />
+      <Grid dataSource={dataSource} />
       {showMoreEnabled && transactions.length > 0 && (
         <div className="flex justify-center mt-6 mb-8">
           <Button

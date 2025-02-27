@@ -82,13 +82,18 @@ function Permasearch() {
 			onCancel={handleCancelSearch}
 			isLoading={isLoading}
 			topComponent={
+				<TopupBalanceWarning />
+			}
+			filterComponent={
 				<>
-					<TopupBalanceWarning />
 					<ArweaveOwnerSelector />
+					<div className="mt-6 md:mt-8">
+						<SearchForm />
+					</div>
 				</>
 			}
-			filterComponent={<SearchForm />}
 			showMoreEnabled={true}
+			dataSource="contentDisplay"
 			// useNsfw={true}
 		/>
 	);

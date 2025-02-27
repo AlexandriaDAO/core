@@ -63,6 +63,7 @@ function Alexandrian() {
 				topComponent={<TopupBalanceWarning />}
 				filterComponent={<Library />}
 				showMoreEnabled={true}
+				dataSource="nftTransactions"
 			/>
 			
 		</>

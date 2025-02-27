@@ -1,5 +1,5 @@
 !/bin/bash
-# dfx canister snapshot list alex_frontend --network ic
+# dfx canister snapshot list emporium --network ic
 
 # # Load snapshot
 # dfx canister stop alex_frontend --network ic
@@ -28,7 +28,7 @@ dfx canister start alex_backend --network ic
 
 # alex_frontend
 dfx canister stop alex_frontend --network ic
-dfx canister snapshot create alex_frontend --replace 00000000000000070000000001f0531c0101 --network ic
+dfx canister snapshot create alex_frontend --replace 00000000000000080000000001f0531c0101 --network ic
 dfx canister start alex_frontend --network ic
 
 # alex_wallet

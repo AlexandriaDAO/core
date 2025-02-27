@@ -120,11 +120,12 @@ export default function PrincipalSelector() {
     fetchPrincipals();
   }, [userPrincipal, collection]);
 
-  // Initialize default principal only on mount
+  // Initialize default principal on mount
   React.useEffect(() => {
-    if (selectedPrincipals.length === 0) {
-      dispatch(togglePrincipal('new'));
-    }
+    // Directly dispatch the action to set 'new' as default
+    dispatch(togglePrincipal('new'));
+    // Update search params to trigger index calculation
+    dispatch(updateSearchParams({}));
   }, []); // Empty dependency array means this only runs on mount
 
   const handlePrincipalSelect = async (principalId: string) => {
@@ -150,7 +151,7 @@ export default function PrincipalSelector() {
 
   const getDisplayValue = (value: string) => {
     if (!value) return '';
-    if (value === 'new') return 'New';
+    if (value === 'new') return 'Most Recent';
     if (value === userPrincipal) return 'My Library';
     const principal = principals.find(p => p.principal === value);
     return principal ? principal.username : value;
@@ -178,7 +179,7 @@ export default function PrincipalSelector() {
                 </div>
               ) : (
                 <>
-                  {getDisplayValue(selectedPrincipals[0] || '')}
+                  {getDisplayValue(selectedPrincipals[0] || 'new')}
                   <ChevronsUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0 opacity-50" />
                 </>
               )}
@@ -192,7 +193,7 @@ export default function PrincipalSelector() {
                   <CommandEmpty>No library found.</CommandEmpty>
                   <CommandGroup>
                     <CommandItem
-                      value="New"
+                      value="Most Recent"
                       onSelect={() => handlePrincipalSelect('new')}
                       className="text-sm sm:text-base py-2 sm:py-3"
                     >
@@ -202,7 +203,7 @@ export default function PrincipalSelector() {
                           selectedPrincipals[0] === 'new' ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      New
+                      Most Recent
                     </CommandItem>
                     {userPrincipal && (
                       <CommandItem

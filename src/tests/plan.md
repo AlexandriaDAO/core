@@ -4,8 +4,6 @@ Starting Optimization:
 
 
 #### Features now:
-- Reset button not working on alexandrian. Not actually clearing the state. It's actually really hard, so dont' assume there's and easy fix.
-- More flexibility/testing on pageSelection.
 - Revert to adils rendering approach without breaking the grid. (problem statement on page bottom).
 
 

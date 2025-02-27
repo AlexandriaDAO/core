@@ -70,12 +70,12 @@ export const ControlsContainer = styled.div<{ $isOpen: boolean }>`
   gap: 12px;
   align-items: center;
   justify-content: center;
-  margin-bottom: ${props => props.$isOpen ? '16px' : '0'};
+  margin-bottom: ${props => props.$isOpen ? '8px' : '0'};
   position: relative;
 
   @media (min-width: 768px) {
     gap: 16px;
-    margin-bottom: ${props => props.$isOpen ? '24px' : '0'};
+    margin-bottom: ${props => props.$isOpen ? '12px' : '0'};
   }
 `;
 
@@ -129,7 +129,6 @@ export const SearchButton = styled.button`
   align-items: center;
   gap: 10px;
   flex: 1;
-  max-width: 400px;
   border-radius: 24px;
   background: var(--balancebox, #3A3630);
   border: none;
@@ -166,11 +165,11 @@ export const SearchFormContainer = styled.div<{ $isOpen: boolean }>`
   overflow: hidden;
   transition: all 0.3s ease-in-out;
   margin: 0;
-  padding: ${props => props.$isOpen ? '0.5rem 0' : '0'};
+  padding: ${props => props.$isOpen ? '0.1rem 0 0.5rem 0' : '0'};
   width: 100%;
   max-width: 800px;
 
   @media (min-width: 768px) {
-    padding: ${props => props.$isOpen ? '1rem 0' : '0'};
+    padding: ${props => props.$isOpen ? '0.2rem 0 1rem 0' : '0'};
   }
 `; 
