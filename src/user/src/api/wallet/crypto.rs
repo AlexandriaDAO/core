@@ -193,7 +193,7 @@ pub async fn sign(data: Vec<u8>, id: u64) -> Result<SignatureResponse, String> {
 
     let (response,): (Result<String, String>,) = ic_cdk::api::call::call(
         vetkd_canister_id(),
-        "abe_decrypt",
+        "wbe_decrypt",
         (request,),
     )
     .await
@@ -201,7 +201,7 @@ pub async fn sign(data: Vec<u8>, id: u64) -> Result<SignatureResponse, String> {
 
     let decrypted = response.map_err(|e| format!("Decryption error: {}", e))?;
 
-    ic_cdk::println!("Decrypted key: {}", decrypted);
+    ic_cdk::println!("Decrypted key");
 
     ic_cdk::println!("Starting sign() function");
     ic_cdk::println!("Input data length: {} bytes", data.len());
@@ -209,7 +209,7 @@ pub async fn sign(data: Vec<u8>, id: u64) -> Result<SignatureResponse, String> {
     // Parse the decrypted JWK string
     let jwk_json: Value = serde_json::from_str(&decrypted).map_err(|e| format!("Failed to parse decrypted JWK: {}", e))?;
 
-    ic_cdk::println!("Parsed JWK: {}", jwk_json);
+    ic_cdk::println!("Parsed JWK");
 
     // Get n directly from parsed JWK
     let owner = wallet.public.n.to_string();

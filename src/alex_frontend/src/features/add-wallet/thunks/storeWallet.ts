@@ -5,7 +5,6 @@ import { ibe_encrypt } from "@/services/vetkdService";
 import { SerializedWallet } from "../../wallets/walletsSlice";
 import { serializeWallet } from "../../wallets/utils";
 import { RootState } from "@/store";
-const user_canister_id = process.env.CANISTER_ID_USER!;
 // Define the async thunk
 const storeWallet = createAsyncThunk<
 	SerializedWallet, // This is the return type of the thunk's payload
