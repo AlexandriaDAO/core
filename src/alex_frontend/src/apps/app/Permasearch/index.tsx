@@ -5,11 +5,11 @@ import ArweaveOwnerSelector from '@/apps/Modules/AppModules/search/selectors/Arw
 import { useHandleSearch } from '@/apps/Modules/AppModules/search/hooks/useSearchHandlers';
 import { toast } from 'sonner';
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { setTransactions, clearTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
 import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
-import { useWiper } from '@/apps/Modules/shared/state/wiper';
+import { useWiper, wipe } from '@/apps/Modules/shared/state/wiper';
 import { nsfwService } from '@/apps/Modules/shared/services/nsfwService';
 import { setIsLoading } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
 
@@ -43,7 +43,8 @@ function Permasearch() {
 
 	const handleNewSearch = useCallback(async () => {
 		try {
-			await dispatch(clearTransactions());
+			// Use the wipe thunk to clear all relevant state
+			await dispatch(wipe());
 			return handleSearch().catch(error => {
 				toast.error(error.message || "An error occurred while searching");
 			});
@@ -62,8 +63,12 @@ function Permasearch() {
 	};
 
 	const handleCancelSearch = useCallback(() => {
-		dispatch(setIsLoading(false)); // Stop loading state
-		dispatch(clearTransactions()); // Clear accumulated results
+		// First stop the loading state
+		dispatch(setIsLoading(false));
+		
+		// Use the wipe thunk to clear all relevant state
+		dispatch(wipe());
+		
 		toast.info("Search cancelled");
 	}, [dispatch]);
 

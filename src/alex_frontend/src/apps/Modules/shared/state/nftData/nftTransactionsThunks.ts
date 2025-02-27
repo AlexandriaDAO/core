@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { setTransactions, setContentData, setLoading, setError } from './nftTransactionsSlice';
+import { setTransactions, setContentData, setLoading, setError, clearTransactions } from './nftTransactionsSlice';
 import { fetchTransactionsForAlexandrian } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 import type { Transaction } from '../../types/queries';
@@ -56,4 +56,4 @@ export const fetchNFTTransactions = createAsyncThunk<
       dispatch(setLoading(false));
     }
   }
-); 
+);

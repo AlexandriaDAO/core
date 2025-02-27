@@ -193,11 +193,3 @@ export const updateTransactions = createAsyncThunk(
     }
   }
 );
-
-export const clearAllTransactions = createAsyncThunk(
-  "contentDisplay/clearAllTransactions",
-  async (_, { dispatch }) => {
-    dispatch(clearTransactions());
-    ContentService.clearCache();
-  }
-);

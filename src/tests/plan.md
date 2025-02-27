@@ -1,7 +1,13 @@
+Starting Optimization: 
+
+
+
+
 #### Features now:
-- Rounded corners on the nft assets?
+- Reset button not working on alexandrian. Not actually clearing the state. It's actually really hard, so dont' assume there's and easy fix.
+- More flexibility/testing on pageSelection.
 - Revert to adils rendering approach without breaking the grid. (problem statement on page bottom).
-- Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
+
 
 
 #### Bugs:
