@@ -79,7 +79,6 @@ dfx deploy user --specified-id yo4hu-nqaaa-aaaap-qkmoq-cai
 dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
 dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
 
-dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
 dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 
 dfx deploy emporium --specified-id zdcg2-dqaaa-aaaap-qpnha-cai

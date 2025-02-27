@@ -1,6 +1,5 @@
 export { default as AlexBackendContext } from './AlexBackendContext';
 export { default as AlexContext } from './AlexContext';
-export { default as AlexWalletContext } from './AlexWalletContext';
 export { default as IcpLedgerContext } from './IcpLedgerContext';
 export { default as IcpSwapContext } from './IcpSwapContext';
 export { default as Icrc7Context } from './Icrc7Context';

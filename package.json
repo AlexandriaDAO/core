@@ -130,8 +130,6 @@
 
     "axios": "^1.7.7",
 
-    "azle": "^0.24.2-rc.46",
-
     "babel-loader": "^9.2.1",
 
     "browserify-zlib": "^0.2.0",

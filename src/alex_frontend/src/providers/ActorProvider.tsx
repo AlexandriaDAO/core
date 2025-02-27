@@ -3,7 +3,6 @@ import ComposeProviders from "@/utils/ComposeProviders";
 import {
 	// AlexBackendActor,
 	// AlexActor,
-	AlexWalletActor,
 	// IcpLedgerActor,
 	// IcpSwapActor,
 	// Icrc7Actor,
@@ -25,7 +24,6 @@ const ActorProvider: React.FC<ActorProviderProps> = ({ children }) => {
 			providers={[
 				// AlexBackendActor,
 				// AlexActor,
-				AlexWalletActor,
 				// IcpLedgerActor,
 				// IcpSwapActor,
 				// Icrc7Actor,

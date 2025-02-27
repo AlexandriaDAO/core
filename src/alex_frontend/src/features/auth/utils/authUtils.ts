@@ -8,7 +8,6 @@ import {
   createActor as createUserActor,
   user,
 } from "../../../../../declarations/user";
-import { createActor as createAlexWalletActor } from "../../../../../declarations/alex_wallet";
 import {
   createActor as createIcrc7Actor,
   icrc7,
@@ -134,13 +133,6 @@ export const getActorAlexBackend = () =>
   getActor(alex_backend_canister_id, createAlexBackendActor, alex_backend);
 
 export const getUser = () => getActor(user_canister_id, createUserActor, user);
-
-export const getActorAlexWallet = async () =>
-  getActor(
-    alex_wallet_canister_id,
-    createAlexWalletActor,
-    createAlexWalletActor(alex_wallet_canister_id)
-  );
 
 export const getIcrc7Actor = () =>
   getActor(icrc7_canister_id, createIcrc7Actor, icrc7);
