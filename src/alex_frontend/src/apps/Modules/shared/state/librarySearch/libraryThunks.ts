@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { togglePrincipal, setLoading, setSearchParams, updateLastSearchTimestamp, setTotalItems } from './librarySlice';
+import { togglePrincipal, setLoading, setSearchParams, updateLastSearchTimestamp, setTotalItems, setCollection } from './librarySlice';
 import { updateTransactions } from '@/apps/Modules/shared/state/content/contentDisplayThunks';
 import { RootState } from '@/store';
 import { toggleSortDirection } from './librarySlice';
@@ -131,6 +131,60 @@ export const updateSearchParams = createAsyncThunk<
     const state = getState();
     const currentStartFromEnd = state.library.searchParams.startFromEnd;
     dispatch(setSearchParams({ ...params, startFromEnd: currentStartFromEnd }));
+  }
+);
+
+export const changeCollection = createAsyncThunk<
+  void,
+  'NFT' | 'SBT',
+  { state: RootState; dispatch: AppDispatch }
+>(
+  'library/changeCollection',
+  async (collectionType, { dispatch, getState }) => {
+    try {
+      dispatch(clearNfts());
+      dispatch(setCollection(collectionType));
+      
+      const state = getState();
+      const { selectedPrincipals } = state.library;
+      
+      // Get total count for the selected collection
+      let totalCount: bigint;
+      
+      if (selectedPrincipals.length === 0 || selectedPrincipals[0] === 'new') {
+        // For 'new' option or when no principal is selected, get total supply
+        totalCount = await (collectionType === 'NFT' 
+          ? icrc7.icrc7_total_supply() 
+          : icrc7_scion.icrc7_total_supply());
+      } else {
+        // For specific principal, get their balance
+        const principalId = selectedPrincipals[0];
+        const principal = Principal.fromText(principalId);
+        const params = [{ owner: principal, subaccount: [] as [] }];
+        const balance = await (collectionType === 'NFT' 
+          ? icrc7.icrc7_balance_of(params)
+          : icrc7_scion.icrc7_balance_of(params));
+        totalCount = BigInt(balance[0]);
+      }
+      
+      // Update total items in the store
+      dispatch(setTotalItems(Number(totalCount)));
+      
+      // Reset search params to start from the beginning
+      const pageSize = state.library.searchParams.pageSize;
+      dispatch(setSearchParams({ 
+        start: 0,
+        end: Math.min(pageSize, Number(totalCount)),
+        pageSize
+      }));
+      
+      // Perform search with the new collection type
+      dispatch(performSearch());
+      
+    } catch (error) {
+      console.error('Error in changeCollection:', error);
+      throw error;
+    }
   }
 );
 

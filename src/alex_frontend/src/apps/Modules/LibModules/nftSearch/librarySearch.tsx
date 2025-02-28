@@ -15,10 +15,13 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 const NFTPagination = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { totalItems, searchParams } = useSelector((state: RootState) => state.library);
+  const { totalItems, searchParams, collection } = useSelector((state: RootState) => state.library);
   const currentPage = Math.floor(searchParams.start / searchParams.pageSize) + 1;
   const totalPages = Math.ceil(totalItems / searchParams.pageSize);
   const [pageInput, setPageInput] = useState<string>(currentPage.toString());
+
+  // Get the content type label based on collection
+  const contentTypeLabel = collection === 'SBT' ? 'SBTs' : 'NFTs';
 
   const handlePageChange = (newPage: number) => {
     const start = (newPage - 1) * searchParams.pageSize;
@@ -111,7 +114,7 @@ const NFTPagination = () => {
         <div className="flex items-center space-x-2">
           <span className="text-sm">Page {currentPage} of {totalPages}</span>
           <span className="text-sm text-muted-foreground">
-            (Showing NFTs {searchParams.start + 1}-{Math.min(searchParams.start + searchParams.pageSize, totalItems)} of {totalItems})
+            (Showing {contentTypeLabel} {searchParams.start + 1}-{Math.min(searchParams.start + searchParams.pageSize, totalItems)} of {totalItems})
           </span>
           <Select
             value={searchParams.pageSize.toString()}
