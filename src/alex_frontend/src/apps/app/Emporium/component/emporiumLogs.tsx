@@ -48,7 +48,7 @@ const columns = [
 
             return (
                 <div className="text-[15px]  p-0 bg-[transparent] border-[0] font-medium font-[Syne] dark:text-white flex items-center">
-                    {seller} <span className="ml-2"><CopyHelper account={seller} /></span> 
+                     {seller.slice(0, 5) + "..." + seller.slice(-4) } <span className="ml-2"><CopyHelper account={seller} /></span> 
                 </div>
             );
         }
@@ -98,7 +98,7 @@ const EmporiumMarketLogs: React.FC = () => {
     }, [dispatch]);
 
     return (
-        <div className="p-10 bg-white rounded-[8px] shadow-[0px 2px 10px rgba(0, 0, 0, 0.1)] overflow-x-auto dark:bg-[#3A3630]">
+        <div className="lg:p-10 md:p-8 sm:p-6 xs:p-4 bg-white rounded-[8px] shadow-[0px 2px 10px rgba(0, 0, 0, 0.1)] overflow-x-auto dark:bg-[#3A3630]">
             <h1 className="text-center mb-[20px] text-[#333] dark:text-white">📜 Marketplace Logs</h1>
             {logs.logs.length > 0 && (
                 <Table

@@ -90,7 +90,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
     >
       <CardContent className="flex flex-col items-start p-0">
         <AspectRatio ratio={1} className="w-full relative">
-          <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800  ${component==="Emporium"?" border-gray-900 dark:border-gray-900":"overflow-hidden h-full "}`}  >
+          <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800  ${component==="Emporium"?" border-gray-900 dark:border-gray-900 rounded-[30px]":"overflow-hidden h-full "}`}  >
             {children}
           </div>
           {/* Action button - either Like or Mint */}
