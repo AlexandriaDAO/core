@@ -1,5 +1,3 @@
-use std::fmt::format;
-
 use crate::{
     get_current_LBRY_ratio,
     get_distribution_interval,
@@ -102,7 +100,7 @@ pub async fn swap(
         );
     }
 
-    deposit_icp_in_canister(amount_icp, from_subaccount).await.map_err(|e| {
+    deposit_icp_in_canister(amount_icp, from_subaccount).await.map_err(|e| 
         ExecutionError::new_with_log(caller, "swap", ExecutionError::TransferFailed {
             source: caller.to_string(),
             dest: "canister".to_string(),
@@ -111,7 +109,7 @@ pub async fn swap(
             details: e.to_string(),
             reason: DEFAULT_TRANSFER_FAILED_ERROR.to_string(),
         })
-    })?;
+    )?;
     register_info_log(
         caller,
         "swap",
@@ -119,7 +117,7 @@ pub async fn swap(
     );
     let icp_rate_in_cents: u64 = get_current_LBRY_ratio();
     // checke here if return
-    let lbry_amount: u64 = amount_icp.checked_mul(icp_rate_in_cents).ok_or_else(|| {
+    let lbry_amount: u64 = amount_icp.checked_mul(icp_rate_in_cents).ok_or_else(|| 
         ExecutionError::new_with_log(caller, "swap", ExecutionError::MultiplicationOverflow {
             operation: DEFAULT_MULTIPLICATION_OVERFLOW_ERROR.to_string(),
             details: format!(
@@ -128,19 +126,23 @@ pub async fn swap(
                 icp_rate_in_cents
             ),
         })
-    })?;
+    )?;
 
     match mint_LBRY(lbry_amount).await {
         Ok(_) => {
             register_info_log(
                 caller,
                 "swap",
-                &format!("Successfully swapped {} ICP (e8s) for {} LBRY (e8s) tokens", amount_icp, lbry_amount)
+                &format!(
+                    "Successfully swapped {} ICP (e8s) for {} LBRY (e8s) tokens",
+                    amount_icp,
+                    lbry_amount
+                )
             );
         }
         Err(e) => {
             // If there was an error, log it in archive trx and return an error result
-            let amount_icp_after_fee = amount_icp.checked_sub(ICP_TRANSFER_FEE).ok_or_else(|| {
+            let amount_icp_after_fee = amount_icp.checked_sub(ICP_TRANSFER_FEE).ok_or_else(||
                 ExecutionError::new_with_log(caller, "swap", ExecutionError::Underflow {
                     operation: DEFAULT_UNDERFLOW_ERROR.to_string(),
                     details: format!(
@@ -149,7 +151,7 @@ pub async fn swap(
                         ICP_TRANSFER_FEE
                     ),
                 })
-            })?;
+            )?;
 
             archive_user_transaction(amount_icp_after_fee)?;
 
@@ -175,7 +177,11 @@ pub async fn burn_LBRY(
 ) -> Result<String, ExecutionError> {
     let caller = ic_cdk::caller();
     let _guard = CallerGuard::new(caller).map_err(|e| ExecutionError::Unauthorized(e.to_string()))?;
-    register_info_log(caller, "burn_LBRY", &format!("burn_LBRY initiated: {} LBRY (e8s)", amount_lbry));
+    register_info_log(
+        caller,
+        "burn_LBRY",
+        &format!("burn_LBRY initiated: {} LBRY (e8s)", amount_lbry)
+    );
 
     if amount_lbry < 1 {
         return Err(
@@ -1166,7 +1172,7 @@ pub async fn get_icp_rate_in_cents() -> Result<u64, ExecutionError> {
                             register_info_log(
                                 caller(),
                                 "get_icp_rate_in_cents",
-                                "get_icp_rate_in_cents process completed successfully."
+                                &format!("get_icp_rate_in_cents process completed successfully.Got {} ICP price in cents", price_in_cents)
                             );
 
                             Ok(price_in_cents)
@@ -1278,7 +1284,7 @@ async fn redeem(from_subaccount: Option<[u8; 32]>) -> Result<String, ExecutionEr
                     Ok(())
                 }
             )?;
-          
+
             Ok("Success".to_string())
         }
         None => {

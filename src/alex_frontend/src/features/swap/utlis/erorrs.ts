@@ -112,6 +112,7 @@ export const getErrorMessage = (error: ExecutionErrorData): ErrorMessage => {
   }
 
   if ("MintFailed" in error) {
+    console.log("ok?",error);
     return { title: "Mint Failed", message: getMessage(error.MintFailed!.reason, undefined, error.MintFailed!.details) };
   }
 

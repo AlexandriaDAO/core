@@ -15,7 +15,6 @@ const stakeAlex = createAsyncThunk<
   "icp_swap/stakeAlex",
   async ({ amount, userPrincipal }, { rejectWithValue }) => {
     try {
-      console.log("Yellow!")
       const actorAlex = await getAlexActor();
       const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
       let amountFormat: bigint = BigInt(
@@ -49,7 +48,7 @@ const stakeAlex = createAsyncThunk<
         });
         if ("Err" in resultAlexApprove) {
           const error = resultAlexApprove.Err;
-          let errorMessage = "Unknown error"; // Default error message
+          let errorMessage = "Insufficent funds"; // Default error message
           if ("TemporarilyUnavailable" in error) {
             errorMessage = "Service is temporarily unavailable";
           }
