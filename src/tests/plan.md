@@ -1,5 +1,6 @@
-Starting Optimization: 
-
+#### Before deploy:
+- Fix mint button not showing up when nsfw model is selected.
+- markdown files need imporvement on the info page.
 
 
 
@@ -44,6 +45,13 @@ Starting Optimization:
 
 
 
+#### Alexandria-wide Next Goals: 
+(1) Improve the Emporium app to be more like a real NFT marketplace. Keeping track of what has been sold, etc.
+(2) Start work on a ICP --> AO bridge. I want to be able to bridge ALEX and LBRY to AO, so people can buy it on AO and send it to our site and use it without needing to buy ICP. This could also be a general bridge for other ICRC1 Tokens.
+(3) Make an Autonomous NFT backup cansiter. If you look in the backups repo, we run a script to make a backup of all the NFTs. But there are too many to run this manually, so we need a canister to fetch the latest on a timer and keep updating the backups.
+(4) An app or feature that lets checks all your NFTs for the amount of tokens in them, and orders them by amount so it's easy to withdraw rewards.
+(5) Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
+(6) Add a ledger canister for $ALEX and $LBRY.
 
 
 
@@ -60,7 +68,7 @@ Starting Optimization:
 
 XWKa-Q2gppignoX_Ngs7VJYZPN_yhiy1ToovQ1NBMFs
 NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
-8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8 
+8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I  09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
