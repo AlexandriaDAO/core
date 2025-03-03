@@ -15,7 +15,6 @@ use crate::{
     ALEX_FEE,
     ARCHIVED_TRANSACTION_LOG,
     DEFAULT_ADDITION_OVERFLOW_ERROR,
-    DEFAULT_CANISTER_CALL_FAILED_ERROR,
     DEFAULT_MULTIPLICATION_OVERFLOW_ERROR,
     DEFAULT_UNDERFLOW_ERROR,
     LOGS,
@@ -40,6 +39,7 @@ pub const SCALING_FACTOR: u128 = 1_000_000_000_000; // Adjust based on your prec
 pub const BURN_CYCLE_FEE: u64 = 10_000_000_000;
 pub const DEFAULT_LBRY_RATIO: u64 = 400;
 pub const E8S: u64 = 100_000_000;
+pub const LOGS_LIMIT: u64 = 100_000;
 
 pub fn verify_caller_balance(amount: u64) -> bool {
     let caller_stake = get_stake(caller());
@@ -353,25 +353,29 @@ pub(crate) async fn get_alex_fee() -> Result<u64, ExecutionError> {
                 details: "Fee value exceeds u64 maximum".to_string(),
             }),
         Err((code, msg)) =>
-            Err(ExecutionError::new_with_log(
-                caller(),
-                "get_alex_fee",ExecutionError::CanisterCallFailed {
-                canister: ALEX_CANISTER_ID.to_string(),
-                method: "icrc1_fee".to_string(),
-                details: format!("Rejection code: {:?}, Message: {}", code, msg),
-            })),
+            Err(
+                ExecutionError::new_with_log(
+                    caller(),
+                    "get_alex_fee",
+                    ExecutionError::CanisterCallFailed {
+                        canister: ALEX_CANISTER_ID.to_string(),
+                        method: "icrc1_fee".to_string(),
+                        details: format!("Rejection code: {:?}, Message: {}", code, msg),
+                    }
+                )
+            ),
     }
 }
 // Function to register an info log
 
 pub fn register_info_log(caller: Principal, function: &str, detail: &str) {
     let timestamp = ic_cdk::api::time();
-    let log_id = LOG_COUNTER.with(|counter| {
-        let next_id = *counter.borrow() + 1;
-        *counter.borrow_mut() = next_id;
-        next_id
-    });
-
+    let log_id =
+        LOG_COUNTER.with(|counter| {
+            let next_id = *counter.borrow() + 1;
+            *counter.borrow_mut() = next_id;
+            next_id
+        }) % LOGS_LIMIT;
     let log_entry = Log {
         log_id,
         timestamp,
@@ -387,11 +391,12 @@ pub fn register_info_log(caller: Principal, function: &str, detail: &str) {
 
 // Function to register an error log
 pub fn register_error_log(caller: Principal, function: &str, error: ExecutionError) {
-    let log_id = LOG_COUNTER.with(|counter| {
-        let next_id = *counter.borrow() + 1;
-        *counter.borrow_mut() = next_id;
-        next_id
-    });
+    let log_id =
+        LOG_COUNTER.with(|counter| {
+            let next_id = *counter.borrow() + 1;
+            *counter.borrow_mut() = next_id;
+            next_id
+        }) % LOGS_LIMIT;
     let timestamp = ic_cdk::api::time();
     let log_entry = Log {
         log_id,

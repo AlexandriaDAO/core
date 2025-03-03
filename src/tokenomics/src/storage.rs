@@ -6,7 +6,6 @@ use ic_stable_structures::{
 };
 use serde::Deserialize;
 use std::cell::RefCell;
-use std::{clone, string};
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 pub const LBRY_THRESHOLDS: [u64; 18] = [
