@@ -34,32 +34,29 @@ module.exports = {
       cacheGroups: {
         tensorflow: {
           test: /[\\/]node_modules[\\/](@tensorflow|tfjs-core|tfjs-backend-.*|tfjs-converter)[\\/]/,
-          name: 'tensorflow-bundle',
+          name: 'tensorflow',
           chunks: 'async',
-          priority: 30,
-          enforce: true
-        },
-        tfjs: {
-          test: /[\\/]node_modules[\\/]@tensorflow[\\/]/,
-          name: 'tfjs-chunk',
-          chunks: 'async',
-          priority: 20,
+          priority: 50,
           enforce: true
         },
         nsfwjs: {
           test: /[\\/]node_modules[\\/]nsfwjs[\\/]/,
-          name: 'nsfwjs-chunk',
+          name: 'nsfwjs',
           chunks: 'async',
-          priority: 20,
+          priority: 40,
           enforce: true
         },
-        vendor: {
+        react: {
+          test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-sync-external-store|react-redux)[\\/]/,
+          name: 'react',
+          chunks: 'all',
+          priority: 30,
+        },
+        vendors: {
           test: /[\\/]node_modules[\\/]/,
-          name(module) {
-            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-            return `npm.${packageName.replace('@', '')}`;
-          },
-          priority: 10,
+          name: 'vendors',
+          chunks: 'all',
+          priority: 20,
         },
       },
     },
@@ -85,7 +82,6 @@ module.exports = {
     alias: {
       "@": path.resolve(__dirname, "src", frontendDirectory, "src"),
       stream: "stream-browserify",
-      '@tensorflow/tfjs': path.resolve(__dirname, 'node_modules/@tensorflow/tfjs'),
       'nsfwjs': path.resolve(__dirname, 'node_modules/nsfwjs'),
       './model_imports/inception_v3': 'null-loader',
       './model_imports/mobilenet_v2': 'null-loader',
@@ -163,6 +159,22 @@ module.exports = {
       {
         test: /nsfwjs[\\/]dist[\\/]esm[\\/]models[\\/].*\.(js|json)$/,
         use: 'null-loader',
+      },
+      {
+        test: /[\\/]node_modules[\\/](@tensorflow|tfjs-core|tfjs-backend-.*|tfjs-converter)[\\/]/,
+        sideEffects: true,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env'],
+              plugins: [
+                '@babel/plugin-transform-runtime',
+                '@babel/plugin-proposal-class-properties'
+              ]
+            }
+          }
+        ]
       }
     ],
   },
@@ -211,27 +223,27 @@ module.exports = {
       'require("./model_imports/mobilenet_v2")': '{}',
       'require("./model_imports/mobilenet_v2_mid")': '{}'
     }),
-    // new BundleAnalyzerPlugin({
-    //   analyzerMode: 'server',
-    //   analyzerHost: 'localhost',
-    //   analyzerPort: 8888,
-    //   openAnalyzer: true,
-    //   generateStatsFile: true,
-    //   statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
-    //   statsOptions: {
-    //     all: false,
-    //     assets: true,
-    //     assetsSort: 'size',
-    //     chunks: true,
-    //     chunkModules: false,
-    //     entrypoints: true,
-    //     hash: true,
-    //     modules: false,
-    //     timings: true,
-    //     errors: true,
-    //     warnings: true,
-    //   },
-    // }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'server',
+      analyzerHost: 'localhost',
+      analyzerPort: 8888,
+      openAnalyzer: true,
+      generateStatsFile: true,
+      statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
+      statsOptions: {
+        all: false,
+        assets: true,
+        assetsSort: 'size',
+        chunks: true,
+        chunkModules: false,
+        entrypoints: true,
+        hash: true,
+        modules: false,
+        timings: true,
+        errors: true,
+        warnings: true,
+      },
+    }),
   ],
   devServer: {
     

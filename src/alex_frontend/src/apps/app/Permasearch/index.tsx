@@ -12,6 +12,7 @@ import { RootState } from '@/store';
 import { useWiper, wipe } from '@/apps/Modules/shared/state/wiper';
 import { nsfwService } from '@/apps/Modules/shared/services/nsfwService';
 import { setIsLoading } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
+import TensorFlowPreloader from '@/apps/Modules/shared/components/TensorFlowPreloader';
 
 function Permasearch() {
 	const { isLoading, handleSearch } = useHandleSearch();
@@ -19,28 +20,64 @@ function Permasearch() {
 	const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
 	const lastCursor = useSelector((state: RootState) => state.arweave.lastCursor);
 	const [modelLoading, setModelLoading] = useState(false);
+	const [modelLoadFailed, setModelLoadFailed] = useState(false);
 	useWiper();
 
+	// Clear transactions when component mounts
 	useEffect(() => {
+		console.log('Permasearch component mounted, clearing transactions');
 		dispatch(setTransactions([])); //clear data from emporium 
 		
-		// Preload TensorFlow when component mounts
-		setModelLoading(true);
-		nsfwService.loadModel()
-			.then(() => {
-				setModelLoading(false);
-			})
-			.catch(error => {
-				console.error('Failed to preload TensorFlow:', error);
-				setModelLoading(false);
-			});
-
+		// Cleanup when component unmounts
 		return () => {
-			// Cleanup when component unmounts
+			console.log('Permasearch component unmounting, unloading model');
 			nsfwService.unloadModel();
 		};
+	}, [dispatch]);
+
+	// Handle TensorFlow loaded event
+	const handleTensorFlowLoaded = useCallback(async () => {
+		console.log('TensorFlow loaded, loading NSFW model');
+		try {
+			setModelLoading(true);
+			setModelLoadFailed(false);
+			
+			// Load the NSFW model
+			const success = await nsfwService.loadModel();
+			
+			if (success) {
+				console.log('NSFW model loaded successfully');
+				setModelLoading(false);
+			} else {
+				throw new Error('Failed to load NSFW model');
+			}
+		} catch (error) {
+			console.error('Failed to load NSFW model:', error);
+			setModelLoading(false);
+			setModelLoadFailed(true);
+			
+			// Show error toast only once
+			toast.error('Failed to load content filter. Some images may not be properly filtered.', {
+				id: 'nsfw-model-load-error',
+				duration: 5000
+			});
+		}
 	}, []);
 
+	// Handle TensorFlow loading error
+	const handleTensorFlowError = useCallback((error: Error) => {
+		console.error('Failed to load TensorFlow after retries:', error);
+		setModelLoading(false);
+		setModelLoadFailed(true);
+		
+		// Show error toast only once
+		toast.error('Failed to load content filter. Some images may not be properly filtered.', {
+			id: 'nsfw-model-load-error',
+			duration: 5000
+		});
+	}, []);
+
+	// Handle new search
 	const handleNewSearch = useCallback(async () => {
 		try {
 			// Use the wipe thunk to clear all relevant state
@@ -53,15 +90,17 @@ function Permasearch() {
 		}
 	}, [dispatch, handleSearch]);
 
-	const handleShowMore = () => {
+	// Handle show more
+	const handleShowMore = useCallback(() => {
 		if (transactions.length > 0) {
 			const lastTransaction = transactions[transactions.length - 1];
 			return handleSearch(lastTransaction.block?.timestamp, 50, lastCursor || undefined).catch(error => {
 				toast.error(error.message || "An error occurred while loading more results");
 			});
 		}
-	};
+	}, [transactions, handleSearch, lastCursor]);
 
+	// Handle cancel search
 	const handleCancelSearch = useCallback(() => {
 		// First stop the loading state
 		dispatch(setIsLoading(false));
@@ -73,29 +112,44 @@ function Permasearch() {
 	}, [dispatch]);
 
 	return (
-		<SearchContainer
-			title="Permasearch"
-			description="Search for Arweave assets. Save them as NFTs."
-			hint={modelLoading ? "Loading content safety model..." : "Minting costs 10 LBRY (this will decrease over time)."}
-			onSearch={handleNewSearch}
-			onShowMore={handleShowMore}
-			onCancel={handleCancelSearch}
-			isLoading={isLoading}
-			topComponent={
-				<TopupBalanceWarning />
-			}
-			filterComponent={
-				<>
-					<ArweaveOwnerSelector />
-					<div className="mt-6 md:mt-8">
-						<SearchForm />
-					</div>
-				</>
-			}
-			showMoreEnabled={true}
-			dataSource="contentDisplay"
-			// useNsfw={true}
-		/>
+		<>
+			{/* TensorFlow Preloader with increased retries and delay */}
+			<TensorFlowPreloader 
+				onLoaded={handleTensorFlowLoaded} 
+				onError={handleTensorFlowError}
+				maxRetries={5}
+				retryDelay={2000}
+			/>
+			<SearchContainer
+				title="Permasearch"
+				description="Search for Arweave assets. Save them as NFTs."
+				hint={
+					modelLoading 
+						? "Loading content safety model..." 
+						: modelLoadFailed 
+							? "Content safety model failed to load. Some images may not be filtered." 
+							: "Minting costs 10 LBRY (this will decrease over time)."
+				}
+				onSearch={handleNewSearch}
+				onShowMore={handleShowMore}
+				onCancel={handleCancelSearch}
+				isLoading={isLoading || modelLoading}
+				topComponent={
+					<TopupBalanceWarning />
+				}
+				filterComponent={
+					<>
+						<ArweaveOwnerSelector />
+						<div className="mt-6 md:mt-8">
+							<SearchForm />
+						</div>
+					</>
+				}
+				showMoreEnabled={true}
+				dataSource="contentDisplay"
+				// useNsfw={true}
+			/>
+		</>
 	);
 }
 

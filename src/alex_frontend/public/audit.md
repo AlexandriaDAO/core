@@ -2,6 +2,9 @@
 
 # Alexandria DAO Audit Report
 
+#### This is an exact copy of the official Solidstate Report which can be found [here](https://github.com/solidstate-auditing/audits-public/blob/main/AlexandriaDAO.md).
+
+
 **Index**
 
 - [**Introduction**](#introduction)

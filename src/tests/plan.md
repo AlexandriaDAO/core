@@ -1,12 +1,10 @@
 #### Before deploy:
 - Fix mint button not showing up when nsfw model is selected.
-- markdown files need imporvement on the info page.
-
+- Most recent looks like it's selected when it's actually not.
 
 
 #### Features now:
 - Revert to adils rendering approach without breaking the grid. (problem statement on page bottom).
-
 
 
 #### Bugs:
