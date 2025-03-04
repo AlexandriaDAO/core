@@ -1,13 +1,13 @@
 {
-  "hash": "60ac63d20ba6dd3a790e",
-  "time": 3025,
+  "hash": "59ff87cc5b7105d4e29c",
+  "time": 2064,
   "assetsByChunkName": {
     "index": [
-      "index.079cae1540496077af01.js"
+      "index.bccd5a5f43d7d9e28332.js"
     ],
     "runtime": [
-      "runtime.f691a86d79b109fd3bee.js",
-      "runtime.ef24a58eaad8ce42d33a.hot-update.js"
+      "runtime.ab7f8467366108e88ebb.js",
+      "runtime.bed22482a62361367434.hot-update.js"
     ],
     "tensorflow": [
       "tensorflow.4be6a8c3b41f70633fd6.js"
@@ -27,11 +27,11 @@
       "type": "assets by status",
       "cached": true,
       "filteredChildren": 217,
-      "size": 102248218
+      "size": 102252161
     },
     {
       "type": "asset",
-      "name": "runtime.ef24a58eaad8ce42d33a.hot-update.json",
+      "name": "runtime.bed22482a62361367434.hot-update.json",
       "size": 31,
       "emitted": true,
       "comparedForEmit": false,
@@ -39,7 +39,7 @@
       "info": {
         "hotModuleReplacement": true,
         "immutable": true,
-        "fullhash": "ef24a58eaad8ce42d33a",
+        "fullhash": "bed22482a62361367434",
         "size": 31
       },
       "chunkNames": [],
@@ -49,7 +49,7 @@
     },
     {
       "type": "asset",
-      "name": "runtime.ef24a58eaad8ce42d33a.hot-update.js",
+      "name": "runtime.bed22482a62361367434.hot-update.js",
       "size": 364,
       "emitted": true,
       "comparedForEmit": false,
@@ -57,9 +57,9 @@
       "info": {
         "hotModuleReplacement": true,
         "immutable": true,
-        "fullhash": "ef24a58eaad8ce42d33a",
+        "fullhash": "bed22482a62361367434",
         "related": {
-          "sourceMap": "runtime.ef24a58eaad8ce42d33a.hot-update.js.map"
+          "sourceMap": "runtime.bed22482a62361367434.hot-update.js.map"
         },
         "size": 364
       },
@@ -74,12 +74,12 @@
     {
       "type": "asset",
       "name": "index.html",
-      "size": 1029,
+      "size": 3167,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
-        "size": 1029
+        "size": 3167
       },
       "chunkNames": [],
       "chunkIdHints": [],
@@ -88,17 +88,17 @@
     },
     {
       "type": "asset",
-      "name": "runtime.f691a86d79b109fd3bee.js",
+      "name": "runtime.ab7f8467366108e88ebb.js",
       "size": 57625,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "immutable": true,
-        "contenthash": "f691a86d79b109fd3bee",
+        "contenthash": "ab7f8467366108e88ebb",
         "javascriptModule": false,
         "related": {
-          "sourceMap": "runtime.f691a86d79b109fd3bee.js.map"
+          "sourceMap": "runtime.ab7f8467366108e88ebb.js.map"
         },
         "size": 57625
       },
@@ -187,9 +187,9 @@
       "initial": true,
       "entry": false,
       "recorded": false,
-      "size": 1076127,
+      "size": 1079214,
       "sizes": {
-        "javascript": 732419,
+        "javascript": 735506,
         "asset": 343708
       },
       "names": [
@@ -200,7 +200,7 @@
         "runtime"
       ],
       "files": [
-        "index.079cae1540496077af01.js"
+        "index.bccd5a5f43d7d9e28332.js"
       ],
       "auxiliaryFiles": [
         "2706e15758321713f37b.woff2",
@@ -213,9 +213,9 @@
         "d4e0d9024bb31c64cdde.woff2",
         "d5654c97c405fc2a96a1.woff2",
         "e0620077ae54ca70f144.woff2",
-        "index.079cae1540496077af01.js.map"
+        "index.bccd5a5f43d7d9e28332.js.map"
       ],
-      "hash": "d8baa75e0333b0be232e",
+      "hash": "ab397501f972b8c9f465",
       "childrenByOrder": {}
     },
     {
@@ -291,14 +291,14 @@
         "runtime"
       ],
       "files": [
-        "runtime.f691a86d79b109fd3bee.js",
-        "runtime.ef24a58eaad8ce42d33a.hot-update.js"
+        "runtime.ab7f8467366108e88ebb.js",
+        "runtime.bed22482a62361367434.hot-update.js"
       ],
       "auxiliaryFiles": [
-        "runtime.ef24a58eaad8ce42d33a.hot-update.js.map",
-        "runtime.f691a86d79b109fd3bee.js.map"
+        "runtime.ab7f8467366108e88ebb.js.map",
+        "runtime.bed22482a62361367434.hot-update.js.map"
       ],
-      "hash": "80e93871c71c05fd6841",
+      "hash": "8e4b8dd10aa8adae83e2",
       "childrenByOrder": {}
     },
     {
@@ -425,9 +425,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 56185,
+      "size": 56730,
       "sizes": {
-        "javascript": 56185
+        "javascript": 56730
       },
       "names": [],
       "idHints": [],
@@ -435,12 +435,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_apps_app_Alexandrian_index_tsx.eda496c233732ce6faf4.js"
+        "src_alex_frontend_src_apps_app_Alexandrian_index_tsx.6961c93bb2fea70785b7.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_app_Alexandrian_index_tsx.eda496c233732ce6faf4.js.map"
+        "src_alex_frontend_src_apps_app_Alexandrian_index_tsx.6961c93bb2fea70785b7.js.map"
       ],
-      "hash": "d4683c6b00b6491fb57e",
+      "hash": "6a955fd110f0fe339f91",
       "childrenByOrder": {}
     },
     {
@@ -1348,11 +1348,11 @@
       "name": "index",
       "assets": [
         {
-          "name": "runtime.f691a86d79b109fd3bee.js",
+          "name": "runtime.ab7f8467366108e88ebb.js",
           "size": 57625
         },
         {
-          "name": "runtime.ef24a58eaad8ce42d33a.hot-update.js",
+          "name": "runtime.bed22482a62361367434.hot-update.js",
           "size": 364
         },
         {
@@ -1364,14 +1364,14 @@
           "size": 25585463
         },
         {
-          "name": "index.079cae1540496077af01.js",
-          "size": 1183692
+          "name": "index.bccd5a5f43d7d9e28332.js",
+          "size": 1186895
         }
       ],
       "filteredAssets": 0,
-      "assetsSize": 28101180,
+      "assetsSize": 28104383,
       "filteredAuxiliaryAssets": 16,
-      "auxiliaryAssetsSize": 28493024
+      "auxiliaryAssetsSize": 28498289
     }
   },
   "errors": [],

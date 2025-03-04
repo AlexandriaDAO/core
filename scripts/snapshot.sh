@@ -1,5 +1,5 @@
 !/bin/bash
-# dfx canister snapshot list emporium --network ic
+# dfx canister snapshot list alex_frontend --network ic
 
 # # Load snapshot
 # dfx canister stop alex_frontend --network ic
