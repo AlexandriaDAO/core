@@ -1,63 +1,19 @@
-****
-- Alexandrian app loading really bad at 100 at a time. (should reduce to 20 for now)
-- Auth getting stuck in the loading state with no way to log out.
-- There's an issue where if you stumble upon an asset that won't render, it'll not render any more after it (try retardio's books.)
-
-
-Dark Mode ToDo:
-- Swap page buttons are black when selected in dark mode.
-- Runtime Error modal not in dark mode.
-- FAQ section to match the styles.
-- HTML needs dark mode.
-
-
-
-
-
-
-
-
-
-
-#### Module Design Optimizations
-- Can tagSelector.tsx and contentTagsSelector.tsx and contentTypeToggleGroup.tsx be combined?
-
-
-
-
-
-
-
-
-
-
-
-
-
-#### UI Fixes:
-- Smaller homepage, no scrolling.
-- Dropdown Menu from apps/swap.
-- Hover animmation on apps.
-- FAQ Page Consolidate.
-- Visibility of the login button.
-
-
-
 #### Features now:
-- Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
-- Finish the channels.md plan, given the new text rendering setup.
+- Revert to adils rendering approach without breaking the grid. (problem statement on page bottom).
 
 
 #### Bugs:
-- Need more dynamic states for the like/mint/withdraw buttons.
+- Need more dynamic states for the like/mint/withdraw buttons. (include in this singleTokenView.tsx which duplicates a lot of this logic.)
 - If the mint has succeded the mint button should go away.
 - If you go to the next page on alexandrian while a modal is open it throws an error.
 - On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.
 
 #### Bigger Features (lower priority):
-- Range selection for Alexandrian.
+- Range selection for Alexandrian, e.g., query nfts of a person by 400-500 instead of starting from the latest.
+- Lazy loading all apps, and loading blur to clear instead of top to bottom.
 - Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
 - Put another amount selector by the show more button on permasearch.
+- Just more efficient loading, maybe lossless compression, or lower res on heavy assets. Maybe make this a setting for people based on how good their internet is.
 - Need to combine emporium with main app modules (eventually, not now.).
 - Authmenu.tsx open back up the dashboard and profile.
 - Add the icrc3 canisters to the cycles manager.
@@ -77,6 +33,19 @@ Dark Mode ToDo:
 #### New Apps:
 - Arena style app, full design in channels.md.
 - Collection service for getting all the money from nfts.
+- Perpetua is a good name for one, latin for perpetual/eternal.
+
+
+
+
+
+#### Alexandria-wide Next Goals: 
+(1) Improve the Emporium app to be more like a real NFT marketplace. Keeping track of what has been sold, etc.
+(2) Start work on a ICP --> AO bridge. I want to be able to bridge ALEX and LBRY to AO, so people can buy it on AO and send it to our site and use it without needing to buy ICP. This could also be a general bridge for other ICRC1 Tokens.
+(3) Make an Autonomous NFT backup cansiter. If you look in the backups repo, we run a script to make a backup of all the NFTs. But there are too many to run this manually, so we need a canister to fetch the latest on a timer and keep updating the backups.
+(4) An app or feature that lets checks all your NFTs for the amount of tokens in them, and orders them by amount so it's easy to withdraw rewards.
+(5) Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
+(6) Add a ledger canister for $ALEX and $LBRY.
 
 
 
@@ -89,28 +58,48 @@ Dark Mode ToDo:
 
 
 
-
-
-
-
-
-
-
-
-### Adding channels/blocks/collections to sort NFTs.
-
-Metrics: 
-9.97T Cycles in ICP Swap at 830 am, and it's dispersing once per minute.
-9.765T Cycles at 7am the next day. (But it could also be that it's because it stopped distributing.)
-9.470 Several days later (12/16), right before deploying tests canister. (the tests canister itself has 8.81T cycles at noon before deployment)
-12/19 (3 days later): icp_swap is at 9.025 and tests is at 7.411.
 
 
 XWKa-Q2gppignoX_Ngs7VJYZPN_yhiy1ToovQ1NBMFs
 NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
-8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8 
+8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I  09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
+bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
+
+
+
+
+
+
+Key Issue: Content Loading Flow Inconsistency
+The real problem appears to be in the updateTransactions thunk where there are two distinct paths:
+
+1. Asset Canister Path:
+   - Loads transactions from canister
+   - Processes each transaction individually
+   - Dispatches content loading
+   - Has proper error handling
+   - Works as expected
+
+2. Direct Arweave Path:
+   - Loads transactions via fetchTransactionsForAlexandrian
+   - Only dispatches setTransactions
+   - MISSING: Does not trigger content loading flow
+   - MISSING: No error handling for individual transactions
+
+What's NOT the Problem:
+- Promise chains in asset canister flow (they work correctly)
+- loadContentForTransactions implementation (it works when called)
+- Redux state management (states are being updated correctly)
+- Error handling in content loading (it's properly implemented)
+
+Required Fix:
+The direct Arweave path needs to:
+1. Load transactions
+2. Dispatch setTransactions
+3. Trigger loadContentForTransactions
+4. Maintain consistent error handling with the asset canister path
 
 
 
@@ -118,3 +107,28 @@ QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 
 
 
+
+“Ten Reasons we LP With $BOB, 
+
+and maybe why you should too.”
+
+- It's ICP Whale's Golden Goose and they know it. How do we know?
+
+BOB Mining was highly profitable for the first few weeks. But since the first month, miners have continued to operate at a >50% loss. Why?
+
+- Volatility is just a consequence of something having high-energy. 
+
+We're in an action deprived technical ecosystem. We need to maximize energy.
+     - Saylor Quote/Meme
+
+- It makes ALEX like an index fund since LP is denominated in a diverse basket of assets (ICP/USD/BOB).
+
+- Bots love the arbitrage oportuninties, LPs love the extra yeild, and exchanges love the extra volume.
+
+- We both share the same 21 Million Hard Cap, making $ALEX/$BOB price a 1:1 comparison.
+
+- BOB is a leverage play on ICP. ICP is too big to move far or fast. If you have conviction, make use asymetric bets.
+
+- The reason to LP in the chain-native token is primarily social. This is a clear bias, as something else will outperform that chain's native token.
+
+- Every chain pumps one memecoin as an onramp. SOL with Bonk/Wif, Cardano with SNEK. Except BOB is very much on-brand for ICP (100% on-chain PoW)

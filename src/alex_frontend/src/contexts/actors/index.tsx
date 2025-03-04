@@ -10,5 +10,5 @@ export { default as TokenomicsContext } from './TokenomicsContext';
 export { default as VetkdContext } from './VetkdContext';
 export { default as UserContext } from './UserContext';
 export { default as EmporiumContext } from './EmporiumContext';
-
+export { default as LexigraphContext } from './LexigraphContext';
 

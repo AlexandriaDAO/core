@@ -2,9 +2,9 @@
 # dfx canister snapshot list alex_frontend --network ic
 
 # # Load snapshot
-# dfx canister stop <canister-name> --network ic
-# dfx canister snapshot load <canister-name> <snapshot-id> --network ic
-# dfx canister start <canister-name> --network ic
+# dfx canister stop alex_frontend --network ic
+# dfx canister snapshot load alex_frontend 00000000000000080000000001f0531c0101 --network ic
+# dfx canister start alex_frontend --network ic
 
 set -x
 
@@ -28,7 +28,7 @@ dfx canister start alex_backend --network ic
 
 # alex_frontend
 dfx canister stop alex_frontend --network ic
-dfx canister snapshot create alex_frontend --replace 00000000000000060000000001f0531c0101 --network ic
+dfx canister snapshot create alex_frontend --replace 00000000000000080000000001f0531c0101 --network ic
 dfx canister start alex_frontend --network ic
 
 # alex_wallet

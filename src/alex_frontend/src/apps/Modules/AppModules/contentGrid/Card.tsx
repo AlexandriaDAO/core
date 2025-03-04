@@ -85,12 +85,12 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
 
   return (
     <Card
-      className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative  bg-white dark:bg-gray-900 h-full ${component==="Emporium"?"mb-20 ":"overflow-hidden "}`}
+      className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative  bg-white dark:bg-gray-900 h-full ${component==="Emporium"?"mb-20 rounded-2xl ":"overflow-hidden "}`}
       onClick={onClick} 
     >
       <CardContent className="flex flex-col items-start p-0">
         <AspectRatio ratio={1} className="w-full relative">
-          <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg  ${component==="Emporium"?" border-gray-900 dark:border-gray-900":"overflow-hidden h-full "}`}  >
+          <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800  ${component==="Emporium"?" border-gray-900 dark:border-gray-900":"overflow-hidden h-full "}`}  >
             {children}
           </div>
           {/* Action button - either Like or Mint */}

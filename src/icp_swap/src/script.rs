@@ -3,7 +3,6 @@ use ic_cdk::{self, init, update, post_upgrade};
 use serde::Deserialize;
 use std::time::Duration;
 
-use crate::guard::*;
 use crate::{
     distribute_reward, get_icp_rate_in_cents, ArchiveBalance, DailyValues, LbryRatio, Stake, APY,
     ARCHIVED_TRANSACTION_LOG, DISTRIBUTION_INTERVALS, LBRY_RATIO, STAKES, TOTAL_ARCHIVED_BALANCE,
@@ -12,16 +11,6 @@ use crate::{
 
 pub const REWARD_DISTRIBUTION_INTERVAL: Duration = Duration::from_secs(60*60); // 1 hour.
 pub const PRICE_FETCH_INTERVAL: Duration = Duration::from_secs(1 * 24 * 60 * 60); // 1 days in seconds
-
-//Old init
-// #[init]
-//  fn init() {
-//     ic_cdk_timers::set_timer(Duration::from_secs(0), || {
-//         ic_cdk::spawn(get_icp_rate_cents_wrapper());
-//     });
-//     let _reward_timer_id: ic_cdk_timers::TimerId = ic_cdk_timers::set_timer_interval(REWARD_DISTRIBUTION_INTERVAL, || ic_cdk::spawn(distribute_reward_wrapper()));
-//     let _price_timer_id: ic_cdk_timers::TimerId = ic_cdk_timers::set_timer_interval(PRICE_FETCH_INTERVAL, || ic_cdk::spawn(get_icp_rate_cents_wrapper()));
-// }
 
 #[derive(CandidType, Deserialize, Clone, Default)]
 pub struct InitArgs {
@@ -149,15 +138,13 @@ fn setup_timers() {
         });
 }
 
-#[update(guard = "is_canister")]
-pub async fn distribute_reward_wrapper() {
+async fn distribute_reward_wrapper() {
     match distribute_reward().await {
         Ok(_) => (),
         Err(e) => ic_cdk::println!("Error distributing rewards: {}", e),
     }
 }
-#[update(guard = "is_canister")]
-pub async fn get_icp_rate_cents_wrapper() {
+async fn get_icp_rate_cents_wrapper() {
     match get_icp_rate_in_cents().await {
         Ok(price) => {
             ic_cdk::println!("Price fetch completed without errors");

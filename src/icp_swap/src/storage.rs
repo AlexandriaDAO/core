@@ -24,8 +24,6 @@ pub const ARCHIVED_TRXS_MEM_ID: MemoryId = MemoryId::new(5);
 pub const ARCHIVED_TRANSACTION_LOG_MEM_ID: MemoryId = MemoryId::new(6);
 pub const DISTRIBUTION_INTERVALS_MEM_ID: MemoryId = MemoryId::new(7);
 
-const MAX_VALUE_SIZE: u32 = 100;
-
 thread_local! {
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
         MemoryManager::init(DefaultMemoryImpl::default())
@@ -132,10 +130,7 @@ impl Storable for Stake {
         Decode!(bytes.as_ref(), Self).unwrap()
     }
 
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_VALUE_SIZE,
-        is_fixed_size: false,
-    };
+    const BOUND: Bound = Bound::Unbounded;
 }
 
 impl Storable for ArchiveBalance {
@@ -147,10 +142,7 @@ impl Storable for ArchiveBalance {
         Decode!(bytes.as_ref(), Self).unwrap()
     }
 
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_VALUE_SIZE,
-        is_fixed_size: false,
-    };
+    const BOUND: Bound = Bound::Unbounded;
 }
 impl Storable for LbryRatio {
     fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
@@ -161,10 +153,7 @@ impl Storable for LbryRatio {
         Decode!(bytes.as_ref(), Self).unwrap()
     }
 
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_VALUE_SIZE,
-        is_fixed_size: false,
-    };
+    const BOUND: Bound = Bound::Unbounded;
 }
 impl Storable for DailyValues {
     fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
@@ -175,8 +164,5 @@ impl Storable for DailyValues {
         Decode!(bytes.as_ref(), Self).unwrap()
     }
 
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_VALUE_SIZE,
-        is_fixed_size: false,
-    };
+    const BOUND: Bound = Bound::Unbounded;
 }

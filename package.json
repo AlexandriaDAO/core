@@ -40,13 +40,13 @@
 
     "@apollo/client": "^3.11.8",
 
-    "@dfinity/agent": "^2.0.0",
+    "@dfinity/agent": "^2.3.0",
 
-    "@dfinity/auth-client": "^2.0.0",
+    "@dfinity/auth-client": "^2.3.0",
 
     "@dfinity/candid": "^2.0.0",
 
-    "@dfinity/identity": "^2.0.0",
+    "@dfinity/identity": "^2.3.0",
 
     "@dfinity/ledger-icp": "^2.5.0",
 
@@ -122,6 +122,8 @@
 
     "@types/dompurify": "^3.0.5",
 
+    "@types/react-beautiful-dnd": "^13.1.8",
+
     "antd": "^5.20.5",
 
     "arweave": "^1.15.5",
@@ -164,7 +166,7 @@
 
     "ic-use-actor": "^0.1.0",
 
-    "ic-use-internet-identity": "^0.1.0",
+    "ic-use-internet-identity": "^0.2.0",
 
     "ic-use-siwe-identity": "^0.1.2",
 
@@ -206,6 +208,8 @@
 
     "react": "^18.3.1",
 
+    "react-beautiful-dnd": "^13.1.1",
+
     "react-circle-flags": "^0.0.20",
 
     "react-csv": "^2.2.2",
@@ -213,6 +217,8 @@
     "react-day-picker": "^8.10.1",
 
     "react-dom": "^18.3.1",
+
+    "react-error-boundary": "^5.0.0",
 
     "react-instantsearch-dom": "^6.40.4",
 
@@ -234,6 +240,8 @@
 
     "react-syntax-highlighter": "^15.5.0",
 
+    "remark-gfm": "^4.0.1",
+
     "root": "github:tanstack/react-virtual",
 
     "sonner": "^1.5.0",
@@ -249,6 +257,8 @@
     "tailwindcss": "^3.4.10",
 
     "tailwindcss-animate": "^1.0.7",
+
+    "unist-util-visit": "^5.0.0",
 
     "viem": "^2.21.56",
 

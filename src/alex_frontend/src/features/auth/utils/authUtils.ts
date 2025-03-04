@@ -58,7 +58,22 @@ import {
   icp_swap_factory,
   createActor as createActorIcpSwapFactory,
 } from "../../../../../icp_swap_factory";
-const isLocalDevelopment =process.env.DFX_NETWORK !== "ic";
+import {
+  createActor as createActorAssetCanister,
+  asset_canister,
+} from "../../../../../asset_canister"; 
+
+import {
+  asset_manager,
+  createActor as createActorAssetManager,
+} from "../../../../../declarations/asset_manager";
+
+import {
+  lexigraph,
+  createActor as createActorLexigraph,
+} from "../../../../../declarations/lexigraph";
+
+const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
 
 const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
 const icrc7_canister_id = process.env.CANISTER_ID_ICRC7!;
@@ -74,7 +89,9 @@ const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 const log_canister_id = process.env.CANISTER_ID_LOGS!;
+const lexigraph_canister_id = process.env.CANISTER_ID_LEXIGRAPH!;
 const icp_swap_factory_canister_id = "ggzvv-5qaaa-aaaag-qck7a-cai";
+const asset_manager_canister_id = process.env.CANISTER_ID_ASSET_MANAGER!;
 
 export const getPrincipal = (client: AuthClient): string =>
   client.getIdentity().getPrincipal().toString();
@@ -164,6 +181,9 @@ export const getActorVetkd = () =>
 export const getActorEmporium = () =>
   getActor(emporium_canister_id, createActorEmporium, emporium);
 
+export const getActorLexigraph = () =>
+  getActor(lexigraph_canister_id, createActorLexigraph, lexigraph);
+
 export const getLogs = () => getActor(log_canister_id, createActorLogs, logs);
 
 export const getIcpSwapFactoryCanister = () =>
@@ -172,3 +192,8 @@ export const getIcpSwapFactoryCanister = () =>
     createActorIcpSwapFactory,
     icp_swap_factory
   );
+export const getActorUserAssetCanister = (canisterId: string) =>
+  getActor(canisterId, createActorAssetCanister, asset_canister);
+
+export const getActorAssetManager = () =>
+  getActor(asset_manager_canister_id, createActorAssetManager, asset_manager);

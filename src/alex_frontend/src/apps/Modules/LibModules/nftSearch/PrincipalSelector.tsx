@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
 import { togglePrincipal, setNoResults } from '../../shared/state/librarySearch/librarySlice';
-import { togglePrincipalSelection } from '../../shared/state/librarySearch/libraryThunks';
+import { togglePrincipalSelection, performSearch, updateSearchParams } from '../../shared/state/librarySearch/libraryThunks';
 import { getActorAlexBackend } from "@/features/auth/utils/authUtils";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,10 +36,6 @@ interface PrincipalData {
   hasNFTs: boolean;
 }
 
-interface PrincipalSelectorProps {
-  shouldTriggerSearch?: boolean;
-}
-
 const network = process.env.DFX_NETWORK === "ic" ? "mainnet" : "devnet";
 
 const TEST_PRINCIPALS: NFTUserInfo[] = [
@@ -56,18 +52,27 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
     has_nfts: true,
     has_scion_nfts: true,
     last_updated: BigInt(0)
+  },
+  {
+    principal: "yshkh-urigw-n2o44-nh27v-63lw4-tsura-tgmsp-suuel-wjkaw-z7vmo-hae",
+    username: "Retardio",
+    has_nfts: true,
+    has_scion_nfts: true,
+    last_updated: BigInt(0)
   }
 ];
 
-export default function PrincipalSelector({ shouldTriggerSearch = false }: PrincipalSelectorProps) {
+export default function PrincipalSelector() {
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const noResults = useSelector((state: RootState) => state.library.noResults);
   const collection = useSelector((state: RootState) => state.library.collection);
+  const totalItems = useSelector((state: RootState) => state.library.totalItems);
   const dispatch = useDispatch<AppDispatch>();
   const [principals, setPrincipals] = React.useState<PrincipalData[]>([]);
   const [open, setOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [hasInitialized, setHasInitialized] = React.useState(false);
 
   // Fetch principals from backend
   const fetchPrincipals = async () => {
@@ -113,20 +118,29 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
     }
   };
 
+  // Combined effect for initialization and data fetching
   React.useEffect(() => {
-    fetchPrincipals();
-  }, [userPrincipal, collection]);
-
-  React.useEffect(() => {
-    if (userPrincipal && selectedPrincipals.length === 0) {
-      dispatch(togglePrincipal(userPrincipal));
-    }
-  }, [userPrincipal, selectedPrincipals.length, dispatch]);
+    const initialize = async () => {
+      // First fetch principals
+      await fetchPrincipals();
+      
+      // Then handle initialization if not done yet
+      if (!hasInitialized) {
+        // Force selection of 'new' and trigger search regardless of what's in the state
+        await dispatch(togglePrincipal('new'));
+        await dispatch(togglePrincipalSelection('new'));
+        setHasInitialized(true);
+      }
+    };
+    
+    initialize();
+  }, [userPrincipal, collection, hasInitialized, dispatch]);
 
   const handlePrincipalSelect = async (principalId: string) => {
-    // Always allow selecting My Library
-    if (principalId === userPrincipal) {
-      dispatch(togglePrincipalSelection(principalId));
+    // For 'new' option or My Library, always allow selection
+    if (principalId === 'new' || principalId === userPrincipal) {
+      await dispatch(togglePrincipalSelection(principalId));
+      await dispatch(updateSearchParams({})); // This will trigger index calculation
       setOpen(false);
       return;
     }
@@ -138,12 +152,14 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
       return;
     }
     
-    dispatch(togglePrincipalSelection(principalId));
+    await dispatch(togglePrincipalSelection(principalId));
+    await dispatch(updateSearchParams({})); // This will trigger index calculation
     setOpen(false);
   };
 
   const getDisplayValue = (value: string) => {
     if (!value) return '';
+    if (value === 'new') return 'Most Recent';
     if (value === userPrincipal) return 'My Library';
     const principal = principals.find(p => p.principal === value);
     return principal ? principal.username : value;
@@ -171,7 +187,7 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
                 </div>
               ) : (
                 <>
-                  {getDisplayValue(selectedPrincipals[0] || '')}
+                  {getDisplayValue(selectedPrincipals[0] || 'new')}
                   <ChevronsUpDown className="ml-2 h-3 w-3 sm:h-4 sm:w-4 shrink-0 opacity-50" />
                 </>
               )}
@@ -184,6 +200,19 @@ export default function PrincipalSelector({ shouldTriggerSearch = false }: Princ
                 <CommandList>
                   <CommandEmpty>No library found.</CommandEmpty>
                   <CommandGroup>
+                    <CommandItem
+                      value="Most Recent"
+                      onSelect={() => handlePrincipalSelect('new')}
+                      className="text-sm sm:text-base py-2 sm:py-3"
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-3 w-3 sm:h-4 sm:w-4",
+                          selectedPrincipals[0] === 'new' ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      Most Recent
+                    </CommandItem>
                     {userPrincipal && (
                       <CommandItem
                         value="My Library"

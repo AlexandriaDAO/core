@@ -10,3 +10,4 @@ export { default as useLbry } from './useLbry';
 export { default as useNftManagerAlexWallet } from './useNftManager';
 export { default as useTokenomics } from './useTokenomics';
 export { default as useVetkd } from './useVetkd';
+export { default as useLexigraph } from './useLexigraph';
