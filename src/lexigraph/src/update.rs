@@ -1,5 +1,5 @@
 use candid::{CandidType, Deserialize};
-use crate::storage::{Slot, SlotContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf};
+use crate::storage::{Slot, SlotContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE};
 
 
 #[ic_cdk::update]
@@ -104,7 +104,22 @@ pub fn update_shelf(shelf_id: String, updates: ShelfUpdate) -> Result<(), String
                 }
             }
 
+            // Update timestamp
+            let old_timestamp = shelf.updated_at;
+            let shelf_id_clone = shelf_id.clone();
             shelf.updated_at = ic_cdk::api::time();
+            
+            // Update in global timeline - remove old entry and add new one
+            GLOBAL_TIMELINE.with(|timeline| {
+                let mut timeline_map = timeline.borrow_mut();
+                // Remove any existing entries for this shelf
+                for ts in [old_timestamp, shelf.created_at].iter() {
+                    timeline_map.remove(ts);
+                }
+                // Add with new timestamp
+                timeline_map.insert(shelf.updated_at, shelf_id_clone);
+            });
+            
             shelves_map.insert(shelf_id, shelf);
             Ok(())
         } else {
@@ -238,6 +253,15 @@ pub fn delete_shelf(shelf_id: String) -> Result<(), String> {
             if let Some(mut user_shelves_set) = user_map.get(&shelf.owner) {
                 user_shelves_set.0.retain(|(_, id)| id != &shelf_id);
                 user_map.insert(shelf.owner, user_shelves_set);
+            }
+        });
+        
+        // Remove from global timeline
+        GLOBAL_TIMELINE.with(|timeline| {
+            let mut timeline_map = timeline.borrow_mut();
+            // Remove any entries for this shelf
+            for ts in [shelf.created_at, shelf.updated_at].iter() {
+                timeline_map.remove(ts);
             }
         });
         

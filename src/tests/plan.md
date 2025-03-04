@@ -1,7 +1,6 @@
 #### Features now:
 - Revert to adils rendering approach without breaking the grid. (problem statement on page bottom).
 
-
 #### Bugs:
 - Need more dynamic states for the like/mint/withdraw buttons. (include in this singleTokenView.tsx which duplicates a lot of this logic.)
 - If the mint has succeded the mint button should go away.
@@ -9,6 +8,7 @@
 - On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.
 
 #### Bigger Features (lower priority):
+- Write jest tests for the apps so we can change modules without needing to test all the apps.
 - Range selection for Alexandrian, e.g., query nfts of a person by 400-500 instead of starting from the latest.
 - Lazy loading all apps, and loading blur to clear instead of top to bottom.
 - Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
@@ -21,6 +21,9 @@
 - Autonomous NFT Backup Canister (automate the backup repo logic in a timer autonomous canister.)
 - Likes tracker canister for NFTs. (and maybe secondary method for SBT.)
 - Make coordinate_mint.rs take the NFT_id instead of the arweave_id.
+- Find out why some NFT assets just arent able to render, and fix our rendering logic to fit them in.
+- Payment for minting should come directly from the wallet rather than the topup account. We'll phase out the topup account now.
+- Cache the nsfw model so it doesn't have to be reloaded every time on permasearch.
 
 #### Permasearch Specific:
 
@@ -108,27 +111,5 @@ The direct Arweave path needs to:
 
 
 
-“Ten Reasons we LP With $BOB, 
-
-and maybe why you should too.”
-
-- It's ICP Whale's Golden Goose and they know it. How do we know?
-
-BOB Mining was highly profitable for the first few weeks. But since the first month, miners have continued to operate at a >50% loss. Why?
-
-- Volatility is just a consequence of something having high-energy. 
-
-We're in an action deprived technical ecosystem. We need to maximize energy.
-     - Saylor Quote/Meme
-
-- It makes ALEX like an index fund since LP is denominated in a diverse basket of assets (ICP/USD/BOB).
-
-- Bots love the arbitrage oportuninties, LPs love the extra yeild, and exchanges love the extra volume.
-
-- We both share the same 21 Million Hard Cap, making $ALEX/$BOB price a 1:1 comparison.
-
-- BOB is a leverage play on ICP. ICP is too big to move far or fast. If you have conviction, make use asymetric bets.
 
 - The reason to LP in the chain-native token is primarily social. This is a clear bias, as something else will outperform that chain's native token.
-
-- Every chain pumps one memecoin as an onramp. SOL with Bonk/Wif, Cardano with SNEK. Except BOB is very much on-brand for ICP (100% on-chain PoW)

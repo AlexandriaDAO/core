@@ -122,19 +122,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(png|jpe?g|gif)$/i,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-              outputPath: 'images',
-              publicPath: '/images',
-            },
-          },
-        ],
-      },
-      {
         test: /\.(png|jpe?g|gif|svg)$/i,
         type: 'asset/resource',
       },
@@ -162,22 +149,9 @@ module.exports = {
         use: ['@svgr/webpack'],
       },
       {
-        test: /\.(png|jpe?g|gif)$/i,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              outputPath: 'images',
-              name: '[name].[ext]',
-            },
-          },
-        ],
-      },
-      {
         test: /\.wasm$/,
         type: "webassembly/async",
       },
-      { test: /\\.(png|jp(e*)g|svg|gif)$/, use: ['file-loader'], },
       {
         test: /nsfwjs[\\/]dist[\\/]esm[\\/]models[\\/].*\.(js|json)$/,
         use: 'null-loader',
@@ -266,11 +240,6 @@ module.exports = {
     //     warnings: true,
     //   },
     // }),
-    // Preload critical chunks
-    new webpack.optimize.AggressiveSplittingPlugin({
-      minSize: 10000,
-      maxSize: 30000,
-    }),
   ],
   devServer: {
     

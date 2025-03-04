@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import ReactMarkdown from 'react-markdown';
-import 'github-markdown-css/github-markdown.css';
 import {
 	Accordion,
 	AccordionContent,
