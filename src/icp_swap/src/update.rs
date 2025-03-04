@@ -180,7 +180,7 @@ pub async fn burn_LBRY(
     register_info_log(
         caller,
         "burn_LBRY",
-        &format!("burn_LBRY initiated: {} LBRY (e8s)", amount_lbry)
+        &format!("burn_LBRY initiated: {} LBRY ", amount_lbry)
     );
 
     if amount_lbry < 1 {

@@ -78,6 +78,12 @@ type LogType = variant {
   Error : record { error : ExecutionError };
   Info : record { detail : text };
 };
+type PaginatedLogs = record {
+  page_size : nat64;
+  logs : vec Log;
+  total_pages : nat64;
+  current_page : nat64;
+};
 type Result = variant { Ok : text; Err : ExecutionError };
 type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
 service : (opt InitArgs) -> {
@@ -92,7 +98,7 @@ service : (opt InitArgs) -> {
   get_current_LBRY_ratio : () -> (nat64) query;
   get_current_staking_reward_percentage : () -> (text) query;
   get_distribution_interval : () -> (nat32) query;
-  get_logs : (nat64) -> (vec Log) query;
+  get_logs : (opt nat64, opt nat64) -> (PaginatedLogs) query;
   get_scaling_factor : () -> (nat) query;
   get_stake : (principal) -> (opt Stake) query;
   get_stakers_count : () -> (nat64) query;

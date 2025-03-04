@@ -143,8 +143,8 @@ fn log_error(caller: Principal, function: &str, error: &ExecutionError) {
 impl ExecutionError {
     /// **Automatically logs the error and returns it**
     pub fn new_with_log(caller: Principal, function: &str, error: ExecutionError) -> Self {
-        log_error(caller, function, &error);
-        return error;
+        register_error_log(caller, function, error.clone());
+        error
     }
 }
 //for debuging

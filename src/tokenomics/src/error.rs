@@ -1,5 +1,7 @@
 use candid::{CandidType, Principal};
 use serde::Deserialize;
+
+use crate::register_error_log;
 pub const DEFAULT_ADDITION_OVERFLOW_ERROR: &str =
     "Addition overflow: The sum exceeds the maximum allowable value.";
 pub const DEFAULT_MULTIPLICATION_OVERFLOW_ERROR: &str =
@@ -14,58 +16,14 @@ pub const DEFAULT_MINT_FAILED: &str =
 
 #[derive(Debug, CandidType, Deserialize, Clone)]
 pub enum ExecutionError {
-    // Amount related errors
-    MinimumRequired {
-        required: u64,
-        provided: u64,
-        token: String,
-        details: String,
-    },
-    InvalidAmount {
-        reason: String,
-        amount: u64,
-        details: String,
-    },
-
-    // Balance errors
-    InsufficientBalance {
-        required: u64,
-        available: u64,
-        token: String,
-        details: String,
-    },
-    InsufficientCanisterBalance {
-        required: u64,
-        available: u64,
-        details: String,
-    },
-    InsufficientBalanceRewardDistribution {
-        available: u128,
-        details: String,
-    },
 
     // Operation errors
-    TransferFailed {
-        source: String,
-        dest: String,
-        token: String,
-        amount: u64,
-        details: String,
-        reason: String,
-    },
     MintFailed {
         token: String,
         amount: u64,
         reason: String,
         details: String,
     },
-    BurnFailed {
-        token: String,
-        amount: u64,
-        reason: String,
-        details: String,
-    },
-
     // Math errors
     AdditionOverflow {
         operation: String,
@@ -83,16 +41,10 @@ pub enum ExecutionError {
         operation: String,
         details: String,
     },
-    RewardDistributionError {
-        reason: String,
-    },
     // External errors
     CanisterCallFailed {
         canister: String,
         method: String,
-        details: String,
-    },
-    RateLookupFailed {
         details: String,
     },
     MaxMintAlexReached {
@@ -103,8 +55,12 @@ pub enum ExecutionError {
     }, NoMoreAlexCanbeMinted {
         reason: String,
     },
-    // General errors
-    StateError(String),
-    Unauthorized(String),
+}
+
+impl ExecutionError {
+    pub fn new_with_log(caller: Principal, function: &str, error: ExecutionError) -> Self {
+        register_error_log(caller, function, error.clone());
+        error
+    }
 }
 

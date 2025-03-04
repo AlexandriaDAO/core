@@ -1,11 +1,15 @@
-use candid::CandidType;
-use ic_stable_structures::DefaultMemoryImpl;
+use candid::{CandidType, Decode, Encode, Principal};
+use ic_stable_structures::storable::Bound;
+use ic_stable_structures::{DefaultMemoryImpl, Storable};
 use ic_stable_structures::{
     memory_manager::{MemoryId, MemoryManager, VirtualMemory},
     StableBTreeMap,
 };
 use serde::Deserialize;
+use std::borrow::Cow;
 use std::cell::RefCell;
+
+use crate::ExecutionError;
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 pub const LBRY_THRESHOLDS: [u64; 18] = [
@@ -52,6 +56,10 @@ pub const ALEX_PER_THRESHOLD: [u64; 18] = [
 ];
 pub const TOTAL_LBRY_BURNED_MEM_ID: MemoryId = MemoryId::new(0);
 pub const CURRENT_THRESHOLD_MEM_ID: MemoryId = MemoryId::new(1);
+pub const TOKEN_LOGS_MEM_ID: MemoryId = MemoryId::new(2);
+pub const LOGS_COUNTER_ID: MemoryId = MemoryId::new(3);
+
+
 thread_local! {
     //Tokenomics
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
@@ -65,6 +73,11 @@ thread_local! {
         StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(CURRENT_THRESHOLD_MEM_ID)))
     );
     pub static LOGS: RefCell<Vec<Logs>> = RefCell::new(Vec::new());
+
+    pub static TOKEN_LOGS: RefCell<StableBTreeMap<u64, TokenLogs, Memory>> = RefCell::new(
+        StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(TOKEN_LOGS_MEM_ID)))
+    );
+    pub static TOKEN_LOG_COUNTER: RefCell<u64> = RefCell::new(0);
 
 
 }
@@ -85,4 +98,35 @@ pub fn get_current_threshold_index_mem() -> StableBTreeMap<(), u32, Memory> {
 pub struct Logs{
     pub log:String,
     pub time:u64
+}
+
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct TokenLogs {
+    pub log_id:u64,
+    pub timestamp: u64,
+    pub caller: Principal,
+    pub function: String,
+    pub log_type: TokenLogType,
+}
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub enum TokenLogType {
+    Info {
+        detail: String,
+    },
+    Error {
+        error: ExecutionError,
+    },
+}
+
+impl Storable for TokenLogs {
+    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
 }

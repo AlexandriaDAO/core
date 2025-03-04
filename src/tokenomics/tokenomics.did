@@ -1,4 +1,30 @@
+type ExecutionError = variant {
+  Underflow : record { operation : text; details : text };
+  DivisionFailed : record { operation : text; details : text };
+  MultiplicationOverflow : record { operation : text; details : text };
+  AdditionOverflow : record { operation : text; details : text };
+  MaxAlexPerTrnxReached : record { reason : text };
+  NoMoreAlexCanbeMinted : record { reason : text };
+  CanisterCallFailed : record {
+    method : text;
+    canister : text;
+    details : text;
+  };
+  MaxMintAlexReached : record { reason : text };
+  MintFailed : record {
+    token : text;
+    details : text;
+    amount : nat64;
+    reason : text;
+  };
+};
 type Logs = record { log : text; time : nat64 };
+type PaginatedTokenLogs = record {
+  page_size : nat64;
+  logs : vec TokenLogs;
+  total_pages : nat64;
+  current_page : nat64;
+};
 type RejectionCode = variant {
   NoError;
   CanisterError;
@@ -13,7 +39,19 @@ type Result_1 = variant {
   Ok : record { record { principal; blob }; record { principal; blob } };
   Err : record { RejectionCode; text };
 };
-type Result_2 = variant { Ok : text; Err : text };
+type Result_2 = variant { Ok : text; Err : ExecutionError };
+type Result_3 = variant { Ok : text; Err : text };
+type TokenLogType = variant {
+  Error : record { error : ExecutionError };
+  Info : record { detail : text };
+};
+type TokenLogs = record {
+  function : text;
+  log_type : TokenLogType;
+  log_id : nat64;
+  timestamp : nat64;
+  caller : principal;
+};
 service : {
   fetch_total_minted_ALEX : () -> (Result);
   get_current_ALEX_rate : () -> (nat64) query;
@@ -21,8 +59,9 @@ service : {
   get_current_threshold_index : () -> (nat32) query;
   get_logs : () -> (vec Logs) query;
   get_max_stats : () -> (nat64, nat64) query;
+  get_token_logs : (opt nat64, opt nat64) -> (PaginatedTokenLogs) query;
   get_total_LBRY_burn : () -> (nat64) query;
   get_two_random_nfts : () -> (Result_1);
   mint_ALEX : (nat64, principal, opt blob) -> (Result_2);
-  your_principal : () -> (Result_2) query;
+  your_principal : () -> (Result_3) query;
 }
