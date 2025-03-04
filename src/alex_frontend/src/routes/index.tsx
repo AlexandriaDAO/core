@@ -20,13 +20,12 @@ const NotFoundPage = lazy(()=>import("@/pages/NotFoundPage"));
 const UpgradePage = lazy(()=>import("@/pages/dashboard/UpgradePage"));
 // const LibrarianLayout = lazy(()=>import("@/layouts/LibrarianLayout"));
 const LibrarianPage = lazy(()=>import("@/pages/librarian/"));
-const NodesPage = lazy(()=>import("@/pages/librarian/NodesPage"));
+const WalletsPage = lazy(()=>import("@/pages/librarian/WalletsPage"));
 // const FileUploadPage = lazy(()=>import("@/pages/dashboard/FileUploadPage"));
 const PinaxPage = lazy(()=>import("@/pages/PinaxPage"));
 // const UploadPage = lazy(()=>import("@/pages/dashboard/UploadPage"));
 
 const ManagerPage = lazy(()=>import("@/pages/ManagerPage"));
-const LegacyLibrarianPage = lazy(()=>import("@/pages/LegacyLibrarianPage"));
 // const WhitepaperPage = lazy(()=>import("@/pages/WhitepaperPage"));
 // const FAQPage = lazy(()=>import("@/pages/FAQPage"));
 const InfoPage = lazy(()=>import("@/pages/InfoPage"));
@@ -37,10 +36,8 @@ const Lexigraph = lazy(()=>import("@/apps/app/Lexigraph"));
 const Dialectica = lazy(()=>import("@/apps/app/Dialectica"));
 const Permasearch = lazy(()=>import("@/apps/app/Permasearch"));
 const Emporium = lazy(()=>import("@/apps/app/Emporium"));
-const LegacyCollectionPage = lazy(()=>import("@/apps/app/Emporium/CollectionPage"));
 const SwapPage = lazy(()=>import("@/pages/swap"));
 const DetailTransaction = lazy(()=>import("@/features/swap/components/transactionHistory/detailTransaction"));
-const MintPage = lazy(()=>import("@/pages/MintPage"));
 // const DashboardPage = lazy(()=>import("@/pages/dashboard"));
 const ProfilePage = lazy(()=>import("@/pages/dashboard/ProfilePage"));
 // const EnginesPage = lazy(()=>import("@/pages/dashboard/EnginesPage"));
@@ -57,7 +54,6 @@ const router = createBrowserRouter(
 				<Route index element={<Suspense key="home" fallback={<TopProgressBar />}><HomePage /></Suspense>} />
 				<Route path="nft/:tokenId" element={<Suspense key="nft" fallback={<TopProgressBar />}><SingleTokenView /></Suspense>} />
 				<Route path="manager" element={<Suspense key="manager" fallback={<TopProgressBar />}><ManagerPage /></Suspense>} />
-				<Route path="legacy_librarian" element={<Suspense key="legacy_librarian" fallback={<TopProgressBar />}><LegacyLibrarianPage /></Suspense>} />
 
 				<Route path="info">
 					<Route index element={<Suspense key="info" fallback={<TopProgressBar />}><InfoPage /></Suspense>} />
@@ -74,13 +70,7 @@ const router = createBrowserRouter(
 					<Route path="dialectica" element={<Suspense key="dialectica" fallback={<TopProgressBar />}><Dialectica /></Suspense>} />
 					<Route path="permasearch" element={<Suspense key="permasearch" fallback={<TopProgressBar />}><Permasearch /></Suspense>} />
 
-					<Route path="emporium">
-						<Route index element={<Suspense key="emporium" fallback={<TopProgressBar />}><Emporium /></Suspense>} />
-						<Route
-							path="collection"
-							element={<Suspense key="collection" fallback={<TopProgressBar />}><LegacyCollectionPage /></Suspense>}
-						/>
-					</Route>
+					<Route path="emporium" element={<Suspense key="emporium" fallback={<TopProgressBar />}><Emporium /></Suspense>} />
 				</Route>
 				<Route path="swap">
 					<Route index element={<Suspense key="swap" fallback={<TopProgressBar />}><SwapPage /></Suspense>} />
@@ -96,7 +86,6 @@ const router = createBrowserRouter(
 					<Route path="insights" element={<Suspense key="swap-insights" fallback={<TopProgressBar />}><SwapPage /></Suspense>} />
 					<Route path="transaction" element={<Suspense key="transaction" fallback={<TopProgressBar />}><DetailTransaction /></Suspense>} />
 				</Route>
-				<Route path="mint" element={<Suspense key="mint" fallback={<TopProgressBar />}><MintPage /></Suspense>} />
 
 				<Route path="401" element={<Suspense key="401" fallback={<TopProgressBar />}><UnauthorizedPage /></Suspense>} />
 				<Route path="*" element={<Suspense key="404" fallback={<TopProgressBar />}><NotFoundPage /></Suspense>} />
@@ -110,7 +99,7 @@ const router = createBrowserRouter(
 					<Route path="dashboard" element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
 						<Route element={<LibrarianGuard />}>
 							<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
-							<Route path="nodes" element={<Suspense key="nodes" fallback={<MainPageSkeleton />}><NodesPage /></Suspense>} />
+							<Route path="wallets" element={<Suspense key="wallets" fallback={<MainPageSkeleton />}><WalletsPage /></Suspense>} />
 						</Route>
 
 						<Route path="profile">

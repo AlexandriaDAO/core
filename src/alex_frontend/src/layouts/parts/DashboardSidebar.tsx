@@ -103,7 +103,7 @@ const DashboardSidebar = () => {
                     </NavLink>
 
                     <NavLink
-                        to="nodes"
+                        to="wallets"
                         end
                         className={({ isActive }) => `
                             px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border border-border/75
@@ -111,7 +111,7 @@ const DashboardSidebar = () => {
                         `}
                     >
                         <LayoutList size={18}/>
-                        <span>My Nodes</span>
+                        <span>My Wallets</span>
                     </NavLink>
 
                 </div>
