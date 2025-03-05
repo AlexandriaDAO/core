@@ -49,10 +49,8 @@ export function SearchContainer({
   
   // Select transactions from the appropriate state slice based on dataSource
   const transactions = useSelector((state: RootState) => {
-    if (dataSource === 'nftTransactions') {
-      return state.nftTransactions.transactions;
-    }
-    return state.contentDisplay.transactions;
+    // Always use the new unified transactions state
+    return state.transactions.transactions;
   });
 
   const handleSearchClick = useCallback(async () => {

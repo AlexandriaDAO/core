@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import {
   getActorEmporium,
   getIcrc7Actor,
@@ -6,7 +6,7 @@ import {
 import { arweaveIdToNat, natToArweaveId } from "@/utils/id_convert";
 import LedgerService from "@/utils/LedgerService";
 import { Principal } from "@dfinity/principal";
-import { removeTransactionById } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { removeTransaction } from "@/apps/Modules/shared/state/transactions/transactionThunks";
 import { constrainedMemory } from "process";
 
 const listNft = createAsyncThunk<
@@ -65,7 +65,7 @@ const listNft = createAsyncThunk<
 
       // Handle success or error response
       if ("Ok" in result) {
-        dispatch(removeTransactionById(nftArweaveId));
+        dispatch(removeTransaction(nftArweaveId) as unknown as AnyAction);
 
         return "success";
       } else if ("Err" in result) {

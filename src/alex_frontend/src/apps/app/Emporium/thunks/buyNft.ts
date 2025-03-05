@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import {
   getActorEmporium,
   getIcpLedgerActor,
@@ -6,7 +6,7 @@ import {
 } from "@/features/auth/utils/authUtils";
 import { arweaveIdToNat, natToArweaveId } from "@/utils/id_convert";
 import { Principal } from "@dfinity/principal";
-import { removeTransactionById } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { removeTransaction } from "@/apps/Modules/shared/state/transactions/transactionThunks";
 
 const buyNft = createAsyncThunk<
   string, // Success return type
@@ -65,7 +65,7 @@ const buyNft = createAsyncThunk<
       const result = await actorEmporium.buy_nft(tokenId);
       // Handle success or error response
       if ("Ok" in result) {
-        dispatch(removeTransactionById(nftArweaveId));
+        dispatch(removeTransaction(nftArweaveId) as unknown as AnyAction);
 
         return "success";
       } else if ("Err" in result) {

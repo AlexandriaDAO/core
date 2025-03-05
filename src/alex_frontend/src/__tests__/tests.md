@@ -1,22 +1,7 @@
 cd /home/theseus/alexandria/core && npm test -- src/alex_frontend/src/__tests__/state/libraryState.test.ts
 
 
-1. Core State Management Modules
-These are the most critical to test since they affect multiple apps:
 
-
-### Library Search State (librarySlice.ts & libraryThunks.ts)
-- Test tasks:
-  - Test the resetSearch action
-  - Test the performSearch and updateSearchParams thunks
-  - Verify state updates correctly based on API responses
-
-### Content Display State (contentDisplaySlice.ts)
-- Test tasks:
-  - Test the clearTransactions and clearContentData actions
-  - Verify state updates correctly when transactions are added
-
-2. Critical Shared Components
 
 ### SearchContainer (used in both apps)
 - Test tasks:
@@ -24,11 +9,6 @@ These are the most critical to test since they affect multiple apps:
   - Handles search, show more, and cancel actions
   - Displays loading states correctly
   - Properly renders child components (filters, top component)
-
-### TopupBalanceWarning (used in both apps)
-- Test tasks:
-  - Renders correctly based on balance state
-  - Displays appropriate warnings
 
 ### TensorFlowPreloader (used in Permasearch)
 - Test tasks:

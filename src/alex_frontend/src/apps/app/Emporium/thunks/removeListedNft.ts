@@ -2,9 +2,9 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getActorEmporium } from "@/features/auth/utils/authUtils";
 import { arweaveIdToNat } from "@/utils/id_convert";
 import {
-  removeTransactionById,
+  removeTransaction,
   setTransactions,
-} from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+} from "@/apps/Modules/shared/state/transactions/transactionSlice";
 
 const removeListedNft = createAsyncThunk<
   string, // Success return type
@@ -20,7 +20,7 @@ const removeListedNft = createAsyncThunk<
 
       // Handle success or error response
       if ("Ok" in result) {
-        dispatch(removeTransactionById(nftArweaveId));
+        dispatch(removeTransaction(nftArweaveId));
         return "success";
       } else if ("Err" in result) {
         return rejectWithValue(result?.Err); // Use rejectWithValue directly

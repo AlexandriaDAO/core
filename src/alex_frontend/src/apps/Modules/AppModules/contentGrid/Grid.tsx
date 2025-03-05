@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
-import { clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { clearTransactionContent } from "@/apps/Modules/shared/state/transactions/transactionSlice";
 import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import ContentRenderer from '@/apps/Modules/AppModules/safeRender/ContentRenderer';
 import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components/TransactionDetails';
@@ -44,7 +44,7 @@ const mapCollectionToBackend = (collection: 'NFT' | 'SBT'): 'icrc7' | 'icrc7_sci
   return collection === 'NFT' ? 'icrc7' : 'icrc7_scion';
 };
 
-export type GridDataSource = 'contentDisplay' | 'nftTransactions';
+export type GridDataSource = 'transactions';
 
 interface GridProps {
   dataSource?: GridDataSource;
@@ -54,28 +54,16 @@ const Grid = ({ dataSource }: GridProps = {}) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   
-  // Determine which data source to use based on props or route
-  let effectiveDataSource: GridDataSource = dataSource || 'contentDisplay';
-  
-  // If no dataSource prop is provided, try to infer from the route
-  if (!dataSource) {
-    const isAlexandrianRoute = location.pathname.includes('/alexandrian');
-    effectiveDataSource = isAlexandrianRoute ? 'nftTransactions' : 'contentDisplay';
-  }
+  // Always use the unified transactions data source
+  const effectiveDataSource: GridDataSource = 'transactions';
   
   // Select the appropriate state based on the determined data source
   const { transactions, contentData } = useSelector((state: RootState) => {
-    if (effectiveDataSource === 'nftTransactions') {
-      return {
-        transactions: state.nftTransactions.transactions,
-        contentData: state.nftTransactions.contentData,
-      };
-    } else {
-      return {
-        transactions: state.contentDisplay.transactions,
-        contentData: state.contentDisplay.contentData,
-      };
-    }
+    // Always use the new unified transactions state
+    return {
+      transactions: state.transactions.transactions,
+      contentData: state.transactions.contentData,
+    };
   });
 
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);

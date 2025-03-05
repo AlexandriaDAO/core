@@ -1,11 +1,8 @@
-#### Features now:
-- Revert to adils rendering approach without breaking the grid. (problem statement on page bottom).
-
 #### Bugs:
 - Need more dynamic states for the like/mint/withdraw buttons. (include in this singleTokenView.tsx which duplicates a lot of this logic.)
 - If the mint has succeded the mint button should go away.
 - If you go to the next page on alexandrian while a modal is open it throws an error.
-- On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.
+
 
 #### Bigger Features (lower priority):
 - Write jest tests for the apps so we can change modules without needing to test all the apps.
@@ -66,7 +63,7 @@
 XWKa-Q2gppignoX_Ngs7VJYZPN_yhiy1ToovQ1NBMFs
 NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
-93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I  09/2022
+93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I 09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
 

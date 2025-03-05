@@ -5,7 +5,7 @@ import ArweaveOwnerSelector from '@/apps/Modules/AppModules/search/selectors/Arw
 import { useHandleSearch } from '@/apps/Modules/AppModules/search/hooks/useSearchHandlers';
 import { toast } from 'sonner';
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { setTransactions } from "@/apps/Modules/shared/state/transactions/transactionSlice";
 import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
@@ -17,7 +17,7 @@ import TensorFlowPreloader from '@/apps/Modules/shared/components/TensorFlowPrel
 function Permasearch() {
 	const { isLoading, handleSearch } = useHandleSearch();
 	const dispatch = useAppDispatch();
-	const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
+	const transactions = useSelector((state: RootState) => state.transactions.transactions);
 	const lastCursor = useSelector((state: RootState) => state.arweave.lastCursor);
 	const [modelLoading, setModelLoading] = useState(false);
 	const [modelLoadFailed, setModelLoadFailed] = useState(false);
@@ -146,7 +146,7 @@ function Permasearch() {
 					</>
 				}
 				showMoreEnabled={true}
-				dataSource="contentDisplay"
+				dataSource="transactions"
 				// useNsfw={true}
 			/>
 		</>

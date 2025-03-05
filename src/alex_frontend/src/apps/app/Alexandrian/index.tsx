@@ -9,7 +9,7 @@ import { resetSearch } from '@/apps/Modules/shared/state/librarySearch/librarySl
 import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
 import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
-import { clearTransactions, clearContentData } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
+import { clearAllTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
 
 function Alexandrian() {
 	useWiper();
@@ -42,8 +42,7 @@ function Alexandrian() {
 	const handleCancelSearch = useCallback(() => {
 		dispatch(resetSearch());
 		dispatch(clearNfts());
-		dispatch(clearTransactions());
-		dispatch(clearContentData());
+		dispatch(clearAllTransactions());
 		toast.info("Search cancelled");
 	}, [dispatch]);
 
@@ -63,7 +62,7 @@ function Alexandrian() {
 				topComponent={<TopupBalanceWarning />}
 				filterComponent={<Library />}
 				showMoreEnabled={true}
-				dataSource="nftTransactions"
+				dataSource="transactions"
 			/>
 			
 		</>

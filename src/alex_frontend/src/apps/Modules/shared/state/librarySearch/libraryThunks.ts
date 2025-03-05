@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { togglePrincipal, setLoading, setSearchParams, updateLastSearchTimestamp, setTotalItems, setCollection } from './librarySlice';
-import { updateTransactions } from '@/apps/Modules/shared/state/content/contentDisplayThunks';
+import { updateTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
 import { RootState } from '@/store';
 import { toggleSortDirection } from './librarySlice';
 import { AppDispatch } from '@/store';

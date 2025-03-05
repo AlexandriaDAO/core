@@ -16,7 +16,7 @@ import { updateNftBalances } from '../../shared/state/nftData/nftDataSlice';
 import { natToArweaveId } from '@/utils/id_convert';
 import { fetchTransactionById } from '../../LibModules/arweaveSearch/api/directArweaveClient';
 import { ContentService } from '../../LibModules/contentDisplay/services/contentService';
-import { setContentData } from '../../shared/state/content/contentDisplaySlice';
+import { setContentData } from '../../shared/state/transactions/transactionSlice';
 import { Transaction } from '../../shared/types/queries';
 import { Badge } from "@/lib/components/badge";
 import { Copy, Check, Link, X } from "lucide-react";
@@ -41,7 +41,7 @@ function SingleTokenView() {
   const [ownerInfo, setOwnerInfo] = useState<UserInfo | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   
-  const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
+  const contentData = useSelector((state: RootState) => state.transactions.contentData);
   const { nfts } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
 

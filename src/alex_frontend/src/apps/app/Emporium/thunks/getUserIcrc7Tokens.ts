@@ -1,10 +1,10 @@
-import {  fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
-import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
-import { loadContentForTransactions } from "@/apps/Modules/shared/state/content/contentDisplayThunks";
+import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
+import { setTransactions } from "@/apps/Modules/shared/state/transactions/transactionSlice";
+import { loadContentForTransactions } from "@/apps/Modules/shared/state/transactions/transactionThunks";
 import { getIcrc7Actor } from "@/features/auth/utils/authUtils";
 import { natToArweaveId } from "@/utils/id_convert";
 import { Principal } from "@dfinity/principal";
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import { resetPagination } from "../emporiumSlice";
 
 const getUserIcrc7Tokens = createAsyncThunk<
@@ -48,7 +48,7 @@ const getUserIcrc7Tokens = createAsyncThunk<
         const fetchedTransactions = await fetchTransactionsForAlexandrian(arweaveIds);
         
         dispatch(setTransactions(fetchedTransactions));
-        await dispatch(loadContentForTransactions(fetchedTransactions));
+        await dispatch(loadContentForTransactions(fetchedTransactions) as unknown as AnyAction);
       }
 
       return tokens;

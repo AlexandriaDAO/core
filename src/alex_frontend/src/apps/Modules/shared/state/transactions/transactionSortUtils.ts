@@ -12,8 +12,8 @@ export const selectFilteredAndSortedTransactions = createSelector(
     // First filter
     const filteredTransactions = tags.length === 0 
       ? transactions 
-      : transactions.filter((transaction: Transaction) => {
-          const contentTypeTag = transaction.tags.find((tag: { name: string; value: string }) => tag.name === 'Content-Type');
+      : transactions.filter(transaction => {
+          const contentTypeTag = transaction.tags.find(tag => tag.name === 'Content-Type');
           return contentTypeTag && tags.includes(contentTypeTag.value);
         });
 

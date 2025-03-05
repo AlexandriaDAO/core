@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { RootState, AppDispatch } from "@/store";
 import { Copy, Info, LoaderPinwheel, X } from 'lucide-react';
-import { clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { clearTransactionContent } from "@/apps/Modules/shared/state/transactions/transactionSlice";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { Dialog, DialogContent } from '@/lib/components/dialog';
 import ContentRenderer from "@/apps/Modules/AppModules/safeRender/ContentRenderer";
-import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
+import { useSortedTransactions } from '@/apps/Modules/shared/state/transactions/transactionSortUtils';
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Overlay from "./overlay";
 import CombinedModal from "./combineModal";
@@ -47,7 +47,7 @@ const defaultTransaction: Transaction = {
 const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   const dispatch = useAppDispatch();
   const transactions = useSortedTransactions();
-  const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
+  const contentData = useSelector((state: RootState) => state.transactions.contentData);
   const predictions = useSelector((state: RootState) => state.arweave.predictions);
   const emporium = useAppSelector((state) => state.emporium);
 
@@ -178,9 +178,9 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
           <LoaderPinwheel className="animate-spin text-4xl text-white w-14 h-14  dark:grey" />
           </div>) : 
         (<ContentGrid key="emporium">
-          {transactions.map((transaction) => {
+          {transactions.map((transaction: Transaction) => {
             const content = contentData[transaction.id];
-            const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+            const contentType = transaction.tags.find((tag: { name: string; value: string }) => tag.name === 'Content-Type')?.value || '';
             const hasPredictions = !!predictions[transaction.id];
             const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 

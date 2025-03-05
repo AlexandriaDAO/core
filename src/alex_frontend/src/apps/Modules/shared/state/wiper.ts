@@ -2,12 +2,11 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { 
   clearTransactions, 
   clearContentData,
-} from './content/contentDisplaySlice';
+} from './transactions/transactionSlice';
 import { clearPredictions } from './arweave/arweaveSlice';
 import { 
   clearNfts 
 } from './nftData/nftDataSlice';
-import { clearTransactions as clearNftTransactions } from './nftData/nftTransactionsSlice';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 import { useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
@@ -20,8 +19,7 @@ const contentStateOperations = [
 ];
 
 const nftStateOperations = [
-  clearNfts,
-  clearNftTransactions
+  clearNfts
 ];
 
 const predictionStateOperations = [
@@ -41,54 +39,68 @@ export const wipe = createAsyncThunk(
       // Clear prediction state
       predictionStateOperations.forEach(operation => dispatch(operation()));
       
-      // Clear service caches
+      // Clear content cache
       ContentService.clearCache();
       
       return true;
     } catch (error) {
-      return rejectWithValue('Failed to wipe state: ' + error);
+      console.error('Error wiping state:', error);
+      return rejectWithValue('Failed to wipe state');
     }
   }
 );
 
+/**
+ * Configuration options for useWiper hook
+ */
 type WipeConfig = {
   wipeOnUnmount?: boolean;
   triggerDeps?: unknown[];
 };
 
 /**
- * Unified hook for state wiping functionality
- * @param config - Configuration object for wiping behavior
- * @returns Function to manually trigger wipe
+ * Hook that provides state wiping functionality
+ * It can be configured to automatically wipe state when the component unmounts
+ * and can be triggered when specific dependencies change
  */
 export const useWiper = (config: WipeConfig = {}) => {
-  const { wipeOnUnmount = true, triggerDeps = [] } = config;
+  const { wipeOnUnmount = false, triggerDeps = [] } = config;
   const dispatch = useDispatch<AppDispatch>();
-
-  const wipeFunction = useCallback(() => {
+  
+  const wipeState = useCallback(() => {
     return dispatch(wipe());
   }, [dispatch]);
-
-  // Wipe on trigger dependencies if provided
+  
+  // If triggerDeps are provided, wipe state when they change
   useEffect(() => {
     if (triggerDeps.length > 0) {
-      wipeFunction();
+      wipeState();
     }
-  }, triggerDeps);
-
-  // Wipe on unmount if enabled
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [...triggerDeps]);
+  
+  // Wipe state on unmount if wipeOnUnmount is true
   useEffect(() => {
-    if (wipeOnUnmount) {
-      return () => {
-        wipeFunction();
-      };
-    }
-  }, [wipeOnUnmount, wipeFunction]);
-
-  return wipeFunction;
+    return () => {
+      if (wipeOnUnmount) {
+        wipeState();
+      }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wipeOnUnmount]);
+  
+  return { wipeState };
 };
 
-// Deprecated - use useWiper instead
+/**
+ * Simplified hook that always wipes state on component unmount
+ */
 export const useWipeOnUnmount = () => {
-  return useWiper({ wipeOnUnmount: true });
+  const dispatch = useDispatch<AppDispatch>();
+  
+  useEffect(() => {
+    return () => {
+      dispatch(wipe());
+    };
+  }, [dispatch]);
 };

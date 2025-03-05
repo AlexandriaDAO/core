@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 
@@ -10,9 +10,9 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock the imports before they're used
-jest.mock('@/apps/Modules/shared/state/content/contentDisplaySlice', () => ({
-  clearTransactions: jest.fn().mockReturnValue({ type: 'content/clearTransactions' }),
-  clearContentData: jest.fn().mockReturnValue({ type: 'content/clearContentData' }),
+jest.mock('@/apps/Modules/shared/state/transactions/transactionSlice', () => ({
+  clearTransactions: jest.fn().mockReturnValue({ type: 'transactions/clearTransactions' }),
+  clearContentData: jest.fn().mockReturnValue({ type: 'transactions/clearContentData' }),
 }));
 
 jest.mock('@/apps/Modules/shared/state/arweave/arweaveSlice', () => ({
@@ -21,10 +21,6 @@ jest.mock('@/apps/Modules/shared/state/arweave/arweaveSlice', () => ({
 
 jest.mock('@/apps/Modules/shared/state/nftData/nftDataSlice', () => ({
   clearNfts: jest.fn().mockReturnValue({ type: 'nft/clearNfts' }),
-}));
-
-jest.mock('@/apps/Modules/shared/state/nftData/nftTransactionsSlice', () => ({
-  clearTransactions: jest.fn().mockReturnValue({ type: 'nft/clearTransactions' }),
 }));
 
 jest.mock('@/apps/Modules/LibModules/contentDisplay/services/contentService', () => ({
@@ -43,7 +39,7 @@ const createMockStore = () => {
   return configureStore({
     reducer: {
       // Add mock reducers if needed
-      content: (state = {}, action) => state,
+      transactions: (state = {}, action) => state,
       nft: (state = {}, action) => state,
       arweave: (state = {}, action) => state,
     },
@@ -71,16 +67,14 @@ describe('Wiper Module', () => {
       await wipe()(mockDispatch, mockGetState, undefined);
       
       // Check that all clear actions were dispatched
-      const { clearTransactions, clearContentData } = require('@/apps/Modules/shared/state/content/contentDisplaySlice');
+      const { clearTransactions, clearContentData } = require('@/apps/Modules/shared/state/transactions/transactionSlice');
       const { clearPredictions } = require('@/apps/Modules/shared/state/arweave/arweaveSlice');
       const { clearNfts } = require('@/apps/Modules/shared/state/nftData/nftDataSlice');
-      const { clearTransactions: clearNftTransactions } = require('@/apps/Modules/shared/state/nftData/nftTransactionsSlice');
       
       expect(mockDispatch).toHaveBeenCalledWith(clearTransactions());
       expect(mockDispatch).toHaveBeenCalledWith(clearContentData());
       expect(mockDispatch).toHaveBeenCalledWith(clearPredictions());
       expect(mockDispatch).toHaveBeenCalledWith(clearNfts());
-      expect(mockDispatch).toHaveBeenCalledWith(clearNftTransactions());
     });
 
     it('should clear service caches', async () => {
@@ -92,14 +86,6 @@ describe('Wiper Module', () => {
       
       // Check that ContentService.clearCache was called
       expect(ContentService.clearCache).toHaveBeenCalled();
-    });
-
-    // Skip the error handling test for now since it's difficult to simulate
-    // the error condition in the current test environment
-    it.skip('should handle errors and return rejected value', async () => {
-      // This test is skipped because it's difficult to simulate the error condition
-      // in the current test environment. In a real application, we would need to
-      // mock the Redux store and dispatch functions more thoroughly.
     });
   });
 
@@ -172,8 +158,11 @@ describe('Wiper Module', () => {
     });
 
     it('should allow manual wiping', async () => {
-      // Mock the dispatch function
-      const mockDispatch = jest.fn().mockReturnValue({ unwrap: () => Promise.resolve() });
+      // Mock the dispatch function to return a promise
+      const mockWipeAction = { type: 'wiper/wipeState' };
+      const mockDispatch = jest.fn().mockImplementation(() => {
+        return Promise.resolve(mockWipeAction);
+      });
       (useDispatch as unknown as jest.Mock).mockReturnValue(mockDispatch);
       
       const { result } = renderHook(() => useWiper(), { wrapper });
@@ -181,8 +170,10 @@ describe('Wiper Module', () => {
       // Clear mocks to ensure we only check calls during manual wipe
       mockDispatch.mockClear();
       
-      // Call the wipe function manually
-      await result.current();
+      // Call the wipeState method manually
+      await act(async () => {
+        await result.current.wipeState();
+      });
       
       // Check that the wipe thunk was dispatched
       expect(mockDispatch).toHaveBeenCalled();

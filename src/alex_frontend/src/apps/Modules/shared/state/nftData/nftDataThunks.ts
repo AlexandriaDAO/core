@@ -1,4 +1,4 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, AnyAction } from '@reduxjs/toolkit';
 import { 
   setNFTs as setNfts,
   updateNftBalances,
@@ -16,7 +16,7 @@ import { Principal } from '@dfinity/principal';
 import { natToArweaveId } from '@/utils/id_convert';
 import type { NFTData } from '../../types/nft';
 import { setNoResults } from '../librarySearch/librarySlice';
-import { fetchNFTTransactions } from './nftTransactionsThunks';
+import { fetchNftTransactions } from '../transactions/transactionThunks';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -359,7 +359,7 @@ export const fetchTokensForPrincipal = createAsyncThunk<
 
       // Fetch transactions for the NFTs
       const arweaveIds = Object.values(nftRecord).map(nft => nft.arweaveId);
-      await dispatch(fetchNFTTransactions(arweaveIds)).unwrap();
+      await dispatch(fetchNftTransactions(arweaveIds) as unknown as AnyAction).unwrap();
 
       // If we're using the 'new' option, make sure all tokens have owner information
       if (principalId === 'new') {
