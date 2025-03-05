@@ -137,7 +137,11 @@ const NFTPagination = () => {
   );
 };
 
-export default function LibrarySearch() {
+interface LibrarySearchProps {
+  defaultCategory?: 'favorites' | 'all';
+}
+
+export default function LibrarySearch({ defaultCategory = 'favorites' }: LibrarySearchProps) {
   const dispatch = useDispatch<AppDispatch>();
   const transactionData = useSelector((state: RootState) => state.transactions.transactions);
   const isTransactionUpdated = useSelector((state: RootState) => state.transactions.isUpdated);
@@ -178,7 +182,7 @@ export default function LibrarySearch() {
               <PrincipalSelector />
               <CollectionSelector />
             </div>
-            <LibraryContentTagsSelector />
+            <LibraryContentTagsSelector defaultCategory={defaultCategory} />
           </div>
           
           {/* Second row: Pagination controls (full width) */}

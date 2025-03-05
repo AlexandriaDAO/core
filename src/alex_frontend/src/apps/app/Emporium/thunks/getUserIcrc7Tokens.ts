@@ -1,11 +1,10 @@
 import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
 import { setTransactions } from "@/apps/Modules/shared/state/transactions/transactionSlice";
 import { loadContentForTransactions } from "@/apps/Modules/shared/state/transactions/transactionThunks";
-import { getIcrc7Actor } from "@/features/auth/utils/authUtils";
-import { natToArweaveId } from "@/utils/id_convert";
 import { Principal } from "@dfinity/principal";
 import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import { resetPagination } from "../emporiumSlice";
+import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
 
 const getUserIcrc7Tokens = createAsyncThunk<
   { tokenId: string; arweaveId: string }[], // Return structure
@@ -19,25 +18,28 @@ const getUserIcrc7Tokens = createAsyncThunk<
       dispatch(resetPagination());
       dispatch(setTransactions([]));
 
-      // Fetch the user's tokens
-      const actorIcrc7 = await getIcrc7Actor();
-      const result = await actorIcrc7.icrc7_tokens_of(
-        {
-          owner: Principal.fromText(userPrincipal),
-          subaccount: [],
-        },
-        [],
-        []
+      // Create NFT token adapter
+      const nftAdapter = createTokenAdapter('NFT');
+      
+      // Fetch the user's tokens using the adapter
+      const result = await nftAdapter.getTokensOf(
+        Principal.fromText(userPrincipal),
+        undefined,
+        undefined
       );
 
-      if (!Array.isArray(result) || result.length === 0) {
+      if (result.length === 0) {
         console.warn("No tokens found for the specified user.");
         return [];
       }
 
-      const tokens = result.map((value) => ({
-        tokenId: value.toString(),
-        arweaveId: natToArweaveId(value),
+      // Convert tokens to the required format using the adapter
+      const tokens = await Promise.all(result.map(async (value) => {
+        const nftData = await nftAdapter.tokenToNFTData(value, userPrincipal);
+        return {
+          tokenId: value.toString(),
+          arweaveId: nftData.arweaveId,
+        };
       }));
 
       // Extract arweaveIds for transactions

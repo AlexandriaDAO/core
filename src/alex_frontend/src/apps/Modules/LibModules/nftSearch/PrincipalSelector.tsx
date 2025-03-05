@@ -21,6 +21,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/lib/components/popover";
+import { TokenType } from '../../shared/adapters/TokenAdapter';
 
 interface NFTUserInfo {
   principal: any;
@@ -66,7 +67,7 @@ export default function PrincipalSelector() {
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const noResults = useSelector((state: RootState) => state.library.noResults);
-  const collection = useSelector((state: RootState) => state.library.collection);
+  const collection = useSelector((state: RootState) => state.library.collection) as TokenType;
   const totalItems = useSelector((state: RootState) => state.library.totalItems);
   const dispatch = useDispatch<AppDispatch>();
   const [principals, setPrincipals] = React.useState<PrincipalData[]>([]);
@@ -250,6 +251,11 @@ export default function PrincipalSelector() {
                               )}
                             />
                             {principal.username}
+                            {!principal.hasNFTs && (
+                              <span className="ml-2 text-xs text-muted-foreground">
+                                (No {collection === 'NFT' ? 'NFTs' : 'SBTs'})
+                              </span>
+                            )}
                           </CommandItem>
                         );
                       })}

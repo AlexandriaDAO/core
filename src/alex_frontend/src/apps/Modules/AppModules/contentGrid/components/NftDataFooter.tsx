@@ -7,6 +7,7 @@ import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 import { Badge } from "@/lib/components/badge";
 import { Skeleton } from "@/lib/components/skeleton";
 import { copyToClipboard } from "../utils/clipboard";
+import { determineTokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
 
 interface NftDataFooterProps {
   id: string;

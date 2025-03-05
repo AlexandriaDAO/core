@@ -112,22 +112,46 @@ export const updateTransactions = createAsyncThunk<
   { dispatch: AppDispatch; state: RootState }
 >(
   'transactions/updateTransactions',
-  async (arweaveIds: string[], { dispatch }) => {
+  async (arweaveIds: string[], { dispatch, getState }) => {
     if (arweaveIds.length === 0) {
-      // If no arweave IDs provided, return empty array
-      dispatch(setTransactions([]));
-      return [];
+      // If no arweave IDs provided, return current transactions from state
+      const state = getState();
+      return state.transactions.transactions;
     }
 
     // Fetch transactions for the arweave IDs
-    const transactions = await fetchTransactionsForAlexandrian(arweaveIds);
+    const newTransactions = await fetchTransactionsForAlexandrian(arweaveIds);
     
-    // Update the store with the fetched transactions
-    dispatch(setTransactions(transactions));
+    // Get existing transactions from state
+    const state = getState();
+    const existingTransactions = state.transactions.transactions;
     
-    // Load content for the transactions
-    await dispatch(loadContentForTransactions(transactions));
+    // Create a map of existing transactions by ID for quick lookup
+    const existingTransactionMap = new Map(
+      existingTransactions.map(tx => [tx.id, tx])
+    );
     
-    return transactions;
+    // Create a merged list with new transactions, preserving existing ones
+    // If a transaction already exists, keep the existing data
+    const mergedTransactions = [
+      ...existingTransactions,
+      ...newTransactions.filter(newTx => !existingTransactionMap.has(newTx.id))
+    ];
+    
+    // Update the store with the merged transactions
+    dispatch(setTransactions(mergedTransactions));
+    
+    // Only load content for the new transactions to avoid redundant loading
+    const transactionsToLoad = newTransactions.filter(
+      newTx => !existingTransactionMap.has(newTx.id) || 
+              (existingTransactionMap.has(newTx.id) && 
+               !('content' in existingTransactionMap.get(newTx.id)!))
+    );
+    
+    if (transactionsToLoad.length > 0) {
+      await dispatch(loadContentForTransactions(transactionsToLoad));
+    }
+    
+    return mergedTransactions;
   }
 ); 

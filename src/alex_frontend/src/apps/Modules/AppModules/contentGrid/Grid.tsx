@@ -16,6 +16,7 @@ import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import type { Transaction } from '../../shared/types/queries';
 import { useLocation } from 'react-router-dom';
+import { TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -40,7 +41,7 @@ export const ContentGrid: ContentGridComponent = Object.assign(
 );
 
 // Map frontend collection names to backend collection names
-const mapCollectionToBackend = (collection: 'NFT' | 'SBT'): 'icrc7' | 'icrc7_scion' => {
+const mapCollectionToBackend = (collection: TokenType): 'icrc7' | 'icrc7_scion' => {
   return collection === 'NFT' ? 'icrc7' : 'icrc7_scion';
 };
 
@@ -58,18 +59,24 @@ const Grid = ({ dataSource }: GridProps = {}) => {
   const effectiveDataSource: GridDataSource = 'transactions';
   
   // Select the appropriate state based on the determined data source
-  const { transactions, contentData } = useSelector((state: RootState) => {
+  const { contentData } = useSelector((state: RootState) => {
     // Always use the new unified transactions state
     return {
-      transactions: state.transactions.transactions,
       contentData: state.transactions.contentData,
     };
   });
 
+  // Fetch raw transactions for use in the dialog content
+  const { transactions } = useSelector((state: RootState) => ({
+    transactions: state.transactions.transactions
+  }));
+
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
   const { predictions } = useSelector((state: RootState) => state.arweave);
-  const sortedTransactions = useMemo(() => transactions, [transactions]); // No need for sorting since they're already in order
+  
+  // Use the sortedTransactions hook which applies proper filtering by tags
+  const sortedTransactions = useSortedTransactions();
 
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string,assetUrl:string } | null>(null);
@@ -106,7 +113,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
         throw new Error("Could not find NFT data for this content");
       }
 
-      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, mapCollectionToBackend(nftData.collection));
+      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, mapCollectionToBackend(nftData.collection as TokenType));
       if (lbryBlock === null && alexBlock === null) {
         toast.info("No funds were available to withdraw");
       } else {
@@ -248,4 +255,4 @@ const Grid = ({ dataSource }: GridProps = {}) => {
   );
 };
 
-export default React.memo(Grid);
+export default Grid;

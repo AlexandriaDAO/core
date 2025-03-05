@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode, useCallback } from "react";
+import React, { useState, useEffect, ReactNode, useCallback, useRef } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
 import { wipe } from '@/apps/Modules/shared/state/wiper';
@@ -29,6 +29,7 @@ interface SearchContainerProps {
   filterComponent?: ReactNode;
   showMoreEnabled?: boolean;
   dataSource?: GridDataSource;
+  preserveState?: boolean;
 }
 
 export function SearchContainer({
@@ -42,20 +43,26 @@ export function SearchContainer({
   topComponent,
   filterComponent,
   showMoreEnabled = true,
-  dataSource
+  dataSource,
+  preserveState = false
 }: SearchContainerProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+  const hasContentRef = useRef(false);
   
   // Select transactions from the appropriate state slice based on dataSource
   const transactions = useSelector((state: RootState) => {
     // Always use the new unified transactions state
     return state.transactions.transactions;
   });
+  
+  // Track if content has been loaded to prevent wiping it
+  if (transactions.length > 0 && !hasContentRef.current) {
+    hasContentRef.current = true;
+  }
 
   const handleSearchClick = useCallback(async () => {
     if (!isLoading) {
-      await dispatch(wipe());
       await onSearch();
     }
   }, [isLoading, onSearch, dispatch]);
@@ -65,7 +72,6 @@ export function SearchContainer({
       onCancel();
     } else if (onCancel) {
       onCancel();
-      dispatch(wipe());
     }
   }, [isLoading, onCancel, dispatch]);
 
@@ -92,8 +98,16 @@ export function SearchContainer({
     document.addEventListener('keypress', handleKeyPress);
     return () => {
       document.removeEventListener('keypress', handleKeyPress);
+      
+      // Only wipe state on unmount if:
+      // 1. preserveState is false (default behavior)
+      // 2. AND no content has been loaded
+      // This prevents wiping state after assets have loaded
+      if (!preserveState && !hasContentRef.current) {
+        dispatch(wipe());
+      }
     };
-  }, [handleKeyPress]);
+  }, [handleKeyPress, preserveState, dispatch]);
 
   return (
     <>

@@ -2,9 +2,8 @@ import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import {
   getActorEmporium,
   getIcpLedgerActor,
-  getIcrc7Actor,
 } from "@/features/auth/utils/authUtils";
-import { arweaveIdToNat, natToArweaveId } from "@/utils/id_convert";
+import { arweaveIdToNat } from "@/utils/id_convert";
 import { Principal } from "@dfinity/principal";
 import { removeTransaction } from "@/apps/Modules/shared/state/transactions/transactionThunks";
 
