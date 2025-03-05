@@ -193,4 +193,3 @@ export const toggleSort = () => (dispatch: AppDispatch) => {
   dispatch(toggleSortDirection());
   dispatch(performSearch());
 };
-

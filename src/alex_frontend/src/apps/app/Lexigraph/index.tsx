@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useIdentity } from "@/hooks/useIdentity";
 import { Button } from "@/lib/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/lib/components/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
