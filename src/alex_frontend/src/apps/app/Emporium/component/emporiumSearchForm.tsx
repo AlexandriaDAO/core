@@ -41,8 +41,7 @@ const EmporiumSearchForm: React.FC = () => {
       <div className="w-full">
         <div className="flex flex-col gap-4 
         ">
-          <div className="flex gap-4 w-full justify-between">
-
+          <div className="flex gap-4 w-full lg:justify-between md:justify-between sm:justify-center xs:justify-center flex-wrap">
             <EmporiumPageSizeSelector />
             <div className="flex flex-col">
               <span className="block mb-3 text-lg font-medium font-['Syne'] text-foreground dark:text-white">
