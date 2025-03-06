@@ -358,17 +358,18 @@ pub async fn burn_LBRY(
         }
     }
 
-    // Alex mint 21M only
-    let limit_result = within_max_limit(amount_lbry).await.map_err(|e|
-        ExecutionError::new_with_log(
-            caller,
-            "burn_LBRY",
-            ExecutionError::StateError(format!("Failed to check max limit: {}", e))
-        )
-    )?;
+    // No LBRY burn limit - the 21M ALEX cap is still enforced in the mint_ALEX function (reason described in commented out utils.rs function)
+    // Original code checked against LBRY thresholds:
+    // let limit_result = within_max_limit(amount_lbry).await.map_err(|e|
+    //     ExecutionError::new_with_log(
+    //         caller,
+    //         "burn_LBRY",
+    //         ExecutionError::StateError(format!("Failed to check max limit: {}", e))
+    //     )
+    // )?;
 
-    if limit_result > 0 {
-        match mint_ALEX(limit_result, caller, from_subaccount).await {
+    // if limit_result > 0 {
+        match mint_ALEX(amount_lbry, caller, from_subaccount).await {
             Ok(_) => {
                 register_info_log(
                     caller,
@@ -398,21 +399,22 @@ pub async fn burn_LBRY(
                 return Err(
                     ExecutionError::new_with_log(caller, "burn_LBRY", ExecutionError::MintFailed {
                         token: "ALEX".to_string(),
-                        amount: limit_result,
+                        amount: amount_lbry,
                         details: e,
                         reason: DEFAULT_MINT_FAILED.to_string(),
                     })
                 );
             }
         }
-    } else {
-        // ALEX fully minted
-        register_info_log(
-            caller,
-            "burn_LBRY",
-            &format!("Burn completed successfully. No more ALEX tokens can be minted.")
-        );
-    }
+    // } 
+    // // else {
+    // //     // ALEX fully minted
+    // //     register_info_log(
+    // //         caller,
+    //         "burn_LBRY",
+    //         &format!("Burn completed successfully. No more ALEX tokens can be minted.")
+    //     );
+    // }
 
     Ok("Burn Successfully!".to_string())
 }

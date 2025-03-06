@@ -73,42 +73,46 @@ pub fn principal_to_subaccount(principal_id: &Principal) -> Subaccount {
     Subaccount(subaccount)
 }
 
-pub async fn within_max_limit(burn_amount: u64) -> Result<u64, ExecutionError> {
-    let result: Result<(u64, u64), String> = ic_cdk
-        ::call::<(), (u64, u64)>(
-            Principal::from_text(TOKENOMICS_CANISTER_ID).map_err(|e|
-                ExecutionError::new_with_log(
-                    caller(),
-                    "within_max_limit",
-                    ExecutionError::StateError(format!("Invalid tokenomics canister ID: {}", e))
-                )
-            )?,
-            "get_max_stats",
-            ()
-        ).await
-        .map_err(|e: (ic_cdk::api::call::RejectionCode, String)| {
-            format!("failed to call tokenomics canister: {:?}", e)
-        });
+// // This logic is removed because of a known bug, whereby failed burns still increase burn_amount.
+// // It was kept as a pre-audit minting limit precaution.
 
-    match result {
-        Ok((max_threshold, total_burned)) => {
-            //Todo
-            if burn_amount + total_burned <= max_threshold {
-                Ok(burn_amount)
-            } else {
-                Ok(max_threshold - total_burned)
-            }
-        }
-        Err(e) =>
-            Err(
-                ExecutionError::new_with_log(
-                    caller(),
-                    "within_max_limit",
-                    ExecutionError::StateError(e)
-                )
-            ),
-    }
-}
+// pub async fn within_max_limit(burn_amount: u64) -> Result<u64, ExecutionError> {
+//     let result: Result<(u64, u64), String> = ic_cdk
+//         ::call::<(), (u64, u64)>(
+//             Principal::from_text(TOKENOMICS_CANISTER_ID).map_err(|e|
+//                 ExecutionError::new_with_log(
+//                     caller(),
+//                     "within_max_limit",
+//                     ExecutionError::StateError(format!("Invalid tokenomics canister ID: {}", e))
+//                 )
+//             )?,
+//             "get_max_stats",
+//             ()
+//         ).await
+//         .map_err(|e: (ic_cdk::api::call::RejectionCode, String)| {
+//             format!("failed to call tokenomics canister: {:?}", e)
+//         });
+
+//     match result {
+//         Ok((max_threshold, total_burned)) => {
+//             //Todo
+//             if burn_amount + total_burned <= max_threshold {
+//                 Ok(burn_amount)
+//             } else {
+//                 Ok(max_threshold - total_burned)
+//             }
+//         }
+//         Err(e) =>
+//             Err(
+//                 ExecutionError::new_with_log(
+//                     caller(),
+//                     "within_max_limit",
+//                     ExecutionError::StateError(e)
+//                 )
+//             ),
+//     }
+// }
+
 //remove
 pub async fn tokenomics_burn_LBRY_stats() -> Result<(u64, u64), String> {
     let result: Result<(u64, u64), String> = ic_cdk

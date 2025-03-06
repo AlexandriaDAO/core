@@ -1,5 +1,5 @@
 !/bin/bash
-# dfx canister snapshot list alex_frontend --network ic
+# dfx canister snapshot list tokenomics --network ic
 
 # # Load snapshot
 # dfx canister stop alex_frontend --network ic
@@ -28,7 +28,7 @@ dfx canister start alex_backend --network ic
 
 # alex_frontend
 dfx canister stop alex_frontend --network ic
-dfx canister snapshot create alex_frontend --replace 00000000000000080000000001f0531c0101 --network ic
+dfx canister snapshot create alex_frontend --replace 00000000000000090000000001f0531c0101 --network ic
 dfx canister start alex_frontend --network ic
 
 # alex_wallet
@@ -58,7 +58,7 @@ dfx canister start ic_siwe_provider --network ic
 
 # icp_swap
 dfx canister stop icp_swap --network ic
-dfx canister snapshot create icp_swap --replace 00000000000000000000000001f053200101 --network ic
+dfx canister snapshot create icp_swap --replace 00000000000000010000000001f053200101 --network ic
 dfx canister start icp_swap --network ic
 
 # icrc7
@@ -88,7 +88,7 @@ dfx canister start logs --network ic
 
 # tokenomics
 dfx canister stop tokenomics --network ic
-dfx canister snapshot create tokenomics --replace 00000000000000010000000001f053240101 --network ic
+dfx canister snapshot create tokenomics --replace 00000000000000020000000001f053240101 --network ic
 dfx canister start tokenomics --network ic
 
 # user
