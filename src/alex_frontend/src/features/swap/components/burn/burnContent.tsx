@@ -30,15 +30,15 @@ const BurnContent = () => {
     const [tentativeALEX, setTentativeALEX] = useState(Number);
     const [loadingModalV, setLoadingModalV] = useState(false);
     const [successModalV, setSucessModalV] = useState(false);
-    const [errorModalV, setErrorModalV] = useState(false);
+    const [errorModalV, setErrorModalV] = useState({ flag: false, title: "", message: "" });
     const [maxBurnAllowed, setMaxburnAllowed] = useState(Number);
 
 
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        if(!user?.principal) return;
-        dispatch(burnLbry({amount:amountLBRY.toString(),userPrincipal:user.principal}));
+        if (!user?.principal) return;
+        dispatch(burnLbry({ amount: amountLBRY.toString(), userPrincipal: user.principal }));
         setLoadingModalV(true);
 
     }
@@ -73,7 +73,7 @@ const BurnContent = () => {
         if (swap.error) {
             dispatch(getLbryBalance(user.principal));
             setLoadingModalV(false);
-            setErrorModalV(true);
+            setErrorModalV({flag:true,title:swap.error.title,message:swap.error.message});
             dispatch(flagHandler());
 
         }
@@ -102,7 +102,7 @@ const BurnContent = () => {
                         <div className='bg-white dark:bg-gray-800 border dark:border-gray-700 py-5 px-5 rounded-borderbox mb-7'>
                             <div className='flex justify-between mb-3'>
                                 <h4 className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-multygray dark:text-gray-300'>Amount</h4>
-                                <input className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-darkgray dark:text-gray-200 text-right bg-transparent w-full placeholder-darkgray dark:placeholder-gray-400 focus:outline-none focus:border-transparent' type='integer' value={amountLBRY+""} defaultValue={0} min={0} onChange={(e) => {
+                                <input className='lg:text-2xl md:text-xl sm:text-lg xs:text-base font-medium text-darkgray dark:text-gray-200 text-right bg-transparent w-full placeholder-darkgray dark:placeholder-gray-400 focus:outline-none focus:border-transparent' type='integer' value={amountLBRY + ""} defaultValue={0} min={0} onChange={(e) => {
                                     handleAmountLBRYChange(e)
                                 }} />
                             </div>
@@ -147,25 +147,24 @@ const BurnContent = () => {
                         </div>
                         {user ? <button
                             type="button"
-                            className={`bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 mb-4 ${
-                                parseInt(amountLBRY.toString()) === 0 || 
-                                swap.loading || 
-                                amountLBRY > maxBurnAllowed ||
-                                tentativeALEX > 50 
-                                    ? 'text-[#808080] cursor-not-allowed' 
-                                    : 'bg-balancebox text-white cursor-pointer'
-                            }`}
-                            style={{
-                                backgroundColor: parseInt(amountLBRY.toString()) === 0 || 
-                                    swap.loading || 
+                            className={`bg-balancebox text-white w-full rounded-full text-base 2xl:text-2xl xl:text-xl lg:text-xl md:text-lg sm:text-base font-semibold py-2 2xl:py-4 xl:py-4 lg:py-3 md:py-3 sm:py-2 px-2 2xl:px-4 xl:px-4 lg:px-3 md:px-3 sm:px-2 mb-4 ${parseInt(amountLBRY.toString()) === 0 ||
+                                    swap.loading ||
                                     amountLBRY > maxBurnAllowed ||
-                                    tentativeALEX > 50 
-                                        ? '#525252' 
-                                        : '', // when disabled
+                                    tentativeALEX > 50
+                                    ? 'text-[#808080] cursor-not-allowed'
+                                    : 'bg-balancebox text-white cursor-pointer'
+                                }`}
+                            style={{
+                                backgroundColor: parseInt(amountLBRY.toString()) === 0 ||
+                                    swap.loading ||
+                                    amountLBRY > maxBurnAllowed ||
+                                    tentativeALEX > 50
+                                    ? '#525252'
+                                    : '', // when disabled
                             }}
                             disabled={
-                                amountLBRY === 0 || 
-                                swap.loading === true || 
+                                amountLBRY === 0 ||
+                                swap.loading === true ||
                                 amountLBRY > maxBurnAllowed ||
                                 tentativeALEX > 50
                             }
@@ -192,7 +191,7 @@ const BurnContent = () => {
                 </div>
                 <LoadingModal show={loadingModalV} message1={"Burn in Progress"} message2={"Burn transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
                 <SuccessModal show={successModalV} setShow={setSucessModalV} />
-                <ErrorModal show={errorModalV} setShow={setErrorModalV} />
+                <ErrorModal show={errorModalV.flag} setShow={setErrorModalV} title={errorModalV.title} message={errorModalV.message} />
 
             </div>
         </>

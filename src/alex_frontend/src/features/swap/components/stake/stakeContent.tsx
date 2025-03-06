@@ -30,7 +30,7 @@ const StakeContent = () => {
     const [loadingModalV, setLoadingModalV] = useState(false);
     const [successModalV, setSucessModalV] = useState(false);
     const [actionType, setActionType] = useState("Stake");
-    const [errorModalV, setErrorModalV] = useState(false);
+    const [errorModalV, setErrorModalV] = useState({ flag: false, title: "", message: "" });
     const [modalData, setModalData] = useState({ message: "Please try again or seek help if needed", title: "Something went wrong..." });
     const [userEstimateReward, setUserEstimatedReward] = useState(0);
     const [apr, setApr] = useState("0");
@@ -65,8 +65,8 @@ const StakeContent = () => {
         if (stakedUsd > 0) {
             const hourlyAprPercentage = ((estimatedRewardIcp * Number(icpLedger.icpPrice)) / stakedUsd) * 100;
             const annualAprPercentage = hourlyAprPercentage * 24 * 365; // Convert hourly to annual
-            setApr(hourlyAprPercentage.toFixed(4)+"%");
-            setAnnualizedApr(annualAprPercentage.toFixed(2)+"%");
+            setApr(hourlyAprPercentage.toFixed(4) + "%");
+            setAnnualizedApr(annualAprPercentage.toFixed(2) + "%");
         } else {
             setApr(''); // Fallback value if division by zero
             setAnnualizedApr('');
@@ -89,14 +89,14 @@ const StakeContent = () => {
             setSucessModalV(true);
         }
         if (swap.error) {
-            if (swap.error && swap.error.includes("Must have ")) {
+            if (swap.error && swap.error.message.includes("Must have ")) {
                 setModalData({ message: "Must have at least 0.01 ICP reward to claim.", title: "Insufficient Reward " })
             }
             else {
                 setModalData({ message: "Please try again or seek help if needed", title: "Something went wrong..." })
             }
             setLoadingModalV(false);
-            setErrorModalV(true);
+            setErrorModalV({ flag: true, title: swap.error.title, message: swap.error.message });
             dispatch(flagHandler());
 
         }
@@ -177,8 +177,8 @@ const StakeContent = () => {
                             <div className='mb-3'>
                                 <div className='flex justify-between mb-5'>
                                     <h4 className='text-2xl font-medium text-darkgray dark:text-white'>Amount</h4>
-                                    <input 
-                                        className='text-darkgray dark:text-white mr-[-10px] text-right bg-transparent text-2xl font-medium placeholder-darkgray dark:placeholder-gray-400 w-full focus:outline-none focus:border-transparent' 
+                                    <input
+                                        className='text-darkgray dark:text-white mr-[-10px] text-right bg-transparent text-2xl font-medium placeholder-darkgray dark:placeholder-gray-400 w-full focus:outline-none focus:border-transparent'
                                         type='number'
                                         min={0}
                                         value={amount}
@@ -228,7 +228,7 @@ const StakeContent = () => {
                 </div>
                 <LoadingModal show={loadingModalV} message1={`${actionType} in Progress`} message2={"Transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
                 <SuccessModal show={successModalV} setShow={setSucessModalV} />
-                <ErrorModal show={errorModalV} setShow={setErrorModalV} message={modalData.message} title={modalData.title} />
+                <ErrorModal show={errorModalV.flag} setShow={setErrorModalV} title={errorModalV.title} message={errorModalV.message} />
 
             </div>
         </>

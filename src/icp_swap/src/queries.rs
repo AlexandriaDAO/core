@@ -1,10 +1,13 @@
 use crate::{
     storage::*,
-    utils::{principal_to_subaccount, DEFAULT_LBRY_RATIO, SCALING_FACTOR, STAKING_REWARD_PERCENTAGE},
+    utils::{
+        principal_to_subaccount, DEFAULT_LBRY_RATIO, SCALING_FACTOR, STAKING_REWARD_PERCENTAGE,
+    },
 };
-use candid::Principal;
+use candid::{CandidType, Principal};
 use ic_cdk::{api::caller, query};
 use ic_ledger_types::AccountIdentifier;
+use serde::Deserialize;
 //swap
 #[query]
 pub async fn caller_subaccount() -> String {
@@ -59,7 +62,7 @@ pub fn get_current_LBRY_ratio() -> u64 {
 
     match lbry_ratio_map.get(&()) {
         Some(lbry_ratio) => return lbry_ratio.ratio, // Return the ratio if it exists
-        None => return DEFAULT_LBRY_RATIO,                          //defult case
+        None => return DEFAULT_LBRY_RATIO,           //defult case
     }
 }
 
@@ -115,4 +118,39 @@ pub fn get_all_apy_values() -> Vec<(u32, u128)> {
 #[query]
 pub fn get_scaling_factor() -> u128 {
     return SCALING_FACTOR;
+}
+#[derive(CandidType, Deserialize)]
+pub struct PaginatedLogs {
+    logs: Vec<Log>,
+    total_pages: u64,
+    current_page: u64,
+    page_size: u64,
+}
+
+#[query]
+pub fn get_logs(page: Option<u64>, page_size: Option<u64>) -> PaginatedLogs {
+    let page = page.unwrap_or(1).max(1); // Ensure page is at least 1
+    let page_size = page_size.unwrap_or(10).max(1); // Ensure page_size is at least 1
+
+    LOGS.with(|logs| {
+        let logs = logs.borrow();
+        let total_count = logs.len() as u64;
+        let total_pages = (total_count as f64 / page_size as f64).ceil() as u64;
+        let start_index = ((page - 1) * page_size) as usize;
+
+        let logs = logs
+            .iter()
+            .rev()
+            .skip(start_index)
+            .take(page_size as usize)
+            .map(|(_, log)| log.clone())
+            .collect();
+
+        PaginatedLogs {
+            logs,
+            total_pages,
+            current_page: page,
+            page_size,
+        }
+    })
 }

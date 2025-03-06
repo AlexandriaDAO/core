@@ -22,7 +22,7 @@ const RedeemContent: React.FC = () => {
   const swap = useAppSelector((state) => state.swap);
   const [loadingModalV, setLoadingModalV] = useState(false);
   const [successModalV, setSucessModalV] = useState(false);
-  const [errorModalV, setErrorModalV] = useState(false);
+  const [errorModalV, setErrorModalV] = useState({ flag: false, title: "", message: "" });
 
   const handleSubmit = () => {
     dispatch(redeemArchivedBalance());
@@ -41,7 +41,7 @@ const RedeemContent: React.FC = () => {
       setSucessModalV(true);
     } else if (swap.error) {
       setLoadingModalV(false);
-      setErrorModalV(true);
+      setErrorModalV({ flag: true, title: swap.error.title, message: swap.error.message });
       dispatch(flagHandler());
 
 
@@ -93,7 +93,7 @@ const RedeemContent: React.FC = () => {
       </div>
       <LoadingModal show={loadingModalV} message1={"Redeem transaction in Progress"} message2={"Redeem transaction is being processed. This may take a few moments."} setShow={setLoadingModalV} />
       <SuccessModal show={successModalV} setShow={setSucessModalV} />
-      <ErrorModal show={errorModalV} setShow={setErrorModalV}/>
+      <ErrorModal show={errorModalV.flag} setShow={setErrorModalV} title={errorModalV.title} message={errorModalV.message} />
 
     </div>
   );

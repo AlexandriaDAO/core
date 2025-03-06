@@ -1,5 +1,62 @@
 type ArchiveBalance = record { icp : nat64 };
 type DailyValues = record { values : vec record { nat32; nat } };
+type ExecutionError = variant {
+  InvalidAmount : record { details : text; amount : nat64; reason : text };
+  Underflow : record { operation : text; details : text };
+  DivisionFailed : record { operation : text; details : text };
+  MultiplicationOverflow : record { operation : text; details : text };
+  AdditionOverflow : record { operation : text; details : text };
+  RewardDistributionError : record { reason : text };
+  RateLookupFailed : record { details : text };
+  InsufficientBalance : record {
+    token : text;
+    available : nat64;
+    details : text;
+    required : nat64;
+  };
+  BurnFailed : record {
+    token : text;
+    details : text;
+    amount : nat64;
+    reason : text;
+  };
+  CanisterCallFailed : record {
+    method : text;
+    canister : text;
+    details : text;
+  };
+  Unauthorized : text;
+  InsufficientCanisterBalance : record {
+    available : nat64;
+    details : text;
+    required : nat64;
+  };
+  MinimumRequired : record {
+    token : text;
+    provided : nat64;
+    details : text;
+    required : nat64;
+  };
+  TransferFailed : record {
+    token : text;
+    source : text;
+    dest : text;
+    details : text;
+    amount : nat64;
+    reason : text;
+  };
+  StateError : text;
+  MintFailed : record {
+    token : text;
+    details : text;
+    amount : nat64;
+    reason : text;
+  };
+  InsufficientBalanceRewardDistribution : record {
+    available : nat;
+    details : text;
+  };
+};
 type InitArgs = record {
   apy : opt vec record { nat32; DailyValues };
   stakes : opt vec record { principal; Stake };
@@ -10,7 +67,24 @@ type InitArgs = record {
   distribution_intervals : opt nat32;
 };
 type LbryRatio = record { time : nat64; ratio : nat64 };
-type Result = variant { Ok : text; Err : text };
+type Log = record {
+  function : text;
+  log_type : LogType;
+  log_id : nat64;
+  timestamp : nat64;
+  caller : principal;
+};
+type LogType = variant {
+  Error : record { error : ExecutionError };
+  Info : record { detail : text };
+};
+type PaginatedLogs = record {
+  page_size : nat64;
+  logs : vec Log;
+  total_pages : nat64;
+  current_page : nat64;
+};
+type Result = variant { Ok : text; Err : ExecutionError };
 type Stake = record { time : nat64; reward_icp : nat64; amount : nat64 };
 service : (opt InitArgs) -> {
   burn_LBRY : (nat64, opt blob) -> (Result);
@@ -24,6 +98,7 @@ service : (opt InitArgs) -> {
   get_current_LBRY_ratio : () -> (nat64) query;
   get_current_staking_reward_percentage : () -> (text) query;
   get_distribution_interval : () -> (nat32) query;
+  get_logs : (opt nat64, opt nat64) -> (PaginatedLogs) query;
   get_scaling_factor : () -> (nat) query;
   get_stake : (principal) -> (opt Stake) query;
   get_stakers_count : () -> (nat64) query;

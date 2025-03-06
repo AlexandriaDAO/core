@@ -1,5 +1,5 @@
 use crate::{
-    get_current_threshold_index_mem, get_principal, get_total_lbry_burned_mem, Logs, ALEX_CANISTER_ID, ALEX_PER_THRESHOLD, LBRY_THRESHOLDS, LOGS,
+    get_current_threshold_index_mem, get_principal, get_total_lbry_burned_mem, Logs, TokenLogs, ALEX_CANISTER_ID, ALEX_PER_THRESHOLD, LBRY_THRESHOLDS, LOGS, TOKEN_LOGS
 };
 use candid::{CandidType, Nat, Principal};
 use ic_cdk::{
@@ -217,4 +217,42 @@ pub async fn get_two_random_nfts() -> CallResult<((Principal, Vec<u8>), (Princip
 #[query]
 fn get_logs() -> Vec<Logs> {
     LOGS.with(|logs| logs.borrow().clone())
+}
+
+
+
+#[query]
+fn get_token_logs(page: Option<u64>, page_size: Option<u64>) -> PaginatedTokenLogs {
+    let page = page.unwrap_or(1).max(1); // Ensure page is at least 1
+    let page_size = page_size.unwrap_or(10).max(1); // Ensure page_size is at least 1
+
+    TOKEN_LOGS.with(|logs| {
+        let logs = logs.borrow();
+        let total_count = logs.len() as u64;
+        let total_pages = (total_count as f64 / page_size as f64).ceil() as u64;
+        let start_index = ((page - 1) * page_size) as usize;
+
+        let logs = logs
+            .iter()
+            .rev()
+            .skip(start_index)
+            .take(page_size as usize)
+            .map(|(_, log)| log.clone())
+            .collect();
+
+        PaginatedTokenLogs {
+            logs,
+            total_pages,
+            current_page: page,
+            page_size,
+        }
+    })
+}
+
+#[derive(CandidType, Deserialize)]
+pub struct PaginatedTokenLogs {
+    logs: Vec<TokenLogs>,
+    total_pages: u64,
+    current_page: u64,
+    page_size: u64,
 }
