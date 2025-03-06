@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useUser } from "@/hooks/actors";
+import { useAlexWallet } from "@/hooks/actors";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import fetchMyWallets from "@/features/wallets/thunks/fetchMyWallets";
@@ -9,7 +9,7 @@ import { Button } from "@/lib/components/button";
 import { RefreshCcw } from "lucide-react";
 
 function WalletsPage() {
-	const {actor} = useUser();
+	const {actor} = useAlexWallet();
 
 	const dispatch = useAppDispatch();
 

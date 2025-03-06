@@ -1,10 +1,9 @@
-use ic_cdk_macros::update;
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use serde_json::Value;
 use num_bigint::BigUint;
 use sha2::{Sha256, Digest};
-use candid::{self, Principal};
-use serde;
+use candid::Principal;
+
 
 const HASH_LENGTH: usize = 32; // SHA-256 produces 32 bytes
 const SALT_LENGTH: usize = 32; // Using 32-byte salt
@@ -108,7 +107,7 @@ async fn generate_salt() -> Result<[u8; SALT_LENGTH], String> {
 }
 
 /// RSA-PSS Signing with internal salt generation
-async fn rsa_pss_sign(message: &[u8], jwk_json: &Value, n: &str) -> Result<Vec<u8>, String> {
+pub async fn rsa_pss_sign(message: &[u8], jwk_json: &Value, n: &str) -> Result<Vec<u8>, String> {
     ic_cdk::println!("Starting RSA-PSS signing process");
     ic_cdk::println!("Input message: {:?}", message);
 
@@ -155,91 +154,12 @@ async fn rsa_pss_sign(message: &[u8], jwk_json: &Value, n: &str) -> Result<Vec<u
 }
 
 /// Convert bytes to base64url string without padding
-fn buffer_to_b64url(buffer: &[u8]) -> String {
+pub fn buffer_to_b64url(buffer: &[u8]) -> String {
     // First encode to standard base64
     let b64 = URL_SAFE_NO_PAD.encode(buffer);
     // URL_SAFE_NO_PAD already handles the url-safe encoding and padding removal
     b64
 }
-
-#[derive(candid::CandidType, serde::Serialize)]
-pub struct SignatureResponse {
-    signature: String,
-    id: String,
-    owner: String,
-}
-
-#[derive(candid::CandidType, serde::Deserialize, Debug)]
-pub struct WalletKeyResponse {
-    pub id: u64,
-    pub key: String,
-    pub n: String,
-}
-
-// /// Calls the `user` canister to get the wallet by ID
-// pub async fn get_wallet_key(wallet_id: u64) -> Result<WalletKeyResponse, String> {
-//     let (response,): (Result<WalletKeyResponse, String>,) = ic_cdk::api::call::call(
-//         user_canister_id(),
-//         "get_wallet_key",
-//         (wallet_id,), // Pass the wallet_id directly
-//     )
-//     .await
-//     .map_err(|e| format!("Call to get_wallet_key failed: {:?}", e))?;
-
-//     let wallet_key = response.map_err(|e| format!("Error from user canister: {}", e))?;
-
-//     ic_cdk::println!("Wallet key: {}, id: {}, owner: {}", wallet_key.key, wallet_key.id, wallet_key.owner);
-
-//     Ok(wallet_key)
-// }
-
-
-pub async fn get_wallet_key(wallet_id: u64) -> Result<WalletKeyResponse, String> {
-    ic_cdk::println!("Starting get_wallet_key function");
-    ic_cdk::println!("Requesting wallet with ID: {}", wallet_id);
-
-    // Perform the cross-canister call to the `user` canister
-    let result: Result<(Result<WalletKeyResponse, String>,), _> = ic_cdk::api::call::call(
-        user_canister_id(),
-        "get_wallet_key",
-        (wallet_id,),
-    )
-    .await;
-
-    match result {
-        Ok((Ok(wallet_key),)) => {
-            ic_cdk::println!("Successfully retrieved wallet key: {:?}", wallet_key);
-            Ok(wallet_key)
-        }
-        Ok((Err(err),)) => {
-            ic_cdk::println!("Error from user canister: {}", err);
-            Err(format!("Error from user canister: {}", err))
-        }
-        Err((code, msg)) => {
-            ic_cdk::println!("Cross-canister call failed: code={:?}, message={}", code, msg);
-            Err(format!("Cross-canister call failed: code={:?}, message={}", code, msg))
-        }
-    }
-}
-
-
-// /// Calls the `vetkd` canister to get the decrypted key
-// pub async fn get_decrypted_key(encrypted_key: String) -> Result<String, String> {
-//     let (response,): (Result<String, String>,) = ic_cdk::api::call::call(
-//         vetkd_canister_id(),
-//         "wbe_decrypt",
-//         (encrypted_key,), // Pass the wallet_id directly
-//     )
-//     .await
-//     .map_err(|e| format!("Call to abe_decrypt failed: {:?}", e))?;
-
-//     let decrypted = response.map_err(|e| format!("Decryption error: {}", e))?;
-
-//     ic_cdk::println!("Decrypted key: {}", decrypted);
-
-//     Ok(decrypted)
-// }
-
 
 /// Calls the `vetkd` canister to get the decrypted key
 pub async fn get_decrypted_key(encrypted_key: String) -> Result<String, String> {
@@ -270,46 +190,7 @@ pub async fn get_decrypted_key(encrypted_key: String) -> Result<String, String> 
     }
 }
 
-#[update]
-pub async fn sign(data: Vec<u8>, id: u64) -> Result<SignatureResponse, String> {
-    ic_cdk::println!("Debugging ID: {}", id);
-
-    // Call the `get_wallet_key` function to retrieve the wallet key
-    let wallet = get_wallet_key(id).await?;
-
-    let decrypted = get_decrypted_key(wallet.key).await?;
-
-    ic_cdk::println!("Starting sign() function");
-    ic_cdk::println!("Input data length: {} bytes", data.len());
-
-    // Parse the decrypted JWK string
-    let jwk_json: Value = serde_json::from_str(&decrypted).map_err(|e| format!("Failed to parse decrypted JWK: {}", e))?;
-
-    ic_cdk::println!("Parsed JWK");
-
-    // Get n directly from parsed JWK
-    let owner = wallet.n.to_string();
-    ic_cdk::println!("Owner: {}", owner);
-
-    let raw_signature = rsa_pss_sign(data.as_slice(), &jwk_json, &owner).await?;
-    let signature = buffer_to_b64url(&raw_signature);
-
-    let id_bytes: Vec<u8> = Sha256::digest(&raw_signature).to_vec();
-    let id = buffer_to_b64url(&id_bytes);
-
-    Ok(SignatureResponse {
-        signature,
-        id,
-        owner
-    })
-}
-
 fn vetkd_canister_id() -> Principal {
     let vetkd_canister_id = "5ham4-hqaaa-aaaap-qkmsq-cai";
     Principal::from_text(vetkd_canister_id).expect("failed to create canister ID")
-}
-
-fn user_canister_id() -> Principal {
-    let user_canister_id = "yo4hu-nqaaa-aaaap-qkmoq-cai";
-    Principal::from_text(user_canister_id).expect("failed to create canister ID")
 }

@@ -1,5 +1,5 @@
 import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE, PublicKey } from "../../../../../declarations/user/user.did";
+import { _SERVICE, PublicKey } from "../../../../../declarations/alex_wallet/alex_wallet.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ibe_encrypt } from "@/services/vetkdService";
 import { SerializedWallet } from "../../wallets/walletsSlice";

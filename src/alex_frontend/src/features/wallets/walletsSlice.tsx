@@ -3,7 +3,7 @@ import fetchMyWallets from "./thunks/fetchMyWallets";
 import { toast } from "sonner";
 import deleteWallet from "./thunks/deleteWallet";
 import updateWalletStatus from "./thunks/updateWalletStatus";
-import { PublicKey } from "../../../../declarations/user/user.did";
+import { PublicKey } from "../../../../declarations/alex_wallet/alex_wallet.did";
 import fetchBalance from "./thunks/fetchBalance";
 
 export interface SerializedWallet {
