@@ -1,7 +1,5 @@
 import {
-  getActorEmporium,
   getActorAssetManager,
-  getIcpLedgerActor,
   getLbryActor,
   getIcrc7Actor,
   getActorUserAssetCanister,
@@ -12,6 +10,7 @@ import { natToArweaveId } from "@/utils/id_convert";
 import { uploadAsset } from "./uploadToAssetCanister";
 import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
 import { RootState } from "@/store";
+import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
 
 export const createAssetCanister = createAsyncThunk<
   string, // Success type
@@ -107,10 +106,6 @@ export const getCallerAssetCanister = createAsyncThunk<
   }
 });
 
-
-
-
-
 export interface syncProgressInterface {
   currentItem: string;
   progress: number;
@@ -137,23 +132,26 @@ export const syncNfts = createAsyncThunk<
     { dispatch, getState, rejectWithValue }
   ) => {
     try {
-      const actorIcrc7 = await getIcrc7Actor();
-      const countLimit = [BigInt(10000)] as [bigint];
+      // Create NFT token adapter
+      const nftAdapter = createTokenAdapter('NFT');
 
-      // Fetch user's NFTs
-      const result = await actorIcrc7.icrc7_tokens_of(
-        {
-          owner: Principal.fromText(userPrincipal),
-          subaccount: [],
-        },
-        [],
-        countLimit
+      // Fetch user's NFTs using the adapter
+      const result = await nftAdapter.getTokensOf(
+        Principal.fromText(userPrincipal),
+        undefined,
+        BigInt(10000)
       );
 
-      if (!Array.isArray(result) || result.length === 0) {
+      if (result.length === 0) {
         console.warn("No tokens found for the specified user.");
       }
-      const tokens = result.map((value) => natToArweaveId(value));
+      
+      // Convert token IDs to arweave IDs using the adapter
+      const tokens: string[] = [];
+      for (const tokenId of result) {
+        const nftData = await nftAdapter.tokenToNFTData(tokenId, userPrincipal);
+        tokens.push(nftData.arweaveId);
+      }
 
       const fetchedTransactions = JSON.stringify(
         await fetchTransactionsForAlexandrian(tokens)
@@ -179,7 +177,6 @@ export const syncNfts = createAsyncThunk<
       console.log("Transaction data uploaded successfully!");
 
       // Step 2: Upload NFTs one by one
-
       console.log("tokens are ", tokens);
       tokens.reduce(async (prevPromise, token) => {
         await prevPromise; //  before starting the next one

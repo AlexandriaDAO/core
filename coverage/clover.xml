@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1741129447175" clover="3.2.0">
+  <project timestamp="1741129447175" name="All files">
+    <metrics statements="7" coveredstatements="6" conditionals="5" coveredconditionals="5" methods="3" coveredmethods="2" elements="15" coveredelements="13" complexity="0" loc="7" ncloc="7" packages="1" files="2" classes="2"/>
+    <file name="Alert.tsx" path="/home/theseus/alexandria/core/src/alex_frontend/src/components/Alert.tsx">
+      <metrics statements="4" coveredstatements="4" conditionals="5" coveredconditionals="5" methods="1" coveredmethods="1"/>
+      <line num="11" count="1" type="stmt"/>
+      <line num="59" count="6" type="stmt"/>
+      <line num="60" count="6" type="cond" truecount="2" falsecount="0"/>
+      <line num="62" count="6" type="stmt"/>
+    </file>
+    <file name="Loading.tsx" path="/home/theseus/alexandria/core/src/alex_frontend/src/components/Loading.tsx">
+      <metrics statements="3" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="1"/>
+      <line num="5" count="1" type="stmt"/>
+      <line num="6" count="1" type="stmt"/>
+      <line num="9" count="0" type="stmt"/>
+    </file>
+  </project>
+</coverage>

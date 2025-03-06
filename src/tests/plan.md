@@ -1,37 +1,16 @@
-#### Before deploy:
-- Fix mint button not showing up when nsfw model is selected.
-- Most recent looks like it's selected when it's actually not.
-
-
-#### Features now:
-- Revert to adils rendering approach without breaking the grid. (problem statement on page bottom).
-
-
-#### Bugs:
-- Need more dynamic states for the like/mint/withdraw buttons. (include in this singleTokenView.tsx which duplicates a lot of this logic.)
-- If the mint has succeded the mint button should go away.
-- If you go to the next page on alexandrian while a modal is open it throws an error.
-- On permasearch, when the safesearch model loads after the search is complete, it should run the check and make the assets mintable rather than requireing a second search attempt.
-
 #### Bigger Features (lower priority):
-- Range selection for Alexandrian, e.g., query nfts of a person by 400-500 instead of starting from the latest.
+- Need more dynamic states for the like/mint/withdraw buttons. include in this singleTokenView.tsx which duplicates a lot of this logic. (If the mint has succeded the mint button should go away).
 - Lazy loading all apps, and loading blur to clear instead of top to bottom.
-- Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
-- Put another amount selector by the show more button on permasearch.
-- Need to combine emporium with main app modules (eventually, not now.).
-- Authmenu.tsx open back up the dashboard and profile.
-- Add the icrc3 canisters to the cycles manager.
-- Index canisters.
-- Autonomous NFT Backup Canister (automate the backup repo logic in a timer autonomous canister.)
-- Likes tracker canister for NFTs. (and maybe secondary method for SBT.)
-- Make coordinate_mint.rs take the NFT_id instead of the arweave_id.
+- Just more efficient loading, maybe lossless compression, or lower res on heavy assets. Maybe make this a setting for people based on how good their internet is.
+- Cache the nsfw model so it doesn't have to be reloaded every time on permasearch.
+- Get rid of the topup concept, and make all lbry payments directly from the wallet, and display balance in the header.
+- Find out why some NFT assets just arent able to render, and fix our rendering logic to fit them in.
 
 #### Permasearch Specific:
 
 - Remove duplicates based on file size.
 - More advanced searching with tags and metadata.
-- Mint button has some load time issues on Alexandrian.
-- Rank by tokens in the NFT.
+- Rank by tokens in the NFT. (rating system for rarity.)
 
 
 #### New Apps:
@@ -44,11 +23,13 @@
 
 
 #### Alexandria-wide Next Goals: 
+- Add the icrc3 canisters to the cycles manager.
+- Get the profile/manager/library stuff opened back up and ready for production.
 (1) Improve the Emporium app to be more like a real NFT marketplace. Keeping track of what has been sold, etc.
 (2) Start work on a ICP --> AO bridge. I want to be able to bridge ALEX and LBRY to AO, so people can buy it on AO and send it to our site and use it without needing to buy ICP. This could also be a general bridge for other ICRC1 Tokens.
 (3) Make an Autonomous NFT backup cansiter. If you look in the backups repo, we run a script to make a backup of all the NFTs. But there are too many to run this manually, so we need a canister to fetch the latest on a timer and keep updating the backups.
 (4) An app or feature that lets checks all your NFTs for the amount of tokens in them, and orders them by amount so it's easy to withdraw rewards.
-(5) Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
+(5) Like tracker for NFTs: Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
 (6) Add a ledger canister for $ALEX and $LBRY.
 
 
@@ -67,7 +48,7 @@
 XWKa-Q2gppignoX_Ngs7VJYZPN_yhiy1ToovQ1NBMFs
 NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
-93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I  09/2022
+93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I 09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
 
@@ -104,3 +85,13 @@ The direct Arweave path needs to:
 2. Dispatch setTransactions
 3. Trigger loadContentForTransactions
 4. Maintain consistent error handling with the asset canister path
+
+
+
+
+
+
+
+
+
+- The reason to LP in the chain-native token is primarily social. This is a clear bias, as something else will outperform that chain's native token.

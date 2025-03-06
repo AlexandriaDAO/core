@@ -26,37 +26,59 @@ module.exports = {
   devtool: isDevelopment ? "source-map" : false,
   optimization: {
     minimize: !isDevelopment,
-    minimizer: [new TerserPlugin()],
+    minimizer: [new TerserPlugin({
+      terserOptions: {
+        compress: {
+          drop_console: false, // Keep console logs for debugging
+        },
+      },
+    })],
     splitChunks: {
       chunks: 'all',
-      maxInitialRequests: Infinity,
-      minSize: 0,
+      maxInitialRequests: 6, // Allow more initial requests for better parallelization
+      maxAsyncRequests: 30, // Allow more async requests
+      minSize: 20000, // Slightly larger minimum size to prevent tiny chunks
+      maxSize: 244000, // Maximum size to prevent huge chunks
       cacheGroups: {
+        // Critical path modules needed for initial render
+        critical: {
+          test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|redux|react-redux|@reduxjs\/toolkit)[\\/]/,
+          name: 'critical',
+          chunks: 'initial', // Only include in initial chunks
+          priority: 60,
+          enforce: true,
+        },
+        // TensorFlow and related packages
         tensorflow: {
           test: /[\\/]node_modules[\\/](@tensorflow|tfjs-core|tfjs-backend-.*|tfjs-converter)[\\/]/,
           name: 'tensorflow',
-          chunks: 'async',
+          chunks: 'async', // Only load asynchronously
           priority: 50,
           enforce: true
         },
+        // NSFWJS package
         nsfwjs: {
           test: /[\\/]node_modules[\\/]nsfwjs[\\/]/,
           name: 'nsfwjs',
-          chunks: 'async',
+          chunks: 'async', // Only load asynchronously
           priority: 40,
           enforce: true
         },
-        react: {
-          test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-sync-external-store|react-redux)[\\/]/,
-          name: 'react',
-          chunks: 'all',
-          priority: 30,
-        },
+        // Common vendor modules
         vendors: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
           chunks: 'all',
           priority: 20,
+          reuseExistingChunk: true,
+        },
+        // Common application code
+        commons: {
+          name: 'commons',
+          minChunks: 2, // Used in at least 2 chunks
+          chunks: 'initial',
+          priority: 10,
+          reuseExistingChunk: true,
         },
       },
     },
@@ -100,19 +122,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(png|jpe?g|gif)$/i,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-              outputPath: 'images',
-              publicPath: '/images',
-            },
-          },
-        ],
-      },
-      {
         test: /\.(png|jpe?g|gif|svg)$/i,
         type: 'asset/resource',
       },
@@ -140,22 +149,9 @@ module.exports = {
         use: ['@svgr/webpack'],
       },
       {
-        test: /\.(png|jpe?g|gif)$/i,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              outputPath: 'images',
-              name: '[name].[ext]',
-            },
-          },
-        ],
-      },
-      {
         test: /\.wasm$/,
         type: "webassembly/async",
       },
-      { test: /\\.(png|jp(e*)g|svg|gif)$/, use: ['file-loader'], },
       {
         test: /nsfwjs[\\/]dist[\\/]esm[\\/]models[\\/].*\.(js|json)$/,
         use: 'null-loader',
@@ -223,27 +219,27 @@ module.exports = {
       'require("./model_imports/mobilenet_v2")': '{}',
       'require("./model_imports/mobilenet_v2_mid")': '{}'
     }),
-    new BundleAnalyzerPlugin({
-      analyzerMode: 'server',
-      analyzerHost: 'localhost',
-      analyzerPort: 8888,
-      openAnalyzer: true,
-      generateStatsFile: true,
-      statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
-      statsOptions: {
-        all: false,
-        assets: true,
-        assetsSort: 'size',
-        chunks: true,
-        chunkModules: false,
-        entrypoints: true,
-        hash: true,
-        modules: false,
-        timings: true,
-        errors: true,
-        warnings: true,
-      },
-    }),
+    // new BundleAnalyzerPlugin({
+    //   analyzerMode: 'server',
+    //   analyzerHost: 'localhost',
+    //   analyzerPort: 8888,
+    //   openAnalyzer: true,
+    //   generateStatsFile: true,
+    //   statsFilename: path.join(__dirname, 'bundle-stats-minimal.json'),
+    //   statsOptions: {
+    //     all: false,
+    //     assets: true,
+    //     assetsSort: 'size',
+    //     chunks: true,
+    //     chunkModules: false,
+    //     entrypoints: true,
+    //     hash: true,
+    //     modules: false,
+    //     timings: true,
+    //     errors: true,
+    //     warnings: true,
+    //   },
+    // }),
   ],
   devServer: {
     

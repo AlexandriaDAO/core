@@ -32,7 +32,7 @@ interface CombinedModalProps {
 
 const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose, handleRenderError }) => {
     const dispatch = useAppDispatch();
-    const contentData = useAppSelector((state) => state.contentDisplay.contentData);
+    const contentData = useAppSelector((state) => state.transactions.contentData);
     const user = useAppSelector((state) => state.auth);
     const emporium = useAppSelector((state) => state.emporium);
     const swap = useAppSelector((state) => state.swap);

@@ -5,15 +5,15 @@ import { RootState } from '@/store';
 
 // Memoized selector for filtered and sorted transactions
 export const selectFilteredAndSortedTransactions = createSelector(
-  [(state: RootState) => state.contentDisplay.transactions,
+  [(state: RootState) => state.transactions.transactions,
    (state: RootState) => state.library.sortAsc,
    (state: RootState) => state.library.tags],
   (transactions, ascending, tags): Transaction[] => {
     // First filter
     const filteredTransactions = tags.length === 0 
       ? transactions 
-      : transactions.filter(transaction => {
-          const contentTypeTag = transaction.tags.find(tag => tag.name === 'Content-Type');
+      : transactions.filter((transaction: Transaction) => {
+          const contentTypeTag = transaction.tags.find((tag: { name: string; value: string }) => tag.name === 'Content-Type');
           return contentTypeTag && tags.includes(contentTypeTag.value);
         });
 

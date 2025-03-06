@@ -1,15 +1,14 @@
 import { useIdentity } from './useIdentity';
+import { useNavigate } from "react-router";
 
 export function useLogout() {
     const {clear} = useIdentity();
+    const navigate = useNavigate()
 
     const logout = async ()=>{
         await clear();
 
-        // navigate('/')
-
-        // cached identity issue, force refresh
-        window.location.href = '/'
+        navigate('/')
     }
 
     return logout

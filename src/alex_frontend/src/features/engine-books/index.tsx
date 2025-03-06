@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import Mint from "../mint";
 import MintedBook from "./components/MintedBook";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchEngineBooks from "./thunks/fetchEngineBooks";
@@ -50,8 +49,6 @@ const EngineBooks = () => {
 									className="font-roboto-condensed font-normal text-base flex-grow rounded border-0 ring-0 focus:ring-0 outline-none"
 								/>
 							</div>
-							<Mint mint={false} />
-							<Mint />
 						</div>
 					</>
 				)}

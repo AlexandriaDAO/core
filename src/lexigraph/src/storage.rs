@@ -14,6 +14,7 @@ type Memory = VirtualMemory<DefaultMemoryImpl>;
 const SHELVES_MEM_ID: MemoryId = MemoryId::new(0);
 const USER_SHELVES_MEM_ID: MemoryId = MemoryId::new(1);
 const NFT_SHELVES_MEM_ID: MemoryId = MemoryId::new(2);
+const GLOBAL_TIMELINE_MEM_ID: MemoryId = MemoryId::new(3);
 
 const MAX_VALUE_SIZE: u32 = 8192; // 8kb should be good for a decent sized markdown file.
 
@@ -48,6 +49,13 @@ thread_local! {
     pub static NFT_SHELVES: RefCell<StableBTreeMap<String, StringVec, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(NFT_SHELVES_MEM_ID))
+        )
+    );
+    
+    // Global timeline index: K: timestamp, V: shelf_id
+    pub static GLOBAL_TIMELINE: RefCell<StableBTreeMap<u64, String, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(GLOBAL_TIMELINE_MEM_ID))
         )
     );
 }

@@ -4,7 +4,7 @@ import { hexDecode, hexEncode } from "@/utils/vetkd";
 import { getActorVetkd } from "@/features/auth/utils/authUtils";
 
 const frontend_canister_id = process.env.CANISTER_ID_ALEX_FRONTEND!;
-const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
+const user_canister_id = process.env.CANISTER_ID_USER!;
 
 export const ibe_decrypt =	 async(encoded:string, receiver:string = frontend_canister_id)=> {
 	const vetkd = await import('ic-vetkd-utils');
@@ -29,7 +29,7 @@ export const ibe_decrypt =	 async(encoded:string, receiver:string = frontend_can
 
 	return decoded;
 }
-export const ibe_encrypt = async( message:string, receiver:string = alex_wallet_canister_id)=> {
+export const ibe_encrypt = async( message:string, receiver:string = user_canister_id)=> {
 	if(message.length == 0) throw new Error("Message is empty");
 
 	const vetkd = await import('ic-vetkd-utils');

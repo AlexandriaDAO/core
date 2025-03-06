@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReduxProvider from "./providers/ReduxProvider";
 
 import "./styles/tailwind.css";
@@ -15,6 +15,18 @@ import { AppRoutes } from "./routes";
 import { ThemeProvider } from "./providers/ThemeProvider";
 
 export default function App() {
+    const [isReady, setIsReady] = useState(false);
+
+    // Mark the app as ready after a short delay to ensure all providers are initialized
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsReady(true);
+            console.log("App is ready");
+        }, 100);
+        
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <AuthProvider>
@@ -22,7 +34,8 @@ export default function App() {
                     <ReduxProvider>
                         <UserProvider>
                             <SessionProvider>
-                                <AppRoutes />
+                                {/* Only render routes when the app is ready */}
+                                {isReady ? <AppRoutes /> : null}
                             </SessionProvider>
                         </UserProvider>
                     </ReduxProvider>

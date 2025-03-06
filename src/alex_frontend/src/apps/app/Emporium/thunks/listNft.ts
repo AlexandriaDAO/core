@@ -1,13 +1,11 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import {
   getActorEmporium,
   getIcrc7Actor,
 } from "@/features/auth/utils/authUtils";
-import { arweaveIdToNat, natToArweaveId } from "@/utils/id_convert";
-import LedgerService from "@/utils/LedgerService";
 import { Principal } from "@dfinity/principal";
-import { removeTransactionById } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
-import { constrainedMemory } from "process";
+import { removeTransaction } from "@/apps/Modules/shared/state/transactions/transactionThunks";
+import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
 
 const listNft = createAsyncThunk<
   string, // Success return type
@@ -23,11 +21,14 @@ const listNft = createAsyncThunk<
       const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
       const actorEmporium = await getActorEmporium();
       const actorIcrc7 = await getIcrc7Actor();
+      
+      const nftAdapter = createTokenAdapter('NFT');
+      
+      const { arweaveIdToNat } = await import("@/utils/id_convert");
       const tokenId = arweaveIdToNat(nftArweaveId);
 
-      // Format the price as BigInt
       const priceFormat: bigint = BigInt(
-        Math.round(Number(price) * 10 ** 8) // Convert to fixed-point format
+        Math.round(Number(price) * 10 ** 8)
       );
 
       const isApproved = await actorIcrc7.icrc37_is_approved([
@@ -63,23 +64,12 @@ const listNft = createAsyncThunk<
       }
       const result = await actorEmporium.list_nft(tokenId, priceFormat);
 
-      // Handle success or error response
       if ("Ok" in result) {
-        dispatch(removeTransactionById(nftArweaveId));
+        dispatch(removeTransaction(nftArweaveId) as unknown as AnyAction);
 
         return "success";
       } else if ("Err" in result) {
-        // const revoke = await actorIcrc7.icrc37_revoke_token_approvals([
-        //   {
-        //     token_id: tokenId,
-        //     memo: [],
-        //     from_subaccount: [],
-        //     created_at_time: [],
-        //     spender: [],
-        //   },
-        // ]);
-        // console.log("this is revoke",revoke);
-        return rejectWithValue(result?.Err); // Use rejectWithValue directly
+        return rejectWithValue(result?.Err);
       }
     } catch (error) {
       console.error("Error listing NFT:", error);
@@ -88,7 +78,6 @@ const listNft = createAsyncThunk<
         "An error occurred while listing the NFT." + error
       );
     }
-    // Fallback for unknown issues
     return rejectWithValue(
       "An unknown error occurred while listing the NFT. Please try again."
     );

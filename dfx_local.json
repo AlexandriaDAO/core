@@ -15,19 +15,6 @@
       "package": "user",
       "candid": "src/user/user.did"
     },
-    "alex_wallet": {
-      "type": "azle",
-      "package": "alex_wallet",
-      "main": "src/alex_wallet/src/main.ts",
-      "candid": "src/alex_wallet/alex_wallet.did",
-      "candid_gen": "automatic",
-      "custom": {
-        "experimental": true
-      },
-      "declarations": {
-        "node_compatibility": true
-      }
-    },
     "alex_backend": {
       "candid": "src/alex_backend/alex_backend.did",
       "package": "alex_backend",

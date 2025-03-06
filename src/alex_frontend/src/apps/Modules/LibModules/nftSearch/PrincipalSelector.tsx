@@ -21,6 +21,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/lib/components/popover";
+import { TokenType } from '../../shared/adapters/TokenAdapter';
 
 interface NFTUserInfo {
   principal: any;
@@ -66,11 +67,13 @@ export default function PrincipalSelector() {
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const noResults = useSelector((state: RootState) => state.library.noResults);
-  const collection = useSelector((state: RootState) => state.library.collection);
+  const collection = useSelector((state: RootState) => state.library.collection) as TokenType;
+  const totalItems = useSelector((state: RootState) => state.library.totalItems);
   const dispatch = useDispatch<AppDispatch>();
   const [principals, setPrincipals] = React.useState<PrincipalData[]>([]);
   const [open, setOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [hasInitialized, setHasInitialized] = React.useState(false);
 
   // Fetch principals from backend
   const fetchPrincipals = async () => {
@@ -116,17 +119,23 @@ export default function PrincipalSelector() {
     }
   };
 
+  // Combined effect for initialization and data fetching
   React.useEffect(() => {
-    fetchPrincipals();
-  }, [userPrincipal, collection]);
-
-  // Initialize default principal on mount
-  React.useEffect(() => {
-    // Directly dispatch the action to set 'new' as default
-    dispatch(togglePrincipal('new'));
-    // Update search params to trigger index calculation
-    dispatch(updateSearchParams({}));
-  }, []); // Empty dependency array means this only runs on mount
+    const initialize = async () => {
+      // First fetch principals
+      await fetchPrincipals();
+      
+      // Then handle initialization if not done yet
+      if (!hasInitialized) {
+        // Force selection of 'new' and trigger search regardless of what's in the state
+        await dispatch(togglePrincipal('new'));
+        await dispatch(togglePrincipalSelection('new'));
+        setHasInitialized(true);
+      }
+    };
+    
+    initialize();
+  }, [userPrincipal, collection, hasInitialized, dispatch]);
 
   const handlePrincipalSelect = async (principalId: string) => {
     // For 'new' option or My Library, always allow selection
@@ -242,6 +251,11 @@ export default function PrincipalSelector() {
                               )}
                             />
                             {principal.username}
+                            {!principal.hasNFTs && (
+                              <span className="ml-2 text-xs text-muted-foreground">
+                                (No {collection === 'NFT' ? 'NFTs' : 'SBTs'})
+                              </span>
+                            )}
                           </CommandItem>
                         );
                       })}

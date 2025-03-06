@@ -1,29 +1,19 @@
-import React, { useEffect } from "react";
-import { useUser } from "@/hooks/actors";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
-import fetchMyNodes from "@/features/my-nodes/thunks/fetchMyNodes";
-import Librarian from "@/features/librarian";
+import React from "react";
 
 function LibrarianPage() {
-	const {actor} = useUser();
-
-	const dispatch = useAppDispatch();
-
-	const { user } = useAppSelector((state) => state.auth);
-
-	useEffect(()=>{
-		if(!actor) return;
-		dispatch(fetchMyNodes(actor));
-	},[user])
-
 	return (
 		<>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold text-primary">Librarian Home</h1>
 			</div>
 			<div className="font-roboto-condensed bg-secondary rounded-lg shadow-md p-6">
-				<Librarian />
+				<div className="mb-6">
+					<h2 className="text-xl font-semibold mb-2">Wallet Management</h2>
+					<p className="text-gray-600">
+						As a librarian, you can create and manage wallets that users can use to upload files.
+						You'll earn LBRY credits for providing this service.
+					</p>
+				</div>
 			</div>
 		</>
 	)

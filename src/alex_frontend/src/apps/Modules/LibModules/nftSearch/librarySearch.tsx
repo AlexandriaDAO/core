@@ -5,7 +5,7 @@ import { AppDispatch } from "@/store";
 import PrincipalSelector from "./PrincipalSelector";
 import CollectionSelector from "./collectionSelector";
 import LibraryContentTagsSelector from "./tagSelector";
-import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
+import { loadContentForTransactions } from "../../shared/state/transactions/transactionThunks";
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/lib/components/select";
@@ -137,20 +137,24 @@ const NFTPagination = () => {
   );
 };
 
-export default function LibrarySearch() {
+interface LibrarySearchProps {
+  defaultCategory?: 'favorites' | 'all';
+}
+
+export default function LibrarySearch({ defaultCategory = 'favorites' }: LibrarySearchProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
-  const isTransactionUpdated = useSelector((state: RootState) => state.contentDisplay.isUpdated);
+  const transactionData = useSelector((state: RootState) => state.transactions.transactions);
+  const isTransactionUpdated = useSelector((state: RootState) => state.transactions.isUpdated);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
     const loadContent = async () => {
-      if (transactions.length > 0 && !isLoading) {
+      if (transactionData.length > 0 && !isLoading) {
         setIsLoading(true);
         try {
-          await dispatch(loadContentForTransactions(transactions));
+          await dispatch(loadContentForTransactions(transactionData));
         } catch (error) {
           console.error('Error loading content:', error);
         } finally {
@@ -166,7 +170,7 @@ export default function LibrarySearch() {
     return () => {
       isMounted = false;
     };
-  }, [dispatch, transactions, isTransactionUpdated]);
+  }, [dispatch, transactionData, isTransactionUpdated]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-[8px] md:rounded-[12px] shadow-md p-2 sm:p-3">
@@ -178,7 +182,7 @@ export default function LibrarySearch() {
               <PrincipalSelector />
               <CollectionSelector />
             </div>
-            <LibraryContentTagsSelector />
+            <LibraryContentTagsSelector defaultCategory={defaultCategory} />
           </div>
           
           {/* Second row: Pagination controls (full width) */}
