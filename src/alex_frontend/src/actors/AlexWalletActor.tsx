@@ -10,7 +10,7 @@ import { AlexWalletContext } from "@/contexts/actors";
 import { useActorErrorHandler } from "@/hooks/actors";
 import { AnonymousIdentity } from "@dfinity/agent";
 
-export default function UserActor({ children }: { children: ReactNode }) {
+export default function AlexWalletActor({ children }: { children: ReactNode }) {
 	const { identity, clear, isInitializing, isLoggingIn } = useIdentity();
     const { errorToast, handleRequest , handleResponse, handleResponseError} = useActorErrorHandler(clear);
 

@@ -8,7 +8,7 @@ export { default as useIcpLedger } from './useIcpLedger';
 export { default as useIcpSwap } from './useIcpSwap';
 export { default as useIcrc7 } from './useIcrc7';
 export { default as useLbry } from './useLbry';
-export { default as useNftManagerAlexWallet } from './useNftManager';
+export { default as useNftManager } from './useNftManager';
 export { default as useTokenomics } from './useTokenomics';
 export { default as useVetkd } from './useVetkd';
 export { default as useLexigraph } from './useLexigraph';
