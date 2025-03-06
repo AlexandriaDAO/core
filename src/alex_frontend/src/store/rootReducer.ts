@@ -28,8 +28,8 @@ import contentDisplayReducer from "@/apps/Modules/shared/state/content/contentDi
 import arweaveReducer from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import libraryReducer from "@/apps/Modules/shared/state/librarySearch/librarySlice";
 import nftDataReducer from "@/apps/Modules/shared/state/nftData/nftDataSlice";
+import nftTransactionsReducer from "@/apps/Modules/shared/state/nftData/nftTransactionsSlice";
 import assetManagerReducer from "@/apps/Modules/shared/state/assetManager/assetManagerSlice";
-
 
 import emporiumReducer from "@/apps/app/Emporium/emporiumSlice";
 
@@ -73,6 +73,7 @@ const rootReducer = combineReducers({
 	contentDisplay: contentDisplayReducer,
 	library: libraryReducer,
 	nftData: nftDataReducer,
+	nftTransactions: nftTransactionsReducer,
 	emporium: emporiumReducer,
 	assetManager:assetManagerReducer,
 });

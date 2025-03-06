@@ -13,6 +13,9 @@ import { withdraw_nft } from "@/features/nft/withdraw";
 import { TooltipProvider } from "@/lib/components/tooltip";
 import { Loader2 } from 'lucide-react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
+import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
+import type { Transaction } from '../../shared/types/queries';
+import { useLocation } from 'react-router-dom';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -28,7 +31,7 @@ type ContentGridComponent = React.FC<ContentGridProps> & {
 export const ContentGrid: ContentGridComponent = Object.assign(
   ({ children }: ContentGridProps) => {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:grid-cols-2 xs:grid-cols-1  gap-2 sm:gap-4 lg:pb-16 md:pb-14 sm:pb-10 xs:pb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:grid-cols-2 gap-2 sm:gap-4 lg:pb-16 md:pb-14 sm:pb-10 xs:pb-6">
         {children}
       </div>
     );
@@ -41,14 +44,45 @@ const mapCollectionToBackend = (collection: 'NFT' | 'SBT'): 'icrc7' | 'icrc7_sci
   return collection === 'NFT' ? 'icrc7' : 'icrc7_scion';
 };
 
-const Grid = () => {
+export type GridDataSource = 'contentDisplay' | 'nftTransactions';
+
+interface GridProps {
+  dataSource?: GridDataSource;
+}
+
+const Grid = ({ dataSource }: GridProps = {}) => {
   const dispatch = useAppDispatch();
-  const transactions = useSortedTransactions();
-  const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
-  const predictions = useSelector((state: RootState) => state.arweave.predictions);
+  const location = useLocation();
+  
+  // Determine which data source to use based on props or route
+  let effectiveDataSource: GridDataSource = dataSource || 'contentDisplay';
+  
+  // If no dataSource prop is provided, try to infer from the route
+  if (!dataSource) {
+    const isAlexandrianRoute = location.pathname.includes('/alexandrian');
+    effectiveDataSource = isAlexandrianRoute ? 'nftTransactions' : 'contentDisplay';
+  }
+  
+  // Select the appropriate state based on the determined data source
+  const { transactions, contentData } = useSelector((state: RootState) => {
+    if (effectiveDataSource === 'nftTransactions') {
+      return {
+        transactions: state.nftTransactions.transactions,
+        contentData: state.nftTransactions.contentData,
+      };
+    } else {
+      return {
+        transactions: state.contentDisplay.transactions,
+        contentData: state.contentDisplay.contentData,
+      };
+    }
+  });
+
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
-  
+  const { predictions } = useSelector((state: RootState) => state.arweave);
+  const sortedTransactions = useMemo(() => transactions, [transactions]); // No need for sorting since they're already in order
+
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string,assetUrl:string } | null>(null);
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
@@ -107,16 +141,13 @@ const Grid = () => {
     }
   }, []);
 
-  // Memoize transactions to prevent unnecessary re-renders
-  const memoizedTransactions = useMemo(() => transactions, [transactions]);
-
   return (
     <TooltipProvider>
       <>
         <ContentGrid>
-          {memoizedTransactions.map((transaction) => {
+          {sortedTransactions.map((transaction: Transaction) => {
             const content = contentData[transaction.id];
-            const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || "application/epub+zip";
+            const contentType = transaction.tags.find((tag: { name: string; value: string }) => tag.name === "Content-Type")?.value || "application/epub+zip";
             
             const nftId = arweaveToNftId[transaction.id];
             const nftData = nftId ? nfts[nftId] : undefined;
@@ -125,9 +156,9 @@ const Grid = () => {
             const hasPredictions = !!predictions[transaction.id];
             const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 
-            const hasWithdrawableBalance = isOwned && nftData && (
-              parseFloat(nftData.balances?.alex || '0') > 0 || 
-              parseFloat(nftData.balances?.lbry || '0') > 0
+            const canWithdraw = isOwned && nftData && hasWithdrawableBalance(
+              nftData.balances?.alex,
+              nftData.balances?.lbry
             );
 
             return (
@@ -141,7 +172,7 @@ const Grid = () => {
                   e.stopPropagation();
                   handleMint(transaction.id);
                 }}
-                onWithdraw={hasWithdrawableBalance ? (e) => {
+                onWithdraw={canWithdraw ? (e) => {
                   e.stopPropagation();
                   handleWithdraw(transaction.id);
                 } : undefined}
@@ -152,10 +183,10 @@ const Grid = () => {
                   <ContentRenderer
                     transaction={transaction}
                     content={content}
-                    contentUrls={ {
+                    contentUrls={content?.urls || {
                       thumbnailUrl: null,
                       coverUrl: null,
-                       fullUrl: transaction?.assetUrl?transaction?.assetUrl:"" //||content?.url// || `https://arweave.net/${transaction.id}`
+                      fullUrl: transaction?.assetUrl || `https://arweave.net/${transaction.id}`
                     }}
                     handleRenderError={handleRenderError}
                   />
@@ -172,7 +203,7 @@ const Grid = () => {
                       Owned
                     </div>
                   )}
-                  {isOwned && hasWithdrawableBalance && (
+                  {isOwned && canWithdraw && (
                     <Button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -200,6 +231,7 @@ const Grid = () => {
         <Dialog open={!!selectedContent} onOpenChange={handleDialogOpenChange}>
           <DialogContent 
             className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"
+            closeIcon={selectedContent?.type === "application/epub+zip" ? null : undefined}
           >
             <DialogTitle className="sr-only">
               {selectedContent?.type.split('/')[0].toUpperCase()} Content Viewer
@@ -209,7 +241,7 @@ const Grid = () => {
               <div className="w-full h-full">
                 <ContentRenderer
                   key={selectedContent.id}
-                  transaction={transactions.find(t => t.id === selectedContent.id)!}
+                  transaction={transactions.find((t: Transaction) => t.id === selectedContent.id)!}
                   content={contentData[selectedContent.id]}
                   contentUrls={contentData[selectedContent.id]?.urls || {
                     thumbnailUrl: null,

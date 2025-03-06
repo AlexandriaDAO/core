@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from 'react-router';
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useTheme } from "@/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 
 export interface App {
@@ -27,7 +26,6 @@ const HomePage: React.FC = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const { user } = useAppSelector((state) => state.auth);
-  const { theme } = useTheme();
 
   useEffect(() => {
     const handleResize = () => {
@@ -55,7 +53,7 @@ const HomePage: React.FC = () => {
         <div className={cn(
           "absolute inset-0 flex flex-col items-center justify-center overflow-hidden touch-none",
           "transition-all duration-500 ease-in-out",
-          "bg-background",
+          "bg-background z-0",
           isPanelOpen ? "-translate-y-full" : "translate-y-0"
         )}>
           <h1 className={cn(
@@ -104,7 +102,7 @@ const HomePage: React.FC = () => {
         <div className={cn(
           "absolute top-full left-0 w-full h-full",
           "flex flex-col items-center",
-          "bg-background overflow-y-auto",
+          "bg-background overflow-y-auto z-0",
           "transition-all duration-500 ease-in-out",
           "py-5 md:py-10",
           isPanelOpen ? "-translate-y-full" : "translate-y-0"

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
 import { setCollection } from '../../shared/state/librarySearch/librarySlice';
+import { changeCollection } from '../../shared/state/librarySearch/libraryThunks';
 import { ToggleGroup, ToggleGroupItem } from "@/lib/components/toggle-group";
 
 export default function CollectionSelector() {
@@ -11,7 +12,7 @@ export default function CollectionSelector() {
 
   const handleCollectionChange = (value: string) => {
     if (value === 'NFT' || value === 'SBT') {
-      dispatch(setCollection(value));
+      dispatch(changeCollection(value as 'NFT' | 'SBT'));
     }
   };
 

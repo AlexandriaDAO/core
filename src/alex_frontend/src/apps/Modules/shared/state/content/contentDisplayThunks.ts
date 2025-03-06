@@ -4,68 +4,81 @@ import {
   clearTransactions,
   setContentData,
   addTransaction,
-  commitAddTransaction,
 } from "./contentDisplaySlice";
 import {
-  fetchTransactionsApi,
   fetchTransactionsForAlexandrian,
 } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
 import { ContentService } from "@/apps/Modules/LibModules/contentDisplay/services/contentService";
 import { Transaction } from "../../../shared/types/queries";
 import {
   getActorUserAssetCanister,
-  getAuthClient,
 } from "@/features/auth/utils/authUtils";
 import { RootState } from "@/store";
 import { fetchAssetFromUserCanister } from "../assetManager/assetManagerThunks";
 import { getAssetCanister } from "../assetManager/utlis";
 
+// The problem with this Adil is that if one asset fails to load, all thereafter fail to load until page refresh. It's also not easy to debug.
+// export const loadContentForTransactions = createAsyncThunk(
+//   "contentDisplay/loadContent",
+//   async (transactions: Transaction[], { dispatch }) => {
+
+//     // Adil asset-canister version
+//     await Promise.all(
+//       transactions.map(async (transaction) => {
+//         try {
+//           const content = await ContentService.loadContent(transaction);
+//           const urls = await ContentService.getContentUrls(
+//             transaction,
+//             content
+//           );
+
+//           // Combine content and urls into a single dispatch
+//           dispatch(
+//             setContentData({
+//               id: transaction.id,
+//               content: {
+//                 ...content,
+//                 urls,
+//               },
+//             })
+//           );
+//         } catch (error) {
+//           console.error('Error loading content for transaction', transaction.id, ':', error);
+//         }
+//       })
+//     );  
+//   });
+
+
+// Evan's versions, doesn't break all the rendering at once if one fails (but no batching).
 export const loadContentForTransactions = createAsyncThunk(
   "contentDisplay/loadContent",
   async (transactions: Transaction[], { dispatch }) => {
+    transactions.forEach(async (transaction) => {
+      try {
+        const content = await ContentService.loadContent(transaction);
+        const urls = await ContentService.getContentUrls(
+          transaction,
+          content
+        );
 
-    // Adil asset-canister version
-    await Promise.all(
-      transactions.map(async (transaction) => {
-        try {
-          const content = await ContentService.loadContent(transaction);
-          const urls = await ContentService.getContentUrls(
-            transaction,
-            content
-          );
-
-          // Combine content and urls into a single dispatch
-          dispatch(
-            setContentData({
-              id: transaction.id,
-              content: {
-                ...content,
-                urls,
-              },
-            })
-          );
-
-//     // Evan master version  
-//     // Process each transaction independently without waiting for others
-//     transactions.forEach(async (transaction) => {
-//       try {
-//         const content = await ContentService.loadContent(transaction);
-//         const urls = await ContentService.getContentUrls(transaction, content);
-
-//         dispatch(setContentData({ 
-//           id: transaction.id, 
-//           content: {
-//             ...content,
-//             urls
-//           }
-//         }));
-        
+        // Combine content and urls into a single dispatch
+        dispatch(
+          setContentData({
+            id: transaction.id,
+            content: {
+              ...content,
+              urls,
+            },
+          })
+        );
       } catch (error) {
         console.error('Error loading content for transaction', transaction.id, ':', error);
       }
-    }));
+    });
   }
 );
+  
 
 export const updateTransactions = createAsyncThunk(
   "contentDisplay/updateTransactions",
@@ -82,6 +95,7 @@ export const updateTransactions = createAsyncThunk(
       const { selectedPrincipals } = state.library;
       const userAssetCanister = state.assetManager.userAssetCanister;
       let userAssetCanisterd = await getAssetCanister(selectedPrincipals[0]);
+      
       // user asset Canister exists
       if (userAssetCanisterd) {
         const assetActor = await getActorUserAssetCanister(userAssetCanisterd);
@@ -100,9 +114,11 @@ export const updateTransactions = createAsyncThunk(
             let transactions = Array.isArray(jsonData) ? jsonData : [jsonData];
             // Filter transactions that match the provided arweaveIds
             transactions = transactions.filter(
-              (tx) => arweaveIds.includes(tx.id) // transaction has an 'id' field comparing with ids in asset Canister
+              (tx) => arweaveIds.includes(tx.id)
             );
-            const fetchPromises = transactions.map(async (transaction) => {
+
+            // Process transactions one by one to isolate failures
+            transactions.forEach(async (transaction) => {
               try {
                 const result = await fetchAssetFromUserCanister(
                   transaction.id,
@@ -122,7 +138,6 @@ export const updateTransactions = createAsyncThunk(
                   })
                 );
 
-                // testing 
                 const content = await ContentService.loadContent(transaction);
                 const urls = await ContentService.getContentUrls(
                   transaction,
@@ -140,12 +155,7 @@ export const updateTransactions = createAsyncThunk(
                   })
                 );
               } catch (error) {
-                console.error(
-                  `Failed to fetch asset for transaction ${transaction.id}:`,
-                  error
-                );
-
-                // Dispatch with empty asset URL on error
+                console.error('Error processing transaction:', error);
                 dispatch(
                   addTransaction({
                     ...transaction,
@@ -154,16 +164,6 @@ export const updateTransactions = createAsyncThunk(
                 );
               }
             });
-            console.log(`[${new Date().toISOString()}] Before promise ...:(`);
-            // dispatch(addTransaction())
-            // Wait for all fetch operations to complete
-            const processedTransactions = await Promise.all(fetchPromises);
-            console.log(`[${new Date().toISOString()}] After promise ...:(`);
-         ///   dispatch(commitAddTransaction());
-            // Update fetchedTransactions with the processed data
-            // fetchedTransactions = processedTransactions;
-
-            console.log("Processed Transactions:", fetchedTransactions);
           } catch (error) {
             console.error("Failed to process data:", error);
             fetchedTransactions = [];
@@ -184,19 +184,13 @@ export const updateTransactions = createAsyncThunk(
           : [...fetchedTransactions].reverse();
 
         dispatch(setTransactions(sortedTransactions));
+        
+        // Load content for transactions
+        dispatch(loadContentForTransactions(sortedTransactions));
       }
-
     } catch (error) {
       console.error("Error fetching transactions:", error);
       throw error;
     }
-  }
-);
-
-export const clearAllTransactions = createAsyncThunk(
-  "contentDisplay/clearAllTransactions",
-  async (_, { dispatch }) => {
-    dispatch(clearTransactions());
-    ContentService.clearCache();
   }
 );

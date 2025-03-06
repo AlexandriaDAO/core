@@ -24,7 +24,7 @@ const ArweaveOwnerSelector: React.FC = () => {
   };
 
   return (
-    <div className={`flex w-full max-w-[800px] h-[50px] md:h-[60px] p-3 md:p-5 items-center rounded-[25px] md:rounded-[30px] border ${isDark ? 'border-border bg-gray-900' : 'border-gray-300 bg-gray-50'} mb-4 md:mb-6`}>
+    <div className={`flex w-full max-w-[800px] h-[50px] md:h-[60px] p-3 md:p-5 items-center rounded-[25px] md:rounded-[30px] border ${isDark ? 'border-border bg-gray-900' : 'border-gray-300 bg-gray-50'}`}>
       <Search className={`w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3 ${isDark ? 'text-gray-400' : 'text-black'}`} />
       <input
         className={`flex-1 border-none outline-none bg-transparent font-syne text-sm md:text-lg ${isDark ? 'placeholder:text-gray-500' : 'placeholder:text-black/60'} ${!isValid ? 'text-destructive' : isDark ? 'text-foreground' : 'text-black'}`}

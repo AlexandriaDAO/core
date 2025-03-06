@@ -67,79 +67,82 @@ export const Hint = styled.p`
 export const ControlsContainer = styled.div<{ $isOpen: boolean }>`
   display: flex;
   width: 100%;
-  gap: 8px;
-  flex-direction: column;
-  margin-bottom: ${props => props.$isOpen ? '16px' : '0'};
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${props => props.$isOpen ? '8px' : '0'};
+  position: relative;
 
   @media (min-width: 768px) {
-    flex-direction: row;
     gap: 16px;
-    margin-bottom: ${props => props.$isOpen ? '24px' : '0'};
+    margin-bottom: ${props => props.$isOpen ? '12px' : '0'};
   }
 `;
 
 export const FiltersButton = styled.button<{ $isOpen?: boolean }>`
   display: flex;
-  width: 100%;
-  height: 50px;
-  padding: 8px 16px;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  padding: 0;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  border-radius: 25px;
+  border-radius: 24px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: Syne;
-  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
   
   @media (min-width: 768px) {
-    width: 180px;
-    height: 60px;
-    padding: 10px 24px;
-    font-size: 16px;
-    border-radius: 30px;
+    width: 56px;
+    min-width: 56px;
+    height: 56px;
+    border-radius: 28px;
   }
   
   ${({ $isOpen }) => $isOpen ? `
-    background: var(--balancebox, #3A3630);
+    background: var(--balancebox, #2A2620);
     color: var(--brightyellow);
     border: none;
   ` : `
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
-    border: 1px solid hsl(var(--border));
+    background: var(--balancebox, #2A2620);
+    color: var(--brightyellow);
+    border: none;
+    
     &:hover {
-      background: var(--balancebox, #3A3630);
-      color: var(--brightyellow);
+      transform: translateY(-1px);
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+      border: 1px solid hsl(var(--border));
+    }
+    
+    &:active {
+      transform: translateY(0);
     }
   `}
 `;
 
 export const SearchButton = styled.button`
   display: flex;
-  height: 50px;
-  padding: 8px 16px;
+  height: 48px;
+  padding: 8px 24px;
   justify-content: center;
   align-items: center;
   gap: 10px;
-  width: 100%;
-  border-radius: 25px;
+  flex: 1;
+  border-radius: 24px;
   background: var(--balancebox, #3A3630);
   border: none;
   color: var(--brightyellow);
   cursor: pointer;
   font-family: Syne;
-  font-size: 14px;
+  font-size: 16px;
   box-shadow: 0px 0px 13px 4px rgba(171, 189, 219, 0.54);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   @media (min-width: 768px) {
-    height: 60px;
-    padding: 10px 24px;
-    font-size: 16px;
-    flex: 1 0 0;
-    min-width: 280px;
-    border-radius: 30px;
+    height: 56px;
+    border-radius: 28px;
+    font-size: 18px;
   }
 
   &:disabled {
@@ -149,6 +152,11 @@ export const SearchButton = styled.button`
 
   &:hover:not(:disabled) {
     background: #2A2620;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 `;
 
@@ -157,11 +165,11 @@ export const SearchFormContainer = styled.div<{ $isOpen: boolean }>`
   overflow: hidden;
   transition: all 0.3s ease-in-out;
   margin: 0;
-  padding: ${props => props.$isOpen ? '0.5rem 0' : '0'};
+  padding: ${props => props.$isOpen ? '0.1rem 0 0.5rem 0' : '0'};
   width: 100%;
   max-width: 800px;
 
   @media (min-width: 768px) {
-    padding: ${props => props.$isOpen ? '1rem 0' : '0'};
+    padding: ${props => props.$isOpen ? '0.2rem 0 1rem 0' : '0'};
   }
 `; 

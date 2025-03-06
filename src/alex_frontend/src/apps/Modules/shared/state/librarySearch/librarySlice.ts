@@ -4,6 +4,7 @@ interface SearchParams {
   start: number;
   end: number;
   pageSize: number;
+  startFromEnd: boolean;
 }
 
 interface LibraryState {
@@ -15,6 +16,7 @@ interface LibraryState {
   noResults: boolean;
   searchParams: SearchParams;
   lastSearchTimestamp: number;
+  totalItems: number;
 }
 
 const initialState: LibraryState = {
@@ -27,9 +29,11 @@ const initialState: LibraryState = {
   searchParams: {
     start: 0,
     end: 20,
-    pageSize: 20
+    pageSize: 20,
+    startFromEnd: true
   },
-  lastSearchTimestamp: 0
+  lastSearchTimestamp: 0,
+  totalItems: 0
 };
 
 const librarySlice = createSlice({
@@ -38,11 +42,12 @@ const librarySlice = createSlice({
   reducers: {
     togglePrincipal: (state, action: PayloadAction<string>) => {
       const principalId = action.payload;
-      
-      if (state.selectedPrincipals[0] === principalId) {
-        state.selectedPrincipals = [];
-      } else {
-        state.selectedPrincipals = [principalId];
+      state.selectedPrincipals = state.selectedPrincipals[0] === principalId ? [] : [principalId];
+      if (state.selectedPrincipals.length > 0) {
+        state.searchParams = {
+          ...initialState.searchParams,
+          pageSize: state.searchParams.pageSize
+        };
       }
     },
     toggleSortDirection: (state) => {
@@ -76,8 +81,23 @@ const librarySlice = createSlice({
       state.lastSearchTimestamp = Date.now();
     },
     resetSearch: (state) => {
-      state.searchParams = initialState.searchParams;
-      state.lastSearchTimestamp = 0;
+      return {
+        ...initialState,
+        collection: state.collection,
+        selectedPrincipals: state.selectedPrincipals,
+        searchParams: {
+          ...state.searchParams
+        },
+        totalItems: state.totalItems
+      };
+    },
+    setTotalItems: (state, action: PayloadAction<number>) => {
+      state.totalItems = action.payload;
+      if (state.selectedPrincipals[0] === 'new' && state.searchParams.start === 0 && action.payload > 0) {
+        const newStart = Math.max(0, action.payload - state.searchParams.pageSize);
+        state.searchParams.start = newStart;
+        state.searchParams.end = Math.min(newStart + state.searchParams.pageSize, action.payload);
+      }
     }
   },
 });
@@ -92,7 +112,8 @@ export const {
   setNoResults,
   setSearchParams,
   updateLastSearchTimestamp,
-  resetSearch
+  resetSearch,
+  setTotalItems
 } = librarySlice.actions;
 
 export default librarySlice.reducer;

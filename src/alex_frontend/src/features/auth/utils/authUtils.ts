@@ -69,11 +69,12 @@ import {
   createActor as createActorAssetManager,
 } from "../../../../../declarations/asset_manager";
 
-const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
-import{
+import {
   lexigraph,
   createActor as createActorLexigraph,
 } from "../../../../../declarations/lexigraph";
+
+const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
 
 const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
 const icrc7_canister_id = process.env.CANISTER_ID_ICRC7!;

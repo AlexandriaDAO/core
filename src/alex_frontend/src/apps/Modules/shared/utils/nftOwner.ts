@@ -8,11 +8,6 @@ export interface UserInfo {
   principal: string;
 }
 
-interface Account {
-  owner: Principal;
-  subaccount?: number[];
-}
-
 export async function getNftOwnerInfo(tokenId: string): Promise<UserInfo | null> {
   try {
     // Determine if this is an SBT by checking tokenId length

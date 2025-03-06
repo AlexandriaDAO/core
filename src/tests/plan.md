@@ -1,12 +1,10 @@
-#### UI Fixes:
-- Epub modal has two "close" buttons.
-- ContentGrid is 1 column on mobile.
+#### Before deploy:
+- Fix mint button not showing up when nsfw model is selected.
+- Most recent looks like it's selected when it's actually not.
 
 
 #### Features now:
-- Sort by non-zero nft balances.
-- Make a 'new' section for alexandrian that's the default, just showing the latest NFTs/SBTs.
-- Finish the channels.md plan, given the new text rendering setup.
+- Revert to adils rendering approach without breaking the grid. (problem statement on page bottom).
 
 
 #### Bugs:
@@ -45,6 +43,13 @@
 
 
 
+#### Alexandria-wide Next Goals: 
+(1) Improve the Emporium app to be more like a real NFT marketplace. Keeping track of what has been sold, etc.
+(2) Start work on a ICP --> AO bridge. I want to be able to bridge ALEX and LBRY to AO, so people can buy it on AO and send it to our site and use it without needing to buy ICP. This could also be a general bridge for other ICRC1 Tokens.
+(3) Make an Autonomous NFT backup cansiter. If you look in the backups repo, we run a script to make a backup of all the NFTs. But there are too many to run this manually, so we need a canister to fetch the latest on a timer and keep updating the backups.
+(4) An app or feature that lets checks all your NFTs for the amount of tokens in them, and orders them by amount so it's easy to withdraw rewards.
+(5) Create a canister that indexes the SBTs, and an an associated count next to the NFTs, so we know how many likes each NFT has and display that next to them. Then sort by most liked.
+(6) Add a ledger canister for $ALEX and $LBRY.
 
 
 
@@ -57,21 +62,11 @@
 
 
 
-
-
-
-### Adding channels/blocks/collections to sort NFTs.
-
-Metrics: 
-9.97T Cycles in ICP Swap at 830 am, and it's dispersing once per minute.
-9.765T Cycles at 7am the next day. (But it could also be that it's because it stopped distributing.)
-9.470 Several days later (12/16), right before deploying tests canister. (the tests canister itself has 8.81T cycles at noon before deployment)
-12/19 (3 days later): icp_swap is at 9.025 and tests is at 7.411.
 
 
 XWKa-Q2gppignoX_Ngs7VJYZPN_yhiy1ToovQ1NBMFs
 NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
-8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8 
+8Pvu_hc9dQWqIPOIcEhtsRYuPtLiQe2TTvhgIj9zmq8
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I  09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
@@ -81,4 +76,31 @@ bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
 
 
 
+Key Issue: Content Loading Flow Inconsistency
+The real problem appears to be in the updateTransactions thunk where there are two distinct paths:
 
+1. Asset Canister Path:
+   - Loads transactions from canister
+   - Processes each transaction individually
+   - Dispatches content loading
+   - Has proper error handling
+   - Works as expected
+
+2. Direct Arweave Path:
+   - Loads transactions via fetchTransactionsForAlexandrian
+   - Only dispatches setTransactions
+   - MISSING: Does not trigger content loading flow
+   - MISSING: No error handling for individual transactions
+
+What's NOT the Problem:
+- Promise chains in asset canister flow (they work correctly)
+- loadContentForTransactions implementation (it works when called)
+- Redux state management (states are being updated correctly)
+- Error handling in content loading (it's properly implemented)
+
+Required Fix:
+The direct Arweave path needs to:
+1. Load transactions
+2. Dispatch setTransactions
+3. Trigger loadContentForTransactions
+4. Maintain consistent error handling with the asset canister path

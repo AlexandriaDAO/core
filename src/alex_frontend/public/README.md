@@ -48,7 +48,7 @@ The Internet has come to rely almost exclusively on Big Tech services as its inf
 
 https://x.com/Noahpinion/status/1818776478315954200
 
-The Static Web1 that was supposed to unlock the worlds information became buried by the Social Web2, sending 95-99% of digital content to the ‘deep web’ where it's inaccessible through conventional means, and force feeding the rest of it to us with black-box algorithms. Today, digital content that isn’t (1) search-engine optimized, (2) open-access, ***and*** (3) brand new, is basically lost forever. The rest is primarily reachable through black-box algorithms on proprietary platforms.
+The Static Web1 that was supposed to unlock the worlds information became buried by the Social Web2, sending 95-99% of digital content to the 'deep web' where it's inaccessible through conventional means, and force feeding the rest of it to us with black-box algorithms. Today, digital content that isn't (1) search-engine optimized, (2) open-access, ***and*** (3) brand new, is basically lost forever. The rest is primarily reachable through black-box algorithms on proprietary platforms.
 
 Alexandria is a Web3 fork of the Web2 paradigm with the vision of restoring that sense of awe and human connection that was so palpable in the early days of the Web.
 
@@ -94,7 +94,7 @@ ALEX is mined when LBRY is burned, up to a hard cap of 21 Million.
 
 ### LBRY Token
 
-LBRY's supply is entirely managed by the "icp_swap" canister which uses the Exchange Rate Canister to keep the mint rate fixed at one cent per LBRY (unless ICP goes below $5 at which point it will stay at that fixed rate). Anyone can mint by sending ICP to the canister, which also serves as the staking contract.
+LBRY's supply is entirely managed by the "icp_swap" canister which uses the Exchange Rate Canister to keep the mint rate fixed at one cent per LBRY (unless ICP goes below $4 at which point it will stay at that fixed rate). Anyone can mint by sending ICP to the canister, which also serves as the staking contract.
 
 All view-only features are free, but once a user has some LBRY, they can use any LibModules by paying Librarian that hosts it. When storing or otherwise interact with other NFTs, LBRY automatically sends nanopayments to those NFTs as payment.
 

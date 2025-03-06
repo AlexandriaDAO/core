@@ -63,6 +63,7 @@ const router = createBrowserRouter(
 					<Route index element={<Suspense key="info" fallback={<TopProgressBar />}><InfoPage /></Suspense>} />
 					<Route path="faq" element={<Suspense key="faq" fallback={<TopProgressBar />}><InfoPage /></Suspense>} />
 					<Route path="whitepaper" element={<Suspense key="whitepaper" fallback={<TopProgressBar />}><InfoPage /></Suspense>} />
+					<Route path="audit" element={<Suspense key="audit" fallback={<TopProgressBar />}><InfoPage /></Suspense>} />
 				</Route>
 
 				<Route path="app">

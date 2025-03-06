@@ -10,7 +10,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import { natToArweaveId } from "@/utils/id_convert";
 import { uploadAsset } from "./uploadToAssetCanister";
-import { loadContentForTransactions } from "../content/contentDisplayThunks";
 import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
 import { RootState } from "@/store";
 

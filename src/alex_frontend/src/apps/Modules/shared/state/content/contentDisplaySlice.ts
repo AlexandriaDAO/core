@@ -1,3 +1,16 @@
+/**
+ * Redux slice for managing content display state in the application.
+ * 
+ * This slice handles:
+ * - Transaction management (adding, removing, clearing transactions)
+ * - Content data caching and management
+ * - State updates tracking through isUpdated flag
+ * - Content URL information storage
+ * 
+ * Used for general content display functionality across the application,
+ * with support for transaction-based content management.
+ */
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Transaction } from '../../../shared/types/queries';
 import { CachedContent, ContentUrlInfo } from '../../../LibModules/contentDisplay/types';

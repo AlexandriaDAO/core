@@ -14,20 +14,20 @@
   "alex_wallet": {
     "ic": "yh7mi-3yaaa-aaaap-qkmpa-cai"
   },
-  "lexigraph": {
-    "ic": "ya6k4-waaaa-aaaap-qkmpq-cai"
+  "asset_manager": {
+    "ic": "zhcno-qqaaa-aaaap-qpv7a-cai"
   },
   "emporium": {
     "ic": "zdcg2-dqaaa-aaaap-qpnha-cai"
-  },
-  "icp_ledger_canister": {
-    "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
   },
   "ic_siwe_provider": {
     "ic": "w4vlu-paaaa-aaaaj-azxyq-cai"
   },
   "ic_siws_provider": {
     "ic": "w3una-cyaaa-aaaaj-azxya-cai"
+  },
+  "icp_ledger_canister": {
+    "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
   },
   "icp_swap": {
     "ic": "54fqz-5iaaa-aaaap-qkmqa-cai"
@@ -41,14 +41,17 @@
   "internet_identity": {
     "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
   },
+  "lexigraph": {
+    "ic": "ya6k4-waaaa-aaaap-qkmpq-cai"
+  },
+  "logs": {
+    "ic": "yn33w-uaaaa-aaaap-qpk5q-cai"
+  },
   "nft_manager": {
     "ic": "5sh5r-gyaaa-aaaap-qkmra-cai"
   },
   "system_api": {
     "ic": "5vg3f-laaaa-aaaap-qkmrq-cai"
-  },
-  "logs": {
-    "ic": "yn33w-uaaaa-aaaap-qpk5q-cai"
   },
   "tokenomics": {
     "ic": "5abki-kiaaa-aaaap-qkmsa-cai"

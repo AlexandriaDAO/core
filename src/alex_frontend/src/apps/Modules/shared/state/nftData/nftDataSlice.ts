@@ -57,8 +57,13 @@ const nftDataSlice = createSlice({
       state.cachedPages = {};
       state.totalNfts = 0;
     },
+    // Deprecated alias for clearNfts
     clearNFTs: (state) => {
+      console.warn('Warning: clearNFTs is deprecated. Please use clearNfts instead.');
       state.nfts = {};
+      state.arweaveToNftId = {};
+      state.cachedPages = {};
+      state.totalNfts = 0;
     }
   },
   extraReducers: (builder) => {
@@ -75,8 +80,7 @@ export const {
   cachePage,
   clearCache,
   clearNfts,
-  clearNFTs
+  clearNFTs // Include the deprecated version in exports
 } = nftDataSlice.actions;
 
-export type { NFTData };
 export default nftDataSlice.reducer;

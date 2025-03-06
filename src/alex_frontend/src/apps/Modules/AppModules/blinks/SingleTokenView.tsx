@@ -24,6 +24,7 @@ import { copyToClipboard } from '@/apps/Modules/AppModules/contentGrid/utils/cli
 import { getNftOwnerInfo, UserInfo } from '../../shared/utils/nftOwner';
 import { setNFTs } from '../../shared/state/nftData/nftDataSlice';
 import { Button } from "@/lib/components/button";
+import { convertE8sToToken, formatPrincipal, formatBalance } from '../../shared/utils/tokenUtils';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -43,16 +44,6 @@ function SingleTokenView() {
   const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
   const { nfts } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
-
-  const formatPrincipal = (principal: string | null) => {
-    if (!principal) return 'Not owned';
-    return `${principal.slice(0, 4)}...${principal.slice(-4)}`;
-  };
-
-  const formatBalance = (balance: string | undefined) => {
-    if (!balance) return '0';
-    return balance;
-  };
 
   useEffect(() => {
     let mounted = true;
@@ -114,10 +105,6 @@ function SingleTokenView() {
           ALEX.icrc1_balance_of(balanceParams),
           LBRY.icrc1_balance_of(balanceParams)
         ]);
-
-        const convertE8sToToken = (e8sAmount: bigint): string => {
-          return (Number(e8sAmount) / 1e8).toString();
-        };
 
         if (mounted) {
           const alexTokens = convertE8sToToken(alexBalance);

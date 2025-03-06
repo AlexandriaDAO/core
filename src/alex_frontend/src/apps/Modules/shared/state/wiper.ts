@@ -7,6 +7,7 @@ import { clearPredictions } from './arweave/arweaveSlice';
 import { 
   clearNfts 
 } from './nftData/nftDataSlice';
+import { clearTransactions as clearNftTransactions } from './nftData/nftTransactionsSlice';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 import { useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
@@ -19,7 +20,8 @@ const contentStateOperations = [
 ];
 
 const nftStateOperations = [
-  clearNfts
+  clearNfts,
+  clearNftTransactions
 ];
 
 const predictionStateOperations = [
