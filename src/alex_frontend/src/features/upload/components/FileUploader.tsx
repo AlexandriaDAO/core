@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import {useUser, useAlexWallet} from "@/hooks/actors";
+import { useAlexWallet } from "@/hooks/actors";
 import { toast } from "sonner";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import uploadFile from "../thunks/uploadFile";
@@ -16,8 +16,7 @@ interface FileUploaderProps {
 
 function FileUploader({file, setFile}: FileUploaderProps) {
     const dispatch = useAppDispatch();
-    const {actor: alexWalletActor} = useAlexWallet();
-    const {actor: userActor} = useUser();
+    const {actor} = useAlexWallet();
 
     const {cost} = useAppSelector(state=>state.upload)
 
@@ -26,14 +25,14 @@ function FileUploader({file, setFile}: FileUploaderProps) {
             toast.error('File not available');
             return;
         }
-        if(!userActor) {
-            toast.error('User actor not available');
+        if(!actor) {
+            toast.error('Actor not available');
             return;
         }
 
         try {
             // Fetch wallets
-            const fetchedWallets = await dispatch(fetchWallets(userActor)).unwrap();
+            const fetchedWallets = await dispatch(fetchWallets(actor)).unwrap();
             if (fetchedWallets.length === 0) {
                 toast.error('No wallets available');
                 return;
@@ -46,13 +45,8 @@ function FileUploader({file, setFile}: FileUploaderProps) {
                 return;
             }
 
-            if(!alexWalletActor) {
-                toast.error('Alex wallet actor not available');
-                return;
-            }
-
             // Upload file
-            await dispatch(uploadFile({file, actor: alexWalletActor})).unwrap();
+            await dispatch(uploadFile({file, actor})).unwrap();
         } catch (error: any) {
             toast.error(error.message || 'Upload process failed');
             // The error message is already handled in the slice reducers
