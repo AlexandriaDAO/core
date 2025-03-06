@@ -35,7 +35,7 @@ type InfoItem = {
 const infoItems: InfoItem[] = [
     { path: 'faq', label: 'FAQ', icon: HelpCircle },
     { path: 'whitepaper', label: 'Whitepaper', icon: FileText },
-    { path: 'audit', label: 'Audit', icon: ShieldCheck, disabled: true }
+    { path: 'audit', label: 'Audit', icon: ShieldCheck }
 ];
 
 export default function Tabs() {

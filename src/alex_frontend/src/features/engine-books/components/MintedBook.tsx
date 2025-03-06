@@ -4,8 +4,6 @@ import useSession from "@/hooks/useSession";
 import { toast } from "sonner";
 import { EnqueuedTask } from "meilisearch";
 import { waitForTaskCompletion } from "@/services/meiliService";
-import Epub, { EpubCFI } from "epubjs";
-import { v4 as uuidv4 } from "uuid";
 import { Book } from "@/features/portal/portalSlice";
 import { getAllDocumentsByManifest } from "../utils/utilities";
 import { LoaderCircle } from "lucide-react";

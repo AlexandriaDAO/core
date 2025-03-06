@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import FAQPage from './FAQPage';
 import WhitepaperPage from './WhitepaperPage';
+import AuditPage from './AuditPage';
 
 function InfoPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [activeTab, setActiveTab] = useState<'faq' | 'whitepaper'>(
-        location.pathname === '/info/whitepaper' ? 'whitepaper' : 'faq'
+    const [activeTab, setActiveTab] = useState<'faq' | 'whitepaper' | 'audit'>(
+        location.pathname === '/info/whitepaper' ? 'whitepaper' : 
+        location.pathname === '/info/audit' ? 'audit' : 'faq'
     );
 
-    const handleTabChange = (tab: 'faq' | 'whitepaper') => {
+    const handleTabChange = (tab: 'faq' | 'whitepaper' | 'audit') => {
         setActiveTab(tab);
         navigate(`/info/${tab}`);
     };
@@ -40,11 +42,23 @@ function InfoPage() {
                         >
                             WHITEPAPER
                         </button>
+                        <button
+                            onClick={() => handleTabChange('audit')}
+                            className={`px-4 py-2 rounded-md transition-all duration-200 text-tabsheading font-roboto-condensed ${
+                                activeTab === 'audit'
+                                    ? 'bg-gray-800 text-brightyellow'
+                                    : 'text-gray-400 hover:text-gray-200'
+                            }`}
+                        >
+                            AUDIT
+                        </button>
                     </div>
                 </div>
                 
                 <div className="bg-balancebox rounded-lg p-6">
-                    {activeTab === 'faq' ? <FAQPage /> : <WhitepaperPage />}
+                    {activeTab === 'faq' ? <FAQPage /> : 
+                     activeTab === 'whitepaper' ? <WhitepaperPage /> : 
+                     <AuditPage />}
                 </div>
             </div>
         </div>

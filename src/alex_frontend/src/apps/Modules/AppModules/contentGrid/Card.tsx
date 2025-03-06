@@ -39,7 +39,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
   const [copiedOwner, setCopiedOwner] = useState(false);
   const dispatch = useDispatch();
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
-  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions as Transaction[]);
+  const transactions = useSelector((state: RootState) => state.transactions.transactions as Transaction[]);
   const formatId = (id: string | undefined) => {
     if (!id) return 'N/A';
     return `${id.slice(0, 4)}...${id.slice(-4)}`;

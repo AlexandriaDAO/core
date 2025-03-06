@@ -1,7 +1,6 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import { SearchContainer } from '@/apps/Modules/shared/components/SearchContainer';
-import Library from "@/apps/Modules/LibModules/nftSearch";
-import { useWiper } from "@/apps/Modules/shared/state/wiper";
+import { AlexandrianLibrary } from "@/apps/Modules/LibModules/nftSearch";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { performSearch, updateSearchParams } from '@/apps/Modules/shared/state/librarySearch/libraryThunks';
@@ -9,13 +8,34 @@ import { resetSearch } from '@/apps/Modules/shared/state/librarySearch/librarySl
 import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
 import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
-import { clearTransactions, clearContentData } from '@/apps/Modules/shared/state/content/contentDisplaySlice';
+import { clearAllTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
+
+/**
+ * Custom hook to track asset loading state and prevent state wiping
+ * when assets have been successfully loaded.
+ */
+const useAssetLoadingState = () => {
+	// Use ref to keep track of loading state without causing re-renders
+	const assetsLoadedRef = useRef(false);
+	
+	// Select required state
+	const { isLoading } = useSelector((state: RootState) => state.library);
+	const transactions = useSelector((state: RootState) => state.transactions.transactions);
+	
+	// Set ref to true when assets have loaded
+	if (transactions.length > 0 && !isLoading && !assetsLoadedRef.current) {
+		assetsLoadedRef.current = true;
+	}
+	
+	return assetsLoadedRef.current;
+};
 
 function Alexandrian() {
-	useWiper();
 	const dispatch = useDispatch<AppDispatch>();
-
 	const { isLoading, searchParams } = useSelector((state: RootState) => state.library);
+	
+	// Track asset loading state to prevent state wiping 
+	const assetsLoaded = useAssetLoadingState();
 
 	const handleSearch = useCallback(async () => {
 		try {
@@ -42,8 +62,7 @@ function Alexandrian() {
 	const handleCancelSearch = useCallback(() => {
 		dispatch(resetSearch());
 		dispatch(clearNfts());
-		dispatch(clearTransactions());
-		dispatch(clearContentData());
+		dispatch(clearAllTransactions());
 		toast.info("Search cancelled");
 	}, [dispatch]);
 
@@ -61,9 +80,10 @@ function Alexandrian() {
 				onCancel={handleCancelSearch}
 				isLoading={isLoading}
 				topComponent={<TopupBalanceWarning />}
-				filterComponent={<Library />}
+				filterComponent={<AlexandrianLibrary />}
 				showMoreEnabled={true}
-				dataSource="nftTransactions"
+				dataSource="transactions"
+				preserveState={assetsLoaded}
 			/>
 			
 		</>

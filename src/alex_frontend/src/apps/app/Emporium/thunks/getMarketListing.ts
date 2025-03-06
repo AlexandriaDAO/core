@@ -1,10 +1,10 @@
-import {  fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
-import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
-import { loadContentForTransactions } from "@/apps/Modules/shared/state/content/contentDisplayThunks";
+import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
+import { setTransactions } from "@/apps/Modules/shared/state/transactions/transactionSlice";
+import { loadContentForTransactions } from "@/apps/Modules/shared/state/transactions/transactionThunks";
 import { getActorEmporium } from "@/features/auth/utils/authUtils";
 import { arweaveIdToNat, natToArweaveId } from "@/utils/id_convert";
 import LedgerService from "@/utils/LedgerService";
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 
 const getMarketListing = createAsyncThunk<
@@ -129,7 +129,7 @@ const getMarketListing = createAsyncThunk<
         };
       }
       dispatch(setTransactions(fetchedTransactions));
-      await dispatch(loadContentForTransactions(fetchedTransactions));
+      await dispatch(loadContentForTransactions(fetchedTransactions) as unknown as AnyAction);
 
       return {
         nfts: tokensObject,

@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
-import { clearTransactionContent } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { clearTransactionContent } from "@/apps/Modules/shared/state/transactions/transactionSlice";
 import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import ContentRenderer from '@/apps/Modules/AppModules/safeRender/ContentRenderer';
 import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components/TransactionDetails';
@@ -16,6 +16,7 @@ import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import type { Transaction } from '../../shared/types/queries';
 import { useLocation } from 'react-router-dom';
+import { TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -40,11 +41,11 @@ export const ContentGrid: ContentGridComponent = Object.assign(
 );
 
 // Map frontend collection names to backend collection names
-const mapCollectionToBackend = (collection: 'NFT' | 'SBT'): 'icrc7' | 'icrc7_scion' => {
+const mapCollectionToBackend = (collection: TokenType): 'icrc7' | 'icrc7_scion' => {
   return collection === 'NFT' ? 'icrc7' : 'icrc7_scion';
 };
 
-export type GridDataSource = 'contentDisplay' | 'nftTransactions';
+export type GridDataSource = 'transactions';
 
 interface GridProps {
   dataSource?: GridDataSource;
@@ -54,34 +55,28 @@ const Grid = ({ dataSource }: GridProps = {}) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   
-  // Determine which data source to use based on props or route
-  let effectiveDataSource: GridDataSource = dataSource || 'contentDisplay';
-  
-  // If no dataSource prop is provided, try to infer from the route
-  if (!dataSource) {
-    const isAlexandrianRoute = location.pathname.includes('/alexandrian');
-    effectiveDataSource = isAlexandrianRoute ? 'nftTransactions' : 'contentDisplay';
-  }
+  // Always use the unified transactions data source
+  const effectiveDataSource: GridDataSource = 'transactions';
   
   // Select the appropriate state based on the determined data source
-  const { transactions, contentData } = useSelector((state: RootState) => {
-    if (effectiveDataSource === 'nftTransactions') {
-      return {
-        transactions: state.nftTransactions.transactions,
-        contentData: state.nftTransactions.contentData,
-      };
-    } else {
-      return {
-        transactions: state.contentDisplay.transactions,
-        contentData: state.contentDisplay.contentData,
-      };
-    }
+  const { contentData } = useSelector((state: RootState) => {
+    // Always use the new unified transactions state
+    return {
+      contentData: state.transactions.contentData,
+    };
   });
+
+  // Fetch raw transactions for use in the dialog content
+  const { transactions } = useSelector((state: RootState) => ({
+    transactions: state.transactions.transactions
+  }));
 
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
   const { predictions } = useSelector((state: RootState) => state.arweave);
-  const sortedTransactions = useMemo(() => transactions, [transactions]); // No need for sorting since they're already in order
+  
+  // Use the sortedTransactions hook which applies proper filtering by tags
+  const sortedTransactions = useSortedTransactions();
 
   const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string,assetUrl:string } | null>(null);
@@ -118,7 +113,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
         throw new Error("Could not find NFT data for this content");
       }
 
-      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, mapCollectionToBackend(nftData.collection));
+      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, mapCollectionToBackend(nftData.collection as TokenType));
       if (lbryBlock === null && alexBlock === null) {
         toast.info("No funds were available to withdraw");
       } else {
@@ -260,4 +255,4 @@ const Grid = ({ dataSource }: GridProps = {}) => {
   );
 };
 
-export default React.memo(Grid);
+export default Grid;

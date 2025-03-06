@@ -5,7 +5,7 @@ import { AppDispatch } from "@/store";
 import PrincipalSelector from "./PrincipalSelector";
 import CollectionSelector from "./collectionSelector";
 import LibraryContentTagsSelector from "./tagSelector";
-import { loadContentForTransactions } from "../../shared/state/content/contentDisplayThunks";
+import { loadContentForTransactions } from "../../shared/state/transactions/transactionThunks";
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/lib/components/select";
@@ -15,10 +15,13 @@ const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 const NFTPagination = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { totalItems, searchParams } = useSelector((state: RootState) => state.library);
+  const { totalItems, searchParams, collection } = useSelector((state: RootState) => state.library);
   const currentPage = Math.floor(searchParams.start / searchParams.pageSize) + 1;
   const totalPages = Math.ceil(totalItems / searchParams.pageSize);
   const [pageInput, setPageInput] = useState<string>(currentPage.toString());
+
+  // Get the content type label based on collection
+  const contentTypeLabel = collection === 'SBT' ? 'SBTs' : 'NFTs';
 
   const handlePageChange = (newPage: number) => {
     const start = (newPage - 1) * searchParams.pageSize;
@@ -111,7 +114,7 @@ const NFTPagination = () => {
         <div className="flex items-center space-x-2">
           <span className="text-sm">Page {currentPage} of {totalPages}</span>
           <span className="text-sm text-muted-foreground">
-            (Showing NFTs {searchParams.start + 1}-{Math.min(searchParams.start + searchParams.pageSize, totalItems)} of {totalItems})
+            (Showing {contentTypeLabel} {searchParams.start + 1}-{Math.min(searchParams.start + searchParams.pageSize, totalItems)} of {totalItems})
           </span>
           <Select
             value={searchParams.pageSize.toString()}
@@ -134,20 +137,24 @@ const NFTPagination = () => {
   );
 };
 
-export default function LibrarySearch() {
+interface LibrarySearchProps {
+  defaultCategory?: 'favorites' | 'all';
+}
+
+export default function LibrarySearch({ defaultCategory = 'favorites' }: LibrarySearchProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const transactions = useSelector((state: RootState) => state.contentDisplay.transactions);
-  const isTransactionUpdated = useSelector((state: RootState) => state.contentDisplay.isUpdated);
+  const transactionData = useSelector((state: RootState) => state.transactions.transactions);
+  const isTransactionUpdated = useSelector((state: RootState) => state.transactions.isUpdated);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
     const loadContent = async () => {
-      if (transactions.length > 0 && !isLoading) {
+      if (transactionData.length > 0 && !isLoading) {
         setIsLoading(true);
         try {
-          await dispatch(loadContentForTransactions(transactions));
+          await dispatch(loadContentForTransactions(transactionData));
         } catch (error) {
           console.error('Error loading content:', error);
         } finally {
@@ -163,7 +170,7 @@ export default function LibrarySearch() {
     return () => {
       isMounted = false;
     };
-  }, [dispatch, transactions, isTransactionUpdated]);
+  }, [dispatch, transactionData, isTransactionUpdated]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-[8px] md:rounded-[12px] shadow-md p-2 sm:p-3">
@@ -175,7 +182,7 @@ export default function LibrarySearch() {
               <PrincipalSelector />
               <CollectionSelector />
             </div>
-            <LibraryContentTagsSelector />
+            <LibraryContentTagsSelector defaultCategory={defaultCategory} />
           </div>
           
           {/* Second row: Pagination controls (full width) */}

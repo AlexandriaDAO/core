@@ -8,7 +8,7 @@ use serde::{Serialize, Deserialize};
 use crate::models::user::User;
 use crate::models::engine::Engine;
 use crate::models::node::Node;
-
+use crate::models::wallet::Wallet;
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 // Memory IDs for different maps
@@ -20,6 +20,9 @@ const USER_ENGINES_MEM_ID: MemoryId = MemoryId::new(4);
 const NODES_MEM_ID: MemoryId = MemoryId::new(5);
 const NODE_COUNTER_MEM_ID: MemoryId = MemoryId::new(6);
 const USER_NODES_MEM_ID: MemoryId = MemoryId::new(7);
+const WALLETS_MEM_ID: MemoryId = MemoryId::new(8);
+const WALLET_COUNTER_MEM_ID: MemoryId = MemoryId::new(9);
+const USER_WALLETS_MEM_ID: MemoryId = MemoryId::new(10);
 
 const MAX_VALUE_SIZE: u32 = 65536; // 64KB should be plenty for our structures
 
@@ -99,6 +102,18 @@ thread_local! {
     pub static USER_NODES: RefCell<StableBTreeMap<Principal, UserIdList, Memory>> = RefCell::new(
         StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(USER_NODES_MEM_ID)))
     );
+
+    pub static WALLETS: RefCell<StableBTreeMap<u64, Wallet, Memory>> = RefCell::new(
+        StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(WALLETS_MEM_ID)))
+    );
+
+    pub static WALLET_COUNTER: RefCell<StableBTreeMap<(), u64, Memory>> = RefCell::new(
+        StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(WALLET_COUNTER_MEM_ID)))
+    );
+
+    pub static USER_WALLETS: RefCell<StableBTreeMap<Principal, UserIdList, Memory>> = RefCell::new(
+        StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(USER_WALLETS_MEM_ID)))
+    );
 }
 
 // Implement Storable for our types
@@ -147,6 +162,21 @@ impl Storable for Node {
     };
 }
 
+impl Storable for Wallet {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+
+    const BOUND: ic_stable_structures::storable::Bound = ic_stable_structures::storable::Bound::Bounded {
+        max_size: MAX_VALUE_SIZE,
+        is_fixed_size: false,
+    };
+}
+
 impl Storable for UserIdList {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
@@ -178,6 +208,11 @@ pub fn init_counters() {
         let mut counter = counter.borrow_mut();
         let _ = counter.insert((), 0);
     });
+
+    WALLET_COUNTER.with(|counter| {
+        let mut counter = counter.borrow_mut();
+        let _ = counter.insert((), 0);
+    });
 }
 
 /// Get and increment the engine counter, returning the current value
@@ -202,11 +237,23 @@ pub fn get_and_increment_node_counter() -> u64 {
     })
 }
 
+/// Get and increment the wallet counter, returning the current value
+pub fn get_and_increment_wallet_counter() -> u64 {
+    WALLET_COUNTER.with(|counter| {
+        let mut counter = counter.borrow_mut();
+        let current = counter.get(&()).unwrap_or(0);
+        let next = current + 1;
+        let _ = counter.insert((), next);
+        current
+    })
+}
+
 // Add a debug function to check counter state
-pub fn debug_counter_state() -> (Option<u64>, Option<u64>) {
+pub fn debug_counter_state() -> (Option<u64>, Option<u64>, Option<u64>) {
     let engine_count = ENGINE_COUNTER.with(|counter| counter.borrow().get(&()));
     let node_count = NODE_COUNTER.with(|counter| counter.borrow().get(&()));
-    (engine_count, node_count)
+    let wallet_count = WALLET_COUNTER.with(|counter| counter.borrow().get(&()));
+    (engine_count, node_count, wallet_count)
 }
 
 //
@@ -260,5 +307,32 @@ pub fn add_node_to_user(principal: &Principal, node_id: u64) {
             .unwrap_or_default();
         ids.push(node_id);
         user_nodes.insert(*principal, UserIdList(ids));
+    });
+}
+
+//
+// User Wallet Management
+//
+
+/// Get all wallet IDs associated with a user
+pub fn get_user_wallet_ids(principal: &Principal) -> Vec<u64> {
+    USER_WALLETS.with(|user_wallets| {
+        user_wallets.borrow()
+            .get(principal)
+            .map(|list| list.0)
+            .unwrap_or_default()
+    })
+}
+
+/// Associate a wallet ID with a user
+pub fn add_wallet_to_user(principal: &Principal, wallet_id: u64) {
+    USER_WALLETS.with(|user_wallets| {
+        let mut user_wallets = user_wallets.borrow_mut();
+        let mut ids = user_wallets
+            .get(principal)
+            .map(|list| list.0)
+            .unwrap_or_default();
+        ids.push(wallet_id);
+        user_wallets.insert(*principal, UserIdList(ids));
     });
 }

@@ -9,7 +9,7 @@ import EmporiumSearch from "./components/EmporiumSearch";
 import getMarketListing from "../Emporium/thunks/getMarketListing";
 import getUserIcrc7Tokens from "../Emporium/thunks/getUserIcrc7Tokens";
 import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
-import { setTransactions } from "@/apps/Modules/shared/state/content/contentDisplaySlice";
+import { setTransactions } from "@/apps/Modules/shared/state/transactions/transactionSlice";
 
 function Dialectica() {
 	const dispatch = useAppDispatch();

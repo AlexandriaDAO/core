@@ -13,10 +13,9 @@ import { ALEX } from '../../../../../../declarations/ALEX';
 import { LBRY } from '../../../../../../declarations/LBRY';
 import { nft_manager } from '../../../../../../declarations/nft_manager';
 import { updateNftBalances } from '../../shared/state/nftData/nftDataSlice';
-import { natToArweaveId } from '@/utils/id_convert';
 import { fetchTransactionById } from '../../LibModules/arweaveSearch/api/directArweaveClient';
 import { ContentService } from '../../LibModules/contentDisplay/services/contentService';
-import { setContentData } from '../../shared/state/content/contentDisplaySlice';
+import { setContentData } from '../../shared/state/transactions/transactionSlice';
 import { Transaction } from '../../shared/types/queries';
 import { Badge } from "@/lib/components/badge";
 import { Copy, Check, Link, X } from "lucide-react";
@@ -25,6 +24,7 @@ import { getNftOwnerInfo, UserInfo } from '../../shared/utils/nftOwner';
 import { setNFTs } from '../../shared/state/nftData/nftDataSlice';
 import { Button } from "@/lib/components/button";
 import { convertE8sToToken, formatPrincipal, formatBalance } from '../../shared/utils/tokenUtils';
+import { createTokenAdapter, determineTokenType, TokenType } from '../../shared/adapters/TokenAdapter';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -41,7 +41,7 @@ function SingleTokenView() {
   const [ownerInfo, setOwnerInfo] = useState<UserInfo | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   
-  const contentData = useSelector((state: RootState) => state.contentDisplay.contentData);
+  const contentData = useSelector((state: RootState) => state.transactions.contentData);
   const { nfts } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -55,17 +55,23 @@ function SingleTokenView() {
         setIsLoading(true);
         console.log('Loading NFT data for tokenId:', tokenId);
         
-        // Determine if this is an SBT by checking tokenId length
-        const isSBT = tokenId.length > 80;
+        const tokenType = determineTokenType(tokenId);
         
-        // Convert SBT to OG NFT id if needed, then convert to arweave id
+        const tokenAdapter = createTokenAdapter(tokenType);
+        
         const nftId = BigInt(tokenId);
-        const ogId = isSBT ? await nft_manager.scion_to_og_id(nftId) : nftId;
-        const arweaveId = natToArweaveId(ogId);
+        
+        let ogId: bigint;
+        if (tokenType === 'SBT') {
+          ogId = await nft_manager.scion_to_og_id(nftId);
+        } else {
+          ogId = nftId;
+        }
+        
+        const arweaveId = await tokenAdapter.tokenToNFTData(nftId, '').then(data => data.arweaveId);
         
         console.log('Converted to arweaveId:', arweaveId);
         
-        // Fetch transaction data with full details including tags
         const txData = await fetchTransactionById(arweaveId);
         console.log('Fetched transaction data:', txData);
         
@@ -79,12 +85,10 @@ function SingleTokenView() {
           setTransaction(txData);
           console.log('Set transaction in state:', txData);
 
-          // Load content using ContentService
           const content = await ContentService.loadContent(txData);
           const urls = await ContentService.getContentUrls(txData, content);
           setContentUrls(urls);
           
-          // Update content in Redux store
           dispatch(setContentData({ 
             id: txData.id, 
             content: {
@@ -94,7 +98,6 @@ function SingleTokenView() {
           }));
         }
 
-        // Load NFT balances
         const subaccount = await nft_manager.to_nft_subaccount(nftId);
         const balanceParams = {
           owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
@@ -110,11 +113,10 @@ function SingleTokenView() {
           const alexTokens = convertE8sToToken(alexBalance);
           const lbryTokens = convertE8sToToken(lbryBalance);
 
-          // Initialize NFT data in the store
           dispatch(setNFTs({
             [tokenId]: {
-              collection: isSBT ? 'SBT' : 'NFT',
-              principal: '', // Using empty string instead of null
+              collection: tokenType,
+              principal: '',
               arweaveId: arweaveId,
               balances: { alex: alexTokens, lbry: lbryTokens }
             }
@@ -124,7 +126,7 @@ function SingleTokenView() {
             tokenId,
             alex: alexTokens,
             lbry: lbryTokens,
-            collection: isSBT ? 'SBT' : 'NFT'
+            collection: tokenType
           }));
         }
       } catch (error) {
@@ -236,7 +238,6 @@ function SingleTokenView() {
         if (alexBlock !== null) message += (lbryBlock !== null ? " and" : "") + " ALEX";
         toast.success(message);
 
-        // Reload balances after withdrawal
         if (tokenId) {
           const subaccount = await nft_manager.to_nft_subaccount(BigInt(tokenId));
           const balanceParams = {
@@ -274,8 +275,7 @@ function SingleTokenView() {
     parseFloat(nftData.balances?.lbry || '0') > 0
   );
 
-  // Determine collection type based on tokenId length
-  const collectionType = tokenId && tokenId.length > 80 ? 'SBT' : 'NFT';
+  const collectionType = nftData?.collection || 'NFT';
 
   const handleCopyPrincipal = async (e: React.MouseEvent) => {
     e.stopPropagation();

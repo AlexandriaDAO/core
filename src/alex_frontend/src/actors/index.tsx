@@ -1,6 +1,5 @@
 export { default as AlexActor } from './AlexActor';
 export { default as AlexBackendActor } from './AlexBackendActor';
-export { default as AlexWalletActor } from './AlexWalletActor';
 export { default as IcpLedgerActor } from './IcpLedgerActor';
 export { default as IcpSwapActor } from './IcpSwapActor';
 export { default as Icrc7Actor } from './Icrc7Actor';

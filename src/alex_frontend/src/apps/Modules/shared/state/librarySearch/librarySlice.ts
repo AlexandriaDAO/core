@@ -20,7 +20,7 @@ interface LibraryState {
 }
 
 const initialState: LibraryState = {
-  selectedPrincipals: [],
+  selectedPrincipals: ['new'],
   sortAsc: true,
   tags: [],
   collection: 'NFT',

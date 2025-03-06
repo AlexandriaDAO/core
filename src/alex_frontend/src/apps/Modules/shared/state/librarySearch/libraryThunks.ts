@@ -1,14 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { togglePrincipal, setLoading, setSearchParams, updateLastSearchTimestamp, setTotalItems } from './librarySlice';
-import { updateTransactions } from '@/apps/Modules/shared/state/content/contentDisplayThunks';
+import { togglePrincipal, setLoading, setSearchParams, updateLastSearchTimestamp, setTotalItems, setCollection } from './librarySlice';
+import { updateTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
 import { RootState } from '@/store';
 import { toggleSortDirection } from './librarySlice';
 import { AppDispatch } from '@/store';
 import { fetchTokensForPrincipal, FetchTokensParams } from '../nftData/nftDataThunks';
 import { clearNfts } from '../nftData/nftDataSlice';
-import { icrc7 } from '../../../../../../../declarations/icrc7';
-import { icrc7_scion } from '../../../../../../../declarations/icrc7_scion';
 import { Principal } from '@dfinity/principal';
+import { createTokenAdapter, TokenType } from '../../adapters/TokenAdapter';
 
 const DEBOUNCE_TIME = 300; // ms
 const DEFAULT_PAGE_SIZE = 20;
@@ -21,24 +20,32 @@ export const togglePrincipalSelection = createAsyncThunk<
   'library/togglePrincipalSelection',
   async (principalId: string, { dispatch, getState }) => {
     try {
-      dispatch(clearNfts());
+      // Get current state
+      const currentState = getState();
+      const currentPrincipals = currentState.library.selectedPrincipals;
+      
+      // Only clear NFTs if we're changing principals (not just re-selecting)
+      const isNewPrincipalSelection = !currentPrincipals.includes(principalId);
+      if (isNewPrincipalSelection) {
+        dispatch(clearNfts());
+      }
+      
       dispatch(togglePrincipal(principalId));
 
       // Get current collection type
       const state = getState();
       const collection = state.library.collection;
+      
+      // Create the appropriate token adapter
+      const tokenAdapter = createTokenAdapter(collection as TokenType);
 
       // Get total NFT count for the selected principal
       let totalCount: bigint;
       if (principalId === 'new') {
-        totalCount = await (collection === 'NFT' ? icrc7.icrc7_total_supply() : icrc7_scion.icrc7_total_supply());
+        totalCount = await tokenAdapter.getTotalSupply();
       } else {
         const principal = Principal.fromText(principalId);
-        const params = [{ owner: principal, subaccount: [] as [] }];
-        const balance = await (collection === 'NFT' 
-          ? icrc7.icrc7_balance_of(params)
-          : icrc7_scion.icrc7_balance_of(params));
-        totalCount = BigInt(balance[0]);
+        totalCount = await tokenAdapter.getBalanceOf(principal);
       }
 
       // Update total items in the store
@@ -75,7 +82,16 @@ export const performSearch = createAsyncThunk<
       return;
     }
 
-    dispatch(clearNfts());
+    // Check if we're adding more content to existing results
+    const currentTransactions = state.transactions.transactions;
+    const isInitialSearch = currentTransactions.length === 0;
+    
+    // Only clear NFTs if this is an initial search or if explicitly requested
+    // This prevents wiping out NFT data when loading content after initial fetch
+    if (isInitialSearch) {
+      dispatch(clearNfts());
+    }
+    
     dispatch(updateLastSearchTimestamp());
     dispatch(setLoading(true));
     
@@ -98,6 +114,28 @@ export const performSearch = createAsyncThunk<
         }
         
         const result = await dispatch(fetchTokensForPrincipal(params)).unwrap();
+        
+        // If we need to update the total count
+        if (totalItems === undefined || totalItems === 0) {
+          const collectionType = collection;
+          // Create the appropriate token adapter
+          const tokenAdapter = createTokenAdapter(collectionType as TokenType);
+          
+          let totalCount: bigint;
+          
+          if (selectedPrincipals.length === 0 || selectedPrincipals[0] === 'new') {
+            // For 'new' option or when no principal is selected, get total supply
+            totalCount = await tokenAdapter.getTotalSupply();
+          } else {
+            // For specific principal, get their balance
+            const principalId = selectedPrincipals[0];
+            const principal = Principal.fromText(principalId);
+            totalCount = await tokenAdapter.getBalanceOf(principal);
+          }
+          
+          // Update total items in the store
+          dispatch(setTotalItems(Number(totalCount)));
+        }
         
         const currentState = getState();
         // Don't update totalItems here since we want to preserve the actual total from the contract
@@ -134,9 +172,59 @@ export const updateSearchParams = createAsyncThunk<
   }
 );
 
+export const changeCollection = createAsyncThunk<
+  void,
+  'NFT' | 'SBT',
+  { state: RootState; dispatch: AppDispatch }
+>(
+  'library/changeCollection',
+  async (collectionType, { dispatch, getState }) => {
+    try {
+      dispatch(clearNfts());
+      dispatch(setCollection(collectionType));
+      
+      const state = getState();
+      const { selectedPrincipals } = state.library;
+      
+      // Create the appropriate token adapter
+      const tokenAdapter = createTokenAdapter(collectionType as TokenType);
+      
+      // Get total count for the selected collection
+      let totalCount: bigint;
+      
+      if (selectedPrincipals.length === 0 || selectedPrincipals[0] === 'new') {
+        // For 'new' option or when no principal is selected, get total supply
+        totalCount = await tokenAdapter.getTotalSupply();
+      } else {
+        // For specific principal, get their balance
+        const principalId = selectedPrincipals[0];
+        const principal = Principal.fromText(principalId);
+        totalCount = await tokenAdapter.getBalanceOf(principal);
+      }
+      
+      // Update total items in the store
+      dispatch(setTotalItems(Number(totalCount)));
+      
+      // Reset search params to start from the beginning
+      const pageSize = state.library.searchParams.pageSize;
+      dispatch(setSearchParams({ 
+        start: 0,
+        end: Math.min(pageSize, Number(totalCount)),
+        pageSize
+      }));
+      
+      // Perform search with the new collection type
+      dispatch(performSearch());
+      
+    } catch (error) {
+      console.error('Error in changeCollection:', error);
+      throw error;
+    }
+  }
+);
+
 export const toggleSort = () => (dispatch: AppDispatch) => {
   dispatch(clearNfts());
   dispatch(toggleSortDirection());
   dispatch(performSearch());
 };
-

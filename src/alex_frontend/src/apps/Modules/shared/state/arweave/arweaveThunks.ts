@@ -1,9 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setIsLoading, setPredictionResults, setLastCursor, PredictionResults } from './arweaveSlice';
-import { setTransactions } from '../content/contentDisplaySlice';
+import { setTransactions } from '../transactions/transactionSlice';
 import { fetchTransactionsApi } from '@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi';
 import { SearchState } from '../../../shared/types/queries';
-import { loadContentForTransactions } from '../content/contentDisplayThunks';
 import { RootState } from '@/store';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 
@@ -29,9 +28,8 @@ export const performSearch = createAsyncThunk(
       searchState,
       isContinuation,
       after,
-      timestamp: searchState.timestamp ? new Date(searchState.timestamp).toISOString() : null
     });
-
+    
     try {
       // Clear cache and transactions if this is a new search
       if (!isContinuation) {
@@ -39,6 +37,7 @@ export const performSearch = createAsyncThunk(
         dispatch(setTransactions([]));
       }
 
+      // Call API with the correctly formatted params
       const fetchedTransactions = await fetchTransactionsApi({
         contentTypes: searchState.tags,
         amount: searchState.amount,
@@ -47,17 +46,22 @@ export const performSearch = createAsyncThunk(
         timestamp: searchState.timestamp
       });
 
-      console.log('Perform Search - Fetched transactions:', {
-        count: fetchedTransactions.length,
-        firstTimestamp: fetchedTransactions[0]?.block?.timestamp,
-        lastTimestamp: fetchedTransactions[fetchedTransactions.length - 1]?.block?.timestamp,
-        lastCursor: fetchedTransactions[fetchedTransactions.length - 1]?.cursor
-      });
+      if (!fetchedTransactions || fetchedTransactions.length === 0) {
+        console.log('No transactions found');
+        dispatch(setIsLoading(false));
+        return [];
+      }
 
-      // Get existing transactions if continuing a search
+      // Get the last cursor (timestamp from the last transaction)
+      const lastTransaction = fetchedTransactions[fetchedTransactions.length - 1];
+      if (lastTransaction?.cursor) {
+        dispatch(setLastCursor(lastTransaction.cursor));
+      }
+
+      // Get the existing transactions if this is a continuation of a search
       const state = getState() as RootState;
       const existingTransactions = isContinuation 
-        ? state.contentDisplay.transactions 
+        ? state.transactions.transactions 
         : [];
 
       // Create a Set of existing transaction IDs for efficient lookup
@@ -67,32 +71,42 @@ export const performSearch = createAsyncThunk(
       const uniqueNewTransactions = fetchedTransactions.filter(
         transaction => !existingIds.has(transaction.id)
       );
-      
-      // Combine existing and filtered new transactions
-      const combinedTransactions = [...existingTransactions, ...uniqueNewTransactions];
-      
-      dispatch(setTransactions(combinedTransactions));
 
-      // Update the last cursor if we have transactions
-      if (fetchedTransactions.length > 0) {
-        const lastCursor = fetchedTransactions[fetchedTransactions.length - 1].cursor;
-        dispatch(setLastCursor(lastCursor || null));
+      console.log(`Found ${uniqueNewTransactions.length} new unique transactions`);
+
+      // Combine existing transactions with new ones
+      const allTransactions = [...existingTransactions, ...uniqueNewTransactions];
+      
+      // Update the Redux store with the transactions
+      dispatch(setTransactions(allTransactions));
+      
+      // Load content for each new transaction
+      for (const transaction of uniqueNewTransactions) {
+        try {
+          const content = await ContentService.loadContent(transaction);
+          const urls = await ContentService.getContentUrls(transaction, content);
+          
+          dispatch({
+            type: 'transactions/setContentData',
+            payload: {
+              id: transaction.id,
+              content: {
+                ...content,
+                urls
+              }
+            }
+          });
+        } catch (error) {
+          console.error(`Error loading content for transaction ${transaction.id}:`, error);
+        }
       }
-
-      // Load content and URLs for the new transactions only
-      await dispatch(loadContentForTransactions(uniqueNewTransactions));
-
-      return {
-        transactions: combinedTransactions,
-        contentTypes: searchState.tags,
-        amount: searchState.amount,
-        ownerFilter: searchState.ownerFilter,
-      };
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-      throw error;
-    } finally {
+      
       dispatch(setIsLoading(false));
+      return uniqueNewTransactions;
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+      dispatch(setIsLoading(false));
+      return [];
     }
   }
 );

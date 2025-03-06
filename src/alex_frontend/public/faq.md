@@ -6,24 +6,23 @@ Alexandria is a experimental protocol. This website is our pilot program.
 
 Our goal is to is to restore that sense of awe and human connection that was so palpable in the early days of the Web by reimagining the FAANG services for Web3. In one sense, we're the ultimate library for permanent content. In another sense, we're a protocol layer for dapps where everything is an NFT with built-in nanopayments.
 
-2. Is this website safe?
+2. Is this site safe?
 
-The site is safe, but holding large amounts of our token is not. Our code is unaudited and participation is risky. Here's how to think about them.
+For the most part, yes. Here's what you need to know: 
 
-   (a) ICP in your account is quite safe, and this website cannot touch it.
-   (b) NFTs are quite safe, and backed up regularly.
-   (c) Staked ALEX is relatively safe, as backups are made often.
-   (d) ALEX balances inside the app are moderately safe, but could still be lost in a catastrophic event.
-   (e) ALEX or ICP used to provide liquidity off this platform is not safe, and would likely be lost in a catastrophic event.
-   (f) LBRY is not safe, though there's no reason to hold much of it.
+Our tokenomics model is audited by Solidstate, the foremost ICP auditing agency, so holding/swapping/staking/burning tokens on this site is pretty safe, though mistakes are always possible.
 
-1. How do I register an account?
+NFTs are pretty safe, but while in pre-alpha our backup system is not live so data loss is possible at this stage. For this reason, ALEX and LBRY inside NFTs should be regularly withdrawn to your wallet. The underling NFT asset is never lost though, as it persits on Arweave forever*, and our backup system will make the entire library forkable/recoverable for everyone.
+
+All our code is open source, but also rapidly changing during this pre-alpha stage. While we work very hard against this, damaging or malicious bugs are possible (as with any dapp storing funds), so if you're super paranoid, just store your tokens in a separate wallet.
+
+3. How do I register an account?
 
 First, you need to get an [Internet Identity](https://identity.ic0.app/).
 
 Then login with II, click 'SignUp', and add your username. This makes you a Librarian - someone who can store, share, and collect content on Alexandria.
 
-3. Why do I need LBRY?
+4. Why do I need LBRY?
 
 On Alexandria everything's an NFT, so using other people's content is not free. You pay to use others' content in LBRY, and get paid when your content is used.
 

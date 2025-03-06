@@ -88,6 +88,7 @@ cargo update
 
 
 dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
+
 dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
 
 
