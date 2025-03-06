@@ -35,9 +35,8 @@ type Result_4 = variant { Ok; Err : text };
 type Result_5 = variant { Ok : User; Err : text };
 type Result_6 = variant { Ok : vec Engine; Err : text };
 type Result_7 = variant { Ok : vec Node; Err : text };
-type Result_8 = variant { Ok : vec Wallet; Err : text };
-type Result_9 = variant { Ok : SignatureResponse; Err : text };
-type SignatureResponse = record { id : text; signature : text; owner : text };
+type Result_8 = variant { Ok : WalletKeyResponse; Err : text };
+type Result_9 = variant { Ok : vec Wallet; Err : text };
 type SignupRequest = record { username : text };
 type UpdateEngineStatusRequest = record { id : nat64; active : bool };
 type UpdateNodeStatusRequest = record { id : nat64; active : bool };
@@ -66,6 +65,7 @@ type Wallet = record {
   public : PublicKey;
   created_at : nat64;
 };
+type WalletKeyResponse = record { n : text; id : nat64; key : text };
 service : {
   check_username_availability : (text) -> (Result) query;
   create_engine : (CreateEngineRequest) -> (Result_1);
@@ -93,9 +93,9 @@ service : {
   get_user_engines : (principal) -> (vec Engine) query;
   get_user_nodes : (principal) -> (vec Node) query;
   get_user_wallets : (principal) -> (vec Wallet) query;
-  get_wallets : (vec nat64) -> (Result_8) query;
-  get_wallets_strict : (vec nat64) -> (Result_8) query;
-  sign : (blob, nat64) -> (Result_9);
+  get_wallet_key : (nat64) -> (Result_8) query;
+  get_wallets : (vec nat64) -> (Result_9) query;
+  get_wallets_strict : (vec nat64) -> (Result_9) query;
   signup : (SignupRequest) -> (Result_5);
   update_engine_status : (UpdateEngineStatusRequest) -> (Result_1);
   update_node_status : (UpdateNodeStatusRequest) -> (Result_2);

@@ -6,6 +6,64 @@ use crate::errors::general::GeneralError;
 use crate::store::{WALLETS, USER_WALLETS};
 use crate::models::wallet::Wallet;
 
+fn wallet_canister_id() -> Principal {
+    let wallet_canister_id = "yh7mi-3yaaa-aaaap-qkmpa-cai";
+    Principal::from_text(wallet_canister_id).expect("failed to create canister ID")
+}
+
+#[derive(candid::CandidType, serde::Serialize)]
+pub struct WalletKeyResponse {
+    id: u64,
+    key: String,
+    n: String,
+}
+
+#[query]
+pub fn get_wallet_key(wallet_id: u64) -> Result<WalletKeyResponse, String> {
+    let caller = caller();
+
+    // Debug: Print the caller's principal
+    ic_cdk::println!("Caller: {}", caller);
+
+    // Ensure only the wallet canister can call this function
+    if caller != wallet_canister_id() {
+        ic_cdk::println!("Unauthorized caller: {}", caller);
+        return Err(GeneralError::NotAuthorized.to_string());
+    }
+
+    // Debug: Print the wallet ID being requested
+    ic_cdk::println!("Requested wallet ID: {}", wallet_id);
+
+    WALLETS.with(|wallets| {
+        let wallets = wallets.borrow();
+
+        // Debug: Print the number of wallets in storage
+        ic_cdk::println!("Total wallets in storage: {}", wallets.len());
+
+        // Look up the wallet by ID
+        match wallets.get(&wallet_id) {
+            Some(wallet) => {
+                // Debug: Print the found wallet details
+                ic_cdk::println!("Found wallet: ID={}, Key={}, Owner={}", wallet.id, wallet.key, wallet.public.n);
+
+                // Return the wallet key response
+                Ok(WalletKeyResponse {
+                    id: wallet.id,
+                    key: wallet.key.clone(),
+                    n: wallet.public.n.to_string(),
+                })
+            }
+            None => {
+                // Debug: Print that the wallet was not found
+                ic_cdk::println!("Wallet with ID {} not found", wallet_id);
+
+                // Return a not found error
+                Err(GeneralError::NotFound("Wallet not found".to_string()).to_string())
+            }
+        }
+    })
+}
+
 /// Retrieves multiple wallets by their ids
 /// Returns a vector of wallets, skipping any IDs that don't exist
 #[query]

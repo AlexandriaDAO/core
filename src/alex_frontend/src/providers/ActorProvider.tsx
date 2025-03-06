@@ -12,6 +12,7 @@ import {
 	// TokenomicsActor,
 	// VetkdActor,
 	UserActor,
+	AlexWalletActor,
 	LexigraphActor,
 } from "@/actors";
 
@@ -34,6 +35,7 @@ const ActorProvider: React.FC<ActorProviderProps> = ({ children }) => {
 				// TokenomicsActor,
 				// VetkdActor,
 				UserActor,
+				AlexWalletActor,
 				LexigraphActor,
 			]}
 			>

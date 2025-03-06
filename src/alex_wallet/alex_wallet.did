@@ -1,0 +1,3 @@
+type Result = variant { Ok : SignatureResponse; Err : text };
+type SignatureResponse = record { id : text; signature : text; owner : text };
+service : { sign : (blob, nat64) -> (Result) }

@@ -6,8 +6,6 @@ use sha2::{Sha256, Digest};
 use candid::{self, Principal};
 use serde;
 
-use crate::wallet_queries::get_wallets;
-
 const HASH_LENGTH: usize = 32; // SHA-256 produces 32 bytes
 const SALT_LENGTH: usize = 32; // Using 32-byte salt
 const RSA_SIZE: usize = 512;   // 4096 bits = 512 bytes
@@ -171,37 +169,115 @@ pub struct SignatureResponse {
     owner: String,
 }
 
+#[derive(candid::CandidType, serde::Deserialize, Debug)]
+pub struct WalletKeyResponse {
+    pub id: u64,
+    pub key: String,
+    pub n: String,
+}
+
+// /// Calls the `user` canister to get the wallet by ID
+// pub async fn get_wallet_key(wallet_id: u64) -> Result<WalletKeyResponse, String> {
+//     let (response,): (Result<WalletKeyResponse, String>,) = ic_cdk::api::call::call(
+//         user_canister_id(),
+//         "get_wallet_key",
+//         (wallet_id,), // Pass the wallet_id directly
+//     )
+//     .await
+//     .map_err(|e| format!("Call to get_wallet_key failed: {:?}", e))?;
+
+//     let wallet_key = response.map_err(|e| format!("Error from user canister: {}", e))?;
+
+//     ic_cdk::println!("Wallet key: {}, id: {}, owner: {}", wallet_key.key, wallet_key.id, wallet_key.owner);
+
+//     Ok(wallet_key)
+// }
+
+
+pub async fn get_wallet_key(wallet_id: u64) -> Result<WalletKeyResponse, String> {
+    ic_cdk::println!("Starting get_wallet_key function");
+    ic_cdk::println!("Requesting wallet with ID: {}", wallet_id);
+
+    // Perform the cross-canister call to the `user` canister
+    let result: Result<(Result<WalletKeyResponse, String>,), _> = ic_cdk::api::call::call(
+        user_canister_id(),
+        "get_wallet_key",
+        (wallet_id,),
+    )
+    .await;
+
+    match result {
+        Ok((Ok(wallet_key),)) => {
+            ic_cdk::println!("Successfully retrieved wallet key: {:?}", wallet_key);
+            Ok(wallet_key)
+        }
+        Ok((Err(err),)) => {
+            ic_cdk::println!("Error from user canister: {}", err);
+            Err(format!("Error from user canister: {}", err))
+        }
+        Err((code, msg)) => {
+            ic_cdk::println!("Cross-canister call failed: code={:?}, message={}", code, msg);
+            Err(format!("Cross-canister call failed: code={:?}, message={}", code, msg))
+        }
+    }
+}
+
+
+// /// Calls the `vetkd` canister to get the decrypted key
+// pub async fn get_decrypted_key(encrypted_key: String) -> Result<String, String> {
+//     let (response,): (Result<String, String>,) = ic_cdk::api::call::call(
+//         vetkd_canister_id(),
+//         "wbe_decrypt",
+//         (encrypted_key,), // Pass the wallet_id directly
+//     )
+//     .await
+//     .map_err(|e| format!("Call to abe_decrypt failed: {:?}", e))?;
+
+//     let decrypted = response.map_err(|e| format!("Decryption error: {}", e))?;
+
+//     ic_cdk::println!("Decrypted key: {}", decrypted);
+
+//     Ok(decrypted)
+// }
+
+
+/// Calls the `vetkd` canister to get the decrypted key
+pub async fn get_decrypted_key(encrypted_key: String) -> Result<String, String> {
+    ic_cdk::println!("Starting get_decrypted_key function");
+    ic_cdk::println!("Encrypted key: {}", encrypted_key);
+
+    // Perform the cross-canister call to the `vetkd` canister
+    let result: Result<(Result<String, String>,), _> = ic_cdk::api::call::call(
+        vetkd_canister_id(),
+        "wbe_decrypt",
+        (encrypted_key,),
+    )
+    .await;
+
+    match result {
+        Ok((Ok(decrypted),)) => {
+            ic_cdk::println!("Successfully decrypted key: {}", decrypted);
+            Ok(decrypted)
+        }
+        Ok((Err(err),)) => {
+            ic_cdk::println!("Error from vetkd canister: {}", err);
+            Err(format!("Error from vetkd canister: {}", err))
+        }
+        Err((code, msg)) => {
+            ic_cdk::println!("Cross-canister call failed: code={:?}, message={}", code, msg);
+            Err(format!("Cross-canister call failed: code={:?}, message={}", code, msg))
+        }
+    }
+}
+
 #[update]
 pub async fn sign(data: Vec<u8>, id: u64) -> Result<SignatureResponse, String> {
     ic_cdk::println!("Debugging ID: {}", id);
 
-    let wallet = get_wallets(vec![id]).unwrap();
+    // Call the `get_wallet_key` function to retrieve the wallet key
+    let wallet = get_wallet_key(id).await?;
 
-    if wallet.is_empty() {
-        return Err(format!("Wallet with ID {} not found", id));
-    }
-
-    let wallet = wallet.first().unwrap();
-
-    if wallet.id != id {
-        return Err(format!("Wallet with ID {} not found", id));
-    }
-
-    ic_cdk::println!("Wallet key: {}", wallet.key);
-
-    let request = wallet.key.to_string();
-
-    let (response,): (Result<String, String>,) = ic_cdk::api::call::call(
-        vetkd_canister_id(),
-        "wbe_decrypt",
-        (request,),
-    )
-    .await
-    .map_err(|e| format!("Call to abe_decrypt failed: {:?}", e))?;
-
-    let decrypted = response.map_err(|e| format!("Decryption error: {}", e))?;
-
-    ic_cdk::println!("Decrypted key");
+    let decrypted = get_decrypted_key(wallet.key).await?;
 
     ic_cdk::println!("Starting sign() function");
     ic_cdk::println!("Input data length: {} bytes", data.len());
@@ -212,7 +288,7 @@ pub async fn sign(data: Vec<u8>, id: u64) -> Result<SignatureResponse, String> {
     ic_cdk::println!("Parsed JWK");
 
     // Get n directly from parsed JWK
-    let owner = wallet.public.n.to_string();
+    let owner = wallet.n.to_string();
     ic_cdk::println!("Owner: {}", owner);
 
     let raw_signature = rsa_pss_sign(data.as_slice(), &jwk_json, &owner).await?;
@@ -231,4 +307,9 @@ pub async fn sign(data: Vec<u8>, id: u64) -> Result<SignatureResponse, String> {
 fn vetkd_canister_id() -> Principal {
     let vetkd_canister_id = "5ham4-hqaaa-aaaap-qkmsq-cai";
     Principal::from_text(vetkd_canister_id).expect("failed to create canister ID")
+}
+
+fn user_canister_id() -> Principal {
+    let user_canister_id = "yo4hu-nqaaa-aaaap-qkmoq-cai";
+    Principal::from_text(user_canister_id).expect("failed to create canister ID")
 }

@@ -11,6 +11,7 @@ members = [
     "src/logs",
     "src/xrc",
     "src/user",
+    "src/alex_wallet",
     "src/emporium",
     "src/logs",
     "src/asset_manager"

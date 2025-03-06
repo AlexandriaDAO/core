@@ -11,9 +11,8 @@ pub mod validations;
 pub use api::node::queries as node_queries;
 pub use api::node::updates as node_updates;
 pub use api::wallet::queries as wallet_queries;
+pub use api::wallet::queries::WalletKeyResponse;
 pub use api::wallet::updates as wallet_updates;
-pub use api::wallet::crypto as wallet_crypto;
-pub use api::wallet::crypto::SignatureResponse;
 pub use api::user::queries as user_queries;
 pub use api::user::updates as user_updates;
 
