@@ -92,7 +92,7 @@ export const performSearch = createAsyncThunk<
       dispatch(clearNfts());
     }
     
-    dispatch(updateLastSearchTimestamp());
+    dispatch(updateLastSearchTimestamp(now));
     dispatch(setLoading(true));
     
     try {

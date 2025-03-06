@@ -113,18 +113,17 @@ export const updateTransactions = createAsyncThunk<
 >(
   'transactions/updateTransactions',
   async (arweaveIds: string[], { dispatch, getState }) => {
+    // Get existing transactions from state first
+    const state = getState();
+    const existingTransactions = state.transactions.transactions;
+    
     if (arweaveIds.length === 0) {
-      // If no arweave IDs provided, return current transactions from state
-      const state = getState();
-      return state.transactions.transactions;
+      // If no arweave IDs provided, return existing transactions without changing state
+      return existingTransactions;
     }
 
     // Fetch transactions for the arweave IDs
     const newTransactions = await fetchTransactionsForAlexandrian(arweaveIds);
-    
-    // Get existing transactions from state
-    const state = getState();
-    const existingTransactions = state.transactions.transactions;
     
     // Create a map of existing transactions by ID for quick lookup
     const existingTransactionMap = new Map(

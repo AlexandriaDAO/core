@@ -89,7 +89,11 @@ export const useWiper = (config: WipeConfig = {}) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wipeOnUnmount]);
   
-  return { wipeState };
+  // For backward compatibility, make the function itself callable
+  // while still providing the object API
+  const wiperFunction = Object.assign(wipeState, { wipeState });
+  
+  return wiperFunction;
 };
 
 /**
@@ -103,4 +107,8 @@ export const useWipeOnUnmount = () => {
       dispatch(wipe());
     };
   }, [dispatch]);
+  
+  // For backward compatibility, return a function
+  const wipeFunction = () => dispatch(wipe());
+  return wipeFunction;
 };

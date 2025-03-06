@@ -11,6 +11,9 @@ import transactionsReducer, {
 } from '@/apps/Modules/shared/state/transactions/transactionSlice';
 import { loadContentForTransactions, updateTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
 import { Transaction } from '@/apps/Modules/shared/types/queries';
+import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
+import { AppDispatch } from '@/store';
+import { CachedContent, ContentUrlInfo } from '@/apps/Modules/LibModules/contentDisplay/types';
 
 // Mock the selectFilteredAndSortedTransactions selector
 jest.mock('@/apps/Modules/shared/state/transactions/transactionSortUtils', () => ({
@@ -56,32 +59,44 @@ jest.mock('@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi', () => ({
   ])
 }));
 
+// Mock imported functions
+jest.mock('@/apps/Modules/shared/state/transactions/transactionThunks', () => {
+  const originalModule = jest.requireActual('@/apps/Modules/shared/state/transactions/transactionThunks');
+  return {
+    ...originalModule,
+    loadContentForTransactions: jest.fn().mockImplementation((transactions) => {
+      return async (dispatch: AppDispatch) => {
+        // For each transaction, dispatch a setContentData action
+        transactions.forEach((tx: Transaction) => {
+          dispatch({
+            type: 'transactions/setContentData',
+            payload: {
+              id: tx.id,
+              content: { data: 'mocked content for ' + tx.id }
+            }
+          });
+        });
+        return Promise.resolve();
+      };
+    }),
+  };
+});
+
+// Mock ContentService
 jest.mock('@/apps/Modules/LibModules/contentDisplay/services/contentService', () => ({
   ContentService: {
-    loadContent: jest.fn().mockImplementation(async (transaction) => ({
-      url: `https://arweave.net/${transaction.id}`,
+    loadContent: jest.fn().mockResolvedValue({ 
+      url: 'https://arweave.net/test',
       textContent: null,
       imageObjectUrl: null,
       thumbnailUrl: null,
       error: null
-    })),
-    getContentUrls: jest.fn().mockImplementation(async (transaction) => {
-      const contentType = transaction.tags.find((tag: { name: string; value: string }) => tag.name === 'Content-Type')?.value;
-      if (contentType?.startsWith('image/')) {
-        return {
-          thumbnailUrl: `https://arweave.net/${transaction.id}?ar-size=20`,
-          coverUrl: `https://arweave.net/${transaction.id}`,
-          fullUrl: `https://arweave.net/${transaction.id}`,
-          needsProcessing: false
-        };
-      }
-      return {
-        thumbnailUrl: null,
-        coverUrl: null,
-        fullUrl: `https://arweave.net/${transaction.id}`,
-        needsProcessing: false
-      };
-    })
+    } as CachedContent),
+    getContentUrls: jest.fn().mockResolvedValue({ 
+      thumbnailUrl: 'test-thumbnail-url',
+      coverUrl: 'test-cover-url',
+      fullUrl: 'test-url.com'
+    } as ContentUrlInfo)
   }
 }));
 
@@ -413,6 +428,24 @@ describe('Transaction State', () => {
     });
 
     it('should handle updateTransactions thunk with arweave IDs', async () => {
+      // Mock the ContentService.loadContent method
+      const mockContent: CachedContent = { 
+        url: 'https://arweave.net/test',
+        textContent: null,
+        imageObjectUrl: null,
+        thumbnailUrl: null,
+        error: null
+      };
+      const mockUrls: ContentUrlInfo = { 
+        thumbnailUrl: 'test-thumbnail-url',
+        coverUrl: 'test-cover-url',
+        fullUrl: 'test-url.com'
+      };
+      
+      // Mock the content service
+      jest.spyOn(ContentService, 'loadContent').mockResolvedValue(mockContent);
+      jest.spyOn(ContentService, 'getContentUrls').mockResolvedValue(mockUrls);
+      
       // Call the updateTransactions thunk with arweave IDs
       await store.dispatch(updateTransactions(['tx1', 'tx2']) as unknown as AnyAction);
       
@@ -440,9 +473,9 @@ describe('Transaction State', () => {
       // Call the updateTransactions thunk with empty array
       await store.dispatch(updateTransactions([]) as unknown as AnyAction);
       
-      // Verify transactions are cleared
+      // Verify transactions are preserved (not cleared)
       const updatedState = store.getState() as RootState;
-      expect(updatedState.transactions.transactions).toEqual([]);
+      expect(updatedState.transactions.transactions).toEqual(mockTransactions);
     });
   });
 

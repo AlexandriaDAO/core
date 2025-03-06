@@ -77,8 +77,8 @@ const librarySlice = createSlice({
     setSearchParams: (state, action: PayloadAction<Partial<SearchParams>>) => {
       state.searchParams = { ...state.searchParams, ...action.payload };
     },
-    updateLastSearchTimestamp: (state) => {
-      state.lastSearchTimestamp = Date.now();
+    updateLastSearchTimestamp: (state, action: PayloadAction<number | undefined>) => {
+      state.lastSearchTimestamp = action.payload !== undefined ? action.payload : Date.now();
     },
     resetSearch: (state) => {
       return {

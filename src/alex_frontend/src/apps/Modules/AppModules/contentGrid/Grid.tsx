@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
@@ -15,7 +15,6 @@ import { Loader2 } from 'lucide-react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import type { Transaction } from '../../shared/types/queries';
-import { useLocation } from 'react-router-dom';
 import { TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
 
 // Create a typed dispatch hook
@@ -53,11 +52,7 @@ interface GridProps {
 
 const Grid = ({ dataSource }: GridProps = {}) => {
   const dispatch = useAppDispatch();
-  const location = useLocation();
-  
-  // Always use the unified transactions data source
-  const effectiveDataSource: GridDataSource = 'transactions';
-  
+
   // Select the appropriate state based on the determined data source
   const { contentData } = useSelector((state: RootState) => {
     // Always use the new unified transactions state
@@ -78,7 +73,6 @@ const Grid = ({ dataSource }: GridProps = {}) => {
   // Use the sortedTransactions hook which applies proper filtering by tags
   const sortedTransactions = useSortedTransactions();
 
-  const [showStats, setShowStats] = useState<Record<string, boolean>>({});
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string,assetUrl:string } | null>(null);
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});

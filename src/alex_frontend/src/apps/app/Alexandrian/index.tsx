@@ -21,9 +21,15 @@ const useAssetLoadingState = () => {
 	// Select required state
 	const { isLoading } = useSelector((state: RootState) => state.library);
 	const transactions = useSelector((state: RootState) => state.transactions.transactions);
+	const nfts = useSelector((state: RootState) => state.nftData.nfts);
+	
+	// Consider assets loaded if we have transactions OR NFTs, and we're not currently loading
+	const hasTransactions = transactions.length > 0;
+	const hasNfts = Object.keys(nfts).length > 0;
 	
 	// Set ref to true when assets have loaded
-	if (transactions.length > 0 && !isLoading && !assetsLoadedRef.current) {
+	if ((hasTransactions || hasNfts) && !isLoading && !assetsLoadedRef.current) {
+		console.log('Assets loaded, preserving state');
 		assetsLoadedRef.current = true;
 	}
 	
@@ -39,13 +45,17 @@ function Alexandrian() {
 
 	const handleSearch = useCallback(async () => {
 		try {
-			await dispatch(resetSearch());
+			// Only reset search if no assets have been loaded
+			// This prevents wiping out state when assets are already present
+			if (!assetsLoaded) {
+				await dispatch(resetSearch());
+			}
 			await dispatch(performSearch());
 		} catch (error) {
 			console.error('Search failed:', error);
 			toast.error('Search failed');
 		}
-	}, [dispatch]);
+	}, [dispatch, assetsLoaded]);
 
 	const handleShowMore = useCallback(async () => {
 		try {
