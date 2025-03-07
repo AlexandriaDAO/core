@@ -170,7 +170,7 @@ pub(crate) fn add_to_total_archived_balance(amount: u64) -> Result<(), Execution
 }
 pub(crate) fn sub_to_total_archived_balance(amount: u64) -> Result<(), ExecutionError> {
     let current_total = get_total_archived_balance();
-    let new_total = current_total.checked_sub(amount).ok_or(
+    let new_total = current_total.checked_sub(amount).ok_or_else(||
         ExecutionError::new_with_log(
             caller(),
             "sub_to_total_archived_balance",
@@ -202,7 +202,7 @@ pub(crate) fn add_to_unclaimed_amount(amount: u64) -> Result<(), ExecutionError>
 }
 pub(crate) fn sub_to_unclaimed_amount(amount: u64) -> Result<(), ExecutionError> {
     let current_total = get_total_unclaimed_icp_reward();
-    let new_total = current_total.checked_sub(amount).ok_or(
+    let new_total = current_total.checked_sub(amount).ok_or_else(||
         ExecutionError::new_with_log(
             caller(),
             "sub_to_unclaimed_amount",
