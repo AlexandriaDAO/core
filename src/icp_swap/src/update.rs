@@ -735,7 +735,6 @@ async fn un_stake_all_ALEX(from_subaccount: Option<[u8; 32]>) -> Result<String, 
 pub async fn distribute_reward() -> Result<String, ExecutionError> {
     register_info_log(caller(), "distribute_reward", "distribute_reward initiated.");
     let intervals = get_distribution_interval();
-
     let staking_percentage = STAKING_REWARD_PERCENTAGE;
     let mut total_icp_available: u64 = 0;
 
@@ -919,7 +918,7 @@ pub async fn distribute_reward() -> Result<String, ExecutionError> {
                             )
                         )?;
 
-                    total_icp_reward = total_icp_reward.checked_add(total_icp_reward).ok_or_else(||
+                    total_icp_reward = total_icp_reward.checked_add(reward).ok_or_else(||
                         ExecutionError::new_with_log(
                             caller(),
                             "distribute_reward",
