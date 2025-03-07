@@ -6,6 +6,7 @@ export interface NFTData {
     alex: string;
     lbry: string;
   };
+  orderIndex?: number;
 }
 
 export interface NFTBalances {

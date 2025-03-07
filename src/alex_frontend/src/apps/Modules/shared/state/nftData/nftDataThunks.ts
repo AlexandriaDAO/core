@@ -23,6 +23,7 @@ interface BatchFetchParams {
   tokenId: bigint;
   collection: 'NFT' | 'SBT';
   principalId: string;
+  orderIndex?: number; // Add optional order index
 }
 
 // Define AppDispatch type
@@ -76,7 +77,7 @@ const fetchNFTBatchHelper = async (params: BatchFetchParams[]) => {
     
     // Process batch with owner information
     const batchResults = await Promise.all(
-      batch.map(async ({ tokenId, collection, principalId }, index) => {
+      batch.map(async ({ tokenId, collection, principalId, orderIndex }, index) => {
         const adapter = getAdapter(collection);
         
         // Determine the owner principal
@@ -112,6 +113,11 @@ const fetchNFTBatchHelper = async (params: BatchFetchParams[]) => {
         
         // Use the adapter to convert token to NFTData
         const nftData = await adapter.tokenToNFTData(tokenId, ownerPrincipal);
+        
+        // Add order index to NFT data if provided
+        if (orderIndex !== undefined) {
+          nftData.orderIndex = orderIndex;
+        }
         
         return [tokenId.toString(), nftData] as [string, NFTData];
       })
@@ -343,10 +349,11 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       });
       
       // Prepare batch params - for 'new' option, we'll fetch owner info in the batch function
-      const batchParams = allNftIds.map(tokenId => ({
+      const batchParams = allNftIds.map((tokenId, index) => ({
         tokenId,
         collection,
-        principalId: principalId
+        principalId: principalId,
+        orderIndex: index // Add order index to track original sequence
       }));
 
       // Use batched fetching
@@ -356,7 +363,18 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       dispatch(setNfts(nftRecord));
 
       // Fetch transactions for the NFTs
-      const arweaveIds = Object.values(nftRecord).map(nft => nft.arweaveId);
+      // Create an array of objects with arweaveId and orderIndex
+      const arweaveIdsWithOrder = Object.entries(nftRecord).map(([tokenId, nft], index) => ({
+        arweaveId: nft.arweaveId,
+        orderIndex: batchParams.find(param => param.tokenId.toString() === tokenId)?.orderIndex ?? index
+      }));
+
+      // Sort by orderIndex to maintain original order
+      arweaveIdsWithOrder.sort((a, b) => a.orderIndex - b.orderIndex);
+
+      // Extract just the arweaveIds in the correct order
+      const arweaveIds = arweaveIdsWithOrder.map(item => item.arweaveId);
+
       await dispatch(fetchNftTransactions(arweaveIds) as unknown as AnyAction).unwrap();
 
       // If we're using the 'new' option, make sure all tokens have owner information

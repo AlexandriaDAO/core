@@ -31,7 +31,7 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
       }
     };
     fetchNftData();
-  }, [id]);
+  }, [id, getNftData]);
 
 
   const formatPrincipal = (principal: string | null) => {
@@ -122,6 +122,12 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
             LBRY: {formatBalance(nftData.balances.lbry.toString())}
           </Badge>
         </div>
+      )}
+      {/* Order Index - very subtle */}
+      {nftData?.orderIndex !== undefined && (
+        <span className="text-[8px] text-muted-foreground/40 ml-auto" title="Order Index">
+          #{nftData.orderIndex}
+        </span>
       )}
     </div>
   );

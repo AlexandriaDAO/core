@@ -37,4 +37,5 @@ data.ms
 
 keys.json
 
-node_repl_historybundle-stats.json
+node_repl_history
+bundle-stats.json
