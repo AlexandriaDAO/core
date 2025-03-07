@@ -30,7 +30,7 @@ type ShelfUpdate = record {
   slots : opt vec Slot;
 };
 type Slot = record { id : nat32; content : SlotContent; position : nat32 };
-type SlotContent = variant { Nft : text; Markdown : text };
+type SlotContent = variant { Nft : text; Shelf : text; Markdown : text };
 type SlotReorderInput = record {
   slot_id : nat32;
   reference_slot_id : opt nat32;

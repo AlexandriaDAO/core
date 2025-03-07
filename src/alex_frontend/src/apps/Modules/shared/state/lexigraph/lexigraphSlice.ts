@@ -109,7 +109,7 @@ export const addSlot = createAsyncThunk(
   }: { 
     shelf: Shelf, 
     content: string, 
-    type: "Nft" | "Markdown",
+    type: "Nft" | "Markdown" | "Shelf",
     principal: Principal
   }, { dispatch, rejectWithValue }) => {
     try {
@@ -121,6 +121,8 @@ export const addSlot = createAsyncThunk(
         id: Math.max(0, ...existingSlots.map(slot => slot.id)) + 1,
         content: type === "Nft" 
           ? { Nft: content } as SlotContent
+          : type === "Shelf"
+          ? { Shelf: content } as SlotContent
           : { Markdown: content } as SlotContent,
         position: newPosition
       };

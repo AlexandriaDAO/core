@@ -202,14 +202,21 @@ pub fn add_shelf_slot(shelf_id: String, input: AddSlotInput) -> Result<(), Strin
                 shelf.move_slot(new_id, Some(ref_id), input.before)?;
             }
 
-            // Handle NFT reference if the new slot contains an NFT
-            if let SlotContent::Nft(nft_id) = &input.content {
-                NFT_SHELVES.with(|nft_shelves| {
-                    let mut nft_map = nft_shelves.borrow_mut();
-                    let mut shelves = nft_map.get(nft_id).unwrap_or_default();
-                    shelves.0.push(shelf_id.clone());
-                    nft_map.insert(nft_id.to_string(), shelves);
-                });
+            // Handle references based on slot content type
+            match &input.content {
+                SlotContent::Nft(nft_id) => {
+                    NFT_SHELVES.with(|nft_shelves| {
+                        let mut nft_map = nft_shelves.borrow_mut();
+                        let mut shelves = nft_map.get(nft_id).unwrap_or_default();
+                        shelves.0.push(shelf_id.clone());
+                        nft_map.insert(nft_id.to_string(), shelves);
+                    });
+                },
+                SlotContent::Shelf(nested_shelf_id) => {
+                    // No additional tracking needed for shelf references
+                    // The circular reference check is handled in insert_slot
+                },
+                _ => {} // No special handling for other content types
             }
 
             shelf.updated_at = ic_cdk::api::time();
@@ -234,16 +241,23 @@ pub fn delete_shelf(shelf_id: String) -> Result<(), String> {
             return Err("Unauthorized: Only shelf owner can delete".to_string());
         }
         
-        // Remove NFT references
+        // Remove references based on slot content type
         for slot in shelf.slots.values() {
-            if let SlotContent::Nft(nft_id) = &slot.content {
-                NFT_SHELVES.with(|nft_shelves| {
-                    let mut nft_map = nft_shelves.borrow_mut();
-                    if let Some(mut shelves) = nft_map.get(nft_id) {
-                        shelves.0.retain(|id| id != &shelf_id);
-                        nft_map.insert(nft_id.clone(), shelves);
-                    }
-                });
+            match &slot.content {
+                SlotContent::Nft(nft_id) => {
+                    NFT_SHELVES.with(|nft_shelves| {
+                        let mut nft_map = nft_shelves.borrow_mut();
+                        if let Some(mut shelves) = nft_map.get(nft_id) {
+                            shelves.0.retain(|id| id != &shelf_id);
+                            nft_map.insert(nft_id.clone(), shelves);
+                        }
+                    });
+                },
+                SlotContent::Shelf(_) => {
+                    // No special cleanup needed for shelf references
+                    // The shelf being referenced will remain intact
+                },
+                _ => {} // No special handling for other content types
             }
         }
         
