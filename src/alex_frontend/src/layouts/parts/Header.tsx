@@ -73,6 +73,7 @@ function Header() {
 			<div className="flex-grow-0 flex-shrink-0 flex basis-24 justify-between items-center w-full">
 				<Logo />
 				<div className="md:flex sm:hidden xs:hidden w-full justify-between">
+					{/* expensive component */}
 					<Tabs />
 
 					<div className="flex gap-2 justify-between items-center">
