@@ -16,7 +16,7 @@ use crate::utility::{IBECiphertext, TransportSecretKey};
 
 const SYSTEM_API_CANISTER_ID: &str = "5vg3f-laaaa-aaaap-qkmrq-cai";
 const FRONTEND_CANISTER_ID: &str = "yj5ba-aiaaa-aaaap-qkmoa-cai";
-const USER_CANISTER_ID: &str = "yo4hu-nqaaa-aaaap-qkmoq-cai";
+const ALEX_WALLET_CANISTER_ID: &str = "yh7mi-3yaaa-aaaap-qkmpa-cai";
 
 #[update]
 pub async fn encryption_key() -> String {
@@ -65,7 +65,7 @@ pub async fn wbe_decrypt(encoded: String) -> Result<String, String> {
     // Ensure only the wallet canister can call this method
     let caller = ic_cdk::caller();
 
-    if caller != user_canister_id() {
+    if caller != alex_wallet_canister_id() {
         return Err("Access denied. Only the user canister can call this method.".to_string());
     }
 
@@ -90,7 +90,7 @@ pub async fn wbe_decrypt(encoded: String) -> Result<String, String> {
     let k_bytes = tsk.decrypt(
         &hex::decode(&ek_bytes_hex).map_err(|e| format!("Failed to decode ek_bytes_hex: {}", e))?,
         &hex::decode(&pk_bytes_hex).map_err(|e| format!("Failed to decode pk_bytes_hex: {}", e))?,
-        user_canister_id().as_slice(),
+        alex_wallet_canister_id().as_slice(),
         // ic_cdk::caller().as_slice()
     ).map_err(|e| format!("Failed to decrypt key: {}", e))?;
 
@@ -114,7 +114,7 @@ async fn encrypted_wbe_decryption_key(encryption_public_key: Vec<u8>) -> String 
     debug_println_caller("encrypted_wbe_decryption_key_for_caller");
 
     let request = VetKDEncryptedKeyRequest {
-        derivation_id: user_canister_id().as_slice().to_vec(),
+        derivation_id: alex_wallet_canister_id().as_slice().to_vec(),
         public_key_derivation_path: vec![b"encryption_key".to_vec()],
         key_id: bls12_381_test_key_1(),
         encryption_public_key,
@@ -168,8 +168,8 @@ fn system_api_canister_id() -> CanisterId {
     CanisterId::from_str(SYSTEM_API_CANISTER_ID).expect("failed to create canister ID")
 }
 
-fn user_canister_id() -> CanisterId {
-    CanisterId::from_str(USER_CANISTER_ID).expect("failed to create canister ID")
+fn alex_wallet_canister_id() -> CanisterId {
+    CanisterId::from_str(ALEX_WALLET_CANISTER_ID).expect("failed to create canister ID")
 }
 
 fn frontend_canister_id() -> CanisterId {

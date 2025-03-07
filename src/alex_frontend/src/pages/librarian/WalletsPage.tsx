@@ -1,15 +1,17 @@
-import React, { useEffect } from "react";
-import { useUser } from "@/hooks/actors";
+import React, { lazy, Suspense, useEffect } from "react";
+import { useAlexWallet } from "@/hooks/actors";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import fetchMyWallets from "@/features/wallets/thunks/fetchMyWallets";
-import Wallets from "@/features/wallets";
 import { AddArweaveWallet } from "@/features/add-wallet";
 import { Button } from "@/lib/components/button";
 import { RefreshCcw } from "lucide-react";
 
-function WalletsPage() {
-	const {actor} = useUser();
+const AlexWalletActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexWalletActor })));
+const Wallets = lazy(() => import("@/features/wallets"));
+
+function WalletsPageCore() {
+	const {actor} = useAlexWallet();
 
 	const dispatch = useAppDispatch();
 
@@ -46,6 +48,16 @@ function WalletsPage() {
 				<Wallets />
 			</div>
 		</>
+	)
+}
+
+function WalletsPage() {
+	return (
+		<Suspense fallback={<div>Loading components...</div>}>
+			<AlexWalletActor>
+				<WalletsPageCore />
+			</AlexWalletActor>
+		</Suspense>
 	)
 }
 

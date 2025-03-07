@@ -1,10 +1,13 @@
 import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE, PublicKey } from "../../../../../declarations/user/user.did";
+import { _SERVICE, PublicKey } from "../../../../../declarations/alex_wallet/alex_wallet.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { ibe_encrypt } from "@/services/vetkdService";
 import { SerializedWallet } from "../../wallets/walletsSlice";
 import { serializeWallet } from "../../wallets/utils";
 import { RootState } from "@/store";
+
+const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
+
 // Define the async thunk
 const storeWallet = createAsyncThunk<
 	SerializedWallet, // This is the return type of the thunk's payload
@@ -36,7 +39,7 @@ const storeWallet = createAsyncThunk<
 				n: wallet.key.n,
 			}
 
-			const encrypted_key = await ibe_encrypt(JSON.stringify(skey));
+			const encrypted_key = await ibe_encrypt(JSON.stringify(skey), alex_wallet_canister_id);
 
 			const result = await actor.create_wallet({key: encrypted_key, public: pkey});
 

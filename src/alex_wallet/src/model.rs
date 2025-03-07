@@ -62,3 +62,10 @@ pub struct UpdateWalletStatusRequest {
     pub id: u64,
     pub active: bool,
 }
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
+pub struct SignatureResponse {
+    pub signature: String,
+    pub id: String,
+    pub owner: String,
+}

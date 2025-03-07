@@ -1,9 +1,12 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import Upload from "@/features/upload";
 import { reset } from "@/features/upload/uploadSlice";
 import useNavigationGuard from "@/features/upload/hooks/useNavigationGuard";
+
+const AlexWalletActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexWalletActor })));
+const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
+const Upload = lazy(() => import("@/features/upload"));
 
 function PinaxPage() {
 	const dispatch = useAppDispatch();
@@ -20,13 +23,20 @@ function PinaxPage() {
 	useNavigationGuard({ uploading, minting, transaction, minted });
 
 	return (
-		<div className="py-10 flex-grow flex justify-center items-center">
-			<div className="w-full">
-				<div className="space-y-6 max-w-2xl mx-auto">
-					<Upload />
-				</div>
-			</div>
-		</div>
+		<Suspense fallback={<div>Loading components...</div>}>
+			<AlexWalletActor>
+				<NftManagerActor>
+					<div className="py-10 flex-grow flex justify-center items-center">
+						<div className="w-full">
+							<div className="space-y-6 max-w-2xl mx-auto">
+								<Upload />
+							</div>
+						</div>
+					</div>
+				</NftManagerActor>
+			</AlexWalletActor>
+		</Suspense>
+
 	);
 }
 

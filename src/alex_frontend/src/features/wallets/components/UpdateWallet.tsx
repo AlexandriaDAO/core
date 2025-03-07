@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { toast } from "sonner";
 
 import { SerializedWallet, setUpdating } from "../walletsSlice";
-import { useUser } from "@/hooks/actors";
+import { useAlexWallet } from "@/hooks/actors";
 import { Button } from "@/lib/components/button";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -17,7 +17,7 @@ interface UpdateWalletProps {
 const UpdateWallet = ({ wallet }: UpdateWalletProps) => {
 	if(!wallet) return null;
 	const dispatch = useAppDispatch();
-	const {actor} = useUser();
+	const {actor} = useAlexWallet();
 
 	const {updating} = useAppSelector((state) => state.wallets);
 

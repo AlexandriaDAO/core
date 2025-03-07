@@ -23,10 +23,10 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { reset } from "./addWalletSlice";
 import storeWallet from "./thunks/storeWallet";
-import { useUser } from "@/hooks/actors";
+import { useAlexWallet } from "@/hooks/actors";
 
 export function AddArweaveWallet() {
-	const {actor} = useUser();
+	const {actor} = useAlexWallet();
 	const dispatch = useAppDispatch();
 	const { wallet } = useAppSelector((state) => state.addWallet);
 	useEffect(() => {

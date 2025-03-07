@@ -10,23 +10,17 @@ pub mod validations;
 
 pub use api::node::queries as node_queries;
 pub use api::node::updates as node_updates;
-pub use api::wallet::queries as wallet_queries;
-pub use api::wallet::updates as wallet_updates;
-pub use api::wallet::crypto as wallet_crypto;
-pub use api::wallet::crypto::SignatureResponse;
 pub use api::user::queries as user_queries;
 pub use api::user::updates as user_updates;
 
 pub use errors::general::*;
 pub use errors::user::UserError;
 pub use errors::node::NodeError;
-pub use errors::wallet::WalletError;
 pub use errors::engine::EngineError;
 
 pub use models::user::*;
 pub use models::node::*;
 pub use models::engine::*;
-pub use models::wallet::*;
 pub use validations::user::*;
 
 ic_cdk::export_candid!();
