@@ -7,141 +7,136 @@ import LedgerService from "@/utils/LedgerService";
 import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 
-const getMarketListing = createAsyncThunk<
-  {
-    nfts: Record<
-      string,
-      {
-        tokenId: string;
-        arweaveId: string;
-        price: string;
-        owner: string;
-      }
-    >;
-    totalPages: string;
-    totalCount: number;
-    pageSize: string;
-  },
-  {
-    page: number;
-    searchStr: string;
-    pageSize: string;
-    sort: string;
-    type: string;
-    userPrincipal: string;
-  },
+interface MarketListingResponse {
+  nfts: Record<
+    string,
+    {
+      tokenId: string;
+      arweaveId: string;
+      price: string;
+      owner: string;
+    }
+  >;
+  totalPages: string;
+  totalCount: number;
+  pageSize: string;
+}
+
+interface MarketListingParams {
+  page: number;
+  searchStr: string;
+  pageSize: string;
+  sort: string;
+  type: string;
+  userPrincipal: string;
+}
+
+export const getMarketListing = createAsyncThunk<
+  MarketListingResponse,
+  MarketListingParams,
   { rejectValue: string }
 >(
   "emporium/getMarketListing",
-  async (
-    { page, searchStr, pageSize, sort, type, userPrincipal },
-    { rejectWithValue, dispatch }
-  ) => {
+  async ({ page, searchStr, pageSize, sort, type, userPrincipal }, { rejectWithValue, dispatch }) => {
     try {
-      dispatch(setTransactions([]));
+      dispatch(setTransactions([])); // Clear transactions before fetching new ones.
+
       const actorEmporium = await getActorEmporium();
-      const ledgerServices = LedgerService();
-      let owner: [] | [Principal] = [];
-      //        searchStr === "" ? [] : [Principal.fromText(searchStr)];
+      const ledgerService =  LedgerService();
 
-      let tokenFilter: [] | [ReturnType<typeof arweaveIdToNat>] = [];
+      // Initialize filters
+      let ownerFilter: [] | [Principal] = [];
+      let tokenFilter: [] | [bigint] = [];
+      let sortFilter: [] | [string] = sort ? [sort] : [];
+      let timeFilter: string = "";
 
-      let sortFilter: [] | [string] = sort === "" ? [] : [sort];
-      if (type === "principal") {
-        tokenFilter = [];
-        owner = searchStr === "" ? [] : [Principal.fromText(searchStr)];
-      } else if (type === "token") {
-        owner = [];
-        tokenFilter = searchStr === "" ? [] : [arweaveIdToNat(searchStr)];
-      } else if (type === "userListings") {
-        owner = [Principal.fromText(userPrincipal)];
-        tokenFilter = searchStr === "" ? [] : [arweaveIdToNat(searchStr)];
+      // Determine filters based on the type
+      switch (type) {
+        case "principal":
+          ownerFilter = searchStr ? [Principal.fromText(searchStr)] : [];
+          break;
+        case "token":
+          tokenFilter = searchStr ? [arweaveIdToNat(searchStr)] : [];
+          break;
+        case "userListings":
+          ownerFilter = [Principal.fromText(userPrincipal)];
+          tokenFilter = searchStr ? [arweaveIdToNat(searchStr)] : [];
+          break;
+        default:
+          timeFilter = "asc"; // Default sorting by time
       }
 
+      // Fetch market listings
       const result = await actorEmporium.get_search_listing(
         [BigInt(page)],
         [BigInt(pageSize)],
         sortFilter,
         tokenFilter,
-        owner,
+        [timeFilter],
+        ownerFilter,
         type
       );
-      if (
-        !result.nfts ||
-        !Array.isArray(result.nfts) ||
-        result.nfts.length === 0
-      ) {
-        console.warn("No market listings found");
-        return {
-          nfts: {},
-          totalPages: "0",
-          totalCount:0,
-          pageSize: "0",
-        };
+
+      if (!result?.nfts || !Array.isArray(result.nfts) || result.nfts.length === 0) {
+        console.warn("No market listings found.");
+        return { nfts: {}, totalPages: "0", totalCount: 0, pageSize: "0" };
       }
 
-      const ids: string[] = [];
-      const tokensObject: Record<
-        string,
-        { tokenId: string; arweaveId: string; price: string; owner: string }
-      > = {};
+      // Process retrieved NFTs
+      const nftIds: string[] = [];
+      const nftsObject: Record<string, { tokenId: string; arweaveId: string; price: string; owner: string }> = {};
 
-      result.nfts.forEach((value) => {
-        if (
-          value &&
-          value[1] &&
-          value[1].token_id !== undefined &&
-          value[1].price !== undefined &&
-          value[1].owner !== undefined
-        ) {
-          const arweaveId = natToArweaveId(BigInt(value[1].token_id));
-          const price = ledgerServices.e8sToIcp(value[1].price).toString();
-          ids.push(arweaveId);
+      result.nfts.forEach(([tokenId, nft]) => {
+        if (nft?.token_id !== undefined && nft?.price !== undefined && nft?.owner !== undefined) {
+          const arweaveId = natToArweaveId(BigInt(nft.token_id));
+          const price = ledgerService.e8sToIcp(nft.price).toString();
+          nftIds.push(arweaveId);
 
-          tokensObject[arweaveId] = {
-            tokenId: value[0] || "",
+          nftsObject[arweaveId] = {
+            tokenId: tokenId || "",
             arweaveId,
             price,
-            owner: value[1].owner.toString(),
+            owner: nft.owner.toString(),
           };
         }
       });
 
-      if (ids.length === 0) {
-        console.warn("No valid tokens found in market listings");
+      if (nftIds.length === 0) {
+        console.warn("No valid tokens found in market listings.");
         return {
-          nfts: tokensObject,
-          totalPages: result.total_pages?.toString() || "0",
-          pageSize: result.page_size?.toString() || "0",
-          totalCount: ids.length,
-        };
-      }
-
-      const fetchedTransactions = await fetchTransactionsForAlexandrian(ids);
-
-      if (!fetchedTransactions || fetchedTransactions.length === 0) {
-        console.warn("No transactions found for the market listings");
-        return {
-          nfts: tokensObject,
+          nfts: nftsObject,
           totalPages: result.total_pages?.toString() || "0",
           pageSize: result.page_size?.toString() || "0",
           totalCount: 0,
         };
       }
-      dispatch(setTransactions(fetchedTransactions));
-      await dispatch(loadContentForTransactions(fetchedTransactions) as unknown as AnyAction);
+
+      // Fetch transactions for the retrieved NFTs
+      const transactions = await fetchTransactionsForAlexandrian(nftIds);
+
+      if (!transactions || transactions.length === 0) {
+        console.warn("No transactions found for the listed NFTs.");
+        return {
+          nfts: nftsObject,
+          totalPages: result.total_pages?.toString() || "0",
+          pageSize: result.page_size?.toString() || "0",
+          totalCount: 0,
+        };
+      }
+
+      // Dispatch transactions to the state
+      dispatch(setTransactions(transactions));
+      await dispatch(loadContentForTransactions(transactions) as unknown as AnyAction);
 
       return {
-        nfts: tokensObject,
+        nfts: nftsObject,
         totalPages: result.total_pages.toString(),
         pageSize: result.page_size.toString(),
-        totalCount: ids.length,
+        totalCount: nftIds.length,
       };
     } catch (error) {
-      console.error("Error fetching market listing:", error);
-      return rejectWithValue(
-        "An unknown error occurred while fetching market listing"
-      );
+      console.error("Error fetching market listings:", error);
+      return rejectWithValue("An error occurred while fetching market listings.");
     }
   }
 );

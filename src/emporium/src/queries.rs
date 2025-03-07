@@ -1,6 +1,6 @@
-use crate::{Listing, LogEntry, Logs, Nft, LISTING, LOGS};
-use candid::{Nat, Principal};
-use ic_cdk::{api::call, caller, query};
+use crate::{ Listing, LogEntry, Logs, Nft, LISTING, LOGS };
+use candid::{ Nat, Principal };
+use ic_cdk::{ api::call, caller, query };
 
 #[query]
 pub fn get_listing(page: Option<u64>, page_size: Option<u64>) -> Listing {
@@ -10,7 +10,7 @@ pub fn get_listing(page: Option<u64>, page_size: Option<u64>) -> Listing {
     LISTING.with(|nfts| {
         let nft_map = nfts.borrow();
         let total_count = nft_map.len();
-        let total_pages = (total_count as f64 / page_size as f64).ceil() as u64;
+        let total_pages = ((total_count as f64) / (page_size as f64)).ceil() as u64;
         let start_index = ((page - 1) * page_size) as usize;
 
         let nfts = nft_map
@@ -56,7 +56,7 @@ pub fn get_caller_listing(page: Option<u64>, page_size: Option<u64>) -> Listing 
             .take(page_size as usize)
             .collect();
         let total_count = nfts.len();
-        let total_pages = (total_count as f64 / page_size as f64).ceil() as u64;
+        let total_pages = ((total_count as f64) / (page_size as f64)).ceil() as u64;
         Listing {
             nfts,
             total_pages,
@@ -70,10 +70,11 @@ pub fn get_caller_listing(page: Option<u64>, page_size: Option<u64>) -> Listing 
 pub fn get_search_listing(
     page: Option<u64>,
     page_size: Option<u64>,
-    sort_order: Option<String>,   // "asc" or "desc"
+    sort_order: Option<String>, // "asc" or "desc"
     token_id_filter: Option<Nat>, // Optional filter by token_id
+    sort_by_time: Option<String>, // "asc" or "desc" (for timestamp)
     owner: Option<Principal>,
-    search_type: String,
+    search_type: String
 ) -> Listing {
     // search by nft owner, token_id and filter by price in assending or decending order
     let page: u64 = page.unwrap_or(1); // Default to 1 if None
@@ -108,9 +109,21 @@ pub fn get_search_listing(
                 nfts.sort_by(|a, b| b.1.price.cmp(&a.1.price));
             }
         }
+        ic_cdk::println!("The sort is {:?}",sort_by_time);
+        // Sorting by time
+        if let Some(ref sort_by_time) = sort_by_time {
+            ic_cdk::println!("Sorting by time: {:?}", sort_by_time);
+        
+            if sort_by_time.to_lowercase() == "asc" {
+                nfts.sort_by(|a, b| a.1.time.cmp(&b.1.time));
+            } else if sort_by_time.to_lowercase() == "desc" {
+                nfts.sort_by(|a, b| b.1.time.cmp(&a.1.time));
+            }
+        }
+        
 
         let total_count = nfts.len();
-        let total_pages = (total_count as f64 / page_size as f64).ceil() as u64;
+        let total_pages = ((total_count as f64) / (page_size as f64)).ceil() as u64;
         let start_index = ((page - 1) * page_size) as usize;
 
         let paginated_nfts = nfts
@@ -136,10 +149,10 @@ pub fn get_logs(page: Option<u64>, page_size: Option<u64>, token_id_filter: Opti
     LOGS.with(|logs| {
         let logs_map = logs.borrow();
         let total_count = logs_map.len();
-        let total_pages = (total_count as f64 / page_size as f64).ceil() as u64;
+        let total_pages = ((total_count as f64) / (page_size as f64)).ceil() as u64;
         let start_index = ((page - 1) * page_size) as usize;
 
-        let filtered_logs: Vec<(u64, LogEntry)>= logs_map
+        let filtered_logs: Vec<(u64, LogEntry)> = logs_map
             .iter()
             .filter(|(_, log)| -> bool {
                 if token_id_filter.is_some() && token_id_filter != Some(log.token_id.clone()) {
@@ -166,7 +179,7 @@ pub fn get_logs(page: Option<u64>, page_size: Option<u64>, token_id_filter: Opti
 pub fn get_caller_logs(
     page: Option<u64>,
     page_size: Option<u64>,
-    token_id_filter: Option<Nat>,
+    token_id_filter: Option<Nat>
 ) -> Logs {
     let page = page.unwrap_or(1); // Default to 1 if None
     let page_size = page_size.unwrap_or(10); // Default to 10 if None
@@ -187,7 +200,7 @@ pub fn get_caller_logs(
             .collect();
 
         let total_count = filtered_logs.len();
-        let total_pages = (total_count as f64 / page_size as f64).ceil() as u64;
+        let total_pages = ((total_count as f64) / (page_size as f64)).ceil() as u64;
         let start_index = ((page - 1) * page_size) as usize;
 
         // Sort the logs by timestamp

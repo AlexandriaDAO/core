@@ -60,6 +60,7 @@ const PriceSort = () => {
                     {sortOrder === "desc" && <ArrowDownWideNarrow className="h-4 w-4 dark:white" />}
                     {sortOrder === "asc" && <ArrowDownNarrowWide className="h-4 w-4 dark:white" />}
                 </Button>
+                <Button>New to Old </Button>
             </div>
         </div>
     )
