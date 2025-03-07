@@ -65,6 +65,7 @@ thread_local! {
 pub enum SlotContent {
     Nft(String), // NFT ID
     Markdown(String), // Markdown text
+    Shelf(String), // Shelf ID - allows nesting shelves
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
@@ -153,6 +154,19 @@ impl Shelf {
             return Err("Maximum slot limit reached (500)".to_string());
         }
         
+        // Check for circular references
+        if let SlotContent::Shelf(ref nested_shelf_id) = slot.content {
+            // Prevent a shelf from containing itself
+            if nested_shelf_id == &self.shelf_id {
+                return Err("Circular reference: A shelf cannot contain itself".to_string());
+            }
+            
+            // Check for deeper circular references by traversing the shelf hierarchy
+            if self.has_circular_reference(nested_shelf_id) {
+                return Err("Circular reference detected in shelf hierarchy".to_string());
+            }
+        }
+        
         let slot_id = slot.id;
         
         // Initialize position at the end
@@ -168,6 +182,36 @@ impl Shelf {
         self.slots.insert(slot_id, slot);
         
         Ok(())
+    }
+
+    // Helper method to check for circular references in the shelf hierarchy
+    fn has_circular_reference(&self, shelf_id: &str) -> bool {
+        // Check if any slot in the current shelf contains the target shelf
+        for slot in self.slots.values() {
+            if let SlotContent::Shelf(nested_id) = &slot.content {
+                // If this slot contains the shelf we're checking, we have a circular reference
+                if nested_id == shelf_id {
+                    return true;
+                }
+                
+                // Check deeper in the hierarchy
+                // We need to get the nested shelf from the global storage
+                let has_deeper_circular_ref = SHELVES.with(|shelves| {
+                    let shelves_map = shelves.borrow();
+                    if let Some(nested_shelf) = shelves_map.get(nested_id) {
+                        nested_shelf.has_circular_reference(shelf_id)
+                    } else {
+                        false
+                    }
+                });
+                
+                if has_deeper_circular_ref {
+                    return true;
+                }
+            }
+        }
+        
+        false
     }
 
     pub fn move_slot(&mut self, slot_id: u32, reference_slot_id: Option<u32>, before: bool) -> Result<(), String> {
