@@ -13,7 +13,8 @@ type QueryError = variant {
 type Result = variant { Ok; Err : text };
 type Result_1 = variant { Ok : vec Shelf; Err : QueryError };
 type Result_2 = variant { Ok : Shelf; Err : QueryError };
-type Result_3 = variant { Ok : vec Slot; Err : QueryError };
+type Result_3 = variant { Ok : ShelfPositionMetrics; Err : text };
+type Result_4 = variant { Ok : vec Slot; Err : QueryError };
 type Shelf = record {
   title : text;
   updated_at : nat64;
@@ -21,15 +22,25 @@ type Shelf = record {
   description : opt text;
   created_at : nat64;
   shelf_id : text;
+  rebalance_count : nat32;
   slots : vec record { nat32; Slot };
+  needs_rebalance : bool;
   slot_positions : vec record { nat32; float64 };
+};
+type ShelfPositionMetrics = record {
+  min_gap : float64;
+  slot_count : nat64;
+  rebalance_count : nat32;
+  avg_gap : float64;
+  max_gap : float64;
+  needs_rebalance : bool;
 };
 type ShelfUpdate = record {
   title : opt text;
   description : opt text;
   slots : opt vec Slot;
 };
-type Slot = record { id : nat32; content : SlotContent; position : nat32 };
+type Slot = record { id : nat32; content : SlotContent };
 type SlotContent = variant { Nft : text; Shelf : text; Markdown : text };
 type SlotReorderInput = record {
   slot_id : nat32;
@@ -41,8 +52,10 @@ service : {
   delete_shelf : (text) -> (Result);
   get_recent_shelves : (opt nat64, opt nat64) -> (Result_1) query;
   get_shelf : (text) -> (Result_2) query;
-  get_shelf_slots : (text) -> (Result_3) query;
+  get_shelf_position_metrics : (text) -> (Result_3) query;
+  get_shelf_slots : (text) -> (Result_4) query;
   get_user_shelves : (principal, opt nat64) -> (Result_1) query;
+  rebalance_shelf_slots : (text) -> (Result);
   reorder_shelf_slot : (text, SlotReorderInput) -> (Result);
   store_shelf : (text, opt text, vec Slot) -> (Result);
   update_shelf : (text, ShelfUpdate) -> (Result);

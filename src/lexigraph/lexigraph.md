@@ -83,46 +83,15 @@ So first let's figure out what's going on with the ordering of the Alexandrian N
 
 
 
-# Index.tsx optimizations: 
+# Backdend optimizations: 
 
 
-## Prompt 5: Simplify Tab State Management
 
-```
-In src/alex_frontend/src/apps/app/Lexigraph/index.tsx, simplify tab state management with a more focused approach:
+## Core Architecture
 
-1. Modify the tab-related state management in the Lexigraph component:
-```typescript
-const Lexigraph: React.FC = () => {
-  // ... existing code
-  
-  // Simplify tab state management
-  const { isExplore, isUserView } = useLexigraphNavigation();
-  const [activeTab, setActiveTab] = useState<string>(
-    isExplore ? "explore" : isUserView ? "user" : "my-library"
-  );
-  
-  // Synchronize tab state with navigation
-  useEffect(() => {
-    if (isExplore) {
-      setActiveTab("explore");
-    } else if (isUserView) {
-      setActiveTab("user");
-    } else {
-      setActiveTab("my-library");
-    }
-  }, [isExplore, isUserView]);
-  
-  // Combine tab change with navigation
-  const handleTabChange = useCallback((value: string) => {
-    setActiveTab(value);
-    switchTab(value);
-  }, [switchTab]);
-  
-  // ... rest of the component
-```
-
-This change simplifies the tab state management by centralizing it in a more focused way.
-```
-
-Each of these prompts addresses a specific pain point in the Lexigraph component without introducing excessive complexity or fundamentally changing the architecture. They focus on practical improvements that will make the code more maintainable while keeping changes minimal and focused.
+Your app is built around these primary concepts:
+- **Shelves**: The main containers (like a bookshelf)
+- **Slots**: Items within a shelf that can contain:
+  - Markdown text
+  - NFTs
+  - References to other shelves (nesting)

@@ -98,3 +98,68 @@ pub fn get_recent_shelves(limit: Option<usize>, before_timestamp: Option<u64>) -
         })
     })
 }
+
+/// Get optimization metrics for a shelf's positions
+/// This helps frontend clients identify when a shelf needs rebalancing
+#[ic_cdk::query]
+pub fn get_shelf_position_metrics(shelf_id: String) -> Result<ShelfPositionMetrics, String> {
+    SHELVES.with(|shelves| {
+        let shelves_map = shelves.borrow();
+        
+        if let Some(shelf) = shelves_map.get(&shelf_id) {
+            // Build metrics
+            let position_count = shelf.slot_positions.len();
+            
+            // Calculate min, max, and average gap
+            if position_count < 2 {
+                return Ok(ShelfPositionMetrics {
+                    slot_count: position_count,
+                    min_gap: 0.0,
+                    avg_gap: 0.0,
+                    max_gap: 0.0,
+                    needs_rebalance: false,
+                    rebalance_count: shelf.rebalance_count,
+                });
+            }
+            
+            // Get ordered positions
+            let mut positions: Vec<f64> = shelf.slot_positions.values().cloned().collect();
+            positions.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            
+            // Calculate gaps
+            let mut min_gap = f64::MAX;
+            let mut max_gap = 0.0;
+            let mut sum_gap = 0.0;
+            
+            for i in 1..positions.len() {
+                let gap = positions[i] - positions[i-1];
+                min_gap = f64::min(min_gap, gap);
+                max_gap = f64::max(max_gap, gap);
+                sum_gap += gap;
+            }
+            
+            let avg_gap = sum_gap / (positions.len() - 1) as f64;
+            
+            Ok(ShelfPositionMetrics {
+                slot_count: position_count,
+                min_gap,
+                avg_gap,
+                max_gap,
+                needs_rebalance: shelf.needs_rebalance,
+                rebalance_count: shelf.rebalance_count,
+            })
+        } else {
+            Err("Shelf not found".to_string())
+        }
+    })
+}
+
+#[derive(CandidType)]
+pub struct ShelfPositionMetrics {
+    pub slot_count: usize,
+    pub min_gap: f64,
+    pub avg_gap: f64,
+    pub max_gap: f64, 
+    pub needs_rebalance: bool,
+    pub rebalance_count: u32,
+}

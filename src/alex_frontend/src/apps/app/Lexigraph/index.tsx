@@ -5,9 +5,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
-import { Plus, ArrowLeft, ExternalLink, Library, Globe, FolderOpen } from "lucide-react";
-import ReactMarkdown from 'react-markdown';
-import { Slot, Shelf, SlotContent } from "../../../../../declarations/lexigraph/lexigraph.did";
+import { Plus, ArrowLeft, Library, Globe, Check, X, Edit } from "lucide-react";
+import { Slot, Shelf, ShelfPositionMetrics } from "../../../../../declarations/lexigraph/lexigraph.did";
 import { convertTimestamp } from "@/utils/general";
 import { parsePathInfo } from "./routes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/components/tabs";
@@ -27,10 +26,14 @@ import {
 	selectSelectedShelf,
 	selectLoading,
 	selectPublicLoading,
-	selectLastTimestamp
+	selectLastTimestamp,
+	rebalanceShelfSlots,
+	updateShelf
 } from "@/apps/Modules/shared/state/lexigraph/lexigraphSlice";
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
+import { getActorLexigraph } from "@/features/auth/utils/authUtils";
+import { createFindSlotById, isShelfContent, renderSlotContent, SlotContentRenderer, renderBreadcrumbs } from "./utils";
 
 // Common dialog props used across dialog components
 interface DialogProps {
@@ -67,20 +70,6 @@ interface SlotDetailProps {
 	onBack: () => void;
 	onBackToShelf: (shelfId: string) => void;
 }
-
-// Utility function for finding slots across shelves
-const createFindSlotById = (shelves: Shelf[]) => 
-	(slotId: number): { slot: Slot; shelf: Shelf; slotKey: number } | null => {
-		for (const shelf of shelves) {
-			for (const [key, slotEntry] of Object.entries(shelf.slots)) {
-				const [slotKey, slot] = slotEntry as [number, Slot];
-				if (slot.id === slotId) {
-					return { slot, shelf, slotKey };
-				}
-			}
-		}
-		return null;
-	};
 
 // Custom hook for shelf operations
 const useShelfOperations = () => {
@@ -328,130 +317,6 @@ const NewSlotDialog = ({ isOpen, onClose, onSubmit, shelves }: NewSlotDialogProp
 	);
 };
 
-// Update the type definitions for the slot content type guard functions
-const isShelfContent = (content: SlotContent): content is { 'Shelf': string } => {
-	return 'Shelf' in content;
-};
-
-const isNftContent = (content: SlotContent): content is { 'Nft': string } => {
-	return 'Nft' in content;
-};
-
-const isMarkdownContent = (content: SlotContent): content is { 'Markdown': string } => {
-	return 'Markdown' in content;
-};
-
-// Memoize the SlotContentRenderer component for better performance
-const SlotContentRenderer = React.memo(({ 
-	slot, 
-	showFull = false, 
-	onViewSlot,
-	onBackToShelf = undefined
-}: {
-	slot: Slot, 
-	showFull?: boolean,
-	onViewSlot?: (slotId: number) => void,
-	onBackToShelf?: (shelfId: string) => void
-}) => {
-	// Type-safe handling of slot content
-	if (isNftContent(slot.content)) {
-		return (
-			<div className="flex items-center justify-center h-full">
-				<div className="text-center">
-					<div className="text-lg font-semibold mb-2">NFT</div>
-					<div>ID: {slot.content.Nft}</div>
-					<Button 
-						variant="outline" 
-						className="mt-2"
-						asChild
-					>
-						<a href={`/nft/${slot.content.Nft}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
-							<ExternalLink className="w-3 h-3" />
-							View NFT
-						</a>
-					</Button>
-				</div>
-			</div>
-		);
-	} else if (isShelfContent(slot.content)) {
-		// Now TypeScript knows slot.content is of type { 'Shelf': string }
-		const shelfContent = slot.content;
-		return (
-			<div className="flex items-center justify-center h-full">
-				<div className="text-center">
-					<div className="text-lg font-semibold mb-2">Nested Shelf</div>
-					<div>ID: {shelfContent.Shelf}</div>
-					{onViewSlot && (
-						<Button 
-							variant="outline" 
-							className="mt-2"
-							onClick={(e: React.MouseEvent) => {
-								e.stopPropagation();
-								// Convert the string to number before passing to onViewSlot
-								const shelfId = parseInt(shelfContent.Shelf, 10);
-								onViewSlot(shelfId);
-							}}
-						>
-							<FolderOpen className="w-3 h-3 mr-1" />
-							Open Shelf
-						</Button>
-					)}
-					{onBackToShelf && (
-						<Button 
-							variant="outline" 
-							className="mt-2"
-							onClick={(e: React.MouseEvent) => {
-								e.stopPropagation();
-								onBackToShelf(shelfContent.Shelf);
-							}}
-						>
-							<FolderOpen className="w-3 h-3 mr-1" />
-							Open Shelf
-						</Button>
-					)}
-				</div>
-			</div>
-		);
-	} else if (isMarkdownContent(slot.content)) {
-		return (
-			<div className="prose dark:prose-invert max-w-none">
-				<ReactMarkdown>
-					{showFull 
-						? slot.content.Markdown 
-						: (slot.content.Markdown.length > 150 
-							? `${slot.content.Markdown.substring(0, 150)}...` 
-							: slot.content.Markdown)}
-				</ReactMarkdown>
-			</div>
-		);
-	}
-	
-	return <div>Unknown content type</div>;
-});
-
-// Add a displayName for better debugging
-SlotContentRenderer.displayName = 'SlotContentRenderer';
-
-// Shared utility function for breadcrumbs
-const renderBreadcrumbs = (items: Array<{label: string, onClick?: () => void}>) => {
-	return (
-		<div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-			{items.map((item, index) => (
-				<React.Fragment key={index}>
-					{index > 0 && <span>/</span>}
-					{item.onClick ? (
-						<Button variant="link" className="p-0 h-auto" onClick={item.onClick}>
-							{item.label}
-						</Button>
-					) : (
-						<span className="text-foreground">{item.label}</span>
-					)}
-				</React.Fragment>
-			))}
-		</div>
-	);
-};
-
 // SlotDetail component for individual slot view
 const SlotDetail = ({
 	slot,
@@ -609,6 +474,90 @@ const PublicShelfCard = ({
 	);
 };
 
+// New component for shelf settings including rebalancing
+const ShelfSettings = ({ 
+	shelf,
+	onRebalance 
+}: {
+	shelf: Shelf,
+	onRebalance?: (shelfId: string) => Promise<void>
+}) => {
+	const [metrics, setMetrics] = useState<ShelfPositionMetrics | null>(null);
+	const [loading, setLoading] = useState(false);
+	
+	// Load metrics when component mounts
+	useEffect(() => {
+		const loadMetrics = async () => {
+			try {
+				setLoading(true);
+				const lexigraphActor = await getActorLexigraph();
+				const result = await lexigraphActor.get_shelf_position_metrics(shelf.shelf_id);
+				if ("Ok" in result) {
+					setMetrics(result.Ok);
+				}
+			} catch (error) {
+				console.error("Failed to load metrics:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
+		
+		loadMetrics();
+	}, [shelf.shelf_id]);
+	
+	return (
+		<div className="mt-4 p-4 bg-gray-50 rounded-lg">
+			<h3 className="text-lg font-semibold mb-2">Shelf Health</h3>
+			
+			{loading ? (
+				<div>Loading metrics...</div>
+			) : metrics ? (
+				<div className="mb-3 text-sm">
+					<div className="flex justify-between mb-1">
+						<span>Slots:</span>
+						<span>{metrics.slot_count.toString()}</span>
+					</div>
+					<div className="flex justify-between mb-1">
+						<span>Min gap:</span>
+						<span>{metrics.min_gap}</span>
+					</div>
+					<div className="flex justify-between mb-1">
+						<span>Max gap:</span>
+						<span>{metrics.max_gap}</span>
+					</div>
+					<div className="flex justify-between mb-1">
+						<span>Avg gap:</span>
+						<span>{metrics.avg_gap.toFixed(2)}</span>
+					</div>
+					<div className="flex justify-between mb-1">
+						<span>Rebalance count:</span>
+						<span>{metrics.rebalance_count}</span>
+					</div>
+					<div className="flex justify-between">
+						<span>Needs rebalance:</span>
+						<span>{metrics.needs_rebalance ? "Yes" : "No"}</span>
+					</div>
+				</div>
+			) : (
+				<div className="mb-3">No metrics available</div>
+			)}
+			
+			{onRebalance && (
+				<button 
+					onClick={() => onRebalance(shelf.shelf_id)}
+					className="w-full py-2 px-4 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition duration-200"
+					disabled={metrics ? !metrics.needs_rebalance : false}
+				>
+					Rebalance Slots
+				</button>
+			)}
+			<p className="text-xs text-gray-500 mt-2">
+				Rebalancing optimizes the internal position values for better performance with many reorderings.
+			</p>
+		</div>
+	);
+};
+
 // Consolidated ShelfDetail component that works for both personal and public shelves
 const ShelfDetail = ({ 
 	shelf, 
@@ -620,36 +569,211 @@ const ShelfDetail = ({
 }: ShelfDetailProps) => {
 	const pathInfo = parsePathInfo(window.location.pathname);
 	const { isExplore, isUserView, userId, backButtonLabel } = pathInfo;
+	const identity = useIdentity();
 	
+	const dispatch = useAppDispatch();
+	
+	// Add edit mode state
+	const [isEditMode, setIsEditMode] = useState(false);
+	const [editedSlots, setEditedSlots] = useState<[number, Slot][]>([]);
+	const [draggedItem, setDraggedItem] = useState<number | null>(null);
+	const [dragOverItem, setDragOverItem] = useState<number | null>(null);
+	
+	// Breadcrumbs data
 	const breadcrumbItems = [
 		{ label: backButtonLabel, onClick: onBack },
 		{ label: shelf.title }
 	];
 	
-	// Convert slots object to array of [number, Slot] pairs
-	const slots = Object.entries(shelf.slots).map(([_, entry]) => {
-		// Each entry is already a tuple of [nat32, Slot]
-		return entry as [number, Slot];
-	});
+	// Simplified drag and drop functionality
+	useEffect(() => {
+		if (!isEditMode) return;
+		
+		const styleEl = document.createElement('style');
+		styleEl.textContent = `
+			.slot-item {
+				transition: transform 0.2s ease, box-shadow 0.2s ease;
+				user-select: none;
+			}
+			.opacity-50 {
+				opacity: 0.5;
+			}
+			.border-dashed {
+				border-style: dashed !important;
+			}
+			.border-primary {
+				border-color: #6366f1 !important;
+			}
+			.cursor-move {
+				cursor: move;
+			}
+			.cursor-grab {
+				cursor: grab;
+			}
+			.slot-drag-handle {
+				cursor: grab;
+				padding: 8px;
+				border-radius: 4px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.slot-drag-handle:hover {
+				background: #f0f0f0;
+			}
+		`;
+		document.head.appendChild(styleEl);
+		
+		return () => {
+			document.head.removeChild(styleEl);
+		};
+	}, [isEditMode]);
 	
+	// Improved ordered slots calculation
+	const orderedSlots = useMemo(() => {
+		// Extract the slots using the slot_positions array for order
+		if (!shelf.slot_positions || !shelf.slots) return [];
+		
+		// Convert positions to array and sort by position values
+		const positionEntries = shelf.slot_positions.map(([id, position]) => ({ id, position }));
+		positionEntries.sort((a, b) => a.position - b.position);
+		
+		// Map to [id, slot] pairs in the correct order
+		return positionEntries.map(({ id }) => {
+			const slotPair = shelf.slots.find(([slotId]) => slotId === id);
+			return slotPair ? slotPair : null;
+		}).filter((slot): slot is [number, Slot] => slot !== null);
+	}, [shelf.slots, shelf.slot_positions]);
+	
+	// Enter edit mode
+	const enterEditMode = () => {
+		// Initialize editedSlots with the current slot order
+		setEditedSlots([...orderedSlots]);
+		setIsEditMode(true);
+		setDraggedItem(null);
+		setDragOverItem(null);
+	};
+	
+	// Existing reorder handler
 	const handleReorder = async (slotId: number, referenceSlotId: number | null, before: boolean) => {
 		if (onReorderSlot) {
 			await onReorderSlot(shelf.shelf_id, slotId, referenceSlotId, before);
 		}
 	};
 	
-	return (
-		<div className="h-full flex flex-col">
-			<div className="flex flex-col gap-4 mb-6">
-				<Button variant="outline" onClick={onBack} className="self-start flex items-center gap-2">
-					<ArrowLeft className="w-4 h-4" />
-					Back to {backButtonLabel}
-				</Button>
-				{renderBreadcrumbs(breadcrumbItems)}
-			</div>
+	// Existing rebalance handler
+	const handleRebalance = async (shelfId: string) => {
+		if (identity && identity.identity) {
+			const principal = identity.identity.getPrincipal();
+			await dispatch(rebalanceShelfSlots({ 
+				shelfId,
+				principal
+			}));
+		}
+	};
+	
+	// New handler for saving the edited slots order
+	const saveSlotOrder = async () => {
+		if (identity && identity.identity) {
+			const principal = identity.identity.getPrincipal();
 			
-			<div className="bg-card rounded-lg border p-6 mb-6">
-				<div className="flex justify-between items-start mb-6">
+			try {
+				// Get original order to compare with
+				const originalOrderMap = new Map();
+				orderedSlots.forEach(([id], index) => {
+					originalOrderMap.set(id, index);
+				});
+				
+				// Find the differences and apply each move
+				// We need to reorder one slot at a time using the backend API
+				for (let newIndex = 0; newIndex < editedSlots.length; newIndex++) {
+					const [slotId] = editedSlots[newIndex];
+					const oldIndex = originalOrderMap.get(slotId);
+					
+					// If position has changed
+					if (oldIndex !== newIndex) {
+						// Find the reference slot (the one we'll place this slot before or after)
+						let referenceSlotId: number | null = null;
+						let before = false;
+						
+						if (newIndex === 0) {
+							// If moving to the first position, place before the current first item
+							if (editedSlots.length > 1) {
+								const [firstSlotId] = editedSlots[1];
+								referenceSlotId = firstSlotId;
+								before = true;
+							}
+						} else {
+							// Otherwise, place after the previous item
+							const [prevSlotId] = editedSlots[newIndex - 1];
+							referenceSlotId = prevSlotId;
+							before = false;
+						}
+						
+						// Call the reorderSlot action
+						await dispatch(reorderSlotAction({
+							shelfId: shelf.shelf_id,
+							slotId,
+							referenceSlotId,
+							before,
+							principal
+						}));
+					}
+				}
+				
+				// Exit edit mode after successful updates
+				setIsEditMode(false);
+			} catch (error) {
+				console.error("Failed to save slot order:", error);
+				// Could add error notification here
+			}
+		}
+	};
+	
+	// Drag handlers
+	const handleDragStart = (index: number) => {
+		setDraggedItem(index);
+	};
+	
+	const handleDragOver = (e: React.DragEvent, index: number) => {
+		e.preventDefault();
+		setDragOverItem(index);
+	};
+	
+	const handleDragEnd = () => {
+		// Reset the dragged item
+		setDraggedItem(null);
+		setDragOverItem(null);
+		
+		// If we have both a valid dragged item and drop target
+		if (draggedItem !== null && dragOverItem !== null && draggedItem !== dragOverItem) {
+			// Create a copy of the items
+			const items = [...editedSlots];
+			// Remove the dragged item
+			const draggedItemContent = items[draggedItem];
+			items.splice(draggedItem, 1);
+			// Add it back at the new position
+			items.splice(dragOverItem, 0, draggedItemContent);
+			// Update state
+			setEditedSlots(items);
+		}
+	};
+	
+	const handleDrop = (e: React.DragEvent, index: number) => {
+		e.preventDefault();
+		// The state updates will be handled in dragEnd
+	};
+
+	return (
+		<div className="container mx-auto p-6">
+			<div className="space-y-6">
+				{/* Breadcrumbs */}
+				<div className="mb-6">
+					{renderBreadcrumbs(breadcrumbItems)}
+				</div>
+				
+				{/* Shelf header with title, description, and control buttons */}
+				<div className="flex justify-between items-start">
 					<div>
 						<h1 className="text-2xl font-bold">{shelf.title}</h1>
 						<p className="text-muted-foreground mt-1">{shelf.description}</p>
@@ -659,77 +783,109 @@ const ShelfDetail = ({
 							</div>
 						)}
 					</div>
-					{!isPublic && onAddSlot && (
-						<Button onClick={() => onAddSlot(shelf)}>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Slot
-						</Button>
-					)}
-				</div>
-				
-				{slots.length === 0 ? (
-					<div className="p-8 bg-secondary rounded-md text-center">
-						<p>This shelf doesn't have any slots yet.</p>
-						{!isPublic && onAddSlot && (
-							<Button onClick={() => onAddSlot(shelf)} className="mt-4">
+					<div className="flex gap-2">
+						{!isPublic && !isEditMode && onAddSlot && (
+							<Button onClick={() => onAddSlot(shelf)}>
 								<Plus className="w-4 h-4 mr-2" />
-								Add Your First Slot
+								Add Slot
+							</Button>
+						)}
+						{!isPublic && !isEditMode && orderedSlots.length > 0 && (
+							<Button variant="outline" onClick={enterEditMode}>
+								<Edit className="w-4 h-4 mr-2" />
+								Edit Layout
 							</Button>
 						)}
 					</div>
-				) : (
-					<ContentGrid>
-						{slots.map(([slotKey, slot], index) => (
-							<ContentCard
-								key={slotKey}
-								onClick={() => onViewSlot(slot.id)}
-								id={slot.id.toString()}
-								component="Lexigraph"
-								footer={
-									!isPublic && onReorderSlot ? (
-										<div className="flex gap-2 mt-1 w-full justify-end">
-											{index > 0 && (
-												<Button
-													variant="outline"
-													onClick={(e) => {
-														e.stopPropagation();
-														handleReorder(slot.id, slots[index - 1][1].id, true);
-													}}
-													className="text-xs py-1 h-auto"
-												>
-													Move Up
-												</Button>
-											)}
-											{index < slots.length - 1 && (
-												<Button
-													variant="outline"
-													onClick={(e) => {
-														e.stopPropagation();
-														handleReorder(slot.id, slots[index + 1][1].id, false);
-													}}
-													className="text-xs py-1 h-auto"
-												>
-													Move Down
-												</Button>
-											)}
-										</div>
-									) : undefined
-								}
+				</div>
+
+				{/* Display the slots in a unified grid view with conditional edit features */}
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+					{orderedSlots.length === 0 ? (
+						<div className="p-8 bg-secondary rounded-md text-center col-span-3">
+							<p>This shelf doesn't have any slots yet.</p>
+							{!isPublic && onAddSlot && (
+								<Button onClick={() => onAddSlot(shelf)} className="mt-4">
+									<Plus className="w-4 h-4 mr-2" />
+									Add Your First Slot
+								</Button>
+							)}
+						</div>
+					) : (
+						(isEditMode ? editedSlots : orderedSlots).map(([slotId, slot], index) => (
+							<div 
+								key={slotId} 
+								className={`relative group ${
+									isEditMode && index === draggedItem ? 'opacity-50' : ''
+								} ${
+									isEditMode && index === dragOverItem ? 'border-dashed border-2 border-primary' : ''
+								}`}
+								draggable={isEditMode}
+								onDragStart={isEditMode ? () => handleDragStart(index) : undefined}
+								onDragOver={isEditMode ? (e) => handleDragOver(e, index) : undefined}
+								onDragEnd={isEditMode ? handleDragEnd : undefined}
+								onDrop={isEditMode ? (e) => handleDrop(e, index) : undefined}
 							>
-								<div className="p-4 w-full h-full overflow-auto">
-									<div className="text-xs text-muted-foreground mb-2">
-										<div>Slot ID: {slot.id}</div>
-									</div>
-									
-									<SlotContentRenderer 
-										slot={slot} 
-										onViewSlot={onViewSlot}
-									/>
+								<div
+									className={`border rounded-lg p-4 h-full hover:border-primary hover:shadow-md transition-all ${
+										isEditMode ? 'cursor-move' : 'cursor-pointer'
+									}`}
+									onClick={isEditMode ? undefined : () => onViewSlot(slotId)}
+								>
+									{!isPublic && isEditMode && (
+										<div className="flex items-center justify-between mb-2">
+											<div className="font-medium">Slot #{slotId}</div>
+											<div 
+												className="slot-drag-handle text-gray-400 p-1 rounded hover:bg-gray-100 cursor-grab"
+												onMouseDown={(e) => {
+													// Prevent the click event on the parent div
+													e.stopPropagation();
+												}}
+											>
+												<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+													<path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
+												</svg>
+											</div>
+										</div>
+									)}
+									{renderSlotContent(slot, slotId)}
 								</div>
-							</ContentCard>
-						))}
-					</ContentGrid>
+							</div>
+						))
+					)}
+				</div>
+				
+				{/* Show edit controls for non-public shelves */}
+				{!isPublic && orderedSlots.length > 0 && (
+					<div className="mt-6 flex justify-end space-x-2">
+						{isEditMode ? (
+							<>
+								<Button 
+									variant="outline"
+									onClick={() => setIsEditMode(false)}
+								>
+									<X className="w-4 h-4 mr-2" />
+									Cancel
+								</Button>
+								<Button 
+									onClick={saveSlotOrder}
+									variant="primary"
+								>
+									<Check className="w-4 h-4 mr-2" />
+									Save Order
+								</Button>
+							</>
+						) : (
+							<Button variant="outline" onClick={enterEditMode}>
+								<Edit className="w-4 h-4 mr-2" />
+								Edit Layout
+							</Button>
+						)}
+					</div>
 				)}
+				
+				{/* Show ShelfSettings with rebalance option for owner only, but hide in edit mode */}
+				{!isPublic && !isEditMode && <ShelfSettings shelf={shelf} onRebalance={handleRebalance} />}
 			</div>
 		</div>
 	);
@@ -828,6 +984,16 @@ const Lexigraph: React.FC = () => {
 		goToSlot(slotId);
 	}, [goToSlot]);
 
+	// Add the reorderSlot handler
+	const handleReorderSlot = useCallback(async (
+		shelfId: string, 
+		slotId: number, 
+		referenceSlotId: number | null, 
+		before: boolean
+	) => {
+		await reorderSlot(shelfId, slotId, referenceSlotId, before);
+	}, [reorderSlot]);
+
 	// If we have a slotId parameter, show the individual slot view
 	if (isSlotDetail && slotId) {
 		const numericSlotId = parseInt(slotId, 10);
@@ -894,7 +1060,7 @@ const Lexigraph: React.FC = () => {
 					shelf={currentShelf}
 					onBack={handleBackToShelves}
 					onAddSlot={!isPublicContext ? handleAddSlot : undefined}
-					onReorderSlot={!isPublicContext ? reorderSlot : undefined}
+					onReorderSlot={!isPublicContext ? handleReorderSlot : undefined}
 					onViewSlot={handleViewSlot}
 					isPublic={isPublicContext}
 				/>
