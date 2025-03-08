@@ -28,6 +28,9 @@ pub use query::*;
 pub mod utils;
 pub use utils::generate_shelf_id;
 
+pub mod guard;
+pub use guard::not_anon;
+
 ic_cdk::export_candid!();
 
 

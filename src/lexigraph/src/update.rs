@@ -1,13 +1,19 @@
-use candid::{CandidType, Deserialize};
+use candid::{CandidType, Deserialize, Nat, Principal};
 use crate::storage::{Slot, SlotContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE};
+use crate::guard::not_anon;
+use crate::utils::generate_shelf_id;
+use ic_cdk::api::call::CallResult;
+use icrc_ledger_types::icrc1::account::Account;
+use std::str::FromStr;
 
 
-#[ic_cdk::update]
+#[ic_cdk::update(guard = "not_anon")]
 pub async fn store_shelf(
     title: String,
     description: Option<String>,
     slots: Vec<Slot>,
 ) -> Result<(), String> {
+    let caller = ic_cdk::caller();
     let shelf = create_shelf(title, description, slots).await?;  // Remove owner parameter
     let shelf_id = shelf.shelf_id.clone();
     let now = shelf.created_at;
@@ -30,22 +36,24 @@ pub async fn store_shelf(
 
     USER_SHELVES.with(|user_shelves| {
         let mut user_map = user_shelves.borrow_mut();
-        let mut user_shelves_set = user_map.get(&shelf.owner).unwrap_or_default();
+        let mut user_shelves_set = user_map.get(&caller).unwrap_or_default();
         user_shelves_set.0.insert((now, shelf_id.clone()));
-        user_map.insert(shelf.owner, user_shelves_set);
+        user_map.insert(caller, user_shelves_set);
     });
 
     Ok(())
 }
 
 // Update update_shelf function
-#[ic_cdk::update]
+#[ic_cdk::update(guard = "not_anon")]
 pub fn update_shelf(shelf_id: String, updates: ShelfUpdate) -> Result<(), String> {
+    let caller = ic_cdk::caller();
+    
     SHELVES.with(|shelves| {
         let mut shelves_map = shelves.borrow_mut();
         if let Some(mut shelf) = shelves_map.get(&shelf_id) {
             // Enforce owner check using caller
-            if shelf.owner != ic_cdk::caller() {
+            if shelf.owner != caller {
                 return Err("Unauthorized: Only shelf owner can update".to_string());
             }
 
@@ -142,13 +150,15 @@ pub struct SlotReorderInput {
     pub before: bool,
 }
 
-#[ic_cdk::update]
+#[ic_cdk::update(guard = "not_anon")]
 pub fn reorder_shelf_slot(shelf_id: String, reorder: SlotReorderInput) -> Result<(), String> {
+    let caller = ic_cdk::caller();
+    
     SHELVES.with(|shelves| {
         let mut shelves_map = shelves.borrow_mut();
         if let Some(mut shelf) = shelves_map.get(&shelf_id) {
             // Enforce owner check using caller
-            if shelf.owner != ic_cdk::caller() {
+            if shelf.owner != caller {
                 return Err("Unauthorized: Only shelf owner can reorder slots".to_string());
             }
 
@@ -172,13 +182,86 @@ pub struct AddSlotInput {
     pub before: bool,
 }
 
-#[ic_cdk::update]
-pub fn add_shelf_slot(shelf_id: String, input: AddSlotInput) -> Result<(), String> {
+/// Checks if an NFT (either original or SBT) is owned by the caller
+async fn verify_nft_ownership(nft_id: &str, caller: Principal) -> Result<bool, String> {
+    // Use different canister based on ID length
+    // SBTs have longer IDs (95 chars) compared to NFTs (73 chars)
+    let is_sbt = nft_id.len() > 90;
+    
+    let canister_principal = if is_sbt {
+        crate::icrc7_scion_principal()
+    } else {
+        crate::icrc7_principal()
+    };
+    
+    // Convert string ID to Nat for canister call
+    let token_nat = Nat::from_str(nft_id)
+        .map_err(|_| format!("Invalid NFT ID format: {}", nft_id))?;
+    
+    // Call owner_of on the appropriate canister
+    let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
+        canister_principal,
+        "icrc7_owner_of",
+        (vec![token_nat],)
+    ).await;
+    
+    match owner_call_result {
+        Ok((owners,)) => {
+            // Check if the first element matches the caller
+            if let Some(Some(account)) = owners.first() {
+                return Ok(account.owner == caller);
+            }
+            // No owner returned means NFT doesn't exist
+            Ok(false)
+        },
+        Err((code, msg)) => {
+            Err(format!("Error fetching owner for NFT {}: {:?} - {}", nft_id, code, msg))
+        }
+    }
+}
+
+/// Checks if a shelf exists
+fn shelf_exists(shelf_id: &String) -> bool {
+    SHELVES.with(|shelves| {
+        shelves.borrow().contains_key(shelf_id)
+    })
+}
+
+/// Check if attempting to add a shelf to itself (direct self-reference)
+fn is_self_reference(shelf_id: &String, nested_shelf_id: &String) -> bool {
+    // Only check for direct self-references (shelf A cannot contain shelf A)
+    shelf_id == nested_shelf_id
+}
+
+#[ic_cdk::update(guard = "not_anon")]
+pub async fn add_shelf_slot(shelf_id: String, input: AddSlotInput) -> Result<(), String> {
+    let caller = ic_cdk::caller();
+    
+    // If attempting to add an NFT, verify ownership first
+    if let SlotContent::Nft(nft_id) = &input.content {
+        let is_owner = verify_nft_ownership(nft_id, caller).await?;
+        if !is_owner {
+            return Err("Unauthorized: You can only add NFTs that you own".to_string());
+        }
+    }
+    
+    // If attempting to add a shelf, verify it exists and check for self-references
+    if let SlotContent::Shelf(nested_shelf_id) = &input.content {
+        if !shelf_exists(nested_shelf_id) {
+            return Err(format!("Shelf '{}' does not exist", nested_shelf_id));
+        }
+        
+        // Check for direct self-references only
+        if is_self_reference(&shelf_id, nested_shelf_id) {
+            return Err("Cannot add a shelf to itself".to_string());
+        }
+    }
+    
     SHELVES.with(|shelves| {
         let mut shelves_map = shelves.borrow_mut();
         if let Some(mut shelf) = shelves_map.get(&shelf_id) {
             // Enforce owner check using caller
-            if shelf.owner != ic_cdk::caller() {
+            if shelf.owner != caller {
                 return Err("Unauthorized: Only shelf owner can add slots".to_string());
             }
 
@@ -212,9 +295,9 @@ pub fn add_shelf_slot(shelf_id: String, input: AddSlotInput) -> Result<(), Strin
                         nft_map.insert(nft_id.to_string(), shelves);
                     });
                 },
-                SlotContent::Shelf(nested_shelf_id) => {
+                SlotContent::Shelf(_) => {
                     // No additional tracking needed for shelf references
-                    // The circular reference check is handled in insert_slot
+                    // Only direct self-references are prevented
                 },
                 _ => {} // No special handling for other content types
             }
@@ -228,8 +311,10 @@ pub fn add_shelf_slot(shelf_id: String, input: AddSlotInput) -> Result<(), Strin
     })
 }
 
-#[ic_cdk::update]
+#[ic_cdk::update(guard = "not_anon")]
 pub fn delete_shelf(shelf_id: String) -> Result<(), String> {
+    let caller = ic_cdk::caller();
+    
     SHELVES.with(|shelves| {
         let mut shelves_map = shelves.borrow_mut();
         
@@ -237,7 +322,7 @@ pub fn delete_shelf(shelf_id: String) -> Result<(), String> {
         let shelf = shelves_map.get(&shelf_id)
             .ok_or_else(|| "Shelf not found".to_string())?;
             
-        if shelf.owner != ic_cdk::caller() {
+        if shelf.owner != caller {
             return Err("Unauthorized: Only shelf owner can delete".to_string());
         }
         
@@ -264,9 +349,9 @@ pub fn delete_shelf(shelf_id: String) -> Result<(), String> {
         // Remove from user's shelf set
         USER_SHELVES.with(|user_shelves| {
             let mut user_map = user_shelves.borrow_mut();
-            if let Some(mut user_shelves_set) = user_map.get(&shelf.owner) {
+            if let Some(mut user_shelves_set) = user_map.get(&caller) {
                 user_shelves_set.0.retain(|(_, id)| id != &shelf_id);
-                user_map.insert(shelf.owner, user_shelves_set);
+                user_map.insert(caller, user_shelves_set);
             }
         });
         

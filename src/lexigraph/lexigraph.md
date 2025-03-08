@@ -1,11 +1,13 @@
 ### UX/UI Feature TODO
 
-Link navigation is always lbry.app/app/user/<shelf_id>/<nft_id>
-  - Going back to user shows their shelves.
-  - Clicking on any shelf inside a shelf takes you to that shelf: /app/user/<shelf_id>
 
-Blog View:
-  - Switch from the table to show the markdown style blog with the NFTs inside.
+The permanence thing is a problem, since these shelves are mutable, and people can nest eachothers. Should we have a feature whereby a deleted shelf deletes it from all the other shelves that it's nested in?
+
+Another thing is the user sharing side. Do we let them add comments or something or other grids in a community section? How do we sort/rank these or do we let users do that themselves?
+
+
+- Display actual NFTs in the NFT slot.
+- Blog View: Switch from the table to show the markdown style blog with the NFTs inside.
 
 
 ### Future Possible Features
@@ -54,6 +56,73 @@ To render NFTs in Lexigraph like in other apps, you would:
 
 But first I need a plan to ensure that the NFT slots are actual NFTs owned by the user.
 
-So for this it's like a my-library component. Plus a Pinax compontent. Plus an add to shelf option on every owned NFT.
+So for this it's like a my-library component. Plus a Pinax compontent. Plus aan add to shelf option on every owned NFT.
 
 So first let's figure out what's going on with the ordering of the Alexandrian NFTs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Index.tsx optimizations: 
+
+
+## Prompt 5: Simplify Tab State Management
+
+```
+In src/alex_frontend/src/apps/app/Lexigraph/index.tsx, simplify tab state management with a more focused approach:
+
+1. Modify the tab-related state management in the Lexigraph component:
+```typescript
+const Lexigraph: React.FC = () => {
+  // ... existing code
+  
+  // Simplify tab state management
+  const { isExplore, isUserView } = useLexigraphNavigation();
+  const [activeTab, setActiveTab] = useState<string>(
+    isExplore ? "explore" : isUserView ? "user" : "my-library"
+  );
+  
+  // Synchronize tab state with navigation
+  useEffect(() => {
+    if (isExplore) {
+      setActiveTab("explore");
+    } else if (isUserView) {
+      setActiveTab("user");
+    } else {
+      setActiveTab("my-library");
+    }
+  }, [isExplore, isUserView]);
+  
+  // Combine tab change with navigation
+  const handleTabChange = useCallback((value: string) => {
+    setActiveTab(value);
+    switchTab(value);
+  }, [switchTab]);
+  
+  // ... rest of the component
+```
+
+This change simplifies the tab state management by centralizing it in a more focused way.
+```
+
+Each of these prompts addresses a specific pain point in the Lexigraph component without introducing excessive complexity or fundamentally changing the architecture. They focus on practical improvements that will make the code more maintainable while keeping changes minimal and focused.

@@ -291,15 +291,3 @@ export const selectLastTimestamp = (state: { lexigraph: LexigraphState }) => sta
 export const selectLoading = (state: { lexigraph: LexigraphState }) => state.lexigraph.loading;
 export const selectPublicLoading = (state: { lexigraph: LexigraphState }) => state.lexigraph.publicLoading;
 export const selectError = (state: { lexigraph: LexigraphState }) => state.lexigraph.error;
-
-// Helper functions
-export const findSlotById = (shelves: Shelf[], slotId: number): { slot: Slot; shelf: Shelf; slotKey: number } | null => {
-  for (const shelf of shelves) {
-    for (const [slotKey, slot] of shelf.slots) {
-      if (slot.id === slotId) {
-        return { slot, shelf, slotKey };
-      }
-    }
-  }
-  return null;
-}; 

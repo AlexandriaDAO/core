@@ -7,11 +7,11 @@ import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
 import { Plus, ArrowLeft, ExternalLink, Library, Globe, FolderOpen } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
-import { getActorLexigraph } from "@/features/auth/utils/authUtils";
 import { Slot, Shelf, SlotContent } from "../../../../../declarations/lexigraph/lexigraph.did";
 import { convertTimestamp } from "@/utils/general";
+import { parsePathInfo } from "./routes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/components/tabs";
-import { useLexigraphNavigation } from "./routes";
+import { useLexigraphNavigation, useViewState } from "./routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { 
@@ -27,11 +27,60 @@ import {
 	selectSelectedShelf,
 	selectLoading,
 	selectPublicLoading,
-	selectLastTimestamp,
-	findSlotById as findSlotByIdUtil
+	selectLastTimestamp
 } from "@/apps/Modules/shared/state/lexigraph/lexigraphSlice";
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
+
+// Common dialog props used across dialog components
+interface DialogProps {
+	isOpen: boolean;
+	onClose: () => void;
+}
+
+// Props for NewShelfDialog
+interface NewShelfDialogProps extends DialogProps {
+	onSubmit: (title: string, description: string) => Promise<void>;
+}
+
+// Props for NewSlotDialog
+interface NewSlotDialogProps extends DialogProps {
+	onSubmit: (content: string, type: "Nft" | "Markdown" | "Shelf") => Promise<void>;
+	shelves?: Shelf[];
+}
+
+// Props for ShelfDetail
+interface ShelfDetailProps {
+	shelf: Shelf;
+	onBack: () => void;
+	onAddSlot?: (shelf: Shelf) => void;
+	onReorderSlot?: (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean) => Promise<void>;
+	onViewSlot: (slotId: number) => void;
+	isPublic?: boolean;
+}
+
+// Props for SlotDetail
+interface SlotDetailProps {
+	slot: Slot;
+	shelf: Shelf;
+	slotKey: number;
+	onBack: () => void;
+	onBackToShelf: (shelfId: string) => void;
+}
+
+// Utility function for finding slots across shelves
+const createFindSlotById = (shelves: Shelf[]) => 
+	(slotId: number): { slot: Slot; shelf: Shelf; slotKey: number } | null => {
+		for (const shelf of shelves) {
+			for (const [key, slotEntry] of Object.entries(shelf.slots)) {
+				const [slotKey, slot] = slotEntry as [number, Slot];
+				if (slot.id === slotId) {
+					return { slot, shelf, slotKey };
+				}
+			}
+		}
+		return null;
+	};
 
 // Custom hook for shelf operations
 const useShelfOperations = () => {
@@ -62,17 +111,27 @@ const useShelfOperations = () => {
 		}));
 	}, [identity, dispatch]);
 
-	const addSlot = useCallback(async (shelf: Shelf, content: string, type: "Nft" | "Markdown" | "Shelf"): Promise<void> => {
+	const addSlot = useCallback(async (shelfId: string, content: string, type: "Nft" | "Markdown" | "Shelf"): Promise<void> => {
 		if (!identity) return;
+		
+		// Find the shelf with the given ID
+		const shelf = shelves.find(s => s.shelf_id === shelfId);
+		if (!shelf) return;
+
 		await dispatch(addSlotAction({ 
 			shelf, 
 			content, 
 			type, 
 			principal: identity.getPrincipal() 
 		}));
-	}, [identity, dispatch]);
+	}, [identity, dispatch, shelves]);
 
-	const reorderSlot = useCallback(async (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean): Promise<void> => {
+	const reorderSlot = useCallback(async (
+		shelfId: string, 
+		slotId: number, 
+		referenceSlotId: number | null, 
+		before: boolean
+	): Promise<void> => {
 		if (!identity) return;
 		await dispatch(reorderSlotAction({ 
 			shelfId, 
@@ -84,9 +143,7 @@ const useShelfOperations = () => {
 	}, [identity, dispatch]);
 
 	// Helper function to find a slot by ID across all shelves
-	const findSlotById = (slotId: number): { slot: Slot; shelf: Shelf; slotKey: number } | null => {
-		return findSlotByIdUtil(shelves, slotId);
-	};
+	const findSlotById = createFindSlotById(shelves);
 
 	useEffect(() => {
 		if (identity) {
@@ -113,19 +170,17 @@ const usePublicShelfOperations = () => {
 	const lastTimestamp = useAppSelector(selectLastTimestamp);
 
 	const loadRecentShelvesData = async (limit: number = 20, beforeTimestamp?: bigint) => {
-		dispatch(loadRecentShelves({ limit, beforeTimestamp }));
+		await dispatch(loadRecentShelves({ limit, beforeTimestamp }));
 	};
 
 	const loadMoreShelves = async () => {
-		if (lastTimestamp) {
+		if (lastTimestamp && !loading) {
 			await loadRecentShelvesData(20, lastTimestamp);
 		}
 	};
 
 	// Find a slot by ID across all public shelves
-	const findSlotById = (slotId: number): { slot: Slot; shelf: Shelf; slotKey: number } | null => {
-		return findSlotByIdUtil(publicShelves, slotId);
-	};
+	const findSlotById = createFindSlotById(publicShelves);
 
 	useEffect(() => {
 		loadRecentShelvesData();
@@ -141,11 +196,7 @@ const usePublicShelfOperations = () => {
 };
 
 // New Shelf Dialog Component
-const NewShelfDialog = ({ isOpen, onClose, onSubmit }: { 
-	isOpen: boolean, 
-	onClose: () => void, 
-	onSubmit: (title: string, description: string) => Promise<void> 
-}) => {
+const NewShelfDialog = ({ isOpen, onClose, onSubmit }: NewShelfDialogProps) => {
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 
@@ -190,12 +241,7 @@ const NewShelfDialog = ({ isOpen, onClose, onSubmit }: {
 };
 
 // New Slot Dialog Component
-const NewSlotDialog = ({ isOpen, onClose, onSubmit, shelves }: {
-	isOpen: boolean,
-	onClose: () => void,
-	onSubmit: (content: string, type: "Nft" | "Markdown" | "Shelf") => Promise<void>,
-	shelves?: Shelf[]
-}) => {
+const NewSlotDialog = ({ isOpen, onClose, onSubmit, shelves }: NewSlotDialogProps) => {
 	const [content, setContent] = useState("");
 	const [type, setType] = useState<"Nft" | "Markdown" | "Shelf">("Markdown");
 	const [selectedShelfId, setSelectedShelfId] = useState<string>("");
@@ -386,76 +432,23 @@ const SlotContentRenderer = React.memo(({
 // Add a displayName for better debugging
 SlotContentRenderer.displayName = 'SlotContentRenderer';
 
-// Slot Component for the shelf detail view
-const SlotItem = ({ 
-	slot, 
-	slotKey, 
-	shelf, 
-	index, 
-	totalSlots, 
-	onReorder,
-	onViewSlot
-}: {
-	slot: Slot,
-	slotKey: number,
-	shelf: Shelf,
-	index: number,
-	totalSlots: Array<[number, Slot]>,
-	onReorder: (slotId: number, referenceSlotId: number | null, before: boolean) => Promise<void>,
-	onViewSlot: (slotId: number) => void
-}) => {
-	const positionValue = shelf.slot_positions.find(([key]) => key === slotKey)?.[1] || 'N/A';
-	
-	// Custom footer for the ContentCard that includes reordering controls
-	const cardFooter = (
-		<div className="flex gap-2 mt-1 w-full justify-end">
-			{index > 0 && (
-				<Button
-					variant="outline"
-					onClick={(e) => {
-						e.stopPropagation();
-						onReorder(slot.id, totalSlots[index - 1][1].id, true);
-					}}
-					className="text-xs py-1 h-auto"
-				>
-					Move Up
-				</Button>
-			)}
-			{index < totalSlots.length - 1 && (
-				<Button
-					variant="outline"
-					onClick={(e) => {
-						e.stopPropagation();
-						onReorder(slot.id, totalSlots[index + 1][1].id, false);
-					}}
-					className="text-xs py-1 h-auto"
-				>
-					Move Down
-				</Button>
-			)}
-		</div>
-	);
-	
+// Shared utility function for breadcrumbs
+const renderBreadcrumbs = (items: Array<{label: string, onClick?: () => void}>) => {
 	return (
-		<ContentCard 
-			key={slotKey}
-			onClick={() => onViewSlot(slot.id)}
-			id={slot.id.toString()}
-			footer={cardFooter}
-			component="Lexigraph"
-		>
-			<div className="p-3 w-full h-full overflow-auto">
-				<div className="text-xs text-muted-foreground mb-2">
-					<div>Slot ID: {slot.id}</div>
-					<div>Position: {slot.position}</div>
-				</div>
-				
-				<SlotContentRenderer 
-					slot={slot} 
-					onViewSlot={onViewSlot}
-				/>
-			</div>
-		</ContentCard>
+		<div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+			{items.map((item, index) => (
+				<React.Fragment key={index}>
+					{index > 0 && <span>/</span>}
+					{item.onClick ? (
+						<Button variant="link" className="p-0 h-auto" onClick={item.onClick}>
+							{item.label}
+						</Button>
+					) : (
+						<span className="text-foreground">{item.label}</span>
+					)}
+				</React.Fragment>
+			))}
+		</div>
 	);
 };
 
@@ -466,33 +459,15 @@ const SlotDetail = ({
 	slotKey,
 	onBack,
 	onBackToShelf
-}: {
-	slot: Slot,
-	shelf: Shelf,
-	slotKey: number,
-	onBack: () => void,
-	onBackToShelf: (shelfId: string) => void
-}) => {
-	const path = window.location.pathname;
-	const isExplore = path.includes('/explore');
-	const isUserView = path.includes('/user/');
-	const userId = isUserView ? path.split('/user/')[1].split('/')[0] : null;
+}: SlotDetailProps) => {
+	const pathInfo = parsePathInfo(window.location.pathname);
+	const { isExplore, isUserView, userId, backButtonLabel } = pathInfo;
 	
-	const renderBreadcrumbs = () => {
-		return (
-			<div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-				<Button variant="link" className="p-0 h-auto" onClick={onBack}>
-					{isExplore ? 'Explore' : isUserView ? 'User' : 'My Library'}
-				</Button>
-				<span>/</span>
-				<Button variant="link" className="p-0 h-auto" onClick={() => onBackToShelf(shelf.shelf_id)}>
-					{shelf.title}
-				</Button>
-				<span>/</span>
-				<span className="text-foreground">Slot {slotKey}</span>
-			</div>
-		);
-	};
+	const breadcrumbItems = [
+		{ label: backButtonLabel, onClick: onBack },
+		{ label: shelf.title, onClick: () => onBackToShelf(shelf.shelf_id) },
+		{ label: `Slot ${slotKey}` }
+	];
 	
 	return (
 		<div className="h-full flex flex-col">
@@ -501,12 +476,12 @@ const SlotDetail = ({
 					<ArrowLeft className="w-4 h-4" />
 					Back to Shelf
 				</Button>
-				{renderBreadcrumbs()}
+				{renderBreadcrumbs(breadcrumbItems)}
 			</div>
 			
 			<div className="bg-card rounded-lg border p-6">
 				<div className="mb-6">
-					<h2 className="text-2xl font-bold mb-2">Slot {slotKey}</h2>
+					<h2 className="text-2xl font-bold">Slot {slotKey}</h2>
 					<div className="text-sm text-muted-foreground">
 						From shelf: <span className="font-medium">{shelf.title}</span>
 					</div>
@@ -634,34 +609,22 @@ const PublicShelfCard = ({
 	);
 };
 
-// ShelfDetail component for individual shelf view
+// Consolidated ShelfDetail component that works for both personal and public shelves
 const ShelfDetail = ({ 
 	shelf, 
 	onBack,
 	onAddSlot,
 	onReorderSlot,
-	onViewSlot
-}: {
-	shelf: Shelf,
-	onBack: () => void,
-	onAddSlot: (shelf: Shelf) => void,
-	onReorderSlot: (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean) => Promise<void>,
-	onViewSlot: (slotId: number) => void
-}) => {
-	const path = window.location.pathname;
-	const isMyLibrary = path.includes('/my-library');
+	onViewSlot,
+	isPublic = false
+}: ShelfDetailProps) => {
+	const pathInfo = parsePathInfo(window.location.pathname);
+	const { isExplore, isUserView, userId, backButtonLabel } = pathInfo;
 	
-	const renderBreadcrumbs = () => {
-		return (
-			<div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-				<Button variant="link" className="p-0 h-auto" onClick={onBack}>
-					My Library
-				</Button>
-				<span>/</span>
-				<span className="text-foreground">{shelf.title}</span>
-			</div>
-		);
-	};
+	const breadcrumbItems = [
+		{ label: backButtonLabel, onClick: onBack },
+		{ label: shelf.title }
+	];
 	
 	// Convert slots object to array of [number, Slot] pairs
 	const slots = Object.entries(shelf.slots).map(([_, entry]) => {
@@ -670,17 +633,19 @@ const ShelfDetail = ({
 	});
 	
 	const handleReorder = async (slotId: number, referenceSlotId: number | null, before: boolean) => {
-		await onReorderSlot(shelf.shelf_id, slotId, referenceSlotId, before);
+		if (onReorderSlot) {
+			await onReorderSlot(shelf.shelf_id, slotId, referenceSlotId, before);
+		}
 	};
 	
 	return (
-		<div>
+		<div className="h-full flex flex-col">
 			<div className="flex flex-col gap-4 mb-6">
 				<Button variant="outline" onClick={onBack} className="self-start flex items-center gap-2">
 					<ArrowLeft className="w-4 h-4" />
-					Back to My Library
+					Back to {backButtonLabel}
 				</Button>
-				{renderBreadcrumbs()}
+				{renderBreadcrumbs(breadcrumbItems)}
 			</div>
 			
 			<div className="bg-card rounded-lg border p-6 mb-6">
@@ -688,8 +653,13 @@ const ShelfDetail = ({
 					<div>
 						<h1 className="text-2xl font-bold">{shelf.title}</h1>
 						<p className="text-muted-foreground mt-1">{shelf.description}</p>
+						{isUserView && userId && (
+							<div className="text-sm text-muted-foreground mt-2">
+								Owner: <span className="font-medium">{userId}</span>
+							</div>
+						)}
 					</div>
-					{isMyLibrary && (
+					{!isPublic && onAddSlot && (
 						<Button onClick={() => onAddSlot(shelf)}>
 							<Plus className="w-4 h-4 mr-2" />
 							Add Slot
@@ -699,11 +669,13 @@ const ShelfDetail = ({
 				
 				{slots.length === 0 ? (
 					<div className="p-8 bg-secondary rounded-md text-center">
-						<p className="mb-4">This shelf doesn't have any slots yet.</p>
-						<Button onClick={() => onAddSlot(shelf)}>
-							<Plus className="w-4 h-4 mr-2" />
-							Add Your First Slot
-						</Button>
+						<p>This shelf doesn't have any slots yet.</p>
+						{!isPublic && onAddSlot && (
+							<Button onClick={() => onAddSlot(shelf)} className="mt-4">
+								<Plus className="w-4 h-4 mr-2" />
+								Add Your First Slot
+							</Button>
+						)}
 					</div>
 				) : (
 					<ContentGrid>
@@ -713,94 +685,42 @@ const ShelfDetail = ({
 								onClick={() => onViewSlot(slot.id)}
 								id={slot.id.toString()}
 								component="Lexigraph"
+								footer={
+									!isPublic && onReorderSlot ? (
+										<div className="flex gap-2 mt-1 w-full justify-end">
+											{index > 0 && (
+												<Button
+													variant="outline"
+													onClick={(e) => {
+														e.stopPropagation();
+														handleReorder(slot.id, slots[index - 1][1].id, true);
+													}}
+													className="text-xs py-1 h-auto"
+												>
+													Move Up
+												</Button>
+											)}
+											{index < slots.length - 1 && (
+												<Button
+													variant="outline"
+													onClick={(e) => {
+														e.stopPropagation();
+														handleReorder(slot.id, slots[index + 1][1].id, false);
+													}}
+													className="text-xs py-1 h-auto"
+												>
+													Move Down
+												</Button>
+											)}
+										</div>
+									) : undefined
+								}
 							>
-								<div className="p-3 w-full h-full overflow-auto">
+								<div className="p-4 w-full h-full overflow-auto">
 									<div className="text-xs text-muted-foreground mb-2">
 										<div>Slot ID: {slot.id}</div>
 									</div>
 									
-									<SlotContentRenderer 
-										slot={slot} 
-										onViewSlot={onViewSlot}
-									/>
-								</div>
-							</ContentCard>
-						))}
-					</ContentGrid>
-				)}
-			</div>
-		</div>
-	);
-};
-
-// Public Shelf Detail component (read-only version)
-const PublicShelfDetail = ({ 
-	shelf, 
-	onBack,
-	onViewSlot
-}: {
-	shelf: Shelf,
-	onBack: () => void,
-	onViewSlot: (slotId: number) => void
-}) => {
-	const path = window.location.pathname;
-	const isExplore = path.includes('/explore');
-	const isUserView = path.includes('/user/');
-	const userId = isUserView ? path.split('/user/')[1].split('/')[0] : null;
-	
-	const renderBreadcrumbs = () => {
-		return (
-			<div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-				<Button variant="link" className="p-0 h-auto" onClick={onBack}>
-					{isExplore ? 'Explore' : isUserView ? 'User' : 'My Library'}
-				</Button>
-				<span>/</span>
-				<span className="text-foreground">{shelf.title}</span>
-			</div>
-		);
-	};
-	
-	// Convert slots object to array of [number, Slot] pairs
-	const slots = Object.entries(shelf.slots).map(([_, entry]) => {
-		// Each entry is already a tuple of [nat32, Slot]
-		return entry as [number, Slot];
-	});
-	
-	return (
-		<div className="h-full flex flex-col">
-			<div className="flex flex-col gap-4 mb-6">
-				<Button variant="outline" onClick={onBack} className="self-start flex items-center gap-2">
-					<ArrowLeft className="w-4 h-4" />
-					Back to {isExplore ? 'Explore' : isUserView ? 'User Shelves' : 'My Library'}
-				</Button>
-				{renderBreadcrumbs()}
-			</div>
-			
-			<div className="bg-card rounded-lg border p-6 mb-6">
-				<div className="mb-6">
-					<h1 className="text-2xl font-bold">{shelf.title}</h1>
-					<p className="text-muted-foreground mt-1">{shelf.description}</p>
-					{isUserView && userId && (
-						<div className="text-sm text-muted-foreground mt-2">
-							Owner: <span className="font-medium">{userId}</span>
-						</div>
-					)}
-				</div>
-				
-				{slots.length === 0 ? (
-					<div className="p-8 bg-secondary rounded-md text-center">
-						<p>This shelf doesn't have any slots yet.</p>
-					</div>
-				) : (
-					<ContentGrid>
-						{slots.map(([slotKey, slot]) => (
-							<ContentCard
-								key={slotKey}
-								onClick={() => onViewSlot(slot.id)}
-								id={slot.id.toString()}
-								component="Lexigraph"
-							>
-								<div className="p-4 w-full h-full overflow-auto">
 									<SlotContentRenderer 
 										slot={slot} 
 										onViewSlot={onViewSlot}
@@ -822,13 +742,9 @@ const Lexigraph: React.FC = () => {
 	const [isNewSlotDialogOpen, setIsNewSlotDialogOpen] = useState(false);
 	const dispatch = useAppDispatch();
 	const selectedShelf = useAppSelector(selectSelectedShelf);
-	const [activeTab, setActiveTab] = useState<string>("my-library");
 	
+	// Use both hooks for combined functionality
 	const { 
-		params, 
-		isMyLibrary, 
-		isExplore, 
-		isUserView, 
 		goToShelves, 
 		goToShelf, 
 		goToSlot, 
@@ -836,20 +752,27 @@ const Lexigraph: React.FC = () => {
 		goToUser
 	} = useLexigraphNavigation();
 	
-	const shelfId = params.shelfId;
-	const slotId = params.slotId;
-	const userId = params.userId;
-
-	useEffect(() => {
-		// Set the active tab based on the URL path
-		if (isExplore) {
-			setActiveTab("explore");
-		} else if (isUserView) {
-			setActiveTab("user");
-		} else {
-			setActiveTab("my-library");
-		}
-	}, [isExplore, isUserView]);
+	// Use the new hook for view state determination
+	const { viewFlags, params } = useViewState();
+	const { shelfId, slotId, userId } = params;
+	const { 
+		isMyLibrary, 
+		isExplore, 
+		isUserView,
+		isShelfDetail,
+		isSlotDetail,
+		isUserDetail,
+		isMainView,
+		isPublicContext
+	} = viewFlags;
+	
+	// Derive active tab directly from route state - no need for separate state
+	const activeTab = isExplore ? "explore" : isUserView ? "user" : "my-library";
+	
+	// Tab change handler calls the navigation function
+	const handleTabChange = useCallback((value: string) => {
+		switchTab(value);
+	}, [switchTab]);
 
 	// Memoize computed values for better performance
 	const shelvesWithSlots = useMemo(() => {
@@ -878,11 +801,24 @@ const Lexigraph: React.FC = () => {
 		setIsNewSlotDialogOpen(true);
 	}, [dispatch, setSelectedShelf, setIsNewSlotDialogOpen]);
 
-	const handleSubmitNewSlot = useCallback(async (content: string, type: "Nft" | "Markdown" | "Shelf") => {
-		if (!selectedShelf) return;
-		await addSlot(selectedShelf, content, type);
-		setIsNewSlotDialogOpen(false);
+	const handleAddNewSlot = useCallback(async (content: string, type: "Nft" | "Markdown" | "Shelf") => {
+		if (selectedShelf) {
+			await addSlot(selectedShelf.shelf_id, content, type);
+			setIsNewSlotDialogOpen(false);
+		}
 	}, [selectedShelf, addSlot, setIsNewSlotDialogOpen]);
+
+	const handleSubmitNewSlot = useCallback(async (content: string, type: "Nft" | "Markdown" | "Shelf") => {
+		await handleAddNewSlot(content, type);
+	}, [handleAddNewSlot]);
+
+	const handleBackToShelf = useCallback((shelfId: string) => {
+		goToShelf(shelfId);
+	}, [goToShelf]);
+
+	const handleBackToShelves = useCallback(() => {
+		goToShelves();
+	}, [goToShelves]);
 
 	const handleViewShelf = useCallback((shelfId: string) => {
 		goToShelf(shelfId);
@@ -892,23 +828,10 @@ const Lexigraph: React.FC = () => {
 		goToSlot(slotId);
 	}, [goToSlot]);
 
-	const handleBackToShelves = useCallback(() => {
-		goToShelves();
-	}, [goToShelves]);
-
-	const handleBackToShelf = useCallback((shelfId: string) => {
-		goToShelf(shelfId);
-	}, [goToShelf]);
-
-	const handleTabChange = useCallback((value: string) => {
-		setActiveTab(value);
-		switchTab(value);
-	}, [setActiveTab, switchTab]);
-
 	// If we have a slotId parameter, show the individual slot view
-	if (slotId) {
+	if (isSlotDetail && slotId) {
 		const numericSlotId = parseInt(slotId, 10);
-		const slotInfo = isExplore || isUserView
+		const slotInfo = isPublicContext
 			? findPublicSlotById(numericSlotId)
 			: findSlotById(numericSlotId);
 		
@@ -943,8 +866,8 @@ const Lexigraph: React.FC = () => {
 	}
 
 	// If we have a shelfId parameter, show the individual shelf view
-	if (shelfId) {
-		const currentShelf = isExplore || isUserView
+	if (isShelfDetail && shelfId) {
+		const currentShelf = isPublicContext
 			? publicShelves.find(shelf => shelf.shelf_id === shelfId)
 			: shelves.find(shelf => shelf.shelf_id === shelfId);
 		
@@ -965,40 +888,31 @@ const Lexigraph: React.FC = () => {
 			);
 		}
 		
-		if (isExplore || isUserView) {
-			return (
-				<div className="container mx-auto p-4">
-					<PublicShelfDetail 
-						shelf={currentShelf}
-						onBack={handleBackToShelves}
-						onViewSlot={handleViewSlot}
-					/>
-				</div>
-			);
-		}
-		
 		return (
 			<div className="container mx-auto p-4">
 				<ShelfDetail 
 					shelf={currentShelf}
 					onBack={handleBackToShelves}
-					onAddSlot={handleAddSlot}
-					onReorderSlot={reorderSlot}
+					onAddSlot={!isPublicContext ? handleAddSlot : undefined}
+					onReorderSlot={!isPublicContext ? reorderSlot : undefined}
 					onViewSlot={handleViewSlot}
+					isPublic={isPublicContext}
 				/>
 				
-				<NewSlotDialog 
-					isOpen={isNewSlotDialogOpen}
-					onClose={() => setIsNewSlotDialogOpen(false)}
-					onSubmit={handleSubmitNewSlot}
-					shelves={shelves}
-				/>
+				{!isPublicContext && (
+					<NewSlotDialog 
+						isOpen={isNewSlotDialogOpen}
+						onClose={() => setIsNewSlotDialogOpen(false)}
+						onSubmit={handleSubmitNewSlot}
+						shelves={shelves}
+					/>
+				)}
 			</div>
 		);
 	}
 
 	// If we have a userId parameter but no shelfId or slotId, show the user's shelves
-	if (userId && !shelfId && !slotId) {
+	if (isUserDetail) {
 		return (
 			<div className="container mx-auto p-4">
 				<div className="flex items-center gap-4 mb-6">
@@ -1031,7 +945,7 @@ const Lexigraph: React.FC = () => {
 	}
 
 	// Main view with tabs (only show if we're not in a specific user, shelf, or slot view)
-	if (!userId && !shelfId && !slotId) {
+	if (isMainView) {
 		return (
 			<div className="container mx-auto p-4">
 				<Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">

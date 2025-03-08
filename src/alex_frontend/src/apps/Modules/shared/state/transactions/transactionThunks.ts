@@ -116,7 +116,8 @@ export const updateTransactions = createAsyncThunk<
     // Get existing transactions from state first
     const state = getState();
     const existingTransactions = state.transactions.transactions;
-    const nfts = state.nftData.nfts;
+    // Check if nftData exists in the state before trying to access it
+    const nfts = state.nftData?.nfts || {};
     
     if (arweaveIds.length === 0) {
       // If no arweave IDs provided, return existing transactions without changing state
