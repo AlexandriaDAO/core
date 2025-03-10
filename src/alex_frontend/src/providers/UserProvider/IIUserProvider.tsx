@@ -11,6 +11,7 @@ interface IIUserProviderProps {
 }
 
 const IIUserProvider: React.FC<IIUserProviderProps> = ({ children }) => {
+	// const {identity, isInitializing, isLoggingIn, loginStatus, loginError, clear} = useInternetIdentity();
 	const {identity, isInitializing} = useInternetIdentity();
     const {actor} = useUser();
 
@@ -37,6 +38,50 @@ const IIUserProvider: React.FC<IIUserProviderProps> = ({ children }) => {
             dispatch(login(actor));
         }
     }, [isInitializing, actor, identity, user, dispatch]);
+
+
+    // const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // // Effect to handle login status changes
+    // useEffect(() => {
+    //     if (loginStatus === 'error' && loginError) {
+    //         toast.error(`Connection failed: ${loginError.message}`);
+    //         // dispatch(setLoading(false));
+    //     } else if (loginStatus === 'success') {
+    //         // dispatch(setLoading(false));
+    //         // toast.success(`Connection successful`);
+    //     }
+
+    //     return () => {
+    //         // Clear any pending timeouts when component unmounts or effect reruns
+    //         if (timeoutRef.current) {
+    //             clearTimeout(timeoutRef.current);
+    //         }
+    //     };
+    // }, [loginStatus, loginError, dispatch]);
+
+    // // Effect for timeout handling while logging in
+    // useEffect(() => {
+    //     if (isLoggingIn) {
+    //         // Set timeout for login process
+    //         timeoutRef.current = setTimeout(() => {
+    //             console.log('Connection timeout');
+    //             if (loginStatus === 'logging-in') {
+    //                 toast.error('Connection timed out. Refreshing page...');
+    //                 // dispatch(setLoading(false));
+    //                 clear().then(()=>{
+    //                     window.location.reload();
+    //                 });
+    //             }
+    //         }, 60000); // 60 seconds timeout
+    //     }
+
+    //     return () => {
+    //         if (timeoutRef.current) {
+    //             clearTimeout(timeoutRef.current);
+    //         }
+    //     };
+    // }, [isLoggingIn, loginStatus, dispatch]);
 
 	return <> {children} </>
 }
