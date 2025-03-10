@@ -35,11 +35,6 @@ type ShelfPositionMetrics = record {
   max_gap : float64;
   needs_rebalance : bool;
 };
-type ShelfUpdate = record {
-  title : opt text;
-  description : opt text;
-  slots : opt vec Slot;
-};
 type Slot = record { id : nat32; content : SlotContent };
 type SlotContent = variant { Nft : text; Shelf : text; Markdown : text };
 type SlotReorderInput = record {
@@ -58,5 +53,5 @@ service : {
   rebalance_shelf_slots : (text) -> (Result);
   reorder_shelf_slot : (text, SlotReorderInput) -> (Result);
   store_shelf : (text, opt text, vec Slot) -> (Result);
-  update_shelf : (text, ShelfUpdate) -> (Result);
+  update_shelf_metadata : (text, opt text, opt text) -> (Result);
 }

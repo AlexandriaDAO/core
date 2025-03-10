@@ -20,7 +20,7 @@ pub mod storage;
 pub use storage::{Slot, Shelf};
 
 pub mod update;
-pub use update::{ShelfUpdate, update_shelf, store_shelf, SlotReorderInput, reorder_shelf_slot, AddSlotInput, delete_shelf, rebalance_shelf_slots};
+pub use update::{ShelfUpdate, store_shelf, SlotReorderInput, reorder_shelf_slot, AddSlotInput, rebalance_shelf_slots};
 
 pub mod query;
 pub use query::*;

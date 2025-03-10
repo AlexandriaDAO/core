@@ -21,6 +21,20 @@ export const createFindSlotById = (shelves: Shelf[]) =>
 	};
 
 /**
+ * Creates a function to find a slot by its ID within a single shelf
+ */
+export const createFindSlotInShelf = (shelf: Shelf) => 
+	(slotId: number): Slot | null => {
+		for (const [key, slotEntry] of Object.entries(shelf.slots)) {
+			const [slotKey, slot] = slotEntry as [number, Slot];
+			if (slot.id === slotId) {
+				return slot;
+			}
+		}
+		return null;
+	};
+
+/**
  * Type guard for shelf content
  */
 export const isShelfContent = (content: SlotContent): content is { 'Shelf': string } => {

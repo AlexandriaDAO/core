@@ -43,167 +43,6 @@ pub async fn store_shelf(
     Ok(())
 }
 
-// Update update_shelf function
-#[ic_cdk::update(guard = "not_anon")]
-pub async fn update_shelf(shelf_id: String, updates: ShelfUpdate) -> Result<(), String> {
-    let caller = ic_cdk::caller();
-    
-    // First, verify NFT ownership for all slots if applicable
-    if let Some(new_slots) = &updates.slots {
-        // Extract all NFT IDs that need ownership verification
-        let nft_ids: Vec<String> = new_slots.iter()
-            .filter_map(|slot| {
-                if let SlotContent::Nft(nft_id) = &slot.content {
-                    Some(nft_id.clone())
-                } else {
-                    None
-                }
-            })
-            .collect();
-            
-        // Verify ownership of all NFTs outside the closure
-        for nft_id in &nft_ids {
-            let is_owner = verify_nft_ownership(nft_id, caller).await?;
-            if !is_owner {
-                return Err(format!("Unauthorized: You don't own NFT '{}'", nft_id));
-            }
-        }
-    }
-    
-    // Now perform the update in the with block
-    SHELVES.with(|shelves| {
-        let mut shelves_map = shelves.borrow_mut();
-        
-        if let Some(mut shelf) = shelves_map.get(&shelf_id) {
-            // Enforce owner check
-            if shelf.owner != caller {
-                return Err("Unauthorized: Only shelf owner can update shelf".to_string());
-            }
-            
-            // Update basic properties if provided
-            if let Some(title) = &updates.title {
-                shelf.title = title.clone();
-            }
-            
-            if let Some(desc) = &updates.description {
-                shelf.description = Some(desc.clone());
-            }
-            
-            // Process slot updates if provided
-            if let Some(new_slots) = &updates.slots {
-                // Validate total slot count
-                if new_slots.len() > 500 {
-                    return Err("Cannot update shelf with more than 500 slots".to_string());
-                }
-                
-                // Validate all nested shelf references
-                for slot in new_slots {
-                    if let SlotContent::Shelf(nested_shelf_id) = &slot.content {
-                        // Check the referenced shelf exists
-                        if !shelf_exists(nested_shelf_id) {
-                            return Err(format!("Shelf '{}' does not exist", nested_shelf_id));
-                        }
-                        
-                        // Check for circular references
-                        if is_self_reference(&shelf_id, nested_shelf_id) {
-                            return Err("Cannot add a shelf to itself".to_string());
-                        }
-                    }
-                }
-            }
-            
-            // Update slots if provided
-            if let Some(new_slots) = updates.slots {
-                if new_slots.len() > 500 {
-                    return Err("Cannot update shelf with more than 500 slots".to_string());
-                }
-                
-                // Extract all NFT IDs for reference updates
-                let new_nfts: Vec<String> = new_slots.iter()
-                    .filter_map(|slot| {
-                        if let SlotContent::Nft(nft_id) = &slot.content {
-                            Some(nft_id.clone())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                    
-                // Create updated shelf for modification
-                let mut updated_shelf = shelf.clone();
-                
-                // Get current NFT references
-                let current_nfts: Vec<String> = updated_shelf.slots.values()
-                    .filter_map(|slot| {
-                        if let SlotContent::Nft(nft_id) = &slot.content {
-                            Some(nft_id.clone())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
-                
-                // Clear current slots and re-add from new list
-                updated_shelf.slots.clear();
-                updated_shelf.slot_positions.clear();
-                
-                // Add new slots
-                for slot in new_slots {
-                    updated_shelf.insert_slot(slot)?;
-                }
-                
-                // Check if the shelf needs rebalancing
-                updated_shelf.ensure_balanced_positions();
-                
-                // Update tracking for NFT references
-                // First remove old references
-                for nft_id in &current_nfts {
-                    NFT_SHELVES.with(|nft_shelves| {
-                        let mut nft_map = nft_shelves.borrow_mut();
-                        if let Some(mut shelves) = nft_map.get(nft_id) {
-                            // Remove this shelf from the list
-                            shelves.0.retain(|id| id != &shelf_id);
-                            nft_map.insert(nft_id.to_string(), shelves);
-                        }
-                    });
-                }
-                
-                // Then add new references
-                for nft_id in &new_nfts {
-                    NFT_SHELVES.with(|nft_shelves| {
-                        let mut nft_map = nft_shelves.borrow_mut();
-                        let mut shelves = nft_map.get(nft_id).unwrap_or_default();
-                        if !shelves.0.contains(&shelf_id) {
-                            shelves.0.push(shelf_id.clone());
-                            nft_map.insert(nft_id.to_string(), shelves);
-                        }
-                    });
-                }
-                
-                // Update shelf
-                shelf = updated_shelf;
-            }
-            
-            // Update timestamp and save
-            shelf.updated_at = ic_cdk::api::time();
-            // Store the timestamp before moving shelf
-            let timestamp = shelf.updated_at;
-            shelves_map.insert(shelf_id.clone(), shelf);
-            
-            // Add to global timeline
-            GLOBAL_TIMELINE.with(|timeline| {
-                let mut timeline_map = timeline.borrow_mut();
-                // Direct insert to the BTreeMap instead of using get/set
-                timeline_map.insert(timestamp, shelf_id.clone());
-            });
-            
-            Ok(())
-        } else {
-            Err("Shelf not found".to_string())
-        }
-    })
-}
-
 #[derive(CandidType, Deserialize)]
 pub struct ShelfUpdate {
     pub title: Option<String>,
@@ -299,61 +138,6 @@ fn shelf_exists(shelf_id: &String) -> bool {
 fn is_self_reference(shelf_id: &String, nested_shelf_id: &String) -> bool {
     // Only check for direct self-references (shelf A cannot contain shelf A)
     shelf_id == nested_shelf_id
-}
-
-#[ic_cdk::update(guard = "not_anon")]
-pub fn delete_shelf(shelf_id: String) -> Result<(), String> {
-    let caller = ic_cdk::caller();
-    
-    SHELVES.with(|shelves| {
-        let mut shelves_map = shelves.borrow_mut();
-        
-        // Get the shelf and verify ownership
-        let shelf = shelves_map.get(&shelf_id)
-            .ok_or_else(|| "Shelf not found".to_string())?;
-            
-        if shelf.owner != caller {
-            return Err("Unauthorized: Only shelf owner can delete".to_string());
-        }
-        
-        // Remove references based on slot content type
-        for slot in shelf.slots.values() {
-            match &slot.content {
-                SlotContent::Nft(nft_id) => {
-                    NFT_SHELVES.with(|nft_shelves| {
-                        let mut nft_map = nft_shelves.borrow_mut();
-                        if let Some(mut shelves) = nft_map.get(nft_id) {
-                            shelves.0.retain(|id| id != &shelf_id);
-                            nft_map.insert(nft_id.clone(), shelves);
-                        }
-                    });
-                },
-                _ => {} // No action needed for other content types
-            }
-        }
-        
-        // Remove from user's shelf list
-        USER_SHELVES.with(|user_shelves| {
-            let mut user_map = user_shelves.borrow_mut();
-            if let Some(mut user_shelves_set) = user_map.get(&shelf.owner) {
-                user_shelves_set.0.retain(|(_, id)| id != &shelf_id);
-                user_map.insert(shelf.owner, user_shelves_set);
-            }
-        });
-        
-        // Remove from global timeline
-        GLOBAL_TIMELINE.with(|timeline| {
-            let mut timeline_map = timeline.borrow_mut();
-            for ts in [shelf.created_at, shelf.updated_at].iter() {
-                timeline_map.remove(ts);
-            }
-        });
-        
-        // Remove the shelf itself
-        shelves_map.remove(&shelf_id);
-        
-        Ok(())
-    })
 }
 
 /// Adds a single slot to an existing shelf
@@ -456,6 +240,47 @@ pub fn rebalance_shelf_slots(shelf_id: String) -> Result<(), String> {
         } else {
             Err("Shelf not found".to_string())
         }
+    })
+}
+
+#[ic_cdk::update(guard = "not_anon")]
+pub fn update_shelf_metadata(
+    shelf_id: String, 
+    title: Option<String>, 
+    description: Option<String>
+) -> Result<(), String> {
+    let caller = ic_cdk::caller();
+    
+    SHELVES.with(|shelves| {
+        let mut shelves_map = shelves.borrow_mut();
+        
+        // Check if shelf exists
+        if !shelves_map.contains_key(&shelf_id) {
+            return Err(format!("Shelf with ID {} not found", shelf_id));
+        }
+        
+        // Get a mutable copy of the shelf
+        let mut shelf = shelves_map.get(&shelf_id).unwrap().clone();
+        
+        // Enforce owner check using caller
+        if shelf.owner != caller {
+            return Err("Unauthorized: Only shelf owner can update metadata".to_string());
+        }
+        
+        // Update the title if provided
+        if let Some(new_title) = title {
+            shelf.title = new_title;
+        }
+        
+        // Update the description (which is already Option<String>)
+        shelf.description = description;
+        
+        // Update the last modified timestamp
+        shelf.updated_at = ic_cdk::api::time() / 1_000_000; // Convert nanoseconds to milliseconds
+        
+        // Save the updated shelf
+        shelves_map.insert(shelf_id, shelf);
+        Ok(())
     })
 }
 

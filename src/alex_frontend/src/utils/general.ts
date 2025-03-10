@@ -23,8 +23,76 @@ export const shorten = (
 export const getIcPrincipal = (principal: string) => principal ? Principal.fromText(principal) : null;
 
 // Helper function to convert IC timestamp (nanoseconds) to Date
-export const convertTimestamp = (timestamp: bigint): string => {
-    return new Date(Number(timestamp) / 1_000_000).toISOString(); // Convert nanoseconds to milliseconds
+export const convertTimestamp = (timestamp: bigint, format: 'iso' | 'readable' | 'relative' | 'combined' = 'iso'): string => {
+    const date = new Date(Number(timestamp) / 1_000_000); // Convert nanoseconds to milliseconds
+    
+    switch (format) {
+        case 'readable':
+            // Format: "May 15, 2025 at 2:30 PM"
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        case 'relative':
+            // Show relative time (e.g., "2 days ago")
+            const now = new Date();
+            const diff = now.getTime() - date.getTime();
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 365) {
+                return `${Math.floor(days / 365)} year${Math.floor(days / 365) !== 1 ? 's' : ''} ago`;
+            } else if (days > 30) {
+                return `${Math.floor(days / 30)} month${Math.floor(days / 30) !== 1 ? 's' : ''} ago`;
+            } else if (days > 0) {
+                return `${days} day${days !== 1 ? 's' : ''} ago`;
+            } else if (hours > 0) {
+                return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+            } else if (minutes > 0) {
+                return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+            } else {
+                return 'just now';
+            }
+        case 'combined':
+            // Show date with short relative time: "May 15 (2d ago)" - year removed
+            const formattedDate = date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric'
+            });
+            
+            // Get short relative time
+            const nowCombined = new Date();
+            const diffCombined = nowCombined.getTime() - date.getTime();
+            const secondsCombined = Math.floor(diffCombined / 1000);
+            const minutesCombined = Math.floor(secondsCombined / 60);
+            const hoursCombined = Math.floor(minutesCombined / 60);
+            const daysCombined = Math.floor(hoursCombined / 24);
+            
+            let relativeTime = '';
+            if (daysCombined > 365) {
+                relativeTime = `${Math.floor(daysCombined / 365)}y ago`;
+            } else if (daysCombined > 30) {
+                relativeTime = `${Math.floor(daysCombined / 30)}mo ago`;
+            } else if (daysCombined > 0) {
+                relativeTime = `${daysCombined}d ago`;
+            } else if (hoursCombined > 0) {
+                relativeTime = `${hoursCombined}h ago`;
+            } else if (minutesCombined > 0) {
+                relativeTime = `${minutesCombined}m ago`;
+            } else {
+                relativeTime = 'just now';
+            }
+            
+            return `${formattedDate} (${relativeTime})`;
+        case 'iso':
+        default:
+            return date.toISOString();
+    }
 };
 
 

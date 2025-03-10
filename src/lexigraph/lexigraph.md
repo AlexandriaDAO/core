@@ -1,9 +1,10 @@
 ### UX/UI Feature TODO
 
+- Should not make a slot by default.
+- Connect and a follow button on the shelves.
+- Make the shelf path be connected to the owner.
+- Another thing is the user sharing side. Do we let them add comments or something or other grids in a community section? How do we sort/rank these or do we let users do that themselves?
 
-The permanence thing is a problem, since these shelves are mutable, and people can nest eachothers. Should we have a feature whereby a deleted shelf deletes it from all the other shelves that it's nested in?
-
-Another thing is the user sharing side. Do we let them add comments or something or other grids in a community section? How do we sort/rank these or do we let users do that themselves?
 
 
 - Display actual NFTs in the NFT slot.
@@ -12,7 +13,7 @@ Another thing is the user sharing side. Do we let them add comments or something
 
 ### Future Possible Features
 
-- Shelf Appears In? YES
+- Shelf Appears In? YES/maybe
 - Allowed to edit others users' shelves? NO
 
 ## Design

@@ -25,6 +25,9 @@ const initialState: LexigraphState = {
   error: null,
 };
 
+
+// // # QUERY CALLS # // //
+
 // Async thunks
 export const loadShelves = createAsyncThunk(
   'lexigraph/loadShelves',
@@ -44,6 +47,62 @@ export const loadShelves = createAsyncThunk(
     }
   }
 );
+
+export const loadRecentShelves = createAsyncThunk(
+  'lexigraph/loadRecentShelves',
+  async ({ 
+    limit = 20, 
+    beforeTimestamp 
+  }: { 
+    limit?: number, 
+    beforeTimestamp?: bigint 
+  }, { rejectWithValue }) => {
+    try {
+      const lexigraphActor = await getActorLexigraph();
+      const result = await lexigraphActor.get_recent_shelves(
+        [BigInt(limit)], 
+        beforeTimestamp ? [beforeTimestamp] : []
+      );
+      
+      if ("Ok" in result) {
+        return { 
+          shelves: result.Ok, 
+          beforeTimestamp,
+          lastTimestamp: result.Ok.length > 0 ? result.Ok[result.Ok.length - 1].created_at : undefined
+        };
+      } else {
+        return rejectWithValue("Failed to load recent shelves");
+      }
+    } catch (error) {
+      console.error("Failed to load recent shelves:", error);
+      return rejectWithValue("Failed to load recent shelves");
+    }
+  }
+);
+
+// export const getShelfPositionMetrics = createAsyncThunk(
+//   'lexigraph/getShelfPositionMetrics',
+//   async (shelfId: string, { rejectWithValue }) => {
+//     try {
+//       const lexigraphActor = await getActorLexigraph();
+//       const result = await lexigraphActor.get_shelf_position_metrics(shelfId);
+      
+//       if ("Ok" in result) {
+//         return result.Ok;
+//       } else {
+//         return rejectWithValue("Failed to get shelf position metrics");
+//       }
+//     } catch (error) {
+//       console.error("Failed to get shelf position metrics:", error);
+//       return rejectWithValue("Failed to get shelf position metrics");
+//     }
+//   }
+// );
+
+
+
+
+// // # UPDATE CALLS # // //
 
 export const createShelf = createAsyncThunk(
   'lexigraph/createShelf',
@@ -73,27 +132,6 @@ export const createShelf = createAsyncThunk(
     } catch (error) {
       console.error("Failed to create shelf:", error);
       return rejectWithValue("Failed to create shelf");
-    }
-  }
-);
-
-export const deleteShelf = createAsyncThunk(
-  'lexigraph/deleteShelf',
-  async ({ shelfId, principal }: { shelfId: string, principal: Principal }, { dispatch, rejectWithValue }) => {
-    try {
-      const lexigraphActor = await getActorLexigraph();
-      const result = await lexigraphActor.delete_shelf(shelfId);
-      
-      if ("Ok" in result) {
-        // Reload shelves after deleting one
-        dispatch(loadShelves(principal));
-        return shelfId;
-      } else {
-        return rejectWithValue("Failed to delete shelf");
-      }
-    } catch (error) {
-      console.error("Failed to delete shelf:", error);
-      return rejectWithValue("Failed to delete shelf");
     }
   }
 );
@@ -188,70 +226,43 @@ export const reorderSlot = createAsyncThunk(
   }
 );
 
-export const updateShelf = createAsyncThunk(
-  'lexigraph/updateShelf',
-  async ({ 
-    shelfId, 
-    updates,
-    principal
-  }: { 
-    shelfId: string, 
-    updates: {
-      title?: string,
-      description?: string,
-      slots?: Slot[]
-    },
-    principal: Principal
-  }, { dispatch, rejectWithValue }) => {
+export const updateShelfMetadata = createAsyncThunk(
+  'lexigraph/updateShelfMetadata',
+  async ({
+    shelfId,
+    title,
+    description
+  }: {
+    shelfId: string,
+    title?: string,
+    description?: string
+  }, { dispatch, getState, rejectWithValue }) => {
     try {
       const lexigraphActor = await getActorLexigraph();
       
-      // Convert to the format expected by the Candid interface
-      // Use proper types for opt values ([] or [value])
-      const candid_updates: {
-        title: [] | [string];
-        description: [] | [string];
-        slots: [] | [Slot[]];
-      } = {
-        title: updates.title ? [updates.title] : [],
-        description: updates.description ? [updates.description] : [],
-        slots: updates.slots ? [updates.slots] : []
-      };
-      
-      const result = await lexigraphActor.update_shelf(
+      // Call the dedicated update_shelf_metadata function
+      const result = await lexigraphActor.update_shelf_metadata(
         shelfId,
-        candid_updates
+        title ? [title] : [],
+        description ? [description] : []
       );
       
       if ("Ok" in result) {
-        // Reload shelves after updating
-        dispatch(loadShelves(principal));
-        return { shelfId, updates };
+        // Get the principal from state if available
+        const state = getState() as { auth: { principal: Principal | null } };
+        const principal = state.auth?.principal;
+        
+        // Reload shelves to refresh the data
+        if (principal) {
+          dispatch(loadShelves(principal));
+        }
+        return { shelfId, title, description };
       } else {
-        return rejectWithValue("Failed to update shelf");
+        return rejectWithValue("Failed to update shelf metadata");
       }
     } catch (error) {
-      console.error("Failed to update shelf:", error);
-      return rejectWithValue("Failed to update shelf");
-    }
-  }
-);
-
-export const getShelfPositionMetrics = createAsyncThunk(
-  'lexigraph/getShelfPositionMetrics',
-  async (shelfId: string, { rejectWithValue }) => {
-    try {
-      const lexigraphActor = await getActorLexigraph();
-      const result = await lexigraphActor.get_shelf_position_metrics(shelfId);
-      
-      if ("Ok" in result) {
-        return result.Ok;
-      } else {
-        return rejectWithValue("Failed to get shelf position metrics");
-      }
-    } catch (error) {
-      console.error("Failed to get shelf position metrics:", error);
-      return rejectWithValue("Failed to get shelf position metrics");
+      console.error("Failed to update shelf metadata:", error);
+      return rejectWithValue("Failed to update shelf metadata");
     }
   }
 );
@@ -277,39 +288,10 @@ export const rebalanceShelfSlots = createAsyncThunk(
   }
 );
 
-export const loadRecentShelves = createAsyncThunk(
-  'lexigraph/loadRecentShelves',
-  async ({ 
-    limit = 20, 
-    beforeTimestamp 
-  }: { 
-    limit?: number, 
-    beforeTimestamp?: bigint 
-  }, { rejectWithValue }) => {
-    try {
-      const lexigraphActor = await getActorLexigraph();
-      const result = await lexigraphActor.get_recent_shelves(
-        [BigInt(limit)], 
-        beforeTimestamp ? [beforeTimestamp] : []
-      );
-      
-      if ("Ok" in result) {
-        return { 
-          shelves: result.Ok, 
-          beforeTimestamp,
-          lastTimestamp: result.Ok.length > 0 ? result.Ok[result.Ok.length - 1].created_at : undefined
-        };
-      } else {
-        return rejectWithValue("Failed to load recent shelves");
-      }
-    } catch (error) {
-      console.error("Failed to load recent shelves:", error);
-      return rejectWithValue("Failed to load recent shelves");
-    }
-  }
-);
 
-// Create the slice
+
+
+// // # REDUCER # // //
 const lexigraphSlice = createSlice({
   name: 'lexigraph',
   initialState,
