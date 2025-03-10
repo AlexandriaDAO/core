@@ -1,5 +1,6 @@
 import React from "react";
 import IIUserProvider from "./IIUserProvider";
+import { UserActor } from "@/actors";
 // import EthUserProvider from "./EthUserProvider";
 // import useAuth from "@/hooks/useAuth";
 // import SolUserProvider from "./SolUserProvider";
@@ -20,7 +21,11 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
     // return <> {children} </>
 
-    return <IIUserProvider>{children}</IIUserProvider>;
+    return (
+        <UserActor>
+            <IIUserProvider>{children}</IIUserProvider>
+        </UserActor>
+    );
 }
 
 export default UserProvider

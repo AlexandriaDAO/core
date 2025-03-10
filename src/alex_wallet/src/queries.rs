@@ -2,9 +2,11 @@ use ic_cdk::api::caller;
 use ic_cdk_macros::query;
 use candid::Principal;
 
-use crate::errors::general::GeneralError;
-use crate::store::{WALLETS, USER_WALLETS};
-use crate::models::wallet::Wallet;
+use crate::errors::GeneralError;
+use crate::get_user_wallet_ids;
+use crate::store::WALLETS;
+use crate::model::Wallet;
+
 
 /// Retrieves multiple wallets by their ids
 /// Returns a vector of wallets, skipping any IDs that don't exist
@@ -44,7 +46,7 @@ pub fn get_wallets_strict(ids: Vec<u64>) -> Result<Vec<Wallet>, String> {
 
     WALLETS.with(|wallets| {
         let wallets = wallets.borrow();
-        
+
         // Check if all IDs exist first
         if ids.iter().any(|id| !wallets.contains_key(id)) {
             return Err(GeneralError::NotFound("One or more wallets not found".to_string()).to_string());
@@ -59,18 +61,16 @@ pub fn get_wallets_strict(ids: Vec<u64>) -> Result<Vec<Wallet>, String> {
 
 #[query]
 pub fn get_user_wallets(user: Principal) -> Vec<Wallet> {
+    // Get wallet IDs for the user
+    let wallet_ids = get_user_wallet_ids(&user);
+
+    // Fetch wallet details for each ID
     WALLETS.with(|wallets| {
         let wallets = wallets.borrow();
-        USER_WALLETS.with(|user_wallets| {
-            user_wallets.borrow()
-                .get(&user)
-                .map(|list| {
-                    list.0.iter()
-                        .filter_map(|id| wallets.get(id).map(|n| n.clone()))
-                        .collect()
-                })
-                .unwrap_or_default()
-        })
+        wallet_ids
+            .iter()
+            .filter_map(|id| wallets.get(id).map(|n| n.clone()))
+            .collect()
     })
 }
 
@@ -85,20 +85,16 @@ pub fn get_active_wallets(user: Option<Principal>) -> Vec<Wallet> {
     match user {
         Some(user) => {
             // Get specific user's active wallets
+            let wallet_ids = get_user_wallet_ids(&user);
+
             WALLETS.with(|wallets| {
                 let wallets = wallets.borrow();
-                USER_WALLETS.with(|user_wallets| {
-                    user_wallets.borrow()
-                        .get(&user)
-                        .map(|list| {
-                            list.0.iter()
-                                .filter_map(|id| wallets.get(id))
-                                .filter(|wallet| wallet.active)
-                                .map(|n| n.clone())
-                                .collect()
-                        })
-                        .unwrap_or_default()
-                })
+                wallet_ids
+                    .iter()
+                    .filter_map(|id| wallets.get(id))
+                    .filter(|wallet| wallet.active) // Filter for active wallets
+                    .map(|n| n.clone())
+                    .collect()
             })
         },
         None => {

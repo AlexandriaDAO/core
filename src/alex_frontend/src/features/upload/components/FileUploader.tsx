@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useUser } from "@/hooks/actors";
+import { useAlexWallet } from "@/hooks/actors";
 import { toast } from "sonner";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import uploadFile from "../thunks/uploadFile";
@@ -16,7 +16,7 @@ interface FileUploaderProps {
 
 function FileUploader({file, setFile}: FileUploaderProps) {
     const dispatch = useAppDispatch();
-    const {actor} = useUser();
+    const {actor} = useAlexWallet();
 
     const {cost} = useAppSelector(state=>state.upload)
 
@@ -25,7 +25,6 @@ function FileUploader({file, setFile}: FileUploaderProps) {
             toast.error('File not available');
             return;
         }
-
         if(!actor) {
             toast.error('Actor not available');
             return;

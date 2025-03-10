@@ -1,12 +1,9 @@
-use ic_cdk_macros::update;
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 use serde_json::Value;
 use num_bigint::BigUint;
 use sha2::{Sha256, Digest};
-use candid::{self, Principal};
-use serde;
+use candid::Principal;
 
-use crate::wallet_queries::get_wallets;
 
 const HASH_LENGTH: usize = 32; // SHA-256 produces 32 bytes
 const SALT_LENGTH: usize = 32; // Using 32-byte salt
@@ -110,7 +107,7 @@ async fn generate_salt() -> Result<[u8; SALT_LENGTH], String> {
 }
 
 /// RSA-PSS Signing with internal salt generation
-async fn rsa_pss_sign(message: &[u8], jwk_json: &Value, n: &str) -> Result<Vec<u8>, String> {
+pub async fn rsa_pss_sign(message: &[u8], jwk_json: &Value, n: &str) -> Result<Vec<u8>, String> {
     ic_cdk::println!("Starting RSA-PSS signing process");
     ic_cdk::println!("Input message: {:?}", message);
 
@@ -157,75 +154,40 @@ async fn rsa_pss_sign(message: &[u8], jwk_json: &Value, n: &str) -> Result<Vec<u
 }
 
 /// Convert bytes to base64url string without padding
-fn buffer_to_b64url(buffer: &[u8]) -> String {
+pub fn buffer_to_b64url(buffer: &[u8]) -> String {
     // First encode to standard base64
     let b64 = URL_SAFE_NO_PAD.encode(buffer);
     // URL_SAFE_NO_PAD already handles the url-safe encoding and padding removal
     b64
 }
 
-#[derive(candid::CandidType, serde::Serialize)]
-pub struct SignatureResponse {
-    signature: String,
-    id: String,
-    owner: String,
-}
+/// Calls the `vetkd` canister to get the decrypted key
+pub async fn get_decrypted_key(encrypted_key: String) -> Result<String, String> {
+    ic_cdk::println!("Starting get_decrypted_key function");
+    ic_cdk::println!("Encrypted key: {}", encrypted_key);
 
-#[update]
-pub async fn sign(data: Vec<u8>, id: u64) -> Result<SignatureResponse, String> {
-    ic_cdk::println!("Debugging ID: {}", id);
-
-    let wallet = get_wallets(vec![id]).unwrap();
-
-    if wallet.is_empty() {
-        return Err(format!("Wallet with ID {} not found", id));
-    }
-
-    let wallet = wallet.first().unwrap();
-
-    if wallet.id != id {
-        return Err(format!("Wallet with ID {} not found", id));
-    }
-
-    ic_cdk::println!("Wallet key: {}", wallet.key);
-
-    let request = wallet.key.to_string();
-
-    let (response,): (Result<String, String>,) = ic_cdk::api::call::call(
+    // Perform the cross-canister call to the `vetkd` canister
+    let result: Result<(Result<String, String>,), _> = ic_cdk::api::call::call(
         vetkd_canister_id(),
         "wbe_decrypt",
-        (request,),
+        (encrypted_key,),
     )
-    .await
-    .map_err(|e| format!("Call to abe_decrypt failed: {:?}", e))?;
+    .await;
 
-    let decrypted = response.map_err(|e| format!("Decryption error: {}", e))?;
-
-    ic_cdk::println!("Decrypted key");
-
-    ic_cdk::println!("Starting sign() function");
-    ic_cdk::println!("Input data length: {} bytes", data.len());
-
-    // Parse the decrypted JWK string
-    let jwk_json: Value = serde_json::from_str(&decrypted).map_err(|e| format!("Failed to parse decrypted JWK: {}", e))?;
-
-    ic_cdk::println!("Parsed JWK");
-
-    // Get n directly from parsed JWK
-    let owner = wallet.public.n.to_string();
-    ic_cdk::println!("Owner: {}", owner);
-
-    let raw_signature = rsa_pss_sign(data.as_slice(), &jwk_json, &owner).await?;
-    let signature = buffer_to_b64url(&raw_signature);
-
-    let id_bytes: Vec<u8> = Sha256::digest(&raw_signature).to_vec();
-    let id = buffer_to_b64url(&id_bytes);
-
-    Ok(SignatureResponse {
-        signature,
-        id,
-        owner
-    })
+    match result {
+        Ok((Ok(decrypted),)) => {
+            ic_cdk::println!("Successfully decrypted key: {}", decrypted);
+            Ok(decrypted)
+        }
+        Ok((Err(err),)) => {
+            ic_cdk::println!("Error from vetkd canister: {}", err);
+            Err(format!("Error from vetkd canister: {}", err))
+        }
+        Err((code, msg)) => {
+            ic_cdk::println!("Cross-canister call failed: code={:?}, message={}", code, msg);
+            Err(format!("Cross-canister call failed: code={:?}, message={}", code, msg))
+        }
+    }
 }
 
 fn vetkd_canister_id() -> Principal {

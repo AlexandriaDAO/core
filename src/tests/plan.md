@@ -1,16 +1,15 @@
 #### Bigger Features (lower priority):
 - Need more dynamic states for the like/mint/withdraw buttons. include in this singleTokenView.tsx which duplicates a lot of this logic. (If the mint has succeded the mint button should go away).
-- Lazy loading all apps, and loading blur to clear instead of top to bottom.
 - Just more efficient loading, maybe lossless compression, or lower res on heavy assets. Maybe make this a setting for people based on how good their internet is.
 - Cache the nsfw model so it doesn't have to be reloaded every time on permasearch.
 - Get rid of the topup concept, and make all lbry payments directly from the wallet, and display balance in the header.
 - Find out why some NFT assets just arent able to render, and fix our rendering logic to fit them in.
+- Rank by tokens in the NFT. (rating system for rarity.)
 
 #### Permasearch Specific:
 
 - Remove duplicates based on file size.
 - More advanced searching with tags and metadata.
-- Rank by tokens in the NFT. (rating system for rarity.)
 
 
 #### New Apps:

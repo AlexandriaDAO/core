@@ -35,7 +35,7 @@
 # # For bookmarks
 # cargo build --release --target wasm32-unknown-unknown --package bookmarks
 # candid-extractor target/wasm32-unknown-unknown/release/bookmarks.wasm > src/bookmarks/bookmarks.did
-# # For icp_swap
+# For icp_swap
 # cargo build --release --target wasm32-unknown-unknown --package icp_swap
 # candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
 # # For tokenomics

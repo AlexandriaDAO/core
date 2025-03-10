@@ -116,6 +116,8 @@ export const updateTransactions = createAsyncThunk<
     // Get existing transactions from state first
     const state = getState();
     const existingTransactions = state.transactions.transactions;
+    // Check if nftData exists in the state before trying to access it
+    const nfts = state.nftData?.nfts || {};
     
     if (arweaveIds.length === 0) {
       // If no arweave IDs provided, return existing transactions without changing state
@@ -130,15 +132,58 @@ export const updateTransactions = createAsyncThunk<
       existingTransactions.map(tx => [tx.id, tx])
     );
     
+    // Create a map to track the original order of arweave IDs
+    const arweaveIdOrderMap = new Map(
+      arweaveIds.map((id, index) => [id, index])
+    );
+    
+    // Find NFT data for each arweave ID to get the orderIndex
+    const nftOrderMap = new Map();
+    Object.values(nfts).forEach(nft => {
+      if (nft.orderIndex !== undefined && arweaveIds.includes(nft.arweaveId)) {
+        nftOrderMap.set(nft.arweaveId, nft.orderIndex);
+      }
+    });
+    
     // Create a merged list with new transactions, preserving existing ones
     // If a transaction already exists, keep the existing data
     const mergedTransactions = [
-      ...existingTransactions,
-      ...newTransactions.filter(newTx => !existingTransactionMap.has(newTx.id))
+      ...existingTransactions.filter(tx => !arweaveIds.includes(tx.id)),
+      ...newTransactions.map(newTx => {
+        // If the transaction already exists, preserve its data
+        if (existingTransactionMap.has(newTx.id)) {
+          return existingTransactionMap.get(newTx.id)!;
+        }
+        return newTx;
+      })
     ];
     
-    // Update the store with the merged transactions
-    dispatch(setTransactions(mergedTransactions));
+    // Sort the merged transactions based on the original order of arweave IDs
+    // Only sort the transactions that are part of the current request
+    const requestedTransactions = mergedTransactions.filter(tx => arweaveIds.includes(tx.id));
+    const otherTransactions = mergedTransactions.filter(tx => !arweaveIds.includes(tx.id));
+    
+    // Sort requested transactions based on NFT orderIndex first, then arweaveIdOrderMap
+    requestedTransactions.sort((a, b) => {
+      // First try to use NFT orderIndex if available
+      const aOrderFromNft = nftOrderMap.has(a.id) ? nftOrderMap.get(a.id) : undefined;
+      const bOrderFromNft = nftOrderMap.has(b.id) ? nftOrderMap.get(b.id) : undefined;
+      
+      if (aOrderFromNft !== undefined && bOrderFromNft !== undefined) {
+        return aOrderFromNft - bOrderFromNft;
+      }
+      
+      // Fall back to arweaveIdOrderMap
+      const aOrder = arweaveIdOrderMap.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+      const bOrder = arweaveIdOrderMap.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+      return aOrder - bOrder;
+    });
+    
+    // Combine sorted requested transactions with other transactions
+    const sortedMergedTransactions = [...requestedTransactions, ...otherTransactions];
+    
+    // Update the store with the sorted merged transactions
+    dispatch(setTransactions(sortedMergedTransactions));
     
     // Only load content for the new transactions to avoid redundant loading
     const transactionsToLoad = newTransactions.filter(
@@ -151,6 +196,6 @@ export const updateTransactions = createAsyncThunk<
       await dispatch(loadContentForTransactions(transactionsToLoad));
     }
     
-    return mergedTransactions;
+    return sortedMergedTransactions;
   }
 ); 

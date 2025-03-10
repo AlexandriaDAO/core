@@ -5,15 +5,18 @@
 >
 > — Dominic Williams, DFINITY founder on ["The Internet Computer Vision"](https://youtu.be/DYVPq_vMB8w?si=w_jopM2o22UQjqwH)
 
-**tldr: Alexandria is a tokenized bridge for Web2's content, functionality, and user data, enabling Web3 stacks to build upon existing digital assets rather than start from scratch. Our goal is to become the definitive content destination for discerning users.**
+**tldr: Alexandria is the dapp store to port Web2's content, functionality, and user data to a Web3 Stack. Our goal is to become the definitive content destination for discerning users.**
+
+*This is not a conventional whitepaper in that it's an evolving document, though it's entire history is availible on our github.*
 
 ## Table of Contents
 - [Alexandria WhitePaper](#alexandria-whitepaper)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Part 1: Network Overview](#part-1-network-overview)
-    - [Librarians](#librarians)
-    - [LibModules](#libmodules)
+    - [Modules](#modules)
+      - [VetKey Modules](#vetkey-modules)
+      - [LibModules](#libmodules)
     - [AppModules](#appmodules)
   - [Part 2: Token Economics and Mechanics](#part-2-token-economics-and-mechanics)
     - [LBRY Token](#lbry-token)
@@ -48,41 +51,45 @@ The Internet has come to rely almost exclusively on Big Tech services as its inf
 
 https://x.com/Noahpinion/status/1818776478315954200
 
-The Static Web1 that was supposed to unlock the worlds information became buried by the Social Web2, sending 95-99% of digital content to the 'deep web' where it's inaccessible through conventional means, and force feeding the rest of it to us with black-box algorithms. Today, digital content that isn't (1) search-engine optimized, (2) open-access, ***and*** (3) brand new, is basically lost forever. The rest is primarily reachable through black-box algorithms on proprietary platforms.
+The Static Web1 that was supposed to unlock the worlds information became buried by the Social Web2, sending 95-99% of digital content to the 'deep web' where it's inaccessible through conventional means, and force feeding the rest of it to us with black-box algorithms on proprietary platforms. Today, digital content that isn't (1) search-engine optimized, (2) open-access, ***and*** (3) brand new, is basically lost forever.
 
-Alexandria is a Web3 fork of the Web2 paradigm with the vision of restoring that sense of awe and human connection that was so palpable in the early days of the Web.
+This problem is unsolvable on Web2. Hyperlinks can change, move or disappear at any time; and there's no consensus on who owns any given peice of content.
+
+There's a better way. Alexandria is a protocol layer and app suite where the all data is permanent, owned by someone, with innate rules on how others can use them. Building this way will allows a fair economy to emerge and hopefully restore that sense of awe and human connection to farmilliar to the early internet.
 
 ## Part 1: Network Overview
 
 Alexandria has only 2 protocol level dependencies (excluding TCP/IP): ArWeave (for content) and ICP (for services) - essentially, the 'AI Stack'. This foundation enables several innovative features that appear to be first of their kind:
 
-  - VetKey Sharing - Alexandrians can 'borrow' eachother's Private Keys or API Keys without revealing them to anyone; allowing the community to bridge any Web2 service to their apps.
+  - VetKey Sharing - Users can 'borrow' eachother's Private Keys or API Keys without revealing them to anyone; allowing the community to bridge any Web2 service to their apps.
   - NFT Wallets - Everything on-site is an NFT, and it's own entity that must be paid when used, allowing the rightful owner to collect any revenue made from their assets.
   - Usage-based Fair-Launch - 21 Million tokens carefully emitted during an up to 60 billion platform actions that make whale and bot games economically unfavorable.
 
 Interaction with Alexandria will often be through apps composed of 'free software.' Eventually, anyone will be able to fork and modify these apps (or all of Alexandria) while staying pluggable with these pre-existing toolkits and content.
 
-### Librarians
+### Modules
 
-These are simply logged in users. Their principal allows them to store, share, and borrow private private keys and opens full access to the FT and NFT minting mechanisms.
+Alexandria has three types of module: VetKey Modules, LibModules and AppModules, availible through APIs or in the core frontend for app developers. The intent is to seed community-created Apps that reimagine the major search, social, and ecommerce platforms. Modules are how we minimize the amount of complex logic in each app so the heavy lifting is already done by the protocol for andy new service.
 
-### LibModules
+#### VetKey Modules
 
-These are code bundles and pluggable APIs for app developers, typically powered by a set of Librarian keys that access Web2 services in a decentralized way, e.g.:
+Librarians can store, share, and borrow private keys of any kind. These can be private wallet keys or API keys that access external Web2 services and compute resources, e.g.:
 
-- ArWeave (completed): Uploads Alexandria-compatable books to the permaweb.
+- ArWeave Nodes (completed): Uploads Alexandria-compatable books to the permaweb.
 - Meilisearch (completed): Creates keyword search engines from the contents of books.
 - AI (incomplete): Provides LLMs and other ML models, pluggable for use in partner apps.
 - Qdrant (incomplete): Creates vector search engines from the contents of books.
 - Whatever else we might be needed for new apps.
 
-Alexandria provides the re-usable code bundles to interact with our smart contracts. LibModules' API-related compute is otherwise entirely managed by the ecosystem of Librarians.
+The point here is that these aren't dev dependencies. They're peer-to-peer, so users can pay eachother to use Claude or sign an ETH transaction on another's behalf without ever revealing the keys required to do so. The regulator of these interactactions (and the only thing that sees the secrets) is core smart contracts.
+
+#### LibModules
+
+Alexandria provides the re-usable code bundles to interact with our smart contracts. LibModules make the logic-centric interface to our smart contracts. These make LibModules accessible to partner apps' UI building blocks. Our system for NFTs display attributes (render, like, withdraw, share) are part of a single import that abstracts away the frontend challenge of using NFTs.
 
 ### AppModules
 
-These make LibModules accessible to partner apps as customizable UI building blocks. ArWeave for example will be used in many Alexandria apps for uploading, searching and displaying in content in various ways, and a UI toolkit is provided with this functionality built-in.
-
-These modules can be preloaded in any third party apps as template UIs, with all platform economics automatically preserved. Any developers can layer these toolkits with custom parameters to create their desired features.
+These are primarily UI components with preloaded with common functionality, e.g., an NFT/SBT search engine with all our filters and sorting techniques. Any developers can layer these toolkits with custom parameters to create their desired features.
 
 ## Part 2: Token Economics and Mechanics
 

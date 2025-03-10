@@ -1,0 +1,1 @@
+export interface Slot { 'id' : number, 'content' : SlotContent } 

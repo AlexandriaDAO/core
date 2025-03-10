@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import { LoaderCircle, Trash2 } from "lucide-react";
 import { SerializedWallet, setDeleting } from "../walletsSlice";
-import { useUser } from "@/hooks/actors";
+import { useAlexWallet } from "@/hooks/actors";
 import { Button } from "@/lib/components/button";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import deleteWallet from "../thunks/deleteWallet";
@@ -17,7 +17,7 @@ interface DeleteWalletProps {
 const DeleteWallet = ({ wallet }: DeleteWalletProps) => {
 	if(!wallet) return null;
 	const dispatch = useAppDispatch();
-	const {actor} = useUser();
+	const {actor} = useAlexWallet();
 
 	const {deleting} = useAppSelector((state) => state.wallets);
 

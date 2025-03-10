@@ -1,0 +1,29 @@
+type CreateWalletRequest = record { key : text; public : PublicKey };
+type PublicKey = record { e : text; n : text; kty : text };
+type Result = variant { Ok : Wallet; Err : text };
+type Result_1 = variant { Ok; Err : text };
+type Result_2 = variant { Ok : vec Wallet; Err : text };
+type Result_3 = variant { Ok : SignatureResponse; Err : text };
+type SignatureResponse = record { id : text; signature : text; owner : text };
+type UpdateWalletStatusRequest = record { id : nat64; active : bool };
+type Wallet = record {
+  id : nat64;
+  key : text;
+  updated_at : nat64;
+  active : bool;
+  owner : principal;
+  public : PublicKey;
+  created_at : nat64;
+};
+service : {
+  create_wallet : (CreateWalletRequest) -> (Result);
+  delete_wallet : (nat64) -> (Result_1);
+  get_active_wallets : (opt principal) -> (vec Wallet) query;
+  get_my_active_wallets : () -> (vec Wallet) query;
+  get_my_wallets : () -> (vec Wallet) query;
+  get_user_wallets : (principal) -> (vec Wallet) query;
+  get_wallets : (vec nat64) -> (Result_2) query;
+  get_wallets_strict : (vec nat64) -> (Result_2) query;
+  sign : (blob, nat64) -> (Result_3);
+  update_wallet_status : (UpdateWalletStatusRequest) -> (Result);
+}

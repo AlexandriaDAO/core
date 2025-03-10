@@ -5,6 +5,11 @@
       "package": "vetkd",
       "candid": "src/vetkd/vetkd.did"
     },
+    "alex_wallet": {
+      "type": "rust",
+      "package": "alex_wallet",
+      "candid": "src/alex_wallet/alex_wallet.did"
+    },
     "system_api": {
       "candid": "src/system_api/system_api.did",
       "package": "system_api",

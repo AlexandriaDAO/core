@@ -63,6 +63,12 @@ dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
 cargo build --release --target wasm32-unknown-unknown --package user
 candid-extractor target/wasm32-unknown-unknown/release/user.wasm > src/user/user.did
 dfx deploy user --specified-id yo4hu-nqaaa-aaaap-qkmoq-cai
+
+# for alex_wallet
+cargo build --release --target wasm32-unknown-unknown --package alex_wallet
+candid-extractor target/wasm32-unknown-unknown/release/alex_wallet.wasm > src/alex_wallet/alex_wallet.did
+dfx deploy alex_wallet --specified-id "yh7mi-3yaaa-aaaap-qkmpa-cai";
+
 # for vetkd
 cargo build --release --target wasm32-unknown-unknown --package vetkd
 candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did

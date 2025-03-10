@@ -51,20 +51,23 @@ export async function fetchTransactionsByIds(txIds: string[]): Promise<Transacti
       return [];
     }
 
-    const transactionMap: Record<string, Transaction> = {};
+    // Create a map of transactions by ID
+    const transactionMap = new Map();
     graphqlResponse.data.transactions.edges.forEach((edge: any) => {
       const tx = edge.node;
-      transactionMap[tx.id] = {
+      transactionMap.set(tx.id, {
         id: tx.id,
         owner: tx.owner.address,
         tags: tx.tags,
         block: tx.block,
         data: tx.data
-      };
+      });
     });
 
-    // Reorder transactions based on the original txIds
-    return txIds.map(id => transactionMap[id] || null).filter((tx): tx is Transaction => tx !== null);
+    // Return transactions in the original order of txIds
+    return txIds
+      .map(id => transactionMap.get(id))
+      .filter((tx: Transaction | undefined): tx is Transaction => tx !== undefined);
   } catch (error) {
     console.error('Error fetching transactions:', error);
     return [];

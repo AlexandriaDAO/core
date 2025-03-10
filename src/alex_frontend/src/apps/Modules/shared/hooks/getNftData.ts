@@ -15,6 +15,7 @@ export interface NftDataResult {
     alex: string;
     lbry: string;
   };
+  orderIndex?: number;
 }
 
 const convertE8sToToken = (e8sAmount: bigint): string => {
@@ -58,7 +59,8 @@ export const useNftData = () => {
           balances: {
             alex: convertE8sToToken(alexBalance),
             lbry: convertE8sToToken(lbryBalance)
-          }
+          },
+          orderIndex: nftEntry[1].orderIndex
         };
       }
 

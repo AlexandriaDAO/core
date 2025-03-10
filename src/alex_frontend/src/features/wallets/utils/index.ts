@@ -1,4 +1,4 @@
-import { Wallet } from "../../../../../../src/declarations/user/user.did";
+import { Wallet } from "../../../../../../src/declarations/alex_wallet/alex_wallet.did";
 import { convertTimestamp } from "@/utils/general";
 import { SerializedWallet } from "../walletsSlice";
 import Arweave from 'arweave';

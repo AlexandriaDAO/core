@@ -1,4 +1,5 @@
-use crate::{errors::wallet::WalletError, PublicKey};
+use crate::errors::WalletError;
+use crate::model::PublicKey;
 
 pub struct WalletValidationConstants;
 

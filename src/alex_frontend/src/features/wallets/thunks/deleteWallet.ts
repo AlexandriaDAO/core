@@ -1,5 +1,5 @@
 import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE } from "../../../../../declarations/user/user.did";
+import { _SERVICE } from "../../../../../declarations/alex_wallet/alex_wallet.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { SerializedWallet } from "../walletsSlice";
 
