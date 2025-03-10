@@ -45,6 +45,8 @@ const AssetManager = () => {
     dispatch(getCallerAssetCanister())
   }, [])
 
+// need to hide details for user 
+// we need to add service or something to enable background sycning
 
   return (<div className="border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 py-5 px-5 rounded-2xl absolute right-[50px] top-[150px] w-96">
     {userAssetCanister === null ? (

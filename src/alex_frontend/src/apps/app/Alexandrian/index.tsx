@@ -9,39 +9,55 @@ import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalan
 import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
 import { clearAllTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
+import AssetManager from "@/apps/Modules/shared/components/AssetManager";
 
-function Alexandrian() {
-	const dispatch = useDispatch<AppDispatch>();
-	const { isLoading, searchParams } = useSelector((state: RootState) => state.library);
+/**
+ * Custom hook to track asset loading state and prevent state wiping
+ * when assets have been successfully loaded.
+ */
+const useAssetLoadingState = () => {
+	// Use ref to keep track of loading state without causing re-renders
+	const assetsLoadedRef = useRef(false);
+
+	// Select required state
+	const { isLoading } = useSelector((state: RootState) => state.library);
 	const transactions = useSelector((state: RootState) => state.transactions.transactions);
 	const nfts = useSelector((state: RootState) => state.nftData.nfts);
-	
-	// Track if assets have been loaded to prevent state wiping
-	const assetsLoadedRef = useRef(false);
-	
-	// Update ref when assets are loaded
-	const hasAssets = transactions.length > 0 || Object.keys(nfts).length > 0;
-	if (hasAssets && !isLoading && !assetsLoadedRef.current) {
+
+	// Consider assets loaded if we have transactions OR NFTs, and we're not currently loading
+	const hasTransactions = transactions.length > 0;
+	const hasNfts = Object.keys(nfts).length > 0;
+
+	// Set ref to true when assets have loaded
+	if ((hasTransactions || hasNfts) && !isLoading && !assetsLoadedRef.current) {
+		console.log('Assets loaded, preserving state');
 		assetsLoadedRef.current = true;
 	}
 
-	// Error handler for search operations
-	const handleSearchError = useCallback((error: any, message: string) => {
-		console.error(`${message}:`, error);
-		toast.error(message);
-	}, []);
+	return assetsLoadedRef.current;
+};
+
+function Alexandrian() {
+	const dispatch = useDispatch<AppDispatch>();
+	const { isLoading, searchParams, selectedPrincipals } = useSelector((state: RootState) => state.library);
+	const { user } = useSelector((state: RootState) => state.auth);
+
+	// Track asset loading state to prevent state wiping 
+	const assetsLoaded = useAssetLoadingState();
 
 	const handleSearch = useCallback(async () => {
 		try {
 			// Only reset search if no assets have been loaded
-			if (!assetsLoadedRef.current) {
+			// This prevents wiping out state when assets are already present
+			if (!assetsLoaded) {
 				await dispatch(resetSearch());
 			}
 			await dispatch(performSearch());
 		} catch (error) {
-			handleSearchError(error, 'Search failed');
+			console.error('Search failed:', error);
+			toast.error('Search failed');
 		}
-	}, [dispatch, handleSearchError]);
+	}, [dispatch, assetsLoaded]);
 
 	const handleShowMore = useCallback(async () => {
 		try {
@@ -50,9 +66,10 @@ function Alexandrian() {
 			await dispatch(updateSearchParams({ start: newStart, end: newEnd }));
 			await dispatch(performSearch());
 		} catch (error) {
-			handleSearchError(error, 'Failed to load more results');
+			console.error('Failed to load more results:', error);
+			toast.error('Failed to load more results');
 		}
-	}, [dispatch, searchParams, handleSearchError]);
+	}, [dispatch, searchParams]);
 
 	const handleCancelSearch = useCallback(() => {
 		dispatch(resetSearch());
@@ -62,20 +79,27 @@ function Alexandrian() {
 	}, [dispatch]);
 
 	return (
-		<SearchContainer
-			title="Alexandrian"
-			description="Search the NFT Library of others, and manage your own."
-			hint="Liking costs 20 LBRY (this will decrease over time)."
-			onSearch={handleSearch}
-			onShowMore={handleShowMore}
-			onCancel={handleCancelSearch}
-			isLoading={isLoading}
-			topComponent={<TopupBalanceWarning />}
-			filterComponent={<AlexandrianLibrary />}
-			showMoreEnabled={true}
-			dataSource="transactions"
-			preserveState={assetsLoadedRef.current}
-		/>
+		<>
+			<div className="rounded-lg">
+				{selectedPrincipals[0] === user?.principal && <AssetManager />}
+
+			</div>
+			<SearchContainer
+				title="Alexandrian"
+				description="Search the NFT Library of others, and manage your own."
+				hint="Liking costs 20 LBRY (this will decrease over time)."
+				onSearch={handleSearch}
+				onShowMore={handleShowMore}
+				onCancel={handleCancelSearch}
+				isLoading={isLoading}
+				topComponent={<TopupBalanceWarning />}
+				filterComponent={<AlexandrianLibrary />}
+				showMoreEnabled={true}
+				dataSource="transactions"
+				preserveState={assetsLoaded}
+			/>
+
+		</>
 	);
 }
 
