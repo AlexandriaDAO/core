@@ -72,7 +72,7 @@ export const Entry = () => {
 	if (!identity) return <InlineLogin />;
 
 	// Show loading state while waiting for actor
-	if (!actor) return <Processing message="Loading..." />;
+	if (!actor) return <Processing message="Loading Actor..." />;
 
 	// Show loading state during login with backend
 	if (loading) return <Processing message="Authenticating..." />;
@@ -81,7 +81,7 @@ export const Entry = () => {
 	if (!user)
 		return (
 			// load signup module only when needed
-			<Suspense fallback={<Processing message="Loading..." />}>
+			<Suspense fallback={<Processing message="Loading User..." />}>
 				<InlineSignup />
 			</Suspense>
 		);
@@ -89,7 +89,7 @@ export const Entry = () => {
 	// Finally, show the authenticated component
 	// load auth module only when needed
 	return (
-		<Suspense fallback={<Processing message="Loading..." />}>
+		<Suspense fallback={<Processing message="Loading Auth..." />}>
 			<Auth />
 		</Suspense>
 	);
