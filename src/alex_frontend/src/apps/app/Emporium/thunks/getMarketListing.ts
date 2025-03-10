@@ -48,7 +48,7 @@ export const getMarketListing = createAsyncThunk<
       let ownerFilter: [] | [Principal] = [];
       let tokenFilter: [] | [bigint] = [];
       let sortFilter: [] | [string] = sort ? [sort] : [];
-      let timeFilter: string = "";
+      let timeFilter: string = "desc";
 
       // Determine filters based on the type
       switch (type) {
@@ -63,7 +63,7 @@ export const getMarketListing = createAsyncThunk<
           tokenFilter = searchStr ? [arweaveIdToNat(searchStr)] : [];
           break;
         default:
-          timeFilter = "asc"; // Default sorting by time
+          timeFilter = "desc"; // Default sorting by time
       }
 
       // Fetch market listings
@@ -110,7 +110,6 @@ export const getMarketListing = createAsyncThunk<
           totalCount: 0,
         };
       }
-
       // Fetch transactions for the retrieved NFTs
       const transactions = await fetchTransactionsForAlexandrian(nftIds);
 

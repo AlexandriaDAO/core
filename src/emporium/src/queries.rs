@@ -109,10 +109,8 @@ pub fn get_search_listing(
                 nfts.sort_by(|a, b| b.1.price.cmp(&a.1.price));
             }
         }
-        ic_cdk::println!("The sort is {:?}",sort_by_time);
         // Sorting by time
         if let Some(ref sort_by_time) = sort_by_time {
-            ic_cdk::println!("Sorting by time: {:?}", sort_by_time);
         
             if sort_by_time.to_lowercase() == "asc" {
                 nfts.sort_by(|a, b| a.1.time.cmp(&b.1.time));
@@ -160,13 +158,19 @@ pub fn get_logs(page: Option<u64>, page_size: Option<u64>, token_id_filter: Opti
                 }
                 return true;
             })
-            .skip(start_index) // Skip entries before the page start
-            .take(page_size as usize) // Take only `page_size` items
             .map(|(timestamp, log)| (timestamp, log.clone())) // Clone log entry
             .collect();
         // Sort the logs by timestamp
         let mut logs = filtered_logs;
         logs.sort_by_key(|(timestamp, _)| std::cmp::Reverse(*timestamp)); // Sort by timestamp in descending order
+
+        // Apply pagination to sorted logs
+        logs = logs
+            .into_iter()
+            .skip(start_index)
+            .take(page_size as usize)
+            .collect();
+
         Logs {
             logs,
             total_pages,
