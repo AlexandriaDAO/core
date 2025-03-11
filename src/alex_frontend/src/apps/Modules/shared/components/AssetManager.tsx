@@ -1,8 +1,8 @@
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import React, { useEffect, useState } from 'react';
-import { createAssetCanister, getCallerAssetCanister, getAssetList, syncNfts, syncProgressInterface } from '../state/assetManager/assetManagerThunks';
-import {  LoaderPinwheel } from "lucide-react";
+import { createAssetCanister, getCallerAssetCanister, getAssetList, syncNfts, syncProgressInterface, getCanisterCycles } from '../state/assetManager/assetManagerThunks';
+import { LoaderPinwheel } from "lucide-react";
 import { Button } from '@/lib/components/button';
 import { Description, FiltersButton } from '@/apps/app/Permasearch/styles';
 
@@ -23,7 +23,8 @@ const AssetManager = () => {
     dispatch(createAssetCanister({ userPrincipal: user.user.principal }))
   }
   const sync = () => {
-    if (!user.user?.principal || !userAssetCanister) return;
+    console.log("user AssetCanister", assetManager.userAssetCanister);
+    if (!user.user?.principal || !assetManager.userAssetCanister) return;
     setSyncProgress({
       currentItem: "",
       progress: 0,
@@ -32,21 +33,32 @@ const AssetManager = () => {
     })
     dispatch(syncNfts({
       userPrincipal: user.user.principal, syncProgress, setSyncProgress,
-      userAssetCanister: userAssetCanister
+      userAssetCanister: assetManager.userAssetCanister
     }))
+    console.log("syncing");
+
   }
+
+
+  useEffect(() => {
+    if (!assetManager.isLoading) {
+      console.log("getting caller asset canister");
+      dispatch(getCallerAssetCanister())
+    }
+  }, [user.user?.principal])
 
   useEffect(() => {
     setUserAssetCanister(assetManager.userAssetCanister);
-    if (assetManager.userAssetCanister)
-      dispatch(getAssetList(assetManager.userAssetCanister))
-  }, [assetManager.userAssetCanister])
-  useEffect(() => {
-    dispatch(getCallerAssetCanister())
-  }, [])
+    if (assetManager.userAssetCanister) {
+      dispatch(getAssetList(assetManager.userAssetCanister));
+      dispatch(getCanisterCycles(assetManager.userAssetCanister))
+      sync()
+    }
 
-// need to hide details for user 
-// we need to add service or something to enable background sycning
+  }, [assetManager.userAssetCanister])
+
+  // need to hide details for user 
+  // we need to add service or something to enable background sycning
 
   return (<div className="border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 py-5 px-5 rounded-2xl absolute right-[50px] top-[150px] w-96">
     {userAssetCanister === null ? (
@@ -76,46 +88,47 @@ const AssetManager = () => {
         </Button>
       </div>
     )}
+    <h1>Cycles ≈  {assetManager.cycles}</h1>
+    {//syncProgress?.currentItem!="" && (
+      // <div className="w-full max-w-md space-y-3">
+      //   <h1 className='text-xl'>Synced :{syncProgress.totalSynced}</h1>
 
-    {syncProgress?.currentItem!="" && (
-      <div className="w-full max-w-md space-y-3">
-        <h1 className='text-xl'>Synced :{syncProgress.totalSynced}</h1>
+      //   {/*  Current Item Being Processed */}
+      //   <div className="text-sm text-gray-600 mb-2">
+      //     {syncProgress.currentProgress === 100
+      //       ? "Upload Complete"
+      //       : `Uploading: ${syncProgress.currentItem}`}
+      //   </div>
 
-        {/*  Current Item Being Processed */}
-        <div className="text-sm text-gray-600 mb-2">
-          {syncProgress.currentProgress === 100
-            ? "Upload Complete"
-            : `Uploading: ${syncProgress.currentItem}`}
-        </div>
+      //   {/*  Current NFT Upload Progress Bar */}
+      //   <div className="w-full bg-gray-200 rounded-full h-2.5">
+      //     <div
+      //       className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+      //       style={{ width: `${syncProgress.currentProgress ?? 0}%` }}
+      //     />
+      //   </div>
 
-        {/*  Current NFT Upload Progress Bar */}
-        <div className="w-full bg-gray-200 rounded-full h-2.5">
-          <div
-            className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-            style={{ width: `${syncProgress.currentProgress ?? 0}%` }}
-          />
-        </div>
+      //   {/*  Total Synced Progress Bar */}
+      //   {
+      //     <>
+      //       <div className="text-sm text-gray-600">
+      //         Total Synced: {syncProgress.totalSynced ?? 0} of  {nftData.totalNfts}
+      //       </div>
 
-        {/*  Total Synced Progress Bar */}
-        {
-          <>
-            <div className="text-sm text-gray-600">
-              Total Synced: {syncProgress.totalSynced ?? 0} of  {nftData.totalNfts}
-            </div>
-
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div
-                className="bg-green-600 h-2.5 rounded-full transition-all duration-300"
-                style={{
-                  width: `${((syncProgress.totalSynced ?? 0) / nftData.totalNfts) * 100
-                    }%`,
-                }}
-              />
-            </div>
-          </>
-        }
-      </div>
-    )}
+      //       <div className="w-full bg-gray-200 rounded-full h-2.5">
+      //         <div
+      //           className="bg-green-600 h-2.5 rounded-full transition-all duration-300"
+      //           style={{
+      //             width: `${((syncProgress.totalSynced ?? 0) / nftData.totalNfts) * 100
+      //               }%`,
+      //           }}
+      //         />
+      //       </div>
+      //     </>
+      //   }
+      // </div>
+      // )
+    }
 
 
   </div>);

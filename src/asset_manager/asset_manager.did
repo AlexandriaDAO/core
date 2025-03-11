@@ -1,4 +1,5 @@
 type Result = variant { Ok : principal; Err : text };
+type Result_1 = variant { Ok : nat; Err : text };
 type UserCanisterRegistry = record {
   owner : principal;
   last_updated : nat64;
@@ -12,4 +13,5 @@ service : {
       vec record { principal; UserCanisterRegistry },
     ) query;
   get_caller_asset_canister : () -> (opt UserCanisterRegistry) query;
+  get_canister_cycles : (principal) -> (Result_1);
 }

@@ -20,3 +20,5 @@ pub struct GrantPermissionArguments {
     pub permission: Permission,       // Permission type
     pub to_principal: Principal,      // The principal to whom the permission is granted
 }
+
+

@@ -1,6 +1,6 @@
 use candid::{CandidType, Encode, Nat, Principal};
 use ic_cdk::api::call::RejectionCode;
-use ic_cdk::api::management_canister::main::{CanisterInstallMode, InstallCodeArgument};
+use ic_cdk::api::management_canister::main::{canister_status, CanisterIdRecord, CanisterInstallMode, CanisterStatusResponse, InstallCodeArgument};
 use ic_cdk::api::management_canister::provisional::CanisterSettings;
 use icrc_ledger_types::{
     icrc1::{
@@ -203,4 +203,25 @@ async fn grant_commit_permission(
         }
     };
     Ok("ok ".to_string())
+}
+
+
+
+
+
+#[ic_cdk::update]
+async fn get_canister_cycles(canister_id: Principal) -> Result<Nat, String> {
+    let args = CanisterIdRecord {
+        canister_id,
+    };
+    
+    match canister_status(args).await {
+        Ok((response,)) => {
+            let cycles = response.cycles;
+            Ok(cycles)
+        },
+        Err((code, message)) => {
+            Err(format!("Error fetching canister status: code {:?}, message: {}", code, message))
+        }
+    }
 }
