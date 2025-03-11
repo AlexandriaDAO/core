@@ -71,7 +71,7 @@ const Emporium = () => {
             getMarketListing({
                 page: 1,
                 searchStr: emporium.search.search,
-                pageSize: (emporium.search.pageSize - 1).toString(),
+                pageSize: (emporium.search.pageSize ).toString(),
                 sort: emporium.search.sort,
                 type,
                 userPrincipal: !user?.principal ? "" : user?.principal,

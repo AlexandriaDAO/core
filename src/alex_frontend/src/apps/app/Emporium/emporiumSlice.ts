@@ -49,7 +49,7 @@ const initialState: EmporiumState = {
   editListingSuccess: false,
   removeListingSuccess: false,
   totalCount: 0,
-  search: { search: "", pageSize: 8, sort: "", type: "principal" },
+  search: { search: "", pageSize: 8, sort: "", type: "token" },
   totalPages: 0,
   pageSize: 0,
   error: null,

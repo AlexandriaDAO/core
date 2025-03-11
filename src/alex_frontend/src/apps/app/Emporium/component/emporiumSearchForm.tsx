@@ -27,7 +27,7 @@ const EmporiumSearchFormContainer = styled.div`
 const EmporiumSearchForm: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  const [searchMode, setSearchMode] = useState<"principal" | "token">("principal");
+  const [searchMode, setSearchMode] = useState<"principal" | "token">("token");
   const search = useAppSelector((state) => state.emporium.search);
 
   const handleSearchStateChange = (value: string) => {
