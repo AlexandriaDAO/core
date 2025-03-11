@@ -1,24 +1,13 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useIdentity } from "@/hooks/useIdentity";
-import { Button } from "@/lib/components/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/lib/components/dialog";
-import { Input } from "@/lib/components/input";
-import { Label } from "@/lib/components/label";
-import { Textarea } from "@/lib/components/textarea";
-import { Plus, ArrowLeft, Library, Globe, Check, X, Edit } from "lucide-react";
-import { Slot, Shelf, ShelfPositionMetrics } from "../../../../../declarations/lexigraph/lexigraph.did";
-import { convertTimestamp } from "@/utils/general";
+import { Library, Globe } from "lucide-react";
+import { Slot, Shelf } from "../../../../../declarations/lexigraph/lexigraph.did";
 import { parsePathInfo } from "./routes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/components/tabs";
 import { useLexigraphNavigation, useViewState } from "./routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { 
-	loadShelves, 
-	createShelf as createShelfAction, 
-	addSlot as addSlotAction,
-	reorderSlot as reorderSlotAction,
-	loadRecentShelves,
 	setSelectedShelf,
 	selectShelves,
 	selectPublicShelves,
@@ -26,10 +15,20 @@ import {
 	selectLoading,
 	selectPublicLoading,
 	selectLastTimestamp,
+} from "@/apps/Modules/shared/state/lexigraph/lexigraphSlice";
+
+import {
+	loadShelves, 
+	createShelf as createShelfAction, 
+	addSlot as addSlotAction,
+	reorderSlot as reorderSlotAction,
+	loadRecentShelves,
 	rebalanceShelfSlots,
 	updateShelfMetadata
-} from "@/apps/Modules/shared/state/lexigraph/lexigraphSlice";
-import { createFindSlotById, createFindSlotInShelf, renderSlotContent, SlotContentRenderer, renderBreadcrumbs } from "./utils";
+} from "@/apps/Modules/shared/state/lexigraph/lexigraphThunks";
+
+
+import { createFindSlotById, createFindSlotInShelf } from "./utils";
 // Import the UI components from ui-components.tsx
 import {
 	SlotDetail,
@@ -37,25 +36,10 @@ import {
 	LibraryShelvesUI,
 	ExploreShelvesUI,
 	UserShelvesUI
-} from "./ui-components";
-import { ShelfSettings } from "./ShelfSettings";
-
-// Common dialog props used across dialog components
-interface DialogProps {
-	isOpen: boolean;
-	onClose: () => void;
-}
-
-// Props for NewShelfDialog
-interface NewShelfDialogProps extends DialogProps {
-	onSubmit: (title: string, description: string) => Promise<void>;
-}
-
-// Props for NewSlotDialog
-interface NewSlotDialogProps extends DialogProps {
-	onSubmit: (content: string, type: "Nft" | "Markdown" | "Shelf") => Promise<void>;
-	shelves?: Shelf[];
-}
+} from "./cards/index";
+import { ShelfSettings } from "./components/ShelfSettings";
+import NewSlotDialog from "./components/NewSlot";
+import NewShelfDialog from "./components/NewShelf";
 
 // Props for ShelfDetail
 interface ShelfDetailProps {
@@ -65,15 +49,6 @@ interface ShelfDetailProps {
 	onReorderSlot?: (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean) => Promise<void>;
 	onViewSlot: (slotId: number) => void;
 	isPublic?: boolean;
-}
-
-// Props for SlotDetail
-interface SlotDetailProps {
-	slot: Slot;
-	shelf: Shelf;
-	slotKey: number;
-	onBack: () => void;
-	onBackToShelf: (shelfId: string) => void;
 }
 
 // Custom hook for shelf operations
@@ -193,139 +168,6 @@ const usePublicShelfOperations = () => {
 		findSlotById,
 		refreshPublicShelves: () => loadRecentShelvesData() // Add a refresh function
 	};
-};
-
-// New Shelf Dialog Component
-const NewShelfDialog = ({ isOpen, onClose, onSubmit }: NewShelfDialogProps) => {
-	const [title, setTitle] = useState("");
-	const [description, setDescription] = useState("");
-
-	const handleSubmit = async () => {
-		await onSubmit(title, description);
-		setTitle("");
-		setDescription("");
-	};
-
-	return (
-		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Create New Shelf</DialogTitle>
-				</DialogHeader>
-				<div className="grid gap-4 py-4">
-					<div className="grid gap-2">
-						<Label htmlFor="title">Title</Label>
-						<Input
-							id="title"
-							value={title}
-							onChange={(e) => setTitle(e.target.value)}
-							placeholder="Shelf Title"
-						/>
-					</div>
-					<div className="grid gap-2">
-						<Label htmlFor="description">Description</Label>
-						<Textarea
-							id="description"
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							placeholder="Description"
-						/>
-					</div>
-				</div>
-				<DialogFooter>
-					<Button onClick={handleSubmit}>Create</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
-	);
-};
-
-// New Slot Dialog Component
-const NewSlotDialog = ({ isOpen, onClose, onSubmit, shelves }: NewSlotDialogProps) => {
-	const [content, setContent] = useState("");
-	const [type, setType] = useState<"Nft" | "Markdown" | "Shelf">("Markdown");
-	const [selectedShelfId, setSelectedShelfId] = useState<string>("");
-
-	const handleSubmit = async () => {
-		// If type is Shelf, use the selected shelf ID as content
-		const finalContent = type === "Shelf" ? selectedShelfId : content;
-		await onSubmit(finalContent, type);
-		setContent("");
-		setSelectedShelfId("");
-	};
-
-	return (
-		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Add New Slot</DialogTitle>
-				</DialogHeader>
-				<div className="grid gap-4 py-4">
-					<div className="grid gap-2">
-						<Label>Content Type</Label>
-						<div className="flex gap-4 flex-wrap">
-							<Button
-								variant={type === "Markdown" ? "primary" : "outline"}
-								onClick={() => setType("Markdown")}
-							>
-								Markdown
-							</Button>
-							<Button
-								variant={type === "Nft" ? "primary" : "outline"}
-								onClick={() => setType("Nft")}
-							>
-								NFT
-							</Button>
-							<Button
-								variant={type === "Shelf" ? "primary" : "outline"}
-								onClick={() => setType("Shelf")}
-							>
-								Shelf
-							</Button>
-						</div>
-					</div>
-					<div className="grid gap-2">
-						<Label htmlFor="content">Content</Label>
-						{type === "Markdown" ? (
-							<Textarea
-								id="content"
-								value={content}
-								onChange={(e) => setContent(e.target.value)}
-								placeholder="Enter markdown content..."
-							/>
-						) : type === "Nft" ? (
-							<Input
-								id="content"
-								value={content}
-								onChange={(e) => setContent(e.target.value)}
-								placeholder="Enter NFT ID..."
-							/>
-						) : (
-							<div className="grid gap-2">
-								<Label htmlFor="shelfSelect">Select a Shelf</Label>
-								<select
-									id="shelfSelect"
-									value={selectedShelfId}
-									onChange={(e) => setSelectedShelfId(e.target.value)}
-									className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-								>
-									<option value="">Select a shelf...</option>
-									{shelves?.map((shelf) => (
-										<option key={shelf.shelf_id} value={shelf.shelf_id}>
-											{shelf.title}
-										</option>
-									))}
-								</select>
-							</div>
-						)}
-					</div>
-				</div>
-				<DialogFooter>
-					<Button onClick={handleSubmit} disabled={type === "Shelf" && !selectedShelfId}>Add</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
-	);
 };
 
 // The ShelfDetail component that integrates with the UI component
@@ -745,18 +587,6 @@ const Lexigraph: React.FC = () => {
 					</TabsList>
 					
 					<TabsContent value="my-library">
-						<div className="flex justify-between items-center mb-6">
-							<h1 className="text-2xl font-bold">My Shelves</h1>
-							<Dialog open={isNewShelfDialogOpen} onOpenChange={setIsNewShelfDialogOpen}>
-								<DialogTrigger asChild>
-									<Button>
-										<Plus className="w-4 h-4 mr-2" />
-										New Shelf
-									</Button>
-								</DialogTrigger>
-							</Dialog>
-						</div>
-
 						<LibraryShelvesUI
 							shelves={shelves}
 							loading={loading}
@@ -772,10 +602,6 @@ const Lexigraph: React.FC = () => {
 					</TabsContent>
 					
 					<TabsContent value="explore">
-						<div className="flex justify-between items-center mb-6">
-							<h1 className="text-2xl font-bold">Explore Shelves</h1>
-						</div>
-
 						<ExploreShelvesUI
 							shelves={publicShelves}
 							loading={publicLoading}

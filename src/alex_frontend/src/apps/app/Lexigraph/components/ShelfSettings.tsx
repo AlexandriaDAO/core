@@ -5,7 +5,7 @@ import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/lib/components/collapsible";
 import { Settings } from "lucide-react";
-import { Shelf } from "../../../../../declarations/lexigraph/lexigraph.did";
+import { Shelf } from "../../../../../../declarations/lexigraph/lexigraph.did";
 import { getActorLexigraph } from "@/features/auth/utils/authUtils";
 
 interface ShelfSettingsProps {
