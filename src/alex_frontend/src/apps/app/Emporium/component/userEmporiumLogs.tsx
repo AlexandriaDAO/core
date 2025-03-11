@@ -59,16 +59,16 @@ const columns = [
             }
 
             return (
-                <div style={{ overflowX: "auto" }}>
-                    <Tag className="text-[15px] p-0 whitespace-nowrap bg-[transparent] border-[0] font-medium font-[Syne] dark:text-white">
-                        {actionText}
-                    </Tag>
-                    {record.buyer && (
-                        <div className="mt-[10px] text-sm text-[#333] whitespace-nowrap dark:text-white">
-                            🛒 <b>{action.isBuyer?"Seller":"Buyer"}:</b> <span className="text-[#333] dark:text-white">{action.isBuyer?record.seller:record.buyer}</span>
-                        </div>
-                    )}
-                </div>
+                    <div style={{ overflowX: "auto" }}>
+                        <Tag className="text-[15px] p-0 whitespace-nowrap bg-[transparent] border-[0] font-medium font-[Syne] dark:text-white">
+                            {actionText}
+                        </Tag>
+                        {record.buyer && (
+                            <div className="mt-[10px] text-sm text-[#333] whitespace-nowrap dark:text-white">
+                                🛒 <b>{action.isBuyer?"Seller":"Buyer"}:</b> <span className="text-[#333] dark:text-white">{action.isBuyer?record.seller:record.buyer}</span>
+                            </div>
+                        )}
+                    </div>
             );
         },
     },
@@ -84,33 +84,35 @@ const UserEmporiumLogs: React.FC = () => {
     }, [dispatch]);
 
     return (
-        <div className="p-[20px] bg-white rounded-[8px] shadow-[0px 2px 10px rgba(0, 0, 0, 0.1)] overflow-x-auto dark:bg-[#3A3630]">
-            <h1 className="text-base text-center mb-[20px] text-[#333] font-medium dark:text-white">📜 Logs</h1>
-            {logs.logs.length > 0 && (
-                <Table
-                    columns={columns}
-                    dataSource={logs.logs}
-                    rowKey="timestamp"
-                    className="custom-pagination-table"
-                    rowClassName={(record, index) =>
-                        ` hover:bg-[#F3F3F2] dark:hover:bg-gray-600 ${index % 2 === 0 ? "bg-gray-100 dark:bg-[#2D2A26]" : "bg-white dark:bg-[#3A3630]"} `
-                    }
-                    pagination={{
+        <div className="lg:pb-10 md:pb-8 sm:pb-6 xs:pb-4">
+            <div className="p-[20px] bg-white rounded-[8px] shadow-[0px 2px 10px rgba(0, 0, 0, 0.1)] overflow-x-auto dark:bg-[#3A3630]">
+                <h1 className="text-base text-center mb-[20px] text-[#333] font-medium dark:text-white">📜 Logs</h1>
+                {logs.logs.length > 0 && (
+                    <Table
+                        columns={columns}
+                        dataSource={logs.logs}
+                        rowKey="timestamp"
+                        className="custom-pagination-table"
+                        rowClassName={(record, index) =>
+                            ` hover:bg-[#F3F3F2] dark:hover:bg-gray-600 ${index % 2 === 0 ? "bg-gray-100 dark:bg-[#2D2A26]" : "bg-white dark:bg-[#3A3630]"} `
+                        }
+                        pagination={{
 
-                        total: Number(logs.totalPages) * 10,
-                        pageSize: 10,
-                        onChange: (page, pageSize) => {
-                            dispatch(getUserLogs({ page, pageSize: pageSize.toString() }));
-                        },
-                        className: "custom-pagination"
-                    }}
-                    rowHoverable={false}
-                    scroll={{ x: "max-content" }}
-                    style={{ minWidth: "100%" }}
-                    bordered
-                />
+                            total: Number(logs.totalPages) * 10,
+                            pageSize: 10,
+                            onChange: (page, pageSize) => {
+                                dispatch(getUserLogs({ page, pageSize: pageSize.toString() }));
+                            },
+                            className: "custom-pagination"
+                        }}
+                        rowHoverable={false}
+                        scroll={{ x: "max-content" }}
+                        style={{ minWidth: "100%" }}
+                        bordered
+                    />
 
-            )}
+                )}
+            </div>
         </div>
     );
 }

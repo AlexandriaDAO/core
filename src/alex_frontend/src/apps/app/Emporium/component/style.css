@@ -4,7 +4,11 @@
 .custom-pagination .ant-pagination-item-active a:hover{color: #fff;}
 .custom-pagination .ant-pagination-item-active a {color: #fff;}
 .dark .ant-table-thead tr th{background-color:#808080;}
-
+.dark .custom-pagination .ant-pagination-item-active a{background-color: #fff;color: #000;}
+.dark .custom-pagination .ant-pagination-item a{color: #fff;border-radius: 5px;}
+.dark .custom-pagination .ant-pagination-item{background-color: #0000004d;color: #fff;transition: 0.3s;}
+.dark .custom-pagination .ant-pagination-item-active a{color: #000;}
+.dark .custom-pagination .ant-pagination-item:hover, .dark .custom-pagination .ant-pagination-item:hover a{background-color: #fff;color: #000;}
 
 
 .custom-modal div[data-radix-aspect-ratio-wrapper] {

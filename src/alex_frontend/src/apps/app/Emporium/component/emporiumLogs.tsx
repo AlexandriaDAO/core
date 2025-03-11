@@ -98,31 +98,33 @@ const EmporiumMarketLogs: React.FC = () => {
     }, [dispatch]);
 
     return (
-        <div className="lg:p-10 md:p-8 sm:p-6 xs:p-4 bg-white rounded-[8px] shadow-[0px 2px 10px rgba(0, 0, 0, 0.1)] overflow-x-auto dark:bg-[#3A3630]">
-            <h1 className="text-center mb-[20px] text-[#333] dark:text-white">📜 Marketplace Logs</h1>
-            {logs.logs.length > 0 && (
-                <Table
-                    columns={columns}
-                    dataSource={logs.logs}
-                    rowKey="timestamp"
-                    className="custom-pagination-table"
-                    rowClassName={(record, index) =>
-                        ` hover:bg-[#F3F3F2] dark:hover:bg-gray-600 ${index % 2 === 0 ? "bg-gray-100 dark:bg-[#2D2A26]" : "bg-white dark:bg-[#3A3630]"} `
-                    }
-                    pagination={{
-                        total: Number(logs.totalPages) * 10,
-                        pageSize: 10,
-                        onChange: (page, pageSize) => {
-                            dispatch(getEmporiumMarketLogs({ page, pageSize: pageSize.toString() }));
-                        },
-                          className: "custom-pagination"
-                    }}
-                    bordered
-                    rowHoverable={false}
-                    scroll={{ x: "max-content" }} 
-                    style={{ minWidth: "100%" }}
-                />
-            )}
+        <div className="lg:pb-10 md:pb-8 sm:pb-6 xs:pb-4">
+            <div className="lg:p-10 md:p-8 sm:p-6 xs:p-4 bg-white rounded-[8px] shadow-[0px 2px 10px rgba(0, 0, 0, 0.1)] overflow-x-auto dark:bg-[#3A3630]">
+                <h1 className="text-center mb-[20px] text-[#333] dark:text-white">📜 Marketplace Logs</h1>
+                {logs.logs.length > 0 && (
+                    <Table
+                        columns={columns}
+                        dataSource={logs.logs}
+                        rowKey="timestamp"
+                        className="custom-pagination-table"
+                        rowClassName={(record, index) =>
+                            ` hover:bg-[#F3F3F2] dark:hover:bg-gray-600 ${index % 2 === 0 ? "bg-gray-100 dark:bg-[#2D2A26]" : "bg-white dark:bg-[#3A3630]"} `
+                        }
+                        pagination={{
+                            total: Number(logs.totalPages) * 10,
+                            pageSize: 10,
+                            onChange: (page, pageSize) => {
+                                dispatch(getEmporiumMarketLogs({ page, pageSize: pageSize.toString() }));
+                            },
+                            className: "custom-pagination"
+                        }}
+                        bordered
+                        rowHoverable={false}
+                        scroll={{ x: "max-content" }} 
+                        style={{ minWidth: "100%" }}
+                    />
+                )}
+            </div>
         </div>
         
     );

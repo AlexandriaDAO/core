@@ -45,6 +45,7 @@ service : {
       opt nat64,
       opt text,
       opt nat,
+      opt text,
       opt principal,
       text,
     ) -> (Listing) query;

@@ -1,3 +1,4 @@
+import { natToArweaveId } from "@/utils/id_convert";
 import { LogEntry } from "../../../../../declarations/emporium/emporium.did";
 export const MARKETPLACE_LBRY_FEE = 20; // MarketPlace fee frontend
 export interface TransformedLogEntry {
@@ -65,7 +66,7 @@ export const transformLogEntry = (log: LogEntry,user:string): TransformedLogEntr
 
   return {
     timestamp: log.timestamp.toString(),
-    token_id: log.token_id.toString(),
+    token_id: natToArweaveId(BigInt(log.token_id.toString())),
     seller: log.seller.toText(),
     buyer:
       log.buyer.toString() === "2vxsx-fae" //anyomus principal
