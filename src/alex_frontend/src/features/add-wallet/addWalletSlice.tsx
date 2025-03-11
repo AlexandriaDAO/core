@@ -51,13 +51,28 @@ const addWalletSlice = createSlice({
 			.addCase(importKeyFile.pending, (state) => {
 				state.importing = true;
 			})
+			// .addCase(importKeyFile.fulfilled, (state, action) => {
+			// 	state.importing = false;
+			// 	state.wallet = {
+			// 		address: action.payload.address,
+			// 		key: action.payload.key,
+			// 	};
+			// 	toast.success("Wallet imported successfully");
+			// })
 			.addCase(importKeyFile.fulfilled, (state, action) => {
 				state.importing = false;
-				state.wallet = {
-					address: action.payload.address,
-					key: action.payload.key,
-				};
-				toast.success("Wallet imported successfully");
+
+				// Check if payload is valid
+				if (action.payload?.address && action.payload?.key) {
+					state.wallet = {
+						address: action.payload.address,
+						key: action.payload.key,
+					};
+					toast.success("Wallet imported successfully");
+				} else {
+					state.wallet = null; // Set wallet to null if payload is invalid
+					toast.error("Invalid key file. Please try again.");
+				}
 			})
 			.addCase(importKeyFile.rejected, (state, action) => {
 				state.importing = false;
