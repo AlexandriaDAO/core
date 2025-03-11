@@ -76,19 +76,6 @@ So first let's figure out what's going on with the ordering of the Alexandrian N
 
 
 
-
-
-
-
-
-
-
-
-
-# Backdend optimizations: 
-
-
-
 ## Core Architecture
 
 Your app is built around these primary concepts:
@@ -97,3 +84,33 @@ Your app is built around these primary concepts:
   - Markdown text
   - NFTs
   - References to other shelves (nesting)
+
+
+
+
+
+
+
+
+
+# Frontend optimizations: 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

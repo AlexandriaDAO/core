@@ -2,9 +2,9 @@ import React from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { ArrowLeft, Edit, Plus, X } from "lucide-react";
-import { renderBreadcrumbs } from "../utils";
-import { SlotCard } from './SlotCard';
-import { ShelfDetailUIProps } from './types';
+import { renderBreadcrumbs } from "../../../utils";
+import { SlotCard } from '../components/SlotCard';
+import { ShelfDetailUIProps } from '../types/types';
 import { PrincipalDisplay } from '@/apps/Modules/shared/components/PrincipalDisplay';
 
 export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shelf, Slot } from "../../../../../../declarations/lexigraph/lexigraph.did";
+import { Shelf, Slot } from "../../../../../../../../declarations/lexigraph/lexigraph.did";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { reorderSlot as reorderSlotAction } from "@/apps/Modules/shared/state/lexigraph/lexigraphThunks";
 import { useIdentity } from "@/hooks/useIdentity";

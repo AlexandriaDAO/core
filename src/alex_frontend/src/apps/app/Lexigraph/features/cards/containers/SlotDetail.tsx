@@ -2,8 +2,8 @@ import React from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { ArrowLeft } from "lucide-react";
-import { renderBreadcrumbs, isShelfContent, SlotContentRenderer } from "../utils";
-import { SlotDetailProps } from './types';
+import { renderBreadcrumbs, isShelfContent, SlotContentRenderer } from "../../../utils";
+import { SlotDetailProps } from '../types/types';
 
 export const SlotDetail: React.FC<SlotDetailProps> = ({
   slot,

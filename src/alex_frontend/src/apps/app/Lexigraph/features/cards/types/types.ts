@@ -1,4 +1,4 @@
-import { Shelf, Slot } from "../../../../../../declarations/lexigraph/lexigraph.did";
+import { Shelf, Slot } from "../../../../../../../../declarations/lexigraph/lexigraph.did";
 import React from 'react';
 
 // Shelf related props
