@@ -4,10 +4,7 @@ import { Button } from "@/lib/components/button";
 import useAuth from "@/hooks/useAuth";
 import { useInternetIdentity } from "ic-use-internet-identity";
 import { toast } from "sonner";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { setLoading } from "../loginSlice";
 const IIProcessor = () => {
-    const dispatch = useAppDispatch();
     const { setProvider } = useAuth();
     const { login, isLoggingIn } = useInternetIdentity();
 
@@ -19,8 +16,6 @@ const IIProcessor = () => {
         } catch (error) {
             toast.error('Failed to login');
             console.error(error);
-        } finally {
-            dispatch(setLoading(false));
         }
     }
 
