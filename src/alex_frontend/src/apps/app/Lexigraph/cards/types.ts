@@ -29,6 +29,7 @@ export interface ShelfDetailUIProps {
   handleDragOver: (e: React.DragEvent, index: number) => void;
   handleDragEnd: () => void;
   handleDrop: (e: React.DragEvent, index: number) => void;
+  settingsButton?: React.ReactNode;
 }
 
 export interface LibraryShelvesUIProps {

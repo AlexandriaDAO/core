@@ -44,7 +44,6 @@ type SlotReorderInput = record {
 };
 service : {
   add_shelf_slot : (text, AddSlotInput) -> (Result);
-  delete_shelf : (text) -> (Result);
   get_recent_shelves : (opt nat64, opt nat64) -> (Result_1) query;
   get_shelf : (text) -> (Result_2) query;
   get_shelf_position_metrics : (text) -> (Result_3) query;

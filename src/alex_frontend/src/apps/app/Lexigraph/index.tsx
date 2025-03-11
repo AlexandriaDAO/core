@@ -27,7 +27,7 @@ import {
 	updateShelfMetadata
 } from "@/apps/Modules/shared/state/lexigraph/lexigraphThunks";
 
-
+import { getPrincipalAsString } from "@/apps/Modules/shared/utils/principalUtils";
 import { createFindSlotById, createFindSlotInShelf } from "./utils";
 // Import the UI components from ui-components.tsx
 import {
@@ -37,9 +37,10 @@ import {
 	ExploreShelvesUI,
 	UserShelvesUI
 } from "./cards/index";
-import { ShelfSettings } from "./components/ShelfSettings";
+import { ShelfSettings, ShelfSettingsDialog } from "./features/shelf-settings";
 import NewSlotDialog from "./components/NewSlot";
 import NewShelfDialog from "./components/NewShelf";
+import SlotReorderManager from "./components/SlotReorderManager";
 
 // Props for ShelfDetail
 interface ShelfDetailProps {
@@ -68,38 +69,30 @@ const useShelfOperations = () => {
 		await dispatch(createShelfAction({ 
 			title, 
 			description, 
-			principal: identity.getPrincipal() 
+			principal: identity.getPrincipal()
 		}));
 	}, [identity, dispatch]);
 
-	const addSlot = useCallback(async (shelfId: string, content: string, type: "Nft" | "Markdown" | "Shelf"): Promise<void> => {
+	const addSlot = useCallback(async (shelf: Shelf, content: string, type: "Nft" | "Markdown" | "Shelf", referenceSlotId?: number | null, before?: boolean): Promise<void> => {
 		if (!identity) return;
-		
-		// Find the shelf with the given ID
-		const shelf = shelves.find(s => s.shelf_id === shelfId);
-		if (!shelf) return;
-
 		await dispatch(addSlotAction({ 
 			shelf, 
 			content, 
-			type, 
-			principal: identity.getPrincipal() 
+			type,
+			principal: identity.getPrincipal(),
+			referenceSlotId,
+			before
 		}));
-	}, [identity, dispatch, shelves]);
+	}, [identity, dispatch]);
 
-	const reorderSlot = useCallback(async (
-		shelfId: string, 
-		slotId: number, 
-		referenceSlotId: number | null, 
-		before: boolean
-	): Promise<void> => {
+	const reorderSlot = useCallback(async (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean): Promise<void> => {
 		if (!identity) return;
 		await dispatch(reorderSlotAction({ 
 			shelfId, 
 			slotId, 
 			referenceSlotId, 
-			before, 
-			principal: identity.getPrincipal() 
+			before,
+			principal: identity.getPrincipal()
 		}));
 	}, [identity, dispatch]);
 
@@ -140,7 +133,7 @@ const usePublicShelfOperations = () => {
 	const loading = useAppSelector(selectPublicLoading);
 	const lastTimestamp = useAppSelector(selectLastTimestamp);
 
-	const loadRecentShelvesData = useCallback(async (limit: number = 20, beforeTimestamp?: bigint) => {
+	const loadRecentShelvesData = useCallback(async (limit: number = 20, beforeTimestamp?: string | bigint) => {
 		await dispatch(loadRecentShelves({ limit, beforeTimestamp }));
 	}, [dispatch]);
 
@@ -153,20 +146,30 @@ const usePublicShelfOperations = () => {
 	// Find a slot by ID across all public shelves
 	const findSlotById = createFindSlotById(publicShelves);
 
-	// Ensure public shelves are loaded
+	// Only load public shelves once when the hook is first used
+	const initialLoadRef = React.useRef(false);
 	useEffect(() => {
-		// Only load if the public shelves array is empty and we're not already loading
-		if (publicShelves.length === 0 && !loading) {
+		// Only load once if the public shelves array is empty and we're not already loading
+		if (publicShelves.length === 0 && !loading && !initialLoadRef.current) {
+			initialLoadRef.current = true;
 			loadRecentShelvesData();
 		}
 	}, [publicShelves.length, loading, loadRecentShelvesData]);
+
+	// Explicit refresh function - only call when needed
+	const refreshPublicShelves = useCallback(() => {
+		// Only refresh if not currently loading
+		if (!loading) {
+			loadRecentShelvesData();
+		}
+	}, [loading, loadRecentShelvesData]);
 
 	return {
 		publicShelves,
 		loading,
 		loadMoreShelves,
 		findSlotById,
-		refreshPublicShelves: () => loadRecentShelvesData() // Add a refresh function
+		refreshPublicShelves
 	};
 };
 
@@ -183,15 +186,9 @@ const ShelfDetail = ({
 	const identity = useIdentity();
 	const dispatch = useAppDispatch();
 	
-	// Add edit mode state
-	const [isEditMode, setIsEditMode] = useState(false);
-	const [editedSlots, setEditedSlots] = useState<[number, Slot][]>([]);
-	const [draggedItem, setDraggedItem] = useState<number | null>(null);
-	const [dragOverItem, setDragOverItem] = useState<number | null>(null);
-	
 	// Access the updateMetadata function from ShelfOperations
 	const { updateMetadata } = useShelfOperations();
-
+	
 	// Improved ordered slots calculation
 	const orderedSlots = useMemo(() => {
 		// Extract the slots using the slot_positions array for order
@@ -206,154 +203,69 @@ const ShelfDetail = ({
 			const slotPair = shelf.slots.find(([slotId]) => slotId === id);
 			return slotPair ? slotPair : null;
 		}).filter((slot): slot is [number, Slot] => slot !== null);
-	}, [shelf.slots, shelf.slot_positions]);
-	
-	// Enter edit mode
-	const enterEditMode = () => {
-		// Initialize editedSlots with the current slot order
-		setEditedSlots([...orderedSlots]);
-		setIsEditMode(true);
-		setDraggedItem(null);
-		setDragOverItem(null);
-	};
-	
-	// Existing reorder handler
-	const handleReorder = async (slotId: number, referenceSlotId: number | null, before: boolean) => {
-		if (onReorderSlot) {
-			await onReorderSlot(shelf.shelf_id, slotId, referenceSlotId, before);
-		}
-	};
+	}, [JSON.stringify({ 
+		slots: shelf.slots?.map(([id]) => id), 
+		positions: shelf.slot_positions?.map(([id, pos]) => `${id}:${pos}`)
+	})]);
 	
 	// Existing rebalance handler
 	const handleRebalance = async (shelfId: string) => {
-		if (identity && identity.identity) {
-			const principal = identity.identity.getPrincipal();
-			await dispatch(rebalanceShelfSlots({ 
-				shelfId,
-				principal
-			}));
+		if (!identity || isPublic) return;
+		// Check if identity.identity exists before accessing it
+		if (identity.identity) {
+			const principal = identity.identity.getPrincipal().toString();
+			dispatch(rebalanceShelfSlots({ shelfId, principal }));
 		}
 	};
 	
-	// New handler for saving the edited slots order
-	const saveSlotOrder = async () => {
-		if (identity && identity.identity) {
-			const principal = identity.identity.getPrincipal();
-			
-			try {
-				// Get original order to compare with
-				const originalOrderMap = new Map();
-				orderedSlots.forEach(([id], index) => {
-					originalOrderMap.set(id, index);
-				});
-				
-				// Find the differences and apply each move
-				// We need to reorder one slot at a time using the backend API
-				for (let newIndex = 0; newIndex < editedSlots.length; newIndex++) {
-					const [slotId] = editedSlots[newIndex];
-					const oldIndex = originalOrderMap.get(slotId);
-					
-					// If position has changed
-					if (oldIndex !== newIndex) {
-						// Find the reference slot (the one we'll place this slot before or after)
-						let referenceSlotId: number | null = null;
-						let before = false;
-						
-						if (newIndex === 0) {
-							// If moving to the first position, place before the current first item
-							if (editedSlots.length > 1) {
-								const [firstSlotId] = editedSlots[1];
-								referenceSlotId = firstSlotId;
-								before = true;
-							}
-						} else {
-							// Otherwise, place after the previous item
-							const [prevSlotId] = editedSlots[newIndex - 1];
-							referenceSlotId = prevSlotId;
-							before = false;
-						}
-						
-						// Call the reorderSlot action
-						await dispatch(reorderSlotAction({
-							shelfId: shelf.shelf_id,
-							slotId,
-							referenceSlotId,
-							before,
-							principal
-						}));
-					}
-				}
-				
-				// Exit edit mode after successful updates
-				setIsEditMode(false);
-			} catch (error) {
-				console.error("Failed to save slot order:", error);
-				// Could add error notification here
-			}
-		}
-	};
-	
-	// Drag handlers
-	const handleDragStart = (index: number) => {
-		setDraggedItem(index);
-	};
-	
-	const handleDragOver = (e: React.DragEvent, index: number) => {
-		e.preventDefault();
-		setDragOverItem(index);
-	};
-	
-	const handleDragEnd = () => {
-		// Reset the dragged item
-		setDraggedItem(null);
-		setDragOverItem(null);
-		
-		// If we have both a valid dragged item and drop target
-		if (draggedItem !== null && dragOverItem !== null && draggedItem !== dragOverItem) {
-			// Create a copy of the items
-			const items = [...editedSlots];
-			// Remove the dragged item
-			const draggedItemContent = items[draggedItem];
-			items.splice(draggedItem, 1);
-			// Add it back at the new position
-			items.splice(dragOverItem, 0, draggedItemContent);
-			// Update state
-			setEditedSlots(items);
-		}
-	};
-	
-	const handleDrop = (e: React.DragEvent, index: number) => {
-		e.preventDefault();
-		// The state updates will be handled in dragEnd
-	};
-
-	// Use the UI component
-	const shelfDetailUI = (
-		<ShelfDetailUI
+	return (
+		<SlotReorderManager
 			shelf={shelf}
 			orderedSlots={orderedSlots}
-			isEditMode={isEditMode}
-			editedSlots={editedSlots}
 			isPublic={isPublic}
-			onBack={onBack}
-			onAddSlot={onAddSlot}
-			onViewSlot={onViewSlot}
-			onEnterEditMode={enterEditMode}
-			onCancelEditMode={() => setIsEditMode(false)}
-			onSaveSlotOrder={saveSlotOrder}
-			handleDragStart={handleDragStart}
-			handleDragOver={handleDragOver}
-			handleDragEnd={handleDragEnd}
-			handleDrop={handleDrop}
-		/>
-	);
-
-	return (
-		<div className="container mx-auto p-4">
-			{shelfDetailUI}
-			{/* Show ShelfSettings with rebalance option for owner only, but hide in edit mode */}
-			{!isPublic && !isEditMode && <ShelfSettings shelf={shelf} onRebalance={handleRebalance} onUpdateMetadata={updateMetadata} />}
-		</div>
+		>
+			{({
+				isEditMode,
+				editedSlots,
+				enterEditMode,
+				cancelEditMode,
+				saveSlotOrder,
+				handleDragStart,
+				handleDragOver,
+				handleDragEnd,
+				handleDrop
+			}) => (
+				<div className="container mx-auto p-4">
+					<ShelfDetailUI
+						shelf={shelf}
+						orderedSlots={orderedSlots}
+						isEditMode={isEditMode}
+						editedSlots={editedSlots}
+						isPublic={isPublic}
+						onBack={onBack}
+						onAddSlot={onAddSlot}
+						onViewSlot={onViewSlot}
+						onEnterEditMode={enterEditMode}
+						onCancelEditMode={cancelEditMode}
+						onSaveSlotOrder={saveSlotOrder}
+						handleDragStart={handleDragStart}
+						handleDragOver={handleDragOver}
+						handleDragEnd={handleDragEnd}
+						handleDrop={handleDrop}
+						settingsButton={
+							!isPublic && !isEditMode ? (
+								<ShelfSettingsDialog 
+									shelf={shelf} 
+									onRebalance={handleRebalance} 
+									onUpdateMetadata={updateMetadata}
+									className="mr-2"
+								/>
+							) : undefined
+						}
+					/>
+				</div>
+			)}
+		</SlotReorderManager>
 	);
 };
 
@@ -410,7 +322,7 @@ const Lexigraph: React.FC = () => {
 
 	const handleSubmitNewSlot = useCallback(async (content: string, type: "Nft" | "Markdown" | "Shelf") => {
 		if (selectedShelf) {
-			await addSlot(selectedShelf.shelf_id, content, type);
+			await addSlot(selectedShelf, content, type);
 			setIsNewSlotDialogOpen(false);
 		}
 	}, [selectedShelf, addSlot]);
@@ -464,7 +376,9 @@ const Lexigraph: React.FC = () => {
 		if (isExplore && publicShelves.length === 0 && !publicLoading) {
 			refreshPublicShelves();
 		}
-	}, [isExplore, publicShelves.length, publicLoading, refreshPublicShelves]);
+		// Only run this effect when switching to the explore tab for the first time
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isExplore]);
 
 	// Shelf detail view
 	if (isShelfDetail) {
