@@ -47,8 +47,14 @@ const defaultTransaction: Transaction = {
 const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   const dispatch = useAppDispatch();
   const transactions = useSortedTransactions();
-  const contentData = useSelector((state: RootState) => state.transactions.contentData);
-  const predictions = useSelector((state: RootState) => state.arweave.predictions);
+  const { contentData } = useSelector((state: RootState) => state.transactions);
+  const { searchParams } = useSelector((state: RootState) => state.library);
+  const { transactions: transactionList } = useSelector((state: RootState) => ({
+    transactions: state.transactions.transactions
+  }));
+  const { predictions } = useSelector((state: RootState) => state.arweave);
+  const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
+  const { user } = useSelector((state: RootState) => state.auth);
   const emporium = useAppSelector((state) => state.emporium);
 
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
@@ -191,9 +197,10 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
                   () => setSelectedContent({ id: transaction.id, type: contentType })
                 }
                 id={transaction.id}
+                owner={transaction.owner}
+                isOwned={user && arweaveToNftId[transaction.id] ? nfts[arweaveToNftId[transaction.id]]?.principal === user.principal : false}
                 predictions={predictions[transaction.id]}
                 component="Emporium"
-
               >
                 <div className="group relative w-full p-4 rounded-lg">
                   <div className="text-lg mb-4"></div>

@@ -71,7 +71,15 @@ function Alexandrian() {
 			onCancel={handleCancelSearch}
 			isLoading={isLoading}
 			topComponent={<TopupBalanceWarning />}
-			filterComponent={<AlexandrianLibrary />}
+			filterComponent={
+				<AlexandrianLibrary 
+					defaultCategory="all"
+					defaultPrincipal="new"
+					showPrincipalSelector={true}
+					showCollectionSelector={true}
+					showTagsSelector={true}
+				/>
+			}
 			showMoreEnabled={true}
 			dataSource="transactions"
 			preserveState={assetsLoadedRef.current}

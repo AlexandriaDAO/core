@@ -6,13 +6,23 @@ import { setCollection } from '../../shared/state/librarySearch/librarySlice';
 import { changeCollection } from '../../shared/state/librarySearch/libraryThunks';
 import { ToggleGroup, ToggleGroupItem } from "@/lib/components/toggle-group";
 
-export default function CollectionSelector() {
+interface CollectionSelectorProps {
+  onCollectionChange?: (collection: 'NFT' | 'SBT') => void;
+}
+
+export default function CollectionSelector({ onCollectionChange }: CollectionSelectorProps) {
   const collection = useSelector((state: RootState) => state.library.collection);
   const dispatch = useDispatch<AppDispatch>();
 
   const handleCollectionChange = (value: string) => {
     if (value === 'NFT' || value === 'SBT') {
-      dispatch(changeCollection(value as 'NFT' | 'SBT'));
+      if (onCollectionChange) {
+        // Use custom handler if provided
+        onCollectionChange(value as 'NFT' | 'SBT');
+      } else {
+        // Otherwise use the default behavior
+        dispatch(changeCollection(value as 'NFT' | 'SBT'));
+      }
     }
   };
 

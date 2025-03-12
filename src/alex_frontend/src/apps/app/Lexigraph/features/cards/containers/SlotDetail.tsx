@@ -1,9 +1,11 @@
-import React from 'react';
+import React from "react";
 import { Button } from "@/lib/components/button";
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { ArrowLeft } from "lucide-react";
-import { renderBreadcrumbs, isShelfContent, SlotContentRenderer } from "../../../utils";
+import { renderBreadcrumbs, isShelfContent, SlotContentRenderer, isNftContent } from "../../../utils";
 import { SlotDetailProps } from '../types/types';
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export const SlotDetail: React.FC<SlotDetailProps> = ({
   slot,
@@ -12,26 +14,30 @@ export const SlotDetail: React.FC<SlotDetailProps> = ({
   onBack,
   onBackToShelf
 }) => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { nfts } = useSelector((state: RootState) => state.nftData);
+  
+  // Check if the slot contains an NFT and if it's owned by the current user
+  const isOwned = React.useMemo(() => {
+    if (isNftContent(slot.content)) {
+      const nftId = slot.content.Nft;
+      return user && nfts[nftId]?.principal === user.principal ? true : false;
+    }
+    return false;
+  }, [slot, user, nfts]);
+
   const backButtonLabel = "Back";
   
-  const breadcrumbItems = [
-    { label: backButtonLabel, onClick: onBack },
-    { label: shelf.title, onClick: () => onBackToShelf(shelf.shelf_id) },
-    { label: `Slot ${slotKey}` }
-  ];
-  
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex flex-col gap-4 mb-6">
-        <Button variant="outline" onClick={() => onBackToShelf(shelf.shelf_id)} className="self-start flex items-center gap-2">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Shelf
-        </Button>
-        {renderBreadcrumbs(breadcrumbItems)}
-      </div>
-      
-      <div className="bg-card rounded-lg border p-6">
-        <div className="mb-6">
+    <div className="flex flex-col h-full">
+      <div className="mb-4">
+        {renderBreadcrumbs([
+          { label: backButtonLabel, onClick: onBack },
+          { label: shelf.title, onClick: () => onBackToShelf(shelf.shelf_id) },
+          { label: `Slot ${slotKey}` }
+        ])}
+        
+        <div className="mt-2">
           <h2 className="text-2xl font-bold">Slot {slotKey}</h2>
           <div className="text-sm text-muted-foreground">
             From shelf: <span className="font-medium">{shelf.title}</span>
@@ -42,6 +48,7 @@ export const SlotDetail: React.FC<SlotDetailProps> = ({
           <ContentCard
             id={slot.id.toString()}
             component="Lexigraph"
+            isOwned={isOwned}
             onClick={() => {
               if (isShelfContent(slot.content)) {
                 const shelfContent = slot.content;
