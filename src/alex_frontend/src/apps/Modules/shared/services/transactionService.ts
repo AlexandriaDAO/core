@@ -39,6 +39,60 @@ export class TransactionService {
     this.dispatch(setError(null));
     
     try {
+
+
+      if (userAssetCanisterd) {
+            const assetActor = await getActorUserAssetCanister(userAssetCanisterd);
+            const getContentData = await fetchAssetFromUserCanister(
+              "ContentData",
+              assetActor
+            );
+
+            if (getContentData?.blob) {
+                    try {
+                      const blobData = await getContentData.blob.arrayBuffer();
+                      const textData = new TextDecoder().decode(blobData);
+                      const jsonData = JSON.parse(textData);
+            
+                      let transactions = Array.isArray(jsonData) ? jsonData : [jsonData];
+                      transactions = transactions.filter((tx) =>
+                        arweaveIds.includes(tx.id)
+                      );
+            
+                      const fetchPromises = transactions.map(async (transaction) => {
+                        try {
+                          const result = await fetchAssetFromUserCanister(
+                            transaction.id,
+                            assetActor
+                          );
+            
+                          const assetUrl = result?.blob
+                            ? URL.createObjectURL(result.blob)
+                            : "";
+            
+                          return { id: transaction.id, assetUrl };
+                        } catch (error) {
+                          console.error(
+                            `Failed to fetch asset for transaction ${transaction.id}:`,
+                            error
+                          );
+                          return { id: transaction.id, assetUrl: "" };
+                        }
+                      });
+            
+                      const assetResults = await Promise.all(fetchPromises);
+            
+                      requestedTransactions = requestedTransactions.map((tx) => {
+                        const found = assetResults.find((a) => a.id === tx.id);
+                        return found ? { ...tx, assetUrl: found.assetUrl } : tx;
+                      });
+                    } catch (error) {
+                      console.error("Failed to process data:", error);
+                    }
+                  } else {
+                    console.warn("No data found in ContentData.");
+                  }
+                }
       // Fetch transactions for the Arweave IDs
       const transactions = await fetchTransactionsForAlexandrian(arweaveIds);
       

@@ -112,7 +112,7 @@ export const performSearch = createAsyncThunk<
         if (searchParams.start !== undefined) {
           params.page = Math.floor(searchParams.start / pageSize) + 1;
         }
-        
+        //We  fetched the transaction, loadcontent and balance here
         const result = await dispatch(fetchTokensForPrincipal(params)).unwrap();
         
         // If we need to update the total count
@@ -148,7 +148,8 @@ export const performSearch = createAsyncThunk<
           .map(nft => nft.arweaveId);
 
         const uniqueArweaveIds = [...new Set(arweaveIds)] as string[];
-        await dispatch(updateTransactions(uniqueArweaveIds));
+        // why are we fetching nft content again here we already did in fetchTokensForPrincipal, should keep one of them ? 
+         await dispatch(updateTransactions(uniqueArweaveIds));
       }
     } catch (error) {
       console.error('Search failed:', error);

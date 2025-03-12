@@ -374,7 +374,10 @@ export const fetchTokensForPrincipal = createAsyncThunk<
 
       // Extract just the arweaveIds in the correct order
       const arweaveIds = arweaveIdsWithOrder.map(item => item.arweaveId);
+      // fetchNftTransactions call here 1
+      // load loadContentForTransactions in child 
 
+      
       await dispatch(fetchNftTransactions(arweaveIds) as unknown as AnyAction).unwrap();
 
       // If we're using the 'new' option, make sure all tokens have owner information
