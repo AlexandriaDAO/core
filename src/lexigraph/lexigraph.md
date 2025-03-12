@@ -1,6 +1,7 @@
 ### UX/UI Feature TODO
 
-- Should not make a slot by default.
+- Fix the public/explore functionality.
+- Add owner to the path so you could go to their profile.
 - Connect and a follow button on the shelves.
 - Make the shelf path be connected to the owner.
 - Another thing is the user sharing side. Do we let them add comments or something or other grids in a community section? How do we sort/rank these or do we let users do that themselves?
@@ -75,19 +76,6 @@ So first let's figure out what's going on with the ordering of the Alexandrian N
 
 
 
-
-
-
-
-
-
-
-
-
-# Backdend optimizations: 
-
-
-
 ## Core Architecture
 
 Your app is built around these primary concepts:
@@ -96,3 +84,33 @@ Your app is built around these primary concepts:
   - Markdown text
   - NFTs
   - References to other shelves (nesting)
+
+
+
+
+
+
+
+
+
+# Frontend optimizations: 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

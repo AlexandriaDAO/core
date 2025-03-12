@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
-import { Shelf } from "../../../../../../declarations/lexigraph/lexigraph.did";
+import { Shelf } from "../../../../../../../../declarations/lexigraph/lexigraph.did";
 
 interface DialogProps {
   isOpen: boolean;

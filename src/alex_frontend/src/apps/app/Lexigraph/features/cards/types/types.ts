@@ -1,4 +1,4 @@
-import { Shelf, Slot } from "../../../../../../declarations/lexigraph/lexigraph.did";
+import { Shelf, Slot } from "../../../../../../../../declarations/lexigraph/lexigraph.did";
 import React from 'react';
 
 // Shelf related props
@@ -29,6 +29,7 @@ export interface ShelfDetailUIProps {
   handleDragOver: (e: React.DragEvent, index: number) => void;
   handleDragEnd: () => void;
   handleDrop: (e: React.DragEvent, index: number) => void;
+  settingsButton?: React.ReactNode;
 }
 
 export interface LibraryShelvesUIProps {

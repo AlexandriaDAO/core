@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { convertTimestamp } from "@/utils/general";
-import { ShelfCardProps, PublicShelfCardProps } from './types';
+import { ShelfCardProps, PublicShelfCardProps } from '../types/types';
 
 // Shelf Card Component for the library view
 export const ShelfCard: React.FC<ShelfCardProps> = ({ 

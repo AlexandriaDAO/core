@@ -10,7 +10,7 @@ export interface LexigraphState {
   shelves: Shelf[];
   publicShelves: Shelf[];
   selectedShelf: Shelf | null;
-  lastTimestamp: bigint | undefined;
+  lastTimestamp: string | undefined;  // String representation of BigInt timestamp
   loading: boolean;
   publicLoading: boolean;
   error: string | null;
@@ -37,6 +37,27 @@ const lexigraphSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+    },
+    // Add a reducer for updating a single shelf
+    updateSingleShelf: (state, action: PayloadAction<Shelf>) => {
+      const updatedShelf = action.payload;
+      
+      // Update in shelves array
+      const index = state.shelves.findIndex(shelf => shelf.shelf_id === updatedShelf.shelf_id);
+      if (index !== -1) {
+        state.shelves[index] = updatedShelf;
+      }
+      
+      // Update in publicShelves if present
+      const publicIndex = state.publicShelves.findIndex(shelf => shelf.shelf_id === updatedShelf.shelf_id);
+      if (publicIndex !== -1) {
+        state.publicShelves[publicIndex] = updatedShelf;
+      }
+      
+      // Update selected shelf if it's the same one
+      if (state.selectedShelf && state.selectedShelf.shelf_id === updatedShelf.shelf_id) {
+        state.selectedShelf = updatedShelf;
+      }
     },
   },
   extraReducers: (builder) => {
@@ -71,7 +92,7 @@ const lexigraphSlice = createSlice({
           state.publicShelves = shelves;
         }
         
-        // Update the last timestamp for pagination
+        // Store the lastTimestamp as a string (already converted in the thunk)
         state.lastTimestamp = lastTimestamp;
         state.publicLoading = false;
       })
@@ -83,7 +104,7 @@ const lexigraphSlice = createSlice({
 });
 
 // Export actions and reducer
-export const { setSelectedShelf, clearError } = lexigraphSlice.actions;
+export const { setSelectedShelf, clearError, updateSingleShelf } = lexigraphSlice.actions;
 export default lexigraphSlice.reducer;
 
 // Selectors

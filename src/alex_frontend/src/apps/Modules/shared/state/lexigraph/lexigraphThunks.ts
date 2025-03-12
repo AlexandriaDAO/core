@@ -2,19 +2,35 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Shelf, Slot, SlotContent } from '../../../../../../../declarations/lexigraph/lexigraph.did';
 import { getActorLexigraph } from '@/features/auth/utils/authUtils';
 import { Principal } from '@dfinity/principal';
+import { convertBigIntsToStrings, convertStringsToBigInts } from '@/utils/bgint_convert';
+import { 
+  setSelectedShelf, 
+  updateSingleShelf 
+} from './lexigraphSlice';
 
 // // # QUERY CALLS # // //
 
 // Async thunks
 export const loadShelves = createAsyncThunk(
   'lexigraph/loadShelves',
-  async (principal: Principal, { rejectWithValue }) => {
+  async (principal: Principal | string, { rejectWithValue }) => {
     try {
       const lexigraphActor = await getActorLexigraph();
-      const result = await lexigraphActor.get_user_shelves(principal, []);
+      
+      // Convert string to Principal for the API call if needed
+      const principalForApi = typeof principal === 'string'
+        ? Principal.fromText(principal)
+        : principal;
+      
+      const result = await lexigraphActor.get_user_shelves(principalForApi, []);
       
       if ("Ok" in result) {
-        return result.Ok;
+        // Convert all BigInt values to strings before returning to Redux
+        const shelves = convertBigIntsToStrings(result.Ok);
+        
+        // We keep the owner as a Principal type here to match the Shelf interface
+        // The Principal will be converted to string when needed in the UI
+        return shelves;
       } else {
         return rejectWithValue("Failed to load shelves");
       }
@@ -32,20 +48,39 @@ export const loadRecentShelves = createAsyncThunk(
     beforeTimestamp 
   }: { 
     limit?: number, 
-    beforeTimestamp?: bigint 
+    beforeTimestamp?: string | bigint 
   }, { rejectWithValue }) => {
     try {
       const lexigraphActor = await getActorLexigraph();
+      
+      // Convert string beforeTimestamp to BigInt if necessary
+      let beforeTimestampBigInt: bigint | undefined = undefined;
+      if (beforeTimestamp) {
+        beforeTimestampBigInt = typeof beforeTimestamp === 'string' 
+          ? BigInt(beforeTimestamp) 
+          : beforeTimestamp;
+      }
+      
       const result = await lexigraphActor.get_recent_shelves(
         [BigInt(limit)], 
-        beforeTimestamp ? [beforeTimestamp] : []
+        beforeTimestampBigInt ? [beforeTimestampBigInt] : []
       );
       
       if ("Ok" in result) {
+        // Get the timestamp from the last shelf for pagination
+        const lastShelfTimestamp = result.Ok.length > 0 
+          ? result.Ok[result.Ok.length - 1].created_at 
+          : undefined;
+          
+        // Convert all BigInt values to strings before returning to Redux
+        const shelves = convertBigIntsToStrings(result.Ok);
+        const serializedBeforeTimestamp = beforeTimestampBigInt ? beforeTimestampBigInt.toString() : undefined;
+        const serializedLastTimestamp = lastShelfTimestamp ? lastShelfTimestamp.toString() : undefined;
+        
         return { 
-          shelves: result.Ok, 
-          beforeTimestamp,
-          lastTimestamp: result.Ok.length > 0 ? result.Ok[result.Ok.length - 1].created_at : undefined
+          shelves, 
+          beforeTimestamp: serializedBeforeTimestamp,
+          lastTimestamp: serializedLastTimestamp
         };
       } else {
         return rejectWithValue("Failed to load recent shelves");
@@ -83,7 +118,7 @@ export const loadRecentShelves = createAsyncThunk(
 
 export const createShelf = createAsyncThunk(
   'lexigraph/createShelf',
-  async ({ title, description, principal }: { title: string, description: string, principal: Principal }, { dispatch, rejectWithValue }) => {
+  async ({ title, description, principal }: { title: string, description: string, principal: Principal | string }, { dispatch, rejectWithValue }) => {
     try {
       const lexigraphActor = await getActorLexigraph();
       // Initialize with empty slots array instead of a default slot
@@ -98,7 +133,7 @@ export const createShelf = createAsyncThunk(
       if ("Ok" in result) {
         // Reload shelves after creating a new one
         dispatch(loadShelves(principal));
-        return result.Ok;
+        return convertBigIntsToStrings(result.Ok);
       } else {
         return rejectWithValue("Failed to create shelf");
       }
@@ -122,7 +157,7 @@ export const addSlot = createAsyncThunk(
     shelf: Shelf, 
     content: string, 
     type: "Nft" | "Markdown" | "Shelf",
-    principal: Principal,
+    principal: Principal | string,
     referenceSlotId?: number | null,
     before?: boolean
   }, { dispatch, rejectWithValue }) => {
@@ -148,7 +183,7 @@ export const addSlot = createAsyncThunk(
       if ("Ok" in result) {
         // Reload the shelf data after adding a slot
         dispatch(loadShelves(principal));
-        return { shelf_id: shelf.shelf_id };
+        return convertBigIntsToStrings({ shelf_id: shelf.shelf_id });
       } else {
         return rejectWithValue("Failed to add slot");
       }
@@ -172,8 +207,8 @@ export const reorderSlot = createAsyncThunk(
     slotId: number, 
     referenceSlotId: number | null, 
     before: boolean,
-    principal: Principal
-  }, { dispatch, rejectWithValue }) => {
+    principal: Principal | string
+  }, { dispatch, rejectWithValue, getState }) => {
     try {
       const lexigraphActor = await getActorLexigraph();
       const result = await lexigraphActor.reorder_shelf_slot(
@@ -186,9 +221,15 @@ export const reorderSlot = createAsyncThunk(
       );
       
       if ("Ok" in result) {
-        // Reload shelves after reordering slots
-        dispatch(loadShelves(principal));
-        return { shelfId, slotId, referenceSlotId, before };
+        // Instead of reloading all shelves, just get the specific updated shelf
+        // This is a more targeted approach to avoid full state refresh
+        const specificShelfResult = await lexigraphActor.get_shelf(shelfId);
+        if ("Ok" in specificShelfResult) {
+          // Update just this shelf in the Redux store
+          // We'll handle this in the slice reducer
+          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
+        }
+        return convertBigIntsToStrings({ shelfId, slotId, referenceSlotId, before });
       } else {
         return rejectWithValue("Failed to reorder slot");
       }
@@ -221,15 +262,13 @@ export const updateShelfMetadata = createAsyncThunk(
       );
       
       if ("Ok" in result) {
-        // Get the principal from state if available
-        const state = getState() as { auth: { principal: Principal | null } };
-        const principal = state.auth?.principal;
-        
-        // Reload shelves to refresh the data
-        if (principal) {
-          dispatch(loadShelves(principal));
+        // Get updated shelf data
+        const specificShelfResult = await lexigraphActor.get_shelf(shelfId);
+        if ("Ok" in specificShelfResult) {
+          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
         }
-        return { shelfId, title, description };
+        
+        return convertBigIntsToStrings({ shelfId, title, description });
       } else {
         return rejectWithValue("Failed to update shelf metadata");
       }
@@ -242,15 +281,19 @@ export const updateShelfMetadata = createAsyncThunk(
 
 export const rebalanceShelfSlots = createAsyncThunk(
   'lexigraph/rebalanceShelfSlots',
-  async ({ shelfId, principal }: { shelfId: string, principal: Principal }, { dispatch, rejectWithValue }) => {
+  async ({ shelfId, principal }: { shelfId: string, principal: Principal | string }, { dispatch, rejectWithValue }) => {
     try {
       const lexigraphActor = await getActorLexigraph();
       const result = await lexigraphActor.rebalance_shelf_slots(shelfId);
       
       if ("Ok" in result) {
-        // Reload shelves after rebalancing
-        dispatch(loadShelves(principal));
-        return { shelfId };
+        // Get updated shelf data
+        const specificShelfResult = await lexigraphActor.get_shelf(shelfId);
+        if ("Ok" in specificShelfResult) {
+          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
+        }
+        
+        return convertBigIntsToStrings({ shelfId });
       } else {
         return rejectWithValue("Failed to rebalance shelf slots");
       }

@@ -2,9 +2,10 @@ import React from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { ArrowLeft, Edit, Plus, X } from "lucide-react";
-import { renderBreadcrumbs } from "../utils";
-import { SlotCard } from './SlotCard';
-import { ShelfDetailUIProps } from './types';
+import { renderBreadcrumbs } from "../../../utils";
+import { SlotCard } from '../components/SlotCard';
+import { ShelfDetailUIProps } from '../types/types';
+import { PrincipalDisplay } from '@/apps/Modules/shared/components/PrincipalDisplay';
 
 export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
   shelf,
@@ -21,7 +22,8 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
   handleDragStart,
   handleDragOver,
   handleDragEnd,
-  handleDrop
+  handleDrop,
+  settingsButton
 }) => {
   const backButtonLabel = "Back";
   const breadcrumbItems = [
@@ -60,16 +62,21 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
           <div>
             <h2 className="text-2xl font-bold">{shelf.title}</h2>
             <p className="text-muted-foreground">{shelf.description}</p>
-            {isPublic && (
-              <div className="mt-1">
+            <div className="mt-2 flex items-center gap-2">
+              {isPublic && (
                 <span className="text-xs bg-green-100 text-green-800 rounded-full px-2 py-1">
                   Public
                 </span>
-              </div>
-            )}
+              )}
+              <span className="text-xs text-muted-foreground">
+                Owner: <PrincipalDisplay principal={shelf.owner} />
+              </span>
+            </div>
           </div>
           
           <div className="flex items-center gap-2">
+            {!isEditMode && !isPublic && settingsButton}
+            
             {!isEditMode && !isPublic && (
               <Button
                 variant="outline"

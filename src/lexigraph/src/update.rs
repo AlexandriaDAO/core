@@ -40,6 +40,12 @@ pub async fn store_shelf(
         user_map.insert(caller, user_shelves_set);
     });
 
+    // Add shelf to the global timeline for public discoverability
+    GLOBAL_TIMELINE.with(|timeline| {
+        let mut timeline_map = timeline.borrow_mut();
+        timeline_map.insert(now, shelf_id.clone());
+    });
+
     Ok(())
 }
 

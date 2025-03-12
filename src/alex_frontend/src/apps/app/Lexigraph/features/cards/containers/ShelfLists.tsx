@@ -2,8 +2,8 @@ import React from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { ArrowLeft, Plus } from "lucide-react";
-import { ShelfCard, PublicShelfCard } from './ShelfCard';
-import { LibraryShelvesUIProps, ExploreShelvesUIProps, UserShelvesUIProps } from './types';
+import { ShelfCard, PublicShelfCard } from '../components/ShelfCard';
+import { LibraryShelvesUIProps, ExploreShelvesUIProps, UserShelvesUIProps } from '../types/types';
 
 // Library Shelves UI Component
 export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = ({

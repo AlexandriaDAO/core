@@ -1,7 +1,7 @@
 import React from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
-import { renderSlotContent } from "../utils";
-import { SlotCardProps } from './types';
+import { renderSlotContent } from "../../../utils";
+import { SlotCardProps } from '../types/types';
 
 export const SlotCard: React.FC<SlotCardProps> = ({ 
   slot, 
