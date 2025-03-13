@@ -1,10 +1,13 @@
 ### UX/UI Feature TODO
 
+- We screwed up the default principal selection a little bit on alexandrian.
+  
 - Fix the public/explore functionality.
 - Add owner to the path so you could go to their profile.
 - Connect and a follow button on the shelves.
 - Make the shelf path be connected to the owner.
 - Another thing is the user sharing side. Do we let them add comments or something or other grids in a community section? How do we sort/rank these or do we let users do that themselves?
+- Most links to /shelf/slot, are not open access and require login which shouldn't be.
 
 
 
@@ -84,21 +87,6 @@ Your app is built around these primary concepts:
   - Markdown text
   - NFTs
   - References to other shelves (nesting)
-
-
-
-
-
-
-
-
-
-# Frontend optimizations: 
-
-
-
-
-
 
 
 

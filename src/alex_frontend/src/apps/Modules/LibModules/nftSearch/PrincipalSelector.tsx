@@ -37,6 +37,10 @@ interface PrincipalData {
   hasNFTs: boolean;
 }
 
+interface PrincipalSelectorProps {
+  defaultPrincipal?: 'new' | 'self' | string;
+}
+
 const network = process.env.DFX_NETWORK === "ic" ? "mainnet" : "devnet";
 
 const TEST_PRINCIPALS: NFTUserInfo[] = [
@@ -63,7 +67,7 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
   }
 ];
 
-export default function PrincipalSelector() {
+export default function PrincipalSelector({ defaultPrincipal = 'new' }: PrincipalSelectorProps) {
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const noResults = useSelector((state: RootState) => state.library.noResults);
@@ -119,6 +123,18 @@ export default function PrincipalSelector() {
     }
   };
 
+  // Get the actual principal to use based on defaultPrincipal value
+  const getActualPrincipal = React.useCallback(() => {
+    if (defaultPrincipal === 'self' && userPrincipal) {
+      return userPrincipal;
+    } else if (defaultPrincipal === 'self' && !userPrincipal) {
+      // If 'self' is specified but user is not logged in, fall back to 'new'
+      console.warn("User principal not available, falling back to 'new'");
+      return 'new';
+    }
+    return defaultPrincipal;
+  }, [defaultPrincipal, userPrincipal]);
+
   // Combined effect for initialization and data fetching
   React.useEffect(() => {
     const initialize = async () => {
@@ -127,15 +143,24 @@ export default function PrincipalSelector() {
       
       // Then handle initialization if not done yet
       if (!hasInitialized) {
-        // Force selection of 'new' and trigger search regardless of what's in the state
-        await dispatch(togglePrincipal('new'));
-        await dispatch(togglePrincipalSelection('new'));
-        setHasInitialized(true);
+        try {
+          const principalToUse = getActualPrincipal();
+          // Initialize with the configured default principal
+          await dispatch(togglePrincipalSelection(principalToUse));
+          setHasInitialized(true);
+        } catch (error) {
+          console.error("Error initializing principal selection:", error);
+          // Fall back to 'new' if there's an error
+          if (defaultPrincipal !== 'new') {
+            await dispatch(togglePrincipalSelection('new'));
+          }
+          setHasInitialized(true);
+        }
       }
     };
     
     initialize();
-  }, [userPrincipal, collection, hasInitialized, dispatch]);
+  }, [userPrincipal, collection, hasInitialized, dispatch, getActualPrincipal]);
 
   const handlePrincipalSelect = async (principalId: string) => {
     // For 'new' option or My Library, always allow selection

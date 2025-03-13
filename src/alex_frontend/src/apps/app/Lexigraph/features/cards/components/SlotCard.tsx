@@ -1,35 +1,46 @@
 import React from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
-import { renderSlotContent } from "../../../utils";
+import { renderSlotContent, isNftContent } from "../../../utils";
 import { SlotCardProps } from '../types/types';
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export const SlotCard: React.FC<SlotCardProps> = ({ 
   slot, 
   slotId, 
-  onClick, 
+  onClick = () => {}, 
   isEditMode = false,
   dragHandlers
 }) => {
-  // Handle the onClick event based on edit mode
-  const handleClick = () => {
-    if (!isEditMode && onClick) {
-      onClick();
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { nfts } = useSelector((state: RootState) => state.nftData);
+  
+  // Check if the slot contains an NFT and if it's owned by the current user
+  const isOwned = React.useMemo(() => {
+    if (isNftContent(slot.content)) {
+      const nftId = slot.content.Nft;
+      return user && nfts[nftId]?.principal === user.principal ? true : false;
     }
+    return false;
+  }, [slot, user, nfts]);
+
+  const handleClick = () => {
+    onClick();
   };
 
-  // We'll wrap the ContentCard in a div that handles the drag events
   return (
     <div 
-      className={`relative ${isEditMode ? 'cursor-move' : 'cursor-pointer'}`}
+      className="slot-card" 
       draggable={isEditMode}
-      onDragStart={isEditMode ? dragHandlers?.onDragStart : undefined}
-      onDragOver={isEditMode ? dragHandlers?.onDragOver : undefined}
-      onDragEnd={isEditMode ? dragHandlers?.onDragEnd : undefined}
-      onDrop={isEditMode ? dragHandlers?.onDrop : undefined}
+      onDragStart={isEditMode && dragHandlers?.onDragStart ? () => dragHandlers.onDragStart?.() : undefined}
+      onDragOver={isEditMode && dragHandlers?.onDragOver ? (e) => dragHandlers.onDragOver?.(e) : undefined}
+      onDragEnd={isEditMode && dragHandlers?.onDragEnd ? () => dragHandlers.onDragEnd?.() : undefined}
+      onDrop={isEditMode && dragHandlers?.onDrop ? (e) => dragHandlers.onDrop?.(e) : undefined}
     >
       <ContentCard
         onClick={handleClick}
         id={slotId.toString()}
+        isOwned={isOwned}
         component="Lexigraph"
       >
         <div className="p-4 w-full h-full flex flex-col">

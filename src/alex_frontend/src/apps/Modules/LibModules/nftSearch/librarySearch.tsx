@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
@@ -9,7 +9,11 @@ import { loadContentForTransactions } from "../../shared/state/transactions/tran
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/lib/components/select";
-import { setSearchParams } from "../../shared/state/librarySearch/librarySlice";
+import { setSearchParams, togglePrincipal, setCollection } from "../../shared/state/librarySearch/librarySlice";
+import { performSearch, togglePrincipalSelection } from "../../shared/state/librarySearch/libraryThunks";
+import { clearNfts } from "../../shared/state/nftData/nftDataSlice";
+import { createTokenAdapter, TokenType } from "../../shared/adapters/TokenAdapter";
+import { Principal } from "@dfinity/principal";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
@@ -139,13 +143,75 @@ const NFTPagination = () => {
 
 interface LibrarySearchProps {
   defaultCategory?: 'favorites' | 'all';
+  defaultPrincipal?: 'new' | 'self' | string;
+  showPrincipalSelector?: boolean;
+  showCollectionSelector?: boolean;
+  showTagsSelector?: boolean;
 }
 
-export default function LibrarySearch({ defaultCategory = 'favorites' }: LibrarySearchProps) {
+export default function LibrarySearch({ 
+  defaultCategory = 'favorites',
+  defaultPrincipal = 'new',
+  showPrincipalSelector = true,
+  showCollectionSelector = true,
+  showTagsSelector = true
+}: LibrarySearchProps) {
   const dispatch = useDispatch<AppDispatch>();
   const transactionData = useSelector((state: RootState) => state.transactions.transactions);
   const isTransactionUpdated = useSelector((state: RootState) => state.transactions.isUpdated);
+  const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
+  const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal?.toString());
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Store the actual principal we want to keep selected 
+  const [preservedPrincipal, setPreservedPrincipal] = useState<string | null>(null);
+  
+  // Initialize the preservedPrincipal on mount
+  useEffect(() => {
+    // If defaultPrincipal is 'self', use the userPrincipal
+    if (defaultPrincipal === 'self' && userPrincipal) {
+      setPreservedPrincipal(userPrincipal);
+    } else {
+      setPreservedPrincipal(defaultPrincipal);
+    }
+  }, [defaultPrincipal, userPrincipal]);
+  
+  // Track changes to selectedPrincipals and update preservedPrincipal
+  useEffect(() => {
+    if (selectedPrincipals.length > 0 && !showPrincipalSelector) {
+      setPreservedPrincipal(selectedPrincipals[0]);
+    }
+  }, [selectedPrincipals, showPrincipalSelector]);
+  
+  // Custom handler for collection changes
+  const handleCollectionChange = useCallback(async (collection: 'NFT' | 'SBT') => {
+    try {
+      // Keep track of the principal we want to maintain
+      const principalToKeep = preservedPrincipal || 
+        (defaultPrincipal === 'self' ? userPrincipal : defaultPrincipal);
+      
+      // Clear existing NFT data
+      dispatch(clearNfts());
+      
+      // Set the new collection type
+      dispatch(setCollection(collection));
+      
+      // Ensure the principal is still selected
+      if (principalToKeep) {
+        await dispatch(togglePrincipalSelection(principalToKeep));
+      }
+      
+      // Manually trigger a search with the new settings
+      dispatch(performSearch());
+    } catch (error) {
+      console.error('Error changing collection:', error);
+    }
+  }, [dispatch, preservedPrincipal, defaultPrincipal, userPrincipal]);
+  
+  // Pass the custom collection change handler to CollectionSelector
+  const wrappedCollectionSelector = useCallback(() => {
+    return <CollectionSelector onCollectionChange={handleCollectionChange} />;
+  }, [handleCollectionChange]);
 
   useEffect(() => {
     let isMounted = true;
@@ -179,10 +245,10 @@ export default function LibrarySearch({ defaultCategory = 'favorites' }: Library
           {/* First row: Principal and Collection selectors */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
             <div className="flex flex-col space-y-2">
-              <PrincipalSelector />
-              <CollectionSelector />
+              {showPrincipalSelector && <PrincipalSelector defaultPrincipal={defaultPrincipal} />}
+              {showCollectionSelector && wrappedCollectionSelector()}
             </div>
-            <LibraryContentTagsSelector defaultCategory={defaultCategory} />
+            {showTagsSelector && <LibraryContentTagsSelector defaultCategory={defaultCategory} />}
           </div>
           
           {/* Second row: Pagination controls (full width) */}

@@ -187,11 +187,6 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                     </div>
                   )}
                   <TransactionDetails transaction={transaction} />
-                  {isOwned && (
-                    <div className="absolute top-0 right-0 bg-green-500 text-white px-2 py-1 text-xs z-30">
-                      Owned
-                    </div>
-                  )}
                   {isOwned && canWithdraw && (
                     <Button
                       onClick={(e) => {
