@@ -167,6 +167,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                 } : undefined}
                 predictions={predictions[transaction.id]}
                 isMinting={mintingStates[transaction.id]}
+                isFromAssetCanister={ (transaction.assetUrl&&transaction?.assetUrl!=="")?true:false}
               >
                 <div className="group relative w-full h-full">
                   <ContentRenderer

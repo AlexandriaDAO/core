@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { SearchContainer } from '@/apps/Modules/shared/components/SearchContainer';
 import { AlexandrianLibrary } from "@/apps/Modules/LibModules/nftSearch";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
 import { clearAllTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
 import AssetManager from "@/apps/Modules/shared/components/AssetManager";
+import { use } from "echarts";
 
 function Alexandrian() {
 	const dispatch = useDispatch<AppDispatch>();
@@ -61,11 +62,13 @@ function Alexandrian() {
 		dispatch(clearAllTransactions());
 		toast.info("Search cancelled");
 	}, [dispatch]);
-
+useEffect(()=>{
+	handleSearch()
+},[searchParams.start])
 	return (
 		<>
 			<div className="rounded-lg">
-				 <AssetManager />
+			 {/* <AssetManager /> */}
 				{/* {selectedPrincipals[0] === user?.principal && <AssetManager />} */}
 				</div>
 			<SearchContainer

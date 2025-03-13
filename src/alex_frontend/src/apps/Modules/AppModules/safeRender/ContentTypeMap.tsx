@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { BookOpen, File, Play, Music } from 'lucide-react';
 import { Reader } from "@/features/reader";
@@ -49,6 +49,19 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   const { theme } = useTheme();
   const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || 'application/octet-stream';
   const { fullUrl, coverUrl, thumbnailUrl } = contentUrls;
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+  // Handle blob URL cleanup
+  useEffect(() => {
+    if (fullUrl.startsWith('blob:')) {
+      setBlobUrl(fullUrl);
+      return () => {
+        URL.revokeObjectURL(fullUrl);
+      };
+    } else {
+      setBlobUrl(fullUrl);
+    }
+  }, [fullUrl]);
 
   const commonProps = {
     className: `${inModal ? 'w-full h-full sm:object-cover xs:object-fill rounded-xl' : 'absolute inset-0 w-full h-full object-cover'}`,
@@ -82,7 +95,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
         return (
           <ReaderProvider>
             <div className="h-[85vh] w-[800px] max-w-[95vw]">
-              <Reader bookUrl={fullUrl} />
+              <Reader bookUrl={blobUrl||fullUrl} />
             </div>
           </ReaderProvider>
         );
@@ -113,7 +126,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
               </div>
             </div>
             <audio 
-              src={fullUrl}
+              src={blobUrl||fullUrl}
               controls
               className="w-full relative z-30"
               onError={() => handleRenderError(transaction.id)}
@@ -128,7 +141,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
         {inModal ? (
           <div className="flex items-center justify-center">
             <video 
-              src={fullUrl}
+              src={blobUrl||fullUrl}
               controls
               playsInline
               controlsList="nodownload"
@@ -170,7 +183,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
       inModal ? (
         <div className="flex items-center justify-center">
           <img 
-            src={fullUrl} 
+            src={blobUrl||fullUrl} 
             alt="Content" 
             decoding="async"
             className="max-w-[95vw] max-h-[90vh] w-auto h-auto object-contain"
@@ -181,7 +194,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
       ) : (
         <AspectRatio ratio={1}>
           <img 
-            src={fullUrl} 
+            src={blobUrl||fullUrl} 
             alt="Content" 
             decoding="async"
             className="absolute inset-0 w-full h-full object-cover"
@@ -336,7 +349,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
         {inModal ? (
           <div className="w-[800px] max-w-[95vw] h-[90vh]">
             <iframe
-              src={`${fullUrl}#view=FitH`}
+              src={`${blobUrl||fullUrl}#view=FitH`}
               className="w-full h-full"
               sandbox="allow-scripts allow-same-origin"
               title="PDF Viewer"
@@ -357,7 +370,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
               <AspectRatio ratio={1}>
                 <div className="relative w-full h-full">
                   <iframe
-                    src={`${fullUrl}#page=1&view=FitH&zoom=50&toolbar=0&navpanes=0`}
+                    src={`${blobUrl||fullUrl}#page=1&view=FitH&zoom=50&toolbar=0&navpanes=0`}
                     className="w-full h-full rounded-lg"
                     sandbox="allow-scripts allow-same-origin"
                     title="PDF Preview"

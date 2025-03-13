@@ -213,30 +213,30 @@ export default function LibrarySearch({
     return <CollectionSelector onCollectionChange={handleCollectionChange} />;
   }, [handleCollectionChange]);
 
-  useEffect(() => {
-    let isMounted = true;
+  // useEffect(() => {
+  //   let isMounted = true;
 
-    const loadContent = async () => {
-      if (transactionData.length > 0 && !isLoading) {
-        setIsLoading(true);
-        try {
-          await dispatch(loadContentForTransactions(transactionData));
-        } catch (error) {
-          console.error('Error loading content:', error);
-        } finally {
-          if (isMounted) {
-            setIsLoading(false);
-          }
-        }
-      }
-    };
+  //   const loadContent = async () => {
+  //     if (transactionData.length > 0 && !isLoading) {
+  //       setIsLoading(true);
+  //       try {
+  //         await dispatch(loadContentForTransactions(transactionData));
+  //       } catch (error) {
+  //         console.error('Error loading content:', error);
+  //       } finally {
+  //         if (isMounted) {
+  //           setIsLoading(false);
+  //         }
+  //       }
+  //     }
+  //   };
 
-    loadContent();
+  //   loadContent();
 
-    return () => {
-      isMounted = false;
-    };
-  }, [dispatch, transactionData, isTransactionUpdated]);
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, [dispatch, transactionData, isTransactionUpdated]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-[8px] md:rounded-[12px] shadow-md p-2 sm:p-3">

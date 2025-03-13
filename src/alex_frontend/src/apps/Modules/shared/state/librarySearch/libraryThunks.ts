@@ -149,7 +149,7 @@ export const performSearch = createAsyncThunk<
 
         const uniqueArweaveIds = [...new Set(arweaveIds)] as string[];
         // why are we fetching nft content again here we already did in fetchTokensForPrincipal, should keep one of them ? 
-         await dispatch(updateTransactions(uniqueArweaveIds));
+         //await dispatch(updateTransactions(uniqueArweaveIds));
       }
     } catch (error) {
       console.error('Search failed:', error);
