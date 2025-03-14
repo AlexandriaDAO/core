@@ -1,3 +1,5 @@
+import { toast } from "sonner";
+
 export function calculateBytes(data: { name: string; value: string }[]): {
     total: number;
     details: { name: string; nameBytes: number; valueBytes: number; total: number }[];
@@ -53,4 +55,15 @@ export const readFileAsBuffer = (file: File): Promise<Buffer> => {
 
         reader.readAsArrayBuffer(file);
     });
+};
+
+
+export const copyToClipboard = async (text: string) => {
+    try {
+        await navigator.clipboard.writeText(text);
+        toast.success("Copied to clipboard");
+    } catch (err) {
+        console.error("Failed to copy text: ", err);
+        toast.error("Failed to copy text");
+    }
 };

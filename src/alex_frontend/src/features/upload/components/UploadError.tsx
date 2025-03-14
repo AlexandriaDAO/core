@@ -1,33 +1,26 @@
 import React from "react";
-import { XCircle } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
+import { Alert } from "@/components/Alert";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
-interface UploadErrorProps {
-	file: File | null;
-	error: string | null;
-}
+const UploadError: React.FC = () => {
+	const { uploadError, fetchError, selectError } = useAppSelector(state => state.upload);
 
-const UploadError: React.FC<UploadErrorProps> = ({ file, error = "Unknown Error" }) => {
+	let title = "Error!!";
+	if (fetchError) {
+		title = "Error while fetching wallets";
+	} else if (selectError) {
+		title = "Error while selecting a wallet";
+	} else if (uploadError) {
+		title = "Error while uploading the file";
+	}
+	const message = uploadError || fetchError || selectError || "Unknown Error";
+
 	return (
-		<div className="bg-secondary rounded-lg shadow-md">
-			<div className="p-4 border-b">
-				<div className="flex items-center justify-between">
-					<div className="flex items-center space-x-3">
-						<XCircle
-							className="w-6 h-6 text-destructive"
-							strokeWidth={2}
-						/>
-						<div>
-							<h3 className="text-lg font-medium text-info">
-								Upload Failed
-							</h3>
-							<p className="text-sm text-gray-500">{file?.name || 'An unknown error occurred'}</p>
-						</div>
-					</div>
-					<p className="text-sm text-info">{error}</p>
-				</div>
-			</div>
-		</div>
-	);
+		<Alert variant="danger" title={title} icon={TriangleAlert} className="w-full text-left border-none border-l-2 border-l-destructive">
+			{message}
+		</Alert>
+	)
 };
 
 export default UploadError;

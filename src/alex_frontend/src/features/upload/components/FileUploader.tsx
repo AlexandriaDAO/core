@@ -4,10 +4,11 @@ import { useAlexWallet } from "@/hooks/actors";
 import { toast } from "sonner";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import uploadFile from "../thunks/uploadFile";
-import { reset } from "../uploadSlice";
+import { reset, setContentType, setFileSelector, setTextEditor, ContentType } from "../uploadSlice";
 import { Button } from "@/lib/components/button";
 import fetchWallets from "../thunks/fetchWallets";
 import selectWallet from "../thunks/selectWallet";
+import { Check } from "lucide-react";
 
 interface FileUploaderProps {
     file: File | null;
@@ -18,7 +19,7 @@ function FileUploader({file, setFile}: FileUploaderProps) {
     const dispatch = useAppDispatch();
     const {actor} = useAlexWallet();
 
-    const {cost} = useAppSelector(state=>state.upload)
+    const { type, estimating, fetching, selecting, uploading, transaction} = useAppSelector(state=>state.upload);
 
     const handleFileUpload = async() => {
         if(!file){
@@ -56,24 +57,33 @@ function FileUploader({file, setFile}: FileUploaderProps) {
     }
 
     const handleCancel = () => {
+        const contentType = type;
+
         setFile(null);
         dispatch(reset());
+
+        dispatch(setContentType(contentType));
+        dispatch(setFileSelector(contentType == ContentType.Local));
+        dispatch(setTextEditor(contentType == ContentType.Manual));
     }
 
 	return (
-        <div className="flex justify-end space-x-3 pt-4 border-t mt-4">
+        <div className="w-full flex justify-between items-center">
             <Button
+                disabled={fetching || selecting || uploading || !!transaction}
                 onClick={handleCancel}
-                variant="muted"
+                variant="outline"
             >
                 Cancel
             </Button>
             <Button
                 onClick={handleFileUpload}
-                disabled={!cost}
+                disabled={!file || estimating || fetching || selecting || uploading || !!transaction }
                 variant="inverted"
             >
-                Upload file
+                {estimating ? "Estimating..." : fetching ? "Fetching..." : selecting ? "Selecting..." : uploading ? "Uploading..." : !!transaction ? <>
+                    <Check size={18} className="mr-1"/> Uploaded
+                </> : "Upload file"}
             </Button>
         </div>
 	);

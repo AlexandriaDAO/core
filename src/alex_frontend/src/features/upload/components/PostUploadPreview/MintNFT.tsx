@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { ArrowUpToLine, CheckCircle2, LoaderPinwheel, RotateCcw } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import { ArrowUpToLine, Check, LoaderPinwheel, RotateCcw } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import useNftManager from "@/hooks/actors/useNftManager";
@@ -12,6 +12,8 @@ const MintNFT: React.FC = () => {
 	const {transaction, minting, minted, mintError} = useAppSelector(state=>state.upload);
 
 	const {actor} = useNftManager();
+
+    const mintAttemptedRef = useRef<string | null>(null);
 
     const handleMint = async(e: React.MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
@@ -28,16 +30,20 @@ const MintNFT: React.FC = () => {
         dispatch(mintNFT({actor}));
     }
 
-    // useEffect(()=>{
-    //     if(!transaction || !actor || minting || (minted && minted == transaction)) return;
+    useEffect(() => {
+        if (
+            !transaction ||
+            !actor ||
+            minting ||
+            (minted && minted === transaction) ||
+            mintAttemptedRef.current === transaction
+        ) return;
 
-    //     console.log("Transaction: ", transaction);
-    //     console.log("Actor: ", actor);
-    //     console.log("Minting: ", minting);
-    //     console.log("Minted: ", minted);
+        // Mark this transaction as attempted to prevent repeated minting attempts
+        mintAttemptedRef.current = transaction;
 
-    //     dispatch(mintNFT({actor}));
-    // }, [transaction, actor, minting, minted, dispatch]);
+        dispatch(mintNFT({actor}));
+    }, [transaction, actor, minting, minted, dispatch]);
 
 	return (
         <div className="mt-6 pt-4 border-t">
@@ -58,7 +64,7 @@ const MintNFT: React.FC = () => {
                 {
 
                     minting ? <Button variant="outline" disabled={true}> <LoaderPinwheel size={18} className="animate-spin"/> Minting </Button> : 
-                        minted == transaction ? <Button variant="constructive" disabled={true}> <CheckCircle2 size={18}/> Minted </Button> : 
+                        minted == transaction ? <Button variant="constructive" disabled={true}> <Check size={18} className="mr-1"/>  Minted </Button> : 
                             mintError ? <Button variant="warning" onClick={handleMint}> <RotateCcw size={16}/> Try Again </Button> : <Button onClick={handleMint} variant="outline"> <ArrowUpToLine size={16}/> Mint NFT </Button>
 
                 }
