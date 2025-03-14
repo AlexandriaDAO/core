@@ -12,12 +12,10 @@ import { useShelfOperations, usePublicShelfOperations } from "../features/shelf-
 
 // Import UI components
 import {
-  ShelfDetailUI,
   LibraryShelvesUI,
   ExploreShelvesUI,
   UserShelvesUI
 } from "../features/cards";
-import { ShelfSettings, ShelfSettingsDialog } from "../features/shelf-settings";
 import { NewSlotDialog } from "../features/slots";
 import { NewShelfDialog, ShelfDetail } from "../features/shelf-management/components";
 
@@ -161,8 +159,16 @@ const LexigraphLayout: React.FC = () => {
   };
   
   return (
-    <div className="container mx-auto p-4">
-      {renderView()}
+    <>
+      {/* Render the shelf detail view directly without any wrappers */}
+      {isShelfDetail && selectedShelf ? (
+        renderView()
+      ) : (
+        /* Use container for other views */
+        <div className="container mx-auto p-4">
+          {renderView()}
+        </div>
+      )}
       
       {/* Dialogs */}
       <NewShelfDialog 
@@ -176,7 +182,7 @@ const LexigraphLayout: React.FC = () => {
         onClose={() => setIsNewSlotDialogOpen(false)}
         onSubmit={handleNewSlotSubmit}
       />
-    </div>
+    </>
   );
 };
 
