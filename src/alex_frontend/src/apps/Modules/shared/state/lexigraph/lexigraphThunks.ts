@@ -164,6 +164,8 @@ export const addSlot = createAsyncThunk(
     try {
       const lexigraphActor = await getActorLexigraph();
       
+      console.log(`Adding ${type} content to shelf: ${shelf.title}, content: ${content.substring(0, 20)}${content.length > 20 ? '...' : ''}`);
+      
       // Use the add_shelf_slot method instead of updating the entire shelf
       const slotContent: SlotContent = type === "Nft" 
         ? { Nft: content } as SlotContent
@@ -184,12 +186,40 @@ export const addSlot = createAsyncThunk(
         // Reload the shelf data after adding a slot
         dispatch(loadShelves(principal));
         return convertBigIntsToStrings({ shelf_id: shelf.shelf_id });
+      } else if ("Err" in result) {
+        // Enhanced error handling for specific backend errors
+        const errorMessage = result.Err;
+        console.error("Backend error adding slot:", errorMessage);
+        return rejectWithValue(errorMessage);
       } else {
-        return rejectWithValue("Failed to add slot");
+        return rejectWithValue("Unknown error adding slot");
       }
     } catch (error) {
+      // Better error message handling
       console.error("Failed to add slot:", error);
-      return rejectWithValue("Failed to add slot");
+      
+      let errorMessage = "Failed to add slot";
+      
+      // Try to extract more detailed error message
+      if (error instanceof Error) {
+        // Check if there's a more specific error message in the error object
+        if (error.message.includes("Rejected")) {
+          // Parse the rejection message which is often a nested structure
+          try {
+            const match = error.message.match(/Reject text: ['"](.*?)['"]/);
+            if (match && match[1]) {
+              errorMessage = match[1];
+            }
+          } catch (e) {
+            // If parsing fails, use the original error message
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      return rejectWithValue(errorMessage);
     }
   }
 );

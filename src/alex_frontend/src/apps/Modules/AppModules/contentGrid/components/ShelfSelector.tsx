@@ -32,11 +32,11 @@ interface Shelf {
 }
 
 interface ShelfSelectorProps {
-  nftId: string;
+  nftId: string; // This is actually the arweaveId
   onClose: () => void;
 }
 
-const ShelfSelector: React.FC<ShelfSelectorProps> = ({ nftId, onClose }) => {
+const ShelfSelector: React.FC<ShelfSelectorProps> = ({ nftId: arweaveId, onClose }) => {
   const { identity } = useIdentity();
   const dispatch = useAppDispatch();
   const [selectedShelfId, setSelectedShelfId] = useState<string>("");
@@ -44,6 +44,11 @@ const ShelfSelector: React.FC<ShelfSelectorProps> = ({ nftId, onClose }) => {
   const shelves = useAppSelector(selectShelves);
   const isLoading = useAppSelector(selectLoading);
   const currentShelf = useAppSelector(selectSelectedShelf);
+  
+  // Get the arweaveToNftId mapping from Redux
+  const arweaveToNftId = useAppSelector(state => state.nftData.arweaveToNftId);
+  // Get the actual NFT ID from the mapping
+  const actualNftId = arweaveToNftId[arweaveId];
   
   // Load shelves on mount if they aren't already loaded
   useEffect(() => {
@@ -55,6 +60,7 @@ const ShelfSelector: React.FC<ShelfSelectorProps> = ({ nftId, onClose }) => {
   // Filter out shelves that already have this NFT
   const availableShelves = React.useMemo(() => {
     if (!shelves || !shelves.length) return [];
+    if (!actualNftId) return shelves; // Show all shelves if no actual NFT ID is found
     
     // Create a filtered list of shelves that don't already contain this NFT
     return shelves.filter(shelf => {
@@ -63,17 +69,24 @@ const ShelfSelector: React.FC<ShelfSelectorProps> = ({ nftId, onClose }) => {
       
       // Check each slot to see if it contains this NFT
       const hasNft = Array.from(shelf.slots).some(([_, slot]) => {
-        return slot.content && 'Nft' in slot.content && slot.content.Nft === nftId;
+        return slot.content && 'Nft' in slot.content && slot.content.Nft === actualNftId;
       });
       
       // Only include shelves that don't already have this NFT
       return !hasNft;
     });
-  }, [shelves, nftId]);
+  }, [shelves, actualNftId]);
 
   const handleSubmit = useCallback(async () => {
     if (!selectedShelfId || !identity) {
       toast.error("Please select a shelf");
+      return;
+    }
+    
+    // Check if we have the actual NFT ID
+    if (!actualNftId) {
+      toast.error("Could not find NFT ID for this item");
+      console.error(`No NFT ID found for arweave ID: ${arweaveId}`);
       return;
     }
     
@@ -88,10 +101,12 @@ const ShelfSelector: React.FC<ShelfSelectorProps> = ({ nftId, onClose }) => {
         return;
       }
       
-      // Add the NFT to the selected shelf
+      console.log(`Adding NFT with ID: ${actualNftId} to shelf: ${selectedShelf.title}`);
+      
+      // Add the NFT to the selected shelf using the actual NFT ID
       await dispatch(addSlot({ 
         shelf: selectedShelf, 
-        content: nftId, 
+        content: actualNftId, // Use the actual NFT ID instead of arweaveId
         type: "Nft",
         principal: identity.getPrincipal()
       }));
@@ -100,11 +115,11 @@ const ShelfSelector: React.FC<ShelfSelectorProps> = ({ nftId, onClose }) => {
       onClose();
     } catch (error) {
       console.error("Error adding NFT to shelf:", error);
-      toast.error("Failed to add NFT to shelf");
+      toast.error(`Failed to add NFT to shelf: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedShelfId, identity, shelves, dispatch, nftId, onClose]);
+  }, [selectedShelfId, identity, shelves, dispatch, actualNftId, arweaveId, onClose]);
 
   if (isLoading) {
     return (
@@ -119,6 +134,21 @@ const ShelfSelector: React.FC<ShelfSelectorProps> = ({ nftId, onClose }) => {
     return (
       <div className="flex flex-col items-center justify-center p-8">
         <p className="text-muted-foreground">You don't have any shelves yet.</p>
+        <Button 
+          onClick={onClose} 
+          className="mt-4"
+        >
+          Close
+        </Button>
+      </div>
+    );
+  }
+
+  // Show message if NFT ID couldn't be found
+  if (!actualNftId) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8">
+        <p className="text-muted-foreground">Could not find NFT data for this item.</p>
         <Button 
           onClick={onClose} 
           className="mt-4"

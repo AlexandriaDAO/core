@@ -50,7 +50,7 @@ NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I 09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
-
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal yvjik-zehkk-qo7nr-t4r7a-2aomx-mnp6e-htymf-r2adf-d7gjm-bpu3e-aae)
 
 
 

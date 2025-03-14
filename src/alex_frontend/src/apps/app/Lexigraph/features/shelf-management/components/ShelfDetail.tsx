@@ -27,7 +27,6 @@ export interface ShelfDetailProps {
 	onBack: () => void;
 	onAddSlot?: (shelf: Shelf) => void;
 	onReorderSlot?: (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean) => Promise<void>;
-	onViewSlot: (slotId: number) => void;
 	isPublic?: boolean;
 }
 
@@ -37,7 +36,6 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 	onBack,
 	onAddSlot,
 	onReorderSlot,
-	onViewSlot,
 	isPublic = false
 }) => {
 	const pathInfo = parsePathInfo(window.location.pathname);
@@ -102,7 +100,7 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 						isPublic={isPublic}
 						onBack={onBack}
 						onAddSlot={onAddSlot}
-						onViewSlot={onViewSlot}
+						onViewSlot={(slotId: number) => {}}
 						onEnterEditMode={enterEditMode}
 						onCancelEditMode={cancelEditMode}
 						onSaveSlotOrder={saveSlotOrder}

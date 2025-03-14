@@ -8,26 +8,20 @@ export const ROUTES = {
   BASE: '/app/lexigraph',
   MY_LIBRARY: '/app/lexigraph/my-library',
   MY_LIBRARY_SHELF: '/app/lexigraph/my-library/shelf/:shelfId',
-  MY_LIBRARY_SLOT: '/app/lexigraph/my-library/slot/:slotId',
   EXPLORE: '/app/lexigraph/explore',
   EXPLORE_SHELF: '/app/lexigraph/explore/shelf/:shelfId',
-  EXPLORE_SLOT: '/app/lexigraph/explore/slot/:slotId',
   USER: '/app/lexigraph/user/:userId',
   USER_SHELF: '/app/lexigraph/user/:userId/shelf/:shelfId',
-  USER_SLOT: '/app/lexigraph/user/:userId/slot/:slotId',
 };
 
 // Route builder functions
 export const buildRoutes = {
   myLibrary: () => ROUTES.MY_LIBRARY,
   myLibraryShelf: (shelfId: string) => `/app/lexigraph/my-library/shelf/${shelfId}`,
-  myLibrarySlot: (slotId: number) => `/app/lexigraph/my-library/slot/${slotId}`,
   explore: () => ROUTES.EXPLORE,
   exploreShelf: (shelfId: string) => `/app/lexigraph/explore/shelf/${shelfId}`,
-  exploreSlot: (slotId: number) => `/app/lexigraph/explore/slot/${slotId}`,
   user: (userId: string) => `/app/lexigraph/user/${userId}`,
   userShelf: (userId: string, shelfId: string) => `/app/lexigraph/user/${userId}/shelf/${shelfId}`,
-  userSlot: (userId: string, slotId: number) => `/app/lexigraph/user/${userId}/slot/${slotId}`,
 };
 
 // Parse path information used across multiple components
@@ -48,7 +42,7 @@ export const parsePathInfo = (path: string) => {
 // Custom hook for Lexigraph navigation
 export const useLexigraphNavigation = () => {
   const navigate = useNavigate();
-  const params = useParams<{ shelfId?: string; slotId?: string; userId?: string }>();
+  const params = useParams<{ shelfId?: string; userId?: string }>();
   const location = useLocation();
   
   // Determine the current view based on URL path
@@ -83,16 +77,6 @@ export const useLexigraphNavigation = () => {
     }
   };
 
-  const goToSlot = (slotId: number) => {
-    if (isExplore) {
-      navigate(buildRoutes.exploreSlot(slotId));
-    } else if (isUserView && (userId || params.userId)) {
-      navigate(buildRoutes.userSlot(userId || params.userId || '', slotId));
-    } else {
-      navigate(buildRoutes.myLibrarySlot(slotId));
-    }
-  };
-
   const goToUser = (userId: string | Principal) => {
     const userIdString = userId.toString();
     navigate(buildRoutes.user(userIdString));
@@ -115,7 +99,6 @@ export const useLexigraphNavigation = () => {
     userId,
     goToShelves,
     goToShelf,
-    goToSlot,
     goToUser,
     switchTab
   };
@@ -124,24 +107,24 @@ export const useLexigraphNavigation = () => {
 // Custom hook to determine current view based on route params
 export const useViewState = () => {
   const { params, isMyLibrary, isExplore, isUserView } = useLexigraphNavigation();
-  const { shelfId, slotId, userId } = params;
+  const { shelfId, userId } = params;
   
   // Determine if we're showing a detail view
   const isShelfDetail = !!shelfId;
-  const isSlotDetail = !!slotId;
-  const isUserDetail = !!userId && !shelfId && !slotId;
+  
+  const isUserDetail = !!userId && !shelfId;
   
   // Determine if we're showing the main view
-  const isMainView = !userId && !shelfId && !slotId;
+  const isMainView = !userId && !shelfId;
   
   // Determine if we're in a public context
   const isPublicContext = isExplore || isUserView;
   
   return {
-    params: { shelfId, slotId, userId },
+    params: { shelfId, userId },
     viewFlags: { 
       isMyLibrary, isExplore, isUserView,
-      isShelfDetail, isSlotDetail, isUserDetail, isMainView, isPublicContext
+      isShelfDetail, isUserDetail, isMainView, isPublicContext
     }
   };
 }; 
