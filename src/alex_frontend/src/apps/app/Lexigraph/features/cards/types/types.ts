@@ -21,7 +21,7 @@ export interface ShelfDetailUIProps {
   isPublic: boolean;
   onBack: () => void;
   onAddSlot?: (shelf: Shelf) => void;
-  onViewSlot: (slotId: number) => void;
+  onViewSlot?: (slotId: number) => void;
   onEnterEditMode: () => void;
   onCancelEditMode: () => void;
   onSaveSlotOrder: () => Promise<void>;
@@ -51,26 +51,4 @@ export interface UserShelvesUIProps {
   loading: boolean;
   onBack: () => void;
   onViewShelf: (shelfId: string) => void;
-}
-
-// Slot related props
-export interface SlotCardProps {
-  slot: Slot;
-  slotId: number;
-  onClick?: () => void;
-  isEditMode?: boolean;
-  dragHandlers?: {
-    onDragStart?: () => void;
-    onDragOver?: (e: React.DragEvent) => void;
-    onDragEnd?: () => void;
-    onDrop?: (e: React.DragEvent) => void;
-  };
-}
-
-export interface SlotDetailProps {
-  slot: Slot;
-  shelf: Shelf;
-  slotKey: number;
-  onBack: () => void;
-  onBackToShelf: (shelfId: string) => void;
 } 

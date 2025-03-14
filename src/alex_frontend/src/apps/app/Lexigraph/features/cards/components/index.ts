@@ -1,2 +1,1 @@
-export * from './ShelfCard';
-export * from './SlotCard'; 
+export * from './ShelfCard'; 

@@ -20,6 +20,21 @@ export function arweaveIdToNat(arweaveId: string): bigint {
 }
 
 export function natToArweaveId(num: bigint): string {
+    // Check if it's likely a scion ID (approximately > 90 characters when as string)
+    const numStr = num.toString();
+    
+    // If it's a scion ID, convert it to original ID first
+    if (numStr.length > 90) {
+        // Extract principal hash (first 64 bits after shifting right)
+        const shifted = num >> 256n;
+        const mask = (1n << 64n) - 1n;
+        const principalHash = shifted & mask;
+        
+        // Reconstruct original number using XOR
+        const shiftedHash = principalHash << 256n;
+        num = num ^ shiftedHash;
+    }
+    
     // Convert BigInt to Uint8Array
     const idBytes = bigIntToBytes(num);
 

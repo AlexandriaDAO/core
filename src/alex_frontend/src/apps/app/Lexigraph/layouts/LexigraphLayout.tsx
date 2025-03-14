@@ -8,12 +8,10 @@ import {
   setSelectedShelf, 
   selectSelectedShelf,
 } from "@/apps/Modules/shared/state/lexigraph/lexigraphSlice";
-import { createFindSlotInShelf } from "../utils";
 import { useShelfOperations, usePublicShelfOperations } from "../features/shelf-management/hooks";
 
 // Import UI components
 import {
-  SlotDetail,
   ShelfDetailUI,
   LibraryShelvesUI,
   ExploreShelvesUI,
@@ -35,17 +33,15 @@ const LexigraphLayout: React.FC = () => {
   const { 
     goToShelves, 
     goToShelf, 
-    goToSlot, 
     switchTab
   } = useLexigraphNavigation();
   
   // Use the view state hook
   const { viewFlags, params } = useViewState();
-  const { shelfId, slotId, userId } = params;
+  const { shelfId, userId } = params;
   const { 
     isExplore, 
     isShelfDetail,
-    isSlotDetail,
     isUserDetail,
     isMainView,
     isPublicContext
@@ -99,28 +95,6 @@ const LexigraphLayout: React.FC = () => {
   
   // Render the appropriate view based on the route
   const renderView = () => {
-    // If we're viewing a specific slot
-    if (isSlotDetail && slotId !== undefined) {
-      // Find the slot in the selected shelf
-      if (selectedShelf) {
-        const findSlot = createFindSlotInShelf(selectedShelf);
-        const slot = findSlot(Number(slotId));
-        
-        if (slot) {
-          return (
-            <SlotDetail 
-              slot={slot} 
-              shelf={selectedShelf}
-              slotKey={Number(slotId)}
-              onBack={goToShelves}
-              onBackToShelf={(shelfId) => goToShelf(shelfId)}
-            />
-          );
-        }
-      }
-      return <div>Slot not found</div>;
-    }
-    
     // If we're viewing a specific shelf
     if (isShelfDetail && selectedShelf) {
       return (
@@ -129,7 +103,6 @@ const LexigraphLayout: React.FC = () => {
           onBack={goToShelves}
           onAddSlot={!isPublicContext ? handleAddSlot : undefined}
           onReorderSlot={!isPublicContext ? handleReorderSlot : undefined}
-          onViewSlot={(slotId) => goToSlot(slotId)}
           isPublic={isPublicContext}
         />
       );

@@ -97,6 +97,17 @@ pub struct AddSlotInput {
 
 /// Checks if an NFT (either original or SBT) is owned by the caller
 async fn verify_nft_ownership(nft_id: &str, caller: Principal) -> Result<bool, String> {
+    // First validate that we have a proper NFT ID format
+    // NFT IDs should be numerical and quite long
+    if !nft_id.chars().all(|c| c.is_digit(10)) {
+        return Err(format!("Invalid NFT ID format: '{}'. The ID must be numeric. You may be trying to use an Arweave transaction ID instead of the actual NFT ID.", nft_id));
+    }
+    
+    // Additional length validation (NFT IDs are typically very long numbers)
+    if nft_id.len() < 10 {
+        return Err(format!("Invalid NFT ID: '{}'. NFT IDs are typically long numeric strings (>10 digits).", nft_id));
+    }
+    
     // Use different canister based on ID length
     // SBTs have longer IDs (95 chars) compared to NFTs (73 chars)
     let is_sbt = nft_id.len() > 90;
@@ -108,8 +119,12 @@ async fn verify_nft_ownership(nft_id: &str, caller: Principal) -> Result<bool, S
     };
     
     // Convert string ID to Nat for canister call
-    let token_nat = Nat::from_str(nft_id)
-        .map_err(|_| format!("Invalid NFT ID format: {}", nft_id))?;
+    let token_nat = match Nat::from_str(nft_id) {
+        Ok(nat) => nat,
+        Err(_) => {
+            return Err(format!("Could not convert '{}' to a valid NFT ID. Make sure you're using the actual NFT ID and not the Arweave transaction ID.", nft_id));
+        }
+    };
     
     // Call owner_of on the appropriate canister
     let owner_call_result: CallResult<(Vec<Option<Account>>,)> = ic_cdk::call(
@@ -125,7 +140,7 @@ async fn verify_nft_ownership(nft_id: &str, caller: Principal) -> Result<bool, S
                 return Ok(account.owner == caller);
             }
             // No owner returned means NFT doesn't exist
-            Ok(false)
+            Err(format!("NFT with ID '{}' not found or has no owner", nft_id))
         },
         Err((code, msg)) => {
             Err(format!("Error fetching owner for NFT {}: {:?} - {}", nft_id, code, msg))
