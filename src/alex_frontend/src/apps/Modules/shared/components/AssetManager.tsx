@@ -11,6 +11,7 @@ const AssetManager = () => {
   const user = useAppSelector((state) => state.auth);
   const nftData = useAppSelector((state) => state.nftData)
   const assetManager = useAppSelector((state) => state.assetManager);
+  const { selectedPrincipals } = useAppSelector((state) => state.library);
   const [userAssetCanister, setUserAssetCanister] = useState<string | null>(null);
   const [syncProgress, setSyncProgress] = useState<syncProgressInterface>({
     currentItem: "",
@@ -57,10 +58,8 @@ const AssetManager = () => {
 
   }, [assetManager.userAssetCanister])
 
-  // need to hide details for user 
-  // we need to add service or something to enable background sycning
 
-  return (<div className="border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 py-5 px-5 rounded-2xl absolute right-[50px] top-[150px] w-96">
+  return (<div>{selectedPrincipals[0] === user.user?.principal && <div className="border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 py-5 px-5 rounded-2xl absolute right-[50px] top-[150px] w-96">
     {userAssetCanister === null ? (
       <div className="p-6 max-w-md w-full text-center">
         <Description>Asset Canister</Description>
@@ -81,14 +80,15 @@ const AssetManager = () => {
         <p className="text-lg text-gray-600 mb-4">
           <span className="font-mono font-semibold text-[#7F8EA3]">{assetManager.userAssetCanister}</span>
         </p>
-        <Button disabled={assetManager.isLoading} className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors" onClick={() => { sync() }} >
+        {/* <Button disabled={assetManager.isLoading} className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors" onClick={() => { sync() }} >
           Sync  {assetManager.isLoading ? (
             <LoaderPinwheel className="animate-spin mr-2" />
           ) : null}
-        </Button>
+        </Button> */}
+        <h1>Cycles ≈  {assetManager.cycles}</h1>
       </div>
     )}
-    <h1>Cycles ≈  {assetManager.cycles}</h1>
+
     {//syncProgress?.currentItem!="" && (
       // <div className="w-full max-w-md space-y-3">
       //   <h1 className='text-xl'>Synced :{syncProgress.totalSynced}</h1>
@@ -131,6 +131,7 @@ const AssetManager = () => {
     }
 
 
+  </div>}
   </div>);
 }
 export default AssetManager;

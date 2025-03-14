@@ -25,7 +25,7 @@ export const createAssetCanister = createAsyncThunk<
       const assetManagerCanisterId = process.env.CANISTER_ID_ASSET_MANAGER!;
       const actorLbryLedger = await getLbryActor();
       let amountFormatApprove: bigint = BigInt(
-        Number((Number(1) + 0.04) * 10 ** 8).toFixed(0)
+        Number((Number(10) + 0.04) * 10 ** 8).toFixed(0)
       );
       const checkApproval = await actorLbryLedger.icrc2_allowance({
         account: {
@@ -142,9 +142,7 @@ export const syncNfts = createAsyncThunk<
         BigInt(10000)
       );
 
-      if (result.length === 0) {
-        console.warn("No tokens found for the specified user.");
-      }
+      
 
       // Convert token IDs to arweave IDs using the adapter
       const tokens: string[] = [];
@@ -174,10 +172,8 @@ export const syncNfts = createAsyncThunk<
         throw new Error("Failed to upload transaction data.");
       }
 
-      console.log("Transaction data uploaded successfully!");
 
       // Step 2: Upload NFTs one by one
-      console.log("tokens are ", tokens);
       tokens.reduce(async (prevPromise, token) => {
         await prevPromise; //  before starting the next one
         const result = await uploadAsset({
@@ -190,7 +186,6 @@ export const syncNfts = createAsyncThunk<
         });
       }, Promise.resolve()); // Initial value to start the chain
 
-      //  upload({ assetCanisterId: assetManager.userAssetCanister, setUploadProgress })
       return "";
     } catch (error) {
       console.error("Error fetching NFTs:", error);

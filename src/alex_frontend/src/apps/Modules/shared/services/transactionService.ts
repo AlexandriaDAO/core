@@ -116,6 +116,8 @@ export class TransactionService {
         this.dispatch(setTransactions(transactions));
       // Load content for each transaction
         await this.loadContentForTransactions(transactions);
+                 
+
 
       return transactions;
     } catch (error) {
@@ -272,6 +274,8 @@ export class TransactionService {
   removeTransaction(id: string): void {
     this.dispatch(removeTransactionAction(id));
   }
+
+  
 }
 
 // Singleton instance

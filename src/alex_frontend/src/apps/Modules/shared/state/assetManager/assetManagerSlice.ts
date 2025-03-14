@@ -81,7 +81,7 @@ const assetManagerSlice = createSlice({
       .addCase(fetchUserNfts.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-        toast.error(action.payload as string);
+        // toast.error(action.payload as string);
       })
       .addCase(getAssetList.pending, (state) => {
         state.error = null;
@@ -92,7 +92,7 @@ const assetManagerSlice = createSlice({
       })
       .addCase(getAssetList.rejected, (state, action) => {
         state.error = action.payload as string;
-        toast.error(action.payload as string);
+        // toast.error(action.payload as string);
       })
       .addCase(syncNfts.pending, (state) => {
         state.isLoading = true;
@@ -100,13 +100,12 @@ const assetManagerSlice = createSlice({
       })
       .addCase(syncNfts.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success("Synced!");
         state.error = null;
       })
       .addCase(syncNfts.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-        toast.error(action.payload as string);
+        // toast.error(action.payload as string);
       })
       .addCase(getCanisterCycles.pending, (state) => {
         state.error = null;

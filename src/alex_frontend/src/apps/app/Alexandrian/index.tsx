@@ -14,7 +14,7 @@ import { use } from "echarts";
 
 function Alexandrian() {
 	const dispatch = useDispatch<AppDispatch>();
-	const { isLoading, searchParams,selectedPrincipals } = useSelector((state: RootState) => state.library);
+	const { isLoading, searchParams, selectedPrincipals } = useSelector((state: RootState) => state.library);
 	const transactions = useSelector((state: RootState) => state.transactions.transactions);
 	const nfts = useSelector((state: RootState) => state.nftData.nfts);
 	const { user } = useSelector((state: RootState) => state.auth);
@@ -62,15 +62,14 @@ function Alexandrian() {
 		dispatch(clearAllTransactions());
 		toast.info("Search cancelled");
 	}, [dispatch]);
-useEffect(()=>{
-	handleSearch()
-},[searchParams.start])
+	useEffect(() => {
+		handleSearch()
+	}, [searchParams.start])
 	return (
 		<>
 			<div className="rounded-lg">
-			 {/* <AssetManager /> */}
-				{/* {selectedPrincipals[0] === user?.principal && <AssetManager />} */}
-				</div>
+				<AssetManager />
+			</div>
 			<SearchContainer
 				title="Alexandrian"
 				description="Search the NFT Library of others, and manage your own."
@@ -81,14 +80,14 @@ useEffect(()=>{
 				isLoading={isLoading}
 				topComponent={<TopupBalanceWarning />}
 				filterComponent={
-				<AlexandrianLibrary 
-					defaultCategory="all"
-					defaultPrincipal="new"
-					showPrincipalSelector={true}
-					showCollectionSelector={true}
-					showTagsSelector={true}
-				/>
-			}
+					<AlexandrianLibrary
+						defaultCategory="all"
+						defaultPrincipal="new"
+						showPrincipalSelector={true}
+						showCollectionSelector={true}
+						showTagsSelector={true}
+					/>
+				}
 				showMoreEnabled={true}
 				dataSource="transactions"
 				preserveState={assetsLoadedRef.current}

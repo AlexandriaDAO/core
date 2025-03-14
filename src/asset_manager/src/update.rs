@@ -124,7 +124,7 @@ async fn deduct_payment(
     amount: u64,
     from_subaccount: Option<[u8; 32]>,
 ) -> Result<BlockIndex, String> {
-    let canister_id: Principal = ic_cdk::api::id();
+    let lbry_canister_id: Principal = Principal::from_text(LBRY_CANISTER_ID).expect("Invalid principal");
 
     let big_int_amount: BigUint = BigUint::from(amount);
     let amount: Nat = Nat(big_int_amount);
@@ -143,7 +143,7 @@ async fn deduct_payment(
         // if not specified, the default fee for the canister is used
         fee: None,
         // the account we want to transfer tokens to
-        to: canister_id.into(),
+        to: lbry_canister_id.into(),
         // a timestamp indicating when the transaction was created by the caller; if it is not specified by the caller then this is set to the current ICP time
         created_at_time: None,
     };
@@ -152,7 +152,7 @@ async fn deduct_payment(
     ic_cdk::call::<(TransferFromArgs,), (Result<BlockIndex, TransferFromError>,)>(
         // 2. Convert a textual representation of a Principal into an actual `Principal` object. The principal is the one we specified in `dfx.json`.
         //    `expect` will panic if the conversion fails, ensuring the code does not proceed with an invalid principal.
-        Principal::from_text(LBRY_CANISTER_ID).expect("Could not decode the principal."),
+        lbry_canister_id,
         // 3. Specify the method name on the target canister to be called, in this case, "icrc1_transfer".
         "icrc2_transfer_from",
         // 4. Provide the arguments for the call in a tuple, here `transfer_args` is encapsulated as a single-element tuple.
