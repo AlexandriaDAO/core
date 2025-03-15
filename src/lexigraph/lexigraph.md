@@ -100,5 +100,3 @@ Your app is built around these primary concepts:
 
 
 
-
-

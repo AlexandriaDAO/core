@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
-import { ArrowLeft, Edit, Plus, X } from "lucide-react";
+import { ArrowLeft, Edit, Plus, X, Grid, List } from "lucide-react";
 import { renderBreadcrumbs, isNftContent, isShelfContent, isMarkdownContent } from "../../../utils";
 import { ShelfDetailUIProps } from '../types/types';
 import { PrincipalDisplay } from '@/apps/Modules/shared/components/PrincipalDisplay';
@@ -11,411 +11,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import ContentRenderer from "@/apps/Modules/AppModules/safeRender/ContentRenderer";
 import { clearTransactionContent, setContentData } from "@/apps/Modules/shared/state/transactions/transactionSlice";
-import { useEffect, useState } from "react";
-import { natToArweaveId } from '@/utils/id_convert';
+import { useState } from "react";
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
-import { fetchTransactionById } from '@/apps/Modules/LibModules/arweaveSearch/api/directArweaveClient';
 import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import { Badge } from "@/lib/components/badge";
-import { toast } from "sonner";
-import { Principal } from '@dfinity/principal';
-import { ALEX } from '../../../../../../../../declarations/ALEX';
-import { LBRY } from '../../../../../../../../declarations/LBRY';
-import { nft_manager } from '../../../../../../../../declarations/nft_manager';
-import { updateNftBalances, setNFTs } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
-import { copyToClipboard } from '@/apps/Modules/AppModules/contentGrid/utils/clipboard';
-import { Check, Link, Database, Copy, User, Heart } from "lucide-react";
-import { getNftOwnerInfo } from '@/apps/Modules/shared/utils/nftOwner';
-import { formatPrincipal, formatBalance, convertE8sToToken } from '@/apps/Modules/shared/utils/tokenUtils';
-import { createTokenAdapter, determineTokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
-// Import SingleTokenView component for direct reuse if needed
-import SingleTokenView from '@/apps/Modules/AppModules/blinks/SingleTokenView';
 
-// Constants
-const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
-
-// NFT Token Display Component - extracted from SingleTokenView
-const NftDisplay = ({ tokenId, onViewDetails, inShelf = false }: { 
-  tokenId: string; 
-  onViewDetails?: (tokenId: string) => void;
-  inShelf?: boolean;
-}) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [transaction, setTransaction] = useState<Transaction | null>(null);
-  const [contentUrls, setContentUrls] = useState<any>(null);
-  const [copiedPrincipal, setCopiedPrincipal] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
-  const [copiedTokenId, setCopiedTokenId] = useState(false);
-  const [ownerInfo, setOwnerInfo] = useState<any | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  
-  const dispatch = useDispatch<AppDispatch>();
-  const contentData = useSelector((state: RootState) => state.transactions.contentData);
-  const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
-  const { user } = useSelector((state: RootState) => state.auth);
-
-  // Load NFT data on component mount
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadNFTData() {
-      if (!tokenId) return;
-
-      try {
-        setIsLoading(true);
-        console.log('Loading NFT data for tokenId:', tokenId);
-        
-        const tokenType = determineTokenType(tokenId);
-        const tokenAdapter = createTokenAdapter(tokenType);
-        const nftId = BigInt(tokenId);
-        
-        let ogId: bigint;
-        if (tokenType === 'SBT') {
-          ogId = await nft_manager.scion_to_og_id(nftId);
-        } else {
-          ogId = nftId;
-        }
-        
-        // Get Arweave ID for this token
-        const arweaveId = await tokenAdapter.tokenToNFTData(nftId, '').then(data => data.arweaveId);
-        console.log('Converted to arweaveId:', arweaveId);
-        
-        // Fetch transaction data from Arweave
-        const txData = await fetchTransactionById(arweaveId);
-        console.log('Fetched transaction data:', txData);
-        
-        if (!txData) {
-          console.error('Transaction not found for arweaveId:', arweaveId);
-          toast.error('Transaction not found');
-          return;
-        }
-        
-        if (mounted) {
-          setTransaction(txData);
-          
-          // Load content and URLs
-          const content = await ContentService.loadContent(txData);
-          const urls = await ContentService.getContentUrls(txData, content);
-          setContentUrls(urls);
-          
-          // Set content in Redux store
-          dispatch(setContentData({ 
-            id: txData.id, 
-            content: {
-              ...content,
-              urls
-            }
-          }));
-          
-          // Get NFT owner info
-          const info = await getNftOwnerInfo(tokenId);
-          setOwnerInfo(info);
-        }
-
-        // Get balances for this NFT
-        const subaccount = await nft_manager.to_nft_subaccount(nftId);
-        const balanceParams = {
-          owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-          subaccount: [Array.from(subaccount)] as [number[]]
-        };
-
-        const [alexBalance, lbryBalance] = await Promise.all([
-          ALEX.icrc1_balance_of(balanceParams),
-          LBRY.icrc1_balance_of(balanceParams)
-        ]);
-
-        if (mounted) {
-          const alexTokens = convertE8sToToken(alexBalance);
-          const lbryTokens = convertE8sToToken(lbryBalance);
-
-          // Update NFT data in Redux store
-          dispatch(setNFTs({
-            [tokenId]: {
-              collection: tokenType,
-              principal: ownerInfo?.principal || '',
-              arweaveId: arweaveId,
-              balances: { alex: alexTokens, lbry: lbryTokens }
-            }
-          }));
-          
-          dispatch(updateNftBalances({
-            tokenId,
-            alex: alexTokens,
-            lbry: lbryTokens,
-            collection: tokenType
-          }));
-        }
-      } catch (error) {
-        console.error('Failed to load NFT:', error);
-        if (mounted) {
-          toast.error('Failed to load NFT data');
-        }
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-    
-    loadNFTData();
-    
-    return () => {
-      mounted = false;
-    };
-  }, [tokenId, dispatch]);
-
-  // Error handler for ContentRenderer
-  const handleRenderError = (transactionId?: string) => {
-    if (transaction) {
-      ContentService.clearTransaction(transactionId || transaction.id);
-    }
-  };
-
-  // Copy handlers
-  const handleCopyPrincipal = async (e: React.MouseEvent, principal: string) => {
-    e.stopPropagation();
-    const copied = await copyToClipboard(principal);
-    if (copied) {
-      setCopiedPrincipal(true);
-      setTimeout(() => setCopiedPrincipal(false), 2000);
-    }
-  };
-
-  const handleCopyLink = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const lbryUrl = process.env.NODE_ENV === 'development' 
-      ? `http://localhost:8080/nft/${tokenId}` 
-      : `https://lbry.app/nft/${tokenId}`;
-    const copied = await copyToClipboard(lbryUrl);
-    if (copied) {
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2000);
-    }
-  };
-
-  const handleCopyTokenId = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const copied = await copyToClipboard(tokenId);
-    if (copied) {
-      setCopiedTokenId(true);
-      setTimeout(() => setCopiedTokenId(false), 2000);
-    }
-  };
-
-  if (isLoading || !transaction || !contentUrls) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-4">
-        <svg className="animate-spin h-8 w-8 mb-2 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <span className="text-xs text-center">Loading NFT...</span>
-      </div>
-    );
-  }
-
-  const nftData = nfts[tokenId];
-  const content = contentData[transaction.id];
-  
-  if (!content) {
-    return (
-      <div className="flex items-center justify-center h-full text-muted-foreground p-4">
-        Content not found
-      </div>
-    );
-  }
-
-  const isOwned = !!(user && nftData?.principal === user.principal);
-  const collectionType = nftData?.collection || 'NFT';
-
-  // NFT Footer - now a reusable component
-  const NftFooter = () => (
-    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full">
-      <Badge 
-        variant="secondary" 
-        className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
-        onClick={handleCopyLink}
-      >
-        {copiedLink ? (
-          <Check className="h-2.5 w-2.5" />
-        ) : (
-          <Link className="h-2.5 w-2.5" />
-        )}
-      </Badge>
-      
-      {nftData?.principal && (
-        <Badge 
-          variant="secondary" 
-          className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
-          onClick={(e) => handleCopyPrincipal(e, nftData.principal)}
-        >
-          {formatPrincipal(nftData.principal)}
-          {copiedPrincipal ? (
-            <Check className="h-2.5 w-2.5" />
-          ) : (
-            <Copy className="h-2.5 w-2.5" />
-          )}
-        </Badge>
-      )}
-      
-      {ownerInfo?.username && (
-        <Badge 
-          variant="secondary" 
-          className="text-[10px] py-0.5 px-1"
-        >
-          @{ownerInfo.username}
-        </Badge>
-      )}
-      
-      <Badge 
-        variant={collectionType === 'NFT' ? 'warning' : 'info'} 
-        className="text-[10px] py-0.5 px-1"
-      >
-        {collectionType}
-      </Badge>
-      
-      <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">
-        ALEX: {formatBalance(nftData?.balances?.alex?.toString())}
-      </Badge>
-      
-      <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">
-        LBRY: {formatBalance(nftData?.balances?.lbry?.toString())}
-      </Badge>
-      
-      {/* Token ID badge */}
-      <Badge 
-        variant="secondary" 
-        className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
-        onClick={handleCopyTokenId}
-        title={`Token ID: ${tokenId}`}
-      >
-        <Database className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-        <span className="text-gray-600 dark:text-gray-400">
-          {tokenId.length <= 4 ? tokenId : `${tokenId.slice(0, 2)}...${tokenId.slice(-2)}`}
-        </span>
-        {copiedTokenId ? (
-          <Check className="h-2.5 w-2.5 text-green-500" />
-        ) : (
-          <Copy className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-        )}
-      </Badge>
-    </div>
-  );
-
-  // Handle click to open modal
-  const handleCardClick = () => {
-    setShowModal(true);
-    // Still call the original handler if provided (for other functionality)
-    if (onViewDetails) {
-      onViewDetails(tokenId);
-    }
-  };
-
-  // Render the NFT Card
-  return (
-    <>
-      <ContentCard
-        id={transaction.id}
-        onClick={handleCardClick}
-        owner={transaction.owner}
-        isOwned={isOwned}
-        component="Lexigraph"
-        footer={<NftFooter />}
-      >
-        <ContentRenderer
-          transaction={transaction}
-          content={content}
-          contentUrls={contentUrls}
-          handleRenderError={handleRenderError}
-          inModal={false}
-        />
-      </ContentCard>
-
-      {/* Modal Dialog for viewing NFT - similar to SingleTokenView */}
-      <Dialog open={showModal} onOpenChange={(open) => !open && setShowModal(false)}>
-        <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col">
-          <DialogTitle className="sr-only">Content Viewer</DialogTitle>
-
-          <div className="w-full h-full overflow-y-auto">
-            <div className="p-6">
-              {content && transaction && (
-                <ContentRenderer
-                  key={transaction.id}
-                  transaction={transaction}
-                  content={content}
-                  contentUrls={contentUrls}
-                  inModal={true}
-                  handleRenderError={() => handleRenderError(transaction.id)}
-                />
-              )}
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-};
-
-// Custom content display components for non-NFT content
-const ShelfContentDisplay = ({ shelfId, owner, onClick }: { shelfId: string, owner: string, onClick: () => void }) => (
-  <ContentCard
-    id={`shelf-${shelfId}`}
-    onClick={onClick}
-    owner={owner}
-    component="Lexigraph"
-    footer={
-      <div className="flex flex-wrap items-center gap-1">
-        <Badge variant="secondary" className="text-[10px] py-0.5 px-1">
-          Shelf
-        </Badge>
-        <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">
-          {shelfId}
-        </Badge>
-      </div>
-    }
-  >
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="text-center p-4">
-        <div className="flex items-center justify-center mb-2">
-          <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
-          </svg>
-        </div>
-        <div className="text-lg font-semibold">Shelf</div>
-        <div className="text-sm text-gray-500">{shelfId}</div>
-      </div>
-    </div>
-  </ContentCard>
-);
-
-const MarkdownContentDisplay = ({ content, owner, onClick }: { content: string, owner: string, onClick: () => void }) => {
-  const preview = content.substring(0, 30) + (content.length > 30 ? '...' : '');
-  
-  return (
-    <ContentCard
-      id={`markdown-${preview}`}
-      onClick={onClick}
-      owner={owner}
-      component="Lexigraph"
-      footer={
-        <div className="flex flex-wrap items-center gap-1">
-          <Badge variant="outline" className="text-[10px] py-0.5 px-1">
-            Markdown
-          </Badge>
-          <Badge variant="outline" className="text-[10px] py-0.5 px-1 max-w-[150px] truncate">
-            {preview}
-          </Badge>
-        </div>
-      }
-    >
-      <div className="w-full h-full flex items-center justify-center overflow-hidden">
-        <div className="p-4 prose dark:prose-invert max-w-none line-clamp-6">
-          {content}
-        </div>
-      </div>
-    </ContentCard>
-  );
-};
+// Import our extracted components
+import NftDisplay from '../components/NftDisplay';
+import { ShelfContentDisplay, MarkdownContentDisplay, BlogMarkdownDisplay } from '../components/ContentDisplays';
 
 // Main ShelfDetailUI component
 export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
@@ -449,6 +52,25 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
     transaction: Transaction | null;
     content: any;
   } | null>(null);
+  
+  // Initialize view mode from localStorage or default to 'grid'
+  const [viewMode, setViewMode] = useState<'grid' | 'blog'>(() => {
+    // Try to get stored preference
+    const storedViewMode = typeof window !== 'undefined' ? 
+      localStorage.getItem('alexandria-shelf-view-mode') : null;
+    // Return stored value if valid, otherwise default to 'grid'
+    return (storedViewMode === 'grid' || storedViewMode === 'blog') ? 
+      storedViewMode as 'grid' | 'blog' : 'grid';
+  });
+  
+  // Save view mode to localStorage when it changes
+  const handleViewModeChange = (mode: 'grid' | 'blog') => {
+    setViewMode(mode);
+    // Save to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('alexandria-shelf-view-mode', mode);
+    }
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -607,112 +229,219 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
   };
 
   return (
-    <>
-      <div className="px-4 pt-4 flex flex-col gap-4 mb-6">
-        <Button 
-          variant="outline" 
-          onClick={onBack} 
-          className="self-start flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </Button>
-        {renderBreadcrumbs(breadcrumbItems)}
-      </div>
-      
-      <div className="px-4 mx-auto max-w-screen-2xl">
-        <div className="bg-card rounded-lg border p-6 mb-6">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h2 className="text-2xl font-bold">{shelf.title}</h2>
-              <p className="text-muted-foreground">{shelf.description}</p>
-              <div className="mt-2 flex items-center gap-2">
-                {isPublic && (
-                  <span className="text-xs bg-green-100 text-green-800 rounded-full px-2 py-1">
-                    Public
-                  </span>
-                )}
-                <span className="text-xs text-muted-foreground">
-                  Owner: <PrincipalDisplay principal={shelf.owner} />
-                </span>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              {!isEditMode && !isPublic && settingsButton}
-              
-              {!isEditMode && !isPublic && (
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-1"
-                  onClick={onEnterEditMode}
-                >
-                  <Edit className="w-4 h-4" />
-                  Reorder
-                </Button>
-              )}
-              
-              {isEditMode && (
-                <>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-1"
-                    onClick={onCancelEditMode}
-                  >
-                    <X className="w-4 h-4" />
-                    Cancel
-                  </Button>
-                  
-                  <Button
-                    variant="primary"
-                    className="flex items-center gap-1"
-                    onClick={handleSave}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? 'Saving...' : 'Save Order'}
-                  </Button>
-                </>
-              )}
-              
-              {!isPublic && onAddSlot && (
-                <Button
-                  variant="primary"
-                  className="flex items-center gap-1"
-                  onClick={() => onAddSlot(shelf)}
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Slot
-                </Button>
-              )}
-            </div>
+    <div className="flex flex-col h-full">
+      <div className="px-4 py-3 flex justify-between items-center w-full bg-background/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            onClick={onBack} 
+            className="flex items-center gap-2 h-8 text-sm"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </Button>
+          {renderBreadcrumbs(breadcrumbItems)}
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <div className="flex border rounded-md overflow-hidden mr-2">
+            <Button
+              variant="outline"
+              className={`rounded-none h-8 px-3 ${viewMode === 'grid' ? 'bg-primary/10' : ''}`}
+              onClick={() => handleViewModeChange('grid')}
+              aria-label="Grid View"
+            >
+              <Grid className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              className={`rounded-none h-8 px-3 ${viewMode === 'blog' ? 'bg-primary/10' : ''}`}
+              onClick={() => handleViewModeChange('blog')}
+              aria-label="Blog View"
+            >
+              <List className="w-4 h-4" />
+            </Button>
           </div>
           
-          <div className="flex-1">
-            {slots.length === 0 ? (
-              <div className="text-center py-10 text-muted-foreground">
-                This shelf is empty.
-                {!isPublic && onAddSlot && (
-                  <div className="mt-2">
-                    <Button
-                      variant="outline"
-                      className="flex items-center gap-1 mx-auto"
-                      onClick={() => onAddSlot(shelf)}
-                    >
-                      <Plus className="w-4 h-4" />
-                      Add First Slot
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ) : (
+          {!isEditMode && !isPublic && settingsButton}
+          
+          {!isEditMode && !isPublic && (
+            <Button
+              variant="outline"
+              className="flex items-center gap-1 h-8 text-sm"
+              onClick={onEnterEditMode}
+            >
+              <Edit className="w-4 h-4" />
+              Reorder
+            </Button>
+          )}
+          
+          {isEditMode && (
+            <>
+              <Button
+                variant="outline"
+                className="flex items-center gap-1 h-8 text-sm"
+                onClick={onCancelEditMode}
+              >
+                <X className="w-4 h-4" />
+                Cancel
+              </Button>
+              
+              <Button
+                variant="primary"
+                className="flex items-center gap-1 h-8 text-sm"
+                onClick={handleSave}
+                disabled={isSaving}
+              >
+                {isSaving ? 'Saving...' : 'Save Order'}
+              </Button>
+            </>
+          )}
+          
+          {!isPublic && onAddSlot && (
+            <Button
+              variant="primary"
+              className="flex items-center gap-1 h-8 text-sm"
+              onClick={() => onAddSlot(shelf)}
+            >
+              <Plus className="w-4 h-4" />
+              Add Slot
+            </Button>
+          )}
+        </div>
+      </div>
+      
+      <div className="px-4 py-2">
+        <div className="mb-3">
+          <h2 className="text-2xl font-bold">{shelf.title}</h2>
+          <p className="text-muted-foreground">{shelf.description}</p>
+          <div className="mt-1 flex items-center gap-2">
+            {isPublic && (
+              <span className="text-xs bg-green-100 text-green-800 rounded-full px-2 py-1">
+                Public
+              </span>
+            )}
+            <span className="text-xs text-muted-foreground">
+              Owner: <PrincipalDisplay principal={shelf.owner} />
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex-1 px-4 pb-4">
+        {slots.length === 0 ? (
+          <div className="text-center py-10 text-muted-foreground h-full flex flex-col items-center justify-center">
+            <p className="mb-2">This shelf is empty.</p>
+            {!isPublic && onAddSlot && (
+              <Button
+                variant="outline"
+                className="flex items-center gap-1 mx-auto"
+                onClick={() => onAddSlot(shelf)}
+              >
+                <Plus className="w-4 h-4" />
+                Add First Slot
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="w-full">
+            {viewMode === 'grid' ? (
+              // Grid View Layout
               <ContentGrid>
                 {slots.map(([slotKey, slot], index) => (
                   renderCard(slotKey, slot, index)
                 ))}
               </ContentGrid>
+            ) : (
+              // Blog View Layout
+              <div className="blog-view-layout max-w-4xl mx-auto">
+                {/* Group content by type - markdown vs. non-markdown */}
+                {(() => {
+                  // Define types
+                  type BlogItemType = [number, any, number]; // [slotKey, slot, index]
+                  type SectionType = 'markdown' | 'visual' | null;
+                  type BlogSection = { type: SectionType; items: BlogItemType[] };
+                  
+                  // Group consecutive markdown slots together
+                  const blogSections: BlogSection[] = [];
+                  let currentGroup: BlogItemType[] = [];
+                  let currentType: SectionType = null; // 'markdown' or 'visual'
+                  
+                  // Process all slots and group them
+                  slots.forEach(([slotKey, slot], index) => {
+                    const isMarkdown = isMarkdownContent(slot.content);
+                    const currentContentType: SectionType = isMarkdown ? 'markdown' : 'visual';
+                    
+                    // Start a new group if type changes
+                    if (currentType !== null && currentType !== currentContentType) {
+                      blogSections.push({ type: currentType, items: [...currentGroup] });
+                      currentGroup = [];
+                    }
+                    
+                    // Add to current group
+                    currentGroup.push([slotKey, slot, index]);
+                    currentType = currentContentType;
+                  });
+                  
+                  // Add the final group
+                  if (currentGroup.length > 0 && currentType !== null) {
+                    blogSections.push({ type: currentType, items: [...currentGroup] });
+                  }
+                  
+                  // Render all sections
+                  return blogSections.map((section, sectionIndex) => (
+                    <div key={`section-${sectionIndex}`} className="mb-12">
+                      {section.type === 'markdown' ? (
+                        // Render markdown content in a vertical flow
+                        <div className="prose dark:prose-invert max-w-none">
+                          {section.items.map(([slotKey, slot, originalIndex]) => (
+                            <div 
+                              key={`slot-${slotKey}`} 
+                              className={`slot-card mb-8 ${isEditMode ? 'relative border border-dashed border-border p-6 rounded-md bg-muted/5' : ''}`}
+                              draggable={isEditMode}
+                              onDragStart={isEditMode ? () => handleDragStart(originalIndex) : undefined}
+                              onDragOver={isEditMode ? (e) => handleDragOver(e, originalIndex) : undefined}
+                              onDragEnd={isEditMode ? handleDragEnd : undefined}
+                              onDrop={isEditMode ? (e) => handleDrop(e, originalIndex) : undefined}
+                            >
+                              {isEditMode && (
+                                <div className="absolute top-2 right-2 z-40 bg-background text-foreground px-2 py-1 text-xs rounded-md border border-border">
+                                  Slot #{slotKey}
+                                  <div 
+                                    className="slot-drag-handle ml-2 inline-block text-gray-400 p-1 rounded hover:bg-gray-700 cursor-grab"
+                                    onMouseDown={(e) => { e.stopPropagation(); }}
+                                  >
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                      <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
+                                    </svg>
+                                  </div>
+                                </div>
+                              )}
+                              <BlogMarkdownDisplay 
+                                content={slot.content.Markdown} 
+                                onClick={() => handleContentClick(slotKey)} 
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        // Render visual content (NFTs/Shelves) in a horizontal grid
+                        <div className="visual-content-row mb-8">
+                          <h3 className="text-sm uppercase tracking-wide text-muted-foreground mb-4 font-semibold">Visual Content</h3>
+                          <ContentGrid>
+                            {section.items.map(([slotKey, slot, originalIndex]) => (
+                              renderCard(slotKey, slot, originalIndex)
+                            ))}
+                          </ContentGrid>
+                        </div>
+                      )}
+                    </div>
+                  ));
+                })()}
+              </div>
             )}
           </div>
-        </div>
+        )}
       </div>
       
       {/* Content dialog for non-NFT content */}
@@ -742,6 +471,6 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
           </DialogContent>
         </Dialog>
       )}
-    </>
+    </div>
   );
 }; 
