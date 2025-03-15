@@ -8,6 +8,7 @@ import BaseLayout from "@/layouts/BaseLayout";
 import MainLayout from "@/layouts/MainLayout";
 import AuthGuard from "@/guards/AuthGuard";
 import MainPageSkeleton from "@/layouts/skeletons/MainPageSkeleton";
+import PinaxSkeleton from "@/layouts/skeletons/PinaxSkeleton";
 import UnauthorizedPage from "@/pages/UnauthorizedPage";
 import Protected from "@/guards/Protected";
 import LibrarianGuard from "@/guards/LibrarianGuard";
@@ -105,7 +106,7 @@ const router = createBrowserRouter(
 
 			<Route element={<AuthGuard />}>
 				<Route element={<MainLayout />}>
-					<Route path={ROUTES.PINAX} element={<Suspense key="pinax" fallback={<MainPageSkeleton />}><PinaxPage /></Suspense>} />
+					<Route path={ROUTES.PINAX} element={<Suspense key="pinax" fallback={<PinaxSkeleton />}><PinaxPage /></Suspense>} />
 				</Route>
 				<Route element={<Protected route />}>
 					<Route path={ROUTES.DASHBOARD_ROUTES.BASE} element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
