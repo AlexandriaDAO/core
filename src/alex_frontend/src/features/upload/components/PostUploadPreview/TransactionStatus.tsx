@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CheckCircle2, RotateCw } from "lucide-react";
+import { Check, RotateCw } from "lucide-react";
 import Arweave from "arweave";
 import { Button } from "@/lib/components/button";
 import { TransactionStatusResponse } from "arweave/node/transactions";
@@ -38,10 +38,10 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ transaction }) =>
                 </span>
                 <div className="flex items-center space-x-2">
                     {status && ( status.status === 200 ? <>
-                        <div className="p-1 rounded-full text-sm bg-green-100 text-green-700">
+                        <div className="p-1 text-sm bg-green-100 text-green-700">
                             <span>Confirmed</span>
                         </div>
-                        <CheckCircle2 className="w-5 h-5 text-green-700" />
+                        <Check className="w-6 h-6 text-constructive" />
                     </>: <>
                         {!loading && <div className="p-1 text-sm bg-yellow-100 text-yellow-700">
                             <span>Pending</span>
@@ -74,10 +74,10 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ transaction }) =>
             {/* Number of Confirmations */}
             {status && status.status === 200 && (
                 <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-lg font-semibold">
                         Block Height:
                     </span>
-                    <div className="font-roboto-condensed text-sm text-green-600">
+                    <div className="font-roboto-condensed text-lg text-green-600">
                         {status.confirmed?.block_height}
                     </div>
                 </div>

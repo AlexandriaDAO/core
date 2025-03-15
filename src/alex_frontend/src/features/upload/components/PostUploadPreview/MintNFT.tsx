@@ -107,7 +107,7 @@ const MintNFT: React.FC = () => {
             </div>
 
             {/* Minting Error */}
-            {mintError && <Alert icon={TriangleAlert} title="Error while minting." variant="danger">{mintError}</Alert>}
+            {mintError && <Alert icon={TriangleAlert} title="Error while minting." variant="danger" className="mt-2">{mintError}</Alert>}
         </div>
     );
 };
