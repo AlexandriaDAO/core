@@ -13,6 +13,7 @@ import Protected from "@/guards/Protected";
 import LibrarianGuard from "@/guards/LibrarianGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ROUTES } from "./routeConfig";
+import TestPage from "@/pages/TestPage";
 
 const HomePage = lazy(()=>import("@/pages/HomePage"));
 
@@ -109,6 +110,7 @@ const router = createBrowserRouter(
 				</Route>
 				<Route element={<Protected route />}>
 					<Route path={ROUTES.DASHBOARD_ROUTES.BASE} element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
+						<Route path="test" element={<Suspense key="test" fallback={<TopProgressBar />}><TestPage /></Suspense>} />
 						<Route element={<LibrarianGuard />}>
 							<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
 							<Route path="wallets" element={<Suspense key="wallets" fallback={<MainPageSkeleton />}><WalletsPage /></Suspense>} />
