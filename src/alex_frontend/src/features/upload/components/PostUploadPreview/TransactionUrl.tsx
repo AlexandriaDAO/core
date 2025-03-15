@@ -11,7 +11,7 @@ const TransactionUrl: React.FC<TransactionUrlProps> = ({ transaction }) => {
 
 	return (
         <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold text-primary">
+            <span className="text-lg font-semibold">
                 Transaction URL:
             </span>
             <div className="flex items-center space-x-2">

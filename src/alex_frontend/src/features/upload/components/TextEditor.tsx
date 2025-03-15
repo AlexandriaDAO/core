@@ -52,10 +52,10 @@ function TextEditor({ setFile }: TextEditorProps) {
         <div className="w-full font-roboto-condensed space-y-4">
             <button
                 onClick={() => dispatch(setTextEditor(!textEditor))}
-                className="w-full font-syne text-xl flex items-center justify-between group"
+                className="w-full font-syne text-xl flex items-center justify-between hover:opacity-70 transition-opacity"
             >
-                <h2 className="text-xl font-semibold text-primary group-hover:text-primary/70">Enter Text Content</h2>
-                <span className="text-sm text-primary group-hover:text-primary/70">
+                <h2 className="text-xl font-semibold">Enter Text Content</h2>
+                <span className="text-sm">
                     {textEditor ? (
                         <ChevronUp
                             className="w-6 h-6"

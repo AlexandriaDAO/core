@@ -14,7 +14,7 @@ function FileInfo({ file }: FileInfoProps) {
     return (
         <div className="flex items-center justify-between">
             <div className="flex items-center justify-start gap-4 text-sm">
-                <span className="text-black">{fileSize}</span>
+                <span className="">{fileSize}</span>
 
                 <span className="text-muted-foreground">{typeName}</span>
             </div>

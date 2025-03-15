@@ -12,7 +12,7 @@ const FileUrl: React.FC<FileUrlProps> = ({transaction}) => {
 
 	return (
         <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold text-primary">
+            <span className="text-lg font-semibold">
                 File URL:
             </span>
             <div className="flex items-center space-x-2">

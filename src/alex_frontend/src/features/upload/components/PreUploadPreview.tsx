@@ -21,10 +21,10 @@ function PreUploadPreview({ file }: PreUploadPreviewProps) {
         <div className="w-full font-roboto-condensed space-y-1">
             <button
                 onClick={() => dispatch(setPreUploadPreview(!preUploadPreview))}
-                className="w-full font-syne text-xl flex items-center justify-between group"
+                className="w-full font-syne text-xl flex items-center justify-between hover:opacity-70 transition-opacity"
             >
-                <h2 className="text-xl font-semibold text-primary group-hover:text-primary/70">Selected File</h2>
-                <span className="text-sm text-primary group-hover:text-primary/70">
+                <h2 className="text-xl font-semibold">Selected File</h2>
+                <span className="text-sm">
                     {preUploadPreview ? (
                         <ChevronUp
                             className="w-6 h-6"

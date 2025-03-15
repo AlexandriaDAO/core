@@ -26,12 +26,12 @@ const Copy: React.FC<CopyProps> = ({ text }) => {
         >
             {success ? (
                 <Check
-                    className="w-4 h-4 text-constructive"
+                    className="w-5 h-5 text-constructive"
                     strokeWidth={2}
                 />
             ) : (
                 <CopyIcon
-                    className="w-4 h-4 text-primary hover:text-primary/50"
+                    className="w-5 h-5 text-muted-foreground hover:text-muted-foreground/50"
                     strokeWidth={2}
                 />
             )}

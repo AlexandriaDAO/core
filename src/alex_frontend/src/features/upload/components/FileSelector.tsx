@@ -78,10 +78,10 @@ function FileSelector({ setFile }: FileSelectorProps) {
         <div className="w-full font-roboto-condensed space-y-1">
             <button
                 onClick={() => dispatch(setFileSelector(!fileSelector))}
-                className="w-full font-syne text-xl flex items-center justify-between group"
+                className="w-full font-syne text-xl flex items-center justify-between hover:opacity-70 transition-opacity"
             >
-                <h2 className="text-xl font-semibold text-primary group-hover:text-primary/70">Select a File to Upload</h2>
-                <span className="text-sm text-primary group-hover:text-primary/70">
+                <h2 className="text-xl font-semibold">Select a File to Upload</h2>
+                <span className="text-sm">
                     {fileSelector ? (
                         <ChevronUp
                             className="w-6 h-6"
@@ -98,13 +98,14 @@ function FileSelector({ setFile }: FileSelectorProps) {
 
             {fileSelector && (
                 <div
-                    className={`relative border-2 rounded-lg py-8 px-4 sm:px-6 md:px-8 text-center cursor-pointer transition-all duration-200 ${
+                    className={`dark:bg-[#3A3630] relative border-2 rounded-xl py-8 px-4 sm:px-6 md:px-8 text-center cursor-pointer transition-all duration-200 ${
                         isDragging
                             ? 'border-border border-solid bg-secondary'
                             : error
                                 ? 'border-destructive/50 border-dashed hover:border-destructive'
-                                : 'border-gray-300 border-dashed hover:border-gray-500'
+                                : 'border-ring/70 border-dashed hover:border-ring dark:border-[#A1A1A1]/70 dark:hover:border-[#A1A1A1]'
                     }`}
+                    // dark:hover:border-border
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
@@ -116,26 +117,26 @@ function FileSelector({ setFile }: FileSelectorProps) {
                         onChange={handleFileChange}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    <div className="space-y-6">
+                    <div className="space-y-6 md:px-6">
 
-                        <div className="text-gray-600">
+                        <div className="text-xl leading-7 text-foreground opacity-60">
                             Drag and drop your asset here
                         </div>
-                        <div className="text-gray-600">
+                        <div className="text-xl leading-7 text-muted-foreground opacity-60">
                             or
                         </div>
-                        <Button variant="outline" rounded="full" className="bg-white">
+                        <Button variant="outline" rounded="full" className="text-black bg-white border dark:border-transparent dark:bg-zinc-600 dark:text-white">
                             Select file
                         </Button>
 
                         {/* File Type Categories */}
                         <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
                             {Object.entries(FILE_TYPES).map(([key, category]) => (
-                                <div key={key} className="flex flex-col items-start justify-center gap-2 p-3 bg-white dark:bg-transparent border rounded">
+                                <div key={key} className="flex flex-col items-start justify-center gap-2 p-3 bg-white dark:bg-[#9C9A97] border dark:border-transparent rounded">
                                     <div className="text-sm text-muted-foreground dark:text-white">{category.label}</div>
-                                    <div className="w-full flex flex-col items-center justify-center gap-2 p-2 bg-card border border-border rounded">
+                                    <div className="w-full rounded flex flex-col items-center justify-center gap-2 p-2 bg-card dark:bg-[#3A3630] border border-border dark:border-transparent dark:text-muted-foreground">
                                         <div className="text-2xl">{category.icon}</div>
-                                        <div className="text-xs text-muted-foreground">
+                                        <div className="text-xs">
                                             Up to {formatFileSize(category.maxSize)}
                                         </div>
                                     </div>

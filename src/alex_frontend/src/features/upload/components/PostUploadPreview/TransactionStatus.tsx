@@ -33,7 +33,7 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ transaction }) =>
         <>
             {/* Confirmation Status */}
             <div className="flex items-center justify-between">
-                <span className="text-lg font-semibold text-primary">
+                <span className="text-lg font-semibold">
                     Transaction Status:
                 </span>
                 <div className="flex items-center space-x-2">
@@ -41,7 +41,7 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ transaction }) =>
                         <div className="p-1 rounded-full text-sm bg-green-100 text-green-700">
                             <span>Confirmed</span>
                         </div>
-                        <CheckCircle2 className="w-4 h-4 text-green-700" />
+                        <CheckCircle2 className="w-5 h-5 text-green-700" />
                     </>: <>
                         {!loading && <div className="p-1 text-sm bg-yellow-100 text-yellow-700">
                             <span>Pending</span>
@@ -61,7 +61,7 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ transaction }) =>
                         >
                             {loading && <span>Checking...</span>}
                             <RotateCw 
-                                className={`w-4 h-4 text-primary hover:text-primary/50 ${
+                                className={`w-5 h-5 text-muted-foreground hover:text-muted-foreground/50 ${
                                     loading ? 'animate-spin' : ''
                                 }`}
                                 strokeWidth={2}

@@ -7,7 +7,7 @@ interface TransactionHashProps {
 const TransactionHash: React.FC<TransactionHashProps> = ({ transaction}) => {
 	return (
         <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold text-primary">
+            <span className="text-lg font-semibold">
                 Tx Hash:
             </span>
             <div className="flex items-center space-x-2">

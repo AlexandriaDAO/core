@@ -11,7 +11,7 @@ function FilePreview({ file }: FilePreviewProps) {
     return (
         <div className="flex justify-start items-center gap-4">
             <div className="flex-shrink-0 w-28 h-20 flex items-center justify-center border rounded bg-white">
-                <span className="text-4xl">{typeInfo?.icon || '📁'}</span>
+                {typeInfo?.icon || '📁'}
             </div>
             <h3 className="text-lg font-medium truncate">
                 {file.name}

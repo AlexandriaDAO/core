@@ -29,10 +29,10 @@ const PostUploadPreview: React.FC<PostUploadPreviewProps> = ({
 		<div className="w-full space-y-1">
 			<button
                 onClick={() => dispatch(setPostUploadPreview(!postUploadPreview))}
-                className="w-full font-syne text-xl flex items-center justify-between group"
+                className="w-full font-syne text-xl flex items-center justify-between hover:opacity-70 transition-opacity"
             >
-                <h2 className="text-xl font-semibold text-primary group-hover:text-primary/70">Uploaded File</h2>
-                <span className="flex items-center text-sm text-primary group-hover:text-primary/70">
+                <h2 className="text-xl font-semibold">Uploaded File</h2>
+                <span className="flex items-center text-sm">
 					{postUploadPreview ? (
                         <>
                             Close

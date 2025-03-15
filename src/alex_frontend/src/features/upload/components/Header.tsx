@@ -28,7 +28,7 @@ function Header() {
         <>
             <div className="flex flex-col justify-center items-center">
                 <h2 className="text-2xl font-bold">Pinax</h2>
-                <p className="text-gray-500">An app for uploading and minting NFTs.</p>
+                <p className="">An app for uploading and minting NFTs.</p>
             </div>
 
             <div className={`flex justify-center items-center gap-4 ${fetching || selecting || uploading ? 'cursor-not-allowed' : ''}`}>
@@ -43,22 +43,22 @@ function Header() {
             {/* steps */}
             <div className="w-full flex justify-center items-center gap-6">
                 <div className={`flex justify-center items-center gap-2 ${step >= Step.Select ? '' : 'opacity-40'}`}>
-                    <div className="w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary"><span className='font-sans text-xs'>1</span></div>
-                    <span className="text-sm font-syne font-normal text-primary">{type == ContentType.Local ? 'Select' : 'Create'}</span>
+                    <div className="w-5 h-5 flex items-center justify-center rounded-full border-2 border-foreground"><span className='font-sans text-xs'>1</span></div>
+                    <span className="text-sm font-syne font-normal">{type == ContentType.Local ? 'Select' : 'Create'}</span>
                 </div>
 
-                <hr className={`flex-grow border-t ${step >= Step.Preview ? 'border-primary' : 'border-primary/40'}`} />
+                <hr className={`flex-grow border-t ${step >= Step.Preview ? 'border-foreground' : 'border-foreground/40'}`} />
 
                 <div className={`flex justify-center items-center gap-2 ${step >= Step.Preview ? '' : 'opacity-40'}`}>
-                    <div className="w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary"><span className='font-sans text-xs'>2</span></div>
-                    <span className="text-sm font-syne font-normal text-primary">Preview</span>
+                    <div className="w-5 h-5 flex items-center justify-center rounded-full border-2 border-foreground"><span className='font-sans text-xs'>2</span></div>
+                    <span className="text-sm font-syne font-normal text-foreground">Preview</span>
                 </div>
 
-                <hr className={`flex-grow border-t ${step >= Step.Success ? 'border-primary' : 'border-primary/40'}`} />
+                <hr className={`flex-grow border-t ${step >= Step.Success ? 'border-foreground' : 'border-foreground/40'}`} />
 
                 <div className={`flex justify-center items-center gap-2 ${step >= Step.Success ? '' : 'opacity-40'}`}>
-                    <div className="w-5 h-5 flex items-center justify-center rounded-full border-2 border-primary"><span className='font-sans text-xs'>3</span></div>
-                    <span className="text-sm font-syne font-normal text-primary">Success</span>
+                    <div className="w-5 h-5 flex items-center justify-center rounded-full border-2 border-foreground"><span className='font-sans text-xs'>3</span></div>
+                    <span className="text-sm font-syne font-normal text-foreground">Success</span>
                 </div>
             </div>
         </>

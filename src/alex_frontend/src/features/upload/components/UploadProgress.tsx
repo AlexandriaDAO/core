@@ -29,25 +29,25 @@ function UploadProgress() {
 
 	return (
 		<div className="flex justify-between items-center gap-2">
-			<div className="flex-grow h-4 bg-secondary rounded-full border overflow-hidden">
+			<div className="flex-grow h-4 bg-secondary dark:bg-[#3A3630] rounded-full border dark:border-transparent overflow-hidden">
 				{progress > 0 ? (
 					<div
-						className="h-full bg-primary rounded-full"
+						className="h-full bg-primary dark:bg-white rounded-full"
 						style={{ width: `${progress}%` }}
 					/>
 				) : (
-					<div className="h-full text-xs flex justify-center items-center text-gray-500">{statusText}</div>
+					<div className="h-full text-xs flex justify-center items-center text-gray-700 dark:text-gray-300">{statusText}</div>
 				)}
 			</div>
 			{fetching || selecting || uploading ? (
 				<LoaderPinwheel
-					size={18}
+					size={20}
 					className="animate-spin text-muted-foreground"
 				/>
 			) : progress >= 100 ? (
-				<Check size={18} className="text-constructive" />
+				<Check size={26} className="text-constructive" />
 			) : estimateError || fetchError || selectError || uploadError ? (
-				<TriangleAlert size={18} className="text-destructive" />
+				<TriangleAlert size={20} className="text-destructive" />
 			) : null}
 		</div>
 	);

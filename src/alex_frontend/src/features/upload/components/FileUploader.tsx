@@ -73,6 +73,7 @@ function FileUploader({file, setFile}: FileUploaderProps) {
                 disabled={fetching || selecting || uploading || !!transaction}
                 onClick={handleCancel}
                 variant="outline"
+                className="dark:bg-[#3A3630]"
             >
                 Cancel
             </Button>

@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from "react";
-import { ArrowUpToLine, Check, LoaderPinwheel, RotateCcw } from "lucide-react";
+import { ArrowUpToLine, Check, LoaderPinwheel, RotateCcw, TriangleAlert } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { toast } from "sonner";
 import useNftManager from "@/hooks/actors/useNftManager";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import mintNFT from "../../thunks/mintNFT";
 import { Button } from "@/lib/components/button";
+import { Alert } from "@/components/Alert";
 
 const MintNFT: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -106,13 +107,7 @@ const MintNFT: React.FC = () => {
             </div>
 
             {/* Minting Error */}
-            {mintError && (
-                <div className="mt-2 p-2 bg-destructive/50 border rounded-md">
-                    <p className="text-sm text-destructive-foreground">
-                        {mintError}
-                    </p>
-                </div>
-            )}
+            {mintError && <Alert icon={TriangleAlert} title="Error while minting." variant="danger">{mintError}</Alert>}
         </div>
     );
 };
