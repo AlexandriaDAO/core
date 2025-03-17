@@ -115,7 +115,12 @@ const lexigraphSlice = createSlice({
       
       // Update permissions for this shelf
       if (state.userPrincipal) {
-        state.permissions[updatedShelf.shelf_id] = updatedShelf.owner.toString() === state.userPrincipal;
+        // Handle both string and Principal object formats for owner
+        const ownerStr = typeof updatedShelf.owner === 'string' 
+          ? updatedShelf.owner 
+          : updatedShelf.owner.toString();
+        
+        state.permissions[updatedShelf.shelf_id] = ownerStr === state.userPrincipal;
       }
     },
   },
@@ -133,7 +138,12 @@ const lexigraphSlice = createSlice({
         // Update permissions for loaded shelves
         if (state.userPrincipal) {
           action.payload.forEach((shelf: Shelf) => {
-            state.permissions[shelf.shelf_id] = shelf.owner.toString() === state.userPrincipal;
+            // Handle both string and Principal object formats for owner
+            const ownerStr = typeof shelf.owner === 'string' 
+              ? shelf.owner 
+              : shelf.owner.toString();
+            
+            state.permissions[shelf.shelf_id] = ownerStr === state.userPrincipal;
           });
         }
       })
@@ -165,7 +175,12 @@ const lexigraphSlice = createSlice({
         // Update permissions for loaded public shelves
         if (state.userPrincipal) {
           shelves.forEach((shelf: Shelf) => {
-            state.permissions[shelf.shelf_id] = shelf.owner.toString() === state.userPrincipal;
+            // Handle both string and Principal object formats for owner
+            const ownerStr = typeof shelf.owner === 'string' 
+              ? shelf.owner 
+              : shelf.owner.toString();
+            
+            state.permissions[shelf.shelf_id] = ownerStr === state.userPrincipal;
           });
         }
       })

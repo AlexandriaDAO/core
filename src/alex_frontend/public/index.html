@@ -9,12 +9,6 @@
     <base href="/" />
     <link rel="icon" href="favicon.ico" />
     
-    <!-- Preload critical resources -->
-    <link rel="preload" href="critical.js" as="script" />
-    <link rel="preload" href="js/libs/jszip.min.js" as="script" />
-    <link rel="preload" href="js/libs/md5.min.js" as="script" />
-    <link rel="preload" href="js/libs/epub.min.js" as="script" />
-    
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -76,25 +70,10 @@
       </div>
     </div>
     
-    <!-- Inline script to start loading critical resources -->
+    <!-- Inline script to track start time for performance measurement -->
     <script>
       // Mark the start time to measure performance
       window.appStartTime = Date.now();
-      
-      // Function to preload critical chunks
-      function preloadCriticalChunks() {
-        const criticalChunks = ['critical', 'vendors', 'runtime'];
-        criticalChunks.forEach(chunk => {
-          const link = document.createElement('link');
-          link.rel = 'preload';
-          link.as = 'script';
-          link.href = `${chunk}.js`; // Adjust path as needed
-          document.head.appendChild(link);
-        });
-      }
-      
-      // Start preloading
-      preloadCriticalChunks();
     </script>
   </body>
 </html>

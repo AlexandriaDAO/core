@@ -18,7 +18,8 @@ import {
   UserShelvesUI
 } from "../features/cards";
 import { NewSlotDialog } from "../features/slots";
-import { NewShelfDialog, ShelfDetail } from "../features/shelf-management/components";
+import { NewShelfDialog } from "../features/shelf-management/components";
+import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
 
 const LexigraphLayout: React.FC = () => {
   const { shelves, loading, createShelf, addSlot, reorderSlot } = useShelfOperations();
@@ -99,7 +100,7 @@ const LexigraphLayout: React.FC = () => {
       const hasEditAccess = selectedShelf ? checkEditAccess(selectedShelf.shelf_id) : false;
       
       return (
-        <ShelfDetail 
+        <ShelfDetailContainer 
           shelf={selectedShelf}
           onBack={goToShelves}
           onAddSlot={hasEditAccess ? handleAddSlot : undefined}

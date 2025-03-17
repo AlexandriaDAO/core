@@ -3,7 +3,8 @@ import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { ArrowLeft, Edit, Plus, X, Grid, List } from "lucide-react";
 import { renderBreadcrumbs, isNftContent, isShelfContent, isMarkdownContent } from "../../../utils";
-import { ShelfDetailUIProps } from '../types/types';
+import { ShelfDetailViewProps } from '../types/types';
+import { Slot } from "../../../../../../../../declarations/lexigraph/lexigraph.did";
 import { PrincipalDisplay } from '@/apps/Modules/shared/components/PrincipalDisplay';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
@@ -20,8 +21,8 @@ import { Badge } from "@/lib/components/badge";
 import NftDisplay from '../components/NftDisplay';
 import { ShelfContentDisplay, MarkdownContentDisplay, BlogMarkdownDisplay } from '../components/ContentDisplays';
 
-// Main ShelfDetailUI component
-export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
+// Main ShelfDetailView component
+export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
   shelf,
   orderedSlots,
   isEditMode,
@@ -87,7 +88,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
     // We still want to call onViewSlot if provided, for other side effects
     if (onViewSlot) {
       // Find the slot key for this NFT
-      const slotEntry = slots.find(([_, slot]) => 
+      const slotEntry = slots.find(([_, slot]: [number, Slot]) => 
         isNftContent(slot.content) && slot.content.Nft === tokenId
       );
       
@@ -104,7 +105,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
       
       // For non-NFT content, we still want to handle modal display here
       // Find the slot for this key
-      const slotEntry = slots.find(([key, _]) => key === slotKey);
+      const slotEntry = slots.find(([key, _]: [number, Slot]) => key === slotKey);
       
       if (slotEntry && !isNftContent(slotEntry[1].content)) {
         // For now we'll use the existing selectedContent state for markdown content
@@ -343,7 +344,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
             {viewMode === 'grid' ? (
               // Grid View Layout
               <ContentGrid>
-                {slots.map(([slotKey, slot], index) => (
+                {slots.map(([slotKey, slot]: [number, Slot], index: number) => (
                   renderCard(slotKey, slot, index)
                 ))}
               </ContentGrid>
@@ -363,7 +364,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
                   let currentType: SectionType = null; // 'markdown' or 'visual'
                   
                   // Process all slots and group them
-                  slots.forEach(([slotKey, slot], index) => {
+                  slots.forEach(([slotKey, slot]: [number, Slot], index: number) => {
                     const isMarkdown = isMarkdownContent(slot.content);
                     const currentContentType: SectionType = isMarkdown ? 'markdown' : 'visual';
                     
@@ -389,7 +390,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
                       {section.type === 'markdown' ? (
                         // Render markdown content in a vertical flow
                         <div className="prose dark:prose-invert max-w-none">
-                          {section.items.map(([slotKey, slot, originalIndex]) => (
+                          {section.items.map(([slotKey, slot, originalIndex]: [number, Slot, number]) => (
                             <div 
                               key={`slot-${slotKey}`} 
                               className={`slot-card mb-8 ${isEditMode ? 'relative border border-dashed border-border p-6 rounded-md bg-muted/5' : ''}`}
@@ -413,7 +414,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
                                 </div>
                               )}
                               <BlogMarkdownDisplay 
-                                content={slot.content.Markdown} 
+                                content={(slot.content as any).Markdown} 
                                 onClick={() => handleContentClick(slotKey)} 
                               />
                             </div>
@@ -424,7 +425,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
                         <div className="visual-content-row mb-8">
                           <h3 className="text-sm uppercase tracking-wide text-muted-foreground mb-4 font-semibold">Visual Content</h3>
                           <ContentGrid>
-                            {section.items.map(([slotKey, slot, originalIndex]) => (
+                            {section.items.map(([slotKey, slot, originalIndex]: [number, Slot, number]) => (
                               renderCard(slotKey, slot, originalIndex)
                             ))}
                           </ContentGrid>
@@ -468,4 +469,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
       )}
     </div>
   );
-}; 
+};
+
+// Export default as well
+export default ShelfDetailView; 

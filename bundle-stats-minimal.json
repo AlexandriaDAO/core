@@ -1,13 +1,13 @@
 {
-  "hash": "208cd9b0e97c2c611ffc",
-  "time": 2185,
+  "hash": "9c5ffb981d778ae9e169",
+  "time": 7944,
   "assetsByChunkName": {
     "index-src_d": [
-      "index-src_d.c28f69225180247dd695.js"
+      "index-src_d.3a127792522ed90d5a95.js"
     ],
     "runtime": [
-      "runtime.3358fda0b46c5e4d71ad.js",
-      "runtime.7e402ffd1e7b90e991e3.hot-update.js"
+      "runtime.dd4835297d72da249f7c.js",
+      "runtime.94d882cdc8087997595c.hot-update.js"
     ],
     "critical-node_modules_r": [
       "critical-node_modules_r.29df2b823ced579c54da.js"
@@ -22,20 +22,19 @@
       "vendors-node_modules_zrender_l.6e1da8bf493f97a0c2a5.js"
     ],
     "index-i": [
-      "index-i.c13cc3be21b73705f089.js"
+      "index-i.f90022b1a598082b8dd0.js"
     ],
     "index-src_alex_frontend_src_c": [
-      "index-src_alex_frontend_src_c.887e78336aa4af8e071a.js"
+      "index-src_alex_frontend_src_c.86a924946875384405c0.js"
     ],
     "index-src_alex_frontend_src_la": [
-      "index-src_alex_frontend_src_la.c1c86693a811e9c99db3.js"
+      "index-src_alex_frontend_src_la.aca31088e1a9a7bc24c8.js"
     ],
     "index-src_alex_frontend_src_p": [
-      "index-src_alex_frontend_src_p.f3be21b36f25c3fe6671.js"
+      "index-src_alex_frontend_src_p.59ec46ac2d5ac81e7609.js"
     ],
     "index-src_al": [
-      "index-src_al.1a95d6b59a632b9a9b86.js",
-      "index-src_al.7e402ffd1e7b90e991e3.hot-update.js"
+      "index-src_al.9f417347cdb8a2061933.js"
     ],
     "critical-node_modules_react-dom_cjs_react-dom_development_js-61bb2bf2": [
       "critical-node_modules_react-dom_cjs_react-dom_development_js-61bb2bf2.5b66634cca2646a5df70.js"
@@ -386,7 +385,7 @@
       "vendors-node_modules_lordvlad_asn1_js_l.5aaa876d655661bdba97.js"
     ],
     "vendors-node_modules_l": [
-      "vendors-node_modules_l.2708625a443eb7756642.js"
+      "vendors-node_modules_l.f8b87926c64e55c053f1.js"
     ],
     "vendors-node_modules_mdast-util-f": [
       "vendors-node_modules_mdast-util-f.1c1e3f48c68b0775c1fe.js"
@@ -519,21 +518,21 @@
     {
       "type": "assets by status",
       "cached": true,
-      "filteredChildren": 362,
-      "size": 99024933
+      "filteredChildren": 365,
+      "size": 99467038
     },
     {
       "type": "asset",
-      "name": "runtime.7e402ffd1e7b90e991e3.hot-update.json",
-      "size": 161,
+      "name": "runtime.94d882cdc8087997595c.hot-update.json",
+      "size": 84,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "hotModuleReplacement": true,
         "immutable": true,
-        "fullhash": "7e402ffd1e7b90e991e3",
-        "size": 161
+        "fullhash": "94d882cdc8087997595c",
+        "size": 84
       },
       "chunkNames": [],
       "chunkIdHints": [],
@@ -542,46 +541,22 @@
     },
     {
       "type": "asset",
-      "name": "runtime.7e402ffd1e7b90e991e3.hot-update.js",
-      "size": 5607,
+      "name": "runtime.94d882cdc8087997595c.hot-update.js",
+      "size": 5807,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "hotModuleReplacement": true,
         "immutable": true,
-        "fullhash": "7e402ffd1e7b90e991e3",
+        "fullhash": "94d882cdc8087997595c",
         "related": {
-          "sourceMap": "runtime.7e402ffd1e7b90e991e3.hot-update.js.map"
+          "sourceMap": "runtime.94d882cdc8087997595c.hot-update.js.map"
         },
-        "size": 5607
+        "size": 5807
       },
       "chunkNames": [
         "runtime"
-      ],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1
-    },
-    {
-      "type": "asset",
-      "name": "index-src_al.7e402ffd1e7b90e991e3.hot-update.js",
-      "size": 11038,
-      "emitted": true,
-      "comparedForEmit": false,
-      "cached": false,
-      "info": {
-        "hotModuleReplacement": true,
-        "immutable": true,
-        "fullhash": "7e402ffd1e7b90e991e3",
-        "related": {
-          "sourceMap": "index-src_al.7e402ffd1e7b90e991e3.hot-update.js.map"
-        },
-        "size": 11038
-      },
-      "chunkNames": [
-        "index-src_al"
       ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
@@ -591,12 +566,12 @@
     {
       "type": "asset",
       "name": "index.html",
-      "size": 15250,
+      "size": 14453,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
-        "size": 15250
+        "size": 14453
       },
       "chunkNames": [],
       "chunkIdHints": [],
@@ -605,19 +580,19 @@
     },
     {
       "type": "asset",
-      "name": "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.7e402ffd1e7b90e991e3.hot-update.js",
-      "size": 51470,
+      "name": "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.94d882cdc8087997595c.hot-update.js",
+      "size": 17663,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "hotModuleReplacement": true,
         "immutable": true,
-        "fullhash": "7e402ffd1e7b90e991e3",
+        "fullhash": "94d882cdc8087997595c",
         "related": {
-          "sourceMap": "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.7e402ffd1e7b90e991e3.hot-update.js.map"
+          "sourceMap": "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.94d882cdc8087997595c.hot-update.js.map"
         },
-        "size": 51470
+        "size": 17663
       },
       "chunkNames": [],
       "chunkIdHints": [],
@@ -627,19 +602,19 @@
     },
     {
       "type": "asset",
-      "name": "runtime.3358fda0b46c5e4d71ad.js",
-      "size": 58748,
+      "name": "runtime.dd4835297d72da249f7c.js",
+      "size": 58948,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "immutable": true,
-        "contenthash": "3358fda0b46c5e4d71ad",
+        "contenthash": "dd4835297d72da249f7c",
         "javascriptModule": false,
         "related": {
-          "sourceMap": "runtime.3358fda0b46c5e4d71ad.js.map"
+          "sourceMap": "runtime.dd4835297d72da249f7c.js.map"
         },
-        "size": 58748
+        "size": 58948
       },
       "chunkNames": [
         "runtime"
@@ -651,45 +626,21 @@
     },
     {
       "type": "asset",
-      "name": "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.7381cf7079050a234d45.js",
-      "size": 59579,
+      "name": "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.669556507e8d7f63f650.js",
+      "size": 225624,
       "emitted": true,
       "comparedForEmit": false,
       "cached": false,
       "info": {
         "immutable": true,
-        "contenthash": "7381cf7079050a234d45",
+        "contenthash": "669556507e8d7f63f650",
         "javascriptModule": false,
         "related": {
-          "sourceMap": "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.7381cf7079050a234d45.js.map"
+          "sourceMap": "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.669556507e8d7f63f650.js.map"
         },
-        "size": 59579
+        "size": 225624
       },
       "chunkNames": [],
-      "chunkIdHints": [],
-      "auxiliaryChunkNames": [],
-      "auxiliaryChunkIdHints": [],
-      "filteredRelated": 1
-    },
-    {
-      "type": "asset",
-      "name": "index-src_al.1a95d6b59a632b9a9b86.js",
-      "size": 277379,
-      "emitted": true,
-      "comparedForEmit": false,
-      "cached": false,
-      "info": {
-        "immutable": true,
-        "contenthash": "1a95d6b59a632b9a9b86",
-        "javascriptModule": false,
-        "related": {
-          "sourceMap": "index-src_al.1a95d6b59a632b9a9b86.js.map"
-        },
-        "size": 277379
-      },
-      "chunkNames": [
-        "index-src_al"
-      ],
       "chunkIdHints": [],
       "auxiliaryChunkNames": [],
       "auxiliaryChunkIdHints": [],
@@ -832,9 +783,9 @@
       "initial": true,
       "entry": false,
       "recorded": false,
-      "size": 126008,
+      "size": 156613,
       "sizes": {
-        "javascript": 126008
+        "javascript": 156613
       },
       "names": [
         "index-i"
@@ -844,22 +795,22 @@
         "runtime"
       ],
       "files": [
-        "index-i.c13cc3be21b73705f089.js"
+        "index-i.f90022b1a598082b8dd0.js"
       ],
       "auxiliaryFiles": [
-        "index-i.c13cc3be21b73705f089.js.map"
+        "index-i.f90022b1a598082b8dd0.js.map"
       ],
-      "hash": "1326c0f611eaddfaa13a",
+      "hash": "50ba5203472bfc85b39f",
       "childrenByOrder": {}
     },
     {
-      "rendered": true,
+      "rendered": false,
       "initial": true,
       "entry": false,
       "recorded": false,
-      "size": 223632,
+      "size": 24953,
       "sizes": {
-        "javascript": 223632
+        "javascript": 24953
       },
       "names": [
         "index-src_al"
@@ -869,24 +820,22 @@
         "runtime"
       ],
       "files": [
-        "index-src_al.1a95d6b59a632b9a9b86.js",
-        "index-src_al.7e402ffd1e7b90e991e3.hot-update.js"
+        "index-src_al.9f417347cdb8a2061933.js"
       ],
       "auxiliaryFiles": [
-        "index-src_al.1a95d6b59a632b9a9b86.js.map",
-        "index-src_al.7e402ffd1e7b90e991e3.hot-update.js.map"
+        "index-src_al.9f417347cdb8a2061933.js.map"
       ],
-      "hash": "5a6ebaaae5096e605639",
+      "hash": "07b4d885c7287903cd74",
       "childrenByOrder": {}
     },
     {
-      "rendered": true,
+      "rendered": false,
       "initial": true,
       "entry": false,
       "recorded": false,
-      "size": 520414,
+      "size": 528094,
       "sizes": {
-        "javascript": 176706,
+        "javascript": 184386,
         "asset": 343708
       },
       "names": [
@@ -897,7 +846,7 @@
         "runtime"
       ],
       "files": [
-        "index-src_alex_frontend_src_c.887e78336aa4af8e071a.js"
+        "index-src_alex_frontend_src_c.86a924946875384405c0.js"
       ],
       "auxiliaryFiles": [
         "2706e15758321713f37b.woff2",
@@ -910,9 +859,9 @@
         "d4e0d9024bb31c64cdde.woff2",
         "d5654c97c405fc2a96a1.woff2",
         "e0620077ae54ca70f144.woff2",
-        "index-src_alex_frontend_src_c.887e78336aa4af8e071a.js.map"
+        "index-src_alex_frontend_src_c.86a924946875384405c0.js.map"
       ],
-      "hash": "b7dd3ada1063a1df0a74",
+      "hash": "c1c3394acef158669f47",
       "childrenByOrder": {}
     },
     {
@@ -920,9 +869,9 @@
       "initial": true,
       "entry": false,
       "recorded": false,
-      "size": 31402,
+      "size": 37716,
       "sizes": {
-        "javascript": 31402
+        "javascript": 37716
       },
       "names": [
         "index-src_alex_frontend_src_la"
@@ -932,12 +881,12 @@
         "runtime"
       ],
       "files": [
-        "index-src_alex_frontend_src_la.c1c86693a811e9c99db3.js"
+        "index-src_alex_frontend_src_la.aca31088e1a9a7bc24c8.js"
       ],
       "auxiliaryFiles": [
-        "index-src_alex_frontend_src_la.c1c86693a811e9c99db3.js.map"
+        "index-src_alex_frontend_src_la.aca31088e1a9a7bc24c8.js.map"
       ],
-      "hash": "5e1241ea29095a6a3b04",
+      "hash": "2847dd349461f1389b56",
       "childrenByOrder": {}
     },
     {
@@ -945,9 +894,9 @@
       "initial": true,
       "entry": false,
       "recorded": false,
-      "size": 38090,
+      "size": 242414,
       "sizes": {
-        "javascript": 38090
+        "javascript": 242414
       },
       "names": [
         "index-src_alex_frontend_src_p"
@@ -957,12 +906,12 @@
         "runtime"
       ],
       "files": [
-        "index-src_alex_frontend_src_p.f3be21b36f25c3fe6671.js"
+        "index-src_alex_frontend_src_p.59ec46ac2d5ac81e7609.js"
       ],
       "auxiliaryFiles": [
-        "index-src_alex_frontend_src_p.f3be21b36f25c3fe6671.js.map"
+        "index-src_alex_frontend_src_p.59ec46ac2d5ac81e7609.js.map"
       ],
-      "hash": "7716e294a362beecb9cf",
+      "hash": "72afbbc5d74d863da1f4",
       "childrenByOrder": {}
     },
     {
@@ -970,9 +919,9 @@
       "initial": true,
       "entry": false,
       "recorded": false,
-      "size": 120674,
+      "size": 126866,
       "sizes": {
-        "javascript": 120674
+        "javascript": 126866
       },
       "names": [
         "index-src_d"
@@ -982,12 +931,12 @@
         "runtime"
       ],
       "files": [
-        "index-src_d.c28f69225180247dd695.js"
+        "index-src_d.3a127792522ed90d5a95.js"
       ],
       "auxiliaryFiles": [
-        "index-src_d.c28f69225180247dd695.js.map"
+        "index-src_d.3a127792522ed90d5a95.js.map"
       ],
-      "hash": "b0864e90bcb7534ef9f3",
+      "hash": "6fdf8d8eb0105ec3b456",
       "childrenByOrder": {}
     },
     {
@@ -1023,9 +972,9 @@
       "initial": true,
       "entry": true,
       "recorded": false,
-      "size": 41069,
+      "size": 41269,
       "sizes": {
-        "runtime": 41069
+        "runtime": 41269
       },
       "names": [
         "runtime"
@@ -1035,14 +984,14 @@
         "runtime"
       ],
       "files": [
-        "runtime.3358fda0b46c5e4d71ad.js",
-        "runtime.7e402ffd1e7b90e991e3.hot-update.js"
+        "runtime.dd4835297d72da249f7c.js",
+        "runtime.94d882cdc8087997595c.hot-update.js"
       ],
       "auxiliaryFiles": [
-        "runtime.3358fda0b46c5e4d71ad.js.map",
-        "runtime.7e402ffd1e7b90e991e3.hot-update.js.map"
+        "runtime.94d882cdc8087997595c.hot-update.js.map",
+        "runtime.dd4835297d72da249f7c.js.map"
       ],
-      "hash": "37449c6f600e1b6b7a22",
+      "hash": "c2619b58e39d2cc3c70f",
       "childrenByOrder": {}
     },
     {
@@ -1050,9 +999,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 16902,
+      "size": 16459,
       "sizes": {
-        "javascript": 16902
+        "javascript": 16459
       },
       "names": [],
       "idHints": [],
@@ -1060,36 +1009,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_apps_Modules_AppModules_blinks_SingleTokenView_tsx.7fbaf82ec907d4d0ca84.js"
+        "src_alex_frontend_src_apps_Modules_AppModules_blinks_SingleTokenView_tsx.b67f23a1421f5705d75c.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_Modules_AppModules_blinks_SingleTokenView_tsx.7fbaf82ec907d4d0ca84.js.map"
+        "src_alex_frontend_src_apps_Modules_AppModules_blinks_SingleTokenView_tsx.b67f23a1421f5705d75c.js.map"
       ],
-      "hash": "22be5560d86957c13848",
-      "childrenByOrder": {}
-    },
-    {
-      "rendered": false,
-      "initial": false,
-      "entry": false,
-      "recorded": false,
-      "reason": "split chunk (cache group: default)",
-      "size": 59486,
-      "sizes": {
-        "javascript": 59486
-      },
-      "names": [],
-      "idHints": [],
-      "runtime": [
-        "runtime"
-      ],
-      "files": [
-        "src_alex_frontend_src_apps_Modules_AppModules_contentGrid_Card_tsx-src_alex_frontend_src_apps-d05b65.a05bc2106a3e743117d0.js"
-      ],
-      "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_Modules_AppModules_contentGrid_Card_tsx-src_alex_frontend_src_apps-d05b65.a05bc2106a3e743117d0.js.map"
-      ],
-      "hash": "917f1e11b66f236d21df",
+      "hash": "587277ec7ef3e80d8a8d",
       "childrenByOrder": {}
     },
     {
@@ -1098,9 +1023,9 @@
       "entry": false,
       "recorded": false,
       "reason": "split chunk (cache group: default)",
-      "size": 21219,
+      "size": 70876,
       "sizes": {
-        "javascript": 21219
+        "javascript": 70876
       },
       "names": [],
       "idHints": [],
@@ -1108,12 +1033,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_apps_Modules_AppModules_contentGrid_Grid_tsx-src_alex_frontend_src_lib_-126894.3757f4edebfe90ef72a1.js"
+        "src_alex_frontend_src_apps_Modules_AppModules_contentGrid_Card_tsx-src_alex_frontend_src_apps-20516a.37977bf507fde48a8784.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_Modules_AppModules_contentGrid_Grid_tsx-src_alex_frontend_src_lib_-126894.3757f4edebfe90ef72a1.js.map"
+        "src_alex_frontend_src_apps_Modules_AppModules_contentGrid_Card_tsx-src_alex_frontend_src_apps-20516a.37977bf507fde48a8784.js.map"
       ],
-      "hash": "b0f15b77bc4548af7e53",
+      "hash": "0839c015a8c8fce94a6e",
       "childrenByOrder": {}
     },
     {
@@ -1121,9 +1046,10 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 73291,
+      "reason": "split chunk (cache group: default)",
+      "size": 21730,
       "sizes": {
-        "javascript": 73291
+        "javascript": 21730
       },
       "names": [],
       "idHints": [],
@@ -1131,12 +1057,59 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_apps_app_Alexandrian_index_tsx.e4ae56c28fbc5b40bb3c.js"
+        "src_alex_frontend_src_apps_Modules_AppModules_contentGrid_Grid_tsx-src_alex_frontend_src_lib_-126894.24d874248a46077f1683.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_app_Alexandrian_index_tsx.e4ae56c28fbc5b40bb3c.js.map"
+        "src_alex_frontend_src_apps_Modules_AppModules_contentGrid_Grid_tsx-src_alex_frontend_src_lib_-126894.24d874248a46077f1683.js.map"
       ],
-      "hash": "a6a756dd9b14c934abfb",
+      "hash": "2ba94018beedb4a886e6",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "reason": "split chunk (cache group: default)",
+      "size": 32963,
+      "sizes": {
+        "javascript": 32963
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "src_alex_frontend_src_apps_Modules_shared_state_librarySearch_libraryThunks_ts-src_alex_front-96500f.093b7e034bf5ad358157.js"
+      ],
+      "auxiliaryFiles": [
+        "src_alex_frontend_src_apps_Modules_shared_state_librarySearch_libraryThunks_ts-src_alex_front-96500f.093b7e034bf5ad358157.js.map"
+      ],
+      "hash": "9ac258ace5c3f56eeb7b",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "size": 49403,
+      "sizes": {
+        "javascript": 49403
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "src_alex_frontend_src_apps_app_Alexandrian_index_tsx.9f081c2508ad3e0dd863.js"
+      ],
+      "auxiliaryFiles": [
+        "src_alex_frontend_src_apps_app_Alexandrian_index_tsx.9f081c2508ad3e0dd863.js.map"
+      ],
+      "hash": "cb88bc3b8852e0f36abc",
       "childrenByOrder": {}
     },
     {
@@ -1154,12 +1127,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_apps_app_Bibliotheca_index_tsx.ae1b67849f6fd971074a.js"
+        "src_alex_frontend_src_apps_app_Bibliotheca_index_tsx.74ca6fe632f5b96b2714.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_app_Bibliotheca_index_tsx.ae1b67849f6fd971074a.js.map"
+        "src_alex_frontend_src_apps_app_Bibliotheca_index_tsx.74ca6fe632f5b96b2714.js.map"
       ],
-      "hash": "dc00e8a3b91f7c8ce08a",
+      "hash": "4acaa639148851742e9e",
       "childrenByOrder": {}
     },
     {
@@ -1167,9 +1140,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 17432,
+      "size": 18449,
       "sizes": {
-        "javascript": 17432
+        "javascript": 18449
       },
       "names": [],
       "idHints": [],
@@ -1177,12 +1150,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_apps_app_Dialectica_index_tsx.ac94a0b6f9f5fe7f5196.js"
+        "src_alex_frontend_src_apps_app_Dialectica_index_tsx.b3a1f4715598850e9535.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_app_Dialectica_index_tsx.ac94a0b6f9f5fe7f5196.js.map"
+        "src_alex_frontend_src_apps_app_Dialectica_index_tsx.b3a1f4715598850e9535.js.map"
       ],
-      "hash": "35d61b7ae26cd9ada762",
+      "hash": "bb30dba185b80180adb4",
       "childrenByOrder": {}
     },
     {
@@ -1190,9 +1163,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 68885,
+      "size": 72593,
       "sizes": {
-        "javascript": 68885
+        "javascript": 72593
       },
       "names": [],
       "idHints": [],
@@ -1200,12 +1173,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_apps_app_Emporium_index_tsx.6296c7be7e3dae78f517.js"
+        "src_alex_frontend_src_apps_app_Emporium_index_tsx.5fcf51648610d41de0bb.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_app_Emporium_index_tsx.6296c7be7e3dae78f517.js.map"
+        "src_alex_frontend_src_apps_app_Emporium_index_tsx.5fcf51648610d41de0bb.js.map"
       ],
-      "hash": "745c1e0796bf9d0de065",
+      "hash": "0430d1cad8df9cc5bc92",
       "childrenByOrder": {}
     },
     {
@@ -1213,9 +1186,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 36633,
+      "size": 115256,
       "sizes": {
-        "javascript": 36633
+        "javascript": 115256
       },
       "names": [],
       "idHints": [],
@@ -1223,14 +1196,14 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.7381cf7079050a234d45.js",
-        "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.7e402ffd1e7b90e991e3.hot-update.js"
+        "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.669556507e8d7f63f650.js",
+        "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.94d882cdc8087997595c.hot-update.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.7381cf7079050a234d45.js.map",
-        "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.7e402ffd1e7b90e991e3.hot-update.js.map"
+        "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.669556507e8d7f63f650.js.map",
+        "src_alex_frontend_src_apps_app_Lexigraph_index_tsx.94d882cdc8087997595c.hot-update.js.map"
       ],
-      "hash": "b8bd91e515783f47bc86",
+      "hash": "47be13559171366b095e",
       "childrenByOrder": {}
     },
     {
@@ -1238,9 +1211,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 56322,
+      "size": 57689,
       "sizes": {
-        "javascript": 56322
+        "javascript": 57689
       },
       "names": [],
       "idHints": [],
@@ -1248,12 +1221,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_apps_app_Permasearch_index_tsx.7ead461397170badf1af.js"
+        "src_alex_frontend_src_apps_app_Permasearch_index_tsx.3aad84db81b6a928ff56.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_app_Permasearch_index_tsx.7ead461397170badf1af.js.map"
+        "src_alex_frontend_src_apps_app_Permasearch_index_tsx.3aad84db81b6a928ff56.js.map"
       ],
-      "hash": "4c0daa04fb4b8debadcf",
+      "hash": "0c9f09b3a1fd1921ffef",
       "childrenByOrder": {}
     },
     {
@@ -1261,9 +1234,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 52546.88,
+      "size": 52714.88,
       "sizes": {
-        "javascript": 52546.88
+        "javascript": 52714.88
       },
       "names": [],
       "idHints": [],
@@ -1271,12 +1244,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_apps_app_Syllogos_index_tsx-data_application_font-woff_charset_utf-8_ba-158802.68cb094547373f1de602.js"
+        "src_alex_frontend_src_apps_app_Syllogos_index_tsx-data_application_font-woff_charset_utf-8_ba-158802.fee9f943be08d6512e20.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_apps_app_Syllogos_index_tsx-data_application_font-woff_charset_utf-8_ba-158802.68cb094547373f1de602.js.map"
+        "src_alex_frontend_src_apps_app_Syllogos_index_tsx-data_application_font-woff_charset_utf-8_ba-158802.fee9f943be08d6512e20.js.map"
       ],
-      "hash": "e89e81eed722708df561",
+      "hash": "b18b47702d4f73a10da0",
       "childrenByOrder": {}
     },
     {
@@ -1294,12 +1267,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_features_auth_index_tsx.b4b9b990fc4210a28149.js"
+        "src_alex_frontend_src_features_auth_index_tsx.4f6cae28fba4be2195a3.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_features_auth_index_tsx.b4b9b990fc4210a28149.js.map"
+        "src_alex_frontend_src_features_auth_index_tsx.4f6cae28fba4be2195a3.js.map"
       ],
-      "hash": "3b2b2a96e21e7afd836f",
+      "hash": "cb3c5a88af970cade4c8",
       "childrenByOrder": {}
     },
     {
@@ -1317,12 +1290,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_features_engine-filters_index_tsx.49c9e1313c12ab69ef9e.js"
+        "src_alex_frontend_src_features_engine-filters_index_tsx.102324688adafff3f99d.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_features_engine-filters_index_tsx.49c9e1313c12ab69ef9e.js.map"
+        "src_alex_frontend_src_features_engine-filters_index_tsx.102324688adafff3f99d.js.map"
       ],
-      "hash": "5b887fb034f8f282a16c",
+      "hash": "cf06118b65eed79d0914",
       "childrenByOrder": {}
     },
     {
@@ -1340,12 +1313,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_features_engine-stats_index_tsx.60d7be911bba5d525b26.js"
+        "src_alex_frontend_src_features_engine-stats_index_tsx.1fc2ee9d4dab01036938.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_features_engine-stats_index_tsx.60d7be911bba5d525b26.js.map"
+        "src_alex_frontend_src_features_engine-stats_index_tsx.1fc2ee9d4dab01036938.js.map"
       ],
-      "hash": "c61007f017b2fdecd2ba",
+      "hash": "9bab5037a162df1eca7e",
       "childrenByOrder": {}
     },
     {
@@ -1363,12 +1336,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_features_engine-tasks_index_tsx.0fa43325531217d0c24a.js"
+        "src_alex_frontend_src_features_engine-tasks_index_tsx.962db66425e970b9d038.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_features_engine-tasks_index_tsx.0fa43325531217d0c24a.js.map"
+        "src_alex_frontend_src_features_engine-tasks_index_tsx.962db66425e970b9d038.js.map"
       ],
-      "hash": "1189dae539549729072d",
+      "hash": "ab554f3ac39b6958da14",
       "childrenByOrder": {}
     },
     {
@@ -1386,12 +1359,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_features_my-engines_components_DraftedEngines_tsx.b6fcbafb07f82675083c.js"
+        "src_alex_frontend_src_features_my-engines_components_DraftedEngines_tsx.906ec27e9697b7939032.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_features_my-engines_components_DraftedEngines_tsx.b6fcbafb07f82675083c.js.map"
+        "src_alex_frontend_src_features_my-engines_components_DraftedEngines_tsx.906ec27e9697b7939032.js.map"
       ],
-      "hash": "738e3c376a6f45d8451c",
+      "hash": "60707c143b40455527d3",
       "childrenByOrder": {}
     },
     {
@@ -1410,12 +1383,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_features_reader_index_tsx-src_alex_frontend_src_features_reader_lib_pro-8ea1c2.89bbc8225056f6a9b5fb.js"
+        "src_alex_frontend_src_features_reader_index_tsx-src_alex_frontend_src_features_reader_lib_pro-8ea1c2.8eaa73dbc57b7a626f98.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_features_reader_index_tsx-src_alex_frontend_src_features_reader_lib_pro-8ea1c2.89bbc8225056f6a9b5fb.js.map"
+        "src_alex_frontend_src_features_reader_index_tsx-src_alex_frontend_src_features_reader_lib_pro-8ea1c2.8eaa73dbc57b7a626f98.js.map"
       ],
-      "hash": "e8ab3b33a031c012ec0b",
+      "hash": "f38f2a20855d01f121fc",
       "childrenByOrder": {}
     },
     {
@@ -1433,12 +1406,35 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_features_swap_components_transactionHistory_detailTransaction_tsx.9e2f4777af08acc920f9.js"
+        "src_alex_frontend_src_features_swap_components_transactionHistory_detailTransaction_tsx.7f5c2a97fcd9a907017b.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_features_swap_components_transactionHistory_detailTransaction_tsx.9e2f4777af08acc920f9.js.map"
+        "src_alex_frontend_src_features_swap_components_transactionHistory_detailTransaction_tsx.7f5c2a97fcd9a907017b.js.map"
       ],
-      "hash": "74eb1c105e83b795a1f3",
+      "hash": "e5b6808feaf8fc2068c5",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "size": 16837,
+      "sizes": {
+        "javascript": 16837
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "src_alex_frontend_src_features_wallets_index_tsx.ec7b9bee9bd9886a54d3.js"
+      ],
+      "auxiliaryFiles": [
+        "src_alex_frontend_src_features_wallets_index_tsx.ec7b9bee9bd9886a54d3.js.map"
+      ],
+      "hash": "94347cd38c23f043674d",
       "childrenByOrder": {}
     },
     {
@@ -1456,12 +1452,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_layouts_DashboardLayout_tsx.a018e89a4dc75b68cca3.js"
+        "src_alex_frontend_src_layouts_DashboardLayout_tsx.205bb64e46b83eda3241.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_layouts_DashboardLayout_tsx.a018e89a4dc75b68cca3.js.map"
+        "src_alex_frontend_src_layouts_DashboardLayout_tsx.205bb64e46b83eda3241.js.map"
       ],
-      "hash": "12ba0af99257367d783e",
+      "hash": "ca19cf7df65e6af70be6",
       "childrenByOrder": {}
     },
     {
@@ -1479,12 +1475,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_pages_InfoPage_tsx.75be99ec0422cc54dfe4.js"
+        "src_alex_frontend_src_pages_InfoPage_tsx.4d15555b31d1132ae920.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_pages_InfoPage_tsx.75be99ec0422cc54dfe4.js.map"
+        "src_alex_frontend_src_pages_InfoPage_tsx.4d15555b31d1132ae920.js.map"
       ],
-      "hash": "fd3edae5999d976cc6c5",
+      "hash": "402ab8f0cd86fcfdbc38",
       "childrenByOrder": {}
     },
     {
@@ -1492,9 +1488,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 35613,
+      "size": 38801,
       "sizes": {
-        "javascript": 35613
+        "javascript": 38801
       },
       "names": [],
       "idHints": [],
@@ -1502,12 +1498,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_pages_ManagerPage_tsx.f4cecc5062d7c5a4bd30.js"
+        "src_alex_frontend_src_pages_ManagerPage_tsx.4c12e07cbd312b6fe448.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_pages_ManagerPage_tsx.f4cecc5062d7c5a4bd30.js.map"
+        "src_alex_frontend_src_pages_ManagerPage_tsx.4c12e07cbd312b6fe448.js.map"
       ],
-      "hash": "a3437b6249e257d94c8e",
+      "hash": "70fc427bf3d8d159a011",
       "childrenByOrder": {}
     },
     {
@@ -1525,12 +1521,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_pages_NotFoundPage_tsx.b741c5b87a050cb84193.js"
+        "src_alex_frontend_src_pages_NotFoundPage_tsx.edaf44996e45055c6762.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_pages_NotFoundPage_tsx.b741c5b87a050cb84193.js.map"
+        "src_alex_frontend_src_pages_NotFoundPage_tsx.edaf44996e45055c6762.js.map"
       ],
-      "hash": "8611025caf4e2ecba5d3",
+      "hash": "90a2c330168108dc3644",
       "childrenByOrder": {}
     },
     {
@@ -1538,9 +1534,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 37930,
+      "size": 48028,
       "sizes": {
-        "javascript": 37930
+        "javascript": 48028
       },
       "names": [],
       "idHints": [],
@@ -1548,12 +1544,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_pages_PinaxPage_tsx.f4e5979eb92655e7b79f.js"
+        "src_alex_frontend_src_pages_PinaxPage_tsx.6162ed522886a7dc10f2.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_pages_PinaxPage_tsx.f4e5979eb92655e7b79f.js.map"
+        "src_alex_frontend_src_pages_PinaxPage_tsx.6162ed522886a7dc10f2.js.map"
       ],
-      "hash": "40ed53bf94b566e11e33",
+      "hash": "92849fced9bc2d843a7b",
       "childrenByOrder": {}
     },
     {
@@ -1571,12 +1567,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_pages_dashboard_ProfilePage_tsx.a5be25385a16489548da.js"
+        "src_alex_frontend_src_pages_dashboard_ProfilePage_tsx.546bfb7025e1a37a8c40.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_pages_dashboard_ProfilePage_tsx.a5be25385a16489548da.js.map"
+        "src_alex_frontend_src_pages_dashboard_ProfilePage_tsx.546bfb7025e1a37a8c40.js.map"
       ],
-      "hash": "c4d601178d331501d960",
+      "hash": "9b9159c6d9f682cdaf0c",
       "childrenByOrder": {}
     },
     {
@@ -1584,9 +1580,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 43272,
+      "size": 26975,
       "sizes": {
-        "javascript": 43272
+        "javascript": 26975
       },
       "names": [],
       "idHints": [],
@@ -1594,12 +1590,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_pages_librarian_WalletsPage_tsx.6712d69d936d5d10bd95.js"
+        "src_alex_frontend_src_pages_librarian_WalletsPage_tsx.1ce4081a2959f33a4b45.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_pages_librarian_WalletsPage_tsx.6712d69d936d5d10bd95.js.map"
+        "src_alex_frontend_src_pages_librarian_WalletsPage_tsx.1ce4081a2959f33a4b45.js.map"
       ],
-      "hash": "d98464fb259e092a15fb",
+      "hash": "97802f01407f2741b1c0",
       "childrenByOrder": {}
     },
     {
@@ -1617,12 +1613,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_pages_librarian_index_tsx.0c6ab9b1e1e7835f1bf3.js"
+        "src_alex_frontend_src_pages_librarian_index_tsx.83d1eca81f8b2bd712b8.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_pages_librarian_index_tsx.0c6ab9b1e1e7835f1bf3.js.map"
+        "src_alex_frontend_src_pages_librarian_index_tsx.83d1eca81f8b2bd712b8.js.map"
       ],
-      "hash": "9be710c13cbbbdab6d61",
+      "hash": "ef8b32a5d735ca99f0a9",
       "childrenByOrder": {}
     },
     {
@@ -1630,9 +1626,9 @@
       "initial": false,
       "entry": false,
       "recorded": false,
-      "size": 144194,
+      "size": 144786,
       "sizes": {
-        "javascript": 144194
+        "javascript": 144786
       },
       "names": [],
       "idHints": [],
@@ -1640,12 +1636,12 @@
         "runtime"
       ],
       "files": [
-        "src_alex_frontend_src_pages_swap_index_tsx.b186eac46b8330a87a76.js"
+        "src_alex_frontend_src_pages_swap_index_tsx.d2a1d6d6b907e7c9aee0.js"
       ],
       "auxiliaryFiles": [
-        "src_alex_frontend_src_pages_swap_index_tsx.b186eac46b8330a87a76.js.map"
+        "src_alex_frontend_src_pages_swap_index_tsx.d2a1d6d6b907e7c9aee0.js.map"
       ],
-      "hash": "4fc4dfb14fa94beb6b4e",
+      "hash": "b4e1679705187cfe359f",
       "childrenByOrder": {}
     },
     {
@@ -4764,9 +4760,9 @@
       "entry": false,
       "recorded": false,
       "reason": "split chunk (cache group: vendors) (name: vendors)",
-      "size": 135288,
+      "size": 139038,
       "sizes": {
-        "javascript": 135288
+        "javascript": 139038
       },
       "names": [
         "vendors-node_modules_l"
@@ -4778,12 +4774,12 @@
         "runtime"
       ],
       "files": [
-        "vendors-node_modules_l.2708625a443eb7756642.js"
+        "vendors-node_modules_l.f8b87926c64e55c053f1.js"
       ],
       "auxiliaryFiles": [
-        "vendors-node_modules_l.2708625a443eb7756642.js.map"
+        "vendors-node_modules_l.f8b87926c64e55c053f1.js.map"
       ],
-      "hash": "7d0b27eb771be0a4ee53",
+      "hash": "84c28e343746b1634a8d",
       "childrenByOrder": {}
     },
     {
@@ -6108,12 +6104,12 @@
       "name": "index",
       "assets": [
         {
-          "name": "runtime.3358fda0b46c5e4d71ad.js",
-          "size": 58748
+          "name": "runtime.dd4835297d72da249f7c.js",
+          "size": 58948
         },
         {
-          "name": "runtime.7e402ffd1e7b90e991e3.hot-update.js",
-          "size": 5607
+          "name": "runtime.94d882cdc8087997595c.hot-update.js",
+          "size": 5807
         },
         {
           "name": "critical-node_modules_react-dom_cjs_react-dom_development_js-61bb2bf2.5b66634cca2646a5df70.js",
@@ -6464,8 +6460,8 @@
           "size": 140283
         },
         {
-          "name": "vendors-node_modules_l.2708625a443eb7756642.js",
-          "size": 200099
+          "name": "vendors-node_modules_l.f8b87926c64e55c053f1.js",
+          "size": 208097
         },
         {
           "name": "vendors-node_modules_mdast-util-f.1c1e3f48c68b0775c1fe.js",
@@ -6640,52 +6636,103 @@
           "size": 137878
         },
         {
-          "name": "index-i.c13cc3be21b73705f089.js",
-          "size": 224560
+          "name": "index-i.f90022b1a598082b8dd0.js",
+          "size": 266798
         },
         {
-          "name": "index-src_alex_frontend_src_c.887e78336aa4af8e071a.js",
-          "size": 369015
+          "name": "index-src_alex_frontend_src_c.86a924946875384405c0.js",
+          "size": 379807
         },
         {
-          "name": "index-src_alex_frontend_src_la.c1c86693a811e9c99db3.js",
-          "size": 72845
+          "name": "index-src_alex_frontend_src_la.aca31088e1a9a7bc24c8.js",
+          "size": 81576
         },
         {
-          "name": "index-src_alex_frontend_src_p.f3be21b36f25c3fe6671.js",
-          "size": 202616
+          "name": "index-src_alex_frontend_src_p.59ec46ac2d5ac81e7609.js",
+          "size": 450046
         },
         {
-          "name": "index-src_al.1a95d6b59a632b9a9b86.js",
-          "size": 277379
+          "name": "index-src_al.9f417347cdb8a2061933.js",
+          "size": 31377
         },
         {
-          "name": "index-src_al.7e402ffd1e7b90e991e3.hot-update.js",
-          "size": 11038
-        },
-        {
-          "name": "index-src_d.c28f69225180247dd695.js",
-          "size": 151985
+          "name": "index-src_d.3a127792522ed90d5a95.js",
+          "size": 159808
         }
       ],
       "filteredAssets": 0,
-      "assetsSize": 25149585,
-      "filteredAuxiliaryAssets": 151,
-      "auxiliaryAssetsSize": 25570137
+      "assetsSize": 25217957,
+      "filteredAuxiliaryAssets": 150,
+      "auxiliaryAssetsSize": 25647331
     }
   },
   "errors": [
     {
-      "moduleIdentifier": "/home/theseus/alexandria/core/node_modules/ts-loader/index.js!/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/index.tsx",
-      "moduleName": "./src/alex_frontend/src/apps/app/Lexigraph/index.tsx",
-      "loc": "16:0-379",
-      "message": "Module not found: Error: Can't resolve '@/features/lexigraph/lexigraphSlice' in '/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph'"
+      "moduleIdentifier": "/home/theseus/alexandria/core/node_modules/ts-loader/index.js!/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/index.ts",
+      "moduleName": "./src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/index.ts",
+      "loc": "1:0-30",
+      "message": "Module not found: Error: Can't resolve './ShelfDetail' in '/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers'"
     },
     {
-      "moduleIdentifier": "/home/theseus/alexandria/core/node_modules/ts-loader/index.js!/home/theseus/alexandria/core/src/alex_frontend/src/store/rootReducer.ts",
-      "moduleName": "./src/alex_frontend/src/store/rootReducer.ts",
-      "loc": "25:0-67",
-      "message": "Module not found: Error: Can't resolve '@/features/lexigraph/lexigraphSlice' in '/home/theseus/alexandria/core/src/alex_frontend/src/store'"
+      "moduleIdentifier": "/home/theseus/alexandria/core/node_modules/ts-loader/index.js!/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/shelf-management/components/index.ts",
+      "moduleName": "./src/alex_frontend/src/apps/app/Lexigraph/features/shelf-management/components/index.ts",
+      "loc": "2:0-92",
+      "message": "Module not found: Error: Can't resolve './ShelfDetail' in '/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/shelf-management/components'"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "6:9-27",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(6,10)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS2724: '\"../types/types\"' has no exported member named 'ShelfDetailUIProps'. Did you mean 'ShelfDetailViewProps'?\u001b[39m\u001b[22m"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "90:37-38",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(90,38)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS7031: Binding element '_' implicitly has an 'any' type.\u001b[39m\u001b[22m"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "90:40-44",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(90,41)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS7031: Binding element 'slot' implicitly has an 'any' type.\u001b[39m\u001b[22m"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "107:37-40",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(107,38)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS7031: Binding element 'key' implicitly has an 'any' type.\u001b[39m\u001b[22m"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "107:42-43",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(107,43)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS7031: Binding element '_' implicitly has an 'any' type.\u001b[39m\u001b[22m"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "346:29-36",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(346,30)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS7031: Binding element 'slotKey' implicitly has an 'any' type.\u001b[39m\u001b[22m"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "346:38-42",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(346,39)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS7031: Binding element 'slot' implicitly has an 'any' type.\u001b[39m\u001b[22m"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "346:45-50",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(346,46)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS7006: Parameter 'index' implicitly has an 'any' type.\u001b[39m\u001b[22m"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "366:34-41",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(366,35)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS7031: Binding element 'slotKey' implicitly has an 'any' type.\u001b[39m\u001b[22m"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "366:43-47",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(366,44)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS7031: Binding element 'slot' implicitly has an 'any' type.\u001b[39m\u001b[22m"
+    },
+    {
+      "file": "/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx",
+      "loc": "366:50-55",
+      "message": "\u001b[90m[tsl] \u001b[39m\u001b[1m\u001b[31mERROR\u001b[39m\u001b[22m\u001b[1m\u001b[31m in \u001b[39m\u001b[22m\u001b[1m\u001b[36m/home/theseus/alexandria/core/src/alex_frontend/src/apps/app/Lexigraph/features/cards/containers/ShelfDetail.tsx(366,51)\u001b[39m\u001b[22m\n\u001b[1m\u001b[31m      TS7006: Parameter 'index' implicitly has an 'any' type.\u001b[39m\u001b[22m"
     }
   ],
   "warnings": []

@@ -1,20 +1,15 @@
 ### UX/UI Feature TODO
 
-- Get the NFTs working like actual NFTs. 
 
-- Fix the public/explore functionality.
 - Add owner to the path so you could go to their profile (Make the shelf path be connected to the owner.)
+
+
+### Backend Decision TODOs
 - Connect and a follow button on the shelves.
 - Another thing is the user sharing side. Do we let them add comments or something or other grids in a community section? How do we sort/rank these or do we let users do that themselves?
-- Most links to /shelf/slot, are not open access and require login which shouldn't be.
-
-
-
-- Display actual NFTs in the NFT slot.
-- Blog View: Switch from the table to show the markdown style blog with the NFTs inside.
-
-
 - Payment for all actions, and removal of topup.
+
+
 
 ### Future Possible Features
 
@@ -89,7 +84,24 @@ Your app is built around these primary concepts:
   - NFTs
   - References to other shelves (nesting)
 
-
+src/alex_frontend/src/apps/app/Lexigraph/features/
+├── shelf-management/
+│   ├── containers/
+│   │   └── ShelfDetailContainer.tsx  # Business logic container
+│   ├── components/
+│   │   └── ...
+│   ├── hooks/
+│   │   └── useShelfOperations.ts
+│   └── index.ts
+│
+├── cards/
+│   ├── components/
+│   │   └── ShelfDetailView.tsx      # Presentational component
+│   ├── containers/
+│   │   └── ...
+│   ├── types/
+│   │   └── types.ts
+│   └── index.ts
 
 
 

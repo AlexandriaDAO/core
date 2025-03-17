@@ -53,7 +53,6 @@ const NftDisplay = ({ tokenId, onViewDetails, inShelf = false }: {
 
       try {
         setIsLoading(true);
-        console.log('Loading NFT data for tokenId:', tokenId);
         
         const tokenType = determineTokenType(tokenId);
         const tokenAdapter = createTokenAdapter(tokenType);

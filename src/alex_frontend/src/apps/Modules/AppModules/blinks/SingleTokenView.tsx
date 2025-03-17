@@ -53,7 +53,6 @@ function SingleTokenView() {
 
       try {
         setIsLoading(true);
-        console.log('Loading NFT data for tokenId:', tokenId);
         
         const tokenType = determineTokenType(tokenId);
         
