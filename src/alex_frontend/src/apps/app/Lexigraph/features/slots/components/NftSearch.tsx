@@ -27,7 +27,6 @@ const NftSearchDialog: React.FC<NftSearchDialogProps> = ({ onSelect }) => {
   const { transactions, contentData } = useSelector((state: RootState) => state.transactions);
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
-  const { predictions } = useSelector((state: RootState) => state.arweave);
   const [selectedNft, setSelectedNft] = useState<string | null>(null);
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string, assetUrl: string } | null>(null);
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal?.toString());

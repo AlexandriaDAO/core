@@ -1,42 +1,55 @@
-import React, { lazy, Suspense } from "react";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import React, { lazy, useState } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { reset } from "@/features/upload/uploadSlice";
+import { ContentType } from "@/features/upload/uploadSlice";
 import useNavigationGuard from "@/features/upload/hooks/useNavigationGuard";
+import { useCleanupEffect } from "@/features/upload/hooks/useCleanupEffect";
+import { useFileEffect } from "@/features/upload/hooks/useFileEffect";
+import { useTransactionEffect } from "@/features/upload/hooks/useTransactionEffect";
+import { useUploadedFileEffect } from "@/features/upload/hooks/useUploadedFileEffect";
+import FileUploader from "@/features/upload/components/FileUploader";
+import UploadError from "@/features/upload/components/UploadError";
+import PostUploadPreview from "@/features/upload/components/PostUploadPreview";
+import PreUploadPreview from "@/features/upload/components/PreUploadPreview";
+import Header from "@/features/upload/components/Header";
+import TextEditor from "@/features/upload/components/TextEditor";
+import FileSelector from "@/features/upload/components/FileSelector";
 
 const AlexWalletActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexWalletActor })));
 const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
-const Upload = lazy(() => import("@/features/upload"));
 
 function PinaxPage() {
-	const dispatch = useAppDispatch();
-	const { uploading, minting, transaction, minted } = useAppSelector(state => state.upload);
+	const { type, uploading, minting, transaction, minted, uploadError, fetchError, selectError } = useAppSelector(state => state.upload);
+	const [file, setFile] = useState<File | null>(null);
+	const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-	// Handle cleanup on unmount
-	React.useEffect(() => {
-		return () => {
-			dispatch(reset());
-		};
-	}, [dispatch]);
-
-	// Custom hook for navigation guards
+	useCleanupEffect();
 	useNavigationGuard({ uploading, minting, transaction, minted });
+	useFileEffect({ file, setUploadedFile });
+	useTransactionEffect({ transaction, file, setUploadedFile });
+	useUploadedFileEffect({ uploadedFile, setFile });
 
 	return (
-		<Suspense fallback={<div>Loading components...</div>}>
-			<AlexWalletActor>
-				<NftManagerActor>
-					<div className="py-10 flex-grow flex justify-center items-center">
-						<div className="w-full">
-							<div className="space-y-6 max-w-2xl mx-auto">
-								<Upload />
-							</div>
-						</div>
-					</div>
-				</NftManagerActor>
-			</AlexWalletActor>
-		</Suspense>
+		<AlexWalletActor>
+			<NftManagerActor>
+				<div className="py-10 px-4 sm:px-6 md:px-10 flex-grow flex justify-center">
+					<div className="max-w-2xl w-full flex flex-col justify-center items-center gap-8">
+						<Header />
 
+						{(uploadedFile && transaction) ? <PostUploadPreview file={uploadedFile} transaction={transaction}/> : null}
+
+						{type == ContentType.Manual && <TextEditor setFile={setFile} />}
+
+						{type == ContentType.Local && <FileSelector setFile={setFile} />}
+
+						{file && !uploadedFile && <PreUploadPreview file={file} />}
+
+						{(uploadError || fetchError || selectError) && <UploadError />}
+
+						{ (file || uploadedFile) && <FileUploader file={file} setFile={setFile} /> }
+					</div>
+				</div>
+			</NftManagerActor>
+		</AlexWalletActor>
 	);
 }
 

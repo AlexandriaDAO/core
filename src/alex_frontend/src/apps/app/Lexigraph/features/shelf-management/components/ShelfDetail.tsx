@@ -91,35 +91,33 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 				handleDragEnd,
 				handleDrop
 			}) => (
-				<div className="container mx-auto p-4">
-					<ShelfDetailUI
-						shelf={shelf}
-						orderedSlots={orderedSlots}
-						isEditMode={isEditMode}
-						editedSlots={editedSlots}
-						isPublic={isPublic}
-						onBack={onBack}
-						onAddSlot={onAddSlot}
-						onViewSlot={(slotId: number) => {}}
-						onEnterEditMode={enterEditMode}
-						onCancelEditMode={cancelEditMode}
-						onSaveSlotOrder={saveSlotOrder}
-						handleDragStart={handleDragStart}
-						handleDragOver={handleDragOver}
-						handleDragEnd={handleDragEnd}
-						handleDrop={handleDrop}
-						settingsButton={
-							!isPublic && !isEditMode ? (
-								<ShelfSettingsDialog 
-									shelf={shelf} 
-									onRebalance={handleRebalance} 
-									onUpdateMetadata={updateMetadata}
-									className="mr-2"
-								/>
-							) : undefined
-						}
-					/>
-				</div>
+				<ShelfDetailUI
+					shelf={shelf}
+					orderedSlots={orderedSlots}
+					isEditMode={isEditMode}
+					editedSlots={editedSlots}
+					isPublic={isPublic}
+					onBack={onBack}
+					onAddSlot={onAddSlot}
+					onViewSlot={(slotId: number) => {}}
+					onEnterEditMode={enterEditMode}
+					onCancelEditMode={cancelEditMode}
+					onSaveSlotOrder={saveSlotOrder}
+					handleDragStart={handleDragStart}
+					handleDragOver={handleDragOver}
+					handleDragEnd={handleDragEnd}
+					handleDrop={handleDrop}
+					settingsButton={
+						!isPublic && !isEditMode ? (
+							<ShelfSettingsDialog 
+								shelf={shelf} 
+								onRebalance={handleRebalance} 
+								onUpdateMetadata={updateMetadata}
+								className="mr-2"
+							/>
+						) : undefined
+					}
+				/>
 			)}
 		</SlotReorderManager>
 	);

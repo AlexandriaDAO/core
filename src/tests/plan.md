@@ -1,3 +1,8 @@
+Alexandrian prev/next doen't work on mobile alexandrian.
+
+
+
+
 #### Bigger Features (lower priority):
 - Need more dynamic states for the like/mint/withdraw buttons. include in this singleTokenView.tsx which duplicates a lot of this logic. (If the mint has succeded the mint button should go away).
 - Just more efficient loading, maybe lossless compression, or lower res on heavy assets. Maybe make this a setting for people based on how good their internet is.
@@ -50,7 +55,7 @@ NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I 09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal yvjik-zehkk-qo7nr-t4r7a-2aomx-mnp6e-htymf-r2adf-d7gjm-bpu3e-aae)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal jp6g7-llm3c-gfcy4-iul27-gtfqc-ebkps-ggmt6-d7b7f-2rxsh-4esz7-mae)
 
 
 

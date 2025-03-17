@@ -7,13 +7,27 @@ import { SerializedWallet } from "../wallets/walletsSlice";
 import fetchBalance from "./thunks/fetchBalance";
 import selectWallet from "./thunks/selectWallet";
 
+export enum Step {
+	Select = 1,
+	Preview = 2,
+	Success = 3,
+}
+
+export enum ContentType {
+	Local = 'local',
+	Manual = 'manual'
+}
 export interface UploadState {
-	textMode: boolean;
+	step: Step;
+	type: ContentType;
 	wallets: SerializedWallet[];
 	wallet: SerializedWallet | null;
 
 	transaction: string | null;
-	details: boolean;
+	fileSelector: boolean;
+	textEditor: boolean;
+	preUploadPreview: boolean;
+	postUploadPreview: boolean;
 
 	progress: number;
 
@@ -35,12 +49,16 @@ export interface UploadState {
 }
 
 const initialState: UploadState = {
-	textMode: false,
+	step: Step.Select,
+	type: ContentType.Local,
 	wallets: [],
 	wallet: null,
 
 	transaction: null,
-	details: true,
+	fileSelector: true,
+	textEditor: false,
+	preUploadPreview: false,
+	postUploadPreview: false,
 	progress: 0,
 
 	fetching: false,
@@ -74,11 +92,23 @@ const uploadSlice = createSlice({
 		setProgress: (state, action)=>{
 			state.progress = action.payload
 		},
-		setDetails: (state, action)=>{
-			state.details = action.payload
+		setFileSelector: (state, action)=>{
+			state.fileSelector = action.payload
 		},
-		setTextMode: (state, action)=>{
-			state.textMode = action.payload
+		setTextEditor: (state, action)=>{
+			state.textEditor = action.payload
+		},
+		setPreUploadPreview: (state, action)=>{
+			state.preUploadPreview = action.payload
+		},
+		setPostUploadPreview: (state, action)=>{
+			state.postUploadPreview = action.payload
+		},
+		setContentType: (state, action)=>{
+			state.type = action.payload
+		},
+		setStep: (state, action)=>{
+			state.step = action.payload
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<UploadState>) => {
@@ -109,14 +139,14 @@ const uploadSlice = createSlice({
 			.addCase(uploadFile.fulfilled, (state, action:PayloadAction<string>) => {
 				state.uploading = false;
 				state.transaction = action.payload;
-				state.progress = 0;
+				// state.progress = 0;
 				state.wallet = null
 			})
 			.addCase(uploadFile.rejected, (state, action) => {
 				state.uploading = false;
 				state.transaction = null;
 				state.uploadError = action.payload as string;
-				state.progress = 0;
+				// state.progress = 0;
 			})
 
 			.addCase(mintNFT.pending, (state) => {
@@ -198,6 +228,6 @@ const uploadSlice = createSlice({
 	}
 });
 
-export const { reset, setWallet, setProgress, setDetails, setTransaction, setTextMode } = uploadSlice.actions;
+export const { reset, setWallet, setProgress, setFileSelector, setTextEditor, setPreUploadPreview, setPostUploadPreview, setTransaction, setContentType, setStep } = uploadSlice.actions;
 
 export default uploadSlice.reducer;
