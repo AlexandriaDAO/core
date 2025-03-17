@@ -26,7 +26,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
   orderedSlots,
   isEditMode,
   editedSlots,
-  isPublic,
+  hasEditAccess,
   onBack,
   onAddSlot,
   onViewSlot,
@@ -263,9 +263,9 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
             </Button>
           </div>
           
-          {!isEditMode && !isPublic && settingsButton}
+          {!isEditMode && settingsButton}
           
-          {!isEditMode && !isPublic && (
+          {!isEditMode && hasEditAccess && (
             <Button
               variant="outline"
               className="flex items-center gap-1 h-8 text-sm"
@@ -298,7 +298,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
             </>
           )}
           
-          {!isPublic && onAddSlot && (
+          {hasEditAccess && onAddSlot && (
             <Button
               variant="primary"
               className="flex items-center gap-1 h-8 text-sm"
@@ -316,11 +316,6 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
           <h2 className="text-2xl font-bold">{shelf.title}</h2>
           <p className="text-muted-foreground">{shelf.description}</p>
           <div className="mt-1 flex items-center gap-2">
-            {isPublic && (
-              <span className="text-xs bg-green-100 text-green-800 rounded-full px-2 py-1">
-                Public
-              </span>
-            )}
             <span className="text-xs text-muted-foreground">
               Owner: <PrincipalDisplay principal={shelf.owner} />
             </span>
@@ -332,7 +327,7 @@ export const ShelfDetailUI: React.FC<ShelfDetailUIProps> = ({
         {slots.length === 0 ? (
           <div className="text-center py-10 text-muted-foreground h-full flex flex-col items-center justify-center">
             <p className="mb-2">This shelf is empty.</p>
-            {!isPublic && onAddSlot && (
+            {hasEditAccess && onAddSlot && (
               <Button
                 variant="outline"
                 className="flex items-center gap-1 mx-auto"

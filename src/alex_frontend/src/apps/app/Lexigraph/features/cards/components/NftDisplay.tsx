@@ -68,11 +68,9 @@ const NftDisplay = ({ tokenId, onViewDetails, inShelf = false }: {
         
         // Get Arweave ID for this token
         const arweaveId = await tokenAdapter.tokenToNFTData(nftId, '').then(data => data.arweaveId);
-        console.log('Converted to arweaveId:', arweaveId);
         
         // Fetch transaction data from Arweave
         const txData = await fetchTransactionById(arweaveId);
-        console.log('Fetched transaction data:', txData);
         
         if (!txData) {
           console.error('Transaction not found for arweaveId:', arweaveId);
@@ -126,13 +124,6 @@ const NftDisplay = ({ tokenId, onViewDetails, inShelf = false }: {
               arweaveId: arweaveId,
               balances: { alex: alexTokens, lbry: lbryTokens }
             }
-          }));
-          
-          dispatch(updateNftBalances({
-            tokenId,
-            alex: alexTokens,
-            lbry: lbryTokens,
-            collection: tokenType
           }));
         }
       } catch (error) {

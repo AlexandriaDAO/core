@@ -27,7 +27,7 @@ export interface ShelfDetailProps {
 	onBack: () => void;
 	onAddSlot?: (shelf: Shelf) => void;
 	onReorderSlot?: (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean) => Promise<void>;
-	isPublic?: boolean;
+	hasEditAccess?: boolean;
 }
 
 // The ShelfDetail component that integrates with the UI component
@@ -36,7 +36,7 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 	onBack,
 	onAddSlot,
 	onReorderSlot,
-	isPublic = false
+	hasEditAccess = true
 }) => {
 	const pathInfo = parsePathInfo(window.location.pathname);
 	const identity = useIdentity();
@@ -66,7 +66,7 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 	
 	// Existing rebalance handler
 	const handleRebalance = async (shelfId: string) => {
-		if (!identity || isPublic) return;
+		if (!identity || !hasEditAccess) return;
 		// Check if identity.identity exists before accessing it
 		if (identity.identity) {
 			const principal = identity.identity.getPrincipal().toString();
@@ -78,7 +78,7 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 		<SlotReorderManager
 			shelf={shelf}
 			orderedSlots={orderedSlots}
-			isPublic={isPublic}
+			hasEditAccess={hasEditAccess}
 		>
 			{({
 				isEditMode,
@@ -96,7 +96,7 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 					orderedSlots={orderedSlots}
 					isEditMode={isEditMode}
 					editedSlots={editedSlots}
-					isPublic={isPublic}
+					hasEditAccess={hasEditAccess}
 					onBack={onBack}
 					onAddSlot={onAddSlot}
 					onViewSlot={(slotId: number) => {}}
@@ -108,7 +108,7 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 					handleDragEnd={handleDragEnd}
 					handleDrop={handleDrop}
 					settingsButton={
-						!isPublic && !isEditMode ? (
+						hasEditAccess && !isEditMode ? (
 							<ShelfSettingsDialog 
 								shelf={shelf} 
 								onRebalance={handleRebalance} 

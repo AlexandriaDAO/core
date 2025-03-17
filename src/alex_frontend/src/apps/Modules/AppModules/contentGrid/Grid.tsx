@@ -6,7 +6,6 @@ import { clearTransactionContent } from "@/apps/Modules/shared/state/transaction
 import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import ContentRenderer from '@/apps/Modules/AppModules/safeRender/ContentRenderer';
 import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components/TransactionDetails';
-import { mint_nft } from "@/features/nft/mint";
 import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
 import { Button } from "@/lib/components/button";
 import { withdraw_nft } from "@/features/nft/withdraw";
@@ -77,19 +76,6 @@ const Grid = ({ dataSource }: GridProps = {}) => {
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
 
-  const handleMint = useCallback(async (transactionId: string) => {
-    try {
-      setMintingStates(prev => ({ ...prev, [transactionId]: true }));
-      const message = await mint_nft(transactionId);
-      toast.success(message);
-    } catch (error) {
-      console.error("Error minting NFT:", error);
-      toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
-    } finally {
-      setMintingStates(prev => ({ ...prev, [transactionId]: false }));
-    }
-  }, []);
-
   const handleRenderError = useCallback((transactionId: string) => {
     dispatch(clearTransactionContent(transactionId));
   }, [dispatch]);
@@ -157,16 +143,12 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                 id={transaction.id}
                 owner={transaction.owner}
                 isOwned={isOwned || false}
-                onMint={(e) => {
-                  e.stopPropagation();
-                  handleMint(transaction.id);
-                }}
+                isMinting={mintingStates[transaction.id]}
                 onWithdraw={canWithdraw ? (e) => {
                   e.stopPropagation();
                   handleWithdraw(transaction.id);
                 } : undefined}
                 predictions={predictions[transaction.id]}
-                isMinting={mintingStates[transaction.id]}
               >
                 <div className="group relative w-full h-full">
                   <ContentRenderer

@@ -172,6 +172,7 @@ export const updateSearchParams = createAsyncThunk<
   }
 );
 
+// Enhanced to update pagination and fetch new data when collection type changes
 export const changeCollection = createAsyncThunk<
   void,
   'NFT' | 'SBT',
@@ -180,32 +181,32 @@ export const changeCollection = createAsyncThunk<
   'library/changeCollection',
   async (collectionType, { dispatch, getState }) => {
     try {
+      // Clear existing NFTs when changing collection
       dispatch(clearNfts());
+      
+      // Update the collection type
       dispatch(setCollection(collectionType));
       
+      // Get current state after collection update
       const state = getState();
-      const { selectedPrincipals } = state.library;
+      const selectedPrincipal = state.library.selectedPrincipals[0] || 'new';
       
-      // Create the appropriate token adapter
+      // Create the appropriate token adapter for the new collection
       const tokenAdapter = createTokenAdapter(collectionType as TokenType);
-      
-      // Get total count for the selected collection
+
+      // Get total count for the selected principal with the new collection type
       let totalCount: bigint;
-      
-      if (selectedPrincipals.length === 0 || selectedPrincipals[0] === 'new') {
-        // For 'new' option or when no principal is selected, get total supply
+      if (selectedPrincipal === 'new') {
         totalCount = await tokenAdapter.getTotalSupply();
       } else {
-        // For specific principal, get their balance
-        const principalId = selectedPrincipals[0];
-        const principal = Principal.fromText(principalId);
+        const principal = Principal.fromText(selectedPrincipal);
         totalCount = await tokenAdapter.getBalanceOf(principal);
       }
-      
+
       // Update total items in the store
       dispatch(setTotalItems(Number(totalCount)));
-      
-      // Reset search params to start from the beginning
+
+      // Reset search params to appropriate values based on the new total
       const pageSize = state.library.searchParams.pageSize;
       dispatch(setSearchParams({ 
         start: 0,
@@ -213,9 +214,7 @@ export const changeCollection = createAsyncThunk<
         pageSize
       }));
       
-      // Perform search with the new collection type
-      dispatch(performSearch());
-      
+      // Don't automatically trigger a search - let the user do it explicitly
     } catch (error) {
       console.error('Error in changeCollection:', error);
       throw error;

@@ -7,7 +7,7 @@ import { useIdentity } from "@/hooks/useIdentity";
 interface SlotReorderManagerProps {
   shelf: Shelf;
   orderedSlots: [number, Slot][];
-  isPublic: boolean;
+  hasEditAccess: boolean;
   children: (props: {
     isEditMode: boolean;
     editedSlots: [number, Slot][];
@@ -24,7 +24,7 @@ interface SlotReorderManagerProps {
 export const SlotReorderManager: React.FC<SlotReorderManagerProps> = ({
   shelf,
   orderedSlots,
-  isPublic,
+  hasEditAccess,
   children
 }) => {
   const dispatch = useAppDispatch();
@@ -90,7 +90,7 @@ export const SlotReorderManager: React.FC<SlotReorderManagerProps> = ({
   
   // Handler for saving the edited slots order
   const saveSlotOrder = async () => {
-    if (!isEditMode || !identity || isPublic) return;
+    if (!isEditMode || !identity || !hasEditAccess) return;
     
     // Check if identity.identity exists before accessing it
     if (identity.identity) {

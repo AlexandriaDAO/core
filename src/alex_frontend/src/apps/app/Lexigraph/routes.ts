@@ -112,19 +112,17 @@ export const useViewState = () => {
   // Determine if we're showing a detail view
   const isShelfDetail = !!shelfId;
   
+  // Determine if we're in a public context
   const isUserDetail = !!userId && !shelfId;
   
   // Determine if we're showing the main view
   const isMainView = !userId && !shelfId;
   
-  // Determine if we're in a public context
-  const isPublicContext = isExplore || isUserView;
-  
   return {
     params: { shelfId, userId },
     viewFlags: { 
       isMyLibrary, isExplore, isUserView,
-      isShelfDetail, isUserDetail, isMainView, isPublicContext
+      isShelfDetail, isUserDetail, isMainView
     }
   };
 }; 

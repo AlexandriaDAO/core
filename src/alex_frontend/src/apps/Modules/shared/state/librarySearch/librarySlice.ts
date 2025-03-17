@@ -42,7 +42,7 @@ const librarySlice = createSlice({
   reducers: {
     togglePrincipal: (state, action: PayloadAction<string>) => {
       const principalId = action.payload;
-      state.selectedPrincipals = state.selectedPrincipals[0] === principalId ? [] : [principalId];
+      state.selectedPrincipals = state.selectedPrincipals[0] === principalId ? ['new'] : [principalId];
       if (state.selectedPrincipals.length > 0) {
         state.searchParams = {
           ...initialState.searchParams,

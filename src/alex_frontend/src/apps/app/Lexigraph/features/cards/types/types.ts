@@ -18,7 +18,7 @@ export interface ShelfDetailUIProps {
   orderedSlots: [number, Slot][];
   isEditMode: boolean;
   editedSlots: [number, Slot][];
-  isPublic: boolean;
+  hasEditAccess: boolean;
   onBack: () => void;
   onAddSlot?: (shelf: Shelf) => void;
   onViewSlot?: (slotId: number) => void;

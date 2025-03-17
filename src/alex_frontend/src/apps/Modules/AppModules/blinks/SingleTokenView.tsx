@@ -73,7 +73,6 @@ function SingleTokenView() {
         console.log('Converted to arweaveId:', arweaveId);
         
         const txData = await fetchTransactionById(arweaveId);
-        console.log('Fetched transaction data:', txData);
         
         if (!txData) {
           console.error('Transaction not found for arweaveId:', arweaveId);
