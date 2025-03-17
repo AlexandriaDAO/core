@@ -42,26 +42,26 @@ export const useNftData = () => {
         };
 
         // Get balances from both ALEX and LBRY
-        const [alexBalance, lbryBalance] = await Promise.all([
-          ALEX.icrc1_balance_of({
-            owner: balanceParams.owner,
-            subaccount: balanceParams.subaccount as [number[]]
-          }),
-          LBRY.icrc1_balance_of({
-            owner: balanceParams.owner,
-            subaccount: balanceParams.subaccount as [number[]]
-          })
-        ]);
+        // const [alexBalance, lbryBalance] = await Promise.all([
+        //   ALEX.icrc1_balance_of({
+        //     owner: balanceParams.owner,
+        //     subaccount: balanceParams.subaccount as [number[]]
+        //   }),
+        //   LBRY.icrc1_balance_of({
+        //     owner: balanceParams.owner,
+        //     subaccount: balanceParams.subaccount as [number[]]
+        //   })
+        // ]);
 
-        return {
-          principal: nftEntry[1].principal,
-          collection: nftEntry[1].collection,
-          balances: {
-            alex: convertE8sToToken(alexBalance),
-            lbry: convertE8sToToken(lbryBalance)
-          },
-          orderIndex: nftEntry[1].orderIndex
-        };
+        // return {
+        //   principal: nftEntry[1].principal,
+        //   collection: nftEntry[1].collection,
+        //   balances: {
+        //     alex: "0",//convertE8sToToken(alexBalance),
+        //     lbry: "0"//convertE8sToToken(lbryBalance)
+        //   },
+        //   orderIndex: nftEntry[1].orderIndex
+        // };
       }
 
       return {

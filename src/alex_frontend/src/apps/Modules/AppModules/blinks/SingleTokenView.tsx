@@ -246,20 +246,20 @@ function SingleTokenView() {
             subaccount: [Array.from(subaccount)] as [number[]]
           };
 
-          const [alexBalance, lbryBalance] = await Promise.all([
-            ALEX.icrc1_balance_of(balanceParams),
-            LBRY.icrc1_balance_of(balanceParams)
-          ]);
+          // const [alexBalance, lbryBalance] = await Promise.all([
+          //   ALEX.icrc1_balance_of(balanceParams),
+          //   LBRY.icrc1_balance_of(balanceParams)
+          // ]);
 
-          const convertE8sToToken = (e8sAmount: bigint): string => {
-            return (Number(e8sAmount) / 1e8).toString();
-          };
+          // const convertE8sToToken = (e8sAmount: bigint): string => {
+          //   return (Number(e8sAmount) / 1e8).toString();
+          // };
 
-          dispatch(updateNftBalances({
-            tokenId,
-            alex: convertE8sToToken(alexBalance),
-            lbry: convertE8sToToken(lbryBalance)
-          }));
+          // dispatch(updateNftBalances({
+          //   tokenId,
+          //   alex: convertE8sToToken(alexBalance),
+          //   lbry: convertE8sToToken(lbryBalance)
+          // }));
         }
       }
     } catch (error) {
