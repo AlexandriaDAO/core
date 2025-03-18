@@ -195,21 +195,21 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
               const lbryTokens = convertE8sToToken(lbryBalance);
 
               // Update NFT data in Redux store with safe arweaveId
-              // dispatch(setNFTs({
-              //   [tokenId]: {
-              //     collection: tokenType,
-              //     principal: ownerInfo?.principal || '',
-              //     arweaveId: nftArweaveId,
-              //     balances: { alex: alexTokens, lbry: lbryTokens }
-              //   }
-              // }));
+              dispatch(setNFTs({
+                [tokenId]: {
+                  collection: tokenType,
+                  principal: ownerInfo?.principal || '',
+                  arweaveId: nftArweaveId,
+                  balances: { alex: alexTokens, lbry: lbryTokens }
+                }
+              }));
               
-              // dispatch(updateNftBalances({
-              //   tokenId,
-              //   alex: alexTokens,
-              //   lbry: lbryTokens,
-              //   collection: tokenType
-              // }));
+              dispatch(updateNftBalances({
+                tokenId,
+                alex: alexTokens,
+                lbry: lbryTokens,
+                collection: tokenType
+              }));
             }
           } catch (error) {
             console.error('Failed to load NFT balances:', error);

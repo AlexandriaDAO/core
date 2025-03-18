@@ -144,6 +144,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                 owner={transaction.owner}
                 isOwned={isOwned || false}
                 isMinting={mintingStates[transaction.id]}
+                isFromAssetCanister={transaction.assetUrl===""?false:true}
                 onWithdraw={canWithdraw ? (e) => {
                   e.stopPropagation();
                   handleWithdraw(transaction.id);

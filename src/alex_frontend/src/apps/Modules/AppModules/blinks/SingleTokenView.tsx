@@ -46,6 +46,7 @@ function SingleTokenView() {
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
+    console.log('Token ID:', tokenId);
     let mounted = true;
 
     async function loadNFTData() {

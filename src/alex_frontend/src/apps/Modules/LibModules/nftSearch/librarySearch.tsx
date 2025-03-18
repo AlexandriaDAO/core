@@ -9,7 +9,7 @@ import { loadContentForTransactions } from "../../shared/state/transactions/tran
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/lib/components/select";
-import { setSearchParams, togglePrincipal } from "../../shared/state/librarySearch/librarySlice";
+import { setBalanceSort, setSearchParams, togglePrincipal } from "../../shared/state/librarySearch/librarySlice";
 import { performSearch, togglePrincipalSelection } from "../../shared/state/librarySearch/libraryThunks";
 import { clearNfts } from "../../shared/state/nftData/nftDataSlice";
 
@@ -41,17 +41,17 @@ const NFTPagination = () => {
   const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setPageInput(inputValue);
-    
+
     // Try to parse the input as a number
     const pageNumber = parseInt(inputValue);
-    
+
     // If it's a valid page number, navigate to that page
     if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages && pageNumber !== currentPage) {
       // Add a small delay to avoid rapid changes while typing
       const timeoutId = setTimeout(() => {
         handlePageChange(pageNumber);
       }, 500);
-      
+
       return () => clearTimeout(timeoutId);
     }
   };
@@ -89,7 +89,7 @@ const NFTPagination = () => {
           >
             Previous
           </Button>
-          
+
           <div className="flex items-center space-x-2">
             <Input
               type="text"
@@ -102,7 +102,7 @@ const NFTPagination = () => {
               title="Type a page number to navigate"
             />
           </div>
-          
+
           <Button
             variant="outline"
             onClick={() => handlePageChange(currentPage + 1)}
@@ -112,7 +112,7 @@ const NFTPagination = () => {
             Next
           </Button>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <span className="text-sm">Page {currentPage} of {totalPages}</span>
           <span className="text-sm text-muted-foreground">
@@ -147,7 +147,7 @@ interface LibrarySearchProps {
   showTagsSelector?: boolean;
 }
 
-export default function LibrarySearch({ 
+export default function LibrarySearch({
   defaultCategory = 'favorites',
   defaultPrincipal = 'new',
   showPrincipalSelector = true,
@@ -158,12 +158,16 @@ export default function LibrarySearch({
   const transactionData = useSelector((state: RootState) => state.transactions.transactions);
   const isTransactionUpdated = useSelector((state: RootState) => state.transactions.isUpdated);
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
+  const sortBalanceBy = useSelector((state: RootState) => state.library.sortBalanceBy);
+
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal?.toString());
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [sortKey, setSortKey] = useState<string>(sortBalanceBy);
+
+
   // Store the actual principal we want to keep selected 
   const [preservedPrincipal, setPreservedPrincipal] = useState<string | null>(null);
-  
+
   // Initialize the preservedPrincipal on mount
   useEffect(() => {
     // If defaultPrincipal is 'self', use the userPrincipal
@@ -173,7 +177,7 @@ export default function LibrarySearch({
       setPreservedPrincipal(defaultPrincipal);
     }
   }, [defaultPrincipal, userPrincipal]);
-  
+
   // Track changes to selectedPrincipals and update preservedPrincipal
   useEffect(() => {
     if (selectedPrincipals.length > 0 && !showPrincipalSelector) {
@@ -205,7 +209,10 @@ export default function LibrarySearch({
   //     isMounted = false;
   //   };
   // }, [dispatch, transactionData, isTransactionUpdated]);
-
+  const handleBalanceSort = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortKey(e.target.value as "DEFAULT" | "ALEX" | "LBRY");
+    dispatch(setBalanceSort(e.target.value));
+  }
   return (
     <div className="bg-white dark:bg-gray-800 rounded-[8px] md:rounded-[12px] shadow-md p-2 sm:p-3">
       <div className="max-w-7xl mx-auto space-y-2 sm:space-y-3">
@@ -218,10 +225,23 @@ export default function LibrarySearch({
             </div>
             {showTagsSelector && <LibraryContentTagsSelector defaultCategory={defaultCategory} />}
           </div>
-          
+
           {/* Second row: Pagination controls (full width) */}
           <div className="w-full">
             <NFTPagination />
+            <div className="flex items-center space-x-2">
+              <label htmlFor="sort-dropdown" className="text-gray-700 dark:text-gray-300">Sort By:</label>
+              <select
+                id="sort-dropdown"
+                value={sortKey}
+                onChange={(e) => handleBalanceSort(e)}
+                className="px-3 py-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="DEFAULT">Default</option>
+                <option value="ALEX">ALEX</option>
+                <option value="LBRY">LBRY</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
