@@ -35,7 +35,11 @@ type Result_6 = variant { Ok : vec Node; Err : text };
 type SignupRequest = record { username : text };
 type UpdateEngineStatusRequest = record { id : nat64; active : bool };
 type UpdateNodeStatusRequest = record { id : nat64; active : bool };
-type UpdateUserRequest = record { name : opt text; avatar : opt text };
+type UpdateUserRequest = record {
+  username : text;
+  name : opt text;
+  avatar : opt text;
+};
 type User = record {
   updated_at : nat64;
   "principal" : principal;
