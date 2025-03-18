@@ -9,6 +9,8 @@ import { Button } from "@/lib/components/button";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import deleteWallet from "../thunks/deleteWallet";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { Tooltip } from "antd";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/lib/components/alert-dialog";
 
 interface DeleteWalletProps {
 	wallet: SerializedWallet;
@@ -48,15 +50,36 @@ const DeleteWallet = ({ wallet }: DeleteWalletProps) => {
 
 
     return (
-		<Button
-            variant="destructive"
-            scale="sm"
-            onClick={handleDeleteWallet}
-            className="flex-grow"
-        >
-            <Trash2 size={14} />
-            <span>Delete</span>
-        </Button>
+		<AlertDialog>
+			<AlertDialogTrigger asChild>
+				<Button
+					variant="destructive"
+					scale="sm"
+					className="flex-grow"
+				>
+					<Trash2 size={14} />
+					<span>Delete</span>
+				</Button>
+			</AlertDialogTrigger>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>Are you sure?</AlertDialogTitle>
+					<AlertDialogDescription>
+						<span>
+							The wallet will be removed from the system.
+							<br />
+							Make sure you have a backup of your wallet
+							<br />
+							or you have withdrawn all your funds.
+						</span>
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogAction onClick={handleDeleteWallet}>Confirm</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
 	);
 };
 
