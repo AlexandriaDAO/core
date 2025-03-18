@@ -31,6 +31,7 @@ export interface UploadState {
 
 	progress: number;
 
+	scanning: boolean;
 	fetching: boolean;
 	selecting: boolean;
 	uploading: boolean;
@@ -46,6 +47,7 @@ export interface UploadState {
 	fetchError: string | null;
 	selectError: string | null;
 	mintError: string | null;
+	scanError: string | null;
 }
 
 const initialState: UploadState = {
@@ -61,6 +63,7 @@ const initialState: UploadState = {
 	postUploadPreview: false,
 	progress: 0,
 
+	scanning: false,
 	fetching: false,
 	uploading: false,
 	selecting: false,
@@ -75,6 +78,7 @@ const initialState: UploadState = {
 	fetchError: null,
 	selectError: null,
 	mintError: null,
+	scanError: null,
 };
 
 const uploadSlice = createSlice({
@@ -109,6 +113,12 @@ const uploadSlice = createSlice({
 		},
 		setStep: (state, action)=>{
 			state.step = action.payload
+		},
+		setScanning: (state, action)=>{
+			state.scanning = action.payload
+		},
+		setScanError: (state, action)=>{
+			state.scanError = action.payload
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<UploadState>) => {
@@ -228,6 +238,6 @@ const uploadSlice = createSlice({
 	}
 });
 
-export const { reset, setWallet, setProgress, setFileSelector, setTextEditor, setPreUploadPreview, setPostUploadPreview, setTransaction, setContentType, setStep } = uploadSlice.actions;
+export const { reset, setWallet, setProgress, setFileSelector, setTextEditor, setPreUploadPreview, setPostUploadPreview, setTransaction, setContentType, setStep, setScanning, setScanError } = uploadSlice.actions;
 
 export default uploadSlice.reducer;

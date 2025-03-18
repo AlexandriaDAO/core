@@ -19,7 +19,7 @@ function FileUploader({file, setFile}: FileUploaderProps) {
     const dispatch = useAppDispatch();
     const {actor} = useAlexWallet();
 
-    const { type, estimating, fetching, selecting, uploading, transaction} = useAppSelector(state=>state.upload);
+    const { type, scanning, estimating, fetching, selecting, uploading, transaction, scanError } = useAppSelector(state=>state.upload);
 
     const handleFileUpload = async() => {
         if(!file){
@@ -67,6 +67,15 @@ function FileUploader({file, setFile}: FileUploaderProps) {
         dispatch(setTextEditor(contentType == ContentType.Manual));
     }
 
+    const handleUpload = () => {
+        // Prevent upload if NSFW content detected
+        if (scanError) {
+            return;
+        }
+
+        handleFileUpload();
+    }
+
 	return (
         <div className="w-full flex justify-between items-center">
             <Button
@@ -78,11 +87,23 @@ function FileUploader({file, setFile}: FileUploaderProps) {
                 Cancel
             </Button>
             <Button
-                onClick={handleFileUpload}
-                disabled={!file || estimating || fetching || selecting || uploading || !!transaction }
+                onClick={handleUpload}
+                disabled={!file || !actor || estimating || fetching || selecting || uploading || !!transaction || !!scanError }
                 variant="inverted"
             >
-                {estimating ? "Estimating..." : fetching ? "Fetching..." : selecting ? "Selecting..." : uploading ? "Uploading..." : !!transaction ? <>
+                {scanning ? (
+                    <>Scanning content...</>
+                ) : scanError ? (
+                    <>Inappropriate content detected</>
+                ) : estimating ? (
+                    <>Estimating...</>
+                ) : fetching ? (
+                    <>Fetching...</>
+                ) : selecting ? (
+                    <>Selecting...</>
+                ) : uploading ? (
+                    <>Uploading...</>
+                ) : !!transaction ? <>
                     <Check size={18} className="mr-1"/> Uploaded
                 </> : "Upload file"}
             </Button>
