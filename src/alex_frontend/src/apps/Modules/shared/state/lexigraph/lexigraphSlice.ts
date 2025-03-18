@@ -5,6 +5,7 @@ import {
   loadShelves, 
   loadRecentShelves 
 } from './lexigraphThunks';
+import { Draft } from 'immer';
 
 // Define the permissions interfaces
 export interface ContentPermissions {
@@ -21,9 +22,13 @@ export interface LexigraphState {
   loading: boolean;
   publicLoading: boolean;
   error: string | null;
-  // New permissions state
+  // Permissions state
   userPrincipal: string | null;
-  permissions: Record<string, boolean>; // Map of contentId -> hasEditAccess
+  permissions: Record<string, boolean>; // Map of contentId -> hasEditAccess (owner OR editor)
+  ownerPermissions: Record<string, boolean>; // Map of contentId -> isOwner
+  // Editor tracking
+  shelfEditors: Record<string, string[]>; // Map of shelfId -> editor principals
+  editorsLoading: Record<string, boolean>; // Track loading state for each shelf's editors
 }
 
 // Initial state
@@ -38,6 +43,28 @@ const initialState: LexigraphState = {
   // Initialize permissions state
   userPrincipal: null,
   permissions: {},
+  ownerPermissions: {},
+  // Initialize editors state
+  shelfEditors: {},
+  editorsLoading: {},
+};
+
+// Helper function to update permissions for a shelf
+const updateShelfPermissions = (
+  state: Draft<LexigraphState>, 
+  shelf: Draft<Shelf> | Shelf, 
+  editors: string[] = []
+) => {
+  if (!state.userPrincipal) return;
+  
+  const shelfId = shelf.shelf_id;
+  const ownerPrincipal = shelf.owner.toString();
+  const isOwner = ownerPrincipal === state.userPrincipal;
+  const isEditor = editors.some(editor => editor === state.userPrincipal);
+  
+  // Update both permission types
+  state.ownerPermissions[shelfId] = isOwner;
+  state.permissions[shelfId] = isOwner || isEditor;
 };
 
 // // # REDUCER # // //
@@ -48,11 +75,11 @@ const lexigraphSlice = createSlice({
     setSelectedShelf: (state, action: PayloadAction<Shelf | null>) => {
       state.selectedShelf = action.payload;
       
-      // Automatically update edit permissions when selected shelf changes
+      // Use the helper function for permission updates
       if (action.payload && state.userPrincipal) {
         const shelfId = action.payload.shelf_id;
-        const ownerPrincipal = action.payload.owner.toString();
-        state.permissions[shelfId] = ownerPrincipal === state.userPrincipal;
+        const editors = state.shelfEditors[shelfId] || [];
+        updateShelfPermissions(state, action.payload, editors);
       }
     },
     setUserPrincipal: (state, action: PayloadAction<string | null>) => {
@@ -63,36 +90,71 @@ const lexigraphSlice = createSlice({
         // Update shelves permissions
         state.shelves.forEach(shelf => {
           const shelfId = shelf.shelf_id;
-          state.permissions[shelfId] = shelf.owner.toString() === action.payload;
+          const editors = state.shelfEditors[shelfId] || [];
+          updateShelfPermissions(state, shelf, editors);
         });
         
         // Update public shelves permissions
         state.publicShelves.forEach(shelf => {
           const shelfId = shelf.shelf_id;
-          state.permissions[shelfId] = shelf.owner.toString() === action.payload;
+          const editors = state.shelfEditors[shelfId] || [];
+          updateShelfPermissions(state, shelf, editors);
         });
         
         // Update selected shelf permission if exists
         if (state.selectedShelf) {
           const shelfId = state.selectedShelf.shelf_id;
-          state.permissions[shelfId] = state.selectedShelf.owner.toString() === action.payload;
+          const editors = state.shelfEditors[shelfId] || [];
+          updateShelfPermissions(state, state.selectedShelf, editors);
         }
       } else {
         // If user is null, clear all permissions
         state.permissions = {};
+        state.ownerPermissions = {};
       }
     },
     setContentPermission: (state, action: PayloadAction<ContentPermissions>) => {
       const { contentId, hasEditAccess } = action.payload;
       state.permissions[contentId] = hasEditAccess;
     },
+    // Add a reducer for handling shelf editors
+    setShelfEditors: (state, action: PayloadAction<{shelfId: string, editors: string[]}>) => {
+      const { shelfId, editors } = action.payload;
+      state.shelfEditors[shelfId] = editors;
+      
+      // Update permissions for this shelf if user is logged in
+      if (state.userPrincipal) {
+        // Find the shelf in either shelves, publicShelves, or selectedShelf
+        let targetShelf: Draft<Shelf> | Shelf | null = null;
+        
+        const inShelves = state.shelves.find(s => s.shelf_id === shelfId);
+        const inPublicShelves = state.publicShelves.find(s => s.shelf_id === shelfId);
+        
+        if (inShelves) {
+          targetShelf = inShelves;
+        } else if (inPublicShelves) {
+          targetShelf = inPublicShelves;
+        } else if (state.selectedShelf && state.selectedShelf.shelf_id === shelfId) {
+          targetShelf = state.selectedShelf;
+        }
+        
+        if (targetShelf) {
+          updateShelfPermissions(state, targetShelf, editors);
+        }
+      }
+    },
+    setEditorsLoading: (state, action: PayloadAction<{shelfId: string, loading: boolean}>) => {
+      const { shelfId, loading } = action.payload;
+      state.editorsLoading[shelfId] = loading;
+    },
     clearPermissions: (state) => {
       state.permissions = {};
+      state.ownerPermissions = {};
     },
     clearError: (state) => {
       state.error = null;
     },
-    // Add a reducer for updating a single shelf
+    // Update the updateSingleShelf reducer to handle permissions properly
     updateSingleShelf: (state, action: PayloadAction<Shelf>) => {
       const updatedShelf = action.payload;
       
@@ -115,12 +177,9 @@ const lexigraphSlice = createSlice({
       
       // Update permissions for this shelf
       if (state.userPrincipal) {
-        // Handle both string and Principal object formats for owner
-        const ownerStr = typeof updatedShelf.owner === 'string' 
-          ? updatedShelf.owner 
-          : updatedShelf.owner.toString();
-        
-        state.permissions[updatedShelf.shelf_id] = ownerStr === state.userPrincipal;
+        const shelfId = updatedShelf.shelf_id;
+        const editors = state.shelfEditors[shelfId] || [];
+        updateShelfPermissions(state, updatedShelf, editors);
       }
     },
   },
@@ -198,7 +257,9 @@ export const {
   updateSingleShelf,
   setUserPrincipal,
   setContentPermission,
-  clearPermissions
+  clearPermissions,
+  setShelfEditors,
+  setEditorsLoading
 } = lexigraphSlice.actions;
 export default lexigraphSlice.reducer;
 
@@ -216,7 +277,20 @@ export const selectError = (state: { lexigraph: LexigraphState }) => state.lexig
 export const selectUserPrincipal = (state: { lexigraph: LexigraphState }) => state.lexigraph.userPrincipal;
 export const selectPermissions = (state: { lexigraph: LexigraphState }) => state.lexigraph.permissions;
 
-// Helper selector to get edit access for a specific content
+// New selectors for collaboration features
+export const selectShelfEditors = (shelfId: string) => 
+  (state: { lexigraph: LexigraphState }) => state.lexigraph.shelfEditors[shelfId] || [];
+
+export const selectEditorsLoading = (shelfId: string) => 
+  (state: { lexigraph: LexigraphState }) => state.lexigraph.editorsLoading[shelfId] || false;
+
+// Check if user is the owner of a shelf
+export const selectIsOwner = (contentId: string) => 
+  (state: { lexigraph: LexigraphState }) => {
+    return state.lexigraph.ownerPermissions[contentId] || false;
+  };
+
+// Keep existing selectHasEditAccess for general edit permission
 export const selectHasEditAccess = (contentId: string) => 
   (state: { lexigraph: LexigraphState }) => {
     return state.lexigraph.permissions[contentId] || false;

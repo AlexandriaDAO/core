@@ -80,6 +80,7 @@ pub struct Shelf {
     pub title: String,
     pub description: Option<String>,
     pub owner: Principal,
+    pub editors: Vec<Principal>,      // List of principals with edit access
     pub slots: BTreeMap<u32, Slot>,      // Slots stored by ID
     pub slot_positions: BTreeMap<u32, f64>, // Map: slot_id -> position number
     pub created_at: u64,
@@ -379,6 +380,7 @@ pub async fn create_shelf(
         title,
         description,
         owner,  // Use derived owner
+        editors: Vec::new(), // Initialize editors as empty vector
         slots: BTreeMap::new(),
         slot_positions: BTreeMap::new(),
         created_at: now,

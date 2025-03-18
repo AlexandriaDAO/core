@@ -1,21 +1,19 @@
-### UX/UI Feature TODO
+### UI
 
+- Add shelf to shelf by some button or something.
 
-- Add owner to the path so you could go to their profile (Make the shelf path be connected to the owner.)
 
 
 ### Backend Decision TODOs
-- Connect and a follow button on the shelves.
-- Another thing is the user sharing side. Do we let them add comments or something or other grids in a community section? How do we sort/rank these or do we let users do that themselves?
 - Payment for all actions, and removal of topup.
 - I think we're going to need tags too (so we could filter the recent one by categories)
+- Allowed to edit others users' shelves? NO
 
 
 
 ### Future Possible Features
 
 - Shelf Appears In? YES/maybe
-- Allowed to edit others users' shelves? NO
 
 ## Design
 

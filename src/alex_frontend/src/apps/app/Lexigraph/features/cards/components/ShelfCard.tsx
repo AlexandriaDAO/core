@@ -4,7 +4,13 @@ import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { convertTimestamp } from "@/utils/general";
 import { ShelfCardProps, PublicShelfCardProps } from '../types/types';
 import { buildRoutes } from '../../../routes';
-import { User } from "lucide-react";
+import { User, Users } from "lucide-react";
+import { useAppSelector } from '@/store/hooks/useAppSelector';
+import { 
+  selectIsOwner, 
+  selectHasEditAccess, 
+  selectShelfEditors 
+} from '@/apps/Modules/shared/state/lexigraph/lexigraphSlice';
 
 // Shelf Card Component for the library view
 export const ShelfCard: React.FC<ShelfCardProps> = ({ 
@@ -15,6 +21,13 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
   const createdAt = convertTimestamp(shelf.created_at, 'combined');
   const updatedAt = convertTimestamp(shelf.updated_at, 'combined');
   const slotCount = Object.keys(shelf.slots).length;
+  
+  // Get collaboration status
+  const isOwner = useAppSelector(selectIsOwner(shelf.shelf_id));
+  const hasEditAccess = useAppSelector(selectHasEditAccess(shelf.shelf_id));
+  const isCollaborator = hasEditAccess && !isOwner;
+  const editors = useAppSelector(selectShelfEditors(shelf.shelf_id));
+  const hasCollaborators = editors.length > 0;
   
   // Check if the updated_at is different from created_at (allowing a small buffer for processing time)
   const wasEdited = Number(shelf.updated_at) - Number(shelf.created_at) > 1000000; // 1 second buffer
@@ -35,6 +48,21 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
         <div className="flex justify-between items-center w-full mt-2">
           <div className="text-xs text-muted-foreground">
             {slotCount} {slotCount === 1 ? 'item' : 'items'}
+          </div>
+          {/* Show collaboration indicators */}
+          <div className="flex items-center gap-2">
+            {isCollaborator && (
+              <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full flex items-center">
+                <Users className="h-3 w-3 mr-1" />
+                Collaborator
+              </span>
+            )}
+            {isOwner && hasCollaborators && (
+              <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-full flex items-center">
+                <Users className="h-3 w-3 mr-1" />
+                {editors.length} {editors.length === 1 ? 'editor' : 'editors'}
+              </span>
+            )}
           </div>
         </div>
       }
