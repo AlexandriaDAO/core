@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Copy, Check, Link, Database } from "lucide-react";
-import { useSelector } from 'react-redux';
+import { Copy, Check, Link, Database, User, Search } from "lucide-react";
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '@/store';
 import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
 import { Badge } from "@/lib/components/badge";
 import { Skeleton } from "@/lib/components/skeleton";
-import { copyToClipboard } from "../utils/clipboard";
+import { formatId, handleCopy } from "../utils/formatters";
 import { determineTokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
+import { setSearchState } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 
 interface NftDataFooterProps {
   id: string;
+  contentOwner?: string; // Add contentOwner prop to differentiate from NFT owner (principal)
 }
 
-export function NftDataFooter({ id }: NftDataFooterProps) {
+export function NftDataFooter({ id, contentOwner }: NftDataFooterProps) {
   const { getNftData } = useNftData();
+  const dispatch = useDispatch();
   const nfts = useSelector((state: RootState) => state.nftData.nfts);
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
   const [nftData, setNftData] = useState<NftDataResult | null>(null);
@@ -22,6 +25,8 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
   const [copiedPrincipal, setCopiedPrincipal] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [copiedTokenId, setCopiedTokenId] = useState(false);
+  const [copiedOwner, setCopiedOwner] = useState(false);
+  const [searchTriggered, setSearchTriggered] = useState(false);
 
   useEffect(() => {
     const fetchNftData = async () => {
@@ -34,44 +39,41 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
     fetchNftData();
   }, [id, getNftData]);
 
-
   const formatPrincipal = (principal: string | null) => {
     if (!principal) return 'Not owned';
-    return `${principal.slice(0, 4)}...${principal.slice(-4)}`;
+    return formatId(principal, 'Not owned');
   };
 
-  const handleCopyPrincipal = async (e: React.MouseEvent, principal: string) => {
-    e.stopPropagation();
-    const copied = await copyToClipboard(principal);
-    if (copied) {
-      setCopiedPrincipal(true);
-      setTimeout(() => setCopiedPrincipal(false), 2000);
-    }
+  const handleCopyPrincipal = (e: React.MouseEvent) => {
+    if (!nftData?.principal) return;
+    handleCopy(e, nftData.principal, setCopiedPrincipal);
   };
 
-  const handleCopyLink = async (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleCopyLink = (e: React.MouseEvent) => {
     const tokenId = arweaveToNftId[id];
     if (!tokenId) return;
     
-    const lbryUrl = process.env.NODE_ENV === 'development' ? `http://localhost:8080/nft/${tokenId}` : `https://lbry.app/nft/${tokenId}`;
-    const copied = await copyToClipboard(lbryUrl);
-    if (copied) {
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2000);
-    }
+    const lbryUrl = process.env.NODE_ENV === 'development' 
+      ? `http://localhost:8080/nft/${tokenId}` 
+      : `https://lbry.app/nft/${tokenId}`;
+    
+    handleCopy(e, lbryUrl, setCopiedLink);
   };
 
-  const handleCopyTokenId = async (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleCopyTokenId = (e: React.MouseEvent) => {
     const tokenId = arweaveToNftId[id];
-    if (!tokenId) return;
+    handleCopy(e, tokenId, setCopiedTokenId);
+  };
+
+  const handleCopyOwner = (e: React.MouseEvent) => {
+    if (!contentOwner) return;
     
-    const copied = await copyToClipboard(tokenId);
-    if (copied) {
-      setCopiedTokenId(true);
-      setTimeout(() => setCopiedTokenId(false), 2000);
-    }
+    handleCopy(e, contentOwner, setCopiedOwner, () => {
+      // Filter results by owner
+      dispatch(setSearchState({ ownerFilter: contentOwner }));
+      setSearchTriggered(true);
+      setTimeout(() => setSearchTriggered(false), 2000);
+    });
   };
 
   const formatBalance = (balance: string | undefined) => {
@@ -82,8 +84,7 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
   // Format the token ID for display (shorten it)
   const formatTokenId = (tokenId: string | undefined) => {
     if (!tokenId) return '';
-    if (tokenId.length <= 4) return tokenId;
-    return `${tokenId.slice(0, 2)}...${tokenId.slice(-2)}`;
+    return formatId(tokenId, '');
   };
 
   if (isLoading) {
@@ -124,7 +125,7 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
         <Badge 
           variant="secondary" 
           className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-          onClick={(e) => handleCopyPrincipal(e, nftData.principal!)}
+          onClick={handleCopyPrincipal}
         >
           {formatPrincipal(nftData.principal)}
           {copiedPrincipal ? (
@@ -144,6 +145,24 @@ export function NftDataFooter({ id }: NftDataFooterProps) {
             LBRY: {formatBalance(nftData.balances.lbry.toString())}
           </Badge>
         </div>
+      )}
+      {/* Content Owner badge (moved from Card.tsx) */}
+      {contentOwner && (
+        <Badge 
+          variant="secondary" 
+          className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
+          onClick={handleCopyOwner}
+        >
+          <User className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
+          <span className="text-gray-600 dark:text-gray-400">
+            {formatId(contentOwner)}
+          </span>
+          {copiedOwner ? (
+            <Check className="h-2.5 w-2.5 text-green-500" />
+          ) : (
+            <Search className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
+          )}
+        </Badge>
       )}
       {/* Token ID badge - now with regular styling and placed last */}
       {tokenId && (

@@ -85,26 +85,6 @@ WebFont.load({
 	}
 });
 
-// Preload critical resources
-const preloadResources = () => {
-	// Preload critical CSS
-	const criticalCSS = document.createElement('link');
-	criticalCSS.rel = 'preload';
-	criticalCSS.as = 'style';
-	criticalCSS.href = '/styles.css'; // Adjust path as needed
-	document.head.appendChild(criticalCSS);
-	
-	// Preload critical JavaScript
-	const criticalJS = document.createElement('link');
-	criticalJS.rel = 'preload';
-	criticalJS.as = 'script';
-	criticalJS.href = '/critical.js'; // Adjust path as needed
-	document.head.appendChild(criticalJS);
-};
-
-// Start preloading resources
-preloadResources();
-
 document.addEventListener("DOMContentLoaded", () => {
 	createRoot(document.getElementById("root")).render(
 		<React.StrictMode>

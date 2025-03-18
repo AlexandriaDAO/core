@@ -44,108 +44,105 @@ function SingleTokenView() {
   const contentData = useSelector((state: RootState) => state.transactions.contentData);
   const { nfts } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
-// we dont need to fetch nft balance,content  again,we are already doing it in fetchTokensForPrincipal
 
-  // useEffect(() => {
-  //   let mounted = true;
+  useEffect(() => {
+    let mounted = true;
 
-  //   async function loadNFTData() {
-  //     if (!tokenId) return;
+    async function loadNFTData() {
+      if (!tokenId) return;
 
-  //     try {
-  //       setIsLoading(true);
-  //       console.log('Loading NFT data for tokenId:', tokenId);
+      try {
+        setIsLoading(true);
         
-  //       const tokenType = determineTokenType(tokenId);
+        const tokenType = determineTokenType(tokenId);
         
-  //       const tokenAdapter = createTokenAdapter(tokenType);
+        const tokenAdapter = createTokenAdapter(tokenType);
         
-  //       const nftId = BigInt(tokenId);
+        const nftId = BigInt(tokenId);
         
-  //       let ogId: bigint;
-  //       if (tokenType === 'SBT') {
-  //         ogId = await nft_manager.scion_to_og_id(nftId);
-  //       } else {
-  //         ogId = nftId;
-  //       }
+        let ogId: bigint;
+        if (tokenType === 'SBT') {
+          ogId = await nft_manager.scion_to_og_id(nftId);
+        } else {
+          ogId = nftId;
+        }
         
-  //       const arweaveId = await tokenAdapter.tokenToNFTData(nftId, '').then(data => data.arweaveId);
+        const arweaveId = await tokenAdapter.tokenToNFTData(nftId, '').then(data => data.arweaveId);
         
-  //       console.log('Converted to arweaveId:', arweaveId);
+        console.log('Converted to arweaveId:', arweaveId);
         
-  //       const txData = await fetchTransactionById(arweaveId);
-  //       console.log('Fetched transaction data:', txData);
+        const txData = await fetchTransactionById(arweaveId);
         
-  //       if (!txData) {
-  //         console.error('Transaction not found for arweaveId:', arweaveId);
-  //         toast.error('Transaction not found');
-  //         return;
-  //       }
+        if (!txData) {
+          console.error('Transaction not found for arweaveId:', arweaveId);
+          toast.error('Transaction not found');
+          return;
+        }
         
-  //       if (mounted) {
-  //         setTransaction(txData);
-  //         console.log('Set transaction in state:', txData);
+        if (mounted) {
+          setTransaction(txData);
+          console.log('Set transaction in state:', txData);
 
-  //         const content = await ContentService.loadContent(txData);
-  //         const urls = await ContentService.getContentUrls(txData, content);
-  //         setContentUrls(urls);
+          const content = await ContentService.loadContent(txData);
+          const urls = await ContentService.getContentUrls(txData, content);
+          setContentUrls(urls);
           
-  //         dispatch(setContentData({ 
-  //           id: txData.id, 
-  //           content: {
-  //             ...content,
-  //             urls
-  //           }
-  //         }));
-  //       }
+          dispatch(setContentData({ 
+            id: txData.id, 
+            content: {
+              ...content,
+              urls
+            }
+          }));
+        }
 
-  //       const subaccount = await nft_manager.to_nft_subaccount(nftId);
-  //       const balanceParams = {
-  //         owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-  //         subaccount: [Array.from(subaccount)] as [number[]]
-  //       };
+        const subaccount = await nft_manager.to_nft_subaccount(nftId);
+        const balanceParams = {
+          owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
+          subaccount: [Array.from(subaccount)] as [number[]]
+        };
 
-  //       const [alexBalance, lbryBalance] = await Promise.all([
-  //         ALEX.icrc1_balance_of(balanceParams),
-  //         LBRY.icrc1_balance_of(balanceParams)
-  //       ]);
+        const [alexBalance, lbryBalance] = await Promise.all([
+          ALEX.icrc1_balance_of(balanceParams),
+          LBRY.icrc1_balance_of(balanceParams)
+        ]);
 
-  //       if (mounted) {
-  //         const alexTokens = convertE8sToToken(alexBalance);
-  //         const lbryTokens = convertE8sToToken(lbryBalance);
+        if (mounted) {
+          const alexTokens = convertE8sToToken(alexBalance);
+          const lbryTokens = convertE8sToToken(lbryBalance);
 
-  //         dispatch(setNFTs({
-  //           [tokenId]: {
-  //             collection: tokenType,
-  //             principal: '',
-  //             arweaveId: arweaveId,
-  //             balances: { alex: alexTokens, lbry: lbryTokens }
-  //           }
-  //         }));
+          dispatch(setNFTs({
+            [tokenId]: {
+              collection: tokenType,
+              principal: '',
+              arweaveId: arweaveId,
+              balances: { alex: alexTokens, lbry: lbryTokens }
+            }
+          }));
           
-  //         dispatch(updateNftBalances({
-  //           tokenId,
-  //           alex: alexTokens,
-  //           lbry: lbryTokens,
-  //           collection: tokenType
-  //         }));
-  //       }
-  //     } catch (error) {
-  //       console.error('Failed to load NFT:', error);
-  //       toast.error('Failed to load NFT data');
-  //     } finally {
-  //       if (mounted) {
-  //         setIsLoading(false);
-  //       }
-  //     }
-  //   }
+          dispatch(updateNftBalances({
+            tokenId,
+            alex: alexTokens,
+            lbry: lbryTokens,
+            collection: tokenType
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to load NFT:', error);
+        toast.error('Failed to load NFT data');
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    }
     
-  //   loadNFTData();
+    loadNFTData();
     
-  //   return () => {
-  //     mounted = false;
-  //   };
-  // }, [tokenId, dispatch]);
+    return () => {
+      mounted = false;
+    };
+  }, [tokenId, dispatch]);
 
   useEffect(() => {
     let mounted = true;
@@ -246,20 +243,20 @@ function SingleTokenView() {
             subaccount: [Array.from(subaccount)] as [number[]]
           };
 
-          // const [alexBalance, lbryBalance] = await Promise.all([
-          //   ALEX.icrc1_balance_of(balanceParams),
-          //   LBRY.icrc1_balance_of(balanceParams)
-          // ]);
+          const [alexBalance, lbryBalance] = await Promise.all([
+            ALEX.icrc1_balance_of(balanceParams),
+            LBRY.icrc1_balance_of(balanceParams)
+          ]);
 
-          // const convertE8sToToken = (e8sAmount: bigint): string => {
-          //   return (Number(e8sAmount) / 1e8).toString();
-          // };
+          const convertE8sToToken = (e8sAmount: bigint): string => {
+            return (Number(e8sAmount) / 1e8).toString();
+          };
 
-          // dispatch(updateNftBalances({
-          //   tokenId,
-          //   alex: convertE8sToToken(alexBalance),
-          //   lbry: convertE8sToToken(lbryBalance)
-          // }));
+          dispatch(updateNftBalances({
+            tokenId,
+            alex: convertE8sToToken(alexBalance),
+            lbry: convertE8sToToken(lbryBalance)
+          }));
         }
       }
     } catch (error) {

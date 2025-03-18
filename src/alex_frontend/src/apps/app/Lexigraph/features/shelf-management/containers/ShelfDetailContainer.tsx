@@ -5,38 +5,38 @@ import { parsePathInfo } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { rebalanceShelfSlots } from "@/apps/Modules/shared/state/lexigraph/lexigraphThunks";
 import { SlotReorderManager } from "../../slots/components/SlotReorderManager";
-import { ShelfDetailUI } from "../../cards/containers/ShelfDetail";
+import { ShelfDetailView } from "../../cards";
 import { ShelfSettingsDialog } from "../../shelf-settings";
 import { useShelfOperations } from "../hooks";
 
 /**
- * ShelfDetail Component
+ * ShelfDetailContainer Component
  * 
  * This component is responsible for managing the state and logic of a shelf detail view.
- * It works together with the ShelfDetailUI component from the cards directory:
+ * It works together with the ShelfDetailView component from the cards directory:
  * 
- * - ShelfDetail (this component): Manages shelf state, data processing, and business logic
- * - ShelfDetailUI (from cards/ShelfDetail.tsx): Pure presentational component that renders the UI
+ * - ShelfDetailContainer (this component): Manages shelf state, data processing, and business logic
+ * - ShelfDetailView (from cards/components/ShelfDetailView.tsx): Pure presentational component that renders the UI
  * 
  * This separation follows a container/presentational component pattern where:
  * - This container component handles data fetching, state management, and logic
- * - The ShelfDetailUI handles the visual representation without business logic
+ * - The ShelfDetailView handles the visual representation without business logic
  */
 export interface ShelfDetailProps {
 	shelf: Shelf;
 	onBack: () => void;
 	onAddSlot?: (shelf: Shelf) => void;
 	onReorderSlot?: (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean) => Promise<void>;
-	isPublic?: boolean;
+	hasEditAccess?: boolean;
 }
 
-// The ShelfDetail component that integrates with the UI component
-export const ShelfDetail: React.FC<ShelfDetailProps> = ({ 
+// The ShelfDetailContainer component that integrates with the UI component
+export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({ 
 	shelf, 
 	onBack,
 	onAddSlot,
 	onReorderSlot,
-	isPublic = false
+	hasEditAccess = true
 }) => {
 	const pathInfo = parsePathInfo(window.location.pathname);
 	const identity = useIdentity();
@@ -66,7 +66,7 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 	
 	// Existing rebalance handler
 	const handleRebalance = async (shelfId: string) => {
-		if (!identity || isPublic) return;
+		if (!identity || !hasEditAccess) return;
 		// Check if identity.identity exists before accessing it
 		if (identity.identity) {
 			const principal = identity.identity.getPrincipal().toString();
@@ -78,7 +78,7 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 		<SlotReorderManager
 			shelf={shelf}
 			orderedSlots={orderedSlots}
-			isPublic={isPublic}
+			hasEditAccess={hasEditAccess}
 		>
 			{({
 				isEditMode,
@@ -91,12 +91,12 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 				handleDragEnd,
 				handleDrop
 			}) => (
-				<ShelfDetailUI
+				<ShelfDetailView
 					shelf={shelf}
 					orderedSlots={orderedSlots}
 					isEditMode={isEditMode}
 					editedSlots={editedSlots}
-					isPublic={isPublic}
+					hasEditAccess={hasEditAccess}
 					onBack={onBack}
 					onAddSlot={onAddSlot}
 					onViewSlot={(slotId: number) => {}}
@@ -108,7 +108,7 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 					handleDragEnd={handleDragEnd}
 					handleDrop={handleDrop}
 					settingsButton={
-						!isPublic && !isEditMode ? (
+						hasEditAccess && !isEditMode ? (
 							<ShelfSettingsDialog 
 								shelf={shelf} 
 								onRebalance={handleRebalance} 
@@ -124,4 +124,4 @@ export const ShelfDetail: React.FC<ShelfDetailProps> = ({
 };
 
 // Export as default as well
-export default ShelfDetail; 
+export default ShelfDetailContainer; 

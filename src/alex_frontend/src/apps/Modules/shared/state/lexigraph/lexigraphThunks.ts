@@ -73,6 +73,7 @@ export const loadRecentShelves = createAsyncThunk(
           : undefined;
           
         // Convert all BigInt values to strings before returning to Redux
+        // This will also convert Principal objects to strings
         const shelves = convertBigIntsToStrings(result.Ok);
         const serializedBeforeTimestamp = beforeTimestampBigInt ? beforeTimestampBigInt.toString() : undefined;
         const serializedLastTimestamp = lastShelfTimestamp ? lastShelfTimestamp.toString() : undefined;

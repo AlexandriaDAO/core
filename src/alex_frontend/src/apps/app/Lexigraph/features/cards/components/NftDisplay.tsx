@@ -53,7 +53,6 @@ const NftDisplay = ({ tokenId, onViewDetails, inShelf = false }: {
 
       try {
         setIsLoading(true);
-        console.log('Loading NFT data for tokenId:', tokenId);
         
         const tokenType = determineTokenType(tokenId);
         const tokenAdapter = createTokenAdapter(tokenType);
@@ -68,11 +67,9 @@ const NftDisplay = ({ tokenId, onViewDetails, inShelf = false }: {
         
         // Get Arweave ID for this token
         const arweaveId = await tokenAdapter.tokenToNFTData(nftId, '').then(data => data.arweaveId);
-        console.log('Converted to arweaveId:', arweaveId);
         
         // Fetch transaction data from Arweave
         const txData = await fetchTransactionById(arweaveId);
-        console.log('Fetched transaction data:', txData);
         
         if (!txData) {
           console.error('Transaction not found for arweaveId:', arweaveId);
@@ -119,21 +116,14 @@ const NftDisplay = ({ tokenId, onViewDetails, inShelf = false }: {
           const lbryTokens = convertE8sToToken(lbryBalance);
 
           // Update NFT data in Redux store
-          // dispatch(setNFTs({
-          //   [tokenId]: {
-          //     collection: tokenType,
-          //     principal: ownerInfo?.principal || '',
-          //     arweaveId: arweaveId,
-          //     balances: { alex: alexTokens, lbry: lbryTokens }
-          //   }
-          // }));
-          
-          // dispatch(updateNftBalances({
-          //   tokenId,
-          //   alex: alexTokens,
-          //   lbry: lbryTokens,
-          //   collection: tokenType
-          // }));
+          dispatch(setNFTs({
+            [tokenId]: {
+              collection: tokenType,
+              principal: ownerInfo?.principal || '',
+              arweaveId: arweaveId,
+              balances: { alex: alexTokens, lbry: lbryTokens }
+            }
+          }));
         }
       } catch (error) {
         console.error('Failed to load NFT:', error);

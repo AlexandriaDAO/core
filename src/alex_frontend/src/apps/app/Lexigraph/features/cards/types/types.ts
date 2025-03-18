@@ -13,12 +13,12 @@ export interface PublicShelfCardProps {
   onViewShelf: (shelfId: string) => void;
 }
 
-export interface ShelfDetailUIProps {
+export interface ShelfDetailViewProps {
   shelf: Shelf;
   orderedSlots: [number, Slot][];
   isEditMode: boolean;
   editedSlots: [number, Slot][];
-  isPublic: boolean;
+  hasEditAccess: boolean;
   onBack: () => void;
   onAddSlot?: (shelf: Shelf) => void;
   onViewSlot?: (slotId: number) => void;

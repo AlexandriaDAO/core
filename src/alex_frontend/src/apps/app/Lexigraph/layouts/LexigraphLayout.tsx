@@ -9,6 +9,7 @@ import {
   selectSelectedShelf,
 } from "@/apps/Modules/shared/state/lexigraph/lexigraphSlice";
 import { useShelfOperations, usePublicShelfOperations } from "../features/shelf-management/hooks";
+import { useContentPermissions } from "../hooks/useContentPermissions";
 
 // Import UI components
 import {
@@ -17,7 +18,8 @@ import {
   UserShelvesUI
 } from "../features/cards";
 import { NewSlotDialog } from "../features/slots";
-import { NewShelfDialog, ShelfDetail } from "../features/shelf-management/components";
+import { NewShelfDialog } from "../features/shelf-management/components";
+import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
 
 const LexigraphLayout: React.FC = () => {
   const { shelves, loading, createShelf, addSlot, reorderSlot } = useShelfOperations();
@@ -26,6 +28,7 @@ const LexigraphLayout: React.FC = () => {
   const [isNewSlotDialogOpen, setIsNewSlotDialogOpen] = useState(false);
   const dispatch = useAppDispatch();
   const selectedShelf = useAppSelector(selectSelectedShelf);
+  const { checkEditAccess } = useContentPermissions();
   
   // Use navigation hooks
   const { 
@@ -41,8 +44,7 @@ const LexigraphLayout: React.FC = () => {
     isExplore, 
     isShelfDetail,
     isUserDetail,
-    isMainView,
-    isPublicContext
+    isMainView
   } = viewFlags;
   
   // Derive active tab directly from route state
@@ -52,7 +54,7 @@ const LexigraphLayout: React.FC = () => {
   useEffect(() => {
     if (shelfId) {
       // Find the shelf in either personal or public shelves
-      const shelf = isPublicContext
+      const shelf = isExplore || userId
         ? publicShelves.find(s => s.shelf_id === shelfId)
         : shelves.find(s => s.shelf_id === shelfId);
       
@@ -60,7 +62,7 @@ const LexigraphLayout: React.FC = () => {
         dispatch(setSelectedShelf(shelf));
       }
     }
-  }, [shelfId, shelves, publicShelves, dispatch, isPublicContext]);
+  }, [shelfId, shelves, publicShelves, dispatch, isExplore, userId]);
   
   // Handle adding a new slot to a shelf
   const handleAddSlot = useCallback(() => {
@@ -95,13 +97,15 @@ const LexigraphLayout: React.FC = () => {
   const renderView = () => {
     // If we're viewing a specific shelf
     if (isShelfDetail && selectedShelf) {
+      const hasEditAccess = selectedShelf ? checkEditAccess(selectedShelf.shelf_id) : false;
+      
       return (
-        <ShelfDetail 
+        <ShelfDetailContainer 
           shelf={selectedShelf}
           onBack={goToShelves}
-          onAddSlot={!isPublicContext ? handleAddSlot : undefined}
-          onReorderSlot={!isPublicContext ? handleReorderSlot : undefined}
-          isPublic={isPublicContext}
+          onAddSlot={hasEditAccess ? handleAddSlot : undefined}
+          onReorderSlot={hasEditAccess ? handleReorderSlot : undefined}
+          hasEditAccess={hasEditAccess}
         />
       );
     }

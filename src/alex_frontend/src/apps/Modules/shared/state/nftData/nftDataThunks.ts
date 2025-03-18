@@ -199,21 +199,7 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       }[];
       // Create the appropriate token adapter
       const tokenAdapter = createTokenAdapter(collection as TokenType);
-
-      // Add debug logging
-      console.log("NFT Search:", {
-        principalId,
-        collection,
-        page,
-        itemsPerPage,
-        sortOrder: startFromEnd ? "Newest first" : "Oldest first",
-        totalItems,
-        range: `${(page - 1) * itemsPerPage + 1}-${Math.min(
-          page * itemsPerPage,
-          totalItems || 0
-        )} of ${totalItems || "unknown"}`,
-      });
-
+      
       let allNftIds: bigint[] = [];
       let totalCount: bigint = totalItems ? BigInt(totalItems) : BigInt(0);
 
@@ -448,17 +434,7 @@ export const fetchTokensForPrincipal = createAsyncThunk<
         dispatch(setNoResults(true));
       }
       dispatch(setTotalNfts(Number(totalCount)));
-
-      // Add debug logging for results
-      console.log("NFT Search Results:", {
-        totalNFTs: Number(totalCount),
-        fetchedCount: allNftIds.length,
-        displayRange: `Showing ${allNftIds.length} NFTs`,
-        firstFewTokenIds: allNftIds.slice(0, 5).map((id) => id.toString()),
-        hasMore:
-          allNftIds.length > 5 ? `...and ${allNftIds.length - 5} more` : "",
-      });
-
+      
       // Prepare batch params - for 'new' option, we'll fetch owner info in the batch function
       const batchParams = allNftIds.map((tokenId, index) => ({
         tokenId,

@@ -84,13 +84,14 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
   const dispatch = useDispatch<AppDispatch>();
   const [principals, setPrincipals] = React.useState<PrincipalData[]>([]);
   const [open, setOpen] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoadingPrincipals, setIsLoadingPrincipals] = React.useState(true);
   const [hasInitialized, setHasInitialized] = React.useState(false);
+  const [dropdownReady, setDropdownReady] = React.useState(false);
 
   // Fetch principals from backend
   const fetchPrincipals = async () => {
     try {
-      setIsLoading(true);
+      setIsLoadingPrincipals(true);
       let nftUsers: NFTUserInfo[];
       
       if (network === "devnet") {
@@ -127,7 +128,7 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
     } catch (error) {
       console.error("Error fetching principals:", error);
     } finally {
-      setIsLoading(false);
+      setIsLoadingPrincipals(false);
     }
   };
 
@@ -146,8 +147,11 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
   // Combined effect for initialization and data fetching
   React.useEffect(() => {
     const initialize = async () => {
-      // First fetch principals
-      await fetchPrincipals();
+      // Make dropdown ready immediately so UI is usable
+      setDropdownReady(true);
+      
+      // Start fetching principals in the background
+      fetchPrincipals();
       
       // Then handle initialization if not done yet
       if (!hasInitialized) {
@@ -212,9 +216,9 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
                 "w-full justify-between text-sm sm:text-base py-2 sm:py-3 border hover:bg-accent hover:text-accent-foreground",
                 selectedPrincipals.length === 0 ? "border-ring dark:border-ring" : "dark:border-gray-600"
               )}
-              disabled={isLoading}
+              disabled={!dropdownReady}
             >
-              {isLoading ? (
+              {!dropdownReady ? (
                 <div className="flex items-center">
                   <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                   Loading...
@@ -227,7 +231,7 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
               )}
             </Button>
           </PopoverTrigger>
-          {!isLoading && (
+          {dropdownReady && (
             <PopoverContent className="w-[calc(100vw-2rem)] sm:w-full p-0">
               <Command>
                 <CommandInput placeholder="Search library..." className="text-sm sm:text-base" />
@@ -267,31 +271,38 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
                         )}
                       </CommandItem>
                     )}
-                    {principals
-                      .filter(principal => principal.principal !== userPrincipal)
-                      .map((principal) => {
-                        return (
-                          <CommandItem
-                            key={principal.principal}
-                            value={principal.username}
-                            onSelect={() => handlePrincipalSelect(principal.principal)}
-                            className="text-sm sm:text-base py-2 sm:py-3"
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-3 w-3 sm:h-4 sm:w-4",
-                                selectedPrincipals[0] === principal.principal ? "opacity-100" : "opacity-0"
+                    {isLoadingPrincipals ? (
+                      <CommandItem className="text-sm sm:text-base py-2 sm:py-3 justify-center">
+                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2" />
+                        Loading principals...
+                      </CommandItem>
+                    ) : (
+                      principals
+                        .filter(principal => principal.principal !== userPrincipal)
+                        .map((principal) => {
+                          return (
+                            <CommandItem
+                              key={principal.principal}
+                              value={principal.username}
+                              onSelect={() => handlePrincipalSelect(principal.principal)}
+                              className="text-sm sm:text-base py-2 sm:py-3"
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-3 w-3 sm:h-4 sm:w-4",
+                                  selectedPrincipals[0] === principal.principal ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {principal.username}
+                              {!principal.hasNFTs && (
+                                <span className="ml-2 text-xs text-muted-foreground">
+                                  (No {collection === 'NFT' ? 'NFTs' : 'SBTs'})
+                                </span>
                               )}
-                            />
-                            {principal.username}
-                            {!principal.hasNFTs && (
-                              <span className="ml-2 text-xs text-muted-foreground">
-                                (No {collection === 'NFT' ? 'NFTs' : 'SBTs'})
-                              </span>
-                            )}
-                          </CommandItem>
-                        );
-                      })}
+                            </CommandItem>
+                          );
+                        })
+                    )}
                   </CommandGroup>
                 </CommandList>
               </Command>
