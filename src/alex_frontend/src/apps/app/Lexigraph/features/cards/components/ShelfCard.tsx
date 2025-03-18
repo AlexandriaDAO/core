@@ -3,6 +3,8 @@ import { Button } from "@/lib/components/button";
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { convertTimestamp } from "@/utils/general";
 import { ShelfCardProps, PublicShelfCardProps } from '../types/types';
+import { buildRoutes } from '../../../routes';
+import { User } from "lucide-react";
 
 // Shelf Card Component for the library view
 export const ShelfCard: React.FC<ShelfCardProps> = ({ 
@@ -19,8 +21,8 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
   
   const handleViewUser = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Navigate to user's shelves
-    window.location.href = `/lexigraph/user/${shelf.owner}`;
+    // Navigate to user's shelves using the route builder
+    window.location.href = buildRoutes.user(shelf.owner.toString());
   };
   
   return (
@@ -45,13 +47,15 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
             <span>Created {createdAt}</span>
             {wasEdited && <span>Updated {updatedAt}</span>}
             {showOwner && (
-              <div>
+              <div className="flex items-center mt-1">
                 <span>By: </span>
                 <Button 
                   variant="link" 
-                  className="p-0 h-auto text-xs text-blue-500 hover:text-blue-700"
+                  className="p-0 h-auto text-xs text-blue-500 hover:text-blue-700 flex items-center"
                   onClick={handleViewUser}
+                  title={`View all shelves by ${shelf.owner.toString()}`}
                 >
+                  <User className="h-3 w-3 mr-1" />
                   {shelf.owner.toString().slice(0, 8)}...
                 </Button>
               </div>

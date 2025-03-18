@@ -6,36 +6,37 @@ import { Principal } from "@dfinity/principal";
 // Route path constants
 export const ROUTES = {
   BASE: '/app/lexigraph',
-  MY_LIBRARY: '/app/lexigraph/my-library',
-  MY_LIBRARY_SHELF: '/app/lexigraph/my-library/shelf/:shelfId',
-  EXPLORE: '/app/lexigraph/explore',
-  EXPLORE_SHELF: '/app/lexigraph/explore/shelf/:shelfId',
+  SHELF: '/app/lexigraph/shelf/:shelfId',
+  SLOT: '/app/lexigraph/slot/:slotId',
   USER: '/app/lexigraph/user/:userId',
   USER_SHELF: '/app/lexigraph/user/:userId/shelf/:shelfId',
+  USER_SLOT: '/app/lexigraph/user/:userId/slot/:slotId',
 };
 
 // Route builder functions
 export const buildRoutes = {
-  myLibrary: () => ROUTES.MY_LIBRARY,
-  myLibraryShelf: (shelfId: string) => `/app/lexigraph/my-library/shelf/${shelfId}`,
-  explore: () => ROUTES.EXPLORE,
-  exploreShelf: (shelfId: string) => `/app/lexigraph/explore/shelf/${shelfId}`,
+  home: () => ROUTES.BASE,
+  shelf: (shelfId: string) => `/app/lexigraph/shelf/${shelfId}`,
+  slot: (slotId: string) => `/app/lexigraph/slot/${slotId}`,
   user: (userId: string) => `/app/lexigraph/user/${userId}`,
   userShelf: (userId: string, shelfId: string) => `/app/lexigraph/user/${userId}/shelf/${shelfId}`,
+  userSlot: (userId: string, slotId: string) => `/app/lexigraph/user/${userId}/slot/${slotId}`,
 };
 
 // Parse path information used across multiple components
 export const parsePathInfo = (path: string) => {
-	const isExplore = path.includes('/explore');
 	const isUserView = path.includes('/user/');
 	const userId = isUserView ? path.split('/user/')[1].split('/')[0] : null;
-	const backButtonLabel = isExplore ? 'Explore' : isUserView ? 'User Shelves' : 'My Library';
+	
+	// Set appropriate breadcrumb/back label based on path context
+  const backButtonLabel = isUserView ? 'User Shelves' : 'Shelves';
+  const backPath = isUserView && userId ? buildRoutes.user(userId) : buildRoutes.home();
 	
 	return {
-		isExplore,
 		isUserView,
 		userId,
-		backButtonLabel
+		backButtonLabel,
+    backPath
 	};
 };
 
@@ -46,34 +47,29 @@ export const useLexigraphNavigation = () => {
   const location = useLocation();
   
   // Determine the current view based on URL path
-  const { isMyLibrary, isExplore, isUserView, userId } = useMemo(() => {
+  const { isUserView, userId, backPath } = useMemo(() => {
     const pathInfo = parsePathInfo(location.pathname);
     return {
-      isMyLibrary: !pathInfo.isExplore && !pathInfo.isUserView,
-      isExplore: pathInfo.isExplore,
       isUserView: pathInfo.isUserView,
-      userId: pathInfo.userId
+      userId: pathInfo.userId,
+      backPath: pathInfo.backPath
     };
   }, [location.pathname]);
 
   // Navigation functions
   const goToShelves = () => {
-    if (isExplore) {
-      navigate(buildRoutes.explore());
-    } else if (isUserView && (userId || params.userId)) {
+    if (isUserView && (userId || params.userId)) {
       navigate(buildRoutes.user(userId || params.userId || ''));
     } else {
-      navigate(buildRoutes.myLibrary());
+      navigate(buildRoutes.home());
     }
   };
 
   const goToShelf = (shelfId: string) => {
-    if (isExplore) {
-      navigate(buildRoutes.exploreShelf(shelfId));
-    } else if (isUserView && (userId || params.userId)) {
+    if (isUserView && (userId || params.userId)) {
       navigate(buildRoutes.userShelf(userId || params.userId || '', shelfId));
     } else {
-      navigate(buildRoutes.myLibraryShelf(shelfId));
+      navigate(buildRoutes.shelf(shelfId));
     }
   };
 
@@ -81,32 +77,27 @@ export const useLexigraphNavigation = () => {
     const userIdString = userId.toString();
     navigate(buildRoutes.user(userIdString));
   };
-
-  const switchTab = (tab: string) => {
-    if (tab === "explore") {
-      navigate(buildRoutes.explore());
-    } else {
-      navigate(buildRoutes.myLibrary());
-    }
+  
+  const goToMainShelves = () => {
+    navigate(buildRoutes.home());
   };
 
   // Return navigation helpers
   return {
     params,
-    isMyLibrary,
-    isExplore,
     isUserView,
     userId,
+    backPath,
     goToShelves,
     goToShelf,
     goToUser,
-    switchTab
+    goToMainShelves
   };
 };
 
 // Custom hook to determine current view based on route params
 export const useViewState = () => {
-  const { params, isMyLibrary, isExplore, isUserView } = useLexigraphNavigation();
+  const { params, isUserView } = useLexigraphNavigation();
   const { shelfId, userId } = params;
   
   // Determine if we're showing a detail view
@@ -121,7 +112,7 @@ export const useViewState = () => {
   return {
     params: { shelfId, userId },
     viewFlags: { 
-      isMyLibrary, isExplore, isUserView,
+      isUserView,
       isShelfDetail, isUserDetail, isMainView
     }
   };

@@ -19,7 +19,7 @@ export interface ShelfDetailViewProps {
   isEditMode: boolean;
   editedSlots: [number, Slot][];
   hasEditAccess: boolean;
-  onBack: () => void;
+  onBack?: () => void;
   onAddSlot?: (shelf: Shelf) => void;
   onViewSlot?: (slotId: number) => void;
   onEnterEditMode: () => void;
@@ -49,6 +49,7 @@ export interface ExploreShelvesUIProps {
 export interface UserShelvesUIProps {
   shelves: Shelf[];
   loading: boolean;
-  onBack: () => void;
   onViewShelf: (shelfId: string) => void;
+  onViewOwner?: (ownerId: string) => void;
+  onBack?: () => void;
 } 

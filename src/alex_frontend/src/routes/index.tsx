@@ -70,12 +70,8 @@ const router = createBrowserRouter(
 					<Route path="syllogos" element={<Suspense key="syllogos" fallback={<TopProgressBar />}><Syllogos /></Suspense>} />
 					<Route path="lexigraph" element={<Suspense key="lexigraph" fallback={<TopProgressBar />}><Lexigraph /></Suspense>}>
 						<Route index element={<Suspense key="lexigraph-home" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="my-library" element={<Suspense key="lexigraph-my-library" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="my-library/shelf/:shelfId" element={<Suspense key="lexigraph-my-library-shelf" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="my-library/slot/:slotId" element={<Suspense key="lexigraph-my-library-slot" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="explore" element={<Suspense key="lexigraph-explore" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="explore/shelf/:shelfId" element={<Suspense key="lexigraph-explore-shelf" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="explore/slot/:slotId" element={<Suspense key="lexigraph-explore-slot" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
+						<Route path="shelf/:shelfId" element={<Suspense key="lexigraph-shelf" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
+						<Route path="slot/:slotId" element={<Suspense key="lexigraph-slot" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
 						<Route path="user/:userId" element={<Suspense key="lexigraph-user" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
 						<Route path="user/:userId/shelf/:shelfId" element={<Suspense key="lexigraph-user-shelf" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
 						<Route path="user/:userId/slot/:slotId" element={<Suspense key="lexigraph-user-slot" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
