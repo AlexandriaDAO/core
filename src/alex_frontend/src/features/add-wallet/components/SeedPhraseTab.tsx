@@ -87,6 +87,17 @@ export function SeedPhraseTab() {
 					"Import Wallet"
 				)}
 			</Button>
+			{importing && (
+				<Alert
+					variant="info"
+					title="Please Wait..."
+				>
+					<div className="flex flex-col space-y-1">
+						<span className="font-medium">Your wallet is being imported securely...</span>
+						<span>This process typically takes 1-2 minutes to complete as we're importing and encrypting your wallet seed phrase.</span>
+					</div>
+				</Alert>
+			)}
 		</div>
 	);
 }
