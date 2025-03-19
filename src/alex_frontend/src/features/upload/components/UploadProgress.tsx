@@ -5,6 +5,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 function UploadProgress() {
 	const {
 		progress,
+		scanning,
 		fetching,
 		selecting,
 		uploading,
@@ -14,17 +15,20 @@ function UploadProgress() {
 		fetchError,
 		selectError,
 		uploadError,
+		scanError,
 	} = useAppSelector((state) => state.upload);
 
 	let statusText = "Preparing...";
 
-	if (estimating) statusText = "Estimating cost";
+	if (scanning) statusText = "Scanning content";
+	else if (estimating) statusText = "Estimating cost";
 	else if (fetching) statusText = "Fetching wallets";
 	else if (fetchError) statusText = "Couldn't fetch wallets";
 	else if (selecting) statusText = "Selecting wallet";
 	else if (selectError) statusText = "Couldn't select a suitable wallet";
 	else if (uploading) statusText = "Uploading file";
 	else if (uploadError) statusText = "Couldn't upload file";
+	else if (scanError) statusText = "Inappropriate content";
 	else if (cost) statusText = "Ready to upload";
 
 	return (

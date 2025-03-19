@@ -13,12 +13,13 @@ import PreUploadPreview from "@/features/upload/components/PreUploadPreview";
 import Header from "@/features/upload/components/Header";
 import TextEditor from "@/features/upload/components/TextEditor";
 import FileSelector from "@/features/upload/components/FileSelector";
+import { useContentScanner } from "@/features/upload/hooks/useContentScanner";
 
 const AlexWalletActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexWalletActor })));
 const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
 
 function PinaxPage() {
-	const { type, uploading, minting, transaction, minted, uploadError, fetchError, selectError } = useAppSelector(state => state.upload);
+	const { type, uploading, minting, transaction, minted, uploadError, fetchError, selectError, scanError } = useAppSelector(state => state.upload);
 	const [file, setFile] = useState<File | null>(null);
 	const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
@@ -27,6 +28,7 @@ function PinaxPage() {
 	useFileEffect({ file, setUploadedFile });
 	useTransactionEffect({ transaction, file, setUploadedFile });
 	useUploadedFileEffect({ uploadedFile, setFile });
+	useContentScanner({ file });
 
 	return (
 		<AlexWalletActor>
@@ -43,9 +45,9 @@ function PinaxPage() {
 
 						{file && !uploadedFile && <PreUploadPreview file={file} />}
 
-						{(uploadError || fetchError || selectError) && <UploadError />}
+						{(uploadError || fetchError || selectError || scanError) && <UploadError />}
 
-						{ (file || uploadedFile) && <FileUploader file={file} setFile={setFile} /> }
+						{(file || uploadedFile) && <FileUploader file={file} setFile={setFile} />}
 					</div>
 				</div>
 			</NftManagerActor>
