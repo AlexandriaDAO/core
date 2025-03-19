@@ -1,8 +1,25 @@
+Before next mainnet push:
+- Upgrade nft_manager.
+- Upgrade user canister.
+- Vetkd
+- Wallet
+
+- Change written warnigns (terms of service, and faq)
+
+
+
+
+
+#### Bugs
+- Alexandrian prev/next doen't work on mobile alexandrian.
+
+
+
+
 #### Bigger Features (lower priority):
 - Need more dynamic states for the like/mint/withdraw buttons. include in this singleTokenView.tsx which duplicates a lot of this logic. (If the mint has succeded the mint button should go away).
 - Just more efficient loading, maybe lossless compression, or lower res on heavy assets. Maybe make this a setting for people based on how good their internet is.
 - Cache the nsfw model so it doesn't have to be reloaded every time on permasearch.
-- Get rid of the topup concept, and make all lbry payments directly from the wallet, and display balance in the header.
 - Find out why some NFT assets just arent able to render, and fix our rendering logic to fit them in.
 - Rank by tokens in the NFT. (rating system for rarity.)
 
@@ -13,8 +30,6 @@
 
 
 #### New Apps:
-- Arena style app, full design in channels.md.
-- Collection service for getting all the money from nfts.
 - Perpetua is a good name for one, latin for perpetual/eternal.
 
 
@@ -50,7 +65,7 @@ NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I 09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal yvjik-zehkk-qo7nr-t4r7a-2aomx-mnp6e-htymf-r2adf-d7gjm-bpu3e-aae)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 3j33x-5dvgt-y4x5x-7qkv2-hdldo-w6klv-23c2q-ljvpb-bouub-6nipv-rqe)
 
 
 

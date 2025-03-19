@@ -41,6 +41,19 @@ export function NewWalletTab() {
 					"Generate New Wallet"
 				)}
 			</Button>
+
+			{generating && (
+				<Alert
+					variant="info"
+					title="Please Wait..."
+				>
+					<div className="flex flex-col space-y-1">
+						<span className="font-medium">Your wallet is being generated securely...</span>
+						<span>This process typically takes 1-2 minutes to complete as we're generating and encrypting your wallet key.</span>
+					</div>
+				</Alert>
+			)}
+
 		</div>
 	);
 }

@@ -24,7 +24,8 @@ export const usePublicShelfOperations = () => {
 
   const loadMoreShelves = useCallback(async () => {
     if (lastTimestamp && !loading) {
-      await loadRecentShelvesData(20, lastTimestamp);
+      // Convert lastTimestamp to appropriate format if needed
+      await loadRecentShelvesData(20, lastTimestamp as string);
     }
   }, [lastTimestamp, loading, loadRecentShelvesData]);
 

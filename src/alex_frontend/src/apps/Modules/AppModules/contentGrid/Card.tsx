@@ -1,19 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Card, CardContent, CardFooter } from "@/lib/components/card";
-import { Check, Loader2, Flag, User, Search, Plus, Heart } from "lucide-react";
+import { Loader2, Flag, Plus, Heart } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Progress } from "@/lib/components/progress";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/lib/components/collapsible";
 import { useDispatch, useSelector } from "react-redux";
-import { setSearchState } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import { NftDataFooter } from "./components/NftDataFooter";
-import { copyToClipboard } from "./utils/clipboard";
-import { Badge } from "@/lib/components/badge";
 import { RootState } from "@/store";
 import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
 import { Dialog, DialogContent, DialogTitle } from "@/lib/components/dialog";
 import ShelfSelector from "./components/ShelfSelector";
+import { mint_nft } from "@/features/nft/mint";
+import { toast } from "sonner";
 
 interface Transaction {
   id: string;
@@ -37,33 +36,17 @@ interface ContentCardProps {
   isFromAssetCanister?: boolean;
 }
 
-export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isOwned, onMint, predictions, isMinting, footer, component, isFromAssetCanister }: ContentCardProps) {
+
+export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isOwned, onMint, predictions, isMinting: externalIsMinting, footer, component, isFromAssetCanister }: ContentCardProps) {
   const [searchTriggered, setSearchTriggered] = useState(false);
   const [copiedOwner, setCopiedOwner] = useState(false);
   const [isShelfSelectorOpen, setIsShelfSelectorOpen] = useState(false);
-  const dispatch = useDispatch();
+  const [internalMintingState, setInternalMintingState] = useState<boolean>(false);
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
   const transactions = useSelector((state: RootState) => state.transactions.transactions as Transaction[]);
-  const formatId = (id: string | undefined) => {
-    if (!id) return 'N/A';
-    return `${id.slice(0, 4)}...${id.slice(-4)}`;
-  };
 
-  const handleOwnerClick = async (e: React.MouseEvent, owner: string | undefined) => {
-    e.stopPropagation();
-    if (owner) {
-      const copied = await copyToClipboard(owner);
-      if (copied) {
-        setCopiedOwner(true);
-        setTimeout(() => setCopiedOwner(false), 2000);
-      }
-
-      // Filter results
-      dispatch(setSearchState({ ownerFilter: owner }));
-      setSearchTriggered(true);
-      setTimeout(() => setSearchTriggered(false), 2000);
-    }
-  };
+  // Use either the external minting state (if provided) or the internal one
+  const isMinting = externalIsMinting !== undefined ? externalIsMinting : internalMintingState;
 
   const handleOwnedBadgeClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
@@ -96,6 +79,32 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
     return predictions && predictions.isPorn === false;
   };
 
+  // Internal handleMint function
+  const handleMintInternal = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    // If external onMint is provided, use that instead
+    if (onMint) {
+      onMint(e);
+      return;
+    }
+
+    // Otherwise use our internal implementation
+    if (!id) return;
+
+    try {
+      setInternalMintingState(true);
+      const message = await mint_nft(id);
+      toast.success(message);
+    } catch (error) {
+      console.error("Error minting NFT:", error);
+      toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
+    } finally {
+      setInternalMintingState(false);
+    }
+  }, [id, onMint]);
+
   return (
     <>
       <Card
@@ -119,11 +128,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
                 <Button
                   variant="secondary"
                   className="bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black text-red-600 hover:text-red-500 border border-red-600/20 hover:border-red-600/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    onMint?.(e);
-                  }}
+                  onClick={handleMintInternal}
                   disabled={isMinting}
                 >
                   {isMinting ? (
@@ -136,11 +141,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
                 <Button
                   variant="secondary"
                   className="bg-black/90 hover:bg-black text-brightyellow border border-brightyellow/20 hover:border-brightyellow/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    onMint?.(e);
-                  }}
+                  onClick={handleMintInternal}
                   disabled={isMinting}
                 >
                   {isMinting ? (
@@ -176,7 +177,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
         <CardFooter className="flex flex-col w-full bg-[--card] dark:border-gray-700 p-1.5">
           <div className="flex flex-wrap items-center gap-1">
             {/* NFT data or custom footer - now first */}
-            {(!predictions || Object.keys(predictions).length === 0) && id && !footer && <NftDataFooter id={id} />}
+            {(!predictions || Object.keys(predictions).length === 0) && id && !footer && <NftDataFooter id={id} contentOwner={owner} />}
             {footer}
 
             {/* Owner badge */}
@@ -197,7 +198,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
                 )}
               </Badge>
             )}
-
+        
             {/* Stats button */}
             {predictions && Object.keys(predictions).length > 0 ? (
               <Collapsible open={showStats} onOpenChange={onToggleStats}>

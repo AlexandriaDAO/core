@@ -1,86 +1,70 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/components/tabs";
-import { Library, Globe } from "lucide-react";
-import { useLexigraphNavigation, useViewState } from "../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { 
   setSelectedShelf, 
   selectSelectedShelf,
 } from "@/apps/Modules/shared/state/lexigraph/lexigraphSlice";
+import { useLexigraphNavigation, useViewState } from "../routes";
 import { useShelfOperations, usePublicShelfOperations } from "../features/shelf-management/hooks";
+import { useContentPermissions } from "../hooks/useContentPermissions";
 
 // Import UI components
 import {
-  ShelfDetailUI,
-  LibraryShelvesUI,
-  ExploreShelvesUI,
+  UnifiedShelvesUI,
   UserShelvesUI
 } from "../features/cards";
-import { ShelfSettings, ShelfSettingsDialog } from "../features/shelf-settings";
 import { NewSlotDialog } from "../features/slots";
-import { NewShelfDialog, ShelfDetail } from "../features/shelf-management/components";
+import { NewShelfDialog } from "../features/shelf-management/components";
+import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
 
 const LexigraphLayout: React.FC = () => {
-  const { shelves, loading, createShelf, addSlot, reorderSlot } = useShelfOperations();
+  // Core data hooks
+  const { shelves, loading: personalLoading, createShelf, addSlot, reorderSlot } = useShelfOperations();
   const { publicShelves, loading: publicLoading, loadMoreShelves } = usePublicShelfOperations();
+  
+  // Dialog state
   const [isNewShelfDialogOpen, setIsNewShelfDialogOpen] = useState(false);
   const [isNewSlotDialogOpen, setIsNewSlotDialogOpen] = useState(false);
+  
+  // Redux state
   const dispatch = useAppDispatch();
   const selectedShelf = useAppSelector(selectSelectedShelf);
   
-  // Use navigation hooks
-  const { 
-    goToShelves, 
-    goToShelf, 
-    switchTab
-  } = useLexigraphNavigation();
+  // Permissions
+  const { checkEditAccess } = useContentPermissions();
   
-  // Use the view state hook
+  // Navigation
+  const { goToShelves, goToShelf, goToUser, goToMainShelves } = useLexigraphNavigation();
+  
+  // View state
   const { viewFlags, params } = useViewState();
   const { shelfId, userId } = params;
-  const { 
-    isExplore, 
-    isShelfDetail,
-    isUserDetail,
-    isMainView,
-    isPublicContext
-  } = viewFlags;
+  const { isShelfDetail, isUserDetail, isMainView } = viewFlags;
   
-  // Derive active tab directly from route state
-  const activeTab = isExplore ? "explore" : "library";
-  
-  // Handle shelf selection
+  // Handle shelf selection when route changes
   useEffect(() => {
     if (shelfId) {
       // Find the shelf in either personal or public shelves
-      const shelf = isPublicContext
+      const shelf = userId
         ? publicShelves.find(s => s.shelf_id === shelfId)
-        : shelves.find(s => s.shelf_id === shelfId);
+        : [...shelves, ...publicShelves].find(s => s.shelf_id === shelfId);
       
       if (shelf) {
         dispatch(setSelectedShelf(shelf));
       }
     }
-  }, [shelfId, shelves, publicShelves, dispatch, isPublicContext]);
+  }, [shelfId, shelves, publicShelves, dispatch, userId]);
   
-  // Handle adding a new slot to a shelf
-  const handleAddSlot = useCallback(() => {
-    setIsNewSlotDialogOpen(true);
-  }, []);
+  // Action handlers
+  const handleAddSlot = useCallback(() => setIsNewSlotDialogOpen(true), []);
+  const handleCreateShelf = useCallback(() => setIsNewShelfDialogOpen(true), []);
   
-  // Handle creating a new shelf
-  const handleCreateShelf = useCallback(() => {
-    setIsNewShelfDialogOpen(true);
-  }, []);
-  
-  // Handle submitting a new shelf
   const handleNewShelfSubmit = useCallback(async (title: string, description: string) => {
     await createShelf(title, description);
     setIsNewShelfDialogOpen(false);
   }, [createShelf]);
   
-  // Handle submitting a new slot
   const handleNewSlotSubmit = useCallback(async (content: string, type: "Nft" | "Markdown" | "Shelf") => {
     if (selectedShelf) {
       await addSlot(selectedShelf, content, type);
@@ -88,7 +72,6 @@ const LexigraphLayout: React.FC = () => {
     }
   }, [selectedShelf, addSlot]);
   
-  // Handle reordering slots
   const handleReorderSlot = useCallback(async (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean) => {
     await reorderSlot(shelfId, slotId, referenceSlotId, before);
   }, [reorderSlot]);
@@ -97,61 +80,51 @@ const LexigraphLayout: React.FC = () => {
   const renderView = () => {
     // If we're viewing a specific shelf
     if (isShelfDetail && selectedShelf) {
+      const hasEditAccess = checkEditAccess(selectedShelf.shelf_id);
+      
       return (
-        <ShelfDetail 
+        <ShelfDetailContainer 
           shelf={selectedShelf}
           onBack={goToShelves}
-          onAddSlot={!isPublicContext ? handleAddSlot : undefined}
-          onReorderSlot={!isPublicContext ? handleReorderSlot : undefined}
-          isPublic={isPublicContext}
+          onAddSlot={hasEditAccess ? handleAddSlot : undefined}
+          onReorderSlot={hasEditAccess ? handleReorderSlot : undefined}
+          hasEditAccess={hasEditAccess}
         />
       );
     }
     
     // If we're viewing the main shelves view
     if (isMainView) {
+      // Combine all shelves in one view
+      const allShelves = [...shelves, ...publicShelves];
+      
       return (
-        <Tabs defaultValue={activeTab} className="w-full" onValueChange={switchTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="library" className="flex items-center gap-2">
-              <Library className="h-4 w-4" />
-              Library
-            </TabsTrigger>
-            <TabsTrigger value="explore" className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              Explore
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="library" className="mt-4">
-            <LibraryShelvesUI 
-              shelves={shelves}
-              loading={loading}
-              onNewShelf={handleCreateShelf}
-              onViewShelf={(shelfId: string) => goToShelf(shelfId)}
-            />
-          </TabsContent>
-          <TabsContent value="explore" className="mt-4">
-            <ExploreShelvesUI 
-              shelves={publicShelves}
-              loading={publicLoading}
-              onLoadMore={loadMoreShelves}
-              onViewShelf={(shelfId: string) => goToShelf(shelfId)}
-            />
-          </TabsContent>
-        </Tabs>
+        <UnifiedShelvesUI 
+          allShelves={allShelves}
+          personalShelves={shelves}
+          loading={personalLoading || publicLoading}
+          onNewShelf={handleCreateShelf}
+          onViewShelf={goToShelf}
+          onViewOwner={goToUser}
+          onLoadMore={loadMoreShelves}
+          checkEditAccess={checkEditAccess}
+        />
       );
     }
     
     // If we're viewing a specific user's shelves
     if (isUserDetail && userId) {
+      const userShelves = publicShelves.filter(shelf => 
+        shelf.owner.toString() === userId
+      );
+      
       return (
         <UserShelvesUI 
-          shelves={publicShelves.filter(shelf => 
-            shelf.owner.toString() === userId
-          )}
+          shelves={userShelves}
           loading={publicLoading}
-          onBack={goToShelves}
-          onViewShelf={(shelfId: string) => goToShelf(shelfId)}
+          onViewShelf={goToShelf}
+          onViewOwner={goToUser}
+          onBack={goToMainShelves}
         />
       );
     }
@@ -161,8 +134,16 @@ const LexigraphLayout: React.FC = () => {
   };
   
   return (
-    <div className="container mx-auto p-4">
-      {renderView()}
+    <>
+      {/* Render the shelf detail view directly without any wrappers */}
+      {isShelfDetail && selectedShelf ? (
+        renderView()
+      ) : (
+        /* Use container for other views */
+        <div className="container mx-auto p-4">
+          {renderView()}
+        </div>
+      )}
       
       {/* Dialogs */}
       <NewShelfDialog 
@@ -176,7 +157,7 @@ const LexigraphLayout: React.FC = () => {
         onClose={() => setIsNewSlotDialogOpen(false)}
         onSubmit={handleNewSlotSubmit}
       />
-    </div>
+    </>
   );
 };
 

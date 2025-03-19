@@ -1,54 +1,60 @@
 import React from "react";
+import { Check, LoaderPinwheel, TriangleAlert, X } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { LoaderCircle } from "lucide-react";
-import { formatFileSize } from "../utils";
 
-interface UploadProgressProps {
-    file: File | null;
-}
+function UploadProgress() {
+	const {
+		progress,
+		scanning,
+		fetching,
+		selecting,
+		uploading,
+		estimating,
+		cost,
+		estimateError,
+		fetchError,
+		selectError,
+		uploadError,
+		scanError,
+	} = useAppSelector((state) => state.upload);
 
-function UploadProgress({ file }: UploadProgressProps) {
-    const { progress, fetching, selecting, uploading } = useAppSelector(state => state.upload);
+	let statusText = "Preparing...";
 
-    if (!file) return null;
+	if (scanning) statusText = "Scanning content";
+	else if (estimating) statusText = "Estimating cost";
+	else if (fetching) statusText = "Fetching wallets";
+	else if (fetchError) statusText = "Couldn't fetch wallets";
+	else if (selecting) statusText = "Selecting wallet";
+	else if (selectError) statusText = "Couldn't select a suitable wallet";
+	else if (uploading) statusText = "Uploading file";
+	else if (uploadError) statusText = "Couldn't upload file";
+	else if (scanError) statusText = "Inappropriate content";
+	else if (cost) statusText = "Ready to upload";
 
-    let statusText = "Preparing...";
-    if (fetching) statusText = "Fetching wallets...";
-    if (selecting) statusText = "Selecting suitable wallet...";
-    if (uploading) statusText = "Uploading file...";
-
-    return (
-        <div className="font-roboto-condensed bg-secondary rounded shadow-sm p-8 border">
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <LoaderCircle className="animate animate-spin"/>
-                        <div>
-                            <span className="font-medium text-gray-700 dark:text-white">
-                                {statusText}
-                            </span>
-                            {uploading && (
-                                <div className="text-sm text-gray-500">
-                                    {formatFileSize((file.size * progress) / 100)} of {formatFileSize(file.size)}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    {uploading && <span className="text-sm">{progress}%</span>}
-                </div>
-                {uploading && (
-                    <div className="relative pt-1">
-                        <div className="overflow-hidden h-2 text-xs flex rounded-full bg-blue-100">
-                            <div
-                                style={{ width: `${progress}%` }}
-                                className={`transition-all duration-300 ease-out shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-constructive`}
-                            ></div>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
+	return (
+		<div className="flex justify-between items-center gap-2">
+			<div className="flex-grow h-4 bg-secondary dark:bg-[#3A3630] rounded-full border dark:border-transparent overflow-hidden">
+				{progress > 0 ? (
+					<div
+						className="h-full bg-primary dark:bg-white rounded-full"
+						style={{ width: `${progress}%` }}
+					/>
+				) : (
+					<div className="h-full text-xs flex justify-center items-center text-gray-700 dark:text-gray-300">{statusText}</div>
+				)}
+			</div>
+			{fetching || selecting || uploading ? (
+				<LoaderPinwheel
+					size={20}
+					className="animate-spin text-muted-foreground"
+				/>
+			) : progress >= 100 ? (
+				<Check size={26} className="text-constructive" />
+			) : estimateError || fetchError || selectError || uploadError ? (
+				<TriangleAlert size={20} className="text-destructive" />
+			) : null}
+		</div>
+	);
 }
 
 export default UploadProgress;

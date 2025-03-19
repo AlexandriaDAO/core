@@ -1,24 +1,19 @@
-### UX/UI Feature TODO
+### UI
 
-- We screwed up the default principal selection a little bit on alexandrian.
-  
-- Fix the public/explore functionality.
-- Add owner to the path so you could go to their profile.
-- Connect and a follow button on the shelves.
-- Make the shelf path be connected to the owner.
-- Another thing is the user sharing side. Do we let them add comments or something or other grids in a community section? How do we sort/rank these or do we let users do that themselves?
-- Most links to /shelf/slot, are not open access and require login which shouldn't be.
+- Add shelf to shelf by some button or something.
 
 
 
-- Display actual NFTs in the NFT slot.
-- Blog View: Switch from the table to show the markdown style blog with the NFTs inside.
+### Backend Decision TODOs
+- Payment for all actions, and removal of topup.
+- I think we're going to need tags too (so we could filter the recent one by categories)
+- Allowed to edit others users' shelves? NO
+
 
 
 ### Future Possible Features
 
 - Shelf Appears In? YES/maybe
-- Allowed to edit others users' shelves? NO
 
 ## Design
 
@@ -88,9 +83,24 @@ Your app is built around these primary concepts:
   - NFTs
   - References to other shelves (nesting)
 
-
-
-
+src/alex_frontend/src/apps/app/Lexigraph/features/
+├── shelf-management/
+│   ├── containers/
+│   │   └── ShelfDetailContainer.tsx  # Business logic container
+│   ├── components/
+│   │   └── ...
+│   ├── hooks/
+│   │   └── useShelfOperations.ts
+│   └── index.ts
+│
+├── cards/
+│   ├── components/
+│   │   └── ShelfDetailView.tsx      # Presentational component
+│   ├── containers/
+│   │   └── ...
+│   ├── types/
+│   │   └── types.ts
+│   └── index.ts
 
 
 

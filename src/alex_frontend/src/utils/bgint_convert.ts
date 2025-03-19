@@ -1,6 +1,6 @@
 /**
  * Recursively converts all BigInt values in an object or array to strings
- * Note: This function preserves Principal types and only converts BigInt values
+ * Note: This function properly serializes Principal types by converting them to strings
  * 
  * @param obj - The object or array to process
  * @returns A new object or array with all BigInt values converted to strings
@@ -15,9 +15,9 @@ export function convertBigIntsToStrings(obj: any): any {
     return obj.toString();
   }
 
-  // Skip Principal objects - do not convert them to strings automatically
+  // Handle Principal objects by converting them to string
   if (obj._isPrincipal === true) {
-    return obj;
+    return obj.toString();
   }
 
   // Handle arrays

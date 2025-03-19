@@ -70,6 +70,36 @@ pub fn update_profile(request: UpdateUserRequest) -> Result<User, String> {
             .map(|user| user.clone())
             .ok_or_else(|| GeneralError::NotFound("User".to_string()).to_string())?;
 
+        // Update username if other than current username
+        let new_username = request.username.trim().to_lowercase();
+        if new_username != user.username {
+            // Validate the new username
+            if let Err(err) = validate_username(&new_username) {
+                return Err(err.to_string());
+            }
+            
+            // Check if username is taken
+            let username_available = USERNAMES.with(|usernames| {
+                let usernames = usernames.borrow();
+                !usernames.contains_key(&new_username)
+            });
+            
+            if !username_available {
+                return Err(UserError::UsernameTaken.to_string());
+            }
+            
+            // Update USERNAMES mapping
+            let old_username = user.username.clone();
+            USERNAMES.with(|usernames| {
+                let mut usernames = usernames.borrow_mut();
+                usernames.remove(&old_username);
+                usernames.insert(new_username.clone(), caller);
+            });
+            
+            // Update the user's username
+            user.username = new_username;
+        }
+
         // Update name if provided
         if let Some(name) = request.name {
             let name = name.trim();

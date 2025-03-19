@@ -20,7 +20,7 @@ export default function CollectionSelector({ onCollectionChange }: CollectionSel
         // Use custom handler if provided
         onCollectionChange(value as 'NFT' | 'SBT');
       } else {
-        // Otherwise use the default behavior
+        // Use the enhanced changeCollection thunk to update pagination and fetch new data
         dispatch(changeCollection(value as 'NFT' | 'SBT'));
       }
     }

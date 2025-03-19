@@ -242,7 +242,6 @@ module.exports = {
     // }),
   ],
   devServer: {
-    
     historyApiFallback: true,
     proxy: [
       {
@@ -252,10 +251,29 @@ module.exports = {
         pathRewrite: { "^/api": "/api" },
       },
     ],
-    static: path.resolve(__dirname, "src", frontendDirectory, "public"),
+    static: [
+      {
+        directory: path.resolve(__dirname, "src", frontendDirectory, "public"),
+        publicPath: '/',
+        watch: true,
+      },
+      {
+        directory: path.resolve(__dirname, "dist", frontendDirectory),
+        publicPath: '/',
+        watch: true,
+      }
+    ],
     hot: true,
     watchFiles: [path.resolve(__dirname, "src", frontendDirectory, "src")],
     liveReload: true,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+    },
+    devMiddleware: {
+      publicPath: '/',
+    },
   },
   experiments: {
     asyncWebAssembly: true,

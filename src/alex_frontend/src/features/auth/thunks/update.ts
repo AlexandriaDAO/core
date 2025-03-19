@@ -10,14 +10,16 @@ const update = createAsyncThunk<
 	{
 		actor: ActorSubclass<_SERVICE>,
 		input: {
+			username: string,
 			name?: string,
 			avatar?: string
 		}
 	}, //Argument that we pass to initialize
 	{ rejectValue: string }
->( "auth/update", async ( {actor, input: {name, avatar}},{ rejectWithValue }) => {
+>( "auth/update", async ( {actor, input: {name, avatar, username}},{ rejectWithValue }) => {
 		try {
 			const updateInput:UpdateUserRequest = {
+				username: username,
 				name: name ? [name]: [],
 				avatar: avatar ? [avatar]: []
 			}

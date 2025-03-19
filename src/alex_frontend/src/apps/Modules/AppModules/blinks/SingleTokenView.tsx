@@ -52,9 +52,8 @@ function SingleTokenView() {
   //   async function loadNFTData() {
   //     if (!tokenId) return;
 
-  //     try {
-  //       setIsLoading(true);
-  //       console.log('Loading NFT data for tokenId:', tokenId);
+      try {
+        setIsLoading(true);
         
   //       const tokenType = determineTokenType(tokenId);
         
@@ -72,9 +71,10 @@ function SingleTokenView() {
   //       const arweaveId = await tokenAdapter.tokenToNFTData(nftId, '').then(data => data.arweaveId);
         
   //       console.log('Converted to arweaveId:', arweaveId);
-        
+
   //       const txData = await fetchTransactionById(arweaveId);
   //       console.log('Fetched transaction data:', txData);
+        const txData = await fetchTransactionById(arweaveId);
         
   //       if (!txData) {
   //         console.error('Transaction not found for arweaveId:', arweaveId);
