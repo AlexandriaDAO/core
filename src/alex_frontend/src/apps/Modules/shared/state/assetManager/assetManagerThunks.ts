@@ -11,6 +11,7 @@ import { uploadAsset } from "./uploadToAssetCanister";
 import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
 import { RootState } from "@/store";
 import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
+import ContentTagsSelector from "@/apps/Modules/AppModules/search/selectors/ContentTagsSelector";
 
 export const createAssetCanister = createAsyncThunk<
   string, // Success type
@@ -24,7 +25,7 @@ export const createAssetCanister = createAsyncThunk<
       const assetManagerCanisterId = process.env.CANISTER_ID_ASSET_MANAGER!;
       const actorLbryLedger = await getLbryActor();
       let amountFormatApprove: bigint = BigInt(
-        Number((Number(1) + 0.04) * 10 ** 8).toFixed(0)
+        Number((Number(10) + 0.04) * 10 ** 8).toFixed(0)
       );
       const checkApproval = await actorLbryLedger.icrc2_allowance({
         account: {
@@ -88,7 +89,6 @@ export const getCallerAssetCanister = createAsyncThunk<
   try {
     const actor = await getActorAssetManager();
     const result = await actor.get_caller_asset_canister();
-    console.log("result isss", result);
     if (result[0]) {
       const canisterId = result[0]?.assigned_canister_id;
       if (!canisterId) {
@@ -133,7 +133,7 @@ export const syncNfts = createAsyncThunk<
   ) => {
     try {
       // Create NFT token adapter
-      const nftAdapter = createTokenAdapter('NFT');
+      const nftAdapter = createTokenAdapter("NFT");
 
       // Fetch user's NFTs using the adapter
       const result = await nftAdapter.getTokensOf(
@@ -142,10 +142,8 @@ export const syncNfts = createAsyncThunk<
         BigInt(10000)
       );
 
-      if (result.length === 0) {
-        console.warn("No tokens found for the specified user.");
-      }
       
+
       // Convert token IDs to arweave IDs using the adapter
       const tokens: string[] = [];
       for (const tokenId of result) {
@@ -174,10 +172,8 @@ export const syncNfts = createAsyncThunk<
         throw new Error("Failed to upload transaction data.");
       }
 
-      console.log("Transaction data uploaded successfully!");
 
       // Step 2: Upload NFTs one by one
-      console.log("tokens are ", tokens);
       tokens.reduce(async (prevPromise, token) => {
         await prevPromise; //  before starting the next one
         const result = await uploadAsset({
@@ -188,11 +184,8 @@ export const syncNfts = createAsyncThunk<
           syncProgress,
           assetList: assetManager.assetList,
         });
-
-
       }, Promise.resolve()); // Initial value to start the chain
 
-      //  upload({ assetCanisterId: assetManager.userAssetCanister, setUploadProgress })
       return "";
     } catch (error) {
       console.error("Error fetching NFTs:", error);
@@ -275,6 +268,37 @@ export const getAssetList = createAsyncThunk<
 
     return simplifiedList;
   } catch (error) {
+    console.error("Error fetching asset canister:", error);
+    return rejectWithValue(
+      error instanceof Error ? error.message : "Unknown error occurred"
+    );
+  }
+});
+
+export const getCanisterCycles = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>("assetManager/getCanisterCycles", async (canisterId, { rejectWithValue }) => {
+  
+  if (!canisterId) {
+    return rejectWithValue("No canister ID found");
+  }
+
+  try {
+    const actor = await getActorAssetManager();
+
+    const result = await actor.get_canister_cycles(Principal.fromText(canisterId));
+    if ("Ok" in result) {
+      return result.Ok.toString();
+    }
+    if ("Err" in result) {
+      return rejectWithValue(result.Err.toString());
+    }
+    
+    return rejectWithValue("Unexpected response format");
+  }
+  catch (error) {
     console.error("Error fetching asset canister:", error);
     return rejectWithValue(
       error instanceof Error ? error.message : "Unknown error occurred"

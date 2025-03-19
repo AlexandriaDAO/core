@@ -32,10 +32,14 @@ interface ContentCardProps {
   predictions?: any;
   isMinting?: boolean;
   footer?: React.ReactNode;
-  component?:string;
+  component?: string;
+  isFromAssetCanister?: boolean;
 }
 
-export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isOwned, onMint, predictions, isMinting: externalIsMinting, footer, component }: ContentCardProps) {
+
+export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isOwned, onMint, predictions, isMinting: externalIsMinting, footer, component, isFromAssetCanister }: ContentCardProps) {
+  const [searchTriggered, setSearchTriggered] = useState(false);
+  const [copiedOwner, setCopiedOwner] = useState(false);
   const [isShelfSelectorOpen, setIsShelfSelectorOpen] = useState(false);
   const [internalMintingState, setInternalMintingState] = useState<boolean>(false);
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
@@ -60,17 +64,17 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
 
   const shouldShowMintButton = () => {
     if (!id) return false;
-    
+
     const transaction = transactions.find(t => t.id === id);
     if (!transaction) return false;
 
     const contentType = transaction.tags?.find(tag => tag.name === "Content-Type")?.value;
-    
+
     // For non-media content (epub, pdf, txt, etc.), always allow minting
     if (!isMediaContent(contentType)) {
       return true;
     }
-    
+
     // For media content, require safety check
     return predictions && predictions.isPorn === false;
   };
@@ -104,17 +108,17 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
   return (
     <>
       <Card
-        className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative  bg-white dark:bg-gray-900 h-full ${component==="Emporium"?"mb-20 rounded-2xl ":"overflow-hidden "}`}
-        onClick={onClick} 
+        className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative  bg-white dark:bg-gray-900 h-full ${component === "Emporium" ? "mb-20 rounded-2xl " : "overflow-hidden "}`}
+        onClick={onClick}
       >
         <CardContent className="flex flex-col items-start p-0">
           <AspectRatio ratio={1} className="w-full relative">
-            <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800  ${component==="Emporium"?" border-gray-900 dark:border-gray-900 rounded-[30px]":"overflow-hidden h-full "}`}  >
+            <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800  ${component === "Emporium" ? " border-gray-900 dark:border-gray-900 rounded-[30px]" : "overflow-hidden h-full "}`}  >
               {children}
             </div>
             {/* Action button - either Like or Mint */}
-            <div 
-              className="absolute bottom-2 left-2 z-[30]" 
+            <div
+              className="absolute bottom-2 left-2 z-[30]"
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -148,16 +152,25 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
                 </Button>
               )}
             </div>
-            
+
             {/* Owned badge */}
             {isOwned && (
-              <div 
+              <div
                 className="absolute top-0 right-0 bg-green-500 hover:bg-green-600 text-white px-2 py-1 text-xs z-30 cursor-pointer"
                 onClick={handleOwnedBadgeClick}
               >
                 Owned
               </div>
             )}
+
+
+            <div
+              className="absolute top-0 left-0 bg-green-500 hover:bg-green-600 text-white px-2 py-1 text-xs z-30 cursor-pointer"
+
+            >
+              {isFromAssetCanister ? "ICP" : "AR"}
+            </div>
+
           </AspectRatio>
         </CardContent>
 
@@ -167,6 +180,25 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
             {(!predictions || Object.keys(predictions).length === 0) && id && !footer && <NftDataFooter id={id} contentOwner={owner} />}
             {footer}
 
+            {/* Owner badge */}
+            {owner && (
+              <Badge
+                variant="secondary"
+                className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
+                onClick={(e) => handleOwnerClick(e, owner)}
+              >
+                <User className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
+                <span className="text-gray-600 dark:text-gray-400">
+                  {formatId(owner)}
+                </span>
+                {copiedOwner ? (
+                  <Check className="h-2.5 w-2.5 text-green-500" />
+                ) : (
+                  <Search className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
+                )}
+              </Badge>
+            )}
+        
             {/* Stats button */}
             {predictions && Object.keys(predictions).length > 0 ? (
               <Collapsible open={showStats} onOpenChange={onToggleStats}>
@@ -204,9 +236,9 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
         <Dialog open={isShelfSelectorOpen} onOpenChange={setIsShelfSelectorOpen}>
           <DialogContent className="w-[500px] p-4">
             <DialogTitle>Add to Shelf</DialogTitle>
-            <ShelfSelector 
-              nftId={id} 
-              onClose={handleCloseShelfSelector} 
+            <ShelfSelector
+              nftId={id}
+              onClose={handleCloseShelfSelector}
             />
           </DialogContent>
         </Dialog>

@@ -130,7 +130,6 @@ export const uploadAsset = async ({
       }
 
       const response = await fetch(itemUrl);
-      console.log("Fetching URL:", itemUrl);
       if (!response.ok) throw new Error(`Failed to fetch file: ${response.statusText}`);
 
       contentType = response.headers.get("content-type") || "image/jpeg";
@@ -237,13 +236,14 @@ export const uploadAsset = async ({
       totalSynced: (prev.totalSynced || 0) + 1,
       currentProgress: 100
     }));
+    console.log(`Upload of "${id}" completed successfully.`);
 
-    toast.success(`Upload of "${id}" completed successfully.`);
+    // toast.success(`Upload of "${id}" completed successfully.`);
     return true;
 
   } catch (error: any) {
     console.error("Upload failed:", error);
-    toast.error("Upload failed: " + (error.message || "Unknown error"));
+    // toast.error("Upload failed: " + (error.message || "Unknown error"));
 
     // Cleanup on failure
     if (currentBatchId && assetActor) {

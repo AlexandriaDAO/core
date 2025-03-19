@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { SearchContainer } from '@/apps/Modules/shared/components/SearchContainer';
 import { AlexandrianLibrary } from "@/apps/Modules/LibModules/nftSearch";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,16 +9,18 @@ import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalan
 import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
 import { clearAllTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
+import AssetManager from "@/apps/Modules/shared/components/AssetManager";
+import { use } from "echarts";
 
 function Alexandrian() {
 	const dispatch = useDispatch<AppDispatch>();
-	const { isLoading, searchParams } = useSelector((state: RootState) => state.library);
+	const { isLoading, searchParams, selectedPrincipals } = useSelector((state: RootState) => state.library);
 	const transactions = useSelector((state: RootState) => state.transactions.transactions);
 	const nfts = useSelector((state: RootState) => state.nftData.nfts);
-	
+	const { user } = useSelector((state: RootState) => state.auth);
 	// Track if assets have been loaded to prevent state wiping
 	const assetsLoadedRef = useRef(false);
-	
+
 	// Update ref when assets are loaded
 	const hasAssets = transactions.length > 0 || Object.keys(nfts).length > 0;
 	if (hasAssets && !isLoading && !assetsLoadedRef.current) {
@@ -60,30 +62,37 @@ function Alexandrian() {
 		dispatch(clearAllTransactions());
 		toast.info("Search cancelled");
 	}, [dispatch]);
-
+	useEffect(() => {
+		handleSearch()
+	}, [searchParams.start])
 	return (
-		<SearchContainer
-			title="Alexandrian"
-			description="Search the NFT Library of others, and manage your own."
-			hint="Liking costs 20 LBRY (this will decrease over time)."
-			onSearch={handleSearch}
-			onShowMore={handleShowMore}
-			onCancel={handleCancelSearch}
-			isLoading={isLoading}
-			topComponent={<TopupBalanceWarning />}
-			filterComponent={
-				<AlexandrianLibrary 
-					defaultCategory="all"
-					defaultPrincipal="new"
-					showPrincipalSelector={true}
-					showCollectionSelector={true}
-					showTagsSelector={true}
-				/>
-			}
-			showMoreEnabled={true}
-			dataSource="transactions"
-			preserveState={assetsLoadedRef.current}
-		/>
+		<>
+			<div className="rounded-lg">
+				<AssetManager />
+			</div>
+			<SearchContainer
+				title="Alexandrian"
+				description="Search the NFT Library of others, and manage your own."
+				hint="Liking costs 20 LBRY (this will decrease over time)."
+				onSearch={handleSearch}
+				onShowMore={handleShowMore}
+				onCancel={handleCancelSearch}
+				isLoading={isLoading}
+				topComponent={<TopupBalanceWarning />}
+				filterComponent={
+					<AlexandrianLibrary
+						defaultCategory="all"
+						defaultPrincipal="new"
+						showPrincipalSelector={true}
+						showCollectionSelector={true}
+						showTagsSelector={true}
+					/>
+				}
+				showMoreEnabled={true}
+				dataSource="transactions"
+				preserveState={assetsLoadedRef.current}
+			/>
+		</>
 	);
 }
 

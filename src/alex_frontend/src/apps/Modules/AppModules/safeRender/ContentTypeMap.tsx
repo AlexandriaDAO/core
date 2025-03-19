@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { BookOpen, File, Play, Music } from 'lucide-react';
 import { Reader } from "@/features/reader";
@@ -37,6 +37,25 @@ const formatJSON = (content: string) => {
     return content;
   }
 };
+const generateVideoThumbnail = (videoUrl: string, callback: (thumbnail: string) => void) => {
+  const video = document.createElement('video');
+  video.src = videoUrl;
+  video.crossOrigin = "anonymous";
+  video.onloadeddata = () => {
+    video.currentTime = 2;
+  };
+  video.onseeked = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const thumbnailUrl = canvas.toDataURL('image/png');
+      callback(thumbnailUrl);
+    }
+  };
+};
 
 export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   transaction,
@@ -49,6 +68,24 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   const { theme } = useTheme();
   const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || 'application/octet-stream';
   const { fullUrl, coverUrl, thumbnailUrl } = contentUrls;
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [generatedThumbnail, setGeneratedThumbnail] = useState<string | null>(null);
+
+  // Handle blob URL cleanup
+  useEffect(() => {
+    if (fullUrl.startsWith('blob:')) {
+      setBlobUrl(fullUrl);
+      return () => {
+        URL.revokeObjectURL(fullUrl);
+      };
+    } else {
+      setBlobUrl(fullUrl);
+    }
+
+    if (contentType.includes("video/") && !thumbnailUrl) {
+      generateVideoThumbnail(fullUrl, setGeneratedThumbnail);
+    }
+  }, [fullUrl]);
 
   const commonProps = {
     className: `${inModal ? 'w-full h-full sm:object-cover xs:object-fill rounded-xl' : 'absolute inset-0 w-full h-full object-cover'}`,
@@ -82,7 +119,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
         return (
           <ReaderProvider>
             <div className="h-[85vh] w-[800px] max-w-[95vw]">
-              <Reader bookUrl={fullUrl} />
+              <Reader bookUrl={blobUrl || fullUrl} />
             </div>
           </ReaderProvider>
         );
@@ -112,8 +149,8 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
                 {contentType.split('/')[1].toUpperCase()}
               </div>
             </div>
-            <audio 
-              src={fullUrl}
+            <audio
+              src={blobUrl || fullUrl}
               controls
               className="w-full relative z-30"
               onError={() => handleRenderError(transaction.id)}
@@ -127,8 +164,8 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
       <div className="relative w-full h-full">
         {inModal ? (
           <div className="flex items-center justify-center">
-            <video 
-              src={fullUrl}
+            <video
+              src={blobUrl || fullUrl}
               controls
               playsInline
               controlsList="nodownload"
@@ -141,11 +178,11 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
           </div>
         ) : (
           <div className="relative w-full h-full">
-            {thumbnailUrl ? (
+            {thumbnailUrl || generatedThumbnail ?  (
               <>
                 <AspectRatio ratio={1}>
                   <img
-                    src={thumbnailUrl}
+                    src={ thumbnailUrl || generatedThumbnail || ''} 
                     alt="Video thumbnail"
                     {...commonProps}
                     crossOrigin="anonymous"
@@ -169,23 +206,23 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
     "image/": () => (
       inModal ? (
         <div className="flex items-center justify-center">
-          <img 
-            src={fullUrl} 
-            alt="Content" 
+          <img
+            src={blobUrl || fullUrl}
+            alt="Content"
             decoding="async"
             className="max-w-[95vw] max-h-[90vh] w-auto h-auto object-contain"
-            crossOrigin="anonymous" 
+            crossOrigin="anonymous"
             onError={() => handleRenderError(transaction.id)}
           />
         </div>
       ) : (
         <AspectRatio ratio={1}>
-          <img 
-            src={fullUrl} 
-            alt="Content" 
+          <img
+            src={blobUrl || fullUrl}
+            alt="Content"
             decoding="async"
             className="absolute inset-0 w-full h-full object-cover"
-            crossOrigin="anonymous" 
+            crossOrigin="anonymous"
             onError={() => handleRenderError(transaction.id)}
           />
         </AspectRatio>
@@ -270,38 +307,38 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
                 <div class="container">
                   <div class="prose">
                     ${DOMPurify.sanitize(content?.textContent, {
-                      ALLOWED_TAGS: [
-                        'p', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                        'strong', 'em', 'b', 'i', 'u', 'strike',
-                        'ul', 'ol', 'li', 'br', 'hr'
-                      ],
-                      ALLOWED_ATTR: ['title'],
-                      ALLOW_DATA_ATTR: false,
-                      FORBID_TAGS: [
-                        'script', 'style', 'iframe', 'frame', 'object', 'embed', 'form',
-                        'base', 'link', 'meta', 'head', 'html', 'body', 'param', 'applet',
-                        'img', 'a', 'input', 'textarea', 'select', 'button', 'svg',
-                        'math', 'template'
-                      ],
-                      FORBID_ATTR: [
-                        'onerror', 'onload', 'onclick', 'onmouseover', 'onmouseout', 
-                        'onmouseenter', 'onmouseleave', 'onscroll', 'onsubmit', 'onreset',
-                        'onselect', 'onblur', 'onfocus', 'onchange', 'onkeydown', 'onkeypress',
-                        'onkeyup', 'ondrag', 'ondrop',
-                        'style', 'href', 'src', 'action', 'formaction', 'ping', 'target',
-                        'rel', 'srcdoc', 'sandbox', 'poster', 'preload', 'formtarget'
-                      ],
-                      ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
-                      RETURN_DOM_FRAGMENT: false,
-                      RETURN_DOM: false,
-                      SANITIZE_DOM: true,
-                      KEEP_CONTENT: true,
-                      WHOLE_DOCUMENT: false,
-                      FORCE_BODY: true,
-                      USE_PROFILES: {html: true},
-                      SANITIZE_NAMED_PROPS: true,
-                      IN_PLACE: false
-                    })}
+            ALLOWED_TAGS: [
+              'p', 'div', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+              'strong', 'em', 'b', 'i', 'u', 'strike',
+              'ul', 'ol', 'li', 'br', 'hr'
+            ],
+            ALLOWED_ATTR: ['title'],
+            ALLOW_DATA_ATTR: false,
+            FORBID_TAGS: [
+              'script', 'style', 'iframe', 'frame', 'object', 'embed', 'form',
+              'base', 'link', 'meta', 'head', 'html', 'body', 'param', 'applet',
+              'img', 'a', 'input', 'textarea', 'select', 'button', 'svg',
+              'math', 'template'
+            ],
+            FORBID_ATTR: [
+              'onerror', 'onload', 'onclick', 'onmouseover', 'onmouseout',
+              'onmouseenter', 'onmouseleave', 'onscroll', 'onsubmit', 'onreset',
+              'onselect', 'onblur', 'onfocus', 'onchange', 'onkeydown', 'onkeypress',
+              'onkeyup', 'ondrag', 'ondrop',
+              'style', 'href', 'src', 'action', 'formaction', 'ping', 'target',
+              'rel', 'srcdoc', 'sandbox', 'poster', 'preload', 'formtarget'
+            ],
+            ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+            RETURN_DOM_FRAGMENT: false,
+            RETURN_DOM: false,
+            SANITIZE_DOM: true,
+            KEEP_CONTENT: true,
+            WHOLE_DOCUMENT: false,
+            FORCE_BODY: true,
+            USE_PROFILES: { html: true },
+            SANITIZE_NAMED_PROPS: true,
+            IN_PLACE: false
+          })}
                   </div>
                 </div>
                 ${!inModal ? '<div class="gradient-overlay"></div>' : ''}
@@ -336,7 +373,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
         {inModal ? (
           <div className="w-[800px] max-w-[95vw] h-[90vh]">
             <iframe
-              src={`${fullUrl}#view=FitH`}
+              src={`${blobUrl || fullUrl}#view=FitH`}
               className="w-full h-full"
               sandbox="allow-scripts allow-same-origin"
               title="PDF Viewer"
@@ -357,17 +394,17 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
               <AspectRatio ratio={1}>
                 <div className="relative w-full h-full">
                   <iframe
-                    src={`${fullUrl}#page=1&view=FitH&zoom=50&toolbar=0&navpanes=0`}
+                    src={`${blobUrl || fullUrl}#page=1&view=FitH&zoom=50&toolbar=0&navpanes=0`}
                     className="w-full h-full rounded-lg"
                     sandbox="allow-scripts allow-same-origin"
                     title="PDF Preview"
-                    style={{ 
+                    style={{
                       pointerEvents: 'none',
                       backgroundColor: 'rgb(243 244 246)'
                     }}
                   />
-                  <div 
-                    className="absolute inset-0" 
+                  <div
+                    className="absolute inset-0"
                     style={{ pointerEvents: 'none' }}
                   />
                 </div>
