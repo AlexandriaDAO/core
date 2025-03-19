@@ -50,6 +50,7 @@ export const DASHBOARD_ROUTES = {
   PROFILE: '/dashboard/profile',
   PROFILE_UPGRADE: '/dashboard/profile/upgrade',
   WALLETS: '/dashboard/wallets',
+  ASSET_SYNC: '/dashboard/asset-sync',
 };
 
 // Combine all routes
@@ -104,6 +105,7 @@ export const buildRoutes = {
   dashboardProfile: () => DASHBOARD_ROUTES.PROFILE,
   dashboardProfileUpgrade: () => DASHBOARD_ROUTES.PROFILE_UPGRADE,
   dashboardWallets: () => DASHBOARD_ROUTES.WALLETS,
+  dashboardAssetSync: () => DASHBOARD_ROUTES.ASSET_SYNC,
 };
 
 export default ROUTES; 

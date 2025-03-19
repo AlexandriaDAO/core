@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/lib/components/dialog";
 import ShelfSelector from "./components/ShelfSelector";
 import { mint_nft } from "@/features/nft/mint";
 import { toast } from "sonner";
+import { Badge } from "@/lib/components/badge";
 
 interface Transaction {
   id: string;
@@ -155,20 +156,22 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
 
             {/* Owned badge */}
             {isOwned && (
-              <div
-                className="absolute top-0 right-0 bg-green-500 hover:bg-green-600 text-white px-2 py-1 text-xs z-30 cursor-pointer"
-                onClick={handleOwnedBadgeClick}
-              >
-                Owned
+              <div className="absolute top-2 right-2 z-30">
+                <Badge 
+                  variant="success" 
+                  className="cursor-pointer text-xs"
+                  onClick={handleOwnedBadgeClick}
+                >
+                  Owned
+                </Badge>
               </div>
             )}
 
-
-            <div
-              className="absolute top-0 left-0 bg-green-500 hover:bg-green-600 text-white px-2 py-1 text-xs z-30 cursor-pointer"
-
-            >
-              {isFromAssetCanister ? "ICP" : "AR"}
+            {/* Storage badge (ICP/AR) */}
+            <div className="absolute top-2 left-2 z-30">
+              <Badge variant="secondary" className="text-xs">
+                {isFromAssetCanister ? "ICP" : "AR"}
+              </Badge>
             </div>
 
           </AspectRatio>
@@ -179,25 +182,6 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
             {/* NFT data or custom footer - now first */}
             {(!predictions || Object.keys(predictions).length === 0) && id && !footer && <NftDataFooter id={id} contentOwner={owner} />}
             {footer}
-
-            {/* Owner badge */}
-            {owner && (
-              <Badge
-                variant="secondary"
-                className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
-                onClick={(e) => handleOwnerClick(e, owner)}
-              >
-                <User className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                <span className="text-gray-600 dark:text-gray-400">
-                  {formatId(owner)}
-                </span>
-                {copiedOwner ? (
-                  <Check className="h-2.5 w-2.5 text-green-500" />
-                ) : (
-                  <Search className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                )}
-              </Badge>
-            )}
         
             {/* Stats button */}
             {predictions && Object.keys(predictions).length > 0 ? (

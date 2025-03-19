@@ -9,7 +9,6 @@ import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalan
 import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
 import { clearAllTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
-import AssetManager from "@/apps/Modules/shared/components/AssetManager";
 import { use } from "echarts";
 
 function Alexandrian() {
@@ -67,9 +66,7 @@ function Alexandrian() {
 	}, [searchParams.start])
 	return (
 		<>
-			<div className="rounded-lg">
-				<AssetManager />
-			</div>
+			{/* Asset Manager has been moved to the Dashboard */}
 			<SearchContainer
 				title="Alexandrian"
 				description="Search the NFT Library of others, and manage your own."

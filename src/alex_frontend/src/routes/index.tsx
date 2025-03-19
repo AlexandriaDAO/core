@@ -23,6 +23,7 @@ const UpgradePage = lazy(()=>import("@/pages/dashboard/UpgradePage"));
 // const LibrarianLayout = lazy(()=>import("@/layouts/LibrarianLayout"));
 const LibrarianPage = lazy(()=>import("@/pages/librarian/"));
 const WalletsPage = lazy(()=>import("@/pages/librarian/WalletsPage"));
+const AssetSyncPage = lazy(()=>import("@/pages/dashboard/AssetSyncPage"));
 // const FileUploadPage = lazy(()=>import("@/pages/dashboard/FileUploadPage"));
 const PinaxPage = lazy(()=>import("@/pages/PinaxPage"));
 // const UploadPage = lazy(()=>import("@/pages/dashboard/UploadPage"));
@@ -110,6 +111,8 @@ const router = createBrowserRouter(
 							<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
 							<Route path="wallets" element={<Suspense key="wallets" fallback={<MainPageSkeleton />}><WalletsPage /></Suspense>} />
 						</Route>
+
+						<Route path="asset-sync" element={<Suspense key="asset-sync" fallback={<MainPageSkeleton />}><AssetSyncPage /></Suspense>} />
 
 						<Route path="profile">
 							<Route index element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />

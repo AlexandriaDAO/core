@@ -1,20 +1,15 @@
-import React, { Suspense, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { Button } from "@/lib/components/button";
-import { Label } from "@/lib/components/label";
 import { LoaderCircle, Save } from "lucide-react";
 import { useUser } from "@/hooks/actors";
 import upgrade from "@/features/auth/thunks/upgrade";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useNavigate } from "react-router";
-const TermsAndConditions = React.lazy(() => import('@/components/TermsAndConditions'));
 
-const LibrarianSchema = Yup.object().shape({
-	agreeToTerms: Yup.boolean()
-		.oneOf([true], "You must agree to the terms and conditions")
-		.required("Agreement is required"),});
+const LibrarianSchema = Yup.object().shape({});
 
 const UpgradePage = () => {
 	const {actor} = useUser();
@@ -31,13 +26,11 @@ const UpgradePage = () => {
 	}, [user])
 
 	const formik = useFormik({
-		initialValues: {
-			agreeToTerms: false,
-		},
+		initialValues: {},
 		validationSchema: LibrarianSchema,
-		validateOnBlur: true, // Validate form field on blur
-		validateOnChange: true, // Validate form field on change
-		onSubmit: async (values) => {
+		validateOnBlur: true,
+		validateOnChange: true,
+		onSubmit: async () => {
 			if(!actor) return;
 			dispatch(upgrade(actor));
 		},
@@ -55,25 +48,10 @@ const UpgradePage = () => {
 					onSubmit={formik.handleSubmit}
 					className="flex flex-col gap-4"
 				>
-					<Suspense fallback={<div>Loading...</div>}>
-						<TermsAndConditions />
-					</Suspense>
-
-					<div className="flex flex-col items-start font-roboto-condensed font-medium text-black">
-						<div className="flex items-center gap-2">
-							<input onChange={formik.handleChange} className="cursor-pointer w-4 h-4" type="checkbox" id="agreeToTerms" name="agreeToTerms" checked={formik.values.agreeToTerms} />
-							<Label htmlFor="agreeToTerms" variant={(formik.touched.agreeToTerms && formik.errors.agreeToTerms ? "destructive" : "default" ) }>
-								I agree to the terms and conditions
-							</Label>
-						</div>
-
-						{formik.touched.agreeToTerms &&
-							formik.errors.agreeToTerms && (
-								<span className="text-destructive text-sm">
-									{formik.errors.agreeToTerms}
-								</span>
-							)}
+					<div className="mb-6 font-roboto-condensed">
+						By upgrading to a librarian account, you acknowledge that this is a pre-alpha project and features may change.
 					</div>
+
 					<div className="flex justify-center">
 						{librarianLoading ? (
 							<Button type="button" disabled rounded={"full"}>
@@ -86,7 +64,7 @@ const UpgradePage = () => {
 						) : (
 							<Button type="submit" rounded={"full"}>
 								<Save size={18} />
-								<span>Save Form</span>
+								<span>Upgrade Account</span>
 							</Button>
 						)}
 

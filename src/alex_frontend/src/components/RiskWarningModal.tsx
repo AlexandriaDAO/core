@@ -9,7 +9,6 @@ import {
   AlertDialogAction,
 } from "@/lib/components/alert-dialog";
 import { ScrollArea } from "@/lib/components/scroll-area";
-import TermsAndConditions from '@/components/TermsAndConditions';
 
 interface RiskWarningModalProps {
   onClose: () => void;
@@ -25,11 +24,18 @@ const RiskWarningModal: React.FC<RiskWarningModalProps> = ({ onClose, open }) =>
           <AlertDialogDescription>Project Status: Pre-Alpha</AlertDialogDescription>
         </AlertDialogHeader>
         <ScrollArea className="pr-4">
-          <TermsAndConditions />
+          <div className="p-4 space-y-4">
+            <p className="font-medium">
+              This project is in pre-alpha stage. Use at your own risk.
+            </p>
+            <p>
+              For more information, please contact the project administrators.
+            </p>
+          </div>
         </ScrollArea>
         <AlertDialogFooter>
           <AlertDialogAction onClick={onClose}>
-            I Understand the Risks
+            I Understand
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

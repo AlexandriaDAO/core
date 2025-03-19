@@ -46,106 +46,107 @@ function SingleTokenView() {
   const { user } = useSelector((state: RootState) => state.auth);
 // we dont need to fetch nft balance,content  again,we are already doing it in fetchTokensForPrincipal
 
-  // useEffect(() => {
-  //   let mounted = true;
-
-  //   async function loadNFTData() {
-  //     if (!tokenId) return;
-
+  useEffect(() => {
+    let mounted = true;
+    
+    async function loadNFTData() {
+      if (!tokenId) return;
+      
       try {
         setIsLoading(true);
+        let nft = nfts[tokenId];
         
-  //       const tokenType = determineTokenType(tokenId);
-        
-  //       const tokenAdapter = createTokenAdapter(tokenType);
-        
-  //       const nftId = BigInt(tokenId);
-        
-  //       let ogId: bigint;
-  //       if (tokenType === 'SBT') {
-  //         ogId = await nft_manager.scion_to_og_id(nftId);
-  //       } else {
-  //         ogId = nftId;
-  //       }
-        
-  //       const arweaveId = await tokenAdapter.tokenToNFTData(nftId, '').then(data => data.arweaveId);
-        
-  //       console.log('Converted to arweaveId:', arweaveId);
-
-  //       const txData = await fetchTransactionById(arweaveId);
-  //       console.log('Fetched transaction data:', txData);
-        const txData = await fetchTransactionById(arweaveId);
-        
-  //       if (!txData) {
-  //         console.error('Transaction not found for arweaveId:', arweaveId);
-  //         toast.error('Transaction not found');
-  //         return;
-  //       }
-        
-  //       if (mounted) {
-  //         setTransaction(txData);
-  //         console.log('Set transaction in state:', txData);
-
-  //         const content = await ContentService.loadContent(txData);
-  //         const urls = await ContentService.getContentUrls(txData, content);
-  //         setContentUrls(urls);
+        if (!nft || !nft.arweaveId) {
+          console.log('NFT not found in Redux store, fetching directly...', tokenId);
+          // If NFT data isn't in the Redux store, fetch it directly
+          const tokenType = determineTokenType(tokenId);
+          const tokenAdapter = createTokenAdapter(tokenType);
+          const nftId = BigInt(tokenId);
           
-  //         dispatch(setContentData({ 
-  //           id: txData.id, 
-  //           content: {
-  //             ...content,
-  //             urls
-  //           }
-  //         }));
-  //       }
-
-  //       const subaccount = await nft_manager.to_nft_subaccount(nftId);
-  //       const balanceParams = {
-  //         owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-  //         subaccount: [Array.from(subaccount)] as [number[]]
-  //       };
-
-  //       const [alexBalance, lbryBalance] = await Promise.all([
-  //         ALEX.icrc1_balance_of(balanceParams),
-  //         LBRY.icrc1_balance_of(balanceParams)
-  //       ]);
-
-  //       if (mounted) {
-  //         const alexTokens = convertE8sToToken(alexBalance);
-  //         const lbryTokens = convertE8sToToken(lbryBalance);
-
-  //         dispatch(setNFTs({
-  //           [tokenId]: {
-  //             collection: tokenType,
-  //             principal: '',
-  //             arweaveId: arweaveId,
-  //             balances: { alex: alexTokens, lbry: lbryTokens }
-  //           }
-  //         }));
+          // Get owner info
+          const ownerResult = await tokenAdapter.getOwnerOf([nftId]);
+          let ownerPrincipal = '';
           
-  //         dispatch(updateNftBalances({
-  //           tokenId,
-  //           alex: alexTokens,
-  //           lbry: lbryTokens,
-  //           collection: tokenType
-  //         }));
-  //       }
-  //     } catch (error) {
-  //       console.error('Failed to load NFT:', error);
-  //       toast.error('Failed to load NFT data');
-  //     } finally {
-  //       if (mounted) {
-  //         setIsLoading(false);
-  //       }
-  //     }
-  //   }
+          if (ownerResult && ownerResult.length > 0 && ownerResult[0] && ownerResult[0].length > 0) {
+            ownerPrincipal = ownerResult[0][0]?.owner.toString() || '';
+          }
+          
+          // Get NFT data
+          const nftData = await tokenAdapter.tokenToNFTData(nftId, ownerPrincipal);
+          
+          // Add to Redux store
+          dispatch(setNFTs({
+            [tokenId]: nftData
+          }));
+          
+          nft = nftData;
+          
+          // Fetch balances
+          const subaccount = await nft_manager.to_nft_subaccount(nftId);
+          const balanceParams = {
+            owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
+            subaccount: [Array.from(subaccount)] as [number[]]
+          };
+
+          const [alexBalance, lbryBalance] = await Promise.all([
+            ALEX.icrc1_balance_of(balanceParams),
+            LBRY.icrc1_balance_of(balanceParams)
+          ]);
+
+          dispatch(updateNftBalances({
+            tokenId,
+            alex: convertE8sToToken(alexBalance),
+            lbry: convertE8sToToken(lbryBalance),
+            collection: tokenType
+          }));
+        }
+        
+        if (!nft || !nft.arweaveId) {
+          console.error('Unable to fetch NFT data for tokenId:', tokenId);
+          toast.error('Unable to fetch NFT data');
+          setIsLoading(false);
+          return;
+        }
+        
+        const txData = await fetchTransactionById(nft.arweaveId);
+        
+        if (!txData) {
+          console.error('Transaction not found for arweaveId:', nft.arweaveId);
+          toast.error('Transaction not found');
+          return;
+        }
+        
+        if (mounted) {
+          setTransaction(txData);
+          
+          const content = await ContentService.loadContent(txData);
+          const urls = await ContentService.getContentUrls(txData, content);
+          setContentUrls(urls);
+          
+          dispatch(setContentData({ 
+            id: txData.id, 
+            content: {
+              ...content,
+              urls
+            }
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to load NFT:', error);
+        toast.error('Failed to load NFT data');
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    }
     
-  //   loadNFTData();
+    loadNFTData();
     
-  //   return () => {
-  //     mounted = false;
-  //   };
-  // }, [tokenId, dispatch]);
+    return () => {
+      mounted = false;
+    };
+  }, [tokenId, dispatch, nfts]);
 
   useEffect(() => {
     let mounted = true;
@@ -409,4 +410,4 @@ function SingleTokenView() {
   );
 }
 
-export default SingleTokenView; 
+export default SingleTokenView;

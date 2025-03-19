@@ -3,10 +3,13 @@ Before next mainnet push:
 - Upgrade user canister.
 - Vetkd
 - Wallet
+- AssetManager
 
-- Change written warnigns (terms of service, and faq)
 
+- Open Pinax
+- LBRY Burn for using Pinax (plus add the noLbry warning wrapper.)
 
+- Alexandrian search is autotriggering with most recent and it's annoying.
 
 
 

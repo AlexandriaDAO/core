@@ -37,9 +37,7 @@ const AssetManager = () => {
       userAssetCanister: assetManager.userAssetCanister
     }))
     console.log("syncing");
-
   }
-
 
   useEffect(() => {
     if (!assetManager.isLoading) {
@@ -55,83 +53,75 @@ const AssetManager = () => {
       dispatch(getCanisterCycles(assetManager.userAssetCanister))
       sync()
     }
-
   }, [assetManager.userAssetCanister])
 
-
-  return (<div>{selectedPrincipals[0] === user.user?.principal && <div className="border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 py-5 px-5 rounded-2xl absolute right-[50px] top-[150px] w-96">
-    {userAssetCanister === null ? (
-      <div className="p-6 max-w-md w-full text-center">
-        <Description>Asset Canister</Description>
-        <Button
-          onClick={() => createUserAssetCanister()}
-          disabled={assetManager.isLoading}
-          className="bg-gray-900 border border-gray-900 text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors mt-2     color: var(--brightyellow);
+  return (
+    <div className="w-full">
+      {userAssetCanister === null ? (
+        <div className="p-6 max-w-md w-full text-center">
+          <Description>Asset Canister</Description>
+          <Button
+            onClick={() => createUserAssetCanister()}
+            disabled={assetManager.isLoading}
+            className="bg-gray-900 border border-gray-900 text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors mt-2     color: var(--brightyellow);
 "
-        >
-          Create {assetManager.isLoading ? (
-            <LoaderPinwheel className="animate-spin mr-2" />
-          ) : null}
-        </Button>
-      </div>
-    ) : (
-      <div className="p-0 max-w-md w-full text-center">
-        <Description>Asset Canister</Description>
-        <p className="text-lg text-gray-600 mb-4">
-          <span className="font-mono font-semibold text-[#7F8EA3]">{assetManager.userAssetCanister}</span>
-        </p>
-        {/* <Button disabled={assetManager.isLoading} className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors" onClick={() => { sync() }} >
-          Sync  {assetManager.isLoading ? (
-            <LoaderPinwheel className="animate-spin mr-2" />
-          ) : null}
-        </Button> */}
-        <h1>Cycles ≈  {assetManager.cycles}</h1>
-      </div>
-    )}
+          >
+            Create {assetManager.isLoading ? (
+              <LoaderPinwheel className="animate-spin mr-2" />
+            ) : null}
+          </Button>
+        </div>
+      ) : (
+        <div className="p-0 max-w-md w-full text-center">
+          <Description>Asset Canister</Description>
+          <p className="text-lg text-gray-600 mb-4">
+            <span className="font-mono font-semibold text-[#7F8EA3]">{assetManager.userAssetCanister}</span>
+          </p>
+          <Button disabled={assetManager.isLoading} className="bg-[#353535] text-white px-8 py-3 rounded-full hover:bg-[#454545] transition-colors" onClick={() => { sync() }} >
+            Sync  {assetManager.isLoading ? (
+              <LoaderPinwheel className="animate-spin mr-2" />
+            ) : null}
+          </Button>
+          <h1>Cycles ≈  {assetManager.cycles}</h1>
+        </div>
+      )}
 
-    {//syncProgress?.currentItem!="" && (
-      // <div className="w-full max-w-md space-y-3">
-      //   <h1 className='text-xl'>Synced :{syncProgress.totalSynced}</h1>
+      {syncProgress?.currentItem !== "" && (
+        <div className="w-full max-w-md space-y-3 mt-6">
+          <h1 className='text-xl'>Synced :{syncProgress.totalSynced}</h1>
 
-      //   {/*  Current Item Being Processed */}
-      //   <div className="text-sm text-gray-600 mb-2">
-      //     {syncProgress.currentProgress === 100
-      //       ? "Upload Complete"
-      //       : `Uploading: ${syncProgress.currentItem}`}
-      //   </div>
+          {/*  Current Item Being Processed */}
+          <div className="text-sm text-gray-600 mb-2">
+            {syncProgress.currentProgress === 100
+              ? "Upload Complete"
+              : `Uploading: ${syncProgress.currentItem}`}
+          </div>
 
-      //   {/*  Current NFT Upload Progress Bar */}
-      //   <div className="w-full bg-gray-200 rounded-full h-2.5">
-      //     <div
-      //       className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-      //       style={{ width: `${syncProgress.currentProgress ?? 0}%` }}
-      //     />
-      //   </div>
+          {/*  Current NFT Upload Progress Bar */}
+          <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div
+              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+              style={{ width: `${syncProgress.currentProgress ?? 0}%` }}
+            />
+          </div>
 
-      //   {/*  Total Synced Progress Bar */}
-      //   {
-      //     <>
-      //       <div className="text-sm text-gray-600">
-      //         Total Synced: {syncProgress.totalSynced ?? 0} of  {nftData.totalNfts}
-      //       </div>
+          {/*  Total Synced Progress Bar */}
+          <div className="text-sm text-gray-600">
+            Total Synced: {syncProgress.totalSynced ?? 0} of {nftData.totalNfts}
+          </div>
 
-      //       <div className="w-full bg-gray-200 rounded-full h-2.5">
-      //         <div
-      //           className="bg-green-600 h-2.5 rounded-full transition-all duration-300"
-      //           style={{
-      //             width: `${((syncProgress.totalSynced ?? 0) / nftData.totalNfts) * 100
-      //               }%`,
-      //           }}
-      //         />
-      //       </div>
-      //     </>
-      //   }
-      // </div>
-      // )
-    }
+          <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div
+              className="bg-green-600 h-2.5 rounded-full transition-all duration-300"
+              style={{
+                width: `${((syncProgress.totalSynced ?? 0) / nftData.totalNfts) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
-
-  </div>}
-  </div>);
-}
 export default AssetManager;

@@ -86,6 +86,8 @@ dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
 cargo build --release --target wasm32-unknown-unknown --package asset_manager
 candid-extractor target/wasm32-unknown-unknown/release/asset_manager.wasm > src/asset_manager/asset_manager.did
 dfx deploy asset_manager --specified-id zhcno-qqaaa-aaaap-qpv7a-cai
+
+
 dfx ledger fabricate-cycles --canister zhcno-qqaaa-aaaap-qpv7a-cai --cycles 10000000000000000
 
 
