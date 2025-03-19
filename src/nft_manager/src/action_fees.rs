@@ -10,6 +10,7 @@ pub const LBRY_MINT_COST: u64 = 10;
 pub const LBRY_MINT_COST_E8S: u64 = LBRY_MINT_COST * LBRY_E8S;
 
 // Only Emporium could call this, since it accesses the topup acccount.
+// Currently 2X the mint cost.
 #[update(guard = "not_anon")]
 pub async fn deduct_marketplace_fee(user_principal: Principal) -> Result<String, String> {
     let caller = caller();

@@ -1,4 +1,17 @@
-Alexandrian prev/next doen't work on mobile alexandrian.
+Before next mainnet push:
+- Upgrade nft_manager.
+- Upgrade user canister.
+- Vetkd
+- Wallet
+
+- Change written warnigns (terms of service, and faq)
+
+
+
+
+
+#### Bugs
+- Alexandrian prev/next doen't work on mobile alexandrian.
 
 
 
@@ -7,7 +20,6 @@ Alexandrian prev/next doen't work on mobile alexandrian.
 - Need more dynamic states for the like/mint/withdraw buttons. include in this singleTokenView.tsx which duplicates a lot of this logic. (If the mint has succeded the mint button should go away).
 - Just more efficient loading, maybe lossless compression, or lower res on heavy assets. Maybe make this a setting for people based on how good their internet is.
 - Cache the nsfw model so it doesn't have to be reloaded every time on permasearch.
-- Get rid of the topup concept, and make all lbry payments directly from the wallet, and display balance in the header.
 - Find out why some NFT assets just arent able to render, and fix our rendering logic to fit them in.
 - Rank by tokens in the NFT. (rating system for rarity.)
 
@@ -18,8 +30,6 @@ Alexandrian prev/next doen't work on mobile alexandrian.
 
 
 #### New Apps:
-- Arena style app, full design in channels.md.
-- Collection service for getting all the money from nfts.
 - Perpetua is a good name for one, latin for perpetual/eternal.
 
 
