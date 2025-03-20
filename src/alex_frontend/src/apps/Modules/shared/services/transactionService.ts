@@ -23,7 +23,7 @@ import {
   setError,
 } from "../state/transactions/transactionSlice";
 import { getAssetCanister } from "../state/assetManager/utlis";
-import { getActorUserAssetCanister } from "@/features/auth/utils/authUtils";
+import { getActorUserAssetCanister, getActorUserAssetCanisterAnonymous } from "@/features/auth/utils/authUtils";
 import { fetchAssetFromUserCanister } from "../state/assetManager/assetManagerThunks";
 
 export class TransactionService {
@@ -58,7 +58,7 @@ export class TransactionService {
       let userAssetCanisterd = await getAssetCanister(selectedPrincipals[0]);
 
       if (userAssetCanisterd) {
-        const assetActor = await getActorUserAssetCanister(userAssetCanisterd);
+        const assetActor = await getActorUserAssetCanisterAnonymous(userAssetCanisterd);
         const getContentData = await fetchAssetFromUserCanister(
           "ContentData",
           assetActor
@@ -114,6 +114,7 @@ export class TransactionService {
 
         // Store the transactions
         this.dispatch(setTransactions(transactions));
+        
       // Load content for each transaction
         await this.loadContentForTransactions(transactions);
                  

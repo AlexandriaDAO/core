@@ -10,6 +10,7 @@ import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/lib/components/select";
 import { setSearchParams } from "../../shared/state/librarySearch/librarySlice";
+import { performSearch } from '@/apps/Modules/shared/state/librarySearch/libraryThunks';
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
@@ -27,6 +28,8 @@ const NFTPagination = () => {
     const start = (newPage - 1) * searchParams.pageSize;
     const end = Math.min(start + searchParams.pageSize, totalItems);
     dispatch(setSearchParams({ start, end }));
+    dispatch(performSearch());
+
   };
 
   const handlePageSizeChange = (newSize: string) => {

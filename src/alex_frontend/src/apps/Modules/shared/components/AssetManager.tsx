@@ -100,14 +100,15 @@ const AssetManager = () => {
           {/*  Current NFT Upload Progress Bar */}
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <div
-              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+              className="bg-grey-600 h-2.5 rounded-full transition-all duration-300"
               style={{ width: `${syncProgress.currentProgress ?? 0}%` }}
             />
           </div>
 
           {/*  Total Synced Progress Bar */}
           <div className="text-sm text-gray-600">
-            Total Synced: {syncProgress.totalSynced ?? 0} of {nftData.totalNfts}
+            Total Synced: {syncProgress.totalSynced ?? 0} 
+            {/* { of {nftData.totalNfts}} */}
           </div>
 
           <div className="w-full bg-gray-200 rounded-full h-2.5">

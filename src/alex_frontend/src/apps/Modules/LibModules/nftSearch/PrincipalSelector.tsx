@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
 import { togglePrincipal, setNoResults } from '../../shared/state/librarySearch/librarySlice';
-import { togglePrincipalSelection, updateSearchParams } from '../../shared/state/librarySearch/libraryThunks';
+import { performSearch, togglePrincipalSelection, updateSearchParams } from '../../shared/state/librarySearch/libraryThunks';
 import { getActorAlexBackend } from "@/features/auth/utils/authUtils";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -64,6 +64,13 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
     has_nfts: true,
     has_scion_nfts: true,
     last_updated: BigInt(0)
+  },
+  {
+    principal: "d3sjl-odpvw-6gc5j-hu7ga-ftzk4-vfa5a-hg3ee-u6t2b-kvams-7liqb-7qe",
+    username: "adIOS",
+    has_nfts: true,
+    has_scion_nfts: true,
+    last_updated: BigInt(0)
   }
 ];
 
@@ -85,14 +92,14 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
     try {
       setIsLoadingPrincipals(true);
       let nftUsers: NFTUserInfo[];
-      
+
       if (network === "devnet") {
         nftUsers = TEST_PRINCIPALS;
       } else {
         const alexBackend = await getActorAlexBackend();
         nftUsers = await alexBackend.get_stored_nft_users();
       }
-      
+
       const processedPrincipals = nftUsers.map((user: NFTUserInfo) => ({
         principal: user.principal.toString(),
         username: user.username,
@@ -100,7 +107,7 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
       }));
 
       // Filter to only include users with NFTs, excluding current user
-      const principalsWithNFTs = processedPrincipals.filter((p: PrincipalData) => 
+      const principalsWithNFTs = processedPrincipals.filter((p: PrincipalData) =>
         p.hasNFTs && p.principal !== userPrincipal
       );
 
@@ -110,12 +117,12 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
         principalsWithNFTs.unshift({
           principal: userPrincipal,
           username: currentUser?.username || 'My Library',
-          hasNFTs: currentUser ? 
-            (collection === 'NFT' ? currentUser.has_nfts : currentUser.has_scion_nfts) 
+          hasNFTs: currentUser ?
+            (collection === 'NFT' ? currentUser.has_nfts : currentUser.has_scion_nfts)
             : false
         });
       }
-      
+
       setPrincipals(principalsWithNFTs);
     } catch (error) {
       console.error("Error fetching principals:", error);
@@ -141,28 +148,32 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
     const initialize = async () => {
       // Make dropdown ready immediately so UI is usable
       setDropdownReady(true);
-      
+
       // Start fetching principals in the background
       fetchPrincipals();
-      
+
       // Then handle initialization if not done yet
       if (!hasInitialized) {
         try {
           const principalToUse = getActualPrincipal();
           // Initialize with the configured default principal
           await dispatch(togglePrincipalSelection(principalToUse));
+          await dispatch(performSearch());
+
           setHasInitialized(true);
         } catch (error) {
           console.error("Error initializing principal selection:", error);
           // Fall back to 'new' if there's an error
           if (defaultPrincipal !== 'new') {
             await dispatch(togglePrincipalSelection('new'));
+            await dispatch(performSearch());
+
           }
           setHasInitialized(true);
         }
       }
     };
-    
+
     initialize();
   }, [userPrincipal, collection, hasInitialized, dispatch, getActualPrincipal]);
 
@@ -181,7 +192,7 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
       dispatch(setNoResults(true));
       return;
     }
-    
+
     await dispatch(togglePrincipalSelection(principalId));
     await dispatch(updateSearchParams({})); // This will trigger index calculation
     setOpen(false);
@@ -304,7 +315,7 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
       </div>
       {noResults && (
         <div className="mt-2 text-xs sm:text-sm text-muted-foreground">
-          {selectedPrincipals[0] === userPrincipal 
+          {selectedPrincipals[0] === userPrincipal
             ? `You don't have any ${collection === 'NFT' ? 'NFTs' : 'SBTs'} yet`
             : `This user has no ${collection === 'NFT' ? 'NFTs' : 'SBTs'}, try selecting another user`
           }

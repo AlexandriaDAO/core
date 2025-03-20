@@ -70,7 +70,6 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   const { fullUrl, coverUrl, thumbnailUrl } = contentUrls;
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [generatedThumbnail, setGeneratedThumbnail] = useState<string | null>(null);
-
   // Handle blob URL cleanup
   useEffect(() => {
     if (fullUrl.startsWith('blob:')) {

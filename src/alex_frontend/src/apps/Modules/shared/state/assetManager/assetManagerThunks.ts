@@ -142,14 +142,13 @@ export const syncNfts = createAsyncThunk<
         BigInt(10000)
       );
 
-      
-
       // Convert token IDs to arweave IDs using the adapter
       const tokens: string[] = [];
       for (const tokenId of result) {
         const nftData = await nftAdapter.tokenToNFTData(tokenId, userPrincipal);
         tokens.push(nftData.arweaveId);
       }
+      // Step 1: Upload fetchedTransactions JSON first
 
       const fetchedTransactions = JSON.stringify(
         await fetchTransactionsForAlexandrian(tokens)
@@ -157,19 +156,38 @@ export const syncNfts = createAsyncThunk<
       const state = getState() as RootState;
       const assetManager = state.assetManager;
       const assetCanisterId = assetManager.userAssetCanister;
+      if (!assetCanisterId) {
+        throw new Error("No asset canister ID found");
+      }
+      // fetch json first and then compare the content data with the asset canister one if there is a difference then upload the new content data
+      console.log("assetCanisterId", assetCanisterId);
+      const assetActor = await getActorUserAssetCanister(assetCanisterId);
+      const resultContentData = await fetchAssetFromUserCanister(
+        "ContentData",
+        assetActor
+      );
+      if (resultContentData) {
+        const contentData = new TextDecoder().decode(
+          new Uint8Array(await resultContentData.blob.arrayBuffer())
+        );
+        if (contentData !== fetchedTransactions) {
+          console.log("Content data is different, uploading new data");
+          const transactionUploadResult = await uploadAsset({
+            assetCanisterId: assetCanisterId || "",
+            id: "ContentData",
+            setSyncProgress,
+            syncProgress,
+            contentData: fetchedTransactions, // Only sending JSON data first
+            assetList: assetManager.assetList,
+          });
 
-      // Step 1: Upload fetchedTransactions JSON first
-      const transactionUploadResult = await uploadAsset({
-        assetCanisterId: assetCanisterId || "",
-        id: "ContentData",
-        setSyncProgress,
-        syncProgress,
-        contentData: fetchedTransactions, // Only sending JSON data first
-        assetList: assetManager.assetList,
-      });
-
-      if (!transactionUploadResult) {
-        throw new Error("Failed to upload transaction data.");
+          if (!transactionUploadResult) {
+            throw new Error("Failed to upload transaction data.");
+          }
+        } else {
+          console.log("Content data is same, no need to upload again!");
+        
+        }
       }
 
 
@@ -280,7 +298,6 @@ export const getCanisterCycles = createAsyncThunk<
   string,
   { rejectValue: string }
 >("assetManager/getCanisterCycles", async (canisterId, { rejectWithValue }) => {
-  
   if (!canisterId) {
     return rejectWithValue("No canister ID found");
   }
@@ -288,17 +305,18 @@ export const getCanisterCycles = createAsyncThunk<
   try {
     const actor = await getActorAssetManager();
 
-    const result = await actor.get_canister_cycles(Principal.fromText(canisterId));
+    const result = await actor.get_canister_cycles(
+      Principal.fromText(canisterId)
+    );
     if ("Ok" in result) {
       return result.Ok.toString();
     }
     if ("Err" in result) {
       return rejectWithValue(result.Err.toString());
     }
-    
+
     return rejectWithValue("Unexpected response format");
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error fetching asset canister:", error);
     return rejectWithValue(
       error instanceof Error ? error.message : "Unknown error occurred"

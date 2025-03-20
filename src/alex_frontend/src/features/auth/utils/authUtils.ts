@@ -146,6 +146,49 @@ const getActor = async <T>(
   return defaultActor;
 };
 
+
+
+const getActorAnonymous = async <T>(
+  canisterId: string,
+  createActorFn: (canisterId: string, options: { agent: HttpAgent }) => T,
+  defaultActor: T
+): Promise<T> => {
+  try {
+    const client = await getAuthClient();
+    let agent: HttpAgent;
+
+    if (await client.isAuthenticated()) {
+      const identity = client.getIdentity();
+      agent = new HttpAgent({
+        identity,
+        host: isLocalDevelopment
+          ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`
+          : "https://identity.ic0.app",
+      });
+    } else {
+      // Create an anonymous agent
+      agent = new HttpAgent({
+        host: isLocalDevelopment
+          ? `http://localhost:4943`
+          : "https://ic0.app",
+      });
+    }
+
+    if (isLocalDevelopment) {
+      await agent.fetchRootKey().catch((err) => {
+        console.warn("Unable to fetch root key. Ensure your local replica is running.");
+        console.error(err);
+      });
+    }
+
+    return createActorFn(canisterId, { agent });
+  } catch (error) {
+    console.error(`Error initializing actor for ${canisterId}:`, error);
+    return defaultActor;
+  }
+};
+
+
 export const getActorAlexBackend = () =>
   getActor(alex_backend_canister_id, createAlexBackendActor, alex_backend);
 
@@ -194,6 +237,9 @@ export const getIcpSwapFactoryCanister = () =>
   );
 export const getActorUserAssetCanister = (canisterId: string) =>
   getActor(canisterId, createActorAssetCanister, asset_canister);
+
+export const getActorUserAssetCanisterAnonymous = (canisterId: string) =>
+  getActorAnonymous(canisterId, createActorAssetCanister, asset_canister);
 
 export const getActorAssetManager = () =>
   getActor(asset_manager_canister_id, createActorAssetManager, asset_manager);
