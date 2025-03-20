@@ -6,6 +6,7 @@ import estimateCost from "./thunks/estimateCost";
 import { SerializedWallet } from "../wallets/walletsSlice";
 import fetchBalance from "./thunks/fetchBalance";
 import selectWallet from "./thunks/selectWallet";
+import getSpendingBalance from "../swap/thunks/lbryIcrc/getSpendingBalance";
 
 export enum Step {
 	Select = 1,
@@ -43,6 +44,11 @@ export interface UploadState {
 	minting: boolean;
 	minted: string | null;
 
+	// Properties for LBRY payment
+	lbryFee: number | null;
+	paymentStatus: 'idle' | 'pending' | 'success' | 'failed';
+	paymentError: string | null;
+
 	uploadError: string | null;
 	fetchError: string | null;
 	selectError: string | null;
@@ -73,6 +79,11 @@ const initialState: UploadState = {
 	cost: null,
 	estimating:false,
 	estimateError:null,
+
+	// Initialize payment properties
+	lbryFee: null,
+	paymentStatus: 'idle',
+	paymentError: null,
 
 	uploadError: null,
 	fetchError: null,
@@ -119,6 +130,16 @@ const uploadSlice = createSlice({
 		},
 		setScanError: (state, action)=>{
 			state.scanError = action.payload
+		},
+		// Action creators for LBRY payment
+		setLbryFee: (state, action)=>{
+			state.lbryFee = action.payload
+		},
+		setPaymentStatus: (state, action)=>{
+			state.paymentStatus = action.payload
+		},
+		setPaymentError: (state, action)=>{
+			state.paymentError = action.payload
 		},
 	},
 	extraReducers: (builder: ActionReducerMapBuilder<UploadState>) => {
@@ -175,7 +196,6 @@ const uploadSlice = createSlice({
 				state.mintError = action.payload as string;
 			})
 
-
 			.addCase(estimateCost.pending, (state) => {
 				state.estimating = true;
 				state.estimateError = null;
@@ -191,7 +211,6 @@ const uploadSlice = createSlice({
 				state.estimateError = action.payload as string;
 				state.cost = null;
 			})
-
 
 			.addCase(fetchBalance.pending, (state, {meta: {arg}}) => {
 				state.wallets = state.wallets.map((wallet) => {
@@ -234,10 +253,34 @@ const uploadSlice = createSlice({
 				state.selectError = action.payload as string;
 				state.wallet = null;
 			})
-
+			
+			// Reset payment status when user gets their spending balance
+			.addCase(getSpendingBalance.fulfilled, (state) => {
+				// Only reset if payment hasn't already been processed
+				if (state.paymentStatus !== 'success') {
+					state.paymentStatus = 'idle';
+					state.paymentError = null;
+				}
+			})
 	}
 });
 
-export const { reset, setWallet, setProgress, setFileSelector, setTextEditor, setPreUploadPreview, setPostUploadPreview, setTransaction, setContentType, setStep, setScanning, setScanError } = uploadSlice.actions;
+export const { 
+	reset, 
+	setWallet, 
+	setProgress, 
+	setFileSelector, 
+	setTextEditor, 
+	setPreUploadPreview, 
+	setPostUploadPreview, 
+	setTransaction, 
+	setContentType, 
+	setStep, 
+	setScanning, 
+	setScanError,
+	setLbryFee,
+	setPaymentStatus,
+	setPaymentError
+} = uploadSlice.actions;
 
 export default uploadSlice.reducer;

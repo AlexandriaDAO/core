@@ -5,21 +5,15 @@ Before next mainnet push:
 - Wallet
 - AssetManager
 
-
-- Open Pinax
-- LBRY Burn for using Pinax (plus add the noLbry warning wrapper.)
-
-- Alexandrian search is autotriggering with most recent and it's annoying.
-
-
+- The upload payment is not enforced in the backend and a sophisticated user could bypass it by changing the redux state.
 
 #### Bugs
 - Alexandrian prev/next doen't work on mobile alexandrian.
 
 
 
-
 #### Bigger Features (lower priority):
+- Stop the autosearch on pageload alexandrian.
 - Need more dynamic states for the like/mint/withdraw buttons. include in this singleTokenView.tsx which duplicates a lot of this logic. (If the mint has succeded the mint button should go away).
 - Just more efficient loading, maybe lossless compression, or lower res on heavy assets. Maybe make this a setting for people based on how good their internet is.
 - Cache the nsfw model so it doesn't have to be reloaded every time on permasearch.

@@ -1,5 +1,6 @@
-import React, { lazy, useState } from "react";
+import React, { lazy, useState, useEffect } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { ContentType } from "@/features/upload/uploadSlice";
 import useNavigationGuard from "@/features/upload/hooks/useNavigationGuard";
 import { useCleanupEffect } from "@/features/upload/hooks/useCleanupEffect";
@@ -13,13 +14,17 @@ import PreUploadPreview from "@/features/upload/components/PreUploadPreview";
 import Header from "@/features/upload/components/Header";
 import TextEditor from "@/features/upload/components/TextEditor";
 import FileSelector from "@/features/upload/components/FileSelector";
+import PaymentPreview from "@/features/upload/components/PaymentPreview";
 import { useContentScanner } from "@/features/upload/hooks/useContentScanner";
+import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
 
 const AlexWalletActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexWalletActor })));
 const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
 
 function PinaxPage() {
-	const { type, uploading, minting, transaction, minted, uploadError, fetchError, selectError, scanError } = useAppSelector(state => state.upload);
+	const dispatch = useAppDispatch();
+	const { type, uploading, minting, transaction, minted, uploadError, fetchError, selectError, scanError, lbryFee } = useAppSelector(state => state.upload);
+	const { user } = useAppSelector(state => state.auth);
 	const [file, setFile] = useState<File | null>(null);
 	const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
@@ -29,6 +34,13 @@ function PinaxPage() {
 	useTransactionEffect({ transaction, file, setUploadedFile });
 	useUploadedFileEffect({ uploadedFile, setFile });
 	useContentScanner({ file });
+	
+	// Fetch LBRY balance when component mounts or user changes
+	useEffect(() => {
+        if (user?.principal) {
+            dispatch(getSpendingBalance(user.principal));
+        }
+    }, [dispatch, user]);
 
 	return (
 		<AlexWalletActor>
@@ -44,6 +56,8 @@ function PinaxPage() {
 						{type == ContentType.Local && <FileSelector setFile={setFile} />}
 
 						{file && !uploadedFile && <PreUploadPreview file={file} />}
+
+						{file && !uploadedFile && lbryFee !== null && <PaymentPreview file={file} />}
 
 						{(uploadError || fetchError || selectError || scanError) && <UploadError />}
 

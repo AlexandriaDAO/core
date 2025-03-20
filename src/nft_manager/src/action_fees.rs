@@ -27,6 +27,30 @@ pub async fn deduct_marketplace_fee(user_principal: Principal) -> Result<String,
     Ok("Marketplace fee successfully deducted.".to_string())
 }
 
+#[update(guard = "not_anon")]
+pub async fn deduct_upload_fee(from: Principal, file_size_bytes: u64) -> Result<(), String> {
+    let file_size_mb = (file_size_bytes as f64 / (1024.0 * 1024.0)).ceil() as u64;
+    let lbry_to_burn = 5 * file_size_mb * LBRY_E8S;
+    burn_lbry(from, Nat::from(lbry_to_burn)).await
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Overarching utility function for burning LBRY.
 async fn burn_lbry(from: Principal, amount: Nat) -> Result<(), String> {
     verify_lbry_payment(
         from,
@@ -42,6 +66,3 @@ async fn burn_lbry(from: Principal, amount: Nat) -> Result<(), String> {
 pub async fn burn_mint_fee(from: Principal) -> Result<(), String> {
     burn_lbry(from, Nat::from(LBRY_MINT_COST_E8S)).await
 }
-
-// We do one for creating nodes, staking and unstaking, uploading files, etc.
-// Anything that can be bot attacked, we can require a fee for.

@@ -9,6 +9,8 @@ import { Button } from "@/lib/components/button";
 import fetchWallets from "../thunks/fetchWallets";
 import selectWallet from "../thunks/selectWallet";
 import { Check } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 interface FileUploaderProps {
     file: File | null;
@@ -19,7 +21,12 @@ function FileUploader({file, setFile}: FileUploaderProps) {
     const dispatch = useAppDispatch();
     const {actor} = useAlexWallet();
 
-    const { type, scanning, estimating, fetching, selecting, uploading, transaction, scanError } = useAppSelector(state=>state.upload);
+    // Get the spending balance from the swap state
+    const { spendingBalance } = useSelector((state: RootState) => state.swap);
+    const { type, scanning, estimating, fetching, selecting, uploading, transaction, scanError, lbryFee, paymentStatus } = useAppSelector(state=>state.upload);
+
+    // Check if user has sufficient balance
+    const hasInsufficientBalance = lbryFee !== null && Number(spendingBalance) < lbryFee;
 
     const handleFileUpload = async() => {
         if(!file){
@@ -29,6 +36,19 @@ function FileUploader({file, setFile}: FileUploaderProps) {
         if(!actor) {
             toast.error('Actor not available');
             return;
+        }
+        
+        // Check if payment is required and has been completed
+        if (lbryFee !== null) {
+            if (hasInsufficientBalance) {
+                toast.error('Insufficient LBRY balance. Please top up your wallet.');
+                return;
+            }
+            
+            if (paymentStatus !== 'success') {
+                toast.error('Please complete the payment before uploading');
+                return;
+            }
         }
 
         try {
@@ -76,6 +96,32 @@ function FileUploader({file, setFile}: FileUploaderProps) {
         handleFileUpload();
     }
 
+    // Determine if upload button should be disabled
+    const isUploadDisabled = !file || 
+                            !actor || 
+                            estimating || 
+                            fetching || 
+                            selecting || 
+                            uploading || 
+                            !!transaction || 
+                            !!scanError || 
+                            hasInsufficientBalance ||
+                            (lbryFee !== null && paymentStatus !== 'success');
+
+    // Determine upload button text
+    const getUploadButtonText = () => {
+        if (scanning) return "Scanning content...";
+        if (scanError) return "Inappropriate content detected";
+        if (estimating) return "Estimating...";
+        if (fetching) return "Fetching...";
+        if (selecting) return "Selecting...";
+        if (uploading) return "Uploading...";
+        if (transaction) return "Uploaded";
+        if (hasInsufficientBalance) return "Insufficient balance";
+        if (lbryFee !== null && paymentStatus !== 'success') return "Payment required";
+        return "Upload file";
+    };
+
 	return (
         <div className="w-full flex justify-between items-center">
             <Button
@@ -88,7 +134,7 @@ function FileUploader({file, setFile}: FileUploaderProps) {
             </Button>
             <Button
                 onClick={handleUpload}
-                disabled={!file || !actor || estimating || fetching || selecting || uploading || !!transaction || !!scanError }
+                disabled={isUploadDisabled}
                 variant="inverted"
             >
                 {scanning ? (
@@ -103,6 +149,10 @@ function FileUploader({file, setFile}: FileUploaderProps) {
                     <>Selecting...</>
                 ) : uploading ? (
                     <>Uploading...</>
+                ) : hasInsufficientBalance ? (
+                    <>Insufficient Balance</>
+                ) : lbryFee !== null && paymentStatus !== 'success' ? (
+                    <>Payment Required</>
                 ) : !!transaction ? <>
                     <Check size={18} className="mr-1"/> Uploaded
                 </> : "Upload file"}

@@ -9,9 +9,7 @@ import { loadContentForTransactions } from "../../shared/state/transactions/tran
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/lib/components/select";
-import { setSearchParams, togglePrincipal } from "../../shared/state/librarySearch/librarySlice";
-import { performSearch, togglePrincipalSelection } from "../../shared/state/librarySearch/libraryThunks";
-import { clearNfts } from "../../shared/state/nftData/nftDataSlice";
+import { setSearchParams } from "../../shared/state/librarySearch/librarySlice";
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
