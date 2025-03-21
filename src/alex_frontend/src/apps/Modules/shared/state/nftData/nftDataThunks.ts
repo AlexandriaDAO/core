@@ -244,34 +244,71 @@ export const fetchTokensForPrincipal = createAsyncThunk<
           undefined,
           totalCount
         );
-        nftWithBalances = await Promise.all(
-          allTokens.map(async (tokenId) => {
-            let alexBalance: [bigint] = [BigInt(0)];
-            let lbryBalance: [bigint] = [BigInt(0)];
-            const subaccount = await nft_manager.to_nft_subaccount(
-              BigInt(tokenId)
-            );
-            const balanceParams = {
-              owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-              subaccount: [Array.from(subaccount)] as [number[]],
-            };
-            if (sortKey === "ALEX") {
-              alexBalance = await Promise.all([
-                ALEX.icrc1_balance_of(balanceParams),
-              ]);
-            } else {
-              lbryBalance = await Promise.all([
-                LBRY.icrc1_balance_of(balanceParams),
-              ]);
-            }
+        // console.log("Time Before ", Date.now());
+        // nftWithBalances = await Promise.all(
+        //   allTokens.map(async (tokenId) => {
+        //     let alexBalance: [bigint] = [BigInt(0)];
+        //     let lbryBalance: [bigint] = [BigInt(0)];
+        //     const subaccount = await nft_manager.to_nft_subaccount(
+        //       BigInt(tokenId)
+        //     );
+        //     const balanceParams = {
+        //       owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
+        //       subaccount: [Array.from(subaccount)] as [number[]],
+        //     };
+        //     if (sortKey === "ALEX") {
+        //       alexBalance = await Promise.all([
+        //         ALEX.icrc1_balance_of(balanceParams),
+        //       ]);
+        //     } else {
+        //       lbryBalance = await Promise.all([
+        //         LBRY.icrc1_balance_of(balanceParams),
+        //       ]);
+        //     }
 
-            return {
-              tokenId,
-              alex: BigInt(alexBalance[0]),
-              lbry: BigInt(lbryBalance[0]),
-            };
-          })
+        //     return {
+        //       tokenId,
+        //       alex: BigInt(alexBalance[0]),
+        //       lbry: BigInt(lbryBalance[0]),
+        //     };
+        //   })
+        // );
+        // console.log("Time After ", Date.now());
+
+        console.log("Time Before ", Date.now());
+
+        const subaccountPromises = allTokens.map((tokenId) =>
+          nft_manager.to_nft_subaccount(BigInt(tokenId)).then((subaccount) => ({
+            tokenId,
+            subaccount,
+          }))
         );
+        const subaccounts = await Promise.all(subaccountPromises);
+
+        const balancePromises = subaccounts.map(({ tokenId, subaccount }) => {
+          const balanceParams = {
+            owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
+            subaccount: [Array.from(subaccount)] as [number[]],
+          };
+
+          return Promise.all([
+            sortKey === "ALEX"
+              ? ALEX.icrc1_balance_of(balanceParams)
+              : BigInt(0),
+            sortKey === "LBRY"
+              ? BigInt(0)
+              : LBRY.icrc1_balance_of(balanceParams),
+          ]).then(([alexBalance, lbryBalance]) => ({
+            tokenId,
+            alex: BigInt(alexBalance),
+            lbry: BigInt(lbryBalance),
+          }));
+        });
+
+        nftWithBalances = await Promise.all(balancePromises);
+
+        console.log("Time After ", Date.now());
+
         if (sortKey === "ALEX") {
           nftWithBalances.sort((a, b) => Number(b.alex) - Number(a.alex));
         } else {
@@ -494,28 +531,28 @@ export const fetchTokensForPrincipal = createAsyncThunk<
 
       const convertE8sToToken = (e8sAmount: bigint): string => {
         return (Number(e8sAmount) / 1e8).toString();
-      }
-      
-      await Promise.all(
-        nftEntries.map(async ([tokenId]) => {
-          const subaccount = await nft_manager.to_nft_subaccount(BigInt(tokenId));
-          const balanceParams = {
-            owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-            subaccount: [Array.from(subaccount)] as [number[]]
-          };
+      };
 
-          const [alexBalance, lbryBalance] = await Promise.all([
-            ALEX.icrc1_balance_of(balanceParams),
-            LBRY.icrc1_balance_of(balanceParams)
-          ]);
+      // await Promise.all(
+      //   nftEntries.map(async ([tokenId]) => {
+      //     const subaccount = await nft_manager.to_nft_subaccount(BigInt(tokenId));
+      //     const balanceParams = {
+      //       owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
+      //       subaccount: [Array.from(subaccount)] as [number[]]
+      //     };
 
-          dispatch(updateNftBalances({
-            tokenId,
-            alex: convertE8sToToken(alexBalance),
-            lbry: convertE8sToToken(lbryBalance)
-          }));
-        })
-      );
+      //     const [alexBalance, lbryBalance] = await Promise.all([
+      //       ALEX.icrc1_balance_of(balanceParams),
+      //       LBRY.icrc1_balance_of(balanceParams)
+      //     ]);
+
+      //     dispatch(updateNftBalances({
+      //       tokenId,
+      //       alex: convertE8sToToken(alexBalance),
+      //       lbry: convertE8sToToken(lbryBalance)
+      //     }));
+      //   })
+      // );
       return nftRecord;
     } catch (error) {
       const errorMessage =

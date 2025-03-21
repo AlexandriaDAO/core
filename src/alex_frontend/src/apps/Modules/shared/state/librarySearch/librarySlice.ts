@@ -93,7 +93,8 @@ const librarySlice = createSlice({
         searchParams: {
           ...state.searchParams
         },
-        totalItems: state.totalItems
+        totalItems: state.totalItems,
+        sortBalanceBy: state.sortBalanceBy
       };
     },
     setTotalItems: (state, action: PayloadAction<number>) => {

@@ -68,7 +68,7 @@ function Alexandrian() {
 	return (
 		<>
 			<div className="rounded-lg">
-				<AssetManager />
+				{/* <AssetManager /> */}
 			</div>
 			<SearchContainer
 				title="Alexandrian"
