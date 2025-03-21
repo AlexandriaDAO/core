@@ -9,7 +9,6 @@ import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalan
 import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
 import { clearAllTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
-import { use } from "echarts";
 
 function Alexandrian() {
 	const dispatch = useDispatch<AppDispatch>();
@@ -70,7 +69,7 @@ function Alexandrian() {
 			<SearchContainer
 				title="Alexandrian"
 				description="Search the NFT Library of others, and manage your own."
-				hint="Liking costs 20 LBRY (this will decrease over time)."
+				hint="Likes cost 10 LBRY (5 burned | 5 to the creator)."
 				onSearch={handleSearch}
 				onShowMore={handleShowMore}
 				onCancel={handleCancelSearch}

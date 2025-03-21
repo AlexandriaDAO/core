@@ -1,15 +1,24 @@
 import { Wallet } from "../../../../../../src/declarations/alex_wallet/alex_wallet.did";
 import { convertTimestamp } from "@/utils/general";
 import { SerializedWallet } from "../walletsSlice";
-import Arweave from 'arweave';
-
-const arweave = Arweave.init({});
+import arweaveClient, { isHtmlResponse } from "@/utils/arweaveClient";
 
 // returns balance in winston
 export const getWalletBalance = async (wallet: SerializedWallet) => {
-    const balance = await arweave.wallets.getBalance(wallet.address)
-
-    return balance;
+    try {
+        const balance = await arweaveClient.wallets.getBalance(wallet.address);
+        
+        // Check if it looks like HTML
+        if (isHtmlResponse(balance)) {
+            console.error("Received HTML instead of balance in getWalletBalance!");
+            return "Error fetching balance";
+        }
+        
+        return balance;
+    } catch (error) {
+        console.error("Balance fetch error in getWalletBalance:", error);
+        return "Error fetching balance";
+    }
 }
 
 // // returns address
@@ -33,7 +42,7 @@ export function parseNumeric(str: string): number | null {
 
 export const winstonToAr = (balance: string) => {
     if(parseNumeric(balance)!==null){
-        const ar = arweave.ar.winstonToAr(balance);
+        const ar = arweaveClient.ar.winstonToAr(balance);
 
         return ar + ' AR';
     }
@@ -43,9 +52,21 @@ export const winstonToAr = (balance: string) => {
 
 // Helper function to transform IC user to our state format
 export const serializeWallet = async (icWallet: Wallet): Promise<SerializedWallet> => {
-    const address = await arweave.wallets.getAddress(icWallet.public)
+    const address = await arweaveClient.wallets.getAddress(icWallet.public)
 
-    const balance = await arweave.wallets.getBalance(address)
+    let balance;
+    try {
+        balance = await arweaveClient.wallets.getBalance(address);
+        
+        // Check if it looks like HTML
+        if (isHtmlResponse(balance)) {
+            console.error("Received HTML instead of balance in serializeWallet!");
+            balance = "Error fetching balance"; // Provide a fallback instead of showing HTML
+        }
+    } catch (error) {
+        console.error("Balance fetch error in serializeWallet:", error);
+        balance = "Error fetching balance";
+    }
 
     return {
         ...icWallet,

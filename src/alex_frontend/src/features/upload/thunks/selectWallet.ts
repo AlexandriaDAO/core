@@ -1,10 +1,8 @@
 import { _SERVICE } from '../../../../../declarations/user/user.did';
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { SerializedWallet } from '@/features/wallets/walletsSlice';
-import Arweave from "arweave";
+import { arweaveClient } from "@/utils/arweaveClient";
 import { RootState } from '@/store';
-
-const arweave = Arweave.init({});
 
 // Define the async thunk
 const selectWallet = createAsyncThunk<
@@ -20,7 +18,7 @@ const selectWallet = createAsyncThunk<
 
         if (wallets.length === 0) return rejectWithValue("No wallets available.");
 
-        const wallet = wallets.find(wallet => arweave.ar.isGreaterThan(wallet.balance, cost));
+        const wallet = wallets.find(wallet => arweaveClient.ar.isGreaterThan(wallet.balance, cost));
 
         if(!wallet) return rejectWithValue("No suitable wallet found");
 

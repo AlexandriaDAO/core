@@ -6,11 +6,11 @@ use crate::coordinate_mint::verify_lbry_payment;
 
 // Make constants public so they can be used in other modules
 pub const LBRY_E8S: u64 = 100_000_000; // Base fee of 1 LBRY.
-pub const LBRY_MINT_COST: u64 = 10;
+pub const LBRY_MINT_COST: u64 = 5;
 pub const LBRY_MINT_COST_E8S: u64 = LBRY_MINT_COST * LBRY_E8S;
 
 // Only Emporium could call this, since it accesses the topup acccount.
-// Currently 2X the mint cost.
+// Currently 4X the mint cost (5 cents).
 #[update(guard = "not_anon")]
 pub async fn deduct_marketplace_fee(user_principal: Principal) -> Result<String, String> {
     let caller = caller();
@@ -19,7 +19,7 @@ pub async fn deduct_marketplace_fee(user_principal: Principal) -> Result<String,
         return Err("Only the emporium can call this function.".to_string());
     }
 
-    let burn_result = burn_lbry(user_principal, Nat::from(LBRY_MINT_COST_E8S*2)).await;
+    let burn_result = burn_lbry(user_principal, Nat::from(LBRY_MINT_COST_E8S*4)).await;
     if let Err(e) = burn_result {
         return Err(format!("Error burning tokens: {}", e));
     }

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import Arweave from "arweave";
 // import { WalletDAO } from "@/features/wallets/utils/wallet_dao";
 import { JWKInterface } from "arweave/node/lib/wallet";
+import { arweaveClient } from "@/utils/arweaveClient";
 
 // Define the async thunk
 const importKeyFile = createAsyncThunk<
@@ -12,13 +12,11 @@ const importKeyFile = createAsyncThunk<
 	"addWallet/importKeyFile",
 	async ( content, { rejectWithValue } ) => {
 		try {
-			const arweave = Arweave.init({});
-
 			// const walletDao = new WalletDAO(arweave);
 
 			const key: JWKInterface = JSON.parse(content);
 
-			const address = await arweave.wallets.jwkToAddress(key);
+			const address = await arweaveClient.wallets.jwkToAddress(key);
 
 			return { address, key };
 		} catch (error) {

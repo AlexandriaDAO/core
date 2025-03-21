@@ -6,8 +6,13 @@ Before next mainnet push:
 - AssetManager
 
 
+# Latest mainnet merge problems:
+- Uploading the profile image or name does not reflect, i.e., I changed my name from chadthechad to evan and added a profile link and the result is still 'C' with a  loading circle.
+- The Seed phrase import landed a super long result.
+
 
 #### Bigger Features (lower priority):
+- Loading is much faster without the nsfw check, and also permasearch page load is much longer when we make it by default. Instead we should allow people to search without NSFW checks, and let them check the individual nft that they want to mint. So we could do a no safe-search where no mints happen, a full safe search like we do now, and a mint-mode, where there's no default safe search but a check when someone goes to mint something.
 - The upload payment is not enforced in the backend and a sophisticated user could bypass it by changing the redux state.
 - Stop the autosearch on pageload alexandrian.
 - Need more dynamic states for the like/mint/withdraw buttons. include in this singleTokenView.tsx which duplicates a lot of this logic. (If the mint has succeded the mint button should go away).

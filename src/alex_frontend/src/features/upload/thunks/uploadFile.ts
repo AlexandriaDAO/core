@@ -4,7 +4,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AppDispatch, RootState } from "@/store";
 import { setProgress } from "../uploadSlice";
 import { readFileAsBuffer } from "../utils";
-import Arweave from "arweave";
+import { arweaveClient } from "@/utils/arweaveClient";
 
 const uploadFile = createAsyncThunk<
 	string, // This is the return type of the thunk's payload
@@ -27,9 +27,7 @@ const uploadFile = createAsyncThunk<
 
 			const buffer = await readFileAsBuffer(file);
 
-			const arweave = Arweave.init({});
-
-			let transaction = await arweave.createTransaction({ data: buffer });
+			let transaction = await arweaveClient.createTransaction({ data: buffer });
 
 			transaction.setOwner(wallet.public.n);
 
@@ -50,13 +48,13 @@ const uploadFile = createAsyncThunk<
 					signature: signature,
 				});
 
-				const valid = await arweave.transactions.verify(transaction);
+				const valid = await arweaveClient.transactions.verify(transaction);
 
 				if(!valid){
 					return rejectWithValue("Failed to verify transaction");
 				}
 
-				let uploader = await arweave.transactions.getUploader(transaction);
+				let uploader = await arweaveClient.transactions.getUploader(transaction);
 
 				while (!uploader.isComplete) {
 					await uploader.uploadChunk();
