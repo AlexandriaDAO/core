@@ -180,7 +180,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
         <CardFooter className="flex flex-col w-full bg-[--card] dark:border-gray-700 p-1.5">
           <div className="flex flex-wrap items-center gap-1">
             {/* NFT data or custom footer - now first */}
-            {(!predictions || Object.keys(predictions).length === 0) && id && !footer && <NftDataFooter id={id} contentOwner={owner} />}
+            {id && !footer && <NftDataFooter id={id} contentOwner={owner} />}
             {footer}
         
             {/* Stats button */}

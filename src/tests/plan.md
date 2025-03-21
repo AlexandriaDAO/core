@@ -5,14 +5,10 @@ Before next mainnet push:
 - Wallet
 - AssetManager
 
-- The upload payment is not enforced in the backend and a sophisticated user could bypass it by changing the redux state.
-
-#### Bugs
-- Alexandrian prev/next doen't work on mobile alexandrian.
-
 
 
 #### Bigger Features (lower priority):
+- The upload payment is not enforced in the backend and a sophisticated user could bypass it by changing the redux state.
 - Stop the autosearch on pageload alexandrian.
 - Need more dynamic states for the like/mint/withdraw buttons. include in this singleTokenView.tsx which duplicates a lot of this logic. (If the mint has succeded the mint button should go away).
 - Just more efficient loading, maybe lossless compression, or lower res on heavy assets. Maybe make this a setting for people based on how good their internet is.

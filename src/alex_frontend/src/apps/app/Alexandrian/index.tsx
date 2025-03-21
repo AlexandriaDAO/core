@@ -48,7 +48,9 @@ function Alexandrian() {
 		try {
 			const newStart = searchParams.end;
 			const newEnd = newStart + searchParams.pageSize;
+			// Update pagination parameters without triggering a search
 			await dispatch(updateSearchParams({ start: newStart, end: newEnd }));
+			// Perform the search directly without relying on useEffect
 			await dispatch(performSearch());
 		} catch (error) {
 			handleSearchError(error, 'Failed to load more results');
@@ -61,9 +63,7 @@ function Alexandrian() {
 		dispatch(clearAllTransactions());
 		toast.info("Search cancelled");
 	}, [dispatch]);
-	useEffect(() => {
-		handleSearch()
-	}, [searchParams.start])
+	
 	return (
 		<>
 			{/* Asset Manager has been moved to the Dashboard */}
