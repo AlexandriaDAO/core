@@ -17,6 +17,7 @@ interface LibraryState {
   searchParams: SearchParams;
   lastSearchTimestamp: number;
   totalItems: number;
+  sortBalanceBy:string;
 }
 
 const initialState: LibraryState = {
@@ -33,7 +34,8 @@ const initialState: LibraryState = {
     startFromEnd: true
   },
   lastSearchTimestamp: 0,
-  totalItems: 0
+  totalItems: 0,
+  sortBalanceBy: 'DEFAULT'
 };
 
 const librarySlice = createSlice({
@@ -71,6 +73,9 @@ const librarySlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
+    setBalanceSort: (state, action: PayloadAction<string>) => {
+      state.sortBalanceBy = action.payload;
+    },
     setNoResults: (state, action: PayloadAction<boolean>) => {
       state.noResults = action.payload;
     },
@@ -88,7 +93,8 @@ const librarySlice = createSlice({
         searchParams: {
           ...state.searchParams
         },
-        totalItems: state.totalItems
+        totalItems: state.totalItems,
+        sortBalanceBy: state.sortBalanceBy
       };
     },
     setTotalItems: (state, action: PayloadAction<number>) => {
@@ -113,7 +119,8 @@ export const {
   setSearchParams,
   updateLastSearchTimestamp,
   resetSearch,
-  setTotalItems
+  setTotalItems,
+  setBalanceSort
 } = librarySlice.actions;
 
 export default librarySlice.reducer;

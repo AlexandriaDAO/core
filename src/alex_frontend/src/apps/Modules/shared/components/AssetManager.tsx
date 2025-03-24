@@ -107,7 +107,7 @@ const AssetManager = () => {
 
           {/*  Total Synced Progress Bar */}
           <div className="text-sm text-gray-600">
-            Total Synced: {syncProgress.totalSynced ?? 0} of {nftData.totalNfts}
+            Total Synced: {syncProgress.totalSynced ?? 0}
           </div>
 
           <div className="w-full bg-gray-200 rounded-full h-2.5">

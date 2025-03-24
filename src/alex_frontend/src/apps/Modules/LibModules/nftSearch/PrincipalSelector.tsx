@@ -64,6 +64,14 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
     has_nfts: true,
     has_scion_nfts: true,
     last_updated: BigInt(0)
+  },
+  // test principal 
+  {
+    principal: "d3sjl-odpvw-6gc5j-hu7ga-ftzk4-vfa5a-hg3ee-u6t2b-kvams-7liqb-7qe",
+    username: "adillOS",
+    has_nfts: true,
+    has_scion_nfts: true,
+    last_updated: BigInt(0)
   }
 ];
 
