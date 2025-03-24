@@ -41,6 +41,12 @@ dfx canister stop asset_manager --network ic
 dfx canister snapshot create asset_manager --network ic
 dfx canister start asset_manager --network ic
 
+# Emporium
+dfx canister stop emporium --network ic
+dfx canister snapshot create emporium --replace 00000000000000000000000001f07b4e0101 --network ic
+dfx canister start emporium --network ic
+
+
 
 
 

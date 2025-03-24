@@ -12,4 +12,4 @@ export { default as TokenomicsActor } from './TokenomicsActor';
 export { default as VetkdActor } from './VetkdActor';
 export { default as UserActor } from './UserActor';
 export { default as AlexWalletActor } from './AlexWalletActor';
-export { default as LexigraphActor } from './LexigraphActor';
+export { default as PerpetuaActor } from './PerpetuaActor';

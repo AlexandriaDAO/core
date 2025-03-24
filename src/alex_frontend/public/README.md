@@ -35,7 +35,7 @@
     - [Permasearch (explore)](#permasearch-explore)
     - [Bibliotheca (library)](#bibliotheca-library)
     - [Syllogos (aggregate)](#syllogos-aggregate)
-    - [Lexigraph (write)](#lexigraph-write)
+    - [Perpetua (write)](#perpetua-write)
     - [Dialectica (debate)](#dialectica-debate)
     - [Emporium (trade)](#emporium-trade)
     - [Taking on Big Tech](#taking-on-big-tech)
@@ -271,7 +271,7 @@ These search engines are a modular and sometimes paid feature. Make a popular se
 
 It's Google, but the search engines are customized and actually designed to find information.
 
-### Lexigraph (write)
+### Perpetua (write)
 
 A blog-based app based around SBTs. All the text fragments you and others have collected here are used to create blogs and whiteboards that are attached to their primary sources.
 

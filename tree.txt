@@ -764,7 +764,7 @@
 │   │   │   │       │   └── index.tsx
 │   │   │   │       ├── Emporium/
 │   │   │   │       │   └── index.tsx
-│   │   │   │       ├── Lexigraph/
+│   │   │   │       ├── Perpetua/
 │   │   │   │       │   └── index.tsx
 │   │   │   │       ├── Permasearch/
 │   │   │   │       │   ├── index.tsx

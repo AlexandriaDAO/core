@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { buildRoutes } from "@/routes/routeConfig";
-import { useLexigraphNavigation } from "@/apps/app/Lexigraph/routes";
+import { usePerpetuaNavigation } from "@/apps/app/Perpetua/routes";
 
 /**
  * Custom hook for application-wide navigation
@@ -9,7 +9,7 @@ import { useLexigraphNavigation } from "@/apps/app/Lexigraph/routes";
 export const useAppNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const lexigraphNavigation = useLexigraphNavigation();
+  const perpetuaNavigation = usePerpetuaNavigation();
   
   // Base navigation
   const goToHome = () => navigate(buildRoutes.home());
@@ -71,8 +71,8 @@ export const useAppNavigation = () => {
     goToEmporium,
     goToPinax,
     
-    // Lexigraph navigation (re-exported from lexigraphNavigation)
-    lexigraph: lexigraphNavigation,
+    // Perpetua navigation (re-exported from perpetuaNavigation)
+    perpetua: perpetuaNavigation,
     
     // Swap navigation
     goToSwap,

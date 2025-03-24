@@ -1,5 +1,5 @@
 // Central route configuration for the application
-import { ROUTES as LEXIGRAPH_ROUTES } from "@/apps/app/Lexigraph/routes";
+import { ROUTES as PERPETUA_ROUTES } from "@/apps/app/Perpetua/routes";
 
 // Base routes
 export const BASE_ROUTES = {
@@ -24,8 +24,8 @@ export const APP_ROUTES = {
   PERMASEARCH: '/app/permasearch',
   EMPORIUM: '/app/emporium',
   PINAX: '/app/pinax',
-  // Include Lexigraph routes
-  LEXIGRAPH: LEXIGRAPH_ROUTES,
+  // Include Perpetua routes
+  PERPETUA: PERPETUA_ROUTES,
 };
 
 // Swap routes

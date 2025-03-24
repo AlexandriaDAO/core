@@ -46,10 +46,10 @@ dfx deploy nft_manager --specified-id 5sh5r-gyaaa-aaaap-qkmra-cai
 cargo build --release --target wasm32-unknown-unknown --package alex_backend
 candid-extractor target/wasm32-unknown-unknown/release/alex_backend.wasm > src/alex_backend/alex_backend.did
 dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
-# For lexigraph
-cargo build --release --target wasm32-unknown-unknown --package lexigraph
-candid-extractor target/wasm32-unknown-unknown/release/lexigraph.wasm > src/lexigraph/lexigraph.did
-dfx deploy lexigraph --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
+# For perpetua
+cargo build --release --target wasm32-unknown-unknown --package perpetua
+candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpetua/perpetua.did
+dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did

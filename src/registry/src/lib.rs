@@ -10,7 +10,7 @@ pub const ALEX_BACKEND: &str = "y42qn-baaaa-aaaap-qkmnq-cai";
 pub const ALEX_FRONTEND: &str = "yj5ba-aiaaa-aaaap-qkmoa-cai";
 pub const USER: &str = "yo4hu-nqaaa-aaaap-qkmoq-cai";
 pub const ALEX_WALLET: &str = "yh7mi-3yaaa-aaaap-qkmpa-cai";
-pub const LEXIGRAPH: &str = "ya6k4-waaaa-aaaap-qkmpq-cai";
+pub const PERPETUA: &str = "ya6k4-waaaa-aaaap-qkmpq-cai";
 pub const ICP_LEDGER: &str = "ryjl3-tyaaa-aaaaa-aaaba-cai";
 pub const ICP_SWAP: &str = "54fqz-5iaaa-aaaap-qkmqa-cai";
 pub const ICRC7: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
@@ -31,7 +31,7 @@ pub fn get_registry_principal(canister_name: String) -> Principal {
         "ALEX_FRONTEND" => get_principal(ALEX_FRONTEND),
         "USER" => get_principal(USER),
         "ALEX_WALLET" => get_principal(ALEX_WALLET),
-        "LEXIGRAPH" => get_principal(LEXIGRAPH),
+        "PERPETUA" => get_principal(PERPETUA),
         "ICP_LEDGER" => get_principal(ICP_LEDGER),
         "ICP_SWAP" => get_principal(ICP_SWAP),
         "ICRC7" => get_principal(ICRC7),

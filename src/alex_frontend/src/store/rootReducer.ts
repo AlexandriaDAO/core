@@ -23,7 +23,7 @@ import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
 import alexReducer from "@/features/swap/alexSlice";
 import uploadReducer from "@/features/upload/uploadSlice";
-import lexigraphReducer from "@/apps/Modules/shared/state/lexigraph/lexigraphSlice";
+import perpetuaReducer from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
 
 import transactionsReducer from "@/apps/Modules/shared/state/transactions/transactionSlice";
 
@@ -64,7 +64,7 @@ const rootReducer = combineReducers({
 	tokenomics:tokenomicsReducer,
 	portal: portalReducer,
 	alex:alexReducer,
-	lexigraph: lexigraphReducer,
+	perpetua: perpetuaReducer,
 
 	arweave: arweaveReducer,
 	transactions: transactionsReducer,

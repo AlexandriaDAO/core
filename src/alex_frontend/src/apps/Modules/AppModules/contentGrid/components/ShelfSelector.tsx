@@ -5,8 +5,8 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useIdentity } from "@/hooks/useIdentity";
-import { selectShelves, selectLoading, selectSelectedShelf } from "@/apps/Modules/shared/state/lexigraph/lexigraphSlice";
-import { addSlot, loadShelves } from "@/apps/Modules/shared/state/lexigraph/lexigraphThunks";
+import { selectShelves, selectLoading, selectSelectedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { addSlot, loadShelves } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
 
 // Define the Shelf interface inline
 interface Slot {

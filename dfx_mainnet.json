@@ -31,9 +31,9 @@
       "type": "rust",
       "specified_id": "zhcno-qqaaa-aaaap-qpv7a-cai"
     },
-    "lexigraph": {
-      "candid": "src/lexigraph/lexigraph.did",
-      "package": "lexigraph",
+    "perpetua": {
+      "candid": "src/perpetua/perpetua.did",
+      "package": "perpetua",
       "type": "rust",
       "specified_id": "ya6k4-waaaa-aaaap-qkmpq-cai"
     },

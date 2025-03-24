@@ -18,7 +18,7 @@ export const apps: App[] = [
   { name: 'Pinax', description: 'Upload', path: '/app/pinax', logo: '/logos/Pinax.svg', comingSoon: false },
   { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos', logo: '/logos/Syllogos.svg', comingSoon: true },
   { name: 'Bibliotheca', description: 'Library', path: '/app/bibliotheca', comingSoon: true },
-  { name: 'Lexigraph', description: 'Write', path: '/app/lexigraph', comingSoon: true },
+  { name: 'Perpetua', description: 'Write', path: '/app/perpetua', comingSoon: true },
   { name: 'Dialectica', description: 'Debate', path: '/app/dialectica', comingSoon: true },
 ];
 

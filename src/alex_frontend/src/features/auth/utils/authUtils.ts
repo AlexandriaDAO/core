@@ -69,9 +69,9 @@ import {
 } from "../../../../../declarations/asset_manager";
 
 import {
-  lexigraph,
-  createActor as createActorLexigraph,
-} from "../../../../../declarations/lexigraph";
+  perpetua,
+  createActor as createActorPerpetua,
+} from "../../../../../declarations/perpetua";
 
 const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
 
@@ -89,7 +89,7 @@ const alex_wallet_canister_id = process.env.CANISTER_ID_ALEX_WALLET!;
 const vetkd_canister_id = process.env.CANISTER_ID_VETKD!;
 const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
 const log_canister_id = process.env.CANISTER_ID_LOGS!;
-const lexigraph_canister_id = process.env.CANISTER_ID_LEXIGRAPH!;
+const perpetua_canister_id = process.env.CANISTER_ID_PERPETUA!;
 const icp_swap_factory_canister_id = "ggzvv-5qaaa-aaaag-qck7a-cai";
 const asset_manager_canister_id = process.env.CANISTER_ID_ASSET_MANAGER!;
 
@@ -181,8 +181,8 @@ export const getActorVetkd = () =>
 export const getActorEmporium = () =>
   getActor(emporium_canister_id, createActorEmporium, emporium);
 
-export const getActorLexigraph = () =>
-  getActor(lexigraph_canister_id, createActorLexigraph, lexigraph);
+export const getActorPerpetua = () =>
+  getActor(perpetua_canister_id, createActorPerpetua, perpetua);
 
 export const getLogs = () => getActor(log_canister_id, createActorLogs, logs);
 

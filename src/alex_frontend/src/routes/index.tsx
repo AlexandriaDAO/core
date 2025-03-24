@@ -37,7 +37,7 @@ const InfoPage = lazy(()=>import("@/pages/InfoPage"));
 const Bibliotheca = lazy(()=>import("@/apps/app/Bibliotheca"));
 const Alexandrian = lazy(()=>import("@/apps/app/Alexandrian"));
 const Syllogos = lazy(()=>import("@/apps/app/Syllogos"));
-const Lexigraph = lazy(()=>import("@/apps/app/Lexigraph"));
+const Perpetua = lazy(()=>import("@/apps/app/Perpetua"));
 const Dialectica = lazy(()=>import("@/apps/app/Dialectica"));
 const Permasearch = lazy(()=>import("@/apps/app/Permasearch"));
 const Emporium = lazy(()=>import("@/apps/app/Emporium"));
@@ -72,13 +72,13 @@ const router = createBrowserRouter(
 					<Route path="bibliotheca" element={<Suspense key="bibliotheca" fallback={<TopProgressBar />}><Bibliotheca /></Suspense>} />
 					<Route path="alexandrian" element={<Suspense key="alexandrian" fallback={<TopProgressBar />}><Alexandrian /></Suspense>} />
 					<Route path="syllogos" element={<Suspense key="syllogos" fallback={<TopProgressBar />}><Syllogos /></Suspense>} />
-					<Route path="lexigraph" element={<Suspense key="lexigraph" fallback={<TopProgressBar />}><Lexigraph /></Suspense>}>
-						<Route index element={<Suspense key="lexigraph-home" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="shelf/:shelfId" element={<Suspense key="lexigraph-shelf" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="slot/:slotId" element={<Suspense key="lexigraph-slot" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="user/:userId" element={<Suspense key="lexigraph-user" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="user/:userId/shelf/:shelfId" element={<Suspense key="lexigraph-user-shelf" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="user/:userId/slot/:slotId" element={<Suspense key="lexigraph-user-slot" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
+					<Route path="perpetua" element={<Suspense key="perpetua" fallback={<TopProgressBar />}><Perpetua /></Suspense>}>
+						<Route index element={<Suspense key="perpetua-home" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						<Route path="shelf/:shelfId" element={<Suspense key="perpetua-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						<Route path="slot/:slotId" element={<Suspense key="perpetua-slot" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						<Route path="user/:userId" element={<Suspense key="perpetua-user" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						<Route path="user/:userId/shelf/:shelfId" element={<Suspense key="perpetua-user-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						<Route path="user/:userId/slot/:slotId" element={<Suspense key="perpetua-user-slot" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
 					</Route>
 					<Route path="dialectica" element={<Suspense key="dialectica" fallback={<TopProgressBar />}><Dialectica /></Suspense>} />
 					<Route path="permasearch" element={<Suspense key="permasearch" fallback={<TopProgressBar />}><Permasearch /></Suspense>} />

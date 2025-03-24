@@ -25,9 +25,9 @@
       "package": "alex_backend",
       "type": "rust"
     },
-    "lexigraph": {
-      "candid": "src/lexigraph/lexigraph.did",
-      "package": "lexigraph",
+    "perpetua": {
+      "candid": "src/perpetua/perpetua.did",
+      "package": "perpetua",
       "type": "rust",
       "specified_id": "ya6k4-waaaa-aaaap-qkmpq-cai"
     },

@@ -45,7 +45,7 @@ const AppModules = {
 	Bibliotheca: lazyLoad(() => import("@/apps/app/Bibliotheca")),
 	Alexandrian: lazyLoad(() => import("@/apps/app/Alexandrian")),
 	Syllogos: lazyLoad(() => import("@/apps/app/Syllogos")),
-	Lexigraph: lazyLoad(() => import("@/apps/app/Lexigraph")),
+	Perpetua: lazyLoad(() => import("@/apps/app/Perpetua")),
 	Dialectica: lazyLoad(() => import("@/apps/app/Dialectica")),
 	Permasearch: lazyLoad(() => import("@/apps/app/Permasearch")),
 	Emporium: lazyLoad(() => import("@/apps/app/Emporium")),
@@ -192,10 +192,10 @@ const mainRoutes = [
 						),
 					},
 					{
-						path: "lexigraph",
+						path: "perpetua",
 						element: (
 							<Suspense fallback={defaultFallback}>
-								<AppModules.Lexigraph />
+								<AppModules.Perpetua />
 							</Suspense>
 						),
 						children: [

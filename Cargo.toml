@@ -4,7 +4,7 @@ members = [
     "src/system_api",
     "src/vetkd",
     "src/icp_swap",
-    "src/lexigraph",
+    "src/perpetua",
     "src/registry",
     "src/tokenomics",
     "src/nft_manager",

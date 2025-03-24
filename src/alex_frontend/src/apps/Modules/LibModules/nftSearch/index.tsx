@@ -26,7 +26,7 @@ export interface AlexandrianLibraryConfig {
  * 
  * This component can be configured for different use cases:
  * - Full library experience (Alexandrian app): Shows principal selector and collection selector
- * - My NFTs only (Lexigraph): Hides principal selector, shows only the user's NFTs
+ * - My NFTs only (Perpetua): Hides principal selector, shows only the user's NFTs
  * 
  * The Redux state is initialized based on the provided configuration.
  */
