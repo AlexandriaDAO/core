@@ -33,7 +33,7 @@ export function TopupBalanceWarning() {
                 <div className="ml-3">
                     <p className="text-sm text-yellow-700">
                         You need at least 10 LBRY in your topup wallet to mint NFTs. Your current balance is {spendingBalance} LBRY.{' '}
-                        <Link to="/Gswap/topup" className="font-medium underline text-yellow-700 hover:text-yellow-600">
+                        <Link to="/swap/topup" className="font-medium underline text-yellow-700 hover:text-yellow-600">
                             Top up your wallet here
                         </Link>
                     </p>
