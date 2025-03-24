@@ -1,13 +1,14 @@
 import React, { useMemo } from "react";
 import { useIdentity } from "@/hooks/useIdentity";
 import { Shelf, Slot } from "../../../../../../../../declarations/perpetua/perpetua.did";
-import { parsePathInfo } from "../../../routes";
+import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { rebalanceShelfSlots } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
 import { SlotReorderManager } from "../../slots/components/SlotReorderManager";
 import { ShelfDetailView } from "../../cards";
 import { ShelfSettingsDialog } from "../../shelf-settings";
 import { useShelfOperations } from "../hooks";
+import { isShelfContent } from "../../../utils";
 
 /**
  * ShelfDetailContainer Component
@@ -41,6 +42,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 	const pathInfo = parsePathInfo(window.location.pathname);
 	const identity = useIdentity();
 	const dispatch = useAppDispatch();
+	const { goToShelf } = usePerpetuaNavigation();
 	
 	// Access the updateMetadata function from ShelfOperations
 	const { updateMetadata } = useShelfOperations();
@@ -74,6 +76,18 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 		}
 	};
 	
+	// Handle slot click - for shelf slots, navigate to that shelf
+	const handleViewSlot = (slotId: number) => {
+		// Find the slot with this ID
+		const slotEntry = orderedSlots.find(([key, _]: [number, Slot]) => key === slotId);
+		
+		if (slotEntry && isShelfContent(slotEntry[1].content)) {
+			// If this is a shelf slot, navigate to that shelf
+			const shelfId = slotEntry[1].content.Shelf;
+			goToShelf(shelfId);
+		}
+	};
+	
 	return (
 		<SlotReorderManager
 			shelf={shelf}
@@ -99,7 +113,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 					hasEditAccess={hasEditAccess}
 					onBack={onBack}
 					onAddSlot={onAddSlot}
-					onViewSlot={(slotId: number) => {}}
+					onViewSlot={handleViewSlot}
 					onEnterEditMode={enterEditMode}
 					onCancelEditMode={cancelEditMode}
 					onSaveSlotOrder={saveSlotOrder}

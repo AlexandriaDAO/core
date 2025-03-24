@@ -136,7 +136,9 @@ export const createShelf = createAsyncThunk(
       if ("Ok" in result) {
         // Reload shelves after creating a new one
         dispatch(loadShelves(principal));
-        return convertBigIntsToStrings(result.Ok);
+        return { shelfId: result.Ok };
+      } else if ("Err" in result) {
+        return rejectWithValue(result.Err);
       } else {
         return rejectWithValue("Failed to create shelf");
       }
@@ -474,6 +476,75 @@ export const removeShelfEditor = createAsyncThunk(
               errorMessage = match[1];
             }
           } catch (e) {
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const createAndAddShelfSlot = createAsyncThunk(
+  'perpetua/createAndAddShelfSlot',
+  async ({ 
+    parentShelfId, 
+    title, 
+    description, 
+    principal 
+  }: { 
+    parentShelfId: string, 
+    title: string, 
+    description: string, 
+    principal: Principal | string 
+  }, { dispatch, rejectWithValue }) => {
+    try {
+      const perpetuaActor = await getActorPerpetua();
+      
+      console.log(`Creating new shelf "${title}" and adding it as a slot to parent shelf: ${parentShelfId}`);
+      
+      const result = await perpetuaActor.create_and_add_shelf_slot(
+        parentShelfId,
+        title,
+        description ? [description] : []
+      );
+      
+      if ("Ok" in result) {
+        // Reload shelves to get both the new shelf and the updated parent shelf
+        dispatch(loadShelves(principal));
+        
+        // Get the shelf ID from the result
+        const newShelfId = result.Ok;
+        
+        return { success: true, parentShelfId, newShelfId };
+      } else if ("Err" in result) {
+        // Enhanced error handling for specific backend errors
+        const errorMessage = result.Err;
+        console.error("Backend error creating and adding shelf slot:", errorMessage);
+        return rejectWithValue(errorMessage);
+      } else {
+        return rejectWithValue("Unknown error creating and adding shelf slot");
+      }
+    } catch (error) {
+      console.error("Failed to create and add shelf slot:", error);
+      
+      let errorMessage = "Failed to create and add shelf";
+      
+      // Try to extract more detailed error message
+      if (error instanceof Error) {
+        // Check if there's a more specific error message in the error object
+        if (error.message.includes("Rejected")) {
+          // Parse the rejection message which is often a nested structure
+          try {
+            const match = error.message.match(/Reject text: ['"](.*?)['"]/);
+            if (match && match[1]) {
+              errorMessage = match[1];
+            }
+          } catch (e) {
+            // If parsing fails, use the original error message
             errorMessage = error.message;
           }
         } else {

@@ -3,7 +3,6 @@
 - Add shelf to shelf by some button or something.
 
 
-
 ### Backend Decision TODOs
 - Payment for all actions, and removal of topup.
 - I think we're going to need tags too (so we could filter the recent one by categories)

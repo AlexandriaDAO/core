@@ -22,6 +22,7 @@ import { buildRoutes } from "../../../routes";
 // Import our extracted components
 import NftDisplay from '../components/NftDisplay';
 import { ShelfContentDisplay, MarkdownContentDisplay, BlogMarkdownDisplay } from '../components/ContentDisplays';
+import { AddToShelfButton } from '@/apps/app/Perpetua/features/shared';
 
 // Main ShelfDetailView component
 export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
@@ -50,10 +51,15 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
   
   const slots = isEditMode ? editedSlots : orderedSlots;
   const [isSaving, setIsSaving] = useState(false);
-  const [selectedContent, setSelectedContent] = useState<{
-    id: string;
-    transaction: Transaction | null;
+  const [viewingSlotContent, setViewingSlotContent] = useState<{
+    slotId: number;
     content: any;
+    transaction: Transaction | null;
+    contentUrls?: {
+      fullUrl: string;
+      coverUrl: string | null;
+      thumbnailUrl: string | null;
+    };
   } | null>(null);
   
   // Navigate to owner's shelves
@@ -97,7 +103,7 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
 
   // For viewing content in modal
   const handleNftDetails = async (tokenId: string) => {
-    // For NFTs, we no longer need to set selectedContent since the modal is handled in NftDisplay
+    // For NFTs, we no longer need to set viewingSlotContent since the modal is handled in NftDisplay
     // We still want to call onViewSlot if provided, for other side effects
     if (onViewSlot) {
       // Find the slot key for this NFT
@@ -111,45 +117,96 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     }
   };
 
-  // Handle non-NFT content clicks
-  const handleContentClick = (slotKey: number) => {
+  // Make sure onViewSlot is properly typed to handle potential undefined
+  const handleShelfContent = (slotId: number) => {
     if (onViewSlot) {
-      onViewSlot(slotKey);
-      
-      // For non-NFT content, we still want to handle modal display here
-      // Find the slot for this key
-      const slotEntry = slots.find(([key, _]: [number, Slot]) => key === slotKey);
-      
-      if (slotEntry && !isNftContent(slotEntry[1].content)) {
-        // For now we'll use the existing selectedContent state for markdown content
-        if (isMarkdownContent(slotEntry[1].content)) {
-          // Create a temporary transaction-like object for markdown content
-          const markdownTransaction: Transaction = {
-            id: `markdown-${slotKey}`,
-            owner: shelf.owner.toString(),
-            tags: []  // Required empty array of tags
-          };
-          
-          setSelectedContent({
-            id: String(slotKey),
-            transaction: markdownTransaction,
-            content: {
-              type: 'markdown',
-              text: slotEntry[1].content.Markdown,
-              urls: {} // Provide any URLs needed for rendering
-            }
-          });
-        }
-        
-        // Add handling for other non-NFT content types as needed
-      }
+      onViewSlot(slotId);
+    } else {
+      console.error("onViewSlot callback is not defined");
     }
+  };
+
+  // Handle clicking a slot to view content
+  const handleContentClick = (slotId: number) => {
+    // Find the slot with this id
+    const slotEntry = slots.find(([key, slot]: [number, Slot]) => key === slotId);
+    if (!slotEntry) return;
+    
+    const [_, slot] = slotEntry;
+    
+    // Make sure slot.content exists
+    if (!slot.content) {
+      console.error("Slot content is undefined for slot ID:", slotId);
+      return;
+    }
+    
+    // If this is a shelf slot, navigate to that shelf instead of showing modal
+    if (isShelfContentSafe(slot.content)) {
+      handleShelfContent(slotId);
+      return;
+    }
+    
+    // For markdown content, create a temporary transaction-like object with proper URLs
+    if (isMarkdownContentSafe(slot.content)) {
+      const markdownTransaction: Transaction = {
+        id: `markdown-${slotId}`,
+        owner: shelf.owner.toString(),
+        tags: []  // Required empty array of tags
+      };
+      
+      setViewingSlotContent({
+        slotId,
+        content: {
+          type: 'markdown',
+          textContent: getMarkdownContentSafe(slot.content),
+          urls: {
+            fullUrl: `data:text/markdown;charset=utf-8,${encodeURIComponent(getMarkdownContentSafe(slot.content))}`,
+            coverUrl: null,
+            thumbnailUrl: null
+          }
+        },
+        transaction: markdownTransaction
+      });
+      return;
+    }
+    
+    // For other content types, set up basic viewing content with default contentUrls
+    const nftId = getNftContentSafe(slot.content);
+    setViewingSlotContent({ 
+      slotId, 
+      content: slot.content,
+      transaction: null,
+      contentUrls: {
+        fullUrl: nftId 
+          ? `https://arweave.net/${nftId}` 
+          : `data:text/plain;charset=utf-8,${encodeURIComponent(JSON.stringify(slot.content, null, 2))}`,
+        coverUrl: null,
+        thumbnailUrl: null
+      }
+    });
   };
 
   // Handler for rendering error
   const handleRenderError = (id: string) => {
     console.error("Error rendering content:", id);
     ContentService.clearTransaction(id);
+  };
+
+  // Safe type checking functions to handle potential undefined values
+  const isMarkdownContentSafe = (content: any): boolean => {
+    return content && typeof content === 'object' && 'Markdown' in content;
+  };
+  
+  const isShelfContentSafe = (content: any): boolean => {
+    return content && typeof content === 'object' && 'Shelf' in content;
+  };
+  
+  const getNftContentSafe = (content: any): string | null => {
+    return content && typeof content === 'object' && 'Nft' in content ? content.Nft : null;
+  };
+  
+  const getMarkdownContentSafe = (content: any): string => {
+    return content && typeof content === 'object' && 'Markdown' in content ? content.Markdown : '';
   };
 
   // Render a card for each slot
@@ -190,33 +247,57 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
       const nftId = slot.content.Nft;
       
       return renderDraggableWrapper(
-        <NftDisplay 
-          tokenId={nftId} 
-          onViewDetails={handleNftDetails}
-          inShelf={true}
-        />
+        <div className="relative">
+          <AddToShelfButton 
+            contentId={nftId} 
+            contentType="Nft"
+            currentShelfId={shelf.shelf_id}
+            position="top-right"
+          />
+          <NftDisplay 
+            tokenId={nftId} 
+            onViewDetails={handleNftDetails}
+            inShelf={true}
+          />
+        </div>
       );
     }
     
     // For shelf content
     if (isShelfContent(slot.content)) {
       return renderDraggableWrapper(
-        <ShelfContentDisplay 
-          shelfId={slot.content.Shelf} 
-          owner={shelf.owner.toString()}
-          onClick={() => handleContentClick(slotKey)}
-        />
+        <div className="relative">
+          <AddToShelfButton 
+            contentId={slot.content.Shelf}
+            contentType="Shelf"
+            currentShelfId={shelf.shelf_id}
+            position="top-right"
+          />
+          <ShelfContentDisplay 
+            shelfId={slot.content.Shelf} 
+            owner={shelf.owner.toString()}
+            onClick={() => handleContentClick(slotKey)}
+          />
+        </div>
       );
     }
     
     // For markdown content 
     if (isMarkdownContent(slot.content)) {
       return renderDraggableWrapper(
-        <MarkdownContentDisplay 
-          content={slot.content.Markdown} 
-          owner={shelf.owner.toString()}
-          onClick={() => handleContentClick(slotKey)}
-        />
+        <div className="relative">
+          <AddToShelfButton 
+            contentId={slot.content.Markdown}
+            contentType="Markdown"
+            currentShelfId={shelf.shelf_id}
+            position="top-right"
+          />
+          <MarkdownContentDisplay 
+            content={slot.content.Markdown} 
+            owner={shelf.owner.toString()}
+            onClick={() => handleContentClick(slotKey)}
+          />
+        </div>
       );
     }
     
@@ -240,6 +321,11 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
         </div>
       </ContentCard>
     );
+  };
+
+  // Handle closing the modal
+  const handleCloseModal = () => {
+    setViewingSlotContent(null);
   };
 
   return (
@@ -468,26 +554,52 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
         )}
       </div>
       
-      {/* Content dialog for non-NFT content */}
-      {selectedContent && (
-        <Dialog open={!!selectedContent} onOpenChange={(open) => !open && setSelectedContent(null)}>
+      {/* Shared Modal for Viewing Content */}
+      {viewingSlotContent && (
+        <Dialog open={!!viewingSlotContent} onOpenChange={handleCloseModal}>
           <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col">
             <DialogTitle className="sr-only">Content Viewer</DialogTitle>
             
             <div className="w-full h-full overflow-y-auto">
               <div className="p-6">
-                {selectedContent.content && selectedContent.transaction && (
+                {viewingSlotContent.transaction && (
                   <ContentRenderer
-                    key={selectedContent.transaction.id}
-                    transaction={selectedContent.transaction}
-                    content={selectedContent.content}
-                    contentUrls={selectedContent.content.urls || {
-                      thumbnailUrl: null,
-                      coverUrl: null,
-                      fullUrl: `https://arweave.net/${selectedContent.transaction.id}`
-                    }}
+                    key={viewingSlotContent.transaction.id}
+                    transaction={viewingSlotContent.transaction}
+                    content={viewingSlotContent.content}
+                    contentUrls={
+                      (viewingSlotContent.content?.urls) || {
+                        fullUrl: `data:text/markdown;charset=utf-8,${encodeURIComponent(
+                          isMarkdownContentSafe(viewingSlotContent.content) 
+                            ? getMarkdownContentSafe(viewingSlotContent.content)
+                            : JSON.stringify(viewingSlotContent.content || {}, null, 2)
+                        )}`,
+                        thumbnailUrl: null,
+                        coverUrl: null
+                      }
+                    }
+                    handleRenderError={() => handleRenderError(viewingSlotContent.transaction?.id || '')}
                     inModal={true}
-                    handleRenderError={() => handleRenderError(selectedContent.transaction?.id || '')}
+                  />
+                )}
+                {!viewingSlotContent.transaction && isMarkdownContentSafe(viewingSlotContent.content) && (
+                  <BlogMarkdownDisplay
+                    content={getMarkdownContentSafe(viewingSlotContent.content)}
+                    onClick={() => {}}
+                  />
+                )}
+                {!viewingSlotContent.transaction && !isMarkdownContentSafe(viewingSlotContent.content) && viewingSlotContent.contentUrls && (
+                  <ContentRenderer
+                    key={`slot-${viewingSlotContent.slotId}`}
+                    transaction={{
+                      id: `generic-${viewingSlotContent.slotId}`,
+                      owner: shelf.owner.toString(),
+                      tags: []
+                    }}
+                    content={viewingSlotContent.content}
+                    contentUrls={viewingSlotContent.contentUrls}
+                    handleRenderError={() => console.error("Error rendering non-transaction content")}
+                    inModal={true}
                   />
                 )}
               </div>

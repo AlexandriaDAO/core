@@ -20,6 +20,7 @@ import { Check, Link, Database, Copy } from "lucide-react";
 import { getNftOwnerInfo } from '@/apps/Modules/shared/utils/nftOwner';
 import { formatPrincipal, formatBalance, convertE8sToToken } from '@/apps/Modules/shared/utils/tokenUtils';
 import { createTokenAdapter, determineTokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
+import { AddToShelfButton } from '@/apps/app/Perpetua/features/shared';
 
 // Constants
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
@@ -302,13 +303,23 @@ const NftDisplay = ({ tokenId, onViewDetails, inShelf = false }: {
         component="Perpetua"
         footer={<NftFooter />}
       >
-        <ContentRenderer
-          transaction={transaction}
-          content={content}
-          contentUrls={contentUrls}
-          handleRenderError={handleRenderError}
-          inModal={false}
-        />
+        <div className="relative w-full h-full">
+          {!inShelf && (
+            <AddToShelfButton
+              contentId={tokenId}
+              contentType="Nft"
+              position="top-right"
+            />
+          )}
+          
+          <ContentRenderer
+            transaction={transaction}
+            content={content}
+            contentUrls={contentUrls}
+            handleRenderError={handleRenderError}
+            inModal={false}
+          />
+        </div>
       </ContentCard>
 
       {/* Modal Dialog for viewing NFT - similar to SingleTokenView */}

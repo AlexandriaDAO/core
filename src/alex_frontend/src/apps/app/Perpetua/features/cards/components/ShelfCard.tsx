@@ -11,6 +11,7 @@ import {
   selectHasEditAccess, 
   selectShelfEditors 
 } from '@/apps/Modules/shared/state/perpetua/perpetuaSlice';
+import { AddToShelfButton } from '@/apps/app/Perpetua/features/shared';
 
 // Shelf Card Component for the library view
 export const ShelfCard: React.FC<ShelfCardProps> = ({ 
@@ -67,44 +68,66 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
         </div>
       }
     >
-      <div className="p-4 w-full h-full flex flex-col">
-        <h3 className="text-lg font-semibold mb-2">{shelf.title}</h3>
-        <p className="text-sm text-muted-foreground line-clamp-3 flex-grow">{shelf.description}</p>
-        <div className="text-xs text-muted-foreground mt-2">
-          <div className="flex flex-col space-y-1">
-            <span>Created {createdAt}</span>
-            {wasEdited && <span>Updated {updatedAt}</span>}
-            {showOwner && (
-              <div className="flex items-center mt-1">
-                <span>By: </span>
-                <Button 
-                  variant="link" 
-                  className="p-0 h-auto text-xs text-blue-500 hover:text-blue-700 flex items-center"
-                  onClick={handleViewUser}
-                  title={`View all shelves by ${shelf.owner.toString()}`}
-                >
-                  <User className="h-3 w-3 mr-1" />
-                  {shelf.owner.toString().slice(0, 8)}...
-                </Button>
-              </div>
-            )}
+      {/* Replace AddToShelfAction with AddToShelfButton */}
+      <div className="relative w-full h-full">
+        <AddToShelfButton
+          contentId={shelf.shelf_id}
+          contentType="Shelf"
+          position="top-right"
+        />
+        <div className="text-center p-4 h-full flex flex-col items-center justify-center">
+          <div className="flex items-center justify-center mb-2">
+            <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+            </svg>
           </div>
+          <div className="text-lg font-semibold">{shelf.title}</div>
+          <div className="text-sm text-muted-foreground mt-1">{shelf.description?.[0]}</div>
         </div>
       </div>
     </ContentCard>
   );
 };
 
-// Public Shelf Card Component for the explore view
+// Public variant of the shelf card used for displaying shelves in lists
 export const PublicShelfCard: React.FC<PublicShelfCardProps> = ({ 
   shelf, 
   onViewShelf 
 }) => {
+  // Skip null safety checks as they should be handled by the parent component
+  const slotCount = Object.keys(shelf.slots).length;
+  
   return (
-    <ShelfCard
-      shelf={shelf}
-      onViewShelf={onViewShelf}
-      showOwner={true}
-    />
+    <ContentCard
+      onClick={() => onViewShelf(shelf.shelf_id)}
+      id={shelf.shelf_id}
+      owner={shelf.owner.toString()}
+      component="Perpetua"
+      footer={
+        <div className="flex items-center justify-between w-full">
+          <div className="text-xs text-muted-foreground">
+            {slotCount} {slotCount === 1 ? 'item' : 'items'}
+          </div>
+        </div>
+      }
+    >
+      {/* Add the AddToShelfButton to the public shelf card as well */}
+      <div className="relative w-full h-full">
+        <AddToShelfButton
+          contentId={shelf.shelf_id}
+          contentType="Shelf"
+          position="top-right"
+        />
+        <div className="text-center p-4 h-full flex flex-col items-center justify-center">
+          <div className="flex items-center justify-center mb-2">
+            <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div className="text-lg font-semibold">{shelf.title}</div>
+          <div className="text-sm text-muted-foreground mt-1">{shelf.description?.[0]}</div>
+        </div>
+      </div>
+    </ContentCard>
   );
 }; 

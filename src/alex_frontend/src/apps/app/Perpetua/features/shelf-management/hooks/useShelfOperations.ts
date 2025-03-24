@@ -11,7 +11,8 @@ import {
   createShelf as createShelfAction, 
   addSlot as addSlotAction,
   reorderSlot as reorderSlotAction,
-  updateShelfMetadata
+  updateShelfMetadata,
+  createAndAddShelfSlot as createAndAddShelfSlotAction
 } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
 import { createFindSlotById } from "../../../utils";
 import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
@@ -49,6 +50,23 @@ export const useShelfOperations = () => {
     }));
   }, [identity, dispatch]);
 
+  const createAndAddShelfSlot = useCallback(async (parentShelfId: string, title: string, description: string): Promise<string | null> => {
+    if (!identity) return null;
+    try {
+      const result = await dispatch(createAndAddShelfSlotAction({
+        parentShelfId,
+        title,
+        description,
+        principal: identity.getPrincipal()
+      })).unwrap();
+      
+      return result.newShelfId || null;
+    } catch (error) {
+      console.error("Failed to create and add shelf slot:", error);
+      return null;
+    }
+  }, [identity, dispatch]);
+
   const reorderSlot = useCallback(async (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean): Promise<void> => {
     if (!identity) return;
     await dispatch(reorderSlotAction({ 
@@ -84,6 +102,7 @@ export const useShelfOperations = () => {
     loading,
     createShelf,
     addSlot,
+    createAndAddShelfSlot,
     reorderSlot,
     findSlotById,
     updateMetadata,

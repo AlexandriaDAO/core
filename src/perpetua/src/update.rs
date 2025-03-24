@@ -12,7 +12,7 @@ pub async fn store_shelf(
     title: String,
     description: Option<String>,
     slots: Vec<Slot>,
-) -> Result<(), String> {
+) -> Result<String, String> {
     let caller = ic_cdk::caller();
     let shelf = create_shelf(title, description, slots).await?;  // Remove owner parameter
     let shelf_id = shelf.shelf_id.clone();
@@ -47,7 +47,7 @@ pub async fn store_shelf(
         timeline_map.insert(now, shelf_id.clone());
     });
 
-    Ok(())
+    Ok(shelf_id)
 }
 
 #[derive(CandidType, Deserialize)]
@@ -306,6 +306,85 @@ pub fn list_shelf_editors(shelf_id: String) -> Result<Vec<Principal>, String> {
             None => Err(format!("Shelf with ID '{}' not found", shelf_id))
         }
     })
+}
+
+#[ic_cdk::update(guard = "not_anon")]
+pub async fn create_and_add_shelf_slot(
+    parent_shelf_id: String,
+    title: String,
+    description: Option<String>,
+) -> Result<String, String> {
+    let caller = ic_cdk::caller();
+    
+    // First, check if the user has edit permissions for the parent shelf
+    if !auth::can_edit_shelf(&parent_shelf_id, &caller)? {
+        return Err("You don't have edit permissions for the parent shelf".to_string());
+    }
+    
+    // Create a new shelf
+    let shelf = create_shelf(title, description, vec![]).await?;
+    let new_shelf_id = shelf.shelf_id.clone();
+    
+    // Store everything in a single critical section to prevent multiple borrows
+    SHELVES.with(|shelves| {
+        let mut shelves_map = shelves.borrow_mut();
+        
+        // First, add the new shelf to SHELVES
+        shelves_map.insert(new_shelf_id.clone(), shelf.clone());
+        
+        // Then, get the parent shelf and modify it
+        if let Some(parent_shelf) = shelves_map.get(&parent_shelf_id) {
+            // Clone the parent shelf to work with it
+            let mut parent_shelf = parent_shelf.clone();
+            
+            // Generate new slot ID
+            let new_id = parent_shelf.slots.keys()
+                .max()
+                .map_or(1, |max_id| max_id + 1);
+
+            // Create the new slot
+            let new_slot = Slot {
+                id: new_id,
+                content: SlotContent::Shelf(new_shelf_id.clone()),
+            };
+
+            // Add the slot to parent shelf
+            if let Err(e) = parent_shelf.insert_slot(new_slot.clone()) {
+                return Err(e);
+            }
+            
+            // Check if the shelf needs rebalancing
+            parent_shelf.ensure_balanced_positions();
+            
+            // Update the timestamp
+            parent_shelf.updated_at = ic_cdk::api::time();
+            
+            // Save the updated parent shelf
+            shelves_map.insert(parent_shelf_id.clone(), parent_shelf);
+            
+            Ok(())
+        } else {
+            Err(format!("Parent shelf with ID '{}' not found", parent_shelf_id))
+        }
+    })?;
+    
+    // Now update USER_SHELVES and GLOBAL_TIMELINE which are separate from SHELVES
+    let now = ic_cdk::api::time();
+    
+    USER_SHELVES.with(|user_shelves| {
+        let mut user_map = user_shelves.borrow_mut();
+        let mut user_shelves_set = user_map.get(&caller).unwrap_or_default();
+        user_shelves_set.0.insert((now, new_shelf_id.clone()));
+        user_map.insert(caller, user_shelves_set);
+    });
+
+    // Add shelf to the global timeline for public discoverability
+    GLOBAL_TIMELINE.with(|timeline| {
+        let mut timeline_map = timeline.borrow_mut();
+        timeline_map.insert(now, new_shelf_id.clone());
+    });
+    
+    Ok(new_shelf_id)
 }
 
 

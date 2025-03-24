@@ -4,12 +4,18 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
-import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
-import { X } from "lucide-react";
+import { Shelf, Slot } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { X, Plus } from "lucide-react";
 import NftSearchDialog from "./NftSearch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { selectShelves, selectSelectedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { selectShelves, selectSelectedShelf, selectUserPrincipal } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
 import { toast } from "sonner";
+import { ShelfForm } from "@/apps/app/Perpetua/features/shelf-management/components/NewShelf";
+import { getActorPerpetua } from "@/features/auth/utils/authUtils";
+import { loadShelves } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
+import { Principal } from "@dfinity/principal";
+import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks/useShelfOperations";
 
 interface DialogProps {
   isOpen: boolean;
@@ -21,14 +27,28 @@ interface NewSlotDialogProps extends DialogProps {
   shelves?: Shelf[];
 }
 
-const NewSlotDialog = ({ isOpen, onClose, onSubmit, shelves: propShelves }: NewSlotDialogProps) => {
+const NewSlotDialog: React.FC<NewSlotDialogProps> = ({ isOpen, onClose, onSubmit, shelves: propShelves }) => {
+  const dispatch = useAppDispatch();
   const [content, setContent] = useState("");
   const [type, setType] = useState<"Nft" | "Markdown" | "Shelf">("Markdown");
   const [selectedShelfId, setSelectedShelfId] = useState<string>("");
+  const [creatingNewShelf, setCreatingNewShelf] = useState(false);
+  
+  // States for shelf creation
+  const [newShelfTitle, setNewShelfTitle] = useState("");
+  const [newShelfDescription, setNewShelfDescription] = useState("");
+  const [isCreatingShelf, setIsCreatingShelf] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Get user principal
+  const userPrincipal = useAppSelector(selectUserPrincipal);
   
   // Get shelves from Redux store
   const allShelves = useAppSelector(selectShelves);
   const currentShelf = useAppSelector(selectSelectedShelf);
+
+  // Get the shelf operations
+  const { createAndAddShelfSlot } = useShelfOperations();
 
   // Filter out the current shelf and any shelves already added as slots
   const availableShelves = useMemo(() => {
@@ -41,7 +61,7 @@ const NewSlotDialog = ({ isOpen, onClose, onSubmit, shelves: propShelves }: NewS
     const shelvesInCurrentShelf = new Set<string>();
     
     if (currentShelf.slots) {
-      currentShelf.slots.forEach(([_, slot]) => {
+      currentShelf.slots.forEach(([key, slot]: [number, Slot]) => {
         if (slot.content && 'Shelf' in slot.content) {
           shelvesInCurrentShelf.add(slot.content.Shelf);
         }
@@ -49,29 +69,250 @@ const NewSlotDialog = ({ isOpen, onClose, onSubmit, shelves: propShelves }: NewS
     }
     
     // Filter out the current shelf and any shelves already in the current shelf
-    return allShelves.filter(shelf => 
+    return allShelves.filter((shelf: Shelf) => 
       shelf.shelf_id !== currentShelf.shelf_id && 
       !shelvesInCurrentShelf.has(shelf.shelf_id)
     );
   }, [allShelves, currentShelf, propShelves]);
 
-  const handleSubmit = async () => {
-    // If type is Shelf, use the selected shelf ID as content
-    const finalContent = type === "Shelf" ? selectedShelfId : content;
-    await onSubmit(finalContent, type);
+  // Reset form when dialog opens/closes or type changes
+  React.useEffect(() => {
     setContent("");
     setSelectedShelfId("");
+    setCreatingNewShelf(false);
+    setNewShelfTitle("");
+    setNewShelfDescription("");
+  }, [isOpen, type]);
+
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+      
+      // If type is Shelf, use the selected shelf ID as content
+      const finalContent = type === "Shelf" ? selectedShelfId : content;
+      
+      // Validate content based on type
+      if (!finalContent) {
+        switch (type) {
+          case "Markdown":
+            toast.error("Please enter markdown content");
+            break;
+          case "Nft":
+            toast.error("Please select an NFT");
+            break;
+          case "Shelf":
+            toast.error("Please select a shelf");
+            break;
+        }
+        return;
+      }
+      
+      console.log(`Submitting ${type} slot with content: ${finalContent.substring(0, 30)}${finalContent.length > 30 ? '...' : ''}`);
+      
+      // Call parent component's onSubmit function
+      await onSubmit(finalContent, type);
+      
+      // Clear form fields
+      setContent("");
+      setSelectedShelfId("");
+      setCreatingNewShelf(false);
+      
+      // Close dialog on success
+      onClose();
+      
+      // Show success message
+      toast.success(`Added ${type} content to shelf successfully`);
+      
+    } catch (error) {
+      console.error(`Error adding ${type} content:`, error);
+      toast.error(`Failed to add ${type} content. Please try again.`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleNftSelect = (nftId: string) => {
     setContent(nftId);
   };
+  
+  const handleCreateShelf = async () => {
+    if (!newShelfTitle) {
+      toast.error("Please enter a title for the shelf");
+      return;
+    }
+    
+    if (!currentShelf) {
+      toast.error("No current shelf selected");
+      return;
+    }
+    
+    try {
+      setIsCreatingShelf(true);
+      
+      // Use the new integrated function instead of the two-step process
+      const newShelfId = await createAndAddShelfSlot(
+        currentShelf.shelf_id,
+        newShelfTitle,
+        newShelfDescription
+      );
+      
+      if (newShelfId) {
+        toast.success(`New shelf "${newShelfTitle}" created and added as a slot`);
+        
+        // Clear the form
+        setNewShelfTitle("");
+        setNewShelfDescription("");
+        
+        // Close the dialog after successful creation and addition
+        onClose();
+      } else {
+        toast.error("Failed to create and add shelf");
+      }
+    } catch (error) {
+      console.error("Error creating and adding shelf:", error);
+      toast.error("Failed to create and add shelf. See console for details.");
+    } finally {
+      setIsCreatingShelf(false);
+    }
+  };
 
-  const handleNftSubmit = async () => {
-    if (content) {
-      await onSubmit(content, "Nft");
-    } else {
-      toast.error("Please select an NFT first");
+  const renderContentTypeForm = () => {
+    switch (type) {
+      case "Markdown":
+        return (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="p-4">
+              <Label htmlFor="markdownContent" className="block mb-2">Markdown Content</Label>
+              <Textarea
+                id="markdownContent"
+                className="h-full min-h-[400px] resize-none"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="# Title
+                
+## Subtitle
+
+Your content here..."
+              />
+            </div>
+            <div className="p-4 mt-auto border-t border-border">
+              <Button 
+                onClick={handleSubmit} 
+                disabled={!content.trim() || isSubmitting}
+                className="px-6 py-2 text-base"
+                variant="primary"
+              >
+                {isSubmitting ? "Adding..." : "Add Markdown"}
+              </Button>
+            </div>
+          </div>
+        );
+        
+      case "Nft":
+        return (
+          <NftSearchDialog
+            onSelect={handleNftSelect}
+          />
+        );
+        
+      case "Shelf":
+        return (
+          <div className="flex-1 flex flex-col p-4">
+            {!creatingNewShelf ? (
+              <>
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <Label htmlFor="shelfSelect" className="block mb-1">Select an existing shelf</Label>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Add an existing shelf as a slot in your current shelf
+                    </p>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setCreatingNewShelf(true)}
+                    className="flex items-center gap-1"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Create New
+                  </Button>
+                </div>
+                <select
+                  id="shelfSelect"
+                  value={selectedShelfId}
+                  onChange={(e) => setSelectedShelfId(e.target.value)}
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">Select a shelf...</option>
+                  {availableShelves.length > 0 ? (
+                    availableShelves.map((shelf) => (
+                      <option key={shelf.shelf_id} value={shelf.shelf_id}>
+                        {shelf.title}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="" disabled>No available shelves to add</option>
+                  )}
+                </select>
+                {availableShelves.length === 0 && (
+                  <p className="text-sm text-amber-500 mt-2">
+                    You don't have any other shelves that can be added. Create a new shelf instead.
+                  </p>
+                )}
+                <div className="flex justify-end mt-4">
+                  <Button 
+                    onClick={handleSubmit} 
+                    disabled={!selectedShelfId || isSubmitting}
+                    className="px-6 py-2 text-base"
+                    variant="primary"
+                  >
+                    {isSubmitting ? "Adding..." : "Add Existing Shelf"}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col">
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <h3 className="text-lg font-medium">Create New Shelf</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Create a new shelf and immediately add it to your current shelf
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => setCreatingNewShelf(false)}
+                  >
+                    Back to Existing Shelves
+                  </Button>
+                </div>
+                <div className="bg-muted/20 p-4 rounded-md border border-border mt-2">
+                  <ShelfForm
+                    title={newShelfTitle}
+                    setTitle={setNewShelfTitle}
+                    description={newShelfDescription}
+                    setDescription={setNewShelfDescription}
+                    submitLabel="Create & Add Shelf"
+                    onSubmit={handleCreateShelf}
+                    inline={true}
+                  />
+                  <div className="flex justify-end mt-4">
+                    <Button 
+                      onClick={handleCreateShelf} 
+                      disabled={!newShelfTitle || isCreatingShelf}
+                      className="px-6 py-2 text-base"
+                      variant="primary"
+                    >
+                      {isCreatingShelf ? "Creating..." : "Create & Add Shelf"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+        
+      default:
+        return null;
     }
   };
 
@@ -106,54 +347,7 @@ const NewSlotDialog = ({ isOpen, onClose, onSubmit, shelves: propShelves }: NewS
           </div>
           
           <div className="flex-1 flex flex-col h-full overflow-hidden">
-            {type === "Markdown" ? (
-              <div className="flex-1 flex flex-col h-full p-4">
-                <Textarea
-                  id="content"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Enter markdown content..."
-                  className="flex-1 text-base p-4 resize-none"
-                />
-                <div className="flex justify-end mt-4">
-                  <Button 
-                    onClick={handleSubmit} 
-                    className="px-6 py-2 text-base"
-                  >
-                    Create
-                  </Button>
-                </div>
-              </div>
-            ) : type === "Nft" ? (
-              <div className="flex-1 flex flex-col h-full overflow-hidden">
-                <NftSearchDialog onSelect={handleNftSelect} />
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col p-4">
-                <select
-                  id="shelfSelect"
-                  value={selectedShelfId}
-                  onChange={(e) => setSelectedShelfId(e.target.value)}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="">Select a shelf...</option>
-                  {availableShelves.map((shelf) => (
-                    <option key={shelf.shelf_id} value={shelf.shelf_id}>
-                      {shelf.title}
-                    </option>
-                  ))}
-                </select>
-                <div className="flex justify-end mt-4">
-                  <Button 
-                    onClick={handleSubmit} 
-                    disabled={!selectedShelfId}
-                    className="px-6 py-2 text-base"
-                  >
-                    Create
-                  </Button>
-                </div>
-              </div>
-            )}
+            {renderContentTypeForm()}
           </div>
         </div>
       </DialogContent>
