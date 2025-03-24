@@ -67,8 +67,8 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
   },
   // test principal 
   {
-    principal: "craan-wljrl-uqfdp-onavh-ucemq-46j6o-dclks-zcqyi-x5hzi-b6rtz-fqe",
-    username: "Kkkkk",
+    principal: "d3sjl-odpvw-6gc5j-hu7ga-ftzk4-vfa5a-hg3ee-u6t2b-kvams-7liqb-7qe",
+    username: "adillOS",
     has_nfts: true,
     has_scion_nfts: true,
     last_updated: BigInt(0)

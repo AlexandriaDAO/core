@@ -285,24 +285,24 @@ export const fetchTokensForPrincipal = createAsyncThunk<
         );
         const subaccounts = await Promise.all(subaccountPromises);
 
-        const balancePromises = subaccounts.map(({ tokenId, subaccount }) => {
+        const balancePromises = subaccounts.map(async ({ tokenId, subaccount }) => {
           const balanceParams = {
             owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
             subaccount: [Array.from(subaccount)] as [number[]],
           };
-
-          return Promise.all([
+          const [alexBalance, lbryBalance] = await Promise.all([
             sortKey === "ALEX"
               ? ALEX.icrc1_balance_of(balanceParams)
               : BigInt(0),
             sortKey === "LBRY"
-              ? BigInt(0)
-              : LBRY.icrc1_balance_of(balanceParams),
-          ]).then(([alexBalance, lbryBalance]) => ({
+              ? LBRY.icrc1_balance_of(balanceParams)
+              :BigInt(0) ,
+          ]);
+          return ({
             tokenId,
             alex: BigInt(alexBalance),
             lbry: BigInt(lbryBalance),
-          }));
+          });
         });
 
         nftWithBalances = await Promise.all(balancePromises);
@@ -311,9 +311,10 @@ export const fetchTokensForPrincipal = createAsyncThunk<
 
         if (sortKey === "ALEX") {
           nftWithBalances.sort((a, b) => Number(b.alex) - Number(a.alex));
-        } else {
+        } else if (sortKey === "LBRY") {
           nftWithBalances.sort((a, b) => Number(b.lbry) - Number(a.lbry));
         }
+        console.log("nftWithBalances", nftWithBalances);
         // nftWithBalances.sort((a, b) => Number(b.alex) - Number(a.alex));
         const sortedNftIds = nftWithBalances.map((item) => item.tokenId);
         const startIndex = (page - 1) * itemsPerPage;
@@ -525,13 +526,13 @@ export const fetchTokensForPrincipal = createAsyncThunk<
         await dispatch(fetchMissingOwnerInfo()).unwrap();
       }
 
-      // we dont need to fetch nft balance here we are already fetching balance
+      // we dont need to fetch nft balance here we are already fetching balance in getnft data
       // Will optimize this later only fetch the required balance
       // fetching here would add unnecessary overhead
 
-      const convertE8sToToken = (e8sAmount: bigint): string => {
-        return (Number(e8sAmount) / 1e8).toString();
-      };
+      // const convertE8sToToken = (e8sAmount: bigint): string => {
+      //   return (Number(e8sAmount) / 1e8).toString();
+      // };
 
       // await Promise.all(
       //   nftEntries.map(async ([tokenId]) => {
@@ -553,131 +554,6 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       //     }));
       //   })
       // );
-      return nftRecord;
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "An error occurred";
-      dispatch(setError(errorMessage));
-      throw error;
-    } finally {
-      dispatch(setLoading(false));
-    }
-  }
-);
-//optimised version
-export const fetchTokensForPrincipalOptimised = createAsyncThunk<
-  Record<string, NFTData>,
-  FetchTokensParams,
-  { state: RootState }
->(
-  "nftData/fetchTokensForPrincipalOptimised",
-  async (
-    {
-      principalId,
-      collection,
-      page,
-      itemsPerPage,
-      startFromEnd = true,
-      totalItems,
-    },
-    { dispatch }
-  ) => {
-    try {
-      dispatch(setLoading(true));
-      dispatch(setError(null));
-      dispatch(setNoResults(false));
-      let sortByBalance = true;
-
-      const tokenAdapter = createTokenAdapter(collection as TokenType);
-      const principal =
-        principalId !== "new" ? Principal.fromText(principalId) : null;
-
-      let allNftIds: bigint[] = [];
-      let totalCount = totalItems ? BigInt(totalItems) : BigInt(0);
-
-      if (principalId === "new") {
-        totalCount ||= await tokenAdapter.getTotalSupply();
-        const start = startFromEnd
-          ? Math.max(0, Number(totalCount) - page * itemsPerPage)
-          : (page - 1) * itemsPerPage;
-        const adjustedTake = Math.min(itemsPerPage, Number(totalCount) - start);
-
-        if (adjustedTake > 0) {
-          allNftIds = await tokenAdapter.getTokens(
-            BigInt(start),
-            BigInt(adjustedTake)
-          );
-          if (startFromEnd) allNftIds.reverse();
-        }
-      } else if (sortByBalance && principal) {
-        totalCount = await tokenAdapter.getBalanceOf(principal);
-        const allTokens = await tokenAdapter.getTokensOf(
-          principal,
-          undefined,
-          totalCount
-        );
-
-        const nftWithBalances = await Promise.all(
-          allTokens.map(async (tokenId) => {
-            const subaccount = await nft_manager.to_nft_subaccount(
-              BigInt(tokenId)
-            );
-            const balanceParams = {
-              owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-              subaccount: [Array.from(subaccount)] as [number[]],
-            };
-            const [alexBalance] = await Promise.all([
-              ALEX.icrc1_balance_of(balanceParams),
-            ]);
-
-            return { tokenId, alex: BigInt(alexBalance), lbry: BigInt(0) };
-          })
-        );
-
-        allNftIds = nftWithBalances
-          .sort((a, b) => Number(b.alex) - Number(a.alex))
-          .slice((page - 1) * itemsPerPage, page * itemsPerPage)
-          .map(({ tokenId }) => tokenId);
-      } else if (principal) {
-        totalCount ||= await tokenAdapter.getBalanceOf(principal);
-        const allTokens = await tokenAdapter.getTokensOf(
-          principal,
-          undefined,
-          totalCount
-        );
-
-        const startIndex = (page - 1) * itemsPerPage;
-        const endIndex = Math.min(startIndex + itemsPerPage, allTokens.length);
-
-        allNftIds = startFromEnd
-          ? allTokens.reverse().slice(startIndex, endIndex)
-          : allTokens.slice(startIndex, endIndex);
-      }
-
-      if (!allNftIds.length) dispatch(setNoResults(true));
-      dispatch(setTotalNfts(Number(totalCount)));
-
-      const batchParams = allNftIds.map((tokenId, index) => ({
-        tokenId,
-        collection,
-        principalId,
-        orderIndex: index,
-      }));
-      const nftEntries = await fetchNFTBatchHelper(batchParams);
-      const nftRecord = Object.fromEntries(nftEntries);
-
-      dispatch(setNfts(nftRecord));
-
-      const arweaveIds = Object.values(nftRecord).map(
-        ({ arweaveId }) => arweaveId
-      );
-      await dispatch(
-        fetchNftTransactions(arweaveIds) as unknown as AnyAction
-      ).unwrap();
-
-      if (principalId === "new")
-        await dispatch(fetchMissingOwnerInfo()).unwrap();
-
       return nftRecord;
     } catch (error) {
       const errorMessage =
