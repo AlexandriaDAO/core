@@ -126,6 +126,30 @@ const DashboardSidebar = () => {
                         <span>ICP Asset Sync</span>
                     </NavLink>
 
+                    <NavLink
+                        to="/dashboard/arweave-assets"
+                        end
+                        className={({ isActive }) => `
+                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border border-border/75
+                            ${isActive ? 'text-primary-foreground bg-primary' : 'text-primary/75 bg-muted hover:border-border hover:text-primary'}
+                        `}
+                    >
+                        <Boxes size={18} />
+                        <span>Arweave Assets</span>
+                    </NavLink>
+
+                    <NavLink
+                        to="/dashboard/icp-assets"
+                        end
+                        className={({ isActive }) => `
+                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border border-border/75
+                            ${isActive ? 'text-primary-foreground bg-primary' : 'text-primary/75 bg-muted hover:border-border hover:text-primary'}
+                        `}
+                    >
+                        <Boxes size={18} />
+                        <span>ICP Assets</span>
+                    </NavLink>
+
                 </div>
             </div>
 

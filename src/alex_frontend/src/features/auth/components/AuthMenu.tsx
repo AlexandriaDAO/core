@@ -78,12 +78,12 @@ export default function AuthMenu() {
 							<span>Profile</span>
 						</DropdownMenuItem>
 						</NavLink>
-						{/* <NavLink to='/dashboard/settings'>
+						<NavLink to='/dashboard/settings'>
 							<DropdownMenuItem className="cursor-pointer">
 								<Settings />
 								<span>Settings</span>
 							</DropdownMenuItem>
-						</NavLink> */}
+						</NavLink>
 					</DropdownMenuGroup>
 				</Protected>
 				<DropdownMenuSeparator />
