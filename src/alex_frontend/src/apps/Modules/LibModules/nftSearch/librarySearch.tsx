@@ -9,16 +9,19 @@ import { loadContentForTransactions } from "../../shared/state/transactions/tran
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/lib/components/select";
-import { setSearchParams } from "../../shared/state/librarySearch/librarySlice";
+import { setBalanceSort, setSearchParams, togglePrincipal } from "../../shared/state/librarySearch/librarySlice";
+
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 const NFTPagination = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { totalItems, searchParams, collection } = useSelector((state: RootState) => state.library);
+  const sortBalanceBy = useSelector((state: RootState) => state.library.sortBalanceBy);
   const currentPage = Math.floor(searchParams.start / searchParams.pageSize) + 1;
   const totalPages = Math.ceil(totalItems / searchParams.pageSize);
   const [pageInput, setPageInput] = useState<string>(currentPage.toString());
+  const [sortKey, setSortKey] = useState<string>(sortBalanceBy);
 
   // Get the content type label based on collection
   const contentTypeLabel = collection === 'SBT' ? 'SBTs' : 'NFTs';
@@ -39,17 +42,17 @@ const NFTPagination = () => {
   const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setPageInput(inputValue);
-    
+
     // Try to parse the input as a number
     const pageNumber = parseInt(inputValue);
-    
+
     // If it's a valid page number, navigate to that page
     if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= totalPages && pageNumber !== currentPage) {
       // Add a small delay to avoid rapid changes while typing
       const timeoutId = setTimeout(() => {
         handlePageChange(pageNumber);
       }, 500);
-      
+
       return () => clearTimeout(timeoutId);
     }
   };
@@ -67,7 +70,10 @@ const NFTPagination = () => {
       }
     }
   };
-
+  const handleBalanceSort = (e: string) => {
+    setSortKey(e);
+    dispatch(setBalanceSort(e));
+  }
   // Update page input when current page changes
   useEffect(() => {
     setPageInput(currentPage.toString());
@@ -77,8 +83,8 @@ const NFTPagination = () => {
 
   return (
     <div className="flex flex-col space-y-2">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-        <div className="flex items-center space-x-2">
+      <div className="flex flex-col sm:flex-row items-center justify-between flex-wrap">
+        <div className="flex items-center space-x-2 md:mb-0 mb-4">
           <Button
             variant="outline"
             onClick={() => handlePageChange(currentPage - 1)}
@@ -87,20 +93,20 @@ const NFTPagination = () => {
           >
             Previous
           </Button>
-          
+
           <div className="flex items-center space-x-2">
             <Input
               type="text"
               value={pageInput}
               onChange={handlePageInputChange}
               onKeyDown={handleKeyDown}
-              className="w-16 h-8 text-sm"
+              className="w-14 h-8 text-sm"
               scale="sm"
               aria-label="Go to page"
               title="Type a page number to navigate"
             />
           </div>
-          
+
           <Button
             variant="outline"
             onClick={() => handlePageChange(currentPage + 1)}
@@ -110,8 +116,7 @@ const NFTPagination = () => {
             Next
           </Button>
         </div>
-        
-        <div className="flex items-center space-x-2">
+        <div className="flex md:justify-left justify-center items-center space-x-2 flex-wrap md:mb-0 mb-4">
           <span className="text-sm">Page {currentPage} of {totalPages}</span>
           <span className="text-sm text-muted-foreground">
             (Showing {contentTypeLabel} {searchParams.start + 1}-{Math.min(searchParams.start + searchParams.pageSize, totalItems)} of {totalItems})
@@ -132,6 +137,23 @@ const NFTPagination = () => {
             </SelectContent>
           </Select>
         </div>
+        <div className="flex items-center space-x-2 ml-2">
+              <label htmlFor="sort-dropdown" className="text-gray-700 dark:text-gray-300 whitespace-nowrap text-sm">Sort By:</label>
+              <Select
+                value={sortKey}
+                onValueChange={(e) => handleBalanceSort(e)}
+              >
+                   <SelectTrigger className="w-full p-[14px] rounded-[0.375rem] text-sm">
+                        <SelectValue placeholder="Sort By:" />
+                      </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DEFAULT">Default</SelectItem>
+                  <SelectItem value="ALEX">ALEX</SelectItem>
+                  <SelectItem value="LBRY">LBRY</SelectItem>
+                </SelectContent>
+
+              </Select>
+            </div>
       </div>
     </div>
   );
@@ -145,7 +167,7 @@ interface LibrarySearchProps {
   showTagsSelector?: boolean;
 }
 
-export default function LibrarySearch({ 
+export default function LibrarySearch({
   defaultCategory = 'favorites',
   defaultPrincipal = 'new',
   showPrincipalSelector = true,
@@ -156,12 +178,16 @@ export default function LibrarySearch({
   const transactionData = useSelector((state: RootState) => state.transactions.transactions);
   const isTransactionUpdated = useSelector((state: RootState) => state.transactions.isUpdated);
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
+  const sortBalanceBy = useSelector((state: RootState) => state.library.sortBalanceBy);
+
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal?.toString());
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [sortKey, setSortKey] = useState<string>(sortBalanceBy);
+
+
   // Store the actual principal we want to keep selected 
   const [preservedPrincipal, setPreservedPrincipal] = useState<string | null>(null);
-  
+
   // Initialize the preservedPrincipal on mount
   useEffect(() => {
     // If defaultPrincipal is 'self', use the userPrincipal
@@ -171,7 +197,7 @@ export default function LibrarySearch({
       setPreservedPrincipal(defaultPrincipal);
     }
   }, [defaultPrincipal, userPrincipal]);
-  
+
   // Track changes to selectedPrincipals and update preservedPrincipal
   useEffect(() => {
     if (selectedPrincipals.length > 0 && !showPrincipalSelector) {
@@ -203,7 +229,10 @@ export default function LibrarySearch({
   //     isMounted = false;
   //   };
   // }, [dispatch, transactionData, isTransactionUpdated]);
-
+  const handleBalanceSort = (e: string) => {
+    setSortKey(e);
+    dispatch(setBalanceSort(e));
+  }
   return (
     <div className="bg-white dark:bg-gray-800 rounded-[8px] md:rounded-[12px] shadow-md p-2 sm:p-3">
       <div className="max-w-7xl mx-auto space-y-2 sm:space-y-3">
@@ -216,10 +245,27 @@ export default function LibrarySearch({
             </div>
             {showTagsSelector && <LibraryContentTagsSelector defaultCategory={defaultCategory} />}
           </div>
-          
+
           {/* Second row: Pagination controls (full width) */}
           <div className="w-full">
             <NFTPagination />
+            {/* <div className="flex items-center space-x-2">
+              <label htmlFor="sort-dropdown" className="text-gray-700 dark:text-gray-300">Sort By:</label>
+              <Select
+                value={sortKey}
+                onValueChange={(e) => handleBalanceSort(e)}
+              >
+                   <SelectTrigger className="w-full p-[14px] rounded-2xl">
+                        <SelectValue placeholder="Sort By:" />
+                      </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DEFAULT">Default</SelectItem>
+                  <SelectItem value="ALEX">ALEX</SelectItem>
+                  <SelectItem value="LBRY">LBRY</SelectItem>
+                </SelectContent>
+
+              </Select>
+            </div> */}
           </div>
         </div>
       </div>

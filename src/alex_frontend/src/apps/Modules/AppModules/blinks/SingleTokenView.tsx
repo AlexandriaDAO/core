@@ -44,7 +44,6 @@ function SingleTokenView() {
   const contentData = useSelector((state: RootState) => state.transactions.contentData);
   const { nfts } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
-// we dont need to fetch nft balance,content  again,we are already doing it in fetchTokensForPrincipal
 
   useEffect(() => {
     let mounted = true;

@@ -107,6 +107,7 @@ export const performSearch = createAsyncThunk<
           itemsPerPage: pageSize,
           startFromEnd: searchParams.startFromEnd,
           totalItems // Pass through the total items for proper pagination
+          
         };
 
         if (searchParams.start !== undefined) {
