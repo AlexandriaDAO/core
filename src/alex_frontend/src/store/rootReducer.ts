@@ -34,6 +34,7 @@ import assetManagerReducer from "@/apps/Modules/shared/state/assetManager/assetM
 
 import emporiumReducer from "@/apps/app/Emporium/emporiumSlice";
 
+import assetsReducer from '@/features/assets/assetsSlice';
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -71,6 +72,8 @@ const rootReducer = combineReducers({
 	nftData: nftDataReducer,
 	emporium: emporiumReducer,
 	assetManager:assetManagerReducer,
+
+	assets: assetsReducer,
 });
 
 export default rootReducer;

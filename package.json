@@ -48,6 +48,8 @@
 
     "@dfinity/agent": "^2.3.0",
 
+    "@dfinity/assets": "^2.3.0",
+
     "@dfinity/auth-client": "^2.3.0",
 
     "@dfinity/candid": "^2.0.0",
