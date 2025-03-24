@@ -5,7 +5,9 @@ import { Principal } from '@dfinity/principal';
 import { convertBigIntsToStrings, convertStringsToBigInts } from '@/utils/bgint_convert';
 import { 
   setSelectedShelf, 
-  updateSingleShelf 
+  updateSingleShelf,
+  setShelfEditors,
+  setEditorsLoading
 } from './lexigraphSlice';
 
 // // # QUERY CALLS # // //
@@ -331,6 +333,155 @@ export const rebalanceShelfSlots = createAsyncThunk(
     } catch (error) {
       console.error("Failed to rebalance shelf slots:", error);
       return rejectWithValue("Failed to rebalance shelf slots");
+    }
+  }
+);
+
+// // # COLLABORATION THUNKS # // //
+
+// List editors for a shelf
+export const listShelfEditors = createAsyncThunk(
+  'lexigraph/listShelfEditors',
+  async (shelfId: string, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setEditorsLoading({ shelfId, loading: true }));
+      
+      const lexigraphActor = await getActorLexigraph();
+      const result = await lexigraphActor.list_shelf_editors(shelfId);
+      
+      if ("Ok" in result) {
+        // Convert Principal objects to strings
+        const editorPrincipals = result.Ok.map(principal => principal.toString());
+        
+        // Update Redux state with editors
+        dispatch(setShelfEditors({ shelfId, editors: editorPrincipals }));
+        dispatch(setEditorsLoading({ shelfId, loading: false }));
+        
+        return editorPrincipals;
+      } else {
+        dispatch(setEditorsLoading({ shelfId, loading: false }));
+        return rejectWithValue("Failed to list shelf editors");
+      }
+    } catch (error) {
+      console.error("Failed to list shelf editors:", error);
+      dispatch(setEditorsLoading({ shelfId, loading: false }));
+      return rejectWithValue("Failed to list shelf editors");
+    }
+  }
+);
+
+// Add an editor to a shelf
+export const addShelfEditor = createAsyncThunk(
+  'lexigraph/addShelfEditor',
+  async ({
+    shelfId,
+    editorPrincipal
+  }: {
+    shelfId: string,
+    editorPrincipal: string
+  }, { dispatch, rejectWithValue }) => {
+    try {
+      const lexigraphActor = await getActorLexigraph();
+      
+      // Convert string to Principal for the API call
+      const principalForApi = Principal.fromText(editorPrincipal);
+      
+      const result = await lexigraphActor.add_shelf_editor(shelfId, principalForApi);
+      
+      if ("Ok" in result) {
+        // Refresh the editors list
+        dispatch(listShelfEditors(shelfId));
+        
+        // Get updated shelf data to ensure UI is consistent
+        const specificShelfResult = await lexigraphActor.get_shelf(shelfId);
+        if ("Ok" in specificShelfResult) {
+          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
+        }
+        
+        return { success: true, shelfId, editorPrincipal };
+      } else if ("Err" in result) {
+        return rejectWithValue(result.Err);
+      } else {
+        return rejectWithValue("Failed to add editor to shelf");
+      }
+    } catch (error) {
+      console.error("Failed to add editor to shelf:", error);
+      
+      let errorMessage = "Failed to add editor to shelf";
+      if (error instanceof Error) {
+        if (error.message.includes("Rejected")) {
+          try {
+            const match = error.message.match(/Reject text: ['"](.*?)['"]/);
+            if (match && match[1]) {
+              errorMessage = match[1];
+            }
+          } catch (e) {
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// Remove an editor from a shelf
+export const removeShelfEditor = createAsyncThunk(
+  'lexigraph/removeShelfEditor',
+  async ({
+    shelfId,
+    editorPrincipal
+  }: {
+    shelfId: string,
+    editorPrincipal: string
+  }, { dispatch, rejectWithValue }) => {
+    try {
+      const lexigraphActor = await getActorLexigraph();
+      
+      // Convert string to Principal for the API call
+      const principalForApi = Principal.fromText(editorPrincipal);
+      
+      const result = await lexigraphActor.remove_shelf_editor(shelfId, principalForApi);
+      
+      if ("Ok" in result) {
+        // Refresh the editors list
+        dispatch(listShelfEditors(shelfId));
+        
+        // Get updated shelf data to ensure UI is consistent
+        const specificShelfResult = await lexigraphActor.get_shelf(shelfId);
+        if ("Ok" in specificShelfResult) {
+          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
+        }
+        
+        return { success: true, shelfId, editorPrincipal };
+      } else if ("Err" in result) {
+        return rejectWithValue(result.Err);
+      } else {
+        return rejectWithValue("Failed to remove editor from shelf");
+      }
+    } catch (error) {
+      console.error("Failed to remove editor from shelf:", error);
+      
+      let errorMessage = "Failed to remove editor from shelf";
+      if (error instanceof Error) {
+        if (error.message.includes("Rejected")) {
+          try {
+            const match = error.message.match(/Reject text: ['"](.*?)['"]/);
+            if (match && match[1]) {
+              errorMessage = match[1];
+            }
+          } catch (e) {
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      return rejectWithValue(errorMessage);
     }
   }
 ); 

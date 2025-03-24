@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import Arweave from "arweave";
 import { JWKInterface } from "arweave/node/lib/wallet";
 import { WalletDAO } from "../utils/wallet_dao";
+import { arweaveClient } from "@/utils/arweaveClient";
 
 // Define the async thunk
 const generateNewWallet = createAsyncThunk<
@@ -12,13 +12,12 @@ const generateNewWallet = createAsyncThunk<
 	"addWallet/generateNewWallet",
 	async ( _, { rejectWithValue } ) => {
 		try {
-			const arweave = Arweave.init({});
-			const walletDao = new WalletDAO(arweave);
+			const walletDao = new WalletDAO(arweaveClient);
 
 			const seedPhrase = await walletDao.generateSeedPhrase();
 			const wallet = await walletDao.generateJWKWallet(seedPhrase);
 			const key = wallet["jwk"] || wallet;
-			const address = await arweave.wallets.jwkToAddress(key);
+			const address = await arweaveClient.wallets.jwkToAddress(key);
 			return {
 				address,
 				key,

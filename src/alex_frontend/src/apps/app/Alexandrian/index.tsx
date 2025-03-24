@@ -9,8 +9,6 @@ import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalan
 import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
 import { clearAllTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
-import AssetManager from "@/apps/Modules/shared/components/AssetManager";
-import { use } from "echarts";
 
 function Alexandrian() {
 	const dispatch = useDispatch<AppDispatch>();
@@ -49,7 +47,9 @@ function Alexandrian() {
 		try {
 			const newStart = searchParams.end;
 			const newEnd = newStart + searchParams.pageSize;
+			// Update pagination parameters without triggering a search
 			await dispatch(updateSearchParams({ start: newStart, end: newEnd }));
+			// Perform the search directly without relying on useEffect
 			await dispatch(performSearch());
 		} catch (error) {
 			handleSearchError(error, 'Failed to load more results');
@@ -62,18 +62,14 @@ function Alexandrian() {
 		dispatch(clearAllTransactions());
 		toast.info("Search cancelled");
 	}, [dispatch]);
-	useEffect(() => {
-		handleSearch()
-	}, [searchParams.start])
+	
 	return (
 		<>
-			<div className="rounded-lg">
-				{/* <AssetManager /> */}
-			</div>
+			{/* Asset Manager has been moved to the Dashboard */}
 			<SearchContainer
 				title="Alexandrian"
 				description="Search the NFT Library of others, and manage your own."
-				hint="Liking costs 20 LBRY (this will decrease over time)."
+				hint="Likes cost 10 LBRY (5 burned | 5 to the creator)."
 				onSearch={handleSearch}
 				onShowMore={handleShowMore}
 				onCancel={handleCancelSearch}

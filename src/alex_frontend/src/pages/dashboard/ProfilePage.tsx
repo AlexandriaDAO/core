@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { LoaderCircle, Save } from "lucide-react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -10,9 +10,19 @@ import { Input } from "@/lib/components/input";
 import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import LibrarianCard from "@/components/LibrarianCard";
+import { UsernameAvailabilityResponse } from "../../../../../src/declarations/user/user.did";
+import { useDebounce } from "@/hooks/useDebounce";
 
 
 const ProfileSchema = Yup.object().shape({
+	username: Yup.string()
+		.min(6, "Username must be at least 6 characters")
+		.max(20, "Username must be at most 20 characters")
+		.matches(
+			/^[a-zA-Z0-9_-]+$/,
+			"Username can only contain letters, numbers, underscores and hyphens"
+		)
+		.required("Username is required"),
 	name: Yup.string()
 		.min(2, 'Name must be at least 2 characters')
 		.max(50, 'Name cannot exceed 50 characters'),
@@ -31,9 +41,11 @@ function ProfilePage() {
 	const dispatch = useAppDispatch();
 
 	const {user, loading, error} = useAppSelector(state=>state.auth)
+    const [availability, setAvailability] = useState<UsernameAvailabilityResponse | null>(null);
 
 	const formik = useFormik({
 		initialValues: {
+			username: "",
 			name: "",
 			avatar: "",
 			tnc: true,
@@ -50,12 +62,50 @@ function ProfilePage() {
 	useEffect(()=>{
 		if(!user) return;
 		if(!formik.dirty) {
-			formik.resetForm({values: {name: user.name, avatar: user.avatar, tnc: formik.values.tnc}})
+			formik.resetForm({values: {username: user.username, name: user.name, avatar: user.avatar, tnc: formik.values.tnc}})
 		}else{
 			formik.resetForm({values: formik.values})
 		}
 	}, [user])
 
+
+	// Debounce username changes to prevent too many API calls
+	const debouncedUsername = useDebounce(formik.values.username, 500);
+
+	// Check username availability when username changes
+	useEffect(() => {
+		const checkAvailability = async () => {
+			if (!actor || !debouncedUsername || formik.errors.username) {
+				setAvailability(null);
+				return;
+			}
+
+			// Only check availability if username has changed from original
+			if (user && debouncedUsername === user.username) {
+				setAvailability(null);
+				return;
+			}
+
+			try {
+				const result = await actor.check_username_availability(debouncedUsername);
+
+                if('Ok' in result){
+                    setAvailability(result.Ok);
+					return;
+                }
+
+                throw new Error('Unknown Error');
+			} catch (error) {
+				setAvailability({
+                    username: debouncedUsername,
+                    available: false,
+					message: "Error checking username availability",
+				});
+			}
+		};
+
+		checkAvailability();
+	}, [debouncedUsername, actor, user]);
 
 	return (
 		<>
@@ -72,15 +122,29 @@ function ProfilePage() {
 					>
 						{error && <span className="text-destructive">{error}</span>}
 						<div className="flex flex-col items-start font-roboto-condensed font-medium ">
-							<Label htmlFor="username">
+							<Label htmlFor="username" variant={(formik.errors.username || (availability && !availability.available)  ? "destructive" : "default" )}>
 								Username
 							</Label>
 							<Input
+								variant={formik.errors.username ? "destructive" : !availability ? "default" : availability.available ? "constructive" : "destructive"}
 								id="username"
 								name="username"
-								value={"@"+user?.username}
-								disabled
+								onChange={formik.handleChange}
+								onBlur={formik.handleBlur}
+								value={formik.values.username}
 							/>
+							<span className="text-destructive text-sm">{formik.errors.username}</span>
+							{!formik.errors.username && availability && (
+								<span
+									className={`text-sm ${
+										availability.available
+											? "text-constructive"
+											: "text-destructive"
+									}`}
+								>
+									{availability.message}
+								</span>
+							)}
 						</div>
 
 						<div className="flex flex-col items-start font-roboto-condensed font-medium">

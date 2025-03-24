@@ -1,5 +1,6 @@
-import React, { lazy, useState } from "react";
+import React, { lazy, useState, useEffect } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { ContentType } from "@/features/upload/uploadSlice";
 import useNavigationGuard from "@/features/upload/hooks/useNavigationGuard";
 import { useCleanupEffect } from "@/features/upload/hooks/useCleanupEffect";
@@ -13,12 +14,17 @@ import PreUploadPreview from "@/features/upload/components/PreUploadPreview";
 import Header from "@/features/upload/components/Header";
 import TextEditor from "@/features/upload/components/TextEditor";
 import FileSelector from "@/features/upload/components/FileSelector";
+import PaymentPreview from "@/features/upload/components/PaymentPreview";
+import { useContentScanner } from "@/features/upload/hooks/useContentScanner";
+import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
 
 const AlexWalletActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexWalletActor })));
 const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
 
 function PinaxPage() {
-	const { type, uploading, minting, transaction, minted, uploadError, fetchError, selectError } = useAppSelector(state => state.upload);
+	const dispatch = useAppDispatch();
+	const { type, uploading, minting, transaction, minted, uploadError, fetchError, selectError, scanError, lbryFee } = useAppSelector(state => state.upload);
+	const { user } = useAppSelector(state => state.auth);
 	const [file, setFile] = useState<File | null>(null);
 	const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
@@ -27,6 +33,14 @@ function PinaxPage() {
 	useFileEffect({ file, setUploadedFile });
 	useTransactionEffect({ transaction, file, setUploadedFile });
 	useUploadedFileEffect({ uploadedFile, setFile });
+	useContentScanner({ file });
+	
+	// Fetch LBRY balance when component mounts or user changes
+	useEffect(() => {
+        if (user?.principal) {
+            dispatch(getSpendingBalance(user.principal));
+        }
+    }, [dispatch, user]);
 
 	return (
 		<AlexWalletActor>
@@ -43,9 +57,11 @@ function PinaxPage() {
 
 						{file && !uploadedFile && <PreUploadPreview file={file} />}
 
-						{(uploadError || fetchError || selectError) && <UploadError />}
+						{file && !uploadedFile && lbryFee !== null && <PaymentPreview file={file} />}
 
-						{ (file || uploadedFile) && <FileUploader file={file} setFile={setFile} /> }
+						{(uploadError || fetchError || selectError || scanError) && <UploadError />}
+
+						{(file || uploadedFile) && <FileUploader file={file} setFile={setFile} />}
 					</div>
 				</div>
 			</NftManagerActor>

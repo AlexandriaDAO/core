@@ -1,12 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AppDispatch, RootState } from '@/store';
 import { calculateBytes } from '../utils';
+import { setLbryFee } from '../uploadSlice';
 
 const estimateCost = createAsyncThunk<
     string, // This is the return type of the thunk's payload
     { file: File }, //Argument that we pass to initialize
     { rejectValue: string , dispatch: AppDispatch, state: RootState }
->("upload/estimateCost", async ({ file }, { rejectWithValue, getState }) => {
+>("upload/estimateCost", async ({ file }, { rejectWithValue, getState, dispatch }) => {
     try {
         const user = getState().auth.user;
 
@@ -19,6 +20,13 @@ const estimateCost = createAsyncThunk<
         const tagsBytes = calculateBytes(tags);
 
         const total = tagsBytes.total + file.size;
+
+        // Calculate LBRY fee (5 LBRY per MB)
+        const fileSizeMB = Math.ceil(file.size / (1024 * 1024));
+        const lbryFee = fileSizeMB * 5;
+        
+        // Store the LBRY fee in the state
+        dispatch(setLbryFee(lbryFee));
 
         // Fetch price estimation from Arweave
         const response = await fetch(`https://arweave.net/price/${total}/`);
@@ -33,10 +41,10 @@ const estimateCost = createAsyncThunk<
         if (error instanceof Error) {
             return rejectWithValue(error.message);
         }
+        return rejectWithValue(
+            "An unknown error occurred while estimating cost"
+        );
     }
-    return rejectWithValue(
-        "An unknown error occurred while estimating cost"
-    );
 });
 
 

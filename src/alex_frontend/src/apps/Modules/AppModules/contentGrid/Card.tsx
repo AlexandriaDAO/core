@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/lib/components/dialog";
 import ShelfSelector from "./components/ShelfSelector";
 import { mint_nft } from "@/features/nft/mint";
 import { toast } from "sonner";
+import { Badge } from "@/lib/components/badge";
 
 interface Transaction {
   id: string;
@@ -36,7 +37,10 @@ interface ContentCardProps {
   isFromAssetCanister?: boolean;
 }
 
-export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isOwned, onMint, predictions, isMinting: externalIsMinting, footer, component,isFromAssetCanister }: ContentCardProps) {
+
+export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isOwned, onMint, predictions, isMinting: externalIsMinting, footer, component, isFromAssetCanister }: ContentCardProps) {
+  const [searchTriggered, setSearchTriggered] = useState(false);
+  const [copiedOwner, setCopiedOwner] = useState(false);
   const [isShelfSelectorOpen, setIsShelfSelectorOpen] = useState(false);
   const [internalMintingState, setInternalMintingState] = useState<boolean>(false);
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
@@ -152,20 +156,22 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
 
             {/* Owned badge */}
             {isOwned && (
-              <div
-                className="absolute top-0 right-0 bg-green-500 hover:bg-green-600 text-white px-2 py-1 text-xs z-30 cursor-pointer"
-                onClick={handleOwnedBadgeClick}
-              >
-                Owned
+              <div className="absolute top-2 right-2 z-30">
+                <Badge 
+                  variant="success" 
+                  className="cursor-pointer text-xs"
+                  onClick={handleOwnedBadgeClick}
+                >
+                  Owned
+                </Badge>
               </div>
             )}
 
-
-            <div
-              className="absolute top-0 left-0 bg-green-500 hover:bg-green-600 text-white px-2 py-1 text-xs z-30 cursor-pointer"
-
-            >
-              {isFromAssetCanister ? "ICP" : "AR"}
+            {/* Storage badge (ICP/AR) */}
+            <div className="absolute top-2 left-2 z-30">
+              <Badge variant="secondary" className="text-xs">
+                {isFromAssetCanister ? "ICP" : "AR"}
+              </Badge>
             </div>
 
           </AspectRatio>
@@ -174,9 +180,9 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
         <CardFooter className="flex flex-col w-full bg-[--card] dark:border-gray-700 p-1.5">
           <div className="flex flex-wrap items-center gap-1">
             {/* NFT data or custom footer - now first */}
-            {(!predictions || Object.keys(predictions).length === 0) && id && !footer && <NftDataFooter id={id} contentOwner={owner} />}
+            {id && !footer && <NftDataFooter id={id} contentOwner={owner} />}
             {footer}
-
+        
             {/* Stats button */}
             {predictions && Object.keys(predictions).length > 0 ? (
               <Collapsible open={showStats} onOpenChange={onToggleStats}>

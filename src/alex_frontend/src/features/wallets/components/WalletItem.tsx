@@ -13,6 +13,8 @@ import { winstonToAr } from "../utils";
 import { Button } from "@/lib/components/button";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import fetchBalance from "../thunks/fetchBalance";
+import { NavLink } from "react-router";
+import { APP_ROUTES } from "@/routes/routeConfig";
 
 interface WalletItemProps {
 	wallet: SerializedWallet;
@@ -104,6 +106,8 @@ const WalletItem = ({ wallet }: WalletItemProps) => {
 									<li>Showing the confirmed balance.</li>
 									<li>Deposits can take a few minutes to reflect.</li>
 									<li>Use the refresh button to fetch latest balance.</li>
+									<li>Active wallets are used in <NavLink to={APP_ROUTES.PINAX}><Button variant="muted" scale="sm" className="h-auto px-0">Pinax Application.</Button></NavLink></li>
+									<li>Delete wallet to remove it from your account.</li>
 								</ul>
 							</td>
 						</tr>

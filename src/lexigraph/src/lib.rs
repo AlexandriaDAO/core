@@ -16,20 +16,16 @@ pub fn icrc7_scion_principal() -> Principal {
     get_principal(ICRC7_SCION_CANISTER_ID)
 }
 
-pub mod storage;
-pub use storage::{Slot, Shelf};
-
-pub mod update;
-pub use update::{ShelfUpdate, store_shelf, SlotReorderInput, reorder_shelf_slot, AddSlotInput, rebalance_shelf_slots};
-
-pub mod query;
-pub use query::*;
-
-pub mod utils;
-pub use utils::generate_shelf_id;
-
 pub mod guard;
-pub use guard::not_anon;
+pub mod auth;
+pub mod storage;
+pub mod update;
+pub mod query;
+pub mod utils;
+
+pub use storage::{Slot, Shelf};
+pub use update::{ShelfUpdate, store_shelf, SlotReorderInput, reorder_shelf_slot, AddSlotInput, rebalance_shelf_slots};
+pub use query::*;
 
 ic_cdk::export_candid!();
 

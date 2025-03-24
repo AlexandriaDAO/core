@@ -1,8 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { SerializedWallet } from '@/features/wallets/walletsSlice';
-import Arweave from 'arweave';
-
-const arweave = Arweave.init({});
+import { arweaveClient } from "@/utils/arweaveClient";
 
 // Define the async thunk
 const fetchBalance = createAsyncThunk<
@@ -11,7 +9,7 @@ const fetchBalance = createAsyncThunk<
     { rejectValue: string }
 >("upload/fetchBalance", async (wallet, { rejectWithValue }) => {
     try {
-        const balance = await arweave.wallets.getBalance(wallet.address)
+        const balance = await arweaveClient.wallets.getBalance(wallet.address)
 
         return balance;
     } catch (error) {

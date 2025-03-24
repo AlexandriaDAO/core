@@ -1,6 +1,7 @@
 use candid::{CandidType, Deserialize, Nat, Principal};
 use crate::storage::{Slot, SlotContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE};
 use crate::guard::not_anon;
+use crate::auth;
 use ic_cdk::api::call::CallResult;
 use icrc_ledger_types::icrc1::account::Account;
 use std::str::FromStr;
@@ -67,24 +68,10 @@ pub struct SlotReorderInput {
 pub fn reorder_shelf_slot(shelf_id: String, reorder: SlotReorderInput) -> Result<(), String> {
     let caller = ic_cdk::caller();
     
-    SHELVES.with(|shelves| {
-        let mut shelves_map = shelves.borrow_mut();
-        if let Some(mut shelf) = shelves_map.get(&shelf_id) {
-            // Enforce owner check using caller
-            if shelf.owner != caller {
-                return Err("Unauthorized: Only shelf owner can reorder slots".to_string());
-            }
-
-            // Use the existing move_slot method to handle the reordering
-            shelf.move_slot(reorder.slot_id, reorder.reference_slot_id, reorder.before)?;
-            
-            // Update the timestamp and save
-            shelf.updated_at = ic_cdk::api::time();
-            shelves_map.insert(shelf_id, shelf);
-            Ok(())
-        } else {
-            Err("Shelf not found".to_string())
-        }
+    // Use the auth helper to handle edit permissions check and update
+    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
+        // Use the existing move_slot method to handle the reordering
+        shelf.move_slot(reorder.slot_id, reorder.reference_slot_id, reorder.before)
     })
 }
 
@@ -187,53 +174,41 @@ pub async fn add_shelf_slot(shelf_id: String, input: AddSlotInput) -> Result<(),
         }
     }
     
-    SHELVES.with(|shelves| {
-        let mut shelves_map = shelves.borrow_mut();
-        if let Some(mut shelf) = shelves_map.get(&shelf_id) {
-            // Enforce owner check
-            if shelf.owner != caller {
-                return Err("Unauthorized: Only shelf owner can add slots".to_string());
-            }
+    // Use the auth helper to handle edit permissions check and update
+    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
+        // Generate new slot ID
+        let new_id = shelf.slots.keys()
+            .max()
+            .map_or(1, |max_id| max_id + 1);
 
-            // Generate new slot ID
-            let new_id = shelf.slots.keys()
-                .max()
-                .map_or(1, |max_id| max_id + 1);
+        // Create the new slot without position field
+        let new_slot = Slot {
+            id: new_id,
+            content: input.content.clone(),
+        };
 
-            // Create the new slot without position field
-            let new_slot = Slot {
-                id: new_id,
-                content: input.content.clone(),
-            };
+        // Add the slot
+        shelf.insert_slot(new_slot.clone())?;
 
-            // Add the slot
-            shelf.insert_slot(new_slot.clone())?;
-
-            // If reference slot is provided, position the new slot relative to it
-            if let Some(ref_id) = input.reference_slot_id {
-                shelf.move_slot(new_id, Some(ref_id), input.before)?;
-            }
-
-            // Update tracking for NFT references if applicable
-            if let SlotContent::Nft(nft_id) = &input.content {
-                NFT_SHELVES.with(|nft_shelves| {
-                    let mut nft_map = nft_shelves.borrow_mut();
-                    let mut shelves = nft_map.get(nft_id).unwrap_or_default();
-                    shelves.0.push(shelf_id.clone());
-                    nft_map.insert(nft_id.to_string(), shelves);
-                });
-            }
-
-            // Check if the shelf needs rebalancing before saving
-            shelf.ensure_balanced_positions();
-
-            // Update timestamp and save
-            shelf.updated_at = ic_cdk::api::time();
-            shelves_map.insert(shelf_id, shelf);
-            Ok(())
-        } else {
-            Err("Shelf not found".to_string())
+        // If reference slot is provided, position the new slot relative to it
+        if let Some(ref_id) = input.reference_slot_id {
+            shelf.move_slot(new_id, Some(ref_id), input.before)?;
         }
+
+        // Update tracking for NFT references if applicable
+        if let SlotContent::Nft(nft_id) = &input.content {
+            NFT_SHELVES.with(|nft_shelves| {
+                let mut nft_map = nft_shelves.borrow_mut();
+                let mut shelves = nft_map.get(nft_id).unwrap_or_default();
+                shelves.0.push(shelf_id.clone());
+                nft_map.insert(nft_id.to_string(), shelves);
+            });
+        }
+
+        // Check if the shelf needs rebalancing before saving
+        shelf.ensure_balanced_positions();
+
+        Ok(())
     })
 }
 
@@ -243,24 +218,11 @@ pub async fn add_shelf_slot(shelf_id: String, input: AddSlotInput) -> Result<(),
 pub fn rebalance_shelf_slots(shelf_id: String) -> Result<(), String> {
     let caller = ic_cdk::caller();
     
-    SHELVES.with(|shelves| {
-        let mut shelves_map = shelves.borrow_mut();
-        if let Some(mut shelf) = shelves_map.get(&shelf_id) {
-            // Enforce owner check
-            if shelf.owner != caller {
-                return Err("Unauthorized: Only shelf owner can rebalance slots".to_string());
-            }
-            
-            // Force a rebalance
-            shelf.rebalance_positions();
-            
-            // Update timestamp and save
-            shelf.updated_at = ic_cdk::api::time();
-            shelves_map.insert(shelf_id, shelf);
-            Ok(())
-        } else {
-            Err("Shelf not found".to_string())
-        }
+    // Use the auth helper to handle edit permissions check and update
+    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
+        // Force a rebalance
+        shelf.rebalance_positions();
+        Ok(())
     })
 }
 
@@ -272,22 +234,8 @@ pub fn update_shelf_metadata(
 ) -> Result<(), String> {
     let caller = ic_cdk::caller();
     
-    SHELVES.with(|shelves| {
-        let mut shelves_map = shelves.borrow_mut();
-        
-        // Check if shelf exists
-        if !shelves_map.contains_key(&shelf_id) {
-            return Err(format!("Shelf with ID {} not found", shelf_id));
-        }
-        
-        // Get a mutable copy of the shelf
-        let mut shelf = shelves_map.get(&shelf_id).unwrap().clone();
-        
-        // Enforce owner check using caller
-        if shelf.owner != caller {
-            return Err("Unauthorized: Only shelf owner can update metadata".to_string());
-        }
-        
+    // Use the auth helper to handle edit permissions check and update
+    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
         // Update the title if provided
         if let Some(new_title) = title {
             shelf.title = new_title;
@@ -296,12 +244,67 @@ pub fn update_shelf_metadata(
         // Update the description (which is already Option<String>)
         shelf.description = description;
         
-        // Update the last modified timestamp
-        shelf.updated_at = ic_cdk::api::time() / 1_000_000; // Convert nanoseconds to milliseconds
-        
-        // Save the updated shelf
-        shelves_map.insert(shelf_id, shelf);
+        // The timestamp will be updated by the auth helper
         Ok(())
+    })
+}
+
+/// Adds a new editor to a shelf
+/// Only the shelf owner can add editors
+#[ic_cdk::update(guard = "not_anon")]
+pub fn add_shelf_editor(shelf_id: String, editor_principal: Principal) -> Result<(), String> {
+    let caller = ic_cdk::caller();
+    
+    // Use the auth helper to handle shelf ownership check and update
+    auth::get_shelf_for_owner_mut(&shelf_id, &caller, |shelf| {
+        // Prevent adding owner as editor (they already have full permissions)
+        if editor_principal == shelf.owner {
+            return Err("Cannot add the owner as an editor".to_string());
+        }
+        
+        // Check if editor already exists
+        if shelf.editors.contains(&editor_principal) {
+            return Err("Principal is already an editor".to_string());
+        }
+        
+        // Add the new editor
+        shelf.editors.push(editor_principal);
+        
+        Ok(())
+    })
+}
+
+/// Removes an editor from a shelf
+/// Only the shelf owner can remove editors
+#[ic_cdk::update(guard = "not_anon")]
+pub fn remove_shelf_editor(shelf_id: String, editor_principal: Principal) -> Result<(), String> {
+    let caller = ic_cdk::caller();
+    
+    // Use the auth helper to handle shelf ownership check and update
+    auth::get_shelf_for_owner_mut(&shelf_id, &caller, |shelf| {
+        // Find and remove the editor
+        let position = shelf.editors.iter().position(|p| *p == editor_principal);
+        
+        match position {
+            Some(index) => {
+                shelf.editors.remove(index);
+                Ok(())
+            },
+            None => Err("Principal is not an editor".to_string())
+        }
+    })
+}
+
+/// Lists all editors for a shelf
+/// Anyone can view the editors list
+#[ic_cdk::query(guard = "not_anon")]
+pub fn list_shelf_editors(shelf_id: String) -> Result<Vec<Principal>, String> {
+    SHELVES.with(|shelves| {
+        let shelves_map = shelves.borrow();
+        match shelves_map.get(&shelf_id) {
+            Some(shelf) => Ok(shelf.editors.clone()),
+            None => Err(format!("Shelf with ID '{}' not found", shelf_id))
+        }
     })
 }
 

@@ -144,12 +144,12 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                 owner={transaction.owner}
                 isOwned={isOwned || false}
                 isMinting={mintingStates[transaction.id]}
-                isFromAssetCanister={transaction.assetUrl===""?false:true}
                 onWithdraw={canWithdraw ? (e) => {
                   e.stopPropagation();
                   handleWithdraw(transaction.id);
                 } : undefined}
                 predictions={predictions[transaction.id]}
+                isFromAssetCanister={ (transaction.assetUrl&&transaction?.assetUrl!=="")?true:false}
               >
                 <div className="group relative w-full h-full">
                   <ContentRenderer

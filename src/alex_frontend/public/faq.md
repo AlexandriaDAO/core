@@ -8,15 +8,13 @@ Our goal is to is to restore that sense of awe and human connection that was so 
 
 2. Is this site safe?
 
-For the most part, yes. Here's what you need to know: 
+Our core tokenomics has been audited and rigorously tested with no known issues, and so while mistakes are always possible, fucntions relating to $alex and $lbry (swap/burn/stake/send) are exceedingly unlikely to result in loss of funds.
 
-Our tokenomics model is audited by Solidstate, the foremost ICP auditing agency, so holding/swapping/staking/burning tokens on this site is pretty safe, though mistakes are always possible.
+That said, the rest of this platform is pre-alpha, unaudited, and rapidly changing. It is possible that funds inside NFTs and  'topup' accounts could be lost in a major failure event, so it is recommended to collect them frequently while we continue work on a backup system.
 
-NFTs are pretty safe, but while in pre-alpha our backup system is not live so data loss is possible at this stage. For this reason, ALEX and LBRY inside NFTs should be regularly withdrawn to your wallet. The underling NFT asset is never lost though, as it persits on Arweave forever*, and our backup system will make the entire library forkable/recoverable for everyone.
+Alexandria is a fair launched community project. It's tokens $alex and $lbry are speculative and could go to zero.
 
-All our code is open source, but also rapidly changing during this pre-alpha stage. While we work very hard against this, damaging or malicious bugs are possible (as with any dapp storing funds), so if you're super paranoid, just store your tokens in a separate wallet.
-
-3. How do I register an account?
+1. How do I register an account?
 
 First, you need to get an [Internet Identity](https://identity.ic0.app/).
 

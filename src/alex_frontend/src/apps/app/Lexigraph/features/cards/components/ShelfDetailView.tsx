@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
-import { ArrowLeft, Edit, Plus, X, Grid, List } from "lucide-react";
+import { ArrowLeft, Edit, Plus, X, Grid, List, Home, User } from "lucide-react";
 import { renderBreadcrumbs, isNftContent, isShelfContent, isMarkdownContent } from "../../../utils";
 import { ShelfDetailViewProps } from '../types/types';
 import { Slot } from "../../../../../../../../declarations/lexigraph/lexigraph.did";
@@ -16,6 +16,8 @@ import { useState } from "react";
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import { Badge } from "@/lib/components/badge";
+import { parsePathInfo } from "../../../routes";
+import { buildRoutes } from "../../../routes";
 
 // Import our extracted components
 import NftDisplay from '../components/NftDisplay';
@@ -40,12 +42,12 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
   handleDrop,
   settingsButton
 }) => {
-  const backButtonLabel = "Back";
-  const breadcrumbItems = [
-    { label: backButtonLabel, onClick: onBack },
-    { label: shelf.title }
-  ];
-
+  // Check if we're in a user-specific view
+  const pathInfo = parsePathInfo(window.location.pathname);
+  const isUserView = pathInfo.isUserView;
+  const userId = pathInfo.userId;
+  const backButtonLabel = pathInfo.backButtonLabel;
+  
   const slots = isEditMode ? editedSlots : orderedSlots;
   const [isSaving, setIsSaving] = useState(false);
   const [selectedContent, setSelectedContent] = useState<{
@@ -53,6 +55,17 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     transaction: Transaction | null;
     content: any;
   } | null>(null);
+  
+  // Navigate to owner's shelves
+  const goToOwnerShelves = () => {
+    // If we're already in a user view, use that user ID
+    const targetUser = isUserView && userId ? userId : shelf.owner.toString();
+    window.location.href = buildRoutes.user(targetUser);
+  };
+  
+  // Get the user ID to display in the breadcrumb
+  const breadcrumbUserId = isUserView && userId ? userId : shelf.owner.toString();
+  const breadcrumbUserLabel = isUserView && userId ? `User ${userId.slice(0, 8)}...` : `${shelf.owner.toString().slice(0, 8)}...`;
   
   // Initialize view mode from localStorage or default to 'grid'
   const [viewMode, setViewMode] = useState<'grid' | 'blog'>(() => {
@@ -232,16 +245,31 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 py-3 flex justify-between items-center w-full bg-background/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            onClick={onBack} 
-            className="flex items-center gap-2 h-8 text-sm"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </Button>
-          {renderBreadcrumbs(breadcrumbItems)}
+        <div className="flex items-center">
+          <div className="flex items-center h-8 rounded-md border border-input bg-background overflow-hidden">
+            <Button 
+              variant="ghost" 
+              onClick={onBack} 
+              className="flex items-center gap-1 h-8 rounded-r-none border-r px-3 text-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {backButtonLabel}
+            </Button>
+            <div className="flex items-center px-3 text-sm">
+              <Button
+                variant="link"
+                onClick={goToOwnerShelves}
+                className="ml-1 p-0 h-auto text-sm text-primary hover:text-primary/80"
+                title={`View all shelves by ${breadcrumbUserId}`}
+              >
+                <User className="w-3 h-3 mr-1" />
+                {breadcrumbUserLabel}
+              </Button>
+              
+              <span className="mx-1">/</span>
+              <span className="font-medium">{shelf.title}</span>
+            </div>
+          </div>
         </div>
         
         <div className="flex items-center gap-2">

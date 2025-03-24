@@ -12,7 +12,7 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { Button } from "@/lib/components/button";
 import { Label } from "@/lib/components/label";
 import { Input } from "@/lib/components/input";
-import { User, Save, LoaderCircle } from "lucide-react";
+import { User, Save, LoaderCircle, UserPlus } from "lucide-react";
 import { useUser } from "@/hooks/actors";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -29,9 +29,6 @@ const UserSchema = Yup.object().shape({
 			"Username can only contain letters, numbers, underscores and hyphens"
 		)
 		.required("Username is required"),
-	agreeToTerms: Yup.boolean()
-		.oneOf([true], "You must agree to the terms and conditions")
-		.required("Agreement is required"),
 });
 
 const SignupForm = () => {
@@ -46,7 +43,6 @@ const SignupForm = () => {
 	const formik = useFormik({
 		initialValues: {
 			username: "",
-			agreeToTerms: false,
 		},
 		validationSchema: UserSchema,
 		validateOnBlur: true, // Validate form field on blur
@@ -140,37 +136,6 @@ const SignupForm = () => {
 						</span>
 					)}
 				</div>
-				<div className="flex flex-col items-start font-roboto-condensed font-medium">
-					<div className="flex items-center gap-2">
-						<input
-							onChange={formik.handleChange}
-							className={`cursor-pointer w-4 h-4 ${isDark ? 'accent-primary' : ''}`}
-							type="checkbox"
-							id="agreeToTerms"
-							name="agreeToTerms"
-							checked={formik.values.agreeToTerms}
-						/>
-						<Label
-							htmlFor="agreeToTerms"
-							variant={
-								formik.touched.agreeToTerms &&
-								formik.errors.agreeToTerms
-									? "destructive"
-									: "default"
-							}
-							className={isDark ? 'text-muted-foreground' : 'text-black'}
-						>
-							I agree to the terms and conditions
-						</Label>
-					</div>
-
-					{formik.touched.agreeToTerms &&
-						formik.errors.agreeToTerms && (
-							<span className="text-destructive text-sm">
-								{formik.errors.agreeToTerms}
-							</span>
-						)}
-				</div>
 				<div className="flex justify-center items-center my-4">
 					<DialogFooter>
 						{loading ? (
@@ -179,12 +144,12 @@ const SignupForm = () => {
 									size={18}
 									className="animate animate-spin"
 								/>
-								<span>Processing...</span>
+								<span>Signing Up</span>
 							</Button>
 						) : (
 							<Button type="submit" rounded={"full"}>
-								<Save size={18} />
-								<span>Save User</span>
+								<UserPlus size={18} />
+								<span>Sign Up</span>
 							</Button>
 						)}
 					</DialogFooter>

@@ -7,7 +7,7 @@ import { Button } from "@/lib/components/button";
 import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
 import { Alert } from "@/components/Alert";
-import { KeyRound, Shield, Loader2 } from "lucide-react";
+import { KeyRound, Shield, Loader2, TriangleAlert } from "lucide-react";
 
 export function SeedPhraseTab() {
 	const dispatch = useAppDispatch();
@@ -55,10 +55,17 @@ export function SeedPhraseTab() {
 							title="Example seed phrase:"
 							icon={KeyRound}
 						>
-							witch collapse practice feed shame open despair
-							creek road again ice least
+							<div className="flex flex-col gap-2">
+								<span>
+									witch collapse practice feed shame open despair creek road again ice least
+								</span>
+								<div className="flex justify-start items-center gap-2 text-destructive">
+									<TriangleAlert className="w-4 h-4" />
+									<span >Do not use this example seed phrase.</span>
+								</div>
+							</div>
 						</Alert>
-
+{/* 
 						<Alert
 							variant="warning"
 							title="Security Warning"
@@ -67,7 +74,7 @@ export function SeedPhraseTab() {
 							Do not use this example seed phrase. It is publicly
 							known and any funds sent to its associated wallet
 							will be lost.
-						</Alert>
+						</Alert> */}
 					</div>
 				</div>
 			</div>
@@ -87,6 +94,17 @@ export function SeedPhraseTab() {
 					"Import Wallet"
 				)}
 			</Button>
+			{importing && (
+				<Alert
+					variant="info"
+					title="Please Wait..."
+				>
+					<div className="flex flex-col space-y-1">
+						<span className="font-medium">Your wallet is being imported securely...</span>
+						<span>This process typically takes 1-2 minutes to complete as we're importing and encrypting your wallet seed phrase.</span>
+					</div>
+				</Alert>
+			)}
 		</div>
 	);
 }

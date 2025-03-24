@@ -1,9 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import Arweave from "arweave";
 import * as bip39 from "bip39";
 import { JWKInterface } from "arweave/node/lib/wallet";
 import { WalletDAO } from "../utils/wallet_dao";
 import { SeedPhrase } from "../types";
+import { arweaveClient } from "@/utils/arweaveClient";
 
 // Define the async thunk
 const importSeedPhrase = createAsyncThunk<
@@ -19,15 +19,13 @@ const importSeedPhrase = createAsyncThunk<
 		try {
 			if (!bip39.validateMnemonic(seed)) return rejectWithValue("Invalid seed phrase");
 
-			const arweave = Arweave.init({});
-
-			const walletDao = new WalletDAO(arweave);
+			const walletDao = new WalletDAO(arweaveClient);
 
 			const wallet = await walletDao.generateJWKWallet(new SeedPhrase(seed));
 
 			const key = wallet["jwk"] || wallet;
 
-			const address = await arweave.wallets.jwkToAddress(key);
+			const address = await arweaveClient.wallets.jwkToAddress(key);
 
 			return { address, key, seed };
 		} catch (error) {

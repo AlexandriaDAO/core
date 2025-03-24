@@ -128,7 +128,7 @@ function Permasearch() {
 						? "Loading content safety model..." 
 						: modelLoadFailed 
 							? "Content safety model failed to load. Some images may not be filtered." 
-							: "Minting costs 10 LBRY (this will decrease over time)."
+							: "Each mint burns 5 LBRY."
 				}
 				onSearch={handleNewSearch}
 				onShowMore={handleShowMore}

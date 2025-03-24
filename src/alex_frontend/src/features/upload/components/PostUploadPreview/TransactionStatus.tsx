@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Check, RotateCw } from "lucide-react";
-import Arweave from "arweave";
 import { Button } from "@/lib/components/button";
 import { TransactionStatusResponse } from "arweave/node/transactions";
+import { arweaveClient } from "@/utils/arweaveClient";
 
 interface TransactionStatusProps {
 	transaction: string;
@@ -15,8 +15,7 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ transaction }) =>
 	const fetchStatus = async () => {
 		setLoading(true);
 		try {
-			const arweave = Arweave.init({});
-			const res = await arweave.transactions.getStatus(transaction);
+			const res = await arweaveClient.transactions.getStatus(transaction);
 			setStatus(res);
 		} catch (error) {
 			console.error('Error checking status:', error);

@@ -289,19 +289,19 @@ describe('Library State', () => {
       const stateAfterToggle = store.getState() as RootState;
       expect(stateAfterToggle.library.selectedPrincipals).toEqual(['2vxsx-fae']);
       
-      // Toggle the same principal again (should remove it)
+      // Toggle the same principal again (should revert to 'new')
       store.dispatch(togglePrincipal('2vxsx-fae'));
       
-      // Verify principal is removed
+      // Verify principal is reverted to 'new' (not removed completely)
       const stateAfterRemove = store.getState() as RootState;
-      expect(stateAfterRemove.library.selectedPrincipals).toEqual([]);
+      expect(stateAfterRemove.library.selectedPrincipals).toEqual(['new']);
       
-      // Toggle back to 'new'
-      store.dispatch(togglePrincipal('new'));
+      // Toggle back to a different principal
+      store.dispatch(togglePrincipal('different-principal'));
       
-      // Verify 'new' is selected
+      // Verify different principal is selected
       const finalState = store.getState() as RootState;
-      expect(finalState.library.selectedPrincipals).toEqual(['new']);
+      expect(finalState.library.selectedPrincipals).toEqual(['different-principal']);
     });
 
     it('should handle setCollection action', () => {

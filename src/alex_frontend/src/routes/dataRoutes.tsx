@@ -27,6 +27,7 @@ const NotFoundPage = lazyLoad(() => import("@/pages/NotFoundPage"));
 const UpgradePage = lazyLoad(() => import("@/pages/dashboard/UpgradePage"));
 const LibrarianPage = lazyLoad(() => import("@/pages/librarian/"));
 const WalletsPage = lazyLoad(() => import("@/pages/librarian/WalletsPage"));
+const AssetSyncPage = lazyLoad(() => import("@/pages/dashboard/AssetSyncPage"));
 const PinaxPage = lazyLoad(() => import("@/pages/PinaxPage"));
 const InfoPage = lazyLoad(() => import("@/pages/InfoPage"));
 const DashboardLayout = lazyLoad(() => import("@/layouts/DashboardLayout"));
@@ -398,6 +399,14 @@ const authRoutes = {
 									element: <WalletsWithActors />,
 								},
 							],
+						},
+						{
+							path: "asset-sync",
+							element: (
+								<Suspense fallback={<MainPageSkeleton />}>
+									<AssetSyncPage />
+								</Suspense>
+							),
 						},
 						{
 							path: "profile",

@@ -61,12 +61,14 @@ pub struct SignupRequest {
 /// # Example
 /// ```rust
 /// let request = UpdateUserRequest {
+///     username: "bookworm".to_string(),
 ///     name: Some("John Doe".to_string()),
 ///     avatar: Some("https://example.com/avatar.jpg".to_string()),
 /// };
 /// ```
 #[derive(CandidType, Serialize, Deserialize, Clone, Debug)]
 pub struct UpdateUserRequest {
+    pub username: String,
     pub name: Option<String>,
     pub avatar: Option<String>,
 }

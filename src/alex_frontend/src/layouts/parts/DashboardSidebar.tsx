@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { Boxes, Home, LayoutList, Library, Upload } from "lucide-react";
+import { Boxes, Home, LayoutList, Library, Upload, Database } from "lucide-react";
 import { NavLink } from "react-router";
 import AuthNavigation from "./AuthNavigation";
 
@@ -112,6 +112,18 @@ const DashboardSidebar = () => {
                     >
                         <LayoutList size={18}/>
                         <span>My Wallets</span>
+                    </NavLink>
+
+                    <NavLink
+                        to="/dashboard/asset-sync"
+                        end
+                        className={({ isActive }) => `
+                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border border-border/75
+                            ${isActive ? 'text-primary-foreground bg-primary' : 'text-primary/75 bg-muted hover:border-border hover:text-primary'}
+                        `}
+                    >
+                        <Database size={18}/>
+                        <span>ICP Asset Sync</span>
                     </NavLink>
 
                 </div>

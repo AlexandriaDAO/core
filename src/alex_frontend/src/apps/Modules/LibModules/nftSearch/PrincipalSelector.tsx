@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
 import { togglePrincipal, setNoResults } from '../../shared/state/librarySearch/librarySlice';
-import { togglePrincipalSelection, performSearch, updateSearchParams } from '../../shared/state/librarySearch/libraryThunks';
+import { togglePrincipalSelection, updateSearchParams } from '../../shared/state/librarySearch/libraryThunks';
 import { getActorAlexBackend } from "@/features/auth/utils/authUtils";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";

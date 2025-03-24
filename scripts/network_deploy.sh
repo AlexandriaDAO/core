@@ -101,36 +101,36 @@
 # # })'
 
 
-# # dfx deploy ALEX --network ic --argument '(variant { Init = 
-# # record {
-# #      token_symbol = "ALEX";
-# #      token_name = "ALEX";
-# #      minting_account = record { owner = principal "'$(dfx canister id tokenomics --network ic)'" };
-# #      transfer_fee = 10_000;
-# #      metadata = vec {
-# #         record { "icrc1:symbol"; variant { Text = "ALEX" } };
-# #         record { "icrc1:name"; variant { Text = "ALEX" } };
-# #         record { "icrc1:description"; variant { Text = "The Primary Token of Alexandria" } };
-# #         record { "icrc1:decimals"; variant { Nat = 8 } };
-# #         record { "icrc1:fee"; variant { Nat = 10_000 } };
-# #         record { "icrc1:logo"; variant { Text = "data:image/svg+xml;base64,'${TOKEN_LOGO}'" } };
-# #      };
-# #      initial_balances = vec {};
-# #      archive_options = record {
-# #          num_blocks_to_archive = 3000;
-# #          trigger_threshold = 6000;
-# #          controller_id = principal "'$(dfx canister id tokenomics --network ic)'";
-# #          cycles_for_archive_creation = opt 10000000000000;
-# #      };
-# #      feature_flags = opt record {
-# #         icrc2 = true;
-# #         icrc3 = true;
-# #      };
-# #      maximum_number_of_accounts = opt 10_000_000;
-# #      accounts_overflow_trim_quantity = opt 100_000;
-# #      max_memo_length = opt 32;
-# #  }
-# # })'
+# dfx deploy ALEX --network ic --argument '(variant { Init = 
+# record {
+#      token_symbol = "ALEX";
+#      token_name = "ALEX";
+#      minting_account = record { owner = principal "'$(dfx canister id tokenomics --network ic)'" };
+#      transfer_fee = 10_000;
+#      metadata = vec {
+#         record { "icrc1:symbol"; variant { Text = "ALEX" } };
+#         record { "icrc1:name"; variant { Text = "ALEX" } };
+#         record { "icrc1:description"; variant { Text = "The Primary Token of Alexandria" } };
+#         record { "icrc1:decimals"; variant { Nat = 8 } };
+#         record { "icrc1:fee"; variant { Nat = 10_000 } };
+#         record { "icrc1:logo"; variant { Text = "data:image/svg+xml;base64,'${TOKEN_LOGO}'" } };
+#      };
+#      initial_balances = vec {};
+#      archive_options = record {
+#          num_blocks_to_archive = 3000;
+#          trigger_threshold = 6000;
+#          controller_id = principal "'$(dfx canister id tokenomics --network ic)'";
+#          cycles_for_archive_creation = opt 10000000000000;
+#      };
+#      feature_flags = opt record {
+#         icrc2 = true;
+#         icrc3 = true;
+#      };
+#      maximum_number_of_accounts = opt 10_000_000;
+#      accounts_overflow_trim_quantity = opt 100_000;
+#      max_memo_length = opt 32;
+#  }
+# })'
 
 
 # # # opt 300000000000; /* 5 minutes */

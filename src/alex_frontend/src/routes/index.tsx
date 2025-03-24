@@ -23,6 +23,7 @@ const UpgradePage = lazy(()=>import("@/pages/dashboard/UpgradePage"));
 // const LibrarianLayout = lazy(()=>import("@/layouts/LibrarianLayout"));
 const LibrarianPage = lazy(()=>import("@/pages/librarian/"));
 const WalletsPage = lazy(()=>import("@/pages/librarian/WalletsPage"));
+const AssetSyncPage = lazy(()=>import("@/pages/dashboard/AssetSyncPage"));
 // const FileUploadPage = lazy(()=>import("@/pages/dashboard/FileUploadPage"));
 const PinaxPage = lazy(()=>import("@/pages/PinaxPage"));
 // const UploadPage = lazy(()=>import("@/pages/dashboard/UploadPage"));
@@ -70,12 +71,8 @@ const router = createBrowserRouter(
 					<Route path="syllogos" element={<Suspense key="syllogos" fallback={<TopProgressBar />}><Syllogos /></Suspense>} />
 					<Route path="lexigraph" element={<Suspense key="lexigraph" fallback={<TopProgressBar />}><Lexigraph /></Suspense>}>
 						<Route index element={<Suspense key="lexigraph-home" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="my-library" element={<Suspense key="lexigraph-my-library" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="my-library/shelf/:shelfId" element={<Suspense key="lexigraph-my-library-shelf" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="my-library/slot/:slotId" element={<Suspense key="lexigraph-my-library-slot" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="explore" element={<Suspense key="lexigraph-explore" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="explore/shelf/:shelfId" element={<Suspense key="lexigraph-explore-shelf" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
-						<Route path="explore/slot/:slotId" element={<Suspense key="lexigraph-explore-slot" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
+						<Route path="shelf/:shelfId" element={<Suspense key="lexigraph-shelf" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
+						<Route path="slot/:slotId" element={<Suspense key="lexigraph-slot" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
 						<Route path="user/:userId" element={<Suspense key="lexigraph-user" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
 						<Route path="user/:userId/shelf/:shelfId" element={<Suspense key="lexigraph-user-shelf" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
 						<Route path="user/:userId/slot/:slotId" element={<Suspense key="lexigraph-user-slot" fallback={<TopProgressBar />}><Lexigraph /></Suspense>} />
@@ -114,6 +111,8 @@ const router = createBrowserRouter(
 							<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
 							<Route path="wallets" element={<Suspense key="wallets" fallback={<MainPageSkeleton />}><WalletsPage /></Suspense>} />
 						</Route>
+
+						<Route path="asset-sync" element={<Suspense key="asset-sync" fallback={<MainPageSkeleton />}><AssetSyncPage /></Suspense>} />
 
 						<Route path="profile">
 							<Route index element={<Suspense key="profile" fallback={<MainPageSkeleton />}><ProfilePage /></Suspense>} />
