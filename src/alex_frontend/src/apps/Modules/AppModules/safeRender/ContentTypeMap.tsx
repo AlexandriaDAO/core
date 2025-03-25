@@ -76,7 +76,8 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
     if (fullUrl.startsWith('blob:')) {
       setBlobUrl(fullUrl);
       return () => {
-        URL.revokeObjectURL(fullUrl);
+        // commenting for now
+      ///  URL.revokeObjectURL(fullUrl);
       };
     } else {
       setBlobUrl(fullUrl);

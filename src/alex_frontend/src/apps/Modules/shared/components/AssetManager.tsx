@@ -25,7 +25,7 @@ const AssetManager = () => {
   }
   const sync = () => {
     console.log("user AssetCanister", assetManager.userAssetCanister);
-    if (!user.user?.principal || !assetManager.userAssetCanister) return;
+    if (!user.user?.principal || !assetManager.userAssetCanister||assetManager.isLoading) return;
     setSyncProgress({
       currentItem: "",
       progress: 0,
@@ -36,7 +36,7 @@ const AssetManager = () => {
       userPrincipal: user.user.principal, syncProgress, setSyncProgress,
       userAssetCanister: assetManager.userAssetCanister
     }))
-    console.log("syncing");
+    console.log("syncing 1");
   }
 
   useEffect(() => {
@@ -98,26 +98,26 @@ const AssetManager = () => {
           </div>
 
           {/*  Current NFT Upload Progress Bar */}
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div className="w-full bg-gray-200  rounded-full h-2.5">
             <div
-              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+              className="bg-gray-800 h-2.5 rounded-full transition-all duration-300"
               style={{ width: `${syncProgress.currentProgress ?? 0}%` }}
             />
           </div>
 
           {/*  Total Synced Progress Bar */}
-          <div className="text-sm text-gray-600">
+          {/* <div className="text-sm text-gray-600">
             Total Synced: {syncProgress.totalSynced ?? 0}
           </div>
 
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <div
-              className="bg-green-600 h-2.5 rounded-full transition-all duration-300"
+              className="bg-gray-900 h-2.5 rounded-full transition-all duration-300"
               style={{
                 width: `${((syncProgress.totalSynced ?? 0) / nftData.totalNfts) * 100}%`,
               }}
             />
-          </div>
+          </div> */}
         </div>
       )}
     </div>
