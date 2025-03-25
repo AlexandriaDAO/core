@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AppDispatch, RootState } from '@/store';
-import { setLbryFee, setPaymentStatus, setPaymentError } from '../uploadSlice';
+import { setPaymentStatus, setPaymentError } from '../uploadSlice';
 import { toast } from "sonner";
 import { Principal } from "@dfinity/principal";
 

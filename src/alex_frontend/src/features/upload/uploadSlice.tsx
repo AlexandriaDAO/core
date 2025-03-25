@@ -7,6 +7,7 @@ import { SerializedWallet } from "../wallets/walletsSlice";
 import fetchBalance from "./thunks/fetchBalance";
 import selectWallet from "./thunks/selectWallet";
 import getSpendingBalance from "../swap/thunks/lbryIcrc/getSpendingBalance";
+import checkEligibility from "./thunks/checkEligibility";
 
 export enum Step {
 	Select = 1,
@@ -32,6 +33,9 @@ export interface UploadState {
 
 	progress: number;
 
+	eligible: boolean;
+	checkingEligibility: boolean;
+
 	scanning: boolean;
 	fetching: boolean;
 	selecting: boolean;
@@ -50,6 +54,7 @@ export interface UploadState {
 	paymentError: string | null;
 
 	uploadError: string | null;
+	eligibilityError: string | null;
 	fetchError: string | null;
 	selectError: string | null;
 	mintError: string | null;
@@ -72,6 +77,8 @@ const initialState: UploadState = {
 	scanning: false,
 	fetching: false,
 	uploading: false,
+	eligible: false,
+	checkingEligibility: false,
 	selecting: false,
 	minting: false,
 	minted: null,
@@ -86,6 +93,7 @@ const initialState: UploadState = {
 	paymentError: null,
 
 	uploadError: null,
+	eligibilityError: null,
 	fetchError: null,
 	selectError: null,
 	mintError: null,
@@ -130,10 +138,6 @@ const uploadSlice = createSlice({
 		},
 		setScanError: (state, action)=>{
 			state.scanError = action.payload
-		},
-		// Action creators for LBRY payment
-		setLbryFee: (state, action)=>{
-			state.lbryFee = action.payload
 		},
 		setPaymentStatus: (state, action)=>{
 			state.paymentStatus = action.payload
@@ -200,16 +204,19 @@ const uploadSlice = createSlice({
 				state.estimating = true;
 				state.estimateError = null;
 				state.cost = null;
+				state.lbryFee = null;
 			})
-			.addCase(estimateCost.fulfilled, (state, action:PayloadAction<string>) => {
+			.addCase(estimateCost.fulfilled, (state, action:PayloadAction<{ cost: string, fee: number }>) => {
 				state.estimating = false;
 				state.estimateError = null;
-				state.cost = action.payload;
+				state.cost = action.payload.cost;
+				state.lbryFee = action.payload.fee;
 			})
 			.addCase(estimateCost.rejected, (state, action) => {
 				state.estimating = false;
 				state.estimateError = action.payload as string;
 				state.cost = null;
+				state.lbryFee = null;
 			})
 
 			.addCase(fetchBalance.pending, (state, {meta: {arg}}) => {
@@ -253,7 +260,23 @@ const uploadSlice = createSlice({
 				state.selectError = action.payload as string;
 				state.wallet = null;
 			})
-			
+
+			.addCase(checkEligibility.pending, (state) => {
+				state.checkingEligibility = true;
+				state.eligible = false;
+				state.eligibilityError = null;
+			})
+			.addCase(checkEligibility.fulfilled, (state, action:PayloadAction<boolean>) => {
+				state.checkingEligibility = false;
+				state.eligible = action.payload;
+				state.eligibilityError = null;
+			})
+			.addCase(checkEligibility.rejected, (state, action) => {
+				state.checkingEligibility = false;
+				state.eligible = false;
+				state.eligibilityError = action.payload as string;
+			})
+
 			// Reset payment status when user gets their spending balance
 			.addCase(getSpendingBalance.fulfilled, (state) => {
 				// Only reset if payment hasn't already been processed
@@ -278,7 +301,6 @@ export const {
 	setStep, 
 	setScanning, 
 	setScanError,
-	setLbryFee,
 	setPaymentStatus,
 	setPaymentError
 } = uploadSlice.actions;

@@ -2,13 +2,13 @@ import React, { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Button } from "@/lib/components/button";
-import { useNftManager } from "@/hooks/actors";
+import { useAlexWallet, useNftManager } from "@/hooks/actors";
 import processPayment from "../thunks/processPayment";
 import { TopupBalanceWarning } from "@/apps/Modules/shared/components/TopupBalanceWarning";
-import { AlertCircle, Loader2, CreditCard, CheckCircle } from "lucide-react";
+import { AlertCircle, Loader2, CreditCard, CheckCircle, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { Alert } from "@/components/Alert";
+import checkEligibility from "../thunks/checkEligibility";
 
 interface PaymentPreviewProps {
     file: File;
@@ -17,11 +17,31 @@ interface PaymentPreviewProps {
 function PaymentPreview({ file }: PaymentPreviewProps) {
     const dispatch = useAppDispatch();
     const { actor: nftManagerActor } = useNftManager();
-    
+    const { actor: alexWalletActor } = useAlexWallet();
+
     // Get the spending balance from the swap state
-    const { spendingBalance, loading: balanceLoading } = useSelector((state: RootState) => state.swap);
-    const { lbryFee, paymentStatus, paymentError } = useAppSelector(state => state.upload);
-    
+    const { spendingBalance, loading: balanceLoading } = useAppSelector(state => state.swap);
+    const { lbryFee, paymentStatus, paymentError, eligible, eligibilityError, checkingEligibility } = useAppSelector(state => state.upload);
+
+    useEffect(() => {
+		if(checkingEligibility || eligible || eligibilityError) return;
+
+		if(alexWalletActor && lbryFee && lbryFee > 0){
+			dispatch(checkEligibility(alexWalletActor))
+		}
+    }, [alexWalletActor, lbryFee]);
+
+    if(checkingEligibility) {
+        return <div className="flex justify-start items-center gap-2 w-full">
+            <Loader2 size={16} className="animate-spin" />
+            <span className="text-sm text-muted-foreground">Checking eligibility...</span>
+        </div>
+    }
+
+    if(!eligible) {
+        return <Alert variant="danger" title="Wallet Error" icon={TriangleAlert} className="w-full text-left border-none border-l-2 border-l-destructive">{eligibilityError || "Payment can't be processed at this time"}</Alert>
+    }
+
     // Calculate file size in MB
     const fileSizeMB = Math.ceil(file.size / (1024 * 1024));
     
