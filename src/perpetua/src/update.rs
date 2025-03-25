@@ -152,7 +152,7 @@ fn is_self_reference(shelf_id: &String, nested_shelf_id: &String) -> bool {
 /// This provides a more specific API for adding just one slot without
 /// needing to replace the entire slot list
 #[ic_cdk::update(guard = "not_anon")]
-pub async fn add_shelf_slot(shelf_id: String, input: AddSlotInput) -> Result<(), String> {
+pub async fn add_slot_to_shelf(shelf_id: String, input: AddSlotInput) -> Result<(), String> {
     let caller = ic_cdk::caller();
     
     // Validate NFT ownership if applicable

@@ -10,7 +10,7 @@ import { NftDataFooter } from "./components/NftDataFooter";
 import { RootState } from "@/store";
 import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
 import { Dialog, DialogContent, DialogTitle } from "@/lib/components/dialog";
-import ShelfSelector from "./components/ShelfSelector";
+import { ShelfSelectionDialog } from "@/apps/app/Perpetua/features/shelf-management/components";
 import { mint_nft } from "@/features/nft/mint";
 import { toast } from "sonner";
 import { Badge } from "@/lib/components/badge";
@@ -217,15 +217,12 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
 
       {/* Shelf Selector Dialog */}
       {isShelfSelectorOpen && id && (
-        <Dialog open={isShelfSelectorOpen} onOpenChange={setIsShelfSelectorOpen}>
-          <DialogContent className="w-[500px] p-4">
-            <DialogTitle>Add to Shelf</DialogTitle>
-            <ShelfSelector
-              nftId={id}
-              onClose={handleCloseShelfSelector}
-            />
-          </DialogContent>
-        </Dialog>
+        <ShelfSelectionDialog
+          contentId={id}
+          contentType="Nft"
+          open={isShelfSelectorOpen}
+          onClose={handleCloseShelfSelector}
+        />
       )}
     </>
   );

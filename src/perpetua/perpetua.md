@@ -1,7 +1,12 @@
 ### UI
 
-- Add shelf to shelf by some button or something.
-
+- Delete slots (but not underlying shelves)
+- Slots should be items.
+- Need to let people delete slots from their shelf.
+  - Do we have a different index for shelves and slots? 
+- Size constraints on everything in the backend.
+- Figure out what the heck we're doing this rebalancing for.
+- Change the max slots to 1,000
 
 ### Backend Decision TODOs
 - Payment for all actions, and removal of topup.

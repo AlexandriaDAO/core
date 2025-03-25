@@ -1,17 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import { 
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle,
-  DialogFooter
+  DialogTitle
 } from "@/lib/components/dialog";
-import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
-import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
-import { useSlotActions } from "../hooks/useSlotActions";
 import { Search } from "lucide-react";
 import { ScrollArea } from "@/lib/components/scroll-area";
+import { Button } from "@/lib/components/button";
+import { useAddToShelf } from "../../shelf-management/hooks/useAddToShelf";
+import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
 
 interface AddToShelfDialogProps {
   open: boolean;
@@ -34,16 +33,28 @@ export const AddToShelfDialog: React.FC<AddToShelfDialogProps> = ({
   contentType,
   excludeShelfId
 }) => {
-  const { getEditableShelves, addContentToShelf, loading } = useSlotActions();
-  const [selectedShelfId, setSelectedShelfId] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isAddingContent, setIsAddingContent] = useState(false);
-
+  const [selectedShelfId, setSelectedShelfId] = React.useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [isAddingContent, setIsAddingContent] = React.useState(false);
+  
+  const {
+    getEditableShelves,
+    addContentToShelf,
+    hasEditableShelvesExcluding,
+    isLoggedIn
+  } = useAddToShelf();
+  
+  // Check if user has shelves they can edit
+  const hasAvailableShelves = hasEditableShelvesExcluding(excludeShelfId);
+  if (!hasAvailableShelves || !isLoggedIn) return null;
+  
   // Get shelves that the user can edit, filtering out the current shelf
   const editableShelves = getEditableShelves(excludeShelfId);
   
   // Filter shelves based on search term
-  const filteredShelves = editableShelves.filter(shelf => {
+  const filteredShelves = editableShelves.filter((shelf: Shelf) => {
+    if (searchTerm === "") return true;
+    
     const title = typeof shelf.title === 'string' ? shelf.title.toLowerCase() : '';
     const description = typeof shelf.description?.[0] === 'string' ? shelf.description[0].toLowerCase() : '';
     const search = searchTerm.toLowerCase();
@@ -51,10 +62,12 @@ export const AddToShelfDialog: React.FC<AddToShelfDialogProps> = ({
     return title.includes(search) || description.includes(search);
   });
 
+  // Handle selection of a shelf
   const handleShelfSelection = (shelfId: string) => {
     setSelectedShelfId(shelfId === selectedShelfId ? null : shelfId);
   };
 
+  // Handle adding content to selected shelf
   const handleAddToShelf = async () => {
     if (!selectedShelfId) return;
     
@@ -102,7 +115,7 @@ export const AddToShelfDialog: React.FC<AddToShelfDialogProps> = ({
             </div>
           ) : (
             <div className="space-y-2 p-1">
-              {filteredShelves.map((shelf) => (
+              {filteredShelves.map((shelf: Shelf) => (
                 <ShelfOption
                   key={shelf.shelf_id}
                   shelf={shelf}
@@ -114,7 +127,7 @@ export const AddToShelfDialog: React.FC<AddToShelfDialogProps> = ({
           )}
         </ScrollArea>
         
-        <DialogFooter className="mt-4">
+        <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={handleDialogClose}>
             Cancel
           </Button>
@@ -124,7 +137,7 @@ export const AddToShelfDialog: React.FC<AddToShelfDialogProps> = ({
           >
             {isAddingContent ? "Adding..." : "Add to Shelf"}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
