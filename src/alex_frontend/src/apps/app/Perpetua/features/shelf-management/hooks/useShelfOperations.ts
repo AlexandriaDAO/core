@@ -12,7 +12,8 @@ import {
   addSlot as addSlotAction,
   reorderSlot as reorderSlotAction,
   updateShelfMetadata,
-  createAndAddShelfSlot as createAndAddShelfSlotAction
+  createAndAddShelfSlot as createAndAddShelfSlotAction,
+  removeSlot as removeSlotAction
 } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
 import { createFindSlotById } from "../../../utils";
 import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
@@ -78,6 +79,33 @@ export const useShelfOperations = () => {
     }));
   }, [identity, dispatch]);
 
+  const removeSlot = useCallback(async (shelfId: string, slotId: number): Promise<boolean> => {
+    if (!identity) {
+      console.error("Cannot remove slot: No identity available");
+      return false;
+    }
+    console.log(`Attempting to remove slot ${slotId} from shelf ${shelfId}`);
+    try {
+      console.log("Dispatching removeSlotAction with:", {
+        shelfId, 
+        slotId,
+        principal: identity.getPrincipal().toString()
+      });
+      
+      const result = await dispatch(removeSlotAction({ 
+        shelfId, 
+        slotId,
+        principal: identity.getPrincipal()
+      })).unwrap();
+      
+      console.log("RemoveSlot result:", result);
+      return true;
+    } catch (error) {
+      console.error("Failed to remove slot:", error);
+      return false;
+    }
+  }, [identity, dispatch]);
+
   // Helper function to find a slot by ID across all shelves
   const findSlotById = createFindSlotById(shelves);
 
@@ -106,5 +134,6 @@ export const useShelfOperations = () => {
     reorderSlot,
     findSlotById,
     updateMetadata,
+    removeSlot,
   };
 }; 

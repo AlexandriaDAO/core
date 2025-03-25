@@ -2,7 +2,7 @@ import React from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { Badge } from "@/lib/components/badge";
 import ReactMarkdown from 'react-markdown';
-import { AddToShelfButton } from '@/apps/app/Perpetua/features/shared';
+import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 
 // New component for blog view markdown display
 export const BlogMarkdownDisplay = ({ content, onClick }: { content: string, onClick: () => void }) => (
@@ -14,7 +14,19 @@ export const BlogMarkdownDisplay = ({ content, onClick }: { content: string, onC
 );
 
 // Display component for shelf content
-export const ShelfContentDisplay = ({ shelfId, owner, onClick }: { shelfId: string, owner: string, onClick: () => void }) => (
+export const ShelfContentDisplay = ({ 
+  shelfId, 
+  owner, 
+  onClick,
+  parentShelfId,
+  slotId
+}: { 
+  shelfId: string, 
+  owner: string, 
+  onClick: () => void,
+  parentShelfId?: string,
+  slotId?: number
+}) => (
   <ContentCard
     id={`shelf-${shelfId}`}
     onClick={onClick}
@@ -32,12 +44,14 @@ export const ShelfContentDisplay = ({ shelfId, owner, onClick }: { shelfId: stri
     }
   >
     <div className="relative w-full h-full">
-      <AddToShelfButton
+      {/* Replace the two buttons with the action menu */}
+      <ShelfCardActionMenu
         contentId={shelfId}
         contentType="Shelf"
-        position="top-right"
+        parentShelfId={parentShelfId}
+        slotId={slotId}
       />
-
+      
       <div className="w-full h-full flex items-center justify-center">
         <div className="text-center p-4">
           <div className="flex items-center justify-center mb-2">
@@ -54,7 +68,19 @@ export const ShelfContentDisplay = ({ shelfId, owner, onClick }: { shelfId: stri
 );
 
 // Display component for markdown content
-export const MarkdownContentDisplay = ({ content, owner, onClick }: { content: string, owner: string, onClick: () => void }) => {
+export const MarkdownContentDisplay = ({ 
+  content, 
+  owner, 
+  onClick,
+  parentShelfId,
+  slotId
+}: { 
+  content: string, 
+  owner: string, 
+  onClick: () => void,
+  parentShelfId?: string,
+  slotId?: number
+}) => {
   const preview = content.substring(0, 30) + (content.length > 30 ? '...' : '');
   
   return (
@@ -75,10 +101,12 @@ export const MarkdownContentDisplay = ({ content, owner, onClick }: { content: s
       }
     >
       <div className="relative w-full h-full">
-        <AddToShelfButton
+        {/* Replace the two buttons with the action menu */}
+        <ShelfCardActionMenu
           contentId={content}
           contentType="Markdown"
-          position="top-right"
+          parentShelfId={parentShelfId}
+          slotId={slotId}
         />
         
         <div className="w-full h-full flex items-center justify-center overflow-hidden">

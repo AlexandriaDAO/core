@@ -47,7 +47,7 @@ type SlotReorderInput = record {
 };
 service : {
   add_shelf_editor : (text, principal) -> (Result);
-  add_shelf_slot : (text, AddSlotInput) -> (Result);
+  add_slot_to_shelf : (text, AddSlotInput) -> (Result);
   create_and_add_shelf_slot : (text, text, opt text) -> (Result_1);
   get_recent_shelves : (opt nat64, opt nat64) -> (Result_2) query;
   get_shelf : (text) -> (Result_3) query;
@@ -57,6 +57,7 @@ service : {
   list_shelf_editors : (text) -> (Result_6) query;
   rebalance_shelf_slots : (text) -> (Result);
   remove_shelf_editor : (text, principal) -> (Result);
+  remove_slot_from_shelf : (text, nat32) -> (Result);
   reorder_shelf_slot : (text, SlotReorderInput) -> (Result);
   store_shelf : (text, opt text, vec Slot) -> (Result_1);
   update_shelf_metadata : (text, opt text, opt text) -> (Result);

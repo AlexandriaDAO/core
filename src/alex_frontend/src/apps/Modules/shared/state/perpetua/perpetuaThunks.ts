@@ -178,7 +178,7 @@ export const addSlot = createAsyncThunk(
         ? { Shelf: content } as SlotContent
         : { Markdown: content } as SlotContent;
       
-      const result = await perpetuaActor.add_shelf_slot(
+      const result = await perpetuaActor.add_slot_to_shelf(
         shelf.shelf_id,
         {
           content: slotContent,
@@ -532,6 +532,76 @@ export const createAndAddShelfSlot = createAsyncThunk(
       console.error("Failed to create and add shelf slot:", error);
       
       let errorMessage = "Failed to create and add shelf";
+      
+      // Try to extract more detailed error message
+      if (error instanceof Error) {
+        // Check if there's a more specific error message in the error object
+        if (error.message.includes("Rejected")) {
+          // Parse the rejection message which is often a nested structure
+          try {
+            const match = error.message.match(/Reject text: ['"](.*?)['"]/);
+            if (match && match[1]) {
+              errorMessage = match[1];
+            }
+          } catch (e) {
+            // If parsing fails, use the original error message
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// Remove a slot from a shelf
+export const removeSlot = createAsyncThunk(
+  'perpetua/removeSlot',
+  async ({ 
+    shelfId, 
+    slotId, 
+    principal 
+  }: { 
+    shelfId: string, 
+    slotId: number, 
+    principal: Principal | string 
+  }, { dispatch, rejectWithValue }) => {
+    try {
+      const perpetuaActor = await getActorPerpetua();
+      
+      console.log(`Removing slot ${slotId} from shelf: ${shelfId}`);
+      
+      const result = await perpetuaActor.remove_slot_from_shelf(
+        shelfId,
+        slotId
+      );
+      
+      if ("Ok" in result) {
+        // Get updated shelf data
+        const specificShelfResult = await perpetuaActor.get_shelf(shelfId);
+        if ("Ok" in specificShelfResult) {
+          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
+        } else {
+          // Reload all shelves as a fallback
+          dispatch(loadShelves(principal));
+        }
+        
+        return { success: true, shelfId, slotId };
+      } else if ("Err" in result) {
+        // Enhanced error handling for specific backend errors
+        const errorMessage = result.Err;
+        console.error("Backend error removing slot:", errorMessage);
+        return rejectWithValue(errorMessage);
+      } else {
+        return rejectWithValue("Unknown error removing slot");
+      }
+    } catch (error) {
+      console.error("Failed to remove slot:", error);
+      
+      let errorMessage = "Failed to remove slot";
       
       // Try to extract more detailed error message
       if (error instanceof Error) {

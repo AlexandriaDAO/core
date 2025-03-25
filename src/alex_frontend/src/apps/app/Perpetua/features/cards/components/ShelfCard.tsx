@@ -1,23 +1,35 @@
 import React from 'react';
-import { Button } from "@/lib/components/button";
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { convertTimestamp } from "@/utils/general";
 import { ShelfCardProps, PublicShelfCardProps } from '../types/types';
 import { buildRoutes } from '../../../routes';
-import { User, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { 
   selectIsOwner, 
   selectHasEditAccess, 
   selectShelfEditors 
 } from '@/apps/Modules/shared/state/perpetua/perpetuaSlice';
-import { AddToShelfButton } from '@/apps/app/Perpetua/features/shared';
+import { ShelfCardActionMenu } from './ShelfCardActionMenu';
+
+// Extending the props interfaces to include parentShelfId and slotId
+interface ExtendedShelfCardProps extends ShelfCardProps {
+  parentShelfId?: string;
+  slotId?: number;
+}
+
+interface ExtendedPublicShelfCardProps extends PublicShelfCardProps {
+  parentShelfId?: string;
+  slotId?: number;
+}
 
 // Shelf Card Component for the library view
-export const ShelfCard: React.FC<ShelfCardProps> = ({ 
+export const ShelfCard: React.FC<ExtendedShelfCardProps> = ({ 
   shelf, 
   onViewShelf,
-  showOwner = false 
+  showOwner = false,
+  parentShelfId,
+  slotId
 }) => {
   const createdAt = convertTimestamp(shelf.created_at, 'combined');
   const updatedAt = convertTimestamp(shelf.updated_at, 'combined');
@@ -68,13 +80,16 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
         </div>
       }
     >
-      {/* Replace AddToShelfAction with AddToShelfButton */}
       <div className="relative w-full h-full">
-        <AddToShelfButton
+        {/* Replace the two buttons with a single action menu */}
+        <ShelfCardActionMenu
           contentId={shelf.shelf_id}
           contentType="Shelf"
-          position="top-right"
+          currentShelfId={shelf.shelf_id}
+          parentShelfId={parentShelfId}
+          slotId={slotId}
         />
+        
         <div className="text-center p-4 h-full flex flex-col items-center justify-center">
           <div className="flex items-center justify-center mb-2">
             <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -90,9 +105,11 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
 };
 
 // Public variant of the shelf card used for displaying shelves in lists
-export const PublicShelfCard: React.FC<PublicShelfCardProps> = ({ 
+export const PublicShelfCard: React.FC<ExtendedPublicShelfCardProps> = ({ 
   shelf, 
-  onViewShelf 
+  onViewShelf,
+  parentShelfId,
+  slotId
 }) => {
   // Skip null safety checks as they should be handled by the parent component
   const slotCount = Object.keys(shelf.slots).length;
@@ -111,13 +128,16 @@ export const PublicShelfCard: React.FC<PublicShelfCardProps> = ({
         </div>
       }
     >
-      {/* Add the AddToShelfButton to the public shelf card as well */}
+      {/* Replace the two buttons with a single action menu */}
       <div className="relative w-full h-full">
-        <AddToShelfButton
+        <ShelfCardActionMenu
           contentId={shelf.shelf_id}
           contentType="Shelf"
-          position="top-right"
+          currentShelfId={shelf.shelf_id}
+          parentShelfId={parentShelfId}
+          slotId={slotId}
         />
+        
         <div className="text-center p-4 h-full flex flex-col items-center justify-center">
           <div className="flex items-center justify-center mb-2">
             <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

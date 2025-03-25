@@ -23,7 +23,7 @@ As is the nature of permissionless software, people can use it however they want
 
 ### Architecture
 
-lbry.fun logic is a simplified fork of lbry.app's core logic. It however makes no secondary token, designed to accrue all generated value back to $ALEX.
+lbry.fun logic is a simplified fork of lbry.app's core logic. It however makes no fork of Alexandria Tokens, and is designed to accrue all generated value back to $ALEX.
 
 #### Core Canisters:
 

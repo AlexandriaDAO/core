@@ -20,7 +20,7 @@ import { Check, Link, Database, Copy } from "lucide-react";
 import { getNftOwnerInfo } from '@/apps/Modules/shared/utils/nftOwner';
 import { formatPrincipal, formatBalance, convertE8sToToken } from '@/apps/Modules/shared/utils/tokenUtils';
 import { createTokenAdapter, determineTokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
-import { AddToShelfButton } from '@/apps/app/Perpetua/features/shared';
+import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 
 // Constants
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
@@ -305,10 +305,10 @@ const NftDisplay = ({ tokenId, onViewDetails, inShelf = false }: {
       >
         <div className="relative w-full h-full">
           {!inShelf && (
-            <AddToShelfButton
+            <ShelfCardActionMenu
               contentId={tokenId}
               contentType="Nft"
-              position="top-right"
+              className="top-2 right-2"
             />
           )}
           

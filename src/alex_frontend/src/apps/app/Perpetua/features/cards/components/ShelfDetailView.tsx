@@ -22,7 +22,7 @@ import { buildRoutes } from "../../../routes";
 // Import our extracted components
 import NftDisplay from '../components/NftDisplay';
 import { ShelfContentDisplay, MarkdownContentDisplay, BlogMarkdownDisplay } from '../components/ContentDisplays';
-import { AddToShelfButton } from '@/apps/app/Perpetua/features/shared';
+import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 
 // Main ShelfDetailView component
 export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
@@ -248,12 +248,15 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
       
       return renderDraggableWrapper(
         <div className="relative">
-          <AddToShelfButton 
-            contentId={nftId} 
+          {/* Replace buttons with action menu */}
+          <ShelfCardActionMenu
+            contentId={nftId}
             contentType="Nft"
             currentShelfId={shelf.shelf_id}
-            position="top-right"
+            parentShelfId={shelf.shelf_id}
+            slotId={slotKey}
           />
+          
           <NftDisplay 
             tokenId={nftId} 
             onViewDetails={handleNftDetails}
@@ -267,16 +270,13 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     if (isShelfContent(slot.content)) {
       return renderDraggableWrapper(
         <div className="relative">
-          <AddToShelfButton 
-            contentId={slot.content.Shelf}
-            contentType="Shelf"
-            currentShelfId={shelf.shelf_id}
-            position="top-right"
-          />
+          {/* ShelfContentDisplay already has the ShelfCardActionMenu */}
           <ShelfContentDisplay 
             shelfId={slot.content.Shelf} 
             owner={shelf.owner.toString()}
             onClick={() => handleContentClick(slotKey)}
+            parentShelfId={shelf.shelf_id}
+            slotId={slotKey}
           />
         </div>
       );
@@ -286,16 +286,20 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     if (isMarkdownContent(slot.content)) {
       return renderDraggableWrapper(
         <div className="relative">
-          <AddToShelfButton 
+          {/* Replace buttons with action menu */}
+          <ShelfCardActionMenu
             contentId={slot.content.Markdown}
             contentType="Markdown"
             currentShelfId={shelf.shelf_id}
-            position="top-right"
+            parentShelfId={shelf.shelf_id}
+            slotId={slotKey}
           />
           <MarkdownContentDisplay 
             content={slot.content.Markdown} 
             owner={shelf.owner.toString()}
             onClick={() => handleContentClick(slotKey)}
+            parentShelfId={shelf.shelf_id}
+            slotId={slotKey}
           />
         </div>
       );
