@@ -1,5 +1,5 @@
 use candid::{CandidType, Deserialize, Principal};
-use crate::storage::{Slot, SlotContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE};
+use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE};
 use crate::guard::not_anon;
 use crate::auth;
 
@@ -8,10 +8,10 @@ use crate::auth;
 pub struct ShelfUpdate {
     pub title: Option<String>,
     pub description: Option<String>,
-    pub slots: Option<Vec<Slot>>,
+    pub items: Option<Vec<Item>>,
 }
 
-/// Creates a new shelf with the provided metadata and slots
+/// Creates a new shelf with the provided metadata and items
 /// 
 /// Stores the newly created shelf in the global registry and
 /// establishes the appropriate ownership and reference tracking.
@@ -19,16 +19,16 @@ pub struct ShelfUpdate {
 pub async fn store_shelf(
     title: String,
     description: Option<String>,
-    slots: Vec<Slot>,
+    items: Vec<Item>,
 ) -> Result<String, String> {
     let caller = ic_cdk::caller();
-    let shelf = create_shelf(title, description, slots).await?;
+    let shelf = create_shelf(title, description, items).await?;
     let shelf_id = shelf.shelf_id.clone();
     let now = shelf.created_at;
 
     // Store NFT references
-    for slot in shelf.slots.values() {
-        if let SlotContent::Nft(nft_id) = &slot.content {
+    for item in shelf.items.values() {
+        if let ItemContent::Nft(nft_id) = &item.content {
             NFT_SHELVES.with(|nft_shelves| {
                 let mut nft_map = nft_shelves.borrow_mut();
                 let mut shelves = nft_map.get(nft_id).unwrap_or_default();
@@ -84,12 +84,12 @@ pub fn update_shelf_metadata(
     })
 }
 
-/// Manually rebalances the slot positions within a shelf
+/// Manually rebalances the item positions within a shelf
 /// 
 /// This can be useful when many reorderings have caused position values to become too close,
 /// which could lead to precision issues or unexpected ordering behavior.
 #[ic_cdk::update(guard = "not_anon")]
-pub fn rebalance_shelf_slots(shelf_id: String) -> Result<(), String> {
+pub fn rebalance_shelf_items(shelf_id: String) -> Result<(), String> {
     let caller = ic_cdk::caller();
     
     // Use the auth helper to handle edit permissions check and update

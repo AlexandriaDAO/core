@@ -13,7 +13,7 @@ import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.di
  * to shelves and get a list of shelves that can be edited.
  */
 export const useAddToShelf = () => {
-  const { addSlot } = useShelfOperations();
+  const { addItem } = useShelfOperations();
   const { checkEditAccess, currentUser } = useContentPermissions();
   const availableShelves = useAppSelector(selectShelves);
 
@@ -72,7 +72,7 @@ export const useAddToShelf = () => {
       }
       
       // Add the content to the shelf
-      await addSlot(targetShelf, content, contentType);
+      await addItem(targetShelf, content, contentType);
       
       toast.success(`Content added to ${targetShelf.title}`);
       return true;
@@ -81,7 +81,7 @@ export const useAddToShelf = () => {
       toast.error("Failed to add content to shelf");
       return false;
     }
-  }, [availableShelves, checkEditAccess, addSlot]);
+  }, [availableShelves, checkEditAccess, addItem]);
 
   return {
     addContentToShelf,

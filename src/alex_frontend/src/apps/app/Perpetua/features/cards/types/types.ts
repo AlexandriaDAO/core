@@ -1,4 +1,4 @@
-import { Shelf, Slot } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf, Item } from "../../../../../../../../declarations/perpetua/perpetua.did";
 import React from 'react';
 
 // Shelf related props
@@ -15,16 +15,16 @@ export interface PublicShelfCardProps {
 
 export interface ShelfDetailViewProps {
   shelf: Shelf;
-  orderedSlots: [number, Slot][];
+  orderedItems: [number, Item][];
   isEditMode: boolean;
-  editedSlots: [number, Slot][];
+  editedItems: [number, Item][];
   hasEditAccess: boolean;
   onBack?: () => void;
-  onAddSlot?: (shelf: Shelf) => void;
-  onViewSlot?: (slotId: number) => void;
+  onAddItem?: (shelf: Shelf) => void;
+  onViewItem?: (itemId: number) => void;
   onEnterEditMode: () => void;
   onCancelEditMode: () => void;
-  onSaveSlotOrder: () => Promise<void>;
+  onSaveItemOrder: () => Promise<void>;
   handleDragStart: (index: number) => void;
   handleDragOver: (e: React.DragEvent, index: number) => void;
   handleDragEnd: () => void;

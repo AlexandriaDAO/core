@@ -7,7 +7,7 @@ import {
 } from "@/lib/components/dropdown-menu";
 import { Button } from "@/lib/components/button";
 
-interface SlotActionMenuProps {
+interface ItemActionMenuProps {
   children: React.ReactNode;
   align?: "start" | "center" | "end";
   side?: "top" | "right" | "bottom" | "left";
@@ -15,12 +15,12 @@ interface SlotActionMenuProps {
 }
 
 /**
- * A reusable menu component for slot actions
+ * A reusable menu component for item actions
  * 
  * This menu is triggered by a three-dots icon button and can contain any number
  * of action menu items as children.
  */
-export const SlotActionMenu: React.FC<SlotActionMenuProps> = ({
+export const ItemActionMenu: React.FC<ItemActionMenuProps> = ({
   children,
   align = "end",
   side = "bottom",

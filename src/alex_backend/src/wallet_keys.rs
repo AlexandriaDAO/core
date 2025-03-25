@@ -171,9 +171,3 @@ pub fn get_librarian_keys(principal: Principal) -> Vec<Keys> {
             .unwrap_or_default()
     })
 }
-
-
-
-
-
-

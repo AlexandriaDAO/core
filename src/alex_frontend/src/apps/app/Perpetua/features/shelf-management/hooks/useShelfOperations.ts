@@ -9,13 +9,13 @@ import {
 import {
   loadShelves, 
   createShelf as createShelfAction, 
-  addSlot as addSlotAction,
-  reorderSlot as reorderSlotAction,
+  addItem as addItemAction,
+  reorderItem as reorderItemAction,
   updateShelfMetadata,
-  createAndAddShelfSlot as createAndAddShelfSlotAction,
-  removeSlot as removeSlotAction
+  createAndAddShelfItem as createAndAddShelfItemAction,
+  removeItem as removeItemAction
 } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
-import { createFindSlotById } from "../../../utils";
+import { createFindItemById } from "../../../utils";
 import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
 
 // Custom hook for shelf operations
@@ -39,22 +39,22 @@ export const useShelfOperations = () => {
     }));
   }, [identity, dispatch]);
 
-  const addSlot = useCallback(async (shelf: Shelf, content: string, type: "Nft" | "Markdown" | "Shelf", referenceSlotId?: number | null, before?: boolean): Promise<void> => {
+  const addItem = useCallback(async (shelf: Shelf, content: string, type: "Nft" | "Markdown" | "Shelf", referenceItemId?: number | null, before?: boolean): Promise<void> => {
     if (!identity) return;
-    await dispatch(addSlotAction({ 
+    await dispatch(addItemAction({ 
       shelf, 
       content, 
       type,
       principal: identity.getPrincipal(),
-      referenceSlotId,
+      referenceItemId,
       before
     }));
   }, [identity, dispatch]);
 
-  const createAndAddShelfSlot = useCallback(async (parentShelfId: string, title: string, description: string): Promise<string | null> => {
+  const createAndAddShelfItem = useCallback(async (parentShelfId: string, title: string, description: string): Promise<string | null> => {
     if (!identity) return null;
     try {
-      const result = await dispatch(createAndAddShelfSlotAction({
+      const result = await dispatch(createAndAddShelfItemAction({
         parentShelfId,
         title,
         description,
@@ -63,51 +63,51 @@ export const useShelfOperations = () => {
       
       return result.newShelfId || null;
     } catch (error) {
-      console.error("Failed to create and add shelf slot:", error);
+      console.error("Failed to create and add shelf item:", error);
       return null;
     }
   }, [identity, dispatch]);
 
-  const reorderSlot = useCallback(async (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean): Promise<void> => {
+  const reorderItem = useCallback(async (shelfId: string, itemId: number, referenceItemId: number | null, before: boolean): Promise<void> => {
     if (!identity) return;
-    await dispatch(reorderSlotAction({ 
+    await dispatch(reorderItemAction({ 
       shelfId, 
-      slotId, 
-      referenceSlotId, 
+      itemId, 
+      referenceItemId, 
       before,
       principal: identity.getPrincipal()
     }));
   }, [identity, dispatch]);
 
-  const removeSlot = useCallback(async (shelfId: string, slotId: number): Promise<boolean> => {
+  const removeItem = useCallback(async (shelfId: string, itemId: number): Promise<boolean> => {
     if (!identity) {
-      console.error("Cannot remove slot: No identity available");
+      console.error("Cannot remove item: No identity available");
       return false;
     }
-    console.log(`Attempting to remove slot ${slotId} from shelf ${shelfId}`);
+    console.log(`Attempting to remove item ${itemId} from shelf ${shelfId}`);
     try {
-      console.log("Dispatching removeSlotAction with:", {
+      console.log("Dispatching removeItemAction with:", {
         shelfId, 
-        slotId,
+        itemId,
         principal: identity.getPrincipal().toString()
       });
       
-      const result = await dispatch(removeSlotAction({ 
+      const result = await dispatch(removeItemAction({ 
         shelfId, 
-        slotId,
+        itemId,
         principal: identity.getPrincipal()
       })).unwrap();
       
-      console.log("RemoveSlot result:", result);
+      console.log("RemoveItem result:", result);
       return true;
     } catch (error) {
-      console.error("Failed to remove slot:", error);
+      console.error("Failed to remove item:", error);
       return false;
     }
   }, [identity, dispatch]);
 
-  // Helper function to find a slot by ID across all shelves
-  const findSlotById = createFindSlotById(shelves);
+  // Helper function to find a item by ID across all shelves
+  const findItemById = createFindItemById(shelves);
 
   const updateMetadata = async (shelfId: string, title?: string, description?: string) => {
     try {
@@ -129,11 +129,11 @@ export const useShelfOperations = () => {
     shelves,
     loading,
     createShelf,
-    addSlot,
-    createAndAddShelfSlot,
-    reorderSlot,
-    findSlotById,
+    addItem,
+    createAndAddShelfItem,
+    reorderItem,
+    findItemById,
     updateMetadata,
-    removeSlot,
+    removeItem,
   };
 }; 

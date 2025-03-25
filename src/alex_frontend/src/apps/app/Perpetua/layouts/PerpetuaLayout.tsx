@@ -14,18 +14,18 @@ import {
   UnifiedShelvesUI,
   UserShelvesUI
 } from "../features/cards";
-import { NewSlotDialog } from "../features/slots";
+import { NewItemDialog } from "../features/items";
 import { NewShelfDialog } from "../features/shelf-management/components";
 import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
 
 const PerpetuaLayout: React.FC = () => {
   // Core data hooks
-  const { shelves, loading: personalLoading, createShelf, addSlot, reorderSlot } = useShelfOperations();
+  const { shelves, loading: personalLoading, createShelf, addItem, reorderItem } = useShelfOperations();
   const { publicShelves, loading: publicLoading, loadMoreShelves } = usePublicShelfOperations();
   
   // Dialog state
   const [isNewShelfDialogOpen, setIsNewShelfDialogOpen] = useState(false);
-  const [isNewSlotDialogOpen, setIsNewSlotDialogOpen] = useState(false);
+  const [isNewItemDialogOpen, setIsNewItemDialogOpen] = useState(false);
   
   // Redux state
   const dispatch = useAppDispatch();
@@ -57,7 +57,7 @@ const PerpetuaLayout: React.FC = () => {
   }, [shelfId, shelves, publicShelves, dispatch, userId]);
   
   // Action handlers
-  const handleAddSlot = useCallback(() => setIsNewSlotDialogOpen(true), []);
+  const handleAddItem = useCallback(() => setIsNewItemDialogOpen(true), []);
   const handleCreateShelf = useCallback(() => setIsNewShelfDialogOpen(true), []);
   
   const handleNewShelfSubmit = useCallback(async (title: string, description: string) => {
@@ -65,16 +65,16 @@ const PerpetuaLayout: React.FC = () => {
     setIsNewShelfDialogOpen(false);
   }, [createShelf]);
   
-  const handleNewSlotSubmit = useCallback(async (content: string, type: "Nft" | "Markdown" | "Shelf") => {
+  const handleNewItemSubmit = useCallback(async (content: string, type: "Nft" | "Markdown" | "Shelf") => {
     if (selectedShelf) {
-      await addSlot(selectedShelf, content, type);
-      setIsNewSlotDialogOpen(false);
+      await addItem(selectedShelf, content, type);
+      setIsNewItemDialogOpen(false);
     }
-  }, [selectedShelf, addSlot]);
+  }, [selectedShelf, addItem]);
   
-  const handleReorderSlot = useCallback(async (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean) => {
-    await reorderSlot(shelfId, slotId, referenceSlotId, before);
-  }, [reorderSlot]);
+  const handleReorderItem = useCallback(async (shelfId: string, itemId: number, referenceItemId: number | null, before: boolean) => {
+    await reorderItem(shelfId, itemId, referenceItemId, before);
+  }, [reorderItem]);
   
   // Render the appropriate view based on the route
   const renderView = () => {
@@ -86,8 +86,8 @@ const PerpetuaLayout: React.FC = () => {
         <ShelfDetailContainer 
           shelf={selectedShelf}
           onBack={goToShelves}
-          onAddSlot={hasEditAccess ? handleAddSlot : undefined}
-          onReorderSlot={hasEditAccess ? handleReorderSlot : undefined}
+          onAddItem={hasEditAccess ? handleAddItem : undefined}
+          onReorderItem={hasEditAccess ? handleReorderItem : undefined}
           hasEditAccess={hasEditAccess}
         />
       );
@@ -152,10 +152,10 @@ const PerpetuaLayout: React.FC = () => {
         onSubmit={handleNewShelfSubmit}
       />
       
-      <NewSlotDialog 
-        isOpen={isNewSlotDialogOpen}
-        onClose={() => setIsNewSlotDialogOpen(false)}
-        onSubmit={handleNewSlotSubmit}
+      <NewItemDialog 
+        isOpen={isNewItemDialogOpen}
+        onClose={() => setIsNewItemDialogOpen(false)}
+        onSubmit={handleNewItemSubmit}
       />
     </>
   );

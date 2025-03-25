@@ -19,13 +19,13 @@ export const ShelfContentDisplay = ({
   owner, 
   onClick,
   parentShelfId,
-  slotId
+  itemId
 }: { 
   shelfId: string, 
   owner: string, 
   onClick: () => void,
   parentShelfId?: string,
-  slotId?: number
+  itemId?: number
 }) => (
   <ContentCard
     id={`shelf-${shelfId}`}
@@ -49,7 +49,7 @@ export const ShelfContentDisplay = ({
         contentId={shelfId}
         contentType="Shelf"
         parentShelfId={parentShelfId}
-        slotId={slotId}
+        itemId={itemId}
       />
       
       <div className="w-full h-full flex items-center justify-center">
@@ -73,13 +73,13 @@ export const MarkdownContentDisplay = ({
   owner, 
   onClick,
   parentShelfId,
-  slotId
+  itemId
 }: { 
   content: string, 
   owner: string, 
   onClick: () => void,
   parentShelfId?: string,
-  slotId?: number
+  itemId?: number
 }) => {
   const preview = content.substring(0, 30) + (content.length > 30 ? '...' : '');
   
@@ -106,7 +106,7 @@ export const MarkdownContentDisplay = ({
           contentId={content}
           contentType="Markdown"
           parentShelfId={parentShelfId}
-          slotId={slotId}
+          itemId={itemId}
         />
         
         <div className="w-full h-full flex items-center justify-center overflow-hidden">

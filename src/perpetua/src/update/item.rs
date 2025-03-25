@@ -1,57 +1,57 @@
 use candid::{CandidType, Deserialize, Principal};
-use crate::storage::{Slot, SlotContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE};
+use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE};
 use crate::guard::not_anon;
 use crate::auth;
 use crate::update::utils::{verify_nft_ownership, shelf_exists, is_self_reference};
 
-/// Input structure for reordering a slot within a shelf
+/// Input structure for reordering a item within a shelf
 #[derive(CandidType, Deserialize)]
-pub struct SlotReorderInput {
-    /// The ID of the slot to move
-    pub slot_id: u32,
-    /// The reference slot to position relative to (if None, will be placed at the end)
-    pub reference_slot_id: Option<u32>,
-    /// Whether to place before (true) or after (false) the reference slot
+pub struct ItemReorderInput {
+    /// The ID of the item to move
+    pub item_id: u32,
+    /// The reference item to position relative to (if None, will be placed at the end)
+    pub reference_item_id: Option<u32>,
+    /// Whether to place before (true) or after (false) the reference item
     pub before: bool,
 }
 
-/// Input structure for adding a new slot to a shelf
+/// Input structure for adding a new item to a shelf
 #[derive(CandidType, Deserialize)]
-pub struct AddSlotInput {
-    /// The content of the new slot (NFT, Shelf, or other type)
-    pub content: SlotContent,
-    /// The reference slot to position relative to (if None, will be placed at the end)
-    pub reference_slot_id: Option<u32>,
-    /// Whether to place before (true) or after (false) the reference slot
+pub struct AddItemInput {
+    /// The content of the new item (NFT, Shelf, or other type)
+    pub content: ItemContent,
+    /// The reference item to position relative to (if None, will be placed at the end)
+    pub reference_item_id: Option<u32>,
+    /// Whether to place before (true) or after (false) the reference item
     pub before: bool,
 }
 
-/// Reorders a slot within a shelf
+/// Reorders a item within a shelf
 /// 
-/// This changes the position of an existing slot relative to other slots.
-/// The position can be specified as before or after another slot.
+/// This changes the position of an existing item relative to other items.
+/// The position can be specified as before or after another item.
 #[ic_cdk::update(guard = "not_anon")]
-pub fn reorder_shelf_slot(shelf_id: String, reorder: SlotReorderInput) -> Result<(), String> {
+pub fn reorder_shelf_item(shelf_id: String, reorder: ItemReorderInput) -> Result<(), String> {
     let caller = ic_cdk::caller();
     
     // Use the auth helper to handle edit permissions check and update
     auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
-        // Use the existing move_slot method to handle the reordering
-        shelf.move_slot(reorder.slot_id, reorder.reference_slot_id, reorder.before)
+        // Use the existing move_item method to handle the reordering
+        shelf.move_item(reorder.item_id, reorder.reference_item_id, reorder.before)
     })
 }
 
-/// Adds a single slot to an existing shelf
+/// Adds a single item to an existing shelf
 /// 
-/// This provides a specific API for adding one slot without
-/// needing to replace the entire slot list. The new slot
-/// can be positioned relative to existing slots.
+/// This provides a specific API for adding one item without
+/// needing to replace the entire item list. The new item
+/// can be positioned relative to existing items.
 #[ic_cdk::update(guard = "not_anon")]
-pub async fn add_slot_to_shelf(shelf_id: String, input: AddSlotInput) -> Result<(), String> {
+pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<(), String> {
     let caller = ic_cdk::caller();
     
     // Validate NFT ownership if applicable
-    if let SlotContent::Nft(nft_id) = &input.content {
+    if let ItemContent::Nft(nft_id) = &input.content {
         let is_owner = verify_nft_ownership(nft_id, caller).await?;
         if !is_owner {
             return Err("Unauthorized: You can only add NFTs that you own".to_string());
@@ -59,7 +59,7 @@ pub async fn add_slot_to_shelf(shelf_id: String, input: AddSlotInput) -> Result<
     }
     
     // Validate shelf existence and prevent self-references
-    if let SlotContent::Shelf(nested_shelf_id) = &input.content {
+    if let ItemContent::Shelf(nested_shelf_id) = &input.content {
         if !shelf_exists(nested_shelf_id) {
             return Err(format!("Shelf '{}' does not exist", nested_shelf_id));
         }
@@ -71,27 +71,27 @@ pub async fn add_slot_to_shelf(shelf_id: String, input: AddSlotInput) -> Result<
     
     // Use the auth helper to handle edit permissions check and update
     auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
-        // Generate new slot ID
-        let new_id = shelf.slots.keys()
+        // Generate new item ID
+        let new_id = shelf.items.keys()
             .max()
             .map_or(1, |max_id| max_id + 1);
 
-        // Create the new slot without position field
-        let new_slot = Slot {
+        // Create the new item without position field
+        let new_item = Item {
             id: new_id,
             content: input.content.clone(),
         };
 
-        // Add the slot
-        shelf.insert_slot(new_slot.clone())?;
+        // Add the item
+        shelf.insert_item(new_item.clone())?;
 
-        // If reference slot is provided, position the new slot relative to it
-        if let Some(ref_id) = input.reference_slot_id {
-            shelf.move_slot(new_id, Some(ref_id), input.before)?;
+        // If reference item is provided, position the new item relative to it
+        if let Some(ref_id) = input.reference_item_id {
+            shelf.move_item(new_id, Some(ref_id), input.before)?;
         }
 
         // Update tracking for NFT references if applicable
-        if let SlotContent::Nft(nft_id) = &input.content {
+        if let ItemContent::Nft(nft_id) = &input.content {
             NFT_SHELVES.with(|nft_shelves| {
                 let mut nft_map = nft_shelves.borrow_mut();
                 let mut shelves = nft_map.get(nft_id).unwrap_or_default();
@@ -107,33 +107,33 @@ pub async fn add_slot_to_shelf(shelf_id: String, input: AddSlotInput) -> Result<
     })
 }
 
-/// Removes a slot from an existing shelf
+/// Removes a item from an existing shelf
 /// 
-/// Only users with edit permissions can remove slots.
-/// This also handles cleanup of any references if the slot contained an NFT.
+/// Only users with edit permissions can remove items.
+/// This also handles cleanup of any references if the item contained an NFT.
 #[ic_cdk::update(guard = "not_anon")]
-pub async fn remove_slot_from_shelf(shelf_id: String, slot_id: u32) -> Result<(), String> {
+pub async fn remove_item_from_shelf(shelf_id: String, item_id: u32) -> Result<(), String> {
     let caller = ic_cdk::caller();
     
     // Use the auth helper to handle edit permissions check and update
     auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
-        // First, check if the slot exists
-        let slot_opt = shelf.slots.get(&slot_id);
-        if slot_opt.is_none() {
-            return Err(format!("Slot {} not found in shelf {}", slot_id, shelf_id));
+        // First, check if the item exists
+        let item_opt = shelf.items.get(&item_id);
+        if item_opt.is_none() {
+            return Err(format!("Item {} not found in shelf {}", item_id, shelf_id));
         }
         
-        // Get a clone of the slot to use after removal for cleanup operations
-        let slot_content = slot_opt.unwrap().content.clone();
+        // Get a clone of the item to use after removal for cleanup operations
+        let item_content = item_opt.unwrap().content.clone();
         
-        // Remove the slot
-        shelf.slots.remove(&slot_id);
+        // Remove the item
+        shelf.items.remove(&item_id);
         
-        // Update slot positions (optional, but might help maintain consistency)
+        // Update item positions (optional, but might help maintain consistency)
         shelf.ensure_balanced_positions();
         
-        // Clean up any references if the removed slot was an NFT
-        if let SlotContent::Nft(nft_id) = &slot_content {
+        // Clean up any references if the removed item was an NFT
+        if let ItemContent::Nft(nft_id) = &item_content {
             NFT_SHELVES.with(|nft_shelves| {
                 let mut nft_map = nft_shelves.borrow_mut();
                 
@@ -159,12 +159,12 @@ pub async fn remove_slot_from_shelf(shelf_id: String, slot_id: u32) -> Result<()
     })
 }
 
-/// Creates a new shelf and adds it as a slot to an existing parent shelf
+/// Creates a new shelf and adds it as a item to an existing parent shelf
 /// 
 /// This is a convenience function that combines shelf creation and
-/// slot addition in a single atomic operation.
+/// item addition in a single atomic operation.
 #[ic_cdk::update(guard = "not_anon")]
-pub async fn create_and_add_shelf_slot(
+pub async fn create_and_add_shelf_item(
     parent_shelf_id: String,
     title: String,
     description: Option<String>,
@@ -192,19 +192,19 @@ pub async fn create_and_add_shelf_slot(
             // Clone the parent shelf to work with it
             let mut parent_shelf = parent_shelf.clone();
             
-            // Generate new slot ID
-            let new_id = parent_shelf.slots.keys()
+            // Generate new item ID
+            let new_id = parent_shelf.items.keys()
                 .max()
                 .map_or(1, |max_id| max_id + 1);
 
-            // Create the new slot
-            let new_slot = Slot {
+            // Create the new item
+            let new_item = Item {
                 id: new_id,
-                content: SlotContent::Shelf(new_shelf_id.clone()),
+                content: ItemContent::Shelf(new_shelf_id.clone()),
             };
 
-            // Add the slot to parent shelf
-            if let Err(e) = parent_shelf.insert_slot(new_slot.clone()) {
+            // Add the item to parent shelf
+            if let Err(e) = parent_shelf.insert_item(new_item.clone()) {
                 return Err(e);
             }
             

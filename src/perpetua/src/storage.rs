@@ -62,16 +62,16 @@ thread_local! {
 
 // Updated Shelf structure
 #[derive(CandidType, Deserialize, Clone, Debug)]
-pub enum SlotContent {
+pub enum ItemContent {
     Nft(String), // NFT ID
     Markdown(String), // Markdown text
     Shelf(String), // Shelf ID - allows nesting shelves
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
-pub struct Slot {
-    pub id: u32, // Unique slot ID
-    pub content: SlotContent,
+pub struct Item {
+    pub id: u32, // Unique item ID
+    pub content: ItemContent,
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
@@ -81,8 +81,8 @@ pub struct Shelf {
     pub description: Option<String>,
     pub owner: Principal,
     pub editors: Vec<Principal>,      // List of principals with edit access
-    pub slots: BTreeMap<u32, Slot>,      // Slots stored by ID
-    pub slot_positions: BTreeMap<u32, f64>, // Map: slot_id -> position number
+    pub items: BTreeMap<u32, Item>,      // Items stored by ID
+    pub item_positions: BTreeMap<u32, f64>, // Map: item_id -> position number
     pub created_at: u64,
     pub updated_at: u64,
     pub needs_rebalance: bool,           // Flag indicating if positions should be rebalanced
@@ -105,7 +105,7 @@ impl Storable for Shelf {
     };
 }
 
-impl Storable for Slot {
+impl Storable for Item {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
     }
@@ -151,13 +151,13 @@ impl Storable for TimestampedShelves {
 }
 
 impl Shelf {
-    pub fn insert_slot(&mut self, slot: Slot) -> Result<(), String> {
-        if self.slots.len() >= 500 {
-            return Err("Maximum slot limit reached (500)".to_string());
+    pub fn insert_item(&mut self, item: Item) -> Result<(), String> {
+        if self.items.len() >= 500 {
+            return Err("Maximum item limit reached (500)".to_string());
         }
         
         // Check for circular references
-        if let SlotContent::Shelf(ref nested_shelf_id) = slot.content {
+        if let ItemContent::Shelf(ref nested_shelf_id) = item.content {
             // Prevent a shelf from containing itself
             if nested_shelf_id == &self.shelf_id {
                 return Err("Circular reference: A shelf cannot contain itself".to_string());
@@ -169,21 +169,21 @@ impl Shelf {
             }
         }
         
-        let slot_id = slot.id;
+        let item_id = item.id;
         
         // Initialize position at the end
-        let new_position = self.slot_positions.values()
+        let new_position = self.item_positions.values()
             .max_by(|a, b| a.partial_cmp(b).unwrap())
             .map_or(0.0, |pos| pos + 1.0);
             
         // Update the float position
-        self.slot_positions.insert(slot_id, new_position);
+        self.item_positions.insert(item_id, new_position);
         
-        // Store the slot without a position field
-        self.slots.insert(slot_id, slot);
+        // Store the item without a position field
+        self.items.insert(item_id, item);
         
-        // Check if we need rebalancing (when there are many slots)
-        if self.slots.len() > 100 {
+        // Check if we need rebalancing (when there are many items)
+        if self.items.len() > 100 {
             self.check_position_spacing();
         }
         
@@ -192,10 +192,10 @@ impl Shelf {
 
     // Helper method to check for circular references in the shelf hierarchy
     fn has_circular_reference(&self, shelf_id: &str) -> bool {
-        // Check if any slot in the current shelf contains the target shelf
-        for slot in self.slots.values() {
-            if let SlotContent::Shelf(nested_id) = &slot.content {
-                // If this slot contains the shelf we're checking, we have a circular reference
+        // Check if any item in the current shelf contains the target shelf
+        for item in self.items.values() {
+            if let ItemContent::Shelf(nested_id) = &item.content {
+                // If this item contains the shelf we're checking, we have a circular reference
                 if nested_id == shelf_id {
                     return true;
                 }
@@ -220,22 +220,22 @@ impl Shelf {
         false
     }
 
-    pub fn move_slot(&mut self, slot_id: u32, reference_slot_id: Option<u32>, before: bool) -> Result<(), String> {
-        // First verify the slot exists
-        if !self.slots.contains_key(&slot_id) {
-            return Err("Slot not found".to_string());
+    pub fn move_item(&mut self, item_id: u32, reference_item_id: Option<u32>, before: bool) -> Result<(), String> {
+        // First verify the item exists
+        if !self.items.contains_key(&item_id) {
+            return Err("Item not found".to_string());
         }
 
         // Get current positions
-        let positions: Vec<(u32, f64)> = self.slot_positions.iter()
+        let positions: Vec<(u32, f64)> = self.item_positions.iter()
             .map(|(&id, &pos)| (id, pos))
             .collect();
             
-        let new_position = match reference_slot_id {
+        let new_position = match reference_item_id {
             Some(ref_id) => {
-                // Verify reference slot exists
-                let reference_pos = self.slot_positions.get(&ref_id)
-                    .ok_or("Reference slot not found")?;
+                // Verify reference item exists
+                let reference_pos = self.item_positions.get(&ref_id)
+                    .ok_or("Reference item not found")?;
                 
                 // Calculate new position based on neighbor
                 if before {
@@ -247,17 +247,17 @@ impl Shelf {
             None => {
                 // Move to start/end
                 if before {
-                    self.slot_positions.values()
+                    self.item_positions.values()
                         .fold(f64::INFINITY, |a, &b| a.min(b)) - 1.0
                 } else {
-                    self.slot_positions.values()
+                    self.item_positions.values()
                         .fold(f64::NEG_INFINITY, |a, &b| a.max(b)) + 1.0
                 }
             }
         };
 
         // Update the float position
-        self.slot_positions.insert(slot_id, new_position);
+        self.item_positions.insert(item_id, new_position);
         
         // Check if positions have become too close, requiring rebalancing
         self.check_position_spacing();
@@ -266,7 +266,7 @@ impl Shelf {
     }
 
     fn find_previous_position(&self, target: f64) -> f64 {
-        let prev = self.slot_positions.values()
+        let prev = self.item_positions.values()
             .filter(|&&pos| pos < target)
             .max_by(|a, b| a.partial_cmp(b).unwrap());
             
@@ -277,7 +277,7 @@ impl Shelf {
     }
 
     fn find_next_position(&self, target: f64) -> f64 {
-        let next = self.slot_positions.values()
+        let next = self.item_positions.values()
             .filter(|&&pos| pos > target)
             .min_by(|a, b| a.partial_cmp(b).unwrap());
             
@@ -287,25 +287,25 @@ impl Shelf {
         }
     }
 
-    pub fn get_ordered_slots(&self) -> Vec<Slot> {
-        let mut ordered: Vec<_> = self.slot_positions.iter().collect();
+    pub fn get_ordered_items(&self) -> Vec<Item> {
+        let mut ordered: Vec<_> = self.item_positions.iter().collect();
         ordered.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap());
         
-        // Create a new vector with cloned slots in the correct order
+        // Create a new vector with cloned items in the correct order
         ordered.into_iter()
             .filter_map(|(id, _)| {
-                self.slots.get(id).map(|slot| slot.clone())
+                self.items.get(id).map(|item| item.clone())
             })
             .collect()
     }
     
     // Checks if positions have become too close, potentially requiring rebalancing
     fn check_position_spacing(&mut self) {
-        if self.slots.len() < 2 {
+        if self.items.len() < 2 {
             return;
         }
         
-        let mut positions: Vec<f64> = self.slot_positions.values().cloned().collect();
+        let mut positions: Vec<f64> = self.item_positions.values().cloned().collect();
         positions.sort_by(|a, b| a.partial_cmp(b).unwrap());
         
         // Check minimum gap between consecutive positions
@@ -316,8 +316,8 @@ impl Shelf {
         }
         
         // If minimum gap is too small, mark for rebalancing
-        // We use a smaller threshold when we have more slots
-        let threshold = match self.slots.len() {
+        // We use a smaller threshold when we have more items
+        let threshold = match self.items.len() {
             n if n > 400 => 1e-10,
             n if n > 200 => 1e-8,
             _ => 1e-6
@@ -328,25 +328,25 @@ impl Shelf {
         }
     }
     
-    // Rebalances all slot positions to be evenly distributed
+    // Rebalances all item positions to be evenly distributed
     pub fn rebalance_positions(&mut self) {
-        if self.slots.is_empty() {
+        if self.items.is_empty() {
             return;
         }
         
         // Get current ordering
         let mut ordered_ids: Vec<u32> = Vec::new();
-        let mut ordered: Vec<_> = self.slot_positions.iter().collect();
+        let mut ordered: Vec<_> = self.item_positions.iter().collect();
         ordered.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap());
         
         for (&id, _) in ordered {
             ordered_ids.push(id);
         }
         
-        // Reset positions to be evenly spaced between 0 and (slots × 1000)
+        // Reset positions to be evenly spaced between 0 and (items × 1000)
         let step_size = 1000.0;
-        for (i, slot_id) in ordered_ids.into_iter().enumerate() {
-            self.slot_positions.insert(slot_id, (i as f64) * step_size);
+        for (i, item_id) in ordered_ids.into_iter().enumerate() {
+            self.item_positions.insert(item_id, (i as f64) * step_size);
         }
         
         self.needs_rebalance = false;
@@ -365,10 +365,10 @@ impl Shelf {
 pub async fn create_shelf(
     title: String,
     description: Option<String>,
-    slots: Vec<Slot>,
+    items: Vec<Item>,
 ) -> Result<Shelf, String> {
-    if slots.len() > 500 {
-        return Err("Cannot create shelf with more than 500 slots".to_string());
+    if items.len() > 500 {
+        return Err("Cannot create shelf with more than 500 items".to_string());
     }
     let now = ic_cdk::api::time();
     let owner = ic_cdk::caller();  // Get caller here
@@ -381,17 +381,17 @@ pub async fn create_shelf(
         description,
         owner,  // Use derived owner
         editors: Vec::new(), // Initialize editors as empty vector
-        slots: BTreeMap::new(),
-        slot_positions: BTreeMap::new(),
+        items: BTreeMap::new(),
+        item_positions: BTreeMap::new(),
         created_at: now,
         updated_at: now,
         needs_rebalance: false,
         rebalance_count: 0,
     };
 
-    // Add slots with proper ordering
-    for slot in slots {
-        shelf.insert_slot(slot)?;
+    // Add items with proper ordering
+    for item in items {
+        shelf.insert_item(item)?;
     }
 
     Ok(shelf)

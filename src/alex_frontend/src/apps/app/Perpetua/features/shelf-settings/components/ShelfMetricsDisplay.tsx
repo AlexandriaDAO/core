@@ -25,11 +25,11 @@ export const ShelfMetricsDisplay: React.FC<ShelfMetricsDisplayProps> = ({
 
   return (
     <div className="mt-6">
-      <h4 className="text-lg font-medium mb-2">Slot Position Metrics</h4>
+      <h4 className="text-lg font-medium mb-2">Item Position Metrics</h4>
       <div className="mb-3 text-sm">
         <div className="flex justify-between mb-1">
-          <span>Slots:</span>
-          <span>{formatMetricValue(metrics.slot_count)}</span>
+          <span>Items:</span>
+          <span>{formatMetricValue(metrics.item_count)}</span>
         </div>
         <div className="flex justify-between mb-1">
           <span>Min gap:</span>
@@ -59,7 +59,7 @@ export const ShelfMetricsDisplay: React.FC<ShelfMetricsDisplayProps> = ({
           className="w-full py-2 px-4 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition duration-200"
           disabled={!isRebalanceRecommended(metrics)}
         >
-          Rebalance Slots
+          Rebalance Items
         </button>
       )}
       <p className="text-xs text-gray-500 mt-2">

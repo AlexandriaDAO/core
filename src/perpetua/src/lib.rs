@@ -21,19 +21,19 @@ pub mod auth;
 pub mod storage;
 pub mod update {
     pub mod shelf;
-    pub mod slot;
+    pub mod item;
     pub mod access;
     pub mod utils;
 }
 pub mod query;
 pub mod utils;
 
-pub use storage::{Slot, Shelf};
-pub use update::shelf::{ShelfUpdate, store_shelf, update_shelf_metadata, rebalance_shelf_slots};
-pub use update::slot::{
-    SlotReorderInput, reorder_shelf_slot, 
-    AddSlotInput, add_slot_to_shelf, remove_slot_from_shelf, 
-    create_and_add_shelf_slot
+pub use storage::{Item, Shelf};
+pub use update::shelf::{ShelfUpdate, store_shelf, update_shelf_metadata, rebalance_shelf_items};
+pub use update::item::{
+    ItemReorderInput, reorder_shelf_item, 
+    AddItemInput, add_item_to_shelf, remove_item_from_shelf, 
+    create_and_add_shelf_item
 };
 pub use update::access::{add_shelf_editor, remove_shelf_editor, list_shelf_editors};
 pub use query::*;

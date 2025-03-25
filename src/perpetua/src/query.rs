@@ -1,7 +1,7 @@
 use candid::{CandidType, Principal};
 use ic_cdk;
 
-use crate::storage::{SHELVES, USER_SHELVES, GLOBAL_TIMELINE, Shelf, Slot};
+use crate::storage::{SHELVES, USER_SHELVES, GLOBAL_TIMELINE, Shelf, Item};
 
 #[derive(CandidType, Debug)]
 pub enum QueryError {
@@ -27,8 +27,8 @@ pub fn get_shelf(shelf_id: String) -> QueryResult<Shelf> {
 }
 
 #[ic_cdk::query]
-pub fn get_shelf_slots(shelf_id: String) -> QueryResult<Vec<Slot>> {
-    get_shelf(shelf_id).map(|shelf| shelf.get_ordered_slots())
+pub fn get_shelf_items(shelf_id: String) -> QueryResult<Vec<Item>> {
+    get_shelf(shelf_id).map(|shelf| shelf.get_ordered_items())
 }
 
 // User queries
@@ -108,12 +108,12 @@ pub fn get_shelf_position_metrics(shelf_id: String) -> Result<ShelfPositionMetri
         
         if let Some(shelf) = shelves_map.get(&shelf_id) {
             // Build metrics
-            let position_count = shelf.slot_positions.len();
+            let position_count = shelf.item_positions.len();
             
             // Calculate min, max, and average gap
             if position_count < 2 {
                 return Ok(ShelfPositionMetrics {
-                    slot_count: position_count,
+                    item_count: position_count,
                     min_gap: 0.0,
                     avg_gap: 0.0,
                     max_gap: 0.0,
@@ -123,7 +123,7 @@ pub fn get_shelf_position_metrics(shelf_id: String) -> Result<ShelfPositionMetri
             }
             
             // Get ordered positions
-            let mut positions: Vec<f64> = shelf.slot_positions.values().cloned().collect();
+            let mut positions: Vec<f64> = shelf.item_positions.values().cloned().collect();
             positions.sort_by(|a, b| a.partial_cmp(b).unwrap());
             
             // Calculate gaps
@@ -141,7 +141,7 @@ pub fn get_shelf_position_metrics(shelf_id: String) -> Result<ShelfPositionMetri
             let avg_gap = sum_gap / (positions.len() - 1) as f64;
             
             Ok(ShelfPositionMetrics {
-                slot_count: position_count,
+                item_count: position_count,
                 min_gap,
                 avg_gap,
                 max_gap,
@@ -156,7 +156,7 @@ pub fn get_shelf_position_metrics(shelf_id: String) -> Result<ShelfPositionMetri
 
 #[derive(CandidType)]
 pub struct ShelfPositionMetrics {
-    pub slot_count: usize,
+    pub item_count: usize,
     pub min_gap: f64,
     pub avg_gap: f64,
     pub max_gap: f64, 

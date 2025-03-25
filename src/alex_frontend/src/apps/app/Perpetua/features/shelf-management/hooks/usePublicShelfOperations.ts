@@ -9,7 +9,7 @@ import {
 import {
   loadRecentShelves
 } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
-import { createFindSlotById } from "../../../utils";
+import { createFindItemById } from "../../../utils";
 
 // Custom hook for public shelf operations
 export const usePublicShelfOperations = () => {
@@ -29,8 +29,8 @@ export const usePublicShelfOperations = () => {
     }
   }, [lastTimestamp, loading, loadRecentShelvesData]);
 
-  // Find a slot by ID across all public shelves
-  const findSlotById = createFindSlotById(publicShelves);
+  // Find a item by ID across all public shelves
+  const findItemById = createFindItemById(publicShelves);
 
   // Only load public shelves once when the hook is first used
   const initialLoadRef = React.useRef(false);
@@ -55,7 +55,7 @@ export const usePublicShelfOperations = () => {
     publicShelves,
     loading,
     loadMoreShelves,
-    findSlotById,
+    findItemById,
     refreshPublicShelves
   };
 }; 

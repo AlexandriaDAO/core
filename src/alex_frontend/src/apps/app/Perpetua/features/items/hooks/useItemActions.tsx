@@ -6,13 +6,13 @@ import { selectShelves } from "@/apps/Modules/shared/state/perpetua/perpetuaSlic
 import { toast } from "sonner";
 
 /**
- * Hook for slot management actions in Perpetua
+ * Hook for item management actions in Perpetua
  * 
- * This hook provides functions for managing slots across shelves,
+ * This hook provides functions for managing items across shelves,
  * including the ability to add content to shelves.
  */
-export const useSlotActions = () => {
-  const { addSlot, shelves, loading } = useShelfOperations();
+export const useItemActions = () => {
+  const { addItem, shelves, loading } = useShelfOperations();
   const { checkEditAccess, currentUser } = useContentPermissions();
   const availableShelves = useAppSelector(selectShelves);
 
@@ -70,7 +70,7 @@ export const useSlotActions = () => {
       }
       
       // Add the content to the shelf
-      await addSlot(targetShelf, content, contentType);
+      await addItem(targetShelf, content, contentType);
       
       toast.success(`Content added to ${targetShelf.title}`);
       return true;
@@ -79,7 +79,7 @@ export const useSlotActions = () => {
       toast.error("Failed to add content to shelf");
       return false;
     }
-  }, [shelves, checkEditAccess, addSlot]);
+  }, [shelves, checkEditAccess, addItem]);
 
   return {
     addContentToShelf,

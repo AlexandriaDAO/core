@@ -4,10 +4,10 @@ import { PerpetuaLayout } from "./layouts";
 // Export public API
 export * from "./features/shelf-management/hooks";
 export * from "./features/shelf-settings";
-export * from "./features/slots";
+export * from "./features/items";
 export * from "./features/cards";
 export { parsePathInfo, usePerpetuaNavigation, useViewState } from "./routes";
-export { createFindSlotInShelf } from "./utils";
+export { createFindItemInShelf } from "./utils";
 
 // Simple entry point
 const Perpetua: React.FC = () => {

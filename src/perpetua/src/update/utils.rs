@@ -86,7 +86,7 @@ pub fn shelf_exists(shelf_id: &String) -> bool {
 /// Checks if one shelf ID is trying to reference itself
 /// 
 /// This prevents creating circular references where a shelf
-/// contains itself as a slot.
+/// contains itself as a item.
 /// 
 /// # Arguments
 /// * `shelf_id` - The ID of the container shelf

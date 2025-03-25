@@ -12,15 +12,15 @@ import {
 } from '@/apps/Modules/shared/state/perpetua/perpetuaSlice';
 import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 
-// Extending the props interfaces to include parentShelfId and slotId
+// Extending the props interfaces to include parentShelfId and itemId
 interface ExtendedShelfCardProps extends ShelfCardProps {
   parentShelfId?: string;
-  slotId?: number;
+  itemId?: number;
 }
 
 interface ExtendedPublicShelfCardProps extends PublicShelfCardProps {
   parentShelfId?: string;
-  slotId?: number;
+  itemId?: number;
 }
 
 // Shelf Card Component for the library view
@@ -29,11 +29,11 @@ export const ShelfCard: React.FC<ExtendedShelfCardProps> = ({
   onViewShelf,
   showOwner = false,
   parentShelfId,
-  slotId
+  itemId
 }) => {
   const createdAt = convertTimestamp(shelf.created_at, 'combined');
   const updatedAt = convertTimestamp(shelf.updated_at, 'combined');
-  const slotCount = Object.keys(shelf.slots).length;
+  const itemCount = Object.keys(shelf.items).length;
   
   // Get collaboration status
   const isOwner = useAppSelector(selectIsOwner(shelf.shelf_id));
@@ -60,7 +60,7 @@ export const ShelfCard: React.FC<ExtendedShelfCardProps> = ({
       footer={
         <div className="flex justify-between items-center w-full mt-2">
           <div className="text-xs text-muted-foreground">
-            {slotCount} {slotCount === 1 ? 'item' : 'items'}
+            {itemCount} {itemCount === 1 ? 'item' : 'items'}
           </div>
           {/* Show collaboration indicators */}
           <div className="flex items-center gap-2">
@@ -87,7 +87,7 @@ export const ShelfCard: React.FC<ExtendedShelfCardProps> = ({
           contentType="Shelf"
           currentShelfId={shelf.shelf_id}
           parentShelfId={parentShelfId}
-          slotId={slotId}
+          itemId={itemId}
         />
         
         <div className="text-center p-4 h-full flex flex-col items-center justify-center">
@@ -109,10 +109,10 @@ export const PublicShelfCard: React.FC<ExtendedPublicShelfCardProps> = ({
   shelf, 
   onViewShelf,
   parentShelfId,
-  slotId
+  itemId
 }) => {
   // Skip null safety checks as they should be handled by the parent component
-  const slotCount = Object.keys(shelf.slots).length;
+  const itemCount = Object.keys(shelf.items).length;
   
   return (
     <ContentCard
@@ -123,7 +123,7 @@ export const PublicShelfCard: React.FC<ExtendedPublicShelfCardProps> = ({
       footer={
         <div className="flex items-center justify-between w-full">
           <div className="text-xs text-muted-foreground">
-            {slotCount} {slotCount === 1 ? 'item' : 'items'}
+            {itemCount} {itemCount === 1 ? 'item' : 'items'}
           </div>
         </div>
       }
@@ -135,7 +135,7 @@ export const PublicShelfCard: React.FC<ExtendedPublicShelfCardProps> = ({
           contentType="Shelf"
           currentShelfId={shelf.shelf_id}
           parentShelfId={parentShelfId}
-          slotId={slotId}
+          itemId={itemId}
         />
         
         <div className="text-center p-4 h-full flex flex-col items-center justify-center">

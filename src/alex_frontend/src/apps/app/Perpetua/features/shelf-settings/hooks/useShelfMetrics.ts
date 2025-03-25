@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 
 export interface ShelfMetrics {
-  slot_count: bigint;
+  item_count: bigint;
   min_gap: number;
   max_gap: number;
   avg_gap: number;

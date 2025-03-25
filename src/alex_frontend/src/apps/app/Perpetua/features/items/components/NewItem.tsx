@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
-import { Shelf, Slot } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf, Item } from "../../../../../../../../declarations/perpetua/perpetua.did";
 import { X, Plus } from "lucide-react";
 import NftSearchDialog from "./NftSearch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -22,12 +22,12 @@ interface DialogProps {
   onClose: () => void;
 }
 
-interface NewSlotDialogProps extends DialogProps {
+interface NewItemDialogProps extends DialogProps {
   onSubmit: (content: string, type: "Nft" | "Markdown" | "Shelf") => Promise<void>;
   shelves?: Shelf[];
 }
 
-const NewSlotDialog: React.FC<NewSlotDialogProps> = ({ isOpen, onClose, onSubmit, shelves: propShelves }) => {
+const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit, shelves: propShelves }) => {
   const dispatch = useAppDispatch();
   const [content, setContent] = useState("");
   const [type, setType] = useState<"Nft" | "Markdown" | "Shelf">("Markdown");
@@ -48,22 +48,22 @@ const NewSlotDialog: React.FC<NewSlotDialogProps> = ({ isOpen, onClose, onSubmit
   const currentShelf = useAppSelector(selectSelectedShelf);
 
   // Get the shelf operations
-  const { createAndAddShelfSlot } = useShelfOperations();
+  const { createAndAddShelfItem } = useShelfOperations();
 
-  // Filter out the current shelf and any shelves already added as slots
+  // Filter out the current shelf and any shelves already added as items
   const availableShelves = useMemo(() => {
     // If we have shelves from props, use those (for backwards compatibility)
     if (propShelves) return propShelves;
     
     if (!allShelves || !currentShelf) return [];
     
-    // Find any shelves that are already added as slots in the current shelf
+    // Find any shelves that are already added as items in the current shelf
     const shelvesInCurrentShelf = new Set<string>();
     
-    if (currentShelf.slots) {
-      currentShelf.slots.forEach(([key, slot]: [number, Slot]) => {
-        if (slot.content && 'Shelf' in slot.content) {
-          shelvesInCurrentShelf.add(slot.content.Shelf);
+    if (currentShelf.items) {
+      currentShelf.items.forEach(([key, item]: [number, Item]) => {
+        if (item.content && 'Shelf' in item.content) {
+          shelvesInCurrentShelf.add(item.content.Shelf);
         }
       });
     }
@@ -107,7 +107,7 @@ const NewSlotDialog: React.FC<NewSlotDialogProps> = ({ isOpen, onClose, onSubmit
         return;
       }
       
-      console.log(`Submitting ${type} slot with content: ${finalContent.substring(0, 30)}${finalContent.length > 30 ? '...' : ''}`);
+      console.log(`Submitting ${type} item with content: ${finalContent.substring(0, 30)}${finalContent.length > 30 ? '...' : ''}`);
       
       // Call parent component's onSubmit function
       await onSubmit(finalContent, type);
@@ -150,14 +150,14 @@ const NewSlotDialog: React.FC<NewSlotDialogProps> = ({ isOpen, onClose, onSubmit
       setIsCreatingShelf(true);
       
       // Use the new integrated function instead of the two-step process
-      const newShelfId = await createAndAddShelfSlot(
+      const newShelfId = await createAndAddShelfItem(
         currentShelf.shelf_id,
         newShelfTitle,
         newShelfDescription
       );
       
       if (newShelfId) {
-        toast.success(`New shelf "${newShelfTitle}" created and added as a slot`);
+        toast.success(`New shelf "${newShelfTitle}" created and added as a item`);
         
         // Clear the form
         setNewShelfTitle("");
@@ -224,7 +224,7 @@ Your content here..."
                   <div>
                     <Label htmlFor="shelfSelect" className="block mb-1">Select an existing shelf</Label>
                     <p className="text-sm text-muted-foreground mb-3">
-                      Add an existing shelf as a slot in your current shelf
+                      Add an existing shelf as a item in your current shelf
                     </p>
                   </div>
                   <Button 
@@ -355,4 +355,4 @@ Your content here..."
   );
 };
 
-export default NewSlotDialog; 
+export default NewItemDialog; 

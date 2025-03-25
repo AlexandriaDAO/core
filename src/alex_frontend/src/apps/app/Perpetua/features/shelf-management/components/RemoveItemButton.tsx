@@ -16,9 +16,9 @@ import {
   AlertDialogTrigger,
 } from "@/lib/components/alert-dialog";
 
-interface RemoveSlotButtonProps {
+interface RemoveItemButtonProps {
   shelfId: string;
-  slotId: number;
+  itemId: number;
   position?: "top-right" | "top-left" | "bottom-right" | "bottom-left";
   buttonSize?: "sm" | "md";
   label?: string; // Optional label to show instead of just the icon
@@ -26,20 +26,20 @@ interface RemoveSlotButtonProps {
 }
 
 /**
- * Button component that allows removing a slot from a shelf
+ * Button component that allows removing a item from a shelf
  * 
  * This component renders a trash button that, when clicked, opens a confirmation dialog
- * before removing the slot from the shelf.
+ * before removing the item from the shelf.
  */
-export const RemoveSlotButton: React.FC<RemoveSlotButtonProps> = ({ 
+export const RemoveItemButton: React.FC<RemoveItemButtonProps> = ({ 
   shelfId, 
-  slotId,
+  itemId,
   position = "top-right",
   buttonSize = "sm",
   label,
   variant = "secondary"
 }) => {
-  const { removeSlot } = useShelfOperations();
+  const { removeItem } = useShelfOperations();
   const { checkEditAccess } = useContentPermissions();
   
   // Only render if user has edit access to the shelf
@@ -55,11 +55,11 @@ export const RemoveSlotButton: React.FC<RemoveSlotButtonProps> = ({
     }
   };
   
-  // Handle slot removal
-  const handleRemoveSlot = useCallback(async () => {
-    console.log(`Removing slot ${slotId} from shelf ${shelfId}`);
+  // Handle item removal
+  const handleRemoveItem = useCallback(async () => {
+    console.log(`Removing item ${itemId} from shelf ${shelfId}`);
     try {
-      const success = await removeSlot(shelfId, slotId);
+      const success = await removeItem(shelfId, itemId);
       
       if (success) {
         toast.success("Item removed from shelf");
@@ -67,10 +67,10 @@ export const RemoveSlotButton: React.FC<RemoveSlotButtonProps> = ({
         toast.error("Failed to remove item from shelf");
       }
     } catch (error) {
-      console.error("Error removing slot:", error);
+      console.error("Error removing item:", error);
       toast.error("Error removing item from shelf");
     }
-  }, [shelfId, slotId, removeSlot]);
+  }, [shelfId, itemId, removeItem]);
   
   // Handle button click
   const handleButtonClick = (e: React.MouseEvent) => {
@@ -102,7 +102,7 @@ export const RemoveSlotButton: React.FC<RemoveSlotButtonProps> = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={e => e.stopPropagation()}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleRemoveSlot}>Remove</AlertDialogAction>
+          <AlertDialogAction onClick={handleRemoveItem}>Remove</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

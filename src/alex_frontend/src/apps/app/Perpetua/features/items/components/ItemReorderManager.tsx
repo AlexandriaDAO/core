@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { Shelf, Slot } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf, Item } from "../../../../../../../../declarations/perpetua/perpetua.did";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { reorderSlot as reorderSlotAction } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
+import { reorderItem as reorderItemAction } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
 import { useIdentity } from "@/hooks/useIdentity";
 
-interface SlotReorderManagerProps {
+interface ItemReorderManagerProps {
   shelf: Shelf;
-  orderedSlots: [number, Slot][];
+  orderedItems: [number, Item][];
   hasEditAccess: boolean;
   children: (props: {
     isEditMode: boolean;
-    editedSlots: [number, Slot][];
+    editedItems: [number, Item][];
     enterEditMode: () => void;
     cancelEditMode: () => void;
-    saveSlotOrder: () => Promise<void>;
+    saveItemOrder: () => Promise<void>;
     handleDragStart: (index: number) => void;
     handleDragOver: (e: React.DragEvent, index: number) => void;
     handleDragEnd: () => void;
@@ -21,9 +21,9 @@ interface SlotReorderManagerProps {
   }) => React.ReactNode;
 }
 
-export const SlotReorderManager: React.FC<SlotReorderManagerProps> = ({
+export const ItemReorderManager: React.FC<ItemReorderManagerProps> = ({
   shelf,
-  orderedSlots,
+  orderedItems,
   hasEditAccess,
   children
 }) => {
@@ -32,13 +32,13 @@ export const SlotReorderManager: React.FC<SlotReorderManagerProps> = ({
   
   // State for managing edit mode and drag-and-drop
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editedSlots, setEditedSlots] = useState<[number, Slot][]>([]);
+  const [editedItems, setEditedItems] = useState<[number, Item][]>([]);
   const [draggedItem, setDraggedItem] = useState<number | null>(null);
   const [dragOverItem, setDragOverItem] = useState<number | null>(null);
   
   // Enter edit mode
   const enterEditMode = () => {
-    setEditedSlots([...orderedSlots]);
+    setEditedItems([...orderedItems]);
     setIsEditMode(true);
     setDraggedItem(null);
     setDragOverItem(null);
@@ -64,23 +64,23 @@ export const SlotReorderManager: React.FC<SlotReorderManagerProps> = ({
     setDragOverItem(null);
   };
 
-  // Add drop handler for reordering slots
+  // Add drop handler for reordering items
   const handleDrop = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     
     // Only proceed if both items are defined
     if (draggedItem !== null && dragOverItem !== null && draggedItem !== dragOverItem) {
-      // Create a copy of the edited slots array
-      const newSlots = [...editedSlots];
+      // Create a copy of the edited items array
+      const newItems = [...editedItems];
       
       // Remove the dragged item
-      const draggedItemContent = newSlots.splice(draggedItem, 1)[0];
+      const draggedItemContent = newItems.splice(draggedItem, 1)[0];
       
       // Insert at the new position
-      newSlots.splice(dragOverItem, 0, draggedItemContent);
+      newItems.splice(dragOverItem, 0, draggedItemContent);
       
       // Update state with the new order
-      setEditedSlots(newSlots);
+      setEditedItems(newItems);
       
       // Reset drag items
       setDraggedItem(null);
@@ -88,8 +88,8 @@ export const SlotReorderManager: React.FC<SlotReorderManagerProps> = ({
     }
   };
   
-  // Handler for saving the edited slots order
-  const saveSlotOrder = async () => {
+  // Handler for saving the edited items order
+  const saveItemOrder = async () => {
     if (!isEditMode || !identity || !hasEditAccess) return;
     
     // Check if identity.identity exists before accessing it
@@ -99,41 +99,41 @@ export const SlotReorderManager: React.FC<SlotReorderManagerProps> = ({
       try {
         // Get original order to compare with
         const originalOrderMap = new Map();
-        orderedSlots.forEach(([id], index) => {
+        orderedItems.forEach(([id], index) => {
           originalOrderMap.set(id, index);
         });
         
         // Find the differences and apply each move
-        // We need to reorder one slot at a time using the backend API
-        for (let newIndex = 0; newIndex < editedSlots.length; newIndex++) {
-          const [slotId] = editedSlots[newIndex];
-          const oldIndex = originalOrderMap.get(slotId);
+        // We need to reorder one item at a time using the backend API
+        for (let newIndex = 0; newIndex < editedItems.length; newIndex++) {
+          const [itemId] = editedItems[newIndex];
+          const oldIndex = originalOrderMap.get(itemId);
           
           // If position has changed
           if (oldIndex !== newIndex) {
-            // Find the reference slot (the one we'll place this slot before or after)
-            let referenceSlotId: number | null = null;
+            // Find the reference item (the one we'll place this item before or after)
+            let referenceItemId: number | null = null;
             let before = false;
             
             if (newIndex === 0) {
               // If moving to the first position, place before the current first item
-              if (editedSlots.length > 1) {
-                const [firstSlotId] = editedSlots[1];
-                referenceSlotId = firstSlotId;
+              if (editedItems.length > 1) {
+                const [firstItemId] = editedItems[1];
+                referenceItemId = firstItemId;
                 before = true;
               }
             } else {
               // Otherwise, place after the previous item
-              const [prevSlotId] = editedSlots[newIndex - 1];
-              referenceSlotId = prevSlotId;
+              const [prevItemId] = editedItems[newIndex - 1];
+              referenceItemId = prevItemId;
               before = false;
             }
             
-            // Call the reorderSlot action
-            await dispatch(reorderSlotAction({
+            // Call the reorderItem action
+            await dispatch(reorderItemAction({
               shelfId: shelf.shelf_id,
-              slotId,
-              referenceSlotId,
+              itemId,
+              referenceItemId,
               before,
               principal
             }));
@@ -143,7 +143,7 @@ export const SlotReorderManager: React.FC<SlotReorderManagerProps> = ({
         // Exit edit mode after successful updates
         setIsEditMode(false);
       } catch (error) {
-        console.error("Failed to save slot order:", error);
+        console.error("Failed to save item order:", error);
         // Could add error notification here
       }
     }
@@ -151,10 +151,10 @@ export const SlotReorderManager: React.FC<SlotReorderManagerProps> = ({
 
   return children({
     isEditMode,
-    editedSlots,
+    editedItems,
     enterEditMode,
     cancelEditMode,
-    saveSlotOrder,
+    saveItemOrder,
     handleDragStart,
     handleDragOver,
     handleDragEnd,
@@ -162,4 +162,4 @@ export const SlotReorderManager: React.FC<SlotReorderManagerProps> = ({
   });
 };
 
-export default SlotReorderManager; 
+export default ItemReorderManager; 

@@ -206,7 +206,7 @@ const mainRoutes = [
 								element: <Outlet />,
 							},
 							{
-								path: "my-library/slot/:slotId",
+								path: "my-library/item/:itemId",
 								element: <Outlet />,
 							},
 							{ path: "explore", element: <Outlet /> },
@@ -215,7 +215,7 @@ const mainRoutes = [
 								element: <Outlet />,
 							},
 							{
-								path: "explore/slot/:slotId",
+								path: "explore/item/:itemId",
 								element: <Outlet />,
 							},
 							{ path: "user/:userId", element: <Outlet /> },
@@ -224,7 +224,7 @@ const mainRoutes = [
 								element: <Outlet />,
 							},
 							{
-								path: "user/:userId/slot/:slotId",
+								path: "user/:userId/item/:itemId",
 								element: <Outlet />,
 							},
 						],

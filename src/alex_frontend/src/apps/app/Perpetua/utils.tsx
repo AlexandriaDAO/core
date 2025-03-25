@@ -1,17 +1,17 @@
 import React from "react";
-import { Slot, Shelf, SlotContent } from "../../../../../declarations/perpetua/perpetua.did";
+import { Item, Shelf, ItemContent } from "../../../../../declarations/perpetua/perpetua.did";
 import { Button } from "@/lib/components/button";
 
 /**
- * Creates a function to find a slot by its ID across multiple shelves
+ * Creates a function to find a item by its ID across multiple shelves
  */
-export const createFindSlotById = (shelves: Shelf[]) => 
-	(slotId: number): { slot: Slot; shelf: Shelf; slotKey: number } | null => {
+export const createFindItemById = (shelves: Shelf[]) => 
+	(itemId: number): { item: Item; shelf: Shelf; itemKey: number } | null => {
 		for (const shelf of shelves) {
-			for (const [key, slotEntry] of Object.entries(shelf.slots)) {
-				const [slotKey, slot] = slotEntry as [number, Slot];
-				if (slot.id === slotId) {
-					return { slot, shelf, slotKey };
+			for (const [key, itemEntry] of Object.entries(shelf.items)) {
+				const [itemKey, item] = itemEntry as [number, Item];
+				if (item.id === itemId) {
+					return { item, shelf, itemKey };
 				}
 			}
 		}
@@ -19,14 +19,14 @@ export const createFindSlotById = (shelves: Shelf[]) =>
 	};
 
 /**
- * Creates a function to find a slot by its ID within a single shelf
+ * Creates a function to find a item by its ID within a single shelf
  */
-export const createFindSlotInShelf = (shelf: Shelf) => 
-	(slotId: number): Slot | null => {
-		for (const [key, slotEntry] of Object.entries(shelf.slots)) {
-			const [slotKey, slot] = slotEntry as [number, Slot];
-			if (slot.id === slotId) {
-				return slot;
+export const createFindItemInShelf = (shelf: Shelf) => 
+	(itemId: number): Item | null => {
+		for (const [key, itemEntry] of Object.entries(shelf.items)) {
+			const [itemKey, item] = itemEntry as [number, Item];
+			if (item.id === itemId) {
+				return item;
 			}
 		}
 		return null;
@@ -35,21 +35,21 @@ export const createFindSlotInShelf = (shelf: Shelf) =>
 /**
  * Type guard for shelf content
  */
-export const isShelfContent = (content: SlotContent): content is { 'Shelf': string } => {
+export const isShelfContent = (content: ItemContent): content is { 'Shelf': string } => {
 	return 'Shelf' in content;
 };
 
 /**
  * Type guard for NFT content
  */
-export const isNftContent = (content: SlotContent): content is { 'Nft': string } => {
+export const isNftContent = (content: ItemContent): content is { 'Nft': string } => {
 	return 'Nft' in content;
 };
 
 /**
  * Type guard for Markdown content
  */
-export const isMarkdownContent = (content: SlotContent): content is { 'Markdown': string } => {
+export const isMarkdownContent = (content: ItemContent): content is { 'Markdown': string } => {
 	return 'Markdown' in content;
 };
 

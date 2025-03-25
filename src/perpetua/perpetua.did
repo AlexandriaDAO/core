@@ -1,7 +1,14 @@
-type AddSlotInput = record {
-  content : SlotContent;
-  reference_slot_id : opt nat32;
+type AddItemInput = record {
+  content : ItemContent;
+  reference_item_id : opt nat32;
   before : bool;
+};
+type Item = record { id : nat32; content : ItemContent };
+type ItemContent = variant { Nft : text; Shelf : text; Markdown : text };
+type ItemReorderInput = record {
+  reference_item_id : opt nat32;
+  before : bool;
+  item_id : nat32;
 };
 type QueryError = variant {
   ShelfNotFound;
@@ -14,8 +21,8 @@ type Result = variant { Ok; Err : text };
 type Result_1 = variant { Ok : text; Err : text };
 type Result_2 = variant { Ok : vec Shelf; Err : QueryError };
 type Result_3 = variant { Ok : Shelf; Err : QueryError };
-type Result_4 = variant { Ok : ShelfPositionMetrics; Err : text };
-type Result_5 = variant { Ok : vec Slot; Err : QueryError };
+type Result_4 = variant { Ok : vec Item; Err : QueryError };
+type Result_5 = variant { Ok : ShelfPositionMetrics; Err : text };
 type Result_6 = variant { Ok : vec principal; Err : text };
 type Shelf = record {
   title : text;
@@ -26,39 +33,32 @@ type Shelf = record {
   created_at : nat64;
   shelf_id : text;
   rebalance_count : nat32;
-  slots : vec record { nat32; Slot };
+  item_positions : vec record { nat32; float64 };
+  items : vec record { nat32; Item };
   needs_rebalance : bool;
-  slot_positions : vec record { nat32; float64 };
 };
 type ShelfPositionMetrics = record {
   min_gap : float64;
-  slot_count : nat64;
   rebalance_count : nat32;
   avg_gap : float64;
   max_gap : float64;
   needs_rebalance : bool;
-};
-type Slot = record { id : nat32; content : SlotContent };
-type SlotContent = variant { Nft : text; Shelf : text; Markdown : text };
-type SlotReorderInput = record {
-  slot_id : nat32;
-  reference_slot_id : opt nat32;
-  before : bool;
+  item_count : nat64;
 };
 service : {
+  add_item_to_shelf : (text, AddItemInput) -> (Result);
   add_shelf_editor : (text, principal) -> (Result);
-  add_slot_to_shelf : (text, AddSlotInput) -> (Result);
-  create_and_add_shelf_slot : (text, text, opt text) -> (Result_1);
+  create_and_add_shelf_item : (text, text, opt text) -> (Result_1);
   get_recent_shelves : (opt nat64, opt nat64) -> (Result_2) query;
   get_shelf : (text) -> (Result_3) query;
-  get_shelf_position_metrics : (text) -> (Result_4) query;
-  get_shelf_slots : (text) -> (Result_5) query;
+  get_shelf_items : (text) -> (Result_4) query;
+  get_shelf_position_metrics : (text) -> (Result_5) query;
   get_user_shelves : (principal, opt nat64) -> (Result_2) query;
   list_shelf_editors : (text) -> (Result_6) query;
-  rebalance_shelf_slots : (text) -> (Result);
+  rebalance_shelf_items : (text) -> (Result);
+  remove_item_from_shelf : (text, nat32) -> (Result);
   remove_shelf_editor : (text, principal) -> (Result);
-  remove_slot_from_shelf : (text, nat32) -> (Result);
-  reorder_shelf_slot : (text, SlotReorderInput) -> (Result);
-  store_shelf : (text, opt text, vec Slot) -> (Result_1);
+  reorder_shelf_item : (text, ItemReorderInput) -> (Result);
+  store_shelf : (text, opt text, vec Item) -> (Result_1);
   update_shelf_metadata : (text, opt text, opt text) -> (Result);
 }

@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
 import { useIdentity } from "@/hooks/useIdentity";
-import { Shelf, Slot } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf, Item } from "../../../../../../../../declarations/perpetua/perpetua.did";
 import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { rebalanceShelfSlots } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
-import { SlotReorderManager } from "../../slots/components/SlotReorderManager";
+import { rebalanceShelfItems } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
+import { ItemReorderManager } from "../../items/components/ItemReorderManager";
 import { ShelfDetailView } from "../../cards";
 import { ShelfSettingsDialog } from "../../shelf-settings";
 import { useShelfOperations } from "../hooks";
@@ -26,8 +26,8 @@ import { isShelfContent } from "../../../utils";
 export interface ShelfDetailProps {
 	shelf: Shelf;
 	onBack: () => void;
-	onAddSlot?: (shelf: Shelf) => void;
-	onReorderSlot?: (shelfId: string, slotId: number, referenceSlotId: number | null, before: boolean) => Promise<void>;
+	onAddItem?: (shelf: Shelf) => void;
+	onReorderItem?: (shelfId: string, itemId: number, referenceItemId: number | null, before: boolean) => Promise<void>;
 	hasEditAccess?: boolean;
 }
 
@@ -35,8 +35,8 @@ export interface ShelfDetailProps {
 export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({ 
 	shelf, 
 	onBack,
-	onAddSlot,
-	onReorderSlot,
+	onAddItem,
+	onReorderItem,
 	hasEditAccess = true
 }) => {
 	const pathInfo = parsePathInfo(window.location.pathname);
@@ -47,23 +47,23 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 	// Access the updateMetadata function from ShelfOperations
 	const { updateMetadata } = useShelfOperations();
 	
-	// Improved ordered slots calculation
-	const orderedSlots = useMemo(() => {
-		// Extract the slots using the slot_positions array for order
-		if (!shelf.slot_positions || !shelf.slots) return [];
+	// Improved ordered items calculation
+	const orderedItems = useMemo(() => {
+		// Extract the items using the item_positions array for order
+		if (!shelf.item_positions || !shelf.items) return [];
 		
 		// Convert positions to array and sort by position values
-		const positionEntries = shelf.slot_positions.map(([id, position]: [number, number]) => ({ id, position }));
+		const positionEntries = shelf.item_positions.map(([id, position]: [number, number]) => ({ id, position }));
 		positionEntries.sort((a: {position: number}, b: {position: number}) => a.position - b.position);
 		
-		// Map to [id, slot] pairs in the correct order
+		// Map to [id, item] pairs in the correct order
 		return positionEntries.map(({ id }: {id: number}) => {
-			const slotPair = shelf.slots?.find(([slotId]: [number, any]) => slotId === id);
-			return slotPair ? slotPair : null;
-		}).filter((slot: any): slot is [number, Slot] => slot !== null);
+			const itemPair = shelf.items?.find(([itemId]: [number, any]) => itemId === id);
+			return itemPair ? itemPair : null;
+		}).filter((item: any): item is [number, Item] => item !== null);
 	}, [JSON.stringify({ 
-		slots: shelf.slots?.map(([id]: [number, any]) => id), 
-		positions: shelf.slot_positions?.map(([id, pos]: [number, number]) => `${id}:${pos}`)
+		items: shelf.items?.map(([id]: [number, any]) => id), 
+		positions: shelf.item_positions?.map(([id, pos]: [number, number]) => `${id}:${pos}`)
 	})]);
 	
 	// Existing rebalance handler
@@ -72,34 +72,34 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 		// Check if identity.identity exists before accessing it
 		if (identity.identity) {
 			const principal = identity.identity.getPrincipal().toString();
-			dispatch(rebalanceShelfSlots({ shelfId, principal }));
+			dispatch(rebalanceShelfItems({ shelfId, principal }));
 		}
 	};
 	
-	// Handle slot click - for shelf slots, navigate to that shelf
-	const handleViewSlot = (slotId: number) => {
-		// Find the slot with this ID
-		const slotEntry = orderedSlots.find(([key, _]: [number, Slot]) => key === slotId);
+	// Handle item click - for shelf items, navigate to that shelf
+	const handleViewItem = (itemId: number) => {
+		// Find the item with this ID
+		const itemEntry = orderedItems.find(([key, _]: [number, Item]) => key === itemId);
 		
-		if (slotEntry && isShelfContent(slotEntry[1].content)) {
-			// If this is a shelf slot, navigate to that shelf
-			const shelfId = slotEntry[1].content.Shelf;
+		if (itemEntry && isShelfContent(itemEntry[1].content)) {
+			// If this is a shelf item, navigate to that shelf
+			const shelfId = itemEntry[1].content.Shelf;
 			goToShelf(shelfId);
 		}
 	};
 	
 	return (
-		<SlotReorderManager
+		<ItemReorderManager
 			shelf={shelf}
-			orderedSlots={orderedSlots}
+			orderedItems={orderedItems}
 			hasEditAccess={hasEditAccess}
 		>
 			{({
 				isEditMode,
-				editedSlots,
+				editedItems,
 				enterEditMode,
 				cancelEditMode,
-				saveSlotOrder,
+				saveItemOrder,
 				handleDragStart,
 				handleDragOver,
 				handleDragEnd,
@@ -107,16 +107,16 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 			}) => (
 				<ShelfDetailView
 					shelf={shelf}
-					orderedSlots={orderedSlots}
+					orderedItems={orderedItems}
 					isEditMode={isEditMode}
-					editedSlots={editedSlots}
+					editedItems={editedItems}
 					hasEditAccess={hasEditAccess}
 					onBack={onBack}
-					onAddSlot={onAddSlot}
-					onViewSlot={handleViewSlot}
+					onAddItem={onAddItem}
+					onViewItem={handleViewItem}
 					onEnterEditMode={enterEditMode}
 					onCancelEditMode={cancelEditMode}
-					onSaveSlotOrder={saveSlotOrder}
+					onSaveItemOrder={saveItemOrder}
 					handleDragStart={handleDragStart}
 					handleDragOver={handleDragOver}
 					handleDragEnd={handleDragEnd}
@@ -133,7 +133,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 					}
 				/>
 			)}
-		</SlotReorderManager>
+		</ItemReorderManager>
 	);
 };
 

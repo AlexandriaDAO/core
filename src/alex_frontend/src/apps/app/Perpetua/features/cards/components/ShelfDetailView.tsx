@@ -4,7 +4,7 @@ import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { ArrowLeft, Edit, Plus, X, Grid, List, Home, User } from "lucide-react";
 import { renderBreadcrumbs, isNftContent, isShelfContent, isMarkdownContent } from "../../../utils";
 import { ShelfDetailViewProps } from '../types/types';
-import { Slot } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Item } from "../../../../../../../../declarations/perpetua/perpetua.did";
 import { PrincipalDisplay } from '@/apps/Modules/shared/components/PrincipalDisplay';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
@@ -27,16 +27,16 @@ import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 // Main ShelfDetailView component
 export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
   shelf,
-  orderedSlots,
+  orderedItems,
   isEditMode,
-  editedSlots,
+  editedItems,
   hasEditAccess,
   onBack,
-  onAddSlot,
-  onViewSlot,
+  onAddItem,
+  onViewItem,
   onEnterEditMode,
   onCancelEditMode,
-  onSaveSlotOrder,
+  onSaveItemOrder,
   handleDragStart,
   handleDragOver,
   handleDragEnd,
@@ -49,10 +49,10 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
   const userId = pathInfo.userId;
   const backButtonLabel = pathInfo.backButtonLabel;
   
-  const slots = isEditMode ? editedSlots : orderedSlots;
+  const items = isEditMode ? editedItems : orderedItems;
   const [isSaving, setIsSaving] = useState(false);
-  const [viewingSlotContent, setViewingSlotContent] = useState<{
-    slotId: number;
+  const [viewingItemContent, setViewingItemContent] = useState<{
+    itemId: number;
     content: any;
     transaction: Transaction | null;
     contentUrls?: {
@@ -95,7 +95,7 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await onSaveSlotOrder();
+      await onSaveItemOrder();
     } finally {
       setIsSaving(false);
     }
@@ -103,64 +103,64 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
 
   // For viewing content in modal
   const handleNftDetails = async (tokenId: string) => {
-    // For NFTs, we no longer need to set viewingSlotContent since the modal is handled in NftDisplay
-    // We still want to call onViewSlot if provided, for other side effects
-    if (onViewSlot) {
-      // Find the slot key for this NFT
-      const slotEntry = slots.find(([_, slot]: [number, Slot]) => 
-        isNftContent(slot.content) && slot.content.Nft === tokenId
+    // For NFTs, we no longer need to set viewingItemContent since the modal is handled in NftDisplay
+    // We still want to call onViewItem if provided, for other side effects
+    if (onViewItem) {
+      // Find the item key for this NFT
+      const itemEntry = items.find(([_, item]: [number, Item]) => 
+        isNftContent(item.content) && item.content.Nft === tokenId
       );
       
-      if (slotEntry) {
-        onViewSlot(slotEntry[0]);
+      if (itemEntry) {
+        onViewItem(itemEntry[0]);
       }
     }
   };
 
-  // Make sure onViewSlot is properly typed to handle potential undefined
-  const handleShelfContent = (slotId: number) => {
-    if (onViewSlot) {
-      onViewSlot(slotId);
+  // Make sure onViewItem is properly typed to handle potential undefined
+  const handleShelfContent = (itemId: number) => {
+    if (onViewItem) {
+      onViewItem(itemId);
     } else {
-      console.error("onViewSlot callback is not defined");
+      console.error("onViewItem callback is not defined");
     }
   };
 
-  // Handle clicking a slot to view content
-  const handleContentClick = (slotId: number) => {
-    // Find the slot with this id
-    const slotEntry = slots.find(([key, slot]: [number, Slot]) => key === slotId);
-    if (!slotEntry) return;
+  // Handle clicking a item to view content
+  const handleContentClick = (itemId: number) => {
+    // Find the item with this id
+    const itemEntry = items.find(([key, item]: [number, Item]) => key === itemId);
+    if (!itemEntry) return;
     
-    const [_, slot] = slotEntry;
+    const [_, item] = itemEntry;
     
-    // Make sure slot.content exists
-    if (!slot.content) {
-      console.error("Slot content is undefined for slot ID:", slotId);
+    // Make sure item.content exists
+    if (!item.content) {
+      console.error("Item content is undefined for item ID:", itemId);
       return;
     }
     
-    // If this is a shelf slot, navigate to that shelf instead of showing modal
-    if (isShelfContentSafe(slot.content)) {
-      handleShelfContent(slotId);
+    // If this is a shelf item, navigate to that shelf instead of showing modal
+    if (isShelfContentSafe(item.content)) {
+      handleShelfContent(itemId);
       return;
     }
     
     // For markdown content, create a temporary transaction-like object with proper URLs
-    if (isMarkdownContentSafe(slot.content)) {
+    if (isMarkdownContentSafe(item.content)) {
       const markdownTransaction: Transaction = {
-        id: `markdown-${slotId}`,
+        id: `markdown-${itemId}`,
         owner: shelf.owner.toString(),
         tags: []  // Required empty array of tags
       };
       
-      setViewingSlotContent({
-        slotId,
+      setViewingItemContent({
+        itemId,
         content: {
           type: 'markdown',
-          textContent: getMarkdownContentSafe(slot.content),
+          textContent: getMarkdownContentSafe(item.content),
           urls: {
-            fullUrl: `data:text/markdown;charset=utf-8,${encodeURIComponent(getMarkdownContentSafe(slot.content))}`,
+            fullUrl: `data:text/markdown;charset=utf-8,${encodeURIComponent(getMarkdownContentSafe(item.content))}`,
             coverUrl: null,
             thumbnailUrl: null
           }
@@ -171,15 +171,15 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     }
     
     // For other content types, set up basic viewing content with default contentUrls
-    const nftId = getNftContentSafe(slot.content);
-    setViewingSlotContent({ 
-      slotId, 
-      content: slot.content,
+    const nftId = getNftContentSafe(item.content);
+    setViewingItemContent({ 
+      itemId, 
+      content: item.content,
       transaction: null,
       contentUrls: {
         fullUrl: nftId 
           ? `https://arweave.net/${nftId}` 
-          : `data:text/plain;charset=utf-8,${encodeURIComponent(JSON.stringify(slot.content, null, 2))}`,
+          : `data:text/plain;charset=utf-8,${encodeURIComponent(JSON.stringify(item.content, null, 2))}`,
         coverUrl: null,
         thumbnailUrl: null
       }
@@ -209,13 +209,13 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     return content && typeof content === 'object' && 'Markdown' in content ? content.Markdown : '';
   };
 
-  // Render a card for each slot
-  const renderCard = (slotKey: number, slot: any, index: number) => {
+  // Render a card for each item
+  const renderCard = (itemKey: number, item: any, index: number) => {
     // Wrap the card content in a draggable container if in edit mode
     const renderDraggableWrapper = (content: React.ReactNode) => (
       <div 
-        key={`slot-${slotKey}`}
-        className="slot-card" 
+        key={`item-${itemKey}`}
+        className="item-card" 
         draggable={isEditMode}
         onDragStart={isEditMode ? () => handleDragStart(index) : undefined}
         onDragOver={isEditMode ? (e) => handleDragOver(e, index) : undefined}
@@ -224,9 +224,9 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
       >
         {isEditMode && (
           <div className="absolute top-0 left-0 z-40 bg-black/50 text-white p-1 text-xs">
-            Slot #{slotKey}
+            Item #{itemKey}
             <div 
-              className="slot-drag-handle ml-2 inline-block text-gray-400 p-1 rounded hover:bg-gray-700 cursor-grab"
+              className="item-drag-handle ml-2 inline-block text-gray-400 p-1 rounded hover:bg-gray-700 cursor-grab"
               onMouseDown={(e) => {
                 // Prevent the click event on the parent div
                 e.stopPropagation();
@@ -243,8 +243,8 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     );
 
     // For NFT content - Use the NftDisplay component
-    if (isNftContent(slot.content)) {
-      const nftId = slot.content.Nft;
+    if (isNftContent(item.content)) {
+      const nftId = item.content.Nft;
       
       return renderDraggableWrapper(
         <div className="relative">
@@ -254,7 +254,7 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
             contentType="Nft"
             currentShelfId={shelf.shelf_id}
             parentShelfId={shelf.shelf_id}
-            slotId={slotKey}
+            itemId={itemKey}
           />
           
           <NftDisplay 
@@ -267,39 +267,39 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     }
     
     // For shelf content
-    if (isShelfContent(slot.content)) {
+    if (isShelfContent(item.content)) {
       return renderDraggableWrapper(
         <div className="relative">
           {/* ShelfContentDisplay already has the ShelfCardActionMenu */}
           <ShelfContentDisplay 
-            shelfId={slot.content.Shelf} 
+            shelfId={item.content.Shelf} 
             owner={shelf.owner.toString()}
-            onClick={() => handleContentClick(slotKey)}
+            onClick={() => handleContentClick(itemKey)}
             parentShelfId={shelf.shelf_id}
-            slotId={slotKey}
+            itemId={itemKey}
           />
         </div>
       );
     }
     
     // For markdown content 
-    if (isMarkdownContent(slot.content)) {
+    if (isMarkdownContent(item.content)) {
       return renderDraggableWrapper(
         <div className="relative">
           {/* Replace buttons with action menu */}
           <ShelfCardActionMenu
-            contentId={slot.content.Markdown}
+            contentId={item.content.Markdown}
             contentType="Markdown"
             currentShelfId={shelf.shelf_id}
             parentShelfId={shelf.shelf_id}
-            slotId={slotKey}
+            itemId={itemKey}
           />
           <MarkdownContentDisplay 
-            content={slot.content.Markdown} 
+            content={item.content.Markdown} 
             owner={shelf.owner.toString()}
-            onClick={() => handleContentClick(slotKey)}
+            onClick={() => handleContentClick(itemKey)}
             parentShelfId={shelf.shelf_id}
-            slotId={slotKey}
+            itemId={itemKey}
           />
         </div>
       );
@@ -308,8 +308,8 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     // Fallback for unknown content
     return renderDraggableWrapper(
       <ContentCard
-        id={`unknown-${slotKey}`}
-        onClick={() => handleContentClick(slotKey)}
+        id={`unknown-${itemKey}`}
+        onClick={() => handleContentClick(itemKey)}
         owner={shelf.owner.toString()}
         component="Perpetua"
         footer={
@@ -329,7 +329,7 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
 
   // Handle closing the modal
   const handleCloseModal = () => {
-    setViewingSlotContent(null);
+    setViewingItemContent(null);
   };
 
   return (
@@ -417,14 +417,14 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
             </>
           )}
           
-          {hasEditAccess && onAddSlot && (
+          {hasEditAccess && onAddItem && (
             <Button
               variant="primary"
               className="flex items-center gap-1 h-8 text-sm"
-              onClick={() => onAddSlot(shelf)}
+              onClick={() => onAddItem(shelf)}
             >
               <Plus className="w-4 h-4" />
-              Add Slot
+              Add Item
             </Button>
           )}
         </div>
@@ -443,17 +443,17 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
       </div>
       
       <div className="flex-1 px-4 pb-4">
-        {slots.length === 0 ? (
+        {items.length === 0 ? (
           <div className="text-center py-10 text-muted-foreground h-full flex flex-col items-center justify-center">
             <p className="mb-2">This shelf is empty.</p>
-            {hasEditAccess && onAddSlot && (
+            {hasEditAccess && onAddItem && (
               <Button
                 variant="outline"
                 className="flex items-center gap-1 mx-auto"
-                onClick={() => onAddSlot(shelf)}
+                onClick={() => onAddItem(shelf)}
               >
                 <Plus className="w-4 h-4" />
-                Add First Slot
+                Add First Item
               </Button>
             )}
           </div>
@@ -462,8 +462,8 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
             {viewMode === 'grid' ? (
               // Grid View Layout
               <ContentGrid>
-                {slots.map(([slotKey, slot]: [number, Slot], index: number) => (
-                  renderCard(slotKey, slot, index)
+                {items.map(([itemKey, item]: [number, Item], index: number) => (
+                  renderCard(itemKey, item, index)
                 ))}
               </ContentGrid>
             ) : (
@@ -472,18 +472,18 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
                 {/* Group content by type - markdown vs. non-markdown */}
                 {(() => {
                   // Define types
-                  type BlogItemType = [number, any, number]; // [slotKey, slot, index]
+                  type BlogItemType = [number, any, number]; // [itemKey, item, index]
                   type SectionType = 'markdown' | 'visual' | null;
                   type BlogSection = { type: SectionType; items: BlogItemType[] };
                   
-                  // Group consecutive markdown slots together
+                  // Group consecutive markdown items together
                   const blogSections: BlogSection[] = [];
                   let currentGroup: BlogItemType[] = [];
                   let currentType: SectionType = null; // 'markdown' or 'visual'
                   
-                  // Process all slots and group them
-                  slots.forEach(([slotKey, slot]: [number, Slot], index: number) => {
-                    const isMarkdown = isMarkdownContent(slot.content);
+                  // Process all items and group them
+                  items.forEach(([itemKey, item]: [number, Item], index: number) => {
+                    const isMarkdown = isMarkdownContent(item.content);
                     const currentContentType: SectionType = isMarkdown ? 'markdown' : 'visual';
                     
                     // Start a new group if type changes
@@ -493,7 +493,7 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
                     }
                     
                     // Add to current group
-                    currentGroup.push([slotKey, slot, index]);
+                    currentGroup.push([itemKey, item, index]);
                     currentType = currentContentType;
                   });
                   
@@ -508,10 +508,10 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
                       {section.type === 'markdown' ? (
                         // Render markdown content in a vertical flow
                         <div className="prose dark:prose-invert max-w-none">
-                          {section.items.map(([slotKey, slot, originalIndex]: [number, Slot, number]) => (
+                          {section.items.map(([itemKey, item, originalIndex]: [number, Item, number]) => (
                             <div 
-                              key={`slot-${slotKey}`} 
-                              className={`slot-card mb-8 ${isEditMode ? 'relative border border-dashed border-border p-6 rounded-md bg-muted/5' : ''}`}
+                              key={`item-${itemKey}`} 
+                              className={`item-card mb-8 ${isEditMode ? 'relative border border-dashed border-border p-6 rounded-md bg-muted/5' : ''}`}
                               draggable={isEditMode}
                               onDragStart={isEditMode ? () => handleDragStart(originalIndex) : undefined}
                               onDragOver={isEditMode ? (e) => handleDragOver(e, originalIndex) : undefined}
@@ -520,9 +520,9 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
                             >
                               {isEditMode && (
                                 <div className="absolute top-2 right-2 z-40 bg-background text-foreground px-2 py-1 text-xs rounded-md border border-border">
-                                  Slot #{slotKey}
+                                  Item #{itemKey}
                                   <div 
-                                    className="slot-drag-handle ml-2 inline-block text-gray-400 p-1 rounded hover:bg-gray-700 cursor-grab"
+                                    className="item-drag-handle ml-2 inline-block text-gray-400 p-1 rounded hover:bg-gray-700 cursor-grab"
                                     onMouseDown={(e) => { e.stopPropagation(); }}
                                   >
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -532,8 +532,8 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
                                 </div>
                               )}
                               <BlogMarkdownDisplay 
-                                content={(slot.content as any).Markdown} 
-                                onClick={() => handleContentClick(slotKey)} 
+                                content={(item.content as any).Markdown} 
+                                onClick={() => handleContentClick(itemKey)} 
                               />
                             </div>
                           ))}
@@ -543,8 +543,8 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
                         <div className="visual-content-row mb-8">
                           <h3 className="text-sm uppercase tracking-wide text-muted-foreground mb-4 font-semibold">Visual Content</h3>
                           <ContentGrid>
-                            {section.items.map(([slotKey, slot, originalIndex]: [number, Slot, number]) => (
-                              renderCard(slotKey, slot, originalIndex)
+                            {section.items.map(([itemKey, item, originalIndex]: [number, Item, number]) => (
+                              renderCard(itemKey, item, originalIndex)
                             ))}
                           </ContentGrid>
                         </div>
@@ -559,49 +559,49 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
       </div>
       
       {/* Shared Modal for Viewing Content */}
-      {viewingSlotContent && (
-        <Dialog open={!!viewingSlotContent} onOpenChange={handleCloseModal}>
+      {viewingItemContent && (
+        <Dialog open={!!viewingItemContent} onOpenChange={handleCloseModal}>
           <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col">
             <DialogTitle className="sr-only">Content Viewer</DialogTitle>
             
             <div className="w-full h-full overflow-y-auto">
               <div className="p-6">
-                {viewingSlotContent.transaction && (
+                {viewingItemContent.transaction && (
                   <ContentRenderer
-                    key={viewingSlotContent.transaction.id}
-                    transaction={viewingSlotContent.transaction}
-                    content={viewingSlotContent.content}
+                    key={viewingItemContent.transaction.id}
+                    transaction={viewingItemContent.transaction}
+                    content={viewingItemContent.content}
                     contentUrls={
-                      (viewingSlotContent.content?.urls) || {
+                      (viewingItemContent.content?.urls) || {
                         fullUrl: `data:text/markdown;charset=utf-8,${encodeURIComponent(
-                          isMarkdownContentSafe(viewingSlotContent.content) 
-                            ? getMarkdownContentSafe(viewingSlotContent.content)
-                            : JSON.stringify(viewingSlotContent.content || {}, null, 2)
+                          isMarkdownContentSafe(viewingItemContent.content) 
+                            ? getMarkdownContentSafe(viewingItemContent.content)
+                            : JSON.stringify(viewingItemContent.content || {}, null, 2)
                         )}`,
                         thumbnailUrl: null,
                         coverUrl: null
                       }
                     }
-                    handleRenderError={() => handleRenderError(viewingSlotContent.transaction?.id || '')}
+                    handleRenderError={() => handleRenderError(viewingItemContent.transaction?.id || '')}
                     inModal={true}
                   />
                 )}
-                {!viewingSlotContent.transaction && isMarkdownContentSafe(viewingSlotContent.content) && (
+                {!viewingItemContent.transaction && isMarkdownContentSafe(viewingItemContent.content) && (
                   <BlogMarkdownDisplay
-                    content={getMarkdownContentSafe(viewingSlotContent.content)}
+                    content={getMarkdownContentSafe(viewingItemContent.content)}
                     onClick={() => {}}
                   />
                 )}
-                {!viewingSlotContent.transaction && !isMarkdownContentSafe(viewingSlotContent.content) && viewingSlotContent.contentUrls && (
+                {!viewingItemContent.transaction && !isMarkdownContentSafe(viewingItemContent.content) && viewingItemContent.contentUrls && (
                   <ContentRenderer
-                    key={`slot-${viewingSlotContent.slotId}`}
+                    key={`item-${viewingItemContent.itemId}`}
                     transaction={{
-                      id: `generic-${viewingSlotContent.slotId}`,
+                      id: `generic-${viewingItemContent.itemId}`,
                       owner: shelf.owner.toString(),
                       tags: []
                     }}
-                    content={viewingSlotContent.content}
-                    contentUrls={viewingSlotContent.contentUrls}
+                    content={viewingItemContent.content}
+                    contentUrls={viewingItemContent.contentUrls}
                     handleRenderError={() => console.error("Error rendering non-transaction content")}
                     inModal={true}
                   />

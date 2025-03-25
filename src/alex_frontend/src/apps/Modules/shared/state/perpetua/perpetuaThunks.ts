@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { Shelf, Slot, SlotContent } from '../../../../../../../declarations/perpetua/perpetua.did';
+import { Shelf, Item, ItemContent } from '../../../../../../../declarations/perpetua/perpetua.did';
 import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 import { Principal } from '@dfinity/principal';
 import { convertBigIntsToStrings, convertStringsToBigInts } from '@/utils/bgint_convert';
@@ -124,13 +124,13 @@ export const createShelf = createAsyncThunk(
   async ({ title, description, principal }: { title: string, description: string, principal: Principal | string }, { dispatch, rejectWithValue }) => {
     try {
       const perpetuaActor = await getActorPerpetua();
-      // Initialize with empty slots array instead of a default slot
-      const initialSlots: Slot[] = [];
+      // Initialize with empty items array instead of a default item
+      const initialItems: Item[] = [];
       
       const result = await perpetuaActor.store_shelf(
         title,
         description ? [description] : [],
-        initialSlots
+        initialItems
       );
       
       if ("Ok" in result) {
@@ -149,21 +149,21 @@ export const createShelf = createAsyncThunk(
   }
 );
 
-export const addSlot = createAsyncThunk(
-  'perpetua/addSlot',
+export const addItem = createAsyncThunk(
+  'perpetua/addItem',
   async ({ 
     shelf, 
     content, 
     type, 
     principal,
-    referenceSlotId = null,
+    referenceItemId = null,
     before = true
   }: { 
     shelf: Shelf, 
     content: string, 
     type: "Nft" | "Markdown" | "Shelf",
     principal: Principal | string,
-    referenceSlotId?: number | null,
+    referenceItemId?: number | null,
     before?: boolean
   }, { dispatch, rejectWithValue }) => {
     try {
@@ -171,39 +171,39 @@ export const addSlot = createAsyncThunk(
       
       console.log(`Adding ${type} content to shelf: ${shelf.title}, content: ${content.substring(0, 20)}${content.length > 20 ? '...' : ''}`);
       
-      // Use the add_shelf_slot method instead of updating the entire shelf
-      const slotContent: SlotContent = type === "Nft" 
-        ? { Nft: content } as SlotContent
+      // Use the add_shelf_item method instead of updating the entire shelf
+      const itemContent: ItemContent = type === "Nft" 
+        ? { Nft: content } as ItemContent
         : type === "Shelf"
-        ? { Shelf: content } as SlotContent
-        : { Markdown: content } as SlotContent;
+        ? { Shelf: content } as ItemContent
+        : { Markdown: content } as ItemContent;
       
-      const result = await perpetuaActor.add_slot_to_shelf(
+      const result = await perpetuaActor.add_item_to_shelf(
         shelf.shelf_id,
         {
-          content: slotContent,
-          reference_slot_id: referenceSlotId ? [referenceSlotId] : [],
+          content: itemContent,
+          reference_item_id: referenceItemId ? [referenceItemId] : [],
           before
         }
       );
       
       if ("Ok" in result) {
-        // Reload the shelf data after adding a slot
+        // Reload the shelf data after adding a item
         dispatch(loadShelves(principal));
         return convertBigIntsToStrings({ shelf_id: shelf.shelf_id });
       } else if ("Err" in result) {
         // Enhanced error handling for specific backend errors
         const errorMessage = result.Err;
-        console.error("Backend error adding slot:", errorMessage);
+        console.error("Backend error adding item:", errorMessage);
         return rejectWithValue(errorMessage);
       } else {
-        return rejectWithValue("Unknown error adding slot");
+        return rejectWithValue("Unknown error adding item");
       }
     } catch (error) {
       // Better error message handling
-      console.error("Failed to add slot:", error);
+      console.error("Failed to add item:", error);
       
-      let errorMessage = "Failed to add slot";
+      let errorMessage = "Failed to add item";
       
       // Try to extract more detailed error message
       if (error instanceof Error) {
@@ -229,28 +229,28 @@ export const addSlot = createAsyncThunk(
   }
 );
 
-export const reorderSlot = createAsyncThunk(
-  'perpetua/reorderSlot',
+export const reorderItem = createAsyncThunk(
+  'perpetua/reorderItem',
   async ({ 
     shelfId, 
-    slotId, 
-    referenceSlotId, 
+    itemId, 
+    referenceItemId, 
     before,
     principal
   }: { 
     shelfId: string, 
-    slotId: number, 
-    referenceSlotId: number | null, 
+    itemId: number, 
+    referenceItemId: number | null, 
     before: boolean,
     principal: Principal | string
   }, { dispatch, rejectWithValue, getState }) => {
     try {
       const perpetuaActor = await getActorPerpetua();
-      const result = await perpetuaActor.reorder_shelf_slot(
+      const result = await perpetuaActor.reorder_shelf_item(
         shelfId,
         {
-          slot_id: slotId,
-          reference_slot_id: referenceSlotId ? [referenceSlotId] : [],
+          item_id: itemId,
+          reference_item_id: referenceItemId ? [referenceItemId] : [],
           before
         }
       );
@@ -264,13 +264,13 @@ export const reorderSlot = createAsyncThunk(
           // We'll handle this in the slice reducer
           dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
         }
-        return convertBigIntsToStrings({ shelfId, slotId, referenceSlotId, before });
+        return convertBigIntsToStrings({ shelfId, itemId, referenceItemId, before });
       } else {
-        return rejectWithValue("Failed to reorder slot");
+        return rejectWithValue("Failed to reorder item");
       }
     } catch (error) {
-      console.error("Failed to reorder slot:", error);
-      return rejectWithValue("Failed to reorder slot");
+      console.error("Failed to reorder item:", error);
+      return rejectWithValue("Failed to reorder item");
     }
   }
 );
@@ -314,12 +314,12 @@ export const updateShelfMetadata = createAsyncThunk(
   }
 );
 
-export const rebalanceShelfSlots = createAsyncThunk(
-  'perpetua/rebalanceShelfSlots',
+export const rebalanceShelfItems = createAsyncThunk(
+  'perpetua/rebalanceShelfItems',
   async ({ shelfId, principal }: { shelfId: string, principal: Principal | string }, { dispatch, rejectWithValue }) => {
     try {
       const perpetuaActor = await getActorPerpetua();
-      const result = await perpetuaActor.rebalance_shelf_slots(shelfId);
+      const result = await perpetuaActor.rebalance_shelf_items(shelfId);
       
       if ("Ok" in result) {
         // Get updated shelf data
@@ -330,11 +330,11 @@ export const rebalanceShelfSlots = createAsyncThunk(
         
         return convertBigIntsToStrings({ shelfId });
       } else {
-        return rejectWithValue("Failed to rebalance shelf slots");
+        return rejectWithValue("Failed to rebalance shelf items");
       }
     } catch (error) {
-      console.error("Failed to rebalance shelf slots:", error);
-      return rejectWithValue("Failed to rebalance shelf slots");
+      console.error("Failed to rebalance shelf items:", error);
+      return rejectWithValue("Failed to rebalance shelf items");
     }
   }
 );
@@ -488,8 +488,8 @@ export const removeShelfEditor = createAsyncThunk(
   }
 );
 
-export const createAndAddShelfSlot = createAsyncThunk(
-  'perpetua/createAndAddShelfSlot',
+export const createAndAddShelfItem = createAsyncThunk(
+  'perpetua/createAndAddShelfItem',
   async ({ 
     parentShelfId, 
     title, 
@@ -504,9 +504,9 @@ export const createAndAddShelfSlot = createAsyncThunk(
     try {
       const perpetuaActor = await getActorPerpetua();
       
-      console.log(`Creating new shelf "${title}" and adding it as a slot to parent shelf: ${parentShelfId}`);
+      console.log(`Creating new shelf "${title}" and adding it as a item to parent shelf: ${parentShelfId}`);
       
-      const result = await perpetuaActor.create_and_add_shelf_slot(
+      const result = await perpetuaActor.create_and_add_shelf_item(
         parentShelfId,
         title,
         description ? [description] : []
@@ -523,13 +523,13 @@ export const createAndAddShelfSlot = createAsyncThunk(
       } else if ("Err" in result) {
         // Enhanced error handling for specific backend errors
         const errorMessage = result.Err;
-        console.error("Backend error creating and adding shelf slot:", errorMessage);
+        console.error("Backend error creating and adding shelf item:", errorMessage);
         return rejectWithValue(errorMessage);
       } else {
-        return rejectWithValue("Unknown error creating and adding shelf slot");
+        return rejectWithValue("Unknown error creating and adding shelf item");
       }
     } catch (error) {
-      console.error("Failed to create and add shelf slot:", error);
+      console.error("Failed to create and add shelf item:", error);
       
       let errorMessage = "Failed to create and add shelf";
       
@@ -557,26 +557,26 @@ export const createAndAddShelfSlot = createAsyncThunk(
   }
 );
 
-// Remove a slot from a shelf
-export const removeSlot = createAsyncThunk(
-  'perpetua/removeSlot',
+// Remove a item from a shelf
+export const removeItem = createAsyncThunk(
+  'perpetua/removeItem',
   async ({ 
     shelfId, 
-    slotId, 
+    itemId, 
     principal 
   }: { 
     shelfId: string, 
-    slotId: number, 
+    itemId: number, 
     principal: Principal | string 
   }, { dispatch, rejectWithValue }) => {
     try {
       const perpetuaActor = await getActorPerpetua();
       
-      console.log(`Removing slot ${slotId} from shelf: ${shelfId}`);
+      console.log(`Removing item ${itemId} from shelf: ${shelfId}`);
       
-      const result = await perpetuaActor.remove_slot_from_shelf(
+      const result = await perpetuaActor.remove_item_from_shelf(
         shelfId,
-        slotId
+        itemId
       );
       
       if ("Ok" in result) {
@@ -589,19 +589,19 @@ export const removeSlot = createAsyncThunk(
           dispatch(loadShelves(principal));
         }
         
-        return { success: true, shelfId, slotId };
+        return { success: true, shelfId, itemId };
       } else if ("Err" in result) {
         // Enhanced error handling for specific backend errors
         const errorMessage = result.Err;
-        console.error("Backend error removing slot:", errorMessage);
+        console.error("Backend error removing item:", errorMessage);
         return rejectWithValue(errorMessage);
       } else {
-        return rejectWithValue("Unknown error removing slot");
+        return rejectWithValue("Unknown error removing item");
       }
     } catch (error) {
-      console.error("Failed to remove slot:", error);
+      console.error("Failed to remove item:", error);
       
-      let errorMessage = "Failed to remove slot";
+      let errorMessage = "Failed to remove item";
       
       // Try to extract more detailed error message
       if (error instanceof Error) {

@@ -7,20 +7,20 @@ import { Principal } from "@dfinity/principal";
 export const ROUTES = {
   BASE: '/app/perpetua',
   SHELF: '/app/perpetua/shelf/:shelfId',
-  SLOT: '/app/perpetua/slot/:slotId',
+  ITEM: '/app/perpetua/item/:itemId',
   USER: '/app/perpetua/user/:userId',
   USER_SHELF: '/app/perpetua/user/:userId/shelf/:shelfId',
-  USER_SLOT: '/app/perpetua/user/:userId/slot/:slotId',
+  USER_ITEM: '/app/perpetua/user/:userId/item/:itemId',
 };
 
 // Route builder functions
 export const buildRoutes = {
   home: () => ROUTES.BASE,
   shelf: (shelfId: string) => `/app/perpetua/shelf/${shelfId}`,
-  slot: (slotId: string) => `/app/perpetua/slot/${slotId}`,
+  item: (itemId: string) => `/app/perpetua/item/${itemId}`,
   user: (userId: string) => `/app/perpetua/user/${userId}`,
   userShelf: (userId: string, shelfId: string) => `/app/perpetua/user/${userId}/shelf/${shelfId}`,
-  userSlot: (userId: string, slotId: string) => `/app/perpetua/user/${userId}/slot/${slotId}`,
+  userItem: (userId: string, itemId: string) => `/app/perpetua/user/${userId}/item/${itemId}`,
 };
 
 // Parse path information used across multiple components

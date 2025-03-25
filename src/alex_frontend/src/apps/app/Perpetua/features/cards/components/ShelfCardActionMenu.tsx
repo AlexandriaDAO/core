@@ -29,12 +29,12 @@ interface ShelfCardActionMenuProps {
   contentType: "Nft" | "Markdown" | "Shelf";
   currentShelfId?: string;
   parentShelfId?: string;
-  slotId?: number;
+  itemId?: number;
   className?: string;
 }
 
 /**
- * A dropdown menu component that combines AddToShelfButton and RemoveSlotButton functionality
+ * A dropdown menu component that combines AddToShelfButton and RemoveItemButton functionality
  * 
  * This menu is triggered by a three-dots icon button and provides actions for
  * adding the content to a shelf and/or removing it from its parent shelf.
@@ -44,7 +44,7 @@ export const ShelfCardActionMenu: React.FC<ShelfCardActionMenuProps> = ({
   contentType,
   currentShelfId,
   parentShelfId,
-  slotId,
+  itemId,
   className
 }) => {
   const [open, setOpen] = useState(false);
@@ -52,18 +52,18 @@ export const ShelfCardActionMenu: React.FC<ShelfCardActionMenuProps> = ({
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
   
   const { hasEditableShelvesExcluding, isLoggedIn } = useAddToShelf();
-  const { removeSlot } = useShelfOperations();
+  const { removeItem } = useShelfOperations();
   const { checkEditAccess } = useContentPermissions();
   
   // Only show add to shelf option if user has shelves they can edit
   const hasAvailableShelves = hasEditableShelvesExcluding(currentShelfId);
   const canAddToShelf = hasAvailableShelves && isLoggedIn;
   
-  // Only show remove slot option if the user has edit access to the parent shelf
-  const canRemoveSlot = parentShelfId && slotId && checkEditAccess(parentShelfId);
+  // Only show remove item option if the user has edit access to the parent shelf
+  const canRemoveItem = parentShelfId && itemId && checkEditAccess(parentShelfId);
   
   // If neither action is available, don't render the menu
-  if (!canAddToShelf && !canRemoveSlot) return null;
+  if (!canAddToShelf && !canRemoveItem) return null;
 
   const handleTriggerClick = (e: React.MouseEvent) => {
     // Prevent event propagation to avoid triggering card clicks
@@ -72,13 +72,13 @@ export const ShelfCardActionMenu: React.FC<ShelfCardActionMenuProps> = ({
     setOpen(!open);
   };
 
-  // Handle slot removal
-  const handleRemoveSlot = async () => {
-    if (!parentShelfId || !slotId) return;
+  // Handle item removal
+  const handleRemoveItem = async () => {
+    if (!parentShelfId || !itemId) return;
     
-    console.log(`Removing slot ${slotId} from shelf ${parentShelfId}`);
+    console.log(`Removing item ${itemId} from shelf ${parentShelfId}`);
     try {
-      const success = await removeSlot(parentShelfId, slotId);
+      const success = await removeItem(parentShelfId, itemId);
       
       if (success) {
         toast.success("Item removed from shelf");
@@ -86,7 +86,7 @@ export const ShelfCardActionMenu: React.FC<ShelfCardActionMenuProps> = ({
         toast.error("Failed to remove item from shelf");
       }
     } catch (error) {
-      console.error("Error removing slot:", error);
+      console.error("Error removing item:", error);
       toast.error("Error removing item from shelf");
     }
     
@@ -127,7 +127,7 @@ export const ShelfCardActionMenu: React.FC<ShelfCardActionMenuProps> = ({
             </DropdownMenuItem>
           )}
           
-          {canRemoveSlot && (
+          {canRemoveItem && (
             <DropdownMenuItem 
               onClick={(e) => {
                 e.preventDefault();
@@ -164,7 +164,7 @@ export const ShelfCardActionMenu: React.FC<ShelfCardActionMenuProps> = ({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={e => e.stopPropagation()}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleRemoveSlot}>Remove</AlertDialogAction>
+            <AlertDialogAction onClick={handleRemoveItem}>Remove</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
