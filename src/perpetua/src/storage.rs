@@ -7,6 +7,7 @@ use std::cell::RefCell;
 use std::collections::BTreeSet;
 use std::collections::BTreeMap;
 use crate::utils;
+use crate::ordering::{PositionedOrdering, get_ordered_by_position, ensure_balanced_positions};
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -58,6 +59,9 @@ thread_local! {
             MEMORY_MANAGER.with(|m| m.borrow().get(GLOBAL_TIMELINE_MEM_ID))
         )
     );
+    
+    // User profile shelf order: K: Principal, V: UserProfileOrder
+    pub static USER_PROFILE_ORDER: RefCell<BTreeMap<Principal, UserProfileOrder>> = RefCell::new(BTreeMap::new());
 }
 
 // Updated Shelf structure
@@ -150,6 +154,16 @@ impl Storable for TimestampedShelves {
     };
 }
 
+// Thresholds for shelf item positioning rebalancing
+const SHELF_ITEM_THRESHOLDS: [(usize, f64); 3] = [
+    (400, 1e-10),
+    (200, 1e-8),
+    (0, 1e-6)
+];
+
+// Default step size for shelf item positioning
+const SHELF_ITEM_STEP_SIZE: f64 = 1000.0;
+
 impl Shelf {
     pub fn insert_item(&mut self, item: Item) -> Result<(), String> {
         if self.items.len() >= 500 {
@@ -171,10 +185,8 @@ impl Shelf {
         
         let item_id = item.id;
         
-        // Initialize position at the end
-        let new_position = self.item_positions.values()
-            .max_by(|a, b| a.partial_cmp(b).unwrap())
-            .map_or(0.0, |pos| pos + 1.0);
+        // Initialize position at the end using the shared abstraction
+        let new_position = self.item_positions.calculate_position(None, false, 1.0).unwrap();
             
         // Update the float position
         self.item_positions.insert(item_id, new_position);
@@ -183,9 +195,7 @@ impl Shelf {
         self.items.insert(item_id, item);
         
         // Check if we need rebalancing (when there are many items)
-        if self.items.len() > 100 {
-            self.check_position_spacing();
-        }
+        self.check_position_spacing();
         
         Ok(())
     }
@@ -226,35 +236,12 @@ impl Shelf {
             return Err("Item not found".to_string());
         }
 
-        // Get current positions
-        let positions: Vec<(u32, f64)> = self.item_positions.iter()
-            .map(|(&id, &pos)| (id, pos))
-            .collect();
-            
-        let new_position = match reference_item_id {
-            Some(ref_id) => {
-                // Verify reference item exists
-                let reference_pos = self.item_positions.get(&ref_id)
-                    .ok_or("Reference item not found")?;
-                
-                // Calculate new position based on neighbor
-                if before {
-                    self.find_previous_position(*reference_pos)
-                } else {
-                    self.find_next_position(*reference_pos)
-                }
-            }
-            None => {
-                // Move to start/end
-                if before {
-                    self.item_positions.values()
-                        .fold(f64::INFINITY, |a, &b| a.min(b)) - 1.0
-                } else {
-                    self.item_positions.values()
-                        .fold(f64::NEG_INFINITY, |a, &b| a.max(b)) + 1.0
-                }
-            }
-        };
+        // Calculate new position using the shared abstraction
+        let new_position = self.item_positions.calculate_position(
+            reference_item_id.as_ref(), 
+            before, 
+            1.0
+        )?;
 
         // Update the float position
         self.item_positions.insert(item_id, new_position);
@@ -265,65 +252,15 @@ impl Shelf {
         Ok(())
     }
 
-    fn find_previous_position(&self, target: f64) -> f64 {
-        let prev = self.item_positions.values()
-            .filter(|&&pos| pos < target)
-            .max_by(|a, b| a.partial_cmp(b).unwrap());
-            
-        match prev {
-            Some(prev_pos) => (prev_pos + target) / 2.0,
-            None => target - 1.0
-        }
-    }
-
-    fn find_next_position(&self, target: f64) -> f64 {
-        let next = self.item_positions.values()
-            .filter(|&&pos| pos > target)
-            .min_by(|a, b| a.partial_cmp(b).unwrap());
-            
-        match next {
-            Some(next_pos) => (target + next_pos) / 2.0,
-            None => target + 1.0
-        }
-    }
-
     pub fn get_ordered_items(&self) -> Vec<Item> {
-        let mut ordered: Vec<_> = self.item_positions.iter().collect();
-        ordered.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap());
-        
-        // Create a new vector with cloned items in the correct order
-        ordered.into_iter()
-            .filter_map(|(id, _)| {
-                self.items.get(id).map(|item| item.clone())
-            })
-            .collect()
+        // Use the shared helper function for ordering
+        get_ordered_by_position(&self.items, &self.item_positions)
     }
     
     // Checks if positions have become too close, potentially requiring rebalancing
     fn check_position_spacing(&mut self) {
-        if self.items.len() < 2 {
-            return;
-        }
-        
-        let mut positions: Vec<f64> = self.item_positions.values().cloned().collect();
-        positions.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        
-        // Check minimum gap between consecutive positions
-        let mut min_gap = f64::MAX;
-        for i in 1..positions.len() {
-            let gap = positions[i] - positions[i-1];
-            min_gap = min_gap.min(gap);
-        }
-        
-        // If minimum gap is too small, mark for rebalancing
-        // We use a smaller threshold when we have more items
-        let threshold = match self.items.len() {
-            n if n > 400 => 1e-10,
-            n if n > 200 => 1e-8,
-            _ => 1e-6
-        };
-        
-        if min_gap < threshold {
+        // Use the shared implementation to check if rebalancing is needed
+        if self.item_positions.needs_rebalancing(&SHELF_ITEM_THRESHOLDS) {
             self.needs_rebalance = true;
         }
     }
@@ -334,20 +271,8 @@ impl Shelf {
             return;
         }
         
-        // Get current ordering
-        let mut ordered_ids: Vec<u32> = Vec::new();
-        let mut ordered: Vec<_> = self.item_positions.iter().collect();
-        ordered.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap());
-        
-        for (&id, _) in ordered {
-            ordered_ids.push(id);
-        }
-        
-        // Reset positions to be evenly spaced between 0 and (items × 1000)
-        let step_size = 1000.0;
-        for (i, item_id) in ordered_ids.into_iter().enumerate() {
-            self.item_positions.insert(item_id, (i as f64) * step_size);
-        }
+        // Use the shared implementation for rebalancing
+        self.item_positions.rebalance_positions(SHELF_ITEM_STEP_SIZE);
         
         self.needs_rebalance = false;
         self.rebalance_count += 1;
@@ -395,4 +320,13 @@ pub async fn create_shelf(
     }
 
     Ok(shelf)
+}
+
+// Structure for tracking custom shelf order in user profiles
+#[derive(Clone, Debug, Default, CandidType, Deserialize)]
+pub struct UserProfileOrder {
+    // Only stores position values for explicitly positioned shelves
+    pub shelf_positions: BTreeMap<String, f64>,
+    // Flag indicating if this profile has customized ordering
+    pub is_customized: bool,
 }

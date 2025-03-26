@@ -19,11 +19,13 @@ pub fn icrc7_scion_principal() -> Principal {
 pub mod guard;
 pub mod auth;
 pub mod storage;
+pub mod ordering;
 pub mod update {
     pub mod shelf;
     pub mod item;
     pub mod access;
     pub mod utils;
+    pub mod profile;
 }
 pub mod query;
 pub mod utils;
@@ -36,6 +38,7 @@ pub use update::item::{
     create_and_add_shelf_item
 };
 pub use update::access::{add_shelf_editor, remove_shelf_editor, list_shelf_editors};
+pub use update::profile::{reorder_profile_shelf, reset_profile_order};
 pub use query::*;
 
 ic_cdk::export_candid!();

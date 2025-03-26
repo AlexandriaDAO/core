@@ -1,7 +1,7 @@
 use candid::{CandidType, Principal};
 use ic_cdk;
 
-use crate::storage::{SHELVES, USER_SHELVES, GLOBAL_TIMELINE, Shelf, Item};
+use crate::storage::{SHELVES, USER_SHELVES, GLOBAL_TIMELINE, USER_PROFILE_ORDER, Shelf, Item};
 
 #[derive(CandidType, Debug)]
 pub enum QueryError {
@@ -40,26 +40,96 @@ pub fn get_user_shelves(user: Principal, range: Option<usize>) -> QueryResult<Ve
             .get(&user)
             .ok_or(QueryError::UserNotFound)
             .map(|timestamped| {
-                let shelf_ids: Vec<String> = match range {
-                    Some(limit) => timestamped.0
-                        .iter()
-                        .rev() // Most recent first
-                        .take(limit)
-                        .map(|(_, id)| id.clone())
-                        .collect(),
-                    None => timestamped.0
-                        .iter()
-                        .map(|(_, id)| id.clone())
-                        .collect(),
-                };
+                // Check if the user has a customized profile order
+                let has_custom_order = USER_PROFILE_ORDER.with(|profile_order| {
+                    profile_order.borrow().get(&user)
+                        .map_or(false, |order| order.is_customized)
+                });
                 
-                SHELVES.with(|shelves| {
-                    let shelves_ref = shelves.borrow();
-                    shelf_ids
-                        .iter()
-                        .filter_map(|id| shelves_ref.get(id))
-                        .collect()
-                })
+                // Different collection strategy based on whether there's custom ordering
+                if has_custom_order {
+                    // For customized profiles, we need to combine ordered and non-ordered shelves
+                    USER_PROFILE_ORDER.with(|profile_order| {
+                        let order_ref = profile_order.borrow();
+                        let user_order = order_ref.get(&user).unwrap();  // Safe because we checked above
+                        
+                        // 2. Prepare ordered shelf IDs
+                        let mut ordered_positions: Vec<(String, f64)> = user_order.shelf_positions
+                            .iter()
+                            .map(|(id, &pos)| (id.clone(), pos))
+                            .collect();
+                        
+                        // Sort by position
+                        ordered_positions.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap());
+                        
+                        // Get IDs in order
+                        let ordered_ids: Vec<String> = ordered_positions
+                            .into_iter()
+                            .map(|(id, _)| id)
+                            .collect();
+                        
+                        // 3. Collect non-ordered shelf IDs (those without custom positions)
+                        // These will be added after the ordered ones, in reverse timestamp order
+                        let mut timestamp_ordered_ids: Vec<(u64, String)> = timestamped.0
+                            .iter()
+                            .filter(|(_, id)| !ordered_ids.contains(id))
+                            .map(|&(ts, ref id)| (ts, id.clone()))
+                            .collect();
+                        
+                        // Sort by timestamp descending (newest first)
+                        timestamp_ordered_ids.sort_by(|a, b| b.0.cmp(&a.0));
+                        
+                        // Take only the IDs
+                        let non_ordered_ids: Vec<String> = timestamp_ordered_ids
+                            .into_iter()
+                            .map(|(_, id)| id)
+                            .collect();
+                        
+                        // 4. Combine the two lists: ordered first, then non-ordered
+                        let mut combined_ids = Vec::new();
+                        combined_ids.extend(ordered_ids);
+                        combined_ids.extend(non_ordered_ids);
+                        
+                        // Apply range limit if specified
+                        let limit_ids = if let Some(limit) = range {
+                            combined_ids.into_iter().take(limit).collect()
+                        } else {
+                            combined_ids
+                        };
+                        
+                        // 5. Fetch the actual shelves
+                        SHELVES.with(|shelves| {
+                            let shelves_ref = shelves.borrow();
+                            limit_ids
+                                .iter()
+                                .filter_map(|id| shelves_ref.get(id))
+                                .collect()
+                        })
+                    })
+                } else {
+                    // For non-customized profiles, use the original timestamp-based ordering
+                    let shelf_ids: Vec<String> = match range {
+                        Some(limit) => timestamped.0
+                            .iter()
+                            .rev() // Most recent first
+                            .take(limit)
+                            .map(|(_, id)| id.clone())
+                            .collect(),
+                        None => timestamped.0
+                            .iter()
+                            .map(|(_, id)| id.clone())
+                            .collect(),
+                    };
+                    
+                    // Fetch the actual shelves
+                    SHELVES.with(|shelves| {
+                        let shelves_ref = shelves.borrow();
+                        shelf_ids
+                            .iter()
+                            .filter_map(|id| shelves_ref.get(id))
+                            .collect()
+                    })
+                }
             })
     })
 }

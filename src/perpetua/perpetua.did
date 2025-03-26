@@ -58,7 +58,9 @@ service : {
   rebalance_shelf_items : (text) -> (Result);
   remove_item_from_shelf : (text, nat32) -> (Result);
   remove_shelf_editor : (text, principal) -> (Result);
+  reorder_profile_shelf : (text, opt text, bool) -> (Result);
   reorder_shelf_item : (text, ItemReorderInput) -> (Result);
+  reset_profile_order : () -> (Result);
   store_shelf : (text, opt text, vec Item) -> (Result_1);
   update_shelf_metadata : (text, opt text, opt text) -> (Result);
 }

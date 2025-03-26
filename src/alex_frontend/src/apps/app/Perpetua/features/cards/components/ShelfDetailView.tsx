@@ -347,9 +347,9 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
             </Button>
             <div className="flex items-center px-3 text-sm">
               <Button
-                variant="link"
+                variant="ghost"
                 onClick={goToOwnerShelves}
-                className="ml-1 p-0 h-auto text-sm text-primary hover:text-primary/80"
+                className="ml-1 p-0 h-auto text-sm hover:bg-transparent"
                 title={`View all shelves by ${breadcrumbUserId}`}
               >
                 <User className="w-3 h-3 mr-1" />

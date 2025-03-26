@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Edit, X, RotateCcw } from "lucide-react";
 import { ShelfCard, PublicShelfCard } from '../components/ShelfCard';
 import { LibraryShelvesUIProps, ExploreShelvesUIProps, UserShelvesUIProps } from '../types/types';
+import { Shelf } from "../../../../../../../,,/../../declarations/perpetua/perpetua.did";
 
 // Unified shelves view - simple version without search/filtering
 interface UnifiedShelvesUIProps {
@@ -211,7 +212,18 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = ({
   loading,
   onViewShelf,
   onViewOwner,
-  onBack
+  onBack,
+  // New props for reordering
+  isReorderMode = false,
+  isCurrentUser = false,
+  onEnterReorderMode,
+  onCancelReorderMode,
+  onSaveReorderedShelves,
+  onResetProfileOrder,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
+  onDrop
 }) => {
   let ownerName = "";
   let ownerId = "";
@@ -261,6 +273,51 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = ({
               </span>
             ) : 'User Shelves'}
           </h2>
+          
+          {/* Add reordering controls only for the current user */}
+          {isCurrentUser && (
+            <div className="flex items-center gap-2">
+              {!isReorderMode ? (
+                // Show edit button when not in reorder mode
+                <Button 
+                  variant="outline"
+                  onClick={onEnterReorderMode}
+                  className="flex items-center gap-1 h-8 text-sm"
+                  disabled={loading || shelves.length <= 1} // Disable if only one shelf or less
+                >
+                  <Edit className="w-4 h-4" />
+                  Reorder
+                </Button>
+              ) : (
+                // Show cancel and save buttons when in reorder mode
+                <>
+                  <Button 
+                    variant="outline"
+                    onClick={onResetProfileOrder}
+                    className="flex items-center gap-1 h-8 text-sm"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Reset to Default
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={onCancelReorderMode}
+                    className="flex items-center gap-1 h-8 text-sm"
+                  >
+                    <X className="w-4 h-4" />
+                    Cancel
+                  </Button>
+                  <Button 
+                    variant="primary"
+                    onClick={onSaveReorderedShelves}
+                    className="flex items-center gap-1 h-8 text-sm"
+                  >
+                    Save Order
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
       
@@ -272,12 +329,53 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = ({
         </div>
       ) : (
         <ContentGrid>
-          {shelves.map((shelf) => (
-            <PublicShelfCard
+          {shelves.map((shelf, index) => (
+            <div
               key={shelf.shelf_id}
-              shelf={shelf}
-              onViewShelf={onViewShelf}
-            />
+              draggable={isReorderMode}
+              onDragStart={isReorderMode ? (e: React.DragEvent<HTMLDivElement>) => {
+                // Set data transfer for compatibility
+                e.dataTransfer.setData('text/plain', index.toString());
+                // Add a class to the element being dragged
+                e.currentTarget.classList.add('opacity-50');
+                onDragStart?.(index);
+              } : undefined}
+              onDragOver={isReorderMode ? (e: React.DragEvent<HTMLDivElement>) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                // Highlight the drop target
+                e.currentTarget.classList.add('bg-primary/10');
+                onDragOver?.(e, index);
+              } : undefined}
+              onDragLeave={isReorderMode ? (e: React.DragEvent<HTMLDivElement>) => {
+                // Remove highlight from drop target when dragging out
+                e.currentTarget.classList.remove('bg-primary/10');
+              } : undefined}
+              onDragEnd={isReorderMode ? (e: React.DragEvent<HTMLDivElement>) => {
+                // Remove dragging styles
+                e.currentTarget.classList.remove('opacity-50');
+                onDragEnd?.();
+              } : undefined}
+              onDrop={isReorderMode ? (e: React.DragEvent<HTMLDivElement>) => {
+                e.preventDefault();
+                // Remove highlight
+                e.currentTarget.classList.remove('bg-primary/10');
+                onDrop?.(e, index);
+              } : undefined}
+              className={`relative transition-all duration-200 ${
+                isReorderMode ? 'cursor-grab active:cursor-grabbing border-2 border-dashed border-transparent hover:border-primary/30' : ''
+              }`}
+            >
+              {isReorderMode && (
+                <div className="absolute top-2 left-2 z-40 bg-black/50 text-white py-1 px-2 text-xs rounded">
+                  {index + 1}
+                </div>
+              )}
+              <PublicShelfCard
+                shelf={shelf}
+                onViewShelf={isReorderMode ? undefined : onViewShelf}
+              />
+            </div>
           ))}
         </ContentGrid>
       )}

@@ -22,7 +22,7 @@ interface Transaction {
 
 interface ContentCardProps {
   children: React.ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
   id?: string;
   owner?: string;
   showStats?: boolean;

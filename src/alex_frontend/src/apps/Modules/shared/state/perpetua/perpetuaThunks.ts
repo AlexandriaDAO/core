@@ -625,4 +625,120 @@ export const removeItem = createAsyncThunk(
       return rejectWithValue(errorMessage);
     }
   }
+);
+
+// Profile Ordering Thunks
+export const reorderProfileShelf = createAsyncThunk(
+  'perpetua/reorderProfileShelf',
+  async ({ 
+    shelfId, 
+    referenceShelfId, 
+    before,
+    principal
+  }: { 
+    shelfId: string, 
+    referenceShelfId?: string, 
+    before: boolean,
+    principal: Principal | string
+  }, { dispatch, rejectWithValue }) => {
+    try {
+      console.log(`=== PROFILE REORDERING DEBUG ===`);
+      console.log(`Reordering shelf ${shelfId} ${before ? 'before' : 'after'} ${referenceShelfId || 'none'}`);
+      
+      const perpetuaActor = await getActorPerpetua();
+      
+      console.log(`API Call params:`, {
+        shelfId,
+        referenceShelfId: referenceShelfId ? [referenceShelfId] : [],
+        before
+      });
+      
+      const result = await perpetuaActor.reorder_profile_shelf(
+        shelfId,
+        referenceShelfId ? [referenceShelfId] : [],
+        before
+      );
+      
+      if ("Ok" in result) {
+        console.log(`Profile reordering SUCCESS for shelf ${shelfId}`);
+        // Reload shelves to get the updated order
+        dispatch(loadShelves(principal));
+        
+        return { 
+          success: true, 
+          shelfId, 
+          referenceShelfId, 
+          before 
+        };
+      } else if ("Err" in result) {
+        console.error(`Profile reordering FAILED with error:`, result.Err);
+        return rejectWithValue(result.Err);
+      } else {
+        console.error(`Profile reordering FAILED with unknown error`);
+        return rejectWithValue("Failed to reorder shelf in profile");
+      }
+    } catch (error) {
+      console.error(`Profile reordering EXCEPTION:`, error);
+      
+      let errorMessage = "Failed to reorder shelf in profile";
+      if (error instanceof Error) {
+        if (error.message.includes("Rejected")) {
+          try {
+            const match = error.message.match(/Reject text: ['"](.*?)['"]/);
+            if (match && match[1]) {
+              errorMessage = match[1];
+            }
+          } catch (e) {
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const resetProfileOrder = createAsyncThunk(
+  'perpetua/resetProfileOrder',
+  async (principal: Principal | string, { dispatch, rejectWithValue }) => {
+    try {
+      const perpetuaActor = await getActorPerpetua();
+      
+      const result = await perpetuaActor.reset_profile_order();
+      
+      if ("Ok" in result) {
+        // Reload shelves to get the restored default order
+        dispatch(loadShelves(principal));
+        
+        return { success: true };
+      } else if ("Err" in result) {
+        return rejectWithValue(result.Err);
+      } else {
+        return rejectWithValue("Failed to reset profile order");
+      }
+    } catch (error) {
+      console.error("Failed to reset profile order:", error);
+      
+      let errorMessage = "Failed to reset profile order";
+      if (error instanceof Error) {
+        if (error.message.includes("Rejected")) {
+          try {
+            const match = error.message.match(/Reject text: ['"](.*?)['"]/);
+            if (match && match[1]) {
+              errorMessage = match[1];
+            }
+          } catch (e) {
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      return rejectWithValue(errorMessage);
+    }
+  }
 ); 

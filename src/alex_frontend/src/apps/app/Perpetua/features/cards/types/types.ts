@@ -10,7 +10,7 @@ export interface ShelfCardProps {
 
 export interface PublicShelfCardProps {
   shelf: Shelf;
-  onViewShelf: (shelfId: string) => void;
+  onViewShelf?: (shelfId: string) => void;
 }
 
 export interface ShelfDetailViewProps {
@@ -52,4 +52,14 @@ export interface UserShelvesUIProps {
   onViewShelf: (shelfId: string) => void;
   onViewOwner?: (ownerId: string) => void;
   onBack?: () => void;
+  isReorderMode?: boolean;
+  isCurrentUser?: boolean;
+  onEnterReorderMode?: () => void;
+  onCancelReorderMode?: () => void;
+  onSaveReorderedShelves?: () => void;
+  onResetProfileOrder?: () => void;
+  onDragStart?: (index: number) => void;
+  onDragOver?: (e: React.DragEvent, index: number) => void;
+  onDragEnd?: () => void;
+  onDrop?: (e: React.DragEvent, index: number) => void;
 } 

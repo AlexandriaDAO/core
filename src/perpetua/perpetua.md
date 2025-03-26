@@ -1,21 +1,23 @@
+
+dfx canister uninstall-code perpetua
+cargo build --release --target wasm32-unknown-unknown --package perpetua
+candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpetua/perpetua.did
+dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
+dfx generate perpetua
+
+
+The output should be an actual prompt that could be provided at the beginning of this conversation and yeild better results.
+
+
 ### UI
 
-- Slots should be items.
-- Size constraints on everything in the backend.
-- Figure out what the heck we're doing this rebalancing for.
-- Change the max slots to 1,000
+- ReorderShelfItem and reorderProfileShelf have similar logic, but different UIs. We should make the UI portion for this reusable so the profile grid is movable.
+- We allowing slots in the profile?
 
 - Big feature: Organized profile page on the user route.
-
-### Backend Decision TODOs
 - Payment for all actions, and removal of topup.
 - I think we're going to need tags too (so we could filter the recent one by categories)
-- Allowed to edit others users' shelves? NO
-
-
-
-### Future Possible Features
-
+- Allowed to edit others users' shelves? YES
 - Shelf Appears In? YES/maybe
 
 ## Design

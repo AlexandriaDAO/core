@@ -50,7 +50,6 @@ dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
 cargo build --release --target wasm32-unknown-unknown --package perpetua
 candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpetua/perpetua.did
 dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
-dfx generate perpetua
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did

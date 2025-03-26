@@ -53,7 +53,7 @@ export const ShelfCard: React.FC<ExtendedShelfCardProps> = ({
   
   return (
     <ContentCard
-      onClick={() => onViewShelf(shelf.shelf_id)}
+      onClick={onViewShelf ? () => onViewShelf(shelf.shelf_id) : undefined}
       id={shelf.shelf_id}
       owner={showOwner ? shelf.owner.toString() : undefined}
       component="Perpetua"
@@ -116,7 +116,7 @@ export const PublicShelfCard: React.FC<ExtendedPublicShelfCardProps> = ({
   
   return (
     <ContentCard
-      onClick={() => onViewShelf(shelf.shelf_id)}
+      onClick={onViewShelf ? () => onViewShelf(shelf.shelf_id) : undefined}
       id={shelf.shelf_id}
       owner={shelf.owner.toString()}
       component="Perpetua"

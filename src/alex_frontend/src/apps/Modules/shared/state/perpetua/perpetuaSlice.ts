@@ -29,6 +29,10 @@ export interface PerpetuaState {
   // Editor tracking
   shelfEditors: Record<string, string[]>; // Map of shelfId -> editor principals
   editorsLoading: Record<string, boolean>; // Track loading state for each shelf's editors
+  // Profile reordering state
+  isProfileReorderMode: boolean;
+  profileShelvesOriginal: Shelf[]; // Original shelf order before reordering
+  profileReorderLoading: boolean;
 }
 
 // Initial state
@@ -47,6 +51,10 @@ const initialState: PerpetuaState = {
   // Initialize editors state
   shelfEditors: {},
   editorsLoading: {},
+  // Initialize profile reordering state
+  isProfileReorderMode: false,
+  profileShelvesOriginal: [],
+  profileReorderLoading: false,
 };
 
 // Helper function to update permissions for a shelf
@@ -182,6 +190,46 @@ const perpetuaSlice = createSlice({
         updateShelfPermissions(state, updatedShelf, editors);
       }
     },
+    // Profile reordering actions
+    enterProfileReorderMode: (state) => {
+      state.isProfileReorderMode = true;
+      // Save the original order of shelves
+      state.profileShelvesOriginal = [...state.shelves];
+    },
+    exitProfileReorderMode: (state) => {
+      state.isProfileReorderMode = false;
+      // Reset to original order if we exit without saving
+      state.shelves = [...state.profileShelvesOriginal];
+      state.profileShelvesOriginal = [];
+    },
+    setProfileReorderLoading: (state, action: PayloadAction<boolean>) => {
+      state.profileReorderLoading = action.payload;
+    },
+    // For local reordering before saving
+    reorderShelvesLocal: (state, action: PayloadAction<{dragIndex: number, dropIndex: number}>) => {
+      const { dragIndex, dropIndex } = action.payload;
+      if (dragIndex === dropIndex) return;
+      
+      console.log(`Redux: Reordering shelves from ${dragIndex} to ${dropIndex}`);
+      
+      // Make a copy of the shelves array
+      const updatedShelves = [...state.shelves];
+      
+      // Get the shelf being moved
+      const draggedShelf = updatedShelves[dragIndex];
+      
+      // Remove the dragged shelf
+      updatedShelves.splice(dragIndex, 1);
+      
+      // Insert it at the drop position
+      updatedShelves.splice(dropIndex, 0, draggedShelf);
+      
+      // Debugging
+      console.log("New shelf order IDs:", updatedShelves.map(s => s.shelf_id).join(", "));
+      
+      // Update the shelves array
+      state.shelves = updatedShelves;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -259,7 +307,12 @@ export const {
   setContentPermission,
   clearPermissions,
   setShelfEditors,
-  setEditorsLoading
+  setEditorsLoading,
+  // Export new actions
+  enterProfileReorderMode,
+  exitProfileReorderMode,
+  setProfileReorderLoading,
+  reorderShelvesLocal
 } = perpetuaSlice.actions;
 export default perpetuaSlice.reducer;
 
@@ -295,3 +348,7 @@ export const selectHasEditAccess = (contentId: string) =>
   (state: { perpetua: PerpetuaState }) => {
     return state.perpetua.permissions[contentId] || false;
   };
+
+// Add selectors for profile reordering state
+export const selectIsProfileReorderMode = (state: { perpetua: PerpetuaState }) => state.perpetua.isProfileReorderMode;
+export const selectProfileReorderLoading = (state: { perpetua: PerpetuaState }) => state.perpetua.profileReorderLoading;
