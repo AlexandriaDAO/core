@@ -2,11 +2,11 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
 import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
-import { AssetItem } from "../types";
+import { ArweaveAssetItem } from "../types";
 import { RootState } from "@/store";
 
 export const fetchUserArweaveAssets = createAsyncThunk<
-	AssetItem[],
+	ArweaveAssetItem[],
 	void,
 	{ state: RootState; rejectValue: string }
 >("assets/fetchUserAssets", async (_, { getState, rejectWithValue }) => {
@@ -42,14 +42,10 @@ export const fetchUserArweaveAssets = createAsyncThunk<
 		const transactions = await fetchTransactionsForAlexandrian(arweaveIds);
 
 		// Map transactions to asset items
-		const assets: AssetItem[] = transactions.map((tx) => {
+		const assets: ArweaveAssetItem[] = transactions.map((tx) => {
 			// Extract content type and other metadata from tags
 			const contentTypeTag = tx.tags.find(
 				(tag) => tag.name === "Content-Type"
-			);
-			const titleTag = tx.tags.find((tag) => tag.name === "Title");
-			const descriptionTag = tx.tags.find(
-				(tag) => tag.name === "Description"
 			);
 
 			return {

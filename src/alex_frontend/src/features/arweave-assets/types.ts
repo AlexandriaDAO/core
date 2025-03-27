@@ -1,4 +1,4 @@
-export interface AssetItem {
+export interface ArweaveAssetItem {
 	id: string; // Arweave transaction ID
 	url?: string; // URL to view the asset
 	contentType?: string;
@@ -8,9 +8,17 @@ export interface AssetItem {
 	tags?: Array<{ name: string; value: string }>;
 }
 
-export interface AssetsState {
-	assets: AssetItem[];
+export interface ArweaveAssetsState {
+	assets: ArweaveAssetItem[];
+
+	selected: ArweaveAssetItem | null;
+
+	pulling: string | null;
+	pullError: string | null;
+
+	deleting: string | null;
+	deleteError: string | null;
+
 	loading: boolean;
 	error: string | null;
-	selectedAsset: AssetItem | null;
 }

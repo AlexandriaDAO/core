@@ -25,7 +25,7 @@ const LibrarianPage = lazy(()=>import("@/pages/librarian/"));
 const WalletsPage = lazy(()=>import("@/pages/librarian/WalletsPage"));
 const AssetSyncPage = lazy(()=>import("@/pages/dashboard/AssetSyncPage"));
 const ArweaveAssetsPage = lazy(()=>import("@/pages/dashboard/ArweaveAssetsPage"));
-const ICPAssetsPage = lazy(()=>import("@/pages/ICPAssetsPage"));
+const ICPAssetsPage = lazy(()=>import("@/pages/dashboard/ICPAssetsPage"));
 // const FileUploadPage = lazy(()=>import("@/pages/dashboard/FileUploadPage"));
 const PinaxPage = lazy(()=>import("@/pages/PinaxPage"));
 // const UploadPage = lazy(()=>import("@/pages/dashboard/UploadPage"));

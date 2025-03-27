@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { AssetItem } from "../types";
+import React, { useEffect } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useInternetIdentity } from "ic-use-internet-identity";
 import { toast } from "sonner";
 import { Button } from "@/lib/components/button";
 import {
@@ -9,9 +7,9 @@ import {
 	Cloud,
 	CloudOff,
 	Download,
+	Ellipsis,
 	ExternalLink,
 	Eye,
-	Upload,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -22,98 +20,39 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/lib/components/table";
-import { useAssetManager } from "@/hooks/useAssetManager";
-import { fetchFile, uploadToCanister } from "../utils/assetUtils";
 import { Alert } from "@/components/Alert";
+import { formatFileSize } from "@/features/upload/utils";
+import { getFileTypeInfo, getFileTypeName } from "@/features/upload/constants";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { pullAssetToCanister } from "../thunks/pullAssetToCanister";
+import { selectAsset } from "../arweaveAssetsSlice";
+import { fetchUserArweaveAssets } from "../thunks/fetchUserArweaveAssets";
+import { AssetManager } from "@dfinity/assets";
+import { ArweaveAssetItem } from "../types";
 
 interface AssetTableProps {
-	assets: AssetItem[];
-	loading: boolean;
-	onSelectAsset: (asset: AssetItem) => void;
+	assetManager: AssetManager | null;
 }
 
-const AssetTable: React.FC<AssetTableProps> = ({
-	assets,
-	loading,
-	onSelectAsset,
-}) => {
+const AssetTable: React.FC<AssetTableProps> = ({ assetManager }) => {
+	const dispatch = useAppDispatch();
+	const { assets: arweaveAssets, loading, pulling, error, selected } = useAppSelector(state => state.arweaveAssets);
+	const { assets: icpAssets } = useAppSelector((state) => state.icpAssets);
+
 	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
-	const { identity } = useInternetIdentity();
-	const [assetAvailability, setAssetAvailability] = useState<Record<string, boolean>>({});
-	const [pullInProgress, setPullInProgress] = useState<Record<string, boolean>>({});
 
-	// Use our custom hook to get the asset manager
-	const assetManager = useAssetManager({
-		canisterId: userAssetCanister ?? undefined,
-		identity
-	});
-
-	// Check which assets are already in the user's canister
 	useEffect(() => {
-		const checkAssetAvailability = async () => {
-			if (!assetManager || assets.length === 0) return;
-
-			try {
-				// Get list of assets from canister
-				const canisterAssets = await assetManager.list();
-				const assetKeysInCanister = new Set(
-					canisterAssets.map((asset) => asset.key)
-				);
-
-				// Check each asset
-				const availability = assets.reduce((acc, asset) => {
-					// We'll store assets with their id as the key
-					const assetKey = `/arweave/${asset.id}`;
-					acc[asset.id] = assetKeysInCanister.has(assetKey);
-					return acc;
-				}, {} as Record<string, boolean>);
-
-				setAssetAvailability(availability);
-			} catch (error) {
-				console.error("Failed to check asset availability:", error);
-			}
-		};
-
-		checkAssetAvailability();
-	}, [assetManager, assets]);
+		dispatch(fetchUserArweaveAssets());
+	}, []);
 
 	// Function to pull asset to user's canister
-	const pullAssetToCanister = async (asset: AssetItem) => {
+	const handlePullAsset = async (asset: ArweaveAssetItem) => {
 		if (!assetManager) {
-			toast.error(
-				"No asset canister available. Please create one first."
-			);
+			toast.error("No asset canister available. Please create one first.");
 			return;
 		}
 
-		try {
-			setPullInProgress({ ...pullInProgress, [asset.id]: true });
-
-			// Fetch the file using our utility function
-			const file = await fetchFile(asset);
-			
-			// Upload the file using our utility function
-			await uploadToCanister(assetManager, file, asset.id);
-
-			// Update availability state
-			setAssetAvailability({
-				...assetAvailability,
-				[asset.id]: true,
-			});
-
-			toast.success(
-				`Asset ${asset.id} pulled to your canister successfully`
-			);
-		} catch (error) {
-			console.error("Failed to pull asset to canister:", error);
-			toast.error(
-				`Failed to pull asset: ${
-					error instanceof Error ? error.message : "Unknown error"
-				}`
-			);
-		} finally {
-			setPullInProgress({ ...pullInProgress, [asset.id]: false });
-		}
+		dispatch(pullAssetToCanister({ asset, assetManager }));
 	};
 
 	if (loading) {
@@ -127,7 +66,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
 		);
 	}
 
-	if (!assets.length) {
+	if (!arweaveAssets.length) {
 		return (
 			<div className="flex justify-center p-16 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-850 rounded-lg border border-gray-200 dark:border-gray-800">
 				<div className="text-center">
@@ -149,26 +88,18 @@ const AssetTable: React.FC<AssetTableProps> = ({
 		return new Date(timestamp * 1000).toLocaleString();
 	};
 
-	// Helper to get file type from content type
-	const getFileType = (contentType?: string) => {
+	// Helper to get file type using the constants
+	const getFileTypeDisplay = (contentType?: string) => {
 		if (!contentType) return "Unknown";
-		if (contentType.includes("image")) return "Image";
-		if (contentType.includes("video")) return "Video";
-		if (contentType.includes("audio")) return "Audio";
-		if (contentType.includes("pdf")) return "PDF";
-		if (contentType.includes("text")) return "Text";
-		if (contentType.includes("json")) return "JSON";
-		return contentType.split("/")[1] || contentType;
+		const fileTypeInfo = getFileTypeInfo(contentType);
+		const typeName = getFileTypeName(contentType);
+		
+		return fileTypeInfo ? `${typeName}` : typeName;
 	};
 
-	// Helper to format file size
-	const formatSize = (bytes?: number) => {
-		if (!bytes) return "Unknown";
-		const sizes = ["Bytes", "KB", "MB", "GB"];
-		if (bytes === 0) return "0 Byte";
-		const i = Math.floor(Math.log(bytes) / Math.log(1024));
-		return `${Math.round(bytes / Math.pow(1024, i))} ${sizes[i]}`;
-	};
+	const isAvailableInCanister = (asset: ArweaveAssetItem) => {
+		return icpAssets.find((icpAsset) => icpAsset.key === `/arweave/${asset.id}`) ? true : false;
+	}
 
 	return (
 		<div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850">
@@ -186,7 +117,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{assets.map((asset) => (
+						{arweaveAssets.map((asset) => (
 							<TableRow key={asset.id}>
 								<TableCell>
 									{asset.contentType?.includes("image") ? (
@@ -202,9 +133,11 @@ const AssetTable: React.FC<AssetTableProps> = ({
 										/>
 									) : (
 										<div className="h-12 w-12 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center">
-											<span className="text-xs">
-												{getFileType(asset.contentType)}
-											</span>
+											{getFileTypeInfo(asset.contentType || "")?.icon || (
+												<span className="text-xs">
+													{getFileTypeName(asset.contentType || "")}
+												</span>
+											)}
 										</div>
 									)}
 								</TableCell>
@@ -215,12 +148,12 @@ const AssetTable: React.FC<AssetTableProps> = ({
 								</TableCell>
 								<TableCell>
 									<span className="text-sm text-gray-500 dark:text-gray-400">
-										{getFileType(asset.contentType)}
+										{getFileTypeDisplay(asset.contentType)}
 									</span>
 								</TableCell>
 								<TableCell>
 									<span className="text-sm text-gray-500 dark:text-gray-400">
-										{formatSize(asset.size)}
+										{asset.size ? formatFileSize(asset.size) : "Unknown"}
 									</span>
 								</TableCell>
 								<TableCell>
@@ -231,10 +164,10 @@ const AssetTable: React.FC<AssetTableProps> = ({
 								<TableCell>
 									{!userAssetCanister ? (
 										<Alert title="No Canister" className="px-2 py-0 m-0 flex justify-start items-center rounded-full" icon={CloudOff} children={null}></Alert>
-									) : assetAvailability[asset.id] ? (
+									) : pulling === asset.id ? (
+										<Alert variant="info" title="Pulling" className="px-2 py-0 m-0 flex justify-start items-center rounded-full" icon={Ellipsis} children={null}></Alert>
+									) : isAvailableInCanister(asset) ? (
 										<Alert variant="success" title="In Canister" className="px-2 py-0 m-0 flex justify-start items-center rounded-full" icon={Check} children={null}></Alert>
-									) : pullInProgress[asset.id] ? (
-										<Alert variant="info" title="Pulling..." className="px-2 py-0 m-0 flex justify-start items-center rounded-full" icon={Download} children={null}></Alert>
 									) : (
 										<Alert variant="warning" title="Arweave only" className="px-2 py-0 m-0 flex justify-start items-center rounded-full" icon={Cloud} children={null}></Alert>
 									)}
@@ -242,7 +175,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
 								<TableCell>
 									<div className="flex items-center space-x-2">
 										<Button
-											onClick={() => onSelectAsset(asset)}
+											onClick={() => dispatch(selectAsset(asset))}
 											variant="muted"
 											scale="sm"
 											className="gap-1"
@@ -267,22 +200,19 @@ const AssetTable: React.FC<AssetTableProps> = ({
 											</a>
 										</Button>
 
-										{userAssetCanister &&
-											!assetAvailability[asset.id] &&
-											!pullInProgress[asset.id] && (
-												<Button
-													onClick={() =>
-														pullAssetToCanister(
-															asset
-														)
-													}
-													variant="outline"
-													scale="sm"
-												>
-													<Download size={16} />
-													Pull
-												</Button>
-											)}
+										{userAssetCanister && !isAvailableInCanister(asset) && (
+											<Button
+												onClick={() =>
+													handlePullAsset(asset)
+												}
+												variant="outline"
+												scale="sm"
+												disabled={pulling === asset.id}
+											>
+												<Download size={16} />
+												Pull
+											</Button>
+										)}
 
 										{!userAssetCanister && (
 											<Button
