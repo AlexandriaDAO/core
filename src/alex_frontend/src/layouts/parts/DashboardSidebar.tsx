@@ -115,18 +115,6 @@ const DashboardSidebar = () => {
                     </NavLink>
 
                     <NavLink
-                        to="/dashboard/asset-sync"
-                        end
-                        className={({ isActive }) => `
-                            px-4 py-2 rounded-full flex justify-start gap-2 items-center transition-all border border-border/75
-                            ${isActive ? 'text-primary-foreground bg-primary' : 'text-primary/75 bg-muted hover:border-border hover:text-primary'}
-                        `}
-                    >
-                        <Database size={18}/>
-                        <span>ICP Asset Sync</span>
-                    </NavLink>
-
-                    <NavLink
                         to="/dashboard/arweave-assets"
                         end
                         className={({ isActive }) => `
