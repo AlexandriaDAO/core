@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { 
   Dialog, 
   DialogContent, 
@@ -8,6 +8,26 @@ import {
 import { ShelfContent } from "./ShelfContent";
 import { useAddToShelf } from "../hooks/useAddToShelf";
 import { ShelfManagerProps } from "../types";
+import { NormalizedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { Principal } from "@dfinity/principal";
+import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
+
+/**
+ * Convert a NormalizedShelf back to a Shelf for API calls and components
+ */
+const denormalizeShelf = (normalizedShelf: NormalizedShelf): Shelf => {
+  return {
+    ...normalizedShelf,
+    owner: Principal.fromText(normalizedShelf.owner)
+  };
+};
+
+/**
+ * Convert an array of NormalizedShelf objects to Shelf objects
+ */
+const denormalizeShelves = (normalizedShelves: NormalizedShelf[]): Shelf[] => {
+  return normalizedShelves.map(denormalizeShelf);
+};
 
 interface ShelfSelectionDialogProps extends ShelfManagerProps {
   open: boolean;
@@ -46,7 +66,7 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
   const editableShelves = getEditableShelves(currentShelfId);
   
   // Filter shelves based on search term
-  const filteredShelves = editableShelves.filter(shelf => {
+  const filteredNormalizedShelves = editableShelves.filter((shelf: NormalizedShelf) => {
     if (searchTerm === "") return true;
     
     const title = typeof shelf.title === 'string' ? shelf.title.toLowerCase() : '';
@@ -55,6 +75,9 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
     
     return title.includes(search) || description.includes(search);
   });
+  
+  // Convert normalized shelves to regular shelves for the components that expect Shelf type
+  const filteredShelves = denormalizeShelves(filteredNormalizedShelves);
 
   // Handle selection of a shelf
   const handleShelfSelection = (shelfId: string) => {

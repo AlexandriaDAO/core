@@ -4,8 +4,9 @@ import React from 'react';
 // Shelf related props
 export interface ShelfCardProps {
   shelf: Shelf;
-  onViewShelf: (shelfId: string) => void;
+  onViewShelf?: (shelfId: string) => void;
   showOwner?: boolean;
+  isReordering?: boolean;
 }
 
 export interface PublicShelfCardProps {

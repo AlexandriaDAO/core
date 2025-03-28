@@ -3,7 +3,7 @@ import { useIdentity } from "@/hooks/useIdentity";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { 
-  selectShelves,
+  selectUserShelves,
   selectLoading
 } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
 import {
@@ -23,7 +23,7 @@ import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.di
 export const useShelfOperations = () => {
   const { identity } = useIdentity();
   const dispatch = useAppDispatch();
-  const shelves = useAppSelector(selectShelves);
+  const shelves = useAppSelector(selectUserShelves);
   const loading = useAppSelector(selectLoading);
 
   const loadShelvesData = useCallback(async () => {

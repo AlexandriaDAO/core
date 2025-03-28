@@ -2,8 +2,10 @@ import { useCallback } from "react";
 import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks";
 import { useContentPermissions } from "@/apps/app/Perpetua/hooks/useContentPermissions";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { selectShelves } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { selectUserShelves, NormalizedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
 import { toast } from "sonner";
+import { Principal } from "@dfinity/principal";
+import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
 
 /**
  * Hook for item management actions in Perpetua
@@ -14,7 +16,17 @@ import { toast } from "sonner";
 export const useItemActions = () => {
   const { addItem, shelves, loading } = useShelfOperations();
   const { checkEditAccess, currentUser } = useContentPermissions();
-  const availableShelves = useAppSelector(selectShelves);
+  const availableShelves = useAppSelector(selectUserShelves);
+
+  /**
+   * Convert a NormalizedShelf back to a Shelf for API calls
+   */
+  const denormalizeShelf = useCallback((normalizedShelf: NormalizedShelf): Shelf => {
+    return {
+      ...normalizedShelf,
+      owner: Principal.fromText(normalizedShelf.owner)
+    };
+  }, []);
 
   /**
    * Get shelves that the current user has edit access to
@@ -24,7 +36,7 @@ export const useItemActions = () => {
    * @returns Array of shelves the user can edit
    */
   const getEditableShelves = useCallback((excludeShelfId?: string) => {
-    return availableShelves.filter(shelf => {
+    return availableShelves.filter((shelf: NormalizedShelf) => {
       // Don't include the shelf itself to prevent circular references
       if (excludeShelfId && shelf.shelf_id === excludeShelfId) {
         return false;
@@ -50,9 +62,9 @@ export const useItemActions = () => {
   ): Promise<boolean> => {
     try {
       // Find the target shelf
-      const targetShelf = shelves.find(s => s.shelf_id === shelfId);
+      const targetNormalizedShelf = availableShelves.find((s: NormalizedShelf) => s.shelf_id === shelfId);
       
-      if (!targetShelf) {
+      if (!targetNormalizedShelf) {
         toast.error("Shelf not found");
         return false;
       }
@@ -69,6 +81,9 @@ export const useItemActions = () => {
         return false;
       }
       
+      // Convert to Shelf type before passing to addItem
+      const targetShelf = denormalizeShelf(targetNormalizedShelf);
+      
       // Add the content to the shelf
       await addItem(targetShelf, content, contentType);
       
@@ -79,7 +94,7 @@ export const useItemActions = () => {
       toast.error("Failed to add content to shelf");
       return false;
     }
-  }, [shelves, checkEditAccess, addItem]);
+  }, [availableShelves, checkEditAccess, addItem, denormalizeShelf]);
 
   return {
     addContentToShelf,

@@ -7,16 +7,95 @@ import {
   setSelectedShelf, 
   updateSingleShelf,
   setShelfEditors,
-  setEditorsLoading
+  setEditorsLoading,
+  updateShelfOrder
 } from './perpetuaSlice';
 
-// Cache for shelves data to prevent repeated API calls
-interface CacheEntry {
-  data: any[];
-  timestamp: number;
+// Enhanced cache manager with more robust invalidation
+class ShelvesCache {
+  private static instance: ShelvesCache;
+  private cache: Map<string, { data: any; timestamp: number }>;
+  private readonly TTL = 30000; // 30 seconds TTL
+  
+  private constructor() {
+    this.cache = new Map();
+  }
+  
+  public static getInstance(): ShelvesCache {
+    if (!ShelvesCache.instance) {
+      ShelvesCache.instance = new ShelvesCache();
+    }
+    return ShelvesCache.instance;
+  }
+  
+  // Normalize principal to string format for consistent cache keys
+  private normalizePrincipal(principal: Principal | string): string {
+    return typeof principal === 'string' ? principal : principal.toString();
+  }
+  
+  // Add shelf ID to the key for per-shelf caching
+  private generateKey(principalOrId: Principal | string, type: string): string {
+    const normalizedId = this.normalizePrincipal(principalOrId);
+    return `${type}:${normalizedId}`;
+  }
+  
+  // Get data from cache if valid
+  public get<T>(principalOrId: Principal | string, type: string): T | null {
+    const key = this.generateKey(principalOrId, type);
+    const entry = this.cache.get(key);
+    
+    if (entry && (Date.now() - entry.timestamp < this.TTL)) {
+      return entry.data as T;
+    }
+    
+    return null;
+  }
+  
+  // Store data in cache
+  public set(principalOrId: Principal | string, type: string, data: any): void {
+    const key = this.generateKey(principalOrId, type);
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now()
+    });
+  }
+  
+  // Invalidate specific cache entry
+  public invalidate(principalOrId: Principal | string, type: string): void {
+    const key = this.generateKey(principalOrId, type);
+    this.cache.delete(key);
+  }
+  
+  // Invalidate all cache entries for a principal
+  public invalidateForPrincipal(principal: Principal | string): void {
+    const principalStr = this.normalizePrincipal(principal);
+    
+    // Find all keys that contain this principal and delete them
+    for (const key of this.cache.keys()) {
+      if (key.includes(principalStr)) {
+        this.cache.delete(key);
+      }
+    }
+  }
+  
+  // Invalidate all cache entries for a shelf
+  public invalidateForShelf(shelfId: string): void {
+    // Find all keys that contain this shelf ID and delete them
+    for (const key of this.cache.keys()) {
+      if (key.includes(shelfId)) {
+        this.cache.delete(key);
+      }
+    }
+  }
+  
+  // Clear all cache
+  public clear(): void {
+    this.cache.clear();
+  }
 }
-const shelvesCache = new Map<string, CacheEntry>();
-const CACHE_TTL = 30000; // 30 seconds cache lifetime
+
+// Singleton cache instance
+const cacheManager = ShelvesCache.getInstance();
 
 // // # QUERY CALLS # // //
 
@@ -25,18 +104,15 @@ export const loadShelves = createAsyncThunk(
   'perpetua/loadShelves',
   async (principal: Principal | string, { rejectWithValue, getState }) => {
     try {
-      // Create a stable string ID for cache key
+      // Create a stable string ID for normalized principal
       const principalStr = typeof principal === 'string' 
         ? principal 
         : principal.toString();
       
-      // Check cache first
-      const now = Date.now();
-      const cacheEntry = shelvesCache.get(principalStr);
-      
-      // If we have valid cache data, use it
-      if (cacheEntry && (now - cacheEntry.timestamp < CACHE_TTL)) {
-        return cacheEntry.data;
+      // Check cache first with the 'shelves' type
+      const cachedData = cacheManager.get<Shelf[]>(principalStr, 'userShelves');
+      if (cachedData) {
+        return cachedData;
       }
       
       // No cache hit, so fetch from API
@@ -53,11 +129,8 @@ export const loadShelves = createAsyncThunk(
         // Convert all BigInt values to strings before returning to Redux
         const shelves = convertBigIntsToStrings(result.Ok);
         
-        // Update the cache
-        shelvesCache.set(principalStr, {
-          data: shelves,
-          timestamp: now
-        });
+        // Update the cache with typed key
+        cacheManager.set(principalStr, 'userShelves', shelves);
         
         return shelves;
       } else {
@@ -69,14 +142,42 @@ export const loadShelves = createAsyncThunk(
   }
 );
 
-// Invalidate cache for a specific principal
-export const invalidateShelvesCache = (principal: Principal | string) => {
-  const principalStr = typeof principal === 'string' 
-    ? principal 
-    : principal.toString();
-  
-  shelvesCache.delete(principalStr);
-};
+// Explicit function to get a shelf by ID
+export const getShelfById = createAsyncThunk(
+  'perpetua/getShelfById',
+  async (shelfId: string, { dispatch, rejectWithValue }) => {
+    try {
+      // Check cache first with the 'shelf' type
+      const cachedData = cacheManager.get<Shelf>(shelfId, 'shelf');
+      if (cachedData) {
+        // Update the Redux store with the cached shelf
+        dispatch(updateSingleShelf(cachedData));
+        return cachedData;
+      }
+      
+      const perpetuaActor = await getActorPerpetua();
+      const result = await perpetuaActor.get_shelf(shelfId);
+      
+      if ("Ok" in result) {
+        // Convert all BigInt values to strings
+        const shelf = convertBigIntsToStrings(result.Ok);
+        
+        // Update the cache
+        cacheManager.set(shelfId, 'shelf', shelf);
+        
+        // Update the Redux store
+        dispatch(updateSingleShelf(shelf));
+        
+        return shelf;
+      } else {
+        return rejectWithValue(`Failed to load shelf ${shelfId}`);
+      }
+    } catch (error) {
+      console.error(`Error fetching shelf ${shelfId}:`, error);
+      return rejectWithValue(`Failed to load shelf ${shelfId}`);
+    }
+  }
+);
 
 export const loadRecentShelves = createAsyncThunk(
   'perpetua/loadRecentShelves',
@@ -88,6 +189,14 @@ export const loadRecentShelves = createAsyncThunk(
     beforeTimestamp?: string | bigint 
   }, { rejectWithValue }) => {
     try {
+      // Check cache only if this is the initial load (no beforeTimestamp)
+      if (!beforeTimestamp) {
+        const cachedData = cacheManager.get<any>('recent', 'publicShelves');
+        if (cachedData) {
+          return cachedData;
+        }
+      }
+      
       const perpetuaActor = await getActorPerpetua();
       
       // Convert string beforeTimestamp to BigInt if necessary
@@ -110,16 +219,22 @@ export const loadRecentShelves = createAsyncThunk(
           : undefined;
           
         // Convert all BigInt values to strings before returning to Redux
-        // This will also convert Principal objects to strings
         const shelves = convertBigIntsToStrings(result.Ok);
         const serializedBeforeTimestamp = beforeTimestampBigInt ? beforeTimestampBigInt.toString() : undefined;
         const serializedLastTimestamp = lastShelfTimestamp ? lastShelfTimestamp.toString() : undefined;
         
-        return { 
+        const responseData = { 
           shelves, 
           beforeTimestamp: serializedBeforeTimestamp,
           lastTimestamp: serializedLastTimestamp
         };
+        
+        // Only cache the initial load (no beforeTimestamp)
+        if (!beforeTimestamp) {
+          cacheManager.set('recent', 'publicShelves', responseData);
+        }
+        
+        return responseData;
       } else {
         return rejectWithValue("Failed to load recent shelves");
       }
@@ -146,8 +261,8 @@ export const createShelf = createAsyncThunk(
       );
       
       if ("Ok" in result) {
-        // Invalidate cache before reloading shelves
-        invalidateShelvesCache(principal);
+        // Invalidate all caches for this principal
+        cacheManager.invalidateForPrincipal(principal);
         
         // Reload shelves after creating a new one
         dispatch(loadShelves(principal));
@@ -200,9 +315,13 @@ export const addItem = createAsyncThunk(
       );
       
       if ("Ok" in result) {
-        // Reload the shelf data after adding a item
-        invalidateShelvesCache(principal);
-        dispatch(loadShelves(principal));
+        // Invalidate caches for this shelf and principal
+        cacheManager.invalidateForShelf(shelf.shelf_id);
+        cacheManager.invalidateForPrincipal(principal);
+        
+        // Fetch the updated shelf directly
+        dispatch(getShelfById(shelf.shelf_id));
+        
         return convertBigIntsToStrings({ shelf_id: shelf.shelf_id });
       } else if ("Err" in result) {
         return rejectWithValue(result.Err);
@@ -259,13 +378,12 @@ export const reorderItem = createAsyncThunk(
       );
       
       if ("Ok" in result) {
-        // Instead of reloading all shelves, just get the specific updated shelf
-        // This is a more targeted approach to avoid full state refresh
-        const specificShelfResult = await perpetuaActor.get_shelf(shelfId);
-        if ("Ok" in specificShelfResult) {
-          // Update just this shelf in the Redux store
-          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
-        }
+        // Invalidate caches for this shelf
+        cacheManager.invalidateForShelf(shelfId);
+        
+        // Fetch the updated shelf data
+        dispatch(getShelfById(shelfId));
+        
         return convertBigIntsToStrings({ shelfId, itemId, referenceItemId, before });
       } else {
         return rejectWithValue("Failed to reorder item");
@@ -283,14 +401,21 @@ export const reorderProfileShelf = createAsyncThunk(
     shelfId, 
     referenceShelfId, 
     before,
-    principal
+    principal,
+    newShelfOrder // Add a parameter for the complete new order
   }: { 
     shelfId: string, 
     referenceShelfId: string | null, 
     before: boolean,
-    principal: Principal | string
+    principal: Principal | string,
+    newShelfOrder?: string[] // Optional complete order for optimistic updates
   }, { dispatch, rejectWithValue }) => {
     try {
+      // If we have the complete new order, update it optimistically in Redux
+      if (newShelfOrder) {
+        dispatch(updateShelfOrder(newShelfOrder));
+      }
+      
       const perpetuaActor = await getActorPerpetua();
       const principalForApi = typeof principal === 'string'
         ? Principal.fromText(principal)
@@ -304,14 +429,24 @@ export const reorderProfileShelf = createAsyncThunk(
       );
       
       if ("Ok" in result) {
-        // After reordering shelves, invalidate cache
-        invalidateShelvesCache(principal);
+        // Invalidate all relevant caches
+        cacheManager.invalidateForPrincipal(principal);
+        cacheManager.invalidateForShelf(shelfId);
+        if (referenceShelfId) {
+          cacheManager.invalidateForShelf(referenceShelfId);
+        }
         
         // Force a reload of the shelves to get the new custom order
         await dispatch(loadShelves(principalForApi));
         
         return convertBigIntsToStrings({ shelfId, referenceShelfId, before });
       } else {
+        // If the API call failed and we did an optimistic update, we need to reload
+        // to restore the correct order
+        if (newShelfOrder) {
+          await dispatch(loadShelves(principalForApi));
+        }
+        
         return rejectWithValue("Failed to reorder shelf");
       }
     } catch (error) {
@@ -358,11 +493,11 @@ export const updateShelfMetadata = createAsyncThunk(
       );
       
       if ("Ok" in result) {
+        // Invalidate cache for this shelf
+        cacheManager.invalidateForShelf(shelfId);
+        
         // Get updated shelf data
-        const specificShelfResult = await perpetuaActor.get_shelf(shelfId);
-        if ("Ok" in specificShelfResult) {
-          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
-        }
+        dispatch(getShelfById(shelfId));
         
         return convertBigIntsToStrings({ shelfId, title, description });
       } else {
@@ -382,11 +517,11 @@ export const rebalanceShelfItems = createAsyncThunk(
       const result = await perpetuaActor.rebalance_shelf_items(shelfId);
       
       if ("Ok" in result) {
+        // Invalidate cache for this shelf
+        cacheManager.invalidateForShelf(shelfId);
+        
         // Get updated shelf data
-        const specificShelfResult = await perpetuaActor.get_shelf(shelfId);
-        if ("Ok" in specificShelfResult) {
-          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
-        }
+        dispatch(getShelfById(shelfId));
         
         return convertBigIntsToStrings({ shelfId });
       } else {
@@ -408,12 +543,23 @@ export const listShelfEditors = createAsyncThunk(
     try {
       dispatch(setEditorsLoading({ shelfId, loading: true }));
       
+      // Check cache first
+      const cachedData = cacheManager.get<string[]>(shelfId, 'editors');
+      if (cachedData) {
+        dispatch(setShelfEditors({ shelfId, editors: cachedData }));
+        dispatch(setEditorsLoading({ shelfId, loading: false }));
+        return cachedData;
+      }
+      
       const perpetuaActor = await getActorPerpetua();
       const result = await perpetuaActor.list_shelf_editors(shelfId);
       
       if ("Ok" in result) {
         // Convert Principal objects to strings
         const editorPrincipals = result.Ok.map(principal => principal.toString());
+        
+        // Cache the editors
+        cacheManager.set(shelfId, 'editors', editorPrincipals);
         
         // Update Redux state with editors
         dispatch(setShelfEditors({ shelfId, editors: editorPrincipals }));
@@ -451,14 +597,14 @@ export const addShelfEditor = createAsyncThunk(
       const result = await perpetuaActor.add_shelf_editor(shelfId, principalForApi);
       
       if ("Ok" in result) {
+        // Invalidate the editors cache
+        cacheManager.invalidate(shelfId, 'editors');
+        
         // Refresh the editors list
         dispatch(listShelfEditors(shelfId));
         
-        // Get updated shelf data to ensure UI is consistent
-        const specificShelfResult = await perpetuaActor.get_shelf(shelfId);
-        if ("Ok" in specificShelfResult) {
-          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
-        }
+        // Get updated shelf data
+        dispatch(getShelfById(shelfId));
         
         return { success: true, shelfId, editorPrincipal };
       } else if ("Err" in result) {
@@ -509,14 +655,14 @@ export const removeShelfEditor = createAsyncThunk(
       const result = await perpetuaActor.remove_shelf_editor(shelfId, principalForApi);
       
       if ("Ok" in result) {
+        // Invalidate the editors cache
+        cacheManager.invalidate(shelfId, 'editors');
+        
         // Refresh the editors list
         dispatch(listShelfEditors(shelfId));
         
-        // Get updated shelf data to ensure UI is consistent
-        const specificShelfResult = await perpetuaActor.get_shelf(shelfId);
-        if ("Ok" in specificShelfResult) {
-          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
-        }
+        // Get updated shelf data
+        dispatch(getShelfById(shelfId));
         
         return { success: true, shelfId, editorPrincipal };
       } else if ("Err" in result) {
@@ -573,8 +719,13 @@ export const createAndAddShelfItem = createAsyncThunk(
       );
       
       if ("Ok" in result) {
-        // Reload shelves to get both the new shelf and the updated parent shelf
+        // Invalidate all relevant caches
+        cacheManager.invalidateForPrincipal(principal);
+        cacheManager.invalidateForShelf(parentShelfId);
+        
+        // Reload shelves and get the updated parent shelf
         dispatch(loadShelves(principal));
+        dispatch(getShelfById(parentShelfId));
         
         // Get the shelf ID from the result
         const newShelfId = result.Ok;
@@ -640,14 +791,11 @@ export const removeItem = createAsyncThunk(
       );
       
       if ("Ok" in result) {
+        // Invalidate cache for this shelf
+        cacheManager.invalidateForShelf(shelfId);
+        
         // Get updated shelf data
-        const specificShelfResult = await perpetuaActor.get_shelf(shelfId);
-        if ("Ok" in specificShelfResult) {
-          dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
-        } else {
-          // Reload all shelves as a fallback
-          dispatch(loadShelves(principal));
-        }
+        dispatch(getShelfById(shelfId));
         
         return { success: true, shelfId, itemId };
       } else if ("Err" in result) {

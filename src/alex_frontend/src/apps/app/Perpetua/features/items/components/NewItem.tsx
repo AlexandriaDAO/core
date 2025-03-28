@@ -9,7 +9,7 @@ import { X, Plus } from "lucide-react";
 import NftSearchDialog from "./NftSearch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { selectShelves, selectSelectedShelf, selectUserPrincipal } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { selectUserShelves, selectSelectedShelf, selectUserPrincipal, NormalizedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
 import { toast } from "sonner";
 import { ShelfForm } from "@/apps/app/Perpetua/features/shelf-management/components/NewShelf";
 import { getActorPerpetua } from "@/features/auth/utils/authUtils";
@@ -24,7 +24,7 @@ interface DialogProps {
 
 interface NewItemDialogProps extends DialogProps {
   onSubmit: (content: string, type: "Nft" | "Markdown" | "Shelf") => Promise<void>;
-  shelves?: Shelf[];
+  shelves?: Shelf[] | NormalizedShelf[];
 }
 
 const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit, shelves: propShelves }) => {
@@ -44,7 +44,7 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
   const userPrincipal = useAppSelector(selectUserPrincipal);
   
   // Get shelves from Redux store
-  const allShelves = useAppSelector(selectShelves);
+  const allShelves = useAppSelector(selectUserShelves);
   const currentShelf = useAppSelector(selectSelectedShelf);
 
   // Get the shelf operations
@@ -69,7 +69,7 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
     }
     
     // Filter out the current shelf and any shelves already in the current shelf
-    return allShelves.filter((shelf: Shelf) => 
+    return allShelves.filter((shelf) => 
       shelf.shelf_id !== currentShelf.shelf_id && 
       !shelvesInCurrentShelf.has(shelf.shelf_id)
     );

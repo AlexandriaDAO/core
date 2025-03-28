@@ -13,14 +13,31 @@ export interface ContentPermissions {
   hasEditAccess: boolean;
 }
 
-// Define the state interface
+// Normalized shelf interface
+export interface NormalizedShelf extends Omit<Shelf, 'owner'> {
+  owner: string; // Always store owner as string for consistency
+}
+
+// Define the state interface with normalized structure
 export interface PerpetuaState {
-  shelves: Shelf[];
-  publicShelves: Shelf[];
-  selectedShelf: Shelf | null;
+  // Normalized entities
+  entities: {
+    shelves: Record<string, NormalizedShelf>; // Map of shelfId -> shelf
+  };
+  // IDs for different views
+  ids: {
+    userShelves: string[]; // IDs of user's shelves (order preserved)
+    publicShelves: string[]; // IDs of public shelves (order preserved)
+  };
+  // References
+  selectedShelfId: string | null;
   lastTimestamp: string | undefined;  // String representation of BigInt timestamp
-  loading: boolean;
-  publicLoading: boolean;
+  // Loading states
+  loading: {
+    userShelves: boolean;
+    publicShelves: boolean;
+    editors: Record<string, boolean>; // Track loading state for each shelf's editors
+  };
   error: string | null;
   // Permissions state
   userPrincipal: string | null;
@@ -28,37 +45,69 @@ export interface PerpetuaState {
   ownerPermissions: Record<string, boolean>; // Map of contentId -> isOwner
   // Editor tracking
   shelfEditors: Record<string, string[]>; // Map of shelfId -> editor principals
-  editorsLoading: Record<string, boolean>; // Track loading state for each shelf's editors
 }
 
 // Initial state
 const initialState: PerpetuaState = {
-  shelves: [],
-  publicShelves: [],
-  selectedShelf: null,
+  entities: {
+    shelves: {},
+  },
+  ids: {
+    userShelves: [],
+    publicShelves: [],
+  },
+  selectedShelfId: null,
   lastTimestamp: undefined,
-  loading: false,
-  publicLoading: false,
+  loading: {
+    userShelves: false,
+    publicShelves: false,
+    editors: {},
+  },
   error: null,
-  // Initialize permissions state
   userPrincipal: null,
   permissions: {},
   ownerPermissions: {},
-  // Initialize editors state
   shelfEditors: {},
-  editorsLoading: {},
+};
+
+// Utility function to normalize a shelf
+const normalizeShelf = (shelf: Shelf): NormalizedShelf => {
+  return {
+    ...shelf,
+    owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString()
+  };
+};
+
+// Utility function to normalize multiple shelves and return entities and ids
+const normalizeShelves = (shelves: Shelf[]): { 
+  entities: Record<string, NormalizedShelf>; 
+  ids: string[];
+} => {
+  const entities: Record<string, NormalizedShelf> = {};
+  const ids: string[] = [];
+  
+  shelves.forEach(shelf => {
+    const normalizedShelf = normalizeShelf(shelf);
+    const shelfId = shelf.shelf_id;
+    entities[shelfId] = normalizedShelf;
+    ids.push(shelfId);
+  });
+  
+  return { entities, ids };
 };
 
 // Helper function to update permissions for a shelf
 const updateShelfPermissions = (
   state: Draft<PerpetuaState>, 
-  shelf: Draft<Shelf> | Shelf, 
+  shelfId: string,
   editors: string[] = []
 ) => {
   if (!state.userPrincipal) return;
   
-  const shelfId = shelf.shelf_id;
-  const ownerPrincipal = shelf.owner.toString();
+  const shelf = state.entities.shelves[shelfId];
+  if (!shelf) return;
+  
+  const ownerPrincipal = shelf.owner;
   const isOwner = ownerPrincipal === state.userPrincipal;
   const isEditor = editors.some(editor => editor === state.userPrincipal);
   
@@ -72,46 +121,47 @@ const perpetuaSlice = createSlice({
   name: 'perpetua',
   initialState,
   reducers: {
-    setSelectedShelf: (state, action: PayloadAction<Shelf | null>) => {
-      state.selectedShelf = action.payload;
+    setSelectedShelf: (state, action: PayloadAction<Shelf | string | null>) => {
+      if (action.payload === null) {
+        state.selectedShelfId = null;
+        return;
+      }
       
-      // Use the helper function for permission updates
-      if (action.payload && state.userPrincipal) {
-        const shelfId = action.payload.shelf_id;
+      // Handle either a shelf object or a shelf ID string
+      if (typeof action.payload === 'string') {
+        state.selectedShelfId = action.payload;
+      } else {
+        const shelf = normalizeShelf(action.payload);
+        const shelfId = shelf.shelf_id;
+        
+        // Add/update the shelf in our entities
+        state.entities.shelves[shelfId] = shelf;
+        state.selectedShelfId = shelfId;
+      }
+      
+      // Update permissions if we have the shelf and user is logged in
+      if (state.selectedShelfId && state.userPrincipal) {
+        const shelfId = state.selectedShelfId;
         const editors = state.shelfEditors[shelfId] || [];
-        updateShelfPermissions(state, action.payload, editors);
+        updateShelfPermissions(state, shelfId, editors);
       }
     },
     setUserPrincipal: (state, action: PayloadAction<string | null>) => {
       state.userPrincipal = action.payload;
       
-      // Update all permissions when user changes
-      if (action.payload) {
-        // Update shelves permissions
-        state.shelves.forEach(shelf => {
-          const shelfId = shelf.shelf_id;
-          const editors = state.shelfEditors[shelfId] || [];
-          updateShelfPermissions(state, shelf, editors);
-        });
-        
-        // Update public shelves permissions
-        state.publicShelves.forEach(shelf => {
-          const shelfId = shelf.shelf_id;
-          const editors = state.shelfEditors[shelfId] || [];
-          updateShelfPermissions(state, shelf, editors);
-        });
-        
-        // Update selected shelf permission if exists
-        if (state.selectedShelf) {
-          const shelfId = state.selectedShelf.shelf_id;
-          const editors = state.shelfEditors[shelfId] || [];
-          updateShelfPermissions(state, state.selectedShelf, editors);
-        }
-      } else {
-        // If user is null, clear all permissions
+      // If user is null, clear all permissions
+      if (!action.payload) {
         state.permissions = {};
         state.ownerPermissions = {};
+        return;
       }
+      
+      // Update all permissions when user changes
+      // For all shelves in our entities
+      Object.keys(state.entities.shelves).forEach(shelfId => {
+        const editors = state.shelfEditors[shelfId] || [];
+        updateShelfPermissions(state, shelfId, editors);
+      });
     },
     setContentPermission: (state, action: PayloadAction<ContentPermissions>) => {
       const { contentId, hasEditAccess } = action.payload;
@@ -122,30 +172,14 @@ const perpetuaSlice = createSlice({
       const { shelfId, editors } = action.payload;
       state.shelfEditors[shelfId] = editors;
       
-      // Update permissions for this shelf if user is logged in
-      if (state.userPrincipal) {
-        // Find the shelf in either shelves, publicShelves, or selectedShelf
-        let targetShelf: Draft<Shelf> | Shelf | null = null;
-        
-        const inShelves = state.shelves.find(s => s.shelf_id === shelfId);
-        const inPublicShelves = state.publicShelves.find(s => s.shelf_id === shelfId);
-        
-        if (inShelves) {
-          targetShelf = inShelves;
-        } else if (inPublicShelves) {
-          targetShelf = inPublicShelves;
-        } else if (state.selectedShelf && state.selectedShelf.shelf_id === shelfId) {
-          targetShelf = state.selectedShelf;
-        }
-        
-        if (targetShelf) {
-          updateShelfPermissions(state, targetShelf, editors);
-        }
+      // Update permissions for this shelf if user is logged in and the shelf exists in our entities
+      if (state.userPrincipal && state.entities.shelves[shelfId]) {
+        updateShelfPermissions(state, shelfId, editors);
       }
     },
     setEditorsLoading: (state, action: PayloadAction<{shelfId: string, loading: boolean}>) => {
       const { shelfId, loading } = action.payload;
-      state.editorsLoading[shelfId] = loading;
+      state.loading.editors[shelfId] = loading;
     },
     clearPermissions: (state) => {
       state.permissions = {};
@@ -154,97 +188,96 @@ const perpetuaSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    // Update the updateSingleShelf reducer to handle permissions properly
+    // Update a single shelf in the normalized store
     updateSingleShelf: (state, action: PayloadAction<Shelf>) => {
-      const updatedShelf = action.payload;
+      const shelf = normalizeShelf(action.payload);
+      const shelfId = shelf.shelf_id;
       
-      // Update in shelves array
-      const index = state.shelves.findIndex(shelf => shelf.shelf_id === updatedShelf.shelf_id);
-      if (index !== -1) {
-        state.shelves[index] = updatedShelf;
-      }
-      
-      // Update in publicShelves if present
-      const publicIndex = state.publicShelves.findIndex(shelf => shelf.shelf_id === updatedShelf.shelf_id);
-      if (publicIndex !== -1) {
-        state.publicShelves[publicIndex] = updatedShelf;
-      }
-      
-      // Update selected shelf if it's the same one
-      if (state.selectedShelf && state.selectedShelf.shelf_id === updatedShelf.shelf_id) {
-        state.selectedShelf = updatedShelf;
-      }
+      // Update in entities
+      state.entities.shelves[shelfId] = shelf;
       
       // Update permissions for this shelf
       if (state.userPrincipal) {
-        const shelfId = updatedShelf.shelf_id;
         const editors = state.shelfEditors[shelfId] || [];
-        updateShelfPermissions(state, updatedShelf, editors);
+        updateShelfPermissions(state, shelfId, editors);
       }
+    },
+    // Update the order of user shelves
+    updateShelfOrder: (state, action: PayloadAction<string[]>) => {
+      // The payload is the new ordered array of shelf IDs
+      state.ids.userShelves = action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
       // Load shelves
       .addCase(loadShelves.pending, (state) => {
-        state.loading = true;
+        state.loading.userShelves = true;
         state.error = null;
       })
       .addCase(loadShelves.fulfilled, (state, action) => {
-        state.shelves = action.payload;
-        state.loading = false;
+        const { entities, ids } = normalizeShelves(action.payload);
+        
+        // Update entities by merging new shelves
+        state.entities.shelves = {
+          ...state.entities.shelves,
+          ...entities
+        };
+        
+        // Set user shelves IDs
+        state.ids.userShelves = ids;
+        state.loading.userShelves = false;
         
         // Update permissions for loaded shelves
         if (state.userPrincipal) {
-          action.payload.forEach((shelf: Shelf) => {
-            // Handle both string and Principal object formats for owner
-            const ownerStr = typeof shelf.owner === 'string' 
-              ? shelf.owner 
-              : shelf.owner.toString();
-            
-            state.permissions[shelf.shelf_id] = ownerStr === state.userPrincipal;
+          ids.forEach(shelfId => {
+            const editors = state.shelfEditors[shelfId] || [];
+            updateShelfPermissions(state, shelfId, editors);
           });
         }
       })
       .addCase(loadShelves.rejected, (state, action) => {
-        state.loading = false;
+        state.loading.userShelves = false;
         state.error = action.payload as string;
       })
       
       // Load recent public shelves
       .addCase(loadRecentShelves.pending, (state) => {
-        state.publicLoading = true;
+        state.loading.publicShelves = true;
         state.error = null;
       })
       .addCase(loadRecentShelves.fulfilled, (state, action) => {
         const { shelves, beforeTimestamp, lastTimestamp } = action.payload;
+        const { entities, ids } = normalizeShelves(shelves);
         
-        // If we're loading with a timestamp, append to existing shelves
+        // Merge new entities
+        state.entities.shelves = {
+          ...state.entities.shelves,
+          ...entities
+        };
+        
+        // If we're loading with a timestamp, append to existing public shelf IDs
         if (beforeTimestamp) {
-          state.publicShelves = [...state.publicShelves, ...shelves];
+          state.ids.publicShelves = [...state.ids.publicShelves, ...ids];
         } else {
-          // Otherwise, replace the shelves
-          state.publicShelves = shelves;
+          // Otherwise, replace the public shelf IDs
+          state.ids.publicShelves = ids;
         }
         
         // Store the lastTimestamp as a string (already converted in the thunk)
         state.lastTimestamp = lastTimestamp;
-        state.publicLoading = false;
+        state.loading.publicShelves = false;
         
         // Update permissions for loaded public shelves
         if (state.userPrincipal) {
-          shelves.forEach((shelf: Shelf) => {
-            // Handle both string and Principal object formats for owner
-            const ownerStr = typeof shelf.owner === 'string' 
-              ? shelf.owner 
-              : shelf.owner.toString();
-            
-            state.permissions[shelf.shelf_id] = ownerStr === state.userPrincipal;
+          ids.forEach(shelfId => {
+            const editors = state.shelfEditors[shelfId] || [];
+            updateShelfPermissions(state, shelfId, editors);
           });
         }
       })
       .addCase(loadRecentShelves.rejected, (state, action) => {
-        state.publicLoading = false;
+        state.loading.publicShelves = false;
         state.error = action.payload as string;
       });
   },
@@ -259,18 +292,37 @@ export const {
   setContentPermission,
   clearPermissions,
   setShelfEditors,
-  setEditorsLoading
+  setEditorsLoading,
+  updateShelfOrder
 } = perpetuaSlice.actions;
 export default perpetuaSlice.reducer;
 
 // Selectors
-export const selectShelves = (state: { perpetua: PerpetuaState }) => state.perpetua.shelves;
-export const selectPublicShelves = (state: { perpetua: PerpetuaState }) => state.perpetua.publicShelves;
-export const selectSelectedShelf = (state: { perpetua: PerpetuaState }) => state.perpetua.selectedShelf;
+// Get all user shelves with preserved order
+export const selectUserShelves = (state: { perpetua: PerpetuaState }) => {
+  return state.perpetua.ids.userShelves.map(id => state.perpetua.entities.shelves[id]).filter(Boolean);
+};
+
+// Get all public shelves with preserved order
+export const selectPublicShelves = (state: { perpetua: PerpetuaState }) => {
+  return state.perpetua.ids.publicShelves.map(id => state.perpetua.entities.shelves[id]).filter(Boolean);
+};
+
+// Get a specific shelf by ID
+export const selectShelfById = (shelfId: string) => 
+  (state: { perpetua: PerpetuaState }) => state.perpetua.entities.shelves[shelfId] || null;
+
+// Get the currently selected shelf
+export const selectSelectedShelf = (state: { perpetua: PerpetuaState }) => {
+  const { selectedShelfId } = state.perpetua;
+  if (!selectedShelfId) return null;
+  return state.perpetua.entities.shelves[selectedShelfId] || null;
+};
+
 export const selectLastTimestamp = (state: { perpetua: PerpetuaState }) => state.perpetua.lastTimestamp;
 
-export const selectLoading = (state: { perpetua: PerpetuaState }) => state.perpetua.loading;
-export const selectPublicLoading = (state: { perpetua: PerpetuaState }) => state.perpetua.publicLoading;
+export const selectLoading = (state: { perpetua: PerpetuaState }) => state.perpetua.loading.userShelves;
+export const selectPublicLoading = (state: { perpetua: PerpetuaState }) => state.perpetua.loading.publicShelves;
 export const selectError = (state: { perpetua: PerpetuaState }) => state.perpetua.error;
 
 // Permission selectors
@@ -282,7 +334,7 @@ export const selectShelfEditors = (shelfId: string) =>
   (state: { perpetua: PerpetuaState }) => state.perpetua.shelfEditors[shelfId] || [];
 
 export const selectEditorsLoading = (shelfId: string) => 
-  (state: { perpetua: PerpetuaState }) => state.perpetua.editorsLoading[shelfId] || false;
+  (state: { perpetua: PerpetuaState }) => state.perpetua.loading.editors[shelfId] || false;
 
 // Check if user is the owner of a shelf
 export const selectIsOwner = (contentId: string) => 
