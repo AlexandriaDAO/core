@@ -1,10 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
-import { ArrowLeft, Plus, Edit, X, RotateCcw } from "lucide-react";
+import { ArrowLeft, Plus, Edit, X, RotateCcw, Save, AlertCircle } from "lucide-react";
 import { ShelfCard, PublicShelfCard } from '../components/ShelfCard';
 import { LibraryShelvesUIProps, ExploreShelvesUIProps, UserShelvesUIProps } from '../types/types';
 import { Shelf } from "../../../../../../../,,/../../declarations/perpetua/perpetua.did";
+import { useShelfReordering } from '../../shelf-management/hooks/useShelfReordering';
+import { useIdentity } from '@/hooks/useIdentity';
+import { toast } from 'sonner';
+import isEqual from 'lodash/isEqual';
+
+// Custom props comparison for React.memo to prevent unnecessary renders
+const areShelvesPropsEqual = (prevProps: UserShelvesUIProps, nextProps: UserShelvesUIProps): boolean => {
+  // Basic props comparison
+  if (prevProps.loading !== nextProps.loading || 
+      prevProps.isCurrentUser !== nextProps.isCurrentUser) {
+    return false;
+  }
+  
+  // Function equality - consider them equal since we can't reliably compare functions
+  // We assume parent components are memoizing their callbacks properly
+  
+  // Deep comparison of shelves - only care about IDs and basic metadata
+  if (prevProps.shelves.length !== nextProps.shelves.length) {
+    return false;
+  }
+  
+  return isEqual(
+    prevProps.shelves.map(s => ({ 
+      id: s.shelf_id, 
+      title: s.title,
+      owner: s.owner.toString() 
+    })),
+    nextProps.shelves.map(s => ({ 
+      id: s.shelf_id, 
+      title: s.title,
+      owner: s.owner.toString()
+    }))
+  );
+};
 
 // Unified shelves view - simple version without search/filtering
 interface UnifiedShelvesUIProps {
@@ -19,7 +53,7 @@ interface UnifiedShelvesUIProps {
 }
 
 // Unified Shelves UI Component that shows all shelves
-export const UnifiedShelvesUI: React.FC<UnifiedShelvesUIProps> = ({
+export const UnifiedShelvesUI: React.FC<UnifiedShelvesUIProps> = React.memo(({
   allShelves,
   personalShelves,
   loading,
@@ -29,6 +63,28 @@ export const UnifiedShelvesUI: React.FC<UnifiedShelvesUIProps> = ({
   onLoadMore,
   checkEditAccess
 }) => {
+  // Memoize shelves rendering to prevent unnecessary work during re-renders
+  const renderedShelves = useMemo(() => {
+    return allShelves.map((shelf) => {
+      // Determine if this is a shelf owned by the current user
+      const isPersonal = personalShelves.some(ps => ps.shelf_id === shelf.shelf_id);
+      
+      return isPersonal ? (
+        <ShelfCard
+          key={shelf.shelf_id}
+          shelf={shelf}
+          onViewShelf={onViewShelf}
+        />
+      ) : (
+        <PublicShelfCard
+          key={shelf.shelf_id}
+          shelf={shelf}
+          onViewShelf={onViewShelf}
+        />
+      );
+    });
+  }, [allShelves, personalShelves, onViewShelf]);
+
   return (
     <div className="h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
@@ -62,24 +118,7 @@ export const UnifiedShelvesUI: React.FC<UnifiedShelvesUIProps> = ({
       ) : (
         <>
           <ContentGrid>
-            {allShelves.map((shelf) => {
-              // Determine if this is a shelf owned by the current user
-              const isPersonal = personalShelves.some(ps => ps.shelf_id === shelf.shelf_id);
-              
-              return isPersonal ? (
-                <ShelfCard
-                  key={shelf.shelf_id}
-                  shelf={shelf}
-                  onViewShelf={onViewShelf}
-                />
-              ) : (
-                <PublicShelfCard
-                  key={shelf.shelf_id}
-                  shelf={shelf}
-                  onViewShelf={onViewShelf}
-                />
-              );
-            })}
+            {renderedShelves}
           </ContentGrid>
           
           <div className="mt-6 text-center">
@@ -95,15 +134,27 @@ export const UnifiedShelvesUI: React.FC<UnifiedShelvesUIProps> = ({
       )}
     </div>
   );
-};
+});
+UnifiedShelvesUI.displayName = 'UnifiedShelvesUI';
 
 // Library Shelves UI Component
-export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = ({
+export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = React.memo(({
   shelves,
   loading,
   onNewShelf,
   onViewShelf
 }) => {
+  // Memoize shelves rendering
+  const renderedShelfCards = useMemo(() => {
+    return shelves.map((shelf) => (
+      <ShelfCard
+        key={shelf.shelf_id}
+        shelf={shelf}
+        onViewShelf={onViewShelf}
+      />
+    ));
+  }, [shelves, onViewShelf]);
+
   return (
     <div className="h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
@@ -136,36 +187,42 @@ export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = ({
         </div>
       ) : (
         <ContentGrid>
-          {shelves.map((shelf) => (
-            <ShelfCard
-              key={shelf.shelf_id}
-              shelf={shelf}
-              onViewShelf={onViewShelf}
-            />
-          ))}
+          {renderedShelfCards}
         </ContentGrid>
       )}
     </div>
   );
-};
+});
+LibraryShelvesUI.displayName = 'LibraryShelvesUI';
 
 // Explore Shelves UI Component
-export const ExploreShelvesUI: React.FC<ExploreShelvesUIProps> = ({
+export const ExploreShelvesUI: React.FC<ExploreShelvesUIProps> = React.memo(({
   shelves,
   loading,
   onViewShelf,
   onLoadMore
 }) => {
-  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   
-  const handleLoadMore = async () => {
+  const handleLoadMore = useCallback(async () => {
     setIsLoadingMore(true);
     try {
       await onLoadMore();
     } finally {
       setIsLoadingMore(false);
     }
-  };
+  }, [onLoadMore]);
+  
+  // Memoize shelf cards
+  const renderedShelfCards = useMemo(() => {
+    return shelves.map((shelf) => (
+      <PublicShelfCard
+        key={shelf.shelf_id}
+        shelf={shelf}
+        onViewShelf={onViewShelf}
+      />
+    ));
+  }, [shelves, onViewShelf]);
   
   return (
     <div className="h-full flex flex-col">
@@ -182,13 +239,7 @@ export const ExploreShelvesUI: React.FC<ExploreShelvesUIProps> = ({
       ) : (
         <>
           <ContentGrid>
-            {shelves.map((shelf) => (
-              <PublicShelfCard
-                key={shelf.shelf_id}
-                shelf={shelf}
-                onViewShelf={onViewShelf}
-              />
-            ))}
+            {renderedShelfCards}
           </ContentGrid>
           
           <div className="mt-6 text-center">
@@ -204,42 +255,131 @@ export const ExploreShelvesUI: React.FC<ExploreShelvesUIProps> = ({
       )}
     </div>
   );
-};
+});
+ExploreShelvesUI.displayName = 'ExploreShelvesUI';
 
-// User Shelves UI Component
-export const UserShelvesUI: React.FC<UserShelvesUIProps> = ({
+// User Shelves UI Component with custom equality function
+export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
   shelves,
   loading,
   onViewShelf,
   onViewOwner,
   onBack,
-  // New props for reordering
-  isReorderMode = false,
-  isCurrentUser = false,
-  onEnterReorderMode,
-  onCancelReorderMode,
-  onSaveReorderedShelves,
-  onResetProfileOrder,
-  onDragStart,
-  onDragOver,
-  onDragEnd,
-  onDrop
+  isCurrentUser = false
 }) => {
-  let ownerName = "";
-  let ownerId = "";
-  if (shelves.length > 0) {
-    ownerName = shelves[0].owner.toString();
-    ownerId = ownerName;
-  }
+  const { identity } = useIdentity();
+  const [saveInProgress, setSaveInProgress] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   
-  const handleGoBack = () => {
+  // Calculate owner information once and memoize it
+  const { ownerName, ownerId, currentUserIsOwner } = useMemo(() => {
+    let owner = "";
+    let id = "";
+    
+    if (shelves.length > 0) {
+      owner = shelves[0].owner.toString();
+      id = owner;
+    }
+
+    // Check if the current user is the owner of this profile (ensure boolean result)
+    const isOwner = Boolean(isCurrentUser || (identity && owner && identity.getPrincipal().toString() === owner));
+    
+    return { ownerName: owner, ownerId: id, currentUserIsOwner: isOwner };
+  }, [shelves, identity, isCurrentUser]);
+
+  // Initialize shelf reordering hook
+  const reorderingProps = useShelfReordering({
+    shelves: shelves,
+    hasEditAccess: currentUserIsOwner
+  });
+  
+  const { 
+    isEditMode, 
+    editedShelves, 
+    enterEditMode, 
+    cancelEditMode, 
+    saveShelfOrder,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+    handleDrop,
+    getDragItemStyle 
+  } = reorderingProps;
+  
+  const handleSaveOrder = useCallback(async () => {
+    setSaveInProgress(true);
+    setSaveError(null);
+    
+    try {
+      await saveShelfOrder();
+      toast.success("Shelf order saved successfully");
+    } catch (error) {
+      console.error("[Shelf Reordering] Error saving order:", error);
+      let errorMessage = "Failed to save shelf order";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      setSaveError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setSaveInProgress(false);
+    }
+  }, [ownerName, saveShelfOrder]);
+
+  // Helper function to get content to render
+  const getShelves = useCallback(() => isEditMode ? editedShelves : shelves, [isEditMode, editedShelves, shelves]);
+  
+  // Helper function to create drag props with correct types - memoized
+  const getDragProps = useCallback((index: number) => {
+    if (isEditMode) {
+      return {
+        draggable: true,
+        onDragStart: (e: React.DragEvent) => handleDragStart(e, index),
+        onDragOver: (e: React.DragEvent) => handleDragOver(e, index),
+        onDragEnd: handleDragEnd,
+        onDrop: (e: React.DragEvent) => handleDrop(e, index),
+        style: getDragItemStyle(index),
+        className: "cursor-move transition-all duration-200"
+      };
+    }
+    return {
+      draggable: false,
+      className: ""
+    };
+  }, [isEditMode, handleDragStart, handleDragOver, handleDragEnd, handleDrop, getDragItemStyle]);
+
+  const handleGoBack = useCallback(() => {
     if (onBack) {
       onBack();
     } else {
       // Fallback to browser history if no onBack provided
       window.history.back();
     }
-  };
+  }, [onBack]);
+  
+  // Memoize the entire rendered shelf list to prevent re-renders
+  const renderShelfCards = useMemo(() => {
+    const currentShelves = getShelves();
+    
+    return currentShelves.map((shelf, index) => {
+      const dragProps = getDragProps(index);
+      
+      return (
+        <div 
+          key={shelf.shelf_id}
+          {...dragProps}
+        >
+          <PublicShelfCard
+            shelf={shelf}
+            onViewShelf={!isEditMode ? onViewShelf : undefined}
+            isReordering={Boolean(isEditMode)}
+          />
+        </div>
+      );
+    });
+  }, [getShelves, getDragProps, isEditMode, onViewShelf]);
   
   return (
     <div className="h-full flex flex-col">
@@ -274,45 +414,36 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = ({
             ) : 'User Shelves'}
           </h2>
           
-          {/* Add reordering controls only for the current user */}
-          {isCurrentUser && (
+          {currentUserIsOwner && (
             <div className="flex items-center gap-2">
-              {!isReorderMode ? (
-                // Show edit button when not in reorder mode
+              {!isEditMode ? (
                 <Button 
-                  variant="outline"
-                  onClick={onEnterReorderMode}
-                  className="flex items-center gap-1 h-8 text-sm"
-                  disabled={loading || shelves.length <= 1} // Disable if only one shelf or less
+                  variant="outline" 
+                  className="flex items-center gap-1"
+                  onClick={enterEditMode}
+                  disabled={loading || shelves.length <= 1}
                 >
                   <Edit className="w-4 h-4" />
-                  Reorder
+                  Edit Order
                 </Button>
               ) : (
-                // Show cancel and save buttons when in reorder mode
                 <>
                   <Button 
-                    variant="outline"
-                    onClick={onResetProfileOrder}
-                    className="flex items-center gap-1 h-8 text-sm"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    Reset to Default
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={onCancelReorderMode}
-                    className="flex items-center gap-1 h-8 text-sm"
+                    variant="outline" 
+                    className="flex items-center gap-1"
+                    onClick={cancelEditMode}
                   >
                     <X className="w-4 h-4" />
                     Cancel
                   </Button>
                   <Button 
-                    variant="primary"
-                    onClick={onSaveReorderedShelves}
-                    className="flex items-center gap-1 h-8 text-sm"
+                    variant="primary" 
+                    className="flex items-center gap-1"
+                    onClick={handleSaveOrder}
+                    disabled={saveInProgress}
                   >
-                    Save Order
+                    <Save className="w-4 h-4" />
+                    {saveInProgress ? 'Saving...' : 'Save Order'}
                   </Button>
                 </>
               )}
@@ -329,56 +460,11 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = ({
         </div>
       ) : (
         <ContentGrid>
-          {shelves.map((shelf, index) => (
-            <div
-              key={shelf.shelf_id}
-              draggable={isReorderMode}
-              onDragStart={isReorderMode ? (e: React.DragEvent<HTMLDivElement>) => {
-                // Set data transfer for compatibility
-                e.dataTransfer.setData('text/plain', index.toString());
-                // Add a class to the element being dragged
-                e.currentTarget.classList.add('opacity-50');
-                onDragStart?.(index);
-              } : undefined}
-              onDragOver={isReorderMode ? (e: React.DragEvent<HTMLDivElement>) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                // Highlight the drop target
-                e.currentTarget.classList.add('bg-primary/10');
-                onDragOver?.(e, index);
-              } : undefined}
-              onDragLeave={isReorderMode ? (e: React.DragEvent<HTMLDivElement>) => {
-                // Remove highlight from drop target when dragging out
-                e.currentTarget.classList.remove('bg-primary/10');
-              } : undefined}
-              onDragEnd={isReorderMode ? (e: React.DragEvent<HTMLDivElement>) => {
-                // Remove dragging styles
-                e.currentTarget.classList.remove('opacity-50');
-                onDragEnd?.();
-              } : undefined}
-              onDrop={isReorderMode ? (e: React.DragEvent<HTMLDivElement>) => {
-                e.preventDefault();
-                // Remove highlight
-                e.currentTarget.classList.remove('bg-primary/10');
-                onDrop?.(e, index);
-              } : undefined}
-              className={`relative transition-all duration-200 ${
-                isReorderMode ? 'cursor-grab active:cursor-grabbing border-2 border-dashed border-transparent hover:border-primary/30' : ''
-              }`}
-            >
-              {isReorderMode && (
-                <div className="absolute top-2 left-2 z-40 bg-black/50 text-white py-1 px-2 text-xs rounded">
-                  {index + 1}
-                </div>
-              )}
-              <PublicShelfCard
-                shelf={shelf}
-                onViewShelf={isReorderMode ? undefined : onViewShelf}
-              />
-            </div>
-          ))}
+          {renderShelfCards}
         </ContentGrid>
       )}
     </div>
   );
-}; 
+}, areShelvesPropsEqual);  // Apply custom equality function to prevent unnecessary re-renders
+
+UserShelvesUI.displayName = 'UserShelvesUI'; 

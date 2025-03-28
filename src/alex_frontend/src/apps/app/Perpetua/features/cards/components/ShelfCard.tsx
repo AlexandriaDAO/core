@@ -21,6 +21,7 @@ interface ExtendedShelfCardProps extends ShelfCardProps {
 interface ExtendedPublicShelfCardProps extends PublicShelfCardProps {
   parentShelfId?: string;
   itemId?: number;
+  isReordering?: boolean;
 }
 
 // Shelf Card Component for the library view
@@ -109,7 +110,8 @@ export const PublicShelfCard: React.FC<ExtendedPublicShelfCardProps> = ({
   shelf, 
   onViewShelf,
   parentShelfId,
-  itemId
+  itemId,
+  isReordering
 }) => {
   // Skip null safety checks as they should be handled by the parent component
   const itemCount = Object.keys(shelf.items).length;
@@ -125,6 +127,13 @@ export const PublicShelfCard: React.FC<ExtendedPublicShelfCardProps> = ({
           <div className="text-xs text-muted-foreground">
             {itemCount} {itemCount === 1 ? 'item' : 'items'}
           </div>
+          {isReordering && (
+            <div className="text-xs text-muted-foreground">
+              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                Drag to reorder
+              </span>
+            </div>
+          )}
         </div>
       }
     >

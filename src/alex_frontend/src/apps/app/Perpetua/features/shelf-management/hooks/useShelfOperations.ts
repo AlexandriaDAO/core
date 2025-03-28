@@ -11,6 +11,7 @@ import {
   createShelf as createShelfAction, 
   addItem as addItemAction,
   reorderItem as reorderItemAction,
+  reorderProfileShelf as reorderProfileShelfAction,
   updateShelfMetadata,
   createAndAddShelfItem as createAndAddShelfItemAction,
   removeItem as removeItemAction
@@ -79,6 +80,17 @@ export const useShelfOperations = () => {
     }));
   }, [identity, dispatch]);
 
+  // New function to reorder shelves in a user's profile
+  const reorderShelf = useCallback(async (shelfId: string, referenceShelfId: string | null, before: boolean): Promise<void> => {
+    if (!identity) return;
+    await dispatch(reorderProfileShelfAction({
+      shelfId,
+      referenceShelfId,
+      before,
+      principal: identity.getPrincipal()
+    }));
+  }, [identity, dispatch]);
+
   const removeItem = useCallback(async (shelfId: string, itemId: number): Promise<boolean> => {
     if (!identity) {
       console.error("Cannot remove item: No identity available");
@@ -132,6 +144,7 @@ export const useShelfOperations = () => {
     addItem,
     createAndAddShelfItem,
     reorderItem,
+    reorderShelf,
     findItemById,
     updateMetadata,
     removeItem,

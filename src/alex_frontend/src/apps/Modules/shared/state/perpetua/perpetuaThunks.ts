@@ -10,13 +10,36 @@ import {
   setEditorsLoading
 } from './perpetuaSlice';
 
+// Cache for shelves data to prevent repeated API calls
+interface CacheEntry {
+  data: any[];
+  timestamp: number;
+}
+const shelvesCache = new Map<string, CacheEntry>();
+const CACHE_TTL = 30000; // 30 seconds cache lifetime
+
 // // # QUERY CALLS # // //
 
 // Async thunks
 export const loadShelves = createAsyncThunk(
   'perpetua/loadShelves',
-  async (principal: Principal | string, { rejectWithValue }) => {
+  async (principal: Principal | string, { rejectWithValue, getState }) => {
     try {
+      // Create a stable string ID for cache key
+      const principalStr = typeof principal === 'string' 
+        ? principal 
+        : principal.toString();
+      
+      // Check cache first
+      const now = Date.now();
+      const cacheEntry = shelvesCache.get(principalStr);
+      
+      // If we have valid cache data, use it
+      if (cacheEntry && (now - cacheEntry.timestamp < CACHE_TTL)) {
+        return cacheEntry.data;
+      }
+      
+      // No cache hit, so fetch from API
       const perpetuaActor = await getActorPerpetua();
       
       // Convert string to Principal for the API call if needed
@@ -30,18 +53,30 @@ export const loadShelves = createAsyncThunk(
         // Convert all BigInt values to strings before returning to Redux
         const shelves = convertBigIntsToStrings(result.Ok);
         
-        // We keep the owner as a Principal type here to match the Shelf interface
-        // The Principal will be converted to string when needed in the UI
+        // Update the cache
+        shelvesCache.set(principalStr, {
+          data: shelves,
+          timestamp: now
+        });
+        
         return shelves;
       } else {
         return rejectWithValue("Failed to load shelves");
       }
     } catch (error) {
-      console.error("Failed to load shelves:", error);
       return rejectWithValue("Failed to load shelves");
     }
   }
 );
+
+// Invalidate cache for a specific principal
+export const invalidateShelvesCache = (principal: Principal | string) => {
+  const principalStr = typeof principal === 'string' 
+    ? principal 
+    : principal.toString();
+  
+  shelvesCache.delete(principalStr);
+};
 
 export const loadRecentShelves = createAsyncThunk(
   'perpetua/loadRecentShelves',
@@ -89,33 +124,10 @@ export const loadRecentShelves = createAsyncThunk(
         return rejectWithValue("Failed to load recent shelves");
       }
     } catch (error) {
-      console.error("Failed to load recent shelves:", error);
       return rejectWithValue("Failed to load recent shelves");
     }
   }
 );
-
-// export const getShelfPositionMetrics = createAsyncThunk(
-//   'perpetua/getShelfPositionMetrics',
-//   async (shelfId: string, { rejectWithValue }) => {
-//     try {
-//       const perpetuaActor = await getActorPerpetua();
-//       const result = await perpetuaActor.get_shelf_position_metrics(shelfId);
-      
-//       if ("Ok" in result) {
-//         return result.Ok;
-//       } else {
-//         return rejectWithValue("Failed to get shelf position metrics");
-//       }
-//     } catch (error) {
-//       console.error("Failed to get shelf position metrics:", error);
-//       return rejectWithValue("Failed to get shelf position metrics");
-//     }
-//   }
-// );
-
-
-
 
 // // # UPDATE CALLS # // //
 
@@ -134,6 +146,9 @@ export const createShelf = createAsyncThunk(
       );
       
       if ("Ok" in result) {
+        // Invalidate cache before reloading shelves
+        invalidateShelvesCache(principal);
+        
         // Reload shelves after creating a new one
         dispatch(loadShelves(principal));
         return { shelfId: result.Ok };
@@ -143,7 +158,6 @@ export const createShelf = createAsyncThunk(
         return rejectWithValue("Failed to create shelf");
       }
     } catch (error) {
-      console.error("Failed to create shelf:", error);
       return rejectWithValue("Failed to create shelf");
     }
   }
@@ -169,8 +183,6 @@ export const addItem = createAsyncThunk(
     try {
       const perpetuaActor = await getActorPerpetua();
       
-      console.log(`Adding ${type} content to shelf: ${shelf.title}, content: ${content.substring(0, 20)}${content.length > 20 ? '...' : ''}`);
-      
       // Use the add_shelf_item method instead of updating the entire shelf
       const itemContent: ItemContent = type === "Nft" 
         ? { Nft: content } as ItemContent
@@ -189,34 +201,25 @@ export const addItem = createAsyncThunk(
       
       if ("Ok" in result) {
         // Reload the shelf data after adding a item
+        invalidateShelvesCache(principal);
         dispatch(loadShelves(principal));
         return convertBigIntsToStrings({ shelf_id: shelf.shelf_id });
       } else if ("Err" in result) {
-        // Enhanced error handling for specific backend errors
-        const errorMessage = result.Err;
-        console.error("Backend error adding item:", errorMessage);
-        return rejectWithValue(errorMessage);
+        return rejectWithValue(result.Err);
       } else {
         return rejectWithValue("Unknown error adding item");
       }
     } catch (error) {
-      // Better error message handling
-      console.error("Failed to add item:", error);
-      
       let errorMessage = "Failed to add item";
       
-      // Try to extract more detailed error message
       if (error instanceof Error) {
-        // Check if there's a more specific error message in the error object
         if (error.message.includes("Rejected")) {
-          // Parse the rejection message which is often a nested structure
           try {
             const match = error.message.match(/Reject text: ['"](.*?)['"]/);
             if (match && match[1]) {
               errorMessage = match[1];
             }
           } catch (e) {
-            // If parsing fails, use the original error message
             errorMessage = error.message;
           }
         } else {
@@ -261,7 +264,6 @@ export const reorderItem = createAsyncThunk(
         const specificShelfResult = await perpetuaActor.get_shelf(shelfId);
         if ("Ok" in specificShelfResult) {
           // Update just this shelf in the Redux store
-          // We'll handle this in the slice reducer
           dispatch(updateSingleShelf(convertBigIntsToStrings(specificShelfResult.Ok)));
         }
         return convertBigIntsToStrings({ shelfId, itemId, referenceItemId, before });
@@ -269,8 +271,67 @@ export const reorderItem = createAsyncThunk(
         return rejectWithValue("Failed to reorder item");
       }
     } catch (error) {
-      console.error("Failed to reorder item:", error);
       return rejectWithValue("Failed to reorder item");
+    }
+  }
+);
+
+// Reorder a shelf within the user profile
+export const reorderProfileShelf = createAsyncThunk(
+  'perpetua/reorderProfileShelf',
+  async ({ 
+    shelfId, 
+    referenceShelfId, 
+    before,
+    principal
+  }: { 
+    shelfId: string, 
+    referenceShelfId: string | null, 
+    before: boolean,
+    principal: Principal | string
+  }, { dispatch, rejectWithValue }) => {
+    try {
+      const perpetuaActor = await getActorPerpetua();
+      const principalForApi = typeof principal === 'string'
+        ? Principal.fromText(principal)
+        : principal;
+      
+      // Execute the reordering
+      const result = await perpetuaActor.reorder_profile_shelf(
+        shelfId,
+        referenceShelfId ? [referenceShelfId] : [],
+        before
+      );
+      
+      if ("Ok" in result) {
+        // After reordering shelves, invalidate cache
+        invalidateShelvesCache(principal);
+        
+        // Force a reload of the shelves to get the new custom order
+        await dispatch(loadShelves(principalForApi));
+        
+        return convertBigIntsToStrings({ shelfId, referenceShelfId, before });
+      } else {
+        return rejectWithValue("Failed to reorder shelf");
+      }
+    } catch (error) {
+      let errorMessage = "Failed to reorder shelf";
+      if (error instanceof Error) {
+        if (error.message.includes("Rejected")) {
+          try {
+            const match = error.message.match(/Reject text: ['"](.*?)['"]/);
+            if (match && match[1]) {
+              errorMessage = match[1];
+            }
+          } catch (e) {
+            errorMessage = error.message;
+          }
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -308,7 +369,6 @@ export const updateShelfMetadata = createAsyncThunk(
         return rejectWithValue("Failed to update shelf metadata");
       }
     } catch (error) {
-      console.error("Failed to update shelf metadata:", error);
       return rejectWithValue("Failed to update shelf metadata");
     }
   }
@@ -615,122 +675,6 @@ export const removeItem = createAsyncThunk(
             }
           } catch (e) {
             // If parsing fails, use the original error message
-            errorMessage = error.message;
-          }
-        } else {
-          errorMessage = error.message;
-        }
-      }
-      
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// Profile Ordering Thunks
-export const reorderProfileShelf = createAsyncThunk(
-  'perpetua/reorderProfileShelf',
-  async ({ 
-    shelfId, 
-    referenceShelfId, 
-    before,
-    principal
-  }: { 
-    shelfId: string, 
-    referenceShelfId?: string, 
-    before: boolean,
-    principal: Principal | string
-  }, { dispatch, rejectWithValue }) => {
-    try {
-      console.log(`=== PROFILE REORDERING DEBUG ===`);
-      console.log(`Reordering shelf ${shelfId} ${before ? 'before' : 'after'} ${referenceShelfId || 'none'}`);
-      
-      const perpetuaActor = await getActorPerpetua();
-      
-      console.log(`API Call params:`, {
-        shelfId,
-        referenceShelfId: referenceShelfId ? [referenceShelfId] : [],
-        before
-      });
-      
-      const result = await perpetuaActor.reorder_profile_shelf(
-        shelfId,
-        referenceShelfId ? [referenceShelfId] : [],
-        before
-      );
-      
-      if ("Ok" in result) {
-        console.log(`Profile reordering SUCCESS for shelf ${shelfId}`);
-        // Reload shelves to get the updated order
-        dispatch(loadShelves(principal));
-        
-        return { 
-          success: true, 
-          shelfId, 
-          referenceShelfId, 
-          before 
-        };
-      } else if ("Err" in result) {
-        console.error(`Profile reordering FAILED with error:`, result.Err);
-        return rejectWithValue(result.Err);
-      } else {
-        console.error(`Profile reordering FAILED with unknown error`);
-        return rejectWithValue("Failed to reorder shelf in profile");
-      }
-    } catch (error) {
-      console.error(`Profile reordering EXCEPTION:`, error);
-      
-      let errorMessage = "Failed to reorder shelf in profile";
-      if (error instanceof Error) {
-        if (error.message.includes("Rejected")) {
-          try {
-            const match = error.message.match(/Reject text: ['"](.*?)['"]/);
-            if (match && match[1]) {
-              errorMessage = match[1];
-            }
-          } catch (e) {
-            errorMessage = error.message;
-          }
-        } else {
-          errorMessage = error.message;
-        }
-      }
-      
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-export const resetProfileOrder = createAsyncThunk(
-  'perpetua/resetProfileOrder',
-  async (principal: Principal | string, { dispatch, rejectWithValue }) => {
-    try {
-      const perpetuaActor = await getActorPerpetua();
-      
-      const result = await perpetuaActor.reset_profile_order();
-      
-      if ("Ok" in result) {
-        // Reload shelves to get the restored default order
-        dispatch(loadShelves(principal));
-        
-        return { success: true };
-      } else if ("Err" in result) {
-        return rejectWithValue(result.Err);
-      } else {
-        return rejectWithValue("Failed to reset profile order");
-      }
-    } catch (error) {
-      console.error("Failed to reset profile order:", error);
-      
-      let errorMessage = "Failed to reset profile order";
-      if (error instanceof Error) {
-        if (error.message.includes("Rejected")) {
-          try {
-            const match = error.message.match(/Reject text: ['"](.*?)['"]/);
-            if (match && match[1]) {
-              errorMessage = match[1];
-            }
-          } catch (e) {
             errorMessage = error.message;
           }
         } else {

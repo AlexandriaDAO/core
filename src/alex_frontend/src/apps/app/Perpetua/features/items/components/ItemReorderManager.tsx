@@ -12,7 +12,7 @@ interface ItemReorderManagerProps {
     enterEditMode: () => void;
     cancelEditMode: () => void;
     saveItemOrder: () => Promise<void>;
-    handleDragStart: (index: number) => void;
+    handleDragStart: (e: React.DragEvent, index: number) => void;
     handleDragOver: (e: React.DragEvent, index: number) => void;
     handleDragEnd: () => void;
     handleDrop: (e: React.DragEvent, index: number) => void;

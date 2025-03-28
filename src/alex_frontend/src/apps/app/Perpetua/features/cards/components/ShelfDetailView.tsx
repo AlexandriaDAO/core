@@ -41,6 +41,8 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
   handleDragOver,
   handleDragEnd,
   handleDrop,
+  getDragItemStyle,
+  draggedIndex,
   settingsButton
 }) => {
   // Check if we're in a user-specific view
@@ -215,18 +217,19 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     const renderDraggableWrapper = (content: React.ReactNode) => (
       <div 
         key={`item-${itemKey}`}
-        className="item-card" 
+        className={`item-card ${isEditMode ? 'cursor-grab active:cursor-grabbing transition-all duration-150' : ''}`}
         draggable={isEditMode}
-        onDragStart={isEditMode ? () => handleDragStart(index) : undefined}
+        onDragStart={isEditMode ? (e) => handleDragStart(e, index) : undefined}
         onDragOver={isEditMode ? (e) => handleDragOver(e, index) : undefined}
         onDragEnd={isEditMode ? handleDragEnd : undefined}
         onDrop={isEditMode ? (e) => handleDrop(e, index) : undefined}
+        style={isEditMode ? getDragItemStyle ? getDragItemStyle(index) : {} : {}}
       >
         {isEditMode && (
-          <div className="absolute top-0 left-0 z-40 bg-black/50 text-white p-1 text-xs">
-            Item #{itemKey}
+          <div className="absolute top-0 left-0 right-0 z-40 bg-black/50 text-white p-1 text-xs flex items-center justify-between">
+            <span>Item #{itemKey}</span>
             <div 
-              className="item-drag-handle ml-2 inline-block text-gray-400 p-1 rounded hover:bg-gray-700 cursor-grab"
+              className="item-drag-handle inline-block text-gray-400 p-1 rounded hover:bg-gray-700 cursor-grab"
               onMouseDown={(e) => {
                 // Prevent the click event on the parent div
                 e.stopPropagation();
@@ -238,7 +241,9 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
             </div>
           </div>
         )}
-        {content}
+        <div className={isEditMode && draggedIndex === index ? 'opacity-30' : ''}>
+          {content}
+        </div>
       </div>
     );
 
@@ -513,7 +518,7 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
                               key={`item-${itemKey}`} 
                               className={`item-card mb-8 ${isEditMode ? 'relative border border-dashed border-border p-6 rounded-md bg-muted/5' : ''}`}
                               draggable={isEditMode}
-                              onDragStart={isEditMode ? () => handleDragStart(originalIndex) : undefined}
+                              onDragStart={isEditMode ? (e) => handleDragStart(e, originalIndex) : undefined}
                               onDragOver={isEditMode ? (e) => handleDragOver(e, originalIndex) : undefined}
                               onDragEnd={isEditMode ? handleDragEnd : undefined}
                               onDrop={isEditMode ? (e) => handleDrop(e, originalIndex) : undefined}

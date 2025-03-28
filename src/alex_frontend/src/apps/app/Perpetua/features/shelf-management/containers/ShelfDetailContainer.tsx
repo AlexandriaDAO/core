@@ -103,7 +103,8 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 				handleDragStart,
 				handleDragOver,
 				handleDragEnd,
-				handleDrop
+				handleDrop,
+				getDragItemStyle
 			}) => (
 				<ShelfDetailView
 					shelf={shelf}
@@ -121,6 +122,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 					handleDragOver={handleDragOver}
 					handleDragEnd={handleDragEnd}
 					handleDrop={handleDrop}
+					getDragItemStyle={getDragItemStyle}
 					settingsButton={
 						hasEditAccess && !isEditMode ? (
 							<ShelfSettingsDialog 

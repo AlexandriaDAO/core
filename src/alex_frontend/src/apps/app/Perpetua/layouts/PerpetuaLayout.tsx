@@ -18,7 +18,6 @@ import {
 import { NewItemDialog } from "../features/items";
 import { NewShelfDialog } from "../features/shelf-management/components";
 import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
-import { ProfileShelfReorderManager } from "../features/shelf-management/components/ProfileShelfReorderManager";
 
 const PerpetuaLayout: React.FC = () => {
   // Core data hooks
@@ -125,41 +124,14 @@ const PerpetuaLayout: React.FC = () => {
       const isCurrentUserProfile = userPrincipal === userId;
       
       return (
-        <ProfileShelfReorderManager
+        <UserShelvesUI 
+          shelves={userShelves}
+          loading={publicLoading}
+          onViewShelf={goToShelf}
+          onViewOwner={goToUser}
+          onBack={goToMainShelves}
           isCurrentUser={isCurrentUserProfile}
-        >
-          {({
-            isReorderMode,
-            isLoading,
-            enterReorderMode,
-            cancelReorderMode,
-            saveShelfOrder,
-            resetProfileOrder,
-            handleDragStart,
-            handleDragOver,
-            handleDragEnd,
-            handleDrop
-          }) => (
-            <UserShelvesUI 
-              shelves={userShelves}
-              loading={publicLoading || isLoading}
-              onViewShelf={goToShelf}
-              onViewOwner={goToUser}
-              onBack={goToMainShelves}
-              // Reordering props from ProfileShelfReorderManager
-              isReorderMode={isReorderMode}
-              isCurrentUser={isCurrentUserProfile}
-              onEnterReorderMode={enterReorderMode}
-              onCancelReorderMode={cancelReorderMode}
-              onSaveReorderedShelves={saveShelfOrder}
-              onResetProfileOrder={resetProfileOrder}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDragEnd={handleDragEnd}
-              onDrop={handleDrop}
-            />
-          )}
-        </ProfileShelfReorderManager>
+        />
       );
     }
     

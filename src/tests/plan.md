@@ -4,11 +4,7 @@ Before next mainnet push:
 - Vetkd
 - Wallet
 - AssetManager
-
-
-# Latest mainnet merge problems:
-- Uploading the profile image or name does not reflect, i.e., I changed my name from chadthechad to evan and added a profile link and the result is still 'C' with a  loading circle.
-- The Seed phrase import landed a super long result.
+- Emporium
 
 
 #### Bigger Features (lower priority):
