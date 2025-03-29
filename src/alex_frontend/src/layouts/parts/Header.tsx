@@ -124,9 +124,9 @@ function Header() {
 				</div>
 			</div>
 			{isMenuOpen && (
-				<div className="flex flex-col pb-4">
+				<div className="flex flex-col">
 					<Tabs />
-					<div className="flex gap-2 justify-between">
+					<div className="flex gap-2 justify-center items-center py-4">
 						<Entry />
 						<ModeToggle />
 					</div>
