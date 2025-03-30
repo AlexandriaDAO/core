@@ -117,6 +117,10 @@ pub fn validate_username(username: &str) -> Result<(), UserError> {
 /// ```
 pub fn validate_name(name: &str) -> Result<(), UserError> {
     let name = name.trim();
+    // Return Ok if the URL is empty
+    if name.is_empty() {
+        return Ok(());
+    }
 
     if name.len() < ValidationConstants::MIN_NAME_LENGTH {
         return Err(UserError::NameTooShort);
@@ -143,6 +147,12 @@ pub fn validate_name(name: &str) -> Result<(), UserError> {
 /// ```
 pub fn validate_avatar_url(url: &str) -> Result<(), UserError> {
     let url = url.trim();
+    
+    // Return Ok if the URL is empty
+    if url.is_empty() {
+        return Ok(());
+    }
+    
     let parsed_url = Url::parse(url).map_err(|_| UserError::AvatarUrlInvalid)?;
 
     if parsed_url.scheme() != "https" {

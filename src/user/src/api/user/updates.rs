@@ -70,6 +70,8 @@ pub fn update_profile(request: UpdateUserRequest) -> Result<User, String> {
             .map(|user| user.clone())
             .ok_or_else(|| GeneralError::NotFound("User".to_string()).to_string())?;
 
+        let mut dirty = false;
+
         // Update username if other than current username
         let new_username = request.username.trim().to_lowercase();
         if new_username != user.username {
@@ -98,29 +100,41 @@ pub fn update_profile(request: UpdateUserRequest) -> Result<User, String> {
             
             // Update the user's username
             user.username = new_username;
+            dirty = true;
         }
 
-        // Update name if provided
+        // Update name if provided and different from current name
         if let Some(name) = request.name {
             let name = name.trim();
-            if let Err(err) = validate_name(name) {
-                return Err(err.to_string());
+            if name != user.name {
+                if let Err(err) = validate_name(name) {
+                    return Err(err.to_string());
+                }
+                user.name = name.to_string();
+                dirty = true;
             }
-            user.name = name.to_string();
         }
 
-        // Update avatar if provided
+        // Update avatar if provided and different from current avatar
         if let Some(avatar) = request.avatar {
             let avatar = avatar.trim();
-            if let Err(err) = validate_avatar_url(avatar) {
-                return Err(err.to_string());
+            if avatar != user.avatar {
+                if let Err(err) = validate_avatar_url(avatar) {
+                    return Err(err.to_string());
+                }
+                user.avatar = avatar.to_string();
+                dirty = true;
             }
-            user.avatar = avatar.to_string();
         }
 
-        user.updated_at = time();
-        users.insert(caller, user.clone());
-        Ok(user)
+        // Only update timestamp and save user if changes were made
+        if dirty {
+            user.updated_at = time();
+            users.insert(caller, user.clone());
+            Ok(user)
+        } else {
+            Err(GeneralError::NoChanges.to_string())
+        }
     })
 }
 

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Camera, LoaderCircle, Save, Upload } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { LoaderCircle, Save } from "lucide-react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useUser } from "@/hooks/actors";
@@ -11,6 +11,7 @@ import { Button } from "@/lib/components/button";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { UsernameAvailabilityResponse } from "../../../../../src/declarations/user/user.did";
 import { useDebounce } from "@/hooks/useDebounce";
+import { Alert } from "@/components/Alert";
 // import {AssetManager} from '@dfinity/assets';
 // import { HttpAgent } from "@dfinity/agent";
 // import { useInternetIdentity } from "ic-use-internet-identity/dist";
@@ -31,7 +32,8 @@ const ProfileSchema = Yup.object().shape({
 		.max(50, 'Name cannot exceed 50 characters'),
 
 	avatar: Yup.string()
-		.url('Avatar must be a valid URL'),
+		.url('Avatar must be a valid URL')
+		.matches(/^https:\/\//, 'Avatar must use a secure HTTPS URL'),
 
 	tnc: Yup.boolean()
 		.oneOf([true], "You must agree to the terms and conditions")
@@ -195,7 +197,7 @@ function ProfilePage() {
 							Full Name
 						</Label>
 						<Input
-							variant={(formik.touched.name ? formik.errors.name ? "destructive" : "constructive" : 'default' ) }
+							variant={(formik.touched.name && formik.values.name !== user?.name ? formik.errors.name ? "destructive" : "constructive" : 'default' ) }
 							id="name"
 							name="name"
 							onChange={formik.handleChange}
@@ -217,7 +219,7 @@ function ProfilePage() {
 						</Label>
 						<div className="flex gap-2 w-full">
 							<Input
-								variant={(formik.touched.avatar ? formik.errors.avatar ? "destructive" : "constructive" : 'default' ) }
+								variant={(formik.touched.avatar && formik.values.avatar !== user?.avatar ? formik.errors.avatar ? "destructive" : "constructive" : 'default' ) }
 								id="avatar"
 								name="avatar"
 								onChange={formik.handleChange}
@@ -244,6 +246,11 @@ function ProfilePage() {
 									{formik.errors.avatar}
 								</span>
 							)}
+
+						<Alert variant="warning" title="Note" className="w-full">
+							We will use this avatar for your profile and other parts of the platform. <br />
+							If its not a valid image, we will fallback to using the first letter of your username.
+						</Alert>
 					</div>
 
 					<div className="flex flex-col items-start font-roboto-condensed font-medium">
@@ -273,7 +280,7 @@ function ProfilePage() {
 								<span>Saving Profile</span>
 							</Button>
 						) : (
-							<Button type="submit" rounded={"full"} disabled={!formik.dirty}>
+							<Button type="submit" rounded={"full"} disabled={!formik.dirty || !formik.isValid}>
 								<Save size={18} />
 								<span>Save Profile</span>
 							</Button>

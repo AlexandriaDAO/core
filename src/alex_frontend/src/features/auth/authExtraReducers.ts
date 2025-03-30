@@ -24,10 +24,10 @@ export const buildAuthExtraReducers = (builder: ActionReducerMapBuilder<AuthStat
         })
         .addCase(update.rejected, (state, action) => {
             state.loading = false;
-            state.user = null;
+            // state.user = null;
             state.error = action.payload as string;
 
-            toast.success('Profile could not be updated.')
+            toast.error('Profile could not be updated.')
         })
 
         // upgrade.ts
