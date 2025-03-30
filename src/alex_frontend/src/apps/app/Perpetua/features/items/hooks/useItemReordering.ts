@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { Shelf, Item } from "../../../../../../../../declarations/perpetua/perpetua.did";
-import { reorderItem as reorderItemAction } from '@/apps/Modules/shared/state/perpetua/perpetuaThunks';
+import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
+import { reorderItem as reorderItemAction } from '@/apps/app/Perpetua/state/perpetuaThunks';
 import { useReorderable } from '../../../features/shared/hooks/useReorderable';
 import { Principal } from '@dfinity/principal';
 

@@ -23,7 +23,7 @@ import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
 import alexReducer from "@/features/swap/alexSlice";
 import uploadReducer from "@/features/upload/uploadSlice";
-import perpetuaReducer from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import perpetuaReducer from "@/apps/app/Perpetua/state/perpetuaSlice";
 
 import transactionsReducer from "@/apps/Modules/shared/state/transactions/transactionSlice";
 

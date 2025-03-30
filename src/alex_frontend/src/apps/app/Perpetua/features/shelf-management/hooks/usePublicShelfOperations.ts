@@ -5,10 +5,10 @@ import {
   selectPublicShelves,
   selectPublicLoading,
   selectLastTimestamp
-} from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+} from "@/apps/app/Perpetua/state/perpetuaSlice";
 import {
   loadRecentShelves
-} from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
+} from "@/apps/app/Perpetua/state/perpetuaThunks";
 import { createFindItemById } from "../../../utils";
 
 // Custom hook for public shelf operations

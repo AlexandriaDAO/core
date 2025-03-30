@@ -3,7 +3,7 @@ import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { ArrowLeft, Plus, Edit, X, RotateCcw, Save, AlertCircle } from "lucide-react";
 import { ShelfCard, PublicShelfCard } from './ShelfCard';
-import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 import { toast } from 'sonner';
 
 // Types for the component

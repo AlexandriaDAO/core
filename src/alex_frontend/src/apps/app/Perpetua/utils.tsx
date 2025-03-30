@@ -1,7 +1,7 @@
 import React from "react";
-import { Item, Shelf, ItemContent } from "../../../../../declarations/perpetua/perpetua.did";
+import { Item, Shelf, ItemContent } from "@/../../declarations/perpetua/perpetua.did";
 import { Button } from "@/lib/components/button";
-import { NormalizedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 
 /**
  * Creates a function to find a item by its ID across multiple shelves

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useMemo } from 'react';
 import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
 import { useReorderable, ReorderParams } from '../../../features/shared/hooks/useReorderable';
-import { reorderProfileShelf as reorderProfileShelfAction } from '@/apps/Modules/shared/state/perpetua/perpetuaThunks';
+import { reorderProfileShelf as reorderProfileShelfAction } from '@/apps/app/Perpetua/state/perpetuaThunks';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useIdentity } from '@/hooks/useIdentity';
 import isEqual from 'lodash/isEqual';

@@ -8,9 +8,9 @@ import {
 import { ShelfContent } from "./ShelfContent";
 import { useAddToShelf } from "../hooks/useAddToShelf";
 import { ShelfManagerProps } from "../types";
-import { NormalizedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { Principal } from "@dfinity/principal";
-import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 
 /**
  * Convert a NormalizedShelf back to a Shelf for API calls and components
@@ -19,7 +19,7 @@ const denormalizeShelf = (normalizedShelf: NormalizedShelf): Shelf => {
   return {
     ...normalizedShelf,
     owner: Principal.fromText(normalizedShelf.owner)
-  };
+  } as Shelf;
 };
 
 /**

@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Principal } from '@dfinity/principal';
-import { Shelf } from '../../../../../../../declarations/perpetua/perpetua.did';
+import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { 
   loadShelves, 
-  loadRecentShelves 
-} from './perpetuaThunks';
+  loadRecentShelves,
+  loadMissingShelves
+} from './thunks/queryThunks';
 import { Draft } from 'immer';
 
 // Define the permissions interfaces
@@ -224,8 +225,21 @@ const perpetuaSlice = createSlice({
           ...entities
         };
         
-        // Set user shelves IDs
-        state.ids.userShelves = ids;
+        // Preserve existing order if we have one
+        if (state.ids.userShelves.length > 0) {
+          // First, keep all existing shelves that still exist in new data
+          const existingOrder = state.ids.userShelves.filter(id => entities[id]);
+          
+          // Then add any new shelves that weren't already in our existing order
+          const newShelfIds = ids.filter(id => !existingOrder.includes(id));
+          
+          // Combine existing (preserved order) with new shelves
+          state.ids.userShelves = [...existingOrder, ...newShelfIds];
+        } else {
+          // If no existing order, use the order from the API
+          state.ids.userShelves = ids;
+        }
+        
         state.loading.userShelves = false;
         
         // Update permissions for loaded shelves
@@ -237,6 +251,50 @@ const perpetuaSlice = createSlice({
         }
       })
       .addCase(loadShelves.rejected, (state, action) => {
+        state.loading.userShelves = false;
+        state.error = action.payload as string;
+      })
+      
+      // Handle loadMissingShelves (new)
+      .addCase(loadMissingShelves.pending, (state) => {
+        state.loading.userShelves = true;
+        state.error = null;
+      })
+      .addCase(loadMissingShelves.fulfilled, (state, action) => {
+        // Only add new shelves that don't exist yet
+        if (action.payload.length === 0) {
+          // No missing shelves, nothing to do
+          state.loading.userShelves = false;
+          return;
+        }
+        
+        const { entities, ids } = normalizeShelves(action.payload);
+        
+        // Update entities by merging new shelves
+        state.entities.shelves = {
+          ...state.entities.shelves,
+          ...entities
+        };
+        
+        // Only add new shelf IDs that aren't already in our order
+        const newShelfIds = ids.filter(id => !state.ids.userShelves.includes(id));
+        
+        // Append any new shelves to the existing order
+        if (newShelfIds.length > 0) {
+          state.ids.userShelves = [...state.ids.userShelves, ...newShelfIds];
+        }
+        
+        state.loading.userShelves = false;
+        
+        // Update permissions for new shelves
+        if (state.userPrincipal) {
+          ids.forEach(shelfId => {
+            const editors = state.shelfEditors[shelfId] || [];
+            updateShelfPermissions(state, shelfId, editors);
+          });
+        }
+      })
+      .addCase(loadMissingShelves.rejected, (state, action) => {
         state.loading.userShelves = false;
         state.error = action.payload as string;
       })

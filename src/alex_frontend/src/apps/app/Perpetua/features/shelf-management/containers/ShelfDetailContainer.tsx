@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import { useIdentity } from "@/hooks/useIdentity";
-import { Shelf, Item } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { rebalanceShelfItems } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
+import { rebalanceShelfItems } from "@/apps/app/Perpetua/state/perpetuaThunks";
 import { ItemReorderManager } from "../../items/components/ItemReorderManager";
 import { ShelfDetailView } from "../../cards";
 import { ShelfSettingsDialog } from "../../shelf-settings";

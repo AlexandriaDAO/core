@@ -2,10 +2,10 @@ import { useCallback } from "react";
 import { useShelfOperations } from "./useShelfOperations";
 import { useContentPermissions } from "@/apps/app/Perpetua/hooks/useContentPermissions";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { selectUserShelves, NormalizedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { selectUserShelves, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { toast } from "sonner";
 import { Principal } from "@dfinity/principal";
-import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 
 /**
  * Hook for adding content to shelves
@@ -25,7 +25,7 @@ export const useAddToShelf = () => {
     return {
       ...normalizedShelf,
       owner: Principal.fromText(normalizedShelf.owner)
-    };
+    } as Shelf;
   }, []);
 
   /**

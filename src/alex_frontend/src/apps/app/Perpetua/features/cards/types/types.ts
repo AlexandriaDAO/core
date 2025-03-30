@@ -1,4 +1,4 @@
-import { Shelf, Item } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import React from 'react';
 
 // Shelf related props

@@ -4,16 +4,16 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
-import { Shelf, Item } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { X, Plus } from "lucide-react";
 import NftSearchDialog from "./NftSearch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { selectUserShelves, selectSelectedShelf, selectUserPrincipal, NormalizedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { selectUserShelves, selectSelectedShelf, selectUserPrincipal, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { toast } from "sonner";
 import { ShelfForm } from "@/apps/app/Perpetua/features/shelf-management/components/NewShelf";
 import { getActorPerpetua } from "@/features/auth/utils/authUtils";
-import { loadShelves } from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
+import { loadShelves } from "@/apps/app/Perpetua/state/perpetuaThunks";
 import { Principal } from "@dfinity/principal";
 import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks/useShelfOperations";
 

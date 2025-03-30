@@ -7,7 +7,7 @@ import {
   selectUserPrincipal, 
   setUserPrincipal,
   setContentPermission
-} from '@/apps/Modules/shared/state/perpetua/perpetuaSlice';
+} from '@/apps/app/Perpetua/state/perpetuaSlice';
 
 /**
  * Hook for managing content permissions

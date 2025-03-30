@@ -5,7 +5,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { 
   selectUserShelves,
   selectLoading
-} from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+} from "@/apps/app/Perpetua/state/perpetuaSlice";
 import {
   loadShelves, 
   createShelf as createShelfAction, 
@@ -15,9 +15,9 @@ import {
   updateShelfMetadata,
   createAndAddShelfItem as createAndAddShelfItemAction,
   removeItem as removeItemAction
-} from "@/apps/Modules/shared/state/perpetua/perpetuaThunks";
+} from "@/apps/app/Perpetua/state/perpetuaThunks";
 import { createFindItemById } from "../../../utils";
-import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 
 // Custom hook for shelf operations
 export const useShelfOperations = () => {

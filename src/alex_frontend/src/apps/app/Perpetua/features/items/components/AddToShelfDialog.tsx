@@ -10,8 +10,8 @@ import { Search } from "lucide-react";
 import { ScrollArea } from "@/lib/components/scroll-area";
 import { Button } from "@/lib/components/button";
 import { useAddToShelf } from "../../shelf-management/hooks/useAddToShelf";
-import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
-import { NormalizedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 
 interface AddToShelfDialogProps {
   open: boolean;
@@ -92,25 +92,31 @@ export const AddToShelfDialog: React.FC<AddToShelfDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add to Shelf</DialogTitle>
         </DialogHeader>
         
-        <div className="relative mb-4">
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search shelves..."
+            className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
           />
-          <Search className="w-5 h-5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
         </div>
         
-        <ScrollArea className="h-[50vh] max-h-96 overflow-y-auto">
-          {filteredShelves.length > 0 ? (
-            <div className="space-y-2">
-              {filteredShelves.map((shelf) => (
+        <ScrollArea className="max-h-[300px] mt-2">
+          {filteredShelves.length === 0 ? (
+            <div className="p-4 text-center text-muted-foreground">
+              {editableShelves.length === 0 
+                ? "You don't have any shelves you can edit" 
+                : "No shelves match your search"}
+            </div>
+          ) : (
+            <div className="space-y-2 p-1">
+              {filteredShelves.map((shelf: NormalizedShelf) => (
                 <ShelfOption
                   key={shelf.shelf_id}
                   shelf={shelf}
@@ -119,24 +125,16 @@ export const AddToShelfDialog: React.FC<AddToShelfDialogProps> = ({
                 />
               ))}
             </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              {searchTerm ? (
-                <>No shelves match your search</>
-              ) : (
-                <>No shelves available</>
-              )}
-            </div>
           )}
         </ScrollArea>
         
-        <div className="mt-4 flex justify-end gap-2">
+        <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={handleDialogClose}>
             Cancel
           </Button>
           <Button 
-            disabled={!selectedShelfId || isAddingContent} 
-            onClick={handleAddToShelf}
+            onClick={handleAddToShelf} 
+            disabled={!selectedShelfId || isAddingContent}
           >
             {isAddingContent ? "Adding..." : "Add to Shelf"}
           </Button>
@@ -156,16 +154,17 @@ interface ShelfOptionProps {
 const ShelfOption: React.FC<ShelfOptionProps> = ({ shelf, isSelected, onSelect }) => {
   return (
     <div
-      className={`p-3 rounded-md cursor-pointer transition-colors
-        ${isSelected ? 'bg-primary/10 border border-primary' : 'bg-card hover:bg-accent border border-border'}`}
+      className={`p-3 rounded-md cursor-pointer transition-colors ${
+        isSelected 
+          ? "bg-primary/10 border border-primary" 
+          : "hover:bg-secondary border border-transparent"
+      }`}
       onClick={() => onSelect(shelf.shelf_id)}
     >
-      <h3 className="font-medium text-sm mb-1 truncate">{shelf.title}</h3>
-      {shelf.description && shelf.description[0] && (
-        <p className="text-xs text-muted-foreground line-clamp-2">
-          {shelf.description[0]}
-        </p>
-      )}
+      <div className="font-medium">{shelf.title}</div>
+      <div className="text-sm text-muted-foreground line-clamp-1">
+        {shelf.description?.[0] || ""}
+      </div>
     </div>
   );
 }; 

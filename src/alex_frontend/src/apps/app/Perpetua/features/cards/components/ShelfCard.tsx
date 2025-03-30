@@ -9,7 +9,7 @@ import {
   selectIsOwner, 
   selectHasEditAccess, 
   selectShelfEditors 
-} from '@/apps/Modules/shared/state/perpetua/perpetuaSlice';
+} from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 
 // Extending the props interfaces to include parentShelfId and itemId

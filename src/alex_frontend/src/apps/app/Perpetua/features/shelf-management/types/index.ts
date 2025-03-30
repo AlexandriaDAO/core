@@ -1,5 +1,5 @@
-import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
-import { NormalizedShelf } from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 
 export type ContentType = "Nft" | "Markdown" | "Shelf";
 

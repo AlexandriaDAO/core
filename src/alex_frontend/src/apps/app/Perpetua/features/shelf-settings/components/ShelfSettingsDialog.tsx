@@ -10,7 +10,7 @@ import { useShelfMetadata } from "../hooks";
 import { ShelfMetricsDisplay } from "./ShelfMetricsDisplay";
 import { CollaboratorsList } from "../../shelf-collaboration/components/CollaboratorsList";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
-import { selectIsOwner } from '@/apps/Modules/shared/state/perpetua/perpetuaSlice';
+import { selectIsOwner } from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/components/tabs";
 
 interface ShelfSettingsDialogProps {

@@ -6,12 +6,12 @@ import {
   selectSelectedShelf,
   selectUserPrincipal,
   NormalizedShelf
-} from "@/apps/Modules/shared/state/perpetua/perpetuaSlice";
+} from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { usePerpetuaNavigation, useViewState } from "../routes";
 import { useShelfOperations, usePublicShelfOperations } from "../features/shelf-management/hooks";
 import { useContentPermissions } from "../hooks/useContentPermissions";
 import { Principal } from "@dfinity/principal";
-import { Shelf } from "../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 
 // Import UI components
 import {
@@ -29,7 +29,7 @@ const denormalizeShelf = (normalizedShelf: NormalizedShelf): Shelf => {
   return {
     ...normalizedShelf,
     owner: Principal.fromText(normalizedShelf.owner)
-  };
+  } as Shelf;
 };
 
 /**

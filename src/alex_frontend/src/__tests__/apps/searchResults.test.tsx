@@ -242,12 +242,12 @@ describe('Search Results Tests', () => {
         tx.tags.find(tag => tag.name === 'Content-Type')?.value
       );
       
-      const pngCount = contentTypes.filter((type): type is string => 
-        typeof type === 'string' && type === 'image/png'
+      const pngCount = contentTypes.filter((type: string | undefined) => 
+        type === 'image/png'
       ).length;
       
-      const jpegCount = contentTypes.filter((type): type is string => 
-        typeof type === 'string' && type === 'image/jpeg'
+      const jpegCount = contentTypes.filter((type: string | undefined) => 
+        type === 'image/jpeg'
       ).length;
       
       expect(pngCount + jpegCount).toBe(20);

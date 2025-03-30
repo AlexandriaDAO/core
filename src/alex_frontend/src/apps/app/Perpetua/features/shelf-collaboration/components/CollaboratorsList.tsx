@@ -6,12 +6,12 @@ import {
   selectEditorsLoading, 
   selectIsOwner,
   selectUserPrincipal 
-} from '@/apps/Modules/shared/state/perpetua/perpetuaSlice';
+} from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { 
   listShelfEditors, 
   addShelfEditor, 
   removeShelfEditor 
-} from '@/apps/Modules/shared/state/perpetua/perpetuaThunks';
+} from '@/apps/app/Perpetua/state/perpetuaThunks';
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
