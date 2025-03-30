@@ -4,13 +4,13 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { getAssetList } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 import { syncProgressInterface } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 import { toast } from 'sonner';
-import { useInternetIdentity } from "ic-use-internet-identity/dist";
+import { useIdentity } from "@/hooks/useIdentity";
 import { useAssetManager } from "@/hooks/useAssetManager";
 
 const Upload: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
-	const {identity} = useInternetIdentity();
+	const {identity} = useIdentity();
 	const [file, setFile] = useState<File | null>(null);
 	const [syncProgress, setSyncProgress] = useState<syncProgressInterface>({
 		currentItem: "",

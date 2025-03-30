@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import IIProvider from "./IIProvider";
 // import EthProvider from "./EthProvider";
 import AuthContext, { Authenticator } from "@/contexts/AuthContext";
+import NFIDProvider from "./NFIDProvider";
 // import SolProvider from "./SolProvider";
 
 interface AuthProviderProps {
@@ -35,7 +36,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			<IIProvider>
 				{/* <EthProvider>
 					<SolProvider> */}
-						{children}
+						<NFIDProvider>
+							{children}
+						</NFIDProvider>
 					{/* </SolProvider>
 				</EthProvider> */}
 			</IIProvider>

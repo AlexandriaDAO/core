@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AssetItem } from "../types";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useInternetIdentity } from "ic-use-internet-identity";
+import { useIdentity } from "@/hooks/useIdentity";
 import { toast } from "sonner";
 import { Button } from "@/lib/components/button";
 import {
@@ -38,7 +38,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
 	onSelectAsset,
 }) => {
 	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
-	const { identity } = useInternetIdentity();
+	const { identity } = useIdentity();
 	const [assetAvailability, setAssetAvailability] = useState<Record<string, boolean>>({});
 	const [pullInProgress, setPullInProgress] = useState<Record<string, boolean>>({});
 

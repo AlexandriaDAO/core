@@ -172,6 +172,8 @@
 
     "ic-use-actor": "^0.1.0",
 
+    "ic-use-nfid": "github:zeeghazi/ic-use-nfid",
+
     "ic-use-internet-identity": "^0.2.0",
 
     "ic-use-siwe-identity": "^0.1.2",

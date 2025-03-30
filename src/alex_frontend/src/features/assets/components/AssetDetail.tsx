@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AssetItem } from "../types";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useInternetIdentity } from "ic-use-internet-identity";
+import { useIdentity } from "@/hooks/useIdentity";
 import { toast } from "sonner";
 import { Button } from "@/lib/components/button";
 import {
@@ -22,7 +22,7 @@ interface AssetDetailProps {
 
 const AssetDetail: React.FC<AssetDetailProps> = ({ asset, onClose }) => {
 	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
-	const { identity } = useInternetIdentity();
+	const { identity } = useIdentity();
 	const [isInCanister, setIsInCanister] = useState<boolean>(false);
 	const [isPulling, setIsPulling] = useState<boolean>(false);
 	const [isDeleting, setIsDeleting] = useState<boolean>(false);

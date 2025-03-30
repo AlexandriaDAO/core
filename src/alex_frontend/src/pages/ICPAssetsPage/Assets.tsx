@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Item from "./Item";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useInternetIdentity } from "ic-use-internet-identity";
+import { useIdentity } from "@/hooks/useIdentity";
 import { useAssetManager } from "@/hooks/useAssetManager";
 
 const Assets: React.FC = () => {
 	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
-	const { identity } = useInternetIdentity();
+	const { identity } = useIdentity();
 	const [assetList, setAssetList] = useState<any[]>([]);
 	const [loading, setLoading] = useState(false);
 

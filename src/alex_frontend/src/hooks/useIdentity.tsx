@@ -3,6 +3,7 @@ import { useSiweIdentity } from 'ic-use-siwe-identity';
 import { AnonymousIdentity } from '@dfinity/agent';
 import useAuth from '@/hooks/useAuth';
 import { useSiwsIdentity } from 'ic-use-siws-identity';
+import { useNFID } from 'ic-use-nfid';
 
 
 export function useIdentity() {
@@ -18,6 +19,10 @@ export function useIdentity() {
 
     if (provider === 'SOL') {
         return useSiwsIdentity();
+    }
+
+    if (provider === 'NFID') {
+        return useNFID();
     }
 
     return {

@@ -1,5 +1,6 @@
 import React from 'react'
 import IIProcessor from './IIProcessor'
+import NFIDProcessor from './NFIDProcessor'
 // import ETHProcessor from './ETHProcessor'
 // import SOLProcessor from './SOLProcessor'
 
@@ -9,6 +10,7 @@ const Processors = () => {
         <IIProcessor />
         {/* <ETHProcessor />
         <SOLProcessor /> */}
+        <NFIDProcessor />
     </div>
   )
 }
