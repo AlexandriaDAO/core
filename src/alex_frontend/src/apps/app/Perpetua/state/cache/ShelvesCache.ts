@@ -1,5 +1,5 @@
 import { Principal } from '@dfinity/principal';
-import { principalToString } from '../utils/perpetuaUtils';
+import { principalToString } from '../../utils';
 
 /**
  * Cache entry with type metadata and timestamp

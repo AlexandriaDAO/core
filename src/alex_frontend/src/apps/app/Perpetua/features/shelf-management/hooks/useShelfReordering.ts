@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useMemo } from 'react';
 import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
-import { useReorderable, ReorderParams } from '../../../features/shared/hooks/useReorderable';
-import { reorderProfileShelf as reorderProfileShelfAction } from '@/apps/app/Perpetua/state/perpetuaThunks';
+import { useReorderable } from '../../../features/shared/hooks/useReorderable';
+import { reorderProfileShelf as reorderProfileShelfAction } from '@/apps/app/Perpetua/state';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useIdentity } from '@/hooks/useIdentity';
 import isEqual from 'lodash/isEqual';
@@ -61,19 +61,25 @@ export const useShelfReordering = ({ shelves, hasEditAccess }: UseShelfReorderin
   }, [shelvesRef.current]);
   
   // Create a stable adapter function with proper dependencies
-  const reorderActionAdapter = useCallback((params: ReorderParams) => {
+  const reorderActionAdapter = useCallback((params: {
+    shelfId: string;
+    itemId: number | string;
+    referenceItemId: number | string | null;
+    before: boolean;
+    principal: string;
+  }) => {
     return reorderProfileShelfAction({
-      shelfId: params.itemId as string,  // The shelf being moved
+      shelfId: params.itemId as string,
       referenceShelfId: params.referenceItemId as string | null,
       before: params.before,
-      principal: ownerPrincipal // Use the profile owner's principal, not the container ID
+      principal: params.principal // Use the provided principal from params
     });
-  }, [ownerPrincipal]);
+  }, []);
   
   // Use the generic reorderable hook with memoized values
   const reorderableProps = useReorderable<ReorderableShelf>({
     items: reorderableShelves,
-    containerId: ownerPrincipal, // Use the profile owner's principal as the container
+    containerId: 'profile', // Use a fixed identifier for the profile shelves container
     hasEditAccess,
     reorderAction: reorderActionAdapter
   });
@@ -97,6 +103,4 @@ export const useShelfReordering = ({ shelves, hasEditAccess }: UseShelfReorderin
     dragOverIndex: reorderableProps.dragOverIndex,
     getDragItemStyle: reorderableProps.getDragItemStyle
   };
-};
-
-export default useShelfReordering; 
+}; 

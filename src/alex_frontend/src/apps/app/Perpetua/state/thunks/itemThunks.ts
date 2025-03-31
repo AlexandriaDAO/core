@@ -1,10 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Principal } from '@dfinity/principal';
-import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { cacheManager } from '../cache/ShelvesCache';
 import { getShelfById } from './queryThunks';
 import { perpetuaService } from '../services/perpetuaService';
-import { extractErrorMessage } from '../utils/perpetuaUtils';
+import { Shelf, Item } from '@/../../declarations/perpetua/perpetua.did';
+import { extractErrorMessage } from '../../utils';
 
 /**
  * Add an item to a shelf

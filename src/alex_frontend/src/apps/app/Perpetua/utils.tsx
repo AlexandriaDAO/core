@@ -2,6 +2,18 @@ import React from "react";
 import { Item, Shelf, ItemContent } from "@/../../declarations/perpetua/perpetua.did";
 import { Button } from "@/lib/components/button";
 import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
+import { Principal } from '@dfinity/principal';
+import { ShelfMetrics } from './features/shelf-settings/hooks/useShelfMetrics';
+
+// Generic Result type similar to Rust's Result
+export type Result<T, E> = { Ok: T } | { Err: E };
+
+/**
+ * Converts a string or Principal to a Principal
+ */
+export const toPrincipal = (principal: Principal | string): Principal => {
+	return typeof principal === 'string' ? Principal.fromText(principal) : principal;
+};
 
 /**
  * Creates a function to find a item by its ID across multiple shelves
@@ -76,4 +88,49 @@ export const renderBreadcrumbs = (items: Array<{label: string, onClick?: () => v
 			))}
 		</div>
 	);
+};
+
+/**
+ * Normalizes a principal to its string representation for consistent handling
+ */
+export const principalToString = (principal: Principal | string): string => {
+	return typeof principal === 'string' ? principal : principal.toString();
+};
+
+/**
+ * Formats a shelf metric value for display
+ */
+export const formatMetricValue = (value: number | bigint): string => {
+	if (typeof value === 'bigint') {
+		return value.toString();
+	}
+	
+	// Format floating point numbers to 2 decimal places
+	if (Number.isInteger(value)) {
+		return value.toString();
+	} else {
+		return value.toFixed(2);
+	}
+};
+
+/**
+ * Determines if rebalancing is recommended based on metrics
+ */
+export const isRebalanceRecommended = (metrics: ShelfMetrics | null): boolean => {
+	if (!metrics) return false;
+	return metrics.needs_rebalance;
+};
+
+/**
+ * Extracts a useful error message from various error types
+ */
+export const extractErrorMessage = (error: unknown, fallback: string = "An error occurred"): string => {
+	if (error instanceof Error) {
+		return error.message;
+	} else if (typeof error === 'string') {
+		return error;
+	} else if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+		return error.message;
+	}
+	return fallback;
 }; 

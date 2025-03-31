@@ -4,7 +4,6 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { 
   setSelectedShelf, 
   selectSelectedShelf,
-  selectUserPrincipal,
   NormalizedShelf
 } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { usePerpetuaNavigation, useViewState } from "../routes";
@@ -51,7 +50,8 @@ const PerpetuaLayout: React.FC = () => {
   // Redux state
   const dispatch = useAppDispatch();
   const selectedShelf = useAppSelector(selectSelectedShelf);
-  const userPrincipal = useAppSelector(selectUserPrincipal);
+  // Direct state access to auth principal - single source of truth
+  const userPrincipal = useAppSelector(state => state.auth.user?.principal);
   
   // Permissions
   const { checkEditAccess } = useContentPermissions();

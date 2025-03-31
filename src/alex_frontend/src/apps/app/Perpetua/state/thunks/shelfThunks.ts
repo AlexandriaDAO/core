@@ -3,7 +3,7 @@ import { Principal } from '@dfinity/principal';
 import { cacheManager } from '../cache/ShelvesCache';
 import { loadShelves, getShelfById } from './queryThunks';
 import { perpetuaService } from '../services/perpetuaService';
-import { extractErrorMessage } from '../utils/perpetuaUtils';
+import { extractErrorMessage } from '../../utils';
 
 /**
  * Create a new shelf

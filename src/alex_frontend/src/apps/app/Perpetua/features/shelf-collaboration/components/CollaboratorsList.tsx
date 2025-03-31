@@ -4,14 +4,13 @@ import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { 
   selectShelfEditors, 
   selectEditorsLoading, 
-  selectIsOwner,
-  selectUserPrincipal 
+  selectIsOwner
 } from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { 
   listShelfEditors, 
   addShelfEditor, 
   removeShelfEditor 
-} from '@/apps/app/Perpetua/state/perpetuaThunks';
+} from '@/apps/app/Perpetua/state';
 import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
@@ -28,7 +27,8 @@ export const CollaboratorsList: React.FC<CollaboratorsListProps> = ({ shelfId })
   const editors = useAppSelector(selectShelfEditors(shelfId));
   const isLoading = useAppSelector(selectEditorsLoading(shelfId));
   const isOwner = useAppSelector(selectIsOwner(shelfId));
-  const userPrincipal = useAppSelector(selectUserPrincipal);
+  // Direct state access to auth principal - single source of truth
+  const userPrincipal = useAppSelector(state => state.auth.user?.principal);
   
   const [newEditor, setNewEditor] = useState('');
   const [isAdding, setIsAdding] = useState(false);

@@ -4,7 +4,7 @@ import { Principal } from '@dfinity/principal';
 import { updateSingleShelf } from '../perpetuaSlice';
 import { cacheManager } from '../cache/ShelvesCache';
 import { perpetuaService } from '../services/perpetuaService';
-import { principalToString, extractErrorMessage } from '../utils/perpetuaUtils';
+import { principalToString, extractErrorMessage } from '../../utils';
 
 /**
  * Load shelves for a user

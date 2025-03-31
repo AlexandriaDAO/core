@@ -8,12 +8,11 @@ import {
   selectLoading,
   selectPublicLoading,
   selectError,
-  selectUserPrincipal,
-  selectPermissions,
   selectShelfEditors,
   selectEditorsLoading,
   selectIsOwner,
   selectHasEditAccess,
+  selectIsEditor,
 } from '../perpetuaSlice';
 
 /**
@@ -46,13 +45,16 @@ export const useEditorsLoadingState = (shelfId: string) =>
 // Error state
 export const useError = () => useSelector(selectError);
 
-// User and permissions
-export const useUserPrincipal = () => useSelector(selectUserPrincipal);
-export const usePermissions = () => useSelector(selectPermissions);
+// Direct access to user principal from auth state - single source of truth
+export const useUserPrincipal = () => useSelector((state: any) => state.auth.user?.principal);
+
+// Permission checks
 export const useIsOwner = (contentId: string) => 
-  useSelector(selectIsOwner(contentId));
+  useSelector((state) => selectIsOwner(contentId)(state));
 export const useHasEditAccess = (contentId: string) => 
-  useSelector(selectHasEditAccess(contentId));
+  useSelector((state) => selectHasEditAccess(contentId)(state));
+export const useIsEditor = (contentId: string) => 
+  useSelector((state) => selectIsEditor(contentId)(state));  
 
 // Collaboration
 export const useShelfEditors = (shelfId: string) => 

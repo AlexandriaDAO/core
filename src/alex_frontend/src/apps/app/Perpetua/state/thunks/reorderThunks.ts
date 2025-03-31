@@ -4,7 +4,7 @@ import { cacheManager } from '../cache/ShelvesCache';
 import { updateShelfOrder } from '../perpetuaSlice';
 import { getShelfById, loadShelves, loadMissingShelves } from './queryThunks';
 import { perpetuaService } from '../services/perpetuaService';
-import { toPrincipal, extractErrorMessage } from '../utils/perpetuaUtils';
+import { toPrincipal, extractErrorMessage } from '../../utils';
 
 /**
  * Reorder an item within a shelf

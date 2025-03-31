@@ -5,7 +5,7 @@ import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { BaseShelfList } from '../components/BaseShelfList';
 import { LibraryShelvesUIProps, ExploreShelvesUIProps, UserShelvesUIProps } from '../types/types';
 import { useDispatch } from 'react-redux';
-import { reorderProfileShelf } from '@/apps/app/Perpetua/state/perpetuaThunks';
+import { reorderProfileShelf } from '@/apps/app/Perpetua/state';
 import { AppDispatch } from '@/store';
 
 // Custom props comparison for React.memo to prevent unnecessary renders

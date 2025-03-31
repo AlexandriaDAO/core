@@ -3,7 +3,7 @@ import { cacheManager } from '../cache/ShelvesCache';
 import { setShelfEditors, setEditorsLoading } from '../perpetuaSlice';
 import { getShelfById } from './queryThunks';
 import { perpetuaService } from '../services/perpetuaService';
-import { extractErrorMessage } from '../utils/perpetuaUtils';
+import { extractErrorMessage } from '../../utils';
 
 /**
  * List editors for a shelf

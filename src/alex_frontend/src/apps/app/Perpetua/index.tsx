@@ -7,7 +7,7 @@ export * from "./features/shelf-settings";
 export * from "./features/items";
 export * from "./features/cards";
 export { parsePathInfo, usePerpetuaNavigation, useViewState } from "./routes";
-export { createFindItemInShelf } from "./utils";
+export * from "./utils";
 
 // Simple entry point
 const Perpetua: React.FC = () => {

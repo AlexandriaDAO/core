@@ -8,7 +8,7 @@ import {
 } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import {
   loadRecentShelves
-} from "@/apps/app/Perpetua/state/perpetuaThunks";
+} from "@/apps/app/Perpetua/state";
 import { createFindItemById } from "../../../utils";
 
 // Custom hook for public shelf operations

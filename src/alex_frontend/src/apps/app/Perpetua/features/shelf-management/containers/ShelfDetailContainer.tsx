@@ -3,7 +3,7 @@ import { useIdentity } from "@/hooks/useIdentity";
 import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { rebalanceShelfItems } from "@/apps/app/Perpetua/state/perpetuaThunks";
+import { rebalanceShelfItems } from "@/apps/app/Perpetua/state";
 import { ItemReorderManager } from "../../items/components/ItemReorderManager";
 import { ShelfDetailView } from "../../cards";
 import { ShelfSettingsDialog } from "../../shelf-settings";

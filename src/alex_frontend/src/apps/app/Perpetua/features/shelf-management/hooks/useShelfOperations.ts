@@ -15,7 +15,7 @@ import {
   updateShelfMetadata,
   createAndAddShelfItem as createAndAddShelfItemAction,
   removeItem as removeItemAction
-} from "@/apps/app/Perpetua/state/perpetuaThunks";
+} from "@/apps/app/Perpetua/state";
 import { createFindItemById } from "../../../utils";
 import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 

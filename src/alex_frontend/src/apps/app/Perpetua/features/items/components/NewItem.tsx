@@ -9,11 +9,11 @@ import { X, Plus } from "lucide-react";
 import NftSearchDialog from "./NftSearch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { selectUserShelves, selectSelectedShelf, selectUserPrincipal, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
+import { selectUserShelves, selectSelectedShelf, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { toast } from "sonner";
 import { ShelfForm } from "@/apps/app/Perpetua/features/shelf-management/components/NewShelf";
 import { getActorPerpetua } from "@/features/auth/utils/authUtils";
-import { loadShelves } from "@/apps/app/Perpetua/state/perpetuaThunks";
+import { loadShelves } from "@/apps/app/Perpetua/state";
 import { Principal } from "@dfinity/principal";
 import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks/useShelfOperations";
 
@@ -40,8 +40,8 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
   const [isCreatingShelf, setIsCreatingShelf] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Get user principal
-  const userPrincipal = useAppSelector(selectUserPrincipal);
+  // Get user principal directly from auth state - single source of truth
+  const userPrincipal = useAppSelector(state => state.auth.user?.principal);
   
   // Get shelves from Redux store
   const allShelves = useAppSelector(selectUserShelves);

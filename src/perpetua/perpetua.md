@@ -1,3 +1,117 @@
+# File Structure: 
+
+Perpetua/
+├── features/
+│   ├── cards/
+│   │   ├── components/
+│   │   │   ├── BaseShelfList.tsx
+│   │   │   ├── ContentDisplays.tsx
+│   │   │   ├── NftDisplay.tsx
+│   │   │   ├── ShelfCard.tsx
+│   │   │   ├── ShelfCardActionMenu.tsx
+│   │   │   ├── ShelfDetailView.tsx
+│   │   │   └── index.ts
+│   │   ├── containers/
+│   │   │   ├── ShelfLists.tsx
+│   │   │   └── index.ts
+│   │   ├── index.ts
+│   │   └── types/
+│   │       ├── index.ts
+│   │       └── types.ts
+│   ├── items/
+│   │   ├── components/
+│   │   │   ├── AddToShelfDialog.tsx
+│   │   │   ├── ItemActionMenu.tsx
+│   │   │   ├── ItemReorderManager.tsx
+│   │   │   ├── NewItem.tsx
+│   │   │   ├── NftSearch.tsx
+│   │   │   └── index.ts
+│   │   ├── hooks/
+│   │   │   ├── index.ts
+│   │   │   ├── useItemActions.tsx
+│   │   │   └── useItemReordering.ts
+│   │   └── index.ts
+│   ├── shared/
+│   │   └── hooks/
+│   │       └── useReorderable.ts
+│   ├── shelf-collaboration/
+│   │   └── components/
+│   │       └── CollaboratorsList.tsx
+│   ├── shelf-management/
+│   │   ├── components/
+│   │   │   ├── NewShelf.tsx
+│   │   │   ├── RemoveItemButton.tsx
+│   │   │   ├── ShelfContent.tsx
+│   │   │   ├── ShelfOption.tsx
+│   │   │   ├── ShelfSelectionDialog.tsx
+│   │   │   └── index.ts
+│   │   ├── containers/
+│   │   │   └── ShelfDetailContainer.tsx
+│   │   ├── hooks/
+│   │   │   ├── index.ts
+│   │   │   ├── useAddToShelf.ts
+│   │   │   ├── usePublicShelfOperations.ts
+│   │   │   ├── useShelfOperations.ts
+│   │   │   └── useShelfReordering.ts
+│   │   ├── index.ts
+│   │   └── types/
+│   │       └── index.ts
+│   └── shelf-settings/
+│       ├── components/
+│       │   ├── ShelfMetricsDisplay.tsx
+│       │   ├── ShelfSettings.tsx
+│       │   ├── ShelfSettingsDialog.tsx
+│       │   └── index.ts
+│       ├── hooks/
+│       │   ├── index.ts
+│       │   ├── useShelfMetadata.ts
+│       │   └── useShelfMetrics.ts
+│       ├── index.ts
+│       └── utils/
+│           └── index.ts
+├── hooks/
+│   ├── index.ts
+│   └── useContentPermissions.ts
+├── index.tsx
+├── layouts/
+│   ├── PerpetuaLayout.tsx
+│   └── index.ts
+├── routes.ts
+├── state/
+│   ├── cache/
+│   │   └── ShelvesCache.ts
+│   ├── hooks/
+│   │   ├── index.ts
+│   │   ├── usePerpetuaActions.ts
+│   │   └── usePerpetuaSelectors.ts
+│   ├── index.ts
+│   ├── perpetuaSlice.ts
+│   ├── services/
+│   │   └── perpetuaService.ts
+│   ├── thunks/
+│   │   ├── collaborationThunks.ts
+│   │   ├── index.ts
+│   │   ├── itemThunks.ts
+│   │   ├── queryThunks.ts
+│   │   ├── reorderThunks.ts
+│   │   └── shelfThunks.ts
+│   ├── utils/
+└── utils.tsx
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 dfx canister uninstall-code perpetua
 cargo build --release --target wasm32-unknown-unknown --package perpetua

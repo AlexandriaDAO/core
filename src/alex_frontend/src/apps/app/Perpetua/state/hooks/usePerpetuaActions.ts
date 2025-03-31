@@ -6,7 +6,6 @@ import { AppDispatch } from '@/store';
 // Import slice actions
 import {
   setSelectedShelf,
-  setUserPrincipal,
   clearPermissions,
   clearError,
   updateShelfOrder,
@@ -46,9 +45,7 @@ export const usePerpetuaActions = () => {
     selectShelf: (shelf: Shelf | string | null) => 
       dispatch(setSelectedShelf(shelf)),
     
-    // User management
-    setUserPrincipal: (principal: string | null) => 
-      dispatch(setUserPrincipal(principal)),
+    // Permission management
     clearPermissions: () => dispatch(clearPermissions()),
     
     // Error handling

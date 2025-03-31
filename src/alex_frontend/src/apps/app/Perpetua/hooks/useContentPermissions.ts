@@ -1,11 +1,9 @@
-import { useEffect } from 'react';
 import { useIdentity } from '@/hooks/useIdentity';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
+import { useCallback } from 'react';
 import { 
-  selectHasEditAccess, 
-  selectUserPrincipal, 
-  setUserPrincipal,
+  selectHasEditAccess,
   setContentPermission
 } from '@/apps/app/Perpetua/state/perpetuaSlice';
 
@@ -13,43 +11,47 @@ import {
  * Hook for managing content permissions
  * 
  * This hook provides a convenient way to check if the current user has edit access
- * to a particular piece of content. It initializes the user principal in Redux
- * state and provides methods to check and modify permissions.
- * 
+ * to a particular piece of content. It provides methods to check permissions
+ * based on direct state access to auth information.
+ *
  * @returns Object with permission utilities
  */
 export const useContentPermissions = () => {
   const dispatch = useAppDispatch();
   const { identity } = useIdentity();
-  const currentPrincipal = useAppSelector(selectUserPrincipal);
-  const permissions = useAppSelector(state => state.perpetua.permissions);
+  // Direct state access to auth principal - single source of truth
+  const currentPrincipal = useAppSelector(state => state.auth.user?.principal);
   
-  // Set the user principal in redux state when identity changes
-  useEffect(() => {
-    const principalString = identity?.getPrincipal().toString() || null;
-    
-    if (principalString !== currentPrincipal) {
-      dispatch(setUserPrincipal(principalString));
-    }
-  }, [identity, currentPrincipal, dispatch]);
+  // Pre-select all the necessary state data for permission checks
+  const shelves = useAppSelector(state => state.perpetua.entities.shelves);
+  const shelfEditors = useAppSelector(state => state.perpetua.shelfEditors);
   
   /**
    * Check if the current user has edit access to the content
-   * @param contentId - ID of the content to check
-   * @returns boolean indicating if user has edit access
+   * This is memoized to avoid recreating the function on each render
    */
-  const checkEditAccess = (contentId: string) => {
-    return permissions[contentId] || false;
-  };
+  const checkEditAccess = useCallback((contentId: string) => {
+    if (!currentPrincipal) return false;
+    
+    const shelf = shelves[contentId];
+    if (!shelf) return false;
+    
+    // Check if user is owner
+    if (shelf.owner === currentPrincipal) return true;
+    
+    // Check if user is editor
+    const editors = shelfEditors[contentId] || [];
+    return editors.includes(currentPrincipal);
+  }, [currentPrincipal, shelves, shelfEditors]);
   
   /**
    * Manually set a permission for a specific content ID
    * @param contentId - ID of the content
    * @param hasAccess - Whether the user has edit access
    */
-  const setEditAccess = (contentId: string, hasAccess: boolean) => {
+  const setEditAccess = useCallback((contentId: string, hasAccess: boolean) => {
     dispatch(setContentPermission({ contentId, hasEditAccess: hasAccess }));
-  };
+  }, [dispatch]);
   
   /**
    * Determine if a user has edit access to a piece of content
@@ -58,11 +60,11 @@ export const useContentPermissions = () => {
    * @param ownerPrincipal - Principal ID of the content owner
    * @returns boolean indicating if current user is the owner
    */
-  const isContentOwner = (ownerPrincipal: string) => {
+  const isContentOwner = useCallback((ownerPrincipal: string) => {
     if (!identity) return false;
-    const currentPrincipal = identity.getPrincipal().toString();
-    return currentPrincipal === ownerPrincipal;
-  };
+    const currentPrincipalStr = identity.getPrincipal().toString();
+    return currentPrincipalStr === ownerPrincipal;
+  }, [identity]);
   
   return {
     checkEditAccess,

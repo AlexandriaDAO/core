@@ -12,15 +12,14 @@ export { cacheManager } from './cache/ShelvesCache';
 // Export service layer
 export { perpetuaService } from './services/perpetuaService';
 
-// Export utils
-export * from './utils/perpetuaUtils';
+// Export utils - now from the central utils file
+export * from '../utils';
 
 // Export slice, reducer, actions and selectors
 export {
   default as perpetuaReducer,
   // Actions
   setSelectedShelf,
-  setUserPrincipal,
   setContentPermission,
   setShelfEditors,
   setEditorsLoading,
@@ -37,12 +36,11 @@ export {
   selectLoading,
   selectPublicLoading,
   selectError,
-  selectUserPrincipal,
-  selectPermissions,
   selectShelfEditors,
   selectEditorsLoading,
   selectIsOwner,
   selectHasEditAccess,
+  selectIsEditor,
 } from './perpetuaSlice';
 
 // Export types from perpetuaSlice

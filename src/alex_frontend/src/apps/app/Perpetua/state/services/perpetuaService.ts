@@ -2,7 +2,7 @@ import { Principal } from '@dfinity/principal';
 import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 import { convertBigIntsToStrings, convertStringsToBigInts } from '@/utils/bgint_convert';
 import { Shelf, Item, ItemContent } from '@/../../declarations/perpetua/perpetua.did';
-import { toPrincipal, principalToString, Result } from '../utils/perpetuaUtils';
+import { toPrincipal, principalToString, Result } from '../../utils';
 
 // Define query error type to match the backend
 type QueryError = any; // We use 'any' here since the specific error types vary by endpoint

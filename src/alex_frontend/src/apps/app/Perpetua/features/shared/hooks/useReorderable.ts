@@ -1,28 +1,34 @@
-import { useCallback, useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useIdentity } from '@/hooks/useIdentity';
-import { AsyncThunkAction, unwrapResult } from '@reduxjs/toolkit';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash';
 
-interface ReorderableItem {
+// Common interface for reorderable items
+export interface ReorderableItem {
   id: number | string;
-  // Any other properties your items might have
 }
 
-// More generic ReorderParams interface
-export interface ReorderParams {
-  shelfId: string;
-  itemId: number | string;
-  referenceItemId: number | string | null;
-  before: boolean;
-  principal: string;
-}
-
-interface UseReorderableProps<T extends ReorderableItem> {
+/**
+ * Props for useReorderable hook
+ */
+export interface UseReorderableProps<T extends ReorderableItem> {
+  // Items to be reordered
   items: T[];
+  
+  // ID of the container (e.g., shelf ID, category ID)
   containerId: string;
+  
+  // Whether the user has permission to edit/reorder items
   hasEditAccess: boolean;
-  reorderAction: (params: ReorderParams) => AsyncThunkAction<any, any, any>;
+  
+  // Action creator for dispatching reorder operations
+  reorderAction: (params: {
+    shelfId: string;
+    itemId: number | string;
+    referenceItemId: number | string | null;
+    before: boolean;
+    principal: string;
+  }) => any;
 }
 
 /**
@@ -75,73 +81,86 @@ export const useReorderable = <T extends ReorderableItem>({
     setDraggedIndex(null);
     setDragOverIndex(null);
   }, []);
-  
-  // Drag and drop handlers - memoized to maintain stable references
+
+  // Handle drag start
   const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
+    if (!isEditMode) return;
+    
     setDraggedIndex(index);
     
-    // Create custom drag image
+    // Create custom drag image for better UX
     const draggedElement = e.currentTarget as HTMLElement;
     
-    // Create a clone of the element for the drag image
     const dragImage = draggedElement.cloneNode(true) as HTMLElement;
     dragImage.style.width = `${draggedElement.offsetWidth}px`;
     dragImage.style.height = `${draggedElement.offsetHeight}px`;
     dragImage.style.opacity = '0.8';
     dragImage.style.position = 'absolute';
-    dragImage.style.top = '-1000px'; // Position offscreen
+    dragImage.style.top = '-1000px';
     dragImage.style.backgroundColor = 'white';
     dragImage.style.border = '2px solid #4299e1';
     dragImage.style.borderRadius = '4px';
     dragImage.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
     
-    // Append to body temporarily
     document.body.appendChild(dragImage);
     
-    // Set the custom drag image
-    e.dataTransfer.setDragImage(dragImage, draggedElement.offsetWidth / 2, draggedElement.offsetHeight / 2);
+    e.dataTransfer.setDragImage(
+      dragImage, 
+      draggedElement.offsetWidth / 2, 
+      draggedElement.offsetHeight / 2
+    );
     
-    // Remove the element after drag starts
     setTimeout(() => {
       document.body.removeChild(dragImage);
     }, 0);
-  }, []);
+  }, [isEditMode]);
 
+  // Handle drag over
   const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
     e.preventDefault();
+    if (!isEditMode) return;
+    
     if (draggedIndex !== null && draggedIndex !== index) {
       setDragOverIndex(index);
     }
-  }, [draggedIndex]);
+  }, [draggedIndex, isEditMode]);
 
+  // Handle drag end
   const handleDragEnd = useCallback(() => {
+    if (!isEditMode) return;
+    
     setDraggedIndex(null);
     setDragOverIndex(null);
-  }, []);
+  }, [isEditMode]);
 
-  const handleDrop = useCallback((e: React.DragEvent, dropIndex: number) => {
+  // Handle drop
+  const handleDrop = useCallback((e: React.DragEvent, index: number) => {
     e.preventDefault();
+    if (!isEditMode) return;
     
-    if (draggedIndex !== null && draggedIndex !== dropIndex) {
-      // Reorder locally
-      const newItems = [...editedItems];
-      const draggedItem = newItems.splice(draggedIndex, 1)[0];
-      newItems.splice(dropIndex, 0, draggedItem);
-      setEditedItems(newItems);
+    if (draggedIndex === null || draggedIndex === index) {
+      return;
     }
     
+    // Create new item order by moving the dragged item
+    const updatedItems = [...editedItems];
+    const [draggedItem] = updatedItems.splice(draggedIndex, 1);
+    updatedItems.splice(index, 0, draggedItem);
+    
+    setEditedItems(updatedItems);
     setDraggedIndex(null);
     setDragOverIndex(null);
-  }, [draggedIndex, editedItems]);
-  
-  // Style utility - memoized to prevent recreation on every render
+  }, [draggedIndex, editedItems, isEditMode]);
+
+  // Determine visual style for dragged items
   const getDragItemStyle = useCallback((index: number) => {
+    if (!isEditMode) return {};
+    
     if (draggedIndex === index) {
       return { 
         opacity: 0.5,
         transform: 'scale(0.98)',
         boxShadow: '0 0 0 2px #4299e1',
-        transition: 'all 0.2s ease'
       };
     }
     
@@ -150,126 +169,99 @@ export const useReorderable = <T extends ReorderableItem>({
         borderTop: '2px dashed #4299e1',
         backgroundColor: 'rgba(66, 153, 225, 0.05)',
         transform: 'scale(1.02)',
-        transition: 'all 0.2s ease'
       };
     }
     
     return {};
-  }, [draggedIndex, dragOverIndex]);
-  
-  // Track operations to prevent duplicate API calls
-  const operationsInProgress = useRef(new Set<string>());
-  
-  // Save the new order - memoize to keep stable reference
+  }, [draggedIndex, dragOverIndex, isEditMode]);
+
+  // Save the reordered items
   const saveOrder = useCallback(async () => {
-    if (!isEditMode || !identity || !hasEditAccess) return;
+    if (!identity) {
+      console.error("Cannot save order: No identity available");
+      return;
+    }
     
-    try {
-      const principal = identity.getPrincipal().toString();
-      
-      // Map original positions - use memoized reference
-      const originalOrderMap = new Map();
-      itemsRef.current.forEach((item, index) => {
-        originalOrderMap.set(item.id, index);
-      });
-      
-      // Apply each move
-      for (let newIndex = 0; newIndex < editedItems.length; newIndex++) {
-        const item = editedItems[newIndex];
-        const oldIndex = originalOrderMap.get(item.id);
-        
-        if (oldIndex !== newIndex) {
-          // Create a unique operation key to prevent duplicates
-          const operationKey = `move-${item.id}-to-${newIndex}`;
-          
-          // Skip if this exact operation is already in progress
-          if (operationsInProgress.current.has(operationKey)) {
-            continue;
-          }
-          
-          // Determine reference item and position
-          let referenceItemId: number | string | null = null;
-          let before = false;
-          
-          if (newIndex === 0) {
-            // Moving to the first position
-            if (editedItems.length > 1) {
-              referenceItemId = editedItems[1].id;
-              before = true;
-            }
-          } else {
-            // Moving after another item
-            referenceItemId = editedItems[newIndex - 1].id;
-            before = false;
-          }
-          
-          try {
-            // Add this operation to the in-progress set
-            operationsInProgress.current.add(operationKey);
-            
-            // Check which principal is being used - container ID (owner) or current user
-            const finalPrincipal = containerId || principal;
-            
-            // Dispatch reorder action
-            const resultAction = await dispatch(reorderAction({
-              shelfId: containerId,
-              itemId: item.id,
-              referenceItemId,
-              before,
-              principal: finalPrincipal
-            }));
-            
-            unwrapResult(resultAction);
-            
-            // Remove from in-progress set when done
-            operationsInProgress.current.delete(operationKey);
-          } catch (error) {
-            // Remove from in-progress set on error
-            operationsInProgress.current.delete(operationKey);
-            
-            if (error instanceof Error) {
-              throw new Error(`Reordering failed: ${error.message}`);
-            } else {
-              throw new Error(`Reordering failed: ${String(error)}`);
-            }
-          }
-        }
+    // Determine the new order - find the item that needs to move and its new position
+    const originalIds = itemsRef.current.map(item => item.id);
+    const newIds = editedItems.map(item => item.id);
+    
+    // Find the first position that changed
+    let changedIndex = -1;
+    for (let i = 0; i < newIds.length; i++) {
+      if (newIds[i] !== originalIds[i]) {
+        changedIndex = i;
+        break;
       }
+    }
+    
+    if (changedIndex === -1) {
+      // No changes, just exit edit mode
+      setIsEditMode(false);
+      return;
+    }
+    
+    // Determine the moved item ID
+    const movedItemId = newIds[changedIndex];
+    
+    // Find where this ID was in the original order
+    const originalPos = originalIds.indexOf(movedItemId);
+    
+    // If item moved earlier in the list, place before the item at the target position
+    // If item moved later in the list, place after the item at the target position - 1
+    const targetPos = changedIndex;
+    const isMoveUp = targetPos < originalPos;
+    
+    // Get the reference item ID
+    let referenceId: string | number | null = null;
+    let before = true;
+    
+    if (isMoveUp) {
+      // For moving up, place before the item at target position
+      referenceId = newIds[targetPos];
+      before = true;
+    } else {
+      // For moving down, place after the item at target position - 1
+      if (targetPos > 0) {
+        referenceId = newIds[targetPos - 1];
+        before = false;
+      } else {
+        // Special case: target is first position
+        referenceId = newIds[0];
+        before = true;
+      }
+    }
+    
+    // Dispatch the reorder action
+    try {
+      await dispatch(reorderAction({
+        shelfId: containerId,
+        itemId: movedItemId,
+        referenceItemId: referenceId,
+        before,
+        principal: identity.getPrincipal().toString()
+      })).unwrap();
       
       setIsEditMode(false);
     } catch (error) {
-      throw error; // Re-throw the error so the caller can handle it
+      console.error("Failed to reorder items:", error);
+      // Revert to original order on error
+      setEditedItems([...itemsRef.current]);
     }
-  }, [isEditMode, identity, hasEditAccess, editedItems, containerId, dispatch, reorderAction]);
-  
-  // Return stable references by using useMemo for the returned object
-  return useMemo(() => ({
-    isEditMode,
-    editedItems,
-    enterEditMode,
-    cancelEditMode,
-    saveOrder,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnd,
-    handleDrop,
-    draggedIndex,
-    dragOverIndex,
-    getDragItemStyle
-  }), [
-    isEditMode,
-    editedItems,
-    enterEditMode,
-    cancelEditMode,
-    saveOrder,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnd,
-    handleDrop,
-    draggedIndex,
-    dragOverIndex,
-    getDragItemStyle
-  ]);
-};
+  }, [containerId, editedItems, identity, itemsRef, dispatch, reorderAction]);
 
-export default useReorderable; 
+  return {
+    isEditMode,
+    editedItems,
+    enterEditMode,
+    cancelEditMode,
+    saveOrder,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+    handleDrop,
+    draggedIndex,
+    dragOverIndex,
+    getDragItemStyle
+  };
+}; 

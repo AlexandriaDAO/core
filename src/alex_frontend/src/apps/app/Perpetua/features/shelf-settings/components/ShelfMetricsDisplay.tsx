@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useShelfMetrics } from '../hooks';
-import { formatMetricValue, isRebalanceRecommended } from '../utils';
+import { formatMetricValue, isRebalanceRecommended } from '../../../utils';
 
 // Custom tooltip/hover implementation since shadcn components aren't installed
 interface TooltipProps {
