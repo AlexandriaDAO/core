@@ -39,6 +39,8 @@ export class PerpetuaService {
       const principalForApi = toPrincipal(principal);
       
       const result = await actor.get_user_shelves(principalForApi, []);
+
+      console.log("result", result);
       
       if ("Ok" in result) {
         // Convert BigInt values to strings for Redux
@@ -273,6 +275,8 @@ export class PerpetuaService {
           before
         }
       );
+
+      console.log("New shelf item order", result);
       
       if ("Ok" in result) {
         return { Ok: true };

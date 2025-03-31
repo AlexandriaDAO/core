@@ -94,14 +94,19 @@ export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = React.memo(({
   const { identity } = useIdentity();
   
   const handleSaveOrder = useCallback(async (newShelfOrder: string[]) => {
-    if (!identity) return;
+    if (!identity || newShelfOrder.length < 2) return;
     
-    // Since we can't easily determine reference shelf ID and before flag from
-    // just the new order array, we'll let the thunk handle the ordering with
-    // the complete new order array for optimistic updates
+    console.log("Saving library shelf order:", newShelfOrder);
+    
+    // Instead of sending an empty shelfId, use the first item in the new order
+    // and the second item as reference, with before=true
+    const shelfId = newShelfOrder[0];
+    const referenceShelfId = newShelfOrder[1];
+    
+    // Use the thunk with optimistic updates AND valid shelf IDs
     await dispatch(reorderProfileShelf({
-      shelfId: "", // These will be ignored when newShelfOrder is provided
-      referenceShelfId: null,
+      shelfId,
+      referenceShelfId,
       before: true,
       principal: identity.getPrincipal(),
       newShelfOrder
@@ -174,12 +179,20 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
   
   // Handler for saving reordered shelves
   const handleSaveOrder = useCallback(async (newShelfOrder: string[]) => {
-    if (!identity || !currentUserIsOwner) return;
+    if (!identity || !currentUserIsOwner || newShelfOrder.length < 2) return;
     
-    // Use the thunk with optimistic updates
+    console.log("Saving new shelf order:", newShelfOrder);
+    
+    // Instead of sending an empty shelfId, use the first item in the new order
+    // and the second item as reference, with before=true (meaning "put before the second item")
+    // This will ensure the backend actually processes a valid reorder operation
+    const shelfId = newShelfOrder[0];
+    const referenceShelfId = newShelfOrder[1];
+    
+    // Use the thunk with optimistic updates AND valid shelf IDs
     await dispatch(reorderProfileShelf({
-      shelfId: "", // These will be ignored when newShelfOrder is provided
-      referenceShelfId: null,
+      shelfId,
+      referenceShelfId,
       before: true,
       principal: ownerName || identity.getPrincipal(),
       newShelfOrder

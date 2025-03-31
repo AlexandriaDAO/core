@@ -11,6 +11,7 @@ import { useShelfOperations, usePublicShelfOperations } from "../features/shelf-
 import { useContentPermissions } from "../hooks/useContentPermissions";
 import { Principal } from "@dfinity/principal";
 import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { loadShelves } from "../state";
 
 // Import UI components
 import {
@@ -32,10 +33,10 @@ const denormalizeShelf = (normalizedShelf: NormalizedShelf): Shelf => {
 };
 
 /**
- * Convert an array of NormalizedShelf objects to Shelf objects
+ * Utility function to convert array of normalized shelves to denormalized shelves
  */
-const denormalizeShelves = (normalizedShelves: NormalizedShelf[]): Shelf[] => {
-  return normalizedShelves.map(denormalizeShelf);
+const denormalizeShelves = (shelves: NormalizedShelf[]): Shelf[] => {
+  return shelves.map(denormalizeShelf);
 };
 
 const PerpetuaLayout: React.FC = () => {
@@ -64,6 +65,33 @@ const PerpetuaLayout: React.FC = () => {
   const { shelfId, userId } = params;
   const { isShelfDetail, isUserDetail, isMainView } = viewFlags;
   
+  // State for user-specific shelves and loading status
+  const [userShelves, setUserShelves] = useState<NormalizedShelf[]>([]);
+  const [userShelvesLoading, setUserShelvesLoading] = useState(false);
+  
+  // Load shelves when viewing a specific user's profile
+  useEffect(() => {
+    if (isUserDetail && userId) {
+      setUserShelvesLoading(true);
+      // Here we directly dispatch loadShelves with the userId instead of filtering
+      // from publicShelves, which will ensure proper order from the backend
+      dispatch(loadShelves(userId))
+        .unwrap()
+        .then((loadedShelves) => {
+          // Convert Shelf[] to NormalizedShelf[] by extracting strings from principals
+          const normalizedShelves = loadedShelves.map(shelf => ({
+            ...shelf,
+            owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString()
+          }));
+          setUserShelves(normalizedShelves);
+          setUserShelvesLoading(false);
+        })
+        .catch(() => {
+          setUserShelvesLoading(false);
+        });
+    }
+  }, [dispatch, isUserDetail, userId]);
+  
   // Handle shelf selection when route changes
   useEffect(() => {
     if (shelfId) {
@@ -88,42 +116,34 @@ const PerpetuaLayout: React.FC = () => {
   }, [createShelf]);
   
   const handleNewItemSubmit = useCallback(async (content: string, type: "Nft" | "Markdown" | "Shelf") => {
-    if (selectedShelf) {
-      // Convert NormalizedShelf to Shelf for the API call
-      const denormalizedShelf = denormalizeShelf(selectedShelf);
-      await addItem(denormalizedShelf, content, type);
-      setIsNewItemDialogOpen(false);
-    }
+    if (!selectedShelf) return;
+    
+    const shelf = denormalizeShelf(selectedShelf);
+    await addItem(shelf, content, type);
+    setIsNewItemDialogOpen(false);
   }, [selectedShelf, addItem]);
   
-  const handleReorderItem = useCallback(async (shelfId: string, itemId: number, referenceItemId: number | null, before: boolean) => {
-    await reorderItem(shelfId, itemId, referenceItemId, before);
-  }, [reorderItem]);
-  
-  // Render the appropriate view based on the route
+  // Render view based on current URL and state
   const renderView = () => {
-    // If we're viewing a specific shelf
+    // If we're viewing a shelf
     if (isShelfDetail && selectedShelf) {
-      const hasEditAccess = checkEditAccess(selectedShelf.shelf_id);
       const denormalizedShelf = denormalizeShelf(selectedShelf);
       
       return (
-        <ShelfDetailContainer 
+        <ShelfDetailContainer
           shelf={denormalizedShelf}
           onBack={goToShelves}
-          onAddItem={hasEditAccess ? handleAddItem : undefined}
-          onReorderItem={hasEditAccess ? handleReorderItem : undefined}
-          hasEditAccess={hasEditAccess}
+          onAddItem={hasEditAccess => hasEditAccess ? handleAddItem : undefined}
         />
       );
     }
     
     // If we're viewing the main shelves view
     if (isMainView) {
-      // Combine all shelves in one view and denormalize them
-      const allNormalizedShelves = [...shelves, ...publicShelves];
-      const allDenormalizedShelves = denormalizeShelves(allNormalizedShelves);
+      // Combine personal and public shelves
+      const allShelves = [...shelves, ...publicShelves];
       const denormalizedPersonalShelves = denormalizeShelves(shelves);
+      const allDenormalizedShelves = denormalizeShelves(allShelves);
       
       return (
         <UnifiedShelvesUI 
@@ -141,18 +161,16 @@ const PerpetuaLayout: React.FC = () => {
     
     // If we're viewing a specific user's shelves
     if (isUserDetail && userId) {
-      const userNormalizedShelves = publicShelves.filter(shelf => 
-        shelf.owner === userId // Owner is already a string in NormalizedShelf
-      );
-      const userDenormalizedShelves = denormalizeShelves(userNormalizedShelves);
-      
       // Check if this is the current user's profile
       const isCurrentUserProfile = userPrincipal === userId;
+      
+      // Use directly loaded user shelves instead of filtering from publicShelves
+      const userDenormalizedShelves = denormalizeShelves(userShelves);
       
       return (
         <UserShelvesUI 
           shelves={userDenormalizedShelves}
-          loading={publicLoading}
+          loading={userShelvesLoading}
           onViewShelf={goToShelf}
           onViewOwner={goToUser}
           onBack={goToMainShelves}
