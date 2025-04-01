@@ -30,6 +30,7 @@ pub enum GeneralError {
     // Other General Errors
     InvalidInput(String),   // e.g., "Invalid parameters provided"
     InternalError(String),  // e.g., "Unexpected error occurred"
+    NoChanges,             // e.g., "No changes were made"
 }
 
 
@@ -53,6 +54,7 @@ impl GeneralError {
             // Other errors
             Self::InvalidInput(msg) => format!("Invalid input: {}", msg),
             Self::InternalError(msg) => format!("Internal error: {}", msg),
+            Self::NoChanges => "No changes were made".to_string(),
         }
     }
 }

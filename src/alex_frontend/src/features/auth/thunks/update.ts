@@ -11,8 +11,8 @@ const update = createAsyncThunk<
 		actor: ActorSubclass<_SERVICE>,
 		input: {
 			username: string,
-			name?: string,
-			avatar?: string
+			name: string,
+			avatar: string
 		}
 	}, //Argument that we pass to initialize
 	{ rejectValue: string }
@@ -20,8 +20,8 @@ const update = createAsyncThunk<
 		try {
 			const updateInput:UpdateUserRequest = {
 				username: username,
-				name: name ? [name]: [],
-				avatar: avatar ? [avatar]: []
+				name: [name],
+				avatar: [avatar],
 			}
 			const result = await actor.update_profile(updateInput);
 

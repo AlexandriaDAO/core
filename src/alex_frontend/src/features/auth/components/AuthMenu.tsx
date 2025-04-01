@@ -45,6 +45,7 @@ export default function AuthMenu() {
 								}}
 								onError={(e) => {
 									(e.currentTarget as HTMLElement).style.display = 'none';
+									(e.currentTarget.previousElementSibling as HTMLElement).style.display = 'none';
 									(e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
 								}}
 							/>
