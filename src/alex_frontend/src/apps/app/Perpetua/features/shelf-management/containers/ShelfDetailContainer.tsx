@@ -3,8 +3,9 @@ import { useIdentity } from "@/hooks/useIdentity";
 import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { rebalanceShelfItems } from "@/apps/app/Perpetua/state";
-import { ItemReorderManager } from "../../items/components/ItemReorderManager";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { rebalanceShelfItems, selectOptimisticShelfItemOrder } from "@/apps/app/Perpetua/state";
+import { ItemReorderManager } from "../../shared/reordering/components/ItemReorderManager";
 import { ShelfDetailView } from "../../cards";
 import { ShelfSettingsDialog } from "../../shelf-settings";
 import { useShelfOperations } from "../hooks";
@@ -47,9 +48,24 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 	// Access the updateMetadata function from ShelfOperations
 	const { updateMetadata } = useShelfOperations();
 	
+	// Check for optimistic item order
+	const optimisticItemOrder = useAppSelector(selectOptimisticShelfItemOrder(shelf.shelf_id)) as number[];
+	
 	// Improved ordered items calculation
 	const orderedItems = useMemo(() => {
-		// Extract the items using the item_positions array for order
+		// If we have optimistic order, prioritize it
+		if (optimisticItemOrder.length > 0 && shelf.items) {
+			// First gather all items
+			const itemMap = new Map<number, Item>();
+			shelf.items.forEach(([id, item]: [number, Item]) => itemMap.set(id, item));
+			
+			// Return items in the optimistic order 
+			return optimisticItemOrder
+				.map(id => itemMap.has(id) ? [id, itemMap.get(id)!] as [number, Item] : null)
+				.filter((item): item is [number, Item] => item !== null);
+		}
+		
+		// Otherwise, fallback to the default ordering
 		if (!shelf.item_positions || !shelf.items) return [];
 		
 		// Convert positions to array and sort by position values
@@ -61,10 +77,13 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 			const itemPair = shelf.items?.find(([itemId]: [number, any]) => itemId === id);
 			return itemPair ? itemPair : null;
 		}).filter((item: any): item is [number, Item] => item !== null);
-	}, [JSON.stringify({ 
-		items: shelf.items?.map(([id]: [number, any]) => id), 
-		positions: shelf.item_positions?.map(([id, pos]: [number, number]) => `${id}:${pos}`)
-	})]);
+	}, [
+		JSON.stringify({ 
+			items: shelf.items?.map(([id]: [number, any]) => id), 
+			positions: shelf.item_positions?.map(([id, pos]: [number, number]) => `${id}:${pos}`),
+			optimistic: optimisticItemOrder
+		})
+	]);
 	
 	// Existing rebalance handler
 	const handleRebalance = async (shelfId: string) => {

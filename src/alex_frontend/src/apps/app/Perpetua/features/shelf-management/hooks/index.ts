@@ -1,4 +1,4 @@
-export { useShelfOperations } from './useShelfOperations';
-export { useShelfReordering } from './useShelfReordering';
-export { useAddToShelf } from './useAddToShelf';
-export { usePublicShelfOperations } from './usePublicShelfOperations';
+export * from './useAddToShelf';
+export * from './usePublicShelfOperations';
+export * from './useShelfOperations';
+export * from '../../shared/reordering/hooks/useShelfReordering';

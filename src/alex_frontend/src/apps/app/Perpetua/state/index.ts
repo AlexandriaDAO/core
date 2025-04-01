@@ -27,6 +27,7 @@ export {
   clearError,
   updateSingleShelf,
   updateShelfOrder,
+  updateItemOrder,
   // Selectors
   selectUserShelves,
   selectPublicShelves,
@@ -41,6 +42,7 @@ export {
   selectIsOwner,
   selectHasEditAccess,
   selectIsEditor,
+  selectOptimisticShelfItemOrder
 } from './perpetuaSlice';
 
 // Export types from perpetuaSlice

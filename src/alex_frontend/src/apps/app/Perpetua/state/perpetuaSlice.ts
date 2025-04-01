@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '@/store';
 import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { 
@@ -28,6 +28,7 @@ export interface PerpetuaState {
   ids: {
     userShelves: string[]; // IDs of user's shelves (order preserved)
     publicShelves: string[]; // IDs of public shelves (order preserved)
+    shelfItems: Record<string, number[]>; // Map of shelfId -> ordered itemIds
   };
   // References
   selectedShelfId: string | null;
@@ -51,6 +52,7 @@ const initialState: PerpetuaState = {
   ids: {
     userShelves: [],
     publicShelves: [],
+    shelfItems: {},
   },
   selectedShelfId: null,
   lastTimestamp: undefined,
@@ -142,6 +144,12 @@ const perpetuaSlice = createSlice({
     updateShelfOrder: (state, action: PayloadAction<string[]>) => {
       // The payload is the new ordered array of shelf IDs
       state.ids.userShelves = action.payload;
+    },
+    // Update the order of items within a shelf
+    updateItemOrder: (state, action: PayloadAction<{shelfId: string, itemIds: number[]}>) => {
+      const { shelfId, itemIds } = action.payload;
+      // Store the new order in the shelfItems map
+      state.ids.shelfItems[shelfId] = itemIds;
     },
   },
   extraReducers: (builder) => {
@@ -262,83 +270,177 @@ export const {
   clearPermissions,
   setShelfEditors,
   setEditorsLoading,
-  updateShelfOrder
+  updateShelfOrder,
+  updateItemOrder
 } = perpetuaSlice.actions;
 export default perpetuaSlice.reducer;
 
+// Selector memoization cache
+const selectorCache: {
+  shelfById: Record<string, ReturnType<typeof createSelector>>;
+  shelfEditors: Record<string, ReturnType<typeof createSelector>>;
+  editorsLoading: Record<string, ReturnType<typeof createSelector>>;
+  hasEditAccess: Record<string, ReturnType<typeof createSelector>>;
+  isOwner: Record<string, ReturnType<typeof createSelector>>;
+  isEditor: Record<string, ReturnType<typeof createSelector>>;
+  optimisticShelfItemOrder: Record<string, ReturnType<typeof createSelector>>;
+} = {
+  shelfById: {},
+  shelfEditors: {},
+  editorsLoading: {},
+  hasEditAccess: {},
+  isOwner: {},
+  isEditor: {},
+  optimisticShelfItemOrder: {},
+};
+
 // Selectors
-// Get all user shelves with preserved order
-export const selectUserShelves = (state: RootState) => {
-  return state.perpetua.ids.userShelves.map(id => state.perpetua.entities.shelves[id]).filter(Boolean);
+// Get the order of user shelves directly from state - memoized to prevent recalculation
+export const selectOptimisticShelfOrder = createSelector(
+  (state: RootState) => state.perpetua.ids.userShelves,
+  (userShelves) => userShelves
+);
+
+// Get all user shelves with preserved order - memoized to prevent recalculation
+export const selectUserShelves = createSelector(
+  selectOptimisticShelfOrder,
+  (state: RootState) => state.perpetua.entities.shelves,
+  (shelfOrder, shelves) => shelfOrder.map(id => shelves[id]).filter(Boolean)
+);
+
+// Get all public shelves with preserved order - memoized to prevent recalculation
+export const selectPublicShelves = createSelector(
+  (state: RootState) => state.perpetua.ids.publicShelves,
+  (state: RootState) => state.perpetua.entities.shelves,
+  (publicShelves, shelves) => publicShelves.map(id => shelves[id]).filter(Boolean)
+);
+
+// Get a specific shelf by ID - memoized factory selector with caching
+export const selectShelfById = (shelfId: string) => {
+  if (!selectorCache.shelfById[shelfId]) {
+    selectorCache.shelfById[shelfId] = createSelector(
+      (state: RootState) => state.perpetua.entities.shelves[shelfId],
+      (shelf) => shelf || null
+    );
+  }
+  return selectorCache.shelfById[shelfId];
 };
 
-// Get all public shelves with preserved order
-export const selectPublicShelves = (state: RootState) => {
-  return state.perpetua.ids.publicShelves.map(id => state.perpetua.entities.shelves[id]).filter(Boolean);
+// Get the currently selected shelf - memoized to prevent recalculation
+export const selectSelectedShelf = createSelector(
+  (state: RootState) => state.perpetua.selectedShelfId,
+  (state: RootState) => state.perpetua.entities.shelves,
+  (selectedShelfId, shelves) => {
+    if (!selectedShelfId) return null;
+    return shelves[selectedShelfId] || null;
+  }
+);
+
+// Get the optimistically updated ordered item IDs for a shelf - memoized factory selector with caching
+export const selectOptimisticShelfItemOrder = (shelfId: string) => {
+  if (!selectorCache.optimisticShelfItemOrder[shelfId]) {
+    selectorCache.optimisticShelfItemOrder[shelfId] = createSelector(
+      (state: RootState) => state.perpetua.ids.shelfItems[shelfId],
+      (itemIds) => itemIds || []
+    );
+  }
+  return selectorCache.optimisticShelfItemOrder[shelfId];
 };
 
-// Get a specific shelf by ID
-export const selectShelfById = (shelfId: string) => 
-  (state: RootState) => state.perpetua.entities.shelves[shelfId] || null;
+// Remaining selectors, also memoized
+export const selectLastTimestamp = createSelector(
+  (state: RootState) => state.perpetua.lastTimestamp,
+  (timestamp) => timestamp
+);
 
-// Get the currently selected shelf
-export const selectSelectedShelf = (state: RootState) => {
-  const { selectedShelfId } = state.perpetua;
-  if (!selectedShelfId) return null;
-  return state.perpetua.entities.shelves[selectedShelfId] || null;
+export const selectLoading = createSelector(
+  (state: RootState) => state.perpetua.loading.userShelves,
+  (loading) => loading
+);
+
+export const selectPublicLoading = createSelector(
+  (state: RootState) => state.perpetua.loading.publicShelves,
+  (loading) => loading
+);
+
+export const selectError = createSelector(
+  (state: RootState) => state.perpetua.error,
+  (error) => error
+);
+
+// New selectors for collaboration features with caching
+export const selectShelfEditors = (shelfId: string) => {
+  if (!selectorCache.shelfEditors[shelfId]) {
+    selectorCache.shelfEditors[shelfId] = createSelector(
+      (state: RootState) => state.perpetua.shelfEditors[shelfId],
+      (editors) => editors || []
+    );
+  }
+  return selectorCache.shelfEditors[shelfId];
 };
 
-export const selectLastTimestamp = (state: RootState) => state.perpetua.lastTimestamp;
+export const selectEditorsLoading = (shelfId: string) => {
+  if (!selectorCache.editorsLoading[shelfId]) {
+    selectorCache.editorsLoading[shelfId] = createSelector(
+      (state: RootState) => state.perpetua.loading.editors[shelfId],
+      (loading) => loading || false
+    );
+  }
+  return selectorCache.editorsLoading[shelfId];
+};
 
-export const selectLoading = (state: RootState) => state.perpetua.loading.userShelves;
-export const selectPublicLoading = (state: RootState) => state.perpetua.loading.publicShelves;
-export const selectError = (state: RootState) => state.perpetua.error;
+// Check if user has edit access to a content item - with caching
+export const selectHasEditAccess = (contentId: string) => {
+  if (!selectorCache.hasEditAccess[contentId]) {
+    selectorCache.hasEditAccess[contentId] = createSelector(
+      (state: RootState) => state.auth.user?.principal,
+      (state: RootState) => state.perpetua.entities.shelves[contentId],
+      (state: RootState) => state.perpetua.shelfEditors[contentId] || [],
+      (userPrincipal, shelf, editors) => {
+        if (!userPrincipal || !shelf) return false;
+        
+        // Check if user is owner
+        if (shelf.owner === userPrincipal) return true;
+        
+        // Check if user is editor
+        return editors.includes(userPrincipal);
+      }
+    );
+  }
+  return selectorCache.hasEditAccess[contentId];
+};
 
-// Updated selectors for permissions
-// No longer need selectPermissions as permissions are calculated on-demand
+// Check if user is the owner of a shelf - with caching
+export const selectIsOwner = (contentId: string) => {
+  if (!selectorCache.isOwner[contentId]) {
+    selectorCache.isOwner[contentId] = createSelector(
+      (state: RootState) => state.auth.user?.principal,
+      (state: RootState) => state.perpetua.entities.shelves[contentId],
+      (userPrincipal, shelf) => {
+        if (!shelf || !userPrincipal) return false;
+        return shelf.owner === userPrincipal;
+      }
+    );
+  }
+  return selectorCache.isOwner[contentId];
+};
 
-// New selectors for collaboration features
-export const selectShelfEditors = (shelfId: string) => 
-  (state: RootState) => state.perpetua.shelfEditors[shelfId] || [];
-
-export const selectEditorsLoading = (shelfId: string) => 
-  (state: RootState) => state.perpetua.loading.editors[shelfId] || false;
-
-// Check if user has edit access to a content item
-export const selectHasEditAccess = (contentId: string) => 
-  (state: RootState) => {
-    const userPrincipal = state.auth.user?.principal;
-    if (!userPrincipal) return false;
-    
-    const shelf = state.perpetua.entities.shelves[contentId];
-    if (!shelf) return false;
-    
-    // Check if user is owner
-    if (shelf.owner === userPrincipal) return true;
-    
-    // Check if user is editor
-    const editors = state.perpetua.shelfEditors[contentId] || [];
-    return editors.includes(userPrincipal);
-  };
-
-// Check if user is the owner of a shelf
-export const selectIsOwner = (contentId: string) => 
-  (state: RootState) => {
-    const shelf = state.perpetua.entities.shelves[contentId];
-    const userPrincipal = state.auth.user?.principal;
-    if (!shelf || !userPrincipal) return false;
-    return shelf.owner === userPrincipal;
-  };
-
-// Check if user is an editor (but not owner) of a shelf
-export const selectIsEditor = (contentId: string) => 
-  (state: RootState) => {
-    const userPrincipal = state.auth.user?.principal;
-    if (!userPrincipal) return false;
-    
-    // If user is owner, they're not just an editor
-    if (selectIsOwner(contentId)(state)) return false;
-    
-    const editors = state.perpetua.shelfEditors[contentId] || [];
-    return editors.includes(userPrincipal);
-  };
+// Check if user is an editor (but not owner) of a shelf - with caching
+export const selectIsEditor = (contentId: string) => {
+  if (!selectorCache.isEditor[contentId]) {
+    selectorCache.isEditor[contentId] = createSelector(
+      (state: RootState) => state.auth.user?.principal,
+      (state: RootState) => state.perpetua.entities.shelves[contentId],
+      (state: RootState) => state.perpetua.shelfEditors[contentId] || [],
+      (userPrincipal, shelf, editors) => {
+        if (!userPrincipal || !shelf) return false;
+        
+        // If user is owner, they're not just an editor
+        if (shelf.owner === userPrincipal) return false;
+        
+        return editors.includes(userPrincipal);
+      }
+    );
+  }
+  return selectorCache.isEditor[contentId];
+};

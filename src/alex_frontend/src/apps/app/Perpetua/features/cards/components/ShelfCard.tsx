@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { convertTimestamp } from "@/utils/general";
 import { ShelfCardProps, PublicShelfCardProps } from '../types/types';
@@ -36,11 +36,16 @@ export const ShelfCard: React.FC<ExtendedShelfCardProps> = ({
   const updatedAt = convertTimestamp(shelf.updated_at, 'combined');
   const itemCount = Object.keys(shelf.items).length;
   
-  // Get collaboration status
-  const isOwner = useAppSelector(selectIsOwner(shelf.shelf_id));
-  const hasEditAccess = useAppSelector(selectHasEditAccess(shelf.shelf_id));
+  // Memoize selector references to prevent recreation on each render
+  const isOwnerSelector = useMemo(() => selectIsOwner(shelf.shelf_id), [shelf.shelf_id]);
+  const hasEditAccessSelector = useMemo(() => selectHasEditAccess(shelf.shelf_id), [shelf.shelf_id]);
+  const shelfEditorsSelector = useMemo(() => selectShelfEditors(shelf.shelf_id), [shelf.shelf_id]);
+  
+  // Get collaboration status using memoized selectors
+  const isOwner = useAppSelector(isOwnerSelector) as boolean;
+  const hasEditAccess = useAppSelector(hasEditAccessSelector) as boolean;
   const isCollaborator = hasEditAccess && !isOwner;
-  const editors = useAppSelector(selectShelfEditors(shelf.shelf_id));
+  const editors = useAppSelector(shelfEditorsSelector) as string[];
   const hasCollaborators = editors.length > 0;
   
   // Check if the updated_at is different from created_at (allowing a small buffer for processing time)

@@ -1,24 +1,7 @@
 import React from 'react';
-import { Shelf, Item } from "../../../../../../../../declarations/perpetua/perpetua.did";
+import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { useItemReordering } from '../hooks/useItemReordering';
-
-interface ItemReorderManagerProps {
-  shelf: Shelf;
-  orderedItems: [number, Item][];
-  hasEditAccess: boolean;
-  children: (props: {
-    isEditMode: boolean;
-    editedItems: [number, Item][];
-    enterEditMode: () => void;
-    cancelEditMode: () => void;
-    saveItemOrder: () => Promise<void>;
-    handleDragStart: (e: React.DragEvent, index: number) => void;
-    handleDragOver: (e: React.DragEvent, index: number) => void;
-    handleDragEnd: () => void;
-    handleDrop: (e: React.DragEvent, index: number) => void;
-    getDragItemStyle?: (index: number) => React.CSSProperties;
-  }) => React.ReactNode;
-}
+import { ItemReorderManagerProps, ReorderRenderProps } from '../types/reorderTypes';
 
 export const ItemReorderManager: React.FC<ItemReorderManagerProps> = ({
   shelf,

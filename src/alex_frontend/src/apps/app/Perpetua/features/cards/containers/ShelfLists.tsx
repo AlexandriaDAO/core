@@ -93,10 +93,14 @@ export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = React.memo(({
   const dispatch = useDispatch<AppDispatch>();
   const { identity } = useIdentity();
   
+  // Memoize the shelf IDs to prevent unnecessary callback recreations
+  const shelfIds = useMemo(() => 
+    shelves.map(shelf => shelf.shelf_id),
+    [shelves]
+  );
+  
   const handleSaveOrder = useCallback(async (newShelfOrder: string[]) => {
     if (!identity || newShelfOrder.length < 2) return;
-    
-    console.log("Saving library shelf order:", newShelfOrder);
     
     // Instead of sending an empty shelfId, use the first item in the new order
     // and the second item as reference, with before=true
@@ -125,6 +129,28 @@ export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = React.memo(({
       onNewShelf={onNewShelf}
       onSaveOrder={handleSaveOrder}
     />
+  );
+}, (prevProps, nextProps) => {
+  // If loading state changed, re-render
+  if (prevProps.loading !== nextProps.loading) {
+    return false;
+  }
+  
+  // Skip deep comparison if length differs
+  if (prevProps.shelves.length !== nextProps.shelves.length) {
+    return false;
+  }
+  
+  // Compare only essential shelf properties to determine if re-render needed
+  return isEqual(
+    prevProps.shelves.map(s => ({ 
+      id: s.shelf_id, 
+      title: s.title
+    })),
+    nextProps.shelves.map(s => ({ 
+      id: s.shelf_id, 
+      title: s.title
+    }))
   );
 });
 LibraryShelvesUI.displayName = 'LibraryShelvesUI';
@@ -158,6 +184,12 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
   onBack,
   isCurrentUser = false
 }) => {
+  // Track shelf IDs in a memoized value to prevent unnecessary recalculations
+  const currentShelfIds = useMemo(() => 
+    shelves.map(s => s.shelf_id),
+    [shelves]
+  );
+  
   const dispatch = useDispatch<AppDispatch>();
   const { identity } = useIdentity();
   
@@ -180,8 +212,6 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
   // Handler for saving reordered shelves
   const handleSaveOrder = useCallback(async (newShelfOrder: string[]) => {
     if (!identity || !currentUserIsOwner || newShelfOrder.length < 2) return;
-    
-    console.log("Saving new shelf order:", newShelfOrder);
     
     // Instead of sending an empty shelfId, use the first item in the new order
     // and the second item as reference, with before=true (meaning "put before the second item")

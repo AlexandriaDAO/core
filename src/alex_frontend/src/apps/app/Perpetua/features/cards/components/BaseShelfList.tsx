@@ -38,11 +38,18 @@ interface DragState {
   shelfIds: string[];  // Array of shelf IDs for tracking order
 }
 
+// Helper function to extract essential properties for comparison
+const getShelfEssentials = (shelf: Shelf) => ({
+  id: shelf.shelf_id,
+  title: shelf.title,
+  owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString(),
+});
+
 /**
  * BaseShelfList - A reusable component for displaying different shelf views
  * This handles the common UI patterns across different shelf views
  */
-export const BaseShelfList: React.FC<BaseShelfListProps> = ({
+export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
   shelves,
   title,
   emptyStateMessage,
@@ -64,6 +71,15 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   const [saveInProgress, setSaveInProgress] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   
+  // Extract only the essential properties from shelves to minimize re-renders
+  const shelfEssentials = useMemo(() => 
+    shelves.map(getShelfEssentials), 
+    [shelves]
+  );
+  
+  // Memoize the actual shelf array to prevent unnecessary updates to dragState
+  const memoizedShelves = useMemo(() => shelves, [shelfEssentials]);
+  
   // Initialize drag state
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
@@ -76,10 +92,10 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
     if (!isEditMode) {
       setDragState(prev => ({
         ...prev,
-        shelfIds: shelves.map(shelf => shelf.shelf_id)
+        shelfIds: memoizedShelves.map(shelf => shelf.shelf_id)
       }));
     }
-  }, [shelves, isEditMode]);
+  }, [memoizedShelves, isEditMode]);
   
   // Drag and drop handlers
   const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
@@ -147,7 +163,14 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   const enterEditMode = useCallback(() => {
     setIsEditMode(true);
     setSaveError(null);
-  }, []);
+    // Make sure we have the latest shelf order
+    setDragState(prev => ({
+      ...prev,
+      isDragging: false,
+      dragIndex: -1,
+      shelfIds: shelves.map(shelf => shelf.shelf_id)
+    }));
+  }, [shelves]);
   
   const cancelEditMode = useCallback(() => {
     setIsEditMode(false);
@@ -191,9 +214,11 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
     if (!isEditMode) return shelves;
     
     // Map IDs back to shelves in the correct order
-    return dragState.shelfIds
+    const ordered = dragState.shelfIds
       .map(id => shelves.find(shelf => shelf.shelf_id === id))
       .filter(Boolean) as Shelf[];
+    
+    return ordered;
   }, [shelves, isEditMode, dragState.shelfIds]);
   
   // Helper for getting drag props
@@ -404,4 +429,41 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
       {renderContent()}
     </div>
   );
-}; 
+}, (prevProps, nextProps) => {
+  // Custom comparison function to determine if re-render is necessary
+  
+  // Simple prop equality checks
+  if (
+    prevProps.title !== nextProps.title ||
+    prevProps.emptyStateMessage !== nextProps.emptyStateMessage ||
+    prevProps.showBackButton !== nextProps.showBackButton ||
+    prevProps.backLabel !== nextProps.backLabel ||
+    prevProps.loading !== nextProps.loading ||
+    prevProps.isCurrentUserProfile !== nextProps.isCurrentUserProfile ||
+    prevProps.allowReordering !== nextProps.allowReordering
+  ) {
+    return false; // Re-render
+  }
+  
+  // Check if the shelves have changed in meaningful ways
+  if (prevProps.shelves.length !== nextProps.shelves.length) {
+    return false; // Re-render
+  }
+  
+  // Compare shelf essential properties (IDs, titles, owners)
+  for (let i = 0; i < prevProps.shelves.length; i++) {
+    const prevShelf = getShelfEssentials(prevProps.shelves[i]);
+    const nextShelf = getShelfEssentials(nextProps.shelves[i]);
+    
+    if (
+      prevShelf.id !== nextShelf.id ||
+      prevShelf.title !== nextShelf.title ||
+      prevShelf.owner !== nextShelf.owner
+    ) {
+      return false; // Re-render
+    }
+  }
+  
+  // We assume callbacks don't change identity between renders (parent should memoize them)
+  return true; // Don't re-render
+}); 

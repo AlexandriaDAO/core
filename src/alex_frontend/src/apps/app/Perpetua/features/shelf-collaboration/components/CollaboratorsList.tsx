@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { 
@@ -24,9 +24,17 @@ interface CollaboratorsListProps {
 
 export const CollaboratorsList: React.FC<CollaboratorsListProps> = ({ shelfId }) => {
   const dispatch = useAppDispatch();
-  const editors = useAppSelector(selectShelfEditors(shelfId));
-  const isLoading = useAppSelector(selectEditorsLoading(shelfId));
-  const isOwner = useAppSelector(selectIsOwner(shelfId));
+  
+  // Memoize selector references to prevent recreation on each render
+  const editorsSelector = useMemo(() => selectShelfEditors(shelfId), [shelfId]);
+  const editorsLoadingSelector = useMemo(() => selectEditorsLoading(shelfId), [shelfId]);
+  const isOwnerSelector = useMemo(() => selectIsOwner(shelfId), [shelfId]);
+  
+  // Use memoized selectors
+  const editors = useAppSelector(editorsSelector) as string[];
+  const isLoading = useAppSelector(editorsLoadingSelector) as boolean;
+  const isOwner = useAppSelector(isOwnerSelector) as boolean;
+  
   // Direct state access to auth principal - single source of truth
   const userPrincipal = useAppSelector(state => state.auth.user?.principal);
   

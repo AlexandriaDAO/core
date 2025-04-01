@@ -1,3 +1,8 @@
+
+
+
+
+
 Perpetua/
 ├── features/
 │   ├── cards/
@@ -5,33 +10,56 @@ Perpetua/
 │   │   │   ├── BaseShelfList.tsx (407 lines)
 │   │   │   ├── ContentDisplays.tsx (120 lines)
 │   │   │   ├── NftDisplay.tsx (350 lines)
+│   │   │   ├── ShelfBlogView.tsx (132 lines)
 │   │   │   ├── ShelfCard.tsx (162 lines)
 │   │   │   ├── ShelfCardActionMenu.tsx (173 lines)
-│   │   │   ├── ShelfDetailView.tsx (624 lines)
-│   │   │   └── index.ts (1 lines)
+│   │   │   ├── ShelfContentCard.tsx (160 lines)
+│   │   │   ├── ShelfContentModal.tsx (97 lines)
+│   │   │   ├── ShelfDetailView.tsx (271 lines)
+│   │   │   ├── ShelfEmptyView.tsx (38 lines)
+│   │   │   ├── ShelfGridView.tsx (57 lines)
+│   │   │   ├── ShelfViewControls.tsx (129 lines)
+│   │   │   ├── ShelfViewHeader.tsx (93 lines)
+│   │   │   └── index.ts (9 lines)
 │   │   ├── containers/
 │   │   │   ├── ShelfLists.tsx (226 lines)
 │   │   │   └── index.ts (1 lines)
 │   │   ├── index.ts (10 lines)
-│   │   └── types/
-│   │       ├── index.ts (1 lines)
-│   │       └── types.ts (60 lines)
+│   │   ├── types/
+│   │   │   ├── index.ts (1 lines)
+│   │   │   └── types.ts (60 lines)
+│   │   └── utils/
+│   │       ├── ShelfViewUtils.ts (42 lines)
+│   │       └── index.ts (1 lines)
 │   ├── items/
 │   │   ├── components/
 │   │   │   ├── AddToShelfDialog.tsx (170 lines)
 │   │   │   ├── ItemActionMenu.tsx (61 lines)
-│   │   │   ├── ItemReorderManager.tsx (61 lines)
 │   │   │   ├── NewItem.tsx (358 lines)
 │   │   │   ├── NftSearch.tsx (270 lines)
 │   │   │   └── index.ts (2 lines)
 │   │   ├── hooks/
 │   │   │   ├── index.ts (2 lines)
-│   │   │   ├── useItemActions.tsx (104 lines)
-│   │   │   └── useItemReordering.ts (73 lines)
+│   │   │   └── useItemActions.tsx (104 lines)
 │   │   └── index.ts (2 lines)
 │   ├── shared/
-│   │   └── hooks/
-│   │       └── useReorderable.ts (267 lines)
+│   │   └── reordering/
+│   │       ├── components/
+│   │       │   ├── ItemReorderManager.tsx (44 lines)
+│   │       │   └── index.ts (1 lines)
+│   │       ├── hooks/
+│   │       │   ├── index.ts (2 lines)
+│   │       │   ├── useItemReordering.ts (76 lines)
+│   │       │   ├── useReorderable.ts (318 lines)
+│   │       │   └── useShelfReordering.ts (67 lines)
+│   │       ├── index.ts (11 lines)
+│   │       ├── types/
+│   │       │   ├── index.ts (1 lines)
+│   │       │   └── reorderTypes.ts (61 lines)
+│   │       └── utils/
+│   │           ├── index.ts (1 lines)
+│   │           ├── index.tsx (1 lines)
+│   │           └── reorderUtils.ts (32 lines)
 │   ├── shelf-collaboration/
 │   │   └── components/
 │   │       └── CollaboratorsList.tsx (177 lines)
@@ -44,13 +72,12 @@ Perpetua/
 │   │   │   ├── ShelfSelectionDialog.tsx (134 lines)
 │   │   │   └── index.ts (5 lines)
 │   │   ├── containers/
-│   │   │   └── ShelfDetailContainer.tsx (143 lines)
+│   │   │   └── ShelfDetailContainer.tsx (162 lines)
 │   │   ├── hooks/
 │   │   │   ├── index.ts (4 lines)
 │   │   │   ├── useAddToShelf.ts (106 lines)
 │   │   │   ├── usePublicShelfOperations.ts (61 lines)
-│   │   │   ├── useShelfOperations.ts (152 lines)
-│   │   │   └── useShelfReordering.ts (106 lines)
+│   │   │   └── useShelfOperations.ts (152 lines)
 │   │   ├── index.ts (3 lines)
 │   │   └── types/
 │   │       └── index.ts (27 lines)
@@ -72,7 +99,7 @@ Perpetua/
 │   └── useContentPermissions.ts (75 lines)
 ├── index.tsx (17 lines)
 ├── layouts/
-│   ├── PerpetuaLayout.tsx (214 lines)
+│   ├── PerpetuaLayout.tsx (215 lines)
 │   └── index.ts (1 lines)
 ├── routes.ts (119 lines)
 ├── state/
@@ -81,9 +108,9 @@ Perpetua/
 │   ├── hooks/
 │   │   ├── index.ts (3 lines)
 │   │   ├── usePerpetuaActions.ts (119 lines)
-│   │   └── usePerpetuaSelectors.ts (61 lines)
-│   ├── index.ts (47 lines)
-│   ├── perpetuaSlice.ts (343 lines)
+│   │   └── usePerpetuaSelectors.ts (62 lines)
+│   ├── index.ts (49 lines)
+│   ├── perpetuaSlice.ts (357 lines)
 │   ├── services/
 │   │   └── perpetuaService.ts (419 lines)
 │   ├── thunks/
@@ -91,10 +118,46 @@ Perpetua/
 │   │   ├── index.ts (6 lines)
 │   │   ├── itemThunks.ts (94 lines)
 │   │   ├── queryThunks.ts (155 lines)
-│   │   ├── reorderThunks.ts (129 lines)
+│   │   ├── reorderThunks.ts (157 lines)
 │   │   └── shelfThunks.ts (157 lines)
 │   ├── utils/
 └── utils.tsx (136 lines)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- Split useReorderable.ts into these focused modules:
+- Create utils/createReorderAdapter.ts to eliminate duplicate code between item and shelf reordering
+- Add ReorderableList.tsx and ReorderableGrid.tsx to components directory
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

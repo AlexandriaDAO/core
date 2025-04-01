@@ -1,12 +1,8 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useIdentity } from '@/hooks/useIdentity';
 import { isEqual } from 'lodash';
-
-// Common interface for reorderable items
-export interface ReorderableItem {
-  id: number | string;
-}
+import { ReorderableItem, ReorderParams } from '../types/reorderTypes';
 
 /**
  * Props for useReorderable hook
@@ -22,13 +18,7 @@ export interface UseReorderableProps<T extends ReorderableItem> {
   hasEditAccess: boolean;
   
   // Action creator for dispatching reorder operations
-  reorderAction: (params: {
-    shelfId: string;
-    itemId: number | string;
-    referenceItemId: number | string | null;
-    before: boolean;
-    principal: string;
-  }) => any;
+  reorderAction: (params: ReorderParams) => any;
 }
 
 /**
@@ -47,15 +37,22 @@ export const useReorderable = <T extends ReorderableItem>({
   // Maintain stable references to items
   const itemsRef = useRef(items);
   
+  // Memoize item IDs for stable comparison
+  const itemIds = useMemo(() => 
+    items.map(item => item.id),
+    [items]
+  );
+  
   // Update items only when they significantly change
   useEffect(() => {
+    // Compare only the IDs for a lightweight comparison
     if (!isEqual(
-      itemsRef.current.map(item => ({ id: item.id })),
-      items.map(item => ({ id: item.id }))
+      itemsRef.current.map(item => item.id),
+      itemIds
     )) {
       itemsRef.current = items;
     }
-  }, [items]);
+  }, [items, itemIds]);
   
   // State management
   const [isEditMode, setIsEditMode] = useState(false);
@@ -82,7 +79,7 @@ export const useReorderable = <T extends ReorderableItem>({
     setDragOverIndex(null);
   }, []);
 
-  // Handle drag start
+  // Handle drag start - memoize the handler
   const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
     if (!isEditMode) return;
     
@@ -212,39 +209,91 @@ export const useReorderable = <T extends ReorderableItem>({
     const targetPos = changedIndex;
     const isMoveUp = targetPos < originalPos;
     
-    // Get the reference item ID
+    // Get the reference item ID - MUST NOT be the same as the moved item
     let referenceId: string | number | null = null;
     let before = true;
     
     if (isMoveUp) {
       // For moving up, place before the item at target position
-      referenceId = newIds[targetPos];
-      before = true;
+      if (targetPos < newIds.length) {
+        const targetId = newIds[targetPos];
+        // Avoid self-reference
+        if (targetId === movedItemId) {
+          // If we'd reference ourself, find another reference point
+          if (targetPos + 1 < newIds.length) {
+            // Use the next item as reference and place before it
+            referenceId = newIds[targetPos + 1];
+            before = true;
+          } else if (targetPos > 0) {
+            // Use the previous item as reference and place after it
+            referenceId = newIds[targetPos - 1]; 
+            before = false;
+          } else {
+            // Edge case: only one item
+            referenceId = null;
+            before = true;
+          }
+        } else {
+          // Normal case
+          referenceId = targetId;
+          before = true;
+        }
+      } else {
+        // Special case: target is last position
+        referenceId = null;
+        before = false;
+      }
     } else {
       // For moving down, place after the item at target position - 1
       if (targetPos > 0) {
-        referenceId = newIds[targetPos - 1];
-        before = false;
+        const targetId = newIds[targetPos - 1];
+        // Avoid self-reference
+        if (targetId === movedItemId) {
+          if (targetPos - 2 >= 0) {
+            // Use the item before as reference
+            referenceId = newIds[targetPos - 2];
+            before = false;
+          } else if (targetPos < newIds.length) {
+            // Use the next item as reference
+            referenceId = newIds[targetPos];
+            before = true;
+          } else {
+            // Edge case
+            referenceId = null;
+            before = true;
+          }
+        } else {
+          // Normal case
+          referenceId = targetId;
+          before = false;
+        }
       } else {
         // Special case: target is first position
-        referenceId = newIds[0];
-        before = true;
+        if (newIds.length > 1) {
+          // If multiple items, reference the second item
+          referenceId = newIds[1];
+          before = true;
+        } else {
+          // Edge case: only one item
+          referenceId = null;
+          before = true;
+        }
       }
     }
     
-    // Dispatch the reorder action
+    // Dispatch the reorder action with both specific parameters AND the complete new order
     try {
       await dispatch(reorderAction({
         shelfId: containerId,
         itemId: movedItemId,
         referenceItemId: referenceId,
         before,
-        principal: identity.getPrincipal().toString()
+        principal: identity.getPrincipal().toString(),
+        newItemOrder: newIds // Pass the complete new order for optimistic updates
       })).unwrap();
       
       setIsEditMode(false);
     } catch (error) {
-      console.error("Failed to reorder items:", error);
       // Revert to original order on error
       setEditedItems([...itemsRef.current]);
     }
