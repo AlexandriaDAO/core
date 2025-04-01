@@ -5,14 +5,18 @@ import { Principal } from "@dfinity/principal";
 import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import { resetPagination } from "../emporiumSlice";
 import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
+import { RootState } from "@/store";
+import { getActorAssetManager } from "@/features/auth/utils/authUtils";
+
+const isLocal = process.env.DFX_NETWORK !== "ic";
 
 const getUserIcrc7Tokens = createAsyncThunk<
   { tokenId: string; arweaveId: string }[], // Return structure
   string, // Argument type
-  { rejectValue: string }
+  { rejectValue: string, state: RootState }
 >(
   "emporium/getUserIcrc7Tokens",
-  async (userPrincipal, { rejectWithValue, dispatch }) => {
+  async (userPrincipal, { rejectWithValue, dispatch, getState }) => {
     try {
       // Clear transactions in the store
       dispatch(resetPagination());
@@ -48,9 +52,32 @@ const getUserIcrc7Tokens = createAsyncThunk<
       // Fetch and dispatch transaction data
       if (arweaveIds.length > 0) {
         const fetchedTransactions = await fetchTransactionsForAlexandrian(arweaveIds);
+        const { userAssetCanister } = getState().assetManager;
+        const { assets: icpAssets } = getState().icpAssets;
         
-        dispatch(setTransactions(fetchedTransactions));
-        await dispatch(loadContentForTransactions(fetchedTransactions) as unknown as AnyAction);
+        console.log("userAssetCanister", userAssetCanister);
+        if(userAssetCanister){
+          const fetchedTransactionsWithAssetCanisterUrl = fetchedTransactions.map((transaction) => {
+            if (transaction.assetUrl) {
+              return transaction;
+            }
+            if(icpAssets.find((asset) => asset.key === `/arweave/${transaction.id}`)){
+              return {
+                ...transaction,
+                assetUrl: isLocal ? `http://${userAssetCanister}.localhost:4943/arweave/${transaction.id}` : `https://${userAssetCanister}.icp0.io/arweave/${transaction.id}`,
+              };
+            }
+            return transaction;
+          });
+
+          console.log("fetchedTransactionsWithAssetCanisterUrl", fetchedTransactionsWithAssetCanisterUrl);
+          dispatch(setTransactions(fetchedTransactionsWithAssetCanisterUrl));
+          dispatch(loadContentForTransactions(fetchedTransactionsWithAssetCanisterUrl) as unknown as AnyAction);
+        }else{
+          console.log("fetchedTransactions", fetchedTransactions);
+          dispatch(setTransactions(fetchedTransactions));
+          dispatch(loadContentForTransactions(fetchedTransactions) as unknown as AnyAction);
+        }
       }
 
       return tokens;

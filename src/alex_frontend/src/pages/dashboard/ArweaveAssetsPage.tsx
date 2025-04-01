@@ -1,41 +1,52 @@
-import React, { useEffect, useState } from "react";
-import { selectAsset } from "@/features/assets/assetsSlice";
-import AssetTable from "@/features/assets/components/AssetTable";
-import AssetDetail from "@/features/assets/components/AssetDetail";
-import { AssetItem } from "@/features/assets/types";
+import React, { useEffect } from "react";
+import AssetTable from "@/features/arweave-assets/components/AssetTable";
+import AssetDetail from "@/features/arweave-assets/components/AssetDetail";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { getCallerAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 import { Button } from "@/lib/components/button";
 import { Alert } from "@/components/Alert";
 import { Link } from "react-router";
-import { RefreshCw } from "lucide-react";
+import { Download, RefreshCw } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { fetchUserArweaveAssets } from "@/features/assets/thunks/fetchUserArweaveAssets";
+import { fetchUserArweaveAssets } from "@/features/arweave-assets/thunks/fetchUserArweaveAssets";
+import { useAssetManager } from "@/hooks/useAssetManager";
+import { useInternetIdentity } from "ic-use-internet-identity/dist";
+import fetch from "@/features/icp-assets/thunks/fetch";
+import { pullAllAssets } from "@/features/arweave-assets/thunks/pullAllAssets";
 
 function ArweaveAssetsPage() {
 	const dispatch = useAppDispatch();
-	const { assets, loading, error, selectedAsset } = useAppSelector(
-		(state) => state.assets
-	);
+	const { error, selected, pulling, pullError, loading } = useAppSelector(state => state.arweaveAssets);
 	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
-	const [showDetail, setShowDetail] = useState(false);
+	const { identity } = useInternetIdentity();
+
+	const icpAssets = useAppSelector((state) => state.icpAssets.assets);
+	const arweaveAssets = useAppSelector((state) => state.arweaveAssets.assets);
+
+	const assetManager = useAssetManager({
+		canisterId: userAssetCanister ?? undefined,
+		identity,
+		maxSingleFileSize: 1_900_000,
+		maxChunkSize: 500_000,
+	});
 
 	useEffect(() => {
-		dispatch(fetchUserArweaveAssets());
-		if (!userAssetCanister) {
-			dispatch(getCallerAssetCanister());
-		}
-	}, [dispatch, userAssetCanister]);
+		dispatch(getCallerAssetCanister());
+	}, []);
 
-	const handleSelectAsset = (asset: AssetItem) => {
-		dispatch(selectAsset(asset));
-		setShowDetail(true);
-	};
+	useEffect(() => {
+		if (!assetManager) return;
+		dispatch(fetch({ assetManager }));
+	}, [assetManager]);
 
-	const handleCloseDetail = () => {
-		setShowDetail(false);
-		dispatch(selectAsset(null));
-	};
+	const handlePullAllAssets = () => {
+		if(!assetManager) return;
+		dispatch(pullAllAssets({ assetManager }));
+	}
+
+	const synced = ()=>{
+		return arweaveAssets.every((asset) => icpAssets.find((icpAsset) => icpAsset.key === `/arweave/${asset.id}`))
+	}
 
 	return (
 		<>
@@ -51,24 +62,47 @@ function ArweaveAssetsPage() {
 				</Button>
 			</div>
 
-			<Alert 
-				title="Why Pull Assets to Your Canister?"
-				className="mb-6"
-			>
-				<p className="mb-2">
-					Assets stored on Arweave are permanent but can load slowly. By pulling assets to your own Internet Computer canister:
-				</p>
-				<ul className="list-disc list-inside mb-2 ml-4">
-					<li>Loading times become much faster</li>
-					<li>Your assets remain available even if Arweave has connectivity issues</li>
-					<li>You maintain ownership and control over your assets</li>
-				</ul>
-				<p>
-					Each asset only needs to be pulled once to your canister for faster access.
-				</p>
-			</Alert>
+			{userAssetCanister ? (
+				<Alert 
+					title="Why Pull Assets to Your Canister?"
+					className="mb-6"
+				>
+					<p className="mb-2">
+						Assets stored on Arweave are permanent but can load slowly. By pulling assets to your own Internet Computer canister:
+					</p>
+					<ul className="list-disc list-inside mb-2 ml-4">
+						<li>Loading times become much faster</li>
+						<li>Your assets remain available even if Arweave has connectivity issues</li>
+						<li>You maintain ownership and control over your assets</li>
+					</ul>
+					<p>
+						Each asset only needs to be pulled once to your canister for faster access.
+					</p>
 
-			{!userAssetCanister && (
+					{!synced() && 
+						<Button
+							onClick={handlePullAllAssets}
+							disabled={!!pulling || loading}
+							variant="info"
+							scale="sm"
+							className="mt-2"
+						>
+							{pulling ? (
+								<>
+									<div className="h-3 w-3 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mr-1" />
+									Pulling - {pulling}
+								</>
+							) : (
+								<>
+									<Download className="h-3 w-3 mr-1" />
+									Pull All Assets
+								</>
+							)}
+						</Button>
+					}
+
+				</Alert>
+			) : (
 				<Alert
 					variant="warning"
 					title="Asset Canister Required"
@@ -86,24 +120,23 @@ function ArweaveAssetsPage() {
 				</Alert>
 			)}
 
+			{pullError && (
+				<Alert variant="danger" title="Pull Error" className="mb-4">
+					{pullError}
+				</Alert>
+			)}
+
 			{error && (
 				<Alert variant="danger" title="Error" className="mb-4">
 					{error}
 				</Alert>
 			)}
 
-			<AssetTable
-				assets={assets}
-				loading={loading}
-				onSelectAsset={handleSelectAsset}
-			/>
+			<AssetTable assetManager={assetManager} />
 
-			{showDetail && selectedAsset && (
+			{selected && (
 				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-					<AssetDetail
-						asset={selectedAsset}
-						onClose={handleCloseDetail}
-					/>
+					<AssetDetail asset={selected} assetManager={assetManager} />
 				</div>
 			)}
 		</>

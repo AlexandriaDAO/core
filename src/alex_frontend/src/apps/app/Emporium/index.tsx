@@ -25,6 +25,10 @@ import getUserLogs from "./thunks/getUserLog";
 import UserEmporiumLogs from "./component/userEmporiumLogs";
 import getEmporiumMarketLogs from "./thunks/getEmporiumMarketLogs";
 import EmporiumMarketLogs from "./component/emporiumLogs";
+import { getCallerAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
+import { useAssetManager } from "@/hooks/useAssetManager";
+import { useInternetIdentity } from "ic-use-internet-identity";
+import fetch from "@/features/icp-assets/thunks/fetch";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
@@ -34,6 +38,24 @@ const Emporium = () => {
     const [activeButton, setActiveButton] = useState(""); // Track active button
     const [currentPage, setCurrentPage] = useState(1);
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+    const { userAssetCanister } = useAppSelector((state) => state.assetManager);
+
+    const { identity } = useInternetIdentity();
+
+    const assetManager = useAssetManager({
+		canisterId: userAssetCanister ?? undefined,
+		identity,
+	});
+
+	useEffect(() => {
+		dispatch(getCallerAssetCanister());
+	}, []);
+
+	useEffect(() => {
+		if (!assetManager) return;
+		dispatch(fetch({ assetManager }));
+	}, [assetManager]);
 
     const fetchUserLogs = () => {
         if (user) {

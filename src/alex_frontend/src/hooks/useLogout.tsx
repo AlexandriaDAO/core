@@ -9,6 +9,7 @@ export function useLogout() {
         await clear();
 
         navigate('/')
+        window.location.href = "/";
     }
 
     return logout

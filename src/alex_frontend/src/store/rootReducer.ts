@@ -34,8 +34,8 @@ import assetManagerReducer from "@/apps/Modules/shared/state/assetManager/assetM
 
 import emporiumReducer from "@/apps/app/Emporium/emporiumSlice";
 
-import assetsReducer from '@/features/assets/assetsSlice';
-
+import arweaveAssetsReducer from '@/features/arweave-assets/arweaveAssetsSlice';
+import icpAssetsReducer from '@/features/icp-assets/icpAssetsSlice';
 const rootReducer = combineReducers({
 	home: homeReducer,
 	auth: authReducer,
@@ -73,7 +73,8 @@ const rootReducer = combineReducers({
 	emporium: emporiumReducer,
 	assetManager:assetManagerReducer,
 
-	assets: assetsReducer,
+	arweaveAssets: arweaveAssetsReducer,
+	icpAssets: icpAssetsReducer,
 });
 
 export default rootReducer;

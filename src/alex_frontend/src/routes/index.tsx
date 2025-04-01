@@ -23,9 +23,9 @@ const UpgradePage = lazy(()=>import("@/pages/dashboard/UpgradePage"));
 // const LibrarianLayout = lazy(()=>import("@/layouts/LibrarianLayout"));
 const LibrarianPage = lazy(()=>import("@/pages/librarian/"));
 const WalletsPage = lazy(()=>import("@/pages/librarian/WalletsPage"));
-const AssetSyncPage = lazy(()=>import("@/pages/dashboard/AssetSyncPage"));
+// const AssetSyncPage = lazy(()=>import("@/pages/dashboard/AssetSyncPage"));
 const ArweaveAssetsPage = lazy(()=>import("@/pages/dashboard/ArweaveAssetsPage"));
-const ICPAssetsPage = lazy(()=>import("@/pages/ICPAssetsPage"));
+const ICPAssetsPage = lazy(()=>import("@/pages/dashboard/ICPAssetsPage"));
 // const FileUploadPage = lazy(()=>import("@/pages/dashboard/FileUploadPage"));
 const PinaxPage = lazy(()=>import("@/pages/PinaxPage"));
 // const UploadPage = lazy(()=>import("@/pages/dashboard/UploadPage"));
@@ -115,7 +115,6 @@ const router = createBrowserRouter(
 							<Route path="wallets" element={<Suspense key="wallets" fallback={<MainPageSkeleton />}><WalletsPage /></Suspense>} />
 						</Route>
 
-						<Route path="asset-sync" element={<Suspense key="asset-sync" fallback={<MainPageSkeleton />}><AssetSyncPage /></Suspense>} />
 						<Route path="arweave-assets" element={<Suspense key="arweave-assets" fallback={<MainPageSkeleton />}><ArweaveAssetsPage /></Suspense>} />
 						<Route path="icp-assets" element={<Suspense key="icp-assets" fallback={<MainPageSkeleton />}><ICPAssetsPage /></Suspense>} />
 						<Route path="profile">

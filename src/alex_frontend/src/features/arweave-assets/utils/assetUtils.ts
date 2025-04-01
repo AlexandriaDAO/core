@@ -1,12 +1,12 @@
 import { AssetManager } from "@dfinity/assets";
-import { AssetItem } from "../types";
+import { ArweaveAssetItem } from "../types";
 
 /**
  * Fetches a file from Arweave or provided URL
  * @param asset The asset to fetch
  * @returns Promise resolving to a File object
  */
-export async function fetchFile(asset: AssetItem): Promise<File> {
+export async function fetchFile(asset: ArweaveAssetItem): Promise<File> {
 	// Use asset URL or construct one from the asset ID
 	const assetUrl = asset.url || `https://arweave.net/${asset.id}`;
 
@@ -29,20 +29,17 @@ export async function fetchFile(asset: AssetItem): Promise<File> {
 /**
  * Uploads a file to the user's canister
  * @param assetManager The asset manager instance
+ * @param path The path to upload the file to
  * @param file The file to upload
- * @param assetId The asset ID (used for path/filename)
+ * @param fileName The name of the file
  * @returns Promise resolving when upload is complete
  */
-export async function uploadToCanister(assetManager: AssetManager, file: File, assetId: string): Promise<void> {
-
-    // If no asset manager is provided, throw an error
-	if (!assetManager) throw new Error("No asset manager available");
-
+export async function uploadToCanister(assetManager: AssetManager, path: string = "/uploads", file: File, fileName: string): Promise<void> {
 	// Create a batch
 	const batch = assetManager.batch();
 
 	// Store the file with a path that includes arweave/ prefix
-	await batch.store(file, { path: "/arweave", fileName: assetId });
+	await batch.store(file, { path, fileName });
 
 	// Commit the batch
 	await batch.commit();
