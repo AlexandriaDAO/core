@@ -133,7 +133,8 @@ const PerpetuaLayout: React.FC = () => {
         <ShelfDetailContainer
           shelf={denormalizedShelf}
           onBack={goToShelves}
-          onAddItem={hasEditAccess => hasEditAccess ? handleAddItem : undefined}
+          onAddItem={handleAddItem}
+          hasEditAccess={checkEditAccess(denormalizedShelf.shelf_id)}
         />
       );
     }

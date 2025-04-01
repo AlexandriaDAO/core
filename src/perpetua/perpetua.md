@@ -1,102 +1,100 @@
-# File Structure: 
-
 Perpetua/
 ├── features/
 │   ├── cards/
 │   │   ├── components/
-│   │   │   ├── BaseShelfList.tsx
-│   │   │   ├── ContentDisplays.tsx
-│   │   │   ├── NftDisplay.tsx
-│   │   │   ├── ShelfCard.tsx
-│   │   │   ├── ShelfCardActionMenu.tsx
-│   │   │   ├── ShelfDetailView.tsx
-│   │   │   └── index.ts
+│   │   │   ├── BaseShelfList.tsx (407 lines)
+│   │   │   ├── ContentDisplays.tsx (120 lines)
+│   │   │   ├── NftDisplay.tsx (350 lines)
+│   │   │   ├── ShelfCard.tsx (162 lines)
+│   │   │   ├── ShelfCardActionMenu.tsx (173 lines)
+│   │   │   ├── ShelfDetailView.tsx (624 lines)
+│   │   │   └── index.ts (1 lines)
 │   │   ├── containers/
-│   │   │   ├── ShelfLists.tsx
-│   │   │   └── index.ts
-│   │   ├── index.ts
+│   │   │   ├── ShelfLists.tsx (226 lines)
+│   │   │   └── index.ts (1 lines)
+│   │   ├── index.ts (10 lines)
 │   │   └── types/
-│   │       ├── index.ts
-│   │       └── types.ts
+│   │       ├── index.ts (1 lines)
+│   │       └── types.ts (60 lines)
 │   ├── items/
 │   │   ├── components/
-│   │   │   ├── AddToShelfDialog.tsx
-│   │   │   ├── ItemActionMenu.tsx
-│   │   │   ├── ItemReorderManager.tsx
-│   │   │   ├── NewItem.tsx
-│   │   │   ├── NftSearch.tsx
-│   │   │   └── index.ts
+│   │   │   ├── AddToShelfDialog.tsx (170 lines)
+│   │   │   ├── ItemActionMenu.tsx (61 lines)
+│   │   │   ├── ItemReorderManager.tsx (61 lines)
+│   │   │   ├── NewItem.tsx (358 lines)
+│   │   │   ├── NftSearch.tsx (270 lines)
+│   │   │   └── index.ts (2 lines)
 │   │   ├── hooks/
-│   │   │   ├── index.ts
-│   │   │   ├── useItemActions.tsx
-│   │   │   └── useItemReordering.ts
-│   │   └── index.ts
+│   │   │   ├── index.ts (2 lines)
+│   │   │   ├── useItemActions.tsx (104 lines)
+│   │   │   └── useItemReordering.ts (73 lines)
+│   │   └── index.ts (2 lines)
 │   ├── shared/
 │   │   └── hooks/
-│   │       └── useReorderable.ts
+│   │       └── useReorderable.ts (267 lines)
 │   ├── shelf-collaboration/
 │   │   └── components/
-│   │       └── CollaboratorsList.tsx
+│   │       └── CollaboratorsList.tsx (177 lines)
 │   ├── shelf-management/
 │   │   ├── components/
-│   │   │   ├── NewShelf.tsx
-│   │   │   ├── RemoveItemButton.tsx
-│   │   │   ├── ShelfContent.tsx
-│   │   │   ├── ShelfOption.tsx
-│   │   │   ├── ShelfSelectionDialog.tsx
-│   │   │   └── index.ts
+│   │   │   ├── NewShelf.tsx (97 lines)
+│   │   │   ├── RemoveItemButton.tsx (110 lines)
+│   │   │   ├── ShelfContent.tsx (80 lines)
+│   │   │   ├── ShelfOption.tsx (30 lines)
+│   │   │   ├── ShelfSelectionDialog.tsx (134 lines)
+│   │   │   └── index.ts (5 lines)
 │   │   ├── containers/
-│   │   │   └── ShelfDetailContainer.tsx
+│   │   │   └── ShelfDetailContainer.tsx (143 lines)
 │   │   ├── hooks/
-│   │   │   ├── index.ts
-│   │   │   ├── useAddToShelf.ts
-│   │   │   ├── usePublicShelfOperations.ts
-│   │   │   ├── useShelfOperations.ts
-│   │   │   └── useShelfReordering.ts
-│   │   ├── index.ts
+│   │   │   ├── index.ts (4 lines)
+│   │   │   ├── useAddToShelf.ts (106 lines)
+│   │   │   ├── usePublicShelfOperations.ts (61 lines)
+│   │   │   ├── useShelfOperations.ts (152 lines)
+│   │   │   └── useShelfReordering.ts (106 lines)
+│   │   ├── index.ts (3 lines)
 │   │   └── types/
-│   │       └── index.ts
+│   │       └── index.ts (27 lines)
 │   └── shelf-settings/
 │       ├── components/
-│       │   ├── ShelfMetricsDisplay.tsx
-│       │   ├── ShelfSettings.tsx
-│       │   ├── ShelfSettingsDialog.tsx
-│       │   └── index.ts
+│       │   ├── ShelfMetricsDisplay.tsx (143 lines)
+│       │   ├── ShelfSettings.tsx (120 lines)
+│       │   ├── ShelfSettingsDialog.tsx (132 lines)
+│       │   └── index.ts (3 lines)
 │       ├── hooks/
-│       │   ├── index.ts
-│       │   ├── useShelfMetadata.ts
-│       │   └── useShelfMetrics.ts
-│       ├── index.ts
+│       │   ├── index.ts (2 lines)
+│       │   ├── useShelfMetadata.ts (34 lines)
+│       │   └── useShelfMetrics.ts (40 lines)
+│       ├── index.ts (3 lines)
 │       └── utils/
-│           └── index.ts
+│           └── index.ts (2 lines)
 ├── hooks/
-│   ├── index.ts
-│   └── useContentPermissions.ts
-├── index.tsx
+│   ├── index.ts (1 lines)
+│   └── useContentPermissions.ts (75 lines)
+├── index.tsx (17 lines)
 ├── layouts/
-│   ├── PerpetuaLayout.tsx
-│   └── index.ts
-├── routes.ts
+│   ├── PerpetuaLayout.tsx (214 lines)
+│   └── index.ts (1 lines)
+├── routes.ts (119 lines)
 ├── state/
 │   ├── cache/
-│   │   └── ShelvesCache.ts
+│   │   └── ShelvesCache.ts (209 lines)
 │   ├── hooks/
-│   │   ├── index.ts
-│   │   ├── usePerpetuaActions.ts
-│   │   └── usePerpetuaSelectors.ts
-│   ├── index.ts
-│   ├── perpetuaSlice.ts
+│   │   ├── index.ts (3 lines)
+│   │   ├── usePerpetuaActions.ts (119 lines)
+│   │   └── usePerpetuaSelectors.ts (61 lines)
+│   ├── index.ts (47 lines)
+│   ├── perpetuaSlice.ts (343 lines)
 │   ├── services/
-│   │   └── perpetuaService.ts
+│   │   └── perpetuaService.ts (419 lines)
 │   ├── thunks/
-│   │   ├── collaborationThunks.ts
-│   │   ├── index.ts
-│   │   ├── itemThunks.ts
-│   │   ├── queryThunks.ts
-│   │   ├── reorderThunks.ts
-│   │   └── shelfThunks.ts
+│   │   ├── collaborationThunks.ts (128 lines)
+│   │   ├── index.ts (6 lines)
+│   │   ├── itemThunks.ts (94 lines)
+│   │   ├── queryThunks.ts (155 lines)
+│   │   ├── reorderThunks.ts (129 lines)
+│   │   └── shelfThunks.ts (157 lines)
 │   ├── utils/
-└── utils.tsx
+└── utils.tsx (136 lines)
 
 
 
@@ -104,6 +102,17 @@ Perpetua/
 
 
 
+
+
+
+
+
+- useItemReordering.ts and useShelfReordering.ts contain similar reordering logic. Extract the common functionality into a shared hook.
+
+- Consolidate type definitions between features/cards/types/types.ts and features/shelf-management/types/index.ts - they likely have overlapping types.
+
+- AddToShelfDialog.tsx and ShelfSelectionDialog.tsx appear to have similar functionality. Consider merging or extracting shared logic.
+- ItemActionMenu.tsx and ShelfCardActionMenu.tsx likely share similar patterns and could be generalized into a base component with specializations.
 
 
 
@@ -123,20 +132,27 @@ dfx generate perpetua
 The output should be an actual prompt that could be provided at the beginning of this conversation and yeild better results.
 
 
-### UI
+## V1 Features
 
-- ReorderShelfItem and reorderProfileShelf have similar logic, but different UIs. We should make the UI portion for this reusable so the profile grid is movable.
-- We allowing slots in the profile?
 
-What if we just treated the profile as if it was a shelf? Everyone gets a special profile shelf that displays by default on their page.
-
+- For whatever reason, NFTs aren't being added to the thing.
 
 - Big feature: Organized profile page on the user route.
 - Track how many items are in the shelf as part of the initial display.
-- Payment for all actions, and removal of topup.
+- Payment for all actions.
 - I think we're going to need tags too (so we could filter the recent one by categories)
 - Allowed to edit others users' shelves? YES
 - Shelf Appears In? YES/maybe
+
+
+## V2 Features: 
+
+- A preview of the slots in the profile. (Could be done later)
+
+
+
+
+
 
 ## Design
 

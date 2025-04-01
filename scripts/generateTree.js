@@ -10,6 +10,16 @@ const essentialFiles = {
   ui: ['components', 'declarations', 'hooks', 'service', 'styles', 'utils']
 };
 
+// Function to count lines in a file
+const countLines = (filePath) => {
+  try {
+    const content = fs.readFileSync(filePath, 'utf8');
+    return content.split('\n').length;
+  } catch (error) {
+    return 0; // Return 0 if file cannot be read
+  }
+};
+
 const createTree = (dir, indent = '') => {
   let tree = '';
   const files = fs.readdirSync(dir);
@@ -26,10 +36,14 @@ const createTree = (dir, indent = '') => {
 
       if (shouldInclude) {
         const lineEnd = isLastFile ? '└── ' : '├── ';
-        tree += `${indent}${lineEnd}${file}${stats.isDirectory() ? '/' : ''}\n`;
-
+        
         if (stats.isDirectory()) {
+          tree += `${indent}${lineEnd}${file}/\n`;
           tree += createTree(fullPath, `${indent}${isLastFile ? '    ' : '│   '}`);
+        } else {
+          // Count lines for files and add the count in parentheses
+          const lineCount = countLines(fullPath);
+          tree += `${indent}${lineEnd}${file} (${lineCount} lines)\n`;
         }
       }
     });

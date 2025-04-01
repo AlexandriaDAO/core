@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '@/store';
 import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { 
   loadShelves, 
@@ -267,45 +268,45 @@ export default perpetuaSlice.reducer;
 
 // Selectors
 // Get all user shelves with preserved order
-export const selectUserShelves = (state: { perpetua: PerpetuaState }) => {
+export const selectUserShelves = (state: RootState) => {
   return state.perpetua.ids.userShelves.map(id => state.perpetua.entities.shelves[id]).filter(Boolean);
 };
 
 // Get all public shelves with preserved order
-export const selectPublicShelves = (state: { perpetua: PerpetuaState }) => {
+export const selectPublicShelves = (state: RootState) => {
   return state.perpetua.ids.publicShelves.map(id => state.perpetua.entities.shelves[id]).filter(Boolean);
 };
 
 // Get a specific shelf by ID
 export const selectShelfById = (shelfId: string) => 
-  (state: { perpetua: PerpetuaState }) => state.perpetua.entities.shelves[shelfId] || null;
+  (state: RootState) => state.perpetua.entities.shelves[shelfId] || null;
 
 // Get the currently selected shelf
-export const selectSelectedShelf = (state: { perpetua: PerpetuaState }) => {
+export const selectSelectedShelf = (state: RootState) => {
   const { selectedShelfId } = state.perpetua;
   if (!selectedShelfId) return null;
   return state.perpetua.entities.shelves[selectedShelfId] || null;
 };
 
-export const selectLastTimestamp = (state: { perpetua: PerpetuaState }) => state.perpetua.lastTimestamp;
+export const selectLastTimestamp = (state: RootState) => state.perpetua.lastTimestamp;
 
-export const selectLoading = (state: { perpetua: PerpetuaState }) => state.perpetua.loading.userShelves;
-export const selectPublicLoading = (state: { perpetua: PerpetuaState }) => state.perpetua.loading.publicShelves;
-export const selectError = (state: { perpetua: PerpetuaState }) => state.perpetua.error;
+export const selectLoading = (state: RootState) => state.perpetua.loading.userShelves;
+export const selectPublicLoading = (state: RootState) => state.perpetua.loading.publicShelves;
+export const selectError = (state: RootState) => state.perpetua.error;
 
 // Updated selectors for permissions
 // No longer need selectPermissions as permissions are calculated on-demand
 
 // New selectors for collaboration features
 export const selectShelfEditors = (shelfId: string) => 
-  (state: { perpetua: PerpetuaState }) => state.perpetua.shelfEditors[shelfId] || [];
+  (state: RootState) => state.perpetua.shelfEditors[shelfId] || [];
 
 export const selectEditorsLoading = (shelfId: string) => 
-  (state: { perpetua: PerpetuaState }) => state.perpetua.loading.editors[shelfId] || false;
+  (state: RootState) => state.perpetua.loading.editors[shelfId] || false;
 
 // Check if user has edit access to a content item
 export const selectHasEditAccess = (contentId: string) => 
-  (state: any) => {
+  (state: RootState) => {
     const userPrincipal = state.auth.user?.principal;
     if (!userPrincipal) return false;
     
@@ -322,7 +323,7 @@ export const selectHasEditAccess = (contentId: string) =>
 
 // Check if user is the owner of a shelf
 export const selectIsOwner = (contentId: string) => 
-  (state: any) => {
+  (state: RootState) => {
     const shelf = state.perpetua.entities.shelves[contentId];
     const userPrincipal = state.auth.user?.principal;
     if (!shelf || !userPrincipal) return false;
@@ -331,7 +332,7 @@ export const selectIsOwner = (contentId: string) =>
 
 // Check if user is an editor (but not owner) of a shelf
 export const selectIsEditor = (contentId: string) => 
-  (state: any) => {
+  (state: RootState) => {
     const userPrincipal = state.auth.user?.principal;
     if (!userPrincipal) return false;
     

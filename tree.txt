@@ -1,1725 +1,1727 @@
 ├── .azle/
 │   └── alex_wallet/
-│       ├── alex_wallet.wasm
-│       └── main.js
-├── .babelrc
-├── .cursorignore
+│       ├── alex_wallet.wasm (148875 lines)
+│       └── main.js (127079 lines)
+├── .babelrc (7 lines)
+├── .cursorignore (9 lines)
 ├── .mops/
 │   ├── _github/
 │   │   ├── array#v0.2.1/
-│   │   │   ├── Makefile
+│   │   │   ├── Makefile (6 lines)
 │   │   │   ├── src/
-│   │   │   │   ├── Array.mo
-│   │   │   │   └── Copy.mo
+│   │   │   │   ├── Array.mo (45 lines)
+│   │   │   │   └── Copy.mo (35 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Array.mo
-│   │   │   │   └── Copy.mo
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── Array.mo (32 lines)
+│   │   │   │   └── Copy.mo (19 lines)
+│   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   ├── base-0.7.3#moc-0.7.3@aafcdee0c8328087aeed506e64aa2ff4ed329b47/
-│   │   │   ├── NOTICE
+│   │   │   ├── NOTICE (13 lines)
 │   │   │   ├── doc/
-│   │   │   │   ├── antora.yml
-│   │   │   │   ├── design.md
-│   │   │   │   ├── make_docs.sh
-│   │   │   │   ├── module_graph.py
-│   │   │   │   ├── module_nav.py
+│   │   │   │   ├── antora.yml (6 lines)
+│   │   │   │   ├── design.md (170 lines)
+│   │   │   │   ├── make_docs.sh (8 lines)
+│   │   │   │   ├── module_graph.py (31 lines)
+│   │   │   │   ├── module_nav.py (26 lines)
 │   │   │   │   ├── modules/
 │   │   │   │   │   └── base-libraries/
 │   │   │   │   │       └── pages/
 │   │   │   ├── src/
-│   │   │   │   ├── Array.mo
-│   │   │   │   ├── AssocList.mo
-│   │   │   │   ├── Blob.mo
-│   │   │   │   ├── Bool.mo
-│   │   │   │   ├── Buffer.mo
-│   │   │   │   ├── CertifiedData.mo
-│   │   │   │   ├── Char.mo
-│   │   │   │   ├── Debug.mo
-│   │   │   │   ├── Deque.mo
-│   │   │   │   ├── Error.mo
-│   │   │   │   ├── ExperimentalCycles.mo
-│   │   │   │   ├── ExperimentalInternetComputer.mo
-│   │   │   │   ├── ExperimentalStableMemory.mo
-│   │   │   │   ├── Float.mo
-│   │   │   │   ├── Func.mo
-│   │   │   │   ├── Hash.mo
-│   │   │   │   ├── HashMap.mo
-│   │   │   │   ├── Heap.mo
-│   │   │   │   ├── Int.mo
-│   │   │   │   ├── Int16.mo
-│   │   │   │   ├── Int32.mo
-│   │   │   │   ├── Int64.mo
-│   │   │   │   ├── Int8.mo
-│   │   │   │   ├── Iter.mo
-│   │   │   │   ├── IterType.mo
-│   │   │   │   ├── List.mo
-│   │   │   │   ├── Nat.mo
-│   │   │   │   ├── Nat16.mo
-│   │   │   │   ├── Nat32.mo
-│   │   │   │   ├── Nat64.mo
-│   │   │   │   ├── Nat8.mo
-│   │   │   │   ├── None.mo
-│   │   │   │   ├── Option.mo
-│   │   │   │   ├── Order.mo
-│   │   │   │   ├── Prelude.mo
-│   │   │   │   ├── Principal.mo
-│   │   │   │   ├── RBTree.mo
-│   │   │   │   ├── Random.mo
-│   │   │   │   ├── Result.mo
-│   │   │   │   ├── Stack.mo
-│   │   │   │   ├── Text.mo
-│   │   │   │   ├── Time.mo
-│   │   │   │   ├── Trie.mo
-│   │   │   │   ├── TrieMap.mo
-│   │   │   │   └── TrieSet.mo
+│   │   │   │   ├── Array.mo (345 lines)
+│   │   │   │   ├── AssocList.mo (204 lines)
+│   │   │   │   ├── Blob.mo (56 lines)
+│   │   │   │   ├── Bool.mo (45 lines)
+│   │   │   │   ├── Buffer.mo (1938 lines)
+│   │   │   │   ├── CertifiedData.mo (30 lines)
+│   │   │   │   ├── Char.mo (68 lines)
+│   │   │   │   ├── Debug.mo (16 lines)
+│   │   │   │   ├── Deque.mo (76 lines)
+│   │   │   │   ├── Error.mo (42 lines)
+│   │   │   │   ├── ExperimentalCycles.mo (52 lines)
+│   │   │   │   ├── ExperimentalInternetComputer.mo (37 lines)
+│   │   │   │   ├── ExperimentalStableMemory.mo (122 lines)
+│   │   │   │   ├── Float.mo (151 lines)
+│   │   │   │   ├── Func.mo (39 lines)
+│   │   │   │   ├── Hash.mo (84 lines)
+│   │   │   │   ├── HashMap.mo (230 lines)
+│   │   │   │   ├── Heap.mo (114 lines)
+│   │   │   │   ├── Int.mo (151 lines)
+│   │   │   │   ├── Int16.mo (160 lines)
+│   │   │   │   ├── Int32.mo (161 lines)
+│   │   │   │   ├── Int64.mo (162 lines)
+│   │   │   │   ├── Int8.mo (161 lines)
+│   │   │   │   ├── Iter.mo (221 lines)
+│   │   │   │   ├── IterType.mo (8 lines)
+│   │   │   │   ├── List.mo (434 lines)
+│   │   │   │   ├── Nat.mo (76 lines)
+│   │   │   │   ├── Nat16.mo (147 lines)
+│   │   │   │   ├── Nat32.mo (147 lines)
+│   │   │   │   ├── Nat64.mo (147 lines)
+│   │   │   │   ├── Nat8.mo (147 lines)
+│   │   │   │   ├── None.mo (20 lines)
+│   │   │   │   ├── Option.mo (161 lines)
+│   │   │   │   ├── Order.mo (47 lines)
+│   │   │   │   ├── Prelude.mo (34 lines)
+│   │   │   │   ├── Principal.mo (59 lines)
+│   │   │   │   ├── RBTree.mo (219 lines)
+│   │   │   │   ├── Random.mo (189 lines)
+│   │   │   │   ├── Result.mo (211 lines)
+│   │   │   │   ├── Stack.mo (41 lines)
+│   │   │   │   ├── Text.mo (616 lines)
+│   │   │   │   ├── Time.mo (38 lines)
+│   │   │   │   ├── Trie.mo (1224 lines)
+│   │   │   │   ├── TrieMap.mo (181 lines)
+│   │   │   │   └── TrieSet.mo (98 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Makefile
-│   │   │   │   ├── RBTreeTest.mo
-│   │   │   │   ├── TrieExampleTest.mo
-│   │   │   │   ├── arrayTest.mo
-│   │   │   │   ├── bufTest.mo
-│   │   │   │   ├── charTest.mo
-│   │   │   │   ├── dequeTest.mo
-│   │   │   │   ├── floatTest.mo
-│   │   │   │   ├── funcTest.mo
-│   │   │   │   ├── hashMapTest.mo
-│   │   │   │   ├── heapTest.mo
-│   │   │   │   ├── int8Test.mo
-│   │   │   │   ├── intTest.mo
-│   │   │   │   ├── iterTest.mo
-│   │   │   │   ├── listTest.mo
-│   │   │   │   ├── natTest.mo
-│   │   │   │   ├── noneTest.mo
-│   │   │   │   ├── optionTest.mo
-│   │   │   │   ├── orderTest.mo
-│   │   │   │   ├── resultTest.mo
-│   │   │   │   ├── stackTest.mo
-│   │   │   │   ├── textTest.mo
-│   │   │   │   ├── trieMapTest.mo
-│   │   │   │   ├── trieSetTest.mo
-│   │   │   │   ├── vessel.dhall
+│   │   │   │   ├── Makefile (40 lines)
+│   │   │   │   ├── RBTreeTest.mo (62 lines)
+│   │   │   │   ├── TrieExampleTest.mo (39 lines)
+│   │   │   │   ├── arrayTest.mo (239 lines)
+│   │   │   │   ├── bufTest.mo (3293 lines)
+│   │   │   │   ├── charTest.mo (65 lines)
+│   │   │   │   ├── dequeTest.mo (46 lines)
+│   │   │   │   ├── floatTest.mo (101 lines)
+│   │   │   │   ├── funcTest.mo (25 lines)
+│   │   │   │   ├── hashMapTest.mo (147 lines)
+│   │   │   │   ├── heapTest.mo (52 lines)
+│   │   │   │   ├── int8Test.mo (8 lines)
+│   │   │   │   ├── intTest.mo (24 lines)
+│   │   │   │   ├── iterTest.mo (177 lines)
+│   │   │   │   ├── listTest.mo (223 lines)
+│   │   │   │   ├── natTest.mo (22 lines)
+│   │   │   │   ├── noneTest.mo (14 lines)
+│   │   │   │   ├── optionTest.mo (267 lines)
+│   │   │   │   ├── orderTest.mo (29 lines)
+│   │   │   │   ├── resultTest.mo (63 lines)
+│   │   │   │   ├── stackTest.mo (16 lines)
+│   │   │   │   ├── textTest.mo (812 lines)
+│   │   │   │   ├── trieMapTest.mo (139 lines)
+│   │   │   │   ├── trieSetTest.mo (53 lines)
+│   │   │   │   ├── vessel.dhall (2 lines)
 │   │   ├── candy_0_3_0#v0.3.0@907a4e7363aac6c6a4e114ebc73e3d3f21e138af/
-│   │   │   ├── CHANGELOG.md
-│   │   │   ├── ICRC16.md
-│   │   │   ├── Makefile
-│   │   │   ├── dfx.json
+│   │   │   ├── CHANGELOG.md (4 lines)
+│   │   │   ├── ICRC16.md (113 lines)
+│   │   │   ├── Makefile (25 lines)
+│   │   │   ├── dfx.json (22 lines)
 │   │   │   ├── docs/
-│   │   │   │   ├── candid.html
-│   │   │   │   ├── clone.html
-│   │   │   │   ├── conversion.html
-│   │   │   │   ├── hex.html
-│   │   │   │   ├── index.html
-│   │   │   │   ├── json.html
-│   │   │   │   ├── properties.html
-│   │   │   │   ├── styles.css
-│   │   │   │   ├── types.html
-│   │   │   │   ├── upgrade.html
-│   │   │   │   └── workspace.html
-│   │   │   ├── mops.toml
-│   │   │   ├── old_package-set.dhall
-│   │   │   ├── old_vessel.dhall
+│   │   │   │   ├── candid.html (7 lines)
+│   │   │   │   ├── clone.html (8 lines)
+│   │   │   │   ├── conversion.html (341 lines)
+│   │   │   │   ├── hex.html (8 lines)
+│   │   │   │   ├── index.html (26 lines)
+│   │   │   │   ├── json.html (8 lines)
+│   │   │   │   ├── properties.html (209 lines)
+│   │   │   │   ├── styles.css (163 lines)
+│   │   │   │   ├── types.html (87 lines)
+│   │   │   │   ├── upgrade.html (6 lines)
+│   │   │   │   └── workspace.html (58 lines)
+│   │   │   ├── mops.toml (23 lines)
+│   │   │   ├── old_package-set.dhall (38 lines)
+│   │   │   ├── old_vessel.dhall (5 lines)
 │   │   │   ├── src/
-│   │   │   │   ├── candid.mo
-│   │   │   │   ├── clone.mo
-│   │   │   │   ├── conversion.mo
-│   │   │   │   ├── json.mo
-│   │   │   │   ├── properties.mo
-│   │   │   │   ├── types.mo
-│   │   │   │   ├── upgrade.mo
-│   │   │   │   └── workspace.mo
+│   │   │   │   ├── candid.mo (307 lines)
+│   │   │   │   ├── clone.mo (54 lines)
+│   │   │   │   ├── conversion.mo (2097 lines)
+│   │   │   │   ├── json.mo (109 lines)
+│   │   │   │   ├── properties.mo (567 lines)
+│   │   │   │   ├── types.mo (1051 lines)
+│   │   │   │   ├── upgrade.mo (303 lines)
+│   │   │   │   └── workspace.mo (562 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── candid.test.mo
-│   │   │   │   ├── clone.test.mo
-│   │   │   │   ├── json.test.mo
-│   │   │   │   ├── properties.test.mo
-│   │   │   │   ├── types.test.mo
-│   │   │   │   ├── upgrade.test.mo
-│   │   │   │   └── workspaces.test.mo
-│   │   │   ├── test_runner.sh
+│   │   │   │   ├── candid.test.mo (323 lines)
+│   │   │   │   ├── clone.test.mo (221 lines)
+│   │   │   │   ├── json.test.mo (162 lines)
+│   │   │   │   ├── properties.test.mo (191 lines)
+│   │   │   │   ├── types.test.mo (175 lines)
+│   │   │   │   ├── upgrade.test.mo (120 lines)
+│   │   │   │   └── workspaces.test.mo (218 lines)
+│   │   │   ├── test_runner.sh (23 lines)
 │   │   │   ├── tests/
-│   │   │   │   └── test_runner.mo
+│   │   │   │   └── test_runner.mo (70 lines)
 │   │   ├── cert#v0.1.3@c403ffec0a60f658a1009976c785aa567ff0da77/
-│   │   │   ├── Developent.md
-│   │   │   ├── Makefile
+│   │   │   ├── Developent.md (17 lines)
+│   │   │   ├── Makefile (14 lines)
 │   │   │   ├── demo/
-│   │   │   │   ├── ManagementCanister.mo
-│   │   │   │   ├── canister_ids.json
-│   │   │   │   ├── dfx.json
-│   │   │   │   ├── main.mo
-│   │   │   │   ├── vessel.dhall
-│   │   │   ├── flake.lock
-│   │   │   ├── flake.nix
+│   │   │   │   ├── ManagementCanister.mo (26 lines)
+│   │   │   │   ├── canister_ids.json (5 lines)
+│   │   │   │   ├── dfx.json (17 lines)
+│   │   │   │   ├── main.mo (483 lines)
+│   │   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── flake.lock (46 lines)
+│   │   │   ├── flake.nix (59 lines)
 │   │   │   ├── gen-tests/
-│   │   │   │   ├── cabal.project.freeze
-│   │   │   │   ├── gen-tests.cabal
-│   │   │   │   ├── main.hs
+│   │   │   │   ├── cabal.project.freeze (84 lines)
+│   │   │   │   ├── gen-tests.cabal (21 lines)
+│   │   │   │   ├── main.hs (290 lines)
 │   │   │   ├── mops.nix/
-│   │   │   │   ├── default.nix
-│   │   │   │   ├── node-env.nix
-│   │   │   │   └── node-packages.nix
-│   │   │   ├── mops.toml
+│   │   │   │   ├── default.nix (18 lines)
+│   │   │   │   ├── node-env.nix (690 lines)
+│   │   │   │   └── node-packages.nix (3258 lines)
+│   │   │   ├── mops.toml (14 lines)
 │   │   │   ├── src/
-│   │   │   │   ├── CanisterSigs.mo
-│   │   │   │   ├── CertTree.mo
-│   │   │   │   ├── Dyadic.mo
-│   │   │   │   ├── MerkleTree.mo
-│   │   │   │   └── ReqData.mo
+│   │   │   │   ├── CanisterSigs.mo (200 lines)
+│   │   │   │   ├── CertTree.mo (109 lines)
+│   │   │   │   ├── Dyadic.mo (105 lines)
+│   │   │   │   ├── MerkleTree.mo (731 lines)
+│   │   │   │   └── ReqData.mo (118 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Makefile
-│   │   │   │   ├── Test.mo
-│   │   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── Makefile (4 lines)
+│   │   │   │   ├── Test.mo (210 lines)
+│   │   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── vessel.dhall (2 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   ├── encoding#v0.4.1@2711d18727e954b11afc0d37945608512b5fbce2/
-│   │   │   ├── Makefile
+│   │   │   ├── Makefile (6 lines)
 │   │   │   ├── src/
-│   │   │   │   ├── Base32.mo
-│   │   │   │   ├── Base64.mo
-│   │   │   │   ├── Binary.mo
-│   │   │   │   └── Hex.mo
+│   │   │   │   ├── Base32.mo (152 lines)
+│   │   │   │   ├── Base64.mo (254 lines)
+│   │   │   │   ├── Binary.mo (115 lines)
+│   │   │   │   └── Hex.mo (115 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Base32.mo
-│   │   │   │   ├── Base64.mo
-│   │   │   │   ├── Binary.mo
-│   │   │   │   ├── Hex.mo
-│   │   │   │   └── util.mo
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── Base32.mo (28 lines)
+│   │   │   │   ├── Base64.mo (39 lines)
+│   │   │   │   ├── Binary.mo (10 lines)
+│   │   │   │   ├── Hex.mo (35 lines)
+│   │   │   │   └── util.mo (29 lines)
+│   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   ├── encoding_0_4_1#v0.4.1@2711d18727e954b11afc0d37945608512b5fbce2/
-│   │   │   ├── Makefile
+│   │   │   ├── Makefile (6 lines)
 │   │   │   ├── src/
-│   │   │   │   ├── Base32.mo
-│   │   │   │   ├── Base64.mo
-│   │   │   │   ├── Binary.mo
-│   │   │   │   └── Hex.mo
+│   │   │   │   ├── Base32.mo (152 lines)
+│   │   │   │   ├── Base64.mo (254 lines)
+│   │   │   │   ├── Binary.mo (115 lines)
+│   │   │   │   └── Hex.mo (115 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Base32.mo
-│   │   │   │   ├── Base64.mo
-│   │   │   │   ├── Binary.mo
-│   │   │   │   ├── Hex.mo
-│   │   │   │   └── util.mo
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── Base32.mo (28 lines)
+│   │   │   │   ├── Base64.mo (39 lines)
+│   │   │   │   ├── Binary.mo (10 lines)
+│   │   │   │   ├── Hex.mo (35 lines)
+│   │   │   │   └── util.mo (29 lines)
+│   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   ├── map9#v9.0.1@10b68f6ea8df5e72dfa4c07a50c8bb60a916c233/
-│   │   │   ├── dfx.json
-│   │   │   ├── mops.toml
+│   │   │   ├── dfx.json (16 lines)
+│   │   │   ├── mops.toml (7 lines)
 │   │   │   ├── src/
 │   │   │   │   ├── Map/
-│   │   │   │   │   ├── const.mo
-│   │   │   │   │   ├── lib.mo
+│   │   │   │   │   ├── const.mo (14 lines)
+│   │   │   │   │   ├── lib.mo (67 lines)
 │   │   │   │   │   ├── modules/
-│   │   │   │   │   │   ├── clone.mo
-│   │   │   │   │   │   ├── find.mo
-│   │   │   │   │   │   ├── fromIter.mo
-│   │   │   │   │   │   ├── get.mo
-│   │   │   │   │   │   ├── init.mo
-│   │   │   │   │   │   ├── iterate.mo
-│   │   │   │   │   │   ├── put.mo
-│   │   │   │   │   │   ├── queue.mo
-│   │   │   │   │   │   ├── rehash.mo
-│   │   │   │   │   │   ├── remove.mo
-│   │   │   │   │   │   └── toArray.mo
-│   │   │   │   │   ├── types.mo
-│   │   │   │   │   └── utils.mo
+│   │   │   │   │   │   ├── clone.mo (367 lines)
+│   │   │   │   │   │   ├── find.mo (248 lines)
+│   │   │   │   │   │   ├── fromIter.mo (600 lines)
+│   │   │   │   │   │   ├── get.mo (68 lines)
+│   │   │   │   │   │   ├── init.mo (123 lines)
+│   │   │   │   │   │   ├── iterate.mo (1860 lines)
+│   │   │   │   │   │   ├── put.mo (876 lines)
+│   │   │   │   │   │   ├── queue.mo (247 lines)
+│   │   │   │   │   │   ├── rehash.mo (78 lines)
+│   │   │   │   │   │   ├── remove.mo (158 lines)
+│   │   │   │   │   │   └── toArray.mo (162 lines)
+│   │   │   │   │   ├── types.mo (37 lines)
+│   │   │   │   │   └── utils.mo (203 lines)
 │   │   │   │   └── Set/
-│   │   │   │       ├── const.mo
-│   │   │   │       ├── lib.mo
+│   │   │   │       ├── const.mo (14 lines)
+│   │   │   │       ├── lib.mo (67 lines)
 │   │   │   │       ├── modules/
-│   │   │   │       │   ├── clone.mo
-│   │   │   │       │   ├── find.mo
-│   │   │   │       │   ├── fromIter.mo
-│   │   │   │       │   ├── get.mo
-│   │   │   │       │   ├── init.mo
-│   │   │   │       │   ├── iterate.mo
-│   │   │   │       │   ├── put.mo
-│   │   │   │       │   ├── queue.mo
-│   │   │   │       │   ├── rehash.mo
-│   │   │   │       │   ├── remove.mo
-│   │   │   │       │   └── toArray.mo
-│   │   │   │       ├── types.mo
-│   │   │   │       └── utils.mo
+│   │   │   │       │   ├── clone.mo (180 lines)
+│   │   │   │       │   ├── find.mo (197 lines)
+│   │   │   │       │   ├── fromIter.mo (580 lines)
+│   │   │   │       │   ├── get.mo (50 lines)
+│   │   │   │       │   ├── init.mo (74 lines)
+│   │   │   │       │   ├── iterate.mo (612 lines)
+│   │   │   │       │   ├── put.mo (306 lines)
+│   │   │   │       │   ├── queue.mo (227 lines)
+│   │   │   │       │   ├── rehash.mo (75 lines)
+│   │   │   │       │   ├── remove.mo (155 lines)
+│   │   │   │       │   └── toArray.mo (146 lines)
+│   │   │   │       ├── types.mo (36 lines)
+│   │   │   │       └── utils.mo (203 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Map.mo
-│   │   │   │   └── Set.mo
-│   │   │   ├── test.mo
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── Map.mo (328 lines)
+│   │   │   │   └── Set.mo (259 lines)
+│   │   │   ├── test.mo (112 lines)
+│   │   │   ├── vessel.dhall (7 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   ├── matchers#v1.3.0@3dac8a071b69e4e651b25a7d9683fe831eb7cffd/
 │   │   │   ├── src/
-│   │   │   │   ├── Canister.mo
-│   │   │   │   ├── Matchers.mo
-│   │   │   │   ├── Suite.mo
-│   │   │   │   ├── Testable.mo
+│   │   │   │   ├── Canister.mo (162 lines)
+│   │   │   │   ├── Matchers.mo (231 lines)
+│   │   │   │   ├── Suite.mo (116 lines)
+│   │   │   │   ├── Testable.mo (286 lines)
 │   │   │   │   └── matchers/
-│   │   │   │       └── Hashmap.mo
+│   │   │   │       └── Hashmap.mo (36 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Test.mo
-│   │   │   │   └── run_test.sh
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── Test.mo (164 lines)
+│   │   │   │   └── run_test.sh (11 lines)
+│   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   ├── motoko_numbers#v1.1.0@773953141f976ccdfc2e6a2c451b841a53bb39a0/
-│   │   │   ├── Makefile
-│   │   │   ├── build.sh
-│   │   │   ├── dfx.json
-│   │   │   ├── mops.toml
+│   │   │   ├── Makefile (14 lines)
+│   │   │   ├── build.sh (12 lines)
+│   │   │   ├── dfx.json (11 lines)
+│   │   │   ├── mops.toml (8 lines)
 │   │   │   ├── samples/
-│   │   │   │   └── Sample.mo
+│   │   │   │   └── Sample.mo (3 lines)
 │   │   │   ├── src/
-│   │   │   │   ├── FloatX.mo
-│   │   │   │   ├── IntX.mo
-│   │   │   │   ├── NatX.mo
-│   │   │   │   └── Util.mo
+│   │   │   │   ├── FloatX.mo (213 lines)
+│   │   │   │   ├── IntX.mo (279 lines)
+│   │   │   │   ├── NatX.mo (313 lines)
+│   │   │   │   └── Util.mo (147 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── FloatXTests.mo
-│   │   │   │   ├── IntXTests.mo
-│   │   │   │   ├── Makefile
-│   │   │   │   ├── NatXTests.mo
-│   │   │   │   ├── TestUtil.mo
-│   │   │   │   └── Tests.mo
-│   │   │   ├── test.sh
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── FloatXTests.mo (58 lines)
+│   │   │   │   ├── IntXTests.mo (234 lines)
+│   │   │   │   ├── Makefile (4 lines)
+│   │   │   │   ├── NatXTests.mo (206 lines)
+│   │   │   │   ├── TestUtil.mo (21 lines)
+│   │   │   │   └── Tests.mo (8 lines)
+│   │   │   ├── test.sh (11 lines)
+│   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   ├── sha224#82e0aa1a77a8c0a2f98332b59ffc242d820e62cb/
-│   │   │   ├── Makefile
-│   │   │   ├── dfx.json
+│   │   │   ├── Makefile (14 lines)
+│   │   │   ├── dfx.json (21 lines)
 │   │   │   ├── src/
-│   │   │   │   └── SHA224.mo
+│   │   │   │   └── SHA224.mo (195 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Makefile
-│   │   │   │   ├── Test.mo
-│   │   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── Makefile (4 lines)
+│   │   │   │   ├── Test.mo (289 lines)
+│   │   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── vessel.dhall (2 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   ├── sha256#9e2468f51ef060ae04fde8d573183191bda30189/
-│   │   │   ├── Makefile
-│   │   │   ├── NOTICE
-│   │   │   ├── dfx.json
-│   │   │   ├── run.sh
+│   │   │   ├── Makefile (14 lines)
+│   │   │   ├── NOTICE (13 lines)
+│   │   │   ├── dfx.json (8 lines)
+│   │   │   ├── run.sh (18 lines)
 │   │   │   ├── src/
-│   │   │   │   └── SHA256.mo
+│   │   │   │   └── SHA256.mo (201 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Makefile
-│   │   │   │   ├── Test.mo
-│   │   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── Makefile (4 lines)
+│   │   │   │   ├── Test.mo (512 lines)
+│   │   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── vessel.dhall (2 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   ├── stable-write-only#v0.1.0@02e9aac74bdbed86b52ebed985d82b6ef66a76d8/
-│   │   │   ├── CHANGELOG.md
-│   │   │   ├── dfx.json
-│   │   │   ├── mops.toml
+│   │   │   ├── CHANGELOG.md (3 lines)
+│   │   │   ├── dfx.json (24 lines)
+│   │   │   ├── mops.toml (17 lines)
 │   │   │   ├── src/
-│   │   │   │   └── lib.mo
+│   │   │   │   └── lib.mo (433 lines)
 │   │   │   ├── test/
-│   │   │   │   └── lib.test.mo
+│   │   │   │   └── lib.test.mo (47 lines)
 │   │   │   ├── testActor/
-│   │   │   │   ├── childv1.mo
-│   │   │   │   ├── childv2.mo
-│   │   │   │   └── test_runner.mo
+│   │   │   │   ├── childv1.mo (218 lines)
+│   │   │   │   ├── childv2.mo (108 lines)
+│   │   │   │   └── test_runner.mo (573 lines)
 │   │   ├── stablebuffer#v0.2.0@110660769d11ba93c618dc4712525d20503bdc37/
-│   │   │   ├── Makefile
+│   │   │   ├── Makefile (14 lines)
 │   │   │   ├── reference/
-│   │   │   │   └── Buffer.mo
+│   │   │   │   └── Buffer.mo (150 lines)
 │   │   │   ├── src/
-│   │   │   │   └── StableBuffer.mo
+│   │   │   │   └── StableBuffer.mo (174 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Makefile
-│   │   │   │   ├── StableBufferTest.mo
-│   │   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── Makefile (4 lines)
+│   │   │   │   ├── StableBufferTest.mo (118 lines)
+│   │   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── vessel.dhall (2 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   ├── stablebuffer_1_3_0#v1.3.0@acdde6bb5b939227997cebdbb8919d2e6da8691c/
-│   │   │   ├── Makefile
+│   │   │   ├── Makefile (14 lines)
 │   │   │   ├── reference/
-│   │   │   │   └── Buffer.mo
+│   │   │   │   └── Buffer.mo (2661 lines)
 │   │   │   ├── src/
-│   │   │   │   └── StableBuffer.mo
+│   │   │   │   └── StableBuffer.mo (2629 lines)
 │   │   │   ├── test/
-│   │   │   │   ├── Makefile
-│   │   │   │   ├── StableBuffer.test.mo
-│   │   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.dhall
-│   │   │   ├── vessel.json
+│   │   │   │   ├── Makefile (6 lines)
+│   │   │   │   ├── StableBuffer.test.mo (3742 lines)
+│   │   │   │   ├── vessel.dhall (5 lines)
+│   │   │   ├── vessel.dhall (2 lines)
+│   │   │   ├── vessel.json (1 lines)
 │   │   └── xtended-numbers#v1.0.2/
-│   │       ├── build.sh
-│   │       ├── dfx.json
-│   │       ├── mops.toml
+│   │       ├── build.sh (12 lines)
+│   │       ├── dfx.json (17 lines)
+│   │       ├── mops.toml (8 lines)
 │   │       ├── samples/
-│   │       │   └── Sample.mo
+│   │       │   └── Sample.mo (3 lines)
 │   │       ├── src/
-│   │       │   ├── FloatX.mo
-│   │       │   ├── IntX.mo
-│   │       │   ├── NatX.mo
-│   │       │   └── Util.mo
+│   │       │   ├── FloatX.mo (213 lines)
+│   │       │   ├── IntX.mo (245 lines)
+│   │       │   ├── NatX.mo (199 lines)
+│   │       │   └── Util.mo (147 lines)
 │   │       ├── test/
-│   │       │   ├── FloatXTests.mo
-│   │       │   ├── IntXTests.mo
-│   │       │   ├── NatXTests.mo
-│   │       │   ├── TestUtil.mo
-│   │       │   └── Tests.mo
-│   │       ├── test.sh
-│   │       ├── vessel.dhall
-│   │       ├── vessel.json
+│   │       │   ├── FloatXTests.mo (58 lines)
+│   │       │   ├── IntXTests.mo (144 lines)
+│   │       │   ├── NatXTests.mo (132 lines)
+│   │       │   ├── TestUtil.mo (21 lines)
+│   │       │   └── Tests.mo (8 lines)
+│   │       ├── test.sh (11 lines)
+│   │       ├── vessel.dhall (5 lines)
+│   │       ├── vessel.json (1 lines)
 │   ├── base@0.12.1/
-│   │   ├── NOTICE
-│   │   ├── mops.toml
+│   │   ├── NOTICE (13 lines)
+│   │   ├── mops.toml (15 lines)
 │   │   ├── src/
-│   │   │   ├── Array.mo
-│   │   │   ├── AssocList.mo
-│   │   │   ├── Blob.mo
-│   │   │   ├── Bool.mo
-│   │   │   ├── Buffer.mo
-│   │   │   ├── CertifiedData.mo
-│   │   │   ├── Char.mo
-│   │   │   ├── Debug.mo
-│   │   │   ├── Deque.mo
-│   │   │   ├── Error.mo
-│   │   │   ├── ExperimentalCycles.mo
-│   │   │   ├── ExperimentalInternetComputer.mo
-│   │   │   ├── ExperimentalStableMemory.mo
-│   │   │   ├── Float.mo
-│   │   │   ├── Func.mo
-│   │   │   ├── Hash.mo
-│   │   │   ├── HashMap.mo
-│   │   │   ├── Heap.mo
-│   │   │   ├── Int.mo
-│   │   │   ├── Int16.mo
-│   │   │   ├── Int32.mo
-│   │   │   ├── Int64.mo
-│   │   │   ├── Int8.mo
-│   │   │   ├── Iter.mo
-│   │   │   ├── IterType.mo
-│   │   │   ├── List.mo
-│   │   │   ├── Nat.mo
-│   │   │   ├── Nat16.mo
-│   │   │   ├── Nat32.mo
-│   │   │   ├── Nat64.mo
-│   │   │   ├── Nat8.mo
-│   │   │   ├── None.mo
-│   │   │   ├── Option.mo
-│   │   │   ├── Order.mo
-│   │   │   ├── Prelude.mo
-│   │   │   ├── Principal.mo
-│   │   │   ├── RBTree.mo
-│   │   │   ├── Random.mo
-│   │   │   ├── Region.mo
-│   │   │   ├── Result.mo
-│   │   │   ├── Stack.mo
-│   │   │   ├── Text.mo
-│   │   │   ├── Time.mo
-│   │   │   ├── Timer.mo
-│   │   │   ├── Trie.mo
-│   │   │   ├── TrieMap.mo
-│   │   │   └── TrieSet.mo
+│   │   │   ├── Array.mo (866 lines)
+│   │   │   ├── AssocList.mo (403 lines)
+│   │   │   ├── Blob.mo (208 lines)
+│   │   │   ├── Bool.mo (45 lines)
+│   │   │   ├── Buffer.mo (2661 lines)
+│   │   │   ├── CertifiedData.mo (54 lines)
+│   │   │   ├── Char.mo (66 lines)
+│   │   │   ├── Debug.mo (57 lines)
+│   │   │   ├── Deque.mo (244 lines)
+│   │   │   ├── Error.mo (69 lines)
+│   │   │   ├── ExperimentalCycles.mo (152 lines)
+│   │   │   ├── ExperimentalInternetComputer.mo (86 lines)
+│   │   │   ├── ExperimentalStableMemory.mo (354 lines)
+│   │   │   ├── Float.mo (855 lines)
+│   │   │   ├── Func.mo (47 lines)
+│   │   │   ├── Hash.mo (83 lines)
+│   │   │   ├── HashMap.mo (458 lines)
+│   │   │   ├── Heap.mo (234 lines)
+│   │   │   ├── Int.mo (371 lines)
+│   │   │   ├── Int16.mo (642 lines)
+│   │   │   ├── Int32.mo (654 lines)
+│   │   │   ├── Int64.mo (640 lines)
+│   │   │   ├── Int8.mo (635 lines)
+│   │   │   ├── Iter.mo (259 lines)
+│   │   │   ├── IterType.mo (8 lines)
+│   │   │   ├── List.mo (933 lines)
+│   │   │   ├── Nat.mo (336 lines)
+│   │   │   ├── Nat16.mo (578 lines)
+│   │   │   ├── Nat32.mo (587 lines)
+│   │   │   ├── Nat64.mo (566 lines)
+│   │   │   ├── Nat8.mo (560 lines)
+│   │   │   ├── None.mo (20 lines)
+│   │   │   ├── Option.mo (162 lines)
+│   │   │   ├── Order.mo (47 lines)
+│   │   │   ├── Prelude.mo (34 lines)
+│   │   │   ├── Principal.mo (1223 lines)
+│   │   │   ├── RBTree.mo (682 lines)
+│   │   │   ├── Random.mo (271 lines)
+│   │   │   ├── Region.mo (391 lines)
+│   │   │   ├── Result.mo (234 lines)
+│   │   │   ├── Stack.mo (94 lines)
+│   │   │   ├── Text.mo (827 lines)
+│   │   │   ├── Time.mo (37 lines)
+│   │   │   ├── Timer.mo (63 lines)
+│   │   │   ├── Trie.mo (1576 lines)
+│   │   │   ├── TrieMap.mo (402 lines)
+│   │   │   └── TrieSet.mo (160 lines)
 │   ├── cbor@1.0.0/
-│   │   ├── mops.toml
+│   │   ├── mops.toml (15 lines)
 │   │   ├── src/
-│   │   │   ├── Decoder.mo
-│   │   │   ├── Encoder.mo
-│   │   │   ├── Types.mo
-│   │   │   └── Util.mo
+│   │   │   ├── Decoder.mo (439 lines)
+│   │   │   ├── Encoder.mo (281 lines)
+│   │   │   ├── Types.mo (35 lines)
+│   │   │   └── Util.mo (10 lines)
 │   ├── fuzz@0.2.1/
-│   │   ├── mops.toml
+│   │   ├── mops.toml (10 lines)
 │   │   ├── src/
-│   │   │   ├── Array.mo
-│   │   │   ├── Blob.mo
-│   │   │   ├── Bool.mo
-│   │   │   ├── Buffer.mo
-│   │   │   ├── Char.mo
-│   │   │   ├── Float.mo
-│   │   │   ├── ICRC1.mo
-│   │   │   ├── Int.mo
-│   │   │   ├── Int16.mo
-│   │   │   ├── Int32.mo
-│   │   │   ├── Int64.mo
-│   │   │   ├── Int8.mo
-│   │   │   ├── Nat.mo
-│   │   │   ├── Nat16.mo
-│   │   │   ├── Nat32.mo
-│   │   │   ├── Nat64.mo
-│   │   │   ├── Nat8.mo
-│   │   │   ├── Option.mo
-│   │   │   ├── Principal.mo
-│   │   │   ├── Text.mo
-│   │   │   ├── lib.mo
-│   │   │   ├── types.mo
-│   │   │   └── utils.mo
+│   │   │   ├── Array.mo (59 lines)
+│   │   │   ├── Blob.mo (15 lines)
+│   │   │   ├── Bool.mo (10 lines)
+│   │   │   ├── Buffer.mo (51 lines)
+│   │   │   ├── Char.mo (45 lines)
+│   │   │   ├── Float.mo (33 lines)
+│   │   │   ├── ICRC1.mo (23 lines)
+│   │   │   ├── Int.mo (25 lines)
+│   │   │   ├── Int16.mo (25 lines)
+│   │   │   ├── Int32.mo (25 lines)
+│   │   │   ├── Int64.mo (25 lines)
+│   │   │   ├── Int8.mo (25 lines)
+│   │   │   ├── Nat.mo (27 lines)
+│   │   │   ├── Nat16.mo (26 lines)
+│   │   │   ├── Nat32.mo (26 lines)
+│   │   │   ├── Nat64.mo (26 lines)
+│   │   │   ├── Nat8.mo (26 lines)
+│   │   │   ├── Option.mo (16 lines)
+│   │   │   ├── Principal.mo (21 lines)
+│   │   │   ├── Text.mo (47 lines)
+│   │   │   ├── lib.mo (111 lines)
+│   │   │   ├── types.mo (6 lines)
+│   │   │   └── utils.mo (16 lines)
 │   ├── icrc3-mo@0.2.6/
 │   │   ├── example/
-│   │   │   └── main.mo
-│   │   ├── mops.toml
+│   │   │   └── main.mo (174 lines)
+│   │   ├── mops.toml (21 lines)
 │   │   ├── src/
 │   │   │   ├── archive/
-│   │   │   │   └── lib.mo
-│   │   │   ├── helper.mo
-│   │   │   ├── lib.mo
+│   │   │   │   └── lib.mo (138 lines)
+│   │   │   ├── helper.mo (24 lines)
+│   │   │   ├── lib.mo (854 lines)
 │   │   │   ├── migrations/
-│   │   │   │   ├── lib.mo
-│   │   │   │   ├── types.mo
+│   │   │   │   ├── lib.mo (51 lines)
+│   │   │   │   ├── types.mo (18 lines)
 │   │   │   │   ├── v000_000_000/
-│   │   │   │   │   ├── lib.mo
-│   │   │   │   │   └── types.mo
+│   │   │   │   │   ├── lib.mo (15 lines)
+│   │   │   │   │   └── types.mo (13 lines)
 │   │   │   │   └── v000_001_000/
-│   │   │   │       ├── lib.mo
-│   │   │   │       └── types.mo
-│   │   │   └── service.mo
+│   │   │   │       ├── lib.mo (64 lines)
+│   │   │   │       └── types.mo (234 lines)
+│   │   │   └── service.mo (68 lines)
 │   │   ├── testActor/
-│   │   │   ├── fake.mo
-│   │   │   └── test_runner.mo
+│   │   │   ├── fake.mo (8 lines)
+│   │   │   └── test_runner.mo (702 lines)
 │   ├── icrc37-mo@0.4.2/
-│   │   ├── mops.toml
+│   │   ├── mops.toml (25 lines)
 │   │   ├── src/
-│   │   │   ├── lib.mo
+│   │   │   ├── lib.mo (1785 lines)
 │   │   │   ├── migrations/
-│   │   │   │   ├── lib.mo
-│   │   │   │   ├── types.mo
+│   │   │   │   ├── lib.mo (53 lines)
+│   │   │   │   ├── types.mo (25 lines)
 │   │   │   │   ├── v000_000_000/
-│   │   │   │   │   ├── lib.mo
-│   │   │   │   │   └── types.mo
+│   │   │   │   │   ├── lib.mo (13 lines)
+│   │   │   │   │   └── types.mo (13 lines)
 │   │   │   │   └── v000_001_000/
-│   │   │   │       ├── lib.mo
-│   │   │   │       └── types.mo
-│   │   │   └── service.mo
+│   │   │   │       ├── lib.mo (71 lines)
+│   │   │   │       └── types.mo (384 lines)
+│   │   │   └── service.mo (166 lines)
 │   ├── icrc7-mo@0.4.1/
 │   │   ├── example/
-│   │   │   └── main.mo
-│   │   ├── mops.toml
+│   │   │   └── main.mo (14 lines)
+│   │   ├── mops.toml (24 lines)
 │   │   ├── src/
-│   │   │   ├── lib.mo
+│   │   │   ├── lib.mo (1916 lines)
 │   │   │   ├── migrations/
-│   │   │   │   ├── lib.mo
-│   │   │   │   ├── types.mo
+│   │   │   │   ├── lib.mo (53 lines)
+│   │   │   │   ├── types.mo (35 lines)
 │   │   │   │   ├── v000_000_000/
-│   │   │   │   │   ├── lib.mo
-│   │   │   │   │   └── types.mo
+│   │   │   │   │   ├── lib.mo (13 lines)
+│   │   │   │   │   └── types.mo (13 lines)
 │   │   │   │   └── v000_001_000/
-│   │   │   │       ├── lib.mo
-│   │   │   │       └── types.mo
-│   │   │   └── service.mo
+│   │   │   │       ├── lib.mo (135 lines)
+│   │   │   │       └── types.mo (404 lines)
+│   │   │   └── service.mo (91 lines)
 │   ├── rep-indy-hash@0.1.1/
-│   │   ├── mops.toml
+│   │   ├── mops.toml (15 lines)
 │   │   ├── src/
-│   │   │   └── lib.mo
+│   │   │   └── lib.mo (116 lines)
 │   ├── sha2@0.0.5/
-│   │   ├── NOTICE
-│   │   ├── mops.toml
+│   │   ├── NOTICE (13 lines)
+│   │   ├── mops.toml (18 lines)
 │   │   ├── src/
-│   │   │   ├── Sha256.mo
-│   │   │   └── Sha512.mo
+│   │   │   ├── Sha256.mo (491 lines)
+│   │   │   └── Sha512.mo (588 lines)
 │   ├── test@2.0.0/
-│   │   ├── mops.toml
+│   │   ├── mops.toml (17 lines)
 │   │   ├── src/
-│   │   │   ├── async.mo
+│   │   │   ├── async.mo (31 lines)
 │   │   │   ├── expect/
-│   │   │   │   ├── async.mo
-│   │   │   │   ├── expect-array.mo
-│   │   │   │   ├── expect-blob.mo
-│   │   │   │   ├── expect-bool.mo
-│   │   │   │   ├── expect-call.mo
-│   │   │   │   ├── expect-char.mo
-│   │   │   │   ├── expect-int.mo
-│   │   │   │   ├── expect-int16.mo
-│   │   │   │   ├── expect-int32.mo
-│   │   │   │   ├── expect-int64.mo
-│   │   │   │   ├── expect-int8.mo
-│   │   │   │   ├── expect-nat.mo
-│   │   │   │   ├── expect-nat16.mo
-│   │   │   │   ├── expect-nat32.mo
-│   │   │   │   ├── expect-nat64.mo
-│   │   │   │   ├── expect-nat8.mo
-│   │   │   │   ├── expect-option.mo
-│   │   │   │   ├── expect-principal.mo
-│   │   │   │   ├── expect-result.mo
-│   │   │   │   ├── expect-text.mo
-│   │   │   │   ├── lib.mo
-│   │   │   │   └── utils.mo
-│   │   │   └── lib.mo
+│   │   │   │   ├── async.mo (8 lines)
+│   │   │   │   ├── expect-array.mo (63 lines)
+│   │   │   │   ├── expect-blob.mo (28 lines)
+│   │   │   │   ├── expect-bool.mo (27 lines)
+│   │   │   │   ├── expect-call.mo (34 lines)
+│   │   │   │   ├── expect-char.mo (15 lines)
+│   │   │   │   ├── expect-int.mo (13 lines)
+│   │   │   │   ├── expect-int16.mo (13 lines)
+│   │   │   │   ├── expect-int32.mo (13 lines)
+│   │   │   │   ├── expect-int64.mo (13 lines)
+│   │   │   │   ├── expect-int8.mo (13 lines)
+│   │   │   │   ├── expect-nat.mo (13 lines)
+│   │   │   │   ├── expect-nat16.mo (13 lines)
+│   │   │   │   ├── expect-nat32.mo (13 lines)
+│   │   │   │   ├── expect-nat64.mo (13 lines)
+│   │   │   │   ├── expect-nat8.mo (13 lines)
+│   │   │   │   ├── expect-option.mo (61 lines)
+│   │   │   │   ├── expect-principal.mo (28 lines)
+│   │   │   │   ├── expect-result.mo (30 lines)
+│   │   │   │   ├── expect-text.mo (18 lines)
+│   │   │   │   ├── lib.mo (44 lines)
+│   │   │   │   └── utils.mo (28 lines)
+│   │   │   └── lib.mo (28 lines)
 │   └── vector@0.4.0/
-│       ├── NOTICE
-│       ├── mops.toml
+│       ├── NOTICE (13 lines)
+│       ├── mops.toml (23 lines)
 │       ├── src/
-│       │   ├── Class.mo
-│       │   └── lib.mo
-├── Cargo.lock
-├── Cargo.toml
+│       │   ├── Class.mo (1055 lines)
+│       │   └── lib.mo (1739 lines)
+├── Cargo.lock (3186 lines)
+├── Cargo.toml (21 lines)
 ├── __mocks__/
-│   └── fileMock.js
-├── bundle-stats.json
-├── canister_ids.json
-├── components.json
+│   └── fileMock.js (2 lines)
+├── bundle-stats.json (4144700 lines)
+├── canister_ids.json (68 lines)
+├── components.json (18 lines)
 ├── coverage/
-│   ├── clover.xml
-│   ├── coverage-final.json
+│   ├── clover.xml (20 lines)
+│   ├── coverage-final.json (4 lines)
 │   ├── lcov-report/
-│   │   ├── Alert.tsx.html
-│   │   ├── Loading.tsx.html
-│   │   ├── base.css
-│   │   ├── block-navigation.js
-│   │   ├── favicon.png
-│   │   ├── index.html
-│   │   ├── prettify.css
-│   │   ├── prettify.js
-│   │   ├── sort-arrow-sprite.png
-│   │   └── sorter.js
-│   └── lcov.info
+│   │   ├── Alert.tsx.html (298 lines)
+│   │   ├── Loading.tsx.html (151 lines)
+│   │   ├── base.css (225 lines)
+│   │   ├── block-navigation.js (88 lines)
+│   │   ├── favicon.png (3 lines)
+│   │   ├── index.html (131 lines)
+│   │   ├── prettify.css (2 lines)
+│   │   ├── prettify.js (3 lines)
+│   │   ├── sort-arrow-sprite.png (3 lines)
+│   │   └── sorter.js (197 lines)
+│   └── lcov.info (37 lines)
 ├── deps/
 │   ├── candid/
-│   │   ├── rdmx6-jaaaa-aaaaa-aaadq-cai.did
-│   │   └── uf6dk-hyaaa-aaaaq-qaaaq-cai.did
-│   ├── init.json
-│   └── pulled.json
-├── dfx.json
-├── dfx_local.json
-├── dfx_mainnet.json
-├── ic-vetkd-utils-0.1.0.tgz
-├── jest.config.js
-├── jest.setup.js
-├── mops.toml
-├── postcss.config.js
+│   │   ├── rdmx6-jaaaa-aaaaa-aaadq-cai.did (808 lines)
+│   │   └── uf6dk-hyaaa-aaaaq-qaaaq-cai.did (84 lines)
+│   ├── init.json (12 lines)
+│   └── pulled.json (13 lines)
+├── dfx.json (152 lines)
+├── dfx_local.json (152 lines)
+├── dfx_mainnet.json (135 lines)
+├── ic-vetkd-utils-0.1.0.tgz (327 lines)
+├── jest.config.js (19 lines)
+├── jest.setup.js (15 lines)
+├── mops.toml (30 lines)
+├── postcss.config.js (9 lines)
 ├── scripts/
-│   ├── build.sh
-│   ├── icp_swap_argument.txt
-│   ├── kill_zombies.sh
-│   ├── network_deploy.sh
-│   ├── network_deploy_frontend.sh
-│   ├── old_readme.md
-│   ├── snapshot.sh
+│   ├── build.sh (282 lines)
+│   ├── icp_swap_argument.txt (130 lines)
+│   ├── kill_zombies.sh (67 lines)
+│   ├── network_deploy.sh (195 lines)
+│   ├── network_deploy_frontend.sh (41 lines)
+│   ├── old_readme.md (262 lines)
+│   ├── snapshot.sh (57 lines)
 │   ├── src/
 │   │   └── icp_swap_factory/
-│   │       └── icp_swap_factory.did
-│   ├── test.sh
-│   ├── testnet_migration.md
-│   ├── whitepaper.md
-├── shelf_scenario.sh
+│   │       └── icp_swap_factory.did (195 lines)
+│   ├── test.sh (26 lines)
+│   ├── testnet_migration.md (23 lines)
+│   ├── whitepaper.md (463 lines)
+├── shelf_item_scenario.sh (101 lines)
+├── shelf_order_test.sh (72 lines)
+├── shelf_scenario.sh (291 lines)
 ├── src/
 │   ├── alex_backend/
-│   │   ├── Cargo.toml
-│   │   ├── alex_backend.did
+│   │   ├── Cargo.toml (19 lines)
+│   │   ├── alex_backend.did (33 lines)
 │   │   └── src/
-│   │       ├── lib.rs
-│   │       ├── nft_users.rs
-│   │       ├── source_cards.rs
-│   │       └── wallet_keys.rs
+│   │       ├── lib.rs (38 lines)
+│   │       ├── nft_users.rs (146 lines)
+│   │       ├── source_cards.rs (107 lines)
+│   │       └── wallet_keys.rs (173 lines)
 │   ├── alex_frontend/
 │   │   ├── src/
-│   │   │   ├── App.tsx
+│   │   │   ├── App.tsx (42 lines)
 │   │   │   ├── __tests__/
 │   │   │   │   ├── apps/
-│   │   │   │   │   ├── searchResults.test.tsx
+│   │   │   │   │   ├── searchResults.test.tsx (421 lines)
 │   │   │   │   ├── integration/
-│   │   │   │   │   └── ShelfReordering.test.tsx
-│   │   │   │   ├── setup.ts
+│   │   │   │   │   └── ShelfReordering.test.tsx (191 lines)
+│   │   │   │   ├── setup.ts (31 lines)
 │   │   │   │   ├── state/
-│   │   │   │   │   ├── libraryState.test.ts
-│   │   │   │   │   ├── perpetuaThunks.test.ts
-│   │   │   │   │   ├── transactionState.test.ts
-│   │   │   │   │   ├── wiper.test.tsx
-│   │   │   │   ├── tests.md
+│   │   │   │   │   ├── libraryState.test.ts (346 lines)
+│   │   │   │   │   ├── perpetuaThunks.test.ts (394 lines)
+│   │   │   │   │   ├── transactionState.test.ts (687 lines)
+│   │   │   │   │   ├── wiper.test.tsx (198 lines)
+│   │   │   │   ├── tests.md (118 lines)
 │   │   │   ├── actors/
-│   │   │   │   ├── AlexActor.tsx
-│   │   │   │   ├── AlexBackendActor.tsx
-│   │   │   │   ├── AlexWalletActor.tsx
-│   │   │   │   ├── AssetCanisterActor.tsx
-│   │   │   │   ├── AssetManagerActor.tsx
-│   │   │   │   ├── IcpLedgerActor.tsx
-│   │   │   │   ├── IcpSwapActor.tsx
-│   │   │   │   ├── Icrc7Actor.tsx
-│   │   │   │   ├── Icrc7ScionActor.tsx
-│   │   │   │   ├── LbryActor.tsx
-│   │   │   │   ├── NftManagerActor.tsx
-│   │   │   │   ├── PerpetuaActor.tsx
-│   │   │   │   ├── TokenomicsActor.tsx
-│   │   │   │   ├── UserActor.tsx
-│   │   │   │   ├── VetkdActor.tsx
-│   │   │   │   └── index.tsx
+│   │   │   │   ├── AlexActor.tsx (36 lines)
+│   │   │   │   ├── AlexBackendActor.tsx (35 lines)
+│   │   │   │   ├── AlexWalletActor.tsx (36 lines)
+│   │   │   │   ├── AssetCanisterActor.tsx (36 lines)
+│   │   │   │   ├── AssetManagerActor.tsx (36 lines)
+│   │   │   │   ├── IcpLedgerActor.tsx (36 lines)
+│   │   │   │   ├── IcpSwapActor.tsx (36 lines)
+│   │   │   │   ├── Icrc7Actor.tsx (36 lines)
+│   │   │   │   ├── Icrc7ScionActor.tsx (36 lines)
+│   │   │   │   ├── LbryActor.tsx (34 lines)
+│   │   │   │   ├── NftManagerActor.tsx (36 lines)
+│   │   │   │   ├── PerpetuaActor.tsx (35 lines)
+│   │   │   │   ├── TokenomicsActor.tsx (36 lines)
+│   │   │   │   ├── UserActor.tsx (36 lines)
+│   │   │   │   ├── VetkdActor.tsx (36 lines)
+│   │   │   │   └── index.tsx (15 lines)
 │   │   │   ├── apps/
 │   │   │   │   ├── Modules/
 │   │   │   │   │   ├── AppModules/
 │   │   │   │   │   │   ├── alexandrian/
 │   │   │   │   │   │   │   └── services/
 │   │   │   │   │   │   ├── blinks/
-│   │   │   │   │   │   │   └── SingleTokenView.tsx
+│   │   │   │   │   │   │   └── SingleTokenView.tsx (412 lines)
 │   │   │   │   │   │   ├── contentGrid/
-│   │   │   │   │   │   │   ├── Card.tsx
-│   │   │   │   │   │   │   ├── Grid.tsx
+│   │   │   │   │   │   │   ├── Card.tsx (229 lines)
+│   │   │   │   │   │   │   ├── Grid.tsx (230 lines)
 │   │   │   │   │   │   │   ├── components/
-│   │   │   │   │   │   │   │   ├── NftDataFooter.tsx
-│   │   │   │   │   │   │   │   └── TransactionDetails.tsx
+│   │   │   │   │   │   │   │   ├── NftDataFooter.tsx (192 lines)
+│   │   │   │   │   │   │   │   └── TransactionDetails.tsx (103 lines)
 │   │   │   │   │   │   │   └── utils/
-│   │   │   │   │   │   │       ├── clipboard.ts
-│   │   │   │   │   │   │       └── formatters.ts
+│   │   │   │   │   │   │       ├── clipboard.ts (9 lines)
+│   │   │   │   │   │   │       └── formatters.ts (54 lines)
 │   │   │   │   │   │   ├── permasearch/
 │   │   │   │   │   │   │   └── services/
 │   │   │   │   │   │   ├── safeRender/
-│   │   │   │   │   │   │   ├── ContentFetcher.tsx
-│   │   │   │   │   │   │   ├── ContentRenderer.tsx
-│   │   │   │   │   │   │   ├── ContentTypeMap.tsx
-│   │   │   │   │   │   │   ├── ContentValidator.tsx
-│   │   │   │   │   │   │   ├── SandboxRenderer.tsx
-│   │   │   │   │   │   │   ├── fileIcons.tsx
+│   │   │   │   │   │   │   ├── ContentFetcher.tsx (89 lines)
+│   │   │   │   │   │   │   ├── ContentRenderer.tsx (69 lines)
+│   │   │   │   │   │   │   ├── ContentTypeMap.tsx (458 lines)
+│   │   │   │   │   │   │   ├── ContentValidator.tsx (129 lines)
+│   │   │   │   │   │   │   ├── SandboxRenderer.tsx (35 lines)
+│   │   │   │   │   │   │   ├── fileIcons.tsx (12 lines)
 │   │   │   │   │   │   │   └── types/
-│   │   │   │   │   │   │       └── index.ts
+│   │   │   │   │   │   │       └── index.ts (27 lines)
 │   │   │   │   │   │   └── search/
-│   │   │   │   │   │       ├── NsfwSelector.tsx
-│   │   │   │   │   │       ├── SearchForm.tsx
+│   │   │   │   │   │       ├── NsfwSelector.tsx (72 lines)
+│   │   │   │   │   │       ├── SearchForm.tsx (37 lines)
 │   │   │   │   │   │       ├── hooks/
-│   │   │   │   │   │       │   └── useSearchHandlers.ts
+│   │   │   │   │   │       │   └── useSearchHandlers.ts (52 lines)
 │   │   │   │   │   │       └── selectors/
-│   │   │   │   │   │           ├── AmountSelector.tsx
-│   │   │   │   │   │           ├── ArweaveOwnerSelector.tsx
-│   │   │   │   │   │           ├── ContentCategorySelector.tsx
-│   │   │   │   │   │           ├── ContentTagsSelector.tsx
-│   │   │   │   │   │           └── DateSelector.tsx
+│   │   │   │   │   │           ├── AmountSelector.tsx (44 lines)
+│   │   │   │   │   │           ├── ArweaveOwnerSelector.tsx (48 lines)
+│   │   │   │   │   │           ├── ContentCategorySelector.tsx (48 lines)
+│   │   │   │   │   │           ├── ContentTagsSelector.tsx (168 lines)
+│   │   │   │   │   │           └── DateSelector.tsx (177 lines)
 │   │   │   │   │   ├── LibModules/
 │   │   │   │   │   │   ├── arweaveSearch/
 │   │   │   │   │   │   │   ├── api/
-│   │   │   │   │   │   │   │   ├── arweaveApi.ts
-│   │   │   │   │   │   │   │   ├── arweaveClient.ts
-│   │   │   │   │   │   │   │   ├── arweaveHelpers.ts
-│   │   │   │   │   │   │   │   ├── directArweaveClient.ts
-│   │   │   │   │   │   │   │   └── singleTransactionClient.ts
+│   │   │   │   │   │   │   │   ├── arweaveApi.ts (94 lines)
+│   │   │   │   │   │   │   │   ├── arweaveClient.ts (227 lines)
+│   │   │   │   │   │   │   │   ├── arweaveHelpers.ts (42 lines)
+│   │   │   │   │   │   │   │   ├── directArweaveClient.ts (80 lines)
+│   │   │   │   │   │   │   │   └── singleTransactionClient.ts (44 lines)
 │   │   │   │   │   │   │   ├── config/
-│   │   │   │   │   │   │   │   └── arweaveConfig.ts
+│   │   │   │   │   │   │   │   └── arweaveConfig.ts (9 lines)
 │   │   │   │   │   │   │   └── types/
-│   │   │   │   │   │   │       └── tensorflow.ts
+│   │   │   │   │   │   │       └── tensorflow.ts (18 lines)
 │   │   │   │   │   │   ├── contentDisplay/
 │   │   │   │   │   │   │   ├── services/
-│   │   │   │   │   │   │   │   └── contentService.ts
-│   │   │   │   │   │   │   └── types.ts
+│   │   │   │   │   │   │   │   └── contentService.ts (151 lines)
+│   │   │   │   │   │   │   └── types.ts (22 lines)
 │   │   │   │   │   │   └── nftSearch/
-│   │   │   │   │   │       ├── PrincipalSelector.tsx
-│   │   │   │   │   │       ├── collectionSelector.tsx
-│   │   │   │   │   │       ├── index.tsx
-│   │   │   │   │   │       ├── librarySearch.tsx
-│   │   │   │   │   │       └── tagSelector.tsx
+│   │   │   │   │   │       ├── PrincipalSelector.tsx (323 lines)
+│   │   │   │   │   │       ├── collectionSelector.tsx (57 lines)
+│   │   │   │   │   │       ├── index.tsx (57 lines)
+│   │   │   │   │   │       ├── librarySearch.tsx (274 lines)
+│   │   │   │   │   │       └── tagSelector.tsx (147 lines)
 │   │   │   │   │   └── shared/
 │   │   │   │   │       ├── adapters/
-│   │   │   │   │       │   └── TokenAdapter.ts
+│   │   │   │   │       │   └── TokenAdapter.ts (179 lines)
 │   │   │   │   │       ├── components/
-│   │   │   │   │       │   ├── AssetManager.tsx
-│   │   │   │   │       │   ├── ContentTypeToggleGroup.tsx
+│   │   │   │   │       │   ├── AssetManager.tsx (127 lines)
+│   │   │   │   │       │   ├── ContentTypeToggleGroup.tsx (45 lines)
 │   │   │   │   │       │   ├── NftDisplay/
-│   │   │   │   │       │   │   ├── NftDisplay.tsx
-│   │   │   │   │       │   │   ├── NftFooter.tsx
-│   │   │   │   │       │   │   ├── index.tsx
-│   │   │   │   │       │   │   └── types.ts
-│   │   │   │   │       │   ├── PrincipalDisplay.tsx
-│   │   │   │   │       │   ├── SearchContainer.tsx
-│   │   │   │   │       │   ├── TensorFlowPreloader.tsx
-│   │   │   │   │       │   └── TopupBalanceWarning.tsx
+│   │   │   │   │       │   │   ├── NftDisplay.tsx (364 lines)
+│   │   │   │   │       │   │   ├── NftFooter.tsx (153 lines)
+│   │   │   │   │       │   │   ├── index.tsx (15 lines)
+│   │   │   │   │       │   │   └── types.ts (44 lines)
+│   │   │   │   │       │   ├── PrincipalDisplay.tsx (38 lines)
+│   │   │   │   │       │   ├── SearchContainer.tsx (169 lines)
+│   │   │   │   │       │   ├── TensorFlowPreloader.tsx (92 lines)
+│   │   │   │   │       │   └── TopupBalanceWarning.tsx (44 lines)
 │   │   │   │   │       ├── hooks/
-│   │   │   │   │       │   ├── getNftData.ts
-│   │   │   │   │       │   ├── index.ts
-│   │   │   │   │       │   └── useAuth.ts
+│   │   │   │   │       │   ├── getNftData.ts (94 lines)
+│   │   │   │   │       │   ├── index.ts (8 lines)
+│   │   │   │   │       │   └── useAuth.ts (10 lines)
 │   │   │   │   │       ├── services/
-│   │   │   │   │       │   ├── contentCacheService.ts
-│   │   │   │   │       │   ├── contentValidation.ts
-│   │   │   │   │       │   ├── nsfwService.ts
-│   │   │   │   │       │   ├── nullTensorflow.ts
-│   │   │   │   │       │   ├── tensorflowLoader.ts
-│   │   │   │   │       │   └── transactionService.ts
+│   │   │   │   │       │   ├── contentCacheService.ts (233 lines)
+│   │   │   │   │       │   ├── contentValidation.ts (10 lines)
+│   │   │   │   │       │   ├── nsfwService.ts (285 lines)
+│   │   │   │   │       │   ├── nullTensorflow.ts (30 lines)
+│   │   │   │   │       │   ├── tensorflowLoader.ts (112 lines)
+│   │   │   │   │       │   └── transactionService.ts (299 lines)
 │   │   │   │   │       ├── state/
 │   │   │   │   │       │   ├── arweave/
-│   │   │   │   │       │   │   ├── arweaveSlice.ts
-│   │   │   │   │       │   │   └── arweaveThunks.ts
+│   │   │   │   │       │   │   ├── arweaveSlice.ts (78 lines)
+│   │   │   │   │       │   │   └── arweaveThunks.ts (113 lines)
 │   │   │   │   │       │   ├── assetManager/
-│   │   │   │   │       │   │   ├── assetManagerSlice.ts
-│   │   │   │   │       │   │   ├── assetManagerThunks.ts
-│   │   │   │   │       │   │   ├── uploadToAssetCanister.tsx
-│   │   │   │   │       │   │   └── utlis.ts
+│   │   │   │   │       │   │   ├── assetManagerSlice.ts (127 lines)
+│   │   │   │   │       │   │   ├── assetManagerThunks.ts (422 lines)
+│   │   │   │   │       │   │   ├── uploadToAssetCanister.tsx (261 lines)
+│   │   │   │   │       │   │   └── utlis.ts (23 lines)
 │   │   │   │   │       │   ├── content/
-│   │   │   │   │       │   │   └── contentSortUtils.ts
+│   │   │   │   │       │   │   └── contentSortUtils.ts (57 lines)
 │   │   │   │   │       │   ├── librarySearch/
-│   │   │   │   │       │   │   ├── librarySlice.ts
-│   │   │   │   │       │   │   └── libraryThunks.ts
+│   │   │   │   │       │   │   ├── librarySlice.ts (127 lines)
+│   │   │   │   │       │   │   └── libraryThunks.ts (231 lines)
 │   │   │   │   │       │   ├── nftData/
-│   │   │   │   │       │   │   ├── nftDataSlice.ts
-│   │   │   │   │       │   │   └── nftDataThunks.ts
+│   │   │   │   │       │   │   ├── nftDataSlice.ts (87 lines)
+│   │   │   │   │       │   │   └── nftDataThunks.ts (750 lines)
 │   │   │   │   │       │   ├── transactions/
-│   │   │   │   │       │   │   ├── transactionSlice.ts
-│   │   │   │   │       │   │   ├── transactionSortUtils.ts
-│   │   │   │   │       │   │   └── transactionThunks.ts
-│   │   │   │   │       │   └── wiper.ts
+│   │   │   │   │       │   │   ├── transactionSlice.ts (129 lines)
+│   │   │   │   │       │   │   ├── transactionSortUtils.ts (30 lines)
+│   │   │   │   │       │   │   └── transactionThunks.ts (250 lines)
+│   │   │   │   │       │   └── wiper.ts (115 lines)
 │   │   │   │   │       ├── types/
-│   │   │   │   │       │   ├── content.ts
-│   │   │   │   │       │   ├── files.ts
-│   │   │   │   │       │   ├── nft.ts
-│   │   │   │   │       │   └── queries.ts
+│   │   │   │   │       │   ├── content.ts (25 lines)
+│   │   │   │   │       │   ├── files.ts (81 lines)
+│   │   │   │   │       │   ├── nft.ts (17 lines)
+│   │   │   │   │       │   └── queries.ts (59 lines)
 │   │   │   │   │       └── utils/
-│   │   │   │   │           ├── nftOwner.ts
-│   │   │   │   │           ├── principalUtils.ts
-│   │   │   │   │           └── tokenUtils.ts
+│   │   │   │   │           ├── nftOwner.ts (60 lines)
+│   │   │   │   │           ├── principalUtils.ts (21 lines)
+│   │   │   │   │           └── tokenUtils.ts (45 lines)
 │   │   │   │   └── app/
 │   │   │   │       ├── Alexandrian/
-│   │   │   │       │   └── index.tsx
+│   │   │   │       │   └── index.tsx (95 lines)
 │   │   │   │       ├── Bibliotheca/
-│   │   │   │       │   └── index.tsx
+│   │   │   │       │   └── index.tsx (6 lines)
 │   │   │   │       ├── Dialectica/
 │   │   │   │       │   ├── components/
-│   │   │   │       │   │   └── EmporiumSearch.tsx
-│   │   │   │       │   └── index.tsx
+│   │   │   │       │   │   └── EmporiumSearch.tsx (88 lines)
+│   │   │   │       │   └── index.tsx (108 lines)
 │   │   │   │       ├── Emporium/
-│   │   │   │       │   ├── combineModal.tsx
+│   │   │   │       │   ├── combineModal.tsx (223 lines)
 │   │   │   │       │   ├── component/
-│   │   │   │       │   │   ├── PaginationComponent.tsx
-│   │   │   │       │   │   ├── emporiumLogs.tsx
-│   │   │   │       │   │   ├── emporiumPageSizeSelector.tsx
-│   │   │   │       │   │   ├── emporiumSearchForm.tsx
-│   │   │   │       │   │   ├── navigationButtons.tsx
-│   │   │   │       │   │   ├── priceSort.tsx
-│   │   │   │       │   │   ├── searchEmporium.tsx
-│   │   │   │       │   │   ├── style.css
-│   │   │   │       │   │   └── userEmporiumLogs.tsx
-│   │   │   │       │   ├── contentListEmporium.tsx
-│   │   │   │       │   ├── emporiumSlice.ts
-│   │   │   │       │   ├── index.tsx
-│   │   │   │       │   ├── overlay.tsx
-│   │   │   │       │   ├── plan.md
-│   │   │   │       │   ├── styles.ts
+│   │   │   │       │   │   ├── PaginationComponent.tsx (35 lines)
+│   │   │   │       │   │   ├── emporiumLogs.tsx (134 lines)
+│   │   │   │       │   │   ├── emporiumPageSizeSelector.tsx (54 lines)
+│   │   │   │       │   │   ├── emporiumSearchForm.tsx (78 lines)
+│   │   │   │       │   │   ├── navigationButtons.tsx (32 lines)
+│   │   │   │       │   │   ├── priceSort.tsx (68 lines)
+│   │   │   │       │   │   ├── searchEmporium.tsx (74 lines)
+│   │   │   │       │   │   ├── style.css (35 lines)
+│   │   │   │       │   │   └── userEmporiumLogs.tsx (121 lines)
+│   │   │   │       │   ├── contentListEmporium.tsx (271 lines)
+│   │   │   │       │   ├── emporiumSlice.ts (234 lines)
+│   │   │   │       │   ├── index.tsx (294 lines)
+│   │   │   │       │   ├── overlay.tsx (92 lines)
+│   │   │   │       │   ├── plan.md (12 lines)
+│   │   │   │       │   ├── styles.ts (195 lines)
 │   │   │   │       │   ├── thunks/
-│   │   │   │       │   │   ├── buyNft.ts
-│   │   │   │       │   │   ├── editListing.ts
-│   │   │   │       │   │   ├── getEmporiumMarketLogs.tsx
-│   │   │   │       │   │   ├── getMarketListing.ts
-│   │   │   │       │   │   ├── getUserIcrc7Tokens.ts
-│   │   │   │       │   │   ├── getUserLog.ts
-│   │   │   │       │   │   ├── listNft.ts
-│   │   │   │       │   │   └── removeListedNft.ts
-│   │   │   │       │   └── utlis.ts
+│   │   │   │       │   │   ├── buyNft.ts (84 lines)
+│   │   │   │       │   │   ├── editListing.ts (43 lines)
+│   │   │   │       │   │   ├── getEmporiumMarketLogs.tsx (45 lines)
+│   │   │   │       │   │   ├── getMarketListing.ts (144 lines)
+│   │   │   │       │   │   ├── getUserIcrc7Tokens.ts (66 lines)
+│   │   │   │       │   │   ├── getUserLog.ts (52 lines)
+│   │   │   │       │   │   ├── listNft.ts (88 lines)
+│   │   │   │       │   │   └── removeListedNft.ts (41 lines)
+│   │   │   │       │   └── utlis.ts (78 lines)
 │   │   │   │       ├── Permasearch/
-│   │   │   │       │   ├── index.tsx
-│   │   │   │       │   ├── queryplan.md
-│   │   │   │       │   └── styles.ts
+│   │   │   │       │   ├── index.tsx (159 lines)
+│   │   │   │       │   ├── queryplan.md (36 lines)
+│   │   │   │       │   └── styles.ts (175 lines)
 │   │   │   │       ├── Perpetua/
 │   │   │   │       │   ├── features/
 │   │   │   │       │   │   ├── cards/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx
-│   │   │   │       │   │   │   │   ├── ContentDisplays.tsx
-│   │   │   │       │   │   │   │   ├── NftDisplay.tsx
-│   │   │   │       │   │   │   │   ├── ShelfCard.tsx
-│   │   │   │       │   │   │   │   ├── ShelfCardActionMenu.tsx
-│   │   │   │       │   │   │   │   ├── ShelfDetailView.tsx
-│   │   │   │       │   │   │   │   └── index.ts
+│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx (407 lines)
+│   │   │   │       │   │   │   │   ├── ContentDisplays.tsx (120 lines)
+│   │   │   │       │   │   │   │   ├── NftDisplay.tsx (350 lines)
+│   │   │   │       │   │   │   │   ├── ShelfCard.tsx (162 lines)
+│   │   │   │       │   │   │   │   ├── ShelfCardActionMenu.tsx (173 lines)
+│   │   │   │       │   │   │   │   ├── ShelfDetailView.tsx (624 lines)
+│   │   │   │       │   │   │   │   └── index.ts (1 lines)
 │   │   │   │       │   │   │   ├── containers/
-│   │   │   │       │   │   │   │   ├── ShelfLists.tsx
-│   │   │   │       │   │   │   │   └── index.ts
-│   │   │   │       │   │   │   ├── index.ts
+│   │   │   │       │   │   │   │   ├── ShelfLists.tsx (226 lines)
+│   │   │   │       │   │   │   │   └── index.ts (1 lines)
+│   │   │   │       │   │   │   ├── index.ts (10 lines)
 │   │   │   │       │   │   │   └── types/
-│   │   │   │       │   │   │       ├── index.ts
-│   │   │   │       │   │   │       └── types.ts
+│   │   │   │       │   │   │       ├── index.ts (1 lines)
+│   │   │   │       │   │   │       └── types.ts (60 lines)
 │   │   │   │       │   │   ├── items/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── AddToShelfDialog.tsx
-│   │   │   │       │   │   │   │   ├── ItemActionMenu.tsx
-│   │   │   │       │   │   │   │   ├── ItemReorderManager.tsx
-│   │   │   │       │   │   │   │   ├── NewItem.tsx
-│   │   │   │       │   │   │   │   ├── NftSearch.tsx
-│   │   │   │       │   │   │   │   └── index.ts
+│   │   │   │       │   │   │   │   ├── AddToShelfDialog.tsx (170 lines)
+│   │   │   │       │   │   │   │   ├── ItemActionMenu.tsx (61 lines)
+│   │   │   │       │   │   │   │   ├── ItemReorderManager.tsx (61 lines)
+│   │   │   │       │   │   │   │   ├── NewItem.tsx (358 lines)
+│   │   │   │       │   │   │   │   ├── NftSearch.tsx (270 lines)
+│   │   │   │       │   │   │   │   └── index.ts (2 lines)
 │   │   │   │       │   │   │   ├── hooks/
-│   │   │   │       │   │   │   │   ├── index.ts
-│   │   │   │       │   │   │   │   ├── useItemActions.tsx
-│   │   │   │       │   │   │   │   └── useItemReordering.ts
-│   │   │   │       │   │   │   └── index.ts
+│   │   │   │       │   │   │   │   ├── index.ts (2 lines)
+│   │   │   │       │   │   │   │   ├── useItemActions.tsx (104 lines)
+│   │   │   │       │   │   │   │   └── useItemReordering.ts (73 lines)
+│   │   │   │       │   │   │   └── index.ts (2 lines)
 │   │   │   │       │   │   ├── shared/
 │   │   │   │       │   │   │   └── hooks/
-│   │   │   │       │   │   │       └── useReorderable.ts
+│   │   │   │       │   │   │       └── useReorderable.ts (267 lines)
 │   │   │   │       │   │   ├── shelf-collaboration/
 │   │   │   │       │   │   │   └── components/
-│   │   │   │       │   │   │       └── CollaboratorsList.tsx
+│   │   │   │       │   │   │       └── CollaboratorsList.tsx (177 lines)
 │   │   │   │       │   │   ├── shelf-management/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── NewShelf.tsx
-│   │   │   │       │   │   │   │   ├── RemoveItemButton.tsx
-│   │   │   │       │   │   │   │   ├── ShelfContent.tsx
-│   │   │   │       │   │   │   │   ├── ShelfOption.tsx
-│   │   │   │       │   │   │   │   ├── ShelfSelectionDialog.tsx
-│   │   │   │       │   │   │   │   └── index.ts
+│   │   │   │       │   │   │   │   ├── NewShelf.tsx (97 lines)
+│   │   │   │       │   │   │   │   ├── RemoveItemButton.tsx (110 lines)
+│   │   │   │       │   │   │   │   ├── ShelfContent.tsx (80 lines)
+│   │   │   │       │   │   │   │   ├── ShelfOption.tsx (30 lines)
+│   │   │   │       │   │   │   │   ├── ShelfSelectionDialog.tsx (134 lines)
+│   │   │   │       │   │   │   │   └── index.ts (5 lines)
 │   │   │   │       │   │   │   ├── containers/
-│   │   │   │       │   │   │   │   └── ShelfDetailContainer.tsx
+│   │   │   │       │   │   │   │   └── ShelfDetailContainer.tsx (143 lines)
 │   │   │   │       │   │   │   ├── hooks/
-│   │   │   │       │   │   │   │   ├── index.ts
-│   │   │   │       │   │   │   │   ├── useAddToShelf.ts
-│   │   │   │       │   │   │   │   ├── usePublicShelfOperations.ts
-│   │   │   │       │   │   │   │   ├── useShelfOperations.ts
-│   │   │   │       │   │   │   │   └── useShelfReordering.ts
-│   │   │   │       │   │   │   ├── index.ts
+│   │   │   │       │   │   │   │   ├── index.ts (4 lines)
+│   │   │   │       │   │   │   │   ├── useAddToShelf.ts (106 lines)
+│   │   │   │       │   │   │   │   ├── usePublicShelfOperations.ts (61 lines)
+│   │   │   │       │   │   │   │   ├── useShelfOperations.ts (152 lines)
+│   │   │   │       │   │   │   │   └── useShelfReordering.ts (106 lines)
+│   │   │   │       │   │   │   ├── index.ts (3 lines)
 │   │   │   │       │   │   │   └── types/
-│   │   │   │       │   │   │       └── index.ts
+│   │   │   │       │   │   │       └── index.ts (27 lines)
 │   │   │   │       │   │   └── shelf-settings/
 │   │   │   │       │   │       ├── components/
-│   │   │   │       │   │       │   ├── ShelfMetricsDisplay.tsx
-│   │   │   │       │   │       │   ├── ShelfSettings.tsx
-│   │   │   │       │   │       │   ├── ShelfSettingsDialog.tsx
-│   │   │   │       │   │       │   └── index.ts
+│   │   │   │       │   │       │   ├── ShelfMetricsDisplay.tsx (143 lines)
+│   │   │   │       │   │       │   ├── ShelfSettings.tsx (120 lines)
+│   │   │   │       │   │       │   ├── ShelfSettingsDialog.tsx (132 lines)
+│   │   │   │       │   │       │   └── index.ts (3 lines)
 │   │   │   │       │   │       ├── hooks/
-│   │   │   │       │   │       │   ├── index.ts
-│   │   │   │       │   │       │   ├── useShelfMetadata.ts
-│   │   │   │       │   │       │   └── useShelfMetrics.ts
-│   │   │   │       │   │       ├── index.ts
+│   │   │   │       │   │       │   ├── index.ts (2 lines)
+│   │   │   │       │   │       │   ├── useShelfMetadata.ts (34 lines)
+│   │   │   │       │   │       │   └── useShelfMetrics.ts (40 lines)
+│   │   │   │       │   │       ├── index.ts (3 lines)
 │   │   │   │       │   │       └── utils/
-│   │   │   │       │   │           └── index.ts
+│   │   │   │       │   │           └── index.ts (2 lines)
 │   │   │   │       │   ├── hooks/
-│   │   │   │       │   │   ├── index.ts
-│   │   │   │       │   │   └── useContentPermissions.ts
-│   │   │   │       │   ├── index.tsx
+│   │   │   │       │   │   ├── index.ts (1 lines)
+│   │   │   │       │   │   └── useContentPermissions.ts (75 lines)
+│   │   │   │       │   ├── index.tsx (17 lines)
 │   │   │   │       │   ├── layouts/
-│   │   │   │       │   │   ├── PerpetuaLayout.tsx
-│   │   │   │       │   │   └── index.ts
-│   │   │   │       │   ├── routes.ts
+│   │   │   │       │   │   ├── PerpetuaLayout.tsx (214 lines)
+│   │   │   │       │   │   └── index.ts (1 lines)
+│   │   │   │       │   ├── routes.ts (119 lines)
 │   │   │   │       │   ├── state/
 │   │   │   │       │   │   ├── cache/
-│   │   │   │       │   │   │   └── ShelvesCache.ts
+│   │   │   │       │   │   │   └── ShelvesCache.ts (209 lines)
 │   │   │   │       │   │   ├── hooks/
-│   │   │   │       │   │   │   ├── index.ts
-│   │   │   │       │   │   │   ├── usePerpetuaActions.ts
-│   │   │   │       │   │   │   └── usePerpetuaSelectors.ts
-│   │   │   │       │   │   ├── index.ts
-│   │   │   │       │   │   ├── perpetuaSlice.ts
+│   │   │   │       │   │   │   ├── index.ts (3 lines)
+│   │   │   │       │   │   │   ├── usePerpetuaActions.ts (119 lines)
+│   │   │   │       │   │   │   └── usePerpetuaSelectors.ts (61 lines)
+│   │   │   │       │   │   ├── index.ts (47 lines)
+│   │   │   │       │   │   ├── perpetuaSlice.ts (343 lines)
 │   │   │   │       │   │   ├── services/
-│   │   │   │       │   │   │   └── perpetuaService.ts
+│   │   │   │       │   │   │   └── perpetuaService.ts (419 lines)
 │   │   │   │       │   │   ├── thunks/
-│   │   │   │       │   │   │   ├── collaborationThunks.ts
-│   │   │   │       │   │   │   ├── index.ts
-│   │   │   │       │   │   │   ├── itemThunks.ts
-│   │   │   │       │   │   │   ├── queryThunks.ts
-│   │   │   │       │   │   │   ├── reorderThunks.ts
-│   │   │   │       │   │   │   └── shelfThunks.ts
+│   │   │   │       │   │   │   ├── collaborationThunks.ts (128 lines)
+│   │   │   │       │   │   │   ├── index.ts (6 lines)
+│   │   │   │       │   │   │   ├── itemThunks.ts (94 lines)
+│   │   │   │       │   │   │   ├── queryThunks.ts (155 lines)
+│   │   │   │       │   │   │   ├── reorderThunks.ts (129 lines)
+│   │   │   │       │   │   │   └── shelfThunks.ts (157 lines)
 │   │   │   │       │   │   ├── utils/
-│   │   │   │       │   └── utils.tsx
+│   │   │   │       │   └── utils.tsx (136 lines)
 │   │   │   │       └── Syllogos/
-│   │   │   │           └── index.tsx
+│   │   │   │           └── index.tsx (27 lines)
 │   │   │   ├── components/
-│   │   │   │   ├── Alert.tsx
-│   │   │   │   ├── BookModal.tsx
+│   │   │   │   ├── Alert.tsx (72 lines)
+│   │   │   │   ├── BookModal.tsx (30 lines)
 │   │   │   │   ├── CanisterCard/
-│   │   │   │   │   ├── CanisterCardSkeleton.tsx
-│   │   │   │   │   ├── CanisterView.tsx
-│   │   │   │   │   ├── NonCanisterView.tsx
-│   │   │   │   │   └── index.tsx
-│   │   │   │   ├── Copy.tsx
-│   │   │   │   ├── ErrorBoundary.tsx
-│   │   │   │   ├── ErrorFallback.tsx
+│   │   │   │   │   ├── CanisterCardSkeleton.tsx (32 lines)
+│   │   │   │   │   ├── CanisterView.tsx (51 lines)
+│   │   │   │   │   ├── NonCanisterView.tsx (35 lines)
+│   │   │   │   │   └── index.tsx (35 lines)
+│   │   │   │   ├── Copy.tsx (43 lines)
+│   │   │   │   ├── ErrorBoundary.tsx (37 lines)
+│   │   │   │   ├── ErrorFallback.tsx (25 lines)
 │   │   │   │   ├── LibrarianCard/
-│   │   │   │   │   ├── LibrarianView.tsx
-│   │   │   │   │   ├── NonLibrarianView.tsx
-│   │   │   │   │   └── index.tsx
-│   │   │   │   ├── Loading.tsx
-│   │   │   │   ├── Logo.tsx
-│   │   │   │   ├── MarkdownRenderer.tsx
-│   │   │   │   ├── Processing.tsx
+│   │   │   │   │   ├── LibrarianView.tsx (26 lines)
+│   │   │   │   │   ├── NonLibrarianView.tsx (30 lines)
+│   │   │   │   │   └── index.tsx (27 lines)
+│   │   │   │   ├── Loading.tsx (23 lines)
+│   │   │   │   ├── Logo.tsx (47 lines)
+│   │   │   │   ├── MarkdownRenderer.tsx (172 lines)
+│   │   │   │   ├── Processing.tsx (15 lines)
 │   │   │   │   ├── Read/
-│   │   │   │   │   └── index.tsx
-│   │   │   │   ├── RiskWarningModal.tsx
-│   │   │   │   ├── Tabs.tsx
-│   │   │   │   ├── TopProgressBar.tsx
+│   │   │   │   │   └── index.tsx (24 lines)
+│   │   │   │   ├── RiskWarningModal.tsx (46 lines)
+│   │   │   │   ├── Tabs.tsx (235 lines)
+│   │   │   │   ├── TopProgressBar.tsx (16 lines)
 │   │   │   │   └── ui/
 │   │   │   ├── contexts/
-│   │   │   │   ├── AuthContext.tsx
-│   │   │   │   ├── KeysContext.tsx
-│   │   │   │   ├── SessionContext.tsx
+│   │   │   │   ├── AuthContext.tsx (15 lines)
+│   │   │   │   ├── KeysContext.tsx (29 lines)
+│   │   │   │   ├── SessionContext.tsx (14 lines)
 │   │   │   │   └── actors/
-│   │   │   │       ├── AlexBackendContext.tsx
-│   │   │   │       ├── AlexContext.tsx
-│   │   │   │       ├── AlexWalletContext.tsx
-│   │   │   │       ├── AssetCanisterContext.tsx
-│   │   │   │       ├── AssetManagerContext.tsx
-│   │   │   │       ├── EmporiumContext.tsx
-│   │   │   │       ├── IcpLedgerContext.tsx
-│   │   │   │       ├── IcpSwapContext.tsx
-│   │   │   │       ├── Icrc7Context.tsx
-│   │   │   │       ├── Icrc7ScionContext.tsx
-│   │   │   │       ├── LbryContext.tsx
-│   │   │   │       ├── NftManagerContext.tsx
-│   │   │   │       ├── PerpetuaContext.tsx
-│   │   │   │       ├── TokenomicsContext.tsx
-│   │   │   │       ├── UserContext.tsx
-│   │   │   │       ├── VetkdContext.tsx
-│   │   │   │       └── index.tsx
+│   │   │   │       ├── AlexBackendContext.tsx (7 lines)
+│   │   │   │       ├── AlexContext.tsx (7 lines)
+│   │   │   │       ├── AlexWalletContext.tsx (7 lines)
+│   │   │   │       ├── AssetCanisterContext.tsx (7 lines)
+│   │   │   │       ├── AssetManagerContext.tsx (7 lines)
+│   │   │   │       ├── EmporiumContext.tsx (7 lines)
+│   │   │   │       ├── IcpLedgerContext.tsx (7 lines)
+│   │   │   │       ├── IcpSwapContext.tsx (7 lines)
+│   │   │   │       ├── Icrc7Context.tsx (7 lines)
+│   │   │   │       ├── Icrc7ScionContext.tsx (8 lines)
+│   │   │   │       ├── LbryContext.tsx (7 lines)
+│   │   │   │       ├── NftManagerContext.tsx (7 lines)
+│   │   │   │       ├── PerpetuaContext.tsx (7 lines)
+│   │   │   │       ├── TokenomicsContext.tsx (7 lines)
+│   │   │   │       ├── UserContext.tsx (7 lines)
+│   │   │   │       ├── VetkdContext.tsx (7 lines)
+│   │   │   │       └── index.tsx (18 lines)
 │   │   │   ├── features/
 │   │   │   │   ├── add-wallet/
 │   │   │   │   │   ├── __tests__/
-│   │   │   │   │   │   └── addWalletSlice.test.tsx
-│   │   │   │   │   ├── addWalletSlice.tsx
+│   │   │   │   │   │   └── addWalletSlice.test.tsx (274 lines)
+│   │   │   │   │   ├── addWalletSlice.tsx (126 lines)
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── KeyFileTab.tsx
-│   │   │   │   │   │   ├── NewWalletTab.tsx
-│   │   │   │   │   │   ├── SeedPhraseTab.tsx
-│   │   │   │   │   │   └── SuccessMessage.tsx
-│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   ├── KeyFileTab.tsx (62 lines)
+│   │   │   │   │   │   ├── NewWalletTab.tsx (60 lines)
+│   │   │   │   │   │   ├── SeedPhraseTab.tsx (111 lines)
+│   │   │   │   │   │   └── SuccessMessage.tsx (240 lines)
+│   │   │   │   │   ├── index.tsx (116 lines)
 │   │   │   │   │   ├── thunks/
-│   │   │   │   │   │   ├── importKeyFile.ts
-│   │   │   │   │   │   ├── importSeedPhrase.ts
-│   │   │   │   │   │   ├── storeWallet.ts
+│   │   │   │   │   │   ├── importKeyFile.ts (35 lines)
+│   │   │   │   │   │   ├── importSeedPhrase.ts (44 lines)
+│   │   │   │   │   │   ├── storeWallet.ts (62 lines)
 │   │   │   │   │   ├── types/
-│   │   │   │   │   │   ├── arweave_address.ts
-│   │   │   │   │   │   ├── equatable.ts
-│   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   ├── seed_phrase.ts
-│   │   │   │   │   │   └── winston.ts
+│   │   │   │   │   │   ├── arweave_address.ts (40 lines)
+│   │   │   │   │   │   ├── equatable.ts (4 lines)
+│   │   │   │   │   │   ├── index.ts (21 lines)
+│   │   │   │   │   │   ├── seed_phrase.ts (36 lines)
+│   │   │   │   │   │   └── winston.ts (66 lines)
 │   │   │   │   │   └── utils/
-│   │   │   │   │       ├── jwk_wallet.ts
-│   │   │   │   │       ├── wallet.ts
-│   │   │   │   │       ├── wallet_dao.ts
-│   │   │   │   │       └── wallet_utils.ts
+│   │   │   │   │       ├── jwk_wallet.ts (40 lines)
+│   │   │   │   │       ├── wallet.ts (8 lines)
+│   │   │   │   │       ├── wallet_dao.ts (171 lines)
+│   │   │   │   │       └── wallet_utils.ts (25 lines)
 │   │   │   │   ├── assets/
-│   │   │   │   │   ├── assetsSlice.ts
+│   │   │   │   │   ├── assetsSlice.ts (43 lines)
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── AssetDetail.tsx
-│   │   │   │   │   │   └── AssetTable.tsx
+│   │   │   │   │   │   ├── AssetDetail.tsx (427 lines)
+│   │   │   │   │   │   └── AssetTable.tsx (310 lines)
 │   │   │   │   │   ├── thunks/
-│   │   │   │   │   │   └── fetchUserArweaveAssets.ts
-│   │   │   │   │   ├── types.ts
+│   │   │   │   │   │   └── fetchUserArweaveAssets.ts (74 lines)
+│   │   │   │   │   ├── types.ts (17 lines)
 │   │   │   │   │   └── utils/
-│   │   │   │   │       └── assetUtils.ts
+│   │   │   │   │       └── assetUtils.ts (50 lines)
 │   │   │   │   ├── auth/
-│   │   │   │   │   ├── authExtraReducers.ts
-│   │   │   │   │   ├── authSlice.ts
+│   │   │   │   │   ├── authExtraReducers.ts (71 lines)
+│   │   │   │   │   ├── authSlice.ts (65 lines)
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── AuthMenu.tsx
-│   │   │   │   │   │   ├── ETHAccount.tsx
-│   │   │   │   │   │   ├── ICPAccount.tsx
-│   │   │   │   │   │   └── SOLAccount.tsx
-│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   ├── AuthMenu.tsx (98 lines)
+│   │   │   │   │   │   ├── ETHAccount.tsx (65 lines)
+│   │   │   │   │   │   ├── ICPAccount.tsx (58 lines)
+│   │   │   │   │   │   └── SOLAccount.tsx (67 lines)
+│   │   │   │   │   ├── index.tsx (21 lines)
 │   │   │   │   │   ├── thunks/
-│   │   │   │   │   │   ├── update.ts
-│   │   │   │   │   │   └── upgrade.ts
+│   │   │   │   │   │   ├── update.ts (42 lines)
+│   │   │   │   │   │   └── upgrade.ts (32 lines)
 │   │   │   │   │   └── utils/
-│   │   │   │   │       ├── authUtils.ts
-│   │   │   │   │       └── user.ts
+│   │   │   │   │       ├── authUtils.ts (200 lines)
+│   │   │   │   │       └── user.ts (11 lines)
 │   │   │   │   ├── engine-books/
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   └── MintedBook.tsx
-│   │   │   │   │   ├── engineBooksSlice.ts
-│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   └── MintedBook.tsx (153 lines)
+│   │   │   │   │   ├── engineBooksSlice.ts (57 lines)
+│   │   │   │   │   ├── index.tsx (98 lines)
 │   │   │   │   │   ├── thunks/
-│   │   │   │   │   │   └── fetchEngineBooks.ts
+│   │   │   │   │   │   └── fetchEngineBooks.ts (52 lines)
 │   │   │   │   │   └── utils/
-│   │   │   │   │       └── utilities.ts
+│   │   │   │   │       └── utilities.ts (64 lines)
 │   │   │   │   ├── engine-filters/
-│   │   │   │   │   └── index.tsx
+│   │   │   │   │   └── index.tsx (139 lines)
 │   │   │   │   ├── engine-overview/
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── Overview.tsx
-│   │   │   │   │   │   ├── OverviewTabContent.tsx
-│   │   │   │   │   │   └── OverviewTabs.tsx
-│   │   │   │   │   ├── engineOverviewSlice.ts
-│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   ├── Overview.tsx (100 lines)
+│   │   │   │   │   │   ├── OverviewTabContent.tsx (24 lines)
+│   │   │   │   │   │   └── OverviewTabs.tsx (34 lines)
+│   │   │   │   │   ├── engineOverviewSlice.ts (70 lines)
+│   │   │   │   │   ├── index.tsx (34 lines)
 │   │   │   │   │   └── thunks/
-│   │   │   │   │       └── fetchEngine.ts
+│   │   │   │   │       └── fetchEngine.ts (36 lines)
 │   │   │   │   ├── engine-stats/
-│   │   │   │   │   └── index.tsx
+│   │   │   │   │   └── index.tsx (95 lines)
 │   │   │   │   ├── engine-tasks/
-│   │   │   │   │   └── index.tsx
+│   │   │   │   │   └── index.tsx (173 lines)
 │   │   │   │   ├── filter/
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── SubTypes.tsx
-│   │   │   │   │   │   └── Types.tsx
-│   │   │   │   │   ├── filterSlice.ts
-│   │   │   │   │   └── index.tsx
+│   │   │   │   │   │   ├── SubTypes.tsx (28 lines)
+│   │   │   │   │   │   └── Types.tsx (41 lines)
+│   │   │   │   │   ├── filterSlice.ts (51 lines)
+│   │   │   │   │   └── index.tsx (58 lines)
 │   │   │   │   ├── home/
-│   │   │   │   │   └── homeSlice.ts
+│   │   │   │   │   └── homeSlice.ts (62 lines)
 │   │   │   │   ├── home-types/
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── BookCard.tsx
-│   │   │   │   │   │   └── BookCarousel.tsx
-│   │   │   │   │   └── index.tsx
+│   │   │   │   │   │   ├── BookCard.tsx (54 lines)
+│   │   │   │   │   │   └── BookCarousel.tsx (137 lines)
+│   │   │   │   │   └── index.tsx (142 lines)
 │   │   │   │   ├── icp-ledger/
-│   │   │   │   │   ├── icpLedgerSlice.ts
+│   │   │   │   │   ├── icpLedgerSlice.ts (132 lines)
 │   │   │   │   │   └── thunks/
-│   │   │   │   │       ├── getAccountId.ts
-│   │   │   │   │       ├── getCanisterBal.ts
-│   │   │   │   │       ├── getIcpBal.ts
-│   │   │   │   │       ├── getIcpPrice.ts
-│   │   │   │   │       └── transferICP.ts
+│   │   │   │   │       ├── getAccountId.ts (32 lines)
+│   │   │   │   │       ├── getCanisterBal.ts (36 lines)
+│   │   │   │   │       ├── getIcpBal.ts (35 lines)
+│   │   │   │   │       ├── getIcpPrice.ts (38 lines)
+│   │   │   │   │       └── transferICP.ts (59 lines)
 │   │   │   │   ├── login/
-│   │   │   │   │   ├── FullPageLogin.tsx
-│   │   │   │   │   ├── InlineLogin.tsx
+│   │   │   │   │   ├── FullPageLogin.tsx (13 lines)
+│   │   │   │   │   ├── InlineLogin.tsx (29 lines)
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── LoginContent.tsx
-│   │   │   │   │   │   └── Processing.tsx
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   ├── loginSlice.ts
+│   │   │   │   │   │   ├── LoginContent.tsx (25 lines)
+│   │   │   │   │   │   └── Processing.tsx (14 lines)
+│   │   │   │   │   ├── index.tsx (2 lines)
+│   │   │   │   │   ├── loginSlice.ts (55 lines)
 │   │   │   │   │   ├── processors/
 │   │   │   │   │   │   ├── ETHProcessor/
-│   │   │   │   │   │   │   ├── ConnectWallet.tsx
-│   │   │   │   │   │   │   ├── LoginButton.tsx
-│   │   │   │   │   │   │   └── index.tsx
-│   │   │   │   │   │   ├── IIProcessor.tsx
+│   │   │   │   │   │   │   ├── ConnectWallet.tsx (85 lines)
+│   │   │   │   │   │   │   ├── LoginButton.tsx (63 lines)
+│   │   │   │   │   │   │   └── index.tsx (47 lines)
+│   │   │   │   │   │   ├── IIProcessor.tsx (38 lines)
 │   │   │   │   │   │   ├── SOLProcessor/
-│   │   │   │   │   │   │   ├── ConnectWallet.tsx
-│   │   │   │   │   │   │   ├── LoginButton.tsx
-│   │   │   │   │   │   │   └── index.tsx
-│   │   │   │   │   │   └── index.tsx
+│   │   │   │   │   │   │   ├── ConnectWallet.tsx (38 lines)
+│   │   │   │   │   │   │   ├── LoginButton.tsx (57 lines)
+│   │   │   │   │   │   │   └── index.tsx (40 lines)
+│   │   │   │   │   │   └── index.tsx (16 lines)
 │   │   │   │   │   └── thunks/
-│   │   │   │   │       └── login.ts
+│   │   │   │   │       └── login.ts (32 lines)
 │   │   │   │   ├── my-engines/
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── AddEngine.tsx
-│   │   │   │   │   │   ├── DraftedEngines.tsx
-│   │   │   │   │   │   ├── EngineItem.tsx
-│   │   │   │   │   │   └── PublishedEngines.tsx
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   ├── myEnginesSlice.ts
+│   │   │   │   │   │   ├── AddEngine.tsx (340 lines)
+│   │   │   │   │   │   ├── DraftedEngines.tsx (75 lines)
+│   │   │   │   │   │   ├── EngineItem.tsx (65 lines)
+│   │   │   │   │   │   └── PublishedEngines.tsx (79 lines)
+│   │   │   │   │   ├── index.tsx (40 lines)
+│   │   │   │   │   ├── myEnginesSlice.ts (138 lines)
 │   │   │   │   │   ├── thunks/
-│   │   │   │   │   │   ├── addEngine.ts
-│   │   │   │   │   │   ├── fetchMyEngines.ts
-│   │   │   │   │   │   └── updateEngineStatus.ts
+│   │   │   │   │   │   ├── addEngine.ts (55 lines)
+│   │   │   │   │   │   ├── fetchMyEngines.ts (29 lines)
+│   │   │   │   │   │   └── updateEngineStatus.ts (37 lines)
 │   │   │   │   │   └── utils/
-│   │   │   │   │       └── index.ts
+│   │   │   │   │       └── index.ts (12 lines)
 │   │   │   │   ├── nft/
-│   │   │   │   │   ├── mint.ts
-│   │   │   │   │   └── withdraw.ts
+│   │   │   │   │   ├── mint.ts (49 lines)
+│   │   │   │   │   └── withdraw.ts (57 lines)
 │   │   │   │   ├── portal/
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── BookCard.tsx
-│   │   │   │   │   │   ├── BookInfo.tsx
-│   │   │   │   │   │   └── BookMint.tsx
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   ├── portalSlice.ts
+│   │   │   │   │   │   ├── BookCard.tsx (79 lines)
+│   │   │   │   │   │   ├── BookInfo.tsx (38 lines)
+│   │   │   │   │   │   └── BookMint.tsx (72 lines)
+│   │   │   │   │   ├── index.tsx (147 lines)
+│   │   │   │   │   ├── portalSlice.ts (98 lines)
 │   │   │   │   │   └── thunks/
-│   │   │   │   │       └── fetchBooks.ts
+│   │   │   │   │       └── fetchBooks.ts (121 lines)
 │   │   │   │   ├── portal-category/
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   ├── portalCategorySlice.ts
+│   │   │   │   │   ├── index.tsx (158 lines)
+│   │   │   │   │   ├── portalCategorySlice.ts (38 lines)
 │   │   │   │   │   └── utils/
-│   │   │   │   │       └── category.ts
+│   │   │   │   │       └── category.ts (22 lines)
 │   │   │   │   ├── portal-era/
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   └── portalEraSlice.ts
+│   │   │   │   │   ├── index.tsx (126 lines)
+│   │   │   │   │   └── portalEraSlice.ts (40 lines)
 │   │   │   │   ├── portal-filter/
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   └── portalFilterSlice.ts
+│   │   │   │   │   ├── index.tsx (229 lines)
+│   │   │   │   │   └── portalFilterSlice.ts (56 lines)
 │   │   │   │   ├── portal-language/
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   └── portalLanguageSlice.ts
+│   │   │   │   │   ├── index.tsx (206 lines)
+│   │   │   │   │   └── portalLanguageSlice.ts (43 lines)
 │   │   │   │   ├── portal-limit/
-│   │   │   │   │   └── index.tsx
+│   │   │   │   │   └── index.tsx (33 lines)
 │   │   │   │   ├── portal-pagination/
-│   │   │   │   │   └── index.tsx
+│   │   │   │   │   └── index.tsx (67 lines)
 │   │   │   │   ├── portal-type/
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   ├── portalTypeSlice.ts
+│   │   │   │   │   ├── index.tsx (147 lines)
+│   │   │   │   │   ├── portalTypeSlice.ts (41 lines)
 │   │   │   │   │   └── utils/
-│   │   │   │   │       └── type.ts
+│   │   │   │   │       └── type.ts (24 lines)
 │   │   │   │   ├── reader/
 │   │   │   │   │   ├── CardList/
-│   │   │   │   │   │   ├── Card.tsx
-│   │   │   │   │   │   └── index.tsx
+│   │   │   │   │   │   ├── Card.tsx (124 lines)
+│   │   │   │   │   │   └── index.tsx (119 lines)
 │   │   │   │   │   ├── ContentList/
-│   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   └── styles.css
+│   │   │   │   │   │   ├── index.tsx (48 lines)
+│   │   │   │   │   │   └── styles.css (37 lines)
 │   │   │   │   │   ├── ContentView/
-│   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── index.tsx (216 lines)
+│   │   │   │   │   │   └── style.ts (64 lines)
 │   │   │   │   │   ├── Drawer/
 │   │   │   │   │   │   ├── Bookmarks/
-│   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── index.tsx (30 lines)
+│   │   │   │   │   │   │   └── style.ts (10 lines)
 │   │   │   │   │   │   ├── Search/
-│   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   ├── index.tsx (129 lines)
+│   │   │   │   │   │   │   └── style.ts (10 lines)
+│   │   │   │   │   │   ├── index.tsx (26 lines)
+│   │   │   │   │   │   └── style.ts (37 lines)
 │   │   │   │   │   ├── Setting/
-│   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   ├── index.tsx (34 lines)
+│   │   │   │   │   │   └── style.ts (37 lines)
 │   │   │   │   │   ├── Sidebar/
-│   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   └── style.ts
-│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   ├── index.tsx (153 lines)
+│   │   │   │   │   │   └── style.ts (37 lines)
+│   │   │   │   │   ├── index.tsx (539 lines)
 │   │   │   │   │   ├── lib/
 │   │   │   │   │   │   ├── components/
-│   │   │   │   │   │   │   ├── AddAnnotationTooltip.tsx
+│   │   │   │   │   │   │   ├── AddAnnotationTooltip.tsx (117 lines)
 │   │   │   │   │   │   │   ├── AnnotationItem/
-│   │   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   │   ├── index.tsx (67 lines)
+│   │   │   │   │   │   │   │   └── style.ts (25 lines)
 │   │   │   │   │   │   │   ├── BookmarkItem/
-│   │   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   │   └── style.ts
+│   │   │   │   │   │   │   │   ├── index.tsx (40 lines)
+│   │   │   │   │   │   │   │   └── style.ts (25 lines)
 │   │   │   │   │   │   │   ├── BookmarkToggle/
-│   │   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   │   ├── ColorSelector.tsx
-│   │   │   │   │   │   │   ├── FlowToggle.tsx
-│   │   │   │   │   │   │   ├── FontFamilySelect.tsx
-│   │   │   │   │   │   │   ├── FontSizeButton.tsx
-│   │   │   │   │   │   │   ├── FontSizeRange.tsx
+│   │   │   │   │   │   │   │   ├── index.tsx (77 lines)
+│   │   │   │   │   │   │   │   └── style.ts (44 lines)
+│   │   │   │   │   │   │   ├── ColorSelector.tsx (28 lines)
+│   │   │   │   │   │   │   ├── FlowToggle.tsx (37 lines)
+│   │   │   │   │   │   │   ├── FontFamilySelect.tsx (44 lines)
+│   │   │   │   │   │   │   ├── FontSizeButton.tsx (58 lines)
+│   │   │   │   │   │   │   ├── FontSizeRange.tsx (63 lines)
 │   │   │   │   │   │   │   ├── FullScreenToggle/
-│   │   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   │   ├── RemoveAnnotationTooltip.tsx
+│   │   │   │   │   │   │   │   ├── index.tsx (85 lines)
+│   │   │   │   │   │   │   │   └── style.ts (44 lines)
+│   │   │   │   │   │   │   ├── RemoveAnnotationTooltip.tsx (51 lines)
 │   │   │   │   │   │   │   ├── SearchItem/
-│   │   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   │   └── style.ts
-│   │   │   │   │   │   │   ├── SidebarItem.tsx
-│   │   │   │   │   │   │   ├── Spinner.tsx
-│   │   │   │   │   │   │   ├── SpreadToggle.tsx
-│   │   │   │   │   │   │   ├── ThemeSelect.tsx
+│   │   │   │   │   │   │   │   ├── index.tsx (67 lines)
+│   │   │   │   │   │   │   │   └── style.ts (24 lines)
+│   │   │   │   │   │   │   ├── SidebarItem.tsx (31 lines)
+│   │   │   │   │   │   │   ├── Spinner.tsx (19 lines)
+│   │   │   │   │   │   │   ├── SpreadToggle.tsx (40 lines)
+│   │   │   │   │   │   │   ├── ThemeSelect.tsx (39 lines)
 │   │   │   │   │   │   │   └── TocItem/
-│   │   │   │   │   │   │       ├── index.tsx
-│   │   │   │   │   │   │       └── style.ts
+│   │   │   │   │   │   │       ├── index.tsx (46 lines)
+│   │   │   │   │   │   │       └── style.ts (24 lines)
 │   │   │   │   │   │   ├── contexts/
-│   │   │   │   │   │   │   └── ReaderContext.tsx
+│   │   │   │   │   │   │   └── ReaderContext.tsx (28 lines)
 │   │   │   │   │   │   ├── hooks/
-│   │   │   │   │   │   │   ├── useAnnotationState.tsx
-│   │   │   │   │   │   │   ├── useBookmarkState.tsx
-│   │   │   │   │   │   │   ├── useCardListState.tsx
-│   │   │   │   │   │   │   ├── useReaderContext.tsx
+│   │   │   │   │   │   │   ├── useAnnotationState.tsx (133 lines)
+│   │   │   │   │   │   │   ├── useBookmarkState.tsx (53 lines)
+│   │   │   │   │   │   │   ├── useCardListState.tsx (17 lines)
+│   │   │   │   │   │   │   ├── useReaderContext.tsx (77 lines)
 │   │   │   │   │   │   │   ├── useReaderState/
-│   │   │   │   │   │   │   │   ├── index.tsx
-│   │   │   │   │   │   │   │   └── useContentState.tsx
-│   │   │   │   │   │   │   ├── useSearchDrawer.tsx
-│   │   │   │   │   │   │   ├── useSearchState.tsx
-│   │   │   │   │   │   │   ├── useSettingState.tsx
-│   │   │   │   │   │   │   ├── useSidebarState.tsx
-│   │   │   │   │   │   │   └── useSnackbar.tsx
+│   │   │   │   │   │   │   │   ├── index.tsx (296 lines)
+│   │   │   │   │   │   │   │   └── useContentState.tsx (54 lines)
+│   │   │   │   │   │   │   ├── useSearchDrawer.tsx (17 lines)
+│   │   │   │   │   │   │   ├── useSearchState.tsx (24 lines)
+│   │   │   │   │   │   │   ├── useSettingState.tsx (17 lines)
+│   │   │   │   │   │   │   ├── useSidebarState.tsx (25 lines)
+│   │   │   │   │   │   │   └── useSnackbar.tsx (32 lines)
 │   │   │   │   │   │   ├── providers/
-│   │   │   │   │   │   │   └── ReaderProvider.tsx
+│   │   │   │   │   │   │   └── ReaderProvider.tsx (46 lines)
 │   │   │   │   │   │   └── utils/
-│   │   │   │   │   │       ├── annotations.ts
-│   │   │   │   │   │       ├── date.ts
-│   │   │   │   │   │       ├── index.ts
-│   │   │   │   │   │       ├── search.ts
-│   │   │   │   │   │       └── url.ts
-│   │   │   │   │   └── style.ts
+│   │   │   │   │   │       ├── annotations.ts (111 lines)
+│   │   │   │   │   │       ├── date.ts (6 lines)
+│   │   │   │   │   │       ├── index.ts (2 lines)
+│   │   │   │   │   │       ├── search.ts (45 lines)
+│   │   │   │   │   │       └── url.ts (14 lines)
+│   │   │   │   │   └── style.ts (48 lines)
 │   │   │   │   ├── search/
-│   │   │   │   │   ├── SearchResult.tsx
+│   │   │   │   │   ├── SearchResult.tsx (64 lines)
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── BookModal.tsx
-│   │   │   │   │   │   ├── Card.tsx
-│   │   │   │   │   │   └── Read.tsx
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   ├── searchSlice.ts
+│   │   │   │   │   │   ├── BookModal.tsx (29 lines)
+│   │   │   │   │   │   ├── Card.tsx (156 lines)
+│   │   │   │   │   │   └── Read.tsx (149 lines)
+│   │   │   │   │   ├── index.tsx (96 lines)
+│   │   │   │   │   ├── searchSlice.ts (72 lines)
 │   │   │   │   │   ├── thunks/
-│   │   │   │   │   │   └── performSearch.ts
+│   │   │   │   │   │   └── performSearch.ts (64 lines)
 │   │   │   │   │   └── utils/
-│   │   │   │   │       └── properties.tsx
+│   │   │   │   │       └── properties.tsx (20 lines)
 │   │   │   │   ├── signup/
-│   │   │   │   │   ├── FullPageSignup.tsx
-│   │   │   │   │   ├── InlineSignup.tsx
+│   │   │   │   │   ├── FullPageSignup.tsx (21 lines)
+│   │   │   │   │   ├── InlineSignup.tsx (48 lines)
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── Processing.tsx
-│   │   │   │   │   │   └── SignupForm.tsx
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   ├── signupSlice.ts
+│   │   │   │   │   │   ├── Processing.tsx (14 lines)
+│   │   │   │   │   │   └── SignupForm.tsx (162 lines)
+│   │   │   │   │   ├── index.tsx (2 lines)
+│   │   │   │   │   ├── signupSlice.ts (50 lines)
 │   │   │   │   │   └── thunks/
-│   │   │   │   │       └── signup.ts
+│   │   │   │   │       └── signup.ts (40 lines)
 │   │   │   │   ├── swap/
-│   │   │   │   │   ├── alexSlice.ts
+│   │   │   │   │   ├── alexSlice.ts (96 lines)
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── BurnLBRY.tsx
+│   │   │   │   │   │   ├── BurnLBRY.tsx (1 lines)
 │   │   │   │   │   │   ├── balance/
-│   │   │   │   │   │   │   ├── accountCards.tsx
-│   │   │   │   │   │   │   ├── alexBalanceCard.tsx
-│   │   │   │   │   │   │   ├── balanceContent.tsx
-│   │   │   │   │   │   │   ├── getAlexBal.tsx
-│   │   │   │   │   │   │   └── lbryBalanceCard.tsx
+│   │   │   │   │   │   │   ├── accountCards.tsx (149 lines)
+│   │   │   │   │   │   │   ├── alexBalanceCard.tsx (56 lines)
+│   │   │   │   │   │   │   ├── balanceContent.tsx (39 lines)
+│   │   │   │   │   │   │   ├── getAlexBal.tsx (30 lines)
+│   │   │   │   │   │   │   └── lbryBalanceCard.tsx (47 lines)
 │   │   │   │   │   │   ├── burn/
-│   │   │   │   │   │   │   ├── burnContent.tsx
-│   │   │   │   │   │   │   ├── burnInfo.tsx
-│   │   │   │   │   │   │   └── calculateMaxBurnAllowed.ts
-│   │   │   │   │   │   ├── copyHelper.tsx
-│   │   │   │   │   │   ├── errorModal.tsx
+│   │   │   │   │   │   │   ├── burnContent.tsx (201 lines)
+│   │   │   │   │   │   │   ├── burnInfo.tsx (45 lines)
+│   │   │   │   │   │   │   └── calculateMaxBurnAllowed.ts (20 lines)
+│   │   │   │   │   │   ├── copyHelper.tsx (48 lines)
+│   │   │   │   │   │   ├── errorModal.tsx (38 lines)
 │   │   │   │   │   │   ├── insights/
-│   │   │   │   │   │   │   ├── chart.tsx
-│   │   │   │   │   │   │   └── insights.tsx
-│   │   │   │   │   │   ├── loadingModal.tsx
+│   │   │   │   │   │   │   ├── chart.tsx (127 lines)
+│   │   │   │   │   │   │   └── insights.tsx (38 lines)
+│   │   │   │   │   │   ├── loadingModal.tsx (48 lines)
 │   │   │   │   │   │   ├── receive/
-│   │   │   │   │   │   │   └── receiveContent.tsx
+│   │   │   │   │   │   │   └── receiveContent.tsx (167 lines)
 │   │   │   │   │   │   ├── redeem/
-│   │   │   │   │   │   │   └── redeemContent.tsx
+│   │   │   │   │   │   │   └── redeemContent.tsx (102 lines)
 │   │   │   │   │   │   ├── send/
-│   │   │   │   │   │   │   └── sendContent.tsx
+│   │   │   │   │   │   │   └── sendContent.tsx (308 lines)
 │   │   │   │   │   │   ├── stake/
-│   │   │   │   │   │   │   ├── claimReward.tsx
-│   │   │   │   │   │   │   ├── stakeContent.tsx
-│   │   │   │   │   │   │   ├── stakeInfo.tsx
-│   │   │   │   │   │   │   └── unstake.tsx
-│   │   │   │   │   │   ├── successModal.tsx
+│   │   │   │   │   │   │   ├── claimReward.tsx (43 lines)
+│   │   │   │   │   │   │   ├── stakeContent.tsx (238 lines)
+│   │   │   │   │   │   │   ├── stakeInfo.tsx (94 lines)
+│   │   │   │   │   │   │   └── unstake.tsx (44 lines)
+│   │   │   │   │   │   ├── successModal.tsx (37 lines)
 │   │   │   │   │   │   ├── swap/
-│   │   │   │   │   │   │   └── swapContent.tsx
+│   │   │   │   │   │   │   └── swapContent.tsx (237 lines)
 │   │   │   │   │   │   ├── topup/
-│   │   │   │   │   │   │   └── topupContent.tsx
+│   │   │   │   │   │   │   └── topupContent.tsx (259 lines)
 │   │   │   │   │   │   └── transactionHistory/
-│   │   │   │   │   │       ├── detailTransaction.tsx
-│   │   │   │   │   │       ├── transactionHistory.tsx
-│   │   │   │   │   │       └── transactionHistoryObj.tsx
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   ├── style.css
-│   │   │   │   │   ├── swapMain.tsx
-│   │   │   │   │   ├── swapSlice.ts
+│   │   │   │   │   │       ├── detailTransaction.tsx (121 lines)
+│   │   │   │   │   │       ├── transactionHistory.tsx (94 lines)
+│   │   │   │   │   │       └── transactionHistoryObj.tsx (42 lines)
+│   │   │   │   │   ├── index.tsx (14 lines)
+│   │   │   │   │   ├── style.css (87 lines)
+│   │   │   │   │   ├── swapMain.tsx (99 lines)
+│   │   │   │   │   ├── swapSlice.ts (476 lines)
 │   │   │   │   │   ├── thunks/
 │   │   │   │   │   │   ├── alexIcrc/
-│   │   │   │   │   │   │   ├── getAccountAlexBalance.ts
-│   │   │   │   │   │   │   ├── getAlexFee.ts
-│   │   │   │   │   │   │   ├── getAlexPrice.ts
-│   │   │   │   │   │   │   ├── getAlexSpendingBalance.ts
-│   │   │   │   │   │   │   └── transferALEX.ts
-│   │   │   │   │   │   ├── burnLBRY.ts
-│   │   │   │   │   │   ├── claimReward.ts
-│   │   │   │   │   │   ├── getAllStakesInfo.ts
-│   │   │   │   │   │   ├── getArchivedBal.ts
-│   │   │   │   │   │   ├── getAverageApy.ts
-│   │   │   │   │   │   ├── getCanisterArchivedBal.ts
-│   │   │   │   │   │   ├── getLBRYratio.ts
-│   │   │   │   │   │   ├── getStakedInfo.ts
-│   │   │   │   │   │   ├── getStakersCount.ts
+│   │   │   │   │   │   │   ├── getAccountAlexBalance.ts (44 lines)
+│   │   │   │   │   │   │   ├── getAlexFee.ts (38 lines)
+│   │   │   │   │   │   │   ├── getAlexPrice.ts (27 lines)
+│   │   │   │   │   │   │   ├── getAlexSpendingBalance.ts (48 lines)
+│   │   │   │   │   │   │   └── transferALEX.ts (58 lines)
+│   │   │   │   │   │   ├── burnLBRY.ts (83 lines)
+│   │   │   │   │   │   ├── claimReward.ts (36 lines)
+│   │   │   │   │   │   ├── getAllStakesInfo.ts (37 lines)
+│   │   │   │   │   │   ├── getArchivedBal.ts (38 lines)
+│   │   │   │   │   │   ├── getAverageApy.ts (39 lines)
+│   │   │   │   │   │   ├── getCanisterArchivedBal.ts (36 lines)
+│   │   │   │   │   │   ├── getLBRYratio.ts (25 lines)
+│   │   │   │   │   │   ├── getStakedInfo.ts (53 lines)
+│   │   │   │   │   │   ├── getStakersCount.ts (32 lines)
 │   │   │   │   │   │   ├── insights/
-│   │   │   │   │   │   │   └── getAllLogs.ts
+│   │   │   │   │   │   │   └── getAllLogs.ts (83 lines)
 │   │   │   │   │   │   ├── lbryIcrc/
-│   │   │   │   │   │   │   ├── getLbryBalance.ts
-│   │   │   │   │   │   │   ├── getLbryFee.ts
-│   │   │   │   │   │   │   ├── getSpendingBalance.ts
-│   │   │   │   │   │   │   ├── getTransactions.ts
-│   │   │   │   │   │   │   ├── topUpLBRY.ts
-│   │   │   │   │   │   │   └── transferLBRY.ts
-│   │   │   │   │   │   ├── redeemArchivedBalance.ts
-│   │   │   │   │   │   ├── stakeAlex.ts
-│   │   │   │   │   │   ├── swapLbry.ts
+│   │   │   │   │   │   │   ├── getLbryBalance.ts (44 lines)
+│   │   │   │   │   │   │   ├── getLbryFee.ts (37 lines)
+│   │   │   │   │   │   │   ├── getSpendingBalance.ts (49 lines)
+│   │   │   │   │   │   │   ├── getTransactions.ts (320 lines)
+│   │   │   │   │   │   │   ├── topUpLBRY.ts (54 lines)
+│   │   │   │   │   │   │   └── transferLBRY.ts (64 lines)
+│   │   │   │   │   │   ├── redeemArchivedBalance.ts (31 lines)
+│   │   │   │   │   │   ├── stakeAlex.ts (80 lines)
+│   │   │   │   │   │   ├── swapLbry.ts (79 lines)
 │   │   │   │   │   │   ├── tokenomics/
-│   │   │   │   │   │   │   └── getAlexMintRate.ts
-│   │   │   │   │   │   ├── transferICPFromUserWallet.ts
-│   │   │   │   │   │   └── unstake.ts
-│   │   │   │   │   ├── tokenomicsSilce.ts
+│   │   │   │   │   │   │   └── getAlexMintRate.ts (29 lines)
+│   │   │   │   │   │   ├── transferICPFromUserWallet.ts (38 lines)
+│   │   │   │   │   │   └── unstake.ts (35 lines)
+│   │   │   │   │   ├── tokenomicsSilce.ts (48 lines)
 │   │   │   │   │   └── utlis/
-│   │   │   │   │       └── erorrs.ts
+│   │   │   │   │       └── erorrs.ts (160 lines)
 │   │   │   │   ├── upload/
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── FileCost.tsx
-│   │   │   │   │   │   ├── FileInfo.tsx
-│   │   │   │   │   │   ├── FilePreview.tsx
-│   │   │   │   │   │   ├── FileSelector.tsx
-│   │   │   │   │   │   ├── FileUploader.tsx
-│   │   │   │   │   │   ├── Header.tsx
-│   │   │   │   │   │   ├── NoFile.tsx
-│   │   │   │   │   │   ├── PaymentPreview.tsx
+│   │   │   │   │   │   ├── FileCost.tsx (15 lines)
+│   │   │   │   │   │   ├── FileInfo.tsx (28 lines)
+│   │   │   │   │   │   ├── FilePreview.tsx (23 lines)
+│   │   │   │   │   │   ├── FileSelector.tsx (179 lines)
+│   │   │   │   │   │   ├── FileUploader.tsx (165 lines)
+│   │   │   │   │   │   ├── Header.tsx (68 lines)
+│   │   │   │   │   │   ├── NoFile.tsx (11 lines)
+│   │   │   │   │   │   ├── PaymentPreview.tsx (135 lines)
 │   │   │   │   │   │   ├── PostUploadPreview/
-│   │   │   │   │   │   │   ├── FileUrl.tsx
-│   │   │   │   │   │   │   ├── MintNFT.tsx
-│   │   │   │   │   │   │   ├── TransactionHash.tsx
-│   │   │   │   │   │   │   ├── TransactionStatus.tsx
-│   │   │   │   │   │   │   ├── TransactionUrl.tsx
-│   │   │   │   │   │   │   └── index.tsx
-│   │   │   │   │   │   ├── PreUploadPreview.tsx
-│   │   │   │   │   │   ├── TextEditor.tsx
-│   │   │   │   │   │   ├── UploadError.tsx
-│   │   │   │   │   │   └── UploadProgress.tsx
-│   │   │   │   │   ├── constants.tsx
+│   │   │   │   │   │   │   ├── FileUrl.tsx (38 lines)
+│   │   │   │   │   │   │   ├── MintNFT.tsx (116 lines)
+│   │   │   │   │   │   │   ├── TransactionHash.tsx (22 lines)
+│   │   │   │   │   │   │   ├── TransactionStatus.tsx (89 lines)
+│   │   │   │   │   │   │   ├── TransactionUrl.tsx (37 lines)
+│   │   │   │   │   │   │   └── index.tsx (76 lines)
+│   │   │   │   │   │   ├── PreUploadPreview.tsx (54 lines)
+│   │   │   │   │   │   ├── TextEditor.tsx (125 lines)
+│   │   │   │   │   │   ├── UploadError.tsx (28 lines)
+│   │   │   │   │   │   └── UploadProgress.tsx (61 lines)
+│   │   │   │   │   ├── constants.tsx (79 lines)
 │   │   │   │   │   ├── hooks/
-│   │   │   │   │   │   ├── useCleanupEffect.ts
-│   │   │   │   │   │   ├── useContentScanner.ts
-│   │   │   │   │   │   ├── useFileEffect.ts
-│   │   │   │   │   │   ├── useNavigationGuard.ts
-│   │   │   │   │   │   ├── useTransactionEffect.ts
-│   │   │   │   │   │   └── useUploadedFileEffect.ts
+│   │   │   │   │   │   ├── useCleanupEffect.ts (11 lines)
+│   │   │   │   │   │   ├── useContentScanner.ts (107 lines)
+│   │   │   │   │   │   ├── useFileEffect.ts (42 lines)
+│   │   │   │   │   │   ├── useNavigationGuard.ts (64 lines)
+│   │   │   │   │   │   ├── useTransactionEffect.ts (20 lines)
+│   │   │   │   │   │   └── useUploadedFileEffect.ts (30 lines)
 │   │   │   │   │   ├── thunks/
-│   │   │   │   │   │   ├── checkLbryBalance.ts
-│   │   │   │   │   │   ├── estimateCost.ts
-│   │   │   │   │   │   ├── fetchBalance.ts
-│   │   │   │   │   │   ├── fetchWallets.ts
-│   │   │   │   │   │   ├── mintNFT.ts
-│   │   │   │   │   │   ├── processPayment.ts
-│   │   │   │   │   │   ├── selectWallet.ts
-│   │   │   │   │   │   └── uploadFile.ts
-│   │   │   │   │   ├── uploadSlice.tsx
-│   │   │   │   │   └── utils.ts
+│   │   │   │   │   │   ├── checkLbryBalance.ts (65 lines)
+│   │   │   │   │   │   ├── estimateCost.ts (51 lines)
+│   │   │   │   │   │   ├── fetchBalance.ts (28 lines)
+│   │   │   │   │   │   ├── fetchWallets.ts (34 lines)
+│   │   │   │   │   │   ├── mintNFT.ts (48 lines)
+│   │   │   │   │   │   ├── processPayment.ts (56 lines)
+│   │   │   │   │   │   ├── selectWallet.ts (36 lines)
+│   │   │   │   │   │   └── uploadFile.ts (88 lines)
+│   │   │   │   │   ├── uploadSlice.tsx (287 lines)
+│   │   │   │   │   └── utils.ts (69 lines)
 │   │   │   │   ├── wallets/
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── DeleteWallet.tsx
-│   │   │   │   │   │   ├── NoWallet.tsx
-│   │   │   │   │   │   ├── UpdateWallet.tsx
-│   │   │   │   │   │   └── WalletItem.tsx
-│   │   │   │   │   ├── index.tsx
+│   │   │   │   │   │   ├── DeleteWallet.tsx (87 lines)
+│   │   │   │   │   │   ├── NoWallet.tsx (17 lines)
+│   │   │   │   │   │   ├── UpdateWallet.tsx (106 lines)
+│   │   │   │   │   │   └── WalletItem.tsx (193 lines)
+│   │   │   │   │   ├── index.tsx (58 lines)
 │   │   │   │   │   ├── thunks/
-│   │   │   │   │   │   ├── deleteWallet.ts
-│   │   │   │   │   │   ├── fetchBalance.ts
-│   │   │   │   │   │   ├── fetchMyWallets.ts
-│   │   │   │   │   │   └── updateWalletStatus.ts
+│   │   │   │   │   │   ├── deleteWallet.ts (37 lines)
+│   │   │   │   │   │   ├── fetchBalance.ts (41 lines)
+│   │   │   │   │   │   ├── fetchMyWallets.ts (30 lines)
+│   │   │   │   │   │   └── updateWalletStatus.ts (37 lines)
 │   │   │   │   │   ├── utils/
-│   │   │   │   │   │   └── index.ts
-│   │   │   │   │   └── walletsSlice.tsx
+│   │   │   │   │   │   └── index.ts (82 lines)
+│   │   │   │   │   └── walletsSlice.tsx (149 lines)
 │   │   │   ├── fonts/
-│   │   │   │   ├── Syne-Bold.woff
-│   │   │   │   ├── Syne-Bold.woff2
-│   │   │   │   ├── Syne-ExtraBold.woff
-│   │   │   │   ├── Syne-ExtraBold.woff2
-│   │   │   │   ├── Syne-Medium.woff
-│   │   │   │   ├── Syne-Medium.woff2
-│   │   │   │   ├── Syne-Regular.woff
-│   │   │   │   ├── Syne-Regular.woff2
-│   │   │   │   ├── Syne-SemiBold.woff
-│   │   │   │   └── Syne-SemiBold.woff2
+│   │   │   │   ├── Syne-Bold.woff (144 lines)
+│   │   │   │   ├── Syne-Bold.woff2 (108 lines)
+│   │   │   │   ├── Syne-ExtraBold.woff (147 lines)
+│   │   │   │   ├── Syne-ExtraBold.woff2 (111 lines)
+│   │   │   │   ├── Syne-Medium.woff (146 lines)
+│   │   │   │   ├── Syne-Medium.woff2 (113 lines)
+│   │   │   │   ├── Syne-Regular.woff (124 lines)
+│   │   │   │   ├── Syne-Regular.woff2 (121 lines)
+│   │   │   │   ├── Syne-SemiBold.woff (161 lines)
+│   │   │   │   └── Syne-SemiBold.woff2 (113 lines)
 │   │   │   ├── guards/
-│   │   │   │   ├── AuthGuard.tsx
-│   │   │   │   ├── LibrarianGuard.tsx
-│   │   │   │   └── Protected.tsx
+│   │   │   │   ├── AuthGuard.tsx (31 lines)
+│   │   │   │   ├── LibrarianGuard.tsx (15 lines)
+│   │   │   │   └── Protected.tsx (20 lines)
 │   │   │   ├── hooks/
 │   │   │   │   ├── actors/
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   ├── useActorErrorHandler.tsx
-│   │   │   │   │   ├── useAlex.tsx
-│   │   │   │   │   ├── useAlexBackend.tsx
-│   │   │   │   │   ├── useAlexWallet.tsx
-│   │   │   │   │   ├── useAssetCanister.tsx
-│   │   │   │   │   ├── useAssetManager.tsx
-│   │   │   │   │   ├── useEmporium.tsx
-│   │   │   │   │   ├── useIcpLedger.tsx
-│   │   │   │   │   ├── useIcpSwap.tsx
-│   │   │   │   │   ├── useIcrc7.tsx
-│   │   │   │   │   ├── useLbry.tsx
-│   │   │   │   │   ├── useNftManager.tsx
-│   │   │   │   │   ├── usePerpetua.tsx
-│   │   │   │   │   ├── useTokenomics.tsx
-│   │   │   │   │   ├── useUser.tsx
-│   │   │   │   │   └── useVetkd.tsx
-│   │   │   │   ├── useAppNavigation.ts
-│   │   │   │   ├── useAssetManager.ts
-│   │   │   │   ├── useAuth.tsx
-│   │   │   │   ├── useDebounce.tsx
-│   │   │   │   ├── useIdentity.tsx
-│   │   │   │   ├── useLogout.tsx
-│   │   │   │   ├── useRiskWarning.ts
-│   │   │   │   └── useSession.tsx
-│   │   │   ├── index.js
+│   │   │   │   │   ├── index.tsx (16 lines)
+│   │   │   │   │   ├── useActorErrorHandler.tsx (46 lines)
+│   │   │   │   │   ├── useAlex.tsx (7 lines)
+│   │   │   │   │   ├── useAlexBackend.tsx (7 lines)
+│   │   │   │   │   ├── useAlexWallet.tsx (7 lines)
+│   │   │   │   │   ├── useAssetCanister.tsx (7 lines)
+│   │   │   │   │   ├── useAssetManager.tsx (7 lines)
+│   │   │   │   │   ├── useEmporium.tsx (7 lines)
+│   │   │   │   │   ├── useIcpLedger.tsx (7 lines)
+│   │   │   │   │   ├── useIcpSwap.tsx (7 lines)
+│   │   │   │   │   ├── useIcrc7.tsx (7 lines)
+│   │   │   │   │   ├── useLbry.tsx (7 lines)
+│   │   │   │   │   ├── useNftManager.tsx (7 lines)
+│   │   │   │   │   ├── usePerpetua.tsx (7 lines)
+│   │   │   │   │   ├── useTokenomics.tsx (7 lines)
+│   │   │   │   │   ├── useUser.tsx (7 lines)
+│   │   │   │   │   └── useVetkd.tsx (7 lines)
+│   │   │   │   ├── useAppNavigation.ts (100 lines)
+│   │   │   │   ├── useAssetManager.ts (50 lines)
+│   │   │   │   ├── useAuth.tsx (6 lines)
+│   │   │   │   ├── useDebounce.tsx (17 lines)
+│   │   │   │   ├── useIdentity.tsx (30 lines)
+│   │   │   │   ├── useLogout.tsx (15 lines)
+│   │   │   │   ├── useRiskWarning.ts (27 lines)
+│   │   │   │   └── useSession.tsx (6 lines)
+│   │   │   ├── index.js (94 lines)
 │   │   │   ├── layouts/
-│   │   │   │   ├── AppLayout.tsx
-│   │   │   │   ├── BaseLayout.tsx
-│   │   │   │   ├── DashboardLayout.tsx
-│   │   │   │   ├── LibrarianLayout.tsx
-│   │   │   │   ├── MainLayout.tsx
+│   │   │   │   ├── AppLayout.tsx (17 lines)
+│   │   │   │   ├── BaseLayout.tsx (23 lines)
+│   │   │   │   ├── DashboardLayout.tsx (24 lines)
+│   │   │   │   ├── LibrarianLayout.tsx (24 lines)
+│   │   │   │   ├── MainLayout.tsx (17 lines)
 │   │   │   │   ├── parts/
-│   │   │   │   │   ├── AppHeader.tsx
-│   │   │   │   │   ├── AuthNavigation.tsx
-│   │   │   │   │   ├── DashboardSidebar.tsx
-│   │   │   │   │   ├── Header.tsx
-│   │   │   │   │   └── LibrarianSidebar.tsx
+│   │   │   │   │   ├── AppHeader.tsx (18 lines)
+│   │   │   │   │   ├── AuthNavigation.tsx (41 lines)
+│   │   │   │   │   ├── DashboardSidebar.tsx (161 lines)
+│   │   │   │   │   ├── Header.tsx (140 lines)
+│   │   │   │   │   └── LibrarianSidebar.tsx (87 lines)
 │   │   │   │   └── skeletons/
-│   │   │   │       ├── HeaderSkeleton.tsx
-│   │   │   │       ├── LayoutSkeleton.tsx
-│   │   │   │       ├── MainPageSkeleton.tsx
-│   │   │   │       ├── PinaxSkeleton.tsx
-│   │   │   │       └── SidebarSkeleton.tsx
+│   │   │   │       ├── HeaderSkeleton.tsx (26 lines)
+│   │   │   │       ├── LayoutSkeleton.tsx (32 lines)
+│   │   │   │       ├── MainPageSkeleton.tsx (31 lines)
+│   │   │   │       ├── PinaxSkeleton.tsx (97 lines)
+│   │   │   │       └── SidebarSkeleton.tsx (30 lines)
 │   │   │   ├── lib/
 │   │   │   │   ├── components/
-│   │   │   │   │   ├── accordion.tsx
-│   │   │   │   │   ├── alert-dialog.tsx
-│   │   │   │   │   ├── alert.tsx
-│   │   │   │   │   ├── aspect-ratio.tsx
-│   │   │   │   │   ├── badge.tsx
-│   │   │   │   │   ├── button.tsx
-│   │   │   │   │   ├── calendar.tsx
-│   │   │   │   │   ├── card.tsx
-│   │   │   │   │   ├── checkbox.tsx
-│   │   │   │   │   ├── collapsible.tsx
-│   │   │   │   │   ├── command.tsx
-│   │   │   │   │   ├── dialog.tsx
-│   │   │   │   │   ├── dropdown-menu.tsx
-│   │   │   │   │   ├── input.tsx
-│   │   │   │   │   ├── label.tsx
-│   │   │   │   │   ├── mode-toggle.tsx
-│   │   │   │   │   ├── popover.tsx
-│   │   │   │   │   ├── progress.tsx
-│   │   │   │   │   ├── scroll-area.tsx
-│   │   │   │   │   ├── select.tsx
-│   │   │   │   │   ├── separator.tsx
-│   │   │   │   │   ├── skeleton.tsx
-│   │   │   │   │   ├── slider.tsx
-│   │   │   │   │   ├── sonner.tsx
-│   │   │   │   │   ├── switch.tsx
-│   │   │   │   │   ├── table.tsx
-│   │   │   │   │   ├── tabs.tsx
-│   │   │   │   │   ├── textarea.tsx
-│   │   │   │   │   ├── toggle-group.tsx
-│   │   │   │   │   ├── toggle.tsx
-│   │   │   │   │   └── tooltip.tsx
-│   │   │   │   └── utils.ts
+│   │   │   │   │   ├── accordion.tsx (57 lines)
+│   │   │   │   │   ├── alert-dialog.tsx (140 lines)
+│   │   │   │   │   ├── alert.tsx (60 lines)
+│   │   │   │   │   ├── aspect-ratio.tsx (6 lines)
+│   │   │   │   │   ├── badge.tsx (40 lines)
+│   │   │   │   │   ├── button.tsx (69 lines)
+│   │   │   │   │   ├── calendar.tsx (65 lines)
+│   │   │   │   │   ├── card.tsx (80 lines)
+│   │   │   │   │   ├── checkbox.tsx (29 lines)
+│   │   │   │   │   ├── collapsible.tsx (12 lines)
+│   │   │   │   │   ├── command.tsx (152 lines)
+│   │   │   │   │   ├── dialog.tsx (121 lines)
+│   │   │   │   │   ├── dropdown-menu.tsx (199 lines)
+│   │   │   │   │   ├── input.tsx (92 lines)
+│   │   │   │   │   ├── label.tsx (45 lines)
+│   │   │   │   │   ├── mode-toggle.tsx (20 lines)
+│   │   │   │   │   ├── popover.tsx (32 lines)
+│   │   │   │   │   ├── progress.tsx (29 lines)
+│   │   │   │   │   ├── scroll-area.tsx (47 lines)
+│   │   │   │   │   ├── select.tsx (159 lines)
+│   │   │   │   │   ├── separator.tsx (30 lines)
+│   │   │   │   │   ├── skeleton.tsx (17 lines)
+│   │   │   │   │   ├── slider.tsx (27 lines)
+│   │   │   │   │   ├── sonner.tsx (37 lines)
+│   │   │   │   │   ├── switch.tsx (28 lines)
+│   │   │   │   │   ├── table.tsx (118 lines)
+│   │   │   │   │   ├── tabs.tsx (54 lines)
+│   │   │   │   │   ├── textarea.tsx (23 lines)
+│   │   │   │   │   ├── toggle-group.tsx (60 lines)
+│   │   │   │   │   ├── toggle.tsx (85 lines)
+│   │   │   │   │   └── tooltip.tsx (29 lines)
+│   │   │   │   └── utils.ts (6 lines)
 │   │   │   ├── pages/
 │   │   │   ├── providers/
 │   │   │   │   ├── AuthProvider/
-│   │   │   │   │   ├── EthProvider.tsx
-│   │   │   │   │   ├── IIProvider.tsx
-│   │   │   │   │   ├── SolProvider.tsx
-│   │   │   │   │   ├── index.tsx
-│   │   │   │   │   └── wagmi.config.ts
-│   │   │   │   ├── ReduxProvider.tsx
-│   │   │   │   ├── SessionProvider.tsx
-│   │   │   │   ├── ThemeProvider.tsx
+│   │   │   │   │   ├── EthProvider.tsx (31 lines)
+│   │   │   │   │   ├── IIProvider.tsx (23 lines)
+│   │   │   │   │   ├── SolProvider.tsx (42 lines)
+│   │   │   │   │   ├── index.tsx (46 lines)
+│   │   │   │   │   └── wagmi.config.ts (22 lines)
+│   │   │   │   ├── ReduxProvider.tsx (14 lines)
+│   │   │   │   ├── SessionProvider.tsx (90 lines)
+│   │   │   │   ├── ThemeProvider.tsx (63 lines)
 │   │   │   │   └── UserProvider/
-│   │   │   │       ├── EthUserProvider.tsx
-│   │   │   │       ├── IIUserProvider.tsx
-│   │   │   │       ├── SolUserProvider.tsx
-│   │   │   │       └── index.tsx
+│   │   │   │       ├── EthUserProvider.tsx (103 lines)
+│   │   │   │       ├── IIUserProvider.tsx (90 lines)
+│   │   │   │       ├── SolUserProvider.tsx (92 lines)
+│   │   │   │       └── index.tsx (31 lines)
 │   │   │   ├── routes/
-│   │   │   │   ├── dataRoutes.tsx
-│   │   │   │   ├── index.tsx
-│   │   │   │   └── routeConfig.ts
+│   │   │   │   ├── dataRoutes.tsx (461 lines)
+│   │   │   │   ├── index.tsx (136 lines)
+│   │   │   │   └── routeConfig.ts (111 lines)
 │   │   │   ├── services/
-│   │   │   │   ├── bookService.ts
-│   │   │   │   ├── librarianService.ts
-│   │   │   │   ├── meiliService.ts
-│   │   │   │   └── vetkdService.ts
+│   │   │   │   ├── bookService.ts (174 lines)
+│   │   │   │   ├── librarianService.ts (74 lines)
+│   │   │   │   ├── meiliService.ts (111 lines)
+│   │   │   │   └── vetkdService.ts (55 lines)
 │   │   │   ├── store/
 │   │   │   │   ├── hooks/
-│   │   │   │   │   ├── useAppDispatch.ts
-│   │   │   │   │   ├── useAppSelector.ts
-│   │   │   │   │   └── useAppStore.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── rootReducer.ts
+│   │   │   │   │   ├── useAppDispatch.ts (4 lines)
+│   │   │   │   │   ├── useAppSelector.ts (5 lines)
+│   │   │   │   │   └── useAppStore.ts (7 lines)
+│   │   │   │   ├── index.ts (11 lines)
+│   │   │   │   └── rootReducer.ts (80 lines)
 │   │   │   ├── styles/
-│   │   │   │   ├── style.css
-│   │   │   │   └── tailwind.css
+│   │   │   │   ├── style.css (53 lines)
+│   │   │   │   └── tailwind.css (104 lines)
 │   │   │   ├── types/
-│   │   │   │   └── azle.d.ts
+│   │   │   │   └── azle.d.ts (17 lines)
 │   │   │   ├── utils/
-│   │   │   │   ├── ComposeProviders.tsx
-│   │   │   │   ├── LedgerService.tsx
-│   │   │   │   ├── arweaveClient.ts
-│   │   │   │   ├── bgint_convert.ts
-│   │   │   │   ├── epub.tsx
-│   │   │   │   ├── general.ts
-│   │   │   │   ├── id_convert.ts
-│   │   │   │   ├── lazyLoad.ts
-│   │   │   │   ├── utils.tsx
-│   │   │   │   └── vetkd.ts
+│   │   │   │   ├── ComposeProviders.tsx (12 lines)
+│   │   │   │   ├── LedgerService.tsx (73 lines)
+│   │   │   │   ├── arweaveClient.ts (25 lines)
+│   │   │   │   ├── bgint_convert.ts (96 lines)
+│   │   │   │   ├── epub.tsx (33 lines)
+│   │   │   │   ├── general.ts (144 lines)
+│   │   │   │   ├── id_convert.ts (126 lines)
+│   │   │   │   ├── lazyLoad.ts (21 lines)
+│   │   │   │   ├── utils.tsx (9 lines)
+│   │   │   │   └── vetkd.ts (15 lines)
 │   ├── alex_wallet/
-│   │   ├── Cargo.toml
-│   │   ├── alex_wallet.did
+│   │   ├── Cargo.toml (33 lines)
+│   │   ├── alex_wallet.did (30 lines)
 │   │   └── src/
-│   │       ├── crypto.rs
-│   │       ├── errors.rs
-│   │       ├── lib.rs
-│   │       ├── model.rs
-│   │       ├── queries.rs
-│   │       ├── store.rs
-│   │       ├── updates.rs
-│   │       ├── utilities.rs
-│   │       └── validations.rs
+│   │       ├── crypto.rs (196 lines)
+│   │       ├── errors.rs (130 lines)
+│   │       ├── lib.rs (28 lines)
+│   │       ├── model.rs (72 lines)
+│   │       ├── queries.rs (116 lines)
+│   │       ├── store.rs (104 lines)
+│   │       ├── updates.rs (156 lines)
+│   │       ├── utilities.rs (48 lines)
+│   │       └── validations.rs (99 lines)
 │   ├── asset_canister/
-│   │   ├── asset_canister.did
-│   │   ├── asset_canister.did.d.ts
-│   │   ├── asset_canister.did.js
-│   │   ├── index.d.ts
-│   │   └── index.js
+│   │   ├── asset_canister.did (264 lines)
+│   │   ├── asset_canister.did.d.ts (245 lines)
+│   │   ├── asset_canister.did.js (297 lines)
+│   │   ├── index.d.ts (51 lines)
+│   │   └── index.js (43 lines)
 │   ├── asset_manager/
-│   │   ├── Cargo.toml
-│   │   ├── asset_manager.did
+│   │   ├── Cargo.toml (23 lines)
+│   │   ├── asset_manager.did (18 lines)
 │   │   └── src/
-│   │       ├── assets_canister.did
-│   │       ├── ic_frontend_canister.wasm
-│   │       ├── lib.rs
-│   │       ├── paln.md
-│   │       ├── queries.rs
-│   │       ├── storage.rs
-│   │       ├── update.rs
-│   │       └── utlis.rs
+│   │       ├── assets_canister.did (1 lines)
+│   │       ├── ic_frontend_canister.wasm (7740 lines)
+│   │       ├── lib.rs (15 lines)
+│   │       ├── paln.md (1 lines)
+│   │       ├── queries.rs (28 lines)
+│   │       ├── storage.rs (52 lines)
+│   │       ├── update.rs (228 lines)
+│   │       └── utlis.rs (24 lines)
 │   ├── bookmarks/
-│   │   ├── Cargo.toml
-│   │   ├── backend.txt
-│   │   ├── bookmarks.did
+│   │   ├── Cargo.toml (22 lines)
+│   │   ├── backend.txt (27 lines)
+│   │   ├── bookmarks.did (39 lines)
 │   │   └── src/
-│   │       ├── folders.rs
-│   │       ├── lib.rs
-│   │       ├── queries.rs
-│   │       ├── storage.rs
-│   │       ├── updates.rs
-│   │       └── utils.rs
+│   │       ├── folders.rs (224 lines)
+│   │       ├── lib.rs (64 lines)
+│   │       ├── queries.rs (99 lines)
+│   │       ├── storage.rs (200 lines)
+│   │       ├── updates.rs (238 lines)
+│   │       └── utils.rs (10 lines)
 │   ├── emporium/
-│   │   ├── Cargo.toml
-│   │   ├── emporium.did
+│   │   ├── Cargo.toml (23 lines)
+│   │   ├── emporium.did (56 lines)
 │   │   └── src/
-│   │       ├── guard.rs
-│   │       ├── lib.rs
-│   │       ├── plan.md
-│   │       ├── queries.rs
-│   │       ├── storage.rs
-│   │       ├── update.rs
-│   │       └── utils.rs
+│   │       ├── guard.rs (41 lines)
+│   │       ├── lib.rs (36 lines)
+│   │       ├── plan.md (53 lines)
+│   │       ├── queries.rs (229 lines)
+│   │       ├── storage.rs (117 lines)
+│   │       ├── update.rs (393 lines)
+│   │       └── utils.rs (145 lines)
 │   ├── icp_swap/
-│   │   ├── Cargo.toml
-│   │   ├── icp_swap.did
-│   │   ├── icp_swap_prelim_audit.txt
+│   │   ├── Cargo.toml (28 lines)
+│   │   ├── icp_swap.did (113 lines)
+│   │   ├── icp_swap_prelim_audit.txt (128 lines)
 │   │   └── src/
-│   │       ├── error.rs
-│   │       ├── guard.rs
-│   │       ├── lib.rs
-│   │       ├── queries.rs
-│   │       ├── script.rs
-│   │       ├── storage.rs
-│   │       ├── update.rs
-│   │       └── utils.rs
+│   │       ├── error.rs (226 lines)
+│   │       ├── guard.rs (41 lines)
+│   │       ├── lib.rs (22 lines)
+│   │       ├── queries.rs (157 lines)
+│   │       ├── script.rs (189 lines)
+│   │       ├── storage.rs (206 lines)
+│   │       ├── update.rs (1432 lines)
+│   │       └── utils.rs (444 lines)
 │   ├── icp_swap_factory/
-│   │   ├── icp_swap_factory copy.did
-│   │   ├── icp_swap_factory.did
-│   │   ├── icp_swap_factory.did.d.ts
-│   │   ├── icp_swap_factory.did.js
-│   │   ├── index.d.ts
-│   │   └── index.js
+│   │   ├── icp_swap_factory copy.did (195 lines)
+│   │   ├── icp_swap_factory.did (195 lines)
+│   │   ├── icp_swap_factory.did.d.ts (163 lines)
+│   │   ├── icp_swap_factory.did.js (191 lines)
+│   │   ├── index.d.ts (51 lines)
+│   │   └── index.js (43 lines)
 │   ├── icrc7/
 │   │   ├── initial_state/
-│   │   │   ├── icrc3.mo
-│   │   │   ├── icrc37.mo
-│   │   │   └── icrc7.mo
-│   │   ├── main.mo
-│   │   └── nft_archive.mo
+│   │   │   ├── icrc3.mo (17 lines)
+│   │   │   ├── icrc37.mo (32 lines)
+│   │   │   └── icrc7.mo (65 lines)
+│   │   ├── main.mo (480 lines)
+│   │   └── nft_archive.mo (931 lines)
 │   ├── icrc7_scion/
 │   │   ├── initial_state/
-│   │   │   ├── icrc3.mo
-│   │   │   ├── icrc37.mo
-│   │   │   └── icrc7.mo
-│   │   ├── main.mo
-│   │   └── nft_archive.mo
+│   │   │   ├── icrc3.mo (17 lines)
+│   │   │   ├── icrc37.mo (32 lines)
+│   │   │   └── icrc7.mo (65 lines)
+│   │   ├── main.mo (347 lines)
+│   │   └── nft_archive.mo (162 lines)
 │   ├── logs/
-│   │   ├── Cargo.toml
-│   │   ├── logs.did
+│   │   ├── Cargo.toml (23 lines)
+│   │   ├── logs.did (18 lines)
 │   │   └── src/
-│   │       ├── guard.rs
-│   │       ├── lib.rs
-│   │       ├── queries.rs
-│   │       ├── script.rs
-│   │       ├── storage.rs
-│   │       ├── update.rs
-│   │       └── utils.rs
+│   │       ├── guard.rs (9 lines)
+│   │       ├── lib.rs (20 lines)
+│   │       ├── queries.rs (22 lines)
+│   │       ├── script.rs (18 lines)
+│   │       ├── storage.rs (57 lines)
+│   │       ├── update.rs (47 lines)
+│   │       └── utils.rs (131 lines)
 │   ├── nft_manager/
-│   │   ├── Cargo.toml
-│   │   ├── nft_manager.did
-│   │   ├── nft_manager.sh
+│   │   ├── Cargo.toml (24 lines)
+│   │   ├── nft_manager.did (49 lines)
+│   │   ├── nft_manager.sh (98 lines)
 │   │   ├── src/
-│   │   │   ├── action_fees.rs
+│   │   │   ├── action_fees.rs (68 lines)
 │   │   │   ├── archive/
-│   │   │   │   ├── dao.rs
-│   │   │   │   ├── extras.rs
-│   │   │   │   └── playground.rs
-│   │   │   ├── coordinate_mint.rs
-│   │   │   ├── guard.rs
-│   │   │   ├── id_converter.rs
-│   │   │   ├── init.rs
-│   │   │   ├── lib.rs
-│   │   │   ├── nft_wallets.rs
-│   │   │   ├── query.rs
-│   │   │   ├── topup_wallet.rs
-│   │   │   ├── types.rs
-│   │   │   ├── update.rs
-│   │   │   └── utils.rs
-│   │   └── stress_test.sh
+│   │   │   │   ├── dao.rs (621 lines)
+│   │   │   │   ├── extras.rs (94 lines)
+│   │   │   │   └── playground.rs (342 lines)
+│   │   │   ├── coordinate_mint.rs (179 lines)
+│   │   │   ├── guard.rs (14 lines)
+│   │   │   ├── id_converter.rs (271 lines)
+│   │   │   ├── init.rs (98 lines)
+│   │   │   ├── lib.rs (88 lines)
+│   │   │   ├── nft_wallets.rs (102 lines)
+│   │   │   ├── query.rs (291 lines)
+│   │   │   ├── topup_wallet.rs (76 lines)
+│   │   │   ├── types.rs (118 lines)
+│   │   │   ├── update.rs (105 lines)
+│   │   │   └── utils.rs (29 lines)
+│   │   └── stress_test.sh (16 lines)
 │   ├── perpetua/
-│   │   ├── Cargo.toml
-│   │   ├── perpetua.did
-│   │   ├── perpetua.md
+│   │   ├── Cargo.toml (20 lines)
+│   │   ├── perpetua.did (67 lines)
+│   │   ├── perpetua.md (245 lines)
 │   │   └── src/
-│   │       ├── auth.rs
-│   │       ├── guard.rs
-│   │       ├── lib.rs
-│   │       ├── ordering.rs
-│   │       ├── query.rs
-│   │       ├── storage.rs
+│   │       ├── auth.rs (143 lines)
+│   │       ├── guard.rs (11 lines)
+│   │       ├── lib.rs (47 lines)
+│   │       ├── ordering.rs (175 lines)
+│   │       ├── query.rs (235 lines)
+│   │       ├── storage.rs (332 lines)
 │   │       ├── update/
-│   │       │   ├── access.rs
-│   │       │   ├── item.rs
-│   │       │   ├── profile.rs
-│   │       │   ├── shelf.rs
-│   │       │   └── utils.rs
-│   │       └── utils.rs
+│   │       │   ├── access.rs (69 lines)
+│   │       │   ├── item.rs (243 lines)
+│   │       │   ├── profile.rs (114 lines)
+│   │       │   ├── shelf.rs (101 lines)
+│   │       │   └── utils.rs (101 lines)
+│   │       └── utils.rs (28 lines)
 │   ├── registry/
-│   │   ├── Cargo.toml
-│   │   ├── registry.did
+│   │   ├── Cargo.toml (14 lines)
+│   │   ├── registry.did (2 lines)
 │   │   └── src/
-│   │       └── lib.rs
+│   │       └── lib.rs (56 lines)
 │   ├── system_api/
-│   │   ├── Cargo.toml
+│   │   ├── Cargo.toml (22 lines)
 │   │   ├── src/
-│   │   │   ├── lib.rs
-│   │   │   └── types.rs
-│   │   └── system_api.did
+│   │   │   ├── lib.rs (149 lines)
+│   │   │   └── types.rs (43 lines)
+│   │   └── system_api.did (20 lines)
 │   ├── tests/
-│   │   ├── Cargo.toml
-│   │   ├── lbryfun.md
-│   │   ├── likes.md
-│   │   ├── milestones.md
-│   │   ├── plan.md
+│   │   ├── Cargo.toml (17 lines)
+│   │   ├── lbryfun.md (122 lines)
+│   │   ├── likes.md (9 lines)
+│   │   ├── milestones.md (119 lines)
+│   │   ├── plan.md (106 lines)
 │   │   ├── scripts/
-│   │   │   ├── basic.sh
-│   │   │   ├── build.sh
-│   │   │   └── nfts.sh
+│   │   │   ├── basic.sh (106 lines)
+│   │   │   ├── build.sh (161 lines)
+│   │   │   └── nfts.sh (7 lines)
 │   │   ├── src/
-│   │   │   ├── balances.rs
-│   │   │   ├── burn.rs
-│   │   │   ├── claim.rs
-│   │   │   ├── lib.rs
-│   │   │   ├── stake.rs
-│   │   │   ├── swap.rs
-│   │   │   ├── triggers.rs
-│   │   │   └── utils.rs
+│   │   │   ├── balances.rs (169 lines)
+│   │   │   ├── burn.rs (64 lines)
+│   │   │   ├── claim.rs (25 lines)
+│   │   │   ├── lib.rs (83 lines)
+│   │   │   ├── stake.rs (98 lines)
+│   │   │   ├── swap.rs (153 lines)
+│   │   │   ├── triggers.rs (108 lines)
+│   │   │   └── utils.rs (24 lines)
 │   │   ├── temp/
-│   │   │   ├── burn.rs
-│   │   │   ├── lib.rs
-│   │   │   └── utils.rs
-│   │   └── tests.did
+│   │   │   ├── burn.rs (64 lines)
+│   │   │   ├── lib.rs (55 lines)
+│   │   │   └── utils.rs (24 lines)
+│   │   └── tests.did (21 lines)
 │   ├── tokenomics/
-│   │   ├── Cargo.toml
-│   │   ├── image.png
+│   │   ├── Cargo.toml (26 lines)
+│   │   ├── image.png (45 lines)
 │   │   ├── src/
-│   │   │   ├── error.rs
-│   │   │   ├── guard.rs
-│   │   │   ├── lib.rs
-│   │   │   ├── queries.rs
-│   │   │   ├── storage.rs
-│   │   │   ├── update.rs
-│   │   │   └── utils.rs
-│   │   ├── tokenomics.
-│   │   ├── tokenomics.did
-│   │   ├── tokenomics_audit.md
-│   │   └── tokenomics_audit5.md
+│   │   │   ├── error.rs (67 lines)
+│   │   │   ├── guard.rs (10 lines)
+│   │   │   ├── lib.rs (19 lines)
+│   │   │   ├── queries.rs (258 lines)
+│   │   │   ├── storage.rs (133 lines)
+│   │   │   ├── update.rs (540 lines)
+│   │   │   └── utils.rs (109 lines)
+│   │   ├── tokenomics. (12 lines)
+│   │   ├── tokenomics.did (68 lines)
+│   │   ├── tokenomics_audit.md (174 lines)
+│   │   └── tokenomics_audit5.md (91 lines)
 │   ├── user/
-│   │   ├── Cargo.toml
+│   │   ├── Cargo.toml (33 lines)
 │   │   ├── src/
 │   │   │   ├── api/
 │   │   │   │   ├── engine/
-│   │   │   │   │   ├── mod.rs
-│   │   │   │   │   ├── queries.rs
-│   │   │   │   │   └── updates.rs
-│   │   │   │   ├── mod.rs
+│   │   │   │   │   ├── mod.rs (2 lines)
+│   │   │   │   │   ├── queries.rs (120 lines)
+│   │   │   │   │   └── updates.rs (109 lines)
+│   │   │   │   ├── mod.rs (3 lines)
 │   │   │   │   ├── node/
-│   │   │   │   │   ├── mod.rs
-│   │   │   │   │   ├── queries.rs
-│   │   │   │   │   └── updates.rs
+│   │   │   │   │   ├── mod.rs (2 lines)
+│   │   │   │   │   ├── queries.rs (120 lines)
+│   │   │   │   │   └── updates.rs (99 lines)
 │   │   │   │   └── user/
-│   │   │   │       ├── mod.rs
-│   │   │   │       ├── queries.rs
-│   │   │   │       └── updates.rs
+│   │   │   │       ├── mod.rs (2 lines)
+│   │   │   │       ├── queries.rs (71 lines)
+│   │   │   │       └── updates.rs (153 lines)
 │   │   │   ├── errors/
-│   │   │   │   ├── engine.rs
-│   │   │   │   ├── general.rs
-│   │   │   │   ├── mod.rs
-│   │   │   │   ├── node.rs
-│   │   │   │   └── user.rs
-│   │   │   ├── lib.rs
+│   │   │   │   ├── engine.rs (73 lines)
+│   │   │   │   ├── general.rs (58 lines)
+│   │   │   │   ├── mod.rs (4 lines)
+│   │   │   │   ├── node.rs (51 lines)
+│   │   │   │   └── user.rs (54 lines)
+│   │   │   ├── lib.rs (33 lines)
 │   │   │   ├── models/
-│   │   │   │   ├── engine.rs
-│   │   │   │   ├── mod.rs
-│   │   │   │   ├── node.rs
-│   │   │   │   └── user.rs
-│   │   │   ├── store.rs
+│   │   │   │   ├── engine.rs (48 lines)
+│   │   │   │   ├── mod.rs (3 lines)
+│   │   │   │   ├── node.rs (39 lines)
+│   │   │   │   └── user.rs (98 lines)
+│   │   │   ├── store.rs (263 lines)
 │   │   │   └── validations/
-│   │   │       ├── engine.rs
-│   │   │       ├── mod.rs
-│   │   │       ├── node.rs
-│   │   │       └── user.rs
-│   │   └── user.did
+│   │   │       ├── engine.rs (87 lines)
+│   │   │       ├── mod.rs (3 lines)
+│   │   │       ├── node.rs (29 lines)
+│   │   │       └── user.rs (159 lines)
+│   │   └── user.did (86 lines)
 │   ├── vetkd/
-│   │   ├── Cargo.toml
+│   │   ├── Cargo.toml (36 lines)
 │   │   ├── src/
-│   │   │   ├── ibe.rs
-│   │   │   ├── lib.rs
-│   │   │   ├── ro.rs
-│   │   │   ├── types.rs
-│   │   │   └── utility.rs
-│   │   └── vetkd.did
+│   │   │   ├── ibe.rs (189 lines)
+│   │   │   ├── lib.rs (19 lines)
+│   │   │   ├── ro.rs (59 lines)
+│   │   │   ├── types.rs (43 lines)
+│   │   │   └── utility.rs (390 lines)
+│   │   └── vetkd.did (8 lines)
 │   ├── xrc/
-│   │   ├── Cargo.toml
+│   │   ├── Cargo.toml (27 lines)
 │   │   ├── src/
-│   │   │   └── lib.rs
-│   │   └── xrc.did
-├── tailwind.config.js
-├── tsconfig.json
-├── webpack.config.js
+│   │   │   └── lib.rs (122 lines)
+│   │   └── xrc.did (44 lines)
+├── tailwind.config.js (223 lines)
+├── tsconfig.json (35 lines)
+├── webpack.config.js (282 lines)

@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
 import {
   selectUserShelves,
   selectPublicShelves,
@@ -46,15 +47,15 @@ export const useEditorsLoadingState = (shelfId: string) =>
 export const useError = () => useSelector(selectError);
 
 // Direct access to user principal from auth state - single source of truth
-export const useUserPrincipal = () => useSelector((state: any) => state.auth.user?.principal);
+export const useUserPrincipal = () => useSelector((state: RootState) => state.auth.user?.principal);
 
 // Permission checks
 export const useIsOwner = (contentId: string) => 
-  useSelector((state) => selectIsOwner(contentId)(state));
+  useSelector((state: RootState) => selectIsOwner(contentId)(state));
 export const useHasEditAccess = (contentId: string) => 
-  useSelector((state) => selectHasEditAccess(contentId)(state));
+  useSelector((state: RootState) => selectHasEditAccess(contentId)(state));
 export const useIsEditor = (contentId: string) => 
-  useSelector((state) => selectIsEditor(contentId)(state));  
+  useSelector((state: RootState) => selectIsEditor(contentId)(state));  
 
 // Collaboration
 export const useShelfEditors = (shelfId: string) => 
