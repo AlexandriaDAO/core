@@ -275,127 +275,139 @@ export const {
 } = perpetuaSlice.actions;
 export default perpetuaSlice.reducer;
 
-// Selector memoization cache
-const selectorCache: {
-  shelfById: Record<string, ReturnType<typeof createSelector>>;
-  shelfEditors: Record<string, ReturnType<typeof createSelector>>;
-  editorsLoading: Record<string, ReturnType<typeof createSelector>>;
-  hasEditAccess: Record<string, ReturnType<typeof createSelector>>;
-  isOwner: Record<string, ReturnType<typeof createSelector>>;
-  isEditor: Record<string, ReturnType<typeof createSelector>>;
-  optimisticShelfItemOrder: Record<string, ReturnType<typeof createSelector>>;
-} = {
-  shelfById: {},
-  shelfEditors: {},
-  editorsLoading: {},
-  hasEditAccess: {},
-  isOwner: {},
-  isEditor: {},
-  optimisticShelfItemOrder: {},
+// Create reusable input selectors to improve memoization
+const selectPerpetuaState = (state: RootState) => state.perpetua;
+const selectShelvesEntities = (state: RootState) => state.perpetua.entities.shelves;
+const selectUserPrincipal = (state: RootState) => state.auth.user?.principal;
+const selectShelfEditorsByIdMap = (state: RootState) => state.perpetua.shelfEditors;
+const selectEditorsLoadingMap = (state: RootState) => state.perpetua.loading.editors;
+const selectShelfItemOrderMap = (state: RootState) => state.perpetua.ids.shelfItems;
+const selectUserShelvesOrder = (state: RootState) => state.perpetua.ids.userShelves;
+const selectPublicShelvesOrder = (state: RootState) => state.perpetua.ids.publicShelves;
+const selectSelectedShelfId = (state: RootState) => state.perpetua.selectedShelfId;
+const selectLastTime = (state: RootState) => state.perpetua.lastTimestamp;
+const selectUserShelvesLoading = (state: RootState) => state.perpetua.loading.userShelves;
+const selectPublicShelvesLoading = (state: RootState) => state.perpetua.loading.publicShelves;
+const selectPerpetuaError = (state: RootState) => state.perpetua.error;
+
+// Enhanced selector caching mechanism
+// This stores actual selector instances instead of creating new ones each time
+const memoizedSelectorsByShelfId = {
+  shelfById: new Map<string, ReturnType<typeof createSelector>>(),
+  shelfEditors: new Map<string, ReturnType<typeof createSelector>>(),
+  editorsLoading: new Map<string, ReturnType<typeof createSelector>>(),
+  hasEditAccess: new Map<string, ReturnType<typeof createSelector>>(),
+  isOwner: new Map<string, ReturnType<typeof createSelector>>(),
+  isEditor: new Map<string, ReturnType<typeof createSelector>>(),
+  optimisticShelfItemOrder: new Map<string, ReturnType<typeof createSelector>>(),
 };
 
 // Selectors
 // Get the order of user shelves directly from state - memoized to prevent recalculation
 export const selectOptimisticShelfOrder = createSelector(
   (state: RootState) => state.perpetua.ids.userShelves,
-  (userShelves) => userShelves
+  (userShelves) => userShelves // Return direct reference from state
 );
 
 // Get all user shelves with preserved order - memoized to prevent recalculation
 export const selectUserShelves = createSelector(
   selectOptimisticShelfOrder,
-  (state: RootState) => state.perpetua.entities.shelves,
+  selectShelvesEntities,
   (shelfOrder, shelves) => shelfOrder.map(id => shelves[id]).filter(Boolean)
 );
 
 // Get all public shelves with preserved order - memoized to prevent recalculation
 export const selectPublicShelves = createSelector(
   (state: RootState) => state.perpetua.ids.publicShelves,
-  (state: RootState) => state.perpetua.entities.shelves,
+  selectShelvesEntities,
   (publicShelves, shelves) => publicShelves.map(id => shelves[id]).filter(Boolean)
 );
 
-// Get a specific shelf by ID - memoized factory selector with caching
+// Get a specific shelf by ID - memoized factory selector with improved caching
 export const selectShelfById = (shelfId: string) => {
-  if (!selectorCache.shelfById[shelfId]) {
-    selectorCache.shelfById[shelfId] = createSelector(
-      (state: RootState) => state.perpetua.entities.shelves[shelfId],
-      (shelf) => shelf || null
+  if (!memoizedSelectorsByShelfId.shelfById.has(shelfId)) {
+    const selector = createSelector(
+      selectShelvesEntities,
+      (shelves) => shelves[shelfId] || null
     );
+    memoizedSelectorsByShelfId.shelfById.set(shelfId, selector);
   }
-  return selectorCache.shelfById[shelfId];
+  return memoizedSelectorsByShelfId.shelfById.get(shelfId)!;
 };
 
 // Get the currently selected shelf - memoized to prevent recalculation
 export const selectSelectedShelf = createSelector(
-  (state: RootState) => state.perpetua.selectedShelfId,
-  (state: RootState) => state.perpetua.entities.shelves,
+  selectSelectedShelfId,
+  selectShelvesEntities,
   (selectedShelfId, shelves) => {
     if (!selectedShelfId) return null;
     return shelves[selectedShelfId] || null;
   }
 );
 
-// Get the optimistically updated ordered item IDs for a shelf - memoized factory selector with caching
+// Get the optimistically updated ordered item IDs for a shelf - memoized factory selector with improved caching
 export const selectOptimisticShelfItemOrder = (shelfId: string) => {
-  if (!selectorCache.optimisticShelfItemOrder[shelfId]) {
-    selectorCache.optimisticShelfItemOrder[shelfId] = createSelector(
-      (state: RootState) => state.perpetua.ids.shelfItems[shelfId],
-      (itemIds) => itemIds || []
+  if (!memoizedSelectorsByShelfId.optimisticShelfItemOrder.has(shelfId)) {
+    const selector = createSelector(
+      selectShelfItemOrderMap,
+      (itemOrderMap) => itemOrderMap[shelfId] || [] // Return direct reference from state
     );
+    memoizedSelectorsByShelfId.optimisticShelfItemOrder.set(shelfId, selector);
   }
-  return selectorCache.optimisticShelfItemOrder[shelfId];
+  return memoizedSelectorsByShelfId.optimisticShelfItemOrder.get(shelfId)!;
 };
 
 // Remaining selectors, also memoized
 export const selectLastTimestamp = createSelector(
-  (state: RootState) => state.perpetua.lastTimestamp,
-  (timestamp) => timestamp
+  selectLastTime,
+  (timestamp) => timestamp ? String(timestamp) : undefined // Ensure transformation
 );
 
 export const selectLoading = createSelector(
-  (state: RootState) => state.perpetua.loading.userShelves,
-  (loading) => loading
+  selectUserShelvesLoading,
+  (loading) => Boolean(loading) // Transform to boolean
 );
 
 export const selectPublicLoading = createSelector(
-  (state: RootState) => state.perpetua.loading.publicShelves,
-  (loading) => loading
+  selectPublicShelvesLoading,
+  (loading) => Boolean(loading) // Transform to boolean
 );
 
 export const selectError = createSelector(
-  (state: RootState) => state.perpetua.error,
-  (error) => error
+  selectPerpetuaError,
+  (error) => error || null // Ensure null if undefined
 );
 
-// New selectors for collaboration features with caching
+// Improved selectors for collaboration features with better caching
 export const selectShelfEditors = (shelfId: string) => {
-  if (!selectorCache.shelfEditors[shelfId]) {
-    selectorCache.shelfEditors[shelfId] = createSelector(
-      (state: RootState) => state.perpetua.shelfEditors[shelfId],
-      (editors) => editors || []
+  if (!memoizedSelectorsByShelfId.shelfEditors.has(shelfId)) {
+    const selector = createSelector(
+      selectShelfEditorsByIdMap,
+      (editorsMap) => editorsMap[shelfId] || [] // Return direct reference from state
     );
+    memoizedSelectorsByShelfId.shelfEditors.set(shelfId, selector);
   }
-  return selectorCache.shelfEditors[shelfId];
+  return memoizedSelectorsByShelfId.shelfEditors.get(shelfId)!;
 };
 
 export const selectEditorsLoading = (shelfId: string) => {
-  if (!selectorCache.editorsLoading[shelfId]) {
-    selectorCache.editorsLoading[shelfId] = createSelector(
-      (state: RootState) => state.perpetua.loading.editors[shelfId],
-      (loading) => loading || false
+  if (!memoizedSelectorsByShelfId.editorsLoading.has(shelfId)) {
+    const selector = createSelector(
+      selectEditorsLoadingMap,
+      (loadingMap) => Boolean(loadingMap[shelfId]) // Transform to boolean
     );
+    memoizedSelectorsByShelfId.editorsLoading.set(shelfId, selector);
   }
-  return selectorCache.editorsLoading[shelfId];
+  return memoizedSelectorsByShelfId.editorsLoading.get(shelfId)!;
 };
 
-// Check if user has edit access to a content item - with caching
+// Check if user has edit access to a content item - with improved caching
 export const selectHasEditAccess = (contentId: string) => {
-  if (!selectorCache.hasEditAccess[contentId]) {
-    selectorCache.hasEditAccess[contentId] = createSelector(
-      (state: RootState) => state.auth.user?.principal,
-      (state: RootState) => state.perpetua.entities.shelves[contentId],
-      (state: RootState) => state.perpetua.shelfEditors[contentId] || [],
+  if (!memoizedSelectorsByShelfId.hasEditAccess.has(contentId)) {
+    const selector = createSelector(
+      selectUserPrincipal,
+      (state: RootState) => selectShelvesEntities(state)[contentId],
+      (state: RootState) => selectShelfEditorsByIdMap(state)[contentId] || [],
       (userPrincipal, shelf, editors) => {
         if (!userPrincipal || !shelf) return false;
         
@@ -406,32 +418,34 @@ export const selectHasEditAccess = (contentId: string) => {
         return editors.includes(userPrincipal);
       }
     );
+    memoizedSelectorsByShelfId.hasEditAccess.set(contentId, selector);
   }
-  return selectorCache.hasEditAccess[contentId];
+  return memoizedSelectorsByShelfId.hasEditAccess.get(contentId)!;
 };
 
-// Check if user is the owner of a shelf - with caching
+// Check if user is the owner of a shelf - with improved caching
 export const selectIsOwner = (contentId: string) => {
-  if (!selectorCache.isOwner[contentId]) {
-    selectorCache.isOwner[contentId] = createSelector(
-      (state: RootState) => state.auth.user?.principal,
-      (state: RootState) => state.perpetua.entities.shelves[contentId],
+  if (!memoizedSelectorsByShelfId.isOwner.has(contentId)) {
+    const selector = createSelector(
+      selectUserPrincipal,
+      (state: RootState) => selectShelvesEntities(state)[contentId],
       (userPrincipal, shelf) => {
         if (!shelf || !userPrincipal) return false;
         return shelf.owner === userPrincipal;
       }
     );
+    memoizedSelectorsByShelfId.isOwner.set(contentId, selector);
   }
-  return selectorCache.isOwner[contentId];
+  return memoizedSelectorsByShelfId.isOwner.get(contentId)!;
 };
 
-// Check if user is an editor (but not owner) of a shelf - with caching
+// Check if user is an editor (but not owner) of a shelf - with improved caching
 export const selectIsEditor = (contentId: string) => {
-  if (!selectorCache.isEditor[contentId]) {
-    selectorCache.isEditor[contentId] = createSelector(
-      (state: RootState) => state.auth.user?.principal,
-      (state: RootState) => state.perpetua.entities.shelves[contentId],
-      (state: RootState) => state.perpetua.shelfEditors[contentId] || [],
+  if (!memoizedSelectorsByShelfId.isEditor.has(contentId)) {
+    const selector = createSelector(
+      selectUserPrincipal,
+      (state: RootState) => selectShelvesEntities(state)[contentId],
+      (state: RootState) => selectShelfEditorsByIdMap(state)[contentId] || [],
       (userPrincipal, shelf, editors) => {
         if (!userPrincipal || !shelf) return false;
         
@@ -441,6 +455,7 @@ export const selectIsEditor = (contentId: string) => {
         return editors.includes(userPrincipal);
       }
     );
+    memoizedSelectorsByShelfId.isEditor.set(contentId, selector);
   }
-  return selectorCache.isEditor[contentId];
+  return memoizedSelectorsByShelfId.isEditor.get(contentId)!;
 };

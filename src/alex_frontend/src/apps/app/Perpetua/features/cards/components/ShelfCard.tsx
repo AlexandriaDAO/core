@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { convertTimestamp } from "@/utils/general";
 import { ShelfCardProps, PublicShelfCardProps } from '../types/types';
@@ -36,16 +36,13 @@ export const ShelfCard: React.FC<ExtendedShelfCardProps> = ({
   const updatedAt = convertTimestamp(shelf.updated_at, 'combined');
   const itemCount = Object.keys(shelf.items).length;
   
-  // Memoize selector references to prevent recreation on each render
-  const isOwnerSelector = useMemo(() => selectIsOwner(shelf.shelf_id), [shelf.shelf_id]);
-  const hasEditAccessSelector = useMemo(() => selectHasEditAccess(shelf.shelf_id), [shelf.shelf_id]);
-  const shelfEditorsSelector = useMemo(() => selectShelfEditors(shelf.shelf_id), [shelf.shelf_id]);
+  // Use selector factories from Redux directly - Redux will internally cache these
+  const isOwner = useAppSelector(state => selectIsOwner(shelf.shelf_id)(state));
+  const hasEditAccess = useAppSelector(state => selectHasEditAccess(shelf.shelf_id)(state));
+  const editors = useAppSelector(state => selectShelfEditors(shelf.shelf_id)(state));
   
-  // Get collaboration status using memoized selectors
-  const isOwner = useAppSelector(isOwnerSelector) as boolean;
-  const hasEditAccess = useAppSelector(hasEditAccessSelector) as boolean;
+  // Derived state
   const isCollaborator = hasEditAccess && !isOwner;
-  const editors = useAppSelector(shelfEditorsSelector) as string[];
   const hasCollaborators = editors.length > 0;
   
   // Check if the updated_at is different from created_at (allowing a small buffer for processing time)
@@ -120,6 +117,9 @@ export const PublicShelfCard: React.FC<ExtendedPublicShelfCardProps> = ({
 }) => {
   // Skip null safety checks as they should be handled by the parent component
   const itemCount = Object.keys(shelf.items).length;
+  
+  // Use selector factory from Redux directly - Redux will internally cache this
+  const hasEditAccess = useAppSelector(state => selectHasEditAccess(shelf.shelf_id)(state));
   
   return (
     <ContentCard

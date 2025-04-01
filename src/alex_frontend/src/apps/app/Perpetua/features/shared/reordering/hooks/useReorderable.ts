@@ -43,16 +43,11 @@ export const useReorderable = <T extends ReorderableItem>({
     [items]
   );
   
-  // Update items only when they significantly change
+  // Update itemsRef reference tracking to be simpler
   useEffect(() => {
-    // Compare only the IDs for a lightweight comparison
-    if (!isEqual(
-      itemsRef.current.map(item => item.id),
-      itemIds
-    )) {
-      itemsRef.current = items;
-    }
-  }, [items, itemIds]);
+    // Only update the reference when the items array actually changes
+    itemsRef.current = items;
+  }, [items]);
   
   // State management
   const [isEditMode, setIsEditMode] = useState(false);
@@ -289,12 +284,12 @@ export const useReorderable = <T extends ReorderableItem>({
         referenceItemId: referenceId,
         before,
         principal: identity.getPrincipal().toString(),
-        newItemOrder: newIds // Pass the complete new order for optimistic updates
+        newItemOrder: newIds // Direct reference is safe here since newIds is already a new array
       })).unwrap();
       
       setIsEditMode(false);
     } catch (error) {
-      // Revert to original order on error
+      // Revert to original order on error - we need to spread here because we need a new reference
       setEditedItems([...itemsRef.current]);
     }
   }, [containerId, editedItems, identity, itemsRef, dispatch, reorderAction]);
