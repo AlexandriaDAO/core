@@ -18,22 +18,21 @@ export const createShelf = createAsyncThunk(
     title: string, 
     description: string, 
     principal: Principal | string 
-  }, { dispatch, rejectWithValue }) => {
+  }, { rejectWithValue }) => {
     try {
       const result = await perpetuaService.createShelf(title, description);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate all caches for this principal
         cacheManager.invalidateForPrincipal(principal);
-        
-        // Reload shelves after creating a new one
-        dispatch(loadShelves(principal));
-        return { shelfId: result.Ok };
-      } else if ("Err" in result && result.Err) {
+        return { shelfId: result.Ok, principal };
+      } 
+      
+      if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
-      } else {
-        return rejectWithValue("Failed to create shelf");
       }
+      
+      return rejectWithValue("Failed to create shelf");
     } catch (error) {
       return rejectWithValue(extractErrorMessage(error, "Failed to create shelf"));
     }
@@ -53,23 +52,21 @@ export const updateShelfMetadata = createAsyncThunk(
     shelfId: string,
     title?: string,
     description?: string
-  }, { dispatch, rejectWithValue }) => {
+  }, { rejectWithValue }) => {
     try {
       const result = await perpetuaService.updateShelfMetadata(shelfId, title, description);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate cache for this shelf
         cacheManager.invalidateForShelf(shelfId);
-        
-        // Get updated shelf data
-        dispatch(getShelfById(shelfId));
-        
         return { shelfId, title, description };
-      } else if ("Err" in result && result.Err) {
+      } 
+      
+      if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
-      } else {
-        return rejectWithValue("Failed to update shelf metadata");
       }
+      
+      return rejectWithValue("Failed to update shelf metadata");
     } catch (error) {
       return rejectWithValue(extractErrorMessage(error, "Failed to update shelf metadata"));
     }
@@ -87,25 +84,22 @@ export const rebalanceShelfItems = createAsyncThunk(
   }: { 
     shelfId: string, 
     principal: Principal | string 
-  }, { dispatch, rejectWithValue }) => {
+  }, { rejectWithValue }) => {
     try {
       const result = await perpetuaService.rebalanceShelfItems(shelfId);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate cache for this shelf
         cacheManager.invalidateForShelf(shelfId);
-        
-        // Get updated shelf data
-        dispatch(getShelfById(shelfId));
-        
         return { shelfId };
-      } else if ("Err" in result && result.Err) {
+      } 
+      
+      if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
-      } else {
-        return rejectWithValue("Failed to rebalance shelf items");
       }
+      
+      return rejectWithValue("Failed to rebalance shelf items");
     } catch (error) {
-      console.error("Failed to rebalance shelf items:", error);
       return rejectWithValue(extractErrorMessage(error, "Failed to rebalance shelf items"));
     }
   }
@@ -126,7 +120,7 @@ export const createAndAddShelfItem = createAsyncThunk(
     title: string, 
     description: string, 
     principal: Principal | string 
-  }, { dispatch, rejectWithValue }) => {
+  }, { rejectWithValue }) => {
     try {
       const result = await perpetuaService.createAndAddShelfItem(parentShelfId, title, description);
       
@@ -135,22 +129,23 @@ export const createAndAddShelfItem = createAsyncThunk(
         cacheManager.invalidateForPrincipal(principal);
         cacheManager.invalidateForShelf(parentShelfId);
         
-        // Reload shelves and get the updated parent shelf
-        dispatch(loadShelves(principal));
-        dispatch(getShelfById(parentShelfId));
-        
         // Get the shelf ID from the result
         const newShelfId = result.Ok;
         
-        return { success: true, parentShelfId, newShelfId };
-      } else if ("Err" in result && result.Err) {
-        console.error("Backend error creating and adding shelf item:", result.Err);
+        return { 
+          success: true, 
+          parentShelfId, 
+          newShelfId,
+          principal
+        };
+      } 
+      
+      if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
-      } else {
-        return rejectWithValue("Unknown error creating and adding shelf item");
       }
+      
+      return rejectWithValue("Unknown error creating and adding shelf item");
     } catch (error) {
-      console.error("Failed to create and add shelf item:", error);
       return rejectWithValue(extractErrorMessage(error, "Failed to create and add shelf"));
     }
   }

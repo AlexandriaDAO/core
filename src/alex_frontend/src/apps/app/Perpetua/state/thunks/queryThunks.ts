@@ -45,13 +45,11 @@ export const loadShelves = createAsyncThunk(
  */
 export const getShelfById = createAsyncThunk(
   'perpetua/getShelfById',
-  async (shelfId: string, { dispatch, rejectWithValue }) => {
+  async (shelfId: string, { rejectWithValue }) => {
     try {
       // Check cache first with the 'shelf' type
       const cachedData = cacheManager.get<Shelf>(shelfId, 'shelf');
       if (cachedData) {
-        // Update the Redux store with the cached shelf
-        dispatch(updateSingleShelf(cachedData));
         return cachedData;
       }
       
@@ -62,17 +60,15 @@ export const getShelfById = createAsyncThunk(
         // Update the cache
         cacheManager.set(shelfId, 'shelf', result.Ok);
         
-        // Update the Redux store
-        dispatch(updateSingleShelf(result.Ok));
-        
         return result.Ok;
-      } else if ("Err" in result && result.Err) {
+      } 
+      
+      if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
-      } else {
-        return rejectWithValue(`Failed to load shelf ${shelfId}`);
       }
+      
+      return rejectWithValue(`Failed to load shelf ${shelfId}`);
     } catch (error) {
-      console.error(`Error fetching shelf ${shelfId}:`, error);
       return rejectWithValue(extractErrorMessage(error, `Failed to load shelf ${shelfId}`));
     }
   }

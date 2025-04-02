@@ -4,8 +4,28 @@ import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { 
   loadShelves, 
   loadRecentShelves,
-  loadMissingShelves
+  loadMissingShelves,
+  getShelfById
 } from './thunks/queryThunks';
+import {
+  createShelf,
+  updateShelfMetadata,
+  rebalanceShelfItems,
+  createAndAddShelfItem
+} from './thunks/shelfThunks';
+import {
+  addItem,
+  removeItem
+} from './thunks/itemThunks';
+import {
+  reorderItem,
+  reorderProfileShelf
+} from './thunks/reorderThunks';
+import {
+  listShelfEditors,
+  addShelfEditor,
+  removeShelfEditor
+} from './thunks/collaborationThunks';
 
 // Define the permissions interfaces
 export interface ContentPermissions {
@@ -256,6 +276,170 @@ const perpetuaSlice = createSlice({
       })
       .addCase(loadRecentShelves.rejected, (state, action) => {
         state.loading.publicShelves = false;
+        state.error = action.payload as string;
+      })
+      
+      // Handle createShelf
+      .addCase(createShelf.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(createShelf.fulfilled, (state, action) => {
+        // We'll reload shelves via loadShelves thunk, so no need to modify state here
+      })
+      .addCase(createShelf.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      // Handle updateShelfMetadata
+      .addCase(updateShelfMetadata.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(updateShelfMetadata.fulfilled, (state, action) => {
+        const { shelfId, title } = action.payload;
+        
+        // Only update the title which we know is a string
+        if (shelfId && title && state.entities.shelves[shelfId]) {
+          state.entities.shelves[shelfId].title = title;
+        }
+      })
+      .addCase(updateShelfMetadata.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      // Handle rebalanceShelfItems
+      .addCase(rebalanceShelfItems.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(rebalanceShelfItems.fulfilled, (state) => {
+        // We'll get the updated shelf via getShelfById, so no need to modify state here
+      })
+      .addCase(rebalanceShelfItems.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      // Handle createAndAddShelfItem
+      .addCase(createAndAddShelfItem.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(createAndAddShelfItem.fulfilled, (state, action) => {
+        // We'll get the updated shelves via loadShelves, so no need to modify state here
+      })
+      .addCase(createAndAddShelfItem.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      // Handle getShelfById
+      .addCase(getShelfById.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(getShelfById.fulfilled, (state, action) => {
+        const shelf = action.payload;
+        if (shelf && shelf.shelf_id) {
+          // Update the shelf in our entities
+          state.entities.shelves[shelf.shelf_id] = normalizeShelf(shelf);
+        }
+      })
+      .addCase(getShelfById.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      // Handle addItem
+      .addCase(addItem.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(addItem.fulfilled, (state, action) => {
+        // Item added successfully, will be reflected when the shelf is loaded
+      })
+      .addCase(addItem.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      // Handle removeItem
+      .addCase(removeItem.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(removeItem.fulfilled, (state, action) => {
+        // Item removed successfully, will be reflected when the shelf is loaded
+      })
+      .addCase(removeItem.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      // Handle reorderItem
+      .addCase(reorderItem.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(reorderItem.fulfilled, (state, action) => {
+        const { shelfId, newItemOrder } = action.payload;
+        
+        // Apply the new order if it was provided (for optimistic updates)
+        if (newItemOrder && shelfId) {
+          state.ids.shelfItems[shelfId] = newItemOrder;
+        }
+      })
+      .addCase(reorderItem.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      // Handle reorderProfileShelf
+      .addCase(reorderProfileShelf.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(reorderProfileShelf.fulfilled, (state, action) => {
+        const { newShelfOrder } = action.payload;
+        
+        // Apply the new shelf order if it was provided
+        if (newShelfOrder) {
+          state.ids.userShelves = newShelfOrder;
+        }
+      })
+      .addCase(reorderProfileShelf.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      // Handle listShelfEditors
+      .addCase(listShelfEditors.pending, (state, action) => {
+        const shelfId = action.meta.arg;
+        state.loading.editors[shelfId] = true;
+        state.error = null;
+      })
+      .addCase(listShelfEditors.fulfilled, (state, action) => {
+        const { shelfId, editors } = action.payload;
+        state.shelfEditors[shelfId] = editors;
+        state.loading.editors[shelfId] = false;
+      })
+      .addCase(listShelfEditors.rejected, (state, action) => {
+        const shelfId = action.meta.arg;
+        state.loading.editors[shelfId] = false;
+        state.error = action.payload as string;
+      })
+      
+      // Handle addShelfEditor
+      .addCase(addShelfEditor.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(addShelfEditor.fulfilled, (state, action) => {
+        const { shelfId } = action.payload;
+        // The next listShelfEditors call will update the editors
+      })
+      .addCase(addShelfEditor.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      
+      // Handle removeShelfEditor
+      .addCase(removeShelfEditor.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(removeShelfEditor.fulfilled, (state, action) => {
+        const { shelfId, editorPrincipal } = action.payload;
+        // Update the editors list if it exists
+        if (state.shelfEditors[shelfId]) {
+          state.shelfEditors[shelfId] = state.shelfEditors[shelfId].filter(
+            editor => editor !== editorPrincipal
+          );
+        }
+      })
+      .addCase(removeShelfEditor.rejected, (state, action) => {
         state.error = action.payload as string;
       });
   },

@@ -1,7 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { cacheManager } from '../cache/ShelvesCache';
-import { setShelfEditors, setEditorsLoading } from '../perpetuaSlice';
-import { getShelfById } from './queryThunks';
 import { perpetuaService } from '../services/perpetuaService';
 import { extractErrorMessage } from '../../utils';
 
@@ -10,16 +8,12 @@ import { extractErrorMessage } from '../../utils';
  */
 export const listShelfEditors = createAsyncThunk(
   'perpetua/listShelfEditors',
-  async (shelfId: string, { dispatch, rejectWithValue }) => {
+  async (shelfId: string, { rejectWithValue }) => {
     try {
-      dispatch(setEditorsLoading({ shelfId, loading: true }));
-      
       // Check cache first
       const cachedData = cacheManager.get<string[]>(shelfId, 'editors');
       if (cachedData) {
-        dispatch(setShelfEditors({ shelfId, editors: cachedData }));
-        dispatch(setEditorsLoading({ shelfId, loading: false }));
-        return cachedData;
+        return { shelfId, editors: cachedData };
       }
       
       // No cache hit, so fetch from API
@@ -31,21 +25,15 @@ export const listShelfEditors = createAsyncThunk(
         // Cache the editors
         cacheManager.set(shelfId, 'editors', editorPrincipals);
         
-        // Update Redux state with editors
-        dispatch(setShelfEditors({ shelfId, editors: editorPrincipals }));
-        dispatch(setEditorsLoading({ shelfId, loading: false }));
-        
-        return editorPrincipals;
-      } else if ("Err" in result && result.Err) {
-        dispatch(setEditorsLoading({ shelfId, loading: false }));
+        return { shelfId, editors: editorPrincipals };
+      } 
+      
+      if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
-      } else {
-        dispatch(setEditorsLoading({ shelfId, loading: false }));
-        return rejectWithValue("Failed to list shelf editors");
       }
+      
+      return rejectWithValue("Failed to list shelf editors");
     } catch (error) {
-      console.error("Failed to list shelf editors:", error);
-      dispatch(setEditorsLoading({ shelfId, loading: false }));
       return rejectWithValue(extractErrorMessage(error, "Failed to list shelf editors"));
     }
   }
@@ -62,7 +50,7 @@ export const addShelfEditor = createAsyncThunk(
   }: {
     shelfId: string,
     editorPrincipal: string
-  }, { dispatch, rejectWithValue }) => {
+  }, { rejectWithValue }) => {
     try {
       const result = await perpetuaService.addShelfEditor(shelfId, editorPrincipal);
       
@@ -70,20 +58,15 @@ export const addShelfEditor = createAsyncThunk(
         // Invalidate the editors cache
         cacheManager.invalidate(shelfId, 'editors');
         
-        // Refresh the editors list
-        dispatch(listShelfEditors(shelfId));
-        
-        // Get updated shelf data
-        dispatch(getShelfById(shelfId));
-        
         return { success: true, shelfId, editorPrincipal };
-      } else if ("Err" in result && result.Err) {
+      } 
+      
+      if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
-      } else {
-        return rejectWithValue("Failed to add editor to shelf");
       }
+      
+      return rejectWithValue("Failed to add editor to shelf");
     } catch (error) {
-      console.error("Failed to add editor to shelf:", error);
       return rejectWithValue(extractErrorMessage(error, "Failed to add editor to shelf"));
     }
   }
@@ -100,7 +83,7 @@ export const removeShelfEditor = createAsyncThunk(
   }: {
     shelfId: string,
     editorPrincipal: string
-  }, { dispatch, rejectWithValue }) => {
+  }, { rejectWithValue }) => {
     try {
       const result = await perpetuaService.removeShelfEditor(shelfId, editorPrincipal);
       
@@ -108,20 +91,15 @@ export const removeShelfEditor = createAsyncThunk(
         // Invalidate the editors cache
         cacheManager.invalidate(shelfId, 'editors');
         
-        // Refresh the editors list
-        dispatch(listShelfEditors(shelfId));
-        
-        // Get updated shelf data
-        dispatch(getShelfById(shelfId));
-        
         return { success: true, shelfId, editorPrincipal };
-      } else if ("Err" in result && result.Err) {
+      } 
+      
+      if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
-      } else {
-        return rejectWithValue("Failed to remove editor from shelf");
       }
+      
+      return rejectWithValue("Failed to remove editor from shelf");
     } catch (error) {
-      console.error("Failed to remove editor from shelf:", error);
       return rejectWithValue(extractErrorMessage(error, "Failed to remove editor from shelf"));
     }
   }

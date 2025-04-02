@@ -4,7 +4,8 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { 
   selectUserShelves,
-  selectLoading
+  selectLoading,
+  selectError
 } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import {
   loadShelves, 
@@ -14,7 +15,8 @@ import {
   reorderProfileShelf as reorderProfileShelfAction,
   updateShelfMetadata,
   createAndAddShelfItem as createAndAddShelfItemAction,
-  removeItem as removeItemAction
+  removeItem as removeItemAction,
+  getShelfById
 } from "@/apps/app/Perpetua/state";
 import { createFindItemById } from "../../../utils";
 import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
@@ -25,32 +27,67 @@ export const useShelfOperations = () => {
   const dispatch = useAppDispatch();
   const shelves = useAppSelector(selectUserShelves);
   const loading = useAppSelector(selectLoading);
+  const error = useAppSelector(selectError);
 
   const loadShelvesData = useCallback(async () => {
     if (!identity) return;
-    dispatch(loadShelves(identity.getPrincipal()));
+    try {
+      await dispatch(loadShelves(identity.getPrincipal())).unwrap();
+    } catch (error) {
+      console.error("Failed to load shelves:", error);
+    }
   }, [identity, dispatch]);
 
-  const createShelf = useCallback(async (title: string, description: string): Promise<void> => {
-    if (!identity) return;
-    await dispatch(createShelfAction({ 
-      title, 
-      description, 
-      principal: identity.getPrincipal()
-    }));
+  const createShelf = useCallback(async (title: string, description: string): Promise<string | null> => {
+    if (!identity) return null;
+    try {
+      const result = await dispatch(createShelfAction({ 
+        title, 
+        description, 
+        principal: identity.getPrincipal()
+      })).unwrap();
+      
+      // Load the updated shelves
+      await dispatch(loadShelves(identity.getPrincipal())).unwrap();
+      
+      return result.shelfId || null;
+    } catch (error) {
+      console.error("Failed to create shelf:", error);
+      return null;
+    }
   }, [identity, dispatch]);
 
-  const addItem = useCallback(async (shelf: Shelf, content: string, type: "Nft" | "Markdown" | "Shelf", referenceItemId?: number | null, before?: boolean): Promise<void> => {
-    if (!identity) return;
-    await dispatch(addItemAction({ 
-      shelf, 
-      content, 
-      type,
-      principal: identity.getPrincipal(),
-      referenceItemId,
-      before
-    }));
-  }, [identity, dispatch]);
+  const getShelf = useCallback(async (shelfId: string): Promise<Shelf | null> => {
+    try {
+      const result = await dispatch(getShelfById(shelfId)).unwrap();
+      return result || null;
+    } catch (error) {
+      console.error(`Failed to get shelf ${shelfId}:`, error);
+      return null;
+    }
+  }, [dispatch]);
+
+  const addItem = useCallback(async (shelf: Shelf, content: string, type: "Nft" | "Markdown" | "Shelf", referenceItemId?: number | null, before?: boolean): Promise<boolean> => {
+    if (!identity) return false;
+    try {
+      await dispatch(addItemAction({ 
+        shelf, 
+        content, 
+        type,
+        principal: identity.getPrincipal(),
+        referenceItemId,
+        before
+      })).unwrap();
+      
+      // Get the updated shelf
+      await getShelf(shelf.shelf_id);
+      
+      return true;
+    } catch (error) {
+      console.error("Failed to add item:", error);
+      return false;
+    }
+  }, [identity, dispatch, getShelf]);
 
   const createAndAddShelfItem = useCallback(async (parentShelfId: string, title: string, description: string): Promise<string | null> => {
     if (!identity) return null;
@@ -62,74 +99,91 @@ export const useShelfOperations = () => {
         principal: identity.getPrincipal()
       })).unwrap();
       
+      // Load the updated shelves and get the updated parent shelf
+      await dispatch(loadShelves(identity.getPrincipal())).unwrap();
+      await getShelf(parentShelfId);
+      
       return result.newShelfId || null;
     } catch (error) {
       console.error("Failed to create and add shelf item:", error);
       return null;
     }
-  }, [identity, dispatch]);
+  }, [identity, dispatch, getShelf]);
 
-  const reorderItem = useCallback(async (shelfId: string, itemId: number, referenceItemId: number | null, before: boolean): Promise<void> => {
-    if (!identity) return;
-    await dispatch(reorderItemAction({ 
-      shelfId, 
-      itemId, 
-      referenceItemId, 
-      before,
-      principal: identity.getPrincipal()
-    }));
-  }, [identity, dispatch]);
+  const reorderItem = useCallback(async (shelfId: string, itemId: number, referenceItemId: number | null, before: boolean): Promise<boolean> => {
+    if (!identity) return false;
+    try {
+      await dispatch(reorderItemAction({ 
+        shelfId, 
+        itemId, 
+        referenceItemId, 
+        before,
+        principal: identity.getPrincipal()
+      })).unwrap();
+      
+      // Get the updated shelf
+      await getShelf(shelfId);
+      
+      return true;
+    } catch (error) {
+      console.error("Failed to reorder item:", error);
+      return false;
+    }
+  }, [identity, dispatch, getShelf]);
 
   // New function to reorder shelves in a user's profile
-  const reorderShelf = useCallback(async (shelfId: string, referenceShelfId: string | null, before: boolean): Promise<void> => {
-    if (!identity) return;
-    await dispatch(reorderProfileShelfAction({
-      shelfId,
-      referenceShelfId,
-      before,
-      principal: identity.getPrincipal()
-    }));
+  const reorderShelf = useCallback(async (shelfId: string, referenceShelfId: string | null, before: boolean): Promise<boolean> => {
+    if (!identity) return false;
+    try {
+      await dispatch(reorderProfileShelfAction({
+        shelfId,
+        referenceShelfId,
+        before,
+        principal: identity.getPrincipal()
+      })).unwrap();
+      
+      return true;
+    } catch (error) {
+      console.error("Failed to reorder shelf:", error);
+      return false;
+    }
   }, [identity, dispatch]);
 
   const removeItem = useCallback(async (shelfId: string, itemId: number): Promise<boolean> => {
-    if (!identity) {
-      console.error("Cannot remove item: No identity available");
-      return false;
-    }
-    console.log(`Attempting to remove item ${itemId} from shelf ${shelfId}`);
+    if (!identity) return false;
     try {
-      console.log("Dispatching removeItemAction with:", {
-        shelfId, 
-        itemId,
-        principal: identity.getPrincipal().toString()
-      });
-      
-      const result = await dispatch(removeItemAction({ 
+      await dispatch(removeItemAction({ 
         shelfId, 
         itemId,
         principal: identity.getPrincipal()
       })).unwrap();
       
-      console.log("RemoveItem result:", result);
+      // Get the updated shelf
+      await getShelf(shelfId);
+      
       return true;
     } catch (error) {
       console.error("Failed to remove item:", error);
       return false;
     }
-  }, [identity, dispatch]);
+  }, [identity, dispatch, getShelf]);
 
   // Helper function to find a item by ID across all shelves
   const findItemById = createFindItemById(shelves);
 
-  const updateMetadata = async (shelfId: string, title?: string, description?: string) => {
+  const updateMetadata = useCallback(async (shelfId: string, title?: string, description?: string): Promise<boolean> => {
     try {
       await dispatch(updateShelfMetadata({ shelfId, title, description })).unwrap();
+      
+      // Get the updated shelf
+      await getShelf(shelfId);
+      
       return true;
     } catch (error) {
       console.error("Failed to update shelf metadata:", error);
       return false;
     }
-  };
+  }, [dispatch, getShelf]);
 
   useEffect(() => {
     if (identity) {
@@ -140,6 +194,7 @@ export const useShelfOperations = () => {
   return {
     shelves,
     loading,
+    error,
     createShelf,
     addItem,
     createAndAddShelfItem,
@@ -148,5 +203,6 @@ export const useShelfOperations = () => {
     findItemById,
     updateMetadata,
     removeItem,
+    getShelf,
   };
 }; 

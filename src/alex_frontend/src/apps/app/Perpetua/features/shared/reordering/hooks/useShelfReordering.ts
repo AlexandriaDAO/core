@@ -61,11 +61,10 @@ export const useShelfReordering = ({ shelves, hasEditAccess }: UseShelfReorderin
     [reorderableProps.editedItems]
   );
   
-  // Return with consistent naming but using editedShelves instead of editedItems
-  return {
-    ...reorderableProps,
-    editedItems: transformedShelves,
-    editedShelves: transformedShelves,
-    saveShelfOrder: reorderableProps.saveOrder
-  };
+  // Return with consistent naming using createReorderReturn like useItemReordering does
+  return createReorderReturn(
+    reorderableProps,
+    transformedShelves,
+    'saveShelfOrder'
+  );
 }; 

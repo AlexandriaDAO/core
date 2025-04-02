@@ -1,9 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Principal } from '@dfinity/principal';
 import { cacheManager } from '../cache/ShelvesCache';
-import { getShelfById } from './queryThunks';
 import { perpetuaService } from '../services/perpetuaService';
-import { Shelf, Item } from '@/../../declarations/perpetua/perpetua.did';
+import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { extractErrorMessage } from '../../utils';
 
 /**
@@ -25,7 +24,7 @@ export const addItem = createAsyncThunk(
     principal: Principal | string,
     referenceItemId?: number | null,
     before?: boolean
-  }, { dispatch, rejectWithValue }) => {
+  }, { rejectWithValue }) => {
     try {
       const result = await perpetuaService.addItemToShelf(
         shelf.shelf_id,
@@ -40,15 +39,14 @@ export const addItem = createAsyncThunk(
         cacheManager.invalidateForShelf(shelf.shelf_id);
         cacheManager.invalidateForPrincipal(principal);
         
-        // Fetch the updated shelf directly
-        dispatch(getShelfById(shelf.shelf_id));
-        
         return { shelf_id: shelf.shelf_id };
-      } else if ("Err" in result && result.Err) {
+      } 
+      
+      if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
-      } else {
-        return rejectWithValue("Unknown error adding item");
       }
+      
+      return rejectWithValue("Unknown error adding item");
     } catch (error) {
       return rejectWithValue(extractErrorMessage(error, "Failed to add item"));
     }
@@ -68,7 +66,7 @@ export const removeItem = createAsyncThunk(
     shelfId: string, 
     itemId: number, 
     principal: Principal | string 
-  }, { dispatch, rejectWithValue }) => {
+  }, { rejectWithValue }) => {
     try {
       const result = await perpetuaService.removeItemFromShelf(shelfId, itemId);
       
@@ -76,18 +74,15 @@ export const removeItem = createAsyncThunk(
         // Invalidate cache for this shelf
         cacheManager.invalidateForShelf(shelfId);
         
-        // Get updated shelf data
-        dispatch(getShelfById(shelfId));
-        
         return { success: true, shelfId, itemId };
-      } else if ("Err" in result && result.Err) {
-        console.error("Backend error removing item:", result.Err);
+      } 
+      
+      if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
-      } else {
-        return rejectWithValue("Unknown error removing item");
       }
+      
+      return rejectWithValue("Unknown error removing item");
     } catch (error) {
-      console.error("Failed to remove item:", error);
       return rejectWithValue(extractErrorMessage(error, "Failed to remove item"));
     }
   }

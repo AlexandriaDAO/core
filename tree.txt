@@ -844,12 +844,9 @@
 │   │   │   │       │   │   │       │   ├── useReorderable.ts (216 lines)
 │   │   │   │       │   │   │       │   └── useShelfReordering.ts (71 lines)
 │   │   │   │       │   │   │       ├── index.ts (11 lines)
-│   │   │   │       │   │   │       ├── types/
-│   │   │   │       │   │   │       │   └── index.ts (2 lines)
 │   │   │   │       │   │   │       └── utils/
 │   │   │   │       │   │   │           ├── createReorderAdapter.ts (49 lines)
 │   │   │   │       │   │   │           ├── index.ts (2 lines)
-│   │   │   │       │   │   │           ├── index.tsx (1 lines)
 │   │   │   │       │   │   │           └── reorderUtils.ts (32 lines)
 │   │   │   │       │   │   ├── shelf-collaboration/
 │   │   │   │       │   │   │   └── components/
@@ -1657,7 +1654,7 @@
 │   ├── perpetua/
 │   │   ├── Cargo.toml (20 lines)
 │   │   ├── perpetua.did (67 lines)
-│   │   ├── perpetua.md (314 lines)
+│   │   ├── perpetua.md (321 lines)
 │   │   └── src/
 │   │       ├── auth.rs (143 lines)
 │   │       ├── guard.rs (11 lines)
