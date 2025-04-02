@@ -2,7 +2,8 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useIdentity } from '@/hooks/useIdentity';
 import { isEqual } from 'lodash';
-import { ReorderableItem, ReorderParams } from '../types/reorderTypes';
+import { useDragAndDrop } from './useDragAndDrop';
+import { ReorderableItem, ReorderParams } from '../../../../types/reordering.types';
 
 /**
  * Props for useReorderable hook
@@ -43,17 +44,14 @@ export const useReorderable = <T extends ReorderableItem>({
     [items]
   );
   
-  // Update itemsRef reference tracking to be simpler
+  // Update itemsRef reference tracking
   useEffect(() => {
-    // Only update the reference when the items array actually changes
     itemsRef.current = items;
   }, [items]);
   
   // State management
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedItems, setEditedItems] = useState<T[]>([]);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   
   // Reset editedItems when original items change
   useEffect(() => {
@@ -61,6 +59,14 @@ export const useReorderable = <T extends ReorderableItem>({
       setEditedItems([...itemsRef.current]);
     }
   }, [itemsRef.current, isEditMode]);
+  
+  // Handler for updating items after drag and drop
+  const handleItemsReordered = useCallback((newItems: T[]) => {
+    setEditedItems(newItems);
+  }, []);
+  
+  // Use the drag and drop hook
+  const dragDropProps = useDragAndDrop(editedItems, handleItemsReordered);
   
   // Edit mode functions
   const enterEditMode = useCallback(() => {
@@ -70,102 +76,7 @@ export const useReorderable = <T extends ReorderableItem>({
   
   const cancelEditMode = useCallback(() => {
     setIsEditMode(false);
-    setDraggedIndex(null);
-    setDragOverIndex(null);
   }, []);
-
-  // Handle drag start - memoize the handler
-  const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
-    if (!isEditMode) return;
-    
-    setDraggedIndex(index);
-    
-    // Create custom drag image for better UX
-    const draggedElement = e.currentTarget as HTMLElement;
-    
-    const dragImage = draggedElement.cloneNode(true) as HTMLElement;
-    dragImage.style.width = `${draggedElement.offsetWidth}px`;
-    dragImage.style.height = `${draggedElement.offsetHeight}px`;
-    dragImage.style.opacity = '0.8';
-    dragImage.style.position = 'absolute';
-    dragImage.style.top = '-1000px';
-    dragImage.style.backgroundColor = 'white';
-    dragImage.style.border = '2px solid #4299e1';
-    dragImage.style.borderRadius = '4px';
-    dragImage.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-    
-    document.body.appendChild(dragImage);
-    
-    e.dataTransfer.setDragImage(
-      dragImage, 
-      draggedElement.offsetWidth / 2, 
-      draggedElement.offsetHeight / 2
-    );
-    
-    setTimeout(() => {
-      document.body.removeChild(dragImage);
-    }, 0);
-  }, [isEditMode]);
-
-  // Handle drag over
-  const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    if (!isEditMode) return;
-    
-    if (draggedIndex !== null && draggedIndex !== index) {
-      setDragOverIndex(index);
-    }
-  }, [draggedIndex, isEditMode]);
-
-  // Handle drag end
-  const handleDragEnd = useCallback(() => {
-    if (!isEditMode) return;
-    
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  }, [isEditMode]);
-
-  // Handle drop
-  const handleDrop = useCallback((e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    if (!isEditMode) return;
-    
-    if (draggedIndex === null || draggedIndex === index) {
-      return;
-    }
-    
-    // Create new item order by moving the dragged item
-    const updatedItems = [...editedItems];
-    const [draggedItem] = updatedItems.splice(draggedIndex, 1);
-    updatedItems.splice(index, 0, draggedItem);
-    
-    setEditedItems(updatedItems);
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  }, [draggedIndex, editedItems, isEditMode]);
-
-  // Determine visual style for dragged items
-  const getDragItemStyle = useCallback((index: number) => {
-    if (!isEditMode) return {};
-    
-    if (draggedIndex === index) {
-      return { 
-        opacity: 0.5,
-        transform: 'scale(0.98)',
-        boxShadow: '0 0 0 2px #4299e1',
-      };
-    }
-    
-    if (dragOverIndex === index) {
-      return { 
-        borderTop: '2px dashed #4299e1',
-        backgroundColor: 'rgba(66, 153, 225, 0.05)',
-        transform: 'scale(1.02)',
-      };
-    }
-    
-    return {};
-  }, [draggedIndex, dragOverIndex, isEditMode]);
 
   // Save the reordered items
   const saveOrder = useCallback(async () => {
@@ -284,12 +195,12 @@ export const useReorderable = <T extends ReorderableItem>({
         referenceItemId: referenceId,
         before,
         principal: identity.getPrincipal().toString(),
-        newItemOrder: newIds // Direct reference is safe here since newIds is already a new array
+        newItemOrder: newIds
       })).unwrap();
       
       setIsEditMode(false);
     } catch (error) {
-      // Revert to original order on error - we need to spread here because we need a new reference
+      // Revert to original order on error
       setEditedItems([...itemsRef.current]);
     }
   }, [containerId, editedItems, identity, itemsRef, dispatch, reorderAction]);
@@ -300,12 +211,6 @@ export const useReorderable = <T extends ReorderableItem>({
     enterEditMode,
     cancelEditMode,
     saveOrder,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnd,
-    handleDrop,
-    draggedIndex,
-    dragOverIndex,
-    getDragItemStyle
+    ...dragDropProps
   };
 }; 

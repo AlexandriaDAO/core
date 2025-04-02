@@ -3,7 +3,18 @@ import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { reorderItem } from '@/apps/app/Perpetua/state';
 import { useReorderable } from './useReorderable';
 import { compareArrays, createReorderReturn } from '../utils/reorderUtils';
-import { UseItemReorderingProps, ReorderParams } from '../types/reorderTypes';
+import { createReorderAdapter } from '../utils/createReorderAdapter';
+import { UseItemReorderingProps } from '../../../../types/reordering.types';
+
+// Type for reorderItem action parameters
+interface ItemReorderParams {
+  shelfId: string;
+  itemId: number;
+  referenceItemId: number | null;
+  before: boolean;
+  principal: string;
+  newItemOrder?: number[];
+}
 
 /**
  * Custom hook for item reordering within a shelf
@@ -29,27 +40,19 @@ export const useItemReordering = ({ shelf, items, hasEditAccess }: UseItemReorde
     [itemsRef.current]
   );
   
-  // Create adapter function for reorder action
-  const reorderAdapter = useCallback((params: ReorderParams) => {
-    // Extract the numbers from the parameters
-    const itemId = typeof params.itemId === 'string' ? parseInt(params.itemId as string, 10) : params.itemId as number;
-    const referenceItemId = params.referenceItemId === null ? null :
-      typeof params.referenceItemId === 'string' ? parseInt(params.referenceItemId as string, 10) : params.referenceItemId as number;
-    
-    // Map all item IDs to numbers for the optimistic update
-    const newItemOrder = params.newItemOrder ? 
-      params.newItemOrder.map(id => typeof id === 'string' ? parseInt(id as string, 10) : id as number) : 
-      undefined;
-    
-    return reorderItem({
-      shelfId: params.shelfId,
-      itemId,
-      referenceItemId,
-      before: params.before,
-      principal: params.principal,
-      newItemOrder
-    });
-  }, []);
+  // Create adapter function for reorder action using the factory
+  const reorderAdapter = useCallback(
+    createReorderAdapter<ItemReorderParams>({
+      actionCreator: reorderItem,
+      parseId: (id) => typeof id === 'string' ? parseInt(id, 10) : id,
+      fieldMapping: {
+        // Map ReorderParams fields to ItemReorderParams fields
+        referenceItemId: 'referenceItemId',
+        newItemOrder: 'newItemOrder'
+      }
+    }),
+    []
+  );
   
   // Use the generic reorderable hook
   const reorderableProps = useReorderable({

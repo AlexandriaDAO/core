@@ -4,7 +4,7 @@ import { Input } from "@/lib/components/input";
 import { Search } from "lucide-react";
 import { ScrollArea } from "@/lib/components/scroll-area";
 import { ShelfOption } from "./ShelfOption";
-import { ShelfContentProps } from "../types";
+import { ShelfContentProps } from "../../../types/shelf.types";
 
 /**
  * Component for displaying the content of shelf selection dialogs

@@ -1,1 +1,2 @@
-export * from './reorderUtils'; 
+export * from './reorderUtils';
+export * from './createReorderAdapter'; 

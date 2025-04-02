@@ -1,19 +1,9 @@
 import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import React from 'react';
 
-// Shelf related props
-export interface ShelfCardProps {
-  shelf: Shelf;
-  onViewShelf?: (shelfId: string) => void;
-  showOwner?: boolean;
-  isReordering?: boolean;
-}
-
-export interface PublicShelfCardProps {
-  shelf: Shelf;
-  onViewShelf?: (shelfId: string) => void;
-  isReordering?: boolean;
-}
+/**
+ * Core item-related types for the Perpetua app
+ */
 
 export interface ShelfDetailViewProps {
   shelf: Shelf;
@@ -34,27 +24,4 @@ export interface ShelfDetailViewProps {
   draggedIndex?: number | null;
   getDragItemStyle?: (index: number) => React.CSSProperties;
   settingsButton?: React.ReactNode;
-}
-
-export interface LibraryShelvesUIProps {
-  shelves: Shelf[];
-  loading: boolean;
-  onNewShelf: () => void;
-  onViewShelf: (shelfId: string) => void;
-}
-
-export interface ExploreShelvesUIProps {
-  shelves: Shelf[];
-  loading: boolean;
-  onViewShelf: (shelfId: string) => void;
-  onLoadMore: () => Promise<void>;
-}
-
-export interface UserShelvesUIProps {
-  shelves: Shelf[];
-  loading: boolean;
-  onViewShelf: (shelfId: string) => void;
-  onViewOwner?: (ownerId: string) => void;
-  onBack?: () => void;
-  isCurrentUser?: boolean;
 } 

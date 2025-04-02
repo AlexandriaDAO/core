@@ -3,7 +3,7 @@ import { useIdentity } from '@/hooks/useIdentity';
 import isEqual from 'lodash/isEqual';
 import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { BaseShelfList } from '../components/BaseShelfList';
-import { LibraryShelvesUIProps, ExploreShelvesUIProps, UserShelvesUIProps } from '../types/types';
+import { LibraryShelvesUIProps, ExploreShelvesUIProps, UserShelvesUIProps } from '../../../types/shelf.types';
 import { useDispatch } from 'react-redux';
 import { reorderProfileShelf } from '@/apps/app/Perpetua/state';
 import { AppDispatch } from '@/store';

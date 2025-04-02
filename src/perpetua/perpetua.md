@@ -1,17 +1,12 @@
-
-
-
-
-
 Perpetua/
 ├── features/
 │   ├── cards/
 │   │   ├── components/
-│   │   │   ├── BaseShelfList.tsx (407 lines)
+│   │   │   ├── BaseShelfList.tsx (469 lines)
 │   │   │   ├── ContentDisplays.tsx (120 lines)
 │   │   │   ├── NftDisplay.tsx (350 lines)
 │   │   │   ├── ShelfBlogView.tsx (132 lines)
-│   │   │   ├── ShelfCard.tsx (162 lines)
+│   │   │   ├── ShelfCard.tsx (155 lines)
 │   │   │   ├── ShelfCardActionMenu.tsx (173 lines)
 │   │   │   ├── ShelfContentCard.tsx (160 lines)
 │   │   │   ├── ShelfContentModal.tsx (97 lines)
@@ -22,12 +17,11 @@ Perpetua/
 │   │   │   ├── ShelfViewHeader.tsx (93 lines)
 │   │   │   └── index.ts (9 lines)
 │   │   ├── containers/
-│   │   │   ├── ShelfLists.tsx (226 lines)
+│   │   │   ├── ShelfLists.tsx (256 lines)
 │   │   │   └── index.ts (1 lines)
 │   │   ├── index.ts (10 lines)
 │   │   ├── types/
-│   │   │   ├── index.ts (1 lines)
-│   │   │   └── types.ts (60 lines)
+│   │   │   └── index.ts (3 lines)
 │   │   └── utils/
 │   │       ├── ShelfViewUtils.ts (42 lines)
 │   │       └── index.ts (1 lines)
@@ -45,24 +39,27 @@ Perpetua/
 │   ├── shared/
 │   │   └── reordering/
 │   │       ├── components/
-│   │       │   ├── ItemReorderManager.tsx (44 lines)
-│   │       │   └── index.ts (1 lines)
+│   │       │   ├── ItemReorderManager.tsx (45 lines)
+│   │       │   ├── ReorderableGrid.tsx (88 lines)
+│   │       │   ├── ReorderableList.tsx (74 lines)
+│   │       │   └── index.ts (3 lines)
 │   │       ├── hooks/
-│   │       │   ├── index.ts (2 lines)
-│   │       │   ├── useItemReordering.ts (76 lines)
-│   │       │   ├── useReorderable.ts (318 lines)
-│   │       │   └── useShelfReordering.ts (67 lines)
+│   │       │   ├── index.ts (4 lines)
+│   │       │   ├── useDragAndDrop.ts (108 lines)
+│   │       │   ├── useItemReordering.ts (79 lines)
+│   │       │   ├── useReorderable.ts (216 lines)
+│   │       │   └── useShelfReordering.ts (71 lines)
 │   │       ├── index.ts (11 lines)
 │   │       ├── types/
-│   │       │   ├── index.ts (1 lines)
-│   │       │   └── reorderTypes.ts (61 lines)
+│   │       │   └── index.ts (2 lines)
 │   │       └── utils/
-│   │           ├── index.ts (1 lines)
+│   │           ├── createReorderAdapter.ts (49 lines)
+│   │           ├── index.ts (2 lines)
 │   │           ├── index.tsx (1 lines)
 │   │           └── reorderUtils.ts (32 lines)
 │   ├── shelf-collaboration/
 │   │   └── components/
-│   │       └── CollaboratorsList.tsx (177 lines)
+│   │       └── CollaboratorsList.tsx (185 lines)
 │   ├── shelf-management/
 │   │   ├── components/
 │   │   │   ├── NewShelf.tsx (97 lines)
@@ -80,7 +77,7 @@ Perpetua/
 │   │   │   └── useShelfOperations.ts (152 lines)
 │   │   ├── index.ts (3 lines)
 │   │   └── types/
-│   │       └── index.ts (27 lines)
+│   │       └── index.ts (30 lines)
 │   └── shelf-settings/
 │       ├── components/
 │       │   ├── ShelfMetricsDisplay.tsx (143 lines)
@@ -110,7 +107,7 @@ Perpetua/
 │   │   ├── usePerpetuaActions.ts (119 lines)
 │   │   └── usePerpetuaSelectors.ts (62 lines)
 │   ├── index.ts (49 lines)
-│   ├── perpetuaSlice.ts (357 lines)
+│   ├── perpetuaSlice.ts (461 lines)
 │   ├── services/
 │   │   └── perpetuaService.ts (419 lines)
 │   ├── thunks/
@@ -118,9 +115,14 @@ Perpetua/
 │   │   ├── index.ts (6 lines)
 │   │   ├── itemThunks.ts (94 lines)
 │   │   ├── queryThunks.ts (155 lines)
-│   │   ├── reorderThunks.ts (157 lines)
+│   │   ├── reorderThunks.ts (192 lines)
 │   │   └── shelfThunks.ts (157 lines)
 │   ├── utils/
+├── types/
+│   ├── index.ts (4 lines)
+│   ├── item.types.ts (27 lines)
+│   ├── reordering.types.ts (68 lines)
+│   └── shelf.types.ts (74 lines)
 └── utils.tsx (136 lines)
 
 
@@ -141,9 +143,13 @@ Perpetua/
 
 
 
-- Split useReorderable.ts into these focused modules:
-- Create utils/createReorderAdapter.ts to eliminate duplicate code between item and shelf reordering
-- Add ReorderableList.tsx and ReorderableGrid.tsx to components directory
+
+
+
+
+1. try to use pending / fullfilled / rejected state for the for state updates instead of dispatching actions inside thunks.
+2. component naming convention and pattern can be improved. It should be synchronous.
+3. try avoiding custom styles or styled components and use tailwind css as much as possible.
 
 
 
@@ -169,8 +175,6 @@ Perpetua/
 
 
 
-
-- useItemReordering.ts and useShelfReordering.ts contain similar reordering logic. Extract the common functionality into a shared hook.
 
 - Consolidate type definitions between features/cards/types/types.ts and features/shelf-management/types/index.ts - they likely have overlapping types.
 

@@ -3,7 +3,7 @@ import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { ArrowLeft, Edit, Plus, X, Grid, List, Home, User } from "lucide-react";
 import { renderBreadcrumbs, isNftContent, isShelfContent, isMarkdownContent } from "../../../utils";
-import { ShelfDetailViewProps } from '../types/types';
+import { ShelfDetailViewProps } from '../../../types/item.types';
 import { Item } from "@/../../declarations/perpetua/perpetua.did";
 import { PrincipalDisplay } from '@/apps/Modules/shared/components/PrincipalDisplay';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";

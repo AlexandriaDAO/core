@@ -774,7 +774,7 @@
 │   │   │   │       │   │   └── userEmporiumLogs.tsx (121 lines)
 │   │   │   │       │   ├── contentListEmporium.tsx (271 lines)
 │   │   │   │       │   ├── emporiumSlice.ts (234 lines)
-│   │   │   │       │   ├── index.tsx (294 lines)
+│   │   │   │       │   ├── index.tsx (316 lines)
 │   │   │   │       │   ├── overlay.tsx (92 lines)
 │   │   │   │       │   ├── plan.md (12 lines)
 │   │   │   │       │   ├── styles.ts (195 lines)
@@ -783,7 +783,7 @@
 │   │   │   │       │   │   ├── editListing.ts (43 lines)
 │   │   │   │       │   │   ├── getEmporiumMarketLogs.tsx (45 lines)
 │   │   │   │       │   │   ├── getMarketListing.ts (144 lines)
-│   │   │   │       │   │   ├── getUserIcrc7Tokens.ts (66 lines)
+│   │   │   │       │   │   ├── getUserIcrc7Tokens.ts (93 lines)
 │   │   │   │       │   │   ├── getUserLog.ts (52 lines)
 │   │   │   │       │   │   ├── listNft.ts (88 lines)
 │   │   │   │       │   │   └── removeListedNft.ts (41 lines)
@@ -796,11 +796,11 @@
 │   │   │   │       │   ├── features/
 │   │   │   │       │   │   ├── cards/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx (407 lines)
+│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx (469 lines)
 │   │   │   │       │   │   │   │   ├── ContentDisplays.tsx (120 lines)
 │   │   │   │       │   │   │   │   ├── NftDisplay.tsx (350 lines)
 │   │   │   │       │   │   │   │   ├── ShelfBlogView.tsx (132 lines)
-│   │   │   │       │   │   │   │   ├── ShelfCard.tsx (162 lines)
+│   │   │   │       │   │   │   │   ├── ShelfCard.tsx (155 lines)
 │   │   │   │       │   │   │   │   ├── ShelfCardActionMenu.tsx (173 lines)
 │   │   │   │       │   │   │   │   ├── ShelfContentCard.tsx (160 lines)
 │   │   │   │       │   │   │   │   ├── ShelfContentModal.tsx (97 lines)
@@ -811,12 +811,11 @@
 │   │   │   │       │   │   │   │   ├── ShelfViewHeader.tsx (93 lines)
 │   │   │   │       │   │   │   │   └── index.ts (9 lines)
 │   │   │   │       │   │   │   ├── containers/
-│   │   │   │       │   │   │   │   ├── ShelfLists.tsx (226 lines)
+│   │   │   │       │   │   │   │   ├── ShelfLists.tsx (256 lines)
 │   │   │   │       │   │   │   │   └── index.ts (1 lines)
 │   │   │   │       │   │   │   ├── index.ts (10 lines)
 │   │   │   │       │   │   │   ├── types/
-│   │   │   │       │   │   │   │   ├── index.ts (1 lines)
-│   │   │   │       │   │   │   │   └── types.ts (60 lines)
+│   │   │   │       │   │   │   │   └── index.ts (3 lines)
 │   │   │   │       │   │   │   └── utils/
 │   │   │   │       │   │   │       ├── ShelfViewUtils.ts (42 lines)
 │   │   │   │       │   │   │       └── index.ts (1 lines)
@@ -832,28 +831,29 @@
 │   │   │   │       │   │   │   │   └── useItemActions.tsx (104 lines)
 │   │   │   │       │   │   │   └── index.ts (2 lines)
 │   │   │   │       │   │   ├── shared/
-│   │   │   │       │   │   │   ├── hooks/
-│   │   │   │       │   │   │   │   └── index.ts (2 lines)
 │   │   │   │       │   │   │   └── reordering/
 │   │   │   │       │   │   │       ├── components/
-│   │   │   │       │   │   │       │   ├── ItemReorderManager.tsx (44 lines)
-│   │   │   │       │   │   │       │   └── index.ts (1 lines)
+│   │   │   │       │   │   │       │   ├── ItemReorderManager.tsx (45 lines)
+│   │   │   │       │   │   │       │   ├── ReorderableGrid.tsx (88 lines)
+│   │   │   │       │   │   │       │   ├── ReorderableList.tsx (74 lines)
+│   │   │   │       │   │   │       │   └── index.ts (3 lines)
 │   │   │   │       │   │   │       ├── hooks/
-│   │   │   │       │   │   │       │   ├── index.ts (2 lines)
-│   │   │   │       │   │   │       │   ├── useItemReordering.ts (76 lines)
-│   │   │   │       │   │   │       │   ├── useReorderable.ts (318 lines)
-│   │   │   │       │   │   │       │   └── useShelfReordering.ts (67 lines)
+│   │   │   │       │   │   │       │   ├── index.ts (4 lines)
+│   │   │   │       │   │   │       │   ├── useDragAndDrop.ts (108 lines)
+│   │   │   │       │   │   │       │   ├── useItemReordering.ts (79 lines)
+│   │   │   │       │   │   │       │   ├── useReorderable.ts (216 lines)
+│   │   │   │       │   │   │       │   └── useShelfReordering.ts (71 lines)
 │   │   │   │       │   │   │       ├── index.ts (11 lines)
 │   │   │   │       │   │   │       ├── types/
-│   │   │   │       │   │   │       │   ├── index.ts (1 lines)
-│   │   │   │       │   │   │       │   └── reorderTypes.ts (61 lines)
+│   │   │   │       │   │   │       │   └── index.ts (2 lines)
 │   │   │   │       │   │   │       └── utils/
-│   │   │   │       │   │   │           ├── index.ts (1 lines)
+│   │   │   │       │   │   │           ├── createReorderAdapter.ts (49 lines)
+│   │   │   │       │   │   │           ├── index.ts (2 lines)
 │   │   │   │       │   │   │           ├── index.tsx (1 lines)
 │   │   │   │       │   │   │           └── reorderUtils.ts (32 lines)
 │   │   │   │       │   │   ├── shelf-collaboration/
 │   │   │   │       │   │   │   └── components/
-│   │   │   │       │   │   │       └── CollaboratorsList.tsx (177 lines)
+│   │   │   │       │   │   │       └── CollaboratorsList.tsx (185 lines)
 │   │   │   │       │   │   ├── shelf-management/
 │   │   │   │       │   │   │   ├── components/
 │   │   │   │       │   │   │   │   ├── NewShelf.tsx (97 lines)
@@ -871,7 +871,7 @@
 │   │   │   │       │   │   │   │   └── useShelfOperations.ts (152 lines)
 │   │   │   │       │   │   │   ├── index.ts (3 lines)
 │   │   │   │       │   │   │   └── types/
-│   │   │   │       │   │   │       └── index.ts (27 lines)
+│   │   │   │       │   │   │       └── index.ts (30 lines)
 │   │   │   │       │   │   └── shelf-settings/
 │   │   │   │       │   │       ├── components/
 │   │   │   │       │   │       │   ├── ShelfMetricsDisplay.tsx (143 lines)
@@ -901,7 +901,7 @@
 │   │   │   │       │   │   │   ├── usePerpetuaActions.ts (119 lines)
 │   │   │   │       │   │   │   └── usePerpetuaSelectors.ts (62 lines)
 │   │   │   │       │   │   ├── index.ts (49 lines)
-│   │   │   │       │   │   ├── perpetuaSlice.ts (357 lines)
+│   │   │   │       │   │   ├── perpetuaSlice.ts (461 lines)
 │   │   │   │       │   │   ├── services/
 │   │   │   │       │   │   │   └── perpetuaService.ts (419 lines)
 │   │   │   │       │   │   ├── thunks/
@@ -909,9 +909,14 @@
 │   │   │   │       │   │   │   ├── index.ts (6 lines)
 │   │   │   │       │   │   │   ├── itemThunks.ts (94 lines)
 │   │   │   │       │   │   │   ├── queryThunks.ts (155 lines)
-│   │   │   │       │   │   │   ├── reorderThunks.ts (157 lines)
+│   │   │   │       │   │   │   ├── reorderThunks.ts (192 lines)
 │   │   │   │       │   │   │   └── shelfThunks.ts (157 lines)
 │   │   │   │       │   │   ├── utils/
+│   │   │   │       │   ├── types/
+│   │   │   │       │   │   ├── index.ts (4 lines)
+│   │   │   │       │   │   ├── item.types.ts (27 lines)
+│   │   │   │       │   │   ├── reordering.types.ts (68 lines)
+│   │   │   │       │   │   └── shelf.types.ts (74 lines)
 │   │   │   │       │   └── utils.tsx (136 lines)
 │   │   │   │       └── Syllogos/
 │   │   │   │           └── index.tsx (27 lines)
@@ -937,7 +942,12 @@
 │   │   │   │   ├── Read/
 │   │   │   │   │   └── index.tsx (24 lines)
 │   │   │   │   ├── RiskWarningModal.tsx (46 lines)
-│   │   │   │   ├── Tabs.tsx (235 lines)
+│   │   │   │   ├── Tabs/
+│   │   │   │   │   ├── AppsTab.tsx (72 lines)
+│   │   │   │   │   ├── InfoTab.tsx (83 lines)
+│   │   │   │   │   ├── NavMenu.tsx (25 lines)
+│   │   │   │   │   ├── SwapTab.tsx (84 lines)
+│   │   │   │   │   └── index.tsx (15 lines)
 │   │   │   │   ├── TopProgressBar.tsx (16 lines)
 │   │   │   │   └── ui/
 │   │   │   ├── contexts/
@@ -988,21 +998,26 @@
 │   │   │   │   │       ├── wallet.ts (8 lines)
 │   │   │   │   │       ├── wallet_dao.ts (171 lines)
 │   │   │   │   │       └── wallet_utils.ts (25 lines)
-│   │   │   │   ├── assets/
-│   │   │   │   │   ├── assetsSlice.ts (43 lines)
+│   │   │   │   ├── arweave-assets/
+│   │   │   │   │   ├── arweaveAssetsSlice.ts (130 lines)
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── AssetDetail.tsx (427 lines)
-│   │   │   │   │   │   └── AssetTable.tsx (310 lines)
+│   │   │   │   │   │   ├── AssetDetail.tsx (476 lines)
+│   │   │   │   │   │   └── AssetTable.tsx (240 lines)
 │   │   │   │   │   ├── thunks/
-│   │   │   │   │   │   └── fetchUserArweaveAssets.ts (74 lines)
-│   │   │   │   │   ├── types.ts (17 lines)
+│   │   │   │   │   │   ├── checkAssetAvailability.ts (29 lines)
+│   │   │   │   │   │   ├── checkAssetsAvailability.ts (30 lines)
+│   │   │   │   │   │   ├── deleteAssetFromCanister.ts (24 lines)
+│   │   │   │   │   │   ├── fetchUserArweaveAssets.ts (70 lines)
+│   │   │   │   │   │   ├── pullAllAssets.ts (54 lines)
+│   │   │   │   │   │   └── pullAssetToCanister.ts (31 lines)
+│   │   │   │   │   ├── types.ts (25 lines)
 │   │   │   │   │   └── utils/
-│   │   │   │   │       └── assetUtils.ts (50 lines)
+│   │   │   │   │       └── assetUtils.ts (47 lines)
 │   │   │   │   ├── auth/
 │   │   │   │   │   ├── authExtraReducers.ts (71 lines)
 │   │   │   │   │   ├── authSlice.ts (65 lines)
 │   │   │   │   │   ├── components/
-│   │   │   │   │   │   ├── AuthMenu.tsx (98 lines)
+│   │   │   │   │   │   ├── AuthMenu.tsx (99 lines)
 │   │   │   │   │   │   ├── ETHAccount.tsx (65 lines)
 │   │   │   │   │   │   ├── ICPAccount.tsx (58 lines)
 │   │   │   │   │   │   └── SOLAccount.tsx (67 lines)
@@ -1050,6 +1065,17 @@
 │   │   │   │   │   │   ├── BookCard.tsx (54 lines)
 │   │   │   │   │   │   └── BookCarousel.tsx (137 lines)
 │   │   │   │   │   └── index.tsx (142 lines)
+│   │   │   │   ├── icp-assets/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── ICPAssetUploader.tsx (75 lines)
+│   │   │   │   │   │   ├── ICPAssets.tsx (61 lines)
+│   │   │   │   │   │   └── Item.tsx (113 lines)
+│   │   │   │   │   ├── icpAssetsSlice.ts (101 lines)
+│   │   │   │   │   ├── thunks/
+│   │   │   │   │   │   ├── fetch.ts (37 lines)
+│   │   │   │   │   │   ├── remove.ts (21 lines)
+│   │   │   │   │   │   └── upload.ts (53 lines)
+│   │   │   │   │   └── types.ts (24 lines)
 │   │   │   │   ├── icp-ledger/
 │   │   │   │   │   ├── icpLedgerSlice.ts (132 lines)
 │   │   │   │   │   └── thunks/
@@ -1404,7 +1430,7 @@
 │   │   │   │   ├── useAuth.tsx (6 lines)
 │   │   │   │   ├── useDebounce.tsx (17 lines)
 │   │   │   │   ├── useIdentity.tsx (30 lines)
-│   │   │   │   ├── useLogout.tsx (15 lines)
+│   │   │   │   ├── useLogout.tsx (16 lines)
 │   │   │   │   ├── useRiskWarning.ts (27 lines)
 │   │   │   │   └── useSession.tsx (6 lines)
 │   │   │   ├── index.js (94 lines)
@@ -1417,7 +1443,7 @@
 │   │   │   │   ├── parts/
 │   │   │   │   │   ├── AppHeader.tsx (18 lines)
 │   │   │   │   │   ├── AuthNavigation.tsx (41 lines)
-│   │   │   │   │   ├── DashboardSidebar.tsx (161 lines)
+│   │   │   │   │   ├── DashboardSidebar.tsx (149 lines)
 │   │   │   │   │   ├── Header.tsx (140 lines)
 │   │   │   │   │   └── LibrarianSidebar.tsx (87 lines)
 │   │   │   │   └── skeletons/
@@ -1478,7 +1504,7 @@
 │   │   │   │       └── index.tsx (31 lines)
 │   │   │   ├── routes/
 │   │   │   │   ├── dataRoutes.tsx (461 lines)
-│   │   │   │   ├── index.tsx (136 lines)
+│   │   │   │   ├── index.tsx (135 lines)
 │   │   │   │   └── routeConfig.ts (111 lines)
 │   │   │   ├── services/
 │   │   │   │   ├── bookService.ts (174 lines)
@@ -1491,7 +1517,7 @@
 │   │   │   │   │   ├── useAppSelector.ts (5 lines)
 │   │   │   │   │   └── useAppStore.ts (7 lines)
 │   │   │   │   ├── index.ts (11 lines)
-│   │   │   │   └── rootReducer.ts (80 lines)
+│   │   │   │   └── rootReducer.ts (81 lines)
 │   │   │   ├── styles/
 │   │   │   │   ├── style.css (53 lines)
 │   │   │   │   └── tailwind.css (104 lines)
@@ -1631,7 +1657,7 @@
 │   ├── perpetua/
 │   │   ├── Cargo.toml (20 lines)
 │   │   ├── perpetua.did (67 lines)
-│   │   ├── perpetua.md (309 lines)
+│   │   ├── perpetua.md (314 lines)
 │   │   └── src/
 │   │       ├── auth.rs (143 lines)
 │   │       ├── guard.rs (11 lines)
@@ -1712,10 +1738,10 @@
 │   │   │   │   └── user/
 │   │   │   │       ├── mod.rs (2 lines)
 │   │   │   │       ├── queries.rs (71 lines)
-│   │   │   │       └── updates.rs (153 lines)
+│   │   │   │       └── updates.rs (167 lines)
 │   │   │   ├── errors/
 │   │   │   │   ├── engine.rs (73 lines)
-│   │   │   │   ├── general.rs (58 lines)
+│   │   │   │   ├── general.rs (60 lines)
 │   │   │   │   ├── mod.rs (4 lines)
 │   │   │   │   ├── node.rs (51 lines)
 │   │   │   │   └── user.rs (54 lines)
@@ -1730,7 +1756,7 @@
 │   │   │       ├── engine.rs (87 lines)
 │   │   │       ├── mod.rs (3 lines)
 │   │   │       ├── node.rs (29 lines)
-│   │   │       └── user.rs (159 lines)
+│   │   │       └── user.rs (169 lines)
 │   │   └── user.did (86 lines)
 │   ├── vetkd/
 │   │   ├── Cargo.toml (36 lines)

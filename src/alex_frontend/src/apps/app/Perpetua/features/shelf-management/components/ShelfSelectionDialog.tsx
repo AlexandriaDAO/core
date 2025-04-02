@@ -7,7 +7,7 @@ import {
 } from "@/lib/components/dialog";
 import { ShelfContent } from "./ShelfContent";
 import { useAddToShelf } from "../hooks/useAddToShelf";
-import { ShelfManagerProps } from "../types";
+import { ShelfManagerProps } from "../../../types/shelf.types";
 import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { Principal } from "@dfinity/principal";
 import { Shelf } from "@/../../declarations/perpetua/perpetua.did";

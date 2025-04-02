@@ -1,3 +1,10 @@
+import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
+import React from 'react';
+
+/**
+ * Core reordering types for the Perpetua app
+ */
+
 /**
  * Common interface for reorderable items
  */
@@ -21,8 +28,8 @@ export interface ReorderParams {
  * Props for useItemReordering hook
  */
 export interface UseItemReorderingProps {
-  shelf: any; // Using 'any' temporarily, should be properly typed with Shelf
-  items: [number, any][]; // Using 'any' temporarily, should be properly typed with Item
+  shelf: Shelf;
+  items: [number, Item][];
   hasEditAccess: boolean;
 }
 
@@ -30,7 +37,7 @@ export interface UseItemReorderingProps {
  * Props for useShelfReordering hook
  */
 export interface UseShelfReorderingProps {
-  shelves: any[]; // Using 'any' temporarily, should be properly typed with Shelf
+  shelves: Shelf[];
   hasEditAccess: boolean;
 }
 
@@ -38,8 +45,8 @@ export interface UseShelfReorderingProps {
  * Props for ItemReorderManager component
  */
 export interface ItemReorderManagerProps {
-  shelf: any; // Using 'any' temporarily, should be properly typed with Shelf
-  orderedItems: [number, any][]; // Using 'any' temporarily, should be properly typed with Item
+  shelf: Shelf;
+  orderedItems: [number, Item][];
   hasEditAccess: boolean;
   children: (props: ReorderRenderProps) => React.ReactNode;
 }
@@ -49,7 +56,7 @@ export interface ItemReorderManagerProps {
  */
 export interface ReorderRenderProps {
   isEditMode: boolean;
-  editedItems: [number, any][]; // Using 'any' temporarily, should be properly typed with Item
+  editedItems: [number, Item][];
   enterEditMode: () => void;
   cancelEditMode: () => void;
   saveItemOrder: () => Promise<void>;

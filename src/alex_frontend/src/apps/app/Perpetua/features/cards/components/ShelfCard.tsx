@@ -1,7 +1,7 @@
 import React from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { convertTimestamp } from "@/utils/general";
-import { ShelfCardProps, PublicShelfCardProps } from '../types/types';
+import { ShelfCardProps, PublicShelfCardProps } from '../../../types/shelf.types';
 import { buildRoutes } from '../../../routes';
 import { Users } from "lucide-react";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
@@ -12,20 +12,8 @@ import {
 } from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 
-// Extending the props interfaces to include parentShelfId and itemId
-interface ExtendedShelfCardProps extends ShelfCardProps {
-  parentShelfId?: string;
-  itemId?: number;
-}
-
-interface ExtendedPublicShelfCardProps extends PublicShelfCardProps {
-  parentShelfId?: string;
-  itemId?: number;
-  isReordering?: boolean;
-}
-
 // Shelf Card Component for the library view
-export const ShelfCard: React.FC<ExtendedShelfCardProps> = ({ 
+export const ShelfCard: React.FC<ShelfCardProps> = ({ 
   shelf, 
   onViewShelf,
   showOwner = false,
@@ -108,7 +96,7 @@ export const ShelfCard: React.FC<ExtendedShelfCardProps> = ({
 };
 
 // Public variant of the shelf card used for displaying shelves in lists
-export const PublicShelfCard: React.FC<ExtendedPublicShelfCardProps> = ({ 
+export const PublicShelfCard: React.FC<PublicShelfCardProps> = ({ 
   shelf, 
   onViewShelf,
   parentShelfId,

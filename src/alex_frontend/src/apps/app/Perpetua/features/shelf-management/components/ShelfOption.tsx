@@ -1,5 +1,5 @@
 import React from "react";
-import { ShelfOptionProps } from "../types";
+import { ShelfOptionProps } from "../../../types/shelf.types";
 
 /**
  * Component for displaying a selectable shelf option

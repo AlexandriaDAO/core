@@ -3,7 +3,17 @@ import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 import { reorderProfileShelf } from '@/apps/app/Perpetua/state';
 import { useReorderable } from './useReorderable';
 import { createReorderReturn } from '../utils/reorderUtils';
-import { UseShelfReorderingProps, ReorderParams } from '../types/reorderTypes';
+import { createReorderAdapter } from '../utils/createReorderAdapter';
+import { UseShelfReorderingProps } from '../../../../types/reordering.types';
+
+// Type for reorderProfileShelf action parameters
+interface ShelfReorderParams {
+  shelfId: string;
+  referenceShelfId: string | null;
+  before: boolean;
+  principal: string;
+  newShelfOrder?: string[];
+}
 
 /**
  * Custom hook for shelf reordering
@@ -23,16 +33,19 @@ export const useShelfReordering = ({ shelves, hasEditAccess }: UseShelfReorderin
     [shelves]
   );
   
-  // Create adapter function for reorder action - memoized
-  const reorderAdapter = useCallback((params: ReorderParams) => {
-    return reorderProfileShelf({
-      shelfId: params.itemId as string,
-      referenceShelfId: params.referenceItemId as string | null,
-      before: params.before,
-      principal: params.principal,
-      newShelfOrder: params.newItemOrder as string[] | undefined
-    });
-  }, []);
+  // Create adapter function for reorder action using the factory
+  const reorderAdapter = useCallback(
+    createReorderAdapter<ShelfReorderParams>({
+      actionCreator: reorderProfileShelf,
+      fieldMapping: {
+        // Map ReorderParams fields to ShelfReorderParams fields
+        itemId: 'shelfId',
+        referenceItemId: 'referenceShelfId',
+        newItemOrder: 'newShelfOrder'
+      }
+    }),
+    []
+  );
   
   // Use the generic reorderable hook
   const reorderableProps = useReorderable({

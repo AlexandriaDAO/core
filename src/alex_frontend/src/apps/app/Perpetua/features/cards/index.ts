@@ -2,7 +2,7 @@
 export { default as ShelfDetailView } from './components/ShelfDetailView';
 
 // Export types
-export * from './types/types';
+export * from './types/index';
 
 // Export any other components as needed
 export * from './components';

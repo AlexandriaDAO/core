@@ -24,4 +24,7 @@ export interface ShelfContentProps {
   isAddingContent: boolean;
   onAddToShelf: () => Promise<void>;
   onClose: () => void;
-} 
+}
+
+// Re-export types from shared types directory
+export * from '../../../types/shelf.types'; 
