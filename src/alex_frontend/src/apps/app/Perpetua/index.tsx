@@ -1,5 +1,5 @@
 import React from "react";
-import { PerpetuaLayout } from "./layouts";
+import PerpetuaLayout from "./layouts/PerpetuaLayout";
 
 // Export public API
 export * from "./features/shelf-management/hooks";

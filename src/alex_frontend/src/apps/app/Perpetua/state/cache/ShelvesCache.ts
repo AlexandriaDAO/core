@@ -13,7 +13,7 @@ interface CacheEntry<T> {
 /**
  * Enhanced cache manager with improved type safety and performance
  */
-export class ShelvesCache {
+class ShelvesCache {
   private static instance: ShelvesCache;
   private cache: Map<string, CacheEntry<any>>;
   private readonly TTL: number;

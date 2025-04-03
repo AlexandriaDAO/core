@@ -10,7 +10,7 @@ import { NftDataFooter } from "./components/NftDataFooter";
 import { RootState } from "@/store";
 import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
 import { Dialog, DialogContent, DialogTitle } from "@/lib/components/dialog";
-import { ShelfSelectionDialog } from "@/apps/app/Perpetua/features/shelf-management/components";
+import { ShelfSelectionDialog } from "@/apps/app/Perpetua/features/shelf-management/components/ShelfSelectionDialog";
 import { mint_nft } from "@/features/nft/mint";
 import { toast } from "sonner";
 import { Badge } from "@/lib/components/badge";

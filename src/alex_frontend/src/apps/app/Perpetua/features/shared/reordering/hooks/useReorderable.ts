@@ -7,8 +7,9 @@ import { ReorderableItem, ReorderParams } from '../../../../types/reordering.typ
 
 /**
  * Props for useReorderable hook
+ * Used internally only 
  */
-export interface UseReorderableProps<T extends ReorderableItem> {
+interface UseReorderableProps<T extends ReorderableItem> {
   // Items to be reordered
   items: T[];
   

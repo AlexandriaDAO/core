@@ -11,7 +11,7 @@ type QueryError = any; // We use 'any' here since the specific error types vary 
  * Service layer for Perpetua API interactions
  * Centralizes all backend calls to provide consistent error handling and data transformation
  */
-export class PerpetuaService {
+class PerpetuaService {
   private static instance: PerpetuaService;
   
   private constructor() {}

@@ -9,9 +9,10 @@ export const isShelfContentSafe = (content: any): boolean => {
   return content && typeof content === 'object' && 'Shelf' in content;
 };
 
-export const isNftContentSafe = (content: any): boolean => {
-  return content && typeof content === 'object' && 'Nft' in content;
-};
+// Unused - marked by ts-unused-exports
+// export const isNftContentSafe = (content: any): boolean => {
+//   return content && typeof content === 'object' && 'Nft' in content;
+// };
 
 export const getNftContentSafe = (content: any): string | null => {
   return content && typeof content === 'object' && 'Nft' in content ? content.Nft : null;
@@ -22,9 +23,10 @@ export const getMarkdownContentSafe = (content: any): string => {
 };
 
 // Function to find an item by its ID
-export const findItemById = (items: [number, Item][], itemId: number) => {
-  return items.find(([key, _]) => key === itemId);
-};
+// Unused - marked by ts-unused-exports
+// export const findItemById = (items: [number, Item][], itemId: number) => {
+//   return items.find(([key, _]) => key === itemId);
+// };
 
 // Generate URLs for content viewing
 export const generateContentUrls = (content: any) => {

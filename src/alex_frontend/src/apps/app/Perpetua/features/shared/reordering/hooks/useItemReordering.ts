@@ -76,4 +76,5 @@ export const useItemReordering = ({ shelf, items, hasEditAccess }: UseItemReorde
   );
 };
 
-export default useItemReordering; 
+// Default export marked as unused by ts-unused-exports
+// export default useItemReordering; 

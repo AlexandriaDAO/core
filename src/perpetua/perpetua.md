@@ -149,12 +149,16 @@ Perpetua/
 
 
 
+npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua
 
 
+npx ts-prune --project src/alex_frontend/src/apps/app/Perpetua
 
-1. try to use pending / fullfilled / rejected state for the for state updates instead of dispatching actions inside thunks.
-2. component naming convention and pattern can be improved. It should be synchronous.
-3. try avoiding custom styles or styled components and use tailwind css as much as possible.
+npx ts-unused-exports tsconfig.json
+
+
+1. component naming convention and pattern can be improved. It should be synchronous.
+2. try avoiding custom styles or styled components and use tailwind css as much as possible.
 
 
 

@@ -19,7 +19,7 @@ import {
   UserShelvesUI
 } from "../features/cards";
 import { NewItemDialog } from "../features/items";
-import { NewShelfDialog } from "../features/shelf-management/components";
+import { default as NewShelfDialog } from "../features/shelf-management/components/NewShelf";
 import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
 
 /**
