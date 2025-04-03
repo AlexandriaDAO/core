@@ -67,13 +67,21 @@ export const useShelfOperations = () => {
     }
   }, [dispatch]);
 
-  const addItem = useCallback(async (shelf: Shelf, content: string, type: "Nft" | "Markdown" | "Shelf", referenceItemId?: number | null, before?: boolean): Promise<boolean> => {
+  const addItem = useCallback(async (
+    shelf: Shelf, 
+    content: string, 
+    type: "Nft" | "Markdown" | "Shelf", 
+    collectionType?: "NFT" | "SBT",
+    referenceItemId?: number | null, 
+    before?: boolean
+  ): Promise<boolean> => {
     if (!identity) return false;
     try {
       await dispatch(addItemAction({ 
         shelf, 
         content, 
         type,
+        collectionType,
         principal: identity.getPrincipal(),
         referenceItemId,
         before
@@ -85,6 +93,10 @@ export const useShelfOperations = () => {
       return true;
     } catch (error) {
       console.error("Failed to add item:", error);
+      // If there's an authentication error, log it specifically
+      if (error && typeof error === 'string' && error.includes('Invalid principal')) {
+        console.error("Authentication error: Invalid principal. User may need to log out and log back in.");
+      }
       return false;
     }
   }, [identity, dispatch, getShelf]);

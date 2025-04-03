@@ -15,6 +15,7 @@ export const addItem = createAsyncThunk(
     content, 
     type, 
     principal,
+    collectionType,
     referenceItemId = null,
     before = true
   }: { 
@@ -22,6 +23,7 @@ export const addItem = createAsyncThunk(
     content: string, 
     type: "Nft" | "Markdown" | "Shelf",
     principal: Principal | string,
+    collectionType?: "NFT" | "SBT",
     referenceItemId?: number | null,
     before?: boolean
   }, { rejectWithValue }) => {
@@ -31,7 +33,8 @@ export const addItem = createAsyncThunk(
         content,
         type,
         referenceItemId,
-        before
+        before,
+        collectionType
       );
       
       if ("Ok" in result && result.Ok) {

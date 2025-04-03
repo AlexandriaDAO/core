@@ -18,7 +18,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/lib/components/toggle-group";
 import { changeCollection } from '@/apps/Modules/shared/state/librarySearch/libraryThunks';
 
 interface NftSearchDialogProps {
-  onSelect: (nftId: string) => void;
+  onSelect: (nftId: string, collectionType: 'NFT' | 'SBT') => void;
 }
 
 const NftSearchDialog: React.FC<NftSearchDialogProps> = ({ onSelect }) => {
@@ -28,8 +28,14 @@ const NftSearchDialog: React.FC<NftSearchDialogProps> = ({ onSelect }) => {
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
   const [selectedNft, setSelectedNft] = useState<string | null>(null);
+  const [selectedNumericId, setSelectedNumericId] = useState<string | null>(null);
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string, assetUrl: string } | null>(null);
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal?.toString());
+
+  // Debug: Log the arweaveToNftId mapping to see what we have
+  React.useEffect(() => {
+    console.log('NftSearch - arweaveToNftId mapping:', arweaveToNftId);
+  }, [arweaveToNftId]);
 
   // Error handler for search operations
   const handleSearchError = useCallback((error: any, message: string) => {
@@ -76,6 +82,7 @@ const NftSearchDialog: React.FC<NftSearchDialogProps> = ({ onSelect }) => {
     dispatch(clearNfts());
     dispatch(clearAllTransactions());
     setSelectedNft(null);
+    setSelectedNumericId(null);
     toast.info("Search cancelled");
   }, [dispatch]);
 
@@ -85,17 +92,42 @@ const NftSearchDialog: React.FC<NftSearchDialogProps> = ({ onSelect }) => {
     }
   };
 
-  const handleNftSelect = (nftId: string, transaction: Transaction) => {
-    setSelectedNft(nftId);
-    onSelect(nftId);
+  const handleNftSelect = (arweaveId: string, transaction: Transaction) => {
+    // Get the numeric token ID from the mapping
+    const numericNftId = arweaveToNftId[arweaveId];
+    
+    console.log(`NftSearch - Selected NFT: arweaveId=${arweaveId}, numericNftId=${numericNftId}`);
+    console.log(`NftSearch - arweaveToNftId keys:`, Object.keys(arweaveToNftId).slice(0, 10));
+    
+    if (!numericNftId) {
+      toast.error("Cannot find numeric NFT ID for this asset. Please try again.");
+      console.error(`Missing numeric ID mapping for Arweave ID: ${arweaveId}`);
+      return;
+    }
+    
+    // Instead of immediately calling onSelect, store the selected values in state
+    setSelectedNft(arweaveId);
+    setSelectedNumericId(numericNftId);
     
     // Get content type for modal view
     const contentType = transaction.tags.find((tag: Tag) => tag.name === "Content-Type")?.value || "application/octet-stream";
     setSelectedContent({ 
-      id: nftId, 
+      id: arweaveId, 
       type: contentType,
       assetUrl: transaction.assetUrl || ""
     });
+  };
+
+  // New function to handle the add button click
+  const handleAddNft = () => {
+    if (!selectedNumericId) {
+      toast.error("Please select an NFT first");
+      return;
+    }
+    
+    console.log(`NftSearch - Adding NFT with numeric ID: ${selectedNumericId} and collection type: ${collection}`);
+    onSelect(selectedNumericId, collection as 'NFT' | 'SBT');
+    toast.success("NFT selected. Click Add NFT in the main dialog to complete.");
   };
 
   const handleDialogOpenChange = useCallback((open: boolean) => {
@@ -180,28 +212,28 @@ const NftSearchDialog: React.FC<NftSearchDialogProps> = ({ onSelect }) => {
         {transactions.length > 0 ? (
           <ContentGrid>
             {transactions.map((transaction: Transaction) => {
-              const nftId = transaction.id;
-              const content = contentData[nftId];
+              const arweaveId = transaction.id;
+              const content = contentData[arweaveId];
               const contentType = transaction.tags.find((tag: Tag) => tag.name === "Content-Type")?.value || "application/octet-stream";
               
               // Check if this NFT is owned by the current user
-              const tokenNftId = arweaveToNftId[nftId];
+              const tokenNftId = arweaveToNftId[arweaveId];
               const nftData = tokenNftId ? nfts[tokenNftId] : undefined;
               const isOwned = user && nftData?.principal === user.principal;
               
               return (
                 <div 
-                  key={nftId}
+                  key={arweaveId}
                   className={cn(
                     "relative", 
-                    selectedNft === nftId && "after:content-[''] after:absolute after:inset-0 after:border-2 after:border-primary after:rounded-md after:pointer-events-none"
+                    selectedNft === arweaveId && "after:content-[''] after:absolute after:inset-0 after:border-2 after:border-primary after:rounded-md after:pointer-events-none"
                   )}
                 >
                   <ContentGrid.Item 
-                    id={nftId}
+                    id={arweaveId}
                     owner={transaction.owner}
                     isOwned={isOwned || false}
-                    onClick={() => handleNftSelect(nftId, transaction)}
+                    onClick={() => handleNftSelect(arweaveId, transaction)}
                   >
                     <div className="w-full h-full flex items-center justify-center bg-muted/10">
                       {content ? (
@@ -211,14 +243,14 @@ const NftSearchDialog: React.FC<NftSearchDialogProps> = ({ onSelect }) => {
                           contentUrls={content?.urls || {
                             thumbnailUrl: null,
                             coverUrl: null,
-                            fullUrl: transaction?.assetUrl || `https://arweave.net/${nftId}`
+                            fullUrl: transaction?.assetUrl || `https://arweave.net/${arweaveId}`
                           }}
                           handleRenderError={handleRenderError}
                         />
                       ) : (
                         <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-4">
                           <FileImage className="h-8 w-8 mb-2" />
-                          <span className="text-xs text-center">{nftId.slice(0, 8)}...</span>
+                          <span className="text-xs text-center">{arweaveId.slice(0, 8)}...</span>
                         </div>
                       )}
                     </div>
@@ -234,6 +266,25 @@ const NftSearchDialog: React.FC<NftSearchDialogProps> = ({ onSelect }) => {
           </div>
         )}
       </div>
+
+      {/* Select button appears when an NFT is selected */}
+      {selectedNft && (
+        <div className="p-4 border-t border-border">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm font-medium">Selected NFT</p>
+              <p className="text-xs text-muted-foreground">ID: {selectedNumericId?.substring(0, 15)}...</p>
+            </div>
+            <Button 
+              onClick={handleAddNft}
+              variant="primary"
+              className="px-4"
+            >
+              Select NFT
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Content dialog for viewing content in modal */}
       <Dialog open={!!selectedContent} onOpenChange={handleDialogOpenChange}>

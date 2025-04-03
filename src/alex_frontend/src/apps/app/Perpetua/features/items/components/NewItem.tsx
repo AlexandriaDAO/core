@@ -23,7 +23,7 @@ interface DialogProps {
 }
 
 interface NewItemDialogProps extends DialogProps {
-  onSubmit: (content: string, type: "Nft" | "Markdown" | "Shelf") => Promise<void>;
+  onSubmit: (content: string, type: "Nft" | "Markdown" | "Shelf", collectionType?: "NFT" | "SBT") => Promise<void>;
   shelves?: Shelf[] | NormalizedShelf[];
 }
 
@@ -31,6 +31,7 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
   const dispatch = useAppDispatch();
   const [content, setContent] = useState("");
   const [type, setType] = useState<"Nft" | "Markdown" | "Shelf">("Markdown");
+  const [collectionType, setCollectionType] = useState<"NFT" | "SBT">("NFT");
   const [selectedShelfId, setSelectedShelfId] = useState<string>("");
   const [creatingNewShelf, setCreatingNewShelf] = useState(false);
   
@@ -107,32 +108,64 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
         return;
       }
       
-      console.log(`Submitting ${type} item with content: ${finalContent.substring(0, 30)}${finalContent.length > 30 ? '...' : ''}`);
+      // Special validation for NFT content - it must be numeric
+      if (type === "Nft" && !/^\d+$/.test(finalContent)) {
+        toast.error("Invalid NFT ID format. The ID must be numeric.");
+        console.error(`Invalid NFT ID format in NewItem.handleSubmit: ${finalContent}`);
+        return;
+      }
       
-      // Call parent component's onSubmit function
-      await onSubmit(finalContent, type);
+      console.log(`NewItem - Submitting ${type} item with content: ${finalContent}${type === "Nft" ? `, collection: ${collectionType}` : ''}`);
       
-      // Clear form fields
-      setContent("");
-      setSelectedShelfId("");
-      setCreatingNewShelf(false);
-      
-      // Close dialog on success
-      onClose();
-      
-      // Show success message
-      toast.success(`Added ${type} content to shelf successfully`);
+      try {
+        // Call parent component's onSubmit function
+        await onSubmit(finalContent, type, type === "Nft" ? collectionType : undefined);
+        
+        // Clear form fields
+        setContent("");
+        setSelectedShelfId("");
+        setCreatingNewShelf(false);
+        
+        // Close dialog on success
+        onClose();
+        
+        // Show success message
+        toast.success(`Added ${type} content to shelf successfully`);
+      } catch (error: any) {
+        // Handle server errors
+        const errorMessage = error?.message || "Failed to add content to shelf";
+        toast.error(errorMessage);
+        console.error(`Server error adding ${type} content:`, error);
+      }
       
     } catch (error) {
-      console.error(`Error adding ${type} content:`, error);
+      console.error(`Error in handleSubmit for ${type} content:`, error);
       toast.error(`Failed to add ${type} content. Please try again.`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleNftSelect = (nftId: string) => {
-    setContent(nftId);
+  // This function receives the numeric NFT ID from NftSearchDialog
+  const handleNftSelect = (numericNftId: string, selectedCollectionType: "NFT" | "SBT") => {
+    // Make sure the ID is valid
+    if (!numericNftId) {
+      toast.error("Invalid NFT ID. Please try selecting another NFT.");
+      console.error("NewItem - Received empty NFT ID in handleNftSelect");
+      return;
+    }
+    
+    // Validate that we received a numeric ID
+    if (!/^\d+$/.test(numericNftId)) {
+      toast.error("Invalid NFT ID format. Expected a numeric ID.");
+      console.error(`NewItem - Received non-numeric NFT ID: ${numericNftId}`);
+      return;
+    }
+    
+    // Store the numeric NFT ID and collection type
+    console.log(`NewItem - Storing numeric NFT ID: ${numericNftId}, collection: ${selectedCollectionType}`);
+    setContent(numericNftId);
+    setCollectionType(selectedCollectionType);
   };
   
   const handleCreateShelf = async () => {
@@ -211,7 +244,7 @@ Your content here..."
       case "Nft":
         return (
           <NftSearchDialog
-            onSelect={handleNftSelect}
+            onSelect={(numericNftId, selectedCollectionType) => handleNftSelect(numericNftId, selectedCollectionType)}
           />
         );
         

@@ -54,12 +54,14 @@ export const useAddToShelf = () => {
    * @param shelfId - ID of the shelf to add content to
    * @param content - Content identifier (NFT id, markdown content, or shelf id)
    * @param contentType - Type of content being added
+   * @param collectionType - For NFTs, specify if it's NFT or SBT
    * @returns Promise resolving to success boolean
    */
   const addContentToShelf = useCallback(async (
     shelfId: string, 
     content: string, 
-    contentType: "Nft" | "Markdown" | "Shelf"
+    contentType: "Nft" | "Markdown" | "Shelf",
+    collectionType?: "NFT" | "SBT"
   ): Promise<boolean> => {
     try {
       // Find the target shelf
@@ -85,11 +87,21 @@ export const useAddToShelf = () => {
       // Convert to Shelf type before passing to addItem
       const targetShelf = denormalizeShelf(targetNormalizedShelf);
       
-      // Add the content to the shelf
-      await addItem(targetShelf, content, contentType);
+      // Add the content to the shelf, passing collectionType for NFTs
+      const success = await addItem(
+        targetShelf, 
+        content, 
+        contentType,
+        contentType === "Nft" ? collectionType : undefined
+      );
       
-      toast.success(`Content added to ${targetShelf.title}`);
-      return true;
+      if (success) {
+        toast.success(`Content added to ${targetShelf.title}`);
+        return true;
+      } else {
+        toast.error(`Failed to add content to ${targetShelf.title}`);
+        return false;
+      }
     } catch (error) {
       console.error("Failed to add content to shelf:", error);
       toast.error("Failed to add content to shelf");
