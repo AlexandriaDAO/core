@@ -1,7 +1,7 @@
 use candid::{CandidType, Principal};
 use ic_cdk;
 
-use crate::storage::{SHELVES, USER_SHELVES, GLOBAL_TIMELINE, USER_PROFILE_ORDER, Shelf, Item};
+use crate::storage::{SHELVES, USER_SHELVES, GLOBAL_TIMELINE, USER_PROFILE_ORDER, TAG_SHELVES, TAG_POPULARITY, TAG_PREFIXES, Shelf, Item, StringVec, normalize_tag, PREFIX_LENGTH};
 
 #[derive(CandidType, Debug)]
 pub enum QueryError {
@@ -10,6 +10,7 @@ pub enum QueryError {
     NftNotFound,
     InvalidTimeRange,
     UnauthorizedAccess,
+    TagNotFound,
 }
 
 pub type QueryResult<T> = Result<T, QueryError>;
@@ -224,6 +225,108 @@ pub fn get_shelf_position_metrics(shelf_id: String) -> Result<ShelfPositionMetri
     })
 }
 
+/// Get shelves by tag with pagination
+#[ic_cdk::query]
+pub fn get_shelves_by_tag(tag: String, offset: u64, limit: u32) -> QueryResult<Vec<Shelf>> {
+    // Get shelf IDs for this tag
+    let shelf_ids = TAG_SHELVES.with(|tag_shelves| {
+        tag_shelves.borrow().get(&tag)
+            .map(|shelves| shelves.0.clone())
+            .ok_or(QueryError::TagNotFound)
+    })?;
+    
+    // Skip to offset and take limit
+    let page_ids: Vec<String> = shelf_ids.into_iter()
+        .skip(offset as usize)
+        .take(limit as usize)
+        .collect();
+    
+    if page_ids.is_empty() {
+        return Ok(Vec::new());
+    }
+    
+    // Get shelves by ID
+    let result = SHELVES.with(|shelves| {
+        let shelves_map = shelves.borrow();
+        page_ids.iter()
+            .filter_map(|id| shelves_map.get(id).map(|shelf| shelf.clone()))
+            .collect()
+    });
+    
+    Ok(result)
+}
+
+/// Get most popular tags with pagination
+#[ic_cdk::query]
+pub fn get_popular_tags(offset: u64, limit: u32) -> Vec<(String, u64)> {
+    TAG_POPULARITY.with(|popularity| {
+        let pop_map = popularity.borrow();
+        let mut result = Vec::new();
+        
+        for (count, tag) in pop_map.iter().skip(offset as usize).take(limit as usize) {
+            // Convert reversed count back to actual count
+            let actual_count = u64::MAX - count;
+            result.push((tag.clone(), actual_count));
+        }
+        
+        result
+    })
+}
+
+/// Get tags matching a prefix (for autocomplete)
+#[ic_cdk::query]
+pub fn get_tags_with_prefix(prefix: String, limit: u32) -> Vec<String> {
+    let normalized_prefix = normalize_tag(&prefix);
+    
+    // For prefixes long enough, we can use the prefix index
+    if normalized_prefix.len() >= PREFIX_LENGTH {
+        let search_prefix = normalized_prefix.chars().take(PREFIX_LENGTH).collect::<String>();
+        
+        // Use the prefix index to get candidate tags
+        return TAG_PREFIXES.with(|prefixes| {
+            let prefix_map = prefixes.borrow();
+            
+            if let Some(tags) = prefix_map.get(&search_prefix) {
+                // Filter the candidates by the full prefix
+                tags.0.iter()
+                    .filter(|tag| tag.starts_with(&normalized_prefix))
+                    .take(limit as usize)
+                    .cloned()
+                    .collect()
+            } else {
+                Vec::new()
+            }
+        });
+    }
+    
+    // For very short prefixes, we still need to scan all tags
+    TAG_SHELVES.with(|tag_shelves| {
+        let tag_map = tag_shelves.borrow();
+        let mut result = Vec::new();
+        
+        for (tag, _) in tag_map.iter() {
+            if tag.starts_with(&normalized_prefix) {
+                result.push(tag.clone());
+                if result.len() >= limit as usize {
+                    break;
+                }
+            }
+        }
+        
+        result
+    })
+}
+
+/// Get count of shelves with a specific tag
+#[ic_cdk::query]
+pub fn get_tag_shelf_count(tag: String) -> u64 {
+    TAG_SHELVES.with(|tag_shelves| {
+        tag_shelves.borrow().get(&tag)
+            .map(|shelves| shelves.0.len() as u64)
+            .unwrap_or(0)
+    })
+}
+
 #[derive(CandidType)]
 pub struct ShelfPositionMetrics {
     pub item_count: usize,
@@ -232,4 +335,66 @@ pub struct ShelfPositionMetrics {
     pub max_gap: f64, 
     pub needs_rebalance: bool,
     pub rebalance_count: u32,
+}
+
+/// Structure for tag system health metrics
+#[derive(CandidType)]
+pub struct TagSystemMetrics {
+    pub total_unique_tags: usize,
+    pub total_tag_references: usize,
+    pub most_popular_tags: Vec<(String, u64)>,
+    pub avg_tag_per_shelf: f64,
+    pub unused_tags_count: usize,
+}
+
+/// Get health metrics for the tag system
+#[ic_cdk::query]
+pub fn get_tag_system_metrics() -> TagSystemMetrics {
+    // Count unique tags and total references
+    let (total_tags, total_refs, unused_count) = TAG_SHELVES.with(|tag_shelves| {
+        let shelves_map = tag_shelves.borrow();
+        let total = shelves_map.len() as usize; // Ensure usize type
+        
+        let mut total_refs: usize = 0;
+        let mut unused: usize = 0;
+        
+        for (_, shelves) in shelves_map.iter() {
+            let count = shelves.0.len();
+            total_refs += count;
+            
+            if count <= 1 {
+                unused += 1;
+            }
+        }
+        
+        (total, total_refs, unused)
+    });
+    
+    // Get top 5 popular tags
+    let popular_tags: Vec<(String, u64)> = get_popular_tags(0, 5);
+    
+    // Calculate average tags per shelf
+    let avg_tags = SHELVES.with(|shelves| {
+        let shelves_map = shelves.borrow();
+        let total_shelves = shelves_map.len();
+        
+        if total_shelves == 0 {
+            return 0.0;
+        }
+        
+        let total_tags: usize = shelves_map
+            .iter()
+            .map(|(_, shelf)| shelf.tags.len())
+            .sum();
+            
+        total_tags as f64 / total_shelves as f64
+    });
+    
+    TagSystemMetrics {
+        total_unique_tags: total_tags,
+        total_tag_references: total_refs,
+        most_popular_tags: popular_tags,
+        avg_tag_per_shelf: avg_tags,
+        unused_tags_count: unused_count,
+    }
 }

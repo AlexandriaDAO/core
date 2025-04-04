@@ -1,4 +1,4 @@
-**Perpetua/
+Perpetua/
 ├── features/
 │   ├── cards/
 │   │   ├── components/
@@ -19,17 +19,17 @@
 │   │   ├── containers/
 │   │   │   ├── ShelfLists.tsx (256 lines)
 │   │   │   └── index.ts (1 lines)
-│   │   ├── index.ts (10 lines)
+│   │   ├── index.ts (7 lines)
 │   │   └── utils/
 │   │       └── ShelfViewUtils.ts (44 lines)
 │   ├── items/
 │   │   ├── components/
 │   │   │   ├── ItemActionMenu.tsx (61 lines)
-│   │   │   ├── NewItem.tsx (358 lines)
-│   │   │   ├── NftSearch.tsx (270 lines)
+│   │   │   ├── NewItem.tsx (391 lines)
+│   │   │   ├── NftSearch.tsx (321 lines)
 │   │   │   └── index.ts (5 lines)
 │   │   ├── hooks/
-│   │   │   └── useItemActions.tsx (104 lines)
+│   │   │   └── useItemActions.tsx (116 lines)
 │   │   └── index.ts (2 lines)
 │   ├── shared/
 │   │   └── reordering/
@@ -59,9 +59,9 @@
 │   │   │   └── ShelfDetailContainer.tsx (162 lines)
 │   │   └── hooks/
 │   │       ├── index.ts (4 lines)
-│   │       ├── useAddToShelf.ts (106 lines)
+│   │       ├── useAddToShelf.ts (118 lines)
 │   │       ├── usePublicShelfOperations.ts (61 lines)
-│   │       └── useShelfOperations.ts (208 lines)
+│   │       └── useShelfOperations.ts (220 lines)
 │   └── shelf-settings/
 │       ├── components/
 │       │   ├── ShelfMetricsDisplay.tsx (143 lines)
@@ -73,6 +73,8 @@
 │       │   ├── useShelfMetadata.ts (34 lines)
 │       │   └── useShelfMetrics.ts (40 lines)
 │       ├── index.ts (3 lines)
+│       └── utils/
+│           └── index.ts (2 lines)
 ├── hooks/
 │   └── useContentPermissions.ts (75 lines)
 ├── index.tsx (17 lines)
@@ -89,21 +91,20 @@
 │   ├── index.ts (49 lines)
 │   ├── perpetuaSlice.ts (645 lines)
 │   ├── services/
-│   │   └── perpetuaService.ts (419 lines)
+│   │   └── perpetuaService.ts (527 lines)
 │   ├── thunks/
 │   │   ├── collaborationThunks.ts (106 lines)
 │   │   ├── index.ts (6 lines)
-│   │   ├── itemThunks.ts (89 lines)
+│   │   ├── itemThunks.ts (92 lines)
 │   │   ├── queryThunks.ts (151 lines)
 │   │   ├── reorderThunks.ts (117 lines)
 │   │   └── shelfThunks.ts (152 lines)
 │   ├── utils/
 ├── types/
-│   ├── index.ts (6 lines)
 │   ├── item.types.ts (27 lines)
 │   ├── reordering.types.ts (68 lines)
 │   └── shelf.types.ts (74 lines)
-└── utils.tsx (136 lines)**
+└── utils.tsx (136 lines)
 
 
 
@@ -126,102 +127,23 @@
 
 
 
-
-
-npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua
-
-
-npx ts-prune --project src/alex_frontend/src/apps/app/Perpetua
-
-npx ts-unused-exports tsconfig.json
-
-
-1. component naming convention and pattern can be improved. It should be synchronous.
-2. try avoiding custom styles or styled components and use tailwind css as much as possible.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-- Consolidate type definitions between features/cards/types/types.ts and features/shelf-management/types/index.ts - they likely have overlapping types.
-
-- AddToShelfDialog.tsx and ShelfSelectionDialog.tsx appear to have similar functionality. Consider merging or extracting shared logic.
-- ItemActionMenu.tsx and ShelfCardActionMenu.tsx likely share similar patterns and could be generalized into a base component with specializations.
-
-
-
-
-
-
-
-
-
-dfx canister uninstall-code perpetua
-cargo build --release --target wasm32-unknown-unknown --package perpetua
-candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpetua/perpetua.did
-dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
-dfx generate perpetua
-
-
-The output should be an actual prompt that could be provided at the beginning of this conversation and yeild better results.
 
 
 ## V1 Features
 
+- Add appears-in in the frontend.
+- Add tags to the frontend.
+- Add number of items as a shelf details.
+ 
+- Payment for all/some actions.
+- Test edit stuff.
 
-- For whatever reason, NFTs aren't being added to the thing.
-
-- Big feature: Organized profile page on the user route.
-- Track how many items are in the shelf as part of the initial display.
-- Payment for all actions.
-- I think we're going to need tags too (so we could filter the recent one by categories)
-- Allowed to edit others users' shelves? YES
-- Shelf Appears In? YES/maybe
-
+- Backup system for all data.
 
 ## V2 Features: 
 
 - A preview of the slots in the profile. (Could be done later)
 
-
-
-
-
-
-## Design
-
-All IC Stable Structures, for V1 only owners can edit shelves.
-
-#[Economics]
-
-The burn functions are in the NFT Manager Canister so we cant use micropayments for each action. We have to charge upfront.
-
-Perhaps for making a shelf cost 20 LBRY, and it just has a max of 500 nfts.
-
-You don't save Shelfs, you add them to your own shelfs.
-
-The hard part will be linking these shelves to eachother, or knowing how many shelves an NFT is in.
 
 
 
@@ -242,68 +164,27 @@ The hard part will be linking these shelves to eachother, or knowing how many sh
 
 
 
-To render NFTs in Perpetua like in other apps, you would:
-- Use the ContentRenderer component to render the NFT content inside your slot components
-- Ensure the NFT data is properly loaded into the Redux store using the same patterns as Alexandrian
-- Use the ContentCard component (which you're already using) with the appropriate props to display NFT metadata
-- Potentially use the NftDataFooter component to display consistent NFT metadata
 
-But first I need a plan to ensure that the NFT slots are actual NFTs owned by the user.
 
-So for this it's like a my-library component. Plus a Pinax compontent. Plus aan add to shelf option on every owned NFT.
-
-So first let's figure out what's going on with the ordering of the Alexandrian NFTs.
+# Backend ToDos:
+- Make sure add_item_to_shelf has the proper type checks. Right now, I just use the frontend to determine if it's 'shelf', 'nft' or 'markdown'.
 
 
 
 
 
+## Cleanup commands. 
+
+
+npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua
+npx ts-prune --project src/alex_frontend/src/apps/app/Perpetua
+npx ts-unused-exports tsconfig.json
 
 
 
+dfx canister uninstall-code perpetua
+cargo build --release --target wasm32-unknown-unknown --package perpetua
+candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpetua/perpetua.did
+dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
+dfx generate perpetua
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Homepage Animation thoughts:
-
-I saw you had that big ball in the middle, with a bunch of extending tenticals.
-I think that can apply as to the grand vision if it somehow animates two parts, one expanding into and one expanding from.
-
-We might call Alexandria the "Universal Content Protocol"
-The ball in the center is 'Alexandria Core', which "Makes files a lot more like Bitcoin"
-- Everything in it is a "Universal Content Unit" wich is it's own:
-  - "Asset" - Owned by someone.
-  - "Business" - Earns money whenever it is re-used.
-  - "Bank" - Holds money on behalf of its creator.
-  - "NFT" - Self-rendering permanent asset with dynamic metadata attributes.
-
-What goes from the tenticals into 'Alexandria Core' is:
-  - Ebooks
-  - Images
-  - Videos
-  - Songs
-  - Movies
-  - Documents
-  - ... Could add more if it fits the animation better
-
-What comes out of the 'Alexandria Core' from the tenticals is:
-  ∞ Alexandrian (d-Drive)
-  ∞ Bibliotheca (d-Kindle)
-  ∞ Emporium (d-Commerce)
-  ∞ Perpetua (d-Social)
-  ∞ Syllogos (d-Google)
-  ... Could add more if it fits the animation better
-
-Call to action: "A digital life that's timeless, under one roof, and truly yours."

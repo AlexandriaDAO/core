@@ -3,6 +3,7 @@ use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, crea
 use crate::guard::not_anon;
 use crate::auth;
 use crate::update::utils::{verify_nft_ownership, shelf_exists, is_self_reference};
+use std::collections::HashSet;
 
 /// Input structure for reordering a item within a shelf
 #[derive(CandidType, Deserialize)]
@@ -67,6 +68,29 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
         if is_self_reference(&shelf_id, nested_shelf_id) {
             return Err("Cannot add a shelf to itself".to_string());
         }
+        
+        // Update the nested shelf's appears_in list
+        SHELVES.with(|shelves| {
+            let mut shelves_map = shelves.borrow_mut();
+            if let Some(mut nested_shelf) = shelves_map.get(nested_shelf_id) {
+                let mut nested_shelf = nested_shelf.clone();
+                
+                // Only add if not already present
+                if !nested_shelf.appears_in.contains(&shelf_id) {
+                    // Cap appears_in to 100 entries
+                    if nested_shelf.appears_in.len() >= 100 {
+                        // Remove the oldest entry (first in the list)
+                        nested_shelf.appears_in.remove(0);
+                    }
+                    
+                    // Add the shelf_id to appears_in
+                    nested_shelf.appears_in.push(shelf_id.clone());
+                    
+                    // Save the updated nested shelf
+                    shelves_map.insert(nested_shelf_id.clone(), nested_shelf);
+                }
+            }
+        });
     }
     
     // Use the auth helper to handle edit permissions check and update
@@ -99,12 +123,87 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
                 nft_map.insert(nft_id.to_string(), shelves);
             });
         }
-
-        // Check if the shelf needs rebalancing before saving
-        shelf.ensure_balanced_positions();
+        
+        // If we added a shelf item, reorder items by popularity
+        if let ItemContent::Shelf(_) = &input.content {
+            reorder_shelves_by_popularity(shelf);
+        } else {
+            // Just ensure positions are balanced
+            shelf.ensure_balanced_positions();
+        }
 
         Ok(())
     })
+}
+
+/// Reorders shelf items based on popularity (number of appearances in other shelves)
+fn reorder_shelves_by_popularity(shelf: &mut crate::storage::Shelf) {
+    // Constant for shelf item positioning
+    const SHELF_ITEM_STEP_SIZE: f64 = 1000.0;
+    
+    // Collect all shelf items with their popularity
+    let mut shelf_items: Vec<(u32, usize)> = Vec::new();
+    
+    for (item_id, item) in &shelf.items {
+        if let ItemContent::Shelf(nested_id) = &item.content {
+            // Get popularity from the nested shelf's appears_in count
+            let popularity = SHELVES.with(|shelves| {
+                shelves.borrow().get(nested_id)
+                    .map(|nested_shelf| nested_shelf.appears_in.len())
+                    .unwrap_or(0)
+            });
+            
+            shelf_items.push((*item_id, popularity));
+        }
+    }
+    
+    // If no shelf items, just return
+    if shelf_items.is_empty() {
+        return;
+    }
+    
+    // Sort by popularity (highest first)
+    shelf_items.sort_by(|a, b| b.1.cmp(&a.1));
+    
+    // Separate shelf items from non-shelf items
+    let shelf_item_ids: std::collections::HashSet<u32> = shelf_items.iter()
+        .map(|(id, _)| *id)
+        .collect();
+    
+    // Gather non-shelf items (preserve their relative order from positions)
+    let mut non_shelf_items: Vec<(u32, f64)> = shelf.item_positions.iter()
+        .filter(|(id, _)| !shelf_item_ids.contains(id))
+        .map(|(id, pos)| (*id, *pos))
+        .collect();
+    
+    // Sort non-shelf items by position
+    non_shelf_items.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+    
+    // Create a new ordering with non-shelf items first, then shelf items by popularity
+    let mut all_items: Vec<u32> = non_shelf_items.iter().map(|(id, _)| *id).collect();
+    for (id, _) in shelf_items {
+        all_items.push(id);
+    }
+    
+    // Evenly distribute positions for all items
+    let total_items = all_items.len();
+    if total_items > 0 {
+        let step = SHELF_ITEM_STEP_SIZE / (total_items as f64 + 1.0);
+        let mut current_pos = step;
+        
+        // Clear existing positions
+        shelf.item_positions.clear();
+        
+        // Assign new positions
+        for item_id in all_items {
+            shelf.item_positions.insert(item_id, current_pos);
+            current_pos += step;
+        }
+        
+        // Mark as not needing rebalance
+        shelf.needs_rebalance = false;
+        shelf.rebalance_count += 1;
+    }
 }
 
 /// Removes a item from an existing shelf
@@ -126,11 +225,36 @@ pub async fn remove_item_from_shelf(shelf_id: String, item_id: u32) -> Result<()
         // Get a clone of the item to use after removal for cleanup operations
         let item_content = item_opt.unwrap().content.clone();
         
+        // Flag to track if we're removing a shelf reference
+        let is_shelf_item = matches!(item_content, ItemContent::Shelf(_));
+        
+        // If removing a shelf reference, update its appears_in list
+        if let ItemContent::Shelf(nested_shelf_id) = &item_content {
+            SHELVES.with(|shelves| {
+                let mut shelves_map = shelves.borrow_mut();
+                if let Some(nested_shelf) = shelves_map.get(nested_shelf_id) {
+                    let mut nested_shelf = nested_shelf.clone();
+                    
+                    // Remove this shelf from the nested shelf's appears_in list
+                    nested_shelf.appears_in.retain(|id| id != &shelf_id);
+                    
+                    // Save the updated nested shelf
+                    shelves_map.insert(nested_shelf_id.clone(), nested_shelf);
+                }
+            });
+        }
+        
         // Remove the item
         shelf.items.remove(&item_id);
+        shelf.item_positions.remove(&item_id);
         
-        // Update item positions (optional, but might help maintain consistency)
-        shelf.ensure_balanced_positions();
+        // If we removed a shelf item, reorder remaining shelf items by popularity
+        if is_shelf_item {
+            reorder_shelves_by_popularity(shelf);
+        } else {
+            // Just ensure positions are balanced
+            shelf.ensure_balanced_positions();
+        }
         
         // Clean up any references if the removed item was an NFT
         if let ItemContent::Nft(nft_id) = &item_content {
@@ -177,7 +301,11 @@ pub async fn create_and_add_shelf_item(
     }
     
     // Create a new shelf
-    let shelf = create_shelf(title, description, vec![]).await?;
+    let mut shelf = create_shelf(title, description, vec![], None).await?;
+    
+    // Initialize appears_in with the parent shelf ID
+    shelf.appears_in.push(parent_shelf_id.clone());
+    
     let new_shelf_id = shelf.shelf_id.clone();
     
     // Store everything in a single critical section to prevent multiple borrows
@@ -208,8 +336,8 @@ pub async fn create_and_add_shelf_item(
                 return Err(e);
             }
             
-            // Check if the shelf needs rebalancing
-            parent_shelf.ensure_balanced_positions();
+            // Reorder shelf items by popularity
+            reorder_shelves_by_popularity(&mut parent_shelf);
             
             // Update the timestamp
             parent_shelf.updated_at = ic_cdk::api::time();

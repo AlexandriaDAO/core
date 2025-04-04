@@ -31,7 +31,7 @@ pub mod query;
 pub mod utils;
 
 pub use storage::{Item, Shelf};
-pub use update::shelf::{ShelfUpdate, store_shelf, update_shelf_metadata, rebalance_shelf_items};
+pub use update::shelf::{ShelfUpdate, TagOperation, store_shelf, update_shelf_metadata, rebalance_shelf_items, add_tag_to_shelf, remove_tag_from_shelf, update_tag_popularity_batch, cleanup_unused_tags};
 pub use update::item::{
     ItemReorderInput, reorder_shelf_item, 
     AddItemInput, add_item_to_shelf, remove_item_from_shelf, 
