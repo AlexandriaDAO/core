@@ -6,8 +6,9 @@ use std::borrow::Cow;
 use std::cell::RefCell;
 use std::collections::BTreeSet;
 use std::collections::BTreeMap;
-use crate::utils;
-use crate::ordering::{PositionedOrdering, get_ordered_by_position, ensure_balanced_positions};
+use crate::ordering::{PositionedOrdering, get_ordered_by_position};
+use sha2;
+use bs58;
 
 /// Normalizes a tag by converting to lowercase, trimming whitespace
 /// This helps prevent duplicates with minor variations
@@ -26,13 +27,15 @@ const TAG_SHELVES_MEM_ID: MemoryId = MemoryId::new(4);
 const TAG_POPULARITY_MEM_ID: MemoryId = MemoryId::new(5);
 const TAG_LAST_USED_MEM_ID: MemoryId = MemoryId::new(6);
 const TAG_PREFIX_MEM_ID: MemoryId = MemoryId::new(7);
+const USER_PROFILE_ORDER_MEM_ID: MemoryId = MemoryId::new(8);
+const USER_TAG_COUNTS_MEM_ID: MemoryId = MemoryId::new(9);
 
 // Constants for tag cleanup and indexing
 pub const TAG_CLEANUP_THRESHOLD: u64 = 30 * 24 * 60 * 60 * 1_000_000_000; // 30 days in nanoseconds
 pub const MIN_TAG_USAGE_COUNT: usize = 3; // Minimum number of uses to keep a tag
 pub const PREFIX_LENGTH: usize = 2; // Length of prefix for tag indexing
 
-const MAX_VALUE_SIZE: u32 = 8192; // 8kb should be good for a decent sized markdown file.
+// Remove the MAX_VALUE_SIZE constant since we're using unbounded storage
 const MAX_TAG_LENGTH: usize = 10;
 pub const MAX_TAGS_PER_SHELF: usize = 3;
 
@@ -40,12 +43,30 @@ pub const MAX_TAGS_PER_SHELF: usize = 3;
 pub const MAX_TAGS_PER_USER: usize = 100;
 pub const TAG_RATE_LIMIT_WINDOW: u64 = 24 * 60 * 60 * 1_000_000_000; // 24 hours in ns
 
+// Constants for shelf operations
+pub const MAX_ITEMS_PER_SHELF: usize = 500;
+pub const MAX_APPEARS_IN_COUNT: usize = 100;
+
 // New wrapper types
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
 pub struct StringVec(pub Vec<String>);
 
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
 pub struct TimestampedShelves(pub BTreeSet<(u64, String)>);
+
+// Add back the ItemContent and Item types
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub enum ItemContent {
+    Nft(String), // NFT ID
+    Markdown(String), // Markdown text
+    Shelf(String), // Shelf ID - allows nesting shelves
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct Item {
+    pub id: u32, // Unique item ID
+    pub content: ItemContent,
+}
 
 thread_local! {
     // Memory manager for stable storage
@@ -113,26 +134,21 @@ thread_local! {
     pub static POPULARITY_NEEDS_UPDATE: RefCell<bool> = RefCell::new(false);
     
     // User profile shelf order: K: Principal, V: UserProfileOrder
-    pub static USER_PROFILE_ORDER: RefCell<BTreeMap<Principal, UserProfileOrder>> = RefCell::new(BTreeMap::new());
+    pub static USER_PROFILE_ORDER: RefCell<StableBTreeMap<Principal, UserProfileOrder, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(USER_PROFILE_ORDER_MEM_ID))
+        )
+    );
     
-    // User tag rate limiting: K: Principal, V: (last_reset_time, count)
-    pub static USER_TAG_COUNTS: RefCell<BTreeMap<Principal, (u64, usize)>> = RefCell::new(BTreeMap::new());
+    // User tag rate limiting: K: Principal, V: UserTagCount
+    pub static USER_TAG_COUNTS: RefCell<StableBTreeMap<Principal, UserTagCount, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(USER_TAG_COUNTS_MEM_ID))
+        )
+    );
 }
 
-// Updated Shelf structure
-#[derive(CandidType, Deserialize, Clone, Debug)]
-pub enum ItemContent {
-    Nft(String), // NFT ID
-    Markdown(String), // Markdown text
-    Shelf(String), // Shelf ID - allows nesting shelves
-}
-
-#[derive(CandidType, Deserialize, Clone, Debug)]
-pub struct Item {
-    pub id: u32, // Unique item ID
-    pub content: ItemContent,
-}
-
+// Updated Shelf structure - remove Default trait
 #[derive(CandidType, Deserialize, Clone, Debug)]
 pub struct Shelf {
     pub shelf_id: String,
@@ -150,7 +166,7 @@ pub struct Shelf {
     pub tags: Vec<String>,               // List of tags, limited to 3 per shelf
 }
 
-// Updated Storable implementation using MAX_VALUE_SIZE
+// Updated Storable implementation using Unbounded size
 impl Storable for Shelf {
     fn to_bytes(&self) -> Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
@@ -160,10 +176,7 @@ impl Storable for Shelf {
         Decode!(bytes.as_ref(), Self).unwrap()
     }
 
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_VALUE_SIZE,
-        is_fixed_size: false,
-    };
+    const BOUND: Bound = Bound::Unbounded;
 }
 
 impl Storable for Item {
@@ -175,10 +188,7 @@ impl Storable for Item {
         Decode!(bytes.as_ref(), Self).unwrap()
     }
 
-    const BOUND: Bound = Bound::Bounded {
-        max_size: 1024, // Adjust based on expected content size
-        is_fixed_size: false,
-    };
+    const BOUND: Bound = Bound::Unbounded;
 }
 
 impl Storable for StringVec {
@@ -190,10 +200,7 @@ impl Storable for StringVec {
         Decode!(bytes.as_ref(), Self).unwrap()
     }
 
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_VALUE_SIZE,
-        is_fixed_size: false,
-    };
+    const BOUND: Bound = Bound::Unbounded;
 }
 
 impl Storable for TimestampedShelves {
@@ -205,10 +212,31 @@ impl Storable for TimestampedShelves {
         Decode!(bytes.as_ref(), Self).unwrap()
     }
 
-    const BOUND: Bound = Bound::Bounded {
-        max_size: MAX_VALUE_SIZE,
-        is_fixed_size: false,
-    };
+    const BOUND: Bound = Bound::Unbounded;
+}
+
+impl Storable for UserProfileOrder {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
+}
+
+impl Storable for UserTagCount {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
 }
 
 // Thresholds for shelf item positioning rebalancing
@@ -222,9 +250,48 @@ const SHELF_ITEM_THRESHOLDS: [(usize, f64); 3] = [
 const SHELF_ITEM_STEP_SIZE: f64 = 1000.0;
 
 impl Shelf {
+    /// Creates a new shelf with provided properties
+    pub fn new(shelf_id: String, title: String, owner: Principal) -> Self {
+        let now = ic_cdk::api::time();
+        Self {
+            shelf_id,
+            title,
+            description: None,
+            owner,
+            editors: Vec::new(),
+            items: BTreeMap::new(),
+            item_positions: BTreeMap::new(),
+            created_at: now,
+            updated_at: now,
+            needs_rebalance: false,
+            rebalance_count: 0,
+            appears_in: Vec::new(),
+            tags: Vec::new(),
+        }
+    }
+
+    /// Builder-style method to add a description
+    pub fn with_description(mut self, description: Option<String>) -> Self {
+        self.description = description;
+        self
+    }
+
+    /// Builder-style method to add editors
+    pub fn with_editors(mut self, editors: Vec<Principal>) -> Self {
+        self.editors = editors;
+        self
+    }
+
+    /// Builder-style method to add tags
+    pub fn with_tags(mut self, tags: Vec<String>) -> Self {
+        // Only store up to MAX_TAGS_PER_SHELF
+        self.tags = tags.into_iter().take(MAX_TAGS_PER_SHELF).collect();
+        self
+    }
+
     pub fn insert_item(&mut self, item: Item) -> Result<(), String> {
-        if self.items.len() >= 500 {
-            return Err("Maximum item limit reached (500)".to_string());
+        if self.items.len() >= MAX_ITEMS_PER_SHELF {
+            return Err(format!("Maximum item limit reached ({})", MAX_ITEMS_PER_SHELF));
         }
         
         // Check for circular references
@@ -243,7 +310,7 @@ impl Shelf {
         let item_id = item.id;
         
         // Initialize position at the end using the shared abstraction
-        let new_position = self.item_positions.calculate_position(None, false, 1.0).unwrap();
+        let new_position = self.item_positions.calculate_position(None, false, 1.0)?;
             
         // Update the float position
         self.item_positions.insert(item_id, new_position);
@@ -259,28 +326,54 @@ impl Shelf {
 
     // Helper method to check for circular references in the shelf hierarchy
     fn has_circular_reference(&self, shelf_id: &str) -> bool {
-        // Check if any item in the current shelf contains the target shelf
+        // Track visited shelves to avoid redundant lookups
+        let mut visited = BTreeSet::new();
+        visited.insert(self.shelf_id.clone());
+        
+        // Use a stack-based approach rather than recursion
+        let mut stack = Vec::new();
+        
+        // Initialize stack with all immediate children (shelf items)
         for item in self.items.values() {
             if let ItemContent::Shelf(nested_id) = &item.content {
-                // If this item contains the shelf we're checking, we have a circular reference
                 if nested_id == shelf_id {
-                    return true;
+                    return true; // Direct circular reference
                 }
-                
-                // Check deeper in the hierarchy
-                // We need to get the nested shelf from the global storage
-                let has_deeper_circular_ref = SHELVES.with(|shelves| {
-                    let shelves_map = shelves.borrow();
-                    if let Some(nested_shelf) = shelves_map.get(nested_id) {
-                        nested_shelf.has_circular_reference(shelf_id)
-                    } else {
-                        false
+                stack.push(nested_id.clone());
+            }
+        }
+        
+        // Stack-based traversal of the hierarchy
+        while let Some(current_id) = stack.pop() {
+            // Skip if already visited
+            if !visited.insert(current_id.clone()) {
+                continue;
+            }
+            
+            // If current shelf is the one we're checking, we found a circular reference
+            if current_id == shelf_id {
+                return true;
+            }
+            
+            // Check all children of the current shelf
+            let found_circular = SHELVES.with(|shelves| {
+                let shelves_map = shelves.borrow();
+                if let Some(nested_shelf) = shelves_map.get(&current_id) {
+                    // Add all shelf items to stack for processing
+                    for item in nested_shelf.items.values() {
+                        if let ItemContent::Shelf(next_id) = &item.content {
+                            if next_id == shelf_id {
+                                return true; // Found circular reference
+                            }
+                            stack.push(next_id.clone());
+                        }
                     }
-                });
-                
-                if has_deeper_circular_ref {
-                    return true;
                 }
+                false
+            });
+            
+            if found_circular {
+                return true;
             }
         }
         
@@ -370,7 +463,7 @@ pub fn validate_tag(tag: &str) -> Result<(), String> {
     Ok(())
 }
 
-// Function to update tag tracking when adding a tag
+// Function to update tag tracking when adding a tag - fix entry API usage
 pub fn add_tag_to_tracking(tag: &str, shelf_id: &str) -> Result<(), String> {
     let normalized_tag = normalize_tag(tag);
     let now = ic_cdk::api::time();
@@ -382,32 +475,40 @@ pub fn add_tag_to_tracking(tag: &str, shelf_id: &str) -> Result<(), String> {
         // Only add if not already present
         if !shelves.0.contains(&shelf_id.to_string()) {
             shelves.0.push(shelf_id.to_string());
-            tag_map.insert(normalized_tag.clone(), shelves.clone());
-            
-            // Update last used timestamp
-            TAG_LAST_USED.with(|last_used| {
-                last_used.borrow_mut().insert(normalized_tag.clone(), now);
-            });
-            
-            // Update popularity tracking
-            update_tag_popularity(&normalized_tag, shelves.0.len());
-            
-            // Update prefix index if tag is long enough
-            if normalized_tag.len() >= PREFIX_LENGTH {
-                let prefix = normalized_tag.chars().take(PREFIX_LENGTH).collect::<String>();
-                
-                TAG_PREFIXES.with(|prefixes| {
-                    let mut prefix_map = prefixes.borrow_mut();
-                    let mut tags = prefix_map.get(&prefix).unwrap_or_default();
-                    
-                    if !tags.0.contains(&normalized_tag) {
-                        tags.0.push(normalized_tag.clone());
-                        prefix_map.insert(prefix, tags);
-                    }
-                });
-            }
+            tag_map.insert(normalized_tag.clone(), shelves);
         }
     });
+    
+    // Update last used timestamp
+    TAG_LAST_USED.with(|last_used| {
+        last_used.borrow_mut().insert(normalized_tag.clone(), now);
+    });
+    
+    // Get current count for popularity tracking
+    let current_count = TAG_SHELVES.with(|tag_shelves| {
+        tag_shelves.borrow()
+            .get(&normalized_tag)
+            .map_or(1, |shelves| shelves.0.len())
+    });
+    
+    // Update popularity tracking
+    update_tag_popularity(&normalized_tag, current_count);
+    
+    // Update prefix index if tag is long enough
+    if normalized_tag.len() >= PREFIX_LENGTH {
+        let prefix = normalized_tag.chars().take(PREFIX_LENGTH).collect::<String>();
+        
+        TAG_PREFIXES.with(|prefixes| {
+            let mut prefix_map = prefixes.borrow_mut();
+            let mut tags = prefix_map.get(&prefix).unwrap_or_default();
+            
+            // Only add if not already present
+            if !tags.0.contains(&normalized_tag) {
+                tags.0.push(normalized_tag.clone());
+                prefix_map.insert(prefix, tags);
+            }
+        });
+    }
     
     Ok(())
 }
@@ -566,57 +667,75 @@ pub async fn create_shelf(
     items: Vec<Item>,
     tags: Option<Vec<String>>,  // New parameter
 ) -> Result<Shelf, String> {
-    if items.len() > 500 {
-        return Err("Cannot create shelf with more than 500 items".to_string());
+    // Input validation
+    if title.trim().is_empty() {
+        return Err("Title cannot be empty".to_string());
+    }
+    
+    // Check for title length
+    if title.len() > 100 {
+        return Err("Title is too long (max 100 characters)".to_string());
+    }
+    
+    // Check for description length if provided
+    if let Some(ref desc) = description {
+        if desc.len() > 500 {
+            return Err("Description is too long (max 500 characters)".to_string());
+        }
     }
     
     // Validate tags if provided
     let validated_tags = if let Some(tag_list) = tags {
+        // Limit the number of tags
         if tag_list.len() > MAX_TAGS_PER_SHELF {
-            return Err(format!("Maximum of {} tags per shelf", MAX_TAGS_PER_SHELF));
+            return Err(format!("Too many tags (max {})", MAX_TAGS_PER_SHELF));
         }
         
         // Validate each tag
-        for tag in &tag_list {
-            validate_tag(tag)?;
+        let mut normalized_tags = Vec::new();
+        for tag in tag_list {
+            validate_tag(&tag)?;
+            normalized_tags.push(normalize_tag(&tag));
         }
         
-        tag_list
+        // Remove duplicates by converting to a set and back
+        let mut unique_tags = BTreeSet::new();
+        for tag in normalized_tags {
+            unique_tags.insert(tag);
+        }
+        
+        unique_tags.into_iter().collect()
     } else {
         Vec::new()
     };
     
+    let caller = ic_cdk::caller();
     let now = ic_cdk::api::time();
-    let owner = ic_cdk::caller();  // Get caller here
-    let shelf_id = utils::generate_shelf_id(&owner).await;
-
-    // Create shelf with generated ID
-    let mut shelf = Shelf {
-        shelf_id: shelf_id.clone(),
-        title,
-        description,
-        owner,  // Use derived owner
-        editors: Vec::new(), // Initialize editors as empty vector
-        items: BTreeMap::new(),
-        item_positions: BTreeMap::new(),
-        created_at: now,
-        updated_at: now,
-        needs_rebalance: false,
-        rebalance_count: 0,
-        appears_in: Vec::new(), // Initialize appears_in as empty vector
-        tags: validated_tags.clone(), // Initialize tags
+    
+    // Create a unique ID for the shelf (hash of owner + timestamp + title)
+    let shelf_id = {
+        let mut hasher = sha2::Sha256::new();
+        let id_input = format!("{}:{}:{}", caller.to_text(), now, title);
+        use sha2::Digest;
+        hasher.update(id_input.as_bytes());
+        let hash = hasher.finalize();
+        // Use base58 for a more URL-friendly ID
+        bs58::encode(hash).into_string()
     };
-
-    // Add items with proper ordering
+    
+    // Create the new shelf using builder pattern
+    let mut shelf = Shelf::new(shelf_id.clone(), title, caller)
+        .with_description(description)
+        .with_tags(validated_tags);
+    
+    // Add the items if any were provided
     for item in items {
         shelf.insert_item(item)?;
     }
     
-    // Update tag tracking for each tag
-    for tag in &validated_tags {
-        add_tag_to_tracking(tag, &shelf_id)?;
-    }
-
+    // We'll add the shelf to data structures in the caller function, not here
+    // This avoids duplicating this logic between here and store_shelf
+    
     Ok(shelf)
 }
 
@@ -629,6 +748,13 @@ pub struct UserProfileOrder {
     pub is_customized: bool,
 }
 
+// Structure to hold user tag counts for rate limiting
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct UserTagCount {
+    pub last_reset_time: u64,
+    pub count: usize,
+}
+
 // Check if a user has hit their tag rate limit
 pub fn check_tag_rate_limit(user: &Principal) -> Result<(), String> {
     let now = ic_cdk::api::time();
@@ -637,26 +763,37 @@ pub fn check_tag_rate_limit(user: &Principal) -> Result<(), String> {
         let mut counts_map = counts.borrow_mut();
         
         // Get or initialize the user's count
-        let (last_reset, count) = counts_map
+        let user_tag_count = counts_map
             .get(user)
-            .cloned()
-            .unwrap_or((now, 0));
+            .map(|count| count.clone())
+            .unwrap_or(UserTagCount { 
+                last_reset_time: now, 
+                count: 0 
+            });
         
         // Check if we should reset the window
-        let (new_last_reset, new_count) = if now - last_reset > TAG_RATE_LIMIT_WINDOW {
-            (now, 1) // Reset window and count
-        } else if count >= MAX_TAGS_PER_USER {
+        let new_tag_count = if now - user_tag_count.last_reset_time > TAG_RATE_LIMIT_WINDOW {
+            // Reset window and count
+            UserTagCount { 
+                last_reset_time: now, 
+                count: 1 
+            }
+        } else if user_tag_count.count >= MAX_TAGS_PER_USER {
             return Err(format!(
                 "Rate limit exceeded. Maximum {} tags per {} hours", 
                 MAX_TAGS_PER_USER, 
                 TAG_RATE_LIMIT_WINDOW / (60 * 60 * 1_000_000_000)
             ));
         } else {
-            (last_reset, count + 1) // Increment within current window
+            // Increment within current window
+            UserTagCount { 
+                last_reset_time: user_tag_count.last_reset_time, 
+                count: user_tag_count.count + 1 
+            }
         };
         
         // Update the counter
-        counts_map.insert(*user, (new_last_reset, new_count));
+        counts_map.insert(*user, new_tag_count);
         
         Ok(())
     })

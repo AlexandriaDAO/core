@@ -52,7 +52,7 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
     let caller = ic_cdk::caller();
     
     // Validate NFT ownership if applicable
-    if let ItemContent::Nft(nft_id) = &input.content {
+    if let ItemContent::Nft(ref nft_id) = input.content {
         let is_owner = verify_nft_ownership(nft_id, caller).await?;
         if !is_owner {
             return Err("Unauthorized: You can only add NFTs that you own".to_string());
@@ -60,7 +60,7 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
     }
     
     // Validate shelf existence and prevent self-references
-    if let ItemContent::Shelf(nested_shelf_id) = &input.content {
+    if let ItemContent::Shelf(ref nested_shelf_id) = input.content {
         if !shelf_exists(nested_shelf_id) {
             return Err(format!("Shelf '{}' does not exist", nested_shelf_id));
         }
@@ -69,6 +69,9 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
             return Err("Cannot add a shelf to itself".to_string());
         }
         
+        // Use a reference to shelf_id to avoid clone when possible
+        let shelf_id_ref = &shelf_id;
+        
         // Update the nested shelf's appears_in list
         SHELVES.with(|shelves| {
             let mut shelves_map = shelves.borrow_mut();
@@ -76,7 +79,7 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
                 let mut nested_shelf = nested_shelf.clone();
                 
                 // Only add if not already present
-                if !nested_shelf.appears_in.contains(&shelf_id) {
+                if !nested_shelf.appears_in.contains(shelf_id_ref) {
                     // Cap appears_in to 100 entries
                     if nested_shelf.appears_in.len() >= 100 {
                         // Remove the oldest entry (first in the list)
@@ -115,7 +118,7 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
         }
 
         // Update tracking for NFT references if applicable
-        if let ItemContent::Nft(nft_id) = &input.content {
+        if let ItemContent::Nft(ref nft_id) = input.content {
             NFT_SHELVES.with(|nft_shelves| {
                 let mut nft_map = nft_shelves.borrow_mut();
                 let mut shelves = nft_map.get(nft_id).unwrap_or_default();
@@ -125,7 +128,7 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
         }
         
         // If we added a shelf item, reorder items by popularity
-        if let ItemContent::Shelf(_) = &input.content {
+        if let ItemContent::Shelf(_) = input.content {
             reorder_shelves_by_popularity(shelf);
         } else {
             // Just ensure positions are balanced
@@ -228,15 +231,18 @@ pub async fn remove_item_from_shelf(shelf_id: String, item_id: u32) -> Result<()
         // Flag to track if we're removing a shelf reference
         let is_shelf_item = matches!(item_content, ItemContent::Shelf(_));
         
+        // Create a reference to avoid cloning
+        let shelf_id_ref = &shelf_id;
+        
         // If removing a shelf reference, update its appears_in list
-        if let ItemContent::Shelf(nested_shelf_id) = &item_content {
+        if let ItemContent::Shelf(ref nested_shelf_id) = item_content {
             SHELVES.with(|shelves| {
                 let mut shelves_map = shelves.borrow_mut();
                 if let Some(nested_shelf) = shelves_map.get(nested_shelf_id) {
                     let mut nested_shelf = nested_shelf.clone();
                     
                     // Remove this shelf from the nested shelf's appears_in list
-                    nested_shelf.appears_in.retain(|id| id != &shelf_id);
+                    nested_shelf.appears_in.retain(|id| id != shelf_id_ref);
                     
                     // Save the updated nested shelf
                     shelves_map.insert(nested_shelf_id.clone(), nested_shelf);
@@ -257,14 +263,14 @@ pub async fn remove_item_from_shelf(shelf_id: String, item_id: u32) -> Result<()
         }
         
         // Clean up any references if the removed item was an NFT
-        if let ItemContent::Nft(nft_id) = &item_content {
+        if let ItemContent::Nft(ref nft_id) = item_content {
             NFT_SHELVES.with(|nft_shelves| {
                 let mut nft_map = nft_shelves.borrow_mut();
                 
                 // If this NFT is in the tracking map
                 if let Some(shelves) = nft_map.get(nft_id) {
                     let mut shelves_clone = shelves.clone();
-                    shelves_clone.0.retain(|id| id != &shelf_id);
+                    shelves_clone.0.retain(|id| id != shelf_id_ref);
                     
                     // Update or remove the entry
                     if shelves_clone.0.is_empty() {

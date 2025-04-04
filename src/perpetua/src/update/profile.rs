@@ -1,8 +1,6 @@
-use candid::{Principal};
-use std::collections::BTreeMap;
 use ic_cdk;
 
-use crate::storage::{SHELVES, USER_SHELVES, USER_PROFILE_ORDER, UserProfileOrder};
+use crate::storage::{USER_SHELVES, USER_PROFILE_ORDER};
 use crate::ordering::{PositionedOrdering, ensure_balanced_positions};
 use crate::guard::not_anon;
 
@@ -21,6 +19,7 @@ const PROFILE_SHELF_STEP_SIZE: f64 = 1000.0;
 #[ic_cdk::update(guard = "not_anon")]
 pub fn reorder_profile_shelf(shelf_id: String, reference_shelf_id: Option<String>, before: bool) -> Result<(), String> {
     let caller = ic_cdk::caller();
+    let shelf_id_ref = &shelf_id;
     
     // First, verify that the shelf belongs to the caller
     USER_SHELVES.with(|user_shelves| {
@@ -28,7 +27,7 @@ pub fn reorder_profile_shelf(shelf_id: String, reference_shelf_id: Option<String
         
         if let Some(shelves_set) = user_shelves_map.get(&caller) {
             // Check if the shelf exists in the user's set
-            let shelf_exists = shelves_set.0.iter().any(|(_, id)| id == &shelf_id);
+            let shelf_exists = shelves_set.0.iter().any(|(_, id)| id == shelf_id_ref);
             
             if !shelf_exists {
                 return Err("Shelf not found in your profile".to_string());
@@ -52,7 +51,9 @@ pub fn reorder_profile_shelf(shelf_id: String, reference_shelf_id: Option<String
     // Now handle the actual reordering
     USER_PROFILE_ORDER.with(|profile_order| {
         let mut profile_map = profile_order.borrow_mut();
-        let mut user_order = profile_map.get(&caller).cloned().unwrap_or_default();
+        let mut user_order = profile_map.get(&caller)
+            .map(|order| order.clone())
+            .unwrap_or_default();
         
         // Mark the profile as customized
         user_order.is_customized = true;
@@ -101,7 +102,7 @@ pub fn reset_profile_order() -> Result<(), String> {
         let mut profile_map = profile_order.borrow_mut();
         
         // Remove the user's profile order or reset it
-        if let Some(mut order) = profile_map.get(&caller).cloned() {
+        if let Some(mut order) = profile_map.get(&caller).map(|order| order.clone()) {
             order.shelf_positions.clear();
             order.is_customized = false;
             profile_map.insert(caller, order);

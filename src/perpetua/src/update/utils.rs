@@ -77,9 +77,9 @@ pub async fn verify_nft_ownership(nft_id: &str, caller: Principal) -> Result<boo
 /// # Returns
 /// * `true` if the shelf exists
 /// * `false` if the shelf does not exist
-pub fn shelf_exists(shelf_id: &String) -> bool {
+pub fn shelf_exists(shelf_id: &str) -> bool {
     SHELVES.with(|shelves| {
-        shelves.borrow().contains_key(shelf_id)
+        shelves.borrow().contains_key(&shelf_id.to_string())
     })
 }
 
@@ -95,7 +95,7 @@ pub fn shelf_exists(shelf_id: &String) -> bool {
 /// # Returns
 /// * `true` if the IDs are the same (self-reference)
 /// * `false` if the IDs are different
-pub fn is_self_reference(shelf_id: &String, nested_shelf_id: &String) -> bool {
+pub fn is_self_reference(shelf_id: &str, nested_shelf_id: &str) -> bool {
     // Only check for direct self-references (shelf A cannot contain shelf A)
     shelf_id == nested_shelf_id
 } 

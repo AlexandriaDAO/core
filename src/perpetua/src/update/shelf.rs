@@ -1,4 +1,4 @@
-use candid::{CandidType, Deserialize, Principal};
+use candid::{CandidType, Deserialize};
 use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE};
 use crate::storage::{validate_tag, add_tag_to_tracking, remove_tag_from_tracking, MAX_TAGS_PER_SHELF, normalize_tag, check_tag_rate_limit};
 use crate::guard::not_anon;
@@ -31,9 +31,16 @@ pub async fn store_shelf(
     tags: Option<Vec<String>>, // New parameter for tags
 ) -> Result<String, String> {
     let caller = ic_cdk::caller();
+    
+    // Create the shelf with basic metadata and items
     let shelf = create_shelf(title, description, items, tags).await?;
     let shelf_id = shelf.shelf_id.clone();
     let now = shelf.created_at;
+
+    // Store in SHELVES first
+    SHELVES.with(|shelves| {
+        shelves.borrow_mut().insert(shelf_id.clone(), shelf.clone());
+    });
 
     // Store NFT references
     for item in shelf.items.values() {
@@ -47,10 +54,7 @@ pub async fn store_shelf(
         }
     }
 
-    SHELVES.with(|shelves| {
-        shelves.borrow_mut().insert(shelf_id.clone(), shelf.clone());
-    });
-
+    // Update user shelf tracking
     USER_SHELVES.with(|user_shelves| {
         let mut user_map = user_shelves.borrow_mut();
         let mut user_shelves_set = user_map.get(&caller).unwrap_or_default();
@@ -63,6 +67,17 @@ pub async fn store_shelf(
         let mut timeline_map = timeline.borrow_mut();
         timeline_map.insert(now, shelf_id.clone());
     });
+    
+    // Track tags if any
+    if !shelf.tags.is_empty() {
+        // Verify the user hasn't exceeded their tag limit
+        check_tag_rate_limit(&caller)?;
+        
+        for tag in &shelf.tags {
+            // Add each tag to tracking
+            add_tag_to_tracking(tag, &shelf_id)?;
+        }
+    }
 
     Ok(shelf_id)
 }

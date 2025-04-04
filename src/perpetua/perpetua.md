@@ -188,3 +188,69 @@ candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpe
 dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx generate perpetua
 
+# Code Review and Optimization Suggestions
+
+## Security and Vulnerability Suggestions
+
+1. **Validate item content more rigorously**
+   - Current validation for `ItemContent` is limited. Add size limits and content validation especially for Markdown content.
+
+2. **Implement proper rate limiting for all write operations**
+   - Currently only tag operations have rate limiting. Extend to all modifying operations.
+
+3. **Add transaction logging for audit purposes**
+   - Log all modifications with timestamps and principals for security auditing.
+
+4. **Prevent unbounded growth of auxiliary data structures**
+   - Implement cleanup mechanisms for `NFT_SHELVES`, `GLOBAL_TIMELINE`, etc.
+
+5. **Add memory bounds checking for stable storage**
+   - Monitor and limit total canister memory usage to prevent out-of-memory errors.
+
+6. **Add a mechanism for shelf data backup and recovery**
+   - Provide a way to export and import shelf data for disaster recovery.
+
+7. **Implement cross-canister call authentication**
+   - When interacting with NFT canisters, verify the caller in both directions.
+
+8. **Add periodic data integrity checks**
+   - Ensure all cross-references remain valid and clean up any inconsistencies.
+
+9. **Implement proper pagination for all query functions**
+   - This prevents large result sets from causing timeouts or memory issues.
+
+10. **Validate shelf title and description for size and content**
+    - Add character limits and content sanitization.
+
+## Performance Optimizations
+
+1. **Review circular reference detection algorithm for efficiency**
+   - The current implementation in `Shelf::has_circular_reference` may cause excessive SHELVES lookups.
+
+2. **Batch update operations when possible**
+   - Group related updates to reduce the number of stable storage operations.
+
+3. **Implement more efficient popularity-based ordering**
+   - Current implementation in `reorder_shelves_by_popularity` rebuilds the entire ordering.
+
+4. **Review position rebalancing thresholds**
+   - Current thresholds may trigger rebalancing too frequently with large shelves.
+
+5. **Optimize tag prefix indexing**
+   - Consider more efficient data structures for prefix search operations.
+
+6. **Cache frequently accessed shelves**
+   - Implement a short-lived in-memory cache for frequently accessed shelves.
+
+7. **Use binary serialization instead of Candid for stable storage**
+   - Consider optimizing serialization format for Shelf structures.
+
+8. **Optimize ordering operations for large collections**
+   - The ordering logic may be inefficient for shelves with hundreds of items.
+
+9. **Minimize cloning of large data structures**
+   - Many operations clone the entire Shelf structure unnecessarily.
+
+10. **Use more granular data structures**
+    - Split large Shelf objects into components that can be updated independently.
+
