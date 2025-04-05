@@ -122,7 +122,7 @@ class PerpetuaService {
   /**
    * Create a new shelf
    */
-  public async createShelf(title: string, description?: string): Promise<Result<string, string>> {
+  public async createShelf(title: string, description?: string, tags?: string[]): Promise<Result<string, string>> {
     try {
       const actor = await this.getActor();
       const initialItems: Item[] = [];
@@ -130,7 +130,8 @@ class PerpetuaService {
       const result = await actor.store_shelf(
         title,
         description ? [description] : [],
-        initialItems
+        initialItems,
+        tags ? [tags] : []
       );
       
       if ("Ok" in result) {
@@ -519,6 +520,58 @@ class PerpetuaService {
     } catch (error) {
       console.error('Error in removeShelfEditor:', error);
       return { Err: "Failed to remove editor from shelf" };
+    }
+  }
+  
+  /**
+   * Add a tag to a shelf
+   */
+  public async addTagToShelf(
+    shelfId: string,
+    tag: string
+  ): Promise<Result<boolean, string>> {
+    try {
+      const actor = await this.getActor();
+      
+      const result = await actor.add_tag_to_shelf({
+        shelf_id: shelfId,
+        tag
+      });
+      
+      if ("Ok" in result) {
+        return { Ok: true };
+      } else {
+        return { Err: result.Err };
+      }
+    } catch (error) {
+      console.error('Error in addTagToShelf:', error);
+      return { Err: "Failed to add tag to shelf" };
+    }
+  }
+  
+  /**
+   * Remove a tag from a shelf
+   */
+  public async removeTagFromShelf(
+    shelfId: string,
+    tag: string
+  ): Promise<Result<boolean, string>> {
+    try {
+      const actor = await this.getActor();
+      
+      const result = await actor.remove_tag_from_shelf({
+        shelf_id: shelfId,
+        tag
+      });
+      
+      if ("Ok" in result) {
+        return { Ok: true };
+      } else {
+        return { Err: result.Err };
+      }
+    } catch (error) {
+      console.error('Error in removeTagFromShelf:', error);
+      return { Err: "Failed to remove tag from shelf" };
     }
   }
 }

@@ -1,15 +1,20 @@
 import React from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { Badge } from "@/lib/components/badge";
-import ReactMarkdown from 'react-markdown';
 import { ShelfCardActionMenu } from './ShelfCardActionMenu';
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
-// New component for blog view markdown display
+type ContentDisplayProps = {
+  owner: string;
+  onClick: () => void;
+  parentShelfId?: string;
+  itemId?: number;
+};
+
+// Display component for blog view markdown
 export const BlogMarkdownDisplay = ({ content, onClick }: { content: string, onClick: () => void }) => (
   <div className="blog-markdown-content cursor-pointer" onClick={onClick}>
-    <ReactMarkdown className="prose dark:prose-invert max-w-none">
-      {content}
-    </ReactMarkdown>
+    <MarkdownRenderer content={content} />
   </div>
 );
 
@@ -20,13 +25,7 @@ export const ShelfContentDisplay = ({
   onClick,
   parentShelfId,
   itemId
-}: { 
-  shelfId: string, 
-  owner: string, 
-  onClick: () => void,
-  parentShelfId?: string,
-  itemId?: number
-}) => (
+}: ContentDisplayProps & { shelfId: string }) => (
   <ContentCard
     id={`shelf-${shelfId}`}
     onClick={onClick}
@@ -34,17 +33,12 @@ export const ShelfContentDisplay = ({
     component="Perpetua"
     footer={
       <div className="flex flex-wrap items-center gap-1">
-        <Badge variant="secondary" className="text-[10px] py-0.5 px-1">
-          Shelf
-        </Badge>
-        <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">
-          {shelfId}
-        </Badge>
+        <Badge variant="secondary" className="text-[10px] py-0.5 px-1">Shelf</Badge>
+        <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">{shelfId}</Badge>
       </div>
     }
   >
     <div className="relative w-full h-full">
-      {/* Replace the two buttons with the action menu */}
       <ShelfCardActionMenu
         contentId={shelfId}
         contentType="Shelf"
@@ -74,14 +68,8 @@ export const MarkdownContentDisplay = ({
   onClick,
   parentShelfId,
   itemId
-}: { 
-  content: string, 
-  owner: string, 
-  onClick: () => void,
-  parentShelfId?: string,
-  itemId?: number
-}) => {
-  const preview = content.substring(0, 30) + (content.length > 30 ? '...' : '');
+}: ContentDisplayProps & { content: string }) => {
+  const preview = content.length > 30 ? `${content.substring(0, 30)}...` : content;
   
   return (
     <ContentCard
@@ -91,17 +79,12 @@ export const MarkdownContentDisplay = ({
       component="Perpetua"
       footer={
         <div className="flex flex-wrap items-center gap-1">
-          <Badge variant="outline" className="text-[10px] py-0.5 px-1">
-            Markdown
-          </Badge>
-          <Badge variant="outline" className="text-[10px] py-0.5 px-1 max-w-[150px] truncate">
-            {preview}
-          </Badge>
+          <Badge variant="outline" className="text-[10px] py-0.5 px-1">Markdown</Badge>
+          <Badge variant="outline" className="text-[10px] py-0.5 px-1 max-w-[150px] truncate">{preview}</Badge>
         </div>
       }
     >
       <div className="relative w-full h-full">
-        {/* Replace the two buttons with the action menu */}
         <ShelfCardActionMenu
           contentId={content}
           contentType="Markdown"

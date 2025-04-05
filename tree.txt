@@ -796,9 +796,9 @@
 │   │   │   │       │   ├── features/
 │   │   │   │       │   │   ├── cards/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx (469 lines)
-│   │   │   │       │   │   │   │   ├── ContentDisplays.tsx (120 lines)
-│   │   │   │       │   │   │   │   ├── NftDisplay.tsx (350 lines)
+│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx (415 lines)
+│   │   │   │       │   │   │   │   ├── ContentDisplays.tsx (103 lines)
+│   │   │   │       │   │   │   │   ├── NftDisplay.tsx (310 lines)
 │   │   │   │       │   │   │   │   ├── ShelfBlogView.tsx (132 lines)
 │   │   │   │       │   │   │   │   ├── ShelfCard.tsx (155 lines)
 │   │   │   │       │   │   │   │   ├── ShelfCardActionMenu.tsx (173 lines)
@@ -813,6 +813,9 @@
 │   │   │   │       │   │   │   ├── containers/
 │   │   │   │       │   │   │   │   ├── ShelfLists.tsx (256 lines)
 │   │   │   │       │   │   │   │   └── index.ts (1 lines)
+│   │   │   │       │   │   │   ├── hooks/
+│   │   │   │       │   │   │   │   ├── index.ts (1 lines)
+│   │   │   │       │   │   │   │   └── useNftData.ts (156 lines)
 │   │   │   │       │   │   │   ├── index.ts (7 lines)
 │   │   │   │       │   │   │   └── utils/
 │   │   │   │       │   │   │       └── ShelfViewUtils.ts (44 lines)
@@ -859,12 +862,12 @@
 │   │   │   │       │   │   └── shelf-settings/
 │   │   │   │       │   │       ├── components/
 │   │   │   │       │   │       │   ├── ShelfMetricsDisplay.tsx (143 lines)
-│   │   │   │       │   │       │   ├── ShelfSettings.tsx (120 lines)
-│   │   │   │       │   │       │   ├── ShelfSettingsDialog.tsx (132 lines)
+│   │   │   │       │   │       │   ├── ShelfSettings.tsx (191 lines)
+│   │   │   │       │   │       │   ├── ShelfSettingsDialog.tsx (199 lines)
 │   │   │   │       │   │       │   └── index.ts (3 lines)
 │   │   │   │       │   │       ├── hooks/
 │   │   │   │       │   │       │   ├── index.ts (2 lines)
-│   │   │   │       │   │       │   ├── useShelfMetadata.ts (34 lines)
+│   │   │   │       │   │       │   ├── useShelfMetadata.ts (86 lines)
 │   │   │   │       │   │       │   └── useShelfMetrics.ts (40 lines)
 │   │   │   │       │   │       ├── index.ts (3 lines)
 │   │   │   │       │   │       └── utils/
@@ -885,7 +888,7 @@
 │   │   │   │       │   │   ├── index.ts (49 lines)
 │   │   │   │       │   │   ├── perpetuaSlice.ts (645 lines)
 │   │   │   │       │   │   ├── services/
-│   │   │   │       │   │   │   └── perpetuaService.ts (527 lines)
+│   │   │   │       │   │   │   └── perpetuaService.ts (580 lines)
 │   │   │   │       │   │   ├── thunks/
 │   │   │   │       │   │   │   ├── collaborationThunks.ts (106 lines)
 │   │   │   │       │   │   │   ├── index.ts (6 lines)
@@ -1637,20 +1640,20 @@
 │   │   └── stress_test.sh (16 lines)
 │   ├── perpetua/
 │   │   ├── Cargo.toml (20 lines)
-│   │   ├── perpetua.did (67 lines)
-│   │   ├── perpetua.md (309 lines)
+│   │   ├── perpetua.did (88 lines)
+│   │   ├── perpetua.md (267 lines)
 │   │   └── src/
-│   │       ├── auth.rs (143 lines)
+│   │       ├── auth.rs (165 lines)
 │   │       ├── guard.rs (11 lines)
 │   │       ├── lib.rs (47 lines)
 │   │       ├── ordering.rs (175 lines)
-│   │       ├── query.rs (235 lines)
-│   │       ├── storage.rs (332 lines)
+│   │       ├── query.rs (400 lines)
+│   │       ├── storage.rs (881 lines)
 │   │       ├── update/
 │   │       │   ├── access.rs (69 lines)
-│   │       │   ├── item.rs (243 lines)
-│   │       │   ├── profile.rs (114 lines)
-│   │       │   ├── shelf.rs (101 lines)
+│   │       │   ├── item.rs (377 lines)
+│   │       │   ├── profile.rs (115 lines)
+│   │       │   ├── shelf.rs (212 lines)
 │   │       │   └── utils.rs (101 lines)
 │   │       └── utils.rs (28 lines)
 │   ├── registry/

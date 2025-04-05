@@ -8,34 +8,21 @@ import { toast } from 'sonner';
 
 // Types for the component
 export interface BaseShelfListProps {
-  // Shelf data
   shelves: Shelf[];
-  // Display options
   title: string;
   emptyStateMessage: string;
   showBackButton?: boolean;
   backLabel?: string;
-  // Control flags
   loading?: boolean;
   isCurrentUserProfile?: boolean;
   allowReordering?: boolean;
-  // Event handlers
   onViewShelf?: (shelfId: string) => void;
   onViewOwner?: (ownerId: string) => void;
   onBack?: () => void;
   onNewShelf?: () => void;
   onLoadMore?: () => Promise<void>;
-  // Reordering callbacks
   onSaveOrder?: (shelfIds: string[]) => Promise<void>;
-  // Permissions
   checkEditAccess?: (shelfId: string) => boolean;
-}
-
-// Drag and Drop types
-interface DragState {
-  isDragging: boolean;
-  dragIndex: number;
-  shelfIds: string[];  // Array of shelf IDs for tracking order
 }
 
 // Helper function to extract essential properties for comparison
@@ -45,9 +32,15 @@ const getShelfEssentials = (shelf: Shelf) => ({
   owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString(),
 });
 
+// Drag and drop types
+interface DragState {
+  isDragging: boolean;
+  dragIndex: number;
+  shelfIds: string[];
+}
+
 /**
  * BaseShelfList - A reusable component for displaying different shelf views
- * This handles the common UI patterns across different shelf views
  */
 export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
   shelves,
@@ -66,21 +59,20 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
   onSaveOrder,
   checkEditAccess
 }) => {
-  // State for edit mode and order tracking
+  // State management
   const [isEditMode, setIsEditMode] = useState(false);
   const [saveInProgress, setSaveInProgress] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   
-  // Extract only the essential properties from shelves to minimize re-renders
+  // Memoize shelf data to minimize re-renders
   const shelfEssentials = useMemo(() => 
     shelves.map(getShelfEssentials), 
     [shelves]
   );
   
-  // Memoize the actual shelf array to prevent unnecessary updates to dragState
   const memoizedShelves = useMemo(() => shelves, [shelfEssentials]);
   
-  // Initialize drag state
+  // Drag state
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     dragIndex: -1,
@@ -111,14 +103,12 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
     e.preventDefault();
     if (dragState.dragIndex === index) return;
     
-    // Reorder during drag to provide visual feedback
     setDragState(prev => {
       if (prev.dragIndex === index) return prev;
       
       const newShelfIds = [...prev.shelfIds];
       const draggedId = newShelfIds[prev.dragIndex];
       
-      // Remove from old position and insert at new position
       newShelfIds.splice(prev.dragIndex, 1);
       newShelfIds.splice(index, 0, draggedId);
       
@@ -139,31 +129,16 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
   
   const handleDrop = useCallback((e: React.DragEvent, index: number) => {
     e.preventDefault();
-    // Dragging is complete, update is handled in dragOver
     setDragState(prev => ({
       ...prev,
       isDragging: false
     }));
   }, []);
   
-  // Helper to get style for dragged items
-  const getDragItemStyle = useCallback((index: number) => {
-    if (!dragState.isDragging) return {};
-    
-    if (index === dragState.dragIndex) {
-      return { 
-        opacity: 0.5, 
-        border: '2px dashed var(--border)'
-      };
-    }
-    return {};
-  }, [dragState.isDragging, dragState.dragIndex]);
-  
   // Edit mode handlers
   const enterEditMode = useCallback(() => {
     setIsEditMode(true);
     setSaveError(null);
-    // Make sure we have the latest shelf order
     setDragState(prev => ({
       ...prev,
       isDragging: false,
@@ -175,8 +150,6 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
   const cancelEditMode = useCallback(() => {
     setIsEditMode(false);
     setSaveError(null);
-    
-    // Reset order to original
     setDragState({
       isDragging: false,
       dragIndex: -1,
@@ -196,11 +169,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
       setIsEditMode(false);
     } catch (error) {
       console.error("[Shelf Reordering] Error saving order:", error);
-      let errorMessage = "Failed to save shelf order";
-      
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
+      const errorMessage = error instanceof Error ? error.message : "Failed to save shelf order";
       
       setSaveError(errorMessage);
       toast.error(errorMessage);
@@ -213,44 +182,37 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
   const orderedShelves = useMemo(() => {
     if (!isEditMode) return shelves;
     
-    // Map IDs back to shelves in the correct order
-    const ordered = dragState.shelfIds
+    return dragState.shelfIds
       .map(id => shelves.find(shelf => shelf.shelf_id === id))
       .filter(Boolean) as Shelf[];
-    
-    return ordered;
   }, [shelves, isEditMode, dragState.shelfIds]);
   
   // Helper for getting drag props
   const getDragProps = useCallback((index: number) => {
-    if (isEditMode) {
-      return {
-        draggable: true,
-        onDragStart: (e: React.DragEvent) => handleDragStart(e, index),
-        onDragOver: (e: React.DragEvent) => handleDragOver(e, index),
-        onDragEnd: handleDragEnd,
-        onDrop: (e: React.DragEvent) => handleDrop(e, index),
-        style: getDragItemStyle(index),
-        className: "cursor-move transition-all duration-200"
-      };
-    }
+    if (!isEditMode) return { draggable: false, className: "" };
+    
     return {
-      draggable: false,
-      className: ""
+      draggable: true,
+      onDragStart: (e: React.DragEvent) => handleDragStart(e, index),
+      onDragOver: (e: React.DragEvent) => handleDragOver(e, index),
+      onDragEnd: handleDragEnd,
+      onDrop: (e: React.DragEvent) => handleDrop(e, index),
+      style: dragState.isDragging && index === dragState.dragIndex 
+        ? { opacity: 0.5, border: '2px dashed var(--border)' } 
+        : {},
+      className: "cursor-move transition-all duration-200"
     };
-  }, [isEditMode, handleDragStart, handleDragOver, handleDragEnd, handleDrop, getDragItemStyle]);
+  }, [isEditMode, handleDragStart, handleDragOver, handleDragEnd, handleDrop, dragState]);
   
-  // Handler for back button
   const handleGoBack = useCallback(() => {
     if (onBack) {
       onBack();
     } else {
-      // Fallback to browser history if no onBack provided
       window.history.back();
     }
   }, [onBack]);
   
-  // Create a handler for shelf viewing that works with the component's API
+  // Shelf view handler
   const getShelfViewHandler = useCallback((shelfId: string) => {
     if (!isEditMode && onViewShelf) {
       return (id: string) => onViewShelf(id);
@@ -258,48 +220,8 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
     return undefined;
   }, [onViewShelf, isEditMode]);
   
-  // Render the shelf cards based on current state and props
-  const renderShelfCards = useMemo(() => {
-    return orderedShelves.map((shelf, index) => {
-      // Get drag props if in edit mode
-      const dragProps = getDragProps(index);
-      
-      // Determine if this is the current user's shelf
-      const isCurrentUserShelf = isCurrentUserProfile || 
-        (checkEditAccess && checkEditAccess(shelf.shelf_id));
-      
-      return (
-        <div 
-          key={shelf.shelf_id}
-          {...dragProps}
-        >
-          {isCurrentUserShelf ? (
-            <ShelfCard
-              shelf={shelf}
-              onViewShelf={getShelfViewHandler(shelf.shelf_id)}
-              isReordering={Boolean(isEditMode)}
-            />
-          ) : (
-            <PublicShelfCard
-              shelf={shelf}
-              onViewShelf={getShelfViewHandler(shelf.shelf_id)}
-              isReordering={Boolean(isEditMode)}
-            />
-          )}
-        </div>
-      );
-    });
-  }, [
-    orderedShelves, 
-    isEditMode, 
-    isCurrentUserProfile, 
-    checkEditAccess, 
-    getDragProps, 
-    getShelfViewHandler
-  ]);
-  
-  // Render header based on options
-  const renderHeader = () => (
+  // Sub-component for rendering the header
+  const ListHeader = () => (
     <div className="flex flex-col gap-4 mb-6">
       {showBackButton && (
         <div className="flex items-center">
@@ -375,63 +297,87 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
       )}
     </div>
   );
-  
-  // Render content based on loading state and data
-  const renderContent = () => {
-    if (loading && shelves.length === 0) {
-      return <div className="text-center py-10">Loading shelves...</div>;
-    }
-    
-    if (shelves.length === 0) {
-      return (
-        <div className="text-center py-10 text-muted-foreground">
-          {emptyStateMessage}
-          {onNewShelf && (
-            <div className="mt-2">
-              <Button
-                variant="outline"
-                className="flex items-center gap-1 mx-auto"
-                onClick={onNewShelf}
-              >
-                <Plus className="w-4 h-4" />
-                Create First Shelf
-              </Button>
-            </div>
-          )}
+
+  // Sub-component for rendering empty state
+  const EmptyState = () => (
+    <div className="text-center py-10 text-muted-foreground">
+      {emptyStateMessage}
+      {onNewShelf && (
+        <div className="mt-2">
+          <Button
+            variant="outline"
+            className="flex items-center gap-1 mx-auto"
+            onClick={onNewShelf}
+          >
+            <Plus className="w-4 h-4" />
+            Create First Shelf
+          </Button>
         </div>
-      );
-    }
-    
-    return (
-      <>
-        <ContentGrid>
-          {renderShelfCards}
-        </ContentGrid>
-        
-        {onLoadMore && (
-          <div className="mt-6 text-center">
-            <Button 
-              variant="outline" 
-              onClick={onLoadMore} 
-              disabled={loading || saveInProgress}
+      )}
+    </div>
+  );
+
+  // Sub-component for rendering shelf cards
+  const ShelfCardList = () => (
+    <>
+      <ContentGrid>
+        {orderedShelves.map((shelf, index) => {
+          const dragProps = getDragProps(index);
+          const isCurrentUserShelf = isCurrentUserProfile || 
+            (checkEditAccess && checkEditAccess(shelf.shelf_id));
+          
+          return (
+            <div 
+              key={shelf.shelf_id}
+              {...dragProps}
             >
-              Load More
-            </Button>
-          </div>
-        )}
-      </>
-    );
-  };
+              {isCurrentUserShelf ? (
+                <ShelfCard
+                  shelf={shelf}
+                  onViewShelf={getShelfViewHandler(shelf.shelf_id)}
+                  isReordering={isEditMode}
+                />
+              ) : (
+                <PublicShelfCard
+                  shelf={shelf}
+                  onViewShelf={getShelfViewHandler(shelf.shelf_id)}
+                  isReordering={isEditMode}
+                />
+              )}
+            </div>
+          );
+        })}
+      </ContentGrid>
+      
+      {onLoadMore && (
+        <div className="mt-6 text-center">
+          <Button 
+            variant="outline" 
+            onClick={onLoadMore} 
+            disabled={loading || saveInProgress}
+          >
+            Load More
+          </Button>
+        </div>
+      )}
+    </>
+  );
   
+  // Main render
   return (
     <div className="h-full flex flex-col">
-      {renderHeader()}
-      {renderContent()}
+      <ListHeader />
+      
+      {loading && shelves.length === 0 ? (
+        <div className="text-center py-10">Loading shelves...</div>
+      ) : shelves.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <ShelfCardList />
+      )}
     </div>
   );
 }, (prevProps, nextProps) => {
-  // Custom comparison function to determine if re-render is necessary
-  
   // Simple prop equality checks
   if (
     prevProps.title !== nextProps.title ||
