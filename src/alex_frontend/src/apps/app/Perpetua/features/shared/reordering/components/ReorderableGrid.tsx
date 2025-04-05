@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react';
 import { ReorderableItem } from '../../../../types/reordering.types';
+import ReorderableContainer from './ReorderableContainer';
+import { cn } from '@/lib/utils';
 
 interface ReorderableGridProps<T extends ReorderableItem> {
   // Items to render
@@ -24,15 +26,15 @@ interface ReorderableGridProps<T extends ReorderableItem> {
   className?: string;
   
   // Grid configuration
-  columns?: number;
-  gap?: number;
+  columns?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  gap?: 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10;
   
   // Optional draggable attribute - defaults to isEditMode
   draggable?: boolean;
 }
 
 /**
- * A reusable component for rendering a grid of reorderable items
+ * A grid layout for reorderable items
  */
 export const ReorderableGrid = <T extends ReorderableItem>({
   items,
@@ -41,47 +43,54 @@ export const ReorderableGrid = <T extends ReorderableItem>({
   handleDragOver,
   handleDragEnd,
   handleDrop,
-  getDragItemStyle = () => ({}),
+  getDragItemStyle,
   renderItem,
-  className = '',
+  className,
   columns = 3,
-  gap = 16,
+  gap = 4,
   draggable
 }: ReorderableGridProps<T>) => {
-  // Determine if items should be draggable
-  const isDraggable = draggable !== undefined ? draggable : isEditMode;
-  
+  const gridColumns = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2', 
+    3: 'grid-cols-3',
+    4: 'grid-cols-4',
+    5: 'grid-cols-5',
+    6: 'grid-cols-6',
+    7: 'grid-cols-7',
+    8: 'grid-cols-8',
+    9: 'grid-cols-9',
+    10: 'grid-cols-10',
+    11: 'grid-cols-11',
+    12: 'grid-cols-12'
+  }[columns];
+
+  const gridGap = {
+    1: 'gap-1',
+    2: 'gap-2',
+    3: 'gap-3',
+    4: 'gap-4',
+    5: 'gap-5',
+    6: 'gap-6',
+    8: 'gap-8',
+    10: 'gap-10'
+  }[gap];
+
   return (
-    <div 
-      className={`reorderable-grid ${className}`}
-      style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${columns}, 1fr)`,
-        gap: `${gap}px`,
-        width: '100%'
-      }}
-    >
-      {items.map((item, index) => (
-        <div
-          key={item.id}
-          draggable={isDraggable}
-          onDragStart={(e) => handleDragStart(e, index)}
-          onDragOver={(e) => handleDragOver(e, index)}
-          onDragEnd={handleDragEnd}
-          onDrop={(e) => handleDrop(e, index)}
-          style={{
-            ...getDragItemStyle(index),
-            cursor: isDraggable ? 'grab' : 'default',
-            transition: 'transform 0.2s, opacity 0.2s, box-shadow 0.2s',
-            borderRadius: '4px',
-            overflow: 'hidden',
-          }}
-          className="reorderable-grid-item"
-        >
-          {renderItem(item, index, isEditMode)}
-        </div>
-      ))}
-    </div>
+    <ReorderableContainer
+      items={items}
+      isEditMode={isEditMode}
+      handleDragStart={handleDragStart}
+      handleDragOver={handleDragOver}
+      handleDragEnd={handleDragEnd}
+      handleDrop={handleDrop}
+      getDragItemStyle={getDragItemStyle}
+      renderItem={renderItem}
+      className={className}
+      containerClassName={cn('grid w-full', gridColumns, gridGap)}
+      itemClassName="rounded-md overflow-hidden"
+      draggable={draggable}
+    />
   );
 };
 

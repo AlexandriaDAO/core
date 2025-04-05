@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react';
 import { ReorderableItem } from '../../../../types/reordering.types';
+import ReorderableContainer from './ReorderableContainer';
+import { cn } from '@/lib/utils';
 
 interface ReorderableListProps<T extends ReorderableItem> {
   // Items to render
@@ -23,12 +25,15 @@ interface ReorderableListProps<T extends ReorderableItem> {
   // Optional class name for the container
   className?: string;
   
+  // Optional spacing between items
+  spacing?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10;
+  
   // Optional draggable attribute - defaults to isEditMode
   draggable?: boolean;
 }
 
 /**
- * A reusable component for rendering a vertically reorderable list
+ * A vertical list layout for reorderable items
  */
 export const ReorderableList = <T extends ReorderableItem>({
   items,
@@ -37,37 +42,38 @@ export const ReorderableList = <T extends ReorderableItem>({
   handleDragOver,
   handleDragEnd,
   handleDrop,
-  getDragItemStyle = () => ({}),
+  getDragItemStyle,
   renderItem,
-  className = '',
+  className,
+  spacing = 2,
   draggable
 }: ReorderableListProps<T>) => {
-  // Determine if items should be draggable
-  const isDraggable = draggable !== undefined ? draggable : isEditMode;
-  
+  const gap = {
+    0: 'gap-0',
+    1: 'gap-1',
+    2: 'gap-2',
+    3: 'gap-3',
+    4: 'gap-4',
+    5: 'gap-5',
+    6: 'gap-6',
+    8: 'gap-8',
+    10: 'gap-10'
+  }[spacing];
+
   return (
-    <div 
-      className={`reorderable-list ${className}`}
-    >
-      {items.map((item, index) => (
-        <div
-          key={item.id}
-          draggable={isDraggable}
-          onDragStart={(e) => handleDragStart(e, index)}
-          onDragOver={(e) => handleDragOver(e, index)}
-          onDragEnd={handleDragEnd}
-          onDrop={(e) => handleDrop(e, index)}
-          style={{
-            ...getDragItemStyle(index),
-            cursor: isDraggable ? 'grab' : 'default',
-            transition: 'transform 0.2s, opacity 0.2s, box-shadow 0.2s',
-          }}
-          className="reorderable-list-item"
-        >
-          {renderItem(item, index, isEditMode)}
-        </div>
-      ))}
-    </div>
+    <ReorderableContainer
+      items={items}
+      isEditMode={isEditMode}
+      handleDragStart={handleDragStart}
+      handleDragOver={handleDragOver}
+      handleDragEnd={handleDragEnd}
+      handleDrop={handleDrop}
+      getDragItemStyle={getDragItemStyle}
+      renderItem={renderItem}
+      className={className}
+      containerClassName={cn('flex flex-col w-full', gap)}
+      draggable={draggable}
+    />
   );
 };
 

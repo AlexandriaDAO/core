@@ -26,9 +26,9 @@ export const ShelfContent: React.FC<ShelfContentProps> = ({
   };
 
   return (
-    <div onClick={handleClick}>
+    <div className="flex flex-col gap-4">
       <div className="relative">
-        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         <Input
           placeholder="Search shelves..."
           className="pl-8"
@@ -37,15 +37,15 @@ export const ShelfContent: React.FC<ShelfContentProps> = ({
         />
       </div>
       
-      <ScrollArea className="max-h-[300px] mt-2">
+      <ScrollArea className="h-[300px] pr-3">
         {shelves.length === 0 ? (
-          <div className="p-4 text-center text-muted-foreground">
+          <div className="flex items-center justify-center h-full text-center text-muted-foreground p-4">
             {searchTerm 
               ? "No shelves match your search" 
               : "You don't have any shelves you can edit"}
           </div>
         ) : (
-          <div className="space-y-2 p-1">
+          <div className="space-y-2">
             {shelves.map((shelf) => (
               <ShelfOption
                 key={shelf.shelf_id}
@@ -58,7 +58,7 @@ export const ShelfContent: React.FC<ShelfContentProps> = ({
         )}
       </ScrollArea>
       
-      <div className="flex justify-end gap-2 mt-4">
+      <div className="flex justify-end gap-2 mt-2">
         <Button variant="outline" onClick={(e) => {
           e.stopPropagation();
           onClose();

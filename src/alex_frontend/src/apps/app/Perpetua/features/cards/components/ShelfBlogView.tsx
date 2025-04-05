@@ -18,7 +18,64 @@ interface ShelfBlogViewProps {
   handleNftDetails: (tokenId: string) => void;
 }
 
-export const ShelfBlogView: React.FC<ShelfBlogViewProps> = ({
+type BlogItemType = [number, Item, number]; // [itemKey, item, index]
+type SectionType = 'markdown' | 'visual';
+type BlogSection = { type: SectionType; items: BlogItemType[] };
+
+const DragHandle = () => (
+  <div className="cursor-grab p-1 rounded hover:bg-gray-700">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
+    </svg>
+  </div>
+);
+
+const MarkdownSection = ({
+  items,
+  isEditMode,
+  handleDragStart,
+  handleDragOver,
+  handleDragEnd,
+  handleDrop,
+  handleContentClick
+}: {
+  items: BlogItemType[];
+  isEditMode: boolean;
+  handleDragStart: ShelfBlogViewProps['handleDragStart'];
+  handleDragOver: ShelfBlogViewProps['handleDragOver'];
+  handleDragEnd: ShelfBlogViewProps['handleDragEnd'];
+  handleDrop: ShelfBlogViewProps['handleDrop'];
+  handleContentClick: ShelfBlogViewProps['handleContentClick'];
+}) => (
+  <div className="prose dark:prose-invert max-w-none">
+    {items.map(([itemKey, item, originalIndex]) => (
+      <div
+        key={`item-${itemKey}`}
+        className={`mb-8 ${isEditMode ? 'relative border border-dashed border-border p-6 rounded-md bg-muted/5' : ''}`}
+        draggable={isEditMode}
+        onDragStart={isEditMode ? (e) => handleDragStart(e, originalIndex) : undefined}
+        onDragOver={isEditMode ? (e) => handleDragOver(e, originalIndex) : undefined}
+        onDragEnd={isEditMode ? handleDragEnd : undefined}
+        onDrop={isEditMode ? (e) => handleDrop(e, originalIndex) : undefined}
+      >
+        {isEditMode && (
+          <div className="absolute top-2 right-2 z-40 bg-background text-foreground px-2 py-1 text-xs rounded-md border border-border flex items-center">
+            <span>Item #{itemKey}</span>
+            <div className="ml-2 text-gray-400" onMouseDown={(e) => e.stopPropagation()}>
+              <DragHandle />
+            </div>
+          </div>
+        )}
+        <BlogMarkdownDisplay 
+          content={(item.content as any).Markdown} 
+          onClick={() => handleContentClick(itemKey)} 
+        />
+      </div>
+    ))}
+  </div>
+);
+
+const VisualSection = ({
   items,
   isEditMode,
   draggedIndex,
@@ -29,99 +86,104 @@ export const ShelfBlogView: React.FC<ShelfBlogViewProps> = ({
   handleDrop,
   handleContentClick,
   handleNftDetails
-}) => {
-  // Define types
-  type BlogItemType = [number, Item, number]; // [itemKey, item, index]
-  type SectionType = 'markdown' | 'visual' | null;
-  type BlogSection = { type: SectionType; items: BlogItemType[] };
+}: {
+  items: BlogItemType[];
+  isEditMode: boolean;
+  draggedIndex: number | null;
+  shelf: any;
+  handleDragStart: ShelfBlogViewProps['handleDragStart'];
+  handleDragOver: ShelfBlogViewProps['handleDragOver'];
+  handleDragEnd: ShelfBlogViewProps['handleDragEnd'];
+  handleDrop: ShelfBlogViewProps['handleDrop'];
+  handleContentClick: ShelfBlogViewProps['handleContentClick'];
+  handleNftDetails: ShelfBlogViewProps['handleNftDetails'];
+}) => (
+  <div className="mb-8">
+    <h3 className="text-sm uppercase tracking-wide text-muted-foreground mb-4 font-semibold">
+      Visual Content
+    </h3>
+    <ContentGrid>
+      {items.map(([itemKey, item, originalIndex]) => (
+        <ShelfContentCard
+          key={`blog-grid-item-${itemKey}`}
+          itemKey={itemKey}
+          item={item}
+          index={originalIndex}
+          isEditMode={isEditMode}
+          draggedIndex={draggedIndex}
+          shelf={shelf}
+          handleDragStart={handleDragStart}
+          handleDragOver={handleDragOver}
+          handleDragEnd={handleDragEnd}
+          handleDrop={handleDrop}
+          handleNftDetails={handleNftDetails}
+          handleContentClick={handleContentClick}
+        />
+      ))}
+    </ContentGrid>
+  </div>
+);
+
+export const ShelfBlogView: React.FC<ShelfBlogViewProps> = (props) => {
+  const { items } = props;
   
-  // Group consecutive markdown items together
-  const blogSections: BlogSection[] = [];
-  let currentGroup: BlogItemType[] = [];
-  let currentType: SectionType = null; // 'markdown' or 'visual'
-  
-  // Process all items and group them
-  items.forEach(([itemKey, item]: [number, Item], index: number) => {
-    const isMarkdownItem = isMarkdownContent(item.content);
-    const currentContentType: SectionType = isMarkdownItem ? 'markdown' : 'visual';
+  // Process items into blog sections
+  const processItems = (): BlogSection[] => {
+    const sections: BlogSection[] = [];
+    let currentGroup: BlogItemType[] = [];
+    let currentType: SectionType | null = null;
     
-    // Start a new group if type changes
-    if (currentType !== null && currentType !== currentContentType) {
-      blogSections.push({ type: currentType, items: [...currentGroup] });
-      currentGroup = [];
+    // Build sections by grouping consecutive items of the same type
+    items.forEach(([itemKey, item], index) => {
+      const isMarkdownItem = isMarkdownContent(item.content);
+      const itemType: SectionType = isMarkdownItem ? 'markdown' : 'visual';
+      
+      if (currentType !== null && currentType !== itemType) {
+        sections.push({ type: currentType, items: [...currentGroup] });
+        currentGroup = [];
+      }
+      
+      currentGroup.push([itemKey, item, index]);
+      currentType = itemType;
+    });
+    
+    // Add the final group
+    if (currentGroup.length > 0 && currentType !== null) {
+      sections.push({ type: currentType, items: [...currentGroup] });
     }
     
-    // Add to current group
-    currentGroup.push([itemKey, item, index]);
-    currentType = currentContentType;
-  });
+    return sections;
+  };
   
-  // Add the final group
-  if (currentGroup.length > 0 && currentType !== null) {
-    blogSections.push({ type: currentType, items: [...currentGroup] });
-  }
+  const blogSections = processItems();
 
   return (
-    <div className="blog-view-layout max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       {blogSections.map((section, sectionIndex) => (
         <div key={`section-${sectionIndex}`} className="mb-12">
           {section.type === 'markdown' ? (
-            // Render markdown content in a vertical flow
-            <div className="prose dark:prose-invert max-w-none">
-              {section.items.map(([itemKey, item, originalIndex]: [number, Item, number]) => (
-                <div 
-                  key={`item-${itemKey}`} 
-                  className={`item-card mb-8 ${isEditMode ? 'relative border border-dashed border-border p-6 rounded-md bg-muted/5' : ''}`}
-                  draggable={isEditMode}
-                  onDragStart={isEditMode ? (e) => handleDragStart(e, originalIndex) : undefined}
-                  onDragOver={isEditMode ? (e) => handleDragOver(e, originalIndex) : undefined}
-                  onDragEnd={isEditMode ? handleDragEnd : undefined}
-                  onDrop={isEditMode ? (e) => handleDrop(e, originalIndex) : undefined}
-                >
-                  {isEditMode && (
-                    <div className="absolute top-2 right-2 z-40 bg-background text-foreground px-2 py-1 text-xs rounded-md border border-border">
-                      Item #{itemKey}
-                      <div 
-                        className="item-drag-handle ml-2 inline-block text-gray-400 p-1 rounded hover:bg-gray-700 cursor-grab"
-                        onMouseDown={(e) => { e.stopPropagation(); }}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-                  <BlogMarkdownDisplay 
-                    content={(item.content as any).Markdown} 
-                    onClick={() => handleContentClick(itemKey)} 
-                  />
-                </div>
-              ))}
-            </div>
+            <MarkdownSection 
+              items={section.items} 
+              isEditMode={props.isEditMode}
+              handleDragStart={props.handleDragStart}
+              handleDragOver={props.handleDragOver}
+              handleDragEnd={props.handleDragEnd}
+              handleDrop={props.handleDrop}
+              handleContentClick={props.handleContentClick}
+            />
           ) : (
-            // Render visual content (NFTs/Shelves) in a horizontal grid
-            <div className="visual-content-row mb-8">
-              <h3 className="text-sm uppercase tracking-wide text-muted-foreground mb-4 font-semibold">Visual Content</h3>
-              <ContentGrid>
-                {section.items.map(([itemKey, item, originalIndex]: [number, Item, number]) => (
-                  <ShelfContentCard
-                    key={`blog-grid-item-${itemKey}`}
-                    itemKey={itemKey}
-                    item={item}
-                    index={originalIndex}
-                    isEditMode={isEditMode}
-                    draggedIndex={draggedIndex}
-                    shelf={shelf}
-                    handleDragStart={handleDragStart}
-                    handleDragOver={handleDragOver}
-                    handleDragEnd={handleDragEnd}
-                    handleDrop={handleDrop}
-                    handleNftDetails={handleNftDetails}
-                    handleContentClick={handleContentClick}
-                  />
-                ))}
-              </ContentGrid>
-            </div>
+            <VisualSection 
+              items={section.items} 
+              isEditMode={props.isEditMode}
+              draggedIndex={props.draggedIndex}
+              shelf={props.shelf}
+              handleDragStart={props.handleDragStart}
+              handleDragOver={props.handleDragOver}
+              handleDragEnd={props.handleDragEnd}
+              handleDrop={props.handleDrop}
+              handleContentClick={props.handleContentClick}
+              handleNftDetails={props.handleNftDetails}
+            />
           )}
         </div>
       ))}

@@ -17,7 +17,7 @@ import { loadShelves } from "../state";
 import {
   UnifiedShelvesUI,
   UserShelvesUI
-} from "../features/cards";
+} from "../features/shelf-management/containers/ShelfLists";
 import { NewItemDialog } from "../features/items";
 import { default as NewShelfDialog } from "../features/shelf-management/components/NewShelf";
 import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";

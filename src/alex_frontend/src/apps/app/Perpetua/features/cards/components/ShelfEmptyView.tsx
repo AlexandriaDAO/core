@@ -12,27 +12,21 @@ export const ShelfEmptyView: React.FC<ShelfEmptyViewProps> = ({
   hasEditAccess,
   onAddItem,
   shelf
-}) => {
-  // Safe way to call onAddItem with the shelf
-  const handleAddItem = () => {
-    onAddItem(shelf);
-  };
-
-  return (
-    <div className="text-center py-10 text-muted-foreground h-full flex flex-col items-center justify-center">
-      <p className="mb-2">This shelf is empty.</p>
-      {hasEditAccess && (
-        <Button
-          variant="outline"
-          className="flex items-center gap-1 mx-auto"
-          onClick={handleAddItem}
-        >
-          <Plus className="w-4 h-4" />
-          Add First Item
-        </Button>
-      )}
-    </div>
-  );
-};
+}) => (
+  <div className="flex flex-col items-center justify-center h-full py-10 text-center">
+    <p className="mb-4 text-muted-foreground">This shelf is empty.</p>
+    
+    {hasEditAccess && (
+      <Button
+        variant="outline"
+        className="flex items-center gap-2 text-sm h-9"
+        onClick={() => onAddItem(shelf)}
+      >
+        <Plus className="w-4 h-4" />
+        Add First Item
+      </Button>
+    )}
+  </div>
+);
 
 export default ShelfEmptyView; 

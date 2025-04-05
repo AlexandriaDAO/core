@@ -35,39 +35,42 @@ export const ShelfForm: React.FC<ShelfFormProps> = ({
   inline = false
 }) => {
   return (
-    <div className={`${inline ? "" : "grid gap-4 py-4"}`}>
-      <div className="grid gap-2">
+    <div className={inline ? "" : "space-y-6"}>
+      <div className="space-y-2">
         <Label htmlFor="title">Title</Label>
         <Input
           id="title"
           value={title}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           placeholder="Shelf Title"
         />
       </div>
-      <div className="grid gap-2 mt-4">
+      <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
         <Textarea
           id="description"
           value={description}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+          onChange={(e) => setDescription(e.target.value)}
           placeholder="Description"
+          className="min-h-[100px]"
         />
       </div>
       {!inline && onSubmit && (
-        <div className="flex justify-end mt-4">
-          <Button onClick={onSubmit}>{submitLabel}</Button>
-        </div>
+        <Button onClick={onSubmit} className="w-full sm:w-auto">
+          {submitLabel}
+        </Button>
       )}
     </div>
   );
 };
 
-const NewShelfDialog = ({ isOpen, onClose, onSubmit }: NewShelfDialogProps) => {
+const NewShelfDialog: React.FC<NewShelfDialogProps> = ({ isOpen, onClose, onSubmit }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
   const handleSubmit = async () => {
+    if (!title.trim()) return;
+    
     await onSubmit(title, description);
     setTitle("");
     setDescription("");
@@ -79,6 +82,7 @@ const NewShelfDialog = ({ isOpen, onClose, onSubmit }: NewShelfDialogProps) => {
         <DialogHeader>
           <DialogTitle>Create New Shelf</DialogTitle>
         </DialogHeader>
+        
         <ShelfForm
           title={title}
           setTitle={setTitle}
@@ -86,8 +90,11 @@ const NewShelfDialog = ({ isOpen, onClose, onSubmit }: NewShelfDialogProps) => {
           setDescription={setDescription}
           inline={true}
         />
+        
         <DialogFooter>
-          <Button onClick={handleSubmit}>Create</Button>
+          <Button onClick={handleSubmit} disabled={!title.trim()}>
+            Create
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

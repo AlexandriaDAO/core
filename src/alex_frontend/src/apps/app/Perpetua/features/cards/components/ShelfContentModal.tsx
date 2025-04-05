@@ -30,15 +30,23 @@ export const ShelfContentModal: React.FC<ShelfContentModalProps> = ({
   onClose,
   shelfOwner
 }) => {
-  // Handler for rendering error
+  if (!viewingItemContent) return null;
+
   const handleRenderError = (id: string) => {
     console.error("Error rendering content:", id);
     ContentService.clearTransaction(id);
   };
 
-  if (!viewingItemContent) {
-    return null;
-  }
+  // Get default content URLs if none provided
+  const getDefaultContentUrls = (content: any): ContentUrls => ({
+    fullUrl: `data:text/markdown;charset=utf-8,${encodeURIComponent(
+      isMarkdownContentSafe(content) 
+        ? getMarkdownContentSafe(content)
+        : JSON.stringify(content || {}, null, 2)
+    )}`,
+    thumbnailUrl: null,
+    coverUrl: null
+  });
 
   return (
     <Dialog open={!!viewingItemContent} onOpenChange={onClose}>
@@ -52,28 +60,22 @@ export const ShelfContentModal: React.FC<ShelfContentModalProps> = ({
                 key={viewingItemContent.transaction.id}
                 transaction={viewingItemContent.transaction}
                 content={viewingItemContent.content}
-                contentUrls={
-                  (viewingItemContent.content?.urls) || {
-                    fullUrl: `data:text/markdown;charset=utf-8,${encodeURIComponent(
-                      isMarkdownContentSafe(viewingItemContent.content) 
-                        ? getMarkdownContentSafe(viewingItemContent.content)
-                        : JSON.stringify(viewingItemContent.content || {}, null, 2)
-                    )}`,
-                    thumbnailUrl: null,
-                    coverUrl: null
-                  }
-                }
+                contentUrls={viewingItemContent.content?.urls || getDefaultContentUrls(viewingItemContent.content)}
                 handleRenderError={() => handleRenderError(viewingItemContent.transaction?.id || '')}
                 inModal={true}
               />
             )}
+
             {!viewingItemContent.transaction && isMarkdownContentSafe(viewingItemContent.content) && (
               <BlogMarkdownDisplay
                 content={getMarkdownContentSafe(viewingItemContent.content)}
                 onClick={() => {}}
               />
             )}
-            {!viewingItemContent.transaction && !isMarkdownContentSafe(viewingItemContent.content) && viewingItemContent.contentUrls && (
+
+            {!viewingItemContent.transaction && 
+             !isMarkdownContentSafe(viewingItemContent.content) && 
+             viewingItemContent.contentUrls && (
               <ContentRenderer
                 key={`item-${viewingItemContent.itemId}`}
                 transaction={{

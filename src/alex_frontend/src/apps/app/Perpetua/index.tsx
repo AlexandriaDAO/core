@@ -5,7 +5,6 @@ import PerpetuaLayout from "./layouts/PerpetuaLayout";
 export * from "./features/shelf-management/hooks";
 export * from "./features/shelf-settings";
 export * from "./features/items";
-export * from "./features/cards";
 export { parsePathInfo, usePerpetuaNavigation, useViewState } from "./routes";
 export * from "./utils";
 

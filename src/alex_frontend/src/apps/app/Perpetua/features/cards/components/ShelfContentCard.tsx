@@ -13,7 +13,10 @@ interface ShelfContentCardProps {
   index: number;
   isEditMode: boolean;
   draggedIndex: number | null;
-  shelf: any;
+  shelf: {
+    shelf_id: string;
+    owner: { toString: () => string };
+  };
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
   handleDragOver: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
   handleDragEnd: (e: React.DragEvent<HTMLDivElement>) => void;
@@ -38,11 +41,11 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
   handleNftDetails,
   handleContentClick
 }) => {
-  // Wrap the card content in a draggable container if in edit mode
-  const renderDraggableWrapper = (content: React.ReactNode) => (
+  // Render card with appropriate draggable properties when in edit mode
+  const renderCard = (content: React.ReactNode) => (
     <div 
       key={`item-${itemKey}`}
-      className={`item-card ${isEditMode ? 'cursor-grab active:cursor-grabbing transition-all duration-150' : ''}`}
+      className={`item-card relative ${isEditMode ? 'cursor-grab active:cursor-grabbing transition-all duration-150' : ''}`}
       draggable={isEditMode}
       onDragStart={isEditMode ? (e) => handleDragStart(e, index) : undefined}
       onDragOver={isEditMode ? (e) => handleDragOver(e, index) : undefined}
@@ -53,13 +56,7 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
       {isEditMode && (
         <div className="absolute top-0 left-0 right-0 z-40 bg-black/50 text-white p-1 text-xs flex items-center justify-between">
           <span>Item #{itemKey}</span>
-          <div 
-            className="item-drag-handle inline-block text-gray-400 p-1 rounded hover:bg-gray-700 cursor-grab"
-            onMouseDown={(e) => {
-              // Prevent the click event on the parent div
-              e.stopPropagation();
-            }}
-          >
+          <div className="item-drag-handle p-1 rounded hover:bg-gray-700 cursor-grab">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
             </svg>
@@ -72,71 +69,45 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
     </div>
   );
 
-  // For NFT content - Use the NftDisplay component
+  // Render NFT content
   if (isNftContent(item.content)) {
-    const nftId = item.content.Nft;
-    
-    return renderDraggableWrapper(
-      <div className="relative">
-        {/* Replace buttons with action menu */}
-        <ShelfCardActionMenu
-          contentId={nftId}
-          contentType="Nft"
-          currentShelfId={shelf.shelf_id}
-          parentShelfId={shelf.shelf_id}
-          itemId={itemKey}
-        />
-        
-        <NftDisplay 
-          tokenId={nftId} 
-          onViewDetails={handleNftDetails}
-          inShelf={true}
-        />
-      </div>
+    return renderCard(
+      <NftDisplay 
+        tokenId={item.content.Nft} 
+        onViewDetails={handleNftDetails}
+        inShelf={true}
+      />
     );
   }
   
-  // For shelf content
+  // Render shelf content
   if (isShelfContent(item.content)) {
-    return renderDraggableWrapper(
-      <div className="relative">
-        {/* ShelfContentDisplay already has the ShelfCardActionMenu */}
-        <ShelfContentDisplay 
-          shelfId={item.content.Shelf} 
-          owner={shelf.owner.toString()}
-          onClick={() => handleContentClick(itemKey)}
-          parentShelfId={shelf.shelf_id}
-          itemId={itemKey}
-        />
-      </div>
+    return renderCard(
+      <ShelfContentDisplay 
+        shelfId={item.content.Shelf} 
+        owner={shelf.owner.toString()}
+        onClick={() => handleContentClick(itemKey)}
+        parentShelfId={shelf.shelf_id}
+        itemId={itemKey}
+      />
     );
   }
   
-  // For markdown content 
+  // Render markdown content
   if (isMarkdownContent(item.content)) {
-    return renderDraggableWrapper(
-      <div className="relative">
-        {/* Replace buttons with action menu */}
-        <ShelfCardActionMenu
-          contentId={item.content.Markdown}
-          contentType="Markdown"
-          currentShelfId={shelf.shelf_id}
-          parentShelfId={shelf.shelf_id}
-          itemId={itemKey}
-        />
-        <MarkdownContentDisplay 
-          content={item.content.Markdown} 
-          owner={shelf.owner.toString()}
-          onClick={() => handleContentClick(itemKey)}
-          parentShelfId={shelf.shelf_id}
-          itemId={itemKey}
-        />
-      </div>
+    return renderCard(
+      <MarkdownContentDisplay 
+        content={item.content.Markdown} 
+        owner={shelf.owner.toString()}
+        onClick={() => handleContentClick(itemKey)}
+        parentShelfId={shelf.shelf_id}
+        itemId={itemKey}
+      />
     );
   }
   
   // Fallback for unknown content
-  return renderDraggableWrapper(
+  return renderCard(
     <ContentCard
       id={`unknown-${itemKey}`}
       onClick={() => handleContentClick(itemKey)}
@@ -144,14 +115,14 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
       component="Perpetua"
       footer={
         <div className="flex flex-wrap items-center gap-1">
-          <Badge variant="default" className="text-[10px] py-0.5 px-1">
+          <Badge variant="secondary" className="text-[10px] py-0.5 px-1">
             Unknown
           </Badge>
         </div>
       }
     >
-      <div className="w-full h-full flex items-center justify-center">
-        <div className="text-center">Unknown content</div>
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="text-center text-muted-foreground">Unknown content</div>
       </div>
     </ContentCard>
   );

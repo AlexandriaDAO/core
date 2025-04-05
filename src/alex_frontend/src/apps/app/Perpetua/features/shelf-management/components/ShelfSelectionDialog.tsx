@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { 
   Dialog, 
   DialogContent, 
@@ -15,19 +15,16 @@ import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 /**
  * Convert a NormalizedShelf back to a Shelf for API calls and components
  */
-const denormalizeShelf = (normalizedShelf: NormalizedShelf): Shelf => {
-  return {
-    ...normalizedShelf,
-    owner: Principal.fromText(normalizedShelf.owner)
-  } as Shelf;
-};
+const denormalizeShelf = (normalizedShelf: NormalizedShelf): Shelf => ({
+  ...normalizedShelf,
+  owner: Principal.fromText(normalizedShelf.owner)
+} as Shelf);
 
 /**
  * Convert an array of NormalizedShelf objects to Shelf objects
  */
-const denormalizeShelves = (normalizedShelves: NormalizedShelf[]): Shelf[] => {
-  return normalizedShelves.map(denormalizeShelf);
-};
+const denormalizeShelves = (normalizedShelves: NormalizedShelf[]): Shelf[] => 
+  normalizedShelves.map(denormalizeShelf);
 
 interface ShelfSelectionDialogProps extends ShelfManagerProps {
   open: boolean;
@@ -66,18 +63,17 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
   const editableShelves = getEditableShelves(currentShelfId);
   
   // Filter shelves based on search term
-  const filteredNormalizedShelves = editableShelves.filter((shelf: NormalizedShelf) => {
-    if (searchTerm === "") return true;
-    
-    const title = typeof shelf.title === 'string' ? shelf.title.toLowerCase() : '';
-    const description = typeof shelf.description?.[0] === 'string' ? shelf.description[0].toLowerCase() : '';
-    const search = searchTerm.toLowerCase();
-    
-    return title.includes(search) || description.includes(search);
-  });
-  
-  // Convert normalized shelves to regular shelves for the components that expect Shelf type
-  const filteredShelves = denormalizeShelves(filteredNormalizedShelves);
+  const filteredShelves = denormalizeShelves(
+    editableShelves.filter((shelf: NormalizedShelf) => {
+      if (!searchTerm) return true;
+      
+      const title = typeof shelf.title === 'string' ? shelf.title.toLowerCase() : '';
+      const description = typeof shelf.description?.[0] === 'string' ? shelf.description[0].toLowerCase() : '';
+      const search = searchTerm.toLowerCase();
+      
+      return title.includes(search) || description.includes(search);
+    })
+  );
 
   // Handle selection of a shelf
   const handleShelfSelection = (shelfId: string) => {
@@ -106,14 +102,9 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
     onClose();
   };
 
-  // Handle click on dialog content to prevent click-through
-  const handleContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogContent className="sm:max-w-md" onClick={handleContentClick}>
+      <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>Add to Shelf</DialogTitle>
         </DialogHeader>

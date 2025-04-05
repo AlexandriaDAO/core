@@ -4,7 +4,7 @@ import { reorderItem } from '@/apps/app/Perpetua/state';
 import { useReorderable } from './useReorderable';
 import { compareArrays, createReorderReturn } from '../utils/reorderUtils';
 import { createReorderAdapter } from '../utils/createReorderAdapter';
-import { UseItemReorderingProps } from '../../../../types/reordering.types';
+import { UseItemReorderingProps, ReorderRenderProps } from '../../../../types/reordering.types';
 
 // Type for reorderItem action parameters
 interface ItemReorderParams {
@@ -18,8 +18,9 @@ interface ItemReorderParams {
 
 /**
  * Custom hook for item reordering within a shelf
+ * Returns all necessary props for drag and drop reordering
  */
-export const useItemReordering = ({ shelf, items, hasEditAccess }: UseItemReorderingProps) => {
+export const useItemReordering = ({ shelf, items, hasEditAccess }: UseItemReorderingProps): ReorderRenderProps => {
   // Keep a stable reference to items 
   const itemsRef = useRef(items);
   
@@ -76,5 +77,4 @@ export const useItemReordering = ({ shelf, items, hasEditAccess }: UseItemReorde
   );
 };
 
-// Default export marked as unused by ts-unused-exports
-// export default useItemReordering; 
+export default useItemReordering; 

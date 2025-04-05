@@ -5,11 +5,12 @@ import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { rebalanceShelfItems, selectOptimisticShelfItemOrder } from "@/apps/app/Perpetua/state";
-import { ItemReorderManager } from "../../shared/reordering/components/ItemReorderManager";
-import { ShelfDetailView } from "../../cards";
+import { ItemReorderManager } from "../../shared/reordering/components";
+import { ShelfDetailView } from "../../cards/components/ShelfDetailView";
 import { ShelfSettingsDialog } from "../../shelf-settings";
 import { useShelfOperations } from "../hooks";
 import { isShelfContent } from "../../../utils";
+import { ReorderRenderProps } from "../../../types/reordering.types";
 
 /**
  * ShelfDetailContainer Component
@@ -51,57 +52,51 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 	// Check for optimistic item order
 	const optimisticItemOrder = useAppSelector(selectOptimisticShelfItemOrder(shelf.shelf_id)) as number[];
 	
-	// Improved ordered items calculation
+	// Optimized ordered items calculation with memoization
 	const orderedItems = useMemo(() => {
 		// If we have optimistic order, prioritize it
 		if (optimisticItemOrder.length > 0 && shelf.items) {
-			// First gather all items
 			const itemMap = new Map<number, Item>();
 			shelf.items.forEach(([id, item]: [number, Item]) => itemMap.set(id, item));
 			
-			// Return items in the optimistic order 
 			return optimisticItemOrder
 				.map(id => itemMap.has(id) ? [id, itemMap.get(id)!] as [number, Item] : null)
 				.filter((item): item is [number, Item] => item !== null);
 		}
 		
-		// Otherwise, fallback to the default ordering
+		// Default ordering
 		if (!shelf.item_positions || !shelf.items) return [];
 		
-		// Convert positions to array and sort by position values
 		const positionEntries = shelf.item_positions.map(([id, position]: [number, number]) => ({ id, position }));
-		positionEntries.sort((a: {position: number}, b: {position: number}) => a.position - b.position);
+		positionEntries.sort((a, b) => a.position - b.position);
 		
-		// Map to [id, item] pairs in the correct order
-		return positionEntries.map(({ id }: {id: number}) => {
-			const itemPair = shelf.items?.find(([itemId]: [number, any]) => itemId === id);
-			return itemPair ? itemPair : null;
-		}).filter((item: any): item is [number, Item] => item !== null);
+		return positionEntries
+			.map(({ id }) => {
+				const itemPair = shelf.items?.find(([itemId]) => itemId === id);
+				return itemPair ? itemPair : null;
+			})
+			.filter((item): item is [number, Item] => item !== null);
 	}, [
 		JSON.stringify({ 
-			items: shelf.items?.map(([id]: [number, any]) => id), 
-			positions: shelf.item_positions?.map(([id, pos]: [number, number]) => `${id}:${pos}`),
+			items: shelf.items?.map(([id]) => id), 
+			positions: shelf.item_positions?.map(([id, pos]) => `${id}:${pos}`),
 			optimistic: optimisticItemOrder
 		})
 	]);
 	
-	// Existing rebalance handler
+	// Handler for rebalancing shelf items
 	const handleRebalance = async (shelfId: string) => {
-		if (!identity || !hasEditAccess) return;
-		// Check if identity.identity exists before accessing it
-		if (identity.identity) {
-			const principal = identity.identity.getPrincipal().toString();
-			dispatch(rebalanceShelfItems({ shelfId, principal }));
-		}
+		if (!identity || !hasEditAccess || !identity.identity) return;
+		
+		const principal = identity.identity.getPrincipal().toString();
+		dispatch(rebalanceShelfItems({ shelfId, principal }));
 	};
 	
-	// Handle item click - for shelf items, navigate to that shelf
+	// Handle item click to navigate to item shelf if applicable
 	const handleViewItem = (itemId: number) => {
-		// Find the item with this ID
-		const itemEntry = orderedItems.find(([key, _]: [number, Item]) => key === itemId);
+		const itemEntry = orderedItems.find(([key]) => key === itemId);
 		
 		if (itemEntry && isShelfContent(itemEntry[1].content)) {
-			// If this is a shelf item, navigate to that shelf
 			const shelfId = itemEntry[1].content.Shelf;
 			goToShelf(shelfId);
 		}
@@ -124,7 +119,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 				handleDragEnd,
 				handleDrop,
 				getDragItemStyle
-			}) => (
+			}: ReorderRenderProps) => (
 				<ShelfDetailView
 					shelf={shelf}
 					orderedItems={orderedItems}
