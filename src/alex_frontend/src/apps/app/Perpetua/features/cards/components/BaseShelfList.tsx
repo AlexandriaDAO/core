@@ -326,9 +326,12 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
           const isCurrentUserShelf = isCurrentUserProfile || 
             (checkEditAccess && checkEditAccess(shelf.shelf_id));
           
+          // Create a composite key using both shelf ID and index to ensure uniqueness
+          const uniqueKey = `${shelf.shelf_id}-${index}`;
+          
           return (
             <div 
-              key={shelf.shelf_id}
+              key={uniqueKey}
               {...dragProps}
             >
               {isCurrentUserShelf ? (

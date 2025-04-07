@@ -136,6 +136,9 @@ Perpetua/
 
 ## V1 Features
 
+
+- UseShelfOpererations useEffect needs to be brought back.
+
 - Add appears-in in the frontend.
 - Add tags to the frontend.
 - Add number of items as a shelf details.
@@ -162,7 +165,6 @@ Perpetua/
 #[Using Modules] 
 
 - SearchContainer Component - Powerful for when we start adding filters to the explore page.
-- TopupBalanceWarning Component - If Perpetua has any operations that require tokens, this could be reused.
 
 
 
@@ -170,9 +172,6 @@ Perpetua/
 
 
 
-
-# Backend ToDos:
-- Make sure add_item_to_shelf has the proper type checks. Right now, I just use the frontend to determine if it's 'shelf', 'nft' or 'markdown'.
 
 
 
@@ -184,6 +183,7 @@ Perpetua/
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua
 npx ts-prune --project src/alex_frontend/src/apps/app/Perpetua
 npx ts-unused-exports tsconfig.json
+
 
 
 
@@ -200,6 +200,9 @@ dfx generate perpetua
 
 
 
+
+# Backend ToDos:
+- Make sure add_item_to_shelf has the proper type checks. Right now, I just use the frontend to determine if it's 'shelf', 'nft' or 'markdown'.
 
 # Code Review and Optimization Suggestions
 

@@ -37,7 +37,7 @@ export const useShelfOperations = () => {
       console.error("Failed to load shelves:", error);
     }
   }, [identity, dispatch]);
-
+  
   const createShelf = useCallback(async (title: string, description: string): Promise<string | null> => {
     if (!identity) return null;
     try {
@@ -196,12 +196,6 @@ export const useShelfOperations = () => {
       return false;
     }
   }, [dispatch, getShelf]);
-
-  useEffect(() => {
-    if (identity) {
-      loadShelvesData();
-    }
-  }, [identity, loadShelvesData]);
 
   return {
     shelves,

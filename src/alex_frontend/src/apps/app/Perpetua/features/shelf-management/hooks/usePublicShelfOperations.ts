@@ -36,6 +36,7 @@ export const usePublicShelfOperations = () => {
   const initialLoadRef = React.useRef(false);
 
   useEffect(() => {
+
     // Only load once if the public shelves array is empty and we're not already loading
     if (publicShelves.length === 0 && !loading && !initialLoadRef.current) {
       initialLoadRef.current = true;

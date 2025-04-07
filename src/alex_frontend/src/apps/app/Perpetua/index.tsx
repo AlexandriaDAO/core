@@ -1,5 +1,6 @@
 import React from "react";
 import PerpetuaLayout from "./layouts/PerpetuaLayout";
+import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
 
 // Export public API
 export * from "./features/shelf-management/hooks";
@@ -10,7 +11,12 @@ export * from "./utils";
 
 // Simple entry point
 const Perpetua: React.FC = () => {
-	return <PerpetuaLayout />;
+	return (
+		<>
+			<TopupBalanceWarning />
+			<PerpetuaLayout />
+		</>
+	);
 };
 
 export default Perpetua; 

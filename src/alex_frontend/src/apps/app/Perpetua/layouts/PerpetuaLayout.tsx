@@ -4,6 +4,8 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { 
   setSelectedShelf, 
   selectSelectedShelf,
+  selectShelfById,
+  selectUserShelvesForUser,
   NormalizedShelf
 } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { usePerpetuaNavigation, useViewState } from "../routes";
@@ -40,6 +42,7 @@ const denormalizeShelves = (shelves: NormalizedShelf[]): Shelf[] => {
 };
 
 const PerpetuaLayout: React.FC = () => {
+
   // Core data hooks
   const { shelves, loading: personalLoading, createShelf, addItem, reorderItem } = useShelfOperations();
   const { publicShelves, loading: publicLoading, loadMoreShelves } = usePublicShelfOperations();
@@ -51,6 +54,7 @@ const PerpetuaLayout: React.FC = () => {
   // Redux state
   const dispatch = useAppDispatch();
   const selectedShelf = useAppSelector(selectSelectedShelf);
+  const currentSelectedShelfId = useAppSelector(state => state.perpetua.selectedShelfId); // Direct access for comparison
   // Direct state access to auth principal - single source of truth
   const userPrincipal = useAppSelector(state => state.auth.user?.principal);
   
@@ -65,46 +69,33 @@ const PerpetuaLayout: React.FC = () => {
   const { shelfId, userId } = params;
   const { isShelfDetail, isUserDetail, isMainView } = viewFlags;
   
-  // State for user-specific shelves and loading status
-  const [userShelves, setUserShelves] = useState<NormalizedShelf[]>([]);
+  // Get user-specific shelves from Redux
+  const userShelves = useAppSelector(state => userId ? selectUserShelvesForUser(state, userId) : []);
   const [userShelvesLoading, setUserShelvesLoading] = useState(false);
   
-  // Load shelves when viewing a specific user's profile
+  // Load shelves when viewing a specific user's profile (modified to prevent loops)
   useEffect(() => {
-    if (isUserDetail && userId) {
+    if (isUserDetail && userId && userId !== userPrincipal && !userShelvesLoading) {
       setUserShelvesLoading(true);
-      // Here we directly dispatch loadShelves with the userId instead of filtering
-      // from publicShelves, which will ensure proper order from the backend
+      // Dispatch loadShelves and let Redux handle state management
       dispatch(loadShelves(userId))
         .unwrap()
-        .then((loadedShelves) => {
-          // Convert Shelf[] to NormalizedShelf[] by extracting strings from principals
-          const normalizedShelves = loadedShelves.map(shelf => ({
-            ...shelf,
-            owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString()
-          }));
-          setUserShelves(normalizedShelves);
+        .then(() => {
           setUserShelvesLoading(false);
         })
         .catch(() => {
           setUserShelvesLoading(false);
         });
     }
-  }, [dispatch, isUserDetail, userId]);
+  }, [dispatch, isUserDetail, userId, userPrincipal, userShelvesLoading]);
   
-  // Handle shelf selection when route changes
+  // Handle shelf selection when route changes - simplified dependencies
   useEffect(() => {
-    if (shelfId) {
-      // Find the shelf in either personal or public shelves
-      const shelf = userId
-        ? publicShelves.find(s => s.shelf_id === shelfId)
-        : [...shelves, ...publicShelves].find(s => s.shelf_id === shelfId);
-      
-      if (shelf) {
-        dispatch(setSelectedShelf(shelf.shelf_id)); // Pass just the ID to avoid type issues
-      }
+    if (shelfId && shelfId !== currentSelectedShelfId) {
+      // Only dispatch if the route shelfId is different from the current state
+      dispatch(setSelectedShelf(shelfId));
     }
-  }, [shelfId, shelves, publicShelves, dispatch, userId]);
+  }, [shelfId, currentSelectedShelfId, dispatch]); // Depends only on IDs and dispatch
   
   // Action handlers
   const handleAddItem = useCallback(() => setIsNewItemDialogOpen(true), []);
@@ -141,10 +132,28 @@ const PerpetuaLayout: React.FC = () => {
     
     // If we're viewing the main shelves view
     if (isMainView) {
-      // Combine personal and public shelves
-      const allShelves = [...shelves, ...publicShelves];
+      // Deduplicate shelves when combining personal and public
+      const seenShelfIds = new Set<string>();
+      const uniqueShelves: NormalizedShelf[] = [];
+      
+      // Add personal shelves first (they take priority)
+      shelves.forEach(shelf => {
+        if (!seenShelfIds.has(shelf.shelf_id)) {
+          seenShelfIds.add(shelf.shelf_id);
+          uniqueShelves.push(shelf);
+        }
+      });
+      
+      // Then add unique public shelves
+      publicShelves.forEach(shelf => {
+        if (!seenShelfIds.has(shelf.shelf_id)) {
+          seenShelfIds.add(shelf.shelf_id);
+          uniqueShelves.push(shelf);
+        }
+      });
+      
       const denormalizedPersonalShelves = denormalizeShelves(shelves);
-      const allDenormalizedShelves = denormalizeShelves(allShelves);
+      const allDenormalizedShelves = denormalizeShelves(uniqueShelves);
       
       return (
         <UnifiedShelvesUI 

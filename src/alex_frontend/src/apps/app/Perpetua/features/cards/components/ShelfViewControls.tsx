@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from "@/lib/components/button";
 import { Edit, Plus, X, Grid, List } from "lucide-react";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface ShelfViewControlsProps {
   hasEditAccess: boolean;

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/lib/components/button";
 import { Dialog, DialogContent } from "@/lib/components/dialog";
 import { Input } from "@/lib/components/input";
@@ -12,6 +12,47 @@ import { selectUserShelves, selectSelectedShelf, NormalizedShelf } from "@/apps/
 import { toast } from "sonner";
 import { ShelfForm } from "@/apps/app/Perpetua/features/shelf-management/components/NewShelf";
 import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks/useShelfOperations";
+
+// Custom Textarea component that prevents focus issues by stopping event propagation
+const FocusProtectedTextarea = React.forwardRef<
+  HTMLTextAreaElement,
+  React.ComponentPropsWithoutRef<typeof Textarea>
+>((props, ref) => {
+  // Event handlers that stop propagation
+  const stopPropagation = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+  };
+  
+  // Create a click handler that stops propagation
+  const handleClick = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    e.stopPropagation();
+    if (props.onClick) {
+      props.onClick(e as any);
+    }
+  };
+  
+  // Create a keydown handler that stops propagation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    e.stopPropagation();
+    if (props.onKeyDown) {
+      props.onKeyDown(e as any);
+    }
+  };
+  
+  return (
+    <div onClick={stopPropagation} onMouseDown={stopPropagation} className="w-full h-full">
+      <Textarea
+        {...props}
+        ref={ref}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        onFocus={stopPropagation}
+        onMouseDown={stopPropagation}
+      />
+    </div>
+  );
+});
+FocusProtectedTextarea.displayName = "FocusProtectedTextarea";
 
 interface DialogProps {
   isOpen: boolean;
@@ -45,7 +86,7 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
   const { createAndAddShelfItem } = useShelfOperations();
 
   // Reset form when dialog opens/closes or type changes
-  React.useEffect(() => {
+  useEffect(() => {
     setContent("");
     setSelectedShelfId("");
     setCreatingNewShelf(false);
@@ -55,9 +96,26 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
 
   // Filter available shelves that can be added as items
   const availableShelves = useMemo(() => {
-    if (propShelves) return propShelves;
-    if (!allShelves || !currentShelf) return [];
+    // Use shelves provided as props if available
+    if (propShelves) {
+      return propShelves;
+    }
+
+    // Get shelves from Redux
+    const userShelves = allShelves;
     
+    // If we don't have any shelves or current shelf, return empty array
+    if (!userShelves || userShelves.length === 0) {
+      console.log("No shelves available in Redux store");
+      return [];
+    }
+    
+    // If no current shelf selected, show all shelves
+    if (!currentShelf) {
+      return userShelves;
+    }
+    
+    // Get IDs of shelves that are already added as items to current shelf
     const shelvesInCurrentShelf = new Set<string>();
     
     if (currentShelf.items) {
@@ -68,11 +126,28 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
       });
     }
     
-    return allShelves.filter((shelf) => 
+    // Debug what we found
+    console.log("Current shelf:", currentShelf.shelf_id);
+    console.log("Total shelves:", userShelves.length);
+    console.log("Shelves already in current shelf:", shelvesInCurrentShelf.size);
+    
+    // Filter out:
+    // 1. The current shelf itself
+    // 2. Shelves that are already added as items
+    const filteredShelves = userShelves.filter((shelf) => 
       shelf.shelf_id !== currentShelf.shelf_id && 
       !shelvesInCurrentShelf.has(shelf.shelf_id)
     );
-  }, [allShelves, currentShelf, propShelves]);
+    
+    console.log("Available shelves after filtering:", filteredShelves.length);
+    
+    return filteredShelves;
+  }, [
+    // Use stable primitive values instead of object references
+    allShelves?.length,
+    currentShelf?.shelf_id,
+    propShelves ? propShelves.length : 0
+  ]);
 
   // Handle NFT selection from NftSearchDialog
   const handleNftSelect = (numericNftId: string, selectedCollectionType: "NFT" | "SBT") => {
@@ -176,34 +251,61 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
   );
   
   // Markdown content form
-  const MarkdownForm = () => (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="p-4 flex-grow">
-        <Label htmlFor="markdownContent" className="block mb-2">Markdown Content</Label>
-        <Textarea
-          id="markdownContent"
-          className="h-full min-h-[400px] resize-none"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="# Title
+  const MarkdownForm = () => {
+    const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+    
+    // Handle submit with current textarea value
+    const handleMarkdownSubmit = () => {
+      if (textareaRef.current) {
+        const currentContent = textareaRef.current.value;
+        // Update state before submitting
+        setContent(currentContent);
+        
+        if (!currentContent.trim()) {
+          toast.error('Please enter markdown content');
+          return;
+        }
+        
+        handleSubmit();
+      }
+    };
+    
+    useEffect(() => {
+      if (textareaRef.current) {
+        // Initialize with current content
+        textareaRef.current.value = content;
+      }
+    }, []);
+    
+    return (
+      <div className="flex-1 flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="p-4 flex-grow">
+          <Label htmlFor="markdownContent" className="block mb-2">Markdown Content</Label>
+          <textarea
+            id="markdownContent"
+            ref={textareaRef}
+            className="flex min-h-[400px] w-full h-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+            defaultValue={content}
+            placeholder="# Title
 
 ## Subtitle
 
 Your content here..."
-        />
+          />
+        </div>
+        <div className="p-4 mt-auto border-t border-border">
+          <Button 
+            onClick={handleMarkdownSubmit} 
+            disabled={isSubmitting}
+            className="px-6 py-2 text-base"
+            variant="primary"
+          >
+            {isSubmitting ? "Adding..." : "Add Markdown"}
+          </Button>
+        </div>
       </div>
-      <div className="p-4 mt-auto border-t border-border">
-        <Button 
-          onClick={handleSubmit} 
-          disabled={!content.trim() || isSubmitting}
-          className="px-6 py-2 text-base"
-          variant="primary"
-        >
-          {isSubmitting ? "Adding..." : "Add Markdown"}
-        </Button>
-      </div>
-    </div>
-  );
+    );
+  };
   
   // Shelf selection form
   const ShelfSelectionForm = () => (
@@ -313,7 +415,11 @@ Your content here..."
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[98vw] h-[95vh] max-w-none p-0 border-0 rounded-none flex flex-col bg-background overflow-hidden" closeIcon={<X className="h-5 w-5" />}>
+      <DialogContent 
+        className="w-[98vw] h-[95vh] max-w-none p-0 border-0 rounded-none flex flex-col bg-background overflow-hidden" 
+        closeIcon={<X className="h-5 w-5" />}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <div className="flex-1 flex flex-col h-full overflow-hidden">
           <ContentTypeTabs />
           <div className="flex-1 flex flex-col h-full overflow-hidden">

@@ -23,9 +23,6 @@ Before next mainnet push:
 - More advanced searching with tags and metadata.
 
 
-#### New Apps:
-- Perpetua is a good name for one, latin for perpetual/eternal.
-
 
 
 
@@ -59,7 +56,7 @@ NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I 09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal zkdgj-uyze5-4c3zz-kdjgc-uu4fv-jlgrt-nmgp7-qhuif-davlg-yfbu6-6ae)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 6qkh4-qpxqa-uld42-dtv35-agdow-en6fd-gvcm6-macvf-c2vua-gyfqa-eqe)
 
 
 

@@ -643,3 +643,24 @@ export const selectIsEditor = (contentId: string) => {
   }
   return memoizedSelectorsByShelfId.isEditor.get(contentId)!;
 };
+
+// Get all shelves belonging to a specific user - memoized
+export const selectUserShelvesForUser = createSelector(
+  [
+    selectShelvesEntities,
+    (_state: RootState, userId: string) => userId
+  ],
+  (shelves, userId) => {
+    const userShelves = Object.values(shelves)
+      .filter(shelf => shelf && shelf.owner === userId)
+      .sort((a, b) => {
+        // Sort by createdAt if available, otherwise keep original order
+        if (a.created_at && b.created_at) {
+          return Number(b.created_at) - Number(a.created_at); // Newest first
+        }
+        return 0;
+      });
+    
+    return userShelves;
+  }
+);
