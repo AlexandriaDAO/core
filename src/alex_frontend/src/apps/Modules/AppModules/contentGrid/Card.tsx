@@ -11,9 +11,12 @@ import { RootState } from "@/store";
 import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
 import { Dialog, DialogContent, DialogTitle } from "@/lib/components/dialog";
 import { ShelfSelectionDialog } from "@/apps/app/Perpetua/features/shelf-management/components/ShelfSelectionDialog";
+import { useAddToShelf } from "@/apps/app/Perpetua/features/shelf-management/hooks/useAddToShelf";
 import { mint_nft } from "@/features/nft/mint";
 import { toast } from "sonner";
 import { Badge } from "@/lib/components/badge";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { selectLoading } from "@/apps/app/Perpetua/state/perpetuaSlice";
 
 interface Transaction {
   id: string;
@@ -45,12 +48,35 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
   const [internalMintingState, setInternalMintingState] = useState<boolean>(false);
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
   const transactions = useSelector((state: RootState) => state.transactions.transactions as Transaction[]);
+  const { hasEditableShelvesExcluding, isLoggedIn } = useAddToShelf();
+  const shelvesLoading = useAppSelector(selectLoading);
 
   // Use either the external minting state (if provided) or the internal one
   const isMinting = externalIsMinting !== undefined ? externalIsMinting : internalMintingState;
 
   const handleOwnedBadgeClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
+    console.log("handleOwnedBadgeClick");
+    
+    // Check if user is logged in
+    if (!isLoggedIn) {
+      toast.error("You need to be logged in to add content to shelves");
+      return;
+    }
+    
+    // Check if shelves are still loading
+    if (shelvesLoading) {
+      toast.info("Loading your shelves...");
+      return;
+    }
+    
+    // Check if user has shelves they can edit
+    if (!hasEditableShelvesExcluding()) {
+      toast.error("You don't have any shelves you can edit. Create a shelf first.");
+      return;
+    }
+    
+    // Open the shelf selector
     setIsShelfSelectorOpen(true);
   };
 
@@ -220,6 +246,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
         <ShelfSelectionDialog
           contentId={id}
           contentType="Nft"
+          currentShelfId={undefined}
           open={isShelfSelectorOpen}
           onClose={handleCloseShelfSelector}
         />

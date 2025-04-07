@@ -1,11 +1,14 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useShelfOperations } from "./useShelfOperations";
 import { useContentPermissions } from "@/apps/app/Perpetua/hooks/useContentPermissions";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { selectUserShelves, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { selectUserShelves, selectLoading, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
+import { loadShelves } from "@/apps/app/Perpetua/state";
 import { toast } from "sonner";
 import { Principal } from "@dfinity/principal";
 import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { useIdentity } from "@/hooks/useIdentity";
 
 /**
  * Hook for adding content to shelves
@@ -17,6 +20,16 @@ export const useAddToShelf = () => {
   const { addItem } = useShelfOperations();
   const { checkEditAccess, currentUser } = useContentPermissions();
   const availableShelves = useAppSelector(selectUserShelves);
+  const shelvesLoading = useAppSelector(selectLoading);
+  const dispatch = useAppDispatch();
+  const { identity } = useIdentity();
+
+  // Ensure shelves are loaded when the hook is first used
+  useEffect(() => {
+    if (identity && availableShelves.length === 0 && !shelvesLoading) {
+      dispatch(loadShelves(identity.getPrincipal()));
+    }
+  }, [identity, availableShelves.length, shelvesLoading, dispatch]);
 
   /**
    * Convert a NormalizedShelf back to a Shelf for API calls
@@ -113,6 +126,7 @@ export const useAddToShelf = () => {
     addContentToShelf,
     getEditableShelves,
     hasEditableShelvesExcluding: (excludeShelfId?: string) => getEditableShelves(excludeShelfId).length > 0,
-    isLoggedIn: !!currentUser
+    isLoggedIn: !!currentUser,
+    shelvesLoading
   };
 }; 

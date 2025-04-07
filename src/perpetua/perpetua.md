@@ -145,6 +145,7 @@ Perpetua/
  
 - Payment for all/some actions.
 - Test edit stuff.
+- Add a 'collaborator' list to the shelves list that they could add items to.
 
 - Backup system for all data.
 

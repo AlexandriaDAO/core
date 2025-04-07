@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
@@ -15,6 +15,9 @@ import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import type { Transaction } from '../../shared/types/queries';
 import { TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
+import { useAddToShelf } from '@/apps/app/Perpetua/features/shelf-management/hooks/useAddToShelf';
+import { useIdentity } from '@/hooks/useIdentity';
+import { loadShelves } from '@/apps/app/Perpetua/state';
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -27,10 +30,36 @@ type ContentGridComponent = React.FC<ContentGridProps> & {
   Item: typeof ContentCard;
 };
 
+/**
+ * Preloads shelves data as soon as the app loads
+ * This ensures shelves are ready when a user clicks on an owned badge
+ */
+const ShelvesPreloader: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { identity } = useIdentity();
+  const { 
+    getEditableShelves, 
+    shelvesLoading 
+  } = useAddToShelf();
+  
+  useEffect(() => {
+    // Only load shelves if the user is logged in and we're not currently loading
+    const shelves = getEditableShelves();
+    if (identity && shelves.length === 0 && !shelvesLoading) {
+      dispatch(loadShelves(identity.getPrincipal()));
+    }
+  }, [identity, getEditableShelves, shelvesLoading, dispatch]);
+  
+  // This component doesn't render anything
+  return null;
+};
+
 export const ContentGrid: ContentGridComponent = Object.assign(
   ({ children }: ContentGridProps) => {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:grid-cols-2 gap-2 sm:gap-4 lg:pb-16 md:pb-14 sm:pb-10 xs:pb-6">
+        {/* Preload shelves data */}
+        <ShelvesPreloader />
         {children}
       </div>
     );
@@ -51,6 +80,22 @@ interface GridProps {
 
 const Grid = ({ dataSource }: GridProps = {}) => {
   const dispatch = useAppDispatch();
+
+  // Preload shelves at component mount time
+  useEffect(() => {
+    const preloadShelves = async () => {
+      const { useIdentity } = await import('@/hooks/useIdentity');
+      const { loadShelves } = await import('@/apps/app/Perpetua/state');
+      
+      const identity = useIdentity();
+      if (identity && identity.identity) {
+        dispatch(loadShelves(identity.identity.getPrincipal()));
+      }
+    };
+    
+    // Preload shelves in the background
+    preloadShelves().catch(console.error);
+  }, [dispatch]);
 
   // Select the appropriate state based on the determined data source
   const { contentData } = useSelector((state: RootState) => {

@@ -14,6 +14,7 @@ import { useContentPermissions } from "../hooks/useContentPermissions";
 import { Principal } from "@dfinity/principal";
 import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 import { loadShelves } from "../state";
+import { useIdentity } from "@/hooks/useIdentity";
 
 // Import UI components
 import {
@@ -57,6 +58,7 @@ const PerpetuaLayout: React.FC = () => {
   const currentSelectedShelfId = useAppSelector(state => state.perpetua.selectedShelfId); // Direct access for comparison
   // Direct state access to auth principal - single source of truth
   const userPrincipal = useAppSelector(state => state.auth.user?.principal);
+  const { identity } = useIdentity();
   
   // Permissions
   const { checkEditAccess } = useContentPermissions();
@@ -72,6 +74,18 @@ const PerpetuaLayout: React.FC = () => {
   // Get user-specific shelves from Redux
   const userShelves = useAppSelector(state => userId ? selectUserShelvesForUser(state, userId) : []);
   const [userShelvesLoading, setUserShelvesLoading] = useState(false);
+  
+  // Global initialization of shelves
+  useEffect(() => {
+    if (identity) {
+      // Load the current user's shelves as soon as the layout mounts
+      dispatch(loadShelves(identity.getPrincipal()))
+        .unwrap()
+        .catch((error) => {
+          console.error("Failed to load shelves:", error);
+        });
+    }
+  }, [identity, dispatch]);
   
   // Load shelves when viewing a specific user's profile (modified to prevent loops)
   useEffect(() => {

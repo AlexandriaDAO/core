@@ -6,12 +6,15 @@ import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
 import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { X, Plus } from "lucide-react";
-import NftSearchDialog from "./NftSearch";
+import AlexandrianSelector from "./AlexandrianSelector";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { selectUserShelves, selectSelectedShelf, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { toast } from "sonner";
 import { ShelfForm } from "@/apps/app/Perpetua/features/shelf-management/components/NewShelf";
 import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks/useShelfOperations";
+import { loadShelves } from "@/apps/app/Perpetua/state";
+import { useIdentity } from "@/hooks/useIdentity";
 
 // Custom Textarea component that prevents focus issues by stopping event propagation
 const FocusProtectedTextarea = React.forwardRef<
@@ -80,7 +83,9 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
   const [newShelfDescription, setNewShelfDescription] = useState("");
   const [isCreatingShelf, setIsCreatingShelf] = useState(false);
   
-  // Selectors
+  // Selectors and hooks
+  const dispatch = useAppDispatch();
+  const { identity } = useIdentity();
   const allShelves = useAppSelector(selectUserShelves);
   const currentShelf = useAppSelector(selectSelectedShelf);
   const { createAndAddShelfItem } = useShelfOperations();
@@ -93,6 +98,14 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
     setNewShelfTitle("");
     setNewShelfDescription("");
   }, [isOpen, type]);
+
+  // Fetch shelves when the Shelf tab is selected
+  useEffect(() => {
+    if (isOpen && type === "Shelf" && identity) {
+      // Load the user's shelves when the Shelf tab is opened
+      dispatch(loadShelves(identity.getPrincipal()));
+    }
+  }, [isOpen, type, dispatch, identity]);
 
   // Filter available shelves that can be added as items
   const availableShelves = useMemo(() => {
@@ -149,20 +162,23 @@ const NewItemDialog: React.FC<NewItemDialogProps> = ({ isOpen, onClose, onSubmit
     propShelves ? propShelves.length : 0
   ]);
 
-  // Handle NFT selection from NftSearchDialog
-  const handleNftSelect = (numericNftId: string, selectedCollectionType: "NFT" | "SBT") => {
-    if (!numericNftId) {
+  // Handle NFT selection from Alexandrian
+  const handleNftSelect = (nftId: string, collectionType: "NFT" | "SBT") => {
+    if (!nftId) {
       toast.error("Invalid NFT ID. Please try selecting another NFT.");
       return;
     }
     
-    if (!/^\d+$/.test(numericNftId)) {
+    if (!/^\d+$/.test(nftId)) {
       toast.error("Invalid NFT ID format. Expected a numeric ID.");
       return;
     }
     
-    setContent(numericNftId);
-    setCollectionType(selectedCollectionType);
+    setContent(nftId);
+    setCollectionType(collectionType);
+    
+    // Log success for user feedback
+    toast.success(`Selected NFT with ID: ${nftId}`);
   };
 
   // Submit the current content as an item
@@ -407,7 +423,7 @@ Your content here..."
   const renderContentForm = () => {
     switch (type) {
       case "Markdown": return <MarkdownForm />;
-      case "Nft": return <NftSearchDialog onSelect={handleNftSelect} />;
+      case "Nft": return <AlexandrianSelector onSelect={handleNftSelect} />;
       case "Shelf": return <ShelfSelectionForm />;
       default: return null;
     }
