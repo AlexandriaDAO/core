@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Card, CardContent, CardFooter } from "@/lib/components/card";
-import { Loader2, Flag, Plus, Heart } from "lucide-react";
+import { Loader2, Flag, Plus, Heart, Bookmark } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Progress } from "@/lib/components/progress";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
@@ -9,12 +9,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { NftDataFooter } from "./components/NftDataFooter";
 import { RootState } from "@/store";
 import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
-import { Dialog, DialogContent, DialogTitle } from "@/lib/components/dialog";
 import { ShelfSelectionDialog } from "@/apps/app/Perpetua/features/shelf-management/components/ShelfSelectionDialog";
 import { useAddToShelf } from "@/apps/app/Perpetua/features/shelf-management/hooks/useAddToShelf";
 import { mint_nft } from "@/features/nft/mint";
 import { toast } from "sonner";
-import { Badge } from "@/lib/components/badge";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { selectLoading } from "@/apps/app/Perpetua/state/perpetuaSlice";
 
@@ -143,7 +141,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
             <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800  ${component === "Emporium" ? " border-gray-900 dark:border-gray-900 rounded-[30px]" : "overflow-hidden h-full "}`}  >
               {children}
             </div>
-            {/* Action button - either Like or Mint */}
+            {/* Action button - either Like, Mint, or Owned */}
             <div
               className="absolute bottom-2 left-2 z-[30]"
               onClick={(e) => {
@@ -152,18 +150,28 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
               }}
             >
               {id && arweaveToNftId[id] ? (
-                <Button
-                  variant="secondary"
-                  className="bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black text-red-600 hover:text-red-500 border border-red-600/20 hover:border-red-600/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
-                  onClick={handleMintInternal}
-                  disabled={isMinting}
-                >
-                  {isMinting ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Heart className="h-4 w-4 transition-all duration-200 group-hover:scale-110" />
-                  )}
-                </Button>
+                isOwned ? (
+                  <Button
+                    variant="secondary"
+                    className="bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black text-green-600 hover:text-green-500 border border-green-600/20 hover:border-green-600/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
+                    onClick={handleOwnedBadgeClick}
+                  >
+                    <Bookmark className="h-4 w-4 transition-all duration-200 group-hover:scale-110" />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    className="bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black text-red-600 hover:text-red-500 border border-red-600/20 hover:border-red-600/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
+                    onClick={handleMintInternal}
+                    disabled={isMinting}
+                  >
+                    {isMinting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Heart className="h-4 w-4 transition-all duration-200 group-hover:scale-110" />
+                    )}
+                  </Button>
+                )
               ) : shouldShowMintButton() && (
                 <Button
                   variant="secondary"
@@ -179,34 +187,13 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
                 </Button>
               )}
             </div>
-
-            {/* Owned badge */}
-            {isOwned && (
-              <div className="absolute top-2 right-2 z-30">
-                <Badge 
-                  variant="success" 
-                  className="cursor-pointer text-xs"
-                  onClick={handleOwnedBadgeClick}
-                >
-                  Owned
-                </Badge>
-              </div>
-            )}
-
-            {/* Storage badge (ICP/AR) */}
-            <div className="absolute top-2 left-2 z-30">
-              <Badge variant="secondary" className="text-xs">
-                {isFromAssetCanister ? "ICP" : "AR"}
-              </Badge>
-            </div>
-
           </AspectRatio>
         </CardContent>
 
         <CardFooter className="flex flex-col w-full bg-[--card] dark:border-gray-700 p-1.5">
           <div className="flex flex-wrap items-center gap-1">
             {/* NFT data or custom footer - now first */}
-            {id && !footer && <NftDataFooter id={id} contentOwner={owner} />}
+            {id && !footer && <NftDataFooter id={id} contentOwner={owner} isFromAssetCanister={isFromAssetCanister} />}
             {footer}
         
             {/* Stats button */}

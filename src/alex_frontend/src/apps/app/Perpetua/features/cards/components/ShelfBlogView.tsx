@@ -99,9 +99,6 @@ const VisualSection = ({
   handleNftDetails: ShelfBlogViewProps['handleNftDetails'];
 }) => (
   <div className="mb-8">
-    <h3 className="text-sm uppercase tracking-wide text-muted-foreground mb-4 font-semibold">
-      Visual Content
-    </h3>
     <ContentGrid>
       {items.map(([itemKey, item, originalIndex]) => (
         <ShelfContentCard

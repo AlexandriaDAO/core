@@ -66,9 +66,18 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
     }
   };
 
+  // Handler for dialog open/close - same pattern as Grid.tsx
+  const handleDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      setShowModal(false);
+    }
+  };
+
   // Handler for card click
   const handleCardClick = () => {
+    console.log('handleCardClick');
     setShowModal(true);
+    
     if (onViewDetails) {
       onViewDetails(tokenId);
     }
@@ -120,14 +129,32 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
         </div>
       </ContentCard>
 
-      <NftDetailModal 
-        showModal={showModal} 
-        setShowModal={setShowModal}
-        transaction={transaction}
-        content={content}
-        contentUrls={contentUrls}
-        handleRenderError={handleRenderError}
-      />
+      {/* This Dialog follows the same pattern as Grid.tsx */}
+      <Dialog open={showModal} onOpenChange={handleDialogOpenChange}>
+        <DialogContent 
+          className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"
+          closeIcon={transaction.tags.find((tag: { name: string; value: string }) => 
+            tag.name === "Content-Type")?.value === "application/epub+zip" ? null : undefined}
+        >
+          <DialogTitle className="sr-only">
+            {transaction.tags.find((tag: { name: string; value: string }) => 
+              tag.name === "Content-Type")?.value.split('/')[0].toUpperCase()} Content Viewer
+          </DialogTitle>
+          
+          {content && (
+            <div className="w-full h-full">
+              <ContentRenderer
+                key={transaction.id}
+                transaction={transaction}
+                content={content}
+                contentUrls={contentUrls}
+                inModal={true}
+                handleRenderError={() => handleRenderError(transaction.id)}
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
@@ -266,45 +293,6 @@ const NftFooter: React.FC<NftFooterProps> = ({
       </Tooltip>
     </TooltipProvider>
   </div>
-);
-
-// Modal component
-interface NftDetailModalProps {
-  showModal: boolean;
-  setShowModal: (show: boolean) => void;
-  transaction: any;
-  content: any;
-  contentUrls: any;
-  handleRenderError: (transactionId?: string) => void;
-}
-
-const NftDetailModal: React.FC<NftDetailModalProps> = ({
-  showModal,
-  setShowModal,
-  transaction,
-  content,
-  contentUrls,
-  handleRenderError
-}) => (
-  <Dialog open={showModal} onOpenChange={(open) => !open && setShowModal(false)}>
-    <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col">
-      <DialogTitle className="sr-only">NFT Viewer</DialogTitle>
-      <div className="w-full h-full overflow-y-auto">
-        <div className="p-6">
-          {content && transaction && (
-            <ContentRenderer
-              key={transaction.id}
-              transaction={transaction}
-              content={content}
-              contentUrls={contentUrls}
-              inModal={true}
-              handleRenderError={() => handleRenderError(transaction.id)}
-            />
-          )}
-        </div>
-      </div>
-    </DialogContent>
-  </Dialog>
 );
 
 export default NftDisplay; 

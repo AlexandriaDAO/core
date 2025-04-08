@@ -13,9 +13,10 @@ import { setSearchState } from "@/apps/Modules/shared/state/arweave/arweaveSlice
 interface NftDataFooterProps {
   id: string;
   contentOwner?: string; // Add contentOwner prop to differentiate from NFT owner (principal)
+  isFromAssetCanister?: boolean; // Add prop to determine if content is from ICP asset canister
 }
 
-export function NftDataFooter({ id, contentOwner }: NftDataFooterProps) {
+export function NftDataFooter({ id, contentOwner, isFromAssetCanister }: NftDataFooterProps) {
   const { getNftData } = useNftData();
   const dispatch = useDispatch();
   const nfts = useSelector((state: RootState) => state.nftData.nfts);
@@ -100,6 +101,11 @@ export function NftDataFooter({ id, contentOwner }: NftDataFooterProps) {
 
   return (
     <div className="flex flex-wrap items-center gap-1">
+      {/* Storage badge (ICP/AR) */}
+      <Badge variant="secondary" className="text-xs">
+        {isFromAssetCanister ? "ICP" : "AR"}
+      </Badge>
+      
       {/* Link badge */}
       {arweaveToNftId[id] && (
         <Badge 

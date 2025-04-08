@@ -3,20 +3,13 @@ import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 import ContentRenderer from "@/apps/Modules/AppModules/safeRender/ContentRenderer";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
-import { BlogMarkdownDisplay } from './ContentDisplays';
-import { isMarkdownContentSafe, getMarkdownContentSafe } from '../utils/ShelfViewUtils';
-
-interface ContentUrls {
-  fullUrl: string;
-  coverUrl: string | null;
-  thumbnailUrl: string | null;
-}
+import { ContentUrlInfo } from '@/apps/Modules/AppModules/safeRender/types';
 
 interface ViewingItemContent {
   itemId: number;
   content: any;
   transaction: Transaction | null;
-  contentUrls?: ContentUrls;
+  contentUrls?: ContentUrlInfo;
 }
 
 interface ShelfContentModalProps {
@@ -37,45 +30,32 @@ export const ShelfContentModal: React.FC<ShelfContentModalProps> = ({
     ContentService.clearTransaction(id);
   };
 
-  // Get default content URLs if none provided
-  const getDefaultContentUrls = (content: any): ContentUrls => ({
-    fullUrl: `data:text/markdown;charset=utf-8,${encodeURIComponent(
-      isMarkdownContentSafe(content) 
-        ? getMarkdownContentSafe(content)
-        : JSON.stringify(content || {}, null, 2)
-    )}`,
-    thumbnailUrl: null,
-    coverUrl: null
-  });
+  // Ensure we always have valid contentUrls
+  const getContentUrls = (): ContentUrlInfo => {
+    return viewingItemContent.content?.urls || viewingItemContent.contentUrls || {
+      fullUrl: '',
+      coverUrl: null,
+      thumbnailUrl: null
+    };
+  };
 
   return (
     <Dialog open={!!viewingItemContent} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col">
-        <DialogTitle className="sr-only">Content Viewer</DialogTitle>
+        <DialogTitle className="sr-only">NFT Content Viewer</DialogTitle>
         
         <div className="w-full h-full overflow-y-auto">
           <div className="p-6">
-            {viewingItemContent.transaction && (
+            {viewingItemContent.transaction ? (
               <ContentRenderer
                 key={viewingItemContent.transaction.id}
                 transaction={viewingItemContent.transaction}
                 content={viewingItemContent.content}
-                contentUrls={viewingItemContent.content?.urls || getDefaultContentUrls(viewingItemContent.content)}
+                contentUrls={getContentUrls()}
                 handleRenderError={() => handleRenderError(viewingItemContent.transaction?.id || '')}
                 inModal={true}
               />
-            )}
-
-            {!viewingItemContent.transaction && isMarkdownContentSafe(viewingItemContent.content) && (
-              <BlogMarkdownDisplay
-                content={getMarkdownContentSafe(viewingItemContent.content)}
-                onClick={() => {}}
-              />
-            )}
-
-            {!viewingItemContent.transaction && 
-             !isMarkdownContentSafe(viewingItemContent.content) && 
-             viewingItemContent.contentUrls && (
+            ) : (
               <ContentRenderer
                 key={`item-${viewingItemContent.itemId}`}
                 transaction={{
@@ -84,8 +64,8 @@ export const ShelfContentModal: React.FC<ShelfContentModalProps> = ({
                   tags: []
                 }}
                 content={viewingItemContent.content}
-                contentUrls={viewingItemContent.contentUrls}
-                handleRenderError={() => console.error("Error rendering non-transaction content")}
+                contentUrls={getContentUrls()}
+                handleRenderError={() => console.error("Error rendering NFT content")}
                 inModal={true}
               />
             )}

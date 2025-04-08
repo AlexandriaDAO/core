@@ -129,7 +129,10 @@ Perpetua/
 
 
 
-
+- We're using a different modal inside the shelf lookup vs. inside the table/list view.
+- The add to shelf modal looks like shit.
+- The 'like' and 'owned' should be one or the other, not both.
+- Footer should be an expanded, not defualt shown.
 
 
 
@@ -137,7 +140,6 @@ Perpetua/
 ## V1 Features
 
 
-- UseShelfOpererations useEffect needs to be brought back.
 
 - Add appears-in in the frontend.
 - Add tags to the frontend.
@@ -148,6 +150,7 @@ Perpetua/
 - Add a 'collaborator' list to the shelves list that they could add items to.
 
 - Backup system for all data.
+- 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
 
 ## V2 Features: 
 

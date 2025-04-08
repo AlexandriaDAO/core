@@ -15,9 +15,8 @@ import ShelfEmptyView from './ShelfEmptyView';
 // Import utility functions
 import { 
   isShelfContentSafe, 
-  isMarkdownContentSafe, 
-  getMarkdownContentSafe,
-  generateContentUrls
+  generateContentUrls,
+  getNftContentSafe
 } from '../utils/ShelfViewUtils';
 
 /**
@@ -88,41 +87,23 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     
     const [_, item] = itemEntry;
     
+    // For Shelf content, navigate to that shelf
     if (isShelfContentSafe(item.content)) {
       if (onViewItem) onViewItem(itemId);
       return;
     }
     
-    if (isMarkdownContentSafe(item.content)) {
-      const markdownContent = getMarkdownContentSafe(item.content);
-      const markdownTransaction: Transaction = {
-        id: `markdown-${itemId}`,
-        owner: shelf.owner.toString(),
-        tags: []
-      };
-      
-      setViewingItemContent({
-        itemId,
-        content: {
-          type: 'markdown',
-          textContent: markdownContent,
-          urls: {
-            fullUrl: `data:text/markdown;charset=utf-8,${encodeURIComponent(markdownContent)}`,
-            coverUrl: null,
-            thumbnailUrl: null
-          }
-        },
-        transaction: markdownTransaction
+    // Only open modals for NFT content
+    const nftId = getNftContentSafe(item.content);
+    if (nftId) {
+      setViewingItemContent({ 
+        itemId, 
+        content: item.content,
+        transaction: null,
+        contentUrls: generateContentUrls(item.content)
       });
-      return;
     }
-    
-    setViewingItemContent({ 
-      itemId, 
-      content: item.content,
-      transaction: null,
-      contentUrls: generateContentUrls(item.content)
-    });
+    // For all other content types including Markdown, don't open a modal
   };
 
   return (
