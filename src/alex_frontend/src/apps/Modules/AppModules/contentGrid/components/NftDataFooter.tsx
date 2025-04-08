@@ -102,7 +102,7 @@ export function NftDataFooter({ id, contentOwner, isFromAssetCanister }: NftData
   return (
     <div className="flex flex-wrap items-center gap-1">
       {/* Storage badge (ICP/AR) */}
-      <Badge variant="secondary" className="text-xs">
+      <Badge variant="secondary" className="text-[10px] py-0.5 px-1">
         {isFromAssetCanister ? "ICP" : "AR"}
       </Badge>
       

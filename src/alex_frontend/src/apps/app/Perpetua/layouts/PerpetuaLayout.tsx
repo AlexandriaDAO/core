@@ -21,7 +21,6 @@ import {
   UnifiedShelvesUI,
   UserShelvesUI
 } from "../features/shelf-management/containers/ShelfLists";
-import { NewItemDialog } from "../features/items";
 import { default as NewShelfDialog } from "../features/shelf-management/components/NewShelf";
 import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
 
@@ -50,7 +49,6 @@ const PerpetuaLayout: React.FC = () => {
   
   // Dialog state
   const [isNewShelfDialogOpen, setIsNewShelfDialogOpen] = useState(false);
-  const [isNewItemDialogOpen, setIsNewItemDialogOpen] = useState(false);
   
   // Redux state
   const dispatch = useAppDispatch();
@@ -112,21 +110,12 @@ const PerpetuaLayout: React.FC = () => {
   }, [shelfId, currentSelectedShelfId, dispatch]); // Depends only on IDs and dispatch
   
   // Action handlers
-  const handleAddItem = useCallback(() => setIsNewItemDialogOpen(true), []);
   const handleCreateShelf = useCallback(() => setIsNewShelfDialogOpen(true), []);
   
   const handleNewShelfSubmit = useCallback(async (title: string, description: string) => {
     await createShelf(title, description);
     setIsNewShelfDialogOpen(false);
   }, [createShelf]);
-  
-  const handleNewItemSubmit = useCallback(async (content: string, type: "Nft" | "Markdown" | "Shelf") => {
-    if (!selectedShelf) return;
-    
-    const shelf = denormalizeShelf(selectedShelf);
-    await addItem(shelf, content, type);
-    setIsNewItemDialogOpen(false);
-  }, [selectedShelf, addItem]);
   
   // Render view based on current URL and state
   const renderView = () => {
@@ -138,7 +127,6 @@ const PerpetuaLayout: React.FC = () => {
         <ShelfDetailContainer
           shelf={denormalizedShelf}
           onBack={goToShelves}
-          onAddItem={handleAddItem}
           hasEditAccess={checkEditAccess(denormalizedShelf.shelf_id)}
         />
       );
@@ -224,12 +212,6 @@ const PerpetuaLayout: React.FC = () => {
         isOpen={isNewShelfDialogOpen}
         onClose={() => setIsNewShelfDialogOpen(false)}
         onSubmit={handleNewShelfSubmit}
-      />
-      
-      <NewItemDialog 
-        isOpen={isNewItemDialogOpen}
-        onClose={() => setIsNewItemDialogOpen(false)}
-        onSubmit={handleNewItemSubmit}
       />
     </>
   );

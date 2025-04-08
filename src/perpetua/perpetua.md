@@ -129,10 +129,7 @@ Perpetua/
 
 
 
-- We're using a different modal inside the shelf lookup vs. inside the table/list view.
 - The add to shelf modal looks like shit.
-- The 'like' and 'owned' should be one or the other, not both.
-- Footer should be an expanded, not defualt shown.
 
 
 

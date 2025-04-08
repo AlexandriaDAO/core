@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useIdentity } from "@/hooks/useIdentity";
 import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
@@ -47,7 +47,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 	const { goToShelf } = usePerpetuaNavigation();
 	
 	// Access the updateMetadata function from ShelfOperations
-	const { updateMetadata } = useShelfOperations();
+	const { updateMetadata, addItem } = useShelfOperations();
 	
 	// Check for optimistic item order
 	const optimisticItemOrder = useAppSelector(selectOptimisticShelfItemOrder(shelf.shelf_id)) as number[];
@@ -101,6 +101,16 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 			goToShelf(shelfId);
 		}
 	};
+
+	// Handle item submission directly from the InlineItemCreator
+	const handleItemSubmit = async (content: string, type: "Nft" | "Markdown" | "Shelf", collectionType?: "NFT" | "SBT") => {
+		try {
+			// Use the addItem function from ShelfOperations
+			await addItem(shelf, content, type);
+		} catch (error) {
+			console.error("Error adding item:", error);
+		}
+	};
 	
 	return (
 		<ItemReorderManager
@@ -118,7 +128,8 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 				handleDragOver,
 				handleDragEnd,
 				handleDrop,
-				getDragItemStyle
+				getDragItemStyle = (index) => ({ opacity: 1 }), // Provide a default implementation
+				draggedIndex
 			}: ReorderRenderProps) => (
 				<ShelfDetailView
 					shelf={shelf}
@@ -127,7 +138,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 					editedItems={editedItems}
 					hasEditAccess={hasEditAccess}
 					onBack={onBack}
-					onAddItem={onAddItem}
+					onAddItem={handleItemSubmit}
 					onViewItem={handleViewItem}
 					onEnterEditMode={enterEditMode}
 					onCancelEditMode={cancelEditMode}
@@ -135,8 +146,9 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 					handleDragStart={handleDragStart}
 					handleDragOver={handleDragOver}
 					handleDragEnd={handleDragEnd}
-					handleDrop={handleDrop}
+					handleDrop={(e) => handleDrop(e, 0)} // Adapt the interface
 					getDragItemStyle={getDragItemStyle}
+					draggedIndex={draggedIndex || null}
 					settingsButton={
 						hasEditAccess && !isEditMode ? (
 							<ShelfSettingsDialog 

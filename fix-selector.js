@@ -1,0 +1,2 @@
+// Copy this script to your clipboard and paste it in your browser console when using the AlexandrianSelector
+function fixPrincipalSelector() { const selectors = document.querySelectorAll('[role="combobox"]'); selectors.forEach(s => { s.addEventListener('click', e => { e.stopPropagation(); setTimeout(() => s.click(), 50); }, true); }); console.log('Principal Selector fixed on ' + selectors.length + ' elements'); } setInterval(fixPrincipalSelector, 1000);

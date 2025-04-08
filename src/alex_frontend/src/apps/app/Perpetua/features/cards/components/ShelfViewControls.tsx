@@ -11,7 +11,7 @@ interface ShelfViewControlsProps {
   onEnterEditMode: () => void;
   onCancelEditMode: () => void;
   onSave: () => void;
-  onAddItem: ((shelf: any) => void) | (() => void);
+  onAddItem: () => void;
   shelf: any;
   onViewModeChange: (mode: 'grid' | 'blog') => void;
   currentViewMode: 'grid' | 'blog';
@@ -93,7 +93,7 @@ export const ShelfViewControls: React.FC<ShelfViewControlsProps> = ({
       <Button
         variant="primary"
         className="flex items-center gap-1 h-8 text-sm"
-        onClick={() => onAddItem(shelf)}
+        onClick={onAddItem}
       >
         <Plus className="w-4 h-4" />
         Add Item

@@ -206,7 +206,7 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
   return (
     <div className="p-2 sm:p-[14px] rounded-2xl border border-input bg-background">
       <div className="flex justify-between items-center mb-2">
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={setOpen} modal={true}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"

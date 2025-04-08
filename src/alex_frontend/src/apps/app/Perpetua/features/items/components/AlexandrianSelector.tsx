@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { SearchContainer } from '@/apps/Modules/shared/components/SearchContainer';
@@ -23,7 +23,6 @@ const SelectableGrid: React.FC<{
   onSelect: (transactionId: string) => void;
   selectedTransactionId: string | null;
 }> = ({ onSelect, selectedTransactionId }) => {
-  const dispatch = useDispatch<AppDispatch>();
   const transactions = useSelector((state: RootState) => state.transactions.transactions); 
   const contentData = useSelector((state: RootState) => state.transactions.contentData);
   
@@ -95,6 +94,19 @@ const AlexandrianSelector: React.FC<AlexandrianSelectorProps> = ({ onSelect }) =
   // Local state
   const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(null);
   const [selectedNumericId, setSelectedNumericId] = useState<string | null>(null);
+  
+  // Memoize the AlexandrianLibrary component, wrap it to stop click propagation, and ensure high z-index
+  const alexandrianLibraryComponent = useMemo(() => (
+    <div onClick={(e) => e.stopPropagation()} className="relative z-10">
+      <AlexandrianLibrary
+        defaultCategory="all"
+        defaultPrincipal="self"
+        showPrincipalSelector={true}
+        showCollectionSelector={true}
+        showTagsSelector={true}
+      />
+    </div>
+  ), []);
   
   // Handle search
   const handleSearch = useCallback(async () => {
@@ -171,15 +183,7 @@ const AlexandrianSelector: React.FC<AlexandrianSelectorProps> = ({ onSelect }) =
             onShowMore={handleShowMore}
             onCancel={handleCancelSearch}
             isLoading={isLoading}
-            filterComponent={
-              <AlexandrianLibrary
-                defaultCategory="all"
-                defaultPrincipal="new"
-                showPrincipalSelector={true}
-                showCollectionSelector={true}
-                showTagsSelector={true}
-              />
-            }
+            filterComponent={alexandrianLibraryComponent}
             showMoreEnabled={true}
             dataSource="transactions"
           />
@@ -216,4 +220,4 @@ const AlexandrianSelector: React.FC<AlexandrianSelectorProps> = ({ onSelect }) =
   );
 };
 
-export default AlexandrianSelector; 
+export default AlexandrianSelector;

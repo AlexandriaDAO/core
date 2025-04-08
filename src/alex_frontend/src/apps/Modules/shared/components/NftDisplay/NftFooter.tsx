@@ -5,22 +5,11 @@ import { copyToClipboard } from '@/apps/Modules/AppModules/contentGrid/utils/cli
 import { formatPrincipal, formatBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import { NftFooterProps } from './types';
 
-/**
- * NftFooter Component
- * 
- * This component is responsible for displaying consistent metadata
- * for NFTs across the application. It shows information like:
- * - Link copy badge
- * - Owner principal
- * - Collection type (NFT/SBT)
- * - Token balances
- * - Token ID with copy functionality
- */
+
 const NftFooter: React.FC<NftFooterProps> = ({
   tokenId,
   nftData,
   ownerInfo,
-  transaction,
   showCopyControls = true,
   showBalances = true,
   compact = false

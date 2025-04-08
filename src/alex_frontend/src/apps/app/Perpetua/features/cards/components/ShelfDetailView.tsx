@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { parsePathInfo } from "../../../routes";
 import { ShelfDetailViewProps } from '../../../types/item.types';
 import { Item } from "@/../../declarations/perpetua/perpetua.did";
@@ -11,6 +11,7 @@ import ShelfContentModal from './ShelfContentModal';
 import ShelfGridView from './ShelfGridView';
 import ShelfBlogView from './ShelfBlogView';
 import ShelfEmptyView from './ShelfEmptyView';
+import InlineItemCreator from '../../items/components/InlineItemCreator';
 
 // Import utility functions
 import { 
@@ -19,10 +20,32 @@ import {
   getNftContentSafe
 } from '../utils/ShelfViewUtils';
 
+// Update the props type definition for the component
+interface UpdatedShelfDetailViewProps {
+  shelf: any;
+  orderedItems: [number, Item][];
+  isEditMode: boolean;
+  editedItems: [number, Item][];
+  hasEditAccess: boolean;
+  onBack: () => void;
+  onAddItem: (content: string, type: "Nft" | "Markdown" | "Shelf", collectionType?: "NFT" | "SBT") => Promise<boolean | void>;
+  onViewItem?: (itemId: number) => void;
+  onEnterEditMode: () => void;
+  onCancelEditMode: () => void;
+  onSaveItemOrder: () => Promise<void>;
+  handleDragStart: (e: React.DragEvent, index: number) => void;
+  handleDragOver: (e: React.DragEvent, index: number) => void;
+  handleDragEnd: () => void;
+  handleDrop: (e: React.DragEvent) => void;
+  getDragItemStyle: (index: number) => React.CSSProperties;
+  draggedIndex: number | null;
+  settingsButton?: React.ReactNode;
+}
+
 /**
  * ShelfDetailView - Main component for displaying a shelf and its contents
  */
-export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
+export const ShelfDetailView: React.FC<UpdatedShelfDetailViewProps> = ({
   shelf,
   orderedItems,
   isEditMode,
@@ -44,12 +67,14 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
 }) => {
   const pathInfo = parsePathInfo(window.location.pathname);
   const items = isEditMode ? editedItems : orderedItems;
-  const [isSaving, setIsSaving] = React.useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const { viewMode, handleViewModeChange } = useViewMode();
-  const safeOnAddItem = onAddItem || (() => console.warn("onAddItem callback is not defined"));
+  
+  // State for inline item creator
+  const [isAddingItem, setIsAddingItem] = useState(false);
   
   // State for content modal
-  const [viewingItemContent, setViewingItemContent] = React.useState<{
+  const [viewingItemContent, setViewingItemContent] = useState<{
     itemId: number;
     content: any;
     transaction: Transaction | null;
@@ -106,6 +131,19 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
     // For all other content types including Markdown, don't open a modal
   };
 
+  const handleAddItemClick = () => {
+    setIsAddingItem(true);
+  };
+
+  const handleItemSubmit = async (content: string, type: "Nft" | "Markdown" | "Shelf", collectionType?: "NFT" | "SBT") => {
+    await onAddItem(content, type, collectionType);
+    setIsAddingItem(false);
+  };
+
+  const handleCancelAddItem = () => {
+    setIsAddingItem(false);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center w-full bg-background/80 backdrop-blur-sm sticky top-0 z-10 p-4 border-b">
@@ -122,18 +160,29 @@ export const ShelfDetailView: React.FC<ShelfDetailViewProps> = ({
           onEnterEditMode={onEnterEditMode}
           onCancelEditMode={onCancelEditMode}
           onSave={handleSave}
-          onAddItem={safeOnAddItem}
+          onAddItem={handleAddItemClick}
           shelf={shelf}
           onViewModeChange={handleViewModeChange}
           currentViewMode={viewMode}
         />
       </div>
       
+      {/* Inline Item Creator */}
+      {isAddingItem && hasEditAccess && (
+        <div className="px-4 pt-4">
+          <InlineItemCreator
+            onSubmit={handleItemSubmit}
+            onCancel={handleCancelAddItem}
+            shelf={shelf}
+          />
+        </div>
+      )}
+      
       <div className="flex-1 p-4">
         {items.length === 0 ? (
           <ShelfEmptyView 
             hasEditAccess={hasEditAccess} 
-            onAddItem={safeOnAddItem} 
+            onAddItem={hasEditAccess ? handleAddItemClick : () => {}} 
             shelf={shelf} 
           />
         ) : viewMode === 'grid' ? (

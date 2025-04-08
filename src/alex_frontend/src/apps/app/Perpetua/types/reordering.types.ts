@@ -65,4 +65,5 @@ export interface ReorderRenderProps {
   handleDragEnd: () => void;
   handleDrop: (e: React.DragEvent, index: number) => void;
   getDragItemStyle?: (index: number) => React.CSSProperties;
+  draggedIndex?: number | null;
 } 

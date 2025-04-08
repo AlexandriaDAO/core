@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Card, CardContent, CardFooter } from "@/lib/components/card";
-import { Loader2, Flag, Plus, Heart, Bookmark } from "lucide-react";
+import { Loader2, Flag, Plus, Heart, Bookmark, Info, ChevronDown } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Progress } from "@/lib/components/progress";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
@@ -40,10 +40,9 @@ interface ContentCardProps {
 
 
 export function ContentCard({ children, onClick, id, owner, showStats, onToggleStats, isOwned, onMint, predictions, isMinting: externalIsMinting, footer, component, isFromAssetCanister }: ContentCardProps) {
-  const [searchTriggered, setSearchTriggered] = useState(false);
-  const [copiedOwner, setCopiedOwner] = useState(false);
   const [isShelfSelectorOpen, setIsShelfSelectorOpen] = useState(false);
   const [internalMintingState, setInternalMintingState] = useState<boolean>(false);
+  const [isFooterExpanded, setIsFooterExpanded] = useState(false);
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
   const transactions = useSelector((state: RootState) => state.transactions.transactions as Transaction[]);
   const { hasEditableShelvesExcluding, isLoggedIn } = useAddToShelf();
@@ -141,7 +140,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
             <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800  ${component === "Emporium" ? " border-gray-900 dark:border-gray-900 rounded-[30px]" : "overflow-hidden h-full "}`}  >
               {children}
             </div>
-            {/* Action button - either Like, Mint, or Owned */}
+            {/* Action buttons - Left side */}
             <div
               className="absolute bottom-2 left-2 z-[30]"
               onClick={(e) => {
@@ -187,45 +186,66 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
                 </Button>
               )}
             </div>
+            
+            {/* Info button - Right side */}
+            {id && (
+              <div 
+                className="absolute bottom-2 right-2 z-[30]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
+              >
+                <Button
+                  variant="secondary"
+                  className="bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black text-gray-600 hover:text-gray-500 border border-gray-600/20 hover:border-gray-600/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
+                  onClick={() => setIsFooterExpanded(!isFooterExpanded)}
+                >
+                  <ChevronDown className={`h-4 w-4 transition-all duration-200 ${isFooterExpanded ? 'rotate-180' : ''}`} />
+                </Button>
+              </div>
+            )}
           </AspectRatio>
         </CardContent>
 
-        <CardFooter className="flex flex-col w-full bg-[--card] dark:border-gray-700 p-1.5">
-          <div className="flex flex-wrap items-center gap-1">
-            {/* NFT data or custom footer - now first */}
-            {id && !footer && <NftDataFooter id={id} contentOwner={owner} isFromAssetCanister={isFromAssetCanister} />}
-            {footer}
-        
-            {/* Stats button */}
-            {predictions && Object.keys(predictions).length > 0 ? (
-              <Collapsible open={showStats} onOpenChange={onToggleStats}>
-                <CollapsibleTrigger asChild>
-                  <Button
-                    variant="secondary"
-                    className="h-5 px-1.5 bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800 rounded-md flex items-center gap-0.5 transition-colors shrink-0 group"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Flag className="h-2.5 w-2.5" />
-                    <span className="text-[10px] font-medium">Stats</span>
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent onClick={(e) => e.stopPropagation()}>
-                  <div className="mt-1.5 space-y-1 w-full">
-                    {Object.entries(predictions).map(([key, value]) => (
-                      <div key={key} className="space-y-0.5">
-                        <div className="flex justify-between text-[10px] dark:text-gray-300">
-                          <span>{key}</span>
-                          <span>{(Number(value) * 100).toFixed(1)}%</span>
+        {isFooterExpanded && (
+          <CardFooter className="flex flex-col w-full bg-[--card] dark:border-gray-700 p-1.5">
+            <div className="flex flex-wrap items-center gap-1">
+              {/* NFT data or custom footer */}
+              {id && !footer && <NftDataFooter id={id} contentOwner={owner} isFromAssetCanister={isFromAssetCanister} />}
+              {footer}
+          
+              {/* Stats button */}
+              {predictions && Object.keys(predictions).length > 0 ? (
+                <Collapsible open={showStats} onOpenChange={onToggleStats}>
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      className="h-5 px-1.5 bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800 rounded-md flex items-center gap-0.5 transition-colors shrink-0 group"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Flag className="h-2.5 w-2.5" />
+                      <span className="text-[10px] font-medium">Stats</span>
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent onClick={(e) => e.stopPropagation()}>
+                    <div className="mt-1.5 space-y-1 w-full">
+                      {Object.entries(predictions).map(([key, value]) => (
+                        <div key={key} className="space-y-0.5">
+                          <div className="flex justify-between text-[10px] dark:text-gray-300">
+                            <span>{key}</span>
+                            <span>{(Number(value) * 100).toFixed(1)}%</span>
+                          </div>
+                          <Progress value={Number(value) * 100} className="h-1" />
                         </div>
-                        <Progress value={Number(value) * 100} className="h-1" />
-                      </div>
-                    ))}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            ) : null}
-          </div>
-        </CardFooter>
+                      ))}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              ) : null}
+            </div>
+          </CardFooter>
+        )}
       </Card>
 
       {/* Shelf Selector Dialog */}
