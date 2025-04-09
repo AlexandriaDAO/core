@@ -571,6 +571,7 @@
 ├── dfx.json (152 lines)
 ├── dfx_local.json (152 lines)
 ├── dfx_mainnet.json (135 lines)
+├── fix-selector.js (3 lines)
 ├── ic-vetkd-utils-0.1.0.tgz (327 lines)
 ├── jest.config.js (19 lines)
 ├── jest.setup.js (15 lines)
@@ -642,10 +643,10 @@
 │   │   │   │   │   │   ├── blinks/
 │   │   │   │   │   │   │   └── SingleTokenView.tsx (412 lines)
 │   │   │   │   │   │   ├── contentGrid/
-│   │   │   │   │   │   │   ├── Card.tsx (229 lines)
-│   │   │   │   │   │   │   ├── Grid.tsx (230 lines)
+│   │   │   │   │   │   │   ├── Card.tsx (263 lines)
+│   │   │   │   │   │   │   ├── Grid.tsx (275 lines)
 │   │   │   │   │   │   │   ├── components/
-│   │   │   │   │   │   │   │   ├── NftDataFooter.tsx (192 lines)
+│   │   │   │   │   │   │   │   ├── NftDataFooter.tsx (198 lines)
 │   │   │   │   │   │   │   │   └── TransactionDetails.tsx (103 lines)
 │   │   │   │   │   │   │   └── utils/
 │   │   │   │   │   │   │       ├── clipboard.ts (9 lines)
@@ -702,7 +703,7 @@
 │   │   │   │   │       │   ├── ContentTypeToggleGroup.tsx (45 lines)
 │   │   │   │   │       │   ├── NftDisplay/
 │   │   │   │   │       │   │   ├── NftDisplay.tsx (364 lines)
-│   │   │   │   │       │   │   ├── NftFooter.tsx (153 lines)
+│   │   │   │   │       │   │   ├── NftFooter.tsx (142 lines)
 │   │   │   │   │       │   │   ├── index.tsx (15 lines)
 │   │   │   │   │       │   │   └── types.ts (44 lines)
 │   │   │   │   │       │   ├── PrincipalDisplay.tsx (38 lines)
@@ -796,15 +797,15 @@
 │   │   │   │       │   ├── features/
 │   │   │   │       │   │   ├── cards/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx (415 lines)
+│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx (413 lines)
 │   │   │   │       │   │   │   │   ├── ContentDisplays.tsx (103 lines)
-│   │   │   │       │   │   │   │   ├── NftDisplay.tsx (310 lines)
-│   │   │   │       │   │   │   │   ├── ShelfBlogView.tsx (194 lines)
-│   │   │   │       │   │   │   │   ├── ShelfCard.tsx (147 lines)
+│   │   │   │       │   │   │   │   ├── NftDisplay.tsx (298 lines)
+│   │   │   │       │   │   │   │   ├── ShelfBlogView.tsx (191 lines)
+│   │   │   │       │   │   │   │   ├── ShelfCard.tsx (276 lines)
 │   │   │   │       │   │   │   │   ├── ShelfCardActionMenu.tsx (159 lines)
 │   │   │   │       │   │   │   │   ├── ShelfContentCard.tsx (131 lines)
-│   │   │   │       │   │   │   │   ├── ShelfContentModal.tsx (99 lines)
-│   │   │   │       │   │   │   │   ├── ShelfDetailView.tsx (197 lines)
+│   │   │   │       │   │   │   │   ├── ShelfContentModal.tsx (79 lines)
+│   │   │   │       │   │   │   │   ├── ShelfDetailView.tsx (227 lines)
 │   │   │   │       │   │   │   │   ├── ShelfEmptyView.tsx (32 lines)
 │   │   │   │       │   │   │   │   ├── ShelfGridView.tsx (57 lines)
 │   │   │   │       │   │   │   │   ├── ShelfViewControls.tsx (127 lines)
@@ -814,12 +815,11 @@
 │   │   │   │       │   │   │   │   ├── index.ts (1 lines)
 │   │   │   │       │   │   │   │   └── useNftData.ts (156 lines)
 │   │   │   │       │   │   │   └── utils/
-│   │   │   │       │   │   │       └── ShelfViewUtils.ts (44 lines)
+│   │   │   │       │   │   │       └── ShelfViewUtils.ts (32 lines)
 │   │   │   │       │   │   ├── items/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── ItemActionMenu.tsx (61 lines)
-│   │   │   │       │   │   │   │   ├── NewItem.tsx (391 lines)
-│   │   │   │       │   │   │   │   ├── NftSearch.tsx (321 lines)
+│   │   │   │       │   │   │   │   ├── AlexandrianSelector.tsx (223 lines)
+│   │   │   │       │   │   │   │   ├── InlineItemCreator.tsx (433 lines)
 │   │   │   │       │   │   │   │   └── index.ts (5 lines)
 │   │   │   │       │   │   │   ├── hooks/
 │   │   │   │       │   │   │   │   └── useItemActions.tsx (116 lines)
@@ -827,10 +827,13 @@
 │   │   │   │       │   │   ├── shared/
 │   │   │   │       │   │   │   └── reordering/
 │   │   │   │       │   │   │       ├── components/
-│   │   │   │       │   │   │       │   ├── ItemReorderManager.tsx (45 lines)
-│   │   │   │       │   │   │       │   ├── ReorderableGrid.tsx (88 lines)
-│   │   │   │       │   │   │       │   └── ReorderableList.tsx (74 lines)
+│   │   │   │       │   │   │       │   ├── ItemReorderManager.tsx (22 lines)
+│   │   │   │       │   │   │       │   ├── ReorderableContainer.tsx (63 lines)
+│   │   │   │       │   │   │       │   ├── ReorderableGrid.tsx (97 lines)
+│   │   │   │       │   │   │       │   ├── ReorderableList.tsx (80 lines)
+│   │   │   │       │   │   │       │   └── index.ts (4 lines)
 │   │   │   │       │   │   │       ├── hooks/
+│   │   │   │       │   │   │       │   ├── index.ts (4 lines)
 │   │   │   │       │   │   │       │   ├── useDragAndDrop.ts (108 lines)
 │   │   │   │       │   │   │       │   ├── useItemReordering.ts (80 lines)
 │   │   │   │       │   │   │       │   ├── useReorderable.ts (217 lines)
@@ -843,24 +846,24 @@
 │   │   │   │       │   │   │       └── CollaboratorsList.tsx (185 lines)
 │   │   │   │       │   │   ├── shelf-management/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── NewShelf.tsx (97 lines)
-│   │   │   │       │   │   │   │   ├── RemoveItemButton.tsx (110 lines)
+│   │   │   │       │   │   │   │   ├── NewShelf.tsx (104 lines)
+│   │   │   │       │   │   │   │   ├── RemoveItemButton.tsx (98 lines)
 │   │   │   │       │   │   │   │   ├── ShelfContent.tsx (80 lines)
-│   │   │   │       │   │   │   │   ├── ShelfOption.tsx (30 lines)
-│   │   │   │       │   │   │   │   └── ShelfSelectionDialog.tsx (134 lines)
+│   │   │   │       │   │   │   │   ├── ShelfOption.tsx (31 lines)
+│   │   │   │       │   │   │   │   └── ShelfSelectionDialog.tsx (158 lines)
 │   │   │   │       │   │   │   ├── containers/
-│   │   │   │       │   │   │   │   ├── ShelfDetailContainer.tsx (162 lines)
+│   │   │   │       │   │   │   │   ├── ShelfDetailContainer.tsx (169 lines)
 │   │   │   │       │   │   │   │   └── ShelfLists.tsx (217 lines)
 │   │   │   │       │   │   │   └── hooks/
 │   │   │   │       │   │   │       ├── index.ts (4 lines)
-│   │   │   │       │   │   │       ├── useAddToShelf.ts (118 lines)
-│   │   │   │       │   │   │       ├── usePublicShelfOperations.ts (61 lines)
-│   │   │   │       │   │   │       └── useShelfOperations.ts (220 lines)
+│   │   │   │       │   │   │       ├── useAddToShelf.ts (132 lines)
+│   │   │   │       │   │   │       ├── usePublicShelfOperations.ts (62 lines)
+│   │   │   │       │   │   │       └── useShelfOperations.ts (214 lines)
 │   │   │   │       │   │   └── shelf-settings/
 │   │   │   │       │   │       ├── components/
 │   │   │   │       │   │       │   ├── ShelfMetricsDisplay.tsx (143 lines)
 │   │   │   │       │   │       │   ├── ShelfSettings.tsx (191 lines)
-│   │   │   │       │   │       │   ├── ShelfSettingsDialog.tsx (199 lines)
+│   │   │   │       │   │       │   ├── ShelfSettingsDialog.tsx (378 lines)
 │   │   │   │       │   │       │   └── index.ts (3 lines)
 │   │   │   │       │   │       ├── hooks/
 │   │   │   │       │   │       │   ├── index.ts (2 lines)
@@ -871,9 +874,9 @@
 │   │   │   │       │   │           └── index.ts (2 lines)
 │   │   │   │       │   ├── hooks/
 │   │   │   │       │   │   └── useContentPermissions.ts (75 lines)
-│   │   │   │       │   ├── index.tsx (16 lines)
+│   │   │   │       │   ├── index.tsx (22 lines)
 │   │   │   │       │   ├── layouts/
-│   │   │   │       │   │   └── PerpetuaLayout.tsx (215 lines)
+│   │   │   │       │   │   └── PerpetuaLayout.tsx (220 lines)
 │   │   │   │       │   ├── routes.ts (119 lines)
 │   │   │   │       │   ├── state/
 │   │   │   │       │   │   ├── cache/
@@ -883,7 +886,7 @@
 │   │   │   │       │   │   │   ├── usePerpetuaActions.ts (147 lines)
 │   │   │   │       │   │   │   └── usePerpetuaSelectors.ts (62 lines)
 │   │   │   │       │   │   ├── index.ts (49 lines)
-│   │   │   │       │   │   ├── perpetuaSlice.ts (645 lines)
+│   │   │   │       │   │   ├── perpetuaSlice.ts (666 lines)
 │   │   │   │       │   │   ├── services/
 │   │   │   │       │   │   │   └── perpetuaService.ts (580 lines)
 │   │   │   │       │   │   ├── thunks/
@@ -895,7 +898,7 @@
 │   │   │   │       │   │   │   └── shelfThunks.ts (152 lines)
 │   │   │   │       │   ├── types/
 │   │   │   │       │   │   ├── item.types.ts (27 lines)
-│   │   │   │       │   │   ├── reordering.types.ts (68 lines)
+│   │   │   │       │   │   ├── reordering.types.ts (69 lines)
 │   │   │   │       │   │   └── shelf.types.ts (74 lines)
 │   │   │   │       │   └── utils.tsx (136 lines)
 │   │   │   │       └── Syllogos/
@@ -1637,7 +1640,7 @@
 │   ├── perpetua/
 │   │   ├── Cargo.toml (20 lines)
 │   │   ├── perpetua.did (88 lines)
-│   │   ├── perpetua.md (274 lines)
+│   │   ├── perpetua.md (267 lines)
 │   │   └── src/
 │   │       ├── auth.rs (165 lines)
 │   │       ├── guard.rs (11 lines)
@@ -1668,7 +1671,7 @@
 │   │   ├── lbryfun.md (122 lines)
 │   │   ├── likes.md (9 lines)
 │   │   ├── milestones.md (119 lines)
-│   │   ├── plan.md (106 lines)
+│   │   ├── plan.md (103 lines)
 │   │   ├── scripts/
 │   │   │   ├── basic.sh (106 lines)
 │   │   │   ├── build.sh (161 lines)

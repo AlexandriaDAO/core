@@ -76,36 +76,51 @@ export const reorderProfileShelf = createAsyncThunk(
     before: boolean,
     principal: Principal | string,
     newShelfOrder?: string[] // Optional complete order for optimistic updates
-  }, { rejectWithValue }) => {
+  }, { rejectWithValue, dispatch }) => {
     try {      
+      // Ensure principal is a string to avoid serialization issues
+      const principalStr = typeof principal === 'string' 
+        ? principal 
+        : principal.toString();
+        
+      // CRITICAL: Apply optimistic update immediately before API call for responsive UI
+      if (newShelfOrder) {
+        // Directly update the Redux store with the new order
+        dispatch(updateShelfOrder(newShelfOrder));
+      }
+      
+      // Then make the actual API call
       const result = await perpetuaService.reorderProfileShelf(
         shelfId,
         referenceShelfId,
         before
       );
       
-      if ("Ok" in result && result.Ok) {
+      if ("Ok" in result) {
         // Invalidate all relevant caches
-        cacheManager.invalidateForPrincipal(principal);
+        cacheManager.invalidateForPrincipal(principalStr);
         cacheManager.invalidateForShelf(shelfId);
         if (referenceShelfId) {
           cacheManager.invalidateForShelf(referenceShelfId);
         }
         
-        // Convert principal for API if needed
-        const principalForApi = toPrincipal(principal);
+        // Force a reload of shelves to ensure we get the updated order
+        await dispatch(loadShelves(principalStr)).unwrap();
         
+        // Return serializable values only
         return { 
           shelfId, 
           referenceShelfId, 
           before,
-          principal: principalForApi, 
+          principal: principalStr, // Use string instead of Principal object
           newShelfOrder,
           success: true
         };
       } 
       
       if ("Err" in result && result.Err) {
+        // If there's an error, revert the optimistic update by forcing a refetch
+        dispatch(loadShelves(principalStr));
         return rejectWithValue(result.Err);
       }
       

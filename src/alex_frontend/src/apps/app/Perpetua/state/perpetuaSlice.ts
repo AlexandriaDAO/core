@@ -648,19 +648,34 @@ export const selectIsEditor = (contentId: string) => {
 export const selectUserShelvesForUser = createSelector(
   [
     selectShelvesEntities,
+    selectUserShelvesOrder,
     (_state: RootState, userId: string) => userId
   ],
-  (shelves, userId) => {
-    const userShelves = Object.values(shelves)
-      .filter(shelf => shelf && shelf.owner === userId)
-      .sort((a, b) => {
-        // Sort by createdAt if available, otherwise keep original order
-        if (a.created_at && b.created_at) {
-          return Number(b.created_at) - Number(a.created_at); // Newest first
-        }
-        return 0;
-      });
+  (shelves, userShelvesOrder, userId) => {
+    // First check if we're looking at shelves for the current logged-in user
+    // We can determine this by checking if any shelves in the ordered list belong to this user
+    const isCurrentUserProfile = userShelvesOrder.length > 0 && 
+      shelves[userShelvesOrder[0]]?.owner === userId;
     
-    return userShelves;
+    if (isCurrentUserProfile) {
+      // For current user, respect the custom order from userShelvesOrder
+      // But filter to ensure we only include this user's shelves (in case of any stale data)
+      return userShelvesOrder
+        .map(id => shelves[id])
+        .filter(shelf => shelf && shelf.owner === userId);
+    } else {
+      // For other users, fall back to timestamp-based ordering
+      const userShelves = Object.values(shelves)
+        .filter(shelf => shelf && shelf.owner === userId)
+        .sort((a, b) => {
+          // Sort by createdAt if available, otherwise keep original order
+          if (a.created_at && b.created_at) {
+            return Number(b.created_at) - Number(a.created_at); // Newest first
+          }
+          return 0;
+        });
+      
+      return userShelves;
+    }
   }
 );

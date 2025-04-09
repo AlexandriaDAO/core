@@ -90,18 +90,34 @@ export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = React.memo(({
   const handleSaveOrder = useCallback(async (newShelfOrder: string[]) => {
     if (!identity || newShelfOrder.length < 2) return;
     
-    // Use the first two items for reordering reference
+    // Find the original positions of shelves to determine what moved
+    const originalOrder = shelves.map(shelf => shelf.shelf_id);
+    console.log('Original order:', originalOrder);
+    console.log('New order:', newShelfOrder);
+    
+    // Instead of sending an empty shelfId, use the first item in the new order
+    // and the second item as reference, with before=true
     const shelfId = newShelfOrder[0];
     const referenceShelfId = newShelfOrder[1];
     
-    await dispatch(reorderProfileShelf({
-      shelfId,
-      referenceShelfId,
-      before: true,
-      principal: identity.getPrincipal(),
-      newShelfOrder
-    }));
-  }, [dispatch, identity]);
+    // CRITICAL: Convert Principal to string to avoid serialization issues
+    const principalStr = identity.getPrincipal().toString();
+    
+    try {
+      // Pass the complete newShelfOrder for optimistic updates in Redux
+      await dispatch(reorderProfileShelf({
+        shelfId,
+        referenceShelfId,
+        before: true,
+        principal: principalStr,
+        newShelfOrder
+      })).unwrap();
+      
+      console.log("Shelf reorder successful!");
+    } catch (error) {
+      console.error("Failed to reorder shelf:", error);
+    }
+  }, [dispatch, identity, shelves]);
 
   return (
     <BaseShelfList
@@ -180,17 +196,37 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
   const handleSaveOrder = useCallback(async (newShelfOrder: string[]) => {
     if (!identity || !currentUserIsOwner || newShelfOrder.length < 2) return;
     
+    // Find the original positions of shelves to determine what moved
+    const originalOrder = shelves.map(shelf => shelf.shelf_id);
+    console.log('Original order:', originalOrder);
+    console.log('New order:', newShelfOrder);
+    
+    // Instead of sending an empty shelfId, use the first item in the new order
+    // and the second item as reference, with before=true
     const shelfId = newShelfOrder[0];
     const referenceShelfId = newShelfOrder[1];
     
-    await dispatch(reorderProfileShelf({
-      shelfId,
-      referenceShelfId,
-      before: true,
-      principal: ownerName || identity.getPrincipal(),
-      newShelfOrder
-    }));
-  }, [dispatch, identity, currentUserIsOwner, ownerName]);
+    console.log(`Moving shelf ${shelfId} before ${referenceShelfId}`);
+    
+    // CRITICAL: Ensure principal is a string, not a Principal object
+    const principalStr = typeof ownerName === 'string' ? 
+      ownerName : identity.getPrincipal().toString();
+    
+    try {
+      // Pass the complete newShelfOrder for optimistic updates in Redux
+      await dispatch(reorderProfileShelf({
+        shelfId,
+        referenceShelfId,
+        before: true,
+        principal: principalStr,
+        newShelfOrder
+      })).unwrap();
+      
+      console.log("Shelf reorder successful!");
+    } catch (error) {
+      console.error("Failed to reorder shelf:", error);
+    }
+  }, [dispatch, identity, shelves, currentUserIsOwner, ownerName]);
   
   const title = useMemo(() => 
     ownerName ? `Shelves by ${ownerName.slice(0, 8)}...` : 'User Shelves',
@@ -214,4 +250,4 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
   );
 }, areShelvesPropsEqual);
 
-UserShelvesUI.displayName = 'UserShelvesUI'; 
+UserShelvesUI.displayName = 'UserShelvesUI';

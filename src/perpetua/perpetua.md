@@ -14,15 +14,15 @@ Perpetua/
 ├── features/
 │   ├── cards/
 │   │   ├── components/
-│   │   │   ├── BaseShelfList.tsx (415 lines)
+│   │   │   ├── BaseShelfList.tsx (413 lines)
 │   │   │   ├── ContentDisplays.tsx (103 lines)
-│   │   │   ├── NftDisplay.tsx (310 lines)
-│   │   │   ├── ShelfBlogView.tsx (194 lines)
-│   │   │   ├── ShelfCard.tsx (147 lines)
+│   │   │   ├── NftDisplay.tsx (298 lines)
+│   │   │   ├── ShelfBlogView.tsx (191 lines)
+│   │   │   ├── ShelfCard.tsx (276 lines)
 │   │   │   ├── ShelfCardActionMenu.tsx (159 lines)
 │   │   │   ├── ShelfContentCard.tsx (131 lines)
-│   │   │   ├── ShelfContentModal.tsx (99 lines)
-│   │   │   ├── ShelfDetailView.tsx (197 lines)
+│   │   │   ├── ShelfContentModal.tsx (79 lines)
+│   │   │   ├── ShelfDetailView.tsx (227 lines)
 │   │   │   ├── ShelfEmptyView.tsx (32 lines)
 │   │   │   ├── ShelfGridView.tsx (57 lines)
 │   │   │   ├── ShelfViewControls.tsx (127 lines)
@@ -32,12 +32,11 @@ Perpetua/
 │   │   │   ├── index.ts (1 lines)
 │   │   │   └── useNftData.ts (156 lines)
 │   │   └── utils/
-│   │       └── ShelfViewUtils.ts (44 lines)
+│   │       └── ShelfViewUtils.ts (32 lines)
 │   ├── items/
 │   │   ├── components/
-│   │   │   ├── ItemActionMenu.tsx (61 lines)
-│   │   │   ├── NewItem.tsx (391 lines)
-│   │   │   ├── NftSearch.tsx (321 lines)
+│   │   │   ├── AlexandrianSelector.tsx (223 lines)
+│   │   │   ├── InlineItemCreator.tsx (433 lines)
 │   │   │   └── index.ts (5 lines)
 │   │   ├── hooks/
 │   │   │   └── useItemActions.tsx (116 lines)
@@ -45,10 +44,13 @@ Perpetua/
 │   ├── shared/
 │   │   └── reordering/
 │   │       ├── components/
-│   │       │   ├── ItemReorderManager.tsx (45 lines)
-│   │       │   ├── ReorderableGrid.tsx (88 lines)
-│   │       │   └── ReorderableList.tsx (74 lines)
+│   │       │   ├── ItemReorderManager.tsx (22 lines)
+│   │       │   ├── ReorderableContainer.tsx (63 lines)
+│   │       │   ├── ReorderableGrid.tsx (97 lines)
+│   │       │   ├── ReorderableList.tsx (80 lines)
+│   │       │   └── index.ts (4 lines)
 │   │       ├── hooks/
+│   │       │   ├── index.ts (4 lines)
 │   │       │   ├── useDragAndDrop.ts (108 lines)
 │   │       │   ├── useItemReordering.ts (80 lines)
 │   │       │   ├── useReorderable.ts (217 lines)
@@ -61,24 +63,24 @@ Perpetua/
 │   │       └── CollaboratorsList.tsx (185 lines)
 │   ├── shelf-management/
 │   │   ├── components/
-│   │   │   ├── NewShelf.tsx (97 lines)
-│   │   │   ├── RemoveItemButton.tsx (110 lines)
+│   │   │   ├── NewShelf.tsx (104 lines)
+│   │   │   ├── RemoveItemButton.tsx (98 lines)
 │   │   │   ├── ShelfContent.tsx (80 lines)
-│   │   │   ├── ShelfOption.tsx (30 lines)
-│   │   │   └── ShelfSelectionDialog.tsx (134 lines)
+│   │   │   ├── ShelfOption.tsx (31 lines)
+│   │   │   └── ShelfSelectionDialog.tsx (158 lines)
 │   │   ├── containers/
-│   │   │   ├── ShelfDetailContainer.tsx (162 lines)
+│   │   │   ├── ShelfDetailContainer.tsx (169 lines)
 │   │   │   └── ShelfLists.tsx (217 lines)
 │   │   └── hooks/
 │   │       ├── index.ts (4 lines)
-│   │       ├── useAddToShelf.ts (118 lines)
-│   │       ├── usePublicShelfOperations.ts (61 lines)
-│   │       └── useShelfOperations.ts (220 lines)
+│   │       ├── useAddToShelf.ts (132 lines)
+│   │       ├── usePublicShelfOperations.ts (62 lines)
+│   │       └── useShelfOperations.ts (214 lines)
 │   └── shelf-settings/
 │       ├── components/
 │       │   ├── ShelfMetricsDisplay.tsx (143 lines)
 │       │   ├── ShelfSettings.tsx (191 lines)
-│       │   ├── ShelfSettingsDialog.tsx (199 lines)
+│       │   ├── ShelfSettingsDialog.tsx (378 lines)
 │       │   └── index.ts (3 lines)
 │       ├── hooks/
 │       │   ├── index.ts (2 lines)
@@ -89,9 +91,9 @@ Perpetua/
 │           └── index.ts (2 lines)
 ├── hooks/
 │   └── useContentPermissions.ts (75 lines)
-├── index.tsx (16 lines)
+├── index.tsx (22 lines)
 ├── layouts/
-│   └── PerpetuaLayout.tsx (215 lines)
+│   └── PerpetuaLayout.tsx (220 lines)
 ├── routes.ts (119 lines)
 ├── state/
 │   ├── cache/
@@ -101,7 +103,7 @@ Perpetua/
 │   │   ├── usePerpetuaActions.ts (147 lines)
 │   │   └── usePerpetuaSelectors.ts (62 lines)
 │   ├── index.ts (49 lines)
-│   ├── perpetuaSlice.ts (645 lines)
+│   ├── perpetuaSlice.ts (666 lines)
 │   ├── services/
 │   │   └── perpetuaService.ts (580 lines)
 │   ├── thunks/
@@ -113,7 +115,7 @@ Perpetua/
 │   │   └── shelfThunks.ts (152 lines)
 ├── types/
 │   ├── item.types.ts (27 lines)
-│   ├── reordering.types.ts (68 lines)
+│   ├── reordering.types.ts (69 lines)
 │   └── shelf.types.ts (74 lines)
 └── utils.tsx (136 lines)
 ```
@@ -124,30 +126,23 @@ Perpetua/
 
 
 
+- Grid fixes. They're all broken.
 
 
+- PerpetuaSlice needs: (editors, appears_in.length())
 
-
-
-- The add to shelf modal looks like shit.
-
-
-
-
-## V1 Features
-
-
+- Shelf settings needs to be cleaned up. It looks like 2 different views, and is open to everyone. It should only appear if it's your shelf, and only show the edit mode. That info is otherwise availible elsewhere.
 
 - Add appears-in in the frontend.
 - Add tags to the frontend.
 - Add number of items as a shelf details.
  
 - Payment for all/some actions.
-- Test edit stuff.
 - Add a 'collaborator' list to the shelves list that they could add items to.
 
 - Backup system for all data.
 - 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
+- Make public, i.e., anyone can edit a shelf.
 
 ## V2 Features: 
 

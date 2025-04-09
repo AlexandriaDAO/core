@@ -2,9 +2,12 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { ArrowLeft, Plus, Edit, X, RotateCcw, Save, AlertCircle } from "lucide-react";
-import { ShelfCard, PublicShelfCard } from './ShelfCard';
+import { ShelfCard } from './ShelfCard';
 import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 import { toast } from 'sonner';
+import { useDragAndDrop } from '../../shared/reordering/hooks/useDragAndDrop';
+import { ReorderableGrid } from '../../shared/reordering/components/ReorderableGrid';
+import { ReorderableItem } from '../../../types/reordering.types';
 
 // Types for the component
 export interface BaseShelfListProps {
@@ -32,11 +35,19 @@ const getShelfEssentials = (shelf: Shelf) => ({
   owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString(),
 });
 
-// Drag and drop types
-interface DragState {
-  isDragging: boolean;
-  dragIndex: number;
-  shelfIds: string[];
+// Type for ListHeader props
+interface ListHeaderProps {
+  isEditMode: boolean;
+  enterEditMode: () => void;
+  cancelEditMode: () => void;
+  saveShelfOrder: () => Promise<void>;
+  saveInProgress: boolean;
+  saveError: string | null;
+}
+
+// Interface for reorderable shelf items
+interface ReorderableShelfItem extends ReorderableItem {
+  shelf: Shelf;
 }
 
 /**
@@ -59,150 +70,40 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
   onSaveOrder,
   checkEditAccess
 }) => {
-  // State management
+  // Simple UI state - no complex state management
   const [isEditMode, setIsEditMode] = useState(false);
   const [saveInProgress, setSaveInProgress] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   
-  // Memoize shelf data to minimize re-renders
-  const shelfEssentials = useMemo(() => 
-    shelves.map(getShelfEssentials), 
+  // Convert shelves to reorderable format for drag-and-drop UI
+  const reorderableShelves = useMemo(() => 
+    shelves.map((shelf: Shelf) => ({ id: shelf.shelf_id, shelf })),
     [shelves]
   );
   
-  const memoizedShelves = useMemo(() => shelves, [shelfEssentials]);
+  // Local state just for visual drag-and-drop
+  const [draggedShelves, setDraggedShelves] = useState<ReorderableShelfItem[]>([]);
   
-  // Drag state
-  const [dragState, setDragState] = useState<DragState>({
-    isDragging: false,
-    dragIndex: -1,
-    shelfIds: shelves.map(shelf => shelf.shelf_id)
-  });
-  
-  // Update shelf order when shelves prop changes
+  // Update dragged shelves when original shelves change or entering edit mode
   React.useEffect(() => {
-    if (!isEditMode) {
-      setDragState(prev => ({
-        ...prev,
-        shelfIds: memoizedShelves.map(shelf => shelf.shelf_id)
-      }));
+    // Always update to match the current shelves from props when not in edit mode
+    // or when first entering edit mode
+    if (!isEditMode || draggedShelves.length === 0) {
+      setDraggedShelves(reorderableShelves);
     }
-  }, [memoizedShelves, isEditMode]);
+  }, [isEditMode, reorderableShelves, draggedShelves.length]);
   
-  // Drag and drop handlers
-  const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
-    e.dataTransfer.effectAllowed = 'move';
-    setDragState(prev => ({
-      ...prev,
-      isDragging: true,
-      dragIndex: index
-    }));
-  }, []);
-  
-  const handleDragOver = useCallback((e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    if (dragState.dragIndex === index) return;
-    
-    setDragState(prev => {
-      if (prev.dragIndex === index) return prev;
-      
-      const newShelfIds = [...prev.shelfIds];
-      const draggedId = newShelfIds[prev.dragIndex];
-      
-      newShelfIds.splice(prev.dragIndex, 1);
-      newShelfIds.splice(index, 0, draggedId);
-      
-      return {
-        ...prev,
-        dragIndex: index,
-        shelfIds: newShelfIds
-      };
-    });
-  }, [dragState.dragIndex]);
-  
-  const handleDragEnd = useCallback(() => {
-    setDragState(prev => ({
-      ...prev,
-      isDragging: false
-    }));
-  }, []);
-  
-  const handleDrop = useCallback((e: React.DragEvent, index: number) => {
-    e.preventDefault();
-    setDragState(prev => ({
-      ...prev,
-      isDragging: false
-    }));
-  }, []);
-  
-  // Edit mode handlers
-  const enterEditMode = useCallback(() => {
-    setIsEditMode(true);
-    setSaveError(null);
-    setDragState(prev => ({
-      ...prev,
-      isDragging: false,
-      dragIndex: -1,
-      shelfIds: shelves.map(shelf => shelf.shelf_id)
-    }));
-  }, [shelves]);
-  
-  const cancelEditMode = useCallback(() => {
-    setIsEditMode(false);
-    setSaveError(null);
-    setDragState({
-      isDragging: false,
-      dragIndex: -1,
-      shelfIds: shelves.map(shelf => shelf.shelf_id)
-    });
-  }, [shelves]);
-  
-  const handleSaveOrder = useCallback(async () => {
-    if (!onSaveOrder) return;
-    
-    setSaveInProgress(true);
-    setSaveError(null);
-    
-    try {
-      await onSaveOrder(dragState.shelfIds);
-      toast.success("Shelf order saved successfully");
-      setIsEditMode(false);
-    } catch (error) {
-      console.error("[Shelf Reordering] Error saving order:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to save shelf order";
-      
-      setSaveError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setSaveInProgress(false);
-    }
-  }, [dragState.shelfIds, onSaveOrder]);
-  
-  // Get shelves in current order
-  const orderedShelves = useMemo(() => {
-    if (!isEditMode) return shelves;
-    
-    return dragState.shelfIds
-      .map(id => shelves.find(shelf => shelf.shelf_id === id))
-      .filter(Boolean) as Shelf[];
-  }, [shelves, isEditMode, dragState.shelfIds]);
-  
-  // Helper for getting drag props
-  const getDragProps = useCallback((index: number) => {
-    if (!isEditMode) return { draggable: false, className: "" };
-    
-    return {
-      draggable: true,
-      onDragStart: (e: React.DragEvent) => handleDragStart(e, index),
-      onDragOver: (e: React.DragEvent) => handleDragOver(e, index),
-      onDragEnd: handleDragEnd,
-      onDrop: (e: React.DragEvent) => handleDrop(e, index),
-      style: dragState.isDragging && index === dragState.dragIndex 
-        ? { opacity: 0.5, border: '2px dashed var(--border)' } 
-        : {},
-      className: "cursor-move transition-all duration-200"
-    };
-  }, [isEditMode, handleDragStart, handleDragOver, handleDragEnd, handleDrop, dragState]);
+  // Hook for drag and drop UI functionality
+  const {
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+    handleDrop,
+    getDragItemStyle
+  } = useDragAndDrop(draggedShelves, (newItems) => {
+    setDraggedShelves(newItems);
+    console.log("Items reordered in UI:", newItems.map(item => item.id));
+  });
   
   const handleGoBack = useCallback(() => {
     if (onBack) {
@@ -212,16 +113,51 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
     }
   }, [onBack]);
   
-  // Shelf view handler
-  const getShelfViewHandler = useCallback((shelfId: string) => {
-    if (!isEditMode && onViewShelf) {
-      return (id: string) => onViewShelf(id);
+  // Simple edit mode handlers
+  const enterEditMode = useCallback(() => {
+    setIsEditMode(true);
+    setSaveError(null);
+    setDraggedShelves(reorderableShelves); // Start with current order
+  }, [reorderableShelves]);
+  
+  const cancelEditMode = useCallback(() => {
+    setIsEditMode(false);
+    setSaveError(null);
+  }, []);
+  
+  // Save order through parent callback
+  const handleSaveOrder = useCallback(async () => {
+    if (!onSaveOrder) return;
+    
+    setSaveInProgress(true);
+    setSaveError(null);
+    
+    try {
+      // Get the current visual order of shelves
+      const shelfIds = draggedShelves.map(item => item.shelf.shelf_id);
+      console.log("Saving new shelf order:", shelfIds);
+      
+      // Let parent handle the actual saving
+      await onSaveOrder(shelfIds);
+      
+      toast.success("Shelf order saved");
+      setIsEditMode(false);
+      
+      // Don't reset draggedShelves here - let Redux update the shelves prop
+      // which will trigger our useEffect to update draggedShelves
+    } catch (error) {
+      console.error("[Shelf Reordering] Error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to save order";
+      
+      setSaveError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setSaveInProgress(false);
     }
-    return undefined;
-  }, [onViewShelf, isEditMode]);
+  }, [draggedShelves, onSaveOrder]);
   
   // Sub-component for rendering the header
-  const ListHeader = () => (
+  const ListHeader = ({ isEditMode, enterEditMode, cancelEditMode, saveShelfOrder, saveInProgress, saveError }: ListHeaderProps) => (
     <div className="flex flex-col gap-4 mb-6">
       {showBackButton && (
         <div className="flex items-center">
@@ -277,7 +213,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
                 <Button 
                   variant="primary" 
                   className="flex items-center gap-1"
-                  onClick={handleSaveOrder}
+                  onClick={saveShelfOrder}
                   disabled={saveInProgress}
                 >
                   <Save className="w-4 h-4" />
@@ -317,66 +253,86 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
     </div>
   );
 
-  // Sub-component for rendering shelf cards
-  const ShelfCardList = () => (
-    <>
-      <ContentGrid>
-        {orderedShelves.map((shelf, index) => {
-          const dragProps = getDragProps(index);
-          const isCurrentUserShelf = isCurrentUserProfile || 
-            (checkEditAccess && checkEditAccess(shelf.shelf_id));
-          
-          // Create a composite key using both shelf ID and index to ensure uniqueness
-          const uniqueKey = `${shelf.shelf_id}-${index}`;
-          
-          return (
-            <div 
-              key={uniqueKey}
-              {...dragProps}
-            >
-              {isCurrentUserShelf ? (
-                <ShelfCard
-                  shelf={shelf}
-                  onViewShelf={getShelfViewHandler(shelf.shelf_id)}
-                  isReordering={isEditMode}
-                />
-              ) : (
-                <PublicShelfCard
-                  shelf={shelf}
-                  onViewShelf={getShelfViewHandler(shelf.shelf_id)}
-                  isReordering={isEditMode}
-                />
-              )}
-            </div>
-          );
-        })}
-      </ContentGrid>
-      
-      {onLoadMore && (
-        <div className="mt-6 text-center">
-          <Button 
-            variant="outline" 
-            onClick={onLoadMore} 
-            disabled={loading || saveInProgress}
-          >
-            Load More
-          </Button>
-        </div>
-      )}
-    </>
-  );
-  
+  // Shelf card renderer with better visual feedback
+  const renderShelfCard = (item: ReorderableShelfItem, index: number, isDragging: boolean) => {
+    const shelf = item.shelf;
+    
+    return (
+      <div className={`transition-all duration-200 ${isDragging ? 'opacity-75 scale-[0.98] shadow-md' : ''}`}>
+        <ShelfCard
+          shelf={shelf}
+          onViewShelf={!isEditMode && onViewShelf ? () => onViewShelf(shelf.shelf_id) : undefined}
+          isReordering={isEditMode}
+          parentShelfId={undefined}
+          itemId={undefined}
+          showCollaborationInfo={false}
+        />
+      </div>
+    );
+  };
+
   // Main render
   return (
     <div className="h-full flex flex-col">
-      <ListHeader />
+      <ListHeader 
+        isEditMode={isEditMode}
+        enterEditMode={enterEditMode}
+        cancelEditMode={cancelEditMode}
+        saveShelfOrder={handleSaveOrder}
+        saveInProgress={saveInProgress}
+        saveError={saveError}
+      />
       
-      {loading && shelves.length === 0 ? (
+      {shelves.length === 0 && loading ? (
         <div className="text-center py-10">Loading shelves...</div>
       ) : shelves.length === 0 ? (
         <EmptyState />
       ) : (
-        <ShelfCardList />
+        <>
+          {isEditMode ? (
+            /* Visual drag-and-drop interface when in edit mode */
+            <ReorderableGrid
+              items={draggedShelves}
+              isEditMode={true}
+              handleDragStart={handleDragStart}
+              handleDragOver={handleDragOver}
+              handleDragEnd={handleDragEnd}
+              handleDrop={handleDrop}
+              getDragItemStyle={getDragItemStyle}
+              renderItem={renderShelfCard}
+              columns={3}
+              gap={4}
+            />
+          ) : (
+            /* Regular grid when not in edit mode */
+            <ContentGrid>
+              {shelves.map((shelf: Shelf) => (
+                <div key={shelf.shelf_id}>
+                  <ShelfCard
+                    shelf={shelf}
+                    onViewShelf={onViewShelf ? () => onViewShelf(shelf.shelf_id) : undefined}
+                    isReordering={false}
+                    parentShelfId={undefined}
+                    itemId={undefined}
+                    showCollaborationInfo={false}
+                  />
+                </div>
+              ))}
+            </ContentGrid>
+          )}
+          
+          {onLoadMore && (
+            <div className="mt-6 text-center">
+              <Button 
+                variant="outline" 
+                onClick={onLoadMore} 
+                disabled={loading || saveInProgress || isEditMode}
+              >
+                Load More
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

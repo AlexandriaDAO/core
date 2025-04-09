@@ -415,13 +415,16 @@ class PerpetuaService {
         before
       );
       
+      // Important: The API returns { Ok: null } on success, not { Ok: true }
+      // Need to check just for "Ok" property existence, not its value
       if ("Ok" in result) {
         return { Ok: true };
-      } else {
+      } else if ("Err" in result) {
         return { Err: result.Err };
       }
+      
+      return { Err: "Unknown response from backend" };
     } catch (error) {
-      console.error('Error in reorderProfileShelf:', error);
       return { Err: "Failed to reorder shelf" };
     }
   }
