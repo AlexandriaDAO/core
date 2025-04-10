@@ -6,8 +6,6 @@ export interface ShelfMetrics {
   min_gap: number;
   max_gap: number;
   avg_gap: number;
-  rebalance_count: number;
-  needs_rebalance: boolean;
 }
 
 export const useShelfMetrics = (shelfId: string, isExpanded: boolean) => {

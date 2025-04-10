@@ -193,20 +193,4 @@ pub fn cleanup_unused_tags() -> Result<usize, String> {
     // This function should be called periodically by system maintenance
     let removed_count = crate::storage::cleanup_unused_tags();
     Ok(removed_count)
-}
-
-/// Manually rebalances the item positions within a shelf
-/// 
-/// This can be useful when many reorderings have caused position values to become too close,
-/// which could lead to precision issues or unexpected ordering behavior.
-#[ic_cdk::update(guard = "not_anon")]
-pub fn rebalance_shelf_items(shelf_id: String) -> Result<(), String> {
-    let caller = ic_cdk::caller();
-    
-    // Use the auth helper to handle edit permissions check and update
-    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
-        // Force a rebalance
-        shelf.rebalance_positions();
-        Ok(())
-    })
 } 

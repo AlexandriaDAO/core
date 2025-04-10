@@ -1,14 +1,14 @@
 use ic_cdk;
 
 use crate::storage::{USER_SHELVES, USER_PROFILE_ORDER};
-use crate::ordering::{PositionedOrdering, ensure_balanced_positions};
+use crate::ordering::{PositionedOrdering};
 use crate::guard::not_anon;
 
 // Constants for profile shelf positioning
-const PROFILE_SHELF_THRESHOLDS: [(usize, f64); 2] = [
-    (100, 1e-8),
-    (0, 1e-6)
-];
+// const PROFILE_SHELF_THRESHOLDS: [(usize, f64); 2] = [
+//     (100, 1e-8),
+//     (0, 1e-6)
+// ];
 
 const PROFILE_SHELF_STEP_SIZE: f64 = 1000.0;
 
@@ -71,7 +71,7 @@ pub fn reorder_profile_shelf(shelf_id: String, reference_shelf_id: Option<String
             }
         }
         
-        // Calculate the new position
+        // Calculate the new position - pass mutable borrow
         let new_position = user_order.shelf_positions.calculate_position(
             ref_shelf_id_ref, 
             before, 
@@ -80,9 +80,6 @@ pub fn reorder_profile_shelf(shelf_id: String, reference_shelf_id: Option<String
         
         // Update the shelf position
         user_order.shelf_positions.insert(shelf_id, new_position);
-        
-        // Check if positions need rebalancing using the shared implementation
-        ensure_balanced_positions(&mut user_order.shelf_positions, &PROFILE_SHELF_THRESHOLDS, PROFILE_SHELF_STEP_SIZE);
         
         // Save changes
         profile_map.insert(caller, user_order);

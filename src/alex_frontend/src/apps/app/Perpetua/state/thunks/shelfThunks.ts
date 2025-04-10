@@ -74,38 +74,6 @@ export const updateShelfMetadata = createAsyncThunk(
 );
 
 /**
- * Rebalance shelf items to optimize item order values
- */
-export const rebalanceShelfItems = createAsyncThunk(
-  'perpetua/rebalanceShelfItems',
-  async ({ 
-    shelfId, 
-    principal 
-  }: { 
-    shelfId: string, 
-    principal: Principal | string 
-  }, { rejectWithValue }) => {
-    try {
-      const result = await perpetuaService.rebalanceShelfItems(shelfId);
-      
-      if ("Ok" in result && result.Ok) {
-        // Invalidate cache for this shelf
-        cacheManager.invalidateForShelf(shelfId);
-        return { shelfId };
-      } 
-      
-      if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
-      }
-      
-      return rejectWithValue("Failed to rebalance shelf items");
-    } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, "Failed to rebalance shelf items"));
-    }
-  }
-);
-
-/**
  * Create a new shelf and add it as an item to a parent shelf
  */
 export const createAndAddShelfItem = createAsyncThunk(

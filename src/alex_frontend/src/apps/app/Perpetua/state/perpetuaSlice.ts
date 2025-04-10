@@ -10,7 +10,6 @@ import {
 import {
   createShelf,
   updateShelfMetadata,
-  rebalanceShelfItems,
   createAndAddShelfItem
 } from './thunks/shelfThunks';
 import {
@@ -303,17 +302,6 @@ const perpetuaSlice = createSlice({
         }
       })
       .addCase(updateShelfMetadata.rejected, (state, action) => {
-        state.error = action.payload as string;
-      })
-      
-      // Handle rebalanceShelfItems
-      .addCase(rebalanceShelfItems.pending, (state) => {
-        state.error = null;
-      })
-      .addCase(rebalanceShelfItems.fulfilled, (state) => {
-        // We'll get the updated shelf via getShelfById, so no need to modify state here
-      })
-      .addCase(rebalanceShelfItems.rejected, (state, action) => {
         state.error = action.payload as string;
       })
       

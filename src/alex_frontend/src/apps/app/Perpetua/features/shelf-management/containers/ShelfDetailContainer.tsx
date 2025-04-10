@@ -4,7 +4,7 @@ import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { rebalanceShelfItems, selectOptimisticShelfItemOrder } from "@/apps/app/Perpetua/state";
+import { selectOptimisticShelfItemOrder } from "@/apps/app/Perpetua/state";
 import { ItemReorderManager } from "../../shared/reordering/components";
 import { ShelfDetailView } from "../../cards/components/ShelfDetailView";
 import { ShelfSettingsDialog } from "../../shelf-settings";
@@ -84,14 +84,6 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 		})
 	]);
 	
-	// Handler for rebalancing shelf items
-	const handleRebalance = async (shelfId: string) => {
-		if (!identity || !hasEditAccess || !identity.identity) return;
-		
-		const principal = identity.identity.getPrincipal().toString();
-		dispatch(rebalanceShelfItems({ shelfId, principal }));
-	};
-	
 	// Handle item click to navigate to item shelf if applicable
 	const handleViewItem = (itemId: number) => {
 		const itemEntry = orderedItems.find(([key]) => key === itemId);
@@ -153,7 +145,6 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 						hasEditAccess && !isEditMode ? (
 							<ShelfSettingsDialog 
 								shelf={shelf} 
-								onRebalance={handleRebalance} 
 								onUpdateMetadata={updateMetadata}
 								className="mr-2"
 							/>

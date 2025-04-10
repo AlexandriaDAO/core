@@ -36,17 +36,13 @@ type Shelf = record {
   description : opt text;
   created_at : nat64;
   shelf_id : text;
-  rebalance_count : nat32;
   item_positions : vec record { nat32; float64 };
   items : vec record { nat32; Item };
-  needs_rebalance : bool;
 };
 type ShelfPositionMetrics = record {
   min_gap : float64;
-  rebalance_count : nat32;
   avg_gap : float64;
   max_gap : float64;
-  needs_rebalance : bool;
   item_count : nat64;
 };
 type TagOperation = record { tag : text; shelf_id : text };
@@ -74,7 +70,6 @@ service : {
   get_tags_with_prefix : (text, nat32) -> (vec text) query;
   get_user_shelves : (principal, opt nat64) -> (Result_3) query;
   list_shelf_editors : (text) -> (Result_7) query;
-  rebalance_shelf_items : (text) -> (Result);
   remove_item_from_shelf : (text, nat32) -> (Result);
   remove_shelf_editor : (text, principal) -> (Result);
   remove_tag_from_shelf : (TagOperation) -> (Result);

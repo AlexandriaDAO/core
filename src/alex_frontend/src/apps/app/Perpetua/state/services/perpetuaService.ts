@@ -174,25 +174,6 @@ class PerpetuaService {
   }
   
   /**
-   * Rebalance shelf items
-   */
-  public async rebalanceShelfItems(shelfId: string): Promise<Result<boolean, string>> {
-    try {
-      const actor = await this.getActor();
-      const result = await actor.rebalance_shelf_items(shelfId);
-      
-      if ("Ok" in result) {
-        return { Ok: true };
-      } else {
-        return { Err: result.Err };
-      }
-    } catch (error) {
-      console.error('Error in rebalanceShelfItems:', error);
-      return { Err: "Failed to rebalance shelf items" };
-    }
-  }
-  
-  /**
    * Add an item to a shelf
    */
   public async addItemToShelf(

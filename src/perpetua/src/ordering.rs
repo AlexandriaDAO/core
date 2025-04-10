@@ -5,10 +5,10 @@ use std::cmp::Ordering;
 /// This abstraction works with different key types while sharing the same positioning logic.
 pub trait PositionedOrdering<K> {
     /// Finds a position that would place an item before the target position
-    fn find_position_before(&self, target_pos: f64) -> f64;
+    fn find_position_before(&self, target_pos: f64, default_step: f64) -> f64;
     
     /// Finds a position that would place an item after the target position
-    fn find_position_after(&self, target_pos: f64) -> f64;
+    fn find_position_after(&self, target_pos: f64, default_step: f64) -> f64;
     
     /// Gets a map of all positions
     fn get_positions(&self) -> &BTreeMap<K, f64>;
@@ -16,38 +16,37 @@ pub trait PositionedOrdering<K> {
     /// Gets a mutable reference to the positions map
     fn get_positions_mut(&mut self) -> &mut BTreeMap<K, f64>;
     
-    /// Calculates a position based on reference item and placement preference
-    fn calculate_position(&self, reference_key: Option<&K>, before: bool, default_step: f64) -> Result<f64, String>
-    where K: Clone;
+    /// Calculates a position based on reference item and placement preference.
+    /// Takes &mut self because it might trigger an internal rebalance.
+    /// Takes step_size to be used during rebalancing if needed.
+    fn calculate_position(&mut self, reference_key: Option<&K>, before: bool, step_size: f64) -> Result<f64, String>
+    where K: Clone + Ord;
     
-    /// Checks if positions need rebalancing
-    fn needs_rebalancing(&self, thresholds: &[(usize, f64)]) -> bool;
-    
-    /// Rebalances all positions to be evenly spaced
+    /// Rebalances all positions to be evenly spaced using the provided step_size
     fn rebalance_positions(&mut self, step_size: f64);
 }
 
 /// Implementation for any BTreeMap-based positioned ordering
 impl<K: Ord + Clone> PositionedOrdering<K> for BTreeMap<K, f64> {
-    fn find_position_before(&self, target_pos: f64) -> f64 {
+    fn find_position_before(&self, target_pos: f64, default_step: f64) -> f64 {
         let prev = self.values()
             .filter(|&&pos| pos < target_pos)
             .max_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
             
         match prev {
             Some(prev_pos) => (prev_pos + target_pos) / 2.0,
-            None => target_pos - 1.0  // Default step can be customized by caller
+            None => target_pos - default_step // Use default_step
         }
     }
 
-    fn find_position_after(&self, target_pos: f64) -> f64 {
+    fn find_position_after(&self, target_pos: f64, default_step: f64) -> f64 {
         let next = self.values()
             .filter(|&&pos| pos > target_pos)
             .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
             
         match next {
             Some(next_pos) => (target_pos + next_pos) / 2.0,
-            None => target_pos + 1.0  // Default step can be customized by caller
+            None => target_pos + default_step // Use default_step
         }
     }
     
@@ -59,72 +58,86 @@ impl<K: Ord + Clone> PositionedOrdering<K> for BTreeMap<K, f64> {
         self
     }
     
-    fn calculate_position(&self, reference_key: Option<&K>, before: bool, default_step: f64) -> Result<f64, String>
-    where K: Clone {
+    // calculate_position now contains the full logic, including rebalancing check
+    fn calculate_position(&mut self, reference_key: Option<&K>, before: bool, step_size: f64) -> Result<f64, String>
+    where K: Clone + Ord {
+        // --- Start of logic moved from compute_position_value --- 
         match reference_key {
             Some(ref_key) => {
-                // Get reference position
-                let reference_pos = self.get(ref_key)
+                let reference_pos = *self.get(ref_key)
                     .ok_or_else(|| "Reference item not found".to_string())?;
-                
-                // Calculate new position based on reference and placement preference
+
                 if before {
-                    Ok(self.find_position_before(*reference_pos))
-                } else {
-                    Ok(self.find_position_after(*reference_pos))
+                    let prev_pos_opt = self.values()
+                        .filter(|&&pos| pos < reference_pos)
+                        .max_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
+                    
+                    match prev_pos_opt {
+                        Some(prev_pos) => {
+                            let new_pos = (prev_pos + reference_pos) / 2.0;
+                            // Check for precision loss
+                            if new_pos == *prev_pos || new_pos == reference_pos {
+                                // Rebalance and retry calculation
+                                self.rebalance_positions(step_size);
+                                // Must recalculate reference_pos and prev_pos after rebalance
+                                let recalced_ref_pos = *self.get(ref_key).unwrap(); // Should exist
+                                let recalced_prev_pos = self.values()
+                                    .filter(|&&pos| pos < recalced_ref_pos)
+                                    .max_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
+                                match recalced_prev_pos {
+                                    Some(p) => Ok((p + recalced_ref_pos) / 2.0),
+                                    None => Ok(recalced_ref_pos - step_size) // Place before first item
+                                }
+                            } else {
+                                Ok(new_pos) // No precision loss
+                            }
+                        },
+                        None => Ok(reference_pos - step_size) // Place before first item
+                    }
+                } else { // Place after reference_key
+                    let next_pos_opt = self.values()
+                        .filter(|&&pos| pos > reference_pos)
+                        .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
+                    
+                    match next_pos_opt {
+                        Some(next_pos) => {
+                            let new_pos = (reference_pos + next_pos) / 2.0;
+                            // Check for precision loss
+                            if new_pos == reference_pos || new_pos == *next_pos {
+                                // Rebalance and retry calculation
+                                self.rebalance_positions(step_size);
+                                // Must recalculate reference_pos and next_pos after rebalance
+                                let recalced_ref_pos = *self.get(ref_key).unwrap(); // Should exist
+                                let recalced_next_pos = self.values()
+                                    .filter(|&&pos| pos > recalced_ref_pos)
+                                    .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
+                                match recalced_next_pos {
+                                    Some(n) => Ok((recalced_ref_pos + n) / 2.0),
+                                    None => Ok(recalced_ref_pos + step_size) // Place after last item
+                                }
+                            } else {
+                                Ok(new_pos) // No precision loss
+                            }
+                        },
+                        None => Ok(reference_pos + step_size) // Place after last item
+                    }
                 }
             },
-            None => {
-                // No reference item, place at start or end
+            None => { // No reference key - place at start or end
+                if self.is_empty() {
+                    return Ok(0.0); // First item
+                }
+                
                 if before {
-                    // Place at beginning
-                    let min_pos = self.values()
-                        .fold(f64::INFINITY, |a, &b| a.min(b));
-                    
-                    if min_pos == f64::INFINITY {
-                        Ok(0.0) // No items yet
-                    } else {
-                        Ok(min_pos - default_step)
-                    }
+                    let min_pos = self.values().fold(f64::INFINITY, |a, &b| a.min(b));
+                    Ok(min_pos - step_size)
                 } else {
-                    // Place at end
-                    let max_pos = self.values()
-                        .fold(f64::NEG_INFINITY, |a, &b| a.max(b));
-                    
-                    if max_pos == f64::NEG_INFINITY {
-                        Ok(0.0) // No items yet
-                    } else {
-                        Ok(max_pos + default_step)
-                    }
+                    let max_pos = self.values().fold(f64::NEG_INFINITY, |a, &b| a.max(b));
+                    Ok(max_pos + step_size)
                 }
             }
         }
-    }
-    
-    fn needs_rebalancing(&self, thresholds: &[(usize, f64)]) -> bool {
-        if self.len() < 2 {
-            return false;
-        }
-        
-        // Collect and sort positions
-        let mut positions: Vec<f64> = self.values().cloned().collect();
-        positions.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
-        
-        // Find minimum gap between consecutive positions
-        let mut min_gap = f64::MAX;
-        for i in 1..positions.len() {
-            let gap = positions[i] - positions[i-1];
-            min_gap = min_gap.min(gap);
-        }
-        
-        // Determine threshold based on number of items
-        let count = self.len();
-        let threshold = thresholds.iter()
-            .find(|(size, _)| count > *size)
-            .map(|(_, threshold)| *threshold)
-            .unwrap_or(1e-6); // Default threshold
-        
-        min_gap < threshold
+        // --- End of logic moved from compute_position_value --- 
     }
     
     fn rebalance_positions(&mut self, step_size: f64) {
@@ -142,8 +155,11 @@ impl<K: Ord + Clone> PositionedOrdering<K> for BTreeMap<K, f64> {
         ordered_pairs.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(Ordering::Equal));
         
         // Reset positions to be evenly spaced
-        for (i, (key, _)) in ordered_pairs.into_iter().enumerate() {
-            self.insert(key, (i as f64) * step_size);
+        // Start from step_size to avoid 0.0, making calculations near the start consistent
+        let mut current_pos = step_size; 
+        for (key, _) in ordered_pairs {
+            self.insert(key, current_pos);
+            current_pos += step_size;
         }
     }
 }
@@ -161,15 +177,4 @@ pub fn get_ordered_by_position<K: Clone + Ord, V: Clone>(
     ordered.into_iter()
         .filter_map(|(key, _)| items.get(key).map(|item| item.clone()))
         .collect()
-}
-
-/// Helper for ensuring positions are properly balanced
-pub fn ensure_balanced_positions<K: Ord + Clone>(
-    positions: &mut BTreeMap<K, f64>,
-    thresholds: &[(usize, f64)],
-    step_size: f64
-) {
-    if positions.needs_rebalancing(thresholds) {
-        positions.rebalance_positions(step_size);
-    }
 } 

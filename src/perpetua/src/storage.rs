@@ -160,8 +160,6 @@ pub struct Shelf {
     pub item_positions: BTreeMap<u32, f64>, // Map: item_id -> position number
     pub created_at: u64,
     pub updated_at: u64,
-    pub needs_rebalance: bool,           // Flag indicating if positions should be rebalanced
-    pub rebalance_count: u32,            // Tracks number of rebalancing operations
     pub appears_in: Vec<String>,         // List of shelf IDs that appear in this shelf
     pub tags: Vec<String>,               // List of tags, limited to 3 per shelf
 }
@@ -239,13 +237,6 @@ impl Storable for UserTagCount {
     const BOUND: Bound = Bound::Unbounded;
 }
 
-// Thresholds for shelf item positioning rebalancing
-const SHELF_ITEM_THRESHOLDS: [(usize, f64); 3] = [
-    (400, 1e-10),
-    (200, 1e-8),
-    (0, 1e-6)
-];
-
 // Default step size for shelf item positioning
 const SHELF_ITEM_STEP_SIZE: f64 = 1000.0;
 
@@ -263,8 +254,6 @@ impl Shelf {
             item_positions: BTreeMap::new(),
             created_at: now,
             updated_at: now,
-            needs_rebalance: false,
-            rebalance_count: 0,
             appears_in: Vec::new(),
             tags: Vec::new(),
         }
@@ -309,17 +298,15 @@ impl Shelf {
         
         let item_id = item.id;
         
-        // Initialize position at the end using the shared abstraction
-        let new_position = self.item_positions.calculate_position(None, false, 1.0)?;
+        // Calculate position at the end using the shared abstraction (now mutable)
+        // Pass SHELF_ITEM_STEP_SIZE as default step
+        let new_position = self.item_positions.calculate_position(None, false, SHELF_ITEM_STEP_SIZE)?; 
             
         // Update the float position
         self.item_positions.insert(item_id, new_position);
         
         // Store the item without a position field
         self.items.insert(item_id, item);
-        
-        // Check if we need rebalancing (when there are many items)
-        self.check_position_spacing();
         
         Ok(())
     }
@@ -386,33 +373,23 @@ impl Shelf {
             return Err("Item not found".to_string());
         }
 
-        // Calculate new position using the shared abstraction
+        // Calculate new position using the shared abstraction (now mutable)
+        // Pass SHELF_ITEM_STEP_SIZE as default step
         let new_position = self.item_positions.calculate_position(
             reference_item_id.as_ref(), 
             before, 
-            1.0
+            SHELF_ITEM_STEP_SIZE
         )?;
 
         // Update the float position
         self.item_positions.insert(item_id, new_position);
         
-        // Check if positions have become too close, requiring rebalancing
-        self.check_position_spacing();
-
         Ok(())
     }
 
     pub fn get_ordered_items(&self) -> Vec<Item> {
         // Use the shared helper function for ordering
         get_ordered_by_position(&self.items, &self.item_positions)
-    }
-    
-    // Checks if positions have become too close, potentially requiring rebalancing
-    fn check_position_spacing(&mut self) {
-        // Use the shared implementation to check if rebalancing is needed
-        if self.item_positions.needs_rebalancing(&SHELF_ITEM_THRESHOLDS) {
-            self.needs_rebalance = true;
-        }
     }
     
     // Rebalances all item positions to be evenly distributed
@@ -423,16 +400,6 @@ impl Shelf {
         
         // Use the shared implementation for rebalancing
         self.item_positions.rebalance_positions(SHELF_ITEM_STEP_SIZE);
-        
-        self.needs_rebalance = false;
-        self.rebalance_count += 1;
-    }
-    
-    // Ensures positions are balanced before any operation that depends on the ordering
-    pub fn ensure_balanced_positions(&mut self) {
-        if self.needs_rebalance {
-            self.rebalance_positions();
-        }
     }
 }
 

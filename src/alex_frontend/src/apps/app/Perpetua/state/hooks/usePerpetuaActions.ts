@@ -19,7 +19,6 @@ import {
   loadMissingShelves,
   createShelf,
   updateShelfMetadata,
-  rebalanceShelfItems,
   createAndAddShelfItem,
   addItem,
   removeItem,
@@ -66,8 +65,6 @@ export const usePerpetuaActions = () => {
       dispatch(createShelf(params)),
     updateShelfMetadata: (params: { shelfId: string, title?: string, description?: string }) => 
       dispatch(updateShelfMetadata(params)),
-    rebalanceShelfItems: (params: { shelfId: string, principal: Principal | string }) => 
-      dispatch(rebalanceShelfItems(params)),
     createAndAddShelfItem: (params: { 
       parentShelfId: string, 
       title: string, 

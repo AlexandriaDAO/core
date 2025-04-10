@@ -188,8 +188,6 @@ pub fn get_shelf_position_metrics(shelf_id: String) -> Result<ShelfPositionMetri
                     min_gap: 0.0,
                     avg_gap: 0.0,
                     max_gap: 0.0,
-                    needs_rebalance: false,
-                    rebalance_count: shelf.rebalance_count,
                 });
             }
             
@@ -216,8 +214,6 @@ pub fn get_shelf_position_metrics(shelf_id: String) -> Result<ShelfPositionMetri
                 min_gap,
                 avg_gap,
                 max_gap,
-                needs_rebalance: shelf.needs_rebalance,
-                rebalance_count: shelf.rebalance_count,
             })
         } else {
             Err("Shelf not found".to_string())
@@ -333,8 +329,6 @@ pub struct ShelfPositionMetrics {
     pub min_gap: f64,
     pub avg_gap: f64,
     pub max_gap: f64, 
-    pub needs_rebalance: bool,
-    pub rebalance_count: u32,
 }
 
 /// Structure for tag system health metrics

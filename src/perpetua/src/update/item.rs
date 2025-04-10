@@ -130,9 +130,6 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
         // If we added a shelf item, reorder items by popularity
         if let ItemContent::Shelf(_) = input.content {
             reorder_shelves_by_popularity(shelf);
-        } else {
-            // Just ensure positions are balanced
-            shelf.ensure_balanced_positions();
         }
 
         Ok(())
@@ -202,10 +199,6 @@ fn reorder_shelves_by_popularity(shelf: &mut crate::storage::Shelf) {
             shelf.item_positions.insert(item_id, current_pos);
             current_pos += step;
         }
-        
-        // Mark as not needing rebalance
-        shelf.needs_rebalance = false;
-        shelf.rebalance_count += 1;
     }
 }
 
@@ -257,9 +250,6 @@ pub async fn remove_item_from_shelf(shelf_id: String, item_id: u32) -> Result<()
         // If we removed a shelf item, reorder remaining shelf items by popularity
         if is_shelf_item {
             reorder_shelves_by_popularity(shelf);
-        } else {
-            // Just ensure positions are balanced
-            shelf.ensure_balanced_positions();
         }
         
         // Clean up any references if the removed item was an NFT

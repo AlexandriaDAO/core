@@ -114,14 +114,6 @@ export const formatMetricValue = (value: number | bigint): string => {
 };
 
 /**
- * Determines if rebalancing is recommended based on metrics
- */
-export const isRebalanceRecommended = (metrics: ShelfMetrics | null): boolean => {
-	if (!metrics) return false;
-	return metrics.needs_rebalance;
-};
-
-/**
  * Extracts a useful error message from various error types
  */
 export const extractErrorMessage = (error: unknown, fallback: string = "An error occurred"): string => {
