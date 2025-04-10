@@ -126,8 +126,6 @@ Perpetua/
 
 
 
-- Grid fixes. They're all broken.
-
 
 - PerpetuaSlice needs: (editors, appears_in.length())
 
