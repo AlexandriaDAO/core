@@ -558,6 +558,49 @@ class PerpetuaService {
       return { Err: "Failed to remove tag from shelf" };
     }
   }
+
+  /**
+   * Check if a shelf is publicly editable
+   */
+  public async isShelfPublic(shelfId: string): Promise<Result<boolean, string>> {
+    try {
+      const actor = await this.getActor();
+      
+      const result = await actor.is_shelf_public(shelfId);
+      
+      if ("Ok" in result) {
+        return { Ok: result.Ok };
+      } else {
+        return { Err: result.Err };
+      }
+    } catch (error) {
+      console.error('Error in isShelfPublic:', error);
+      return { Err: "Failed to check shelf public status" };
+    }
+  }
+
+  /**
+   * Toggle public access for a shelf
+   */
+  public async toggleShelfPublicAccess(
+    shelfId: string,
+    isPublic: boolean
+  ): Promise<Result<boolean, string>> {
+    try {
+      const actor = await this.getActor();
+      
+      const result = await actor.toggle_shelf_public_access(shelfId, isPublic);
+      
+      if ("Ok" in result) {
+        return { Ok: true };
+      } else {
+        return { Err: result.Err };
+      }
+    } catch (error) {
+      console.error('Error in toggleShelfPublicAccess:', error);
+      return { Err: `Failed to ${isPublic ? 'enable' : 'disable'} public access for shelf` };
+    }
+  }
 }
 
 // Export singleton instance

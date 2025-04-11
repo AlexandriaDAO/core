@@ -276,6 +276,7 @@ pub struct Shelf {
     pub updated_at: u64,
     pub appears_in: Vec<ShelfId>,         // List of shelf IDs that appear in this shelf
     pub tags: Vec<NormalizedTag>,         // Use NormalizedTag
+    pub is_public: bool,                  // Flag to indicate if shelf is publicly editable
 }
 
 // Updated Storable implementation using Unbounded size
@@ -358,6 +359,7 @@ impl Shelf {
             updated_at: now,
             appears_in: Vec::new(),
             tags: Vec::new(), // Initialize with empty Vec<NormalizedTag>
+            is_public: false, // Default to private
         }
     }
 

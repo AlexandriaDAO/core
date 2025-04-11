@@ -4,12 +4,14 @@ import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/lib/components/dialog";
-import { Settings, Users, Tag, PlusCircle, X, AlertCircle, InfoIcon, Edit2, Check, Save } from "lucide-react";
+import { Switch } from "@/lib/components/switch";
+import { Settings, Users, Tag, PlusCircle, X, AlertCircle, InfoIcon, Edit2, Check, Save, Globe, Lock } from "lucide-react";
 import { Shelf } from "../../../../../../../../declarations/perpetua/perpetua.did";
-import { ShelfMetricsDisplay } from "./ShelfMetricsDisplay";
 import { CollaboratorsList } from "../../shelf-collaboration/components/CollaboratorsList";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
-import { selectIsOwner } from '@/apps/app/Perpetua/state/perpetuaSlice';
+import { useAppDispatch } from '@/store/hooks/useAppDispatch';
+import { selectIsOwner, selectIsShelfPublic, selectPublicAccessLoading } from '@/apps/app/Perpetua/state/perpetuaSlice';
+import { toggleShelfPublicAccess, checkShelfPublicAccess } from '@/apps/app/Perpetua/state/thunks/publicAccessThunks';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/components/tabs";
 import { Badge } from "@/lib/components/badge";
 import { Alert, AlertDescription } from "@/lib/components/alert";
@@ -67,20 +69,22 @@ const validateTag = (tag: string): TagValidationResult => {
 
 interface ShelfSettingsDialogProps {
   shelf: Shelf;
-  onRebalance?: (shelfId: string) => Promise<void>;
   onUpdateMetadata?: (shelfId: string, title: string, description?: string) => Promise<boolean>;
   className?: string;
 }
 
 export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({ 
   shelf,
-  onRebalance,
   onUpdateMetadata,
   className = ""
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
+  const dispatch = useAppDispatch();
   const isOwner = useAppSelector(selectIsOwner(shelf.shelf_id));
+  const isPublic = useAppSelector(selectIsShelfPublic(shelf.shelf_id)) as boolean;
+  const isPublicLoading = useAppSelector(selectPublicAccessLoading(shelf.shelf_id));
+  const [isTogglingPublic, setIsTogglingPublic] = useState(false);
   const [tagLimitReached, setTagLimitReached] = useState(false);
   const [tagError, setTagError] = useState<string | null>(null);
   
@@ -123,6 +127,13 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
     
     setIsDirty(hasChanges);
   }, [title, description, originalTitle, originalDescription]);
+
+  // Load public status when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(checkShelfPublicAccess(shelf.shelf_id));
+    }
+  }, [dispatch, shelf.shelf_id, isOpen]);
 
   // Function to add a tag
   const handleAddTag = async () => {
@@ -267,6 +278,31 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
     setIsDirty(false);
   };
 
+  // Handle public access toggle
+  const handlePublicAccessToggle = async (enabled: boolean) => {
+    if (isTogglingPublic) return;
+    
+    setIsTogglingPublic(true);
+    try {
+      const resultAction = await dispatch(toggleShelfPublicAccess({
+        shelfId: shelf.shelf_id,
+        isPublic: enabled
+      }));
+      
+      if (toggleShelfPublicAccess.fulfilled.match(resultAction)) {
+        toast.success(enabled 
+          ? "This shelf is now publicly editable by anyone" 
+          : "This shelf is now private");
+      } else if (toggleShelfPublicAccess.rejected.match(resultAction)) {
+        toast.error(resultAction.payload as string || "Failed to update public access");
+      }
+    } catch (error) {
+      toast.error("An error occurred while updating public access");
+    } finally {
+      setIsTogglingPublic(false);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -366,34 +402,91 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
                   )}
                 </div>
                 
-                {/* Description Field */}
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-medium text-muted-foreground">Description</h4>
-                    {(isOwner || onUpdateMetadata) && (
-                      <Button 
-                        variant="ghost" 
-                        scale="sm" 
-                        className="h-6 px-2"
-                        onClick={() => toggleFieldEdit(editingField === "description" ? null : "description")}
-                      >
-                        {editingField === "description" ? <Check size={14} /> : <Edit2 size={14} />}
-                      </Button>
+                {/* Description Field - Removed ineffective ts-ignore */}
+                <div> 
+                  <div className="flex items-center justify-between"> 
+                    <h4 className="text-sm font-medium text-muted-foreground">Description</h4> 
+                    {(isOwner || onUpdateMetadata) && ( 
+                      <Button  
+                        variant="ghost"  
+                        scale="sm"  
+                        className="h-6 px-2" 
+                        onClick={() => toggleFieldEdit(editingField === "description" ? null : "description")} 
+                      > 
+                        {editingField === "description" ? <Check size={14} /> : <Edit2 size={14} />} 
+                      </Button> 
+                    )} 
+                  </div> 
+                   
+                  {editingField === "description" ? ( 
+                    <Textarea  
+                      value={description}  
+                      onChange={(e) => setDescription(e.target.value)}  
+                      className="w-full mt-1 resize-none" 
+                      rows={3} 
+                      autoFocus 
+                    /> 
+                  ) : ( 
+                    <p className="text-base mt-1">{description || "None"}</p> 
+                  )} 
+                </div>
+                
+                {/* Add Public Access section */}
+                {isOwner && (
+                  <div className="mt-6 pt-4 border-t">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <h3 className="text-sm font-medium">Public Access</h3>
+                        <p className="text-xs text-muted-foreground">
+                          Allow anyone to edit this shelf without requiring explicit permission
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        {isPublicLoading || isTogglingPublic ? (
+                          <div className="flex items-center gap-2">
+                            <span className="animate-spin inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full"></span>
+                            <span className="text-xs">{isTogglingPublic ? 'Saving...' : 'Loading...'}</span>
+                          </div>
+                        ) : (
+                          <>
+                            <span className="text-xs font-medium flex items-center gap-1">
+                              {isPublic ? (
+                                <>
+                                  <Globe size={14} className="text-green-500" />
+                                  <span className="text-green-600">Public</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Lock size={14} className="text-amber-500" />
+                                  <span className="text-amber-600">Private</span>
+                                </>
+                              )}
+                            </span>
+                            <Switch
+                              checked={isPublic}
+                              onCheckedChange={handlePublicAccessToggle}
+                              aria-label="Toggle public access"
+                              // Keep the @ts-ignore for the disabled prop
+                              // @ts-ignore - Persistent type issue
+                              disabled={isPublicLoading || isTogglingPublic}
+                            />
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {isPublic && (
+                      <Alert variant="default" className="mt-3 bg-blue-50 border-blue-200 text-blue-800">
+                        <AlertCircle className="h-4 w-4 text-blue-500" />
+                        <AlertDescription className="text-xs">
+                          Anyone with the link can now edit this shelf without logging in. 
+                          This can be useful for community shelves and public collections.
+                        </AlertDescription>
+                      </Alert>
                     )}
                   </div>
-                  
-                  {editingField === "description" ? (
-                    <Textarea 
-                      value={description} 
-                      onChange={(e) => setDescription(e.target.value)} 
-                      className="w-full mt-1 resize-none"
-                      rows={3}
-                      autoFocus
-                    />
-                  ) : (
-                    <p className="text-base mt-1">{description || "None"}</p>
-                  )}
-                </div>
+                )}
                 
                 {/* Tags Field */}
                 <div>
@@ -500,15 +593,6 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
                     </>
                   )}
                 </div>
-              </div>
-              
-              <div className="mt-6">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Shelf Metrics</h3>
-                <ShelfMetricsDisplay 
-                  shelfId={shelf.shelf_id} 
-                  isExpanded={isOpen && activeTab === "general"}
-                  onRebalance={onRebalance}
-                />
               </div>
             </div>
           </TabsContent>

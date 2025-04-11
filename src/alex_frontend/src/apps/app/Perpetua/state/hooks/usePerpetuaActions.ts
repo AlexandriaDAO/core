@@ -27,6 +27,8 @@ import {
   listShelfEditors,
   addShelfEditor,
   removeShelfEditor,
+  checkShelfPublicAccess,
+  toggleShelfPublicAccess,
 } from '../thunks';
 
 /**
@@ -137,6 +139,27 @@ export const usePerpetuaActions = () => {
         return result;
       } catch (error) {
         console.error("Failed to remove shelf editor:", error);
+        return null;
+      }
+    },
+    
+    // Public access features
+    checkShelfPublicAccess: async (shelfId: string) => {
+      try {
+        return await dispatch(checkShelfPublicAccess(shelfId)).unwrap();
+      } catch (error) {
+        console.error("Failed to check shelf public access:", error);
+        return null;
+      }
+    },
+    toggleShelfPublicAccess: async (params: { shelfId: string, isPublic: boolean }) => {
+      try {
+        const result = await dispatch(toggleShelfPublicAccess(params)).unwrap();
+        // Get the updated shelf
+        await dispatch(getShelfById(params.shelfId)).unwrap();
+        return result;
+      } catch (error) {
+        console.error("Failed to toggle shelf public access:", error);
         return null;
       }
     },

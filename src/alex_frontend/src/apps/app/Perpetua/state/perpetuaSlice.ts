@@ -25,6 +25,10 @@ import {
   addShelfEditor,
   removeShelfEditor
 } from './thunks/collaborationThunks';
+import {
+  checkShelfPublicAccess,
+  toggleShelfPublicAccess
+} from './thunks/publicAccessThunks';
 
 // Define the permissions interfaces
 export interface ContentPermissions {
@@ -35,6 +39,7 @@ export interface ContentPermissions {
 // Normalized shelf interface
 export interface NormalizedShelf extends Omit<Shelf, 'owner'> {
   owner: string; // Always store owner as string for consistency
+  is_public: boolean; // Add is_public field to match the backend
 }
 
 // Define the state interface with normalized structure
@@ -57,10 +62,13 @@ export interface PerpetuaState {
     userShelves: boolean;
     publicShelves: boolean;
     editors: Record<string, boolean>; // Track loading state for each shelf's editors
+    publicAccess: Record<string, boolean>; // Track loading state for public access checks
   };
   error: string | null;
   // Editor tracking
   shelfEditors: Record<string, string[]>; // Map of shelfId -> editor principals
+  // Public access tracking
+  publicShelfAccess: Record<string, boolean>; // Map of shelfId -> isPublic
 }
 
 // Initial state
@@ -79,16 +87,19 @@ const initialState: PerpetuaState = {
     userShelves: false,
     publicShelves: false,
     editors: {},
+    publicAccess: {},
   },
   error: null,
   shelfEditors: {},
+  publicShelfAccess: {},
 };
 
 // Utility function to normalize a shelf
 const normalizeShelf = (shelf: Shelf): NormalizedShelf => {
   return {
     ...shelf,
-    owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString()
+    owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString(),
+    is_public: typeof shelf.is_public === 'boolean' ? shelf.is_public : false
   };
 };
 
@@ -169,6 +180,15 @@ const perpetuaSlice = createSlice({
       const { shelfId, itemIds } = action.payload;
       // Store the new order in the shelfItems map
       state.ids.shelfItems[shelfId] = itemIds;
+    },
+    // Add a reducer for handling shelf public access
+    setShelfPublicAccess: (state, action: PayloadAction<{shelfId: string, isPublic: boolean}>) => {
+      const { shelfId, isPublic } = action.payload;
+      state.publicShelfAccess[shelfId] = isPublic;
+    },
+    setPublicAccessLoading: (state, action: PayloadAction<{shelfId: string, loading: boolean}>) => {
+      const { shelfId, loading } = action.payload;
+      state.loading.publicAccess[shelfId] = loading;
     },
   },
   extraReducers: (builder) => {
@@ -429,6 +449,42 @@ const perpetuaSlice = createSlice({
       })
       .addCase(removeShelfEditor.rejected, (state, action) => {
         state.error = action.payload as string;
+      })
+      
+      // Handle checkShelfPublicAccess
+      .addCase(checkShelfPublicAccess.pending, (state, action) => {
+        const shelfId = action.meta.arg;
+        state.loading.publicAccess[shelfId] = true;
+        state.error = null;
+      })
+      .addCase(checkShelfPublicAccess.fulfilled, (state, action) => {
+        const { shelfId, isPublic } = action.payload;
+        // Reinstate explicit check as a workaround for persistent type issue
+        state.publicShelfAccess[shelfId] = typeof isPublic === 'boolean' ? isPublic : false;
+        state.loading.publicAccess[shelfId] = false;
+      })
+      .addCase(checkShelfPublicAccess.rejected, (state, action) => {
+        const shelfId = action.meta.arg;
+        state.loading.publicAccess[shelfId] = false;
+        state.error = action.payload as string;
+      })
+      
+      // Handle toggleShelfPublicAccess
+      .addCase(toggleShelfPublicAccess.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(toggleShelfPublicAccess.fulfilled, (state, action) => {
+        const { shelfId, isPublic } = action.payload;
+        // Update the public access status
+        state.publicShelfAccess[shelfId] = isPublic;
+        
+        // Also update the shelf entity if it exists
+        if (state.entities.shelves[shelfId]) {
+          state.entities.shelves[shelfId].is_public = isPublic;
+        }
+      })
+      .addCase(toggleShelfPublicAccess.rejected, (state, action) => {
+        state.error = action.payload as string;
       });
   },
 });
@@ -442,6 +498,8 @@ export const {
   clearPermissions,
   setShelfEditors,
   setEditorsLoading,
+  setShelfPublicAccess,
+  setPublicAccessLoading,
   updateShelfOrder,
   updateItemOrder
 } = perpetuaSlice.actions;
@@ -462,6 +520,9 @@ const selectUserShelvesLoading = (state: RootState) => state.perpetua.loading.us
 const selectPublicShelvesLoading = (state: RootState) => state.perpetua.loading.publicShelves;
 const selectPerpetuaError = (state: RootState) => state.perpetua.error;
 
+const selectPublicAccessByIdMap = (state: RootState) => state.perpetua.publicShelfAccess;
+const selectPublicAccessLoadingMap = (state: RootState) => state.perpetua.loading.publicAccess;
+
 // Enhanced selector caching mechanism
 // This stores actual selector instances instead of creating new ones each time
 const memoizedSelectorsByShelfId = {
@@ -471,6 +532,8 @@ const memoizedSelectorsByShelfId = {
   hasEditAccess: new Map<string, ReturnType<typeof createSelector>>(),
   isOwner: new Map<string, ReturnType<typeof createSelector>>(),
   isEditor: new Map<string, ReturnType<typeof createSelector>>(),
+  isPublic: new Map<string, ReturnType<typeof createSelector>>(),
+  publicAccessLoading: new Map<string, ReturnType<typeof createSelector>>(),
   optimisticShelfItemOrder: new Map<string, ReturnType<typeof createSelector>>(),
 };
 
@@ -573,15 +636,61 @@ export const selectEditorsLoading = (shelfId: string) => {
   return memoizedSelectorsByShelfId.editorsLoading.get(shelfId)!;
 };
 
-// Check if user has edit access to a content item - with improved caching
+// Get the public access status for a shelf - with improved caching
+export const selectIsShelfPublic = (shelfId: string): ((state: RootState) => boolean) => {
+  if (!memoizedSelectorsByShelfId.isPublic.has(shelfId)) {
+    const selector = createSelector(
+      selectPublicAccessByIdMap,
+      (state: RootState) => selectShelvesEntities(state)[shelfId],
+      (publicAccessMap, shelf): boolean => { // Explicitly type the result function's return value
+        // First check the dedicated map
+        if (publicAccessMap[shelfId] !== undefined) {
+          return Boolean(publicAccessMap[shelfId]);
+        }
+        
+        // Fall back to the shelf entity if available
+        // Ensure the generated Shelf type includes is_public: boolean
+        if (shelf && typeof shelf.is_public === 'boolean') {
+          return shelf.is_public;
+        }
+        
+        // Default to false if no data is available
+        return false;
+      }
+    );
+    memoizedSelectorsByShelfId.isPublic.set(shelfId, selector);
+  }
+  // We need to assert the type here because the Map stores a generic selector type
+  return memoizedSelectorsByShelfId.isPublic.get(shelfId)! as (state: RootState) => boolean;
+};
+
+export const selectPublicAccessLoading = (shelfId: string) => {
+  if (!memoizedSelectorsByShelfId.publicAccessLoading.has(shelfId)) {
+    const selector = createSelector(
+      selectPublicAccessLoadingMap,
+      (loadingMap) => Boolean(loadingMap[shelfId]) // Transform to boolean
+    );
+    memoizedSelectorsByShelfId.publicAccessLoading.set(shelfId, selector);
+  }
+  return memoizedSelectorsByShelfId.publicAccessLoading.get(shelfId)!;
+};
+
+// Update the hasEditAccess selector to check for public access
 export const selectHasEditAccess = (contentId: string) => {
   if (!memoizedSelectorsByShelfId.hasEditAccess.has(contentId)) {
     const selector = createSelector(
       selectUserPrincipal,
       (state: RootState) => selectShelvesEntities(state)[contentId],
       (state: RootState) => selectShelfEditorsByIdMap(state)[contentId] || [],
-      (userPrincipal, shelf, editors) => {
-        if (!userPrincipal || !shelf) return false;
+      (state: RootState) => selectPublicAccessByIdMap(state)[contentId],
+      (userPrincipal, shelf, editors, isPublic) => {
+        if (!shelf) return false;
+        
+        // Check if shelf is public
+        if (isPublic === true) return true;
+        
+        // For non-public shelves, user needs to be logged in
+        if (!userPrincipal) return false;
         
         // Check if user is owner
         if (shelf.owner === userPrincipal) return true;

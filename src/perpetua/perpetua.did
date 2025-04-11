@@ -22,8 +22,10 @@ type Result_2 = variant { Ok : vec Shelf; Err : QueryError };
 type Result_3 = variant { Ok : Shelf; Err : QueryError };
 type Result_4 = variant { Ok : vec Item; Err : QueryError };
 type Result_5 = variant { Ok : ShelfPositionMetrics; Err : text };
-type Result_6 = variant { Ok : vec principal; Err : text };
+type Result_6 = variant { Ok : bool; Err : text };
+type Result_7 = variant { Ok : vec principal; Err : text };
 type Shelf = record {
+  is_public : bool;
   title : text;
   updated_at : nat64;
   editors : vec principal;
@@ -57,7 +59,8 @@ service : () -> {
   get_tag_shelf_count : (text) -> (nat64) query;
   get_tags_with_prefix : (text) -> (vec text) query;
   get_user_shelves : (principal, opt nat) -> (Result_2) query;
-  list_shelf_editors : (text) -> (Result_6) query;
+  is_shelf_public : (text) -> (Result_6) query;
+  list_shelf_editors : (text) -> (Result_7) query;
   remove_item_from_shelf : (text, nat32) -> (Result);
   remove_shelf_editor : (text, principal) -> (Result);
   remove_tag_from_shelf : (TagOperationInput) -> (Result);
@@ -65,5 +68,6 @@ service : () -> {
   reorder_shelf_item : (text, ItemReorderInput) -> (Result);
   reset_profile_order : () -> (Result);
   store_shelf : (text, opt text, vec Item, opt vec text) -> (Result_1);
+  toggle_shelf_public_access : (text, bool) -> (Result);
   update_shelf_metadata : (text, opt text, opt text) -> (Result);
 }

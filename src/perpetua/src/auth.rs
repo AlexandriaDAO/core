@@ -40,10 +40,10 @@ pub fn is_shelf_owner(shelf_id: &str, principal: &Principal) -> Result<bool, Str
 }
 
 /// Checks if the provided principal has edit permissions for the specified shelf
-/// Returns true if the principal is either the owner or in the editors list
+/// Returns true if the principal is either the owner, in the editors list, or the shelf is public
 pub fn can_edit_shelf(shelf_id: &str, principal: &Principal) -> Result<bool, String> {
     let shelf = get_shelf(shelf_id)?;
-    Ok(shelf.owner == *principal || shelf.editors.contains(principal))
+    Ok(shelf.owner == *principal || shelf.editors.contains(principal) || shelf.is_public)
 }
 
 /// Checks if the provided principal is the admin (owner) of the specified shelf
@@ -71,7 +71,7 @@ pub fn get_shelf_for_owner(shelf_id: &str, principal: &Principal) -> Result<Shel
 pub fn get_shelf_for_edit(shelf_id: &str, principal: &Principal) -> Result<Shelf, String> {
     let shelf = get_shelf(shelf_id)?;
     
-    if shelf.owner != *principal && !shelf.editors.contains(principal) {
+    if shelf.owner != *principal && !shelf.editors.contains(principal) && !shelf.is_public {
         return Err(ShelfAuthError::Unauthorized(
             "Unauthorized: You don't have edit permissions for this shelf".to_string()
         ).into());
