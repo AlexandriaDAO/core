@@ -1,6 +1,10 @@
 use std::collections::BTreeMap;
 use std::cmp::Ordering;
 
+/// The minimum floating-point gap allowed between adjacent positions before triggering a rebalance.
+/// Set significantly larger than f64 epsilon (~2.2e-16) to prevent clustering.
+const REBALANCE_MIN_GAP_THRESHOLD: f64 = 1e-9;
+
 /// Trait defining the core ordering operations used across the application.
 /// This abstraction works with different key types while sharing the same positioning logic.
 pub trait PositionedOrdering<K> {
@@ -20,7 +24,7 @@ pub trait PositionedOrdering<K> {
     /// Takes &mut self because it might trigger an internal rebalance.
     /// Takes step_size to be used during rebalancing if needed.
     fn calculate_position(&mut self, reference_key: Option<&K>, before: bool, step_size: f64) -> Result<f64, String>
-    where K: Clone + Ord;
+    where K: Clone + Ord + std::fmt::Debug;
     
     /// Rebalances all positions to be evenly spaced using the provided step_size
     fn rebalance_positions(&mut self, step_size: f64);
@@ -58,86 +62,130 @@ impl<K: Ord + Clone> PositionedOrdering<K> for BTreeMap<K, f64> {
         self
     }
     
-    // calculate_position now contains the full logic, including rebalancing check
+    // calculate_position now contains the full logic, including proactive rebalancing check
     fn calculate_position(&mut self, reference_key: Option<&K>, before: bool, step_size: f64) -> Result<f64, String>
-    where K: Clone + Ord {
-        // --- Start of logic moved from compute_position_value --- 
-        match reference_key {
-            Some(ref_key) => {
-                let reference_pos = *self.get(ref_key)
-                    .ok_or_else(|| "Reference item not found".to_string())?;
+    where K: Clone + Ord + std::fmt::Debug { // Added Debug constraint for logging
+        
+        // Loop allows for one retry attempt after a rebalance.
+        for attempt in 0..2 {
+            match reference_key {
+                Some(ref_key) => {
+                    // --- Get current reference position ---
+                    // Ensure reference key exists in the current state of the map
+                    let reference_pos = *self.get(ref_key)
+                        .ok_or_else(|| {
+                            // If the key disappeared after a rebalance, it's an issue.
+                            if attempt > 0 {
+                                format!("Reference item (key: {:?}) lost after rebalance", ref_key) // TODO: Improve key display if possible
+                            } else {
+                                "Reference item not found".to_string()
+                            }
+                        })?;
 
-                if before {
-                    let prev_pos_opt = self.values()
-                        .filter(|&&pos| pos < reference_pos)
-                        .max_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
-                    
-                    match prev_pos_opt {
-                        Some(prev_pos) => {
-                            let new_pos = (prev_pos + reference_pos) / 2.0;
-                            // Check for precision loss
-                            if new_pos == *prev_pos || new_pos == reference_pos {
-                                // Rebalance and retry calculation
-                                self.rebalance_positions(step_size);
-                                // Must recalculate reference_pos and prev_pos after rebalance
-                                let recalced_ref_pos = *self.get(ref_key).unwrap(); // Should exist
-                                let recalced_prev_pos = self.values()
-                                    .filter(|&&pos| pos < recalced_ref_pos)
-                                    .max_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
-                                match recalced_prev_pos {
-                                    Some(p) => Ok((p + recalced_ref_pos) / 2.0),
-                                    None => Ok(recalced_ref_pos - step_size) // Place before first item
-                                }
-                            } else {
-                                Ok(new_pos) // No precision loss
-                            }
-                        },
-                        None => Ok(reference_pos - step_size) // Place before first item
+                    // --- Determine immediate neighbours based on 'before' flag ---
+                    // We find the positions immediately adjacent to the *target insertion spot*.
+                    let (prev_pos_opt, next_pos_opt) = if before {
+                        // Target spot is just *before* reference_pos.
+                        // Neighbour before target spot: The item with the largest position < reference_pos.
+                        // Neighbour after target spot: The reference item itself.
+                        let prev = self.values()
+                            .filter(|&&pos| pos < reference_pos)
+                            .max_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal))
+                            .cloned(); // Clone value in case we need mutable borrow later for rebalance
+                        (prev, Some(reference_pos))
+                    } else {
+                        // Target spot is just *after* reference_pos.
+                        // Neighbour before target spot: The reference item itself.
+                        // Neighbour after target spot: The item with the smallest position > reference_pos.
+                        let next = self.values()
+                            .filter(|&&pos| pos > reference_pos)
+                            .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal))
+                            .cloned(); // Clone value
+                        (Some(reference_pos), next)
+                    };
+
+                    // --- Calculate potential new position ---
+                    let new_pos = match (prev_pos_opt, next_pos_opt) {
+                        (Some(prev), Some(next)) => (prev + next) / 2.0, // Between two items
+                        (None, Some(next)) => next - step_size,         // Before the first item (relative to ref)
+                        (Some(prev), None) => prev + step_size,         // After the last item (relative to ref)
+                        (None, None) => {
+                            // This case implies the reference key is the *only* item in the map.
+                            // Calculate position relative to the single reference item.
+                            if before { reference_pos - step_size } else { reference_pos + step_size }
+                        }
+                    };
+
+                    // --- Check if rebalance is needed ---
+                    let mut needs_rebalance = false;
+                    if let (Some(prev), Some(next)) = (prev_pos_opt, next_pos_opt) {
+                        // Check only when inserting BETWEEN two existing positions.
+                        let gap_before = new_pos - prev;
+                        let gap_after = next - new_pos;
+
+                        // Trigger rebalance if EITHER gap is too small OR if floating point precision loss occurred.
+                        if gap_before < REBALANCE_MIN_GAP_THRESHOLD 
+                           || gap_after < REBALANCE_MIN_GAP_THRESHOLD 
+                           || new_pos == prev // Precision loss check
+                           || new_pos == next // Precision loss check
+                        {
+                            needs_rebalance = true;
+                        }
+                    } 
+                    // No gap check needed when adding at the absolute start/end relative to the reference key,
+                    // but we still need the precision loss check in those cases.
+                    else if let (None, Some(next)) = (prev_pos_opt, next_pos_opt) { // Before first relative to ref
+                        if new_pos == next { needs_rebalance = true; }
+                    } else if let (Some(prev), None) = (prev_pos_opt, next_pos_opt) { // After last relative to ref
+                        if new_pos == prev { needs_rebalance = true; }
                     }
-                } else { // Place after reference_key
-                    let next_pos_opt = self.values()
-                        .filter(|&&pos| pos > reference_pos)
-                        .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
-                    
-                    match next_pos_opt {
-                        Some(next_pos) => {
-                            let new_pos = (reference_pos + next_pos) / 2.0;
-                            // Check for precision loss
-                            if new_pos == reference_pos || new_pos == *next_pos {
-                                // Rebalance and retry calculation
-                                self.rebalance_positions(step_size);
-                                // Must recalculate reference_pos and next_pos after rebalance
-                                let recalced_ref_pos = *self.get(ref_key).unwrap(); // Should exist
-                                let recalced_next_pos = self.values()
-                                    .filter(|&&pos| pos > recalced_ref_pos)
-                                    .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal));
-                                match recalced_next_pos {
-                                    Some(n) => Ok((recalced_ref_pos + n) / 2.0),
-                                    None => Ok(recalced_ref_pos + step_size) // Place after last item
-                                }
-                            } else {
-                                Ok(new_pos) // No precision loss
-                            }
-                        },
-                        None => Ok(reference_pos + step_size) // Place after last item
+                    // Case (None, None) means only one item exists, no gaps/precision loss to check yet.
+
+                    // --- Perform rebalance or return position ---
+                    if needs_rebalance {
+                        if attempt == 0 {
+                            self.rebalance_positions(step_size);
+                            continue; // Go to the next iteration to recalculate with new positions
+                        } else {
+                            // If rebalance was needed even on the second attempt, it indicates a potential issue.
+                            // This could happen if step_size is too small for the number of items, causing
+                            // rebalanced gaps to *still* be below the threshold.
+                            // Use ic_cdk::println for logging on ICP.
+                            ic_cdk::println!("WARN: Rebalance triggered twice for reference_key: {:?}, before: {}. Proceeding with potentially suboptimal position.", reference_key, before);
+                            // Proceeding with the potentially suboptimal position calculated after the first rebalance attempt.
+                            // A hard error might be too disruptive. Log and return the current `new_pos`.
+                             return Ok(new_pos); 
+                            // Alternative: return Err("Failed to find suitable position even after rebalancing... L".to_string());
+                        }
+                    } else {
+                        // No rebalance needed, return the calculated position
+                        return Ok(new_pos);
                     }
                 }
-            },
-            None => { // No reference key - place at start or end
-                if self.is_empty() {
-                    return Ok(0.0); // First item
-                }
-                
-                if before {
-                    let min_pos = self.values().fold(f64::INFINITY, |a, &b| a.min(b));
-                    Ok(min_pos - step_size)
-                } else {
-                    let max_pos = self.values().fold(f64::NEG_INFINITY, |a, &b| a.max(b));
-                    Ok(max_pos + step_size)
+                None => { // No reference key: Place at the absolute start or end of the list.
+                    if self.is_empty() {
+                        return Ok(0.0); // First item ever.
+                    }
+                    
+                    // No gap checks needed here, as we are extending the range.
+                    if before {
+                        // Find the minimum position in the current state.
+                        let min_pos = self.values().cloned().fold(f64::INFINITY, f64::min);
+                        return Ok(min_pos - step_size);
+                    } else {
+                        // Find the maximum position in the current state.
+                        let max_pos = self.values().cloned().fold(f64::NEG_INFINITY, f64::max);
+                        return Ok(max_pos + step_size);
+                    }
                 }
             }
-        }
-        // --- End of logic moved from compute_position_value --- 
+        } // End of loop
+
+        // Should be unreachable if logic is correct, but needed for compiler.
+        // This path is taken only if the loop completes without returning, 
+        // which implies the rebalance -> continue path was taken on attempt 0, 
+        // and then the code somehow exited the match without returning Ok or Err on attempt 1.
+        Err("Internal error: Failed to calculate position after rebalance logic.".to_string())
     }
     
     fn rebalance_positions(&mut self, step_size: f64) {

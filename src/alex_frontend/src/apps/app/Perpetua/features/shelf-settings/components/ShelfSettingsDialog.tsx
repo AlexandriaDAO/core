@@ -14,6 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/components/tabs"
 import { Badge } from "@/lib/components/badge";
 import { Alert, AlertDescription } from "@/lib/components/alert";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/lib/components/tooltip";
+import { perpetuaService } from "@/apps/app/Perpetua/state/services/perpetuaService";
+import { toast } from "sonner";
 
 // Constants based on backend rules
 const MAX_TAGS = 3;
@@ -66,7 +68,7 @@ const validateTag = (tag: string): TagValidationResult => {
 interface ShelfSettingsDialogProps {
   shelf: Shelf;
   onRebalance?: (shelfId: string) => Promise<void>;
-  onUpdateMetadata?: (shelfId: string, title: string, description?: string, tags?: string[]) => Promise<boolean>;
+  onUpdateMetadata?: (shelfId: string, title: string, description?: string) => Promise<boolean>;
   className?: string;
 }
 
@@ -88,19 +90,22 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
   const [description, setDescription] = useState(shelf.description?.[0] || "");
   const [tags, setTags] = useState<string[]>(shelf.tags || []);
   const [tagInput, setTagInput] = useState("");
-  const [isProcessingTags, setIsProcessingTags] = useState(false);
+  const [isSavingMetadata, setIsSavingMetadata] = useState(false);
+  const [isAddingTag, setIsAddingTag] = useState(false);
+  const [removingTagId, setRemovingTagId] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
 
   // Keep track of original values for comparison
   const [originalTitle] = useState(shelf.title);
   const [originalDescription] = useState(shelf.description?.[0] || "");
-  const [originalTags] = useState<string[]>(shelf.tags || []);
 
   // Update state when shelf changes
   useEffect(() => {
     setTitle(shelf.title);
     setDescription(shelf.description?.[0] || "");
     setTags(shelf.tags || []);
+    setEditingField(null);
+    setIsDirty(false);
   }, [shelf]);
 
   // Clear tag error when input changes
@@ -110,21 +115,20 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
     }
   }, [tagInput]);
 
-  // Check if any field has been modified
+  // Check if metadata (title, description) has been modified
   useEffect(() => {
     const hasChanges = 
       title !== originalTitle || 
-      description !== originalDescription || 
-      JSON.stringify(tags) !== JSON.stringify(originalTags);
+      description !== originalDescription;
     
     setIsDirty(hasChanges);
-  }, [title, description, tags, originalTitle, originalDescription, originalTags]);
+  }, [title, description, originalTitle, originalDescription]);
 
   // Function to add a tag
-  const handleAddTag = () => {
+  const handleAddTag = async () => {
     const trimmedTag = tagInput.trim();
     
-    if (!trimmedTag) {
+    if (!trimmedTag || isAddingTag || removingTagId) {
       return;
     }
     
@@ -149,19 +153,68 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
     const validation = validateTag(trimmedTag);
     if (!validation.isValid) {
       setTagError(validation.errorMessage || "Invalid tag");
+      setTimeout(() => setTagError(null), 3000);
       return;
     }
     
-    // Add the valid tag
-    setTags([...tags, trimmedTag]);
-    setTagInput("");
-    setTagLimitReached(tags.length + 1 >= MAX_TAGS);
+    // Call the service to add the tag
+    setIsAddingTag(true);
+    setTagError(null);
+    
+    try {
+      const result = await perpetuaService.addTagToShelf(shelf.shelf_id, trimmedTag);
+      
+      if ('Ok' in result && result.Ok) {
+        // Update local state on success
+        setTags([...tags, trimmedTag]);
+        setTagInput("");
+        setTagLimitReached(tags.length + 1 >= MAX_TAGS);
+        toast.success(`Tag "${trimmedTag}" added.`);
+      } else {
+        const errorMsg = 'Err' in result ? result.Err : "Failed to add tag";
+        setTagError(errorMsg);
+        toast.error(`Error adding tag: ${errorMsg}`);
+      }
+    } catch (error) {
+      console.error("Error adding tag:", error);
+      const errorMsg = "An unexpected error occurred while adding the tag.";
+      setTagError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setIsAddingTag(false);
+    }
   };
 
   // Handle removing a tag
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
-    setTagLimitReached(false);
+  const handleRemoveTag = async (tagToRemove: string) => {
+    if (isAddingTag || removingTagId) {
+      return;
+    }
+    
+    setRemovingTagId(tagToRemove);
+    setTagError(null);
+    
+    try {
+      const result = await perpetuaService.removeTagFromShelf(shelf.shelf_id, tagToRemove);
+      
+      if ('Ok' in result && result.Ok) {
+        // Update local state on success
+        setTags(tags.filter(tag => tag !== tagToRemove));
+        setTagLimitReached(false);
+        toast.success(`Tag "${tagToRemove}" removed.`);
+      } else {
+        const errorMsg = 'Err' in result ? result.Err : "Failed to remove tag";
+        setTagError(errorMsg);
+        toast.error(`Error removing tag: ${errorMsg}`);
+      }
+    } catch (error) {
+      console.error("Error removing tag:", error);
+      const errorMsg = "An unexpected error occurred while removing the tag.";
+      setTagError(errorMsg);
+      toast.error(errorMsg);
+    } finally {
+      setRemovingTagId(null);
+    }
   };
 
   // Handle key press for tag input
@@ -172,28 +225,32 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
     }
   };
 
-  // Save all changes
+  // Save metadata changes (Title and Description only)
   const handleSaveChanges = async () => {
-    if (!onUpdateMetadata) return;
+    if (!onUpdateMetadata || !isDirty) return;
     
-    setIsProcessingTags(true);
+    setIsSavingMetadata(true);
     
     try {
-      // Update basic metadata
+      // Update basic metadata (no tags)
       const success = await onUpdateMetadata(
         shelf.shelf_id, 
         title, 
-        description || undefined,
-        tags
+        description || undefined
       );
       
       if (success) {
         setEditingField(null);
+        setIsDirty(false);
+        toast.success("Shelf details updated successfully.");
+      } else {
+        toast.error("Failed to update shelf details.");
       }
     } catch (error) {
-      console.error("Error updating shelf:", error);
+      console.error("Error updating shelf metadata:", error);
+      toast.error("An error occurred while saving changes.");
     } finally {
-      setIsProcessingTags(false);
+      setIsSavingMetadata(false);
     }
   };
 
@@ -202,12 +259,12 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
     setEditingField(fieldName);
   };
 
-  // Cancel all changes
+  // Cancel metadata changes
   const handleCancelChanges = () => {
     setTitle(originalTitle);
     setDescription(originalDescription);
-    setTags([...originalTags]);
     setEditingField(null);
+    setIsDirty(false);
   };
 
   return (
@@ -260,7 +317,7 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
                           variant="outline" 
                           scale="sm"
                           onClick={handleCancelChanges}
-                          disabled={isProcessingTags}
+                          disabled={isSavingMetadata}
                         >
                           Cancel
                         </Button>
@@ -268,11 +325,11 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
                           variant="primary" 
                           scale="sm"
                           onClick={handleSaveChanges}
-                          disabled={isProcessingTags}
+                          disabled={isSavingMetadata || !isDirty}
                           className="flex items-center gap-1"
                         >
                           <Save size={14} />
-                          {isProcessingTags ? "Saving..." : "Save Changes"}
+                          {isSavingMetadata ? "Saving..." : "Save Changes"}
                         </Button>
                       </>
                     )}
@@ -365,20 +422,9 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
                         </Tooltip>
                       </TooltipProvider>
                     </div>
-                    
-                    {(isOwner || onUpdateMetadata) && (
-                      <Button 
-                        variant="ghost" 
-                        scale="sm" 
-                        className="h-6 px-2"
-                        onClick={() => toggleFieldEdit(editingField === "tags" ? null : "tags")}
-                      >
-                        {editingField === "tags" ? <Check size={14} /> : <Edit2 size={14} />}
-                      </Button>
-                    )}
                   </div>
                   
-                  {editingField === "tags" ? (
+                  {(isOwner || onUpdateMetadata) && (
                     <>
                       {(tagLimitReached || tagError) && (
                         <Alert variant={tagLimitReached ? "default" : "destructive"} className="py-2 mb-2 mt-2">
@@ -397,24 +443,32 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
                             onKeyPress={handleTagKeyPress}
                             placeholder={tags.length >= MAX_TAGS ? "Tag limit reached" : "Add a tag"}
                             className={`pr-16 ${tags.length >= MAX_TAGS ? "opacity-50" : ""}`}
-                            disabled={tags.length >= MAX_TAGS}
+                            disabled={tags.length >= MAX_TAGS || isAddingTag || !!removingTagId}
                             maxLength={MAX_TAG_LENGTH + 5}
-                            autoFocus
                           />
                           <Button 
                             type="button" 
                             variant="ghost" 
                             onClick={handleAddTag}
-                            className="absolute right-0 top-0 h-full px-3 flex items-center gap-1 text-xs font-medium hover:bg-primary/10 hover:text-primary"
-                            disabled={!tagInput.trim() || tags.length >= MAX_TAGS}
+                            className="absolute right-0 top-0 h-full px-3 flex items-center gap-1 text-xs font-medium hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+                            disabled={!tagInput.trim() || tags.length >= MAX_TAGS || isAddingTag || !!removingTagId}
                           >
-                            <PlusCircle size={14} />
-                            Add
+                            {isAddingTag ? (
+                              <>
+                                <span className="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full" role="status" aria-label="loading"></span>
+                                Adding...
+                              </>
+                            ) : (
+                              <>
+                                <PlusCircle size={14} />
+                                Add
+                              </>
+                            )}
                           </Button>
                         </div>
                       </div>
                       
-                      <div className="flex flex-wrap gap-1.5 mt-3 p-2 bg-background min-h-[40px] rounded-md">
+                      <div className="flex flex-wrap gap-1.5 mt-3 p-2 bg-background min-h-[40px] rounded-md border">
                         {tags.length === 0 ? (
                           <p className="w-full text-center text-sm text-muted-foreground py-1">
                             No tags added yet
@@ -424,39 +478,26 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
                             <Badge 
                               key={index} 
                               variant="secondary"
-                              className="bg-primary/10 text-primary pl-2 pr-1 py-1 flex items-center gap-1"
+                              className={`bg-primary/10 text-primary pl-2 pr-1 py-1 flex items-center gap-1 ${removingTagId === tag ? 'opacity-50 pointer-events-none' : ''}`}
                             >
                               {tag}
-                              <button 
-                                onClick={() => {
-                                  handleRemoveTag(tag);
-                                }}
-                                className="ml-1 rounded-full hover:bg-primary/20 p-0.5"
-                                aria-label={`Remove tag ${tag}`}
-                              >
-                                <X size={14} />
-                              </button>
+                              {removingTagId === tag ? (
+                                <span className="ml-1 animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full" role="status" aria-label="removing tag"></span>
+                              ) : (
+                                <button 
+                                  onClick={() => handleRemoveTag(tag)}
+                                  className="ml-1 rounded-full hover:bg-primary/20 p-0.5 disabled:opacity-50"
+                                  aria-label={`Remove tag ${tag}`}
+                                  disabled={isAddingTag || !!removingTagId}
+                                >
+                                  <X size={14} />
+                                </button>
+                              )}
                             </Badge>
                           ))
                         )}
                       </div>
                     </>
-                  ) : (
-                    <div className="flex flex-wrap gap-1.5 mt-1">
-                      {tags.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">No tags</p>
-                      ) : (
-                        tags.map((tag, index) => (
-                          <Badge 
-                            key={index} 
-                            variant="secondary" 
-                            className="bg-primary/10 text-primary hover:bg-primary/20"
-                          >
-                            {tag}
-                          </Badge>
-                        ))
-                      )}
-                    </div>
                   )}
                 </div>
               </div>
