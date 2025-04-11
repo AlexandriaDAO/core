@@ -13,19 +13,16 @@ type ItemReorderInput = record {
 type QueryError = variant {
   TagNotFound;
   ShelfNotFound;
-  UnauthorizedAccess;
-  NftNotFound;
   InvalidTimeRange;
   UserNotFound;
 };
 type Result = variant { Ok; Err : text };
-type Result_1 = variant { Ok : nat64; Err : text };
-type Result_2 = variant { Ok : text; Err : text };
-type Result_3 = variant { Ok : vec Shelf; Err : QueryError };
-type Result_4 = variant { Ok : Shelf; Err : QueryError };
-type Result_5 = variant { Ok : vec Item; Err : QueryError };
-type Result_6 = variant { Ok : ShelfPositionMetrics; Err : text };
-type Result_7 = variant { Ok : vec principal; Err : text };
+type Result_1 = variant { Ok : text; Err : text };
+type Result_2 = variant { Ok : vec Shelf; Err : QueryError };
+type Result_3 = variant { Ok : Shelf; Err : QueryError };
+type Result_4 = variant { Ok : vec Item; Err : QueryError };
+type Result_5 = variant { Ok : ShelfPositionMetrics; Err : text };
+type Result_6 = variant { Ok : vec principal; Err : text };
 type Shelf = record {
   title : text;
   updated_at : nat64;
@@ -45,38 +42,28 @@ type ShelfPositionMetrics = record {
   max_gap : float64;
   item_count : nat64;
 };
-type TagOperation = record { tag : text; shelf_id : text };
-type TagSystemMetrics = record {
-  unused_tags_count : nat64;
-  avg_tag_per_shelf : float64;
-  total_unique_tags : nat64;
-  most_popular_tags : vec record { text; nat64 };
-  total_tag_references : nat64;
-};
-service : {
+type TagOperationInput = record { tag : text; shelf_id : text };
+service : () -> {
   add_item_to_shelf : (text, AddItemInput) -> (Result);
   add_shelf_editor : (text, principal) -> (Result);
-  add_tag_to_shelf : (TagOperation) -> (Result);
-  cleanup_unused_tags : () -> (Result_1);
-  create_and_add_shelf_item : (text, text, opt text) -> (Result_2);
-  get_popular_tags : (nat64, nat32) -> (vec record { text; nat64 }) query;
-  get_recent_shelves : (opt nat64, opt nat64) -> (Result_3) query;
-  get_shelf : (text) -> (Result_4) query;
-  get_shelf_items : (text) -> (Result_5) query;
-  get_shelf_position_metrics : (text) -> (Result_6) query;
-  get_shelves_by_tag : (text, nat64, nat32) -> (Result_3) query;
+  add_tag_to_shelf : (TagOperationInput) -> (Result);
+  create_and_add_shelf_item : (text, text, opt text) -> (Result_1);
+  get_popular_tags : (nat) -> (vec text) query;
+  get_recent_shelves : (opt nat, opt nat64) -> (Result_2) query;
+  get_shelf : (text) -> (Result_3) query;
+  get_shelf_items : (text) -> (Result_4) query;
+  get_shelf_position_metrics : (text) -> (Result_5) query;
+  get_shelves_by_tag : (text) -> (vec text) query;
   get_tag_shelf_count : (text) -> (nat64) query;
-  get_tag_system_metrics : () -> (TagSystemMetrics) query;
-  get_tags_with_prefix : (text, nat32) -> (vec text) query;
-  get_user_shelves : (principal, opt nat64) -> (Result_3) query;
-  list_shelf_editors : (text) -> (Result_7) query;
+  get_tags_with_prefix : (text) -> (vec text) query;
+  get_user_shelves : (principal, opt nat) -> (Result_2) query;
+  list_shelf_editors : (text) -> (Result_6) query;
   remove_item_from_shelf : (text, nat32) -> (Result);
   remove_shelf_editor : (text, principal) -> (Result);
-  remove_tag_from_shelf : (TagOperation) -> (Result);
+  remove_tag_from_shelf : (TagOperationInput) -> (Result);
   reorder_profile_shelf : (text, opt text, bool) -> (Result);
   reorder_shelf_item : (text, ItemReorderInput) -> (Result);
   reset_profile_order : () -> (Result);
-  store_shelf : (text, opt text, vec Item, opt vec text) -> (Result_2);
+  store_shelf : (text, opt text, vec Item, opt vec text) -> (Result_1);
   update_shelf_metadata : (text, opt text, opt text) -> (Result);
-  update_tag_popularity_batch : () -> (Result_1);
 }

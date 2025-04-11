@@ -100,6 +100,7 @@ Perpetua/
 │   │   ├── index.ts (6 lines)
 │   │   ├── itemThunks.ts (92 lines)
 │   │   ├── queryThunks.ts (151 lines)
+- Add number of items as a shelf details.
 │   │   ├── reorderThunks.ts (117 lines)
 │   │   └── shelfThunks.ts (152 lines)
 ├── types/
@@ -113,7 +114,6 @@ Perpetua/
 
 
 Backend Stuff:
-- Make the rebalance and autonomous thing in the backend, and remove all traces of it in the frontend. 
 - Make public, i.e., anyone can edit a shelf.
 - Payment for all/some actions (maybe we do an action count for all backend calls, after certain actions you must pay X lbry).
 - 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
@@ -123,7 +123,6 @@ Backend Stuff:
 Frontend Stuff:
 - PerpetuaSlice needs: (editors, appears_in.length(), public or private)
 - Add appears-in in the frontend.
-- Add number of items as a shelf details.
 - Test collborator list stuff.
  
 
@@ -132,6 +131,7 @@ Frontend Stuff:
 
 - Backup system for all data.
 - A preview of the slots in the profile. (Could be done later)
+
 
 
 

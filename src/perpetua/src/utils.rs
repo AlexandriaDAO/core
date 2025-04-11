@@ -25,4 +25,9 @@ pub async fn generate_shelf_id(caller: &Principal) -> String {
     
     // Add prefix
     format!("sh_{}", id)
+}
+
+/// Normalizes a tag by converting to lowercase and trimming whitespace.
+pub fn normalize_tag(tag: &str) -> String {
+    tag.trim().to_lowercase()
 } 
