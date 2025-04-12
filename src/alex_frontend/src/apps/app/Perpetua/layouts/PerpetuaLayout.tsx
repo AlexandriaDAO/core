@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { 
@@ -44,8 +44,8 @@ const denormalizeShelves = (shelves: NormalizedShelf[]): Shelf[] => {
 const PerpetuaLayout: React.FC = () => {
 
   // Core data hooks
-  const { shelves, loading: personalLoading, createShelf, addItem, reorderItem } = useShelfOperations();
-  const { publicShelves, loading: publicLoading, loadMoreShelves } = usePublicShelfOperations();
+  const { shelves: personalNormalizedShelves, loading: personalLoading, createShelf, addItem, reorderItem } = useShelfOperations();
+  const { publicShelves: publicNormalizedShelves, loading: publicLoading, loadMoreShelves } = usePublicShelfOperations();
   
   // Dialog state
   const [isNewShelfDialogOpen, setIsNewShelfDialogOpen] = useState(false);
@@ -72,6 +72,43 @@ const PerpetuaLayout: React.FC = () => {
   // Get user-specific shelves from Redux
   const userShelves = useAppSelector(state => userId ? selectUserShelvesForUser(state, userId) : []);
   const [userShelvesLoading, setUserShelvesLoading] = useState(false);
+  
+  // Memoize the combined and unique shelves for the main view
+  const uniqueNormalizedShelves = useMemo(() => {
+    if (!isMainView) return []; // Only calculate if needed
+    
+    const seenShelfIds = new Set<string>();
+    const uniqueShelves: NormalizedShelf[] = [];
+    
+    // Add personal shelves first (they take priority)
+    personalNormalizedShelves.forEach(shelf => {
+      if (!seenShelfIds.has(shelf.shelf_id)) {
+        seenShelfIds.add(shelf.shelf_id);
+        uniqueShelves.push(shelf);
+      }
+    });
+    
+    // Then add unique public shelves
+    publicNormalizedShelves.forEach(shelf => {
+      if (!seenShelfIds.has(shelf.shelf_id)) {
+        seenShelfIds.add(shelf.shelf_id);
+        uniqueShelves.push(shelf);
+      }
+    });
+    
+    return uniqueShelves;
+  }, [isMainView, personalNormalizedShelves, publicNormalizedShelves]);
+
+  // Memoize the denormalized versions of the shelf lists
+  const allDenormalizedShelves = useMemo(() => 
+    denormalizeShelves(uniqueNormalizedShelves),
+    [uniqueNormalizedShelves]
+  );
+
+  const denormalizedPersonalShelves = useMemo(() => 
+    denormalizeShelves(personalNormalizedShelves), 
+    [personalNormalizedShelves]
+  );
   
   // Global initialization of shelves
   useEffect(() => {
@@ -135,27 +172,27 @@ const PerpetuaLayout: React.FC = () => {
     // If we're viewing the main shelves view
     if (isMainView) {
       // Deduplicate shelves when combining personal and public
-      const seenShelfIds = new Set<string>();
-      const uniqueShelves: NormalizedShelf[] = [];
+      // const seenShelfIds = new Set<string>(); // Logic moved to useMemo
+      // const uniqueShelves: NormalizedShelf[] = []; // Logic moved to useMemo
+      // 
+      // // Add personal shelves first (they take priority)
+      // shelves.forEach(shelf => {
+      //   if (!seenShelfIds.has(shelf.shelf_id)) {
+      //     seenShelfIds.add(shelf.shelf_id);
+      //     uniqueShelves.push(shelf);
+      //   }
+      // });
+      // 
+      // // Then add unique public shelves
+      // publicShelves.forEach(shelf => {
+      //   if (!seenShelfIds.has(shelf.shelf_id)) {
+      //     seenShelfIds.add(shelf.shelf_id);
+      //     uniqueShelves.push(shelf);
+      //   }
+      // });
       
-      // Add personal shelves first (they take priority)
-      shelves.forEach(shelf => {
-        if (!seenShelfIds.has(shelf.shelf_id)) {
-          seenShelfIds.add(shelf.shelf_id);
-          uniqueShelves.push(shelf);
-        }
-      });
-      
-      // Then add unique public shelves
-      publicShelves.forEach(shelf => {
-        if (!seenShelfIds.has(shelf.shelf_id)) {
-          seenShelfIds.add(shelf.shelf_id);
-          uniqueShelves.push(shelf);
-        }
-      });
-      
-      const denormalizedPersonalShelves = denormalizeShelves(shelves);
-      const allDenormalizedShelves = denormalizeShelves(uniqueShelves);
+      // const denormalizedPersonalShelves = denormalizeShelves(shelves); // Now using memoized version
+      // const allDenormalizedShelves = denormalizeShelves(uniqueShelves); // Now using memoized version
       
       return (
         <UnifiedShelvesUI 

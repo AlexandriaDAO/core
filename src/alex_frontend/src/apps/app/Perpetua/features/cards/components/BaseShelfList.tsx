@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { ArrowLeft, Plus, Edit, X, RotateCcw, Save, AlertCircle } from "lucide-react";
@@ -82,20 +82,33 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   const [saveInProgress, setSaveInProgress] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   
+  // DEBUG: Log shelf prop changes
+  // const prevShelvesRef = useRef<Shelf[]>();
+  // if (prevShelvesRef.current !== shelves) {
+  //   console.log('[BaseShelfList] Shelves prop reference changed.', { prev: prevShelvesRef.current, next: shelves });
+  // }
+  // React.useEffect(() => {
+  //   prevShelvesRef.current = shelves;
+  // });
+
   // Convert shelves to reorderable format for drag-and-drop UI
-  const reorderableShelves = useMemo(() => 
-    shelves.map((shelf: Shelf) => ({ id: shelf.shelf_id, shelf })),
-    [shelves]
-  );
+  const reorderableShelves = useMemo(() => {
+    // console.log('[BaseShelfList] Recalculating reorderableShelves...'); // DEBUG
+    return shelves.map((shelf: Shelf) => ({ id: shelf.shelf_id, shelf }));
+  }, [shelves]);
   
   // Local state just for visual drag-and-drop
   const [draggedShelves, setDraggedShelves] = useState<ReorderableShelfItem[]>([]);
   
   // Update dragged shelves when original shelves change or entering edit mode
   React.useEffect(() => {
+    // DEBUG: Log effect execution and dependencies
+    // console.log('[BaseShelfList] useEffect running. Deps:', { isEditMode, reorderableShelves, length: draggedShelves.length });
+    
     // Always update to match the current shelves from props when not in edit mode
     // or when first entering edit mode
     if (!isEditMode || draggedShelves.length === 0) {
+      // console.log('[BaseShelfList] Calling setDraggedShelves inside useEffect.'); // DEBUG
       setDraggedShelves(reorderableShelves);
     }
   }, [isEditMode, reorderableShelves, draggedShelves.length]);

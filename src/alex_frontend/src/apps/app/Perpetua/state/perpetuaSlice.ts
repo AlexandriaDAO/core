@@ -541,11 +541,8 @@ const memoizedSelectorsByShelfId = {
 };
 
 // Selectors
-// Get the order of user shelves directly from state - memoized to prevent recalculation
-export const selectOptimisticShelfOrder = createSelector(
-  (state: RootState) => state.perpetua.ids.userShelves,
-  (userShelves) => userShelves // Return direct reference from state
-);
+// Get the order of user shelves directly from state
+export const selectOptimisticShelfOrder = (state: RootState) => state.perpetua.ids.userShelves;
 
 // Get all user shelves with preserved order - memoized to prevent recalculation
 export const selectUserShelves = createSelector(
