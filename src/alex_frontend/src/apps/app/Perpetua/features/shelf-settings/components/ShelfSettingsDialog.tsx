@@ -98,16 +98,19 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
             <GeneralSettingsTab
               shelf={shelf}
               isOwner={isOwner}
-              isPublic={isPublic}
-              isPublicLoading={isPublicLoading}
-              isTogglingPublic={isTogglingPublic}
               onUpdateMetadata={onUpdateMetadata}
-              handlePublicAccessToggle={handlePublicAccessToggle}
             />
           </TabsContent>
           
           <TabsContent value="collaborators">
-            <CollaboratorsTab shelfId={shelf.shelf_id} />
+            <CollaboratorsTab 
+              shelfId={shelf.shelf_id} 
+              isOwner={isOwner}
+              isPublic={isPublic}
+              isPublicLoading={isPublicLoading}
+              isTogglingPublic={isTogglingPublic}
+              handlePublicAccessToggle={handlePublicAccessToggle}
+            />
           </TabsContent>
         </Tabs>
       </DialogContent>

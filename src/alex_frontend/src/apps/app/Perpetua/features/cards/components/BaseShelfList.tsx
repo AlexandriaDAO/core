@@ -8,6 +8,13 @@ import { toast } from 'sonner';
 import { useDragAndDrop } from '../../shared/reordering/hooks/useDragAndDrop';
 import { ReorderableGrid } from '../../shared/reordering/components/ReorderableGrid';
 import { ReorderableItem } from '../../../types/reordering.types';
+import { useAppSelector } from '@/store/hooks/useAppSelector';
+import {
+  selectIsShelfPublic,
+  selectIsOwner,
+  selectIsEditor,
+  selectShelfEditors
+} from '@/apps/app/Perpetua/state/perpetuaSlice';
 
 // Types for the component
 export interface BaseShelfListProps {
@@ -53,7 +60,7 @@ interface ReorderableShelfItem extends ReorderableItem {
 /**
  * BaseShelfList - A reusable component for displaying different shelf views
  */
-export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
+export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   shelves,
   title,
   emptyStateMessage,
@@ -253,19 +260,32 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
     </div>
   );
 
-  // Shelf card renderer with better visual feedback
-  const renderShelfCard = (item: ReorderableShelfItem, index: number, isDragging: boolean) => {
-    const shelf = item.shelf;
-    
+  // Wrapper component defined directly inside BaseShelfList
+  const ShelfCardWrapper: React.FC<{ shelf: Shelf; isEditMode: boolean; isDragging: boolean; }> = ({ shelf, isEditMode, isDragging }) => {
+    const isPublic = Boolean(useAppSelector(selectIsShelfPublic(shelf.shelf_id)));
+    const isOwner = Boolean(useAppSelector(selectIsOwner(shelf.shelf_id)));
+    const isEditor = Boolean(useAppSelector(selectIsEditor(shelf.shelf_id)));
+    const editors = useAppSelector(selectShelfEditors(shelf.shelf_id)) as string[]; 
+    const editorsCount = editors.length;
+
+    const collaborationData = {
+      isOwner,
+      isCollaborator: isEditor,
+      editorsCount
+    };
+
     return (
       <div className={`transition-all duration-200 ${isDragging ? 'opacity-75 scale-[0.98] shadow-md' : ''}`}>
         <ShelfCard
+          key={shelf.shelf_id}
           shelf={shelf}
           onViewShelf={!isEditMode && onViewShelf ? () => onViewShelf(shelf.shelf_id) : undefined}
           isReordering={isEditMode}
           parentShelfId={undefined}
           itemId={undefined}
-          showCollaborationInfo={false}
+          isPublic={isPublic} 
+          showCollaborationInfo={isOwner || isEditor || editorsCount > 0} 
+          collaborationData={collaborationData}
         />
       </div>
     );
@@ -290,7 +310,6 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
       ) : (
         <>
           {isEditMode ? (
-            /* Visual drag-and-drop interface when in edit mode */
             <ReorderableGrid
               items={draggedShelves}
               isEditMode={true}
@@ -299,24 +318,25 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
               handleDragEnd={handleDragEnd}
               handleDrop={handleDrop}
               getDragItemStyle={getDragItemStyle}
-              renderItem={renderShelfCard}
+              renderItem={(item, index, isDragging) => 
+                <ShelfCardWrapper 
+                  shelf={item.shelf} 
+                  isEditMode={isEditMode} 
+                  isDragging={isDragging} 
+                />
+              } 
               columns={3}
               gap={4}
             />
           ) : (
-            /* Regular grid when not in edit mode */
             <ContentGrid>
               {shelves.map((shelf: Shelf) => (
-                <div key={shelf.shelf_id}>
-                  <ShelfCard
-                    shelf={shelf}
-                    onViewShelf={onViewShelf ? () => onViewShelf(shelf.shelf_id) : undefined}
-                    isReordering={false}
-                    parentShelfId={undefined}
-                    itemId={undefined}
-                    showCollaborationInfo={false}
-                  />
-                </div>
+                <ShelfCardWrapper 
+                  key={shelf.shelf_id} 
+                  shelf={shelf} 
+                  isEditMode={false} 
+                  isDragging={false} 
+                />
               ))}
             </ContentGrid>
           )}
@@ -336,7 +356,10 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = React.memo(({
       )}
     </div>
   );
-}, (prevProps, nextProps) => {
+};
+
+// ADD: Re-apply React.memo with the correct comparison function signature
+export const MemoizedBaseShelfList = React.memo(BaseShelfList, (prevProps: Readonly<BaseShelfListProps>, nextProps: Readonly<BaseShelfListProps>) => {
   // Simple prop equality checks
   if (
     prevProps.title !== nextProps.title ||

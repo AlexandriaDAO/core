@@ -1,7 +1,6 @@
 use candid::Principal;
 use crate::storage::{Shelf, SHELVES};
 use ic_stable_structures::{StableBTreeMap, memory_manager::VirtualMemory};
-use ic_stable_structures::memory_manager::MemoryId;
 use ic_stable_structures::DefaultMemoryImpl;
 
 // Define Memory type alias for clarity

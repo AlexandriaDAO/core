@@ -1,5 +1,5 @@
 use candid::{CandidType, Deserialize};
-use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE, ShelfId, NormalizedTag};
+use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE, ShelfId};
 use crate::guard::not_anon;
 use crate::auth;
 
@@ -27,7 +27,6 @@ pub async fn store_shelf(
     // Create the shelf - create_shelf now handles normalization/validation
     let shelf = create_shelf(title, description, items, tags).await?;
     let shelf_id = shelf.shelf_id.clone();
-    let initial_tags = shelf.tags.clone(); // Get normalized tags from created shelf
     let now = shelf.created_at;
 
     // Store in SHELVES first

@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { ShelfInformationSection } from "./ShelfInformationSection";
-import { PublicAccessSection } from "./PublicAccessSection";
 import { TagsSection } from "./TagsSection";
 import { perpetuaService } from "@/apps/app/Perpetua/state/services/perpetuaService";
 import { toast } from "sonner";
-import { GeneralSettingsTabProps } from "../types";
+import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+
+interface GeneralSettingsTabProps {
+  shelf: Shelf;
+  isOwner: boolean;
+  onUpdateMetadata?: (
+    shelfId: string, 
+    title: string, 
+    description?: string
+  ) => Promise<boolean>;
+}
 
 export const GeneralSettingsTab: React.FC<GeneralSettingsTabProps> = ({ 
   shelf, 
   isOwner, 
-  isPublic, 
-  isPublicLoading, 
-  isTogglingPublic,
   onUpdateMetadata,
-  handlePublicAccessToggle
 }) => {
   // Editor states
   const [editingField, setEditingField] = useState<string | null>(null);
@@ -211,15 +216,6 @@ export const GeneralSettingsTab: React.FC<GeneralSettingsTabProps> = ({
       />
 
       <div className="bg-card rounded-lg p-4">
-        <PublicAccessSection
-          isOwner={isOwner}
-          isPublic={isPublic}
-          isPublicLoading={isPublicLoading}
-          isTogglingPublic={isTogglingPublic}
-          shelfId={shelf.shelf_id}
-          handlePublicAccessToggle={handlePublicAccessToggle}
-        />
-
         <TagsSection
           isOwner={isOwner}
           tags={tags}

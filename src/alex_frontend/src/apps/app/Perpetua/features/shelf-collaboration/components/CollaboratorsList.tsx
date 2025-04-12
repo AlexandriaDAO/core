@@ -5,7 +5,6 @@ import {
   selectShelfEditors, 
   selectEditorsLoading, 
   selectIsOwner,
-  selectIsShelfPublic
 } from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { 
   listShelfEditors, 
@@ -31,13 +30,11 @@ export const CollaboratorsList: React.FC<CollaboratorsListProps> = ({ shelfId })
   const editorsSelector = useMemo(() => selectShelfEditors(shelfId), [shelfId]);
   const editorsLoadingSelector = useMemo(() => selectEditorsLoading(shelfId), [shelfId]);
   const isOwnerSelector = useMemo(() => selectIsOwner(shelfId), [shelfId]);
-  const isPublicSelector = useMemo(() => selectIsShelfPublic(shelfId), [shelfId]);
   
   // Use memoized selectors
   const editors = useAppSelector(editorsSelector) as string[];
   const isLoading = useAppSelector(editorsLoadingSelector) as boolean;
   const isOwner = useAppSelector(isOwnerSelector) as boolean;
-  const isPublic = useAppSelector(isPublicSelector) as boolean;
   
   // Direct state access to auth principal - single source of truth
   const userPrincipal = useAppSelector(state => state.auth.user?.principal);
@@ -111,46 +108,21 @@ export const CollaboratorsList: React.FC<CollaboratorsListProps> = ({ shelfId })
           Collaborators
         </CardTitle>
         <CardDescription>
-          {isPublic 
-            ? "Anyone can edit this shelf (public access is enabled)"
-            : "Manage who can edit this shelf"}
+          Manage who can edit this shelf
         </CardDescription>
       </CardHeader>
       
       <CardContent>
-        {isPublic && (
-          <Alert className="mb-4 bg-blue-50 border-blue-200">
-            <Globe className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-sm text-blue-700">
-              This shelf is publicly editable. Anyone with the link can make changes without logging in.
-            </AlertDescription>
-          </Alert>
-        )}
-      
         {isLoading ? (
           <div className="text-center py-4">Loading collaborators...</div>
         ) : (
           <>
-            {!isPublic && editors.length === 0 ? (
+            {editors.length === 0 ? (
               <div className="text-center py-2 text-muted-foreground">
                 No collaborators yet
               </div>
             ) : (
               <ul className="space-y-2">
-                {isPublic && (
-                  <li className="flex items-center justify-between p-2 rounded bg-blue-50/50">
-                    <div className="flex items-center gap-2">
-                      <Globe size={16} className="text-blue-500" />
-                      <span className="text-sm font-medium text-blue-700">
-                        Public Access
-                      </span>
-                    </div>
-                    <div className="text-xs text-blue-600">
-                      Anyone can edit
-                    </div>
-                  </li>
-                )}
-                
                 {editors.map((editor: string) => (
                   <li key={editor} className="flex items-center justify-between p-2 rounded bg-muted/50">
                     <div className="flex items-center gap-2">
@@ -176,7 +148,7 @@ export const CollaboratorsList: React.FC<CollaboratorsListProps> = ({ shelfId })
               </ul>
             )}
             
-            {isOwner && !isPublic && (
+            {isOwner && (
               <div className="mt-4">
                 <Label htmlFor="new-editor">Add collaborator</Label>
                 <div className="flex gap-2 mt-1">

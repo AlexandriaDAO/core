@@ -1,15 +1,12 @@
-use candid::Principal;
 use ic_cdk;
 use ic_cdk::api::time;
-use std::borrow::Cow;
-use std::collections::BTreeSet;
 
 use crate::storage::{
-    Shelf, ShelfId, NormalizedTag, TagMetadata, 
+    ShelfId, NormalizedTag,
     TAG_METADATA, TAG_SHELF_ASSOCIATIONS, SHELF_TAG_ASSOCIATIONS,
     TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, ORPHANED_TAG_CANDIDATES,
-    SHELVES, MAX_TAGS_PER_SHELF, validate_tag_format,
-    TagShelfAssociationKey, ShelfTagAssociationKey, TagPopularityKey, OrphanedTagValue
+    MAX_TAGS_PER_SHELF, validate_tag_format,
+    TagShelfAssociationKey, ShelfTagAssociationKey, TagPopularityKey
 };
 use crate::utils::normalize_tag;
 use crate::auth;

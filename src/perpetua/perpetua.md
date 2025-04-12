@@ -3,7 +3,7 @@ Perpetua/
 ├── features/
 │   ├── cards/
 │   │   ├── components/
-│   │   │   ├── BaseShelfList.tsx (413 lines)
+│   │   │   ├── BaseShelfList.tsx (374 lines)
 │   │   │   ├── ContentDisplays.tsx (103 lines)
 │   │   │   ├── NftDisplay.tsx (298 lines)
 │   │   │   ├── ShelfBlogView.tsx (191 lines)
@@ -28,7 +28,7 @@ Perpetua/
 │   │   │   ├── InlineItemCreator.tsx (433 lines)
 │   │   │   └── index.ts (5 lines)
 │   │   ├── hooks/
-│   │   │   └── useItemActions.tsx (116 lines)
+│   │   │   └── useItemActions.tsx (112 lines)
 │   │   └── index.ts (2 lines)
 │   ├── shared/
 │   │   └── reordering/
@@ -49,7 +49,7 @@ Perpetua/
 │   │           └── reorderUtils.ts (32 lines)
 │   ├── shelf-collaboration/
 │   │   └── components/
-│   │       └── CollaboratorsList.tsx (185 lines)
+│   │       └── CollaboratorsList.tsx (186 lines)
 │   ├── shelf-management/
 │   │   ├── components/
 │   │   │   ├── NewShelf.tsx (104 lines)
@@ -58,26 +58,29 @@ Perpetua/
 │   │   │   ├── ShelfOption.tsx (31 lines)
 │   │   │   └── ShelfSelectionDialog.tsx (158 lines)
 │   │   ├── containers/
-│   │   │   ├── ShelfDetailContainer.tsx (169 lines)
-│   │   │   └── ShelfLists.tsx (217 lines)
+│   │   │   ├── ShelfDetailContainer.tsx (161 lines)
+│   │   │   └── ShelfLists.tsx (253 lines)
 │   │   └── hooks/
 │   │       ├── index.ts (4 lines)
-│   │       ├── useAddToShelf.ts (132 lines)
+│   │       ├── useAddToShelf.ts (128 lines)
 │   │       ├── usePublicShelfOperations.ts (62 lines)
-│   │       └── useShelfOperations.ts (214 lines)
+│   │       └── useShelfOperations.ts (213 lines)
 │   └── shelf-settings/
 │       ├── components/
-│       │   ├── ShelfMetricsDisplay.tsx (143 lines)
-│       │   ├── ShelfSettings.tsx (191 lines)
-│       │   ├── ShelfSettingsDialog.tsx (378 lines)
-│       │   └── index.ts (3 lines)
+│       │   ├── CollaboratorsTab.tsx (40 lines)
+│       │   ├── GeneralSettingsTab.tsx (237 lines)
+│       │   ├── PublicAccessSection.tsx (70 lines)
+│       │   ├── ShelfInformationSection.tsx (116 lines)
+│       │   ├── ShelfSettingsDialog.tsx (119 lines)
+│       │   ├── TagsSection.tsx (132 lines)
+│       │   └── index.ts (6 lines)
 │       ├── hooks/
-│       │   ├── index.ts (2 lines)
-│       │   ├── useShelfMetadata.ts (86 lines)
-│       │   └── useShelfMetrics.ts (40 lines)
-│       ├── index.ts (3 lines)
+│       │   ├── index.ts (1 lines)
+│       │   └── useShelfMetrics.ts (38 lines)
+│       ├── index.ts (2 lines)
+│       ├── types.ts (62 lines)
 │       └── utils/
-│           └── index.ts (2 lines)
+│           └── tagValidation.ts (47 lines)
 ├── hooks/
 │   └── useContentPermissions.ts (75 lines)
 ├── index.tsx (22 lines)
@@ -86,35 +89,35 @@ Perpetua/
 ├── routes.ts (119 lines)
 ├── state/
 │   ├── cache/
-│   │   └── ShelvesCache.ts (209 lines)
+│   │   └── ShelvesCache.ts (210 lines)
 │   ├── hooks/
 │   │   ├── index.ts (3 lines)
-│   │   ├── usePerpetuaActions.ts (147 lines)
+│   │   ├── usePerpetuaActions.ts (165 lines)
 │   │   └── usePerpetuaSelectors.ts (62 lines)
 │   ├── index.ts (49 lines)
-│   ├── perpetuaSlice.ts (666 lines)
+│   ├── perpetuaSlice.ts (786 lines)
 │   ├── services/
-│   │   └── perpetuaService.ts (580 lines)
+│   │   └── perpetuaService.ts (607 lines)
 │   ├── thunks/
 │   │   ├── collaborationThunks.ts (106 lines)
-│   │   ├── index.ts (6 lines)
-│   │   ├── itemThunks.ts (92 lines)
+│   │   ├── index.ts (7 lines)
+│   │   ├── itemThunks.ts (97 lines)
 │   │   ├── queryThunks.ts (151 lines)
-- Add number of items as a shelf details.
-│   │   ├── reorderThunks.ts (117 lines)
-│   │   └── shelfThunks.ts (152 lines)
+│   │   ├── reorderThunks.ts (132 lines)
+│   │   ├── shelfThunks.ts (120 lines)
 ├── types/
 │   ├── item.types.ts (27 lines)
 │   ├── reordering.types.ts (69 lines)
 │   └── shelf.types.ts (74 lines)
-└── utils.tsx (136 lines)
+└── utils.tsx (128 lines)
 ```
 
 
-- Shelf display not working
+
+
+
 
 Backend Stuff:
-- Make public, i.e., anyone can edit a shelf. (make it work now, and put it under the collaborator tab for clarity).
 - Payment for all/some actions (maybe we do an action count for all backend calls, after certain actions you must pay X lbry).
 - 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
 

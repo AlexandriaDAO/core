@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/lib/components/card";
 import { Badge } from "@/lib/components/badge";
-import { Folder, ChevronDown, Calendar, User, Tag, Clock, Info, Copy, Check, Link } from "lucide-react";
+import { Folder, ChevronDown, Calendar, User, Tag, Clock, Info, Copy, Check, Link, Globe, Lock } from "lucide-react";
 import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Button } from "@/lib/components/button";
@@ -20,6 +20,7 @@ export interface ShelfCardProps {
     isCollaborator?: boolean;
     editorsCount?: number;
   };
+  isPublic?: boolean;
 }
 
 /**
@@ -32,7 +33,8 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
   itemId,
   isReordering = false,
   showCollaborationInfo = false,
-  collaborationData
+  collaborationData,
+  isPublic = false
 }) => {
   const [isFooterExpanded, setIsFooterExpanded] = useState(false);
   const itemCount = Object.keys(shelf.items).length;
@@ -145,6 +147,17 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
               <Badge variant="secondary" className="text-[10px] py-0.5 px-1">
                 {itemCount} {itemCount === 1 ? 'item' : 'items'}
               </Badge>
+              
+              {/* ADD: Public/Private Badge */} 
+              {isPublic ? (
+                <Badge variant="success" className="text-[10px] flex items-center gap-1 py-0.5 px-1">
+                  <Globe size={10} /> Public
+                </Badge>
+              ) : (
+                <Badge variant="warning" className="text-[10px] flex items-center gap-1 py-0.5 px-1">
+                  <Lock size={10} /> Private
+                </Badge>
+              )}
               
               {isReordering && (
                 <Badge variant="info" className="text-[10px] py-0.5 px-1">

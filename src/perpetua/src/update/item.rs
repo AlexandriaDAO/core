@@ -1,9 +1,8 @@
-use candid::{CandidType, Deserialize, Principal};
-use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE, Shelf};
+use candid::{CandidType, Deserialize};
+use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE};
 use crate::guard::not_anon;
 use crate::auth;
 use crate::update::utils::{verify_nft_ownership, shelf_exists, is_self_reference};
-use std::collections::HashSet;
 use ic_stable_structures::{StableBTreeMap, memory_manager::VirtualMemory};
 use ic_stable_structures::DefaultMemoryImpl;
 
