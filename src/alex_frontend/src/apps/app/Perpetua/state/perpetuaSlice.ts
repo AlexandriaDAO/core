@@ -459,8 +459,14 @@ const perpetuaSlice = createSlice({
       })
       .addCase(checkShelfPublicAccess.fulfilled, (state, action) => {
         const { shelfId, isPublic } = action.payload;
-        // Reinstate explicit check as a workaround for persistent type issue
-        state.publicShelfAccess[shelfId] = typeof isPublic === 'boolean' ? isPublic : false;
+        // console.log(`[Reducer checkShelfPublicAccess.fulfilled] Shelf: ${shelfId}, Payload isPublic: ${isPublic}, Current state:`, state.publicShelfAccess[shelfId]);
+        // Only update the state if the payload is explicitly a boolean
+        if (typeof isPublic === 'boolean') {
+          state.publicShelfAccess[shelfId] = isPublic;
+          // console.log(`[Reducer checkShelfPublicAccess.fulfilled] Shelf: ${shelfId}, Updated state to:`, state.publicShelfAccess[shelfId]);
+        } else {
+          // console.log(`[Reducer checkShelfPublicAccess.fulfilled] Shelf: ${shelfId}, Received non-boolean payload (${isPublic}). Not updating state.`);
+        }
         state.loading.publicAccess[shelfId] = false;
       })
       .addCase(checkShelfPublicAccess.rejected, (state, action) => {
@@ -475,13 +481,10 @@ const perpetuaSlice = createSlice({
       })
       .addCase(toggleShelfPublicAccess.fulfilled, (state, action) => {
         const { shelfId, isPublic } = action.payload;
+        // console.log(`[Reducer toggleShelfPublicAccess.fulfilled] Shelf: ${shelfId}, Payload isPublic: ${isPublic}, Current state:`, state.publicShelfAccess[shelfId]);
         // Update the public access status
         state.publicShelfAccess[shelfId] = isPublic;
-        
-        // Also update the shelf entity if it exists
-        if (state.entities.shelves[shelfId]) {
-          state.entities.shelves[shelfId].is_public = isPublic;
-        }
+        // console.log(`[Reducer toggleShelfPublicAccess.fulfilled] Shelf: ${shelfId}, New state:`, state.publicShelfAccess[shelfId]);
       })
       .addCase(toggleShelfPublicAccess.rejected, (state, action) => {
         state.error = action.payload as string;
@@ -643,18 +646,23 @@ export const selectIsShelfPublic = (shelfId: string): ((state: RootState) => boo
       selectPublicAccessByIdMap,
       (state: RootState) => selectShelvesEntities(state)[shelfId],
       (publicAccessMap, shelf): boolean => { // Explicitly type the result function's return value
+        // console.log(`[Selector selectIsShelfPublic ${shelfId}] Map value: ${publicAccessMap[shelfId]}, Shelf entity:`, shelf ? shelf.is_public : 'undefined');
         // First check the dedicated map
         if (publicAccessMap[shelfId] !== undefined) {
-          return Boolean(publicAccessMap[shelfId]);
+          const result = Boolean(publicAccessMap[shelfId]);
+          // console.log(`[Selector selectIsShelfPublic ${shelfId}] Using map value. Returning: ${result}`);
+          return result;
         }
         
         // Fall back to the shelf entity if available
         // Ensure the generated Shelf type includes is_public: boolean
         if (shelf && typeof shelf.is_public === 'boolean') {
+          // console.log(`[Selector selectIsShelfPublic ${shelfId}] Falling back to shelf entity. Returning: ${shelf.is_public}`);
           return shelf.is_public;
         }
         
         // Default to false if no data is available
+        // console.log(`[Selector selectIsShelfPublic ${shelfId}] No data found. Returning default: false`);
         return false;
       }
     );

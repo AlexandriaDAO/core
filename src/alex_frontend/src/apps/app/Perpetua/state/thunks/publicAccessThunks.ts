@@ -34,7 +34,8 @@ export const checkShelfPublicAccess = createAsyncThunk(
       
       return rejectWithValue("Failed to check shelf public status");
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, "Failed to check shelf public status"));
+      const errorMsg = extractErrorMessage(error, "Failed to check shelf public status");
+      return rejectWithValue(errorMsg);
     }
   }
 );
@@ -67,7 +68,8 @@ export const toggleShelfPublicAccess = createAsyncThunk(
       
       return rejectWithValue(`Failed to ${isPublic ? 'enable' : 'disable'} public access for shelf`);
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, `Failed to ${isPublic ? 'enable' : 'disable'} public access for shelf`));
+      const errorMsg = extractErrorMessage(error, `Failed to ${isPublic ? 'enable' : 'disable'} public access for shelf`);
+      return rejectWithValue(errorMsg);
     }
   }
 ); 

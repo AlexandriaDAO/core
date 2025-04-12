@@ -42,6 +42,11 @@ export const addItem = createAsyncThunk(
         cacheManager.invalidateForShelf(shelf.shelf_id);
         cacheManager.invalidateForPrincipal(principal);
         
+        // If a shelf was added, invalidate the cache for that nested shelf too
+        if (type === "Shelf") {
+          cacheManager.invalidateForShelf(content);
+        }
+        
         return { shelf_id: shelf.shelf_id };
       } 
       

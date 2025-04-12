@@ -1,5 +1,11 @@
 use candid::Principal;
 use crate::storage::{Shelf, SHELVES};
+use ic_stable_structures::{StableBTreeMap, memory_manager::VirtualMemory};
+use ic_stable_structures::memory_manager::MemoryId;
+use ic_stable_structures::DefaultMemoryImpl;
+
+// Define Memory type alias for clarity
+type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 /// Common enum for shelf authorization errors
 #[derive(Debug, Clone)]
@@ -131,7 +137,7 @@ pub fn get_shelf_for_edit_mut<F, R>(
     callback: F
 ) -> Result<R, String> 
 where 
-    F: FnOnce(&mut Shelf) -> Result<R, String>
+    F: FnOnce(&mut Shelf, &mut StableBTreeMap<String, Shelf, Memory>) -> Result<R, String>
 {
     // First verify permissions without borrowing mutable
     if !can_edit_shelf(shelf_id, principal)? {
@@ -151,8 +157,8 @@ where
         // Create a mutable copy of the shelf
         let mut shelf_mut = shelf;
         
-        // Execute the callback with the mutable shelf
-        let result = callback(&mut shelf_mut)?;
+        // Execute the callback with the mutable shelf and the map
+        let result = callback(&mut shelf_mut, &mut shelves_map)?;
         
         // Update the timestamp
         shelf_mut.updated_at = ic_cdk::api::time();

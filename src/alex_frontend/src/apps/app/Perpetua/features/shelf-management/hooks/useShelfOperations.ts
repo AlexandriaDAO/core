@@ -74,8 +74,8 @@ export const useShelfOperations = () => {
     collectionType?: "NFT" | "SBT",
     referenceItemId?: number | null, 
     before?: boolean
-  ): Promise<boolean> => {
-    if (!identity) return false;
+  ): Promise<void> => {
+    if (!identity) throw new Error("User identity not found");
     try {
       await dispatch(addItemAction({ 
         shelf, 
@@ -90,14 +90,13 @@ export const useShelfOperations = () => {
       // Get the updated shelf
       await getShelf(shelf.shelf_id);
       
-      return true;
     } catch (error) {
       console.error("Failed to add item:", error);
       // If there's an authentication error, log it specifically
       if (error && typeof error === 'string' && error.includes('Invalid principal')) {
         console.error("Authentication error: Invalid principal. User may need to log out and log back in.");
       }
-      return false;
+      throw error;
     }
   }, [identity, dispatch, getShelf]);
 

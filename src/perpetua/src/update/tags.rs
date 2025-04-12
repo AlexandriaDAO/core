@@ -41,7 +41,7 @@ pub fn add_tag_to_shelf(input: TagOperationInput) -> Result<(), String> {
     validate_tag_format(&normalized_tag)?; // Validate format
 
     // 2. Authorize and Get Shelf (Mutable)
-    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
+    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf, _shelves_map| {
         
         // 3. Check Max Tags Constraint
         if !shelf.tags.contains(&normalized_tag) && shelf.tags.len() >= MAX_TAGS_PER_SHELF {
@@ -81,7 +81,7 @@ pub fn remove_tag_from_shelf(input: TagOperationInput) -> Result<(), String> {
     // No format validation needed on remove, just find the normalized version
 
     // 2. Authorize and Get Shelf (Mutable)
-    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
+    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf, _shelves_map| {
 
         // 3. Remove tag from Shelf struct (if present)
         let original_len = shelf.tags.len();

@@ -111,11 +111,10 @@ Perpetua/
 ```
 
 
-
-But first I gotta remove rebalancing?
+- Shelf display not working
 
 Backend Stuff:
-- Make public, i.e., anyone can edit a shelf.
+- Make public, i.e., anyone can edit a shelf. (make it work now, and put it under the collaborator tab for clarity).
 - Payment for all/some actions (maybe we do an action count for all backend calls, after certain actions you must pay X lbry).
 - 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
 
@@ -126,6 +125,7 @@ Frontend Stuff:
 - PerpetuaSlice needs: (editors, appears_in.length(), public or private)
 - Add appears-in in the frontend.
 - Test collaborator list stuff.
+- The nested alexandrian has two grids and is just buggy. Needs better experience.
  
 
 
@@ -146,14 +146,14 @@ Frontend Stuff:
 
 
 
-## Cleanup commands. 
+## Helpful Commands
+
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal nnw37-xatop-hpcix-h2ghs-45ahl-p6prc-vcj3w-g5mcw-zzxrc-gyedl-rqe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua
 npx ts-prune --project src/alex_frontend/src/apps/app/Perpetua
 npx ts-unused-exports tsconfig.json
-
-
 
 
 dfx canister uninstall-code perpetua

@@ -101,6 +101,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 			await addItem(shelf, content, type);
 		} catch (error) {
 			console.error("Error adding item:", error);
+			throw error; // Re-throw the error
 		}
 	};
 	

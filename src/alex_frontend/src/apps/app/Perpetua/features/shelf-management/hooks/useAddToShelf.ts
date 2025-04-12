@@ -101,20 +101,16 @@ export const useAddToShelf = () => {
       const targetShelf = denormalizeShelf(targetNormalizedShelf);
       
       // Add the content to the shelf, passing collectionType for NFTs
-      const success = await addItem(
+      await addItem(
         targetShelf, 
         content, 
         contentType,
         contentType === "Nft" ? collectionType : undefined
       );
       
-      if (success) {
-        toast.success(`Content added to ${targetShelf.title}`);
-        return true;
-      } else {
-        toast.error(`Failed to add content to ${targetShelf.title}`);
-        return false;
-      }
+      // If addItem didn't throw, it was successful
+      toast.success(`Content added to ${targetShelf.title}`);
+      return true;
     } catch (error) {
       console.error("Failed to add content to shelf:", error);
       toast.error("Failed to add content to shelf");

@@ -155,8 +155,6 @@ export const usePerpetuaActions = () => {
     toggleShelfPublicAccess: async (params: { shelfId: string, isPublic: boolean }) => {
       try {
         const result = await dispatch(toggleShelfPublicAccess(params)).unwrap();
-        // Get the updated shelf
-        await dispatch(getShelfById(params.shelfId)).unwrap();
         return result;
       } catch (error) {
         console.error("Failed to toggle shelf public access:", error);

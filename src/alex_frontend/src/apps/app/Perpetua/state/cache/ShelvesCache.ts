@@ -70,7 +70,7 @@ class ShelvesCache {
   /**
    * Get data from cache if valid and not expired
    */
-  public get<T>(id: Principal | string, type: string): T | null {
+  public get<T>(id: Principal | string, type: string): T | undefined {
     const key = this.generateKey(id, type);
     const entry = this.cache.get(key);
     
@@ -84,7 +84,8 @@ class ShelvesCache {
       this.cache.delete(key); // Clean up expired entry
     }
     
-    return null;
+    // Return undefined for missing or expired entries
+    return undefined;
   }
   
   /**
