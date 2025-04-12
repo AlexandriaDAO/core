@@ -9,14 +9,13 @@ interface AuthProviderProps {
 }
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    // const preffered = localStorage.getItem('provider');
+    const preffered = localStorage.getItem('provider');
 
-    // const [provider, setProvider] = useState<Authenticator>( preffered ? preffered as Authenticator : 'II');
-    const [provider, setProvider] = useState<Authenticator>('II');
+    const [provider, setProvider] = useState<Authenticator>( preffered ? preffered as Authenticator : 'II');
 
-	// useEffect(() => {
-	// 	localStorage.setItem('provider', provider);
-	// }, [provider]);
+	useEffect(() => {
+		localStorage.setItem('provider', provider);
+	}, [provider]);
 
 	// const renderProvider = () => {
 	// 	switch (provider) {
@@ -29,15 +28,22 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	// 	}
 	// };
 
+	// return (
+	// 	<AuthContext.Provider value={{ provider, setProvider }}>
+	// 		{/* {renderProvider()} */}
+	// 		<IIProvider>
+	// 			{/* <EthProvider>
+	// 				<SolProvider> */}
+	// 					{children}
+	// 				{/* </SolProvider>
+	// 			</EthProvider> */}
+	// 		</IIProvider>
+	// 	</AuthContext.Provider>
+	// );
 	return (
 		<AuthContext.Provider value={{ provider, setProvider }}>
-			{/* {renderProvider()} */}
 			<IIProvider>
-				{/* <EthProvider>
-					<SolProvider> */}
-						{children}
-					{/* </SolProvider>
-				</EthProvider> */}
+				{children}
 			</IIProvider>
 		</AuthContext.Provider>
 	);

@@ -1,9 +1,9 @@
 import { setUser } from "@/features/auth/authSlice";
 import login from "@/features/login/thunks/login";
 import { useUser } from "@/hooks/actors";
+import { useIdentity } from "@/hooks/useIdentity";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useInternetIdentity } from "ic-use-internet-identity";
 import React, { useEffect } from "react";
 
 interface IIUserProviderProps {
@@ -12,7 +12,7 @@ interface IIUserProviderProps {
 
 const IIUserProvider: React.FC<IIUserProviderProps> = ({ children }) => {
 	// const {identity, isInitializing, isLoggingIn, loginStatus, loginError, clear} = useInternetIdentity();
-	const {identity, isInitializing} = useInternetIdentity();
+	const {identity, isInitializing} = useIdentity();
     const {actor} = useUser();
 
     const dispatch = useAppDispatch();
