@@ -15,7 +15,7 @@ const IIProcessor = () => {
         try {
             setProvider('II');
 
-            await login();
+            await login(II_URL);
         } catch (error) {
             toast.error('Failed to login');
             console.error(error);
