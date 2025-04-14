@@ -13,8 +13,9 @@ export interface ShelfInformationSectionProps {
   description: string;
   setDescription: (description: string) => void;
   isOwner: boolean;
-  editingField: string | null;
-  toggleFieldEdit: (fieldName: string | null) => void;
+  appearsIn: string[];
+  editingField: "title" | "description" | null;
+  toggleFieldEdit: (field: "title" | "description" | null) => void;
   isDirty: boolean;
   isSavingMetadata: boolean;
   handleSaveChanges: () => Promise<void>;
