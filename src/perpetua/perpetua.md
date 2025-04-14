@@ -128,7 +128,6 @@ Frontend Stuff:
 - PerpetuaSlice needs: (editors, appears_in.length(), public or private)
 - Add appears-in in the frontend.
 - Test collaborator list stuff.
-- The nested alexandrian has two grids and is just buggy. Needs better experience.
  
 
 
@@ -151,7 +150,7 @@ Frontend Stuff:
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal nnw37-xatop-hpcix-h2ghs-45ahl-p6prc-vcj3w-g5mcw-zzxrc-gyedl-rqe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal gcuqr-i2pze-jo24s-lgaj2-bewrz-b23sk-nijk6-vqmlx-b46q3-msxsi-oqe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

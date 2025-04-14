@@ -117,6 +117,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
   // Use the sortedTransactions hook which applies proper filtering by tags
   const sortedTransactions = useSortedTransactions();
 
+  // Reinstate local state for dialog management
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string,assetUrl:string } | null>(null);
   const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
@@ -155,6 +156,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
     }
   }, [arweaveToNftId, nfts]);
 
+  // Reinstate dialog open change handler
   const handleDialogOpenChange = useCallback((open: boolean) => {
     if (!open) {
       setSelectedContent(null);
@@ -167,6 +169,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
         <ContentGrid>
           {sortedTransactions.map((transaction: Transaction) => {
             const content = contentData[transaction.id];
+            // Reinstate contentType variable
             const contentType = transaction.tags.find((tag: { name: string; value: string }) => tag.name === "Content-Type")?.value || "application/epub+zip";
             
             const nftId = arweaveToNftId[transaction.id];
@@ -184,6 +187,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
             return (
               <ContentGrid.Item
                 key={transaction.id}
+                // Revert onClick handler to use setSelectedContent
                 onClick={() => setSelectedContent({ id: transaction.id, type: contentType ,assetUrl:transaction.assetUrl?transaction.assetUrl:""})}
                 id={transaction.id}
                 owner={transaction.owner}
@@ -240,6 +244,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
           })}
         </ContentGrid>
 
+        {/* Reinstate Dialog component */}
         <Dialog open={!!selectedContent} onOpenChange={handleDialogOpenChange}>
           <DialogContent 
             className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"

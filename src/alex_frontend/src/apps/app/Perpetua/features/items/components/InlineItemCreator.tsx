@@ -5,7 +5,6 @@ import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
 import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { X, Plus, ChevronUp } from "lucide-react";
-import AlexandrianSelector from "./AlexandrianSelector";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { selectUserShelves, selectSelectedShelf, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
@@ -14,11 +13,12 @@ import { ShelfForm } from "@/apps/app/Perpetua/features/shelf-management/compone
 import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks/useShelfOperations";
 import { loadShelves } from "@/apps/app/Perpetua/state";
 import { useIdentity } from "@/hooks/useIdentity";
+import AlexandrianSelector from "./AlexandrianSelector";
 
 type ContentType = "Markdown" | "Nft" | "Shelf";
 
 interface InlineItemCreatorProps {
-  onSubmit: (content: string, type: "Nft" | "Markdown" | "Shelf", collectionType?: "NFT" | "SBT") => Promise<void>;
+  onSubmit: (content: string, type: "Markdown" | "Shelf") => Promise<void>;
   onCancel: () => void;
   shelves?: Shelf[] | NormalizedShelf[];
   shelf: any;
@@ -33,7 +33,6 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
   // Core state
   const [content, setContent] = useState("");
   const [type, setType] = useState<ContentType>("Markdown");
-  const [collectionType, setCollectionType] = useState<"NFT" | "SBT">("NFT");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Shelf-specific state
@@ -124,26 +123,14 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
     propShelves
   ]);
 
-  // Memoize handlers to prevent unnecessary rerenders
-  const handleNftSelect = useCallback((nftId: string, selectedCollectionType: "NFT" | "SBT") => {
-    if (!nftId) {
-      toast.error("Invalid NFT ID. Please try selecting another NFT.");
-      return;
-    }
-    
-    if (!/^\d+$/.test(nftId)) {
-      toast.error("Invalid NFT ID format. Expected a numeric ID.");
-      return;
-    }
-    
-    setContent(nftId);
-    setCollectionType(selectedCollectionType);
-    
-    toast.success(`Selected NFT with ID: ${nftId}`);
-  }, []);
-
   // Submit the current content as an item - memoized to prevent rerenders
   const handleSubmit = useCallback(async () => {
+    // Explicitly handle only Markdown and Shelf types for submission
+    if (type === "Nft") {
+      console.warn("handleSubmit called on Nft tab, which should not happen.");
+      return; // Do nothing if on the Nft tab
+    }
+
     try {
       setIsSubmitting(true);
       
@@ -154,12 +141,7 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
         return;
       }
       
-      if (type === "Nft" && !/^\d+$/.test(finalContent)) {
-        toast.error("Invalid NFT ID format. The ID must be numeric.");
-        return;
-      }
-      
-      await onSubmit(finalContent, type, type === "Nft" ? collectionType : undefined);
+      await onSubmit(finalContent, type as "Markdown" | "Shelf");
       setContent("");
       setSelectedShelfId("");
       toast.success(`Added ${type.toLowerCase()} content to shelf`);
@@ -169,7 +151,7 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [type, selectedShelfId, content, collectionType, onSubmit]);
+  }, [type, selectedShelfId, content, onSubmit]);
   
   // Create a new shelf and add it as an item - memoized
   const handleCreateShelf = useCallback(async () => {
@@ -286,17 +268,7 @@ Your content here..."
         return (
           <div className="flex-1 flex flex-col">
             <div className="flex-1 overflow-hidden">
-              <AlexandrianSelector onSelect={handleNftSelect} />
-            </div>
-            <div className="p-4 mt-auto border-t border-border flex justify-between">
-              <Button onClick={onCancel} variant="outline">Cancel</Button>
-              <Button 
-                onClick={handleSubmit} 
-                disabled={isSubmitting || !content}
-                variant="primary"
-              >
-                {isSubmitting ? "Adding..." : "Add NFT"}
-              </Button>
+              <AlexandrianSelector />
             </div>
           </div>
         );

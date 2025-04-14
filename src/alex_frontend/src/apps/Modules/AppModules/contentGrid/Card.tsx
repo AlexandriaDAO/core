@@ -132,7 +132,7 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
   return (
     <>
       <Card
-        className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative  bg-white dark:bg-gray-900 h-full ${component === "Emporium" ? "mb-20 rounded-2xl " : "overflow-hidden "}`}
+        className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative bg-white dark:bg-gray-900 h-full ${component === "Emporium" ? "mb-20 rounded-2xl" : "overflow-hidden"}`}
         onClick={onClick}
       >
         <CardContent className="flex flex-col items-start p-0">
@@ -248,14 +248,14 @@ export function ContentCard({ children, onClick, id, owner, showStats, onToggleS
         )}
       </Card>
 
-      {/* Shelf Selector Dialog */}
-      {isShelfSelectorOpen && id && (
+      {/* Shelf Selection Dialog */}
+      {id && (
         <ShelfSelectionDialog
+          open={isShelfSelectorOpen}
+          onClose={handleCloseShelfSelector}
           contentId={id}
           contentType="Nft"
           currentShelfId={undefined}
-          open={isShelfSelectorOpen}
-          onClose={handleCloseShelfSelector}
         />
       )}
     </>
