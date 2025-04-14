@@ -35,7 +35,6 @@ pub mod utils;
 pub use storage::{Item, Shelf, ShelfId, NormalizedTag};
 pub use update::shelf::{store_shelf, update_shelf_metadata};
 pub use update::item::{
-    ItemReorderInput, reorder_shelf_item, 
     AddItemInput, add_item_to_shelf, remove_item_from_shelf, 
     create_and_add_shelf_item
 };

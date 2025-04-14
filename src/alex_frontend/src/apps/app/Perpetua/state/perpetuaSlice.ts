@@ -17,7 +17,6 @@ import {
   removeItem
 } from './thunks/itemThunks';
 import {
-  reorderItem,
   reorderProfileShelf
 } from './thunks/reorderThunks';
 import {
@@ -29,6 +28,9 @@ import {
   checkShelfPublicAccess,
   toggleShelfPublicAccess
 } from './thunks/publicAccessThunks';
+import {
+  setItemOrder
+} from './thunks/reorderThunks';
 
 // Define the permissions interfaces
 export interface ContentPermissions {
@@ -343,8 +345,12 @@ const perpetuaSlice = createSlice({
       .addCase(getShelfById.fulfilled, (state, action) => {
         const shelf = action.payload;
         if (shelf && shelf.shelf_id) {
-          // Update the shelf in our entities
-          state.entities.shelves[shelf.shelf_id] = normalizeShelf(shelf);
+          const normalized = normalizeShelf(shelf);
+          const shelfId = normalized.shelf_id;
+          
+          // Update the shelf in our entities ONLY
+          // Do NOT update state.ids.shelfItems here, let reorderItem.fulfilled handle it
+          state.entities.shelves[shelfId] = normalized;
         }
       })
       .addCase(getShelfById.rejected, (state, action) => {
@@ -370,22 +376,6 @@ const perpetuaSlice = createSlice({
         // Item removed successfully, will be reflected when the shelf is loaded
       })
       .addCase(removeItem.rejected, (state, action) => {
-        state.error = action.payload as string;
-      })
-      
-      // Handle reorderItem
-      .addCase(reorderItem.pending, (state) => {
-        state.error = null;
-      })
-      .addCase(reorderItem.fulfilled, (state, action) => {
-        const { shelfId, newItemOrder } = action.payload;
-        
-        // Apply the new order if it was provided (for optimistic updates)
-        if (newItemOrder && shelfId) {
-          state.ids.shelfItems[shelfId] = newItemOrder;
-        }
-      })
-      .addCase(reorderItem.rejected, (state, action) => {
         state.error = action.payload as string;
       })
       
@@ -449,6 +439,28 @@ const perpetuaSlice = createSlice({
       })
       .addCase(removeShelfEditor.rejected, (state, action) => {
         state.error = action.payload as string;
+      })
+      
+      // Handle setItemOrder (NEW)
+      .addCase(setItemOrder.pending, (state, action) => {
+        const { shelfId } = action.meta.arg;
+        // Optionally apply optimistic update here if needed, but fulfilled handles it
+        state.error = null;
+      })
+      .addCase(setItemOrder.fulfilled, (state, action) => {
+        const { shelfId, newItemOrder } = action.payload;
+        // Update the optimistic state with the confirmed order
+        if (shelfId && newItemOrder) {
+          state.ids.shelfItems[shelfId] = newItemOrder;
+          // console.log(`[Reducer setItemOrder.fulfilled] Shelf: ${shelfId}, Updated item order:`, newItemOrder);
+        } else {
+           // console.warn(`[Reducer setItemOrder.fulfilled] Missing shelfId or newItemOrder in payload`, action.payload);
+        }
+      })
+      .addCase(setItemOrder.rejected, (state, action) => {
+        // Optionally revert optimistic update here if applied in pending
+        state.error = action.payload as string;
+        // console.error(`[Reducer setItemOrder.rejected] Error setting item order:`, action.payload);
       })
       
       // Handle checkShelfPublicAccess

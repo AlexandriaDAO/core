@@ -5,20 +5,10 @@ use crate::auth;
 use crate::update::utils::{verify_nft_ownership, shelf_exists, is_self_reference};
 use ic_stable_structures::{StableBTreeMap, memory_manager::VirtualMemory};
 use ic_stable_structures::DefaultMemoryImpl;
+use std::collections::HashSet;
 
 // Define Memory type alias for clarity
 type Memory = VirtualMemory<DefaultMemoryImpl>;
-
-/// Input structure for reordering a item within a shelf
-#[derive(CandidType, Deserialize)]
-pub struct ItemReorderInput {
-    /// The ID of the item to move
-    pub item_id: u32,
-    /// The reference item to position relative to (if None, will be placed at the end)
-    pub reference_item_id: Option<u32>,
-    /// Whether to place before (true) or after (false) the reference item
-    pub before: bool,
-}
 
 /// Input structure for adding a new item to a shelf
 #[derive(CandidType, Deserialize)]
@@ -29,21 +19,6 @@ pub struct AddItemInput {
     pub reference_item_id: Option<u32>,
     /// Whether to place before (true) or after (false) the reference item
     pub before: bool,
-}
-
-/// Reorders a item within a shelf
-/// 
-/// This changes the position of an existing item relative to other items.
-/// The position can be specified as before or after another item.
-#[ic_cdk::update(guard = "not_anon")]
-pub fn reorder_shelf_item(shelf_id: String, reorder: ItemReorderInput) -> Result<(), String> {
-    let caller = ic_cdk::caller();
-    
-    // Use the auth helper - update closure to accept the (unused) map argument
-    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf, _shelves_map| {
-        // Use the existing move_item method to handle the reordering
-        shelf.move_item(reorder.item_id, reorder.reference_item_id, reorder.before)
-    })
 }
 
 /// Adds a single item to an existing shelf
@@ -407,4 +382,57 @@ pub async fn create_and_add_shelf_item(
     });
     
     Ok(new_shelf_id)
+}
+
+/// Sets the absolute order of items within a shelf.
+///
+/// This replaces the existing item order with the one provided.
+/// All item IDs in the input list must exist within the shelf.
+#[ic_cdk::update(guard = "not_anon")]
+pub fn set_item_order(shelf_id: String, ordered_item_ids: Vec<u32>) -> Result<(), String> {
+    let caller = ic_cdk::caller();
+    const POSITION_STEP: f64 = 1000.0; // Use a constant step size
+
+    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf, _shelves_map| {
+        // 1. Validation: Check if all provided IDs exist in the shelf
+        let existing_item_ids: HashSet<u32> = shelf.items.keys().cloned().collect();
+        let input_item_ids: HashSet<u32> = ordered_item_ids.iter().cloned().collect();
+
+        if input_item_ids.len() != ordered_item_ids.len() {
+            return Err("Duplicate item IDs provided in the order list.".to_string());
+        }
+
+        // Check for missing IDs (IDs in shelf but not in input)
+        let missing_ids: Vec<u32> = existing_item_ids.difference(&input_item_ids).cloned().collect();
+        if !missing_ids.is_empty() {
+            return Err(format!(
+                "Input order is incomplete. Missing item IDs: {:?}",
+                missing_ids
+            ));
+        }
+
+        // Check for extra IDs (IDs in input but not in shelf)
+        let extra_ids: Vec<u32> = input_item_ids.difference(&existing_item_ids).cloned().collect();
+        if !extra_ids.is_empty() {
+            return Err(format!(
+                "Input order contains invalid item IDs not found in the shelf: {:?}",
+                extra_ids
+            ));
+        }
+
+        // 2. Clear existing positions
+        shelf.item_positions.clear();
+
+        // 3. Calculate and set new positions based on the provided order
+        for (index, item_id) in ordered_item_ids.iter().enumerate() {
+            // Calculate position starting from POSITION_STEP, increasing by STEP
+            let position = (index as f64 + 1.0) * POSITION_STEP;
+            shelf.item_positions.insert(*item_id, position);
+        }
+
+        // 4. Update timestamp
+        shelf.updated_at = ic_cdk::api::time();
+
+        Ok(())
+    })
 } 

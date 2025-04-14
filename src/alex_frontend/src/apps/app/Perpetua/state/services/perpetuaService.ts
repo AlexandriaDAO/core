@@ -346,40 +346,6 @@ class PerpetuaService {
   }
   
   /**
-   * Reorder a shelf item
-   */
-  public async reorderShelfItem(
-    shelfId: string,
-    itemId: number,
-    referenceItemId: number | null,
-    before: boolean
-  ): Promise<Result<boolean, string>> {
-    try {
-      const actor = await this.getActor();
-      
-      const result = await actor.reorder_shelf_item(
-        shelfId,
-        {
-          item_id: itemId,
-          reference_item_id: referenceItemId ? [referenceItemId] : [],
-          before
-        }
-      );
-
-      console.log("New shelf item order", result);
-      
-      if ("Ok" in result) {
-        return { Ok: true };
-      } else {
-        return { Err: result.Err };
-      }
-    } catch (error) {
-      console.error('Error in reorderShelfItem:', error);
-      return { Err: "Failed to reorder item" };
-    }
-  }
-  
-  /**
    * Reorder a shelf in a user's profile
    */
   public async reorderProfileShelf(
@@ -599,6 +565,29 @@ class PerpetuaService {
     } catch (error) {
       console.error('Error in toggleShelfPublicAccess:', error);
       return { Err: `Failed to ${isPublic ? 'enable' : 'disable'} public access for shelf` };
+    }
+  }
+
+  /**
+   * Set the absolute order of items in a shelf
+   */
+  public async setItemOrder(
+    shelfId: string,
+    orderedItemIds: number[]
+  ): Promise<Result<void, string>> {
+    try {
+      const actor = await this.getActor();
+      const result = await actor.set_item_order(shelfId, orderedItemIds);
+
+      if ("Ok" in result) {
+        // The backend returns Ok(()) which is equivalent to void in TS
+        return { Ok: undefined };
+      } else {
+        return { Err: result.Err };
+      }
+    } catch (error) {
+      console.error('Error in setItemOrder:', error);
+      return { Err: "Failed to set item order" };
     }
   }
 }

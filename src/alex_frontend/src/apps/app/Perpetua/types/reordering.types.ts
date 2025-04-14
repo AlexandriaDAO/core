@@ -17,11 +17,11 @@ export interface ReorderableItem {
  */
 export interface ReorderParams {
   shelfId: string;
-  itemId: number | string;
-  referenceItemId: number | string | null;
-  before: boolean;
+  referenceItemId?: string | number | null;
+  before?: boolean;
+  orderedItemIds?: number[];
   principal: string;
-  newItemOrder?: (number | string)[];
+  newItemOrder?: (string | number)[];
 }
 
 /**

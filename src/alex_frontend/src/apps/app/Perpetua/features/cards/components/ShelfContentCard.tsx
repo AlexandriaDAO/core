@@ -50,7 +50,11 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
       onDragStart={isEditMode ? (e) => handleDragStart(e, index) : undefined}
       onDragOver={isEditMode ? (e) => handleDragOver(e, index) : undefined}
       onDragEnd={isEditMode ? handleDragEnd : undefined}
-      onDrop={isEditMode ? (e) => handleDrop(e, index) : undefined}
+      onDrop={isEditMode ? (e) => {
+        console.log(`[ShelfContentCard] onDrop triggered. Passing index: ${index} to handleDrop prop.`);
+        e.stopPropagation();
+        handleDrop(e, index);
+      } : undefined}
       style={isEditMode && getDragItemStyle ? getDragItemStyle(index) : {}}
     >
       {isEditMode && (

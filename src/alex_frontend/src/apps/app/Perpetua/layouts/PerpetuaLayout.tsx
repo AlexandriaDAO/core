@@ -44,7 +44,7 @@ const denormalizeShelves = (shelves: NormalizedShelf[]): Shelf[] => {
 const PerpetuaLayout: React.FC = () => {
 
   // Core data hooks
-  const { shelves: personalNormalizedShelves, loading: personalLoading, createShelf, addItem, reorderItem } = useShelfOperations();
+  const { shelves: personalNormalizedShelves, loading: personalLoading, createShelf, addItem, setItemOrder } = useShelfOperations();
   const { publicShelves: publicNormalizedShelves, loading: publicLoading, loadMoreShelves } = usePublicShelfOperations();
   
   // Dialog state

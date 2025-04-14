@@ -1,19 +1,16 @@
 import { useCallback, useMemo, useRef, useEffect } from 'react';
 import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
-import { reorderItem } from '@/apps/app/Perpetua/state';
+import { setItemOrder } from '@/apps/app/Perpetua/state';
 import { useReorderable } from './useReorderable';
 import { compareArrays, createReorderReturn } from '../utils/reorderUtils';
 import { createReorderAdapter } from '../utils/createReorderAdapter';
-import { UseItemReorderingProps, ReorderRenderProps } from '../../../../types/reordering.types';
+import { UseItemReorderingProps, ReorderRenderProps, ReorderParams } from '../../../../types/reordering.types';
 
-// Type for reorderItem action parameters
-interface ItemReorderParams {
+// Type for setItemOrder action parameters (Matches the thunk payload)
+interface SetItemOrderParams {
   shelfId: string;
-  itemId: number;
-  referenceItemId: number | null;
-  before: boolean;
+  orderedItemIds: number[];
   principal: string;
-  newItemOrder?: number[];
 }
 
 /**
@@ -41,15 +38,15 @@ export const useItemReordering = ({ shelf, items, hasEditAccess }: UseItemReorde
     [itemsRef.current]
   );
   
-  // Create adapter function for reorder action using the factory
+  // Create adapter function for the new setItemOrder action
   const reorderAdapter = useCallback(
-    createReorderAdapter<ItemReorderParams>({
-      actionCreator: reorderItem,
+    createReorderAdapter<SetItemOrderParams>({
+      actionCreator: setItemOrder,
       parseId: (id) => typeof id === 'string' ? parseInt(id, 10) : id,
       fieldMapping: {
-        // Map ReorderParams fields to ItemReorderParams fields
-        referenceItemId: 'referenceItemId',
-        newItemOrder: 'newItemOrder'
+        // Map ReorderParams fields to SetItemOrderParams fields
+        orderedItemIds: 'orderedItemIds',
+        // No need to map itemId, referenceItemId, before
       }
     }),
     []

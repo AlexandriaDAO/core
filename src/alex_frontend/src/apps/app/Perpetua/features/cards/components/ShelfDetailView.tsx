@@ -36,7 +36,7 @@ interface UpdatedShelfDetailViewProps {
   handleDragStart: (e: React.DragEvent, index: number) => void;
   handleDragOver: (e: React.DragEvent, index: number) => void;
   handleDragEnd: () => void;
-  handleDrop: (e: React.DragEvent) => void;
+  handleDrop: (e: React.DragEvent, index: number) => void;
   getDragItemStyle: (index: number) => React.CSSProperties;
   draggedIndex: number | null;
   settingsButton?: React.ReactNode;

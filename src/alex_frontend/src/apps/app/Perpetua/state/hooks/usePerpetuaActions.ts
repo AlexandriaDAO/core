@@ -22,7 +22,7 @@ import {
   createAndAddShelfItem,
   addItem,
   removeItem,
-  reorderItem,
+  setItemOrder,
   reorderProfileShelf,
   listShelfEditors,
   addShelfEditor,
@@ -90,13 +90,11 @@ export const usePerpetuaActions = () => {
     }) => dispatch(removeItem(params)),
     
     // Ordering and arrangement
-    reorderItem: (params: { 
-      shelfId: string, 
-      itemId: number, 
-      referenceItemId: number | null, 
-      before: boolean,
-      principal: Principal | string
-    }) => dispatch(reorderItem(params)),
+    setItemOrder: (params: {
+      shelfId: string;
+      orderedItemIds: number[];
+      principal: Principal | string;
+    }) => dispatch(setItemOrder(params)),
     reorderProfileShelf: (params: { 
       shelfId: string, 
       referenceShelfId: string | null, 

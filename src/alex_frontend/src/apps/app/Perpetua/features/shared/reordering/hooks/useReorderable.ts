@@ -82,127 +82,52 @@ export const useReorderable = <T extends ReorderableItem>({
   // Save the reordered items
   const saveOrder = useCallback(async () => {
     if (!identity) {
-      console.error("Cannot save order: No identity available");
+      console.error("[useReorderable] Cannot save order: No identity available");
       return;
     }
-    
-    // Determine the new order - find the item that needs to move and its new position
+
     const originalIds = itemsRef.current.map(item => item.id);
     const newIds = editedItems.map(item => item.id);
-    
-    // Find the first position that changed
-    let changedIndex = -1;
-    for (let i = 0; i < newIds.length; i++) {
-      if (newIds[i] !== originalIds[i]) {
-        changedIndex = i;
-        break;
-      }
-    }
-    
-    if (changedIndex === -1) {
-      // No changes, just exit edit mode
+
+    if (isEqual(originalIds, newIds)) {
+      console.log("[useReorderable] No changes detected, exiting edit mode.");
       setIsEditMode(false);
       return;
     }
-    
-    // Determine the moved item ID
-    const movedItemId = newIds[changedIndex];
-    
-    // Find where this ID was in the original order
-    const originalPos = originalIds.indexOf(movedItemId);
-    
-    // If item moved earlier in the list, place before the item at the target position
-    // If item moved later in the list, place after the item at the target position - 1
-    const targetPos = changedIndex;
-    const isMoveUp = targetPos < originalPos;
-    
-    // Get the reference item ID - MUST NOT be the same as the moved item
-    let referenceId: string | number | null = null;
-    let before = true;
-    
-    if (isMoveUp) {
-      // For moving up, place before the item at target position
-      if (targetPos < newIds.length) {
-        const targetId = newIds[targetPos];
-        // Avoid self-reference
-        if (targetId === movedItemId) {
-          // If we'd reference ourself, find another reference point
-          if (targetPos + 1 < newIds.length) {
-            // Use the next item as reference and place before it
-            referenceId = newIds[targetPos + 1];
-            before = true;
-          } else if (targetPos > 0) {
-            // Use the previous item as reference and place after it
-            referenceId = newIds[targetPos - 1]; 
-            before = false;
-          } else {
-            // Edge case: only one item
-            referenceId = null;
-            before = true;
-          }
-        } else {
-          // Normal case
-          referenceId = targetId;
-          before = true;
-        }
-      } else {
-        // Special case: target is last position
-        referenceId = null;
-        before = false;
-      }
-    } else {
-      // For moving down, place after the item at target position - 1
-      if (targetPos > 0) {
-        const targetId = newIds[targetPos - 1];
-        // Avoid self-reference
-        if (targetId === movedItemId) {
-          if (targetPos - 2 >= 0) {
-            // Use the item before as reference
-            referenceId = newIds[targetPos - 2];
-            before = false;
-          } else if (targetPos < newIds.length) {
-            // Use the next item as reference
-            referenceId = newIds[targetPos];
-            before = true;
-          } else {
-            // Edge case
-            referenceId = null;
-            before = true;
-          }
-        } else {
-          // Normal case
-          referenceId = targetId;
-          before = false;
-        }
-      } else {
-        // Special case: target is first position
-        if (newIds.length > 1) {
-          // If multiple items, reference the second item
-          referenceId = newIds[1];
-          before = true;
-        } else {
-          // Edge case: only one item
-          referenceId = null;
-          before = true;
-        }
-      }
-    }
-    
-    // Dispatch the reorder action with both specific parameters AND the complete new order
+
+    // console.log(`[useReorderable] Saving absolute order. Shelf ID: ${containerId}, New IDs: [${newIds.join(', ')}]`);
+
+    // Log the parameters being sent
+    // console.log(`[useReorderable] Dispatching setItemOrder: shelfId=${containerId}, orderedItemIds=[${newIds.join(', ')}], principal=${identity.getPrincipal().toString()}`);
+
+    // Dispatch the reorder action (which should now be setItemOrder)
     try {
+      // Ensure newIds are numbers if your backend expects nat32/number[]
+      const numericIds = newIds.map(id => {
+        if (typeof id === 'number') return id;
+        // Attempt conversion if needed, handle errors appropriately
+        const num = Number(id);
+        if (isNaN(num)) {
+          throw new Error(`Invalid item ID found: ${id}`);
+        }
+        return num;
+      });
+
       await dispatch(reorderAction({
         shelfId: containerId,
-        itemId: movedItemId,
-        referenceItemId: referenceId,
-        before,
+        orderedItemIds: numericIds, // Pass the full array of ordered IDs
         principal: identity.getPrincipal().toString(),
-        newItemOrder: newIds
+        // No need for itemId, referenceItemId, before, or newItemOrder here
+        // as the thunk payload expects orderedItemIds
       })).unwrap();
-      
+
+      // console.log("[useReorderable] setItemOrder action dispatched successfully.");
+
       setIsEditMode(false);
     } catch (error) {
-      // Revert to original order on error
-      setEditedItems([...itemsRef.current]);
+      // console.error("[useReorderable] setItemOrder action failed:", error);
+      // Consider reverting editedItems on error:
+      // setEditedItems([...itemsRef.current]);
     }
   }, [containerId, editedItems, identity, itemsRef, dispatch, reorderAction]);
 

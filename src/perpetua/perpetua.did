@@ -65,8 +65,8 @@ service : () -> {
   remove_shelf_editor : (text, principal) -> (Result);
   remove_tag_from_shelf : (TagOperationInput) -> (Result);
   reorder_profile_shelf : (text, opt text, bool) -> (Result);
-  reorder_shelf_item : (text, ItemReorderInput) -> (Result);
   reset_profile_order : () -> (Result);
+  set_item_order : (text, vec nat32) -> (Result);
   store_shelf : (text, opt text, vec Item, opt vec text) -> (Result_1);
   toggle_shelf_public_access : (text, bool) -> (Result);
   update_shelf_metadata : (text, opt text, opt text) -> (Result);

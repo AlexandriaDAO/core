@@ -56,15 +56,18 @@ export const useDragAndDrop = <T>(items: T[], onReorder: (newItems: T[]) => void
 
   // Handle drop
   const handleDrop = useCallback((e: React.DragEvent, index: number) => {
+    console.log(`[useDragAndDrop] handleDrop called. Received index: ${index}, Current draggedIndex: ${draggedIndex}`);
     e.preventDefault();
     
     if (draggedIndex === null || draggedIndex === index) {
+      console.log(`[useDragAndDrop] handleDrop: No action needed (draggedIndex: ${draggedIndex}, target index: ${index})`);
       return;
     }
     
     // Create new item order by moving the dragged item
     const updatedItems = [...items];
     const [draggedItem] = updatedItems.splice(draggedIndex, 1);
+    console.log(`[useDragAndDrop] handleDrop: Splicing dragged item (${draggedIndex}) into target index: ${index}`);
     updatedItems.splice(index, 0, draggedItem);
     
     // Notify parent of the reordering
@@ -73,7 +76,7 @@ export const useDragAndDrop = <T>(items: T[], onReorder: (newItems: T[]) => void
     // Reset drag state
     setDraggedIndex(null);
     setDragOverIndex(null);
-  }, [draggedIndex, items, onReorder]);
+  }, [draggedIndex, items, onReorder, dragOverIndex]);
 
   // Determine visual style for dragged items
   const getDragItemStyle = useCallback((index: number) => {

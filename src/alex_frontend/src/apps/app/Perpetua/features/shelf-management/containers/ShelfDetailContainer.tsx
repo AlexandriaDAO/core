@@ -139,7 +139,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 					handleDragStart={handleDragStart}
 					handleDragOver={handleDragOver}
 					handleDragEnd={handleDragEnd}
-					handleDrop={(e) => handleDrop(e, 0)} // Adapt the interface
+					handleDrop={handleDrop}
 					getDragItemStyle={getDragItemStyle}
 					draggedIndex={draggedIndex || null}
 					settingsButton={

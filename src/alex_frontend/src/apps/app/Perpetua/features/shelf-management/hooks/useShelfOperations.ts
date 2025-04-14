@@ -11,7 +11,7 @@ import {
   loadShelves, 
   createShelf as createShelfAction, 
   addItem as addItemAction,
-  reorderItem as reorderItemAction,
+  setItemOrder as setItemOrderAction,
   reorderProfileShelf as reorderProfileShelfAction,
   updateShelfMetadata,
   createAndAddShelfItem as createAndAddShelfItemAction,
@@ -121,23 +121,21 @@ export const useShelfOperations = () => {
     }
   }, [identity, dispatch, getShelf]);
 
-  const reorderItem = useCallback(async (shelfId: string, itemId: number, referenceItemId: number | null, before: boolean): Promise<boolean> => {
+  const setItemOrder = useCallback(async (shelfId: string, orderedItemIds: number[]): Promise<boolean> => {
     if (!identity) return false;
     try {
-      await dispatch(reorderItemAction({ 
-        shelfId, 
-        itemId, 
-        referenceItemId, 
-        before,
+      await dispatch(setItemOrderAction({
+        shelfId,
+        orderedItemIds,
         principal: identity.getPrincipal()
       })).unwrap();
-      
-      // Get the updated shelf
+
+      // Get the updated shelf (optional, depends if you need the full shelf data immediately after reorder)
       await getShelf(shelfId);
-      
+
       return true;
     } catch (error) {
-      console.error("Failed to reorder item:", error);
+      console.error("Failed to set item order:", error);
       return false;
     }
   }, [identity, dispatch, getShelf]);
@@ -203,7 +201,7 @@ export const useShelfOperations = () => {
     createShelf,
     addItem,
     createAndAddShelfItem,
-    reorderItem,
+    setItemOrder,
     reorderShelf,
     findItemById,
     updateMetadata,

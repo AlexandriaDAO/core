@@ -14,36 +14,46 @@ export function createReorderAdapter<T extends Record<string, any>>({
   fieldMapping?: Record<string, string>;
 }) {
   return (params: ReorderParams) => {
-    // Extract and transform IDs if needed
-    const itemId = parseId(params.itemId);
-    const referenceItemId = params.referenceItemId === null ? null : parseId(params.referenceItemId);
-    
-    // Transform the complete item order array if provided
-    const newItemOrder = params.newItemOrder ? params.newItemOrder.map(parseId) : undefined;
-    
-    // Map fields according to the provided mapping
-    const mappedParams: Record<string, any> = {
-      ...params,
-      itemId,
-      referenceItemId,
-    };
-    
-    // Create the final payload with mapped field names
+    // Initialize payload
     const payload: Record<string, any> = {};
-    
-    // Apply field mapping
-    Object.entries(mappedParams).forEach(([key, value]) => {
-      const mappedKey = fieldMapping[key] || key;
-      payload[mappedKey] = value;
-    });
-    
-    // Special handling for array fields that need mapping
-    if (params.newItemOrder) {
-      const orderFieldName = fieldMapping['newItemOrder'] || 'newItemOrder';
-      payload[orderFieldName] = newItemOrder;
+
+    // Always include shelfId and principal
+    payload[fieldMapping?.['shelfId'] || 'shelfId'] = params.shelfId;
+    payload[fieldMapping?.['principal'] || 'principal'] = params.principal;
+
+    // Remove handling for legacy itemId field
+    // if (params.itemId !== undefined && params.itemId !== null) {
+    //   const key = fieldMapping?.['itemId'] || 'itemId';
+    //   payload[key] = parseId(params.itemId);
+    // }
+
+    // Handle optional legacy fields (referenceItemId, before)
+    if (params.referenceItemId !== undefined) {
+      const key = fieldMapping?.['referenceItemId'] || 'referenceItemId';
+      payload[key] = params.referenceItemId === null ? null : parseId(params.referenceItemId);
     }
-    
-    // Call the provided action creator with transformed parameters
+    if (params.before !== undefined) {
+      const key = fieldMapping?.['before'] || 'before';
+      payload[key] = params.before;
+    }
+
+    // Handle optional new field (orderedItemIds)
+    if (params.orderedItemIds !== undefined) {
+      const key = fieldMapping?.['orderedItemIds'] || 'orderedItemIds';
+      // Assuming orderedItemIds are already numbers and don't need parseId
+      payload[key] = params.orderedItemIds;
+    }
+
+    // Handle optional optimistic update field (newItemOrder)
+    if (params.newItemOrder !== undefined) {
+      const key = fieldMapping?.['newItemOrder'] || 'newItemOrder';
+      payload[key] = params.newItemOrder.map(parseId);
+    }
+
+    // Log the final payload being sent to the action creator
+    // console.log(`[createReorderAdapter] Final payload:`, payload);
+
+    // Call the provided action creator with the constructed payload
     return actionCreator(payload as T);
   };
 } 

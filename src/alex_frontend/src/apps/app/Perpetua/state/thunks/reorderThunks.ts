@@ -7,54 +7,41 @@ import { perpetuaService } from '../services/perpetuaService';
 import { toPrincipal, extractErrorMessage } from '../../utils';
 
 /**
- * Reorder an item within a shelf
+ * Set the absolute order of items within a shelf
  */
-export const reorderItem = createAsyncThunk(
-  'perpetua/reorderItem',
-  async ({ 
-    shelfId, 
-    itemId, 
-    referenceItemId, 
-    before,
-    principal,
-    newItemOrder // Optional parameter for the complete new order
-  }: { 
-    shelfId: string, 
-    itemId: number, 
-    referenceItemId: number | null, 
-    before: boolean,
-    principal: Principal | string,
-    newItemOrder?: number[] // Optional complete order for optimistic updates
+export const setItemOrder = createAsyncThunk(
+  'perpetua/setItemOrder',
+  async ({
+    shelfId,
+    orderedItemIds,
+    principal // Add principal if needed for cache invalidation or logging
+  }: {
+    shelfId: string;
+    orderedItemIds: number[];
+    principal: Principal | string; // Pass principal for consistency if needed
   }, { rejectWithValue }) => {
     try {
-      const result = await perpetuaService.reorderShelfItem(
-        shelfId,
-        itemId,
-        referenceItemId,
-        before
-      );
-      
-      if ("Ok" in result && result.Ok) {
+      const result = await perpetuaService.setItemOrder(shelfId, orderedItemIds);
+
+      if ("Ok" in result) {
         // Invalidate caches for this shelf
         cacheManager.invalidateForShelf(shelfId);
-        
-        return { 
-          shelfId, 
-          itemId, 
-          referenceItemId, 
-          before, 
-          newItemOrder,
-          success: true
+
+        // The thunk needs to return serializable data
+        return {
+          shelfId,
+          newItemOrder: orderedItemIds, // Return the confirmed new order
+          success: true,
         };
-      } 
-      
+      }
+
       if ("Err" in result && result.Err) {
         return rejectWithValue(result.Err);
       }
-      
-      return rejectWithValue("Failed to reorder item");
+
+      return rejectWithValue("Failed to set item order");
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, "Failed to reorder item"));
+      return rejectWithValue(extractErrorMessage(error, "Failed to set item order"));
     }
   }
 );
