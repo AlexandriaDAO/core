@@ -27,7 +27,10 @@ export const useAddToShelf = () => {
   // Ensure shelves are loaded when the hook is first used
   useEffect(() => {
     if (identity && availableShelves.length === 0 && !shelvesLoading) {
-      dispatch(loadShelves(identity.getPrincipal()));
+      dispatch(loadShelves({ 
+        principal: identity.getPrincipal(), 
+        params: { offset: 0, limit: 20 }
+      }));
     }
   }, [identity, availableShelves.length, shelvesLoading, dispatch]);
 

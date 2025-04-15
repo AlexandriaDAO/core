@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction, createSelector, createAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createSelector, createAction, AsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '@/store';
 import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { 
@@ -49,6 +49,16 @@ import {
 // } from './thunks/tagThunks'; // Placeholder
 
 import { Principal } from '@dfinity/principal'; // Import Principal
+
+// Import needed types from service
+import { 
+  OffsetPaginatedResponse, 
+  CursorPaginatedResponse, 
+  TimestampCursor, 
+  TagPopularityKeyCursor, 
+  TagShelfAssociationKeyCursor, 
+  NormalizedTagCursor 
+} from './services/perpetuaService'; // Corrected path
 
 // Define the permissions interfaces
 export interface ContentPermissions {
@@ -244,72 +254,48 @@ const perpetuaSlice = createSlice({
         state.loading.userShelves = true;
         state.error = null;
       })
-      .addCase(loadShelves.fulfilled, (state, action) => {
-        const shelves = action.payload;
-        const { entities, ids } = normalizeShelves(shelves);
+      .addCase(loadShelves.fulfilled, (state, action: PayloadAction<OffsetPaginatedResponse<Shelf>>) => {
+        const { items, offset, limit, total_count } = action.payload;
+        const { entities, ids } = normalizeShelves(items);
         
-        // Update entities by merging new shelves
-        state.entities.shelves = {
-          ...state.entities.shelves,
-          ...entities
-        };
+        state.entities.shelves = { ...state.entities.shelves, ...entities };
         
-        // Preserve existing order if we have one
-        if (state.ids.userShelves.length > 0) {
-          // First, keep all existing shelves that still exist in new data
-          const existingOrder = state.ids.userShelves.filter(id => entities[id]);
-          
-          // Then add any new shelves that weren't already in our existing order
-          const newShelfIds = ids.filter(id => !existingOrder.includes(id));
-          
-          // Combine existing (preserved order) with new shelves
-          state.ids.userShelves = [...existingOrder, ...newShelfIds];
+        if (offset === 0) {
+            state.ids.userShelves = ids;
         } else {
-          // If no existing order, use the order from the API
-          state.ids.userShelves = ids;
+            // Decide how to handle subsequent pages - appending for now
+            const newIds = ids.filter(id => !state.ids.userShelves.includes(id));
+            state.ids.userShelves = [...state.ids.userShelves, ...newIds];
         }
         
         state.loading.userShelves = false;
       })
       .addCase(loadShelves.rejected, (state, action) => {
         state.loading.userShelves = false;
-        state.error = action.payload as string;
+        state.error = action.payload || null; // Handle potential undefined payload
       })
       
-      // Handle loadMissingShelves (new)
+      // Handle loadMissingShelves
       .addCase(loadMissingShelves.pending, (state) => {
         state.loading.userShelves = true;
         state.error = null;
       })
-      .addCase(loadMissingShelves.fulfilled, (state, action) => {
-        // Only add new shelves that don't exist yet
+      .addCase(loadMissingShelves.fulfilled, (state, action: PayloadAction<Shelf[]>) => {
         if (action.payload.length === 0) {
-          // No missing shelves, nothing to do
           state.loading.userShelves = false;
           return;
         }
-        
         const { entities, ids } = normalizeShelves(action.payload);
-        
-        // Update entities by merging new shelves
-        state.entities.shelves = {
-          ...state.entities.shelves,
-          ...entities
-        };
-        
-        // Only add new shelf IDs that aren't already in our order
+        state.entities.shelves = { ...state.entities.shelves, ...entities };
         const newShelfIds = ids.filter(id => !state.ids.userShelves.includes(id));
-        
-        // Append any new shelves to the existing order
         if (newShelfIds.length > 0) {
           state.ids.userShelves = [...state.ids.userShelves, ...newShelfIds];
         }
-        
         state.loading.userShelves = false;
       })
       .addCase(loadMissingShelves.rejected, (state, action) => {
         state.loading.userShelves = false;
-        state.error = action.payload as string;
+        state.error = action.payload || null; // Handle potential undefined payload
       })
       
       // Load recent public shelves
@@ -317,86 +303,40 @@ const perpetuaSlice = createSlice({
         state.loading.publicShelves = true;
         state.error = null;
       })
-      .addCase(loadRecentShelves.fulfilled, (state, action) => {
-        const { shelves, beforeTimestamp, lastTimestamp } = action.payload;
-        const { entities, ids } = normalizeShelves(shelves);
+      // Explicitly type the action to include meta
+      .addCase(loadRecentShelves.fulfilled, (state, action: ReturnType<typeof loadRecentShelves.fulfilled>) => {
+        const { items, next_cursor, limit } = action.payload;
+        const { entities, ids } = normalizeShelves(items);
         
-        // Merge new entities
-        state.entities.shelves = {
-          ...state.entities.shelves,
-          ...entities
-        };
+        state.entities.shelves = { ...state.entities.shelves, ...entities };
         
-        // If we're loading with a timestamp, append to existing public shelf IDs
-        if (beforeTimestamp) {
-          state.ids.publicShelves = [...state.ids.publicShelves, ...ids];
-        } else {
-          // Otherwise, replace the public shelf IDs
+        // Use meta argument to determine if it was the first page
+        const isFirstPage = !action.meta.arg.cursor;
+        if (isFirstPage) { 
           state.ids.publicShelves = ids;
+        } else {
+          const newIds = ids.filter(id => !state.ids.publicShelves.includes(id));
+          state.ids.publicShelves = [...state.ids.publicShelves, ...newIds];
         }
         
-        // Store the lastTimestamp as a string (already converted in the thunk)
-        state.lastTimestamp = lastTimestamp;
+        state.lastTimestamp = next_cursor ? String(next_cursor) : undefined;
         state.loading.publicShelves = false;
       })
       .addCase(loadRecentShelves.rejected, (state, action) => {
         state.loading.publicShelves = false;
-        state.error = action.payload as string;
+        state.error = action.payload || null; // Handle potential undefined payload
       })
       
-      // Handle createShelf
-      .addCase(createShelf.pending, (state) => {
-        state.error = null;
+      // Handle getShelfById (No changes needed for payload)
+      .addCase(getShelfById.pending, (state) => { state.error = null; })
+      .addCase(getShelfById.fulfilled, (state, action: PayloadAction<Shelf>) => {
+          const shelf = action.payload;
+          if (shelf && shelf.shelf_id) {
+              const normalized = normalizeShelf(shelf);
+              state.entities.shelves[normalized.shelf_id] = normalized;
+          }
       })
-      .addCase(createShelf.fulfilled, (state, action) => {
-        // We'll reload shelves via loadShelves thunk, so no need to modify state here
-      })
-      .addCase(createShelf.rejected, (state, action) => {
-        state.error = action.payload as string;
-      })
-      
-      // Handle updateShelfMetadata
-      .addCase(updateShelfMetadata.pending, (state) => {
-        state.error = null;
-      })
-      .addCase(updateShelfMetadata.fulfilled, (state, action) => {
-        const { shelfId, title } = action.payload;
-        
-        // Only update the title which we know is a string
-        if (shelfId && title && state.entities.shelves[shelfId]) {
-          state.entities.shelves[shelfId].title = title;
-        }
-      })
-      .addCase(updateShelfMetadata.rejected, (state, action) => {
-        state.error = action.payload as string;
-      })
-      
-      // Handle createAndAddShelfItem
-      .addCase(createAndAddShelfItem.pending, (state) => {
-        state.error = null;
-      })
-      .addCase(createAndAddShelfItem.fulfilled, (state, action) => {
-        // We'll get the updated shelves via loadShelves, so no need to modify state here
-      })
-      .addCase(createAndAddShelfItem.rejected, (state, action) => {
-        state.error = action.payload as string;
-      })
-      
-      // Handle getShelfById
-      .addCase(getShelfById.pending, (state) => {
-        state.error = null;
-      })
-      .addCase(getShelfById.fulfilled, (state, action) => {
-        const shelf = action.payload;
-        if (shelf && shelf.shelf_id) {
-          const normalized = normalizeShelf(shelf);
-          const shelfId = normalized.shelf_id;
-          state.entities.shelves[shelfId] = normalized;
-        }
-      })
-      .addCase(getShelfById.rejected, (state, action) => {
-        state.error = action.payload as string;
-      })
+      .addCase(getShelfById.rejected, (state, action) => { state.error = action.payload || null; })
       
       // Handle addItem
       .addCase(addItem.pending, (state) => {
@@ -539,54 +479,68 @@ const perpetuaSlice = createSlice({
         state.loading.popularTags = true;
         state.error = null;
       })
-      .addCase(fetchPopularTags.fulfilled, (state, action: PayloadAction<string[]>) => {
-        state.popularTags = action.payload;
+       // Explicitly type the action to include meta
+      .addCase(fetchPopularTags.fulfilled, (state, action: ReturnType<typeof fetchPopularTags.fulfilled>) => {
+        const { items, next_cursor } = action.payload;
+        const isFirstPage = !action.meta.arg.cursor; 
+        if (isFirstPage) {
+           state.popularTags = items;
+        }
+        // Logic to append might be needed if UI supports infinite scroll for tags
         state.loading.popularTags = false;
       })
       .addCase(fetchPopularTags.rejected, (state, action) => {
         state.loading.popularTags = false;
-        state.error = action.payload as string;
+        state.error = action.payload || null; // Handle potential undefined payload
       })
       
       .addCase(fetchShelvesByTag.pending, (state) => {
         state.loading.shelvesByTag = true;
         state.error = null;
       })
-      .addCase(fetchShelvesByTag.fulfilled, (state, action: PayloadAction<{ tag: string; shelfIds: string[] }>) => {
-        const { tag, shelfIds } = action.payload;
-        state.ids.shelvesByTag[tag] = shelfIds;
+      // Explicitly type the action to include meta
+      .addCase(fetchShelvesByTag.fulfilled, (state, action: ReturnType<typeof fetchShelvesByTag.fulfilled>) => {
+        const { tag, response } = action.payload;
+        const { items, next_cursor } = response;
+        const isFirstPage = !action.meta.arg.params.cursor; 
+        if (isFirstPage) { 
+           state.ids.shelvesByTag[tag] = items;
+         }
+        // Logic to append might be needed
         state.loading.shelvesByTag = false;
       })
       .addCase(fetchShelvesByTag.rejected, (state, action) => {
         state.loading.shelvesByTag = false;
-        state.error = action.payload as string;
+        state.error = action.payload || null; // Handle potential undefined payload
       })
       
-      .addCase(fetchTagShelfCount.pending, (state) => {
-        state.loading.tagCounts = true;
-        state.error = null;
-      })
+      // Handle fetchTagShelfCount (No changes needed for payload)
+      .addCase(fetchTagShelfCount.pending, (state) => { state.loading.tagCounts = true; state.error = null; })
       .addCase(fetchTagShelfCount.fulfilled, (state, action: PayloadAction<{ tag: string; count: number }>) => {
-        const { tag, count } = action.payload;
-        state.tagShelfCounts[tag] = count;
-        state.loading.tagCounts = false;
+          const { tag, count } = action.payload;
+          state.tagShelfCounts[tag] = count;
+          state.loading.tagCounts = false;
       })
-      .addCase(fetchTagShelfCount.rejected, (state, action) => {
-        state.loading.tagCounts = false;
-        state.error = action.payload as string;
-      })
+      .addCase(fetchTagShelfCount.rejected, (state, action) => { state.loading.tagCounts = false; state.error = action.payload || null; })
       
       .addCase(fetchTagsWithPrefix.pending, (state) => {
         state.loading.tagSearch = true;
         state.error = null;
       })
-      .addCase(fetchTagsWithPrefix.fulfilled, (state, action: PayloadAction<string[]>) => {
-        state.tagSearchResults = action.payload;
+      // Explicitly type the action to include meta
+      .addCase(fetchTagsWithPrefix.fulfilled, (state, action: ReturnType<typeof fetchTagsWithPrefix.fulfilled>) => {
+        const { items, next_cursor } = action.payload;
+        const isFirstPage = !action.meta.arg.params.cursor;
+        // Replace search results entirely for now
+        if (isFirstPage) {
+            state.tagSearchResults = items;
+        }
+        // Logic to append might be needed
         state.loading.tagSearch = false;
       })
       .addCase(fetchTagsWithPrefix.rejected, (state, action) => {
         state.loading.tagSearch = false;
-        state.error = action.payload as string;
+        state.error = action.payload || null; // Handle potential undefined payload
       });
       // --- End Tag Thunk Reducers ---
   },
@@ -951,7 +905,8 @@ export {
 const selectShelvesByTagMap = (state: RootState) => state.perpetua.ids.shelvesByTag;
 const selectTagShelfCountsMap = (state: RootState) => state.perpetua.tagShelfCounts;
 
-// This block should only export selectTagShelfCountsMap
+// This block should export both map selectors now
 export {
+    selectShelvesByTagMap,
     selectTagShelfCountsMap
 };

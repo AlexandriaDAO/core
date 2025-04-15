@@ -19,7 +19,7 @@ export const usePublicShelfOperations = () => {
   const lastTimestamp = useAppSelector(selectLastTimestamp);
 
   const loadRecentShelvesData = useCallback(async (limit: number = 20, beforeTimestamp?: string | bigint) => {
-    await dispatch(loadRecentShelves({ limit, beforeTimestamp }));
+    await dispatch(loadRecentShelves({ limit, cursor: beforeTimestamp }));
   }, [dispatch]);
 
   const loadMoreShelves = useCallback(async () => {

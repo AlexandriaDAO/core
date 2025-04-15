@@ -3,149 +3,143 @@ import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { Principal } from '@dfinity/principal';
 import { updateSingleShelf } from '../perpetuaSlice';
 import { cacheManager } from '../cache/ShelvesCache';
-import { perpetuaService } from '../services/perpetuaService';
+import { 
+  perpetuaService, 
+  OffsetPaginationParams, 
+  CursorPaginationParams, 
+  OffsetPaginatedResponse, 
+  CursorPaginatedResponse, 
+  TimestampCursor, 
+  TagPopularityKeyCursor, 
+  TagShelfAssociationKeyCursor, 
+  NormalizedTagCursor
+} from '../services/perpetuaService';
 import { principalToString, extractErrorMessage } from '../../utils';
 
+// Define a type for the rejectWithValue result
+type RejectValue = string;
+
 /**
- * Load shelves for a user
+ * Load shelves for a user (Paginated)
  */
-export const loadShelves = createAsyncThunk(
+export const loadShelves = createAsyncThunk<
+  OffsetPaginatedResponse<Shelf>, // Return type on success
+  { principal: Principal | string; params: OffsetPaginationParams }, // Argument type
+  { rejectValue: RejectValue } // Type for rejectWithValue
+>(
   'perpetua/loadShelves',
-  async (principal: Principal | string, { rejectWithValue }) => {
+  async ({ principal, params }, { rejectWithValue }) => {
     try {
-      // Create a stable string ID for normalized principal
       const principalStr = principalToString(principal);
+      // Caching removed for paginated endpoint
       
-      // Check cache first with the 'shelves' type
-      const cachedData = cacheManager.get<Shelf[]>(principalStr, 'userShelves');
-      if (cachedData) {
-        return cachedData;
-      }
-      
-      // No cache hit, so fetch from API
-      const result = await perpetuaService.getUserShelves(principal);
+      const result = await perpetuaService.getUserShelves(principal, params);
       
       if ("Ok" in result && result.Ok) {
-        // Store in cache
-        cacheManager.set(principalStr, 'userShelves', result.Ok);
-        return result.Ok;
+        return result.Ok; 
       } else if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
+        return rejectWithValue(result.Err as RejectValue);
       } else {
-        return rejectWithValue("Failed to load shelves");
+        return rejectWithValue("Failed to load shelves" as RejectValue);
       }
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, "Failed to load shelves"));
+      return rejectWithValue(extractErrorMessage(error, "Failed to load shelves") as RejectValue);
     }
   }
 );
 
 /**
- * Get a shelf by ID
+ * Get a shelf by ID (Not Paginated - Keep Caching)
  */
-export const getShelfById = createAsyncThunk(
+export const getShelfById = createAsyncThunk<
+  Shelf, // Return type on success
+  string, // Argument type (shelfId)
+  { rejectValue: RejectValue } // Type for rejectWithValue
+>(
   'perpetua/getShelfById',
-  async (shelfId: string, { rejectWithValue }) => {
+  async (shelfId, { rejectWithValue }) => {
     try {
-      // Check cache first with the 'shelf' type
       const cachedData = cacheManager.get<Shelf>(shelfId, 'shelf');
       if (cachedData) {
         return cachedData;
       }
       
-      // No cache hit, so fetch from API
       const result = await perpetuaService.getShelf(shelfId);
       
       if ("Ok" in result && result.Ok) {
-        // Update the cache
         cacheManager.set(shelfId, 'shelf', result.Ok);
-        
         return result.Ok;
       } 
       
       if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
+        return rejectWithValue(result.Err as RejectValue);
       }
       
-      return rejectWithValue(`Failed to load shelf ${shelfId}`);
+      return rejectWithValue(`Failed to load shelf ${shelfId}` as RejectValue);
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, `Failed to load shelf ${shelfId}`));
+      return rejectWithValue(extractErrorMessage(error, `Failed to load shelf ${shelfId}`) as RejectValue);
     }
   }
 );
 
 /**
- * Load recent public shelves
+ * Load recent public shelves (Paginated)
  */
-export const loadRecentShelves = createAsyncThunk(
+export const loadRecentShelves = createAsyncThunk<
+  CursorPaginatedResponse<Shelf, TimestampCursor>, // Return type
+  CursorPaginationParams<TimestampCursor>, // Argument type
+  { rejectValue: RejectValue } // Reject type
+>(
   'perpetua/loadRecentShelves',
-  async ({ 
-    limit = 20, 
-    beforeTimestamp 
-  }: { 
-    limit?: number, 
-    beforeTimestamp?: string | bigint 
-  }, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      // Check cache only if this is the initial load (no beforeTimestamp)
-      if (!beforeTimestamp) {
-        const cachedData = cacheManager.get<any>('recent', 'publicShelves');
-        if (cachedData) {
-          return cachedData;
-        }
-      }
+      // Caching removed for paginated endpoint
       
-      // No cache hit or pagination request, so fetch from API
-      const result = await perpetuaService.getRecentShelves(limit, beforeTimestamp);
+      const result = await perpetuaService.getRecentShelves(params);
       
       if ("Ok" in result && result.Ok) {
-        // Only cache the initial load (no beforeTimestamp)
-        if (!beforeTimestamp) {
-          cacheManager.set('recent', 'publicShelves', result.Ok);
-        }
-        
-        return result.Ok;
+        return result.Ok; 
       } else if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
+        return rejectWithValue(result.Err as RejectValue);
       } else {
-        return rejectWithValue("Failed to load recent shelves");
+        return rejectWithValue("Failed to load recent shelves" as RejectValue);
       }
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, "Failed to load recent shelves"));
+      return rejectWithValue(extractErrorMessage(error, "Failed to load recent shelves") as RejectValue);
     }
   }
 );
 
 /**
  * Load only missing shelves without disturbing the order
+ * NOTE: This thunk might need rethinking with pagination. 
+ * Loading all pages to diff is inefficient.
+ * For now, it just loads the *first* page and filters.
  */
-export const loadMissingShelves = createAsyncThunk(
+export const loadMissingShelves = createAsyncThunk<
+  Shelf[], // Return type (array of missing shelves)
+  Principal | string, // Argument type (principal)
+  { rejectValue: RejectValue, state: any } // Reject type and state type
+>(
   'perpetua/loadMissingShelves',
-  async (principal: Principal | string, { rejectWithValue, getState }) => {
+  async (principal, { rejectWithValue, getState }) => {
     try {
-      // Get the current user shelves from state
-      const state = getState() as any;
+      const state = getState();
       const existingShelves = state?.perpetua?.entities?.shelves || {};
       
-      // Fetch all shelves from the API
-      const result = await perpetuaService.getUserShelves(principal);
+      const params: OffsetPaginationParams = { offset: 0, limit: 50 }; 
+      const result = await perpetuaService.getUserShelves(principal, params);
       
       if ("Ok" in result && result.Ok) {
-        const shelves = result.Ok;
-        
-        // Update the cache
-        cacheManager.set(principalToString(principal), 'userShelves', shelves);
-        
-        // Filter out only the shelves that don't exist in state yet
-        // This ensures we don't disturb the existing order
+        const shelves = result.Ok.items;
         return shelves.filter((shelf: any) => !existingShelves[shelf.shelf_id]);
       } else if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
+        return rejectWithValue(result.Err as RejectValue);
       } else {
-        return rejectWithValue("Failed to load shelves");
+        return rejectWithValue("Failed to load shelves" as RejectValue);
       }
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, "Failed to load shelves"));
+      return rejectWithValue(extractErrorMessage(error, "Failed to load shelves") as RejectValue);
     }
   }
 );
@@ -153,136 +147,116 @@ export const loadMissingShelves = createAsyncThunk(
 // # Tag Thunks #
 
 /**
- * Fetch popular tags
+ * Fetch popular tags (Paginated)
  */
-export const fetchPopularTags = createAsyncThunk(
+export const fetchPopularTags = createAsyncThunk<
+  CursorPaginatedResponse<string, TagPopularityKeyCursor>, // Return type
+  CursorPaginationParams<TagPopularityKeyCursor>, // Argument type
+  { rejectValue: RejectValue } // Reject type
+>(
   'perpetua/fetchPopularTags',
-  async (limit: number | undefined, { rejectWithValue }) => {
-    const effectiveLimit = limit ?? 20; // Use default if limit is undefined
+  async (params, { rejectWithValue }) => {
     try {
-      // Use effectiveLimit in cache key and service call
-      const cacheKey = `popularTags_${effectiveLimit}`;
-      
-      // Check cache first
-      const cachedData = cacheManager.get<string[]>(cacheKey, 'tags');
-      if (cachedData) {
-        return cachedData;
-      }
-      
-      // Fetch from service
-      const result = await perpetuaService.getPopularTags(effectiveLimit);
+      // Caching removed for paginated endpoint
+      const result = await perpetuaService.getPopularTags(params);
       
       if ("Ok" in result && result.Ok) {
-        // Update cache
-        cacheManager.set(cacheKey, 'tags', result.Ok);
         return result.Ok;
       } else if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
+        return rejectWithValue(result.Err as RejectValue);
       } else {
-        return rejectWithValue("Failed to fetch popular tags");
+        return rejectWithValue("Failed to fetch popular tags" as RejectValue);
       }
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, "Failed to fetch popular tags"));
+      return rejectWithValue(extractErrorMessage(error, "Failed to fetch popular tags") as RejectValue);
     }
   }
 );
 
 /**
- * Fetch shelf IDs by tag
+ * Fetch shelf IDs by tag (Paginated)
  */
-export const fetchShelvesByTag = createAsyncThunk(
+export const fetchShelvesByTag = createAsyncThunk<
+  { tag: string; response: CursorPaginatedResponse<string, TagShelfAssociationKeyCursor> }, // Return type
+  { tag: string; params: CursorPaginationParams<TagShelfAssociationKeyCursor> }, // Argument type
+  { rejectValue: RejectValue } // Reject type
+>(
   'perpetua/fetchShelvesByTag',
-  async (tag: string, { rejectWithValue, dispatch }) => {
+  async ({ tag, params }, { rejectWithValue, dispatch }) => {
     try {
-      // Cache key for shelves by tag
-      const cacheKey = `shelvesByTag_${tag}`;
-      
-      // Check cache first
-      const cachedData = cacheManager.get<string[]>(cacheKey, 'tags');
-      if (cachedData) {
-        // Return the cached shelf IDs and the tag
-        return { tag, shelfIds: cachedData };
-      }
-      
-      // Fetch from service
-      const result = await perpetuaService.getShelvesByTag(tag);
+      // Caching removed for paginated endpoint
+      const result = await perpetuaService.getShelvesByTag(tag, params);
       
       if ("Ok" in result && result.Ok) {
-        const shelfIds = result.Ok;
-        // Update cache
-        cacheManager.set(cacheKey, 'tags', shelfIds);
-        
-        // Optional: Fetch full shelf data for missing shelves
-        // This depends on whether the UI needs full data immediately.
-        // If needed, dispatch getShelfById for each ID not in the state.
-        
-        // Return the tag and the fetched shelf IDs
-        return { tag, shelfIds };
+        return { tag, response: result.Ok }; 
       } else if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
+        return rejectWithValue(result.Err as RejectValue);
       } else {
-        return rejectWithValue(`Failed to fetch shelves for tag ${tag}`);
+        return rejectWithValue(`Failed to fetch shelves for tag ${tag}` as RejectValue);
       }
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, `Failed to fetch shelves for tag ${tag}`));
+      return rejectWithValue(extractErrorMessage(error, `Failed to fetch shelves for tag ${tag}`) as RejectValue);
     }
   }
 );
 
 /**
- * Fetch shelf count for a tag
+ * Fetch shelf count for a tag (Not Paginated - Keep Caching)
  */
-export const fetchTagShelfCount = createAsyncThunk(
+export const fetchTagShelfCount = createAsyncThunk<
+  { tag: string; count: number }, // Return type
+  string, // Argument type (tag)
+  { rejectValue: RejectValue } // Reject type
+>(
   'perpetua/fetchTagShelfCount',
-  async (tag: string, { rejectWithValue }) => {
+  async (tag, { rejectWithValue }) => {
     try {
-      // Cache key for tag count
       const cacheKey = `tagCount_${tag}`;
-      
-      // Check cache first
       const cachedData = cacheManager.get<number>(cacheKey, 'tags');
-      if (cachedData !== undefined && cachedData !== null) { // Check for null/undefined too
+      if (cachedData !== undefined && cachedData !== null) { 
         return { tag, count: cachedData };
       }
       
-      // Fetch from service
       const result = await perpetuaService.getTagShelfCount(tag);
       
       if ("Ok" in result && typeof result.Ok === 'number') {
         const count = result.Ok;
-        // Update cache
         cacheManager.set(cacheKey, 'tags', count);
         return { tag, count };
       } else if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
+        return rejectWithValue(result.Err as RejectValue);
       } else {
-        return rejectWithValue(`Failed to fetch count for tag ${tag}`);
+        return rejectWithValue(`Failed to fetch count for tag ${tag}` as RejectValue);
       }
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, `Failed to fetch count for tag ${tag}`));
+      return rejectWithValue(extractErrorMessage(error, `Failed to fetch count for tag ${tag}`) as RejectValue);
     }
   }
 );
 
 /**
- * Fetch tags with a specific prefix
+ * Fetch tags with a specific prefix (Paginated)
  */
-export const fetchTagsWithPrefix = createAsyncThunk(
+export const fetchTagsWithPrefix = createAsyncThunk<
+  CursorPaginatedResponse<string, NormalizedTagCursor>, // Return type
+  { prefix: string; params: CursorPaginationParams<NormalizedTagCursor> }, // Argument type
+  { rejectValue: RejectValue } // Reject type
+>(
   'perpetua/fetchTagsWithPrefix',
-  async (prefix: string, { rejectWithValue }) => {
+  async ({ prefix, params }, { rejectWithValue }) => {
     try {
-      // No caching for prefix search as results can change frequently
-      const result = await perpetuaService.getTagsWithPrefix(prefix);
+      // Caching removed for paginated endpoint
+      const result = await perpetuaService.getTagsWithPrefix(prefix, params);
       
       if ("Ok" in result && result.Ok) {
-        return result.Ok; // Return the array of matching tags
+        return result.Ok; 
       } else if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
+        return rejectWithValue(result.Err as RejectValue);
       } else {
-        return rejectWithValue(`Failed to fetch tags with prefix ${prefix}`);
+        return rejectWithValue(`Failed to fetch tags with prefix ${prefix}` as RejectValue);
       }
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, `Failed to fetch tags with prefix ${prefix}`));
+      return rejectWithValue(extractErrorMessage(error, `Failed to fetch tags with prefix ${prefix}`) as RejectValue);
     }
   }
 ); 

@@ -6,8 +6,9 @@ use crate::storage::{
     TAG_METADATA, TAG_SHELF_ASSOCIATIONS, SHELF_TAG_ASSOCIATIONS,
     TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, ORPHANED_TAG_CANDIDATES,
     MAX_TAGS_PER_SHELF, validate_tag_format,
-    TagShelfAssociationKey, ShelfTagAssociationKey, TagPopularityKey
+    ShelfTagAssociationKey
 };
+use crate::types::{TagPopularityKey, TagShelfAssociationKey};
 use crate::utils::normalize_tag;
 use crate::auth;
 use crate::guard::not_anon; // Assuming guard functions are needed

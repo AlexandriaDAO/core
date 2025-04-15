@@ -8,6 +8,7 @@ use std::collections::BTreeSet;
 use std::collections::BTreeMap;
 use crate::ordering::{PositionedOrdering, get_ordered_by_position};
 use crate::utils::normalize_tag; // Import the normalization function
+use crate::types::{TagPopularityKey, TagShelfAssociationKey}; // Import from new types module
 use sha2;
 use bs58;
 use std::cmp::Ordering; // Import Ordering for custom Ord impl
@@ -24,6 +25,7 @@ type Memory = VirtualMemory<DefaultMemoryImpl>;
 // --- Define ShelfId and NormalizedTag types ---
 pub type ShelfId = String; 
 pub type NormalizedTag = String;
+pub type ItemId = u32; // Define ItemId here
 
 // --- Define TagMetadata ---
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
@@ -50,33 +52,6 @@ impl Storable for TagMetadata {
 // --- Wrapper Structs for Storable Tuples and Vec ---
 
 #[derive(CandidType, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
-pub struct TagShelfAssociationKey(pub NormalizedTag, pub ShelfId);
-
-impl Storable for TagShelfAssociationKey {
-    fn to_bytes(&self) -> Cow<[u8]> { Cow::Owned(Encode!(&self.0, &self.1).unwrap()) }
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        let (tag, shelf_id) = Decode!(bytes.as_ref(), NormalizedTag, ShelfId).unwrap();
-        Self(tag, shelf_id)
-    }
-    const BOUND: Bound = Bound::Unbounded;
-}
-// Manual Ord implementation needed because tuple derives Ord lexicographically
-impl PartialOrd for TagShelfAssociationKey {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-impl Ord for TagShelfAssociationKey {
-    fn cmp(&self, other: &Self) -> Ordering {
-        match self.0.cmp(&other.0) {
-            Ordering::Equal => self.1.cmp(&other.1),
-            other => other,
-        }
-    }
-}
-
-
-#[derive(CandidType, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
 pub struct ShelfTagAssociationKey(pub ShelfId, pub NormalizedTag);
 
 impl Storable for ShelfTagAssociationKey {
@@ -98,32 +73,6 @@ impl Ord for ShelfTagAssociationKey {
         }
     }
 }
-
-
-#[derive(CandidType, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
-pub struct TagPopularityKey(pub u64, pub NormalizedTag);
-
-impl Storable for TagPopularityKey {
-     fn to_bytes(&self) -> Cow<[u8]> { Cow::Owned(Encode!(&self.0, &self.1).unwrap()) }
-     fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        let (count, tag) = Decode!(bytes.as_ref(), u64, NormalizedTag).unwrap();
-        Self(count, tag)
-    }
-    const BOUND: Bound = Bound::Unbounded;
-}
-impl PartialOrd for TagPopularityKey {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> { Some(self.cmp(other)) }
-}
-impl Ord for TagPopularityKey {
-     fn cmp(&self, other: &Self) -> Ordering {
-         // Note: Higher count should come first in reverse iteration
-         match self.0.cmp(&other.0) {
-             Ordering::Equal => self.1.cmp(&other.1),
-             other => other,
-         }
-     }
-}
-
 
 #[derive(CandidType, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
 pub struct OrphanedTagValue(pub Vec<NormalizedTag>);
@@ -160,6 +109,8 @@ pub const MAX_APPEARS_IN_COUNT: usize = 100; // Keep this if relevant elsewhere
 // --- Define new constants ---
 pub const MAX_TAG_LENGTH: usize = 50; // Adjusted max tag length
 pub const MAX_TAGS_PER_SHELF: usize = 10; // Adjusted max tags per shelf
+pub const MAX_NFT_ID_LENGTH: usize = 100; // Max length for NFT IDs
+pub const MAX_MARKDOWN_LENGTH: usize = 100_000; // Max length for Markdown content
 
 // New wrapper types (Keep these if used outside tags)
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
@@ -341,7 +292,7 @@ impl Storable for UserProfileOrder {
 }
 
 // Default step size for shelf item positioning
-const SHELF_ITEM_STEP_SIZE: f64 = 1000.0;
+pub const SHELF_ITEM_STEP_SIZE: f64 = 1000.0;
 
 impl Shelf {
     /// Creates a new shelf with provided properties
@@ -386,32 +337,51 @@ impl Shelf {
         if self.items.len() >= MAX_ITEMS_PER_SHELF {
             return Err(format!("Maximum item limit reached ({})", MAX_ITEMS_PER_SHELF));
         }
-        
-        // Check for circular references
-        if let ItemContent::Shelf(ref nested_shelf_id) = item.content {
-            // Prevent a shelf from containing itself
-            if nested_shelf_id == &self.shelf_id {
-                return Err("Circular reference: A shelf cannot contain itself".to_string());
+
+        // --- Validate Item Content ---
+        match &item.content {
+            ItemContent::Nft(nft_id) => {
+                if nft_id.chars().any(|c| !c.is_digit(10)) {
+                     return Err("Invalid NFT ID: Contains non-digit characters.".to_string());
+                }
+                if nft_id.len() > MAX_NFT_ID_LENGTH {
+                    return Err(format!("NFT ID exceeds maximum length of {} characters", MAX_NFT_ID_LENGTH));
+                }
+                // NOTE: NFT existence/ownership check happens in the update::item::add_item_to_shelf function
             }
-            
-            // Check for deeper circular references by traversing the shelf hierarchy
-            if self.has_circular_reference(nested_shelf_id) {
-                return Err("Circular reference detected in shelf hierarchy".to_string());
+            ItemContent::Markdown(markdown) => {
+                if markdown.len() > MAX_MARKDOWN_LENGTH {
+                     return Err(format!("Markdown content exceeds maximum length of {} characters", MAX_MARKDOWN_LENGTH));
+                }
+                 // TODO: Add more specific Markdown validation if needed (e.g., disallowed tags, structure)
+            }
+            ItemContent::Shelf(nested_shelf_id) => {
+                 // Check for direct self-reference
+                if nested_shelf_id == &self.shelf_id {
+                    return Err("Circular reference: A shelf cannot contain itself".to_string());
+                }
+                // Check for deeper circular references (potentially expensive, consider optimizing if needed)
+                // This implicitly checks if the nested shelf exists during the lookup within has_circular_reference.
+                if self.has_circular_reference(nested_shelf_id) {
+                    return Err("Circular reference detected in shelf hierarchy".to_string());
+                }
+                // NOTE: Explicit Shelf existence check happens in the update::item::add_item_to_shelf function
             }
         }
-        
+
+        // --- Proceed with Insertion ---
         let item_id = item.id;
-        
+
         // Calculate position at the end using the shared abstraction (now mutable)
         // Pass SHELF_ITEM_STEP_SIZE as default step
-        let new_position = self.item_positions.calculate_position(None, false, SHELF_ITEM_STEP_SIZE)?; 
-            
+        let new_position = self.item_positions.calculate_position(None, false, SHELF_ITEM_STEP_SIZE)?;
+
         // Update the float position
         self.item_positions.insert(item_id, new_position);
-        
+
         // Store the item without a position field
         self.items.insert(item_id, item);
-        
+
         Ok(())
     }
 

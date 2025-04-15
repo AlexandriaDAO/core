@@ -28,7 +28,7 @@ export const PopularTagsList: React.FC = () => {
     const allCounts = useAppSelector(selectTagShelfCountsMap);
 
     useEffect(() => {
-        fetchPopularTags();
+        fetchPopularTags({ limit: 20 });
     }, [fetchPopularTags]);
 
     useEffect(() => {

@@ -1,7 +1,18 @@
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { setTagFilter } from '@/apps/app/Perpetua/state/perpetuaSlice';
-import { fetchPopularTags, fetchTagShelfCount, fetchShelvesByTag, fetchTagsWithPrefix } from '@/apps/app/Perpetua/state/thunks/queryThunks';
+import { 
+    fetchPopularTags, 
+    fetchTagShelfCount, 
+    fetchShelvesByTag, 
+    fetchTagsWithPrefix 
+} from '@/apps/app/Perpetua/state/thunks/queryThunks';
+import { 
+    CursorPaginationParams, 
+    TagPopularityKeyCursor, 
+    TagShelfAssociationKeyCursor, 
+    NormalizedTagCursor 
+} from '@/apps/app/Perpetua/state/services/perpetuaService';
 import { useCallback } from 'react';
 
 /**
@@ -10,8 +21,8 @@ import { useCallback } from 'react';
 export function useTagActions() {
     const dispatch = useDispatch<AppDispatch>();
 
-    const dispatchFetchPopularTags = useCallback(() => {
-        dispatch(fetchPopularTags());
+    const dispatchFetchPopularTags = useCallback((params: CursorPaginationParams<TagPopularityKeyCursor>) => {
+        dispatch(fetchPopularTags(params));
     }, [dispatch]);
 
     const dispatchFetchTagShelfCount = useCallback((tagName: string) => {
@@ -22,12 +33,12 @@ export function useTagActions() {
         dispatch(setTagFilter(tagName));
     }, [dispatch]);
 
-    const dispatchFetchShelvesByTag = useCallback((tagName: string) => {
-        dispatch(fetchShelvesByTag(tagName));
+    const dispatchFetchShelvesByTag = useCallback((tag: string, params: CursorPaginationParams<TagShelfAssociationKeyCursor>) => {
+        dispatch(fetchShelvesByTag({ tag, params }));
     }, [dispatch]);
 
-    const dispatchFetchTagsWithPrefix = useCallback((prefix: string) => {
-        dispatch(fetchTagsWithPrefix(prefix));
+    const dispatchFetchTagsWithPrefix = useCallback((prefix: string, params: CursorPaginationParams<NormalizedTagCursor>) => {
+        dispatch(fetchTagsWithPrefix({ prefix, params }));
     }, [dispatch]);
 
     return {

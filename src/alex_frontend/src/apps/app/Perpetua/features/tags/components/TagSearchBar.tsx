@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Input } from '@/lib/components/input'; // Assuming Input component exists
-import { LoaderCircle, Search } from 'lucide-react';
+import { Input } from '@/lib/components/input';
+import { LoaderCircle, Search, Tag } from 'lucide-react';
 import { useTagActions } from '../hooks/useTagActions';
 import { useTagData } from '../hooks/useTagData';
 import debounce from 'lodash/debounce';
+import { cn } from '@/lib/utils'; // Import cn utility for combining classes
 
 const DEBOUNCE_DELAY = 300; // ms
 
@@ -18,7 +19,7 @@ export const TagSearchBar: React.FC = () => {
     const debouncedFetch = useCallback(
         debounce((prefix: string) => {
             if (prefix.trim()) {
-                fetchTagsWithPrefix(prefix);
+                fetchTagsWithPrefix(prefix, { limit: 20 });
             }
         }, DEBOUNCE_DELAY),
         [fetchTagsWithPrefix]
@@ -67,7 +68,7 @@ export const TagSearchBar: React.FC = () => {
                     value={searchTerm}
                     onChange={handleInputChange}
                     onFocus={() => setIsFocused(true)}
-                    className="pl-9 pr-8" // Padding for icons
+                    className="pl-9 pr-8 w-full transition-all border-input focus:ring-1 focus:ring-primary"
                 />
                 {isTagSearchLoading && (
                     <LoaderCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
@@ -75,20 +76,27 @@ export const TagSearchBar: React.FC = () => {
             </div>
 
             {showDropdown && (
-                <div className="absolute z-10 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    <ul className="p-1">
+                <div className="absolute z-10 top-full left-0 right-0 mt-1.5 bg-background border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    <ul className="py-1">
                         {tagSearchResults.length > 0 ? (
                             tagSearchResults.map((tag) => (
                                 <li
-                                    key={tag} // Assuming tag is a string
-                                    className="px-3 py-1.5 text-sm rounded cursor-pointer hover:bg-accent"
-                                    onClick={() => handleTagSelect(tag)} // Assuming tag is a string
+                                    key={tag}
+                                    className={cn(
+                                        "px-3 py-2 text-sm rounded-sm flex items-center gap-2",
+                                        "text-foreground hover:bg-accent hover:text-accent-foreground",
+                                        "cursor-pointer transition-colors"
+                                    )}
+                                    onClick={() => handleTagSelect(tag)}
                                 >
-                                    {tag} {/* Assuming tag is a string */}
+                                    <Tag className="h-3.5 w-3.5 text-primary" />
+                                    <span>{tag}</span>
                                 </li>
                             ))
                         ) : !isTagSearchLoading ? (
-                            <li className="px-3 py-1.5 text-sm text-muted-foreground text-center">No matching tags found.</li>
+                            <li className="px-3 py-2 text-sm text-muted-foreground text-center">
+                                No matching tags found.
+                            </li>
                         ) : null /* Show nothing while loading */}
                     </ul>
                 </div>

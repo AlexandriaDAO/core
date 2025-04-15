@@ -31,8 +31,10 @@ pub mod update {
 }
 pub mod query;
 pub mod utils;
+pub mod types;
 
-pub use storage::{Item, Shelf, ShelfId, NormalizedTag};
+pub use storage::{Item, Shelf, ShelfId, NormalizedTag, ItemId};
+pub use types::{TagPopularityKey, TagShelfAssociationKey};
 pub use update::shelf::{store_shelf, update_shelf_metadata};
 pub use update::item::{
     AddItemInput, add_item_to_shelf, remove_item_from_shelf, 
@@ -46,7 +48,11 @@ pub use query::{
     get_shelf_position_metrics, 
     get_shelves_by_tag, get_tag_shelf_count, get_popular_tags, get_tags_with_prefix,
     QueryResult, QueryError,
-    ShelfPositionMetrics
+    ShelfPositionMetrics,
+    OffsetPaginationInput,
+    CursorPaginationInput,
+    OffsetPaginatedResult,
+    CursorPaginatedResult
 };
 
 #[init]

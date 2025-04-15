@@ -3,27 +3,70 @@ type AddItemInput = record {
   reference_item_id : opt nat32;
   before : bool;
 };
+type CursorPaginatedResult = record {
+  limit : nat;
+  next_cursor : opt record { nat64; text };
+  items : vec text;
+};
+type CursorPaginatedResult_1 = record {
+  limit : nat;
+  next_cursor : opt nat64;
+  items : vec Shelf;
+};
+type CursorPaginatedResult_2 = record {
+  limit : nat;
+  next_cursor : opt nat32;
+  items : vec Item;
+};
+type CursorPaginatedResult_3 = record {
+  limit : nat;
+  next_cursor : opt record { text; text };
+  items : vec text;
+};
+type CursorPaginatedResult_4 = record {
+  limit : nat;
+  next_cursor : opt text;
+  items : vec text;
+};
+type CursorPaginationInput = record {
+  cursor : opt record { nat64; text };
+  limit : nat;
+};
+type CursorPaginationInput_1 = record { cursor : opt nat64; limit : nat };
+type CursorPaginationInput_2 = record { cursor : opt nat32; limit : nat };
+type CursorPaginationInput_3 = record {
+  cursor : opt record { text; text };
+  limit : nat;
+};
+type CursorPaginationInput_4 = record { cursor : opt text; limit : nat };
 type Item = record { id : nat32; content : ItemContent };
 type ItemContent = variant { Nft : text; Shelf : text; Markdown : text };
-type ItemReorderInput = record {
-  reference_item_id : opt nat32;
-  before : bool;
-  item_id : nat32;
+type OffsetPaginatedResult = record {
+  offset : nat;
+  limit : nat;
+  items : vec Shelf;
+  total_count : nat;
 };
+type OffsetPaginationInput = record { offset : nat; limit : nat };
 type QueryError = variant {
   TagNotFound;
+  InvalidCursor;
   ShelfNotFound;
   InvalidTimeRange;
   UserNotFound;
 };
 type Result = variant { Ok; Err : text };
 type Result_1 = variant { Ok : text; Err : text };
-type Result_2 = variant { Ok : vec Shelf; Err : QueryError };
-type Result_3 = variant { Ok : Shelf; Err : QueryError };
-type Result_4 = variant { Ok : vec Item; Err : QueryError };
-type Result_5 = variant { Ok : ShelfPositionMetrics; Err : text };
-type Result_6 = variant { Ok : bool; Err : text };
-type Result_7 = variant { Ok : vec principal; Err : text };
+type Result_10 = variant { Ok : bool; Err : text };
+type Result_11 = variant { Ok : vec principal; Err : text };
+type Result_2 = variant { Ok : CursorPaginatedResult; Err : QueryError };
+type Result_3 = variant { Ok : CursorPaginatedResult_1; Err : QueryError };
+type Result_4 = variant { Ok : Shelf; Err : QueryError };
+type Result_5 = variant { Ok : CursorPaginatedResult_2; Err : QueryError };
+type Result_6 = variant { Ok : ShelfPositionMetrics; Err : text };
+type Result_7 = variant { Ok : CursorPaginatedResult_3; Err : QueryError };
+type Result_8 = variant { Ok : CursorPaginatedResult_4; Err : QueryError };
+type Result_9 = variant { Ok : OffsetPaginatedResult; Err : QueryError };
 type Shelf = record {
   is_public : bool;
   title : text;
@@ -50,17 +93,17 @@ service : () -> {
   add_shelf_editor : (text, principal) -> (Result);
   add_tag_to_shelf : (TagOperationInput) -> (Result);
   create_and_add_shelf_item : (text, text, opt text) -> (Result_1);
-  get_popular_tags : (nat) -> (vec text) query;
-  get_recent_shelves : (opt nat, opt nat64) -> (Result_2) query;
-  get_shelf : (text) -> (Result_3) query;
-  get_shelf_items : (text) -> (Result_4) query;
-  get_shelf_position_metrics : (text) -> (Result_5) query;
-  get_shelves_by_tag : (text) -> (vec text) query;
+  get_popular_tags : (CursorPaginationInput) -> (Result_2) query;
+  get_recent_shelves : (CursorPaginationInput_1) -> (Result_3) query;
+  get_shelf : (text) -> (Result_4) query;
+  get_shelf_items : (text, CursorPaginationInput_2) -> (Result_5) query;
+  get_shelf_position_metrics : (text) -> (Result_6) query;
+  get_shelves_by_tag : (text, CursorPaginationInput_3) -> (Result_7) query;
   get_tag_shelf_count : (text) -> (nat64) query;
-  get_tags_with_prefix : (text) -> (vec text) query;
-  get_user_shelves : (principal, opt nat) -> (Result_2) query;
-  is_shelf_public : (text) -> (Result_6) query;
-  list_shelf_editors : (text) -> (Result_7) query;
+  get_tags_with_prefix : (text, CursorPaginationInput_4) -> (Result_8) query;
+  get_user_shelves : (principal, OffsetPaginationInput) -> (Result_9) query;
+  is_shelf_public : (text) -> (Result_10) query;
+  list_shelf_editors : (text) -> (Result_11) query;
   remove_item_from_shelf : (text, nat32) -> (Result);
   remove_shelf_editor : (text, principal) -> (Result);
   remove_tag_from_shelf : (TagOperationInput) -> (Result);

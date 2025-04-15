@@ -1,9 +1,58 @@
 import { Principal } from '@dfinity/principal';
 import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 import { convertBigIntsToStrings, convertStringsToBigInts } from '@/utils/bgint_convert';
-import { Shelf, Item, ItemContent } from '@/../../declarations/perpetua/perpetua.did';
+import { 
+  Shelf, 
+  Item, 
+  ItemContent, 
+  OffsetPaginationInput as BackendOffsetPaginationInput, 
+  CursorPaginationInput as BackendCursorPaginationInput,
+  OffsetPaginatedResult as BackendOffsetPaginatedResult,
+  CursorPaginatedResult as BackendCursorPaginatedResult,
+} from '@/../../declarations/perpetua/perpetua.did';
 import { toPrincipal, principalToString, Result } from '../../utils';
 import { store } from "@/store";
+
+// --- Frontend Pagination Types ---
+
+// Input Types
+export interface OffsetPaginationParams {
+  offset: number;
+  limit: number;
+}
+
+export interface CursorPaginationParams<C = unknown> {
+  cursor?: C | string; // Allow stringified cursor for easy passing
+  limit: number;
+}
+
+// Result Types (using generics)
+export interface PaginatedResult<T> {
+  items: T[];
+  limit: number;
+}
+
+export interface OffsetPaginatedResponse<T> extends PaginatedResult<T> {
+  offset: number;
+  total_count: number;
+}
+
+export interface CursorPaginatedResponse<T, C = unknown> extends PaginatedResult<T> {
+  next_cursor?: C | string; // Return stringified cursor
+}
+
+// Cursor Types (mirroring backend structures)
+export type TimestampCursor = string | bigint;
+export type ItemIdCursor = number; // ItemId is u32
+export type NormalizedTagCursor = string;
+// Use JSON string representation for complex tuple cursors
+export type TagPopularityKeyCursor = string; // Represents JSON of [bigint_string, string]
+export type TagShelfAssociationKeyCursor = string; // Represents JSON of [string, string]
+
+// Define actual backend tuple types expected by actor calls (based on .did)
+// These might not match the generated .did.ts function signatures exactly due to monomorphization issues
+type BackendTagPopularityKeyTuple = [bigint, string];
+type BackendTagShelfAssociationKeyTuple = [string, string];
 
 // Define query error type to match the backend
 type QueryError = any; // We use 'any' here since the specific error types vary by endpoint
@@ -32,18 +81,38 @@ class PerpetuaService {
   }
   
   /**
-   * Get all shelves for a user
+   * Get all shelves for a user (Paginated)
    */
-  public async getUserShelves(principal: Principal | string): Promise<Result<Shelf[], QueryError>> {
+  public async getUserShelves(
+    principal: Principal | string, 
+    params: OffsetPaginationParams
+  ): Promise<Result<OffsetPaginatedResponse<Shelf>, QueryError>> {
     try {
       const actor = await this.getActor();
       const principalForApi = toPrincipal(principal);
       
-      const result = await actor.get_user_shelves(principalForApi, []);
+      // Prepare pagination input for the backend
+      const paginationInput: BackendOffsetPaginationInput = {
+        offset: BigInt(params.offset),
+        limit: BigInt(params.limit)
+      };
+      
+      // Call the updated backend method
+      const result = await actor.get_user_shelves(principalForApi, paginationInput);
 
       if ("Ok" in result) {
-        // Convert BigInt values to strings for Redux
-        return { Ok: convertBigIntsToStrings(result.Ok) };
+        // Process the paginated result
+        const paginatedResult = result.Ok;
+        const items = convertBigIntsToStrings(paginatedResult.items);
+        
+        return {
+          Ok: {
+            items: items,
+            total_count: Number(paginatedResult.total_count), // Convert Nat to number
+            limit: Number(paginatedResult.limit), // Convert Nat to number
+            offset: Number(paginatedResult.offset) // Convert Nat to number
+          }
+        };
       } else {
         return { Err: result.Err };
       }
@@ -73,45 +142,50 @@ class PerpetuaService {
   }
   
   /**
-   * Get recent public shelves
+   * Get recent public shelves (Paginated)
    */
-  public async getRecentShelves(limit: number = 20, beforeTimestamp?: string | bigint): Promise<Result<any, QueryError>> {
+  public async getRecentShelves(
+    params: CursorPaginationParams<TimestampCursor>
+  ): Promise<Result<CursorPaginatedResponse<Shelf, TimestampCursor>, QueryError>> {
     try {
       const actor = await this.getActor();
       
-      // Convert string beforeTimestamp to BigInt if necessary
-      let beforeTimestampBigInt: bigint | undefined = undefined;
-      if (beforeTimestamp) {
-        beforeTimestampBigInt = typeof beforeTimestamp === 'string' 
-          ? BigInt(beforeTimestamp) 
-          : beforeTimestamp;
+      let cursorOpt: [] | [bigint] = [];
+      if (params.cursor) {
+        cursorOpt = [BigInt(params.cursor)];
       }
       
-      const result = await actor.get_recent_shelves(
-        [BigInt(limit)], 
-        beforeTimestampBigInt ? [beforeTimestampBigInt] : []
-      );
+      // Prepare pagination input, casting cursor to 'any' to bypass likely incorrect .did.ts type
+      const paginationInput = {
+        cursor: cursorOpt as any, // Cast to bypass incorrect generated type
+        limit: BigInt(params.limit)
+      };
       
-      if ("Ok" in result) {
-        // Get the timestamp from the last shelf for pagination
-        const lastShelfTimestamp = result.Ok.length > 0 
-          ? result.Ok[result.Ok.length - 1].created_at 
-          : undefined;
-          
-        // Convert all BigInt values to strings
-        const shelves = convertBigIntsToStrings(result.Ok);
-        const serializedBeforeTimestamp = beforeTimestampBigInt ? beforeTimestampBigInt.toString() : undefined;
-        const serializedLastTimestamp = lastShelfTimestamp ? lastShelfTimestamp.toString() : undefined;
-        
+      // Call the updated backend method, passing the structured but less strictly typed input
+      const result = await actor.get_recent_shelves(paginationInput);
+      
+      if ("Ok" in result && result.Ok) {
+        const paginatedResult = result.Ok;
+        const items = convertBigIntsToStrings(paginatedResult.items);
+        // Ensure next_cursor exists, has elements, and the first element is defined before accessing
+        const nextCursorOpt = paginatedResult.next_cursor;
+        const nextCursor = nextCursorOpt && nextCursorOpt.length > 0 && nextCursorOpt[0] !== undefined 
+                           ? nextCursorOpt[0].toString() 
+                           : undefined;
+
         return { 
-          Ok: { 
-            shelves, 
-            beforeTimestamp: serializedBeforeTimestamp,
-            lastTimestamp: serializedLastTimestamp
-          }
+          Ok: {
+            items: items,
+            limit: Number(paginatedResult.limit), 
+            next_cursor: nextCursor
+          } 
         };
-      } else {
+      } else if ("Err" in result) {
         return { Err: result.Err };
+      } else {
+        // Handle unexpected response structure
+        console.error('Unexpected response format from getRecentShelves:', result);
+        return { Err: "Unexpected response format" }; 
       }
     } catch (error) {
       console.error('Error in getRecentShelves:', error);
@@ -592,22 +666,67 @@ class PerpetuaService {
   }
 
   /**
-   * Get popular tags
+   * Get popular tags (Paginated)
    */
-  public async getPopularTags(limit: number = 20): Promise<Result<string[], QueryError>> {
+  public async getPopularTags(
+    params: CursorPaginationParams<TagPopularityKeyCursor> 
+  ): Promise<Result<CursorPaginatedResponse<string, TagPopularityKeyCursor>, QueryError>> {
     try {
       const actor = await this.getActor();
-      // Convert limit to BigInt for the backend call
-      const limitBigInt = BigInt(limit);
       
-      const result = await actor.get_popular_tags(limitBigInt);
+      let cursorOpt: [] | [BackendTagPopularityKeyTuple] = []; // Use the tuple type
+      if (params.cursor && typeof params.cursor === 'string') {
+        try {
+          const parsedTuple = JSON.parse(params.cursor);
+          if (Array.isArray(parsedTuple) && parsedTuple.length === 2) {
+             // Convert count back to BigInt
+            parsedTuple[0] = BigInt(parsedTuple[0]); 
+            cursorOpt = [parsedTuple as BackendTagPopularityKeyTuple]; // Assert as tuple type
+          } else {
+            throw new Error('Parsed cursor is not a tuple of length 2');
+          }
+        } catch (e) {
+          console.error("Error parsing TagPopularityKey cursor:", e);
+          return { Err: "Invalid cursor format" };
+        }
+      }
       
-      // Backend returns `vec text`, no Err variant defined in .did, but wrap defensively
-      if (Array.isArray(result)) { 
-        return { Ok: result }; 
+      const paginationInput = {
+        cursor: cursorOpt as any, // Cast tuple to any for actor call
+        limit: BigInt(params.limit)
+      };
+      
+      const result = await actor.get_popular_tags(paginationInput);
+      
+      if ("Ok" in result && result.Ok) {
+        const paginatedResult = result.Ok;
+        const items = paginatedResult.items;
+        
+        const nextCursorOpt = paginatedResult.next_cursor;
+        let nextCursorString: TagPopularityKeyCursor | undefined = undefined;
+        // Backend returns Option<[nat64, text]>
+        if (nextCursorOpt && nextCursorOpt.length > 0 && nextCursorOpt[0]) {
+          try {
+            const cursorTuple = nextCursorOpt[0]; // This should be [bigint, string]
+            // Convert BigInt count to string before stringifying
+            const cursorToSerialize: [string, string] = [cursorTuple[0].toString(), cursorTuple[1]];
+            nextCursorString = JSON.stringify(cursorToSerialize);
+          } catch (e) {
+            console.error("Error stringifying next TagPopularityKey cursor:", e);
+          }
+        }
+
+        return { 
+          Ok: {
+            items: items,
+            limit: Number(paginatedResult.limit), 
+            next_cursor: nextCursorString
+          } 
+        };
+      } else if ("Err" in result) {
+        return { Err: result.Err };
       } else {
-        // This case shouldn't happen based on .did, but handle potential issues
-        console.error('Unexpected response format from get_popular_tags:', result);
+        console.error('Unexpected response format from getPopularTags:', result);
         return { Err: "Unexpected response format" }; 
       }
     } catch (error) {
@@ -617,18 +736,64 @@ class PerpetuaService {
   }
   
   /**
-   * Get shelf IDs associated with a specific tag
+   * Get shelf IDs associated with a specific tag (Paginated)
    */
-  public async getShelvesByTag(tag: string): Promise<Result<string[], QueryError>> {
+  public async getShelvesByTag(
+    tag: string,
+    params: CursorPaginationParams<TagShelfAssociationKeyCursor>
+  ): Promise<Result<CursorPaginatedResponse<string, TagShelfAssociationKeyCursor>, QueryError>> {
     try {
       const actor = await this.getActor();
-      const result = await actor.get_shelves_by_tag(tag);
+      
+      let cursorOpt: [] | [BackendTagShelfAssociationKeyTuple] = []; // Use tuple type
+      if (params.cursor && typeof params.cursor === 'string') {
+        try {
+          const parsedTuple = JSON.parse(params.cursor);
+           if (Array.isArray(parsedTuple) && parsedTuple.length === 2) {
+             cursorOpt = [parsedTuple as BackendTagShelfAssociationKeyTuple]; // Assert tuple type
+           } else {
+            throw new Error('Parsed cursor is not a tuple of length 2');
+           }
+        } catch (e) {
+          console.error("Error parsing TagShelfAssociationKey cursor:", e);
+          return { Err: "Invalid cursor format" };
+        }
+      }
+      
+      const paginationInput = {
+        cursor: cursorOpt as any, // Cast tuple to any for actor call
+        limit: BigInt(params.limit)
+      };
+      
+      const result = await actor.get_shelves_by_tag(tag, paginationInput);
 
-      // Backend returns `vec text` (Shelf IDs), no Err variant defined in .did
-      if (Array.isArray(result)) {
-        return { Ok: result };
+      if ("Ok" in result && result.Ok) {
+        const paginatedResult = result.Ok;
+        const items = paginatedResult.items; 
+        
+        const nextCursorOpt = paginatedResult.next_cursor;
+        let nextCursorString: TagShelfAssociationKeyCursor | undefined = undefined;
+         // Backend returns Option<[text, text]>
+        if (nextCursorOpt && nextCursorOpt.length > 0 && nextCursorOpt[0]) {
+          try {
+            const cursorTuple = nextCursorOpt[0]; // This should be [string, string]
+            nextCursorString = JSON.stringify(cursorTuple);
+          } catch (e) {
+            console.error("Error stringifying next TagShelfAssociationKey cursor:", e);
+          }
+        }
+
+        return { 
+          Ok: {
+            items: items,
+            limit: Number(paginatedResult.limit), 
+            next_cursor: nextCursorString
+          } 
+        };
+      } else if ("Err" in result) {
+        return { Err: result.Err };
       } else {
-        console.error('Unexpected response format from get_shelves_by_tag:', result);
+        console.error('Unexpected response format from getShelvesByTag:', result);
         return { Err: "Unexpected response format" };
       }
     } catch (error) {
@@ -660,18 +825,48 @@ class PerpetuaService {
   }
 
   /**
-   * Get tags starting with a given prefix (case-insensitive on backend)
+   * Get tags starting with a given prefix (Paginated)
    */
-  public async getTagsWithPrefix(prefix: string): Promise<Result<string[], QueryError>> {
+  public async getTagsWithPrefix(
+    prefix: string,
+    params: CursorPaginationParams<NormalizedTagCursor> // Simple string cursor
+  ): Promise<Result<CursorPaginatedResponse<string, NormalizedTagCursor>, QueryError>> {
     try {
       const actor = await this.getActor();
-      const result = await actor.get_tags_with_prefix(prefix);
+      
+      // Prepare pagination input
+      let cursorOpt: [] | [string] = [];
+      if (params.cursor && typeof params.cursor === 'string') {
+        cursorOpt = [params.cursor];
+      }
+      
+      const paginationInput = {
+        cursor: cursorOpt as any, // Cast to bypass potential .did.ts issues
+        limit: BigInt(params.limit)
+      };
+      
+      // Call the updated backend method
+      const result = await actor.get_tags_with_prefix(prefix, paginationInput);
 
-      // Backend returns `vec text`, no Err variant defined in .did
-      if (Array.isArray(result)) {
-        return { Ok: result };
+      if ("Ok" in result && result.Ok) {
+        const paginatedResult = result.Ok;
+        const items = paginatedResult.items; // Already string[]
+        
+        // Get the next cursor if it exists
+        const nextCursorOpt = paginatedResult.next_cursor;
+        const nextCursor = nextCursorOpt && nextCursorOpt.length > 0 ? nextCursorOpt[0] : undefined;
+        
+        return { 
+          Ok: {
+            items: items,
+            limit: Number(paginatedResult.limit), 
+            next_cursor: nextCursor
+          } 
+        };
+      } else if ("Err" in result) {
+        return { Err: result.Err };
       } else {
-        console.error('Unexpected response format from get_tags_with_prefix:', result);
+        console.error('Unexpected response format from getTagsWithPrefix:', result);
         return { Err: "Unexpected response format" };
       }
     } catch (error) {

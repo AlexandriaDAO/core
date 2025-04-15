@@ -32,7 +32,10 @@ export const useShelfOperations = () => {
   const loadShelvesData = useCallback(async () => {
     if (!identity) return;
     try {
-      await dispatch(loadShelves(identity.getPrincipal())).unwrap();
+      await dispatch(loadShelves({ 
+        principal: identity.getPrincipal(), 
+        params: { offset: 0, limit: 20 }
+      })).unwrap();
     } catch (error) {
       console.error("Failed to load shelves:", error);
     }
@@ -48,7 +51,10 @@ export const useShelfOperations = () => {
       })).unwrap();
       
       // Load the updated shelves
-      await dispatch(loadShelves(identity.getPrincipal())).unwrap();
+      await dispatch(loadShelves({ 
+        principal: identity.getPrincipal(), 
+        params: { offset: 0, limit: 20 }
+      })).unwrap();
       
       return result.shelfId || null;
     } catch (error) {
@@ -111,7 +117,10 @@ export const useShelfOperations = () => {
       })).unwrap();
       
       // Load the updated shelves and get the updated parent shelf
-      await dispatch(loadShelves(identity.getPrincipal())).unwrap();
+      await dispatch(loadShelves({ 
+        principal: identity.getPrincipal(), 
+        params: { offset: 0, limit: 20 }
+      })).unwrap();
       await getShelf(parentShelfId);
       
       return result.newShelfId || null;

@@ -54,11 +54,17 @@ export const usePerpetuaActions = () => {
     
     // Query actions
     loadShelves: (principal: Principal | string) => 
-      dispatch(loadShelves(principal)),
+      dispatch(loadShelves({ 
+        principal, 
+        params: { offset: 0, limit: 20 }
+      })),
     getShelf: (shelfId: string) => 
       dispatch(getShelfById(shelfId)),
     loadRecentShelves: (params: { limit?: number, beforeTimestamp?: string | bigint }) => 
-      dispatch(loadRecentShelves(params)),
+      dispatch(loadRecentShelves({ 
+        limit: params.limit || 20, 
+        cursor: params.beforeTimestamp 
+      })),
     loadMissingShelves: (principal: Principal | string) => 
       dispatch(loadMissingShelves(principal)),
     

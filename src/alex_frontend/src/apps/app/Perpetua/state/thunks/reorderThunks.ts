@@ -92,7 +92,10 @@ export const reorderProfileShelf = createAsyncThunk(
         }
         
         // Force a reload of shelves to ensure we get the updated order
-        await dispatch(loadShelves(principalStr)).unwrap();
+        await dispatch(loadShelves({ 
+          principal: principalStr, 
+          params: { offset: 0, limit: 20 }
+        })).unwrap();
         
         // Return serializable values only
         return { 
@@ -107,7 +110,10 @@ export const reorderProfileShelf = createAsyncThunk(
       
       if ("Err" in result && result.Err) {
         // If there's an error, revert the optimistic update by forcing a refetch
-        dispatch(loadShelves(principalStr));
+        await dispatch(loadShelves({ 
+          principal: principalStr, 
+          params: { offset: 0, limit: 20 }
+        })).unwrap();
         return rejectWithValue(result.Err);
       }
       

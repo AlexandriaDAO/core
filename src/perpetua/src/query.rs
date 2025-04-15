@@ -1,14 +1,67 @@
-use candid::{CandidType, Nat, Principal};
+use candid::{CandidType, Nat, Principal, Deserialize};
 use ic_cdk;
 use std::convert::TryInto;
+use std::ops::Bound;
 
 use crate::storage::{
     SHELVES, USER_SHELVES, GLOBAL_TIMELINE, USER_PROFILE_ORDER, 
-    TAG_SHELF_ASSOCIATIONS, TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX,
-    Shelf, Item, ShelfId, NormalizedTag,
-    TagShelfAssociationKey, TagPopularityKey
+    TAG_SHELF_ASSOCIATIONS, TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, TAG_METADATA,
+    Shelf, Item, ShelfId, NormalizedTag, ItemId,
+    TagMetadata
 };
+use crate::types::{TagPopularityKey, TagShelfAssociationKey};
 use crate::utils::normalize_tag;
+
+// --- Pagination Defaults ---
+const DEFAULT_PAGE_LIMIT: usize = 20;
+const MAX_PAGE_LIMIT: usize = 50;
+
+// --- Pagination Input Types ---
+
+#[derive(CandidType, Deserialize, Debug, Clone)]
+pub struct OffsetPaginationInput {
+    pub offset: Nat,
+    pub limit: Nat,
+}
+
+impl OffsetPaginationInput {
+    fn get_limit(&self) -> usize {
+        self.limit.clone().0.try_into().unwrap_or(DEFAULT_PAGE_LIMIT).min(MAX_PAGE_LIMIT)
+    }
+
+    fn get_offset(&self) -> usize {
+        self.offset.clone().0.try_into().unwrap_or(0)
+    }
+}
+
+#[derive(CandidType, Deserialize, Debug, Clone)]
+pub struct CursorPaginationInput<C: CandidType + Clone> {
+    pub cursor: Option<C>,
+    pub limit: Nat,
+}
+
+impl<C: CandidType + Clone> CursorPaginationInput<C> {
+    fn get_limit(&self) -> usize {
+        self.limit.clone().0.try_into().unwrap_or(DEFAULT_PAGE_LIMIT).min(MAX_PAGE_LIMIT)
+    }
+}
+
+// --- Pagination Result Types ---
+
+#[derive(CandidType, Debug, Clone)]
+pub struct OffsetPaginatedResult<T: CandidType + Clone> {
+    pub items: Vec<T>,
+    pub total_count: Nat,
+    pub limit: Nat,
+    pub offset: Nat,
+}
+
+#[derive(CandidType, Debug, Clone)]
+pub struct CursorPaginatedResult<T: CandidType + Clone, C: CandidType + Clone> {
+    pub items: Vec<T>,
+    pub next_cursor: Option<C>,
+    pub limit: Nat,
+}
 
 #[derive(CandidType, Debug)]
 pub enum QueryError {
@@ -16,6 +69,7 @@ pub enum QueryError {
     UserNotFound,
     InvalidTimeRange,
     TagNotFound,
+    InvalidCursor,
 }
 
 pub type QueryResult<T> = Result<T, QueryError>;
@@ -33,30 +87,90 @@ pub fn get_shelf(shelf_id: ShelfId) -> QueryResult<Shelf> {
 }
 
 #[ic_cdk::query]
-pub fn get_shelf_items(shelf_id: ShelfId) -> QueryResult<Vec<Item>> {
-    get_shelf(shelf_id).map(|shelf| shelf.get_ordered_items())
+pub fn get_shelf_items(
+    shelf_id: ShelfId, 
+    pagination: CursorPaginationInput<ItemId> // Use ItemId as cursor
+) -> QueryResult<CursorPaginatedResult<Item, ItemId>> {
+    let limit = pagination.get_limit();
+
+    // 1. Get the full shelf
+    let shelf = get_shelf(shelf_id)?;
+
+    // 2. Get all items ordered by their position
+    let ordered_items = shelf.get_ordered_items(); // This returns Vec<Item>
+    let total_items = ordered_items.len();
+
+    if total_items == 0 {
+        return Ok(CursorPaginatedResult {
+            items: Vec::new(),
+            next_cursor: None,
+            limit: Nat::from(limit),
+        });
+    }
+
+    // 3. Find the starting index based on the cursor
+    let start_index = match pagination.cursor {
+        Some(cursor_id) => {
+            // Find the index of the item AFTER the cursor
+            ordered_items
+                .iter()
+                .position(|item| item.id == cursor_id)
+                .map(|idx| idx + 1) // Start from the item *after* the cursor
+                .unwrap_or(0) // If cursor not found, start from beginning (or error?)
+                // Consider returning InvalidCursor if cursor_id is not found?
+                // For now, starting from 0 provides resilience.
+        }
+        None => 0, // No cursor, start from the beginning
+    };
+
+    // 4. Slice the vector to get the current page's items
+    let end_index = (start_index + limit).min(total_items);
+    let items_page: Vec<Item> = if start_index >= total_items {
+        Vec::new() // Cursor pointed past the end
+    } else {
+        ordered_items[start_index..end_index].to_vec()
+    };
+
+    // 5. Determine the next cursor
+    let next_cursor = if end_index < total_items {
+        // The ID of the last item on *this* page is the cursor for the *next* page
+        items_page.last().map(|item| item.id)
+    } else {
+        None // No more items
+    };
+
+    Ok(CursorPaginatedResult {
+        items: items_page,
+        next_cursor,
+        limit: Nat::from(limit),
+    })
 }
 
-// User queries
+// User queries (Refactored for Offset Pagination)
 #[ic_cdk::query]
-pub fn get_user_shelves(user: Principal, range: Option<Nat>) -> QueryResult<Vec<Shelf>> {
-    let limit: Option<usize> = range.and_then(|n| n.0.try_into().ok());
+pub fn get_user_shelves(
+    user: Principal, 
+    pagination: OffsetPaginationInput
+) -> QueryResult<OffsetPaginatedResult<Shelf>> {
+    let limit = pagination.get_limit();
+    let offset = pagination.get_offset();
 
     USER_SHELVES.with(|user_shelves| {
         user_shelves
             .borrow()
             .get(&user)
             .ok_or(QueryError::UserNotFound)
-            .map(|timestamped| {
+            .and_then(|timestamped| {
                 let has_custom_order = USER_PROFILE_ORDER.with(|profile_order| {
                     profile_order.borrow().get(&user)
                         .map_or(false, |order| order.is_customized)
                 });
-                
-                if has_custom_order {
+
+                let combined_ids: Vec<ShelfId> = if has_custom_order {
                     USER_PROFILE_ORDER.with(|profile_order| {
                         let order_ref = profile_order.borrow();
-                        let user_order = order_ref.get(&user).unwrap();
+                        // Assume user exists based on the outer check
+                        let user_order = order_ref.get(&user).unwrap(); 
                         
                         let mut ordered_positions: Vec<(ShelfId, f64)> = user_order.shelf_positions
                             .iter()
@@ -72,69 +186,101 @@ pub fn get_user_shelves(user: Principal, range: Option<Nat>) -> QueryResult<Vec<
                             .filter(|(_, id)| !ordered_id_set.contains(id))
                             .map(|&(ts, ref id)| (ts, id.clone()))
                             .collect();
-                        timestamp_ordered_ids.sort_by(|a, b| b.0.cmp(&a.0));
+                        timestamp_ordered_ids.sort_by(|a, b| b.0.cmp(&a.0)); // Newest first
                         
                         let non_ordered_ids: Vec<ShelfId> = timestamp_ordered_ids.into_iter().map(|(_, id)| id).collect();
                         
-                        let combined_ids: Vec<ShelfId> = ordered_ids.into_iter().chain(non_ordered_ids.into_iter()).collect();
-                        
-                        let final_ids: Vec<ShelfId> = match limit {
-                             Some(l) => combined_ids.into_iter().take(l).collect(),
-                             None => combined_ids,
-                        };
-                        
-                        SHELVES.with(|shelves| {
-                            let shelves_ref = shelves.borrow();
-                            final_ids.iter().filter_map(|id| shelves_ref.get(id)).collect()
-                        })
+                        // Combine: custom order first, then timestamp order
+                        ordered_ids.into_iter().chain(non_ordered_ids.into_iter()).collect()
                     })
                 } else {
+                    // Default: Sort by timestamp (newest first)
                     let mut shelf_data: Vec<(u64, ShelfId)> = timestamped.0.iter().cloned().collect();
-                    shelf_data.sort_by(|a, b| b.0.cmp(&a.0));
+                    shelf_data.sort_by(|a, b| b.0.cmp(&a.0)); // Newest first
+                    shelf_data.into_iter().map(|(_, id)| id).collect()
+                };
 
-                    let final_ids: Vec<ShelfId> = match limit {
-                        Some(l) => shelf_data.into_iter().take(l).map(|(_, id)| id).collect(),
-                        None => shelf_data.into_iter().map(|(_, id)| id).collect(),
-                    };
+                let total_count = combined_ids.len();
 
-                    SHELVES.with(|shelves| {
-                        let shelves_ref = shelves.borrow();
-                        final_ids.iter().filter_map(|id| shelves_ref.get(id)).collect()
+                // Apply offset and limit to the final ID list
+                let final_ids: Vec<ShelfId> = combined_ids
+                    .into_iter()
+                    .skip(offset)
+                    .take(limit)
+                    .collect();
+                
+                // Fetch Shelf data for the paginated IDs
+                SHELVES.with(|shelves| {
+                    let shelves_ref = shelves.borrow();
+                    let items: Vec<Shelf> = final_ids
+                        .iter()
+                        .filter_map(|id| shelves_ref.get(id))
+                        .collect();
+
+                    Ok(OffsetPaginatedResult {
+                        items,
+                        total_count: Nat::from(total_count),
+                        limit: Nat::from(limit),
+                        offset: Nat::from(offset),
                     })
-                }
+                })
             })
     })
 }
 
-// Global timeline query
+// Global timeline query (Refactored for Cursor Pagination)
 #[ic_cdk::query]
-pub fn get_recent_shelves(limit: Option<Nat>, before_timestamp: Option<u64>) -> QueryResult<Vec<Shelf>> {
-    let max_limit = 50;
-    let limit_usize: usize = limit.and_then(|n| n.0.try_into().ok()).unwrap_or(20).min(max_limit);
-    let max_ts = before_timestamp.unwrap_or(u64::MAX);
-    
+pub fn get_recent_shelves(
+    pagination: CursorPaginationInput<u64>
+) -> QueryResult<CursorPaginatedResult<Shelf, u64>> {
+    let limit = pagination.get_limit();
+    let limit_plus_one = limit + 1; // Fetch one extra to determine next_cursor
+
     GLOBAL_TIMELINE.with(|timeline| {
         let timeline_ref = timeline.borrow();
         
-        let shelf_ids: Vec<ShelfId> = timeline_ref
-            .range(..=max_ts)
-            .rev()
-            .take(limit_usize)
-            .map(|(_, id)| id.clone())
+        // Determine the starting bound based on the cursor
+        let start_bound = match pagination.cursor {
+            Some(cursor_ts) => Bound::Excluded(cursor_ts),
+            None => Bound::Unbounded, // Start from the beginning (latest)
+        };
+
+        // Iterate in reverse chronological order
+        let mut shelf_ids_with_ts: Vec<(u64, ShelfId)> = timeline_ref
+            .iter()
+            .rev() // Iterate newest first
+            .skip_while(|(ts, _)| match start_bound {
+                Bound::Excluded(cursor_ts) => *ts > cursor_ts, // Skip items newer than or at cursor
+                Bound::Unbounded => false, // Don't skip if no cursor
+                _ => unreachable!(), // We only use Excluded or Unbounded
+            })
+            .take(limit_plus_one)
+            .map(|(ts, id)| (ts, id.clone()))
             .collect();
-        
-        if shelf_ids.is_empty() {
-            return Ok(Vec::new());
-        }
-        
+
+        // Determine the next cursor
+        let next_cursor = if shelf_ids_with_ts.len() == limit_plus_one {
+            // The last item fetched is the key for the next page
+            shelf_ids_with_ts.pop().map(|(ts, _)| ts)
+        } else {
+            None
+        };
+
+        // Get the actual Shelf data for the current page
+        let shelf_ids: Vec<ShelfId> = shelf_ids_with_ts.into_iter().map(|(_, id)| id).collect();
+
         SHELVES.with(|shelves| {
             let shelves_ref = shelves.borrow();
-            let result: Vec<Shelf> = shelf_ids
+            let items: Vec<Shelf> = shelf_ids
                 .iter()
                 .filter_map(|id| shelves_ref.get(id))
                 .collect();
             
-            Ok(result)
+            Ok(CursorPaginatedResult {
+                items,
+                next_cursor,
+                limit: Nat::from(limit),
+            })
         })
     })
 }
@@ -186,27 +332,76 @@ pub fn get_shelf_position_metrics(shelf_id: ShelfId) -> Result<ShelfPositionMetr
     })
 }
 
-/// Get shelf IDs associated with a specific tag.
-/// Returns an empty vec if the tag is not found.
+/// Get shelf IDs associated with a specific tag (Paginated).
+/// Returns an empty list if the tag is not found.
 #[ic_cdk::query]
-pub fn get_shelves_by_tag(tag: String) -> Vec<ShelfId> {
+pub fn get_shelves_by_tag(
+    tag: String, 
+    pagination: CursorPaginationInput<TagShelfAssociationKey>
+) -> QueryResult<CursorPaginatedResult<ShelfId, TagShelfAssociationKey>> {
     let normalized_tag = normalize_tag(&tag);
-    let mut shelf_ids = Vec::new();
+    if normalized_tag.is_empty() {
+        // Return empty result for empty tag
+        return Ok(CursorPaginatedResult {
+            items: Vec::new(),
+            next_cursor: None,
+            limit: Nat::from(pagination.get_limit()),
+        });
+    }
+
+    let limit = pagination.get_limit();
+    let limit_plus_one = limit + 1;
+    let mut result_keys: Vec<TagShelfAssociationKey> = Vec::with_capacity(limit_plus_one);
 
     TAG_SHELF_ASSOCIATIONS.with(|assoc| {
         let map = assoc.borrow();
-        let start_key = TagShelfAssociationKey(normalized_tag.clone(), String::new());
 
-        for (TagShelfAssociationKey(current_tag, shelf_id), _) in map.range(start_key..) {
-            if current_tag == normalized_tag {
-                 shelf_ids.push(shelf_id.clone());
-            } else {
+        // Define the iteration range start based on the cursor
+        let start_bound = match pagination.cursor {
+            // If cursor exists, start EXCLUSIVEly after it
+            Some(cursor_key) => {
+                // Basic validation: cursor tag should match requested tag
+                if cursor_key.0 != normalized_tag {
+                    return Err(QueryError::InvalidCursor);
+                }
+                Bound::Excluded(cursor_key)
+            },
+            // If no cursor, start INCLUSIVEly from the beginning for this tag
+            None => Bound::Included(TagShelfAssociationKey(normalized_tag.clone(), String::new())),
+        };
+
+        // Iterate through the associations for the given tag
+        for (key, _) in map.range((start_bound, Bound::Unbounded)) {
+            // Stop if we've moved past the target tag
+            if key.0 != normalized_tag {
+                break;
+            }
+
+            result_keys.push(key.clone());
+
+            // Stop if we have fetched enough keys for pagination logic
+            if result_keys.len() >= limit_plus_one {
                 break;
             }
         }
-    });
+        Ok(())
+    })?;
 
-    shelf_ids
+    // Determine the next cursor
+    let next_cursor = if result_keys.len() == limit_plus_one {
+        result_keys.pop() // Remove the extra item and use its key as the cursor
+    } else {
+        None
+    };
+
+    // Extract ShelfIds from the remaining keys
+    let items: Vec<ShelfId> = result_keys.into_iter().map(|key| key.1).collect();
+
+    Ok(CursorPaginatedResult {
+        items,
+        next_cursor,
+        limit: Nat::from(limit),
+    })
 }
 
 /// Get the number of shelves associated with a specific tag.
@@ -221,49 +416,121 @@ pub fn get_tag_shelf_count(tag: String) -> u64 {
      })
 }
 
-/// Get popular tags (most associated shelves first).
+/// Get popular tags (most associated shelves first - Paginated).
 #[ic_cdk::query]
-pub fn get_popular_tags(limit: Nat) -> Vec<NormalizedTag> {
-    let limit_usize: usize = limit.0.try_into().unwrap_or(usize::MAX);
-    let mut popular_tags = Vec::new();
+pub fn get_popular_tags(
+    pagination: CursorPaginationInput<TagPopularityKey>
+) -> QueryResult<CursorPaginatedResult<NormalizedTag, TagPopularityKey>> {
+    let limit = pagination.get_limit();
+    let limit_plus_one = limit + 1;
+    let mut result_keys: Vec<TagPopularityKey> = Vec::with_capacity(limit_plus_one);
 
     TAG_POPULARITY_INDEX.with(|pop| {
         let map = pop.borrow();
-        for (TagPopularityKey(_count, tag), _) in map.iter().rev().take(limit_usize) {
-             popular_tags.push(tag.clone());
+
+        // Determine the starting bound for reverse iteration based on the cursor
+        let start_bound = match pagination.cursor {
+            Some(cursor_key) => Bound::Excluded(cursor_key), // Start exclusively before the cursor (higher popularity)
+            None => Bound::Unbounded, // Start from the highest popularity
+        };
+        
+        // Iterate in reverse (highest count first)
+        for (key, _) in map.iter().rev() // Use iter().rev() for descending order
+            .skip_while(|(k, _)| match start_bound {
+                Bound::Excluded(ref cursor_key) => k >= cursor_key, // Skip keys >= cursor
+                Bound::Unbounded => false,
+                _ => unreachable!(), // Should only be Excluded or Unbounded
+            })
+            .take(limit_plus_one) 
+        {
+            result_keys.push(key.clone());
         }
     });
 
-    popular_tags
+    // Determine the next cursor
+    let next_cursor = if result_keys.len() == limit_plus_one {
+        result_keys.pop() // Remove the extra item and use its key as the cursor
+    } else {
+        None
+    };
+
+    // Extract tags from the keys
+    let items: Vec<NormalizedTag> = result_keys.into_iter().map(|key| key.1).collect();
+
+    Ok(CursorPaginatedResult {
+        items,
+        next_cursor,
+        limit: Nat::from(limit),
+    })
 }
 
-/// Get tags starting with a given prefix (case-insensitive).
+/// Get tags starting with a given prefix (case-insensitive - Paginated).
 #[ic_cdk::query]
-pub fn get_tags_with_prefix(prefix: String) -> Vec<NormalizedTag> {
+pub fn get_tags_with_prefix(
+    prefix: String, 
+    pagination: CursorPaginationInput<NormalizedTag>
+) -> QueryResult<CursorPaginatedResult<NormalizedTag, NormalizedTag>> {
     let normalized_prefix = normalize_tag(&prefix);
     if normalized_prefix.is_empty() {
-        return Vec::new();
+        // Return empty result for empty prefix
+        return Ok(CursorPaginatedResult {
+            items: Vec::new(),
+            next_cursor: None,
+            limit: Nat::from(pagination.get_limit()),
+        });
     }
 
-    let mut matching_tags = Vec::new();
-    let limit = 50;
+    let limit = pagination.get_limit();
+    let limit_plus_one = limit + 1;
+    let mut matching_tags = Vec::with_capacity(limit_plus_one);
 
     TAG_LEXICAL_INDEX.with(|lex| {
         let map = lex.borrow();
-        let start_key = normalized_prefix.clone();
-        for (tag, _) in map.range(start_key..) {
-            if tag.starts_with(&normalized_prefix) {
-                 matching_tags.push(tag.clone());
-                 if matching_tags.len() >= limit {
-                     break;
-                 }
-            } else {
-                break; 
+
+        // Determine the start bound based on the cursor
+        let start_bound = match pagination.cursor {
+            Some(cursor_tag) => {
+                // Basic validation: cursor must start with the prefix
+                if !cursor_tag.starts_with(&normalized_prefix) {
+                    return Err(QueryError::InvalidCursor); 
+                }
+                Bound::Excluded(cursor_tag)
+            },
+            None => Bound::Included(normalized_prefix.clone()), // Start from the prefix itself
+        };
+
+        // Iterate through tags starting from the bound
+        for (tag, _) in map.range((start_bound, Bound::Unbounded)) {
+            // Stop if the tag no longer starts with the prefix
+            if !tag.starts_with(&normalized_prefix) {
+                break;
+            }
+
+            matching_tags.push(tag.clone());
+
+            // Stop if we have fetched enough tags for pagination
+            if matching_tags.len() >= limit_plus_one {
+                break;
             }
         }
-    });
+        Ok(())
+    })?;
 
-    matching_tags
+    // Determine the next cursor
+    let next_cursor = if matching_tags.len() == limit_plus_one {
+        matching_tags.pop() // The last tag fetched is the cursor for the next page
+    } else {
+        None
+    };
+
+    // `matching_tags` now contains only the items for the current page
+    let items = matching_tags;
+
+    Ok(CursorPaginatedResult {
+        items,
+        next_cursor,
+        limit: Nat::from(limit),
+    })
 }
 
 #[derive(CandidType)]

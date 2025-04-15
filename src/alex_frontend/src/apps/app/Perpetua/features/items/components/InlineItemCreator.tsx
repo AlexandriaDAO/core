@@ -66,7 +66,10 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
       try {
         const principal = identity.getPrincipal().toString();
         // Dispatch action with a stable reference
-        const action = loadShelves(principal);
+        const action = loadShelves({ 
+          principal, 
+          params: { offset: 0, limit: 20 }
+        });
         dispatch(action);
       } catch (err) {
         console.error("Error loading shelves:", err);

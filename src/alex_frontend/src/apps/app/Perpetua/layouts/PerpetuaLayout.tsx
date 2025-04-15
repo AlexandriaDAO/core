@@ -122,7 +122,10 @@ const PerpetuaLayout: React.FC = () => {
   useEffect(() => {
     if (identity) {
       // Load the current user's shelves as soon as the layout mounts
-      dispatch(loadShelves(identity.getPrincipal()))
+      dispatch(loadShelves({ 
+        principal: identity.getPrincipal(), 
+        params: { offset: 0, limit: 20 }
+      }))
         .unwrap()
         .catch((error) => {
           console.error("Failed to load shelves:", error);
@@ -135,7 +138,10 @@ const PerpetuaLayout: React.FC = () => {
     if (isUserDetail && userId && userId !== userPrincipal && !userShelvesLoading) {
       setUserShelvesLoading(true);
       // Dispatch loadShelves and let Redux handle state management
-      dispatch(loadShelves(userId))
+      dispatch(loadShelves({ 
+        principal: userId, 
+        params: { offset: 0, limit: 20 }
+      }))
         .unwrap()
         .then(() => {
           setUserShelvesLoading(false);

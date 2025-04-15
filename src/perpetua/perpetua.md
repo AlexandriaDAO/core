@@ -3,13 +3,13 @@ Perpetua/
 ├── features/
 │   ├── cards/
 │   │   ├── components/
-│   │   │   ├── BaseShelfList.tsx (374 lines)
+│   │   │   ├── BaseShelfList.tsx (410 lines)
 │   │   │   ├── ContentDisplays.tsx (103 lines)
 │   │   │   ├── NftDisplay.tsx (298 lines)
 │   │   │   ├── ShelfBlogView.tsx (191 lines)
-│   │   │   ├── ShelfCard.tsx (276 lines)
+│   │   │   ├── ShelfCard.tsx (286 lines)
 │   │   │   ├── ShelfCardActionMenu.tsx (159 lines)
-│   │   │   ├── ShelfContentCard.tsx (131 lines)
+│   │   │   ├── ShelfContentCard.tsx (135 lines)
 │   │   │   ├── ShelfContentModal.tsx (79 lines)
 │   │   │   ├── ShelfDetailView.tsx (227 lines)
 │   │   │   ├── ShelfEmptyView.tsx (32 lines)
@@ -24,8 +24,8 @@ Perpetua/
 │   │       └── ShelfViewUtils.ts (32 lines)
 │   ├── items/
 │   │   ├── components/
-│   │   │   ├── AlexandrianSelector.tsx (223 lines)
-│   │   │   ├── InlineItemCreator.tsx (433 lines)
+│   │   │   ├── AlexandrianSelector.tsx (84 lines)
+│   │   │   ├── InlineItemCreator.tsx (405 lines)
 │   │   │   └── index.ts (5 lines)
 │   │   ├── hooks/
 │   │   │   └── useItemActions.tsx (112 lines)
@@ -40,12 +40,12 @@ Perpetua/
 │   │       │   └── index.ts (4 lines)
 │   │       ├── hooks/
 │   │       │   ├── index.ts (4 lines)
-│   │       │   ├── useDragAndDrop.ts (108 lines)
-│   │       │   ├── useItemReordering.ts (80 lines)
-│   │       │   ├── useReorderable.ts (217 lines)
+│   │       │   ├── useDragAndDrop.ts (111 lines)
+│   │       │   ├── useItemReordering.ts (77 lines)
+│   │       │   ├── useReorderable.ts (142 lines)
 │   │       │   └── useShelfReordering.ts (70 lines)
 │   │       └── utils/
-│   │           ├── createReorderAdapter.ts (49 lines)
+│   │           ├── createReorderAdapter.ts (59 lines)
 │   │           └── reorderUtils.ts (32 lines)
 │   ├── shelf-collaboration/
 │   │   └── components/
@@ -59,51 +59,63 @@ Perpetua/
 │   │   │   └── ShelfSelectionDialog.tsx (158 lines)
 │   │   ├── containers/
 │   │   │   ├── ShelfDetailContainer.tsx (161 lines)
-│   │   │   └── ShelfLists.tsx (253 lines)
+│   │   │   └── ShelfLists.tsx (248 lines)
 │   │   └── hooks/
 │   │       ├── index.ts (4 lines)
 │   │       ├── useAddToShelf.ts (128 lines)
 │   │       ├── usePublicShelfOperations.ts (62 lines)
-│   │       └── useShelfOperations.ts (213 lines)
-│   └── shelf-settings/
+│   │       └── useShelfOperations.ts (211 lines)
+│   ├── shelf-settings/
+│   │   ├── components/
+│   │   │   ├── CollaboratorsTab.tsx (40 lines)
+│   │   │   ├── GeneralSettingsTab.tsx (238 lines)
+│   │   │   ├── PublicAccessSection.tsx (70 lines)
+│   │   │   ├── ShelfInformationSection.tsx (132 lines)
+│   │   │   ├── ShelfLinkItem.tsx (32 lines)
+│   │   │   ├── ShelfSettingsDialog.tsx (119 lines)
+│   │   │   ├── TagsSection.tsx (132 lines)
+│   │   │   └── index.ts (6 lines)
+│   │   ├── hooks/
+│   │   │   ├── index.ts (1 lines)
+│   │   │   └── useShelfMetrics.ts (38 lines)
+│   │   ├── index.ts (2 lines)
+│   │   ├── types.ts (63 lines)
+│   │   └── utils/
+│   │       └── tagValidation.ts (47 lines)
+│   └── tags/
 │       ├── components/
-│       │   ├── CollaboratorsTab.tsx (40 lines)
-│       │   ├── GeneralSettingsTab.tsx (237 lines)
-│       │   ├── PublicAccessSection.tsx (70 lines)
-│       │   ├── ShelfInformationSection.tsx (116 lines)
-│       │   ├── ShelfSettingsDialog.tsx (119 lines)
-│       │   ├── TagsSection.tsx (132 lines)
-│       │   └── index.ts (6 lines)
+│       │   ├── PopularTagsList.tsx (93 lines)
+│       │   ├── TagFilterDisplay.tsx (38 lines)
+│       │   └── TagSearchBar.tsx (98 lines)
+│       ├── containers/
+│       │   └── FilteredShelfListContainer.tsx (88 lines)
 │       ├── hooks/
-│       │   ├── index.ts (1 lines)
-│       │   └── useShelfMetrics.ts (38 lines)
-│       ├── index.ts (2 lines)
-│       ├── types.ts (62 lines)
-│       └── utils/
-│           └── tagValidation.ts (47 lines)
+│       │   ├── useTagActions.ts (40 lines)
+│       │   └── useTagData.ts (37 lines)
+│       └── index.ts (1 lines)
 ├── hooks/
 │   └── useContentPermissions.ts (75 lines)
 ├── index.tsx (22 lines)
 ├── layouts/
-│   └── PerpetuaLayout.tsx (220 lines)
+│   └── PerpetuaLayout.tsx (260 lines)
 ├── routes.ts (119 lines)
 ├── state/
 │   ├── cache/
 │   │   └── ShelvesCache.ts (210 lines)
 │   ├── hooks/
 │   │   ├── index.ts (3 lines)
-│   │   ├── usePerpetuaActions.ts (165 lines)
+│   │   ├── usePerpetuaActions.ts (163 lines)
 │   │   └── usePerpetuaSelectors.ts (62 lines)
 │   ├── index.ts (49 lines)
-│   ├── perpetuaSlice.ts (786 lines)
+│   ├── perpetuaSlice.ts (957 lines)
 │   ├── services/
-│   │   └── perpetuaService.ts (607 lines)
+│   │   └── perpetuaService.ts (685 lines)
 │   ├── thunks/
 │   │   ├── collaborationThunks.ts (106 lines)
 │   │   ├── index.ts (7 lines)
 │   │   ├── itemThunks.ts (97 lines)
-│   │   ├── queryThunks.ts (151 lines)
-│   │   ├── reorderThunks.ts (132 lines)
+│   │   ├── queryThunks.ts (288 lines)
+│   │   ├── reorderThunks.ts (119 lines)
 │   │   ├── shelfThunks.ts (120 lines)
 ├── types/
 │   ├── item.types.ts (27 lines)
@@ -123,9 +135,6 @@ Backend Stuff:
 
 
 
-Frontend Stuff:
-- Add and use all the tag related functions.
-- Test collaborator list stuff.
  
 
 
@@ -162,8 +171,7 @@ candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpe
 dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx generate perpetua
 
-git show --patch a18002337fdc2aa9c6a619b4cf982f7d52c6c566
-
+git show --patch cd31e7d78c7eaa085dff1e7bf490c871c1a7594c
 
 
 
@@ -177,34 +185,13 @@ git show --patch a18002337fdc2aa9c6a619b4cf982f7d52c6c566
 
 ## Security and Vulnerability Suggestions
 
-1. **Validate item content more rigorously**
-   - Current validation for `ItemContent` is limited. Add size limits and content validation especially for Markdown content.
-
-2. **Implement proper rate limiting for all write operations**
-   - Currently only tag operations have rate limiting. Extend to all modifying operations.
-
-3. **Add transaction logging for audit purposes**
-   - Log all modifications with timestamps and principals for security auditing.
-
-4. **Prevent unbounded growth of auxiliary data structures**
-   - Implement cleanup mechanisms for `NFT_SHELVES`, `GLOBAL_TIMELINE`, etc.
-
-5. **Add memory bounds checking for stable storage**
-   - Monitor and limit total canister memory usage to prevent out-of-memory errors.
-
-6. **Add a mechanism for shelf data backup and recovery**
+1. **Add a mechanism for shelf data backup and recovery**
    - Provide a way to export and import shelf data for disaster recovery.
 
-7. **Implement cross-canister call authentication**
-   - When interacting with NFT canisters, verify the caller in both directions.
-
-8. **Add periodic data integrity checks**
-   - Ensure all cross-references remain valid and clean up any inconsistencies.
-
-9. **Implement proper pagination for all query functions**
+2. **Implement proper pagination for all query functions**
    - This prevents large result sets from causing timeouts or memory issues.
 
-10. **Validate shelf title and description for size and content**
+3.  **Validate shelf title and description for size and content**
     - Add character limits and content sanitization.
 
 ## Performance Optimizations

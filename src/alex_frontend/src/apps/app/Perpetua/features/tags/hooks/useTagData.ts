@@ -4,7 +4,7 @@ import {
     selectPopularTags,
     selectTagShelfCount,
     selectCurrentTagFilter,
-    selectShelfIdsForTag,
+    selectShelfIdsForTag as selectShelfIdsForTagFactory,
     selectTagSearchResults,
     selectIsTagSearchLoading,
     selectIsLoadingPopularTags,
@@ -17,7 +17,7 @@ import {
 export function useTagData() {
     const popularTags = useSelector(selectPopularTags);
     const currentTagFilter = useSelector(selectCurrentTagFilter);
-    const shelfIdsForTagSelector = useSelector(selectShelfIdsForTag);
+    const shelfIdsForTagSelectorFactory = selectShelfIdsForTagFactory;
     const tagSearchResults = useSelector(selectTagSearchResults);
     const isTagSearchLoading = useSelector(selectIsTagSearchLoading);
     const isLoadingPopularTags = useSelector(selectIsLoadingPopularTags);
@@ -27,7 +27,7 @@ export function useTagData() {
     return {
         popularTags,
         tagShelfCountSelector,
-        shelfIdsForTagSelector,
+        shelfIdsForTagSelectorFactory,
         currentTagFilter,
         tagSearchResults,
         isTagSearchLoading,

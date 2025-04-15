@@ -46,7 +46,10 @@ const ShelvesPreloader: React.FC = () => {
     // Only load shelves if the user is logged in and we're not currently loading
     const shelves = getEditableShelves();
     if (identity && shelves.length === 0 && !shelvesLoading) {
-      dispatch(loadShelves(identity.getPrincipal()));
+      dispatch(loadShelves({ 
+        principal: identity.getPrincipal(), 
+        params: { offset: 0, limit: 20 }
+      }));
     }
   }, [identity, getEditableShelves, shelvesLoading, dispatch]);
   
@@ -89,7 +92,10 @@ const Grid = ({ dataSource }: GridProps = {}) => {
       
       const identity = useIdentity();
       if (identity && identity.identity) {
-        dispatch(loadShelves(identity.identity.getPrincipal()));
+        dispatch(loadShelves({ 
+          principal: identity.identity.getPrincipal(), 
+          params: { offset: 0, limit: 20 }
+        }));
       }
     };
     
