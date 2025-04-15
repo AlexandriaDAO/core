@@ -6,7 +6,8 @@ import {
   selectSelectedShelf,
   selectShelfById,
   selectUserShelvesForUser,
-  NormalizedShelf
+  NormalizedShelf,
+  selectCurrentTagFilter
 } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { usePerpetuaNavigation, useViewState } from "../routes";
 import { useShelfOperations, usePublicShelfOperations } from "../features/shelf-management/hooks";
@@ -23,6 +24,12 @@ import {
 } from "../features/shelf-management/containers/ShelfLists";
 import { default as NewShelfDialog } from "../features/shelf-management/components/NewShelf";
 import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
+
+// Import Tag components
+import { PopularTagsList } from '../features/tags/components/PopularTagsList';
+import { TagSearchBar } from '../features/tags/components/TagSearchBar';
+import { TagFilterDisplay } from '../features/tags/components/TagFilterDisplay';
+import { FilteredShelfListContainer } from '../features/tags/containers/FilteredShelfListContainer';
 
 /**
  * Convert a NormalizedShelf back to a Shelf for API calls and components
@@ -57,6 +64,7 @@ const PerpetuaLayout: React.FC = () => {
   // Direct state access to auth principal - single source of truth
   const userPrincipal = useAppSelector(state => state.auth.user?.principal);
   const { identity } = useIdentity();
+  const currentTagFilter = useAppSelector(selectCurrentTagFilter); // Get the active tag filter
   
   // Permissions
   const { checkEditAccess } = useContentPermissions();
@@ -75,13 +83,13 @@ const PerpetuaLayout: React.FC = () => {
   
   // Memoize the combined and unique shelves for the main view
   const uniqueNormalizedShelves = useMemo(() => {
-    if (!isMainView) return []; // Only calculate if needed
+    if (!isMainView) return [];
     
     const seenShelfIds = new Set<string>();
     const uniqueShelves: NormalizedShelf[] = [];
     
     // Add personal shelves first (they take priority)
-    personalNormalizedShelves.forEach(shelf => {
+    personalNormalizedShelves.forEach((shelf: NormalizedShelf) => {
       if (!seenShelfIds.has(shelf.shelf_id)) {
         seenShelfIds.add(shelf.shelf_id);
         uniqueShelves.push(shelf);
@@ -89,7 +97,7 @@ const PerpetuaLayout: React.FC = () => {
     });
     
     // Then add unique public shelves
-    publicNormalizedShelves.forEach(shelf => {
+    (publicNormalizedShelves as NormalizedShelf[]).forEach((shelf: NormalizedShelf) => {
       if (!seenShelfIds.has(shelf.shelf_id)) {
         seenShelfIds.add(shelf.shelf_id);
         uniqueShelves.push(shelf);
@@ -171,40 +179,35 @@ const PerpetuaLayout: React.FC = () => {
     
     // If we're viewing the main shelves view
     if (isMainView) {
-      // Deduplicate shelves when combining personal and public
-      // const seenShelfIds = new Set<string>(); // Logic moved to useMemo
-      // const uniqueShelves: NormalizedShelf[] = []; // Logic moved to useMemo
-      // 
-      // // Add personal shelves first (they take priority)
-      // shelves.forEach(shelf => {
-      //   if (!seenShelfIds.has(shelf.shelf_id)) {
-      //     seenShelfIds.add(shelf.shelf_id);
-      //     uniqueShelves.push(shelf);
-      //   }
-      // });
-      // 
-      // // Then add unique public shelves
-      // publicShelves.forEach(shelf => {
-      //   if (!seenShelfIds.has(shelf.shelf_id)) {
-      //     seenShelfIds.add(shelf.shelf_id);
-      //     uniqueShelves.push(shelf);
-      //   }
-      // });
-      
-      // const denormalizedPersonalShelves = denormalizeShelves(shelves); // Now using memoized version
-      // const allDenormalizedShelves = denormalizeShelves(uniqueShelves); // Now using memoized version
-      
       return (
-        <UnifiedShelvesUI 
-          allShelves={allDenormalizedShelves}
-          personalShelves={denormalizedPersonalShelves}
-          loading={personalLoading || publicLoading}
-          onNewShelf={handleCreateShelf}
-          onViewShelf={goToShelf}
-          onViewOwner={goToUser}
-          onLoadMore={loadMoreShelves}
-          checkEditAccess={checkEditAccess}
-        />
+        <>
+          {/* Add Tag Components */} 
+          <div className="flex flex-col sm:flex-row gap-4 mb-4 items-start">
+            <div className="flex-grow">
+              <PopularTagsList />
+            </div>
+            <TagSearchBar />
+          </div>
+          <TagFilterDisplay />
+
+          {/* Conditional Shelf List */} 
+          {currentTagFilter ? (
+            // Show filtered list if a tag is selected
+            <FilteredShelfListContainer /> 
+          ) : (
+            // Show default unified list if no tag is selected
+            <UnifiedShelvesUI 
+              allShelves={allDenormalizedShelves}
+              personalShelves={denormalizedPersonalShelves}
+              loading={personalLoading || publicLoading}
+              onNewShelf={handleCreateShelf}
+              onViewShelf={goToShelf}
+              onViewOwner={goToUser}
+              onLoadMore={loadMoreShelves}
+              checkEditAccess={checkEditAccess}
+            />
+          )}
+        </>
       );
     }
     

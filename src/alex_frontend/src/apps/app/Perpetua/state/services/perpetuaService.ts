@@ -590,6 +590,95 @@ class PerpetuaService {
       return { Err: "Failed to set item order" };
     }
   }
+
+  /**
+   * Get popular tags
+   */
+  public async getPopularTags(limit: number = 20): Promise<Result<string[], QueryError>> {
+    try {
+      const actor = await this.getActor();
+      // Convert limit to BigInt for the backend call
+      const limitBigInt = BigInt(limit);
+      
+      const result = await actor.get_popular_tags(limitBigInt);
+      
+      // Backend returns `vec text`, no Err variant defined in .did, but wrap defensively
+      if (Array.isArray(result)) { 
+        return { Ok: result }; 
+      } else {
+        // This case shouldn't happen based on .did, but handle potential issues
+        console.error('Unexpected response format from get_popular_tags:', result);
+        return { Err: "Unexpected response format" }; 
+      }
+    } catch (error) {
+      console.error('Error in getPopularTags:', error);
+      return { Err: "Failed to load popular tags" };
+    }
+  }
+  
+  /**
+   * Get shelf IDs associated with a specific tag
+   */
+  public async getShelvesByTag(tag: string): Promise<Result<string[], QueryError>> {
+    try {
+      const actor = await this.getActor();
+      const result = await actor.get_shelves_by_tag(tag);
+
+      // Backend returns `vec text` (Shelf IDs), no Err variant defined in .did
+      if (Array.isArray(result)) {
+        return { Ok: result };
+      } else {
+        console.error('Unexpected response format from get_shelves_by_tag:', result);
+        return { Err: "Unexpected response format" };
+      }
+    } catch (error) {
+      console.error(`Error in getShelvesByTag (${tag}):`, error);
+      return { Err: `Failed to load shelves for tag ${tag}` };
+    }
+  }
+
+  /**
+   * Get the number of shelves associated with a specific tag
+   */
+  public async getTagShelfCount(tag: string): Promise<Result<number, QueryError>> {
+    try {
+      const actor = await this.getActor();
+      const result = await actor.get_tag_shelf_count(tag);
+
+      // Backend returns nat64, no Err variant defined in .did
+      if (typeof result === 'bigint') {
+        // Convert BigInt count to number
+        return { Ok: Number(result) };
+      } else {
+         console.error('Unexpected response format from get_tag_shelf_count:', result);
+        return { Err: "Unexpected response format" };
+      }
+    } catch (error) {
+      console.error(`Error in getTagShelfCount (${tag}):`, error);
+      return { Err: `Failed to load count for tag ${tag}` };
+    }
+  }
+
+  /**
+   * Get tags starting with a given prefix (case-insensitive on backend)
+   */
+  public async getTagsWithPrefix(prefix: string): Promise<Result<string[], QueryError>> {
+    try {
+      const actor = await this.getActor();
+      const result = await actor.get_tags_with_prefix(prefix);
+
+      // Backend returns `vec text`, no Err variant defined in .did
+      if (Array.isArray(result)) {
+        return { Ok: result };
+      } else {
+        console.error('Unexpected response format from get_tags_with_prefix:', result);
+        return { Err: "Unexpected response format" };
+      }
+    } catch (error) {
+      console.error(`Error in getTagsWithPrefix (${prefix}):`, error);
+      return { Err: `Failed to search tags with prefix ${prefix}` };
+    }
+  }
 }
 
 // Export singleton instance

@@ -148,4 +148,141 @@ export const loadMissingShelves = createAsyncThunk(
       return rejectWithValue(extractErrorMessage(error, "Failed to load shelves"));
     }
   }
+);
+
+// # Tag Thunks #
+
+/**
+ * Fetch popular tags
+ */
+export const fetchPopularTags = createAsyncThunk(
+  'perpetua/fetchPopularTags',
+  async (limit: number | undefined, { rejectWithValue }) => {
+    const effectiveLimit = limit ?? 20; // Use default if limit is undefined
+    try {
+      // Use effectiveLimit in cache key and service call
+      const cacheKey = `popularTags_${effectiveLimit}`;
+      
+      // Check cache first
+      const cachedData = cacheManager.get<string[]>(cacheKey, 'tags');
+      if (cachedData) {
+        return cachedData;
+      }
+      
+      // Fetch from service
+      const result = await perpetuaService.getPopularTags(effectiveLimit);
+      
+      if ("Ok" in result && result.Ok) {
+        // Update cache
+        cacheManager.set(cacheKey, 'tags', result.Ok);
+        return result.Ok;
+      } else if ("Err" in result && result.Err) {
+        return rejectWithValue(result.Err);
+      } else {
+        return rejectWithValue("Failed to fetch popular tags");
+      }
+    } catch (error) {
+      return rejectWithValue(extractErrorMessage(error, "Failed to fetch popular tags"));
+    }
+  }
+);
+
+/**
+ * Fetch shelf IDs by tag
+ */
+export const fetchShelvesByTag = createAsyncThunk(
+  'perpetua/fetchShelvesByTag',
+  async (tag: string, { rejectWithValue, dispatch }) => {
+    try {
+      // Cache key for shelves by tag
+      const cacheKey = `shelvesByTag_${tag}`;
+      
+      // Check cache first
+      const cachedData = cacheManager.get<string[]>(cacheKey, 'tags');
+      if (cachedData) {
+        // Return the cached shelf IDs and the tag
+        return { tag, shelfIds: cachedData };
+      }
+      
+      // Fetch from service
+      const result = await perpetuaService.getShelvesByTag(tag);
+      
+      if ("Ok" in result && result.Ok) {
+        const shelfIds = result.Ok;
+        // Update cache
+        cacheManager.set(cacheKey, 'tags', shelfIds);
+        
+        // Optional: Fetch full shelf data for missing shelves
+        // This depends on whether the UI needs full data immediately.
+        // If needed, dispatch getShelfById for each ID not in the state.
+        
+        // Return the tag and the fetched shelf IDs
+        return { tag, shelfIds };
+      } else if ("Err" in result && result.Err) {
+        return rejectWithValue(result.Err);
+      } else {
+        return rejectWithValue(`Failed to fetch shelves for tag ${tag}`);
+      }
+    } catch (error) {
+      return rejectWithValue(extractErrorMessage(error, `Failed to fetch shelves for tag ${tag}`));
+    }
+  }
+);
+
+/**
+ * Fetch shelf count for a tag
+ */
+export const fetchTagShelfCount = createAsyncThunk(
+  'perpetua/fetchTagShelfCount',
+  async (tag: string, { rejectWithValue }) => {
+    try {
+      // Cache key for tag count
+      const cacheKey = `tagCount_${tag}`;
+      
+      // Check cache first
+      const cachedData = cacheManager.get<number>(cacheKey, 'tags');
+      if (cachedData !== undefined && cachedData !== null) { // Check for null/undefined too
+        return { tag, count: cachedData };
+      }
+      
+      // Fetch from service
+      const result = await perpetuaService.getTagShelfCount(tag);
+      
+      if ("Ok" in result && typeof result.Ok === 'number') {
+        const count = result.Ok;
+        // Update cache
+        cacheManager.set(cacheKey, 'tags', count);
+        return { tag, count };
+      } else if ("Err" in result && result.Err) {
+        return rejectWithValue(result.Err);
+      } else {
+        return rejectWithValue(`Failed to fetch count for tag ${tag}`);
+      }
+    } catch (error) {
+      return rejectWithValue(extractErrorMessage(error, `Failed to fetch count for tag ${tag}`));
+    }
+  }
+);
+
+/**
+ * Fetch tags with a specific prefix
+ */
+export const fetchTagsWithPrefix = createAsyncThunk(
+  'perpetua/fetchTagsWithPrefix',
+  async (prefix: string, { rejectWithValue }) => {
+    try {
+      // No caching for prefix search as results can change frequently
+      const result = await perpetuaService.getTagsWithPrefix(prefix);
+      
+      if ("Ok" in result && result.Ok) {
+        return result.Ok; // Return the array of matching tags
+      } else if ("Err" in result && result.Err) {
+        return rejectWithValue(result.Err);
+      } else {
+        return rejectWithValue(`Failed to fetch tags with prefix ${prefix}`);
+      }
+    } catch (error) {
+      return rejectWithValue(extractErrorMessage(error, `Failed to fetch tags with prefix ${prefix}`));
+    }
+  }
 ); 
