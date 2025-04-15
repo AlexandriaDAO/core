@@ -20,9 +20,9 @@ export const ShelfOption: React.FC<ShelfOptionProps> = ({ shelf, isSelected, onS
         onSelect(shelf.shelf_id);
       }}
     >
-      <div className="font-medium truncate">{shelf.title}</div>
+      <div className="font-medium truncate font-serif">{shelf.title}</div>
       {shelf.description?.[0] && (
-        <div className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
+        <div className="text-sm text-muted-foreground line-clamp-1 mt-0.5 font-serif">
           {shelf.description[0]}
         </div>
       )}

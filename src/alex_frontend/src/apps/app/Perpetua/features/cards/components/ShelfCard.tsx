@@ -87,14 +87,14 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
   };
   
   return (
-    <div className="relative h-full">
+    <div className="relative h-full group">
       <Card 
-        className="h-full cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative bg-white dark:bg-gray-900"
+        className="h-full cursor-pointer hover:shadow-md transition-all duration-300 flex flex-col relative border-gray-200/70 dark:border-gray-700/70 overflow-hidden bg-white dark:bg-gray-900"
         onClick={onViewShelf ? () => onViewShelf(shelf.shelf_id) : undefined}
       >
         <CardContent className="flex flex-col items-start p-0 flex-grow">
           <AspectRatio ratio={1} className="w-full relative">
-            <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 h-full">
+            <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 h-full group-hover:bg-gray-100 dark:group-hover:bg-gray-900/80 transition-colors duration-300">
               <div className="relative w-full h-full">
                 <ShelfCardActionMenu
                   contentId={shelf.shelf_id}
@@ -104,179 +104,176 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
                   itemId={itemId}
                 />
                 
-                <div className="text-center p-4 h-full flex flex-col items-center justify-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <Folder className="w-8 h-8 text-primary" />
-                  </div>
-                  <div className="text-lg font-semibold truncate max-w-full">{shelf.title}</div>
+                <div className="text-center p-6 h-full flex flex-col items-center justify-center">
+                  <div className="text-xl font-semibold truncate max-w-full mb-1 font-serif">{shelf.title}</div>
                   {shelf.description?.[0] && (
-                    <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{shelf.description[0]}</div>
+                    <div className="text-sm text-muted-foreground mt-1 line-clamp-2 font-serif">{shelf.description[0]}</div>
+                  )}
+
+                  {/* Basic info badges displayed on the card itself */}
+                  <div className="mt-3 flex flex-wrap gap-1.5 justify-center">
+                    <Badge variant="secondary" className="text-xs font-serif">
+                      {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                    </Badge>
+                    
+                    {isPublic ? (
+                      <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800 flex items-center gap-1 font-serif">
+                        <Globe className="h-3 w-3" /> Public
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 flex items-center gap-1 font-serif">
+                        <Lock className="h-3 w-3" /> Private
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Render tags below other badges if they exist */}
+                  {shelf.tags && shelf.tags.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1 justify-center">
+                      {shelf.tags.map((tag, index) => (
+                        <Badge key={index} variant="outline" className="text-[11px] px-1.5 py-px bg-gray-50 dark:bg-gray-800 flex items-center gap-0.5 font-serif">
+                          <Tag className="h-2.5 w-2.5 text-gray-500" /> {tag}
+                        </Badge>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>
             </div>
             
-            <div 
-              className="absolute bottom-2 right-2 z-[30]"
+            <Button
+              variant="secondary"
+              className="absolute bottom-2 right-2 z-[30] opacity-70 hover:opacity-100 transition-opacity duration-200 h-7 w-7 p-0 bg-white/80 hover:bg-white dark:bg-gray-900/80 dark:hover:bg-gray-900 shadow-md rounded-full flex items-center justify-center"
               onClick={(e) => {
                 e.stopPropagation();
-                e.preventDefault();
+                setIsFooterExpanded(!isFooterExpanded);
               }}
             >
-              <Button
-                variant="secondary"
-                className="bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black text-gray-600 hover:text-gray-500 border border-gray-600/20 hover:border-gray-600/40 p-1.5 rounded-md flex items-center justify-center shadow-lg backdrop-blur-sm group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsFooterExpanded(!isFooterExpanded);
-                }}
-              >
-                <ChevronDown className={`h-4 w-4 transition-all duration-200 ${isFooterExpanded ? 'rotate-180' : ''}`} />
-              </Button>
-            </div>
+              <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isFooterExpanded ? 'rotate-180' : ''}`} />
+            </Button>
           </AspectRatio>
         </CardContent>
       </Card>
       
       {/* Expanded footer with detailed information */}
       {isFooterExpanded && (
-        <div className="absolute bottom-0 left-0 right-0 w-full bg-white dark:bg-gray-900 rounded-b-lg border border-t-0 border-gray-200 dark:border-gray-700 shadow-md z-10 p-3">
-          <div className="grid grid-cols-1 gap-2 text-xs">
-            {/* Basic Info Section */}
-            <div className="flex flex-wrap items-center gap-1.5">
-              <Badge variant="secondary" className="text-[10px] py-0.5 px-1">
-                {itemCount} {itemCount === 1 ? 'item' : 'items'}
-              </Badge>
-              
-              {/* ADD: Public/Private Badge */} 
-              {isPublic ? (
-                <Badge variant="success" className="text-[10px] flex items-center gap-1 py-0.5 px-1">
-                  <Globe size={10} /> Public
-                </Badge>
-              ) : (
-                <Badge variant="warning" className="text-[10px] flex items-center gap-1 py-0.5 px-1">
-                  <Lock size={10} /> Private
-                </Badge>
-              )}
+        <div 
+          className="absolute bottom-0 left-0 right-0 w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg z-10 p-4 rounded-b-lg animate-in fade-in duration-200"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="space-y-2 text-xs font-serif">
+            {/* Combined section with all metadata */}
+            <div className="grid gap-2">
+              {/* Tags */}
+              {/* {shelf.tags && shelf.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 items-center mb-2">
+                  {shelf.tags.map((tag, index) => (
+                    <Badge key={index} variant="outline" className="text-xs px-2 py-0.5 bg-gray-50 dark:bg-gray-800 flex items-center gap-1 font-serif">
+                      <Tag className="h-3 w-3 text-gray-500" /> {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )} */}
               
               {isReordering && (
-                <Badge variant="info" className="text-[10px] py-0.5 px-1">
+                <Badge variant="outline" className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 mb-2 inline-flex font-serif">
                   Drag to reorder
                 </Badge>
               )}
-              
-              {showCollaborationInfo && collaborationData && (
-                <>
-                  {collaborationData.isCollaborator && (
-                    <Badge variant="info" className="text-[10px] flex items-center py-0.5 px-1">
-                      Collaborator
-                    </Badge>
-                  )}
-                  {collaborationData.isOwner && collaborationData.editorsCount && collaborationData.editorsCount > 0 && (
-                    <Badge variant="secondary" className="text-[10px] flex items-center py-0.5 px-1">
-                      {collaborationData.editorsCount} {collaborationData.editorsCount === 1 ? 'editor' : 'editors'}
-                    </Badge>
-                  )}
-                </>
-              )}
-            </div>
-            
-            {/* Metadata Section - Copyable badges */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-gray-200 dark:border-gray-700">
+
               {/* ID Badge */}
-              <Badge 
-                variant="secondary" 
-                className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCopy(shelf.shelf_id, setCopiedId);
-                }}
+              <div 
+                className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-gray-50 dark:hover:bg-gray-900/60 cursor-pointer group/item transition-colors"
+                onClick={() => handleCopy(shelf.shelf_id, setCopiedId)}
                 title={`Shelf ID: ${shelf.shelf_id}`}
               >
-                <Info className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                <span className="text-gray-600 dark:text-gray-400">{formatId(shelf.shelf_id)}</span>
-                {copiedId ? (
-                  <Check className="h-2.5 w-2.5 text-green-500" />
-                ) : (
-                  <Copy className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                )}
-              </Badge>
+                <div className="flex items-center gap-2">
+                  <Info className="h-3.5 w-3.5 text-gray-500" />
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">ID</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-gray-600 dark:text-gray-400">{formatId(shelf.shelf_id)}</span>
+                  {copiedId ? (
+                    <Check className="h-3.5 w-3.5 text-green-500 opacity-100" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5 text-gray-400 opacity-70 group-hover/item:opacity-100" />
+                  )}
+                </div>
+              </div>
               
               {/* Owner Badge */}
-              <Badge 
-                variant="secondary" 
-                className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                onClick={(e) => {
-                  e.stopPropagation();
+              <div 
+                className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer group/owner transition-colors"
+                onClick={() => {
                   const ownerText = typeof shelf.owner === 'string' ? shelf.owner : shelf.owner?.toString();
                   if (ownerText) handleCopy(ownerText, setCopiedOwner);
                 }}
               >
-                <User className="h-2.5 w-2.5" />
-                <span>{formatId(typeof shelf.owner === 'string' ? shelf.owner : shelf.owner?.toString() || '')}</span>
-                {copiedOwner ? (
-                  <Check className="h-2.5 w-2.5 text-green-500" />
-                ) : (
-                  <Copy className="h-2.5 w-2.5" />
-                )}
-              </Badge>
+                <div className="flex items-center gap-2">
+                  <User className="h-3.5 w-3.5 text-blue-500" />
+                  <span className="text-blue-700 dark:text-blue-300 font-medium">Owner</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-blue-600 dark:text-blue-400">{formatId(typeof shelf.owner === 'string' ? shelf.owner : shelf.owner?.toString() || '')}</span>
+                  {copiedOwner ? (
+                    <Check className="h-3.5 w-3.5 text-green-500 opacity-100" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5 text-blue-400 opacity-70 group-hover/owner:opacity-100" />
+                  )}
+                </div>
+              </div>
               
               {/* Created Date Badge */}
-              <Badge 
-                variant="outline" 
-                className="text-[10px] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-0.5 py-0.5 px-1"
-                onClick={(e) => {
-                  e.stopPropagation();
+              <div 
+                className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-gray-50 dark:hover:bg-gray-900/60 cursor-pointer group/created transition-colors"
+                onClick={() => {
                   if (shelf.created_at) handleCopy(createdAt, setCopiedCreated);
                 }}
               >
-                <Calendar className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                <span className="text-gray-600 dark:text-gray-400">{createdAt}</span>
-                {copiedCreated ? (
-                  <Check className="h-2.5 w-2.5 text-green-500" />
-                ) : (
-                  <Copy className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                )}
-              </Badge>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-3.5 w-3.5 text-gray-500" />
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Created</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-gray-600 dark:text-gray-400">{createdAt}</span>
+                  {copiedCreated ? (
+                    <Check className="h-3.5 w-3.5 text-green-500 opacity-100" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5 text-gray-400 opacity-70 group-hover/created:opacity-100" />
+                  )}
+                </div>
+              </div>
               
               {/* Updated Date Badge */}
-              <Badge 
-                variant="outline" 
-                className="text-[10px] cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center gap-0.5 py-0.5 px-1"
-                onClick={(e) => {
-                  e.stopPropagation();
+              <div 
+                className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-gray-50 dark:hover:bg-gray-900/60 cursor-pointer group/updated transition-colors"
+                onClick={() => {
                   if (shelf.updated_at) handleCopy(updatedAt, setCopiedUpdated);
                 }}
               >
-                <Clock className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                <span className="text-gray-600 dark:text-gray-400">{updatedAt}</span>
-                {copiedUpdated ? (
-                  <Check className="h-2.5 w-2.5 text-green-500" />
-                ) : (
-                  <Copy className="h-2.5 w-2.5 text-gray-500 dark:text-gray-400" />
-                )}
-              </Badge>
-              
-              {/* Tags */}
-              {shelf.tags && shelf.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 items-center">
-                  {shelf.tags.map((tag, index) => (
-                    <Badge key={index} variant="outline" className="text-[10px] px-1 py-0">
-                      {tag}
-                    </Badge>
-                  ))}
+                <div className="flex items-center gap-2">
+                  <Clock className="h-3.5 w-3.5 text-gray-500" />
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Updated</span>
                 </div>
-              )}
+                <div className="flex items-center gap-1">
+                  <span className="text-gray-600 dark:text-gray-400">{updatedAt}</span>
+                  {copiedUpdated ? (
+                    <Check className="h-3.5 w-3.5 text-green-500 opacity-100" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5 text-gray-400 opacity-70 group-hover/updated:opacity-100" />
+                  )}
+                </div>
+              </div>
               
               {/* Appears in */}
               {shelf.appears_in && shelf.appears_in.length > 0 && (
-                <div className="flex flex-wrap gap-1 items-center">
-                  <Badge 
-                    variant="secondary" 
-                    className="text-[10px] flex items-center py-0.5 px-1"
-                  >
-                    <Folder className="h-2.5 w-2.5 mr-0.5 text-gray-500 dark:text-gray-400" />
-                    {shelf.appears_in.length}
+                <div className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-gray-50 dark:hover:bg-gray-900/60 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Folder className="h-3.5 w-3.5 text-gray-500" />
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Appears in</span>
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-serif">
+                    {shelf.appears_in.length} {shelf.appears_in.length === 1 ? 'shelf' : 'shelves'}
                   </Badge>
                 </div>
               )}

@@ -45,7 +45,7 @@ export const ShelfViewHeader: React.FC<ShelfViewHeaderProps> = ({
   const userBreadcrumb = getUserBreadcrumb();
   
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full font-serif">
       {/* Breadcrumb navigation bar */}
       <div className="flex items-center gap-2 py-2">
         <div className="flex items-center h-8 rounded-md border border-input bg-background overflow-hidden">
@@ -77,11 +77,11 @@ export const ShelfViewHeader: React.FC<ShelfViewHeaderProps> = ({
       
       {/* Shelf title and info */}
       <div className="py-2">
-        <h2 className="text-2xl font-bold mb-1">{shelf.title}</h2>
+        <h2 className="text-2xl font-bold mb-1 font-serif">{shelf.title}</h2>
         {shelf.description && (
-          <p className="text-muted-foreground">{shelf.description}</p>
+          <p className="text-muted-foreground font-serif">{shelf.description}</p>
         )}
-        <div className="mt-2 flex items-center text-xs text-muted-foreground">
+        <div className="mt-2 flex items-center text-xs text-muted-foreground font-serif">
           Owner: <PrincipalDisplay principal={shelf.owner} />
         </div>
       </div>

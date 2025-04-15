@@ -23,9 +23,9 @@ export const ShelfInformationSection: React.FC<ShelfInformationSectionProps> = (
   onUpdateMetadata
 }) => {
   return (
-    <div className="bg-card rounded-lg p-4">
+    <div className="bg-card rounded-lg p-4 font-serif">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium">Shelf Information</h3>
+        <h3 className="text-lg font-medium font-serif">Shelf Information</h3>
         
         {(isOwner || onUpdateMetadata) && (
           <div className="space-x-2">
@@ -59,7 +59,7 @@ export const ShelfInformationSection: React.FC<ShelfInformationSectionProps> = (
         {/* Title Field */}
         <div>
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium text-muted-foreground">Title</h4>
+            <h4 className="text-sm font-medium text-muted-foreground font-serif">Title</h4>
             {(isOwner || onUpdateMetadata) && (
               <Button 
                 variant="ghost" 
@@ -76,18 +76,18 @@ export const ShelfInformationSection: React.FC<ShelfInformationSectionProps> = (
             <Input 
               value={title} 
               onChange={(e) => setTitle(e.target.value)} 
-              className="w-full mt-1"
+              className="w-full mt-1 font-serif"
               autoFocus
             />
           ) : (
-            <p className="text-base mt-1">{title}</p>
+            <p className="text-base mt-1 font-serif">{title}</p>
           )}
         </div>
         
         {/* Description Field */}
         <div> 
           <div className="flex items-center justify-between"> 
-            <h4 className="text-sm font-medium text-muted-foreground">Description</h4> 
+            <h4 className="text-sm font-medium text-muted-foreground font-serif">Description</h4> 
             {(isOwner || onUpdateMetadata) && ( 
               <Button  
                 variant="ghost"  
@@ -104,26 +104,26 @@ export const ShelfInformationSection: React.FC<ShelfInformationSectionProps> = (
             <Textarea  
               value={description}  
               onChange={(e) => setDescription(e.target.value)}  
-              className="w-full mt-1 resize-none" 
+              className="w-full mt-1 resize-none font-serif" 
               rows={3} 
               autoFocus 
             /> 
           ) : ( 
-            <p className="text-base mt-1">{description || "None"}</p> 
+            <p className="text-base mt-1 font-serif">{description || "None"}</p> 
           )} 
         </div>
         
         {/* Appears In Section (Read-only) */}
         <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-1">Included In Shelves</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-1 font-serif">Included In Shelves</h4>
           {appearsIn && appearsIn.length > 0 ? (
-            <ul className="list-none space-y-1 text-sm">
+            <ul className="list-none space-y-1 text-sm font-serif">
               {appearsIn.map((shelfId: string) => (
                 <ShelfLinkItem key={shelfId} shelfId={shelfId} />
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground mt-1">This shelf is not included in any other shelves.</p>
+            <p className="text-sm text-muted-foreground mt-1 font-serif">This shelf is not included in any other shelves.</p>
           )}
         </div>
       </div>

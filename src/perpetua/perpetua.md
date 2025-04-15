@@ -125,8 +125,6 @@ Backend Stuff:
 
 Frontend Stuff:
 - Add and use all the tag related functions.
-- PerpetuaSlice needs: (editors, appears_in.length(), public or private)
-- Add appears-in in the frontend.
 - Test collaborator list stuff.
  
 

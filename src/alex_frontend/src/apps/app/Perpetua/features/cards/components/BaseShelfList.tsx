@@ -178,7 +178,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   
   // Sub-component for rendering the header
   const ListHeader = ({ isEditMode, enterEditMode, cancelEditMode, saveShelfOrder, saveInProgress, saveError }: ListHeaderProps) => (
-    <div className="flex flex-col gap-4 mb-6">
+    <div className="flex flex-col gap-4 mb-6 font-serif">
       {showBackButton && (
         <div className="flex items-center">
           <div className="flex items-center h-8 rounded-md border border-input bg-background overflow-hidden">
@@ -195,7 +195,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
       )}
       
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">{title}</h2>
+        <h2 className="text-2xl font-bold font-serif">{title}</h2>
         
         <div className="flex items-center gap-2">
           {onNewShelf && !isEditMode && (
@@ -246,7 +246,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
       </div>
       
       {saveError && (
-        <div className="flex items-center gap-2 text-destructive text-sm mt-2">
+        <div className="flex items-center gap-2 text-destructive text-sm mt-2 font-serif">
           <AlertCircle className="w-4 h-4" />
           {saveError}
         </div>
@@ -256,7 +256,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
 
   // Sub-component for rendering empty state
   const EmptyState = () => (
-    <div className="text-center py-10 text-muted-foreground">
+    <div className="text-center py-10 text-muted-foreground font-serif">
       {emptyStateMessage}
       {onNewShelf && (
         <div className="mt-2">
@@ -288,7 +288,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
     };
 
     return (
-      <div className={`transition-all duration-200 ${isDragging ? 'opacity-75 scale-[0.98] shadow-md' : ''}`}>
+      <div className={`transition-all duration-200 font-serif ${isDragging ? 'opacity-75 scale-[0.98] shadow-md' : ''}`}>
         <ShelfCard
           key={shelf.shelf_id}
           shelf={shelf}
@@ -317,7 +317,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
       />
       
       {shelves.length === 0 && loading ? (
-        <div className="text-center py-10">Loading shelves...</div>
+        <div className="text-center py-10 font-serif">Loading shelves...</div>
       ) : shelves.length === 0 ? (
         <EmptyState />
       ) : (

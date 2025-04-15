@@ -15,11 +15,11 @@ export const PublicAccessSection: React.FC<PublicAccessSectionProps> = ({
   if (!isOwner) return null;
 
   return (
-    <div className="mt-6 pt-4 border-t">
+    <div className="mt-6 pt-4 border-t font-serif">
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
-          <h3 className="text-sm font-medium">Public Access</h3>
-          <p className="text-xs text-muted-foreground">
+          <h3 className="text-sm font-medium font-serif">Public Access</h3>
+          <p className="text-xs text-muted-foreground font-serif">
             Allow anyone to edit this shelf without requiring explicit permission
           </p>
         </div>
@@ -57,7 +57,7 @@ export const PublicAccessSection: React.FC<PublicAccessSectionProps> = ({
       </div>
       
       {isPublic && (
-        <Alert variant="default" className="mt-3 bg-blue-50 border-blue-200 text-blue-800">
+        <Alert variant="default" className="mt-3 bg-blue-50 border-blue-200 text-blue-800 font-serif">
           <AlertCircle className="h-4 w-4 text-blue-500" />
           <AlertDescription className="text-xs">
             Anyone with the link can now edit this shelf without logging in. 

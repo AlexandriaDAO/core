@@ -13,7 +13,7 @@ type ContentDisplayProps = {
 
 // Display component for blog view markdown
 export const BlogMarkdownDisplay = ({ content, onClick }: { content: string, onClick: () => void }) => (
-  <div className="blog-markdown-content cursor-pointer" onClick={onClick}>
+  <div className="blog-markdown-content cursor-pointer font-serif" onClick={onClick}>
     <MarkdownRenderer content={content} />
   </div>
 );
@@ -32,7 +32,7 @@ export const ShelfContentDisplay = ({
     owner={owner}
     component="Perpetua"
     footer={
-      <div className="flex flex-wrap items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1 font-serif">
         <Badge variant="secondary" className="text-[10px] py-0.5 px-1">Shelf</Badge>
         <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">{shelfId}</Badge>
       </div>
@@ -53,8 +53,8 @@ export const ShelfContentDisplay = ({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <div className="text-lg font-semibold">Shelf</div>
-          <div className="text-sm text-gray-500">{shelfId}</div>
+          <div className="text-lg font-semibold font-serif">Shelf</div>
+          <div className="text-sm text-gray-500 font-serif">{shelfId}</div>
         </div>
       </div>
     </div>
@@ -78,7 +78,7 @@ export const MarkdownContentDisplay = ({
       owner={owner}
       component="Perpetua"
       footer={
-        <div className="flex flex-wrap items-center gap-1">
+        <div className="flex flex-wrap items-center gap-1 font-serif">
           <Badge variant="outline" className="text-[10px] py-0.5 px-1">Markdown</Badge>
           <Badge variant="outline" className="text-[10px] py-0.5 px-1 max-w-[150px] truncate">{preview}</Badge>
         </div>
@@ -93,7 +93,7 @@ export const MarkdownContentDisplay = ({
         />
         
         <div className="w-full h-full flex items-center justify-center overflow-hidden">
-          <div className="p-4 prose dark:prose-invert max-w-none line-clamp-6">
+          <div className="p-4 prose dark:prose-invert max-w-none line-clamp-6 font-serif">
             {content}
           </div>
         </div>

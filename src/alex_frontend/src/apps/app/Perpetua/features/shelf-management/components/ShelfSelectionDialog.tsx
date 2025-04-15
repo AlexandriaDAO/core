@@ -114,21 +114,21 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
   
   return (
     <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
+      <DialogContent className="sm:max-w-md font-serif" onClick={(e) => e.stopPropagation()}>
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-8">
+          <div className="flex flex-col items-center justify-center py-8 font-serif">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="mt-2 text-sm text-muted-foreground">Loading shelves...</p>
           </div>
         ) : !isLoggedIn ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
+          <div className="flex flex-col items-center justify-center py-8 text-center font-serif">
             <h3 className="text-lg font-semibold">Login Required</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               You need to be logged in to add content to shelves
             </p>
           </div>
         ) : !hasEditableShelvesExcluding(currentShelfId) ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
+          <div className="flex flex-col items-center justify-center py-8 text-center font-serif">
             <h3 className="text-lg font-semibold">No Shelves Available</h3>
             <p className="mt-2 text-sm text-muted-foreground">
               You don't have any shelves you can edit. Create a shelf first.
@@ -137,7 +137,7 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>Add to Shelf</DialogTitle>
+              <DialogTitle className="font-serif">Add to Shelf</DialogTitle>
             </DialogHeader>
             
             <ShelfContent

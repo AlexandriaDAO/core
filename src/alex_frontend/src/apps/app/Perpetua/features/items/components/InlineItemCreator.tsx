@@ -217,7 +217,7 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
 
   // Memoize the tab buttons to prevent unnecessary rerenders
   const contentTypeTabs = useMemo(() => (
-    <div className="flex p-2 gap-2 border-b border-border">
+    <div className="flex p-2 gap-2 border-b border-border font-serif">
       {(["Markdown", "Nft", "Shelf"] as ContentType[]).map((contentType) => (
         <Button
           key={contentType}
@@ -236,12 +236,12 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
     switch(type) {
       case "Markdown":
         return (
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col font-serif">
             <div className="p-4 flex-grow">
-              <Label htmlFor="markdownContent" className="block mb-2">Markdown Content</Label>
+              <Label htmlFor="markdownContent" className="block mb-2 font-serif">Markdown Content</Label>
               <Textarea
                 id="markdownContent"
-                className="min-h-[300px] w-full"
+                className="min-h-[300px] w-full font-serif"
                 value={content}
                 onChange={handleSetContent}
                 placeholder="# Title
@@ -276,12 +276,12 @@ Your content here..."
       case "Shelf":
         if (creatingNewShelf) {
           return (
-            <div className="flex-1 flex flex-col p-4">
+            <div className="flex-1 flex flex-col p-4 font-serif">
               <div className="flex flex-col">
                 <div className="flex justify-between items-center mb-2">
                   <div>
-                    <h3 className="text-lg font-medium">Create New Shelf</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="text-lg font-medium font-serif">Create New Shelf</h3>
+                    <p className="text-sm text-muted-foreground font-serif">
                       Create a new shelf and immediately add it to your current shelf
                     </p>
                   </div>
@@ -318,11 +318,11 @@ Your content here..."
           );
         } else {
           return (
-            <div className="flex-1 flex flex-col p-4">
+            <div className="flex-1 flex flex-col p-4 font-serif">
               <div className="flex justify-between items-center mb-2">
                 <div>
-                  <Label htmlFor="shelfSelect" className="block mb-1">Select an existing shelf</Label>
-                  <p className="text-sm text-muted-foreground mb-3">
+                  <Label htmlFor="shelfSelect" className="block mb-1 font-serif">Select an existing shelf</Label>
+                  <p className="text-sm text-muted-foreground mb-3 font-serif">
                     Add an existing shelf as an item in your current shelf
                   </p>
                 </div>
@@ -339,7 +339,7 @@ Your content here..."
                 id="shelfSelect"
                 value={selectedShelfId}
                 onChange={handleSetShelfId}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-serif"
               >
                 <option value="">Select a shelf...</option>
                 {availableShelves.length > 0 ? (
@@ -353,7 +353,7 @@ Your content here..."
                 )}
               </select>
               {availableShelves.length === 0 && (
-                <p className="text-sm text-amber-500 mt-2">
+                <p className="text-sm text-amber-500 mt-2 font-serif">
                   You don't have any other shelves that can be added. Create a new shelf instead.
                 </p>
               )}
@@ -377,11 +377,11 @@ Your content here..."
   };
 
   return (
-    <div className="bg-background border border-border rounded-md shadow-sm mb-4 overflow-hidden">
+    <div className="bg-background border border-border rounded-md shadow-sm mb-4 overflow-hidden font-serif">
       <div className="flex flex-col">
         {/* Header with close button */}
         <div className="flex justify-between items-center p-4 border-b border-border bg-muted/30">
-          <h3 className="text-lg font-medium">Add Item to Shelf</h3>
+          <h3 className="text-lg font-medium font-serif">Add Item to Shelf</h3>
           <div 
             onClick={onCancel} 
             className="h-8 w-8 flex items-center justify-center rounded-full hover:bg-muted cursor-pointer"

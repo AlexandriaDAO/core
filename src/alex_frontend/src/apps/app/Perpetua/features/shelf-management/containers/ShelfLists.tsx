@@ -90,11 +90,6 @@ export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = React.memo(({
   const handleSaveOrder = useCallback(async (newShelfOrder: string[]) => {
     if (!identity || newShelfOrder.length < 2) return;
     
-    // Find the original positions of shelves to determine what moved
-    const originalOrder = shelves.map(shelf => shelf.shelf_id);
-    console.log('Original order:', originalOrder);
-    console.log('New order:', newShelfOrder);
-    
     // Instead of sending an empty shelfId, use the first item in the new order
     // and the second item as reference, with before=true
     const shelfId = newShelfOrder[0];
