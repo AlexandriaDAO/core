@@ -131,7 +131,6 @@ Perpetua/
 
 Backend Stuff:
 - Payment for all/some actions (maybe we do an action count for all backend calls, after certain actions you must pay X lbry).
-- 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
 
 
 
@@ -141,6 +140,7 @@ Backend Stuff:
 ## V2 Features:
 
 - Backup system for all data.
+- 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
 - A preview of the slots in the profile. (Could be done later)
 
 
