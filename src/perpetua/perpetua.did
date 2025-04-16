@@ -5,13 +5,13 @@ type AddItemInput = record {
 };
 type CursorPaginatedResult = record {
   limit : nat;
-  next_cursor : opt record { nat64; text };
-  items : vec text;
+  next_cursor : opt nat64;
+  items : vec Shelf;
 };
 type CursorPaginatedResult_1 = record {
   limit : nat;
-  next_cursor : opt nat64;
-  items : vec Shelf;
+  next_cursor : opt record { nat64; text };
+  items : vec text;
 };
 type CursorPaginatedResult_2 = record {
   limit : nat;
@@ -28,11 +28,11 @@ type CursorPaginatedResult_4 = record {
   next_cursor : opt text;
   items : vec text;
 };
-type CursorPaginationInput = record {
+type CursorPaginationInput = record { cursor : opt nat64; limit : nat };
+type CursorPaginationInput_1 = record {
   cursor : opt record { nat64; text };
   limit : nat;
 };
-type CursorPaginationInput_1 = record { cursor : opt nat64; limit : nat };
 type CursorPaginationInput_2 = record { cursor : opt nat32; limit : nat };
 type CursorPaginationInput_3 = record {
   cursor : opt record { text; text };
@@ -93,8 +93,12 @@ service : () -> {
   add_shelf_editor : (text, principal) -> (Result);
   add_tag_to_shelf : (TagOperationInput) -> (Result);
   create_and_add_shelf_item : (text, text, opt text) -> (Result_1);
-  get_popular_tags : (CursorPaginationInput) -> (Result_2) query;
-  get_recent_shelves : (CursorPaginationInput_1) -> (Result_3) query;
+  follow_tag : (text) -> (Result);
+  follow_user : (principal) -> (Result);
+  get_followed_tags_feed : (CursorPaginationInput) -> (Result_2) query;
+  get_followed_users_feed : (CursorPaginationInput) -> (Result_2) query;
+  get_popular_tags : (CursorPaginationInput_1) -> (Result_3) query;
+  get_recent_shelves : (CursorPaginationInput) -> (Result_2) query;
   get_shelf : (text) -> (Result_4) query;
   get_shelf_items : (text, CursorPaginationInput_2) -> (Result_5) query;
   get_shelf_position_metrics : (text) -> (Result_6) query;
@@ -112,5 +116,7 @@ service : () -> {
   set_item_order : (text, vec nat32) -> (Result);
   store_shelf : (text, opt text, vec Item, opt vec text) -> (Result_1);
   toggle_shelf_public_access : (text, bool) -> (Result);
+  unfollow_tag : (text) -> (Result);
+  unfollow_user : (principal) -> (Result);
   update_shelf_metadata : (text, opt text, opt text) -> (Result);
 }

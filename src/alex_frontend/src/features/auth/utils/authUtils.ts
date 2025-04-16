@@ -122,7 +122,7 @@ const getActor = async <T>(
         identity,
         host: isLocalDevelopment
           ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943` // Local development URL
-          : "https://identity.ic0.app", // Default to mainnet if neither condition is true
+          : "https://ic0.app", // Default to mainnet if neither condition is true
       });
 
       // Fetch root key for certificate validation during development

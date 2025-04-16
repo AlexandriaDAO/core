@@ -6,11 +6,13 @@ use std::ops::Bound;
 use crate::storage::{
     SHELVES, USER_SHELVES, GLOBAL_TIMELINE, USER_PROFILE_ORDER, 
     TAG_SHELF_ASSOCIATIONS, TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, TAG_METADATA,
+    FOLLOWED_USERS, FOLLOWED_TAGS,
     Shelf, Item, ShelfId, NormalizedTag, ItemId,
-    TagMetadata
+    TagMetadata, PrincipalSet, NormalizedTagSet
 };
 use crate::types::{TagPopularityKey, TagShelfAssociationKey};
 use crate::utils::normalize_tag;
+use crate::guard::not_anon;
 
 // --- Pagination Defaults ---
 const DEFAULT_PAGE_LIMIT: usize = 20;
@@ -528,6 +530,184 @@ pub fn get_tags_with_prefix(
 
     Ok(CursorPaginatedResult {
         items,
+        next_cursor,
+        limit: Nat::from(limit),
+    })
+}
+
+/// Query to get a feed of shelves created by users the caller follows.
+/// Paginated by timestamp cursor (newest first).
+#[ic_cdk::query(guard = "not_anon")] // Add guard to prevent anonymous access
+pub fn get_followed_users_feed(
+    pagination: CursorPaginationInput<u64>
+) -> QueryResult<CursorPaginatedResult<Shelf, u64>> {
+    let caller = ic_cdk::caller();
+    let limit = pagination.get_limit();
+    let limit_plus_one = limit + 1; // Fetch one extra for cursor logic
+
+    // 1. Get the set of users the caller follows
+    let followed_users_set = FOLLOWED_USERS.with(|followed| {
+        followed.borrow().get(&caller).unwrap_or_default()
+    });
+
+    // If the user follows no one, return empty result immediately
+    if followed_users_set.0.is_empty() {
+        return Ok(CursorPaginatedResult {
+            items: Vec::new(),
+            next_cursor: None,
+            limit: Nat::from(limit),
+        });
+    }
+
+    let mut result_shelves: Vec<Shelf> = Vec::with_capacity(limit);
+    let mut last_timestamp: Option<u64> = None;
+    let mut items_fetched = 0;
+
+    // 2. Iterate through the global timeline with pagination
+    GLOBAL_TIMELINE.with(|timeline| {
+        let timeline_ref = timeline.borrow();
+
+        // Determine the starting bound for reverse iteration based on the cursor
+        let start_bound = match pagination.cursor {
+            Some(cursor_ts) => Bound::Excluded(cursor_ts),
+            None => Bound::Unbounded,
+        };
+
+        // Iterate newest first
+        for (timestamp, shelf_id) in timeline_ref
+            .iter()
+            .rev()
+            .skip_while(|(ts, _)| match start_bound {
+                Bound::Excluded(cursor_ts) => *ts >= cursor_ts, // Skip items newer than or equal to cursor
+                Bound::Unbounded => false,
+                _ => unreachable!(),
+            })
+        {
+            // 3. Fetch the shelf and check owner
+            let shelf_owner_is_followed = SHELVES.with(|shelves| {
+                shelves.borrow().get(&shelf_id).map_or(false, |shelf| {
+                    followed_users_set.0.contains(&shelf.owner)
+                })
+            });
+
+            if shelf_owner_is_followed {
+                 // 4. If owner is followed, try to fetch the full shelf
+                 let maybe_shelf = SHELVES.with(|shelves| shelves.borrow().get(&shelf_id));
+                 if let Some(shelf) = maybe_shelf {
+                    result_shelves.push(shelf.clone());
+                    last_timestamp = Some(timestamp); // Track the timestamp of the last added item
+                    items_fetched += 1;
+
+                    // Stop if we have enough items for the page + cursor check
+                    if items_fetched >= limit_plus_one {
+                        break;
+                    }
+                 }
+                 // Shelf existed in timeline but not in SHELVES (should ideally not happen, but handle gracefully)
+                 // else { ic_cdk::println!("Warning: Shelf {} found in timeline but not in SHELVES map.", shelf_id); }
+            }
+        }
+    });
+
+    // 5. Determine next_cursor
+    let next_cursor = if items_fetched == limit_plus_one {
+        // We fetched one extra item, use its timestamp as the next cursor
+        // The extra item is the last one added, so `last_timestamp` holds its timestamp.
+        result_shelves.pop(); // Remove the extra item from the results
+        last_timestamp
+    } else {
+        None // No more items available
+    };
+
+    Ok(CursorPaginatedResult {
+        items: result_shelves,
+        next_cursor,
+        limit: Nat::from(limit),
+    })
+}
+
+/// Query to get a feed of shelves tagged with tags the caller follows.
+/// Paginated by timestamp cursor (newest first).
+#[ic_cdk::query(guard = "not_anon")] // Add guard
+pub fn get_followed_tags_feed(
+    pagination: CursorPaginationInput<u64>
+) -> QueryResult<CursorPaginatedResult<Shelf, u64>> {
+    let caller = ic_cdk::caller();
+    let limit = pagination.get_limit();
+    let limit_plus_one = limit + 1;
+
+    // 1. Get the set of tags the caller follows
+    let followed_tags_set = FOLLOWED_TAGS.with(|followed| {
+        followed.borrow().get(&caller).unwrap_or_default()
+    });
+
+    // If the user follows no tags, return empty result immediately
+    if followed_tags_set.0.is_empty() {
+        return Ok(CursorPaginatedResult {
+            items: Vec::new(),
+            next_cursor: None,
+            limit: Nat::from(limit),
+        });
+    }
+
+    let mut result_shelves: Vec<Shelf> = Vec::with_capacity(limit);
+    let mut last_timestamp: Option<u64> = None;
+    let mut items_fetched = 0;
+
+    // 2. Iterate through the global timeline with pagination
+    GLOBAL_TIMELINE.with(|timeline| {
+        let timeline_ref = timeline.borrow();
+
+        let start_bound = match pagination.cursor {
+            Some(cursor_ts) => Bound::Excluded(cursor_ts),
+            None => Bound::Unbounded,
+        };
+
+        for (timestamp, shelf_id) in timeline_ref
+            .iter()
+            .rev()
+            .skip_while(|(ts, _)| match start_bound {
+                Bound::Excluded(cursor_ts) => *ts >= cursor_ts,
+                Bound::Unbounded => false,
+                _ => unreachable!(),
+            })
+        {
+            // 3. Fetch the shelf and check its tags
+            let shelf_has_followed_tag = SHELVES.with(|shelves| {
+                shelves.borrow().get(&shelf_id).map_or(false, |shelf| {
+                    // Check if any of the shelf's tags are in the user's followed set
+                    shelf.tags.iter().any(|tag| followed_tags_set.0.contains(tag))
+                })
+            });
+
+            if shelf_has_followed_tag {
+                // 4. If a tag matches, try to fetch the full shelf
+                let maybe_shelf = SHELVES.with(|shelves| shelves.borrow().get(&shelf_id));
+                if let Some(shelf) = maybe_shelf {
+                    result_shelves.push(shelf.clone());
+                    last_timestamp = Some(timestamp); // Track timestamp of last added item
+                    items_fetched += 1;
+
+                    // Stop if we have enough items for the page + cursor check
+                    if items_fetched >= limit_plus_one {
+                        break;
+                    }
+                }
+                // else { ic_cdk::println!("Warning: Shelf {} found in timeline but not in SHELVES map.", shelf_id); }
+            }
+        }
+    });
+
+    // 5. Determine next_cursor
+    let next_cursor = if items_fetched == limit_plus_one {
+        result_shelves.pop(); // Remove the extra item
+        last_timestamp
+    } else {
+        None
+    };
+
+    Ok(CursorPaginatedResult {
+        items: result_shelves,
         next_cursor,
         limit: Nat::from(limit),
     })

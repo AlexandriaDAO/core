@@ -1,6 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { cacheManager } from '../cache/ShelvesCache';
-import { perpetuaService } from '../services/perpetuaService';
+import { 
+  listShelfEditors as listShelfEditorsService,
+  addShelfEditor as addShelfEditorService,
+  removeShelfEditor as removeShelfEditorService
+} from '../services';
 import { extractErrorMessage } from '../../utils';
 
 /**
@@ -17,7 +21,7 @@ export const listShelfEditors = createAsyncThunk(
       }
       
       // No cache hit, so fetch from API
-      const result = await perpetuaService.listShelfEditors(shelfId);
+      const result = await listShelfEditorsService(shelfId);
       
       if ("Ok" in result && result.Ok) {
         const editorPrincipals = result.Ok;
@@ -52,7 +56,7 @@ export const addShelfEditor = createAsyncThunk(
     editorPrincipal: string
   }, { rejectWithValue }) => {
     try {
-      const result = await perpetuaService.addShelfEditor(shelfId, editorPrincipal);
+      const result = await addShelfEditorService(shelfId, editorPrincipal);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate the editors cache
@@ -85,7 +89,7 @@ export const removeShelfEditor = createAsyncThunk(
     editorPrincipal: string
   }, { rejectWithValue }) => {
     try {
-      const result = await perpetuaService.removeShelfEditor(shelfId, editorPrincipal);
+      const result = await removeShelfEditorService(shelfId, editorPrincipal);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate the editors cache

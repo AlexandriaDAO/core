@@ -101,6 +101,9 @@ const SHELF_TAG_ASSOCIATIONS_MEM_ID: MemoryId = MemoryId::new(12);
 const TAG_POPULARITY_INDEX_MEM_ID: MemoryId = MemoryId::new(13);
 const TAG_LEXICAL_INDEX_MEM_ID: MemoryId = MemoryId::new(14);
 const ORPHANED_TAG_CANDIDATES_MEM_ID: MemoryId = MemoryId::new(15);
+// --- Follow System Memory IDs ---
+const FOLLOWED_USERS_MEM_ID: MemoryId = MemoryId::new(16);
+const FOLLOWED_TAGS_MEM_ID: MemoryId = MemoryId::new(17);
 
 
 // Constants for shelf operations
@@ -209,6 +212,19 @@ thread_local! {
     pub static ORPHANED_TAG_CANDIDATES: RefCell<StableBTreeMap<u64, OrphanedTagValue, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(ORPHANED_TAG_CANDIDATES_MEM_ID))
+        )
+    );
+
+    // --- Follow System Maps ---
+    pub static FOLLOWED_USERS: RefCell<StableBTreeMap<Principal, PrincipalSet, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(FOLLOWED_USERS_MEM_ID))
+        )
+    );
+
+    pub static FOLLOWED_TAGS: RefCell<StableBTreeMap<Principal, NormalizedTagSet, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(FOLLOWED_TAGS_MEM_ID))
         )
     );
 }
@@ -573,4 +589,30 @@ pub async fn create_shelf(
 pub struct UserProfileOrder {
     pub shelf_positions: BTreeMap<ShelfId, f64>,
     pub is_customized: bool,
+}
+
+// --- Wrapper Structs for Storable Collections for Follows ---
+
+#[derive(CandidType, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
+pub struct PrincipalSet(pub BTreeSet<Principal>);
+
+impl Storable for PrincipalSet {
+    fn to_bytes(&self) -> Cow<[u8]> { Cow::Owned(Encode!(&self.0).unwrap()) }
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        let set = Decode!(bytes.as_ref(), BTreeSet<Principal>).unwrap();
+        Self(set)
+    }
+    const BOUND: Bound = Bound::Unbounded;
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
+pub struct NormalizedTagSet(pub BTreeSet<NormalizedTag>);
+
+impl Storable for NormalizedTagSet {
+    fn to_bytes(&self) -> Cow<[u8]> { Cow::Owned(Encode!(&self.0).unwrap()) }
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        let set = Decode!(bytes.as_ref(), BTreeSet<NormalizedTag>).unwrap();
+        Self(set)
+    }
+    const BOUND: Bound = Bound::Unbounded;
 }

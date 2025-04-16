@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
+import { Principal } from '@dfinity/principal';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
-import { ArrowLeft, Plus, Edit, X, RotateCcw, Save, AlertCircle } from "lucide-react";
+import { ArrowLeft, Plus, Edit, X, RotateCcw, Save, AlertCircle, UserPlus } from "lucide-react";
 import { ShelfCard } from './ShelfCard';
 import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ import {
   selectIsEditor,
   selectShelfEditors
 } from '@/apps/app/Perpetua/state/perpetuaSlice';
+import { followUser } from '@/apps/app/Perpetua/state/services/followService';
 
 // Types for the component
 export interface BaseShelfListProps {
@@ -25,6 +27,7 @@ export interface BaseShelfListProps {
   backLabel?: string;
   loading?: boolean;
   isCurrentUserProfile?: boolean;
+  profileOwnerPrincipal?: string;
   allowReordering?: boolean;
   onViewShelf?: (shelfId: string) => void;
   onViewOwner?: (ownerId: string) => void;
@@ -44,12 +47,22 @@ const getShelfEssentials = (shelf: Shelf) => ({
 
 // Type for ListHeader props
 interface ListHeaderProps {
+  title: string;
+  showBackButton: boolean;
+  backLabel: string;
+  profileOwnerPrincipal?: string;
+  isCurrentUserProfile: boolean;
+  allowReordering: boolean;
+  canCreateNewShelf: boolean;
+  canEditOrder: boolean;
   isEditMode: boolean;
   enterEditMode: () => void;
   cancelEditMode: () => void;
   saveShelfOrder: () => Promise<void>;
   saveInProgress: boolean;
   saveError: string | null;
+  handleGoBack: () => void;
+  onNewShelf?: () => void;
 }
 
 // Interface for reorderable shelf items
@@ -68,6 +81,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   backLabel = "All Shelves",
   loading = false,
   isCurrentUserProfile = false,
+  profileOwnerPrincipal,
   allowReordering = false,
   onViewShelf,
   onViewOwner,
@@ -81,19 +95,10 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [saveInProgress, setSaveInProgress] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [followInProgress, setFollowInProgress] = useState(false);
   
-  // DEBUG: Log shelf prop changes
-  // const prevShelvesRef = useRef<Shelf[]>();
-  // if (prevShelvesRef.current !== shelves) {
-  //   console.log('[BaseShelfList] Shelves prop reference changed.', { prev: prevShelvesRef.current, next: shelves });
-  // }
-  // React.useEffect(() => {
-  //   prevShelvesRef.current = shelves;
-  // });
-
   // Convert shelves to reorderable format for drag-and-drop UI
   const reorderableShelves = useMemo(() => {
-    // console.log('[BaseShelfList] Recalculating reorderableShelves...'); // DEBUG
     return shelves.map((shelf: Shelf) => ({ id: shelf.shelf_id, shelf }));
   }, [shelves]);
   
@@ -102,13 +107,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   
   // Update dragged shelves when original shelves change or entering edit mode
   React.useEffect(() => {
-    // DEBUG: Log effect execution and dependencies
-    // console.log('[BaseShelfList] useEffect running. Deps:', { isEditMode, reorderableShelves, length: draggedShelves.length });
-    
-    // Always update to match the current shelves from props when not in edit mode
-    // or when first entering edit mode
     if (!isEditMode || draggedShelves.length === 0) {
-      // console.log('[BaseShelfList] Calling setDraggedShelves inside useEffect.'); // DEBUG
       setDraggedShelves(reorderableShelves);
     }
   }, [isEditMode, reorderableShelves, draggedShelves.length]);
@@ -176,89 +175,135 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
     }
   }, [draggedShelves, onSaveOrder]);
   
+  // --- Follow User Handler ---
+  const handleFollowUser = useCallback(async () => {
+    if (!profileOwnerPrincipal) return;
+    setFollowInProgress(true);
+    try {
+      const result = await followUser(profileOwnerPrincipal);
+      if ('Ok' in result) {
+        toast.success(`Followed user ${profileOwnerPrincipal.substring(0, 5)}...`);
+        // TODO: Update local/global state to reflect follow status later
+      } else {
+        toast.error(`Failed to follow user: ${result.Err}`);
+      }
+    } catch (error) {
+      console.error("Error following user:", error);
+      toast.error("An unexpected error occurred while trying to follow the user.");
+    } finally {
+      setFollowInProgress(false);
+    }
+  }, [profileOwnerPrincipal]);
+
   // Sub-component for rendering the header
-  const ListHeader = ({ isEditMode, enterEditMode, cancelEditMode, saveShelfOrder, saveInProgress, saveError }: ListHeaderProps) => (
-    <div className="flex flex-col gap-4 mb-6 font-serif">
-      {showBackButton && (
-        <div className="flex items-center">
-          <div className="flex items-center h-8 rounded-md border border-input bg-background overflow-hidden">
-            <Button 
-              variant="ghost" 
-              onClick={handleGoBack}
-              className="flex items-center gap-1 h-8 rounded-r-none border-r px-3 text-sm"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>{backLabel}</span>
-            </Button>
-          </div>
-        </div>
-      )}
+  const ListHeader = ({ 
+    title, showBackButton, backLabel, handleGoBack, profileOwnerPrincipal, isCurrentUserProfile,
+    allowReordering, canCreateNewShelf, canEditOrder, isEditMode, enterEditMode, 
+    cancelEditMode, saveShelfOrder, saveInProgress, saveError, onNewShelf
+  }: ListHeaderProps) => {
       
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold font-serif">{title}</h2>
-        
-        <div className="flex items-center gap-2">
-          {onNewShelf && !isEditMode && (
-            <Button 
-              variant="primary" 
-              className="flex items-center gap-1"
-              onClick={onNewShelf}
-            >
-              <Plus className="w-4 h-4" />
-              New Shelf
-            </Button>
+      // Determine if the follow button should be shown
+      const showFollowButton = 
+        profileOwnerPrincipal &&       // Owner principal is known
+        !isCurrentUserProfile;       // Not viewing own profile
+  
+      return (
+        <div className="flex flex-col gap-4 mb-6 font-serif">
+          {showBackButton && (
+            <div className="flex items-center">
+              <div className="flex items-center h-8 rounded-md border border-input bg-background overflow-hidden">
+                <Button 
+                  variant="ghost" 
+                  onClick={handleGoBack}
+                  className="flex items-center gap-1 h-8 rounded-r-none border-r px-3 text-sm"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  <span>{backLabel}</span>
+                </Button>
+              </div>
+            </div>
           )}
           
-          {allowReordering && shelves.length > 1 && (
-            !isEditMode ? (
-              <Button 
-                variant="outline" 
-                className="flex items-center gap-1"
-                onClick={enterEditMode}
-                disabled={loading || saveInProgress}
-              >
-                <Edit className="w-4 h-4" />
-                Edit Order
-              </Button>
-            ) : (
-              <>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center gap-1"
-                  onClick={cancelEditMode}
-                >
-                  <X className="w-4 h-4" />
-                  Cancel
-                </Button>
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold font-serif">{title}</h2>
+            
+            <div className="flex items-center gap-2">
+              {showFollowButton && (
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-1 px-3 h-9"
+                    onClick={handleFollowUser}
+                    disabled={followInProgress}
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    {followInProgress ? 'Following...' : 'Follow'}
+                  </Button>
+              )}
+              
+              {canCreateNewShelf && !isEditMode && (
                 <Button 
                   variant="primary" 
-                  className="flex items-center gap-1"
-                  onClick={saveShelfOrder}
-                  disabled={saveInProgress}
+                  className="flex items-center gap-1 px-3 h-9"
+                  onClick={onNewShelf}
+                  disabled={loading || saveInProgress || followInProgress}
                 >
-                  <Save className="w-4 h-4" />
-                  {saveInProgress ? 'Saving...' : 'Save Order'}
+                  <Plus className="w-4 h-4" />
+                  New Shelf
                 </Button>
-              </>
-            )
+              )}
+              
+              {canEditOrder && (
+                !isEditMode ? (
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-1 px-3 h-9"
+                    onClick={enterEditMode}
+                    disabled={loading || saveInProgress || followInProgress}
+                  >
+                    <Edit className="w-4 h-4" />
+                    Edit Order
+                  </Button>
+                ) : (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-1 px-3 h-9"
+                      onClick={cancelEditMode}
+                      disabled={saveInProgress}
+                    >
+                      <X className="w-4 h-4" />
+                      Cancel
+                    </Button>
+                    <Button 
+                      variant="primary" 
+                      className="flex items-center gap-1 px-3 h-9"
+                      onClick={saveShelfOrder}
+                      disabled={saveInProgress}
+                    >
+                      <Save className="w-4 h-4" />
+                      {saveInProgress ? 'Saving...' : 'Save Order'}
+                    </Button>
+                  </>
+                )
+              )}
+            </div>
+          </div>
+          
+          {saveError && (
+            <div className="flex items-center gap-2 text-destructive text-sm mt-2 font-serif">
+              <AlertCircle className="w-4 h-4" />
+              {saveError}
+            </div>
           )}
         </div>
-      </div>
-      
-      {saveError && (
-        <div className="flex items-center gap-2 text-destructive text-sm mt-2 font-serif">
-          <AlertCircle className="w-4 h-4" />
-          {saveError}
-        </div>
-      )}
-    </div>
-  );
+      );
+  };
 
   // Sub-component for rendering empty state
   const EmptyState = () => (
     <div className="text-center py-10 text-muted-foreground font-serif">
       {emptyStateMessage}
-      {onNewShelf && (
+      {onNewShelf && isCurrentUserProfile && (
         <div className="mt-2">
           <Button
             variant="outline"
@@ -308,12 +353,22 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   return (
     <div className="h-full flex flex-col">
       <ListHeader 
+        title={title}
+        showBackButton={showBackButton}
+        backLabel={backLabel}
+        handleGoBack={handleGoBack}
+        profileOwnerPrincipal={profileOwnerPrincipal}
+        isCurrentUserProfile={isCurrentUserProfile}
+        allowReordering={allowReordering}
+        canCreateNewShelf={!!onNewShelf && isCurrentUserProfile}
+        canEditOrder={allowReordering && shelves.length > 1}
         isEditMode={isEditMode}
         enterEditMode={enterEditMode}
         cancelEditMode={cancelEditMode}
         saveShelfOrder={handleSaveOrder}
         saveInProgress={saveInProgress}
         saveError={saveError}
+        onNewShelf={onNewShelf}
       />
       
       {shelves.length === 0 && loading ? (
@@ -354,12 +409,12 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
             </ContentGrid>
           )}
           
-          {onLoadMore && (
+          {onLoadMore && !isEditMode && (
             <div className="mt-6 text-center">
               <Button 
                 variant="outline" 
                 onClick={onLoadMore} 
-                disabled={loading || saveInProgress || isEditMode}
+                disabled={loading || saveInProgress || followInProgress}
               >
                 Load More
               </Button>
@@ -381,7 +436,8 @@ export const MemoizedBaseShelfList = React.memo(BaseShelfList, (prevProps: Reado
     prevProps.backLabel !== nextProps.backLabel ||
     prevProps.loading !== nextProps.loading ||
     prevProps.isCurrentUserProfile !== nextProps.isCurrentUserProfile ||
-    prevProps.allowReordering !== nextProps.allowReordering
+    prevProps.allowReordering !== nextProps.allowReordering ||
+    prevProps.profileOwnerPrincipal !== nextProps.profileOwnerPrincipal
   ) {
     return false; // Re-render
   }

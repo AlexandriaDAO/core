@@ -129,6 +129,9 @@ Perpetua/
 
 
 
+- People/follow tags work functinoally now. Now we make them usable on many levels.
+
+
 Backend Stuff:
 - Payment for all/some actions (maybe we do an action count for all backend calls, after certain actions you must pay X lbry).
 
@@ -171,7 +174,7 @@ candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpe
 dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx generate perpetua
 
-git show --patch cd31e7d78c7eaa085dff1e7bf490c871c1a7594c
+git show --patch 3600406077dace006a518893b41666a2ab535195
 
 
 
@@ -188,10 +191,7 @@ git show --patch cd31e7d78c7eaa085dff1e7bf490c871c1a7594c
 1. **Add a mechanism for shelf data backup and recovery**
    - Provide a way to export and import shelf data for disaster recovery.
 
-2. **Implement proper pagination for all query functions**
-   - This prevents large result sets from causing timeouts or memory issues.
-
-3.  **Validate shelf title and description for size and content**
+2.  **Validate shelf title and description for size and content**
     - Add character limits and content sanitization.
 
 ## Performance Optimizations

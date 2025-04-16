@@ -9,9 +9,6 @@ export * from './hooks';
 // Export the cache manager
 export { cacheManager } from './cache/ShelvesCache';
 
-// Export service layer
-export { perpetuaService } from './services/perpetuaService';
-
 // Export utils - now from the central utils file
 export * from '../utils';
 

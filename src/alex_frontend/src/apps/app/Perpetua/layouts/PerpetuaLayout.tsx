@@ -31,6 +31,10 @@ import { TagSearchBar } from '../features/tags/components/TagSearchBar';
 import { TagFilterDisplay } from '../features/tags/components/TagFilterDisplay';
 import { FilteredShelfListContainer } from '../features/tags/containers/FilteredShelfListContainer';
 
+// Import Following components
+import { FollowedTagsList } from '../features/following/components/FollowedTagsList';
+import { FollowedUsersList } from '../features/following/components/FollowedUsersList';
+
 /**
  * Convert a NormalizedShelf back to a Shelf for API calls and components
  */
@@ -194,6 +198,12 @@ const PerpetuaLayout: React.FC = () => {
             </div>
             <TagSearchBar />
           </div>
+
+          {/* Following Lists (Placeholders) */}
+          {/* TODO: Implement data fetching for these lists */}
+          <FollowedTagsList />
+          <FollowedUsersList />
+
           <TagFilterDisplay />
 
           {/* Conditional Shelf List */} 

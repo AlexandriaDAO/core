@@ -1,7 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Principal } from '@dfinity/principal';
 import { cacheManager } from '../cache/ShelvesCache';
-import { perpetuaService } from '../services/perpetuaService';
+import { 
+  addItemToShelf as addItemToShelfService,
+  removeItemFromShelf as removeItemFromShelfService
+} from '../services';
 import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
 import { extractErrorMessage } from '../../utils';
 
@@ -28,7 +31,7 @@ export const addItem = createAsyncThunk(
     before?: boolean
   }, { rejectWithValue }) => {
     try {
-      const result = await perpetuaService.addItemToShelf(
+      const result = await addItemToShelfService(
         shelf.shelf_id,
         content,
         type,
@@ -76,7 +79,7 @@ export const removeItem = createAsyncThunk(
     principal: Principal | string 
   }, { rejectWithValue }) => {
     try {
-      const result = await perpetuaService.removeItemFromShelf(shelfId, itemId);
+      const result = await removeItemFromShelfService(shelfId, itemId);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate cache for this shelf

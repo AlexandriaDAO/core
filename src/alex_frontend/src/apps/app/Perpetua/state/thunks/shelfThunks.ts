@@ -2,7 +2,11 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Principal } from '@dfinity/principal';
 import { cacheManager } from '../cache/ShelvesCache';
 import { loadShelves, getShelfById } from './queryThunks';
-import { perpetuaService } from '../services/perpetuaService';
+import { 
+  createShelf as createShelfService,
+  updateShelfMetadata as updateShelfMetadataService,
+  createAndAddShelfItem as createAndAddShelfItemService
+} from '../services';
 import { extractErrorMessage } from '../../utils';
 
 /**
@@ -20,7 +24,7 @@ export const createShelf = createAsyncThunk(
     principal: Principal | string 
   }, { rejectWithValue }) => {
     try {
-      const result = await perpetuaService.createShelf(title, description);
+      const result = await createShelfService(title, description);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate all caches for this principal
@@ -54,7 +58,7 @@ export const updateShelfMetadata = createAsyncThunk(
     description?: string
   }, { rejectWithValue }) => {
     try {
-      const result = await perpetuaService.updateShelfMetadata(shelfId, title, description);
+      const result = await updateShelfMetadataService(shelfId, title, description);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate cache for this shelf
@@ -90,7 +94,7 @@ export const createAndAddShelfItem = createAsyncThunk(
     principal: Principal | string 
   }, { rejectWithValue }) => {
     try {
-      const result = await perpetuaService.createAndAddShelfItem(parentShelfId, title, description);
+      const result = await createAndAddShelfItemService(parentShelfId, title, description);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate all relevant caches

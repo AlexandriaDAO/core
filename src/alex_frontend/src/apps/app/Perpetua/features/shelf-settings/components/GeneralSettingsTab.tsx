@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { ShelfInformationSection } from "./ShelfInformationSection";
 import { TagsSection } from "./TagsSection";
-import { perpetuaService } from "@/apps/app/Perpetua/state/services/perpetuaService";
 import { toast } from "sonner";
 import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { 
+  addTagToShelf,
+  removeTagFromShelf
+} from "@/apps/app/Perpetua/state/services";
 
 interface GeneralSettingsTabProps {
   shelf: Shelf;
@@ -134,7 +137,7 @@ export const GeneralSettingsTab: React.FC<GeneralSettingsTabProps> = ({
     setTagError(null);
     
     try {
-      const result = await perpetuaService.addTagToShelf(shelf.shelf_id, trimmedTag);
+      const result = await addTagToShelf(shelf.shelf_id, trimmedTag);
       
       if ('Ok' in result && result.Ok) {
         // Update local state on success
@@ -167,7 +170,7 @@ export const GeneralSettingsTab: React.FC<GeneralSettingsTabProps> = ({
     setTagError(null);
     
     try {
-      const result = await perpetuaService.removeTagFromShelf(shelf.shelf_id, tagToRemove);
+      const result = await removeTagFromShelf(shelf.shelf_id, tagToRemove);
       
       if ('Ok' in result && result.Ok) {
         // Update local state on success

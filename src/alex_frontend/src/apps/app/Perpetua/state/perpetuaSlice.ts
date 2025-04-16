@@ -58,7 +58,7 @@ import {
   TagPopularityKeyCursor, 
   TagShelfAssociationKeyCursor, 
   NormalizedTagCursor 
-} from './services/perpetuaService'; // Corrected path
+} from './services'; // Updated to use the new services index
 
 // Define the permissions interfaces
 export interface ContentPermissions {

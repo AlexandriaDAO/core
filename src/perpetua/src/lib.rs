@@ -28,6 +28,7 @@ pub mod update {
     pub mod utils;
     pub mod profile;
     pub mod tags;
+    pub mod follow;
 }
 pub mod query;
 pub mod utils;
@@ -54,6 +55,7 @@ pub use query::{
     OffsetPaginatedResult,
     CursorPaginatedResult
 };
+pub use update::follow::*;
 
 #[init]
 fn init() {

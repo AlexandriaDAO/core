@@ -3,7 +3,10 @@ import { Principal } from '@dfinity/principal';
 import { cacheManager } from '../cache/ShelvesCache';
 import { updateShelfOrder, updateItemOrder } from '../perpetuaSlice';
 import { getShelfById, loadShelves, loadMissingShelves } from './queryThunks';
-import { perpetuaService } from '../services/perpetuaService';
+import { 
+  setItemOrder as setItemOrderService,
+  reorderProfileShelf as reorderProfileShelfService
+} from '../services';
 import { toPrincipal, extractErrorMessage } from '../../utils';
 
 /**
@@ -21,7 +24,7 @@ export const setItemOrder = createAsyncThunk(
     principal: Principal | string; // Pass principal for consistency if needed
   }, { rejectWithValue }) => {
     try {
-      const result = await perpetuaService.setItemOrder(shelfId, orderedItemIds);
+      const result = await setItemOrderService(shelfId, orderedItemIds);
 
       if ("Ok" in result) {
         // Invalidate caches for this shelf
@@ -77,7 +80,7 @@ export const reorderProfileShelf = createAsyncThunk(
       }
       
       // Then make the actual API call
-      const result = await perpetuaService.reorderProfileShelf(
+      const result = await reorderProfileShelfService(
         shelfId,
         referenceShelfId,
         before

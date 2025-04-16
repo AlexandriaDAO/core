@@ -4,7 +4,6 @@ import { Principal } from '@dfinity/principal';
 import { updateSingleShelf } from '../perpetuaSlice';
 import { cacheManager } from '../cache/ShelvesCache';
 import { 
-  perpetuaService, 
   OffsetPaginationParams, 
   CursorPaginationParams, 
   OffsetPaginatedResponse, 
@@ -12,8 +11,15 @@ import {
   TimestampCursor, 
   TagPopularityKeyCursor, 
   TagShelfAssociationKeyCursor, 
-  NormalizedTagCursor
-} from '../services/perpetuaService';
+  NormalizedTagCursor,
+  getUserShelves,
+  getShelf,
+  getRecentShelves,
+  getPopularTags,
+  getShelvesByTag,
+  getTagShelfCount,
+  getTagsWithPrefix
+} from '../services';
 import { principalToString, extractErrorMessage } from '../../utils';
 
 // Define a type for the rejectWithValue result
@@ -33,7 +39,7 @@ export const loadShelves = createAsyncThunk<
       const principalStr = principalToString(principal);
       // Caching removed for paginated endpoint
       
-      const result = await perpetuaService.getUserShelves(principal, params);
+      const result = await getUserShelves(principal, params);
       
       if ("Ok" in result && result.Ok) {
         return result.Ok; 
@@ -64,7 +70,7 @@ export const getShelfById = createAsyncThunk<
         return cachedData;
       }
       
-      const result = await perpetuaService.getShelf(shelfId);
+      const result = await getShelf(shelfId);
       
       if ("Ok" in result && result.Ok) {
         cacheManager.set(shelfId, 'shelf', result.Ok);
@@ -95,7 +101,7 @@ export const loadRecentShelves = createAsyncThunk<
     try {
       // Caching removed for paginated endpoint
       
-      const result = await perpetuaService.getRecentShelves(params);
+      const result = await getRecentShelves(params);
       
       if ("Ok" in result && result.Ok) {
         return result.Ok; 
@@ -128,7 +134,7 @@ export const loadMissingShelves = createAsyncThunk<
       const existingShelves = state?.perpetua?.entities?.shelves || {};
       
       const params: OffsetPaginationParams = { offset: 0, limit: 50 }; 
-      const result = await perpetuaService.getUserShelves(principal, params);
+      const result = await getUserShelves(principal, params);
       
       if ("Ok" in result && result.Ok) {
         const shelves = result.Ok.items;
@@ -158,7 +164,7 @@ export const fetchPopularTags = createAsyncThunk<
   async (params, { rejectWithValue }) => {
     try {
       // Caching removed for paginated endpoint
-      const result = await perpetuaService.getPopularTags(params);
+      const result = await getPopularTags(params);
       
       if ("Ok" in result && result.Ok) {
         return result.Ok;
@@ -185,7 +191,7 @@ export const fetchShelvesByTag = createAsyncThunk<
   async ({ tag, params }, { rejectWithValue, dispatch }) => {
     try {
       // Caching removed for paginated endpoint
-      const result = await perpetuaService.getShelvesByTag(tag, params);
+      const result = await getShelvesByTag(tag, params);
       
       if ("Ok" in result && result.Ok) {
         return { tag, response: result.Ok }; 
@@ -217,7 +223,7 @@ export const fetchTagShelfCount = createAsyncThunk<
         return { tag, count: cachedData };
       }
       
-      const result = await perpetuaService.getTagShelfCount(tag);
+      const result = await getTagShelfCount(tag);
       
       if ("Ok" in result && typeof result.Ok === 'number') {
         const count = result.Ok;
@@ -246,7 +252,7 @@ export const fetchTagsWithPrefix = createAsyncThunk<
   async ({ prefix, params }, { rejectWithValue }) => {
     try {
       // Caching removed for paginated endpoint
-      const result = await perpetuaService.getTagsWithPrefix(prefix, params);
+      const result = await getTagsWithPrefix(prefix, params);
       
       if ("Ok" in result && result.Ok) {
         return result.Ok; 

@@ -1,6 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { cacheManager } from '../cache/ShelvesCache';
-import { perpetuaService } from '../services/perpetuaService';
+import { 
+  isShelfPublic,
+  toggleShelfPublicAccess as toggleShelfPublicAccessService
+} from '../services';
 import { extractErrorMessage } from '../../utils';
 
 /**
@@ -17,7 +20,7 @@ export const checkShelfPublicAccess = createAsyncThunk(
       }
       
       // No cache hit, so fetch from API
-      const result = await perpetuaService.isShelfPublic(shelfId);
+      const result = await isShelfPublic(shelfId);
       
       if ("Ok" in result) {
         const isPublic = result.Ok;
@@ -53,7 +56,7 @@ export const toggleShelfPublicAccess = createAsyncThunk(
     isPublic: boolean
   }, { rejectWithValue }) => {
     try {
-      const result = await perpetuaService.toggleShelfPublicAccess(shelfId, isPublic);
+      const result = await toggleShelfPublicAccessService(shelfId, isPublic);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate the public status cache

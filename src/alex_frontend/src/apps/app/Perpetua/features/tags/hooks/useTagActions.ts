@@ -12,7 +12,7 @@ import {
     TagPopularityKeyCursor, 
     TagShelfAssociationKeyCursor, 
     NormalizedTagCursor 
-} from '@/apps/app/Perpetua/state/services/perpetuaService';
+} from '@/apps/app/Perpetua/state/services';
 import { useCallback } from 'react';
 
 /**

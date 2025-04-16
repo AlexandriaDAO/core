@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent } from "@/lib/components/card";
 import { Badge } from "@/lib/components/badge";
 import { Folder, ChevronDown, Calendar, User, Tag, Clock, Info, Copy, Check, Link, Globe, Lock } from "lucide-react";
@@ -7,6 +7,8 @@ import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Button } from "@/lib/components/button";
 import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
 import { format } from 'date-fns';
+import { followTag } from '@/apps/app/Perpetua/state/services/followService';
+import { toast } from 'sonner';
 
 export interface ShelfCardProps {
   shelf: Shelf;
@@ -65,6 +67,24 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
 
   const createdAt = formatDate(shelf.created_at);
   const updatedAt = formatDate(shelf.updated_at);
+
+  // --- Tag Follow Handler ---
+  const handleFollowTag = useCallback(async (tag: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent card click when clicking tag
+    // TODO: Add loading state indicator for the specific tag badge
+    try {
+      const result = await followTag(tag);
+      if ('Ok' in result) {
+        toast.success(`Followed tag: ${tag}`);
+        // TODO: Update local/global state later to visually indicate followed status
+      } else {
+        toast.error(`Failed to follow tag: ${result.Err}`);
+      }
+    } catch (error) {
+      console.error("Error following tag:", error);
+      toast.error("An unexpected error occurred while trying to follow the tag.");
+    }
+  }, []); // No dependencies needed for now
 
   // Copy states
   const [copiedId, setCopiedId] = useState(false);
@@ -131,9 +151,20 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
                   {shelf.tags && shelf.tags.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1 justify-center">
                       {shelf.tags.map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-[11px] px-1.5 py-px bg-gray-50 dark:bg-gray-800 flex items-center gap-0.5 font-serif">
-                          <Tag className="h-2.5 w-2.5 text-gray-500" /> {tag}
-                        </Badge>
+                        <button
+                          key={index}
+                          onClick={(e) => handleFollowTag(tag, e)}
+                          className="focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 rounded transition-all duration-150"
+                          title={`Follow tag: ${tag}`}
+                          aria-label={`Follow tag ${tag}`}
+                        >
+                          <Badge 
+                            variant="outline" 
+                            className="text-[11px] px-1.5 py-px bg-gray-50 dark:bg-gray-800 flex items-center gap-0.5 font-serif cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            <Tag className="h-2.5 w-2.5 text-gray-500" /> {tag}
+                          </Badge>
+                        </button>
                       ))}
                     </div>
                   )}
