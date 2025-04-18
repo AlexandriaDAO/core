@@ -38,6 +38,14 @@ Before next mainnet push:
 (6) Add a ledger canister for $ALEX and $LBRY.
 
 
+## 3rd party apps:
+- lbry.app
+- bridge
+- lend
+
+I think it'd be cool to 
+
+
 
 
 
@@ -96,7 +104,3 @@ The direct Arweave path needs to:
 
 
 
-
-
-
-- The reason to LP in the chain-native token is primarily social. This is a clear bias, as something else will outperform that chain's native token.

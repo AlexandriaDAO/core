@@ -131,6 +131,10 @@ Perpetua/
 
 - People/follow tags work functinoally now. Now we make them usable on many levels.
 
+(1) Tag follow toasts don't actually show.
+(2) 
+
+
 
 Backend Stuff:
 - Payment for all/some actions (maybe we do an action count for all backend calls, after certain actions you must pay X lbry).

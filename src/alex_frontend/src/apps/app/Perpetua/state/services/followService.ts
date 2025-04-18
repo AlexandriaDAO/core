@@ -214,3 +214,31 @@ export async function getFollowedTagsFeed(
     return { Err: "Failed to load followed tags feed" };
   }
 }
+
+// --- Get Followed Lists ---
+
+/**
+ * Get the list of tags followed by the current user
+ */
+export async function getMyFollowedTags(): Promise<Result<string[], QueryError>> {
+  try {
+    const actor = await getActorPerpetua();
+    // Assuming backend method is get_my_followed_tags() -> (Result<vec text, QueryError>) query;
+    const result = await actor.get_my_followed_tags();
+
+    if ("Ok" in result) {
+      return { Ok: result.Ok };
+    } else if ("Err" in result) {
+      return { Err: result.Err };
+    } else {
+      // This case might occur if the backend returns an unexpected format
+      // or if the type definition used by the actor is incorrect.
+      console.error('Unexpected response format from get_my_followed_tags:', result);
+      return { Err: "Unexpected response format" };
+    }
+  } catch (error) {
+    console.error('Error in getMyFollowedTags:', error);
+    // Provide a more specific error message if possible, e.g., based on error type
+    return { Err: "Failed to load followed tags" };
+  }
+}

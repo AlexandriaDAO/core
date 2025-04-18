@@ -720,3 +720,19 @@ pub struct ShelfPositionMetrics {
     pub avg_gap: f64,
     pub max_gap: f64, 
 }
+
+// --- Follow System Queries ---
+
+/// Query to get the list of tags followed by the caller.
+#[ic_cdk::query(guard = "not_anon")]
+pub fn get_my_followed_tags() -> QueryResult<Vec<NormalizedTag>> {
+    let caller = ic_cdk::caller();
+
+    FOLLOWED_TAGS.with(|followed| {
+        let map = followed.borrow();
+        let tags = map.get(&caller)
+                     .map(|tag_set| tag_set.0.iter().cloned().collect()) // Clone tags from BTreeSet into Vec
+                     .unwrap_or_default(); // Return empty Vec if user not found or no tags followed
+        Ok(tags)
+    })
+}

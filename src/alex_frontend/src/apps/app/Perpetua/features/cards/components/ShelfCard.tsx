@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Card, CardContent } from "@/lib/components/card";
 import { Badge } from "@/lib/components/badge";
-import { Folder, ChevronDown, Calendar, User, Tag, Clock, Info, Copy, Check, Link, Globe, Lock } from "lucide-react";
+import { Folder, ChevronDown, Calendar, User, Tag, Clock, Info, Copy, Check, Link, Globe, Lock, PlusCircle, Loader2 } from "lucide-react";
 import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Button } from "@/lib/components/button";
@@ -41,6 +41,9 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
   const [isFooterExpanded, setIsFooterExpanded] = useState(false);
   const itemCount = Object.keys(shelf.items).length;
   
+  // State to track which tag is currently being followed
+  const [followingTag, setFollowingTag] = useState<string | null>(null);
+
   // Format dates if they exist
   const formatDate = (timestamp: bigint | undefined) => {
     if (!timestamp) return 'N/A';
@@ -70,19 +73,22 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
 
   // --- Tag Follow Handler ---
   const handleFollowTag = useCallback(async (tag: string, event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent card click when clicking tag
-    // TODO: Add loading state indicator for the specific tag badge
+    event.stopPropagation(); // Prevent card click when clicking tag follow button
+    setFollowingTag(tag); // Set loading state for this specific tag
     try {
       const result = await followTag(tag);
       if ('Ok' in result) {
         toast.success(`Followed tag: ${tag}`);
         // TODO: Update local/global state later to visually indicate followed status
+        // e.g., disable button, change icon to Check, or sync with a global followed tags list
       } else {
         toast.error(`Failed to follow tag: ${result.Err}`);
       }
     } catch (error) {
       console.error("Error following tag:", error);
       toast.error("An unexpected error occurred while trying to follow the tag.");
+    } finally {
+      setFollowingTag(null); // Clear loading state regardless of outcome
     }
   }, []); // No dependencies needed for now
 
@@ -149,22 +155,32 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
 
                   {/* Render tags below other badges if they exist */}
                   {shelf.tags && shelf.tags.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1 justify-center">
+                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5 justify-center items-center">
                       {shelf.tags.map((tag, index) => (
-                        <button
-                          key={index}
-                          onClick={(e) => handleFollowTag(tag, e)}
-                          className="focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 rounded transition-all duration-150"
-                          title={`Follow tag: ${tag}`}
-                          aria-label={`Follow tag ${tag}`}
-                        >
+                        <div key={index} className="flex items-center gap-1">
+                          {/* Tag Badge (now not clickable) */}
                           <Badge 
                             variant="outline" 
-                            className="text-[11px] px-1.5 py-px bg-gray-50 dark:bg-gray-800 flex items-center gap-0.5 font-serif cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                            className="text-[11px] px-1.5 py-px bg-gray-50 dark:bg-gray-800 flex items-center gap-0.5 font-serif cursor-default"
                           >
                             <Tag className="h-2.5 w-2.5 text-gray-500" /> {tag}
                           </Badge>
-                        </button>
+                          {/* Follow Button */}
+                          <Button
+                            variant="ghost" 
+                            className="h-5 w-5 p-0 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={(e) => handleFollowTag(tag, e)}
+                            disabled={followingTag === tag} // Disable while this tag is being followed
+                            title={`Follow tag: ${tag}`}
+                            aria-label={`Follow tag ${tag}`}
+                          >
+                            {followingTag === tag ? (
+                              <Loader2 className="h-3 w-3 animate-spin" /> // Loading spinner
+                            ) : (
+                              <PlusCircle className="h-4 w-4" /> // Plus icon
+                            )}
+                          </Button>
+                        </div>
                       ))}
                     </div>
                   )}

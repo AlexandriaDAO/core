@@ -1,19 +1,42 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/lib/components/button';
 import { Badge } from '@/lib/components/badge';
 import { toast } from 'sonner';
-import { unfollowTag } from '@/apps/app/Perpetua/state/services/followService';
-import { X } from 'lucide-react';
-
-// Placeholder data - Replace with actual data fetching later
-const placeholderFollowedTags = ['motoko', 'rust', 'web3', 'gaming', 'icp', 'nft'];
+import { unfollowTag, getMyFollowedTags } from '@/apps/app/Perpetua/state/services/followService';
+import { X, Loader2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/lib/components/alert";
+import { Skeleton } from "@/lib/components/skeleton";
 
 export const FollowedTagsList: React.FC = () => {
-    // State to manage loading status for individual tags during unfollow
+    const [followedTags, setFollowedTags] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [unfollowingTag, setUnfollowingTag] = useState<string | null>(null);
 
-    // TODO: Replace placeholder data with actual state/props from data fetching
-    const followedTags = placeholderFollowedTags;
+    const fetchFollowedTags = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const result = await getMyFollowedTags();
+            if ('Ok' in result) {
+                setFollowedTags(result.Ok);
+            } else {
+                setError(result.Err || 'Failed to load followed tags.');
+                toast.error(result.Err || 'Failed to load followed tags.');
+            }
+        } catch (err) {
+            console.error("Error fetching followed tags:", err);
+            const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
+            setError(errorMessage);
+            toast.error(`Error: ${errorMessage}`);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchFollowedTags();
+    }, [fetchFollowedTags]);
 
     const handleUnfollow = useCallback(async (tag: string) => {
         setUnfollowingTag(tag);
@@ -21,9 +44,7 @@ export const FollowedTagsList: React.FC = () => {
             const result = await unfollowTag(tag);
             if ('Ok' in result) {
                 toast.success(`Unfollowed tag: ${tag}`);
-                // TODO: Remove tag from local state/trigger refetch once real data source exists
-                // Example (if using local state for placeholders): 
-                // setFollowedTags(current => current.filter(t => t !== tag));
+                setFollowedTags(current => current.filter(t => t !== tag));
             } else {
                 toast.error(`Failed to unfollow tag: ${result.Err}`);
             }
@@ -35,11 +56,31 @@ export const FollowedTagsList: React.FC = () => {
         }
     }, []);
 
+    if (isLoading) {
+        return (
+            <div className="mb-4 font-serif">
+                <h3 className="mb-2 font-semibold text-base">Following Tags:</h3>
+                <div className="flex flex-wrap gap-2 items-center">
+                    {[...Array(3)].map((_, index) => (
+                        <Skeleton key={index} className="h-7 w-20 rounded-full" />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <Alert variant="destructive" className="mb-4">
+                <AlertTitle>Error Loading Tags</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+                <Button onClick={fetchFollowedTags} variant="secondary" className="mt-2">Retry</Button>
+            </Alert>
+        );
+    }
+
     if (followedTags.length === 0) {
-        // Don't render anything if no tags are followed (or placeholder is empty)
-        // Optionally show a message: 
-        // return <p className="text-sm text-muted-foreground mb-4">You are not following any tags yet.</p>;
-        return null;
+        return <p className="text-sm text-muted-foreground mb-4 font-serif">You are not following any tags yet.</p>;
     }
 
     return (
@@ -47,17 +88,18 @@ export const FollowedTagsList: React.FC = () => {
             <h3 className="mb-2 font-semibold text-base">Following Tags:</h3>
             <div className="flex flex-wrap gap-2 items-center">
                 {followedTags.map(tag => (
-                    <Badge key={tag} variant="secondary" className="pl-3 pr-1 py-1 flex items-center gap-1">
+                    <Badge key={tag} variant="secondary" className="pl-3 pr-1 py-1 flex items-center gap-1 group relative">
                         <span>{tag}</span>
                         <Button
                             variant="ghost"
-                            className="h-5 w-5 p-0 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                            className="h-5 w-5 p-0 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-opacity opacity-50 group-hover:opacity-100"
                             onClick={() => handleUnfollow(tag)}
                             disabled={unfollowingTag === tag}
                             aria-label={`Unfollow tag ${tag}`}
+                            title={`Unfollow tag ${tag}`}
                         >
                             {unfollowingTag === tag ? (
-                                <span className="animate-spin text-xs">...</span> // Simple spinner
+                                <Loader2 className="h-3 w-3 animate-spin" />
                             ) : (
                                 <X size={14} />
                             )}
@@ -67,4 +109,4 @@ export const FollowedTagsList: React.FC = () => {
             </div>
         </div>
     );
-}; 
+};
