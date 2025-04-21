@@ -135,19 +135,28 @@ Perpetua/
 (2) 
 
 
+Minor Frontend Stuff:
+- Enforce 100 char title, 500 char description.
+- Shelves actually have a 10 tag max in the backend. Should we change this? (and 50 chars)
+- Max 500 items per shelf.
+- 10k markdown chars.
+
+
 
 Backend Stuff:
-- Payment for all/some actions (maybe we do an action count for all backend calls, after certain actions you must pay X lbry).
+- Payment for all/some actions
+  - Pay for shelf creation after the fifth shelf. That's it (for now).
+- Download personal data as a csv.
+  - This way we could use this function to do it manually at various times.
+- Feed: 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
 
 
 
  
 
 
-## V2 Features:
-
-- Backup system for all data.
-- 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
+## V2 Features (Separate Canister):
+- More advanced search engine for the setup. So separate architecture with backups (maybe centralized).
 - A preview of the slots in the profile. (Could be done later)
 
 
@@ -185,18 +194,16 @@ git show --patch 3600406077dace006a518893b41666a2ab535195
 
 
 
-# Backend ToDos:
-- Make sure add_item_to_shelf has the proper type checks. Right now, I just use the frontend to determine if it's 'shelf', 'nft' or 'markdown'.
 
-# Code Review and Optimization Suggestions
+
+
+
+# Backend ToDos
 
 ## Security and Vulnerability Suggestions
 
 1. **Add a mechanism for shelf data backup and recovery**
    - Provide a way to export and import shelf data for disaster recovery.
-
-2.  **Validate shelf title and description for size and content**
-    - Add character limits and content sanitization.
 
 ## Performance Optimizations
 

@@ -6,7 +6,7 @@ use std::ops::Bound;
 use crate::storage::{
     SHELVES, USER_SHELVES, GLOBAL_TIMELINE, USER_PROFILE_ORDER, 
     TAG_SHELF_ASSOCIATIONS, TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, TAG_METADATA,
-    FOLLOWED_USERS, FOLLOWED_TAGS,
+    FOLLOWED_USERS, FOLLOWED_TAGS, NFT_SHELVES,
     Shelf, Item, ShelfId, NormalizedTag, ItemId,
     TagMetadata, PrincipalSet, NormalizedTagSet
 };
@@ -734,5 +734,19 @@ pub fn get_my_followed_tags() -> QueryResult<Vec<NormalizedTag>> {
                      .map(|tag_set| tag_set.0.iter().cloned().collect()) // Clone tags from BTreeSet into Vec
                      .unwrap_or_default(); // Return empty Vec if user not found or no tags followed
         Ok(tags)
+    })
+}
+
+/// Query to find all shelves that contain a specific NFT ID.
+/// Returns an empty list if the NFT is not found in any tracked shelves.
+#[ic_cdk::query]
+pub fn get_shelves_containing_nft(nft_id: String) -> Vec<ShelfId> {
+    NFT_SHELVES.with(|nft_shelves| {
+        nft_shelves
+            .borrow()
+            .get(&nft_id)
+            // If the NFT ID exists in the map, clone its list of Shelf IDs.
+            // Otherwise, return an empty vector.
+            .map_or(Vec::new(), |string_vec| string_vec.0.clone())
     })
 }

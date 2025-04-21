@@ -113,7 +113,7 @@ pub const MAX_APPEARS_IN_COUNT: usize = 100; // Keep this if relevant elsewhere
 pub const MAX_TAG_LENGTH: usize = 50; // Adjusted max tag length
 pub const MAX_TAGS_PER_SHELF: usize = 10; // Adjusted max tags per shelf
 pub const MAX_NFT_ID_LENGTH: usize = 100; // Max length for NFT IDs
-pub const MAX_MARKDOWN_LENGTH: usize = 100_000; // Max length for Markdown content
+pub const MAX_MARKDOWN_LENGTH: usize = 10_000; // Max length for Markdown content
 
 // New wrapper types (Keep these if used outside tags)
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]

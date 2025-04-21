@@ -4,7 +4,8 @@ use ic_cdk;
 use crate::storage::{
     FOLLOWED_USERS, FOLLOWED_TAGS, 
     PrincipalSet, NormalizedTagSet, 
-    validate_tag_format, NormalizedTag
+    validate_tag_format, NormalizedTag,
+    USER_SHELVES // Added USER_SHELVES for potential future use, though not needed here yet
 };
 use crate::utils::normalize_tag;
 // Assuming the guard function is in src/guards.rs
@@ -21,6 +22,10 @@ fn not_anon() -> Result<(), String> {
     }
 }
 
+// --- Constants ---
+const MAX_FOLLOWED_USERS: usize = 1000;
+const MAX_FOLLOWED_TAGS: usize = 1000;
+
 pub type UpdateResult = Result<(), String>;
 
 #[ic_cdk::update(guard = "not_anon")]
@@ -36,6 +41,14 @@ pub fn follow_user(user_to_follow: Principal) -> UpdateResult {
         let mut map = followed.borrow_mut();
         let mut followed_set = map.get(&caller).unwrap_or_default();
         
+        // Check limit before inserting
+        if followed_set.0.len() >= MAX_FOLLOWED_USERS {
+            // Check if the user is already followed (idempotency)
+            if !followed_set.0.contains(&user_to_follow) {
+                return Err(format!("Cannot follow more than {} users.", MAX_FOLLOWED_USERS));
+            }
+        }
+
         // Add the user to the set
         if followed_set.0.insert(user_to_follow) {
              // If insert returned true, the set was modified
@@ -76,6 +89,14 @@ pub fn follow_tag(tag: String) -> UpdateResult {
     FOLLOWED_TAGS.with(|followed| {
         let mut map = followed.borrow_mut();
         let mut followed_set = map.get(&caller).unwrap_or_default();
+        
+        // Check limit before inserting
+        if followed_set.0.len() >= MAX_FOLLOWED_TAGS {
+            // Check if the tag is already followed (idempotency)
+            if !followed_set.0.contains(&normalized_tag) {
+                return Err(format!("Cannot follow more than {} tags.", MAX_FOLLOWED_TAGS));
+            }
+        }
         
         // Add the tag to the set
         if followed_set.0.insert(normalized_tag) {

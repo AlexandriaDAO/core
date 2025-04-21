@@ -7,6 +7,10 @@ use ic_stable_structures::{StableBTreeMap, memory_manager::VirtualMemory};
 use ic_stable_structures::DefaultMemoryImpl;
 use std::collections::HashSet;
 
+// --- Constants ---
+const MAX_USER_SHELVES: usize = 1000;
+const MAX_NFT_REFERENCES: usize = 1000; // Limit for NFT_SHELVES tracking
+
 // Define Memory type alias for clarity
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -140,11 +144,17 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
             let mut nft_map = nft_shelves.borrow_mut();
             let mut shelves = nft_map.get(nft_id).unwrap_or_default();
             
-            // Avoid duplicates if item already exists somehow? Check needed?
-            // For now, assume add implies it wasn't there before for this shelf.
+            // Check if the shelf ID is already present
             if !shelves.0.contains(&shelf_id) {
-                shelves.0.push(shelf_id.clone());
-                nft_map.insert(nft_id.to_string(), shelves);
+                // Check the reference limit *before* adding
+                if shelves.0.len() < MAX_NFT_REFERENCES {
+                    shelves.0.push(shelf_id.clone());
+                    nft_map.insert(nft_id.to_string(), shelves);
+                } else {
+                    // Silently not adding the shelf to the NFT reference list.
+                    // ic_cdk::println!("NFT {} reference limit ({}) reached. Not adding shelf {}.", 
+                    //    nft_id, MAX_NFT_REFERENCES, shelf_id);
+                }
             }
         });
     }
@@ -314,6 +324,17 @@ pub async fn create_and_add_shelf_item(
         return Err("You don't have edit permissions for the parent shelf".to_string());
     }
     
+    // --- Check Shelf Limit Before Creation ---
+    let current_shelf_count = USER_SHELVES.with(|user_shelves| {
+        user_shelves.borrow()
+            .get(&caller)
+            .map_or(0, |shelves_set| shelves_set.0.len())
+    });
+
+    if current_shelf_count >= MAX_USER_SHELVES {
+        return Err(format!("User cannot own more than {} shelves.", MAX_USER_SHELVES));
+    }
+
     // Create a new shelf
     let mut shelf = create_shelf(title, description, vec![], None).await?;
     

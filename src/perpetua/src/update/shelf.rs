@@ -3,6 +3,9 @@ use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, crea
 use crate::guard::not_anon;
 use crate::auth;
 
+// --- Constants ---
+const MAX_USER_SHELVES: usize = 1000;
+
 /// Represents the data needed to update a shelf's metadata
 #[derive(CandidType, Deserialize)]
 pub struct ShelfUpdate {
@@ -23,6 +26,17 @@ pub async fn store_shelf(
     tags: Option<Vec<String>>, // Still accepts raw tags for shelf creation
 ) -> Result<ShelfId, String> { // Return ShelfId (String)
     let caller = ic_cdk::caller();
+    
+    // --- Check Shelf Limit ---
+    let current_shelf_count = USER_SHELVES.with(|user_shelves| {
+        user_shelves.borrow()
+            .get(&caller)
+            .map_or(0, |shelves_set| shelves_set.0.len())
+    });
+
+    if current_shelf_count >= MAX_USER_SHELVES {
+        return Err(format!("User cannot own more than {} shelves.", MAX_USER_SHELVES));
+    }
     
     // Create the shelf - create_shelf now handles normalization/validation
     let shelf = create_shelf(title, description, items, tags).await?;

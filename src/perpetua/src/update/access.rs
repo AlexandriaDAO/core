@@ -3,6 +3,9 @@ use crate::storage::SHELVES;
 use crate::guard::not_anon;
 use crate::auth;
 
+// --- Constants ---
+const MAX_SHELF_EDITORS: usize = 20;
+
 /// Adds a new editor to a shelf
 /// 
 /// Only the shelf owner can add editors. The editors have permission
@@ -21,6 +24,11 @@ pub fn add_shelf_editor(shelf_id: String, editor_principal: Principal) -> Result
         // Check if editor already exists
         if shelf.editors.contains(&editor_principal) {
             return Err("Principal is already an editor".to_string());
+        }
+
+        // Check editor limit
+        if shelf.editors.len() >= MAX_SHELF_EDITORS {
+            return Err(format!("Shelf cannot have more than {} editors.", MAX_SHELF_EDITORS));
         }
         
         // Add the new editor
