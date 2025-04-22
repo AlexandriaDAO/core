@@ -2,14 +2,18 @@ use candid::{CandidType, Nat, Principal, Deserialize};
 use ic_cdk;
 use std::convert::TryInto;
 use std::ops::Bound;
+use std::collections::BTreeMap; // Import BTreeMap for ShelfPublic
 
 use crate::storage::{
     SHELVES, USER_SHELVES, GLOBAL_TIMELINE, USER_PROFILE_ORDER, 
     TAG_SHELF_ASSOCIATIONS, TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, TAG_METADATA,
     FOLLOWED_USERS, FOLLOWED_TAGS, NFT_SHELVES,
-    Shelf, Item, ShelfId, NormalizedTag, ItemId,
+    Shelf, Item, ShelfId, NormalizedTag, ItemId, // Keep internal Shelf import
     TagMetadata, PrincipalSet, NormalizedTagSet
 };
+// Needed for PositionTracker methods used in get_user_shelves
+use crate::storage::UserProfileOrder; 
+
 use crate::types::{TagPopularityKey, TagShelfAssociationKey};
 use crate::utils::normalize_tag;
 use crate::guard::not_anon;
@@ -76,14 +80,53 @@ pub enum QueryError {
 
 pub type QueryResult<T> = Result<T, QueryError>;
 
+// --- Public Shelf structure for Candid export ---
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct ShelfPublic {
+    pub shelf_id: ShelfId,
+    pub title: String,
+    pub description: Option<String>,
+    pub owner: Principal,
+    pub editors: Vec<Principal>,      
+    pub items: BTreeMap<u32, Item>, // Assuming Item is CandidType      
+    // Use Vec for positions, ordered by the tracker
+    pub item_positions: Vec<(u32, f64)>, 
+    pub created_at: u64,
+    pub updated_at: u64,
+    pub appears_in: Vec<ShelfId>,         
+    pub tags: Vec<NormalizedTag>, // Assuming NormalizedTag (String) is CandidType         
+    pub is_public: bool,                  
+}
+
+// Helper function to convert internal Shelf to ShelfPublic
+impl From<Shelf> for ShelfPublic {
+    fn from(shelf: Shelf) -> Self {
+        Self {
+            shelf_id: shelf.shelf_id,
+            title: shelf.title,
+            description: shelf.description,
+            owner: shelf.owner,
+            editors: shelf.editors,
+            items: shelf.items,
+            item_positions: shelf.item_positions.get_ordered_entries(), // Use tracker method
+            created_at: shelf.created_at,
+            updated_at: shelf.updated_at,
+            appears_in: shelf.appears_in,
+            tags: shelf.tags,
+            is_public: shelf.is_public,
+        }
+    }
+}
+
 // Shelf queries
 #[ic_cdk::query]
-pub fn get_shelf(shelf_id: ShelfId) -> QueryResult<Shelf> {
+pub fn get_shelf(shelf_id: ShelfId) -> QueryResult<ShelfPublic> {
     SHELVES.with(|shelves| {
         shelves
             .borrow()
             .get(&shelf_id)
-            .map(|shelf| shelf.clone())
+            .map(|s| s.clone())
+            .map(ShelfPublic::from)
             .ok_or(QueryError::ShelfNotFound)
     })
 }
@@ -95,12 +138,13 @@ pub fn get_shelf_items(
 ) -> QueryResult<CursorPaginatedResult<Item, ItemId>> {
     let limit = pagination.get_limit();
 
-    // 1. Get the full shelf
-    let shelf = get_shelf(shelf_id)?;
+    // Get the internal shelf first
+    let internal_shelf = SHELVES.with(|s| s.borrow().get(&shelf_id).map(|sh| sh.clone()))
+        .ok_or(QueryError::ShelfNotFound)?;
 
-    // 2. Get all items ordered by their position
-    let ordered_items = shelf.get_ordered_items(); // This returns Vec<Item>
-    let total_items = ordered_items.len();
+    // Get ordered item IDs from the tracker O(N)
+    let ordered_ids: Vec<u32> = internal_shelf.item_positions.iter_keys_ordered().cloned().collect();
+    let total_items = ordered_ids.len();
 
     if total_items == 0 {
         return Ok(CursorPaginatedResult {
@@ -110,40 +154,44 @@ pub fn get_shelf_items(
         });
     }
 
-    // 3. Find the starting index based on the cursor
+    // Find the starting index based on the cursor in the ordered ID list
     let start_index = match pagination.cursor {
         Some(cursor_id) => {
-            // Find the index of the item AFTER the cursor
-            ordered_items
+            ordered_ids
                 .iter()
-                .position(|item| item.id == cursor_id)
+                .position(|&id| id == cursor_id)
                 .map(|idx| idx + 1) // Start from the item *after* the cursor
-                .unwrap_or(0) // If cursor not found, start from beginning (or error?)
-                // Consider returning InvalidCursor if cursor_id is not found?
-                // For now, starting from 0 provides resilience.
+                .unwrap_or(0) 
         }
-        None => 0, // No cursor, start from the beginning
+        None => 0,
     };
 
-    // 4. Slice the vector to get the current page's items
+    // Slice the ID vector
     let end_index = (start_index + limit).min(total_items);
-    let items_page: Vec<Item> = if start_index >= total_items {
-        Vec::new() // Cursor pointed past the end
+    let page_ids: &[u32] = if start_index >= total_items {
+        &[]
     } else {
-        ordered_items[start_index..end_index].to_vec()
+        &ordered_ids[start_index..end_index]
     };
 
-    // 5. Determine the next cursor
-    let next_cursor = if end_index < total_items {
-        // The ID of the last item on *this* page is the cursor for the *next* page
-        items_page.last().map(|item| item.id)
-    } else {
-        None // No more items
-    };
+    // Fetch only the items for the current page using the IDs O(page_limit * log N)
+    let items_page: Vec<Item> = page_ids
+        .iter()
+        .filter_map(|id| internal_shelf.items.get(id).map(|i| i.clone()))
+        .collect();
+
+    // Determine the next cursor (ID of the last item on *this* page)
+     let correct_next_cursor = if end_index < total_items {
+         // The cursor should be the ID of the last item INCLUDED in the current page
+         page_ids.last().cloned() 
+     } else {
+         None
+     };
+
 
     Ok(CursorPaginatedResult {
         items: items_page,
-        next_cursor,
+        next_cursor: correct_next_cursor, // Use the corrected cursor logic
         limit: Nat::from(limit),
     })
 }
@@ -153,7 +201,7 @@ pub fn get_shelf_items(
 pub fn get_user_shelves(
     user: Principal, 
     pagination: OffsetPaginationInput
-) -> QueryResult<OffsetPaginatedResult<Shelf>> {
+) -> QueryResult<OffsetPaginatedResult<ShelfPublic>> {
     let limit = pagination.get_limit();
     let offset = pagination.get_offset();
 
@@ -161,44 +209,43 @@ pub fn get_user_shelves(
         user_shelves
             .borrow()
             .get(&user)
+            .map(|ts| ts.clone())
             .ok_or(QueryError::UserNotFound)
             .and_then(|timestamped| {
-                let has_custom_order = USER_PROFILE_ORDER.with(|profile_order| {
-                    profile_order.borrow().get(&user)
-                        .map_or(false, |order| order.is_customized)
+                // Get user profile order (contains PositionTracker)
+                let user_profile_opt: Option<UserProfileOrder> = USER_PROFILE_ORDER.with(|profile_order| {
+                    profile_order.borrow().get(&user).map(|o| o.clone())
                 });
+                
+                let has_custom_order = user_profile_opt.as_ref().map_or(false, |order| order.is_customized);
 
                 let combined_ids: Vec<ShelfId> = if has_custom_order {
-                    USER_PROFILE_ORDER.with(|profile_order| {
-                        let order_ref = profile_order.borrow();
-                        // Assume user exists based on the outer check
-                        let user_order = order_ref.get(&user).unwrap(); 
-                        
-                        let mut ordered_positions: Vec<(ShelfId, f64)> = user_order.shelf_positions
-                            .iter()
-                            .map(|(id, &pos)| (id.clone(), pos))
-                            .collect();
-                        ordered_positions.sort_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-                        
-                        let ordered_ids: Vec<ShelfId> = ordered_positions.into_iter().map(|(id, _)| id).collect();
-                        let ordered_id_set: std::collections::HashSet<ShelfId> = ordered_ids.iter().cloned().collect();
+                    let user_order = user_profile_opt.unwrap(); // Safe unwrap due to has_custom_order check
+                    
+                    // Use get_ordered_entries to get (key, pos) pairs directly
+                    let ordered_positions: Vec<(ShelfId, f64)> = user_order.shelf_positions.get_ordered_entries(); 
+                    // Already sorted by position from get_ordered_entries
+                    
+                    let ordered_ids: Vec<ShelfId> = ordered_positions.into_iter().map(|(id, _)| id).collect();
+                    let ordered_id_set: std::collections::HashSet<ShelfId> = ordered_ids.iter().cloned().collect();
 
-                        let mut timestamp_ordered_ids: Vec<(u64, ShelfId)> = timestamped.0
-                            .iter()
-                            .filter(|(_, id)| !ordered_id_set.contains(id))
-                            .map(|&(ts, ref id)| (ts, id.clone()))
-                            .collect();
-                        timestamp_ordered_ids.sort_by(|a, b| b.0.cmp(&a.0)); // Newest first
-                        
-                        let non_ordered_ids: Vec<ShelfId> = timestamp_ordered_ids.into_iter().map(|(_, id)| id).collect();
-                        
-                        // Combine: custom order first, then timestamp order
-                        ordered_ids.into_iter().chain(non_ordered_ids.into_iter()).collect()
-                    })
+                    // Get timestamp-ordered IDs for shelves *not* in the custom order
+                    let mut timestamp_ordered_ids: Vec<(u64, ShelfId)> = timestamped.0
+                        .iter()
+                        .filter(|(_, id)| !ordered_id_set.contains(id))
+                        .cloned() // Clone the (u64, ShelfId) tuple
+                        .collect();
+                    timestamp_ordered_ids.sort_by(|a, b| b.0.cmp(&a.0)); // Newest first
+                    
+                    let non_ordered_ids: Vec<ShelfId> = timestamp_ordered_ids.into_iter().map(|(_, id)| id).collect();
+                    
+                    // Combine: custom order first, then timestamp order
+                    ordered_ids.into_iter().chain(non_ordered_ids.into_iter()).collect()
+                    
                 } else {
                     // Default: Sort by timestamp (newest first)
                     let mut shelf_data: Vec<(u64, ShelfId)> = timestamped.0.iter().cloned().collect();
-                    shelf_data.sort_by(|a, b| b.0.cmp(&a.0)); // Newest first
+                    shelf_data.sort_by(|a, b| b.0.cmp(&a.0)); 
                     shelf_data.into_iter().map(|(_, id)| id).collect()
                 };
 
@@ -214,9 +261,11 @@ pub fn get_user_shelves(
                 // Fetch Shelf data for the paginated IDs
                 SHELVES.with(|shelves| {
                     let shelves_ref = shelves.borrow();
-                    let items: Vec<Shelf> = final_ids
+                    // Fetch internal Shelves, then convert to ShelfPublic
+                    let items: Vec<ShelfPublic> = final_ids
                         .iter()
-                        .filter_map(|id| shelves_ref.get(id))
+                        .filter_map(|id| shelves_ref.get(id).map(|s| s.clone()))
+                        .map(ShelfPublic::from)
                         .collect();
 
                     Ok(OffsetPaginatedResult {
@@ -234,7 +283,7 @@ pub fn get_user_shelves(
 #[ic_cdk::query]
 pub fn get_recent_shelves(
     pagination: CursorPaginationInput<u64>
-) -> QueryResult<CursorPaginatedResult<Shelf, u64>> {
+) -> QueryResult<CursorPaginatedResult<ShelfPublic, u64>> {
     let limit = pagination.get_limit();
     let limit_plus_one = limit + 1; // Fetch one extra to determine next_cursor
 
@@ -273,9 +322,10 @@ pub fn get_recent_shelves(
 
         SHELVES.with(|shelves| {
             let shelves_ref = shelves.borrow();
-            let items: Vec<Shelf> = shelf_ids
+            let items: Vec<ShelfPublic> = shelf_ids
                 .iter()
-                .filter_map(|id| shelves_ref.get(id))
+                .filter_map(|id| shelves_ref.get(id).map(|s| s.clone()))
+                .map(ShelfPublic::from)
                 .collect();
             
             Ok(CursorPaginatedResult {
@@ -294,7 +344,7 @@ pub fn get_shelf_position_metrics(shelf_id: ShelfId) -> Result<ShelfPositionMetr
     SHELVES.with(|shelves| {
         let shelves_map = shelves.borrow();
         
-        if let Some(shelf) = shelves_map.get(&shelf_id) {
+        if let Some(shelf) = shelves_map.get(&shelf_id).map(|s| s.clone()) {
             let position_count = shelf.item_positions.len();
             
             if position_count < 2 {
@@ -306,7 +356,7 @@ pub fn get_shelf_position_metrics(shelf_id: ShelfId) -> Result<ShelfPositionMetr
                 });
             }
             
-            let mut positions: Vec<f64> = shelf.item_positions.values().cloned().collect();
+            let mut positions: Vec<f64> = shelf.item_positions.iter_ordered().map(|(_, pos)| pos).collect();
             positions.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
             
             let mut min_gap = f64::MAX;
@@ -315,6 +365,7 @@ pub fn get_shelf_position_metrics(shelf_id: ShelfId) -> Result<ShelfPositionMetr
             
             for i in 1..positions.len() {
                 let gap = positions[i] - positions[i-1];
+                if gap < 0.0 { /* Handle potential floating point issue or ordering bug */ continue; }
                 min_gap = f64::min(min_gap, gap);
                 max_gap = f64::max(max_gap, gap);
                 sum_gap += gap;
@@ -540,14 +591,14 @@ pub fn get_tags_with_prefix(
 #[ic_cdk::query(guard = "not_anon")] // Add guard to prevent anonymous access
 pub fn get_followed_users_feed(
     pagination: CursorPaginationInput<u64>
-) -> QueryResult<CursorPaginatedResult<Shelf, u64>> {
+) -> QueryResult<CursorPaginatedResult<ShelfPublic, u64>> {
     let caller = ic_cdk::caller();
     let limit = pagination.get_limit();
     let limit_plus_one = limit + 1; // Fetch one extra for cursor logic
 
     // 1. Get the set of users the caller follows
     let followed_users_set = FOLLOWED_USERS.with(|followed| {
-        followed.borrow().get(&caller).unwrap_or_default()
+        followed.borrow().get(&caller).map(|ps| ps.clone()).unwrap_or_default()
     });
 
     // If the user follows no one, return empty result immediately
@@ -559,7 +610,7 @@ pub fn get_followed_users_feed(
         });
     }
 
-    let mut result_shelves: Vec<Shelf> = Vec::with_capacity(limit);
+    let mut result_shelves: Vec<ShelfPublic> = Vec::with_capacity(limit);
     let mut last_timestamp: Option<u64> = None;
     let mut items_fetched = 0;
 
@@ -594,7 +645,7 @@ pub fn get_followed_users_feed(
                  // 4. If owner is followed, try to fetch the full shelf
                  let maybe_shelf = SHELVES.with(|shelves| shelves.borrow().get(&shelf_id));
                  if let Some(shelf) = maybe_shelf {
-                    result_shelves.push(shelf.clone());
+                    result_shelves.push(ShelfPublic::from(shelf.clone()));
                     last_timestamp = Some(timestamp); // Track the timestamp of the last added item
                     items_fetched += 1;
 
@@ -631,14 +682,14 @@ pub fn get_followed_users_feed(
 #[ic_cdk::query(guard = "not_anon")] // Add guard
 pub fn get_followed_tags_feed(
     pagination: CursorPaginationInput<u64>
-) -> QueryResult<CursorPaginatedResult<Shelf, u64>> {
+) -> QueryResult<CursorPaginatedResult<ShelfPublic, u64>> {
     let caller = ic_cdk::caller();
     let limit = pagination.get_limit();
     let limit_plus_one = limit + 1;
 
     // 1. Get the set of tags the caller follows
     let followed_tags_set = FOLLOWED_TAGS.with(|followed| {
-        followed.borrow().get(&caller).unwrap_or_default()
+        followed.borrow().get(&caller).map(|nts| nts.clone()).unwrap_or_default()
     });
 
     // If the user follows no tags, return empty result immediately
@@ -650,7 +701,7 @@ pub fn get_followed_tags_feed(
         });
     }
 
-    let mut result_shelves: Vec<Shelf> = Vec::with_capacity(limit);
+    let mut result_shelves: Vec<ShelfPublic> = Vec::with_capacity(limit);
     let mut last_timestamp: Option<u64> = None;
     let mut items_fetched = 0;
 
@@ -684,7 +735,7 @@ pub fn get_followed_tags_feed(
                 // 4. If a tag matches, try to fetch the full shelf
                 let maybe_shelf = SHELVES.with(|shelves| shelves.borrow().get(&shelf_id));
                 if let Some(shelf) = maybe_shelf {
-                    result_shelves.push(shelf.clone());
+                    result_shelves.push(ShelfPublic::from(shelf.clone()));
                     last_timestamp = Some(timestamp); // Track timestamp of last added item
                     items_fetched += 1;
 
@@ -731,8 +782,9 @@ pub fn get_my_followed_tags() -> QueryResult<Vec<NormalizedTag>> {
     FOLLOWED_TAGS.with(|followed| {
         let map = followed.borrow();
         let tags = map.get(&caller)
-                     .map(|tag_set| tag_set.0.iter().cloned().collect()) // Clone tags from BTreeSet into Vec
-                     .unwrap_or_default(); // Return empty Vec if user not found or no tags followed
+                     .map(|nts| nts.clone())
+                     .map(|tag_set| tag_set.0.into_iter().collect())
+                     .unwrap_or_default();
         Ok(tags)
     })
 }

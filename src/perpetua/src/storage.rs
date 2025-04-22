@@ -6,7 +6,7 @@ use std::borrow::Cow;
 use std::cell::RefCell;
 use std::collections::BTreeSet;
 use std::collections::BTreeMap;
-use crate::ordering::{PositionedOrdering, get_ordered_by_position};
+use crate::ordering::PositionTracker; // Import the new tracker
 use crate::utils::normalize_tag; // Import the normalization function
 use crate::types::{TagPopularityKey, TagShelfAssociationKey}; // Import from new types module
 use sha2;
@@ -229,31 +229,89 @@ thread_local! {
     );
 }
 
-// Updated Shelf structure - use NormalizedTag
+// --- Serializable version of Shelf --- Must derive CandidType and Deserialize
 #[derive(CandidType, Deserialize, Clone, Debug)]
+struct ShelfSerializable {
+    shelf_id: ShelfId,
+    title: String,
+    description: Option<String>,
+    owner: Principal,
+    editors: Vec<Principal>,
+    items: BTreeMap<u32, Item>,
+    // Store positions as a Vec for serialization
+    item_positions: Vec<(u32, f64)>, 
+    created_at: u64,
+    updated_at: u64,
+    appears_in: Vec<ShelfId>,
+    tags: Vec<NormalizedTag>,
+    is_public: bool,
+}
+
+// --- Main Shelf struct using PositionTracker --- 
+// Does NOT derive CandidType/Deserialize directly because PositionTracker isn't Candid
+#[derive(/* Remove CandidType, Deserialize here */ Clone, Debug)] 
 pub struct Shelf {
     pub shelf_id: ShelfId,
     pub title: String,
     pub description: Option<String>,
     pub owner: Principal,
-    pub editors: Vec<Principal>,      // List of principals with edit access
-    pub items: BTreeMap<u32, Item>,      // Items stored by ID
-    pub item_positions: BTreeMap<u32, f64>, // Map: item_id -> position number
+    pub editors: Vec<Principal>,      
+    pub items: BTreeMap<u32, Item>,      
+    // Use PositionTracker now
+    pub item_positions: PositionTracker<u32>, 
     pub created_at: u64,
     pub updated_at: u64,
-    pub appears_in: Vec<ShelfId>,         // List of shelf IDs that appear in this shelf
-    pub tags: Vec<NormalizedTag>,         // Use NormalizedTag
-    pub is_public: bool,                  // Flag to indicate if shelf is publicly editable
+    pub appears_in: Vec<ShelfId>,         
+    pub tags: Vec<NormalizedTag>,         
+    pub is_public: bool,                  
 }
 
-// Updated Storable implementation using Unbounded size
+// --- Manual Storable implementation for Shelf --- Needs Encode/Decode
 impl Storable for Shelf {
     fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
+        let serializable = ShelfSerializable {
+            shelf_id: self.shelf_id.clone(),
+            title: self.title.clone(),
+            description: self.description.clone(),
+            owner: self.owner.clone(),
+            editors: self.editors.clone(),
+            items: self.items.clone(),
+            // Convert tracker to Vec for serialization
+            item_positions: self.item_positions.get_ordered_entries(), 
+            created_at: self.created_at,
+            updated_at: self.updated_at,
+            appears_in: self.appears_in.clone(),
+            tags: self.tags.clone(),
+            is_public: self.is_public,
+        };
+        // Use Encode! from candid library
+        Cow::Owned(Encode!(&serializable).expect("Failed to encode ShelfSerializable"))
     }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
+        // Use Decode! from candid library
+        let serializable: ShelfSerializable = Decode!(bytes.as_ref(), ShelfSerializable).expect("Failed to decode ShelfSerializable");
+        
+        // Rebuild PositionTracker from Vec
+        let mut item_positions = PositionTracker::<u32>::new();
+        for (key, pos) in serializable.item_positions {
+            item_positions.insert(key, pos);
+        }
+
+        Self {
+            shelf_id: serializable.shelf_id,
+            title: serializable.title,
+            description: serializable.description,
+            owner: serializable.owner,
+            editors: serializable.editors,
+            items: serializable.items,
+            item_positions, // Assign the rebuilt tracker
+            created_at: serializable.created_at,
+            updated_at: serializable.updated_at,
+            appears_in: serializable.appears_in,
+            tags: serializable.tags,
+            is_public: serializable.is_public,
+        }
     }
 
     const BOUND: Bound = Bound::Unbounded;
@@ -295,14 +353,50 @@ impl Storable for TimestampedShelves {
     const BOUND: Bound = Bound::Unbounded;
 }
 
-impl Storable for UserProfileOrder {
-    fn to_bytes(&self) -> Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
-    }
+// --- Serializable version of UserProfileOrder --- Must derive CandidType and Deserialize
+#[derive(CandidType, Deserialize, Clone, Debug, Default)]
+struct UserProfileOrderSerializable {
+    // Store positions as a Vec for serialization
+    shelf_positions: Vec<(ShelfId, f64)>,
+    is_customized: bool,
+}
 
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
-    }
+// --- Main UserProfileOrder struct using PositionTracker ---
+// Does NOT derive CandidType/Deserialize directly
+#[derive(/* Remove CandidType, Deserialize here */ Clone, Debug, Default)]
+pub struct UserProfileOrder {
+    // Use PositionTracker now
+    pub shelf_positions: PositionTracker<ShelfId>,
+    pub is_customized: bool,
+}
+
+// --- Manual Storable implementation for UserProfileOrder --- Needs Encode/Decode
+impl Storable for UserProfileOrder {
+     fn to_bytes(&self) -> Cow<[u8]> {
+        let serializable = UserProfileOrderSerializable {
+            // Convert tracker to Vec for serialization
+             shelf_positions: self.shelf_positions.get_ordered_entries(),
+             is_customized: self.is_customized,
+         };
+         // Use Encode! from candid library
+         Cow::Owned(Encode!(&serializable).expect("Failed to encode UserProfileOrderSerializable"))
+     }
+
+     fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        // Use Decode! from candid library
+         let serializable: UserProfileOrderSerializable = Decode!(bytes.as_ref(), UserProfileOrderSerializable).expect("Failed to decode UserProfileOrderSerializable");
+        
+         // Rebuild PositionTracker from Vec
+         let mut shelf_positions = PositionTracker::<ShelfId>::new();
+         for (key, pos) in serializable.shelf_positions {
+             shelf_positions.insert(key, pos);
+         }
+
+         Self {
+             shelf_positions, // Assign the rebuilt tracker
+             is_customized: serializable.is_customized,
+         }
+     }
 
     const BOUND: Bound = Bound::Unbounded;
 }
@@ -321,12 +415,13 @@ impl Shelf {
             owner,
             editors: Vec::new(),
             items: BTreeMap::new(),
-            item_positions: BTreeMap::new(),
+            // Initialize PositionTracker
+            item_positions: PositionTracker::new(), 
             created_at: now,
             updated_at: now,
             appears_in: Vec::new(),
-            tags: Vec::new(), // Initialize with empty Vec<NormalizedTag>
-            is_public: false, // Default to private
+            tags: Vec::new(), 
+            is_public: false, 
         }
     }
 
@@ -350,7 +445,8 @@ impl Shelf {
     }
 
     pub fn insert_item(&mut self, item: Item) -> Result<(), String> {
-        if self.items.len() >= MAX_ITEMS_PER_SHELF {
+        if self.item_positions.len() >= MAX_ITEMS_PER_SHELF {
+            // Check length using tracker now
             return Err(format!("Maximum item limit reached ({})", MAX_ITEMS_PER_SHELF));
         }
 
@@ -372,123 +468,86 @@ impl Shelf {
                  // TODO: Add more specific Markdown validation if needed (e.g., disallowed tags, structure)
             }
             ItemContent::Shelf(nested_shelf_id) => {
-                 // Check for direct self-reference
                 if nested_shelf_id == &self.shelf_id {
                     return Err("Circular reference: A shelf cannot contain itself".to_string());
                 }
-                // Check for deeper circular references (potentially expensive, consider optimizing if needed)
-                // This implicitly checks if the nested shelf exists during the lookup within has_circular_reference.
-                if self.has_circular_reference(nested_shelf_id) {
-                    return Err("Circular reference detected in shelf hierarchy".to_string());
+                let nested_contains_self = SHELVES.with(|shelves_map| {
+                    shelves_map.borrow().get(nested_shelf_id).map_or(false, |nested_shelf| {
+                        // Check items map of nested shelf
+                        nested_shelf.items.values().any(|nested_item| {
+                            matches!(&nested_item.content, ItemContent::Shelf(id_in_nested) if id_in_nested == &self.shelf_id)
+                        })
+                    })
+                });
+                if nested_contains_self {
+                    return Err(format!(
+                        "Circular reference detected: Shelf '{}' already contains shelf '{}'",
+                        nested_shelf_id, self.shelf_id
+                    ));
                 }
-                // NOTE: Explicit Shelf existence check happens in the update::item::add_item_to_shelf function
             }
         }
 
         // --- Proceed with Insertion ---
         let item_id = item.id;
 
-        // Calculate position at the end using the shared abstraction (now mutable)
+        // Calculate position at the end using PositionTracker
         // Pass SHELF_ITEM_STEP_SIZE as default step
-        let new_position = self.item_positions.calculate_position(None, false, SHELF_ITEM_STEP_SIZE)?;
+        let new_position = self.item_positions.calculate_position(
+            None, // No reference key means add to end (implicitly)
+            false, // 'after' flag when no reference means end
+            SHELF_ITEM_STEP_SIZE
+        )?;
 
-        // Update the float position
+        // Insert into PositionTracker
         self.item_positions.insert(item_id, new_position);
 
-        // Store the item without a position field
+        // Store the item itself
         self.items.insert(item_id, item);
 
         Ok(())
     }
 
-    // Helper method to check for circular references in the shelf hierarchy
-    fn has_circular_reference(&self, shelf_id: &str) -> bool {
-        // Track visited shelves to avoid redundant lookups
-        let mut visited = BTreeSet::new();
-        visited.insert(self.shelf_id.clone());
-        
-        // Use a stack-based approach rather than recursion
-        let mut stack = Vec::new();
-        
-        // Initialize stack with all immediate children (shelf items)
-        for item in self.items.values() {
-            if let ItemContent::Shelf(nested_id) = &item.content {
-                if nested_id == shelf_id {
-                    return true; // Direct circular reference
-                }
-                stack.push(nested_id.clone());
-            }
-        }
-        
-        // Stack-based traversal of the hierarchy
-        while let Some(current_id) = stack.pop() {
-            // Skip if already visited
-            if !visited.insert(current_id.clone()) {
-                continue;
-            }
-            
-            // If current shelf is the one we're checking, we found a circular reference
-            if current_id == shelf_id {
-                return true;
-            }
-            
-            // Check all children of the current shelf
-            let found_circular = SHELVES.with(|shelves| {
-                let shelves_map = shelves.borrow();
-                if let Some(nested_shelf) = shelves_map.get(&current_id) {
-                    // Add all shelf items to stack for processing
-                    for item in nested_shelf.items.values() {
-                        if let ItemContent::Shelf(next_id) = &item.content {
-                            if next_id == shelf_id {
-                                return true; // Found circular reference
-                            }
-                            stack.push(next_id.clone());
-                        }
-                    }
-                }
-                false
-            });
-            
-            if found_circular {
-                return true;
-            }
-        }
-        
-        false
-    }
-
     pub fn move_item(&mut self, item_id: u32, reference_item_id: Option<u32>, before: bool) -> Result<(), String> {
-        // First verify the item exists
-        if !self.items.contains_key(&item_id) {
-            return Err("Item not found".to_string());
+        // Verify the item exists using the tracker's contains_key method
+        if !self.item_positions.contains_key(&item_id) {
+             // Check items map as well for consistency
+             if self.items.contains_key(&item_id) {
+                  ic_cdk::println!("ERROR: Item {} found in items map but not in position tracker for shelf {}", item_id, self.shelf_id);
+                  return Err("Internal state inconsistency: Item position missing".to_string());
+             }
+             return Err("Item not found".to_string());
+        }
+        // Verify reference item exists in the tracker if provided
+        if let Some(ref_id) = reference_item_id {
+             if !self.item_positions.contains_key(&ref_id) {
+                 return Err("Reference item not found".to_string());
+             }
         }
 
-        // Calculate new position using the shared abstraction (now mutable)
-        // Pass SHELF_ITEM_STEP_SIZE as default step
+        // Calculate new position using PositionTracker
         let new_position = self.item_positions.calculate_position(
-            reference_item_id.as_ref(), 
+            reference_item_id.as_ref(), // Pass Option<&u32> directly
             before, 
             SHELF_ITEM_STEP_SIZE
         )?;
 
-        // Update the float position
+        // Update the position in the tracker (insert handles update)
         self.item_positions.insert(item_id, new_position);
         
         Ok(())
     }
 
+    /// Gets items in the order defined by item_positions
     pub fn get_ordered_items(&self) -> Vec<Item> {
-        // Use the shared helper function for ordering
-        get_ordered_by_position(&self.items, &self.item_positions)
+        self.item_positions
+            .iter_keys_ordered() // Get keys (item IDs) in position order O(N)
+            .filter_map(|item_id| self.items.get(item_id).cloned()) // Fetch and clone items O(N * log N)
+            .collect() // O(N)
     }
     
-    // Rebalances all item positions to be evenly distributed
+    /// Rebalances all item positions using PositionTracker
     pub fn rebalance_positions(&mut self) {
-        if self.items.is_empty() {
-            return;
-        }
-        
-        // Use the shared implementation for rebalancing
         self.item_positions.rebalance_positions(SHELF_ITEM_STEP_SIZE);
     }
 }
@@ -582,13 +641,6 @@ pub async fn create_shelf(
     // using the dedicated add_tag_to_shelf update method
     
     Ok(shelf)
-}
-
-// Structure for tracking custom shelf order in user profiles (Keep as is)
-#[derive(Clone, Debug, Default, CandidType, Deserialize)]
-pub struct UserProfileOrder {
-    pub shelf_positions: BTreeMap<ShelfId, f64>,
-    pub is_customized: bool,
 }
 
 // --- Wrapper Structs for Storable Collections for Follows ---

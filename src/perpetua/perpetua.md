@@ -140,6 +140,7 @@ Minor Frontend Stuff:
 - Shelves actually have a 10 tag max in the backend. Should we change this? (and 50 chars)
 - Max 500 items per shelf.
 - 10k markdown chars.
+- In storage.rs there's a check that won't let you add a shelf to a shelf that already has that shelf. Need to make sure that operation is clear to the user when attempted and fails.
 
 
 
@@ -149,6 +150,7 @@ Backend Stuff:
 - Download personal data as a csv.
   - This way we could use this function to do it manually at various times.
 - Feed: 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
+
 
 
 
@@ -207,39 +209,11 @@ git show --patch 3600406077dace006a518893b41666a2ab535195
 
 ## Performance Optimizations
 
-1. **Review circular reference detection algorithm for efficiency**
-   - The current implementation in `Shelf::has_circular_reference` may cause excessive SHELVES lookups.
-
-2. **Batch update operations when possible**
-   - Group related updates to reduce the number of stable storage operations.
-
-3. **Implement more efficient popularity-based ordering**
-   - Current implementation in `reorder_shelves_by_popularity` rebuilds the entire ordering.
-
-4. **Review position rebalancing thresholds**
+1. **Review position rebalancing thresholds**
    - Current thresholds may trigger rebalancing too frequently with large shelves.
 
-5. **Optimize tag prefix indexing**
-   - Consider more efficient data structures for prefix search operations.
-
-6. **Cache frequently accessed shelves**
-   - Implement a short-lived in-memory cache for frequently accessed shelves.
-
-7. **Use binary serialization instead of Candid for stable storage**
-   - Consider optimizing serialization format for Shelf structures.
-
-8. **Optimize ordering operations for large collections**
+2. **Optimize ordering operations for large collections**
    - The ordering logic may be inefficient for shelves with hundreds of items.
-
-9. **Minimize cloning of large data structures**
-   - Many operations clone the entire Shelf structure unnecessarily.
-
-10. **Use more granular data structures**
-    - Split large Shelf objects into components that can be updated independently.
-
-
-
-
 
 
 
@@ -253,7 +227,7 @@ git show --patch 3600406077dace006a518893b41666a2ab535195
 
 
 # Required Tests
-
+f
 - Do thousands of shelf and item reorderings and see what the limits are at.
 
 

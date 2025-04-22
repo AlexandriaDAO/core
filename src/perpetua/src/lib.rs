@@ -70,5 +70,3 @@ fn init() {
 }
 
 ic_cdk::export_candid!();
-
-

@@ -105,44 +105,46 @@ pub fn remove_tag_from_shelf(input: TagOperationInput) -> Result<(), String> {
 /// Encapsulates index updates when a tag is ADDED to a shelf.
 fn _update_tag_indices_on_add(shelf_id: &ShelfId, tag: &NormalizedTag, now: u64) -> Result<(), String> {
     
-    // Association Indices - Use Wrappers
+    // --- Read Phase ---
+    let mut metadata = TAG_METADATA.with(|map| map.borrow().get(tag)).unwrap_or_default();
+    let old_count = metadata.current_shelf_count;
+    let orphan_timestamp_key = metadata.last_association_timestamp; // Needed for orphan removal
+
+    // --- Compute Phase ---
+    let is_first_association = old_count == 0;
+    metadata.current_shelf_count += 1;
+    metadata.last_association_timestamp = now;
+    metadata.last_active_timestamp = now;
+    if is_first_association {
+        metadata.first_seen_timestamp = now;
+    }
+    let new_count = metadata.current_shelf_count;
+
+    // Prepare keys
     let ts_key = TagShelfAssociationKey(tag.clone(), shelf_id.clone());
     let st_key = ShelfTagAssociationKey(shelf_id.clone(), tag.clone());
+    let old_pop_key = if old_count > 0 { Some(TagPopularityKey(old_count, tag.clone())) } else { None };
+    let new_pop_key = TagPopularityKey(new_count, tag.clone());
+
+    // --- Write Phase ---
     TAG_SHELF_ASSOCIATIONS.with(|map| map.borrow_mut().insert(ts_key, ()));
     SHELF_TAG_ASSOCIATIONS.with(|map| map.borrow_mut().insert(st_key, ()));
+    TAG_METADATA.with(|map| map.borrow_mut().insert(tag.clone(), metadata));
 
-    // Metadata & Popularity Update
-    TAG_METADATA.with(|map| {
-        let mut meta_map = map.borrow_mut();
-        let mut metadata = meta_map.get(tag).unwrap_or_default();
-        let old_count = metadata.current_shelf_count;
-
-        // Update metadata
-        if old_count == 0 { // First time seeing this tag on *any* shelf
-            metadata.first_seen_timestamp = now;
-            TAG_LEXICAL_INDEX.with(|lex| lex.borrow_mut().insert(tag.clone(), ())); // Add to lexical index
+    TAG_POPULARITY_INDEX.with(|pop| {
+        let mut pop_map = pop.borrow_mut();
+        if let Some(key) = old_pop_key {
+            pop_map.remove(&key);
         }
-        metadata.current_shelf_count += 1;
-        metadata.last_association_timestamp = now;
-        metadata.last_active_timestamp = now; // Update last active time
-
-        // Remove old popularity entry if it exists
-        if old_count > 0 {
-            let old_pop_key = TagPopularityKey(old_count, tag.clone());
-            TAG_POPULARITY_INDEX.with(|pop| pop.borrow_mut().remove(&old_pop_key));
-        }
-        
-        // Insert new popularity entry
-        let new_count = metadata.current_shelf_count;
-        let new_pop_key = TagPopularityKey(new_count, tag.clone());
-        TAG_POPULARITY_INDEX.with(|pop| pop.borrow_mut().insert(new_pop_key, ()));
-
-        // Remove from potential orphans if it was there
-        _remove_from_orphan_candidates(tag, metadata.last_association_timestamp); 
-
-        // Save metadata
-        meta_map.insert(tag.clone(), metadata);
+        pop_map.insert(new_pop_key, ());
     });
+
+    if is_first_association {
+        TAG_LEXICAL_INDEX.with(|lex| lex.borrow_mut().insert(tag.clone(), ()));
+    }
+
+    // Remove from potential orphans using the timestamp read earlier
+    _remove_from_orphan_candidates(tag, orphan_timestamp_key);
 
     Ok(())
 }
@@ -150,54 +152,59 @@ fn _update_tag_indices_on_add(shelf_id: &ShelfId, tag: &NormalizedTag, now: u64)
 /// Encapsulates index updates when a tag is REMOVED from a shelf.
 fn _update_tag_indices_on_remove(shelf_id: &ShelfId, tag: &NormalizedTag, now: u64) -> Result<(), String> {
 
-    // Association Indices - Use Wrappers
-    let ts_key = TagShelfAssociationKey(tag.clone(), shelf_id.clone());
-    let st_key = ShelfTagAssociationKey(shelf_id.clone(), tag.clone());
-    TAG_SHELF_ASSOCIATIONS.with(|map| map.borrow_mut().remove(&ts_key));
-    SHELF_TAG_ASSOCIATIONS.with(|map| map.borrow_mut().remove(&st_key));
+    // --- Read Phase ---
+    let metadata_opt = TAG_METADATA.with(|map| map.borrow().get(tag));
 
-    // Metadata & Popularity Update
-    TAG_METADATA.with(|map| {
-        let mut meta_map = map.borrow_mut();
-        if let Some(mut metadata) = meta_map.get(tag) {
-            let old_count = metadata.current_shelf_count;
-            
-            // Ensure count doesn't go below zero (shouldn't happen with correct logic)
-            if old_count == 0 { 
-                 ic_cdk::trap("Tag count inconsistency detected during removal.");
-            }
-
-            // Update metadata
-            metadata.current_shelf_count -= 1;
-            metadata.last_active_timestamp = now; // Update last active time
-            let new_count = metadata.current_shelf_count;
-
-            // Update popularity index
-            let old_pop_key = TagPopularityKey(old_count, tag.clone());
-            TAG_POPULARITY_INDEX.with(|pop| {
-                 let mut pop_map = pop.borrow_mut();
-                 pop_map.remove(&old_pop_key); // Remove old
-                 if new_count > 0 {
-                     let new_pop_key = TagPopularityKey(new_count, tag.clone());
-                     pop_map.insert(new_pop_key, ()); // Add new if still > 0
-                 }
-             });
-
-            // If count is now zero, add to orphan candidates
-            if new_count == 0 {
-                metadata.last_association_timestamp = now; // Record when it became orphaned
-                 _add_to_orphan_candidates(tag, metadata.last_association_timestamp);
-            }
-            
-            // Save updated metadata
-            meta_map.insert(tag.clone(), metadata);
-
-        } else {
-            // This case implies the tag metadata didn't exist, which suggests an inconsistency.
-            // Depending on desired robustness, could log an error or trap.
-             ic_cdk::println!("Warning: Attempted to remove tag '{}' which has no metadata.", tag);
+    // --- Compute & Write Phase ---
+    if let Some(mut metadata) = metadata_opt {
+        let old_count = metadata.current_shelf_count;
+        
+        if old_count == 0 { 
+            ic_cdk::trap("Tag count inconsistency detected during removal.");
         }
-    });
+
+        // Compute changes
+        metadata.current_shelf_count -= 1;
+        metadata.last_active_timestamp = now;
+        let new_count = metadata.current_shelf_count;
+        let becomes_orphan = new_count == 0;
+        if becomes_orphan {
+            metadata.last_association_timestamp = now; // Record orphan time
+        }
+
+        // Prepare keys
+        let ts_key = TagShelfAssociationKey(tag.clone(), shelf_id.clone());
+        let st_key = ShelfTagAssociationKey(shelf_id.clone(), tag.clone());
+        let old_pop_key = TagPopularityKey(old_count, tag.clone());
+        let new_pop_key = if new_count > 0 { Some(TagPopularityKey(new_count, tag.clone())) } else { None };
+        let orphan_timestamp = metadata.last_association_timestamp; // Get timestamp before saving metadata
+
+        // Write changes
+        TAG_SHELF_ASSOCIATIONS.with(|map| map.borrow_mut().remove(&ts_key));
+        SHELF_TAG_ASSOCIATIONS.with(|map| map.borrow_mut().remove(&st_key));
+        TAG_METADATA.with(|map| map.borrow_mut().insert(tag.clone(), metadata));
+
+        TAG_POPULARITY_INDEX.with(|pop| {
+            let mut pop_map = pop.borrow_mut();
+            pop_map.remove(&old_pop_key);
+            if let Some(key) = new_pop_key {
+                pop_map.insert(key, ());
+            }
+        });
+
+        if becomes_orphan {
+            _add_to_orphan_candidates(tag, orphan_timestamp);
+        }
+
+    } else {
+        // Tag metadata didn't exist, log warning but don't trap.
+        // Still try to remove associations just in case they exist.
+        ic_cdk::println!("Warning: Attempted to remove tag '{}' which has no metadata. Removing associations anyway.", tag);
+        let ts_key = TagShelfAssociationKey(tag.clone(), shelf_id.clone());
+        let st_key = ShelfTagAssociationKey(shelf_id.clone(), tag.clone());
+        TAG_SHELF_ASSOCIATIONS.with(|map| map.borrow_mut().remove(&ts_key));
+        SHELF_TAG_ASSOCIATIONS.with(|map| map.borrow_mut().remove(&st_key));
+    }
 
     Ok(())
 }
