@@ -1,4 +1,4 @@
-import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { NormalizedShelf } from "../state/perpetuaSlice";
 
 /**
@@ -7,7 +7,7 @@ import { NormalizedShelf } from "../state/perpetuaSlice";
 
 // Shelf card display types
 export interface ShelfCardProps {
-  shelf: Shelf;
+  shelf: ShelfPublic;
   onViewShelf?: (shelfId: string) => void;
   showOwner?: boolean;
   isReordering?: boolean;
@@ -16,7 +16,7 @@ export interface ShelfCardProps {
 }
 
 export interface PublicShelfCardProps {
-  shelf: Shelf;
+  shelf: ShelfPublic;
   onViewShelf?: (shelfId: string) => void;
   isReordering?: boolean;
   parentShelfId?: string;
@@ -25,21 +25,21 @@ export interface PublicShelfCardProps {
 
 // Shelf UI containers
 export interface LibraryShelvesUIProps {
-  shelves: Shelf[];
+  shelves: ShelfPublic[];
   loading: boolean;
   onNewShelf: () => void;
   onViewShelf: (shelfId: string) => void;
 }
 
 export interface ExploreShelvesUIProps {
-  shelves: Shelf[];
+  shelves: ShelfPublic[];
   loading: boolean;
   onViewShelf: (shelfId: string) => void;
   onLoadMore: () => Promise<void>;
 }
 
 export interface UserShelvesUIProps {
-  shelves: Shelf[];
+  shelves: ShelfPublic[];
   loading: boolean;
   onViewShelf: (shelfId: string) => void;
   onViewOwner?: (ownerId: string) => void;
@@ -57,13 +57,13 @@ export interface ShelfManagerProps {
 }
 
 export interface ShelfOptionProps {
-  shelf: Shelf | NormalizedShelf;
+  shelf: ShelfPublic | NormalizedShelf;
   isSelected: boolean;
   onSelect: (shelfId: string) => void;
 }
 
 export interface ShelfContentProps {
-  shelves: (Shelf | NormalizedShelf)[];
+  shelves: (ShelfPublic | NormalizedShelf)[];
   selectedShelfId: string | null;
   onSelectShelf: (shelfId: string) => void;
   searchTerm: string;

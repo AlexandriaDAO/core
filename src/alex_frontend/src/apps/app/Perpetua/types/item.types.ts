@@ -1,18 +1,18 @@
-import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic, Item } from "@/../../declarations/perpetua/perpetua.did";
 import React from 'react';
 
-/**
+/** 
  * Core item-related types for the Perpetua app
  */
 
 export interface ShelfDetailViewProps {
-  shelf: Shelf;
+  shelf: ShelfPublic;
   orderedItems: [number, Item][];
   isEditMode: boolean;
   editedItems: [number, Item][];
   hasEditAccess: boolean;
   onBack?: () => void;
-  onAddItem?: (shelf: Shelf) => void;
+  onAddItem?: (shelf: ShelfPublic) => void;
   onViewItem?: (itemId: number) => void;
   onEnterEditMode: () => void;
   onCancelEditMode: () => void;

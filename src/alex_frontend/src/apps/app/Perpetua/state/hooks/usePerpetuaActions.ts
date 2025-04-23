@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux';
 import { Principal } from '@dfinity/principal';
-import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
+import { ShelfPublic } from '@/../../declarations/perpetua/perpetua.did';
 import { AppDispatch } from '@/store';
 
 // Import slice actions
@@ -43,7 +43,7 @@ export const usePerpetuaActions = () => {
 
   return {
     // Shelf selection and navigation
-    selectShelf: (shelf: Shelf | string | null) => 
+    selectShelf: (shelf: ShelfPublic | string | null) => 
       dispatch(setSelectedShelf(shelf)),
     
     // Permission management
@@ -82,7 +82,7 @@ export const usePerpetuaActions = () => {
     
     // Item management
     addItem: (params: { 
-      shelf: Shelf, 
+      shelf: ShelfPublic, 
       content: string, 
       type: "Nft" | "Markdown" | "Shelf",
       principal: Principal | string,

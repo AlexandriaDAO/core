@@ -15,9 +15,10 @@ import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import type { Transaction } from '../../shared/types/queries';
 import { TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
-import { useAddToShelf } from '@/apps/app/Perpetua/features/shelf-management/hooks/useAddToShelf';
 import { useIdentity } from '@/hooks/useIdentity';
 import { loadShelves } from '@/apps/app/Perpetua/state';
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { selectUserShelves, selectLoading } from "@/apps/app/Perpetua/state/perpetuaSlice";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -37,22 +38,18 @@ type ContentGridComponent = React.FC<ContentGridProps> & {
 const ShelvesPreloader: React.FC = () => {
   const dispatch = useAppDispatch();
   const { identity } = useIdentity();
-  const { 
-    getEditableShelves, 
-    shelvesLoading 
-  } = useAddToShelf();
-  
+  const shelvesLoading = useAppSelector(selectLoading);
+  const availableShelves = useAppSelector(selectUserShelves);
+
   useEffect(() => {
-    // Only load shelves if the user is logged in and we're not currently loading
-    const shelves = getEditableShelves();
-    if (identity && shelves.length === 0 && !shelvesLoading) {
-      dispatch(loadShelves({ 
-        principal: identity.getPrincipal(), 
+    if (identity && !shelvesLoading && availableShelves.length === 0) {
+      dispatch(loadShelves({
+        principal: identity.getPrincipal(),
         params: { offset: 0, limit: 20 }
       }));
     }
-  }, [identity, getEditableShelves, shelvesLoading, dispatch]);
-  
+  }, [identity, dispatch]);
+
   // This component doesn't render anything
   return null;
 };
@@ -84,37 +81,11 @@ interface GridProps {
 const Grid = ({ dataSource }: GridProps = {}) => {
   const dispatch = useAppDispatch();
 
-  // Preload shelves at component mount time
-  useEffect(() => {
-    const preloadShelves = async () => {
-      const { useIdentity } = await import('@/hooks/useIdentity');
-      const { loadShelves } = await import('@/apps/app/Perpetua/state');
-      
-      const identity = useIdentity();
-      if (identity && identity.identity) {
-        dispatch(loadShelves({ 
-          principal: identity.identity.getPrincipal(), 
-          params: { offset: 0, limit: 20 }
-        }));
-      }
-    };
-    
-    // Preload shelves in the background
-    preloadShelves().catch(console.error);
-  }, [dispatch]);
-
   // Select the appropriate state based on the determined data source
-  const { contentData } = useSelector((state: RootState) => {
-    // Always use the new unified transactions state
-    return {
-      contentData: state.transactions.contentData,
-    };
-  });
+  const contentData = useSelector((state: RootState) => state.transactions.contentData);
 
   // Fetch raw transactions for use in the dialog content
-  const { transactions } = useSelector((state: RootState) => ({
-    transactions: state.transactions.transactions
-  }));
+  const transactions = useSelector((state: RootState) => state.transactions.transactions);
 
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);

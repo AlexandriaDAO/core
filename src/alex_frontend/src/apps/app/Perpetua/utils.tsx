@@ -1,5 +1,5 @@
 import React from "react";
-import { Item, Shelf, ItemContent } from "@/../../declarations/perpetua/perpetua.did";
+import { Item, ShelfPublic, ItemContent } from "@/../../declarations/perpetua/perpetua.did";
 import { Button } from "@/lib/components/button";
 import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { Principal } from '@dfinity/principal';
@@ -19,8 +19,8 @@ export const toPrincipal = (principal: Principal | string): Principal => {
  * Creates a function to find a item by its ID across multiple shelves
  * Supports both Shelf and NormalizedShelf types
  */
-export const createFindItemById = (shelves: (Shelf | NormalizedShelf)[]) => 
-	(itemId: number): { item: Item; shelf: Shelf | NormalizedShelf; itemKey: number } | null => {
+export const createFindItemById = (shelves: (ShelfPublic | NormalizedShelf)[]) => 
+	(itemId: number): { item: Item; shelf: ShelfPublic | NormalizedShelf; itemKey: number } | null => {
 		for (const shelf of shelves) {
 			for (const [key, itemEntry] of Object.entries(shelf.items)) {
 				const [itemKey, item] = itemEntry as [number, Item];
@@ -36,7 +36,7 @@ export const createFindItemById = (shelves: (Shelf | NormalizedShelf)[]) =>
  * Creates a function to find a item by its ID within a single shelf
  * Supports both Shelf and NormalizedShelf types
  */
-export const createFindItemInShelf = (shelf: Shelf | NormalizedShelf) => 
+export const createFindItemInShelf = (shelf: ShelfPublic | NormalizedShelf) => 
 	(itemId: number): Item | null => {
 		for (const [key, itemEntry] of Object.entries(shelf.items)) {
 			const [itemKey, item] = itemEntry as [number, Item];

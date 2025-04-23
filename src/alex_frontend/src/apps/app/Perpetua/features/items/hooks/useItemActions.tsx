@@ -5,7 +5,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { selectUserShelves, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { toast } from "sonner";
 import { Principal } from "@dfinity/principal";
-import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 
 /**
  * Hook for item management actions in Perpetua
@@ -21,11 +21,11 @@ export const useItemActions = () => {
   /**
    * Convert a NormalizedShelf back to a Shelf for API calls
    */
-  const denormalizeShelf = useCallback((normalizedShelf: NormalizedShelf): Shelf => {
+  const denormalizeShelf = useCallback((normalizedShelf: NormalizedShelf): ShelfPublic => {
     return {
       ...normalizedShelf,
       owner: Principal.fromText(normalizedShelf.owner)
-    } as Shelf;
+    } as ShelfPublic;
   }, []);
 
   /**

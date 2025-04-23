@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useIdentity } from "@/hooks/useIdentity";
-import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -26,9 +26,9 @@ import { ReorderRenderProps } from "../../../types/reordering.types";
  * - The ShelfDetailView handles the visual representation without business logic
  */
 export interface ShelfDetailProps {
-	shelf: Shelf;
+	shelf: ShelfPublic;
 	onBack: () => void;
-	onAddItem?: (shelf: Shelf) => void;
+	onAddItem?: (shelf: ShelfPublic	) => void;
 	onReorderItem?: (shelfId: string, itemId: number, referenceItemId: number | null, before: boolean) => Promise<void>;
 	hasEditAccess?: boolean;
 }

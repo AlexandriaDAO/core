@@ -1,4 +1,4 @@
-import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic, Item } from "@/../../declarations/perpetua/perpetua.did";
 import React from 'react';
 
 /**
@@ -28,7 +28,7 @@ export interface ReorderParams {
  * Props for useItemReordering hook
  */
 export interface UseItemReorderingProps {
-  shelf: Shelf;
+  shelf: ShelfPublic;
   items: [number, Item][];
   hasEditAccess: boolean;
 }
@@ -37,7 +37,7 @@ export interface UseItemReorderingProps {
  * Props for useShelfReordering hook
  */
 export interface UseShelfReorderingProps {
-  shelves: Shelf[];
+  shelves: ShelfPublic[];
   hasEditAccess: boolean;
 }
 
@@ -45,7 +45,7 @@ export interface UseShelfReorderingProps {
  * Props for ItemReorderManager component
  */
 export interface ItemReorderManagerProps {
-  shelf: Shelf;
+  shelf: ShelfPublic;
   orderedItems: [number, Item][];
   hasEditAccess: boolean;
   children: (props: ReorderRenderProps) => React.ReactNode;

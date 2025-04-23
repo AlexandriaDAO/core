@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, createSelector, createAction, AsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '@/store';
-import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
+import { ShelfPublic } from '@/../../declarations/perpetua/perpetua.did';
 import { 
   loadShelves, 
   loadRecentShelves,
@@ -67,7 +67,7 @@ export interface ContentPermissions {
 }
 
 // Normalized shelf interface - Export this type
-export interface NormalizedShelf extends Omit<Shelf, 'owner'> {
+export interface NormalizedShelf extends Omit<ShelfPublic, 'owner'> {
   owner: string; // Always store owner as string for consistency
   is_public: boolean; // Add is_public field to match the backend
 }
@@ -144,7 +144,7 @@ const initialState: PerpetuaState = {
 };
 
 // Utility function to normalize a shelf
-const normalizeShelf = (shelf: Shelf): NormalizedShelf => {
+const normalizeShelf = (shelf: ShelfPublic): NormalizedShelf => {
   return {
     ...shelf,
     owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString(),
@@ -153,7 +153,7 @@ const normalizeShelf = (shelf: Shelf): NormalizedShelf => {
 };
 
 // Utility function to normalize multiple shelves and return entities and ids
-const normalizeShelves = (shelves: Shelf[]): { 
+const normalizeShelves = (shelves: ShelfPublic[]): { 
   entities: Record<string, NormalizedShelf>; 
   ids: string[];
 } => {
@@ -175,7 +175,7 @@ const perpetuaSlice = createSlice({
   name: 'perpetua',
   initialState,
   reducers: {
-    setSelectedShelf: (state, action: PayloadAction<Shelf | string | null>) => {
+    setSelectedShelf: (state, action: PayloadAction<ShelfPublic | string | null>) => {
       if (action.payload === null) {
         state.selectedShelfId = null;
         return;
@@ -212,7 +212,7 @@ const perpetuaSlice = createSlice({
       state.error = null;
     },
     // Update a single shelf in the normalized store
-    updateSingleShelf: (state, action: PayloadAction<Shelf>) => {
+    updateSingleShelf: (state, action: PayloadAction<ShelfPublic>) => {
       const shelf = normalizeShelf(action.payload);
       const shelfId = shelf.shelf_id;
       
@@ -254,7 +254,7 @@ const perpetuaSlice = createSlice({
         state.loading.userShelves = true;
         state.error = null;
       })
-      .addCase(loadShelves.fulfilled, (state, action: PayloadAction<OffsetPaginatedResponse<Shelf>>) => {
+      .addCase(loadShelves.fulfilled, (state, action: PayloadAction<OffsetPaginatedResponse<ShelfPublic>>) => {
         const { items, offset, limit, total_count } = action.payload;
         const { entities, ids } = normalizeShelves(items);
         
@@ -280,7 +280,7 @@ const perpetuaSlice = createSlice({
         state.loading.userShelves = true;
         state.error = null;
       })
-      .addCase(loadMissingShelves.fulfilled, (state, action: PayloadAction<Shelf[]>) => {
+      .addCase(loadMissingShelves.fulfilled, (state, action: PayloadAction<ShelfPublic[]>) => {
         if (action.payload.length === 0) {
           state.loading.userShelves = false;
           return;
@@ -329,7 +329,7 @@ const perpetuaSlice = createSlice({
       
       // Handle getShelfById (No changes needed for payload)
       .addCase(getShelfById.pending, (state) => { state.error = null; })
-      .addCase(getShelfById.fulfilled, (state, action: PayloadAction<Shelf>) => {
+      .addCase(getShelfById.fulfilled, (state, action: PayloadAction<ShelfPublic>) => {
           const shelf = action.payload;
           if (shelf && shelf.shelf_id) {
               const normalized = normalizeShelf(shelf);
@@ -566,8 +566,7 @@ export default perpetuaSlice.reducer;
 
 // // # SELECTORS # // //
 const selectPerpetuaState = (state: RootState) => state.perpetua;
-// Export selectShelvesEntities
-export const selectShelvesEntities = (state: RootState): Record<string, NormalizedShelf> => state.perpetua.entities.shelves;
+const selectShelvesEntities = (state: RootState): Record<string, NormalizedShelf> => state.perpetua.entities.shelves;
 const selectUserPrincipal = (state: RootState) => state.auth.user?.principal;
 const selectShelfEditorsByIdMap = (state: RootState) => state.perpetua.shelfEditors;
 const selectEditorsLoadingMap = (state: RootState) => state.perpetua.loading.editors;
@@ -579,12 +578,17 @@ const selectLastTime = (state: RootState) => state.perpetua.lastTimestamp;
 const selectUserShelvesLoading = (state: RootState) => state.perpetua.loading.userShelves;
 const selectPublicShelvesLoading = (state: RootState) => state.perpetua.loading.publicShelves;
 const selectPerpetuaError = (state: RootState) => state.perpetua.error;
-
 const selectPublicAccessByIdMap = (state: RootState) => state.perpetua.publicShelfAccess;
 const selectPublicAccessLoadingMap = (state: RootState) => state.perpetua.loading.publicAccess;
+const selectShelvesByTagMap = (state: RootState) => state.perpetua.ids.shelvesByTag;
+const selectTagShelfCountsMap = (state: RootState) => state.perpetua.tagShelfCounts;
+
+// Base input selectors for memoized lists
+const selectShelves = (state: RootState) => state.perpetua.entities.shelves;
+const selectUserShelfIds = (state: RootState) => state.perpetua.ids.userShelves;
+const selectPublicShelfIds = (state: RootState) => state.perpetua.ids.publicShelves;
 
 // Enhanced selector caching mechanism
-// This stores actual selector instances instead of creating new ones each time
 const memoizedSelectorsByShelfId = {
   shelfById: new Map<string, ReturnType<typeof createSelector>>(),
   shelfEditors: new Map<string, ReturnType<typeof createSelector>>(),
@@ -597,22 +601,43 @@ const memoizedSelectorsByShelfId = {
   optimisticShelfItemOrder: new Map<string, ReturnType<typeof createSelector>>(),
 };
 
-// Selectors
-// Get the order of user shelves directly from state
-const selectOptimisticShelfOrder = (state: RootState) => state.perpetua.ids.userShelves;
+const memoizedTagSelectors = {
+  shelvesByTag: new Map<string, ReturnType<typeof createSelector>>(),
+  tagShelfCount: new Map<string, ReturnType<typeof createSelector>>(),
+};
 
-// Remove export keyword here
+// --- Simple Selectors ---
+export const selectPopularTags = (state: RootState): string[] => state.perpetua.popularTags;
+export const selectTagSearchResults = (state: RootState): string[] => state.perpetua.tagSearchResults;
+export const selectCurrentTagFilter = (state: RootState): string | null => state.perpetua.currentTagFilter;
+export const selectIsLoadingPopularTags = (state: RootState): boolean => state.perpetua.loading.popularTags;
+export const selectIsLoadingShelvesForTag = (state: RootState): boolean => state.perpetua.loading.shelvesByTag;
+export const selectIsTagSearchLoading = (state: RootState): boolean => state.perpetua.loading.tagSearch;
+export const selectIsLoadingTagCounts = (state: RootState): boolean => state.perpetua.loading.tagCounts;
+export { // Export map selectors needed for factory selectors
+    selectShelvesByTagMap,
+    selectTagShelfCountsMap
+};
+
+// --- Memoized Selectors ---
+
+// Select user's shelves (correctly memoized)
 const selectUserShelves = createSelector(
-  selectOptimisticShelfOrder,
-  selectShelvesEntities,
-  (shelfOrder, shelves) => shelfOrder.map(id => shelves[id]).filter(Boolean)
+  [selectUserShelfIds, selectShelves],
+  (shelfIds, shelves) => shelfIds.map(id => shelves[id]).filter(Boolean)
 );
 
-// Remove export keyword here
+// Select public shelves (correctly memoized)
+const selectPublicShelves = createSelector(
+  [selectPublicShelfIds, selectShelves],
+  (shelfIds, shelves) => shelfIds.map(id => shelves[id]).filter(Boolean)
+);
+
+// Select a specific shelf by ID (memoized factory)
 const selectShelfById = (shelfId: string) => {
   if (!memoizedSelectorsByShelfId.shelfById.has(shelfId)) {
     const selector = createSelector(
-      selectShelvesEntities,
+      selectShelves, // Use the base selector
       (shelves) => shelves[shelfId] || null
     );
     memoizedSelectorsByShelfId.shelfById.set(shelfId, selector);
@@ -620,136 +645,113 @@ const selectShelfById = (shelfId: string) => {
   return memoizedSelectorsByShelfId.shelfById.get(shelfId)!;
 };
 
-// Keep export here for now
+// Select the currently selected shelf
 const selectSelectedShelf = createSelector(
   selectSelectedShelfId,
-  selectShelvesEntities,
+  selectShelves, // Use the base selector
   (selectedShelfId, shelves) => {
     if (!selectedShelfId) return null;
     return shelves[selectedShelfId] || null;
   }
 );
 
-// Get the optimistically updated ordered item IDs for a shelf - memoized factory selector with improved caching
+// Get optimistically updated item order for a shelf (memoized factory)
 const selectOptimisticShelfItemOrder = (shelfId: string) => {
   if (!memoizedSelectorsByShelfId.optimisticShelfItemOrder.has(shelfId)) {
     const selector = createSelector(
       selectShelfItemOrderMap,
-      (itemOrderMap) => itemOrderMap[shelfId] || [] // Return direct reference from state
+      (itemOrderMap) => itemOrderMap[shelfId] || []
     );
     memoizedSelectorsByShelfId.optimisticShelfItemOrder.set(shelfId, selector);
   }
   return memoizedSelectorsByShelfId.optimisticShelfItemOrder.get(shelfId)!;
 };
 
-// Remaining selectors, also memoized
-export const selectLastTimestamp = createSelector(
-  selectLastTime,
-  (timestamp) => timestamp ? String(timestamp) : undefined // Ensure transformation
-);
+// Select last timestamp - simplified
+const selectLastTimestamp = selectLastTime;
 
-export const selectLoading = createSelector(
-  selectUserShelvesLoading,
-  (loading) => Boolean(loading) // Transform to boolean
-);
+// Select loading state for user shelves - simplified
+const selectLoading = selectUserShelvesLoading;
 
-export const selectPublicLoading = createSelector(
-  selectPublicShelvesLoading,
-  (loading) => Boolean(loading) // Transform to boolean
-);
+// Select loading state for public shelves - simplified
+const selectPublicLoading = selectPublicShelvesLoading;
 
-export const selectError = createSelector(
-  selectPerpetuaError,
-  (error) => error || null // Ensure null if undefined
-);
+// Select error state - Simplified to direct selector
+const selectError = selectPerpetuaError; 
 
-// Improved selectors for collaboration features with better caching
+// Select editors for a specific shelf (memoized factory)
 const selectShelfEditors = (shelfId: string) => {
   if (!memoizedSelectorsByShelfId.shelfEditors.has(shelfId)) {
     const selector = createSelector(
       selectShelfEditorsByIdMap,
-      (editorsMap) => editorsMap[shelfId] || [] // Return direct reference from state
+      (editorsMap) => editorsMap[shelfId] || []
     );
     memoizedSelectorsByShelfId.shelfEditors.set(shelfId, selector);
   }
   return memoizedSelectorsByShelfId.shelfEditors.get(shelfId)!;
 };
 
+// Select loading state for editors of a specific shelf (memoized factory)
 const selectEditorsLoading = (shelfId: string) => {
   if (!memoizedSelectorsByShelfId.editorsLoading.has(shelfId)) {
     const selector = createSelector(
       selectEditorsLoadingMap,
-      (loadingMap) => Boolean(loadingMap[shelfId]) // Transform to boolean
+      (loadingMap) => Boolean(loadingMap[shelfId])
     );
     memoizedSelectorsByShelfId.editorsLoading.set(shelfId, selector);
   }
   return memoizedSelectorsByShelfId.editorsLoading.get(shelfId)!;
 };
 
-// Get the public access status for a shelf - with improved caching
+// Select public access status for a shelf (memoized factory)
 const selectIsShelfPublic = (shelfId: string): ((state: RootState) => boolean) => {
   if (!memoizedSelectorsByShelfId.isPublic.has(shelfId)) {
     const selector = createSelector(
       selectPublicAccessByIdMap,
-      (state: RootState) => selectShelvesEntities(state)[shelfId],
-      (publicAccessMap, shelf): boolean => { // Explicitly type the result function's return value
-        // console.log(`[Selector selectIsShelfPublic ${shelfId}] Map value: ${publicAccessMap[shelfId]}, Shelf entity:`, shelf ? shelf.is_public : 'undefined');
-        // First check the dedicated map
+      (state: RootState) => selectShelves(state)[shelfId], // Use base selector
+      (publicAccessMap, shelf): boolean => {
         if (publicAccessMap[shelfId] !== undefined) {
-          const result = Boolean(publicAccessMap[shelfId]);
-          // console.log(`[Selector selectIsShelfPublic ${shelfId}] Using map value. Returning: ${result}`);
-          return result;
+          return Boolean(publicAccessMap[shelfId]);
         }
-        
-        // Fall back to the shelf entity if available
-        // Ensure the generated Shelf type includes is_public: boolean
         if (shelf && typeof shelf.is_public === 'boolean') {
-          // console.log(`[Selector selectIsShelfPublic ${shelfId}] Falling back to shelf entity. Returning: ${shelf.is_public}`);
           return shelf.is_public;
         }
-        
-        // Default to false if no data is available
-        // console.log(`[Selector selectIsShelfPublic ${shelfId}] No data found. Returning default: false`);
         return false;
       }
     );
     memoizedSelectorsByShelfId.isPublic.set(shelfId, selector);
   }
-  // We need to assert the type here because the Map stores a generic selector type
   return memoizedSelectorsByShelfId.isPublic.get(shelfId)! as (state: RootState) => boolean;
 };
 
+// Select loading state for public access of a specific shelf (memoized factory)
 const selectPublicAccessLoading = (shelfId: string) => {
   if (!memoizedSelectorsByShelfId.publicAccessLoading.has(shelfId)) {
     const selector = createSelector(
       selectPublicAccessLoadingMap,
-      (loadingMap) => Boolean(loadingMap[shelfId]) // Transform to boolean
+      (loadingMap) => Boolean(loadingMap[shelfId])
     );
     memoizedSelectorsByShelfId.publicAccessLoading.set(shelfId, selector);
   }
   return memoizedSelectorsByShelfId.publicAccessLoading.get(shelfId)!;
 };
 
-// Update the hasEditAccess selector to check for public access
+// Select edit access for a shelf (memoized factory)
 const selectHasEditAccess = (contentId: string) => {
   if (!memoizedSelectorsByShelfId.hasEditAccess.has(contentId)) {
     const selector = createSelector(
       selectUserPrincipal,
-      (state: RootState) => selectShelvesEntities(state)[contentId],
+      (state: RootState) => selectShelves(state)[contentId], // Use base selector
       (state: RootState) => selectShelfEditorsByIdMap(state)[contentId] || [],
-      (state: RootState) => selectPublicAccessByIdMap(state)[contentId],
+      (state: RootState) => selectPublicAccessByIdMap(state)[contentId], // Check public map first
       (userPrincipal, shelf, editors, isPublic) => {
         if (!shelf) return false;
-        
-        // Check if shelf is public
+        // Check if explicitly public first (using the dedicated map value if available)
         if (isPublic === true) return true;
-        
         // For non-public shelves, user needs to be logged in
         if (!userPrincipal) return false;
-        
         // Check if user is owner
         if (shelf.owner === userPrincipal) return true;
-        
         // Check if user is editor
         return editors.includes(userPrincipal);
       }
@@ -759,12 +761,12 @@ const selectHasEditAccess = (contentId: string) => {
   return memoizedSelectorsByShelfId.hasEditAccess.get(contentId)!;
 };
 
-// Check if user is the owner of a shelf - with improved caching
+// Select if user is owner of a shelf (memoized factory)
 const selectIsOwner = (contentId: string) => {
   if (!memoizedSelectorsByShelfId.isOwner.has(contentId)) {
     const selector = createSelector(
       selectUserPrincipal,
-      (state: RootState) => selectShelvesEntities(state)[contentId],
+      (state: RootState) => selectShelves(state)[contentId], // Use base selector
       (userPrincipal, shelf) => {
         if (!shelf || !userPrincipal) return false;
         return shelf.owner === userPrincipal;
@@ -775,20 +777,17 @@ const selectIsOwner = (contentId: string) => {
   return memoizedSelectorsByShelfId.isOwner.get(contentId)!;
 };
 
-// Check if user is an editor (but not owner) of a shelf - with improved caching
+// Select if user is editor (but not owner) of a shelf (memoized factory)
 const selectIsEditor = (contentId: string) => {
   if (!memoizedSelectorsByShelfId.isEditor.has(contentId)) {
     const selector = createSelector(
       selectUserPrincipal,
-      (state: RootState) => selectShelvesEntities(state)[contentId],
-      (state: RootState) => selectShelfEditorsByIdMap(state)[contentId] || [],
+      (state: RootState) => selectShelves(state)[contentId], // Use base selector
+      (state: RootState) => selectShelfEditorsByIdMap(state)[contentId],
       (userPrincipal, shelf, editors) => {
         if (!userPrincipal || !shelf) return false;
-        
-        // If user is owner, they're not just an editor
         if (shelf.owner === userPrincipal) return false;
-        
-        return editors.includes(userPrincipal);
+        return editors?.includes(userPrincipal) ?? false;
       }
     );
     memoizedSelectorsByShelfId.isEditor.set(contentId, selector);
@@ -796,70 +795,58 @@ const selectIsEditor = (contentId: string) => {
   return memoizedSelectorsByShelfId.isEditor.get(contentId)!;
 };
 
-// Get all shelves belonging to a specific user - memoized
+// Select shelves for a specific user (memoized - uses other selectors)
 const selectUserShelvesForUser = createSelector(
   [
-    selectShelvesEntities,
-    selectUserShelvesOrder,
-    (_state: RootState, userId: string) => userId
+    selectShelves, // Input 1: Stable reference to the shelves object
+    selectUserShelfIds, // Input 2: Stable reference (usually) to user's shelf IDs array
+    selectUserPrincipal, // Input 3: Current user's principal (stable string or null)
+    (_state: RootState, userId: string) => userId // Input 4: The target userId (stable string)
   ],
-  (shelves, userShelvesOrder, userId) => {
-    // First check if we're looking at shelves for the current logged-in user
-    // We can determine this by checking if any shelves in the ordered list belong to this user
-    const isCurrentUserProfile = userShelvesOrder.length > 0 && 
-      shelves[userShelvesOrder[0]]?.owner === userId;
-    
+  (shelves, userShelfIds, currentUserPrincipal, targetUserId) => {
+    // All filtering/sorting/conditional logic happens here in the output function
+
+    // Determine if we are looking at the current logged-in user's profile
+    // This check should be reliable now that currentUserPrincipal is an input
+    const isCurrentUserProfile = currentUserPrincipal === targetUserId;
+
     if (isCurrentUserProfile) {
-      // For current user, respect the custom order from userShelvesOrder
-      // But filter to ensure we only include this user's shelves (in case of any stale data)
-      return userShelvesOrder
+      // For current user, use userShelfIds for order, filter by owner
+      // Make sure the map/filter process only includes valid shelves owned by the target user
+      return userShelfIds
         .map(id => shelves[id])
-        .filter(shelf => shelf && shelf.owner === userId);
+        .filter((shelf): shelf is NormalizedShelf => shelf !== undefined && shelf.owner === targetUserId);
     } else {
-      // For other users, fall back to timestamp-based ordering
-      const userShelves = Object.values(shelves)
-        .filter(shelf => shelf && shelf.owner === userId)
+      // For other users, filter all shelves by owner and sort by creation date
+      // Create the array from Object.values *inside* the output function
+      const allShelvesArray = Object.values(shelves);
+      return allShelvesArray
+        .filter((shelf): shelf is NormalizedShelf => shelf !== undefined && shelf.owner === targetUserId)
         .sort((a, b) => {
-          // Sort by createdAt if available, otherwise keep original order
-          if (a.created_at && b.created_at) {
-            return Number(b.created_at) - Number(a.created_at); // Newest first
-          }
+          // Sort by createdAt (newest first), handling potential undefined values
+          const timeA = BigInt(a.created_at ?? 0);
+          const timeB = BigInt(b.created_at ?? 0);
+          if (timeB > timeA) return 1;
+          if (timeA > timeB) return -1;
           return 0;
         });
-      
-      return userShelves;
     }
   }
 );
 
-// New memoized selectors for tags
-const memoizedTagSelectors = {
-  shelvesByTag: new Map<string, ReturnType<typeof createSelector>>(),
-  tagShelfCount: new Map<string, ReturnType<typeof createSelector>>(),
-};
-
-// Tag Selectors
-export const selectPopularTags = (state: RootState): string[] => state.perpetua.popularTags;
-export const selectTagSearchResults = (state: RootState): string[] => state.perpetua.tagSearchResults;
-export const selectCurrentTagFilter = (state: RootState): string | null => state.perpetua.currentTagFilter;
-export const selectIsLoadingPopularTags = (state: RootState): boolean => state.perpetua.loading.popularTags;
-export const selectIsLoadingShelvesForTag = (state: RootState): boolean => state.perpetua.loading.shelvesByTag;
-export const selectIsTagSearchLoading = (state: RootState): boolean => state.perpetua.loading.tagSearch;
-export const selectIsLoadingTagCounts = (state: RootState): boolean => state.perpetua.loading.tagCounts;
-
-// Get shelf IDs for a specific tag - memoized factory selector
+// Select shelf IDs for a specific tag (memoized factory)
 const selectShelfIdsForTag = (tag: string) => {
   if (!memoizedTagSelectors.shelvesByTag.has(tag)) {
     const selector = createSelector(
       selectShelvesByTagMap,
-      (shelvesByTag) => shelvesByTag[tag] || [] // Return IDs or empty array
+      (shelvesByTag) => shelvesByTag[tag] || []
     );
     memoizedTagSelectors.shelvesByTag.set(tag, selector);
   }
   return memoizedTagSelectors.shelvesByTag.get(tag)!;
 };
 
-// Get shelf count for a specific tag - memoized factory selector
+// Select shelf count for a specific tag (memoized factory)
 const selectTagShelfCount = (tag: string) => {
   if (!memoizedTagSelectors.tagShelfCount.has(tag)) {
     const selector = createSelector(
@@ -871,19 +858,32 @@ const selectTagShelfCount = (tag: string) => {
   return memoizedTagSelectors.tagShelfCount.get(tag)!;
 };
 
-// Re-add export keyword here
-export const selectPublicShelves = createSelector(
-  selectPublicShelvesOrder,
-  selectShelvesEntities,
-  (publicShelves, shelves) => publicShelves.map(id => shelves[id]).filter(Boolean)
-);
 
-// Export existing selectors (remove selectPublicShelves from this block)
-export { 
-    selectOptimisticShelfOrder,
+// --- Export Selectors ---
+// Export the selectors needed by the application
+export {
+    // Base state parts (if needed directly, though usually derived selectors are preferred)
+    selectShelvesEntities, // Keep original export if needed elsewhere
+    selectUserShelvesOrder, // Keep original export if needed elsewhere
+    selectPublicShelvesOrder, // Keep original export if needed elsewhere
+
+    // Derived Lists/Objects
     selectUserShelves,
-    selectShelfById,
+    selectPublicShelves,
     selectSelectedShelf,
+
+    // Loading states
+    selectLoading, // Export the simplified selector
+    selectPublicLoading, // Export the simplified selector
+
+    // Error state
+    selectError, // Keep exporting the potentially transformed error
+
+    // Other simple states
+    selectLastTimestamp, // Export the simplified selector
+
+    // Factory selectors (exported so they can be called with parameters)
+    selectShelfById,
     selectOptimisticShelfItemOrder,
     selectShelfEditors,
     selectEditorsLoading,
@@ -893,20 +893,6 @@ export {
     selectIsOwner,
     selectIsEditor,
     selectUserShelvesForUser,
-    selectUserShelvesLoading,
-    selectPublicShelvesLoading,
-    selectPerpetuaError,
-    selectLastTime,
     selectShelfIdsForTag,
     selectTagShelfCount
-};
-
-// Re-add definitions for base map selectors
-const selectShelvesByTagMap = (state: RootState) => state.perpetua.ids.shelvesByTag;
-const selectTagShelfCountsMap = (state: RootState) => state.perpetua.tagShelfCounts;
-
-// This block should export both map selectors now
-export {
-    selectShelvesByTagMap,
-    selectTagShelfCountsMap
 };

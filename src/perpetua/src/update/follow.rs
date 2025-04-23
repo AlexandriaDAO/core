@@ -40,20 +40,22 @@ pub fn follow_user(user_to_follow: Principal) -> UpdateResult {
     FOLLOWED_USERS.with(|followed| {
         let mut map = followed.borrow_mut();
         let mut followed_set = map.get(&caller).unwrap_or_default();
-        
+
+        // Check if already following FIRST
+        if followed_set.0.contains(&user_to_follow) {
+            return Err("Already following this user.".to_string());
+        }
+
         // Check limit before inserting
         if followed_set.0.len() >= MAX_FOLLOWED_USERS {
-            // Check if the user is already followed (idempotency)
-            if !followed_set.0.contains(&user_to_follow) {
-                return Err(format!("Cannot follow more than {} users.", MAX_FOLLOWED_USERS));
-            }
+            // This check is now simpler as we know the user isn't already followed
+            return Err(format!("Cannot follow more than {} users.", MAX_FOLLOWED_USERS));
         }
 
         // Add the user to the set
-        if followed_set.0.insert(user_to_follow) {
-             // If insert returned true, the set was modified
-            map.insert(caller, followed_set);
-        }
+        // No need to check the return value of insert anymore, as we know it's a new user
+        followed_set.0.insert(user_to_follow);
+        map.insert(caller, followed_set);
         Ok(())
     })
 }
@@ -89,19 +91,22 @@ pub fn follow_tag(tag: String) -> UpdateResult {
     FOLLOWED_TAGS.with(|followed| {
         let mut map = followed.borrow_mut();
         let mut followed_set = map.get(&caller).unwrap_or_default();
-        
+
+        // Check if already following FIRST
+        if followed_set.0.contains(&normalized_tag) {
+            return Err("Already following this tag.".to_string());
+        }
+
         // Check limit before inserting
         if followed_set.0.len() >= MAX_FOLLOWED_TAGS {
-            // Check if the tag is already followed (idempotency)
-            if !followed_set.0.contains(&normalized_tag) {
-                return Err(format!("Cannot follow more than {} tags.", MAX_FOLLOWED_TAGS));
-            }
+             // This check is now simpler as we know the tag isn't already followed
+            return Err(format!("Cannot follow more than {} tags.", MAX_FOLLOWED_TAGS));
         }
-        
+
         // Add the tag to the set
-        if followed_set.0.insert(normalized_tag) {
-            map.insert(caller, followed_set);
-        }
+        // No need to check return value, we know it's a new tag
+        followed_set.0.insert(normalized_tag);
+        map.insert(caller, followed_set);
         Ok(())
     })
 }

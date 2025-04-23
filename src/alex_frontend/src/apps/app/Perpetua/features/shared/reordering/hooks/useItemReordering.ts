@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useEffect } from 'react';
-import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
+import { Item } from "@/../../declarations/perpetua/perpetua.did";
 import { setItemOrder } from '@/apps/app/Perpetua/state';
 import { useReorderable } from './useReorderable';
 import { compareArrays, createReorderReturn } from '../utils/reorderUtils';

@@ -5,7 +5,7 @@ import {
   addItemToShelf as addItemToShelfService,
   removeItemFromShelf as removeItemFromShelfService
 } from '../services';
-import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
+import { ShelfPublic } from '@/../../declarations/perpetua/perpetua.did';
 import { extractErrorMessage } from '../../utils';
 
 /**
@@ -22,7 +22,7 @@ export const addItem = createAsyncThunk(
     referenceItemId = null,
     before = true
   }: { 
-    shelf: Shelf, 
+    shelf: ShelfPublic, 
     content: string, 
     type: "Nft" | "Markdown" | "Shelf",
     principal: Principal | string,

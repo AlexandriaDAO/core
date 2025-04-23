@@ -3,7 +3,7 @@ import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 import { convertBigIntsToStrings } from '@/utils/bgint_convert';
 import { toPrincipal, Result } from '../../utils';
 import {
-  Shelf,
+  ShelfPublic,
   // We might need specific pagination/result types if they differ, but assuming reuse for now
   // Check .did if needed
 } from '@/../../declarations/perpetua/perpetua.did';
@@ -68,16 +68,20 @@ export async function unfollowUser(
 export async function followTag(tag: string): Promise<Result<boolean, string>> {
   try {
     const actor = await getActorPerpetua();
+    // Assuming actor.follow_tag returns Result<null, text>
+    // Ok(null) means success, Err(text) contains the error message.
     const result = await actor.follow_tag(tag);
 
     if ("Ok" in result) {
+      // Backend confirmed success
       return { Ok: true };
     } else {
+      // Backend returned an error (e.g., "Already following", "Unauthorized")
       return { Err: result.Err };
     }
   } catch (error) {
     console.error('Error in followTag:', error);
-    return { Err: "Failed to follow tag" };
+    return { Err: "Failed to follow tag" }; // Catch network/actor errors
   }
 }
 
@@ -107,7 +111,7 @@ export async function unfollowTag(tag: string): Promise<Result<boolean, string>>
  */
 export async function getFollowedUsersFeed(
   params: CursorPaginationParams<TimestampCursor>
-): Promise<Result<CursorPaginatedResponse<Shelf, TimestampCursor>, QueryError>> {
+): Promise<Result<CursorPaginatedResponse<ShelfPublic, TimestampCursor>, QueryError>> {
   try {
     const actor = await getActorPerpetua();
 
@@ -164,7 +168,7 @@ export async function getFollowedUsersFeed(
  */
 export async function getFollowedTagsFeed(
   params: CursorPaginationParams<TimestampCursor>
-): Promise<Result<CursorPaginatedResponse<Shelf, TimestampCursor>, QueryError>> {
+): Promise<Result<CursorPaginatedResponse<ShelfPublic, TimestampCursor>, QueryError>> {
   try {
     const actor = await getActorPerpetua();
 

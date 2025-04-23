@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useIdentity } from '@/hooks/useIdentity';
 import isEqual from 'lodash/isEqual';
-import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
+import { ShelfPublic } from '@/../../declarations/perpetua/perpetua.did';
 import { BaseShelfList } from '../../cards/components/BaseShelfList';
 import { LibraryShelvesUIProps, ExploreShelvesUIProps, UserShelvesUIProps } from '../../../types/shelf.types';
 import { useDispatch } from 'react-redux';
@@ -30,8 +30,8 @@ const areShelvesPropsEqual = (prevProps: UserShelvesUIProps, nextProps: UserShel
 };
 
 interface UnifiedShelvesUIProps {
-  allShelves: Shelf[];
-  personalShelves: Shelf[];
+  allShelves: ShelfPublic[];
+  personalShelves: ShelfPublic[];
   loading: boolean;
   onNewShelf: () => void;
   onViewShelf: (shelfId: string) => void;

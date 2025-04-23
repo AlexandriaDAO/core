@@ -1,13 +1,13 @@
-import { Shelf } from "../../../../../../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "../../../../../../../declarations/perpetua/perpetua.did";
 
 export interface ShelfSettingsDialogProps {
-  shelf: Shelf;
+  shelf: ShelfPublic;
   onUpdateMetadata?: (shelfId: string, title: string, description?: string) => Promise<boolean>;
   className?: string;
 }
 
 export interface ShelfInformationSectionProps {
-  shelf: Shelf;
+  shelf: ShelfPublic;
   title: string;
   setTitle: (title: string) => void;
   description: string;
@@ -49,7 +49,7 @@ export interface TagsSectionProps {
 }
 
 export interface GeneralSettingsTabProps {
-  shelf: Shelf;
+  shelf: ShelfPublic;
   isOwner: boolean;
   isPublic: boolean;
   isPublicLoading: boolean;

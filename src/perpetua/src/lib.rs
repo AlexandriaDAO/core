@@ -2,6 +2,8 @@ use ic_cdk::{self, init, spawn};
 use candid::{Principal, Nat};
 use std::time::Duration;
 
+use crate::query::ShelfPublic;
+
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
 pub const ICRC7_SCION_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 

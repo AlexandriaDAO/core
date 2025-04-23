@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { Shelf } from '@/../../declarations/perpetua/perpetua.did';
+import { ShelfPublic } from '@/../../declarations/perpetua/perpetua.did';
 import { Principal } from '@dfinity/principal';
 import { updateSingleShelf } from '../perpetuaSlice';
 import { cacheManager } from '../cache/ShelvesCache';
@@ -29,7 +29,7 @@ type RejectValue = string;
  * Load shelves for a user (Paginated)
  */
 export const loadShelves = createAsyncThunk<
-  OffsetPaginatedResponse<Shelf>, // Return type on success
+  OffsetPaginatedResponse<ShelfPublic>, // Return type on success
   { principal: Principal | string; params: OffsetPaginationParams }, // Argument type
   { rejectValue: RejectValue } // Type for rejectWithValue
 >(
@@ -58,14 +58,14 @@ export const loadShelves = createAsyncThunk<
  * Get a shelf by ID (Not Paginated - Keep Caching)
  */
 export const getShelfById = createAsyncThunk<
-  Shelf, // Return type on success
+  ShelfPublic, // Return type on success
   string, // Argument type (shelfId)
   { rejectValue: RejectValue } // Type for rejectWithValue
 >(
   'perpetua/getShelfById',
   async (shelfId, { rejectWithValue }) => {
     try {
-      const cachedData = cacheManager.get<Shelf>(shelfId, 'shelf');
+      const cachedData = cacheManager.get<ShelfPublic>(shelfId, 'shelf');
       if (cachedData) {
         return cachedData;
       }
@@ -92,7 +92,7 @@ export const getShelfById = createAsyncThunk<
  * Load recent public shelves (Paginated)
  */
 export const loadRecentShelves = createAsyncThunk<
-  CursorPaginatedResponse<Shelf, TimestampCursor>, // Return type
+  CursorPaginatedResponse<ShelfPublic, TimestampCursor>, // Return type
   CursorPaginationParams<TimestampCursor>, // Argument type
   { rejectValue: RejectValue } // Reject type
 >(
@@ -123,7 +123,7 @@ export const loadRecentShelves = createAsyncThunk<
  * For now, it just loads the *first* page and filters.
  */
 export const loadMissingShelves = createAsyncThunk<
-  Shelf[], // Return type (array of missing shelves)
+  ShelfPublic[], // Return type (array of missing shelves)
   Principal | string, // Argument type (principal)
   { rejectValue: RejectValue, state: any } // Reject type and state type
 >(

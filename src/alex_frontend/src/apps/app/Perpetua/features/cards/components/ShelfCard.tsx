@@ -5,13 +5,13 @@ import { Folder, ChevronDown, Calendar, User, Tag, Clock, Info, Copy, Check, Lin
 import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Button } from "@/lib/components/button";
-import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { format } from 'date-fns';
 import { followTag } from '@/apps/app/Perpetua/state/services/followService';
 import { toast } from 'sonner';
 
 export interface ShelfCardProps {
-  shelf: Shelf;
+  shelf: ShelfPublic;
   onViewShelf?: (shelfId: string) => void;
   parentShelfId?: string;
   itemId?: number;
@@ -77,14 +77,25 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
     setFollowingTag(tag); // Set loading state for this specific tag
     try {
       const result = await followTag(tag);
-      if ('Ok' in result) {
+
+      if ('Ok' in result && result.Ok === true) {
         toast.success(`Followed tag: ${tag}`);
         // TODO: Update local/global state later to visually indicate followed status
         // e.g., disable button, change icon to Check, or sync with a global followed tags list
-      } else {
-        toast.error(`Failed to follow tag: ${result.Err}`);
-      }
+      } else if ('Err' in result) {
+        // Check if the error indicates the tag was already followed
+        if (result.Err.toLowerCase().includes('already following')) {
+          toast.info(`Already following tag: ${tag}`);
+        } else {
+          // Handle other backend errors
+          toast.error(`Failed to follow tag: ${result.Err}`);
+        }
+      } 
+      // No action needed if result is { Ok: false } which shouldn't happen with the current service logic,
+      // but added robustness in case the service changes.
+
     } catch (error) {
+      // Catch frontend/network errors during the service call
       console.error("Error following tag:", error);
       toast.error("An unexpected error occurred while trying to follow the tag.");
     } finally {

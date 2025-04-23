@@ -2,7 +2,7 @@ import { Principal } from '@dfinity/principal';
 import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 import { convertBigIntsToStrings } from '@/utils/bgint_convert';
 import {
-  Shelf,
+  ShelfPublic,
   Item,
   OffsetPaginationInput as BackendOffsetPaginationInput,
   OffsetPaginatedResult as BackendOffsetPaginatedResult,
@@ -23,7 +23,7 @@ import {
 export async function getUserShelves(
   principal: Principal | string,
   params: OffsetPaginationParams
-): Promise<Result<OffsetPaginatedResponse<Shelf>, QueryError>> {
+): Promise<Result<OffsetPaginatedResponse<ShelfPublic>, QueryError>> {
   try {
     const actor = await getActorPerpetua();
     const principalForApi = toPrincipal(principal);
@@ -62,7 +62,7 @@ export async function getUserShelves(
 /**
  * Get a specific shelf by ID
  */
-export async function getShelf(shelfId: string): Promise<Result<Shelf, QueryError>> {
+export async function getShelf(shelfId: string): Promise<Result<ShelfPublic, QueryError>> {
   try {
     const actor = await getActorPerpetua();
     const result = await actor.get_shelf(shelfId);
@@ -83,7 +83,7 @@ export async function getShelf(shelfId: string): Promise<Result<Shelf, QueryErro
  */
 export async function getRecentShelves(
   params: CursorPaginationParams<TimestampCursor>
-): Promise<Result<CursorPaginatedResponse<Shelf, TimestampCursor>, QueryError>> {
+): Promise<Result<CursorPaginatedResponse<ShelfPublic, TimestampCursor>, QueryError>> {
   try {
     const actor = await getActorPerpetua();
 

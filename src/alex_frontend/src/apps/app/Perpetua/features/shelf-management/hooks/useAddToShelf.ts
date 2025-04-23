@@ -1,13 +1,12 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useShelfOperations } from "./useShelfOperations";
 import { useContentPermissions } from "@/apps/app/Perpetua/hooks/useContentPermissions";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { selectUserShelves, selectLoading, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
-import { loadShelves } from "@/apps/app/Perpetua/state";
 import { toast } from "sonner";
 import { Principal } from "@dfinity/principal";
-import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { useIdentity } from "@/hooks/useIdentity";
 
 /**
@@ -24,24 +23,14 @@ export const useAddToShelf = () => {
   const dispatch = useAppDispatch();
   const { identity } = useIdentity();
 
-  // Ensure shelves are loaded when the hook is first used
-  useEffect(() => {
-    if (identity && availableShelves.length === 0 && !shelvesLoading) {
-      dispatch(loadShelves({ 
-        principal: identity.getPrincipal(), 
-        params: { offset: 0, limit: 20 }
-      }));
-    }
-  }, [identity, availableShelves.length, shelvesLoading, dispatch]);
-
   /**
    * Convert a NormalizedShelf back to a Shelf for API calls
    */
-  const denormalizeShelf = useCallback((normalizedShelf: NormalizedShelf): Shelf => {
+  const denormalizeShelf = useCallback((normalizedShelf: NormalizedShelf): ShelfPublic => {
     return {
       ...normalizedShelf,
       owner: Principal.fromText(normalizedShelf.owner)
-    } as Shelf;
+    } as ShelfPublic;
   }, []);
 
   /**

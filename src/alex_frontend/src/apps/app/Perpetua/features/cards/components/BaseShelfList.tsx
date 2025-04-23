@@ -4,7 +4,7 @@ import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { ArrowLeft, Plus, Edit, X, RotateCcw, Save, AlertCircle, UserPlus } from "lucide-react";
 import { ShelfCard } from './ShelfCard';
-import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { toast } from 'sonner';
 import { useDragAndDrop } from '../../shared/reordering/hooks/useDragAndDrop';
 import { ReorderableGrid } from '../../shared/reordering/components/ReorderableGrid';
@@ -14,13 +14,15 @@ import {
   selectIsShelfPublic,
   selectIsOwner,
   selectIsEditor,
-  selectShelfEditors
+  selectShelfEditors,
+  selectUserShelves
 } from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { followUser } from '@/apps/app/Perpetua/state/services/followService';
+import { NormalizedShelf } from '@/apps/app/Perpetua/state/perpetuaSlice';
 
 // Types for the component
 export interface BaseShelfListProps {
-  shelves: Shelf[];
+  shelves: ShelfPublic[];
   title: string;
   emptyStateMessage: string;
   showBackButton?: boolean;
@@ -39,7 +41,7 @@ export interface BaseShelfListProps {
 }
 
 // Helper function to extract essential properties for comparison
-const getShelfEssentials = (shelf: Shelf) => ({
+const getShelfEssentials = (shelf: ShelfPublic) => ({
   id: shelf.shelf_id,
   title: shelf.title,
   owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString(),
@@ -67,7 +69,7 @@ interface ListHeaderProps {
 
 // Interface for reorderable shelf items
 interface ReorderableShelfItem extends ReorderableItem {
-  shelf: Shelf;
+  shelf: ShelfPublic;
 }
 
 /**
@@ -99,7 +101,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   
   // Convert shelves to reorderable format for drag-and-drop UI
   const reorderableShelves = useMemo(() => {
-    return shelves.map((shelf: Shelf) => ({ id: shelf.shelf_id, shelf }));
+    return shelves.map((shelf: ShelfPublic) => ({ id: shelf.shelf_id, shelf }));
   }, [shelves]);
   
   // Local state just for visual drag-and-drop
@@ -319,11 +321,18 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   );
 
   // Wrapper component defined directly inside BaseShelfList
-  const ShelfCardWrapper: React.FC<{ shelf: Shelf; isEditMode: boolean; isDragging: boolean; }> = ({ shelf, isEditMode, isDragging }) => {
-    const isPublic = Boolean(useAppSelector(selectIsShelfPublic(shelf.shelf_id)));
-    const isOwner = Boolean(useAppSelector(selectIsOwner(shelf.shelf_id)));
-    const isEditor = Boolean(useAppSelector(selectIsEditor(shelf.shelf_id)));
-    const editors = useAppSelector(selectShelfEditors(shelf.shelf_id)) as string[]; 
+  const ShelfCardWrapper: React.FC<{ shelf: ShelfPublic; isEditMode: boolean; isDragging: boolean; }> = ({ shelf, isEditMode, isDragging }) => {
+    // Memoize selector instances to prevent re-creation on every render
+    const selectIsPublicMemo = useMemo(() => selectIsShelfPublic(shelf.shelf_id), [shelf.shelf_id]);
+    const selectIsOwnerMemo = useMemo(() => selectIsOwner(shelf.shelf_id), [shelf.shelf_id]);
+    const selectIsEditorMemo = useMemo(() => selectIsEditor(shelf.shelf_id), [shelf.shelf_id]);
+    const selectEditorsMemo = useMemo(() => selectShelfEditors(shelf.shelf_id), [shelf.shelf_id]);
+
+    // Use memoized selectors with useAppSelector
+    const isPublic = Boolean(useAppSelector(selectIsPublicMemo));
+    const isOwner = Boolean(useAppSelector(selectIsOwnerMemo));
+    const isEditor = Boolean(useAppSelector(selectIsEditorMemo));
+    const editors = useAppSelector(selectEditorsMemo) as string[]; 
     const editorsCount = editors.length;
 
     const collaborationData = {
@@ -360,7 +369,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
         profileOwnerPrincipal={profileOwnerPrincipal}
         isCurrentUserProfile={isCurrentUserProfile}
         allowReordering={allowReordering}
-        canCreateNewShelf={!!onNewShelf && isCurrentUserProfile}
+        canCreateNewShelf={!!onNewShelf}
         canEditOrder={allowReordering && shelves.length > 1}
         isEditMode={isEditMode}
         enterEditMode={enterEditMode}
@@ -398,7 +407,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
             />
           ) : (
             <ContentGrid>
-              {shelves.map((shelf: Shelf) => (
+              {shelves.map((shelf: ShelfPublic) => (
                 <ShelfCardWrapper 
                   key={shelf.shelf_id} 
                   shelf={shelf} 

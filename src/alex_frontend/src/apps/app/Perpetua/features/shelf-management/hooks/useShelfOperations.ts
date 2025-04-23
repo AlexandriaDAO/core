@@ -19,7 +19,7 @@ import {
   getShelfById
 } from "@/apps/app/Perpetua/state";
 import { createFindItemById } from "../../../utils";
-import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 
 // Custom hook for shelf operations
 export const useShelfOperations = () => {
@@ -63,7 +63,7 @@ export const useShelfOperations = () => {
     }
   }, [identity, dispatch]);
 
-  const getShelf = useCallback(async (shelfId: string): Promise<Shelf | null> => {
+  const getShelf = useCallback(async (shelfId: string): Promise<ShelfPublic | null> => {
     try {
       const result = await dispatch(getShelfById(shelfId)).unwrap();
       return result || null;
@@ -74,7 +74,7 @@ export const useShelfOperations = () => {
   }, [dispatch]);
 
   const addItem = useCallback(async (
-    shelf: Shelf, 
+    shelf: ShelfPublic, 
     content: string, 
     type: "Nft" | "Markdown" | "Shelf", 
     collectionType?: "NFT" | "SBT",

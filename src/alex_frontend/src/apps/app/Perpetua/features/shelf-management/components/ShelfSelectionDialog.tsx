@@ -11,20 +11,20 @@ import { useAddToShelf } from "../hooks/useAddToShelf";
 import { ShelfManagerProps } from "../../../types/shelf.types";
 import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { Principal } from "@dfinity/principal";
-import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 
 /**
  * Convert a NormalizedShelf back to a Shelf for API calls and components
  */
-const denormalizeShelf = (normalizedShelf: NormalizedShelf): Shelf => ({
+const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => ({
   ...normalizedShelf,
   owner: Principal.fromText(normalizedShelf.owner)
-} as Shelf);
+} as ShelfPublic);
 
 /**
  * Convert an array of NormalizedShelf objects to Shelf objects
  */
-const denormalizeShelves = (normalizedShelves: NormalizedShelf[]): Shelf[] => 
+const denormalizeShelves = (normalizedShelves: NormalizedShelf[]): ShelfPublic[] => 
   normalizedShelves.map(denormalizeShelf);
 
 interface ShelfSelectionDialogProps extends ShelfManagerProps {

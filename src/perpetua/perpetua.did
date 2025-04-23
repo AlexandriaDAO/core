@@ -6,7 +6,7 @@ type AddItemInput = record {
 type CursorPaginatedResult = record {
   limit : nat;
   next_cursor : opt nat64;
-  items : vec Shelf;
+  items : vec ShelfPublic;
 };
 type CursorPaginatedResult_1 = record {
   limit : nat;
@@ -44,7 +44,7 @@ type ItemContent = variant { Nft : text; Shelf : text; Markdown : text };
 type OffsetPaginatedResult = record {
   offset : nat;
   limit : nat;
-  items : vec Shelf;
+  items : vec ShelfPublic;
   total_count : nat;
 };
 type OffsetPaginationInput = record { offset : nat; limit : nat };
@@ -63,12 +63,18 @@ type Result_12 = variant { Ok : vec principal; Err : text };
 type Result_2 = variant { Ok : CursorPaginatedResult; Err : QueryError };
 type Result_3 = variant { Ok : vec text; Err : QueryError };
 type Result_4 = variant { Ok : CursorPaginatedResult_1; Err : QueryError };
-type Result_5 = variant { Ok : Shelf; Err : QueryError };
+type Result_5 = variant { Ok : ShelfPublic; Err : QueryError };
 type Result_6 = variant { Ok : CursorPaginatedResult_2; Err : QueryError };
 type Result_7 = variant { Ok : ShelfPositionMetrics; Err : text };
 type Result_8 = variant { Ok : CursorPaginatedResult_3; Err : QueryError };
 type Result_9 = variant { Ok : CursorPaginatedResult_4; Err : QueryError };
-type Shelf = record {
+type ShelfPositionMetrics = record {
+  min_gap : float64;
+  avg_gap : float64;
+  max_gap : float64;
+  item_count : nat64;
+};
+type ShelfPublic = record {
   is_public : bool;
   title : text;
   updated_at : nat64;
@@ -81,12 +87,6 @@ type Shelf = record {
   shelf_id : text;
   item_positions : vec record { nat32; float64 };
   items : vec record { nat32; Item };
-};
-type ShelfPositionMetrics = record {
-  min_gap : float64;
-  avg_gap : float64;
-  max_gap : float64;
-  item_count : nat64;
 };
 type TagOperationInput = record { tag : text; shelf_id : text };
 service : () -> {
@@ -105,6 +105,7 @@ service : () -> {
   get_shelf_items : (text, CursorPaginationInput_2) -> (Result_6) query;
   get_shelf_position_metrics : (text) -> (Result_7) query;
   get_shelves_by_tag : (text, CursorPaginationInput_3) -> (Result_8) query;
+  get_shelves_containing_nft : (text) -> (vec text) query;
   get_tag_shelf_count : (text) -> (nat64) query;
   get_tags_with_prefix : (text, CursorPaginationInput_4) -> (Result_9) query;
   get_user_shelves : (principal, OffsetPaginationInput) -> (Result_10) query;

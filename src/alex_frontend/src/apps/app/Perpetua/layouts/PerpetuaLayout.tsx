@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { RootState } from "@/store";
 import { 
   setSelectedShelf, 
   selectSelectedShelf,
@@ -13,7 +14,7 @@ import { usePerpetuaNavigation, useViewState } from "../routes";
 import { useShelfOperations, usePublicShelfOperations } from "../features/shelf-management/hooks";
 import { useContentPermissions } from "../hooks/useContentPermissions";
 import { Principal } from "@dfinity/principal";
-import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { loadShelves } from "../state";
 import { useIdentity } from "@/hooks/useIdentity";
 
@@ -38,17 +39,17 @@ import { FollowedUsersList } from '../features/following/components/FollowedUser
 /**
  * Convert a NormalizedShelf back to a Shelf for API calls and components
  */
-const denormalizeShelf = (normalizedShelf: NormalizedShelf): Shelf => {
+const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => {
   return {
     ...normalizedShelf,
     owner: Principal.fromText(normalizedShelf.owner)
-  } as Shelf;
+  } as ShelfPublic;
 };
 
 /**
  * Utility function to convert array of normalized shelves to denormalized shelves
  */
-const denormalizeShelves = (shelves: NormalizedShelf[]): Shelf[] => {
+const denormalizeShelves = (shelves: NormalizedShelf[]): ShelfPublic[] => {
   return shelves.map(denormalizeShelf);
 };
 
@@ -70,6 +71,9 @@ const PerpetuaLayout: React.FC = () => {
   const { identity } = useIdentity();
   const currentTagFilter = useAppSelector(selectCurrentTagFilter); // Get the active tag filter
   
+  // Define a stable empty array reference
+  const stableEmptyShelves: NormalizedShelf[] = useMemo(() => [], []);
+  
   // Permissions
   const { checkEditAccess } = useContentPermissions();
   
@@ -81,8 +85,15 @@ const PerpetuaLayout: React.FC = () => {
   const { shelfId, userId } = params;
   const { isShelfDetail, isUserDetail, isMainView } = viewFlags;
   
-  // Get user-specific shelves from Redux
-  const userShelves = useAppSelector(state => userId ? selectUserShelvesForUser(state, userId) : []);
+  // Get user-specific shelves from Redux using a stable approach
+  const userShelvesSelector = useMemo(() => {
+    // Only create the specific selector if userId is present
+    // Ensure the function signature matches what useSelector expects
+    return userId ? (state: RootState) => selectUserShelvesForUser(state, userId) : null;
+  }, [userId]);
+
+  // Use the memoized selector, or default to the stable empty array
+  const userShelves = useAppSelector(state => userShelvesSelector ? userShelvesSelector(state) : stableEmptyShelves);
   const [userShelvesLoading, setUserShelvesLoading] = useState(false);
   
   // Memoize the combined and unique shelves for the main view

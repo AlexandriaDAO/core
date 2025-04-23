@@ -126,9 +126,6 @@ Perpetua/
 
 
 
-
-
-
 - People/follow tags work functinoally now. Now we make them usable on many levels.
 
 (1) Tag follow toasts don't actually show.
@@ -167,15 +164,9 @@ Backend Stuff:
 
 
 
-
-
-
-
-
-
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal gcuqr-i2pze-jo24s-lgaj2-bewrz-b23sk-nijk6-vqmlx-b46q3-msxsi-oqe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal h3aiz-rumwf-ycche-jdxcl-hkn22-2tyam-lzjgv-x7c3j-tbizn-tejua-hqe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua
@@ -189,7 +180,7 @@ candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpe
 dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx generate perpetua
 
-git show --patch 3600406077dace006a518893b41666a2ab535195
+git show --patch c0ccbd75ca2cb2ce2dab10611df028a4f8e47d0a
 
 
 
@@ -206,70 +197,3 @@ git show --patch 3600406077dace006a518893b41666a2ab535195
 
 1. **Add a mechanism for shelf data backup and recovery**
    - Provide a way to export and import shelf data for disaster recovery.
-
-## Performance Optimizations
-
-1. **Review position rebalancing thresholds**
-   - Current thresholds may trigger rebalancing too frequently with large shelves.
-
-2. **Optimize ordering operations for large collections**
-   - The ordering logic may be inefficient for shelves with hundreds of items.
-
-
-
-
-
-
-
-
-
-
-
-
-# Required Tests
-f
-- Do thousands of shelf and item reorderings and see what the limits are at.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

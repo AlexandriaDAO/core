@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { ShelfInformationSection } from "./ShelfInformationSection";
 import { TagsSection } from "./TagsSection";
 import { toast } from "sonner";
-import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { 
   addTagToShelf,
   removeTagFromShelf
 } from "@/apps/app/Perpetua/state/services";
 
 interface GeneralSettingsTabProps {
-  shelf: Shelf;
+  shelf: ShelfPublic;
   isOwner: boolean;
   onUpdateMetadata?: (
     shelfId: string, 

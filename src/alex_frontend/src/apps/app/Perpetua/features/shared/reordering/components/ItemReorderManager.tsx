@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shelf } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { useItemReordering } from '../hooks/useItemReordering';
 import { ItemReorderManagerProps } from '../../../../types/reordering.types';
 

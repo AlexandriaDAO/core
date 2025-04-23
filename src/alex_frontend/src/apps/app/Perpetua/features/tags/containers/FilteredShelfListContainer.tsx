@@ -13,12 +13,12 @@ import {
 } from '@/apps/app/Perpetua/state/perpetuaSlice'; // Import selector & type from slice
 import { BaseShelfList } from '@/apps/app/Perpetua/features/cards/components/BaseShelfList';
 import { LoaderCircle } from 'lucide-react';
-import { Shelf } from '@/../../declarations/perpetua/perpetua.did'; // Import original Shelf type
+import { ShelfPublic } from '@/../../declarations/perpetua/perpetua.did'; // Import original Shelf type
 import { Principal } from '@dfinity/principal'; // Import Principal
 import { RootState } from '@/store'; // Import RootState for typing selectors
 
 // Helper to convert NormalizedShelf back to Shelf for BaseShelfList
-const denormalizeShelf = (normalizedShelf: NormalizedShelf): Shelf => {
+const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => {
     return {
         ...normalizedShelf,
         owner: Principal.fromText(normalizedShelf.owner), // Convert string back to Principal
@@ -77,7 +77,7 @@ export const FilteredShelfListContainer: React.FC = () => {
         .filter((shelf): shelf is NormalizedShelf => !!shelf); // Filter out undefined and type guard
 
     // Denormalize shelves for BaseShelfList
-    const filteredShelvesForList: Shelf[] = filteredNormalizedShelves.map(denormalizeShelf);
+    const filteredShelvesForList: ShelfPublic[] = filteredNormalizedShelves.map(denormalizeShelf);
 
     // --- Updated Loading state calculation --- 
     // Loading if: 

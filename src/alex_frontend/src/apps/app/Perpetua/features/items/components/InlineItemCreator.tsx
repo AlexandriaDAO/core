@@ -3,7 +3,7 @@ import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
-import { Shelf, Item } from "@/../../declarations/perpetua/perpetua.did";
+import { ShelfPublic, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { X, Plus, ChevronUp } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -20,7 +20,7 @@ type ContentType = "Markdown" | "Nft" | "Shelf";
 interface InlineItemCreatorProps {
   onSubmit: (content: string, type: "Markdown" | "Shelf") => Promise<void>;
   onCancel: () => void;
-  shelves?: Shelf[] | NormalizedShelf[];
+  shelves?: ShelfPublic[] | NormalizedShelf[];
   shelf: any;
 }
 
