@@ -228,7 +228,7 @@
 
     "react-instantsearch-dom": "^6.40.4",
 
-    "react-markdown": "^9.0.1",
+    "react-markdown": "^9.1.0",
 
     "react-paginate": "^8.2.0",
 
@@ -244,7 +244,9 @@
 
     "react-router-dom": "^7.1.1",
 
-    "react-syntax-highlighter": "^15.5.0",
+    "react-syntax-highlighter": "^15.6.1",
+
+    "react-viewer": "^3.2.2",
 
     "remark-gfm": "^4.0.1",
 

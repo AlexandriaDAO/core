@@ -1,0 +1,93 @@
+import { natToArweaveId } from "@/utils/id_convert";
+import LedgerService from "@/utils/LedgerService";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../../declarations/emporium/emporium.did";
+import { RootState } from "@/store";
+import { Listing, ListingItem } from "../types";
+
+interface MyListingsResponse {
+	nfts: Listing;
+	totalPages: number;
+	currentPage: number;
+	pageSize: number;
+}
+
+export const getListings = createAsyncThunk<
+	MyListingsResponse,
+	{actor: ActorSubclass<_SERVICE>, owner?: string},
+	{ rejectValue: string, state: RootState }
+>(
+	"imporium/listings/getListings",
+	async ({ actor, owner }, { rejectWithValue, getState }) => {
+		try {
+			const { page, size, sortByPrice, sortByTime } = getState().imporium.listings;
+
+			const ledgerService = LedgerService();
+
+			// Fetch market listings
+			const result = await actor.get_listings(
+				owner ? [owner] : [],
+				// page number defaults to 1 if not provided, so pass page + 1
+				[BigInt(page + 1)],
+				// page size defaults to 10 if not provided
+				[BigInt(size)],
+				// sortByPrice can be null, true, or false
+				sortByPrice !== null ? [sortByPrice] : [],
+				// sortByTime can be null, true, or false
+				sortByTime !== null ? [sortByTime] : []
+			);
+
+			if (!result?.nfts || !Array.isArray(result.nfts) || result.nfts.length === 0) {
+				console.warn("No market listings found.");
+				return {
+					nfts: {},
+					totalPages: 0,
+					currentPage: 0,
+					pageSize: 0,
+				};
+			}
+
+			// Process retrieved NFTs
+			const listings: Listing = {};
+
+			result.nfts.forEach(([tokenId, nft]) => {
+				if ( nft?.token_id !== undefined && nft?.price !== undefined && nft?.owner !== undefined) {
+					const arweaveId = natToArweaveId(BigInt(nft.token_id));
+					const listItem: ListingItem = {
+						tokenId: tokenId || "",
+						arweaveId,
+						price: ledgerService.e8sToIcp(nft.price).toString(),
+						owner: nft.owner.toString(),
+					};
+
+					listings[arweaveId] = listItem;
+				}
+			});
+
+			// if (Object.keys(listings).length === 0) {
+			// 	console.warn("No valid tokens found in market listings.");
+			// 	return {
+			// 		nfts: listings,
+			// 		totalPages: result.total_pages || 0,
+			// 		pageSize: result.page_size || 0,
+			// 		currentPage: result.current_page || 0,
+			// 	};
+			// }
+
+			return {
+				nfts: listings,
+				totalPages: Number(result.total_pages || 0),
+				pageSize: Number(result.page_size || size),
+				currentPage: Number(result.current_page || 1) - 1,
+			};
+		} catch (error) {
+			console.error("Error fetching market listings:", error);
+			return rejectWithValue(
+				"An error occurred while fetching market listings."
+			);
+		}
+	}
+);
+
+export default getListings;
