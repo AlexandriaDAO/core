@@ -137,8 +137,17 @@ Mainnet bug findings:
 
 
 
+- Can't seem to add any shelves as items: 
+```
+Failed to add content to shelf: Call failed:
+  Canister: ya6k4-waaaa-aaaap-qkmpq-cai
+  Method: add_item_to_shelf (update)
+  "Request ID": "18a177ab5111e2fc237989f99962b89cd9edcd57c71ddbe1e5fe0dddf4b48b7a"
+  "Error code": "IC0503"
+  "Reject code": "5"
+  "Reject message": "Error from Canister ya6k4-waaaa-aaaap-qkmpq-cai: Canister called `ic0.trap` with message: 'Panicked at 'already mutably borrowed: BorrowError', src/perpetua/src/storage.rs:475:33'.\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://internetcomputer.org/docs/current/references/execution-errors#trapped-explicitly"
 
-
+```
 
 
 
@@ -148,7 +157,9 @@ Minor Frontend Stuff:
 - Max 500 items per shelf.
 - 10k markdown chars.
 - In storage.rs there's a check that won't let you add a shelf to a shelf that already has that shelf. Need to make sure that operation is clear to the user when attempted and fails.
-
+- There's no 'add-item' option on public shelves.
+- Also, the add to shelf modal needs a public section.
+- Withdraw button is partially underneath the expander button.
 
 
 Backend Stuff:
