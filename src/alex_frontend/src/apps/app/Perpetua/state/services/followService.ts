@@ -246,3 +246,30 @@ export async function getMyFollowedTags(): Promise<Result<string[], QueryError>>
     return { Err: "Failed to load followed tags" };
   }
 }
+
+/**
+ * Get the list of users (Principals) followed by the current user
+ */
+export async function getMyFollowedUsers(): Promise<Result<Principal[], QueryError>> {
+  try {
+    const actor = await getActorPerpetua();
+    // TODO: Ensure 'get_my_followed_users' exists in perpetua.did and types are regenerated.
+    // Assuming backend method is get_my_followed_users() -> (Result<vec principal, QueryError>) query;
+    const result = await actor.get_my_followed_users(); // Linter error expected if types not updated
+
+    if ("Ok" in result) {
+      // Convert principals to string representation for easier handling in frontend state if needed,
+      // but returning Principal objects might be more idiomatic for IC interactions.
+      // For now, return as Principal[] as defined by the expected backend type.
+      return { Ok: result.Ok };
+    } else if ("Err" in result) {
+      return { Err: result.Err };
+    } else {
+      console.error('Unexpected response format from get_my_followed_users:', result);
+      return { Err: "Unexpected response format" };
+    }
+  } catch (error) {
+    console.error('Error in getMyFollowedUsers:', error);
+    return { Err: "Failed to load followed users" };
+  }
+}

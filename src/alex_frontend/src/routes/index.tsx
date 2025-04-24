@@ -14,6 +14,7 @@ import Protected from "@/guards/Protected";
 import LibrarianGuard from "@/guards/LibrarianGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ROUTES } from "./routeConfig";
+import PasswordProtect from "@/components/PasswordProtect";
 
 const HomePage = lazy(()=>import("@/pages/HomePage"));
 
@@ -72,7 +73,16 @@ const router = createBrowserRouter(
 					<Route path="bibliotheca" element={<Suspense key="bibliotheca" fallback={<TopProgressBar />}><Bibliotheca /></Suspense>} />
 					<Route path="alexandrian" element={<Suspense key="alexandrian" fallback={<TopProgressBar />}><Alexandrian /></Suspense>} />
 					<Route path="syllogos" element={<Suspense key="syllogos" fallback={<TopProgressBar />}><Syllogos /></Suspense>} />
-					<Route path="perpetua" element={<Suspense key="perpetua" fallback={<TopProgressBar />}><Perpetua /></Suspense>}>
+					<Route 
+						path="perpetua"
+						element={
+							<PasswordProtect>
+								<Suspense key="perpetua" fallback={<TopProgressBar />}>
+									<Perpetua />
+								</Suspense>
+							</PasswordProtect>
+						}
+					>
 						<Route index element={<Suspense key="perpetua-home" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
 						<Route path="shelf/:shelfId" element={<Suspense key="perpetua-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
 						<Route path="item/:itemId" element={<Suspense key="perpetua-item" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />

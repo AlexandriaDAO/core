@@ -9,6 +9,7 @@ import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { format } from 'date-fns';
 import { followTag } from '@/apps/app/Perpetua/state/services/followService';
 import { toast } from 'sonner';
+import { Principal } from '@dfinity/principal';
 
 export interface ShelfCardProps {
   shelf: ShelfPublic;
@@ -139,6 +140,7 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
                   currentShelfId={shelf.shelf_id}
                   parentShelfId={parentShelfId}
                   itemId={itemId}
+                  shelfOwnerPrincipal={shelf.owner}
                 />
                 
                 <div className="text-center p-6 h-full flex flex-col items-center justify-center">

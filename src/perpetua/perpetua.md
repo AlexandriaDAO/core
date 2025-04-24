@@ -126,10 +126,20 @@ Perpetua/
 
 
 
-- People/follow tags work functinoally now. Now we make them usable on many levels.
 
-(1) Tag follow toasts don't actually show.
-(2) 
+Mainnet bug findings: 
+- Create a shelf if double clicked creates 2+ shelves.
+- Should be able to add an item to multiple shelves at once, not one at a time.
+- We need loading indicators on the shelf pages when the images are taking time to load.
+- I'm still somehow being logged out every 20 mintues. Wtf.
+
+
+
+
+
+
+
+
 
 
 Minor Frontend Stuff:

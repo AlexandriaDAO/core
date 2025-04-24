@@ -1,5 +1,5 @@
 import React from "react";
-import { MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { MoreHorizontal, Plus, Trash2, UserPlus, UserMinus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { 
   DropdownMenu, 
@@ -22,10 +22,14 @@ import { ShelfSelectionDialog } from "../../shelf-management/components/ShelfSel
 import { useAddToShelf } from "../../shelf-management/hooks/useAddToShelf";
 import { useShelfOperations } from "../../shelf-management/hooks/useShelfOperations";
 import { useContentPermissions } from "../../../hooks/useContentPermissions";
+import { useFollowStatus } from "../../following/hooks/useFollowStatus";
+import { getAuthClient } from "@/features/auth/utils/authUtils";
+import { Principal } from "@dfinity/principal";
 
 interface ShelfCardActionMenuProps {
   contentId: string;
   contentType: "Nft" | "Markdown" | "Shelf";
+  shelfOwnerPrincipal?: Principal;
   currentShelfId?: string;
   parentShelfId?: string;
   itemId?: number;
@@ -38,6 +42,7 @@ interface ShelfCardActionMenuProps {
 export const ShelfCardActionMenu = ({
   contentId,
   contentType,
+  shelfOwnerPrincipal,
   currentShelfId,
   parentShelfId,
   itemId,
@@ -46,17 +51,46 @@ export const ShelfCardActionMenu = ({
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [addDialogOpen, setAddDialogOpen] = React.useState(false);
   const [removeDialogOpen, setRemoveDialogOpen] = React.useState(false);
+  const [followLoading, setFollowLoading] = React.useState(false);
+  const [currentUserPrincipal, setCurrentUserPrincipal] = React.useState<Principal | null>(null);
   
   const { hasEditableShelvesExcluding, isLoggedIn } = useAddToShelf();
   const { removeItem } = useShelfOperations();
   const { checkEditAccess } = useContentPermissions();
+  const { isFollowingUser, toggleFollowUser } = useFollowStatus();
+  
+  React.useEffect(() => {
+    let isMounted = true;
+    const fetchPrincipal = async () => {
+      try {
+        const authClient = await getAuthClient();
+        if (isMounted && await authClient.isAuthenticated()) {
+          const identity = authClient.getIdentity();
+          setCurrentUserPrincipal(identity.getPrincipal());
+        } else if (isMounted) {
+           setCurrentUserPrincipal(null);
+        }
+      } catch (error) {
+        console.error("Error getting auth client or principal:", error);
+        if (isMounted) {
+          setCurrentUserPrincipal(null);
+        }
+      }
+    };
+  
+    fetchPrincipal();
+    return () => { isMounted = false; };
+  }, []);
   
   const hasAvailableShelves = hasEditableShelvesExcluding(currentShelfId);
   const canAddToShelf = hasAvailableShelves && isLoggedIn;
   const canRemoveItem = Boolean(parentShelfId && itemId && checkEditAccess(parentShelfId));
   
-  // If no actions are available, don't render the menu
-  if (!canAddToShelf && !canRemoveItem) return null;
+  const isOwner = !!currentUserPrincipal && !!shelfOwnerPrincipal && currentUserPrincipal.toText() === shelfOwnerPrincipal.toText();
+  const canInteractWithFollow = isLoggedIn && !!shelfOwnerPrincipal && !isOwner;
+  const currentlyFollowingOwner = !!shelfOwnerPrincipal && isFollowingUser(shelfOwnerPrincipal);
+
+  if (!canAddToShelf && !canRemoveItem && !canInteractWithFollow) return null;
 
   const handleRemoveItem = async () => {
     if (!parentShelfId || !itemId) return;
@@ -72,6 +106,21 @@ export const ShelfCardActionMenu = ({
     }
     
     setRemoveDialogOpen(false);
+  };
+
+  const handleToggleFollowOwner = async (e: React.MouseEvent) => {
+    stopPropagation(e);
+    if (!canInteractWithFollow || !shelfOwnerPrincipal) return;
+
+    setFollowLoading(true);
+    setMenuOpen(false);
+    try {
+      await toggleFollowUser(shelfOwnerPrincipal);
+    } catch (error) {
+      console.error("Error toggling follow state:", error);
+    } finally {
+      setFollowLoading(false);
+    }
   };
 
   const stopPropagation = (e: React.MouseEvent) => {
@@ -108,6 +157,23 @@ export const ShelfCardActionMenu = ({
             >
               <Plus className="h-4 w-4 mr-2" />
               Add to shelf
+            </DropdownMenuItem>
+          )}
+          
+          {canInteractWithFollow && (
+            <DropdownMenuItem 
+              onClick={handleToggleFollowOwner}
+              disabled={followLoading}
+              className="cursor-pointer"
+            >
+              {followLoading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : currentlyFollowingOwner ? (
+                <UserMinus className="h-4 w-4 mr-2" />
+              ) : (
+                <UserPlus className="h-4 w-4 mr-2" />
+              )}
+              {followLoading ? 'Processing...' : currentlyFollowingOwner ? 'Unfollow Owner' : 'Follow Owner'}
             </DropdownMenuItem>
           )}
           

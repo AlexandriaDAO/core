@@ -789,6 +789,22 @@ pub fn get_my_followed_tags() -> QueryResult<Vec<NormalizedTag>> {
     })
 }
 
+/// Query to get the list of users (Principals) followed by the caller.
+#[ic_cdk::query(guard = "not_anon")]
+pub fn get_my_followed_users() -> QueryResult<Vec<Principal>> {
+    let caller = ic_cdk::caller();
+
+    FOLLOWED_USERS.with(|followed| {
+        let map = followed.borrow();
+        // Retrieve the PrincipalSet for the caller, default to empty if not found.
+        let users = map.get(&caller)
+                     .map(|ps| ps.clone()) // Clone the PrincipalSet
+                     .map(|user_set| user_set.0.into_iter().collect()) // Convert HashSet<Principal> to Vec<Principal>
+                     .unwrap_or_default(); // Return empty Vec if user wasn't following anyone
+        Ok(users)
+    })
+}
+
 /// Query to find all shelves that contain a specific NFT ID.
 /// Returns an empty list if the NFT is not found in any tracked shelves.
 #[ic_cdk::query]
