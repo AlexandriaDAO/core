@@ -30,10 +30,13 @@ dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
 dfx canister create icrc7 --specified-id 53ewn-qqaaa-aaaap-qkmqq-cai
 dfx build icrc7
 dfx canister update-settings icrc7 --add-controller 5sh5r-gyaaa-aaaap-qkmra-cai
+dfx canister update-settings icrc7 --add-controller $(dfx identity get-principal)
+
 
 dfx canister create icrc7_scion --specified-id uxyan-oyaaa-aaaap-qhezq-cai
 dfx build icrc7_scion
 dfx canister update-settings icrc7_scion --add-controller 5sh5r-gyaaa-aaaap-qkmra-cai
+dfx canister update-settings icrc7_scion --add-controller $(dfx identity get-principal)
 
 cargo build --release --target wasm32-unknown-unknown --package nft_manager
 candid-extractor target/wasm32-unknown-unknown/release/nft_manager.wasm > src/nft_manager/nft_manager.did

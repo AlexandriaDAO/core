@@ -336,6 +336,27 @@ shared(_init_msg) actor class Example(_args : {
       };
   };
 
+  // DEVELOPMENT ONLY - This function is a workaround for local testing
+  // It bypasses standard authorization by calling the underlying
+  // set_nfts function with the NFT manager principal.
+  // DO NOT DEPLOY THIS TO PRODUCTION
+  public shared(msg) func dev_mint(tokens : ICRC7.SetNFTRequest) : async [ICRC7.SetNFTResult] {
+    D.print("Development minting (SCION) - LOCAL USE ONLY! Bypassing standard checks.");
+    
+    // Use the NFT manager principal to satisfy internal library checks
+    // Note: Assuming the same NFT manager principal controls this canister
+    let authorized_caller = Principal.fromText("5sh5r-gyaaa-aaaap-qkmra-cai");
+    
+    // Call set_nfts without <system> tag, passing the authorized principal
+    switch (icrc7().set_nfts(authorized_caller, tokens, true)) {
+      case (#ok(val)) val;
+      case (#err(err)) {
+        D.print("Error in scion dev_mint: " # err);
+        D.trap(err);
+      };
+    };
+  };
+
   private stable var _init = true;
 
   // Function to initialize archived nfts.
