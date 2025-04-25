@@ -99,7 +99,7 @@ export const useItemActions = () => {
       return true;
     } catch (error) {
       console.error("Failed to add content to shelf:", error);
-      toast.error("Failed to add content to shelf");
+      toast.error("You can't add a shelf that has this shelf inside it.");
       return false;
     }
   }, [availableShelves, checkEditAccess, addItem, denormalizeShelf]);

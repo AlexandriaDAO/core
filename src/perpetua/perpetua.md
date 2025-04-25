@@ -3,12 +3,12 @@ Perpetua/
 ├── features/
 │   ├── cards/
 │   │   ├── components/
-│   │   │   ├── BaseShelfList.tsx (410 lines)
+│   │   │   ├── BaseShelfList.tsx (475 lines)
 │   │   │   ├── ContentDisplays.tsx (103 lines)
 │   │   │   ├── NftDisplay.tsx (298 lines)
 │   │   │   ├── ShelfBlogView.tsx (191 lines)
-│   │   │   ├── ShelfCard.tsx (286 lines)
-│   │   │   ├── ShelfCardActionMenu.tsx (159 lines)
+│   │   │   ├── ShelfCard.tsx (346 lines)
+│   │   │   ├── ShelfCardActionMenu.tsx (225 lines)
 │   │   │   ├── ShelfContentCard.tsx (135 lines)
 │   │   │   ├── ShelfContentModal.tsx (79 lines)
 │   │   │   ├── ShelfDetailView.tsx (227 lines)
@@ -22,14 +22,18 @@ Perpetua/
 │   │   │   └── useNftData.ts (156 lines)
 │   │   └── utils/
 │   │       └── ShelfViewUtils.ts (32 lines)
+│   ├── following/
+│   │   ├── components/
+│   │   │   ├── FollowedTagsList.tsx (112 lines)
+│   │   │   └── FollowedUsersList.tsx (105 lines)
+│   │   └── hooks/
+│   │       └── useFollowStatus.ts (160 lines)
 │   ├── items/
 │   │   ├── components/
 │   │   │   ├── AlexandrianSelector.tsx (84 lines)
-│   │   │   ├── InlineItemCreator.tsx (405 lines)
-│   │   │   └── index.ts (5 lines)
-│   │   ├── hooks/
-│   │   │   └── useItemActions.tsx (112 lines)
-│   │   └── index.ts (2 lines)
+│   │   │   └── InlineItemCreator.tsx (408 lines)
+│   │   └── hooks/
+│   │       └── useItemActions.tsx (112 lines)
 │   ├── shared/
 │   │   └── reordering/
 │   │       ├── components/
@@ -43,7 +47,7 @@ Perpetua/
 │   │       │   ├── useDragAndDrop.ts (111 lines)
 │   │       │   ├── useItemReordering.ts (77 lines)
 │   │       │   ├── useReorderable.ts (142 lines)
-│   │       │   └── useShelfReordering.ts (70 lines)
+│   │       │   └── useShelfReordering.ts (69 lines)
 │   │       └── utils/
 │   │           ├── createReorderAdapter.ts (59 lines)
 │   │           └── reorderUtils.ts (32 lines)
@@ -62,13 +66,13 @@ Perpetua/
 │   │   │   └── ShelfLists.tsx (248 lines)
 │   │   └── hooks/
 │   │       ├── index.ts (4 lines)
-│   │       ├── useAddToShelf.ts (128 lines)
+│   │       ├── useAddToShelf.ts (120 lines)
 │   │       ├── usePublicShelfOperations.ts (62 lines)
-│   │       └── useShelfOperations.ts (211 lines)
+│   │       └── useShelfOperations.ts (220 lines)
 │   ├── shelf-settings/
 │   │   ├── components/
 │   │   │   ├── CollaboratorsTab.tsx (40 lines)
-│   │   │   ├── GeneralSettingsTab.tsx (238 lines)
+│   │   │   ├── GeneralSettingsTab.tsx (241 lines)
 │   │   │   ├── PublicAccessSection.tsx (70 lines)
 │   │   │   ├── ShelfInformationSection.tsx (132 lines)
 │   │   │   ├── ShelfLinkItem.tsx (32 lines)
@@ -86,37 +90,42 @@ Perpetua/
 │       ├── components/
 │       │   ├── PopularTagsList.tsx (93 lines)
 │       │   ├── TagFilterDisplay.tsx (38 lines)
-│       │   └── TagSearchBar.tsx (98 lines)
+│       │   └── TagSearchBar.tsx (106 lines)
 │       ├── containers/
-│       │   └── FilteredShelfListContainer.tsx (88 lines)
+│       │   └── FilteredShelfListContainer.tsx (111 lines)
 │       ├── hooks/
-│       │   ├── useTagActions.ts (40 lines)
+│       │   ├── useTagActions.ts (51 lines)
 │       │   └── useTagData.ts (37 lines)
 │       └── index.ts (1 lines)
 ├── hooks/
 │   └── useContentPermissions.ts (75 lines)
-├── index.tsx (22 lines)
+├── index.tsx (21 lines)
 ├── layouts/
-│   └── PerpetuaLayout.tsx (260 lines)
+│   └── PerpetuaLayout.tsx (287 lines)
 ├── routes.ts (119 lines)
 ├── state/
 │   ├── cache/
 │   │   └── ShelvesCache.ts (210 lines)
 │   ├── hooks/
 │   │   ├── index.ts (3 lines)
-│   │   ├── usePerpetuaActions.ts (163 lines)
+│   │   ├── usePerpetuaActions.ts (169 lines)
 │   │   └── usePerpetuaSelectors.ts (62 lines)
-│   ├── index.ts (49 lines)
-│   ├── perpetuaSlice.ts (957 lines)
+│   ├── index.ts (46 lines)
+│   ├── perpetuaSlice.ts (898 lines)
 │   ├── services/
-│   │   └── perpetuaService.ts (685 lines)
-│   ├── thunks/
-│   │   ├── collaborationThunks.ts (106 lines)
+│   │   ├── followService.ts (276 lines)
 │   │   ├── index.ts (7 lines)
-│   │   ├── itemThunks.ts (97 lines)
-│   │   ├── queryThunks.ts (288 lines)
-│   │   ├── reorderThunks.ts (119 lines)
-│   │   ├── shelfThunks.ts (120 lines)
+│   │   ├── itemService.ts (201 lines)
+│   │   ├── serviceTypes.ts (39 lines)
+│   │   ├── shelfService.ts (357 lines)
+│   │   └── tagService.ts (306 lines)
+│   ├── thunks/
+│   │   ├── collaborationThunks.ts (110 lines)
+│   │   ├── index.ts (7 lines)
+│   │   ├── itemThunks.ts (100 lines)
+│   │   ├── queryThunks.ts (268 lines)
+│   │   ├── reorderThunks.ts (128 lines)
+│   │   ├── shelfThunks.ts (124 lines)
 ├── types/
 │   ├── item.types.ts (27 lines)
 │   ├── reordering.types.ts (69 lines)
@@ -127,27 +136,34 @@ Perpetua/
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Mainnet bug findings: 
-- Create a shelf if double clicked creates 2+ shelves.
+- The "No tags" failure while not logged in is too agressive looking.
 - Should be able to add an item to multiple shelves at once, not one at a time.
 - We need loading indicators on the shelf pages when the images are taking time to load.
 - I'm still somehow being logged out every 20 mintues. Wtf.
+- Withdraw button is partially underneath the expander button.
+- Also, the add to shelf modal needs a public section.
+- There's no 'add-item' option on public shelves and should be.
 
 
 
 
 
-- Can't seem to add any shelves as items: 
-```
-Failed to add content to shelf: Call failed:
-  Canister: ya6k4-waaaa-aaaap-qkmpq-cai
-  Method: add_item_to_shelf (update)
-  "Request ID": "18a177ab5111e2fc237989f99962b89cd9edcd57c71ddbe1e5fe0dddf4b48b7a"
-  "Error code": "IC0503"
-  "Reject code": "5"
-  "Reject message": "Error from Canister ya6k4-waaaa-aaaap-qkmpq-cai: Canister called `ic0.trap` with message: 'Panicked at 'already mutably borrowed: BorrowError', src/perpetua/src/storage.rs:475:33'.\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://internetcomputer.org/docs/current/references/execution-errors#trapped-explicitly"
 
-```
 
 
 
@@ -157,9 +173,6 @@ Minor Frontend Stuff:
 - Max 500 items per shelf.
 - 10k markdown chars.
 - In storage.rs there's a check that won't let you add a shelf to a shelf that already has that shelf. Need to make sure that operation is clear to the user when attempted and fails.
-- There's no 'add-item' option on public shelves.
-- Also, the add to shelf modal needs a public section.
-- Withdraw button is partially underneath the expander button.
 
 
 Backend Stuff:
@@ -205,16 +218,3 @@ git show --patch c0ccbd75ca2cb2ce2dab10611df028a4f8e47d0a
 
 
 
-
-
-
-
-
-
-
-# Backend ToDos
-
-## Security and Vulnerability Suggestions
-
-1. **Add a mechanism for shelf data backup and recovery**
-   - Provide a way to export and import shelf data for disaster recovery.

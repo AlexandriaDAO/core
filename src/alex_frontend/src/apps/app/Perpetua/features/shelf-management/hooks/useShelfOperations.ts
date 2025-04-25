@@ -50,12 +50,6 @@ export const useShelfOperations = () => {
         principal: identity.getPrincipal()
       })).unwrap();
       
-      // Load the updated shelves
-      await dispatch(loadShelves({ 
-        principal: identity.getPrincipal(), 
-        params: { offset: 0, limit: 20 }
-      })).unwrap();
-      
       return result.shelfId || null;
     } catch (error) {
       console.error("Failed to create shelf:", error);

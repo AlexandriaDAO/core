@@ -67,17 +67,27 @@ export const ShelfForm: React.FC<ShelfFormProps> = ({
 const NewShelfDialog: React.FC<NewShelfDialogProps> = ({ isOpen, onClose, onSubmit }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (!title.trim()) return;
-    
-    await onSubmit(title, description);
-    setTitle("");
-    setDescription("");
+    if (!title.trim() || isLoading) return;
+
+    setIsLoading(true);
+    onClose();
+
+    try {
+      await onSubmit(title, description);
+      setTitle("");
+      setDescription("");
+    } catch (error) {
+      console.error("Failed to create shelf:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !isLoading && onClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Shelf</DialogTitle>
@@ -92,8 +102,8 @@ const NewShelfDialog: React.FC<NewShelfDialogProps> = ({ isOpen, onClose, onSubm
         />
         
         <DialogFooter>
-          <Button onClick={handleSubmit} disabled={!title.trim()}>
-            Create
+          <Button onClick={handleSubmit} disabled={!title.trim() || isLoading}>
+            {isLoading ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

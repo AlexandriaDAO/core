@@ -119,6 +119,9 @@ export async function addItemToShelf(
       } else if ("Err" in result) {
         const errMessage = result.Err;
         console.error(`Error from backend adding ${type} item to shelf:`, errMessage);
+        if (type === "Shelf" && (errMessage.includes("Circular reference") || errMessage.includes("Cannot add a shelf to itself"))) {
+          return { Err: "Cannot add this shelf because it already contains the current shelf." };
+        }
         return { Err: errMessage };
       }
 
@@ -128,6 +131,11 @@ export async function addItemToShelf(
       console.error(`IC canister error adding ${type} item to shelf:`, error);
 
       const errorMessage = error?.message || String(error);
+
+      // Check for circular reference errors specifically when adding a Shelf
+      if (type === "Shelf" && (errorMessage.includes("Circular reference") || errorMessage.includes("Cannot add a shelf to itself"))) {
+        return { Err: "Cannot add this shelf because it already contains the current shelf." };
+      }
 
       // If this is a regular NFT and we got an ownership/auth error, provide helpful message
       if (type === "Nft" && content.length < 80 &&

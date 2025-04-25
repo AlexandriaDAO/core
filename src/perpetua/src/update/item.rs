@@ -1,5 +1,5 @@
 use candid::{CandidType, Deserialize};
-use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, ShelfId, create_shelf, GLOBAL_TIMELINE, SHELF_ITEM_STEP_SIZE};
+use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, ShelfId, create_shelf, GLOBAL_TIMELINE, SHELF_ITEM_STEP_SIZE, Shelf};
 use crate::guard::not_anon;
 use crate::auth;
 use crate::update::utils::{verify_nft_ownership, shelf_exists, is_self_reference};
@@ -49,85 +49,100 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
         }
     }
     
-    // 3. Validate shelf existence and prevent self-references (read-only SHELVES access ok)
+    // 3. Validate shelf existence and prevent self-references
     if let ItemContent::Shelf(ref nested_shelf_id) = input.content {
-        if !shelf_exists(nested_shelf_id) {
-            return Err(format!("Shelf '{}' does not exist", nested_shelf_id));
+        // Use immutable read for existence check
+        let exists = SHELVES.with(|s| s.borrow().contains_key(nested_shelf_id));
+        if !exists {
+             return Err(format!("Shelf to be added ('{}') does not exist", nested_shelf_id));
         }
-        
+
         if is_self_reference(&shelf_id, nested_shelf_id) {
             return Err("Cannot add a shelf to itself".to_string());
         }
     }
 
-    // --- Main Logic: Modify SHELVES within a single critical section ---
+    // --- Prepare Updated Data (Read Phase - Immutable Borrows) ---
+
+    let mut maybe_updated_nested_shelf: Option<(ShelfId, Shelf)> = None;
+    if let ItemContent::Shelf(ref nested_shelf_id) = input.content {
+        // Fetch nested shelf immutably and clone
+        let nested_shelf_opt = SHELVES.with(|s| s.borrow().get(nested_shelf_id));
+        if let Some(mut nested_shelf) = nested_shelf_opt {
+            // Modify the clone
+            if !nested_shelf.appears_in.contains(&shelf_id) {
+                if nested_shelf.appears_in.len() >= crate::storage::MAX_APPEARS_IN_COUNT {
+                    nested_shelf.appears_in.remove(0); // Remove oldest
+                }
+                nested_shelf.appears_in.push(shelf_id.clone());
+                maybe_updated_nested_shelf = Some((nested_shelf_id.clone(), nested_shelf));
+            }
+            // If appears_in already contains shelf_id, no update needed for nested shelf clone
+        } else {
+            // This should ideally not happen due to the earlier existence check,
+            // but provides robustness against potential race conditions.
+            return Err(format!("Nested shelf '{}' not found during preparation phase", nested_shelf_id));
+        }
+    }
+
+    // Fetch parent shelf immutably and clone
+    let mut parent_shelf = SHELVES.with(|s| s.borrow().get(&shelf_id))
+        .ok_or_else(|| format!("Parent shelf '{}' not found during preparation phase", shelf_id))?;
+
+    // --- Modify Cloned Data ---
+
+    // Generate new item ID (using the cloned parent_shelf state)
+    let new_id = parent_shelf.items.keys()
+        .max()
+        .map_or(1, |max_id| max_id + 1); // Start from 1 if empty, else increment max u32 ID
+
+    // Create the new item
+    let new_item = Item {
+        id: new_id,
+        content: input.content.clone(),
+    };
+
+    // Add the item to the *cloned* parent shelf state
+    // Assuming insert_item modifies the shelf in place and returns Result<(), String>
+    // And assuming it DOES NOT access global SHELVES
+    parent_shelf.insert_item(new_item)?; // Handles MAX_ITEMS check within the cloned struct
+
+    // Position the new item relative to the reference item if provided, using the cloned state
+    if let Some(ref_id) = input.reference_item_id {
+         // Assuming move_item modifies the shelf in place and returns Result<(), String>
+         // And assuming it DOES NOT access global SHELVES
+        parent_shelf.move_item(new_id, Some(ref_id), input.before)?; // Modifies cloned struct
+    }
+    // else: rely on insert_item's default placement within the cloned struct
+
+    // Update timestamp on the clone
+    parent_shelf.updated_at = ic_cdk::api::time();
+
+
+    // --- Write Phase (Single Mutable Borrow) ---
     SHELVES.with(|shelves| {
         let mut shelves_map = shelves.borrow_mut();
 
-        // --- Handle Nested Shelf Update (if adding a shelf item) ---
-        if let ItemContent::Shelf(ref nested_shelf_id) = input.content {
-            // Fetch the nested shelf
-            if let Some(nested_shelf) = shelves_map.get(nested_shelf_id) {
-                let mut nested_shelf = nested_shelf.clone(); // Clone to modify
-
-                // Update appears_in list
-                if !nested_shelf.appears_in.contains(&shelf_id) {
-                    // Cap appears_in
-                    if nested_shelf.appears_in.len() >= crate::storage::MAX_APPEARS_IN_COUNT {
-                        nested_shelf.appears_in.remove(0); // Remove oldest
-                    }
-                    nested_shelf.appears_in.push(shelf_id.clone());
-
-                    // Save the updated nested shelf back to the map
-                    shelves_map.insert(nested_shelf_id.clone(), nested_shelf);
-                }
-            } else {
-                // This should ideally not happen due to the shelf_exists check earlier
-                return Err(format!("Nested shelf '{}' disappeared unexpectedly", nested_shelf_id));
-            }
+        // Insert the updated nested shelf if it was modified
+        if let Some((nested_id, updated_nested)) = maybe_updated_nested_shelf {
+             // Ensure nested shelf still exists before overwriting (optional robustness check)
+            // if !shelves_map.contains_key(&nested_id) {
+            //     return Err(format!("Nested shelf '{}' disappeared before write phase", nested_id));
+            // }
+            shelves_map.insert(nested_id, updated_nested);
         }
 
-        // --- Handle Parent Shelf Update ---
-        // Fetch the parent shelf
-        let parent_shelf_opt = shelves_map.get(&shelf_id);
-        if parent_shelf_opt.is_none() {
-            return Err(format!("Parent shelf '{}' not found", shelf_id));
-        }
-        let mut parent_shelf = parent_shelf_opt.unwrap().clone(); // Clone to modify
+        // Insert the updated parent shelf
+         // Ensure parent shelf still exists before overwriting (optional robustness check)
+        // if !shelves_map.contains_key(&shelf_id) {
+        //     return Err(format!("Parent shelf '{}' disappeared before write phase", shelf_id));
+        // }
+        shelves_map.insert(shelf_id.clone(), parent_shelf); // Insert the fully prepared parent shelf
 
-        // Generate new item ID
-        let new_id = parent_shelf.items.keys()
-            .max()
-            .map_or(1, |max_id| max_id + 1);
+        // Explicitly specify the error type for the closure's Ok variant
+        Ok::<(), String>(()) // Indicate success for the SHELVES.with block
+    })?; // Propagate potential errors from the SHELVES block (like out of memory during insert)
 
-        // Create the new item
-        let new_item = Item {
-            id: new_id,
-            content: input.content.clone(),
-        };
-
-        // Add the item to the parent shelf
-        parent_shelf.insert_item(new_item)?; // Handles MAX_ITEMS check
-
-        // If reference item is provided, position the new item relative to it
-        if let Some(ref_id) = input.reference_item_id {
-            parent_shelf.move_item(new_id, Some(ref_id), input.before)?;
-        } else {
-             // If no reference, ensure it's positioned correctly (e.g., at the end)
-             // insert_item already calculates an initial position, but we might need
-             // to rebalance or explicitly move it if no reference is given.
-             // For now, relying on insert_item's default placement at the end.
-             // Consider adding explicit move_item(new_id, None, false) if necessary.
-        }
-
-        // Update timestamp
-        parent_shelf.updated_at = ic_cdk::api::time();
-
-        // Save the updated parent shelf back to the map
-        shelves_map.insert(shelf_id.clone(), parent_shelf);
-
-        Ok(()) // Return success from the SHELVES.with block
-    })?; // Propagate errors from the SHELVES block
 
     // --- Post-Update (outside the main SHELVES lock) ---
 

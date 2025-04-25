@@ -149,7 +149,7 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
       setSelectedShelfId("");
       toast.success(`Added ${type.toLowerCase()} content to shelf`);
     } catch (error: any) {
-      const errorMessage = error?.message || "Failed to add content to shelf";
+      const errorMessage = error?.message || "You can't add a shelf that has this shelf inside it.";
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);

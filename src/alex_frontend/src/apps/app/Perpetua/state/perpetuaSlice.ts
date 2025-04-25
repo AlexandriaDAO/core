@@ -327,7 +327,7 @@ const perpetuaSlice = createSlice({
         state.error = action.payload || null; // Handle potential undefined payload
       })
       
-      // Handle getShelfById (No changes needed for payload)
+      // Handle getShelfById
       .addCase(getShelfById.pending, (state) => { state.error = null; })
       .addCase(getShelfById.fulfilled, (state, action: PayloadAction<ShelfPublic>) => {
           const shelf = action.payload;
@@ -337,6 +337,49 @@ const perpetuaSlice = createSlice({
           }
       })
       .addCase(getShelfById.rejected, (state, action) => { state.error = action.payload || null; })
+      
+      // Handle createShelf
+      .addCase(createShelf.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(createShelf.fulfilled, (state, action) => {
+        // Type the payload explicitly for clarity
+        const { shelfId, principal, title, description }: { 
+          shelfId: string, 
+          principal: string, 
+          title: string, 
+          description: string // This is the description string from the payload
+        } = action.payload;
+        
+        // Create a basic representation for the new shelf
+        const now = BigInt(Date.now() * 1_000_000); // Use microseconds
+        const newShelf: NormalizedShelf = {
+          shelf_id: shelfId,
+          owner: principal, 
+          title: title,
+          description: description ? [description] : [], 
+          items: [], 
+          tags: [],
+          appears_in: [],
+          item_positions: [],
+          created_at: now,
+          updated_at: now,
+          is_public: false, 
+          editors: [], 
+        };
+        
+        // Add to entities
+        state.entities.shelves[shelfId] = newShelf;
+        
+        // Add to the beginning of user's shelf list
+        // Ensure no duplicates if the logic ever changes
+        if (!state.ids.userShelves.includes(shelfId)) {
+          state.ids.userShelves.unshift(shelfId);
+        }
+      })
+      .addCase(createShelf.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
       
       // Handle addItem
       .addCase(addItem.pending, (state) => {

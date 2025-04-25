@@ -76,11 +76,11 @@ const router = createBrowserRouter(
 					<Route 
 						path="perpetua"
 						element={
-							<PasswordProtect>
+							// <PasswordProtect>
 								<Suspense key="perpetua" fallback={<TopProgressBar />}>
 									<Perpetua />
 								</Suspense>
-							</PasswordProtect>
+							// </PasswordProtect>
 						}
 					>
 						<Route index element={<Suspense key="perpetua-home" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />

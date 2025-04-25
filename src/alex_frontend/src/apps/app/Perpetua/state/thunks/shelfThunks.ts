@@ -29,7 +29,8 @@ export const createShelf = createAsyncThunk(
       if ("Ok" in result && result.Ok) {
         // Invalidate all caches for this principal
         cacheManager.invalidateForPrincipal(principal);
-        return { shelfId: result.Ok, principal };
+        // Return necessary data for optimistic update
+        return { shelfId: result.Ok, principal: principal.toString(), title, description };
       } 
       
       if ("Err" in result && result.Err) {
