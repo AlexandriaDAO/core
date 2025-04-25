@@ -125,16 +125,16 @@ Perpetua/
 │   │   ├── itemThunks.ts (100 lines)
 │   │   ├── queryThunks.ts (268 lines)
 │   │   ├── reorderThunks.ts (128 lines)
-│   │   ├── shelfThunks.ts (124 lines)
-├── types/
-│   ├── item.types.ts (27 lines)
-│   ├── reordering.types.ts (69 lines)
-│   └── shelf.types.ts (74 lines)
-└── utils.tsx (128 lines)
 ```
 
 
 
+
+
+
+
+
+Browsing in general is bit confusing, Next Page doesn't work unless you hit Search
 
 
 
@@ -151,11 +151,9 @@ Perpetua/
 
 
 Mainnet bug findings: 
-- Also, the add to shelf modal needs a public section.
-- There's no 'add-item' option on public shelves and should be.
+
+
 - Should be able to add an item to multiple shelves at once, not one at a time.
-
-
 - (Will fix this when I deploy without all nfts)Withdraw button is partially underneath the expander button.
 
 
@@ -169,7 +167,6 @@ Minor Frontend Stuff:
 - Shelves actually have a 10 tag max in the backend. Should we change this? (and 50 chars)
 - Max 500 items per shelf.
 - 10k markdown chars.
-- In storage.rs there's a check that won't let you add a shelf to a shelf that already has that shelf. Need to make sure that operation is clear to the user when attempted and fails.
 
 
 Backend Stuff:

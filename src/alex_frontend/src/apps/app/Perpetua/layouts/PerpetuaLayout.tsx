@@ -8,7 +8,8 @@ import {
   selectShelfById,
   selectUserShelvesForUser,
   NormalizedShelf,
-  selectCurrentTagFilter
+  selectCurrentTagFilter,
+  selectIsCreatingShelf
 } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { usePerpetuaNavigation, useViewState } from "../routes";
 import { useShelfOperations, usePublicShelfOperations } from "../features/shelf-management/hooks";
@@ -40,9 +41,12 @@ import { FollowedUsersList } from '../features/following/components/FollowedUser
  * Convert a NormalizedShelf back to a Shelf for API calls and components
  */
 const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => {
+  // Ensure conversion back to BigInt for ShelfPublic type
   return {
     ...normalizedShelf,
-    owner: Principal.fromText(normalizedShelf.owner)
+    owner: Principal.fromText(normalizedShelf.owner),
+    created_at: BigInt(normalizedShelf.created_at), // Convert string back to BigInt
+    updated_at: BigInt(normalizedShelf.updated_at)  // Convert string back to BigInt
   } as ShelfPublic;
 };
 
@@ -70,6 +74,7 @@ const PerpetuaLayout: React.FC = () => {
   const userPrincipal = useAppSelector(state => state.auth.user?.principal);
   const { identity } = useIdentity();
   const currentTagFilter = useAppSelector(selectCurrentTagFilter); // Get the active tag filter
+  const isCreatingShelf = useAppSelector(selectIsCreatingShelf); // Get the loading state
   
   // Define a stable empty array reference
   const stableEmptyShelves: NormalizedShelf[] = useMemo(() => [], []);
@@ -231,6 +236,7 @@ const PerpetuaLayout: React.FC = () => {
               onViewOwner={goToUser}
               onLoadMore={loadMoreShelves}
               checkEditAccess={checkEditAccess}
+              isCreatingShelf={isCreatingShelf}
             />
           )}
         </>

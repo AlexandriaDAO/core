@@ -67,9 +67,11 @@ export interface ContentPermissions {
 }
 
 // Normalized shelf interface - Export this type
-export interface NormalizedShelf extends Omit<ShelfPublic, 'owner'> {
+export interface NormalizedShelf extends Omit<ShelfPublic, 'owner' | 'created_at' | 'updated_at'> {
   owner: string; // Always store owner as string for consistency
   is_public: boolean; // Add is_public field to match the backend
+  created_at: string; // Store timestamp as string
+  updated_at: string; // Store timestamp as string
 }
 
 // Define the state interface with normalized structure
@@ -103,6 +105,7 @@ export interface PerpetuaState {
     shelvesByTag: boolean;
     tagSearch: boolean;
     tagCounts: boolean;
+    creatingShelf: boolean; // Add loading state for creating a shelf
   };
   error: string | null;
   // Editor tracking
@@ -137,6 +140,7 @@ const initialState: PerpetuaState = {
     shelvesByTag: false,
     tagSearch: false,
     tagCounts: false,
+    creatingShelf: false, // Initialize creatingShelf loading state
   },
   error: null,
   shelfEditors: {},
@@ -148,7 +152,10 @@ const normalizeShelf = (shelf: ShelfPublic): NormalizedShelf => {
   return {
     ...shelf,
     owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString(),
-    is_public: typeof shelf.is_public === 'boolean' ? shelf.is_public : false
+    is_public: typeof shelf.is_public === 'boolean' ? shelf.is_public : false,
+    // Convert timestamps to string during normalization
+    created_at: String(shelf.created_at),
+    updated_at: String(shelf.updated_at)
   };
 };
 
@@ -340,19 +347,15 @@ const perpetuaSlice = createSlice({
       
       // Handle createShelf
       .addCase(createShelf.pending, (state) => {
+        state.loading.creatingShelf = true; // Set loading true
         state.error = null;
       })
       .addCase(createShelf.fulfilled, (state, action) => {
-        // Type the payload explicitly for clarity
-        const { shelfId, principal, title, description }: { 
-          shelfId: string, 
-          principal: string, 
-          title: string, 
-          description: string // This is the description string from the payload
-        } = action.payload;
+        const { shelfId, principal, title, description } = action.payload;
         
-        // Create a basic representation for the new shelf
-        const now = BigInt(Date.now() * 1_000_000); // Use microseconds
+        // Convert BigInt to string for serialization
+        const nowString = String(BigInt(Date.now() * 1_000_000)); 
+        
         const newShelf: NormalizedShelf = {
           shelf_id: shelfId,
           owner: principal, 
@@ -362,22 +365,21 @@ const perpetuaSlice = createSlice({
           tags: [],
           appears_in: [],
           item_positions: [],
-          created_at: now,
-          updated_at: now,
+          created_at: nowString, // Store as string (Matches updated type)
+          updated_at: nowString, // Store as string (Matches updated type)
           is_public: false, 
           editors: [], 
         };
         
-        // Add to entities
         state.entities.shelves[shelfId] = newShelf;
         
-        // Add to the beginning of user's shelf list
-        // Ensure no duplicates if the logic ever changes
         if (!state.ids.userShelves.includes(shelfId)) {
           state.ids.userShelves.unshift(shelfId);
         }
+        state.loading.creatingShelf = false; // Set loading false on success
       })
       .addCase(createShelf.rejected, (state, action) => {
+        state.loading.creatingShelf = false; // Set loading false on error
         state.error = action.payload as string;
       })
       
@@ -625,6 +627,7 @@ const selectPublicAccessByIdMap = (state: RootState) => state.perpetua.publicShe
 const selectPublicAccessLoadingMap = (state: RootState) => state.perpetua.loading.publicAccess;
 const selectShelvesByTagMap = (state: RootState) => state.perpetua.ids.shelvesByTag;
 const selectTagShelfCountsMap = (state: RootState) => state.perpetua.tagShelfCounts;
+const selectIsCreatingShelfLoading = (state: RootState) => state.perpetua.loading.creatingShelf; // Add selector
 
 // Base input selectors for memoized lists
 const selectShelves = (state: RootState) => state.perpetua.entities.shelves;
@@ -657,6 +660,7 @@ export const selectIsLoadingPopularTags = (state: RootState): boolean => state.p
 export const selectIsLoadingShelvesForTag = (state: RootState): boolean => state.perpetua.loading.shelvesByTag;
 export const selectIsTagSearchLoading = (state: RootState): boolean => state.perpetua.loading.tagSearch;
 export const selectIsLoadingTagCounts = (state: RootState): boolean => state.perpetua.loading.tagCounts;
+export const selectIsCreatingShelf = selectIsCreatingShelfLoading; // Export the selector ONCE
 export { // Export map selectors needed for factory selectors
     selectShelvesByTagMap,
     selectTagShelfCountsMap

@@ -38,6 +38,7 @@ interface UnifiedShelvesUIProps {
   onViewOwner: (ownerId: string) => void;
   onLoadMore: () => Promise<void>;
   checkEditAccess: (shelfId: string) => boolean;
+  isCreatingShelf?: boolean;
 }
 
 /**
@@ -51,7 +52,8 @@ export const UnifiedShelvesUI: React.FC<UnifiedShelvesUIProps> = React.memo(({
   onViewShelf,
   onViewOwner,
   onLoadMore,
-  checkEditAccess
+  checkEditAccess,
+  isCreatingShelf
 }) => {
   const shelfIds = useMemo(() => 
     personalShelves.map(shelf => shelf.shelf_id), 
@@ -70,6 +72,7 @@ export const UnifiedShelvesUI: React.FC<UnifiedShelvesUIProps> = React.memo(({
       onNewShelf={onNewShelf}
       onLoadMore={onLoadMore}
       checkEditAccess={checkEditAccess}
+      isCreatingShelf={isCreatingShelf}
     />
   );
 });

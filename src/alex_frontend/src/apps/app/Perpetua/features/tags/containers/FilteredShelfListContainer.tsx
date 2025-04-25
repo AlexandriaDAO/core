@@ -22,6 +22,8 @@ const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => {
     return {
         ...normalizedShelf,
         owner: Principal.fromText(normalizedShelf.owner), // Convert string back to Principal
+        created_at: BigInt(normalizedShelf.created_at),   // Convert string back to BigInt
+        updated_at: BigInt(normalizedShelf.updated_at)    // Convert string back to BigInt
     };
 };
 

@@ -24,7 +24,9 @@ export const useItemActions = () => {
   const denormalizeShelf = useCallback((normalizedShelf: NormalizedShelf): ShelfPublic => {
     return {
       ...normalizedShelf,
-      owner: Principal.fromText(normalizedShelf.owner)
+      owner: Principal.fromText(normalizedShelf.owner),
+      created_at: BigInt(normalizedShelf.created_at),
+      updated_at: BigInt(normalizedShelf.updated_at)
     } as ShelfPublic;
   }, []);
 

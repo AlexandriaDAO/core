@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { Principal } from '@dfinity/principal';
 import { Button } from "@/lib/components/button";
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
-import { ArrowLeft, Plus, Edit, X, RotateCcw, Save, AlertCircle, UserPlus } from "lucide-react";
+import { ArrowLeft, Plus, Edit, X, RotateCcw, Save, AlertCircle, UserPlus, RotateCw } from "lucide-react";
 import { ShelfCard } from './ShelfCard';
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { toast } from 'sonner';
@@ -38,6 +38,7 @@ export interface BaseShelfListProps {
   onLoadMore?: () => Promise<void>;
   onSaveOrder?: (shelfIds: string[]) => Promise<void>;
   checkEditAccess?: (shelfId: string) => boolean;
+  isCreatingShelf?: boolean;
 }
 
 // Helper function to extract essential properties for comparison
@@ -65,6 +66,7 @@ interface ListHeaderProps {
   saveError: string | null;
   handleGoBack: () => void;
   onNewShelf?: () => void;
+  isCreatingShelf: boolean;
 }
 
 // Interface for reorderable shelf items
@@ -91,7 +93,8 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   onNewShelf,
   onLoadMore,
   onSaveOrder,
-  checkEditAccess
+  checkEditAccess,
+  isCreatingShelf = false
 }) => {
   // Simple UI state - no complex state management
   const [isEditMode, setIsEditMode] = useState(false);
@@ -201,7 +204,8 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   const ListHeader = ({ 
     title, showBackButton, backLabel, handleGoBack, profileOwnerPrincipal, isCurrentUserProfile,
     allowReordering, canCreateNewShelf, canEditOrder, isEditMode, enterEditMode, 
-    cancelEditMode, saveShelfOrder, saveInProgress, saveError, onNewShelf
+    cancelEditMode, saveShelfOrder, saveInProgress, saveError, onNewShelf,
+    isCreatingShelf
   }: ListHeaderProps) => {
       
       // Determine if the follow button should be shown
@@ -247,10 +251,19 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
                   variant="primary" 
                   className="flex items-center gap-1 px-3 h-9"
                   onClick={onNewShelf}
-                  disabled={loading || saveInProgress || followInProgress}
+                  disabled={loading || saveInProgress || followInProgress || isCreatingShelf}
                 >
-                  <Plus className="w-4 h-4" />
-                  New Shelf
+                  {isCreatingShelf ? (
+                    <>
+                      <RotateCw className="w-4 h-4 animate-spin mr-1" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" />
+                      New Shelf
+                    </>
+                  )}
                 </Button>
               )}
               
@@ -378,6 +391,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
         saveInProgress={saveInProgress}
         saveError={saveError}
         onNewShelf={onNewShelf}
+        isCreatingShelf={isCreatingShelf}
       />
       
       {shelves.length === 0 && loading ? (
@@ -446,7 +460,8 @@ export const MemoizedBaseShelfList = React.memo(BaseShelfList, (prevProps: Reado
     prevProps.loading !== nextProps.loading ||
     prevProps.isCurrentUserProfile !== nextProps.isCurrentUserProfile ||
     prevProps.allowReordering !== nextProps.allowReordering ||
-    prevProps.profileOwnerPrincipal !== nextProps.profileOwnerPrincipal
+    prevProps.profileOwnerPrincipal !== nextProps.profileOwnerPrincipal ||
+    prevProps.isCreatingShelf !== nextProps.isCreatingShelf
   ) {
     return false; // Re-render
   }
