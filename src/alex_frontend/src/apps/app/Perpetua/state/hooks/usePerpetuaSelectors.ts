@@ -12,7 +12,6 @@ import {
   selectShelfEditors,
   selectEditorsLoading,
   selectIsOwner,
-  selectHasEditAccess,
   selectIsEditor,
 } from '../perpetuaSlice';
 
@@ -52,8 +51,6 @@ export const useUserPrincipal = () => useSelector((state: RootState) => state.au
 // Permission checks
 export const useIsOwner = (contentId: string) => 
   useSelector((state: RootState) => selectIsOwner(contentId)(state));
-export const useHasEditAccess = (contentId: string) => 
-  useSelector((state: RootState) => selectHasEditAccess(contentId)(state));
 export const useIsEditor = (contentId: string) => 
   useSelector((state: RootState) => selectIsEditor(contentId)(state));  
 

@@ -37,9 +37,9 @@ export {
   selectShelfEditors,
   selectEditorsLoading,
   selectIsOwner,
-  selectHasEditAccess,
   selectIsEditor,
-  selectOptimisticShelfItemOrder
+  selectOptimisticShelfItemOrder,
+  selectCanAddItem
 } from './perpetuaSlice';
 
 // Export types from perpetuaSlice

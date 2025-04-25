@@ -1,10 +1,11 @@
-import { useCallback, useMemo, useRef, useEffect } from 'react';
-import { Item } from "@/../../declarations/perpetua/perpetua.did";
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { ShelfPublic, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { setItemOrder } from '@/apps/app/Perpetua/state';
 import { useReorderable } from './useReorderable';
 import { compareArrays, createReorderReturn } from '../utils/reorderUtils';
 import { createReorderAdapter } from '../utils/createReorderAdapter';
-import { UseItemReorderingProps, ReorderRenderProps, ReorderParams } from '../../../../types/reordering.types';
+import { UseItemReorderingProps as ImportedProps, ReorderRenderProps, ReorderParams } from '../../../../types/reordering.types';
+import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 
 // Type for setItemOrder action parameters (Matches the thunk payload)
 interface SetItemOrderParams {
@@ -13,11 +14,23 @@ interface SetItemOrderParams {
   principal: string;
 }
 
+// Explicitly define props for the hook, matching the imported type
+interface UseItemReorderingProps {
+  shelf: ShelfPublic;
+  items: [number, Item][];
+  isOwner: boolean;
+}
+
 /**
  * Custom hook for item reordering within a shelf
  * Returns all necessary props for drag and drop reordering
  */
-export const useItemReordering = ({ shelf, items, hasEditAccess }: UseItemReorderingProps): ReorderRenderProps => {
+export const useItemReordering = ({
+  shelf,
+  items,
+  isOwner
+}: UseItemReorderingProps): ReorderRenderProps => {
+  const dispatch = useAppDispatch();
   // Keep a stable reference to items 
   const itemsRef = useRef(items);
   
@@ -56,7 +69,7 @@ export const useItemReordering = ({ shelf, items, hasEditAccess }: UseItemReorde
   const reorderableProps = useReorderable({
     items: reorderableItems,
     containerId: shelf.shelf_id,
-    hasEditAccess,
+    hasEditAccess: isOwner,
     reorderAction: reorderAdapter
   });
   

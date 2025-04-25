@@ -19,7 +19,7 @@ dfx canister start alex_frontend --network ic
 # alex_wallet (done)
 dfx canister stop alex_wallet --network ic
 dfx canister snapshot create alex_wallet --replace 00000000000000000000000001f0531e0101 --network ic
-dfx canister start alex_wallet --network ic
+dfx canister start alex_wallet --network icf
 
 # user (done)
 dfx canister stop user --network ic
@@ -43,7 +43,7 @@ dfx canister start asset_manager --network ic
 
 # Emporium
 dfx canister stop emporium --network ic
-dfx canister snapshot create emporium --replace 00000000000000000000000001f07b4e0101 --network ic
+dfx canister snapshot create emporium --replace 00000000000000020000000001f07b4e0101 --network ic
 dfx canister start emporium --network ic
 
 

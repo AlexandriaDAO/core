@@ -69,16 +69,6 @@ export const FollowedTagsList: React.FC = () => {
         );
     }
 
-    if (error) {
-        return (
-            <Alert variant="destructive" className="mb-4">
-                <AlertTitle>Error Loading Tags</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-                <Button onClick={fetchFollowedTags} variant="secondary" className="mt-2">Retry</Button>
-            </Alert>
-        );
-    }
-
     if (followedTags.length === 0) {
         return <p className="text-sm text-muted-foreground mb-4 font-serif">You are not following any tags yet.</p>;
     }

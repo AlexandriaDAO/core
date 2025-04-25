@@ -47,7 +47,7 @@ export interface UseShelfReorderingProps {
 export interface ItemReorderManagerProps {
   shelf: ShelfPublic;
   orderedItems: [number, Item][];
-  hasEditAccess: boolean;
+  isOwner: boolean;
   children: (props: ReorderRenderProps) => React.ReactNode;
 }
 

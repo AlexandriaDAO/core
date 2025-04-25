@@ -6,14 +6,14 @@ import { ItemReorderManagerProps } from '../../../../types/reordering.types';
 const ItemReorderManager: React.FC<ItemReorderManagerProps> = ({
   shelf,
   orderedItems,
-  hasEditAccess,
+  isOwner,
   children
 }) => {
   // All reordering logic is contained in this hook
   const reorderingProps = useItemReordering({
     shelf,
     items: orderedItems,
-    hasEditAccess
+    isOwner
   });
 
   return children(reorderingProps);

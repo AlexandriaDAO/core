@@ -151,15 +151,12 @@ Perpetua/
 
 
 Mainnet bug findings: 
-- The "No tags" failure while not logged in is too agressive looking.
-- Should be able to add an item to multiple shelves at once, not one at a time.
-- We need loading indicators on the shelf pages when the images are taking time to load.
-- I'm still somehow being logged out every 20 mintues. Wtf.
-- Withdraw button is partially underneath the expander button.
 - Also, the add to shelf modal needs a public section.
 - There's no 'add-item' option on public shelves and should be.
+- Should be able to add an item to multiple shelves at once, not one at a time.
 
 
+- (Will fix this when I deploy without all nfts)Withdraw button is partially underneath the expander button.
 
 
 

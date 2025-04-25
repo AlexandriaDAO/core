@@ -60,16 +60,6 @@ export const FollowedUsersList: React.FC = () => {
         );
     }
 
-    if (error) {
-        return (
-            <Alert variant="destructive" className="mb-4">
-                <AlertTitle>Error Loading Followed Users</AlertTitle>
-                <AlertDescription>{typeof error === 'string' ? error : JSON.stringify(error)}</AlertDescription>
-                <Button onClick={refetch} variant="secondary" className="mt-2">Retry</Button>
-            </Alert>
-        );
-    }
-
     if (followedUsers.size === 0) {
         return <p className="text-sm text-muted-foreground mb-4 font-serif">You are not following any users yet.</p>;
     }
@@ -78,7 +68,6 @@ export const FollowedUsersList: React.FC = () => {
         <div className="mb-4 font-serif">
             <h3 className="mb-2 font-semibold text-base">Following Users:</h3>
             <div className="flex flex-wrap gap-2 items-center">
-                {/* Convert Set to Array for mapping */} 
                 {Array.from(followedUsers).map(principalString => (
                     <Badge key={principalString} variant="secondary" className="pl-3 pr-1 py-1 flex items-center gap-1 group relative">
                         <User size={12} className="text-muted-foreground" />

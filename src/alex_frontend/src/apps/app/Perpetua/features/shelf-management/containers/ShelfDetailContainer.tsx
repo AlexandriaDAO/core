@@ -4,7 +4,11 @@ import { ShelfPublic, Item } from "@/../../declarations/perpetua/perpetua.did";
 import { parsePathInfo, usePerpetuaNavigation } from "../../../routes";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { selectOptimisticShelfItemOrder } from "@/apps/app/Perpetua/state";
+import { 
+	selectOptimisticShelfItemOrder,
+	selectIsOwner,
+	selectCanAddItem
+} from "@/apps/app/Perpetua/state";
 import { ItemReorderManager } from "../../shared/reordering/components";
 import { ShelfDetailView } from "../../cards/components/ShelfDetailView";
 import { ShelfSettingsDialog } from "../../shelf-settings";
@@ -30,7 +34,6 @@ export interface ShelfDetailProps {
 	onBack: () => void;
 	onAddItem?: (shelf: ShelfPublic	) => void;
 	onReorderItem?: (shelfId: string, itemId: number, referenceItemId: number | null, before: boolean) => Promise<void>;
-	hasEditAccess?: boolean;
 }
 
 // The ShelfDetailContainer component that integrates with the UI component
@@ -39,7 +42,6 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 	onBack,
 	onAddItem,
 	onReorderItem,
-	hasEditAccess = true
 }) => {
 	const pathInfo = parsePathInfo(window.location.pathname);
 	const identity = useIdentity();
@@ -48,6 +50,10 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 	
 	// Access the updateMetadata function from ShelfOperations
 	const { updateMetadata, addItem } = useShelfOperations();
+	
+	// Determine access rights using selectors
+	const isOwner = useAppSelector<boolean>(selectIsOwner(shelf.shelf_id));
+	const canAddItem = useAppSelector<boolean>(selectCanAddItem(shelf.shelf_id));
 	
 	// Check for optimistic item order
 	const optimisticItemOrder = useAppSelector(selectOptimisticShelfItemOrder(shelf.shelf_id)) as number[];
@@ -109,7 +115,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 		<ItemReorderManager
 			shelf={shelf}
 			orderedItems={orderedItems}
-			hasEditAccess={hasEditAccess}
+			isOwner={isOwner}
 		>
 			{({
 				isEditMode,
@@ -129,7 +135,8 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 					orderedItems={orderedItems}
 					isEditMode={isEditMode}
 					editedItems={editedItems}
-					hasEditAccess={hasEditAccess}
+					isOwner={isOwner}
+					canAddItem={canAddItem}
 					onBack={onBack}
 					onAddItem={handleItemSubmit}
 					onViewItem={handleViewItem}
@@ -143,7 +150,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 					getDragItemStyle={getDragItemStyle}
 					draggedIndex={draggedIndex || null}
 					settingsButton={
-						hasEditAccess && !isEditMode ? (
+						isOwner && !isEditMode ? (
 							<ShelfSettingsDialog 
 								shelf={shelf} 
 								onUpdateMetadata={updateMetadata}

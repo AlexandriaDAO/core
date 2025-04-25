@@ -4,7 +4,8 @@ import { Edit, Plus, X, Grid, List } from "lucide-react";
 import { useState } from 'react';
 
 interface ShelfViewControlsProps {
-  hasEditAccess: boolean;
+  isOwner: boolean;
+  canAddItem: boolean;
   isEditMode: boolean;
   isSaving: boolean;
   settingsButton?: React.ReactNode;
@@ -18,7 +19,8 @@ interface ShelfViewControlsProps {
 }
 
 export const ShelfViewControls: React.FC<ShelfViewControlsProps> = ({
-  hasEditAccess,
+  isOwner,
+  canAddItem,
   isEditMode,
   isSaving,
   settingsButton,
@@ -55,7 +57,7 @@ export const ShelfViewControls: React.FC<ShelfViewControlsProps> = ({
     {!isEditMode && settingsButton}
     
     {/* Edit mode controls */}
-    {!isEditMode && hasEditAccess && (
+    {!isEditMode && isOwner && (
       <Button
         variant="outline"
         className="flex items-center gap-1 h-8 text-sm"
@@ -89,7 +91,7 @@ export const ShelfViewControls: React.FC<ShelfViewControlsProps> = ({
     )}
     
     {/* Add item button */}
-    {hasEditAccess && (
+    {canAddItem && (
       <Button
         variant="primary"
         className="flex items-center gap-1 h-8 text-sm"

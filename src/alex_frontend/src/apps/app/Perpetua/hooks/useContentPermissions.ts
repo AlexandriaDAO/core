@@ -3,7 +3,6 @@ import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useCallback } from 'react';
 import { 
-  selectHasEditAccess,
   setContentPermission
 } from '@/apps/app/Perpetua/state/perpetuaSlice';
 

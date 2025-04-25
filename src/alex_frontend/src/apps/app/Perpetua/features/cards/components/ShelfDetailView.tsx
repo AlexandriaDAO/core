@@ -26,7 +26,8 @@ interface UpdatedShelfDetailViewProps {
   orderedItems: [number, Item][];
   isEditMode: boolean;
   editedItems: [number, Item][];
-  hasEditAccess: boolean;
+  isOwner: boolean;
+  canAddItem: boolean;
   onBack: () => void;
   onAddItem: (content: string, type: "Nft" | "Markdown" | "Shelf", collectionType?: "NFT" | "SBT") => Promise<boolean | void>;
   onViewItem?: (itemId: number) => void;
@@ -50,7 +51,8 @@ export const ShelfDetailView: React.FC<UpdatedShelfDetailViewProps> = ({
   orderedItems,
   isEditMode,
   editedItems,
-  hasEditAccess,
+  isOwner,
+  canAddItem,
   onBack,
   onAddItem,
   onViewItem,
@@ -153,7 +155,8 @@ export const ShelfDetailView: React.FC<UpdatedShelfDetailViewProps> = ({
         />
         
         <ShelfViewControls
-          hasEditAccess={hasEditAccess}
+          isOwner={isOwner}
+          canAddItem={canAddItem}
           isEditMode={isEditMode}
           isSaving={isSaving}
           settingsButton={settingsButton}
@@ -168,7 +171,7 @@ export const ShelfDetailView: React.FC<UpdatedShelfDetailViewProps> = ({
       </div>
       
       {/* Inline Item Creator */}
-      {isAddingItem && hasEditAccess && (
+      {isAddingItem && canAddItem && (
         <div className="px-4 pt-4">
           <InlineItemCreator
             onSubmit={handleItemSubmit}
@@ -181,8 +184,8 @@ export const ShelfDetailView: React.FC<UpdatedShelfDetailViewProps> = ({
       <div className="flex-1 p-4">
         {items.length === 0 ? (
           <ShelfEmptyView 
-            hasEditAccess={hasEditAccess} 
-            onAddItem={hasEditAccess ? handleAddItemClick : () => {}} 
+            canAddItem={canAddItem}
+            onAddItem={canAddItem ? handleAddItemClick : () => {}}
             shelf={shelf} 
           />
         ) : viewMode === 'grid' ? (

@@ -636,7 +636,7 @@ const memoizedSelectorsByShelfId = {
   shelfById: new Map<string, ReturnType<typeof createSelector>>(),
   shelfEditors: new Map<string, ReturnType<typeof createSelector>>(),
   editorsLoading: new Map<string, ReturnType<typeof createSelector>>(),
-  hasEditAccess: new Map<string, ReturnType<typeof createSelector>>(),
+  canAddItem: new Map<string, ReturnType<typeof createSelector>>(),
   isOwner: new Map<string, ReturnType<typeof createSelector>>(),
   isEditor: new Map<string, ReturnType<typeof createSelector>>(),
   isPublic: new Map<string, ReturnType<typeof createSelector>>(),
@@ -779,31 +779,6 @@ const selectPublicAccessLoading = (shelfId: string) => {
   return memoizedSelectorsByShelfId.publicAccessLoading.get(shelfId)!;
 };
 
-// Select edit access for a shelf (memoized factory)
-const selectHasEditAccess = (contentId: string) => {
-  if (!memoizedSelectorsByShelfId.hasEditAccess.has(contentId)) {
-    const selector = createSelector(
-      selectUserPrincipal,
-      (state: RootState) => selectShelves(state)[contentId], // Use base selector
-      (state: RootState) => selectShelfEditorsByIdMap(state)[contentId] || [],
-      (state: RootState) => selectPublicAccessByIdMap(state)[contentId], // Check public map first
-      (userPrincipal, shelf, editors, isPublic) => {
-        if (!shelf) return false;
-        // Check if explicitly public first (using the dedicated map value if available)
-        if (isPublic === true) return true;
-        // For non-public shelves, user needs to be logged in
-        if (!userPrincipal) return false;
-        // Check if user is owner
-        if (shelf.owner === userPrincipal) return true;
-        // Check if user is editor
-        return editors.includes(userPrincipal);
-      }
-    );
-    memoizedSelectorsByShelfId.hasEditAccess.set(contentId, selector);
-  }
-  return memoizedSelectorsByShelfId.hasEditAccess.get(contentId)!;
-};
-
 // Select if user is owner of a shelf (memoized factory)
 const selectIsOwner = (contentId: string) => {
   if (!memoizedSelectorsByShelfId.isOwner.has(contentId)) {
@@ -901,6 +876,23 @@ const selectTagShelfCount = (tag: string) => {
   return memoizedTagSelectors.tagShelfCount.get(tag)!;
 };
 
+// Select if user can add items to a shelf (memoized factory)
+// Allows adding if the shelf is public OR the user is owner OR the user is an editor
+const selectCanAddItem = (contentId: string) => {
+  if (!memoizedSelectorsByShelfId.canAddItem.has(contentId)) {
+    const selector = createSelector(
+      (state: RootState) => selectIsShelfPublic(contentId)(state), // Is it public?
+      (state: RootState) => selectIsOwner(contentId)(state),      // Is user the owner?
+      (state: RootState) => selectIsEditor(contentId)(state),     // Is user an editor?
+      (isPublic, isOwner, isEditor) => {
+        // Allow adding if public OR owner OR editor
+        return isPublic || isOwner || isEditor;
+      }
+    );
+    memoizedSelectorsByShelfId.canAddItem.set(contentId, selector);
+  }
+  return memoizedSelectorsByShelfId.canAddItem.get(contentId)!;
+};
 
 // --- Export Selectors ---
 // Export the selectors needed by the application
@@ -932,7 +924,7 @@ export {
     selectEditorsLoading,
     selectIsShelfPublic,
     selectPublicAccessLoading,
-    selectHasEditAccess,
+    selectCanAddItem,
     selectIsOwner,
     selectIsEditor,
     selectUserShelvesForUser,
