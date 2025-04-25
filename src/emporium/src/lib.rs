@@ -1,5 +1,8 @@
 use ic_cdk;
 
+mod id_converter;
+pub use id_converter::*;
+
 mod storage;
 pub use storage::*;
 mod update;

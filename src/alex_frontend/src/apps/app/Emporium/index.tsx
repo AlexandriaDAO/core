@@ -1,20 +1,9 @@
 import React, { useEffect, useState } from "react";
-import {
-    PageContainer,
-    Title,
-    Description,
-    Hint,
-    ControlsContainer,
-    FiltersButton,
-    SearchButton,
-    SearchFormContainer,
-    FiltersIcon,
-} from "./styles";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketListing from "./thunks/getMarketListing";
 import ContentListEmporium from "./contentListEmporium";
-import { ArrowUp, Container } from "lucide-react";
+import { ArrowUp, Search } from "lucide-react";
 import EmporiumSearchForm from "./component/emporiumSearchForm";
 import SearchEmporium from "./component/searchEmporium";
 import PaginationComponent from "./component/PaginationComponent";
@@ -29,6 +18,7 @@ import { getCallerAssetCanister } from "@/apps/Modules/shared/state/assetManager
 import { useAssetManager } from "@/hooks/useAssetManager";
 import { useInternetIdentity } from "ic-use-internet-identity";
 import fetch from "@/features/icp-assets/thunks/fetch";
+import { Link } from "react-router";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
@@ -248,36 +238,34 @@ const Emporium = () => {
 
     return (
         <>
-            <PageContainer className="">
-                <Title className="lg:text-5xl md:text-3xl sm:text-2xl xs:text-xl">
+            <div className="flex flex-col items-center gap-3.5 md:gap-6 mx-auto py-10 sm:pb-4 px-5 w-full max-w-md md:max-w-2xl xl:max-w-[800px]">
+                <h1 className="text-foreground text-center font-syne font-bold m-0 text-xl sm:text-2xl md:text-3xl lg:text-5xl">
                     Emporium
-                </Title>
-                <Description>MarketPlace</Description>
-                <Hint></Hint>
+                </h1>
+                <p className="text-foreground text-center font-syne font-normal m-0 text-2xl">MarketPlace</p>
 
-                {activeButton === "userNfts" ? (
-                    <></>
-                ) : (
+                {activeButton !== "userNfts" && (
                     <>
                         <SearchEmporium />
-                        <ControlsContainer $isOpen={isFiltersOpen}>
-                            <FiltersButton onClick={toggleFilters} $isOpen={isFiltersOpen}>
+                        <div className={`flex w-full gap-4 flex-wrap justify-center ${isFiltersOpen ? "mb-6" : "mb-2.5 sm:mb-0"}`}>
+                            <button onClick={toggleFilters} className={`h-10 py-2.5 px-6 flex justify-center items-center gap-2.5 flex-shrink-0 rounded-[10px] cursor-pointer transition-all duration-300 ease-in-out font-syne text-base min-w-[90px] md:min-w-[100px] md:h-[50px] xl:min-w-[120px] ${isFiltersOpen ? "bg-balancebox text-white border-none shadow-sm" : "bg-background text-foreground border border-border"}`}>
                                 Filters
-                                {isFiltersOpen ? <ArrowUp size={20} /> : <FiltersIcon />}
-                            </FiltersButton>
-                            <SearchButton
+                                {isFiltersOpen ? <ArrowUp size={20} /> : <Search size={20} />}
+                            </button>
+                            <button
                                 onClick={handleSearchClick}
                                 disabled={emporium.loading}
+                                className="h-10 py-2.5 px-4 flex justify-center items-center gap-2.5 flex-grow flex-shrink-0 flex-basis-0 rounded-[10px] bg-balancebox border-none text-white cursor-pointer font-syne text-base min-w-[230px] md:min-w-[400px] md:h-[50px] xl:min-w-[600px]"
                             >
                                 {emporium.loading ? "Loading..." : "Search"}
-                            </SearchButton>
-                        </ControlsContainer>
-                        <SearchFormContainer $isOpen={isFiltersOpen}>
+                            </button>
+                        </div>
+                        <div className={`${isFiltersOpen ? "h-auto py-4 px-0" : "h-0 p-0"} overflow-hidden transition-all duration-300 ease-in-out m-0 w-full max-w-[800px]`}>
                             <EmporiumSearchForm />
-                        </SearchFormContainer>
+                        </div>
                     </>
                 )}
-            </PageContainer>
+            </div>
             <div className="container px-2">
                 <div className="lg:pb-10 md:pb-8 sm:pb-6 xs:pb-4">
                     {navigationItems.map((item) => (

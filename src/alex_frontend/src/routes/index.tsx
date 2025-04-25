@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router";
 
 import TopProgressBar from "@/components/TopProgressBar";
@@ -16,6 +16,11 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { ROUTES } from "./routeConfig";
 import PasswordProtect from "@/components/PasswordProtect";
 
+import MarketSkeleton from "@/layouts/skeletons/emporium/MarketSkeleton";
+import GeneralSkeleton from "@/layouts/skeletons/emporium/GeneralSkeleton";
+import MyNftsSkeleton from "@/layouts/skeletons/emporium/MyNftsSkeleton";
+import { EmporiumActor } from "@/actors";
+import Imporium from "@/pages/emporium";
 const HomePage = lazy(()=>import("@/pages/HomePage"));
 
 const DashboardLayout = lazy(()=>import("@/layouts/DashboardLayout"));
@@ -42,6 +47,14 @@ const Perpetua = lazy(()=>import("@/apps/app/Perpetua"));
 const Dialectica = lazy(()=>import("@/apps/app/Dialectica"));
 const Permasearch = lazy(()=>import("@/apps/app/Permasearch"));
 const Emporium = lazy(()=>import("@/apps/app/Emporium"));
+
+const NftsPage = lazy(()=>import("@/pages/emporium/NftsPage"));
+const MyLogsPage = lazy(()=>import("@/pages/emporium/MyLogsPage"));
+const MarketLogsPage = lazy(()=>import("@/pages/emporium/MarketLogsPage"));
+const MyListingsPage = lazy(()=>import("@/pages/emporium/MyListingsPage"));
+const OwnerListingsPage = lazy(()=>import("@/pages/emporium/OwnerListingsPage"));
+const MarketPlacePage = lazy(()=>import("@/pages/emporium/MarketPlacePage"));
+
 const SwapPage = lazy(()=>import("@/pages/swap"));
 const DetailTransaction = lazy(()=>import("@/features/swap/components/transactionHistory/detailTransaction"));
 // const DashboardPage = lazy(()=>import("@/pages/dashboard"));
@@ -94,6 +107,18 @@ const router = createBrowserRouter(
 					<Route path="permasearch" element={<Suspense key="permasearch" fallback={<TopProgressBar />}><Permasearch /></Suspense>} />
 
 					<Route path="emporium" element={<Suspense key="emporium" fallback={<TopProgressBar />}><Emporium /></Suspense>} />
+
+					<Route path="imporium">
+						<Route index element={<Suspense key="imporium" fallback={<MarketSkeleton />}><Imporium /></Suspense>} />
+
+						{/* <Route path="marketplace" element={<Suspense key="emporium-marketplace" fallback={<MarketSkeleton />}><MarketPlacePage /></Suspense>} /> */}
+
+						{/* <Route path="my-nfts" element={<Suspense key="emporium-my-nfts" fallback={<MyNftsSkeleton />}><MyNftsPage /></Suspense>} /> */}
+
+						<Route path="my-logs" element={<Suspense key="emporium-my-logs" fallback={<GeneralSkeleton />}><MyLogsPage /></Suspense>} />
+						<Route path="market-logs" element={<Suspense key="emporium-market-logs" fallback={<GeneralSkeleton />}><MarketLogsPage /></Suspense>} />
+						{/* <Route path="my-listings" element={<Suspense key="emporium-my-listing" fallback={<GeneralSkeleton />}><EmporiumActor><MyListingsPage /></EmporiumActor></Suspense>} /> */}
+					</Route>
 				</Route>
 				<Route path="swap">
 					<Route index element={<Suspense key="swap" fallback={<TopProgressBar />}><SwapPage /></Suspense>} />
@@ -117,6 +142,11 @@ const router = createBrowserRouter(
 			<Route element={<AuthGuard />}>
 				<Route element={<MainLayout />}>
 					<Route path={ROUTES.PINAX} element={<Suspense key="pinax" fallback={<PinaxSkeleton />}><PinaxPage /></Suspense>} />
+
+					<Route path="app/imporium/nfts" element={<Suspense key="imporium-nfts" fallback={<MyNftsSkeleton />}><NftsPage /></Suspense>} />
+					<Route path="app/imporium/marketplace" element={<Suspense key="imporium-marketplace" fallback={<GeneralSkeleton />}><EmporiumActor><MarketPlacePage /></EmporiumActor></Suspense>} />
+					<Route path="app/imporium/listings" element={<Suspense key="imporium-listing" fallback={<GeneralSkeleton />}><EmporiumActor><MyListingsPage /></EmporiumActor></Suspense>} />
+					<Route path="app/imporium/listings/:owner" element={<Suspense key="imporium-listing-owner" fallback={<GeneralSkeleton />}><EmporiumActor><OwnerListingsPage /></EmporiumActor></Suspense>} />
 				</Route>
 				<Route element={<Protected route />}>
 					<Route path={ROUTES.DASHBOARD_ROUTES.BASE} element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>

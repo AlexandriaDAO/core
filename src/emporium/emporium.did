@@ -34,11 +34,14 @@ type Nft = record {
 type NftStatus = variant { Listed; Reimbursed };
 type Result = variant { Ok : text; Err : text };
 service : {
+  arweave_id_to_nat : (text) -> (nat) query;
   buy_nft : (nat) -> (Result);
-  get_caller_listing : (opt nat64, opt nat64) -> (Listing) query;
   get_caller_logs : (opt nat64, opt nat64, opt nat) -> (Logs) query;
   get_listing : (opt nat64, opt nat64) -> (Listing) query;
   get_listing_total_count : () -> (nat64) query;
+  get_listings : (opt text, opt nat64, opt nat64, opt bool, opt bool) -> (
+      Listing,
+    ) query;
   get_logs : (opt nat64, opt nat64, opt nat) -> (Logs) query;
   get_search_listing : (
       opt nat64,
@@ -49,7 +52,15 @@ service : {
       opt principal,
       text,
     ) -> (Listing) query;
+  is_arweave_id : (text) -> (bool) query;
   list_nft : (nat, nat64) -> (Result);
+  nat_to_arweave_id : (nat) -> (text) query;
   remove_nft_listing : (nat) -> (Result);
+  search_caller_listing_by_token_id : (nat, opt principal) -> (
+      opt record { text; Nft },
+    ) query;
+  search_listing : (text) -> (vec record { text; Nft }) query;
+  search_listing_by_principal : (principal) -> (vec record { text; Nft }) query;
+  search_listing_by_token : (nat) -> (vec record { text; Nft }) query;
   update_nft_price : (nat, nat64) -> (Result);
 }

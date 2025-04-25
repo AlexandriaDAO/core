@@ -13,3 +13,4 @@ export { default as VetkdActor } from './VetkdActor';
 export { default as UserActor } from './UserActor';
 export { default as AlexWalletActor } from './AlexWalletActor';
 export { default as PerpetuaActor } from './PerpetuaActor';
+export { default as EmporiumActor } from './EmporiumActor';
