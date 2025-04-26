@@ -9,9 +9,11 @@ import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components
 import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
 import { Button } from "@/lib/components/button";
 import { withdraw_nft } from "@/features/nft/withdraw";
+import { mint_nft } from "@/features/nft/mint";
 import { TooltipProvider } from "@/lib/components/tooltip";
 import { Loader2 } from 'lucide-react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
+import { UnifiedCardActions } from "@/apps/Modules/shared/components/UnifiedCardActions/UnifiedCardActions";
 import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import type { Transaction } from '../../shared/types/queries';
 import { TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
@@ -19,6 +21,8 @@ import { useIdentity } from '@/hooks/useIdentity';
 import { loadShelves } from '@/apps/app/Perpetua/state';
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { selectUserShelves, selectLoading } from "@/apps/app/Perpetua/state/perpetuaSlice";
+import { Principal } from '@dfinity/principal';
+import { ShelvesPreloader } from "../shared/components/ShelvesPreloader";
 
 // Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
@@ -29,29 +33,6 @@ export interface ContentGridProps {
 
 type ContentGridComponent = React.FC<ContentGridProps> & {
   Item: typeof ContentCard;
-};
-
-/**
- * Preloads shelves data as soon as the app loads
- * This ensures shelves are ready when a user clicks on an owned badge
- */
-const ShelvesPreloader: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { identity } = useIdentity();
-  const shelvesLoading = useAppSelector(selectLoading);
-  const availableShelves = useAppSelector(selectUserShelves);
-
-  useEffect(() => {
-    if (identity && !shelvesLoading && availableShelves.length === 0) {
-      dispatch(loadShelves({
-        principal: identity.getPrincipal(),
-        params: { offset: 0, limit: 20 }
-      }));
-    }
-  }, [identity, dispatch]);
-
-  // This component doesn't render anything
-  return null;
 };
 
 export const ContentGrid: ContentGridComponent = Object.assign(
@@ -95,12 +76,31 @@ const Grid = ({ dataSource }: GridProps = {}) => {
   const sortedTransactions = useSortedTransactions();
 
   // Reinstate local state for dialog management
-  const [selectedContent, setSelectedContent] = useState<{ id: string; type: string,assetUrl:string } | null>(null);
-  const [mintingStates, setMintingStates] = useState<Record<string, boolean>>({});
+  const [selectedContent, setSelectedContent] = useState<{ id: string; type: string, assetUrl: string } | null>(null);
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
+  const [likingStates, setLikingStates] = useState<Record<string, boolean>>({});
 
   const handleRenderError = useCallback((transactionId: string) => {
     dispatch(clearTransactionContent(transactionId));
+  }, [dispatch]);
+
+  const handleLike = useCallback(async (transactionId: string): Promise<string | null> => {
+    setLikingStates(prev => ({ ...prev, [transactionId]: true }));
+    try {
+      const mintedIdString = await mint_nft(transactionId);
+      
+      if (mintedIdString) {
+        return mintedIdString;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error("Unexpected error in handleLike after mint_nft call:", error);
+      toast.error("An unexpected error occurred while liking.");
+      return null;
+    } finally {
+      setLikingStates(prev => ({ ...prev, [transactionId]: false }));
+    }
   }, [dispatch]);
 
   const handleWithdraw = useCallback(async (transactionId: string) => {
@@ -146,38 +146,56 @@ const Grid = ({ dataSource }: GridProps = {}) => {
         <ContentGrid>
           {sortedTransactions.map((transaction: Transaction) => {
             const content = contentData[transaction.id];
-            // Reinstate contentType variable
             const contentType = transaction.tags.find((tag: { name: string; value: string }) => tag.name === "Content-Type")?.value || "application/epub+zip";
-            
-            const nftId = arweaveToNftId[transaction.id];
-            const nftData = nftId ? nfts[nftId] : undefined;
-            const isOwned = user && nftData?.principal === user.principal;
             
             const hasPredictions = !!predictions[transaction.id];
             const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 
+            const nftId = arweaveToNftId[transaction.id];
+            const nftData = nftId ? nfts[nftId] : undefined;
+            const isOwned = !!(user && nftData?.principal === user.principal);
             const canWithdraw = isOwned && nftData && hasWithdrawableBalance(
               nftData.balances?.alex,
               nftData.balances?.lbry
             );
 
+            const detectedContentType = nftData ? 'Nft' : 'Arweave';
+
+            let ownerPrincipal: Principal | undefined;
+            try {
+              ownerPrincipal = transaction.owner ? Principal.fromText(transaction.owner) : undefined;
+            } catch (e) {
+              console.error("Invalid owner principal format:", transaction.owner, e);
+              ownerPrincipal = undefined;
+            }
+
             return (
               <ContentGrid.Item
                 key={transaction.id}
-                // Revert onClick handler to use setSelectedContent
-                onClick={() => setSelectedContent({ id: transaction.id, type: contentType ,assetUrl:transaction.assetUrl?transaction.assetUrl:""})}
+                onClick={() => setSelectedContent({ 
+                    id: transaction.id, 
+                    type: contentType,
+                    assetUrl: transaction?.assetUrl || ""
+                 })}
                 id={transaction.id}
                 owner={transaction.owner}
-                isOwned={isOwned || false}
-                isMinting={mintingStates[transaction.id]}
-                onWithdraw={canWithdraw ? (e) => {
-                  e.stopPropagation();
-                  handleWithdraw(transaction.id);
-                } : undefined}
                 predictions={predictions[transaction.id]}
-                isFromAssetCanister={ (transaction.assetUrl&&transaction?.assetUrl!=="")?true:false}
+                isFromAssetCanister={(transaction.assetUrl && transaction?.assetUrl !== "") ? true : false}
+                initialContentType={detectedContentType}
               >
                 <div className="group relative w-full h-full">
+                  <UnifiedCardActions 
+                    contentId={transaction.id}
+                    contentType={detectedContentType}
+                    ownerPrincipal={ownerPrincipal}
+                    isOwned={isOwned}
+                    isLikable={detectedContentType === 'Arweave' && !isOwned}
+                    onLike={async () => await handleLike(transaction.id)}
+                    className="absolute top-1.5 right-1.5 z-20"
+                    onToggleDetails={() => {}}
+                    showDetails={false}
+                  />
+                  
                   <ContentRenderer
                     transaction={transaction}
                     content={content}
@@ -202,12 +220,13 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                         e.stopPropagation();
                         handleWithdraw(transaction.id);
                       }}
-                      className="absolute bottom-2 right-2 z-30"
+                      className="absolute bottom-2 right-2 z-20 bg-background/80 backdrop-blur-sm hover:bg-background/90 text-xs h-7 px-2"
+                      variant="secondary"
                       disabled={withdrawingStates[transaction.id]}
                     >
                       {withdrawingStates[transaction.id] ? (
                         <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                           Withdrawing...
                         </>
                       ) : (
@@ -221,7 +240,6 @@ const Grid = ({ dataSource }: GridProps = {}) => {
           })}
         </ContentGrid>
 
-        {/* Reinstate Dialog component */}
         <Dialog open={!!selectedContent} onOpenChange={handleDialogOpenChange}>
           <DialogContent 
             className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"
@@ -240,7 +258,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                   contentUrls={contentData[selectedContent.id]?.urls || {
                     thumbnailUrl: null,
                     coverUrl: null,
-                    fullUrl: contentData[selectedContent.id]?.url || `https://arweave.net/${selectedContent.id}`
+                    fullUrl: selectedContent.assetUrl || `https://arweave.net/${selectedContent.id}`
                   }}
                   inModal={true}
                   handleRenderError={handleRenderError}

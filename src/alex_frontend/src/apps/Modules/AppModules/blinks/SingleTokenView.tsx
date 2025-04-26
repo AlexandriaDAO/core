@@ -6,13 +6,12 @@ import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
 import { toast } from "sonner";
-import { mint_nft } from "@/features/nft/mint";
-import { withdraw_nft } from "@/features/nft/withdraw";
+// import { withdraw_nft } from "@/features/nft/withdraw"; // Keep commented if not used
 import { Principal } from '@dfinity/principal';
 import { ALEX } from '../../../../../../declarations/ALEX';
 import { LBRY } from '../../../../../../declarations/LBRY';
 import { nft_manager } from '../../../../../../declarations/nft_manager';
-import { updateNftBalances } from '../../shared/state/nftData/nftDataSlice';
+import { updateNftBalances, setNFTs } from '../../shared/state/nftData/nftDataSlice';
 import { fetchTransactionById } from '../../LibModules/arweaveSearch/api/directArweaveClient';
 import { ContentService } from '../../LibModules/contentDisplay/services/contentService';
 import { setContentData } from '../../shared/state/transactions/transactionSlice';
@@ -21,18 +20,17 @@ import { Badge } from "@/lib/components/badge";
 import { Copy, Check, Link, X } from "lucide-react";
 import { copyToClipboard } from '@/apps/Modules/AppModules/contentGrid/utils/clipboard';
 import { getNftOwnerInfo, UserInfo } from '../../shared/utils/nftOwner';
-import { setNFTs } from '../../shared/state/nftData/nftDataSlice';
 import { Button } from "@/lib/components/button";
 import { convertE8sToToken, formatPrincipal, formatBalance } from '../../shared/utils/tokenUtils';
 import { createTokenAdapter, determineTokenType, TokenType } from '../../shared/adapters/TokenAdapter';
+import { UnifiedCardActions } from '../../shared/components/UnifiedCardActions/UnifiedCardActions';
+import { ShelvesPreloader } from '../shared/components/ShelvesPreloader';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
 function SingleTokenView() {
-  const { tokenId } = useParams();
+  const { tokenId } = useParams<{ tokenId: string }>();
   const [isLoading, setIsLoading] = useState(true);
-  const [isMinting, setIsMinting] = useState(false);
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [contentUrls, setContentUrls] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
@@ -42,7 +40,15 @@ function SingleTokenView() {
   const dispatch = useDispatch<AppDispatch>();
   
   const contentData = useSelector((state: RootState) => state.transactions.contentData);
-  const { nfts } = useSelector((state: RootState) => state.nftData);
+  const nft = useSelector((state: RootState) => 
+    tokenId ? state.nftData.nfts[tokenId] : undefined
+  );
+  const nftBalances = useSelector((state: RootState) => 
+    tokenId ? state.nftData.nfts[tokenId]?.balances : undefined
+  );
+  const nftPrincipal = nft?.principal;
+  const nftCollection = nft?.collection;
+  
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -53,86 +59,62 @@ function SingleTokenView() {
       
       try {
         setIsLoading(true);
-        let nft = nfts[tokenId];
-        
-        if (!nft || !nft.arweaveId) {
-          console.log('NFT not found in Redux store, fetching directly...', tokenId);
-          // If NFT data isn't in the Redux store, fetch it directly
+        let currentNftData = nft;
+        let arweaveId = nft?.arweaveId;
+
+        if (!currentNftData || !arweaveId) {
+          console.log('NFT data or Arweave ID missing in Redux store, fetching directly...', tokenId);
           const tokenType = determineTokenType(tokenId);
           const tokenAdapter = createTokenAdapter(tokenType);
           const nftId = BigInt(tokenId);
           
-          // Get owner info
-          const ownerResult = await tokenAdapter.getOwnerOf([nftId]);
-          let ownerPrincipal = '';
+          const fetchedNftDataBase = await tokenAdapter.tokenToNFTData(nftId, '');
+          arweaveId = fetchedNftDataBase.arweaveId;
           
-          if (ownerResult && ownerResult.length > 0 && ownerResult[0] && ownerResult[0].length > 0) {
-            ownerPrincipal = ownerResult[0][0]?.owner.toString() || '';
+          if (!arweaveId) {
+            throw new Error('Unable to fetch Arweave ID for NFT');
           }
-          
-          // Get NFT data
-          const nftData = await tokenAdapter.tokenToNFTData(nftId, ownerPrincipal);
-          
-          // Add to Redux store
-          dispatch(setNFTs({
-            [tokenId]: nftData
-          }));
-          
-          nft = nftData;
-          
-          // Fetch balances
-          const subaccount = await nft_manager.to_nft_subaccount(nftId);
-          const balanceParams = {
-            owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-            subaccount: [Array.from(subaccount)] as [number[]]
+
+          currentNftData = { 
+              ...fetchedNftDataBase,
+              principal: currentNftData?.principal || ''
           };
-
-          const [alexBalance, lbryBalance] = await Promise.all([
-            ALEX.icrc1_balance_of(balanceParams),
-            LBRY.icrc1_balance_of(balanceParams)
-          ]);
-
-          dispatch(updateNftBalances({
-            tokenId,
-            alex: convertE8sToToken(alexBalance),
-            lbry: convertE8sToToken(lbryBalance),
-            collection: tokenType
-          }));
+          
+          // Avoid dispatching within the primary data loading part if possible to prevent loops
         }
+
+        if (!arweaveId) {
+          console.error('Critical: Arweave ID not found for tokenId:', tokenId);
+          toast.error('Unable to fetch NFT metadata link.');
+          setIsLoading(false);
+          return;
+        }
+
+        const txData = await fetchTransactionById(arweaveId);
         
-        if (!nft || !nft.arweaveId) {
-          console.error('Unable to fetch NFT data for tokenId:', tokenId);
-          toast.error('Unable to fetch NFT data');
+        if (!txData) {
+          console.error('Transaction not found for arweaveId:', arweaveId);
+          toast.error('Transaction data not found.');
           setIsLoading(false);
           return;
         }
         
-        const txData = await fetchTransactionById(nft.arweaveId);
-        
-        if (!txData) {
-          console.error('Transaction not found for arweaveId:', nft.arweaveId);
-          toast.error('Transaction not found');
-          return;
-        }
+        const content = await ContentService.loadContent(txData);
+        const urls = await ContentService.getContentUrls(txData, content);
         
         if (mounted) {
           setTransaction(txData);
-          
-          const content = await ContentService.loadContent(txData);
-          const urls = await ContentService.getContentUrls(txData, content);
           setContentUrls(urls);
           
           dispatch(setContentData({ 
             id: txData.id, 
-            content: {
-              ...content,
-              urls
-            }
+            content: { ...content, urls }
           }));
         }
+
       } catch (error) {
-        console.error('Failed to load NFT:', error);
-        toast.error('Failed to load NFT data');
+        console.error('Failed to load NFT core data:', error);
+        if (mounted) toast.error('Failed to load NFT data');
       } finally {
         if (mounted) {
           setIsLoading(false);
@@ -145,30 +127,69 @@ function SingleTokenView() {
     return () => {
       mounted = false;
     };
-  }, [tokenId, dispatch, nfts]);
+  }, [tokenId, dispatch]);
 
   useEffect(() => {
     let mounted = true;
-    
     async function loadOwnerInfo() {
       if (!tokenId) return;
-      
-      try {
-        const info = await getNftOwnerInfo(tokenId);
-        if (mounted) {
-          setOwnerInfo(info);
-        }
-      } catch (error) {
-        console.error('Failed to load owner info:', error);
+      if (!ownerInfo || (nftPrincipal && ownerInfo.principal !== nftPrincipal)) {
+          try {
+            const info = await getNftOwnerInfo(tokenId);
+            if (mounted) {
+              setOwnerInfo(info);
+              if (nft && info?.principal && nft.principal !== info.principal) {
+                  dispatch(setNFTs({ [tokenId]: { ...nft, principal: info.principal } }));
+              }
+            }
+          } catch (error) {
+            if (mounted) console.error('Failed to load owner info:', error);
+          }
       }
     }
-    
     loadOwnerInfo();
-    
-    return () => {
-      mounted = false;
-    };
-  }, [tokenId]);
+    return () => { mounted = false; };
+  }, [tokenId, nftPrincipal, ownerInfo, dispatch, nft]);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadBalances() {
+        if (!tokenId || !nftCollection) return;
+
+        if (!nftBalances || Object.keys(nftBalances).length === 0) {
+            console.log("Fetching balances for", tokenId);
+            try {
+                const nftId = BigInt(tokenId);
+                const subaccount = await nft_manager.to_nft_subaccount(nftId);
+                const balanceParams = {
+                    owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
+                    subaccount: [Array.from(subaccount)] as [number[]]
+                };
+
+                const [alexBalance, lbryBalance] = await Promise.all([
+                    ALEX.icrc1_balance_of(balanceParams),
+                    LBRY.icrc1_balance_of(balanceParams)
+                ]);
+
+                if (mounted) {
+                    const alex = convertE8sToToken(alexBalance);
+                    const lbry = convertE8sToToken(lbryBalance);
+                    
+                    dispatch(updateNftBalances({
+                        tokenId,
+                        alex,
+                        lbry,
+                        collection: nftCollection
+                    }));
+                }
+            } catch (error) {
+                if (mounted) console.error('Failed to load NFT balances:', error);
+            }
+        }
+    }
+    loadBalances();
+    return () => { mounted = false; };
+  }, [tokenId, nftCollection, nftBalances, dispatch]);
 
   const handleRenderError = (transactionId: string) => {
     ContentService.clearTransaction(transactionId);
@@ -180,109 +201,40 @@ function SingleTokenView() {
   }
 
   if (isLoading || !transaction || !contentUrls) {
-    console.log('Still loading or no transaction:', { isLoading, transaction });
+    console.log('Still loading or no transaction/contentUrls:', { isLoading, transaction: !!transaction, contentUrls: !!contentUrls });
     return <div className="container mx-auto p-4 text-center">Loading...</div>;
   }
 
-  const nftData = nfts[tokenId];
-  const content = contentData[transaction.id];
+  const currentContent = transaction ? contentData[transaction.id] : null;
 
-  console.log('Component state:', {
-    tokenId,
-    transaction,
-    nftData,
-    content,
-    contentDataKeys: Object.keys(contentData)
-  });
-  
-  if (!content) {
-    console.error('Content not found:', {
-      transactionId: transaction.id,
+  if (!currentContent) {
+    console.error('Content not found in Redux for transaction:', { 
+      transactionId: transaction.id, 
       availableContentIds: Object.keys(contentData),
-      nftData
+      nftData: nft
     });
-    return <div className="container mx-auto p-4 text-center">Content not found</div>;
   }
 
-  const handleMint = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const nftData = nfts[tokenId || ''];
-    if (!nftData) return;
-    
-    try {
-      setIsMinting(true);
-      const message = await mint_nft(nftData.arweaveId);
-      toast.success(message);
-    } catch (error) {
-      console.error("Error minting NFT:", error);
-      toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
-    } finally {
-      setIsMinting(false);
-    }
-  };
+  const collectionType = nftCollection || 'NFT';
 
-  const handleWithdraw = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const nftData = nfts[tokenId || ''];
-    if (!nftData) return;
-    
-    try {
-      setIsWithdrawing(true);
-      const collection = nftData.collection === 'NFT' ? 'icrc7' : 'icrc7_scion';
-      const [lbryBlock, alexBlock] = await withdraw_nft(tokenId || '', collection);
-      
-      if (lbryBlock === null && alexBlock === null) {
-        toast.info("No funds were available to withdraw");
-      } else {
-        let message = "Successfully withdrew";
-        if (lbryBlock !== null) message += " LBRY";
-        if (alexBlock !== null) message += (lbryBlock !== null ? " and" : "") + " ALEX";
-        toast.success(message);
-
-        if (tokenId) {
-          const subaccount = await nft_manager.to_nft_subaccount(BigInt(tokenId));
-          const balanceParams = {
-            owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-            subaccount: [Array.from(subaccount)] as [number[]]
-          };
-
-          const [alexBalance, lbryBalance] = await Promise.all([
-            ALEX.icrc1_balance_of(balanceParams),
-            LBRY.icrc1_balance_of(balanceParams)
-          ]);
-
-          const convertE8sToToken = (e8sAmount: bigint): string => {
-            return (Number(e8sAmount) / 1e8).toString();
-          };
-
-          dispatch(updateNftBalances({
-            tokenId,
-            alex: convertE8sToToken(alexBalance),
-            lbry: convertE8sToToken(lbryBalance)
-          }));
-        }
-      }
-    } catch (error) {
-      console.error("Error withdrawing funds:", error);
-      toast.error(error instanceof Error ? error.message : "An unexpected error occurred");
-    } finally {
-      setIsWithdrawing(false);
-    }
-  };
-
-  const isOwned = !!(user && nftData?.principal === user.principal);
-  const hasWithdrawableBalance = isOwned && nftData && (
-    parseFloat(nftData.balances?.alex || '0') > 0 || 
-    parseFloat(nftData.balances?.lbry || '0') > 0
-  );
-
-  const collectionType = nftData?.collection || 'NFT';
+  // Determine owner principal for actions
+  let ownerPrincipalForActions: Principal | undefined;
+  try {
+    const ownerString = ownerInfo?.principal || nftPrincipal;
+    ownerPrincipalForActions = ownerString ? Principal.fromText(ownerString) : undefined;
+  } catch (e) {
+    console.error("Invalid owner principal format for actions:", ownerInfo?.principal || nftPrincipal, e);
+    ownerPrincipalForActions = undefined;
+  }
+  
+  const isOwned = !!(user?.principal && ownerPrincipalForActions && user.principal === ownerPrincipalForActions.toText());
 
   const handleCopyPrincipal = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!nftData?.principal) return;
+    const principalToCopy = ownerInfo?.principal || nftPrincipal;
+    if (!principalToCopy) return;
     
-    const copied = await copyToClipboard(nftData.principal);
+    const copied = await copyToClipboard(principalToCopy);
     if (copied) {
       setCopiedPrincipal(true);
       setTimeout(() => setCopiedPrincipal(false), 2000);
@@ -317,24 +269,16 @@ function SingleTokenView() {
           className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
           onClick={handleCopyLink}
         >
-          {copiedLink ? (
-            <Check className="h-2.5 w-2.5" />
-          ) : (
-            <Link className="h-2.5 w-2.5" />
-          )}
+          {copiedLink ? <Check className="h-2.5 w-2.5" /> : <Link className="h-2.5 w-2.5" />}
         </Badge>
-        {nftData?.principal && (
+        {(ownerInfo?.principal || nftPrincipal) && (
           <Badge 
             variant="secondary" 
             className="text-[10px] cursor-pointer hover:bg-secondary/80 transition-colors flex items-center gap-0.5 py-0.5 px-1"
             onClick={handleCopyPrincipal}
           >
-            {formatPrincipal(nftData.principal)}
-            {copiedPrincipal ? (
-              <Check className="h-2.5 w-2.5" />
-            ) : (
-              <Copy className="h-2.5 w-2.5" />
-            )}
+            {formatPrincipal(ownerInfo?.principal || nftPrincipal || '')}
+            {copiedPrincipal ? <Check className="h-2.5 w-2.5" /> : <Copy className="h-2.5 w-2.5" />}
           </Badge>
         )}
         {ownerInfo?.username && (
@@ -352,10 +296,10 @@ function SingleTokenView() {
           {collectionType}
         </Badge>
         <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">
-          ALEX: {formatBalance(nftData?.balances?.alex?.toString())}
+          ALEX: {formatBalance(nftBalances?.alex?.toString())}
         </Badge>
         <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">
-          LBRY: {formatBalance(nftData?.balances?.lbry?.toString())}
+          LBRY: {formatBalance(nftBalances?.lbry?.toString())}
         </Badge>
       </div>
     </div>
@@ -363,39 +307,56 @@ function SingleTokenView() {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm">
+      <ShelvesPreloader />
+      
+      <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm dark:bg-gray-900 relative">
+        {tokenId && (
+          <UnifiedCardActions 
+            contentId={tokenId}
+            contentType={'Nft'}
+            ownerPrincipal={ownerPrincipalForActions}
+            isOwned={isOwned}
+            isLikable={false}
+            className="absolute top-2 right-2 z-20"
+            onToggleDetails={() => {}}
+            showDetails={false}
+          />
+        )}
+
         <ContentCard
           id={transaction.id}
           onClick={() => setShowModal(true)}
           owner={transaction.owner}
-          isOwned={isOwned}
-          onMint={undefined}
-          onWithdraw={hasWithdrawableBalance ? handleWithdraw : undefined}
           predictions={undefined}
-          isMinting={isMinting}
           footer={<CustomFooter />}
+          initialContentType="Nft"
         >
-          <ContentRenderer
-            transaction={transaction}
-            content={content}
-            contentUrls={contentUrls}
-            handleRenderError={handleRenderError}
-            inModal={false}
-          />
+          {currentContent && contentUrls ? (
+             <ContentRenderer
+               transaction={transaction}
+               content={currentContent}
+               contentUrls={contentUrls}
+               handleRenderError={handleRenderError}
+               inModal={false}
+             />
+          ) : (
+             <div className="flex items-center justify-center h-48 text-muted-foreground">
+                Content not available...
+             </div>
+          )}
         </ContentCard>
       </div>
 
       <Dialog open={showModal} onOpenChange={(open) => !open && setShowModal(false)}>
         <DialogContent className="max-w-4xl h-[90vh] p-0 overflow-hidden flex flex-col">
           <DialogTitle className="sr-only">Content Viewer</DialogTitle>
-
           <div className="w-full h-full overflow-y-auto">
             <div className="p-6">
-              {content && transaction && (
+              {currentContent && transaction && contentUrls && (
                 <ContentRenderer
                   key={transaction.id}
                   transaction={transaction}
-                  content={content}
+                  content={currentContent}
                   contentUrls={contentUrls}
                   inModal={true}
                   handleRenderError={handleRenderError}

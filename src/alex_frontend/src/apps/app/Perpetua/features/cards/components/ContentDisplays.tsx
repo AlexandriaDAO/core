@@ -1,14 +1,15 @@
 import React from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { Badge } from "@/lib/components/badge";
-import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { Principal } from '@dfinity/principal';
 
 type ContentDisplayProps = {
   owner: string;
   onClick: () => void;
   parentShelfId?: string;
   itemId?: number;
+  currentShelfId?: string;
 };
 
 // Display component for blog view markdown
@@ -19,18 +20,22 @@ export const BlogMarkdownDisplay = ({ content, onClick }: { content: string, onC
 );
 
 // Display component for shelf content
-export const ShelfContentDisplay = ({ 
-  shelfId, 
-  owner, 
+export const ShelfContentDisplay = ({
+  shelfId,
+  owner,
   onClick,
   parentShelfId,
-  itemId
+  itemId,
+  currentShelfId
 }: ContentDisplayProps & { shelfId: string }) => (
   <ContentCard
     id={`shelf-${shelfId}`}
     onClick={onClick}
     owner={owner}
     component="Perpetua"
+    parentShelfId={parentShelfId}
+    itemId={itemId}
+    currentShelfId={currentShelfId}
     footer={
       <div className="flex flex-wrap items-center gap-1 font-serif">
         <Badge variant="secondary" className="text-[10px] py-0.5 px-1">Shelf</Badge>
@@ -39,13 +44,6 @@ export const ShelfContentDisplay = ({
     }
   >
     <div className="relative w-full h-full">
-      <ShelfCardActionMenu
-        contentId={shelfId}
-        contentType="Shelf"
-        parentShelfId={parentShelfId}
-        itemId={itemId}
-      />
-      
       <div className="w-full h-full flex items-center justify-center">
         <div className="text-center p-4">
           <div className="flex items-center justify-center mb-2">
@@ -62,12 +60,13 @@ export const ShelfContentDisplay = ({
 );
 
 // Display component for markdown content
-export const MarkdownContentDisplay = ({ 
-  content, 
-  owner, 
+export const MarkdownContentDisplay = ({
+  content,
+  owner,
   onClick,
   parentShelfId,
-  itemId
+  itemId,
+  currentShelfId
 }: ContentDisplayProps & { content: string }) => {
   const preview = content.length > 30 ? `${content.substring(0, 30)}...` : content;
   
@@ -77,6 +76,9 @@ export const MarkdownContentDisplay = ({
       onClick={onClick}
       owner={owner}
       component="Perpetua"
+      parentShelfId={parentShelfId}
+      itemId={itemId}
+      currentShelfId={currentShelfId}
       footer={
         <div className="flex flex-wrap items-center gap-1 font-serif">
           <Badge variant="outline" className="text-[10px] py-0.5 px-1">Markdown</Badge>
@@ -85,13 +87,6 @@ export const MarkdownContentDisplay = ({
       }
     >
       <div className="relative w-full h-full">
-        <ShelfCardActionMenu
-          contentId={content}
-          contentType="Markdown"
-          parentShelfId={parentShelfId}
-          itemId={itemId}
-        />
-        
         <div className="w-full h-full flex items-center justify-center overflow-hidden">
           <div className="p-4 prose dark:prose-invert max-w-none line-clamp-6 font-serif">
             {content}

@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react';
 import { Card, CardContent } from "@/lib/components/card";
 import { Badge } from "@/lib/components/badge";
 import { Folder, ChevronDown, Calendar, User, Tag, Clock, Info, Copy, Check, Link, Globe, Lock, PlusCircle, Loader2 } from "lucide-react";
-import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Button } from "@/lib/components/button";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
@@ -10,6 +9,9 @@ import { format } from 'date-fns';
 import { followTag } from '@/apps/app/Perpetua/state/services/followService';
 import { toast } from 'sonner';
 import { Principal } from '@dfinity/principal';
+import { UnifiedCardActions } from '@/apps/Modules/shared/components/UnifiedCardActions/UnifiedCardActions';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
 
 export interface ShelfCardProps {
   shelf: ShelfPublic;
@@ -44,6 +46,10 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
   
   // State to track which tag is currently being followed
   const [followingTag, setFollowingTag] = useState<string | null>(null);
+
+  // Get current user principal to determine ownership
+  const { user } = useSelector((state: RootState) => state.auth);
+  const currentUserPrincipal = user?.principal;
 
   // Format dates if they exist
   const formatDate = (timestamp: bigint | undefined) => {
@@ -124,6 +130,10 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
     setTimeout(() => setCopied(false), 1500);
   };
   
+  // Determine ownership
+  const ownerPrincipal = shelf.owner instanceof Principal ? shelf.owner : undefined;
+  const isOwnedByUser = !!(ownerPrincipal && currentUserPrincipal && ownerPrincipal.toText() === currentUserPrincipal);
+
   return (
     <div className="relative h-full group">
       <Card 
@@ -134,13 +144,18 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
           <AspectRatio ratio={1} className="w-full relative">
             <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 h-full group-hover:bg-gray-100 dark:group-hover:bg-gray-900/80 transition-colors duration-300">
               <div className="relative w-full h-full">
-                <ShelfCardActionMenu
+                <UnifiedCardActions
                   contentId={shelf.shelf_id}
                   contentType="Shelf"
-                  currentShelfId={shelf.shelf_id}
+                  ownerPrincipal={ownerPrincipal}
                   parentShelfId={parentShelfId}
                   itemId={itemId}
-                  shelfOwnerPrincipal={shelf.owner}
+                  currentShelfId={shelf.shelf_id}
+                  onToggleDetails={() => setIsFooterExpanded(prev => !prev)}
+                  showDetails={isFooterExpanded}
+                  isOwned={isOwnedByUser}
+                  isLikable={false}
+                  onLike={undefined}
                 />
                 
                 <div className="text-center p-6 h-full flex flex-col items-center justify-center">
@@ -200,17 +215,6 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
                 </div>
               </div>
             </div>
-            
-            <Button
-              variant="secondary"
-              className="absolute bottom-2 right-2 z-[30] opacity-70 hover:opacity-100 transition-opacity duration-200 h-7 w-7 p-0 bg-white/80 hover:bg-white dark:bg-gray-900/80 dark:hover:bg-gray-900 shadow-md rounded-full flex items-center justify-center"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsFooterExpanded(!isFooterExpanded);
-              }}
-            >
-              <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isFooterExpanded ? 'rotate-180' : ''}`} />
-            </Button>
           </AspectRatio>
         </CardContent>
       </Card>

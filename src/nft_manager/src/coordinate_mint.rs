@@ -8,7 +8,9 @@ use crate::id_converter::*;
 use crate::{icrc7_principal, icrc7_scion_principal, nft_manager_principal, lbry_principal};
 use crate::action_fees::{burn_mint_fee, LBRY_MINT_COST_E8S};
 
-pub type MintResult = Result<String, String>;
+// Return Nat (the minted ID) on success, String on error
+// pub type MintResult = Result<String, String>; // Old
+pub type MintResult = Result<Nat, String>; // New
 
 async fn check_existing_ownership(minting_number: &Nat) -> Result<Option<Principal>, String> {
     get_nft_owner(minting_number.clone(), icrc7_principal()).await
@@ -28,7 +30,7 @@ async fn check_caller_scion(minting_number: &Nat, caller: Principal) -> Result<b
 pub async fn coordinate_mint(
     arweave_id: String,
     owner_principal: Option<Principal>,
-) -> MintResult {
+) -> MintResult { // Ensure return type is MintResult (Result<Nat, String>)
     let caller = ic_cdk::caller();
     
     if !is_arweave_id(arweave_id.clone()) {
@@ -116,9 +118,10 @@ pub async fn burn_lbry_tokens(from: Principal) -> Result<(), String> {
 async fn mint_original(minting_number: Nat, caller: Principal) -> MintResult {
     burn_lbry_tokens(caller).await?;
     
-    super::update::mint_nft(minting_number, None)
+    super::update::mint_nft(minting_number.clone(), None) // Pass clone here
         .await
-        .map(|_| "Original NFT minted successfully!".to_string())
+        // Return the minted number on success
+        .map(|_| minting_number) // Return Ok(minting_number)
         .map_err(|e| format!("Mint failed: {}", e))
 }
 
@@ -133,9 +136,10 @@ async fn mint_scion_from_original(minting_number: Nat, caller: Principal) -> Min
         .map_err(|_| "Failed to transfer LBRY to original NFT owner".to_string())?;
     
     let new_scion_id = og_to_scion_id(minting_number, caller);
-    super::update::mint_scion_nft(new_scion_id, None)
+    super::update::mint_scion_nft(new_scion_id.clone(), None) // Pass clone here
         .await
-        .map(|_| "Scion NFT saved successfully!".to_string())
+        // Return the new scion ID on success
+        .map(|_| new_scion_id) // Return Ok(new_scion_id)
         .map_err(|e| format!("Mint failed: {}", e))
 }
 
@@ -159,9 +163,10 @@ async fn mint_scion_from_scion(
         .map_err(|_| "Failed to transfer LBRY to the Scion NFT's wallet".to_string())?;
     
     let new_scion_id = og_to_scion_id(minting_number, caller);
-    super::update::mint_scion_nft(new_scion_id, None)
+    super::update::mint_scion_nft(new_scion_id.clone(), None) // Pass clone here
         .await
-        .map(|_| "Scion NFT saved successfully!".to_string())
+        // Return the new scion ID on success
+        .map(|_| new_scion_id) // Return Ok(new_scion_id)
         .map_err(|e| format!("Mint failed: {}", e))
 }
 

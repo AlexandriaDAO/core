@@ -2,7 +2,6 @@ import React from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { Badge } from "@/lib/components/badge";
 import { Item } from "@/../../declarations/perpetua/perpetua.did";
-import { ShelfCardActionMenu } from './ShelfCardActionMenu';
 import NftDisplay from './NftDisplay';
 import { ShelfContentDisplay, MarkdownContentDisplay } from './ContentDisplays';
 import { isNftContent, isShelfContent, isMarkdownContent } from "../../../utils";
@@ -80,6 +79,8 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
         tokenId={item.content.Nft} 
         onViewDetails={handleNftDetails}
         inShelf={true}
+        parentShelfId={shelf.shelf_id}
+        itemId={itemKey}
       />
     );
   }

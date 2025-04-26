@@ -70,6 +70,8 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   const { fullUrl, coverUrl, thumbnailUrl } = contentUrls;
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [generatedThumbnail, setGeneratedThumbnail] = useState<string | null>(null);
+  const [isVideoThumbLoading, setIsVideoThumbLoading] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
   // Handle blob URL cleanup
   useEffect(() => {
@@ -83,9 +85,13 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
     }
 
     if (contentType.includes("video/") && !thumbnailUrl) {
-      generateVideoThumbnail(fullUrl, setGeneratedThumbnail);
+      setIsVideoThumbLoading(true);
+      generateVideoThumbnail(fullUrl, (thumb) => {
+        setGeneratedThumbnail(thumb);
+        setIsVideoThumbLoading(false);
+      });
     }
-  }, [fullUrl]);
+  }, [fullUrl, contentType, thumbnailUrl]);
 
   const commonProps = {
     className: `${inModal ? 'w-full h-full sm:object-cover xs:object-fill rounded-xl' : 'absolute inset-0 w-full h-full object-cover'}`,
@@ -178,11 +184,15 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
           </div>
         ) : (
           <div className="relative w-full h-full">
-            {thumbnailUrl || generatedThumbnail ?  (
+            {isVideoThumbLoading ? (
+              <div className="w-full h-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
+                <Skeleton className="h-12 w-12 rounded-full" />
+              </div>
+            ) : thumbnailUrl || generatedThumbnail ? (
               <>
                 <AspectRatio ratio={1}>
                   <img
-                    src={ thumbnailUrl || generatedThumbnail || ''} 
+                    src={thumbnailUrl || generatedThumbnail || ''}
                     alt="Video thumbnail"
                     {...commonProps}
                     crossOrigin="anonymous"
@@ -195,7 +205,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
                 </div>
               </>
             ) : (
-              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+              <div className="w-full h-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
                 <Play className="text-gray-500 text-4xl" />
               </div>
             )}
@@ -216,14 +226,18 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
           />
         </div>
       ) : (
-        <AspectRatio ratio={1}>
+        <AspectRatio ratio={1} className="bg-gray-200 dark:bg-gray-800">
           <img
             src={blobUrl || fullUrl}
             alt="Content"
             decoding="async"
-            className="absolute inset-0 w-full h-full object-cover"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isImageLoading ? 'opacity-0' : 'opacity-100'}`}
             crossOrigin="anonymous"
-            onError={() => handleRenderError(transaction.id)}
+            onError={() => {
+              setIsImageLoading(false);
+              handleRenderError(transaction.id);
+            }}
+            onLoad={() => setIsImageLoading(false)}
           />
         </AspectRatio>
       )

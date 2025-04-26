@@ -57,168 +57,137 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
   const transactions = useSelector((state: RootState) => state.transactions.transactions);
   const { user } = useSelector((state: RootState) => state.auth);
 
+  // Normalize providedTransaction for dependency array
+  const transactionDependency = providedTransaction ?? undefined;
+
   // Intelligent data loading
   useEffect(() => {
     let mounted = true;
 
     async function loadNFTData() {
-      if (!tokenId) return;
+      if (!tokenId) {
+        setError('Token ID is missing');
+        setIsLoading(false);
+        return;
+      }
 
+      setIsLoading(true);
+      setError(null);
+      
       try {
-        setIsLoading(true);
-        
-        // Strategy 1: Use provided transaction if available
-        if (loadingStrategy === 'provided' && providedTransaction) {
-          setTransaction(providedTransaction);
-          
-          // Still need to get content URLs
-          const content = await ContentService.loadContent(providedTransaction);
-          const urls = await ContentService.getContentUrls(providedTransaction, content);
-          
-          if (mounted) {
-            setContentUrls(urls);
-            
-            // Store in Redux for caching
-            dispatch(setContentData({ 
-              id: providedTransaction.id, 
-              content: {
-                ...content,
-                urls
-              }
-            }));
-          }
-          
-          return;
+        // Check Redux first (most efficient)
+        const storedNft = nfts[tokenId];
+        // Prioritize provided arweaveId, then Redux arweaveId, then mapping from id prop if available
+        const storedArweaveId = arweaveId || storedNft?.arweaveId || (tokenId ? arweaveToNftId[tokenId] : undefined);
+        let potentialTransaction = providedTransaction;
+
+        // Find transaction in Redux if not provided
+        if (!potentialTransaction && storedArweaveId) {
+           potentialTransaction = transactions.find((t: Transaction) => t.id === storedArweaveId);
         }
         
-        // Strategy 2: Use Redux data if available
-        if (loadingStrategy === 'redux') {
-          const storedNft = nfts[tokenId];
+        const potentialContent = potentialTransaction ? contentData[potentialTransaction.id] : null;
+
+        // Case 1: Have NFT, Transaction, and Content URLs in Redux/Props
+        if (storedNft && potentialTransaction && potentialContent?.urls) {
+          console.log('[NftDisplay] Using existing data for token:', tokenId);
+          setTransaction(potentialTransaction);
+          setContentUrls(potentialContent.urls);
           
-          if (storedNft?.arweaveId) {
-            const reduxTransaction = transactions.find((t: Transaction) => t.id === storedNft.arweaveId);
-            const reduxContent = reduxTransaction ? contentData[reduxTransaction.id] : null;
-            
-            if (reduxTransaction && reduxContent) {
-              if (mounted) {
-                setTransaction(reduxTransaction);
-                setContentUrls(reduxContent.urls);
-                return;
-              }
-            }
+          // Fetch owner only if needed and not already present in component state
+          if (showOwnerInfo && !ownerInfo) { 
+             getNftOwnerInfo(tokenId).then(info => mounted && setOwnerInfo(info)).catch(err => console.error('Failed to load owner info:', err));
           }
+          // Fetch balances only if needed and not present in Redux NFT data
+          if (showBalances && (!storedNft.balances || Object.keys(storedNft.balances).length === 0)) {
+             fetchNftBalances(tokenId, storedNft.collection, mounted, dispatch);
+          }
+          setIsLoading(false);
+          return; // Data is sufficient
         }
         
-        // Strategy 3: Direct loading (fallback)
+        // Case 2: Data is incomplete, need to fetch
+        console.log('[NftDisplay] Fetching required data for token:', tokenId);
         const tokenType = determineTokenType(tokenId);
         const tokenAdapter = createTokenAdapter(tokenType);
         const nftId = BigInt(tokenId);
         
-        // Handle SBT original ID
-        let ogId: bigint;
-        if (tokenType === 'SBT') {
-          ogId = await nft_manager.scion_to_og_id(nftId);
-        } else {
-          ogId = nftId;
+        // Determine the Arweave ID to use for fetching
+        let currentArweaveId = storedArweaveId;
+        if (!currentArweaveId) {
+           // Fetch metadata only if Arweave ID wasn't found via props or Redux
+           console.log('[NftDisplay] Fetching Arweave ID from tokenAdapter for token:', tokenId);
+           const nftMetaData = await tokenAdapter.tokenToNFTData(nftId, '');
+           currentArweaveId = nftMetaData.arweaveId;
+        }
+
+        if (!currentArweaveId) {
+          throw new Error('Failed to retrieve Arweave ID for NFT metadata');
+        }
+
+        // Initialize finalTransaction explicitly as Transaction | null
+        let finalTransaction: Transaction | null = potentialTransaction ?? null;
+
+        // Fetch transaction only if we don't have one yet
+        if (!finalTransaction) {
+           console.log('[NftDisplay] Fetching transaction from Arweave:', currentArweaveId);
+           const fetchedTx: Transaction | null = await fetchTransactionById(currentArweaveId);
+           if (fetchedTx) { // Assign only if fetch returned a transaction
+              finalTransaction = fetchedTx;
+           } 
+           // If fetchedTx was null, finalTransaction remains null
         }
         
-        // Get Arweave ID for this token
-        const nftArweaveId = arweaveId || 
-          await tokenAdapter.tokenToNFTData(nftId, '').then(data => data.arweaveId);
-        
-        // Ensure arweaveId is defined before proceeding
-        if (!nftArweaveId) {
-          if (mounted) {
-            setError('Failed to retrieve NFT metadata');
-            setIsLoading(false);
-          }
-          return;
+        // Now, if finalTransaction is still null here, we couldn't get transaction data
+        if (!finalTransaction) {
+          throw new Error('NFT Arweave data not found after fetch attempt');
         }
         
-        // Fetch transaction data from Arweave
-        const txData = await fetchTransactionById(nftArweaveId);
-        
-        if (!txData) {
-          if (mounted) {
-            setError('NFT data not found');
-            setIsLoading(false);
-          }
-          return;
+        // Fetch content/URLs if needed (if not found in Redux)
+        let finalContentUrls = potentialContent?.urls;
+        if (!finalContentUrls) {
+            console.log('[NftDisplay] Loading content from ContentService for transaction:', finalTransaction.id);
+            const content = await ContentService.loadContent(finalTransaction);
+            finalContentUrls = await ContentService.getContentUrls(finalTransaction, content);
+            // Dispatch content data to Redux for caching
+            dispatch(setContentData({ 
+                id: finalTransaction.id, 
+                content: { ...content, urls: finalContentUrls }
+            }));
         }
-        
+
+        // --- Update Component State --- 
         if (mounted) {
-          setTransaction(txData);
-          
-          // Load content and URLs
-          const content = await ContentService.loadContent(txData);
-          const urls = await ContentService.getContentUrls(txData, content);
-          setContentUrls(urls);
-          
-          // Set content in Redux store
-          dispatch(setContentData({ 
-            id: txData.id, 
-            content: {
-              ...content,
-              urls
+            setTransaction(finalTransaction);
+            setContentUrls(finalContentUrls);
+
+            let fetchedOwnerPrincipal = ownerInfo?.principal || ''; // Get current owner principal if already fetched
+
+            // Fetch owner only if needed and not already present
+            if (showOwnerInfo && !ownerInfo) {
+                 try {
+                    const info = await getNftOwnerInfo(tokenId);
+                    if (mounted) {
+                       setOwnerInfo(info);
+                       fetchedOwnerPrincipal = info?.principal || ''; // Update principal for balance fetch
+                    }
+                 } catch(err) {
+                     console.error('Failed to load owner info:', err)
+                 }
             }
-          }));
+            
+            // Fetch balances if needed (Re-fetch here to ensure freshness after direct load)
+            if (showBalances) { 
+                console.log('[NftDisplay] Fetching balances for token:', tokenId);
+                // Pass currentArweaveId and potentially fetched owner principal to ensure Redux update has full info
+                fetchNftBalances(tokenId, tokenType, mounted, dispatch, currentArweaveId, fetchedOwnerPrincipal);
+            }
         }
 
-        // Get NFT owner info if requested
-        if (showOwnerInfo) {
-          try {
-            const info = await getNftOwnerInfo(tokenId);
-            if (mounted) {
-              setOwnerInfo(info);
-            }
-          } catch (error) {
-            console.error('Failed to load owner info:', error);
-          }
-        }
-
-        // Get balances for this NFT if we need to show them
-        if (showBalances) {
-          try {
-            const subaccount = await nft_manager.to_nft_subaccount(nftId);
-            const balanceParams = {
-              owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-              subaccount: [Array.from(subaccount)] as [number[]]
-            };
-
-            const [alexBalance, lbryBalance] = await Promise.all([
-              ALEX.icrc1_balance_of(balanceParams),
-              LBRY.icrc1_balance_of(balanceParams)
-            ]);
-
-            if (mounted) {
-              const alexTokens = convertE8sToToken(alexBalance);
-              const lbryTokens = convertE8sToToken(lbryBalance);
-
-              // Update NFT data in Redux store with safe arweaveId
-              dispatch(setNFTs({
-                [tokenId]: {
-                  collection: tokenType,
-                  principal: ownerInfo?.principal || '',
-                  arweaveId: nftArweaveId,
-                  balances: { alex: alexTokens, lbry: lbryTokens }
-                }
-              }));
-              
-              dispatch(updateNftBalances({
-                tokenId,
-                alex: alexTokens,
-                lbry: lbryTokens,
-                collection: tokenType
-              }));
-            }
-          } catch (error) {
-            console.error('Failed to load NFT balances:', error);
-          }
-        }
       } catch (error) {
-        console.error('Failed to load NFT:', error);
+        console.error('[NftDisplay] Failed to load NFT:', error);
         if (mounted) {
-          setError('Failed to load NFT data');
+          setError(error instanceof Error ? error.message : 'Failed to load NFT data');
         }
       } finally {
         if (mounted) {
@@ -232,7 +201,50 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
     return () => {
       mounted = false;
     };
-  }, [tokenId, arweaveId, providedTransaction, loadingStrategy, dispatch, showOwnerInfo, showBalances, transactions, nfts, contentData]);
+    // Dependency array: Use the normalized transactionDependency
+  }, [tokenId, arweaveId, transactionDependency, loadingStrategy, dispatch, showOwnerInfo, showBalances, nfts, transactions, contentData, arweaveToNftId, ownerInfo]);
+
+  // Helper function to fetch balances and update Redux
+  async function fetchNftBalances(nftTokenId: string, tokenType: TokenType, mounted: boolean, dispatch: AppDispatch, fetchedArweaveId?: string, fetchedOwnerPrincipal?: string) {
+      try {
+          const nftIdBigInt = BigInt(nftTokenId);
+          const subaccount = await nft_manager.to_nft_subaccount(nftIdBigInt);
+          const balanceParams = {
+              owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
+              subaccount: [Array.from(subaccount)] as [number[]]
+          };
+
+          const [alexBalance, lbryBalance] = await Promise.all([
+              ALEX.icrc1_balance_of(balanceParams),
+              LBRY.icrc1_balance_of(balanceParams)
+          ]);
+
+          if (mounted) {
+              const alexTokens = convertE8sToToken(alexBalance);
+              const lbryTokens = convertE8sToToken(lbryBalance);
+              
+              // Update Redux state, preserving existing data and adding balances
+              const currentNftData = nfts[nftTokenId] || {}; // Get existing data or empty object
+              dispatch(setNFTs({
+                  [nftTokenId]: {
+                      ...currentNftData, // Preserve existing fields
+                      collection: currentNftData.collection || tokenType, // Use existing or fetched type
+                      principal: fetchedOwnerPrincipal || currentNftData.principal || '', // Update principal if fetched
+                      arweaveId: fetchedArweaveId || currentNftData.arweaveId || '', // Update Arweave ID if fetched
+                      balances: { alex: alexTokens, lbry: lbryTokens } // Add/overwrite balances
+                  }
+              }));
+
+              // Dispatch updateNftBalances as well if still needed elsewhere? 
+              // setNFTs above should be sufficient for NftDisplay itself.
+              // dispatch(updateNftBalances({...
+          }
+      } catch (error) {
+          console.error('Failed to load NFT balances for token:', nftTokenId, error);
+          // Optionally update state to show balance loading error
+          // if (mounted) setError("Failed to load balances");
+      }
+  }
 
   // Error handler for ContentRenderer
   const handleRenderError = () => {

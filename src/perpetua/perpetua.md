@@ -129,13 +129,66 @@ Perpetua/
 
 
 
+- Really, next thing is to just play around a LOT with the new system and get out the kinks.
+  
 
 
 
 
+First some context. This is a big project with a suite of apps that use NFTs as a content primative. Every peice of permanent content is an NFT, but you could get a copy of someone's NFT (an SBT) in order to use it by liking the original NFT. Then in the Perpetua app we use these nfts in a content grid style social app. The social app has it's own two primitives: Shelves and Items.
 
-Browsing in general is bit confusing, Next Page doesn't work unless you hit Search
+A shelf holds a grid of items, that's it.
+An item is a (1) NFT/SBT, and only it's owner can add it to a shelf, or (2) some markdown text which anyone can add, or (3) another shelf which anyone can add.
 
+
+All of these, both independent NFTs, or shelves or markdown items or items of any kind, all of them, appear in the UI in the same style of card.
+
+Now there were 3-4 buttons, kindof, that we used inside the UI cards that make up this app. The problem was that they had overlapping functionality that was confusing users. Let me explain.
+
+(1) The first two are the either/or heart/bookmark which are used on NFTs/SBTs. The heart triggers a like, which then makes the nft availible to add to a shelf via the bookmark. If the user already owns the NFT, then it will show the bookmark, so since they already own it they don't need to 'like' it to use it where they want.
+
+(2) Then there's the expander button, which just opens the metadata details in a dropdown. Very simple. And this is on all nfts and items, though they have different details inside.
+
+(3) And then there's the button with the three dot icons, which is on items of all types and not NFTs that are not items in a shelf, but maybe should be integrated with regular nfts as well. It opens up the 'Add to shelf' and 'Remove from shelf' opetions in ShelfCardActionMenu.tsx.
+
+So as you can see this was pretty confusing for users.
+
+So now we simplied it, made it one button, and allow people to bookmark the nfts, and then the liking actions happen behind the scenes.
+
+The problem is that we're not using a more cleanly implemented flow for this. It should just be 'bookmark' and the rest is handled. So for example it should check when I bookmark an nft:
+
+- is nft
+  - if user is owner of nft
+    - go straight to bookmark
+  - if user is not the owner of the nft
+    - mint an sbt (with the like action)
+      - generate the sbt_id from the nft_id
+      - proceed with bookmarking of the sbt.
+  - done
+- is sbt
+  - if user owns the sbt
+    - go straight to bookmark action
+  - if user does not own the sbt.
+    - go to the liking action, which derives the original NFT id from the sbt id, and generates the new stb for that user.
+    - proceed with bookmarking the nft.
+- if it's neither (not an nft yet), proceed with liking it with coordinate_mint, which will mint an original NFT if no-one owns it, or if it was already owned, mint an sbt.
+  - then use the proper id to bookmark it to the shelf. 
+
+
+Perhaps the ideal way foward is to consolidate this code and get it working in a separate compontent that puts all the buttons into one uniform dropdown without scattering overlapping functionality all over the place. First find all the involved components and come up with a methodlogy for consolidation. Any new approach should remove unused code, not overproduce more new code.
+
+
+
+unifiedCardActions.tsx
+NftDisplay.tsx
+ContentDisplay.tsx
+ShelfCard.tsx
+Card.tsx
+mint.ts
+coordinate_mint.rs
+item.rs
+id_converter.rs
+id_convert.ts.
 
 
 
@@ -152,11 +205,11 @@ Browsing in general is bit confusing, Next Page doesn't work unless you hit Sear
 
 Mainnet bug findings: 
 
-
 - Should be able to add an item to multiple shelves at once, not one at a time.
 - (Will fix this when I deploy without all nfts)Withdraw button is partially underneath the expander button.
 
-
+Major (whole moring):
+- Make saves/shelf-additions/etc./Single-Step.
 
 
 
@@ -170,6 +223,7 @@ Minor Frontend Stuff:
 
 
 Backend Stuff:
+- Search engine for shelves (public ones at least.)
 - Payment for all/some actions
   - Pay for shelf creation after the fifth shelf. That's it (for now).
 - Download personal data as a csv.
@@ -194,7 +248,7 @@ Backend Stuff:
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal h3aiz-rumwf-ycche-jdxcl-hkn22-2tyam-lzjgv-x7c3j-tbizn-tejua-hqe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal e4mdi-f6mls-s6zby-ymosz-5nxxs-buiks-gvrre-2aiyt-fa7q4-bssvn-vqe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

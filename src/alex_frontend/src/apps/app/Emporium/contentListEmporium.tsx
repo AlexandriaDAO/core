@@ -48,13 +48,8 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   const dispatch = useAppDispatch();
   const transactions = useSortedTransactions();
   const { contentData } = useSelector((state: RootState) => state.transactions);
-  const { searchParams } = useSelector((state: RootState) => state.library);
-  const { transactions: transactionList } = useSelector((state: RootState) => ({
-    transactions: state.transactions.transactions
-  }));
   const { predictions } = useSelector((state: RootState) => state.arweave);
-  const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const emporium = useAppSelector((state) => state.emporium);
 
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string } | null>(null);
@@ -169,41 +164,41 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
   useEffect(() => {
     if (type === "userNfts") {
       setButtonType("Sell");
-    }
-    else if (type === "marketPlace") {
+    } else if (type === "marketPlace") {
       setButtonType("Buy");
     }
-  }, [type])
+  }, [type]);
 
   return (
     <TooltipProvider>
       <>
-        {emporium.loading == true ? (<div className="w-screen h-screen fixed top-0 left-0 flex flex-col items-center justify-center gap-2 bg-black/70
-">
+        {emporium.loading == true ? (
+          <div className="w-screen h-screen fixed top-0 left-0 flex flex-col items-center justify-center gap-2 bg-black/70">
+            <LoaderPinwheel className="animate-spin text-4xl text-white w-14 h-14 dark:grey" />
+          </div>
+        ) : (
+          <ContentGrid key="emporium">
+            {transactions.map((transaction: Transaction) => {
+              const content = contentData[transaction.id];
+              const contentType = transaction.tags.find((tag: { name: string; value: string }) => tag.name === 'Content-Type')?.value || '';
+              const hasPredictions = !!predictions[transaction.id];
+              const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
 
-          <LoaderPinwheel className="animate-spin text-4xl text-white w-14 h-14  dark:grey" />
-          </div>) : 
-        (<ContentGrid key="emporium">
-          {transactions.map((transaction: Transaction) => {
-            const content = contentData[transaction.id];
-            const contentType = transaction.tags.find((tag: { name: string; value: string }) => tag.name === 'Content-Type')?.value || '';
-            const hasPredictions = !!predictions[transaction.id];
-            const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
+              const isKnownNft = !!(transaction.id && arweaveToNftId[transaction.id]);
+              const detectedInitialContentType = isKnownNft ? 'Nft' : 'Arweave';
 
-            return (
-              <ContentGrid.Item
-                key={transaction.id}
-                onClick={
-                  () => setSelectedContent({ id: transaction.id, type: contentType })
-                }
-                id={transaction.id}
-                owner={transaction.owner}
-                isOwned={user && arweaveToNftId[transaction.id] ? nfts[arweaveToNftId[transaction.id]]?.principal === user.principal : false}
-                predictions={predictions[transaction.id]}
-                component="Emporium"
-              >
-                <div className="group relative w-full p-4 rounded-lg">
-                  <div className="text-lg mb-4"></div>
+              return (
+                <ContentGrid.Item
+                  key={transaction.id}
+                  onClick={() => setSelectedContent({ id: transaction.id, type: contentType })}
+                  id={transaction.id}
+                  owner={transaction.owner}
+                  predictions={predictions[transaction.id]}
+                  component="Emporium"
+                  initialContentType={detectedInitialContentType}
+                >
+                  <div className="group relative w-full p-4 rounded-lg">
+                    <div className="text-lg mb-4"></div>
                     <ContentRenderer
                       transaction={transaction}
                       content={content}
@@ -211,32 +206,29 @@ const ContentListEmporium: React.FC<ContentListEmporiumProps> = ({ type }) => {
                         thumbnailUrl: null,
                         coverUrl: null,
                         fullUrl: content?.url || `https://arweave.net/${transaction.id}`
-                       
                       }}
                       handleRenderError={handleRenderError}
                     />
-                  <Overlay transaction={transaction} type={type} buttonType={buttonType} setModal={handleOpenModal} />
-                  {shouldShowBlur && (
-                    <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
-                        Content Filtered
+                    <Overlay transaction={transaction} type={type} buttonType={buttonType} setModal={handleOpenModal} />
+                    {shouldShowBlur && (
+                      <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
+                          Content Filtered
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {renderDetails(transaction)}
-                </div>
-              </ContentGrid.Item>
-            );
-          })}
-        </ContentGrid>)}
-        
+                    )}
+                    {renderDetails(transaction)}
+                  </div>
+                </ContentGrid.Item>
+              );
+            })}
+          </ContentGrid>
+        )}
 
         <Dialog open={!!selectedContent} onOpenChange={(open) => !open && setSelectedContent(null)}>
           <DialogContent
             className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"
           >
-
-
             {selectedContent && contentData[selectedContent.id] && (
               <div className="w-full h-full">
                 <ContentRenderer
