@@ -187,33 +187,33 @@ class NSFWService {
 
   /**
    * Validate content for NSFW material
+   * Assumes the model has already been loaded.
    */
   async validateContent(
     element: HTMLImageElement | HTMLVideoElement,
     contentType: string
   ): Promise<PredictionResults | null> {
-    // Ensure model is loaded
+    // Ensure model is loaded BEFORE calling this function
     if (!this.isModelLoaded()) {
-      console.log('Model not loaded, attempting to load');
-      const loaded = await this.loadModel();
-      if (!loaded) {
-        console.error('Failed to load model for content validation');
+      console.warn('NSFW model not loaded. Cannot validate content. Ensure loadModel() was called and completed.');
+      return null; // Return null if model isn't ready
+    }
+
+    // Ensure tf is available (should be if model is loaded, but check for safety)
+    if (!this.state.tf) {
+        console.error('TensorFlow instance not available in NSFWService state.');
         return null;
-      }
     }
 
     try {
-      console.log('Starting content validation');
       let tempCanvas: HTMLCanvasElement | null = null;
-      let imgTensor: any | null = null;
+      let imgTensor: any = null; // Use 'any' or tf.Tensor type if tf is strongly typed
       let predictions: PredictionType[];
 
       // Process based on content type
       if (contentType.startsWith('image/')) {
-        console.log('Processing image content');
         tempCanvas = this.resizeImage(element as HTMLImageElement);
       } else if (contentType.startsWith('video/')) {
-        console.log('Processing video content');
         tempCanvas = document.createElement('canvas');
         const video = element as HTMLVideoElement;
         tempCanvas.width = video.videoWidth;
@@ -225,54 +225,64 @@ class NSFWService {
       }
 
       // Create tensor from canvas
-      if (tempCanvas && this.state.tf) {
+      if (tempCanvas) {
         const ctx = tempCanvas.getContext('2d');
         if (ctx) {
           const imgData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+           // Use the stored tf instance
           imgTensor = this.state.tf.browser.fromPixels(imgData);
+        } else {
+             console.error('Failed to get 2D context from tempCanvas');
+             if (tempCanvas) this.disposeCanvas(tempCanvas);
+             return null;
         }
+      } else {
+          console.error('Failed to create tempCanvas for tensor creation');
+          return null;
       }
 
       // Classify the image
       if (imgTensor && this.state.model) {
-        console.log('Classifying content');
         predictions = await this.state.model.classify(imgTensor);
-        imgTensor.dispose();
+        imgTensor.dispose(); // Dispose tensor after use
       } else {
-        console.error('Failed to create image tensor for classification');
+        console.error('Failed to create image tensor or model not available for classification');
+        if (imgTensor) imgTensor.dispose(); // Dispose if created but model failed
+        if (tempCanvas) this.disposeCanvas(tempCanvas);
         return null;
       }
 
-      // Clean up
+      // Clean up canvas
       if (tempCanvas) {
         this.disposeCanvas(tempCanvas);
       }
 
       // Process results
       const predictionResults: PredictionResults = {
-        Drawing: 0,
-        Hentai: 0,
-        Neutral: 0,
-        Porn: 0,
-        Sexy: 0,
-        isPorn: false,
+         Drawing: 0,
+         Hentai: 0,
+         Neutral: 0,
+         Porn: 0,
+         Sexy: 0,
+         isPorn: false,
       };
-
+      
       predictions.forEach((prediction) => {
-        predictionResults[prediction.className as keyof Omit<PredictionResults, 'isPorn'>] =
-          prediction.probability;
+         // Type assertion for safety
+         const key = prediction.className as keyof Omit<PredictionResults, 'isPorn'>;
+         if (key in predictionResults) {
+           predictionResults[key] = prediction.probability;
+         }
       });
-
-      // Determine if content is NSFW
+      
       const isPorn =
-        predictionResults.Porn > 0.4 ||
-        (predictionResults.Sexy > 0.2 && predictionResults.Porn > 0.2) ||
-        (predictionResults.Hentai > 0.15 && (predictionResults.Porn > 0.03 || predictionResults.Sexy > 0.05)) || 
-        (predictionResults.Hentai > 0.3) ||
-        predictionResults.Sexy > 0.8;
-
-      predictionResults.isPorn = isPorn;
-      console.log('Content validation complete', predictionResults);
+         predictionResults.Porn > 0.4 ||
+         (predictionResults.Sexy > 0.2 && predictionResults.Porn > 0.2) ||
+         (predictionResults.Hentai > 0.15 && (predictionResults.Porn > 0.03 || predictionResults.Sexy > 0.05)) || 
+         (predictionResults.Hentai > 0.3) ||
+         predictionResults.Sexy > 0.8;
+ 
+       predictionResults.isPorn = isPorn;
 
       return predictionResults;
     } catch (error) {

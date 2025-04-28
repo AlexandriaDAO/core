@@ -316,7 +316,6 @@ function SingleTokenView() {
             contentType={'Nft'}
             ownerPrincipal={ownerPrincipalForActions}
             isOwned={isOwned}
-            isLikable={false}
             className="absolute top-2 right-2 z-20"
             onToggleDetails={() => {}}
             showDetails={false}

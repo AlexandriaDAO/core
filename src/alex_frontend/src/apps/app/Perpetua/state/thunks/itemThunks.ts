@@ -8,6 +8,11 @@ import {
 import { ShelfPublic } from '@/../../declarations/perpetua/perpetua.did';
 import { extractErrorMessage } from '../../utils';
 
+// Define Result type for better type checking
+export type AddItemResult = 
+  | { status: 'success', shelf_id: string, backend_result?: any }
+  | { status: 'error', message: string, backend_result?: any };
+
 /**
  * Add an item to a shelf
  */
@@ -50,16 +55,28 @@ export const addItem = createAsyncThunk(
           cacheManager.invalidateForShelf(content);
         }
         
-        return { shelf_id: shelf.shelf_id };
+        return { 
+          status: 'success' as const, 
+          shelf_id: shelf.shelf_id,
+          // Include the original Result.Ok data in case it's needed
+          backend_result: result.Ok
+        };
       } 
       
       if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
+        // Return a structured error with the backend message
+        return { 
+          status: 'error' as const, 
+          message: result.Err,
+          // Include the original Result.Err data
+          backend_result: result.Err
+        };
       }
       
-      return rejectWithValue("Unknown error adding item");
+      return { status: 'error' as const, message: "Unknown error adding item" };
     } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, "Failed to add item"));
+      const errorMsg = extractErrorMessage(error, "Failed to add item");
+      return { status: 'error' as const, message: errorMsg };
     }
   }
 );

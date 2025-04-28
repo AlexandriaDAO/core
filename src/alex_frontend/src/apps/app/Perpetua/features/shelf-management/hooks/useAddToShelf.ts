@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Principal } from "@dfinity/principal";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { useIdentity } from "@/hooks/useIdentity";
+import { AddItemResult } from "@/apps/app/Perpetua/state/thunks/itemThunks";
 
 /**
  * Hook for adding content to shelves
@@ -62,53 +63,51 @@ export const useAddToShelf = () => {
    * @param content - Content identifier (NFT id, markdown content, or shelf id)
    * @param contentType - Type of content being added
    * @param collectionType - For NFTs, specify if it's NFT or SBT
-   * @returns Promise resolving to success boolean
+   * @returns Promise resolving to the complete Result object
    */
   const addContentToShelf = useCallback(async (
     shelfId: string, 
     content: string, 
     contentType: "Nft" | "Markdown" | "Shelf",
     collectionType?: "NFT" | "SBT"
-  ): Promise<boolean> => {
+  ): Promise<AddItemResult> => {
     try {
       // Find the target shelf
       const targetNormalizedShelf = availableShelves.find((s: NormalizedShelf) => s.shelf_id === shelfId);
       
       if (!targetNormalizedShelf) {
-        toast.error("Shelf not found");
-        return false;
+        return { status: 'error', message: "Shelf not found" };
       }
       
       // Check if user has edit access
       if (!checkEditAccess(shelfId)) {
-        toast.error("You don't have permission to edit this shelf");
-        return false;
+        return { status: 'error', message: "You don't have permission to edit this shelf" };
       }
       
       // Prevent circular references for shelves
       if (contentType === "Shelf" && content === shelfId) {
-        toast.error("Cannot add a shelf to itself");
-        return false;
+        return { status: 'error', message: "Cannot add a shelf to itself" };
       }
       
       // Convert to Shelf type before passing to addItem
       const targetShelf = denormalizeShelf(targetNormalizedShelf);
       
       // Add the content to the shelf, passing collectionType for NFTs
-      await addItem(
+      // Pass through the complete result from addItem
+      return await addItem(
         targetShelf, 
         content, 
         contentType,
         contentType === "Nft" ? collectionType : undefined
       );
       
-      // If addItem didn't throw, it was successful
-      toast.success(`Content added to ${targetShelf.title}`);
-      return true;
     } catch (error) {
       console.error("Failed to add content to shelf:", error);
-      toast.error("You can't add a shelf that has this shelf inside it.");
-      return false;
+      return { 
+        status: 'error', 
+        message: error instanceof Error ? error.message : 
+                 "An unexpected error occurred while adding to shelf" 
+      };
     }
   }, [availableShelves, checkEditAccess, addItem, denormalizeShelf]);
 

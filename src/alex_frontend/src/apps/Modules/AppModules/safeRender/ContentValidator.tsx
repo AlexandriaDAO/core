@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
-import { setPredictionResults } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
+import { setPredictionResults, setNsfwModelLoaded } from '@/apps/Modules/shared/state/arweave/arweaveSlice';
 import { useContentValidation } from '@/apps/Modules/shared/services/contentValidation';
 import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import ContentFetcher from './ContentFetcher';
@@ -21,106 +21,72 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   const { validateContent } = useContentValidation();
   const { getNftData } = useNftData();
   const [nftData, setNftData] = useState<NftDataResult | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [pendingValidation, setPendingValidation] = useState<{
-    element: HTMLImageElement | HTMLVideoElement;
-    thumbnailUrl?: string;
-  } | null>(null);
+  const [isLoadingNftData, setIsLoadingNftData] = useState(true);
+  const isModelReady = useSelector((state: RootState) => state.arweave.nsfwModelLoaded);
 
-  // Handle NFT data fetching
   useEffect(() => {
     const fetchNftData = async () => {
-      setIsLoading(true);
+      setIsLoadingNftData(true);
       try {
         const data = await getNftData(transactionId);
         setNftData(data);
       } catch (error) {
         console.error('Error fetching NFT data:', error);
       } finally {
-        setIsLoading(false);
+        setIsLoadingNftData(false);
       }
     };
-
     fetchNftData();
   }, [transactionId, getNftData]);
 
-  const validateNewContent = useCallback(
-    debounce(async (element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => {
-      if (isLoading || nftData?.principal) {
+  const runValidation = useCallback(
+    debounce(async (element: HTMLImageElement | HTMLVideoElement, currentContentType: string) => {
+      if (!isModelReady || nftData?.principal) {
+        console.log('Skipping validation:', { isModelReady, isNft: !!nftData?.principal });
         return;
       }
 
-      // If model is not loaded, store the element for later validation
-      if (!nsfwService.isModelLoaded()) {
-        setPendingValidation({ element, thumbnailUrl });
-        return;
-      }
-
+      console.log(`Running validation for ${transactionId}`);
       try {
-        const elementToValidate = (!contentType.startsWith('video/') && thumbnailUrl) 
-          ? await createImageFromThumbnail(thumbnailUrl) 
-          : element;
-        
-        const predictionResults = await validateContent(elementToValidate, contentType);
+        const predictionResults = await validateContent(element, currentContentType);
         if (predictionResults) {
           dispatch(setPredictionResults({ 
             id: transactionId, 
             predictions: predictionResults 
           }));
+        } else {
+          console.warn(`Validation returned null for ${transactionId}`);
         }
       } catch (error) {
-        console.error('Error in validation:', error);
+        console.error(`Error during validation for ${transactionId}:`, error);
       }
-    }, 300),
-    [contentType, isLoading, transactionId, validateContent, nftData, dispatch]
+    }, 500),
+    [isModelReady, transactionId, validateContent, nftData?.principal, dispatch]
   );
 
-  // Effect to handle pending validations when model loads
-  useEffect(() => {
-    const checkAndValidate = async () => {
-      if (pendingValidation && nsfwService.isModelLoaded()) {
-        await validateNewContent(pendingValidation.element, pendingValidation.thumbnailUrl);
-        setPendingValidation(null);
-      }
-    };
-
-    checkAndValidate();
-  }, [pendingValidation, validateNewContent]);
-
-  const handleValidateContent = async (element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => {
+  const handleContentLoad = useCallback((element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => {
     if (thumbnailUrl && contentType.startsWith('video/')) {
       contentCache.updateThumbnail(transactionId, thumbnailUrl);
     }
 
-    // Skip validation for NFTs
-    if (nftData?.principal) {
-      return;
+    if (isLoadingNftData || nftData?.principal) {
+        return;
     }
 
-    // For new content, proceed with NSFW validation
-    await validateNewContent(element, thumbnailUrl);
-  };
+    runValidation(element, contentType);
 
-  const handleError = () => {
+  }, [contentType, transactionId, isLoadingNftData, nftData?.principal, runValidation]);
+
+  const handleError = useCallback(() => {
     console.error(`Error loading content for transaction ID: ${transactionId}`);
-  };
-
-  const createImageFromThumbnail = (thumbnailUrl: string): Promise<HTMLImageElement> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = thumbnailUrl;
-      img.crossOrigin = "anonymous";
-    });
-  };
+  }, [transactionId]);
 
   return (
     <ContentFetcher
       contentUrl={contentUrl}
       contentType={contentType}
       imageObjectUrl={imageObjectUrl}
-      onLoad={handleValidateContent}
+      onLoad={handleContentLoad}
       onError={handleError}
     />
   );

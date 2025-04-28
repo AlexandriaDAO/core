@@ -1,25 +1,19 @@
 import React, { useState, useCallback } from "react";
 import { Card, CardContent, CardFooter } from "@/lib/components/card";
-import { Loader2, Flag, Plus, Heart, Bookmark, Info, ChevronDown } from "lucide-react";
+import { Flag, Info, ChevronDown } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import { Progress } from "@/lib/components/progress";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/lib/components/collapsible";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import { NftDataFooter } from "./components/NftDataFooter";
-import { fileTypeCategories } from "@/apps/Modules/shared/types/files";
-import { useAddToShelf } from "@/apps/app/Perpetua/features/shelf-management/hooks/useAddToShelf";
-import { mint_nft } from "@/features/nft/mint";
-import { toast } from "sonner";
 import { UnifiedCardActions } from "@/apps/Modules/shared/components/UnifiedCardActions/UnifiedCardActions";
 import { useContentCardState } from "./hooks/useContentCardState";
 
 interface ContentCardProps {
   children: React.ReactNode;
   onClick?: () => void;
-  id?: string; // Arweave ID
-  owner?: string; // Keep original owner string for NftDataFooter
+  id?: string; // Arweave ID or NFT Nat ID string
+  owner?: string; // Keep original owner string for NftDataFooter (might be useful for display)
   showStats?: boolean;
   onToggleStats?: (open: boolean) => void;
   predictions?: any;
@@ -29,13 +23,13 @@ interface ContentCardProps {
   parentShelfId?: string;
   itemId?: number;
   currentShelfId?: string;
-  initialContentType?: 'Arweave' | 'Nft'; // New prop to specify context
+  initialContentType?: 'Arweave' | 'Nft'; // Specifies the *context* this card is rendered in
 }
 
 export function ContentCard({
   children,
   onClick,
-  id, // Arweave ID
+  id, // Arweave ID or NFT Nat ID string
   owner, // Keep owner
   showStats,
   onToggleStats,
@@ -48,60 +42,28 @@ export function ContentCard({
   currentShelfId,
   initialContentType = 'Arweave' // Default to Arweave context
 }: ContentCardProps) {
-  const [isLiking, setIsLiking] = useState<boolean>(false);
   const [showDetails, setShowDetails] = useState(false);
 
   // --- Use the Custom Hook ---
   const {
     finalContentId,
     finalContentType,
-    isItemLikable,
     isOwnedByUser,
-    ownerPrincipal
+    ownerPrincipal,
+    isSafeForMinting
   } = useContentCardState({ id, initialContentType, predictions });
-
-  // --- Callbacks ---
-
-  // handleLike needs access to arweaveToNftId from redux store, so keep it here
-  const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
-  const handleLike = useCallback(async (): Promise<string | null> => {
-    if (!id) return null; // Need Arweave ID to mint
-
-    setIsLiking(true);
-    try {
-      const newlyMintedId = await mint_nft(id);
-      if (newlyMintedId) {
-        toast.success("Item Liked!");
-        return newlyMintedId;
-      } else {
-        const existingNftId = arweaveToNftId[id];
-        if (existingNftId) {
-             toast.info("This item is already an NFT/SBT.");
-        } else {
-            toast.error("Failed to like item.");
-        }
-        return null;
-      }
-    } catch (error) {
-      console.error("Error liking item (minting NFT):", error);
-      toast.error(error instanceof Error ? error.message : "An unexpected error occurred during like");
-      return null;
-    } finally {
-      setIsLiking(false);
-    }
-  }, [id, arweaveToNftId]); // Added arweaveToNftId dependency
 
   // --- Rendering ---
 
   return (
     <>
       <Card
-        className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative bg-white dark:bg-gray-900 h-full ${component === "Emporium" ? "mb-20 rounded-2xl" : "overflow-hidden"}`}
+        className={`group cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 flex flex-col relative bg-white dark:bg-gray-900 h-full ${component === "Emporium" ? "mb-20 rounded-2xl" : "overflow-hidden"}`}
         onClick={onClick}
       >
         <CardContent className="flex flex-col items-start p-0">
           <AspectRatio ratio={1} className="w-full relative">
-            <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800  ${component === "Emporium" ? " border-gray-900 dark:border-gray-900 rounded-[30px]" : "overflow-hidden h-full "}`}  >
+            <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800 ${component === "Emporium" ? " border-gray-900 dark:border-gray-900 rounded-[30px]" : "overflow-hidden h-full "}`} >
               {children}
             </div>
             {finalContentId && (
@@ -110,13 +72,13 @@ export function ContentCard({
                 contentType={finalContentType}
                 ownerPrincipal={ownerPrincipal}
                 isOwned={isOwnedByUser}
-                isLikable={isItemLikable}
-                onLike={isItemLikable ? handleLike : undefined}
+                isSafeForMinting={isSafeForMinting}
                 parentShelfId={parentShelfId}
                 itemId={itemId}
                 currentShelfId={currentShelfId}
                 onToggleDetails={() => setShowDetails(prev => !prev)}
                 showDetails={showDetails}
+                className="absolute top-1.5 right-1.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
               />
             )}
           </AspectRatio>

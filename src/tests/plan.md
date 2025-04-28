@@ -1,10 +1,7 @@
 Before next mainnet push:
-- Upgrade nft_manager.
-- Upgrade user canister.
-- Vetkd
-- Wallet
-- AssetManager
-- Emporium
+- Upgrade nft_manager (there was a slight logging change to coordinate_mint() that's a breaking change but it should be fine).
+
+
 
 
 #### Bigger Features (lower priority):

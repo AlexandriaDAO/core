@@ -154,8 +154,6 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
                   onToggleDetails={() => setIsFooterExpanded(prev => !prev)}
                   showDetails={isFooterExpanded}
                   isOwned={isOwnedByUser}
-                  isLikable={false}
-                  onLike={undefined}
                 />
                 
                 <div className="text-center p-6 h-full flex flex-col items-center justify-center">

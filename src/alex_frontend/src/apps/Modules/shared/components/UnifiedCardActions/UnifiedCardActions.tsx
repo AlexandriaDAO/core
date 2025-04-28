@@ -27,15 +27,15 @@ import { useFollowStatus } from "@/apps/app/Perpetua/features/following/hooks/us
 import { Principal } from "@dfinity/principal";
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store';
-
+import { mint_nft, MintResult } from "@/features/nft/mint";
+import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice"; // Import if needed for shelf name toast
 
 interface UnifiedCardActionsProps {
   contentId: string; // Arweave ID, Shelf ID, NFT Nat ID string
   contentType: "Nft" | "Shelf" | "Markdown" | "Arweave"; // Added 'Arweave'
   ownerPrincipal?: Principal; // Owner for follow/permission checks
   isOwned: boolean; // Does the current user own this specific item?
-  isLikable?: boolean; // Can this UNOWNED item be liked/minted?
-  onLike?: () => Promise<string | null>; // Function to call for liking/minting, returns new Nat ID string or null
+  isSafeForMinting?: boolean; // Is this item safe to mint (relevant for Arweave type)
   // Context for other actions
   currentShelfId?: string; // The shelf the item is currently displayed in (if any)
   parentShelfId?: string; // The shelf this item belongs to (for removal)
@@ -44,7 +44,15 @@ interface UnifiedCardActionsProps {
   onToggleDetails: () => void; // Callback to toggle details visibility
   showDetails: boolean; // Are details currently visible?
   className?: string;
-  // Removed: isOwnedNft, isMintableNft, onMint, isMinting - replaced by isOwned, isLikable, onLike
+}
+
+// Type for the context needed by the dialog and background processing
+interface AddToShelfContext {
+    originalContentId: string;
+    originalContentType: UnifiedCardActionsProps['contentType'];
+    initialIsOwned: boolean;
+    isSafe?: boolean;
+    currentShelfId?: string; // Pass currentShelfId for exclusion in dialog
 }
 
 export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
@@ -52,8 +60,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
   contentType,
   ownerPrincipal,
   isOwned,
-  isLikable = false, // Default to false if not provided
-  onLike,
+  isSafeForMinting = true, // Default to true (safe), receives false if unsafe Arweave
   currentShelfId,
   parentShelfId,
   itemId,
@@ -62,25 +69,24 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
   className
 }) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const [dialogContentId, setDialogContentId] = React.useState<string | null>(null);
-  const [dialogContentType, setDialogContentType] = React.useState<'Nft' | 'Shelf' | 'Markdown' | null>(null); // Store type for dialog
+  // State to control the ShelfSelectionDialog and hold context
+  const [addToShelfContext, setAddToShelfContext] = React.useState<AddToShelfContext | null>(null);
   const [removeDialogOpen, setRemoveDialogOpen] = React.useState(false);
   const [followLoading, setFollowLoading] = React.useState(false);
-  const [likeAndAddLoading, setLikeAndAddLoading] = React.useState(false); // Loading state for the like+add operation
+  // Keep track of background processing state for the specific action
+  const [isProcessingAddToShelf, setIsProcessingAddToShelf] = React.useState(false);
 
-  const { hasEditableShelvesExcluding, isLoggedIn } = useAddToShelf();
+  const { addContentToShelf, isLoggedIn } = useAddToShelf(); // Removed getShelfById as it wasn't available
   const { user } = useSelector((state: RootState) => state.auth);
   const currentUserPrincipal = user?.principal;
-  const { removeItem } = useShelfOperations();
+  const { removeItem, shelves } = useShelfOperations();
   const { checkEditAccess } = useContentPermissions();
   const { isFollowingUser, toggleFollowUser } = useFollowStatus();
 
-  const hasAvailableShelves = hasEditableShelvesExcluding(currentShelfId);
-
   // --- Determine Action Availability ---
 
-  // Can Add to Shelf: Logged in, has shelves, and it's any content type
-  const canAddToShelf = isLoggedIn && hasAvailableShelves;
+  // Can Add to Shelf: Only requires user to be logged in to see the option
+  const canAddToShelf = isLoggedIn;
 
   // Can Remove Item: Standard logic
   const canRemoveItem = !!parentShelfId && itemId !== undefined && checkEditAccess(parentShelfId);
@@ -96,7 +102,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
     : false;
 
   // --- Determine Overall Menu Visibility ---
-  const showAnyAction = canAddToShelf || canRemoveItem || canInteractWithFollow; // Add to shelf is always primary if available
+  const showAnyAction = canAddToShelf || canRemoveItem || canInteractWithFollow || true; // Keep menu if toggle details is always an option
   const showSeparator1 = (canAddToShelf || canRemoveItem) && canInteractWithFollow; // Separator needed if primary actions and follow action exist
 
   // If no actions are available, don't render anything
@@ -106,7 +112,6 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
 
   const stopPropagation = (e: React.MouseEvent | React.TouchEvent | Event) => {
     e.stopPropagation();
-    // Only prevent default for non-Events (like mouse/touch) to allow dropdown trigger behavior
     if (!(e instanceof Event)) {
       e.preventDefault();
     }
@@ -114,12 +119,8 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
 
   // --- Action Handlers ---
 
-  const openShelfDialog = (id: string, type: 'Nft' | 'Shelf' | 'Markdown') => {
-    setDialogContentType(type);
-    setDialogContentId(id);
-  };
-
-  const handleAddToShelfClick = async (e: React.MouseEvent) => {
+  // 1. Initial Click Handler: Perform checks and open dialog
+  const handleAddToShelfClick = (e: React.MouseEvent) => {
     stopPropagation(e);
     setMenuOpen(false);
 
@@ -127,56 +128,114 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
       toast.error("Please log in to add items to a shelf.");
       return;
     }
-    if (!hasAvailableShelves) {
-      toast.error("You don't have any shelves you can add to. Create one first!");
-      return;
+
+    // Check safety for Arweave content IF it's not owned (owned content is assumed safe/already an NFT)
+    if (contentType === 'Arweave' && !isOwned && !isSafeForMinting) {
+        toast.error("Cannot add potentially unsafe content.");
+        console.warn(`[UnifiedCardActions] Add to shelf blocked for unsafe Arweave content: ${contentId}`);
+        return;
     }
 
-    // Handle Shelf or Markdown directly
-    if (contentType === 'Shelf' || contentType === 'Markdown') {
-      openShelfDialog(contentId, contentType);
-      return;
-    }
-
-    // Handle Nft or Arweave
-    if (contentType === 'Nft' || contentType === 'Arweave') {
-      if (isOwned) {
-        // Owned items (must be Nft or treated as Nft if Arweave context but already owned)
-        openShelfDialog(contentId, 'Nft');
-      } else if (isLikable && onLike) {
-        // Not owned, but likable -> Like/Mint first
-        setLikeAndAddLoading(true);
-        try {
-          const newlyMintedId = await onLike();
-          if (newlyMintedId) {
-            toast.success("Item liked! Now add it to a shelf.");
-            // Use timeout to ensure state updates propagate before opening dialog
-            setTimeout(() => openShelfDialog(newlyMintedId, 'Nft'), 0);
-          } else {
-            // Error likely handled within onLike (toast shown there)
-            // console.warn("onLike completed but returned null/undefined. No shelf dialog opened."); // Removed console log
-          }
-        } catch (error) {
-          console.error("Error during onLike execution:", error);
-          // Ensure a generic error is shown if onLike fails unexpectedly
-          if (!(error instanceof Error && error.message.includes("already own")) && !(error instanceof Error && error.message.includes("already minted"))) {
-             toast.error("Failed to like the item. Please try again.");
-          }
-        } finally {
-          setLikeAndAddLoading(false);
-        }
-      } else {
-        // This case should ideally not be reachable if button visibility is correct
-        console.error("Add to Shelf clicked for unowned/unlikeable item without onLike handler.", { contentType, isOwned, isLikable });
-        toast.error("Cannot add this item to a shelf at the moment.");
-      }
-      return;
-    }
-
-    // Fallback/Error case - Should not happen with current types
-    console.error("Unhandled contentType in handleAddToShelfClick:", contentType);
-    toast.error("An unexpected error occurred.");
+    console.log(`[UnifiedCardActions] Initiating add to shelf for ${contentType} ID: ${contentId}, Owned: ${isOwned}, Safe: ${isSafeForMinting}`);
+    // Set context to open the dialog
+    setAddToShelfContext({
+        originalContentId: contentId,
+        originalContentType: contentType,
+        initialIsOwned: isOwned,
+        isSafe: isSafeForMinting,
+        currentShelfId: currentShelfId // Pass current shelf ID for exclusion
+    });
   };
+
+  // 2. Background Processor: Called after dialog confirms selection
+  const processAddToShelfInBackground = async (selectedShelfId: string) => {
+    if (!addToShelfContext) {
+        console.error("[UnifiedCardActions] Background process called without context.");
+        toast.error("An unexpected error occurred (missing context).");
+        return;
+    }
+
+    const { originalContentId, originalContentType, initialIsOwned } = addToShelfContext;
+    let finalContentId = originalContentId;
+    let finalContentType: "Nft" | "Shelf" | "Markdown" = 'Nft'; // Default, will be adjusted
+    let needsMinting = false;
+
+    setIsProcessingAddToShelf(true); // Indicate background processing starts
+
+    try {
+        // Determine if minting is needed
+        if (!initialIsOwned && (originalContentType === 'Nft' || originalContentType === 'Arweave')) {
+            // We already checked Arweave safety in handleAddToShelfClick
+            needsMinting = true;
+            console.log(`[UnifiedCardActions] Background: Minting required for unowned ${originalContentType}: ${originalContentId}`);
+        } else if (originalContentType === 'Shelf') {
+            finalContentType = 'Shelf';
+            console.log(`[UnifiedCardActions] Background: Adding existing Shelf: ${originalContentId}`);
+        } else if (originalContentType === 'Markdown') {
+            finalContentType = 'Markdown';
+            console.log(`[UnifiedCardActions] Background: Adding existing Markdown: ${originalContentId}`);
+        } else {
+            // Already owned Nft/SBT
+            finalContentType = 'Nft';
+            console.log(`[UnifiedCardActions] Background: Adding existing owned NFT/SBT: ${originalContentId}`);
+        }
+
+        // Perform minting if required
+        if (needsMinting) {
+            console.log(`[UnifiedCardActions] Background: Starting minting for ${originalContentId}`);
+            const mintResult = await mint_nft(originalContentId);
+            
+            if (mintResult.status === 'success' || mintResult.status === 'already_exists') {
+                console.log(`[UnifiedCardActions] Background: Mint ${mintResult.status}. ID: ${mintResult.id}`);
+                finalContentId = mintResult.id;
+                finalContentType = 'Nft'; // Content is now an NFT/SBT
+            } else {
+                console.error(`[UnifiedCardActions] Background: Minting failed: ${mintResult.message}`);
+                toast.error(mintResult.message || "Failed to acquire item for adding.");
+                throw new Error("Minting failed"); // Stop processing
+            }
+        }
+
+        // Add to shelf (using finalContentId and finalContentType)
+        console.log(`[UnifiedCardActions] Background: Adding ${finalContentType} (${finalContentId}) to shelf ${selectedShelfId}`);
+        
+        // Determine collectionType for NFTs/SBTs - simplistic check based on ID length
+        const collectionType = (finalContentType === 'Nft' && finalContentId.length >= 80) ? 'SBT' : (finalContentType === 'Nft' ? 'NFT' : undefined);
+
+        // Now we get a proper Result object with status and message
+        const addResult = await addContentToShelf(
+            selectedShelfId,
+            finalContentId,
+            finalContentType,
+            collectionType
+        );
+
+        // Handle the Result based on status
+        if (addResult.status === 'success') {
+            // Get the shelf name if possible
+            const selectedShelf = shelves.find(shelf => shelf.shelf_id === selectedShelfId);
+            const shelfName = selectedShelf ? selectedShelf.title : "shelf";
+            
+            toast.success(`Item added to ${shelfName}`);
+            console.log(`[UnifiedCardActions] Background: Successfully added item to shelf ${selectedShelfId}`);
+        } else {
+            // Show the specific error from the backend
+            toast.error(`Failed to add item: ${addResult.message}`);
+            console.error(`[UnifiedCardActions] Background: Failed to add item: ${addResult.message}`);
+        }
+
+    } catch (error) {
+        console.error("[UnifiedCardActions] Error during background add-to-shelf process:", error);
+        // Avoid double-toasting if mint/add already toasted
+        if (!(error instanceof Error && error.message === "Minting failed")) {
+           toast.error(error instanceof Error ? error.message : "An unexpected error occurred while adding the item.");
+        }
+    } finally {
+        setIsProcessingAddToShelf(false); // Indicate background processing finished
+        setAddToShelfContext(null); // Clear context, dialog is already closed
+    }
+  };
+
 
   const handleRemoveClick = (e: React.MouseEvent) => {
     stopPropagation(e);
@@ -188,18 +247,15 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
     stopPropagation(e);
     if (!parentShelfId || itemId === undefined) return;
 
-    setRemoveDialogOpen(true); // Keep dialog open while processing
     try {
       await removeItem(parentShelfId, itemId);
       toast.success("Item removed from shelf");
-      setRemoveDialogOpen(false); // Close on success
+      setRemoveDialogOpen(false);
     } catch (error) {
       console.error("Error removing item:", error);
       toast.error("Error removing item from shelf");
-      // Optionally keep dialog open on error: setRemoveDialogOpen(false);
     } finally {
-      // Ensure dialog is closed if not already closed on success
-       if (removeDialogOpen) setRemoveDialogOpen(false);
+       setRemoveDialogOpen(false);
     }
   };
 
@@ -211,11 +267,9 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
     setMenuOpen(false);
     try {
       await toggleFollowUser(ownerPrincipal);
-      // Toast is handled within useFollowStatus hook
+      // Toast handled in hook
     } catch (error) {
       console.error("Error toggling follow state:", error);
-      // Avoid duplicate toasts if hook handles it
-      // toast.error("Failed to update follow status.");
     } finally {
       setFollowLoading(false);
     }
@@ -234,33 +288,27 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
           <Button
             variant="ghost"
             className={`h-8 w-8 p-0 absolute top-2 right-2 z-20 bg-background/80 backdrop-blur-sm hover:bg-muted ${className ?? ""}`}
-            onClick={(e) => {
-              // Stop propagation for the button click itself to prevent card click
-              stopPropagation(e);
-              // Allow the trigger default behavior to open/close the menu
-              // Do not manually call setMenuOpen here
-            }}
+            onClick={stopPropagation} // Stop propagation here too
             aria-label="Open actions menu"
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
 
-        {/* Use stopPropagation on Content to prevent clicks inside menu from closing it or triggering card actions */}
         <DropdownMenuContent align="end" onClick={stopPropagation} className="w-52">
-          {/* Add to Shelf (Handles Like+Add internally) */}
+          {/* Add to Shelf */}
           {canAddToShelf && (
             <DropdownMenuItem
               onClick={handleAddToShelfClick}
-              disabled={likeAndAddLoading}
+              disabled={isProcessingAddToShelf} // Disable while background task runs
               className="cursor-pointer"
             >
-              {likeAndAddLoading ? (
+              {isProcessingAddToShelf ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
                 <Bookmark className="h-4 w-4 mr-2" />
               )}
-              {likeAndAddLoading ? 'Liking...' : 'Add to shelf'}
+              {isProcessingAddToShelf ? 'Adding...' : 'Add to shelf'}
             </DropdownMenuItem>
           )}
 
@@ -275,7 +323,6 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
             </DropdownMenuItem>
           )}
 
-          {/* Separator */}
           {showSeparator1 && <DropdownMenuSeparator />}
 
           {/* Follow/Unfollow Owner */}
@@ -307,17 +354,24 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Add to Shelf Dialog */}
-      {/* Only render the dialog when we have a valid ID and Type */}
-      {dialogContentId && dialogContentType && (
+      {/* Add to Shelf Dialog - Opens when addToShelfContext is set */}
+      {addToShelfContext && (
         <ShelfSelectionDialog
-          contentId={dialogContentId}
-          contentType={dialogContentType} // Type is already correct
-          currentShelfId={currentShelfId}
-          open={!!dialogContentId} // Control visibility directly
+          // Pass the context needed for display and background processing
+          originalContentId={addToShelfContext.originalContentId}
+          originalContentType={addToShelfContext.originalContentType}
+          initialIsOwned={addToShelfContext.initialIsOwned}
+          // Pass currentShelfId directly for exclusion logic within the dialog
+          currentShelfId={addToShelfContext.currentShelfId}
+          // Control visibility
+          open={!!addToShelfContext}
+          // Function to call when a shelf is selected and confirmed
+          onConfirmSelection={processAddToShelfInBackground}
+          // Function to call when dialog is closed (X button, overlay click)
           onClose={() => {
-            setDialogContentId(null);
-            setDialogContentType(null);
+            setAddToShelfContext(null); // Clear context to close
+            // Optionally reset processing state if closed prematurely, though it might finish anyway
+            // setIsProcessingAddToShelf(false);
           }}
         />
       )}
@@ -325,7 +379,6 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
       {/* Remove Item Confirmation Dialog */}
       {removeDialogOpen && canRemoveItem && (
         <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
-          {/* Use stopPropagation on Content to prevent clicks inside closing dialog accidentally */}
           <AlertDialogContent onClick={stopPropagation}>
             <AlertDialogHeader>
               <AlertDialogTitle>Remove item from shelf</AlertDialogTitle>

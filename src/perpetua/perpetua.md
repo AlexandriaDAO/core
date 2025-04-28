@@ -130,12 +130,43 @@ Perpetua/
 
 
 - Really, next thing is to just play around a LOT with the new system and get out the kinks.
-  
+- Reduce buttons even further (clicking on the NFT brings up the info, and the button is just a bookmark (no follow owner or anything else, just bookmarking!!!))
+
+
+- The add to shelves option doesn't open if it's already owned by a user, which is foolish, because an owner should be able to add it to any shelf. (it gives you a toast of "You already liked this item" or "You already own this NFT", and so it's a hiccup in the user flow). It should be if you own an NFT or an SBT, you should be able to add it to as many shelves as you like.
 
 
 
 
-First some context. This is a big project with a suite of apps that use NFTs as a content primative. Every peice of permanent content is an NFT, but you could get a copy of someone's NFT (an SBT) in order to use it by liking the original NFT. Then in the Perpetua app we use these nfts in a content grid style social app. The social app has it's own two primitives: Shelves and Items.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+First some context. This is a big project with a suite of apps that use NFTs as a content primative. Every peice of permanent content is an NFT, but you could get a copy of someone's NFT (an SBT) in order to use it by liking the original NFT.
+
+In the Permasearch app, we're just searching arweave transactions. People can mint them as NFTs, usually for the first time, but if they're already owned than the backend mints an SBT for that person. To trigger the mint action on Permasearch though, we need to run the nsfw check to ensure porn isn't minted as an NFT. After that though, after it's minted as an NFT or SBT, we never need to run the nsfw check on them again, so minting as an option is always availible by default. Then in the alexandrian app, we search through existing NFTs, which are areweave transactions that are minted as NFTs on our backend, so we treat them as NFTs/SBTs. Then in the Perpetua app we use these nfts in a content grid style social app. The social app has it's own two primitives: Shelves and Items.
 
 A shelf holds a grid of items, that's it.
 An item is a (1) NFT/SBT, and only it's owner can add it to a shelf, or (2) some markdown text which anyone can add, or (3) another shelf which anyone can add.
@@ -143,19 +174,9 @@ An item is a (1) NFT/SBT, and only it's owner can add it to a shelf, or (2) some
 
 All of these, both independent NFTs, or shelves or markdown items or items of any kind, all of them, appear in the UI in the same style of card.
 
-Now there were 3-4 buttons, kindof, that we used inside the UI cards that make up this app. The problem was that they had overlapping functionality that was confusing users. Let me explain.
+Now here's the problem. We consolidated these functionalities in a single button that opens up a set of options in UnifiedCardActions.tsx. For one thing user's can click 'show details' or 'follow owner', but the flow for minting the NFT so you could add it to a shelf is not there. 
 
-(1) The first two are the either/or heart/bookmark which are used on NFTs/SBTs. The heart triggers a like, which then makes the nft availible to add to a shelf via the bookmark. If the user already owns the NFT, then it will show the bookmark, so since they already own it they don't need to 'like' it to use it where they want.
-
-(2) Then there's the expander button, which just opens the metadata details in a dropdown. Very simple. And this is on all nfts and items, though they have different details inside.
-
-(3) And then there's the button with the three dot icons, which is on items of all types and not NFTs that are not items in a shelf, but maybe should be integrated with regular nfts as well. It opens up the 'Add to shelf' and 'Remove from shelf' opetions in ShelfCardActionMenu.tsx.
-
-So as you can see this was pretty confusing for users.
-
-So now we simplied it, made it one button, and allow people to bookmark the nfts, and then the liking actions happen behind the scenes.
-
-The problem is that we're not using a more cleanly implemented flow for this. It should just be 'bookmark' and the rest is handled. So for example it should check when I bookmark an nft:
+The ideal user flow is the. A user can click on any asset to move forward by 'bookmarking' it, that is, adding it to a shelf, as part of the UnifiedCardActions.
 
 - is nft
   - if user is owner of nft
@@ -174,8 +195,49 @@ The problem is that we're not using a more cleanly implemented flow for this. It
 - if it's neither (not an nft yet), proceed with liking it with coordinate_mint, which will mint an original NFT if no-one owns it, or if it was already owned, mint an sbt.
   - then use the proper id to bookmark it to the shelf. 
 
+But right now I don't see that option to mint or bookmark or add to shelf anywhere so something is wrong with the conditions that we're using.
 
 Perhaps the ideal way foward is to consolidate this code and get it working in a separate compontent that puts all the buttons into one uniform dropdown without scattering overlapping functionality all over the place. First find all the involved components and come up with a methodlogy for consolidation. Any new approach should remove unused code, not overproduce more new code.
+
+It's also very important to make the 'toasts' involved in this process explain what's actually happening in the backend, not a arbitrary frontend error message, so let's make sure the toast logs are all accurate to what is occuring during the flow.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -248,7 +310,7 @@ Backend Stuff:
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal e4mdi-f6mls-s6zby-ymosz-5nxxs-buiks-gvrre-2aiyt-fa7q4-bssvn-vqe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 2p7fi-l3ykz-vhg7k-inwpw-kuia3-2iiv2-dm6qm-rcnp3-jdfnm-od6uw-rae)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

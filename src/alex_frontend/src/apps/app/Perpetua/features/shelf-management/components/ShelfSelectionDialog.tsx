@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { 
   Dialog, 
   DialogContent, 
@@ -6,9 +6,8 @@ import {
   DialogTitle 
 } from "@/lib/components/dialog";
 import { Loader2 } from "lucide-react";
-import { ShelfContent } from "./ShelfContent";
+import { ShelfContent, UpdatedShelfContentProps } from "./ShelfContent";
 import { useAddToShelf } from "../hooks/useAddToShelf";
-import { ShelfManagerProps } from "../../../types/shelf.types";
 import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { Principal } from "@dfinity/principal";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
@@ -29,9 +28,18 @@ const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => ({
 const denormalizeShelves = (normalizedShelves: NormalizedShelf[]): ShelfPublic[] => 
   normalizedShelves.map(denormalizeShelf);
 
-interface ShelfSelectionDialogProps extends ShelfManagerProps {
+interface ShelfSelectionDialogProps {
+  // Context from the triggering component
+  originalContentId: string;
+  originalContentType: "Nft" | "Shelf" | "Markdown" | "Arweave";
+  initialIsOwned: boolean;
+
+  // UI and functionality props
+  currentShelfId?: string; // ID of the shelf the item might currently be in (for exclusion)
   open: boolean;
   onClose: () => void;
+  // Callback to trigger background processing after selection
+  onConfirmSelection: (selectedShelfId: string) => void;
 }
 
 /**
@@ -41,25 +49,30 @@ interface ShelfSelectionDialogProps extends ShelfManagerProps {
  * type to shelves that the user has permission to edit.
  */
 export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
-  contentId,
-  contentType,
+  // originalContentId, // Not directly used in dialog logic, but kept for potential future use?
+  // originalContentType, // Not directly used in dialog logic
+  // initialIsOwned, // Not directly used in dialog logic
   currentShelfId,
   open,
-  onClose
+  // onClose
+  onClose,
+  onConfirmSelection
 }) => {
   const [selectedShelfId, setSelectedShelfId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isAddingContent, setIsAddingContent] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
   const {
     getEditableShelves,
-    addContentToShelf,
-    hasEditableShelvesExcluding,
+    // addContentToShelf, // Removed, handled by caller now
+    // hasEditableShelvesExcluding, // Filtering happens in getEditableShelves
     isLoggedIn,
     shelvesLoading
   } = useAddToShelf();
   
+  // TODO: Get the function to trigger shelf creation
+  // const { openCreateShelfModal } = useShelfCreation(); 
+
   // This effect runs when the dialog is opened
   useEffect(() => {
     if (open) {
@@ -69,34 +82,45 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
   }, [open, shelvesLoading]);
   
   // Reset state when dialog closes
-  const handleDialogClose = () => {
+  const handleDialogClose = useCallback(() => {
     setSelectedShelfId(null);
     setSearchTerm("");
     onClose();
-  };
+  }, [onClose]);
   
   // Handle selection of a shelf
   const handleShelfSelection = (shelfId: string) => {
     setSelectedShelfId(shelfId === selectedShelfId ? null : shelfId);
   };
   
-  // Handle adding content to selected shelf
+  // Handle confirming the shelf selection
   const handleAddToShelf = async () => {
     if (!selectedShelfId) return;
     
-    setIsAddingContent(true);
-    try {
-      const success = await addContentToShelf(selectedShelfId, contentId, contentType);
-      if (success) {
-        onClose();
-      }
-    } finally {
-      setIsAddingContent(false);
-    }
+    console.log(`[ShelfSelectionDialog] Shelf selected: ${selectedShelfId}. Triggering background process.`);
+    
+    // Call the callback provided by the parent to handle the background logic
+    onConfirmSelection(selectedShelfId);
+    
+    // Close the dialog immediately (Optimistic UI)
+    handleDialogClose();
   };
   
+  // New handler for the create shelf request
+  const handleCreateNewShelfRequest = useCallback(() => {
+    console.log("[ShelfSelectionDialog] Create New Shelf requested");
+    handleDialogClose();
+    // TODO: Trigger the actual shelf creation flow
+    // if (openCreateShelfModal) { 
+    //   openCreateShelfModal(); 
+    // } else { 
+    //   console.error("Shelf creation function not available!");
+    // }
+    alert("Trigger Create Shelf Flow! (Placeholder)");
+  }, [handleDialogClose /*, openCreateShelfModal */]);
+  
   // Check conditions for rendering content
-  const canShowContent = isLoggedIn && hasEditableShelvesExcluding(currentShelfId);
+  const canShowContent = isLoggedIn;
   
   // Get shelves data if we can show content
   const editableShelves = canShowContent ? getEditableShelves(currentShelfId) : [];
@@ -129,13 +153,6 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
               You need to be logged in to add content to shelves
             </p>
           </div>
-        ) : !hasEditableShelvesExcluding(currentShelfId) ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center font-serif">
-            <h3 className="text-lg font-semibold">No Shelves Available</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              You don't have any shelves you can edit. Create a shelf first.
-            </p>
-          </div>
         ) : (
           <>
             <DialogHeader>
@@ -148,9 +165,10 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
               onSelectShelf={handleShelfSelection}
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
-              isAddingContent={isAddingContent}
+              isAddingContent={false} // Dialog no longer handles adding state
               onAddToShelf={handleAddToShelf}
               onClose={handleDialogClose}
+              onCreateNewShelfRequest={handleCreateNewShelfRequest}
             />
           </>
         )}

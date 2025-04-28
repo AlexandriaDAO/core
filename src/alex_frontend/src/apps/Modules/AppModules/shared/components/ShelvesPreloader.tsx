@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIdentity } from '@/hooks/useIdentity';
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch"; // Assuming useAppDispatch is correctly set up
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { selectLoading, selectUserShelves } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { loadShelves } from '@/apps/app/Perpetua/state';
 
@@ -14,17 +14,33 @@ export const ShelvesPreloader: React.FC = () => {
   const { identity } = useIdentity();
   const shelvesLoading = useAppSelector(selectLoading);
   const availableShelves = useAppSelector(selectUserShelves);
+  const hasLoadedShelves = availableShelves.length > 0;
+
+  // State to track if the initial load attempt has been made for the current identity
+  const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
 
   useEffect(() => {
-    // Load shelves only if identity exists, shelves aren't already loading, and no shelves are currently loaded
-    if (identity && !shelvesLoading && availableShelves.length === 0) {
-      console.log('[ShelvesPreloader] Triggering shelf load...');
+    // Reset attempt flag if identity changes (e.g., user logs out and logs in)
+    if (identity) {
+        setHasAttemptedLoad(false);
+    }
+  }, [identity]);
+
+  useEffect(() => {
+    // Load shelves only if:
+    // 1. Identity exists
+    // 2. Not currently loading
+    // 3. Shelves haven't been successfully loaded yet
+    // 4. Haven't already attempted to load for this identity session
+    if (identity && !shelvesLoading && !hasLoadedShelves && !hasAttemptedLoad) {
+      console.log('[ShelvesPreloader] Triggering initial shelf load...');
+      setHasAttemptedLoad(true); // Mark that we've started the attempt
       dispatch(loadShelves({
         principal: identity.getPrincipal(),
-        params: { offset: 0, limit: 20 } // Consider making limit configurable or higher if needed
+        params: { offset: 0, limit: 50 } // Load a reasonable number initially
       }));
     }
-  }, [identity, dispatch, shelvesLoading, availableShelves]);
+  }, [identity, dispatch, shelvesLoading, hasLoadedShelves, hasAttemptedLoad]);
 
   // This component doesn't render anything visible
   return null;

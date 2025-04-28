@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
@@ -9,22 +9,15 @@ import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components
 import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
 import { Button } from "@/lib/components/button";
 import { withdraw_nft } from "@/features/nft/withdraw";
-import { mint_nft } from "@/features/nft/mint";
 import { TooltipProvider } from "@/lib/components/tooltip";
 import { Loader2 } from 'lucide-react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
-import { UnifiedCardActions } from "@/apps/Modules/shared/components/UnifiedCardActions/UnifiedCardActions";
 import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import type { Transaction } from '../../shared/types/queries';
 import { TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
-import { useIdentity } from '@/hooks/useIdentity';
-import { loadShelves } from '@/apps/app/Perpetua/state';
-import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { selectUserShelves, selectLoading } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { Principal } from '@dfinity/principal';
 import { ShelvesPreloader } from "../shared/components/ShelvesPreloader";
 
-// Create a typed dispatch hook
 const useAppDispatch = () => useDispatch<AppDispatch>();
 
 export interface ContentGridProps {
@@ -39,7 +32,6 @@ export const ContentGrid: ContentGridComponent = Object.assign(
   ({ children }: ContentGridProps) => {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:grid-cols-2 gap-2 sm:gap-4 lg:pb-16 md:pb-14 sm:pb-10 xs:pb-6">
-        {/* Preload shelves data */}
         <ShelvesPreloader />
         {children}
       </div>
@@ -48,7 +40,6 @@ export const ContentGrid: ContentGridComponent = Object.assign(
   { Item: ContentCard }
 );
 
-// Map frontend collection names to backend collection names
 const mapCollectionToBackend = (collection: TokenType): 'icrc7' | 'icrc7_scion' => {
   return collection === 'NFT' ? 'icrc7' : 'icrc7_scion';
 };
@@ -62,45 +53,19 @@ interface GridProps {
 const Grid = ({ dataSource }: GridProps = {}) => {
   const dispatch = useAppDispatch();
 
-  // Select the appropriate state based on the determined data source
   const contentData = useSelector((state: RootState) => state.transactions.contentData);
-
-  // Fetch raw transactions for use in the dialog content
   const transactions = useSelector((state: RootState) => state.transactions.transactions);
-
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
   const { predictions } = useSelector((state: RootState) => state.arweave);
   
-  // Use the sortedTransactions hook which applies proper filtering by tags
   const sortedTransactions = useSortedTransactions();
 
-  // Reinstate local state for dialog management
   const [selectedContent, setSelectedContent] = useState<{ id: string; type: string, assetUrl: string } | null>(null);
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
-  const [likingStates, setLikingStates] = useState<Record<string, boolean>>({});
 
   const handleRenderError = useCallback((transactionId: string) => {
     dispatch(clearTransactionContent(transactionId));
-  }, [dispatch]);
-
-  const handleLike = useCallback(async (transactionId: string): Promise<string | null> => {
-    setLikingStates(prev => ({ ...prev, [transactionId]: true }));
-    try {
-      const mintedIdString = await mint_nft(transactionId);
-      
-      if (mintedIdString) {
-        return mintedIdString;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      console.error("Unexpected error in handleLike after mint_nft call:", error);
-      toast.error("An unexpected error occurred while liking.");
-      return null;
-    } finally {
-      setLikingStates(prev => ({ ...prev, [transactionId]: false }));
-    }
   }, [dispatch]);
 
   const handleWithdraw = useCallback(async (transactionId: string) => {
@@ -116,7 +81,13 @@ const Grid = ({ dataSource }: GridProps = {}) => {
         throw new Error("Could not find NFT data for this content");
       }
 
-      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, mapCollectionToBackend(nftData.collection as TokenType));
+      const collection = nftData.collection as TokenType | undefined;
+      if (!collection || (collection !== 'NFT' && collection !== 'SBT')) {
+        throw new Error(`Invalid or missing collection type on NFT data: ${collection}`);
+      }
+      const backendCollection = mapCollectionToBackend(collection);
+
+      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, backendCollection);
       if (lbryBlock === null && alexBlock === null) {
         toast.info("No funds were available to withdraw");
       } else {
@@ -131,9 +102,8 @@ const Grid = ({ dataSource }: GridProps = {}) => {
     } finally {
       setWithdrawingStates(prev => ({ ...prev, [transactionId]: false }));
     }
-  }, [arweaveToNftId, nfts]);
+  }, [arweaveToNftId, nfts, dispatch]);
 
-  // Reinstate dialog open change handler
   const handleDialogOpenChange = useCallback((open: boolean) => {
     if (!open) {
       setSelectedContent(null);
@@ -161,14 +131,6 @@ const Grid = ({ dataSource }: GridProps = {}) => {
 
             const detectedContentType = nftData ? 'Nft' : 'Arweave';
 
-            let ownerPrincipal: Principal | undefined;
-            try {
-              ownerPrincipal = transaction.owner ? Principal.fromText(transaction.owner) : undefined;
-            } catch (e) {
-              console.error("Invalid owner principal format:", transaction.owner, e);
-              ownerPrincipal = undefined;
-            }
-
             return (
               <ContentGrid.Item
                 key={transaction.id}
@@ -184,18 +146,6 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                 initialContentType={detectedContentType}
               >
                 <div className="group relative w-full h-full">
-                  <UnifiedCardActions 
-                    contentId={transaction.id}
-                    contentType={detectedContentType}
-                    ownerPrincipal={ownerPrincipal}
-                    isOwned={isOwned}
-                    isLikable={detectedContentType === 'Arweave' && !isOwned}
-                    onLike={async () => await handleLike(transaction.id)}
-                    className="absolute top-1.5 right-1.5 z-20"
-                    onToggleDetails={() => {}}
-                    showDetails={false}
-                  />
-                  
                   <ContentRenderer
                     transaction={transaction}
                     content={content}
@@ -223,6 +173,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                       className="absolute bottom-2 right-2 z-20 bg-background/80 backdrop-blur-sm hover:bg-background/90 text-xs h-7 px-2"
                       variant="secondary"
                       disabled={withdrawingStates[transaction.id]}
+                      aria-label="Withdraw funds"
                     >
                       {withdrawingStates[transaction.id] ? (
                         <>

@@ -20,6 +20,7 @@ import {
 } from "@/apps/app/Perpetua/state";
 import { createFindItemById } from "../../../utils";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
+import { AddItemResult } from "@/apps/app/Perpetua/state/thunks/itemThunks";
 
 // Custom hook for shelf operations
 export const useShelfOperations = () => {
@@ -74,10 +75,14 @@ export const useShelfOperations = () => {
     collectionType?: "NFT" | "SBT",
     referenceItemId?: number | null, 
     before?: boolean
-  ): Promise<void> => {
-    if (!identity) throw new Error("User identity not found");
+  ): Promise<AddItemResult> => {
+    if (!identity) {
+      return { status: 'error', message: "User identity not found" };
+    }
+    
     try {
-      await dispatch(addItemAction({ 
+      // Pass all parameters to the thunk and return the result directly
+      const result = await dispatch(addItemAction({ 
         shelf, 
         content, 
         type,
@@ -87,16 +92,28 @@ export const useShelfOperations = () => {
         before
       })).unwrap();
       
-      // Get the updated shelf
-      await getShelf(shelf.shelf_id);
+      // Get the updated shelf in the background (don't wait for it)
+      getShelf(shelf.shelf_id).catch(err => 
+        console.warn(`Background refresh of shelf ${shelf.shelf_id} failed:`, err)
+      );
+      
+      // Return the result exactly as received from the thunk
+      return result;
       
     } catch (error) {
       console.error("Failed to add item:", error);
       // If there's an authentication error, log it specifically
       if (error && typeof error === 'string' && error.includes('Invalid principal')) {
         console.error("Authentication error: Invalid principal. User may need to log out and log back in.");
+        return { status: 'error', message: "Authentication error. You may need to log out and log back in." };
       }
-      throw error;
+      
+      // Return a proper error result
+      const message = error instanceof Error ? error.message : 
+                      typeof error === 'string' ? error :
+                      "Failed to add item to shelf";
+                      
+      return { status: 'error', message };
     }
   }, [identity, dispatch, getShelf]);
 
