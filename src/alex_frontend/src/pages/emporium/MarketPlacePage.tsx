@@ -23,27 +23,10 @@ import ReactPaginate from 'react-paginate';
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { useParams } from "react-router";
 import Search from "@/features/imporium/listings/components/Search";
-
-const RemoveButton = () => {
-    return (
-        <Button className="flex-grow" variant="primary" scale="sm">Remove <Trash2 size={16} /></Button>
-    )
-}
-
-const EditButton = () => {
-    return (
-        <Button className="flex-grow" variant="primary" scale="sm">Edit <Pencil size={16} /></Button>
-    )
-}
-
-const ActionButtons = () => {
-	return (
-		<div className="flex gap-2 items-stretch justify-between">
-			<RemoveButton />
-			<EditButton />
-		</div>
-	)
-}
+import { EmporiumActor, IcpLedgerActor } from "@/actors";
+import PurchaseNft from "@/features/imporium/listings/components/PurchaseNft";
+import UnListNft from "@/features/imporium/listings/components/UnListNft";
+import EditListedNft from "@/features/imporium/listings/components/EditListedNft";
 
 const MarketPlacePage = () => {
     const {actor} = useEmporium();
@@ -78,7 +61,7 @@ const MarketPlacePage = () => {
     };
 
     return (
-        <div className="container px-2 flex flex-col gap-10">
+        <div className="container p-2 flex flex-col gap-10">
             <div className="flex flex-col items-center gap-3 md:gap-6 mx-auto p-5 sm:p-10 w-full max-w-md md:max-w-2xl xl:max-w-[800px]">
                 <h1 className="text-foreground text-center font-syne font-bold m-0 text-xl sm:text-2xl md:text-3xl lg:text-5xl">Emporium</h1>
                 <div className="flex flex-col items-center gap-1 text-foreground text-center font-syne">
@@ -106,7 +89,18 @@ const MarketPlacePage = () => {
             ) : Object.keys(found).length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {Object.keys(found).map((id) => (
-                        <Nft key={id} id={id} action={<ActionButtons />} price={found[id].price} owner={found[id].owner}/>
+                        <Nft key={id} id={id} action={
+                            <EmporiumActor>
+                                <IcpLedgerActor>
+                                    {found[id].owner !== user?.principal ? (
+                                        <PurchaseNft id={id} price={found[id].price} />
+                                    ): <div className="flex gap-2 items-stretch justify-between">
+                                        <UnListNft id={id} />
+                                        <EditListedNft id={id} originalPrice={found[id].price} />
+                                    </div>}
+                                </IcpLedgerActor>
+                            </EmporiumActor>
+                        } price={found[id].price} owner={found[id].owner}/>
                     ))}
                 </div>
             ) : Object.keys(nfts).length <= 0 ? (
@@ -117,7 +111,18 @@ const MarketPlacePage = () => {
                 <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {Object.keys(nfts).map((id) => (
-                            <Nft key={id} id={id} action={<ActionButtons />} price={nfts[id].price} owner={nfts[id].owner}/>
+                            <Nft key={id} id={id} action={
+                                <EmporiumActor>
+                                    <IcpLedgerActor>
+                                        {nfts[id].owner !== user?.principal ? (
+                                            <PurchaseNft id={id} price={nfts[id].price} />
+                                        ): <div className="flex gap-2 items-stretch justify-between">
+                                            <UnListNft id={id} />
+                                            <EditListedNft id={id} originalPrice={nfts[id].price} />
+                                        </div>}
+                                    </IcpLedgerActor>
+                                </EmporiumActor>
+                            } price={nfts[id].price} owner={nfts[id].owner}/>
                         ))}
                     </div>
                     {/* <ResponsiveMasonry

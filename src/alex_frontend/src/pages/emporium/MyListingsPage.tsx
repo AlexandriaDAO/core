@@ -97,7 +97,7 @@ const MyListingsPage = () => {
                                         </div>
                                 </Icrc7Actor>
                             </EmporiumActor>
-                        } price={found[id].price} owner={found[id].owner}/>
+                        } price={found[id].price}/>
                     ))}
                 </div>
             ) : Object.keys(nfts).length <= 0 ? (
@@ -117,7 +117,7 @@ const MyListingsPage = () => {
                                         </div>
                                     </Icrc7Actor>
                                 </EmporiumActor>
-                            } price={nfts[id].price} owner={nfts[id].owner}/>
+                            } price={nfts[id].price}/>
                         ))}
                     </div>
                     {/* <ResponsiveMasonry
