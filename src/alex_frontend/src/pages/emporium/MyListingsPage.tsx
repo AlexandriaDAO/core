@@ -1,20 +1,13 @@
 import React, { useEffect } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { getCallerAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
-import { useAssetManager } from "@/hooks/useAssetManager";
-import { useInternetIdentity } from "ic-use-internet-identity";
-import fetch from "@/features/icp-assets/thunks/fetch";
 import NftsSkeleton from "@/layouts/skeletons/emporium/components/NftsSkeleton";
 import { Alert } from "@/components/Alert";
-import { Button } from "@/lib/components/button";
 import Nft from "@/features/nft";
 import getListings from "@/features/imporium/listings/thunks/getListings";
 import useEmporium from "@/hooks/actors/useEmporium";
-import { Trash2, Pencil } from "lucide-react";
 
 import PageSize from "@/features/imporium/listings/components/PageSize";
-import Grid from "@/features/imporium/listings/components/Grid";
 import SearchId from "@/features/imporium/listings/components/SearchId";
 import PriceSort from "@/features/imporium/listings/components/PriceSort";
 import TimeSort from "@/features/imporium/listings/components/TimeSort";
@@ -31,24 +24,8 @@ const MyListingsPage = () => {
     const {actor} = useEmporium();
     const dispatch = useAppDispatch();
 
-    const { userAssetCanister } = useAppSelector((state) => state.assetManager);
     const { user } = useAppSelector((state) => state.auth);
     const { nfts, found, loading, error, page, size, pages, sortByPrice, sortByTime } = useAppSelector((state) => state.imporium.listings);
-    const { identity } = useInternetIdentity();
-
-    const assetManager = useAssetManager({
-		canisterId: userAssetCanister ?? undefined,
-		identity,
-	});
-
-	useEffect(() => {
-		dispatch(getCallerAssetCanister());
-	}, []);
-
-	useEffect(() => {
-		if (!assetManager) return;
-		dispatch(fetch({ assetManager }));
-	}, [assetManager]);
 
     useEffect(() => {
         if(!actor || !user) return;
