@@ -31,6 +31,9 @@ const Search: React.FC = () => {
     const handleClear = () => {
         setQuery('');
         dispatch(clearFound());
+
+        searchParams.delete('search');
+        setSearchParams(searchParams);
     };
 
     const handleSearch = async () => {

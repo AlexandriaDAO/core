@@ -52,7 +52,6 @@ const NftsPage = lazy(()=>import("@/pages/emporium/NftsPage"));
 const MyLogsPage = lazy(()=>import("@/pages/emporium/MyLogsPage"));
 const MarketLogsPage = lazy(()=>import("@/pages/emporium/MarketLogsPage"));
 const MyListingsPage = lazy(()=>import("@/pages/emporium/MyListingsPage"));
-const OwnerListingsPage = lazy(()=>import("@/pages/emporium/OwnerListingsPage"));
 const MarketPlacePage = lazy(()=>import("@/pages/emporium/MarketPlacePage"));
 
 const SwapPage = lazy(()=>import("@/pages/swap"));
@@ -146,7 +145,6 @@ const router = createBrowserRouter(
 					<Route path="app/imporium/nfts" element={<Suspense key="imporium-nfts" fallback={<MyNftsSkeleton />}><NftsPage /></Suspense>} />
 					<Route path="app/imporium/marketplace" element={<Suspense key="imporium-marketplace" fallback={<GeneralSkeleton />}><EmporiumActor><MarketPlacePage /></EmporiumActor></Suspense>} />
 					<Route path="app/imporium/listings" element={<Suspense key="imporium-listing" fallback={<GeneralSkeleton />}><EmporiumActor><MyListingsPage /></EmporiumActor></Suspense>} />
-					<Route path="app/imporium/listings/:owner" element={<Suspense key="imporium-listing-owner" fallback={<GeneralSkeleton />}><EmporiumActor><OwnerListingsPage /></EmporiumActor></Suspense>} />
 				</Route>
 				<Route element={<Protected route />}>
 					<Route path={ROUTES.DASHBOARD_ROUTES.BASE} element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
