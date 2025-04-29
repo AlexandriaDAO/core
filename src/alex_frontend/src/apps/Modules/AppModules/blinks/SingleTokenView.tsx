@@ -17,7 +17,7 @@ import { ContentService } from '../../LibModules/contentDisplay/services/content
 import { setContentData } from '../../shared/state/transactions/transactionSlice';
 import { Transaction } from '../../shared/types/queries';
 import { Badge } from "@/lib/components/badge";
-import { Copy, Check, Link, X } from "lucide-react";
+import { Copy, Check, Link, X, Calendar, Info } from "lucide-react";
 import { copyToClipboard } from '@/apps/Modules/AppModules/contentGrid/utils/clipboard';
 import { getNftOwnerInfo, UserInfo } from '../../shared/utils/nftOwner';
 import { Button } from "@/lib/components/button";
@@ -37,6 +37,8 @@ function SingleTokenView() {
   const [copiedPrincipal, setCopiedPrincipal] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [ownerInfo, setOwnerInfo] = useState<UserInfo | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [copiedId, setCopiedId] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   
   const contentData = useSelector((state: RootState) => state.transactions.contentData);
@@ -50,6 +52,22 @@ function SingleTokenView() {
   const nftCollection = nft?.collection;
   
   const { user } = useSelector((state: RootState) => state.auth);
+
+  const toggleDetails = () => {
+    setShowDetails(prev => !prev);
+  };
+
+  const handleCopyId = async () => {
+    if (!tokenId) return;
+    const copied = await copyToClipboard(tokenId);
+    if (copied) {
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+      toast.success('Copied ID to clipboard');
+    } else {
+      toast.error('Failed to copy ID');
+    }
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -217,7 +235,6 @@ function SingleTokenView() {
 
   const collectionType = nftCollection || 'NFT';
 
-  // Determine owner principal for actions
   let ownerPrincipalForActions: Principal | undefined;
   try {
     const ownerString = ownerInfo?.principal || nftPrincipal;
@@ -305,6 +322,12 @@ function SingleTokenView() {
     </div>
   );
 
+  const formatId = (id: string) => {
+    if (!id) return '';
+    if (id.length <= 8) return id;
+    return `${id.substring(0, 4)}...${id.substring(id.length - 4)}`;
+  };
+
   return (
     <div className="container mx-auto p-4">
       <ShelvesPreloader />
@@ -317,8 +340,8 @@ function SingleTokenView() {
             ownerPrincipal={ownerPrincipalForActions}
             isOwned={isOwned}
             className="absolute top-2 right-2 z-20"
-            onToggleDetails={() => {}}
-            showDetails={false}
+            onToggleDetails={toggleDetails}
+            showDetails={showDetails}
           />
         )}
 
@@ -344,6 +367,70 @@ function SingleTokenView() {
              </div>
           )}
         </ContentCard>
+
+        {showDetails && (
+          <div className="absolute bottom-0 left-0 right-0 w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg z-10 p-4 rounded-b-lg animate-in fade-in duration-200">
+            <div className="space-y-2 text-xs">
+              <div className="grid gap-2">
+                <div 
+                  className="flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-gray-50 dark:hover:bg-gray-900/60 cursor-pointer group/item transition-colors"
+                  onClick={handleCopyId}
+                  title={`NFT ID: ${tokenId}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Info className="h-3.5 w-3.5 text-gray-500" />
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">ID</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-gray-600 dark:text-gray-400">{formatId(tokenId || '')}</span>
+                    {copiedId ? (
+                      <Check className="h-3.5 w-3.5 text-green-500 opacity-100" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5 text-gray-400 opacity-70 group-hover/item:opacity-100" />
+                    )}
+                  </div>
+                </div>
+
+                {nft?.arweaveId && (
+                  <div className="flex items-center justify-between px-2 py-1.5 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-3.5 w-3.5 text-gray-500" />
+                      <span className="text-gray-700 dark:text-gray-300 font-medium">Arweave ID</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-600 dark:text-gray-400">{formatId(nft.arweaveId)}</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between px-2 py-1.5 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <Info className="h-3.5 w-3.5 text-gray-500" />
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Type</span>
+                  </div>
+                  <Badge variant={collectionType === 'NFT' ? 'warning' : 'info'} className="text-xs">
+                    {collectionType}
+                  </Badge>
+                </div>
+
+                <div className="flex items-center justify-between px-2 py-1.5 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <Info className="h-3.5 w-3.5 text-gray-500" />
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Balances</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs bg-white/50 dark:bg-gray-800/50">
+                      ALEX: {formatBalance(nftBalances?.alex?.toString())}
+                    </Badge>
+                    <Badge variant="outline" className="text-xs bg-white/50 dark:bg-gray-800/50">
+                      LBRY: {formatBalance(nftBalances?.lbry?.toString())}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <Dialog open={showModal} onOpenChange={(open) => !open && setShowModal(false)}>

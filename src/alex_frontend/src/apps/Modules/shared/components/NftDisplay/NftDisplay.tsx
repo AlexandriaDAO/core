@@ -8,7 +8,7 @@ import { ALEX } from '../../../../../../../declarations/ALEX';
 import { LBRY } from '../../../../../../../declarations/LBRY';
 import { nft_manager } from '../../../../../../../declarations/nft_manager';
 import { setContentData } from '@/apps/Modules/shared/state/transactions/transactionSlice';
-import { setNFTs, updateNftBalances } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
+import { setNFTs } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
 import ContentRenderer from '@/apps/Modules/AppModules/safeRender/ContentRenderer';
 import { createTokenAdapter, determineTokenType, TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
 import { convertE8sToToken } from '@/apps/Modules/shared/utils/tokenUtils';
@@ -16,7 +16,6 @@ import { getNftOwnerInfo } from '@/apps/Modules/shared/utils/nftOwner';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 import { fetchTransactionById } from '@/apps/Modules/LibModules/arweaveSearch/api/directArweaveClient';
 import { NftDisplayProps } from './types';
-import NftFooter from './NftFooter';
 
 // Constants
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
@@ -26,6 +25,7 @@ const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
  * 
  * A flexible component for displaying NFTs consistently across the application.
  * Supports different display densities, data loading strategies, and customizable features.
+ * Footer functionality has been removed and details are expected to be shown via hover effects.
  */
 const NftDisplay: React.FC<NftDisplayProps> = ({
   tokenId,
@@ -38,10 +38,6 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
   transaction: providedTransaction,
   onClick,
   onViewDetails,
-  showFooter = true,
-  showCopyControls = true,
-  showOwnerInfo = true,
-  showBalances = true
 }) => {
   // Component state
   const [isLoading, setIsLoading] = useState(true);
@@ -94,14 +90,6 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
           setTransaction(potentialTransaction);
           setContentUrls(potentialContent.urls);
           
-          // Fetch owner only if needed and not already present in component state
-          if (showOwnerInfo && !ownerInfo) { 
-             getNftOwnerInfo(tokenId).then(info => mounted && setOwnerInfo(info)).catch(err => console.error('Failed to load owner info:', err));
-          }
-          // Fetch balances only if needed and not present in Redux NFT data
-          if (showBalances && (!storedNft.balances || Object.keys(storedNft.balances).length === 0)) {
-             fetchNftBalances(tokenId, storedNft.collection, mounted, dispatch);
-          }
           setIsLoading(false);
           return; // Data is sufficient
         }
@@ -160,28 +148,6 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
         if (mounted) {
             setTransaction(finalTransaction);
             setContentUrls(finalContentUrls);
-
-            let fetchedOwnerPrincipal = ownerInfo?.principal || ''; // Get current owner principal if already fetched
-
-            // Fetch owner only if needed and not already present
-            if (showOwnerInfo && !ownerInfo) {
-                 try {
-                    const info = await getNftOwnerInfo(tokenId);
-                    if (mounted) {
-                       setOwnerInfo(info);
-                       fetchedOwnerPrincipal = info?.principal || ''; // Update principal for balance fetch
-                    }
-                 } catch(err) {
-                     console.error('Failed to load owner info:', err)
-                 }
-            }
-            
-            // Fetch balances if needed (Re-fetch here to ensure freshness after direct load)
-            if (showBalances) { 
-                console.log('[NftDisplay] Fetching balances for token:', tokenId);
-                // Pass currentArweaveId and potentially fetched owner principal to ensure Redux update has full info
-                fetchNftBalances(tokenId, tokenType, mounted, dispatch, currentArweaveId, fetchedOwnerPrincipal);
-            }
         }
 
       } catch (error) {
@@ -202,49 +168,7 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
       mounted = false;
     };
     // Dependency array: Use the normalized transactionDependency
-  }, [tokenId, arweaveId, transactionDependency, loadingStrategy, dispatch, showOwnerInfo, showBalances, nfts, transactions, contentData, arweaveToNftId, ownerInfo]);
-
-  // Helper function to fetch balances and update Redux
-  async function fetchNftBalances(nftTokenId: string, tokenType: TokenType, mounted: boolean, dispatch: AppDispatch, fetchedArweaveId?: string, fetchedOwnerPrincipal?: string) {
-      try {
-          const nftIdBigInt = BigInt(nftTokenId);
-          const subaccount = await nft_manager.to_nft_subaccount(nftIdBigInt);
-          const balanceParams = {
-              owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-              subaccount: [Array.from(subaccount)] as [number[]]
-          };
-
-          const [alexBalance, lbryBalance] = await Promise.all([
-              ALEX.icrc1_balance_of(balanceParams),
-              LBRY.icrc1_balance_of(balanceParams)
-          ]);
-
-          if (mounted) {
-              const alexTokens = convertE8sToToken(alexBalance);
-              const lbryTokens = convertE8sToToken(lbryBalance);
-              
-              // Update Redux state, preserving existing data and adding balances
-              const currentNftData = nfts[nftTokenId] || {}; // Get existing data or empty object
-              dispatch(setNFTs({
-                  [nftTokenId]: {
-                      ...currentNftData, // Preserve existing fields
-                      collection: currentNftData.collection || tokenType, // Use existing or fetched type
-                      principal: fetchedOwnerPrincipal || currentNftData.principal || '', // Update principal if fetched
-                      arweaveId: fetchedArweaveId || currentNftData.arweaveId || '', // Update Arweave ID if fetched
-                      balances: { alex: alexTokens, lbry: lbryTokens } // Add/overwrite balances
-                  }
-              }));
-
-              // Dispatch updateNftBalances as well if still needed elsewhere? 
-              // setNFTs above should be sufficient for NftDisplay itself.
-              // dispatch(updateNftBalances({...
-          }
-      } catch (error) {
-          console.error('Failed to load NFT balances for token:', nftTokenId, error);
-          // Optionally update state to show balance loading error
-          // if (mounted) setError("Failed to load balances");
-      }
-  }
+  }, [tokenId, arweaveId, transactionDependency, loadingStrategy, dispatch, nfts, transactions, contentData, arweaveToNftId]);
 
   // Error handler for ContentRenderer
   const handleRenderError = () => {
@@ -265,9 +189,7 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
   // Loading state
   if (isLoading) {
     return (
-      <div className={`flex flex-col items-center justify-center ${
-        variant === 'full' ? 'h-96' : 'h-full'
-      } text-muted-foreground p-4`}>
+      <div className={`flex flex-col items-center justify-center ${variant === 'full' ? 'h-96' : 'h-full'} text-muted-foreground p-4`}>
         <svg className="animate-spin h-8 w-8 mb-2 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -349,26 +271,11 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
     >
       {/* NFT Content Display */}
       <div 
-        className={`relative overflow-hidden rounded-md border border-border ${
-          variant === 'full' ? 'w-full max-w-3xl mx-auto' : ''
-        }`}
+        className={`relative overflow-hidden rounded-md border border-border ${variant === 'full' ? 'w-full max-w-3xl mx-auto' : ''}`}
         style={{ aspectRatio: aspectRatio.toString() }}
       >
         {renderContent()}
       </div>
-      
-      {/* NFT Footer */}
-      {showFooter && (
-        <NftFooter
-          tokenId={tokenId}
-          nftData={nftData}
-          ownerInfo={ownerInfo}
-          transaction={transaction}
-          showCopyControls={showCopyControls}
-          showBalances={showBalances}
-          compact={variant === 'grid'}
-        />
-      )}
     </div>
   );
 };

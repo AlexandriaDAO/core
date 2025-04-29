@@ -23,9 +23,9 @@ module {
 
     // Define the variable data for each NFT
     let nft_data : [NFTData] = [
-      { token_id = 1_986_593_300_987_535_914_180_049_530_962_874_657_164_380_109_956_141_747_037_709_565_802_331_738_699_840_388_666_345_080_709_091; owner = Principal.fromText("2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe"); description = ""; },
-      { token_id = 1_986_593_300_987_535_914_219_784_576_269_852_932_078_473_115_824_316_056_973_383_662_846_012_025_301_278_355_013_091_370_745_492; owner = Principal.fromText("2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe"); description = ""; },
-      { token_id = 1_187_062_600_132_777_102_541_745_778_453_199_791_590_110_030_967_350_889_409_556_289_930_086_013_813_646_597_574_980_649_624_678; owner = Principal.fromText("2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe"); description = ""; },
+      // { token_id = 1_986_593_300_987_535_914_180_049_530_962_874_657_164_380_109_956_141_747_037_709_565_802_331_738_699_840_388_666_345_080_709_091; owner = Principal.fromText("2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe"); description = ""; },
+      // { token_id = 1_986_593_300_987_535_914_219_784_576_269_852_932_078_473_115_824_316_056_973_383_662_846_012_025_301_278_355_013_091_370_745_492; owner = Principal.fromText("2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe"); description = ""; },
+      // { token_id = 1_187_062_600_132_777_102_541_745_778_453_199_791_590_110_030_967_350_889_409_556_289_930_086_013_813_646_597_574_980_649_624_678; owner = Principal.fromText("2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe"); description = ""; },
     ];
 
     let initial_nfts = Array.map<NFTData, ICRC7.SetNFTItemRequest>(

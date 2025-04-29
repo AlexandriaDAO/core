@@ -130,6 +130,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
             );
 
             const detectedContentType = nftData ? 'Nft' : 'Arweave';
+            const currentPredictions = predictions[transaction.id];
 
             return (
               <ContentGrid.Item
@@ -141,7 +142,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                  })}
                 id={transaction.id}
                 owner={transaction.owner}
-                predictions={predictions[transaction.id]}
+                predictions={currentPredictions}
                 isFromAssetCanister={(transaction.assetUrl && transaction?.assetUrl !== "") ? true : false}
                 initialContentType={detectedContentType}
               >
@@ -163,7 +164,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                       </div>
                     </div>
                   )}
-                  <TransactionDetails transaction={transaction} />
+                  <TransactionDetails transaction={transaction} predictions={currentPredictions} />
                   {isOwned && canWithdraw && (
                     <Button
                       onClick={(e) => {

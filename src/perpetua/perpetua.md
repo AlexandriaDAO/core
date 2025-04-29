@@ -131,7 +131,7 @@ Perpetua/
 
 - Really, next thing is to just play around a LOT with the new system and get out the kinks.
 - Reduce buttons even further (clicking on the NFT brings up the info, and the button is just a bookmark (no follow owner or anything else, just bookmarking!!!))
-
+- Making a placeholder shelf does not work. 
 
 - The add to shelves option doesn't open if it's already owned by a user, which is foolish, because an owner should be able to add it to any shelf. (it gives you a toast of "You already liked this item" or "You already own this NFT", and so it's a hiccup in the user flow). It should be if you own an NFT or an SBT, you should be able to add it to as many shelves as you like.
 
@@ -310,7 +310,7 @@ Backend Stuff:
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 2p7fi-l3ykz-vhg7k-inwpw-kuia3-2iiv2-dm6qm-rcnp3-jdfnm-od6uw-rae)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal il4xe-eoz52-6cji5-ekcaj-yra6f-7qxuy-pqwks-jwy3n-ot2jv-j4nzf-gqe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

@@ -1,5 +1,5 @@
 import React from "react";
-import { MoreHorizontal, Plus, Trash2, UserPlus, UserMinus, Loader2, Heart, Bookmark, Info, ChevronUp } from "lucide-react";
+import { MoreHorizontal, Plus, Trash2, UserPlus, UserMinus, Loader2, Heart, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -102,8 +102,8 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
     : false;
 
   // --- Determine Overall Menu Visibility ---
-  const showAnyAction = canAddToShelf || canRemoveItem || canInteractWithFollow || true; // Keep menu if toggle details is always an option
-  const showSeparator1 = (canAddToShelf || canRemoveItem) && canInteractWithFollow; // Separator needed if primary actions and follow action exist
+  const showAnyAction = canAddToShelf || canRemoveItem || canInteractWithFollow;
+  const showSeparator1 = (canAddToShelf || canRemoveItem) && canInteractWithFollow;
 
   // If no actions are available, don't render anything
   if (!showAnyAction) {
@@ -275,12 +275,6 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
     }
   };
 
-  const handleDetailsClick = (e: React.MouseEvent) => {
-    stopPropagation(e);
-    onToggleDetails();
-    setMenuOpen(false);
-  };
-
   return (
     <>
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
@@ -342,15 +336,6 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
               {followLoading ? 'Processing...' : currentlyFollowingOwner ? 'Unfollow Owner' : 'Follow Owner'}
             </DropdownMenuItem>
           )}
-
-          {/* Show/Hide Details */}
-          <DropdownMenuItem
-            onClick={handleDetailsClick}
-            className="cursor-pointer"
-          >
-            {showDetails ? <ChevronUp className="h-4 w-4 mr-2" /> : <Info className="h-4 w-4 mr-2" />}
-            {showDetails ? 'Hide Details' : 'Show Details'}
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
