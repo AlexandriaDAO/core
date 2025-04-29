@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/lib/components/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/lib/components/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/lib/components/dialog";
 import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
@@ -69,16 +69,22 @@ const NewShelfDialog: React.FC<NewShelfDialogProps> = ({ isOpen, onClose, onSubm
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleDialogClose = () => {
+    if (!isLoading) {
+      onClose();
+    }
+  };
+
   const handleSubmit = async () => {
     if (!title.trim() || isLoading) return;
 
     setIsLoading(true);
-    onClose();
 
     try {
       await onSubmit(title, description);
       setTitle("");
       setDescription("");
+      onClose();
     } catch (error) {
       console.error("Failed to create shelf:", error);
     } finally {
@@ -86,11 +92,20 @@ const NewShelfDialog: React.FC<NewShelfDialogProps> = ({ isOpen, onClose, onSubm
     }
   };
 
+  React.useEffect(() => {
+    if (isOpen) {
+    } else {
+    }
+  }, [isOpen]);
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !isLoading && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleDialogClose(); }}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Shelf</DialogTitle>
+          <DialogDescription>
+            Just enter something. You could change it later.
+          </DialogDescription>
         </DialogHeader>
         
         <ShelfForm

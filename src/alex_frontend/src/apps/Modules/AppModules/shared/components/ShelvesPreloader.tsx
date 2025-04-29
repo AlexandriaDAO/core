@@ -33,7 +33,6 @@ export const ShelvesPreloader: React.FC = () => {
     // 3. Shelves haven't been successfully loaded yet
     // 4. Haven't already attempted to load for this identity session
     if (identity && !shelvesLoading && !hasLoadedShelves && !hasAttemptedLoad) {
-      console.log('[ShelvesPreloader] Triggering initial shelf load...');
       setHasAttemptedLoad(true); // Mark that we've started the attempt
       dispatch(loadShelves({
         principal: identity.getPrincipal(),

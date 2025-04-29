@@ -48,37 +48,47 @@ export function ContentCard({
     <>
       <Card
         className={`group flex flex-col relative bg-white dark:bg-gray-900 h-full ${component === "Emporium" ? "mb-20 rounded-2xl" : "overflow-hidden"}`}
-        // Entire card is clickable
-        onClick={onClick}
+        // onClick is now applied to the content area if needed, or removed if whole card isn't clickable anymore
+        // Note: If the entire card should still be clickable *except* the action button,
+        // you might need to move onClick to the CardContent/AspectRatio and ensure stopPropagation in UnifiedCardActions works.
       >
-        {/* Main content area */}
-        <CardContent className="flex flex-col items-start p-0 flex-grow">
+        {/* Action Button - Increased z-index */}
+        {finalContentId && (
+          <UnifiedCardActions
+            contentId={finalContentId}
+            contentType={finalContentType}
+            ownerPrincipal={ownerPrincipal}
+            isOwned={isOwnedByUser}
+            isSafeForMinting={isSafeForMinting}
+            parentShelfId={parentShelfId}
+            itemId={itemId}
+            currentShelfId={currentShelfId}
+            // Removed props related to details toggle as this button is now independent
+            // onToggleDetails={() => {}}
+            // showDetails={false}
+            // Removed group-hover opacity classes, kept positioning
+            className="absolute top-1.5 right-1.5 z-40" // Increased z-index from 20 to 40
+            // The UnifiedCardActions component itself now has the styling for the bookmark icon look
+          />
+        )}
+
+        {/* Main content area - Apply onClick here if needed */}
+        <CardContent
+            className="flex flex-col items-start p-0 flex-grow"
+            onClick={onClick} // Apply onClick here if the main area should be clickable
+        >
           <AspectRatio ratio={1} className="w-full relative">
             <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800 ${component === "Emporium" ? " border-gray-900 dark:border-gray-900 rounded-[30px]" : "overflow-hidden h-full "}`} >
+              {/* Children now include the hover overlay (TransactionDetails) internally */}
               {children}
             </div>
-            {finalContentId && (
-              <UnifiedCardActions
-                contentId={finalContentId}
-                contentType={finalContentType}
-                ownerPrincipal={ownerPrincipal}
-                isOwned={isOwnedByUser}
-                isSafeForMinting={isSafeForMinting}
-                parentShelfId={parentShelfId}
-                itemId={itemId}
-                currentShelfId={currentShelfId}
-                onToggleDetails={() => {}}
-                showDetails={false}
-                className="absolute top-1.5 right-1.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-              />
-            )}
+            {/* UnifiedCardActions moved outside */}
           </AspectRatio>
         </CardContent>
 
-        {/* Footer area removed unless custom footer is provided */}
+        {/* Footer area (unchanged) */}
         {footer && (
            <div className="p-1.5 pt-1 w-full">
-             {/* Render only custom footer content if provided */} 
              {footer}
            </div>
         )}

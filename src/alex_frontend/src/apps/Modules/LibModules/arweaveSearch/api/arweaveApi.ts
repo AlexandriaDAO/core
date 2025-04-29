@@ -14,12 +14,6 @@ export const fetchTransactionsApi = async (params: {
   try {
     const { nftIds, contentTypes, amount, ownerFilter, after, timestamp } = params;
 
-    console.log('ArweaveAPI - Processing request:', {
-      params,
-      timestamp: timestamp ? new Date(timestamp).toISOString() : undefined,
-      after
-    });
-
     let minBlock: number | undefined;
     let maxBlock: number | undefined;
 
@@ -30,13 +24,7 @@ export const fetchTransactionsApi = async (params: {
         maxBlock = await getBlockHeightForTimestamp(maxTimestamp);
         // Adjust the block range to be more reasonable
         minBlock = Math.max(0, maxBlock - 50000); // Reduced from 500000 to 50000
-        
-        console.log('ArweaveAPI - Block range:', {
-          maxBlock,
-          minBlock,
-          maxTimestamp,
-          date: new Date(maxTimestamp * 1000).toISOString()
-        });
+
       } catch (error) {
         console.error("Error getting block height for timestamp:", error);
         throw error;

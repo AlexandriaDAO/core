@@ -25,30 +25,23 @@ async function importTensorFlowWebGLDirectly(): Promise<any> {
  */
 export async function loadTensorFlow(): Promise<TensorFlow> {
   try {
-    console.log('Starting TensorFlow load');
-    
     // First, load the core TensorFlow library
     const tf = await importTensorFlowDirectly();
-    console.log('TensorFlow core loaded');
     
     // Then load the WebGL backend
     await importTensorFlowWebGLDirectly();
-    console.log('TensorFlow WebGL backend loaded');
     
     // Try to initialize the WebGL backend
     try {
       await tf.setBackend('webgl');
-      console.log('WebGL backend initialized');
     } catch (backendError) {
       console.warn('WebGL backend failed, trying CPU backend:', backendError);
       // Fall back to CPU backend
       await tf.setBackend('cpu');
-      console.log('CPU backend initialized');
     }
     
     // Wait for TensorFlow to be ready
     await tf.ready();
-    console.log('TensorFlow ready');
     
     return tf as unknown as TensorFlow;
   } catch (error) {

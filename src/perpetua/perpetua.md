@@ -129,12 +129,20 @@ Perpetua/
 
 
 
-- Really, next thing is to just play around a LOT with the new system and get out the kinks.
-- Reduce buttons even further (clicking on the NFT brings up the info, and the button is just a bookmark (no follow owner or anything else, just bookmarking!!!))
+- Prettier hover background (transactionDetails). Also the owner feild isn't there on permasearch.
+- Experiment.
 - Making a placeholder shelf does not work. 
 
-- The add to shelves option doesn't open if it's already owned by a user, which is foolish, because an owner should be able to add it to any shelf. (it gives you a toast of "You already liked this item" or "You already own this NFT", and so it's a hiccup in the user flow). It should be if you own an NFT or an SBT, you should be able to add it to as many shelves as you like.
 
+
+
+This when opening the dialog to add to shelf: 
+<anonymous code>:1:145535
+`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
 
 
 
@@ -310,7 +318,7 @@ Backend Stuff:
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal il4xe-eoz52-6cji5-ekcaj-yra6f-7qxuy-pqwks-jwy3n-ot2jv-j4nzf-gqe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal wfk4b-5av7y-vh6uq-umpc7-tj2zz-nj2fb-lo6zb-uxbqt-p55ex-tqhyp-6qe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

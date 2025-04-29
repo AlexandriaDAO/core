@@ -110,7 +110,6 @@ export class TransactionService {
           console.warn("No data found in ContentData.");
         }
       } 
-      console.log("transactions", transactions);
 
         // Store the transactions
         this.dispatch(setTransactions(transactions));

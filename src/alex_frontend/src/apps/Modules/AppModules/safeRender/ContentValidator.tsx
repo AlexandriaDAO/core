@@ -42,11 +42,9 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   const runValidation = useCallback(
     debounce(async (element: HTMLImageElement | HTMLVideoElement, currentContentType: string) => {
       if (!isModelReady || nftData?.principal) {
-        console.log('Skipping validation:', { isModelReady, isNft: !!nftData?.principal });
         return;
       }
 
-      console.log(`Running validation for ${transactionId}`);
       try {
         const predictionResults = await validateContent(element, currentContentType);
         if (predictionResults) {

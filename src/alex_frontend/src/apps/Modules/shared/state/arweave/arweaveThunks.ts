@@ -24,11 +24,6 @@ export const performSearch = createAsyncThunk(
   'arweave/performSearch',
   async ({ searchState, isContinuation = false, after }: SearchParams, { dispatch, getState }) => {
     dispatch(setIsLoading(true));
-    console.log('Perform Search - Starting with params:', {
-      searchState,
-      isContinuation,
-      after,
-    });
     
     try {
       // Clear cache and transactions if this is a new search
@@ -71,8 +66,6 @@ export const performSearch = createAsyncThunk(
       const uniqueNewTransactions = fetchedTransactions.filter(
         transaction => !existingIds.has(transaction.id)
       );
-
-      console.log(`Found ${uniqueNewTransactions.length} new unique transactions`);
 
       // Combine existing transactions with new ones
       const allTransactions = [...existingTransactions, ...uniqueNewTransactions];

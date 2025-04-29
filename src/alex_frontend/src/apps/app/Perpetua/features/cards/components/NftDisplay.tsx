@@ -68,16 +68,12 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
 
   // Handler for card click
   const handleCardClick = () => {
-    console.log('handleCardClick');
     setShowModal(true);
     
     if (onViewDetails) {
       onViewDetails(tokenId);
     }
   };
-
-  // Add logging right before rendering ContentCard
-  console.log(`NftDisplay [${tokenId}]: Rendering ContentCard with initialContentType="Nft"`);
 
   return (
     <>

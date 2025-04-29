@@ -25,29 +25,24 @@ export const TensorFlowPreloader: React.FC<TensorFlowPreloaderProps> = ({
   const preloadTensorFlow = useCallback(async () => {
     // If TensorFlow is already loaded, just call onLoaded
     if (isTensorFlowLoaded()) {
-      console.log('TensorFlow already loaded, calling onLoaded');
       if (onLoaded) onLoaded();
       return;
     }
     
     // If we've already tried and failed, and exceeded retries, don't try again
     if (hasError && retryCount >= maxRetries) {
-      console.log('Max retries exceeded, not trying again');
       return;
     }
     
     // If we're already loading, don't start another load
     if (isLoading) {
-      console.log('Already loading TensorFlow, not starting another load');
       return;
     }
     
-    console.log(`Attempting to load TensorFlow (attempt ${retryCount + 1}/${maxRetries + 1})`);
     setIsLoading(true);
     
     try {
       await getTensorFlow();
-      console.log('TensorFlow loaded successfully');
       setIsLoading(false);
       setHasError(false);
       if (onLoaded) onLoaded();

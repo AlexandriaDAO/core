@@ -30,9 +30,6 @@ interface BatchFetchParams {
   orderIndex?: number; // Add optional order index
 }
 
-// Define AppDispatch type
-type AppDispatch = any; // Replace with your actual AppDispatch type if available
-
 // Helper function for batch fetching NFTs
 const fetchNFTBatchHelper = async (params: BatchFetchParams[]) => {
   const batchSize = 10;
@@ -244,38 +241,6 @@ export const fetchTokensForPrincipal = createAsyncThunk<
           undefined,
           totalCount
         );
-        // console.log("Time Before ", Date.now());
-        // nftWithBalances = await Promise.all(
-        //   allTokens.map(async (tokenId) => {
-        //     let alexBalance: [bigint] = [BigInt(0)];
-        //     let lbryBalance: [bigint] = [BigInt(0)];
-        //     const subaccount = await nft_manager.to_nft_subaccount(
-        //       BigInt(tokenId)
-        //     );
-        //     const balanceParams = {
-        //       owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
-        //       subaccount: [Array.from(subaccount)] as [number[]],
-        //     };
-        //     if (sortKey === "ALEX") {
-        //       alexBalance = await Promise.all([
-        //         ALEX.icrc1_balance_of(balanceParams),
-        //       ]);
-        //     } else {
-        //       lbryBalance = await Promise.all([
-        //         LBRY.icrc1_balance_of(balanceParams),
-        //       ]);
-        //     }
-
-        //     return {
-        //       tokenId,
-        //       alex: BigInt(alexBalance[0]),
-        //       lbry: BigInt(lbryBalance[0]),
-        //     };
-        //   })
-        // );
-        // console.log("Time After ", Date.now());
-
-        console.log("Time Before ", Date.now());
 
         const subaccountPromises = allTokens.map((tokenId) =>
           nft_manager.to_nft_subaccount(BigInt(tokenId)).then((subaccount) => ({
@@ -492,7 +457,6 @@ export const fetchTokensForPrincipal = createAsyncThunk<
 
       // Use batched fetching
       const nftEntries = await fetchNFTBatchHelper(batchParams);
-      console.log("nftEntries", nftEntries);
       const nftRecord = Object.fromEntries(nftEntries);
 
       dispatch(setNfts(nftRecord));
@@ -515,7 +479,6 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       const arweaveIds = arweaveIdsWithOrder.map((item) => item.arweaveId);
       // fetchNftTransactions call here 1
       // load loadContentForTransactions in child
-      console.log("arweaveIds", arweaveIds);
 
       await dispatch(
         fetchNftTransactions(arweaveIds) as unknown as AnyAction

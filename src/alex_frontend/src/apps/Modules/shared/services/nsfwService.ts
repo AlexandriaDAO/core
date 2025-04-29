@@ -41,9 +41,7 @@ class NSFWService {
    */
   private async importNSFWJS() {
     try {
-      console.log('Loading NSFWJS module');
       const nsfwjs = await import('nsfwjs');
-      console.log('NSFWJS module loaded');
       return nsfwjs.default || nsfwjs;
     } catch (error) {
       console.error('Failed to load NSFWJS module:', error);
@@ -57,40 +55,31 @@ class NSFWService {
   async loadModel(): Promise<boolean> {
     // If model is already loaded, return success
     if (this.state.model) {
-      console.log('NSFW model already loaded');
       return true;
     }
     
     // If we're already loading, return the existing promise
     if (this.loadPromise) {
-      console.log('NSFW model already loading, returning existing promise');
       return this.loadPromise;
     }
     
-    console.log('Starting NSFW model load');
     this.isLoading = true;
     
     // Create a new promise for loading
     this.loadPromise = (async () => {
       try {
         // First, get TensorFlow
-        console.log('Getting TensorFlow for NSFW model');
         const tf = await getTensorFlow();
-        console.log('TensorFlow obtained for NSFW model');
-        
+
         // Then, load NSFWJS
-        console.log('Loading NSFWJS');
         const nsfwjs = await this.importNSFWJS();
-        console.log('NSFWJS loaded');
         
         // Store the modules
         this.state.tf = tf;
         this.state.nsfwjs = nsfwjs;
         
         // Load the model
-        console.log('Loading NSFW model from file');
         this.state.model = await nsfwjs.load('/models/mobilenet_v2_mid/model.json', { type: 'graph' });
-        console.log('NSFW model loaded successfully');
         
         this.isLoading = false;
         return true;
@@ -110,7 +99,6 @@ class NSFWService {
    * Unload the NSFW model and clear resources
    */
   unloadModel(): void {
-    console.log('Unloading NSFW model');
     
     if (this.state.model) {
       try {

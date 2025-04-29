@@ -1,9 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+// Restore original dialog imports
 import { 
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle 
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
 } from "@/lib/components/dialog";
 import { Loader2 } from "lucide-react";
 import { ShelfContent, UpdatedShelfContentProps } from "./ShelfContent";
@@ -11,6 +14,9 @@ import { useAddToShelf } from "../hooks/useAddToShelf";
 import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { Principal } from "@dfinity/principal";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
+import { toast } from 'sonner';
+import { Button } from "@/lib/components/button";
+import { Input } from "@/lib/components/input";
 
 /**
  * Convert a NormalizedShelf back to a Shelf for API calls and components
@@ -29,118 +35,104 @@ const denormalizeShelves = (normalizedShelves: NormalizedShelf[]): ShelfPublic[]
   normalizedShelves.map(denormalizeShelf);
 
 interface ShelfSelectionDialogProps {
-  // Context from the triggering component
-  originalContentId: string;
-  originalContentType: "Nft" | "Shelf" | "Markdown" | "Arweave";
-  initialIsOwned: boolean;
-
-  // UI and functionality props
-  currentShelfId?: string; // ID of the shelf the item might currently be in (for exclusion)
+  currentShelfId?: string; 
   open: boolean;
   onClose: () => void;
-  // Callback to trigger background processing after selection
   onConfirmSelection: (selectedShelfId: string) => void;
+  onCreateShelf: (title: string, description: string) => Promise<string | null | undefined>;
 }
 
-/**
- * Dialog component for selecting a shelf to add content to
- * 
- * This component provides a standardized interface for adding any content
- * type to shelves that the user has permission to edit.
- */
 export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
-  // originalContentId, // Not directly used in dialog logic, but kept for potential future use?
-  // originalContentType, // Not directly used in dialog logic
-  // initialIsOwned, // Not directly used in dialog logic
   currentShelfId,
   open,
-  // onClose
   onClose,
-  onConfirmSelection
+  onConfirmSelection,
+  onCreateShelf
 }) => {
   const [selectedShelfId, setSelectedShelfId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isCreatingShelf, setIsCreatingShelf] = useState(false);
   
   const {
     getEditableShelves,
-    // addContentToShelf, // Removed, handled by caller now
-    // hasEditableShelvesExcluding, // Filtering happens in getEditableShelves
     isLoggedIn,
     shelvesLoading
   } = useAddToShelf();
-  
-  // TODO: Get the function to trigger shelf creation
-  // const { openCreateShelfModal } = useShelfCreation(); 
 
-  // This effect runs when the dialog is opened
   useEffect(() => {
     if (open) {
-      // Set loading state based on whether shelves are still loading from the backend
       setIsLoading(shelvesLoading);
     }
   }, [open, shelvesLoading]);
   
-  // Reset state when dialog closes
   const handleDialogClose = useCallback(() => {
+    if (isCreatingShelf) return;
     setSelectedShelfId(null);
     setSearchTerm("");
     onClose();
-  }, [onClose]);
+  }, [onClose, isCreatingShelf]);
   
-  // Handle selection of a shelf
   const handleShelfSelection = (shelfId: string) => {
     setSelectedShelfId(shelfId === selectedShelfId ? null : shelfId);
   };
   
-  // Handle confirming the shelf selection
-  const handleAddToShelf = async () => {
+  const handleConfirmExistingShelf = async () => {
     if (!selectedShelfId) return;
-    
-    console.log(`[ShelfSelectionDialog] Shelf selected: ${selectedShelfId}. Triggering background process.`);
-    
-    // Call the callback provided by the parent to handle the background logic
     onConfirmSelection(selectedShelfId);
-    
-    // Close the dialog immediately (Optimistic UI)
-    handleDialogClose();
   };
-  
-  // New handler for the create shelf request
-  const handleCreateNewShelfRequest = useCallback(() => {
-    console.log("[ShelfSelectionDialog] Create New Shelf requested");
-    handleDialogClose();
-    // TODO: Trigger the actual shelf creation flow
-    // if (openCreateShelfModal) { 
-    //   openCreateShelfModal(); 
-    // } else { 
-    //   console.error("Shelf creation function not available!");
-    // }
-    alert("Trigger Create Shelf Flow! (Placeholder)");
-  }, [handleDialogClose /*, openCreateShelfModal */]);
-  
-  // Check conditions for rendering content
+
+  const handleCreateNewShelfRequest = useCallback(async () => {
+    if (!onCreateShelf || isCreatingShelf || isLoading) return;
+
+    setIsCreatingShelf(true);
+    try {
+      const newShelfId = await onCreateShelf("un-named shelf", ""); 
+
+      if (newShelfId) {
+          setSelectedShelfId(newShelfId); 
+          toast.success("'un-named shelf' created. Click 'Add to Selected Shelf' to continue.");
+          setIsCreatingShelf(false); 
+      } else {
+          toast.error("Failed to create shelf. Please try again.");
+          setIsCreatingShelf(false); 
+      }
+    } catch (error) {
+      toast.error(`Shelf creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setIsCreatingShelf(false); 
+    }
+  }, [onCreateShelf, isLoading, isCreatingShelf]);
+
   const canShowContent = isLoggedIn;
-  
-  // Get shelves data if we can show content
   const editableShelves = canShowContent ? getEditableShelves(currentShelfId) : [];
-  
-  // Filter shelves based on search term
   const filteredShelves = denormalizeShelves(
     editableShelves.filter((shelf: NormalizedShelf) => {
       if (!searchTerm) return true;
-      
       const title = typeof shelf.title === 'string' ? shelf.title.toLowerCase() : '';
       const description = typeof shelf.description?.[0] === 'string' ? shelf.description[0].toLowerCase() : '';
       const search = searchTerm.toLowerCase();
-      
       return title.includes(search) || description.includes(search);
     })
   );
-  
+  const availableShelves = useMemo(() => {
+    return filteredShelves;
+  }, [filteredShelves]);
+
+  useEffect(() => {
+    if (!open) {
+      setIsCreatingShelf(false);
+    }
+  }, [open]);
+
+  const descriptionId = "shelf-selection-dialog-description";
+
   return (
-    <Dialog open={open} onOpenChange={handleDialogClose}>
-      <DialogContent className="sm:max-w-md font-serif" onClick={(e) => e.stopPropagation()}>
+    <Dialog open={open} onOpenChange={(isOpen) => { if(!isOpen) handleDialogClose(); }}>
+      <DialogContent 
+        className="sm:max-w-md font-serif" 
+        onClick={(e) => e.stopPropagation()}
+        aria-describedby={descriptionId}
+      >
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-8 font-serif">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -148,7 +140,9 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
           </div>
         ) : !isLoggedIn ? (
           <div className="flex flex-col items-center justify-center py-8 text-center font-serif">
-            <h3 className="text-lg font-semibold">Login Required</h3>
+            <DialogHeader>
+              <DialogTitle>Login Required</DialogTitle>
+            </DialogHeader>
             <p className="mt-2 text-sm text-muted-foreground">
               You need to be logged in to add content to shelves
             </p>
@@ -157,19 +151,64 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
           <>
             <DialogHeader>
               <DialogTitle className="font-serif">Add to Shelf</DialogTitle>
+              <DialogDescription id={descriptionId}> 
+                 Select an existing shelf or create a new one to add this item.
+              </DialogDescription>
             </DialogHeader>
-            
-            <ShelfContent
-              shelves={filteredShelves}
-              selectedShelfId={selectedShelfId}
-              onSelectShelf={handleShelfSelection}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              isAddingContent={false} // Dialog no longer handles adding state
-              onAddToShelf={handleAddToShelf}
-              onClose={handleDialogClose}
-              onCreateNewShelfRequest={handleCreateNewShelfRequest}
+
+            <Input
+              type="text"
+              placeholder="Search shelves..."
+              value={searchTerm}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              className="mb-4 font-sans"
+              disabled={isCreatingShelf}
             />
+
+            {availableShelves.length > 0 ? (
+              <div className="max-h-[250px] overflow-y-auto space-y-2 pr-2 mb-4 custom-scrollbar">
+                {availableShelves.map((shelf) => (
+                  <Button
+                    key={shelf.shelf_id}
+                    variant={selectedShelfId === shelf.shelf_id ? "primary" : "outline"}
+                    className="w-full justify-start font-serif"
+                    onClick={() => handleShelfSelection(shelf.shelf_id)}
+                    disabled={isCreatingShelf}
+                  >
+                    {shelf.title || (shelf.shelf_id === selectedShelfId ? "un-named shelf" : "Loading...")}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-4 text-muted-foreground font-serif">
+                {searchTerm ? "No shelves match your search." : "You have no editable shelves yet."}
+              </div>
+            )}
+
+            <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">
+              <Button
+                  variant="secondary"
+                  onClick={handleCreateNewShelfRequest}
+                  disabled={isLoading || isCreatingShelf || !onCreateShelf}
+                  className="w-full sm:w-auto"
+              >
+                  {isCreatingShelf ? (
+                      <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Creating...
+                      </>
+                  ) : (
+                      "Create New Shelf"
+                  )}
+              </Button>
+               <Button
+                 onClick={handleConfirmExistingShelf}
+                 disabled={!selectedShelfId || isCreatingShelf}
+                 className="w-full sm:w-auto"
+               >
+                 Add to Selected Shelf
+               </Button>
+            </DialogFooter>
           </>
         )}
       </DialogContent>

@@ -25,19 +25,16 @@ function Permasearch() {
 
 	// Clear transactions when component mounts
 	useEffect(() => {
-		console.log('Permasearch component mounted, clearing transactions');
 		dispatch(setTransactions([])); //clear data from emporium 
 		
 		// Cleanup when component unmounts
 		return () => {
-			console.log('Permasearch component unmounting, unloading model');
 			nsfwService.unloadModel();
 		};
 	}, [dispatch]);
 
 	// Handle TensorFlow loaded event
 	const handleTensorFlowLoaded = useCallback(async () => {
-		console.log('TensorFlow loaded, loading NSFW model');
 		try {
 			setModelLoading(true);
 			setModelLoadFailed(false);
@@ -46,7 +43,6 @@ function Permasearch() {
 			const success = await nsfwService.loadModel();
 			
 			if (success) {
-				console.log('NSFW model loaded successfully');
 				setModelLoading(false);
 			} else {
 				throw new Error('Failed to load NSFW model');
