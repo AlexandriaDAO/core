@@ -333,18 +333,6 @@ function SingleTokenView() {
       <ShelvesPreloader />
       
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm dark:bg-gray-900 relative">
-        {tokenId && (
-          <UnifiedCardActions 
-            contentId={tokenId}
-            contentType={'Nft'}
-            ownerPrincipal={ownerPrincipalForActions}
-            isOwned={isOwned}
-            className="absolute top-2 right-2 z-20"
-            onToggleDetails={toggleDetails}
-            showDetails={showDetails}
-          />
-        )}
-
         <ContentCard
           id={transaction.id}
           onClick={() => setShowModal(true)}

@@ -59,7 +59,7 @@ async fn create_asset_canister(from_subaccount: Option<[u8; 32]>) -> Result<Prin
         Principal::management_canister(),
         "create_canister",
         (create_args,),
-        7_692_307_692, // Required cycles for canister creation
+        500_000_000_000, // Updated cycles for mainnet canister creation fee
     )
     .await
     .map_err(|e| format!("Failed to create canister: {}", e.1))?;
@@ -75,7 +75,7 @@ async fn create_asset_canister(from_subaccount: Option<[u8; 32]>) -> Result<Prin
         Principal::management_canister(),
         "deposit_cycles",
         (deposit_cycles_args,),
-        9_230_818_665, // Required cycles for installation and operation
+        1_000_000_000_000, // Increased deposit for installation and operation buffer
     )
     .await
     .map_err(|e| format!("Failed to deposit cycles: {}", e.1))?;

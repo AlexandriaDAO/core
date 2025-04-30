@@ -1,5 +1,6 @@
 Before next mainnet push:
-- Upgrade nft_manager (there was a slight logging change to coordinate_mint() that's a breaking change but it should be fine).
+
+
 
 
 
@@ -95,8 +96,6 @@ The direct Arweave path needs to:
 2. Dispatch setTransactions
 3. Trigger loadContentForTransactions
 4. Maintain consistent error handling with the asset canister path
-
-
 
 
 

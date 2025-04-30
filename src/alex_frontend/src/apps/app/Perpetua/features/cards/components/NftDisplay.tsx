@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import ContentRenderer from "@/apps/Modules/AppModules/safeRender/ContentRenderer";
+import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components/TransactionDetails';
 import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/lib/components/tooltip";
 import { Skeleton } from "@/lib/components/skeleton";
@@ -29,6 +30,7 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
   currentShelfId
 }) => {
   const { user } = useSelector((state: RootState) => state.auth);
+  const { predictions } = useSelector((state: RootState) => state.arweave);
   
   const {
     isLoading,
@@ -48,6 +50,9 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
   if (isLoading) {
     return <NftLoadingState />;
   }
+
+  // Get predictions for the specific transaction
+  const currentPredictions = transaction ? predictions[transaction.id] : undefined;
 
   if (!transaction || !contentUrls || !content) {
     return (
@@ -87,13 +92,16 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
         currentShelfId={currentShelfId}
         initialContentType="Nft"
       >
-        <ContentRenderer
-          transaction={transaction}
-          content={content}
-          contentUrls={contentUrls}
-          handleRenderError={handleRenderError}
-          inModal={false}
-        />
+        <div className="group relative w-full h-full">
+          <ContentRenderer
+            transaction={transaction}
+            content={content}
+            contentUrls={contentUrls}
+            handleRenderError={handleRenderError}
+            inModal={false}
+          />
+          <TransactionDetails transaction={transaction} predictions={currentPredictions} />
+        </div>
       </ContentCard>
 
       {/* This Dialog follows the same pattern as Grid.tsx */}

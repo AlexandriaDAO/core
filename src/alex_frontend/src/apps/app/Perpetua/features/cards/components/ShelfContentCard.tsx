@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { Badge } from "@/lib/components/badge";
 import { Item } from "@/../../declarations/perpetua/perpetua.did";
@@ -41,6 +41,19 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
   handleNftDetails,
   handleContentClick
 }) => {
+  // Add state to track if card asset is loaded
+  const [cardAssetLoaded, setCardAssetLoaded] = useState(false);
+  
+  // Simulate asset loading with useEffect
+  useEffect(() => {
+    // Wait for a short time to simulate assets loading
+    const timer = setTimeout(() => {
+      setCardAssetLoaded(true);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
   // Render card with appropriate draggable properties when in edit mode
   const renderCard = (content: React.ReactNode) => (
     <div 
@@ -67,14 +80,22 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
           </div>
         </div>
       )}
-      {!isEditMode && (
-        <div className="absolute top-2 left-2 z-30" onClick={(e) => e.stopPropagation()}>
-          <RemoveItemButton 
-            shelfId={shelf.shelf_id}
-            itemId={itemKey}
-            buttonSize="sm" 
-            variant="destructive"
-          />
+      {!isEditMode && cardAssetLoaded && (
+        <div className="absolute top-0 left-7 z-10" onClick={(e) => e.stopPropagation()}>
+          <div className="relative">
+            {/* Shadow */}
+            <div className="absolute top-0.5 left-0 h-6 w-6 bg-black/30 rounded-b-sm blur-[1px]"></div>
+            
+            {/* Background */}
+            <div className="relative h-6 w-6 bg-black/75 rounded-b-sm flex items-center justify-center pt-1">
+              <RemoveItemButton 
+                shelfId={shelf.shelf_id}
+                itemId={itemKey}
+                buttonSize="sm" 
+                variant="ghost" 
+              />
+            </div>
+          </div>
         </div>
       )}
       <div className={isEditMode && draggedIndex === index ? 'opacity-30' : ''}>

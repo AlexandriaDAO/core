@@ -200,7 +200,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
     <>
       {/* True bookmark-shaped button with no box around it */}
       <div 
-        className={`absolute right-3 top-0 z-40 cursor-pointer ${className ?? ""}`}
+        className={`absolute right-3 top-0 z-10 cursor-pointer ${className ?? ""}`}
         onClick={handleAddToShelfClick}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}

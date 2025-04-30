@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { parsePathInfo } from "../../../routes";
-import { ShelfDetailViewProps } from '../../../types/item.types';
 import { Item } from "@/../../declarations/perpetua/perpetua.did";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 
@@ -148,7 +147,7 @@ export const ShelfDetailView: React.FC<UpdatedShelfDetailViewProps> = ({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex justify-between items-center w-full bg-background/80 backdrop-blur-sm sticky top-0 z-10 p-4 border-b">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full bg-background/80 backdrop-blur-sm sticky top-0 z-50 p-4 border-b gap-3 sm:gap-0">
         <ShelfViewHeader 
           shelf={shelf} 
           onBack={onBack} 

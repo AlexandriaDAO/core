@@ -129,11 +129,17 @@ Perpetua/
 
 
 
-- create shelf/creating should have a title input.
-- Singletokenview has two bookmark buttons, for whatever reason.
-- Test, test, push, test, test.
 
 
+
+
+
+
+
+
+
+
+- Mobile view is just in tatters.
 - Can't figure it out, it seems.
 This when opening the dialog to add to shelf: 
 <anonymous code>:1:145535
@@ -317,7 +323,7 @@ Backend Stuff:
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal wfk4b-5av7y-vh6uq-umpc7-tj2zz-nj2fb-lo6zb-uxbqt-p55ex-tqhyp-6qe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 77qnb-kysg7-m7qf5-32p5z-xrsmf-r7fa2-lwmfm-ywi7f-wm65e-5sib5-fqe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

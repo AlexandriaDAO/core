@@ -1,5 +1,5 @@
 !/bin/bash
-# dfx canister snapshot list tokenomics --network ic
+dfx canister snapshot list alex_frontend --network ic
 
 # # Load snapshot
 # dfx canister stop alex_frontend --network ic
@@ -13,7 +13,7 @@ dfx identity use mainnet
 
 # alex_frontend
 dfx canister stop alex_frontend --network ic
-dfx canister snapshot create alex_frontend --replace 000000000000000b0000000001f0531c0101 --network ic
+dfx canister snapshot create alex_frontend --replace 000000000000000c0000000001f0531c0101 --network ic
 dfx canister start alex_frontend --network ic
 
 # alex_wallet (done)

@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
 } from "@/lib/components/card";
 import { ScrollArea } from "@/lib/components/scroll-area";
 import { Badge } from "@/lib/components/badge";
@@ -383,8 +382,8 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
 
   return (
     <>
-      {/* Desktop version - hover based */}
-      <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:flex flex-col group-hover:opacity-100 transition-opacity duration-200 z-[20]">
+      {/* Desktop version - hover based - reduce z-index from 20 to 5 */}
+      <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:flex flex-col group-hover:opacity-100 transition-opacity duration-200 z-[5]">
         <ScrollArea className="h-full">
           <Card className="bg-transparent border-none text-gray-100 shadow-none">
             <CardHeader className="p-2 pb-0 md:p-3">
@@ -395,11 +394,8 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
         </ScrollArea>
       </div>
 
-      {/* Mobile details toggle button - styled like a caret in top left */}
-      <div 
-        className="absolute left-3 -top-[1px] md:hidden z-40 cursor-pointer"
-        onClick={toggleMobileDetails}
-      >
+      {/* Move to right-21 to avoid overlapping with other buttons */}
+      <div className="absolute top-0 right-21 z-10">
         <div className="relative">
           {/* Caret shadow */}
           <div className="absolute top-0.5 left-0 h-6 w-6 bg-black/30 rounded-b-sm blur-[1px]"></div>
@@ -407,18 +403,18 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
           {/* Caret background */}
           <div className="relative h-6 w-6 bg-black/75 rounded-b-sm flex items-center justify-center pt-1">
             {showMobileDetails ? (
-              <ChevronUp className="h-3.5 w-3.5 text-gray-300" />
+              <ChevronUp className="h-3.5 w-3.5 text-gray-300 hover:text-brightyellow transition-colors duration-150" />
             ) : (
-              <ChevronDown className="h-3.5 w-3.5 text-gray-300" />
+              <ChevronDown className="h-3.5 w-3.5 text-gray-300 hover:text-brightyellow transition-colors duration-150" />
             )}
           </div>
         </div>
       </div>
 
-      {/* Mobile overlay that appears when info button is clicked */}
+      {/* Mobile overlay - also needs z-index adjustment */}
       {showMobileDetails && (
         <div 
-          className="fixed inset-0 bg-black/95 z-50 md:hidden overflow-auto"
+          className="fixed inset-0 bg-black/95 z-40 md:hidden overflow-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="container max-w-md mx-auto p-3 pb-16">

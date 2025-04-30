@@ -9,7 +9,6 @@ import {
   DialogFooter
 } from "@/lib/components/dialog";
 import { Loader2 } from "lucide-react";
-import { ShelfContent, UpdatedShelfContentProps } from "./ShelfContent";
 import { useAddToShelf } from "../hooks/useAddToShelf";
 import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { Principal } from "@dfinity/principal";
@@ -52,7 +51,9 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
   const [selectedShelfId, setSelectedShelfId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [isCreatingShelf, setIsCreatingShelf] = useState(false);
+  const [isEnteringTitleMode, setIsEnteringTitleMode] = useState(false);
+  const [newShelfTitle, setNewShelfTitle] = useState("");
+  const [isSubmittingNewShelf, setIsSubmittingNewShelf] = useState(false);
   
   const {
     getEditableShelves,
@@ -63,45 +64,65 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
   useEffect(() => {
     if (open) {
       setIsLoading(shelvesLoading);
+      setIsEnteringTitleMode(false);
+      setNewShelfTitle("");
+      setIsSubmittingNewShelf(false);
     }
   }, [open, shelvesLoading]);
   
   const handleDialogClose = useCallback(() => {
-    if (isCreatingShelf) return;
+    if (isSubmittingNewShelf) return;
     setSelectedShelfId(null);
     setSearchTerm("");
+    setIsEnteringTitleMode(false);
+    setNewShelfTitle("");
     onClose();
-  }, [onClose, isCreatingShelf]);
+  }, [onClose, isSubmittingNewShelf]);
   
   const handleShelfSelection = (shelfId: string) => {
+    if (isEnteringTitleMode || isSubmittingNewShelf) return;
     setSelectedShelfId(shelfId === selectedShelfId ? null : shelfId);
   };
   
   const handleConfirmExistingShelf = async () => {
-    if (!selectedShelfId) return;
+    if (!selectedShelfId || isEnteringTitleMode || isSubmittingNewShelf) return;
+
     onConfirmSelection(selectedShelfId);
+    onClose();
   };
 
-  const handleCreateNewShelfRequest = useCallback(async () => {
-    if (!onCreateShelf || isCreatingShelf || isLoading) return;
+  const handleStartCreateNewShelf = () => {
+    if (isLoading || isSubmittingNewShelf || !onCreateShelf) return;
+    setIsEnteringTitleMode(true);
+    setSelectedShelfId(null);
+  };
 
-    setIsCreatingShelf(true);
+  const handleCancelCreateNewShelf = () => {
+    setIsEnteringTitleMode(false);
+    setNewShelfTitle("");
+  };
+
+  const handleConfirmCreateShelf = useCallback(async () => {
+    if (!newShelfTitle.trim() || !onCreateShelf || isSubmittingNewShelf || isLoading) return;
+
+    setIsSubmittingNewShelf(true);
     try {
-      const newShelfId = await onCreateShelf("un-named shelf", ""); 
+      const newShelfId = await onCreateShelf(newShelfTitle.trim(), ""); 
 
       if (newShelfId) {
           setSelectedShelfId(newShelfId); 
-          toast.success("'un-named shelf' created. Click 'Add to Selected Shelf' to continue.");
-          setIsCreatingShelf(false); 
+          toast.success(`'${newShelfTitle.trim()}' created. Click 'Add to Selected Shelf' to continue.`);
+          setIsEnteringTitleMode(false);
+          setNewShelfTitle("");
       } else {
           toast.error("Failed to create shelf. Please try again.");
-          setIsCreatingShelf(false); 
       }
     } catch (error) {
       toast.error(`Shelf creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      setIsCreatingShelf(false); 
+    } finally {
+      setIsSubmittingNewShelf(false);
     }
-  }, [onCreateShelf, isLoading, isCreatingShelf]);
+  }, [onCreateShelf, isLoading, isSubmittingNewShelf, newShelfTitle]);
 
   const canShowContent = isLoggedIn;
   const editableShelves = canShowContent ? getEditableShelves(currentShelfId) : [];
@@ -115,16 +136,19 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
     })
   );
   const availableShelves = useMemo(() => {
-    return filteredShelves;
-  }, [filteredShelves]);
+    return isEnteringTitleMode ? [] : filteredShelves;
+  }, [filteredShelves, isEnteringTitleMode]);
 
   useEffect(() => {
     if (!open) {
-      setIsCreatingShelf(false);
+      setIsSubmittingNewShelf(false);
+      setIsEnteringTitleMode(false);
+      setNewShelfTitle("");
     }
   }, [open]);
 
   const descriptionId = "shelf-selection-dialog-description";
+  const disableInteractions = isEnteringTitleMode || isSubmittingNewShelf;
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if(!isOpen) handleDialogClose(); }}>
@@ -152,20 +176,60 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
             <DialogHeader>
               <DialogTitle className="font-serif">Add to Shelf</DialogTitle>
               <DialogDescription id={descriptionId}> 
-                 Select an existing shelf or create a new one to add this item.
+                 {isEnteringTitleMode 
+                   ? "Don't worry, you can change the later." 
+                   : "Select an existing shelf or create a new one to add this item."}
               </DialogDescription>
             </DialogHeader>
 
-            <Input
-              type="text"
-              placeholder="Search shelves..."
-              value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-              className="mb-4 font-sans"
-              disabled={isCreatingShelf}
-            />
+            {!isEnteringTitleMode && (
+              <Input
+                type="text"
+                placeholder="Search shelves..."
+                value={searchTerm}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                className="mb-4 font-sans"
+                disabled={disableInteractions}
+              />
+            )}
 
-            {availableShelves.length > 0 ? (
+            {isEnteringTitleMode && (
+              <div className="space-y-2 mb-4">
+                <Input
+                  type="text"
+                  placeholder="New shelf title"
+                  value={newShelfTitle}
+                  onChange={(e) => setNewShelfTitle(e.target.value)}
+                  className="font-sans"
+                  disabled={isSubmittingNewShelf}
+                  autoFocus
+                />
+                <div className="flex justify-end gap-2">
+                  <Button 
+                    variant="ghost" 
+                    onClick={handleCancelCreateNewShelf}
+                    disabled={isSubmittingNewShelf}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleConfirmCreateShelf}
+                    disabled={!newShelfTitle.trim() || isSubmittingNewShelf}
+                  >
+                    {isSubmittingNewShelf ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Shelf"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {!isEnteringTitleMode && availableShelves.length > 0 ? (
               <div className="max-h-[250px] overflow-y-auto space-y-2 pr-2 mb-4 custom-scrollbar">
                 {availableShelves.map((shelf) => (
                   <Button
@@ -173,42 +237,37 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
                     variant={selectedShelfId === shelf.shelf_id ? "primary" : "outline"}
                     className="w-full justify-start font-serif"
                     onClick={() => handleShelfSelection(shelf.shelf_id)}
-                    disabled={isCreatingShelf}
+                    disabled={disableInteractions}
                   >
-                    {shelf.title || (shelf.shelf_id === selectedShelfId ? "un-named shelf" : "Loading...")}
+                    {shelf.title || "un-named shelf"}
                   </Button>
                 ))}
               </div>
-            ) : (
+            ) : !isEnteringTitleMode && (
               <div className="text-center py-4 text-muted-foreground font-serif">
                 {searchTerm ? "No shelves match your search." : "You have no editable shelves yet."}
               </div>
             )}
 
-            <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">
-              <Button
-                  variant="secondary"
-                  onClick={handleCreateNewShelfRequest}
-                  disabled={isLoading || isCreatingShelf || !onCreateShelf}
-                  className="w-full sm:w-auto"
-              >
-                  {isCreatingShelf ? (
-                      <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Creating...
-                      </>
-                  ) : (
-                      "Create New Shelf"
-                  )}
-              </Button>
-               <Button
-                 onClick={handleConfirmExistingShelf}
-                 disabled={!selectedShelfId || isCreatingShelf}
-                 className="w-full sm:w-auto"
-               >
-                 Add to Selected Shelf
-               </Button>
-            </DialogFooter>
+            {!isEnteringTitleMode && (
+              <DialogFooter className="flex flex-col sm:flex-row sm:justify-between gap-2">
+                <Button
+                    variant="secondary"
+                    onClick={handleStartCreateNewShelf}
+                    disabled={isLoading || disableInteractions || !onCreateShelf}
+                    className="w-full sm:w-auto"
+                >
+                    Create New Shelf
+                </Button>
+                 <Button
+                   onClick={handleConfirmExistingShelf}
+                   disabled={!selectedShelfId || disableInteractions}
+                   className="w-full sm:w-auto"
+                 >
+                     Add to Selected Shelf
+                 </Button>
+              </DialogFooter>
+            )}
           </>
         )}
       </DialogContent>
