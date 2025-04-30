@@ -52,7 +52,7 @@ export function ContentCard({
         // Note: If the entire card should still be clickable *except* the action button,
         // you might need to move onClick to the CardContent/AspectRatio and ensure stopPropagation in UnifiedCardActions works.
       >
-        {/* Action Button - Increased z-index */}
+        {/* Action Button - Using updated bookmark design */}
         {finalContentId && (
           <UnifiedCardActions
             contentId={finalContentId}
@@ -63,12 +63,7 @@ export function ContentCard({
             parentShelfId={parentShelfId}
             itemId={itemId}
             currentShelfId={currentShelfId}
-            // Removed props related to details toggle as this button is now independent
-            // onToggleDetails={() => {}}
-            // showDetails={false}
-            // Removed group-hover opacity classes, kept positioning
-            className="absolute top-1.5 right-1.5 z-40" // Increased z-index from 20 to 40
-            // The UnifiedCardActions component itself now has the styling for the bookmark icon look
+            // We don't need to specify className now as the component has its own positioning
           />
         )}
 

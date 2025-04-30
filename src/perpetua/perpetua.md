@@ -129,13 +129,12 @@ Perpetua/
 
 
 
-- Prettier hover background (transactionDetails). Also the owner feild isn't there on permasearch.
-- Experiment.
-- Making a placeholder shelf does not work. 
+- create shelf/creating should have a title input.
+- Singletokenview has two bookmark buttons, for whatever reason.
+- Test, test, push, test, test.
 
 
-
-
+- Can't figure it out, it seems.
 This when opening the dialog to add to shelf: 
 <anonymous code>:1:145535
 `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
@@ -275,7 +274,7 @@ id_convert.ts.
 
 Mainnet bug findings: 
 
-- Should be able to add an item to multiple shelves at once, not one at a time.
+- Should be able to add an item to multiple shelves at once, not one at a time. (actually, I don't think we need this).
 - (Will fix this when I deploy without all nfts)Withdraw button is partially underneath the expander button.
 
 Major (whole moring):

@@ -51,6 +51,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
 }) => {
   const [addToShelfContext, setAddToShelfContext] = React.useState<AddToShelfContext | null>(null);
   const [isProcessingAddToShelf, setIsProcessingAddToShelf] = React.useState(false);
+  const [isHovering, setIsHovering] = React.useState(false);
 
   const { addContentToShelf, isLoggedIn } = useAddToShelf();
   const { createShelf } = useShelfOperations();
@@ -195,23 +196,40 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
     }
   };
 
-  // Removed handleRemoveClick, handleRemoveConfirm, handleToggleFollowOwner
-
   return (
     <>
-      <Button
-        variant="ghost"
-        className={`p-0 absolute top-1 right-1 z-20 text-muted-foreground hover:text-foreground drop-shadow-md ${className ?? ""}`}
+      {/* True bookmark-shaped button with no box around it */}
+      <div 
+        className={`absolute right-3 top-0 z-40 cursor-pointer ${className ?? ""}`}
         onClick={handleAddToShelfClick}
-        disabled={isProcessingAddToShelf || !createShelf}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
         aria-label={isProcessingAddToShelf ? "Adding to shelf..." : "Add to shelf"}
       >
-        {isProcessingAddToShelf ? (
-          <Loader2 className="h-6 w-6 animate-spin" />
-        ) : (
-          <Bookmark className="h-6 w-6" />
-        )}
-      </Button>
+        <div className="relative">
+          {/* Bookmark shadow */}
+          <div className="absolute top-0.5 right-0 h-10 w-8 bg-black/30 rounded-b-md blur-[1px]"></div>
+          
+          {/* Bookmark shape - using same black as info button */}
+          <div className="relative h-10 w-8 bg-black/75 transition-colors duration-150 rounded-b-md">
+            {/* Notch at bottom of bookmark */}
+            <div className="absolute bottom-0 left-1/2 h-2.5 w-3 transform -translate-x-1/2 bg-black/75 transition-colors duration-150" style={{ clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)' }}></div>
+            
+            {/* Content */}
+            <div className="h-full w-full flex items-center justify-center pt-1">
+              {isProcessingAddToShelf ? (
+                <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
+              ) : (
+                <Bookmark 
+                  className={`h-5 w-5 transition-colors duration-150 ${isHovering ? 'text-brightyellow' : 'text-white dark:text-brightyellow'}`} 
+                  fill={isHovering ? 'currentColor' : 'none'} 
+                  strokeWidth={isHovering ? 2.5 : 2}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {addToShelfContext && (
         <ShelfSelectionDialog

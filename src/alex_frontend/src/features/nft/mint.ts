@@ -1,12 +1,12 @@
 import { getNftManagerActor, getAuthClient } from "@/features/auth/utils/authUtils";
 import { Principal } from '@dfinity/principal';
 import { store } from "@/store";
-import { Nat } from "@dfinity/candid/lib/cjs/idl"; // Import Nat type if needed, agent might use bigint
-import { toast } from "sonner";
+import { nft_manager } from "@/../../declarations/nft_manager";
+import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
 
 // Define expected types based on Candid Result<Nat, String>
 // Agent typically represents Nat as bigint
-type CoordinateMintOk = bigint; // Nat is usually bigint
+type CoordinateMintOk = bigint; // Nat is usually bigints
 type CoordinateMintErr = string;
 type CoordinateMintResultBackend = 
   | { Ok: CoordinateMintOk } 
@@ -21,28 +21,64 @@ export type MintResult =
 // Function to find existing NFT ID for a given Arweave transaction
 const getExistingNftIdForTransaction = async (transactionId: string): Promise<string | null> => {
   console.log(`[mint.ts] Searching for existing NFT ID for Arweave tx: ${transactionId}`);
-  
-  // First try to find it in the current redux state
   const state = store.getState();
-  const nftId = state.nftData.arweaveToNftId[transactionId];
-  
-  // Verify the NFT is owned by the current user
-  if (nftId && state.nftData.nfts[nftId]) {
-    const principal = (await getAuthClient()).getIdentity().getPrincipal().toText();
-    const owner = state.nftData.nfts[nftId]?.principal;
-    
-    if (owner === principal) {
-      console.log(`[mint.ts] Found existing ID in Redux state: ${nftId} owned by current user`);
-      return nftId;
+  const currentUserPrincipal = (await getAuthClient()).getIdentity().getPrincipal();
+  const currentUserPrincipalText = currentUserPrincipal.toText();
+
+  // --- Step 1: Check Redux Cache ---
+  const cachedNftId = state.nftData.arweaveToNftId[transactionId];
+  if (cachedNftId && state.nftData.nfts[cachedNftId]) {
+    const cachedOwner = state.nftData.nfts[cachedNftId]?.principal;
+    if (cachedOwner === currentUserPrincipalText) {
+      console.log(`[mint.ts] Found existing ID in Redux state: ${cachedNftId} owned by current user`);
+      return cachedNftId;
+    } else {
+       console.log(`[mint.ts] Found ID ${cachedNftId} in Redux for tx ${transactionId}, but owner (${cachedOwner}) doesn't match current user (${currentUserPrincipalText}).`);
     }
+  } else {
+     console.log(`[mint.ts] Did not find owned ID for tx ${transactionId} in Redux cache.`);
   }
-  
-  // TODO: If not found in state, could implement a backend call to lookup by transaction
-  // const actor = await getSomeOtherActor();
-  // const result = await actor.findNftByTx(transactionId);
-  // return result.Ok ? result.Ok.toString() : null;
-  
-  return null;
+
+  // --- Step 2: Fallback - Query Canisters Directly ---
+  console.log(`[mint.ts] Redux check failed for tx ${transactionId}, querying canisters...`);
+  try {
+    // Convert Arweave ID to the base minting number (Nat/bigint)
+    // Assuming nft_manager actor can do this conversion, or use a local utility if available
+    const mintingNumber: bigint = await nft_manager.arweave_id_to_nat(transactionId);
+
+    // Check ownership of the original NFT
+    const nftAdapter = createTokenAdapter("NFT");
+    const nftOwnerResult = await nftAdapter.getOwnerOf([mintingNumber]);
+    if (nftOwnerResult && nftOwnerResult.length > 0 && nftOwnerResult[0] && nftOwnerResult[0].length > 0 && nftOwnerResult[0][0]) {
+        const nftOwnerPrincipal = nftOwnerResult[0][0].owner;
+        if (nftOwnerPrincipal.toText() === currentUserPrincipalText) {
+             console.log(`[mint.ts] Found owned original NFT via canister query: ID ${mintingNumber.toString()}`);
+             return mintingNumber.toString();
+        }
+    }
+
+    // If not original NFT owner, check ownership of the Scion SBT
+    // Calculate the Scion ID for the current user
+    const scionId: bigint = await nft_manager.og_to_scion_id(mintingNumber, currentUserPrincipal);
+
+    const sbtAdapter = createTokenAdapter("SBT");
+    const sbtOwnerResult = await sbtAdapter.getOwnerOf([scionId]);
+     if (sbtOwnerResult && sbtOwnerResult.length > 0 && sbtOwnerResult[0] && sbtOwnerResult[0].length > 0 && sbtOwnerResult[0][0]) {
+        const sbtOwnerPrincipal = sbtOwnerResult[0][0].owner;
+         if (sbtOwnerPrincipal.toText() === currentUserPrincipalText) {
+             console.log(`[mint.ts] Found owned Scion SBT via canister query: ID ${scionId.toString()}`);
+             return scionId.toString();
+         }
+     }
+
+    // If neither is found owned by the user after checking canisters
+    console.log(`[mint.ts] No owned NFT or SBT found for tx ${transactionId} after canister query.`);
+    return null;
+
+  } catch (error) {
+     console.error(`[mint.ts] Error during canister query fallback for tx ${transactionId}:`, error);
+     return null; // Return null on error during fallback
+  }
 }
 
 export const mint_nft = async (transactionId: string): Promise<MintResult> => {
@@ -51,49 +87,55 @@ export const mint_nft = async (transactionId: string): Promise<MintResult> => {
     if (!await client.isAuthenticated()) {
       return { status: 'error', message: "Authentication required to acquire item." };
     }
+    const currentUserPrincipalText = client.getIdentity().getPrincipal().toText();
 
+    // --- Optimization: Check Redux cache *before* calling backend ---
+    // This avoids backend call if user clearly owns it according to cache
     const state = store.getState();
     const nfts = state.nftData.nfts;
     const arweaveToNftId = state.nftData.arweaveToNftId;
-    const nftId = arweaveToNftId[transactionId];
-    const nftData = nftId ? nfts[nftId] : undefined;
+    const cachedNftId = arweaveToNftId[transactionId];
+    const nftData = cachedNftId ? nfts[cachedNftId] : undefined;
     const ownerStr = nftData?.principal;
-    
-    // Check if user already owns this NFT before calling backend
-    if (nftId && ownerStr === client.getIdentity().getPrincipal().toText()) {
-      console.log(`[mint.ts] User already owns NFT with ID ${nftId} for tx ${transactionId}`);
-      return { status: 'already_exists', id: nftId };
+
+    if (cachedNftId && ownerStr === currentUserPrincipalText) {
+      console.log(`[mint.ts] User already owns NFT with ID ${cachedNftId} for tx ${transactionId} (checked Redux before backend call)`);
+      return { status: 'already_exists', id: cachedNftId };
     }
-    
-    let ownerArg: [] | [Principal] = [];
-    
+    // --- End Optimization ---
+
+    let ownerArg: [] | [Principal] = []; // Keep ownerArg logic if needed for specific mint flows
+
     const actorNftManager = await getNftManagerActor();
+    // Use the existing coordinate_mint call
     const result = await actorNftManager.coordinate_mint(transactionId, ownerArg) as CoordinateMintResultBackend;
     console.log("coordinate_mint backend result:", result);
 
     if ("Err" in result) {
       const errorMsg = result.Err;
-      
+
       // Check for "already owns" type errors
-      if (errorMsg.includes("already own") || 
-          errorMsg.includes("already minted") || 
-          errorMsg.includes("already exists")) {
-        
+      if (errorMsg.includes("already own") ||
+          errorMsg.includes("already minted") ||
+          errorMsg.includes("already exists") || // Added "already exists" just in case
+          errorMsg.includes("You have already minted a scion")) { // Added Scion specific error
+
         console.log(`[mint.ts] Backend indicates user already owns item for tx: ${transactionId}`);
-        
-        // Attempt to retrieve the existing ID
+
+        // Attempt to retrieve the existing ID using the *updated* function
         const existingId = await getExistingNftIdForTransaction(transactionId);
-        
+
         if (existingId) {
+          // Successfully found the ID (either from cache or canister query)
           return { status: 'already_exists', id: existingId };
         } else {
-          // This is a situation where backend says user owns it but we couldn't find the ID
-          console.error(`[mint.ts] Backend indicated ownership for tx ${transactionId}, but failed to retrieve existing ID`);
-          
-          // Return a proper error that doesn't stop the flow but provides useful information
-          return { 
-            status: 'error', 
-            message: "Could not retrieve your existing item ID. Please try refreshing the page."
+          // This should now only happen if the backend says owned, but the direct query fails
+          // (e.g., network issue during query, unexpected state mismatch)
+          console.error(`[mint.ts] Backend indicated ownership for tx ${transactionId}, but failed to retrieve existing ID even after direct canister query.`);
+          // Return a more specific error perhaps?
+          return {
+            status: 'error',
+            message: "Could not retrieve your existing item ID. Please try again or contact support if the issue persists."
           };
         }
       } else {
@@ -101,11 +143,11 @@ export const mint_nft = async (transactionId: string): Promise<MintResult> => {
         return { status: 'error', message: `Failed to acquire item: ${errorMsg}` };
       }
     }
-    
+
     // If Ok, result.Ok should be bigint (Nat)
     const mintedNat: CoordinateMintOk = result.Ok;
     const mintedIdString: string = mintedNat.toString();
-    
+
     console.log("[mint.ts] Mint successful. New ID String:", mintedIdString);
     return { status: 'success', id: mintedIdString };
 

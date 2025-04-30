@@ -5,6 +5,7 @@ import { Item } from "@/../../declarations/perpetua/perpetua.did";
 import NftDisplay from './NftDisplay';
 import { ShelfContentDisplay, MarkdownContentDisplay } from './ContentDisplays';
 import { isNftContent, isShelfContent, isMarkdownContent } from "../../../utils";
+import { RemoveItemButton } from '@/apps/app/Perpetua/features/shelf-management/components/RemoveItemButton';
 
 interface ShelfContentCardProps {
   itemKey: number;
@@ -59,11 +60,21 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
       {isEditMode && (
         <div className="absolute top-0 left-0 right-0 z-40 bg-black/50 text-white p-1 text-xs flex items-center justify-between">
           <span>Item #{itemKey}</span>
-          <div className="item-drag-handle p-1 rounded hover:bg-gray-700 cursor-grab">
+          <div className="item-drag-handle p-1 rounded hover:bg-gray-700 cursor-grab ml-auto">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
             </svg>
           </div>
+        </div>
+      )}
+      {!isEditMode && (
+        <div className="absolute top-2 left-2 z-30" onClick={(e) => e.stopPropagation()}>
+          <RemoveItemButton 
+            shelfId={shelf.shelf_id}
+            itemId={itemKey}
+            buttonSize="sm" 
+            variant="destructive"
+          />
         </div>
       )}
       <div className={isEditMode && draggedIndex === index ? 'opacity-30' : ''}>
@@ -81,6 +92,7 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
         inShelf={true}
         parentShelfId={shelf.shelf_id}
         itemId={itemKey}
+        currentShelfId={shelf.shelf_id}
       />
     );
   }
@@ -94,6 +106,7 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
         onClick={() => handleContentClick(itemKey)}
         parentShelfId={shelf.shelf_id}
         itemId={itemKey}
+        currentShelfId={shelf.shelf_id}
       />
     );
   }
@@ -107,6 +120,7 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
         onClick={() => handleContentClick(itemKey)}
         parentShelfId={shelf.shelf_id}
         itemId={itemKey}
+        currentShelfId={shelf.shelf_id}
       />
     );
   }
@@ -118,6 +132,9 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
       onClick={() => handleContentClick(itemKey)}
       owner={shelf.owner.toString()}
       component="Perpetua"
+      parentShelfId={shelf.shelf_id}
+      itemId={itemKey}
+      currentShelfId={shelf.shelf_id}
       footer={
         <div className="flex flex-wrap items-center gap-1">
           <Badge variant="secondary" className="text-[10px] py-0.5 px-1">
