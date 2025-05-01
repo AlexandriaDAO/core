@@ -129,6 +129,15 @@ Perpetua/
 
 
 
+- Need a my Library area that takes you to your profile page, and the New Shelf button should be there.
+- Need a public search for the create shelf option (and consider how this'll work with duplicate names.)
+
+
+
+- Use 'appears in' in NFT fullscreen modal. (this will guide how the next one should look.)
+  - Start displaying NFTs by default in conjunction with the shelves.
+- Expander carrot should do something on desktop mode, or be removed.
+- Shouldn't have to wait for following info to load to do stuff.
 
 
 
@@ -139,7 +148,77 @@ Perpetua/
 
 
 
-- Mobile view is just in tatters.
+
+
+
+
+
+Backend Stuff:
+- Tag/user follow loading is really slow. (does this lag increase with scale?)
+- Search engine for shelves (public ones at least.)
+- Payment for all/some actions
+  - Pay for shelf creation after the fifth shelf. That's it (for now).
+- Download personal data as a csv.
+  - This way we could use this function to do it manually at various times.
+- Feed: 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
+
+
+
+
+
+
+Bigger stuff: 
+- Progressive loading, like in other apps.
+
+
+## V2 Features (Separate Canister):
+- More advanced search engine for the setup. So separate architecture with backups (maybe centralized).
+- A preview of the slots in the profile. (Could be done later)
+
+
+
+
+
+Bugs: 
+- I can't add create a shelf while doing it inside an existing shelf (create and add to shelf):
+index-a1d49c1c.11c9dd3f5d3f56515c0c.js:51 Error in createAndAddShelfItem: AgentError: Call failed:
+  Canister: ya6k4-waaaa-aaaap-qkmpq-cai
+  Method: create_and_add_shelf_item (update)
+  "Request ID": "6bc6c9d56181b299127dde7d59f4633da9e14c602618c25e0e75717c6e17e68b"
+  "Error code": "IC0503"
+  "Reject code": "5"
+  "Reject message": "Error from Canister ya6k4-waaaa-aaaap-qkmpq-cai: Canister called `ic0.trap` with message: 'Panicked at 'already mutably borrowed: BorrowError', src/perpetua/src/storage.rs:475:33'.\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://internetcomputer.org/docs/current/references/execution-errors#trapped-explicitly"
+    at a (vendors-1a69cf2e.83eb96115e5a2e13803d.js:1:55695)
+    at async p (index-a1d49c1c.11c9dd3f5d3f56515c0c.js:51:59352)
+    at async index-a1d49c1c.11c9dd3f5d3f56515c0c.js:51:75172
+    at async critical-27545368.0032df30f5ef8db872c7.js:2:8322
+    at async 5145.88994b602aac2d81aa47.js:1:42910
+    at async 2108.cdbd2a4bc4e9ba28719d.js:1:49604
+p @ index-a1d49c1c.11c9dd3f5d3f56515c0c.js:51
+await in p
+(anonymous) @ index-a1d49c1c.11c9dd3f5d3f56515c0c.js:51
+(anonymous) @ critical-27545368.0032df30f5ef8db872c7.js:2
+Object.assign.pending @ critical-27545368.0032df30f5ef8db872c7.js:2
+(anonymous) @ vendors-49ceb22a.86e86ba8e4c983b736c6.js:1
+(anonymous) @ 5145.88994b602aac2d81aa47.js:1
+(anonymous) @ 2108.cdbd2a4bc4e9ba28719d.js:1
+Me @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+Ae @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+(anonymous) @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+Ir @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+Ur @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+(anonymous) @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+ss @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+Te @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+Hr @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+Kn @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+Qn @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
+5145.88994b602aac2d81aa47.js:1 Failed to create and add shelf item: Failed to create and add shelf
+
+
+
+
+
 - Can't figure it out, it seems.
 This when opening the dialog to add to shelf: 
 <anonymous code>:1:145535
@@ -173,23 +252,8 @@ For more information, see https://radix-ui.com/primitives/docs/components/dialog
 
 
 
+Prompt helper.
 
-
-
-
-First some context. This is a big project with a suite of apps that use NFTs as a content primative. Every peice of permanent content is an NFT, but you could get a copy of someone's NFT (an SBT) in order to use it by liking the original NFT.
-
-In the Permasearch app, we're just searching arweave transactions. People can mint them as NFTs, usually for the first time, but if they're already owned than the backend mints an SBT for that person. To trigger the mint action on Permasearch though, we need to run the nsfw check to ensure porn isn't minted as an NFT. After that though, after it's minted as an NFT or SBT, we never need to run the nsfw check on them again, so minting as an option is always availible by default. Then in the alexandrian app, we search through existing NFTs, which are areweave transactions that are minted as NFTs on our backend, so we treat them as NFTs/SBTs. Then in the Perpetua app we use these nfts in a content grid style social app. The social app has it's own two primitives: Shelves and Items.
-
-A shelf holds a grid of items, that's it.
-An item is a (1) NFT/SBT, and only it's owner can add it to a shelf, or (2) some markdown text which anyone can add, or (3) another shelf which anyone can add.
-
-
-All of these, both independent NFTs, or shelves or markdown items or items of any kind, all of them, appear in the UI in the same style of card.
-
-Now here's the problem. We consolidated these functionalities in a single button that opens up a set of options in UnifiedCardActions.tsx. For one thing user's can click 'show details' or 'follow owner', but the flow for minting the NFT so you could add it to a shelf is not there. 
-
-The ideal user flow is the. A user can click on any asset to move forward by 'bookmarking' it, that is, adding it to a shelf, as part of the UnifiedCardActions.
 
 - is nft
   - if user is owner of nft
@@ -208,51 +272,6 @@ The ideal user flow is the. A user can click on any asset to move forward by 'bo
 - if it's neither (not an nft yet), proceed with liking it with coordinate_mint, which will mint an original NFT if no-one owns it, or if it was already owned, mint an sbt.
   - then use the proper id to bookmark it to the shelf. 
 
-But right now I don't see that option to mint or bookmark or add to shelf anywhere so something is wrong with the conditions that we're using.
-
-Perhaps the ideal way foward is to consolidate this code and get it working in a separate compontent that puts all the buttons into one uniform dropdown without scattering overlapping functionality all over the place. First find all the involved components and come up with a methodlogy for consolidation. Any new approach should remove unused code, not overproduce more new code.
-
-It's also very important to make the 'toasts' involved in this process explain what's actually happening in the backend, not a arbitrary frontend error message, so let's make sure the toast logs are all accurate to what is occuring during the flow.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 unifiedCardActions.tsx
 NftDisplay.tsx
@@ -270,60 +289,9 @@ id_convert.ts.
 
 
 
-
-
-
-
-
-
-
-
-Mainnet bug findings: 
-
-- Should be able to add an item to multiple shelves at once, not one at a time. (actually, I don't think we need this).
-- (Will fix this when I deploy without all nfts)Withdraw button is partially underneath the expander button.
-
-Major (whole moring):
-- Make saves/shelf-additions/etc./Single-Step.
-
-
-
-
-
-Minor Frontend Stuff:
-- Enforce 100 char title, 500 char description.
-- Shelves actually have a 10 tag max in the backend. Should we change this? (and 50 chars)
-- Max 500 items per shelf.
-- 10k markdown chars.
-
-
-Backend Stuff:
-- Search engine for shelves (public ones at least.)
-- Payment for all/some actions
-  - Pay for shelf creation after the fifth shelf. That's it (for now).
-- Download personal data as a csv.
-  - This way we could use this function to do it manually at various times.
-- Feed: 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
-
-
-
-
- 
-
-
-## V2 Features (Separate Canister):
-- More advanced search engine for the setup. So separate architecture with backups (maybe centralized).
-- A preview of the slots in the profile. (Could be done later)
-
-
-
-
-
-
-
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 77qnb-kysg7-m7qf5-32p5z-xrsmf-r7fa2-lwmfm-ywi7f-wm65e-5sib5-fqe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 3sfuz-25qob-k6nmf-cvrmm-vdesm-ngb2o-gpvnb-kgzhi-evt3o-ktmoo-cae)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua
@@ -338,6 +306,3 @@ dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx generate perpetua
 
 git show --patch c0ccbd75ca2cb2ce2dab10611df028a4f8e47d0a
-
-
-

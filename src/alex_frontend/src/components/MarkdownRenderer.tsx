@@ -158,7 +158,7 @@ function MarkdownRenderer({ content, className = "" }: MarkdownRendererProps) {
 	}, [location.hash, content]);
 	
 	return (
-		<div className={`p-4 md:p-8 rounded-lg shadow-lg bg-gray-900 text-gray-100 ${className}`}>
+		<div className={`p-1 md:p-2 rounded-lg shadow-lg bg-gray-900 text-gray-100 ${className}`}>
 			<ReactMarkdown 
 				components={MarkdownComponents}
 				remarkPlugins={[remarkGfm, remarkFixInlineCode]}

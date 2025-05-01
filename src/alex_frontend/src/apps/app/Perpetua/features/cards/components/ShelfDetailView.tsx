@@ -147,7 +147,7 @@ export const ShelfDetailView: React.FC<UpdatedShelfDetailViewProps> = ({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full bg-background/80 backdrop-blur-sm sticky top-0 z-50 p-4 border-b gap-3 sm:gap-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full bg-background/80 backdrop-blur-sm sticky top-0 z-40 p-4 border-b gap-3 sm:gap-0">
         <ShelfViewHeader 
           shelf={shelf} 
           onBack={onBack} 

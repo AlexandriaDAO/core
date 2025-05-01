@@ -10,6 +10,7 @@ import { RootState } from '@/store';
 import { mint_nft, MintResult } from "@/features/nft/mint";
 import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks/useShelfOperations";
+import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did"; // Import ShelfPublic for type hints
 
 interface UnifiedCardActionsProps {
   contentId: string; // Arweave ID, Shelf ID, NFT Nat ID string
@@ -53,7 +54,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
   const [isProcessingAddToShelf, setIsProcessingAddToShelf] = React.useState(false);
   const [isHovering, setIsHovering] = React.useState(false);
 
-  const { addContentToShelf, isLoggedIn } = useAddToShelf();
+  const { addContentToShelf, isLoggedIn, getEditableShelves } = useAddToShelf();
   const { createShelf } = useShelfOperations();
   // Removed user, currentUserPrincipal, removeItem, shelves, checkEditAccess, isFollowingUser, toggleFollowUser as they relate to removed actions
   // const { user } = useSelector((state: RootState) => state.auth);
@@ -118,12 +119,16 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
     });
   };
 
-  // 2. Background Processor: Called after dialog confirms selection/creation
-  const processAddToShelfInBackground = async (selectedShelfId: string) => {
+  // 2. Background Processor: Called after dialog confirms selection
+  const processAddToShelfInBackground = async (selectedShelfIds: string[]) => {
     if (!addToShelfContext) {
         console.error("[UnifiedCardActions] Background process called without context.");
         toast.error("An unexpected error occurred (missing context).");
         return;
+    }
+    if (selectedShelfIds.length === 0) {
+        console.warn("[UnifiedCardActions] Background process called with empty selection.");
+        return; // Nothing to do
     }
 
     const { originalContentId, originalContentType, initialIsOwned } = addToShelfContext;
@@ -131,12 +136,25 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
     let finalContentType: "Nft" | "Shelf" | "Markdown" = 'Nft'; // Default, will be adjusted
     let needsMinting = false;
 
+    // Fetch shelf details for toast messages *before* starting async operations
+    // Note: getEditableShelves returns NormalizedShelf[], need to denormalize for ShelfPublic
+    // Let's assume denormalizeShelves is available or implement it inline if needed
+    const allEditableShelves = getEditableShelves(); // Assuming this returns NormalizedShelf[]
+    // Inline denormalization for simplicity if needed:
+    const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => ({
+        ...normalizedShelf,
+        owner: Principal.fromText(normalizedShelf.owner),
+        created_at: BigInt(normalizedShelf.created_at),
+        updated_at: BigInt(normalizedShelf.updated_at)
+    } as ShelfPublic);
+    const denormalizedShelves = allEditableShelves.map(denormalizeShelf);
+    const shelfDetailsMap = new Map(denormalizedShelves.map(shelf => [shelf.shelf_id, shelf]));
+
     setIsProcessingAddToShelf(true); // Indicate background processing starts
 
     try {
-        // Determine if minting is needed
+        // Determine if minting is needed (only needs to happen once)
         if (!initialIsOwned && (originalContentType === 'Nft' || originalContentType === 'Arweave')) {
-            // We already checked Arweave safety in handleAddToShelfClick
             needsMinting = true;
         } else if (originalContentType === 'Shelf') {
             finalContentType = 'Shelf';
@@ -147,52 +165,76 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
             finalContentType = 'Nft';
         }
 
-        // Perform minting if required
+        // Perform minting if required (once for all selected shelves)
         if (needsMinting) {
             const mintResult = await mint_nft(originalContentId);
 
             if (mintResult.status === 'success' || mintResult.status === 'already_exists') {
                 finalContentId = mintResult.id;
                 finalContentType = 'Nft'; // Content is now an NFT/SBT
+                toast.info(`Item acquired successfully. Adding to shelves...`);
             } else {
                 console.error(`[UnifiedCardActions] Background: Minting failed: ${mintResult.message}`);
                 toast.error(mintResult.message || "Failed to acquire item for adding.");
-                throw new Error("Minting failed"); // Stop processing
+                throw new Error("Minting failed"); // Stop processing for all shelves
             }
         }
 
-        // Determine collectionType for NFTs/SBTs - simplistic check based on ID length
+        // Determine collectionType for NFTs/SBTs (once)
         const collectionType = (finalContentType === 'Nft' && finalContentId.length >= 80) ? 'SBT' : (finalContentType === 'Nft' ? 'NFT' : undefined);
 
-        // Now we get a proper Result object with status and message
-        const addResult = await addContentToShelf(
-            selectedShelfId,
-            finalContentId,
-            finalContentType,
-            collectionType
+        // Add to each selected shelf concurrently
+        const addPromises = selectedShelfIds.map(shelfId =>
+            addContentToShelf(
+                shelfId,
+                finalContentId,
+                finalContentType,
+                collectionType
+            )
+            .then(result => ({ ...result, shelfId })) // Pass shelfId along for context in success
+            .catch(error => ({ status: 'error', message: error?.message || "Unknown error", shelfId })) // Catch and format errors
         );
 
-        // Handle the Result based on status
-        if (addResult.status === 'success') {
-            // Get the shelf name if possible - Requires access to shelves state again, re-add if needed or simplify toast
-            // const selectedShelf = shelves.find(shelf => shelf.shelf_id === selectedShelfId);
-            // const shelfName = selectedShelf ? selectedShelf.title : "shelf";
-            // toast.success(`Item added to ${shelfName}`);
-            toast.success(`Item added to shelf`); // Simplified toast
-        } else {
-            // Show the specific error from the backend
-            toast.error(`Failed to add item: ${addResult.message}`);
-        }
+        // Wait for all attempts to settle
+        const results = await Promise.allSettled(addPromises);
+
+        // Process results and show individual toasts
+        results.forEach(result => {
+            let shelfId: string | undefined;
+            let shelfName = 'selected shelf';
+
+            if (result.status === 'fulfilled') {
+                shelfId = result.value.shelfId;
+                const shelfInfo = shelfDetailsMap.get(shelfId);
+                shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`; 
+
+                if (result.value.status === 'success') {
+                    toast.success(`Successfully added ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}'.`);
+                } else if (result.value.status === 'error') {
+                    toast.error(`Failed to add ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}': ${result.value.message}`);
+                } else {
+                    console.warn("Unexpected fulfilled status:", result.value);
+                    toast.error(`An unexpected issue occurred when adding to '${shelfName}'.`);
+                }
+            } else { // result.status === 'rejected'
+                const reason = result.reason as any;
+                shelfId = reason?.shelfId;
+                const shelfInfo = shelfId ? shelfDetailsMap.get(shelfId) : undefined;
+                shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`; 
+                const errorMessage = reason?.message || reason?.toString() || "An unknown error occurred";
+                toast.error(`Failed to add ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}': ${errorMessage}`);
+            }
+        });
 
     } catch (error) {
         console.error("[UnifiedCardActions] Error during background add-to-shelf process:", error);
-        // Avoid double-toasting if mint/add already toasted
+        // Avoid double-toasting if minting failed and threw
         if (!(error instanceof Error && error.message === "Minting failed")) {
-           toast.error(error instanceof Error ? error.message : "An unexpected error occurred while adding the item.");
+           toast.error(error instanceof Error ? error.message : "An unexpected error occurred while adding the item(s).");
         }
     } finally {
         setIsProcessingAddToShelf(false); // Indicate background processing finished
-        setAddToShelfContext(null); // Clear context, dialog is already closed
+        setAddToShelfContext(null); // Clear context
     }
   };
 
@@ -238,6 +280,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
           onConfirmSelection={processAddToShelfInBackground}
           onClose={() => {
             setAddToShelfContext(null);
+            setIsProcessingAddToShelf(false); // Ensure spinner stops if closed early
           }}
           onCreateShelf={createShelf}
         />

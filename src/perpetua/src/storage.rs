@@ -110,8 +110,8 @@ const FOLLOWED_TAGS_MEM_ID: MemoryId = MemoryId::new(17);
 pub const MAX_ITEMS_PER_SHELF: usize = 500;
 pub const MAX_APPEARS_IN_COUNT: usize = 100; // Keep this if relevant elsewhere
 // --- Define new constants ---
-pub const MAX_TAG_LENGTH: usize = 50; // Adjusted max tag length
-pub const MAX_TAGS_PER_SHELF: usize = 10; // Adjusted max tags per shelf
+pub const MAX_TAG_LENGTH: usize = 25; // Adjusted max tag length
+pub const MAX_TAGS_PER_SHELF: usize = 3; // Adjusted max tags per shelf
 pub const MAX_NFT_ID_LENGTH: usize = 100; // Max length for NFT IDs
 pub const MAX_MARKDOWN_LENGTH: usize = 10_000; // Max length for Markdown content
 
@@ -560,19 +560,14 @@ pub fn validate_tag_format(tag: &NormalizedTag) -> Result<(), String> {
         return Err(format!("Tag exceeds maximum length of {}", MAX_TAG_LENGTH));
     }
     
-    // Check for whitespace (shouldn't happen after normalization, but good check)
-    if tag.chars().any(|c| c.is_whitespace()) {
-        return Err("Tags cannot contain whitespace".to_string());
+    // Check for non-alphanumeric characters (stricter)
+    if !tag.chars().all(|c| c.is_alphanumeric()) {
+        return Err("Tags can only contain letters (a-z, A-Z) and numbers (0-9)".to_string());
     }
     
-    // Check for control characters
-    if tag.chars().any(|c| c.is_control()) {
-        return Err("Tags cannot contain control characters".to_string());
-    }
-    
-    // Ensure tag has at least one visible character
-    if tag.is_empty() || tag.chars().all(|c| !c.is_alphanumeric()) {
-        return Err("Tags must contain at least one alphanumeric character".to_string());
+    // Ensure tag is not empty (already covered by alphanumeric check, but good practice)
+    if tag.is_empty() {
+         return Err("Tag cannot be empty".to_string());
     }
     
     Ok(())

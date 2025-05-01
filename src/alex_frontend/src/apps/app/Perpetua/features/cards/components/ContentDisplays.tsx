@@ -79,17 +79,11 @@ export const MarkdownContentDisplay = ({
       parentShelfId={parentShelfId}
       itemId={itemId}
       currentShelfId={currentShelfId}
-      footer={
-        <div className="flex flex-wrap items-center gap-1 font-serif">
-          <Badge variant="outline" className="text-[10px] py-0.5 px-1">Markdown</Badge>
-          <Badge variant="outline" className="text-[10px] py-0.5 px-1 max-w-[150px] truncate">{preview}</Badge>
-        </div>
-      }
     >
-      <div className="relative w-full h-full">
-        <div className="w-full h-full flex items-center justify-center overflow-hidden">
-          <div className="p-4 prose dark:prose-invert max-w-none line-clamp-6 font-serif">
-            {content}
+      <div className="relative w-full h-full overflow-hidden">
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full overflow-auto">
+            <MarkdownRenderer content={content} className="bg-transparent shadow-none text-sm" />
           </div>
         </div>
       </div>

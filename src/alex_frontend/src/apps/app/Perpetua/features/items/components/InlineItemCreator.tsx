@@ -15,6 +15,9 @@ import { loadShelves } from "@/apps/app/Perpetua/state";
 import { useIdentity } from "@/hooks/useIdentity";
 import AlexandrianSelector from "./AlexandrianSelector";
 
+// Define the character limit constant
+const MAX_MARKDOWN_LENGTH = 10000;
+
 type ContentType = "Markdown" | "Nft" | "Shelf";
 
 interface InlineItemCreatorProps {
@@ -247,12 +250,12 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
                 className="min-h-[300px] w-full font-serif"
                 value={content}
                 onChange={handleSetContent}
-                placeholder="# Title
-                
-## Subtitle
-                
-Your content here..."
+                placeholder={`# Title\n\n## Subtitle\n\n- Use lists for points\n- Another list item\n\n**Bold text** or *italic text*.\n\n[Link example](https://example.com)\n\nYour content here...`}
+                maxLength={MAX_MARKDOWN_LENGTH}
               />
+              <div className="text-right text-xs text-muted-foreground mt-1 font-serif">
+                {content.length} / {MAX_MARKDOWN_LENGTH}
+              </div>
             </div>
             <div className="p-4 mt-auto border-t border-border flex justify-between">
               <Button onClick={onCancel} variant="outline">Cancel</Button>

@@ -72,7 +72,7 @@ export const TagsSection: React.FC<TagsSectionProps> = ({
                 placeholder={tags.length >= MAX_TAGS ? "Tag limit reached" : "Add a tag"}
                 className={`pr-16 ${tags.length >= MAX_TAGS ? "opacity-50" : ""} font-serif`}
                 disabled={tags.length >= MAX_TAGS || isAddingTag || !!removingTagId}
-                maxLength={MAX_TAG_LENGTH + 5}
+                maxLength={MAX_TAG_LENGTH}
               />
               <Button 
                 type="button" 

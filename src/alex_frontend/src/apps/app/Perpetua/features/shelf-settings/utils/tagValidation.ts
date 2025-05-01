@@ -1,6 +1,6 @@
 // Constants based on backend rules
 export const MAX_TAGS = 3;
-export const MAX_TAG_LENGTH = 10;
+export const MAX_TAG_LENGTH = 25;
 
 // Tag validation rules from backend
 export interface TagValidationResult {

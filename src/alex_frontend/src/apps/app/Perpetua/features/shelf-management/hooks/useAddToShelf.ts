@@ -4,7 +4,6 @@ import { useContentPermissions } from "@/apps/app/Perpetua/hooks/useContentPermi
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { selectUserShelves, selectLoading, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
-import { toast } from "sonner";
 import { Principal } from "@dfinity/principal";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { useIdentity } from "@/hooks/useIdentity";

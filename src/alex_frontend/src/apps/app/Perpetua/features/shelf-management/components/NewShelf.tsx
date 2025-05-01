@@ -25,6 +25,9 @@ export interface ShelfFormProps {
   inline?: boolean;
 }
 
+const MAX_TITLE_LENGTH = 100;
+const MAX_DESCRIPTION_LENGTH = 500;
+
 export const ShelfForm: React.FC<ShelfFormProps> = ({
   title,
   setTitle,
@@ -34,29 +37,48 @@ export const ShelfForm: React.FC<ShelfFormProps> = ({
   onSubmit,
   inline = false
 }) => {
+  const titleLength = title.length;
+  const descriptionLength = description.length;
+
   return (
     <div className={inline ? "" : "space-y-6"}>
       <div className="space-y-2">
-        <Label htmlFor="title">Title</Label>
+        <div className="flex justify-between items-center">
+          <Label htmlFor="title">Title</Label>
+          <span className={`text-xs ${titleLength > MAX_TITLE_LENGTH ? 'text-red-500' : 'text-muted-foreground'}`}>
+            {titleLength}/{MAX_TITLE_LENGTH}
+          </span>
+        </div>
         <Input
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Shelf Title"
+          placeholder="Ideas worth sharing..."
+          maxLength={MAX_TITLE_LENGTH}
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+         <div className="flex justify-between items-center">
+            <Label htmlFor="description">Description</Label>
+            <span className={`text-xs ${descriptionLength > MAX_DESCRIPTION_LENGTH ? 'text-red-500' : 'text-muted-foreground'}`}>
+              {descriptionLength}/{MAX_DESCRIPTION_LENGTH}
+            </span>
+         </div>
         <Textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Description"
           className="min-h-[100px]"
+          maxLength={MAX_DESCRIPTION_LENGTH}
         />
       </div>
       {!inline && onSubmit && (
-        <Button onClick={onSubmit} className="w-full sm:w-auto">
+        <Button
+          onClick={onSubmit}
+          className="w-full sm:w-auto"
+          disabled={titleLength === 0 || titleLength > MAX_TITLE_LENGTH || descriptionLength > MAX_DESCRIPTION_LENGTH}
+        >
           {submitLabel}
         </Button>
       )}
@@ -76,7 +98,7 @@ const NewShelfDialog: React.FC<NewShelfDialogProps> = ({ isOpen, onClose, onSubm
   };
 
   const handleSubmit = async () => {
-    if (!title.trim() || isLoading) return;
+    if (!title.trim() || isLoading || title.length > MAX_TITLE_LENGTH || description.length > MAX_DESCRIPTION_LENGTH) return;
 
     setIsLoading(true);
 
@@ -117,7 +139,10 @@ const NewShelfDialog: React.FC<NewShelfDialogProps> = ({ isOpen, onClose, onSubm
         />
         
         <DialogFooter>
-          <Button onClick={handleSubmit} disabled={!title.trim() || isLoading}>
+          <Button
+            onClick={handleSubmit}
+            disabled={!title.trim() || isLoading || title.length > MAX_TITLE_LENGTH || description.length > MAX_DESCRIPTION_LENGTH}
+          >
             {isLoading ? "Creating..." : "Create"}
           </Button>
         </DialogFooter>
