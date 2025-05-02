@@ -1,0 +1,27 @@
+WARN: Cannot fetch Candid interface for backup_get_followed_users, sending arguments with inferred types.
+(
+  record {
+    1_113_806_378 = vec {
+      record {
+        principal "2spk5-ajww7-53l5p-mcmmn-eqyw4-a4xce-qdr4m-ee46q-qc3d5-c47st-uqe";
+        vec {
+          principal "nixig-flniw-flb7m-uvuxw-b62zk-mwxku-ozffc-arwb4-tyvjl-rp23u-oqe";
+        };
+      };
+      record {
+        principal "nixig-flniw-flb7m-uvuxw-b62zk-mwxku-ozffc-arwb4-tyvjl-rp23u-oqe";
+        vec {
+          principal "e2mqm-f5kv2-wacvn-7sjl2-4wmrn-zumo5-l4g2v-ac752-2vgow-tnd7c-qae";
+        };
+      };
+      record {
+        principal "mii24-jfmgd-hb5qx-z3zji-6vcpp-62tox-udazu-newqc-azuoz-6tcvb-2ae";
+        vec {
+          principal "e2mqm-f5kv2-wacvn-7sjl2-4wmrn-zumo5-l4g2v-ac752-2vgow-tnd7c-qae";
+          principal "2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe";
+        };
+      };
+    };
+    3_622_570_708 = 3 : nat64;
+  },
+)

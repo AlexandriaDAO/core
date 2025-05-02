@@ -2,7 +2,7 @@ use ic_cdk::{self, init, spawn};
 use candid::{Principal, Nat};
 use std::time::Duration;
 
-use crate::query::ShelfPublic;
+use crate::query::follows::ShelfPublic;
 
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
 pub const ICRC7_SCION_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
@@ -32,7 +32,11 @@ pub mod update {
     pub mod tags;
     pub mod follow;
 }
-pub mod query;
+pub mod query {
+    pub mod shelves;
+    pub mod follows;
+    pub mod backups;
+}
 pub mod utils;
 pub mod types;
 
@@ -46,17 +50,23 @@ pub use update::item::{
 pub use update::access::{add_shelf_editor, remove_shelf_editor, list_shelf_editors};
 pub use update::profile::{reorder_profile_shelf, reset_profile_order};
 pub use update::tags::{TagOperationInput, add_tag_to_shelf, remove_tag_from_shelf};
-pub use query::{
-    get_shelf, get_shelf_items, get_user_shelves, get_recent_shelves, 
-    get_shelf_position_metrics, 
-    get_shelves_by_tag, get_tag_shelf_count, get_popular_tags, get_tags_with_prefix,
+pub use query::follows::{
+    get_tag_shelf_count, get_popular_tags, get_tags_with_prefix,
+    get_my_followed_tags, get_my_followed_users,
     QueryResult, QueryError,
-    ShelfPositionMetrics,
     OffsetPaginationInput,
     CursorPaginationInput,
     OffsetPaginatedResult,
-    CursorPaginatedResult
+    CursorPaginatedResult,
 };
+pub use query::shelves::{
+    get_shelf, get_shelf_items, get_shelf_position_metrics, get_shelves_by_tag,
+    get_shelves_containing_nft,
+    get_user_shelves, get_recent_shelves,
+    get_followed_users_feed, get_followed_tags_feed,
+    ShelfPositionMetrics
+};
+pub use query::backups::*;
 pub use update::follow::*;
 
 #[init]

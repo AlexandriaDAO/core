@@ -1,0 +1,2 @@
+WARN: Cannot fetch Candid interface for backup_get_user_profile_orders, sending arguments with inferred types.
+(record { 1_113_806_378 = vec {}; 3_622_570_708 = 0 : nat64 })

@@ -1,5 +1,4 @@
 Before next mainnet push:
-- Perpetua
 
 
 

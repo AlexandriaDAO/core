@@ -231,20 +231,40 @@ thread_local! {
 
 // --- Serializable version of Shelf --- Must derive CandidType and Deserialize
 #[derive(CandidType, Deserialize, Clone, Debug)]
-struct ShelfSerializable {
+pub struct ShelfSerializable {
+    // Keep fields private unless explicitly needed public
     shelf_id: ShelfId,
     title: String,
     description: Option<String>,
     owner: Principal,
     editors: Vec<Principal>,
     items: BTreeMap<u32, Item>,
-    // Store positions as a Vec for serialization
-    item_positions: Vec<(u32, f64)>, 
+    item_positions: Vec<(u32, f64)>,
     created_at: u64,
     updated_at: u64,
     appears_in: Vec<ShelfId>,
     tags: Vec<NormalizedTag>,
     is_public: bool,
+}
+
+impl ShelfSerializable {
+    // Public constructor method
+    pub fn from_shelf(shelf: &Shelf) -> Self {
+        Self {
+            shelf_id: shelf.shelf_id.clone(),
+            title: shelf.title.clone(),
+            description: shelf.description.clone(),
+            owner: shelf.owner.clone(),
+            editors: shelf.editors.clone(),
+            items: shelf.items.clone(),
+            item_positions: shelf.item_positions.get_ordered_entries(),
+            created_at: shelf.created_at,
+            updated_at: shelf.updated_at,
+            appears_in: shelf.appears_in.clone(),
+            tags: shelf.tags.clone(),
+            is_public: shelf.is_public,
+        }
+    }
 }
 
 // --- Main Shelf struct using PositionTracker --- 
@@ -355,10 +375,20 @@ impl Storable for TimestampedShelves {
 
 // --- Serializable version of UserProfileOrder --- Must derive CandidType and Deserialize
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
-struct UserProfileOrderSerializable {
-    // Store positions as a Vec for serialization
+pub struct UserProfileOrderSerializable {
+    // Keep fields private unless explicitly needed public
     shelf_positions: Vec<(ShelfId, f64)>,
     is_customized: bool,
+}
+
+impl UserProfileOrderSerializable {
+     // Public constructor method
+     pub fn from_uop(uop: &UserProfileOrder) -> Self {
+         Self {
+             shelf_positions: uop.shelf_positions.get_ordered_entries(),
+             is_customized: uop.is_customized,
+         }
+     }
 }
 
 // --- Main UserProfileOrder struct using PositionTracker ---

@@ -1,0 +1,107 @@
+WARN: Cannot fetch Candid interface for backup_get_user_shelves, sending arguments with inferred types.
+(
+  record {
+    1_113_806_378 = vec {
+      record {
+        principal "xjrkz-kzwab-n35mh-2hbfc-mvbgt-olflt-hpher-72d4r-6av7g-6oij4-zqe";
+        vec {
+          record {
+            1_745_613_214_791_625_298 : nat64;
+            "2zhTjiYHvyLRz6kvYgM9dpeu7tGwwDdEypkrJii4HBt8";
+          };
+        };
+      };
+      record {
+        principal "n3br6-rkkdh-5jcq7-pbwsx-yeqm7-jbzqi-54j4d-3isk3-js4sp-vqct5-rae";
+        vec {
+          record {
+            1_746_104_805_235_079_492 : nat64;
+            "8zqPtvTEVXcuiw24oHAUHpoUFMQVMtTEVnpvxK2hDAUs";
+          };
+          record {
+            1_746_105_467_847_665_562 : nat64;
+            "G9AXjKNxnx7G8Hvri6Ag43f5svMLtUakDXcBotztTz71";
+          };
+          record {
+            1_746_105_566_436_744_920 : nat64;
+            "Ahbk182YRyp3sQpNTLaLT65EMjYnorffDby3eGdBcdhP";
+          };
+          record {
+            1_746_105_784_634_824_551 : nat64;
+            "4g9ReQRuS4Cw2znVtQTUjtxwSCynsUjn4BdERQ4copUK";
+          };
+          record {
+            1_746_105_998_956_736_559 : nat64;
+            "6q4LKScC2KHrJxyLYNKTjdtjkxqgAMvEYTNfrVRnLUL4";
+          };
+        };
+      };
+      record {
+        principal "nixig-flniw-flb7m-uvuxw-b62zk-mwxku-ozffc-arwb4-tyvjl-rp23u-oqe";
+        vec {
+          record {
+            1_745_524_700_934_314_792 : nat64;
+            "BGR8L8KHthf84Lte5pE41ZeyTJGCovYwJdfVzLrCPG6m";
+          };
+          record {
+            1_745_524_701_800_171_086 : nat64;
+            "Fd2BHoGHjK12JaNfPFaTheRtdEFnYfJTPEegZi8w9M6Y";
+          };
+          record {
+            1_745_524_705_261_454_388 : nat64;
+            "642tzTpSbiH6CYc6i4DJiGAdk4j66zYuauUiJwwemgco";
+          };
+        };
+      };
+      record {
+        principal "2zf7e-ctv4z-lbpwc-an3f4-u53uo-wcam7-pur4v-2clio-s7isj-eehzy-mqe";
+        vec {
+          record {
+            1_745_424_574_425_080_110 : nat64;
+            "6wabDv8oaRE4xHmFQoWBmWz32StJ7UZLgVRK9UrMPGfc";
+          };
+        };
+      };
+      record {
+        principal "hlmbu-xmzcn-l526t-yyfet-xf2ix-hyo66-ter6l-pu2ad-6flhh-icaxp-iae";
+        vec {
+          record {
+            1_745_854_952_504_891_794 : nat64;
+            "C9wirm5qJ9R2zGdHMzNLrYQQvujBHq8hd9LqW1qURjSY";
+          };
+        };
+      };
+      record {
+        principal "e2mqm-f5kv2-wacvn-7sjl2-4wmrn-zumo5-l4g2v-ac752-2vgow-tnd7c-qae";
+        vec {
+          record {
+            1_745_495_436_113_842_269 : nat64;
+            "Crdg3ZT5TVXxffwQWfETv9p5MWtAT5a7TGDCWrqP1wmT";
+          };
+          record {
+            1_745_495_651_019_416_426 : nat64;
+            "9sTDJPuYtvUZUD9D8v3DnZA45dWWhbitrhDgjKkt9BTJ";
+          };
+          record {
+            1_745_495_686_996_156_946 : nat64;
+            "HTZ5osbgCtcsHG2G2jkcu6v4poPNQjEWmV3D4SqVDKNi";
+          };
+        };
+      };
+      record {
+        principal "mii24-jfmgd-hb5qx-z3zji-6vcpp-62tox-udazu-newqc-azuoz-6tcvb-2ae";
+        vec {
+          record {
+            1_745_550_671_160_816_825 : nat64;
+            "2G8s16z5ekRUDwjeMTTivNu6HeXY4eTuwKtWD4Q6S5kv";
+          };
+        };
+      };
+      record {
+        principal "2ljyd-77i5g-ix222-szy7a-ru4cu-ns4j7-kxc2z-oazam-igx3u-uwee6-yqe";
+        vec { record { 1_745_421_921_587_075_390 : nat64; "HzVrmFAhMygbJU18eH3efsnVMv3goTkvAuTXsEHP8A3s";}; record { 1_745_421_923_479_793_038 : nat64; "H4nmtF3muZRkBywk3d6cz4aRswGPG4AcWTogrSbZyBzR";}; record { 1_745_422_317_567_742_575 : nat64; "3vLXnHNMsAaWYpeZCmZAecZjBLTK7abidJTaQgG9SrQG";}; record { 1_745_422_653_900_972_106 : nat64; "EftDzyvxT3PEaHV1m4MoirxewggiFm435M8JKVamQ2VA";}; record { 1_745_422_666_618_066_677 : nat64; "DqQHA124wPqT9XZpPvXX4faE5qzKWnGWHg9Y7MvEwGEj";}; record { 1_745_422_811_867_901_746 : nat64; "ADzetaV9MAQbXFbVmzen7Ra8r6HDgkAjihM3yrAkAX7F";}; record { 1_745_604_848_789_260_424 : nat64; "DskUBCu1mLPJrHkRkqRfY749HQ3JxtUd7kiLwKFQXjzC";}; record { 1_746_017_498_927_311_546 : nat64; "9CdxwVHXEL9VZKSwjPzM1Ajb1mbPCuJyqr45psgmD3dX";}; record { 1_746_018_070_487_263_137 : nat64; "CXEUJmbNtJnzzmFG54xYM5kXeAzcHX1Xf1aVGQEAR3Uc";}; record { 1_746_018_257_421_632_451 : nat64; "BPyeHSSZHYUgug7VednjFyCW5p6rcyNwPeB92enkR5D4";}; record { 1_746_018_307_241_885_899 : nat64; "z5P2dZ1PSQZcH9ja5xBA2LNXgZ1VhhJMyXHKWHJ4R94";}; record { 1_746_018_359_202_410_462 : nat64; "653EarYRB5fZio6voH7LpnXPpYCmgjaHi99spVZfmGod";}; record { 1_746_018_889_489_372_786 : nat64; "GKSyJUNUd9HRVTHRiQ6frg9WktX7wJbLo6HcqsSSy4CT";}; record { 1_746_019_283_689_218_169 : nat64; "9eWesmQQdgg4vkmaXJWeqPo6WWtf3MKvU8gDjYg36bwX";};};
+      };
+    };
+    3_622_570_708 = 8 : nat64;
+  },
+)

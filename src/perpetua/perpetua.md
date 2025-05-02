@@ -299,7 +299,7 @@ id_convert.ts.
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 3sfuz-25qob-k6nmf-cvrmm-vdesm-ngb2o-gpvnb-kgzhi-evt3o-ktmoo-cae)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 5fdik-5kn6x-zecnz-lsigd-mfvtg-blh6n-p7mgt-i77y3-qlx4t-rlrez-tae)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua
