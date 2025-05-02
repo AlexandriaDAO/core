@@ -3,18 +3,17 @@ Perpetua/
 ├── features/
 │   ├── cards/
 │   │   ├── components/
-│   │   │   ├── BaseShelfList.tsx (475 lines)
-│   │   │   ├── ContentDisplays.tsx (103 lines)
-│   │   │   ├── NftDisplay.tsx (298 lines)
+│   │   │   ├── BaseShelfList.tsx (490 lines)
+│   │   │   ├── ContentDisplays.tsx (92 lines)
+│   │   │   ├── NftDisplay.tsx (152 lines)
 │   │   │   ├── ShelfBlogView.tsx (191 lines)
-│   │   │   ├── ShelfCard.tsx (346 lines)
-│   │   │   ├── ShelfCardActionMenu.tsx (225 lines)
-│   │   │   ├── ShelfContentCard.tsx (135 lines)
+│   │   │   ├── ShelfCard.tsx (348 lines)
+│   │   │   ├── ShelfContentCard.tsx (174 lines)
 │   │   │   ├── ShelfContentModal.tsx (79 lines)
-│   │   │   ├── ShelfDetailView.tsx (227 lines)
+│   │   │   ├── ShelfDetailView.tsx (229 lines)
 │   │   │   ├── ShelfEmptyView.tsx (32 lines)
 │   │   │   ├── ShelfGridView.tsx (57 lines)
-│   │   │   ├── ShelfViewControls.tsx (127 lines)
+│   │   │   ├── ShelfViewControls.tsx (239 lines)
 │   │   │   ├── ShelfViewHeader.tsx (92 lines)
 │   │   │   └── index.ts (9 lines)
 │   │   ├── hooks/
@@ -24,16 +23,10 @@ Perpetua/
 │   │       └── ShelfViewUtils.ts (32 lines)
 │   ├── following/
 │   │   ├── components/
-│   │   │   ├── FollowedTagsList.tsx (112 lines)
-│   │   │   └── FollowedUsersList.tsx (105 lines)
+│   │   │   ├── FollowedTagsList.tsx (102 lines)
+│   │   │   └── FollowedUsersList.tsx (94 lines)
 │   │   └── hooks/
 │   │       └── useFollowStatus.ts (160 lines)
-│   ├── items/
-│   │   ├── components/
-│   │   │   ├── AlexandrianSelector.tsx (84 lines)
-│   │   │   └── InlineItemCreator.tsx (408 lines)
-│   │   └── hooks/
-│   │       └── useItemActions.tsx (112 lines)
 │   ├── shared/
 │   │   └── reordering/
 │   │       ├── components/
@@ -45,7 +38,7 @@ Perpetua/
 │   │       ├── hooks/
 │   │       │   ├── index.ts (4 lines)
 │   │       │   ├── useDragAndDrop.ts (111 lines)
-│   │       │   ├── useItemReordering.ts (77 lines)
+│   │       │   ├── useItemReordering.ts (90 lines)
 │   │       │   ├── useReorderable.ts (142 lines)
 │   │       │   └── useShelfReordering.ts (69 lines)
 │   │       └── utils/
@@ -56,19 +49,19 @@ Perpetua/
 │   │       └── CollaboratorsList.tsx (186 lines)
 │   ├── shelf-management/
 │   │   ├── components/
-│   │   │   ├── NewShelf.tsx (104 lines)
+│   │   │   ├── NewShelf.tsx (154 lines)
 │   │   │   ├── RemoveItemButton.tsx (98 lines)
-│   │   │   ├── ShelfContent.tsx (80 lines)
+│   │   │   ├── ShelfContent.tsx (90 lines)
 │   │   │   ├── ShelfOption.tsx (31 lines)
-│   │   │   └── ShelfSelectionDialog.tsx (158 lines)
+│   │   │   └── ShelfSelectionDialog.tsx (328 lines)
 │   │   ├── containers/
-│   │   │   ├── ShelfDetailContainer.tsx (161 lines)
-│   │   │   └── ShelfLists.tsx (248 lines)
+│   │   │   ├── ShelfDetailContainer.tsx (168 lines)
+│   │   │   └── ShelfLists.tsx (251 lines)
 │   │   └── hooks/
 │   │       ├── index.ts (4 lines)
 │   │       ├── useAddToShelf.ts (120 lines)
 │   │       ├── usePublicShelfOperations.ts (62 lines)
-│   │       └── useShelfOperations.ts (220 lines)
+│   │       └── useShelfOperations.ts (231 lines)
 │   ├── shelf-settings/
 │   │   ├── components/
 │   │   │   ├── CollaboratorsTab.tsx (40 lines)
@@ -92,16 +85,16 @@ Perpetua/
 │       │   ├── TagFilterDisplay.tsx (38 lines)
 │       │   └── TagSearchBar.tsx (106 lines)
 │       ├── containers/
-│       │   └── FilteredShelfListContainer.tsx (111 lines)
+│       │   └── FilteredShelfListContainer.tsx (113 lines)
 │       ├── hooks/
 │       │   ├── useTagActions.ts (51 lines)
 │       │   └── useTagData.ts (37 lines)
 │       └── index.ts (1 lines)
 ├── hooks/
-│   └── useContentPermissions.ts (75 lines)
+│   └── useContentPermissions.ts (74 lines)
 ├── index.tsx (21 lines)
 ├── layouts/
-│   └── PerpetuaLayout.tsx (287 lines)
+│   └── PerpetuaLayout.tsx (292 lines)
 ├── routes.ts (119 lines)
 ├── state/
 │   ├── cache/
@@ -109,29 +102,44 @@ Perpetua/
 │   ├── hooks/
 │   │   ├── index.ts (3 lines)
 │   │   ├── usePerpetuaActions.ts (169 lines)
-│   │   └── usePerpetuaSelectors.ts (62 lines)
+│   │   └── usePerpetuaSelectors.ts (59 lines)
 │   ├── index.ts (46 lines)
-│   ├── perpetuaSlice.ts (898 lines)
+│   ├── perpetuaSlice.ts (937 lines)
 │   ├── services/
 │   │   ├── followService.ts (276 lines)
 │   │   ├── index.ts (7 lines)
-│   │   ├── itemService.ts (201 lines)
+│   │   ├── itemService.ts (209 lines)
 │   │   ├── serviceTypes.ts (39 lines)
 │   │   ├── shelfService.ts (357 lines)
 │   │   └── tagService.ts (306 lines)
 │   ├── thunks/
 │   │   ├── collaborationThunks.ts (110 lines)
 │   │   ├── index.ts (7 lines)
-│   │   ├── itemThunks.ts (100 lines)
+│   │   ├── itemThunks.ts (117 lines)
 │   │   ├── queryThunks.ts (268 lines)
 │   │   ├── reorderThunks.ts (128 lines)
+│   │   ├── shelfThunks.ts (125 lines)
+├── types/
+│   ├── reordering.types.ts (69 lines)
+│   └── shelf.types.ts (74 lines)
+└── utils.tsx (128 lines)
 ```
 
 
 
+
+
+
+
+
+- Adding to public shelves actually can't be done at all right now.
+  - We probably need a search engine in the backend?
+
+
+- Shelf-type item needs better display with its actual name. It should be like the main page display.
 - Need a my Library area that takes you to your profile page, and the New Shelf button should be there.
 - Need a public search for the create shelf option (and consider how this'll work with duplicate names.)
-
+- Popular tags display proportional to size. & Show existing popular tabs when people go to add tags (use the existing search engine.).
 
 
 - Use 'appears in' in NFT fullscreen modal. (this will guide how the next one should look.)

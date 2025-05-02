@@ -627,6 +627,7 @@
 │   │   │   │   ├── AlexWalletActor.tsx (36 lines)
 │   │   │   │   ├── AssetCanisterActor.tsx (36 lines)
 │   │   │   │   ├── AssetManagerActor.tsx (36 lines)
+│   │   │   │   ├── EmporiumActor.tsx (36 lines)
 │   │   │   │   ├── IcpLedgerActor.tsx (36 lines)
 │   │   │   │   ├── IcpSwapActor.tsx (36 lines)
 │   │   │   │   ├── Icrc7Actor.tsx (36 lines)
@@ -637,20 +638,21 @@
 │   │   │   │   ├── TokenomicsActor.tsx (36 lines)
 │   │   │   │   ├── UserActor.tsx (81 lines)
 │   │   │   │   ├── VetkdActor.tsx (36 lines)
-│   │   │   │   └── index.tsx (15 lines)
+│   │   │   │   └── index.tsx (16 lines)
 │   │   │   ├── apps/
 │   │   │   │   ├── Modules/
 │   │   │   │   │   ├── AppModules/
 │   │   │   │   │   │   ├── alexandrian/
 │   │   │   │   │   │   │   └── services/
 │   │   │   │   │   │   ├── blinks/
-│   │   │   │   │   │   │   └── SingleTokenView.tsx (412 lines)
+│   │   │   │   │   │   │   └── SingleTokenView.tsx (447 lines)
 │   │   │   │   │   │   ├── contentGrid/
-│   │   │   │   │   │   │   ├── Card.tsx (263 lines)
-│   │   │   │   │   │   │   ├── Grid.tsx (257 lines)
+│   │   │   │   │   │   │   ├── Card.tsx (93 lines)
+│   │   │   │   │   │   │   ├── Grid.tsx (227 lines)
 │   │   │   │   │   │   │   ├── components/
-│   │   │   │   │   │   │   │   ├── NftDataFooter.tsx (198 lines)
-│   │   │   │   │   │   │   │   └── TransactionDetails.tsx (103 lines)
+│   │   │   │   │   │   │   │   └── TransactionDetails.tsx (442 lines)
+│   │   │   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   │   │   └── useContentCardState.ts (196 lines)
 │   │   │   │   │   │   │   └── utils/
 │   │   │   │   │   │   │       ├── clipboard.ts (9 lines)
 │   │   │   │   │   │   │       └── formatters.ts (54 lines)
@@ -659,27 +661,30 @@
 │   │   │   │   │   │   ├── safeRender/
 │   │   │   │   │   │   │   ├── ContentFetcher.tsx (89 lines)
 │   │   │   │   │   │   │   ├── ContentRenderer.tsx (69 lines)
-│   │   │   │   │   │   │   ├── ContentTypeMap.tsx (458 lines)
-│   │   │   │   │   │   │   ├── ContentValidator.tsx (129 lines)
+│   │   │   │   │   │   │   ├── ContentTypeMap.tsx (472 lines)
+│   │   │   │   │   │   │   ├── ContentValidator.tsx (93 lines)
 │   │   │   │   │   │   │   ├── SandboxRenderer.tsx (35 lines)
 │   │   │   │   │   │   │   ├── fileIcons.tsx (12 lines)
 │   │   │   │   │   │   │   └── types/
 │   │   │   │   │   │   │       └── index.ts (27 lines)
-│   │   │   │   │   │   └── search/
-│   │   │   │   │   │       ├── NsfwSelector.tsx (72 lines)
-│   │   │   │   │   │       ├── SearchForm.tsx (37 lines)
-│   │   │   │   │   │       ├── hooks/
-│   │   │   │   │   │       │   └── useSearchHandlers.ts (52 lines)
-│   │   │   │   │   │       └── selectors/
-│   │   │   │   │   │           ├── AmountSelector.tsx (44 lines)
-│   │   │   │   │   │           ├── ArweaveOwnerSelector.tsx (48 lines)
-│   │   │   │   │   │           ├── ContentCategorySelector.tsx (48 lines)
-│   │   │   │   │   │           ├── ContentTagsSelector.tsx (168 lines)
-│   │   │   │   │   │           └── DateSelector.tsx (177 lines)
+│   │   │   │   │   │   ├── search/
+│   │   │   │   │   │   │   ├── NsfwSelector.tsx (72 lines)
+│   │   │   │   │   │   │   ├── SearchForm.tsx (37 lines)
+│   │   │   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   │   │   └── useSearchHandlers.ts (52 lines)
+│   │   │   │   │   │   │   └── selectors/
+│   │   │   │   │   │   │       ├── AmountSelector.tsx (44 lines)
+│   │   │   │   │   │   │       ├── ArweaveOwnerSelector.tsx (48 lines)
+│   │   │   │   │   │   │       ├── ContentCategorySelector.tsx (48 lines)
+│   │   │   │   │   │   │       ├── ContentTagsSelector.tsx (168 lines)
+│   │   │   │   │   │   │       └── DateSelector.tsx (177 lines)
+│   │   │   │   │   │   └── shared/
+│   │   │   │   │   │       └── components/
+│   │   │   │   │   │           └── ShelvesPreloader.tsx (46 lines)
 │   │   │   │   │   ├── LibModules/
 │   │   │   │   │   │   ├── arweaveSearch/
 │   │   │   │   │   │   │   ├── api/
-│   │   │   │   │   │   │   │   ├── arweaveApi.ts (94 lines)
+│   │   │   │   │   │   │   │   ├── arweaveApi.ts (82 lines)
 │   │   │   │   │   │   │   │   ├── arweaveClient.ts (227 lines)
 │   │   │   │   │   │   │   │   ├── arweaveHelpers.ts (42 lines)
 │   │   │   │   │   │   │   │   ├── directArweaveClient.ts (80 lines)
@@ -705,14 +710,15 @@
 │   │   │   │   │       │   ├── AssetManager.tsx (127 lines)
 │   │   │   │   │       │   ├── ContentTypeToggleGroup.tsx (45 lines)
 │   │   │   │   │       │   ├── NftDisplay/
-│   │   │   │   │       │   │   ├── NftDisplay.tsx (364 lines)
-│   │   │   │   │       │   │   ├── NftFooter.tsx (142 lines)
-│   │   │   │   │       │   │   ├── index.tsx (15 lines)
+│   │   │   │   │       │   │   ├── NftDisplay.tsx (283 lines)
+│   │   │   │   │       │   │   ├── index.tsx (12 lines)
 │   │   │   │   │       │   │   └── types.ts (44 lines)
 │   │   │   │   │       │   ├── PrincipalDisplay.tsx (38 lines)
 │   │   │   │   │       │   ├── SearchContainer.tsx (169 lines)
-│   │   │   │   │       │   ├── TensorFlowPreloader.tsx (92 lines)
-│   │   │   │   │       │   └── TopupBalanceWarning.tsx (44 lines)
+│   │   │   │   │       │   ├── TensorFlowPreloader.tsx (87 lines)
+│   │   │   │   │       │   ├── TopupBalanceWarning.tsx (44 lines)
+│   │   │   │   │       │   └── UnifiedCardActions/
+│   │   │   │   │       │       └── UnifiedCardActions.tsx (293 lines)
 │   │   │   │   │       ├── hooks/
 │   │   │   │   │       │   ├── getNftData.ts (94 lines)
 │   │   │   │   │       │   ├── index.ts (8 lines)
@@ -720,14 +726,14 @@
 │   │   │   │   │       ├── services/
 │   │   │   │   │       │   ├── contentCacheService.ts (233 lines)
 │   │   │   │   │       │   ├── contentValidation.ts (10 lines)
-│   │   │   │   │       │   ├── nsfwService.ts (285 lines)
+│   │   │   │   │       │   ├── nsfwService.ts (283 lines)
 │   │   │   │   │       │   ├── nullTensorflow.ts (30 lines)
-│   │   │   │   │       │   ├── tensorflowLoader.ts (112 lines)
-│   │   │   │   │       │   └── transactionService.ts (299 lines)
+│   │   │   │   │       │   ├── tensorflowLoader.ts (105 lines)
+│   │   │   │   │       │   └── transactionService.ts (298 lines)
 │   │   │   │   │       ├── state/
 │   │   │   │   │       │   ├── arweave/
 │   │   │   │   │       │   │   ├── arweaveSlice.ts (78 lines)
-│   │   │   │   │       │   │   └── arweaveThunks.ts (113 lines)
+│   │   │   │   │       │   │   └── arweaveThunks.ts (106 lines)
 │   │   │   │   │       │   ├── assetManager/
 │   │   │   │   │       │   │   ├── assetManagerSlice.ts (127 lines)
 │   │   │   │   │       │   │   ├── assetManagerThunks.ts (422 lines)
@@ -740,7 +746,7 @@
 │   │   │   │   │       │   │   └── libraryThunks.ts (231 lines)
 │   │   │   │   │       │   ├── nftData/
 │   │   │   │   │       │   │   ├── nftDataSlice.ts (87 lines)
-│   │   │   │   │       │   │   └── nftDataThunks.ts (750 lines)
+│   │   │   │   │       │   │   └── nftDataThunks.ts (713 lines)
 │   │   │   │   │       │   ├── transactions/
 │   │   │   │   │       │   │   ├── transactionSlice.ts (129 lines)
 │   │   │   │   │       │   │   ├── transactionSortUtils.ts (30 lines)
@@ -776,12 +782,12 @@
 │   │   │   │       │   │   ├── searchEmporium.tsx (74 lines)
 │   │   │   │       │   │   ├── style.css (35 lines)
 │   │   │   │       │   │   └── userEmporiumLogs.tsx (121 lines)
-│   │   │   │       │   ├── contentListEmporium.tsx (271 lines)
+│   │   │   │       │   ├── contentListEmporium.tsx (263 lines)
 │   │   │   │       │   ├── emporiumSlice.ts (234 lines)
-│   │   │   │       │   ├── index.tsx (316 lines)
+│   │   │   │       │   ├── index.tsx (304 lines)
 │   │   │   │       │   ├── overlay.tsx (92 lines)
 │   │   │   │       │   ├── plan.md (12 lines)
-│   │   │   │       │   ├── styles.ts (195 lines)
+│   │   │   │       │   ├── styles.ts (53 lines)
 │   │   │   │       │   ├── thunks/
 │   │   │   │       │   │   ├── buyNft.ts (84 lines)
 │   │   │   │       │   │   ├── editListing.ts (43 lines)
@@ -791,27 +797,26 @@
 │   │   │   │       │   │   ├── getUserLog.ts (52 lines)
 │   │   │   │       │   │   ├── listNft.ts (88 lines)
 │   │   │   │       │   │   └── removeListedNft.ts (41 lines)
-│   │   │   │       │   └── utlis.ts (78 lines)
+│   │   │   │       │   └── utlis.ts (79 lines)
 │   │   │   │       ├── Permasearch/
-│   │   │   │       │   ├── index.tsx (159 lines)
+│   │   │   │       │   ├── index.tsx (155 lines)
 │   │   │   │       │   ├── queryplan.md (36 lines)
 │   │   │   │       │   └── styles.ts (175 lines)
 │   │   │   │       ├── Perpetua/
 │   │   │   │       │   ├── features/
 │   │   │   │       │   │   ├── cards/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx (475 lines)
-│   │   │   │       │   │   │   │   ├── ContentDisplays.tsx (103 lines)
-│   │   │   │       │   │   │   │   ├── NftDisplay.tsx (298 lines)
+│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx (490 lines)
+│   │   │   │       │   │   │   │   ├── ContentDisplays.tsx (92 lines)
+│   │   │   │       │   │   │   │   ├── NftDisplay.tsx (152 lines)
 │   │   │   │       │   │   │   │   ├── ShelfBlogView.tsx (191 lines)
-│   │   │   │       │   │   │   │   ├── ShelfCard.tsx (346 lines)
-│   │   │   │       │   │   │   │   ├── ShelfCardActionMenu.tsx (225 lines)
-│   │   │   │       │   │   │   │   ├── ShelfContentCard.tsx (135 lines)
+│   │   │   │       │   │   │   │   ├── ShelfCard.tsx (348 lines)
+│   │   │   │       │   │   │   │   ├── ShelfContentCard.tsx (174 lines)
 │   │   │   │       │   │   │   │   ├── ShelfContentModal.tsx (79 lines)
-│   │   │   │       │   │   │   │   ├── ShelfDetailView.tsx (227 lines)
+│   │   │   │       │   │   │   │   ├── ShelfDetailView.tsx (229 lines)
 │   │   │   │       │   │   │   │   ├── ShelfEmptyView.tsx (32 lines)
 │   │   │   │       │   │   │   │   ├── ShelfGridView.tsx (57 lines)
-│   │   │   │       │   │   │   │   ├── ShelfViewControls.tsx (127 lines)
+│   │   │   │       │   │   │   │   ├── ShelfViewControls.tsx (239 lines)
 │   │   │   │       │   │   │   │   ├── ShelfViewHeader.tsx (92 lines)
 │   │   │   │       │   │   │   │   └── index.ts (9 lines)
 │   │   │   │       │   │   │   ├── hooks/
@@ -821,16 +826,16 @@
 │   │   │   │       │   │   │       └── ShelfViewUtils.ts (32 lines)
 │   │   │   │       │   │   ├── following/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── FollowedTagsList.tsx (112 lines)
-│   │   │   │       │   │   │   │   └── FollowedUsersList.tsx (105 lines)
+│   │   │   │       │   │   │   │   ├── FollowedTagsList.tsx (102 lines)
+│   │   │   │       │   │   │   │   └── FollowedUsersList.tsx (94 lines)
 │   │   │   │       │   │   │   └── hooks/
 │   │   │   │       │   │   │       └── useFollowStatus.ts (160 lines)
 │   │   │   │       │   │   ├── items/
 │   │   │   │       │   │   │   ├── components/
 │   │   │   │       │   │   │   │   ├── AlexandrianSelector.tsx (84 lines)
-│   │   │   │       │   │   │   │   └── InlineItemCreator.tsx (408 lines)
+│   │   │   │       │   │   │   │   └── InlineItemCreator.tsx (411 lines)
 │   │   │   │       │   │   │   └── hooks/
-│   │   │   │       │   │   │       └── useItemActions.tsx (112 lines)
+│   │   │   │       │   │   │       └── useItemActions.tsx (114 lines)
 │   │   │   │       │   │   ├── shared/
 │   │   │   │       │   │   │   └── reordering/
 │   │   │   │       │   │   │       ├── components/
@@ -842,7 +847,7 @@
 │   │   │   │       │   │   │       ├── hooks/
 │   │   │   │       │   │   │       │   ├── index.ts (4 lines)
 │   │   │   │       │   │   │       │   ├── useDragAndDrop.ts (111 lines)
-│   │   │   │       │   │   │       │   ├── useItemReordering.ts (77 lines)
+│   │   │   │       │   │   │       │   ├── useItemReordering.ts (90 lines)
 │   │   │   │       │   │   │       │   ├── useReorderable.ts (142 lines)
 │   │   │   │       │   │   │       │   └── useShelfReordering.ts (69 lines)
 │   │   │   │       │   │   │       └── utils/
@@ -853,19 +858,19 @@
 │   │   │   │       │   │   │       └── CollaboratorsList.tsx (186 lines)
 │   │   │   │       │   │   ├── shelf-management/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── NewShelf.tsx (104 lines)
+│   │   │   │       │   │   │   │   ├── NewShelf.tsx (154 lines)
 │   │   │   │       │   │   │   │   ├── RemoveItemButton.tsx (98 lines)
-│   │   │   │       │   │   │   │   ├── ShelfContent.tsx (80 lines)
+│   │   │   │       │   │   │   │   ├── ShelfContent.tsx (90 lines)
 │   │   │   │       │   │   │   │   ├── ShelfOption.tsx (31 lines)
-│   │   │   │       │   │   │   │   └── ShelfSelectionDialog.tsx (158 lines)
+│   │   │   │       │   │   │   │   └── ShelfSelectionDialog.tsx (328 lines)
 │   │   │   │       │   │   │   ├── containers/
-│   │   │   │       │   │   │   │   ├── ShelfDetailContainer.tsx (161 lines)
-│   │   │   │       │   │   │   │   └── ShelfLists.tsx (248 lines)
+│   │   │   │       │   │   │   │   ├── ShelfDetailContainer.tsx (168 lines)
+│   │   │   │       │   │   │   │   └── ShelfLists.tsx (251 lines)
 │   │   │   │       │   │   │   └── hooks/
 │   │   │   │       │   │   │       ├── index.ts (4 lines)
 │   │   │   │       │   │   │       ├── useAddToShelf.ts (120 lines)
 │   │   │   │       │   │   │       ├── usePublicShelfOperations.ts (62 lines)
-│   │   │   │       │   │   │       └── useShelfOperations.ts (220 lines)
+│   │   │   │       │   │   │       └── useShelfOperations.ts (231 lines)
 │   │   │   │       │   │   ├── shelf-settings/
 │   │   │   │       │   │   │   ├── components/
 │   │   │   │       │   │   │   │   ├── CollaboratorsTab.tsx (40 lines)
@@ -889,16 +894,16 @@
 │   │   │   │       │   │       │   ├── TagFilterDisplay.tsx (38 lines)
 │   │   │   │       │   │       │   └── TagSearchBar.tsx (106 lines)
 │   │   │   │       │   │       ├── containers/
-│   │   │   │       │   │       │   └── FilteredShelfListContainer.tsx (111 lines)
+│   │   │   │       │   │       │   └── FilteredShelfListContainer.tsx (113 lines)
 │   │   │   │       │   │       ├── hooks/
 │   │   │   │       │   │       │   ├── useTagActions.ts (51 lines)
 │   │   │   │       │   │       │   └── useTagData.ts (37 lines)
 │   │   │   │       │   │       └── index.ts (1 lines)
 │   │   │   │       │   ├── hooks/
-│   │   │   │       │   │   └── useContentPermissions.ts (75 lines)
+│   │   │   │       │   │   └── useContentPermissions.ts (74 lines)
 │   │   │   │       │   ├── index.tsx (21 lines)
 │   │   │   │       │   ├── layouts/
-│   │   │   │       │   │   └── PerpetuaLayout.tsx (287 lines)
+│   │   │   │       │   │   └── PerpetuaLayout.tsx (292 lines)
 │   │   │   │       │   ├── routes.ts (119 lines)
 │   │   │   │       │   ├── state/
 │   │   │   │       │   │   ├── cache/
@@ -906,25 +911,24 @@
 │   │   │   │       │   │   ├── hooks/
 │   │   │   │       │   │   │   ├── index.ts (3 lines)
 │   │   │   │       │   │   │   ├── usePerpetuaActions.ts (169 lines)
-│   │   │   │       │   │   │   └── usePerpetuaSelectors.ts (62 lines)
+│   │   │   │       │   │   │   └── usePerpetuaSelectors.ts (59 lines)
 │   │   │   │       │   │   ├── index.ts (46 lines)
-│   │   │   │       │   │   ├── perpetuaSlice.ts (898 lines)
+│   │   │   │       │   │   ├── perpetuaSlice.ts (937 lines)
 │   │   │   │       │   │   ├── services/
 │   │   │   │       │   │   │   ├── followService.ts (276 lines)
 │   │   │   │       │   │   │   ├── index.ts (7 lines)
-│   │   │   │       │   │   │   ├── itemService.ts (201 lines)
+│   │   │   │       │   │   │   ├── itemService.ts (209 lines)
 │   │   │   │       │   │   │   ├── serviceTypes.ts (39 lines)
 │   │   │   │       │   │   │   ├── shelfService.ts (357 lines)
 │   │   │   │       │   │   │   └── tagService.ts (306 lines)
 │   │   │   │       │   │   ├── thunks/
 │   │   │   │       │   │   │   ├── collaborationThunks.ts (110 lines)
 │   │   │   │       │   │   │   ├── index.ts (7 lines)
-│   │   │   │       │   │   │   ├── itemThunks.ts (100 lines)
+│   │   │   │       │   │   │   ├── itemThunks.ts (117 lines)
 │   │   │   │       │   │   │   ├── queryThunks.ts (268 lines)
 │   │   │   │       │   │   │   ├── reorderThunks.ts (128 lines)
-│   │   │   │       │   │   │   ├── shelfThunks.ts (124 lines)
+│   │   │   │       │   │   │   ├── shelfThunks.ts (125 lines)
 │   │   │   │       │   ├── types/
-│   │   │   │       │   │   ├── item.types.ts (27 lines)
 │   │   │   │       │   │   ├── reordering.types.ts (69 lines)
 │   │   │   │       │   │   └── shelf.types.ts (74 lines)
 │   │   │   │       │   └── utils.tsx (128 lines)
@@ -938,7 +942,7 @@
 │   │   │   │   │   ├── CanisterView.tsx (51 lines)
 │   │   │   │   │   ├── NonCanisterView.tsx (35 lines)
 │   │   │   │   │   └── index.tsx (35 lines)
-│   │   │   │   ├── Copy.tsx (43 lines)
+│   │   │   │   ├── Copy.tsx (59 lines)
 │   │   │   │   ├── ErrorBoundary.tsx (37 lines)
 │   │   │   │   ├── ErrorFallback.tsx (25 lines)
 │   │   │   │   ├── LibrarianCard/
@@ -948,7 +952,7 @@
 │   │   │   │   ├── Loading.tsx (23 lines)
 │   │   │   │   ├── Logo.tsx (47 lines)
 │   │   │   │   ├── MarkdownRenderer.tsx (172 lines)
-│   │   │   │   ├── PasswordProtect.tsx (51 lines)
+│   │   │   │   ├── PasswordProtect.tsx (79 lines)
 │   │   │   │   ├── Processing.tsx (15 lines)
 │   │   │   │   ├── Read/
 │   │   │   │   │   └── index.tsx (24 lines)
@@ -1095,6 +1099,41 @@
 │   │   │   │   │       ├── getIcpBal.ts (35 lines)
 │   │   │   │   │       ├── getIcpPrice.ts (38 lines)
 │   │   │   │   │       └── transferICP.ts (59 lines)
+│   │   │   │   ├── imporium/
+│   │   │   │   │   ├── imporiumSlice.ts (50 lines)
+│   │   │   │   │   ├── listings/
+│   │   │   │   │   │   ├── components/
+│   │   │   │   │   │   │   ├── EditListedNft.tsx (115 lines)
+│   │   │   │   │   │   │   ├── Filter.tsx (67 lines)
+│   │   │   │   │   │   │   ├── Grid.tsx (20 lines)
+│   │   │   │   │   │   │   ├── PageSize copy.tsx (67 lines)
+│   │   │   │   │   │   │   ├── PageSize.tsx (46 lines)
+│   │   │   │   │   │   │   ├── PriceSort.tsx (24 lines)
+│   │   │   │   │   │   │   ├── PurchaseNft.tsx (93 lines)
+│   │   │   │   │   │   │   ├── Search.tsx (53 lines)
+│   │   │   │   │   │   │   ├── SearchId.tsx (59 lines)
+│   │   │   │   │   │   │   ├── SearchPrincipal.tsx (27 lines)
+│   │   │   │   │   │   │   ├── TimeSort.tsx (24 lines)
+│   │   │   │   │   │   │   └── UnListNft.tsx (89 lines)
+│   │   │   │   │   │   ├── listingsSlice.ts (178 lines)
+│   │   │   │   │   │   ├── thunks/
+│   │   │   │   │   │   │   ├── edit.ts (36 lines)
+│   │   │   │   │   │   │   ├── getListings.ts (94 lines)
+│   │   │   │   │   │   │   ├── getMyTokens.ts (38 lines)
+│   │   │   │   │   │   │   ├── purchase.ts (83 lines)
+│   │   │   │   │   │   │   ├── search.ts (61 lines)
+│   │   │   │   │   │   │   ├── searchById.ts (60 lines)
+│   │   │   │   │   │   │   └── unlist.ts (31 lines)
+│   │   │   │   │   │   └── types.ts (50 lines)
+│   │   │   │   │   └── nfts/
+│   │   │   │   │       ├── components/
+│   │   │   │   │       │   └── ListNft.tsx (116 lines)
+│   │   │   │   │       ├── nftsSlice.ts (75 lines)
+│   │   │   │   │       ├── thunks/
+│   │   │   │   │       │   ├── getMyTokens.ts (38 lines)
+│   │   │   │   │       │   ├── listNft.ts (77 lines)
+│   │   │   │   │       │   └── unlistNft.ts (31 lines)
+│   │   │   │   │       └── types.ts (27 lines)
 │   │   │   │   ├── login/
 │   │   │   │   │   ├── FullPageLogin.tsx (13 lines)
 │   │   │   │   │   ├── InlineLogin.tsx (29 lines)
@@ -1132,7 +1171,35 @@
 │   │   │   │   │   └── utils/
 │   │   │   │   │       └── index.ts (12 lines)
 │   │   │   │   ├── nft/
-│   │   │   │   │   ├── mint.ts (49 lines)
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── Asset/
+│   │   │   │   │   │   │   ├── Audio.tsx (35 lines)
+│   │   │   │   │   │   │   ├── Book/
+│   │   │   │   │   │   │   │   ├── Cover.tsx (30 lines)
+│   │   │   │   │   │   │   │   └── index.tsx (29 lines)
+│   │   │   │   │   │   │   ├── HyperText.tsx (46 lines)
+│   │   │   │   │   │   │   ├── Image.tsx (60 lines)
+│   │   │   │   │   │   │   ├── Json.tsx (41 lines)
+│   │   │   │   │   │   │   ├── Markdown.tsx (46 lines)
+│   │   │   │   │   │   │   ├── Preview.tsx (20 lines)
+│   │   │   │   │   │   │   ├── Text.tsx (67 lines)
+│   │   │   │   │   │   │   ├── Video.tsx (30 lines)
+│   │   │   │   │   │   │   └── index.tsx (112 lines)
+│   │   │   │   │   │   ├── Attributes.tsx (53 lines)
+│   │   │   │   │   │   ├── Info.tsx (93 lines)
+│   │   │   │   │   │   ├── Metadata.tsx (72 lines)
+│   │   │   │   │   │   └── Tags.tsx (59 lines)
+│   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   ├── useArweaveData.ts (236 lines)
+│   │   │   │   │   │   ├── useData.ts (162 lines)
+│   │   │   │   │   │   ├── useSize.ts (41 lines)
+│   │   │   │   │   │   ├── useStatus.ts (48 lines)
+│   │   │   │   │   │   ├── useTags copy.ts (49 lines)
+│   │   │   │   │   │   ├── useTags.ts (57 lines)
+│   │   │   │   │   │   └── useTimestamp.ts (54 lines)
+│   │   │   │   │   ├── index.tsx (194 lines)
+│   │   │   │   │   ├── mint.ts (159 lines)
+│   │   │   │   │   ├── types.ts (14 lines)
 │   │   │   │   │   └── withdraw.ts (57 lines)
 │   │   │   │   ├── portal/
 │   │   │   │   │   ├── components/
@@ -1382,7 +1449,7 @@
 │   │   │   │   │   │   ├── estimateCost.ts (51 lines)
 │   │   │   │   │   │   ├── fetchBalance.ts (28 lines)
 │   │   │   │   │   │   ├── fetchWallets.ts (34 lines)
-│   │   │   │   │   │   ├── mintNFT.ts (48 lines)
+│   │   │   │   │   │   ├── mintNFT.ts (65 lines)
 │   │   │   │   │   │   ├── processPayment.ts (56 lines)
 │   │   │   │   │   │   ├── selectWallet.ts (36 lines)
 │   │   │   │   │   │   └── uploadFile.ts (88 lines)
@@ -1463,7 +1530,21 @@
 │   │   │   │       ├── LayoutSkeleton.tsx (32 lines)
 │   │   │   │       ├── MainPageSkeleton.tsx (31 lines)
 │   │   │   │       ├── PinaxSkeleton.tsx (97 lines)
-│   │   │   │       └── SidebarSkeleton.tsx (30 lines)
+│   │   │   │       ├── SidebarSkeleton.tsx (30 lines)
+│   │   │   │       └── emporium/
+│   │   │   │           ├── GeneralSkeleton.tsx (29 lines)
+│   │   │   │           ├── MarketSkeleton.tsx (29 lines)
+│   │   │   │           ├── MyNftsSkeleton.tsx (30 lines)
+│   │   │   │           └── components/
+│   │   │   │               ├── AssetSkeleton.tsx (40 lines)
+│   │   │   │               ├── BoxSkeleton.tsx (12 lines)
+│   │   │   │               ├── CardSkeleton.tsx (23 lines)
+│   │   │   │               ├── ContentSkeleton.tsx (24 lines)
+│   │   │   │               ├── HeaderSkeleton.tsx (18 lines)
+│   │   │   │               ├── NavigationSkeleton.tsx (14 lines)
+│   │   │   │               ├── NftsSkeleton.tsx (18 lines)
+│   │   │   │               ├── PaginationSkeleton.tsx (14 lines)
+│   │   │   │               └── SearchSkeleton.tsx (16 lines)
 │   │   │   ├── lib/
 │   │   │   │   ├── components/
 │   │   │   │   │   ├── accordion.tsx (57 lines)
@@ -1502,7 +1583,7 @@
 │   │   │   ├── providers/
 │   │   │   │   ├── AuthProvider/
 │   │   │   │   │   ├── EthProvider.tsx (31 lines)
-│   │   │   │   │   ├── IIProvider.tsx (23 lines)
+│   │   │   │   │   ├── IIProvider.tsx (27 lines)
 │   │   │   │   │   ├── SolProvider.tsx (42 lines)
 │   │   │   │   │   ├── index.tsx (52 lines)
 │   │   │   │   │   └── wagmi.config.ts (22 lines)
@@ -1516,7 +1597,7 @@
 │   │   │   │       └── index.tsx (28 lines)
 │   │   │   ├── routes/
 │   │   │   │   ├── dataRoutes.tsx (461 lines)
-│   │   │   │   ├── index.tsx (145 lines)
+│   │   │   │   ├── index.tsx (175 lines)
 │   │   │   │   └── routeConfig.ts (111 lines)
 │   │   │   ├── services/
 │   │   │   │   ├── bookService.ts (174 lines)
@@ -1529,7 +1610,7 @@
 │   │   │   │   │   ├── useAppSelector.ts (5 lines)
 │   │   │   │   │   └── useAppStore.ts (7 lines)
 │   │   │   │   ├── index.ts (11 lines)
-│   │   │   │   └── rootReducer.ts (81 lines)
+│   │   │   │   └── rootReducer.ts (84 lines)
 │   │   │   ├── styles/
 │   │   │   │   ├── style.css (53 lines)
 │   │   │   │   └── tailwind.css (104 lines)
@@ -1542,7 +1623,7 @@
 │   │   │   │   ├── bgint_convert.ts (96 lines)
 │   │   │   │   ├── epub.tsx (33 lines)
 │   │   │   │   ├── general.ts (144 lines)
-│   │   │   │   ├── id_convert.ts (126 lines)
+│   │   │   │   ├── id_convert.ts (125 lines)
 │   │   │   │   ├── lazyLoad.ts (21 lines)
 │   │   │   │   ├── utils.tsx (9 lines)
 │   │   │   │   └── vetkd.ts (15 lines)
@@ -1590,12 +1671,13 @@
 │   │       └── utils.rs (10 lines)
 │   ├── emporium/
 │   │   ├── Cargo.toml (23 lines)
-│   │   ├── emporium.did (56 lines)
+│   │   ├── emporium.did (67 lines)
 │   │   └── src/
 │   │       ├── guard.rs (41 lines)
-│   │       ├── lib.rs (36 lines)
+│   │       ├── id_converter.rs (99 lines)
+│   │       ├── lib.rs (39 lines)
 │   │       ├── plan.md (53 lines)
-│   │       ├── queries.rs (229 lines)
+│   │       ├── queries.rs (424 lines)
 │   │       ├── storage.rs (117 lines)
 │   │       ├── update.rs (393 lines)
 │   │       └── utils.rs (145 lines)
@@ -1658,7 +1740,7 @@
 │   │   │   │   ├── dao.rs (621 lines)
 │   │   │   │   ├── extras.rs (94 lines)
 │   │   │   │   └── playground.rs (342 lines)
-│   │   │   ├── coordinate_mint.rs (179 lines)
+│   │   │   ├── coordinate_mint.rs (184 lines)
 │   │   │   ├── guard.rs (14 lines)
 │   │   │   ├── id_converter.rs (271 lines)
 │   │   │   ├── init.rs (98 lines)
@@ -1673,19 +1755,19 @@
 │   ├── perpetua/
 │   │   ├── Cargo.toml (20 lines)
 │   │   ├── perpetua.did (128 lines)
-│   │   ├── perpetua.md (220 lines)
+│   │   ├── perpetua.md (312 lines)
 │   │   └── src/
 │   │       ├── auth.rs (170 lines)
 │   │       ├── guard.rs (11 lines)
 │   │       ├── lib.rs (74 lines)
 │   │       ├── ordering.rs (542 lines)
 │   │       ├── query.rs (820 lines)
-│   │       ├── storage.rs (670 lines)
+│   │       ├── storage.rs (665 lines)
 │   │       ├── types.rs (62 lines)
 │   │       ├── update/
 │   │       │   ├── access.rs (108 lines)
 │   │       │   ├── follow.rs (132 lines)
-│   │       │   ├── item.rs (415 lines)
+│   │       │   ├── item.rs (430 lines)
 │   │       │   ├── profile.rs (119 lines)
 │   │       │   ├── shelf.rs (126 lines)
 │   │       │   ├── tags.rs (324 lines)
@@ -1707,7 +1789,7 @@
 │   │   ├── lbryfun.md (122 lines)
 │   │   ├── likes.md (9 lines)
 │   │   ├── milestones.md (119 lines)
-│   │   ├── plan.md (107 lines)
+│   │   ├── plan.md (103 lines)
 │   │   ├── scripts/
 │   │   │   ├── basic.sh (106 lines)
 │   │   │   ├── build.sh (161 lines)

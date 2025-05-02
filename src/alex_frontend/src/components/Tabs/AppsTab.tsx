@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
-import { apps } from "@/pages/HomePage";
+import { useNavigate } from "react-router-dom";
+import { appsData, App } from "@/config/apps";
 import { LayoutGrid } from "lucide-react";
 import NavMenu from "./NavMenu";
 
@@ -8,7 +8,7 @@ export const AppsTab: React.FC = () => {
 	const navigate = useNavigate();
 	const [isHovered, setIsHovered] = useState(false);
 
-	const activeApps = apps.filter((app) => !app.comingSoon);
+	const activeApps = appsData.filter((app: App) => !app.comingSoon);
 
 	return (
 		<div
@@ -31,7 +31,7 @@ export const AppsTab: React.FC = () => {
                 }
 			>
 				<div className="p-1.5">
-					{activeApps.map((app) => (
+					{activeApps.map((app: App) => (
 						<div
 							key={app.name}
 							className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-800 rounded"

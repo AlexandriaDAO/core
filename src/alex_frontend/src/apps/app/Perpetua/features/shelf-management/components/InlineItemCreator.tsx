@@ -13,7 +13,8 @@ import { ShelfForm } from "@/apps/app/Perpetua/features/shelf-management/compone
 import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks/useShelfOperations";
 import { loadShelves } from "@/apps/app/Perpetua/state";
 import { useIdentity } from "@/hooks/useIdentity";
-import AlexandrianSelector from "./AlexandrianSelector";
+import AppCard from '@/components/AppCard';
+import { findApp } from '@/config/apps';
 
 // Define the character limit constant
 const MAX_MARKDOWN_LENGTH = 10000;
@@ -53,6 +54,11 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
   const allShelves = useAppSelector(type === "Shelf" ? selectUserShelves : () => []);
   const currentShelf = useAppSelector(type === "Shelf" ? selectSelectedShelf : () => null);
   const { createAndAddShelfItem } = useShelfOperations();
+
+  // Find the specific apps we need
+  const alexandrianApp = findApp('Alexandrian');
+  const permasearchApp = findApp('Permasearch');
+  const pinaxApp = findApp('Pinax');
 
   // Reset form on type changes
   useEffect(() => {
@@ -272,9 +278,46 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
         
       case "Nft":
         return (
-          <div className="flex-1 flex flex-col">
-            <div className="flex-1 overflow-hidden">
-              <AlexandrianSelector />
+          <div className="flex-1 flex flex-col p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 h-full place-items-center">
+              <div className="flex flex-col items-center w-full">
+                <span className="font-medium text-base mb-4">Find Existing NFTs</span>
+                {alexandrianApp && (
+                  <div className="w-full max-w-xs">
+                    <AppCard 
+                      app={alexandrianApp} 
+                      size="default" 
+                      className="w-full cursor-pointer hover:scale-105 transition-transform" 
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex flex-col items-center w-full">
+                <span className="font-medium text-base mb-4">Find New Ones on Arweave</span>
+                {permasearchApp && (
+                  <div className="w-full max-w-xs">
+                    <AppCard 
+                      app={permasearchApp} 
+                      size="default" 
+                      className="w-full cursor-pointer hover:scale-105 transition-transform" 
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex flex-col items-center w-full">
+                <span className="font-medium text-base mb-4">Bring Your Own</span>
+                {pinaxApp && (
+                  <div className="w-full max-w-xs">
+                    <AppCard 
+                      app={pinaxApp} 
+                      size="default" 
+                      className="w-full cursor-pointer hover:scale-105 transition-transform" 
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         );

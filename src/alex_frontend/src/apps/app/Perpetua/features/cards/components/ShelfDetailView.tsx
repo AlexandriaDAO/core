@@ -10,7 +10,7 @@ import ShelfContentModal from './ShelfContentModal';
 import ShelfGridView from './ShelfGridView';
 import ShelfBlogView from './ShelfBlogView';
 import ShelfEmptyView from './ShelfEmptyView';
-import InlineItemCreator from '../../items/components/InlineItemCreator';
+import InlineItemCreator from '../../shelf-management/components/InlineItemCreator';
 
 // Import utility functions
 import { 

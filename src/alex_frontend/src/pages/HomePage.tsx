@@ -1,35 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Link } from 'react-router';
+import { Link as RouterLink } from 'react-router-dom';
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { cn } from "@/lib/utils";
-
-export interface App {
-  name: string;
-  description: string;
-  path: string;
-  logo?: string;
-  comingSoon?: boolean;
-  isThirdParty?: boolean;
-}
-
-export const apps: App[] = [
-  { name: 'Alexandrian', description: 'Library', path: '/app/alexandrian', logo: '/logos/Alexandrian.svg' },
-  { name: 'Permasearch', description: 'Explore', path: '/app/permasearch', logo: '/logos/Permasearch.svg' },
-  { name: 'Emporium', description: 'Trade', path: '/app/emporium', logo: '/logos/Emporium.svg' },
-  { name: 'Pinax', description: 'Upload', path: '/app/pinax', logo: '/logos/Pinax.svg', comingSoon: false },
-  { name: 'Perpetua', description: 'Write', path: '/app/perpetua', logo: '/logos/Perpetua.svg', comingSoon: false },
-  { name: 'Syllogos', description: 'Aggregate', path: '/app/syllogos', logo: '/logos/Syllogos.svg', comingSoon: true },
-  { name: 'Bibliotheca', description: 'Library', path: '/app/bibliotheca', comingSoon: true },
-  { name: 'Dialectica', description: 'Debate', path: '/app/dialectica', comingSoon: true },
-];
-
-export const thirdPartyApps: App[] = [
-  { name: 'lbry.fun', description: 'launchpad', path: 'https://lbry.fun', logo: '/logos/lbry.svg', comingSoon: true, isThirdParty: true },
-  { name: 'fission.bridge', description: 'bridge', path: 'https://fission.bridge', logo: '/logos/fission.svg', comingSoon: true, isThirdParty: true },
-  { name: 'lbry.finance', description: 'lend', path: 'https://lbry.finance', logo: '/logos/lbry.svg', comingSoon: true, isThirdParty: true },
-  { name: '...', description: 'come build with us', path: '', logo: '', comingSoon: true, isThirdParty: true },
-
-];
+import { appsData, thirdPartyAppsData } from "@/config/apps";
+import AppCard from "@/components/AppCard";
 
 const HomePage: React.FC = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -130,64 +104,13 @@ const HomePage: React.FC = () => {
             "grid gap-2.5 md:gap-5 w-full max-w-[1200px] px-2.5 mt-10",
             isMobile ? "grid-cols-2" : "grid-cols-[repeat(auto-fit,minmax(180px,1fr))]"
           )}>
-            {apps.map((app) => (
-              <Link 
-                to={app.comingSoon ? '#' : app.path} 
-                key={app.name} 
-                className="no-underline w-full"
-                onClick={(e) => app.comingSoon && e.preventDefault()}
-              >
-                <div className={cn(
-                  "w-full min-h-[140px] p-2",
-                  "rounded-2xl flex flex-col items-center justify-center gap-1.5",
-                  "transition-all duration-300",
-                  "shadow-md dark:shadow-lg group",
-                  app.comingSoon 
-                    ? "dark:bg-gray-850 bg-gray-100 cursor-not-allowed opacity-70"
-                    : [
-                        "dark:bg-gray-800 bg-gray-50 cursor-pointer opacity-100",
-                        "hover:shadow-xl dark:hover:shadow-2xl",
-                        "hover:bg-gray-100 dark:hover:bg-gray-700"
-                      ].join(" ")
-                )}>
-                  <div className={cn(
-                    "flex items-center justify-center m-1 transition-transform duration-300",
-                    isMobile ? "w-20 h-20" : "w-[120px] h-[120px]",
-                    !app.comingSoon && "group-hover:scale-110"
-                  )}>
-                    {app.comingSoon ? (
-                      <div className="text-[#848484] font-syne text-sm font-semibold text-center">
-                        COMING<br />SOON
-                      </div>
-                    ) : (
-                      <img 
-                        src={app.logo}
-                        alt={`${app.name} logo`}
-                        className="w-full h-full object-contain p-2 transition-transform duration-300 hover:scale-110"
-                      />
-                    )}
-                  </div>
-                  <div className={cn(
-                    "font-syne font-bold",
-                    "text-foreground transition-colors duration-300",
-                    isMobile ? "text-sm" : "text-lg"
-                  )}>
-                    {app.name}
-                  </div>
-                  <div className={cn(
-                    "font-poppins font-normal",
-                    "text-muted-foreground transition-colors duration-300",
-                    isMobile ? "text-xs" : "text-sm"
-                  )}>
-                    {app.description}
-                  </div>
-                </div>
-              </Link>
+            {appsData.map((app) => (
+              <AppCard key={app.name} app={app} size="default" />
             ))}
           </div>
           
           {/* 3rd Party Apps Section */}
-          {thirdPartyApps.length > 0 && (
+          {thirdPartyAppsData.length > 0 && (
             <>
               <h2 className={cn(
                 "self-stretch text-center",
@@ -202,59 +125,8 @@ const HomePage: React.FC = () => {
                 "grid gap-2.5 md:gap-5 w-full max-w-[1200px] px-2.5 mt-10",
                 isMobile ? "grid-cols-2" : "grid-cols-[repeat(auto-fit,minmax(180px,1fr))]"
               )}>
-                {thirdPartyApps.map((app) => (
-                  <Link 
-                    to={app.comingSoon ? '#' : app.path} 
-                    key={app.name} 
-                    className="no-underline w-full"
-                    onClick={(e) => app.comingSoon && e.preventDefault()}
-                  >
-                    <div className={cn(
-                      "w-full min-h-[140px] p-2",
-                      "rounded-2xl flex flex-col items-center justify-center gap-1.5",
-                      "transition-all duration-300",
-                      "shadow-md dark:shadow-lg group",
-                      app.comingSoon 
-                        ? "dark:bg-gray-850 bg-gray-100 cursor-not-allowed opacity-70"
-                        : [
-                            "dark:bg-gray-800 bg-gray-50 cursor-pointer opacity-100",
-                            "hover:shadow-xl dark:hover:shadow-2xl",
-                            "hover:bg-gray-100 dark:hover:bg-gray-700"
-                          ].join(" ")
-                    )}>
-                      <div className={cn(
-                        "flex items-center justify-center m-1 transition-transform duration-300",
-                        isMobile ? "w-20 h-20" : "w-[120px] h-[120px]",
-                        !app.comingSoon && "group-hover:scale-110"
-                      )}>
-                        {app.comingSoon ? (
-                          <div className="text-[#848484] font-syne text-sm font-semibold text-center">
-                            COMING<br />SOON
-                          </div>
-                        ) : (
-                          <img 
-                            src={app.logo}
-                            alt={`${app.name} logo`}
-                            className="w-full h-full object-contain p-2 transition-transform duration-300 hover:scale-110"
-                          />
-                        )}
-                      </div>
-                      <div className={cn(
-                        "font-syne font-bold",
-                        "text-foreground transition-colors duration-300",
-                        isMobile ? "text-sm" : "text-lg"
-                      )}>
-                        {app.name}
-                      </div>
-                      <div className={cn(
-                        "font-poppins font-normal",
-                        "text-muted-foreground transition-colors duration-300",
-                        isMobile ? "text-xs" : "text-sm"
-                      )}>
-                        {app.description}
-                      </div>
-                    </div>
-                  </Link>
+                {thirdPartyAppsData.map((app) => (
+                  <AppCard key={app.name} app={app} size="default" />
                 ))}
               </div>
             </>
