@@ -2,8 +2,6 @@ use ic_cdk::{self, init, spawn};
 use candid::{Principal, Nat};
 use std::time::Duration;
 
-use crate::query::follows::ShelfPublic;
-
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
 pub const ICRC7_SCION_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
 
@@ -31,6 +29,7 @@ pub mod update {
     pub mod profile;
     pub mod tags;
     pub mod follow;
+    pub mod restore;
 }
 pub mod query {
     pub mod shelves;
@@ -40,7 +39,7 @@ pub mod query {
 pub mod utils;
 pub mod types;
 
-pub use storage::{Item, Shelf, ShelfId, NormalizedTag, ItemId};
+pub use storage::{Item, Shelf, ShelfId, NormalizedTag, ItemId, ShelfPublic, ShelfBackupData};
 pub use types::{TagPopularityKey, TagShelfAssociationKey};
 pub use update::shelf::{store_shelf, update_shelf_metadata};
 pub use update::item::{
@@ -50,6 +49,7 @@ pub use update::item::{
 pub use update::access::{add_shelf_editor, remove_shelf_editor, list_shelf_editors};
 pub use update::profile::{reorder_profile_shelf, reset_profile_order};
 pub use update::tags::{TagOperationInput, add_tag_to_shelf, remove_tag_from_shelf};
+pub use update::restore::restore_essential_shelves;
 pub use query::follows::{
     get_tag_shelf_count, get_popular_tags, get_tags_with_prefix,
     get_my_followed_tags, get_my_followed_users,

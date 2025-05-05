@@ -3,6 +3,7 @@ type AddItemInput = record {
   reference_item_id : opt nat32;
   before : bool;
 };
+type BackupPaginationInput = record { offset : nat64; limit : nat64 };
 type CursorPaginatedResult = record {
   limit : nat;
   next_cursor : opt nat64;
@@ -69,6 +70,16 @@ type Result_6 = variant { Ok : ShelfPublic; Err : QueryError };
 type Result_7 = variant { Ok : CursorPaginatedResult_2; Err : QueryError };
 type Result_8 = variant { Ok : ShelfPositionMetrics; Err : text };
 type Result_9 = variant { Ok : CursorPaginatedResult_3; Err : QueryError };
+type ShelfBackupData = record {
+  is_public : bool;
+  title : text;
+  owner : principal;
+  tags : vec text;
+  description : opt text;
+  shelf_id : text;
+  item_positions : vec record { nat32; float64 };
+  items : vec record { nat32; Item };
+};
 type ShelfPositionMetrics = record {
   min_gap : float64;
   avg_gap : float64;
@@ -89,11 +100,18 @@ type ShelfPublic = record {
   item_positions : vec record { nat32; float64 };
   items : vec record { nat32; Item };
 };
+type ShelvesEssentialBackupChunk = record {
+  data : vec ShelfBackupData;
+  total_count : nat64;
+};
 type TagOperationInput = record { tag : text; shelf_id : text };
 service : () -> {
   add_item_to_shelf : (text, AddItemInput) -> (Result);
   add_shelf_editor : (text, principal) -> (Result);
   add_tag_to_shelf : (TagOperationInput) -> (Result);
+  backup_get_essential_shelves : (BackupPaginationInput) -> (
+      ShelvesEssentialBackupChunk,
+    ) query;
   create_and_add_shelf_item : (text, text, opt text) -> (Result_1);
   follow_tag : (text) -> (Result);
   follow_user : (principal) -> (Result);
@@ -118,6 +136,7 @@ service : () -> {
   remove_tag_from_shelf : (TagOperationInput) -> (Result);
   reorder_profile_shelf : (text, opt text, bool) -> (Result);
   reset_profile_order : () -> (Result);
+  restore_essential_shelves : (ShelvesEssentialBackupChunk) -> (Result);
   set_item_order : (text, vec nat32) -> (Result);
   store_shelf : (text, opt text, vec Item, opt vec text) -> (Result_1);
   toggle_shelf_public_access : (text, bool) -> (Result);

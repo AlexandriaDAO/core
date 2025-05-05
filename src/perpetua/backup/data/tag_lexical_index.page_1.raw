@@ -1,7 +1,0 @@
-WARN: Cannot fetch Candid interface for backup_get_tag_lexical_index, sending arguments with inferred types.
-(
-  record {
-    1_113_806_378 = vec { "#2dgame"; "#asset"; "#microbo"; "adventure"; "animals"; "art"; "arts"; "beasts"; "beauty"; "birds"; "books"; "classics"; "creative"; "legends"; "mythical"; "nature"; "people"; "photography"; "places"; "ships";};
-    3_622_570_708 = 20 : nat64;
-  },
-)

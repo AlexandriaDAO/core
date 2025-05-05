@@ -229,35 +229,35 @@ thread_local! {
     );
 }
 
-// --- Serializable version of Shelf --- Must derive CandidType and Deserialize
-#[derive(CandidType, Deserialize, Clone, Debug)]
-pub struct ShelfSerializable {
-    // Keep fields private unless explicitly needed public
-    shelf_id: ShelfId,
-    title: String,
-    description: Option<String>,
-    owner: Principal,
-    editors: Vec<Principal>,
-    items: BTreeMap<u32, Item>,
-    item_positions: Vec<(u32, f64)>,
-    created_at: u64,
-    updated_at: u64,
-    appears_in: Vec<ShelfId>,
-    tags: Vec<NormalizedTag>,
-    is_public: bool,
+// --- Public Shelf structure for Candid export ---
+// Moved from query/follows.rs and replaces ShelfSerializable
+#[derive(CandidType, Deserialize, Clone, Debug)] // Add CandidType, Deserialize
+pub struct ShelfPublic {
+    pub shelf_id: ShelfId,
+    pub title: String,
+    pub description: Option<String>,
+    pub owner: Principal,
+    pub editors: Vec<Principal>,
+    pub items: BTreeMap<u32, Item>, // Use BTreeMap for direct Candid compatibility if Item is CandidType
+    pub item_positions: Vec<(u32, f64)>, // Use Vec for Candid compatibility
+    pub created_at: u64,
+    pub updated_at: u64,
+    pub appears_in: Vec<ShelfId>,
+    pub tags: Vec<NormalizedTag>, // Assuming NormalizedTag (String) is CandidType
+    pub is_public: bool,
 }
 
-impl ShelfSerializable {
-    // Public constructor method
-    pub fn from_shelf(shelf: &Shelf) -> Self {
+impl ShelfPublic {
+    // Constructor to convert from the internal Shelf struct
+    pub fn from_internal(shelf: &Shelf) -> Self {
         Self {
             shelf_id: shelf.shelf_id.clone(),
             title: shelf.title.clone(),
             description: shelf.description.clone(),
             owner: shelf.owner.clone(),
             editors: shelf.editors.clone(),
-            items: shelf.items.clone(),
-            item_positions: shelf.item_positions.get_ordered_entries(),
+            items: shelf.items.clone(), // Clone the BTreeMap
+            item_positions: shelf.item_positions.get_ordered_entries(), // Get Vec from tracker
             created_at: shelf.created_at,
             updated_at: shelf.updated_at,
             appears_in: shelf.appears_in.clone(),
@@ -267,70 +267,55 @@ impl ShelfSerializable {
     }
 }
 
-// --- Main Shelf struct using PositionTracker --- 
-// Does NOT derive CandidType/Deserialize directly because PositionTracker isn't Candid
-#[derive(/* Remove CandidType, Deserialize here */ Clone, Debug)] 
+
+// --- Main Shelf struct using PositionTracker ---
+#[derive(Clone, Debug)] // No CandidType/Deserialize here
 pub struct Shelf {
     pub shelf_id: ShelfId,
     pub title: String,
     pub description: Option<String>,
     pub owner: Principal,
-    pub editors: Vec<Principal>,      
-    pub items: BTreeMap<u32, Item>,      
-    // Use PositionTracker now
-    pub item_positions: PositionTracker<u32>, 
+    pub editors: Vec<Principal>,
+    pub items: BTreeMap<u32, Item>,
+    pub item_positions: PositionTracker<u32>, // Keep the internal tracker
     pub created_at: u64,
     pub updated_at: u64,
-    pub appears_in: Vec<ShelfId>,         
-    pub tags: Vec<NormalizedTag>,         
-    pub is_public: bool,                  
+    pub appears_in: Vec<ShelfId>,
+    pub tags: Vec<NormalizedTag>,
+    pub is_public: bool,
 }
 
-// --- Manual Storable implementation for Shelf --- Needs Encode/Decode
+// --- Update Storable implementation for Shelf ---
 impl Storable for Shelf {
     fn to_bytes(&self) -> Cow<[u8]> {
-        let serializable = ShelfSerializable {
-            shelf_id: self.shelf_id.clone(),
-            title: self.title.clone(),
-            description: self.description.clone(),
-            owner: self.owner.clone(),
-            editors: self.editors.clone(),
-            items: self.items.clone(),
-            // Convert tracker to Vec for serialization
-            item_positions: self.item_positions.get_ordered_entries(), 
-            created_at: self.created_at,
-            updated_at: self.updated_at,
-            appears_in: self.appears_in.clone(),
-            tags: self.tags.clone(),
-            is_public: self.is_public,
-        };
-        // Use Encode! from candid library
-        Cow::Owned(Encode!(&serializable).expect("Failed to encode ShelfSerializable"))
+        // Use ShelfPublic for serialization
+        let public_shelf = ShelfPublic::from_internal(self);
+        Cow::Owned(Encode!(&public_shelf).expect("Failed to encode ShelfPublic"))
     }
 
     fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        // Use Decode! from candid library
-        let serializable: ShelfSerializable = Decode!(bytes.as_ref(), ShelfSerializable).expect("Failed to decode ShelfSerializable");
-        
+        // Use ShelfPublic for deserialization
+        let public_shelf: ShelfPublic = Decode!(bytes.as_ref(), ShelfPublic).expect("Failed to decode ShelfPublic");
+
         // Rebuild PositionTracker from Vec
         let mut item_positions = PositionTracker::<u32>::new();
-        for (key, pos) in serializable.item_positions {
+        for (key, pos) in public_shelf.item_positions {
             item_positions.insert(key, pos);
         }
 
         Self {
-            shelf_id: serializable.shelf_id,
-            title: serializable.title,
-            description: serializable.description,
-            owner: serializable.owner,
-            editors: serializable.editors,
-            items: serializable.items,
+            shelf_id: public_shelf.shelf_id,
+            title: public_shelf.title,
+            description: public_shelf.description,
+            owner: public_shelf.owner,
+            editors: public_shelf.editors,
+            items: public_shelf.items, // Use the deserialized BTreeMap
             item_positions, // Assign the rebuilt tracker
-            created_at: serializable.created_at,
-            updated_at: serializable.updated_at,
-            appears_in: serializable.appears_in,
-            tags: serializable.tags,
-            is_public: serializable.is_public,
+            created_at: public_shelf.created_at,
+            updated_at: public_shelf.updated_at,
+            appears_in: public_shelf.appears_in,
+            tags: public_shelf.tags,
+            is_public: public_shelf.is_public,
         }
     }
 
@@ -692,4 +677,37 @@ impl Storable for NormalizedTagSet {
         Self(set)
     }
     const BOUND: Bound = Bound::Unbounded;
+}
+
+// --- NEW: Simplified Shelf structure for Backup --- 
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct ShelfBackupData {
+    pub shelf_id: ShelfId,
+    pub title: String,
+    pub description: Option<String>,
+    pub owner: Principal, 
+    // No editors
+    pub items: BTreeMap<u32, Item>, // Keep the items map
+    pub item_positions: Vec<(u32, f64)>, // Keep ordered positions
+    // No created_at, updated_at, appears_in
+    pub tags: Vec<NormalizedTag>,
+    pub is_public: bool,
+}
+
+impl ShelfBackupData {
+    // Constructor to convert from the internal Shelf struct
+    pub fn from_internal(shelf: &Shelf) -> Self {
+        Self {
+            shelf_id: shelf.shelf_id.clone(),
+            title: shelf.title.clone(),
+            description: shelf.description.clone(),
+            owner: shelf.owner.clone(),
+            // editors omitted
+            items: shelf.items.clone(), 
+            item_positions: shelf.item_positions.get_ordered_entries(), // Get Vec from tracker
+            // created_at, updated_at, appears_in omitted
+            tags: shelf.tags.clone(),
+            is_public: shelf.is_public,
+        }
+    }
 }
