@@ -1,11 +1,8 @@
-use candid::{CandidType, Deserialize, Principal, Encode, Decode};
+use candid::{CandidType, Deserialize};
 use ic_cdk_macros::query;
-use std::collections::BTreeMap;
-use std::borrow::Cow; // Needed for manual conversion
 
 use crate::storage::{
     SHELVES,
-    ShelfPublic, // Keep temporarily if ShelfBackupData needs it, but likely removable
     ShelfBackupData, // Import the new struct
     GLOBAL_TIMELINE,
     // Remove imports for deleted backup targets:

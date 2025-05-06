@@ -2,18 +2,18 @@ use candid::{CandidType, Nat, Principal, Deserialize};
 use ic_cdk;
 use std::convert::TryInto;
 use std::ops::Bound;
-use std::collections::{BTreeMap, HashSet}; // Import HashSet used by get_user_shelves (now moved)
+use std::collections::BTreeMap; // HashSet is no longer used directly in this file.
 
 use crate::storage::{
-    SHELVES, // Keep SHELVES as it might be used by feeds
+    // SHELVES, // No longer used in this file as feeds have moved
     TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, TAG_METADATA,
     FOLLOWED_USERS, FOLLOWED_TAGS, // Keep FOLLOWED_*
-    Shelf, Item, ShelfId, NormalizedTag, ItemId,
+    Shelf, Item, ShelfId, NormalizedTag, // ItemId is no longer used directly
     TagMetadata, PrincipalSet, NormalizedTagSet
 };
 // Remove UserProfileOrder import
 
-use crate::types::{TagPopularityKey, TagShelfAssociationKey}; // Keep
+use crate::types::TagPopularityKey; // TagShelfAssociationKey is no longer used
 use crate::utils::normalize_tag; // Keep
 use crate::guard::not_anon; // Keep
 

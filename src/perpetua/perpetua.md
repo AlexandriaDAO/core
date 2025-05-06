@@ -135,10 +135,6 @@ Perpetua/
 
 
 
-- Adding to public shelves actually can't be done at all right now.
-  - We probably need a search engine in the backend?
-
-
 - Shelf-type item needs better display with its actual name. It should be like the main page display.
 - Need a my Library area that takes you to your profile page, and the New Shelf button should be there.
 - Need a public search for the create shelf option (and consider how this'll work with duplicate names.)
@@ -149,6 +145,7 @@ Perpetua/
   - Start displaying NFTs by default in conjunction with the shelves.
 - Expander carrot should do something on desktop mode, or be removed.
 - Shouldn't have to wait for following info to load to do stuff.
+- Progressive loading, like in other apps.
 
 
 
@@ -169,22 +166,24 @@ Backend Stuff:
 - Search engine for shelves (public ones at least.)
 - Payment for all/some actions
   - Pay for shelf creation after the fifth shelf. That's it (for now).
+
+- Feed: 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
 - Download personal data as a csv.
   - This way we could use this function to do it manually at various times.
-- Feed: 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
 
 
 
 
 
 
-Bigger stuff: 
-- Progressive loading, like in other apps.
 
 
 ## V2 Features (Separate Canister):
 - More advanced search engine for the setup. So separate architecture with backups (maybe centralized).
+  - Adding to public shelves actually can't be done at all right now.
+  - We probably need a search engine in the backend?
 - A preview of the slots in the profile. (Could be done later)
+
 
 
 

@@ -8,6 +8,7 @@ import { Principal } from "@dfinity/principal";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { useIdentity } from "@/hooks/useIdentity";
 import { AddItemResult } from "@/apps/app/Perpetua/state/thunks/itemThunks";
+import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 
 /**
  * Hook for adding content to shelves
@@ -110,11 +111,38 @@ export const useAddToShelf = () => {
     }
   }, [availableShelves, checkEditAccess, addItem, denormalizeShelf]);
 
+  /**
+   * Fetch public shelves by a specific tag from the backend actor.
+   */
+  const fetchPublicShelvesByTag = useCallback(async (tag: string): Promise<ShelfPublic[]> => {
+    try {
+      const perpetuaActor = await getActorPerpetua();
+      if (!perpetuaActor) {
+        console.error("Perpetua actor could not be initialized");
+        return [];
+      }
+      const result = await perpetuaActor.get_public_shelves_by_tag(tag);
+      if ('Ok' in result) {
+        return result.Ok as ShelfPublic[];
+      } else if ('Err' in result) {
+        console.error("Error fetching public shelves by tag:", result.Err);
+        return [];
+      } else {
+        console.error("Unexpected result structure when fetching public shelves by tag:", result);
+        return [];
+      }
+    } catch (error) {
+      console.error("Exception when fetching public shelves by tag:", error);
+      return [];
+    }
+  }, []);
+
   return {
     addContentToShelf,
     getEditableShelves,
     hasEditableShelvesExcluding: (excludeShelfId?: string) => getEditableShelves(excludeShelfId).length > 0,
     isLoggedIn: !!currentUser,
-    shelvesLoading
+    shelvesLoading,
+    fetchPublicShelvesByTag,
   };
 }; 

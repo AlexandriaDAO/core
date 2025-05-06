@@ -1,6 +1,5 @@
 use candid::{CandidType, Nat, Principal, Deserialize};
 use ic_cdk;
-use std::convert::TryInto;
 use std::collections::BTreeMap;
 use std::ops::Bound;
 
@@ -11,7 +10,6 @@ use crate::storage::{
     USER_SHELVES, GLOBAL_TIMELINE, USER_PROFILE_ORDER, // Added for moved functions
     FOLLOWED_USERS, FOLLOWED_TAGS, PrincipalSet, NormalizedTagSet, // Added for moved functions
     UserProfileOrder, // Added for get_user_shelves
-    TagMetadata // Keep if needed, seems unused in this file now
 };
 // Import necessary types from types module
 use crate::types::TagShelfAssociationKey;
@@ -21,14 +19,12 @@ use crate::utils::normalize_tag;
 use super::follows::{ 
     // Add Offset types back for get_user_shelves
     OffsetPaginationInput, OffsetPaginatedResult, 
-    DEFAULT_PAGE_LIMIT, MAX_PAGE_LIMIT, // Import pagination constants
     CursorPaginationInput, CursorPaginatedResult, // Import pagination types
     QueryResult, QueryError, // Import result types
     ShelfPublic, // Import public shelf structure
 };
 // Add other necessary imports
 use crate::guard::not_anon;
-use std::collections::HashSet; // For get_user_shelves
 
 
 // --- ShelfPositionMetrics Struct (Moved from query.rs) ---
@@ -572,4 +568,51 @@ pub fn get_followed_tags_feed(
         next_cursor,
         limit: Nat::from(limit),
     })
+}
+
+/// Get public shelf DTOs associated with a specific tag.
+/// Returns an empty list if the tag is not found or no public shelves are associated.
+#[ic_cdk::query]
+pub fn get_public_shelves_by_tag(tag: String) -> QueryResult<Vec<ShelfPublic>> {
+    let normalized_tag = normalize_tag(&tag);
+    if normalized_tag.is_empty() {
+        // Consider if TagNotFound is more appropriate, but empty list is also valid.
+        return Ok(Vec::new());
+    }
+
+    let mut shelf_ids_for_tag: Vec<ShelfId> = Vec::new();
+
+    TAG_SHELF_ASSOCIATIONS.with(|assoc_map_borrow| {
+        let map_ref = assoc_map_borrow.borrow();
+        // Define the start key for iteration (inclusive)
+        let start_key = TagShelfAssociationKey(normalized_tag.clone(), String::new()); // Smallest possible ShelfId string
+
+        for (key, _) in map_ref.range((Bound::Included(start_key), Bound::Unbounded)) {
+            if key.0 != normalized_tag {
+                // We've iterated past all associations for the target tag
+                break;
+            }
+            shelf_ids_for_tag.push(key.1.clone());
+        }
+    });
+
+    if shelf_ids_for_tag.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let mut public_shelves: Vec<ShelfPublic> = Vec::new();
+    SHELVES.with(|shelves_map_borrow| {
+        let shelves_map = shelves_map_borrow.borrow();
+        for shelf_id in shelf_ids_for_tag {
+            if let Some(shelf) = shelves_map.get(&shelf_id) {
+                if shelf.is_public {
+                    public_shelves.push(ShelfPublic::from(shelf.clone()));
+                }
+            }
+            // If shelf_id from associations is not in SHELVES, we silently ignore it.
+            // This could indicate a data consistency issue, but the query will still complete.
+        }
+    });
+
+    Ok(public_shelves)
 }
