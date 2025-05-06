@@ -40,7 +40,7 @@ pub mod utils;
 pub mod types;
 
 pub use storage::{Item, Shelf, ShelfId, NormalizedTag, ItemId, ShelfPublic, ShelfBackupData};
-pub use types::{TagPopularityKey, TagShelfAssociationKey};
+pub use types::{TagPopularityKey, TagShelfAssociationKey, GlobalTimelineBackupChunk, ShelvesEssentialBackupChunk, BackupPaginationInput};
 pub use update::shelf::{store_shelf, update_shelf_metadata};
 pub use update::item::{
     AddItemInput, add_item_to_shelf, remove_item_from_shelf, 
@@ -48,7 +48,6 @@ pub use update::item::{
 };
 pub use update::profile::{reorder_profile_shelf, reset_profile_order};
 pub use update::tags::{TagOperationInput, add_tag_to_shelf, remove_tag_from_shelf};
-pub use update::restore::restore_essential_shelves;
 pub use query::follows::{
     get_tag_shelf_count, get_popular_tags, get_tags_with_prefix,
     get_my_followed_tags, get_my_followed_users,
@@ -67,6 +66,7 @@ pub use query::shelves::{
 };
 pub use query::backups::*;
 pub use update::follow::*;
+pub use query::backups::backup_get_global_timeline;
 
 #[init]
 fn init() {

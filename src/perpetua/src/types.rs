@@ -5,7 +5,7 @@ use candid::{Encode, Decode};
 use ic_stable_structures::{storable::Bound, Storable};
 
 // Import necessary types (adjust path if needed)
-use crate::storage::{NormalizedTag, ShelfId};
+use crate::storage::{NormalizedTag, ShelfId, ShelfBackupData};
 
 // --- TagPopularityKey Definition ---
 
@@ -59,4 +59,28 @@ impl Ord for TagShelfAssociationKey {
             other => other,
         }
     }
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct GlobalTimelineEntry {
+    pub timestamp: u64,
+    pub shelf_id: ShelfId,
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct GlobalTimelineBackupChunk {
+    pub data: Vec<GlobalTimelineEntry>,
+    pub total_count: u64,
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct BackupPaginationInput {
+    pub offset: u64,
+    pub limit: u64,
+}
+
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct ShelvesEssentialBackupChunk {
+    pub data: Vec<ShelfBackupData>,
+    pub total_count: u64,
 } 

@@ -40,6 +40,11 @@ type CursorPaginationInput_3 = record {
   limit : nat;
 };
 type CursorPaginationInput_4 = record { cursor : opt text; limit : nat };
+type GlobalTimelineBackupChunk = record {
+  data : vec GlobalTimelineEntry;
+  total_count : nat64;
+};
+type GlobalTimelineEntry = record { shelf_id : text; timestamp : nat64 };
 type Item = record { id : nat32; content : ItemContent };
 type ItemContent = variant { Nft : text; Shelf : text; Markdown : text };
 type OffsetPaginatedResult = record {
@@ -109,6 +114,9 @@ service : () -> {
   backup_get_essential_shelves : (BackupPaginationInput) -> (
       ShelvesEssentialBackupChunk,
     ) query;
+  backup_get_global_timeline : (BackupPaginationInput) -> (
+      GlobalTimelineBackupChunk,
+    ) query;
   create_and_add_shelf_item : (text, text, opt text) -> (Result_1);
   follow_tag : (text) -> (Result);
   follow_user : (principal) -> (Result);
@@ -132,6 +140,7 @@ service : () -> {
   reorder_profile_shelf : (text, opt text, bool) -> (Result);
   reset_profile_order : () -> (Result);
   restore_essential_shelves : (ShelvesEssentialBackupChunk) -> (Result);
+  restore_global_timeline : (GlobalTimelineBackupChunk) -> (Result);
   set_item_order : (text, vec nat32) -> (Result);
   store_shelf : (text, opt text, vec Item, opt vec text) -> (Result_1);
   toggle_shelf_public_access : (text, bool) -> (Result);
