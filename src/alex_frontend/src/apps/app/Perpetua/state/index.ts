@@ -18,8 +18,6 @@ export {
   // Actions
   setSelectedShelf,
   setContentPermission,
-  setShelfEditors,
-  setEditorsLoading,
   clearPermissions,
   clearError,
   updateSingleShelf,
@@ -34,10 +32,7 @@ export {
   selectLoading,
   selectPublicLoading,
   selectError,
-  selectShelfEditors,
-  selectEditorsLoading,
   selectIsOwner,
-  selectIsEditor,
   selectOptimisticShelfItemOrder,
   selectCanAddItem
 } from './perpetuaSlice';

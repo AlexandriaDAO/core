@@ -61,7 +61,6 @@ type Result_1 = variant { Ok : text; Err : text };
 type Result_10 = variant { Ok : CursorPaginatedResult_4; Err : QueryError };
 type Result_11 = variant { Ok : OffsetPaginatedResult; Err : QueryError };
 type Result_12 = variant { Ok : bool; Err : text };
-type Result_13 = variant { Ok : vec principal; Err : text };
 type Result_2 = variant { Ok : CursorPaginatedResult; Err : QueryError };
 type Result_3 = variant { Ok : vec text; Err : QueryError };
 type Result_4 = variant { Ok : vec principal; Err : QueryError };
@@ -90,7 +89,6 @@ type ShelfPublic = record {
   is_public : bool;
   title : text;
   updated_at : nat64;
-  editors : vec principal;
   owner : principal;
   appears_in : vec text;
   tags : vec text;
@@ -107,7 +105,6 @@ type ShelvesEssentialBackupChunk = record {
 type TagOperationInput = record { tag : text; shelf_id : text };
 service : () -> {
   add_item_to_shelf : (text, AddItemInput) -> (Result);
-  add_shelf_editor : (text, principal) -> (Result);
   add_tag_to_shelf : (TagOperationInput) -> (Result);
   backup_get_essential_shelves : (BackupPaginationInput) -> (
       ShelvesEssentialBackupChunk,
@@ -130,9 +127,7 @@ service : () -> {
   get_tags_with_prefix : (text, CursorPaginationInput_4) -> (Result_10) query;
   get_user_shelves : (principal, OffsetPaginationInput) -> (Result_11) query;
   is_shelf_public : (text) -> (Result_12) query;
-  list_shelf_editors : (text) -> (Result_13) query;
   remove_item_from_shelf : (text, nat32) -> (Result);
-  remove_shelf_editor : (text, principal) -> (Result);
   remove_tag_from_shelf : (TagOperationInput) -> (Result);
   reorder_profile_shelf : (text, opt text, bool) -> (Result);
   reset_profile_order : () -> (Result);

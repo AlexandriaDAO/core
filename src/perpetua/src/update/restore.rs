@@ -56,7 +56,6 @@ pub async fn restore_essential_shelves(backup_chunk: ShelvesEssentialBackupChunk
             title: backup_shelf.title,
             description: backup_shelf.description,
             owner: backup_shelf.owner,
-            editors: Vec::new(), // Reset editors as they weren't backed up
             items: backup_shelf.items,
             item_positions, // Use the rebuilt tracker
             created_at: ic_cdk::api::time(), // Set new timestamp

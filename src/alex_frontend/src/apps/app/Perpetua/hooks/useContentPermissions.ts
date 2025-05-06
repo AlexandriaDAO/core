@@ -1,73 +1,65 @@
 import { useIdentity } from '@/hooks/useIdentity';
-import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useCallback } from 'react';
-import { 
-  setContentPermission
-} from '@/apps/app/Perpetua/state/perpetuaSlice';
 
 /**
- * Hook for managing content permissions
- * 
+ * Hook for checking content permissions based on ownership or public status.
+ *
  * This hook provides a convenient way to check if the current user has edit access
- * to a particular piece of content. It provides methods to check permissions
- * based on direct state access to auth information.
+ * to a shelf. Access is granted if the user is the owner or if the shelf is public.
  *
  * @returns Object with permission utilities
  */
 export const useContentPermissions = () => {
-  const dispatch = useAppDispatch();
   const { identity } = useIdentity();
   // Direct state access to auth principal - single source of truth
   const currentPrincipal = useAppSelector(state => state.auth.user?.principal);
-  
+
   // Pre-select all the necessary state data for permission checks
   const shelves = useAppSelector(state => state.perpetua.entities.shelves);
-  const shelfEditors = useAppSelector(state => state.perpetua.shelfEditors);
-  
+  // Add selector for the public access map
+  const publicAccessMap = useAppSelector(state => state.perpetua.publicShelfAccess);
+
   /**
-   * Check if the current user has edit access to the content
-   * This is memoized to avoid recreating the function on each render
+   * Check if the current user has edit access to the content (shelf).
+   * Access is granted if the user is the owner or the shelf is public.
+   * This is memoized to avoid recreating the function on each render.
    */
-  const checkEditAccess = useCallback((contentId: string) => {
-    if (!currentPrincipal) return false;
-    
+  const checkEditAccess = useCallback((contentId: string): boolean => {
+    if (!currentPrincipal) return false; // No user, no access
+
     const shelf = shelves[contentId];
-    if (!shelf) return false;
-    
-    // Check if user is owner
+    if (!shelf) return false; // Shelf not found in state
+
+    // Check 1: Is the user the owner?
     if (shelf.owner === currentPrincipal) return true;
-    
-    // Check if user is editor
-    const editors = shelfEditors[contentId] || [];
-    return editors.includes(currentPrincipal);
-  }, [currentPrincipal, shelves, shelfEditors]);
-  
-  /**
-   * Manually set a permission for a specific content ID
-   * @param contentId - ID of the content
-   * @param hasAccess - Whether the user has edit access
-   */
-  const setEditAccess = useCallback((contentId: string, hasAccess: boolean) => {
-    dispatch(setContentPermission({ contentId, hasEditAccess: hasAccess }));
-  }, [dispatch]);
-  
+
+    // Check 2: Is the shelf public?
+    // Prioritize the dynamically checked publicAccessMap, fall back to shelf.is_public from normalized data
+    const isPublic = publicAccessMap[contentId] !== undefined
+      ? publicAccessMap[contentId]
+      : shelf.is_public; // Use shelf.is_public as fallback
+
+    return isPublic; // Return true if public
+
+  }, [currentPrincipal, shelves, publicAccessMap]); // Added publicAccessMap dependency
+
   /**
    * Determine if a user has edit access to a piece of content
    * based on comparing the content owner with the current user
-   * 
+   *
    * @param ownerPrincipal - Principal ID of the content owner
    * @returns boolean indicating if current user is the owner
    */
-  const isContentOwner = useCallback((ownerPrincipal: string) => {
-    if (!identity) return false;
-    const currentPrincipalStr = identity.getPrincipal().toString();
-    return currentPrincipalStr === ownerPrincipal;
-  }, [identity]);
-  
+  const isContentOwner = useCallback((ownerPrincipal: string): boolean => {
+    // Keep identity check for robustness, but also check currentPrincipal from state
+    if (!currentPrincipal) return false;
+    // Use currentPrincipal from Redux state for consistency
+    return currentPrincipal === ownerPrincipal;
+  }, [currentPrincipal]); // Depend on currentPrincipal from Redux state
+
   return {
     checkEditAccess,
-    setEditAccess,
     isContentOwner,
     currentUser: currentPrincipal
   };

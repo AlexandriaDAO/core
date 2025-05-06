@@ -384,7 +384,7 @@ pub async fn create_and_add_shelf_item(
 pub fn set_item_order(shelf_id: ShelfId, ordered_item_ids: Vec<u32>) -> Result<(), String> {
     let caller = ic_cdk::caller();
 
-    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf, _shelves_map| {
+    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
         // 1. Validation: Check if all provided IDs exist in the shelf's *items* map
         let existing_item_ids: HashSet<u32> = shelf.items.keys().cloned().collect();
         let input_item_ids: HashSet<u32> = ordered_item_ids.iter().cloned().collect();

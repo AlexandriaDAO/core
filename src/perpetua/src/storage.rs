@@ -237,7 +237,6 @@ pub struct ShelfPublic {
     pub title: String,
     pub description: Option<String>,
     pub owner: Principal,
-    pub editors: Vec<Principal>,
     pub items: BTreeMap<u32, Item>, // Use BTreeMap for direct Candid compatibility if Item is CandidType
     pub item_positions: Vec<(u32, f64)>, // Use Vec for Candid compatibility
     pub created_at: u64,
@@ -255,7 +254,6 @@ impl ShelfPublic {
             title: shelf.title.clone(),
             description: shelf.description.clone(),
             owner: shelf.owner.clone(),
-            editors: shelf.editors.clone(),
             items: shelf.items.clone(), // Clone the BTreeMap
             item_positions: shelf.item_positions.get_ordered_entries(), // Get Vec from tracker
             created_at: shelf.created_at,
@@ -275,7 +273,6 @@ pub struct Shelf {
     pub title: String,
     pub description: Option<String>,
     pub owner: Principal,
-    pub editors: Vec<Principal>,
     pub items: BTreeMap<u32, Item>,
     pub item_positions: PositionTracker<u32>, // Keep the internal tracker
     pub created_at: u64,
@@ -308,7 +305,6 @@ impl Storable for Shelf {
             title: public_shelf.title,
             description: public_shelf.description,
             owner: public_shelf.owner,
-            editors: public_shelf.editors,
             items: public_shelf.items, // Use the deserialized BTreeMap
             item_positions, // Assign the rebuilt tracker
             created_at: public_shelf.created_at,
@@ -428,7 +424,6 @@ impl Shelf {
             title,
             description: None,
             owner,
-            editors: Vec::new(),
             items: BTreeMap::new(),
             // Initialize PositionTracker
             item_positions: PositionTracker::new(), 
@@ -443,12 +438,6 @@ impl Shelf {
     /// Builder-style method to add a description
     pub fn with_description(mut self, description: Option<String>) -> Self {
         self.description = description;
-        self
-    }
-
-    /// Builder-style method to add editors
-    pub fn with_editors(mut self, editors: Vec<Principal>) -> Self {
-        self.editors = editors;
         self
     }
 
@@ -686,7 +675,6 @@ pub struct ShelfBackupData {
     pub title: String,
     pub description: Option<String>,
     pub owner: Principal, 
-    // No editors
     pub items: BTreeMap<u32, Item>, // Keep the items map
     pub item_positions: Vec<(u32, f64)>, // Keep ordered positions
     // No created_at, updated_at, appears_in
@@ -702,10 +690,8 @@ impl ShelfBackupData {
             title: shelf.title.clone(),
             description: shelf.description.clone(),
             owner: shelf.owner.clone(),
-            // editors omitted
             items: shelf.items.clone(), 
             item_positions: shelf.item_positions.get_ordered_entries(), // Get Vec from tracker
-            // created_at, updated_at, appears_in omitted
             tags: shelf.tags.clone(),
             is_public: shelf.is_public,
         }

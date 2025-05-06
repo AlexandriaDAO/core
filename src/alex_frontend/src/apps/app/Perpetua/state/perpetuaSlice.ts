@@ -20,11 +20,6 @@ import {
   reorderProfileShelf
 } from './thunks/reorderThunks';
 import {
-  listShelfEditors,
-  addShelfEditor,
-  removeShelfEditor
-} from './thunks/collaborationThunks';
-import {
   checkShelfPublicAccess,
   toggleShelfPublicAccess
 } from './thunks/publicAccessThunks';
@@ -99,7 +94,6 @@ export interface PerpetuaState {
   loading: {
     userShelves: boolean;
     publicShelves: boolean;
-    editors: Record<string, boolean>; // Track loading state for each shelf's editors
     publicAccess: Record<string, boolean>; // Track loading state for public access checks
     popularTags: boolean;
     shelvesByTag: boolean;
@@ -108,8 +102,6 @@ export interface PerpetuaState {
     creatingShelf: boolean; // Add loading state for creating a shelf
   };
   error: string | null;
-  // Editor tracking
-  shelfEditors: Record<string, string[]>; // Map of shelfId -> editor principals
   // Public access tracking
   publicShelfAccess: Record<string, boolean>; // Map of shelfId -> isPublic
 }
@@ -134,7 +126,6 @@ const initialState: PerpetuaState = {
   loading: {
     userShelves: false,
     publicShelves: false,
-    editors: {},
     publicAccess: {},
     popularTags: false,
     shelvesByTag: false,
@@ -143,7 +134,6 @@ const initialState: PerpetuaState = {
     creatingShelf: false, // Initialize creatingShelf loading state
   },
   error: null,
-  shelfEditors: {},
   publicShelfAccess: {},
 };
 
@@ -202,15 +192,6 @@ const perpetuaSlice = createSlice({
     },
     setContentPermission: (state, action: PayloadAction<ContentPermissions>) => {
       // This is now handled via selectors - can be removed if not used elsewhere
-    },
-    // Add a reducer for handling shelf editors
-    setShelfEditors: (state, action: PayloadAction<{shelfId: string, editors: string[]}>) => {
-      const { shelfId, editors } = action.payload;
-      state.shelfEditors[shelfId] = editors;
-    },
-    setEditorsLoading: (state, action: PayloadAction<{shelfId: string, loading: boolean}>) => {
-      const { shelfId, loading } = action.payload;
-      state.loading.editors[shelfId] = loading;
     },
     clearPermissions: (state) => {
       // This is now handled via selectors - can be removed if not used elsewhere
@@ -368,7 +349,6 @@ const perpetuaSlice = createSlice({
           created_at: nowString, // Store as string (Matches updated type)
           updated_at: nowString, // Store as string (Matches updated type)
           is_public: false, 
-          editors: [], 
         };
         
         state.entities.shelves[shelfId] = newShelf;
@@ -418,52 +398,6 @@ const perpetuaSlice = createSlice({
         }
       })
       .addCase(reorderProfileShelf.rejected, (state, action) => {
-        state.error = action.payload as string;
-      })
-      
-      // Handle listShelfEditors
-      .addCase(listShelfEditors.pending, (state, action) => {
-        const shelfId = action.meta.arg;
-        state.loading.editors[shelfId] = true;
-        state.error = null;
-      })
-      .addCase(listShelfEditors.fulfilled, (state, action) => {
-        const { shelfId, editors } = action.payload;
-        state.shelfEditors[shelfId] = editors;
-        state.loading.editors[shelfId] = false;
-      })
-      .addCase(listShelfEditors.rejected, (state, action) => {
-        const shelfId = action.meta.arg;
-        state.loading.editors[shelfId] = false;
-        state.error = action.payload as string;
-      })
-      
-      // Handle addShelfEditor
-      .addCase(addShelfEditor.pending, (state) => {
-        state.error = null;
-      })
-      .addCase(addShelfEditor.fulfilled, (state, action) => {
-        const { shelfId } = action.payload;
-        // The next listShelfEditors call will update the editors
-      })
-      .addCase(addShelfEditor.rejected, (state, action) => {
-        state.error = action.payload as string;
-      })
-      
-      // Handle removeShelfEditor
-      .addCase(removeShelfEditor.pending, (state) => {
-        state.error = null;
-      })
-      .addCase(removeShelfEditor.fulfilled, (state, action) => {
-        const { shelfId, editorPrincipal } = action.payload;
-        // Update the editors list if it exists
-        if (state.shelfEditors[shelfId]) {
-          state.shelfEditors[shelfId] = state.shelfEditors[shelfId].filter(
-            editor => editor !== editorPrincipal
-          );
-        }
-      })
-      .addCase(removeShelfEditor.rejected, (state, action) => {
         state.error = action.payload as string;
       })
       
@@ -598,8 +532,6 @@ export const {
   updateSingleShelf,
   setContentPermission,
   clearPermissions,
-  setShelfEditors,
-  setEditorsLoading,
   setShelfPublicAccess,
   setPublicAccessLoading,
   updateShelfOrder,
@@ -613,8 +545,6 @@ export default perpetuaSlice.reducer;
 const selectPerpetuaState = (state: RootState) => state.perpetua;
 const selectShelvesEntities = (state: RootState): Record<string, NormalizedShelf> => state.perpetua.entities.shelves;
 const selectUserPrincipal = (state: RootState) => state.auth.user?.principal;
-const selectShelfEditorsByIdMap = (state: RootState) => state.perpetua.shelfEditors;
-const selectEditorsLoadingMap = (state: RootState) => state.perpetua.loading.editors;
 const selectShelfItemOrderMap = (state: RootState) => state.perpetua.ids.shelfItems;
 const selectUserShelvesOrder = (state: RootState) => state.perpetua.ids.userShelves;
 const selectPublicShelvesOrder = (state: RootState) => state.perpetua.ids.publicShelves;
@@ -637,11 +567,8 @@ const selectPublicShelfIds = (state: RootState) => state.perpetua.ids.publicShel
 // Enhanced selector caching mechanism
 const memoizedSelectorsByShelfId = {
   shelfById: new Map<string, ReturnType<typeof createSelector>>(),
-  shelfEditors: new Map<string, ReturnType<typeof createSelector>>(),
-  editorsLoading: new Map<string, ReturnType<typeof createSelector>>(),
   canAddItem: new Map<string, ReturnType<typeof createSelector>>(),
   isOwner: new Map<string, ReturnType<typeof createSelector>>(),
-  isEditor: new Map<string, ReturnType<typeof createSelector>>(),
   isPublic: new Map<string, ReturnType<typeof createSelector>>(),
   publicAccessLoading: new Map<string, ReturnType<typeof createSelector>>(),
   optimisticShelfItemOrder: new Map<string, ReturnType<typeof createSelector>>(),
@@ -726,30 +653,6 @@ const selectPublicLoading = selectPublicShelvesLoading;
 // Select error state - Simplified to direct selector
 const selectError = selectPerpetuaError; 
 
-// Select editors for a specific shelf (memoized factory)
-const selectShelfEditors = (shelfId: string) => {
-  if (!memoizedSelectorsByShelfId.shelfEditors.has(shelfId)) {
-    const selector = createSelector(
-      selectShelfEditorsByIdMap,
-      (editorsMap) => editorsMap[shelfId] || []
-    );
-    memoizedSelectorsByShelfId.shelfEditors.set(shelfId, selector);
-  }
-  return memoizedSelectorsByShelfId.shelfEditors.get(shelfId)!;
-};
-
-// Select loading state for editors of a specific shelf (memoized factory)
-const selectEditorsLoading = (shelfId: string) => {
-  if (!memoizedSelectorsByShelfId.editorsLoading.has(shelfId)) {
-    const selector = createSelector(
-      selectEditorsLoadingMap,
-      (loadingMap) => Boolean(loadingMap[shelfId])
-    );
-    memoizedSelectorsByShelfId.editorsLoading.set(shelfId, selector);
-  }
-  return memoizedSelectorsByShelfId.editorsLoading.get(shelfId)!;
-};
-
 // Select public access status for a shelf (memoized factory)
 const selectIsShelfPublic = (shelfId: string): ((state: RootState) => boolean) => {
   if (!memoizedSelectorsByShelfId.isPublic.has(shelfId)) {
@@ -797,24 +700,6 @@ const selectIsOwner = (contentId: string) => {
     memoizedSelectorsByShelfId.isOwner.set(contentId, selector);
   }
   return memoizedSelectorsByShelfId.isOwner.get(contentId)!;
-};
-
-// Select if user is editor (but not owner) of a shelf (memoized factory)
-const selectIsEditor = (contentId: string) => {
-  if (!memoizedSelectorsByShelfId.isEditor.has(contentId)) {
-    const selector = createSelector(
-      selectUserPrincipal,
-      (state: RootState) => selectShelves(state)[contentId], // Use base selector
-      (state: RootState) => selectShelfEditorsByIdMap(state)[contentId],
-      (userPrincipal, shelf, editors) => {
-        if (!userPrincipal || !shelf) return false;
-        if (shelf.owner === userPrincipal) return false;
-        return editors?.includes(userPrincipal) ?? false;
-      }
-    );
-    memoizedSelectorsByShelfId.isEditor.set(contentId, selector);
-  }
-  return memoizedSelectorsByShelfId.isEditor.get(contentId)!;
 };
 
 // Select shelves for a specific user (memoized - uses other selectors)
@@ -881,16 +766,15 @@ const selectTagShelfCount = (tag: string) => {
 };
 
 // Select if user can add items to a shelf (memoized factory)
-// Allows adding if the shelf is public OR the user is owner OR the user is an editor
+// Allows adding if the shelf is public OR the user is owner
 const selectCanAddItem = (contentId: string) => {
   if (!memoizedSelectorsByShelfId.canAddItem.has(contentId)) {
     const selector = createSelector(
       (state: RootState) => selectIsShelfPublic(contentId)(state), // Is it public?
       (state: RootState) => selectIsOwner(contentId)(state),      // Is user the owner?
-      (state: RootState) => selectIsEditor(contentId)(state),     // Is user an editor?
-      (isPublic, isOwner, isEditor) => {
-        // Allow adding if public OR owner OR editor
-        return isPublic || isOwner || isEditor;
+      (isPublic, isOwner) => {
+        // Allow adding if public OR owner
+        return isPublic || isOwner;
       }
     );
     memoizedSelectorsByShelfId.canAddItem.set(contentId, selector);
@@ -924,13 +808,10 @@ export {
     // Factory selectors (exported so they can be called with parameters)
     selectShelfById,
     selectOptimisticShelfItemOrder,
-    selectShelfEditors,
-    selectEditorsLoading,
     selectIsShelfPublic,
     selectPublicAccessLoading,
     selectCanAddItem,
     selectIsOwner,
-    selectIsEditor,
     selectUserShelvesForUser,
     selectShelfIdsForTag,
     selectTagShelfCount

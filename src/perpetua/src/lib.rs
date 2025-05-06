@@ -46,7 +46,6 @@ pub use update::item::{
     AddItemInput, add_item_to_shelf, remove_item_from_shelf, 
     create_and_add_shelf_item
 };
-pub use update::access::{add_shelf_editor, remove_shelf_editor, list_shelf_editors};
 pub use update::profile::{reorder_profile_shelf, reset_profile_order};
 pub use update::tags::{TagOperationInput, add_tag_to_shelf, remove_tag_from_shelf};
 pub use update::restore::restore_essential_shelves;

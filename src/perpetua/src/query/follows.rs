@@ -86,7 +86,6 @@ pub struct ShelfPublic {
     pub title: String,
     pub description: Option<String>,
     pub owner: Principal,
-    pub editors: Vec<Principal>,
     pub items: BTreeMap<u32, Item>, // Assuming Item is CandidType
     // Use Vec for positions, ordered by the tracker
     pub item_positions: Vec<(u32, f64)>,
@@ -105,7 +104,6 @@ impl From<Shelf> for ShelfPublic {
             title: shelf.title,
             description: shelf.description,
             owner: shelf.owner,
-            editors: shelf.editors,
             items: shelf.items,
             item_positions: shelf.item_positions.get_ordered_entries(), // Use tracker method
             created_at: shelf.created_at,

@@ -99,7 +99,7 @@ pub fn update_shelf_metadata(
     let caller = ic_cdk::caller();
     
     // Use the auth helper - update closure to accept the (unused) map argument
-    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf, _shelves_map| {
+    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
         // Update the title if provided and not empty
         if let Some(new_title) = title {
             if new_title.trim().is_empty() {

@@ -9,10 +9,7 @@ import {
   selectLoading,
   selectPublicLoading,
   selectError,
-  selectShelfEditors,
-  selectEditorsLoading,
   selectIsOwner,
-  selectIsEditor,
 } from '../perpetuaSlice';
 
 /**
@@ -39,8 +36,6 @@ export const useLastTimestamp = () => useSelector(selectLastTimestamp);
 // Loading states
 export const useLoadingState = () => useSelector(selectLoading);
 export const usePublicLoadingState = () => useSelector(selectPublicLoading);
-export const useEditorsLoadingState = (shelfId: string) => 
-  useSelector(selectEditorsLoading(shelfId));
 
 // Error state
 export const useError = () => useSelector(selectError);
@@ -51,9 +46,3 @@ export const useUserPrincipal = () => useSelector((state: RootState) => state.au
 // Permission checks
 export const useIsOwner = (contentId: string) => 
   useSelector((state: RootState) => selectIsOwner(contentId)(state));
-export const useIsEditor = (contentId: string) => 
-  useSelector((state: RootState) => selectIsEditor(contentId)(state));  
-
-// Collaboration
-export const useShelfEditors = (shelfId: string) => 
-  useSelector(selectShelfEditors(shelfId)); 

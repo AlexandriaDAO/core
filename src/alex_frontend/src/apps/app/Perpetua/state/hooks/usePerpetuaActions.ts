@@ -24,9 +24,6 @@ import {
   removeItem,
   setItemOrder,
   reorderProfileShelf,
-  listShelfEditors,
-  addShelfEditor,
-  removeShelfEditor,
   checkShelfPublicAccess,
   toggleShelfPublicAccess,
 } from '../thunks';
@@ -110,42 +107,6 @@ export const usePerpetuaActions = () => {
     }) => dispatch(reorderProfileShelf(params)),
     updateShelfOrder: (newOrder: string[]) => 
       dispatch(updateShelfOrder(newOrder)),
-    
-    // Collaboration features
-    listShelfEditors: async (shelfId: string) => {
-      try {
-        return await dispatch(listShelfEditors(shelfId)).unwrap();
-      } catch (error) {
-        console.error("Failed to list shelf editors:", error);
-        return null;
-      }
-    },
-    addShelfEditor: async (params: { shelfId: string, editorPrincipal: string }) => {
-      try {
-        const result = await dispatch(addShelfEditor(params)).unwrap();
-        // Reload the editors list
-        await dispatch(listShelfEditors(params.shelfId)).unwrap();
-        // Get the updated shelf
-        await dispatch(getShelfById(params.shelfId)).unwrap();
-        return result;
-      } catch (error) {
-        console.error("Failed to add shelf editor:", error);
-        return null;
-      }
-    },
-    removeShelfEditor: async (params: { shelfId: string, editorPrincipal: string }) => {
-      try {
-        const result = await dispatch(removeShelfEditor(params)).unwrap();
-        // Reload the editors list
-        await dispatch(listShelfEditors(params.shelfId)).unwrap();
-        // Get the updated shelf
-        await dispatch(getShelfById(params.shelfId)).unwrap();
-        return result;
-      } catch (error) {
-        console.error("Failed to remove shelf editor:", error);
-        return null;
-      }
-    },
     
     // Public access features
     checkShelfPublicAccess: async (shelfId: string) => {

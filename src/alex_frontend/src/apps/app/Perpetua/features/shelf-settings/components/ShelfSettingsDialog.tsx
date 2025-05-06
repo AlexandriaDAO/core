@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/lib/components/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/lib/components/dialog";
-import { Settings, Users } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/lib/components/tabs";
+import { Settings } from "lucide-react";
 import { toggleShelfPublicAccess, checkShelfPublicAccess } from '@/apps/app/Perpetua/state/thunks/publicAccessThunks';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
@@ -10,7 +9,7 @@ import { selectIsOwner, selectIsShelfPublic, selectPublicAccessLoading } from '@
 import { toast } from "sonner";
 import { ShelfSettingsDialogProps } from "../types";
 import { GeneralSettingsTab } from "./GeneralSettingsTab";
-import { CollaboratorsTab } from "./CollaboratorsTab";
+import { PublicAccessSection } from "./PublicAccessSection";
 
 export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({ 
   shelf,
@@ -18,7 +17,6 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
   className = ""
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("general");
   const dispatch = useAppDispatch();
   const isOwner = Boolean(useAppSelector(selectIsOwner(shelf.shelf_id)));
   const isPublic = Boolean(useAppSelector(selectIsShelfPublic(shelf.shelf_id)));
@@ -70,49 +68,28 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
         <DialogHeader className="mb-4">
           <DialogTitle>Shelf Settings</DialogTitle>
           <DialogDescription>
-            Configure settings and manage collaborators for this shelf
+            Configure general settings and public access for this shelf
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs 
-          value={activeTab} 
-          onValueChange={setActiveTab}
-          className="space-y-4"
-        >
-          <TabsList className="w-full grid grid-cols-2">
-            <TabsTrigger value="general">
-              <span className="flex items-center gap-2">
-                <Settings size={16} />
-                General
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="collaborators">
-              <span className="flex items-center gap-2">
-                <Users size={16} />
-                Collaborators
-              </span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="space-y-6">
+          <GeneralSettingsTab
+            shelf={shelf}
+            isOwner={isOwner}
+            onUpdateMetadata={onUpdateMetadata}
+          />
           
-          <TabsContent value="general">
-            <GeneralSettingsTab
-              shelf={shelf}
-              isOwner={isOwner}
-              onUpdateMetadata={onUpdateMetadata}
-            />
-          </TabsContent>
-          
-          <TabsContent value="collaborators">
-            <CollaboratorsTab 
-              shelfId={shelf.shelf_id} 
+          <div className="bg-card rounded-lg p-4">
+            <PublicAccessSection
+              shelfId={shelf.shelf_id}
               isOwner={isOwner}
               isPublic={isPublic}
               isPublicLoading={isPublicLoading}
               isTogglingPublic={isTogglingPublic}
               handlePublicAccessToggle={handlePublicAccessToggle}
             />
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

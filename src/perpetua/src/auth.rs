@@ -44,15 +44,14 @@ pub fn is_shelf_owner(shelf_id: &str, principal: &Principal) -> Result<bool, Str
     Ok(shelf.owner == *principal)
 }
 
-/// Checks if the provided principal has edit permissions for the specified shelf
-/// Returns true if the principal is either the owner, in the editors list, or the shelf is public
+/// Checks if principal can edit shelf
 pub fn can_edit_shelf(shelf_id: &str, principal: &Principal) -> Result<bool, String> {
     let shelf = get_shelf(shelf_id)?;
-    Ok(shelf.owner == *principal || shelf.editors.contains(principal) || shelf.is_public)
+    Ok(shelf.owner == *principal || shelf.is_public)
 }
 
 /// Checks if the provided principal is the admin (owner) of the specified shelf
-/// This is used for admin-only operations like managing editors
+/// This is used for admin-only operations like changing shelf private/public satus.
 pub fn is_shelf_admin(shelf_id: &str, principal: &Principal) -> Result<bool, String> {
     is_shelf_owner(shelf_id, principal)
 }
@@ -76,7 +75,7 @@ pub fn get_shelf_for_owner(shelf_id: &str, principal: &Principal) -> Result<Shel
 pub fn get_shelf_for_edit(shelf_id: &str, principal: &Principal) -> Result<Shelf, String> {
     let shelf = get_shelf(shelf_id)?;
     
-    if shelf.owner != *principal && !shelf.editors.contains(principal) && !shelf.is_public {
+    if shelf.owner != *principal && !shelf.is_public {
         return Err(ShelfAuthError::Unauthorized(
             "Unauthorized: You don't have edit permissions for this shelf".to_string()
         ).into());
@@ -136,7 +135,7 @@ pub fn get_shelf_for_edit_mut<F, R>(
     callback: F
 ) -> Result<R, String> 
 where 
-    F: FnOnce(&mut Shelf, &mut StableBTreeMap<String, Shelf, Memory>) -> Result<R, String>
+    F: FnOnce(&mut Shelf) -> Result<R, String>
 {
     // First verify permissions without borrowing mutable
     if !can_edit_shelf(shelf_id, principal)? {
@@ -157,7 +156,7 @@ where
         let mut shelf_mut = shelf;
         
         // Execute the callback with the mutable shelf and the map
-        let result = callback(&mut shelf_mut, &mut shelves_map)?;
+        let result = callback(&mut shelf_mut)?;
         
         // Update the timestamp
         shelf_mut.updated_at = ic_cdk::api::time();

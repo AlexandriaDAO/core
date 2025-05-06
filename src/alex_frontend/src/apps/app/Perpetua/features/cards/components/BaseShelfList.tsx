@@ -13,8 +13,6 @@ import { useAppSelector } from '@/store/hooks/useAppSelector';
 import {
   selectIsShelfPublic,
   selectIsOwner,
-  selectIsEditor,
-  selectShelfEditors,
   selectUserShelves
 } from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { followUser } from '@/apps/app/Perpetua/state/services/followService';
@@ -338,20 +336,16 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
     // Memoize selector instances to prevent re-creation on every render
     const selectIsPublicMemo = useMemo(() => selectIsShelfPublic(shelf.shelf_id), [shelf.shelf_id]);
     const selectIsOwnerMemo = useMemo(() => selectIsOwner(shelf.shelf_id), [shelf.shelf_id]);
-    const selectIsEditorMemo = useMemo(() => selectIsEditor(shelf.shelf_id), [shelf.shelf_id]);
-    const selectEditorsMemo = useMemo(() => selectShelfEditors(shelf.shelf_id), [shelf.shelf_id]);
 
     // Use memoized selectors with useAppSelector
     const isPublic = Boolean(useAppSelector(selectIsPublicMemo));
     const isOwner = Boolean(useAppSelector(selectIsOwnerMemo));
-    const isEditor = Boolean(useAppSelector(selectIsEditorMemo));
-    const editors = useAppSelector(selectEditorsMemo) as string[]; 
-    const editorsCount = editors.length;
 
+    // Updated collaboration data - only based on ownership now
     const collaborationData = {
       isOwner,
-      isCollaborator: isEditor,
-      editorsCount
+      isCollaborator: false, // No editors means no collaborators other than owner
+      editorsCount: 0 // No editors
     };
 
     return (
@@ -363,8 +357,8 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
           isReordering={isEditMode}
           parentShelfId={undefined}
           itemId={undefined}
-          isPublic={isPublic} 
-          showCollaborationInfo={isOwner || isEditor || editorsCount > 0} 
+          isPublic={isPublic}
+          showCollaborationInfo={isOwner}
           collaborationData={collaborationData}
         />
       </div>
