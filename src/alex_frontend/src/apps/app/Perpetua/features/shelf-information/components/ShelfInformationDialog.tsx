@@ -12,6 +12,8 @@ import {
 import { Info, User, CalendarDays, Hash, Layers, Package } from "lucide-react";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { ShelfLinkItem } from "../../shelf-settings/components/ShelfLinkItem";
+import { Principal } from "@dfinity/principal";
+import { useUsername } from "@/hooks/useUsername";
 
 interface ShelfInformationDialogProps {
   shelf: ShelfPublic;
@@ -51,12 +53,21 @@ export const ShelfInformationDialog: React.FC<ShelfInformationDialogProps> = ({
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
-  // Assuming shelf.owner is a Principal
-  const ownerPrincipal = shelf.owner ? shelf.owner.toText() : "N/A";
+  const ownerPrincipalString = React.useMemo(() => {
+    if (shelf.owner instanceof Principal) return shelf.owner.toText();
+    if (typeof shelf.owner === 'string') return shelf.owner;
+    return ""; // Fallback for unexpected types
+  }, [shelf.owner]);
+
+  const { username: ownerUsername, isLoading: isLoadingOwnerUsername } = useUsername(ownerPrincipalString);
+
   const createdAt = shelf.created_at ? formatDate(shelf.created_at) : "N/A";
   const updatedAt = shelf.updated_at ? formatDate(shelf.updated_at) : "N/A";
   const itemCount = shelf.items ? String(shelf.items.length) : "N/A";
 
+  const ownerDisplayValue = isLoadingOwnerUsername
+    ? "Loading username..."
+    : ownerUsername || ownerPrincipalString || "N/A";
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -85,7 +96,7 @@ export const ShelfInformationDialog: React.FC<ShelfInformationDialogProps> = ({
         </DialogHeader>
 
         <div className="grid gap-6 py-1">
-          <DetailItem icon={User} label="Owner" value={ownerPrincipal} />
+          <DetailItem icon={User} label="Owner" value={ownerDisplayValue} />
           <DetailItem icon={CalendarDays} label="Created Date" value={createdAt} />
           <DetailItem icon={CalendarDays} label="Last Updated" value={updatedAt} />
           <DetailItem icon={Package} label="Number of Items" value={itemCount} />

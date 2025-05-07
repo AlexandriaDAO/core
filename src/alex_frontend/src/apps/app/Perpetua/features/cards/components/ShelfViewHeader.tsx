@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Button } from "@/lib/components/button";
 import { ArrowLeft, User } from "lucide-react";
-import { PrincipalDisplay } from '@/apps/Modules/shared/components/PrincipalDisplay';
 import { parsePathInfo } from "../../../routes";
 import { buildRoutes } from "../../../routes";
+import { useUsername } from '@/hooks/useUsername';
+import { Principal } from '@dfinity/principal';
 
 interface ShelfViewHeaderProps {
   shelf: any;
@@ -14,24 +15,20 @@ export const ShelfViewHeader: React.FC<ShelfViewHeaderProps> = ({
   shelf,
   onBack
 }) => {
-  // Get path information
   const { isUserView, userId, backButtonLabel } = parsePathInfo(window.location.pathname);
+
+  const ownerPrincipalString = useMemo(() => {
+    if (shelf.owner instanceof Principal) {
+      return shelf.owner.toText();
+    }
+    return String(shelf.owner || '');
+  }, [shelf.owner]);
+
+  const { username: ownerUsername, isLoading: isLoadingOwnerUsername } = useUsername(ownerPrincipalString);
   
-  // Navigate to shelf owner's page
   const goToOwnerShelves = () => {
-    const targetUser = isUserView && userId ? userId : shelf.owner.toString();
-    window.location.href = buildRoutes.user(targetUser);
-  };
-  
-  // Format user information for breadcrumb display
-  const getUserBreadcrumb = () => {
-    const id = isUserView && userId ? userId : shelf.owner.toString();
-    return {
-      id,
-      label: isUserView && userId 
-        ? `User ${userId.slice(0, 8)}...` 
-        : `${shelf.owner.toString().slice(0, 8)}...`
-    };
+    const targetUser = isUserView && userId ? userId : ownerPrincipalString;
+    if (targetUser) window.location.href = buildRoutes.user(targetUser);
   };
   
   const handleBackClick = () => {
@@ -42,8 +39,12 @@ export const ShelfViewHeader: React.FC<ShelfViewHeaderProps> = ({
     }
   };
   
-  const userBreadcrumb = getUserBreadcrumb();
-  
+  const userBreadcrumbDisplay = isLoadingOwnerUsername 
+    ? 'Loading user...' 
+    : ownerUsername || (ownerPrincipalString ? `${ownerPrincipalString.slice(0,5)}...${ownerPrincipalString.slice(-3)}` : 'Unknown Owner');
+
+  const ownerLinkTooltip = `View all shelves by ${ownerUsername || ownerPrincipalString || 'this user'}`;
+
   return (
     <div className="flex flex-col w-full font-serif relative z-20">
       {/* Breadcrumb navigation bar */}
@@ -58,20 +59,23 @@ export const ShelfViewHeader: React.FC<ShelfViewHeaderProps> = ({
             {backButtonLabel}
           </Button>
           
-          <div className="flex items-center px-3 text-sm">
-            <Button
-              variant="ghost"
-              onClick={goToOwnerShelves}
-              className="p-0 h-auto text-sm hover:bg-transparent"
-              title={`View all shelves by ${userBreadcrumb.id}`}
-            >
-              <User className="w-3 h-3 mr-1" />
-              {userBreadcrumb.label}
-            </Button>
-            
-            <span className="mx-1 text-muted-foreground">/</span>
-            <span className="font-medium">{shelf.title}</span>
-          </div>
+          {ownerPrincipalString && (
+            <div className="flex items-center px-3 text-sm">
+              <Button
+                variant="ghost"
+                onClick={goToOwnerShelves}
+                className="p-0 h-auto text-sm hover:bg-transparent"
+                title={ownerLinkTooltip}
+                disabled={isLoadingOwnerUsername}
+              >
+                <User className="w-3 h-3 mr-1" />
+                {userBreadcrumbDisplay}
+              </Button>
+              
+              <span className="mx-1 text-muted-foreground">/</span>
+              <span className="font-medium truncate max-w-[200px] sm:max-w-[300px]" title={shelf.title}>{shelf.title}</span>
+            </div>
+          )}
         </div>
       </div>
       
@@ -81,9 +85,14 @@ export const ShelfViewHeader: React.FC<ShelfViewHeaderProps> = ({
         {shelf.description && (
           <p className="text-muted-foreground font-serif">{shelf.description}</p>
         )}
-        <div className="mt-2 flex items-center text-xs text-muted-foreground font-serif">
-          Owner: <PrincipalDisplay principal={shelf.owner} />
-        </div>
+        {ownerPrincipalString && (
+            <div className="mt-2 flex items-center text-xs text-muted-foreground font-serif">
+            Owner: 
+            {isLoadingOwnerUsername 
+                ? <span className="ml-1">Loading...</span> 
+                : <span className="ml-1 font-medium text-primary cursor-pointer hover:underline" onClick={goToOwnerShelves} title={ownerLinkTooltip}>{ownerUsername || ownerPrincipalString}</span>}
+            </div>
+        )}
       </div>
     </div>
   );

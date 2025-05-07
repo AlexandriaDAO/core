@@ -18,6 +18,7 @@ import { Principal } from "@dfinity/principal";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { loadShelves } from "../state";
 import { useIdentity } from "@/hooks/useIdentity";
+import { useUsername } from '@/hooks/useUsername';
 
 // Import UI components
 import {
@@ -88,15 +89,18 @@ const PerpetuaLayout: React.FC = () => {
   
   // View state
   const { viewFlags, params } = useViewState();
-  const { shelfId, userId } = params;
+  const { shelfId, userId: routeUserId } = params;
   const { isShelfDetail, isUserDetail, isMainView } = viewFlags;
+  
+  // Fetch username for the user ID from the route
+  const { username: routeUsername, isLoading: isLoadingRouteUsername } = useUsername(routeUserId);
   
   // Get user-specific shelves from Redux using a stable approach
   const userShelvesSelector = useMemo(() => {
     // Only create the specific selector if userId is present
     // Ensure the function signature matches what useSelector expects
-    return userId ? (state: RootState) => selectUserShelvesForUser(state, userId) : null;
-  }, [userId]);
+    return routeUserId ? (state: RootState) => selectUserShelvesForUser(state, routeUserId) : null;
+  }, [routeUserId]);
 
   // Use the memoized selector, or default to the stable empty array
   const userShelves = useAppSelector(state => userShelvesSelector ? userShelvesSelector(state) : stableEmptyShelves);
@@ -156,11 +160,11 @@ const PerpetuaLayout: React.FC = () => {
   
   // Load shelves when viewing a specific user's profile (modified to prevent loops)
   useEffect(() => {
-    if (isUserDetail && userId && userId !== userPrincipal && !userShelvesLoading) {
+    if (isUserDetail && routeUserId && routeUserId !== userPrincipal && !userShelvesLoading) {
       setUserShelvesLoading(true);
       // Dispatch loadShelves and let Redux handle state management
       dispatch(loadShelves({ 
-        principal: userId, 
+        principal: routeUserId, 
         params: { offset: 0, limit: 20 }
       }))
         .unwrap()
@@ -171,7 +175,7 @@ const PerpetuaLayout: React.FC = () => {
           setUserShelvesLoading(false);
         });
     }
-  }, [dispatch, isUserDetail, userId, userPrincipal, userShelvesLoading]);
+  }, [dispatch, isUserDetail, routeUserId, userPrincipal, userShelvesLoading]);
   
   // Handle shelf selection when route changes - simplified dependencies
   useEffect(() => {
@@ -252,32 +256,38 @@ const PerpetuaLayout: React.FC = () => {
     }
     
     // If we're viewing a specific user's shelves
-    if (isUserDetail && userId) {
-      // Check if this is the current user's profile
-      const isCurrentUserProfile = userPrincipal === userId;
-      let displayedUsername: string | undefined = undefined;
-
-      if (isCurrentUserProfile && authUser && typeof (authUser as any).username === 'string') {
-        // Attempt to use username from authUser if it exists and is a string
-        displayedUsername = (authUser as any).username;
-      }
-      // For other users (userId !== userPrincipal), displayedUsername remains undefined.
-      // UserShelvesUI will fall back to Principal ID if username is not available.
+    if (isUserDetail && routeUserId) {
+      const isCurrentUserProfile = userPrincipal === routeUserId;
       
-      // Use directly loaded user shelves instead of filtering from publicShelves
+      // Determine the username to display
+      // If it's the current user's profile, authUser.username might be available and fresher initially
+      // Otherwise, use the fetched routeUsername
+      let displayedUsername: string | undefined = undefined;
+      if (isCurrentUserProfile && authUser && typeof (authUser as any).username === 'string') {
+        displayedUsername = (authUser as any).username;
+      } else if (routeUsername) {
+        displayedUsername = routeUsername;
+      } else if (isLoadingRouteUsername) {
+        // Optionally, show principal or loading indicator while username is loading for other users
+        displayedUsername = `Loading user...`; // Or routeUserId to show principal
+      } else {
+        // Fallback if username couldn't be fetched
+        displayedUsername = routeUserId; // Display principal as fallback
+      }
+
       const userDenormalizedShelves = denormalizeShelves(userShelves);
       
       return (
         <UserShelvesUI 
           shelves={userDenormalizedShelves}
-          loading={userShelvesLoading}
+          loading={userShelvesLoading || isLoadingRouteUsername} // Combine loading states
           onViewShelf={goToShelf}
-          onViewOwner={goToUser}
+          onViewOwner={goToUser} // This likely navigates to a user page, might need username there too
           onBack={goToMainShelves}
           isCurrentUser={isCurrentUserProfile}
           onNewShelf={isCurrentUserProfile ? handleCreateShelf : undefined}
           isCreatingShelf={isCurrentUserProfile ? isCreatingShelf : undefined}
-          ownerUsername={displayedUsername}
+          ownerUsername={displayedUsername} // Pass the resolved or fallback username
         />
       );
     }

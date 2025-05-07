@@ -37,6 +37,7 @@ import emporiumReducer from "@/apps/app/Emporium/emporiumSlice";
 import arweaveAssetsReducer from '@/features/arweave-assets/arweaveAssetsSlice';
 import icpAssetsReducer from '@/features/icp-assets/icpAssetsSlice';
 import imporiumReducer from '@/features/imporium/imporiumSlice';
+import userDisplayReducer from './slices/userDisplaySlice';
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -78,6 +79,7 @@ const rootReducer = combineReducers({
 
 	arweaveAssets: arweaveAssetsReducer,
 	icpAssets: icpAssetsReducer,
+	userDisplay: userDisplayReducer,
 });
 
 export default rootReducer;

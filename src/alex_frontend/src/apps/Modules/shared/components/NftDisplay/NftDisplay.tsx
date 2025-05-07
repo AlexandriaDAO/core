@@ -15,6 +15,7 @@ import { convertE8sToToken } from '@/apps/Modules/shared/utils/tokenUtils';
 import { getNftOwnerInfo } from '@/apps/Modules/shared/utils/nftOwner';
 import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/services/contentService';
 import { fetchTransactionById } from '@/apps/Modules/LibModules/arweaveSearch/api/directArweaveClient';
+import { useUsername } from '@/hooks/useUsername';
 import { NftDisplayProps } from './types';
 
 // Constants
@@ -27,7 +28,7 @@ const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
  * Supports different display densities, data loading strategies, and customizable features.
  * Footer functionality has been removed and details are expected to be shown via hover effects.
  */
-const NftDisplay: React.FC<NftDisplayProps> = ({
+const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }> = ({
   tokenId,
   variant = 'compact',
   aspectRatio = 1, // Default to 1:1 ratio
@@ -38,6 +39,7 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
   transaction: providedTransaction,
   onClick,
   onViewDetails,
+  showOwnerInfo = false,
 }) => {
   // Component state
   const [isLoading, setIsLoading] = useState(true);
@@ -45,13 +47,17 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
   const [contentUrls, setContentUrls] = useState<any>(null);
   const [ownerInfo, setOwnerInfo] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+  const [ownerPrincipal, setOwnerPrincipal] = useState<string | null>(null);
+
   // Redux state
   const dispatch = useDispatch<AppDispatch>();
   const contentData = useSelector((state: RootState) => state.transactions.contentData);
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const transactions = useSelector((state: RootState) => state.transactions.transactions);
   const { user } = useSelector((state: RootState) => state.auth);
+
+  // Use the useUsername hook
+  const { username: ownerUsername, isLoading: isLoadingOwnerUsername } = useUsername(ownerPrincipal);
 
   // Normalize providedTransaction for dependency array
   const transactionDependency = providedTransaction ?? undefined;
@@ -170,6 +176,26 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
     // Dependency array: Use the normalized transactionDependency
   }, [tokenId, arweaveId, transactionDependency, loadingStrategy, dispatch, nfts, transactions, contentData, arweaveToNftId]);
 
+  // Effect to fetch owner principal if showOwnerInfo is true and tokenId is present
+  useEffect(() => {
+    let mounted = true;
+    if (showOwnerInfo && tokenId) {
+      getNftOwnerInfo(tokenId)
+        .then(info => {
+          if (mounted && info) {
+            setOwnerPrincipal(info.principal);
+          }
+        })
+        .catch(err => {
+          if (mounted) {
+            console.error('[NftDisplay] Failed to get owner info:', err);
+            setOwnerPrincipal(null); // Reset on error
+          }
+        });
+    }
+    return () => { mounted = false; };
+  }, [tokenId, showOwnerInfo]);
+
   // Error handler for ContentRenderer
   const handleRenderError = () => {
     if (transaction) {
@@ -276,6 +302,13 @@ const NftDisplay: React.FC<NftDisplayProps> = ({
       >
         {renderContent()}
       </div>
+
+      {/* Owner Information Display */}
+      {showOwnerInfo && ownerPrincipal && (
+        <div className="mt-2 text-xs text-muted-foreground text-center">
+          Owned by: {isLoadingOwnerUsername ? 'Loading...' : ownerUsername || ownerPrincipal}
+        </div>
+      )}
     </div>
   );
 };

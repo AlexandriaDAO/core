@@ -15,7 +15,6 @@ import {
   selectIsOwner,
   selectUserShelves
 } from '@/apps/app/Perpetua/state/perpetuaSlice';
-import { followUser } from '@/apps/app/Perpetua/state/services/followService';
 import { NormalizedShelf } from '@/apps/app/Perpetua/state/perpetuaSlice';
 
 // Types for the component
@@ -27,7 +26,6 @@ export interface BaseShelfListProps {
   backLabel?: string;
   loading?: boolean;
   isCurrentUserProfile?: boolean;
-  profileOwnerPrincipal?: string;
   allowReordering?: boolean;
   onViewShelf?: (shelfId: string) => void;
   onViewOwner?: (ownerId: string) => void;
@@ -51,7 +49,6 @@ interface ListHeaderProps {
   title: string;
   showBackButton: boolean;
   backLabel: string;
-  profileOwnerPrincipal?: string;
   isCurrentUserProfile: boolean;
   allowReordering: boolean;
   canCreateNewShelf: boolean;
@@ -83,7 +80,6 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   backLabel = "All Shelves",
   loading = false,
   isCurrentUserProfile = false,
-  profileOwnerPrincipal,
   allowReordering = false,
   onViewShelf,
   onViewOwner,
@@ -98,7 +94,6 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [saveInProgress, setSaveInProgress] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [followInProgress, setFollowInProgress] = useState(false);
   
   // Convert shelves to reorderable format for drag-and-drop UI
   const reorderableShelves = useMemo(() => {
@@ -177,40 +172,15 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
       setSaveInProgress(false);
     }
   }, [draggedShelves, onSaveOrder]);
-  
-  // --- Follow User Handler ---
-  const handleFollowUser = useCallback(async () => {
-    if (!profileOwnerPrincipal) return;
-    setFollowInProgress(true);
-    try {
-      const result = await followUser(profileOwnerPrincipal);
-      if ('Ok' in result) {
-        toast.success(`Followed user ${profileOwnerPrincipal.substring(0, 5)}...`);
-        // TODO: Update local/global state to reflect follow status later
-      } else {
-        toast.error(`Failed to follow user: ${result.Err}`);
-      }
-    } catch (error) {
-      console.error("Error following user:", error);
-      toast.error("An unexpected error occurred while trying to follow the user.");
-    } finally {
-      setFollowInProgress(false);
-    }
-  }, [profileOwnerPrincipal]);
 
   // Sub-component for rendering the header
   const ListHeader = ({ 
-    title, showBackButton, backLabel, handleGoBack, profileOwnerPrincipal, isCurrentUserProfile,
+    title, showBackButton, backLabel, handleGoBack, isCurrentUserProfile,
     allowReordering, canCreateNewShelf, canEditOrder, isEditMode, enterEditMode, 
     cancelEditMode, saveShelfOrder, saveInProgress, saveError, onNewShelf,
     isCreatingShelf
   }: ListHeaderProps) => {
       
-      // Determine if the follow button should be shown
-      const showFollowButton = 
-        profileOwnerPrincipal &&       // Owner principal is known
-        !isCurrentUserProfile;       // Not viewing own profile
-  
       return (
         <div className="flex flex-col gap-4 mb-6 font-serif">
           {showBackButton && (
@@ -232,24 +202,12 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
             <h2 className="text-2xl font-bold font-serif">{title}</h2>
             
             <div className="flex items-center gap-2">
-              {showFollowButton && (
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-1 px-3 h-9"
-                    onClick={handleFollowUser}
-                    disabled={followInProgress}
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    {followInProgress ? 'Following...' : 'Follow'}
-                  </Button>
-              )}
-              
               {canCreateNewShelf && !isEditMode && (
                 <Button 
                   variant="primary" 
                   className="flex items-center gap-1 px-3 h-9"
                   onClick={onNewShelf}
-                  disabled={loading || saveInProgress || followInProgress || isCreatingShelf}
+                  disabled={loading || saveInProgress}
                 >
                   {isCreatingShelf ? (
                     <>
@@ -271,7 +229,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
                     variant="outline" 
                     className="flex items-center gap-1 px-3 h-9"
                     onClick={enterEditMode}
-                    disabled={loading || saveInProgress || followInProgress}
+                    disabled={loading || saveInProgress}
                   >
                     <Edit className="w-4 h-4" />
                     Edit Order
@@ -332,7 +290,12 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
   );
 
   // Wrapper component defined directly inside BaseShelfList
-  const ShelfCardWrapper: React.FC<{ shelf: ShelfPublic; isEditMode: boolean; isDragging: boolean; }> = ({ shelf, isEditMode, isDragging }) => {
+  const ShelfCardWrapper: React.FC<{ 
+    shelf: ShelfPublic; 
+    isEditMode: boolean; 
+    isDragging: boolean; 
+    onViewOwner?: (ownerId: string) => void;
+  }> = ({ shelf, isEditMode, isDragging, onViewOwner }) => {
     // Memoize selector instances to prevent re-creation on every render
     const selectIsPublicMemo = useMemo(() => selectIsShelfPublic(shelf.shelf_id), [shelf.shelf_id]);
     const selectIsOwnerMemo = useMemo(() => selectIsOwner(shelf.shelf_id), [shelf.shelf_id]);
@@ -360,6 +323,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
           isPublic={isPublic}
           showCollaborationInfo={isOwner}
           collaborationData={collaborationData}
+          onViewOwner={onViewOwner}
         />
       </div>
     );
@@ -373,7 +337,6 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
         showBackButton={showBackButton}
         backLabel={backLabel}
         handleGoBack={handleGoBack}
-        profileOwnerPrincipal={profileOwnerPrincipal}
         isCurrentUserProfile={isCurrentUserProfile}
         allowReordering={allowReordering}
         canCreateNewShelf={!!onNewShelf}
@@ -408,6 +371,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
                   shelf={item.shelf} 
                   isEditMode={isEditMode} 
                   isDragging={isDragging} 
+                  onViewOwner={onViewOwner}
                 />
               } 
               columns={3}
@@ -421,6 +385,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
                   shelf={shelf} 
                   isEditMode={false} 
                   isDragging={false} 
+                  onViewOwner={onViewOwner}
                 />
               ))}
             </ContentGrid>
@@ -431,7 +396,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
               <Button 
                 variant="outline" 
                 onClick={onLoadMore} 
-                disabled={loading || saveInProgress || followInProgress}
+                disabled={loading || saveInProgress}
               >
                 Load More
               </Button>
@@ -454,7 +419,6 @@ export const MemoizedBaseShelfList = React.memo(BaseShelfList, (prevProps: Reado
     prevProps.loading !== nextProps.loading ||
     prevProps.isCurrentUserProfile !== nextProps.isCurrentUserProfile ||
     prevProps.allowReordering !== nextProps.allowReordering ||
-    prevProps.profileOwnerPrincipal !== nextProps.profileOwnerPrincipal ||
     prevProps.isCreatingShelf !== nextProps.isCreatingShelf
   ) {
     return false; // Re-render

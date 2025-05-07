@@ -13,13 +13,6 @@ use sha2;
 use bs58;
 use std::cmp::Ordering; // Import Ordering for custom Ord impl
 
-// Remove the duplicate definition from here, keep the one in utils.rs
-// /// Normalizes a tag by converting to lowercase, trimming whitespace
-// /// This helps prevent duplicates with minor variations
-// pub fn normalize_tag(tag: &str) -> String {
-//     tag.trim().to_lowercase()
-// }
-
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 // --- Define ShelfId and NormalizedTag types ---
