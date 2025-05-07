@@ -5,7 +5,7 @@ import { loadShelves, getShelfById } from './queryThunks';
 import { 
   createShelf as createShelfService,
   updateShelfMetadata as updateShelfMetadataService,
-  createAndAddShelfItem as createAndAddShelfItemService
+  // createAndAddShelfItem as createAndAddShelfItemService
 } from '../services';
 import { extractErrorMessage } from '../../utils';
 
@@ -78,48 +78,48 @@ export const updateShelfMetadata = createAsyncThunk(
   }
 );
 
-/**
- * Create a new shelf and add it as an item to a parent shelf
- */
-export const createAndAddShelfItem = createAsyncThunk(
-  'perpetua/createAndAddShelfItem',
-  async ({ 
-    parentShelfId, 
-    title, 
-    description, 
-    principal 
-  }: { 
-    parentShelfId: string, 
-    title: string, 
-    description: string, 
-    principal: Principal | string 
-  }, { rejectWithValue }) => {
-    try {
-      const result = await createAndAddShelfItemService(parentShelfId, title, description);
+// /**
+//  * Create a new shelf and add it as an item to a parent shelf
+//  */
+// export const createAndAddShelfItem = createAsyncThunk(
+//   'perpetua/createAndAddShelfItem',
+//   async ({ 
+//     parentShelfId, 
+//     title, 
+//     description, 
+//     principal 
+//   }: { 
+//     parentShelfId: string, 
+//     title: string, 
+//     description: string, 
+//     principal: Principal | string 
+//   }, { rejectWithValue }) => {
+//     try {
+//       const result = await createAndAddShelfItemService(parentShelfId, title, description);
       
-      if ("Ok" in result && result.Ok) {
-        // Invalidate all relevant caches
-        cacheManager.invalidateForPrincipal(principal);
-        cacheManager.invalidateForShelf(parentShelfId);
+//       if ("Ok" in result && result.Ok) {
+//         // Invalidate all relevant caches
+//         cacheManager.invalidateForPrincipal(principal);
+//         cacheManager.invalidateForShelf(parentShelfId);
         
-        // Get the shelf ID from the result
-        const newShelfId = result.Ok;
+//         // Get the shelf ID from the result
+//         const newShelfId = result.Ok;
         
-        return { 
-          success: true, 
-          parentShelfId, 
-          newShelfId,
-          principal
-        };
-      } 
+//         return { 
+//           success: true, 
+//           parentShelfId, 
+//           newShelfId,
+//           principal
+//         };
+//       } 
       
-      if ("Err" in result && result.Err) {
-        return rejectWithValue(result.Err);
-      }
+//       if ("Err" in result && result.Err) {
+//         return rejectWithValue(result.Err);
+//       }
       
-      return rejectWithValue("Unknown error creating and adding shelf item");
-    } catch (error) {
-      return rejectWithValue(extractErrorMessage(error, "Failed to create and add shelf"));
-    }
-  }
-); 
+//       return rejectWithValue("Unknown error creating and adding shelf item");
+//     } catch (error) {
+//       return rejectWithValue(extractErrorMessage(error, "Failed to create and add shelf"));
+//     }
+//   }
+// ); 

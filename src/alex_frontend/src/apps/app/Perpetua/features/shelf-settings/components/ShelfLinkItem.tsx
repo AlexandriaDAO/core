@@ -19,10 +19,12 @@ export const ShelfLinkItem: React.FC<ShelfLinkItemProps> = ({ shelfId }) => {
   const displayText = shelfData?.title || shelfId;
 
   return (
-    <li>
+    <li className="inline-block mr-2 mb-2">
       <Link 
         to={linkPath} 
-        className="block w-full bg-muted/50 px-2 py-1 rounded text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus:outline-none focus:ring-1 focus:ring-ring"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium px-3 py-1.5 rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 whitespace-nowrap"
         title={`Go to shelf: ${displayText}`}
       >
         {displayText}

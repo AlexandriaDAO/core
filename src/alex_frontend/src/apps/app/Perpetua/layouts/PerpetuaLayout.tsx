@@ -26,6 +26,7 @@ import {
 } from "../features/shelf-management/containers/ShelfLists";
 import { default as NewShelfDialog } from "../features/shelf-management/components/NewShelf";
 import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
+import { Button } from "@/lib/components/button";
 
 // Import Tag components
 import { PopularTagsList } from '../features/tags/components/PopularTagsList';
@@ -70,8 +71,8 @@ const PerpetuaLayout: React.FC = () => {
   const dispatch = useAppDispatch();
   const selectedShelf = useAppSelector(selectSelectedShelf);
   const currentSelectedShelfId = useAppSelector(state => state.perpetua.selectedShelfId); // Direct access for comparison
-  // Direct state access to auth principal - single source of truth
-  const userPrincipal = useAppSelector(state => state.auth.user?.principal);
+  const authUser = useAppSelector(state => state.auth.user);
+  const userPrincipal = authUser?.principal;
   const { identity } = useIdentity();
   const currentTagFilter = useAppSelector(selectCurrentTagFilter); // Get the active tag filter
   const isCreatingShelf = useAppSelector(selectIsCreatingShelf); // Get the loading state
@@ -206,6 +207,13 @@ const PerpetuaLayout: React.FC = () => {
     if (isMainView) {
       return (
         <>
+          {userPrincipal && (
+            <div className="mb-4">
+              <Button onClick={() => goToUser(userPrincipal.toString())}>
+                My Library
+              </Button>
+            </div>
+          )}
           {/* Add Tag Components */} 
           <div className="flex flex-col sm:flex-row gap-4 mb-4 items-start">
             <div className="flex-grow">
@@ -247,6 +255,14 @@ const PerpetuaLayout: React.FC = () => {
     if (isUserDetail && userId) {
       // Check if this is the current user's profile
       const isCurrentUserProfile = userPrincipal === userId;
+      let displayedUsername: string | undefined = undefined;
+
+      if (isCurrentUserProfile && authUser && typeof (authUser as any).username === 'string') {
+        // Attempt to use username from authUser if it exists and is a string
+        displayedUsername = (authUser as any).username;
+      }
+      // For other users (userId !== userPrincipal), displayedUsername remains undefined.
+      // UserShelvesUI will fall back to Principal ID if username is not available.
       
       // Use directly loaded user shelves instead of filtering from publicShelves
       const userDenormalizedShelves = denormalizeShelves(userShelves);
@@ -259,6 +275,9 @@ const PerpetuaLayout: React.FC = () => {
           onViewOwner={goToUser}
           onBack={goToMainShelves}
           isCurrentUser={isCurrentUserProfile}
+          onNewShelf={isCurrentUserProfile ? handleCreateShelf : undefined}
+          isCreatingShelf={isCurrentUserProfile ? isCreatingShelf : undefined}
+          ownerUsername={displayedUsername}
         />
       );
     }

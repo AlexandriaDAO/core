@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { Badge } from "@/lib/components/badge";
-import { Item } from "@/../../declarations/perpetua/perpetua.did";
+import { Item, ShelfPublic as ShelfPublicDID } from "@/../../declarations/perpetua/perpetua.did";
 import NftDisplay from './NftDisplay';
-import { ShelfContentDisplay, MarkdownContentDisplay } from './ContentDisplays';
-import { isNftContent, isShelfContent, isMarkdownContent } from "../../../utils";
+import { MarkdownContentDisplay } from './ContentDisplays';
+import { isNftContent, isShelfContent as isShelfContentType, isMarkdownContent } from "../../../utils";
 import { RemoveItemButton } from '@/apps/app/Perpetua/features/shelf-management/components/RemoveItemButton';
+import { ShelfCard } from './ShelfCard';
 
 interface ShelfContentCardProps {
   itemKey: number;
@@ -41,20 +42,8 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
   handleNftDetails,
   handleContentClick
 }) => {
-  // Add state to track if card asset is loaded
-  const [cardAssetLoaded, setCardAssetLoaded] = useState(false);
-  
-  // Simulate asset loading with useEffect
-  useEffect(() => {
-    // Wait for a short time to simulate assets loading
-    const timer = setTimeout(() => {
-      setCardAssetLoaded(true);
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, []);
+  const [cardAssetLoaded, setCardAssetLoaded] = useState(true);
 
-  // Render card with appropriate draggable properties when in edit mode
   const renderCard = (content: React.ReactNode) => (
     <div 
       key={`item-${itemKey}`}
@@ -64,7 +53,6 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
       onDragOver={isEditMode ? (e) => handleDragOver(e, index) : undefined}
       onDragEnd={isEditMode ? handleDragEnd : undefined}
       onDrop={isEditMode ? (e) => {
-        console.log(`[ShelfContentCard] onDrop triggered. Passing index: ${index} to handleDrop prop.`);
         e.stopPropagation();
         handleDrop(e, index);
       } : undefined}
@@ -83,10 +71,7 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
       {!isEditMode && cardAssetLoaded && (
         <div className="absolute top-0 left-7 z-10" onClick={(e) => e.stopPropagation()}>
           <div className="relative">
-            {/* Shadow */}
             <div className="absolute top-0.5 left-0 h-6 w-6 bg-black/30 rounded-b-sm blur-[1px]"></div>
-            
-            {/* Background */}
             <div className="relative h-6 w-6 bg-black/75 rounded-b-sm flex items-center justify-center pt-1">
               <RemoveItemButton 
                 shelfId={shelf.shelf_id}
@@ -104,7 +89,6 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
     </div>
   );
 
-  // Render NFT content
   if (isNftContent(item.content)) {
     return renderCard(
       <NftDisplay 
@@ -118,21 +102,54 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
     );
   }
   
-  // Render shelf content
-  if (isShelfContent(item.content)) {
-    return renderCard(
-      <ShelfContentDisplay 
-        shelfId={item.content.Shelf} 
-        owner={shelf.owner.toString()}
-        onClick={() => handleContentClick(itemKey)}
-        parentShelfId={shelf.shelf_id}
-        itemId={itemKey}
-        currentShelfId={shelf.shelf_id}
-      />
-    );
+  if (isShelfContentType(item.content)) {
+    const shelfContentData = item.content.Shelf;
+
+    if (typeof shelfContentData === 'object' && shelfContentData !== null && 'shelf_id' in shelfContentData && !('isLoading' in shelfContentData)) {
+      return renderCard(
+        <ShelfCard 
+          shelf={shelfContentData as ShelfPublicDID}
+          parentShelfId={shelf.shelf_id}
+          itemId={itemKey}
+          onViewShelf={() => handleContentClick(itemKey)}
+        />
+      );
+    }
+    
+    let loadingShelfId: string | undefined = undefined;
+    if (typeof shelfContentData === 'string') {
+      loadingShelfId = shelfContentData;
+    } else if (typeof shelfContentData === 'object' && shelfContentData !== null && 'isLoading' in shelfContentData && typeof (shelfContentData as any).Shelf === 'string') {
+      loadingShelfId = (shelfContentData as any).Shelf;
+    }
+
+    if (loadingShelfId) {
+      return renderCard(
+        <ContentCard
+          id={`shelf-loading-${loadingShelfId}`}
+          owner={shelf.owner.toString()}
+          component="Perpetua"
+          parentShelfId={shelf.shelf_id}
+          itemId={itemKey}
+          footer={
+            <div className="flex flex-wrap items-center gap-1 font-serif">
+              <Badge variant="secondary" className="text-[10px] py-0.5 px-1">Shelf</Badge>
+              <Badge variant="outline" className="text-[10px] py-0.5 px-1 bg-white/50 dark:bg-gray-800/50">Loading...</Badge>
+            </div>
+          }
+          onClick={() => handleContentClick(itemKey)}
+        >
+          <div className="flex items-center justify-center w-full h-full">
+            <div className="text-center text-muted-foreground p-2">
+              <svg className="w-8 h-8 text-primary mx-auto mb-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v3m0 12v3m-9-9h3m12 0h3M5.636 5.636l2.122 2.122m8.486 8.486l2.122 2.122M5.636 18.364l2.122-2.122m8.486-8.486l2.122-2.122"></path></svg>
+              Loading Shelf...
+            </div>
+          </div>
+        </ContentCard>
+      );
+    }
   }
   
-  // Render markdown content
   if (isMarkdownContent(item.content)) {
     return renderCard(
       <MarkdownContentDisplay 
@@ -146,7 +163,6 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
     );
   }
   
-  // Fallback for unknown content
   return renderCard(
     <ContentCard
       id={`unknown-${itemKey}`}
@@ -159,13 +175,13 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
       footer={
         <div className="flex flex-wrap items-center gap-1">
           <Badge variant="secondary" className="text-[10px] py-0.5 px-1">
-            Unknown
+            Item
           </Badge>
         </div>
       }
     >
       <div className="flex items-center justify-center w-full h-full">
-        <div className="text-center text-muted-foreground">Unknown content</div>
+        <div className="text-center text-muted-foreground">Unable to display item</div>
       </div>
     </ContentCard>
   );

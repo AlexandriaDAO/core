@@ -45,6 +45,9 @@ export interface UserShelvesUIProps {
   onViewOwner?: (ownerId: string) => void;
   onBack?: () => void;
   isCurrentUser?: boolean;
+  onNewShelf?: () => void;
+  isCreatingShelf?: boolean;
+  ownerUsername?: string;
 }
 
 // Shelf management types

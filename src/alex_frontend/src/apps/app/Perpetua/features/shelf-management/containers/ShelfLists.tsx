@@ -14,7 +14,9 @@ import { AppDispatch } from '@/store';
 const areShelvesPropsEqual = (prevProps: UserShelvesUIProps, nextProps: UserShelvesUIProps): boolean => {
   // Basic props comparison
   if (prevProps.loading !== nextProps.loading || 
-      prevProps.isCurrentUser !== nextProps.isCurrentUser) {
+      prevProps.isCurrentUser !== nextProps.isCurrentUser ||
+      prevProps.isCreatingShelf !== nextProps.isCreatingShelf ||
+      prevProps.ownerUsername !== nextProps.ownerUsername) {
     return false;
   }
   
@@ -170,7 +172,10 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
   onViewShelf,
   onViewOwner,
   onBack,
-  isCurrentUser = false
+  isCurrentUser = false,
+  onNewShelf,
+  isCreatingShelf,
+  ownerUsername
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { identity } = useIdentity();
@@ -180,15 +185,14 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
     if (shelves.length === 0) return { ownerName: "", ownerId: "", currentUserIsOwner: false };
     
     const owner = shelves[0].owner.toString();
-    const isOwner = Boolean(isCurrentUser || 
-      (identity && owner && identity.getPrincipal().toString() === owner));
+    const isOwner = Boolean(isCurrentUser);
     
     return { 
-      ownerName: owner, 
-      ownerId: owner, 
+      ownerName: owner,
+      ownerId: owner,
       currentUserIsOwner: isOwner 
     };
-  }, [shelves, identity, isCurrentUser]);
+  }, [shelves, isCurrentUser]);
   
   // Handler for saving reordered shelves
   const handleSaveOrder = useCallback(async (newShelfOrder: string[]) => {
@@ -226,10 +230,17 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
     }
   }, [dispatch, identity, shelves, currentUserIsOwner, ownerName]);
   
-  const title = useMemo(() => 
-    ownerName ? `Shelves by ${ownerName.slice(0, 8)}...` : 'User Shelves',
-    [ownerName]
-  );
+  const title = useMemo(() => {
+    if (ownerUsername) {
+      // If a specific username is provided (e.g., for the current user)
+      return `Shelves by ${ownerUsername}`;
+    }
+    if (ownerId) {
+      // For other users, or if username isn't available, use "Shelves of <PrincipalID>"
+      return `Shelves of ${ownerId.length > 10 ? `${ownerId.slice(0, 5)}...${ownerId.slice(-5)}` : ownerId}`;
+    }
+    return 'User Shelves'; // Fallback if no username or ownerId
+  }, [ownerUsername, ownerId]);
 
   return (
     <BaseShelfList
@@ -244,6 +255,8 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
       onViewShelf={onViewShelf}
       onBack={onBack}
       onSaveOrder={handleSaveOrder}
+      onNewShelf={isCurrentUser ? onNewShelf : undefined}
+      isCreatingShelf={isCurrentUser ? isCreatingShelf : undefined}
     />
   );
 }, areShelvesPropsEqual);

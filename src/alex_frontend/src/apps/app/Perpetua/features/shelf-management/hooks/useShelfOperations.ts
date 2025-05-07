@@ -14,7 +14,6 @@ import {
   setItemOrder as setItemOrderAction,
   reorderProfileShelf as reorderProfileShelfAction,
   updateShelfMetadata,
-  createAndAddShelfItem as createAndAddShelfItemAction,
   removeItem as removeItemAction,
   getShelfById
 } from "@/apps/app/Perpetua/state";
@@ -117,30 +116,6 @@ export const useShelfOperations = () => {
     }
   }, [identity, dispatch, getShelf]);
 
-  const createAndAddShelfItem = useCallback(async (parentShelfId: string, title: string, description: string): Promise<string | null> => {
-    if (!identity) return null;
-    try {
-      const result = await dispatch(createAndAddShelfItemAction({
-        parentShelfId,
-        title,
-        description,
-        principal: identity.getPrincipal()
-      })).unwrap();
-      
-      // Load the updated shelves and get the updated parent shelf
-      await dispatch(loadShelves({ 
-        principal: identity.getPrincipal(), 
-        params: { offset: 0, limit: 20 }
-      })).unwrap();
-      await getShelf(parentShelfId);
-      
-      return result.newShelfId || null;
-    } catch (error) {
-      console.error("Failed to create and add shelf item:", error);
-      return null;
-    }
-  }, [identity, dispatch, getShelf]);
-
   const setItemOrder = useCallback(async (shelfId: string, orderedItemIds: number[]): Promise<boolean> => {
     if (!identity) return false;
     try {
@@ -220,7 +195,6 @@ export const useShelfOperations = () => {
     error,
     createShelf,
     addItem,
-    createAndAddShelfItem,
     setItemOrder,
     reorderShelf,
     findItemById,

@@ -4,7 +4,6 @@ import { Input } from "@/lib/components/input";
 import { Textarea } from "@/lib/components/textarea";
 import { Edit2, Check, Save } from "lucide-react";
 import { ShelfInformationSectionProps } from "../types";
-import { ShelfLinkItem } from "./ShelfLinkItem";
 
 export const ShelfInformationSection: React.FC<ShelfInformationSectionProps> = ({
   shelf,
@@ -111,20 +110,6 @@ export const ShelfInformationSection: React.FC<ShelfInformationSectionProps> = (
           ) : ( 
             <p className="text-base mt-1 font-serif">{description || "None"}</p> 
           )} 
-        </div>
-        
-        {/* Appears In Section (Read-only) */}
-        <div>
-          <h4 className="text-sm font-medium text-muted-foreground mb-1 font-serif">Included In Shelves</h4>
-          {appearsIn && appearsIn.length > 0 ? (
-            <ul className="list-none space-y-1 text-sm font-serif">
-              {appearsIn.map((shelfId: string) => (
-                <ShelfLinkItem key={shelfId} shelfId={shelfId} />
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground mt-1 font-serif">This shelf is not included in any other shelves.</p>
-          )}
         </div>
       </div>
     </div>

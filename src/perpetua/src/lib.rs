@@ -44,7 +44,6 @@ pub use types::{TagPopularityKey, TagShelfAssociationKey, GlobalTimelineBackupCh
 pub use update::shelf::{store_shelf, update_shelf_metadata};
 pub use update::item::{
     AddItemInput, add_item_to_shelf, remove_item_from_shelf, 
-    create_and_add_shelf_item
 };
 pub use update::profile::{reorder_profile_shelf, reset_profile_order};
 pub use update::tags::{TagOperationInput, add_tag_to_shelf, remove_tag_from_shelf};

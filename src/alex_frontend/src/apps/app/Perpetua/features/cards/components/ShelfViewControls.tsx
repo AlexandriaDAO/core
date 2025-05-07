@@ -9,6 +9,7 @@ interface ShelfViewControlsProps {
   isEditMode: boolean;
   isSaving: boolean;
   settingsButton?: React.ReactNode;
+  infoButton?: React.ReactNode;
   onEnterEditMode: () => void;
   onCancelEditMode: () => void;
   onSave: () => void;
@@ -24,6 +25,7 @@ export const ShelfViewControls: React.FC<ShelfViewControlsProps> = ({
   isEditMode,
   isSaving,
   settingsButton,
+  infoButton,
   onEnterEditMode,
   onCancelEditMode,
   onSave,
@@ -61,6 +63,9 @@ export const ShelfViewControls: React.FC<ShelfViewControlsProps> = ({
             <List className="w-4 h-4" />
           </Button>
         </div>
+        
+        {/* Info button if provided */}
+        {infoButton}
         
         {/* Settings button if not in edit mode */}
         {!isEditMode && settingsButton}
@@ -134,6 +139,13 @@ export const ShelfViewControls: React.FC<ShelfViewControlsProps> = ({
           </Button>
         </div>
         
+        {/* Info Button on Mobile, if provided and not in edit mode */}
+        {!isEditMode && infoButton && (
+          <div className="h-8 w-8 flex items-center justify-center">
+            {infoButton}
+          </div>
+        )}
+        
         {/* Most important action - directly available */}
         {canAddItem && !isEditMode && (
           <Button
@@ -188,7 +200,7 @@ export const ShelfViewControls: React.FC<ShelfViewControlsProps> = ({
                 <div className="py-1">
                   {!isEditMode && settingsButton && (
                     <div className="px-2 py-1">
-                      {settingsButton}
+                      {React.cloneElement(settingsButton as React.ReactElement, { className: "w-full justify-start" })}
                     </div>
                   )}
                   

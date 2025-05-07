@@ -133,16 +133,14 @@ Perpetua/
 
 
 
+- Need to really rethink the way we use following.
+  - It shouldn't attempt to fetch if not logged in.
+  - We shouldn't have to wait for it to finish to see other stuff.
+  - It doesn't need to be in your face.
 
+- Random vs. Latest feed on initial load.
+- Popular tags display proportional to size. 
 
-- Shelf-type item needs better display with its actual name. It should be like the main page display.
-- Need a my Library area that takes you to your profile page, and the New Shelf button should be there.
-- Need a public search for the create shelf option (and consider how this'll work with duplicate names.)
-- Popular tags display proportional to size. & Show existing popular tabs when people go to add tags (use the existing search engine.).
-
-
-- Use 'appears in' in NFT fullscreen modal. (this will guide how the next one should look.)
-  - Start displaying NFTs by default in conjunction with the shelves.
 - Expander carrot should do something on desktop mode, or be removed.
 - Shouldn't have to wait for following info to load to do stuff.
 - Progressive loading, like in other apps.
@@ -163,13 +161,8 @@ Perpetua/
 
 Backend Stuff:
 - Tag/user follow loading is really slow. (does this lag increase with scale?)
-- Search engine for shelves (public ones at least.)
 - Payment for all/some actions
   - Pay for shelf creation after the fifth shelf. That's it (for now).
-
-- Feed: 'Following' with your feed being the latest of those you're following? Could we make a query function for that?
-- Download personal data as a csv.
-  - This way we could use this function to do it manually at various times.
 
 
 
@@ -179,51 +172,15 @@ Backend Stuff:
 
 
 ## V2 Features (Separate Canister):
+
+- Download personal data as a csv.
+  - This way we could use this function to do it manually at various times.
 - More advanced search engine for the setup. So separate architecture with backups (maybe centralized).
   - Adding to public shelves actually can't be done at all right now.
   - We probably need a search engine in the backend?
 - A preview of the slots in the profile. (Could be done later)
+- NFT 'Appears in' based on secondary SBT data.
 
-
-
-
-
-
-Bugs: 
-- I can't add create a shelf while doing it inside an existing shelf (create and add to shelf):
-index-a1d49c1c.11c9dd3f5d3f56515c0c.js:51 Error in createAndAddShelfItem: AgentError: Call failed:
-  Canister: ya6k4-waaaa-aaaap-qkmpq-cai
-  Method: create_and_add_shelf_item (update)
-  "Request ID": "6bc6c9d56181b299127dde7d59f4633da9e14c602618c25e0e75717c6e17e68b"
-  "Error code": "IC0503"
-  "Reject code": "5"
-  "Reject message": "Error from Canister ya6k4-waaaa-aaaap-qkmpq-cai: Canister called `ic0.trap` with message: 'Panicked at 'already mutably borrowed: BorrowError', src/perpetua/src/storage.rs:475:33'.\nConsider gracefully handling failures from this canister or altering the canister to handle exceptions. See documentation: https://internetcomputer.org/docs/current/references/execution-errors#trapped-explicitly"
-    at a (vendors-1a69cf2e.83eb96115e5a2e13803d.js:1:55695)
-    at async p (index-a1d49c1c.11c9dd3f5d3f56515c0c.js:51:59352)
-    at async index-a1d49c1c.11c9dd3f5d3f56515c0c.js:51:75172
-    at async critical-27545368.0032df30f5ef8db872c7.js:2:8322
-    at async 5145.88994b602aac2d81aa47.js:1:42910
-    at async 2108.cdbd2a4bc4e9ba28719d.js:1:49604
-p @ index-a1d49c1c.11c9dd3f5d3f56515c0c.js:51
-await in p
-(anonymous) @ index-a1d49c1c.11c9dd3f5d3f56515c0c.js:51
-(anonymous) @ critical-27545368.0032df30f5ef8db872c7.js:2
-Object.assign.pending @ critical-27545368.0032df30f5ef8db872c7.js:2
-(anonymous) @ vendors-49ceb22a.86e86ba8e4c983b736c6.js:1
-(anonymous) @ 5145.88994b602aac2d81aa47.js:1
-(anonymous) @ 2108.cdbd2a4bc4e9ba28719d.js:1
-Me @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-Ae @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-(anonymous) @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-Ir @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-Ur @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-(anonymous) @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-ss @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-Te @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-Hr @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-Kn @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-Qn @ critical-e5bca7e4.a14c31f8054987adef7a.js:2
-5145.88994b602aac2d81aa47.js:1 Failed to create and add shelf item: Failed to create and add shelf
 
 
 
@@ -301,7 +258,7 @@ id_convert.ts.
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 5fdik-5kn6x-zecnz-lsigd-mfvtg-blh6n-p7mgt-i77y3-qlx4t-rlrez-tae)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal fogrq-ch55d-mwkdr-c5oik-ecjul-eehnn-hajmf-7wt3c-hluo4-txwk3-nae)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

@@ -10,7 +10,6 @@ import {
 import {
   createShelf,
   updateShelfMetadata,
-  createAndAddShelfItem
 } from './thunks/shelfThunks';
 import {
   addItem,

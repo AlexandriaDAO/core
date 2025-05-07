@@ -217,7 +217,7 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
         </CardContent>
       </Card>
       
-      {/* Expanded footer with detailed information */}
+      {/* Expanded footer with detailed information - always expandable */}
       {isFooterExpanded && (
         <div 
           className="absolute bottom-0 left-0 right-0 w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg z-10 p-4 rounded-b-lg animate-in fade-in duration-200"

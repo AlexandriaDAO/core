@@ -217,34 +217,6 @@ export async function reorderProfileShelf(
 }
 
 /**
- * Create a new shelf and add it as an item to a parent shelf
- */
-export async function createAndAddShelfItem(
-  parentShelfId: string,
-  title: string,
-  description?: string
-): Promise<Result<string, string>> {
-  try {
-    const actor = await getActorPerpetua();
-
-    const result = await actor.create_and_add_shelf_item(
-      parentShelfId,
-      title,
-      description ? [description] : []
-    );
-
-    if ("Ok" in result) {
-      return { Ok: result.Ok };
-    } else {
-      return { Err: result.Err };
-    }
-  } catch (error) {
-    console.error('Error in createAndAddShelfItem:', error);
-    return { Err: "Failed to create and add shelf" };
-  }
-}
-
-/**
  * Check if a shelf is publicly editable
  */
 export async function isShelfPublic(shelfId: string): Promise<Result<boolean, string>> {

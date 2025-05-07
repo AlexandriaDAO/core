@@ -41,10 +41,6 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
   
   // Shelf-specific state
   const [selectedShelfId, setSelectedShelfId] = useState<string>("");
-  const [creatingNewShelf, setCreatingNewShelf] = useState(false);
-  const [newShelfTitle, setNewShelfTitle] = useState("");
-  const [newShelfDescription, setNewShelfDescription] = useState("");
-  const [isCreatingShelf, setIsCreatingShelf] = useState(false);
   
   // Selectors and hooks
   const dispatch = useAppDispatch();
@@ -53,7 +49,6 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
   // Only fetch shelves data when needed (when on Shelf tab)
   const allShelves = useAppSelector(type === "Shelf" ? selectUserShelves : () => []);
   const currentShelf = useAppSelector(type === "Shelf" ? selectSelectedShelf : () => null);
-  const { createAndAddShelfItem } = useShelfOperations();
 
   // Find the specific apps we need
   const alexandrianApp = findApp('Alexandrian');
@@ -64,9 +59,6 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
   useEffect(() => {
     setContent("");
     setSelectedShelfId("");
-    setCreatingNewShelf(false);
-    setNewShelfTitle("");
-    setNewShelfDescription("");
   }, [type]);
 
   // Fetch shelves when the Shelf tab is selected - only on initial tab selection
@@ -129,9 +121,9 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
     );
   }, [
     type,
-    allShelves?.length,
+    allShelves?.length, // Use .length for dependency if allShelves itself is stable
     currentShelf?.shelf_id,
-    currentShelf?.items,
+    currentShelf?.items, // Consider deep comparison or more specific dependencies if items structure changes often
     propShelves
   ]);
 
@@ -164,53 +156,6 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
       setIsSubmitting(false);
     }
   }, [type, selectedShelfId, content, onSubmit]);
-  
-  // Create a new shelf and add it as an item - memoized
-  const handleCreateShelf = useCallback(async () => {
-    if (!newShelfTitle) {
-      toast.error("Please enter a title for the shelf");
-      return;
-    }
-    
-    if (!currentShelf) {
-      toast.error("No current shelf selected");
-      return;
-    }
-    
-    try {
-      setIsCreatingShelf(true);
-      
-      const newShelfId = await createAndAddShelfItem(
-        currentShelf.shelf_id,
-        newShelfTitle,
-        newShelfDescription
-      );
-      
-      if (newShelfId) {
-        toast.success(`New shelf "${newShelfTitle}" created and added as an item`);
-        setNewShelfTitle("");
-        setNewShelfDescription("");
-        onCancel();
-      } else {
-        toast.error("Failed to create and add shelf");
-      }
-    } catch (error) {
-      console.error("Error creating and adding shelf:", error);
-      toast.error("Failed to create and add shelf");
-    } finally {
-      setIsCreatingShelf(false);
-    }
-  }, [currentShelf, newShelfTitle, newShelfDescription, createAndAddShelfItem, onCancel]);
-
-  // Memoized handler for switching to create mode
-  const handleEnterCreateMode = useCallback(() => {
-    setCreatingNewShelf(true);
-  }, []);
-
-  // Memoized handler for returning to selection mode
-  const handleBackToSelection = useCallback(() => {
-    setCreatingNewShelf(false);
-  }, []);
 
   // Set content handler - memoized
   const handleSetContent = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -323,102 +268,50 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
         );
         
       case "Shelf":
-        if (creatingNewShelf) {
-          return (
-            <div className="flex-1 flex flex-col p-4 font-serif">
-              <div className="flex flex-col">
-                <div className="flex justify-between items-center mb-2">
-                  <div>
-                    <h3 className="text-lg font-medium font-serif">Create New Shelf</h3>
-                    <p className="text-sm text-muted-foreground font-serif">
-                      Create a new shelf and immediately add it to your current shelf
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    onClick={handleBackToSelection}
-                  >
-                    Back to Existing Shelves
-                  </Button>
-                </div>
-                <div className="bg-muted/20 p-4 rounded-md border border-border mt-2">
-                  <ShelfForm
-                    title={newShelfTitle}
-                    setTitle={setNewShelfTitle}
-                    description={newShelfDescription}
-                    setDescription={setNewShelfDescription}
-                    submitLabel="Create & Add Shelf"
-                    onSubmit={handleCreateShelf}
-                    inline={true}
-                  />
-                  <div className="flex justify-between mt-4">
-                    <Button onClick={onCancel} variant="outline">Cancel</Button>
-                    <Button 
-                      onClick={handleCreateShelf} 
-                      disabled={!newShelfTitle || isCreatingShelf}
-                      variant="primary"
-                    >
-                      {isCreatingShelf ? "Creating..." : "Create & Add Shelf"}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        } else {
-          return (
-            <div className="flex-1 flex flex-col p-4 font-serif">
-              <div className="flex justify-between items-center mb-2">
-                <div>
-                  <Label htmlFor="shelfSelect" className="block mb-1 font-serif">Select an existing shelf</Label>
-                  <p className="text-sm text-muted-foreground mb-3 font-serif">
-                    Add an existing shelf as an item in your current shelf
-                  </p>
-                </div>
-                <Button 
-                  variant="outline" 
-                  onClick={handleEnterCreateMode}
-                  className="flex items-center gap-1"
-                >
-                  <Plus className="w-4 h-4" />
-                  Create New
-                </Button>
-              </div>
-              <select
-                id="shelfSelect"
-                value={selectedShelfId}
-                onChange={handleSetShelfId}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-serif"
-              >
-                <option value="">Select a shelf...</option>
-                {availableShelves.length > 0 ? (
-                  availableShelves.map((shelf) => (
-                    <option key={shelf.shelf_id} value={shelf.shelf_id}>
-                      {shelf.title}
-                    </option>
-                  ))
-                ) : (
-                  <option value="" disabled>No available shelves to add</option>
-                )}
-              </select>
-              {availableShelves.length === 0 && (
-                <p className="text-sm text-amber-500 mt-2 font-serif">
-                  You don't have any other shelves that can be added. Create a new shelf instead.
+        return (
+          <div className="flex-1 flex flex-col p-4 font-serif">
+            <div className="flex justify-between items-center mb-2">
+              <div>
+                <Label htmlFor="shelfSelect" className="block mb-1 font-serif">Select an existing shelf</Label>
+                <p className="text-sm text-muted-foreground mb-3 font-serif">
+                  Add an existing shelf as an item in your current shelf
                 </p>
-              )}
-              <div className="flex justify-between mt-4">
-                <Button onClick={onCancel} variant="outline">Cancel</Button>
-                <Button 
-                  onClick={handleSubmit} 
-                  disabled={!selectedShelfId || isSubmitting}
-                  variant="primary"
-                >
-                  {isSubmitting ? "Adding..." : "Add Existing Shelf"}
-                </Button>
               </div>
             </div>
-          );
-        }
+            <select
+              id="shelfSelect"
+              value={selectedShelfId}
+              onChange={handleSetShelfId}
+              className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-serif"
+            >
+              <option value="">Select a shelf...</option>
+              {availableShelves.length > 0 ? (
+                availableShelves.map((shelf) => (
+                  <option key={shelf.shelf_id} value={shelf.shelf_id}>
+                    {shelf.title}
+                  </option>
+                ))
+              ) : (
+                <option value="" disabled>No available shelves to add</option>
+              )}
+            </select>
+            {availableShelves.length === 0 && (
+              <p className="text-sm text-amber-500 mt-2 font-serif">
+                You don't have any other shelves that can be added. Create a new shelf instead.
+              </p>
+            )}
+            <div className="flex justify-between mt-4">
+              <Button onClick={onCancel} variant="outline">Cancel</Button>
+              <Button 
+                onClick={handleSubmit} 
+                disabled={!selectedShelfId || isSubmitting}
+                variant="primary"
+              >
+                {isSubmitting ? "Adding..." : "Add Existing Shelf"}
+              </Button>
+            </div>
+          </div>
+        );
         
       default:
         return null;

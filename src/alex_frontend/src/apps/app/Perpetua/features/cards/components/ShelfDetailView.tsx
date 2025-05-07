@@ -11,6 +11,7 @@ import ShelfGridView from './ShelfGridView';
 import ShelfBlogView from './ShelfBlogView';
 import ShelfEmptyView from './ShelfEmptyView';
 import InlineItemCreator from '../../shelf-management/components/InlineItemCreator';
+import { ShelfInformationDialog } from '../../shelf-information/components/ShelfInformationDialog';
 
 // Import utility functions
 import { 
@@ -159,6 +160,9 @@ export const ShelfDetailView: React.FC<UpdatedShelfDetailViewProps> = ({
           isEditMode={isEditMode}
           isSaving={isSaving}
           settingsButton={settingsButton}
+          infoButton={
+            <ShelfInformationDialog shelf={shelf} />
+          }
           onEnterEditMode={onEnterEditMode}
           onCancelEditMode={onCancelEditMode}
           onSave={handleSave}
