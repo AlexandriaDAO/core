@@ -18,7 +18,9 @@ import {
   getPopularTags,
   getShelvesByTag,
   getTagShelfCount,
-  getTagsWithPrefix
+  getTagsWithPrefix,
+  getShuffledByHourFeed,
+  getStorylineFeed
 } from '../services';
 import { principalToString, extractErrorMessage } from '../../utils';
 
@@ -263,6 +265,62 @@ export const fetchTagsWithPrefix = createAsyncThunk<
       }
     } catch (error) {
       return rejectWithValue(extractErrorMessage(error, `Failed to fetch tags with prefix ${prefix}`) as RejectValue);
+    }
+  }
+); 
+
+// --- New Feed Thunks ---
+
+/**
+ * Load random feed (shuffled by hour)
+ */
+export const loadRandomFeed = createAsyncThunk<
+  ShelfPublic[], // Return type on success
+  { limit: number }, // Argument type
+  { rejectValue: RejectValue } // Type for rejectWithValue
+>(
+  'perpetua/loadRandomFeed',
+  async ({ limit }, { rejectWithValue }) => {
+    try {
+      // Ensure getShuffledByHourFeed is imported from services
+      const result = await getShuffledByHourFeed(limit); 
+      
+      if ("Ok" in result && result.Ok) {
+        return result.Ok; 
+      } else if ("Err" in result && result.Err) {
+        return rejectWithValue(result.Err as RejectValue);
+      } else {
+        return rejectWithValue("Failed to load random feed" as RejectValue);
+      }
+    } catch (error) {
+      return rejectWithValue(extractErrorMessage(error, "Failed to load random feed") as RejectValue);
+    }
+  }
+);
+
+/**
+ * Load storyline feed (Paginated)
+ */
+export const loadStorylineFeed = createAsyncThunk<
+  CursorPaginatedResponse<ShelfPublic, TimestampCursor>, // Return type
+  { principal?: Principal | string; params: CursorPaginationParams<TimestampCursor> }, // Argument type (principal is optional for now, might be derived from identity in usage)
+  { rejectValue: RejectValue } // Reject type
+>(
+  'perpetua/loadStorylineFeed',
+  async ({ params }, { rejectWithValue }) => { // Removed principal from direct args, thunk caller will handle it
+    try {
+      // Ensure getStorylineFeed is imported from services
+      const result = await getStorylineFeed(params); 
+      
+      if ("Ok" in result && result.Ok) {
+        return result.Ok; 
+      } else if ("Err" in result && result.Err) {
+        return rejectWithValue(result.Err as RejectValue);
+      } else {
+        return rejectWithValue("Failed to load storyline feed" as RejectValue);
+      }
+    } catch (error) {
+      return rejectWithValue(extractErrorMessage(error, "Failed to load storyline feed") as RejectValue);
     }
   }
 ); 

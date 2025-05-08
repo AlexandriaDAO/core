@@ -9,8 +9,24 @@ import {
   selectUserShelvesForUser,
   NormalizedShelf,
   selectCurrentTagFilter,
-  selectIsCreatingShelf
+  selectIsCreatingShelf,
+  setCurrentFeedType,
+  selectCurrentFeedType,
+  selectRandomFeedShelves,
+  selectStorylineFeedShelves,
+  selectRandomFeedLoading,
+  selectStorylineFeedLoading,
+  selectStorylineFeedCursor,
+  selectPublicShelves,
+  selectUserShelves,
+  selectPublicLoading,
+  selectLoading
 } from "@/apps/app/Perpetua/state/perpetuaSlice";
+import { 
+  loadRecentShelves, 
+  loadRandomFeed, 
+  loadStorylineFeed 
+} from "@/apps/app/Perpetua/state/thunks/queryThunks";
 import { usePerpetuaNavigation, useViewState } from "../routes";
 import { useShelfOperations, usePublicShelfOperations } from "../features/shelf-management/hooks";
 import { useContentPermissions } from "../hooks/useContentPermissions";
@@ -28,6 +44,7 @@ import {
 import { default as NewShelfDialog } from "../features/shelf-management/components/NewShelf";
 import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
 import { Button } from "@/lib/components/button";
+import { ToggleGroup, ToggleGroupItem } from "@/lib/components/toggle-group";
 
 // Import Tag components
 import { PopularTagsList } from '../features/tags/components/PopularTagsList';
@@ -38,6 +55,12 @@ import { FilteredShelfListContainer } from '../features/tags/containers/Filtered
 // Import Following components
 import { FollowedTagsList } from '../features/following/components/FollowedTagsList';
 import { FollowedUsersList } from '../features/following/components/FollowedUsersList';
+
+// Import thunks for dispatching
+import { loadMyFollowedTags } from '../state/thunks/followThunks';
+
+// Feed type definition
+type FeedType = 'recency' | 'random' | 'storyline';
 
 /**
  * Convert a NormalizedShelf back to a Shelf for API calls and components
@@ -78,6 +101,20 @@ const PerpetuaLayout: React.FC = () => {
   const currentTagFilter = useAppSelector(selectCurrentTagFilter); // Get the active tag filter
   const isCreatingShelf = useAppSelector(selectIsCreatingShelf); // Get the loading state
   
+  // Feed specific state
+  const currentFeedType = useAppSelector(selectCurrentFeedType);
+  const randomFeedShelves = useAppSelector(selectRandomFeedShelves) as NormalizedShelf[]; // Type assertion
+  const storylineFeedShelves = useAppSelector(selectStorylineFeedShelves) as NormalizedShelf[]; // Type assertion
+  const storylineFeedCursor = useAppSelector(selectStorylineFeedCursor);
+  const recencyPublicShelves = useAppSelector(selectPublicShelves) as NormalizedShelf[]; // Type assertion
+  const recencyUserShelves = useAppSelector(selectUserShelves) as NormalizedShelf[]; // Type assertion
+
+  // Loading states for feeds
+  const isLoadingRecencyPublic = useAppSelector(selectPublicLoading);
+  const isLoadingRecencyUser = useAppSelector(selectLoading);
+  const isLoadingRandomFeed = useAppSelector(selectRandomFeedLoading);
+  const isLoadingStorylineFeed = useAppSelector(selectStorylineFeedLoading);
+  
   // Define a stable empty array reference
   const stableEmptyShelves: NormalizedShelf[] = useMemo(() => [], []);
   
@@ -103,7 +140,7 @@ const PerpetuaLayout: React.FC = () => {
   }, [routeUserId]);
 
   // Use the memoized selector, or default to the stable empty array
-  const userShelves = useAppSelector(state => userShelvesSelector ? userShelvesSelector(state) : stableEmptyShelves);
+  const userShelves = useAppSelector(state => userShelvesSelector ? userShelvesSelector(state) : stableEmptyShelves) as NormalizedShelf[]; // Type assertion
   const [userShelvesLoading, setUserShelvesLoading] = useState(false);
   
   // Memoize the combined and unique shelves for the main view
@@ -155,6 +192,9 @@ const PerpetuaLayout: React.FC = () => {
         .catch((error) => {
           console.error("Failed to load shelves:", error);
         });
+      
+      // Load the current user's followed tags
+      dispatch(loadMyFollowedTags());
     }
   }, [identity, dispatch]);
   
@@ -185,6 +225,19 @@ const PerpetuaLayout: React.FC = () => {
     }
   }, [shelfId, currentSelectedShelfId, dispatch]); // Depends only on IDs and dispatch
   
+  // Effect to load initial feed data when feed type changes
+  useEffect(() => {
+    if (currentFeedType === 'random' && randomFeedShelves.length === 0 && !isLoadingRandomFeed) {
+      dispatch(loadRandomFeed({ limit: 20 })); // Default limit, adjust as needed
+    } else if (currentFeedType === 'storyline' && storylineFeedShelves.length === 0 && !isLoadingStorylineFeed && identity) {
+      // For storyline, ensure identity is available as it might be needed for personalization,
+      // even if not directly passed to the current thunk, it's good practice for feed thunks.
+      // The current loadStorylineFeed thunk doesn't require principal in its direct args,
+      // but future versions or the service might.
+      dispatch(loadStorylineFeed({ params: { limit: 20 } })); // Initial load, no cursor
+    }
+  }, [currentFeedType, dispatch, randomFeedShelves.length, storylineFeedShelves.length, isLoadingRandomFeed, isLoadingStorylineFeed, identity]);
+  
   // Action handlers
   const handleCreateShelf = useCallback(() => setIsNewShelfDialogOpen(true), []);
   
@@ -193,6 +246,32 @@ const PerpetuaLayout: React.FC = () => {
     setIsNewShelfDialogOpen(false);
   }, [createShelf]);
   
+  const handleFeedTypeChange = (value: string) => {
+    if (value) { // ToggleGroup might pass empty string if nothing is active, ensure value exists
+        dispatch(setCurrentFeedType(value as FeedType));
+    }
+  };
+
+  const loadMoreStoryline = useCallback(async () => { // Make async for UnifiedShelvesUI
+    if (identity && storylineFeedCursor && !isLoadingStorylineFeed) {
+      await dispatch(loadStorylineFeed({ params: { limit: 20, cursor: storylineFeedCursor }})).unwrap();
+    }
+  }, [dispatch, identity, storylineFeedCursor, isLoadingStorylineFeed]);
+
+  // Combine shelves for Recency feed view
+  const recencyCombinedNormalizedShelves = useMemo(() => {
+    if (currentFeedType !== 'recency') return [];
+    const seenShelfIds = new Set<string>();
+    const uniqueShelves: NormalizedShelf[] = [];
+    [...(recencyUserShelves || []), ...(recencyPublicShelves || [])].forEach((shelf: NormalizedShelf) => {
+      if (shelf && shelf.shelf_id && !seenShelfIds.has(shelf.shelf_id)) {
+        seenShelfIds.add(shelf.shelf_id);
+        uniqueShelves.push(shelf);
+      }
+    });
+    return uniqueShelves;
+  }, [currentFeedType, recencyUserShelves, recencyPublicShelves]);
+
   // Render view based on current URL and state
   const renderView = () => {
     // If we're viewing a shelf
@@ -209,44 +288,63 @@ const PerpetuaLayout: React.FC = () => {
     
     // If we're viewing the main shelves view
     if (isMainView) {
+      let shelvesToDisplay: NormalizedShelf[] = [];
+      let isLoadingCurrentFeed = false;
+      let loadMoreAction: (() => Promise<void>) | undefined = undefined;
+
+      if (currentFeedType === 'recency') {
+        shelvesToDisplay = recencyCombinedNormalizedShelves;
+        isLoadingCurrentFeed = isLoadingRecencyUser || isLoadingRecencyPublic;
+        loadMoreAction = loadMoreShelves; // Corrected: use loadMoreShelves for recency public part
+      } else if (currentFeedType === 'random') {
+        shelvesToDisplay = randomFeedShelves || []; // Ensure array
+        isLoadingCurrentFeed = isLoadingRandomFeed;
+      } else if (currentFeedType === 'storyline') {
+        shelvesToDisplay = storylineFeedShelves || []; // Ensure array
+        isLoadingCurrentFeed = isLoadingStorylineFeed;
+        loadMoreAction = storylineFeedCursor ? loadMoreStoryline : undefined; 
+      }
+
       return (
         <>
           {userPrincipal && (
-            <div className="mb-4">
-              <Button onClick={() => goToUser(userPrincipal.toString())}>
-                My Library
-              </Button>
+            <div className="mb-4 flex justify-between items-center">
+              <Button onClick={() => goToUser(userPrincipal.toString())}>My Library</Button>
+              <ToggleGroup type="single" defaultValue={currentFeedType} value={currentFeedType} onValueChange={handleFeedTypeChange} className="w-auto">
+                <ToggleGroupItem value="recency">Recent</ToggleGroupItem>
+                <ToggleGroupItem value="random">Random</ToggleGroupItem>
+                <ToggleGroupItem value="storyline">Storyline</ToggleGroupItem>
+              </ToggleGroup>
             </div>
           )}
-          {/* Add Tag Components */} 
-          <div className="flex flex-col sm:flex-row gap-4 mb-4 items-start">
-            <div className="flex-grow">
-              <PopularTagsList />
+          {!userPrincipal && (
+             <div className="mb-4 flex justify-end items-center">
+              <ToggleGroup type="single" defaultValue={currentFeedType} value={currentFeedType} onValueChange={handleFeedTypeChange} className="w-auto">
+                <ToggleGroupItem value="recency">Recent</ToggleGroupItem>
+                <ToggleGroupItem value="random">Random</ToggleGroupItem>
+              </ToggleGroup>
             </div>
+          )}
+          
+          <div className="flex flex-col sm:flex-row gap-4 mb-4 items-start">
+            <div className="flex-grow"><PopularTagsList /></div>
             <TagSearchBar />
           </div>
-
-          {/* Following Lists (Placeholders) */}
-          {/* TODO: Implement data fetching for these lists */}
           <FollowedTagsList />
           <FollowedUsersList />
-
           <TagFilterDisplay />
 
-          {/* Conditional Shelf List */} 
           {currentTagFilter ? (
-            // Show filtered list if a tag is selected
             <FilteredShelfListContainer /> 
           ) : (
-            // Show default unified list if no tag is selected
             <UnifiedShelvesUI 
-              allShelves={allDenormalizedShelves}
-              personalShelves={denormalizedPersonalShelves}
-              loading={personalLoading || publicLoading}
+              allShelves={denormalizeShelves(shelvesToDisplay)}
+              personalShelves={denormalizeShelves(currentFeedType === 'recency' ? (recencyUserShelves || []) : [])} 
+              loading={isLoadingCurrentFeed}
               onNewShelf={handleCreateShelf}
               onViewShelf={goToShelf}
               onViewOwner={goToUser}
-              onLoadMore={loadMoreShelves}
+              onLoadMore={loadMoreAction ? loadMoreAction : async () => {}}
               checkEditAccess={checkEditAccess}
               isCreatingShelf={isCreatingShelf}
             />

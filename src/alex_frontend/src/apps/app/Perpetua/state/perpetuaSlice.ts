@@ -5,7 +5,10 @@ import {
   loadShelves, 
   loadRecentShelves,
   loadMissingShelves,
-  getShelfById
+  getShelfById,
+  // Import new feed thunks
+  loadRandomFeed, 
+  loadStorylineFeed 
 } from './thunks/queryThunks';
 import {
   createShelf,
@@ -33,6 +36,13 @@ import {
   fetchTagShelfCount,
   fetchTagsWithPrefix
 } from './thunks/queryThunks'; // Corrected path
+
+// Import follow thunks
+import {
+  loadMyFollowedTags,
+  followTag,
+  unfollowTag
+} from './thunks/followThunks';
 
 // TODO: Import tag thunks once created
 // import {
@@ -78,13 +88,20 @@ export interface PerpetuaState {
   ids: {
     userShelves: string[]; // IDs of user's shelves (order preserved)
     publicShelves: string[]; // IDs of public shelves (order preserved)
+    // New feed IDs
+    randomFeedShelves: string[];
+    storylineFeedShelves: string[];
     shelfItems: Record<string, number[]>; // Map of shelfId -> ordered itemIds
     shelvesByTag: Record<string, string[]>; // Map of tag -> shelf IDs
   };
   // References
   selectedShelfId: string | null;
-  lastTimestamp: string | undefined;  // String representation of BigInt timestamp
-  currentTagFilter: string | null; // Currently active tag filter
+  lastTimestamp: string | undefined;  // String representation of BigInt timestamp for recency feed
+  // New feed cursors and state
+  currentFeedType: 'recency' | 'random' | 'storyline';
+  storylineFeedCursor: string | undefined;
+  // Current tag filter
+  currentTagFilter: string | null; 
   // Tag data
   popularTags: string[];
   tagSearchResults: string[];
@@ -92,17 +109,23 @@ export interface PerpetuaState {
   // Loading states
   loading: {
     userShelves: boolean;
-    publicShelves: boolean;
+    publicShelves: boolean; // Recency feed (public part)
+    // New feed loading states
+    randomFeed: boolean;
+    storylineFeed: boolean;
     publicAccess: Record<string, boolean>; // Track loading state for public access checks
     popularTags: boolean;
     shelvesByTag: boolean;
     tagSearch: boolean;
     tagCounts: boolean;
     creatingShelf: boolean; // Add loading state for creating a shelf
+    followedTagsList: boolean; // Loading state for the user's followed tags list
   };
   error: string | null;
   // Public access tracking
   publicShelfAccess: Record<string, boolean>; // Map of shelfId -> isPublic
+  // User's followed tags
+  followedTags: string[];
 }
 
 // Initial state
@@ -113,27 +136,38 @@ const initialState: PerpetuaState = {
   ids: {
     userShelves: [],
     publicShelves: [],
+    // Initialize new feed IDs
+    randomFeedShelves: [],
+    storylineFeedShelves: [],
     shelfItems: {},
     shelvesByTag: {},
   },
   selectedShelfId: null,
   lastTimestamp: undefined,
+  // Initialize new feed state
+  currentFeedType: 'recency', // Default to recency
+  storylineFeedCursor: undefined,
   currentTagFilter: null,
   popularTags: [],
   tagSearchResults: [],
   tagShelfCounts: {},
   loading: {
     userShelves: false,
-    publicShelves: false,
+    publicShelves: false, // Recency feed loading
+    // Initialize new feed loading states
+    randomFeed: false,
+    storylineFeed: false,
     publicAccess: {},
     popularTags: false,
     shelvesByTag: false,
     tagSearch: false,
     tagCounts: false,
     creatingShelf: false, // Initialize creatingShelf loading state
+    followedTagsList: false, // Initialize loading state for followed tags
   },
   error: null,
   publicShelfAccess: {},
+  followedTags: [], // Initialize followed tags
 };
 
 // Utility function to normalize a shelf
@@ -188,6 +222,11 @@ const perpetuaSlice = createSlice({
         state.entities.shelves[shelfId] = shelf;
         state.selectedShelfId = shelfId;
       }
+    },
+    // New reducer to set the current feed type
+    setCurrentFeedType: (state, action: PayloadAction<'recency' | 'random' | 'storyline'>) => {
+      state.currentFeedType = action.payload;
+      // Potentially clear other feed data when switching, or handle in component
     },
     setContentPermission: (state, action: PayloadAction<ContentPermissions>) => {
       // This is now handled via selectors - can be removed if not used elsewhere
@@ -521,12 +560,103 @@ const perpetuaSlice = createSlice({
         state.error = action.payload || null; // Handle potential undefined payload
       });
       // --- End Tag Thunk Reducers ---
+
+      // --- New Feed Thunk Reducers ---
+      builder
+        // Load Random Feed
+        .addCase(loadRandomFeed.pending, (state) => {
+          state.loading.randomFeed = true;
+          state.error = null;
+        })
+        .addCase(loadRandomFeed.fulfilled, (state, action: PayloadAction<ShelfPublic[]>) => {
+          const { entities, ids } = normalizeShelves(action.payload);
+          state.entities.shelves = { ...state.entities.shelves, ...entities };
+          state.ids.randomFeedShelves = ids; // Replace current random shelves
+          state.loading.randomFeed = false;
+        })
+        .addCase(loadRandomFeed.rejected, (state, action) => {
+          state.loading.randomFeed = false;
+          state.error = action.payload || null;
+        })
+
+        // Load Storyline Feed
+        .addCase(loadStorylineFeed.pending, (state) => {
+          state.loading.storylineFeed = true;
+          state.error = null;
+        })
+        .addCase(loadStorylineFeed.fulfilled, (state, action: ReturnType<typeof loadStorylineFeed.fulfilled>) => {
+          const { items, next_cursor } = action.payload;
+          const { entities, ids } = normalizeShelves(items);
+          
+          state.entities.shelves = { ...state.entities.shelves, ...entities };
+          
+          const isFirstPage = !action.meta.arg.params.cursor;
+          if (isFirstPage) {
+            state.ids.storylineFeedShelves = ids;
+          } else {
+            // Append new unique IDs
+            const newIds = ids.filter(id => !state.ids.storylineFeedShelves.includes(id));
+            state.ids.storylineFeedShelves = [...state.ids.storylineFeedShelves, ...newIds];
+          }
+          
+          state.storylineFeedCursor = next_cursor ? String(next_cursor) : undefined;
+          state.loading.storylineFeed = false;
+        })
+        .addCase(loadStorylineFeed.rejected, (state, action) => {
+          state.loading.storylineFeed = false;
+          state.error = action.payload || null;
+        });
+      // --- End New Feed Thunk Reducers ---
+
+      // --- Followed Tags Thunk Reducers ---
+      builder
+        .addCase(loadMyFollowedTags.pending, (state) => {
+          state.loading.followedTagsList = true;
+          state.error = null; // Clear previous errors for this specific load
+        })
+        .addCase(loadMyFollowedTags.fulfilled, (state, action: PayloadAction<string[]>) => {
+          state.followedTags = action.payload;
+          state.loading.followedTagsList = false;
+        })
+        .addCase(loadMyFollowedTags.rejected, (state, action) => {
+          state.loading.followedTagsList = false;
+          state.error = action.payload || 'Failed to load followed tags'; // Set specific error or general
+        })
+        // Handle followTag and unfollowTag: they return the refreshed list or an error
+        // Thus, their fulfilled state can be handled similarly to loadMyFollowedTags.fulfilled
+        .addCase(followTag.pending, (state) => {
+          state.loading.followedTagsList = true; // Indicate loading while follow/refresh happens
+          state.error = null;
+        })
+        .addCase(followTag.fulfilled, (state, action: PayloadAction<string[]>) => {
+          state.followedTags = action.payload; // Update with the refreshed list
+          state.loading.followedTagsList = false;
+        })
+        .addCase(followTag.rejected, (state, action) => {
+          state.loading.followedTagsList = false;
+          state.error = action.payload || 'Failed to follow tag and refresh list';
+        })
+        .addCase(unfollowTag.pending, (state) => {
+          state.loading.followedTagsList = true; // Indicate loading while unfollow/refresh happens
+          state.error = null;
+        })
+        .addCase(unfollowTag.fulfilled, (state, action: PayloadAction<string[]>) => {
+          state.followedTags = action.payload; // Update with the refreshed list
+          state.loading.followedTagsList = false;
+        })
+        .addCase(unfollowTag.rejected, (state, action) => {
+          state.loading.followedTagsList = false;
+          state.error = action.payload || 'Failed to unfollow tag and refresh list';
+        });
+      // --- End Followed Tags Thunk Reducers ---
   },
 });
 
 // Export actions and reducer
 export const { 
   setSelectedShelf, 
+  // Export new action
+  setCurrentFeedType,
   clearError, 
   updateSingleShelf,
   setContentPermission,
@@ -562,6 +692,9 @@ const selectIsCreatingShelfLoading = (state: RootState) => state.perpetua.loadin
 const selectShelves = (state: RootState) => state.perpetua.entities.shelves;
 const selectUserShelfIds = (state: RootState) => state.perpetua.ids.userShelves;
 const selectPublicShelfIds = (state: RootState) => state.perpetua.ids.publicShelves;
+// Define ID-based selectors for new feeds FIRST
+const selectRandomFeedShelfIds = (state: RootState) => state.perpetua.ids.randomFeedShelves;
+const selectStorylineFeedShelfIds = (state: RootState) => state.perpetua.ids.storylineFeedShelves;
 
 // Enhanced selector caching mechanism
 const memoizedSelectorsByShelfId = {
@@ -587,7 +720,7 @@ export const selectIsLoadingShelvesForTag = (state: RootState): boolean => state
 export const selectIsTagSearchLoading = (state: RootState): boolean => state.perpetua.loading.tagSearch;
 export const selectIsLoadingTagCounts = (state: RootState): boolean => state.perpetua.loading.tagCounts;
 export const selectIsCreatingShelf = selectIsCreatingShelfLoading; // Export the selector ONCE
-export { // Export map selectors needed for factory selectors
+export { 
     selectShelvesByTagMap,
     selectTagShelfCountsMap
 };
@@ -606,12 +739,25 @@ const selectPublicShelves = createSelector(
   (shelfIds, shelves) => shelfIds.map(id => shelves[id]).filter(Boolean)
 );
 
+// NOW define the memoized selectors that use the ID-based ones defined above
+// Select Random Feed shelves (memoized)
+const selectRandomFeedShelves = createSelector(
+  [selectRandomFeedShelfIds, selectShelves], // selectRandomFeedShelfIds is now defined before this
+  (shelfIds, shelves) => shelfIds.map(id => shelves[id]).filter(Boolean)
+);
+
+// Select Storyline Feed shelves (memoized)
+const selectStorylineFeedShelves = createSelector(
+  [selectStorylineFeedShelfIds, selectShelves], // selectStorylineFeedShelfIds is now defined before this
+  (shelfIds, shelves) => shelfIds.map(id => shelves[id]).filter(Boolean)
+);
+
 // Select a specific shelf by ID (memoized factory)
 const selectShelfById = (shelfId: string) => {
   if (!memoizedSelectorsByShelfId.shelfById.has(shelfId)) {
     const selector = createSelector(
       selectShelves, // Use the base selector
-      (shelves) => shelves[shelfId] || null
+      (shelves: Record<string, NormalizedShelf>) => shelves[shelfId] || null
     );
     memoizedSelectorsByShelfId.shelfById.set(shelfId, selector);
   }
@@ -633,7 +779,7 @@ const selectOptimisticShelfItemOrder = (shelfId: string) => {
   if (!memoizedSelectorsByShelfId.optimisticShelfItemOrder.has(shelfId)) {
     const selector = createSelector(
       selectShelfItemOrderMap,
-      (itemOrderMap) => itemOrderMap[shelfId] || []
+      (itemOrderMap: Record<string, number[]>) => itemOrderMap[shelfId] || []
     );
     memoizedSelectorsByShelfId.optimisticShelfItemOrder.set(shelfId, selector);
   }
@@ -657,7 +803,7 @@ const selectIsShelfPublic = (shelfId: string): ((state: RootState) => boolean) =
   if (!memoizedSelectorsByShelfId.isPublic.has(shelfId)) {
     const selector = createSelector(
       selectPublicAccessByIdMap,
-      (state: RootState) => selectShelves(state)[shelfId], // Use base selector
+      (state: RootState) => selectShelves(state)[shelfId] as NormalizedShelf | undefined, // Use base selector, cast result
       (publicAccessMap, shelf): boolean => {
         if (publicAccessMap[shelfId] !== undefined) {
           return Boolean(publicAccessMap[shelfId]);
@@ -678,7 +824,7 @@ const selectPublicAccessLoading = (shelfId: string) => {
   if (!memoizedSelectorsByShelfId.publicAccessLoading.has(shelfId)) {
     const selector = createSelector(
       selectPublicAccessLoadingMap,
-      (loadingMap) => Boolean(loadingMap[shelfId])
+      (loadingMap: Record<string, boolean>) => Boolean(loadingMap[shelfId])
     );
     memoizedSelectorsByShelfId.publicAccessLoading.set(shelfId, selector);
   }
@@ -690,7 +836,7 @@ const selectIsOwner = (contentId: string) => {
   if (!memoizedSelectorsByShelfId.isOwner.has(contentId)) {
     const selector = createSelector(
       selectUserPrincipal,
-      (state: RootState) => selectShelves(state)[contentId], // Use base selector
+      (state: RootState) => selectShelves(state)[contentId] as NormalizedShelf | undefined, // Use base selector, cast result
       (userPrincipal, shelf) => {
         if (!shelf || !userPrincipal) return false;
         return shelf.owner === userPrincipal;
@@ -745,7 +891,7 @@ const selectShelfIdsForTag = (tag: string) => {
   if (!memoizedTagSelectors.shelvesByTag.has(tag)) {
     const selector = createSelector(
       selectShelvesByTagMap,
-      (shelvesByTag) => shelvesByTag[tag] || []
+      (shelvesByTag: Record<string, string[]>) => shelvesByTag[tag] || []
     );
     memoizedTagSelectors.shelvesByTag.set(tag, selector);
   }
@@ -757,7 +903,7 @@ const selectTagShelfCount = (tag: string) => {
   if (!memoizedTagSelectors.tagShelfCount.has(tag)) {
     const selector = createSelector(
       selectTagShelfCountsMap,
-      (counts) => counts[tag] // Return count or undefined
+      (counts: Record<string, number>) => counts[tag] // Return count or undefined
     );
     memoizedTagSelectors.tagShelfCount.set(tag, selector);
   }
@@ -781,28 +927,47 @@ const selectCanAddItem = (contentId: string) => {
   return memoizedSelectorsByShelfId.canAddItem.get(contentId)!;
 };
 
+// New feed selectors
+const selectCurrentFeedType = (state: RootState) => state.perpetua.currentFeedType;
+const selectStorylineFeedCursor = (state: RootState) => state.perpetua.storylineFeedCursor;
+
+// New loading selectors
+const selectRandomFeedLoading = (state: RootState) => state.perpetua.loading.randomFeed;
+const selectStorylineFeedLoading = (state: RootState) => state.perpetua.loading.storylineFeed;
+
+// Selectors for followed tags
+export const selectMyFollowedTags = (state: RootState): string[] => state.perpetua.followedTags;
+export const selectIsLoadingMyFollowedTags = (state: RootState): boolean => state.perpetua.loading.followedTagsList;
+
 // --- Export Selectors ---
 // Export the selectors needed by the application
 export {
     // Base state parts (if needed directly, though usually derived selectors are preferred)
-    selectShelvesEntities, // Keep original export if needed elsewhere
-    selectUserShelvesOrder, // Keep original export if needed elsewhere
-    selectPublicShelvesOrder, // Keep original export if needed elsewhere
+    selectShelvesEntities, 
+    selectUserShelvesOrder, 
+    selectPublicShelvesOrder, 
 
     // Derived Lists/Objects
     selectUserShelves,
-    selectPublicShelves,
+    selectPublicShelves, 
     selectSelectedShelf,
 
     // Loading states
-    selectLoading, // Export the simplified selector
-    selectPublicLoading, // Export the simplified selector
+    selectLoading, 
+    selectPublicLoading, 
 
     // Error state
-    selectError, // Keep exporting the potentially transformed error
+    selectError, 
 
     // Other simple states
-    selectLastTimestamp, // Export the simplified selector
+    selectLastTimestamp, 
+    // Export new feed selectors
+    selectCurrentFeedType,
+    selectRandomFeedShelves,    // This should now be the correctly defined createSelector version
+    selectStorylineFeedShelves, // This should now be the correctly defined createSelector version
+    selectStorylineFeedCursor,
+    selectRandomFeedLoading,
+    selectStorylineFeedLoading,
 
     // Factory selectors (exported so they can be called with parameters)
     selectShelfById,

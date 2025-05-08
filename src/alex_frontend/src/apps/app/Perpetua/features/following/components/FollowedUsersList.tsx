@@ -9,12 +9,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/lib/components/alert";
 import { Skeleton } from "@/lib/components/skeleton";
 import { FollowedUserBadge } from './FollowedUserBadge';
 
-// Placeholder data - Replace with actual data fetching later
-// const placeholderFollowedUsers = [
-//     'qoctq-giaaa-aaaaa-aaaea-cai', // Example Principals
-//     'a4gq5-oaaaa-aaaab-qaa4q-cai',
-//     'ryjl3-tyaaa-aaaaa-aaaba-cai'
-// ];
 
 export const FollowedUsersList: React.FC = () => {
     // Use the hook to get followed users and manage state

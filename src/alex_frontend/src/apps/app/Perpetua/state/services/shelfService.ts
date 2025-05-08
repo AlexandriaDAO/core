@@ -257,4 +257,76 @@ export async function toggleShelfPublicAccess(
     console.error('Error in toggleShelfPublicAccess:', error);
     return { Err: `Failed to ${isPublic ? 'enable' : 'disable'} public access for shelf` };
   }
+}
+
+/**
+ * Get a shuffled feed of shelves, updated hourly.
+ */
+export async function getShuffledByHourFeed(
+  limit: number
+): Promise<Result<ShelfPublic[], QueryError>> {
+  try {
+    const actor = await getActorPerpetua();
+    const result = await actor.get_shuffled_by_hour_feed(BigInt(limit));
+
+    if ("Ok" in result) {
+      return { Ok: convertBigIntsToStrings(result.Ok) };
+    } else if ("Err" in result) {
+      return { Err: result.Err };
+    } else {
+      console.error('Unexpected response format from getShuffledByHourFeed:', result);
+      return { Err: "Unexpected response format" };
+    }
+  } catch (error) {
+    console.error('Error in getShuffledByHourFeed:', error);
+    return { Err: "Failed to load shuffled feed" };
+  }
+}
+
+/**
+ * Get a storyline feed of shelves based on followed users and tags (Paginated)
+ */
+export async function getStorylineFeed(
+  params: CursorPaginationParams<TimestampCursor>
+): Promise<Result<CursorPaginatedResponse<ShelfPublic, TimestampCursor>, QueryError>> {
+  try {
+    const actor = await getActorPerpetua();
+
+    let cursorOpt: [] | [bigint] = [];
+    if (params.cursor) {
+      cursorOpt = [BigInt(params.cursor)];
+    }
+
+    const paginationInput = {
+      cursor: cursorOpt as any, // Cast to bypass potential .did.ts type issues
+      limit: BigInt(params.limit)
+    };
+
+    const result = await actor.get_storyline_feed(paginationInput);
+
+    if ("Ok" in result && result.Ok) {
+      const paginatedResult = result.Ok;
+      const items = convertBigIntsToStrings(paginatedResult.items);
+      const nextCursorOpt = paginatedResult.next_cursor;
+      const nextCursor = nextCursorOpt && nextCursorOpt.length > 0 && nextCursorOpt[0] !== undefined
+                         ? nextCursorOpt[0].toString()
+                         : undefined;
+
+      return {
+        Ok: {
+          items: items,
+          limit: Number(paginatedResult.limit),
+          next_cursor: nextCursor
+        }
+      };
+    } else if ("Err" in result) {
+      return { Err: result.Err };
+    } else {
+      console.error('Unexpected response format from getStorylineFeed:', result);
+      return { Err: "Unexpected response format" };
+    }
+  } catch (error) {
+    console.error('Error in getStorylineFeed:', error);
+    return { Err: "Failed to load storyline feed" };
+  }
 } 

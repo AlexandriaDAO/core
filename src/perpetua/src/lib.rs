@@ -1,21 +1,10 @@
-use ic_cdk::{self, init, spawn};
+use ic_cdk::{self, init, post_upgrade, spawn};
 use candid::{Principal, Nat};
 use std::time::Duration;
 
+// Re-added constants
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
 pub const ICRC7_SCION_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
-
-pub fn get_principal(id: &str) -> Principal {
-    Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
-}
-
-pub fn icrc7_principal() -> Principal {
-    get_principal(ICRC7_CANISTER_ID)
-}
-
-pub fn icrc7_scion_principal() -> Principal {
-    get_principal(ICRC7_SCION_CANISTER_ID)
-}
 
 pub mod guard;
 pub mod auth;
@@ -67,6 +56,18 @@ pub use query::backups::*;
 pub use update::follow::*;
 pub use query::backups::backup_get_global_timeline;
 
+pub fn get_principal(id: &str) -> Principal {
+    Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
+}
+
+pub fn icrc7_principal() -> Principal {
+    get_principal(ICRC7_CANISTER_ID)
+}
+
+pub fn icrc7_scion_principal() -> Principal {
+    get_principal(ICRC7_SCION_CANISTER_ID)
+}
+
 #[init]
 fn init() {
     let gc_interval = Duration::from_secs(60 * 60 * 24);
@@ -77,6 +78,11 @@ fn init() {
         });
     });
     ic_cdk::println!("Perpetua canister initialized with GC timer set for interval: {:?}", gc_interval);
+}
+
+#[post_upgrade]
+fn post_upgrade() {
+    ic_cdk::println!("Perpetua canister upgraded.");
 }
 
 ic_cdk::export_candid!();

@@ -1,20 +1,22 @@
 ```
+// Perpetua/ Frontend
+
 Perpetua/
 ├── features/
 │   ├── cards/
 │   │   ├── components/
-│   │   │   ├── BaseShelfList.tsx (490 lines)
+│   │   │   ├── BaseShelfList.tsx (448 lines)
 │   │   │   ├── ContentDisplays.tsx (92 lines)
 │   │   │   ├── NftDisplay.tsx (152 lines)
 │   │   │   ├── ShelfBlogView.tsx (191 lines)
-│   │   │   ├── ShelfCard.tsx (348 lines)
-│   │   │   ├── ShelfContentCard.tsx (174 lines)
+│   │   │   ├── ShelfCard.tsx (315 lines)
+│   │   │   ├── ShelfContentCard.tsx (190 lines)
 │   │   │   ├── ShelfContentModal.tsx (79 lines)
-│   │   │   ├── ShelfDetailView.tsx (229 lines)
+│   │   │   ├── ShelfDetailView.tsx (233 lines)
 │   │   │   ├── ShelfEmptyView.tsx (32 lines)
 │   │   │   ├── ShelfGridView.tsx (57 lines)
-│   │   │   ├── ShelfViewControls.tsx (239 lines)
-│   │   │   ├── ShelfViewHeader.tsx (92 lines)
+│   │   │   ├── ShelfViewControls.tsx (251 lines)
+│   │   │   ├── ShelfViewHeader.tsx (101 lines)
 │   │   │   └── index.ts (9 lines)
 │   │   ├── hooks/
 │   │   │   ├── index.ts (1 lines)
@@ -24,7 +26,8 @@ Perpetua/
 │   ├── following/
 │   │   ├── components/
 │   │   │   ├── FollowedTagsList.tsx (102 lines)
-│   │   │   └── FollowedUsersList.tsx (94 lines)
+│   │   │   ├── FollowedUserBadge.tsx (56 lines)
+│   │   │   └── FollowedUsersList.tsx (77 lines)
 │   │   └── hooks/
 │   │       └── useFollowStatus.ts (160 lines)
 │   ├── shared/
@@ -44,32 +47,32 @@ Perpetua/
 │   │       └── utils/
 │   │           ├── createReorderAdapter.ts (59 lines)
 │   │           └── reorderUtils.ts (32 lines)
-│   ├── shelf-collaboration/
+│   ├── shelf-information/
 │   │   └── components/
-│   │       └── CollaboratorsList.tsx (186 lines)
+│   │       └── ShelfInformationDialog.tsx (144 lines)
 │   ├── shelf-management/
 │   │   ├── components/
+│   │   │   ├── InlineItemCreator.tsx (347 lines)
 │   │   │   ├── NewShelf.tsx (154 lines)
 │   │   │   ├── RemoveItemButton.tsx (98 lines)
 │   │   │   ├── ShelfContent.tsx (90 lines)
 │   │   │   ├── ShelfOption.tsx (31 lines)
-│   │   │   └── ShelfSelectionDialog.tsx (328 lines)
+│   │   │   └── ShelfSelectionDialog.tsx (564 lines)
 │   │   ├── containers/
-│   │   │   ├── ShelfDetailContainer.tsx (168 lines)
-│   │   │   └── ShelfLists.tsx (251 lines)
+│   │   │   ├── ShelfDetailContainer.tsx (277 lines)
+│   │   │   └── ShelfLists.tsx (264 lines)
 │   │   └── hooks/
 │   │       ├── index.ts (4 lines)
-│   │       ├── useAddToShelf.ts (120 lines)
+│   │       ├── useAddToShelf.ts (148 lines)
 │   │       ├── usePublicShelfOperations.ts (62 lines)
-│   │       └── useShelfOperations.ts (231 lines)
+│   │       └── useShelfOperations.ts (205 lines)
 │   ├── shelf-settings/
 │   │   ├── components/
-│   │   │   ├── CollaboratorsTab.tsx (40 lines)
 │   │   │   ├── GeneralSettingsTab.tsx (241 lines)
 │   │   │   ├── PublicAccessSection.tsx (70 lines)
-│   │   │   ├── ShelfInformationSection.tsx (132 lines)
-│   │   │   ├── ShelfLinkItem.tsx (32 lines)
-│   │   │   ├── ShelfSettingsDialog.tsx (119 lines)
+│   │   │   ├── ShelfInformationSection.tsx (117 lines)
+│   │   │   ├── ShelfLinkItem.tsx (34 lines)
+│   │   │   ├── ShelfSettingsDialog.tsx (96 lines)
 │   │   │   ├── TagsSection.tsx (132 lines)
 │   │   │   └── index.ts (6 lines)
 │   │   ├── hooks/
@@ -91,38 +94,65 @@ Perpetua/
 │       │   └── useTagData.ts (37 lines)
 │       └── index.ts (1 lines)
 ├── hooks/
-│   └── useContentPermissions.ts (74 lines)
+│   └── useContentPermissions.ts (66 lines)
 ├── index.tsx (21 lines)
 ├── layouts/
-│   └── PerpetuaLayout.tsx (292 lines)
+│   └── PerpetuaLayout.tsx (321 lines)
 ├── routes.ts (119 lines)
 ├── state/
 │   ├── cache/
 │   │   └── ShelvesCache.ts (210 lines)
 │   ├── hooks/
 │   │   ├── index.ts (3 lines)
-│   │   ├── usePerpetuaActions.ts (169 lines)
-│   │   └── usePerpetuaSelectors.ts (59 lines)
-│   ├── index.ts (46 lines)
-│   ├── perpetuaSlice.ts (937 lines)
+│   │   ├── usePerpetuaActions.ts (123 lines)
+│   │   └── usePerpetuaSelectors.ts (48 lines)
+│   ├── index.ts (41 lines)
+│   ├── perpetuaSlice.ts (817 lines)
 │   ├── services/
 │   │   ├── followService.ts (276 lines)
 │   │   ├── index.ts (7 lines)
 │   │   ├── itemService.ts (209 lines)
 │   │   ├── serviceTypes.ts (39 lines)
-│   │   ├── shelfService.ts (357 lines)
+│   │   ├── shelfService.ts (260 lines)
 │   │   └── tagService.ts (306 lines)
 │   ├── thunks/
-│   │   ├── collaborationThunks.ts (110 lines)
-│   │   ├── index.ts (7 lines)
+│   │   ├── index.ts (6 lines)
 │   │   ├── itemThunks.ts (117 lines)
 │   │   ├── queryThunks.ts (268 lines)
 │   │   ├── reorderThunks.ts (128 lines)
 │   │   ├── shelfThunks.ts (125 lines)
 ├── types/
 │   ├── reordering.types.ts (69 lines)
-│   └── shelf.types.ts (74 lines)
+│   └── shelf.types.ts (77 lines)
 └── utils.tsx (128 lines)
+
+
+// perpetua/ backend.
+perpetua/
+├── Cargo.toml (20 lines)
+├── perpetua.did (151 lines)
+├── perpetua.md (273 lines)
+└── src/
+    ├── auth.rs (169 lines)
+    ├── guard.rs (11 lines)
+    ├── lib.rs (82 lines)
+    ├── ordering.rs (542 lines)
+    ├── query/
+    │   ├── backups.rs (129 lines)
+    │   ├── follows.rs (280 lines)
+    │   └── shelves.rs (618 lines)
+    ├── storage.rs (692 lines)
+    ├── types.rs (86 lines)
+    ├── update/
+    │   ├── access.rs (34 lines)
+    │   ├── follow.rs (132 lines)
+    │   ├── item.rs (335 lines)
+    │   ├── profile.rs (119 lines)
+    │   ├── restore.rs (128 lines)
+    │   ├── shelf.rs (126 lines)
+    │   ├── tags.rs (324 lines)
+    │   └── utils.rs (101 lines)
+    └── utils.rs (33 lines)
 ```
 
 
@@ -133,16 +163,16 @@ Perpetua/
 
 
 
+- Tag/user follow loading is really slow. (does this lag increase with scale?)
 - Need to really rethink the way we use following.
   - It shouldn't attempt to fetch if not logged in.
   - We shouldn't have to wait for it to finish to see other stuff.
   - It doesn't need to be in your face.
+    - Really what we need is different feeds, one recent, one random, one followed tags, one followed users. 
 
-- Random vs. Latest feed on initial load.
-- Popular tags display proportional to size. 
 
-- Expander carrot should do something on desktop mode, or be removed.
-- Shouldn't have to wait for following info to load to do stuff.
+- Public/private should just be a lock/unlock icon.
+- Fix the ugly ill-placed expander/delete buttons
 - Progressive loading, like in other apps.
 
 
@@ -160,7 +190,6 @@ Perpetua/
 
 
 Backend Stuff:
-- Tag/user follow loading is really slow. (does this lag increase with scale?)
 - Payment for all/some actions
   - Pay for shelf creation after the fifth shelf. That's it (for now).
 

@@ -3,6 +3,12 @@ use ic_cdk;
 use std::collections::BTreeMap;
 use std::ops::Bound;
 
+// rand traits and PRNG implementation
+use rand::Rng; 
+use rand::seq::SliceRandom;
+use rand_chacha::ChaCha20Rng;
+use rand_core::SeedableRng;
+
 // Import necessary items from storage
 use crate::storage::{
     SHELVES, TAG_SHELF_ASSOCIATIONS, NFT_SHELVES,
@@ -342,40 +348,34 @@ pub fn get_user_shelves(
 pub fn get_recent_shelves(
     pagination: CursorPaginationInput<u64>
 ) -> QueryResult<CursorPaginatedResult<ShelfPublic, u64>> {
-    let limit = pagination.get_limit(); // Uses CursorPaginationInput::get_limit() - made pub
-    let limit_plus_one = limit + 1; // Fetch one extra to determine next_cursor
+    let limit = pagination.get_limit();
+    let limit_plus_one = limit + 1;
 
     GLOBAL_TIMELINE.with(|timeline| {
         let timeline_ref = timeline.borrow();
-
-        // Determine the starting bound based on the cursor
         let start_bound = match pagination.cursor {
             Some(cursor_ts) => Bound::Excluded(cursor_ts),
-            None => Bound::Unbounded, // Start from the beginning (latest)
+            None => Bound::Unbounded,
         };
 
-        // Iterate in reverse chronological order
         let mut shelf_ids_with_ts: Vec<(u64, ShelfId)> = timeline_ref
             .iter()
-            .rev() // Iterate newest first
+            .rev()
             .skip_while(|(ts, _)| match start_bound {
-                Bound::Excluded(cursor_ts) => *ts > cursor_ts, // Skip items newer than or at cursor
-                Bound::Unbounded => false, // Don't skip if no cursor
-                _ => unreachable!(), // We only use Excluded or Unbounded
+                Bound::Excluded(cursor_ts) => *ts > cursor_ts, 
+                Bound::Unbounded => false, 
+                _ => unreachable!(), 
             })
             .take(limit_plus_one)
             .map(|(ts, id)| (ts, id.clone()))
             .collect();
 
-        // Determine the next cursor
         let next_cursor = if shelf_ids_with_ts.len() == limit_plus_one {
-            // The last item fetched is the key for the next page
             shelf_ids_with_ts.pop().map(|(ts, _)| ts)
         } else {
             None
         };
 
-        // Get the actual Shelf data for the current page
         let shelf_ids: Vec<ShelfId> = shelf_ids_with_ts.into_iter().map(|(_, id)| id).collect();
 
         SHELVES.with(|shelves| {
@@ -395,6 +395,62 @@ pub fn get_recent_shelves(
     })
 }
 
+// Define constants for the time-based shuffle
+const NANOS_PER_HOUR: u64 = 60 * 60 * 1_000_000_000;
+// Or const NANOS_PER_DAY: u64 = 24 * NANOS_PER_HOUR;
+
+// Helper to derive a seed from a time period ID
+fn derive_seed_from_period_id(period_id: u64) -> [u8; 32] {
+    let mut seed = [0u8; 32];
+    let bytes = period_id.to_le_bytes();
+    // Simple mixing: XOR bytes into the seed array
+    for i in 0..bytes.len() {
+        seed[i % 32] ^= bytes[i]; // Use modulo to wrap around the 32-byte seed
+    }
+    // Could add more mixing based on a fixed salt or other canister state if needed
+    seed
+}
+
+/// Returns a list of shelves shuffled deterministically based on the current hour.
+#[ic_cdk::query]
+pub fn get_shuffled_by_hour_feed(
+    limit: Nat
+) -> QueryResult<Vec<ShelfPublic>> {
+    let limit_usize: usize = limit.0.try_into().unwrap_or(20);
+    if limit_usize == 0 {
+        return Ok(Vec::new());
+    }
+
+    let current_timestamp_ns = ic_cdk::api::time();
+    let hour_period_id = current_timestamp_ns / NANOS_PER_HOUR;
+    let seed = derive_seed_from_period_id(hour_period_id);
+    let mut rng = ChaCha20Rng::from_seed(seed); // Use ChaCha20Rng with the deterministic seed
+
+    SHELVES.with(|shelves_map_ref| {
+        let shelves_map = shelves_map_ref.borrow();
+        
+        // Collect all shelf IDs. Corrected: .keys() returns String, no clone needed.
+        let mut all_shelf_ids: Vec<ShelfId> = shelves_map.keys().collect();
+        
+        if all_shelf_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        // Shuffle the collected IDs using the deterministic RNG
+        all_shelf_ids.shuffle(&mut rng);
+
+        // Take the requested limit
+        let final_ids: Vec<ShelfId> = all_shelf_ids.into_iter().take(limit_usize).collect();
+        
+        // Fetch the shelf data for the selected IDs
+        let result_shelves: Vec<ShelfPublic> = final_ids
+            .iter()
+            .filter_map(|id| shelves_map.get(id).map(|s| ShelfPublic::from(s.clone())))
+            .collect();
+
+        Ok(result_shelves)
+    })
+}
 
 #[ic_cdk::query(guard = "not_anon")] // Add guard to prevent anonymous access
 pub fn get_followed_users_feed(
@@ -559,6 +615,97 @@ pub fn get_followed_tags_feed(
     let next_cursor = if items_fetched == limit_plus_one {
         result_shelves.pop(); // Remove the extra item
         last_timestamp
+    } else {
+        None
+    };
+
+    Ok(CursorPaginatedResult {
+        items: result_shelves,
+        next_cursor,
+        limit: Nat::from(limit),
+    })
+}
+
+#[ic_cdk::query(guard = "not_anon")]
+pub fn get_storyline_feed(
+    pagination: CursorPaginationInput<u64>
+) -> QueryResult<CursorPaginatedResult<ShelfPublic, u64>> {
+    let caller = ic_cdk::caller();
+    let limit = pagination.get_limit();
+    let limit_plus_one = limit + 1;
+
+    let followed_users_set = FOLLOWED_USERS.with(|followed| {
+        followed.borrow().get(&caller).map(|ps| ps.clone()).unwrap_or_default()
+    });
+    let followed_tags_set = FOLLOWED_TAGS.with(|followed| {
+        followed.borrow().get(&caller).map(|nts| nts.clone()).unwrap_or_default()
+    });
+
+    if followed_users_set.0.is_empty() && followed_tags_set.0.is_empty() {
+        return Ok(CursorPaginatedResult {
+            items: Vec::new(),
+            next_cursor: None,
+            limit: Nat::from(limit),
+        });
+    }
+
+    let mut result_shelves: Vec<ShelfPublic> = Vec::with_capacity(limit);
+    let mut last_timestamp: Option<u64> = None;
+    let mut items_fetched = 0;
+    let mut unique_shelf_ids_processed: std::collections::BTreeSet<ShelfId> = std::collections::BTreeSet::new();
+
+    GLOBAL_TIMELINE.with(|timeline| {
+        let timeline_ref = timeline.borrow();
+        let start_bound = match pagination.cursor {
+            Some(cursor_ts) => Bound::Excluded(cursor_ts),
+            None => Bound::Unbounded,
+        };
+
+        for (timestamp, shelf_id) in timeline_ref
+            .iter()
+            .rev() 
+            .skip_while(|(ts, _)| match start_bound { 
+                Bound::Excluded(cursor_ts) => *ts >= cursor_ts,
+                Bound::Unbounded => false,
+                _ => unreachable!(),
+            })
+        {
+            if unique_shelf_ids_processed.contains(&shelf_id) {
+                continue; 
+            }
+
+            let shelf_details = SHELVES.with(|shelves_map_ref| {
+                shelves_map_ref.borrow().get(&shelf_id).map(|s| s.clone())
+            });
+
+            if let Some(shelf) = shelf_details {
+                let owner_is_followed = !followed_users_set.0.is_empty() && followed_users_set.0.contains(&shelf.owner);
+                let mut tag_is_followed = false;
+                if !followed_tags_set.0.is_empty() {
+                    for tag_on_shelf in &shelf.tags {
+                        if followed_tags_set.0.contains(tag_on_shelf) {
+                            tag_is_followed = true;
+                            break;
+                        }
+                    }
+                }
+
+                if owner_is_followed || tag_is_followed {
+                    result_shelves.push(ShelfPublic::from(shelf.clone()));
+                    last_timestamp = Some(timestamp);
+                    items_fetched += 1;
+                    unique_shelf_ids_processed.insert(shelf_id.clone());
+                    if items_fetched >= limit_plus_one {
+                        break;
+                    }
+                }
+            }
+        }
+    });
+
+    let next_cursor = if items_fetched == limit_plus_one {
+        result_shelves.pop(); 
+        last_timestamp 
     } else {
         None
     };

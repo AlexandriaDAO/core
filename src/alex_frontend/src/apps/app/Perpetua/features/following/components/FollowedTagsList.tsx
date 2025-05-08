@@ -1,62 +1,36 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useAppDispatch } from '@/store/hooks/useAppDispatch';
+import { useAppSelector } from '@/store/hooks/useAppSelector';
+
 import { Button } from '@/lib/components/button';
 import { Badge } from '@/lib/components/badge';
 import { toast } from 'sonner';
-import { unfollowTag, getMyFollowedTags } from '@/apps/app/Perpetua/state/services/followService';
+import { unfollowTag } from '@/apps/app/Perpetua/state/thunks/followThunks';
+import { selectMyFollowedTags, selectIsLoadingMyFollowedTags } from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { X, Loader2 } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from "@/lib/components/alert";
 import { Skeleton } from "@/lib/components/skeleton";
 
 export const FollowedTagsList: React.FC = () => {
-    const [followedTags, setFollowedTags] = useState<string[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [unfollowingTag, setUnfollowingTag] = useState<string | null>(null);
-
-    const fetchFollowedTags = useCallback(async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const result = await getMyFollowedTags();
-            if ('Ok' in result) {
-                setFollowedTags(result.Ok);
-            } else {
-                setError(result.Err || 'Failed to load followed tags.');
-                toast.error(result.Err || 'Failed to load followed tags.');
-            }
-        } catch (err) {
-            console.error("Error fetching followed tags:", err);
-            const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
-            setError(errorMessage);
-            toast.error(`Error: ${errorMessage}`);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchFollowedTags();
-    }, [fetchFollowedTags]);
+    const dispatch = useAppDispatch();
+    const followedTags = useAppSelector(selectMyFollowedTags);
+    const isLoading = useAppSelector(selectIsLoadingMyFollowedTags);
+    const [unfollowingTagUi, setUnfollowingTagUi] = useState<string | null>(null);
 
     const handleUnfollow = useCallback(async (tag: string) => {
-        setUnfollowingTag(tag);
+        setUnfollowingTagUi(tag);
         try {
-            const result = await unfollowTag(tag);
-            if ('Ok' in result) {
-                toast.success(`Unfollowed tag: ${tag}`);
-                setFollowedTags(current => current.filter(t => t !== tag));
-            } else {
-                toast.error(`Failed to unfollow tag: ${result.Err}`);
-            }
-        } catch (error) {
-            console.error("Error unfollowing tag:", error);
-            toast.error("An error occurred while unfollowing the tag.");
+            await dispatch(unfollowTag(tag)).unwrap();
+            toast.success(`Unfollowed tag: ${tag}`);
+        } catch (err: any) {
+            const errorMessage = typeof err === 'string' ? err : (err?.message || 'Failed to unfollow tag.');
+            toast.error(errorMessage);
+            console.error("Error unfollowing tag via thunk:", err);
         } finally {
-            setUnfollowingTag(null);
+            setUnfollowingTagUi(null);
         }
-    }, []);
+    }, [dispatch]);
 
-    if (isLoading) {
+    if (isLoading && followedTags.length === 0) {
         return (
             <div className="mb-4 font-serif">
                 <h3 className="mb-2 font-semibold text-base">Following Tags:</h3>
@@ -77,18 +51,18 @@ export const FollowedTagsList: React.FC = () => {
         <div className="mb-4 font-serif">
             <h3 className="mb-2 font-semibold text-base">Following Tags:</h3>
             <div className="flex flex-wrap gap-2 items-center">
-                {followedTags.map(tag => (
+                {followedTags.map((tag: string) => (
                     <Badge key={tag} variant="secondary" className="pl-3 pr-1 py-1 flex items-center gap-1 group relative">
                         <span>{tag}</span>
                         <Button
                             variant="ghost"
                             className="h-5 w-5 p-0 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-opacity opacity-50 group-hover:opacity-100"
                             onClick={() => handleUnfollow(tag)}
-                            disabled={unfollowingTag === tag}
+                            disabled={unfollowingTagUi === tag || isLoading}
                             aria-label={`Unfollow tag ${tag}`}
                             title={`Unfollow tag ${tag}`}
                         >
-                            {unfollowingTag === tag ? (
+                            {unfollowingTagUi === tag ? (
                                 <Loader2 className="h-3 w-3 animate-spin" />
                             ) : (
                                 <X size={14} />
