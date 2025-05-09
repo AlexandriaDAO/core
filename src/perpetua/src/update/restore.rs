@@ -68,7 +68,7 @@
 //             updated_at: ic_cdk::api::time(), // Set new timestamp
 //             appears_in: Vec::new(), // Reset appears_in
 //             tags: backup_shelf.tags,
-//             is_public: backup_shelf.is_public,
+//             public_editing: backup_shelf.public_editing,
 //         };
 
 //         // Insert into the main map

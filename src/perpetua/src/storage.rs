@@ -12,6 +12,9 @@ use crate::types::{TagPopularityKey, TagShelfAssociationKey}; // Import from new
 use sha2;
 use bs58;
 use std::cmp::Ordering; // Import Ordering for custom Ord impl
+use rand_chacha;
+use rand_core::SeedableRng;
+use rand::Rng;
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -97,6 +100,8 @@ const ORPHANED_TAG_CANDIDATES_MEM_ID: MemoryId = MemoryId::new(15);
 // --- Follow System Memory IDs ---
 const FOLLOWED_USERS_MEM_ID: MemoryId = MemoryId::new(16);
 const FOLLOWED_TAGS_MEM_ID: MemoryId = MemoryId::new(17);
+// --- New Memory ID for Random Shelf Candidates ---
+const RANDOM_SHELF_CANDIDATES_MEM_ID: MemoryId = MemoryId::new(18);
 
 
 // Constants for shelf operations
@@ -129,6 +134,21 @@ pub struct Item {
     pub content: ItemContent,
 }
 
+// --- New Struct for enriched Global Timeline items ---
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct GlobalTimelineItemValue {
+    pub shelf_id: ShelfId,
+    pub owner: Principal,
+    pub tags: Vec<NormalizedTag>,
+    pub public_editing: bool,
+}
+
+impl Storable for GlobalTimelineItemValue {
+    fn to_bytes(&self) -> Cow<[u8]> { Cow::Owned(Encode!(self).unwrap()) }
+    fn from_bytes(bytes: Cow<[u8]>) -> Self { Decode!(bytes.as_ref(), Self).unwrap() }
+    const BOUND: Bound = Bound::Unbounded;
+}
+
 thread_local! {
     // Memory manager for stable storage
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
@@ -156,8 +176,9 @@ thread_local! {
         )
     );
     
-    // Global timeline index: K: timestamp, V: shelf_id
-    pub static GLOBAL_TIMELINE: RefCell<StableBTreeMap<u64, ShelfId, Memory>> = RefCell::new(
+    // Global timeline index: K: timestamp, V: GlobalTimelineItemValue
+    // NOTE: Update calls (like store_shelf) must now populate GlobalTimelineItemValue
+    pub static GLOBAL_TIMELINE: RefCell<StableBTreeMap<u64, GlobalTimelineItemValue, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(GLOBAL_TIMELINE_MEM_ID))
         )
@@ -220,6 +241,15 @@ thread_local! {
             MEMORY_MANAGER.with(|m| m.borrow().get(FOLLOWED_TAGS_MEM_ID))
         )
     );
+
+    // --- New Map for Storing Random Shelf Candidates ---
+    // This map will store a fixed number of ShelfIds, indexed from 0 to K-1,
+    // and is updated periodically by a timer/heartbeat mechanism.
+    pub static RANDOM_SHELF_CANDIDATES: RefCell<StableBTreeMap<u32, ShelfId, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(RANDOM_SHELF_CANDIDATES_MEM_ID))
+        )
+    );
 }
 
 // --- Public Shelf structure for Candid export ---
@@ -236,7 +266,7 @@ pub struct ShelfPublic {
     pub updated_at: u64,
     pub appears_in: Vec<ShelfId>,
     pub tags: Vec<NormalizedTag>, // Assuming NormalizedTag (String) is CandidType
-    pub is_public: bool,
+    pub public_editing: bool,
 }
 
 impl ShelfPublic {
@@ -253,7 +283,7 @@ impl ShelfPublic {
             updated_at: shelf.updated_at,
             appears_in: shelf.appears_in.clone(),
             tags: shelf.tags.clone(),
-            is_public: shelf.is_public,
+            public_editing: shelf.public_editing,
         }
     }
 }
@@ -272,7 +302,7 @@ pub struct Shelf {
     pub updated_at: u64,
     pub appears_in: Vec<ShelfId>,
     pub tags: Vec<NormalizedTag>,
-    pub is_public: bool,
+    pub public_editing: bool,
 }
 
 // --- Update Storable implementation for Shelf ---
@@ -304,7 +334,7 @@ impl Storable for Shelf {
             updated_at: public_shelf.updated_at,
             appears_in: public_shelf.appears_in,
             tags: public_shelf.tags,
-            is_public: public_shelf.is_public,
+            public_editing: public_shelf.public_editing,
         }
     }
 
@@ -424,7 +454,7 @@ impl Shelf {
             updated_at: now,
             appears_in: Vec::new(),
             tags: Vec::new(), 
-            is_public: false, 
+            public_editing: false, 
         }
     }
 
@@ -630,7 +660,25 @@ pub async fn create_shelf(
     }
     
     // Tag association logic will happen in the calling function (store_shelf)
-    // using the dedicated add_tag_to_shelf update method
+    // using the dedicated add_tag_to_shelf update method. 
+    // The calling function (e.g., store_shelf in update logic) will also be responsible for saving the shelf to SHELVES map.
+
+    // Populate GLOBAL_TIMELINE with the new shelf's metadata
+    // It's assumed that 'now' (the creation timestamp) is unique enough or combined with shelf_id for timeline key if high-frequency collision is a concern.
+    // For simplicity here, using 'now' directly as per original GLOBAL_TIMELINE structure with u64 keys.
+    // The 'public_editing' field of the shelf is false by default upon creation with Shelf::new().
+    // If a shelf can be public immediately upon creation, ensure 'shelf.public_editing' reflects that before this step.
+    /* GLOBAL_TIMELINE.with(|timeline_ref| {
+        timeline_ref.borrow_mut().insert(
+            now, // Using the creation timestamp as the key for the timeline
+            GlobalTimelineItemValue {
+                shelf_id: shelf.shelf_id.clone(),
+                owner: shelf.owner, // Owner is already part of the shelf struct
+                tags: shelf.tags.clone(), // Tags are already part of the shelf struct
+                public_editing: shelf.public_editing, // public_editing is part of the shelf struct
+            }
+        ); // .expect("Failed to insert into GLOBAL_TIMELINE") removed, insert returns Option<V>
+    }); */
     
     Ok(shelf)
 }
@@ -672,7 +720,7 @@ pub struct ShelfBackupData {
     pub item_positions: Vec<(u32, f64)>, // Keep ordered positions
     // No created_at, updated_at, appears_in
     pub tags: Vec<NormalizedTag>,
-    pub is_public: bool,
+    pub public_editing: bool,
 }
 
 impl ShelfBackupData {
@@ -686,7 +734,72 @@ impl ShelfBackupData {
             items: shelf.items.clone(), 
             item_positions: shelf.item_positions.get_ordered_entries(), // Get Vec from tracker
             tags: shelf.tags.clone(),
-            is_public: shelf.is_public,
+            public_editing: shelf.public_editing,
         }
     }
+}
+
+// --- Function to be called periodically to refresh random shelf candidates ---
+// NOTE: This function should be called by a canister timer (e.g., hourly via canister_heartbeat or ic_cdk_timers).
+// Consider potential instruction limits if the number of shelves is very large;
+// chunking the reservoir sampling might be necessary in such scenarios.
+#[allow(dead_code)] // Remove if integrated and called from a timer/heartbeat
+pub fn refresh_random_shelf_candidates() {
+    const K_CANDIDATES: usize = 1000; // Number of candidates to maintain
+    let mut candidate_ids_reservoir: Vec<ShelfId> = Vec::with_capacity(K_CANDIDATES); // Renamed for clarity
+    let mut shelves_processed_count: u64 = 0; // Renamed to reflect all shelves
+
+    SHELVES.with(|shelves_map_ref| {
+        let shelves_map = shelves_map_ref.borrow();
+        let total_shelves_in_map = shelves_map.len();
+
+        if total_shelves_in_map == 0 {
+            ic_cdk::println!("No shelves available to select candidates for random feed.");
+            RANDOM_SHELF_CANDIDATES.with(|candidates_map_ref| {
+                let mut map = candidates_map_ref.borrow_mut();
+                // Manual clear if clear_new() isn't a standard method or has different semantics
+                let keys_to_remove: Vec<u32> = map.iter().map(|(k, _)| k).collect();
+                for k in keys_to_remove { map.remove(&k); }
+            });
+            return;
+        }
+
+        // Reservoir sampling for public shelves
+        let mut rng_seed = [0u8; 32];
+        let time_bytes = ic_cdk::api::time().to_le_bytes();
+        // Ensure rng_seed is fully initialized even if time_bytes is shorter than 32 bytes.
+        for i in 0..32 { // Iterate up to 32, the length of rng_seed
+            rng_seed[i] = time_bytes.get(i).cloned().unwrap_or_else(|| (i as u8).wrapping_add(0xAA));
+        }
+        let mut prng = rand_chacha::ChaCha20Rng::from_seed(rng_seed);
+
+        for (shelf_id, _shelf) in shelves_map.iter() { // Iterate over ALL shelves
+            shelves_processed_count += 1;
+            if candidate_ids_reservoir.len() < K_CANDIDATES {
+                candidate_ids_reservoir.push(shelf_id.clone());
+            } else {
+                // Generate j in the range [0, shelves_processed_count - 1]
+                let j = prng.gen_range(0..shelves_processed_count); 
+                if (j as usize) < K_CANDIDATES { // Check if j falls within the reservoir size
+                    candidate_ids_reservoir[j as usize] = shelf_id.clone();
+                }
+            }
+        }
+    });
+
+    RANDOM_SHELF_CANDIDATES.with(|candidates_map_ref| {
+        let mut candidates_map = candidates_map_ref.borrow_mut();
+        // Clear existing candidates before adding new ones
+        let keys_to_remove: Vec<u32> = candidates_map.iter().map(|(k, _)| k).collect();
+        for k in keys_to_remove { candidates_map.remove(&k); }
+
+        for (idx, shelf_id) in candidate_ids_reservoir.into_iter().enumerate() {
+            candidates_map.insert(idx as u32, shelf_id);
+        }
+    });
+    ic_cdk::println!(
+        "Refreshed random shelf candidates. Processed {} shelves, selected {} candidates for the pool.", 
+        shelves_processed_count, 
+        RANDOM_SHELF_CANDIDATES.with(|c| c.borrow().len())
+    );
 }

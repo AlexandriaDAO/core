@@ -35,10 +35,10 @@ export const useContentPermissions = () => {
     if (shelf.owner === currentPrincipal) return true;
 
     // Check 2: Is the shelf public?
-    // Prioritize the dynamically checked publicAccessMap, fall back to shelf.is_public from normalized data
+    // Prioritize the dynamically checked publicAccessMap, fall back to shelf.public_editing from normalized data
     const isPublic = publicAccessMap[contentId] !== undefined
       ? publicAccessMap[contentId]
-      : shelf.is_public; // Use shelf.is_public as fallback
+      : shelf.public_editing; // Use shelf.public_editing as fallback
 
     return isPublic; // Return true if public
 

@@ -73,7 +73,7 @@ export interface ContentPermissions {
 // Normalized shelf interface - Export this type
 export interface NormalizedShelf extends Omit<ShelfPublic, 'owner' | 'created_at' | 'updated_at'> {
   owner: string; // Always store owner as string for consistency
-  is_public: boolean; // Add is_public field to match the backend
+  public_editing: boolean; // Add public_editing field to match the backend
   created_at: string; // Store timestamp as string
   updated_at: string; // Store timestamp as string
 }
@@ -175,7 +175,7 @@ const normalizeShelf = (shelf: ShelfPublic): NormalizedShelf => {
   return {
     ...shelf,
     owner: typeof shelf.owner === 'string' ? shelf.owner : shelf.owner.toString(),
-    is_public: typeof shelf.is_public === 'boolean' ? shelf.is_public : false,
+    public_editing: typeof shelf.public_editing === 'boolean' ? shelf.public_editing : false,
     // Convert timestamps to string during normalization
     created_at: String(shelf.created_at),
     updated_at: String(shelf.updated_at)
@@ -345,7 +345,8 @@ const perpetuaSlice = createSlice({
           state.ids.publicShelves = [...state.ids.publicShelves, ...newIds];
         }
         
-        state.lastTimestamp = next_cursor ? String(next_cursor) : undefined;
+        // NEW: Safely convert to string if bigint, otherwise use as is (handles string | undefined correctly)
+        state.lastTimestamp = typeof next_cursor === 'bigint' ? next_cursor.toString() : next_cursor;
         state.loading.publicShelves = false;
       })
       .addCase(loadRecentShelves.rejected, (state, action) => {
@@ -386,7 +387,7 @@ const perpetuaSlice = createSlice({
           item_positions: [],
           created_at: nowString, // Store as string (Matches updated type)
           updated_at: nowString, // Store as string (Matches updated type)
-          is_public: false, 
+          public_editing: false, 
         };
         
         state.entities.shelves[shelfId] = newShelf;
@@ -808,8 +809,8 @@ const selectIsShelfPublic = (shelfId: string): ((state: RootState) => boolean) =
         if (publicAccessMap[shelfId] !== undefined) {
           return Boolean(publicAccessMap[shelfId]);
         }
-        if (shelf && typeof shelf.is_public === 'boolean') {
-          return shelf.is_public;
+        if (shelf && typeof shelf.public_editing === 'boolean') {
+          return shelf.public_editing;
         }
         return false;
       }

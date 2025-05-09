@@ -1,5 +1,5 @@
 use ic_cdk::{self, init, post_upgrade, spawn};
-use candid::{Principal, Nat};
+use candid::{Principal};
 use std::time::Duration;
 
 // Re-added constants
@@ -19,6 +19,7 @@ pub mod update {
     pub mod tags;
     pub mod follow;
     pub mod restore;
+    pub mod debug;
 }
 pub mod query {
     pub mod shelves;
@@ -52,9 +53,8 @@ pub use query::shelves::{
     get_followed_users_feed, get_followed_tags_feed,
     ShelfPositionMetrics
 };
-pub use query::backups::*;
 pub use update::follow::*;
-pub use query::backups::backup_get_global_timeline;
+pub use update::debug::{debug_trigger_refresh_random_candidates};
 
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))

@@ -3,9 +3,8 @@ use ic_cdk;
 
 use crate::storage::{
     FOLLOWED_USERS, FOLLOWED_TAGS, 
-    PrincipalSet, NormalizedTagSet, 
-    validate_tag_format, NormalizedTag,
-    USER_SHELVES // Added USER_SHELVES for potential future use, though not needed here yet
+    validate_tag_format, 
+    // Removed TAG_METADATA, TagMetadata
 };
 use crate::utils::normalize_tag;
 // Assuming the guard function is in src/guards.rs

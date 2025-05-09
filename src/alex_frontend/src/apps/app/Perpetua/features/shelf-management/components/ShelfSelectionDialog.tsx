@@ -47,7 +47,7 @@ const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => {
     updated_at: BigInt(normalizedShelf.updated_at),
     appears_in: normalizedShelf.appears_in || [],
     tags: normalizedShelf.tags || [],
-    is_public: normalizedShelf.is_public,
+    public_editing: normalizedShelf.public_editing,
   };
 };
 

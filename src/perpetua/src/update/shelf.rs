@@ -1,5 +1,5 @@
 use candid::{CandidType, Deserialize};
-use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE, ShelfId};
+use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE, ShelfId, GlobalTimelineItemValue};
 use crate::guard::not_anon;
 use crate::auth;
 
@@ -44,8 +44,8 @@ pub async fn store_shelf(
     let now = shelf.created_at;
 
     // Store in SHELVES first
-    SHELVES.with(|shelves| {
-        shelves.borrow_mut().insert(shelf_id.clone(), shelf.clone());
+    SHELVES.with(|shelves_map_ref| {
+        shelves_map_ref.borrow_mut().insert(shelf_id.clone(), shelf.clone());
     });
 
     // Store NFT references
@@ -69,9 +69,16 @@ pub async fn store_shelf(
     });
 
     // Add shelf to the global timeline for public discoverability
-    GLOBAL_TIMELINE.with(|timeline| {
-        let mut timeline_map = timeline.borrow_mut();
-        timeline_map.insert(now, shelf_id.clone());
+    GLOBAL_TIMELINE.with(|timeline_map_ref| {
+        timeline_map_ref.borrow_mut().insert(
+            now,
+            GlobalTimelineItemValue {
+                shelf_id: shelf.shelf_id.clone(),
+                owner: shelf.owner,
+                tags: shelf.tags.clone(),
+                public_editing: shelf.public_editing,
+            }
+        );
     });
     
     // --- Defer Tag Association ---

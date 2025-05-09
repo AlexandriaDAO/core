@@ -6,10 +6,9 @@ use std::collections::BTreeMap; // HashSet is no longer used directly in this fi
 
 use crate::storage::{
     // SHELVES, // No longer used in this file as feeds have moved
-    TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, TAG_METADATA,
+    TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, 
     FOLLOWED_USERS, FOLLOWED_TAGS, // Keep FOLLOWED_*
     Shelf, Item, ShelfId, NormalizedTag, // ItemId is no longer used directly
-    TagMetadata, PrincipalSet, NormalizedTagSet
 };
 // Remove UserProfileOrder import
 
@@ -26,15 +25,15 @@ pub(super) const MAX_PAGE_LIMIT: usize = 50;   // Keep pub(super) for now
 #[derive(CandidType, Deserialize, Debug, Clone)]
 pub struct OffsetPaginationInput {
     pub offset: Nat,
-    pub limit: Nat,
+    pub limit: u64,
 }
 
 impl OffsetPaginationInput {
-    pub fn get_limit(&self) -> usize { // <<< Make pub
-        self.limit.clone().0.try_into().unwrap_or(DEFAULT_PAGE_LIMIT).min(MAX_PAGE_LIMIT)
+    pub fn get_limit(&self) -> usize {
+        self.limit.try_into().unwrap_or(DEFAULT_PAGE_LIMIT).min(MAX_PAGE_LIMIT)
     }
 
-    pub fn get_offset(&self) -> usize { // <<< Make pub
+    pub fn get_offset(&self) -> usize {
         self.offset.clone().0.try_into().unwrap_or(0)
     }
 }
@@ -42,12 +41,12 @@ impl OffsetPaginationInput {
 #[derive(CandidType, Deserialize, Debug, Clone)]
 pub struct CursorPaginationInput<C: CandidType + Clone> {
     pub cursor: Option<C>,
-    pub limit: Nat,
+    pub limit: u64,
 }
 
 impl<C: CandidType + Clone> CursorPaginationInput<C> {
-    pub fn get_limit(&self) -> usize { // <<< Make pub
-        self.limit.clone().0.try_into().unwrap_or(DEFAULT_PAGE_LIMIT).min(MAX_PAGE_LIMIT)
+    pub fn get_limit(&self) -> usize {
+        self.limit.try_into().unwrap_or(DEFAULT_PAGE_LIMIT).min(MAX_PAGE_LIMIT)
     }
 }
 
@@ -57,7 +56,7 @@ impl<C: CandidType + Clone> CursorPaginationInput<C> {
 pub struct OffsetPaginatedResult<T: CandidType + Clone> {
     pub items: Vec<T>,
     pub total_count: Nat,
-    pub limit: Nat,
+    pub limit: u64,
     pub offset: Nat,
 }
 
@@ -65,7 +64,7 @@ pub struct OffsetPaginatedResult<T: CandidType + Clone> {
 pub struct CursorPaginatedResult<T: CandidType + Clone, C: CandidType + Clone> {
     pub items: Vec<T>,
     pub next_cursor: Option<C>,
-    pub limit: Nat,
+    pub limit: u64,
 }
 
 #[derive(CandidType, Debug)]
@@ -93,7 +92,7 @@ pub struct ShelfPublic {
     pub updated_at: u64,
     pub appears_in: Vec<ShelfId>,
     pub tags: Vec<NormalizedTag>, // Assuming NormalizedTag (String) is CandidType
-    pub is_public: bool,
+    pub public_editing: bool,
 }
 
 // Helper function to convert internal Shelf to ShelfPublic
@@ -110,7 +109,7 @@ impl From<Shelf> for ShelfPublic {
             updated_at: shelf.updated_at,
             appears_in: shelf.appears_in,
             tags: shelf.tags,
-            is_public: shelf.is_public,
+            public_editing: shelf.public_editing,
         }
     }
 }
@@ -171,7 +170,7 @@ pub fn get_popular_tags(
     Ok(CursorPaginatedResult {
         items,
         next_cursor,
-        limit: Nat::from(limit),
+        limit: limit as u64,
     })
 }
 
@@ -187,7 +186,7 @@ pub fn get_tags_with_prefix(
         return Ok(CursorPaginatedResult {
             items: Vec::new(),
             next_cursor: None,
-            limit: Nat::from(pagination.get_limit()),
+            limit: pagination.limit,
         });
     }
 
@@ -240,7 +239,7 @@ pub fn get_tags_with_prefix(
     Ok(CursorPaginatedResult {
         items,
         next_cursor,
-        limit: Nat::from(limit),
+        limit: pagination.limit,
     })
 }
 

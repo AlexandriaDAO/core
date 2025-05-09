@@ -235,8 +235,21 @@ const PerpetuaLayout: React.FC = () => {
       // The current loadStorylineFeed thunk doesn't require principal in its direct args,
       // but future versions or the service might.
       dispatch(loadStorylineFeed({ params: { limit: 20 } })); // Initial load, no cursor
+    } else if (currentFeedType === 'recency' && recencyPublicShelves.length === 0 && !isLoadingRecencyPublic ) {
+      // Initial load for recency feed if it's empty and not already loading.
+      // This assumes loadRecentShelves populates recencyPublicShelves.
+      dispatch(loadRecentShelves({ limit: 20 })); // Corrected: pass params directly
     }
-  }, [currentFeedType, dispatch, randomFeedShelves.length, storylineFeedShelves.length, isLoadingRandomFeed, isLoadingStorylineFeed, identity]);
+  }, [
+    currentFeedType, 
+    dispatch, 
+    randomFeedShelves.length, 
+    storylineFeedShelves.length, 
+    identity, 
+    recencyPublicShelves.length, 
+    // Removed isLoadingRecencyPublic, isLoadingRandomFeed, isLoadingStorylineFeed from dependencies to prevent loops on error
+    // The conditions inside the effect already check these loading states before dispatching.
+  ]);
   
   // Action handlers
   const handleCreateShelf = useCallback(() => setIsNewShelfDialogOpen(true), []);
@@ -293,9 +306,9 @@ const PerpetuaLayout: React.FC = () => {
       let loadMoreAction: (() => Promise<void>) | undefined = undefined;
 
       if (currentFeedType === 'recency') {
-        shelvesToDisplay = recencyCombinedNormalizedShelves;
-        isLoadingCurrentFeed = isLoadingRecencyUser || isLoadingRecencyPublic;
-        loadMoreAction = loadMoreShelves; // Corrected: use loadMoreShelves for recency public part
+        shelvesToDisplay = recencyPublicShelves || [];
+        isLoadingCurrentFeed = isLoadingRecencyPublic;
+        loadMoreAction = loadMoreShelves;
       } else if (currentFeedType === 'random') {
         shelvesToDisplay = randomFeedShelves || []; // Ensure array
         isLoadingCurrentFeed = isLoadingRandomFeed;
@@ -339,7 +352,7 @@ const PerpetuaLayout: React.FC = () => {
           ) : (
             <UnifiedShelvesUI 
               allShelves={denormalizeShelves(shelvesToDisplay)}
-              personalShelves={denormalizeShelves(currentFeedType === 'recency' ? (recencyUserShelves || []) : [])} 
+              personalShelves={denormalizeShelves(personalNormalizedShelves)}
               loading={isLoadingCurrentFeed}
               onNewShelf={handleCreateShelf}
               onViewShelf={goToShelf}

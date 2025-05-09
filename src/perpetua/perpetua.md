@@ -1,4 +1,3 @@
-```
 // Perpetua/ Frontend
 
 Perpetua/
@@ -157,6 +156,15 @@ perpetua/
 
 
 
+dfx canister call perpetua get_recent_shelves '(record { limit = 20 : nat; cursor = null : opt nat64})'
+dfx canister call perpetua get_shuffled_by_hour_feed '(20 : nat)'
+dfx canister call --query perpetua get_storyline_feed '(record { limit = 20 : nat; cursor = null : opt nat64 })'
+
+
+
+
+
+
 
 
 
@@ -174,55 +182,6 @@ perpetua/
 - Public/private should just be a lock/unlock icon.
 - Fix the ugly ill-placed expander/delete buttons
 - Progressive loading, like in other apps.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Backend Stuff:
-- Payment for all/some actions
-  - Pay for shelf creation after the fifth shelf. That's it (for now).
-
-
-
-
-
-
-
-
-## V2 Features (Separate Canister):
-
-- Download personal data as a csv.
-  - This way we could use this function to do it manually at various times.
-- More advanced search engine for the setup. So separate architecture with backups (maybe centralized).
-  - Adding to public shelves actually can't be done at all right now.
-  - We probably need a search engine in the backend?
-- A preview of the slots in the profile. (Could be done later)
-- NFT 'Appears in' based on secondary SBT data.
-
-
-
-
-
-
-- Can't figure it out, it seems.
-This when opening the dialog to add to shelf: 
-<anonymous code>:1:145535
-`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-
-If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-
-For more information, see https://radix-ui.com/primitives/docs/components/dialog
 
 
 

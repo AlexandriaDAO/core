@@ -3,57 +3,51 @@ type AddItemInput = record {
   reference_item_id : opt nat32;
   before : bool;
 };
-type BackupPaginationInput = record { offset : nat64; limit : nat64 };
 type CursorPaginatedResult = record {
-  limit : nat;
+  limit : nat64;
   next_cursor : opt nat64;
   items : vec ShelfPublic;
 };
 type CursorPaginatedResult_1 = record {
-  limit : nat;
+  limit : nat64;
   next_cursor : opt record { nat64; text };
   items : vec text;
 };
 type CursorPaginatedResult_2 = record {
-  limit : nat;
+  limit : nat64;
   next_cursor : opt nat32;
   items : vec Item;
 };
 type CursorPaginatedResult_3 = record {
-  limit : nat;
+  limit : nat64;
   next_cursor : opt record { text; text };
   items : vec text;
 };
 type CursorPaginatedResult_4 = record {
-  limit : nat;
+  limit : nat64;
   next_cursor : opt text;
   items : vec text;
 };
-type CursorPaginationInput = record { cursor : opt nat64; limit : nat };
+type CursorPaginationInput = record { cursor : opt nat64; limit : nat64 };
 type CursorPaginationInput_1 = record {
   cursor : opt record { nat64; text };
-  limit : nat;
+  limit : nat64;
 };
-type CursorPaginationInput_2 = record { cursor : opt nat32; limit : nat };
+type CursorPaginationInput_2 = record { cursor : opt nat32; limit : nat64 };
 type CursorPaginationInput_3 = record {
   cursor : opt record { text; text };
-  limit : nat;
+  limit : nat64;
 };
-type CursorPaginationInput_4 = record { cursor : opt text; limit : nat };
-type GlobalTimelineBackupChunk = record {
-  data : vec GlobalTimelineEntry;
-  total_count : nat64;
-};
-type GlobalTimelineEntry = record { shelf_id : text; timestamp : nat64 };
+type CursorPaginationInput_4 = record { cursor : opt text; limit : nat64 };
 type Item = record { id : nat32; content : ItemContent };
 type ItemContent = variant { Nft : text; Shelf : text; Markdown : text };
 type OffsetPaginatedResult = record {
   offset : nat;
-  limit : nat;
+  limit : nat64;
   items : vec ShelfPublic;
   total_count : nat;
 };
-type OffsetPaginationInput = record { offset : nat; limit : nat };
+type OffsetPaginationInput = record { offset : nat; limit : nat64 };
 type QueryError = variant {
   TagNotFound;
   InvalidCursor;
@@ -75,16 +69,6 @@ type Result_6 = variant { Ok : ShelfPublic; Err : QueryError };
 type Result_7 = variant { Ok : CursorPaginatedResult_2; Err : QueryError };
 type Result_8 = variant { Ok : ShelfPositionMetrics; Err : text };
 type Result_9 = variant { Ok : CursorPaginatedResult_3; Err : QueryError };
-type ShelfBackupData = record {
-  is_public : bool;
-  title : text;
-  owner : principal;
-  tags : vec text;
-  description : opt text;
-  shelf_id : text;
-  item_positions : vec record { nat32; float64 };
-  items : vec record { nat32; Item };
-};
 type ShelfPositionMetrics = record {
   min_gap : float64;
   avg_gap : float64;
@@ -92,32 +76,23 @@ type ShelfPositionMetrics = record {
   item_count : nat64;
 };
 type ShelfPublic = record {
-  is_public : bool;
   title : text;
   updated_at : nat64;
   owner : principal;
   appears_in : vec text;
   tags : vec text;
   description : opt text;
+  public_editing : bool;
   created_at : nat64;
   shelf_id : text;
   item_positions : vec record { nat32; float64 };
   items : vec record { nat32; Item };
 };
-type ShelvesEssentialBackupChunk = record {
-  data : vec ShelfBackupData;
-  total_count : nat64;
-};
 type TagOperationInput = record { tag : text; shelf_id : text };
 service : () -> {
   add_item_to_shelf : (text, AddItemInput) -> (Result);
   add_tag_to_shelf : (TagOperationInput) -> (Result);
-  backup_get_essential_shelves : (BackupPaginationInput) -> (
-      ShelvesEssentialBackupChunk,
-    ) query;
-  backup_get_global_timeline : (BackupPaginationInput) -> (
-      GlobalTimelineBackupChunk,
-    ) query;
+  debug_trigger_refresh_random_candidates : () -> (Result);
   follow_tag : (text) -> (Result);
   follow_user : (principal) -> (Result);
   get_followed_tags_feed : (CursorPaginationInput) -> (Result_1) query;
@@ -132,7 +107,7 @@ service : () -> {
   get_shelf_position_metrics : (text) -> (Result_8) query;
   get_shelves_by_tag : (text, CursorPaginationInput_3) -> (Result_9) query;
   get_shelves_containing_nft : (text) -> (vec text) query;
-  get_shuffled_by_hour_feed : (nat) -> (Result_5) query;
+  get_shuffled_by_hour_feed : (nat64) -> (Result_5) query;
   get_storyline_feed : (CursorPaginationInput) -> (Result_1) query;
   get_tag_shelf_count : (text) -> (nat64) query;
   get_tags_with_prefix : (text, CursorPaginationInput_4) -> (Result_10) query;

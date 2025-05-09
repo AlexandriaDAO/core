@@ -1,6 +1,6 @@
 use candid::Principal;
 use crate::storage::{Shelf, SHELVES};
-use ic_stable_structures::{StableBTreeMap, memory_manager::VirtualMemory};
+use ic_stable_structures::{memory_manager::VirtualMemory};
 use ic_stable_structures::DefaultMemoryImpl;
 
 // Define Memory type alias for clarity
@@ -47,7 +47,7 @@ pub fn is_shelf_owner(shelf_id: &str, principal: &Principal) -> Result<bool, Str
 /// Checks if principal can edit shelf
 pub fn can_edit_shelf(shelf_id: &str, principal: &Principal) -> Result<bool, String> {
     let shelf = get_shelf(shelf_id)?;
-    Ok(shelf.owner == *principal || shelf.is_public)
+    Ok(shelf.owner == *principal || shelf.public_editing)
 }
 
 /// Checks if the provided principal is the admin (owner) of the specified shelf
@@ -75,7 +75,7 @@ pub fn get_shelf_for_owner(shelf_id: &str, principal: &Principal) -> Result<Shel
 pub fn get_shelf_for_edit(shelf_id: &str, principal: &Principal) -> Result<Shelf, String> {
     let shelf = get_shelf(shelf_id)?;
     
-    if shelf.owner != *principal && !shelf.is_public {
+    if shelf.owner != *principal && !shelf.public_editing {
         return Err(ShelfAuthError::Unauthorized(
             "Unauthorized: You don't have edit permissions for this shelf".to_string()
         ).into());

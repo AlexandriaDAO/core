@@ -1,18 +1,13 @@
 use candid::{CandidType, Deserialize};
-use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, ShelfId, create_shelf, GLOBAL_TIMELINE, SHELF_ITEM_STEP_SIZE, Shelf};
+use std::collections::HashSet;
+use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, ShelfId, SHELF_ITEM_STEP_SIZE, Shelf};
 use crate::guard::not_anon;
 use crate::auth;
-use crate::update::utils::{verify_nft_ownership, shelf_exists, is_self_reference};
-use ic_stable_structures::{StableBTreeMap, memory_manager::VirtualMemory};
-use ic_stable_structures::DefaultMemoryImpl;
-use std::collections::HashSet;
+use crate::update::utils::{verify_nft_ownership, is_self_reference};
 
 // --- Constants ---
 const MAX_USER_SHELVES: usize = 1000;
 const MAX_NFT_REFERENCES: usize = 1000; // Limit for NFT_SHELVES tracking
-
-// Define Memory type alias for clarity
-type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 /// Input structure for adding a new item to a shelf
 #[derive(CandidType, Deserialize)]
