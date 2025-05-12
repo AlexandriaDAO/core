@@ -1,3 +1,4 @@
+```
 // Perpetua/ Frontend
 
 Perpetua/
@@ -156,18 +157,6 @@ perpetua/
 
 
 
-dfx canister call perpetua get_recent_shelves '(record { limit = 20 : nat; cursor = null : opt nat64})'
-dfx canister call perpetua get_shuffled_by_hour_feed '(20 : nat)'
-dfx canister call --query perpetua get_storyline_feed '(record { limit = 20 : nat; cursor = null : opt nat64 })'
-
-
-
-
-
-
-
-
-
 
 
 
@@ -179,6 +168,7 @@ dfx canister call --query perpetua get_storyline_feed '(record { limit = 20 : na
     - Really what we need is different feeds, one recent, one random, one followed tags, one followed users. 
 
 
+- Option to mint without minting to shelf.
 - Public/private should just be a lock/unlock icon.
 - Fix the ugly ill-placed expander/delete buttons
 - Progressive loading, like in other apps.
@@ -246,7 +236,7 @@ id_convert.ts.
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal fogrq-ch55d-mwkdr-c5oik-ecjul-eehnn-hajmf-7wt3c-hluo4-txwk3-nae)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal qfjpl-beqtj-w4vfq-kbi42-cajph-nkqod-odqoo-akdw4-yji3u-irw6u-gqe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

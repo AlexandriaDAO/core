@@ -3,12 +3,111 @@
 set -eo pipefail # Exit on error, treat unset variables as an error, and propagate pipeline failures.
 # set -x # Uncomment for verbose command execution
 
+# --- Configuration ---
+PERPETUA_CANISTER_ID="ya6k4-waaaa-aaaap-qkmpq-cai" # Replace with your actual canister ID if different
+DFX_NETWORK="local" # Or your target network
+
+# Define user identities (ensure these are set up in dfx)
+USER_1_IDENTITY="user_1"
+USER_2_IDENTITY="user_2"
+USER_3_IDENTITY="user_3"
+DEFAULT_IDENTITY="default" # Or another identity for general queries
+
+# --- Helper Functions ---
+DFX_CMD="dfx"
+
+# Function to make a dfx canister call
+# $1: Identity to use
+# $2: Canister method
+# $3: Arguments (Candid string)
+# $4: Optional --query flag
+call_canister() {
+    local identity="$1"
+    local method="$2"
+    local args="$3"
+    local query_flag="$4"
+
+    echo "----------------------------------------------------------------------" >&2
+    echo "CALLING: Method '$method' as identity '$identity'" >&2
+    echo "ARGS: $args" >&2
+    if [[ "$query_flag" == "--query" ]]; then
+        echo "TYPE: Query Call" >&2
+    else
+        echo "TYPE: Update Call" >&2
+    fi
+    echo "----------------------------------------------------------------------" >&2
+
+    local dfx_output
+    local dfx_stderr_file
+    dfx_stderr_file=$(mktemp)
+
+    if [[ "$query_flag" == "--query" ]]; then
+        dfx_output=$($DFX_CMD identity use "$identity" >/dev/null && \
+                 $DFX_CMD canister --network "$DFX_NETWORK" call "$PERPETUA_CANISTER_ID" "$method" "$args" --query 2>"$dfx_stderr_file")
+    else
+        dfx_output=$($DFX_CMD identity use "$identity" >/dev/null && \
+                 $DFX_CMD canister --network "$DFX_NETWORK" call "$PERPETUA_CANISTER_ID" "$method" "$args" 2>"$dfx_stderr_file")
+    fi
+    
+    if [[ -s "$dfx_stderr_file" ]]; then
+        echo "STDERR from dfx call:" >&2
+        cat "$dfx_stderr_file" >&2
+    fi
+    rm -f "$dfx_stderr_file"
+
+    echo "OUTPUT (stdout from dfx call for logging):" >&2 # Clarify this is for logging
+    echo "$dfx_output" >&2 # Log the raw output to stderr for debugging
+    echo -e "----------------------------------------------------------------------\n" >&2
+    
+    # This function is used in command substitution, so it should only output the final dfx_output to stdout
+    echo "$dfx_output"
+}
+
+# --- Test Script ---
+
+echo "===== Starting Perpetua Feed Test Script (v2) ====="
+
+# Attempt to make 'mainnet' identity a controller of the 'perpetua' canister
+echo "INFO: Attempting to ensure 'mainnet' identity can control the 'perpetua' canister..."
+CURRENT_DFX_IDENTITY=$(dfx identity whoami)
+MAINNET_PRINCIPAL=$(dfx identity get-principal --identity mainnet 2>/dev/null)
+
+if [ -z "$MAINNET_PRINCIPAL" ]; then
+    echo "ERROR: 'mainnet' identity principal not found. Please ensure 'mainnet' identity is configured (e.g., via mainnet.pem)."
+    # Attempt to restore original identity before exiting
+    dfx identity use "$CURRENT_DFX_IDENTITY" >/dev/null
+    exit 1
+fi
+
+# Temporarily use 'default' identity to try and add 'mainnet' as a controller.
+# This assumes 'default' might be a controller if the canister already exists on local.
+echo "INFO: Temporarily switching to 'default' identity to manage controllers for 'perpetua'."
+dfx identity use "$DEFAULT_IDENTITY" >/dev/null
+
+# Check if the canister exists before trying to update its settings
+if dfx canister --network "$DFX_NETWORK" info "$PERPETUA_CANISTER_ID" > /dev/null 2>&1; then
+    echo "INFO: 'perpetua' canister ($PERPETUA_CANISTER_ID) found. Attempting to add 'mainnet' ($MAINNET_PRINCIPAL) as a controller."
+    if dfx canister --network "$DFX_NETWORK" update-settings "$PERPETUA_CANISTER_ID" --add-controller "$MAINNET_PRINCIPAL"; then
+        echo "INFO: 'mainnet' identity successfully added as a controller."
+    else
+        echo "WARN: Failed to add 'mainnet' as a controller using 'default' identity. This could be an issue if 'mainnet' is not already a controller (e.g., 'default' is not a controller itself, or other restrictions)."
+    fi
+else
+    echo "INFO: 'perpetua' canister ($PERPETUA_CANISTER_ID) does not seem to exist. 'mainnet' will become a controller upon deployment."
+fi
+
+# Switch back to the identity that was active before this block, or to mainnet if that was the original.
+# The original script intends to use 'mainnet' for the setup operations that follow.
+echo "INFO: Switching to 'mainnet' identity for subsequent operations."
+dfx identity use mainnet >/dev/null
+# End of controller management block
+
 # Cold Start:
 dfx identity use mainnet
-dfx canister uninstall-code perpetua
+dfx canister uninstall-code perpetua --network "$DFX_NETWORK" || echo "WARN: uninstall-code failed. This may be okay if canister was already empty or 'mainnet' is now a controller and it failed for other reasons."
 cargo build --release --target wasm32-unknown-unknown --package perpetua
 candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpetua/perpetua.did
-dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
+dfx deploy perpetua --network "$DFX_NETWORK" --specified-id "$PERPETUA_CANISTER_ID"
 dfx generate perpetua
 dfx identity use default
 

@@ -192,9 +192,6 @@ const PerpetuaLayout: React.FC = () => {
         .catch((error) => {
           console.error("Failed to load shelves:", error);
         });
-      
-      // Load the current user's followed tags
-      dispatch(loadMyFollowedTags());
     }
   }, [identity, dispatch]);
   
@@ -247,8 +244,9 @@ const PerpetuaLayout: React.FC = () => {
     storylineFeedShelves.length, 
     identity, 
     recencyPublicShelves.length, 
-    // Removed isLoadingRecencyPublic, isLoadingRandomFeed, isLoadingStorylineFeed from dependencies to prevent loops on error
-    // The conditions inside the effect already check these loading states before dispatching.
+    isLoadingRecencyPublic,
+    isLoadingRandomFeed,
+    isLoadingStorylineFeed
   ]);
   
   // Action handlers

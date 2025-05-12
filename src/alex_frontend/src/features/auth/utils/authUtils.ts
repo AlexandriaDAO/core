@@ -73,6 +73,13 @@ import {
   createActor as createActorPerpetua,
 } from "../../../../../declarations/perpetua";
 
+// --- Caching Variables ---
+let authClientInstance: AuthClient | null = null;
+const agentCache = new Map<string, HttpAgent>();
+const agentsFetchedRootKey = new Set<HttpAgent>();
+const actorCache = new Map<string, any>();
+// --- End Caching Variables ---
+
 const isLocalDevelopment = process.env.DFX_NETWORK !== "ic";
 
 const alex_backend_canister_id = process.env.CANISTER_ID_ALEX_BACKEND!;
@@ -97,15 +104,18 @@ export const getPrincipal = (client: AuthClient): string =>
   client.getIdentity().getPrincipal().toString();
 
 export const getAuthClient = async (): Promise<AuthClient> => {
-  // create new client each time inspired by default react app
-  // https://gitlab.com/kurdy/dfx_base/-/blob/main/src/dfx_base_frontend/src/services/auth.ts?ref_type=heads
+  if (authClientInstance) {
+    return authClientInstance;
+  }
 
   // reason for creating new client each time is
   // if the user login has expired it will SPA will not know
   // as same client's ( isAuthenticated ) will always return true even if user session is expired
-  const authClient = await AuthClient.create();
+  console.time('AuthClient.create');
+  authClientInstance = await AuthClient.create();
+  console.timeEnd('AuthClient.create');
 
-  return authClient;
+  return authClientInstance;
 };
 
 const getActor = async <T>(
@@ -117,32 +127,56 @@ const getActor = async <T>(
     const client = await getAuthClient();
     if (await client.isAuthenticated()) {
       const identity = client.getIdentity();
+      const principalString = identity.getPrincipal().toString();
+      const actorCacheKey = `${canisterId}_${principalString}`;
 
-      const agent = await HttpAgent.create({
-        identity,
-        host: isLocalDevelopment
-          ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943` // Local development URL
-          : "https://ic0.app", // Default to mainnet if neither condition is true
-      });
-
-      // Fetch root key for certificate validation during development
-      // dangerous on mainnet
-      if (isLocalDevelopment) {
-        await agent.fetchRootKey().catch((err) => {
-          console.warn(
-            "Unable to fetch root key. Check to ensure that your local replica is running"
-          );
-          console.error(err);
-        });
+      // Check actor cache first
+      if (actorCache.has(actorCacheKey)) {
+        return actorCache.get(actorCacheKey);
       }
 
-      return createActorFn(canisterId, {
-        agent,
-      });
+      let agent: HttpAgent;
+
+      // Check agent cache
+      if (agentCache.has(principalString)) {
+        agent = agentCache.get(principalString)!;
+      } else {
+        // Create and cache agent
+        console.time('HttpAgent.create');
+        agent = await HttpAgent.create({
+          identity,
+          host: isLocalDevelopment
+            ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943` // Local development URL
+            : "https://ic0.app", // Default to mainnet if neither condition is true
+        });
+        console.timeEnd('HttpAgent.create');
+
+        agentCache.set(principalString, agent);
+
+        // Fetch root key for new agent if in development
+        if (isLocalDevelopment && !agentsFetchedRootKey.has(agent)) {
+          console.time('agent.fetchRootKey');
+          await agent.fetchRootKey().catch((err) => {
+            console.warn(
+              "Unable to fetch root key. Check to ensure that your local replica is running"
+            );
+            console.error(err);
+          });
+          console.timeEnd('agent.fetchRootKey');
+          agentsFetchedRootKey.add(agent);
+        }
+      }
+
+      // Create and cache actor
+      const newActor = createActorFn(canisterId, { agent });
+      actorCache.set(actorCacheKey, newActor);
+
+      return newActor;
     }
   } catch (error) {
     console.error(`Error initializing actor for ${canisterId}:`, error);
   }
+  // Return default actor if not authenticated or if error occurred
   return defaultActor;
 };
 

@@ -1,11 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 
 import { Button } from '@/lib/components/button';
 import { Badge } from '@/lib/components/badge';
 import { toast } from 'sonner';
-import { unfollowTag } from '@/apps/app/Perpetua/state/thunks/followThunks';
+import { loadMyFollowedTags, unfollowTag } from '@/apps/app/Perpetua/state/thunks/followThunks';
 import { selectMyFollowedTags, selectIsLoadingMyFollowedTags } from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { X, Loader2 } from 'lucide-react';
 import { Skeleton } from "@/lib/components/skeleton";
@@ -15,6 +15,10 @@ export const FollowedTagsList: React.FC = () => {
     const followedTags = useAppSelector(selectMyFollowedTags);
     const isLoading = useAppSelector(selectIsLoadingMyFollowedTags);
     const [unfollowingTagUi, setUnfollowingTagUi] = useState<string | null>(null);
+
+    useEffect(() => {
+        dispatch(loadMyFollowedTags());
+    }, [dispatch]);
 
     const handleUnfollow = useCallback(async (tag: string) => {
         setUnfollowingTagUi(tag);

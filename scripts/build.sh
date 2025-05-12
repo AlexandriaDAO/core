@@ -56,7 +56,7 @@ dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx generate perpetua
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
-candid-extractor target/wasm  32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
+candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
 dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
 # For tokenomics
 cargo build --release --target wasm32-unknown-unknown --package tokenomics

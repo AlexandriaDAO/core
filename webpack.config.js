@@ -273,12 +273,4 @@ module.exports = {
   experiments: {
     asyncWebAssembly: true,
   },
-  ignoreWarnings: [
-    {
-        message: /asm\.js link error: FFI imports must be functions/,
-    },
-    {
-        message: /asm\.js type error: Asm\.js optimizer disabled by linker/,
-    }
-  ],
 };
