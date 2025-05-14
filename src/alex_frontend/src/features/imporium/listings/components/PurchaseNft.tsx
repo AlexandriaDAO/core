@@ -46,7 +46,7 @@ export function PurchaseNft({ id, price }: PurchaseNftProps) {
 
 	return (
 		<Dialog open={open}>
-			<DialogTrigger>
+			<DialogTrigger asChild>
 				<Button onClick={() => setOpen(true)} variant="primary" scale="sm">Buy Now <ShoppingCart size={16} /></Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]" closeIcon={<Button

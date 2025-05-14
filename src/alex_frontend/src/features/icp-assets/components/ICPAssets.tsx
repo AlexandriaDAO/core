@@ -8,12 +8,12 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 
 const ICPAssets: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
+	const { canister } = useAppSelector((state) => state.auth);
 	const { identity } = useInternetIdentity();
 	const { assets, loading } = useAppSelector((state) => state.icpAssets);
 
 	const assetManager = useAssetManager({
-		canisterId: userAssetCanister ?? undefined,
+		canisterId: canister ?? undefined,
 		identity
 	});
 

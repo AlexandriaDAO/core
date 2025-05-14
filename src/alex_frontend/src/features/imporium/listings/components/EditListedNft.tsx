@@ -56,7 +56,7 @@ export function EditListedNft({ id, originalPrice }: EditListedNftProps) {
 
 	return (
 		<Dialog open={open}>
-			<DialogTrigger>
+			<DialogTrigger asChild>
 				<Button onClick={() => setOpen(true)} variant="primary" scale="sm">Edit Price <Pencil size={16} /></Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]" closeIcon={<Button

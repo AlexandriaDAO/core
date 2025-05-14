@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/lib/components/input';
 import { Button } from '@/lib/components/button';
 import { SearchIcon, X } from 'lucide-react';
@@ -6,11 +6,23 @@ import useEmporium from '@/hooks/actors/useEmporium';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import search from '../thunks/search';
 import { clearFound } from '../listingsSlice';
+import { useSearchParams } from 'react-router';
 
 const Search: React.FC = () => {
     const { actor } = useEmporium();
     const dispatch = useAppDispatch();
     const [query, setQuery] = useState('');
+
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    useEffect(() => {
+        if (!actor) return;
+        const searchTerm = searchParams.get('search');
+        if (searchTerm) {
+            setQuery(searchTerm);
+            dispatch(search({actor, query: searchTerm}))
+        }
+    }, [searchParams]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value);
@@ -19,12 +31,23 @@ const Search: React.FC = () => {
     const handleClear = () => {
         setQuery('');
         dispatch(clearFound());
+
+        searchParams.delete('search');
+        setSearchParams(searchParams);
     };
 
     const handleSearch = async () => {
         if (!actor) return;
 
-        dispatch(search({actor, query}))
+        if (query.trim()) {
+            setSearchParams({ search: query });
+            dispatch(search({actor, query}))
+        } else {
+            // Remove search param if query is empty
+            searchParams.delete('search');
+            setSearchParams(searchParams);
+            handleClear();
+        }
     };
 
     return (

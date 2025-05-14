@@ -42,7 +42,7 @@ export function UnListNft({ id }: UnListNftProps) {
 
 	return (
 		<Dialog open={open}>
-			<DialogTrigger>
+			<DialogTrigger asChild>
 				<Button onClick={() => setOpen(true)} variant="primary" scale="sm">Remove <Trash2 size={16} /></Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]" closeIcon={<Button

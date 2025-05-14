@@ -1,24 +1,44 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { Check } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { getCanisterCycles } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 import { Button } from "@/lib/components/button";
 import Copy from "../Copy";
 import ROUTES from "@/routes/routeConfig";
+import { useAssetManager } from "@/hooks/actors";
+import { Principal } from "@dfinity/principal";
 
 function CanisterView() {
+    const { actor } = useAssetManager();
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    const { userAssetCanister, cycles } = useAppSelector(state => state.assetManager);
+
+    const [cycles, setCycles] = useState<string>('N/A');
+    const { canister } = useAppSelector(state => state.auth);
+
+    // fetch cycles
+
+    const fetchCycles = useCallback(async () => {
+        if(!canister || !actor) return;
+
+        try {
+            const result = await actor.get_canister_cycles(Principal.fromText(canister));
+            if ("Ok" in result) {
+                setCycles(result.Ok.toString());
+            }
+            if ("Err" in result) {
+                throw new Error("Failed to fetch cycles");
+            }
+        } catch (error) {
+            console.error("Error fetching cycles:", error);
+            setCycles("N/A");
+        }
+    }, [canister, actor]);
+
     useEffect(() => {
-        if(!userAssetCanister) return;
+        fetchCycles();
+    }, [canister, fetchCycles]);
 
-        dispatch(getCanisterCycles(userAssetCanister))
-    }, [userAssetCanister]);
-
-    if(!userAssetCanister) return null;
+    if(!canister) return null;
 
 	return (
         <div className="flex flex-col items-center justify-between gap-3">
@@ -35,8 +55,8 @@ function CanisterView() {
             )}
 
             <div className="flex items-center space-x-2">
-                <code className="px-2 py-1 border bg-white dark:bg-transparent rounded text-sm font-mono">{userAssetCanister}</code>
-                <Copy text={userAssetCanister} />
+                <code className="px-2 py-1 border bg-white dark:bg-transparent rounded text-sm font-mono">{canister}</code>
+                <Copy text={canister} />
             </div>
             <Button
                 variant={"link"}
