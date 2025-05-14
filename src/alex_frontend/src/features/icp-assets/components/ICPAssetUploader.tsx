@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useInternetIdentity } from "ic-use-internet-identity/dist";
+import { useIdentity } from "@/hooks/useIdentity";
 import { useAssetManager } from "@/hooks/useAssetManager";
 import upload from "../thunks/upload";
 
 const ICPAssetUploader: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
-	const {identity} = useInternetIdentity();
+	const {identity} = useIdentity();
 	const [file, setFile] = useState<File | null>(null);
 	const { uploading, percentage } = useAppSelector((state) => state.icpAssets);
 

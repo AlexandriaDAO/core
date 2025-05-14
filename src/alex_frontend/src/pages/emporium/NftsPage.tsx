@@ -3,7 +3,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { getCallerAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 import { useAssetManager } from "@/hooks/useAssetManager";
-import { useInternetIdentity } from "ic-use-internet-identity";
+import { useIdentity } from "@/hooks/useIdentity";
 import fetch from "@/features/icp-assets/thunks/fetch";
 import getMyTokens from "@/features/imporium/nfts/thunks/getMyTokens";
 import NftsSkeleton from "@/layouts/skeletons/emporium/components/NftsSkeleton";
@@ -19,7 +19,7 @@ const NftsPage = () => {
 
     const { userAssetCanister } = useAppSelector((state) => state.assetManager);
     const { ids, loading, error } = useAppSelector((state) => state.imporium.nfts);
-    const { identity } = useInternetIdentity();
+    const { identity } = useIdentity();
 
     const assetManager = useAssetManager({
 		canisterId: userAssetCanister ?? undefined,

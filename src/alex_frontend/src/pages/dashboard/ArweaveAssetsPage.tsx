@@ -9,7 +9,7 @@ import { Download, RefreshCw } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { fetchUserArweaveAssets } from "@/features/arweave-assets/thunks/fetchUserArweaveAssets";
 import { useAssetManager } from "@/hooks/useAssetManager";
-import { useInternetIdentity } from "ic-use-internet-identity/dist";
+import { useIdentity } from "@/hooks/useIdentity";
 import fetch from "@/features/icp-assets/thunks/fetch";
 import { pullAllAssets } from "@/features/arweave-assets/thunks/pullAllAssets";
 
@@ -17,7 +17,7 @@ function ArweaveAssetsPage() {
 	const dispatch = useAppDispatch();
 	const { error, selected, pulling, pullError, loading } = useAppSelector(state => state.arweaveAssets);
 	const { canister } = useAppSelector(state => state.auth);
-	const { identity } = useInternetIdentity();
+	const { identity } = useIdentity();
 
 	const icpAssets = useAppSelector((state) => state.icpAssets.assets);
 	const arweaveAssets = useAppSelector((state) => state.arweaveAssets.assets);

@@ -16,9 +16,8 @@ import getEmporiumMarketLogs from "./thunks/getEmporiumMarketLogs";
 import EmporiumMarketLogs from "./component/emporiumLogs";
 import { getCallerAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 import { useAssetManager } from "@/hooks/useAssetManager";
-import { useInternetIdentity } from "ic-use-internet-identity";
 import fetch from "@/features/icp-assets/thunks/fetch";
-import { Link } from "react-router";
+import { useIdentity } from "@/hooks/useIdentity";
 
 const Emporium = () => {
     const dispatch = useAppDispatch();
@@ -31,7 +30,7 @@ const Emporium = () => {
 
     const { userAssetCanister } = useAppSelector((state) => state.assetManager);
 
-    const { identity } = useInternetIdentity();
+    const { identity } = useIdentity();
 
     const assetManager = useAssetManager({
 		canisterId: userAssetCanister ?? undefined,
