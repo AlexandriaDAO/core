@@ -1,4 +1,4 @@
-use ic_cdk::{self, init, post_upgrade, spawn};
+use ic_cdk::{self, spawn};
 use candid::{Principal};
 use std::time::Duration;
 
@@ -24,13 +24,12 @@ pub mod update {
 pub mod query {
     pub mod shelves;
     pub mod follows;
-    pub mod backups;
 }
 pub mod utils;
 pub mod types;
 
-pub use storage::{Item, Shelf, ShelfId, NormalizedTag, ItemId, ShelfPublic, ShelfBackupData};
-pub use types::{TagPopularityKey, TagShelfAssociationKey, GlobalTimelineBackupChunk, ShelvesEssentialBackupChunk, BackupPaginationInput};
+pub use storage::{Item, Shelf, ShelfId, NormalizedTag, ItemId, ShelfPublic, ShelfBackupData, TagShelfCreationTimelineKey};
+pub use types::{TagPopularityKey, /* TagShelfAssociationKey, */ GlobalTimelineBackupChunk, ShelvesEssentialBackupChunk, BackupPaginationInput};
 pub use update::shelf::{store_shelf, update_shelf_metadata};
 pub use update::item::{
     AddItemInput, add_item_to_shelf, remove_item_from_shelf, 
@@ -56,6 +55,7 @@ pub use query::shelves::{
 pub use update::follow::*;
 pub use update::debug::{debug_trigger_refresh_random_candidates};
 
+
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))
 }
@@ -66,23 +66,6 @@ pub fn icrc7_principal() -> Principal {
 
 pub fn icrc7_scion_principal() -> Principal {
     get_principal(ICRC7_SCION_CANISTER_ID)
-}
-
-#[init]
-fn init() {
-    let gc_interval = Duration::from_secs(60 * 60 * 24);
-    ic_cdk_timers::set_timer_interval(gc_interval, || {
-        spawn(async {
-             ic_cdk::println!("Running scheduled tag garbage collection...");
-             update::tags::gc_orphaned_tags();
-        });
-    });
-    ic_cdk::println!("Perpetua canister initialized with GC timer set for interval: {:?}", gc_interval);
-}
-
-#[post_upgrade]
-fn post_upgrade() {
-    ic_cdk::println!("Perpetua canister upgraded.");
 }
 
 ic_cdk::export_candid!();

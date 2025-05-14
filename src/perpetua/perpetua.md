@@ -160,18 +160,11 @@ perpetua/
 
 
 
-- Tag/user follow loading is really slow. (does this lag increase with scale?)
-- Need to really rethink the way we use following.
-  - It shouldn't attempt to fetch if not logged in.
-  - We shouldn't have to wait for it to finish to see other stuff.
-  - It doesn't need to be in your face.
-    - Really what we need is different feeds, one recent, one random, one followed tags, one followed users. 
 
 
-- Option to mint without minting to shelf.
-- Public/private should just be a lock/unlock icon.
-- Fix the ugly ill-placed expander/delete buttons
-- Progressive loading, like in other apps.
+
+
+- Probably next step is to make the display with the leading NFTs, and the hover with what's inside.
 
 
 
@@ -186,48 +179,6 @@ perpetua/
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-Prompt helper.
-
-
-- is nft
-  - if user is owner of nft
-    - go straight to bookmark
-  - if user is not the owner of the nft
-    - mint an sbt (with the like action)
-      - generate the sbt_id from the nft_id
-      - proceed with bookmarking of the sbt.
-  - done
-- is sbt
-  - if user owns the sbt
-    - go straight to bookmark action
-  - if user does not own the sbt.
-    - go to the liking action, which derives the original NFT id from the sbt id, and generates the new stb for that user.
-    - proceed with bookmarking the nft.
-- if it's neither (not an nft yet), proceed with liking it with coordinate_mint, which will mint an original NFT if no-one owns it, or if it was already owned, mint an sbt.
-  - then use the proper id to bookmark it to the shelf. 
-
-
-unifiedCardActions.tsx
-NftDisplay.tsx
-ContentDisplay.tsx
-ShelfCard.tsx
-Card.tsx
-mint.ts
-coordinate_mint.rs
-item.rs
-id_converter.rs
-id_convert.ts.
 
 
 

@@ -52,69 +52,76 @@ export class TransactionService {
 
       if (!transactions || transactions.length === 0) {
         console.warn("No transactions found for the NFTs");
+        // If no initial transactions are found from Arweave, it's a more fundamental issue.
         throw new Error("No transactions found for the NFTs");
       }
 
-      let userAssetCanisterd = await getAssetCanister(selectedPrincipals[0]);
+      const userAssetCanisterPrincipal = selectedPrincipals[0];
+      if (userAssetCanisterPrincipal && userAssetCanisterPrincipal !== 'new') {
+        try { // New try-catch block for user asset canister interactions
+          const userAssetCanisterId = await getAssetCanister(userAssetCanisterPrincipal);
 
-      if (userAssetCanisterd) {
-        const assetActor = await getActorUserAssetCanister(userAssetCanisterd);
-        const getContentData = await fetchAssetFromUserCanister(
-          "ContentData",
-          assetActor
-        );
+          if (userAssetCanisterId) {
+            const assetActor = await getActorUserAssetCanister(userAssetCanisterId);
+            
+            // Attempt to get overall "ContentData" if it exists
+            const getContentData = await fetchAssetFromUserCanister(
+              "ContentData",
+              assetActor
+            );
 
-        if (getContentData?.blob) {
-          try {
-            const blobData = await getContentData.blob.arrayBuffer();
-            const textData = new TextDecoder().decode(blobData);
-            const jsonData = JSON.parse(textData);
+            if (getContentData?.blob) {
+              try {
+                const blobData = await getContentData.blob.arrayBuffer();
+                const textData = new TextDecoder().decode(blobData);
+                const jsonData = JSON.parse(textData);
+                // Process jsonData if necessary, potentially updating transactions
+                console.log("jsonData from ContentData:", jsonData)
+              } catch (error) {
+                console.error("Failed to process ContentData from user asset canister:", error);
+                // Non-fatal, proceed to fetch individual assets
+              }
+            } else {
+              console.warn(`No "ContentData" found in user asset canister: ${userAssetCanisterId}`);
+            }
 
-            // let transactions = Array.isArray(jsonData) ? jsonData : [jsonData];
-            // transactions = transactions.filter((tx) =>
-            //   arweaveIds.includes(tx.id)
-            // );
-
-            const fetchPromises = transactions.map(async (transaction) => {
+            // Attempt to fetch individual assets from the user's canister
+            // This updates transactions in place with assetUrl if found in user canister
+            const assetFetchPromises = transactions.map(async (transaction) => {
               try {
                 const result = await fetchAssetFromUserCanister(
-                  transaction.id,
+                  transaction.id, // Assuming transaction.id is the Arweave ID / key in asset canister
                   assetActor
                 );
-
-                const assetUrl = result?.blob
-                  ? URL.createObjectURL(result.blob)
-                  : "";
-
-                return { id: transaction.id, assetUrl };
+                if (result?.blob) {
+                  const assetUrl = URL.createObjectURL(result.blob);
+                  return { ...transaction, assetUrl }; // Return a new transaction object with the URL
+                }
+                return transaction; // Return original transaction if not found in user canister
               } catch (error) {
-                console.error(
-                  `Failed to fetch asset for transaction ${transaction.id}:`,
-                  error
+                // Log individual asset fetch error but don't let it stop everything
+                const errorMessage = error instanceof Error && error.message.includes("asset not found") ? error.message : String(error);
+                console.warn(
+                  `Failed to fetch asset ${transaction.id} from user canister ${userAssetCanisterId}:\n${errorMessage}`
                 );
-                return { id: transaction.id, assetUrl: "" };
+                return transaction; // Return original transaction
               }
             });
-
-            const assetResults = await Promise.all(fetchPromises);
-
-            transactions =  transactions.map((tx) => {
-              const found = assetResults.find((a) => a.id === tx.id);
-              return found ? { ...tx, assetUrl: found.assetUrl } : tx;
-            });
-            console.log("ok",transactions);
-          } catch (error) {
-            console.error("Failed to process data:", error);
+            
+            transactions = await Promise.all(assetFetchPromises);
+            console.log("Transactions after attempting fetch from user asset canister:", transactions);
           }
-        } else {
-          console.warn("No data found in ContentData.");
+        } catch (error) {
+          // Catch errors from getAssetCanister, getActorUserAssetCanister, or initial "ContentData" fetch
+          console.error("Error interacting with user asset canister. Proceeding with Arweave fallback for all assets.", error);
+          // Do not re-throw; allow progression to Arweave fallback for all original transactions
         }
-      } 
+      }
 
-        // Store the transactions
-        this.dispatch(setTransactions(transactions));
-      // Load content for each transaction
-        await this.loadContentForTransactions(transactions);
+      // Store the transactions (potentially updated with URLs from user asset canister)
+      this.dispatch(setTransactions(transactions));
+      // Load content for each transaction (ContentService will use Arweave if assetUrl is not already set)
+      await this.loadContentForTransactions(transactions);
                  
 
 

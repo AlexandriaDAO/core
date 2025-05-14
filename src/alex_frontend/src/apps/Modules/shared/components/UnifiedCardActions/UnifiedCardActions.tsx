@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, Trash2, UserPlus, UserMinus, Loader2, Heart, Bookmark } from "lucide-react";
+import { Plus, Trash2, UserPlus, UserMinus, Loader2, Heart, Bookmark, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/lib/components/button";
 import { ShelfSelectionDialog } from "@/apps/app/Perpetua/features/shelf-management/components/ShelfSelectionDialog";
@@ -53,6 +53,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
   const [addToShelfContext, setAddToShelfContext] = React.useState<AddToShelfContext | null>(null);
   const [isProcessingAddToShelf, setIsProcessingAddToShelf] = React.useState(false);
   const [isHovering, setIsHovering] = React.useState(false);
+  const [isProcessingDirectMint, setIsProcessingDirectMint] = React.useState(false); // New state for direct minting
 
   const { addContentToShelf, isLoggedIn, getEditableShelves } = useAddToShelf();
   const { createShelf } = useShelfOperations();
@@ -68,10 +69,13 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
   // Can Add to Shelf: Only requires user to be logged in
   const canAddToShelf = isLoggedIn;
 
+  // Condition for showing the direct mint button
+  const canDirectMint = isLoggedIn && !isOwned && (contentType === 'Nft' || contentType === 'Arweave') && isSafeForMinting;
+
   // Removed logic for canRemoveItem, canInteractWithFollow, currentlyFollowingOwner, showAnyAction, showSeparator1
 
-  // If the Add to Shelf action isn't available, don't render anything
-  if (!canAddToShelf) {
+  // If neither action is available, don't render anything (or adjust as needed)
+  if (!canAddToShelf && !canDirectMint) {
     return null;
   }
 
@@ -86,7 +90,50 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
 
   // --- Action Handlers ---
 
-  // 1. Initial Click Handler: Perform checks and open dialog
+  // Refactored Minting Operation
+  const performMintOperation = async (
+    originalContentId: string,
+    originalContentType: UnifiedCardActionsProps['contentType']
+  ): Promise<{ finalContentId: string; finalContentType: 'Nft' | 'Shelf' | 'Markdown'; mintStatus: MintResult['status'] | 'not_needed' | 'failed_precheck'; mintMessage?: string }> => {
+    if (!isLoggedIn) {
+      return { finalContentId: originalContentId, finalContentType: originalContentType as any, mintStatus: 'failed_precheck', mintMessage: "User not logged in." };
+    }
+    if ((originalContentType === 'Arweave' || originalContentType === 'Nft') && !isSafeForMinting && !isOwned) { // Check isOwned here for Arweave
+        return { finalContentId: originalContentId, finalContentType: originalContentType as any, mintStatus: 'failed_precheck', mintMessage: "Content is not safe for minting or already owned." };
+    }
+
+    let finalContentId = originalContentId;
+    let finalContentType: "Nft" | "Shelf" | "Markdown" = originalContentType as any; // Initial assumption
+    let needsMinting = false;
+
+    if (!isOwned && (originalContentType === 'Nft' || originalContentType === 'Arweave')) {
+        needsMinting = true;
+    } else if (originalContentType === 'Shelf') {
+        finalContentType = 'Shelf';
+    } else if (originalContentType === 'Markdown') {
+        finalContentType = 'Markdown';
+    } else { // Already owned Nft/SBT
+        finalContentType = 'Nft';
+    }
+
+    if (needsMinting) {
+        console.log(`[UnifiedCardActions] Minting required for ${originalContentType} ID: ${originalContentId}`);
+        const mintResult = await mint_nft(originalContentId);
+        if (mintResult.status === 'success' || mintResult.status === 'already_exists') {
+            finalContentId = mintResult.id;
+            finalContentType = 'Nft';
+            return { finalContentId, finalContentType, mintStatus: mintResult.status };
+        } else {
+            console.error(`[UnifiedCardActions] Minting failed: ${mintResult.message}`);
+            return { finalContentId: originalContentId, finalContentType: originalContentType as any, mintStatus: 'error', mintMessage: mintResult.message || "Failed to acquire item." };
+        }
+    }
+    // If no minting was needed
+    return { finalContentId, finalContentType, mintStatus: 'not_needed' };
+  };
+
+
+  // 1. Initial Click Handler for Add to Shelf: Perform checks and open dialog
   const handleAddToShelfClick = (e: React.MouseEvent) => {
     stopPropagation(e);
 
@@ -131,7 +178,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
         return; // Nothing to do
     }
 
-    const { originalContentId, originalContentType, initialIsOwned } = addToShelfContext;
+    const { originalContentId, originalContentType, initialIsOwned, isSafe } = addToShelfContext;
     let finalContentId = originalContentId;
     let finalContentType: "Nft" | "Shelf" | "Markdown" = 'Nft'; // Default, will be adjusted
     let needsMinting = false;
@@ -167,64 +214,67 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
 
         // Perform minting if required (once for all selected shelves)
         if (needsMinting) {
-            const mintResult = await mint_nft(originalContentId);
+            const mintingOutcome = await performMintOperation(originalContentId, originalContentType);
 
-            if (mintResult.status === 'success' || mintResult.status === 'already_exists') {
-                finalContentId = mintResult.id;
-                finalContentType = 'Nft'; // Content is now an NFT/SBT
+            if (mintingOutcome.mintStatus === 'error' || mintingOutcome.mintStatus === 'failed_precheck') {
+                toast.error(mintingOutcome.mintMessage || "Failed to acquire item for adding.");
+                throw new Error(mintingOutcome.mintMessage || "Minting prerequisite failed");
+            }
+            
+            const { finalContentId, finalContentType, mintStatus } = mintingOutcome;
+
+            if (mintStatus === 'success' || mintStatus === 'already_exists') {
                 toast.info(`Item acquired successfully. Adding to shelves...`);
-            } else {
-                console.error(`[UnifiedCardActions] Background: Minting failed: ${mintResult.message}`);
-                toast.error(mintResult.message || "Failed to acquire item for adding.");
-                throw new Error("Minting failed"); // Stop processing for all shelves
             }
-        }
 
-        // Determine collectionType for NFTs/SBTs (once)
-        const collectionType = (finalContentType === 'Nft' && finalContentId.length >= 80) ? 'SBT' : (finalContentType === 'Nft' ? 'NFT' : undefined);
+            // Determine collectionType for NFTs/SBTs (once)
+            const collectionType = (finalContentType === 'Nft' && finalContentId.length >= 80) ? 'SBT' : (finalContentType === 'Nft' ? 'NFT' : undefined);
 
-        // Add to each selected shelf concurrently
-        const addPromises = selectedShelfIds.map(shelfId =>
-            addContentToShelf(
-                shelfId,
-                finalContentId,
-                finalContentType,
-                collectionType
-            )
-            .then(result => ({ ...result, shelfId })) // Pass shelfId along for context in success
-            .catch(error => ({ status: 'error', message: error?.message || "Unknown error", shelfId })) // Catch and format errors
-        );
+            // Add to each selected shelf concurrently
+            const addPromises = selectedShelfIds.map(shelfId =>
+                addContentToShelf(
+                    shelfId,
+                    finalContentId,
+                    finalContentType,
+                    collectionType
+                )
+                .then(result => ({ ...result, shelfId })) // Pass shelfId along for context in success
+                .catch(error => ({ status: 'error', message: error?.message || "Unknown error", shelfId })) // Catch and format errors
+            );
 
-        // Wait for all attempts to settle
-        const results = await Promise.allSettled(addPromises);
+            // Wait for all attempts to settle
+            const results = await Promise.allSettled(addPromises);
 
-        // Process results and show individual toasts
-        results.forEach(result => {
-            let shelfId: string | undefined;
-            let shelfName = 'selected shelf';
+            // Process results and show individual toasts
+            results.forEach(result => {
+                let shelfId: string | undefined;
+                let shelfName = 'selected shelf';
 
-            if (result.status === 'fulfilled') {
-                shelfId = result.value.shelfId;
-                const shelfInfo = shelfDetailsMap.get(shelfId);
-                shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`; 
+                if (result.status === 'fulfilled') {
+                    shelfId = result.value.shelfId;
+                    const shelfInfo = shelfDetailsMap.get(shelfId);
+                    shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`; 
 
-                if (result.value.status === 'success') {
-                    toast.success(`Successfully added ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}'.`);
-                } else if (result.value.status === 'error') {
-                    toast.error(`Failed to add ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}': ${result.value.message}`);
-                } else {
-                    console.warn("Unexpected fulfilled status:", result.value);
-                    toast.error(`An unexpected issue occurred when adding to '${shelfName}'.`);
+                    if (result.value.status === 'success') {
+                        toast.success(`Successfully added ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}'.`);
+                    } else if (result.value.status === 'error') {
+                        toast.error(`Failed to add ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}': ${result.value.message}`);
+                    } else if (result.value.status === 'already_on_shelf') { // Handle new status
+                        toast.info(`Item is already on '${shelfName}'.`);
+                    } else {
+                        console.warn("Unexpected fulfilled status:", result.value);
+                        toast.error(`An unexpected issue occurred when adding to '${shelfName}'.`);
+                    }
+                } else { // result.status === 'rejected'
+                    const reason = result.reason as any;
+                    shelfId = reason?.shelfId;
+                    const shelfInfo = shelfId ? shelfDetailsMap.get(shelfId) : undefined;
+                    shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`; 
+                    const errorMessage = reason?.message || reason?.toString() || "An unknown error occurred";
+                    toast.error(`Failed to add ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}': ${errorMessage}`);
                 }
-            } else { // result.status === 'rejected'
-                const reason = result.reason as any;
-                shelfId = reason?.shelfId;
-                const shelfInfo = shelfId ? shelfDetailsMap.get(shelfId) : undefined;
-                shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`; 
-                const errorMessage = reason?.message || reason?.toString() || "An unknown error occurred";
-                toast.error(`Failed to add ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}': ${errorMessage}`);
-            }
-        });
+            });
+        }
 
     } catch (error) {
         console.error("[UnifiedCardActions] Error during background add-to-shelf process:", error);
@@ -238,39 +288,100 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
     }
   };
 
+  // 3. Handler for Direct Minting
+  const handleDirectMintClick = async (e: React.MouseEvent) => {
+    stopPropagation(e);
+
+    if (!isLoggedIn) {
+      toast.error("Please log in to mint items.");
+      return;
+    }
+    // Safety check is part of performMintOperation for Arweave
+    // if (contentType === 'Arweave' && !isSafeForMinting) {
+    //     toast.error("Cannot mint potentially unsafe content.");
+    //     return;
+    // }
+
+    console.log(`[UnifiedCardActions] Initiating direct mint for ${contentType} ID: ${contentId}`);
+    setIsProcessingDirectMint(true);
+
+    try {
+      const mintingOutcome = await performMintOperation(contentId, contentType);
+
+      if (mintingOutcome.mintStatus === 'success') {
+        toast.success(`Item (ID: ${mintingOutcome.finalContentId.substring(0,8)}...) minted successfully as NFT!`);
+      } else if (mintingOutcome.mintStatus === 'already_exists') {
+        toast.info(`You already own this item (NFT ID: ${mintingOutcome.finalContentId.substring(0,8)}...).`);
+      } else if (mintingOutcome.mintStatus === 'not_needed') {
+         // This case should ideally not be hit if button is conditioned on !isOwned
+        toast.info("This item doesn't need minting or is already an NFT you own.");
+      } else { // error or failed_precheck
+        toast.error(mintingOutcome.mintMessage || "Minting failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("[UnifiedCardActions] Error during direct mint process:", error);
+      toast.error(error instanceof Error ? error.message : "An unexpected error occurred during minting.");
+    } finally {
+      setIsProcessingDirectMint(false);
+    }
+  };
+
+
   return (
     <>
-      {/* True bookmark-shaped button with no box around it */}
-      <div 
-        className={`absolute right-3 top-0 z-10 cursor-pointer ${className ?? ""}`}
-        onClick={handleAddToShelfClick}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-        aria-label={isProcessingAddToShelf ? "Adding to shelf..." : "Add to shelf"}
-      >
-        <div className="relative">
-          {/* Bookmark shadow */}
-          <div className="absolute top-0.5 right-0 h-10 w-8 bg-black/30 rounded-b-md blur-[1px]"></div>
-          
-          {/* Bookmark shape - using same black as info button */}
-          <div className="relative h-10 w-8 bg-black/75 transition-colors duration-150 rounded-b-md">
-            {/* Notch at bottom of bookmark */}
-            <div className="absolute bottom-0 left-1/2 h-2.5 w-3 transform -translate-x-1/2 bg-black/75 transition-colors duration-150" style={{ clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)' }}></div>
-            
-            {/* Content */}
-            <div className="h-full w-full flex items-center justify-center pt-1">
-              {isProcessingAddToShelf ? (
-                <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
-              ) : (
-                <Bookmark 
-                  className={`h-5 w-5 transition-colors duration-150 ${isHovering ? 'text-brightyellow' : 'text-white dark:text-brightyellow'}`} 
-                  fill={isHovering ? 'currentColor' : 'none'} 
-                  strokeWidth={isHovering ? 2.5 : 2}
-                />
-              )}
+      <div className="absolute right-3 top-0 z-10 flex flex-col items-end space-y-1">
+        {/* Add to Shelf (Bookmark) Button - only if canAddToShelf is true */}
+        {canAddToShelf && (
+          <div 
+            className={`cursor-pointer ${className ?? ""}`}
+            onClick={isProcessingDirectMint || isProcessingAddToShelf ? undefined : handleAddToShelfClick}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+            aria-label={isProcessingAddToShelf ? "Adding to shelf..." : "Add to shelf"}
+            title="Add to Shelf"
+          >
+            <div className="relative">
+              {/* Bookmark shadow */}
+              <div className="absolute top-0.5 right-0 h-10 w-8 bg-black/30 rounded-b-md blur-[1px]"></div>
+              
+              {/* Bookmark shape - using same black as info button */}
+              <div className="relative h-10 w-8 bg-black/75 transition-colors duration-150 rounded-b-md">
+                {/* Notch at bottom of bookmark */}
+                <div className="absolute bottom-0 left-1/2 h-2.5 w-3 transform -translate-x-1/2 bg-black/75 transition-colors duration-150" style={{ clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)' }}></div>
+                
+                {/* Content */}
+                <div className="h-full w-full flex items-center justify-center pt-1">
+                  {isProcessingAddToShelf ? (
+                    <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
+                  ) : (
+                    <Bookmark 
+                      className={`h-5 w-5 transition-colors duration-150 ${isHovering ? 'text-brightyellow' : 'text-white dark:text-brightyellow'}`} 
+                      fill={isHovering ? 'currentColor' : 'none'} 
+                      strokeWidth={isHovering ? 2.5 : 2}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Direct Mint NFT Button - only if canDirectMint is true */}
+        {canDirectMint && (
+           <Button
+            variant="secondary"
+            onClick={isProcessingDirectMint || isProcessingAddToShelf ? undefined : handleDirectMintClick}
+            disabled={isProcessingDirectMint || isProcessingAddToShelf}
+            className="h-8 px-2 py-1 text-xs flex items-center gap-1 bg-black/75 hover:bg-black/90 text-white dark:text-brightyellow border-none shadow-md"
+            title="Mint as NFT"
+          >
+            {isProcessingDirectMint ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <PlusCircle className="h-4 w-4" /> 
+            )}
+          </Button>
+        )}
       </div>
 
       {addToShelfContext && (

@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
+import { useIdentity } from '@/hooks/useIdentity';
 
 import { Button } from '@/lib/components/button';
 import { Badge } from '@/lib/components/badge';
@@ -12,13 +13,16 @@ import { Skeleton } from "@/lib/components/skeleton";
 
 export const FollowedTagsList: React.FC = () => {
     const dispatch = useAppDispatch();
+    const { identity } = useIdentity();
     const followedTags = useAppSelector(selectMyFollowedTags);
     const isLoading = useAppSelector(selectIsLoadingMyFollowedTags);
     const [unfollowingTagUi, setUnfollowingTagUi] = useState<string | null>(null);
 
     useEffect(() => {
-        dispatch(loadMyFollowedTags());
-    }, [dispatch]);
+        if (identity) {
+            dispatch(loadMyFollowedTags());
+        }
+    }, [dispatch, identity]);
 
     const handleUnfollow = useCallback(async (tag: string) => {
         setUnfollowingTagUi(tag);
@@ -34,6 +38,10 @@ export const FollowedTagsList: React.FC = () => {
         }
     }, [dispatch]);
 
+    if (!identity) {
+        return null;
+    }
+
     if (isLoading && followedTags.length === 0) {
         return (
             <div className="mb-4 font-serif">
@@ -48,7 +56,12 @@ export const FollowedTagsList: React.FC = () => {
     }
 
     if (followedTags.length === 0) {
-        return <p className="text-sm text-muted-foreground mb-4 font-serif">You are not following any tags yet.</p>;
+        return (
+            <div className="mb-4 font-serif">
+                 <h3 className="mb-2 font-semibold text-base">Following Tags:</h3>
+                 <p className="text-sm text-muted-foreground">You are not following any tags yet.</p>
+            </div>
+        );
     }
 
     return (

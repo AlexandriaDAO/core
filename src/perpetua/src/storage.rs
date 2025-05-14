@@ -1,7 +1,7 @@
 use candid::{CandidType, Principal};
 use candid::{Decode, Deserialize, Encode};
 use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
-use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable};
+use ic_stable_structures::{storable::Bound, DefaultMemoryImpl, StableBTreeMap, Storable, StableCell};
 use std::borrow::Cow;
 use std::cell::RefCell;
 use std::collections::BTreeSet;
@@ -16,12 +16,75 @@ use rand_chacha;
 use rand_core::SeedableRng;
 use rand::Rng;
 
-type Memory = VirtualMemory<DefaultMemoryImpl>;
+pub(crate) type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 // --- Define ShelfId and NormalizedTag types ---
 pub type ShelfId = String; 
 pub type NormalizedTag = String;
 pub type ItemId = u32; // Define ItemId here
+
+// --- Define ShelfMetadata ---
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct ShelfMetadata {
+    pub shelf_id: ShelfId,
+    pub title: String,
+    pub description: Option<String>,
+    pub owner: Principal,
+    pub created_at: u64,
+    pub updated_at: u64,
+    pub appears_in: Vec<ShelfId>,
+    pub tags: Vec<NormalizedTag>,
+    pub public_editing: bool,
+}
+
+impl Storable for ShelfMetadata {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(self).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
+}
+
+// --- Define ShelfContent ---
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct ShelfContentSerializable {
+    pub items: BTreeMap<u32, Item>,
+    pub item_positions: Vec<(u32, f64)>,
+}
+
+#[derive(Clone, Debug)]
+pub struct ShelfContent {
+    pub items: BTreeMap<u32, Item>,
+    pub item_positions: PositionTracker<u32>,
+}
+
+impl Storable for ShelfContent {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        let serializable = ShelfContentSerializable {
+            items: self.items.clone(),
+            item_positions: self.item_positions.get_ordered_entries(),
+        };
+        Cow::Owned(Encode!(&serializable).unwrap())
+    }
+
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        let serializable: ShelfContentSerializable = Decode!(bytes.as_ref(), ShelfContentSerializable).unwrap();
+        let mut item_positions = PositionTracker::<u32>::new();
+        for (key, pos) in serializable.item_positions {
+            item_positions.insert(key, pos);
+        }
+        Self {
+            items: serializable.items,
+            item_positions,
+        }
+    }
+
+    const BOUND: Bound = Bound::Unbounded;
+}
 
 // --- Define TagMetadata ---
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
@@ -82,9 +145,46 @@ impl Storable for OrphanedTagValue {
     const BOUND: Bound = Bound::Unbounded;
 }
 
+// --- New Key for Tag Shelf Creation Timeline Index ---
+#[derive(CandidType, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
+pub struct TagShelfCreationTimelineKey {
+    pub tag: NormalizedTag,
+    pub reversed_created_at: u64, // u64::MAX - shelf.created_at
+    pub shelf_id: ShelfId,
+}
+
+impl Storable for TagShelfCreationTimelineKey {
+    fn to_bytes(&self) -> Cow<[u8]> {
+        Cow::Owned(Encode!(&self.tag, &self.reversed_created_at, &self.shelf_id).unwrap())
+    }
+    fn from_bytes(bytes: Cow<[u8]>) -> Self {
+        let (tag, reversed_created_at, shelf_id) =
+            Decode!(bytes.as_ref(), NormalizedTag, u64, ShelfId).unwrap();
+        Self { tag, reversed_created_at, shelf_id }
+    }
+    const BOUND: Bound = Bound::Unbounded;
+}
+
+impl PartialOrd for TagShelfCreationTimelineKey {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for TagShelfCreationTimelineKey {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match self.tag.cmp(&other.tag) {
+            Ordering::Equal => match self.reversed_created_at.cmp(&other.reversed_created_at) {
+                Ordering::Equal => self.shelf_id.cmp(&other.shelf_id),
+                other_ts => other_ts,
+            },
+            other_tag => other_tag,
+        }
+    }
+}
 
 // Memory IDs for different storage maps
-const SHELVES_MEM_ID: MemoryId = MemoryId::new(0);
+pub(crate) const SHELVES_MEM_ID: MemoryId = MemoryId::new(0); // Now stores ShelfContent
 const USER_SHELVES_MEM_ID: MemoryId = MemoryId::new(1);
 const NFT_SHELVES_MEM_ID: MemoryId = MemoryId::new(2);
 const GLOBAL_TIMELINE_MEM_ID: MemoryId = MemoryId::new(3);
@@ -102,6 +202,10 @@ const FOLLOWED_USERS_MEM_ID: MemoryId = MemoryId::new(16);
 const FOLLOWED_TAGS_MEM_ID: MemoryId = MemoryId::new(17);
 // --- New Memory ID for Random Shelf Candidates ---
 const RANDOM_SHELF_CANDIDATES_MEM_ID: MemoryId = MemoryId::new(18);
+// --- New Memory ID for Tag Shelf Creation Timeline Index ---
+const TAG_SHELF_CREATION_TIMELINE_INDEX_MEM_ID: MemoryId = MemoryId::new(19);
+// --- New Memory ID for Shelf Metadata ---
+pub(crate) const SHELF_METADATA_MEM_ID: MemoryId = MemoryId::new(20);
 
 
 // Constants for shelf operations
@@ -111,7 +215,7 @@ pub const MAX_APPEARS_IN_COUNT: usize = 100; // Keep this if relevant elsewhere
 pub const MAX_TAG_LENGTH: usize = 25; // Adjusted max tag length
 pub const MAX_TAGS_PER_SHELF: usize = 3; // Adjusted max tags per shelf
 pub const MAX_NFT_ID_LENGTH: usize = 100; // Max length for NFT IDs
-pub const MAX_MARKDOWN_LENGTH: usize = 10_000; // Max length for Markdown content
+pub const MAX_MARKDOWN_LENGTH: usize = 1_000; // Max length for Markdown content
 
 // New wrapper types (Keep these if used outside tags)
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
@@ -151,12 +255,12 @@ impl Storable for GlobalTimelineItemValue {
 
 thread_local! {
     // Memory manager for stable storage
-    static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
+    pub(crate) static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(
         MemoryManager::init(DefaultMemoryImpl::default())
     );
 
-    // Main shelves storage: K: shelf_id, V: Shelf
-    pub static SHELVES: RefCell<StableBTreeMap<ShelfId, Shelf, Memory>> = RefCell::new(
+    // Main shelves storage: K: shelf_id, V: ShelfContent
+    pub static SHELVES: RefCell<StableBTreeMap<ShelfId, ShelfContent, Memory>> = RefCell::new(
         StableBTreeMap::init(
             MEMORY_MANAGER.with(|m| m.borrow().get(SHELVES_MEM_ID))
         )
@@ -250,9 +354,23 @@ thread_local! {
             MEMORY_MANAGER.with(|m| m.borrow().get(RANDOM_SHELF_CANDIDATES_MEM_ID))
         )
     );
+
+    // --- New Index for Tag -> Shelf (ordered by Shelf Creation Time) ---
+    pub static TAG_SHELF_CREATION_TIMELINE_INDEX: RefCell<StableBTreeMap<TagShelfCreationTimelineKey, (), Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(TAG_SHELF_CREATION_TIMELINE_INDEX_MEM_ID))
+        )
+    );
+
+    // --- New Map for Shelf Metadata ---
+    pub static SHELF_METADATA: RefCell<StableBTreeMap<ShelfId, ShelfMetadata, Memory>> = RefCell::new(
+        StableBTreeMap::init(
+            MEMORY_MANAGER.with(|m| m.borrow().get(SHELF_METADATA_MEM_ID))
+        )
+    );
 }
 
-// --- Public Shelf structure for Candid export ---
+// --- Public Shelf structure for Candid export --- 
 // Moved from query/follows.rs and replaces ShelfSerializable
 #[derive(CandidType, Deserialize, Clone, Debug)] // Add CandidType, Deserialize
 pub struct ShelfPublic {
@@ -286,6 +404,23 @@ impl ShelfPublic {
             public_editing: shelf.public_editing,
         }
     }
+
+    // New constructor from ShelfMetadata and ShelfContent
+    pub fn from_parts(metadata: &ShelfMetadata, content: &ShelfContent) -> Self {
+        Self {
+            shelf_id: metadata.shelf_id.clone(),
+            title: metadata.title.clone(),
+            description: metadata.description.clone(),
+            owner: metadata.owner.clone(),
+            items: content.items.clone(),
+            item_positions: content.item_positions.get_ordered_entries(),
+            created_at: metadata.created_at,
+            updated_at: metadata.updated_at,
+            appears_in: metadata.appears_in.clone(),
+            tags: metadata.tags.clone(),
+            public_editing: metadata.public_editing,
+        }
+    }
 }
 
 
@@ -303,42 +438,6 @@ pub struct Shelf {
     pub appears_in: Vec<ShelfId>,
     pub tags: Vec<NormalizedTag>,
     pub public_editing: bool,
-}
-
-// --- Update Storable implementation for Shelf ---
-impl Storable for Shelf {
-    fn to_bytes(&self) -> Cow<[u8]> {
-        // Use ShelfPublic for serialization
-        let public_shelf = ShelfPublic::from_internal(self);
-        Cow::Owned(Encode!(&public_shelf).expect("Failed to encode ShelfPublic"))
-    }
-
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        // Use ShelfPublic for deserialization
-        let public_shelf: ShelfPublic = Decode!(bytes.as_ref(), ShelfPublic).expect("Failed to decode ShelfPublic");
-
-        // Rebuild PositionTracker from Vec
-        let mut item_positions = PositionTracker::<u32>::new();
-        for (key, pos) in public_shelf.item_positions {
-            item_positions.insert(key, pos);
-        }
-
-        Self {
-            shelf_id: public_shelf.shelf_id,
-            title: public_shelf.title,
-            description: public_shelf.description,
-            owner: public_shelf.owner,
-            items: public_shelf.items, // Use the deserialized BTreeMap
-            item_positions, // Assign the rebuilt tracker
-            created_at: public_shelf.created_at,
-            updated_at: public_shelf.updated_at,
-            appears_in: public_shelf.appears_in,
-            tags: public_shelf.tags,
-            public_editing: public_shelf.public_editing,
-        }
-    }
-
-    const BOUND: Bound = Bound::Unbounded;
 }
 
 impl Storable for Item {
@@ -498,10 +597,10 @@ impl Shelf {
                 if nested_shelf_id == &self.shelf_id {
                     return Err("Circular reference: A shelf cannot contain itself".to_string());
                 }
-                let nested_contains_self = SHELVES.with(|shelves_map| {
-                    shelves_map.borrow().get(nested_shelf_id).map_or(false, |nested_shelf| {
-                        // Check items map of nested shelf
-                        nested_shelf.items.values().any(|nested_item| {
+                let nested_contains_self = SHELVES.with(|shelves_map_ref| {
+                    shelves_map_ref.borrow().get(nested_shelf_id).map_or(false, |nested_shelf_content| {
+                        // Check items map of nested shelf's content
+                        nested_shelf_content.items.values().any(|nested_item| {
                             matches!(&nested_item.content, ItemContent::Shelf(id_in_nested) if id_in_nested == &self.shelf_id)
                         })
                     })
@@ -773,7 +872,7 @@ pub fn refresh_random_shelf_candidates() {
         }
         let mut prng = rand_chacha::ChaCha20Rng::from_seed(rng_seed);
 
-        for (shelf_id, _shelf) in shelves_map.iter() { // Iterate over ALL shelves
+        for (shelf_id, _shelf_content) in shelves_map.iter() { // Iterate over ALL shelves (now _shelf_content)
             shelves_processed_count += 1;
             if candidate_ids_reservoir.len() < K_CANDIDATES {
                 candidate_ids_reservoir.push(shelf_id.clone());

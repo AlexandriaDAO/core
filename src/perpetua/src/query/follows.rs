@@ -8,6 +8,9 @@ use crate::storage::{
     // SHELVES, // No longer used in this file as feeds have moved
     TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, 
     FOLLOWED_USERS, FOLLOWED_TAGS, // Keep FOLLOWED_*
+    ShelfMetadata as StorageShelfMetadata, // Alias to avoid name clash if needed
+    ShelfContent as StorageShelfContent,   // Alias to avoid name clash if needed
+    Shelf as StorageShelf, // For the existing ShelfPublic::from
     Shelf, Item, ShelfId, NormalizedTag, // ItemId is no longer used directly
 };
 // Remove UserProfileOrder import
@@ -22,61 +25,18 @@ pub(super) const MAX_PAGE_LIMIT: usize = 50;   // Keep pub(super) for now
 
 // --- Pagination Input Types ---
 
-#[derive(CandidType, Deserialize, Debug, Clone)]
-pub struct OffsetPaginationInput {
-    pub offset: Nat,
-    pub limit: u64,
-}
-
-impl OffsetPaginationInput {
-    pub fn get_limit(&self) -> usize {
-        self.limit.try_into().unwrap_or(DEFAULT_PAGE_LIMIT).min(MAX_PAGE_LIMIT)
-    }
-
-    pub fn get_offset(&self) -> usize {
-        self.offset.clone().0.try_into().unwrap_or(0)
-    }
-}
-
-#[derive(CandidType, Deserialize, Debug, Clone)]
-pub struct CursorPaginationInput<C: CandidType + Clone> {
-    pub cursor: Option<C>,
-    pub limit: u64,
-}
-
-impl<C: CandidType + Clone> CursorPaginationInput<C> {
-    pub fn get_limit(&self) -> usize {
-        self.limit.try_into().unwrap_or(DEFAULT_PAGE_LIMIT).min(MAX_PAGE_LIMIT)
-    }
-}
-
-// --- Pagination Result Types ---
-
-#[derive(CandidType, Debug, Clone)]
-pub struct OffsetPaginatedResult<T: CandidType + Clone> {
-    pub items: Vec<T>,
-    pub total_count: Nat,
-    pub limit: u64,
-    pub offset: Nat,
-}
-
-#[derive(CandidType, Debug, Clone)]
-pub struct CursorPaginatedResult<T: CandidType + Clone, C: CandidType + Clone> {
-    pub items: Vec<T>,
-    pub next_cursor: Option<C>,
-    pub limit: u64,
-}
-
-#[derive(CandidType, Debug)]
+#[derive(CandidType, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum QueryError {
     ShelfNotFound,
     UserNotFound,
-    InvalidTimeRange,
     TagNotFound,
     InvalidCursor,
+    InvalidTimeRange,
+    ShelfContentNotFound, // ADDED
+    // Any other existing variants
 }
 
-pub type QueryResult<T> = Result<T, QueryError>;
+pub type QueryResult<T> = std::result::Result<T, QueryError>;
 
 // --- Public Shelf structure for Candid export ---
 #[derive(CandidType, Deserialize, Clone, Debug)]
@@ -85,32 +45,48 @@ pub struct ShelfPublic {
     pub title: String,
     pub description: Option<String>,
     pub owner: Principal,
-    pub items: BTreeMap<u32, Item>, // Assuming Item is CandidType
-    // Use Vec for positions, ordered by the tracker
+    pub items: BTreeMap<u32, Item>, 
     pub item_positions: Vec<(u32, f64)>,
     pub created_at: u64,
     pub updated_at: u64,
     pub appears_in: Vec<ShelfId>,
-    pub tags: Vec<NormalizedTag>, // Assuming NormalizedTag (String) is CandidType
+    pub tags: Vec<NormalizedTag>, 
     pub public_editing: bool,
 }
 
-// Helper function to convert internal Shelf to ShelfPublic
-impl From<Shelf> for ShelfPublic {
-    fn from(shelf: Shelf) -> Self {
+impl ShelfPublic {
+    // ADDED: New constructor from ShelfMetadata and ShelfContent
+    pub fn from_parts(metadata: &StorageShelfMetadata, content: &StorageShelfContent) -> Self {
         Self {
-            shelf_id: shelf.shelf_id,
-            title: shelf.title,
-            description: shelf.description,
-            owner: shelf.owner,
-            items: shelf.items,
-            item_positions: shelf.item_positions.get_ordered_entries(), // Use tracker method
-            created_at: shelf.created_at,
-            updated_at: shelf.updated_at,
-            appears_in: shelf.appears_in,
-            tags: shelf.tags,
-            public_editing: shelf.public_editing,
+            shelf_id: metadata.shelf_id.clone(),
+            title: metadata.title.clone(),
+            description: metadata.description.clone(),
+            owner: metadata.owner.clone(),
+            items: content.items.clone(),
+            item_positions: content.item_positions.get_ordered_entries(),
+            created_at: metadata.created_at,
+            updated_at: metadata.updated_at,
+            appears_in: metadata.appears_in.clone(),
+            tags: metadata.tags.clone(),
+            public_editing: metadata.public_editing,
         }
+    }
+
+    // Existing constructor (if still needed, ensure it uses the correct type for StorageShelf)
+    pub fn from(internal_shelf: &StorageShelf) -> Self {
+         Self {
+             shelf_id: internal_shelf.shelf_id.clone(),
+             title: internal_shelf.title.clone(),
+             description: internal_shelf.description.clone(),
+             owner: internal_shelf.owner.clone(),
+             items: internal_shelf.items.clone(),
+             item_positions: internal_shelf.item_positions.get_ordered_entries(),
+             created_at: internal_shelf.created_at,
+             updated_at: internal_shelf.updated_at,
+             appears_in: internal_shelf.appears_in.clone(),
+             tags: internal_shelf.tags.clone(),
+             public_editing: internal_shelf.public_editing,
+         }
     }
 }
 
@@ -274,5 +250,50 @@ pub fn get_my_followed_users() -> QueryResult<Vec<Principal>> {
                      .unwrap_or_default(); // Return empty Vec if user wasn't following anyone
         Ok(users)
     })
+}
+
+#[derive(CandidType, Deserialize, Debug, Clone)]
+pub struct OffsetPaginationInput {
+    pub offset: Nat,
+    pub limit: u64,
+}
+
+impl OffsetPaginationInput {
+    pub fn get_limit(&self) -> usize {
+        self.limit.try_into().unwrap_or(DEFAULT_PAGE_LIMIT).min(MAX_PAGE_LIMIT)
+    }
+
+    pub fn get_offset(&self) -> usize {
+        self.offset.clone().0.try_into().unwrap_or(0)
+    }
+}
+
+#[derive(CandidType, Deserialize, Debug, Clone)]
+pub struct CursorPaginationInput<C: CandidType + Clone> {
+    pub cursor: Option<C>,
+    pub limit: u64,
+}
+
+impl<C: CandidType + Clone> CursorPaginationInput<C> {
+    pub fn get_limit(&self) -> usize {
+        self.limit.try_into().unwrap_or(DEFAULT_PAGE_LIMIT).min(MAX_PAGE_LIMIT)
+    }
+}
+
+// --- Pagination Result Types ---
+
+#[derive(CandidType, Debug, Clone)]
+pub struct OffsetPaginatedResult<T: CandidType + Clone> {
+    pub items: Vec<T>,
+    pub total_count: Nat,
+    pub limit: u64,
+    pub offset: Nat,
+}
+
+#[derive(CandidType, Debug, Clone)]
+pub struct CursorPaginatedResult<T: CandidType + Clone, C: CandidType + Clone> {
+    pub items: Vec<T>,
+    pub next_cursor: Option<C>,
+    pub limit: u64,
 }
 

@@ -20,8 +20,8 @@ type CursorPaginatedResult_2 = record {
 };
 type CursorPaginatedResult_3 = record {
   limit : nat64;
-  next_cursor : opt record { text; text };
-  items : vec text;
+  next_cursor : opt TagShelfCreationTimelineKey;
+  items : vec ShelfPublic;
 };
 type CursorPaginatedResult_4 = record {
   limit : nat64;
@@ -35,7 +35,7 @@ type CursorPaginationInput_1 = record {
 };
 type CursorPaginationInput_2 = record { cursor : opt nat32; limit : nat64 };
 type CursorPaginationInput_3 = record {
-  cursor : opt record { text; text };
+  cursor : opt TagShelfCreationTimelineKey;
   limit : nat64;
 };
 type CursorPaginationInput_4 = record { cursor : opt text; limit : nat64 };
@@ -51,6 +51,7 @@ type OffsetPaginationInput = record { offset : nat; limit : nat64 };
 type QueryError = variant {
   TagNotFound;
   InvalidCursor;
+  ShelfContentNotFound;
   ShelfNotFound;
   InvalidTimeRange;
   UserNotFound;
@@ -89,7 +90,12 @@ type ShelfPublic = record {
   items : vec record { nat32; Item };
 };
 type TagOperationInput = record { tag : text; shelf_id : text };
-service : () -> {
+type TagShelfCreationTimelineKey = record {
+  tag : text;
+  shelf_id : text;
+  reversed_created_at : nat64;
+};
+service : {
   add_item_to_shelf : (text, AddItemInput) -> (Result);
   add_tag_to_shelf : (TagOperationInput) -> (Result);
   debug_trigger_refresh_random_candidates : () -> (Result);

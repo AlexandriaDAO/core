@@ -245,12 +245,12 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
                     </Badge>
                     
                     {isPublic ? (
-                      <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800 flex items-center gap-1 font-serif">
-                        <Globe className="h-3 w-3" /> Public
+                      <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800 flex items-center gap-1 font-serif" title="Public Shelf" aria-label="Public Shelf">
+                        <Globe className="h-4 w-4" />
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 flex items-center gap-1 font-serif">
-                        <Lock className="h-3 w-3" /> Private
+                      <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 flex items-center gap-1 font-serif" title="Private Shelf" aria-label="Private Shelf">
+                        <Lock className="h-4 w-4" />
                       </Badge>
                     )}
                   </div>

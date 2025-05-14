@@ -18,7 +18,7 @@ import { formatPrincipal, formatBalance } from '@/apps/Modules/shared/utils/toke
 import { setSearchState } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 import { Button } from "@/lib/components/button";
 import { Progress } from "@/lib/components/progress";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/lib/components/collapsible";
+import { PredictionResults } from "@/apps/Modules/shared/state/arweave/arweaveSlice";
 
 const truncateMiddle = (str: string, startChars: number = 4, endChars: number = 4) => {
   if (str.length <= startChars + endChars + 3) return str;
@@ -27,7 +27,7 @@ const truncateMiddle = (str: string, startChars: number = 4, endChars: number = 
 
 interface TransactionDetailsProps {
   transaction: Transaction;
-  predictions?: any;
+  predictions?: PredictionResults;
 }
 
 const TransactionDetails: React.FC<TransactionDetailsProps> = ({ 
@@ -35,8 +35,6 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
   predictions
 }) => {
   const dispatch = useDispatch();
-  const [showStatsInternal, setShowStatsInternal] = React.useState(false);
-  const [showMobileDetails, setShowMobileDetails] = React.useState(false);
 
   // NFT data related hooks and state
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
@@ -150,12 +148,6 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
     });
   };
 
-  // Toggle mobile details handler
-  const toggleMobileDetails = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowMobileDetails(prev => !prev);
-  };
-
   const isFromAssetCanister = transaction.assetUrl && transaction.assetUrl !== "";
   // Use principal from local state or store, and check tokenId for NFT data presence
   const hasNftData = tokenId || nftDataResult?.principal || nftDataFromStore?.principal;
@@ -164,12 +156,8 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
   const balancesToDisplay = nftDataFromStore?.balances; // Get balances from Redux store
   const orderIndexToDisplay = nftDataResult?.orderIndex ?? nftDataFromStore?.orderIndex;
 
-  // Handler for internal stats toggle
-  const handleToggleStats = (open: boolean) => {
-    setShowStatsInternal(open);
-  };
-
-  // Render the content of transaction details
+  // This function now directly returns the details content JSX
+  // The old hover wrapper div is removed.
   const renderDetailsContent = (): JSX.Element => (
     <CardContent className="space-y-3 p-2 md:p-3 pt-0 text-[11px] md:text-xs">
       {/* ICP NFT Data Section */}
@@ -345,98 +333,12 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Stats Section - Use internal state */}
-      {predictions && Object.keys(predictions).length > 0 && (
-        <div className="pt-2">
-          <Separator className="bg-gray-700 mb-2" />
-          <Collapsible open={showStatsInternal} onOpenChange={handleToggleStats}>
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="secondary"
-                className="h-5 px-1.5 bg-rose-900/20 hover:bg-rose-900/30 text-rose-300 border border-rose-800 dark:bg-rose-900/20 dark:hover:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800 rounded-md flex items-center gap-0.5 transition-colors shrink-0 group"
-                onClick={(e) => e.stopPropagation()} // Stop propagation
-              >
-                <Flag className="h-2.5 w-2.5" />
-                <span className="text-[10px] font-medium">Stats</span>
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent onClick={(e) => e.stopPropagation()}> {/* Stop propagation */}
-              <div className="mt-1.5 space-y-1 w-full">
-                {Object.entries(predictions).map(([key, value]) => (
-                  <div key={key} className="space-y-0.5">
-                    <div className="flex justify-between text-[10px] dark:text-gray-300 text-gray-300">
-                      <span>{key}</span>
-                      <span>{(Number(value) * 100).toFixed(1)}%</span>
-                    </div>
-                    <Progress value={Number(value) * 100} className="h-1 bg-gray-700" />
-                  </div>
-                ))}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-      )}
     </CardContent>
   );
 
-  return (
-    <>
-      {/* Desktop version - hover based - reduce z-index from 20 to 5 */}
-      <div className="absolute inset-0 bg-black/90 opacity-0 hidden md:flex flex-col group-hover:opacity-100 transition-opacity duration-200 z-[5]">
-        <ScrollArea className="h-full">
-          <Card className="bg-transparent border-none text-gray-100 shadow-none">
-            <CardHeader className="p-2 pb-0 md:p-3">
-              {/* Header can be empty or used for other purposes if needed */}
-            </CardHeader>
-            {renderDetailsContent()}
-          </Card>
-        </ScrollArea>
-      </div>
-
-      {/* Move to right-21 to avoid overlapping with other buttons */}
-      <div className="absolute top-0 right-21 z-10">
-        <div className="relative">
-          {/* Caret shadow */}
-          <div className="absolute top-0.5 left-0 h-6 w-6 bg-black/30 rounded-b-sm blur-[1px]"></div>
-          
-          {/* Caret background */}
-          <div className="relative h-6 w-6 bg-black/75 rounded-b-sm flex items-center justify-center pt-1">
-            {showMobileDetails ? (
-              <ChevronUp className="h-3.5 w-3.5 text-gray-300 hover:text-brightyellow transition-colors duration-150" />
-            ) : (
-              <ChevronDown className="h-3.5 w-3.5 text-gray-300 hover:text-brightyellow transition-colors duration-150" />
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile overlay - also needs z-index adjustment */}
-      {showMobileDetails && (
-        <div 
-          className="fixed inset-0 bg-black/95 z-40 md:hidden overflow-auto"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="container max-w-md mx-auto p-3 pb-16">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm font-medium text-gray-100">Transaction Details</h3>
-              <Button
-                variant="ghost"
-                className="h-7 w-7 rounded-full p-0"
-                onClick={toggleMobileDetails}
-              >
-                <X className="h-3.5 w-3.5 text-gray-300" />
-              </Button>
-            </div>
-            
-            <Card className="bg-black/60 border-gray-800 text-gray-100">
-              {renderDetailsContent()}
-            </Card>
-          </div>
-        </div>
-      )}
-    </>
-  );
+  // The component now directly returns the result of renderDetailsContent()
+  // The hover div and ScrollArea/Card wrappers are removed from here.
+  return renderDetailsContent(); 
 };
 
 export default TransactionDetails; 

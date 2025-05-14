@@ -7,6 +7,7 @@ import { MarkdownContentDisplay } from './ContentDisplays';
 import { isNftContent, isShelfContent as isShelfContentType, isMarkdownContent } from "../../../utils";
 import { RemoveItemButton } from '@/apps/app/Perpetua/features/shelf-management/components/RemoveItemButton';
 import { ShelfCard } from './ShelfCard';
+import { cn } from '@/lib/utils';
 
 interface ShelfContentCardProps {
   itemKey: number;
@@ -44,7 +45,10 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
 }) => {
   const [cardAssetLoaded, setCardAssetLoaded] = useState(true);
 
-  const renderCard = (content: React.ReactNode) => (
+  const renderCard = (content: React.ReactNode) => {
+    const shouldRenderRemoveButton = !isEditMode && cardAssetLoaded;
+
+    return (
     <div 
       key={`item-${itemKey}`}
       className={`item-card relative ${isEditMode ? 'cursor-grab active:cursor-grabbing transition-all duration-150' : ''}`}
@@ -68,26 +72,26 @@ export const ShelfContentCard: React.FC<ShelfContentCardProps> = ({
           </div>
         </div>
       )}
-      {!isEditMode && cardAssetLoaded && (
-        <div className="absolute top-0 left-7 z-10" onClick={(e) => e.stopPropagation()}>
-          <div className="relative">
-            <div className="absolute top-0.5 left-0 h-6 w-6 bg-black/30 rounded-b-sm blur-[1px]"></div>
-            <div className="relative h-6 w-6 bg-black/75 rounded-b-sm flex items-center justify-center pt-1">
-              <RemoveItemButton 
-                shelfId={shelf.shelf_id}
-                itemId={itemKey}
-                buttonSize="sm" 
-                variant="ghost" 
-              />
-            </div>
-          </div>
-        </div>
-      )}
-      <div className={isEditMode && draggedIndex === index ? 'opacity-30' : ''}>
+      <div className={cn('relative h-full w-full', isEditMode && draggedIndex === index ? 'opacity-30' : '')}>
         {content}
+
+        {shouldRenderRemoveButton && (
+          <div 
+            className="absolute bottom-1 right-1 z-10" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <RemoveItemButton 
+              shelfId={shelf.shelf_id}
+              itemId={itemKey}
+              buttonSize="sm"
+              variant="ghost"
+            />
+          </div>
+        )}
       </div>
     </div>
-  );
+    )
+  };
 
   if (isNftContent(item.content)) {
     return renderCard(

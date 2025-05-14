@@ -22,8 +22,8 @@ fn not_anon() -> Result<(), String> {
 }
 
 // --- Constants ---
-const MAX_FOLLOWED_USERS: usize = 1000;
-const MAX_FOLLOWED_TAGS: usize = 1000;
+const MAX_FOLLOWED_USERS: usize = 100;
+const MAX_FOLLOWED_TAGS: usize = 100;
 
 pub type UpdateResult = Result<(), String>;
 

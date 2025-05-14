@@ -17,7 +17,7 @@ import AppCard from '@/components/AppCard';
 import { findApp } from '@/config/apps';
 
 // Define the character limit constant
-const MAX_MARKDOWN_LENGTH = 10000;
+const MAX_MARKDOWN_LENGTH = 1000;
 
 type ContentType = "Markdown" | "Nft" | "Shelf";
 
@@ -207,6 +207,9 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
               <div className="text-right text-xs text-muted-foreground mt-1 font-serif">
                 {content.length} / {MAX_MARKDOWN_LENGTH}
               </div>
+              <p className="text-xs text-muted-foreground mt-1 font-serif">
+                For larger content, consider uploading your markdown as an NFT.
+              </p>
             </div>
             <div className="p-4 mt-auto border-t border-border flex justify-between">
               <Button onClick={onCancel} variant="outline">Cancel</Button>

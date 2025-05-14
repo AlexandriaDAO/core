@@ -3,9 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { toast } from "sonner";
 import { clearTransactionContent } from "@/apps/Modules/shared/state/transactions/transactionSlice";
-import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
 import ContentRenderer from '@/apps/Modules/AppModules/safeRender/ContentRenderer';
-import TransactionDetails from '@/apps/Modules/AppModules/contentGrid/components/TransactionDetails';
 import { useSortedTransactions } from '@/apps/Modules/shared/state/content/contentSortUtils';
 import { Button } from "@/lib/components/button";
 import { withdraw_nft } from "@/features/nft/withdraw";
@@ -15,8 +13,9 @@ import { ContentCard } from "@/apps/Modules/AppModules/contentGrid/Card";
 import { hasWithdrawableBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import type { Transaction } from '../../shared/types/queries';
 import { TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
-import { Principal } from '@dfinity/principal';
 import { ShelvesPreloader } from "../shared/components/ShelvesPreloader";
+import { MainContentDisplayModal } from '@/apps/Modules/shared/components/MainContentDisplayModal/MainContentDisplayModal';
+import { AttachedDetailsPanel } from '@/apps/Modules/shared/components/AttachedDetailsPanel/AttachedDetailsPanel';
 
 const useAppDispatch = () => useDispatch<AppDispatch>();
 
@@ -50,18 +49,26 @@ interface GridProps {
   dataSource?: GridDataSource;
 }
 
+// Define a type for the selected content state (Transaction should be enough)
+interface SelectedContentState {
+  transaction: Transaction;
+  // Removed contentType, as it's derived from transaction
+}
+
 const Grid = ({ dataSource }: GridProps = {}) => {
   const dispatch = useAppDispatch();
 
   const contentData = useSelector((state: RootState) => state.transactions.contentData);
-  const transactions = useSelector((state: RootState) => state.transactions.transactions);
+  const transactions = useSelector((state: RootState) => state.transactions.transactions); // Ensure this is used or remove
   const { nfts, arweaveToNftId } = useSelector((state: RootState) => state.nftData);
   const { user } = useSelector((state: RootState) => state.auth);
   const { predictions } = useSelector((state: RootState) => state.arweave);
   
   const sortedTransactions = useSortedTransactions();
 
-  const [selectedContent, setSelectedContent] = useState<{ id: string; type: string, assetUrl: string } | null>(null);
+  const [selectedContent, setSelectedContent] = useState<SelectedContentState | null>(null);
+  const [isMainModalOpen, setIsMainModalOpen] = useState(false);
+  const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
   const [withdrawingStates, setWithdrawingStates] = useState<Record<string, boolean>>({});
 
   const handleRenderError = useCallback((transactionId: string) => {
@@ -102,12 +109,26 @@ const Grid = ({ dataSource }: GridProps = {}) => {
     } finally {
       setWithdrawingStates(prev => ({ ...prev, [transactionId]: false }));
     }
-  }, [arweaveToNftId, nfts, dispatch]);
+  }, [arweaveToNftId, nfts, dispatch]); // Removed 'user' as it's not directly used in this callback
 
-  const handleDialogOpenChange = useCallback((open: boolean) => {
-    if (!open) {
-      setSelectedContent(null);
-    }
+  const handleOpenMainModal = useCallback((transaction: Transaction) => {
+    setSelectedContent({ transaction });
+    setIsMainModalOpen(true);
+    setIsDetailsPanelOpen(false); // Ensure details panel is closed when a new item is opened
+  }, []);
+
+  const handleCloseMainModal = useCallback(() => {
+    setIsMainModalOpen(false);
+    setIsDetailsPanelOpen(false); // Also close details panel when main modal is closed
+    setSelectedContent(null);
+  }, []);
+
+  const handleToggleDetailsPanel = useCallback(() => {
+    setIsDetailsPanelOpen(prev => !prev);
+  }, []);
+  
+  const handleCloseDetailsPanel = useCallback(() => {
+    setIsDetailsPanelOpen(false);
   }, []);
 
   return (
@@ -115,12 +136,10 @@ const Grid = ({ dataSource }: GridProps = {}) => {
       <>
         <ContentGrid>
           {sortedTransactions.map((transaction: Transaction) => {
-            const content = contentData[transaction.id];
-            const contentType = transaction.tags.find((tag: { name: string; value: string }) => tag.name === "Content-Type")?.value || "application/epub+zip";
+            const cardContent = contentData[transaction.id];
+            // Removed contentType as it's derived within MainContentDisplayModal if needed or not used.
             
-            const hasPredictions = !!predictions[transaction.id];
-            const shouldShowBlur = hasPredictions && predictions[transaction.id]?.isPorn == true;
-
+            const currentPredictions = predictions[transaction.id];
             const nftId = arweaveToNftId[transaction.id];
             const nftData = nftId ? nfts[nftId] : undefined;
             const isOwned = !!(user && nftData?.principal === user.principal);
@@ -128,18 +147,12 @@ const Grid = ({ dataSource }: GridProps = {}) => {
               nftData.balances?.alex,
               nftData.balances?.lbry
             );
-
             const detectedContentType = nftData ? 'Nft' : 'Arweave';
-            const currentPredictions = predictions[transaction.id];
 
             return (
               <ContentGrid.Item
                 key={transaction.id}
-                onClick={() => setSelectedContent({ 
-                    id: transaction.id, 
-                    type: contentType,
-                    assetUrl: transaction?.assetUrl || ""
-                 })}
+                onClick={() => handleOpenMainModal(transaction)} // Updated onClick
                 id={transaction.id}
                 owner={transaction.owner}
                 predictions={currentPredictions}
@@ -149,22 +162,22 @@ const Grid = ({ dataSource }: GridProps = {}) => {
                 <div className="group relative w-full h-full">
                   <ContentRenderer
                     transaction={transaction}
-                    content={content}
-                    contentUrls={content?.urls || {
+                    content={cardContent}
+                    contentUrls={cardContent?.urls || {
                       thumbnailUrl: null,
                       coverUrl: null,
                       fullUrl: transaction?.assetUrl || `https://arweave.net/${transaction.id}`
                     }}
                     handleRenderError={handleRenderError}
                   />
-                  {shouldShowBlur && (
+                  {predictions[transaction.id]?.isPorn && (
                     <div className="absolute inset-0 backdrop-blur-xl bg-black/30 z-[15]">
                       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm font-medium">
                         Content Filtered
                       </div>
                     </div>
                   )}
-                  <TransactionDetails transaction={transaction} predictions={currentPredictions} />
+
                   {isOwned && canWithdraw && (
                     <Button
                       onClick={(e) => {
@@ -192,33 +205,29 @@ const Grid = ({ dataSource }: GridProps = {}) => {
           })}
         </ContentGrid>
 
-        <Dialog open={!!selectedContent} onOpenChange={handleDialogOpenChange}>
-          <DialogContent 
-            className="w-auto h-auto max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-background"
-            closeIcon={selectedContent?.type === "application/epub+zip" ? null : undefined}
-          >
-            <DialogTitle className="sr-only">
-              {selectedContent?.type.split('/')[0].toUpperCase()} Content Viewer
-            </DialogTitle>
-            
-            {selectedContent && contentData[selectedContent.id] && (
-              <div className="w-full h-full">
-                <ContentRenderer
-                  key={selectedContent.id}
-                  transaction={transactions.find((t: Transaction) => t.id === selectedContent.id)!}
-                  content={contentData[selectedContent.id]}
-                  contentUrls={contentData[selectedContent.id]?.urls || {
-                    thumbnailUrl: null,
-                    coverUrl: null,
-                    fullUrl: selectedContent.assetUrl || `https://arweave.net/${selectedContent.id}`
-                  }}
-                  inModal={true}
-                  handleRenderError={handleRenderError}
-                />
-              </div>
-            )}
-          </DialogContent>
-        </Dialog> 
+        {selectedContent && selectedContent.transaction && (
+          <>
+            <MainContentDisplayModal 
+              isOpen={isMainModalOpen}
+              onClose={handleCloseMainModal}
+              onToggleDetails={handleToggleDetailsPanel}
+              transaction={selectedContent.transaction}
+              content={contentData[selectedContent.transaction.id]}
+              contentUrls={contentData[selectedContent.transaction.id]?.urls || {
+                thumbnailUrl: null,
+                coverUrl: null,
+                fullUrl: selectedContent.transaction?.assetUrl || `https://arweave.net/${selectedContent.transaction.id}`
+              }}
+              handleRenderError={handleRenderError}
+            />
+            <AttachedDetailsPanel
+              isOpen={isDetailsPanelOpen}
+              onClose={handleCloseDetailsPanel}
+              transaction={selectedContent.transaction}
+              predictions={predictions[selectedContent.transaction.id]}
+            />
+          </>
+        )}
       </>
     </TooltipProvider>
   );

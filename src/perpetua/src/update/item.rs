@@ -1,16 +1,16 @@
 use candid::{CandidType, Deserialize};
 use std::collections::HashSet;
-use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, ShelfId, SHELF_ITEM_STEP_SIZE, Shelf};
+use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, ShelfId, SHELF_ITEM_STEP_SIZE, SHELF_METADATA, MAX_ITEMS_PER_SHELF, MAX_NFT_ID_LENGTH, MAX_MARKDOWN_LENGTH, MAX_APPEARS_IN_COUNT};
 use crate::guard::not_anon;
-use crate::auth;
-use crate::update::utils::{verify_nft_ownership, is_self_reference};
+use crate::auth::{get_shelf_parts_for_edit_mut };
+use crate::update::utils::{verify_nft_ownership};
 
 // --- Constants ---
-const MAX_USER_SHELVES: usize = 1000;
+// const MAX_USER_SHELVES: usize = 1000; // Defined in shelf.rs if needed there
 const MAX_NFT_REFERENCES: usize = 1000; // Limit for NFT_SHELVES tracking
 
 /// Input structure for adding a new item to a shelf
-#[derive(CandidType, Deserialize)]
+#[derive(CandidType, Deserialize, Clone)] // Added Clone
 pub struct AddItemInput {
     /// The content of the new item (NFT, Shelf, or other type)
     pub content: ItemContent,
@@ -31,248 +31,208 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
     
     // --- Pre-checks (outside the main SHELVES lock) ---
 
-    // 1. Check edit permissions for the parent shelf first
-    if !auth::can_edit_shelf(&shelf_id, &caller)? {
+    // 1. Check edit permissions for the parent shelf first using metadata
+    // This doesn't use the _mut auth helper yet, as we might bail early.
+    let parent_metadata = SHELF_METADATA.with(|m| m.borrow().get(&shelf_id).map(|meta| meta.clone()))
+        .ok_or_else(|| format!("Parent shelf metadata '{}' not found", shelf_id))?;
+
+    if parent_metadata.owner != caller && !parent_metadata.public_editing {
         return Err("Unauthorized: You don't have edit permissions for this shelf".to_string());
     }
     
     // 2. Validate NFT ownership if applicable (async)
     if let ItemContent::Nft(ref nft_id) = input.content {
+        // Basic NFT ID validation (moved from Shelf::insert_item)
+        if nft_id.chars().any(|c| !c.is_digit(10)) {
+            return Err("Invalid NFT ID: Contains non-digit characters.".to_string());
+        }
+        if nft_id.len() > MAX_NFT_ID_LENGTH {
+            return Err(format!("NFT ID exceeds maximum length of {} characters", MAX_NFT_ID_LENGTH));
+        }
         let is_owner = verify_nft_ownership(nft_id, caller).await?;
         if !is_owner {
             return Err("Unauthorized: You can only add NFTs that you own".to_string());
         }
     }
     
-    // 3. Validate shelf existence and prevent self-references
+    // 3. Validate shelf existence and prevent self-references if adding a shelf
     if let ItemContent::Shelf(ref nested_shelf_id) = input.content {
-        // Use immutable read for existence check
-        let exists = SHELVES.with(|s| s.borrow().contains_key(nested_shelf_id));
-        if !exists {
+        if nested_shelf_id == &shelf_id {
+            return Err("Circular reference: A shelf cannot contain itself".to_string());
+        }
+        // Check existence from SHELF_METADATA
+        let nested_exists = SHELF_METADATA.with(|m| m.borrow().contains_key(nested_shelf_id));
+        if !nested_exists {
              return Err(format!("Shelf to be added ('{}') does not exist", nested_shelf_id));
         }
 
-        if is_self_reference(&shelf_id, nested_shelf_id) {
-            return Err("Cannot add a shelf to itself".to_string());
+        // Deeper circular reference check (simplified, might need full graph traversal for complex cases)
+        let nested_shelf_content = SHELVES.with(|s| s.borrow().get(nested_shelf_id).map(|c| c.clone()))
+            .ok_or_else(|| format!("Content for shelf to be added ('{}') not found", nested_shelf_id))?;
+        
+        if nested_shelf_content.items.values().any(|item| 
+            matches!(&item.content, ItemContent::Shelf(id_in_nested) if id_in_nested == &shelf_id)
+        ) {
+            return Err(format!(
+                "Circular reference detected: Shelf '{}' already contains shelf '{}'",
+                nested_shelf_id, shelf_id
+            ));
         }
     }
 
-    // --- Prepare Updated Data (Read Phase - Immutable Borrows) ---
+    // Markdown length validation (moved from Shelf::insert_item)
+    if let ItemContent::Markdown(markdown) = &input.content {
+        if markdown.len() > MAX_MARKDOWN_LENGTH {
+             return Err(format!("Markdown content exceeds maximum length of {} characters", MAX_MARKDOWN_LENGTH));
+        }
+    }
 
-    let mut maybe_updated_nested_shelf: Option<(ShelfId, Shelf)> = None;
-    if let ItemContent::Shelf(ref nested_shelf_id) = input.content {
-        // Fetch nested shelf immutably and clone
-        let nested_shelf_opt = SHELVES.with(|s| s.borrow().get(nested_shelf_id));
-        if let Some(mut nested_shelf) = nested_shelf_opt {
-            // Modify the clone
-            if !nested_shelf.appears_in.contains(&shelf_id) {
-                if nested_shelf.appears_in.len() >= crate::storage::MAX_APPEARS_IN_COUNT {
-                    nested_shelf.appears_in.remove(0); // Remove oldest
+    // --- Main Operation using auth helper ---
+    get_shelf_parts_for_edit_mut(&shelf_id, &caller, |parent_meta, parent_content| {
+        // parent_meta.updated_at will be set by the auth helper
+
+        if parent_content.item_positions.len() >= MAX_ITEMS_PER_SHELF {
+            return Err(format!("Maximum item limit reached ({}) for shelf {}", MAX_ITEMS_PER_SHELF, parent_meta.shelf_id));
+        }
+
+        let new_id = parent_content.items.keys()
+            .max()
+            .map_or(1, |max_id| max_id + 1);
+
+        let new_item = Item {
+            id: new_id,
+            content: input.content.clone(), // Clone input content
+        };
+
+        // Insert into ShelfContent.items
+        parent_content.items.insert(new_id, new_item);
+
+        // Calculate and insert position into ShelfContent.item_positions
+        let new_position = parent_content.item_positions.calculate_position(
+            input.reference_item_id.as_ref(),
+            input.before,
+            SHELF_ITEM_STEP_SIZE
+        )?;
+        parent_content.item_positions.insert(new_id, new_position);
+
+        Ok(())
+    })?;
+
+    // --- Post-Update Side Effects (Outside main lock of parent shelf) ---
+
+    // Update appears_in for nested shelf if a shelf was added
+    if let ItemContent::Shelf(ref nested_shelf_id_added) = input.content {
+        // We need to fetch, modify, and save the *nested* shelf's metadata
+        SHELF_METADATA.with(|metadata_map_ref| {
+            let mut metadata_map = metadata_map_ref.borrow_mut();
+            if let Some(mut nested_meta) = metadata_map.get(nested_shelf_id_added).map(|m| m.clone()) {
+                if !nested_meta.appears_in.contains(&shelf_id) {
+                    if nested_meta.appears_in.len() >= MAX_APPEARS_IN_COUNT {
+                        // Potentially remove the oldest if limit is strict, or handle as error
+                        // For now, let's assume we can just add if not full, or error if strict
+                        if nested_meta.appears_in.len() >= MAX_APPEARS_IN_COUNT {
+                            // Remove the oldest one to make space
+                            nested_meta.appears_in.remove(0);
+                        }
+                    }
+                    nested_meta.appears_in.push(shelf_id.clone());
+                    nested_meta.updated_at = ic_cdk::api::time(); // Update nested shelf timestamp
+                    metadata_map.insert(nested_shelf_id_added.clone(), nested_meta);
                 }
-                nested_shelf.appears_in.push(shelf_id.clone());
-                maybe_updated_nested_shelf = Some((nested_shelf_id.clone(), nested_shelf));
+            } else {
+                // This would be an inconsistency, as we checked existence before.
+                ic_cdk::println!("ERROR: Nested shelf metadata '{}' not found during appears_in update.", nested_shelf_id_added);
             }
-            // If appears_in already contains shelf_id, no update needed for nested shelf clone
-        } else {
-            // This should ideally not happen due to the earlier existence check,
-            // but provides robustness against potential race conditions.
-            return Err(format!("Nested shelf '{}' not found during preparation phase", nested_shelf_id));
-        }
+        });
     }
 
-    // Fetch parent shelf immutably and clone
-    let mut parent_shelf = SHELVES.with(|s| s.borrow().get(&shelf_id))
-        .ok_or_else(|| format!("Parent shelf '{}' not found during preparation phase", shelf_id))?;
-
-    // --- Modify Cloned Data ---
-
-    // Generate new item ID (using the cloned parent_shelf state)
-    let new_id = parent_shelf.items.keys()
-        .max()
-        .map_or(1, |max_id| max_id + 1); // Start from 1 if empty, else increment max u32 ID
-
-    // Create the new item
-    let new_item = Item {
-        id: new_id,
-        content: input.content.clone(),
-    };
-
-    // Add the item to the *cloned* parent shelf state
-    // Assuming insert_item modifies the shelf in place and returns Result<(), String>
-    // And assuming it DOES NOT access global SHELVES
-    parent_shelf.insert_item(new_item)?; // Handles MAX_ITEMS check within the cloned struct
-
-    // Position the new item relative to the reference item if provided, using the cloned state
-    if let Some(ref_id) = input.reference_item_id {
-         // Assuming move_item modifies the shelf in place and returns Result<(), String>
-         // And assuming it DOES NOT access global SHELVES
-        parent_shelf.move_item(new_id, Some(ref_id), input.before)?; // Modifies cloned struct
-    }
-    // else: rely on insert_item's default placement within the cloned struct
-
-    // Update timestamp on the clone
-    parent_shelf.updated_at = ic_cdk::api::time();
-
-
-    // --- Write Phase (Single Mutable Borrow) ---
-    SHELVES.with(|shelves| {
-        let mut shelves_map = shelves.borrow_mut();
-
-        // Insert the updated nested shelf if it was modified
-        if let Some((nested_id, updated_nested)) = maybe_updated_nested_shelf {
-             // Ensure nested shelf still exists before overwriting (optional robustness check)
-            // if !shelves_map.contains_key(&nested_id) {
-            //     return Err(format!("Nested shelf '{}' disappeared before write phase", nested_id));
-            // }
-            shelves_map.insert(nested_id, updated_nested);
-        }
-
-        // Insert the updated parent shelf
-         // Ensure parent shelf still exists before overwriting (optional robustness check)
-        // if !shelves_map.contains_key(&shelf_id) {
-        //     return Err(format!("Parent shelf '{}' disappeared before write phase", shelf_id));
-        // }
-        shelves_map.insert(shelf_id.clone(), parent_shelf); // Insert the fully prepared parent shelf
-
-        // Explicitly specify the error type for the closure's Ok variant
-        Ok::<(), String>(()) // Indicate success for the SHELVES.with block
-    })?; // Propagate potential errors from the SHELVES block (like out of memory during insert)
-
-
-    // --- Post-Update (outside the main SHELVES lock) ---
-
-    // Update tracking for NFT references if applicable
+    // Update NFT_SHELVES tracking
     if let ItemContent::Nft(ref nft_id) = input.content {
-        NFT_SHELVES.with(|nft_shelves| {
-            let mut nft_map = nft_shelves.borrow_mut();
-            let mut shelves = nft_map.get(nft_id).unwrap_or_default();
-            
-            // Check if the shelf ID is already present
-            if !shelves.0.contains(&shelf_id) {
-                // Check the reference limit *before* adding
-                if shelves.0.len() < MAX_NFT_REFERENCES {
-                    shelves.0.push(shelf_id.clone());
-                    nft_map.insert(nft_id.to_string(), shelves);
+        NFT_SHELVES.with(|nft_shelves_map_ref| {
+            let mut nft_map = nft_shelves_map_ref.borrow_mut();
+            let mut shelves_for_nft = nft_map.get(nft_id).unwrap_or_default();
+            if !shelves_for_nft.0.contains(&shelf_id) {
+                if shelves_for_nft.0.len() < MAX_NFT_REFERENCES {
+                    shelves_for_nft.0.push(shelf_id.clone());
+                    nft_map.insert(nft_id.to_string(), shelves_for_nft);
                 } else {
-                    // Silently not adding the shelf to the NFT reference list.
-                    // ic_cdk::println!("NFT {} reference limit ({}) reached. Not adding shelf {}.", 
-                    //    nft_id, MAX_NFT_REFERENCES, shelf_id);
+                    ic_cdk::println!("NFT {} reference limit ({}) reached. Not adding shelf {}.", nft_id, MAX_NFT_REFERENCES, shelf_id);
                 }
             }
         });
     }
 
-    Ok(()) // Final success
+    Ok(())
 }
 
 /// Removes a item from an existing shelf
 /// 
 /// Only users with edit permissions can remove items.
-/// This also handles cleanup of any references if the item contained an NFT.
+/// This also handles cleanup of any references if the item contained an NFT or nested Shelf.
 #[ic_cdk::update(guard = "not_anon")]
 pub async fn remove_item_from_shelf(shelf_id: ShelfId, item_id: u32) -> Result<(), String> {
     let caller = ic_cdk::caller();
-    
-    // Check edit permissions first (outside the main logic for clarity)
-    if !auth::can_edit_shelf(&shelf_id, &caller)? {
-        return Err("Unauthorized: You don't have edit permissions for this shelf".to_string());
-    }
+    let mut removed_item_content: Option<ItemContent> = None;
 
-    // --- Perform Removal ---
-    // We need mutable access to SHELVES for potentially updating nested shelf `appears_in`
-    // and the parent shelf's items/positions.
-    
-    let mut item_content_opt: Option<ItemContent> = None;
-    let mut removal_successful = false;
+    // --- Main Operation using auth helper ---
+    get_shelf_parts_for_edit_mut(&shelf_id, &caller, |parent_meta, parent_content| {
+        // parent_meta.updated_at will be set by the auth helper
 
-    // First, modify the parent shelf
-    SHELVES.with(|shelves_refcell| {
-        let mut shelves_map = shelves_refcell.borrow_mut();
-        if let Some(mut shelf) = shelves_map.get(&shelf_id).map(|s| s.clone()) { 
-            
-            // Check if item exists before attempting removal
-            if !shelf.items.contains_key(&item_id) {
-                // Explicitly return error if item doesn't exist in the primary map
-                 return Err(format!("Item {} not found in shelf {}", item_id, shelf_id));
-            }
-
-            // Get content before removing from map
-            item_content_opt = shelf.items.get(&item_id).map(|item| item.content.clone());
-
-            // Remove from items map
-            let removed_item = shelf.items.remove(&item_id); 
-            // Remove from position tracker
-            let removed_pos = shelf.item_positions.remove(&item_id); 
-
-            // Check consistency (optional but recommended)
-            if removed_item.is_some() && removed_pos.is_none() {
-                 ic_cdk::println!("WARN: Item {} removed from items map but was missing from position tracker in shelf {}", item_id, shelf_id);
-                 // Decide if this is an error or just a warning. Let's treat as warning for now.
-            } else if removed_item.is_none() && removed_pos.is_some() {
-                 // This case means item was in tracker but not map, indicates prior inconsistency.
-                 ic_cdk::println!("WARN: Item {} removed from position tracker but was missing from items map in shelf {}", item_id, shelf_id);
-            }
-
-            // If removal from items map succeeded, update shelf and mark success
-            if removed_item.is_some() {
-                 shelf.updated_at = ic_cdk::api::time();
-                 shelves_map.insert(shelf_id.clone(), shelf); // Put modified shelf back
-                 removal_successful = true;
-                 Ok(()) // Return success from this part of the closure
-            } else {
-                 // This path means item wasn't in items map, despite check above (shouldn't happen)
-                 Err("Failed to remove item from shelf items map.".to_string()) 
-            }
-
-        } else {
-            Err(format!("Shelf {} not found", shelf_id))
+        if !parent_content.items.contains_key(&item_id) {
+            return Err(format!("Item {} not found in shelf {}", item_id, parent_meta.shelf_id));
         }
-    })?; // Propagate error from SHELVES.with
 
-    // Ensure removal was marked successful before proceeding with side effects
-    if !removal_successful {
-         // If removal failed above (e.g., shelf not found, item not found), return early.
-         // The specific error should have been propagated by the `?` operator.
-         // Adding an explicit check just in case.
-         return Err("Item removal failed or shelf not found.".to_string()); 
-    }
-
-
-    // --- Handle Side Effects (Post-Removal) ---
-    if let Some(item_content) = item_content_opt {
-        let shelf_id_ref = &shelf_id; // Borrow shelf_id
-
-        // Handle nested shelf appears_in update
-        if let ItemContent::Shelf(ref nested_shelf_id) = item_content {
-            SHELVES.with(|shelves_refcell| {
-                let mut shelves_map = shelves_refcell.borrow_mut();
-                if let Some(mut nested_shelf) = shelves_map.get(nested_shelf_id).map(|s| s.clone()) { 
-                    nested_shelf.appears_in.retain(|id| id != shelf_id_ref);
-                    shelves_map.insert(nested_shelf_id.clone(), nested_shelf);
-                }
-            });
-        }
+        // Store content for side-effects, then remove
+        removed_item_content = parent_content.items.get(&item_id).map(|item| item.content.clone());
         
-        // Handle NFT tracking update
-        if let ItemContent::Nft(ref nft_id) = item_content {
-            NFT_SHELVES.with(|nft_shelves| {
-                let mut nft_map = nft_shelves.borrow_mut();
-                if let Some(mut shelves) = nft_map.get(nft_id).map(|sv| sv.clone()) { 
-                    shelves.0.retain(|id| id != shelf_id_ref);
-                    if shelves.0.is_empty() {
-                        nft_map.remove(nft_id);
-                    } else {
-                        nft_map.insert(nft_id.to_string(), shelves);
+        let item_removed_from_map = parent_content.items.remove(&item_id).is_some();
+        let item_removed_from_pos = parent_content.item_positions.remove(&item_id).is_some();
+
+        if !item_removed_from_map && !item_removed_from_pos {
+            // Should have been caught by contains_key check above
+            return Err(format!("Item {} not found for removal in shelf {}", item_id, parent_meta.shelf_id));
+        } else if item_removed_from_map != item_removed_from_pos {
+            // Log inconsistency but proceed if at least one part was removed
+            ic_cdk::println!("WARN: Inconsistent removal for item {} in shelf {}. Map: {}, Pos: {}", 
+                             item_id, parent_meta.shelf_id, item_removed_from_map, item_removed_from_pos);
+        }
+        Ok(())
+    })?;
+
+    // --- Post-Update Side Effects (Outside main lock of parent shelf) ---
+    if let Some(content) = removed_item_content {
+        // Handle appears_in for nested shelf
+        if let ItemContent::Shelf(ref nested_shelf_id_removed) = content {
+            SHELF_METADATA.with(|metadata_map_ref| {
+                let mut metadata_map = metadata_map_ref.borrow_mut();
+                if let Some(mut nested_meta) = metadata_map.get(nested_shelf_id_removed).map(|m| m.clone()) {
+                    let initial_len = nested_meta.appears_in.len();
+                    nested_meta.appears_in.retain(|id| id != &shelf_id);
+                    if nested_meta.appears_in.len() != initial_len { // Only update if changed
+                        nested_meta.updated_at = ic_cdk::api::time();
+                        metadata_map.insert(nested_shelf_id_removed.clone(), nested_meta);
                     }
                 }
             });
         }
-    } else {
-        // This means item content wasn't retrieved, possibly because the item didn't exist initially.
-        // Log or handle as appropriate, though the initial check should prevent this.
-        ic_cdk::println!("WARN: Item content not available after removal for item_id {} in shelf {}", item_id, shelf_id);
+
+        // Handle NFT_SHELVES tracking update
+        if let ItemContent::Nft(ref nft_id) = content {
+            NFT_SHELVES.with(|nft_shelves_map_ref| {
+                let mut nft_map = nft_shelves_map_ref.borrow_mut();
+                if let Some(mut shelves_for_nft) = nft_map.get(nft_id).map(|sv| sv.clone()) { 
+                    let initial_len = shelves_for_nft.0.len();
+                    shelves_for_nft.0.retain(|id| id != &shelf_id);
+                    if shelves_for_nft.0.is_empty() {
+                        nft_map.remove(nft_id);
+                    } else if shelves_for_nft.0.len() != initial_len { // Only update if changed
+                        nft_map.insert(nft_id.to_string(), shelves_for_nft);
+                    }
+                }
+            });
+        }
     }
-        
+
     Ok(())
 }
 
@@ -284,47 +244,43 @@ pub async fn remove_item_from_shelf(shelf_id: ShelfId, item_id: u32) -> Result<(
 pub fn set_item_order(shelf_id: ShelfId, ordered_item_ids: Vec<u32>) -> Result<(), String> {
     let caller = ic_cdk::caller();
 
-    auth::get_shelf_for_edit_mut(&shelf_id, &caller, |shelf| {
-        // 1. Validation: Check if all provided IDs exist in the shelf's *items* map
-        let existing_item_ids: HashSet<u32> = shelf.items.keys().cloned().collect();
-        let input_item_ids: HashSet<u32> = ordered_item_ids.iter().cloned().collect();
+    get_shelf_parts_for_edit_mut(&shelf_id, &caller, |parent_meta, parent_content| {
+        // parent_meta.updated_at will be set by the auth helper
 
-        if input_item_ids.len() != ordered_item_ids.len() {
+        // 1. Validation: Check if all provided IDs exist in the shelf's *items* map
+        let existing_item_ids_in_content: HashSet<u32> = parent_content.items.keys().cloned().collect();
+        let input_item_ids_set: HashSet<u32> = ordered_item_ids.iter().cloned().collect();
+
+        if input_item_ids_set.len() != ordered_item_ids.len() {
             return Err("Duplicate item IDs provided in the order list.".to_string());
         }
 
-        // Check for missing IDs (IDs in shelf but not in input)
-        let missing_ids: Vec<u32> = existing_item_ids.difference(&input_item_ids).cloned().collect();
+        // Check for missing IDs (IDs in shelf content but not in input)
+        let missing_ids: Vec<u32> = existing_item_ids_in_content.difference(&input_item_ids_set).cloned().collect();
         if !missing_ids.is_empty() {
             return Err(format!(
-                "Input order is incomplete. Missing item IDs: {:?}",
-                missing_ids
+                "Input order is incomplete for shelf {}. Missing item IDs from content: {:?}",
+                parent_meta.shelf_id, missing_ids
             ));
         }
 
         // Check for extra IDs (IDs in input but not in shelf's items map)
-        let extra_ids: Vec<u32> = input_item_ids.difference(&existing_item_ids).cloned().collect();
+        let extra_ids: Vec<u32> = input_item_ids_set.difference(&existing_item_ids_in_content).cloned().collect();
         if !extra_ids.is_empty() {
             return Err(format!(
-                "Input order contains invalid item IDs not found in the shelf: {:?}",
-                extra_ids
+                "Input order for shelf {} contains invalid item IDs not found in content: {:?}",
+                parent_meta.shelf_id, extra_ids
             ));
         }
 
-        // 2. Clear existing positions using PositionTracker method
-        shelf.item_positions.clear();
+        // 2. Clear existing positions in ShelfContent.item_positions
+        parent_content.item_positions.clear();
 
-        // 3. Calculate and set new positions based on the provided order using PositionTracker method
+        // 3. Calculate and set new positions based on the provided order
         for (index, item_id) in ordered_item_ids.iter().enumerate() {
-            // Calculate position starting from STEP, increasing by STEP
-            // Using SHELF_ITEM_STEP_SIZE imported from storage
             let position = (index as f64 + 1.0) * SHELF_ITEM_STEP_SIZE; 
-            shelf.item_positions.insert(*item_id, position); // Use insert
+            parent_content.item_positions.insert(*item_id, position);
         }
-
-        // 4. Update timestamp
-        shelf.updated_at = ic_cdk::api::time();
-
         Ok(())
     })
 } 

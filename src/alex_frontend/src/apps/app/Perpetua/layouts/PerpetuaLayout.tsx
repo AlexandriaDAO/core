@@ -96,8 +96,8 @@ const PerpetuaLayout: React.FC = () => {
   const selectedShelf = useAppSelector(selectSelectedShelf);
   const currentSelectedShelfId = useAppSelector(state => state.perpetua.selectedShelfId); // Direct access for comparison
   const authUser = useAppSelector(state => state.auth.user);
-  const userPrincipal = authUser?.principal;
   const { identity } = useIdentity();
+  const userPrincipal = identity?.getPrincipal().toString();
   const currentTagFilter = useAppSelector(selectCurrentTagFilter); // Get the active tag filter
   const isCreatingShelf = useAppSelector(selectIsCreatingShelf); // Get the loading state
   
@@ -318,31 +318,36 @@ const PerpetuaLayout: React.FC = () => {
 
       return (
         <>
-          {userPrincipal && (
-            <div className="mb-4 flex justify-between items-center">
-              <Button onClick={() => goToUser(userPrincipal.toString())}>My Library</Button>
-              <ToggleGroup type="single" defaultValue={currentFeedType} value={currentFeedType} onValueChange={handleFeedTypeChange} className="w-auto">
-                <ToggleGroupItem value="recency">Recent</ToggleGroupItem>
-                <ToggleGroupItem value="random">Random</ToggleGroupItem>
-                <ToggleGroupItem value="storyline">Storyline</ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-          )}
-          {!userPrincipal && (
-             <div className="mb-4 flex justify-end items-center">
-              <ToggleGroup type="single" defaultValue={currentFeedType} value={currentFeedType} onValueChange={handleFeedTypeChange} className="w-auto">
-                <ToggleGroupItem value="recency">Recent</ToggleGroupItem>
-                <ToggleGroupItem value="random">Random</ToggleGroupItem>
-              </ToggleGroup>
-            </div>
-          )}
+          {/* Top controls */}  
+          <div className="mb-4 flex justify-between items-center">
+            {userPrincipal ? (
+              <Button onClick={() => goToUser(userPrincipal)}>My Library</Button>
+            ) : (
+              <div /> // Placeholder for alignment if needed when not logged in
+            )}
+            <ToggleGroup type="single" defaultValue={currentFeedType} value={currentFeedType} onValueChange={handleFeedTypeChange} className="w-auto">
+              <ToggleGroupItem value="recency">Recent</ToggleGroupItem>
+              <ToggleGroupItem value="random">Random</ToggleGroupItem>
+              {/* Only show Storyline if logged in, assuming it requires auth */} 
+              {userPrincipal && <ToggleGroupItem value="storyline">Storyline</ToggleGroupItem>}
+            </ToggleGroup>
+          </div>
           
+          {/* Tags Search and Popular */}  
           <div className="flex flex-col sm:flex-row gap-4 mb-4 items-start">
             <div className="flex-grow"><PopularTagsList /></div>
             <TagSearchBar />
           </div>
-          <FollowedTagsList />
-          <FollowedUsersList />
+
+          {/* Conditionally render Followed lists only if logged in */} 
+          {identity && (
+            <>
+              <FollowedTagsList />
+              <FollowedUsersList />
+            </>
+          )}
+
+          {/* Tag Filter and Shelf List */}  
           <TagFilterDisplay />
 
           {currentTagFilter ? (
@@ -352,7 +357,7 @@ const PerpetuaLayout: React.FC = () => {
               allShelves={denormalizeShelves(shelvesToDisplay)}
               personalShelves={denormalizeShelves(personalNormalizedShelves)}
               loading={isLoadingCurrentFeed}
-              onNewShelf={handleCreateShelf}
+              onNewShelf={userPrincipal ? handleCreateShelf : () => {}}
               onViewShelf={goToShelf}
               onViewOwner={goToUser}
               onLoadMore={loadMoreAction ? loadMoreAction : async () => {}}
@@ -418,11 +423,13 @@ const PerpetuaLayout: React.FC = () => {
       )}
       
       {/* Dialogs */}
-      <NewShelfDialog 
-        isOpen={isNewShelfDialogOpen}
-        onClose={() => setIsNewShelfDialogOpen(false)}
-        onSubmit={handleNewShelfSubmit}
-      />
+      {identity && (
+        <NewShelfDialog 
+          isOpen={isNewShelfDialogOpen}
+          onClose={() => setIsNewShelfDialogOpen(false)}
+          onSubmit={handleNewShelfSubmit}
+        />
+      )}
     </>
   );
 };

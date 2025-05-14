@@ -78,8 +78,9 @@ export const ShelfDetailView: React.FC<UpdatedShelfDetailViewProps> = ({
   // State for content modal
   const [viewingItemContent, setViewingItemContent] = useState<{
     itemId: number;
-    content: any;
-    transaction: Transaction | null;
+    content: any; // Keep 'any' for now, represents ItemContent variant
+    nftId?: string; // Store the Arweave ID for NFTs
+    // Removed transaction: Transaction | null;
     contentUrls?: {
       fullUrl: string;
       coverUrl: string | null;
@@ -114,23 +115,34 @@ export const ShelfDetailView: React.FC<UpdatedShelfDetailViewProps> = ({
     
     const [_, item] = itemEntry;
     
-    // For Shelf content, navigate to that shelf
+    // For Shelf content, navigate to that shelf (or handle as needed)
     if (isShelfContentSafe(item.content)) {
       if (onViewItem) onViewItem(itemId);
+      // Potentially open a different kind of modal or navigate
+      console.log("Shelf content clicked, navigating/handling...");
       return;
     }
     
-    // Only open modals for NFT content
+    // Get NFT Arweave ID if it's an NFT
     const nftId = getNftContentSafe(item.content);
-    if (nftId) {
+    
+    // Open modal for content types that should have one (NFTs primarily)
+    if (nftId) { // Only open for NFTs for now
+      console.log(`Opening modal for NFT: Item ID ${itemId}, Arweave ID ${nftId}`);
       setViewingItemContent({ 
         itemId, 
-        content: item.content,
-        transaction: null,
+        content: item.content, // The ItemContent variant (e.g., { Nft: 'arweave_id' })
+        nftId: nftId, // Store the Arweave ID
         contentUrls: generateContentUrls(item.content)
       });
+    } else {
+      // Handle clicks for other types like Markdown if needed
+      // Currently, only NFTs open the modal
+      console.log(`Content type clicked (Item ID ${itemId}) does not open standard modal.`);
+      // If Markdown should open *something*, add logic here.
+      // If onViewItem should be called for non-NFTs/Shelves, call it here.
+      // if (onViewItem) onViewItem(itemId); 
     }
-    // For all other content types including Markdown, don't open a modal
   };
 
   const handleAddItemClick = () => {

@@ -17,7 +17,8 @@ import {
 // --- Backend Tuple Types ---
 // These might not match the generated .did.ts function signatures exactly
 type BackendTagPopularityKeyTuple = [bigint, string];
-type BackendTagShelfAssociationKeyTuple = [string, string];
+// type BackendTagShelfAssociationKeyTuple = [string, string]; // Not used by getShelvesByTag directly
+type BackendTagShelfCreationTimelineKeyTuple = [string, string, bigint]; // Defined for TagShelfCreationTimelineKey
 
 // --- Query Error Type --- (REMOVED - Imported from types file)
 // type QueryError = any;
@@ -166,43 +167,44 @@ export async function getShelvesByTag(
   try {
     const actor = await getPerpetuaActorInstance();
     
-    let cursorOpt: [] | [BackendTagShelfAssociationKeyTuple] = []; // Use tuple type
+    let cursorOpt: [] | [BackendTagShelfCreationTimelineKeyTuple] = []; 
     if (params.cursor && typeof params.cursor === 'string') {
       try {
-        const parsedTuple = JSON.parse(params.cursor);
-         if (Array.isArray(parsedTuple) && parsedTuple.length === 2) {
-           cursorOpt = [parsedTuple as BackendTagShelfAssociationKeyTuple]; // Assert tuple type
-         } else {
-          throw new Error('Parsed cursor is not a tuple of length 2');
-         }
+        // Expecting a JSON string of [tag, shelf_id, reversed_created_at_string]
+        const parsedArr = JSON.parse(params.cursor) as [string, string, string]; 
+        if (Array.isArray(parsedArr) && parsedArr.length === 3) {
+            cursorOpt = [[parsedArr[0], parsedArr[1], BigInt(parsedArr[2])]]; 
+        } else {
+            throw new Error("Parsed cursor is not an array of length 3 for TagShelfCreationTimelineKey");
+        }
       } catch (e) {
-        console.error("Error parsing TagShelfAssociationKey cursor:", e);
-        return { Err: "Invalid cursor format" };
+        console.error("Error parsing TagShelfCreationTimelineKey cursor:", e);
+        return { Err: "Invalid cursor format" as any }; 
       }
     }
-    
-    // Use 'any' for paginationInput to bypass specific generated type issues
+        
     const paginationInput: any = {
       cursor: cursorOpt,
       limit: BigInt(params.limit)
     };
     
-    // Backend Result type expected: Result_9 = { Ok: T9 } | { Err: QueryError }; T9 = { items: Array<string>, limit: bigint, next_cursor: [] | [[string, string]] }
     const result = await actor.get_shelves_by_tag(tag, paginationInput);
 
     if ("Ok" in result && result.Ok) {
       const paginatedResult = result.Ok;
-      const items = paginatedResult.items;
+      const items: string[] = paginatedResult.items.map(shelf => shelf.shelf_id);
       
-      const nextCursorOpt = paginatedResult.next_cursor;
-      let nextCursorString: TagShelfAssociationKeyCursor | undefined = undefined;
-       // Backend returns Option<[text, text]>
+      const nextCursorOpt = paginatedResult.next_cursor; // This is Option<TagShelfCreationTimelineKey>
+      let nextCursorString: TagShelfAssociationKeyCursor | undefined = undefined; // TODO: This should be string | undefined for TagShelfCreationTimelineKey
+      
       if (nextCursorOpt && nextCursorOpt.length > 0 && nextCursorOpt[0]) {
         try {
-          const cursorTuple = nextCursorOpt[0]; // This should be [string, string]
-          nextCursorString = JSON.stringify(cursorTuple);
+          const cursorObject = nextCursorOpt[0]; // This is TagShelfCreationTimelineKey {tag:string, shelf_id:string, reversed_created_at:bigint}
+          // Serialize to [string, string, string] for JSON stringification
+          const cursorToSerialize: [string, string, string] = [cursorObject.tag, cursorObject.shelf_id, cursorObject.reversed_created_at.toString()];
+          nextCursorString = JSON.stringify(cursorToSerialize);
         } catch (e) {
-          console.error("Error stringifying next TagShelfAssociationKey cursor:", e);
+          console.error("Error stringifying next TagShelfCreationTimelineKey cursor:", e);
         }
       }
 
@@ -217,11 +219,11 @@ export async function getShelvesByTag(
       return { Err: result.Err };
     } else {
       console.error('Unexpected response format from getShelvesByTag:', result);
-      return { Err: "Unexpected response format" };
+      return { Err: "Unexpected response format" as any };
     }
   } catch (error) {
     console.error(`Error in getShelvesByTag (${tag}):`, error);
-    return { Err: `Failed to load shelves for tag ${tag}` };
+    return { Err: `Failed to load shelves for tag ${tag}` as any };
   }
 }
 
