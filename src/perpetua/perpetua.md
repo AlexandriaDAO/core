@@ -1,5 +1,4 @@
 ```
-// Perpetua/ Frontend
 
 Perpetua/
 ├── features/
@@ -7,12 +6,12 @@ Perpetua/
 │   │   ├── components/
 │   │   │   ├── BaseShelfList.tsx (448 lines)
 │   │   │   ├── ContentDisplays.tsx (92 lines)
-│   │   │   ├── NftDisplay.tsx (152 lines)
+│   │   │   ├── NftDisplay.tsx (138 lines)
 │   │   │   ├── ShelfBlogView.tsx (191 lines)
 │   │   │   ├── ShelfCard.tsx (315 lines)
-│   │   │   ├── ShelfContentCard.tsx (190 lines)
-│   │   │   ├── ShelfContentModal.tsx (79 lines)
-│   │   │   ├── ShelfDetailView.tsx (233 lines)
+│   │   │   ├── ShelfContentCard.tsx (194 lines)
+│   │   │   ├── ShelfContentModal.tsx (111 lines)
+│   │   │   ├── ShelfDetailView.tsx (245 lines)
 │   │   │   ├── ShelfEmptyView.tsx (32 lines)
 │   │   │   ├── ShelfGridView.tsx (57 lines)
 │   │   │   ├── ShelfViewControls.tsx (251 lines)
@@ -25,11 +24,11 @@ Perpetua/
 │   │       └── ShelfViewUtils.ts (32 lines)
 │   ├── following/
 │   │   ├── components/
-│   │   │   ├── FollowedTagsList.tsx (102 lines)
+│   │   │   ├── FollowedTagsList.tsx (93 lines)
 │   │   │   ├── FollowedUserBadge.tsx (56 lines)
-│   │   │   └── FollowedUsersList.tsx (77 lines)
+│   │   │   └── FollowedUsersList.tsx (80 lines)
 │   │   └── hooks/
-│   │       └── useFollowStatus.ts (160 lines)
+│   │       └── useFollowStatus.ts (193 lines)
 │   ├── shared/
 │   │   └── reordering/
 │   │       ├── components/
@@ -52,7 +51,7 @@ Perpetua/
 │   │       └── ShelfInformationDialog.tsx (144 lines)
 │   ├── shelf-management/
 │   │   ├── components/
-│   │   │   ├── InlineItemCreator.tsx (347 lines)
+│   │   │   ├── InlineItemCreator.tsx (350 lines)
 │   │   │   ├── NewShelf.tsx (154 lines)
 │   │   │   ├── RemoveItemButton.tsx (98 lines)
 │   │   │   ├── ShelfContent.tsx (90 lines)
@@ -97,7 +96,7 @@ Perpetua/
 │   └── useContentPermissions.ts (66 lines)
 ├── index.tsx (21 lines)
 ├── layouts/
-│   └── PerpetuaLayout.tsx (321 lines)
+│   └── PerpetuaLayout.tsx (437 lines)
 ├── routes.ts (119 lines)
 ├── state/
 │   ├── cache/
@@ -107,18 +106,19 @@ Perpetua/
 │   │   ├── usePerpetuaActions.ts (123 lines)
 │   │   └── usePerpetuaSelectors.ts (48 lines)
 │   ├── index.ts (41 lines)
-│   ├── perpetuaSlice.ts (817 lines)
+│   ├── perpetuaSlice.ts (983 lines)
 │   ├── services/
 │   │   ├── followService.ts (276 lines)
 │   │   ├── index.ts (7 lines)
 │   │   ├── itemService.ts (209 lines)
 │   │   ├── serviceTypes.ts (39 lines)
-│   │   ├── shelfService.ts (260 lines)
-│   │   └── tagService.ts (306 lines)
+│   │   ├── shelfService.ts (332 lines)
+│   │   └── tagService.ts (308 lines)
 │   ├── thunks/
+│   │   ├── followThunks.ts (91 lines)
 │   │   ├── index.ts (6 lines)
 │   │   ├── itemThunks.ts (117 lines)
-│   │   ├── queryThunks.ts (268 lines)
+│   │   ├── queryThunks.ts (326 lines)
 │   │   ├── reorderThunks.ts (128 lines)
 │   │   ├── shelfThunks.ts (125 lines)
 ├── types/
@@ -159,13 +159,15 @@ perpetua/
 
 
 
-
-
-
-
-
 - Probably next step is to make the display with the leading NFTs, and the hover with what's inside.
+- We're going to need to be able to add an item in a certain spot. Not just the top/bottom.
+- Adding markdown items is not optimistic.
+- The nsfw test blocks the mint button but not the bookmark button while the nsfw mode is off.
 
+
+
+V2
+- Appears in for NFTs (separate nft metadata cansiter?)
 
 
 
@@ -187,7 +189,7 @@ perpetua/
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal qfjpl-beqtj-w4vfq-kbi42-cajph-nkqod-odqoo-akdw4-yji3u-irw6u-gqe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal cdbs2-5n54e-clnl2-fqcqs-oastc-zx3gj-w5jrl-3w5q6-gyqk5-xn3px-oqe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

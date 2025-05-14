@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Card, CardContent } from "@/lib/components/card";
 import { Badge } from "@/lib/components/badge";
-import { Folder, ChevronDown, Calendar, User, Tag, Clock, Info, Copy, Check, Link, Globe, Lock, PlusCircle, Loader2, UserPlus } from "lucide-react";
+import { Tag, Globe, Lock, PlusCircle, Loader2, UserPlus, Eye } from "lucide-react";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Button } from "@/lib/components/button";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
@@ -10,8 +10,8 @@ import { followTag } from '@/apps/app/Perpetua/state/services/followService';
 import { toast } from 'sonner';
 import { Principal } from '@dfinity/principal';
 import { UnifiedCardActions } from '@/apps/Modules/shared/components/UnifiedCardActions/UnifiedCardActions';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/store';
 import { useUsername } from '@/hooks/useUsername';
 import { useFollowStatus } from '../../following/hooks/useFollowStatus';
 
@@ -46,47 +46,35 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
   isPublic = false
 }) => {
   const [isFooterExpanded, setIsFooterExpanded] = useState(false);
-  const itemCount = Object.keys(shelf.items).length;
+  const itemCount = shelf.items ? shelf.items.length : 0;
   
-  // State to track which tag is currently being followed
-  const [followingTag, setFollowingTag] = useState<string | null>(null);
-
-  // Get current user principal to determine ownership
+  const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+
+  const [followingTag, setFollowingTag] = useState<string | null>(null);
   const currentUserPrincipal = user?.principal;
 
   const ownerPrincipalString = useMemo(() => {
     if (shelf.owner instanceof Principal) {
       return shelf.owner.toText();
     }
-    // If not a Principal, it should be a string based on ShelfPublic type.
-    // String() handles if it's already a string or converts other primitives.
-    // Fallback to empty string if shelf.owner is unexpectedly null/undefined.
     return String(shelf.owner || ''); 
   }, [shelf.owner]);
 
   const { username: ownerUsername, isLoading: isLoadingOwnerUsername } = useUsername(ownerPrincipalString);
 
-  // Format dates if they exist
   const formatDate = (timestamp: bigint | undefined) => {
     if (!timestamp) return 'N/A';
     try {
-      // Convert bigint to number for date formatting
-      // Divide by 1,000,000 to convert nanoseconds to milliseconds if necessary
-      // or use as is if already in milliseconds
       const timeInMillis = Number(timestamp) > 1000000000000000 
         ? Number(timestamp) / 1000000 
         : Number(timestamp);
       const date = new Date(timeInMillis);
-      
-      // Check if date is valid before formatting
       if (isNaN(date.getTime())) {
         return `Timestamp: ${timestamp.toString()}`;
       }
-      
       return format(date, 'MMM dd, yyyy HH:mm');
     } catch (error) {
-      // If conversion fails, at least show the raw timestamp
       return `Timestamp: ${timestamp.toString()}`;
     }
   };
@@ -94,59 +82,45 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
   const createdAt = formatDate(shelf.created_at);
   const updatedAt = formatDate(shelf.updated_at);
 
-  // --- Tag Follow Handler ---
   const handleFollowTag = useCallback(async (tag: string, event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent card click when clicking tag follow button
-    setFollowingTag(tag); // Set loading state for this specific tag
+    event.stopPropagation();
+    setFollowingTag(tag);
     try {
       const result = await followTag(tag);
-
       if ('Ok' in result && result.Ok === true) {
         toast.success(`Followed tag: ${tag}`);
-        // TODO: Update local/global state later to visually indicate followed status
-        // e.g., disable button, change icon to Check, or sync with a global followed tags list
       } else if ('Err' in result) {
-        // Check if the error indicates the tag was already followed
         if (result.Err.toLowerCase().includes('already following')) {
           toast.info(`Already following tag: ${tag}`);
         } else {
-          // Handle other backend errors
           toast.error(`Failed to follow tag: ${result.Err}`);
         }
       } 
-      // No action needed if result is { Ok: false } which shouldn't happen with the current service logic,
-      // but added robustness in case the service changes.
-
     } catch (error) {
-      // Catch frontend/network errors during the service call
       console.error("Error following tag:", error);
       toast.error("An unexpected error occurred while trying to follow the tag.");
     } finally {
-      setFollowingTag(null); // Clear loading state regardless of outcome
+      setFollowingTag(null);
     }
-  }, []); // No dependencies needed for now
+  }, []);
 
-  // Copy states
   const [copiedId, setCopiedId] = useState(false);
   const [copiedOwner, setCopiedOwner] = useState(false);
   const [copiedCreated, setCopiedCreated] = useState(false);
   const [copiedUpdated, setCopiedUpdated] = useState(false);
   
-  // Format ID for display
   const formatId = (id: string) => {
     if (!id) return '';
     if (id.length <= 8) return id;
     return `${id.substring(0, 3)}...${id.substring(id.length - 3)}`;
   };
   
-  // Handle copy functionality
   const handleCopy = (text: string, setCopied: React.Dispatch<React.SetStateAction<boolean>>) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
   
-  // Determine ownership
   const ownerPrincipal = shelf.owner instanceof Principal ? shelf.owner : undefined;
   const isOwnedByUser = !!(ownerPrincipal && currentUserPrincipal && ownerPrincipal.toText() === currentUserPrincipal);
 
@@ -159,16 +133,13 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
   const [followActionInProgress, setFollowActionInProgress] = useState(false);
 
   const handleToggleFollowOwner = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation();
     if (!ownerPrincipalString || isOwnedByUser) return;
-
     setFollowActionInProgress(true);
     try {
       await toggleFollowUser(ownerPrincipalString);
-      // Toasts are handled by the useFollowStatus hook
     } catch (error) {
       console.error("Error toggling follow for shelf owner:", error);
-      // Errors are also handled by the hook, but toast here for specific failure if needed
     } finally {
       setFollowActionInProgress(false);
     }
@@ -205,7 +176,6 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
                     <div className="text-sm text-muted-foreground mt-1 mb-2 line-clamp-2 font-serif">{shelf.description[0]}</div>
                   )}
 
-                  {/* Owner Display with Follow Button */}
                   {ownerPrincipalString && (
                     <div className="flex items-center justify-center text-xs text-muted-foreground mb-2 font-serif">
                       <span 
@@ -238,9 +208,9 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
                     </div>
                   )}
 
-                  {/* Basic info badges displayed on the card itself */}
                   <div className="mt-1 flex flex-wrap gap-1.5 justify-center">
                     <Badge variant="secondary" className="text-xs font-serif">
+                      <Eye className="h-3 w-3 mr-1" />
                       {itemCount} {itemCount === 1 ? 'item' : 'items'}
                     </Badge>
                     
@@ -255,31 +225,28 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
                     )}
                   </div>
 
-                  {/* Render tags below other badges if they exist */}
                   {shelf.tags && shelf.tags.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5 justify-center items-center">
                       {shelf.tags.map((tag, index) => (
                         <div key={index} className="flex items-center gap-1">
-                          {/* Tag Badge (now not clickable) */}
                           <Badge 
                             variant="outline" 
                             className="text-[11px] px-1.5 py-px bg-gray-50 dark:bg-gray-800 flex items-center gap-0.5 font-serif cursor-default"
                           >
                             <Tag className="h-2.5 w-2.5 text-gray-500" /> {tag}
                           </Badge>
-                          {/* Follow Button */}
                           <Button
                             variant="ghost" 
                             className="h-5 w-5 p-0 rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
                             onClick={(e) => handleFollowTag(tag, e)}
-                            disabled={followingTag === tag} // Disable while this tag is being followed
+                            disabled={followingTag === tag}
                             title={`Follow tag: ${tag}`}
                             aria-label={`Follow tag ${tag}`}
                           >
                             {followingTag === tag ? (
-                              <Loader2 className="h-3 w-3 animate-spin" /> // Loading spinner
+                              <Loader2 className="h-3 w-3 animate-spin" />
                             ) : (
-                              <PlusCircle className="h-4 w-4" /> // Plus icon
+                              <PlusCircle className="h-4 w-4" />
                             )}
                           </Button>
                         </div>
@@ -293,7 +260,6 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
         </CardContent>
       </Card>
       
-      {/* Expanded footer with detailed information - Owner badge removed */}
       {isFooterExpanded && (
         <div 
           className="absolute bottom-0 left-0 right-0 w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg z-10 p-4 rounded-b-lg animate-in fade-in duration-200"
