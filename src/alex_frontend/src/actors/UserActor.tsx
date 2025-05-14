@@ -9,11 +9,11 @@ import { useIdentity } from "@/hooks/useIdentity";
 import { UserContext } from "@/contexts/actors";
 import { useActorErrorHandler } from "@/hooks/actors";
 import { AnonymousIdentity } from "@dfinity/agent";
-import useAuth from "@/hooks/useAuth";
+// import useAuth from "@/hooks/useAuth";
 
-const isLocal = process.env.DFX_NETWORK !== 'ic';
+// const isLocal = process.env.DFX_NETWORK !== 'ic';
 export default function UserActor({ children }: { children: ReactNode }) {
-	const {provider} = useAuth();
+	// const {provider} = useAuth();
 	const { identity, clear, isInitializing, isLoggingIn } = useIdentity();
     const { errorToast, handleRequest , handleResponse, handleResponseError} = useActorErrorHandler(clear);
 
@@ -61,7 +61,7 @@ export default function UserActor({ children }: { children: ReactNode }) {
 			// for mainnet no need to pass this option
 
 			// httpAgentOptions={{
-			// 	host: provider === 'NFID' ? "https://ic0.app" : undefined
+			// 	host: provider === 'NFID' ? "https://icp-api.io" : undefined
 			// }}
 
 			canisterId={canisterId}

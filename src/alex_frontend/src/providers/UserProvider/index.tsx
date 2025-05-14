@@ -1,5 +1,6 @@
 import React from "react";
 import IIUserProvider from "./IIUserProvider";
+import OISYUserProvider from "./OISYUserProvider";
 import { AssetManagerActor, UserActor } from "@/actors";
 // import EthUserProvider from "./EthUserProvider";
 import useAuth from "@/hooks/useAuth";
@@ -23,6 +24,15 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     )
 
     // if (provider === 'SOL') return <SolUserProvider>{children}</SolUserProvider>;
+
+    if (provider === 'OISY') return (
+        <UserActor>
+            <AssetManagerActor>
+                <OISYUserProvider>{children}</OISYUserProvider>
+            </AssetManagerActor>
+        </UserActor>
+    )
+
 
     return <> {children} </>;
 }

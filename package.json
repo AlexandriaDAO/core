@@ -170,6 +170,8 @@
 
     "ic-mops": "^1.0.1",
 
+    "ic-use-siwo-identity": "file:ic-use-siwo-identity-0.1.0.tgz",
+
     "ic-use-actor": "^0.1.0",
 
     "ic-use-internet-identity": "file:ic-use-internet-identity-0.2.0.tgz",

@@ -4,6 +4,7 @@ import useAuth from "@/hooks/useAuth";
 // import ETHProcessor from "./ETHProcessor";
 import IIProcessor from "./IIProcessor";
 import NFIDProcessor from "./NFIDProcessor";
+import OISYProcessor from "./OISYProcessor";
 
 const Processors = () => {
   const { provider } = useAuth();
@@ -12,6 +13,7 @@ const Processors = () => {
       {provider && <>
         {provider === "II" && <IIProcessor />}
         {provider === "NFID" && <NFIDProcessor />}
+        {provider === "OISY" && <OISYProcessor />}
       </>}
 
       {provider && <Separator className="my-4" />}
@@ -24,6 +26,7 @@ const Processors = () => {
         {/* Show all processors that aren't currently selected */}
         {provider !== "II" && <IIProcessor />}
         {provider !== "NFID" && <NFIDProcessor />}
+        {provider !== "OISY" && <OISYProcessor />}
         {/* {provider !== "ETH" && <ETHProcessor />} */}
       </div>
     </div>
