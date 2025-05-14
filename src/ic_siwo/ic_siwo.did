@@ -1,0 +1,81 @@
+type Challenge = record {
+  created_at : nat64;
+  nonce : text;
+  expires_at : nat64;
+};
+type ChallengeError = variant {
+  InvalidSignature;
+  ChallengeExpired;
+  ChallengeInvalid;
+  ChallengeNotFound;
+  InvalidPublicKey : text;
+  SignatureVerificationFailed;
+  TooManyChallenges;
+};
+type Delegation = record {
+  pubkey : blob;
+  targets : opt vec principal;
+  expiration : nat64;
+};
+type Icrc21ConsentInfo = record {
+  metadata : Icrc21ConsentMessageMetadata;
+  consent_message : Icrc21ConsentMessage;
+};
+type Icrc21ConsentMessage = variant {
+  FieldsDisplayMessage : record {
+    fields : vec record { text; text };
+    intent : text;
+  };
+  GenericDisplayMessage : text;
+};
+type Icrc21ConsentMessageMetadata = record {
+  utc_offset_minutes : opt int16;
+  language : text;
+};
+type Icrc21ConsentMessageRequest = record {
+  arg : blob;
+  method : text;
+  user_preferences : Icrc21ConsentMessageSpec;
+};
+type Icrc21ConsentMessageSpec = record {
+  metadata : Icrc21ConsentMessageMetadata;
+  device_spec : opt Icrc21DeviceSpec;
+};
+type Icrc21DeviceSpec = variant { GenericDisplay; FieldsDisplay };
+type Icrc21Error = variant {
+  GenericError : record { description : text; error_code : nat };
+  InsufficientPayment : Icrc21ErrorInfo;
+  UnsupportedCanisterCall : Icrc21ErrorInfo;
+  ConsentMessageUnavailable : Icrc21ErrorInfo;
+};
+type Icrc21ErrorInfo = record { description : text };
+type LoginDetails = record { user_canister_pubkey : blob; expiration : nat64 };
+type Result = variant { Ok : principal; Err : text };
+type Result_1 = variant { Ok : blob; Err : text };
+type Result_2 = variant { Ok : Icrc21ConsentInfo; Err : Icrc21Error };
+type Result_3 = variant { Ok : Challenge; Err : ChallengeError };
+type Result_4 = variant { Ok : SignedDelegation; Err : text };
+type Result_5 = variant { Ok : LoginDetails; Err : text };
+type SettingsInput = record {
+  uri : text;
+  challenge_expires_in : opt nat64;
+  domain : text;
+  statement : opt text;
+  scheme : opt text;
+  salt : text;
+  session_expires_in : opt nat64;
+  targets : opt vec text;
+};
+type SignedDelegation = record { signature : blob; delegation : Delegation };
+service : (SettingsInput) -> {
+  get_caller_oisy_principal : () -> (Result) query;
+  get_ic_principal : (principal) -> (Result_1) query;
+  get_oisy_principal : (principal) -> (Result) query;
+  icrc21_canister_call_consent_message : (Icrc21ConsentMessageRequest) -> (
+      Result_2,
+    );
+  siwo_challenge : (principal) -> (Result_3);
+  siwo_get_delegation : (principal, blob, nat64) -> (Result_4) query;
+  siwo_login : (blob, blob, text) -> (Result_5);
+  whoami : () -> (principal) query;
+}
