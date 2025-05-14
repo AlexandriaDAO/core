@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import IIProvider from "./IIProvider";
+import OISYProvider from "./OISYProvider";
 // import EthProvider from "./EthProvider";
 import AuthContext, { Authenticator } from "@/contexts/AuthContext";
 // import SolProvider from "./SolProvider";
@@ -43,7 +44,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	return (
 		<AuthContext.Provider value={{ provider, setProvider }}>
 			<IIProvider>
-				{children}
+				<OISYProvider>
+					{children}
+				</OISYProvider>
 			</IIProvider>
 		</AuthContext.Provider>
 	);

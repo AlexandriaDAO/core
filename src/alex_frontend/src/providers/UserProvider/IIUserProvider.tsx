@@ -1,6 +1,8 @@
 import { setUser } from "@/features/auth/authSlice";
+import getCanister from "@/features/auth/thunks/getCanister";
 import login from "@/features/login/thunks/login";
 import { useUser } from "@/hooks/actors";
+import { useAssetManager } from "@/hooks/actors";
 import { useIdentity } from "@/hooks/useIdentity";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -14,9 +16,10 @@ const IIUserProvider: React.FC<IIUserProviderProps> = ({ children }) => {
 	// const {identity, isInitializing, isLoggingIn, loginStatus, loginError, clear} = useInternetIdentity();
 	const {identity, isInitializing} = useIdentity();
     const {actor} = useUser();
+    const {actor: assetManagerActor} = useAssetManager();
 
     const dispatch = useAppDispatch();
-    const {user} = useAppSelector(state=>state.auth);
+    const {user, canister} = useAppSelector(state=>state.auth);
 
     // Handle authentication state changes and user synchronization
     useEffect(()=>{
@@ -82,6 +85,20 @@ const IIUserProvider: React.FC<IIUserProviderProps> = ({ children }) => {
     //         }
     //     };
     // }, [isLoggingIn, loginStatus, dispatch]);
+
+
+
+
+    // fetch authenticated user's canister
+    useEffect(()=>{
+        // Wait for the asset manager actor to be available before proceeding
+        if(!assetManagerActor || !user) return;
+
+        // Attempt to login only if we don't have user data in the store
+        // This prevents unnecessary login attempts if the user is already authenticated
+        dispatch(getCanister({actor: assetManagerActor}));
+    }, [assetManagerActor, user]);
+
 
 	return <> {children} </>
 }

@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-export type Authenticator = 'II' | 'NFID' | 'ETH' | 'SOL';
+export type Authenticator = 'II' | 'NFID' | 'OISY' | 'ETH' | 'SOL';
 
 interface AuthContextProps {
 	provider: Authenticator;

@@ -56,7 +56,7 @@ export function ListNft({ id }: ListNftProps) {
 
 	return (
 		<Dialog open={open}>
-			<DialogTrigger>
+			<DialogTrigger asChild>
 				<Button onClick={() => setOpen(true)} variant="primary" scale="sm">Sell NFT</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]" closeIcon={<Button

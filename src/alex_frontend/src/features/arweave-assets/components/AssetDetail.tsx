@@ -11,7 +11,6 @@ import {
 	DialogTitle,
 } from "@/lib/components/dialog";
 import { Clock, Download, ExternalLink, FileType, Trash2, X } from "lucide-react";
-import { useAssetManager } from "@/hooks/useAssetManager";
 import { getFileTypeInfo, getFileTypeName } from "@/features/upload/constants";
 import Copy from "@/components/Copy";
 import { selectAsset } from "../arweaveAssetsSlice";
@@ -28,7 +27,7 @@ interface AssetDetailProps {
 
 const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 	const dispatch = useAppDispatch();
-	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
+	const { canister } = useAppSelector(state => state.auth);
 	const {pulling, pullError, deleting, deleteError} = useAppSelector((state) => state.arweaveAssets);
 	const { assets: icpAssets } = useAppSelector((state) => state.icpAssets);
 
@@ -101,11 +100,11 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 
 	// Generate canister asset URL
 	const getCanisterAssetUrl = () => {
-		if (!userAssetCanister) return "";
+		if (!canister) return "";
 		const isLocal = !window.location.host.endsWith("ic0.app");
 		const baseUrl = isLocal
-			? `http://${userAssetCanister}.localhost:4943`
-			: `https://${userAssetCanister}.ic0.app`;
+			? `http://${canister}.localhost:4943`
+			: `https://${canister}.ic0.app`;
 		return `${baseUrl}/arweave/${asset.id}`;
 	};
 
@@ -390,7 +389,7 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 
 				{/* Fixed footer for actions */}
 				<div className="border-t border-gray-200 dark:border-gray-800 p-4 bg-gray-50 dark:bg-gray-900 sticky bottom-0 z-10">
-					{userAssetCanister && !isAvailableInCanister(asset) && (
+					{canister && !isAvailableInCanister(asset) && (
 						<div className="bg-info/25 rounded p-3 shadow-sm flex items-center gap-3">
 							<div className="p-1.5 rounded text-info-foreground bg-info/40 flex-shrink-0">
 								<Download className="h-5 w-5" />
@@ -424,7 +423,7 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 						</div>
 					)}
 
-					{userAssetCanister && isAvailableInCanister(asset) && (
+					{canister && isAvailableInCanister(asset) && (
 						<div className="bg-constructive/10 rounded border border-constructive/50 p-3 flex justify-between items-center shadow-sm">
 							<div className="flex items-center gap-3">
 								<div className="bg-constructive/20 p-1.5 rounded text-constructive">

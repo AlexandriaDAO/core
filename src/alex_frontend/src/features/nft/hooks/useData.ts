@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { TransactionStatusType } from "../types";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { useLocation } from "react-router";
 
 const useData = (id: string, status: TransactionStatusType) => {
+	const {canister} = useAppSelector(state=>state.auth);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [data, setData] = useState<Uint8Array | null>(null);
 	// const [progress, setProgress] = useState(0);
 	const progress = useRef(0);
+	const location = useLocation();
 
 
 	// fetch data using arweaveClient
@@ -94,11 +98,28 @@ const useData = (id: string, status: TransactionStatusType) => {
 				setLoading(true);
 				progress.current = 0;
 
-				// throw new Error("test");
+				let response = null;
 
-				const response = await fetch('https://arweave.net/' + id);
-				if(!response.ok){
-					throw new Error("Failed to fetch Asset data");
+				const isImporiumNftsRoute = location.pathname.includes('/app/imporium/nfts');
+
+				try {
+					if (!isImporiumNftsRoute) {
+						throw new Error("Not on imporium NFTs route, skipping canister fetch");
+					}
+
+					if(!canister) throw new Error("No user canister found");
+
+					response = await fetch(`http://${canister}.localhost:4943/arweave/${id}`);
+
+					if(!response.ok){
+						throw new Error("Asset not found in canister");
+					}
+				} catch (error) {
+					console.warn("Failed to fetch Asset from canister", error);
+					response = await fetch('https://arweave.net/' + id);
+					if(!response.ok){
+						throw new Error("Failed to fetch Asset data from arweave");
+					}
 				}
 
 				// Get the total size if available

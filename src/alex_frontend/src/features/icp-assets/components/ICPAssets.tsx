@@ -1,19 +1,19 @@
 import React, { useEffect } from "react";
 import Item from "./Item";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useInternetIdentity } from "ic-use-internet-identity";
+import { useIdentity } from "@/hooks/useIdentity";
 import { useAssetManager } from "@/hooks/useAssetManager";
 import fetch from "@/features/icp-assets/thunks/fetch";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 
 const ICPAssets: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
-	const { identity } = useInternetIdentity();
+	const { canister } = useAppSelector((state) => state.auth);
+	const { identity } = useIdentity();
 	const { assets, loading } = useAppSelector((state) => state.icpAssets);
 
 	const assetManager = useAssetManager({
-		canisterId: userAssetCanister ?? undefined,
+		canisterId: canister ?? undefined,
 		identity
 	});
 

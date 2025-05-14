@@ -15,6 +15,7 @@ export interface SerializedUser {
 // Define the interface for our auth state
 export interface AuthState {
 	user: SerializedUser | null,
+	canister: string | null,
 
 	initialized: boolean,
 
@@ -28,6 +29,7 @@ export interface AuthState {
 // Define the initial state using the AuthState interface
 const initialState: AuthState = {
 	user: null,
+	canister: null,
 
 	initialized: false,
 

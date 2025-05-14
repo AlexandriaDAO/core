@@ -39,7 +39,7 @@ const AssetTable: React.FC<AssetTableProps> = ({ assetManager }) => {
 	const { assets: arweaveAssets, loading, pulling, error, selected } = useAppSelector(state => state.arweaveAssets);
 	const { assets: icpAssets } = useAppSelector((state) => state.icpAssets);
 
-	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
+	const { canister } = useAppSelector((state) => state.auth);
 
 	useEffect(() => {
 		dispatch(fetchUserArweaveAssets());
@@ -162,7 +162,7 @@ const AssetTable: React.FC<AssetTableProps> = ({ assetManager }) => {
 									</span>
 								</TableCell>
 								<TableCell>
-									{!userAssetCanister ? (
+									{!canister ? (
 										<Alert title="No Canister" className="px-2 py-0 m-0 flex justify-start items-center rounded-full" icon={CloudOff} children={null}></Alert>
 									) : pulling === asset.id ? (
 										<Alert variant="info" title="Pulling" className="px-2 py-0 m-0 flex justify-start items-center rounded-full" icon={Ellipsis} children={null}></Alert>
@@ -200,7 +200,7 @@ const AssetTable: React.FC<AssetTableProps> = ({ assetManager }) => {
 											</a>
 										</Button>
 
-										{userAssetCanister && !isAvailableInCanister(asset) && (
+										{canister && !isAvailableInCanister(asset) && (
 											<Button
 												onClick={() =>
 													handlePullAsset(asset)
@@ -214,7 +214,7 @@ const AssetTable: React.FC<AssetTableProps> = ({ assetManager }) => {
 											</Button>
 										)}
 
-										{!userAssetCanister && (
+										{!canister && (
 											<Button
 												variant="link"
 												scale="sm"

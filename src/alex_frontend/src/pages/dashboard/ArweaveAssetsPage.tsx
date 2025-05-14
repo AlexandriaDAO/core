@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import AssetTable from "@/features/arweave-assets/components/AssetTable";
 import AssetDetail from "@/features/arweave-assets/components/AssetDetail";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { getCallerAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 import { Button } from "@/lib/components/button";
 import { Alert } from "@/components/Alert";
 import { Link } from "react-router";
@@ -10,29 +9,25 @@ import { Download, RefreshCw } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { fetchUserArweaveAssets } from "@/features/arweave-assets/thunks/fetchUserArweaveAssets";
 import { useAssetManager } from "@/hooks/useAssetManager";
-import { useInternetIdentity } from "ic-use-internet-identity/dist";
+import { useIdentity } from "@/hooks/useIdentity";
 import fetch from "@/features/icp-assets/thunks/fetch";
 import { pullAllAssets } from "@/features/arweave-assets/thunks/pullAllAssets";
 
 function ArweaveAssetsPage() {
 	const dispatch = useAppDispatch();
 	const { error, selected, pulling, pullError, loading } = useAppSelector(state => state.arweaveAssets);
-	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
-	const { identity } = useInternetIdentity();
+	const { canister } = useAppSelector(state => state.auth);
+	const { identity } = useIdentity();
 
 	const icpAssets = useAppSelector((state) => state.icpAssets.assets);
 	const arweaveAssets = useAppSelector((state) => state.arweaveAssets.assets);
 
 	const assetManager = useAssetManager({
-		canisterId: userAssetCanister ?? undefined,
+		canisterId: canister ?? undefined,
 		identity,
 		maxSingleFileSize: 1_900_000,
 		maxChunkSize: 500_000,
 	});
-
-	useEffect(() => {
-		dispatch(getCallerAssetCanister());
-	}, []);
 
 	useEffect(() => {
 		if (!assetManager) return;
@@ -62,7 +57,7 @@ function ArweaveAssetsPage() {
 				</Button>
 			</div>
 
-			{userAssetCanister ? (
+			{canister ? (
 				<Alert 
 					title="Why Pull Assets to Your Canister?"
 					className="mb-6"

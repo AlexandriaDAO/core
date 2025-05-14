@@ -172,6 +172,8 @@
 
     "ic-mops": "^1.0.1",
 
+    "ic-use-siwo-identity": "file:ic-use-siwo-identity-0.1.0.tgz",
+
     "ic-use-actor": "^0.1.0",
 
     "ic-use-internet-identity": "file:ic-use-internet-identity-0.2.0.tgz",
@@ -287,6 +289,10 @@
   "devDependencies": {
 
     "@babel/core": "^7.25.2",
+
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
+
+    "@babel/plugin-transform-runtime": "^7.27.1",
 
     "@babel/preset-env": "^7.25.4",
 

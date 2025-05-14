@@ -38,7 +38,7 @@ const Attributes: React.FC<AttributesProps> = ({
 					{/* <Copy text={owner} size="sm"/> */}
 					<div className="flex justify-between items-center gap-2">
 						<CopyIcon className="w-4 h-4 hover:opacity-70 cursor-pointer" onClick={() => copyToClipboard(owner)} />
-						<Link to={`/app/imporium/listings/${owner}`}>
+						<Link to={`/app/imporium/marketplace?search=${owner}`}>
 							<ExternalLink className="w-4 h-4 hover:opacity-70 cursor-pointer" />
 						</Link>
 					</div>
