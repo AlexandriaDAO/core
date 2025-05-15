@@ -5,6 +5,7 @@ import {
   setLoading,
   setError,
   setTotalNfts,
+  updateNftAppearsIn,
 } from "./nftDataSlice";
 import { RootState } from "@/store";
 import { nft_manager } from "../../../../../../../declarations/nft_manager";
@@ -19,6 +20,7 @@ import {
   TokenType,
   TokenAdapter,
 } from "../../adapters/TokenAdapter";
+import { perpetua } from "../../../../../../../declarations/perpetua";
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -707,6 +709,29 @@ export const fetchNFTBatch = createAsyncThunk<void, void, { state: RootState }>(
       }
     } catch (error) {
       console.error("Error fetching NFT batch:", error);
+    }
+  }
+);
+
+export const fetchShelvesContainingNft = createAsyncThunk<
+  void,
+  { nftId: string; arweaveId: string },
+  { state: RootState }
+>(
+  "nftData/fetchShelvesContainingNft",
+  async ({ nftId, arweaveId }, { dispatch }) => {
+    console.log(`[fetchShelvesContainingNft thunk] Called with nftId (storeKey/TokenId): ${nftId}, arweaveId: ${arweaveId}`);
+    try {
+      // Pass nftId (the numeric Token ID) to the backend call, as per successful manual test.
+      const appearsInResult: string[] = await perpetua.get_shelves_containing_nft(nftId);
+      console.log(`[fetchShelvesContainingNft thunk] Received from backend for Token ID ${nftId}:`, appearsInResult);
+      
+      dispatch(updateNftAppearsIn({ nftId, appearsIn: appearsInResult }));
+      console.log(`[fetchShelvesContainingNft thunk] Dispatched updateNftAppearsIn with nftId (storeKey/TokenId): ${nftId}, appearsIn:`, appearsInResult);
+    } catch (error) {
+      console.error(`[fetchShelvesContainingNft thunk] Error for Token ID ${nftId}:`, error);
+      // Optionally dispatch an error action to update the state
+      // dispatch(setError(error.message)); // Example
     }
   }
 );

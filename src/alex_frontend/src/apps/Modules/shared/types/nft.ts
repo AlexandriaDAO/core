@@ -7,6 +7,7 @@ export interface NFTData {
     lbry: string;
   };
   orderIndex?: number;
+  appears_in?: string[];
 }
 
 export interface NFTBalances {

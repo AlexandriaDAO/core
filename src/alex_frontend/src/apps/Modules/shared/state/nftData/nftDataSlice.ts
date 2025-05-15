@@ -30,6 +30,17 @@ const nftDataSlice = createSlice({
         state.arweaveToNftId[nft.arweaveId] = tokenId;
       });
     },
+    updateNftAppearsIn: (state, action: PayloadAction<{ nftId: string; appearsIn: string[] }>) => {
+      const { nftId, appearsIn } = action.payload;
+      console.log(`[updateNftAppearsIn reducer] Called with nftId (storeKey): ${nftId}, appearsIn:`, appearsIn);
+      if (state.nfts[nftId]) {
+        console.log(`[updateNftAppearsIn reducer] NFT found in state for storeKey ${nftId}. Old appears_in:`, state.nfts[nftId].appears_in);
+        state.nfts[nftId].appears_in = appearsIn;
+        console.log(`[updateNftAppearsIn reducer] NFT updated for storeKey ${nftId}. New appears_in:`, state.nfts[nftId].appears_in);
+      } else {
+        console.warn(`[updateNftAppearsIn reducer] NFT with storeKey ${nftId} not found in state.nfts. Cannot update appears_in.`);
+      }
+    },
     updateNftBalances: (state, action: PayloadAction<NFTBalances>) => {
       const { tokenId, alex, lbry } = action.payload;
       if (state.nfts[tokenId]) {
@@ -73,6 +84,7 @@ const nftDataSlice = createSlice({
 
 export const { 
   setNFTs, 
+  updateNftAppearsIn,
   updateNftBalances,
   setLoading, 
   setError, 

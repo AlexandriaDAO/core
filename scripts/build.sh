@@ -211,7 +211,7 @@ cargo build --release --target wasm32-unknown-unknown --package ic_siwo
 candid-extractor target/wasm32-unknown-unknown/release/ic_siwo.wasm > src/ic_siwo/ic_siwo.did
 
 # create and deploy sign in with ethereum provider
-dfx canister create ic_siwo --specified-id p3dep-3iaaa-aaaap-qp2kq-cai
+dfx canister create ic_siwo --specified-id odkrm-viaaa-aaaap-qp2oq-cai
 
 dfx deploy ic_siwo --argument $'(
     record {

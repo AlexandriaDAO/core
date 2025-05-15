@@ -3,7 +3,7 @@ dfx canister snapshot list alex_frontend --network ic
 
 # # Load snapshot
 # dfx canister stop alex_frontend --network ic
-# dfx canister snapshot load alex_frontend 000000000000000d0000000001f0531c0101 --network ic
+# dfx canister snapshot load alex_frontend 000000000000000e0000000001f0531c0101 --network ic
 # dfx canister start alex_frontend --network ic
 
 set -x

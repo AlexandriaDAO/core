@@ -156,10 +156,16 @@ perpetua/
 ```
 
 
-
+- Appears-in feature for NFTs?!
 
 
 - Probably next step is to make the display with the leading NFTs, and the hover with what's inside.
+  - This turned out to be near impossible, so we're going to try another way.
+  - 
+
+
+
+
 - We're going to need to be able to add an item in a certain spot. Not just the top/bottom.
 - Adding markdown items is not optimistic.
 - The nsfw test blocks the mint button but not the bookmark button while the nsfw mode is off.
@@ -189,7 +195,7 @@ V2
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal cdbs2-5n54e-clnl2-fqcqs-oastc-zx3gj-w5jrl-3w5q6-gyqk5-xn3px-oqe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 3ztps-i5ti5-rtzs5-uqur6-grz7s-rg7i7-yhylz-4ybfx-o4sir-qhmjo-hqe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

@@ -104,7 +104,7 @@
       "type": "rust",
       "package": "ic_siwo",
       "candid": "src/ic_siwo/ic_siwo.did",
-      "specified_id": "p3dep-3iaaa-aaaap-qp2kq-cai"
+      "specified_id": "odkrm-viaaa-aaaap-qp2oq-cai"
     },
     "ic_siwe_provider": {
       "type": "custom",

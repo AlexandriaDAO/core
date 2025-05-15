@@ -10,7 +10,7 @@ const OISYProvider: React.FC<OISYProviderProps> = ({ children }) => {
 	return (
 		<SiwoIdentityProvider
 			idlFactory={idlFactory}
-			canisterId="p3dep-3iaaa-aaaap-qp2kq-cai"
+			canisterId="odkrm-viaaa-aaaap-qp2oq-cai"
 			httpAgentOptions={{ host: "https://icp-api.io" }}
 		>
 			{children}
