@@ -169,7 +169,7 @@ perpetua/
 
 
 
-
+- Filter by tag doesn't seem to work on mainnet.
 - Items on perpetua display load.
 
 

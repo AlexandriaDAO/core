@@ -224,9 +224,7 @@ const PerpetuaLayout: React.FC = () => {
   
   // Effect to load initial feed data when feed type changes
   useEffect(() => {
-    if (currentFeedType === 'random' && randomFeedShelves.length === 0 && !isLoadingRandomFeed) {
-      dispatch(loadRandomFeed({ limit: 20 })); // Default limit, adjust as needed
-    } else if (currentFeedType === 'storyline' && storylineFeedShelves.length === 0 && !isLoadingStorylineFeed && identity) {
+    if (currentFeedType === 'storyline' && storylineFeedShelves.length === 0 && !isLoadingStorylineFeed && identity) {
       // For storyline, ensure identity is available as it might be needed for personalization,
       // even if not directly passed to the current thunk, it's good practice for feed thunks.
       // The current loadStorylineFeed thunk doesn't require principal in its direct args,
@@ -240,12 +238,10 @@ const PerpetuaLayout: React.FC = () => {
   }, [
     currentFeedType, 
     dispatch, 
-    randomFeedShelves.length, 
     storylineFeedShelves.length, 
     identity, 
     recencyPublicShelves.length, 
     isLoadingRecencyPublic,
-    isLoadingRandomFeed,
     isLoadingStorylineFeed
   ]);
   
@@ -259,7 +255,12 @@ const PerpetuaLayout: React.FC = () => {
   
   const handleFeedTypeChange = (value: string) => {
     if (value) { // ToggleGroup might pass empty string if nothing is active, ensure value exists
-        dispatch(setCurrentFeedType(value as FeedType));
+        const newFeedType = value as FeedType;
+        dispatch(setCurrentFeedType(newFeedType));
+        if (newFeedType === 'random') {
+          // Unconditionally load random feed when selected
+          dispatch(loadRandomFeed({ limit: 20 })); 
+        }
     }
   };
 

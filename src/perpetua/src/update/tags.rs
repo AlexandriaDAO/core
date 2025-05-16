@@ -77,7 +77,7 @@ pub fn remove_tag_from_shelf(input: TagOperationInput) -> Result<(), String> {
     })
 }
 
-fn add_tag_to_metadata_maps(shelf_id: &ShelfId, normalized_tag: &NormalizedTag, shelf_created_at: u64, now: u64) -> Result<(), String> {
+pub(super) fn add_tag_to_metadata_maps(shelf_id: &ShelfId, normalized_tag: &NormalizedTag, shelf_created_at: u64, now: u64) -> Result<(), String> {
     TAG_METADATA.with(|map_ref| {
         let mut map = map_ref.borrow_mut();
         let mut entry = map.get(normalized_tag).unwrap_or_default();

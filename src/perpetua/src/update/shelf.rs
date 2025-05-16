@@ -1,6 +1,7 @@
 use candid::{CandidType, Deserialize};
 use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE, ShelfId, GlobalTimelineItemValue, ShelfMetadata, ShelfContent, SHELF_METADATA};
 use crate::guard::not_anon;
+use super::tags::add_tag_to_metadata_maps;
 
 // --- Constants ---
 const MAX_USER_SHELVES: usize = 1000;
@@ -109,6 +110,17 @@ pub async fn store_shelf(
     // The caller (e.g., frontend) is responsible for making subsequent
     // add_tag_to_shelf calls for the initial_tags if needed. 
     // We return the shelf_id and the normalized initial tags for this purpose.
+
+    // MODIFICATION: Call add_tag_to_metadata_maps for each tag
+    // shelf_metadata.tags are already normalized by create_shelf
+    for tag_to_associate in &shelf_metadata.tags {
+        // The 'now' timestamp here refers to the shelf creation time.
+        // add_tag_to_metadata_maps uses its 'now' param for last_association_timestamp etc.
+        // For initial creation, using shelf_metadata.created_at for both 'now' and 'shelf_created_at' in add_tag_to_metadata_maps call
+        // or more accurately, 'now' (shelf creation time) for both.
+        add_tag_to_metadata_maps(&shelf_id, tag_to_associate, shelf_metadata.created_at, now)
+            .map_err(|e| format!("Failed to associate tag '{}': {}", tag_to_associate, e))?;
+    }
 
     // Returning just the shelf_id as per original function signature change in .did
     Ok(shelf_id) 
