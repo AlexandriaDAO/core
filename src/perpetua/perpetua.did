@@ -98,7 +98,6 @@ type TagShelfCreationTimelineKey = record {
 service : {
   add_item_to_shelf : (text, AddItemInput) -> (Result);
   add_tag_to_shelf : (TagOperationInput) -> (Result);
-  debug_trigger_refresh_random_candidates : () -> (Result);
   follow_tag : (text) -> (Result);
   follow_user : (principal) -> (Result);
   get_followed_tags_feed : (CursorPaginationInput) -> (Result_1) query;

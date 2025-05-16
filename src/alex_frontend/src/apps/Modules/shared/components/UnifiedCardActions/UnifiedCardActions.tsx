@@ -66,11 +66,15 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
 
   // --- Determine Action Availability ---
 
-  // Can Add to Shelf: Only requires user to be logged in
-  const canAddToShelf = isLoggedIn;
+  // Condition for an item being potentially mintable (unowned NFT or Arweave)
+  const conditionsMetForPotentialMint = !isOwned && (contentType === 'Nft' || contentType === 'Arweave');
+
+  // Can Add to Shelf: User must be logged in.
+  // If the item is potentially mintable, it must also be safe for minting.
+  const canAddToShelf = isLoggedIn && (!conditionsMetForPotentialMint || isSafeForMinting);
 
   // Condition for showing the direct mint button
-  const canDirectMint = isLoggedIn && !isOwned && (contentType === 'Nft' || contentType === 'Arweave') && isSafeForMinting;
+  const canDirectMint = isLoggedIn && conditionsMetForPotentialMint && isSafeForMinting;
 
   // Removed logic for canRemoveItem, canInteractWithFollow, currentlyFollowingOwner, showAnyAction, showSeparator1
 

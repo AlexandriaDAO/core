@@ -720,7 +720,6 @@ export const fetchShelvesContainingNft = createAsyncThunk<
 >(
   "nftData/fetchShelvesContainingNft",
   async ({ nftId, arweaveId }, { dispatch }) => {
-    console.log(`[fetchShelvesContainingNft thunk] Called with nftId (storeKey/TokenId): ${nftId}, arweaveId: ${arweaveId}`);
     try {
       // Pass nftId (the numeric Token ID) to the backend call, as per successful manual test.
       const appearsInResult: string[] = await perpetua.get_shelves_containing_nft(nftId);

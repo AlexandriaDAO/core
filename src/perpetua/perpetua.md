@@ -8,7 +8,7 @@ Perpetua/
 │   │   │   ├── ContentDisplays.tsx (92 lines)
 │   │   │   ├── NftDisplay.tsx (138 lines)
 │   │   │   ├── ShelfBlogView.tsx (191 lines)
-│   │   │   ├── ShelfCard.tsx (315 lines)
+│   │   │   ├── ShelfCard.tsx (281 lines)
 │   │   │   ├── ShelfContentCard.tsx (194 lines)
 │   │   │   ├── ShelfContentModal.tsx (111 lines)
 │   │   │   ├── ShelfDetailView.tsx (245 lines)
@@ -21,7 +21,8 @@ Perpetua/
 │   │   │   ├── index.ts (1 lines)
 │   │   │   └── useNftData.ts (156 lines)
 │   │   └── utils/
-│   │       └── ShelfViewUtils.ts (32 lines)
+│   │       ├── ShelfViewUtils.ts (32 lines)
+│   │       └── itemUtils.ts (47 lines)
 │   ├── following/
 │   │   ├── components/
 │   │   │   ├── FollowedTagsList.tsx (93 lines)
@@ -125,55 +126,60 @@ Perpetua/
 │   ├── reordering.types.ts (69 lines)
 │   └── shelf.types.ts (77 lines)
 └── utils.tsx (128 lines)
+Syllogos/
+└── index.tsx (27 lines)
 
 
 // perpetua/ backend.
 perpetua/
-├── Cargo.toml (20 lines)
-├── perpetua.did (151 lines)
-├── perpetua.md (273 lines)
+├── Cargo.toml (23 lines)
+├── perpetua.did (133 lines)
+├── perpetua.md (207 lines)
+├── scalability_report.md (180 lines)
 └── src/
-    ├── auth.rs (169 lines)
+    ├── auth.rs (172 lines)
     ├── guard.rs (11 lines)
-    ├── lib.rs (82 lines)
+    ├── lib.rs (71 lines)
     ├── ordering.rs (542 lines)
     ├── query/
-    │   ├── backups.rs (129 lines)
-    │   ├── follows.rs (280 lines)
-    │   └── shelves.rs (618 lines)
-    ├── storage.rs (692 lines)
+    │   ├── follows.rs (300 lines)
+    │   └── shelves.rs (800 lines)
+    ├── storage/
+    │   ├── common_types.rs (5 lines)
+    │   ├── follow_storage.rs (52 lines)
+    │   ├── mod.rs (92 lines)
+    │   ├── nft_storage.rs (32 lines)
+    │   ├── random_feed_storage.rs (86 lines)
+    │   ├── shelf_storage.rs (417 lines)
+    │   ├── tag_storage.rs (161 lines)
+    │   └── user_storage.rs (81 lines)
     ├── types.rs (86 lines)
     ├── update/
-    │   ├── access.rs (34 lines)
-    │   ├── follow.rs (132 lines)
-    │   ├── item.rs (335 lines)
+    │   ├── access.rs (104 lines)
+    │   ├── debug.rs (10 lines)
+    │   ├── follow.rs (131 lines)
+    │   ├── item.rs (286 lines)
     │   ├── profile.rs (119 lines)
     │   ├── restore.rs (128 lines)
-    │   ├── shelf.rs (126 lines)
-    │   ├── tags.rs (324 lines)
+    │   ├── shelf.rs (170 lines)
+    │   ├── tags.rs (184 lines)
     │   └── utils.rs (101 lines)
     └── utils.rs (33 lines)
 ```
 
 
-- Appears-in feature for NFTs?!
 
 
-- Probably next step is to make the display with the leading NFTs, and the hover with what's inside.
-  - This turned out to be near impossible, so we're going to try another way.
-  - 
+- Items on perpetua display load.
 
 
 
 
 - We're going to need to be able to add an item in a certain spot. Not just the top/bottom.
 - Adding markdown items is not optimistic.
-- The nsfw test blocks the mint button but not the bookmark button while the nsfw mode is off.
 
 
 
-V2
-- Appears in for NFTs (separate nft metadata cansiter?)
 
 
 

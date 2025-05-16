@@ -56,23 +56,13 @@
 **`unfollow_tag(tag_to_unfollow)`**
 *   Max Storage Impact: `NormalizedTagSet` capped at `MAX_FOLLOWED_TAGS` (now 100).
 
-**`debug_trigger_refresh_random_candidates()`**
-*   Avg Compute: Very high cost - iterates all shelf IDs from `SHELVES` (now `ShelfContent` map) or `SHELF_METADATA` to select candidates. If values are read during iteration, it's now `ShelfContent` or `ShelfMetadata`, which are smaller than the old composite `Shelf`.
-*   Max Compute: Extremely high cost if millions of shelves exist. **Major compute scalability concern.** Storage impact for the candidate list itself is fixed (~50KB).
-*   Data Structures Used: `FOLLOWED_TAGS (Principal -> BTreeSet<NormalizedTag>)`
-*   Logic Summary: Fetches the set of normalized tags followed by the caller. The number of tags a user can follow is capped at `MAX_FOLLOWED_TAGS` (now 100).
-*   Avg Compute & Time: Low. 1 `FOLLOWED_TAGS` lookup + deserialization of one user's `NormalizedTagSet`. Cost proportional to number of tags followed by the user (`T_f_user`), up to 100.
-*   Max Compute & Time: Low. Deserializing a set of 100 tags is minimal.
-*   Scalability: Good. Performance depends on the number of tags followed by the individual user, which is capped at a low number.
-*   Failure Scenarios: Unlikely due to the cap.
-
 ---
 
 **Key Concerns (Simplified):**
 *   **Large `ShelfContent` Rewrites:** Operations modifying items or their order within a shelf require rewriting the entire `ShelfContent` object. This is costly if `ShelfContent` has many items (e.g., max 500 items), but the cost is now isolated to content and does not include metadata.
     *   **Potential Failure Scenario:** If a `ShelfContent` object is very large (e.g., 500 items with substantial individual data), any operation like adding, removing, or reordering items could hit instruction limits for the update call due to the cost of deserializing, modifying (including complex `PositionTracker` updates for many items), and serializing the entire large `ShelfContent`.
-*   **Full Iteration:** `debug_trigger_refresh_random_candidates` iterating all shelves (metadata or content) is not scalable.
-    *   **Potential Failure Scenario:** If the canister stores millions of shelves, iterating through all shelf IDs (from `SHELF_METADATA` or `SHELVES` keys) to perform reservoir sampling will consume a massive number of instructions, likely exceeding the per-call limit and trapping the canister. This makes the feature unusable at scale.
+*   **Full Iteration:** ~~`debug_trigger_refresh_random_candidates` iterating all shelves (metadata or content) is not scalable.~~
+    *   **Potential Failure Scenario:** ~~If the canister stores millions of shelves, iterating through all shelf IDs (from `SHELF_METADATA` or `SHELVES` keys) to perform reservoir sampling will consume a massive number of instructions, likely exceeding the per-call limit and trapping the canister. This makes the feature unusable at scale.~~
 
 
 ## Query Functions
@@ -105,8 +95,13 @@
 **`get_tags_with_prefix(prefix: String, cursor: Option<String>, limit: u64) -> Page<String>`**
 *   Scalability: Excellent.
 
-**`get_shuffled_by_hour_feed(seed: u64) -> Vec<ShelfPublic>` (No pagination in DID)**
-*   Scalability: Good for reasonable `M` (number of shelves returned). Relies on `refresh_random_shelf_candidates`. Each shelf requires loading metadata and content separately.
+**`get_shuffled_by_hour_feed(limit_input: u64) -> Vec<ShelfPublic>`**
+*   Data Structures Used: `GLOBAL_TIMELINE`, `SHELF_METADATA`, `SHELVES`
+*   Logic Summary: Fetches the latest `RANDOM_FEED_WINDOW_SIZE` (e.g., 200) shelf IDs from `GLOBAL_TIMELINE`. For each, loads `ShelfMetadata` and `ShelfContent`. Shuffles this list using an hourly deterministic seed and returns the top `limit_input` shelves. All shelves are considered, `public_editing` flag is not used for filtering this feed.
+*   Avg Compute & Time: Moderate. Involves iterating up to `RANDOM_FEED_WINDOW_SIZE` items from the timeline, `2 * RANDOM_FEED_WINDOW_SIZE` map lookups (metadata and content), and shuffling. The cost is bounded by `RANDOM_FEED_WINDOW_SIZE`.
+*   Max Compute & Time: Same as average, as operations are on a fixed-size window.
+*   Scalability: Good. Performance is independent of the total number of shelves in the canister, depending only on `RANDOM_FEED_WINDOW_SIZE` and `limit_input`.
+*   Failure Scenarios: Low. If `GLOBAL_TIMELINE` is empty or has fewer items than requested, it will return fewer items or an empty list, which is gracefully handled.
 
 **`get_shelf_items(shelf_id: String, cursor: Option<u32>, limit: u64) -> Page<Item>`**
 *   Scalability: **Addressed/Improved.** Loads only `ShelfContent`, avoiding metadata deserialization if only items are needed.
@@ -171,7 +166,7 @@
     *   **Potential Failure Scenario:** When a user with many shelves (e.g., 1000) requests a deep page (e.g., page 40 of 50, offset 780), the backend still deserializes the entire list of 1000 shelf IDs and their timestamps/order, then internally skips 780 of them. This leads to progressively slower response times for deeper pages as the wasted computation increases, negatively impacting UX for browsing far into large collections.
     *   **Recommendation:** Primary hit is initial load. Less critical than other prior issues.
 
-5. **`get_public_shelves_by_tag` Scalability:**
+5 **`get_public_shelves_by_tag` Scalability:**
     *   **Function Affected:** `get_public_shelves_by_tag`.
     *   **Concern:** Still loads `ShelfMetadata` for all matching shelves, then potentially `ShelfContent`. Popular tags can still be an issue.
     *   **Potential Failure Scenario:** If a tag is extremely popular (e.g., associated with 10,000+ shelves), this unpaginated query will attempt to load metadata for all of them, then content for all public ones, and assemble a potentially huge `Vec<ShelfPublic>`. This will almost certainly exceed canister instruction limits, causing the call to trap and making the endpoint unusable for such popular tags.

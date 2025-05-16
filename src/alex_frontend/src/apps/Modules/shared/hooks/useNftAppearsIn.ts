@@ -9,9 +9,6 @@ export const useNftAppearsIn = (nft: NFTData | null | undefined) => {
   const arweaveIdFromProp = nft?.arweaveId;
   const [fetchInitiatedForArweaveId, setFetchInitiatedForArweaveId] = useState<string | null>(null);
 
-  console.log('[useNftAppearsIn] Hook called. NFT prop:', nft);
-  console.log('[useNftAppearsIn] arweaveIdFromProp:', arweaveIdFromProp);
-
   const { appearsIn, nftStoreKey } = useSelector((state: RootState) => {
     if (!arweaveIdFromProp) {
       console.log('[useNftAppearsIn useSelector] No arweaveIdFromProp, returning undefineds');
@@ -21,17 +18,12 @@ export const useNftAppearsIn = (nft: NFTData | null | undefined) => {
     const storeKey = state.nftData.arweaveToNftId[arweaveIdFromProp];
     const appears_in = storeKey ? state.nftData.nfts[storeKey]?.appears_in : undefined;
     
-    console.log(`[useNftAppearsIn useSelector] arweaveId: ${arweaveIdFromProp}, Found storeKey: ${storeKey}, Selected appears_in:`, appears_in);
     return { appearsIn: appears_in, nftStoreKey: storeKey };
   });
 
-  console.log(`[useNftAppearsIn] Data from useSelector - nftStoreKey: ${nftStoreKey}, appearsIn:`, appearsIn);
-
   useEffect(() => {
-    console.log(`[useNftAppearsIn useEffect] Evaluating. arweaveIdFromProp: ${arweaveIdFromProp}, nftStoreKey: ${nftStoreKey}, typeof appearsIn: ${typeof appearsIn}, fetchInitiatedForArweaveId: ${fetchInitiatedForArweaveId}`);
     
     if (arweaveIdFromProp && nftStoreKey && (typeof appearsIn === 'undefined' || fetchInitiatedForArweaveId !== arweaveIdFromProp)) {
-      console.log(`[useNftAppearsIn useEffect] Dispatching fetchShelvesContainingNft with nftId (storeKey): ${nftStoreKey}, arweaveId: ${arweaveIdFromProp}`);
       dispatch(fetchShelvesContainingNft({ nftId: nftStoreKey, arweaveId: arweaveIdFromProp }));
       setFetchInitiatedForArweaveId(arweaveIdFromProp);
     } else if (arweaveIdFromProp && !nftStoreKey) {

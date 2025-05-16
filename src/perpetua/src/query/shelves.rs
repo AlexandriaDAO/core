@@ -425,8 +425,11 @@ fn derive_seed_from_period_id(period_id: u64) -> [u8; 32] {
     seed
 }
 
+// Define constant for the new approach
+const RANDOM_FEED_WINDOW_SIZE: usize = 200; // Number of recent items to consider for shuffling
+
 /// Returns a list of shelves shuffled deterministically based on the current hour.
-/// This now uses a pre-populated list of candidates.
+/// This samples from a recent window of public shelves.
 #[ic_cdk::query]
 pub fn get_shuffled_by_hour_feed(
     limit_input: u64
@@ -441,39 +444,40 @@ pub fn get_shuffled_by_hour_feed(
     let seed = derive_seed_from_period_id(hour_period_id);
     let mut rng = ChaCha20Rng::from_seed(seed);
 
-    RANDOM_SHELF_CANDIDATES.with(|candidates_map_ref| {
-        let candidates_map = candidates_map_ref.borrow();
-        
-        let mut candidate_shelf_ids: Vec<ShelfId> = candidates_map.iter().map(|(_, shelf_id)| shelf_id.clone()).collect();
-        
-        if candidate_shelf_ids.is_empty() {
-            ic_cdk::println!("No candidates available for shuffled feed.");
-            return Ok(Vec::new());
-        }
+    let mut candidate_shelves: Vec<ShelfPublic> = Vec::with_capacity(RANDOM_FEED_WINDOW_SIZE);
 
-        candidate_shelf_ids.shuffle(&mut rng);
-        let final_ids: Vec<ShelfId> = candidate_shelf_ids.into_iter().take(limit_usize).collect();
-        
-        SHELF_METADATA.with(|meta_map_ref| {
-            SHELVES.with(|content_map_ref| {
-                let meta_map = meta_map_ref.borrow();
-                let content_map = content_map_ref.borrow();
-                let result_shelves: Vec<ShelfPublic> = final_ids
-                    .iter()
-                    .filter_map(|id| {
-                        match (meta_map.get(id).map(|m|m.clone()), content_map.get(id).map(|c|c.clone())) {
-                            (Some(meta), Some(content)) => Some(ShelfPublic::from_parts(&meta, &content)),
-                            _ => {
-                                ic_cdk::println!("Warning: Missing metadata or content for shelf ID {} in get_shuffled_by_hour_feed.", id);
-                                None
-                            }
+    GLOBAL_TIMELINE.with(|timeline_ref_cell| {
+        SHELF_METADATA.with(|metadata_ref_cell| {
+            SHELVES.with(|content_ref_cell| {
+                let timeline = timeline_ref_cell.borrow();
+                let metadata_map = metadata_ref_cell.borrow();
+                let content_map = content_ref_cell.borrow();
+
+                for (_timestamp, timeline_item) in timeline.iter().rev() { // Iterate newest first
+                    if candidate_shelves.len() >= RANDOM_FEED_WINDOW_SIZE {
+                        break;
+                    }
+
+                    if let Some(metadata) = metadata_map.get(&timeline_item.shelf_id).map(|v| v.clone()) {
+                        if let Some(content) = content_map.get(&timeline_item.shelf_id).map(|v| v.clone()) {
+                            candidate_shelves.push(ShelfPublic::from_parts(&metadata, &content));
                         }
-                    })
-                    .collect();
-                Ok(result_shelves)
+                    }
+                }
             })
         })
-    })
+    });
+
+    if candidate_shelves.is_empty() {
+        ic_cdk::println!("No candidates found for shuffled feed from recent items.");
+        return Ok(Vec::new());
+    }
+
+    candidate_shelves.shuffle(&mut rng);
+    
+    let result_shelves: Vec<ShelfPublic> = candidate_shelves.into_iter().take(limit_usize).collect();
+    
+    Ok(result_shelves)
 }
 
 #[ic_cdk::query(guard = "not_anon")]

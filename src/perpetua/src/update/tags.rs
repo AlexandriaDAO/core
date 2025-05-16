@@ -95,7 +95,7 @@ fn add_tag_to_metadata_maps(shelf_id: &ShelfId, normalized_tag: &NormalizedTag, 
     });
     
     SHELF_TAG_ASSOCIATIONS.with(|map_ref| {
-        map_ref.borrow_mut().insert(ShelfTagAssociationKey(shelf_id.clone(), normalized_tag.clone()), ());
+        map_ref.borrow_mut().insert(ShelfTagAssociationKey { shelf_id: shelf_id.clone(), tag: normalized_tag.clone() }, ());
     });
 
     TAG_METADATA.with(|meta_map_ref|{
@@ -152,7 +152,7 @@ fn remove_tag_from_metadata_maps(shelf_id: &ShelfId, normalized_tag: &Normalized
     });
 
     SHELF_TAG_ASSOCIATIONS.with(|map_ref| {
-        map_ref.borrow_mut().remove(&ShelfTagAssociationKey(shelf_id.clone(), normalized_tag.clone()));
+        map_ref.borrow_mut().remove(&ShelfTagAssociationKey { shelf_id: shelf_id.clone(), tag: normalized_tag.clone() });
     });
     
     TAG_SHELF_CREATION_TIMELINE_INDEX.with(|map_ref| {

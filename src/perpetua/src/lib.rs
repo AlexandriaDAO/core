@@ -48,13 +48,11 @@ pub use query::follows::{
 pub use query::shelves::{
     get_shelf, get_shelf_items, get_shelf_position_metrics, get_shelves_by_tag,
     get_shelves_containing_nft,
-    get_user_shelves, get_recent_shelves,
+    get_user_shelves, get_recent_shelves, get_shuffled_by_hour_feed,
     get_followed_users_feed, get_followed_tags_feed,
     ShelfPositionMetrics
 };
 pub use update::follow::*;
-pub use update::debug::{debug_trigger_refresh_random_candidates};
-
 
 pub fn get_principal(id: &str) -> Principal {
     Principal::from_text(id).expect(&format!("Invalid principal: {}", id))

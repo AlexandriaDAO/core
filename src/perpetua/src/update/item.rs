@@ -1,6 +1,6 @@
 use candid::{CandidType, Deserialize};
 use std::collections::HashSet;
-use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, ShelfId, SHELF_ITEM_STEP_SIZE, SHELF_METADATA, MAX_ITEMS_PER_SHELF, MAX_NFT_ID_LENGTH, MAX_MARKDOWN_LENGTH, MAX_APPEARS_IN_COUNT};
+use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, ShelfId, SHELF_ITEM_STEP_SIZE, SHELF_METADATA, MAX_ITEMS_PER_SHELF, SHELF_MAX_NFT_ID_LENGTH, MAX_MARKDOWN_LENGTH, MAX_APPEARS_IN_COUNT};
 use crate::guard::not_anon;
 use crate::auth::{get_shelf_parts_for_edit_mut };
 use crate::update::utils::{verify_nft_ownership};
@@ -46,8 +46,8 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
         if nft_id.chars().any(|c| !c.is_digit(10)) {
             return Err("Invalid NFT ID: Contains non-digit characters.".to_string());
         }
-        if nft_id.len() > MAX_NFT_ID_LENGTH {
-            return Err(format!("NFT ID exceeds maximum length of {} characters", MAX_NFT_ID_LENGTH));
+        if nft_id.len() > SHELF_MAX_NFT_ID_LENGTH {
+            return Err(format!("NFT ID exceeds maximum length of {} characters", SHELF_MAX_NFT_ID_LENGTH));
         }
         let is_owner = verify_nft_ownership(nft_id, caller).await?;
         if !is_owner {
