@@ -23,9 +23,12 @@ export const usePublicShelfOperations = () => {
   }, [dispatch]);
 
   const loadMoreShelves = useCallback(async () => {
-    if (lastTimestamp && !loading) {
-      // Convert lastTimestamp to appropriate format if needed
-      await loadRecentShelvesData(20, lastTimestamp as string);
+    if (!loading) { // Always try if not loading
+      if (lastTimestamp) { // If cursor exists, load next page
+        await loadRecentShelvesData(20, lastTimestamp as string);
+      } else { // If no cursor (at the end or initial state), load first page
+        await loadRecentShelvesData(20, undefined); // 'undefined' cursor for first page
+      }
     }
   }, [lastTimestamp, loading, loadRecentShelvesData]);
 

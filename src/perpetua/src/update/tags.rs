@@ -47,7 +47,7 @@ pub fn add_tag_to_shelf(input: TagOperationInput) -> Result<(), String> {
         }
         
         let now = ic_cdk::api::time();
-        add_tag_to_metadata_maps(&shelf_id, &normalized_tag, metadata.created_at, now)?;
+        add_tag_to_metadata_maps(&shelf_id, &normalized_tag, metadata.created_at, now);
 
         Ok(())
     })
@@ -71,13 +71,13 @@ pub fn remove_tag_from_shelf(input: TagOperationInput) -> Result<(), String> {
         }
         
         let now = ic_cdk::api::time();
-        remove_tag_from_metadata_maps(&shelf_id, &normalized_tag, metadata.created_at, now)?;
+        remove_tag_from_metadata_maps(&shelf_id, &normalized_tag, metadata.created_at, now);
 
         Ok(())
     })
 }
 
-pub(super) fn add_tag_to_metadata_maps(shelf_id: &ShelfId, normalized_tag: &NormalizedTag, shelf_created_at: u64, now: u64) -> Result<(), String> {
+pub(super) fn add_tag_to_metadata_maps(shelf_id: &ShelfId, normalized_tag: &NormalizedTag, shelf_created_at: u64, now: u64) {
     TAG_METADATA.with(|map_ref| {
         let mut map = map_ref.borrow_mut();
         let mut entry = map.get(normalized_tag).unwrap_or_default();
@@ -126,10 +126,9 @@ pub(super) fn add_tag_to_metadata_maps(shelf_id: &ShelfId, normalized_tag: &Norm
             (),
         );
     });
-    Ok(())
 }
 
-fn remove_tag_from_metadata_maps(shelf_id: &ShelfId, normalized_tag: &NormalizedTag, shelf_created_at: u64, now: u64) -> Result<(), String> {
+fn remove_tag_from_metadata_maps(shelf_id: &ShelfId, normalized_tag: &NormalizedTag, shelf_created_at: u64, now: u64) {
     let mut old_tag_metadata: Option<TagMetadata> = None;
     TAG_METADATA.with(|map_ref| {
         let mut map = map_ref.borrow_mut();
@@ -180,5 +179,4 @@ fn remove_tag_from_metadata_maps(shelf_id: &ShelfId, normalized_tag: &Normalized
             });
         }
     }
-    Ok(())
 } 

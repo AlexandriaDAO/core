@@ -19,7 +19,7 @@ impl Storable for StringVec {
 }
 
 // Constants
-pub const MAX_NFT_ID_LENGTH: usize = 100; // Max length for NFT IDs (key in NFT_SHELVES)
+// pub const MAX_NFT_ID_LENGTH: usize = 100; // Max length for NFT IDs (key in NFT_SHELVES)
 
 // Memory ID
 pub(crate) const NFT_SHELVES_MEM_ID: MemoryId = MemoryId::new(2);

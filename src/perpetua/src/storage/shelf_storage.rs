@@ -8,7 +8,7 @@ use std::cell::RefCell; // Required for SHELVES.with, etc.
 use super::{MEMORY_MANAGER, Memory, MemoryId};
 
 // Import common types from sibling module
-use super::common_types::{ShelfId, ItemId, NormalizedTag};
+use super::common_types::{ShelfId, ItemId, NormalizedTag, MAX_TAGS_PER_SHELF, MAX_NFT_ID_LENGTH, MAX_ITEMS_PER_SHELF, MAX_MARKDOWN_LENGTH, SHELF_ITEM_STEP_SIZE, MAX_APPEARS_IN_COUNT};
 
 // Imports from other parts of the crate
 use crate::ordering::PositionTracker;
@@ -18,7 +18,7 @@ use sha2::{Sha256, Digest};
 use bs58;
 
 // Import re-exported items from storage module for tag constants/validation
-use crate::storage::{MAX_TAGS_PER_SHELF, validate_tag_format};
+use crate::storage::{validate_tag_format};
 
 // --- Define ShelfMetadata ---
 #[derive(CandidType, Deserialize, Clone, Debug)]
@@ -183,23 +183,10 @@ pub struct Shelf {
     pub public_editing: bool,
 }
 
-// --- Constants for shelf operations ---
-pub const MAX_ITEMS_PER_SHELF: usize = 500;
-pub const MAX_APPEARS_IN_COUNT: usize = 100; // Keep this if relevant elsewhere
-pub const MAX_MARKDOWN_LENGTH: usize = 1_000; // Max length for Markdown content
-pub const SHELF_ITEM_STEP_SIZE: f64 = 1000.0;
-
 // Memory IDs
 pub(crate) const SHELVES_MEM_ID: MemoryId = MemoryId::new(0);
 pub(crate) const GLOBAL_TIMELINE_MEM_ID: MemoryId = MemoryId::new(3);
 pub(crate) const SHELF_METADATA_MEM_ID: MemoryId = MemoryId::new(20);
-
-// Max NFT ID length (used in Shelf::insert_item validation)
-// This constant is also in nft_storage.rs. It should ideally be in one place.
-// For now, keeping it here as Shelf::insert_item uses it.
-// Consider moving to common_types.rs or a general constants module if widely used.
-pub const MAX_NFT_ID_LENGTH: usize = 100;
-
 
 thread_local! {
     pub static SHELVES: RefCell<StableBTreeMap<ShelfId, ShelfContent, Memory>> = RefCell::new(

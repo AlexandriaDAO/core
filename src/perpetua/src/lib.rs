@@ -1,6 +1,5 @@
-use ic_cdk::{self, spawn};
+use ic_cdk::{self};
 use candid::{Principal};
-use std::time::Duration;
 
 // Re-added constants
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
@@ -18,7 +17,6 @@ pub mod update {
     pub mod profile;
     pub mod tags;
     pub mod follow;
-    pub mod restore;
     pub mod debug;
 }
 pub mod query {

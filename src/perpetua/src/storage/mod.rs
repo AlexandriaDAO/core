@@ -27,7 +27,16 @@ pub mod follow_storage;
 pub mod random_feed_storage;
 
 // Re-export key types/structs for easier access from outside crate::storage
-pub use common_types::{ShelfId, NormalizedTag, ItemId};
+pub use common_types::{
+    ShelfId, NormalizedTag, ItemId,
+    // Centralized constants
+    MAX_NFT_ID_LENGTH,
+    MAX_TAGS_PER_SHELF,
+    MAX_ITEMS_PER_SHELF,
+    MAX_APPEARS_IN_COUNT,
+    MAX_MARKDOWN_LENGTH,
+    SHELF_ITEM_STEP_SIZE
+};
 
 pub use shelf_storage::{
     // Statics (Maps)
@@ -37,24 +46,21 @@ pub use shelf_storage::{
     GlobalTimelineItemValue, ShelfPublic, ShelfBackupData,
     // Functions
     create_shelf,
-    // Constants
-    MAX_ITEMS_PER_SHELF, MAX_APPEARS_IN_COUNT, MAX_MARKDOWN_LENGTH, SHELF_ITEM_STEP_SIZE,
-    MAX_NFT_ID_LENGTH as SHELF_MAX_NFT_ID_LENGTH, // Renamed to avoid conflict if nft_storage also exports it
+    // Constants - Removed as they are now in common_types
     // Memory IDs (made pub(crate) in their modules, re-export if needed publicly)
-    // Exposing specific constants like MAX_TAGS_PER_SHELF might be better than all MEM_IDs.
 };
 
 pub use tag_storage::{
     // Statics (Maps)
     TAG_METADATA, TAG_SHELF_ASSOCIATIONS, SHELF_TAG_ASSOCIATIONS,
-    TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX, ORPHANED_TAG_CANDIDATES,
+    TAG_POPULARITY_INDEX, TAG_LEXICAL_INDEX,
     TAG_SHELF_CREATION_TIMELINE_INDEX,
     // Structs
-    TagMetadata, ShelfTagAssociationKey, OrphanedTagValue, TagShelfCreationTimelineKey,
+    TagMetadata, ShelfTagAssociationKey, TagShelfCreationTimelineKey,
     // Functions
     validate_tag_format,
     // Constants
-    MAX_TAG_LENGTH, MAX_TAGS_PER_SHELF,
+    MAX_TAG_LENGTH, // MAX_TAGS_PER_SHELF removed, now in common_types
 };
 
 pub use user_storage::{
@@ -69,8 +75,7 @@ pub use nft_storage::{
     NFT_SHELVES,
     // Structs
     StringVec,
-    // Constants
-    MAX_NFT_ID_LENGTH as NFT_STORAGE_MAX_NFT_ID_LENGTH, // Renamed to avoid conflict
+    // Constants - MAX_NFT_ID_LENGTH removed, now in common_types
 };
 
 pub use follow_storage::{

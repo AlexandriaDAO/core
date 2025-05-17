@@ -4,7 +4,7 @@ use crate::guard::not_anon;
 use super::tags::add_tag_to_metadata_maps;
 
 // --- Constants ---
-const MAX_USER_SHELVES: usize = 1000;
+const MAX_USER_SHELVES: usize = 500;
 
 /// Represents the data needed to update a shelf's metadata
 #[derive(CandidType, Deserialize)]
@@ -61,12 +61,27 @@ pub async fn store_shelf(
         item_positions: shelf_in_memory.item_positions.clone(),
     };
 
+    // --- COMMIT PHASE ---
+    // From this point onwards, any failure MUST cause a panic to ensure atomicity.
+
     // Store ShelfMetadata and ShelfContent
     SHELF_METADATA.with(|metadata_map_ref| {
-        metadata_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_metadata.clone());
+        // metadata_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_metadata.clone());
+        // If insert can theoretically fail (e.g. OOM), it should panic. StableBTreeMap's insert doesn't return Result.
+        // Panics from Storable trait's to_bytes (Encode!) are expected and desired here on failure.
+        if metadata_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_metadata.clone()).is_some() {
+            // This case (replacing an existing item with the same key) should ideally not happen for a new shelf_id.
+            // Depending on exact guarantees of shelf_id generation, this might indicate a hash collision or reuse.
+            // For atomicity, if this is an unexpected state, a panic might be justified.
+            // However, StableBTreeMap's insert replaces and returns the old value.
+            // For now, we assume shelf_id is unique and this won't be an issue of replacing an *intended* different shelf.
+        }
     });
     SHELVES.with(|content_map_ref| { // SHELVES now stores ShelfContent
-        content_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_content);
+        // content_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_content);
+        if content_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_content).is_some() {
+            // Similar consideration as above for SHELF_METADATA.
+        }
     });
 
     // Store NFT references (using data from shelf_metadata or shelf_in_memory)
@@ -76,7 +91,10 @@ pub async fn store_shelf(
                 let mut nft_map = nft_shelves.borrow_mut();
                 let mut shelves = nft_map.get(nft_id).unwrap_or_default();
                 shelves.0.push(shelf_id.clone());
-                nft_map.insert(nft_id.to_string(), shelves);
+                // nft_map.insert(nft_id.to_string(), shelves);
+                if nft_map.insert(nft_id.to_string(), shelves).is_some() {
+                    // If replacing, it means the NFT_ID was already there, we're just adding a new shelf_id to its list.
+                }
             });
         }
     }
@@ -86,40 +104,51 @@ pub async fn store_shelf(
         let mut user_map = user_shelves.borrow_mut();
         let mut user_shelves_set = user_map.get(&caller).unwrap_or_default();
         user_shelves_set.0.insert((now, shelf_id.clone()));
-        user_map.insert(caller, user_shelves_set);
+        // user_map.insert(caller, user_shelves_set);
+        if user_map.insert(caller, user_shelves_set).is_some() {
+            // Replacing the user's entry, expected if they already have other shelves.
+        }
     });
 
     // Add shelf to the global timeline for public discoverability
     GLOBAL_TIMELINE.with(|timeline_map_ref| {
-        timeline_map_ref.borrow_mut().insert(
-            now,
+        // timeline_map_ref.borrow_mut().insert(
+        //     now, // This 'now' is shelf_in_memory.created_at
+        //     GlobalTimelineItemValue {
+        //         shelf_id: shelf_metadata.shelf_id.clone(), 
+        //         owner: shelf_metadata.owner, 
+        //         tags: shelf_metadata.tags.clone(), 
+        //         public_editing: shelf_metadata.public_editing, 
+        //     }
+        // );
+        if timeline_map_ref.borrow_mut().insert(
+            now, // This 'now' is shelf_in_memory.created_at
             GlobalTimelineItemValue {
-                shelf_id: shelf_metadata.shelf_id.clone(), // Use metadata
-                owner: shelf_metadata.owner, // Use metadata
-                tags: shelf_metadata.tags.clone(), // Use metadata
-                public_editing: shelf_metadata.public_editing, // Use metadata
+                shelf_id: shelf_metadata.shelf_id.clone(), 
+                owner: shelf_metadata.owner, 
+                tags: shelf_metadata.tags.clone(), 
+                public_editing: shelf_metadata.public_editing, 
             }
-        );
+        ).is_some() {
+            // This means a timeline entry for this exact timestamp 'now' was replaced.
+            // Highly unlikely for u64 ns timestamps unless multiple shelves are created by same user in same transaction (not possible from UI)
+            // or a hash collision on timestamp (extremely unlikely).
+            // If this happens, it's a critical issue. For now, we let it replace. A panic could be justified if 'now' must be unique.
+            // ic_cdk::trap(&format!("Duplicate timestamp in GLOBAL_TIMELINE: {}", now));
+        }
     });
     
-    // --- Defer Tag Association ---
-    // The initial tags stored on the shelf struct are now set.
-    // The actual association and index updates need to happen via calls 
-    // to the new add_tag_to_shelf function from update::tags.
-    // This function (store_shelf) *only* creates the shelf itself.
-    // The caller (e.g., frontend) is responsible for making subsequent
-    // add_tag_to_shelf calls for the initial_tags if needed. 
-    // We return the shelf_id and the normalized initial tags for this purpose.
-
-    // MODIFICATION: Call add_tag_to_metadata_maps for each tag
+    // MODIFICATION: Call add_tag_to_metadata_maps for each tag.
+    // This helper now panics on failure, ensuring atomicity for tag-related map updates.
+    // The original .map_err and ? are removed.
     // shelf_metadata.tags are already normalized by create_shelf
     for tag_to_associate in &shelf_metadata.tags {
         // The 'now' timestamp here refers to the shelf creation time.
         // add_tag_to_metadata_maps uses its 'now' param for last_association_timestamp etc.
         // For initial creation, using shelf_metadata.created_at for both 'now' and 'shelf_created_at' in add_tag_to_metadata_maps call
         // or more accurately, 'now' (shelf creation time) for both.
-        add_tag_to_metadata_maps(&shelf_id, tag_to_associate, shelf_metadata.created_at, now)
-            .map_err(|e| format!("Failed to associate tag '{}': {}", tag_to_associate, e))?;
+        add_tag_to_metadata_maps(&shelf_id, tag_to_associate, shelf_metadata.created_at, now); 
+            // REMOVED: .map_err(|e| format!("Failed to associate tag '{}': {}", tag_to_associate, e))?;
     }
 
     // Returning just the shelf_id as per original function signature change in .did

@@ -265,10 +265,20 @@ const PerpetuaLayout: React.FC = () => {
   };
 
   const loadMoreStoryline = useCallback(async () => { // Make async for UnifiedShelvesUI
-    if (identity && storylineFeedCursor && !isLoadingStorylineFeed) {
-      await dispatch(loadStorylineFeed({ params: { limit: 20, cursor: storylineFeedCursor }})).unwrap();
+    if (identity && !isLoadingStorylineFeed) { // Always try if identity exists and not loading
+      if (storylineFeedCursor) { // If cursor exists, load next page
+        await dispatch(loadStorylineFeed({ params: { limit: 20, cursor: storylineFeedCursor }})).unwrap();
+      } else { // If no cursor, load first page
+        await dispatch(loadStorylineFeed({ params: { limit: 20, cursor: undefined }})).unwrap();
+      }
     }
   }, [dispatch, identity, storylineFeedCursor, isLoadingStorylineFeed]);
+
+  const loadMoreRandom = useCallback(async () => {
+    if (!isLoadingRandomFeed) {
+      await dispatch(loadRandomFeed({ limit: 20 }));
+    }
+  }, [dispatch, isLoadingRandomFeed]);
 
   // Combine shelves for Recency feed view
   const recencyCombinedNormalizedShelves = useMemo(() => {
@@ -311,10 +321,11 @@ const PerpetuaLayout: React.FC = () => {
       } else if (currentFeedType === 'random') {
         shelvesToDisplay = randomFeedShelves || []; // Ensure array
         isLoadingCurrentFeed = isLoadingRandomFeed;
+        loadMoreAction = loadMoreRandom; // Assign loadMoreRandom for the random feed
       } else if (currentFeedType === 'storyline') {
         shelvesToDisplay = storylineFeedShelves || []; // Ensure array
         isLoadingCurrentFeed = isLoadingStorylineFeed;
-        loadMoreAction = storylineFeedCursor ? loadMoreStoryline : undefined; 
+        loadMoreAction = loadMoreStoryline; // Always assign loadMoreStoryline for the storyline feed
       }
 
       return (

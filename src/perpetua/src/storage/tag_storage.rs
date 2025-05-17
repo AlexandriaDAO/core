@@ -2,7 +2,6 @@ use candid::{CandidType, Decode, Deserialize, Encode};
 use ic_stable_structures::{storable::Bound, StableBTreeMap, Storable};
 use std::borrow::Cow;
 use std::cmp::Ordering;
-use std::collections::BTreeSet; // For OrphanedTagValue if it uses BTreeSet directly (it uses Vec)
 use std::cell::RefCell; // Required for MAP.with, etc.
 
 // Imports from parent storage module
@@ -58,20 +57,6 @@ impl Ord for ShelfTagAssociationKey {
     }
 }
 
-
-// --- Define OrphanedTagValue ---
-#[derive(CandidType, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
-pub struct OrphanedTagValue(pub Vec<NormalizedTag>);
-
-impl Storable for OrphanedTagValue {
-    fn to_bytes(&self) -> Cow<[u8]> { Cow::Owned(Encode!(&self.0).unwrap()) }
-    fn from_bytes(bytes: Cow<[u8]>) -> Self {
-        let tags = Decode!(bytes.as_ref(), Vec<NormalizedTag>).unwrap();
-        Self(tags)
-    }
-    const BOUND: Bound = Bound::Unbounded;
-}
-
 // --- Tag Shelf Creation Timeline Index Key ---
 #[derive(CandidType, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
 pub struct TagShelfCreationTimelineKey {
@@ -108,7 +93,6 @@ impl Ord for TagShelfCreationTimelineKey {
 
 // --- Constants ---
 pub const MAX_TAG_LENGTH: usize = 25;
-pub const MAX_TAGS_PER_SHELF: usize = 3;
 
 // Memory IDs
 pub(crate) const TAG_METADATA_MEM_ID: MemoryId = MemoryId::new(10);
@@ -116,7 +100,6 @@ pub(crate) const TAG_SHELF_ASSOCIATIONS_MEM_ID: MemoryId = MemoryId::new(11); //
 pub(crate) const SHELF_TAG_ASSOCIATIONS_MEM_ID: MemoryId = MemoryId::new(12); // Uses local ShelfTagAssociationKey
 pub(crate) const TAG_POPULARITY_INDEX_MEM_ID: MemoryId = MemoryId::new(13); // Uses crate::types::TagPopularityKey
 pub(crate) const TAG_LEXICAL_INDEX_MEM_ID: MemoryId = MemoryId::new(14);
-pub(crate) const ORPHANED_TAG_CANDIDATES_MEM_ID: MemoryId = MemoryId::new(15);
 pub(crate) const TAG_SHELF_CREATION_TIMELINE_INDEX_MEM_ID: MemoryId = MemoryId::new(19);
 
 thread_local! {
@@ -137,9 +120,6 @@ thread_local! {
     );
     pub static TAG_LEXICAL_INDEX: RefCell<StableBTreeMap<NormalizedTag, (), Memory>> = RefCell::new(
         StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(TAG_LEXICAL_INDEX_MEM_ID)))
-    );
-    pub static ORPHANED_TAG_CANDIDATES: RefCell<StableBTreeMap<u64, OrphanedTagValue, Memory>> = RefCell::new(
-        StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(ORPHANED_TAG_CANDIDATES_MEM_ID)))
     );
     pub static TAG_SHELF_CREATION_TIMELINE_INDEX: RefCell<StableBTreeMap<TagShelfCreationTimelineKey, (), Memory>> = RefCell::new(
         StableBTreeMap::init(MEMORY_MANAGER.with(|m| m.borrow().get(TAG_SHELF_CREATION_TIMELINE_INDEX_MEM_ID)))
