@@ -5,8 +5,6 @@ import useAuth from "@/hooks/useAuth";
 import { useInternetIdentity } from "ic-use-internet-identity";
 import { toast } from "sonner";
 
-const II_URL = process.env.DFX_NETWORK === "local" ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`: "https://identity.ic0.app";
-
 const IIProcessor = () => {
     const { setProvider } = useAuth();
     const { login, isLoggingIn } = useInternetIdentity();
@@ -15,7 +13,7 @@ const IIProcessor = () => {
         try {
             setProvider('II');
 
-            await login(II_URL);
+            await login();
         } catch (error) {
             toast.error('Failed to login');
             console.error(error);

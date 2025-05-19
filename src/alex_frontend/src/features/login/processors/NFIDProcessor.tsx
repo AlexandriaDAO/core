@@ -3,23 +3,23 @@ import { LoaderCircle } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import useAuth from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { useIdentity } from "@/hooks/useIdentity";
+import { useNfidIdentity } from "ic-use-nfid-identity";
 
 // Define a password for protected access during testing
 const PROTECTED_PASSWORD = "testnfid"; // Change this as needed
 
 const NFIDProcessor = () => {
     const { setProvider } = useAuth();
-    const { login, isLoggingIn } = useIdentity();
+    const { login, isLoggingIn } = useNfidIdentity();
     // State to track if access has been granted via password
     const [isAccessGranted, setIsAccessGranted] = useState(false);
 
     const handleLogin = async () => {
         try {
+            setProvider('NFID');
+
             // await login("http://localhost:9090/authenticate");
             await login();
-
-            setProvider('NFID');
         } catch (error) {
             toast.error('Failed to login');
             console.error(error);

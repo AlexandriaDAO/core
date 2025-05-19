@@ -17,20 +17,16 @@ import { EmporiumActor, Icrc7Actor } from "@/actors";
 const NftsPage = () => {
     const dispatch = useAppDispatch();
 
-    const { userAssetCanister } = useAppSelector((state) => state.assetManager);
+    const { canister } = useAppSelector((state) => state.auth);
     const { ids, loading, error } = useAppSelector((state) => state.imporium.nfts);
     const { identity } = useIdentity();
 
     const assetManager = useAssetManager({
-		canisterId: userAssetCanister ?? undefined,
+		canisterId: canister ?? undefined,
 		identity,
 	});
 
-	useEffect(() => {
-		dispatch(getCallerAssetCanister());
-	}, []);
-
-	useEffect(() => {
+    useEffect(() => {
 		if (!assetManager) return;
 		dispatch(fetch({ assetManager }));
 	}, [assetManager]);

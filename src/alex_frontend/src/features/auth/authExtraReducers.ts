@@ -6,6 +6,7 @@ import login from "../login/thunks/login";
 import update from "./thunks/update";
 import { toast } from "sonner";
 import getCanister from "./thunks/getCanister";
+import { createCanister } from "./thunks/createCanister";
 
 export const buildAuthExtraReducers = (builder: ActionReducerMapBuilder<AuthState>) => {
     builder
@@ -59,14 +60,37 @@ export const buildAuthExtraReducers = (builder: ActionReducerMapBuilder<AuthStat
             state.user = null;
         })
 
+        // getCanister slice
+        // getCanister.ts
         .addCase(getCanister.pending, (state) => {
             state.canister = null;
+            state.canisterLoading = true;
         })
         .addCase(getCanister.fulfilled, (state, action) => {
             state.canister = action.payload;
+            state.canisterLoading = false;
         })
         .addCase(getCanister.rejected, (state, action) => {
             state.canister = null;
+            state.canisterLoading = false;
+        })
+
+        // createCanister slice
+        // createCanister.ts
+        .addCase(createCanister.pending, (state) => {
+            state.canister = null;
+            state.canisterError = null;
+            state.canisterLoading = true;
+        })
+        .addCase(createCanister.fulfilled, (state, action) => {
+            state.canister = action.payload;
+            state.canisterError = null;
+            state.canisterLoading = false;
+        })
+        .addCase(createCanister.rejected, (state, action) => {
+            state.canister = null;
+            state.canisterError = action.payload as string;
+            state.canisterLoading = false;
         })
 
         // signup slice

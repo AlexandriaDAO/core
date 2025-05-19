@@ -13,7 +13,7 @@ interface ItemProps {
 }
 
 const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
-	const {userAssetCanister} = useAppSelector(state=>state.assetManager);
+	const {canister} = useAppSelector(state=>state.auth);
 	const dispatch = useAppDispatch();
 	const {deleting} = useAppSelector(state=>state.icpAssets);
 
@@ -34,7 +34,7 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 			<div className="h-48 overflow-hidden bg-gray-50 flex items-center justify-center">
 				{isImage ? (
 					<img 
-						src={`http://${userAssetCanister}.localhost:4943${asset.key}`} 
+						src={`http://${canister}.localhost:4943${asset.key}`} 
 						alt={asset.key}
 						className="w-full h-full object-cover"
 					/>
@@ -44,7 +44,7 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 						className="w-full h-full object-contain"
 					>
 						<source 
-							src={`http://${userAssetCanister}.localhost:4943${asset.key}`} 
+							src={`http://${canister}.localhost:4943${asset.key}`} 
 							type={asset.content_type}
 						/>
 						Your browser does not support the video tag.
@@ -56,7 +56,7 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 							className="w-full"
 						>
 							<source 
-								src={`http://${userAssetCanister}.localhost:4943${asset.key}`} 
+								src={`http://${canister}.localhost:4943${asset.key}`} 
 								type={asset.content_type}
 							/>
 							Your browser does not support the audio element.
@@ -89,7 +89,7 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 
 				<div className="mt-4 flex justify-between items-center">
 					<a 
-						href={`http://${userAssetCanister}.localhost:4943${asset.key}`} 
+						href={`http://${canister}.localhost:4943${asset.key}`} 
 						target="_blank" 
 						rel="noopener noreferrer" 
 						className="text-sm text-blue-600 hover:text-blue-800 font-medium"

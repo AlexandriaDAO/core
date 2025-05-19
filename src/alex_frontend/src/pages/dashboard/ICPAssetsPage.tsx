@@ -33,7 +33,7 @@ const ICPAssetsPage: React.FC = () => {
 					</Button>
 				</Alert>
 			) : (
-				<>
+				<AssetCanisterActor canisterId={canister}>
 					<ICPAssetUploader />
 
 					<div className="mt-8 bg-gray-50 p-4 rounded-lg border">
@@ -46,10 +46,8 @@ const ICPAssetsPage: React.FC = () => {
 						</p>
 					</div>
 
-					<AssetCanisterActor canisterId={canister}>
-						<ICPAssets />
-					</AssetCanisterActor>
-				</>
+					<ICPAssets />
+				</AssetCanisterActor>
 			)}
 		</>
 	);
