@@ -5,6 +5,9 @@ import { parsePathInfo } from "../../../routes";
 import { buildRoutes } from "../../../routes";
 import { useUsername } from '@/hooks/useUsername';
 import { Principal } from '@dfinity/principal';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
+import { UnifiedCardActions } from '@/apps/Modules/shared/components/UnifiedCardActions/UnifiedCardActions';
 
 interface ShelfViewHeaderProps {
   shelf: any;
@@ -18,13 +21,38 @@ export const ShelfViewHeader: React.FC<ShelfViewHeaderProps> = ({
   const { isUserView, userId, backButtonLabel } = parsePathInfo(window.location.pathname);
 
   const ownerPrincipalString = useMemo(() => {
-    if (shelf.owner instanceof Principal) {
+    if (shelf?.owner instanceof Principal) {
       return shelf.owner.toText();
     }
-    return String(shelf.owner || '');
-  }, [shelf.owner]);
+    return String(shelf?.owner || '');
+  }, [shelf?.owner]);
 
   const { username: ownerUsername, isLoading: isLoadingOwnerUsername } = useUsername(ownerPrincipalString);
+
+  const { user } = useSelector((state: RootState) => state.auth);
+  const currentUserPrincipalString = useMemo(() => {
+    return user?.principal ? String(user.principal) : undefined;
+  }, [user?.principal]);
+
+  const isOwned = useMemo(() => {
+    if (!currentUserPrincipalString || !ownerPrincipalString) return false;
+    return currentUserPrincipalString === ownerPrincipalString;
+  }, [currentUserPrincipalString, ownerPrincipalString]);
+
+  const shelfOwnerPrincipal = useMemo(() => {
+    if (shelf?.owner instanceof Principal) {
+      return shelf.owner;
+    }
+    if (ownerPrincipalString) {
+      try {
+        return Principal.fromText(ownerPrincipalString);
+      } catch (e) {
+        console.error("Failed to parse ownerPrincipalString into Principal:", e);
+        return undefined;
+      }
+    }
+    return undefined;
+  }, [shelf?.owner, ownerPrincipalString]);
   
   const goToOwnerShelves = () => {
     const targetUser = isUserView && userId ? userId : ownerPrincipalString;
@@ -73,7 +101,7 @@ export const ShelfViewHeader: React.FC<ShelfViewHeaderProps> = ({
               </Button>
               
               <span className="mx-1 text-muted-foreground">/</span>
-              <span className="font-medium truncate max-w-[200px] sm:max-w-[300px]" title={shelf.title}>{shelf.title}</span>
+              <span className="font-medium truncate max-w-[200px] sm:max-w-[300px]" title={shelf?.title}>{shelf?.title}</span>
             </div>
           )}
         </div>
@@ -81,9 +109,21 @@ export const ShelfViewHeader: React.FC<ShelfViewHeaderProps> = ({
       
       {/* Shelf title and info */}
       <div className="py-2">
-        <h2 className="text-2xl font-bold mb-1 font-serif">{shelf.title}</h2>
-        {shelf.description && (
-          <p className="text-muted-foreground font-serif">{shelf.description}</p>
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl font-bold font-serif">{shelf?.title}</h2>
+          {shelf && shelf.shelf_id && (
+            <UnifiedCardActions
+              contentId={shelf.shelf_id}
+              contentType="Shelf"
+              isOwned={isOwned}
+              ownerPrincipal={shelfOwnerPrincipal}
+              currentShelfId={shelf.shelf_id}
+              containerClassName=""
+            />
+          )}
+        </div>
+        {shelf?.description && (
+          <p className="text-muted-foreground font-serif mt-1">{shelf.description}</p>
         )}
         {ownerPrincipalString && (
             <div className="mt-2 flex items-center text-xs text-muted-foreground font-serif">

@@ -215,8 +215,8 @@ dfx canister create ic_siwo --specified-id odkrm-viaaa-aaaap-qp2oq-cai
 
 dfx deploy ic_siwo --argument $'(
     record {
-      domain = "lbry.app";
-      uri = "https://lbry.app";
+      domain = "yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io";
+      uri = "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io";
       salt = "FuriousSalter";
       scheme = opt "https";
       statement = opt "Login to Alexandria";

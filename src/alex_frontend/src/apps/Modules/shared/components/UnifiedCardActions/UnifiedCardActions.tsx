@@ -26,6 +26,7 @@ interface UnifiedCardActionsProps {
   onToggleDetails?: () => void; // Now optional
   showDetails?: boolean;     // Now optional
   className?: string;
+  containerClassName?: string; // New prop for styling the main container
 }
 
 // Type for the context needed by the dialog and background processing
@@ -48,7 +49,8 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
   itemId,       // Kept prop, but logic using it is removed below
   // onToggleDetails, // No longer needed internally
   // showDetails,     // No longer needed internally
-  className
+  className,
+  containerClassName
 }) => {
   const [addToShelfContext, setAddToShelfContext] = React.useState<AddToShelfContext | null>(null);
   const [isProcessingAddToShelf, setIsProcessingAddToShelf] = React.useState(false);
@@ -172,6 +174,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
 
   // 2. Background Processor: Called after dialog confirms selection
   const processAddToShelfInBackground = async (selectedShelfIds: string[]) => {
+    // console.log("[UnifiedCardActions] processAddToShelfInBackground called. Selected IDs:", selectedShelfIds, "Context exists:", !!addToShelfContext);
     if (!addToShelfContext) {
         console.error("[UnifiedCardActions] Background process called without context.");
         toast.error("An unexpected error occurred (missing context).");
@@ -225,60 +228,63 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
                 throw new Error(mintingOutcome.mintMessage || "Minting prerequisite failed");
             }
             
-            const { finalContentId, finalContentType, mintStatus } = mintingOutcome;
+            finalContentId = mintingOutcome.finalContentId; // Update finalContentId after minting
+            finalContentType = mintingOutcome.finalContentType; // Update finalContentType after minting
 
-            if (mintStatus === 'success' || mintStatus === 'already_exists') {
+            // If minting was successful (or item already existed), provide some feedback
+            if (mintingOutcome.mintStatus === 'success' || mintingOutcome.mintStatus === 'already_exists') {
                 toast.info(`Item acquired successfully. Adding to shelves...`);
             }
-
-            // Determine collectionType for NFTs/SBTs (once)
-            const collectionType = (finalContentType === 'Nft' && finalContentId.length >= 80) ? 'SBT' : (finalContentType === 'Nft' ? 'NFT' : undefined);
-
-            // Add to each selected shelf concurrently
-            const addPromises = selectedShelfIds.map(shelfId =>
-                addContentToShelf(
-                    shelfId,
-                    finalContentId,
-                    finalContentType,
-                    collectionType
-                )
-                .then(result => ({ ...result, shelfId })) // Pass shelfId along for context in success
-                .catch(error => ({ status: 'error', message: error?.message || "Unknown error", shelfId })) // Catch and format errors
-            );
-
-            // Wait for all attempts to settle
-            const results = await Promise.allSettled(addPromises);
-
-            // Process results and show individual toasts
-            results.forEach(result => {
-                let shelfId: string | undefined;
-                let shelfName = 'selected shelf';
-
-                if (result.status === 'fulfilled') {
-                    shelfId = result.value.shelfId;
-                    const shelfInfo = shelfDetailsMap.get(shelfId);
-                    shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`; 
-
-                    if (result.value.status === 'success') {
-                        toast.success(`Successfully added ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}'.`);
-                    } else if (result.value.status === 'error') {
-                        toast.error(`Failed to add ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}': ${result.value.message}`);
-                    } else if (result.value.status === 'already_on_shelf') { // Handle new status
-                        toast.info(`Item is already on '${shelfName}'.`);
-                    } else {
-                        console.warn("Unexpected fulfilled status:", result.value);
-                        toast.error(`An unexpected issue occurred when adding to '${shelfName}'.`);
-                    }
-                } else { // result.status === 'rejected'
-                    const reason = result.reason as any;
-                    shelfId = reason?.shelfId;
-                    const shelfInfo = shelfId ? shelfDetailsMap.get(shelfId) : undefined;
-                    shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`; 
-                    const errorMessage = reason?.message || reason?.toString() || "An unknown error occurred";
-                    toast.error(`Failed to add ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}': ${errorMessage}`);
-                }
-            });
         }
+
+        // Determine collectionType for NFTs/SBTs (once)
+        const collectionType = (finalContentType === 'Nft' && finalContentId.length >= 80) ? 'SBT' : (finalContentType === 'Nft' ? 'NFT' : undefined);
+
+        // Add to each selected shelf concurrently
+        // console.log(`[UnifiedCardActions] Preparing to call addContentToShelf for ${selectedShelfIds.length} shelves. Content ID: ${finalContentId}, Type: ${finalContentType}`);
+        const addPromises = selectedShelfIds.map(shelfId =>
+            addContentToShelf(
+                shelfId,
+                finalContentId,
+                finalContentType,
+                collectionType
+            )
+            .then(result => ({ ...result, shelfId })) // Pass shelfId along for context in success
+            .catch(error => ({ status: 'error', message: error?.message || "Unknown error", shelfId })) // Catch and format errors
+        );
+
+        // Wait for all attempts to settle
+        const results = await Promise.allSettled(addPromises);
+
+        // Process results and show individual toasts
+        results.forEach(result => {
+            let shelfId: string | undefined;
+            let shelfName = 'selected shelf';
+
+            if (result.status === 'fulfilled') {
+                shelfId = result.value.shelfId;
+                const shelfInfo = shelfDetailsMap.get(shelfId);
+                shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`; 
+
+                if (result.value.status === 'success') {
+                    toast.success(`Successfully added ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}'.`);
+                } else if (result.value.status === 'error') {
+                    toast.error(`Failed to add ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}': ${result.value.message}`);
+                } else if (result.value.status === 'already_on_shelf') { // Handle new status
+                    toast.info(`Item is already on '${shelfName}'.`);
+                } else {
+                    console.warn("Unexpected fulfilled status:", result.value);
+                    toast.error(`An unexpected issue occurred when adding to '${shelfName}'.`);
+                }
+            } else { // result.status === 'rejected'
+                const reason = result.reason as any;
+                shelfId = reason?.shelfId;
+                const shelfInfo = shelfId ? shelfDetailsMap.get(shelfId) : undefined;
+                shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`; 
+                const errorMessage = reason?.message || reason?.toString() || "An unknown error occurred";
+                toast.error(`Failed to add ${finalContentType === 'Shelf' ? 'shelf' : 'item'} to '${shelfName}': ${errorMessage}`);
+            }
+        });
 
     } catch (error) {
         console.error("[UnifiedCardActions] Error during background add-to-shelf process:", error);
@@ -333,7 +339,9 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
 
   return (
     <>
-      <div className="absolute right-3 top-0 z-10 flex flex-col items-end space-y-1">
+      <div 
+        className={containerClassName !== undefined ? containerClassName : "absolute right-3 top-0 z-10 flex flex-col items-end space-y-1"}
+      >
         {/* Add to Shelf (Bookmark) Button - only if canAddToShelf is true */}
         {canAddToShelf && (
           <div 

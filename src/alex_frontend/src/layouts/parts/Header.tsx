@@ -17,6 +17,7 @@ const InlineSignup = lazy(() =>
 	}))
 );
 const Auth = lazy(() => import("@/features/auth"));
+const BalanceDisplay = lazy(() => import("@/components/BalanceDisplay"));
 
 export const Entry = () => {
 	const { actor } = useUser();
@@ -107,12 +108,17 @@ function Header() {
 	return (
 		<div className="flex-grow-0 flex-shrink-0 bg-gray-900 basis-24 flex flex-col justify-center items-stretch lg:px-10 md:px-8 sm:px-6 xs:px-4 relative z-50">
 			<div className="flex-grow-0 flex-shrink-0 flex basis-24 justify-between items-center w-full">
-				<Logo />
-				<div className="md:flex sm:hidden xs:hidden w-full justify-between">
-					{/* expensive component */}
-					<Tabs />
-
-					<div className="flex gap-2 justify-between items-center">
+				<div className="flex items-center">
+					<Logo />
+					<Suspense fallback={<Processing message="Loading Balances..." />}>
+						<BalanceDisplay />
+					</Suspense>
+				</div>
+				<div className="md:flex sm:hidden xs:hidden items-center w-full justify-end">
+					<div className="flex-grow flex justify-center">
+						<Tabs />
+					</div>
+					<div className="flex gap-2 items-center ml-4">
 						<Entry />
 						<ModeToggle />
 					</div>
@@ -124,7 +130,7 @@ function Header() {
 				</div>
 			</div>
 			{isMenuOpen && (
-				<div className="flex flex-col">
+				<div className="flex flex-col md:hidden">
 					<Tabs />
 					<div className="flex gap-2 justify-center items-center py-4">
 						<Entry />

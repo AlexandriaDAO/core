@@ -167,27 +167,29 @@ perpetua/
     └── utils.rs (33 lines)
 ```
 
+UI:
+- New item/shelf button on my library page.
+- Adding markdown items is not optimistic.
+- There's a lot of background loading, like if I go to "My Library" it feels frozen for 10 seconds.
 
+
+Backend:
 - Go through perpetua audit.
+- Add payments for making shelves, and maybe elsewhere.
+
+Functional:
+- We're going to need to be able to add an item in a certain spot. Not just the top/bottom.
+- Progressive loading of NFTs inside shelves.
 
 
-
-- Tag display needs to look better.
-- show topup account in the header toolbar.
+New Canister:
 - Items on perpetua display load (need to maybe make the nft ranking setup.)
 
 
 
 
-- We're going to need to be able to add an item in a certain spot. Not just the top/bottom.
-- Adding markdown items is not optimistic.
-
-
-
-
-
-
-
+Later:
+- Animate the LBRY changes when doing stuff (and color it when the topup warning is present).
 
 
 
@@ -205,7 +207,7 @@ perpetua/
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 3ztps-i5ti5-rtzs5-uqur6-grz7s-rg7i7-yhylz-4ybfx-o4sir-qhmjo-hqe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 2rffu-d2h7x-atqfv-7x4ab-ok7a7-e2o5r-ys3nc-po3xi-5tz6y-fngv7-5qe)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua

@@ -250,7 +250,7 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
     <BaseShelfList
       shelves={shelves}
       title={title}
-      emptyStateMessage="This user has no public shelves."
+      emptyStateMessage="This user has no shelves."
       showBackButton={true}
       backLabel="All Shelves"
       loading={loading}

@@ -61,7 +61,7 @@ NVkSolD-1AJcJ0BMfEASJjIuak3Y6CvDJZ4XOIUbU9g
 93mQRQG7zpvKQj3sUaDlNu_dOWFmb3-vp2Myu8sw03I 09/2022
 QXvFGeh4LaqKQD7pxNOjs48FmFEjSAhhzxgvBairAFc
 bqQgrxMXYFJXTqS5EF_XgmHUYyLNPXUv5Ze_c0RlW18 05/30/2024 (all oldschool paintings)
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 2owke-l2git-pq3wl-qv3tc-ri7tf-b7pds-b25bl-doa4l-7f6mt-4t5fk-hqe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal hfjwd-e626p-t3gjd-mk7tk-zdiun-4xzhd-7zlbd-6v4o4-b3oqc-3qcvq-dae)
 
 
 
@@ -100,24 +100,3 @@ The direct Arweave path needs to:
 
 
 
-
-
-Next conversation, order of operations:
-
-- Perpetua frontend fixes - 1-2 days.
-- Perpetua backend audit - 2-3 thing.
-- Beta testing and more frontend fixes - 1-3 days.
-- NFT Rarity score - 1 week.
-- Lbry.fun - >2+ weeks.
-
-
-- Nelia animation - 
-- auth NFID/OISY - 
-- Pinax upload multiple assets at one time (and general imporvements) - 
-- Pulling to asset canisters working smoothly - 
-- Smoother loading from the asset_canisters get_all_user_asset_canisters() to load all assets. This should be part of a unified loading flow (I think it's scattered right now) -
-- Single congfigureable NFT component -
-
-
-notest:
-Change derivation origin in the deploy command.
