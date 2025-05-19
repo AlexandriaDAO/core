@@ -31,50 +31,33 @@ export const FollowedUsersList: React.FC = () => {
         return null;
     }
 
-    if (isLoading && followedUsers.size === 0) {
-        return (
-            <div className="mb-4 font-serif">
-                <h3 className="mb-2 font-semibold text-base">Following Users:</h3>
+    return (
+        <div className="bg-card text-card-foreground border rounded-lg p-4 shadow font-serif">
+            <h3 className="mb-3 font-semibold text-base text-card-foreground/90">Following Users</h3>
+            {isLoading && followedUsers.size === 0 ? (
                 <div className="flex flex-wrap gap-2 items-center">
                     {[...Array(2)].map((_, index) => (
                         <Skeleton key={index} className="h-7 w-32 rounded-full" />
                     ))}
                 </div>
-            </div>
-        );
-    }
-
-    if (error) {
-      return (
-        <div className="mb-4 font-serif text-destructive">
-          <h3 className="mb-2 font-semibold text-base">Following Users:</h3>
-          <p>Error loading followed users: {typeof error === 'string' ? error : JSON.stringify(error)}</p>
-        </div>
-      );
-    }
-
-    if (followedUsers.size === 0) {
-        return (
-             <div className="mb-4 font-serif">
-                 <h3 className="mb-2 font-semibold text-base">Following Users:</h3>
-                 <p className="text-sm text-muted-foreground">You are not following any users yet.</p>
-             </div>
-        );
-    }
-
-    return (
-        <div className="mb-4 font-serif">
-            <h3 className="mb-2 font-semibold text-base">Following Users:</h3>
-            <div className="flex flex-wrap gap-2 items-center">
-                {Array.from(followedUsers).map(principalString => (
-                    <FollowedUserBadge 
-                        key={principalString}
-                        principalString={principalString}
-                        onUnfollow={handleUnfollow}
-                        isUnfollowingThisUser={unfollowingUserPrincipal === principalString}
-                    />
-                ))}
-            </div>
+            ) : error ? (
+                <p className="text-sm text-destructive">
+                    Error loading followed users: {typeof error === 'string' ? error : JSON.stringify(error)}
+                </p>
+            ) : followedUsers.size === 0 ? (
+                <p className="text-sm text-muted-foreground">You are not following any users yet.</p>
+            ) : (
+                <div className="flex flex-wrap gap-2 items-center">
+                    {Array.from(followedUsers).map(principalString => (
+                        <FollowedUserBadge 
+                            key={principalString}
+                            principalString={principalString}
+                            onUnfollow={handleUnfollow}
+                            isUnfollowingThisUser={unfollowingUserPrincipal === principalString}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }; 

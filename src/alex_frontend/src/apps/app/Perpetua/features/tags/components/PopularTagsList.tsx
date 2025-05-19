@@ -8,6 +8,7 @@ import { useTagData } from '../hooks/useTagData';
 import { RootState } from '@/store';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { selectTagShelfCountsMap } from '@/apps/app/Perpetua/state/perpetuaSlice';
+import { Badge } from "@/lib/components/badge";
 
 // Define thresholds for tag size tiers (adjust as needed)
 const TAG_SIZE_THRESHOLDS = {
@@ -27,6 +28,7 @@ export const PopularTagsList: React.FC = () => {
     const { popularTags, isLoadingPopularTags } = useTagData();
     const allCounts = useAppSelector(selectTagShelfCountsMap);
 
+    
     useEffect(() => {
         fetchPopularTags({ limit: 20 });
     }, [fetchPopularTags]);
@@ -60,8 +62,7 @@ export const PopularTagsList: React.FC = () => {
 
     return (
         <TooltipProvider>
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="mr-2 font-semibold text-base">Popular Tags:</span>
+            <div className="flex items-center gap-2 mb-0 overflow-x-auto whitespace-nowrap py-2 scrollbar-thin scrollbar-thumb-muted-foreground/50 scrollbar-track-transparent">
                 {popularTags.map(tagName => {
                     const count = allCounts[tagName];
                     const size = getTagSize(count);
@@ -73,13 +74,13 @@ export const PopularTagsList: React.FC = () => {
                     return (
                         <Tooltip key={tagName} delayDuration={300}>
                             <TooltipTrigger asChild>
-                                <Button
+                                <Badge
                                     variant="outline"
-                                    className={`rounded-full h-auto ${sizeClasses}`}
+                                    className={`rounded-full cursor-pointer ${sizeClasses}`}
                                     onClick={() => handleTagClick(tagName)}
                                 >
                                     {tagName}
-                                </Button>
+                                </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
                                 <p>Shelves: {count ?? 'Loading...'}</p>

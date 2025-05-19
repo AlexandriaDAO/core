@@ -199,30 +199,9 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
           )}
           
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold font-serif">{title}</h2>
+            {title && <h2 className="text-2xl font-bold font-serif">{title}</h2>}
             
             <div className="flex items-center gap-2">
-              {canCreateNewShelf && !isEditMode && (
-                <Button 
-                  variant="primary" 
-                  className="flex items-center gap-1 px-3 h-9"
-                  onClick={onNewShelf}
-                  disabled={loading || saveInProgress}
-                >
-                  {isCreatingShelf ? (
-                    <>
-                      <RotateCw className="w-4 h-4 animate-spin mr-1" />
-                      Creating...
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="w-4 h-4" />
-                      New Shelf
-                    </>
-                  )}
-                </Button>
-              )}
-              
               {canEditOrder && (
                 !isEditMode ? (
                   <Button 

@@ -41,6 +41,7 @@ interface UnifiedShelvesUIProps {
   onLoadMore: () => Promise<void>;
   checkEditAccess: (shelfId: string) => boolean;
   isCreatingShelf?: boolean;
+  displayTitle?: string;
 }
 
 /**
@@ -55,17 +56,20 @@ export const UnifiedShelvesUI: React.FC<UnifiedShelvesUIProps> = React.memo(({
   onViewOwner,
   onLoadMore,
   checkEditAccess,
-  isCreatingShelf
+  isCreatingShelf,
+  displayTitle
 }) => {
   const shelfIds = useMemo(() => 
     personalShelves.map(shelf => shelf.shelf_id), 
     [personalShelves]
   );
 
+  const titleForBaseList = displayTitle === undefined ? "Shelves" : displayTitle;
+
   return (
     <BaseShelfList
       shelves={allShelves}
-      title="Shelves"
+      title={titleForBaseList}
       emptyStateMessage="No shelves found."
       loading={loading}
       isCurrentUserProfile={false}

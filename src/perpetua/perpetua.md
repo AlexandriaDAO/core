@@ -168,8 +168,11 @@ perpetua/
 ```
 
 
+- Go through perpetua audit.
 
 
+
+- Tag display needs to look better.
 - show topup account in the header toolbar.
 - Items on perpetua display load (need to maybe make the nft ranking setup.)
 

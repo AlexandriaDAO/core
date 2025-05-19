@@ -1,5 +1,4 @@
 use ic_cdk;
-use ic_cdk::api::time;
 use candid::{CandidType, Deserialize};
 
 use crate::storage::{

@@ -45,6 +45,7 @@ import { default as NewShelfDialog } from "../features/shelf-management/componen
 import { ShelfDetailContainer } from "../features/shelf-management/containers/ShelfDetailContainer";
 import { Button } from "@/lib/components/button";
 import { ToggleGroup, ToggleGroupItem } from "@/lib/components/toggle-group";
+import { LoaderCircle, Library, Plus, Users, Filter, FilterX } from "lucide-react";
 
 // Import Tag components
 import { PopularTagsList } from '../features/tags/components/PopularTagsList';
@@ -86,10 +87,12 @@ const PerpetuaLayout: React.FC = () => {
 
   // Core data hooks
   const { shelves: personalNormalizedShelves, loading: personalLoading, createShelf, addItem, setItemOrder } = useShelfOperations();
-  const { publicShelves: publicNormalizedShelves, loading: publicLoading, loadMoreShelves } = usePublicShelfOperations();
+  const { publicShelves: publicNormalizedShelves, loading: publicShelvesHookLoading, loadMoreShelves } = usePublicShelfOperations(); // Renamed publicLoading to avoid conflict
   
   // Dialog state
   const [isNewShelfDialogOpen, setIsNewShelfDialogOpen] = useState(false);
+  const [isFollowingSectionVisible, setIsFollowingSectionVisible] = useState(false);
+  const [isSearchSectionVisible, setIsSearchSectionVisible] = useState(false); // New state for search expander
   
   // Redux state
   const dispatch = useAppDispatch();
@@ -141,7 +144,7 @@ const PerpetuaLayout: React.FC = () => {
 
   // Use the memoized selector, or default to the stable empty array
   const userShelves = useAppSelector(state => userShelvesSelector ? userShelvesSelector(state) : stableEmptyShelves) as NormalizedShelf[]; // Type assertion
-  const [userShelvesLoading, setUserShelvesLoading] = useState(false);
+  const [userShelvesLoadingState, setUserShelvesLoadingState] = useState(false);
   
   // Memoize the combined and unique shelves for the main view
   const uniqueNormalizedShelves = useMemo(() => {
@@ -197,8 +200,8 @@ const PerpetuaLayout: React.FC = () => {
   
   // Load shelves when viewing a specific user's profile (modified to prevent loops)
   useEffect(() => {
-    if (isUserDetail && routeUserId && routeUserId !== userPrincipal && !userShelvesLoading) {
-      setUserShelvesLoading(true);
+    if (isUserDetail && routeUserId && routeUserId !== userPrincipal && !userShelvesLoadingState) {
+      setUserShelvesLoadingState(true);
       // Dispatch loadShelves and let Redux handle state management
       dispatch(loadShelves({ 
         principal: routeUserId, 
@@ -206,13 +209,13 @@ const PerpetuaLayout: React.FC = () => {
       }))
         .unwrap()
         .then(() => {
-          setUserShelvesLoading(false);
+          setUserShelvesLoadingState(false);
         })
         .catch(() => {
-          setUserShelvesLoading(false);
+          setUserShelvesLoadingState(false);
         });
     }
-  }, [dispatch, isUserDetail, routeUserId, userPrincipal, userShelvesLoading]);
+  }, [dispatch, isUserDetail, routeUserId, userPrincipal, userShelvesLoadingState]);
   
   // Handle shelf selection when route changes - simplified dependencies
   useEffect(() => {
@@ -225,15 +228,9 @@ const PerpetuaLayout: React.FC = () => {
   // Effect to load initial feed data when feed type changes
   useEffect(() => {
     if (currentFeedType === 'storyline' && storylineFeedShelves.length === 0 && !isLoadingStorylineFeed && identity) {
-      // For storyline, ensure identity is available as it might be needed for personalization,
-      // even if not directly passed to the current thunk, it's good practice for feed thunks.
-      // The current loadStorylineFeed thunk doesn't require principal in its direct args,
-      // but future versions or the service might.
-      dispatch(loadStorylineFeed({ params: { limit: 20 } })); // Initial load, no cursor
+      dispatch(loadStorylineFeed({ params: { limit: 20 } })); 
     } else if (currentFeedType === 'recency' && recencyPublicShelves.length === 0 && !isLoadingRecencyPublic ) {
-      // Initial load for recency feed if it's empty and not already loading.
-      // This assumes loadRecentShelves populates recencyPublicShelves.
-      dispatch(loadRecentShelves({ limit: 20 })); // Corrected: pass params directly
+      dispatch(loadRecentShelves({ limit: 20 })); 
     }
   }, [
     currentFeedType, 
@@ -254,21 +251,20 @@ const PerpetuaLayout: React.FC = () => {
   }, [createShelf]);
   
   const handleFeedTypeChange = (value: string) => {
-    if (value) { // ToggleGroup might pass empty string if nothing is active, ensure value exists
+    if (value) { 
         const newFeedType = value as FeedType;
         dispatch(setCurrentFeedType(newFeedType));
         if (newFeedType === 'random') {
-          // Unconditionally load random feed when selected
           dispatch(loadRandomFeed({ limit: 20 })); 
         }
     }
   };
 
-  const loadMoreStoryline = useCallback(async () => { // Make async for UnifiedShelvesUI
-    if (identity && !isLoadingStorylineFeed) { // Always try if identity exists and not loading
-      if (storylineFeedCursor) { // If cursor exists, load next page
+  const loadMoreStoryline = useCallback(async () => { 
+    if (identity && !isLoadingStorylineFeed) { 
+      if (storylineFeedCursor) { 
         await dispatch(loadStorylineFeed({ params: { limit: 20, cursor: storylineFeedCursor }})).unwrap();
-      } else { // If no cursor, load first page
+      } else { 
         await dispatch(loadStorylineFeed({ params: { limit: 20, cursor: undefined }})).unwrap();
       }
     }
@@ -296,7 +292,6 @@ const PerpetuaLayout: React.FC = () => {
 
   // Render view based on current URL and state
   const renderView = () => {
-    // If we're viewing a shelf
     if (isShelfDetail && selectedShelf) {
       const denormalizedShelf = denormalizeShelf(selectedShelf);
       
@@ -308,7 +303,6 @@ const PerpetuaLayout: React.FC = () => {
       );
     }
     
-    // If we're viewing the main shelves view
     if (isMainView) {
       let shelvesToDisplay: NormalizedShelf[] = [];
       let isLoadingCurrentFeed = false;
@@ -319,86 +313,147 @@ const PerpetuaLayout: React.FC = () => {
         isLoadingCurrentFeed = isLoadingRecencyPublic;
         loadMoreAction = loadMoreShelves;
       } else if (currentFeedType === 'random') {
-        shelvesToDisplay = randomFeedShelves || []; // Ensure array
+        shelvesToDisplay = randomFeedShelves || []; 
         isLoadingCurrentFeed = isLoadingRandomFeed;
-        loadMoreAction = loadMoreRandom; // Assign loadMoreRandom for the random feed
+        loadMoreAction = loadMoreRandom; 
       } else if (currentFeedType === 'storyline') {
-        shelvesToDisplay = storylineFeedShelves || []; // Ensure array
+        shelvesToDisplay = storylineFeedShelves || []; 
         isLoadingCurrentFeed = isLoadingStorylineFeed;
-        loadMoreAction = loadMoreStoryline; // Always assign loadMoreStoryline for the storyline feed
+        loadMoreAction = loadMoreStoryline; 
       }
 
       return (
         <>
-          {/* Top controls */}  
-          <div className="mb-4 flex justify-between items-center">
-            {userPrincipal ? (
-              <Button onClick={() => goToUser(userPrincipal)}>My Library</Button>
-            ) : (
-              <div /> // Placeholder for alignment if needed when not logged in
-            )}
-            <ToggleGroup type="single" defaultValue={currentFeedType} value={currentFeedType} onValueChange={handleFeedTypeChange} className="w-auto">
-              <ToggleGroupItem value="recency">Recent</ToggleGroupItem>
-              <ToggleGroupItem value="random">Random</ToggleGroupItem>
-              {/* Only show Storyline if logged in, assuming it requires auth */} 
-              {userPrincipal && <ToggleGroupItem value="storyline">Storyline</ToggleGroupItem>}
-            </ToggleGroup>
+          {/* Top controls: Feed Toggles first, then Action Buttons & Search Expander */}
+          <div className="mb-4 flex flex-col items-center gap-3"> {/* Reduced gap slightly */}
+            {/* Feed Toggles - Centered */}
+            <div className="flex justify-center w-full sm:w-auto">
+              <ToggleGroup 
+                type="single" 
+                defaultValue={currentFeedType} 
+                value={currentFeedType} 
+                onValueChange={handleFeedTypeChange} 
+                className="w-auto flex-shrink-0 border border-border rounded-md p-0.5"
+              >
+                <ToggleGroupItem value="recency" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground hover:bg-accent rounded-sm px-3 py-1 text-sm">Recent</ToggleGroupItem>
+                <ToggleGroupItem value="random" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground hover:bg-accent rounded-sm px-3 py-1 text-sm">Random</ToggleGroupItem>
+                {userPrincipal && <ToggleGroupItem value="storyline" className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground hover:bg-accent rounded-sm px-3 py-1 text-sm">Storyline</ToggleGroupItem>}
+              </ToggleGroup>
+            </div>
+
+            {/* Action Buttons & Search Expander - Below feeds, centered */}
+            <div className="flex items-center gap-2 flex-wrap justify-center w-full">
+              {userPrincipal && (
+                <Button 
+                  onClick={() => goToUser(userPrincipal)} 
+                  className="whitespace-nowrap" 
+                  variant="primary" 
+                  scale="sm"
+                >
+                  <Library className="mr-2 h-4 w-4" />
+                  My Library
+                </Button>
+              )}
+              {userPrincipal && (
+                <Button 
+                  onClick={handleCreateShelf} 
+                  className="whitespace-nowrap"
+                  disabled={isCreatingShelf} 
+                  variant="primary" 
+                  scale="sm"
+                >
+                  {isCreatingShelf ? (
+                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="mr-2 h-4 w-4" />
+                  )}
+                  New Shelf
+                </Button>
+              )}
+              {userPrincipal && (
+                <Button 
+                  onClick={() => setIsFollowingSectionVisible(!isFollowingSectionVisible)}
+                  className="whitespace-nowrap"
+                  variant={isFollowingSectionVisible ? "secondary" : "primary"} // Corrected: No "default", uses primary/secondary
+                  scale="sm"
+                >
+                  <Users className="mr-2 h-4 w-4" />
+                  Following
+                </Button>
+              )}
+              <Button 
+                onClick={() => setIsSearchSectionVisible(!isSearchSectionVisible)}
+                className="whitespace-nowrap"
+                variant={isSearchSectionVisible ? "secondary" : "primary"} // Corrected: No "default", uses primary/secondary
+                scale="sm"
+              >
+                {isSearchSectionVisible ? <FilterX className="mr-2 h-4 w-4" /> : <Filter className="mr-2 h-4 w-4" />}
+                {isSearchSectionVisible ? 'Hide Filters' : 'Show Filters'}
+              </Button>
+            </div>
           </div>
           
-          {/* Tags Search and Popular */}  
-          <div className="flex flex-col sm:flex-row gap-4 mb-4 items-start">
-            <div className="flex-grow"><PopularTagsList /></div>
-            <TagSearchBar />
-          </div>
-
-          {/* Conditionally render Followed lists only if logged in */} 
-          {identity && (
-            <>
-              <FollowedTagsList />
-              <FollowedUsersList />
-            </>
+          {/* Conditionally rendered Tags and Search Section */}
+          {isSearchSectionVisible && (
+            <div className="mb-6 flex flex-col md:flex-row items-center gap-4">
+              <div className="flex-grow w-full md:w-auto">
+                <PopularTagsList /> 
+              </div>
+              <div className="w-full md:w-auto md:min-w-[250px] flex-shrink-0">
+                <TagSearchBar />
+              </div>
+            </div>
           )}
+          
+          {/* Following Section (conditionally rendered) */}
+          {identity && isFollowingSectionVisible && (
+            <div className="mb-6 flex flex-col gap-6 border-t pt-6 mt-6">
+              <h3 className="text-lg font-semibold">Following</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <FollowedTagsList />
+                <FollowedUsersList />
+              </div>
+            </div>
+          )}
+          
+          {/* Tag Filter Display - show if search is open OR a filter is active */}
+          {(isSearchSectionVisible || currentTagFilter) && <TagFilterDisplay />}
 
-          {/* Tag Filter and Shelf List */}  
-          <TagFilterDisplay />
 
-          {currentTagFilter ? (
+          {currentTagFilter && isSearchSectionVisible ? ( // If a filter is applied AND search is open, show filtered list
             <FilteredShelfListContainer /> 
-          ) : (
+          ) : currentTagFilter && !isSearchSectionVisible ? ( // If a filter is applied BUT search is closed, still show filtered list
+             <FilteredShelfListContainer /> 
+          ) : ( // Otherwise, show the normal feed
             <UnifiedShelvesUI 
+              displayTitle=""
               allShelves={denormalizeShelves(shelvesToDisplay)}
               personalShelves={denormalizeShelves(personalNormalizedShelves)}
               loading={isLoadingCurrentFeed}
-              onNewShelf={userPrincipal ? handleCreateShelf : () => {}}
+              onNewShelf={() => {}}
               onViewShelf={goToShelf}
               onViewOwner={goToUser}
               onLoadMore={loadMoreAction ? loadMoreAction : async () => {}}
               checkEditAccess={checkEditAccess}
-              isCreatingShelf={isCreatingShelf}
+              isCreatingShelf={isCreatingShelf} 
             />
           )}
         </>
       );
     }
     
-    // If we're viewing a specific user's shelves
     if (isUserDetail && routeUserId) {
       const isCurrentUserProfile = userPrincipal === routeUserId;
       
-      // Determine the username to display
-      // If it's the current user's profile, authUser.username might be available and fresher initially
-      // Otherwise, use the fetched routeUsername
       let displayedUsername: string | undefined = undefined;
       if (isCurrentUserProfile && authUser && typeof (authUser as any).username === 'string') {
         displayedUsername = (authUser as any).username;
       } else if (routeUsername) {
         displayedUsername = routeUsername;
       } else if (isLoadingRouteUsername) {
-        // Optionally, show principal or loading indicator while username is loading for other users
-        displayedUsername = `Loading user...`; // Or routeUserId to show principal
+        displayedUsername = `Loading user...`; 
       } else {
-        // Fallback if username couldn't be fetched
-        displayedUsername = routeUserId; // Display principal as fallback
+        displayedUsername = routeUserId; 
       }
 
       const userDenormalizedShelves = denormalizeShelves(userShelves);
@@ -406,35 +461,31 @@ const PerpetuaLayout: React.FC = () => {
       return (
         <UserShelvesUI 
           shelves={userDenormalizedShelves}
-          loading={userShelvesLoading || isLoadingRouteUsername} // Combine loading states
+          loading={userShelvesLoadingState || isLoadingRouteUsername} // Corrected variable name
           onViewShelf={goToShelf}
-          onViewOwner={goToUser} // This likely navigates to a user page, might need username there too
+          onViewOwner={goToUser} 
           onBack={goToMainShelves}
           isCurrentUser={isCurrentUserProfile}
-          onNewShelf={isCurrentUserProfile ? handleCreateShelf : undefined}
+          onNewShelf={undefined}
           isCreatingShelf={isCurrentUserProfile ? isCreatingShelf : undefined}
-          ownerUsername={displayedUsername} // Pass the resolved or fallback username
+          ownerUsername={displayedUsername} 
         />
       );
     }
     
-    // Fallback
     return <div>Loading...</div>;
   };
   
   return (
     <>
-      {/* Render the shelf detail view directly without any wrappers */}
       {isShelfDetail && selectedShelf ? (
         renderView()
       ) : (
-        /* Use container for other views */
         <div className="container mx-auto p-4">
           {renderView()}
         </div>
       )}
       
-      {/* Dialogs */}
       {identity && (
         <NewShelfDialog 
           isOpen={isNewShelfDialogOpen}
