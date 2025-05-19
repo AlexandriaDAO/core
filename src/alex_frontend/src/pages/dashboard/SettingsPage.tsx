@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React from "react";
 import LibrarianCard from "@/components/LibrarianCard";
 import CanisterCard from "@/components/CanisterCard";
+import { LbryActor } from "@/actors";
 
 function SettingsPage() {
 	return (
-		<>
+		<LbryActor>
 			<div className="flex justify-between items-center mb-8">
 				<h1 className="text-3xl font-bold">Settings</h1>
 			</div>
@@ -16,7 +17,7 @@ function SettingsPage() {
 					<CanisterCard />
 				</div>
 			</div>
-		</>
+		</LbryActor>
 	);
 }
 

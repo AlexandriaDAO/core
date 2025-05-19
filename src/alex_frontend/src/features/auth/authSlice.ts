@@ -24,6 +24,9 @@ export interface AuthState {
 
 	librarianLoading: boolean
 	librarianError: string | null;
+
+	canisterLoading: boolean
+	canisterError: string | null;
 }
 
 // Define the initial state using the AuthState interface
@@ -38,6 +41,9 @@ const initialState: AuthState = {
 
 	librarianLoading: false,
 	librarianError: null,
+
+	canisterLoading: false,
+	canisterError: null,
 };
 
 

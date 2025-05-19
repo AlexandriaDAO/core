@@ -7,7 +7,7 @@ import upload from "../thunks/upload";
 
 const ICPAssetUploader: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const { userAssetCanister } = useAppSelector((state) => state.assetManager);
+	const { canister } = useAppSelector((state) => state.auth);
 	const {identity} = useIdentity();
 	const [file, setFile] = useState<File | null>(null);
 	const { uploading, percentage } = useAppSelector((state) => state.icpAssets);
@@ -19,7 +19,7 @@ const ICPAssetUploader: React.FC = () => {
 	};
 
 	const assetManager = useAssetManager({
-		canisterId: userAssetCanister ?? undefined,
+		canisterId: canister ?? undefined,
 		identity
 	});
 
@@ -42,9 +42,9 @@ const ICPAssetUploader: React.FC = () => {
 				/>
 				<button
 					onClick={handleUpload}
-					disabled={!file || uploading || !userAssetCanister}
+					disabled={!file || uploading || !canister}
 					className={`px-6 py-2 rounded ${
-						!file || uploading || !userAssetCanister
+						!file || uploading || !canister
 							? "bg-gray-300 cursor-not-allowed"
 							: "bg-blue-500 hover:bg-blue-600 text-white"
 					}`}

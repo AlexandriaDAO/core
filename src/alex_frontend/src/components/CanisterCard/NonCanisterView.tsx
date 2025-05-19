@@ -3,16 +3,31 @@ import { Button } from "@/lib/components/button";
 import { LockKeyhole } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { createAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
+import { createCanister } from "@/features/auth/thunks/createCanister";
+import { useAssetManager, useLbry } from "@/hooks/actors";
+import { toast } from "sonner";
+// import { createAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 
 function NonCanisterView() {
+    const {actor: assetManagerActor} = useAssetManager();
+    const {actor: lbryActor} = useLbry();
+
     const dispatch = useAppDispatch();
-    const {user} = useAppSelector(state=> state.auth)
+    const {user, canisterError} = useAppSelector(state=> state.auth)
 
     const handleCreate = ()=>{
-        if(!user) return;
+        try{
+            if(!user) throw new Error('Unauthenticated User');
+            if(!assetManagerActor) throw new Error('Asset Manager Actor not available');
+            if(!lbryActor) throw new Error('LBRY Actor not available');
 
-        dispatch(createAssetCanister({ userPrincipal: user.principal }))
+            // dispatch(createAssetCanister({ userPrincipal: user.principal }))
+            dispatch(createCanister({assetManagerActor, lbryActor}))
+        }catch(error){
+            console.log('create error,' , error);
+            toast.error('Failed. ' + (error instanceof Error ? error.message : String(error)))
+        }
+        if(!user) return;
     }
 
 	return (
@@ -20,12 +35,25 @@ function NonCanisterView() {
             <div className="p-2 bg-muted border rounded-full">
                 <LockKeyhole size={22} className="text-primary"/>
             </div>
-            <span className="font-roboto-condensed font-medium text-base">
-                Your do not have a canister yet. Create a canister to start uploading assets.
-            </span>
+            <div className="flex flex-col gap-2 items-center justify-center font-roboto-condensed font-medium text-base">
+                <span className="text-center">
+                    Your do not have a canister yet.
+                </span>
+                <span className="text-center">
+                    Create a canister to start uploading assets.
+                </span>
+            </div>
             <Button variant="link" scale="sm" onClick={handleCreate}>
-                Create Canister
+                {canisterError ? 'Try Again!!':'Create Canister'}
             </Button>
+            {canisterError &&
+                <div className="flex flex-col gap-2 items-center justify-center font-roboto-condensed font-medium text-base text-destructive">
+                    <span className="text-center">
+                        An Error Occured while creating canister.
+                    </span>
+                    <span className="text-center">{canisterError}</span>
+                </div>
+            }
         </div>
 	);
 }
