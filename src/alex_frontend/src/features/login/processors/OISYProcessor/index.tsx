@@ -21,13 +21,13 @@ const PROTECTED_PASSWORD = "testoisy"; // Change this as needed
 
 const OISYProcessor = () => {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
-	const { setProvider } = useAuth();
+	// const { setProvider } = useAuth();
 	const { isLoggingIn } = useSiwoIdentity();
     // State to track if access has been granted via password
     const [isAccessGranted, setIsAccessGranted] = useState(false);
 
 	const handleLogin = async () => {
-		setProvider("OISY");
+		// setProvider("OISY");
 		setIsOpen(true);
 	};
 
@@ -35,7 +35,7 @@ const OISYProcessor = () => {
         if (isAccessGranted) {
             handleLogin();
         } else {
-            const password = window.prompt("Enter the password to test NFID login:");
+            const password = window.prompt("Enter the password to test OISY login:");
             if (password === PROTECTED_PASSWORD) {
                 setIsAccessGranted(true);
 

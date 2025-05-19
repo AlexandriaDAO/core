@@ -5,7 +5,7 @@ import { AssetManagerActor, UserActor } from "@/actors";
 // import EthUserProvider from "./EthUserProvider";
 import useAuth from "@/hooks/useAuth";
 // import SolUserProvider from "./SolUserProvider";
-// import NFIDUserProvider from "./NFIDUserProvider";
+import NFIDUserProvider from "./NFIDUserProvider";
 
 interface UserProviderProps {
 	children: React.ReactNode;
@@ -15,7 +15,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
     const {provider} = useAuth();
 
-    if (provider === 'II' || provider === 'NFID') return (
+    if (provider === 'II') return (
         <UserActor>
             <AssetManagerActor>
                 <IIUserProvider>{children}</IIUserProvider>
@@ -23,7 +23,13 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         </UserActor>
     )
 
-    // if (provider === 'SOL') return <SolUserProvider>{children}</SolUserProvider>;
+    if (provider === 'NFID') return (
+        <UserActor>
+            <AssetManagerActor>
+                <NFIDUserProvider>{children}</NFIDUserProvider>
+            </AssetManagerActor>
+        </UserActor>
+    )
 
     if (provider === 'OISY') return (
         <UserActor>

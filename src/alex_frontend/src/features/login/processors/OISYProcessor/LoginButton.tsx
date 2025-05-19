@@ -1,5 +1,3 @@
-import { useAccount, useChainId } from "wagmi";
-
 import { Button } from "@/lib/components/button";
 import React, { useEffect } from "react";
 import { LoaderCircle } from "lucide-react";

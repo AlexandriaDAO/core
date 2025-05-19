@@ -176,7 +176,9 @@
 
     "ic-use-actor": "^0.1.0",
 
-    "ic-use-internet-identity": "file:ic-use-internet-identity-0.2.0.tgz",
+    "ic-use-internet-identity": "file:ic-use-internet-identity-0.2.1.tgz",
+
+    "ic-use-nfid-identity": "file:ic-use-nfid-identity-0.1.0.tgz",
 
     "ic-use-siwe-identity": "^0.1.2",
 
