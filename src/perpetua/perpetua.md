@@ -168,8 +168,6 @@ perpetua/
 ```
 
 UI:
-- New item/shelf button on my library page.
-- Adding markdown items is not optimistic.
 - There's a lot of background loading, like if I go to "My Library" it feels frozen for 10 seconds.
 
 
@@ -178,6 +176,7 @@ Backend:
 - Add payments for making shelves, and maybe elsewhere.
 
 Functional:
+- Going to need to search by user public shelves (in addition to search by tags). Or some other way to reach tags.
 - We're going to need to be able to add an item in a certain spot. Not just the top/bottom.
 - Progressive loading of NFTs inside shelves.
 

@@ -205,7 +205,7 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
               {canEditOrder && (
                 !isEditMode ? (
                   <Button 
-                    variant="outline" 
+                    variant="primary" 
                     className="flex items-center gap-1 px-3 h-9"
                     onClick={enterEditMode}
                     disabled={loading || saveInProgress}
@@ -236,9 +236,30 @@ export const BaseShelfList: React.FC<BaseShelfListProps> = ({
                   </>
                 )
               )}
+              {isCurrentUserProfile && onNewShelf && !isEditMode && (
+                <Button 
+                  variant="primary" 
+                  className="flex items-center gap-1 px-3 h-9"
+                  onClick={onNewShelf} 
+                  disabled={isCreatingShelf || loading || saveInProgress}
+                >
+                  {isCreatingShelf ? (
+                    <RotateCw className="w-4 h-4 animate-spin mr-1" />
+                  ) : (
+                    <Plus className="w-4 h-4 mr-1" />
+                  )}
+                  New Shelf
+                </Button>
+              )}
             </div>
           </div>
           
+          {isCurrentUserProfile && !isEditMode && (
+            <p className="text-xs text-muted-foreground font-serif mt-1">
+              This is the order your profile will appear to others.
+            </p>
+          )}
+
           {saveError && (
             <div className="flex items-center gap-2 text-destructive text-sm mt-2 font-serif">
               <AlertCircle className="w-4 h-4" />

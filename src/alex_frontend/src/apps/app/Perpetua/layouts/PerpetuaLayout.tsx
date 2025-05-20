@@ -466,7 +466,7 @@ const PerpetuaLayout: React.FC = () => {
           onViewOwner={goToUser} 
           onBack={goToMainShelves}
           isCurrentUser={isCurrentUserProfile}
-          onNewShelf={undefined}
+          onNewShelf={isCurrentUserProfile ? handleCreateShelf : undefined}
           isCreatingShelf={isCurrentUserProfile ? isCreatingShelf : undefined}
           ownerUsername={displayedUsername} 
         />

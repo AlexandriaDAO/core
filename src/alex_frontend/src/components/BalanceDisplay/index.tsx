@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import getSpendingBalance from '@/features/swap/thunks/lbryIcrc/getSpendingBalance';
-import getLbryBalance from '@/features/swap/thunks/lbryIcrc/getLbryBalance';
-import getAccountAlexBalance from '@/features/swap/thunks/alexIcrc/getAccountAlexBalance';
+import getLbryBalance from '../../features/swap/thunks/lbryIcrc/getLbryBalance';
+import getAccountAlexBalance from '../../features/swap/thunks/alexIcrc/getAccountAlexBalance';
 import getIcpBal from '@/features/icp-ledger/thunks/getIcpBal';
 import { LoaderCircle, ChevronDown, ChevronUp, Layers, Wallet } from 'lucide-react';
 
@@ -11,34 +11,40 @@ const BalanceDisplay: React.FC = () => {
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const {
-        spendingBalance, // LBRY spending
-        lbryBalance,      // Main LBRY
+        spendingBalance, 
+        lbryBalance,      
         loading: swapLoading,
     } = useAppSelector((state) => state.swap);
     const {
-        accountBalance: icpBalance, // ICP balance
+        accountBalance: icpBalance, 
         loading: icpLoading,
     } = useAppSelector((state) => state.icpLedger);
-
-    // Using local state for ALEX balance display until selector is known
-    const [actualAlexBalance, setActualAlexBalance] = useState<string | number | undefined>(undefined);
+    const {
+        alexBal: mainAlexBalance,
+        loading: alexLoading,
+    } = useAppSelector((state) => state.alex);
 
     const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
-        if (user?.principal) {
-            if (spendingBalance === undefined) {
-                dispatch(getSpendingBalance(user.principal));
-            }
-            if (lbryBalance === undefined) {
-                dispatch(getLbryBalance(user.principal));
-            }
-            dispatch(getAccountAlexBalance(user.principal));
-            if (icpBalance === undefined) {
+        if (user?.principal && spendingBalance === "0") {
+            dispatch(getSpendingBalance(user.principal));
+        }
+    }, [dispatch, user, spendingBalance]);
+
+    useEffect(() => {
+        if (user?.principal && isExpanded) {
+            if (icpBalance === "0") {
                 dispatch(getIcpBal(user.principal));
             }
+            if (mainAlexBalance === "0") {
+                dispatch(getAccountAlexBalance(user.principal));
+            }
+            if (lbryBalance === "0") {
+                dispatch(getLbryBalance(user.principal));
+            }
         }
-    }, [dispatch, user, spendingBalance, lbryBalance, icpBalance]);
+    }, [dispatch, user, isExpanded, icpBalance, mainAlexBalance, lbryBalance]);
 
     if (!user) {
         return null;
@@ -46,11 +52,11 @@ const BalanceDisplay: React.FC = () => {
 
     const formatBalance = (balance: string | number | undefined, decimals = 2) => {
         const num = Number(balance);
-        if (balance === undefined || balance === null || isNaN(num)) return (0).toFixed(decimals);
+        if (balance === undefined || balance === null || isNaN(num) || balance === "0") return (0).toFixed(decimals);
         return num.toFixed(decimals);
     };
     
-    const defaultBalanceValue = spendingBalance === undefined || swapLoading 
+    const defaultBalanceValue = swapLoading && spendingBalance === "0"
         ? <LoaderCircle size={16} className="animate-spin inline-block" /> 
         : formatBalance(spendingBalance);
 
@@ -66,15 +72,15 @@ const BalanceDisplay: React.FC = () => {
                     <div className="text-sm space-y-2">
                         <p className="flex justify-between items-center">
                             <span className="flex items-center"><Wallet size={14} className="mr-2 text-gray-400" />ICP:</span>
-                            {icpBalance === undefined || icpLoading ? <LoaderCircle size={12} className="animate-spin" /> : <span>{formatBalance(icpBalance)}</span>}
+                            {icpLoading && icpBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span>{formatBalance(icpBalance)}</span>}
                         </p>
                         <p className="flex justify-between items-center">
                             <span className="flex items-center"><Wallet size={14} className="mr-2 text-gray-400" />ALEX:</span>
-                            {swapLoading && actualAlexBalance === undefined ? <LoaderCircle size={12} className="animate-spin" /> : <span>{formatBalance(actualAlexBalance)}</span>}
+                            {alexLoading && mainAlexBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span>{formatBalance(mainAlexBalance)}</span>}
                         </p>
                         <p className="flex justify-between items-center">
                             <span className="flex items-center"><Wallet size={14} className="mr-2 text-gray-400" />LBRY:</span>
-                            {lbryBalance === undefined || swapLoading ? <LoaderCircle size={12} className="animate-spin" /> : <span>{formatBalance(lbryBalance)}</span>}
+                            {swapLoading && lbryBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span>{formatBalance(lbryBalance)}</span>}
                         </p>
                     </div>
                 </div>

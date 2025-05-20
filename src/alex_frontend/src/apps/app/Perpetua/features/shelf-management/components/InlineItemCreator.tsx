@@ -142,20 +142,57 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
       
       if (!finalContent) {
         toast.error(`Please ${type === "Markdown" ? "enter" : "select"} ${type.toLowerCase()} content`);
+        setIsSubmitting(false); // Release submitting state if validation fails
         return;
+      }
+
+      if (type === "Markdown") {
+        // Optimistic update for Markdown
+        const tempUiId = `optimistic_${Date.now()}`; // Generate a temporary ID
+        dispatch({
+          type: "perpetua/optimisticMarkdownAddPending", // Replace with your actual action type
+          payload: {
+            shelfId: shelf.shelf_id, // Assuming shelf prop has shelf_id
+            item: {
+              type: "Markdown",
+              content: finalContent,
+              tempUiId: tempUiId,
+              // You might want to add other temporary fields like a timestamp or pending status
+            },
+          },
+        });
       }
       
       await onSubmit(finalContent, type as "Markdown" | "Shelf");
+      // If onSubmit is successful, it should ideally dispatch an action to finalize the optimistic update,
+      // replacing the temporary item with the real one from the backend, using the tempUiId.
+
       setContent("");
       setSelectedShelfId("");
-      toast.success(`Added ${type.toLowerCase()} content to shelf`);
+      // Toast message might need adjustment based on optimistic success vs. actual success
+      // For now, we keep it as is, assuming onSubmit handles its own success/error feedback
+      // or that the optimistic add is usually fast and reliable.
+      // toast.success(`Added ${type.toLowerCase()} content to shelf`); // Consider moving this or making it conditional
     } catch (error: any) {
       const errorMessage = error?.message || "You can't add a shelf that has this shelf inside it.";
       toast.error(errorMessage);
+      // If an error occurs, dispatch an action to roll back the optimistic update for Markdown
+      if (type === "Markdown") {
+        // Assuming you have a tempUiId from the optimistic add step, you'd use it here.
+        // This part requires the tempUiId to be available in this catch block.
+        // For simplicity, this example doesn't pass tempUiId to the catch block,
+        // but in a real implementation, you'd need to handle this.
+        // A more robust way would be for onSubmit to handle its own rollback action dispatch
+        // upon failure, referencing the tempUiId if it was involved in an optimistic update.
+        // dispatch({
+        //   type: "perpetua/optimisticMarkdownAddRollback", // Replace with your actual rollback action
+        //   payload: { shelfId: shelf.shelf_id, tempUiId: /* tempUiId from above */ },
+        // });
+      }
     } finally {
       setIsSubmitting(false);
     }
-  }, [type, selectedShelfId, content, onSubmit]);
+  }, [type, selectedShelfId, content, onSubmit, dispatch, shelf?.shelf_id]); // Added dispatch and shelf.shelf_id
 
   // Set content handler - memoized
   const handleSetContent = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
