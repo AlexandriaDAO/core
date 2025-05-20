@@ -2,11 +2,13 @@ import { useMemo } from "react";
 import { HttpAgent, Identity } from "@dfinity/agent";
 import { AssetManager } from "@dfinity/assets";
 
+const isLocal = process.env.DFX_NETWORK == "local";
 interface UseAssetManagerOptions {
 	canisterId?: string;
 	identity?: Identity;
 	maxSingleFileSize?: number;
 	maxChunkSize?: number;
+	host?: string;
 }
 
 export function useAssetManager({
@@ -14,17 +16,15 @@ export function useAssetManager({
 	identity,
 	maxSingleFileSize = 1_900_000, // Default value
 	maxChunkSize = 500_000, // Default value
+	host= isLocal ? `http://localhost:${window.location.port}`:'https://ic0.app',
 }: UseAssetManagerOptions) {
 	const assetManager = useMemo(() => {
 		if (!canisterId || !identity) return null;
 
 		try {
 			// Create agent
-			const isLocal = !window.location.host.endsWith("ic0.app");
 			const agent = HttpAgent.createSync({
-				host: isLocal
-					? `http://localhost:${window.location.port}`
-					: "https://ic0.app",
+				host,
 				identity,
 			});
 

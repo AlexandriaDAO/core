@@ -85,22 +85,24 @@ const router = createBrowserRouter(
 					<Route path="bibliotheca" element={<Suspense key="bibliotheca" fallback={<TopProgressBar />}><Bibliotheca /></Suspense>} />
 					<Route path="alexandrian" element={<Suspense key="alexandrian" fallback={<TopProgressBar />}><Alexandrian /></Suspense>} />
 					<Route path="syllogos" element={<Suspense key="syllogos" fallback={<TopProgressBar />}><Syllogos /></Suspense>} />
-					<Route 
-						path="perpetua"
-						element={
-							<PasswordProtect>
-								<Suspense key="perpetua" fallback={<TopProgressBar />}>
-									<Perpetua />
-								</Suspense>
-							</PasswordProtect>
-						}
-					>
-						<Route index element={<Suspense key="perpetua-home" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-						<Route path="shelf/:shelfId" element={<Suspense key="perpetua-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-						<Route path="item/:itemId" element={<Suspense key="perpetua-item" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-						<Route path="user/:userId" element={<Suspense key="perpetua-user" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-						<Route path="user/:userId/shelf/:shelfId" element={<Suspense key="perpetua-user-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-						<Route path="user/:userId/item/:itemId" element={<Suspense key="perpetua-user-item" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+					<Route element={<AuthGuard />}>
+						<Route
+							path="perpetua"
+							element={
+								<PasswordProtect>
+									<Suspense key="perpetua" fallback={<TopProgressBar />}>
+										<Perpetua />
+									</Suspense>
+								</PasswordProtect>
+							}
+						>
+							<Route index element={<Suspense key="perpetua-home" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+							<Route path="shelf/:shelfId" element={<Suspense key="perpetua-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+							<Route path="item/:itemId" element={<Suspense key="perpetua-item" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+							<Route path="user/:userId" element={<Suspense key="perpetua-user" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+							<Route path="user/:userId/shelf/:shelfId" element={<Suspense key="perpetua-user-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+							<Route path="user/:userId/item/:itemId" element={<Suspense key="perpetua-user-item" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						</Route>
 					</Route>
 					<Route path="dialectica" element={<Suspense key="dialectica" fallback={<TopProgressBar />}><Dialectica /></Suspense>} />
 					<Route path="permasearch" element={<Suspense key="permasearch" fallback={<TopProgressBar />}><Permasearch /></Suspense>} />
