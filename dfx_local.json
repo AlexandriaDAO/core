@@ -141,6 +141,12 @@
       "package": "icp_swap_factory",
       "candid": "src/icp_swap_factory/icp_swap_factory.did",
       "specified_id": "ggzvv-5qaaa-aaaag-qck7a-cai"
+    },
+    "feed": {
+      "candid": "src/feed/feed.did",
+      "package": "feed",
+      "type": "rust",
+      "specified_id": "okj2q-daaaa-aaaap-qp2pa-cai"
     }
   },
   "defaults": {

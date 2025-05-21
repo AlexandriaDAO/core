@@ -54,6 +54,10 @@ cargo build --release --target wasm32-unknown-unknown --package perpetua --clean
 candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpetua/perpetua.did
 dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx generate perpetua
+# For feed
+cargo build --release --target wasm32-unknown-unknown --package feed
+candid-extractor target/wasm32-unknown-unknown/release/feed.wasm > src/feed/feed.did
+dfx deploy feed --specified-id okj2q-daaaa-aaaap-qp2pa-cai --network ic
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did

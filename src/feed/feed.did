@@ -1,0 +1,9 @@
+type Result = variant { Ok; Err : text };
+service : {
+  get_stored_icrc7_main_token_ids : () -> (opt vec nat) query;
+  get_stored_icrc7_main_token_ids_count : () -> (nat64) query;
+  get_stored_icrc7_scion_token_ids : () -> (opt vec nat) query;
+  get_stored_icrc7_scion_token_ids_count : () -> (nat64) query;
+  store_icrc7_main_token_ids : () -> (Result);
+  store_icrc7_scion_token_ids : () -> (Result);
+}

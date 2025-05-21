@@ -124,6 +124,12 @@
       "package": "emporium",
       "type": "rust",
       "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
+    },
+    "feed": {
+      "candid": "src/feed/feed.did",
+      "package": "feed",
+      "type": "rust",
+      "specified_id": "okj2q-daaaa-aaaap-qp2pa-cai"
     }
   },
   "defaults": {

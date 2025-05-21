@@ -15,6 +15,7 @@ members = [
     "src/emporium",
     "src/ic_siwo",
     "src/logs",
-    "src/asset_manager"
+    "src/asset_manager",
+    "src/feed",
 ]
 resolver = "2"
