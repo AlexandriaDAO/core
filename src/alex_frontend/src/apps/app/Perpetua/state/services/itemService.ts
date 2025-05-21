@@ -17,10 +17,11 @@ export async function addItemToShelf(
   collectionType?: "NFT" | "SBT"
 ): Promise<Result<boolean, string>> {
   try {
-    console.log(`perpetuaService: Adding ${type} item to shelf ${shelfId}`);
+    console.log(`[itemService] addItemToShelf: Called with shelfId: [${shelfId}], type: [${type}], content: [${content}], refId: [${referenceItemId}], before: [${before}]`);
 
     // For NFT/SBT items, ensure the content is a numeric ID
     if (type === "Nft") {
+      console.log(`[itemService] addItemToShelf: Processing NFT item.`);
       // Check if content is already a numeric ID
       if (!/^\d+$/.test(content)) {
         try {
@@ -34,18 +35,18 @@ export async function addItemToShelf(
             console.log(`Converting Arweave ID ${content} to numeric NFT ID: ${numericId}`);
             content = numericId;
           } else {
-            console.error(`Invalid NFT ID format and couldn't find numeric ID for: ${content}`);
+            console.error(`[itemService] addItemToShelf: Invalid NFT ID format and couldn't find numeric ID for: ${content}`);
             return { Err: "Invalid NFT ID format. The ID must be numeric." };
           }
         } catch (err) {
-          console.error("Error converting Arweave ID to numeric NFT ID:", err);
+          console.error("[itemService] addItemToShelf: Error converting Arweave ID to numeric NFT ID:", err);
           return { Err: "Invalid NFT ID format. The ID must be numeric." };
         }
       }
 
       // Final validation
       if (!/^\d+$/.test(content)) {
-        console.error(`Invalid NFT ID format after attempted conversion: ${content}`);
+        console.error(`[itemService] addItemToShelf: Invalid NFT ID format after attempted conversion: ${content}`);
         return { Err: "Invalid NFT ID format. The ID must be numeric." };
       }
 
@@ -81,10 +82,11 @@ export async function addItemToShelf(
             content = normalizedId;
           }
         } catch (err) {
-          console.error("Error during NFT pre-check:", err);
+          console.error("[itemService] addItemToShelf: Error during NFT pre-check:", err);
         }
       }
     }
+    console.log(`[itemService] addItemToShelf: NFT pre-check completed or skipped.`);
 
     // Create item content based on type
     let itemContent;
@@ -95,14 +97,15 @@ export async function addItemToShelf(
     } else if (type === "Shelf") {
       itemContent = { Shelf: content };
     } else {
-      console.error(`Unsupported item type: ${type}`);
+      console.error(`[itemService] addItemToShelf: Unsupported item type: ${type}`);
       return { Err: "Unsupported item type" };
     }
 
-    console.log(`Adding ${type} item to shelf ${shelfId} with content:`, itemContent);
+    console.log(`[itemService] addItemToShelf: Prepared itemContent for shelf [${shelfId}]:`, JSON.stringify(itemContent));
 
     // Make the backend call with prepared content
     try {
+      console.log(`[itemService] addItemToShelf: Attempting actor.add_item_to_shelf for shelf [${shelfId}]...`);
       const actor = await getActorPerpetua();
       const result = await actor.add_item_to_shelf(
         shelfId,
@@ -112,25 +115,28 @@ export async function addItemToShelf(
           before
         }
       );
+      console.log(`[itemService] addItemToShelf: Backend call for shelf [${shelfId}] completed. Raw result:`, JSON.stringify(result));
 
       if ("Ok" in result) {
-        console.log(`Successfully added ${type} item to shelf ${shelfId}`);
+        console.log(`[itemService] addItemToShelf: Successfully added ${type} item to shelf ${shelfId}`);
         return { Ok: true };
       } else if ("Err" in result) {
         const errMessage = result.Err;
-        console.error(`Error from backend adding ${type} item to shelf:`, errMessage);
+        console.error(`[itemService] addItemToShelf: Error from backend adding ${type} item to shelf [${shelfId}]:`, errMessage);
         if (type === "Shelf" && (errMessage.includes("Circular reference") || errMessage.includes("Cannot add a shelf to itself"))) {
           return { Err: "Cannot add this shelf because it already contains the current shelf." };
         }
         return { Err: errMessage };
       }
 
+      console.warn(`[itemService] addItemToShelf: Unknown response structure from canister for shelf [${shelfId}].`);
       return { Err: "Unknown response from canister" };
     } catch (error: any) {
       // Handle IC canister call errors
-      console.error(`IC canister error adding ${type} item to shelf:`, error);
+      console.error(`[itemService] addItemToShelf: IC canister call FAILED for shelf [${shelfId}]:`, error);
 
       const errorMessage = error?.message || String(error);
+      console.error(`[itemService] addItemToShelf: Parsed error message:`, errorMessage);
 
       // Check for circular reference errors specifically when adding a Shelf
       if (type === "Shelf" && (errorMessage.includes("Circular reference") || errorMessage.includes("Cannot add a shelf to itself"))) {
@@ -157,7 +163,7 @@ export async function addItemToShelf(
       return { Err: errorMessage };
     }
   } catch (error) {
-    console.error(`Unexpected error adding ${type} item to shelf:`, error);
+    console.error(`[itemService] addItemToShelf: UNEXPECTED outer error for shelf [${shelfId}]:`, error);
     return { Err: "An unexpected error occurred" };
   }
 }

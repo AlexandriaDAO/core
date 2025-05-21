@@ -40,7 +40,13 @@ export async function getUserShelves(
     if ("Ok" in result) {
       // Process the paginated result
       const paginatedResult = result.Ok;
-      const items = convertBigIntsToStrings(paginatedResult.items);
+      let items = convertBigIntsToStrings(paginatedResult.items) as ShelfPublic[];
+
+      // Re-convert owner strings back to Principal objects
+      items = items.map(shelf => ({
+        ...shelf,
+        owner: Principal.fromText(shelf.owner as any as string) // Cast needed as it was converted to string
+      }));
 
       return {
         Ok: {
@@ -328,5 +334,47 @@ export async function getStorylineFeed(
   } catch (error) {
     console.error('Error in getStorylineFeed:', error);
     return { Err: "Failed to load storyline feed" };
+  }
+}
+
+export async function getUserPubliclyEditableShelves(
+  principal: Principal | string,
+  params: OffsetPaginationParams
+): Promise<Result<OffsetPaginatedResponse<ShelfPublic>, QueryError>> {
+  try {
+    const actor = await getActorPerpetua();
+    const principalForApi = toPrincipal(principal);
+    const paginationInput: BackendOffsetPaginationInput = {
+      offset: BigInt(params.offset),
+      limit: BigInt(params.limit)
+    };
+    // Call the new backend method
+    const result = await actor.get_user_publicly_editable_shelves(principalForApi, paginationInput);
+
+    if ("Ok" in result) {
+      const paginatedResult = result.Ok;
+      // Assuming items are already ShelfPublic and bigints are handled by actor or further processing if needed
+      let items = convertBigIntsToStrings(paginatedResult.items) as ShelfPublic[]; 
+
+      // Re-convert owner strings back to Principal objects
+      items = items.map(shelf => ({
+        ...shelf,
+        owner: Principal.fromText(shelf.owner as any as string) // Cast needed as it was converted to string
+      }));
+
+      return {
+        Ok: {
+          items: items,
+          total_count: Number(paginatedResult.total_count),
+          limit: Number(paginatedResult.limit),
+          offset: Number(paginatedResult.offset)
+        }
+      };
+    } else {
+      return { Err: result.Err };
+    }
+  } catch (error) {
+    console.error('Error in getUserPubliclyEditableShelves:', error);
+    return { Err: "Failed to load user publicly editable shelves" };
   }
 } 

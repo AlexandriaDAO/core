@@ -116,6 +116,9 @@ service : {
   get_storyline_feed : (CursorPaginationInput) -> (Result_1) query;
   get_tag_shelf_count : (text) -> (nat64) query;
   get_tags_with_prefix : (text, CursorPaginationInput_4) -> (Result_10) query;
+  get_user_publicly_editable_shelves : (principal, OffsetPaginationInput) -> (
+      Result_11,
+    ) query;
   get_user_shelves : (principal, OffsetPaginationInput) -> (Result_11) query;
   is_shelf_public : (text) -> (Result_12) query;
   remove_item_from_shelf : (text, nat32) -> (Result);

@@ -810,3 +810,94 @@ pub fn get_public_shelves_by_tag(tag: String) -> QueryResult<Vec<ShelfPublic>> {
 
     Ok(public_shelves)
 }
+
+#[ic_cdk::query]
+pub fn get_user_publicly_editable_shelves(
+    user: Principal,
+    pagination: OffsetPaginationInput
+) -> QueryResult<OffsetPaginatedResult<ShelfPublic>> {
+    let limit = pagination.get_limit();
+    let offset = pagination.get_offset();
+
+    USER_SHELVES.with(|user_shelves_map_ref| {
+        let user_shelves_map = user_shelves_map_ref.borrow();
+        user_shelves_map
+            .get(&user)
+            .map(|ts| ts.clone()) // Clones the TimestampedShelfIds
+            .ok_or(QueryError::UserNotFound)
+            .and_then(|timestamped_shelf_ids| {
+                // Get profile order if it exists
+                let user_profile_opt: Option<UserProfileOrder> = USER_PROFILE_ORDER.with(|profile_order_map_ref| {
+                    profile_order_map_ref.borrow().get(&user).map(|o| o.clone())
+                });
+                let has_custom_order = user_profile_opt.as_ref().map_or(false, |order| order.is_customized);
+
+                // Combine shelf IDs based on profile order (if custom) or timestamp order
+                let ordered_shelf_ids: Vec<ShelfId> = if has_custom_order {
+                    let user_order = user_profile_opt.unwrap(); // Safe due to has_custom_order check
+                    let ordered_positions: Vec<(ShelfId, f64)> = user_order.shelf_positions.get_ordered_entries();
+                    let custom_ordered_ids: Vec<ShelfId> = ordered_positions.into_iter().map(|(id, _)| id).collect();
+                    let custom_ordered_id_set: std::collections::HashSet<ShelfId> = custom_ordered_ids.iter().cloned().collect();
+                    
+                    let mut timestamp_fallback_ids: Vec<(u64, ShelfId)> = timestamped_shelf_ids.0
+                        .iter()
+                        .filter(|(_, id)| !custom_ordered_id_set.contains(id))
+                        .cloned()
+                        .collect();
+                    timestamp_fallback_ids.sort_by(|a, b| b.0.cmp(&a.0)); // Sort by newest first for fallback
+                    let fallback_ids: Vec<ShelfId> = timestamp_fallback_ids.into_iter().map(|(_, id)| id).collect();
+                    
+                    custom_ordered_ids.into_iter().chain(fallback_ids.into_iter()).collect()
+                } else {
+                    let mut shelf_data: Vec<(u64, ShelfId)> = timestamped_shelf_ids.0.iter().cloned().collect();
+                    shelf_data.sort_by(|a, b| b.0.cmp(&a.0)); // Sort by newest first
+                    shelf_data.into_iter().map(|(_, id)| id).collect()
+                };
+
+                // Filter these ordered Shelf IDs by public_editing status BEFORE pagination
+                let publicly_editable_shelf_ids: Vec<ShelfId> = ordered_shelf_ids
+                    .into_iter()
+                    .filter(|id| {
+                        SHELF_METADATA.with(|meta_map_ref| {
+                            meta_map_ref.borrow().get(id).map_or(false, |m| m.public_editing)
+                        })
+                    })
+                    .collect();
+
+                let total_count = publicly_editable_shelf_ids.len();
+
+                // Apply pagination to the publicly_editable_shelf_ids
+                let paginated_ids: Vec<ShelfId> = publicly_editable_shelf_ids
+                    .into_iter()
+                    .skip(offset)
+                    .take(limit)
+                    .collect();
+
+                // Construct ShelfPublic for the paginated IDs
+                let items: Vec<ShelfPublic> = paginated_ids
+                    .iter()
+                    .filter_map(|id| {
+                        let metadata_opt = SHELF_METADATA.with(|meta_map_ref| meta_map_ref.borrow().get(id).map(|m| m.clone()));
+                        let content_opt = SHELVES.with(|content_map_ref| content_map_ref.borrow().get(id).map(|c| c.clone()));
+                        match (metadata_opt, content_opt) {
+                            (Some(metadata), Some(content)) => Some(ShelfPublic::from_parts(&metadata, &content)),
+                            _ => {
+                                ic_cdk::println!(
+                                    "Warning: Missing metadata or content for shelf ID {} in get_user_publicly_editable_shelves.",
+                                    id
+                                );
+                                None
+                            }
+                        }
+                    })
+                    .collect();
+
+                Ok(OffsetPaginatedResult {
+                    items,
+                    total_count: Nat::from(total_count),
+                    limit: limit as u64,
+                    offset: Nat::from(offset),
+                })
+            })
+    })
+}

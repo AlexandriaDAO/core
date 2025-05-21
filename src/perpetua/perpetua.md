@@ -167,28 +167,76 @@ perpetua/
     └── utils.rs (33 lines)
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 UI:
 - There's a lot of background loading, like if I go to "My Library" it feels frozen for 10 seconds.
-
+- Too much recursion and dialog opening errors.
 
 Backend:
 - Go through perpetua audit.
 - Add payments for making shelves, and maybe elsewhere.
 
 Functional:
-- Going to need to search by user public shelves (in addition to search by tags). Or some other way to reach tags.
-- We're going to need to be able to add an item in a certain spot. Not just the top/bottom.
 - Progressive loading of NFTs inside shelves.
 
 
 New Canister:
-- Items on perpetua display load (need to maybe make the nft ranking setup.)
+- Items on perpetua display load (need to maybe make the nft ranking setup.) Also at this point add the $ values to nfts with the rarity score.
 
 
 
-
-Later:
+V2:
 - Animate the LBRY changes when doing stuff (and color it when the topup warning is present).
+- We're going to need to be able to add an item in a certain spot. Not just the top/bottom. The backend already supports this, but you need to use another item to reference it which is a UX challenge. But if referencing a certain reference_item_id we could place before or after the add_item_to_shelf().
+
+
+
+
+
+
+
+
+
+
+
+
+## Home feed attack plan.
+
+- Make a 'feed' canister that tracks the NFTs, their ranks, and mixes them in with shelves.
+- NFT's rating is based-on rarity %, which is just from #sbts created from it.
+
+
+FEED Tab, so a 4th tab in the header:
+- Select an NFT, psuedo-random but rarity weighted.
+- For each nft there's a 60% chance we pick one of the shelves they appear in to show.
+
+That's it.
+
+
+
+
+
+
+
+
+
+
+
 
 
 

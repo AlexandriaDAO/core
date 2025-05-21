@@ -72,28 +72,60 @@ export const useAddToShelf = () => {
     collectionType?: "NFT" | "SBT"
   ): Promise<AddItemResult> => {
     try {
-      // Find the target shelf
+      let targetShelf: ShelfPublic | undefined = undefined;
+      let canEdit = false;
+
       const targetNormalizedShelf = availableShelves.find((s: NormalizedShelf) => s.shelf_id === shelfId);
       
-      if (!targetNormalizedShelf) {
-        return { status: 'error', message: "Shelf not found" };
+      if (targetNormalizedShelf) {
+        targetShelf = denormalizeShelf(targetNormalizedShelf);
+        canEdit = checkEditAccess(shelfId); 
+      } else {
+        console.warn(`[useAddToShelf] Shelf ID ${shelfId} not in availableShelves. Assuming public shelf and proceeding. Backend will verify permissions.`);
+        let ownerPrincipal: Principal;
+        const potentialPrincipal = currentUser as any; // Use 'any' for the duck-typing check
+
+        if (potentialPrincipal && typeof potentialPrincipal.toText === 'function') {
+          ownerPrincipal = potentialPrincipal as Principal; // Cast to Principal after the check
+        } else if (typeof currentUser === 'string') {
+          try {
+            ownerPrincipal = Principal.fromText(currentUser);
+          } catch (e) {
+            console.error("[useAddToShelf] Failed to parse current user string as Principal:", currentUser, e);
+            ownerPrincipal = Principal.anonymous(); // Fallback
+          }
+        } else {
+          ownerPrincipal = Principal.anonymous(); // Fallback for null/undefined or unexpected type
+        }
+
+        targetShelf = {
+          shelf_id: shelfId,
+          owner: ownerPrincipal, 
+          title: `Shelf ${shelfId.substring(0,5)}...`, 
+          description: [],
+          items: [], 
+          item_positions: [],
+          created_at: BigInt(0), 
+          updated_at: BigInt(0), 
+          appears_in: [],
+          tags: [],
+          public_editing: true, 
+        };
+        canEdit = true; 
       }
       
-      // Check if user has edit access
-      if (!checkEditAccess(shelfId)) {
+      if (!targetShelf) { 
+        return { status: 'error', message: "Shelf not found (unexpected)" };
+      }
+      
+      if (!canEdit) {
         return { status: 'error', message: "You don't have permission to edit this shelf" };
       }
       
-      // Prevent circular references for shelves
       if (contentType === "Shelf" && content === shelfId) {
         return { status: 'error', message: "Cannot add a shelf to itself" };
       }
       
-      // Convert to Shelf type before passing to addItem
-      const targetShelf = denormalizeShelf(targetNormalizedShelf);
-      
-      // Add the content to the shelf, passing collectionType for NFTs
-      // Pass through the complete result from addItem
       return await addItem(
         targetShelf, 
         content, 
@@ -109,7 +141,7 @@ export const useAddToShelf = () => {
                  "An unexpected error occurred while adding to shelf" 
       };
     }
-  }, [availableShelves, checkEditAccess, addItem, denormalizeShelf]);
+  }, [availableShelves, checkEditAccess, addItem, denormalizeShelf, currentUser]);
 
   /**
    * Fetch public shelves by a specific tag from the backend actor.
@@ -145,4 +177,4 @@ export const useAddToShelf = () => {
     shelvesLoading,
     fetchPublicShelvesByTag,
   };
-}; 
+};

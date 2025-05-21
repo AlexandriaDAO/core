@@ -50,7 +50,7 @@ cargo build --release --target wasm32-unknown-unknown --package alex_backend
 candid-extractor target/wasm32-unknown-unknown/release/alex_backend.wasm > src/alex_backend/alex_backend.did
 dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
 # For perpetua
-cargo build --release --target wasm32-unknown-unknown --package perpetua
+cargo build --release --target wasm32-unknown-unknown --package perpetua --clean
 candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpetua/perpetua.did
 dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx generate perpetua

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
@@ -39,6 +39,9 @@ interface PrincipalData {
 
 interface PrincipalSelectorProps {
   defaultPrincipal?: 'new' | 'self' | string;
+  onPrincipalSelected?: (principalId: string | null) => void;
+  performDefaultActions?: boolean;
+  showMostRecentOption?: boolean;
 }
 
 const network = process.env.DFX_NETWORK === "ic" ? "mainnet" : "devnet";
@@ -65,6 +68,13 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
     has_scion_nfts: true,
     last_updated: BigInt(0)
   },
+  {
+    principal: "jfu7o-xjjug-zk7c5-yipen-o62uu-vbwua-2zvsd-73otf-2lisp-jco6v-xqe",
+    username: "evanmcfarland",
+    has_nfts: true,
+    has_scion_nfts: true,
+    last_updated: BigInt(0)
+  },
   // test principal 
   {
     principal: "d3sjl-odpvw-6gc5j-hu7ga-ftzk4-vfa5a-hg3ee-u6t2b-kvams-7liqb-7qe",
@@ -75,7 +85,8 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
   }
 ];
 
-export default function PrincipalSelector({ defaultPrincipal = 'new' }: PrincipalSelectorProps) {
+// Renamed original component and will export a memoized version
+function PrincipalSelectorImpl({ defaultPrincipal = 'new', onPrincipalSelected, performDefaultActions = true, showMostRecentOption = true }: PrincipalSelectorProps) {
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const noResults = useSelector((state: RootState) => state.library.noResults);
@@ -89,7 +100,7 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
   const [dropdownReady, setDropdownReady] = React.useState(false);
 
   // Fetch principals from backend
-  const fetchPrincipals = async () => {
+  const fetchPrincipals = React.useCallback(async () => {
     try {
       setIsLoadingPrincipals(true);
       let nftUsers: NFTUserInfo[];
@@ -107,12 +118,10 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
         hasNFTs: collection === 'NFT' ? user.has_nfts : user.has_scion_nfts
       }));
 
-      // Filter to only include users with NFTs, excluding current user
       const principalsWithNFTs = processedPrincipals.filter((p: PrincipalData) => 
         p.hasNFTs && p.principal !== userPrincipal
       );
 
-      // Always add current user, regardless of NFT status
       if (userPrincipal) {
         const currentUser = nftUsers.find((u: NFTUserInfo) => u.principal.toString() === userPrincipal);
         principalsWithNFTs.unshift({
@@ -130,7 +139,7 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
     } finally {
       setIsLoadingPrincipals(false);
     }
-  };
+  }, [collection, userPrincipal, setIsLoadingPrincipals, setPrincipals]);
 
   // Get the actual principal to use based on defaultPrincipal value
   const getActualPrincipal = React.useCallback(() => {
@@ -147,24 +156,33 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
   // Combined effect for initialization and data fetching
   React.useEffect(() => {
     const initialize = async () => {
-      // Make dropdown ready immediately so UI is usable
       setDropdownReady(true);
       
-      // Start fetching principals in the background
       fetchPrincipals();
       
-      // Then handle initialization if not done yet
       if (!hasInitialized) {
         try {
           const principalToUse = getActualPrincipal();
-          // Initialize with the configured default principal
-          await dispatch(togglePrincipalSelection(principalToUse));
+          
+          if (performDefaultActions) {
+            await dispatch(togglePrincipalSelection(principalToUse));
+          }
+          
+          if (onPrincipalSelected) {
+            if (!performDefaultActions) {
+              const valueToSelect = principalToUse === 'new' ? null : principalToUse;
+              onPrincipalSelected(valueToSelect);
+            }
+          }
+
           setHasInitialized(true);
         } catch (error) {
           console.error("Error initializing principal selection:", error);
-          // Fall back to 'new' if there's an error
-          if (defaultPrincipal !== 'new') {
+          if (performDefaultActions && defaultPrincipal !== 'new') {
             await dispatch(togglePrincipalSelection('new'));
+          }
+          if (onPrincipalSelected && !performDefaultActions) { 
+            onPrincipalSelected(null);
           }
           setHasInitialized(true);
         }
@@ -172,36 +190,41 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
     };
     
     initialize();
-  }, [userPrincipal, collection, hasInitialized, dispatch, getActualPrincipal]);
+  }, [userPrincipal, collection, hasInitialized, dispatch, getActualPrincipal, performDefaultActions, onPrincipalSelected, defaultPrincipal, fetchPrincipals]);
 
-  const handlePrincipalSelect = async (principalId: string) => {
-    // For 'new' option or My Library, always allow selection
-    if (principalId === 'new' || principalId === userPrincipal) {
-      await dispatch(togglePrincipalSelection(principalId));
-      await dispatch(updateSearchParams({})); // This will trigger index calculation
-      setOpen(false);
-      return;
+  const handlePrincipalSelect = React.useCallback(async (principalId: string) => {
+    if (performDefaultActions) {
+      if (principalId === 'new' || principalId === userPrincipal) {
+        dispatch(setNoResults(false));
+        await dispatch(togglePrincipalSelection(principalId));
+        await dispatch(updateSearchParams({}));
+      } else {
+        const hasNFTs = principals.some(p => p.principal === principalId && p.hasNFTs);
+        if (!hasNFTs) {
+          dispatch(setNoResults(true));
+          await dispatch(togglePrincipalSelection(principalId)); 
+          await dispatch(updateSearchParams({}));
+        } else {
+          dispatch(setNoResults(false));
+          await dispatch(togglePrincipalSelection(principalId));
+          await dispatch(updateSearchParams({}));
+        }
+      }
     }
 
-    // For other users, check NFT status
-    const hasNFTs = principals.some(p => p.principal === principalId && p.hasNFTs);
-    if (!hasNFTs) {
-      dispatch(setNoResults(true));
-      return;
-    }
-    
-    await dispatch(togglePrincipalSelection(principalId));
-    await dispatch(updateSearchParams({})); // This will trigger index calculation
     setOpen(false);
-  };
+    if (onPrincipalSelected) {
+      onPrincipalSelected(principalId === 'new' ? null : principalId);
+    }
+  }, [performDefaultActions, userPrincipal, dispatch, principals, onPrincipalSelected, setOpen]);
 
-  const getDisplayValue = (value: string) => {
+  const getDisplayValue = React.useCallback((value: string) => {
     if (!value) return '';
     if (value === 'new') return 'Most Recent';
     if (value === userPrincipal) return 'My Library';
     const principal = principals.find(p => p.principal === value);
     return principal ? principal.username : value;
-  };
+  }, [userPrincipal, principals]);
 
   return (
     <div className="p-2 sm:p-[14px] rounded-2xl border border-input bg-background">
@@ -238,19 +261,21 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
                 <CommandList>
                   <CommandEmpty>No library found.</CommandEmpty>
                   <CommandGroup>
-                    <CommandItem
-                      value="Most Recent"
-                      onSelect={() => handlePrincipalSelect('new')}
-                      className="text-sm sm:text-base py-2 sm:py-3"
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-3 w-3 sm:h-4 sm:w-4",
-                          selectedPrincipals[0] === 'new' ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      Most Recent
-                    </CommandItem>
+                    {showMostRecentOption && (
+                      <CommandItem
+                        value="Most Recent"
+                        onSelect={() => handlePrincipalSelect('new')}
+                        className="text-sm sm:text-base py-2 sm:py-3"
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-3 w-3 sm:h-4 sm:w-4",
+                            selectedPrincipals[0] === 'new' ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        Most Recent
+                      </CommandItem>
+                    )}
                     {userPrincipal && (
                       <CommandItem
                         value="My Library"
@@ -320,4 +345,6 @@ export default function PrincipalSelector({ defaultPrincipal = 'new' }: Principa
       )}
     </div>
   );
-} 
+}
+
+export default React.memo(PrincipalSelectorImpl); 
