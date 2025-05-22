@@ -7,6 +7,8 @@ import { AssetManager } from "@dfinity/assets";
 import remove from "../thunks/remove";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 
+const isLocal = process.env.DFX_NETWORK == "local";
+
 interface ItemProps {
 	asset: IcpAssetItem;
 	assetManager: AssetManager | null;
@@ -29,12 +31,19 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 	const isAudio = fileTypeInfo?.label === 'Media' && asset.content_type.startsWith('audio');
 	const isDocument = fileTypeInfo?.label === 'Documents' || fileTypeInfo?.label === 'E-books';
 
+	// Generate canister asset URL
+	const getCanisterAssetUrl = () => {
+		if (!canister) return "";
+		const baseUrl = isLocal ? `http://${canister}.localhost:4943` : `https://${canister}.raw.icp0.io`;
+		return baseUrl + asset.key;
+	};
+
 	return (
 		<div className="w-64 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-gray-200">
 			<div className="h-48 overflow-hidden bg-gray-50 flex items-center justify-center">
 				{isImage ? (
 					<img 
-						src={`http://${canister}.localhost:4943${asset.key}`} 
+						src={getCanisterAssetUrl()} 
 						alt={asset.key}
 						className="w-full h-full object-cover"
 					/>
@@ -44,7 +53,7 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 						className="w-full h-full object-contain"
 					>
 						<source 
-							src={`http://${canister}.localhost:4943${asset.key}`} 
+							src={getCanisterAssetUrl()} 
 							type={asset.content_type}
 						/>
 						Your browser does not support the video tag.
@@ -56,7 +65,7 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 							className="w-full"
 						>
 							<source 
-								src={`http://${canister}.localhost:4943${asset.key}`} 
+								src={getCanisterAssetUrl()} 
 								type={asset.content_type}
 							/>
 							Your browser does not support the audio element.
@@ -89,7 +98,7 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 
 				<div className="mt-4 flex justify-between items-center">
 					<a 
-						href={`http://${canister}.localhost:4943${asset.key}`} 
+						href={getCanisterAssetUrl()} 
 						target="_blank" 
 						rel="noopener noreferrer" 
 						className="text-sm text-blue-600 hover:text-blue-800 font-medium"

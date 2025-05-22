@@ -4,9 +4,9 @@ import { Check } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Button } from "@/lib/components/button";
 import Copy from "../Copy";
-import ROUTES from "@/routes/routeConfig";
 import { useAssetManager } from "@/hooks/actors";
 import { Principal } from "@dfinity/principal";
+import { Link } from "react-router";
 
 function CanisterView() {
     const { actor } = useAssetManager();
@@ -61,7 +61,7 @@ function CanisterView() {
             <Button
                 variant={"link"}
                 scale={"sm"}
-                onClick={()=>navigate(ROUTES.DASHBOARD_ROUTES.ASSET_SYNC)}>
+                onClick={()=>navigate('/dashboard/icp-assets')}>
                 View Assets
             </Button>
         </div>
