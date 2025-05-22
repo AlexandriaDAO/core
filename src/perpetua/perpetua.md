@@ -233,7 +233,6 @@ Progress: So it gets all the nfts in one long call.
 - but getting percentages in one long call is another story.
 
 Plan:
-    - Check if total-supply matches the mint amounts. 
     - For each SBT, add the like count to its original.
     - Maybe make this dynamic, so whenever coordinate mint is used, if it adds the new one. But first it needs to do all from scratch.
 

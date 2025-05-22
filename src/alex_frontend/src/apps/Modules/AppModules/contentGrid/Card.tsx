@@ -47,7 +47,7 @@ export function ContentCard({
   return (
     <>
       <Card
-        className={`group flex flex-col relative bg-white dark:bg-gray-900 h-full ${component === "Emporium" ? "mb-20 rounded-2xl" : "overflow-hidden"}`}
+        className={`group flex flex-col relative bg-white dark:bg-gray-900 h-full ${component === "Emporium" ? "mb-20 rounded-2xl" : ""}`}
         // onClick is now applied to the content area if needed, or removed if whole card isn't clickable anymore
         // Note: If the entire card should still be clickable *except* the action button,
         // you might need to move onClick to the CardContent/AspectRatio and ensure stopPropagation in UnifiedCardActions works.
@@ -73,7 +73,7 @@ export function ContentCard({
             onClick={onClick} // Apply onClick here if the main area should be clickable
         >
           <AspectRatio ratio={1} className="w-full relative">
-            <div className={`flex items-center justify-center bg-gray-50 dark:bg-gray-800 ${component === "Emporium" ? " border-gray-900 dark:border-gray-900 rounded-[30px]" : "overflow-hidden h-full "}`} >
+            <div className={`relative flex items-center justify-center bg-gray-50 dark:bg-gray-800 ${component === "Emporium" ? " border-gray-900 dark:border-gray-900 rounded-[30px] overflow-hidden" : "overflow-hidden h-full "}`} >
               {/* Children now include the hover overlay (TransactionDetails) internally */}
               {children}
             </div>

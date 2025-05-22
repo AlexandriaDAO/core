@@ -8,6 +8,7 @@ export interface NFTData {
   };
   orderIndex?: number;
   appears_in?: string[];
+  rarityPercentage?: number;
 }
 
 export interface NFTBalances {

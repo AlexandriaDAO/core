@@ -57,7 +57,7 @@ dfx generate perpetua
 # For feed
 cargo build --release --target wasm32-unknown-unknown --package feed
 candid-extractor target/wasm32-unknown-unknown/release/feed.wasm > src/feed/feed.did
-dfx deploy feed --specified-id okj2q-daaaa-aaaap-qp2pa-cai --network ic
+dfx deploy feed --specified-id okj2q-daaaa-aaaap-qp2pa-cai
 # For icp_swap
 cargo build --release --target wasm32-unknown-unknown --package icp_swap
 candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did

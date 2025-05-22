@@ -35,6 +35,5 @@ wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797b
 wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did -O .dfx/local/canisters/LBRY/LBRY.did
 
 
-dfx identity use mainnet
+dfx identity use alex
 dfx deploy alex_frontend --network ic
-

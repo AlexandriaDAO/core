@@ -11,6 +11,9 @@ import { mint_nft, MintResult } from "@/features/nft/mint";
 import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks/useShelfOperations";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did"; // Import ShelfPublic for type hints
+import { Badge } from "@/lib/components/badge";
+import { formatBalance } from '@/apps/Modules/shared/utils/tokenUtils';
+import { Percent } from "lucide-react"; // Icon for rarity badge
 
 interface UnifiedCardActionsProps {
   contentId: string; // Arweave ID, Shelf ID, NFT Nat ID string
@@ -38,7 +41,8 @@ interface AddToShelfContext {
     currentShelfId?: string; // Pass currentShelfId for exclusion in dialog
 }
 
-export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
+// Wrap component with React.memo
+export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(({
   contentId,
   contentType,
   ownerPrincipal, // Kept prop, but logic using it is removed below
@@ -66,6 +70,91 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
   // const { checkEditAccess } = useContentPermissions(); // Removed
   // const { isFollowingUser, toggleFollowUser } = useFollowStatus(); // Removed
 
+  // --- Access NFT Data for Badges ---
+  // const allNfts = useSelector((state: RootState) => state.nftData.nfts); // Keep for now if other parts rely on it directly, but try to minimize.
+  const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
+
+  const actualNftTokenId = React.useMemo(() => {
+    if (contentId && arweaveToNftId[contentId]) {
+      return arweaveToNftId[contentId];
+    } else if (contentType === 'Nft') {
+      return contentId;
+    }
+    // For 'Arweave' type, if not in arweaveToNftId, it remains undefined.
+    // For 'Markdown' or 'Shelf', it also remains undefined.
+    return undefined;
+  }, [contentId, contentType, arweaveToNftId]);
+
+  const nftDetails = useSelector((state: RootState) => {
+    if (!actualNftTokenId) return undefined;
+    const nft = state.nftData.nfts[actualNftTokenId];
+    if (!nft) return undefined;
+    return {
+      balances: nft.balances,
+      rarityPercentage: nft.rarityPercentage,
+      collection: nft.collection,
+    };
+  }, (left, right) => {
+    if (left === right) return true;
+    if (!left || !right) return false;
+
+    let balancesEqual = false;
+    if (!left.balances && !right.balances) {
+      balancesEqual = true;
+    } else if (left.balances && right.balances) {
+      balancesEqual = left.balances.alex === right.balances.alex && 
+                      left.balances.lbry === right.balances.lbry;
+    } else {
+      // One has balances, the other doesn't
+      balancesEqual = false;
+    }
+
+    return (
+      balancesEqual &&
+      left.rarityPercentage === right.rarityPercentage &&
+      left.collection === right.collection
+    );
+  });
+
+  // Fallback if allNfts is still needed elsewhere, otherwise it can be removed.
+  // For nftDataItem, prefer using the more granularly selected `nftDetails`.
+  // const nftDataItem = actualNftTokenId ? useSelector((state: RootState) => state.nftData.nfts[actualNftTokenId]) : undefined;
+  // Let's adjust logic to use nftDetails primarily.
+
+  const alexBalance = nftDetails?.balances?.alex;
+  const lbryBalance = nftDetails?.balances?.lbry;
+  const rarityPercentage = nftDetails?.rarityPercentage;
+  const isItemAnNftCollection = nftDetails?.collection === 'NFT';
+
+
+  // Helper to format rarity percentage
+  const formatRarityDisplay = (rarity: number | undefined): string => {
+    if (rarity === undefined || rarity === null || rarity < 0) { // Handles "not ranked" (-1) or undefined
+      return ""; // Don't display if not ranked or not available
+    }
+    return `${(rarity / 100).toFixed(2)}%`;
+  };
+
+  // Conditions for showing badges
+  const rarityFormatted = formatRarityDisplay(rarityPercentage);
+
+  // --- Log values for badge conditions ---
+  console.log(`[UnifiedCardActions Debug] contentId: ${contentId}, contentType: ${contentType}`);
+  console.log(`[UnifiedCardActions Debug] actualNftTokenId: ${actualNftTokenId}`);
+  console.log(`[UnifiedCardActions Debug] nftDetails:`, nftDetails);
+  console.log(`[UnifiedCardActions Debug] alexBalance: ${alexBalance}, lbryBalance: ${lbryBalance}, rarityPercentage: ${rarityPercentage}`);
+  console.log(`[UnifiedCardActions Debug] isItemAnNftCollection: ${isItemAnNftCollection}`);
+  console.log(`[UnifiedCardActions Debug] rarityFormatted: ${rarityFormatted}`);
+
+  const showAlexBadge = !!alexBalance && parseFloat(alexBalance) > 0;
+  const showLbryBadge = !!lbryBalance && parseFloat(lbryBalance) > 0;
+  // Show rarity badge if it's an NFT by collection type and has a valid, formatted rarity string
+  const showRarityBadge = isItemAnNftCollection && rarityFormatted !== "";
+
+  // --- Log evaluated conditions ---
+  console.log(`[UnifiedCardActions Debug] showAlexBadge: ${showAlexBadge}, showLbryBadge: ${showLbryBadge}, showRarityBadge: ${showRarityBadge}`);
+
+
   // --- Determine Action Availability ---
 
   // Condition for an item being potentially mintable (unowned NFT or Arweave)
@@ -78,11 +167,12 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
   // Condition for showing the direct mint button
   const canDirectMint = isLoggedIn && conditionsMetForPotentialMint && isSafeForMinting;
 
-  // Removed logic for canRemoveItem, canInteractWithFollow, currentlyFollowingOwner, showAnyAction, showSeparator1
+  // Determine if anything at all needs to be rendered
+  const shouldShowAnyBadge = showAlexBadge || showLbryBadge || showRarityBadge;
+  const shouldShowAnyActionButton = canAddToShelf || canDirectMint;
 
-  // If neither action is available, don't render anything (or adjust as needed)
-  if (!canAddToShelf && !canDirectMint) {
-    return null;
+  if (!shouldShowAnyBadge && !shouldShowAnyActionButton) {
+    return null; // Return null only if there's absolutely nothing to display
   }
 
   const stopPropagation = (e: React.MouseEvent | React.TouchEvent | Event) => {
@@ -339,62 +429,95 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
 
   return (
     <>
-      <div 
-        className={containerClassName !== undefined ? containerClassName : "absolute right-3 top-0 z-10 flex flex-col items-end space-y-1"}
-      >
-        {/* Add to Shelf (Bookmark) Button - only if canAddToShelf is true */}
-        {canAddToShelf && (
-          <div 
-            className={`cursor-pointer ${className ?? ""}`}
-            onClick={isProcessingDirectMint || isProcessingAddToShelf ? undefined : handleAddToShelfClick}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-            aria-label={isProcessingAddToShelf ? "Adding to shelf..." : "Add to shelf"}
-            title="Add to Shelf"
-          >
-            <div className="relative">
-              {/* Bookmark shadow */}
-              <div className="absolute top-0.5 right-0 h-10 w-8 bg-black/30 rounded-b-md blur-[1px]"></div>
-              
-              {/* Bookmark shape - using same black as info button */}
-              <div className="relative h-10 w-8 bg-black/75 transition-colors duration-150 rounded-b-md">
-                {/* Notch at bottom of bookmark */}
-                <div className="absolute bottom-0 left-1/2 h-2.5 w-3 transform -translate-x-1/2 bg-black/75 transition-colors duration-150" style={{ clipPath: 'polygon(0% 0%, 100% 0%, 50% 100%)' }}></div>
+      {/* Top-left badges container - Render if any badge should be shown */}
+      {shouldShowAnyBadge && (
+        <div className="absolute left-1 top-1 z-30 flex flex-col items-start space-y-0.5 p-1 rounded-md bg-black/20 backdrop-blur-[2px] shadow-lg">
+          {/* Prestigious Rarity Badge */}
+          {showRarityBadge && (
+            <Badge 
+              variant="default" // Use default or a custom variant if set up
+              className="text-[10px] h-6 px-2 py-1 bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 text-black border border-yellow-700 shadow-md flex items-center font-semibold"
+              title={`Rarity: ${rarityFormatted}`}
+            >
+              <Percent className="h-3 w-3 mr-1 text-black/80" />
+              {rarityFormatted}
+            </Badge>
+          )}
+
+          {/* Smaller ALEX and LBRY badges below rarity */}
+          {(showAlexBadge || showLbryBadge) && (
+            <div className="flex flex-row items-center space-x-0.5 mt-0.5">
+              {showAlexBadge && (
+                <Badge variant="secondary" className="text-[8px] h-4 px-1 py-0 bg-blue-600/50 hover:bg-blue-600/60 text-blue-100 border-blue-700/70 shadow-sm">
+                  {formatBalance(alexBalance!)} ALEX
+                </Badge>
+              )}
+              {showLbryBadge && (
+                <Badge variant="secondary" className="text-[8px] h-4 px-1 py-0 bg-purple-600/50 hover:bg-purple-600/60 text-purple-100 border-purple-700/70 shadow-sm">
+                  {formatBalance(lbryBalance!)} LBRY
+                </Badge>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Action buttons container - Render if any action button should be shown */}
+      {shouldShowAnyActionButton && (
+        <div 
+          className={containerClassName !== undefined ? containerClassName : "absolute right-3 top-0 z-30 flex flex-col items-end space-y-1"}
+        >
+          {/* Add to Shelf (Bookmark) Button - only if canAddToShelf is true */}
+          {canAddToShelf && (
+            <div 
+              className={`cursor-pointer ${className ?? ""}`}
+              onClick={isProcessingDirectMint || isProcessingAddToShelf ? undefined : handleAddToShelfClick}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+              aria-label={isProcessingAddToShelf ? "Adding to shelf..." : "Add to shelf"}
+              title="Add to Shelf"
+            >
+              <div className="relative">
+                {/* Bookmark shadow */}
+                <div className="absolute top-0.5 right-0 h-10 w-8 bg-black/30 rounded-b-md blur-[1px]"></div>
                 
-                {/* Content */}
-                <div className="h-full w-full flex items-center justify-center pt-1">
-                  {isProcessingAddToShelf ? (
-                    <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
-                  ) : (
-                    <Bookmark 
-                      className={`h-5 w-5 transition-colors duration-150 ${isHovering ? 'text-brightyellow' : 'text-white dark:text-brightyellow'}`} 
-                      fill={isHovering ? 'currentColor' : 'none'} 
-                      strokeWidth={isHovering ? 2.5 : 2}
-                    />
-                  )}
+                {/* Bookmark shape - using same black as info button */}
+                <div className="relative h-10 w-8 bg-black/75 transition-colors duration-150 rounded-b-md">
+                  {/* Content */}
+                  <div className="h-full w-full flex items-center justify-center pt-1">
+                    {isProcessingAddToShelf ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
+                    ) : (
+                      <Bookmark 
+                        className={`h-5 w-5 transition-colors duration-150 ${isHovering ? 'text-brightyellow' : 'text-white dark:text-brightyellow'}`} 
+                        fill={isHovering ? 'currentColor' : 'none'} 
+                        strokeWidth={isHovering ? 2.5 : 2}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Direct Mint NFT Button - only if canDirectMint is true */}
-        {canDirectMint && (
-           <Button
-            variant="secondary"
-            onClick={isProcessingDirectMint || isProcessingAddToShelf ? undefined : handleDirectMintClick}
-            disabled={isProcessingDirectMint || isProcessingAddToShelf}
-            className="h-8 px-2 py-1 text-xs flex items-center gap-1 bg-black/75 hover:bg-black/90 text-white dark:text-brightyellow border-none shadow-md"
-            title="Mint as NFT"
-          >
-            {isProcessingDirectMint ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <PlusCircle className="h-4 w-4" /> 
-            )}
-          </Button>
-        )}
-      </div>
+          {/* Direct Mint NFT Button - only if canDirectMint is true */}
+          {canDirectMint && (
+             <Button
+              variant="secondary"
+              onClick={isProcessingDirectMint || isProcessingAddToShelf ? undefined : handleDirectMintClick}
+              disabled={isProcessingDirectMint || isProcessingAddToShelf}
+              className="h-8 px-2 py-1 text-xs flex items-center gap-1 bg-black/75 hover:bg-black/90 text-white dark:text-brightyellow border-none shadow-md"
+              title="Mint as NFT"
+            >
+              {isProcessingDirectMint ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <PlusCircle className="h-4 w-4" /> 
+              )}
+            </Button>
+          )}
+        </div>
+      )}
 
       {addToShelfContext && (
         <ShelfSelectionDialog
@@ -410,7 +533,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = ({
       )}
     </>
   );
-};
+});
 
-// Default export or named export depending on your project structure
-// export default UnifiedCardActions; 
+// Add display name for React.memo component for better debugging
+UnifiedCardActions.displayName = 'UnifiedCardActions'; 

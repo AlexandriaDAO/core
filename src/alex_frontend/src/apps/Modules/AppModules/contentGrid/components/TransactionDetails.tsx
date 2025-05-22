@@ -155,6 +155,16 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
   const collectionToDisplay = nftDataResult?.collection || nftDataFromStore?.collection;
   const balancesToDisplay = nftDataFromStore?.balances; // Get balances from Redux store
   const orderIndexToDisplay = nftDataResult?.orderIndex ?? nftDataFromStore?.orderIndex;
+  const rarityPercentageToDisplay = nftDataFromStore?.rarityPercentage; // Get rarity from Redux store
+
+  // Helper function to format rarity percentage
+  const formatRarityPercentage = (rarity: number | undefined): string => {
+    if (rarity === undefined || rarity === null || rarity < 0) { // Check for -1 as "not ranked"
+      return "Not Ranked";
+    }
+    const percentage = (rarity / 100).toFixed(2);
+    return `${percentage}% Rarity`;
+  };
 
   // This function now directly returns the details content JSX
   // The old hover wrapper div is removed.
@@ -237,21 +247,36 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
             )}
           </div>
           
-          {/* Balance badges - Use balances from Redux store with better styling */}
-          {balancesToDisplay && (
+          {/* Balance and Rarity badges - Use balances from Redux store with better styling */}
+          {(balancesToDisplay || (collectionToDisplay === 'NFT' && rarityPercentageToDisplay !== undefined)) && (
             <div className="flex flex-wrap items-center gap-1.5 mt-1">
-              {/* ALEX Badge with improved styling */}
-              <Badge variant="outline" className="text-[10px] py-0.5 px-1.5 bg-blue-900/30 text-blue-300 border-blue-800 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800">
-                <span className="font-mono font-medium">
-                  {formatBalance(balancesToDisplay.alex)} ALEX
-                </span>
-              </Badge>
-              {/* LBRY Badge with improved styling */}
-              <Badge variant="outline" className="text-[10px] py-0.5 px-1.5 bg-purple-900/30 text-purple-300 border-purple-800 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">
-                <span className="font-mono font-medium">
-                  {formatBalance(balancesToDisplay.lbry)} LBRY
-                </span>
-              </Badge>
+              {/* ALEX Badge */}
+              {balancesToDisplay && (
+                <Badge variant="outline" className="text-[10px] py-0.5 px-1.5 bg-blue-900/30 text-blue-300 border-blue-800 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800">
+                  <span className="font-mono font-medium">
+                    {formatBalance(balancesToDisplay.alex)} ALEX
+                  </span>
+                </Badge>
+              )}
+              {/* LBRY Badge */}
+              {balancesToDisplay && (
+                <Badge variant="outline" className="text-[10px] py-0.5 px-1.5 bg-purple-900/30 text-purple-300 border-purple-800 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">
+                  <span className="font-mono font-medium">
+                    {formatBalance(balancesToDisplay.lbry)} LBRY
+                  </span>
+                </Badge>
+              )}
+              {/* Rarity Percentage Badge - only for NFTs */}
+              {collectionToDisplay === 'NFT' && rarityPercentageToDisplay !== undefined && (
+                <Badge 
+                  variant="outline" 
+                  className={`text-[10px] py-0.5 px-1.5 ${rarityPercentageToDisplay < 0 ? "bg-gray-700 text-gray-400 border-gray-600" : "bg-yellow-900/30 text-yellow-300 border-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800"}`}
+                  title={rarityPercentageToDisplay < 0 ? "This NFT is not currently ranked." : `Rarity: ${formatRarityPercentage(rarityPercentageToDisplay)}`}
+                >
+                  <Flag className="h-2.5 w-2.5 mr-0.5" />
+                  {formatRarityPercentage(rarityPercentageToDisplay)}
+                </Badge>
+              )}
             </div>
           )}
           

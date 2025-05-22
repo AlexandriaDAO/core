@@ -1,9 +1,24 @@
+type ExecutionLogEntry = record {
+  status : ExecutionStatus;
+  timestamp_nanos : nat64;
+  function_name : text;
+};
+type ExecutionStatus = variant { Success; Failure : record { error : text } };
 type Result = variant { Ok; Err : text };
-service : {
-  get_stored_icrc7_main_token_ids : () -> (opt vec nat) query;
+service : () -> {
+  get_execution_logs : (nat64, opt nat64) -> (vec ExecutionLogEntry) query;
+  get_next_log_key_debug : () -> (nat64) query;
+  get_rarity_percentage_distribution : () -> (
+      vec record { nat32; nat32 },
+    ) query;
+  get_rarity_percentages_for_og_nfts : (vec nat) -> (
+      vec record { nat; nat32 },
+    ) query;
+  get_sbt_counts_for_og_nfts : (vec nat) -> (vec record { nat; nat32 }) query;
   get_stored_icrc7_main_token_ids_count : () -> (nat64) query;
-  get_stored_icrc7_scion_token_ids : () -> (opt vec nat) query;
   get_stored_icrc7_scion_token_ids_count : () -> (nat64) query;
   store_icrc7_main_token_ids : () -> (Result);
   store_icrc7_scion_token_ids : () -> (Result);
+  update_og_nft_rarity_percentages : () -> (Result);
+  update_og_nft_sbt_counts : () -> (Result);
 }

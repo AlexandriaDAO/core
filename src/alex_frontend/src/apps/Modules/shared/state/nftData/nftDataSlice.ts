@@ -47,6 +47,12 @@ const nftDataSlice = createSlice({
         state.nfts[tokenId].balances = { alex, lbry };
       }
     },
+    updateNftRarityPercentage: (state, action: PayloadAction<{ nftId: string; rarityPercentage: number }>) => {
+      const { nftId, rarityPercentage } = action.payload;
+      if (state.nfts[nftId]) {
+        state.nfts[nftId].rarityPercentage = rarityPercentage;
+      }
+    },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
@@ -86,6 +92,7 @@ export const {
   setNFTs, 
   updateNftAppearsIn,
   updateNftBalances,
+  updateNftRarityPercentage,
   setLoading, 
   setError, 
   setTotalNfts, 

@@ -66,7 +66,6 @@ export const useContentCardState = ({
         return { nftNatId: natId, nftData: data };
     }, [id, initialContentType, arweaveToNftId, nfts]);
 
-
     const ownerPrincipal = useMemo(() => {
         // NFT data takes precedence if available
         if (nftData?.principal) {
@@ -97,12 +96,10 @@ export const useContentCardState = ({
         return undefined;
     }, [nftData, initialContentType, id, transactions]);
 
-
     const isOwnedByUser = useMemo(() => {
         // Ownership is determined *only* by the NFT data, regardless of context
         return !!(nftData && currentUserPrincipal && nftData.principal === currentUserPrincipal);
     }, [nftData, currentUserPrincipal]);
-
 
     const isMediaContent = useMemo(() => {
         // Use the direct transaction if Arweave context, or the looked-up one if NFT context
@@ -185,12 +182,20 @@ export const useContentCardState = ({
         };
     }, [id, initialContentType, nftNatId, isOwnedByUser, isMediaContent, predictions]);
 
-    return {
+    // --- Memoized return value for the entire hook --- 
+    return useMemo(() => ({
         finalContentId,
         finalContentType,
         isItemLikable,
         isOwnedByUser,
-        ownerPrincipal, // Return the derived ownerPrincipal
-        isSafeForMinting, // Ensure this line exists
-    };
+        ownerPrincipal,
+        isSafeForMinting,
+    }), [
+        finalContentId,
+        finalContentType,
+        isItemLikable,
+        isOwnedByUser,
+        ownerPrincipal,
+        isSafeForMinting,
+    ]);
 }; 

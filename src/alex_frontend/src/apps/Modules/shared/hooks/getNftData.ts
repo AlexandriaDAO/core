@@ -4,8 +4,9 @@ import { RootState } from "@/store";
 import { ALEX } from "../../../../../../declarations/ALEX";
 import { LBRY } from "../../../../../../declarations/LBRY";
 import { nft_manager } from "../../../../../../declarations/nft_manager";
+import { feed } from "../../../../../../declarations/feed";
 import { Principal } from "@dfinity/principal";
-import { updateNftBalances } from "../state/nftData/nftDataSlice";
+import { updateNftBalances, updateNftRarityPercentage } from "../state/nftData/nftDataSlice";
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -36,39 +37,80 @@ export const useNftData = () => {
 
         if (nftEntry) {
           const tokenId = BigInt(nftEntry[0]);
+          // Subaccount must be fetched first as it's needed for balance calls.
           const subaccount = await nft_manager.to_nft_subaccount(tokenId);
 
-          // Correct Account structure for ICRC-1 balance_of
           const balanceParams = {
             owner: Principal.fromText(NFT_MANAGER_PRINCIPAL),
             subaccount: [Array.from(subaccount)],
           };
 
-          //Get balances from both ALEX and LBRY
-          const [alexBalance, lbryBalance] = await Promise.all([
-            ALEX.icrc1_balance_of({
-              owner: balanceParams.owner,
-              subaccount: balanceParams.subaccount as [number[]],
-            }),
-            LBRY.icrc1_balance_of({
-              owner: balanceParams.owner,
-              subaccount: balanceParams.subaccount as [number[]],
-            }),
+          // Create promises for balance fetching
+          const alexBalancePromise = ALEX.icrc1_balance_of({
+            owner: balanceParams.owner,
+            subaccount: balanceParams.subaccount as [number[]],
+          });
+          const lbryBalancePromise = LBRY.icrc1_balance_of({
+            owner: balanceParams.owner,
+            subaccount: balanceParams.subaccount as [number[]],
+          });
+
+          // Create promise for rarity fetching (conditional)
+          let rarityPromise;
+          if (nftEntry[1].collection === 'NFT') {
+            const nftIdNat = BigInt(tokenId.toString());
+            rarityPromise = feed.get_rarity_percentages_for_og_nfts([nftIdNat])
+              .then(rarityData => {
+                if (rarityData && rarityData.length > 0 && rarityData[0]) {
+                  // rarityData[0][1] is the nat32 rarity value
+                  return { success: true, value: Number(rarityData[0][1]) };
+                }
+                return { success: true, value: -1 }; // No data found, treat as "not ranked"
+              })
+              .catch(error => {
+                console.error("Error fetching NFT rarity percentage:", error);
+                return { success: false, value: -1 }; // Error occurred
+              });
+          } else {
+            rarityPromise = Promise.resolve({ success: false, value: -1, skipped: true }); // Not an NFT, or fetch not applicable
+          }
+
+          // Await all promises concurrently
+          const [
+            alexBalanceResult, 
+            lbryBalanceResult, 
+            rarityFetchOutcome
+          ] = await Promise.all([
+            alexBalancePromise, 
+            lbryBalancePromise, 
+            rarityPromise
           ]);
+          
+          // Dispatch balance updates
           dispatch(
             updateNftBalances({
               tokenId: tokenId.toString(),
-              alex: convertE8sToToken(alexBalance),
-              lbry: convertE8sToToken(lbryBalance),
+              alex: convertE8sToToken(alexBalanceResult),
+              lbry: convertE8sToToken(lbryBalanceResult),
             })
           );
+
+          // Dispatch rarity percentage update if it was an NFT and fetch was attempted
+          if (nftEntry[1].collection === 'NFT' && !('skipped' in rarityFetchOutcome && rarityFetchOutcome.skipped)) {
+            dispatch(
+              updateNftRarityPercentage({
+                nftId: tokenId.toString(),
+                rarityPercentage: rarityFetchOutcome.value, // This will be the rarity or -1
+              })
+            );
+          }
 
           return {
             principal: nftEntry[1].principal,
             collection: nftEntry[1].collection,
             balances: {
-              alex: convertE8sToToken(alexBalance),
-              lbry: convertE8sToToken(lbryBalance),
+              alex: convertE8sToToken(alexBalanceResult),
+              lbry: convertE8sToToken(lbryBalanceResult),
             },
             orderIndex: nftEntry[1].orderIndex,
           };
