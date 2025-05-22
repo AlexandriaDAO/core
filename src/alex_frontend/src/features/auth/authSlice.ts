@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { buildAuthExtraReducers } from "./authExtraReducers";
 
-// Add our frontend-friendly version
 export interface SerializedUser {
     principal: string;
     username: string;
@@ -15,7 +14,8 @@ export interface SerializedUser {
 // Define the interface for our auth state
 export interface AuthState {
 	user: SerializedUser | null,
-	canister: string | null,
+	canister: string | undefined,
+	canisters: Record<string, string>,
 
 	initialized: boolean,
 
@@ -32,7 +32,8 @@ export interface AuthState {
 // Define the initial state using the AuthState interface
 const initialState: AuthState = {
 	user: null,
-	canister: null,
+	canister: undefined,
+	canisters: {},
 
 	initialized: false,
 

@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { getCallerAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 import { useAssetManager } from "@/hooks/useAssetManager";
 import { useIdentity } from "@/hooks/useIdentity";
 import fetch from "@/features/icp-assets/thunks/fetch";
@@ -73,7 +72,7 @@ const NftsPage = () => {
                                                 <ListNft id={id} />
                                             </Icrc7Actor>
                                         </EmporiumActor>
-                                    }/>
+                                    } canister={canister}/>
                                 ))}
                             </div>
 

@@ -27,15 +27,16 @@ interface NftProps {
 	action: React.ReactNode;
 	price?: string;
 	owner?: string;
+	canister?: string
 }
 
-const Nft: React.FC<NftProps> = ({ id, action, price, owner }) => {
+const Nft: React.FC<NftProps> = ({ id, action, price, owner, canister }) => {
 	const { status, loading: statusLoading, error: statusError } = useStatus(id);
 	const { readableSize } = useSize(id, status);
 	const { tags, loading: tagsLoading, error: tagsError, contentType, assetType } = useTags(id, status);
 	const { readableTimestamp } = useTimestamp(status);
 
-	const {data, loading: dataLoading, error: dataError, progress} = useData(id, status);
+	const {data, loading: dataLoading, error: dataError, progress} = useData(id, status, canister);
 
 	const [info, setInfo] = useState(false);
 	const [fullscreen, setFullscreen] = useState(false);
