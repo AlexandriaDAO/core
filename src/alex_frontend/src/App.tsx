@@ -17,6 +17,12 @@ import { ThemeProvider } from "./providers/ThemeProvider";
 export default function App() {
     const [isReady, setIsReady] = useState(false);
 
+    useEffect(() => {
+        const introduced = localStorage.getItem('IntroductionShown');
+		if(!introduced) window.location.href = "/introduction"
+    }, []);
+
+
     // costs a re render
     // Mark the app as ready after a short delay to ensure all providers are initialized
     useEffect(() => {
