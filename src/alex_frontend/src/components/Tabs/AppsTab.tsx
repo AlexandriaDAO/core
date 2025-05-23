@@ -35,7 +35,10 @@ export const AppsTab: React.FC = () => {
 						<div
 							key={app.name}
 							className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-800 rounded"
-							onClick={() => navigate(app.path)}
+							onClick={() => {
+								navigate(app.path)
+								setIsHovered(false)
+							}}
 						>
 							{app.logo && (
 								<img
@@ -57,7 +60,10 @@ export const AppsTab: React.FC = () => {
 					<div className="h-px bg-gray-800 my-1"></div>
 					<div
 						className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-800 rounded"
-						onClick={() => navigate("/")}
+						onClick={() => {
+							navigate("/")
+							setIsHovered(false)
+						}}
 					>
 						<LayoutGrid className="w-5 h-5 text-gray-400" />
 						<span className="text-white text-sm font-syne">
