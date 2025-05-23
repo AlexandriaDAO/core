@@ -36,7 +36,7 @@ const ICPAssetsPage: React.FC = () => {
 				<AssetCanisterActor canisterId={canister}>
 					<ICPAssetUploader />
 
-					<div className="mt-8 bg-gray-50 p-4 rounded-lg border">
+					<div className="mt-8 bg-card p-4 rounded-lg border">
 						<h2 className="text-lg font-semibold mb-2">Asset Canister Information</h2>
 						<p className="text-sm text-gray-600">
 							Your Asset Canister ID: <span className="font-mono font-medium">{canister}</span>
