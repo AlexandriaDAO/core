@@ -7,6 +7,7 @@ const Imporium = () => {
             <Link to="/app/imporium/nfts">My Nfts</Link>
             <Link to="/app/imporium/listings">My Listings</Link>
             <Link to="/app/imporium/marketplace">Marketplace</Link>
+            <Link to="/app/imporium/my-logs">My Logs</Link>
         </div>
     )
 };

@@ -1,14 +1,27 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ActionReducerMapBuilder, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import nftsReducer from "./nfts/nftsSlice";
 import listingsReducer from "./listings/listingsSlice";
+import { TransformedLog } from "./types";
+import getUserLogs from "./thunks/getUserLog";
+import { toast } from "sonner";
 // import marketplaceReducer from "./marketplace/marketplaceSlice";
 
 interface ImporiumState {
+	logs: TransformedLog[];
+	pageSize: number;
+	totalPages: number;
+	currentPage: number;
+
 	loading: boolean;
 	error: string | null;
 }
 
 const initialState: ImporiumState = {
+	logs: [],
+	pageSize: 0,
+	totalPages: 0,
+	currentPage: 0,
+
 	loading: false,
 	error: null,
 };
@@ -24,6 +37,29 @@ const imporiumSlice = createSlice({
 			state.error = action.payload;
 		},
 	},
+	extraReducers: (builder: ActionReducerMapBuilder<ImporiumState>)=>{
+		builder
+			.addCase(getUserLogs.pending, (state) => {
+				state.logs = [];
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(getUserLogs.fulfilled, (state, action) => {
+				state.logs = action.payload.logs;
+				state.pageSize = action.payload.pageSize;
+				state.totalPages = action.payload.totalPages;
+				state.currentPage = action.payload.currentPage;
+
+				state.loading = false;
+				state.error = null;
+			})
+			.addCase(getUserLogs.rejected, (state, action) => {
+				state.logs = []
+				state.loading = false;
+				state.error = action.payload as string;
+				toast.error(action.payload);
+			})
+	}
 });
 
 export const { setLoading, setError } = imporiumSlice.actions;
