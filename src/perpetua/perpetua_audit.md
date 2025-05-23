@@ -16,25 +16,6 @@ This audit focuses on potential failure scenarios in update calls and storage st
 
 ## Storage Structures (`src/perpetua/src/storage/`)
 
-### `tag_storage.rs`
-
-*   **Original Risk**: High risk of inconsistency between `TAG_METADATA`, `TAG_SHELF_ASSOCIATIONS`, `SHELF_TAG_ASSOCIATIONS`, `TAG_POPULARITY_INDEX`, `TAG_LEXICAL_INDEX`, and `TAG_SHELF_CREATION_TIMELINE_INDEX` due to non-atomic updates across these `StableBTreeMap` instances.
-*   **Original Scenario**: If an operation in `update/tags.rs` (e.g., adding/removing a tag from a shelf) failed midway, these maps could desynchronize. For instance, `TagMetadata.current_shelf_count` might not reflect the actual number of associations in `TAG_SHELF_ASSOCIATIONS`, or `TAG_POPULARITY_INDEX` could be stale.
-
-*   **Mitigation Implemented (as of [current date/commit reference if available])**:
-    The `update/tags.rs` module, specifically the `add_tag_to_metadata_maps` and `remove_tag_from_metadata_maps` functions, has been refactored. The key changes include:
-    1.  **Dynamic Recalculation of Shelf Count**: When a tag is added to or removed from a shelf, the total number of shelves associated with that tag (`TagMetadata.current_shelf_count`) is now recalculated by directly querying/iterating `TAG_SHELF_ASSOCIATIONS` *after* the primary association has been made or broken.
-    2.  **Derived Popularity Index**: The `TAG_POPULARITY_INDEX` is updated (old entry removed, new entry added) based on this freshly recalculated shelf count.
-    3.  **Idempotent Updates to Core Associations**: Operations on `TAG_SHELF_ASSOCIATIONS`, `SHELF_TAG_ASSOCIATIONS`, `TAG_LEXICAL_INDEX`, and `TAG_SHELF_CREATION_TIMELINE_INDEX` remain largely idempotent due to the nature of inserting/removing keys with `()` values or simple data.
-
-*   **Revised Risk Assessment**:
-    *   **Significantly Reduced Risk of Persistent Inconsistency**: The implemented changes substantially reduce the risk of long-term data desynchronization. If an operation traps mid-way (e.g., after `TAG_SHELF_ASSOCIATIONS` is updated but before `TAG_METADATA`'s count is), a subsequent retry of the *same logical operation* (e.g., user retries adding/removing the tag, or an admin re-runs a failed process if applicable) will re-derive the counts from the current state of `TAG_SHELF_ASSOCIATIONS` and self-correct `TAG_METADATA` and `TAG_POPULARITY_INDEX`.
-    *   **Temporary Inconsistency Still Theoretically Possible**: True atomicity across all map updates within a single operation is not achieved (as `StableBTreeMap` does not offer cross-map transactions). A failure *during* the update of derived data (after primary associations are changed but before metadata/popularity recalculation is complete) can still lead to a brief, temporary inconsistency. However, the window for such inconsistency is narrowed, and the system is designed to be self-healing upon the next relevant operation for that tag.
-    *   **Overall Improvement**: The system is now much more robust against partial updates leading to lasting corruption in the tag-related data structures. The primary source of truth for counts (`TAG_SHELF_ASSOCIATIONS`) is used to correct derived data, which is a strong mitigation.
-
-*   **Further Considerations (Optional)**:
-    While the current implementation significantly bolsters data integrity for tag operations, for systems with extreme fault tolerance requirements, periodic (e.g., nightly) background reconciliation jobs could theoretically be implemented as an additional layer. These jobs would defensively scan and verify consistency between primary association maps and derived data maps, correcting any discrepancies found. However, given the self-correcting nature of the current design upon retry/re-operation, the necessity for such background jobs is greatly diminished.
-
 ### `shelf_storage.rs`
 
 *   **Risk**: `GLOBAL_TIMELINE` becoming inconsistent with actual shelf states.
@@ -44,11 +25,6 @@ This audit focuses on potential failure scenarios in update calls and storage st
 
 *   **Risk**: `NFT_SHELVES` map becoming inconsistent with actual shelf content.
 *   **Scenario**: If an NFT is added to/removed from a shelf in `SHELVES`, but the corresponding update to `NFT_SHELVES` fails, the record of which shelves contain a particular NFT will be wrong.
-
-### `random_feed_storage.rs`
-
-*   **Risk**: `RANDOM_SHELF_CANDIDATES` containing stale or dangling `ShelfId`s.
-*   **Scenario**: If `refresh_random_shelf_candidates` fails or isn't run after shelves are deleted, the feed might propose non-existent shelves. A failure during the refresh (after clearing but before full repopulation) can lead to a temporarily empty or small feed.
 
 ### `user_storage.rs`
 

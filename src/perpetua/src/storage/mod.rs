@@ -25,6 +25,7 @@ pub mod user_storage;
 pub mod nft_storage;
 pub mod follow_storage;
 pub mod random_feed_storage;
+pub mod error_log_storage;
 
 // Re-export key types/structs for easier access from outside crate::storage
 pub use common_types::{
@@ -90,6 +91,18 @@ pub use random_feed_storage::{
     RANDOM_SHELF_CANDIDATES,
     // Functions
     refresh_random_shelf_candidates,
+};
+
+// Re-exports for error_log_storage
+pub use error_log_storage::{
+    // Statics (Maps)
+    RECONCILIATION_TASKS,
+    // Enums & Structs
+    ReconciliationTask, ReconciliationTaskType, ReconciliationTaskStatus,
+    // Functions
+    add_reconciliation_task, get_pending_tasks, get_task_by_id, update_task_info, init_next_task_id,
+    // Memory ID (if needed publicly, though typically kept crate-internal)
+    // RECONCILIATION_TASKS_MEM_ID,
 };
 
 // Re-export MemoryId constants if they need to be accessed from outside the storage module directly.
