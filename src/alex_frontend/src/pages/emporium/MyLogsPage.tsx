@@ -6,6 +6,7 @@ import useEmporium from "@/hooks/actors/useEmporium";
 import getUserLogs from "@/features/imporium/thunks/getUserLog";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
+import { reset } from "@/features/imporium/imporiumSlice";
 
 
 const MyLogsPage = () => {
@@ -17,6 +18,10 @@ const MyLogsPage = () => {
     useEffect(() => {
         if(!actor) return;
         dispatch(getUserLogs({actor}));
+
+        return ()=>{
+            dispatch(reset())
+        }
     }, [actor]);
 
     return (

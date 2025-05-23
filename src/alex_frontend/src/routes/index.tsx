@@ -117,7 +117,7 @@ const router = createBrowserRouter(
 						{/* <Route path="my-nfts" element={<Suspense key="emporium-my-nfts" fallback={<MyNftsSkeleton />}><MyNftsPage /></Suspense>} /> */}
 
 						{/* <Route path="my-logs" element={<Suspense key="emporium-my-logs" fallback={<GeneralSkeleton />}><MyLogsPage /></Suspense>} /> */}
-						<Route path="market-logs" element={<Suspense key="emporium-market-logs" fallback={<GeneralSkeleton />}><MarketLogsPage /></Suspense>} />
+						{/* <Route path="market-logs" element={<Suspense key="emporium-market-logs" fallback={<GeneralSkeleton />}><MarketLogsPage /></Suspense>} /> */}
 						{/* <Route path="my-listings" element={<Suspense key="emporium-my-listing" fallback={<GeneralSkeleton />}><EmporiumActor><MyListingsPage /></EmporiumActor></Suspense>} /> */}
 					</Route>
 				</Route>
@@ -148,6 +148,11 @@ const router = createBrowserRouter(
 					<Route path="app/imporium/marketplace" element={<Suspense key="imporium-marketplace" fallback={<GeneralSkeleton />}><EmporiumActor><MarketPlacePage /></EmporiumActor></Suspense>} />
 					<Route path="app/imporium/listings" element={<Suspense key="imporium-listing" fallback={<GeneralSkeleton />}><EmporiumActor><MyListingsPage /></EmporiumActor></Suspense>} />
 
+					<Route path="app/imporium/market-logs" element={
+						<Suspense key="imporium-market-logs" fallback={<MyNftsSkeleton />}>
+							<MarketLogsPage />
+						</Suspense>
+					} />
 
 					<Route path="app/imporium/my-logs" element={
 						<Suspense key="imporium-my-logs" fallback={<MyNftsSkeleton />}>
