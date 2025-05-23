@@ -184,6 +184,12 @@ perpetua/
 
 
 UI:
+- Solid filling for the LBRY/ALEX Badge
+- Remove the percent icon before the percent number in the badge. Put a rarity info hover/click on it. Also pick one text color and a better background color. Probably less orange and more gold with black text. Or different colors for different rarity tiers.
+- Make the lbry/alex badges display in $amounts.
+
+
+
 - There's a lot of background loading, like if I go to "My Library" it feels frozen for 10 seconds.
 - Too much recursion and dialog opening errors.
 

@@ -2,7 +2,7 @@ use candid::{Nat, Principal};
 use ic_cdk::api::call::CallResult;
 use icrc_ledger_types::icrc1::account::Account;
 use std::str::FromStr;
-use crate::storage::SHELVES;
+use crate::storage::SHELF_DATA;
 
 /// Verifies if the specified NFT is owned by the caller
 /// 
@@ -78,8 +78,8 @@ pub async fn verify_nft_ownership(nft_id: &str, caller: Principal) -> Result<boo
 /// * `true` if the shelf exists
 /// * `false` if the shelf does not exist
 pub fn shelf_exists(shelf_id: &str) -> bool {
-    SHELVES.with(|shelves| {
-        shelves.borrow().contains_key(&shelf_id.to_string())
+    SHELF_DATA.with(|shelf_data_map| {
+        shelf_data_map.borrow().contains_key(&shelf_id.to_string())
     })
 }
 

@@ -47,7 +47,8 @@ export function ContentCard({
   return (
     <>
       <Card
-        className={`group flex flex-col relative bg-white dark:bg-gray-900 h-full ${component === "Emporium" ? "mb-20 rounded-2xl" : ""}`}
+        // overflow-hidden is used to prevent the asset from overflowing its container
+        className={`group flex flex-col relative bg-white dark:bg-gray-900 h-full ${component === "Emporium" ? "mb-20 rounded-2xl" : "overflow-hidden"}`}
         // onClick is now applied to the content area if needed, or removed if whole card isn't clickable anymore
         // Note: If the entire card should still be clickable *except* the action button,
         // you might need to move onClick to the CardContent/AspectRatio and ensure stopPropagation in UnifiedCardActions works.

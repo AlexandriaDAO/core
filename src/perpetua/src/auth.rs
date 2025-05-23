@@ -1,6 +1,6 @@
 use candid::Principal;
 // Import New Types
-use crate::storage::{ShelfMetadata, ShelfContent, SHELF_METADATA, SHELVES};
+use crate::storage::{ShelfData, ShelfMetadata, ShelfContent, SHELF_DATA};
 use ic_stable_structures::{memory_manager::VirtualMemory};
 use ic_stable_structures::DefaultMemoryImpl;
 
@@ -12,7 +12,7 @@ type Memory = VirtualMemory<DefaultMemoryImpl>;
 pub enum ShelfAuthError {
     NotFound(String),
     Unauthorized(String),
-    ContentNotFound(String), // For when ShelfContent is missing
+    // ContentNotFound is implicitly covered by NotFound if ShelfData is missing
 }
 
 impl std::fmt::Display for ShelfAuthError {
@@ -20,7 +20,6 @@ impl std::fmt::Display for ShelfAuthError {
         match self {
             ShelfAuthError::NotFound(msg) => write!(f, "{}", msg),
             ShelfAuthError::Unauthorized(msg) => write!(f, "{}", msg),
-            ShelfAuthError::ContentNotFound(msg) => write!(f, "{}", msg),
         }
     }
 }
@@ -31,34 +30,25 @@ impl From<ShelfAuthError> for String {
     }
 }
 
-/// Internal helper to get a shelf's metadata by ID
-fn get_shelf_metadata_internal(shelf_id: &str) -> Result<ShelfMetadata, ShelfAuthError> {
-    SHELF_METADATA.with(|metadata_map| {
-        metadata_map.borrow().get(&shelf_id.to_string())
-            .map(|metadata| metadata.clone())
-            .ok_or_else(|| ShelfAuthError::NotFound(format!("Shelf metadata for ID '{}' not found", shelf_id)))
-    })
-}
-
-/// Internal helper to get a shelf's content by ID
-fn get_shelf_content_internal(shelf_id: &str) -> Result<ShelfContent, ShelfAuthError> {
-    SHELVES.with(|content_map| {
-        content_map.borrow().get(&shelf_id.to_string())
-            .map(|content| content.clone()) // Assuming ShelfContent is Clone
-            .ok_or_else(|| ShelfAuthError::ContentNotFound(format!("Shelf content for ID '{}' not found", shelf_id)))
+/// Internal helper to get a shelf's data by ID
+fn get_shelf_data_internal(shelf_id: &str) -> Result<ShelfData, ShelfAuthError> {
+    SHELF_DATA.with(|map| {
+        map.borrow().get(&shelf_id.to_string())
+            .map(|data| data.clone()) // ShelfData must be Clone
+            .ok_or_else(|| ShelfAuthError::NotFound(format!("Shelf data for ID '{}' not found", shelf_id)))
     })
 }
 
 /// Checks if the provided principal is the owner of the specified shelf
 pub fn is_shelf_owner(shelf_id: &str, principal: &Principal) -> Result<bool, String> {
-    let metadata = get_shelf_metadata_internal(shelf_id)?;
-    Ok(metadata.owner == *principal)
+    let shelf_data = get_shelf_data_internal(shelf_id)?;
+    Ok(shelf_data.metadata.owner == *principal)
 }
 
 /// Checks if principal can edit shelf
 pub fn can_edit_shelf(shelf_id: &str, principal: &Principal) -> Result<bool, String> {
-    let metadata = get_shelf_metadata_internal(shelf_id)?;
-    Ok(metadata.owner == *principal || metadata.public_editing)
+    let shelf_data = get_shelf_data_internal(shelf_id)?;
+    Ok(shelf_data.metadata.owner == *principal || shelf_data.metadata.public_editing)
 }
 
 /// Checks if the provided principal is the admin (owner) of the specified shelf
@@ -70,32 +60,32 @@ pub fn is_shelf_admin(shelf_id: &str, principal: &Principal) -> Result<bool, Str
 /// Retrieves a shelf's metadata and verifies ownership by the provided principal
 /// Returns the ShelfMetadata if the principal is the owner, otherwise returns an error
 pub fn get_shelf_metadata_for_owner(shelf_id: &str, principal: &Principal) -> Result<ShelfMetadata, String> {
-    let metadata = get_shelf_metadata_internal(shelf_id)?;
+    let shelf_data = get_shelf_data_internal(shelf_id)?;
     
-    if metadata.owner != *principal {
+    if shelf_data.metadata.owner != *principal {
         return Err(ShelfAuthError::Unauthorized(
             "Unauthorized: Only shelf owner can perform this action".to_string()
         ).into());
     }
     
-    Ok(metadata)
+    Ok(shelf_data.metadata)
 }
 
 /// Retrieves a shelf's metadata and verifies that the principal has edit permissions
 /// Returns the ShelfMetadata if the principal can edit it, otherwise returns an error
 pub fn get_shelf_metadata_for_edit(shelf_id: &str, principal: &Principal) -> Result<ShelfMetadata, String> {
-    let metadata = get_shelf_metadata_internal(shelf_id)?;
+    let shelf_data = get_shelf_data_internal(shelf_id)?;
     
-    if metadata.owner != *principal && !metadata.public_editing {
+    if shelf_data.metadata.owner != *principal && !shelf_data.metadata.public_editing {
         return Err(ShelfAuthError::Unauthorized(
             "Unauthorized: You don't have edit permissions for this shelf".to_string()
         ).into());
     }
     
-    Ok(metadata)
+    Ok(shelf_data.metadata)
 }
 
-/// Retrieves shelf metadata and content for owner, allows mutable operations via callback.
+/// Retrieves shelf data for owner, allows mutable operations on metadata and content via callback.
 pub fn get_shelf_parts_for_owner_mut<F, R>(
     shelf_id: &str,
     principal: &Principal,
@@ -112,28 +102,24 @@ where
         .into());
     }
 
-    // Load metadata and content
-    let mut metadata = get_shelf_metadata_internal(shelf_id)?;
-    let mut content = get_shelf_content_internal(shelf_id)?; // Load ShelfContent
+    // Load ShelfData
+    let mut shelf_data = get_shelf_data_internal(shelf_id)?;
 
     // Execute the callback with mutable metadata and content
-    let result = callback(&mut metadata, &mut content)?;
+    let result = callback(&mut shelf_data.metadata, &mut shelf_data.content)?;
 
     // Update the timestamp on metadata
-    metadata.updated_at = ic_cdk::api::time();
+    shelf_data.metadata.updated_at = ic_cdk::api::time();
 
-    // Save the updated metadata and content
-    SHELF_METADATA.with(|metadata_map_ref| {
-        metadata_map_ref.borrow_mut().insert(shelf_id.to_string(), metadata);
-    });
-    SHELVES.with(|content_map_ref| {
-        content_map_ref.borrow_mut().insert(shelf_id.to_string(), content);
+    // Save the updated ShelfData
+    SHELF_DATA.with(|map_ref| {
+        map_ref.borrow_mut().insert(shelf_id.to_string(), shelf_data);
     });
 
     Ok(result)
 }
 
-/// Retrieves shelf metadata and content for editor, allows mutable operations via callback.
+/// Retrieves shelf data for editor, allows mutable operations on metadata and content via callback.
 pub fn get_shelf_parts_for_edit_mut<F, R>(
     shelf_id: &str,
     principal: &Principal,
@@ -150,22 +136,18 @@ where
         .into());
     }
 
-    // Load metadata and content
-    let mut metadata = get_shelf_metadata_internal(shelf_id)?;
-    let mut content = get_shelf_content_internal(shelf_id)?;
+    // Load ShelfData
+    let mut shelf_data = get_shelf_data_internal(shelf_id)?;
 
     // Execute the callback with mutable metadata and content
-    let result = callback(&mut metadata, &mut content)?;
+    let result = callback(&mut shelf_data.metadata, &mut shelf_data.content)?;
 
     // Update the timestamp on metadata
-    metadata.updated_at = ic_cdk::api::time();
+    shelf_data.metadata.updated_at = ic_cdk::api::time();
 
-    // Save the updated metadata and content
-    SHELF_METADATA.with(|metadata_map_ref| {
-        metadata_map_ref.borrow_mut().insert(shelf_id.to_string(), metadata);
-    });
-    SHELVES.with(|content_map_ref| {
-        content_map_ref.borrow_mut().insert(shelf_id.to_string(), content);
+    // Save the updated ShelfData
+    SHELF_DATA.with(|map_ref| {
+        map_ref.borrow_mut().insert(shelf_id.to_string(), shelf_data);
     });
 
     Ok(result)

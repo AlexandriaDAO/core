@@ -1,5 +1,5 @@
 use candid::{CandidType, Deserialize};
-use crate::storage::{Item, ItemContent, SHELVES, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE, ShelfId, GlobalTimelineItemValue, ShelfMetadata, ShelfContent, SHELF_METADATA};
+use crate::storage::{Item, ItemContent, ShelfData, SHELF_DATA, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE, ShelfId, GlobalTimelineItemValue, ShelfMetadata, ShelfContent};
 use crate::guard::not_anon;
 use super::tags::add_tag_to_metadata_maps;
 
@@ -44,7 +44,7 @@ pub async fn store_shelf(
     let now = shelf_in_memory.created_at; // Use created_at from the in-memory shelf
 
     // Deconstruct the in-memory Shelf into ShelfMetadata and ShelfContent parts
-    let shelf_metadata = ShelfMetadata {
+    let shelf_metadata_for_data = ShelfMetadata {
         shelf_id: shelf_in_memory.shelf_id.clone(),
         title: shelf_in_memory.title.clone(),
         description: shelf_in_memory.description.clone(),
@@ -56,31 +56,23 @@ pub async fn store_shelf(
         public_editing: shelf_in_memory.public_editing,
     };
 
-    let shelf_content = ShelfContent {
+    let shelf_content_for_data = ShelfContent {
         items: shelf_in_memory.items.clone(),
         item_positions: shelf_in_memory.item_positions.clone(),
+    };
+
+    let shelf_data_to_store = ShelfData {
+        metadata: shelf_metadata_for_data.clone(), // Clone for ShelfData, metadata_for_data is used below for timeline
+        content: shelf_content_for_data,
     };
 
     // --- COMMIT PHASE ---
     // From this point onwards, any failure MUST cause a panic to ensure atomicity.
 
-    // Store ShelfMetadata and ShelfContent
-    SHELF_METADATA.with(|metadata_map_ref| {
-        // metadata_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_metadata.clone());
-        // If insert can theoretically fail (e.g. OOM), it should panic. StableBTreeMap's insert doesn't return Result.
-        // Panics from Storable trait's to_bytes (Encode!) are expected and desired here on failure.
-        if metadata_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_metadata.clone()).is_some() {
-            // This case (replacing an existing item with the same key) should ideally not happen for a new shelf_id.
-            // Depending on exact guarantees of shelf_id generation, this might indicate a hash collision or reuse.
-            // For atomicity, if this is an unexpected state, a panic might be justified.
-            // However, StableBTreeMap's insert replaces and returns the old value.
-            // For now, we assume shelf_id is unique and this won't be an issue of replacing an *intended* different shelf.
-        }
-    });
-    SHELVES.with(|content_map_ref| { // SHELVES now stores ShelfContent
-        // content_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_content);
-        if content_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_content).is_some() {
-            // Similar consideration as above for SHELF_METADATA.
+    // Store ShelfData
+    SHELF_DATA.with(|sds_map_ref| {
+        if sds_map_ref.borrow_mut().insert(shelf_id.clone(), shelf_data_to_store).is_some() {
+            // Log or handle potential overwrite if necessary, though shelf_id should be unique
         }
     });
 
@@ -91,10 +83,7 @@ pub async fn store_shelf(
                 let mut nft_map = nft_shelves.borrow_mut();
                 let mut shelves = nft_map.get(nft_id).unwrap_or_default();
                 shelves.0.push(shelf_id.clone());
-                // nft_map.insert(nft_id.to_string(), shelves);
-                if nft_map.insert(nft_id.to_string(), shelves).is_some() {
-                    // If replacing, it means the NFT_ID was already there, we're just adding a new shelf_id to its list.
-                }
+                nft_map.insert(nft_id.to_string(), shelves);
             });
         }
     }
@@ -104,30 +93,18 @@ pub async fn store_shelf(
         let mut user_map = user_shelves.borrow_mut();
         let mut user_shelves_set = user_map.get(&caller).unwrap_or_default();
         user_shelves_set.0.insert((now, shelf_id.clone()));
-        // user_map.insert(caller, user_shelves_set);
-        if user_map.insert(caller, user_shelves_set).is_some() {
-            // Replacing the user's entry, expected if they already have other shelves.
-        }
+        user_map.insert(caller, user_shelves_set);
     });
 
     // Add shelf to the global timeline for public discoverability
     GLOBAL_TIMELINE.with(|timeline_map_ref| {
-        // timeline_map_ref.borrow_mut().insert(
-        //     now, // This 'now' is shelf_in_memory.created_at
-        //     GlobalTimelineItemValue {
-        //         shelf_id: shelf_metadata.shelf_id.clone(), 
-        //         owner: shelf_metadata.owner, 
-        //         tags: shelf_metadata.tags.clone(), 
-        //         public_editing: shelf_metadata.public_editing, 
-        //     }
-        // );
         if timeline_map_ref.borrow_mut().insert(
             now, // This 'now' is shelf_in_memory.created_at
             GlobalTimelineItemValue {
-                shelf_id: shelf_metadata.shelf_id.clone(), 
-                owner: shelf_metadata.owner, 
-                tags: shelf_metadata.tags.clone(), 
-                public_editing: shelf_metadata.public_editing, 
+                shelf_id: shelf_metadata_for_data.shelf_id.clone(), 
+                owner: shelf_metadata_for_data.owner, 
+                tags: shelf_metadata_for_data.tags.clone(), 
+                public_editing: shelf_metadata_for_data.public_editing, 
             }
         ).is_some() {
             // This means a timeline entry for this exact timestamp 'now' was replaced.
@@ -142,12 +119,12 @@ pub async fn store_shelf(
     // This helper now panics on failure, ensuring atomicity for tag-related map updates.
     // The original .map_err and ? are removed.
     // shelf_metadata.tags are already normalized by create_shelf
-    for tag_to_associate in &shelf_metadata.tags {
+    for tag_to_associate in &shelf_metadata_for_data.tags {
         // The 'now' timestamp here refers to the shelf creation time.
         // add_tag_to_metadata_maps uses its 'now' param for last_association_timestamp etc.
         // For initial creation, using shelf_metadata.created_at for both 'now' and 'shelf_created_at' in add_tag_to_metadata_maps call
         // or more accurately, 'now' (shelf creation time) for both.
-        add_tag_to_metadata_maps(&shelf_id, tag_to_associate, shelf_metadata.created_at, now); 
+        add_tag_to_metadata_maps(&shelf_id, tag_to_associate, shelf_metadata_for_data.created_at, now); 
             // REMOVED: .map_err(|e| format!("Failed to associate tag '{}': {}", tag_to_associate, e))?;
     }
 
@@ -165,20 +142,15 @@ pub fn update_shelf_metadata(
     description: Option<String>
 ) -> Result<(), String> {
     let caller = ic_cdk::caller();
-    
-    // This function now only deals with ShelfMetadata
-    // The auth helper get_shelf_parts_for_owner_mut or a new one for metadata only could be used.
-    // For simplicity, let's fetch, check, modify, and save metadata directly here.
+    let now = ic_cdk::api::time();
 
-    SHELF_METADATA.with(|metadata_map_ref| {
-        let mut metadata_map = metadata_map_ref.borrow_mut();
-        if let Some(mut metadata) = metadata_map.get(&shelf_id).map(|m| m.clone()) {
-            // Authorization check
-            if metadata.owner != caller {
-                return Err("Unauthorized: Only shelf owner can perform this action".to_string());
+    SHELF_DATA.with(|shelf_data_map_ref| {
+        let mut shelf_data_map = shelf_data_map_ref.borrow_mut();
+        if let Some(mut shelf_data) = shelf_data_map.get(&shelf_id).map(|sd| sd.clone()) { // Clone to modify
+            if shelf_data.metadata.owner != caller && !shelf_data.metadata.public_editing { // Check edit permission
+                return Err("Unauthorized: You don\'t have permission to edit this shelf metadata".to_string());
             }
 
-            // Update the title if provided and not empty
             if let Some(new_title) = title {
                 if new_title.trim().is_empty() {
                     return Err("Title cannot be empty".to_string());
@@ -186,26 +158,22 @@ pub fn update_shelf_metadata(
                 if new_title.len() > 100 {
                      return Err("Title is too long (max 100 characters)".to_string());
                 }
-                metadata.title = new_title;
+                shelf_data.metadata.title = new_title;
             }
             
-            // Update the description if provided
-            if let Some(ref desc) = description {
-                 if desc.len() > 500 {
+            if let Some(ref desc_val) = description {
+                 if desc_val.len() > 500 {
                      return Err("Description is too long (max 500 characters)".to_string());
                  }
             }
-            // Directly assign, allowing None to clear the description
-            metadata.description = description;
+            shelf_data.metadata.description = description;
             
-            // Update the timestamp
-            metadata.updated_at = ic_cdk::api::time();
+            shelf_data.metadata.updated_at = now;
 
-            // Save the updated metadata
-            metadata_map.insert(shelf_id.clone(), metadata);
+            shelf_data_map.insert(shelf_id.clone(), shelf_data); // Insert the modified ShelfData
             Ok(())
         } else {
-            Err(format!("Shelf metadata with ID '{}' not found", shelf_id))
+            Err(format!("Shelf with ID '{}' not found", shelf_id))
         }
     })
 } 

@@ -40,9 +40,9 @@ pub use common_types::{
 
 pub use shelf_storage::{
     // Statics (Maps)
-    SHELVES, SHELF_METADATA, GLOBAL_TIMELINE,
+    SHELF_DATA, GLOBAL_TIMELINE,
     // Structs
-    Shelf, ShelfMetadata, ShelfContent, ShelfContentSerializable, Item, ItemContent,
+    Shelf, ShelfData, ShelfMetadata, ShelfContent, ShelfContentSerializable, Item, ItemContent,
     GlobalTimelineItemValue, ShelfPublic, ShelfBackupData,
     // Functions
     create_shelf,

@@ -79,6 +79,57 @@ impl Storable for ShelfContent {
     const BOUND: Bound = Bound::Unbounded;
 }
 
+// Manual implementation of CandidType for ShelfContent
+impl candid::CandidType for ShelfContent {
+    fn _ty() -> candid::types::Type {
+        ShelfContentSerializable::_ty()
+    }
+
+    fn idl_serialize<S>(&self, serializer: S) -> Result<(), S::Error>
+    where
+        S: candid::types::Serializer,
+    {
+        let serializable = ShelfContentSerializable {
+            items: self.items.clone(),
+            item_positions: self.item_positions.get_ordered_entries(),
+        };
+        serializable.idl_serialize(serializer)
+    }
+}
+
+// Manual implementation of Deserialize for ShelfContent
+impl<'de> serde::Deserialize<'de> for ShelfContent {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let serializable = ShelfContentSerializable::deserialize(deserializer)?;
+        let mut item_positions = PositionTracker::<u32>::new();
+        for (key, pos) in serializable.item_positions {
+            // It's possible insert could fail if PositionTracker has such logic,
+            // but assuming it's straightforward for deserialization context.
+            item_positions.insert(key, pos);
+        }
+        Ok(Self {
+            items: serializable.items,
+            item_positions,
+        })
+    }
+}
+
+// --- Define ShelfData (New combined structure) ---
+#[derive(CandidType, Deserialize, Clone, Debug)]
+pub struct ShelfData {
+    pub metadata: ShelfMetadata,
+    pub content: ShelfContent,
+}
+
+impl Storable for ShelfData {
+    fn to_bytes(&self) -> Cow<[u8]> { Cow::Owned(Encode!(self).unwrap()) }
+    fn from_bytes(bytes: Cow<[u8]>) -> Self { Decode!(bytes.as_ref(), Self).unwrap() }
+    const BOUND: Bound = Bound::Unbounded;
+}
+
 // --- ItemContent and Item types ---
 #[derive(CandidType, Deserialize, Clone, Debug)]
 pub enum ItemContent {
@@ -187,16 +238,12 @@ pub struct Shelf {
 pub(crate) const SHELVES_MEM_ID: MemoryId = MemoryId::new(0);
 pub(crate) const GLOBAL_TIMELINE_MEM_ID: MemoryId = MemoryId::new(3);
 pub(crate) const SHELF_METADATA_MEM_ID: MemoryId = MemoryId::new(20);
+pub(crate) const SHELF_DATA_MEM_ID: MemoryId = MemoryId::new(21);
 
 thread_local! {
-    pub static SHELVES: RefCell<StableBTreeMap<ShelfId, ShelfContent, Memory>> = RefCell::new(
+    pub static SHELF_DATA: RefCell<StableBTreeMap<ShelfId, ShelfData, Memory>> = RefCell::new(
         StableBTreeMap::init(
-            MEMORY_MANAGER.with(|m| m.borrow().get(SHELVES_MEM_ID))
-        )
-    );
-    pub static SHELF_METADATA: RefCell<StableBTreeMap<ShelfId, ShelfMetadata, Memory>> = RefCell::new(
-        StableBTreeMap::init(
-            MEMORY_MANAGER.with(|m| m.borrow().get(SHELF_METADATA_MEM_ID))
+            MEMORY_MANAGER.with(|m| m.borrow().get(SHELF_DATA_MEM_ID))
         )
     );
     pub static GLOBAL_TIMELINE: RefCell<StableBTreeMap<u64, GlobalTimelineItemValue, Memory>> = RefCell::new(
@@ -245,7 +292,7 @@ impl Shelf {
                 if nft_id.chars().any(|c| !c.is_digit(10)) {
                      return Err("Invalid NFT ID: Contains non-digit characters.".to_string());
                 }
-                if nft_id.len() > MAX_NFT_ID_LENGTH { // MAX_NFT_ID_LENGTH defined locally for now
+                if nft_id.len() > MAX_NFT_ID_LENGTH {
                     return Err(format!("NFT ID exceeds maximum length of {} characters", MAX_NFT_ID_LENGTH));
                 }
             }
@@ -258,9 +305,9 @@ impl Shelf {
                 if nested_shelf_id == &self.shelf_id {
                     return Err("Circular reference: A shelf cannot contain itself".to_string());
                 }
-                let nested_contains_self = SHELVES.with(|shelves_map_ref| {
-                    shelves_map_ref.borrow().get(nested_shelf_id).map_or(false, |nested_shelf_content| {
-                        nested_shelf_content.items.values().any(|nested_item| {
+                let nested_contains_self = SHELF_DATA.with(|map_ref| {
+                    map_ref.borrow().get(nested_shelf_id).map_or(false, |shelf_data| {
+                        shelf_data.content.items.values().any(|nested_item| {
                             matches!(&nested_item.content, ItemContent::Shelf(id_in_nested) if id_in_nested == &self.shelf_id)
                         })
                     })

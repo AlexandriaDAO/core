@@ -7,8 +7,8 @@ use super::{MEMORY_MANAGER, Memory, MemoryId};
 // Import common types from sibling module
 use super::common_types::ShelfId;
 
-// Imports from sibling storage module for SHELVES access
-use super::shelf_storage::SHELVES; // For refresh_random_shelf_candidates
+// Imports from crate::storage for SHELF_DATA access
+use crate::storage::SHELF_DATA; // Changed from shelf_storage::SHELVES
 
 // Imports for random number generation
 use rand_chacha::ChaCha20Rng;
@@ -32,9 +32,9 @@ pub fn refresh_random_shelf_candidates() {
     let mut candidate_ids_reservoir: Vec<ShelfId> = Vec::with_capacity(K_CANDIDATES);
     let mut shelves_processed_count: u64 = 0;
 
-    SHELVES.with(|shelves_map_ref| { // Accessing SHELVES from shelf_storage
-        let shelves_map = shelves_map_ref.borrow();
-        let total_shelves_in_map = shelves_map.len();
+    SHELF_DATA.with(|shelf_data_map_ref| { // Changed from SHELVES
+        let shelf_data_map = shelf_data_map_ref.borrow();
+        let total_shelves_in_map = shelf_data_map.len();
 
         if total_shelves_in_map == 0 {
             ic_cdk::println!("No shelves available to select candidates for random feed.");
@@ -53,10 +53,8 @@ pub fn refresh_random_shelf_candidates() {
         }
         let mut prng = ChaCha20Rng::from_seed(rng_seed);
 
-        // Iterate over SHELVES content. Since SHELVES stores ShelfContent, we need to get ShelfId from ShelfMetadata if needed.
-        // However, the original code iterated `shelves_map.iter()` where shelves_map was `SHELVES` (ShelfId -> ShelfContent).
-        // So, the key of SHELVES is already ShelfId.
-        for (shelf_id, _shelf_content) in shelves_map.iter() { 
+        // Iterate over SHELF_DATA. The key is ShelfId, which is what we need.
+        for (shelf_id, _shelf_data) in shelf_data_map.iter() { // Changed from _shelf_content
             shelves_processed_count += 1;
             if candidate_ids_reservoir.len() < K_CANDIDATES {
                 candidate_ids_reservoir.push(shelf_id.clone());

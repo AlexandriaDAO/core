@@ -9,14 +9,15 @@ use rand_core::SeedableRng;
 
 // Import necessary items from storage
 use crate::storage::{
-    SHELVES, NFT_SHELVES, 
+    SHELF_DATA, ShelfData, // Replaced SHELVES, SHELF_METADATA
+    NFT_SHELVES, 
     Item, ShelfId, ItemId, 
-    USER_SHELVES, GLOBAL_TIMELINE, USER_PROFILE_ORDER, 
-    FOLLOWED_USERS, FOLLOWED_TAGS, 
+    USER_SHELVES, GLOBAL_TIMELINE, USER_PROFILE_ORDER, TimestampedShelves, // Added TimestampedShelves
+    FOLLOWED_USERS, FOLLOWED_TAGS, PrincipalSet, NormalizedTagSet, // Added PrincipalSet, NormalizedTagSet
     UserProfileOrder, 
     RANDOM_SHELF_CANDIDATES, 
     TagShelfCreationTimelineKey, TAG_SHELF_CREATION_TIMELINE_INDEX, 
-    ShelfMetadata, ShelfContent, SHELF_METADATA 
+    ShelfMetadata, ShelfContent // Still useful for type hints if ShelfData is deconstructed
 };
 // Import necessary types from types module
 // use crate::types::TagShelfAssociationKey; // Comment out, no longer primary key for this query
@@ -49,15 +50,11 @@ pub struct ShelfPositionMetrics {
 
 #[ic_cdk::query]
 pub fn get_shelf(shelf_id: ShelfId) -> QueryResult<ShelfPublic> {
-    let metadata: crate::storage::ShelfMetadata = SHELF_METADATA.with(|metadata_map_ref| {
-        metadata_map_ref.borrow().get(&shelf_id).map(|m| m.clone())
-    }).ok_or(QueryError::ShelfNotFound)?;
-
-    let content: crate::storage::ShelfContent = SHELVES.with(|content_map_ref| {
-        content_map_ref.borrow().get(&shelf_id).map(|c| c.clone())
-    }).ok_or(QueryError::ShelfContentNotFound)?;
-
-    Ok(ShelfPublic::from_parts(&metadata, &content))
+    SHELF_DATA.with(|sds_map_ref| {
+        sds_map_ref.borrow().get(&shelf_id)
+            .map(|shelf_data| ShelfPublic::from_parts(&shelf_data.metadata, &shelf_data.content))
+            .ok_or(QueryError::ShelfNotFound)
+    })
 }
 
 #[ic_cdk::query]
@@ -67,10 +64,10 @@ pub fn get_shelf_items(
 ) -> QueryResult<CursorPaginatedResult<Item, ItemId>> {
     let limit = pagination.get_limit();
 
-    let shelf_content: crate::storage::ShelfContent = SHELVES.with(|s_map| s_map.borrow().get(&shelf_id).map(|sc| sc.clone()))
-        .ok_or(QueryError::ShelfContentNotFound)?;
+    let shelf_data = SHELF_DATA.with(|sds_map| sds_map.borrow().get(&shelf_id).map(|sd_ref| sd_ref.clone()))
+        .ok_or(QueryError::ShelfNotFound)?;
 
-    let ordered_ids: Vec<u32> = shelf_content.item_positions.iter_keys_ordered().cloned().collect();
+    let ordered_ids: Vec<u32> = shelf_data.content.item_positions.iter_keys_ordered().cloned().collect();
     let total_items = ordered_ids.len();
 
     if total_items == 0 {
@@ -82,33 +79,16 @@ pub fn get_shelf_items(
     }
 
     let start_index = match pagination.cursor {
-        Some(cursor_id) => {
-            ordered_ids
-                .iter()
-                .position(|&id| id == cursor_id)
-                .map(|idx| idx + 1)
-                .unwrap_or(0)
-        }
+        Some(cursor_id) => ordered_ids.iter().position(|&id| id == cursor_id).map(|idx| idx + 1).unwrap_or(0),
         None => 0,
     };
 
     let end_index = (start_index + limit).min(total_items);
-    let page_ids: &[u32] = if start_index >= total_items {
-        &[]
-    } else {
-        &ordered_ids[start_index..end_index]
-    };
+    let page_ids: &[u32] = if start_index >= total_items { &[] } else { &ordered_ids[start_index..end_index] };
 
-    let items_page: Vec<Item> = page_ids
-        .iter()
-        .filter_map(|id| shelf_content.items.get(id).map(|i| i.clone()))
-        .collect();
+    let items_page: Vec<Item> = page_ids.iter().filter_map(|id| shelf_data.content.items.get(id).cloned()).collect();
 
-    let correct_next_cursor = if end_index < total_items {
-        page_ids.last().cloned()
-    } else {
-        None
-    };
+    let correct_next_cursor = if end_index < total_items { page_ids.last().cloned() } else { None };
 
     Ok(CursorPaginatedResult {
         items: items_page,
@@ -121,28 +101,18 @@ pub fn get_shelf_items(
 /// This helps frontend clients identify when a shelf needs rebalancing
 #[ic_cdk::query]
 pub fn get_shelf_position_metrics(shelf_id: ShelfId) -> Result<ShelfPositionMetrics, String> {
-    SHELVES.with(|content_map_ref| {
-        let content_map = content_map_ref.borrow();
-
-        if let Some(shelf_content) = content_map.get(&shelf_id).map(|c| c.clone()) {
-            let position_count = shelf_content.item_positions.len();
-
+    SHELF_DATA.with(|sds_map_ref| {
+        let sds_map = sds_map_ref.borrow();
+        if let Some(shelf_data) = sds_map.get(&shelf_id) { // No clone needed if only accessing .content
+            let position_count = shelf_data.content.item_positions.len();
             if position_count < 2 {
-                return Ok(ShelfPositionMetrics {
-                    item_count: position_count,
-                    min_gap: 0.0,
-                    avg_gap: 0.0,
-                    max_gap: 0.0,
-                });
+                return Ok(ShelfPositionMetrics { item_count: position_count, min_gap: 0.0, avg_gap: 0.0, max_gap: 0.0 });
             }
-
-            let mut positions: Vec<f64> = shelf_content.item_positions.iter_ordered().map(|(_, pos)| pos).collect();
+            let mut positions: Vec<f64> = shelf_data.content.item_positions.iter_ordered().map(|(_, pos)| pos).collect();
             positions.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-
             let mut min_gap = f64::MAX;
             let mut max_gap = 0.0;
             let mut sum_gap = 0.0;
-
             for i in 1..positions.len() {
                 let gap = positions[i] - positions[i-1];
                 if gap < 0.0 { continue; }
@@ -150,17 +120,10 @@ pub fn get_shelf_position_metrics(shelf_id: ShelfId) -> Result<ShelfPositionMetr
                 max_gap = f64::max(max_gap, gap);
                 sum_gap += gap;
             }
-
             let avg_gap = if positions.len() > 1 { sum_gap / (positions.len() - 1) as f64 } else { 0.0 };
-
-            Ok(ShelfPositionMetrics {
-                item_count: position_count,
-                min_gap,
-                avg_gap,
-                max_gap,
-            })
+            Ok(ShelfPositionMetrics { item_count: position_count, min_gap, avg_gap, max_gap })
         } else {
-            Err(format!("Shelf content for ID '{}' not found", shelf_id))
+            Err(format!("Shelf with ID '{}' not found", shelf_id))
         }
     })
 }
@@ -169,12 +132,7 @@ pub fn get_shelf_position_metrics(shelf_id: ShelfId) -> Result<ShelfPositionMetr
 /// Returns an empty list if the NFT is not found in any tracked shelves.
 #[ic_cdk::query]
 pub fn get_shelves_containing_nft(nft_id: String) -> Vec<ShelfId> {
-    NFT_SHELVES.with(|nft_shelves| {
-        nft_shelves
-            .borrow()
-            .get(&nft_id)
-            .map_or(Vec::new(), |string_vec| string_vec.0.clone())
-    })
+    NFT_SHELVES.with(|nft_shelves| nft_shelves.borrow().get(&nft_id).map_or(Vec::new(), |sv| sv.0.clone()))
 }
 
 // --- Functions moved from query.rs ---
@@ -187,66 +145,34 @@ pub fn get_user_shelves(
     let limit = pagination.get_limit();
     let offset = pagination.get_offset();
 
-    USER_SHELVES.with(|user_shelves| {
-        user_shelves
-            .borrow()
-            .get(&user)
-            .map(|ts| ts.clone())
-            .ok_or(QueryError::UserNotFound)
+    USER_SHELVES.with(|user_shelves_map_ref| {
+        user_shelves_map_ref.borrow().get(&user).map(|v_ref| v_ref.clone()).ok_or(QueryError::UserNotFound)
             .and_then(|timestamped| {
-                let user_profile_opt: Option<UserProfileOrder> = USER_PROFILE_ORDER.with(|profile_order| {
-                    profile_order.borrow().get(&user).map(|o| o.clone())
-                });
-
+                let user_profile_opt: Option<UserProfileOrder> = USER_PROFILE_ORDER.with(|po_map| po_map.borrow().get(&user).map(|v_ref| v_ref.clone()));
                 let has_custom_order = user_profile_opt.as_ref().map_or(false, |order| order.is_customized);
-
                 let combined_ids: Vec<ShelfId> = if has_custom_order {
                     let user_order = user_profile_opt.unwrap();
                     let ordered_positions: Vec<(ShelfId, f64)> = user_order.shelf_positions.get_ordered_entries();
                     let ordered_ids: Vec<ShelfId> = ordered_positions.into_iter().map(|(id, _)| id).collect();
                     let ordered_id_set: std::collections::HashSet<ShelfId> = ordered_ids.iter().cloned().collect();
-                    let mut timestamp_ordered_ids: Vec<(u64, ShelfId)> = timestamped.0
-                        .iter()
-                        .filter(|(_, id)| !ordered_id_set.contains(id))
-                        .cloned()
-                        .collect();
+                    let mut timestamp_ordered_ids: Vec<(u64, ShelfId)> = timestamped.0.iter().filter(|(_, id)| !ordered_id_set.contains(id)).cloned().collect();
                     timestamp_ordered_ids.sort_by(|a, b| b.0.cmp(&a.0));
                     let non_ordered_ids: Vec<ShelfId> = timestamp_ordered_ids.into_iter().map(|(_, id)| id).collect();
                     ordered_ids.into_iter().chain(non_ordered_ids.into_iter()).collect()
                 } else {
-                    let mut shelf_data: Vec<(u64, ShelfId)> = timestamped.0.iter().cloned().collect();
-                    shelf_data.sort_by(|a, b| b.0.cmp(&a.0));
-                    shelf_data.into_iter().map(|(_, id)| id).collect()
+                    let mut shelf_data_timestamps: Vec<(u64, ShelfId)> = timestamped.0.iter().cloned().collect();
+                    shelf_data_timestamps.sort_by(|a, b| b.0.cmp(&a.0));
+                    shelf_data_timestamps.into_iter().map(|(_, id)| id).collect()
                 };
-
                 let total_count = combined_ids.len();
-                let final_ids: Vec<ShelfId> = combined_ids
-                    .into_iter()
-                    .skip(offset)
-                    .take(limit)
-                    .collect();
-
-                let items: Vec<ShelfPublic> = final_ids
-                    .iter()
-                    .filter_map(|id| {
-                        let metadata_opt: Option<crate::storage::ShelfMetadata> = SHELF_METADATA.with(|meta_map_ref| meta_map_ref.borrow().get(id).map(|m| m.clone()));
-                        let content_opt: Option<crate::storage::ShelfContent> = SHELVES.with(|content_map_ref| content_map_ref.borrow().get(id).map(|c| c.clone()));
-                        match (metadata_opt, content_opt) {
-                            (Some(metadata), Some(content)) => Some(ShelfPublic::from_parts(&metadata, &content)),
-                            _ => {
-                                ic_cdk::println!("Warning: Missing metadata or content for shelf ID {} in get_user_shelves.", id);
-                                None
-                            }
-                        }
-                    })
-                    .collect();
-
-                Ok(OffsetPaginatedResult {
-                    items,
-                    total_count: Nat::from(total_count),
-                    limit: limit as u64,
-                    offset: Nat::from(offset),
-                })
+                let final_ids: Vec<ShelfId> = combined_ids.into_iter().skip(offset).take(limit).collect();
+                let items: Vec<ShelfPublic> = SHELF_DATA.with(|sds_map_ref| {
+                    let sds_map = sds_map_ref.borrow();
+                    final_ids.iter().filter_map(|id| 
+                        sds_map.get(id).map(|sd| ShelfPublic::from_parts(&sd.metadata, &sd.content))
+                    ).collect()
+                });
+                Ok(OffsetPaginatedResult { items, total_count: Nat::from(total_count), limit: limit as u64, offset: Nat::from(offset) })
             })
     })
 }
@@ -261,62 +187,25 @@ pub fn get_recent_shelves(
     let mut last_processed_timeline_key: Option<u64> = None;
     let mut shelf_public_items: Vec<ShelfPublic> = Vec::with_capacity(limit);
 
-    GLOBAL_TIMELINE.with(|timeline| {
-        let timeline_ref = timeline.borrow();
-        let start_bound = match pagination.cursor {
-            Some(cursor_ts) => Bound::Excluded(cursor_ts),
-            None => Bound::Unbounded,
-        };
-
-        for (timestamp_key, timeline_item_value) in timeline_ref
-            .iter()
-            .rev()
-            .skip_while(|(ts, _)| match start_bound {
-                Bound::Excluded(cursor_ts) => *ts >= cursor_ts,
-                Bound::Unbounded => false,
-                _ => unreachable!(),
-            })
-        {
+    GLOBAL_TIMELINE.with(|timeline_map_ref| {
+        let timeline_map = timeline_map_ref.borrow();
+        let start_bound = match pagination.cursor { Some(cursor_ts) => Bound::Excluded(cursor_ts), None => Bound::Unbounded };
+        for (timestamp_key, timeline_item_value) in timeline_map.iter().rev().skip_while(|(ts, _)| match start_bound { Bound::Excluded(cursor_ts) => *ts >= cursor_ts, Bound::Unbounded => false, _ => unreachable!() }) {
             last_processed_timeline_key = Some(timestamp_key);
-
-            let maybe_shelf_public = SHELF_METADATA.with(|meta_map_ref| {
-                SHELVES.with(|content_map_ref| {
-                    match (meta_map_ref.borrow().get(&timeline_item_value.shelf_id).map(|m|m.clone()), 
-                           content_map_ref.borrow().get(&timeline_item_value.shelf_id).map(|c|c.clone())) {
-                        (Some(meta), Some(content)) => Some(ShelfPublic::from_parts(&meta, &content)),
-                        _ => None
-                    }
-                })
-            });
-
+            let maybe_shelf_public = SHELF_DATA.with(|sds_map_ref| 
+                sds_map_ref.borrow().get(&timeline_item_value.shelf_id).map(|sd| ShelfPublic::from_parts(&sd.metadata, &sd.content))
+            );
             if let Some(shelf_public_item) = maybe_shelf_public {
                 shelf_public_items.push(shelf_public_item);
                 fetched_items_count += 1;
-
-                if fetched_items_count >= limit_plus_one {
-                    break;
-                }
+                if fetched_items_count >= limit_plus_one { break; }
             } else {
-                ic_cdk::println!(
-                    "Warning: Shelf {} (public) found in GLOBAL_TIMELINE but not in SHELVES map.", 
-                    timeline_item_value.shelf_id
-                );
+                ic_cdk::println!("Warning: Shelf {} from GLOBAL_TIMELINE not found in SHELF_DATA.", timeline_item_value.shelf_id);
             }
         }
     });
-
-    let next_cursor = if fetched_items_count == limit_plus_one {
-        shelf_public_items.pop();
-        last_processed_timeline_key
-    } else {
-        None
-    };
-
-    Ok(CursorPaginatedResult {
-        items: shelf_public_items,
-        next_cursor,
-        limit: pagination.limit, 
-    })
+    let next_cursor = if fetched_items_count == limit_plus_one { shelf_public_items.pop(); last_processed_timeline_key } else { None };
+    Ok(CursorPaginatedResult { items: shelf_public_items, next_cursor, limit: pagination.limit })
 }
 
 // Define constants for the time-based shuffle
@@ -363,25 +252,18 @@ pub fn get_shuffled_by_hour_feed(
 
     let mut candidate_shelves: Vec<ShelfPublic> = Vec::with_capacity(RANDOM_FEED_WINDOW_SIZE);
 
-    GLOBAL_TIMELINE.with(|timeline_ref_cell| {
-        SHELF_METADATA.with(|metadata_ref_cell| {
-            SHELVES.with(|content_ref_cell| {
-                let timeline = timeline_ref_cell.borrow();
-                let metadata_map = metadata_ref_cell.borrow();
-                let content_map = content_ref_cell.borrow();
-
-                for (_timestamp, timeline_item) in timeline.iter().rev() { // Iterate newest first
-                    if candidate_shelves.len() >= RANDOM_FEED_WINDOW_SIZE {
-                        break;
-                    }
-
-                    if let Some(metadata) = metadata_map.get(&timeline_item.shelf_id).map(|v| v.clone()) {
-                        if let Some(content) = content_map.get(&timeline_item.shelf_id).map(|v| v.clone()) {
-                            candidate_shelves.push(ShelfPublic::from_parts(&metadata, &content));
-                        }
-                    }
+    GLOBAL_TIMELINE.with(|timeline_rc| {
+        SHELF_DATA.with(|sds_rc| {
+            let timeline = timeline_rc.borrow();
+            let sds_map = sds_rc.borrow();
+            for (_timestamp, timeline_item) in timeline.iter().rev() {
+                if candidate_shelves.len() >= RANDOM_FEED_WINDOW_SIZE {
+                    break;
                 }
-            })
+                if let Some(sd) = sds_map.get(&timeline_item.shelf_id) {
+                    candidate_shelves.push(ShelfPublic::from_parts(&sd.metadata, &sd.content));
+                }
+            }
         })
     });
 
@@ -405,9 +287,7 @@ pub fn get_followed_users_feed(
     let limit = pagination.get_limit();
     let limit_plus_one = limit + 1;
 
-    let followed_users_set = FOLLOWED_USERS.with(|followed| {
-        followed.borrow().get(&caller).map(|ps| ps.clone()).unwrap_or_default()
-    });
+    let followed_users_set = FOLLOWED_USERS.with(|fu| fu.borrow().get(&caller).map(|v_ref| v_ref.clone()).unwrap_or_default());
 
     if followed_users_set.0.is_empty() {
         return Ok(CursorPaginatedResult {
@@ -421,34 +301,22 @@ pub fn get_followed_users_feed(
     let mut last_processed_timeline_key: Option<u64> = None;
     let mut items_fetched_count = 0;
 
-    GLOBAL_TIMELINE.with(|timeline| {
-        let timeline_ref = timeline.borrow();
+    GLOBAL_TIMELINE.with(|timeline_rc| {
+        let timeline_map = timeline_rc.borrow();
         let start_bound = match pagination.cursor {
             Some(cursor_ts) => Bound::Excluded(cursor_ts),
             None => Bound::Unbounded,
         };
 
-        for (timestamp_key, timeline_item_value) in timeline_ref
-            .iter()
-            .rev()
-            .skip_while(|(ts, _)| match start_bound {
-                Bound::Excluded(cursor_ts) => *ts >= cursor_ts,
-                Bound::Unbounded => false,
-                _ => unreachable!(),
-            })
-        {
+        for (timestamp_key, timeline_item_value) in timeline_map.iter().rev().skip_while(|(ts, _)| match start_bound {
+            Bound::Excluded(cursor_ts) => *ts >= cursor_ts,
+            Bound::Unbounded => false,
+            _ => unreachable!(),
+        }) {
             last_processed_timeline_key = Some(timestamp_key);
 
             if followed_users_set.0.contains(&timeline_item_value.owner) {
-                let maybe_shelf_public = SHELF_METADATA.with(|meta_map_ref| {
-                    SHELVES.with(|content_map_ref| {
-                        match (meta_map_ref.borrow().get(&timeline_item_value.shelf_id).map(|m|m.clone()),
-                               content_map_ref.borrow().get(&timeline_item_value.shelf_id).map(|c|c.clone())) {
-                            (Some(meta), Some(content)) => Some(ShelfPublic::from_parts(&meta, &content)),
-                            _ => None
-                        }
-                    })
-                });
+                let maybe_shelf_public = SHELF_DATA.with(|sds_rc| sds_rc.borrow().get(&timeline_item_value.shelf_id).map(|sd| ShelfPublic::from_parts(&sd.metadata, &sd.content)));
                 if let Some(shelf_public_item) = maybe_shelf_public {
                     result_shelves.push(shelf_public_item);
                     items_fetched_count += 1;
@@ -482,9 +350,7 @@ pub fn get_followed_tags_feed(
     let limit = pagination.get_limit();
     let limit_plus_one = limit + 1;
 
-    let followed_tags_set = FOLLOWED_TAGS.with(|followed| {
-        followed.borrow().get(&caller).map(|nts| nts.clone()).unwrap_or_default()
-    });
+    let followed_tags_set = FOLLOWED_TAGS.with(|ft| ft.borrow().get(&caller).map(|v_ref| v_ref.clone()).unwrap_or_default());
 
     if followed_tags_set.0.is_empty() {
         return Ok(CursorPaginatedResult {
@@ -498,22 +364,18 @@ pub fn get_followed_tags_feed(
     let mut last_processed_timeline_key: Option<u64> = None;
     let mut items_fetched_count = 0;
 
-    GLOBAL_TIMELINE.with(|timeline| {
-        let timeline_ref = timeline.borrow();
+    GLOBAL_TIMELINE.with(|timeline_rc| {
+        let timeline_map = timeline_rc.borrow();
         let start_bound = match pagination.cursor {
             Some(cursor_ts) => Bound::Excluded(cursor_ts),
             None => Bound::Unbounded,
         };
 
-        for (timestamp_key, timeline_item_value) in timeline_ref
-            .iter()
-            .rev()
-            .skip_while(|(ts, _)| match start_bound {
-                Bound::Excluded(cursor_ts) => *ts >= cursor_ts,
-                Bound::Unbounded => false,
-                _ => unreachable!(),
-            })
-        {
+        for (timestamp_key, timeline_item_value) in timeline_map.iter().rev().skip_while(|(ts, _)| match start_bound {
+            Bound::Excluded(cursor_ts) => *ts >= cursor_ts,
+            Bound::Unbounded => false,
+            _ => unreachable!(),
+        }) {
             last_processed_timeline_key = Some(timestamp_key);
 
             let shelf_has_followed_tag = timeline_item_value.tags.iter().any(|tag_on_shelf| {
@@ -521,15 +383,7 @@ pub fn get_followed_tags_feed(
             });
 
             if shelf_has_followed_tag {
-                let maybe_shelf_public = SHELF_METADATA.with(|meta_map_ref| {
-                    SHELVES.with(|content_map_ref| {
-                        match (meta_map_ref.borrow().get(&timeline_item_value.shelf_id).map(|m|m.clone()),
-                               content_map_ref.borrow().get(&timeline_item_value.shelf_id).map(|c|c.clone())) {
-                            (Some(meta), Some(content)) => Some(ShelfPublic::from_parts(&meta, &content)),
-                            _ => None
-                        }
-                    })
-                });
+                let maybe_shelf_public = SHELF_DATA.with(|sds_rc| sds_rc.borrow().get(&timeline_item_value.shelf_id).map(|sd| ShelfPublic::from_parts(&sd.metadata, &sd.content)));
                 if let Some(shelf_public_item) = maybe_shelf_public {
                     result_shelves.push(shelf_public_item);
                     items_fetched_count += 1;
@@ -563,12 +417,8 @@ pub fn get_storyline_feed(
     let limit = pagination.get_limit();
     let limit_plus_one = limit + 1;
 
-    let followed_users_set = FOLLOWED_USERS.with(|followed| {
-        followed.borrow().get(&caller).map(|ps| ps.clone()).unwrap_or_default()
-    });
-    let followed_tags_set = FOLLOWED_TAGS.with(|followed| {
-        followed.borrow().get(&caller).map(|nts| nts.clone()).unwrap_or_default()
-    });
+    let followed_users_set = FOLLOWED_USERS.with(|fu| fu.borrow().get(&caller).map(|v_ref| v_ref.clone()).unwrap_or_default());
+    let followed_tags_set = FOLLOWED_TAGS.with(|ft| ft.borrow().get(&caller).map(|v_ref| v_ref.clone()).unwrap_or_default());
 
     if followed_users_set.0.is_empty() && followed_tags_set.0.is_empty() {
         return Ok(CursorPaginatedResult {
@@ -583,22 +433,18 @@ pub fn get_storyline_feed(
     let mut items_fetched_count = 0;
     let mut unique_shelf_ids_in_page: std::collections::BTreeSet<ShelfId> = std::collections::BTreeSet::new();
 
-    GLOBAL_TIMELINE.with(|timeline| {
-        let timeline_ref = timeline.borrow();
+    GLOBAL_TIMELINE.with(|timeline_rc| {
+        let timeline_map = timeline_rc.borrow();
         let start_bound = match pagination.cursor {
             Some(cursor_ts) => Bound::Excluded(cursor_ts),
             None => Bound::Unbounded,
         };
 
-        for (timestamp_key, timeline_item_value) in timeline_ref
-            .iter()
-            .rev()
-            .skip_while(|(ts, _)| match start_bound {
-                Bound::Excluded(cursor_ts) => *ts >= cursor_ts,
-                Bound::Unbounded => false,
-                _ => unreachable!(),
-            })
-        {
+        for (timestamp_key, timeline_item_value) in timeline_map.iter().rev().skip_while(|(ts, _)| match start_bound {
+            Bound::Excluded(cursor_ts) => *ts >= cursor_ts,
+            Bound::Unbounded => false,
+            _ => unreachable!(),
+        }) {
             last_processed_timeline_key = Some(timestamp_key);
 
             if unique_shelf_ids_in_page.contains(&timeline_item_value.shelf_id) {
@@ -619,18 +465,7 @@ pub fn get_storyline_feed(
             }
 
             if owner_is_followed || tag_is_followed {
-                let maybe_shelf_public = SHELF_METADATA.with(|meta_map_ref| {
-                    SHELVES.with(|content_map_ref| {
-                        match (meta_map_ref.borrow().get(&timeline_item_value.shelf_id).map(|m|m.clone()),
-                               content_map_ref.borrow().get(&timeline_item_value.shelf_id).map(|c|c.clone())) {
-                            (Some(meta), Some(content)) => Some(ShelfPublic::from_parts(&meta, &content)),
-                            _ => {
-                                ic_cdk::println!("Warning: Missing metadata or content for shelf ID {} in get_storyline_feed (timeline item: {:?}).", timeline_item_value.shelf_id, timeline_item_value);
-                                None
-                            }
-                        }
-                    })
-                });
+                let maybe_shelf_public = SHELF_DATA.with(|sds_rc| sds_rc.borrow().get(&timeline_item_value.shelf_id).map(|sd| ShelfPublic::from_parts(&sd.metadata, &sd.content)));
 
                 if let Some(shelf_public_item) = maybe_shelf_public {
                     result_shelves_public.push(shelf_public_item);
@@ -641,7 +476,7 @@ pub fn get_storyline_feed(
                         break;
                     }
                 } else {
-                    ic_cdk::println!("Warning: Shelf {} found in timeline's GlobalTimelineItemValue but not in SHELVES map.", timeline_item_value.shelf_id);
+                    ic_cdk::println!("Warning: Shelf {} found in timeline's GlobalTimelineItemValue but not in SHELF_DATA map.", timeline_item_value.shelf_id);
                 }
             }
         }
@@ -684,8 +519,8 @@ pub fn get_shelves_by_tag(
     let mut result_keys: Vec<TagShelfCreationTimelineKey> = Vec::with_capacity(limit_plus_one);
     let mut shelf_public_items: Vec<ShelfPublic> = Vec::with_capacity(limit);
 
-    TAG_SHELF_CREATION_TIMELINE_INDEX.with(|timeline_idx| {
-        let map = timeline_idx.borrow();
+    TAG_SHELF_CREATION_TIMELINE_INDEX.with(|timeline_idx_rc| {
+        let map = timeline_idx_rc.borrow();
         
         // Define the absolute end bound for this tag (oldest possible item for this tag)
         let end_bound_for_this_tag = Bound::Included(TagShelfCreationTimelineKey {
@@ -727,24 +562,15 @@ pub fn get_shelves_by_tag(
         None
     };
 
-    SHELF_METADATA.with(|metadata_map_borrow| {
-        SHELVES.with(|shelves_map_borrow| {
-            let metadata_map = metadata_map_borrow.borrow();
-            let shelves_map = shelves_map_borrow.borrow();
-            for key in result_keys {
-                match (metadata_map.get(&key.shelf_id).map(|m|m.clone()), shelves_map.get(&key.shelf_id).map(|c|c.clone())) {
-                    (Some(metadata), Some(content)) => {
-                        shelf_public_items.push(ShelfPublic::from_parts(&metadata, &content));
-                    },
-                    (None, _) => {
-                        ic_cdk::println!("Warning: Shelf METADATA for {} found in TAG_SHELF_CREATION_TIMELINE_INDEX but not in SHELF_METADATA map.", key.shelf_id);
-                    },
-                    (_, None) => {
-                        ic_cdk::println!("Warning: Shelf CONTENT for {} found in TAG_SHELF_CREATION_TIMELINE_INDEX but not in SHELVES (content) map.", key.shelf_id);
-                    }
-                }
+    SHELF_DATA.with(|sds_rc| {
+        let sds_map = sds_rc.borrow();
+        for key in result_keys {
+            if let Some(shelf_data_ref) = sds_map.get(&key.shelf_id) { 
+                shelf_public_items.push(ShelfPublic::from_parts(&shelf_data_ref.metadata, &shelf_data_ref.content));
+            } else {
+                ic_cdk::println!("Warning: Shelf {} from TAG_SHELF_CREATION_TIMELINE_INDEX not found in SHELF_DATA.", key.shelf_id);
             }
-        });
+        }
     });
 
     Ok(CursorPaginatedResult {
@@ -765,8 +591,8 @@ pub fn get_public_shelves_by_tag(tag: String) -> QueryResult<Vec<ShelfPublic>> {
 
     let mut shelf_ids_for_tag: Vec<ShelfId> = Vec::new();
 
-    TAG_SHELF_CREATION_TIMELINE_INDEX.with(|timeline_idx| {
-        let map = timeline_idx.borrow();
+    TAG_SHELF_CREATION_TIMELINE_INDEX.with(|timeline_idx_rc| {
+        let map = timeline_idx_rc.borrow();
         let start_key = TagShelfCreationTimelineKey {
             tag: normalized_tag.clone(),
             reversed_created_at: 0,
@@ -791,21 +617,15 @@ pub fn get_public_shelves_by_tag(tag: String) -> QueryResult<Vec<ShelfPublic>> {
     }
 
     let mut public_shelves: Vec<ShelfPublic> = Vec::new();
-    SHELF_METADATA.with(|metadata_map_borrow| {
-        SHELVES.with(|shelves_map_borrow| {
-            let metadata_map = metadata_map_borrow.borrow();
-            let shelves_map = shelves_map_borrow.borrow();
-            for shelf_id in shelf_ids_for_tag {
-                 match (metadata_map.get(&shelf_id).map(|m|m.clone()), shelves_map.get(&shelf_id).map(|c|c.clone())) {
-                    (Some(metadata), Some(content)) => {
-                        public_shelves.push(ShelfPublic::from_parts(&metadata, &content));
-                    },
-                    _ => {
-                        ic_cdk::println!("Warning: Missing metadata or content for shelf ID {} in get_public_shelves_by_tag.", shelf_id);
-                    }
-                }
+    SHELF_DATA.with(|sds_rc| {
+        let sds_map = sds_rc.borrow();
+        for shelf_id in shelf_ids_for_tag {
+            if let Some(shelf_data_ref) = sds_map.get(&shelf_id) { 
+                public_shelves.push(ShelfPublic::from_parts(&shelf_data_ref.metadata, &shelf_data_ref.content));
+            } else {
+                ic_cdk::println!("Warning: Shelf {} from TAG_SHELF_CREATION_TIMELINE_INDEX not found in SHELF_DATA (public).", shelf_id);
             }
-        });
+        }
     });
 
     Ok(public_shelves)
@@ -820,84 +640,39 @@ pub fn get_user_publicly_editable_shelves(
     let offset = pagination.get_offset();
 
     USER_SHELVES.with(|user_shelves_map_ref| {
-        let user_shelves_map = user_shelves_map_ref.borrow();
-        user_shelves_map
-            .get(&user)
-            .map(|ts| ts.clone()) // Clones the TimestampedShelfIds
-            .ok_or(QueryError::UserNotFound)
+        user_shelves_map_ref.borrow().get(&user).map(|v_ref| v_ref.clone()).ok_or(QueryError::UserNotFound)
             .and_then(|timestamped_shelf_ids| {
-                // Get profile order if it exists
-                let user_profile_opt: Option<UserProfileOrder> = USER_PROFILE_ORDER.with(|profile_order_map_ref| {
-                    profile_order_map_ref.borrow().get(&user).map(|o| o.clone())
-                });
+                let user_profile_opt: Option<UserProfileOrder> = USER_PROFILE_ORDER.with(|po_map| po_map.borrow().get(&user).map(|v_ref| v_ref.clone()));
                 let has_custom_order = user_profile_opt.as_ref().map_or(false, |order| order.is_customized);
 
-                // Combine shelf IDs based on profile order (if custom) or timestamp order
                 let ordered_shelf_ids: Vec<ShelfId> = if has_custom_order {
-                    let user_order = user_profile_opt.unwrap(); // Safe due to has_custom_order check
-                    let ordered_positions: Vec<(ShelfId, f64)> = user_order.shelf_positions.get_ordered_entries();
-                    let custom_ordered_ids: Vec<ShelfId> = ordered_positions.into_iter().map(|(id, _)| id).collect();
+                    let user_order = user_profile_opt.unwrap();
+                    let custom_ordered_ids: Vec<ShelfId> = user_order.shelf_positions.get_ordered_entries().into_iter().map(|(id, _)| id).collect();
                     let custom_ordered_id_set: std::collections::HashSet<ShelfId> = custom_ordered_ids.iter().cloned().collect();
                     
-                    let mut timestamp_fallback_ids: Vec<(u64, ShelfId)> = timestamped_shelf_ids.0
-                        .iter()
-                        .filter(|(_, id)| !custom_ordered_id_set.contains(id))
-                        .cloned()
-                        .collect();
-                    timestamp_fallback_ids.sort_by(|a, b| b.0.cmp(&a.0)); // Sort by newest first for fallback
+                    let mut timestamp_fallback_ids: Vec<(u64, ShelfId)> = timestamped_shelf_ids.0.iter().filter(|(_, id)| !custom_ordered_id_set.contains(id)).cloned().collect();
+                    timestamp_fallback_ids.sort_by(|a, b| b.0.cmp(&a.0));
                     let fallback_ids: Vec<ShelfId> = timestamp_fallback_ids.into_iter().map(|(_, id)| id).collect();
                     
                     custom_ordered_ids.into_iter().chain(fallback_ids.into_iter()).collect()
                 } else {
-                    let mut shelf_data: Vec<(u64, ShelfId)> = timestamped_shelf_ids.0.iter().cloned().collect();
-                    shelf_data.sort_by(|a, b| b.0.cmp(&a.0)); // Sort by newest first
-                    shelf_data.into_iter().map(|(_, id)| id).collect()
+                    let mut shelf_data_timestamps: Vec<(u64, ShelfId)> = timestamped_shelf_ids.0.iter().cloned().collect();
+                    shelf_data_timestamps.sort_by(|a, b| b.0.cmp(&a.0));
+                    shelf_data_timestamps.into_iter().map(|(_, id)| id).collect()
                 };
 
-                // Filter these ordered Shelf IDs by public_editing status BEFORE pagination
-                let publicly_editable_shelf_ids: Vec<ShelfId> = ordered_shelf_ids
-                    .into_iter()
-                    .filter(|id| {
-                        SHELF_METADATA.with(|meta_map_ref| {
-                            meta_map_ref.borrow().get(id).map_or(false, |m| m.public_editing)
-                        })
-                    })
-                    .collect();
+                let publicly_editable_shelf_data: Vec<ShelfData> = SHELF_DATA.with(|sds_rc|{
+                    let sds_map = sds_rc.borrow();
+                    ordered_shelf_ids.iter()
+                        .filter_map(|id| sds_map.get(id).filter(|sd_ref| sd_ref.metadata.public_editing).map(|sd_ref| sd_ref.clone())) 
+                        .collect()
+                });
 
-                let total_count = publicly_editable_shelf_ids.len();
+                let total_count = publicly_editable_shelf_data.len();
+                let paginated_shelf_data_list: Vec<ShelfData> = publicly_editable_shelf_data.into_iter().skip(offset).take(limit).collect();
+                let items: Vec<ShelfPublic> = paginated_shelf_data_list.iter().map(|sd| ShelfPublic::from_parts(&sd.metadata, &sd.content)).collect();
 
-                // Apply pagination to the publicly_editable_shelf_ids
-                let paginated_ids: Vec<ShelfId> = publicly_editable_shelf_ids
-                    .into_iter()
-                    .skip(offset)
-                    .take(limit)
-                    .collect();
-
-                // Construct ShelfPublic for the paginated IDs
-                let items: Vec<ShelfPublic> = paginated_ids
-                    .iter()
-                    .filter_map(|id| {
-                        let metadata_opt = SHELF_METADATA.with(|meta_map_ref| meta_map_ref.borrow().get(id).map(|m| m.clone()));
-                        let content_opt = SHELVES.with(|content_map_ref| content_map_ref.borrow().get(id).map(|c| c.clone()));
-                        match (metadata_opt, content_opt) {
-                            (Some(metadata), Some(content)) => Some(ShelfPublic::from_parts(&metadata, &content)),
-                            _ => {
-                                ic_cdk::println!(
-                                    "Warning: Missing metadata or content for shelf ID {} in get_user_publicly_editable_shelves.",
-                                    id
-                                );
-                                None
-                            }
-                        }
-                    })
-                    .collect();
-
-                Ok(OffsetPaginatedResult {
-                    items,
-                    total_count: Nat::from(total_count),
-                    limit: limit as u64,
-                    offset: Nat::from(offset),
-                })
+                Ok(OffsetPaginatedResult { items, total_count: Nat::from(total_count), limit: limit as u64, offset: Nat::from(offset) })
             })
     })
 }

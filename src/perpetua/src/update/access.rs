@@ -1,4 +1,4 @@
-use crate::storage::{GLOBAL_TIMELINE, ShelfId, ShelfMetadata, SHELF_METADATA};
+use crate::storage::{GLOBAL_TIMELINE, ShelfId, ShelfData, SHELF_DATA};
 use crate::guard::not_anon;
 use ic_cdk;
 use candid::Principal;
@@ -17,83 +17,77 @@ pub fn toggle_shelf_public_access(shelf_id: ShelfId, public_editing: bool) -> Re
 
     // Step 1.1: Process SHELF_METADATA
     // This closure retrieves existing metadata, performs checks, and returns the
-    // prepared (but not yet saved) updated ShelfMetadata, along with original details
+    // prepared (but not yet saved) updated ShelfData, along with original details
     // needed for GLOBAL_TIMELINE.
-    let (prepared_shelf_metadata, created_at_key, owner_key_from_shelf, tags_key_from_shelf) =
-        SHELF_METADATA.with(|metadata_map_ref| {
-            let metadata_map = metadata_map_ref.borrow(); // Immutable borrow for reading
-            if let Some(existing_metadata) = metadata_map.get(&shelf_id) {
+    let (prepared_shelf_data_to_commit, created_at_key_for_timeline, owner_for_timeline, tags_for_timeline) =
+        SHELF_DATA.with(|shelf_data_map_ref| {
+            let shelf_data_map = shelf_data_map_ref.borrow();
+            if let Some(existing_shelf_data) = shelf_data_map.get(&shelf_id) {
                 // Authorization check
-                if existing_metadata.owner != caller {
+                if existing_shelf_data.metadata.owner != caller {
                     return Err("Unauthorized: Only shelf owner can toggle public access.".to_string());
                 }
 
-                // Clone and prepare the updated metadata
-                let mut updated_metadata = existing_metadata.clone();
-                updated_metadata.public_editing = public_editing;
-                updated_metadata.updated_at = now;
+                // Clone and prepare the updated ShelfData
+                let mut updated_shelf_data = existing_shelf_data.clone();
+                updated_shelf_data.metadata.public_editing = public_editing;
+                updated_shelf_data.metadata.updated_at = now;
 
                 Ok((
-                    updated_metadata, // The full metadata object ready to be inserted
-                    existing_metadata.created_at,
-                    existing_metadata.owner,      // Principal (used for GLOBAL_TIMELINE)
-                    existing_metadata.tags.clone(), // Vec<String> (used for GLOBAL_TIMELINE)
+                    updated_shelf_data, // The full ShelfData object ready to be inserted
+                    existing_shelf_data.metadata.created_at,    // For timeline key
+                    existing_shelf_data.metadata.owner,         // For timeline value consistency
+                    existing_shelf_data.metadata.tags.clone(),  // For timeline value consistency
                 ))
             } else {
-                Err(format!("Shelf metadata with ID '{}' not found", shelf_id))
+                Err(format!("Shelf with ID '{}' not found", shelf_id)) // General not found message
             }
-        })?; // Propagate error if any, no state changed yet
+        })?;
 
     // Step 1.2: Process GLOBAL_TIMELINE
     // This closure retrieves the existing timeline item, performs consistency checks,
     // and returns the prepared (but not yet saved) updated GlobalTimelineItemValue.
     let prepared_timeline_item = GLOBAL_TIMELINE.with(|timeline_map_ref| {
-        let timeline_map = timeline_map_ref.borrow(); // Immutable borrow for reading
-        if let Some(existing_timeline_item) = timeline_map.get(&created_at_key) {
-            // Consistency check
+        let timeline_map = timeline_map_ref.borrow();
+        if let Some(existing_timeline_item) = timeline_map.get(&created_at_key_for_timeline) {
             if existing_timeline_item.shelf_id != shelf_id {
                 let err_msg = format!(
                     "CRITICAL INCONSISTENCY: GLOBAL_TIMELINE key {} for shelf_id {} resolved to an item for shelf_id {}. Update aborted.",
-                    created_at_key, shelf_id, existing_timeline_item.shelf_id
+                    created_at_key_for_timeline, shelf_id, existing_timeline_item.shelf_id
                 );
                 ic_cdk::println!("{}", err_msg);
                 return Err(err_msg);
             }
 
-            // Clone and prepare the updated timeline item
             let mut updated_item = existing_timeline_item.clone();
-            updated_item.public_editing = public_editing;
-            // Ensure owner and tags are consistent with what's in ShelfMetadata
-            updated_item.owner = owner_key_from_shelf;
-            updated_item.tags = tags_key_from_shelf;
+            updated_item.public_editing = public_editing; // This public_editing is from the input param
+            updated_item.owner = owner_for_timeline; // Ensure consistency
+            updated_item.tags = tags_for_timeline;   // Ensure consistency
 
-            Ok(updated_item) // The full timeline item ready for insertion
+            Ok(updated_item)
         } else {
-            // If the shelf exists in SHELF_METADATA but not in GLOBAL_TIMELINE, this is an inconsistency.
             let err_msg = format!(
-                "ERROR: Shelf {} (created_at_key: {}) found in SHELF_METADATA, but its entry was NOT found in GLOBAL_TIMELINE. Update aborted.",
-                shelf_id, created_at_key
+                "ERROR: Shelf {} (created_at_key: {}) found (implying its data exists), but its entry was NOT found in GLOBAL_TIMELINE. Update aborted.",
+                shelf_id, created_at_key_for_timeline
             );
             ic_cdk::println!("{}", err_msg);
             Err(err_msg)
         }
-    })?; // Propagate error if any, no state changed yet
+    })?;
 
     // --- Phase 2: Commit changes to both storages ---
     // If we've reached here, all checks passed and all data is prepared.
 
     // Commit to SHELF_METADATA
-    SHELF_METADATA.with(|metadata_map_ref| {
-        let mut metadata_map = metadata_map_ref.borrow_mut();
-        // shelf_id is cloned for the key as insert takes ownership
-        metadata_map.insert(shelf_id.clone(), prepared_shelf_metadata);
+    SHELF_DATA.with(|shelf_data_map_ref| {
+        let mut map = shelf_data_map_ref.borrow_mut();
+        map.insert(shelf_id.clone(), prepared_shelf_data_to_commit);
     });
 
     // Commit to GLOBAL_TIMELINE
     GLOBAL_TIMELINE.with(|timeline_map_ref| {
         let mut timeline_map = timeline_map_ref.borrow_mut();
-        // created_at_key is u64 (Copy), prepared_timeline_item is taken by value
-        timeline_map.insert(created_at_key, prepared_timeline_item);
+        timeline_map.insert(created_at_key_for_timeline, prepared_timeline_item);
     });
 
     Ok(())
@@ -104,11 +98,11 @@ pub fn toggle_shelf_public_access(shelf_id: ShelfId, public_editing: bool) -> Re
 /// Returns true if the shelf is set to public access mode.
 #[ic_cdk::query(guard = "not_anon")]
 pub fn is_shelf_public(shelf_id: String) -> Result<bool, String> {
-    SHELF_METADATA.with(|metadata_map_ref| {
-        let metadata_map = metadata_map_ref.borrow();
-        match metadata_map.get(&shelf_id) {
-            Some(metadata) => Ok(metadata.public_editing),
-            None => Err(format!("Shelf metadata with ID '{}' not found", shelf_id))
+    SHELF_DATA.with(|shelf_data_map_ref| {
+        let shelf_data_map = shelf_data_map_ref.borrow();
+        match shelf_data_map.get(&shelf_id) {
+            Some(shelf_data) => Ok(shelf_data.metadata.public_editing),
+            None => Err(format!("Shelf with ID '{}' not found", shelf_id))
         }
     })
 } 
