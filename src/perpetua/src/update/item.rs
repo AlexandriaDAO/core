@@ -5,6 +5,59 @@ use crate::storage::common_types::{MAX_NFT_ID_LENGTH, MAX_ITEMS_PER_SHELF, MAX_M
 use crate::guard::not_anon;
 use crate::update::utils::{verify_nft_ownership};
 
+// --- Helper function for deep circular reference check ---
+// Checks if adding 'shelf_to_evaluate_id' into 'target_parent_id' would create a cycle.
+// It does this by seeing if 'target_parent_id' can be reached by traversing 'shelf_to_evaluate_id's children.
+fn would_create_cycle(
+    target_parent_id: &ShelfId,     // The shelf we are considering adding into (e.g., A)
+    shelf_to_evaluate_id: &ShelfId, // The shelf being proposed to be added (e.g., B)
+    visited_in_current_path: &mut HashSet<ShelfId>, // Tracks nodes visited in the current DFS path
+) -> Result<bool, String> {
+    // Base case 1: If the shelf we are evaluating (B or its children) is the same as the target parent (A),
+    // then adding B to A would form a cycle (A -> B -> ... -> A).
+    if shelf_to_evaluate_id == target_parent_id {
+        return Ok(true);
+    }
+
+    // Base case 2: If we've already visited 'shelf_to_evaluate_id' in this specific DFS path,
+    // it means we're in a loop that doesn't involve 'target_parent_id' directly from this path,
+    // or we've already processed this node down this path. Stop here for this branch to prevent infinite recursion
+    // during the check itself (e.g. if B -> D -> B already exists, and we are checking A -> B).
+    if visited_in_current_path.contains(shelf_to_evaluate_id) {
+        return Ok(false); 
+    }
+    
+    visited_in_current_path.insert(shelf_to_evaluate_id.clone());
+
+    let cycle_found_recursively = SHELF_DATA.with(|sds_map_ref| {
+        let sds_map = sds_map_ref.borrow();
+        // Fetch the data for the shelf we are currently evaluating.
+        if let Some(shelf_to_evaluate_data) = sds_map.get(shelf_to_evaluate_id) {
+            // Iterate over all items within the current shelf_to_evaluate.
+            for item_in_evaluated_shelf in shelf_to_evaluate_data.content.items.values() {
+                // If an item is a shelf, recursively check it.
+                if let ItemContent::Shelf(ref sub_shelf_id) = item_in_evaluated_shelf.content {
+                    // Pass along the original target_parent_id and the current sub_shelf_id
+                    if would_create_cycle(target_parent_id, sub_shelf_id, visited_in_current_path)? {
+                        return Ok(true); // Cycle detected through a sub-shelf.
+                    }
+                }
+            }
+            Ok(false) // No cycle found through this shelf's direct children leading to target_parent_id.
+        } else {
+            // If shelf_to_evaluate_id (or one of its children during recursion) doesn't exist,
+            // it cannot complete a cycle involving target_parent_id through this path.
+            // This could happen if a shelf ID exists in an item but the shelf itself was deleted.
+            Ok(false)
+        }
+    });
+
+    // Backtrack: remove from visited set as we return from this recursion path.
+    visited_in_current_path.remove(shelf_to_evaluate_id);
+
+    cycle_found_recursively
+}
+
 // --- Constants ---
 const MAX_NFT_REFERENCES: usize = 500; // Limit for NFT_SHELVES tracking
 
@@ -74,30 +127,32 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
             });
         }
         ItemContent::Shelf(ref nested_shelf_id) => {
-            if nested_shelf_id == &shelf_id {
-                return Err("Circular reference: A shelf cannot contain itself".to_string());
-            }
-            let mut nested_shelf_data = SHELF_DATA.with(|sds| sds.borrow().get(nested_shelf_id))
-                .ok_or_else(|| format!("Shelf to be added ('{}') does not exist", nested_shelf_id))?;
+            // The direct self-reference (A cannot contain A) is implicitly handled by would_create_cycle
+            // if shelf_id == nested_shelf_id { return Ok(true) } will be the first check.
+
+            // Fetch the ShelfData for the nested_shelf_id. We need to clone it to potentially modify `appears_in`.
+            let mut modified_nested_shelf_data = SHELF_DATA.with(|sds| 
+                sds.borrow().get(nested_shelf_id).map(|data| data.clone())
+            ).ok_or_else(|| format!("Shelf to be added ('{}') does not exist", nested_shelf_id))?;
             
-            // Circular reference check using nested_shelf_data.content
-            if nested_shelf_data.content.items.values().any(|item| 
-                matches!(&item.content, ItemContent::Shelf(id_in_nested) if id_in_nested == &shelf_id)
-            ) {
+            // Deep circular reference check:
+            // Check if adding 'nested_shelf_id' into the current 'shelf_id' would create a cycle.
+            let mut visited_for_cycle_check = HashSet::new();
+            if would_create_cycle(&shelf_id, nested_shelf_id, &mut visited_for_cycle_check)? {
                 return Err(format!(
-                    "Circular reference detected: Shelf '{}' already contains shelf '{}'",
+                    "Adding shelf '{}' to shelf '{}' would create a circular reference.",
                     nested_shelf_id, shelf_id
                 ));
             }
 
-            // Prepare appears_in update for nested shelf
-            if !nested_shelf_data.metadata.appears_in.contains(&shelf_id) {
-                if nested_shelf_data.metadata.appears_in.len() >= MAX_APPEARS_IN_COUNT {
-                    nested_shelf_data.metadata.appears_in.remove(0); // Remove the oldest
+            // Prepare appears_in update for the (cloned and now potentially modified) nested shelf data.
+            if !modified_nested_shelf_data.metadata.appears_in.contains(&shelf_id) {
+                if modified_nested_shelf_data.metadata.appears_in.len() >= MAX_APPEARS_IN_COUNT {
+                    modified_nested_shelf_data.metadata.appears_in.remove(0); // Remove the oldest
                 }
-                nested_shelf_data.metadata.appears_in.push(shelf_id.clone());
-                nested_shelf_data.metadata.updated_at = now;
-                prepared_nested_shelf_data_update = Some((nested_shelf_id.clone(), nested_shelf_data));
+                modified_nested_shelf_data.metadata.appears_in.push(shelf_id.clone());
+                modified_nested_shelf_data.metadata.updated_at = now;
+                prepared_nested_shelf_data_update = Some((nested_shelf_id.clone(), modified_nested_shelf_data));
             }
         }
         ItemContent::Markdown(markdown) => {

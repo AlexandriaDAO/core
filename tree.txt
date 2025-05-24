@@ -540,12 +540,12 @@
 │       ├── src/
 │       │   ├── Class.mo (1055 lines)
 │       │   └── lib.mo (1739 lines)
-├── Cargo.lock (3407 lines)
-├── Cargo.toml (21 lines)
+├── Cargo.lock (3425 lines)
+├── Cargo.toml (22 lines)
 ├── __mocks__/
 │   └── fileMock.js (2 lines)
 ├── bundle-stats.json (4144700 lines)
-├── canister_ids.json (71 lines)
+├── canister_ids.json (74 lines)
 ├── components.json (18 lines)
 ├── coverage/
 │   ├── clover.xml (20 lines)
@@ -568,11 +568,12 @@
 │   │   └── uf6dk-hyaaa-aaaaq-qaaaq-cai.did (84 lines)
 │   ├── init.json (12 lines)
 │   └── pulled.json (13 lines)
-├── dfx.json (158 lines)
-├── dfx_local.json (158 lines)
-├── dfx_mainnet.json (141 lines)
+├── dfx.json (164 lines)
+├── dfx_local.json (164 lines)
+├── dfx_mainnet.json (147 lines)
 ├── fix-selector.js (3 lines)
-├── ic-use-internet-identity-0.2.0.tgz (43 lines)
+├── ic-use-internet-identity-0.2.1.tgz (107 lines)
+├── ic-use-nfid-identity-0.1.0.tgz (20 lines)
 ├── ic-use-siwo-identity-0.1.0.tgz (37 lines)
 ├── ic-vetkd-utils-0.1.0.tgz (327 lines)
 ├── jest.config.js (19 lines)
@@ -581,17 +582,17 @@
 ├── mops.toml (30 lines)
 ├── postcss.config.js (9 lines)
 ├── scripts/
-│   ├── build.sh (310 lines)
+│   ├── build.sh (314 lines)
 │   ├── icp_swap_argument.txt (130 lines)
 │   ├── kill_zombies.sh (67 lines)
 │   ├── network_deploy.sh (195 lines)
-│   ├── network_deploy_frontend.sh (41 lines)
+│   ├── network_deploy_frontend.sh (39 lines)
 │   ├── old_readme.md (262 lines)
 │   ├── snapshot.sh (65 lines)
 │   ├── test.sh (323 lines)
+│   ├── test_tag_query.sh (6 lines)
 │   ├── testnet_migration.md (23 lines)
 │   ├── whitepaper.md (463 lines)
-├── seed.txt (2 lines)
 ├── shelf_item_scenario.sh (101 lines)
 ├── shelf_order_test.sh (72 lines)
 ├── shelf_scenario.sh (291 lines)
@@ -645,12 +646,12 @@
 │   │   │   │   │   │   ├── blinks/
 │   │   │   │   │   │   │   └── SingleTokenView.tsx (447 lines)
 │   │   │   │   │   │   ├── contentGrid/
-│   │   │   │   │   │   │   ├── Card.tsx (93 lines)
+│   │   │   │   │   │   │   ├── Card.tsx (94 lines)
 │   │   │   │   │   │   │   ├── Grid.tsx (236 lines)
 │   │   │   │   │   │   │   ├── components/
-│   │   │   │   │   │   │   │   └── TransactionDetails.tsx (344 lines)
+│   │   │   │   │   │   │   │   └── TransactionDetails.tsx (369 lines)
 │   │   │   │   │   │   │   ├── hooks/
-│   │   │   │   │   │   │   │   └── useContentCardState.ts (196 lines)
+│   │   │   │   │   │   │   │   └── useContentCardState.ts (201 lines)
 │   │   │   │   │   │   │   └── utils/
 │   │   │   │   │   │   │       ├── clipboard.ts (9 lines)
 │   │   │   │   │   │   │       └── formatters.ts (54 lines)
@@ -696,7 +697,7 @@
 │   │   │   │   │   │   │   │   └── contentService.ts (151 lines)
 │   │   │   │   │   │   │   └── types.ts (22 lines)
 │   │   │   │   │   │   └── nftSearch/
-│   │   │   │   │   │       ├── PrincipalSelector.tsx (323 lines)
+│   │   │   │   │   │       ├── PrincipalSelector.tsx (350 lines)
 │   │   │   │   │   │       ├── collectionSelector.tsx (57 lines)
 │   │   │   │   │   │       ├── index.tsx (57 lines)
 │   │   │   │   │   │       ├── librarySearch.tsx (274 lines)
@@ -721,9 +722,9 @@
 │   │   │   │   │       │   ├── TensorFlowPreloader.tsx (87 lines)
 │   │   │   │   │       │   ├── TopupBalanceWarning.tsx (44 lines)
 │   │   │   │   │       │   └── UnifiedCardActions/
-│   │   │   │   │       │       └── UnifiedCardActions.tsx (408 lines)
+│   │   │   │   │       │       └── UnifiedCardActions.tsx (539 lines)
 │   │   │   │   │       ├── hooks/
-│   │   │   │   │       │   ├── getNftData.ts (94 lines)
+│   │   │   │   │       │   ├── getNftData.ts (136 lines)
 │   │   │   │   │       │   ├── index.ts (8 lines)
 │   │   │   │   │       │   ├── useAuth.ts (10 lines)
 │   │   │   │   │       │   └── useNftAppearsIn.ts (51 lines)
@@ -749,7 +750,7 @@
 │   │   │   │   │       │   │   ├── librarySlice.ts (127 lines)
 │   │   │   │   │       │   │   └── libraryThunks.ts (231 lines)
 │   │   │   │   │       │   ├── nftData/
-│   │   │   │   │       │   │   ├── nftDataSlice.ts (99 lines)
+│   │   │   │   │       │   │   ├── nftDataSlice.ts (106 lines)
 │   │   │   │   │       │   │   └── nftDataThunks.ts (737 lines)
 │   │   │   │   │       │   ├── transactions/
 │   │   │   │   │       │   │   ├── transactionSlice.ts (129 lines)
@@ -759,7 +760,7 @@
 │   │   │   │   │       ├── types/
 │   │   │   │   │       │   ├── content.ts (25 lines)
 │   │   │   │   │       │   ├── files.ts (81 lines)
-│   │   │   │   │       │   ├── nft.ts (18 lines)
+│   │   │   │   │       │   ├── nft.ts (19 lines)
 │   │   │   │   │       │   └── queries.ts (59 lines)
 │   │   │   │   │       └── utils/
 │   │   │   │   │           ├── nftOwner.ts (60 lines)
@@ -821,7 +822,7 @@
 │   │   │   │       │   │   │   │   ├── ShelfEmptyView.tsx (32 lines)
 │   │   │   │       │   │   │   │   ├── ShelfGridView.tsx (57 lines)
 │   │   │   │       │   │   │   │   ├── ShelfViewControls.tsx (251 lines)
-│   │   │   │       │   │   │   │   ├── ShelfViewHeader.tsx (101 lines)
+│   │   │   │       │   │   │   │   ├── ShelfViewHeader.tsx (141 lines)
 │   │   │   │       │   │   │   │   └── index.ts (9 lines)
 │   │   │   │       │   │   │   ├── hooks/
 │   │   │   │       │   │   │   │   ├── index.ts (1 lines)
@@ -831,9 +832,9 @@
 │   │   │   │       │   │   │       └── itemUtils.ts (47 lines)
 │   │   │   │       │   │   ├── following/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── FollowedTagsList.tsx (93 lines)
+│   │   │   │       │   │   │   │   ├── FollowedTagsList.tsx (81 lines)
 │   │   │   │       │   │   │   │   ├── FollowedUserBadge.tsx (56 lines)
-│   │   │   │       │   │   │   │   └── FollowedUsersList.tsx (80 lines)
+│   │   │   │       │   │   │   │   └── FollowedUsersList.tsx (63 lines)
 │   │   │   │       │   │   │   └── hooks/
 │   │   │   │       │   │   │       └── useFollowStatus.ts (193 lines)
 │   │   │   │       │   │   ├── shared/
@@ -858,19 +859,19 @@
 │   │   │   │       │   │   │       └── ShelfInformationDialog.tsx (144 lines)
 │   │   │   │       │   │   ├── shelf-management/
 │   │   │   │       │   │   │   ├── components/
-│   │   │   │       │   │   │   │   ├── InlineItemCreator.tsx (350 lines)
+│   │   │   │       │   │   │   │   ├── InlineItemCreator.tsx (387 lines)
 │   │   │   │       │   │   │   │   ├── NewShelf.tsx (154 lines)
 │   │   │   │       │   │   │   │   ├── RemoveItemButton.tsx (98 lines)
 │   │   │   │       │   │   │   │   ├── ShelfContent.tsx (90 lines)
 │   │   │   │       │   │   │   │   ├── ShelfOption.tsx (31 lines)
-│   │   │   │       │   │   │   │   └── ShelfSelectionDialog.tsx (564 lines)
+│   │   │   │       │   │   │   │   └── ShelfSelectionDialog.tsx (796 lines)
 │   │   │   │       │   │   │   ├── containers/
 │   │   │   │       │   │   │   │   ├── ShelfDetailContainer.tsx (277 lines)
-│   │   │   │       │   │   │   │   └── ShelfLists.tsx (264 lines)
+│   │   │   │       │   │   │   │   └── ShelfLists.tsx (268 lines)
 │   │   │   │       │   │   │   └── hooks/
 │   │   │   │       │   │   │       ├── index.ts (4 lines)
-│   │   │   │       │   │   │       ├── useAddToShelf.ts (148 lines)
-│   │   │   │       │   │   │       ├── usePublicShelfOperations.ts (62 lines)
+│   │   │   │       │   │   │       ├── useAddToShelf.ts (180 lines)
+│   │   │   │       │   │   │       ├── usePublicShelfOperations.ts (65 lines)
 │   │   │   │       │   │   │       └── useShelfOperations.ts (205 lines)
 │   │   │   │       │   │   ├── shelf-settings/
 │   │   │   │       │   │   │   ├── components/
@@ -890,7 +891,7 @@
 │   │   │   │       │   │   │       └── tagValidation.ts (47 lines)
 │   │   │   │       │   │   └── tags/
 │   │   │   │       │   │       ├── components/
-│   │   │   │       │   │       │   ├── PopularTagsList.tsx (93 lines)
+│   │   │   │       │   │       │   ├── PopularTagsList.tsx (94 lines)
 │   │   │   │       │   │       │   ├── TagFilterDisplay.tsx (38 lines)
 │   │   │   │       │   │       │   └── TagSearchBar.tsx (106 lines)
 │   │   │   │       │   │       ├── containers/
@@ -903,7 +904,7 @@
 │   │   │   │       │   │   └── useContentPermissions.ts (66 lines)
 │   │   │   │       │   ├── index.tsx (21 lines)
 │   │   │   │       │   ├── layouts/
-│   │   │   │       │   │   └── PerpetuaLayout.tsx (437 lines)
+│   │   │   │       │   │   └── PerpetuaLayout.tsx (500 lines)
 │   │   │   │       │   ├── routes.ts (119 lines)
 │   │   │   │       │   ├── state/
 │   │   │   │       │   │   ├── cache/
@@ -917,9 +918,9 @@
 │   │   │   │       │   │   ├── services/
 │   │   │   │       │   │   │   ├── followService.ts (276 lines)
 │   │   │   │       │   │   │   ├── index.ts (7 lines)
-│   │   │   │       │   │   │   ├── itemService.ts (209 lines)
+│   │   │   │       │   │   │   ├── itemService.ts (215 lines)
 │   │   │   │       │   │   │   ├── serviceTypes.ts (39 lines)
-│   │   │   │       │   │   │   ├── shelfService.ts (332 lines)
+│   │   │   │       │   │   │   ├── shelfService.ts (380 lines)
 │   │   │   │       │   │   │   └── tagService.ts (308 lines)
 │   │   │   │       │   │   ├── thunks/
 │   │   │   │       │   │   │   ├── followThunks.ts (91 lines)
@@ -937,12 +938,14 @@
 │   │   │   ├── components/
 │   │   │   │   ├── Alert.tsx (72 lines)
 │   │   │   │   ├── AppCard.tsx (95 lines)
+│   │   │   │   ├── BalanceDisplay/
+│   │   │   │   │   └── index.tsx (92 lines)
 │   │   │   │   ├── BookModal.tsx (30 lines)
 │   │   │   │   ├── CanisterCard/
 │   │   │   │   │   ├── CanisterCardSkeleton.tsx (32 lines)
 │   │   │   │   │   ├── CanisterView.tsx (71 lines)
-│   │   │   │   │   ├── NonCanisterView.tsx (35 lines)
-│   │   │   │   │   └── index.tsx (29 lines)
+│   │   │   │   │   ├── NonCanisterView.tsx (63 lines)
+│   │   │   │   │   └── index.tsx (30 lines)
 │   │   │   │   ├── Copy.tsx (59 lines)
 │   │   │   │   ├── ErrorBoundary.tsx (37 lines)
 │   │   │   │   ├── ErrorFallback.tsx (25 lines)
@@ -1032,8 +1035,8 @@
 │   │   │   │   │   └── utils/
 │   │   │   │   │       └── assetUtils.ts (47 lines)
 │   │   │   │   ├── auth/
-│   │   │   │   │   ├── authExtraReducers.ts (81 lines)
-│   │   │   │   │   ├── authSlice.ts (67 lines)
+│   │   │   │   │   ├── authExtraReducers.ts (105 lines)
+│   │   │   │   │   ├── authSlice.ts (73 lines)
 │   │   │   │   │   ├── components/
 │   │   │   │   │   │   ├── AuthMenu.tsx (99 lines)
 │   │   │   │   │   │   ├── ETHAccount.tsx (65 lines)
@@ -1041,6 +1044,7 @@
 │   │   │   │   │   │   └── SOLAccount.tsx (67 lines)
 │   │   │   │   │   ├── index.tsx (21 lines)
 │   │   │   │   │   ├── thunks/
+│   │   │   │   │   │   ├── createCanister.ts (84 lines)
 │   │   │   │   │   │   ├── getCanister.ts (36 lines)
 │   │   │   │   │   │   ├── update.ts (42 lines)
 │   │   │   │   │   │   └── upgrade.ts (32 lines)
@@ -1087,7 +1091,7 @@
 │   │   │   │   ├── icp-assets/
 │   │   │   │   │   ├── components/
 │   │   │   │   │   │   ├── ICPAssetUploader.tsx (75 lines)
-│   │   │   │   │   │   ├── ICPAssets.tsx (61 lines)
+│   │   │   │   │   │   ├── ICPAssets.tsx (64 lines)
 │   │   │   │   │   │   └── Item.tsx (113 lines)
 │   │   │   │   │   ├── icpAssetsSlice.ts (101 lines)
 │   │   │   │   │   ├── thunks/
@@ -1151,10 +1155,10 @@
 │   │   │   │   │   │   │   ├── ConnectWallet.tsx (85 lines)
 │   │   │   │   │   │   │   ├── LoginButton.tsx (63 lines)
 │   │   │   │   │   │   │   └── index.tsx (47 lines)
-│   │   │   │   │   │   ├── IIProcessor.tsx (41 lines)
+│   │   │   │   │   │   ├── IIProcessor.tsx (39 lines)
 │   │   │   │   │   │   ├── NFIDProcessor.tsx (67 lines)
 │   │   │   │   │   │   ├── OISYProcessor/
-│   │   │   │   │   │   │   ├── LoginButton.tsx (56 lines)
+│   │   │   │   │   │   │   ├── LoginButton.tsx (54 lines)
 │   │   │   │   │   │   │   ├── Model.tsx (57 lines)
 │   │   │   │   │   │   │   └── index.tsx (97 lines)
 │   │   │   │   │   │   ├── SOLProcessor/
@@ -1516,7 +1520,7 @@
 │   │   │   │   ├── useAssetManager.ts (50 lines)
 │   │   │   │   ├── useAuth.tsx (6 lines)
 │   │   │   │   ├── useDebounce.tsx (17 lines)
-│   │   │   │   ├── useIdentity.tsx (35 lines)
+│   │   │   │   ├── useIdentity.tsx (62 lines)
 │   │   │   │   ├── useLogout.tsx (13 lines)
 │   │   │   │   ├── useRiskWarning.ts (27 lines)
 │   │   │   │   ├── useSession.tsx (6 lines)
@@ -1532,7 +1536,7 @@
 │   │   │   │   │   ├── AppHeader.tsx (18 lines)
 │   │   │   │   │   ├── AuthNavigation.tsx (41 lines)
 │   │   │   │   │   ├── DashboardSidebar.tsx (149 lines)
-│   │   │   │   │   ├── Header.tsx (140 lines)
+│   │   │   │   │   ├── Header.tsx (146 lines)
 │   │   │   │   │   └── LibrarianSidebar.tsx (87 lines)
 │   │   │   │   └── skeletons/
 │   │   │   │       ├── HeaderSkeleton.tsx (26 lines)
@@ -1595,9 +1599,10 @@
 │   │   │   │   ├── AuthProvider/
 │   │   │   │   │   ├── EthProvider.tsx (31 lines)
 │   │   │   │   │   ├── IIProvider.tsx (27 lines)
+│   │   │   │   │   ├── NFIDProvider.tsx (27 lines)
 │   │   │   │   │   ├── OISYProvider.tsx (22 lines)
 │   │   │   │   │   ├── SolProvider.tsx (42 lines)
-│   │   │   │   │   ├── index.tsx (55 lines)
+│   │   │   │   │   ├── index.tsx (58 lines)
 │   │   │   │   │   └── wagmi.config.ts (22 lines)
 │   │   │   │   ├── ReduxProvider.tsx (14 lines)
 │   │   │   │   ├── SessionProvider.tsx (90 lines)
@@ -1605,12 +1610,13 @@
 │   │   │   │   └── UserProvider/
 │   │   │   │       ├── EthUserProvider.tsx (103 lines)
 │   │   │   │       ├── IIUserProvider.tsx (107 lines)
+│   │   │   │       ├── NFIDUserProvider.tsx (60 lines)
 │   │   │   │       ├── OISYUserProvider.tsx (58 lines)
 │   │   │   │       ├── SolUserProvider.tsx (92 lines)
-│   │   │   │       └── index.tsx (40 lines)
+│   │   │   │       └── index.tsx (46 lines)
 │   │   │   ├── routes/
 │   │   │   │   ├── dataRoutes.tsx (461 lines)
-│   │   │   │   ├── index.tsx (173 lines)
+│   │   │   │   ├── index.tsx (175 lines)
 │   │   │   │   └── routeConfig.ts (111 lines)
 │   │   │   ├── services/
 │   │   │   │   ├── bookService.ts (174 lines)
@@ -1696,54 +1702,60 @@
 │   │       ├── storage.rs (117 lines)
 │   │       ├── update.rs (393 lines)
 │   │       └── utils.rs (145 lines)
+│   ├── feed/
+│   │   ├── Cargo.toml (20 lines)
+│   │   ├── feed.did (25 lines)
+│   │   └── src/
+│   │       ├── lib.rs (545 lines)
+│   │       └── storage.rs (260 lines)
 │   ├── ic_siwo/
 │   │   ├── Cargo.toml (30 lines)
 │   │   ├── ic_siwo.did (82 lines)
-│   │   └── src/
-│   │       ├── build/
-│   │       │   ├── init.rs (19 lines)
-│   │       │   ├── mod.rs (5 lines)
-│   │       │   ├── rng.rs (18 lines)
-│   │       │   ├── settings.rs (50 lines)
-│   │       │   ├── types.rs (36 lines)
-│   │       │   └── upgrade.rs (24 lines)
-│   │       ├── challenge/
-│   │       │   ├── map.rs (265 lines)
-│   │       │   ├── mod.rs (5 lines)
-│   │       │   ├── types.rs (182 lines)
-│   │       │   ├── updates.rs (49 lines)
-│   │       │   └── utils.rs (91 lines)
-│   │       ├── delegation/
-│   │       │   ├── mod.rs (4 lines)
-│   │       │   ├── types.rs (127 lines)
-│   │       │   ├── updates.rs (111 lines)
-│   │       │   └── utils.rs (381 lines)
-│   │       ├── hash.rs (100 lines)
-│   │       ├── icrc21/
-│   │       │   ├── mod.rs (2 lines)
-│   │       │   ├── types.rs (66 lines)
-│   │       │   └── updates.rs (241 lines)
-│   │       ├── lib.rs (28 lines)
-│   │       ├── login/
-│   │       │   ├── mod.rs (3 lines)
-│   │       │   ├── types.rs (119 lines)
-│   │       │   ├── updates.rs (225 lines)
-│   │       │   └── utils.rs (60 lines)
-│   │       ├── macros.rs (30 lines)
-│   │       ├── queries.rs (143 lines)
-│   │       ├── settings/
-│   │       │   ├── builder.rs (285 lines)
-│   │       │   ├── mod.rs (3 lines)
-│   │       │   ├── types.rs (42 lines)
-│   │       │   └── utils.rs (306 lines)
-│   │       ├── signature/
-│   │       │   ├── expiration.rs (24 lines)
-│   │       │   ├── map.rs (90 lines)
-│   │       │   ├── mod.rs (6 lines)
-│   │       │   └── types.rs (14 lines)
-│   │       ├── store.rs (43 lines)
-│   │       ├── types.rs (25 lines)
-│   │       └── utils.rs (129 lines)
+│   │   ├── src/
+│   │   │   ├── build/
+│   │   │   │   ├── init.rs (19 lines)
+│   │   │   │   ├── mod.rs (5 lines)
+│   │   │   │   ├── rng.rs (18 lines)
+│   │   │   │   ├── settings.rs (50 lines)
+│   │   │   │   ├── types.rs (36 lines)
+│   │   │   │   └── upgrade.rs (24 lines)
+│   │   │   ├── challenge/
+│   │   │   │   ├── map.rs (265 lines)
+│   │   │   │   ├── mod.rs (5 lines)
+│   │   │   │   ├── types.rs (182 lines)
+│   │   │   │   ├── updates.rs (49 lines)
+│   │   │   │   └── utils.rs (91 lines)
+│   │   │   ├── delegation/
+│   │   │   │   ├── mod.rs (4 lines)
+│   │   │   │   ├── types.rs (127 lines)
+│   │   │   │   ├── updates.rs (111 lines)
+│   │   │   │   └── utils.rs (381 lines)
+│   │   │   ├── hash.rs (100 lines)
+│   │   │   ├── icrc21/
+│   │   │   │   ├── mod.rs (2 lines)
+│   │   │   │   ├── types.rs (66 lines)
+│   │   │   │   └── updates.rs (241 lines)
+│   │   │   ├── lib.rs (28 lines)
+│   │   │   ├── login/
+│   │   │   │   ├── mod.rs (3 lines)
+│   │   │   │   ├── types.rs (119 lines)
+│   │   │   │   ├── updates.rs (225 lines)
+│   │   │   │   └── utils.rs (60 lines)
+│   │   │   ├── macros.rs (30 lines)
+│   │   │   ├── queries.rs (143 lines)
+│   │   │   ├── settings/
+│   │   │   │   ├── builder.rs (285 lines)
+│   │   │   │   ├── mod.rs (3 lines)
+│   │   │   │   ├── types.rs (42 lines)
+│   │   │   │   └── utils.rs (306 lines)
+│   │   │   ├── signature/
+│   │   │   │   ├── expiration.rs (24 lines)
+│   │   │   │   ├── map.rs (90 lines)
+│   │   │   │   ├── mod.rs (6 lines)
+│   │   │   │   └── types.rs (14 lines)
+│   │   │   ├── store.rs (43 lines)
+│   │   │   ├── types.rs (25 lines)
+│   │   │   └── utils.rs (129 lines)
 │   ├── icp_swap/
 │   │   ├── Cargo.toml (28 lines)
 │   │   ├── icp_swap.did (113 lines)
@@ -1772,7 +1784,7 @@
 │   │   │   └── icrc7.mo (65 lines)
 │   │   ├── launch_nfts.sh (169 lines)
 │   │   ├── main.mo (500 lines)
-│   │   └── nft_archive.mo (53 lines)
+│   │   └── nft_archive.mo (930 lines)
 │   ├── icrc7_scion/
 │   │   ├── full_archive.mo (41237 lines)
 │   │   ├── initial_state/
@@ -1781,7 +1793,7 @@
 │   │   │   └── icrc7.mo (65 lines)
 │   │   ├── launch_nfts.sh (170 lines)
 │   │   ├── main.mo (368 lines)
-│   │   └── nft_archive.mo (51 lines)
+│   │   └── nft_archive.mo (161 lines)
 │   ├── logs/
 │   │   ├── Cargo.toml (23 lines)
 │   │   ├── logs.did (18 lines)
@@ -1815,36 +1827,36 @@
 │   │       └── utils.rs (29 lines)
 │   ├── perpetua/
 │   │   ├── Cargo.toml (23 lines)
-│   │   ├── perpetua.did (133 lines)
-│   │   ├── perpetua.md (207 lines)
-│   │   ├── scalability_report.md (180 lines)
+│   │   ├── perpetua.did (135 lines)
+│   │   ├── perpetua.md (286 lines)
+│   │   ├── perpetua_audit.md (1 lines)
 │   │   └── src/
-│   │       ├── auth.rs (172 lines)
+│   │       ├── auth.rs (154 lines)
 │   │       ├── guard.rs (11 lines)
-│   │       ├── lib.rs (71 lines)
+│   │       ├── lib.rs (67 lines)
 │   │       ├── ordering.rs (542 lines)
 │   │       ├── query/
 │   │       │   ├── follows.rs (300 lines)
-│   │       │   └── shelves.rs (800 lines)
+│   │       │   └── shelves.rs (678 lines)
 │   │       ├── storage/
-│   │       │   ├── common_types.rs (5 lines)
+│   │       │   ├── common_types.rs (11 lines)
 │   │       │   ├── follow_storage.rs (52 lines)
-│   │       │   ├── mod.rs (92 lines)
+│   │       │   ├── mod.rs (97 lines)
 │   │       │   ├── nft_storage.rs (32 lines)
-│   │       │   ├── random_feed_storage.rs (86 lines)
-│   │       │   ├── shelf_storage.rs (417 lines)
-│   │       │   ├── tag_storage.rs (161 lines)
+│   │       │   ├── random_feed_storage.rs (84 lines)
+│   │       │   ├── shelf_storage.rs (479 lines)
+│   │       │   ├── tag_storage.rs (141 lines)
 │   │       │   └── user_storage.rs (81 lines)
 │   │       ├── types.rs (86 lines)
 │   │       ├── update/
-│   │       │   ├── access.rs (104 lines)
-│   │       │   ├── debug.rs (10 lines)
+│   │       │   ├── access.rs (108 lines)
+│   │       │   ├── debug.rs (1 lines)
 │   │       │   ├── follow.rs (131 lines)
-│   │       │   ├── item.rs (286 lines)
+│   │       │   ├── item.rs (301 lines)
+│   │       │   ├── mod.rs (4 lines)
 │   │       │   ├── profile.rs (119 lines)
-│   │       │   ├── restore.rs (128 lines)
-│   │       │   ├── shelf.rs (170 lines)
-│   │       │   ├── tags.rs (184 lines)
+│   │       │   ├── shelf.rs (179 lines)
+│   │       │   ├── tags.rs (199 lines)
 │   │       │   └── utils.rs (101 lines)
 │   │       └── utils.rs (33 lines)
 │   ├── registry/
@@ -1863,7 +1875,7 @@
 │   │   ├── lbryfun.md (122 lines)
 │   │   ├── likes.md (9 lines)
 │   │   ├── milestones.md (119 lines)
-│   │   ├── plan.md (102 lines)
+│   │   ├── plan.md (103 lines)
 │   │   ├── scripts/
 │   │   │   ├── basic.sh (106 lines)
 │   │   │   ├── build.sh (161 lines)

@@ -283,4 +283,4 @@ candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpe
 dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx generate perpetua
 
-git show --patch 14ff688320ebcf1f2c5acb374ab3a995f998b992
+git show --patch add81056f2eaa8103b4def714be73e699121b9a4

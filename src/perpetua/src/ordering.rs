@@ -39,7 +39,7 @@ impl Ord for OrderedFloat {
 #[derive(Debug, Clone)]
 pub struct PositionTracker<K: Ord + Clone> {
     positions_by_key: BTreeMap<K, f64>,
-    keys_by_position: BTreeMap<OrderedFloat, K>,
+    keys_by_position: BTreeMap<OrderedFloat, Vec<K>>,
     // Note: Using BTreeMap<OrderedFloat, K> assumes positions are unique. 
     // If exact position collisions are possible and need to be handled (e.g., multiple items at 0.0), 
     // value should be BTreeSet<K>. For our midpoint logic, collisions should be extremely rare except transiently during rebalance.
@@ -87,47 +87,59 @@ impl<K: Ord + Clone + std::fmt::Debug> PositionTracker<K> {
     }
 
     pub fn get_ordered_keys(&self) -> Vec<K> {
-        self.keys_by_position.values().cloned().collect()
+        self.keys_by_position.values().flat_map(|keys_vec| keys_vec.iter().cloned()).collect()
     }
 
     /// Returns the keys and their positions, ordered by position.
     pub fn get_ordered_entries(&self) -> Vec<(K, f64)> {
         self.keys_by_position.iter()
-            .map(|(pos, key)| (key.clone(), pos.0))
+            .flat_map(|(pos_ord, keys_vec)| {
+                keys_vec.iter().map(move |key| (key.clone(), pos_ord.0))
+            })
             .collect()
     }
 
     // --- Core Mutation Methods ---
 
     /// Inserts or updates the position for a key, maintaining both maps.
-    pub fn insert(&mut self, key: K, position: f64) {
-        // Remove old entry from keys_by_position if key already exists
-        if let Some(old_pos) = self.positions_by_key.insert(key.clone(), position) {
-             // Only remove from keys_by_position if the old position was different
-             // Handles cases where insert is called multiple times with the same key/position
-             if old_pos != position {
-                self.keys_by_position.remove(&OrderedFloat(old_pos));
-             }
-             // TODO: Handle potential collisions if using BTreeSet<K> as value
+    pub fn insert(&mut self, key_to_insert: K, new_position: f64) {
+        // Remove key_to_insert from its old position in keys_by_position if its position changes.
+        if let Some(old_position_float) = self.positions_by_key.insert(key_to_insert.clone(), new_position) {
+            if old_position_float != new_position { // Position actually changed.
+                let old_ord_float = OrderedFloat(old_position_float);
+                if let Some(keys_at_old_pos) = self.keys_by_position.get_mut(&old_ord_float) {
+                    keys_at_old_pos.retain(|k| k != &key_to_insert); // K needs PartialEq, which Ord implies.
+                    if keys_at_old_pos.is_empty() {
+                        self.keys_by_position.remove(&old_ord_float);
+                    }
+                }
+            }
         }
         
-        // Insert into keys_by_position map (potentially overwriting if position existed for another key, though unlikely)
-        self.keys_by_position.insert(OrderedFloat(position), key);
-         // TODO: Handle potential collisions if using BTreeSet<K> as value
+        // Add key_to_insert to the Vec at new_position in keys_by_position.
+        self.keys_by_position
+            .entry(OrderedFloat(new_position))
+            .or_insert_with(Vec::new)
+            .push(key_to_insert);
     }
 
     /// Removes a key and its position from both maps. Returns the position if the key existed.
-    pub fn remove<Q: ?Sized>(&mut self, key: &Q) -> Option<f64>
+    pub fn remove<Q: ?Sized>(&mut self, key_to_remove: &Q) -> Option<f64>
     where
-        K: Borrow<Q> + Clone, // Clone needed to remove from keys_by_position if using BTreeSet<K>
-        Q: Ord + Eq,
+        K: Borrow<Q> + Clone, 
+        Q: Ord + Eq, // Removed Debug constraint as it's not used in this function body for Q
     {
         // Remove from positions_by_key first to get the position
-        if let Some(position) = self.positions_by_key.remove(key) {
-            // Now remove the corresponding entry from keys_by_position
-            self.keys_by_position.remove(&OrderedFloat(position));
-             // TODO: Handle potential collisions if using BTreeSet<K> as value
-            Some(position)
+        if let Some(removed_position_float) = self.positions_by_key.remove(key_to_remove) {
+            let ord_float = OrderedFloat(removed_position_float);
+            if let Some(keys_at_pos) = self.keys_by_position.get_mut(&ord_float) {
+                // K: Borrow<Q> allows us to compare &K with &Q
+                keys_at_pos.retain(|k_in_vec| k_in_vec.borrow() != key_to_remove);
+                if keys_at_pos.is_empty() {
+                    self.keys_by_position.remove(&ord_float);
+                }
+            }
+            Some(removed_position_float)
         } else {
             None
         }
@@ -284,8 +296,11 @@ impl<K: Ord + Clone + std::fmt::Debug> PositionTracker<K> {
             return;
         }
 
-        // Get currently ordered keys (ordered by position) - O(N)
-        let ordered_keys: Vec<K> = self.keys_by_position.values().cloned().collect();
+        // Get currently ordered keys (ordered by position)
+        let ordered_keys: Vec<K> = self.keys_by_position
+            .values()
+            .flat_map(|vec_k| vec_k.iter().cloned())
+            .collect();
 
         // We need to rebuild both maps. Clear them first.
         self.positions_by_key.clear();
@@ -302,12 +317,14 @@ impl<K: Ord + Clone + std::fmt::Debug> PositionTracker<K> {
     
     /// Returns an iterator over keys ordered by their position.
     pub fn iter_keys_ordered(&self) -> impl Iterator<Item = &K> {
-        self.keys_by_position.values()
+        self.keys_by_position.values().flat_map(|keys_vec| keys_vec.iter())
     }
 
     /// Returns an iterator over (key, position) ordered by position.
     pub fn iter_ordered(&self) -> impl Iterator<Item = (&K, f64)> {
-        self.keys_by_position.iter().map(|(pos_ord, key)| (key, pos_ord.0))
+        self.keys_by_position.iter().flat_map(|(pos_ord, keys_vec)| {
+            keys_vec.iter().map(move |key| (key, pos_ord.0))
+        })
     }
 }
 
