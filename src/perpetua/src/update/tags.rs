@@ -86,6 +86,12 @@ pub(super) fn add_tag_to_metadata_maps(shelf_id: &ShelfId, normalized_tag: &Norm
         map_ref.borrow_mut().insert(ShelfTagAssociationKey { shelf_id: shelf_id.clone(), tag: normalized_tag.clone() }, ());
     });
 
+    // TAG_LEXICAL_INDEX is typically added when a tag first appears or its count > 0.
+    // It's managed below based on count. If it's the first time, it will be added.
+    // The original code added it here unconditionally, let's preserve that and ensure it's also handled
+    // correctly based on count logic for new tags / existing tags.
+    // For now, let's ensure it is added if the metadata entry is new or count becomes > 0.
+    // The most straightforward is to add it here, and remove it if count drops to 0 in remove_tag_from_metadata_maps
     TAG_LEXICAL_INDEX.with(|map_ref| {
         map_ref.borrow_mut().insert(normalized_tag.clone(), ());
     });
@@ -101,45 +107,36 @@ pub(super) fn add_tag_to_metadata_maps(shelf_id: &ShelfId, normalized_tag: &Norm
         );
     });
 
-    // --- Phase 2: Recalculate count and update derived data (Metadata & Popularity) ---
-    let new_shelf_count = TAG_SHELF_ASSOCIATIONS.with(|map_ref| {
-        let map = map_ref.borrow();
-        map.iter().filter(|(key, _)| key.0 == *normalized_tag).count() as u64
-    });
-
-    let old_shelf_count_for_popularity_removal = if new_shelf_count > 0 { new_shelf_count - 1 } else { 0 };
-
+    // --- Phase 2: Update Metadata & Popularity Incrementally ---
     TAG_METADATA.with(|map_ref| {
         let mut map = map_ref.borrow_mut();
-        let mut entry = map.get(normalized_tag).unwrap_or_default();
-        
-        if entry.current_shelf_count == 0 && new_shelf_count > 0 { // First time this tag is being added effectively
-            entry.first_seen_timestamp = now;
-        }
-        
-        entry.current_shelf_count = new_shelf_count;
-        entry.last_association_timestamp = now; // Reflects this specific association event
-        entry.last_active_timestamp = now;    // Reflects general activity for the tag
-        
-        if new_shelf_count > 0 {
-            map.insert(normalized_tag.clone(), entry);
-        } else {
-            // This case should ideally not be hit if we are adding a tag,
-            // but as a safeguard if new_shelf_count is somehow 0 after an add.
-            map.remove(normalized_tag);
-        }
-    });
+        // Get the existing metadata or create a new default one.
+        // We remove it and re-insert to handle the StableBTreeMap update pattern.
+        let mut metadata = map.remove(normalized_tag).unwrap_or_default();
 
-    if old_shelf_count_for_popularity_removal > 0 {
-        TAG_POPULARITY_INDEX.with(|pop_map_ref|{
-            pop_map_ref.borrow_mut().remove(&TagPopularityKey(old_shelf_count_for_popularity_removal, normalized_tag.clone()));
-        });
-    }
-    if new_shelf_count > 0 {
+        let old_shelf_count = metadata.current_shelf_count;
+        metadata.current_shelf_count += 1; // Increment count
+        let new_shelf_count = metadata.current_shelf_count;
+
+        if old_shelf_count == 0 { // This means it's the first time this tag is associated with a shelf
+            metadata.first_seen_timestamp = now;
+        }
+        metadata.last_association_timestamp = now; // Timestamp of this specific association
+        metadata.last_active_timestamp = now;    // General activity timestamp for the tag
+        
+        map.insert(normalized_tag.clone(), metadata); // Store the updated metadata
+
+        // Update Popularity Index
+        if old_shelf_count > 0 {
+            TAG_POPULARITY_INDEX.with(|pop_map_ref|{
+                pop_map_ref.borrow_mut().remove(&TagPopularityKey(old_shelf_count, normalized_tag.clone()));
+            });
+        }
+        // new_shelf_count is guaranteed to be > 0 because we incremented
         TAG_POPULARITY_INDEX.with(|pop_map_ref|{
             pop_map_ref.borrow_mut().insert(TagPopularityKey(new_shelf_count, normalized_tag.clone()), ());
         });
-    }
+    });
 }
 
 fn remove_tag_from_metadata_maps(shelf_id: &ShelfId, normalized_tag: &NormalizedTag, shelf_created_at: u64, now: u64) {
@@ -160,38 +157,53 @@ fn remove_tag_from_metadata_maps(shelf_id: &ShelfId, normalized_tag: &Normalized
         });
     });
 
-    // --- Phase 2: Recalculate count and update derived data (Metadata & Popularity) ---
-    let new_shelf_count = TAG_SHELF_ASSOCIATIONS.with(|map_ref| {
-        let map = map_ref.borrow();
-        map.iter().filter(|(key, _)| key.0 == *normalized_tag).count() as u64
-    });
-
-    let old_shelf_count_for_popularity_removal = new_shelf_count + 1; // The count before this removal
+    // --- Phase 2: Update Metadata & Popularity Incrementally ---
+    let mut final_shelf_count: u64 = 0;
+    let mut popularity_old_count: u64 = 0;
+    let mut popularity_new_count: u64 = 0;
+    let mut tag_existed_in_metadata_and_was_processed = false;
 
     TAG_METADATA.with(|map_ref| {
         let mut map = map_ref.borrow_mut();
-        if let Some(mut entry) = map.get(normalized_tag).map(|e| e.clone()) { 
-            entry.current_shelf_count = new_shelf_count;
-            entry.last_active_timestamp = now; 
-            if new_shelf_count == 0 {
-                map.remove(normalized_tag); 
-            } else {
-                map.insert(normalized_tag.clone(), entry);
+        if let Some(mut metadata) = map.remove(normalized_tag) { // Try to get and remove
+            tag_existed_in_metadata_and_was_processed = true;
+            popularity_old_count = metadata.current_shelf_count;
+
+            if metadata.current_shelf_count > 0 {
+                metadata.current_shelf_count -= 1; // Decrement count
             }
+            // If count was already 0 (or became 0), it implies an issue or that it's the last one.
+
+            metadata.last_active_timestamp = now; // Update activity timestamp
+            popularity_new_count = metadata.current_shelf_count;
+            final_shelf_count = metadata.current_shelf_count;
+
+            if metadata.current_shelf_count > 0 {
+                map.insert(normalized_tag.clone(), metadata); // Put back if count is still > 0
+            }
+            // If current_shelf_count is 0, the metadata entry remains removed.
         }
+        // If tag was not in metadata, final_shelf_count remains 0, 
+        // and popularity counts remain 0. Nothing to do for this tag in TAG_METADATA.
     });
 
     // Update Popularity Index
-    TAG_POPULARITY_INDEX.with(|pop_map_ref|{
-        pop_map_ref.borrow_mut().remove(&TagPopularityKey(old_shelf_count_for_popularity_removal, normalized_tag.clone()));
-    });
-
-    if new_shelf_count > 0 {
+    // Only update if the tag was in metadata and its count potentially changed.
+    if tag_existed_in_metadata_and_was_processed && popularity_old_count > 0 {
         TAG_POPULARITY_INDEX.with(|pop_map_ref|{
-            pop_map_ref.borrow_mut().insert(TagPopularityKey(new_shelf_count, normalized_tag.clone()), ());
+            pop_map_ref.borrow_mut().remove(&TagPopularityKey(popularity_old_count, normalized_tag.clone()));
         });
-    } else {
-        // If the tag is no longer associated with any shelves, remove it from the lexical index as well.
+    }
+    if tag_existed_in_metadata_and_was_processed && popularity_new_count > 0 {
+        TAG_POPULARITY_INDEX.with(|pop_map_ref|{
+            pop_map_ref.borrow_mut().insert(TagPopularityKey(popularity_new_count, normalized_tag.clone()), ());
+        });
+    }
+
+    // Update Lexical Index: Remove if the count has dropped to zero.
+    if final_shelf_count == 0 {
+        // This means either the tag was not in metadata (so its count is considered 0),
+        // or it was in metadata and its count decremented to 0.
         TAG_LEXICAL_INDEX.with(|lex_map_ref|{
             lex_map_ref.borrow_mut().remove(normalized_tag);
         });

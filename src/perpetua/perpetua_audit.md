@@ -152,9 +152,9 @@ This audit reviews the backend Rust files for the Perpetua canister, focusing on
     - **Performance of Shelf Count Recalculation**: Iterating `TAG_SHELF_ASSOCIATIONS` to count shelves per tag (`map.iter().filter(...).count()`) can be very slow for popular tags.
         - **Severity**: Medium (performance).
         - **Improvement**: Modify `TagMetadata.current_shelf_count` incrementally instead of full recalculation. This requires ensuring every add/remove path updates it perfectly.
-- **Overall**: Logic is complex but aims for consistency. Performance of count recalculation is a key area for optimization.
+- **Overall**: Logic is complex but aims for consistency. Performance of count recalculation is a key area for optimization. -->
 
-### `src/update/utils.rs`
+<!-- ### `src/update/utils.rs`
 - **Audit Result**: Generally good; external dependency is key.
 - **`verify_nft_ownership`**:
     - **Security**: Relies entirely on the security and correctness of external ICRC7 canisters.
@@ -169,7 +169,7 @@ This audit reviews the backend Rust files for the Perpetua canister, focusing on
     - **Severity**: Low (collision if used and space is too small; 96 bits is generally large).
 - **`normalize_tag`**: Good and widely used (`trim().to_lowercase()`). -->
 
-## Overall Critical Vulnerabilities & Key Improvement Areas
+<!-- ## Overall Critical Vulnerabilities & Key Improvement Areas -->
 
 <!-- 1.  **Deep Circular References in Nested Shelves (`src/storage/shelf_storage.rs` via `src/update/item.rs`)**:
     *   **Current State**: `would_create_cycle` in `item.rs` is a good DFS-based detection mechanism for *newly added* items.
@@ -181,10 +181,10 @@ This audit reviews the backend Rust files for the Perpetua canister, focusing on
     *   **Severity**: Medium.
     *   **Action**: Implement robust collision handling in `keys_by_position` (e.g., `BTreeMap<OrderedFloat, Vec<K>>`). Strengthen logic for "suboptimal positions" after failed rebalance attempts. -->
 
-3.  **Consistency of Tag Indexes (`src/update/tags.rs` & `src/storage/tag_storage.rs`)**:
+<!-- 3.  **Consistency of Tag Indexes (`src/update/tags.rs` & `src/storage/tag_storage.rs`)**:
     *   **Concern**: Multiple BTreeMaps store tag data. All must be updated atomically. Performance of shelf count recalculation in `add/remove_tag_from_metadata_maps` is also a concern for popular tags.
     *   **Severity**: Medium to High (for data inconsistency if updates fail partially), Medium (for performance).
-    *   **Action**: Ensure helper functions (`add_tag_to_metadata_maps`, etc.) are fully atomic (panic on any partial failure). Optimize shelf count updates (e.g., incremental updates to `TagMetadata.current_shelf_count`).
+    *   **Action**: Ensure helper functions (`add_tag_to_metadata_maps`, etc.) are fully atomic (panic on any partial failure). Optimize shelf count updates (e.g., incremental updates to `TagMetadata.current_shelf_count`). -->
 
 <!-- 4.  **Potential Data Exposure in `get_public_shelves_by_tag` (`src/query/shelves.rs`)**:
     *   **Concern**: May return non-public shelves if the underlying index contains them and no explicit public filter is applied after fetching `ShelfData`.

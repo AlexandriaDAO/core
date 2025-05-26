@@ -184,6 +184,9 @@ perpetua/
 
 
 UI:
+- This should reflect in the UI in a toast when shelf creation fails: Failed to create shelf: Not enough balance. Shelves cost 50 LBRY to create.
+
+- Time to get rid of the password and logging blockers.
 - Solid filling for the LBRY/ALEX Badge
 - Remove the percent icon before the percent number in the badge. Put a rarity info hover/click on it. Also pick one text color and a better background color. Probably less orange and more gold with black text. Or different colors for different rarity tiers.
 - Make the lbry/alex badges display in $amounts.
@@ -194,7 +197,6 @@ UI:
 - Too much recursion and dialog opening errors.
 
 Backend:
-- Go through perpetua audit.
 - Add payments for making shelves, and maybe elsewhere.
 
 Functional:
@@ -203,6 +205,19 @@ Functional:
 
 New Canister:
 - Items on perpetua display load (need to maybe make the nft ranking setup.) Also at this point add the $ values to nfts with the rarity score.
+
+
+
+Bugs:
+- When trying to create a shelf while uploading an nft on perpetua it fails to make the shelf (just the first shelf maybe?)
+Failed to create shelf: Failed to create shelf <anonymous code>:1:145535
+    overrideMethod <anonymous code>:1
+    m https://lbry.app/1776.b80481b284427548edca.js:1
+Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://mlymmtr6mvxbk4c5p2o34y7cvkkavg3x4wtrq3rxq4ft4m47cemq.arweave.net/YvDGTj5lbhVwXX6dvmPiqpQKm3flpxhuN4cLPjOfERk. (Reason: CORS request did not succeed). Status code: (null).
+
+
+
+
 
 
 

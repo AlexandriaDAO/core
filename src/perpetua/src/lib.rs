@@ -4,6 +4,7 @@ use candid::{Principal};
 // Re-added constants
 pub const ICRC7_CANISTER_ID: &str = "53ewn-qqaaa-aaaap-qkmqq-cai";
 pub const ICRC7_SCION_CANISTER_ID: &str = "uxyan-oyaaa-aaaap-qhezq-cai";
+pub const NFT_MANAGER_CANISTER_ID: &str = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
 pub mod guard;
 pub mod auth;
@@ -62,6 +63,10 @@ pub fn icrc7_principal() -> Principal {
 
 pub fn icrc7_scion_principal() -> Principal {
     get_principal(ICRC7_SCION_CANISTER_ID)
+}
+
+pub fn nft_manager_principal() -> Principal {
+    get_principal(NFT_MANAGER_CANISTER_ID)
 }
 
 ic_cdk::export_candid!();

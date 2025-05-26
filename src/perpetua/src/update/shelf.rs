@@ -1,10 +1,13 @@
 use candid::{CandidType, Deserialize};
+use ic_cdk::api::call::CallResult;
 use crate::storage::{Item, ItemContent, ShelfData, SHELF_DATA, NFT_SHELVES, USER_SHELVES, create_shelf, GLOBAL_TIMELINE, ShelfId, GlobalTimelineItemValue, ShelfMetadata, ShelfContent};
 use crate::guard::not_anon;
+use crate::nft_manager_principal;
 use super::tags::add_tag_to_metadata_maps;
 
 // --- Constants ---
 const MAX_USER_SHELVES: usize = 500;
+const SHELF_CREATION_FEE_THRESHOLD: usize = 3;
 
 /// Represents the data needed to update a shelf's metadata
 #[derive(CandidType, Deserialize)]
@@ -35,13 +38,39 @@ pub async fn store_shelf(
         return Err("Initializing shelves with items is currently unsupported. Please create an empty shelf and add items separately.".to_string());
     }
     
-    // --- Check Shelf Limit ---
+    // --- Check Shelf Count and Payment ---
     let current_shelf_count = USER_SHELVES.with(|user_shelves| {
         user_shelves.borrow()
             .get(&caller)
             .map_or(0, |shelves_set| shelves_set.0.len())
     });
 
+    // If user has 3+ shelves, require payment
+    if current_shelf_count >= SHELF_CREATION_FEE_THRESHOLD {
+        let payment_result: CallResult<(Result<String, String>,)> = ic_cdk::call(
+            nft_manager_principal(),
+            "deduct_shelf_creation_fee",
+            (caller,)
+        ).await;
+
+        match payment_result {
+            Ok((result,)) => {
+                match result {
+                    Ok(_) => {
+                        ic_cdk::println!("Shelf creation fee successfully deducted for user: {}", caller);
+                    }
+                    Err(error_msg) => {
+                        return Err(error_msg);
+                    }
+                }
+            }
+            Err((code, msg)) => {
+                return Err(format!("Payment service unavailable: {:?} - {}", code, msg));
+            }
+        }
+    }
+
+    // --- Check Shelf Limit ---
     if current_shelf_count >= MAX_USER_SHELVES {
         return Err(format!("User cannot own more than {} shelves.", MAX_USER_SHELVES));
     }

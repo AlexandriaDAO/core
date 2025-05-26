@@ -25,6 +25,7 @@ service : () -> {
   arweave_id_to_nat : (text) -> (nat) query;
   coordinate_mint : (text, opt principal) -> (Result);
   deduct_marketplace_fee : (principal) -> (Result_1);
+  deduct_shelf_creation_fee : (principal) -> (Result_1);
   deduct_upload_fee : (principal, nat64) -> (Result_2);
   get_manifest_ids : (vec nat) -> (Result_3);
   get_metadata : (vec nat) -> (Result_4);

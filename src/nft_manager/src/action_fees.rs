@@ -8,6 +8,8 @@ use crate::coordinate_mint::verify_lbry_payment;
 pub const LBRY_E8S: u64 = 100_000_000; // Base fee of 1 LBRY.
 pub const LBRY_MINT_COST: u64 = 5;
 pub const LBRY_MINT_COST_E8S: u64 = LBRY_MINT_COST * LBRY_E8S;
+pub const LBRY_SHELF_CREATION_COST: u64 = 50;
+pub const LBRY_SHELF_CREATION_COST_E8S: u64 = LBRY_SHELF_CREATION_COST * LBRY_E8S;
 
 // Only Emporium could call this, since it accesses the topup acccount.
 // Currently 4X the mint cost (5 cents).
@@ -34,21 +36,15 @@ pub async fn deduct_upload_fee(from: Principal, file_size_bytes: u64) -> Result<
     burn_lbry(from, Nat::from(lbry_to_burn)).await
 }
 
+#[update(guard = "not_anon")]
+pub async fn deduct_shelf_creation_fee(user_principal: Principal) -> Result<String, String> {
+    let burn_result = burn_lbry(user_principal, Nat::from(LBRY_SHELF_CREATION_COST_E8S)).await;
+    if let Err(_e) = burn_result {
+        return Err("Not enough balance. Shelves cost 50 LBRY to create.".to_string());
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    Ok("Shelf creation fee successfully deducted.".to_string())
+}
 
 // Overarching utility function for burning LBRY.
 async fn burn_lbry(from: Principal, amount: Nat) -> Result<(), String> {
