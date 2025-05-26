@@ -4,7 +4,7 @@ import LoginContent from "./components/LoginContent";
 
 const FullPageLogin = () => (
 	<Dialog open>
-		<DialogContent className="sm:max-w-[425px] font-roboto-condensed" closeIcon={null} onOpenAutoFocus={(e) => e.preventDefault()}>
+		<DialogContent className="sm:max-w-[500px] font-roboto-condensed" closeIcon={null} onOpenAutoFocus={(e) => e.preventDefault()}>
 			<LoginContent />
 		</DialogContent>
 	</Dialog>

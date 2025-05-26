@@ -1,5 +1,5 @@
 import { setUser } from "@/features/auth/authSlice";
-import getCanister from "@/features/auth/thunks/getCanister";
+import getCanisters from "@/features/auth/thunks/getCanisters";
 import login from "@/features/login/thunks/login";
 import { useUser } from "@/hooks/actors";
 import { useAssetManager } from "@/hooks/actors";
@@ -19,7 +19,7 @@ const IIUserProvider: React.FC<IIUserProviderProps> = ({ children }) => {
     const {actor: assetManagerActor} = useAssetManager();
 
     const dispatch = useAppDispatch();
-    const {user, canister} = useAppSelector(state=>state.auth);
+    const {user} = useAppSelector(state=>state.auth);
 
     // Handle authentication state changes and user synchronization
     useEffect(()=>{
@@ -96,7 +96,7 @@ const IIUserProvider: React.FC<IIUserProviderProps> = ({ children }) => {
 
         // Attempt to login only if we don't have user data in the store
         // This prevents unnecessary login attempts if the user is already authenticated
-        dispatch(getCanister({actor: assetManagerActor}));
+        dispatch(getCanisters({actor: assetManagerActor}));
     }, [assetManagerActor, user]);
 
 

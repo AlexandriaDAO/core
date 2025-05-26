@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { setUser } from "@/features/auth/authSlice";
-import getCanister from "@/features/auth/thunks/getCanister";
+import getCanisters from "@/features/auth/thunks/getCanisters";
 import login from "@/features/login/thunks/login";
 import { useAssetManager, useUser } from "@/hooks/actors";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -17,7 +17,7 @@ const OISYUserProvider: React.FC<OISYUserProviderProps> = ({ children }) => {
     const {actor: assetManagerActor} = useAssetManager();
 
     const dispatch = useAppDispatch();
-    const {user, canister} = useAppSelector(state=>state.auth);
+    const {user} = useAppSelector(state=>state.auth);
 
     // Handle authentication state changes and user synchronization
     useEffect(()=>{
@@ -48,7 +48,7 @@ const OISYUserProvider: React.FC<OISYUserProviderProps> = ({ children }) => {
 
         // Attempt to login only if we don't have user data in the store
         // This prevents unnecessary login attempts if the user is already authenticated
-        dispatch(getCanister({actor: assetManagerActor}));
+        dispatch(getCanisters({actor: assetManagerActor}));
     }, [assetManagerActor, user]);
 
 	return <> {children} </>

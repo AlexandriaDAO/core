@@ -5,7 +5,6 @@ import { useIdentity } from "@/hooks/useIdentity";
 import { useAssetManager } from "@/hooks/useAssetManager";
 import fetch from "@/features/icp-assets/thunks/fetch";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import {useSearchParams} from "react-router"
 
 const ICPAssets: React.FC = () => {
 	const dispatch = useAppDispatch();
@@ -13,11 +12,9 @@ const ICPAssets: React.FC = () => {
 	const { identity } = useIdentity();
 	const { assets, loading } = useAppSelector((state) => state.icpAssets);
 
-	const [searchParams] = useSearchParams();
 	const assetManager = useAssetManager({
 		canisterId: canister ?? undefined,
 		identity,
-		host: searchParams.get('host') || undefined
 	});
 
 	useEffect(() => {

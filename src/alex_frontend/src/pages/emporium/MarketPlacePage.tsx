@@ -22,7 +22,7 @@ const MarketPlacePage = () => {
     const {actor} = useEmporium();
     const dispatch = useAppDispatch();
 
-    const { user } = useAppSelector((state) => state.auth);
+    const { user, canisters } = useAppSelector((state) => state.auth);
     const { nfts, found, loading, error, page, size, pages, sortByPrice, sortByTime } = useAppSelector((state) => state.imporium.listings);
 
     useEffect(() => {
@@ -74,7 +74,7 @@ const MarketPlacePage = () => {
                                     </div>}
                                 </IcpLedgerActor>
                             </EmporiumActor>
-                        } price={found[id].price} owner={found[id].owner}/>
+                        } price={found[id].price} owner={found[id].owner} canister={canisters[found[id].owner]} />
                     ))}
                 </div>
             ) : Object.keys(nfts).length <= 0 ? (
@@ -96,7 +96,7 @@ const MarketPlacePage = () => {
                                         </div>}
                                     </IcpLedgerActor>
                                 </EmporiumActor>
-                            } price={nfts[id].price} owner={nfts[id].owner}/>
+                            } price={nfts[id].price} owner={nfts[id].owner} canister={canisters[nfts[id].owner]} />
                         ))}
                     </div>
                     {/* <ResponsiveMasonry

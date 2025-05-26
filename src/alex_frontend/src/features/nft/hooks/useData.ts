@@ -1,16 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { TransactionStatusType } from "../types";
-import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useLocation } from "react-router";
 
-const useData = (id: string, status: TransactionStatusType) => {
-	const {canister} = useAppSelector(state=>state.auth);
+const isLocal = process.env.DFX_NETWORK == "local";
+
+const useData = (id: string, status: TransactionStatusType, canister?: string) => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [data, setData] = useState<Uint8Array | null>(null);
 	// const [progress, setProgress] = useState(0);
 	const progress = useRef(0);
-	const location = useLocation();
 
 
 	// fetch data using arweaveClient
@@ -100,16 +98,13 @@ const useData = (id: string, status: TransactionStatusType) => {
 
 				let response = null;
 
-				const isImporiumNftsRoute = location.pathname.includes('/app/imporium/nfts');
-
 				try {
-					if (!isImporiumNftsRoute) {
-						throw new Error("Not on imporium NFTs route, skipping canister fetch");
-					}
-
 					if(!canister) throw new Error("No user canister found");
 
-					response = await fetch(`http://${canister}.localhost:4943/arweave/${id}`);
+					const baseUrl = isLocal ? `http://${canister}.localhost:4943` : `https://${canister}.raw.icp0.io`;
+					const assetUrl = `${baseUrl}/arweave/${id}`;
+
+					response = await fetch(assetUrl);
 
 					if(!response.ok){
 						throw new Error("Asset not found in canister");

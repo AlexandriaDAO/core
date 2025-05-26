@@ -8,7 +8,6 @@ interface UseAssetManagerOptions {
 	identity?: Identity;
 	maxSingleFileSize?: number;
 	maxChunkSize?: number;
-	host?: string;
 }
 
 export function useAssetManager({
@@ -16,7 +15,6 @@ export function useAssetManager({
 	identity,
 	maxSingleFileSize = 1_900_000, // Default value
 	maxChunkSize = 500_000, // Default value
-	host= isLocal ? `http://localhost:${window.location.port}`:'https://ic0.app',
 }: UseAssetManagerOptions) {
 	const assetManager = useMemo(() => {
 		if (!canisterId || !identity) return null;
@@ -24,7 +22,9 @@ export function useAssetManager({
 		try {
 			// Create agent
 			const agent = HttpAgent.createSync({
-				host,
+				host: isLocal
+					? `http://localhost:${window.location.port}`
+					: 'https://ic0.app',
 				identity,
 			});
 

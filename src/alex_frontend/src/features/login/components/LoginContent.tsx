@@ -1,26 +1,29 @@
 import React from "react";
 import { DialogHeader, DialogTitle, DialogDescription } from '@/lib/components/dialog'
-import { User } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import Processors from '../processors';
 
 const LoginContent = () => {
     // const {provider} = useAuth();
     return (
-        <div className="space-y-6 py-2">
+        <div className="space-y-6">
             <DialogHeader>
                 <DialogTitle>
-                    <div className="flex gap-2 justify-start items-center">
-                        <User size={28} className="text-constructive" />
-                        <span className="text-xl font-semibold">Welcome Back</span>
-                    </div>
+                    <span className="text-xl font-semibold">Welcome Back</span>
                 </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground pt-1">
-                    Choose your preferred authentication method to continue.
+                <DialogDescription className="pt-2">
+                    <div className="flex items-center gap-2 text-base">
+                        <Lock size={16} className="text-constructive" />
+                        <span className="font-medium text-black dark:text-white">Your security is our Top Priority</span>
+                    </div>
+                    {/* <p>Choose your preferred authentication method to continue.</p> */}
+                    <p className="font-normal text-sm text-muted-foreground">
+                        We support multiple secure authentication methods including Internet Identity, NFID, and OISY.
+                        Choose how you would like to authenticate yourself.
+                    </p>
                 </DialogDescription>
             </DialogHeader>
-            <div className="px-1">
-                <Processors />
-            </div>
+            <Processors />
         </div>
     )
 }

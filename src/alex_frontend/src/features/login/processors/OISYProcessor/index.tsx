@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { LoaderCircle, X } from "lucide-react";
+import { LoaderCircle, X, Wallet, Shield, CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/lib/components/button";
 import useAuth from "@/hooks/useAuth";
 import { useSiwoIdentity } from "ic-use-siwo-identity";
+import { toast } from "sonner";
 
 import {
 	Dialog,
@@ -38,10 +39,9 @@ const OISYProcessor = () => {
             const password = window.prompt("Enter the password to test OISY login:");
             if (password === PROTECTED_PASSWORD) {
                 setIsAccessGranted(true);
-
-                handleLogin(); // Proceed with login immediately after correct password
-            } else if (password !== null) { // Check if prompt was cancelled
-                alert("Incorrect password.");
+                handleLogin();
+            } else if (password !== null) {
+                toast.error('Invalid password');
             }
         }
     };
@@ -52,39 +52,65 @@ const OISYProcessor = () => {
 			<DialogTrigger asChild>
 				<Button
 					onClick={handleButtonClick}
-					variant="link"
+					variant="outline"
 					disabled={isLoggingIn}
-					className="w-full justify-between mb-2 py-6 text-left"
-                    style={!isAccessGranted ? { opacity: 0.6, pointerEvents: isLoggingIn ? 'none' : 'auto' } : {}}
-                    title={!isAccessGranted ? "OISY Login (Test Access)" : "Login with OISY"}
+					className="w-full h-auto justify-between mb-2 p-4 border border-border dark:hover:border-primary transition-colors group"
+                    style={!isAccessGranted ? { opacity: 0.6 } : {}}
 				>
-					<div className="flex flex-col">
-						<span className="font-medium">OISY</span>
-						<span className="text-xs opacity-80">
-							Oisy wallet authentication
-						</span>
+					<div className="w-full flex items-center gap-3">
+						<div className="relative basis-10 flex-grow-0 flex-shrink-0">
+							<img
+								src="/images/oisy-logo.svg"
+								alt="OISY"
+								className="w-10 h-10 rounded-lg bg-background p-1.5 border border-border/50"
+							/>
+							{isLoggingIn && (
+								<div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-lg">
+									<LoaderCircle className="animate-spin text-constructive" size={20} />
+								</div>
+							)}
+						</div>
+						<div className="flex-grow flex flex-col items-start">
+							<div className="flex items-center gap-2">
+								<span className="font-medium">
+									OISY {!isAccessGranted && <span className="text-xs text-muted-foreground">(Test Access)</span>}
+								</span>
+								<Wallet size={14} className="text-constructive" />
+							</div>
+							<div className="w-full flex items-center justify-between">
+								<span className="text-xs text-muted-foreground">
+									Web3 wallet authentication
+								</span>
+								{!isLoggingIn && (
+									<div className="flex items-center gap-2 text-xs text-muted-foreground group-hover:text-primary">
+										<span>Click to login</span>
+										<ArrowRight size={18}/>
+									</div>
+								)}
+							</div>
+							<div className="flex items-center gap-1 mt-1">
+								<CheckCircle2 size={12} className="text-constructive" />
+								<span className="text-xs text-muted-foreground">
+									Secure wallet connection
+								</span>
+							</div>
+						</div>
 					</div>
-					{isLoggingIn ? (
-						<LoaderCircle className="animate-spin" />
-					) : (
-						<img
-							src="/images/oisy-logo.svg"
-							alt="OISY"
-							className="w-8 h-8"
-						/>
-					)}
 				</Button>
 			</DialogTrigger>
 
 			<DialogContent
 				closeIcon={<X size={20} onClick={() => setIsOpen(false)} />}
 				onOpenAutoFocus={(e) => e.preventDefault()}
-				className={`sm:max-w-[400px] bg-white dark:bg-gray-900 border dark:border-gray-800`}
+				className="sm:max-w-[400px] bg-background border-border"
 			>
 				<DialogHeader>
-					<DialogTitle>OISY</DialogTitle>
+					<DialogTitle className="flex items-center gap-2">
+						<Wallet size={20} className="text-constructive" />
+						OISY Wallet
+					</DialogTitle>
 					<DialogDescription>
-						Sign in with Your OISY wallet
+						Connect your OISY wallet to continue
 					</DialogDescription>
 				</DialogHeader>
 				<Model />

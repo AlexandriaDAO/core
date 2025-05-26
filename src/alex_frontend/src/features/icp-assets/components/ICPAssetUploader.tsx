@@ -4,6 +4,8 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useIdentity } from "@/hooks/useIdentity";
 import { useAssetManager } from "@/hooks/useAssetManager";
 import upload from "../thunks/upload";
+import { Input } from "@/lib/components/input";
+import { Button } from "@/lib/components/button";
 
 const ICPAssetUploader: React.FC = () => {
 	const dispatch = useAppDispatch();
@@ -26,31 +28,33 @@ const ICPAssetUploader: React.FC = () => {
 	const handleUpload = async () => {
 		if (!file || !assetManager) return;
 
-		dispatch(upload({ file, assetManager }));
+		try {
+			await dispatch(upload({ file, assetManager })).unwrap();
+		} catch (error) {
+			console.log('upload failed', error)
+		} finally{
+			setFile(null)
+		}
 	};
 
 	return (
-		<div className="bg-white p-6 rounded-lg shadow-sm border">
+		<div className="bg-card p-6 rounded-lg shadow-sm border">
 			<h2 className="text-xl font-semibold mb-4">Upload New Asset</h2>
-
-			<div className="flex flex-col md:flex-row gap-4">
-				<input
+			<div className="flex flex-col md:flex-row md:justify-center md:items-center gap-4">
+				<Input
 					type="file"
 					onChange={handleFileChange}
-					className="flex-1 border rounded p-2"
 					disabled={uploading}
+					placeholder="Ideas worth sharing..."
+					className="flex-grow border rounded cursor-pointer"
 				/>
-				<button
+				<Button
 					onClick={handleUpload}
 					disabled={!file || uploading || !canister}
-					className={`px-6 py-2 rounded ${
-						!file || uploading || !canister
-							? "bg-gray-300 cursor-not-allowed"
-							: "bg-blue-500 hover:bg-blue-600 text-white"
-					}`}
+					variant="info"
 				>
 					Upload
-				</button>
+				</Button>
 			</div>
 
 			{uploading && (
@@ -58,13 +62,11 @@ const ICPAssetUploader: React.FC = () => {
 					<p className="text-sm text-gray-600 mb-1">
 						Uploading: {file?.name} ({Math.round(percentage)}%)
 					</p>
-					<div className="w-full bg-gray-200 rounded-full h-2">
-						<div
-							className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-							style={{
-								width: `${percentage}%`,
-							}}
-						/>
+					<div className="h-4 bg-secondary dark:bg-[#3A3630] rounded-full border dark:border-transparent overflow-hidden">
+						{percentage > 0 && <div
+							className="h-full bg-primary dark:bg-white rounded-full"
+							style={{ width: `${percentage}%` }}
+						/>}
 					</div>
 				</div>
 			)}

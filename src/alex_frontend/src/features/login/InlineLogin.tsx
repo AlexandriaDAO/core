@@ -19,7 +19,7 @@ const InlineLogin = () => {
 					</span>
 				</div>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[425px] font-roboto-condensed" closeIcon={<XIcon onClick={()=>dispatch(setOpen(false))} className="w-4 h-4" />}>
+			<DialogContent className="sm:max-w-[500px] font-roboto-condensed px-6 py-3" closeIcon={<XIcon onClick={()=>dispatch(setOpen(false))} className="w-4 h-4" />}>
 				<LoginContent />
 			</DialogContent>
 		</Dialog>

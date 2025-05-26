@@ -9,7 +9,7 @@ import OISYProcessor from "./OISYProcessor";
 const Processors = () => {
   const { provider } = useAuth();
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full pb-4">
       {provider && <>
         {provider === "II" && <IIProcessor />}
         {provider === "NFID" && <NFIDProcessor />}
@@ -23,11 +23,13 @@ const Processors = () => {
           {provider ? "Other login options" : "Login options"}
         </h3>
 
-        {/* Show all processors that aren't currently selected */}
-        {provider !== "II" && <IIProcessor />}
-        {provider !== "NFID" && <NFIDProcessor />}
-        {provider !== "OISY" && <OISYProcessor />}
-        {/* {provider !== "ETH" && <ETHProcessor />} */}
+        <div className="space-y-2">
+          {/* Show all processors that aren't currently selected */}
+          {provider !== "II" && <IIProcessor />}
+          {provider !== "NFID" && <NFIDProcessor />}
+          {provider !== "OISY" && <OISYProcessor />}
+          {/* {provider !== "ETH" && <ETHProcessor />} */}
+        </div>
       </div>
     </div>
   );

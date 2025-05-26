@@ -6,6 +6,9 @@ import { IcpAssetItem } from "../types";
 import { AssetManager } from "@dfinity/assets";
 import remove from "../thunks/remove";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { Button } from "@/lib/components/button";
+
+const isLocal = process.env.DFX_NETWORK == "local";
 
 interface ItemProps {
 	asset: IcpAssetItem;
@@ -29,12 +32,19 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 	const isAudio = fileTypeInfo?.label === 'Media' && asset.content_type.startsWith('audio');
 	const isDocument = fileTypeInfo?.label === 'Documents' || fileTypeInfo?.label === 'E-books';
 
+	// Generate canister asset URL
+	const getCanisterAssetUrl = () => {
+		if (!canister) return "";
+		const baseUrl = isLocal ? `http://${canister}.localhost:4943` : `https://${canister}.raw.icp0.io`;
+		return baseUrl + asset.key;
+	};
+
 	return (
-		<div className="w-64 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-gray-200">
+		<div className="w-64 bg-card rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-ring">
 			<div className="h-48 overflow-hidden bg-gray-50 flex items-center justify-center">
 				{isImage ? (
 					<img 
-						src={`http://${canister}.localhost:4943${asset.key}`} 
+						src={getCanisterAssetUrl()} 
 						alt={asset.key}
 						className="w-full h-full object-cover"
 					/>
@@ -44,7 +54,7 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 						className="w-full h-full object-contain"
 					>
 						<source 
-							src={`http://${canister}.localhost:4943${asset.key}`} 
+							src={getCanisterAssetUrl()} 
 							type={asset.content_type}
 						/>
 						Your browser does not support the video tag.
@@ -56,7 +66,7 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 							className="w-full"
 						>
 							<source 
-								src={`http://${canister}.localhost:4943${asset.key}`} 
+								src={getCanisterAssetUrl()} 
 								type={asset.content_type}
 							/>
 							Your browser does not support the audio element.
@@ -76,12 +86,12 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 			</div>
 
 			<div className="p-4">
-				<h3 className="text-lg font-semibold text-gray-800 truncate" title={asset.key}>{asset.key}</h3>
+				<h3 className="text-lg font-semibold truncate" title={asset.key}>{asset.key}</h3>
 
 				<div className="mt-3 text-sm text-gray-600 space-y-1">
 					<div className="flex items-center">
 						<span className="font-medium mr-2">Type:</span> 
-						<span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs">
+						<span className="bg-info/10 dark:bg-white/80 text-info/60 dark:text-black px-2 py-0.5 rounded-full text-xs">
 							{asset.content_type}
 						</span>
 					</div>
@@ -89,21 +99,16 @@ const Item: React.FC<ItemProps> = ({ asset, assetManager }) => {
 
 				<div className="mt-4 flex justify-between items-center">
 					<a 
-						href={`http://${canister}.localhost:4943${asset.key}`} 
+						href={getCanisterAssetUrl()} 
 						target="_blank" 
 						rel="noopener noreferrer" 
-						className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+						className="text-sm text-primary/80 hover:text-primary font-medium"
 					>
 						View File
 					</a>
-
-					<button 
-						onClick={handleDelete}
-						disabled={deleting?.key == asset.key}
-						className="text-sm bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1 rounded transition-colors duration-200 disabled:opacity-50"
-					>
+					<Button variant="warning" scale="sm" onClick={handleDelete} disabled={deleting?.key == asset.key}>
 						{deleting?.key == asset.key ? "Deleting..." : "Delete"}
-					</button>
+					</Button>
 				</div>
 			</div>
 		</div>

@@ -59,15 +59,10 @@ export function ListNft({ id }: ListNftProps) {
 			<DialogTrigger asChild>
 				<Button onClick={() => setOpen(true)} variant="primary" scale="sm">Sell NFT</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[425px]" closeIcon={<Button
-                    disabled={listing}
-					onClick={() => setOpen(false)}
-					variant="outline"
-					scale="icon"
-					rounded="full"
-                    className="border-ring"
-				><X size={18} /></Button>}
-                >
+			<DialogContent className="sm:max-w-[425px]"
+				closeIcon={listing ? null : <X size={20} onClick={()=>setOpen(false)} />}
+				onOpenAutoFocus={(e) => e.preventDefault()}
+			>
 				<DialogHeader>
 					<DialogTitle>List NFT for Sale</DialogTitle>
 					<DialogDescription>

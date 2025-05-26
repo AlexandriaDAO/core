@@ -20,6 +20,8 @@ import { pullAssetToCanister } from "../thunks/pullAssetToCanister";
 import { deleteAssetFromCanister } from "../thunks/deleteAssetFromCanister";
 import { AssetManager } from "@dfinity/assets";
 
+const isLocal = process.env.DFX_NETWORK == "local";
+
 interface AssetDetailProps {
 	asset: ArweaveAssetItem;
 	assetManager: AssetManager | null;
@@ -101,10 +103,10 @@ const AssetDetail: React.FC<AssetDetailProps> = ({ asset, assetManager }) => {
 	// Generate canister asset URL
 	const getCanisterAssetUrl = () => {
 		if (!canister) return "";
-		const isLocal = !window.location.host.endsWith("ic0.app");
 		const baseUrl = isLocal
 			? `http://${canister}.localhost:4943`
-			: `https://${canister}.ic0.app`;
+			// : `https://${canister}.ic0.app`;
+			: `https://${canister}.raw.icp0.io`;
 		return `${baseUrl}/arweave/${asset.id}`;
 	};
 
