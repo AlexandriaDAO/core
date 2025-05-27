@@ -10,8 +10,8 @@ function LibrarianPage() {
 				<div className="mb-6">
 					<h2 className="text-xl font-semibold mb-2">Wallet Management</h2>
 					<p className="text-gray-600">
-						As a librarian, you can create and manage wallets that users can use to upload files.
-						You'll earn LBRY credits for providing this service.
+						This is an experimental VetKey feature that shares private keys in exchange for LBRY payments.
+						It is only available on a volunteer basis until audited. Reach an admin if you'd like access.
 					</p>
 				</div>
 			</div>

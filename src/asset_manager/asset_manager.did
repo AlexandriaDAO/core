@@ -8,7 +8,7 @@ type UserCanisterRegistry = record {
   assigned_canister_id : principal;
 };
 service : {
-  create_asset_canister : (opt blob) -> (Result);
+  create_asset_canister : () -> (Result);
   get_all_user_asset_canisters : () -> (
       vec record { principal; UserCanisterRegistry },
     ) query;

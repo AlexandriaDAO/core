@@ -8,8 +8,14 @@ use crate::coordinate_mint::verify_lbry_payment;
 pub const LBRY_E8S: u64 = 100_000_000; // Base fee of 1 LBRY.
 pub const LBRY_MINT_COST: u64 = 5;
 pub const LBRY_MINT_COST_E8S: u64 = LBRY_MINT_COST * LBRY_E8S;
-pub const LBRY_SHELF_CREATION_COST: u64 = 50;
+pub const LBRY_SHELF_CREATION_COST: u64 = 500;
 pub const LBRY_SHELF_CREATION_COST_E8S: u64 = LBRY_SHELF_CREATION_COST * LBRY_E8S;
+
+// Fee for creating an asset canister (1 LBRY, similar to ASSET_CANISTER_FEE in asset_manager, assuming 1 LBRY = 100_000_000 e8s)
+// ASSET_CANISTER_FEE was 1_000_000_000 which is 10 LBRY if LBRY_E8S is 100_000_000
+// Let's define it as 10 LBRY
+pub const LBRY_ASSET_CANISTER_CREATION_COST: u64 = 10;
+pub const LBRY_ASSET_CANISTER_CREATION_COST_E8S: u64 = LBRY_ASSET_CANISTER_CREATION_COST * LBRY_E8S;
 
 // Only Emporium could call this, since it accesses the topup acccount.
 // Currently 4X the mint cost (5 cents).
@@ -44,6 +50,16 @@ pub async fn deduct_shelf_creation_fee(user_principal: Principal) -> Result<Stri
     }
 
     Ok("Shelf creation fee successfully deducted.".to_string())
+}
+
+#[update(guard = "not_anon")]
+pub async fn deduct_asset_canister_creation_fee(user_principal: Principal) -> Result<String, String> {
+    let burn_result = burn_lbry(user_principal, Nat::from(LBRY_ASSET_CANISTER_CREATION_COST_E8S)).await;
+    if let Err(_e) = burn_result {
+        // It's important to provide a clear error message to the user.
+        return Err(format!("Failed to deduct asset canister creation fee ({} LBRY). Check your top-up balance.", LBRY_ASSET_CANISTER_CREATION_COST));
+    }
+    Ok("Asset canister creation fee successfully deducted.".to_string())
 }
 
 // Overarching utility function for burning LBRY.

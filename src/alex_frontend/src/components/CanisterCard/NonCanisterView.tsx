@@ -6,6 +6,17 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { createCanister } from "@/features/auth/thunks/createCanister";
 import { useAssetManager, useLbry } from "@/hooks/actors";
 import { toast } from "sonner";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/lib/components/alert-dialog";
 // import { createAssetCanister } from "@/apps/Modules/shared/state/assetManager/assetManagerThunks";
 
 function NonCanisterView() {
@@ -37,15 +48,40 @@ function NonCanisterView() {
             </div>
             <div className="flex flex-col gap-2 items-center justify-center font-roboto-condensed font-medium text-base">
                 <span className="text-center">
-                    Your do not have a canister yet.
+                    You do not have a canister yet.
                 </span>
                 <span className="text-center">
                     Create a canister to start uploading assets.
                 </span>
             </div>
-            <Button variant="link" scale="sm" onClick={handleCreate}>
-                {canisterError ? 'Try Again!!':'Create Canister'}
-            </Button>
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button variant="link" scale="sm">
+                        {canisterError ? 'Try Again!!':'Create Canister'}
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Create Your Own Asset Canister?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will cost 500 LBRY (approximately $5).
+                            <br /><br />
+                            Benefits of having your own asset canister include:
+                            <ul>
+                                <li>- It will be yours forever.</li>
+                                <li>- Assets will load much faster.</li>
+                                <li>- Enhanced in-app visibility and other perks.</li>
+                            </ul>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleCreate}>
+                            Confirm & Create
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             {canisterError &&
                 <div className="flex flex-col gap-2 items-center justify-center font-roboto-condensed font-medium text-base text-destructive">
                     <span className="text-center">

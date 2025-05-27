@@ -4,7 +4,6 @@ import TopProgressBar from "@/components/TopProgressBar";
 import BaseLayout from "@/layouts/BaseLayout";
 import MainLayout from "@/layouts/MainLayout";
 import AuthGuard from "@/guards/AuthGuard";
-import Protected from "@/guards/Protected";
 import LibrarianGuard from "@/guards/LibrarianGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ROUTES } from "./routeConfig";
@@ -371,7 +370,7 @@ const authRoutes = {
 			children: [{ path: ROUTES.PINAX, element: <PinaxWithActors /> }],
 		},
 		{
-			element: <Protected />,
+			// element: <Protected />,
 			children: [
 				{
 					path: ROUTES.DASHBOARD_ROUTES.BASE,

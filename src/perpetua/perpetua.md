@@ -186,10 +186,12 @@ perpetua/
 
 
 Functional:
+- You should not be able to perform remove actions on public shelves.
 - The ICP/AR badge is not showing for ICP ones.
 - There's a lot of background loading, like if I go to "My Library" it feels frozen for 10 seconds.
 - Too much recursion and dialog opening errors.
 - Progressive loading of NFTs inside shelves.
+- Should reduce the delay for loading shelf paths that you click on.
 
 
 
@@ -231,6 +233,9 @@ Progress: So it gets all the nfts in one long call.
 Plan:
     - For each SBT, add the like count to its original.
     - Maybe make this dynamic, so whenever coordinate mint is used, if it adds the new one. But first it needs to do all from scratch.
+
+
+
 
 
 

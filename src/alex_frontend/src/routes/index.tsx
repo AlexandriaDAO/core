@@ -146,11 +146,20 @@ const router = createBrowserRouter(
 						</Suspense>
 					} />
 				</Route>
-				<Route element={<Protected route />}>
+				{/* <Route element={<Protected route />}> */}
 					<Route path={ROUTES.DASHBOARD_ROUTES.BASE} element={<Suspense key="dashboard_layout" fallback={<LayoutSkeleton />}><DashboardLayout /></Suspense>}>
 						<Route element={<LibrarianGuard />}>
 							<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
-							<Route path="wallets" element={<Suspense key="wallets" fallback={<MainPageSkeleton />}><WalletsPage /></Suspense>} />
+							{/* <Route path="wallets" element={<Suspense key="wallets" fallback={<MainPageSkeleton />}><WalletsPage /></Suspense>} /> */}
+							<Route path="wallets" element={<Protected unauthorizedComponent={
+								<div className="p-4 text-center">
+									<p className="text-lg font-semibold">Experimental Feature</p>
+									<p className="mt-2 text-sm text-gray-600">
+										This is an experimental VetKey feature to provide Arweave Wallet Private Keys to be used in-app. 
+										If you'd like to participate in adding a wallet as a volunteer, please ask an admin.
+									</p>
+								</div>
+							}><WalletsPage /></Protected>} />
 						</Route>
 						<Route path="arweave-assets" element={<Suspense key="arweave-assets" fallback={<MainPageSkeleton />}><ArweaveAssetsPage /></Suspense>} />
 						<Route path="icp-assets" element={<Suspense key="icp-assets" fallback={<MainPageSkeleton />}><ICPAssetsPage /></Suspense>} />
@@ -160,7 +169,7 @@ const router = createBrowserRouter(
 						</Route>
 						<Route path="settings" element={<Suspense key="settings" fallback={<MainPageSkeleton />}><SettingsPage /></Suspense>} />
 					</Route>
-				</Route>
+				{/* </Route> */}
 			</Route>
 		</Route>
 	)
