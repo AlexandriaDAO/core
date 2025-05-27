@@ -14,7 +14,6 @@ import Protected from "@/guards/Protected";
 import LibrarianGuard from "@/guards/LibrarianGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ROUTES } from "./routeConfig";
-import PasswordProtect from "@/components/PasswordProtect";
 
 import MarketSkeleton from "@/layouts/skeletons/emporium/MarketSkeleton";
 import GeneralSkeleton from "@/layouts/skeletons/emporium/GeneralSkeleton";
@@ -85,42 +84,32 @@ const router = createBrowserRouter(
 					<Route path="bibliotheca" element={<Suspense key="bibliotheca" fallback={<TopProgressBar />}><Bibliotheca /></Suspense>} />
 					<Route path="alexandrian" element={<Suspense key="alexandrian" fallback={<TopProgressBar />}><Alexandrian /></Suspense>} />
 					<Route path="syllogos" element={<Suspense key="syllogos" fallback={<TopProgressBar />}><Syllogos /></Suspense>} />
-					<Route element={<AuthGuard />}>
-						<Route
-							path="perpetua"
-							element={
-								<PasswordProtect>
-									<Suspense key="perpetua" fallback={<TopProgressBar />}>
-										<Perpetua />
-									</Suspense>
-								</PasswordProtect>
-							}
-						>
-							<Route index element={<Suspense key="perpetua-home" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-							<Route path="shelf/:shelfId" element={<Suspense key="perpetua-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-							<Route path="item/:itemId" element={<Suspense key="perpetua-item" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-							<Route path="user/:userId" element={<Suspense key="perpetua-user" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-							<Route path="user/:userId/shelf/:shelfId" element={<Suspense key="perpetua-user-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-							<Route path="user/:userId/item/:itemId" element={<Suspense key="perpetua-user-item" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
-						</Route>
+					
+					<Route
+						path="perpetua"
+						element={
+							<Suspense key="perpetua" fallback={<TopProgressBar />}>
+								<Perpetua />
+							</Suspense>
+						}
+					>
+						<Route index element={<Suspense key="perpetua-home" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						<Route path="shelf/:shelfId" element={<Suspense key="perpetua-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						<Route path="item/:itemId" element={<Suspense key="perpetua-item" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						<Route path="user/:userId" element={<Suspense key="perpetua-user" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						<Route path="user/:userId/shelf/:shelfId" element={<Suspense key="perpetua-user-shelf" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
+						<Route path="user/:userId/item/:itemId" element={<Suspense key="perpetua-user-item" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
 					</Route>
+					
 					<Route path="dialectica" element={<Suspense key="dialectica" fallback={<TopProgressBar />}><Dialectica /></Suspense>} />
 					<Route path="permasearch" element={<Suspense key="permasearch" fallback={<TopProgressBar />}><Permasearch /></Suspense>} />
-
 					<Route path="emporium" element={<Suspense key="emporium" fallback={<TopProgressBar />}><Emporium /></Suspense>} />
 
 					<Route path="imporium">
 						<Route index element={<Suspense key="imporium" fallback={<MarketSkeleton />}><Imporium /></Suspense>} />
-
-						{/* <Route path="marketplace" element={<Suspense key="emporium-marketplace" fallback={<MarketSkeleton />}><MarketPlacePage /></Suspense>} /> */}
-
-						{/* <Route path="my-nfts" element={<Suspense key="emporium-my-nfts" fallback={<MyNftsSkeleton />}><MyNftsPage /></Suspense>} /> */}
-
-						{/* <Route path="my-logs" element={<Suspense key="emporium-my-logs" fallback={<GeneralSkeleton />}><MyLogsPage /></Suspense>} /> */}
-						{/* <Route path="market-logs" element={<Suspense key="emporium-market-logs" fallback={<GeneralSkeleton />}><MarketLogsPage /></Suspense>} /> */}
-						{/* <Route path="my-listings" element={<Suspense key="emporium-my-listing" fallback={<GeneralSkeleton />}><EmporiumActor><MyListingsPage /></EmporiumActor></Suspense>} /> */}
 					</Route>
 				</Route>
+				
 				<Route path="swap">
 					<Route index element={<Suspense key="swap" fallback={<TopProgressBar />}><SwapPage /></Suspense>} />
 					<Route path="balance" element={<Suspense key="swap-balance" fallback={<TopProgressBar />}><SwapPage /></Suspense>} />
@@ -143,17 +132,14 @@ const router = createBrowserRouter(
 			<Route element={<AuthGuard />}>
 				<Route element={<MainLayout />}>
 					<Route path={ROUTES.PINAX} element={<Suspense key="pinax" fallback={<PinaxSkeleton />}><PinaxPage /></Suspense>} />
-
 					<Route path="app/imporium/nfts" element={<Suspense key="imporium-nfts" fallback={<MyNftsSkeleton />}><NftsPage /></Suspense>} />
 					<Route path="app/imporium/marketplace" element={<Suspense key="imporium-marketplace" fallback={<GeneralSkeleton />}><EmporiumActor><MarketPlacePage /></EmporiumActor></Suspense>} />
 					<Route path="app/imporium/listings" element={<Suspense key="imporium-listing" fallback={<GeneralSkeleton />}><EmporiumActor><MyListingsPage /></EmporiumActor></Suspense>} />
-
 					<Route path="app/imporium/market-logs" element={
 						<Suspense key="imporium-market-logs" fallback={<MyNftsSkeleton />}>
 							<MarketLogsPage />
 						</Suspense>
 					} />
-
 					<Route path="app/imporium/my-logs" element={
 						<Suspense key="imporium-my-logs" fallback={<MyNftsSkeleton />}>
 							<EmporiumActor><MyLogsPage /></EmporiumActor>
@@ -166,7 +152,6 @@ const router = createBrowserRouter(
 							<Route index element={<Suspense key="dashboard_page" fallback={<MainPageSkeleton />}><LibrarianPage /></Suspense>} />
 							<Route path="wallets" element={<Suspense key="wallets" fallback={<MainPageSkeleton />}><WalletsPage /></Suspense>} />
 						</Route>
-
 						<Route path="arweave-assets" element={<Suspense key="arweave-assets" fallback={<MainPageSkeleton />}><ArweaveAssetsPage /></Suspense>} />
 						<Route path="icp-assets" element={<Suspense key="icp-assets" fallback={<MainPageSkeleton />}><ICPAssetsPage /></Suspense>} />
 						<Route path="profile">
@@ -181,6 +166,6 @@ const router = createBrowserRouter(
 	)
 );
   
-export const AppRoutes = ()=>{
+export const AppRoutes = ()=> {
 	return <RouterProvider router={router} />;
 }

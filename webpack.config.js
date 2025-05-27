@@ -191,11 +191,40 @@ module.exports = {
     }),
     new CopyPlugin({
       patterns: [
+        // Explicitly copy files from the 'introduction' directory
         {
-          from: path.resolve(__dirname, `src/${frontendDirectory}/public`),
+          from: path.resolve(__dirname, "src", frontendDirectory, "public", "introduction", "index.html"),
+          to: path.resolve(__dirname, "dist", frontendDirectory, "introduction", "index.html"),
+          noErrorOnMissing: true,
+          transform(content, absoluteFrom) {
+            console.log(`[CopyPlugin Info] Processing for introduction: ${absoluteFrom}`);
+            return content;
+          },
+        },
+        {
+          from: path.resolve(__dirname, "src", frontendDirectory, "public", "introduction", "styles.css"),
+          to: path.resolve(__dirname, "dist", frontendDirectory, "introduction", "styles.css"),
+          noErrorOnMissing: true,
+        },
+        {
+          from: path.resolve(__dirname, "src", frontendDirectory, "public", "introduction", "particles.css"), // Assuming this is the correct name
+          to: path.resolve(__dirname, "dist", frontendDirectory, "introduction", "particles.css"),
+          noErrorOnMissing: true,
+        },
+        // Add any other specific files from 'introduction' directory here if needed
+
+        // Copy other assets from the main public directory
+        {
+          from: path.resolve(__dirname, "src", frontendDirectory, "public"),
           to: path.resolve(__dirname, "dist", frontendDirectory),
           globOptions: {
-            ignore: ["**/index.html"], // Exclude index.html if it's already handled by HtmlWebpackPlugin
+            dot: true, // copy dotfiles like .well-known
+            ignore: [
+              // Ignore the root public/index.html (handled by HtmlWebpackPlugin)
+              path.resolve(__dirname, "src", frontendDirectory, "public", "index.html"),
+              // Ignore the entire introduction directory (handled by specific copies above)
+              path.resolve(__dirname, "src", frontendDirectory, "public", "introduction") + '/**',
+            ],
           },
           noErrorOnMissing: true,
         },
@@ -274,3 +303,4 @@ module.exports = {
     asyncWebAssembly: true,
   },
 };
+

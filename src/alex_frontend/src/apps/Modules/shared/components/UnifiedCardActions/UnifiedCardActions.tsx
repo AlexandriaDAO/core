@@ -135,6 +135,14 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
     return `${(rarity / 100).toFixed(2)}%`;
   };
 
+  // Helper to format LBRY balance as dollars
+  const formatLbryToDollars = (lbryAmount: string | undefined): string => {
+    if (!lbryAmount) return "";
+    const numericAmount = parseFloat(lbryAmount);
+    if (isNaN(numericAmount)) return "";
+    return `$${(numericAmount / 100).toFixed(2)}`;
+  };
+
   // Conditions for showing badges
   const rarityFormatted = formatRarityDisplay(rarityPercentage);
 
@@ -150,6 +158,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
   const showLbryBadge = !!lbryBalance && parseFloat(lbryBalance) > 0;
   // Show rarity badge if it's an NFT by collection type and has a valid, formatted rarity string
   const showRarityBadge = isItemAnNftCollection && rarityFormatted !== "";
+  const lbryDollarAmount = formatLbryToDollars(lbryBalance);
 
   // --- Log evaluated conditions ---
   console.log(`[UnifiedCardActions Debug] showAlexBadge: ${showAlexBadge}, showLbryBadge: ${showLbryBadge}, showRarityBadge: ${showRarityBadge}`);
@@ -439,7 +448,6 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
               className="text-[10px] h-6 px-2 py-1 bg-gradient-to-br from-yellow-400 via-amber-500 to-yellow-600 text-black border border-yellow-700 shadow-md flex items-center font-semibold"
               title={`Rarity: ${rarityFormatted}`}
             >
-              <Percent className="h-3 w-3 mr-1 text-black/80" />
               {rarityFormatted}
             </Badge>
           )}
@@ -448,13 +456,21 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
           {(showAlexBadge || showLbryBadge) && (
             <div className="flex flex-row items-center space-x-0.5 mt-0.5">
               {showAlexBadge && (
-                <Badge variant="secondary" className="text-[8px] h-4 px-1 py-0 bg-blue-600/50 hover:bg-blue-600/60 text-blue-100 border-blue-700/70 shadow-sm">
-                  {formatBalance(alexBalance!)} ALEX
+                <Badge 
+                  variant="secondary" 
+                  className="text-[8px] h-4 px-1 py-0 bg-gradient-to-br from-gold-400 via-yellow-500 to-gold-600 text-black border border-yellow-700 shadow-sm"
+                  title={`ALEX Balance: ${alexBalance}`}
+                >
+                  {alexBalance} ALEX
                 </Badge>
               )}
               {showLbryBadge && (
-                <Badge variant="secondary" className="text-[8px] h-4 px-1 py-0 bg-purple-600/50 hover:bg-purple-600/60 text-purple-100 border-purple-700/70 shadow-sm">
-                  {formatBalance(lbryBalance!)} LBRY
+                <Badge 
+                  variant="secondary" 
+                  className="text-[8px] h-4 px-1 py-0 bg-gradient-to-br from-gold-400 via-yellow-500 to-gold-600 text-black border border-yellow-700 shadow-sm"
+                  title={`LBRY Balance: ${lbryBalance} (approx. ${lbryDollarAmount})`}
+                >
+                  {lbryDollarAmount}
                 </Badge>
               )}
             </div>

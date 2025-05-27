@@ -35,7 +35,7 @@
             <g id="content" transform="translate(400, 300)">
                 <!-- Alexandria title -->
                 <text id="title" class="title-text" x="0" y="-120">Alexandria</text>
-                <text id="subtitle" class="subtitle-text" x="0" y="-80">Universal Content Unit</text>
+                <text id="subtitle" class="subtitle-text" x="0" y="-80">A Universal Content Protocol</text>
                 
                 <!-- Alexandria main node (center) with click group -->
                 <g id="clickable-node" style="cursor: pointer;">
@@ -47,11 +47,11 @@
                 <!-- Замінюємо блок alexandria-info з елементами -->
                 <g id="alexandria-info" style="opacity: 0; pointer-events: none;">
                     <text id="top-typewriter" class="typewriter-text" x="0" y="-100" text-anchor="middle">
-                        <tspan x="0" dy="0" text-anchor="middle">Alexandria is a blockchain-powered platform for evolving knowledge and shared insight.</tspan>
+                        <tspan x="0" dy="0" text-anchor="middle">Alexandria is the 100% Blockchain-Powered Library</tspan>
                     </text>
                     
                     <text id="bottom-typewriter" class="typewriter-text" x="0" y="100" opacity="0" text-anchor="middle">
-                        <tspan x="0" dy="0" text-anchor="middle">It's more than data — it's a living network of ideas, perspectives, and continuous discovery.</tspan>
+                        <tspan x="0" dy="0" text-anchor="middle">It does for files what Bitcoin did for money.</tspan>
                     </text>
                 </g>
 
@@ -61,8 +61,12 @@
 
             <!-- Додати typewriter текст для мережевого графа -->
             <text id="network-typewriter" class="typewriter-text" x="400" y="30" text-anchor="middle" opacity="0">
-                <tspan x="400" dy="0" text-anchor="middle">Alexandria is a decentralized hub that brings together knowledge in all forms - from books and videos to NFTs</tspan>
-                <tspan x="400" dy="25" text-anchor="middle">and business resources - into a single interconnected network.</tspan>
+                <tspan x="400" dy="0" text-anchor="middle">All content types (books, video, text, image, audio...) One format. Stored forever.</tspan>
+                <tspan x="400" dy="25" text-anchor="middle">Every Alexandria Post is its own:</tspan>
+                <tspan x="400" dy="1.8em" text-anchor="middle" style="font-size: 0.9em;">"Asset" : It is owned by someone.</tspan>
+                <tspan x="400" dy="1.5em" text-anchor="middle" style="font-size: 0.9em;">"Business" : Earns money whenever re-used.</tspan>
+                <tspan x="400" dy="1.5em" text-anchor="middle" style="font-size: 0.9em;">"Bank" : Holds money on behalf of its creator.</tspan>
+                <tspan x="400" dy="1.5em" text-anchor="middle" style="font-size: 0.9em;">"NFT" : Permanent and tradable.</tspan>
             </text>
         </svg>
         
@@ -2563,9 +2567,10 @@
                 const otherNodes = networkGraph.querySelectorAll('circle:not([r="42"]), circle:not([r="70"]), circle:not([r="90"]), circle:not([r="150"])');
                 const links = networkGraph.querySelectorAll('.network-link');
                 const labels = networkGraph.querySelectorAll('.network-label');
+                const tokenomicsLabel = networkGraph.querySelectorAll('.tokenomics-text');
                 
                 // Приховуємо інші елементи
-                gsap.to([otherNodes, links, labels], {
+                gsap.to([otherNodes, links, labels, tokenomicsLabel], {
                     opacity: 0.2,
                     duration: 0.3,
                     ease: "power2.out"
@@ -2661,7 +2666,7 @@
                 // Функція для створення багатьох маленьких частинок
                 function createManyParticles() {
                     // Приховуємо всі елементи графа повністю
-                    gsap.to([otherNodes, links, labels], {
+                    gsap.to([otherNodes, links, labels, tokenomicsLabel], {
                         opacity: 0,
                         duration: 0.5,
                         ease: "power2.out"

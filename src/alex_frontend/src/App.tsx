@@ -17,10 +17,10 @@ import { ThemeProvider } from "./providers/ThemeProvider";
 export default function App() {
     const [isReady, setIsReady] = useState(false);
 
-    useEffect(() => {
-        const introduced = localStorage.getItem('IntroductionShown');
-		if(!introduced) window.location.href = "/introduction"
-    }, []);
+    // useEffect(() => {
+    //     const introduced = localStorage.getItem('IntroductionShown');
+	// 	if(!introduced) window.location.href = "/introduction"
+    // }, []);
 
 
     // costs a re render

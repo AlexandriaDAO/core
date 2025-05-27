@@ -16,6 +16,7 @@ import {
   TimestampCursor,
   QueryError
 } from './serviceTypes';
+import { toast } from "sonner";
 
 /**
  * Get all shelves for a user (Paginated)
@@ -154,6 +155,12 @@ export async function createShelf(title: string, description?: string, tags?: st
     if ("Ok" in result) {
       return { Ok: result.Ok };
     } else {
+      // Check for specific error message related to insufficient balance
+      if (result.Err.includes("Not enough balance") || result.Err.includes("Shelves cost 50 LBRY to create")) {
+        toast.error("Failed to create shelf: Not enough balance. Shelves cost 50 LBRY to create. Please add to your top-up account.");
+      } else {
+        toast.error(`Failed to create shelf: ${result.Err}`);
+      }
       return { Err: result.Err };
     }
   } catch (error) {
