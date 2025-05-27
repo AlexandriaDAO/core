@@ -46,7 +46,7 @@ pub use query::follows::{
 };
 pub use query::shelves::{
     get_shelf, get_shelf_items, get_shelf_position_metrics, get_shelves_by_tag,
-    get_shelves_containing_nft,
+    get_nft_shelf_appearances, NFTAppearancesResult,
     get_user_shelves, get_recent_shelves, get_shuffled_by_hour_feed,
     get_followed_users_feed, get_followed_tags_feed,
     ShelfPositionMetrics

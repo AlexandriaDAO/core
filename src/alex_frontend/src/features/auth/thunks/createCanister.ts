@@ -61,7 +61,7 @@ export const createCanister = createAsyncThunk<
 				}
 			}
 
-			const result = await assetManagerActor.create_asset_canister([]);
+			const result = await assetManagerActor.create_asset_canister();
 
 			if ("Ok" in result) {
 				return result.Ok.toString();

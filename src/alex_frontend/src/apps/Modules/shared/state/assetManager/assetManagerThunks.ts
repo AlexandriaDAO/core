@@ -62,7 +62,7 @@ export const createAssetCanister = createAsyncThunk<
         }
       }
 
-      const result = await actor.create_asset_canister([]);
+      const result = await actor.create_asset_canister();
 
       if ("Ok" in result) {
         return result.Ok.toString();

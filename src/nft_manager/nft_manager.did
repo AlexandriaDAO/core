@@ -24,6 +24,7 @@ type Value = variant {
 service : () -> {
   arweave_id_to_nat : (text) -> (nat) query;
   coordinate_mint : (text, opt principal) -> (Result);
+  deduct_asset_canister_creation_fee : (principal) -> (Result_1);
   deduct_marketplace_fee : (principal) -> (Result_1);
   deduct_shelf_creation_fee : (principal) -> (Result_1);
   deduct_upload_fee : (principal, nat64) -> (Result_2);

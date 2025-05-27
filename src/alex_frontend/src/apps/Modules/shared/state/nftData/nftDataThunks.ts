@@ -713,6 +713,48 @@ export const fetchNFTBatch = createAsyncThunk<void, void, { state: RootState }>(
   }
 );
 
+export const fetchNftShelfAppearances = createAsyncThunk<
+  void,
+  { nftId: string; arweaveId: string }, 
+  { state: RootState }
+>(
+  "nftData/fetchNftShelfAppearances", 
+  async ({ nftId, arweaveId }, { dispatch }) => {
+    dispatch(setLoading(true)); // Set loading true at the beginning
+    dispatch(setError(null)); // Clear previous errors
+    try {
+      const result = await perpetua.get_nft_shelf_appearances(nftId); // This is the call to the backend
+      console.log(`[fetchNftShelfAppearances thunk] Received from backend for ID ${nftId} (ArweaveID: ${arweaveId}):`, result);
+      
+      if ('Ok' in result) {
+        // Dispatch with the new payload structure, which updateNftAppearsIn now expects
+        dispatch(updateNftAppearsIn({
+          initiatingNftId: nftId, 
+          arweaveId: arweaveId,    
+          trueOriginalNumericId: result.Ok.original_id_used, 
+          appearsIn: result.Ok.shelves 
+        }));
+        console.log(`[fetchNftShelfAppearances thunk] Dispatched updateNftAppearsIn with arweaveId: ${arweaveId}, trueOriginalNumericId: ${result.Ok.original_id_used}, appearsIn:`, result.Ok.shelves);
+      } else if ('Err' in result) {
+        console.error(`[fetchNftShelfAppearances thunk] Backend error for ID ${nftId} (ArweaveID: ${arweaveId}):`, result.Err);
+        dispatch(setError(result.Err));
+      } else {
+        console.error(`[fetchNftShelfAppearances thunk] Unexpected response structure for ID ${nftId} (ArweaveID: ${arweaveId}):`, result);
+        dispatch(setError("Unexpected response structure from backend."));
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      console.error(`[fetchNftShelfAppearances thunk] Catch block Error for ID ${nftId} (ArweaveID: ${arweaveId}):`, errorMessage, error);
+      dispatch(setError(errorMessage));
+    } finally {
+      dispatch(setLoading(false)); // Set loading false at the end
+    }
+  }
+);
+
+// Deprecated: Old thunk, will be removed or updated if still used elsewhere.
+// For now, keeping it commented out for reference during transition.
+/*
 export const fetchShelvesContainingNft = createAsyncThunk<
   void,
   { nftId: string; arweaveId: string },
@@ -734,3 +776,4 @@ export const fetchShelvesContainingNft = createAsyncThunk<
     }
   }
 );
+*/

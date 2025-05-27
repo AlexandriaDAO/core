@@ -4,6 +4,8 @@ use candid::Principal;
 use sha2::{Sha256, Digest};
 use bs58;
 
+pub mod id_conversion;
+
 pub async fn generate_shelf_id(caller: &Principal) -> String {
     // Get current timestamp in nanoseconds from IC
     let timestamp = time();

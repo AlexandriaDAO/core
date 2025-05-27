@@ -41,6 +41,10 @@ type CursorPaginationInput_3 = record {
 type CursorPaginationInput_4 = record { cursor : opt text; limit : nat64 };
 type Item = record { id : nat32; content : ItemContent };
 type ItemContent = variant { Nft : text; Shelf : text; Markdown : text };
+type NFTAppearancesResult = record {
+  original_id_used : text;
+  shelves : vec text;
+};
 type OffsetPaginatedResult = record {
   offset : nat;
   limit : nat64;
@@ -58,18 +62,19 @@ type QueryError = variant {
 };
 type Result = variant { Ok; Err : text };
 type Result_1 = variant { Ok : CursorPaginatedResult; Err : QueryError };
-type Result_10 = variant { Ok : CursorPaginatedResult_4; Err : QueryError };
-type Result_11 = variant { Ok : OffsetPaginatedResult; Err : QueryError };
-type Result_12 = variant { Ok : bool; Err : text };
-type Result_13 = variant { Ok : text; Err : text };
+type Result_10 = variant { Ok : CursorPaginatedResult_3; Err : QueryError };
+type Result_11 = variant { Ok : CursorPaginatedResult_4; Err : QueryError };
+type Result_12 = variant { Ok : OffsetPaginatedResult; Err : QueryError };
+type Result_13 = variant { Ok : bool; Err : text };
+type Result_14 = variant { Ok : text; Err : text };
 type Result_2 = variant { Ok : vec text; Err : QueryError };
 type Result_3 = variant { Ok : vec principal; Err : QueryError };
-type Result_4 = variant { Ok : CursorPaginatedResult_1; Err : QueryError };
-type Result_5 = variant { Ok : vec ShelfPublic; Err : QueryError };
-type Result_6 = variant { Ok : ShelfPublic; Err : QueryError };
-type Result_7 = variant { Ok : CursorPaginatedResult_2; Err : QueryError };
-type Result_8 = variant { Ok : ShelfPositionMetrics; Err : text };
-type Result_9 = variant { Ok : CursorPaginatedResult_3; Err : QueryError };
+type Result_4 = variant { Ok : NFTAppearancesResult; Err : text };
+type Result_5 = variant { Ok : CursorPaginatedResult_1; Err : QueryError };
+type Result_6 = variant { Ok : vec ShelfPublic; Err : QueryError };
+type Result_7 = variant { Ok : ShelfPublic; Err : QueryError };
+type Result_8 = variant { Ok : CursorPaginatedResult_2; Err : QueryError };
+type Result_9 = variant { Ok : ShelfPositionMetrics; Err : text };
 type ShelfPositionMetrics = record {
   min_gap : float64;
   avg_gap : float64;
@@ -104,29 +109,29 @@ service : {
   get_followed_users_feed : (CursorPaginationInput) -> (Result_1) query;
   get_my_followed_tags : () -> (Result_2) query;
   get_my_followed_users : () -> (Result_3) query;
-  get_popular_tags : (CursorPaginationInput_1) -> (Result_4) query;
-  get_public_shelves_by_tag : (text) -> (Result_5) query;
+  get_nft_shelf_appearances : (text) -> (Result_4) query;
+  get_popular_tags : (CursorPaginationInput_1) -> (Result_5) query;
+  get_public_shelves_by_tag : (text) -> (Result_6) query;
   get_recent_shelves : (CursorPaginationInput) -> (Result_1) query;
-  get_shelf : (text) -> (Result_6) query;
-  get_shelf_items : (text, CursorPaginationInput_2) -> (Result_7) query;
-  get_shelf_position_metrics : (text) -> (Result_8) query;
-  get_shelves_by_tag : (text, CursorPaginationInput_3) -> (Result_9) query;
-  get_shelves_containing_nft : (text) -> (vec text) query;
-  get_shuffled_by_hour_feed : (nat64) -> (Result_5) query;
+  get_shelf : (text) -> (Result_7) query;
+  get_shelf_items : (text, CursorPaginationInput_2) -> (Result_8) query;
+  get_shelf_position_metrics : (text) -> (Result_9) query;
+  get_shelves_by_tag : (text, CursorPaginationInput_3) -> (Result_10) query;
+  get_shuffled_by_hour_feed : (nat64) -> (Result_6) query;
   get_storyline_feed : (CursorPaginationInput) -> (Result_1) query;
   get_tag_shelf_count : (text) -> (nat64) query;
-  get_tags_with_prefix : (text, CursorPaginationInput_4) -> (Result_10) query;
+  get_tags_with_prefix : (text, CursorPaginationInput_4) -> (Result_11) query;
   get_user_publicly_editable_shelves : (principal, OffsetPaginationInput) -> (
-      Result_11,
+      Result_12,
     ) query;
-  get_user_shelves : (principal, OffsetPaginationInput) -> (Result_11) query;
-  is_shelf_public : (text) -> (Result_12) query;
+  get_user_shelves : (principal, OffsetPaginationInput) -> (Result_12) query;
+  is_shelf_public : (text) -> (Result_13) query;
   remove_item_from_shelf : (text, nat32) -> (Result);
   remove_tag_from_shelf : (TagOperationInput) -> (Result);
   reorder_profile_shelf : (text, opt text, bool) -> (Result);
   reset_profile_order : () -> (Result);
   set_item_order : (text, vec nat32) -> (Result);
-  store_shelf : (text, opt text, vec Item, opt vec text) -> (Result_13);
+  store_shelf : (text, opt text, vec Item, opt vec text) -> (Result_14);
   toggle_shelf_public_access : (text, bool) -> (Result);
   unfollow_tag : (text) -> (Result);
   unfollow_user : (principal) -> (Result);

@@ -4,6 +4,7 @@ use crate::storage::{Item, ItemContent, ShelfData, SHELF_DATA, NFT_SHELVES, Shel
 use crate::storage::common_types::{MAX_NFT_ID_LENGTH, MAX_ITEMS_PER_SHELF, MAX_MARKDOWN_LENGTH, MAX_APPEARS_IN_COUNT, SHELF_ITEM_STEP_SIZE};
 use crate::guard::not_anon;
 use crate::update::utils::{verify_nft_ownership};
+use crate::utils::id_conversion;
 
 // --- Helper function for deep circular reference check ---
 // Checks if adding 'shelf_to_evaluate_id' into 'target_parent_id' would create a cycle.
@@ -99,32 +100,50 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
 
     // 3. Validate input.content and prepare related data for commit
     let mut prepared_nested_shelf_data_update: Option<(ShelfId, ShelfData)> = None;
-    let mut prepared_nft_shelves_update: Option<(String, StringVec)> = None;
+    // This variable will store the intent to add a specific shelf_id to an NFT's list.
+    let mut nft_shelf_addition_intent: Option<(String, ShelfId)> = None;
 
     match &input.content {
-        ItemContent::Nft(ref nft_id) => {
-            if nft_id.chars().any(|c| !c.is_digit(10)) {
+        ItemContent::Nft(ref nft_id_from_input) => {
+            ic_cdk::println!("[add_item_to_shelf] Received ItemContent::Nft with nft_id_from_input: {}", nft_id_from_input);
+            if nft_id_from_input.chars().any(|c| !c.is_digit(10)) {
                 return Err("Invalid NFT ID: Contains non-digit characters.".to_string());
             }
-            if nft_id.len() > MAX_NFT_ID_LENGTH { 
+            if nft_id_from_input.len() > MAX_NFT_ID_LENGTH { 
                 return Err(format!("NFT ID exceeds maximum length of {} characters", MAX_NFT_ID_LENGTH));
             }
-            let is_owner = verify_nft_ownership(nft_id, caller).await?;
+            let is_owner = verify_nft_ownership(nft_id_from_input, caller).await?;
             if !is_owner {
                 return Err("Unauthorized: You can only add NFTs that you own".to_string());
             }
-            NFT_SHELVES.with(|nft_shelves_map_ref| {
-                let map = nft_shelves_map_ref.borrow();
-                let mut shelves_for_nft = map.get(nft_id).unwrap_or_default();
-                if !shelves_for_nft.0.contains(&shelf_id) {
-                    if shelves_for_nft.0.len() < MAX_NFT_REFERENCES {
-                        shelves_for_nft.0.push(shelf_id.clone());
-                        prepared_nft_shelves_update = Some((nft_id.to_string(), shelves_for_nft));
+            
+            let key_for_nft_shelves = id_conversion::get_original_nft_id_for_storage(nft_id_from_input);
+            ic_cdk::println!("[add_item_to_shelf] Preparing NFT_SHELVES update for key: {}", key_for_nft_shelves);
+
+            let decision = NFT_SHELVES.with(|map_ref| {
+                let map = map_ref.borrow();
+                if let Some(existing_shelves) = map.get(&key_for_nft_shelves) { // .get() clones from StableBTreeMap
+                    if existing_shelves.0.contains(&shelf_id) {
+                        Ok::<bool, String>(false) // Already present, no update needed
+                    } else if existing_shelves.0.len() >= MAX_NFT_REFERENCES {
+                        ic_cdk::println!("NFT {} reference limit ({}) reached. Not adding shelf {} to NFT_SHELVES.", key_for_nft_shelves, MAX_NFT_REFERENCES, shelf_id);
+                        Ok::<bool, String>(false) // Limit reached
                     } else {
-                        ic_cdk::println!("NFT {} reference limit ({}) reached for shelf {}. Not adding shelf to NFT_SHELVES.", nft_id, MAX_NFT_REFERENCES, shelf_id);
+                        Ok::<bool, String>(true) // Needs to be added
+                    }
+                } else { // Key doesn't exist
+                    if MAX_NFT_REFERENCES > 0 {
+                        Ok::<bool, String>(true) // Needs to be added (new key)
+                    } else {
+                        ic_cdk::println!("NFT {} reference limit ({}) is zero. Not adding new shelf {} to NFT_SHELVES.", key_for_nft_shelves, MAX_NFT_REFERENCES, shelf_id);
+                        Ok::<bool, String>(false) // Limit is zero, cannot add
                     }
                 }
-            });
+            })?;
+
+            if decision {
+                nft_shelf_addition_intent = Some((key_for_nft_shelves.clone(), shelf_id.clone()));
+            }
         }
         ItemContent::Shelf(ref nested_shelf_id) => {
             // The direct self-reference (A cannot contain A) is implicitly handled by would_create_cycle
@@ -193,9 +212,26 @@ pub async fn add_item_to_shelf(shelf_id: String, input: AddItemInput) -> Result<
         });
     }
 
-    if let Some((id, string_vec)) = prepared_nft_shelves_update {
-        NFT_SHELVES.with(|n| {
-            n.borrow_mut().insert(id, string_vec);
+    if let Some((key, shelf_to_add)) = nft_shelf_addition_intent {
+        NFT_SHELVES.with(|map_ref| {
+            let mut map = map_ref.borrow_mut();
+            
+            // Get the current list of shelves for the NFT, or a default (empty) if it's not present.
+            let mut current_shelves = map.get(&key).unwrap_or_default(); // StringVec::default() is an empty Vec
+
+            // Defensive checks, though prepare phase should have ideally caught these.
+            if !current_shelves.0.contains(&shelf_to_add) {
+                if current_shelves.0.len() < MAX_NFT_REFERENCES {
+                    current_shelves.0.push(shelf_to_add.clone()); // Add the new shelf
+                    map.insert(key.clone(), current_shelves); // Re-insert the modified list
+                } else {
+                    // This indicates a potential issue if prepare checks passed but limit is hit here.
+                    ic_cdk::println!("[add_item_to_shelf] Commit: MAX_NFT_REFERENCES ({}) reached for key '{}' when trying to add shelf '{}'. This might indicate a state change between prepare and commit or a logic flaw.", MAX_NFT_REFERENCES, key, shelf_to_add);
+                }
+            } else {
+                 // Optional: Log if it was already present, though prepare phase should have handled this.
+                 // ic_cdk::println!("[add_item_to_shelf] Commit: Shelf '{}' already present for key '{}'. No update needed.", shelf_to_add, key);
+            }
         });
     }
 
@@ -253,15 +289,16 @@ pub async fn remove_item_from_shelf(shelf_id: ShelfId, item_id: u32) -> Result<(
                 }
             });
         }
-        ItemContent::Nft(ref nft_id) => {
+        ItemContent::Nft(ref nft_id_on_shelf) => {
+            let key_for_nft_shelves = id_conversion::get_original_nft_id_for_storage(nft_id_on_shelf);
             NFT_SHELVES.with(|nft_shelves_map_ref| {
-                if let Some(mut shelves_for_nft) = nft_shelves_map_ref.borrow().get(nft_id).map(|sv| sv.clone()) {
+                if let Some(mut shelves_for_nft) = nft_shelves_map_ref.borrow().get(&key_for_nft_shelves).map(|sv| sv.clone()) {
                     let initial_len = shelves_for_nft.0.len();
                     shelves_for_nft.0.retain(|id| id != &shelf_id);
                     if shelves_for_nft.0.is_empty() {
-                        prepared_nft_shelves_update = Some((nft_id.to_string(), None));
+                        prepared_nft_shelves_update = Some((key_for_nft_shelves.clone(), None));
                     } else if shelves_for_nft.0.len() != initial_len {
-                        prepared_nft_shelves_update = Some((nft_id.to_string(), Some(shelves_for_nft)));
+                        prepared_nft_shelves_update = Some((key_for_nft_shelves.clone(), Some(shelves_for_nft)));
                     }
                 }
             });

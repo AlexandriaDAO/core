@@ -1,4 +1,4 @@
-use candid::{CandidType, Principal, Nat};
+use candid::{CandidType, Principal, Nat, Deserialize};
 use ic_cdk;
 use std::ops::Bound;
 
@@ -17,12 +17,14 @@ use crate::storage::{
     UserProfileOrder, 
     RANDOM_SHELF_CANDIDATES, 
     TagShelfCreationTimelineKey, TAG_SHELF_CREATION_TIMELINE_INDEX, 
-    ShelfMetadata, ShelfContent // Still useful for type hints if ShelfData is deconstructed
+    ShelfMetadata, ShelfContent, // Still useful for type hints if ShelfData is deconstructed
+    StringVec, // Ensure StringVec is imported if not already
 };
 // Import necessary types from types module
 // use crate::types::TagShelfAssociationKey; // Comment out, no longer primary key for this query
 // Import utils
 use crate::utils::normalize_tag;
+use crate::utils::id_conversion;
 // Import types/functions from the parent query module
 use super::follows::{ 
     // Add Offset types back for get_user_shelves
@@ -43,6 +45,12 @@ pub struct ShelfPositionMetrics {
     pub min_gap: f64,
     pub avg_gap: f64,
     pub max_gap: f64,
+}
+
+#[derive(CandidType, Deserialize)]
+pub struct NFTAppearancesResult {
+    pub shelves: Vec<ShelfId>,
+    pub original_id_used: String,
 }
 
 
@@ -126,13 +134,6 @@ pub fn get_shelf_position_metrics(shelf_id: ShelfId) -> Result<ShelfPositionMetr
             Err(format!("Shelf with ID '{}' not found", shelf_id))
         }
     })
-}
-
-/// Query to find all shelves that contain a specific NFT ID.
-/// Returns an empty list if the NFT is not found in any tracked shelves.
-#[ic_cdk::query]
-pub fn get_shelves_containing_nft(nft_id: String) -> Vec<ShelfId> {
-    NFT_SHELVES.with(|nft_shelves| nft_shelves.borrow().get(&nft_id).map_or(Vec::new(), |sv| sv.0.clone()))
 }
 
 // --- Functions moved from query.rs ---
@@ -674,5 +675,25 @@ pub fn get_user_publicly_editable_shelves(
 
                 Ok(OffsetPaginatedResult { items, total_count: Nat::from(total_count), limit: limit as u64, offset: Nat::from(offset) })
             })
+    })
+}
+
+#[ic_cdk::query]
+pub fn get_nft_shelf_appearances(user_provided_id: String) -> Result<NFTAppearancesResult, String> {
+    ic_cdk::println!("[get_nft_shelf_appearances] Received user_provided_id: {}", user_provided_id);
+    let key_to_query = id_conversion::get_original_nft_id_for_storage(&user_provided_id);
+    ic_cdk::println!("[get_nft_shelf_appearances] Derived key_to_query: {}", key_to_query);
+    
+    NFT_SHELVES.with(|nft_shelves_map_ref| {
+        match nft_shelves_map_ref.borrow().get(&key_to_query) {
+            Some(string_vec) => Ok(NFTAppearancesResult {
+                shelves: string_vec.0.clone(),
+                original_id_used: key_to_query.clone(),
+            }),
+            None => Ok(NFTAppearancesResult {
+                shelves: Vec::new(),
+                original_id_used: key_to_query.clone(), // Still return the ID that would have been used
+            }),
+        }
     })
 }

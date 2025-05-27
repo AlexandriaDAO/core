@@ -1,133 +1,129 @@
-```
-
-Perpetua/
-├── features/
-│   ├── cards/
-│   │   ├── components/
-│   │   │   ├── BaseShelfList.tsx (448 lines)
-│   │   │   ├── ContentDisplays.tsx (92 lines)
-│   │   │   ├── NftDisplay.tsx (138 lines)
-│   │   │   ├── ShelfBlogView.tsx (191 lines)
-│   │   │   ├── ShelfCard.tsx (281 lines)
-│   │   │   ├── ShelfContentCard.tsx (194 lines)
-│   │   │   ├── ShelfContentModal.tsx (111 lines)
-│   │   │   ├── ShelfDetailView.tsx (245 lines)
-│   │   │   ├── ShelfEmptyView.tsx (32 lines)
-│   │   │   ├── ShelfGridView.tsx (57 lines)
-│   │   │   ├── ShelfViewControls.tsx (251 lines)
-│   │   │   ├── ShelfViewHeader.tsx (101 lines)
-│   │   │   └── index.ts (9 lines)
-│   │   ├── hooks/
-│   │   │   ├── index.ts (1 lines)
-│   │   │   └── useNftData.ts (156 lines)
-│   │   └── utils/
-│   │       ├── ShelfViewUtils.ts (32 lines)
-│   │       └── itemUtils.ts (47 lines)
-│   ├── following/
-│   │   ├── components/
-│   │   │   ├── FollowedTagsList.tsx (93 lines)
-│   │   │   ├── FollowedUserBadge.tsx (56 lines)
-│   │   │   └── FollowedUsersList.tsx (80 lines)
-│   │   └── hooks/
-│   │       └── useFollowStatus.ts (193 lines)
-│   ├── shared/
-│   │   └── reordering/
-│   │       ├── components/
-│   │       │   ├── ItemReorderManager.tsx (22 lines)
-│   │       │   ├── ReorderableContainer.tsx (63 lines)
-│   │       │   ├── ReorderableGrid.tsx (97 lines)
-│   │       │   ├── ReorderableList.tsx (80 lines)
-│   │       │   └── index.ts (4 lines)
-│   │       ├── hooks/
-│   │       │   ├── index.ts (4 lines)
-│   │       │   ├── useDragAndDrop.ts (111 lines)
-│   │       │   ├── useItemReordering.ts (90 lines)
-│   │       │   ├── useReorderable.ts (142 lines)
-│   │       │   └── useShelfReordering.ts (69 lines)
-│   │       └── utils/
-│   │           ├── createReorderAdapter.ts (59 lines)
-│   │           └── reorderUtils.ts (32 lines)
-│   ├── shelf-information/
-│   │   └── components/
-│   │       └── ShelfInformationDialog.tsx (144 lines)
-│   ├── shelf-management/
-│   │   ├── components/
-│   │   │   ├── InlineItemCreator.tsx (350 lines)
-│   │   │   ├── NewShelf.tsx (154 lines)
-│   │   │   ├── RemoveItemButton.tsx (98 lines)
-│   │   │   ├── ShelfContent.tsx (90 lines)
-│   │   │   ├── ShelfOption.tsx (31 lines)
-│   │   │   └── ShelfSelectionDialog.tsx (564 lines)
-│   │   ├── containers/
-│   │   │   ├── ShelfDetailContainer.tsx (277 lines)
-│   │   │   └── ShelfLists.tsx (264 lines)
-│   │   └── hooks/
-│   │       ├── index.ts (4 lines)
-│   │       ├── useAddToShelf.ts (148 lines)
-│   │       ├── usePublicShelfOperations.ts (62 lines)
-│   │       └── useShelfOperations.ts (205 lines)
-│   ├── shelf-settings/
-│   │   ├── components/
-│   │   │   ├── GeneralSettingsTab.tsx (241 lines)
-│   │   │   ├── PublicAccessSection.tsx (70 lines)
-│   │   │   ├── ShelfInformationSection.tsx (117 lines)
-│   │   │   ├── ShelfLinkItem.tsx (34 lines)
-│   │   │   ├── ShelfSettingsDialog.tsx (96 lines)
-│   │   │   ├── TagsSection.tsx (132 lines)
-│   │   │   └── index.ts (6 lines)
-│   │   ├── hooks/
-│   │   │   ├── index.ts (1 lines)
-│   │   │   └── useShelfMetrics.ts (38 lines)
-│   │   ├── index.ts (2 lines)
-│   │   ├── types.ts (63 lines)
-│   │   └── utils/
-│   │       └── tagValidation.ts (47 lines)
-│   └── tags/
-│       ├── components/
-│       │   ├── PopularTagsList.tsx (93 lines)
-│       │   ├── TagFilterDisplay.tsx (38 lines)
-│       │   └── TagSearchBar.tsx (106 lines)
-│       ├── containers/
-│       │   └── FilteredShelfListContainer.tsx (113 lines)
-│       ├── hooks/
-│       │   ├── useTagActions.ts (51 lines)
-│       │   └── useTagData.ts (37 lines)
-│       └── index.ts (1 lines)
-├── hooks/
-│   └── useContentPermissions.ts (66 lines)
-├── index.tsx (21 lines)
-├── layouts/
-│   └── PerpetuaLayout.tsx (437 lines)
-├── routes.ts (119 lines)
-├── state/
-│   ├── cache/
-│   │   └── ShelvesCache.ts (210 lines)
-│   ├── hooks/
-│   │   ├── index.ts (3 lines)
-│   │   ├── usePerpetuaActions.ts (123 lines)
-│   │   └── usePerpetuaSelectors.ts (48 lines)
-│   ├── index.ts (41 lines)
-│   ├── perpetuaSlice.ts (983 lines)
-│   ├── services/
-│   │   ├── followService.ts (276 lines)
-│   │   ├── index.ts (7 lines)
-│   │   ├── itemService.ts (209 lines)
-│   │   ├── serviceTypes.ts (39 lines)
-│   │   ├── shelfService.ts (332 lines)
-│   │   └── tagService.ts (308 lines)
-│   ├── thunks/
-│   │   ├── followThunks.ts (91 lines)
-│   │   ├── index.ts (6 lines)
-│   │   ├── itemThunks.ts (117 lines)
-│   │   ├── queryThunks.ts (326 lines)
-│   │   ├── reorderThunks.ts (128 lines)
-│   │   ├── shelfThunks.ts (125 lines)
-├── types/
-│   ├── reordering.types.ts (69 lines)
-│   └── shelf.types.ts (77 lines)
-└── utils.tsx (128 lines)
-Syllogos/
-└── index.tsx (27 lines)
+│   │   │   │       ├── Perpetua/
+│   │   │   │       │   ├── features/
+│   │   │   │       │   │   ├── cards/
+│   │   │   │       │   │   │   ├── components/
+│   │   │   │       │   │   │   │   ├── BaseShelfList.tsx (448 lines)
+│   │   │   │       │   │   │   │   ├── ContentDisplays.tsx (92 lines)
+│   │   │   │       │   │   │   │   ├── NftDisplay.tsx (138 lines)
+│   │   │   │       │   │   │   │   ├── ShelfBlogView.tsx (191 lines)
+│   │   │   │       │   │   │   │   ├── ShelfCard.tsx (281 lines)
+│   │   │   │       │   │   │   │   ├── ShelfContentCard.tsx (194 lines)
+│   │   │   │       │   │   │   │   ├── ShelfContentModal.tsx (111 lines)
+│   │   │   │       │   │   │   │   ├── ShelfDetailView.tsx (245 lines)
+│   │   │   │       │   │   │   │   ├── ShelfEmptyView.tsx (32 lines)
+│   │   │   │       │   │   │   │   ├── ShelfGridView.tsx (57 lines)
+│   │   │   │       │   │   │   │   ├── ShelfViewControls.tsx (251 lines)
+│   │   │   │       │   │   │   │   ├── ShelfViewHeader.tsx (141 lines)
+│   │   │   │       │   │   │   │   └── index.ts (9 lines)
+│   │   │   │       │   │   │   ├── hooks/
+│   │   │   │       │   │   │   │   ├── index.ts (1 lines)
+│   │   │   │       │   │   │   │   └── useNftData.ts (156 lines)
+│   │   │   │       │   │   │   └── utils/
+│   │   │   │       │   │   │       ├── ShelfViewUtils.ts (32 lines)
+│   │   │   │       │   │   │       └── itemUtils.ts (47 lines)
+│   │   │   │       │   │   ├── following/
+│   │   │   │       │   │   │   ├── components/
+│   │   │   │       │   │   │   │   ├── FollowedTagsList.tsx (81 lines)
+│   │   │   │       │   │   │   │   ├── FollowedUserBadge.tsx (56 lines)
+│   │   │   │       │   │   │   │   └── FollowedUsersList.tsx (63 lines)
+│   │   │   │       │   │   │   └── hooks/
+│   │   │   │       │   │   │       └── useFollowStatus.ts (193 lines)
+│   │   │   │       │   │   ├── shared/
+│   │   │   │       │   │   │   └── reordering/
+│   │   │   │       │   │   │       ├── components/
+│   │   │   │       │   │   │       │   ├── ItemReorderManager.tsx (22 lines)
+│   │   │   │       │   │   │       │   ├── ReorderableContainer.tsx (63 lines)
+│   │   │   │       │   │   │       │   ├── ReorderableGrid.tsx (97 lines)
+│   │   │   │       │   │   │       │   ├── ReorderableList.tsx (80 lines)
+│   │   │   │       │   │   │       │   └── index.ts (4 lines)
+│   │   │   │       │   │   │       ├── hooks/
+│   │   │   │       │   │   │       │   ├── index.ts (4 lines)
+│   │   │   │       │   │   │       │   ├── useDragAndDrop.ts (111 lines)
+│   │   │   │       │   │   │       │   ├── useItemReordering.ts (90 lines)
+│   │   │   │       │   │   │       │   ├── useReorderable.ts (142 lines)
+│   │   │   │       │   │   │       │   └── useShelfReordering.ts (69 lines)
+│   │   │   │       │   │   │       └── utils/
+│   │   │   │       │   │   │           ├── createReorderAdapter.ts (59 lines)
+│   │   │   │       │   │   │           └── reorderUtils.ts (32 lines)
+│   │   │   │       │   │   ├── shelf-information/
+│   │   │   │       │   │   │   └── components/
+│   │   │   │       │   │   │       └── ShelfInformationDialog.tsx (144 lines)
+│   │   │   │       │   │   ├── shelf-management/
+│   │   │   │       │   │   │   ├── components/
+│   │   │   │       │   │   │   │   ├── InlineItemCreator.tsx (387 lines)
+│   │   │   │       │   │   │   │   ├── NewShelf.tsx (154 lines)
+│   │   │   │       │   │   │   │   ├── RemoveItemButton.tsx (98 lines)
+│   │   │   │       │   │   │   │   ├── ShelfContent.tsx (90 lines)
+│   │   │   │       │   │   │   │   ├── ShelfOption.tsx (31 lines)
+│   │   │   │       │   │   │   │   └── ShelfSelectionDialog.tsx (796 lines)
+│   │   │   │       │   │   │   ├── containers/
+│   │   │   │       │   │   │   │   ├── ShelfDetailContainer.tsx (277 lines)
+│   │   │   │       │   │   │   │   └── ShelfLists.tsx (268 lines)
+│   │   │   │       │   │   │   └── hooks/
+│   │   │   │       │   │   │       ├── index.ts (4 lines)
+│   │   │   │       │   │   │       ├── useAddToShelf.ts (180 lines)
+│   │   │   │       │   │   │       ├── usePublicShelfOperations.ts (65 lines)
+│   │   │   │       │   │   │       └── useShelfOperations.ts (205 lines)
+│   │   │   │       │   │   ├── shelf-settings/
+│   │   │   │       │   │   │   ├── components/
+│   │   │   │       │   │   │   │   ├── GeneralSettingsTab.tsx (241 lines)
+│   │   │   │       │   │   │   │   ├── PublicAccessSection.tsx (70 lines)
+│   │   │   │       │   │   │   │   ├── ShelfInformationSection.tsx (117 lines)
+│   │   │   │       │   │   │   │   ├── ShelfLinkItem.tsx (34 lines)
+│   │   │   │       │   │   │   │   ├── ShelfSettingsDialog.tsx (96 lines)
+│   │   │   │       │   │   │   │   ├── TagsSection.tsx (132 lines)
+│   │   │   │       │   │   │   │   └── index.ts (6 lines)
+│   │   │   │       │   │   │   ├── hooks/
+│   │   │   │       │   │   │   │   ├── index.ts (1 lines)
+│   │   │   │       │   │   │   │   └── useShelfMetrics.ts (38 lines)
+│   │   │   │       │   │   │   ├── index.ts (2 lines)
+│   │   │   │       │   │   │   ├── types.ts (63 lines)
+│   │   │   │       │   │   │   └── utils/
+│   │   │   │       │   │   │       └── tagValidation.ts (47 lines)
+│   │   │   │       │   │   └── tags/
+│   │   │   │       │   │       ├── components/
+│   │   │   │       │   │       │   ├── PopularTagsList.tsx (94 lines)
+│   │   │   │       │   │       │   ├── TagFilterDisplay.tsx (38 lines)
+│   │   │   │       │   │       │   └── TagSearchBar.tsx (106 lines)
+│   │   │   │       │   │       ├── containers/
+│   │   │   │       │   │       │   └── FilteredShelfListContainer.tsx (113 lines)
+│   │   │   │       │   │       ├── hooks/
+│   │   │   │       │   │       │   ├── useTagActions.ts (51 lines)
+│   │   │   │       │   │       │   └── useTagData.ts (37 lines)
+│   │   │   │       │   │       └── index.ts (1 lines)
+│   │   │   │       │   ├── hooks/
+│   │   │   │       │   │   └── useContentPermissions.ts (66 lines)
+│   │   │   │       │   ├── index.tsx (21 lines)
+│   │   │   │       │   ├── layouts/
+│   │   │   │       │   │   └── PerpetuaLayout.tsx (500 lines)
+│   │   │   │       │   ├── routes.ts (119 lines)
+│   │   │   │       │   ├── state/
+│   │   │   │       │   │   ├── cache/
+│   │   │   │       │   │   │   └── ShelvesCache.ts (210 lines)
+│   │   │   │       │   │   ├── hooks/
+│   │   │   │       │   │   │   ├── index.ts (3 lines)
+│   │   │   │       │   │   │   ├── usePerpetuaActions.ts (123 lines)
+│   │   │   │       │   │   │   └── usePerpetuaSelectors.ts (48 lines)
+│   │   │   │       │   │   ├── index.ts (41 lines)
+│   │   │   │       │   │   ├── perpetuaSlice.ts (983 lines)
+│   │   │   │       │   │   ├── services/
+│   │   │   │       │   │   │   ├── followService.ts (276 lines)
+│   │   │   │       │   │   │   ├── index.ts (7 lines)
+│   │   │   │       │   │   │   ├── itemService.ts (215 lines)
+│   │   │   │       │   │   │   ├── serviceTypes.ts (39 lines)
+│   │   │   │       │   │   │   ├── shelfService.ts (387 lines)
+│   │   │   │       │   │   │   └── tagService.ts (308 lines)
+│   │   │   │       │   │   ├── thunks/
+│   │   │   │       │   │   │   ├── followThunks.ts (91 lines)
+│   │   │   │       │   │   │   ├── index.ts (6 lines)
+│   │   │   │       │   │   │   ├── itemThunks.ts (117 lines)
+│   │   │   │       │   │   │   ├── queryThunks.ts (326 lines)
+│   │   │   │       │   │   │   ├── reorderThunks.ts (128 lines)
+│   │   │   │       │   │   │   ├── shelfThunks.ts (125 lines)
+│   │   │   │       │   ├── types/
+│   │   │   │       │   │   ├── reordering.types.ts (69 lines)
+│   │   │   │       │   │   └── shelf.types.ts (77 lines)
+│   │   │   │       │   └── utils.tsx (128 lines)
 
 
 // perpetua/ backend.
@@ -175,9 +171,21 @@ perpetua/
 
 
 
+Experience:
+- 'Explore' feed that:
+  - Picks and shows an SBT
+  - Has a 50% chance of triggering an if statement
+    - If triggered
+      - Show 1 of the shelves that NFT appears-in.
+    - Else
+      - Go to start.
 
+How-to.
 
-
+- To pick SBTs, use icrc7_scion canister. Then use icrc7_total_supply, pick an number with even randomness from 1-total_supply,  then use icrc7_tokens: (opt nat, opt nat) → (vec nat) query | Where the first parameter is the index and the second is the amount of results.
+    - TokenAdapter.ts already implements these as utility functions.
+- To figure out the NFT id from the SBT id use the backend function from nft_manager/src/id_converter.rs: scion_to_og_id(scion_id: Nat)
+- To get the shelf
 
 
 

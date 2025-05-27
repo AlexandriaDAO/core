@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store';
-import { fetchShelvesContainingNft } from '../state/nftData/nftDataThunks';
+import {
+  fetchNftShelfAppearances
+} from '../state/nftData/nftDataThunks';
 import { NFTData } from '../types/nft';
 
 export const useNftAppearsIn = (nft: NFTData | null | undefined) => {
@@ -24,7 +26,7 @@ export const useNftAppearsIn = (nft: NFTData | null | undefined) => {
   useEffect(() => {
     
     if (arweaveIdFromProp && nftStoreKey && (typeof appearsIn === 'undefined' || fetchInitiatedForArweaveId !== arweaveIdFromProp)) {
-      dispatch(fetchShelvesContainingNft({ nftId: nftStoreKey, arweaveId: arweaveIdFromProp }));
+      dispatch(fetchNftShelfAppearances({ nftId: nftStoreKey, arweaveId: arweaveIdFromProp }));
       setFetchInitiatedForArweaveId(arweaveIdFromProp);
     } else if (arweaveIdFromProp && !nftStoreKey) {
         console.warn(`[useNftAppearsIn useEffect] Arweave ID "${arweaveIdFromProp}" present, but no nftStoreKey found in arweaveToNftId map. Cannot fetch appearsIn data. Full map:`, useSelector((state: RootState) => state.nftData.arweaveToNftId));

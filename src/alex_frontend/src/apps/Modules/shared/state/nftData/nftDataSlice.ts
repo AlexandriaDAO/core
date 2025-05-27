@@ -10,6 +10,13 @@ interface NFTDataState {
   arweaveToNftId: Record<string, string>;
 }
 
+interface UpdateNftAppearsInPayload {
+  initiatingNftId: string; 
+  arweaveId: string; 
+  trueOriginalNumericId: string; 
+  appearsIn: string[];
+}
+
 const initialState: NFTDataState = {
   nfts: {},
   loading: false,
@@ -27,18 +34,35 @@ const nftDataSlice = createSlice({
       state.nfts = { ...state.nfts, ...action.payload };
       // Update arweaveToNftId mapping
       Object.entries(action.payload).forEach(([tokenId, nft]) => {
-        state.arweaveToNftId[nft.arweaveId] = tokenId;
+        if (nft.arweaveId) { // Ensure arweaveId exists
+            state.arweaveToNftId[nft.arweaveId] = tokenId;
+        }
       });
     },
-    updateNftAppearsIn: (state, action: PayloadAction<{ nftId: string; appearsIn: string[] }>) => {
-      const { nftId, appearsIn } = action.payload;
-      console.log(`[updateNftAppearsIn reducer] Called with nftId (storeKey): ${nftId}, appearsIn:`, appearsIn);
-      if (state.nfts[nftId]) {
-        console.log(`[updateNftAppearsIn reducer] NFT found in state for storeKey ${nftId}. Old appears_in:`, state.nfts[nftId].appears_in);
-        state.nfts[nftId].appears_in = appearsIn;
-        console.log(`[updateNftAppearsIn reducer] NFT updated for storeKey ${nftId}. New appears_in:`, state.nfts[nftId].appears_in);
-      } else {
-        console.warn(`[updateNftAppearsIn reducer] NFT with storeKey ${nftId} not found in state.nfts. Cannot update appears_in.`);
+    updateNftAppearsIn: (state, action: PayloadAction<UpdateNftAppearsInPayload>) => {
+      const { arweaveId, appearsIn, trueOriginalNumericId, initiatingNftId } = action.payload;
+      console.log(`[updateNftAppearsIn reducer] Called for arweaveId: ${arweaveId}, trueOriginalNumericId: ${trueOriginalNumericId}, initiatingNftId: ${initiatingNftId}, appearsIn:`, appearsIn);
+
+      let foundMatch = false;
+      Object.keys(state.nfts).forEach(key => {
+        if (state.nfts[key].arweaveId === arweaveId) {
+          foundMatch = true;
+          // console.log(`[updateNftAppearsIn reducer] Updating appears_in for NFT key ${key} (ArweaveID: ${arweaveId}). Old:`, state.nfts[key].appears_in);
+          state.nfts[key].appears_in = appearsIn;
+        }
+      });
+      if (!foundMatch) {
+        console.warn(`[updateNftAppearsIn reducer] No NFT found in state with arweaveId: ${arweaveId}. initiatingNftId: ${initiatingNftId}, trueOriginalNumericId: ${trueOriginalNumericId}`);
+        // Fallback: if somehow no arweaveId match, update the initiatingNftId if it exists, 
+        // and the trueOriginalNumericId if it exists, as a safety net.
+        if (state.nfts[initiatingNftId]) {
+            // console.log(`[updateNftAppearsIn reducer] Fallback: Updating appears_in for initiatingNftId ${initiatingNftId}`);
+            state.nfts[initiatingNftId].appears_in = appearsIn;
+        }
+        if (trueOriginalNumericId && state.nfts[trueOriginalNumericId] && initiatingNftId !== trueOriginalNumericId) {
+            // console.log(`[updateNftAppearsIn reducer] Fallback: Also updating appears_in for trueOriginalNumericId ${trueOriginalNumericId}`);
+            state.nfts[trueOriginalNumericId].appears_in = appearsIn;
+        }
       }
     },
     updateNftBalances: (state, action: PayloadAction<NFTBalances>) => {
