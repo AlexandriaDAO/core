@@ -8,12 +8,18 @@ import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import { flagHandler } from "../../swapSlice";
 import stakeAlex from "../../thunks/stakeAlex";
 import StakedInfo from "./stakeInfo";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, HelpCircle } from "lucide-react";
 import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
 import ErrorModal from "../errorModal";
 import { Entry } from "@/layouts/parts/Header";
 import { useAlex, useIcpSwap } from "@/hooks/actors";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/lib/components/tooltip";
 
 const StakeContent = () => {
     const {actor: actorAlex} = useAlex();
@@ -135,8 +141,31 @@ const StakeContent = () => {
                             </h2>
                             <ul className='ps-0'>
                                 <li className='mb-4'>
-                                    <div className='flex justify-between'>
-                                        <strong className='sm:text-lg xs:text-sm text-radiocolor dark:text-white font-semibold me-1'>Estimated Returns</strong>
+                                    <div className='flex justify-between items-center'>
+                                        <div className="flex items-center">
+                                            <strong className='sm:text-lg xs:text-sm text-radiocolor dark:text-white font-semibold me-1'>Estimated Returns</strong>
+                                            <TooltipProvider>
+                                                <Tooltip delayDuration={100}>
+                                                    <TooltipTrigger asChild>
+                                                        <span className="ml-1 cursor-help">
+                                                            <HelpCircle
+                                                                size={16}
+                                                                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                                                            />
+                                                        </span>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent className="max-w-xs">
+                                                        <p className="text-sm">
+                                                            APY is an estimate using: <br />
+                                                            1. Average rewards from the last 24 distribution cycles (typically hourly). <br />
+                                                            2. Current ICP & ALEX USD prices for conversion. <br />
+                                                            The reward pool mechanism aims to adjust by approximately 1% each cycle (emit or drain). <br />
+                                                            Future returns can vary.
+                                                        </p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        </div>
                                         <div className='text-right'>
                                             <div className='flex flex-col items-end'>
                                                 <div>

@@ -55,9 +55,8 @@ pub async fn deduct_shelf_creation_fee(user_principal: Principal) -> Result<Stri
 #[update(guard = "not_anon")]
 pub async fn deduct_asset_canister_creation_fee(user_principal: Principal) -> Result<String, String> {
     let burn_result = burn_lbry(user_principal, Nat::from(LBRY_ASSET_CANISTER_CREATION_COST_E8S)).await;
-    if let Err(_e) = burn_result {
-        // It's important to provide a clear error message to the user.
-        return Err(format!("Failed to deduct asset canister creation fee ({} LBRY). Check your top-up balance.", LBRY_ASSET_CANISTER_CREATION_COST));
+    if let Err(e) = burn_result {
+        return Err(format!("Asset canister creation fee deduction failed: {}. (Cost: {} LBRY)", e, LBRY_ASSET_CANISTER_CREATION_COST));
     }
     Ok("Asset canister creation fee successfully deducted.".to_string())
 }
@@ -71,7 +70,6 @@ async fn burn_lbry(from: Principal, amount: Nat) -> Result<(), String> {
         amount
     )
     .await
-    .map_err(|_| "Failed to burn LBRY tokens (transfer to ICP_SWAP failed)".to_string())
 }
 
 // This one is used for minting an original NFT (burns 1 LBRY).

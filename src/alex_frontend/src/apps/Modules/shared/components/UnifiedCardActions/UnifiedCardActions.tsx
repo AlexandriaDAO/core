@@ -74,8 +74,155 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
   // const { checkEditAccess } = useContentPermissions(); // Removed
   // const { isFollowingUser, toggleFollowUser } = useFollowStatus(); // Removed
 
-  // --- Access NFT Data for Badges ---
-  // const allNfts = useSelector((state: RootState) => state.nftData.nfts); // Keep for now if other parts rely on it directly, but try to minimize.
+  // --- Early exit for non-NFT/Arweave content types ---
+  if (contentType === 'Shelf' || contentType === 'Markdown') {
+    // For Shelf and Markdown, no NFT-specific badges or direct mint actions are relevant.
+    // We only need to consider the "Add to Shelf" action.
+    const canAddToShelfOnly = isLoggedIn;
+
+    if (!canAddToShelfOnly) {
+      return null; // Nothing to display if user can't even add to shelf
+    }
+
+    const stopPropagation = (e: React.MouseEvent | React.TouchEvent | Event) => {
+      e.stopPropagation();
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+    };
+
+    const handleAddToShelfClickOnly = (e: React.MouseEvent) => {
+      stopPropagation(e);
+      if (!isLoggedIn) {
+        toast.error("Please log in to add items to a shelf.");
+        return;
+      }
+      if (!createShelf) {
+        toast.error("Shelf management actions are currently unavailable.");
+        return;
+      }
+      setAddToShelfContext({
+        originalContentId: contentId,
+        originalContentType: contentType as 'Shelf' | 'Markdown',
+        initialIsOwned: isOwned,
+        isSafe: true,
+        currentShelfId: currentShelfId
+      });
+    };
+
+    // Simplified processAddToShelfInBackground for Shelf/Markdown
+    const processAddToShelfInBackgroundOnly = async (selectedShelfIds: string[]) => {
+      if (!addToShelfContext) {
+        toast.error("An unexpected error occurred (missing context).");
+        return;
+      }
+      if (selectedShelfIds.length === 0) return;
+
+      const { originalContentId, originalContentType } = addToShelfContext;
+      setIsProcessingAddToShelf(true);
+
+      const allEditableShelves = getEditableShelves();
+      const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => ({
+        ...normalizedShelf,
+        owner: Principal.fromText(normalizedShelf.owner),
+        created_at: BigInt(normalizedShelf.created_at),
+        updated_at: BigInt(normalizedShelf.updated_at)
+      } as ShelfPublic);
+      const denormalizedShelves = allEditableShelves.map(denormalizeShelf);
+      const shelfDetailsMap = new Map(denormalizedShelves.map(shelf => [shelf.shelf_id, shelf]));
+
+      // Type assertion for this specific codepath
+      const validatedContentType = originalContentType as 'Shelf' | 'Markdown';
+
+      try {
+        const addPromises = selectedShelfIds.map(shelfId =>
+          addContentToShelf(shelfId, originalContentId, validatedContentType, undefined)
+            .then(result => ({ ...result, shelfId }))
+            .catch(error => ({ status: 'error', message: error?.message || "Unknown error", shelfId }))
+        );
+        const results = await Promise.allSettled(addPromises);
+        results.forEach(result => {
+          let shelfId: string | undefined;
+          let shelfName = 'selected shelf';
+          if (result.status === 'fulfilled') {
+            shelfId = result.value.shelfId;
+            const shelfInfo = shelfDetailsMap.get(shelfId);
+            shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`;
+            if (result.value.status === 'success') {
+              toast.success(`Successfully added ${validatedContentType.toLowerCase()} to '${shelfName}'.`);
+            } else if (result.value.status === 'error') {
+              toast.error(`Failed to add ${validatedContentType.toLowerCase()} to '${shelfName}': ${result.value.message}`);
+            } else if (result.value.status === 'already_on_shelf') {
+              toast.info(`${validatedContentType} is already on '${shelfName}'.`);
+            }
+          } else {
+            const reason = result.reason as any;
+            shelfId = reason?.shelfId;
+            const shelfInfo = shelfId ? shelfDetailsMap.get(shelfId) : undefined;
+            shelfName = shelfInfo?.title || `shelf ID ${shelfId || 'unknown'}`;
+            const errorMessage = reason?.message || reason?.toString() || "An unknown error occurred";
+            toast.error(`Failed to add ${validatedContentType.toLowerCase()} to '${shelfName}': ${errorMessage}`);
+          }
+        });
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "An unexpected error occurred while adding the item(s).");
+      } finally {
+        setIsProcessingAddToShelf(false);
+        setAddToShelfContext(null);
+      }
+    };
+
+    return (
+      <>
+        {canAddToShelfOnly && (
+          <div
+            className={containerClassName !== undefined ? containerClassName : "absolute right-3 top-0 z-30 flex flex-col items-end space-y-1"}
+          >
+            <div
+              className={`cursor-pointer ${className ?? ""}`}
+              onClick={isProcessingAddToShelf ? undefined : handleAddToShelfClickOnly}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+              aria-label={isProcessingAddToShelf ? "Adding to shelf..." : "Add to shelf"}
+              title="Add to Shelf"
+            >
+              <div className="relative">
+                <div className="absolute top-0.5 right-0 h-10 w-8 bg-black/30 rounded-b-md blur-[1px]"></div>
+                <div className="relative h-10 w-8 bg-black/75 transition-colors duration-150 rounded-b-md">
+                  <div className="h-full w-full flex items-center justify-center pt-1">
+                    {isProcessingAddToShelf ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
+                    ) : (
+                      <Bookmark
+                        className={`h-5 w-5 transition-colors duration-150 ${isHovering ? 'text-brightyellow' : 'text-white dark:text-brightyellow'}`}
+                        fill={isHovering ? 'currentColor' : 'none'}
+                        strokeWidth={isHovering ? 2.5 : 2}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {addToShelfContext && (
+          <ShelfSelectionDialog
+            currentShelfId={addToShelfContext.currentShelfId}
+            open={!!addToShelfContext}
+            onConfirmSelection={processAddToShelfInBackgroundOnly}
+            onClose={() => {
+              setAddToShelfContext(null);
+              setIsProcessingAddToShelf(false);
+            }}
+            onCreateShelf={createShelf}
+          />
+        )}
+      </>
+    );
+  }
+  // --- End of early exit ---
+
+  // --- Access NFT Data for Badges --- (This part will only be reached for Nft/Arweave types)
   const arweaveToNftId = useSelector((state: RootState) => state.nftData.arweaveToNftId);
 
   const actualNftTokenId = React.useMemo(() => {
@@ -84,8 +231,6 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
     } else if (contentType === 'Nft') {
       return contentId;
     }
-    // For 'Arweave' type, if not in arweaveToNftId, it remains undefined.
-    // For 'Markdown' or 'Shelf', it also remains undefined.
     return undefined;
   }, [contentId, contentType, arweaveToNftId]);
 
@@ -109,7 +254,6 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
       balancesEqual = left.balances.alex === right.balances.alex && 
                       left.balances.lbry === right.balances.lbry;
     } else {
-      // One has balances, the other doesn't
       balancesEqual = false;
     }
 
@@ -120,69 +264,56 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
     );
   });
 
-  // Fallback if allNfts is still needed elsewhere, otherwise it can be removed.
-  // For nftDataItem, prefer using the more granularly selected `nftDetails`.
-  // const nftDataItem = actualNftTokenId ? useSelector((state: RootState) => state.nftData.nfts[actualNftTokenId]) : undefined;
-  // Let's adjust logic to use nftDetails primarily.
+  const alexBalance = React.useMemo(() => nftDetails?.balances?.alex, [nftDetails]);
+  const lbryBalance = React.useMemo(() => nftDetails?.balances?.lbry, [nftDetails]);
+  const rarityPercentage = React.useMemo(() => nftDetails?.rarityPercentage, [nftDetails]);
+  const isItemAnNftCollection = React.useMemo(() => nftDetails?.collection === 'NFT', [nftDetails]);
 
-  const alexBalance = nftDetails?.balances?.alex;
-  const lbryBalance = nftDetails?.balances?.lbry;
-  const rarityPercentage = nftDetails?.rarityPercentage;
-  const isItemAnNftCollection = nftDetails?.collection === 'NFT';
-
-
-  // Helper to format rarity percentage
-  const formatRarityDisplay = (rarity: number | undefined): string => {
-    if (rarity === undefined || rarity === null || rarity < 0) { // Handles "not ranked" (-1) or undefined
-      return ""; // Don't display if not ranked or not available
+  const formatRarityDisplay = React.useCallback((rarity: number | undefined): string => {
+    if (rarity === undefined || rarity === null || rarity < 0) {
+      return "";
     }
     return `${(rarity / 100).toFixed(2)}%`;
-  };
+  }, []);
 
-  // Helper to format LBRY balance as dollars
-  const formatLbryToDollars = (lbryAmount: string | undefined): string => {
+  const formatLbryToDollars = React.useCallback((lbryAmount: string | undefined): string => {
     if (!lbryAmount) return "";
     const numericAmount = parseFloat(lbryAmount);
     if (isNaN(numericAmount)) return "";
     return `$${(numericAmount / 100).toFixed(2)}`;
-  };
+  }, []);
 
-  // Conditions for showing badges
-  const rarityFormatted = formatRarityDisplay(rarityPercentage);
+  const rarityFormatted = React.useMemo(() => formatRarityDisplay(rarityPercentage), [formatRarityDisplay, rarityPercentage]);
+  const lbryDollarAmount = React.useMemo(() => formatLbryToDollars(lbryBalance), [formatLbryToDollars, lbryBalance]);
 
-  // --- Log values for badge conditions ---
-  console.log(`[UnifiedCardActions Debug] contentId: ${contentId}, contentType: ${contentType}`);
-  console.log(`[UnifiedCardActions Debug] actualNftTokenId: ${actualNftTokenId}`);
-  console.log(`[UnifiedCardActions Debug] nftDetails:`, nftDetails);
-  console.log(`[UnifiedCardActions Debug] alexBalance: ${alexBalance}, lbryBalance: ${lbryBalance}, rarityPercentage: ${rarityPercentage}`);
-  console.log(`[UnifiedCardActions Debug] isItemAnNftCollection: ${isItemAnNftCollection}`);
-  console.log(`[UnifiedCardActions Debug] rarityFormatted: ${rarityFormatted}`);
-
-  const showAlexBadge = !!alexBalance && parseFloat(alexBalance) > 0;
-  const showLbryBadge = !!lbryBalance && parseFloat(lbryBalance) > 0;
-  // Show rarity badge if it's an NFT by collection type and has a valid, formatted rarity string
-  const showRarityBadge = isItemAnNftCollection && rarityFormatted !== "";
-  const lbryDollarAmount = formatLbryToDollars(lbryBalance);
-
-  // --- Log evaluated conditions ---
-  console.log(`[UnifiedCardActions Debug] showAlexBadge: ${showAlexBadge}, showLbryBadge: ${showLbryBadge}, showRarityBadge: ${showRarityBadge}`);
-
+  const showAlexBadge = React.useMemo(() => !!alexBalance && parseFloat(alexBalance) > 0, [alexBalance]);
+  const showLbryBadge = React.useMemo(() => !!lbryBalance && parseFloat(lbryBalance) > 0, [lbryBalance]);
+  const showRarityBadge = React.useMemo(() => isItemAnNftCollection && rarityFormatted !== "", [isItemAnNftCollection, rarityFormatted]);
 
   // --- Determine Action Availability ---
+  const conditionsMetForPotentialMint = React.useMemo(() => 
+    !isOwned && (contentType === 'Nft' || contentType === 'Arweave'), 
+    [isOwned, contentType]
+  );
 
-  // Condition for an item being potentially mintable (unowned NFT or Arweave)
-  const conditionsMetForPotentialMint = !isOwned && (contentType === 'Nft' || contentType === 'Arweave');
+  const canAddToShelf = React.useMemo(() => 
+    isLoggedIn && (!conditionsMetForPotentialMint || isSafeForMinting), 
+    [isLoggedIn, conditionsMetForPotentialMint, isSafeForMinting]
+  );
 
-  // Can Add to Shelf: User must be logged in.
-  // If the item is potentially mintable, it must also be safe for minting.
-  const canAddToShelf = isLoggedIn && (!conditionsMetForPotentialMint || isSafeForMinting);
+  const canDirectMint = React.useMemo(() => 
+    isLoggedIn && conditionsMetForPotentialMint && isSafeForMinting, 
+    [isLoggedIn, conditionsMetForPotentialMint, isSafeForMinting]
+  );
 
-  // Condition for showing the direct mint button
-  const canDirectMint = isLoggedIn && conditionsMetForPotentialMint && isSafeForMinting;
-
-  // Determine if anything at all needs to be rendered
-  const shouldShowAnyBadge = showAlexBadge || showLbryBadge || showRarityBadge;
-  const shouldShowAnyActionButton = canAddToShelf || canDirectMint;
+  const shouldShowAnyBadge = React.useMemo(() => 
+    showAlexBadge || showLbryBadge || showRarityBadge, 
+    [showAlexBadge, showLbryBadge, showRarityBadge]
+  );
+  const shouldShowAnyActionButton = React.useMemo(() => 
+    canAddToShelf || canDirectMint, 
+    [canAddToShelf, canDirectMint]
+  );
 
   if (!shouldShowAnyBadge && !shouldShowAnyActionButton) {
     return null; // Return null only if there's absolutely nothing to display
@@ -234,7 +365,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
             finalContentType = 'Nft';
             return { finalContentId, finalContentType, mintStatus: mintResult.status };
         } else {
-            console.error(`[UnifiedCardActions] Minting failed: ${mintResult.message}`);
+            // console.error(`[UnifiedCardActions] Minting failed: ${mintResult.message}`);
             return { finalContentId: originalContentId, finalContentType: originalContentType as any, mintStatus: 'error', mintMessage: mintResult.message || "Failed to acquire item." };
         }
     }
@@ -255,18 +386,18 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
     // Check safety for Arweave content IF it's not owned
     if (contentType === 'Arweave' && !isOwned && !isSafeForMinting) {
         toast.error("Cannot add potentially unsafe content.");
-        console.warn(`[UnifiedCardActions] Add to shelf blocked for unsafe Arweave content: ${contentId}`);
+        // console.warn(`[UnifiedCardActions] Add to shelf blocked for unsafe Arweave content: ${contentId}`);
         return;
     }
 
     // Check if the createShelf function is available before opening
     if (!createShelf) {
-        console.error("[UnifiedCardActions] Shelf creation function is unavailable. Cannot open dialog.");
+        // console.error("[UnifiedCardActions] Shelf creation function is unavailable. Cannot open dialog.");
         toast.error("Shelf management actions are currently unavailable.");
         return;
     }
 
-    console.log(`[UnifiedCardActions] Initiating add to shelf for ${contentType} ID: ${contentId}, Owned: ${isOwned}, Safe: ${isSafeForMinting}`);
+    // console.log(`[UnifiedCardActions] Initiating add to shelf for ${contentType} ID: ${contentId}, Owned: ${isOwned}, Safe: ${isSafeForMinting}`);
     setAddToShelfContext({
         originalContentId: contentId,
         originalContentType: contentType,
@@ -284,12 +415,12 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
     }
     // console.log("[UnifiedCardActions] processAddToShelfInBackground called. Selected IDs:", selectedShelfIds, "Context exists:", !!addToShelfContext);
     if (!addToShelfContext) {
-        console.error("[UnifiedCardActions] Background process called without context.");
+        // console.error("[UnifiedCardActions] Background process called without context.");
         toast.error("An unexpected error occurred (missing context).");
         return;
     }
     if (selectedShelfIds.length === 0) {
-        console.warn("[UnifiedCardActions] Background process called with empty selection.");
+        // console.warn("[UnifiedCardActions] Background process called with empty selection.");
         return; // Nothing to do
     }
 
@@ -381,7 +512,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
                 } else if (result.value.status === 'already_on_shelf') { // Handle new status
                     toast.info(`Item is already on '${shelfName}'.`);
                 } else {
-                    console.warn("Unexpected fulfilled status:", result.value);
+                    // console.warn("Unexpected fulfilled status:", result.value);
                     toast.error(`An unexpected issue occurred when adding to '${shelfName}'.`);
                 }
             } else { // result.status === 'rejected'
@@ -395,7 +526,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
         });
 
     } catch (error) {
-        console.error("[UnifiedCardActions] Error during background add-to-shelf process:", error);
+        // console.error("[UnifiedCardActions] Error during background add-to-shelf process:", error);
         // Avoid double-toasting if minting failed and threw
         if (!(error instanceof Error && error.message === "Minting failed")) {
            toast.error(error instanceof Error ? error.message : "An unexpected error occurred while adding the item(s).");
@@ -426,7 +557,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
     //     return;
     // }
 
-    console.log(`[UnifiedCardActions] Initiating direct mint for ${contentType} ID: ${contentId}`);
+    // console.log(`[UnifiedCardActions] Initiating direct mint for ${contentType} ID: ${contentId}`);
     setIsProcessingDirectMint(true);
 
     try {
@@ -443,7 +574,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
         toast.error(mintingOutcome.mintMessage || "Minting failed. Please try again.");
       }
     } catch (error) {
-      console.error("[UnifiedCardActions] Error during direct mint process:", error);
+      // console.error("[UnifiedCardActions] Error during direct mint process:", error);
       toast.error(error instanceof Error ? error.message : "An unexpected error occurred during minting.");
     } finally {
       setIsProcessingDirectMint(false);
