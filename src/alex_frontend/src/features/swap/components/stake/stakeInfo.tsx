@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useAppDispatch } from '../../../../store/hooks/useAppDispatch';
 import { useAppSelector } from "../../../../store/hooks/useAppSelector";
-import { useTheme } from "@/providers/ThemeProvider";
 
 import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
 import getStakeInfo from "../../thunks/getStakedInfo";
@@ -10,6 +9,7 @@ import Unstake from "./unstake";
 import getALlStakesInfo from "../../thunks/getAllStakesInfo";
 import getStakersCount from "../../thunks/getStakersCount";
 import getAverageApy from "../../thunks/getAverageApy";
+import { useAlex, useIcpSwap } from "@/hooks/actors";
 interface StakedInfoProps {
     setLoadingModalV: any;
     setActionType: any;
@@ -19,21 +19,23 @@ const StakedInfo: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
     const { user } = useAppSelector((state) => state.auth);
-    const { theme } = useTheme();
+    const { actor: actorSwap } = useIcpSwap();
+    const { actor: actorAlex } = useAlex();
 
     useEffect(() => {
+        if(!actorSwap || !actorAlex) return;
+        if(user) dispatch(getStakeInfo({actor: actorSwap, account: user.principal}));
+        dispatch(getStakersCount(actorSwap));
+        dispatch(getALlStakesInfo(actorAlex));
+        dispatch(getAverageApy(actorSwap));
 
-        if(user) dispatch(getStakeInfo(user.principal));
-        dispatch(getStakersCount());
-        dispatch(getALlStakesInfo());
-        dispatch(getAverageApy());
-
-    }, [user])
+    }, [user, actorSwap, actorAlex])
     useEffect(() => {
+        if(!actorSwap || !actorAlex) return;
         if (swap.successStake === true || swap.unstakeSuccess === true || swap.successClaimReward === true) {
-            if(user) dispatch(getStakeInfo(user.principal))
-            dispatch(getALlStakesInfo())
-            dispatch(getStakersCount())
+            if(user) dispatch(getStakeInfo({actor: actorSwap, account: user.principal}))
+            dispatch(getALlStakesInfo(actorAlex))
+            dispatch(getStakersCount(actorSwap))
         }
     }, [user, swap])
 

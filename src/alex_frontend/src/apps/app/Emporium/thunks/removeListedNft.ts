@@ -1,20 +1,23 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getActorEmporium } from "@/features/auth/utils/authUtils";
 import { arweaveIdToNat } from "@/utils/id_convert";
 import {
   removeTransaction,
   setTransactions,
 } from "@/apps/Modules/shared/state/transactions/transactionSlice";
+import { _SERVICE as _SERVICE_EMPORIUM} from "../../../../../../declarations/emporium/emporium.did";
+import { ActorSubclass } from "@dfinity/agent";
 
 const removeListedNft = createAsyncThunk<
   string, // Success return type
-  string,
+  {
+    actorEmporium: ActorSubclass<_SERVICE_EMPORIUM>,
+    nftArweaveId: string,
+  },
   { rejectValue: string } // Reject type
 >(
   "emporium/removeListedNft",
-  async (nftArweaveId, { dispatch, rejectWithValue }) => {
+  async ({ actorEmporium, nftArweaveId }, { dispatch, rejectWithValue }) => {
     try {
-      const actorEmporium = await getActorEmporium();
       const tokenId = arweaveIdToNat(nftArweaveId);
       const result = await actorEmporium.remove_nft_listing(tokenId);
 

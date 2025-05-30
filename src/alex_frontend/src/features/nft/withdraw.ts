@@ -1,22 +1,16 @@
-import { getNftManagerActor, getAuthClient } from "@/features/auth/utils/authUtils";
-import { Principal } from '@dfinity/principal';
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../declarations/nft_manager/nft_manager.did";
 
 // Define collection type for better type safety
 export type NftCollection = 'icrc7' | 'icrc7_scion';
 
 export const withdraw_nft = async (
-  mintNumber: string, 
+  actor: ActorSubclass<_SERVICE>,
+  mintNumber: string,
   collection?: NftCollection
 ): Promise<[bigint | null, bigint | null]> => {
   console.log("withdraw_nft called with mintNumber:", mintNumber, "collection:", collection);
-  
   try {
-    // Get necessary actors and client
-    const client = await getAuthClient();
-    if (!await client.isAuthenticated()) {
-      throw new Error("You must be authenticated to withdraw NFT funds");
-    }
-
     // Validate and convert mintNumber to bigint
     if (!mintNumber || mintNumber.trim() === '') {
       throw new Error("Mint number cannot be empty");
@@ -27,8 +21,7 @@ export const withdraw_nft = async (
     const mintNumberBigInt = BigInt(cleanedNumber);
 
     // Call the backend withdraw function with collection
-    const actorNftManager = await getNftManagerActor();
-    const result = await actorNftManager.withdraw(
+    const result = await actor.withdraw(
       mintNumberBigInt, 
       collection ? [collection] : [] // Convert to optional array for Candid
     );

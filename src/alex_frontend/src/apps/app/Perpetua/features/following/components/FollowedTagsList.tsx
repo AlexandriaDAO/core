@@ -10,8 +10,10 @@ import { loadMyFollowedTags, unfollowTag } from '@/apps/app/Perpetua/state/thunk
 import { selectMyFollowedTags, selectIsLoadingMyFollowedTags } from '@/apps/app/Perpetua/state/perpetuaSlice';
 import { X, Loader2 } from 'lucide-react';
 import { Skeleton } from "@/lib/components/skeleton";
+import { usePerpetua } from '@/hooks/actors';
 
 export const FollowedTagsList: React.FC = () => {
+    const {actor} = usePerpetua();
     const dispatch = useAppDispatch();
     const { identity } = useIdentity();
     const followedTags = useAppSelector(selectMyFollowedTags);
@@ -19,15 +21,16 @@ export const FollowedTagsList: React.FC = () => {
     const [unfollowingTagUi, setUnfollowingTagUi] = useState<string | null>(null);
 
     useEffect(() => {
-        if (identity) {
-            dispatch(loadMyFollowedTags());
+        if (identity && actor) {
+            dispatch(loadMyFollowedTags(actor));
         }
-    }, [dispatch, identity]);
+    }, [dispatch, identity, actor]);
 
     const handleUnfollow = useCallback(async (tag: string) => {
+        if(!actor) return;
         setUnfollowingTagUi(tag);
         try {
-            await dispatch(unfollowTag(tag)).unwrap();
+            await dispatch(unfollowTag({actor, tagToUnfollow: tag})).unwrap();
             toast.success(`Unfollowed tag: ${tag}`);
         } catch (err: any) {
             const errorMessage = typeof err === 'string' ? err : (err?.message || 'Failed to unfollow tag.');
@@ -36,7 +39,7 @@ export const FollowedTagsList: React.FC = () => {
         } finally {
             setUnfollowingTagUi(null);
         }
-    }, [dispatch]);
+    }, [dispatch, actor]);
 
     if (!identity) {
         return null;

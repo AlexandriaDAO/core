@@ -10,6 +10,7 @@ import { Button } from "@/lib/components/button";
 import { Input } from "@/lib/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/lib/components/select";
 import { setBalanceSort, setSearchParams, togglePrincipal } from "../../shared/state/librarySearch/librarySlice";
+import { AlexBackendActor } from "@/actors";
 
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
@@ -240,7 +241,7 @@ export default function LibrarySearch({
           {/* First row: Principal and Collection selectors */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
             <div className="flex flex-col space-y-2">
-              {showPrincipalSelector && <PrincipalSelector defaultPrincipal={defaultPrincipal} />}
+              {showPrincipalSelector && <AlexBackendActor><PrincipalSelector defaultPrincipal={defaultPrincipal} /></AlexBackendActor>}
               {showCollectionSelector && <CollectionSelector />}
             </div>
             {showTagsSelector && <LibraryContentTagsSelector defaultCategory={defaultCategory} />}

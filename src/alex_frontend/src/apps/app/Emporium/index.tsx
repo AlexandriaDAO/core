@@ -18,8 +18,12 @@ import { getCallerAssetCanister } from "@/apps/Modules/shared/state/assetManager
 import { useAssetManager } from "@/hooks/useAssetManager";
 import fetch from "@/features/icp-assets/thunks/fetch";
 import { useIdentity } from "@/hooks/useIdentity";
+import { useEmporium, useLbry, useNftManager } from "@/hooks/actors";
 
 const Emporium = () => {
+    const {actor: lbryActor} = useLbry();
+    const {actor: nftManagerActor} = useNftManager();
+    const {actor: emporiumActor} = useEmporium();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const emporium = useAppSelector((state) => state.emporium);
@@ -47,9 +51,10 @@ const Emporium = () => {
 	}, [assetManager]);
 
     const fetchUserLogs = () => {
-        if (user) {
+        if (user && emporiumActor) {
             dispatch(
                 getUserLogs({
+                    actorEmporium: emporiumActor,
                     page: 1,
                     searchStr: "",
                     pageSize: "10",
@@ -59,9 +64,10 @@ const Emporium = () => {
         }
     };
     const fetchMarketLogs = () => {
-
+        if (!emporiumActor) return;
         dispatch(
             getEmporiumMarketLogs({
+                actorEmporium: emporiumActor,
                 page: 1,
                 searchStr: "",
                 pageSize: "10",
@@ -77,9 +83,11 @@ const Emporium = () => {
         }
     };
     const fetchMarketListings = () => {
+        if (!emporiumActor) return;
         setCurrentPage(0);
         dispatch(
             getMarketListing({
+                actorEmporium: emporiumActor,
                 page: 1,
                 searchStr: emporium.search.search,
                 pageSize: (emporium.search.pageSize ).toString(),
@@ -109,9 +117,10 @@ const Emporium = () => {
         setIsFiltersOpen(!isFiltersOpen);
     };
     const fetchUserListings = () => {
-        if (!user?.principal) return;
+        if (!user?.principal || !emporiumActor) return;
         dispatch(
             getMarketListing({
+                actorEmporium: emporiumActor,
                 page: 1,
                 searchStr: emporium.search.search,
                 pageSize: emporium.search.pageSize.toString(),
@@ -125,10 +134,12 @@ const Emporium = () => {
         setCurrentPage(0);
     };
     const handleSearchClick = async () => {
+        if (!emporiumActor) return;
         let type = emporium.search.type;
         if (!user) {
             dispatch(
                 getMarketListing({
+                    actorEmporium: emporiumActor,
                     page: 1,
                     searchStr: emporium.search.search,
                     pageSize: emporium.search.pageSize.toString(),
@@ -150,6 +161,7 @@ const Emporium = () => {
         }
         dispatch(
             getMarketListing({
+                actorEmporium: emporiumActor,
                 page: 1,
                 searchStr: emporium.search.search,
                 pageSize: emporium.search.pageSize.toString(),
@@ -162,10 +174,12 @@ const Emporium = () => {
     };
 
     const handlePageClick = ({ selected }: { selected: number }) => {
+        if (!emporiumActor) return;
         if (activeButton === "marketPlace") {
             setCurrentPage(selected);
             dispatch(
                 getMarketListing({
+                    actorEmporium: emporiumActor,
                     page: selected + 1,
                     searchStr: emporium.search.search,
                     pageSize: emporium.search.pageSize.toString(),
@@ -180,6 +194,7 @@ const Emporium = () => {
 
             dispatch(
                 getMarketListing({
+                    actorEmporium: emporiumActor,
                     page: selected + 1,
                     searchStr: emporium.search.search,
                     pageSize: emporium.search.pageSize.toString(),
@@ -197,10 +212,10 @@ const Emporium = () => {
     }, []);
 
     useEffect(() => {
-        if (user?.principal) {
-            dispatch(getSpendingBalance(user.principal));
-        }
-    }, [dispatch, user]);
+        if (!user || !lbryActor || !nftManagerActor) return;
+
+        dispatch(getSpendingBalance({lbryActor, nftManagerActor, userPrincipal: user.principal}));
+    }, [dispatch, user, lbryActor, nftManagerActor]);
     const navigationItems = [
         {
             label: "My Nfts",

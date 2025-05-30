@@ -16,6 +16,7 @@ import { TokenType } from '@/apps/Modules/shared/adapters/TokenAdapter';
 import { ShelvesPreloader } from "../shared/components/ShelvesPreloader";
 import { MainContentDisplayModal } from '@/apps/Modules/shared/components/MainContentDisplayModal/MainContentDisplayModal';
 import { AttachedDetailsPanel } from '@/apps/Modules/shared/components/AttachedDetailsPanel/AttachedDetailsPanel';
+import { useNftManager } from "@/hooks/actors";
 
 const useAppDispatch = () => useDispatch<AppDispatch>();
 
@@ -56,6 +57,7 @@ interface SelectedContentState {
 }
 
 const Grid = ({ dataSource }: GridProps = {}) => {
+  const { actor } = useNftManager();
   const dispatch = useAppDispatch();
 
   const contentData = useSelector((state: RootState) => state.transactions.contentData);
@@ -88,13 +90,21 @@ const Grid = ({ dataSource }: GridProps = {}) => {
         throw new Error("Could not find NFT data for this content");
       }
 
+      if (!actor) {
+        throw new Error("Could not find NFT manager actor");
+      }
+
+      if(!user) {
+        throw new Error("You must be authenticated to withdraw NFT funds");
+      }
+
       const collection = nftData.collection as TokenType | undefined;
       if (!collection || (collection !== 'NFT' && collection !== 'SBT')) {
         throw new Error(`Invalid or missing collection type on NFT data: ${collection}`);
       }
       const backendCollection = mapCollectionToBackend(collection);
 
-      const [lbryBlock, alexBlock] = await withdraw_nft(nftId, backendCollection);
+      const [lbryBlock, alexBlock] = await withdraw_nft(actor, nftId, backendCollection);
       if (lbryBlock === null && alexBlock === null) {
         toast.info("No funds were available to withdraw");
       } else {
@@ -109,7 +119,7 @@ const Grid = ({ dataSource }: GridProps = {}) => {
     } finally {
       setWithdrawingStates(prev => ({ ...prev, [transactionId]: false }));
     }
-  }, [arweaveToNftId, nfts, dispatch]); // Removed 'user' as it's not directly used in this callback
+  }, [arweaveToNftId, nfts, user, actor]);
 
   const handleOpenMainModal = useCallback((transaction: Transaction) => {
     setSelectedContent({ transaction });

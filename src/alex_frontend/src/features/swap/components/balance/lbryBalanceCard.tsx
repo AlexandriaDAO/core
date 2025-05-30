@@ -5,15 +5,17 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "sonner";
+import { useLbry } from "@/hooks/actors";
 
 const LbryBalanceCard = () => {
+    const {actor: lbryActor} = useLbry();
     const dispatch = useAppDispatch();
     const icpSwap = useAppSelector(state => state.swap);
     const auth = useAppSelector((state) => state.auth);
 
     const handleRefresh = () => {
-        if (!auth.user) return;
-        dispatch(getLbryBalance(auth.user.principal))
+        if (!auth.user || !lbryActor) return;
+        dispatch(getLbryBalance({actor: lbryActor, account: auth.user.principal}))
         toast.info("Refreshing balance!")
 
     }

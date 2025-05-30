@@ -1,11 +1,12 @@
 import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
 import { setTransactions } from "@/apps/Modules/shared/state/transactions/transactionSlice";
 import { loadContentForTransactions } from "@/apps/Modules/shared/state/transactions/transactionThunks";
-import { getActorEmporium } from "@/features/auth/utils/authUtils";
 import { arweaveIdToNat, natToArweaveId } from "@/utils/id_convert";
 import LedgerService from "@/utils/LedgerService";
 import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
+import { _SERVICE } from "../../../../../../declarations/emporium/emporium.did";
+import { ActorSubclass } from "@dfinity/agent";
 
 interface MarketListingResponse {
   nfts: Record<
@@ -23,6 +24,7 @@ interface MarketListingResponse {
 }
 
 interface MarketListingParams {
+  actorEmporium: ActorSubclass<_SERVICE>,
   page: number;
   searchStr: string;
   pageSize: string;
@@ -37,11 +39,10 @@ export const getMarketListing = createAsyncThunk<
   { rejectValue: string }
 >(
   "emporium/getMarketListing",
-  async ({ page, searchStr, pageSize, sort, type, userPrincipal }, { rejectWithValue, dispatch }) => {
+  async ({ actorEmporium, page, searchStr, pageSize, sort, type, userPrincipal }, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setTransactions([])); // Clear transactions before fetching new ones.
 
-      const actorEmporium = await getActorEmporium();
       const ledgerService =  LedgerService();
 
       // Initialize filters

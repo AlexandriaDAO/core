@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { SearchContainer } from '@/apps/Modules/shared/components/SearchContainer';
 import { AlexandrianLibrary } from "@/apps/Modules/LibModules/nftSearch";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,8 +9,11 @@ import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalan
 import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
 import { clearAllTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
+import { useAssetManager } from "@/hooks/actors";
+import { AlexBackendActor, LbryActor, NftManagerActor } from "@/actors";
 
 function Alexandrian() {
+	const {actor: assetManagerActor} = useAssetManager();
 	const dispatch = useDispatch<AppDispatch>();
 	const { isLoading, searchParams, selectedPrincipals } = useSelector((state: RootState) => state.library);
 	const transactions = useSelector((state: RootState) => state.transactions.transactions);
@@ -32,29 +35,31 @@ function Alexandrian() {
 	}, []);
 
 	const handleSearch = useCallback(async () => {
+		if(!assetManagerActor) return;
 		try {
 			// Only reset search if no assets have been loaded
 			if (!assetsLoadedRef.current) {
 				await dispatch(resetSearch());
 			}
-			await dispatch(performSearch());
+			await dispatch(performSearch({actor: assetManagerActor}));
 		} catch (error) {
 			handleSearchError(error, 'Search failed');
 		}
-	}, [dispatch, handleSearchError]);
+	}, [dispatch, handleSearchError, assetManagerActor]);
 
 	const handleShowMore = useCallback(async () => {
+		if(!assetManagerActor) return;
 		try {
 			const newStart = searchParams.end;
 			const newEnd = newStart + searchParams.pageSize;
 			// Update pagination parameters without triggering a search
 			await dispatch(updateSearchParams({ start: newStart, end: newEnd }));
 			// Perform the search directly without relying on useEffect
-			await dispatch(performSearch());
+			await dispatch(performSearch({actor: assetManagerActor}));
 		} catch (error) {
 			handleSearchError(error, 'Failed to load more results');
 		}
-	}, [dispatch, searchParams, handleSearchError]);
+	}, [dispatch, searchParams, handleSearchError, assetManagerActor]);
 
 	const handleCancelSearch = useCallback(() => {
 		dispatch(resetSearch());
@@ -74,15 +79,23 @@ function Alexandrian() {
 				onShowMore={handleShowMore}
 				onCancel={handleCancelSearch}
 				isLoading={isLoading}
-				topComponent={<TopupBalanceWarning />}
+				topComponent={
+					<LbryActor>
+						<NftManagerActor>
+							<TopupBalanceWarning />
+						</NftManagerActor>
+					</LbryActor>
+				}
 				filterComponent={
-					<AlexandrianLibrary
-						defaultCategory="all"
-						defaultPrincipal="new"
-						showPrincipalSelector={true}
-						showCollectionSelector={true}
-						showTagsSelector={true}
-					/>
+					<AlexBackendActor>
+						<AlexandrianLibrary
+							defaultCategory="all"
+							defaultPrincipal="new"
+							showPrincipalSelector={true}
+							showCollectionSelector={true}
+							showTagsSelector={true}
+						/>
+					</AlexBackendActor>
 				}
 				showMoreEnabled={true}
 				dataSource="transactions"

@@ -1,18 +1,22 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
-import { getNftManagerActor } from "@/features/auth/utils/authUtils";
 import transferLBRY from "./transferLBRY";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE as _SERVICELBRY } from "../../../../../../declarations/LBRY/LBRY.did";
+import { _SERVICE as _SERVICENFTMANAGER } from "../../../../../../declarations/nft_manager/nft_manager.did";
 
 const topUpLBRY = createAsyncThunk<
   string,
   {
+    nftManagerActor: ActorSubclass<_SERVICENFTMANAGER>,
+    lbryActor: ActorSubclass<_SERVICELBRY>,
     amount: string;
     userPrincipal: string;
   },
   { rejectValue: string }
 >(
   "icp_swap/topUpLBRY",
-  async ({ amount, userPrincipal }, { dispatch, rejectWithValue }) => {
+  async ({ nftManagerActor, lbryActor, amount, userPrincipal }, { dispatch, rejectWithValue }) => {
     try {
       console.log("topUpLBRY thunk started", { amount, userPrincipal });
       
@@ -23,7 +27,6 @@ const topUpLBRY = createAsyncThunk<
       }
 
       console.log("Getting nftManagerActor");
-      const nftManagerActor = await getNftManagerActor();
       
       console.log("Converting principal and getting subaccount");
       const subaccount = await nftManagerActor.principal_to_subaccount(
@@ -33,6 +36,7 @@ const topUpLBRY = createAsyncThunk<
       console.log("Dispatching transferLBRY", { amount, nftManagerId, subaccount });
       const result = await dispatch(
         transferLBRY({
+          actor: lbryActor,
           amount,
           destination: nftManagerId,
           subaccount: Array.from(subaccount),

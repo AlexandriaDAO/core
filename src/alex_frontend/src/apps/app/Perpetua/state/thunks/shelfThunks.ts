@@ -1,13 +1,14 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Principal } from '@dfinity/principal';
 import { cacheManager } from '../cache/ShelvesCache';
-import { loadShelves, getShelfById } from './queryThunks';
 import { 
   createShelf as createShelfService,
   updateShelfMetadata as updateShelfMetadataService,
   // createAndAddShelfItem as createAndAddShelfItemService
 } from '../services';
 import { extractErrorMessage } from '../../utils';
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../../../../../declarations/perpetua/perpetua.did';
 
 /**
  * Create a new shelf
@@ -15,16 +16,18 @@ import { extractErrorMessage } from '../../utils';
 export const createShelf = createAsyncThunk(
   'perpetua/createShelf',
   async ({ 
+    actor,
     title, 
     description, 
     principal 
   }: { 
+    actor: ActorSubclass<_SERVICE>,
     title: string, 
     description: string, 
     principal: Principal | string 
   }, { rejectWithValue }) => {
     try {
-      const result = await createShelfService(title, description);
+      const result = await createShelfService(actor, title, description);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate all caches for this principal
@@ -50,16 +53,18 @@ export const createShelf = createAsyncThunk(
 export const updateShelfMetadata = createAsyncThunk(
   'perpetua/updateShelfMetadata',
   async ({
+    actor,
     shelfId,
     title,
     description
   }: {
+    actor: ActorSubclass<_SERVICE>,
     shelfId: string,
     title?: string,
     description?: string
   }, { rejectWithValue }) => {
     try {
-      const result = await updateShelfMetadataService(shelfId, title, description);
+      const result = await updateShelfMetadataService(actor, shelfId, title, description);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate cache for this shelf

@@ -7,6 +7,7 @@ import {
   addTagToShelf,
   removeTagFromShelf
 } from "@/apps/app/Perpetua/state/services";
+import { usePerpetua } from "@/hooks/actors";
 
 interface GeneralSettingsTabProps {
   shelf: ShelfPublic;
@@ -23,6 +24,7 @@ export const GeneralSettingsTab: React.FC<GeneralSettingsTabProps> = ({
   isOwner, 
   onUpdateMetadata,
 }) => {
+  const {actor} = usePerpetua();
   // Editor states
   const [editingField, setEditingField] = useState<string | null>(null);
   const [title, setTitle] = useState(shelf.title);
@@ -109,6 +111,10 @@ export const GeneralSettingsTab: React.FC<GeneralSettingsTabProps> = ({
 
   // Function to add a tag
   const handleAddTag = async () => {
+    if(!actor) {
+      console.error("Actor not found");
+      return;
+    };
     const trimmedTag = tagInput.trim();
     
     if (!trimmedTag || isAddingTag || removingTagId) {
@@ -137,7 +143,7 @@ export const GeneralSettingsTab: React.FC<GeneralSettingsTabProps> = ({
     setTagError(null);
     
     try {
-      const result = await addTagToShelf(shelf.shelf_id, trimmedTag);
+      const result = await addTagToShelf(actor, shelf.shelf_id, trimmedTag);
       
       if ('Ok' in result && result.Ok) {
         // Update local state on success
@@ -162,7 +168,7 @@ export const GeneralSettingsTab: React.FC<GeneralSettingsTabProps> = ({
 
   // Handle removing a tag
   const handleRemoveTag = async (tagToRemove: string) => {
-    if (isAddingTag || removingTagId) {
+    if (isAddingTag || removingTagId || !actor) {
       return;
     }
     
@@ -170,7 +176,7 @@ export const GeneralSettingsTab: React.FC<GeneralSettingsTabProps> = ({
     setTagError(null);
     
     try {
-      const result = await removeTagFromShelf(shelf.shelf_id, tagToRemove);
+      const result = await removeTagFromShelf(actor, shelf.shelf_id, tagToRemove);
       
       if ('Ok' in result && result.Ok) {
         // Update local state on success

@@ -10,16 +10,24 @@ import getMarketListing from "../Emporium/thunks/getMarketListing";
 import getUserIcrc7Tokens from "../Emporium/thunks/getUserIcrc7Tokens";
 import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
 import { setTransactions } from "@/apps/Modules/shared/state/transactions/transactionSlice";
+import { useLbry, useNftManager, useEmporium } from "@/hooks/actors";
 
 function Dialectica() {
+	const {actor: lbryActor} = useLbry();
+	const {actor: emporiumActor} = useEmporium();
+	const {actor: nftManagerActor} = useNftManager();
+
 	const dispatch = useAppDispatch();
 	const { user } = useAppSelector((state) => state.auth);
 	const emporium = useAppSelector((state) => state.emporium);
 	const [activeButton, setActiveButton] = React.useState("marketPlace");
 
 	const handleSearch = useCallback(async () => {
+		if(!emporiumActor) return;
+
 		if (activeButton === "marketPlace") {
 			await dispatch(getMarketListing({
+				actorEmporium: emporiumActor,
 				page: 1,
 				searchStr: emporium.search.search,
 				pageSize: emporium.search.pageSize.toString(),
@@ -29,6 +37,7 @@ function Dialectica() {
 			}));
 		} else if (activeButton === "userListings" && user?.principal) {
 			await dispatch(getMarketListing({
+				actorEmporium: emporiumActor,
 				page: 1,
 				searchStr: emporium.search.search,
 				pageSize: emporium.search.pageSize.toString(),
@@ -37,7 +46,7 @@ function Dialectica() {
 				userPrincipal: user.principal
 			}));
 		}
-	}, [dispatch, activeButton, emporium.search, user?.principal]);
+	}, [emporiumActor, activeButton, emporium.search, user?.principal]);
 
 	const handleShowMore = useCallback(async () => {
 		// Implement show more logic here similar to original Emporium
@@ -49,10 +58,10 @@ function Dialectica() {
 	}, [dispatch, handleSearch]);
 
 	useEffect(() => {
-		if (user?.principal) {
-			dispatch(getSpendingBalance(user.principal));
-		}
-	}, [dispatch, user]);
+		if (!user || !lbryActor || !nftManagerActor)return;
+
+		dispatch(getSpendingBalance({lbryActor, nftManagerActor, userPrincipal: user.principal}));
+	}, [user, lbryActor, nftManagerActor]);
 
 	const topComponent = (
 		<div className="pb-4 text-center">

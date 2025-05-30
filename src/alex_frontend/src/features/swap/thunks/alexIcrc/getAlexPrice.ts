@@ -1,13 +1,12 @@
-import { getIcpSwapFactoryCanister } from "@/features/auth/utils/authUtils";
+import { ActorSubclass } from "@dfinity/agent";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { _SERVICE } from "../../../../../../declarations/icp_swap_factory/icp_swap_factory.did";
 
-const getAlexPrice = createAsyncThunk<string, void, { rejectValue: string }>(
+const getAlexPrice = createAsyncThunk<string, ActorSubclass<_SERVICE>, { rejectValue: string }>(
   "alex/getAlexPrice",
-  async (_, { rejectWithValue }) => {
+  async (actor, { rejectWithValue }) => {
     try {
-      const factorySwapCanister = await getIcpSwapFactoryCanister();
-      const poolData = await factorySwapCanister.getPoolsForToken(
+      const poolData = await actor.getPoolsForToken(
         "ysy5f-2qaaa-aaaap-qkmmq-cai"
       );
       return poolData[0].token0Price.toString();

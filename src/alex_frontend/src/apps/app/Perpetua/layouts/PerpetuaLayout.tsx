@@ -59,6 +59,7 @@ import { FollowedUsersList } from '../features/following/components/FollowedUser
 
 // Import thunks for dispatching
 import { loadMyFollowedTags } from '../state/thunks/followThunks';
+import { usePerpetua } from "@/hooks/actors";
 
 // Feed type definition
 type FeedType = 'recency' | 'random' | 'storyline';
@@ -84,6 +85,8 @@ const denormalizeShelves = (shelves: NormalizedShelf[]): ShelfPublic[] => {
 };
 
 const PerpetuaLayout: React.FC = () => {
+
+  const {actor} = usePerpetua();
 
   // Core data hooks
   const { shelves: personalNormalizedShelves, loading: personalLoading, createShelf, addItem, setItemOrder } = useShelfOperations();
@@ -185,9 +188,11 @@ const PerpetuaLayout: React.FC = () => {
   
   // Global initialization of shelves
   useEffect(() => {
+    if(!actor) return;
     if (identity) {
       // Load the current user's shelves as soon as the layout mounts
       dispatch(loadShelves({ 
+        actor,
         principal: identity.getPrincipal(), 
         params: { offset: 0, limit: 20 }
       }))
@@ -196,14 +201,16 @@ const PerpetuaLayout: React.FC = () => {
           console.error("Failed to load shelves:", error);
         });
     }
-  }, [identity, dispatch]);
+  }, [identity, actor, dispatch]);
   
   // Load shelves when viewing a specific user's profile (modified to prevent loops)
   useEffect(() => {
+    if(!actor) return;
     if (isUserDetail && routeUserId && routeUserId !== userPrincipal && !userShelvesLoadingState) {
       setUserShelvesLoadingState(true);
       // Dispatch loadShelves and let Redux handle state management
       dispatch(loadShelves({ 
+        actor,
         principal: routeUserId, 
         params: { offset: 0, limit: 20 }
       }))
@@ -215,7 +222,7 @@ const PerpetuaLayout: React.FC = () => {
           setUserShelvesLoadingState(false);
         });
     }
-  }, [dispatch, isUserDetail, routeUserId, userPrincipal, userShelvesLoadingState]);
+  }, [dispatch, actor, isUserDetail, routeUserId, userPrincipal, userShelvesLoadingState]);
   
   // Handle shelf selection when route changes - simplified dependencies
   useEffect(() => {
@@ -227,12 +234,15 @@ const PerpetuaLayout: React.FC = () => {
   
   // Effect to load initial feed data when feed type changes
   useEffect(() => {
+    if(!actor) return;
+
     if (currentFeedType === 'storyline' && storylineFeedShelves.length === 0 && !isLoadingStorylineFeed && identity) {
-      dispatch(loadStorylineFeed({ params: { limit: 20 } })); 
+      dispatch(loadStorylineFeed({ actor,params: { limit: 20 } })); 
     } else if (currentFeedType === 'recency' && recencyPublicShelves.length === 0 && !isLoadingRecencyPublic ) {
-      dispatch(loadRecentShelves({ limit: 20 })); 
+      dispatch(loadRecentShelves({ actor, params: { limit: 20 } })); 
     }
   }, [
+    actor,
     currentFeedType, 
     dispatch, 
     storylineFeedShelves.length, 
@@ -251,30 +261,33 @@ const PerpetuaLayout: React.FC = () => {
   }, [createShelf]);
   
   const handleFeedTypeChange = (value: string) => {
+    if(!actor) return;
     if (value) { 
         const newFeedType = value as FeedType;
         dispatch(setCurrentFeedType(newFeedType));
         if (newFeedType === 'random') {
-          dispatch(loadRandomFeed({ limit: 20 })); 
+          dispatch(loadRandomFeed({ actor, limit: 20 })); 
         }
     }
   };
 
   const loadMoreStoryline = useCallback(async () => { 
+    if(!actor) return;
     if (identity && !isLoadingStorylineFeed) { 
       if (storylineFeedCursor) { 
-        await dispatch(loadStorylineFeed({ params: { limit: 20, cursor: storylineFeedCursor }})).unwrap();
+        await dispatch(loadStorylineFeed({ actor, params: { limit: 20, cursor: storylineFeedCursor }})).unwrap();
       } else { 
-        await dispatch(loadStorylineFeed({ params: { limit: 20, cursor: undefined }})).unwrap();
+        await dispatch(loadStorylineFeed({ actor, params: { limit: 20, cursor: undefined }})).unwrap();
       }
     }
-  }, [dispatch, identity, storylineFeedCursor, isLoadingStorylineFeed]);
+  }, [dispatch,actor, identity, storylineFeedCursor, isLoadingStorylineFeed]);
 
   const loadMoreRandom = useCallback(async () => {
+    if(!actor) return;
     if (!isLoadingRandomFeed) {
-      await dispatch(loadRandomFeed({ limit: 20 }));
+      await dispatch(loadRandomFeed({ actor, limit: 20 }));
     }
-  }, [dispatch, isLoadingRandomFeed]);
+  }, [dispatch, actor, isLoadingRandomFeed]);
 
   // Combine shelves for Recency feed view
   const recencyCombinedNormalizedShelves = useMemo(() => {

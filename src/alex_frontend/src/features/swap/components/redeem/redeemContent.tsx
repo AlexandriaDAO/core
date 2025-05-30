@@ -14,9 +14,10 @@ import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
 import ErrorModal from "../errorModal";
 import { Entry } from "@/layouts/parts/Header";
+import { useIcpSwap } from "@/hooks/actors";
 
 const RedeemContent: React.FC = () => {
-  const { theme } = useTheme();
+  const {actor: actorSwap} = useIcpSwap();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const swap = useAppSelector((state) => state.swap);
@@ -25,17 +26,19 @@ const RedeemContent: React.FC = () => {
   const [errorModalV, setErrorModalV] = useState({ flag: false, title: "", message: "" });
 
   const handleSubmit = () => {
-    dispatch(redeemArchivedBalance());
+    if(!actorSwap) return;
+    dispatch(redeemArchivedBalance(actorSwap));
     setLoadingModalV(true);
   };
 
   useEffect(() => {
-    if(!user) return;
-    dispatch(getArchivedBal(user.principal))
-  }, [user]);
+    if(!user || !actorSwap) return;
+    dispatch(getArchivedBal({actor: actorSwap, account: user.principal}))
+  }, [user, actorSwap]);
   useEffect(() => {
+    if(!actorSwap) return;
     if (swap.redeeemSuccess === true) {
-      if(user) dispatch(getArchivedBal(user.principal));
+      if(user) dispatch(getArchivedBal({actor: actorSwap, account: user.principal}));
       dispatch(flagHandler());
       setLoadingModalV(false);
       setSucessModalV(true);
@@ -43,11 +46,8 @@ const RedeemContent: React.FC = () => {
       setLoadingModalV(false);
       setErrorModalV({ flag: true, title: swap.error.title, message: swap.error.message });
       dispatch(flagHandler());
-
-
     }
-
-  }, [user, swap]);
+  }, [user, swap, actorSwap]);
 
   return (
     <div>

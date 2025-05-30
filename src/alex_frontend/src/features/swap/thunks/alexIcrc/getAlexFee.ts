@@ -1,18 +1,17 @@
-import { _SERVICE as _SERVICEALEX } from "../../../../../../declarations/ALEX/ALEX.did";
+import { _SERVICE } from "../../../../../../declarations/ALEX/ALEX.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
-import { getAlexActor } from "@/features/auth/utils/authUtils";
+import { ActorSubclass } from "@dfinity/agent/lib/cjs";
 
 // Define the asyn thunk
 const getAlexFee = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  void,
+  ActorSubclass<_SERVICE>,
   { rejectValue: string }
 >(
   "alex/getAlexFee",
-  async (_, { rejectWithValue }) => {
+  async (actor, { rejectWithValue }) => {
     try {
-      const actor = await getAlexActor();
       const result = await actor.icrc1_fee();
       const LedgerServices = LedgerService();
       const fromatedFee = (

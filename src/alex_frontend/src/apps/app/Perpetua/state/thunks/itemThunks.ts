@@ -5,8 +5,9 @@ import {
   addItemToShelf as addItemToShelfService,
   removeItemFromShelf as removeItemFromShelfService
 } from '../services';
-import { ShelfPublic } from '@/../../declarations/perpetua/perpetua.did';
+import { ShelfPublic, _SERVICE } from '@/../../declarations/perpetua/perpetua.did';
 import { extractErrorMessage } from '../../utils';
+import { ActorSubclass } from '@dfinity/agent';
 
 // Define Result type for better type checking
 export type AddItemResult = 
@@ -19,6 +20,7 @@ export type AddItemResult =
 export const addItem = createAsyncThunk(
   'perpetua/addItem',
   async ({ 
+    actor,
     shelf, 
     content, 
     type, 
@@ -27,6 +29,7 @@ export const addItem = createAsyncThunk(
     referenceItemId = null,
     before = true
   }: { 
+    actor: ActorSubclass<_SERVICE>,
     shelf: ShelfPublic, 
     content: string, 
     type: "Nft" | "Markdown" | "Shelf",
@@ -37,6 +40,7 @@ export const addItem = createAsyncThunk(
   }, { rejectWithValue }) => {
     try {
       const result = await addItemToShelfService(
+        actor,
         shelf.shelf_id,
         content,
         type,
@@ -87,16 +91,18 @@ export const addItem = createAsyncThunk(
 export const removeItem = createAsyncThunk(
   'perpetua/removeItem',
   async ({ 
+    actor,
     shelfId, 
     itemId, 
     principal 
   }: { 
+    actor: ActorSubclass<_SERVICE>
     shelfId: string, 
     itemId: number, 
     principal: Principal | string 
   }, { rejectWithValue }) => {
     try {
-      const result = await removeItemFromShelfService(shelfId, itemId);
+      const result = await removeItemFromShelfService(actor, shelfId, itemId);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate cache for this shelf

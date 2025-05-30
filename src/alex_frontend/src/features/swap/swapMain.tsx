@@ -21,8 +21,14 @@ import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
 import getLbryFee from './thunks/lbryIcrc/getLbryFee';
 import getAlexFee from './thunks/alexIcrc/getAlexFee';
 import Insights from './components/insights/insights';
+import { useLbry, useAlex, useIcpSwap, useTokenomics } from '@/hooks/actors';
 
 const SwapMain = () => {
+    const {actor: lbryActor} = useLbry();
+    const {actor: alexActor} = useAlex();
+    const {actor: icpSwapActor} = useIcpSwap();
+    const {actor: tokenomicsActor} = useTokenomics();
+
     const dispatch = useAppDispatch();
     const swap = useAppSelector(state => state.swap);
     const navigate = useNavigate();
@@ -30,14 +36,19 @@ const SwapMain = () => {
 
     const tabs = [
         { id: 1, path: 'balance', label: 'Balance', hover: null, content: <BalanceContent /> },
+        // { id: 2, path: 'swap', label: 'Swap', hover: "Swap ICP for LBRY", content: <IcpLedgerActor><SwapContent /></IcpLedgerActor> },
         { id: 2, path: 'swap', label: 'Swap', hover: "Swap ICP for LBRY", content: <SwapContent /> },
+        // { id: 3, path: 'topup', label: 'Topup', hover: "Allocate LBRY that can be spent in-app", content: <NftManagerActor><TopupContent /></NftManagerActor> },
         { id: 3, path: 'topup', label: 'Topup', hover: "Allocate LBRY that can be spent in-app", content: <TopupContent /> },
+        // { id: 4, path: 'send', label: 'Send', hover: null, content: <IcpLedgerActor><SendContent /></IcpLedgerActor> },
         { id: 4, path: 'send', label: 'Send', hover: null, content: <SendContent /> },
         { id: 5, path: 'receive', label: 'Receive', hover: null, content: <ReceiveContent /> },
+        // { id: 6, path: 'burn', label: 'Burn', hover: "Burn LBRY, get back ALEX and ICP", content: <IcpLedgerActor><BurnContent /></IcpLedgerActor> },
         { id: 6, path: 'burn', label: 'Burn', hover: "Burn LBRY, get back ALEX and ICP", content: <BurnContent /> },
         { id: 7, path: 'stake', label: 'Stake', hover: null, content: <StakeContent /> },
         { id: 8, path: 'redeem', label: 'Redeem', hover: "Redeem ICP if your swap fails", content: <RedeemContent /> },
         { id: 9, path: 'history', label: 'Transaction history', hover: null, content: <TransactionHistory /> },
+        // { id: 10, path: 'insights', label: 'Insights', hover: null, content: <LogsActor><Insights /></LogsActor> }
         { id: 10, path: 'insights', label: 'Insights', hover: null, content: <Insights /> }
     ];
 
@@ -45,25 +56,27 @@ const SwapMain = () => {
     const activeTab = tabs.find(tab => tab.path === currentPath)?.id || 1;
 
     useEffect(() => {
-        dispatch(getLBRYratio());
-        dispatch(getAlexMintRate());
-        dispatch(getLbryFee());
-        dispatch(getAlexFee());
+        if (!lbryActor || !alexActor || !icpSwapActor || !tokenomicsActor) return;
+        dispatch(getLBRYratio(icpSwapActor));
+        dispatch(getAlexMintRate(tokenomicsActor));
+        dispatch(getLbryFee(lbryActor));
+        dispatch(getAlexFee(alexActor));
         if (localStorage.getItem("tab")) {
             navigate('/swap/stake');
             localStorage.removeItem("tab");
         }
-    }, []);
+    }, [lbryActor, alexActor, icpSwapActor, tokenomicsActor]);
 
     useEffect(() => {
-        if (swap.burnSuccess === true) {
-            dispatch(getLBRYratio());
+        if (swap.burnSuccess === true && icpSwapActor) {
+            dispatch(getLBRYratio(icpSwapActor));
         }
-    }, [swap]);
+    }, [swap, icpSwapActor]);
 
     return (
         <div className='tabs py-10 2xl:py-20 xl:py-16 lg:py-14 md:py-12 sm:py-10'>
             <div className='container px-5'>
+                {/* <IcpLedgerActor><AccountCards /></IcpLedgerActor> */}
                 <AccountCards />
                 <div className='tabs-content'>
                     <div className='tabs-content'>

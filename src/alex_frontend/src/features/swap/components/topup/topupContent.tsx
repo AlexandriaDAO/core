@@ -2,20 +2,22 @@ import React, { useEffect, useState } from "react";
 import { LoaderCircle } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import Auth from "@/features/auth";
 import { flagHandler } from "../../swapSlice";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
 import ErrorModal from "../errorModal";
-import { _SERVICE } from "../../../../../../declarations/nft_manager/nft_manager.did";
 import getSpendingBalance from "../../thunks/lbryIcrc/getSpendingBalance";
 import topUpLBRY from "../../thunks/lbryIcrc/topUpLBRY";
 import getAlexSpendingBalance from "../../thunks/alexIcrc/getAlexSpendingBalance";
-import { getNftManagerActor } from "@/features/auth/utils/authUtils";
 import { Entry } from "@/layouts/parts/Header";
+import { useAlex, useLbry, useNftManager } from "@/hooks/actors";
 
 const TopupContent = () => {
+    const {actor: lbryActor} = useLbry();
+    const {actor: alexActor} = useAlex();
+    const {actor: nftManagerActor} = useNftManager();
+
     const dispatch = useAppDispatch();
     const { user } = useAppSelector(state => state.auth);
     const swap = useAppSelector((state) => state.swap);
@@ -41,11 +43,11 @@ const TopupContent = () => {
     };
 
     useEffect(() => {
-        if (user?.principal) {
-            dispatch(getSpendingBalance(user.principal));
-            dispatch(getAlexSpendingBalance(user.principal));
-        }
-    }, [dispatch, user]);
+        if (!user || !lbryActor || !nftManagerActor || !alexActor) return;
+
+        dispatch(getSpendingBalance({lbryActor, nftManagerActor, userPrincipal: user.principal}));
+        dispatch(getAlexSpendingBalance({alexActor, nftManagerActor, userPrincipal: user.principal}));
+    }, [user, lbryActor, nftManagerActor, alexActor]);
 
     const handleTopUp = async () => {
         console.log("handleTopUp called", { user, amount });
@@ -55,12 +57,24 @@ const TopupContent = () => {
             return;
         }
 
+        if (!nftManagerActor) {
+            console.log("NFT Manager Actor unavailable");
+            return;
+        }
+
+        if (!lbryActor) {
+            console.log("LBRY Actor unavailable");
+            return;
+        }
+
         try {
             console.log("Dispatching topUpLBRY", { amount, userPrincipal: user.principal });
             setLoadingModalV(true);
 
             const result = await dispatch(
                 topUpLBRY({
+                    nftManagerActor: nftManagerActor,
+                    lbryActor: lbryActor,
                     amount: amount,
                     userPrincipal: user.principal,
                 })
@@ -76,20 +90,20 @@ const TopupContent = () => {
     };
 
     useEffect(() => {
-        if (!user?.principal) return;
+        if (!user?.principal || !lbryActor || !nftManagerActor ) return;
 
         if (swap.transferSuccess === true) {
             setLoadingModalV(false);
             setSuccessModalV(true);
-            dispatch(getLbryBalance(user.principal));
-            dispatch(getSpendingBalance(user.principal));
+            dispatch(getLbryBalance({actor: lbryActor, account: user.principal}));
+            dispatch(getSpendingBalance({lbryActor, nftManagerActor, userPrincipal: user.principal}));
             dispatch(flagHandler());
         } else if (swap.error) {
             setLoadingModalV(false);
             setErrorModalV(true);
             dispatch(flagHandler());
         }
-    }, [swap.transferSuccess, swap.error, dispatch, user]);
+    }, [swap.transferSuccess, swap.error, user, lbryActor, nftManagerActor]);
 
     const handleWithdraw = async () => {
         if (!user?.principal) {
@@ -97,18 +111,27 @@ const TopupContent = () => {
             return;
         }
 
+        if (!nftManagerActor) {
+            console.log("NFT Manager Actor unavailable");
+            return;
+        }
+
+        if (!lbryActor) {
+            console.log("LBRY Actor unavailable");
+            return;
+        }
+
         try {
             setWithdrawLoading(true);
             setLoadingModalV(true);
 
-            const nftManager = await getNftManagerActor();
-            const result = await nftManager.withdraw_topup();
+            const result = await nftManagerActor.withdraw_topup();
 
             console.log("Withdraw result:", result);
 
             // Refresh balances after withdrawal
-            await dispatch(getSpendingBalance(user.principal));
-            await dispatch(getLbryBalance(user.principal));
+            await dispatch(getSpendingBalance({lbryActor, nftManagerActor, userPrincipal: user.principal}));
+            await dispatch(getLbryBalance({actor: lbryActor, account: user.principal}));
 
             setLoadingModalV(false);
             setSuccessModalV(true);

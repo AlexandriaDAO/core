@@ -7,6 +7,7 @@ import { LibraryShelvesUIProps, ExploreShelvesUIProps, UserShelvesUIProps } from
 import { useDispatch } from 'react-redux';
 import { reorderProfileShelf } from '@/apps/app/Perpetua/state';
 import { AppDispatch } from '@/store';
+import { usePerpetua } from '@/hooks/actors';
 
 /**
  * Custom props comparison for React.memo to prevent unnecessary renders
@@ -93,11 +94,12 @@ export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = React.memo(({
   onNewShelf,
   onViewShelf
 }) => {
+  const {actor} = usePerpetua();
   const dispatch = useDispatch<AppDispatch>();
   const { identity } = useIdentity();
   
   const handleSaveOrder = useCallback(async (newShelfOrder: string[]) => {
-    if (!identity || newShelfOrder.length < 2) return;
+    if (!identity || !actor || newShelfOrder.length < 2) return;
     
     // Instead of sending an empty shelfId, use the first item in the new order
     // and the second item as reference, with before=true
@@ -110,6 +112,7 @@ export const LibraryShelvesUI: React.FC<LibraryShelvesUIProps> = React.memo(({
     try {
       // Pass the complete newShelfOrder for optimistic updates in Redux
       await dispatch(reorderProfileShelf({
+        actor,
         shelfId,
         referenceShelfId,
         before: true,
@@ -181,6 +184,7 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
   isCreatingShelf,
   ownerUsername
 }) => {
+  const {actor} = usePerpetua();
   const dispatch = useDispatch<AppDispatch>();
   const { identity } = useIdentity();
   
@@ -200,7 +204,7 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
   
   // Handler for saving reordered shelves
   const handleSaveOrder = useCallback(async (newShelfOrder: string[]) => {
-    if (!identity || !currentUserIsOwner || newShelfOrder.length < 2) return;
+    if (!identity || !actor || !currentUserIsOwner || newShelfOrder.length < 2) return;
     
     // Find the original positions of shelves to determine what moved
     const originalOrder = shelves.map(shelf => shelf.shelf_id);
@@ -221,6 +225,7 @@ export const UserShelvesUI: React.FC<UserShelvesUIProps> = React.memo(({
     try {
       // Pass the complete newShelfOrder for optimistic updates in Redux
       await dispatch(reorderProfileShelf({
+        actor,
         shelfId,
         referenceShelfId,
         before: true,

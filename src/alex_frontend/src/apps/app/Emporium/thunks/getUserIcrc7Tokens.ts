@@ -6,7 +6,6 @@ import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
 import { resetPagination } from "../emporiumSlice";
 import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
 import { RootState } from "@/store";
-import { getActorAssetManager } from "@/features/auth/utils/authUtils";
 
 const isLocal = process.env.DFX_NETWORK !== "ic";
 

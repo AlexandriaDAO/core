@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useAppDispatch } from '../../../../store/hooks/useAppDispatch';
 import { useAppSelector } from "../../../../store/hooks/useAppSelector";
-import { useTheme } from "@/providers/ThemeProvider";
 
-import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
 import claimReward from "../../thunks/claimReward";
 import { flagHandler } from "../../swapSlice";
+import { useIcpSwap } from "@/hooks/actors";
 
 interface StakedInfoProps {
     setLoadingModalV: any;
@@ -15,11 +14,12 @@ interface StakedInfoProps {
 const ClaimReward: React.FC<StakedInfoProps> = ({ setLoadingModalV, setActionType }) => {
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
-    const { theme } = useTheme();
+    const {actor: actorSwap} = useIcpSwap();
 
     const handleClaim = (e: any) => {
         e.preventDefault();
-        dispatch(claimReward({reward:swap.stakeInfo.rewardIcp}));
+        if(!actorSwap) return;
+        dispatch(claimReward({actor: actorSwap, reward:swap.stakeInfo.rewardIcp}));
         setActionType("Claiming ICP rewards");
         setLoadingModalV(true);
     }

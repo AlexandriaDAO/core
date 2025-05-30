@@ -1,14 +1,13 @@
-import { Principal } from '@dfinity/principal';
-import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 import { store } from "@/store";
 import { Result } from '../../utils';
-import { Item } from '@/../../declarations/perpetua/perpetua.did';
-import { QueryError } from './serviceTypes';
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../../../declarations/perpetua/perpetua.did";
 
 /**
  * Add an item to a shelf
  */
 export async function addItemToShelf(
+  actor: ActorSubclass<_SERVICE>,
   shelfId: string,
   content: string,
   type: "Nft" | "Markdown" | "Shelf",
@@ -106,7 +105,6 @@ export async function addItemToShelf(
     // Make the backend call with prepared content
     try {
       console.log(`[itemService] addItemToShelf: Attempting actor.add_item_to_shelf for shelf [${shelfId}]...`);
-      const actor = await getActorPerpetua();
       const result = await actor.add_item_to_shelf(
         shelfId,
         {
@@ -172,12 +170,11 @@ export async function addItemToShelf(
  * Remove an item from a shelf
  */
 export async function removeItemFromShelf(
+  actor: ActorSubclass<_SERVICE>,
   shelfId: string,
   itemId: number
 ): Promise<Result<boolean, string>> {
   try {
-    const actor = await getActorPerpetua();
-
     const result = await actor.remove_item_from_shelf(shelfId, itemId);
 
     if ("Ok" in result) {
@@ -195,11 +192,11 @@ export async function removeItemFromShelf(
  * Set the absolute order of items in a shelf
  */
 export async function setItemOrder(
+  actor: ActorSubclass<_SERVICE>,
   shelfId: string,
   orderedItemIds: number[]
 ): Promise<Result<void, string>> {
   try {
-    const actor = await getActorPerpetua();
     const result = await actor.set_item_order(shelfId, orderedItemIds);
 
     if ("Ok" in result) {

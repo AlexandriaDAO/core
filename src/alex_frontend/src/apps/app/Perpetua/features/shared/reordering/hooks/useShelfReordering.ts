@@ -4,6 +4,7 @@ import { useReorderable } from './useReorderable';
 import { createReorderReturn } from '../utils/reorderUtils';
 import { createReorderAdapter } from '../utils/createReorderAdapter';
 import { UseShelfReorderingProps } from '../../../../types/reordering.types';
+import { usePerpetua } from '@/hooks/actors';
 
 // Type for reorderProfileShelf action parameters
 interface ShelfReorderParams {
@@ -18,6 +19,7 @@ interface ShelfReorderParams {
  * Custom hook for shelf reordering
  */
 export const useShelfReordering = ({ shelves, hasEditAccess }: UseShelfReorderingProps) => {
+  const {actor} = usePerpetua();
   // Keep a stable reference to shelves 
   const shelvesRef = useRef(shelves);
   
@@ -35,7 +37,10 @@ export const useShelfReordering = ({ shelves, hasEditAccess }: UseShelfReorderin
   // Create adapter function for reorder action using the factory
   const reorderAdapter = useCallback(
     createReorderAdapter<ShelfReorderParams>({
-      actionCreator: reorderProfileShelf,
+      actionCreator: (params) => {
+        if(!actor) return;
+        return reorderProfileShelf({actor, ...params})
+      },
       fieldMapping: {
         // Map ReorderParams fields to ShelfReorderParams fields
         itemId: 'shelfId',
@@ -43,7 +48,7 @@ export const useShelfReordering = ({ shelves, hasEditAccess }: UseShelfReorderin
         newItemOrder: 'newShelfOrder'
       }
     }),
-    []
+    [actor]
   );
   
   // Use the generic reorderable hook

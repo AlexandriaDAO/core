@@ -6,7 +6,6 @@ import { Button } from "@/lib/components/button";
 import Copy from "../Copy";
 import { useAssetManager } from "@/hooks/actors";
 import { Principal } from "@dfinity/principal";
-import { Link } from "react-router";
 
 function CanisterView() {
     const { actor } = useAssetManager();

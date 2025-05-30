@@ -1,13 +1,14 @@
-import { TransferArgs } from "../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE, TransferArgs } from "../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
 import { Principal } from "@dfinity/principal";
-import { getIcpLedgerActor } from "@/features/auth/utils/authUtils";
 
 // Define the async thunk
 const transferICP = createAsyncThunk<
   string, // This is the return type of the thunk's payload
   {
+    actor: ActorSubclass<_SERVICE>,
     amount: string;
     destination: string;
     accountType: string;
@@ -15,9 +16,8 @@ const transferICP = createAsyncThunk<
   { rejectValue: string }
 >(
   "icp_ledger/transferICP",
-  async ({ amount, destination, accountType }, { rejectWithValue }) => {
+  async ({ actor, amount, destination, accountType }, { rejectWithValue }) => {
     try {
-      const actor = await getIcpLedgerActor();
       const amountFormat = {
         e8s: BigInt(Math.floor(Number(amount) * 10 ** 8)),
       };

@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
 import { useAppDispatch } from '../../../../store/hooks/useAppDispatch';
 import { useAppSelector } from "../../../../store/hooks/useAppSelector";
-import { ActorSubclass } from "@dfinity/agent";
-import { useTheme } from "@/providers/ThemeProvider";
 
-import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did';
 import { flagHandler } from "../../swapSlice";
 import unstake from "../../thunks/unstake";
+import { useIcpSwap } from "@/hooks/actors";
 
 interface UnstakeProps {
     setLoadingModalV: any;
@@ -14,13 +12,14 @@ interface UnstakeProps {
 }
 
 const Unstake: React.FC<UnstakeProps> = ({ setLoadingModalV, setActionType}) => {
+    const {actor: actorSwap} = useIcpSwap();
     const dispatch = useAppDispatch();
     const swap = useAppSelector((state) => state.swap);
-    const { theme } = useTheme();
 
     const handleUnstake = (e: any) => {
         e.preventDefault();
-        dispatch(unstake());
+        if(!actorSwap) return;
+        dispatch(unstake(actorSwap));
         setActionType("UnStake ICP");
         setLoadingModalV(true);
     }

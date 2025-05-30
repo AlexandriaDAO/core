@@ -19,6 +19,11 @@ const InlineSignup = lazy(() =>
 const Auth = lazy(() => import("@/features/auth"));
 const BalanceDisplay = lazy(() => import("@/components/BalanceDisplay"));
 
+const AlexActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexActor })));
+const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
+const LbryActor = lazy(() => import("@/actors").then(module => ({ default: module.LbryActor })));
+const IcpLedgerActor = lazy(() => import("@/actors").then(module => ({ default: module.IcpLedgerActor })));
+
 export const Entry = () => {
 	const { actor } = useUser();
 	const { identity, isInitializing, isLoggingIn } = useIdentity();
@@ -111,8 +116,17 @@ function Header() {
 				<div className="flex items-center">
 					<Logo />
 					<Suspense fallback={<Processing message="Loading Balances..." />}>
-						<BalanceDisplay />
+						<NftManagerActor>
+							<LbryActor>
+								<IcpLedgerActor>
+									<AlexActor>
+										<BalanceDisplay />
+									</AlexActor>
+								</IcpLedgerActor>
+							</LbryActor>
+						</NftManagerActor>
 					</Suspense>
+
 				</div>
 				<div className="md:flex sm:hidden xs:hidden items-center w-full justify-end">
 					<div className="flex-grow flex justify-center">

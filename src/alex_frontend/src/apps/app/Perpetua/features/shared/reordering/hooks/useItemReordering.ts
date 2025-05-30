@@ -6,6 +6,7 @@ import { compareArrays, createReorderReturn } from '../utils/reorderUtils';
 import { createReorderAdapter } from '../utils/createReorderAdapter';
 import { UseItemReorderingProps as ImportedProps, ReorderRenderProps, ReorderParams } from '../../../../types/reordering.types';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
+import { usePerpetua } from '@/hooks/actors';
 
 // Type for setItemOrder action parameters (Matches the thunk payload)
 interface SetItemOrderParams {
@@ -30,6 +31,7 @@ export const useItemReordering = ({
   items,
   isOwner
 }: UseItemReorderingProps): ReorderRenderProps => {
+  const {actor} = usePerpetua();
   const dispatch = useAppDispatch();
   // Keep a stable reference to items 
   const itemsRef = useRef(items);
@@ -54,7 +56,10 @@ export const useItemReordering = ({
   // Create adapter function for the new setItemOrder action
   const reorderAdapter = useCallback(
     createReorderAdapter<SetItemOrderParams>({
-      actionCreator: setItemOrder,
+      actionCreator: (params) => {
+        if(!actor) return;
+        return setItemOrder({actor, ...params})
+      },
       parseId: (id) => typeof id === 'string' ? parseInt(id, 10) : id,
       fieldMapping: {
         // Map ReorderParams fields to SetItemOrderParams fields
@@ -62,7 +67,7 @@ export const useItemReordering = ({
         // No need to map itemId, referenceItemId, before
       }
     }),
-    []
+    [actor]
   );
   
   // Use the generic reorderable hook

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Table, Tag } from "antd"; // Using Ant Design for UI
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getUserLogs from "../thunks/getUserLog";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import CopyHelper from "@/features/swap/components/copyHelper";
 import "./style.css";
+import { useEmporium } from "@/hooks/actors";
 
 // Define table columns
 const columns = [
@@ -75,13 +76,15 @@ const columns = [
 ];
 
 const UserEmporiumLogs: React.FC = () => {
+    const {actor: actorEmporium} = useEmporium();
     const dispatch = useAppDispatch();
     const logs = useAppSelector((state) => state.emporium.userLogs);
     const user= useAppSelector((state)=>state.auth);
 
     useEffect(() => {
-        dispatch(getUserLogs({user:user.user?user.user.principal:""}));
-    }, [dispatch]);
+        if(!actorEmporium) return;
+        dispatch(getUserLogs({actorEmporium, user:user.user?user.user.principal:""}));
+    }, [dispatch, actorEmporium, user]);
 
     return (
         <div className="lg:pb-10 md:pb-8 sm:pb-6 xs:pb-4">
@@ -101,7 +104,8 @@ const UserEmporiumLogs: React.FC = () => {
                             total: Number(logs.totalPages) * 10,
                             pageSize: 10,
                             onChange: (page, pageSize) => {
-                                dispatch(getUserLogs({ page, pageSize: pageSize.toString() }));
+                                if(!actorEmporium) return;
+                                dispatch(getUserLogs({actorEmporium, page, pageSize: pageSize.toString() }));
                             },
                             className: "custom-pagination"
                         }}

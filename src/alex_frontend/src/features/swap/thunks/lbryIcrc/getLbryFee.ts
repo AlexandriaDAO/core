@@ -1,17 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
-import {getLbryActor } from "@/features/auth/utils/authUtils";
+import { ActorSubclass } from "@dfinity/agent/lib/cjs";
+import { _SERVICE } from "../../../../../../declarations/LBRY/LBRY.did";
 
 // Define the asyn thunk
 const getLbryFee = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  void,
+  ActorSubclass<_SERVICE>,
   { rejectValue: string }
 >(
   "icp_swap/getLbryFee",
-  async (_, { rejectWithValue }) => {
+  async (actor, { rejectWithValue }) => {
     try {
-      const actor = await getLbryActor();
       const result = await actor.icrc1_fee();
       const LedgerServices = LedgerService();
       const fromatedFee = (

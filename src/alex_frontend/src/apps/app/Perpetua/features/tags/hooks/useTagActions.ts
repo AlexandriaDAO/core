@@ -14,32 +14,38 @@ import {
     NormalizedTagCursor 
 } from '@/apps/app/Perpetua/state/services';
 import { useCallback } from 'react';
+import { usePerpetua } from '@/hooks/actors';
 
 /**
  * Hook providing memoized action dispatchers for tag-related operations.
  */
 export function useTagActions() {
+    const {actor} = usePerpetua();
     const dispatch = useDispatch<AppDispatch>();
 
     const dispatchFetchPopularTags = useCallback((params: CursorPaginationParams<TagPopularityKeyCursor>) => {
-        dispatch(fetchPopularTags(params));
-    }, [dispatch]);
+        if(!actor) return;
+        dispatch(fetchPopularTags({actor, params}));
+    }, [dispatch, actor]);
 
     const dispatchFetchTagShelfCount = useCallback((tagName: string) => {
-        dispatch(fetchTagShelfCount(tagName));
-    }, [dispatch]);
+        if(!actor) return;
+        dispatch(fetchTagShelfCount({actor, tag: tagName}));
+    }, [dispatch, actor]);
 
     const dispatchSetTagFilter = useCallback((tagName: string | null) => {
         dispatch(setTagFilter(tagName));
     }, [dispatch]);
 
     const dispatchFetchShelvesByTag = useCallback((tag: string, params: CursorPaginationParams<TagShelfAssociationKeyCursor>) => {
-        dispatch(fetchShelvesByTag({ tag, params }));
-    }, [dispatch]);
+        if(!actor) return;
+        dispatch(fetchShelvesByTag({actor, tag, params}));
+    }, [dispatch, actor]);
 
     const dispatchFetchTagsWithPrefix = useCallback((prefix: string, params: CursorPaginationParams<NormalizedTagCursor>) => {
-        dispatch(fetchTagsWithPrefix({ prefix, params }));
-    }, [dispatch]);
+        if(!actor) return;
+        dispatch(fetchTagsWithPrefix({ actor, prefix, params }));
+    }, [dispatch, actor]);
 
     return {
         fetchPopularTags: dispatchFetchPopularTags,

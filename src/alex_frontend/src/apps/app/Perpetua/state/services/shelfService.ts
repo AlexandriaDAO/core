@@ -1,5 +1,4 @@
 import { Principal } from '@dfinity/principal';
-import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 import { convertBigIntsToStrings } from '@/utils/bgint_convert';
 import {
   ShelfPublic,
@@ -17,16 +16,18 @@ import {
   QueryError
 } from './serviceTypes';
 import { toast } from "sonner";
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../../../../../declarations/perpetua/perpetua.did';
 
 /**
  * Get all shelves for a user (Paginated)
  */
 export async function getUserShelves(
+  actor: ActorSubclass<_SERVICE>,
   principal: Principal | string,
   params: OffsetPaginationParams
 ): Promise<Result<OffsetPaginatedResponse<ShelfPublic>, QueryError>> {
   try {
-    const actor = await getActorPerpetua();
     const principalForApi = toPrincipal(principal);
 
     // Prepare pagination input for the backend
@@ -69,9 +70,8 @@ export async function getUserShelves(
 /**
  * Get a specific shelf by ID
  */
-export async function getShelf(shelfId: string): Promise<Result<ShelfPublic, QueryError>> {
+export async function getShelf(actor: ActorSubclass<_SERVICE>, shelfId: string): Promise<Result<ShelfPublic, QueryError>> {
   try {
-    const actor = await getActorPerpetua();
     const result = await actor.get_shelf(shelfId);
 
     if ("Ok" in result) {
@@ -89,11 +89,10 @@ export async function getShelf(shelfId: string): Promise<Result<ShelfPublic, Que
  * Get recent public shelves (Paginated)
  */
 export async function getRecentShelves(
+  actor: ActorSubclass<_SERVICE>,
   params: CursorPaginationParams<TimestampCursor>
 ): Promise<Result<CursorPaginatedResponse<ShelfPublic, TimestampCursor>, QueryError>> {
-  try {
-    const actor = await getActorPerpetua();
-
+  try { 
     let cursorOpt: [] | [bigint] = [];
     if (params.cursor) {
       cursorOpt = [BigInt(params.cursor)];
@@ -140,9 +139,8 @@ export async function getRecentShelves(
 /**
  * Create a new shelf
  */
-export async function createShelf(title: string, description?: string, tags?: string[]): Promise<Result<string, string>> {
+export async function createShelf(actor: ActorSubclass<_SERVICE>, title: string, description?: string, tags?: string[]): Promise<Result<string, string>> {
   try {
-    const actor = await getActorPerpetua();
     const initialItems: Item[] = [];
 
     const result = await actor.store_shelf(
@@ -173,13 +171,12 @@ export async function createShelf(title: string, description?: string, tags?: st
  * Update shelf metadata
  */
 export async function updateShelfMetadata(
+  actor: ActorSubclass<_SERVICE>,
   shelfId: string,
   title?: string,
   description?: string
 ): Promise<Result<boolean, string>> {
   try {
-    const actor = await getActorPerpetua();
-
     const result = await actor.update_shelf_metadata(
       shelfId,
       title ? [title] : [],
@@ -201,13 +198,12 @@ export async function updateShelfMetadata(
  * Reorder a shelf in a user's profile
  */
 export async function reorderProfileShelf(
+  actor: ActorSubclass<_SERVICE>,
   shelfId: string,
   referenceShelfId: string | null,
   before: boolean
 ): Promise<Result<boolean, string>> {
   try {
-    const actor = await getActorPerpetua();
-
     const result = await actor.reorder_profile_shelf(
       shelfId,
       referenceShelfId ? [referenceShelfId] : [],
@@ -232,10 +228,8 @@ export async function reorderProfileShelf(
 /**
  * Check if a shelf is publicly editable
  */
-export async function isShelfPublic(shelfId: string): Promise<Result<boolean, string>> {
+export async function isShelfPublic(actor: ActorSubclass<_SERVICE>, shelfId: string): Promise<Result<boolean, string>> {
   try {
-    const actor = await getActorPerpetua();
-
     const result = await actor.is_shelf_public(shelfId);
 
     if ("Ok" in result) {
@@ -253,12 +247,11 @@ export async function isShelfPublic(shelfId: string): Promise<Result<boolean, st
  * Toggle public access for a shelf
  */
 export async function toggleShelfPublicAccess(
+  actor: ActorSubclass<_SERVICE>,
   shelfId: string,
   isPublic: boolean
 ): Promise<Result<boolean, string>> {
   try {
-    const actor = await getActorPerpetua();
-
     const result = await actor.toggle_shelf_public_access(shelfId, isPublic);
 
     if ("Ok" in result) {
@@ -276,10 +269,10 @@ export async function toggleShelfPublicAccess(
  * Get a shuffled feed of shelves, updated hourly.
  */
 export async function getShuffledByHourFeed(
+  actor: ActorSubclass<_SERVICE>,
   limit: number
 ): Promise<Result<ShelfPublic[], QueryError>> {
   try {
-    const actor = await getActorPerpetua();
     const result = await actor.get_shuffled_by_hour_feed(BigInt(limit));
 
     if ("Ok" in result) {
@@ -300,11 +293,10 @@ export async function getShuffledByHourFeed(
  * Get a storyline feed of shelves based on followed users and tags (Paginated)
  */
 export async function getStorylineFeed(
+  actor: ActorSubclass<_SERVICE>,
   params: CursorPaginationParams<TimestampCursor>
 ): Promise<Result<CursorPaginatedResponse<ShelfPublic, TimestampCursor>, QueryError>> {
   try {
-    const actor = await getActorPerpetua();
-
     let cursorOpt: [] | [bigint] = [];
     if (params.cursor) {
       cursorOpt = [BigInt(params.cursor)];
@@ -345,11 +337,11 @@ export async function getStorylineFeed(
 }
 
 export async function getUserPubliclyEditableShelves(
+  actor: ActorSubclass<_SERVICE>,
   principal: Principal | string,
   params: OffsetPaginationParams
 ): Promise<Result<OffsetPaginatedResponse<ShelfPublic>, QueryError>> {
   try {
-    const actor = await getActorPerpetua();
     const principalForApi = toPrincipal(principal);
     const paginationInput: BackendOffsetPaginationInput = {
       offset: BigInt(params.offset),

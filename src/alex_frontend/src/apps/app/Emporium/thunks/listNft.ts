@@ -1,26 +1,25 @@
 import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
-import {
-  getActorEmporium,
-  getIcrc7Actor,
-} from "@/features/auth/utils/authUtils";
 import { Principal } from "@dfinity/principal";
 import { removeTransaction } from "@/apps/Modules/shared/state/transactions/transactionThunks";
 import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
+import { _SERVICE as _SERVICE_EMPORIUM} from "../../../../../../declarations/emporium/emporium.did";
+import { _SERVICE as _SERVICE_ICRC7} from "../../../../../../declarations/icrc7/icrc7.did";
+import { ActorSubclass } from "@dfinity/agent";
 
 const listNft = createAsyncThunk<
   string, // Success return type
   {
+    actorEmporium: ActorSubclass<_SERVICE_EMPORIUM>,
+    actorIcrc7: ActorSubclass<_SERVICE_ICRC7>,
     nftArweaveId: string;
     price: string;
   },
   { rejectValue: string } // Reject type
 >(
   "emporium/listNft",
-  async ({ nftArweaveId, price }, { dispatch, rejectWithValue }) => {
+  async ({ actorEmporium, actorIcrc7, nftArweaveId, price }, { dispatch, rejectWithValue }) => {
     try {
       const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
-      const actorEmporium = await getActorEmporium();
-      const actorIcrc7 = await getIcrc7Actor();
       
       const nftAdapter = createTokenAdapter('NFT');
       

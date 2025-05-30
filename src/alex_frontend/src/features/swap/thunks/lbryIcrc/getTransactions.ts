@@ -1,11 +1,8 @@
 import { _SERVICE as _SERVICELBRY } from "../../../../../../declarations/LBRY/LBRY.did";
+import { _SERVICE as _SERVICEALEX } from "../../../../../../declarations/ALEX/ALEX.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
-import {
-  getAlexActor,
-  getIcpLedgerActor,
-  getLbryActor,
-} from "@/features/auth/utils/authUtils";
+import { ActorSubclass } from "@dfinity/agent/lib/cjs";
 
 export interface TransactionType {
   type: string;
@@ -19,14 +16,14 @@ export interface TransactionType {
 // Create the async thunk for fetching transactions
 const fetchTransaction = createAsyncThunk<
   TransactionType[], // Use the interface here for the return type of the thunk's payload
-  string, // The argument type (account or principal string)
+  {
+    lbryActor: ActorSubclass<_SERVICELBRY>,
+    alexActor: ActorSubclass<_SERVICEALEX>,
+    account: string
+  }, // The argument type (account or principal string)
   { rejectValue: string }
->("icp_swap/fetchTransaction", async (account, { rejectWithValue }) => {
+>("icp_swap/fetchTransaction", async ({ lbryActor, alexActor, account }, { rejectWithValue }) => {
   try {
-    const lbryActor = await getLbryActor();
-    // const icpLedgerActor = getIcpLedgerActor();
-    const alexActor = await getAlexActor();
-
     // Retrieve LBRY transactions
     const resultLbryPeek = await lbryActor.get_transactions({
       start: 0n,

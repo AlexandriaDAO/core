@@ -13,6 +13,8 @@ import libraryReducer, {
   togglePrincipal
 } from '@/apps/Modules/shared/state/librarySearch/librarySlice';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../../declarations/asset_manager/asset_manager.did';
 
 // Mock the external dependencies
 jest.mock('@/apps/Modules/shared/state/nftData/nftDataSlice', () => ({
@@ -222,9 +224,9 @@ describe('Library State', () => {
       // Initial state
       const initialState = store.getState() as RootState;
       expect(initialState.library.sortAsc).toBe(true);
-      
+      const actor = {} as ActorSubclass<_SERVICE>;
       // Call the toggleSort thunk
-      await store.dispatch(toggleSort() as unknown as AnyAction);
+      await store.dispatch(toggleSort(actor) as unknown as AnyAction);
       
       // Verify sort direction is toggled
       const updatedState = store.getState() as RootState;

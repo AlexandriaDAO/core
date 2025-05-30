@@ -1,20 +1,18 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { Button } from "@/lib/components/button";
-import { Input } from "@/lib/components/input";
 import { Label } from "@/lib/components/label";
 import { Textarea } from "@/lib/components/textarea";
 import { ShelfPublic, Item } from "@/../../declarations/perpetua/perpetua.did";
-import { X, Plus, ChevronUp } from "lucide-react";
+import { X } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { selectUserShelves, selectSelectedShelf, NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { toast } from "sonner";
-import { ShelfForm } from "@/apps/app/Perpetua/features/shelf-management/components/NewShelf";
-import { useShelfOperations } from "@/apps/app/Perpetua/features/shelf-management/hooks/useShelfOperations";
 import { loadShelves } from "@/apps/app/Perpetua/state";
 import { useIdentity } from "@/hooks/useIdentity";
 import AppCard from '@/components/AppCard';
 import { findApp } from '@/config/apps';
+import { usePerpetua } from "@/hooks/actors";
 
 // Define the character limit constant
 const MAX_MARKDOWN_LENGTH = 1000;
@@ -45,6 +43,7 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
   // Selectors and hooks
   const dispatch = useAppDispatch();
   const { identity } = useIdentity();
+  const {actor} = usePerpetua();
   
   // Only fetch shelves data when needed (when on Shelf tab)
   const allShelves = useAppSelector(type === "Shelf" ? selectUserShelves : () => []);
@@ -63,11 +62,13 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
 
   // Fetch shelves when the Shelf tab is selected - only on initial tab selection
   useEffect(() => {
+    if(!actor) return;
     if (type === "Shelf" && identity) {
       try {
         const principal = identity.getPrincipal().toString();
         // Dispatch action with a stable reference
         const action = loadShelves({ 
+          actor,
           principal, 
           params: { offset: 0, limit: 20 }
         });
@@ -76,7 +77,7 @@ const InlineItemCreator: React.FC<InlineItemCreatorProps> = ({
         console.error("Error loading shelves:", err);
       }
     }
-  }, [type, identity]); // explicitly exclude dispatch
+  }, [actor, type, identity]); // explicitly exclude dispatch
 
   // Filter available shelves that can be added as items
   const availableShelves = useMemo(() => {

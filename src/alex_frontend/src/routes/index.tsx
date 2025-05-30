@@ -18,7 +18,6 @@ import { ROUTES } from "./routeConfig";
 import MarketSkeleton from "@/layouts/skeletons/emporium/MarketSkeleton";
 import GeneralSkeleton from "@/layouts/skeletons/emporium/GeneralSkeleton";
 import MyNftsSkeleton from "@/layouts/skeletons/emporium/MyNftsSkeleton";
-import { EmporiumActor } from "@/actors";
 import Imporium from "@/pages/emporium";
 const HomePage = lazy(()=>import("@/pages/HomePage"));
 
@@ -65,6 +64,10 @@ const SettingsPage = lazy(()=>import("@/pages/dashboard/SettingsPage"));
 // const CollectionPage = lazy(()=>import("@/pages/dashboard/CollectionPage"));
 const SingleTokenView = lazy(() => import("@/apps/Modules/AppModules/blinks/SingleTokenView"));
 
+const EmporiumActor = lazy(() => import("@/actors").then(module => ({ default: module.EmporiumActor })));
+const LbryActor = lazy(() => import("@/actors").then(module => ({ default: module.LbryActor })));
+const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
+
 const router = createBrowserRouter(
 	createRoutesFromElements(
 		<Route element={<ErrorBoundary><BaseLayout /></ErrorBoundary>}>
@@ -101,9 +104,29 @@ const router = createBrowserRouter(
 						<Route path="user/:userId/item/:itemId" element={<Suspense key="perpetua-user-item" fallback={<TopProgressBar />}><Perpetua /></Suspense>} />
 					</Route>
 					
-					<Route path="dialectica" element={<Suspense key="dialectica" fallback={<TopProgressBar />}><Dialectica /></Suspense>} />
+					<Route path="dialectica" element={
+						<Suspense key="dialectica" fallback={<TopProgressBar />}>
+							<LbryActor>
+								<NftManagerActor>
+									<EmporiumActor>
+										<Dialectica />
+									</EmporiumActor>
+								</NftManagerActor>
+							</LbryActor>
+						</Suspense>
+					} />
 					<Route path="permasearch" element={<Suspense key="permasearch" fallback={<TopProgressBar />}><Permasearch /></Suspense>} />
-					<Route path="emporium" element={<Suspense key="emporium" fallback={<TopProgressBar />}><Emporium /></Suspense>} />
+					<Route path="emporium" element={
+						<Suspense key="emporium" fallback={<TopProgressBar />}>
+							<LbryActor>
+								<NftManagerActor>
+									<EmporiumActor>
+										<Emporium />
+									</EmporiumActor>
+								</NftManagerActor>
+							</LbryActor>
+						</Suspense>
+					} />
 
 					<Route path="imporium">
 						<Route index element={<Suspense key="imporium" fallback={<MarketSkeleton />}><Imporium /></Suspense>} />

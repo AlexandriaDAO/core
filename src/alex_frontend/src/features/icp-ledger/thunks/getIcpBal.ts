@@ -1,16 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
 import { Principal } from "@dfinity/principal";
-import { getIcpLedgerActor } from "@/features/auth/utils/authUtils";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 
 // Define the async thunk
 const getIcpBal = createAsyncThunk<
   {formatedAccountBal:string}, // This is the return type of the thunk's payload
-  string,
+  {actor: ActorSubclass<_SERVICE>, account: string},
   { rejectValue: string }
->("icp_ledger/getIcpBal", async (account, { rejectWithValue }) => {
+>("icp_ledger/getIcpBal", async ({actor, account}, { rejectWithValue }) => {
   try {
-    const actor = await getIcpLedgerActor();
     let resultAccountBal = await actor.icrc1_balance_of({
       owner: Principal.fromText(account),
       subaccount: []

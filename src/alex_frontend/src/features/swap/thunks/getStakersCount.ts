@@ -1,17 +1,15 @@
+import { _SERVICE as _SERVICESWAP } from "../../../../../declarations/icp_swap/icp_swap.did";
+import { ActorSubclass } from "@dfinity/agent";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import LedgerService from "@/utils/LedgerService";
-import { getActorSwap } from "@/features/auth/utils/authUtils";
 
 
 // Define the async thunk
 const getStakersCount = createAsyncThunk<
   string,
-  void,
+  ActorSubclass<_SERVICESWAP>,
   { rejectValue: string }
->("icp_swap/getTotalStakerCount", async (_, { rejectWithValue }) => {
+>("icp_swap/getTotalStakerCount", async (actor, { rejectWithValue }) => {
   try {
-    const actor = await getActorSwap();
-   
     const result = await actor.get_stakers_count();
     
     return result.toString();

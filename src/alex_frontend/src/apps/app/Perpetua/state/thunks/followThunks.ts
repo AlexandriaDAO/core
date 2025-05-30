@@ -2,6 +2,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { getMyFollowedTags, unfollowTag as unfollowTagService, followTag as followTagService } from '../services/followService'; // Assuming followService.ts is in ../services/
 import { RootState } from '@/store'; // For getState type if needed
 import { extractErrorMessage } from '../../utils';
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../../../../../declarations/perpetua/perpetua.did';
 
 type RejectValue = string;
 
@@ -10,13 +12,13 @@ type RejectValue = string;
  */
 export const loadMyFollowedTags = createAsyncThunk<
   string[], // Return type on success (array of tag strings)
-  void,       // Argument type (none for this thunk)
+  ActorSubclass<_SERVICE>,       // Argument type (none for this thunk)
   { rejectValue: RejectValue }
 >(
   'perpetua/loadMyFollowedTags',
-  async (_, { rejectWithValue }) => {
+  async (actor, { rejectWithValue }) => {
     try {
-      const result = await getMyFollowedTags();
+      const result = await getMyFollowedTags(actor);
       if ('Ok' in result) {
         return result.Ok;
       } else {
@@ -33,16 +35,16 @@ export const loadMyFollowedTags = createAsyncThunk<
  */
 export const unfollowTag = createAsyncThunk<
   string[], // Returns the new list of followed tags
-  string,   // Argument: the tag to unfollow
+  {actor: ActorSubclass<_SERVICE>, tagToUnfollow: string},   // Argument: the tag to unfollow
   { rejectValue: RejectValue; state: RootState }
 >(
   'perpetua/unfollowTag',
-  async (tagToUnfollow, { dispatch, rejectWithValue }) => {
+  async ({actor, tagToUnfollow}, { dispatch, rejectWithValue }) => {
     try {
-      const unfollowResult = await unfollowTagService(tagToUnfollow);
+      const unfollowResult = await unfollowTagService(actor, tagToUnfollow);
       if ('Ok' in unfollowResult) {
         // After successful unfollow, dispatch loadMyFollowedTags to refresh the list
-        const refreshResultAction = await dispatch(loadMyFollowedTags());
+        const refreshResultAction = await dispatch(loadMyFollowedTags(actor));
         if (loadMyFollowedTags.fulfilled.match(refreshResultAction)) {
           return refreshResultAction.payload; // Return the refreshed list
         } else {
@@ -64,16 +66,16 @@ export const unfollowTag = createAsyncThunk<
  */
 export const followTag = createAsyncThunk<
   string[], // Returns the new list of followed tags
-  string,   // Argument: the tag to follow
+  {actor: ActorSubclass<_SERVICE>, tagToFollow: string},   // Argument: the tag to follow
   { rejectValue: RejectValue; state: RootState }
 >(
   'perpetua/followTag',
-  async (tagToFollow, { dispatch, rejectWithValue }) => {
+  async ({actor, tagToFollow}, { dispatch, rejectWithValue }) => {
     try {
-      const followResult = await followTagService(tagToFollow);
+      const followResult = await followTagService(actor, tagToFollow);
       if ('Ok' in followResult) {
         // After successful follow, dispatch loadMyFollowedTags to refresh the list
-        const refreshResultAction = await dispatch(loadMyFollowedTags());
+        const refreshResultAction = await dispatch(loadMyFollowedTags(actor));
         if (loadMyFollowedTags.fulfilled.match(refreshResultAction)) {
           return refreshResultAction.payload; // Return the refreshed list
         } else {

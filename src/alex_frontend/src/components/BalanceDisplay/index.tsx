@@ -6,8 +6,13 @@ import getLbryBalance from '../../features/swap/thunks/lbryIcrc/getLbryBalance';
 import getAccountAlexBalance from '../../features/swap/thunks/alexIcrc/getAccountAlexBalance';
 import getIcpBal from '@/features/icp-ledger/thunks/getIcpBal';
 import { LoaderCircle, ChevronDown, ChevronUp, Layers, Wallet } from 'lucide-react';
+import { useAlex, useIcpLedger, useLbry, useNftManager } from '@/hooks/actors';
 
 const BalanceDisplay: React.FC = () => {
+    const {actor: lbryActor} = useLbry();
+    const {actor: nftManagerActor} = useNftManager();
+    const {actor: icpLedgerActor} = useIcpLedger();
+    const {actor: alexActor} = useAlex();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const {
@@ -27,21 +32,23 @@ const BalanceDisplay: React.FC = () => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
-        if (user?.principal && spendingBalance === "0") {
-            dispatch(getSpendingBalance(user.principal));
+        if (!user || !lbryActor || !nftManagerActor) return;
+        if (spendingBalance === "0") {
+            dispatch(getSpendingBalance({lbryActor, nftManagerActor, userPrincipal: user.principal}));
         }
-    }, [dispatch, user, spendingBalance]);
+    }, [dispatch, user, spendingBalance, lbryActor, nftManagerActor]);
 
     useEffect(() => {
-        if (user?.principal && isExpanded) {
+        if (!user || !icpLedgerActor || !alexActor || !lbryActor) return;
+        if (isExpanded) {
             if (icpBalance === "0") {
-                dispatch(getIcpBal(user.principal));
+                dispatch(getIcpBal({actor: icpLedgerActor, account: user.principal}));
             }
             if (mainAlexBalance === "0") {
-                dispatch(getAccountAlexBalance(user.principal));
+                dispatch(getAccountAlexBalance({actor: alexActor, account: user.principal}));
             }
             if (lbryBalance === "0") {
-                dispatch(getLbryBalance(user.principal));
+                dispatch(getLbryBalance({actor: lbryActor, account: user.principal}));
             }
         }
     }, [dispatch, user, isExpanded, icpBalance, mainAlexBalance, lbryBalance]);

@@ -1,18 +1,16 @@
+import { ActorSubclass } from "@dfinity/agent";
 import { _SERVICE as _SERVICESWAP } from "../../../../../declarations/icp_swap/icp_swap.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
-import { getActorSwap } from "@/features/auth/utils/authUtils";
-import { CanisterArchived } from "../swapSlice";
 
 // Define the async thunk
 const getAverageApy = createAsyncThunk<
   number, // This is the return type of the thunk's payload
-  void,
+  ActorSubclass<_SERVICESWAP>,
   { rejectValue: string }
->("icp_swap/getAverageApy", async (_, { rejectWithValue }) => {
+>("icp_swap/getAverageApy", async (actor, { rejectWithValue }) => {
   try {
     const LedgerServices = LedgerService();
-    const actor = await getActorSwap();
     const result = await actor.get_all_apy_values();
     const scalingFactor = LedgerServices.e8sToIcp(
       await actor.get_scaling_factor()

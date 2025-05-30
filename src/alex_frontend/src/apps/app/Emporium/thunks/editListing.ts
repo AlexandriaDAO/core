@@ -1,19 +1,20 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getActorEmporium } from "@/features/auth/utils/authUtils";
 import { arweaveIdToNat } from "@/utils/id_convert";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE as _SERVICE_EMPORIUM} from "../../../../../../declarations/emporium/emporium.did";
 
 const editListing = createAsyncThunk<
   { nftArweaveId: string; price: string }, // Success return type
   {
+    actorEmporium: ActorSubclass<_SERVICE_EMPORIUM>,
     nftArweaveId: string;
     price: string;
   },
   { rejectValue: string } // Reject type
 >(
   "emporium/editListing",
-  async ({ nftArweaveId, price }, { rejectWithValue }) => {
+  async ({ actorEmporium, nftArweaveId, price }, { rejectWithValue }) => {
     try {
-      const actorEmporium = await getActorEmporium();
       const tokenId = arweaveIdToNat(nftArweaveId);
 
       // Format the price as BigInt

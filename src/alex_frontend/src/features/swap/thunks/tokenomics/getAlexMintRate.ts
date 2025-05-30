@@ -1,14 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
-import { getTokenomicsActor } from "@/features/auth/utils/authUtils";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../../declarations/tokenomics/tokenomics.did";
 // Define the asyn thunk
 const getAlexMintRate = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  void,
+  ActorSubclass<_SERVICE>,
   { rejectValue: string }
->("tokenomics/getAlexMintRate", async (_, { rejectWithValue }) => {
+>("tokenomics/getAlexMintRate", async (actor, { rejectWithValue }) => {
   try {
-    const actor = await getTokenomicsActor();
     const result = await actor.get_current_ALEX_rate();
     const LedgerServices = LedgerService();
     const fromatedBal = LedgerServices.e8sToIcp(

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useIdentity } from "@/hooks/useIdentity";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -20,31 +20,36 @@ import {
 import { createFindItemById } from "../../../utils";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { AddItemResult } from "@/apps/app/Perpetua/state/thunks/itemThunks";
+import { usePerpetua } from "@/hooks/actors";
 
 // Custom hook for shelf operations
 export const useShelfOperations = () => {
   const { identity } = useIdentity();
+  const {actor} = usePerpetua();
   const dispatch = useAppDispatch();
   const shelves = useAppSelector(selectUserShelves);
   const loading = useAppSelector(selectLoading);
   const error = useAppSelector(selectError);
 
   const loadShelvesData = useCallback(async () => {
-    if (!identity) return;
+    if (!identity || !actor) return;
     try {
       await dispatch(loadShelves({ 
+        actor,
         principal: identity.getPrincipal(), 
         params: { offset: 0, limit: 20 }
       })).unwrap();
     } catch (error) {
       console.error("Failed to load shelves:", error);
     }
-  }, [identity, dispatch]);
+  }, [identity, dispatch, actor]);
   
   const createShelf = useCallback(async (title: string, description: string): Promise<string | null> => {
-    if (!identity) return null;
     try {
+      if (!identity) throw new Error("User identity not found");
+      if (!actor) throw new Error("Actor not found");
       const result = await dispatch(createShelfAction({ 
+        actor,
         title, 
         description, 
         principal: identity.getPrincipal()
@@ -55,17 +60,18 @@ export const useShelfOperations = () => {
       console.error("Failed to create shelf:", error);
       return null;
     }
-  }, [identity, dispatch]);
+  }, [identity, actor, dispatch]);
 
   const getShelf = useCallback(async (shelfId: string): Promise<ShelfPublic | null> => {
     try {
-      const result = await dispatch(getShelfById(shelfId)).unwrap();
+      if(!actor) throw new Error("Actor not found");
+      const result = await dispatch(getShelfById({actor, shelfId})).unwrap();
       return result || null;
     } catch (error) {
       console.error(`Failed to get shelf ${shelfId}:`, error);
       return null;
     }
-  }, [dispatch]);
+  }, [dispatch, actor]);
 
   const addItem = useCallback(async (
     shelf: ShelfPublic, 
@@ -75,13 +81,13 @@ export const useShelfOperations = () => {
     referenceItemId?: number | null, 
     before?: boolean
   ): Promise<AddItemResult> => {
-    if (!identity) {
-      return { status: 'error', message: "User identity not found" };
-    }
-    
+    if (!identity) return { status: 'error', message: "User identity not found" };
+    if (!actor) return { status: 'error', message: "Actor not found" };
+
     try {
       // Pass all parameters to the thunk and return the result directly
       const result = await dispatch(addItemAction({ 
+        actor,
         shelf, 
         content, 
         type,
@@ -117,9 +123,10 @@ export const useShelfOperations = () => {
   }, [identity, dispatch, getShelf]);
 
   const setItemOrder = useCallback(async (shelfId: string, orderedItemIds: number[]): Promise<boolean> => {
-    if (!identity) return false;
+    if (!identity || !actor) return false;
     try {
       await dispatch(setItemOrderAction({
+        actor,
         shelfId,
         orderedItemIds,
         principal: identity.getPrincipal()
@@ -133,13 +140,14 @@ export const useShelfOperations = () => {
       console.error("Failed to set item order:", error);
       return false;
     }
-  }, [identity, dispatch, getShelf]);
+  }, [identity, actor, dispatch, getShelf]);
 
   // New function to reorder shelves in a user's profile
   const reorderShelf = useCallback(async (shelfId: string, referenceShelfId: string | null, before: boolean): Promise<boolean> => {
-    if (!identity) return false;
+    if (!identity || !actor) return false;
     try {
       await dispatch(reorderProfileShelfAction({
+        actor,
         shelfId,
         referenceShelfId,
         before,
@@ -151,12 +159,13 @@ export const useShelfOperations = () => {
       console.error("Failed to reorder shelf:", error);
       return false;
     }
-  }, [identity, dispatch]);
+  }, [identity, actor, dispatch]);
 
   const removeItem = useCallback(async (shelfId: string, itemId: number): Promise<boolean> => {
-    if (!identity) return false;
+    if (!identity || !actor) return false;
     try {
       await dispatch(removeItemAction({ 
+        actor,
         shelfId, 
         itemId,
         principal: identity.getPrincipal()
@@ -170,14 +179,15 @@ export const useShelfOperations = () => {
       console.error("Failed to remove item:", error);
       return false;
     }
-  }, [identity, dispatch, getShelf]);
+  }, [identity,actor, dispatch, getShelf]);
 
   // Helper function to find a item by ID across all shelves
   const findItemById = createFindItemById(shelves);
 
   const updateMetadata = useCallback(async (shelfId: string, title?: string, description?: string): Promise<boolean> => {
     try {
-      await dispatch(updateShelfMetadata({ shelfId, title, description })).unwrap();
+      if(!actor) throw new Error("Actor Unavailable");
+      await dispatch(updateShelfMetadata({ actor, shelfId, title, description })).unwrap();
       
       // Get the updated shelf
       await getShelf(shelfId);
@@ -187,7 +197,7 @@ export const useShelfOperations = () => {
       console.error("Failed to update shelf metadata:", error);
       return false;
     }
-  }, [dispatch, getShelf]);
+  }, [dispatch, getShelf, actor]);
 
   return {
     shelves,

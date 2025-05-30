@@ -8,24 +8,23 @@ import { Transaction } from "../../../shared/types/queries";
 import { fetchTransactionsForAlexandrian } from "@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi";
 import { setTransactions } from "./transactionSlice";
 import { getAssetCanister } from "../assetManager/utlis";
-import {
-  getActorUserAssetCanister,
-  getAuthClient,
-} from "@/features/auth/utils/authUtils";
+import { getActorUserAssetCanister } from "@/features/auth/utils/authUtils";
 import { fetchAssetFromUserCanister } from "../assetManager/assetManagerThunks";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../../../declarations/asset_manager/asset_manager.did";
 
 /**
  * Fetch transactions for NFTs
  */
 export const fetchNftTransactions = createAsyncThunk<
   Transaction[],
-  string[],
+  {arweaveIds: string[], actor: ActorSubclass<_SERVICE>},
   { dispatch: AppDispatch; state: RootState }
 >(
   "transactions/fetchNftTransactions",
-  async (arweaveIds: string[], { dispatch, getState }) => {
+  async ({arweaveIds, actor}, { dispatch, getState }) => {
     const transactionService = getTransactionService(dispatch, getState);
-    return await transactionService.fetchNftTransactions(arweaveIds);
+    return await transactionService.fetchNftTransactions(arweaveIds, actor);
   }
 );
 
@@ -108,16 +107,16 @@ export const removeTransaction = createAsyncThunk<
  */
 export const updateTransactions = createAsyncThunk<
   Transaction[],
-  string[],
+  {arweaveIds: string[], actor: ActorSubclass<_SERVICE>},
   { dispatch: AppDispatch; state: RootState }
 >(
   "transactions/updateTransactions",
-  async (arweaveIds: string[], { dispatch, getState }) => {
+  async ({arweaveIds, actor}, { dispatch, getState }) => {
     const state = getState() as RootState;
     const { selectedPrincipals } = state.library;
     const existingTransactions = state.transactions.transactions;
     const nfts = state.nftData?.nfts || {};
-    let userAssetCanisterd = await getAssetCanister(selectedPrincipals[0]);
+    let userAssetCanisterd = await getAssetCanister(selectedPrincipals[0], actor);
 
     if (arweaveIds.length === 0) {
       return existingTransactions;

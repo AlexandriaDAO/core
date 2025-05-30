@@ -23,8 +23,8 @@ import { getNftOwnerInfo, UserInfo } from '../../shared/utils/nftOwner';
 import { Button } from "@/lib/components/button";
 import { convertE8sToToken, formatPrincipal, formatBalance } from '../../shared/utils/tokenUtils';
 import { createTokenAdapter, determineTokenType, TokenType } from '../../shared/adapters/TokenAdapter';
-import { UnifiedCardActions } from '../../shared/components/UnifiedCardActions/UnifiedCardActions';
 import { ShelvesPreloader } from '../shared/components/ShelvesPreloader';
+import { PerpetuaActor } from '@/actors';
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -330,7 +330,7 @@ function SingleTokenView() {
 
   return (
     <div className="container mx-auto p-4">
-      <ShelvesPreloader />
+      <PerpetuaActor><ShelvesPreloader /></PerpetuaActor>
       
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm dark:bg-gray-900 relative">
         <ContentCard

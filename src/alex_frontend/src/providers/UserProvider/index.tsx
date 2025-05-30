@@ -1,10 +1,7 @@
 import React from "react";
 import IIUserProvider from "./IIUserProvider";
 import OISYUserProvider from "./OISYUserProvider";
-import { AssetManagerActor, UserActor } from "@/actors";
-// import EthUserProvider from "./EthUserProvider";
 import useAuth from "@/hooks/useAuth";
-// import SolUserProvider from "./SolUserProvider";
 import NFIDUserProvider from "./NFIDUserProvider";
 
 interface UserProviderProps {
@@ -15,30 +12,11 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
     const {provider} = useAuth();
 
-    if (provider === 'II') return (
-        <UserActor>
-            <AssetManagerActor>
-                <IIUserProvider>{children}</IIUserProvider>
-            </AssetManagerActor>
-        </UserActor>
-    )
+    if (provider === 'II') return <IIUserProvider>{children}</IIUserProvider>
 
-    if (provider === 'NFID') return (
-        <UserActor>
-            <AssetManagerActor>
-                <NFIDUserProvider>{children}</NFIDUserProvider>
-            </AssetManagerActor>
-        </UserActor>
-    )
+    if (provider === 'NFID') return <NFIDUserProvider>{children}</NFIDUserProvider>
 
-    if (provider === 'OISY') return (
-        <UserActor>
-            <AssetManagerActor>
-                <OISYUserProvider>{children}</OISYUserProvider>
-            </AssetManagerActor>
-        </UserActor>
-    )
-
+    if (provider === 'OISY') return <OISYUserProvider>{children}</OISYUserProvider>
 
     return <> {children} </>;
 }

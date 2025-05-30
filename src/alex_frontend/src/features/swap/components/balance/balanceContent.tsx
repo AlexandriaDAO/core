@@ -7,18 +7,21 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import LbryBalanceCard from "./lbryBalanceCard";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
+import { useAlex, useLbry } from "@/hooks/actors";
+import { IcpSwapFactoryActor } from "@/actors";
 
 const BalanceContent: React.FC = () => {
     const dispatch = useAppDispatch();
     const {user} = useAppSelector((state) => state.auth);
-
+    const {actor: alexActor} = useAlex();
+    const {actor: lbryActor} = useLbry();
 
     useEffect(() => {
-        if (user) {
-            dispatch(getAccountAlexBalance(user.principal))
-            dispatch(getLbryBalance(user.principal))
-        }
-    }, [user])
+        if (!user || !alexActor || !lbryActor) return;
+
+        dispatch(getAccountAlexBalance({actor: alexActor, account: user.principal}))
+        dispatch(getLbryBalance({actor: lbryActor, account: user.principal}))
+    }, [user, alexActor, lbryActor])
 
 
     return (
@@ -28,7 +31,7 @@ const BalanceContent: React.FC = () => {
                     <h3 className="text-tabsheading 2xl:text-xxltabsheading xl:text-xltabsheading lg:text-lgtabsheading md:text-mdtabsheading sm:text-smtabsheading font-bold">Balance</h3>
                 </div>
                 <div className="flex md:flex-row flex-col">
-                    <AlexBalanceCard />
+                    <IcpSwapFactoryActor><AlexBalanceCard /></IcpSwapFactoryActor>
                     <LbryBalanceCard />
                 </div>
             </div>
