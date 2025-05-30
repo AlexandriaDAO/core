@@ -47,6 +47,7 @@ const TopupContent = () => {
 
         dispatch(getSpendingBalance({lbryActor, nftManagerActor, userPrincipal: user.principal}));
         dispatch(getAlexSpendingBalance({alexActor, nftManagerActor, userPrincipal: user.principal}));
+        dispatch(getLbryBalance({actor: lbryActor, account: user.principal}));
     }, [user, lbryActor, nftManagerActor, alexActor]);
 
     const handleTopUp = async () => {
