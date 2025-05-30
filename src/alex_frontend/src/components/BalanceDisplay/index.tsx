@@ -8,6 +8,15 @@ import getIcpBal from '@/features/icp-ledger/thunks/getIcpBal';
 import { LoaderCircle, ChevronDown, ChevronUp, Layers, Wallet } from 'lucide-react';
 import { useAlex, useIcpLedger, useLbry, useNftManager } from '@/hooks/actors';
 
+import { NavLink } from "react-router";
+
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/lib/components/dropdown-menu";
+
 const BalanceDisplay: React.FC = () => {
     const {actor: lbryActor} = useLbry();
     const {actor: nftManagerActor} = useNftManager();
@@ -68,31 +77,38 @@ const BalanceDisplay: React.FC = () => {
         : formatBalance(spendingBalance);
 
     return (
-        <div className="balance-display text-white ml-3 relative">
-            <div className="flex items-center cursor-pointer h-full" onClick={() => setIsExpanded(!isExpanded)}>
-                <Layers size={16} className="mr-1 text-gray-400" />
-                <span className="text-sm font-medium">{defaultBalanceValue}</span>
-                {user && (isExpanded ? <ChevronUp size={16} className="ml-1" /> : <ChevronDown size={16} className="ml-1" />)}
-            </div>
-            {isExpanded && user && (
-                <div className="absolute top-full left-0 mt-1 p-3 bg-gray-800 rounded-md shadow-lg border border-gray-700 w-52 z-[100]">
-                    <div className="text-sm space-y-2">
-                        <p className="flex justify-between items-center">
-                            <span className="flex items-center"><Wallet size={14} className="mr-2 text-gray-400" />ICP:</span>
-                            {icpLoading && icpBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span>{formatBalance(icpBalance)}</span>}
-                        </p>
-                        <p className="flex justify-between items-center">
-                            <span className="flex items-center"><Wallet size={14} className="mr-2 text-gray-400" />ALEX:</span>
-                            {alexLoading && mainAlexBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span>{formatBalance(mainAlexBalance)}</span>}
-                        </p>
-                        <p className="flex justify-between items-center">
-                            <span className="flex items-center"><Wallet size={14} className="mr-2 text-gray-400" />LBRY:</span>
-                            {swapLoading && lbryBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span>{formatBalance(lbryBalance)}</span>}
-                        </p>
-                    </div>
+        <DropdownMenu onOpenChange={setIsExpanded}>
+            <DropdownMenuTrigger asChild>
+                <div className="flex-shrink h-auto w-max flex justify-center items-center gap-1 px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 text-white hover:text-white/90 hover:border-white rounded-full cursor-pointer duration-300 transition-all">
+                    <Layers size={16} className="mr-1 text-gray-400" />
+                    <span className="text-base font-normal font-roboto-condensed tracking-wider">{defaultBalanceValue}</span>
+                    {user && (isExpanded ? <ChevronUp size={16} className="ml-1" /> : <ChevronDown size={16} className="ml-1" />)}
                 </div>
-            )}
-        </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="end" className="font-roboto-condensed">
+                <NavLink to='/swap/balance'>
+                    <DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
+                        <Wallet />
+                        <span className="flex-grow text-left">ICP</span>
+                        {icpLoading && icpBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span className="pl-4">{formatBalance(icpBalance)}</span>}
+                    </DropdownMenuItem>
+                </NavLink>
+                <NavLink to='/swap/balance'>
+                    <DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
+                        <Wallet />
+                        <span className="flex-grow text-left">ALEX</span>
+                        {alexLoading && mainAlexBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span className="pl-4">{formatBalance(mainAlexBalance)}</span>}
+                    </DropdownMenuItem>
+                </NavLink>
+                <NavLink to='/swap/balance'>
+                    <DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
+                        <Wallet />
+                        <span className="flex-grow text-left">LBRY</span>
+                        {swapLoading && lbryBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span className="pl-4">{formatBalance(lbryBalance)}</span>}
+                    </DropdownMenuItem>
+                </NavLink>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 };
 
