@@ -4,17 +4,20 @@ import { AppDispatch, RootState } from '@/store';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import getSpendingBalance from '@/features/swap/thunks/lbryIcrc/getSpendingBalance';
 import { Link } from 'react-router-dom';
+import { useLbry, useNftManager } from '@/hooks/actors';
 
 export function TopupBalanceWarning() {
+    const {actor: lbryActor} = useLbry();
+    const {actor: nftManagerActor} = useNftManager();
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useAppSelector(state => state.auth);
     const { spendingBalance, loading } = useSelector((state: RootState) => state.swap);
 
     useEffect(() => {
-        if (user?.principal) {
-            dispatch(getSpendingBalance(user.principal));
-        }
-    }, [dispatch, user]);
+        if (!user || !lbryActor || !nftManagerActor) return;
+
+        dispatch(getSpendingBalance({lbryActor, nftManagerActor, userPrincipal: user.principal}));
+    }, [dispatch, user, lbryActor, nftManagerActor]);
 
     if (loading || !user) return null;
 

@@ -10,6 +10,7 @@ import {
 import { useIdentity } from '@/hooks/useIdentity';
 import { Result } from '@/apps/app/Perpetua/utils'; // Import Result from its definition file
 import { QueryError } from '@/../../declarations/perpetua/perpetua.did'; // Import QueryError from declarations
+import { usePerpetua } from '@/hooks/actors';
 
 // Define a more specific error type if needed, or use string/null
 type FollowError = string | null;
@@ -30,6 +31,7 @@ interface UseFollowStatusReturn {
  * Hook to manage and interact with the current user's follow status for tags and users.
  */
 export const useFollowStatus = (): UseFollowStatusReturn => {
+  const {actor} = usePerpetua();
   const { identity } = useIdentity();
   const [followedTags, setFollowedTags] = useState<Set<string>>(new Set());
   const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
@@ -37,6 +39,7 @@ export const useFollowStatus = (): UseFollowStatusReturn => {
   const [error, setError] = useState<QueryError | string | null>(null);
 
   const fetchData = useCallback(async () => {
+    if(!actor) return;
     if (!identity) {
       setFollowedUsers(new Set());
       setFollowedTags(new Set());
@@ -51,8 +54,8 @@ export const useFollowStatus = (): UseFollowStatusReturn => {
 
     try {
       const [usersResult, tagsResult] = await Promise.all([
-        getMyFollowedUsers(),
-        getMyFollowedTags()
+        getMyFollowedUsers(actor),
+        getMyFollowedTags(actor)
       ]);
 
       if ('Ok' in usersResult) {
@@ -86,7 +89,7 @@ export const useFollowStatus = (): UseFollowStatusReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [identity]);
+  }, [identity, actor]);
 
   useEffect(() => {
     fetchData();
@@ -102,6 +105,7 @@ export const useFollowStatus = (): UseFollowStatusReturn => {
   }, [followedUsers]);
 
   const toggleFollowTag = useCallback(async (tag: string): Promise<void> => {
+    if(!actor) return;
     const currentlyFollowing = isFollowingTag(tag);
     const action = currentlyFollowing ? unfollowUser : followUser;
     const optimisticUpdate = () => {
@@ -121,7 +125,7 @@ export const useFollowStatus = (): UseFollowStatusReturn => {
     const toastId = toast.loading(`${currentlyFollowing ? 'Unfollowing' : 'Following'} tag "${tag}"...`);
 
     try {
-      const result = await action(tag);
+      const result = await action(tag, actor);
       if ('Ok' in result) {
         toast.success(`${actionVerb}ed tag: ${tag}`, { id: toastId });
       } else {
@@ -139,6 +143,9 @@ export const useFollowStatus = (): UseFollowStatusReturn => {
     if (!identity) {
       toast.error("You must be logged in to follow or unfollow users.");
       throw new Error("User not authenticated");
+    }
+    if (!actor) {
+      throw new Error("Actor not available");
     }
 
     const isCurrentlyFollowing = followedUsers.has(principalString);
@@ -158,7 +165,7 @@ export const useFollowStatus = (): UseFollowStatusReturn => {
     });
 
     try {
-      apiResult = await action(principalString);
+      apiResult = await action(principalString, actor);
 
       if ('Ok' in apiResult) {
         toast.success(`${actionVerb}ed user successfully.`);

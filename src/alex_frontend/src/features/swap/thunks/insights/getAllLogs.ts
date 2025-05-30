@@ -1,5 +1,6 @@
+import { ActorSubclass } from "@dfinity/agent";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getLogs } from "@/features/auth/utils/authUtils";
+import { _SERVICE } from "../../../../../../declarations/logs/logs.did";
 
 interface LogData {
   alex_rate: bigint;
@@ -39,11 +40,10 @@ const getAllLogs = createAsyncThunk<
       totalLbryBurn: number;
     }[];
   },
-  void,
+  ActorSubclass<_SERVICE>,
   { rejectValue: string }
->("icp_swap/getAllLogs", async (_, { rejectWithValue }) => {
+>("icp_swap/getAllLogs", async (actor, { rejectWithValue }) => {
   try {
-    const actor = await getLogs();
     const result = await actor.get_all_logs();
     console.log("result is ", result);
 

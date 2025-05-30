@@ -337,7 +337,7 @@ const perpetuaSlice = createSlice({
         state.entities.shelves = { ...state.entities.shelves, ...entities };
         
         // Use meta argument to determine if it was the first page
-        const isFirstPage = !action.meta.arg.cursor;
+        const isFirstPage = !action.meta.arg.params.cursor;
         if (isFirstPage) { 
           state.ids.publicShelves = ids;
         } else {
@@ -455,7 +455,7 @@ const perpetuaSlice = createSlice({
       
       // Handle checkShelfPublicAccess
       .addCase(checkShelfPublicAccess.pending, (state, action) => {
-        const shelfId = action.meta.arg;
+        const {shelfId} = action.meta.arg;
         state.loading.publicAccess[shelfId] = true;
         state.error = null;
       })
@@ -472,7 +472,7 @@ const perpetuaSlice = createSlice({
         state.loading.publicAccess[shelfId] = false;
       })
       .addCase(checkShelfPublicAccess.rejected, (state, action) => {
-        const shelfId = action.meta.arg;
+        const {shelfId} = action.meta.arg;
         state.loading.publicAccess[shelfId] = false;
         state.error = action.payload as string;
       })
@@ -500,7 +500,7 @@ const perpetuaSlice = createSlice({
        // Explicitly type the action to include meta
       .addCase(fetchPopularTags.fulfilled, (state, action: ReturnType<typeof fetchPopularTags.fulfilled>) => {
         const { items, next_cursor } = action.payload;
-        const isFirstPage = !action.meta.arg.cursor; 
+        const isFirstPage = !action.meta.arg.params.cursor; 
         if (isFirstPage) {
            state.popularTags = items;
         }

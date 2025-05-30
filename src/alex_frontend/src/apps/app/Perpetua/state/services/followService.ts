@@ -1,8 +1,8 @@
 import { Principal } from '@dfinity/principal';
-import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 import { convertBigIntsToStrings } from '@/utils/bgint_convert';
 import { toPrincipal, Result } from '../../utils';
 import {
+  _SERVICE,
   ShelfPublic,
   // We might need specific pagination/result types if they differ, but assuming reuse for now
   // Check .did if needed
@@ -13,6 +13,7 @@ import {
   TimestampCursor,
   QueryError
 } from './serviceTypes';
+import { ActorSubclass } from '@dfinity/agent';
 
 // --- Follow/Unfollow Users ---
 
@@ -20,10 +21,10 @@ import {
  * Follow a user
  */
 export async function followUser(
-  userToFollow: string | Principal
+  userToFollow: string | Principal,
+  actor: ActorSubclass<_SERVICE>
 ): Promise<Result<boolean, string>> {
   try {
-    const actor = await getActorPerpetua();
     const principalForApi = toPrincipal(userToFollow);
     const result = await actor.follow_user(principalForApi);
 
@@ -42,10 +43,10 @@ export async function followUser(
  * Unfollow a user
  */
 export async function unfollowUser(
-  userToUnfollow: string | Principal
+  userToUnfollow: string | Principal,
+  actor: ActorSubclass<_SERVICE>
 ): Promise<Result<boolean, string>> {
   try {
-    const actor = await getActorPerpetua();
     const principalForApi = toPrincipal(userToUnfollow);
     const result = await actor.unfollow_user(principalForApi);
 
@@ -65,9 +66,8 @@ export async function unfollowUser(
 /**
  * Follow a tag
  */
-export async function followTag(tag: string): Promise<Result<boolean, string>> {
+export async function followTag(actor: ActorSubclass<_SERVICE>, tag: string): Promise<Result<boolean, string>> {
   try {
-    const actor = await getActorPerpetua();
     // Assuming actor.follow_tag returns Result<null, text>
     // Ok(null) means success, Err(text) contains the error message.
     const result = await actor.follow_tag(tag);
@@ -88,9 +88,8 @@ export async function followTag(tag: string): Promise<Result<boolean, string>> {
 /**
  * Unfollow a tag
  */
-export async function unfollowTag(tag: string): Promise<Result<boolean, string>> {
+export async function unfollowTag(actor: ActorSubclass<_SERVICE>, tag: string): Promise<Result<boolean, string>> {
   try {
-    const actor = await getActorPerpetua();
     const result = await actor.unfollow_tag(tag);
 
     if ("Ok" in result) {
@@ -110,10 +109,10 @@ export async function unfollowTag(tag: string): Promise<Result<boolean, string>>
  * Get feed of shelves from followed users (Paginated)
  */
 export async function getFollowedUsersFeed(
+  actor: ActorSubclass<_SERVICE>,
   params: CursorPaginationParams<TimestampCursor>
 ): Promise<Result<CursorPaginatedResponse<ShelfPublic, TimestampCursor>, QueryError>> {
   try {
-    const actor = await getActorPerpetua();
 
     let cursorOpt: [] | [bigint] = [];
     if (params.cursor) {
@@ -167,10 +166,10 @@ export async function getFollowedUsersFeed(
  * Get feed of shelves with followed tags (Paginated)
  */
 export async function getFollowedTagsFeed(
+  actor: ActorSubclass<_SERVICE>,
   params: CursorPaginationParams<TimestampCursor>
 ): Promise<Result<CursorPaginatedResponse<ShelfPublic, TimestampCursor>, QueryError>> {
   try {
-    const actor = await getActorPerpetua();
 
     let cursorOpt: [] | [bigint] = [];
     if (params.cursor) {
@@ -224,9 +223,8 @@ export async function getFollowedTagsFeed(
 /**
  * Get the list of tags followed by the current user
  */
-export async function getMyFollowedTags(): Promise<Result<string[], QueryError>> {
+export async function getMyFollowedTags(actor: ActorSubclass<_SERVICE>): Promise<Result<string[], QueryError>> {
   try {
-    const actor = await getActorPerpetua();
     // Assuming backend method is get_my_followed_tags() -> (Result<vec text, QueryError>) query;
     const result = await actor.get_my_followed_tags();
 
@@ -250,9 +248,8 @@ export async function getMyFollowedTags(): Promise<Result<string[], QueryError>>
 /**
  * Get the list of users (Principals) followed by the current user
  */
-export async function getMyFollowedUsers(): Promise<Result<Principal[], QueryError>> {
+export async function getMyFollowedUsers(actor: ActorSubclass<_SERVICE>): Promise<Result<Principal[], QueryError>> {
   try {
-    const actor = await getActorPerpetua();
     // TODO: Ensure 'get_my_followed_users' exists in perpetua.did and types are regenerated.
     // Assuming backend method is get_my_followed_users() -> (Result<vec principal, QueryError>) query;
     const result = await actor.get_my_followed_users(); // Linter error expected if types not updated

@@ -7,12 +7,12 @@ import {
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import { Account } from "@dfinity/ledger-icp";
-import { getLbryActor } from "@/features/auth/utils/authUtils";
 
 // Define the async thunk
 const transferLBRY = createAsyncThunk<
   string,
   {
+    actor: ActorSubclass<_SERVICELBRY>,
     amount: string;
     destination: string;
     subaccount?: number[];
@@ -21,11 +21,10 @@ const transferLBRY = createAsyncThunk<
 >(
   "icp_swap/transferLBRY",
   async (
-    { amount, destination, subaccount },
+    { actor, amount, destination, subaccount },
     { rejectWithValue }
   ) => {
     try {
-      const actorLbry = await getLbryActor();
       const amountFormat = BigInt(Math.floor(Number(amount) * 10 ** 8));
       let recipientAccount: Account;
       
@@ -42,7 +41,7 @@ const transferLBRY = createAsyncThunk<
         created_at_time: [],
         amount: amountFormat
       };
-      const result = await actorLbry.icrc1_transfer(transferArg);
+      const result = await actor.icrc1_transfer(transferArg);
       if ("Ok" in result) return "success";
       else {
         console.log("error is ", result.Err);

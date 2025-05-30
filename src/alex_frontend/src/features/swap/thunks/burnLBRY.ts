@@ -1,26 +1,26 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
-import LedgerService from "@/utils/LedgerService";
-import { getActorSwap, getLbryActor } from "@/features/auth/utils/authUtils";
-import getCanisterBal from "@/features/icp-ledger/thunks/getCanisterBal";
-import getCanisterArchivedBal from "./getCanisterArchivedBal";
+// import getCanisterBal from "@/features/icp-ledger/thunks/getCanisterBal";
+// import getCanisterArchivedBal from "./getCanisterArchivedBal";
 import { ErrorMessage, getErrorMessage } from "../utlis/erorrs";
+import { ActorSubclass } from "@dfinity/agent/lib/cjs";
+import { _SERVICE as _SERVICE_LBRY } from "../../../../../declarations/LBRY/LBRY.did";
+import { _SERVICE as _SERVICE_SWAP } from "../../../../../declarations/icp_swap/icp_swap.did";
 
 // Define the async thunk
 const burnLbry = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  { amount: string; userPrincipal: string },
+  { lbryActor: ActorSubclass<_SERVICE_LBRY>,swapActor: ActorSubclass<_SERVICE_SWAP>, amount: string; userPrincipal: string },
   { rejectValue: ErrorMessage }
 >(
   "icp_swap/burnLBRY",
-  async ({ amount, userPrincipal }, { dispatch, rejectWithValue }) => {
+  async ({ lbryActor,swapActor, amount, userPrincipal }, { rejectWithValue }) => {
     try {
-      const actorLbry = await getLbryActor();
       const icp_swap_canister_id = process.env.CANISTER_ID_ICP_SWAP!;
       let amountFormat: bigint = BigInt(Number(amount));
       let amountFormate8s: bigint = BigInt(Number(amount) * 10 ** 8);
 
-      const checkApproval = await actorLbry.icrc2_allowance({
+      const checkApproval = await lbryActor.icrc2_allowance({
         account: {
           owner: Principal.fromText(userPrincipal),
           subaccount: [],
@@ -31,7 +31,7 @@ const burnLbry = createAsyncThunk<
         },
       });
       if (checkApproval.allowance < amountFormate8s) {
-        const resultLbryApprove = await actorLbry.icrc2_approve({
+        const resultLbryApprove = await lbryActor.icrc2_approve({
           spender: {
             owner: Principal.fromText(icp_swap_canister_id),
             subaccount: [],
@@ -55,11 +55,8 @@ const burnLbry = createAsyncThunk<
         }
       }
 
-      const actorSwap = await getActorSwap();
-      const result = await actorSwap.burn_LBRY(amountFormat, []);
+      const result = await swapActor.burn_LBRY(amountFormat, []);
       if ("Ok" in result) {
-        dispatch(getCanisterBal());
-        dispatch(getCanisterArchivedBal());
         return "success";
       } else if ("Err" in result) {
         const errorMessage = getErrorMessage(result.Err);

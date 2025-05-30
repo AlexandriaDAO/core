@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { AppDispatch } from "@/store";
-import { togglePrincipal, setNoResults } from '../../shared/state/librarySearch/librarySlice';
+import { setNoResults } from '../../shared/state/librarySearch/librarySlice';
 import { togglePrincipalSelection, updateSearchParams } from '../../shared/state/librarySearch/libraryThunks';
-import { getActorAlexBackend } from "@/features/auth/utils/authUtils";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/lib/components/button";
@@ -22,6 +21,7 @@ import {
   PopoverTrigger,
 } from "@/lib/components/popover";
 import { TokenType } from '../../shared/adapters/TokenAdapter';
+import { useAlexBackend } from "@/hooks/actors";
 
 interface NFTUserInfo {
   principal: any;
@@ -87,6 +87,7 @@ const TEST_PRINCIPALS: NFTUserInfo[] = [
 
 // Renamed original component and will export a memoized version
 function PrincipalSelectorImpl({ defaultPrincipal = 'new', onPrincipalSelected, performDefaultActions = true, showMostRecentOption = true }: PrincipalSelectorProps) {
+  const {actor} = useAlexBackend();
   const userPrincipal = useSelector((state: RootState) => state.auth.user?.principal.toString());
   const selectedPrincipals = useSelector((state: RootState) => state.library.selectedPrincipals);
   const noResults = useSelector((state: RootState) => state.library.noResults);
@@ -101,6 +102,7 @@ function PrincipalSelectorImpl({ defaultPrincipal = 'new', onPrincipalSelected, 
 
   // Fetch principals from backend
   const fetchPrincipals = React.useCallback(async () => {
+    if(!actor) return;
     try {
       setIsLoadingPrincipals(true);
       let nftUsers: NFTUserInfo[];
@@ -108,8 +110,7 @@ function PrincipalSelectorImpl({ defaultPrincipal = 'new', onPrincipalSelected, 
       if (network === "devnet") {
         nftUsers = TEST_PRINCIPALS;
       } else {
-        const alexBackend = await getActorAlexBackend();
-        nftUsers = await alexBackend.get_stored_nft_users();
+        nftUsers = await actor.get_stored_nft_users();
       }
       
       const processedPrincipals = nftUsers.map((user: NFTUserInfo) => ({
@@ -139,7 +140,7 @@ function PrincipalSelectorImpl({ defaultPrincipal = 'new', onPrincipalSelected, 
     } finally {
       setIsLoadingPrincipals(false);
     }
-  }, [collection, userPrincipal, setIsLoadingPrincipals, setPrincipals]);
+  }, [actor, collection, userPrincipal, setIsLoadingPrincipals, setPrincipals]);
 
   // Get the actual principal to use based on defaultPrincipal value
   const getActualPrincipal = React.useCallback(() => {

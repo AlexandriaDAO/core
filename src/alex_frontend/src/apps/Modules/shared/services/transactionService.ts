@@ -25,6 +25,8 @@ import {
 import { getAssetCanister } from "../state/assetManager/utlis";
 import { getActorUserAssetCanister } from "@/features/auth/utils/authUtils";
 import { fetchAssetFromUserCanister } from "../state/assetManager/assetManagerThunks";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../../declarations/asset_manager/asset_manager.did";
 
 export class TransactionService {
   private dispatch: AppDispatch;
@@ -40,7 +42,7 @@ export class TransactionService {
    * @param arweaveIds Array of Arweave IDs
    * @returns Promise resolving to the fetched transactions
    */
-  async fetchNftTransactions(arweaveIds: string[]): Promise<Transaction[]> {
+  async fetchNftTransactions(arweaveIds: string[], actor: ActorSubclass<_SERVICE>): Promise<Transaction[]> {
     this.dispatch(setLoading(true));
     this.dispatch(setError(null));
 
@@ -59,7 +61,7 @@ export class TransactionService {
       const userAssetCanisterPrincipal = selectedPrincipals[0];
       if (userAssetCanisterPrincipal && userAssetCanisterPrincipal !== 'new') {
         try { // New try-catch block for user asset canister interactions
-          const userAssetCanisterId = await getAssetCanister(userAssetCanisterPrincipal);
+          const userAssetCanisterId = await getAssetCanister(userAssetCanisterPrincipal, actor);
 
           if (userAssetCanisterId) {
             const assetActor = await getActorUserAssetCanister(userAssetCanisterId);

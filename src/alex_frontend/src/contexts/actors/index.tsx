@@ -14,4 +14,5 @@ export { default as UserContext } from './UserContext';
 export { default as AlexWalletContext } from './AlexWalletContext';
 export { default as EmporiumContext } from './EmporiumContext';
 export { default as PerpetuaContext } from './PerpetuaContext';
-
+export { default as IcpSwapFactoryContext } from './IcpSwapFactoryContext';
+export { default as LogsContext } from './LogsContext';

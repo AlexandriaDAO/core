@@ -1,16 +1,15 @@
 import { _SERVICE as _SERVICESWAP } from "../../../../../declarations/icp_swap/icp_swap.did";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getActorSwap } from "@/features/auth/utils/authUtils";
 import { ErrorMessage, getErrorMessage } from "../utlis/erorrs";
+import { ActorSubclass } from "@dfinity/agent";
 
 // Define the async thunk
 const redeemArchivedBalance = createAsyncThunk<
   string, // This is the return type of the thunk's payload
-  void,
+  ActorSubclass<_SERVICESWAP>,
   { rejectValue: ErrorMessage }
->("icp_swap/redeemArchivedBalance", async (_, { rejectWithValue }) => {
+>("icp_swap/redeemArchivedBalance", async (actor, { rejectWithValue }) => {
   try {
-    const actor = await getActorSwap();
     const result = await actor.redeem([]);
     if ("Ok" in result) return "success";
     else if ("Err" in result) {

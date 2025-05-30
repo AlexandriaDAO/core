@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { _SERVICE as _SERVICESWAP } from '../../../../../../declarations/icp_swap/icp_swap.did'
-import { _SERVICE as _SERVICELBRY } from '../../../../../../declarations/LBRY/LBRY.did';
 
 import { Link } from "react-router";
 import { flagHandler } from "../../swapSlice";
@@ -17,8 +15,12 @@ import ErrorModal from "../errorModal";
 import BurnInfo from "./burnInfo";
 import calculateMaxBurnAllowed from "./calculateMaxBurnAllowed";
 import { Entry } from "@/layouts/parts/Header";
+import { useIcpLedger, useIcpSwap, useLbry } from "@/hooks/actors";
 
 const BurnContent = () => {
+    const {actor: lbryActor} = useLbry();
+    const {actor: icpSwapActor} = useIcpSwap();
+    const {actor: icpLedgerActor} = useIcpLedger();
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const swap = useAppSelector((state) => state.swap);
@@ -35,12 +37,19 @@ const BurnContent = () => {
 
 
 
-    const handleSubmit = (event: any) => {
+    const handleSubmit = async (event: any) => {
         event.preventDefault();
-        if (!user?.principal) return;
-        dispatch(burnLbry({ amount: amountLBRY.toString(), userPrincipal: user.principal }));
-        setLoadingModalV(true);
+        if (!user?.principal || !lbryActor || !icpSwapActor || !icpLedgerActor) return;
+        try{
+            await dispatch(burnLbry({ lbryActor, swapActor: icpSwapActor, amount: amountLBRY.toString(), userPrincipal: user.principal })).unwrap();
 
+            dispatch(getCanisterBal(icpLedgerActor));
+            dispatch(getCanisterArchivedBal(icpSwapActor));
+
+            setLoadingModalV(true);
+        }catch(error){
+            console.log(error);
+        }
     }
     const handleAmountLBRYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
@@ -62,16 +71,16 @@ const BurnContent = () => {
     };
 
     useEffect(() => {
-        if (!user) return;
+        if (!user|| !lbryActor) return;
         if (swap.burnSuccess === true) {
             dispatch(flagHandler())
-            dispatch(getLbryBalance(user.principal))
+            dispatch(getLbryBalance({actor: lbryActor, account: user.principal}))
             setLoadingModalV(false);
             setSucessModalV(true);
             setMaxburnAllowed(calculateMaxBurnAllowed(swap.lbryRatio, icpLedger.canisterBalance, swap.canisterArchivedBal.canisterArchivedBal, swap.canisterArchivedBal.canisterUnClaimedIcp))
         }
         if (swap.error) {
-            dispatch(getLbryBalance(user.principal));
+            dispatch(getLbryBalance({actor: lbryActor, account: user.principal}));
             setLoadingModalV(false);
             setErrorModalV({flag:true,title:swap.error.title,message:swap.error.message});
             dispatch(flagHandler());
@@ -80,12 +89,24 @@ const BurnContent = () => {
     }, [user, swap])
 
     useEffect(() => {
-        if (user) {
-            dispatch(getLbryBalance(user.principal));
-        }
-        dispatch(getCanisterBal());
-        dispatch(getCanisterArchivedBal());
-    }, [user])
+        if (!user || !lbryActor) return;
+
+        dispatch(getLbryBalance({actor: lbryActor, account: user.principal}));
+    }, [user, lbryActor])
+
+
+    useEffect(() => {
+        if(!icpLedgerActor) return;
+
+        dispatch(getCanisterBal(icpLedgerActor));
+    }, [icpLedgerActor])
+
+
+    useEffect(() => {
+        if (!icpSwapActor) return;
+
+        dispatch(getCanisterArchivedBal(icpSwapActor));
+    }, [icpSwapActor])
 
 
     useEffect(() => {

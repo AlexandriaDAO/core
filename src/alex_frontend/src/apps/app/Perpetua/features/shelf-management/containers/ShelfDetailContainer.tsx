@@ -20,6 +20,7 @@ import { NormalizedShelf } from "@/apps/app/Perpetua/state/perpetuaSlice";
 import { getShelfById as getShelfByIdThunk } from "@/apps/app/Perpetua/state/thunks/queryThunks";
 import { Principal } from '@dfinity/principal';
 import { RootState } from "@/store";
+import { usePerpetua } from "@/hooks/actors";
 
 // Define a type for enriched item content
 type EnrichedItemContent = 
@@ -56,6 +57,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 	onAddItem,
 	onReorderItem,
 }) => {
+	const {actor} = usePerpetua();
 	const pathInfo = parsePathInfo(window.location.pathname);
 	const identity = useIdentity();
 	const dispatch = useAppDispatch();
@@ -116,6 +118,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 
 	// 2. Fetch data for all unique nested shelf IDs if not already loading or present
 	useEffect(() => {
+		if(!actor) return;
 		let isMounted = true;
 		const idsToFetchActually: string[] = [];
 
@@ -128,7 +131,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 		
 		if (idsToFetchActually.length > 0) {
 			setIsLoadingGlobalNestedShelves(true);
-			const promises = idsToFetchActually.map(id => dispatch(getShelfByIdThunk(id)));
+			const promises = idsToFetchActually.map(id => dispatch(getShelfByIdThunk({actor, shelfId: id})));
 			Promise.all(promises).finally(() => {
 				if (isMounted) {
 					setIsLoadingGlobalNestedShelves(false);
@@ -136,7 +139,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 			});
 		}
 		return () => { isMounted = false; };
-	}, [allNestedShelfIds, dispatch]);
+	}, [allNestedShelfIds, actor, dispatch]);
 	
 	// 3. Select all required nested shelves data from the store
 	// This selector needs to be stable. We select a map of shelves.

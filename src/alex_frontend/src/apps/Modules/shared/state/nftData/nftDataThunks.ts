@@ -21,6 +21,8 @@ import {
   TokenAdapter,
 } from "../../adapters/TokenAdapter";
 import { perpetua } from "../../../../../../../declarations/perpetua";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../../../declarations/asset_manager/asset_manager.did";
 
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
@@ -159,6 +161,7 @@ const fetchNFTBatchHelper = async (params: BatchFetchParams[]) => {
 
 // Export the interface so it can be imported by other files
 export interface FetchTokensParams {
+  actor: ActorSubclass<_SERVICE>;
   principalId: string;
   collection: "NFT" | "SBT";
   page: number;
@@ -175,6 +178,7 @@ export const fetchTokensForPrincipal = createAsyncThunk<
   "nftData/fetchTokensForPrincipal",
   async (
     {
+      actor,
       principalId,
       collection,
       page,
@@ -483,7 +487,7 @@ export const fetchTokensForPrincipal = createAsyncThunk<
       // load loadContentForTransactions in child
 
       await dispatch(
-        fetchNftTransactions(arweaveIds) as unknown as AnyAction
+        fetchNftTransactions({arweaveIds, actor}) as unknown as AnyAction
       ).unwrap();
 
       // If we're using the 'new' option, make sure all tokens have owner information

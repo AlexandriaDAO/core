@@ -1,7 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import LedgerService from "@/utils/LedgerService";
 import { Principal } from "@dfinity/principal";
-import { getIcpLedgerActor } from "@/features/auth/utils/authUtils";
 import { AccountIdentifier } from "@dfinity/ledger-icp";
 
 // Define the async thunk

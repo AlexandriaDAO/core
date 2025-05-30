@@ -1,8 +1,8 @@
-import { getActorAssetManager } from "@/features/auth/utils/authUtils";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../../../declarations/asset_manager/asset_manager.did";
 
-export const getAssetCanister = async (principal: string): Promise<string | null> => {
+export const getAssetCanister = async (principal: string, actor: ActorSubclass<_SERVICE>): Promise<string | null> => {
     try {
-      const actor =await  getActorAssetManager();
       const result =await  actor.get_all_user_asset_canisters();
   
       const matchingCanister = result

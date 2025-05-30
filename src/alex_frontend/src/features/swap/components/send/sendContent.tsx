@@ -5,9 +5,6 @@ import transferICP from "@/features/icp-ledger/thunks/transferICP";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
-import { _SERVICE as _SERVICELBRY } from '../../../../../../declarations/LBRY/LBRY.did';
-import { _SERVICE as _SERVICEALEX } from '../../../../../../declarations/ALEX/ALEX.did';
-import { _SERVICE as _SERVICEICPLEDGER } from '../../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did'
 import transferALEX from "../../thunks/alexIcrc/transferALEX";
 import transferLBRY from "../../thunks/lbryIcrc/transferLBRY";
 import { icpLedgerFlagHandler } from "@/features/icp-ledger/icpLedgerSlice";
@@ -23,9 +20,13 @@ import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
 import ErrorModal from "../errorModal";
 import { Entry } from "@/layouts/parts/Header";
 import { Principal } from "@dfinity/principal";
+import { useAlex, useIcpLedger, useLbry } from "@/hooks/actors";
 
 const SendContent = () => {
     const dispatch = useAppDispatch();
+    const {actor: lbryActor} = useLbry();
+    const {actor: icpLedgerActor} = useIcpLedger();
+    const {actor: alexActor} = useAlex();
 
     const { user } = useAppSelector(state => state.auth);
     const icpLedger = useAppSelector((state) => state.icpLedger);
@@ -115,13 +116,26 @@ const SendContent = () => {
             return;
         }
         if (selectedOption === "ICP") {
-            dispatch(transferICP({ amount, destination: destinationPrincipal, accountType: "principal" }));
+            if (!icpLedgerActor) {
+                console.log("ICP Ledger Actor unavailable");
+                return;
+            }
+
+            dispatch(transferICP({ actor: icpLedgerActor, amount, destination: destinationPrincipal, accountType: "principal" }));
         }
         else if (selectedOption === "ALEX") {
-            dispatch(transferALEX({ amount, destination: destinationPrincipal }));
+            if (!alexActor) {
+                console.log("ALEX Actor unavailable");
+                return;
+            }
+            dispatch(transferALEX({ actor: alexActor, amount, destination: destinationPrincipal }));
         }
         else if (selectedOption === "LBRY") {
-            dispatch(transferLBRY({ amount, destination: destinationPrincipal }));
+            if (!lbryActor) {
+                console.log("LBRY Actor unavailable");
+                return;
+            }
+            dispatch(transferLBRY({ actor: lbryActor, amount, destination: destinationPrincipal }));
         }
         setLoadingModalV(true);
     }
@@ -139,18 +153,18 @@ const SendContent = () => {
     }, [selectedOption, icpLedger.accountBalance, alex.alexBal, swap.lbryBalance])
 
     useEffect(() => {
-        if(!user) return;
+        if(!user || !icpLedgerActor || !alexActor || !lbryActor) return;
         if (icpLedger.transferSuccess === true) {
             setLoadingModalV(false);
             setSucessModalV(true);
-            dispatch(getIcpBal(user.principal));
+            dispatch(getIcpBal({actor: icpLedgerActor, account: user.principal}));
             dispatch(icpLedgerFlagHandler());
 
         }
         else if (alex.transferSuccess === true) {
             setLoadingModalV(false);
             setSucessModalV(true);
-            dispatch(getAccountAlexBalance(user.principal))
+            dispatch(getAccountAlexBalance({actor: alexActor, account: user.principal}))
 
             dispatch((alexFlagHandler()));
 
@@ -158,7 +172,7 @@ const SendContent = () => {
         else if (swap.transferSuccess === true) {
             setLoadingModalV(false);
             setSucessModalV(true);
-            dispatch(getLbryBalance(user.principal))
+            dispatch(getLbryBalance({actor: lbryActor, account: user.principal}))
             dispatch((flagHandler()));
         }
         else if (swap.error || alex.error || icpLedger.error) {

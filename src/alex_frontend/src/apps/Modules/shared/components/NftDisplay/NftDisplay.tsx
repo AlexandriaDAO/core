@@ -10,6 +10,7 @@ import { ContentService } from '@/apps/Modules/LibModules/contentDisplay/service
 import { useUsername } from '@/hooks/useUsername';
 import { NftDisplayProps } from './types';
 import { getTransactionService } from '@/apps/Modules/shared/services/transactionService';
+import { useAssetManager } from '@/hooks/actors';
 
 // Constants
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
@@ -37,7 +38,7 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const store = useStore<RootState>(); // Use useStore to get the store instance
-
+  const {actor} = useAssetManager();
   // Component state
   const [isLoading, setIsLoading] = useState(true);
   const [transaction, setTransaction] = useState<Transaction | undefined>(providedTransaction);
@@ -63,6 +64,7 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
   const transactionDependency = providedTransaction ?? undefined;
 
   const loadNFTData = useCallback(async (mountedChecker: { isMounted: boolean }) => {
+    if(!actor) return;
     if (!tokenId) {
       if (mountedChecker.isMounted) {
         setError('Token ID is missing');
@@ -155,7 +157,7 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
         const transactionService = getTransactionService(dispatch, store.getState);
         try {
           // Service updates Redux. We rely on re-render from Redux state change.
-          await transactionService.fetchNftTransactions([currentArweaveId!]); // Added non-null assertion for currentArweaveId
+          await transactionService.fetchNftTransactions([currentArweaveId!], actor); // Added non-null assertion for currentArweaveId
           // After this, the useEffect dependency on `transactionsFromRedux` should trigger a re-run.
           // For now, we just set loading and wait.
           if (mountedChecker.isMounted) setIsLoading(true); 
@@ -215,6 +217,7 @@ export const NftDisplay: React.FC<NftDisplayProps & { showOwnerInfo?: boolean }>
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ 
+    actor,
     tokenId, initialArweaveId, providedTransaction, //transactionDependency, // Using providedTransaction directly
     dispatch, 
     store.getState, // Changed from store (full object) to store.getState (stable function reference)

@@ -1,9 +1,8 @@
-import { Principal } from '@dfinity/principal';
-import { getActorPerpetua } from '@/features/auth/utils/authUtils';
-import { toPrincipal, Result } from '../../utils';
+import { Result } from '../../utils';
 import {
   // CursorPaginationInput as BackendCursorPaginationInput, // Removed generic import
   // CursorPaginatedResult as BackendCursorPaginatedResult, // Removed generic import
+  _SERVICE
 } from '@/../../declarations/perpetua/perpetua.did';
 import {
   CursorPaginationParams,
@@ -13,6 +12,7 @@ import {
   NormalizedTagCursor,
   QueryError // Added QueryError import
 } from './serviceTypes';
+import { ActorSubclass } from '@dfinity/agent';
 
 // --- Backend Tuple Types ---
 // These might not match the generated .did.ts function signatures exactly
@@ -23,11 +23,6 @@ type BackendTagShelfCreationTimelineKeyTuple = [string, string, bigint]; // Defi
 // --- Query Error Type --- (REMOVED - Imported from types file)
 // type QueryError = any;
 
-// --- Shared Actor Utility ---
-// It might be better placed in a more general utility file later
-async function getPerpetuaActorInstance() {
-  return await getActorPerpetua();
-}
 
 // --- Tag Service Functions ---
 
@@ -35,11 +30,11 @@ async function getPerpetuaActorInstance() {
  * Add a tag to a shelf
  */
 export async function addTagToShelf(
+  actor: ActorSubclass<_SERVICE>,
   shelfId: string,
   tag: string
 ): Promise<Result<boolean, string>> {
   try {
-    const actor = await getPerpetuaActorInstance();
     
     const result = await actor.add_tag_to_shelf({
       shelf_id: shelfId,
@@ -62,11 +57,11 @@ export async function addTagToShelf(
  * Remove a tag from a shelf
  */
 export async function removeTagFromShelf(
+  actor: ActorSubclass<_SERVICE>,
   shelfId: string,
   tag: string
 ): Promise<Result<boolean, string>> {
   try {
-    const actor = await getPerpetuaActorInstance();
     
     const result = await actor.remove_tag_from_shelf({
       shelf_id: shelfId,
@@ -89,10 +84,10 @@ export async function removeTagFromShelf(
  * Get popular tags (Paginated)
  */
 export async function getPopularTags(
+  actor: ActorSubclass<_SERVICE>,
   params: CursorPaginationParams<TagPopularityKeyCursor>
 ): Promise<Result<CursorPaginatedResponse<string, TagPopularityKeyCursor>, QueryError>> {
   try {
-    const actor = await getPerpetuaActorInstance();
     
     let cursorOpt: [] | [BackendTagPopularityKeyTuple] = []; // Use the tuple type
     if (params.cursor && typeof params.cursor === 'string') {
@@ -161,11 +156,11 @@ export async function getPopularTags(
  * Get shelf IDs associated with a specific tag (Paginated)
  */
 export async function getShelvesByTag(
+  actor: ActorSubclass<_SERVICE>,
   tag: string,
   params: CursorPaginationParams<TagShelfAssociationKeyCursor>
 ): Promise<Result<CursorPaginatedResponse<string, TagShelfAssociationKeyCursor>, QueryError>> {
   try {
-    const actor = await getPerpetuaActorInstance();
     
     let cursorOpt: [] | [BackendTagShelfCreationTimelineKeyTuple] = []; 
     if (params.cursor && typeof params.cursor === 'string') {
@@ -230,9 +225,8 @@ export async function getShelvesByTag(
 /**
  * Get the number of shelves associated with a specific tag
  */
-export async function getTagShelfCount(tag: string): Promise<Result<number, QueryError>> {
+export async function getTagShelfCount(actor: ActorSubclass<_SERVICE>, tag: string): Promise<Result<number, QueryError>> {
   try {
-    const actor = await getPerpetuaActorInstance();
     // Backend Result type expected: bigint
     const result = await actor.get_tag_shelf_count(tag);
 
@@ -254,11 +248,11 @@ export async function getTagShelfCount(tag: string): Promise<Result<number, Quer
  * Get tags starting with a given prefix (Paginated)
  */
 export async function getTagsWithPrefix(
+  actor: ActorSubclass<_SERVICE>,
   prefix: string,
   params: CursorPaginationParams<NormalizedTagCursor> // Simple string cursor
 ): Promise<Result<CursorPaginatedResponse<string, NormalizedTagCursor>, QueryError>> {
   try {
-    const actor = await getPerpetuaActorInstance();
     
     // Prepare pagination input
     let cursorOpt: [] | [string] = [];

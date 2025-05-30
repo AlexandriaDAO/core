@@ -1,11 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { useTheme } from "@/providers/ThemeProvider";
 
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { _SERVICE as _SERVICESWAP } from "../../../../../../declarations/icp_swap/icp_swap.did"
-import { _SERVICE as _SERVICEALEX } from "../../../../../../declarations/ALEX/ALEX.did";
 
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import { flagHandler } from "../../swapSlice";
@@ -16,6 +13,7 @@ import LoadingModal from "../loadingModal";
 import SuccessModal from "../successModal";
 import ErrorModal from "../errorModal";
 import { Entry } from "@/layouts/parts/Header";
+import { useAlex, useIcpSwap } from "@/hooks/actors";
 import {
     Tooltip,
     TooltipContent,
@@ -24,7 +22,9 @@ import {
 } from "@/lib/components/tooltip";
 
 const StakeContent = () => {
-    const { theme } = useTheme();
+    const {actor: actorAlex} = useAlex();
+    const {actor: actorSwap} = useIcpSwap();
+
     const dispatch = useAppDispatch();
 
     const swap = useAppSelector((state) => state.swap);
@@ -44,8 +44,8 @@ const StakeContent = () => {
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
-        if (!user?.principal) return;
-        dispatch(stakeAlex({ amount, userPrincipal: user?.principal }));
+        if (!user?.principal || !actorAlex || !actorSwap) return;
+        dispatch(stakeAlex({ actorSwap, actorAlex, amount, userPrincipal: user?.principal }));
         setActionType("Stake");
         setLoadingModalV(true);
     }
@@ -81,16 +81,16 @@ const StakeContent = () => {
 
 
     useEffect(() => {
-        if (user) {
-            dispatch(getAccountAlexBalance(user.principal))
-        }
-    }, [user])
+        if (!user || !actorAlex) return;
+
+        dispatch(getAccountAlexBalance({actor: actorAlex, account: user.principal}))
+    }, [user, actorAlex])
 
     useEffect(() => {
 
         if (swap.successStake === true || swap.unstakeSuccess === true || swap.burnSuccess === true || swap.successClaimReward === true) {
             dispatch(flagHandler());
-            if (user) dispatch(getAccountAlexBalance(user.principal))
+            if (user && actorAlex) dispatch(getAccountAlexBalance({actor: actorAlex, account: user.principal}))
             setLoadingModalV(false);
             setSucessModalV(true);
         }

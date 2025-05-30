@@ -16,6 +16,7 @@ import { LoaderCircle } from 'lucide-react';
 import { ShelfPublic } from '@/../../declarations/perpetua/perpetua.did'; // Import original Shelf type
 import { Principal } from '@dfinity/principal'; // Import Principal
 import { RootState } from '@/store'; // Import RootState for typing selectors
+import { usePerpetua } from '@/hooks/actors';
 
 // Helper to convert NormalizedShelf back to Shelf for BaseShelfList
 const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => {
@@ -28,6 +29,7 @@ const denormalizeShelf = (normalizedShelf: NormalizedShelf): ShelfPublic => {
 };
 
 export const FilteredShelfListContainer: React.FC = () => {
+    const {actor} = usePerpetua();
     const dispatch = useAppDispatch();
     const { 
         currentTagFilter, 
@@ -62,16 +64,17 @@ export const FilteredShelfListContainer: React.FC = () => {
 
     // Effect to fetch missing shelf data
     useEffect(() => {
+        if(!actor) return;
         // Ensure shelfIds is an array before iterating
         if (!Array.isArray(shelfIds) || shelfIds.length === 0) return;
 
         shelfIds.forEach((id: string) => { // Explicitly type id
             // Check if shelf exists and is not null/undefined
             if (!allShelves || !allShelves[id]) {
-                dispatch(getShelfById(id));
+                dispatch(getShelfById({actor, shelfId: id}));
             }
         });
-    }, [shelfIds, allShelves, dispatch]);
+    }, [shelfIds, allShelves, dispatch, actor]);
 
     // Filter and map IDs to actual shelf objects that are loaded
     const filteredNormalizedShelves = shelfIds

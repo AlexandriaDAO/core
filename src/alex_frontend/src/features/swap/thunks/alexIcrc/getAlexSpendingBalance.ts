@@ -1,29 +1,29 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import LedgerService from "@/utils/LedgerService";
-import { getNftManagerActor, getAlexActor } from "@/features/auth/utils/authUtils";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE as _SERVICE_ALEX } from "../../../../../../declarations/ALEX/ALEX.did"
+import { _SERVICE as _SERVICE_NFT_MANAGER } from "../../../../../../declarations/nft_manager/nft_manager.did"
 
 const getAlexSpendingBalance = createAsyncThunk<
   string,
-  string,
+  {alexActor: ActorSubclass<_SERVICE_ALEX>, nftManagerActor: ActorSubclass<_SERVICE_NFT_MANAGER> , userPrincipal: string},
   { rejectValue: string }
 >(
   "icp_swap/getAlexSpendingBalance",
-  async (userPrincipal, { rejectWithValue }) => {
+  async ({alexActor, nftManagerActor, userPrincipal}, { rejectWithValue }) => {
     try {
-      const actor = await getAlexActor();
       const nftManagerId = process.env.CANISTER_ID_NFT_MANAGER!;
-      
+
       if (!nftManagerId) {
         throw new Error("NFT Manager canister ID not found in environment variables");
       }
 
-      const nftManagerActor = await getNftManagerActor();
       const subaccount = await nftManagerActor.principal_to_subaccount(
         Principal.fromText(userPrincipal)
       );
 
-      const result = await actor.icrc1_balance_of({
+      const result = await alexActor.icrc1_balance_of({
         owner: Principal.fromText(nftManagerId),
         subaccount: [subaccount],
       });

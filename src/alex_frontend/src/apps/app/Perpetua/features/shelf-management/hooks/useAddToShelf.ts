@@ -8,7 +8,7 @@ import { Principal } from "@dfinity/principal";
 import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did";
 import { useIdentity } from "@/hooks/useIdentity";
 import { AddItemResult } from "@/apps/app/Perpetua/state/thunks/itemThunks";
-import { getActorPerpetua } from '@/features/auth/utils/authUtils';
+import { usePerpetua } from "@/hooks/actors";
 
 /**
  * Hook for adding content to shelves
@@ -17,6 +17,7 @@ import { getActorPerpetua } from '@/features/auth/utils/authUtils';
  * to shelves and get a list of shelves that can be edited.
  */
 export const useAddToShelf = () => {
+  const {actor} = usePerpetua();
   const { addItem } = useShelfOperations();
   const { checkEditAccess, currentUser } = useContentPermissions();
   const availableShelves = useAppSelector(selectUserShelves);
@@ -148,12 +149,12 @@ export const useAddToShelf = () => {
    */
   const fetchPublicShelvesByTag = useCallback(async (tag: string): Promise<ShelfPublic[]> => {
     try {
-      const perpetuaActor = await getActorPerpetua();
-      if (!perpetuaActor) {
+      if(!actor) throw new Error('Perpetua actor unavailable');
+      if (!actor) {
         console.error("Perpetua actor could not be initialized");
         return [];
       }
-      const result = await perpetuaActor.get_public_shelves_by_tag(tag);
+      const result = await actor.get_public_shelves_by_tag(tag);
       if ('Ok' in result) {
         return result.Ok as ShelfPublic[];
       } else if ('Err' in result) {
@@ -167,7 +168,7 @@ export const useAddToShelf = () => {
       console.error("Exception when fetching public shelves by tag:", error);
       return [];
     }
-  }, []);
+  }, [actor]);
 
   return {
     addContentToShelf,

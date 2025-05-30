@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/lib/components/card";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { UnifiedCardActions } from "@/apps/Modules/shared/components/UnifiedCardActions/UnifiedCardActions";
 import { useContentCardState } from "./hooks/useContentCardState";
+import { NftManagerActor } from "@/actors";
 
 interface ContentCardProps {
   children: React.ReactNode;
@@ -55,17 +56,19 @@ export function ContentCard({
       >
         {/* Action Button - Using updated bookmark design */}
         {finalContentId && (
-          <UnifiedCardActions
-            contentId={finalContentId}
-            contentType={finalContentType}
-            ownerPrincipal={ownerPrincipal}
-            isOwned={isOwnedByUser}
-            isSafeForMinting={isSafeForMinting}
-            parentShelfId={parentShelfId}
-            itemId={itemId}
-            currentShelfId={currentShelfId}
-            // We don't need to specify className now as the component has its own positioning
-          />
+          <NftManagerActor>
+            <UnifiedCardActions
+              contentId={finalContentId}
+              contentType={finalContentType}
+              ownerPrincipal={ownerPrincipal}
+              isOwned={isOwnedByUser}
+              isSafeForMinting={isSafeForMinting}
+              parentShelfId={parentShelfId}
+              itemId={itemId}
+              currentShelfId={currentShelfId}
+              // We don't need to specify className now as the component has its own positioning
+            />
+          </NftManagerActor>
         )}
 
         {/* Main content area - Apply onClick here if needed */}

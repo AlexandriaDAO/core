@@ -10,12 +10,14 @@ import { toast } from "sonner";
 import { ShelfSettingsDialogProps } from "../types";
 import { GeneralSettingsTab } from "./GeneralSettingsTab";
 import { PublicAccessSection } from "./PublicAccessSection";
+import { usePerpetua } from "@/hooks/actors";
 
 export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({ 
   shelf,
   onUpdateMetadata,
   className = ""
 }) => {
+  const {actor} = usePerpetua();
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useAppDispatch();
   const isOwner = Boolean(useAppSelector(selectIsOwner(shelf.shelf_id)));
@@ -25,18 +27,21 @@ export const ShelfSettingsDialog: React.FC<ShelfSettingsDialogProps> = ({
 
   // Load public status when dialog opens
   useEffect(() => {
+    if(!actor) return;
     if (isOpen) {
-      dispatch(checkShelfPublicAccess(shelf.shelf_id));
+      dispatch(checkShelfPublicAccess({actor, shelfId: shelf.shelf_id}));
     }
-  }, [dispatch, shelf.shelf_id, isOpen]);
+  }, [dispatch, actor, shelf.shelf_id, isOpen]);
 
   // Handle public access toggle
   const handlePublicAccessToggle = async (enabled: boolean) => {
-    if (isTogglingPublic) return;
+    if (!actor) return;
+    if (isTogglingPublic ) return;
     
     setIsTogglingPublic(true);
     try {
       const resultAction = await dispatch(toggleShelfPublicAccess({
+        actor,
         shelfId: shelf.shelf_id,
         isPublic: enabled
       }));

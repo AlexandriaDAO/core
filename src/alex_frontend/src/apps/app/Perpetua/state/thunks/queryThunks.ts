@@ -23,6 +23,8 @@ import {
   getStorylineFeed
 } from '../services';
 import { principalToString, extractErrorMessage } from '../../utils';
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../../../../../declarations/perpetua/perpetua.did';
 
 // Define a type for the rejectWithValue result
 type RejectValue = string;
@@ -32,16 +34,16 @@ type RejectValue = string;
  */
 export const loadShelves = createAsyncThunk<
   OffsetPaginatedResponse<ShelfPublic>, // Return type on success
-  { principal: Principal | string; params: OffsetPaginationParams }, // Argument type
+  { actor: ActorSubclass<_SERVICE>, principal: Principal | string; params: OffsetPaginationParams; }, // Argument type
   { rejectValue: RejectValue } // Type for rejectWithValue
 >(
   'perpetua/loadShelves',
-  async ({ principal, params }, { rejectWithValue }) => {
+  async ({ actor, principal, params }, { rejectWithValue }) => {
     try {
       const principalStr = principalToString(principal);
       // Caching removed for paginated endpoint
       
-      const result = await getUserShelves(principal, params);
+      const result = await getUserShelves(actor, principal, params);
       
       if ("Ok" in result && result.Ok) {
         return result.Ok; 
@@ -61,18 +63,18 @@ export const loadShelves = createAsyncThunk<
  */
 export const getShelfById = createAsyncThunk<
   ShelfPublic, // Return type on success
-  string, // Argument type (shelfId)
+  { actor: ActorSubclass<_SERVICE>, shelfId: string; }, // Argument type
   { rejectValue: RejectValue } // Type for rejectWithValue
 >(
   'perpetua/getShelfById',
-  async (shelfId, { rejectWithValue }) => {
+  async ({ actor, shelfId }, { rejectWithValue }) => {
     try {
       const cachedData = cacheManager.get<ShelfPublic>(shelfId, 'shelf');
       if (cachedData) {
         return cachedData;
       }
       
-      const result = await getShelf(shelfId);
+      const result = await getShelf(actor, shelfId);
       
       if ("Ok" in result && result.Ok) {
         cacheManager.set(shelfId, 'shelf', result.Ok);
@@ -95,15 +97,15 @@ export const getShelfById = createAsyncThunk<
  */
 export const loadRecentShelves = createAsyncThunk<
   CursorPaginatedResponse<ShelfPublic, TimestampCursor>, // Return type
-  CursorPaginationParams<TimestampCursor>, // Argument type
+  { actor: ActorSubclass<_SERVICE>, params: CursorPaginationParams<TimestampCursor>; }, // Argument type
   { rejectValue: RejectValue } // Reject type
 >(
   'perpetua/loadRecentShelves',
-  async (params, { rejectWithValue }) => {
+  async ({ actor, params }, { rejectWithValue }) => {
     try {
       // Caching removed for paginated endpoint
       
-      const result = await getRecentShelves(params);
+      const result = await getRecentShelves(actor, params);
       
       if ("Ok" in result && result.Ok) {
         return result.Ok; 
@@ -126,17 +128,17 @@ export const loadRecentShelves = createAsyncThunk<
  */
 export const loadMissingShelves = createAsyncThunk<
   ShelfPublic[], // Return type (array of missing shelves)
-  Principal | string, // Argument type (principal)
+  { actor: ActorSubclass<_SERVICE>, principal: Principal | string }, // Argument type
   { rejectValue: RejectValue, state: any } // Reject type and state type
 >(
   'perpetua/loadMissingShelves',
-  async (principal, { rejectWithValue, getState }) => {
+  async ({ actor, principal}, { rejectWithValue, getState }) => {
     try {
       const state = getState();
       const existingShelves = state?.perpetua?.entities?.shelves || {};
       
       const params: OffsetPaginationParams = { offset: 0, limit: 50 }; 
-      const result = await getUserShelves(principal, params);
+      const result = await getUserShelves(actor, principal, params);
       
       if ("Ok" in result && result.Ok) {
         const shelves = result.Ok.items;
@@ -159,14 +161,14 @@ export const loadMissingShelves = createAsyncThunk<
  */
 export const fetchPopularTags = createAsyncThunk<
   CursorPaginatedResponse<string, TagPopularityKeyCursor>, // Return type
-  CursorPaginationParams<TagPopularityKeyCursor>, // Argument type
+  { actor: ActorSubclass<_SERVICE>, params: CursorPaginationParams<TagPopularityKeyCursor>; }, // Argument type
   { rejectValue: RejectValue } // Reject type
 >(
   'perpetua/fetchPopularTags',
-  async (params, { rejectWithValue }) => {
+  async ({ actor, params }, { rejectWithValue }) => {
     try {
       // Caching removed for paginated endpoint
-      const result = await getPopularTags(params);
+      const result = await getPopularTags(actor, params);
       
       if ("Ok" in result && result.Ok) {
         return result.Ok;
@@ -186,14 +188,14 @@ export const fetchPopularTags = createAsyncThunk<
  */
 export const fetchShelvesByTag = createAsyncThunk<
   { tag: string; response: CursorPaginatedResponse<string, TagShelfAssociationKeyCursor> }, // Return type
-  { tag: string; params: CursorPaginationParams<TagShelfAssociationKeyCursor> }, // Argument type
+  { actor: ActorSubclass<_SERVICE>, tag: string; params: CursorPaginationParams<TagShelfAssociationKeyCursor> }, // Argument type
   { rejectValue: RejectValue } // Reject type
 >(
   'perpetua/fetchShelvesByTag',
-  async ({ tag, params }, { rejectWithValue, dispatch }) => {
+  async ({ actor, tag, params }, { rejectWithValue, dispatch }) => {
     try {
       // Caching removed for paginated endpoint
-      const result = await getShelvesByTag(tag, params);
+      const result = await getShelvesByTag(actor, tag, params);
       
       if ("Ok" in result && result.Ok) {
         return { tag, response: result.Ok }; 
@@ -213,11 +215,11 @@ export const fetchShelvesByTag = createAsyncThunk<
  */
 export const fetchTagShelfCount = createAsyncThunk<
   { tag: string; count: number }, // Return type
-  string, // Argument type (tag)
+  { actor: ActorSubclass<_SERVICE>, tag: string; }, // Argument type
   { rejectValue: RejectValue } // Reject type
 >(
   'perpetua/fetchTagShelfCount',
-  async (tag, { rejectWithValue }) => {
+  async ({ actor, tag }, { rejectWithValue }) => {
     try {
       const cacheKey = `tagCount_${tag}`;
       const cachedData = cacheManager.get<number>(cacheKey, 'tags');
@@ -225,7 +227,7 @@ export const fetchTagShelfCount = createAsyncThunk<
         return { tag, count: cachedData };
       }
       
-      const result = await getTagShelfCount(tag);
+      const result = await getTagShelfCount(actor, tag);
       
       if ("Ok" in result && typeof result.Ok === 'number') {
         const count = result.Ok;
@@ -247,14 +249,14 @@ export const fetchTagShelfCount = createAsyncThunk<
  */
 export const fetchTagsWithPrefix = createAsyncThunk<
   CursorPaginatedResponse<string, NormalizedTagCursor>, // Return type
-  { prefix: string; params: CursorPaginationParams<NormalizedTagCursor> }, // Argument type
+  { actor: ActorSubclass<_SERVICE>, prefix: string; params: CursorPaginationParams<NormalizedTagCursor> }, // Argument type
   { rejectValue: RejectValue } // Reject type
 >(
   'perpetua/fetchTagsWithPrefix',
-  async ({ prefix, params }, { rejectWithValue }) => {
+  async ({ actor, prefix, params }, { rejectWithValue }) => {
     try {
       // Caching removed for paginated endpoint
-      const result = await getTagsWithPrefix(prefix, params);
+      const result = await getTagsWithPrefix(actor, prefix, params);
       
       if ("Ok" in result && result.Ok) {
         return result.Ok; 
@@ -276,14 +278,14 @@ export const fetchTagsWithPrefix = createAsyncThunk<
  */
 export const loadRandomFeed = createAsyncThunk<
   ShelfPublic[], // Return type on success
-  { limit: number }, // Argument type
+  { actor: ActorSubclass<_SERVICE>, limit: number }, // Argument type
   { rejectValue: RejectValue } // Type for rejectWithValue
 >(
   'perpetua/loadRandomFeed',
-  async ({ limit }, { rejectWithValue }) => {
+  async ({ actor, limit }, { rejectWithValue }) => {
     try {
       // Ensure getShuffledByHourFeed is imported from services
-      const result = await getShuffledByHourFeed(limit); 
+      const result = await getShuffledByHourFeed(actor, limit); 
       
       if ("Ok" in result && result.Ok) {
         return result.Ok; 
@@ -303,14 +305,14 @@ export const loadRandomFeed = createAsyncThunk<
  */
 export const loadStorylineFeed = createAsyncThunk<
   CursorPaginatedResponse<ShelfPublic, TimestampCursor>, // Return type
-  { principal?: Principal | string; params: CursorPaginationParams<TimestampCursor> }, // Argument type (principal is optional for now, might be derived from identity in usage)
+  { actor: ActorSubclass<_SERVICE>, principal?: Principal | string; params: CursorPaginationParams<TimestampCursor> }, // Argument type (principal is optional for now, might be derived from identity in usage)
   { rejectValue: RejectValue } // Reject type
 >(
   'perpetua/loadStorylineFeed',
-  async ({ params }, { rejectWithValue }) => { // Removed principal from direct args, thunk caller will handle it
+  async ({ actor, params }, { rejectWithValue }) => { // Removed principal from direct args, thunk caller will handle it
     try {
       // Ensure getStorylineFeed is imported from services
-      const result = await getStorylineFeed(params); 
+      const result = await getStorylineFeed(actor, params); 
       
       if ("Ok" in result && result.Ok) {
         return result.Ok; 

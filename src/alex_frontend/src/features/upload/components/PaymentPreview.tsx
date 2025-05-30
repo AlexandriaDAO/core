@@ -2,13 +2,14 @@ import React, { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Button } from "@/lib/components/button";
-import { useNftManager } from "@/hooks/actors";
+import { useLbry, useNftManager } from "@/hooks/actors";
 import processPayment from "../thunks/processPayment";
 import { TopupBalanceWarning } from "@/apps/Modules/shared/components/TopupBalanceWarning";
 import { AlertCircle, Loader2, CreditCard, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
 
 interface PaymentPreviewProps {
     file: File;
@@ -17,10 +18,19 @@ interface PaymentPreviewProps {
 function PaymentPreview({ file }: PaymentPreviewProps) {
     const dispatch = useAppDispatch();
     const { actor: nftManagerActor } = useNftManager();
-    
+    const {actor: lbryActor} = useLbry();
+
     // Get the spending balance from the swap state
     const { spendingBalance, loading: balanceLoading } = useSelector((state: RootState) => state.swap);
     const { lbryFee, paymentStatus, paymentError } = useAppSelector(state => state.upload);
+	const { user } = useAppSelector(state => state.auth);
+
+    // Fetch LBRY balance when component mounts or user changes
+	useEffect(() => {
+        if (!user || !lbryActor || !nftManagerActor) return;
+
+		dispatch(getSpendingBalance({lbryActor, nftManagerActor, userPrincipal: user.principal}));
+    }, [user, lbryActor, nftManagerActor]);
     
     // Calculate file size in MB
     const fileSizeMB = Math.ceil(file.size / (1024 * 1024));

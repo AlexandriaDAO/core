@@ -14,6 +14,9 @@ import { ShelfPublic } from "@/../../declarations/perpetua/perpetua.did"; // Imp
 import { Badge } from "@/lib/components/badge";
 import { formatBalance } from '@/apps/Modules/shared/utils/tokenUtils';
 import { Percent } from "lucide-react"; // Icon for rarity badge
+import { useNftManager } from "@/hooks/actors";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../../../declarations/nft_manager/nft_manager.did";
 
 interface UnifiedCardActionsProps {
   contentId: string; // Arweave ID, Shelf ID, NFT Nat ID string
@@ -56,6 +59,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
   className,
   containerClassName
 }) => {
+  const {actor: nftManagerActor} = useNftManager();
   const [addToShelfContext, setAddToShelfContext] = React.useState<AddToShelfContext | null>(null);
   const [isProcessingAddToShelf, setIsProcessingAddToShelf] = React.useState(false);
   const [isHovering, setIsHovering] = React.useState(false);
@@ -328,6 +332,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
 
   // Refactored Minting Operation
   const performMintOperation = async (
+    actor: ActorSubclass<_SERVICE>,
     originalContentId: string,
     originalContentType: UnifiedCardActionsProps['contentType']
   ): Promise<{ finalContentId: string; finalContentType: 'Nft' | 'Shelf' | 'Markdown'; mintStatus: MintResult['status'] | 'not_needed' | 'failed_precheck'; mintMessage?: string }> => {
@@ -353,8 +358,8 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
     }
 
     if (needsMinting) {
-        // console.log(`[UnifiedCardActions] Minting required for ${originalContentType} ID: ${originalContentId}`);
-        const mintResult = await mint_nft(originalContentId);
+        console.log(`[UnifiedCardActions] Minting required for ${originalContentType} ID: ${originalContentId}`);
+        const mintResult = await mint_nft(actor, originalContentId);
         if (mintResult.status === 'success' || mintResult.status === 'already_exists') {
             finalContentId = mintResult.id;
             finalContentType = 'Nft';
@@ -404,6 +409,10 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
 
   // 2. Background Processor: Called after dialog confirms selection
   const processAddToShelfInBackground = async (selectedShelfIds: string[]) => {
+    if(!nftManagerActor) {
+      toast.error("NFT Manager Actor not found.");
+      return;
+    }
     // console.log("[UnifiedCardActions] processAddToShelfInBackground called. Selected IDs:", selectedShelfIds, "Context exists:", !!addToShelfContext);
     if (!addToShelfContext) {
         // console.error("[UnifiedCardActions] Background process called without context.");
@@ -451,7 +460,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
 
         // Perform minting if required (once for all selected shelves)
         if (needsMinting) {
-            const mintingOutcome = await performMintOperation(originalContentId, originalContentType);
+            const mintingOutcome = await performMintOperation(nftManagerActor, originalContentId, originalContentType);
 
             if (mintingOutcome.mintStatus === 'error' || mintingOutcome.mintStatus === 'failed_precheck') {
                 toast.error(mintingOutcome.mintMessage || "Failed to acquire item for adding.");
@@ -536,6 +545,12 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
       toast.error("Please log in to mint items.");
       return;
     }
+
+    if(!nftManagerActor) {
+      toast.error("NFT Manager Actor not found.");
+      return;
+    }
+
     // Safety check is part of performMintOperation for Arweave
     // if (contentType === 'Arweave' && !isSafeForMinting) {
     //     toast.error("Cannot mint potentially unsafe content.");
@@ -546,7 +561,7 @@ export const UnifiedCardActions: React.FC<UnifiedCardActionsProps> = React.memo(
     setIsProcessingDirectMint(true);
 
     try {
-      const mintingOutcome = await performMintOperation(contentId, contentType);
+      const mintingOutcome = await performMintOperation(nftManagerActor, contentId, contentType);
 
       if (mintingOutcome.mintStatus === 'success') {
         toast.success(`Item (ID: ${mintingOutcome.finalContentId.substring(0,8)}...) minted successfully as NFT!`);

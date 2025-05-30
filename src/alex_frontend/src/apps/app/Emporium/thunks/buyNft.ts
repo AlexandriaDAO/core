@@ -1,15 +1,16 @@
 import { createAsyncThunk, AnyAction } from "@reduxjs/toolkit";
-import {
-  getActorEmporium,
-  getIcpLedgerActor,
-} from "@/features/auth/utils/authUtils";
 import { arweaveIdToNat } from "@/utils/id_convert";
 import { Principal } from "@dfinity/principal";
 import { removeTransaction } from "@/apps/Modules/shared/state/transactions/transactionThunks";
+import { ActorSubclass } from "@dfinity/agent/lib/cjs";
+import { _SERVICE as _SERVICE_EMPORIUM} from "../../../../../../declarations/emporium/emporium.did";
+import { _SERVICE as _SERVICE_ICP_LEDGER} from "../../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 
 const buyNft = createAsyncThunk<
   string, // Success return type
   {
+    actorEmporium: ActorSubclass<_SERVICE_EMPORIUM>,
+    actorIcpLedger: ActorSubclass<_SERVICE_ICP_LEDGER>,
     nftArweaveId: string;
     userPrincipal:string;
     price: string;
@@ -17,11 +18,9 @@ const buyNft = createAsyncThunk<
   { rejectValue: string } // Reject type
 >(
   "emporium/buyNft",
-  async ({ nftArweaveId, price,userPrincipal }, { dispatch, rejectWithValue }) => {
+  async ({ actorEmporium, actorIcpLedger, nftArweaveId, price,userPrincipal }, { dispatch, rejectWithValue }) => {
     try {
       const emporium_canister_id = process.env.CANISTER_ID_EMPORIUM!;
-      const actorEmporium = await getActorEmporium();
-      const actorIcpLedger = await getIcpLedgerActor();
 
       const tokenId = arweaveIdToNat(nftArweaveId);
       let amountFormatApprove: bigint = BigInt(

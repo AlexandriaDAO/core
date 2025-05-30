@@ -1,15 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import LedgerService from "@/utils/LedgerService";
-import { getActorSwap } from "@/features/auth/utils/authUtils";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../declarations/icp_swap/icp_swap.did";
 
 const getArchivedBal = createAsyncThunk<
   string,
-  string,
+  {actor: ActorSubclass<_SERVICE>, account: string},
   { rejectValue: string }
->("icp_swap/getArchivedBal", async (account, { rejectWithValue }) => {
+>("icp_swap/getArchivedBal", async ({actor, account}, { rejectWithValue }) => {
   try {
-    const actor = await getActorSwap();
     const result = await actor.get_user_archive_balance(
       Principal.fromText(account)
     );

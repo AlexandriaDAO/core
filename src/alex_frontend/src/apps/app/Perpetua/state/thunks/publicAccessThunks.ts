@@ -5,13 +5,15 @@ import {
   toggleShelfPublicAccess as toggleShelfPublicAccessService
 } from '../services';
 import { extractErrorMessage } from '../../utils';
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../../../../../declarations/perpetua/perpetua.did';
 
 /**
  * Check if a shelf is publicly editable
  */
 export const checkShelfPublicAccess = createAsyncThunk(
   'perpetua/checkShelfPublicAccess',
-  async (shelfId: string, { rejectWithValue }) => {
+  async ({actor, shelfId}: {actor: ActorSubclass<_SERVICE>, shelfId: string}, { rejectWithValue }) => {
     try {
       // Check cache first
       const cachedData = cacheManager.get<boolean>(shelfId, 'isPublic');
@@ -20,7 +22,7 @@ export const checkShelfPublicAccess = createAsyncThunk(
       }
       
       // No cache hit, so fetch from API
-      const result = await isShelfPublic(shelfId);
+      const result = await isShelfPublic(actor, shelfId);
       
       if ("Ok" in result) {
         const isPublic = result.Ok;
@@ -49,14 +51,16 @@ export const checkShelfPublicAccess = createAsyncThunk(
 export const toggleShelfPublicAccess = createAsyncThunk(
   'perpetua/toggleShelfPublicAccess',
   async ({
+    actor,
     shelfId,
     isPublic
   }: {
+    actor: ActorSubclass<_SERVICE>,
     shelfId: string,
     isPublic: boolean
   }, { rejectWithValue }) => {
     try {
-      const result = await toggleShelfPublicAccessService(shelfId, isPublic);
+      const result = await toggleShelfPublicAccessService(actor, shelfId, isPublic);
       
       if ("Ok" in result && result.Ok) {
         // Invalidate the public status cache

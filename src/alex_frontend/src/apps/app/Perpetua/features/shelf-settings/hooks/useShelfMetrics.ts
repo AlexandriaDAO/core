@@ -1,5 +1,5 @@
+import { usePerpetua } from '@/hooks/actors';
 import { useState, useEffect } from 'react';
-import { getActorPerpetua } from '@/features/auth/utils/authUtils';
 
 export interface ShelfMetrics {
   item_count: bigint;
@@ -9,17 +9,18 @@ export interface ShelfMetrics {
 }
 
 export const useShelfMetrics = (shelfId: string, isExpanded: boolean) => {
+  const {actor} = usePerpetua();
   const [metrics, setMetrics] = useState<ShelfMetrics | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if(!actor) return;
     const loadMetrics = async () => {
       if (!isExpanded) return; // Only load metrics when expanded
       
       try {
         setLoading(true);
-        const perpetuaActor = await getActorPerpetua();
-        const result = await perpetuaActor.get_shelf_position_metrics(shelfId);
+        const result = await actor.get_shelf_position_metrics(shelfId);
         
         if ("Ok" in result) {
           setMetrics(result.Ok);
@@ -32,7 +33,7 @@ export const useShelfMetrics = (shelfId: string, isExpanded: boolean) => {
     };
     
     loadMetrics();
-  }, [shelfId, isExpanded]);
+  }, [shelfId, isExpanded, actor]);
 
   return { metrics, loading };
 }; 

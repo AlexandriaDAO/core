@@ -1,8 +1,9 @@
-import { getNftManagerActor, getAuthClient } from "@/features/auth/utils/authUtils";
 import { Principal } from '@dfinity/principal';
 import { store } from "@/store";
 import { nft_manager } from "@/../../declarations/nft_manager";
 import { createTokenAdapter } from "@/apps/Modules/shared/adapters/TokenAdapter";
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../../declarations/nft_manager/nft_manager.did';
 
 // Define expected types based on Candid Result<Nat, String>
 // Agent typically represents Nat as bigint
@@ -21,14 +22,20 @@ export type MintResult =
 // Function to find existing NFT ID for a given Arweave transaction
 const getExistingNftIdForTransaction = async (transactionId: string): Promise<string | null> => {
   console.log(`[mint.ts] Searching for existing NFT ID for Arweave tx: ${transactionId}`);
-  const state = store.getState();
-  const currentUserPrincipal = (await getAuthClient()).getIdentity().getPrincipal();
-  const currentUserPrincipalText = currentUserPrincipal.toText();
+  const {arweaveToNftId, nfts} = store.getState().nftData;
+  const {user} = store.getState().auth;
+
+  if(!user) {
+    throw new Error("You must be authenticated to mint NFTs");
+  }
+
+  const currentUserPrincipalText = user.principal
+  const currentUserPrincipal = Principal.fromText(currentUserPrincipalText);
 
   // --- Step 1: Check Redux Cache ---
-  const cachedNftId = state.nftData.arweaveToNftId[transactionId];
-  if (cachedNftId && state.nftData.nfts[cachedNftId]) {
-    const cachedOwner = state.nftData.nfts[cachedNftId]?.principal;
+  const cachedNftId = arweaveToNftId[transactionId];
+  if (cachedNftId && nfts[cachedNftId]) {
+    const cachedOwner = nfts[cachedNftId]?.principal;
     if (cachedOwner === currentUserPrincipalText) {
       console.log(`[mint.ts] Found existing ID in Redux state: ${cachedNftId} owned by current user`);
       return cachedNftId;
@@ -81,19 +88,19 @@ const getExistingNftIdForTransaction = async (transactionId: string): Promise<st
   }
 }
 
-export const mint_nft = async (transactionId: string): Promise<MintResult> => {
+export const mint_nft = async (actor: ActorSubclass<_SERVICE>, transactionId: string): Promise<MintResult> => {
   try {
-    const client = await getAuthClient();
-    if (!await client.isAuthenticated()) {
-      return { status: 'error', message: "Authentication required to acquire item." };
+    const {user} = store.getState().auth;
+
+    if(!user) {
+      throw new Error("You must be authenticated to mint NFTs");
     }
-    const currentUserPrincipalText = client.getIdentity().getPrincipal().toText();
+
+    const currentUserPrincipalText = user.principal;
 
     // --- Optimization: Check Redux cache *before* calling backend ---
     // This avoids backend call if user clearly owns it according to cache
-    const state = store.getState();
-    const nfts = state.nftData.nfts;
-    const arweaveToNftId = state.nftData.arweaveToNftId;
+    const {nfts, arweaveToNftId} = store.getState().nftData;
     const cachedNftId = arweaveToNftId[transactionId];
     const nftData = cachedNftId ? nfts[cachedNftId] : undefined;
     const ownerStr = nftData?.principal;
@@ -106,9 +113,8 @@ export const mint_nft = async (transactionId: string): Promise<MintResult> => {
 
     let ownerArg: [] | [Principal] = []; // Keep ownerArg logic if needed for specific mint flows
 
-    const actorNftManager = await getNftManagerActor();
     // Use the existing coordinate_mint call
-    const result = await actorNftManager.coordinate_mint(transactionId, ownerArg) as CoordinateMintResultBackend;
+    const result = await actor.coordinate_mint(transactionId, ownerArg) as CoordinateMintResultBackend;
     console.log("coordinate_mint backend result:", result);
 
     if ("Err" in result) {

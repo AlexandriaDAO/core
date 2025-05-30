@@ -15,6 +15,7 @@ import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { MARKETPLACE_LBRY_FEE } from "./utlis";
 import { toast } from "sonner";
 import "./component/style.css"
+import { useEmporium, useIcpLedger, useIcrc7 } from "@/hooks/actors";
 
 
 
@@ -31,6 +32,9 @@ interface CombinedModalProps {
 }
 
 const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose, handleRenderError }) => {
+    const {actor: actorEmporium} = useEmporium();
+    const {actor: actorIcrc7} = useIcrc7();
+    const {actor: actorIcpLedger} = useIcpLedger();
     const dispatch = useAppDispatch();
     const contentData = useAppSelector((state) => state.transactions.contentData);
     const user = useAppSelector((state) => state.auth);
@@ -41,20 +45,23 @@ const CombinedModal: React.FC<CombinedModalProps> = ({ type, modalData, onClose,
     if (!modalData.show) return null;
 
     const handleAction = () => {
+        if(!actorEmporium || !actorIcrc7 || !actorIcpLedger) return;
         if (Number(swap.spendingBalance) >= MARKETPLACE_LBRY_FEE) {
             switch (type) {
                 case "Sell":
-                    dispatch(listNft({ nftArweaveId: modalData.arwaveId, price }));
+                    dispatch(listNft({ actorEmporium, actorIcrc7, nftArweaveId: modalData.arwaveId, price }));
                     break;
                 case "Edit":
-                    dispatch(updateListing({ nftArweaveId: modalData.arwaveId, price }));
+                    dispatch(updateListing({ actorEmporium, nftArweaveId: modalData.arwaveId, price }));
                     break;
                 case "Remove":
-                    dispatch(removeListedNft(modalData.arwaveId));
+                    dispatch(removeListedNft({ actorEmporium, nftArweaveId: modalData.arwaveId }));
                     break;
                 case "Buy":
                     if (!user.user?.principal) return;
                     dispatch(buyNft({
+                        actorEmporium,
+                        actorIcpLedger,
                         nftArweaveId: modalData.arwaveId, price: modalData.price,
                         userPrincipal: user.user?.principal
                     }));

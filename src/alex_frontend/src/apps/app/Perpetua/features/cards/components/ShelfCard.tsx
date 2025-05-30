@@ -14,6 +14,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store';
 import { useUsername } from '@/hooks/useUsername';
 import { useFollowStatus } from '../../following/hooks/useFollowStatus';
+import { usePerpetua } from '@/hooks/actors';
+import { NftManagerActor } from '@/actors';
 
 export interface ShelfCardProps {
   shelf: ShelfPublic;
@@ -47,7 +49,7 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
 }) => {
   const [isFooterExpanded, setIsFooterExpanded] = useState(false);
   const itemCount = shelf.items ? shelf.items.length : 0;
-  
+  const {actor} = usePerpetua();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -84,9 +86,10 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
 
   const handleFollowTag = useCallback(async (tag: string, event: React.MouseEvent) => {
     event.stopPropagation();
-    setFollowingTag(tag);
     try {
-      const result = await followTag(tag);
+      if(!actor) throw new Error("Perpetua Actor unavailable");
+      setFollowingTag(tag);
+      const result = await followTag(actor, tag);
       if ('Ok' in result && result.Ok === true) {
         toast.success(`Followed tag: ${tag}`);
       } else if ('Err' in result) {
@@ -157,18 +160,19 @@ export const ShelfCard: React.FC<ShelfCardProps> = ({
           <AspectRatio ratio={1} className="w-full relative">
             <div className="flex items-center justify-center bg-gray-50 dark:bg-gray-800 h-full group-hover:bg-gray-100 dark:group-hover:bg-gray-900/80 transition-colors duration-300">
               <div className="relative w-full h-full">
-                <UnifiedCardActions
-                  contentId={shelf.shelf_id}
-                  contentType="Shelf"
-                  ownerPrincipal={ownerPrincipal}
-                  parentShelfId={parentShelfId}
-                  itemId={itemId}
-                  currentShelfId={shelf.shelf_id}
-                  onToggleDetails={() => setIsFooterExpanded(prev => !prev)}
-                  showDetails={isFooterExpanded}
-                  isOwned={isOwnedByUser}
-                />
-                
+                <NftManagerActor>
+                  <UnifiedCardActions
+                    contentId={shelf.shelf_id}
+                    contentType="Shelf"
+                    ownerPrincipal={ownerPrincipal}
+                    parentShelfId={parentShelfId}
+                    itemId={itemId}
+                    currentShelfId={shelf.shelf_id}
+                    onToggleDetails={() => setIsFooterExpanded(prev => !prev)}
+                    showDetails={isFooterExpanded}
+                    isOwned={isOwnedByUser}
+                  />
+                </NftManagerActor>
                 <div className="text-center p-6 h-full flex flex-col items-center justify-center">
                   <div className="text-xl font-semibold truncate max-w-full mb-1 font-serif">{shelf.title}</div>
                   

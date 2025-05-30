@@ -8,6 +8,8 @@ import { fetchTokensForPrincipal, FetchTokensParams } from '../nftData/nftDataTh
 import { clearNfts } from '../nftData/nftDataSlice';
 import { Principal } from '@dfinity/principal';
 import { createTokenAdapter, TokenType } from '../../adapters/TokenAdapter';
+import { ActorSubclass } from '@dfinity/agent';
+import { _SERVICE } from '../../../../../../../declarations/asset_manager/asset_manager.did';
 
 const DEBOUNCE_TIME = 300; // ms
 const DEFAULT_PAGE_SIZE = 20;
@@ -69,11 +71,11 @@ export const togglePrincipalSelection = createAsyncThunk<
 
 export const performSearch = createAsyncThunk<
   void,
-  void,
+  { actor: ActorSubclass<_SERVICE> },
   { state: RootState; dispatch: AppDispatch }
 >(
   'library/performSearch',
-  async (_, { getState, dispatch }) => {
+  async ({actor}, { getState, dispatch }) => {
     const state = getState();
     const now = Date.now();
     const timeSinceLastSearch = now - state.library.lastSearchTimestamp;
@@ -101,6 +103,7 @@ export const performSearch = createAsyncThunk<
 
       if (selectedPrincipals && selectedPrincipals.length > 0 && collection) {
         const params: FetchTokensParams = {
+          actor,
           principalId: selectedPrincipals[0],
           collection,
           page: 1,
@@ -224,8 +227,8 @@ export const changeCollection = createAsyncThunk<
   }
 );
 
-export const toggleSort = () => (dispatch: AppDispatch) => {
+export const toggleSort = (actor: ActorSubclass<_SERVICE>) => (dispatch: AppDispatch) => {
   dispatch(clearNfts());
   dispatch(toggleSortDirection());
-  dispatch(performSearch());
+  dispatch(performSearch({actor}));
 };

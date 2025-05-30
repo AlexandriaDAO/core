@@ -10,17 +10,20 @@ import {
   loadRecentShelves
 } from "@/apps/app/Perpetua/state";
 import { createFindItemById } from "../../../utils";
+import { usePerpetua } from "@/hooks/actors";
 
 // Custom hook for public shelf operations
 export const usePublicShelfOperations = () => {
   const dispatch = useAppDispatch();
+  const {actor} = usePerpetua();
   const publicShelves = useAppSelector(selectPublicShelves);
   const loading = useAppSelector(selectPublicLoading);
   const lastTimestamp = useAppSelector(selectLastTimestamp);
 
   const loadRecentShelvesData = useCallback(async (limit: number = 20, beforeTimestamp?: string | bigint) => {
-    await dispatch(loadRecentShelves({ limit, cursor: beforeTimestamp }));
-  }, [dispatch]);
+    if(!actor) return;
+    await dispatch(loadRecentShelves({ actor, params: { limit, cursor: beforeTimestamp } }));
+  }, [actor, dispatch]);
 
   const loadMoreShelves = useCallback(async () => {
     if (!loading) { // Always try if not loading

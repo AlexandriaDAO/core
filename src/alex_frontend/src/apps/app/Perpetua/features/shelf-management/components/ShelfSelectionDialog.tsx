@@ -26,6 +26,8 @@ import PrincipalSelector from "@/apps/Modules/LibModules/nftSearch/PrincipalSele
 import { getUserShelves, getUserPubliclyEditableShelves } from "@/apps/app/Perpetua/state/services/shelfService"; // Updated import
 import { OffsetPaginationParams, OffsetPaginatedResponse } from "@/apps/app/Perpetua/state/services/serviceTypes"; // Corrected import path
 import { Result } from "@/apps/app/Perpetua/utils"; // Corrected import path
+import { usePerpetua } from "@/hooks/actors";
+import { AlexBackendActor } from "@/actors";
 
 /**
  * Convert a NormalizedShelf back to a Shelf for API calls and components
@@ -83,6 +85,7 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
   onConfirmSelection,
   onCreateShelf
 }) => {
+  const {actor} = usePerpetua();
   const [selectedShelfIds, setSelectedShelfIds] = useState<string[]>([]);
   const [myShelvesSearchTerm, setMyShelvesSearchTerm] = useState(""); // Renamed from searchTerm
   const [isLoading, setIsLoading] = useState(true); // For initial own shelves loading
@@ -298,6 +301,7 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
 
   // --- Public User Search Logic ---
   const fetchAndSetUserPublicShelves = useCallback(async (principalId: string) => {
+    if(!actor) throw new Error("Perpetua Actor unavailable");
     if (!principalId || principalId === 'new') { 
       setFetchedUserPublicShelves([]);
       setSelectedPublicUserPrincipal(null); 
@@ -310,7 +314,7 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
 
     try {
       const resultFromService: Result<OffsetPaginatedResponse<ShelfPublic>, QueryError> = 
-        await getUserPubliclyEditableShelves(Principal.fromText(principalId), params);
+        await getUserPubliclyEditableShelves(actor,Principal.fromText(principalId), params);
 
       if ("Ok" in resultFromService) {
         const paginatedResult = resultFromService.Ok;
@@ -578,12 +582,12 @@ export const ShelfSelectionDialog: React.FC<ShelfSelectionDialogProps> = ({
                   <div className="mb-4">
                     <div style={{ display: !selectedPublicUserPrincipal ? 'block' : 'none' }}>
                       <div className="min-h-[150px]"> {/* Ensure PrincipalSelector has enough space */}
-                        <PrincipalSelector 
+                        <AlexBackendActor><PrincipalSelector 
                           onPrincipalSelected={handleUserPrincipalSelect} 
                           defaultPrincipal="new" // Or any other appropriate default
                           performDefaultActions={false} // CRUCIAL: Set this to false
                           showMostRecentOption={false}
-                        />
+                        /></AlexBackendActor>
                       </div>
                     </div>
                     {selectedPublicUserPrincipal && (

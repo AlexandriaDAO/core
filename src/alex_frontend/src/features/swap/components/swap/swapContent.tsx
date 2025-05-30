@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { _SERVICE as _SERVICESWAP } from "../../../../../../declarations/icp_swap/icp_swap.did";
-import { _SERVICE as _SERVICEICPLEDGER } from "../../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 
 import { Link } from "react-router";
 import swapLbry from "../../thunks/swapLbry";
@@ -15,8 +13,13 @@ import SuccessModal from "../successModal";
 import LoadingModal from "../loadingModal";
 import ErrorModal from "../errorModal";
 import { Entry } from "@/layouts/parts/Header";
+import { useIcpLedger, useLbry, useIcpSwap } from "@/hooks/actors";
 
 const SwapContent: React.FC = () => {
+  const {actor: lbryActor} = useLbry();
+  const {actor: icpLedgerActor} = useIcpLedger();
+  const {actor: icpSwapActor} = useIcpSwap();
+
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const icpLedger = useAppSelector((state) => state.icpLedger);
@@ -31,9 +34,9 @@ const SwapContent: React.FC = () => {
   const [shadow, setShadow] = useState('shadow-[0px_0px_13px_4px_#abbddb8a] border-[#C5CFF9] ');
 
   const handleSubmit = () => {
-    if (!user?.principal) return;
+    if (!user?.principal || !icpLedgerActor || !icpSwapActor) return;
     let amountAfterFees = (Number(amount)).toFixed(4);
-    dispatch(swapLbry({ amount: amountAfterFees, userPrincipal: user?.principal }));
+    dispatch(swapLbry({ actorIcpLedger: icpLedgerActor, actorSwap: icpSwapActor, amount: amountAfterFees, userPrincipal: user?.principal }));
     setLoadingModalV(true);
   };
 
@@ -62,16 +65,16 @@ const SwapContent: React.FC = () => {
     );
   }, [swap.lbryRatio]);
   useEffect(() => {
-    if (!user) return;
+    if (!user || !lbryActor) return;
     if (swap.swapSuccess === true) {
-      dispatch(getLbryBalance(user.principal));
+      dispatch(getLbryBalance({actor: lbryActor, account: user.principal}));
       dispatch(flagHandler());
       setLoadingModalV(false);
       setSucessModalV(true);
       setAmount("");
       setTentativeLBRY(0);
     }
-  }, [user, swap.swapSuccess]);
+  }, [user, swap.swapSuccess, lbryActor]);
   useEffect(() => {
     if (swap.error) {
       setLoadingModalV(false);

@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { _SERVICE as _SERVICESWAP } from "../../../../../../declarations/icp_swap/icp_swap.did";
-import { _SERVICE as _SERVICEICPLEDGER } from "../../../../../../declarations/icp_ledger_canister/icp_ledger_canister.did";
 
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getIcpBal from "@/features/icp-ledger/thunks/getIcpBal";
@@ -13,8 +11,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate } from "@fortawesome/free-solid-svg-icons";
 import { Entry } from "@/layouts/parts/Header";
 import { toast } from "sonner";
+import { useIcpLedger } from "@/hooks/actors";
 
 const AccountCards: React.FC = () => {
+    const {actor: icpLedgerActor} = useIcpLedger();
+
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
     const swap = useAppSelector((state) => state.swap);
@@ -23,21 +24,28 @@ const AccountCards: React.FC = () => {
     const [formattedAccountId, setFormattedAccountId] = useState("");
 
     const handleRefresh = () => {
-        if (!user) return;
-        dispatch(getIcpBal(user.principal));
+        if (!user || !icpLedgerActor) return;
+        dispatch(getIcpBal({actor: icpLedgerActor, account: user.principal}));
         dispatch(getIcpPrice());
         toast.info("Refreshing balance!")
     }
+    useEffect(() => {
+        dispatch(getIcpPrice());
+    }, []);
+
+    useEffect(() => {
+        if(!user) return;
+
+        dispatch(getAccountId(user.principal));
+    }, [user]);
     // icp ledger
     useEffect(() => {
-        if (user) {
-            dispatch(getIcpBal(user.principal));
-            dispatch(getAccountId(user.principal));
-            dispatch(getIcpPrice());
-        }
-    }, [user]);
+        if (!user || !icpLedgerActor) return;
+
+        dispatch(getIcpBal({actor: icpLedgerActor, account: user.principal}));
+    }, [user, icpLedgerActor]);
     useEffect(() => {
-        if (!user) return;
+        if (!user || !icpLedgerActor) return;
         if (
             swap.successClaimReward === true ||
             swap.swapSuccess === true ||
@@ -46,9 +54,9 @@ const AccountCards: React.FC = () => {
             swap.redeeemSuccess === true ||
             icpLedger.transferSuccess === true
         ) {
-            dispatch(getIcpBal(user.principal));
+            dispatch(getIcpBal({actor: icpLedgerActor, account: user.principal}));
         }
-    }, [user, swap, icpLedger]);
+    }, [user, swap, icpLedger, icpLedgerActor]);
 
     //style
     useEffect(() => {

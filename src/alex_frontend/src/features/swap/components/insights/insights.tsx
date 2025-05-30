@@ -3,17 +3,19 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import getAllLogs from '../../thunks/insights/getAllLogs';
-import LbryBurnChart from './chart';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import LineChart from './chart';
+import { useLogs } from '@/hooks/actors';
 
 const Insights: React.FC = () => {
+    const {actor} = useLogs();
     const dispatch = useAppDispatch();
     const chartData = useAppSelector((state) => state.swap.logsData);
 
     useEffect(() => {
-        dispatch(getAllLogs());
-    }, [])
+        if(!actor) return;
+        dispatch(getAllLogs(actor));
+    }, [actor])
     return (
         <>
             <div className='container px-3'>

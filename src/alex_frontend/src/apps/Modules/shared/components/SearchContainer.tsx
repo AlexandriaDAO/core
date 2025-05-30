@@ -16,6 +16,7 @@ import {
 } from "../../../app/Permasearch/styles";
 import { ArrowUp, LoaderPinwheel, RotateCcw, RotateCw } from "lucide-react";
 import { Button } from '@/lib/components/button';
+import { NftManagerActor } from "@/actors";
 
 interface SearchContainerProps {
   title: string;
@@ -149,7 +150,7 @@ export function SearchContainer({
           </SearchFormContainer>
         )}
       </PageContainer>
-      <Grid dataSource={dataSource} />
+      <NftManagerActor><Grid dataSource={dataSource} /></NftManagerActor>
       {showMoreEnabled && transactions.length > 0 && (
         <div className="flex justify-center mt-6 mb-8">
           <Button

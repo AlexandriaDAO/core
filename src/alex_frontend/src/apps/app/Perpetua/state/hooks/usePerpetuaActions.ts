@@ -26,6 +26,7 @@ import {
   checkShelfPublicAccess,
   toggleShelfPublicAccess,
 } from '../thunks';
+import { usePerpetua } from '@/hooks/actors';
 
 /**
  * Custom hook providing actions for Perpetua state management
@@ -34,6 +35,7 @@ import {
  * for easier consumption by React components
  */
 export const usePerpetuaActions = () => {
+  const {actor} = usePerpetua();
   // Use properly typed dispatch
   const dispatch = useDispatch<AppDispatch>();
 
@@ -49,26 +51,42 @@ export const usePerpetuaActions = () => {
     clearError: () => dispatch(clearError()),
     
     // Query actions
-    loadShelves: (principal: Principal | string) => 
-      dispatch(loadShelves({ 
+    loadShelves: (principal: Principal | string) => {
+      if(!actor) return;
+      return dispatch(loadShelves({ 
+        actor,
         principal, 
         params: { offset: 0, limit: 20 }
-      })),
-    getShelf: (shelfId: string) => 
-      dispatch(getShelfById(shelfId)),
-    loadRecentShelves: (params: { limit?: number, beforeTimestamp?: string | bigint }) => 
-      dispatch(loadRecentShelves({ 
-        limit: params.limit || 20, 
-        cursor: params.beforeTimestamp 
-      })),
-    loadMissingShelves: (principal: Principal | string) => 
-      dispatch(loadMissingShelves(principal)),
+      }))
+    },
+    getShelf: (shelfId: string) => {
+      if(!actor) return;
+      return dispatch(getShelfById({actor, shelfId}))
+    },
+    loadRecentShelves: (params: { limit?: number, beforeTimestamp?: string | bigint }) => {
+      if(!actor) return;
+      return dispatch(loadRecentShelves({ 
+        actor, params: {
+          limit: params.limit || 20, 
+          cursor: params.beforeTimestamp 
+        }
+      }))
+    },
+    loadMissingShelves: (principal: Principal | string) => {
+      if(!actor) return;
+      return dispatch(loadMissingShelves({actor, principal}))
+    },
     
     // Shelf management
-    createShelf: (params: { title: string, description: string, principal: Principal | string }) => 
-      dispatch(createShelf(params)),
-    updateShelfMetadata: (params: { shelfId: string, title?: string, description?: string }) => 
-      dispatch(updateShelfMetadata(params)),
+    createShelf: (params: { title: string, description: string, principal: Principal | string }) => {
+      if(!actor) return;
+
+      return dispatch(createShelf({actor, ...params}))
+    },
+    updateShelfMetadata: (params: { shelfId: string, title?: string, description?: string }) => {
+      if(!actor) return;
+      return dispatch(updateShelfMetadata({actor, ...params}))
+    },
     
     // Item management
     addItem: (params: { 
@@ -78,33 +96,46 @@ export const usePerpetuaActions = () => {
       principal: Principal | string,
       referenceItemId?: number | null,
       before?: boolean
-    }) => dispatch(addItem(params)),
+    }) => {
+      if(!actor) return;
+      return dispatch(addItem({actor, ...params}))
+    },
     removeItem: (params: { 
       shelfId: string, 
       itemId: number, 
       principal: Principal | string 
-    }) => dispatch(removeItem(params)),
+    }) => {
+      if(!actor) return;
+      return dispatch(removeItem({actor, ...params}))
+    },
     
     // Ordering and arrangement
     setItemOrder: (params: {
       shelfId: string;
       orderedItemIds: number[];
       principal: Principal | string;
-    }) => dispatch(setItemOrder(params)),
+    }) => {
+      if(!actor) return;
+      return dispatch(setItemOrder({actor, ...params}))
+    },
     reorderProfileShelf: (params: { 
       shelfId: string, 
       referenceShelfId: string | null, 
       before: boolean,
       principal: Principal | string,
       newShelfOrder?: string[]
-    }) => dispatch(reorderProfileShelf(params)),
+    }) => {
+      if(!actor) return;
+      return dispatch(reorderProfileShelf({actor, ...params}))
+    },
     updateShelfOrder: (newOrder: string[]) => 
       dispatch(updateShelfOrder(newOrder)),
     
     // Public access features
     checkShelfPublicAccess: async (shelfId: string) => {
       try {
-        return await dispatch(checkShelfPublicAccess(shelfId)).unwrap();
+        if(!actor) return;
+        return await dispatch(checkShelfPublicAccess({actor, shelfId})).unwrap();
       } catch (error) {
         console.error("Failed to check shelf public access:", error);
         return null;
@@ -112,7 +143,8 @@ export const usePerpetuaActions = () => {
     },
     toggleShelfPublicAccess: async (params: { shelfId: string, isPublic: boolean }) => {
       try {
-        const result = await dispatch(toggleShelfPublicAccess(params)).unwrap();
+        if(!actor) return;
+        const result = await dispatch(toggleShelfPublicAccess({actor, ...params})).unwrap();
         return result;
       } catch (error) {
         console.error("Failed to toggle shelf public access:", error);

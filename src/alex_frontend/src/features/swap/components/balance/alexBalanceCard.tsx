@@ -6,22 +6,26 @@ import React, { useEffect, useState } from "react";
 import getAlexPrice from "../../thunks/alexIcrc/getAlexPrice";
 import getAccountAlexBalance from "../../thunks/alexIcrc/getAccountAlexBalance";
 import { toast } from "sonner";
+import { useAlex, useIcpSwapFactory } from "@/hooks/actors";
 
 const AlexBalanceCard = () => {
+    const {actor: alexActor} = useAlex();
+    const {actor: icpSwapFactoryActor} = useIcpSwapFactory();
     const alex = useAppSelector(state => state.alex);
     const auth = useAppSelector(state => state.auth);
     const dispatch = useAppDispatch();
     const [alexBalUsd, setAlexBalUsd] = useState(0);
 
     const handleRefresh = () => {
-        if (!auth.user) return;
-        dispatch(getAccountAlexBalance(auth.user.principal))
+        if (!auth.user || !alexActor) return;
+        dispatch(getAccountAlexBalance({actor: alexActor, account: auth.user.principal}))
         toast.info("Refreshing balance!")
 
     }
     useEffect(() => {
-        dispatch(getAlexPrice())
-    }, [])
+        if(!icpSwapFactoryActor) return;
+        dispatch(getAlexPrice(icpSwapFactoryActor))
+    }, [icpSwapFactoryActor])
 
     useEffect(() => {
         setAlexBalUsd(Number(alex.alexBal) * Number(alex.alexPriceUsd));

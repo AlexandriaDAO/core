@@ -40,6 +40,8 @@ jest.mock('@/apps/Modules/shared/state/transactions/transactionSortUtils', () =>
 
 // Import the mocked selector
 import { selectFilteredAndSortedTransactions } from '@/apps/Modules/shared/state/transactions/transactionSortUtils';
+import { ActorSubclass } from '@dfinity/agent/lib/cjs/actor';
+import { _SERVICE } from '../../../../declarations/asset_manager/asset_manager.did';
 
 // Mock the external dependencies
 jest.mock('@/apps/Modules/LibModules/arweaveSearch/api/arweaveApi', () => ({
@@ -445,9 +447,9 @@ describe('Transaction State', () => {
       // Mock the content service
       jest.spyOn(ContentService, 'loadContent').mockResolvedValue(mockContent);
       jest.spyOn(ContentService, 'getContentUrls').mockResolvedValue(mockUrls);
-      
+      const actor = {} as ActorSubclass<_SERVICE>;
       // Call the updateTransactions thunk with arweave IDs
-      await store.dispatch(updateTransactions(['tx1', 'tx2']) as unknown as AnyAction);
+      await store.dispatch(updateTransactions({arweaveIds: ['tx1', 'tx2'], actor}) as unknown as AnyAction);
       
       // Verify transactions are an empty array (per the current implementation)
       const updatedState = store.getState() as RootState;
@@ -468,9 +470,10 @@ describe('Transaction State', () => {
         }
       ];
       store.dispatch(setTransactions(mockTransactions));
+      const actor = {} as ActorSubclass<_SERVICE>;
       
       // Call the updateTransactions thunk with empty array
-      await store.dispatch(updateTransactions([]) as unknown as AnyAction);
+      await store.dispatch(updateTransactions({arweaveIds: [], actor: {} as ActorSubclass<_SERVICE>}) as unknown as AnyAction);
       
       // Verify transactions from initial state are returned (since no change for empty array)
       const updatedState = store.getState() as RootState;

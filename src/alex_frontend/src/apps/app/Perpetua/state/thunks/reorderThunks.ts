@@ -8,23 +8,26 @@ import {
   reorderProfileShelf as reorderProfileShelfService
 } from '../services';
 import { toPrincipal, extractErrorMessage } from '../../utils';
-
+import { ActorSubclass } from '@dfinity/agent/lib/cjs/actor';
+import { _SERVICE } from '../../../../../../../declarations/perpetua/perpetua.did';
 /**
  * Set the absolute order of items within a shelf
  */
 export const setItemOrder = createAsyncThunk(
   'perpetua/setItemOrder',
   async ({
+    actor,
     shelfId,
     orderedItemIds,
     principal // Add principal if needed for cache invalidation or logging
   }: {
+    actor: ActorSubclass<_SERVICE>,
     shelfId: string;
     orderedItemIds: number[];
     principal: Principal | string; // Pass principal for consistency if needed
   }, { rejectWithValue }) => {
     try {
-      const result = await setItemOrderService(shelfId, orderedItemIds);
+      const result = await setItemOrderService(actor, shelfId, orderedItemIds);
 
       if ("Ok" in result) {
         // Invalidate caches for this shelf
@@ -55,12 +58,14 @@ export const setItemOrder = createAsyncThunk(
 export const reorderProfileShelf = createAsyncThunk(
   'perpetua/reorderProfileShelf',
   async ({ 
+    actor,
     shelfId, 
     referenceShelfId, 
     before,
     principal,
     newShelfOrder // Optional parameter for the complete new order
   }: { 
+    actor: ActorSubclass<_SERVICE>,
     shelfId: string, 
     referenceShelfId: string | null, 
     before: boolean,
@@ -81,6 +86,7 @@ export const reorderProfileShelf = createAsyncThunk(
       
       // Then make the actual API call
       const result = await reorderProfileShelfService(
+        actor,
         shelfId,
         referenceShelfId,
         before
@@ -96,6 +102,7 @@ export const reorderProfileShelf = createAsyncThunk(
         
         // Force a reload of shelves to ensure we get the updated order
         await dispatch(loadShelves({ 
+          actor,
           principal: principalStr, 
           params: { offset: 0, limit: 20 }
         })).unwrap();
@@ -114,6 +121,7 @@ export const reorderProfileShelf = createAsyncThunk(
       if ("Err" in result && result.Err) {
         // If there's an error, revert the optimistic update by forcing a refetch
         await dispatch(loadShelves({ 
+          actor,
           principal: principalStr, 
           params: { offset: 0, limit: 20 }
         })).unwrap();

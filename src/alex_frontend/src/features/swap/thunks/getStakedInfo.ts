@@ -2,17 +2,17 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Principal } from "@dfinity/principal";
 import LedgerService from "@/utils/LedgerService";
 import { StakeInfo } from "../swapSlice";
-import { getActorSwap } from "@/features/auth/utils/authUtils";
+import { ActorSubclass } from "@dfinity/agent";
+import { _SERVICE } from "../../../../../declarations/icp_swap/icp_swap.did";
 
 
 // Define the async thunk
 const getStakeInfo = createAsyncThunk<
   StakeInfo, // This is the return type of the thunk's payload
-  string,
+  {actor: ActorSubclass<_SERVICE>, account: string},
   { rejectValue: string }
->("icp_swap/getStakeInfo", async (account, { rejectWithValue }) => {
+>("icp_swap/getStakeInfo", async ({actor, account}, { rejectWithValue }) => {
   try {
-    const actor = await getActorSwap();
     const result = await actor.get_stake(Principal.fromText(account));
     if (result.length > 0) {
       // Stake exists
