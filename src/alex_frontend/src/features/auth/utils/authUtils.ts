@@ -60,7 +60,7 @@ import {
 } from "../../../../../icp_swap_factory";
 import {
   createActor as createActorAssetCanister,
-  asset_canister,
+  // asset_canister, // We will not use the potentially undefined global default
 } from "../../../../../asset_canister"; 
 
 import {
@@ -76,7 +76,7 @@ import {
 // --- Caching Variables ---
 let authClientInstance: AuthClient | null = null;
 const agentCache = new Map<string, HttpAgent>();
-const agentsFetchedRootKey = new Set<HttpAgent>();
+const agentsFetchedRootKey = new Set<HttpAgent>(); // To avoid fetching root key multiple times for the same agent instance
 const actorCache = new Map<string, any>();
 // --- End Caching Variables ---
 
@@ -107,127 +107,123 @@ export const getAuthClient = async (): Promise<AuthClient> => {
   if (authClientInstance) {
     return authClientInstance;
   }
-
-  // reason for creating new client each time is
-  // if the user login has expired it will SPA will not know
-  // as same client's ( isAuthenticated ) will always return true even if user session is expired
-  console.time('AuthClient.create');
   authClientInstance = await AuthClient.create();
-  console.timeEnd('AuthClient.create');
-
   return authClientInstance;
 };
 
+// Generic actor creation and caching utility
 const getActor = async <T>(
   canisterId: string,
   createActorFn: (canisterId: string, options: { agent: HttpAgent }) => T,
-  defaultActor: T
+  // defaultActor: T // Removed: We should always create a specific actor or fail clearly.
 ): Promise<T> => {
+  if (!canisterId) {
+    throw new Error("[authUtils.getActor] Canister ID cannot be null or empty.");
+  }
+
   try {
     const client = await getAuthClient();
-    if (await client.isAuthenticated()) {
-      const identity = client.getIdentity();
-      const principalString = identity.getPrincipal().toString();
-      const actorCacheKey = `${canisterId}_${principalString}`;
+    const isAuthenticated = await client.isAuthenticated();
+    const principalString = isAuthenticated
+      ? client.getIdentity().getPrincipal().toString()
+      : "ANONYMOUS";
 
-      // Check actor cache first
-      if (actorCache.has(actorCacheKey)) {
-        return actorCache.get(actorCacheKey);
-      }
-
-      let agent: HttpAgent;
-
-      // Check agent cache
-      if (agentCache.has(principalString)) {
-        agent = agentCache.get(principalString)!;
-      } else {
-        // Create and cache agent
-        console.time('HttpAgent.create');
-        agent = await HttpAgent.create({
-          identity,
-          host: isLocalDevelopment
-            ? `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943` // Local development URL
-            : "https://ic0.app", // Default to mainnet if neither condition is true
-        });
-        console.timeEnd('HttpAgent.create');
-
-        agentCache.set(principalString, agent);
-
-        // Fetch root key for new agent if in development
-        if (isLocalDevelopment && !agentsFetchedRootKey.has(agent)) {
-          console.time('agent.fetchRootKey');
-          await agent.fetchRootKey().catch((err) => {
-            console.warn(
-              "Unable to fetch root key. Check to ensure that your local replica is running"
-            );
-            console.error(err);
-          });
-          console.timeEnd('agent.fetchRootKey');
-          agentsFetchedRootKey.add(agent);
-        }
-      }
-
-      // Create and cache actor
-      const newActor = createActorFn(canisterId, { agent });
-      actorCache.set(actorCacheKey, newActor);
-
-      return newActor;
+    const actorCacheKey = `${canisterId}_${principalString}`;
+    if (actorCache.has(actorCacheKey)) {
+      return actorCache.get(actorCacheKey) as T;
     }
+
+    let agent: HttpAgent;
+    const agentCacheKey = principalString; // Agent is cached by principal string (or "ANONYMOUS")
+
+    if (agentCache.has(agentCacheKey)) {
+      agent = agentCache.get(agentCacheKey)!;
+    } else {
+      const agentOptions: { identity?: Identity; host?: string } = {};
+      agentOptions.host = isLocalDevelopment
+        ? (process.env.NODE_ENV === 'development' ? `http://127.0.0.1:4943` : `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943`) 
+        : "https://ic0.app";
+
+      if (isAuthenticated) {
+        agentOptions.identity = client.getIdentity();
+      } else {
+        // For anonymous agent, if local development, ensure it targets the local replica correctly.
+        // The host is already set above.
+      }
+      
+      agent = new HttpAgent(agentOptions);
+      agentCache.set(agentCacheKey, agent);
+
+      // Fetch root key for new agent if in development (applies to both authenticated and anonymous)
+      // Avoid fetching multiple times for the same agent *instance*
+      if (isLocalDevelopment && !agentsFetchedRootKey.has(agent)) {
+        console.log(`[authUtils.getActor] Agent (Authenticated: ${isAuthenticated}, Principal: ${principalString}) fetching root key for host: ${agentOptions.host}`);
+        await agent.fetchRootKey().catch((err) => {
+          console.warn(`Unable to fetch root key for agent. Host: ${agentOptions.host}`, err);
+        });
+        agentsFetchedRootKey.add(agent);
+      }
+    }
+
+    const newActor = createActorFn(canisterId, { agent });
+    actorCache.set(actorCacheKey, newActor);
+    return newActor;
+
   } catch (error) {
-    console.error(`Error initializing actor for ${canisterId}:`, error);
+    console.error(`[authUtils.getActor] CRITICAL ERROR initializing actor for canister ${canisterId} (Authenticated: ${await authClientInstance?.isAuthenticated()}):`, error);
+    throw error; // Rethrow so the caller knows something went wrong
   }
-  // Return default actor if not authenticated or if error occurred
-  return defaultActor;
 };
 
+// Specific actor getters
 export const getActorAlexBackend = () =>
-  getActor(alex_backend_canister_id, createAlexBackendActor, alex_backend);
+  getActor(alex_backend_canister_id, createAlexBackendActor);
 
-export const getUser = () => getActor(user_canister_id, createUserActor, user);
+export const getUser = () => getActor(user_canister_id, createUserActor);
 
 export const getIcrc7Actor = () =>
-  getActor(icrc7_canister_id, createIcrc7Actor, icrc7);
+  getActor(icrc7_canister_id, createIcrc7Actor);
 
 export const getIcrc7ScionActor = () =>
-  getActor(icrc7_scion_canister_id, createIcrc7ScionActor, icrc7_scion);
+  getActor(icrc7_scion_canister_id, createIcrc7ScionActor);
 
 export const getNftManagerActor = () =>
-  getActor(nft_manager_canister_id, createNftManagerActor, nft_manager);
+  getActor(nft_manager_canister_id, createNftManagerActor);
 
 export const getActorSwap = () =>
-  getActor(icp_swap_canister_id, createActorSwap, icp_swap);
+  getActor(icp_swap_canister_id, createActorSwap);
 
 export const getIcpLedgerActor = () =>
-  getActor(icp_ledger_canister_id, createActorIcpLedger, icp_ledger_canister);
+  getActor(icp_ledger_canister_id, createActorIcpLedger);
 
 export const getTokenomicsActor = () =>
-  getActor(tokenomics_canister_id, createActorTokenomics, tokenomics);
+  getActor(tokenomics_canister_id, createActorTokenomics);
 
 export const getLbryActor = () =>
-  getActor(lbry_canister_id, createActorLbry, LBRY);
+  getActor(lbry_canister_id, createActorLbry);
 
 export const getAlexActor = () =>
-  getActor(alex_canister_id, createActorAlex, ALEX);
+  getActor(alex_canister_id, createActorAlex);
 
 export const getActorVetkd = () =>
-  getActor(vetkd_canister_id, createActorVetkd, vetkd);
+  getActor(vetkd_canister_id, createActorVetkd);
 
 export const getActorEmporium = () =>
-  getActor(emporium_canister_id, createActorEmporium, emporium);
+  getActor(emporium_canister_id, createActorEmporium);
 
 export const getActorPerpetua = () =>
-  getActor(perpetua_canister_id, createActorPerpetua, perpetua);
+  getActor(perpetua_canister_id, createActorPerpetua);
 
-export const getLogs = () => getActor(log_canister_id, createActorLogs, logs);
+export const getLogs = () => getActor(log_canister_id, createActorLogs);
 
 export const getIcpSwapFactoryCanister = () =>
   getActor(
     icp_swap_factory_canister_id,
     createActorIcpSwapFactory,
-    icp_swap_factory
   );
+
 export const getActorUserAssetCanister = (canisterId: string) =>
-  getActor(canisterId, createActorAssetCanister, asset_canister);
+  getActor(canisterId, createActorAssetCanister);
 
 export const getActorAssetManager = () =>
-  getActor(asset_manager_canister_id, createActorAssetManager, asset_manager);
+  getActor(asset_manager_canister_id, createActorAssetManager);

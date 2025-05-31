@@ -166,7 +166,7 @@ perpetua/
 
 
 
-
+- First next thing, get perpetua assets to load from trnasactionService like in ALexandian, and make alexandrian not freeze up being slow.
 
 
 
@@ -204,6 +204,10 @@ Functional:
 - Should reduce the delay for loading shelf paths that you click on.
 
 
+
+
+Efficiency: 
+- Are we able to not get the arweave metadata query before loading it from the asset canisters?
 
 
 

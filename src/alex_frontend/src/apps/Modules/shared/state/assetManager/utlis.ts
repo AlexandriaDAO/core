@@ -4,6 +4,7 @@ import { _SERVICE } from "../../../../../../../declarations/asset_manager/asset_
 export const getAssetCanister = async (principal: string, actor: ActorSubclass<_SERVICE>): Promise<string | null> => {
     try {
       const result =await  actor.get_all_user_asset_canisters();
+      console.log("get_all_user_asset_canisters result", result);
   
       const matchingCanister = result
         .map(([userPrincipal, canisterRegistry]) => {
