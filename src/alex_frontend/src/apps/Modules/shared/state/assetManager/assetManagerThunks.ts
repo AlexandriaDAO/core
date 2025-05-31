@@ -306,116 +306,124 @@ export const getCanisterCycles = createAsyncThunk<
   }
 });
 
-// export const fetchAssetFromUserCanister = async (key: string, actor: any) => {
-//   try {
-//     // Query to get the file by key
-//     const fileRecord = await actor.get({
-//       key: key,
-//       accept_encodings: ["identity"],
-//     });
-
-//     if (fileRecord) {
-//       const { content, content_type } = fileRecord;
-
-//       // Ensure content is properly handled as Uint8Array
-//       const contentArray = Array.isArray(content)
-//         ? new Uint8Array(content)
-//         : content;
-
-//       // Create blob with proper content type and streaming support
-//       const blob = new Blob([contentArray], {
-//         type: content_type,
-//       });
-
-//       return { blob, contentType: content_type };
-//     } else {
-//       console.log("File not found");
-//       return null;
-//     }
-//   } catch (error) {
-//     console.error("Error fetching file:", error);
-//     return null;
-//   }
-// };
-
-export const fetchAssetFromUserCanister = async (key: string, actor: any) => {
+export const fetchAssetFromUserCanister = async (key: string, actor: any): Promise<{ blob: Blob; contentType: string } | null> => {
+  console.log(`[assetManagerThunks] fetchAssetFromUserCanister: Attempting to fetch key: "${key}" with encodings ["gzip", "identity"]`);
   try {
-    // Initial request to get first chunk and metadata
     const initialResponse = await actor.get({
       key: key,
-      accept_encodings: ["gzip"],
+      accept_encodings: ["gzip", "identity"], 
     });
 
-    if (!initialResponse) {
-      throw new Error("File not found");
+    if (!initialResponse || !initialResponse.content) {
+      console.warn(`[assetManagerThunks] fetchAssetFromUserCanister: Initial fetch for key "${key}" did not return content or was null. Response:`, initialResponse);
+      return null; 
     }
 
-    const { content, content_type, content_encoding, total_length, sha256 } =
-      initialResponse;
+    const { content, content_type, content_encoding, total_length, sha256 } = initialResponse;
+    console.log(`[assetManagerThunks] fetchAssetFromUserCanister: Initial chunk for key "${key}". Content-Type: ${content_type}, Content-Encoding: ${content_encoding}, Total-Length: ${total_length}, SHA256: ${sha256 ? 'present' : 'absent'}`);
 
-    // Convert total_length from BigInt to number safely
     const totalLengthNum = Number(total_length);
+    
+    let firstChunkArrayBuffer: ArrayBuffer;
+    if (Array.isArray(content)) { // Assuming content is number[]
+        firstChunkArrayBuffer = new Uint8Array(content).buffer;
+    } else if (content instanceof Uint8Array) {
+        // Ensure we get a new ArrayBuffer copy if it might be a view on a SharedArrayBuffer
+        firstChunkArrayBuffer = content.slice().buffer;
+    } else if (content instanceof ArrayBuffer) {
+        firstChunkArrayBuffer = content;
+    } else {
+        console.warn(`[assetManagerThunks] fetchAssetFromUserCanister: Unhandled type for initial content for key "${key}".`);
+        firstChunkArrayBuffer = new ArrayBuffer(0);
+    }
+    const firstChunk = new Uint8Array(firstChunkArrayBuffer);
 
-    // Convert initial content to Uint8Array
-    let firstChunk = Array.isArray(content)
-      ? new Uint8Array(content)
-      : new Uint8Array(content.buffer);
+    if (firstChunk.length === 0 && totalLengthNum > 0) {
+        console.warn(`[assetManagerThunks] fetchAssetFromUserCanister: Initial chunk for key "${key}" is empty but total_length is ${totalLengthNum}.`);
+    }
+    console.log(`[assetManagerThunks] fetchAssetFromUserCanister: First chunk size for key "${key}": ${firstChunk.length} bytes. Total expected: ${totalLengthNum} bytes.`);
 
-    // If the first chunk is the entire content, return it
-    if (firstChunk.length === totalLengthNum) {
+    if (firstChunk.length >= totalLengthNum) {
+      console.log(`[assetManagerThunks] fetchAssetFromUserCanister: Key "${key}" fetched in a single chunk.`);
       const blob = new Blob([firstChunk], { type: content_type });
+      console.log(`[assetManagerThunks] fetchAssetFromUserCanister: Created blob for key: "${key}". Blob Type: ${blob.type}, Blob Size: ${blob.size}`);
       return { blob, contentType: content_type };
     }
 
-    // Calculate number of additional chunks needed
-    const chunkSize = firstChunk.length;
+    if (!sha256) {
+      console.warn(`[assetManagerThunks] fetchAssetFromUserCanister: SHA256 hash is missing for key "${key}". Assuming content was fully fetched or chunking not supported.`);
+       const blob = new Blob([firstChunk], { type: content_type });
+       console.log(`[assetManagerThunks] fetchAssetFromUserCanister: Created blob for key: "${key}" (possibly incomplete). Blob Type: ${blob.type}, Blob Size: ${blob.size}`);
+       return { blob, contentType: content_type };
+    }
+    
+    console.log(`[assetManagerThunks] fetchAssetFromUserCanister: Key "${key}" requires chunked fetching.`);
+    const chunkSize = firstChunk.length; 
     const remainingLength = totalLengthNum - chunkSize;
-    const numberOfAdditionalChunks = Math.ceil(remainingLength / chunkSize);
+    const numberOfAdditionalChunks = chunkSize > 0 ? Math.ceil(remainingLength / chunkSize) : 0;
 
-    // Initialize array to store all chunks
     const chunks: Uint8Array[] = [firstChunk];
+    console.log(`[assetManagerThunks] fetchAssetFromUserCanister: Fetching ${numberOfAdditionalChunks} additional chunks for key "${key}".`);
 
-    // Fetch remaining chunks
-    for (let i = 1; i <= numberOfAdditionalChunks; i++) {
+    if (chunkSize === 0 && totalLengthNum > 0) {
+        console.error(`[assetManagerThunks] fetchAssetFromUserCanister: Initial chunk size is 0 for key "${key}", cannot proceed with chunking. Total length expected: ${totalLengthNum}.`);
+        const blob = new Blob([firstChunk], { type: content_type });
+        return { blob, contentType: content_type };
+    }
+
+    for (let i = 0; i < numberOfAdditionalChunks; i++) {
+      const chunkIndexToRequest = BigInt(i + 1); 
+      console.log(`[assetManagerThunks] fetchAssetFromUserCanister: Requesting chunk index ${chunkIndexToRequest} for key "${key}".`);
+
       const chunkResponse = await actor.get_chunk({
         key: key,
-        content_encoding: content_encoding,
-        index: BigInt(i), // Convert index to BigInt for the API
-        sha256: sha256,
+        content_encoding: content_encoding, 
+        index: chunkIndexToRequest, 
+        sha256: sha256, 
       });
 
       if (!chunkResponse || !chunkResponse.content) {
-        throw new Error(`Failed to fetch chunk ${i}`);
+        const errorMsg = `[assetManagerThunks] fetchAssetFromUserCanister: Failed to fetch chunk ${chunkIndexToRequest} for key "${key}". Response: ${JSON.stringify(chunkResponse)}`;
+        console.error(errorMsg);
+        throw new Error(errorMsg);
       }
-
-      const chunkContent = Array.isArray(chunkResponse.content)
-        ? new Uint8Array(chunkResponse.content)
-        : new Uint8Array(chunkResponse.content.buffer);
-
-      chunks.push(chunkContent);
+      
+      let currentChunkArrayBuffer: ArrayBuffer;
+      if (Array.isArray(chunkResponse.content)) { // Assuming content is number[]
+          currentChunkArrayBuffer = new Uint8Array(chunkResponse.content).buffer;
+      } else if (chunkResponse.content instanceof Uint8Array) {
+          // Ensure we get a new ArrayBuffer copy
+          currentChunkArrayBuffer = chunkResponse.content.slice().buffer;
+      } else if (chunkResponse.content instanceof ArrayBuffer) {
+          currentChunkArrayBuffer = chunkResponse.content;
+      } else {
+          console.warn(`[assetManagerThunks] fetchAssetFromUserCanister: Unhandled type for chunk content for key "${key}".`);
+          currentChunkArrayBuffer = new ArrayBuffer(0);
+      }
+      const currentChunk = new Uint8Array(currentChunkArrayBuffer);
+      console.log(`[assetManagerThunks] fetchAssetFromUserCanister: Received chunk index ${chunkIndexToRequest} for key "${key}". Size: ${currentChunk.length}`);
+      chunks.push(currentChunk);
     }
 
-    // Combine all chunks into a single Uint8Array
     const combinedArray = new Uint8Array(totalLengthNum);
     let offset = 0;
-
     for (const chunk of chunks) {
       combinedArray.set(chunk, offset);
       offset += chunk.length;
     }
 
-    // Verify total length
+    console.log(`[assetManagerThunks] fetchAssetFromUserCanister: All chunks combined for key "${key}". Total combined size: ${combinedArray.length}. Expected: ${totalLengthNum}`);
     if (combinedArray.length !== totalLengthNum) {
-      throw new Error(
-        `Size mismatch: expected ${totalLengthNum} bytes but got ${combinedArray.length} bytes`
-      );
+      const sizeMismatchError = `[assetManagerThunks] fetchAssetFromUserCanister: Size mismatch for key "${key}": expected ${totalLengthNum} bytes but got ${combinedArray.length} bytes`;
+      console.error(sizeMismatchError);
     }
 
-    // Create and return blob
     const blob = new Blob([combinedArray], { type: content_type });
+    console.log(`[assetManagerThunks] fetchAssetFromUserCanister: Created final blob for key: "${key}". Blob Type: ${blob.type}, Blob Size: ${blob.size}`);
     return { blob, contentType: content_type };
+
   } catch (error) {
-    console.error("Error fetching file:", error);
-    throw error;
+    console.error(`[assetManagerThunks] fetchAssetFromUserCanister: Error fetching or processing chunks for key "${key}":`, error);
+    return null; 
   }
 };
