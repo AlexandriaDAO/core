@@ -928,6 +928,18 @@ const selectCanAddItem = (contentId: string) => {
   return memoizedSelectorsByShelfId.canAddItem.get(contentId)!;
 };
 
+// Selector for nested shelves data map (memoized factory)
+const selectNestedShelvesDataMap = (shelfIds: string[]) => createSelector(
+  selectShelves,
+  (shelves) => {
+    const map: Record<string, NormalizedShelf | undefined> = {};
+    shelfIds.forEach(id => {
+      map[id] = shelves[id]; // Assumes shelves[id] is NormalizedShelf | undefined
+    });
+    return map;
+  }
+);
+
 // New feed selectors
 const selectCurrentFeedType = (state: RootState) => state.perpetua.currentFeedType;
 const selectStorylineFeedCursor = (state: RootState) => state.perpetua.storylineFeedCursor;
@@ -979,5 +991,6 @@ export {
     selectIsOwner,
     selectUserShelvesForUser,
     selectShelfIdsForTag,
-    selectTagShelfCount
+    selectTagShelfCount,
+    selectNestedShelvesDataMap // Ensure this is correctly placed for export
 };

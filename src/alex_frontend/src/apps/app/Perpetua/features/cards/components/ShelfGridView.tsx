@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { ContentGrid } from "@/apps/Modules/AppModules/contentGrid/Grid";
 import { Item } from "@/../../declarations/perpetua/perpetua.did";
 import ShelfContentCard from './ShelfContentCard';
+import { fetchNftMetadataBatch } from '@/apps/app/Perpetua/state/thunks/nftThunks';
+import { AppDispatch } from '@/store';
 
 interface ShelfGridViewProps {
   items: [number, Item][];
@@ -30,6 +33,46 @@ export const ShelfGridView: React.FC<ShelfGridViewProps> = ({
   handleNftDetails,
   handleContentClick
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const dispatchedTokenIdsRef = useRef<string>('');
+
+  useEffect(() => {
+    let currentTokenIdsString = '';
+
+    if (items && items.length > 0) {
+      const tokenIdsToFetch: string[] = [];
+      items.forEach(([_, item]) => {
+        if (item.content && 'Nft' in item.content) {
+          const tokenId = item.content.Nft;
+          if (typeof tokenId === 'string') {
+            tokenIdsToFetch.push(tokenId);
+          }
+        }
+      });
+
+      if (tokenIdsToFetch.length > 0) {
+        const uniqueTokenIds = Array.from(new Set(tokenIdsToFetch));
+        currentTokenIdsString = JSON.stringify(uniqueTokenIds.sort());
+        
+        if (dispatchedTokenIdsRef.current !== currentTokenIdsString) {
+          console.log('[ShelfGridView] Dispatching fetchNftMetadataBatch for unique tokenIds:', uniqueTokenIds);
+          dispatch(fetchNftMetadataBatch({ tokenIds: uniqueTokenIds }));
+          dispatchedTokenIdsRef.current = currentTokenIdsString;
+        } else {
+          // console.log('[ShelfGridView] Token IDs unchanged, skipping dispatch', uniqueTokenIds);
+        }
+      } else {
+        if (dispatchedTokenIdsRef.current !== '') {
+          dispatchedTokenIdsRef.current = '';
+        }
+      }
+    } else {
+      if (dispatchedTokenIdsRef.current !== '') {
+        dispatchedTokenIdsRef.current = '';
+      }
+    }
+  }, [items, dispatch]);
+
   return (
     <ContentGrid>
       {items.map(([itemKey, item]: [number, Item], index: number) => (

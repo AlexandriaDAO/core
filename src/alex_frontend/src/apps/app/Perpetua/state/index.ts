@@ -34,7 +34,8 @@ export {
   selectError,
   selectIsOwner,
   selectOptimisticShelfItemOrder,
-  selectCanAddItem
+  selectCanAddItem,
+  selectNestedShelvesDataMap
 } from './perpetuaSlice';
 
 // Export types from perpetuaSlice

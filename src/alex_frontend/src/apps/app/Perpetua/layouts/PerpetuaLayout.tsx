@@ -121,6 +121,14 @@ const PerpetuaLayout: React.FC = () => {
   const isLoadingRandomFeed = useAppSelector(selectRandomFeedLoading);
   const isLoadingStorylineFeed = useAppSelector(selectStorylineFeedLoading);
   
+  // Memoize the denormalized selected shelf
+  const denormalizedSelectedShelf = useMemo(() => {
+    if (selectedShelf) {
+      return denormalizeShelf(selectedShelf);
+    }
+    return null;
+  }, [selectedShelf]);
+  
   // Define a stable empty array reference
   const stableEmptyShelves: NormalizedShelf[] = useMemo(() => [], []);
   
@@ -305,12 +313,10 @@ const PerpetuaLayout: React.FC = () => {
 
   // Render view based on current URL and state
   const renderView = () => {
-    if (isShelfDetail && selectedShelf) {
-      const denormalizedShelf = denormalizeShelf(selectedShelf);
-      
+    if (isShelfDetail && denormalizedSelectedShelf) {
       return (
         <ShelfDetailContainer
-          shelf={denormalizedShelf}
+          shelf={denormalizedSelectedShelf}
           onBack={goToShelves}
         />
       );

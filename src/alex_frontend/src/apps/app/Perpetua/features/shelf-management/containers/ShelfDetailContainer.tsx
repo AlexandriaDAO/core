@@ -8,7 +8,8 @@ import {
 	selectOptimisticShelfItemOrder,
 	selectIsOwner,
 	selectCanAddItem,
-	selectShelfById
+	selectShelfById,
+	selectNestedShelvesDataMap
 } from "@/apps/app/Perpetua/state";
 import { ItemReorderManager } from "../../shared/reordering/components";
 import { ShelfDetailView } from "../../cards/components/ShelfDetailView";
@@ -75,7 +76,7 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 	
 	// Optimized ordered items calculation with memoization
 	const baseOrderedItems = useMemo((): [number, Item][] => {
-		if (optimisticItemOrder.length > 0 && shelf.items) {
+		if (optimisticItemOrder && optimisticItemOrder.length > 0 && shelf.items) {
 			const itemMap = new Map<number, Item>();
 			shelf.items.forEach(([id, item]) => itemMap.set(id, item));
 			return optimisticItemOrder
@@ -92,11 +93,9 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 			})
 			.filter((item): item is [number, Item] => item !== null);
 	}, [
-		JSON.stringify({ 
-			items: shelf.items?.map(([id]) => id), 
-			positions: shelf.item_positions?.map(([id, pos]) => id + ":" + pos),
-			optimistic: optimisticItemOrder
-		})
+		shelf.items, 
+		shelf.item_positions, 
+		optimisticItemOrder 
 	]);
 	
 	// --- BEGIN: Enriching items with full nested shelf data ---
@@ -143,16 +142,11 @@ export const ShelfDetailContainer: React.FC<ShelfDetailProps> = ({
 	
 	// 3. Select all required nested shelves data from the store
 	// This selector needs to be stable. We select a map of shelves.
-	const nestedShelvesDataMap = useAppSelector((state: RootState) => {
-		const map: Record<string, NormalizedShelf | undefined> = {};
-		allNestedShelfIds.forEach(id => {
-			// Assuming selectShelfById(id) returns a selector for that specific shelf.
-			// And that selector (created by selectShelfById(id)) takes state and returns NormalizedShelf | undefined
-			const specificShelfSelector = selectShelfById(id);
-			map[id] = specificShelfSelector(state);
-		});
-		return map;
-	});
+	const nestedShelvesDataMapSelector = useMemo(() => {
+		return selectNestedShelvesDataMap(allNestedShelfIds);
+	}, [allNestedShelfIds]);
+	
+	const nestedShelvesDataMap = useAppSelector(nestedShelvesDataMapSelector) as Record<string, NormalizedShelf | undefined>;
 
 	// 4. Create enriched items, now using nestedShelvesDataMap
 	const enrichedOrderedItems = useMemo((): [number, EnrichedItem][] => {

@@ -6,11 +6,15 @@ import { Transaction } from '../../../shared/types/queries';
 import { CachedContent, ContentUrlInfo } from '../../../LibModules/contentDisplay/types';
 
 export interface ContentDataItem extends CachedContent {
+  data?: Blob | any; // Allow for blob data
+  source?: 'ic_canister' | 'arweave' | 'unknown'; // Source of the content
+  contentType?: string; // Content type of the blob
   urls?: ContentUrlInfo;
 }
 
 interface TransactionState {
   transactions: Transaction[];
+  arweaveTxCache: Record<string, Transaction>;
   contentData: Record<string, ContentDataItem>;
   loading: boolean;
   error: string | null;
@@ -19,6 +23,7 @@ interface TransactionState {
 
 const initialState: TransactionState = {
   transactions: [],
+  arweaveTxCache: {},
   contentData: {},
   loading: false,
   error: null,
@@ -35,6 +40,9 @@ export const clearContentData = createAction('transactions/clearContentData');
 export const clearTransactionContent = createAction<string>('transactions/clearTransactionContent');
 export const setLoading = createAction<boolean>('transactions/setLoading');
 export const setError = createAction<string | null>('transactions/setError');
+export const setArweaveTxsInCache = createAction<Record<string, Transaction>>('transactions/setArweaveTxsInCache');
+export const setArweaveTxInCache = createAction<{ id: string; transaction: Transaction }>('transactions/setArweaveTxInCache');
+export const clearArweaveTxCache = createAction('transactions/clearArweaveTxCache');
 
 const transactionSlice = createSlice({
   name: 'transactions',
@@ -70,6 +78,16 @@ const transactionSlice = createSlice({
     },
     setErrorLocal: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
+    },
+    setArweaveTxsInCacheLocal: (state, action: PayloadAction<Record<string, Transaction>>) => {
+      state.arweaveTxCache = { ...state.arweaveTxCache, ...action.payload };
+    },
+    setArweaveTxInCacheLocal: (state, action: PayloadAction<{ id: string; transaction: Transaction }>) => {
+      const { id, transaction } = action.payload;
+      state.arweaveTxCache[id] = transaction;
+    },
+    clearArweaveTxCacheLocal: (state) => {
+      state.arweaveTxCache = {};
     },
   },
   extraReducers: (builder) => {
@@ -111,6 +129,16 @@ const transactionSlice = createSlice({
       })
       .addCase(setError, (state, action) => {
         state.error = action.payload;
+      })
+      .addCase(setArweaveTxsInCache, (state, action: PayloadAction<Record<string, Transaction>>) => {
+        state.arweaveTxCache = { ...state.arweaveTxCache, ...action.payload };
+      })
+      .addCase(setArweaveTxInCache, (state, action: PayloadAction<{ id: string; transaction: Transaction }>) => {
+        const { id, transaction } = action.payload;
+        state.arweaveTxCache[id] = transaction;
+      })
+      .addCase(clearArweaveTxCache, (state) => {
+        state.arweaveTxCache = {};
       });
   }
 });
@@ -123,7 +151,10 @@ export const {
   setContentDataLocal,
   clearContentDataLocal,
   setLoadingLocal,
-  setErrorLocal
+  setErrorLocal,
+  setArweaveTxsInCacheLocal,
+  setArweaveTxInCacheLocal,
+  clearArweaveTxCacheLocal
 } = transactionSlice.actions;
 
 export default transactionSlice.reducer; 
