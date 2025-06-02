@@ -49,7 +49,7 @@ function PaymentPreview({ file }: PaymentPreviewProps) {
     }
 
     if(!eligible) {
-        return <Alert variant="danger" title="Wallet Error" icon={TriangleAlert} className="w-full text-left border-none border-l-2 border-l-destructive">{eligibilityError || "Payment can't be processed at this time"}</Alert>
+        return <Alert variant="danger" title="Wallet Error" icon={TriangleAlert} className="w-full text-left">{eligibilityError || "Payment can't be processed at this time"}</Alert>
     }
 
     // Calculate file size in MB
