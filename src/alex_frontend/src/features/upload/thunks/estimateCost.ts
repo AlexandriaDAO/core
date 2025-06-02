@@ -1,10 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AppDispatch, RootState } from '@/store';
 import { calculateBytes } from '../utils';
-import { setLbryFee } from '../uploadSlice';
 
 const estimateCost = createAsyncThunk<
-    string, // This is the return type of the thunk's payload
+    { cost: string, fee: number }, // This is the return type of the thunk's payload
     { file: File }, //Argument that we pass to initialize
     { rejectValue: string , dispatch: AppDispatch, state: RootState }
 >("upload/estimateCost", async ({ file }, { rejectWithValue, getState, dispatch }) => {
@@ -23,10 +22,7 @@ const estimateCost = createAsyncThunk<
 
         // Calculate LBRY fee (5 LBRY per MB)
         const fileSizeMB = Math.ceil(file.size / (1024 * 1024));
-        const lbryFee = fileSizeMB * 5;
-        
-        // Store the LBRY fee in the state
-        dispatch(setLbryFee(lbryFee));
+        const fee = fileSizeMB * 5;
 
         // Fetch price estimation from Arweave
         const response = await fetch(`https://arweave.net/price/${total}/`);
@@ -34,7 +30,12 @@ const estimateCost = createAsyncThunk<
             throw new Error('Failed to fetch price estimation from Arweave');
         }
 
-        return await response.text();
+        const cost = await response.text();
+
+        return {
+            cost,
+            fee
+        }
     } catch (error) {
         console.error("Failed to Estimate Cost:", error);
 

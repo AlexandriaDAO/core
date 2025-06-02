@@ -50,9 +50,12 @@ const MintNFT: React.FC = () => {
         <div className="mt-6 pt-4 border-t">
             <div className="flex items-center justify-between">
                 <div>
-                    <h4 className="text-sm font-medium">
-                        NFT Mint
-                    </h4>
+                    <div className="flex justify-start items-center gap-2">
+                        <h4 className="font-medium">
+                            NFT Mint
+                        </h4>
+                        <span className="text-sm font-normal">{"("}Minting Cost: 5 LBRY{")"}</span>
+                    </div>
                     <p className="text-sm text-gray-500">
                         {minting
                             ? "Please wait while we are minting your file"
