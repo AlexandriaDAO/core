@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Copy as CopyIcon, Check } from "lucide-react";
-import { copyToClipboard } from "@/features/upload/utils";
+import { copyToClipboard } from "@/features/pinax/utils";
 import { wait } from "@/utils/lazyLoad";
 
 interface CopyProps {

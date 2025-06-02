@@ -22,7 +22,7 @@ import swapReducer from "@/features/swap/swapSlice"
 import icpLedgerReducer from "@/features/icp-ledger/icpLedgerSlice";
 import tokenomicsReducer from "@/features/swap/tokenomicsSilce";
 import alexReducer from "@/features/swap/alexSlice";
-import uploadReducer from "@/features/upload/uploadSlice";
+import pinaxReducer from "@/features/pinax/pinaxSlice";
 import perpetuaReducer from "@/apps/app/Perpetua/state/perpetuaSlice";
 
 import transactionsReducer from "@/apps/Modules/shared/state/transactions/transactionSlice";
@@ -60,7 +60,7 @@ const rootReducer = combineReducers({
 	portalFilter: portalFilterReducer,
 	wallets: walletsReducer,
 	addWallet: addWalletReducer,
-	upload: uploadReducer,
+	pinax: pinaxReducer,
 
 	swap:swapReducer,
 	icpLedger:icpLedgerReducer,

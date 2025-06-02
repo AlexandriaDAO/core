@@ -20,7 +20,7 @@ import useSize from "./hooks/useSize";
 import useTags from "./hooks/useTags";
 import useTimestamp from "./hooks/useTimestamp";
 import useData from "./hooks/useData";
-import { copyToClipboard } from "../upload/utils";
+import { copyToClipboard } from "../pinax/utils";
 
 interface NftProps {
 	id: string;

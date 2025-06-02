@@ -67,6 +67,7 @@ const SingleTokenView = lazy(() => import("@/apps/Modules/AppModules/blinks/Sing
 const EmporiumActor = lazy(() => import("@/actors").then(module => ({ default: module.EmporiumActor })));
 const LbryActor = lazy(() => import("@/actors").then(module => ({ default: module.LbryActor })));
 const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
+const AlexWalletActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexWalletActor })));
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -154,7 +155,16 @@ const router = createBrowserRouter(
 
 			<Route element={<AuthGuard />}>
 				<Route element={<MainLayout />}>
-					<Route path={ROUTES.PINAX} element={<Suspense key="pinax" fallback={<PinaxSkeleton />}><PinaxPage /></Suspense>} />
+					<Route path={ROUTES.PINAX} element={
+						<Suspense key="pinax" fallback={<PinaxSkeleton />}>
+							<AlexWalletActor>
+								<NftManagerActor>
+									<LbryActor>
+										<PinaxPage />
+									</LbryActor>
+								</NftManagerActor>
+							</AlexWalletActor>
+						</Suspense>} />
 					<Route path="app/imporium/nfts" element={<Suspense key="imporium-nfts" fallback={<MyNftsSkeleton />}><NftsPage /></Suspense>} />
 					<Route path="app/imporium/marketplace" element={<Suspense key="imporium-marketplace" fallback={<GeneralSkeleton />}><EmporiumActor><MarketPlacePage /></EmporiumActor></Suspense>} />
 					<Route path="app/imporium/listings" element={<Suspense key="imporium-listing" fallback={<GeneralSkeleton />}><EmporiumActor><MyListingsPage /></EmporiumActor></Suspense>} />

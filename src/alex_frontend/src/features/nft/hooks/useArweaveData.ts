@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import arweaveClient from "@/utils/arweaveClient";
 import { TransactionStatusResponse } from "arweave/node/transactions";
-import { getFileTypeInfo, getFileTypeName } from "@/features/upload/constants";
+import { getFileTypeInfo } from "@/features/pinax/constants";
 
 const useArweaveData = (id: string) => {
 	const [loading, setLoading] = useState(true);

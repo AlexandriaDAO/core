@@ -1,7 +1,7 @@
 import React from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { FileText } from "lucide-react";
-import { getFileTypeInfo } from "@/features/upload/constants";
+import { getFileTypeInfo } from "@/features/pinax/constants";
 import { IcpAssetItem } from "../types";
 import { AssetManager } from "@dfinity/assets";
 import remove from "../thunks/remove";

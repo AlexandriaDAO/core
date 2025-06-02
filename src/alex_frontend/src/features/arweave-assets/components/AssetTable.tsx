@@ -23,8 +23,8 @@ import {
 	TableRow,
 } from "@/lib/components/table";
 import { Alert } from "@/components/Alert";
-import { formatFileSize } from "@/features/upload/utils";
-import { getFileTypeInfo, getFileTypeName } from "@/features/upload/constants";
+import { formatFileSize } from "@/features/pinax/utils";
+import { getFileTypeInfo, getFileTypeName } from "@/features/pinax/constants";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { pullAssetToCanister } from "../thunks/pullAssetToCanister";
 import { selectAsset } from "../arweaveAssetsSlice";
