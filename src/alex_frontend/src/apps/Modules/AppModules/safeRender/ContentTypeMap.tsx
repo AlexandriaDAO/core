@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, Suspense } from 'react';
 import DOMPurify from 'dompurify';
 import { BookOpen, File, Play, Music } from 'lucide-react';
-import { Reader } from "@/features/reader";
-import { ReaderProvider } from "@/features/reader/lib/providers/ReaderProvider";
 import { AspectRatio } from "@/lib/components/aspect-ratio";
 import { Skeleton } from "@/lib/components/skeleton";
 import { getFileIcon } from './fileIcons';
@@ -56,6 +54,10 @@ const generateVideoThumbnail = (videoUrl: string, callback: (thumbnail: string) 
     }
   };
 };
+
+// Lazy load Reader and ReaderProvider
+const Reader = React.lazy(() => import('@/features/reader').then(module => ({ default: module.Reader })));
+const ReaderProvider = React.lazy(() => import('@/features/reader/lib/providers/ReaderProvider').then(module => ({ default: module.ReaderProvider })));
 
 export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   transaction,
@@ -124,11 +126,13 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
     "application/epub+zip": () => {
       if (inModal) {
         return (
-          <ReaderProvider>
-            <div className="h-[85vh] w-[800px] max-w-[95vw]">
-              <Reader bookUrl={fullUrl} />
-            </div>
-          </ReaderProvider>
+          <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><Skeleton className="h-12 w-12 rounded-full" /></div>}>
+            <ReaderProvider>
+              <div className="h-[85vh] w-[800px] max-w-[95vw]">
+                <Reader bookUrl={blobUrl || fullUrl} />
+              </div>
+            </ReaderProvider>
+          </Suspense>
         );
       }
       return (
@@ -232,6 +236,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
             src={fullUrl}
             alt="Content"
             decoding="async"
+            loading="lazy"
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isImageLoading ? 'opacity-0' : 'opacity-100'}`}
             crossOrigin="anonymous"
             onError={() => {
@@ -403,25 +408,13 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
                   alt="PDF thumbnail"
                   className="w-full h-full object-cover rounded-lg"
                   crossOrigin="anonymous"
+                  loading="lazy"
                 />
               </AspectRatio>
             ) : (
               <AspectRatio ratio={1}>
-                <div className="relative w-full h-full">
-                  <iframe
-                    src={`${fullUrl}#page=1&view=FitH&zoom=50&toolbar=0&navpanes=0`}
-                    className="w-full h-full rounded-lg"
-                    sandbox="allow-scripts allow-same-origin"
-                    title="PDF Preview"
-                    style={{
-                      pointerEvents: 'none',
-                      backgroundColor: 'rgb(243 244 246)'
-                    }}
-                  />
-                  <div
-                    className="absolute inset-0"
-                    style={{ pointerEvents: 'none' }}
-                  />
+                <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                  <File className="text-gray-500 dark:text-gray-400 text-4xl" />
                 </div>
               </AspectRatio>
             )}

@@ -165,7 +165,7 @@ perpetua/
 
 
 
-
+- Figure out why asset loading is taking so long in alexandrian (and everywhere).
 - First next thing, get perpetua assets to load from trnasactionService like in ALexandian, and make alexandrian not freeze up being slow.
 
 
@@ -278,7 +278,7 @@ Plan:
 
 ## Helpful Commands
 
-dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal 2rffu-d2h7x-atqfv-7x4ab-ok7a7-e2o5r-ys3nc-po3xi-5tz6y-fngv7-5qe)
+dfx ledger transfer --icp 99 --memo 0 $(dfx ledger account-id --of-principal xh356-m5udq-k6mzi-fisij-u37hx-umzgd-qirj5-g7qkk-cruwz-fz6fl-qae)
 
 
 npx ts-unused-exports tsconfig.json src/alex_frontend/src/apps/app/Perpetua
@@ -292,7 +292,9 @@ candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpe
 dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
 dfx generate perpetua
 
-git show --patch add81056f2eaa8103b4def714be73e699121b9a4
+git show --patch 73abef0953392de2d3b074862017c21592ed32df
+git show --patch ef28d762b9e5028c236b2984b1df935e378b9c90
+git show --patch 742b946754434f6e70ac047a9b49784c24aee939
 
 
 

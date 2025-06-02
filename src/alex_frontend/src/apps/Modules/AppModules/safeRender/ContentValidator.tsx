@@ -7,9 +7,9 @@ import { useNftData } from '@/apps/Modules/shared/hooks/getNftData';
 import ContentFetcher from './ContentFetcher';
 import { ContentValidatorProps } from './types';
 import { NftDataResult } from '@/apps/Modules/shared/hooks/getNftData';
-import { contentCache } from '@/apps/Modules/shared/services/contentCacheService';
+// import { contentCache } from '@/apps/Modules/shared/services/contentCacheService'; // Removed: contentCacheService was deleted
 import { debounce } from 'lodash';
-import { nsfwService } from '@/apps/Modules/shared/services/nsfwService';
+// import { nsfwService } from '@/apps/Modules/shared/services/nsfwService'; // Removed: nsfwService seems unused in this snippet
 
 const ContentValidator: React.FC<ContentValidatorProps> = ({
   transactionId,
@@ -63,9 +63,9 @@ const ContentValidator: React.FC<ContentValidatorProps> = ({
   );
 
   const handleContentLoad = useCallback((element: HTMLImageElement | HTMLVideoElement, thumbnailUrl?: string) => {
-    if (thumbnailUrl && contentType.startsWith('video/')) {
-      contentCache.updateThumbnail(transactionId, thumbnailUrl);
-    }
+    // if (thumbnailUrl && contentType.startsWith('video/')) { // Removed: contentCache no longer exists
+    //   contentCache.updateThumbnail(transactionId, thumbnailUrl);
+    // }
 
     if (isLoadingNftData || nftData?.principal) {
         return;

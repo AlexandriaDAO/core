@@ -174,10 +174,9 @@ export const updateTransactions = createAsyncThunk<
     ];
 
     if (userAssetCanisterd) {
-      const assetActor = await getActorUserAssetCanister(userAssetCanisterd);
       const getContentData = await fetchAssetFromUserCanister(
         "ContentData",
-        assetActor
+        userAssetCanisterd
       );
 
       if (getContentData?.blob) {
@@ -195,7 +194,7 @@ export const updateTransactions = createAsyncThunk<
             try {
               const result = await fetchAssetFromUserCanister(
                 transaction.id,
-                assetActor
+                userAssetCanisterd
               );
 
               const assetUrl = result?.blob

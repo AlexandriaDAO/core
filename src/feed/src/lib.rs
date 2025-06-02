@@ -267,7 +267,6 @@ async fn update_og_nft_sbt_counts() -> Result<(), String> {
 #[query]
 fn get_sbt_counts_for_og_nfts(og_ids: Vec<Nat>) -> HashMap<Nat, u32> {
     let mut result_counts: HashMap<Nat, u32> = HashMap::new();
-    ic_cdk::println!("Querying SBT counts for {} OG NFT IDs.", og_ids.len());
 
     OG_NFT_SBT_COUNTS.with(|map_ref| {
         let map = map_ref.borrow();
@@ -278,7 +277,6 @@ fn get_sbt_counts_for_og_nfts(og_ids: Vec<Nat>) -> HashMap<Nat, u32> {
         }
     });
     
-    ic_cdk::println!("Found {} SBT counts for the requested OG NFT IDs.", result_counts.len());
     result_counts
 }
 
@@ -366,7 +364,6 @@ async fn update_og_nft_rarity_percentages() -> Result<(), String> {
 #[query]
 fn get_rarity_percentages_for_og_nfts(og_ids: Vec<Nat>) -> HashMap<Nat, u32> {
     let mut result_percentages: HashMap<Nat, u32> = HashMap::new();
-    ic_cdk::println!("Querying rarity percentages for {} OG NFT IDs.", og_ids.len());
 
     OG_NFT_RARITY_PERCENTAGES.with(|map_ref| {
         let map = map_ref.borrow();
@@ -377,7 +374,6 @@ fn get_rarity_percentages_for_og_nfts(og_ids: Vec<Nat>) -> HashMap<Nat, u32> {
         }
     });
     
-    ic_cdk::println!("Found {} rarity percentages for the requested OG NFT IDs.", result_percentages.len());
     result_percentages
 }
 
