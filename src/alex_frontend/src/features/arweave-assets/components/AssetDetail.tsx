@@ -11,7 +11,7 @@ import {
 	DialogTitle,
 } from "@/lib/components/dialog";
 import { Clock, Download, ExternalLink, FileType, Trash2, X } from "lucide-react";
-import { getFileTypeInfo, getFileTypeName } from "@/features/upload/constants";
+import { getFileTypeInfo, getFileTypeName } from "@/features/pinax/constants";
 import Copy from "@/components/Copy";
 import { selectAsset } from "../arweaveAssetsSlice";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";

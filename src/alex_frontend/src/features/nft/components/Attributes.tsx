@@ -1,7 +1,7 @@
 import React from "react";
 // import Copy from "@/components/Copy";
 import { CopyIcon, ExternalLink } from "lucide-react";
-import { copyToClipboard } from "@/features/upload/utils";
+import { copyToClipboard } from "@/features/pinax/utils";
 // import { Button } from "@/lib/components/button";
 // import { copyToClipboard } from "@/features/upload/utils";
 // import { Copy as CopyIcon, ExternalLink } from "lucide-react";

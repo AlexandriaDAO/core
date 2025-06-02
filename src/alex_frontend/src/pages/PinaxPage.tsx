@@ -1,27 +1,27 @@
 import React, { lazy, useState } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { ContentType } from "@/features/upload/uploadSlice";
-import useNavigationGuard from "@/features/upload/hooks/useNavigationGuard";
-import { useCleanupEffect } from "@/features/upload/hooks/useCleanupEffect";
-import { useFileEffect } from "@/features/upload/hooks/useFileEffect";
-import { useTransactionEffect } from "@/features/upload/hooks/useTransactionEffect";
-import { useUploadedFileEffect } from "@/features/upload/hooks/useUploadedFileEffect";
-import FileUploader from "@/features/upload/components/FileUploader";
-import UploadError from "@/features/upload/components/UploadError";
-import PostUploadPreview from "@/features/upload/components/PostUploadPreview";
-import PreUploadPreview from "@/features/upload/components/PreUploadPreview";
-import Header from "@/features/upload/components/Header";
-import TextEditor from "@/features/upload/components/TextEditor";
-import FileSelector from "@/features/upload/components/FileSelector";
-import PaymentPreview from "@/features/upload/components/PaymentPreview";
-import { useContentScanner } from "@/features/upload/hooks/useContentScanner";
+import { ContentType } from "@/features/pinax/pinaxSlice";
+import useNavigationGuard from "@/features/pinax/hooks/useNavigationGuard";
+import { useCleanupEffect } from "@/features/pinax/hooks/useCleanupEffect";
+import { useFileEffect } from "@/features/pinax/hooks/useFileEffect";
+import { useTransactionEffect } from "@/features/pinax/hooks/useTransactionEffect";
+import { useUploadedFileEffect } from "@/features/pinax/hooks/useUploadedFileEffect";
+import FileUploader from "@/features/pinax/components/FileUploader";
+import UploadError from "@/features/pinax/components/UploadError";
+import PostUploadPreview from "@/features/pinax/components/PostUploadPreview";
+import PreUploadPreview from "@/features/pinax/components/PreUploadPreview";
+import Header from "@/features/pinax/components/Header";
+import TextEditor from "@/features/pinax/components/TextEditor";
+import FileSelector from "@/features/pinax/components/FileSelector";
+import PaymentPreview from "@/features/pinax/components/PaymentPreview";
+import { useContentScanner } from "@/features/pinax/hooks/useContentScanner";
 
 const AlexWalletActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexWalletActor })));
 const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
 const LbryActor = lazy(() => import("@/actors").then(module => ({ default: module.LbryActor })));
 
 function PinaxPage() {
-	const { type, uploading, minting, transaction, minted, uploadError, fetchError, selectError, scanError, lbryFee } = useAppSelector(state => state.upload);
+	const { type, uploading, minting, transaction, minted, uploadError, fetchError, selectError, scanError, lbryFee } = useAppSelector(state => state.pinax);
 	const [file, setFile] = useState<File | null>(null);
 	const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 

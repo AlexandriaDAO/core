@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { formatFileSize } from "@/features/upload/utils";
+import { formatFileSize } from "@/features/pinax/utils";
 import { TransactionStatusType } from "../types";
 
 const useSize = (id: string, status: TransactionStatusType) => {

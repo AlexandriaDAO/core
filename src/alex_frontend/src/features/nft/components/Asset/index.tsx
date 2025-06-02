@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { getFileTypeInfo } from "@/features/upload/constants";
+import { getFileTypeInfo } from "@/features/pinax/constants";
 import AssetSkeleton from "@/layouts/skeletons/emporium/components/AssetSkeleton";
 
 import Image from "./Image";

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Tag, Tags, TransactionStatus } from "../types";
-import { getFileTypeInfo } from "@/features/upload/constants";
+import { getFileTypeInfo } from "@/features/pinax/constants";
 
 const useTags = ( id: string, status: TransactionStatus) => {
 	const [tags, setTags] = useState<Tags>([]);
