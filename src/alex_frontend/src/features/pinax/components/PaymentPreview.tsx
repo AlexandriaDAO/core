@@ -2,14 +2,13 @@ import React, { useEffect } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Button } from "@/lib/components/button";
-import { useAlexWallet, useLbry, useNftManager } from "@/hooks/actors";
+import { useAlexWallet, useNftManager } from "@/hooks/actors";
 import processPayment from "../thunks/processPayment";
 import { TopupBalanceWarning } from "@/apps/Modules/shared/components/TopupBalanceWarning";
 import { AlertCircle, Loader2, CreditCard, CheckCircle, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { Alert } from "@/components/Alert";
 import checkEligibility from "../thunks/checkEligibility";
-import getSpendingBalance from "@/features/swap/thunks/lbryIcrc/getSpendingBalance";
 
 interface PaymentPreviewProps {
     file: File;
@@ -19,9 +18,7 @@ function PaymentPreview({ file }: PaymentPreviewProps) {
     const dispatch = useAppDispatch();
     const { actor: nftManagerActor } = useNftManager();
     const { actor: alexWalletActor } = useAlexWallet();
-    const { actor: lbryActor } = useLbry();
 
-	const { user } = useAppSelector(state => state.auth);
     // Get the spending balance from the swap state
     const { spendingBalance, loading: balanceLoading } = useAppSelector(state => state.swap);
     const { lbryFee, paymentStatus, paymentError, eligible, eligibilityError, checkingEligibility } = useAppSelector(state => state.pinax);
@@ -33,13 +30,6 @@ function PaymentPreview({ file }: PaymentPreviewProps) {
 			dispatch(checkEligibility(alexWalletActor))
 		}
     }, [alexWalletActor, lbryFee]);
-
-    // Fetch LBRY balance when component mounts or user changes
-	useEffect(() => {
-        if (!user || !lbryActor || !nftManagerActor) return;
-
-		dispatch(getSpendingBalance({lbryActor, nftManagerActor, userPrincipal: user.principal}));
-    }, [user, lbryActor, nftManagerActor]);
 
     if(checkingEligibility) {
         return <div className="flex justify-start items-center gap-2 w-full">
