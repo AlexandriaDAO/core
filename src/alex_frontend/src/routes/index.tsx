@@ -68,6 +68,7 @@ const EmporiumActor = lazy(() => import("@/actors").then(module => ({ default: m
 const LbryActor = lazy(() => import("@/actors").then(module => ({ default: module.LbryActor })));
 const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
 const AlexWalletActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexWalletActor })));
+const AlexBackendActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexBackendActor })));
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -86,7 +87,15 @@ const router = createBrowserRouter(
 
 				<Route path="app">
 					<Route path="bibliotheca" element={<Suspense key="bibliotheca" fallback={<TopProgressBar />}><Bibliotheca /></Suspense>} />
-					<Route path="alexandrian" element={<Suspense key="alexandrian" fallback={<TopProgressBar />}><Alexandrian /></Suspense>} />
+					<Route path="alexandrian" element={
+						<Suspense key="alexandrian" fallback={<TopProgressBar />}>
+							<LbryActor>
+								<NftManagerActor>
+									<Alexandrian />
+								</NftManagerActor>
+							</LbryActor>
+						</Suspense>
+					} />
 					<Route path="syllogos" element={<Suspense key="syllogos" fallback={<TopProgressBar />}><Syllogos /></Suspense>} />
 					
 					<Route
@@ -116,7 +125,17 @@ const router = createBrowserRouter(
 							</LbryActor>
 						</Suspense>
 					} />
-					<Route path="permasearch" element={<Suspense key="permasearch" fallback={<TopProgressBar />}><Permasearch /></Suspense>} />
+					<Route path="permasearch" element={
+						<Suspense key="permasearch" fallback={<TopProgressBar />}>
+							<LbryActor>
+								<NftManagerActor>
+									<AlexBackendActor>
+										<Permasearch />
+									</AlexBackendActor>
+								</NftManagerActor>
+							</LbryActor>
+						</Suspense>
+					} />
 					<Route path="emporium" element={
 						<Suspense key="emporium" fallback={<TopProgressBar />}>
 							<LbryActor>
