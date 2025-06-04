@@ -7,20 +7,14 @@ const LoginContent = () => {
     // const {provider} = useAuth();
     return (
         <div className="space-y-6">
-            <DialogHeader>
-                <DialogTitle>
+            <DialogHeader className="space-y-1">
+                <DialogTitle className="flex items-center gap-2">
+                    <Lock size={16} className="text-constructive" />
                     <span className="text-xl font-semibold">Welcome Back</span>
                 </DialogTitle>
-                <DialogDescription className="pt-2">
-                    <div className="flex items-center gap-2 text-base">
-                        <Lock size={16} className="text-constructive" />
-                        <span className="font-medium text-black dark:text-white">Your security is our Top Priority</span>
-                    </div>
-                    {/* <p>Choose your preferred authentication method to continue.</p> */}
-                    <p className="font-normal text-sm text-muted-foreground">
-                        We support multiple secure authentication methods including Internet Identity, NFID, and OISY.
-                        Choose how you would like to authenticate yourself.
-                    </p>
+                {/* DialogDescription is a p tag, don't put div inside DialogDescription it will throw console error */}
+                <DialogDescription className="mt-0 mb-2">
+                    We support multiple secure authentication methods including Internet Identity, NFID, and OISY. Choose how you would like to authenticate yourself.
                 </DialogDescription>
             </DialogHeader>
             <Processors />

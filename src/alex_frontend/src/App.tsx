@@ -17,24 +17,24 @@ import { AssetManagerActor } from "./actors";
 import { UserActor } from "./actors";
 
 export default function App() {
-    const [isReady, setIsReady] = useState(false);
+    // const [isReady, setIsReady] = useState(false);
 
+    // // useEffect(() => {
+    // //     const introduced = localStorage.getItem('IntroductionShown');
+	// // 	if(!introduced) window.location.href = "/introduction"
+    // // }, []);
+
+
+    // // costs a re render
+    // // Mark the app as ready after a short delay to ensure all providers are initialized
     // useEffect(() => {
-    //     const introduced = localStorage.getItem('IntroductionShown');
-	// 	if(!introduced) window.location.href = "/introduction"
-    // }, []);
-
-
-    // costs a re render
-    // Mark the app as ready after a short delay to ensure all providers are initialized
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsReady(true);
-            console.log("App is ready");
-        }, 100);
+    //     const timer = setTimeout(() => {
+    //         setIsReady(true);
+    //         console.log("App is ready");
+    //     }, 100);
         
-        return () => clearTimeout(timer);
-    }, []);
+    //     return () => clearTimeout(timer);
+    // }, []);
 
     return (
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -43,7 +43,7 @@ export default function App() {
                     <UserActor>
                         <AssetManagerActor>
                             <UserProvider>
-                                {isReady ? <AppRoutes /> : null}
+                                <AppRoutes />
                             </UserProvider>
                         </AssetManagerActor>
                     </UserActor>
