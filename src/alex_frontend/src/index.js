@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
-import WebFont from "webfontloader";
+// import WebFont from "webfontloader";
 import App from "./App";
 
 // Create a loading indicator
@@ -76,14 +76,14 @@ import App from "./App";
 //   return <App />;
 // };
 
-WebFont.load({
-	google: {
-		families: ["Syne", "Roboto Condensed"],
-	},
-	active: () => {
-		console.log("Fonts loaded");
-	}
-});
+// WebFont.load({
+// 	google: {
+// 		families: ["Syne", "Roboto Condensed"],
+// 	},
+// 	active: () => {
+// 		console.log("Fonts loaded");
+// 	}
+// });
 
 document.addEventListener("DOMContentLoaded", () => {
 	createRoot(document.getElementById("root")).render(

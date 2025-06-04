@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ReduxProvider from "./providers/ReduxProvider";
 
 import "./styles/tailwind.css";
 // import SessionProvider from "./providers/SessionProvider";
 
-import "./styles/style.css";
+// import "./styles/style.css";
 
 import "nprogress/nprogress.css";
 
