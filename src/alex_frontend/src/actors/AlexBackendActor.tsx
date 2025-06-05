@@ -5,23 +5,20 @@ import { canisterId, idlFactory } from "../../../declarations/alex_backend";
 import { _SERVICE } from "../../../declarations/alex_backend/alex_backend.did";
 
 import { ReactNode } from "react";
-import { useIdentity } from "@/hooks/useIdentity";
 import { AlexBackendContext } from "@/contexts/actors";
-import { useActorErrorHandler } from "@/hooks/actors";
-import { AnonymousIdentity } from "@dfinity/agent";
+import { useActor } from "@/hooks/useActor";
 
 export default function AlexBackendActor({ children }: { children: ReactNode }) {
-    const { identity, clear, isInitializing, isLoggingIn } = useIdentity();
-    const { errorToast, handleRequest , handleResponse, handleResponseError} = useActorErrorHandler(clear);
+    const { identity, errorToast, handleResponseError, handleRequest, handleResponse } = useActor();
 
 	// Don't render the ActorProvider until we know the identity state
-    if (isInitializing || isLoggingIn) return <>{children}</>;
+    // if (isInitializing || isLoggingIn) return <>{children}</>;
 
 	return (
 		<ActorProvider<_SERVICE>
 			canisterId={canisterId}
 			context={AlexBackendContext}
-			identity={identity || new AnonymousIdentity()}
+			identity={identity}
 			idlFactory={idlFactory}
 			onRequest={handleRequest}
 			onRequestError={(error) => errorToast(error)}

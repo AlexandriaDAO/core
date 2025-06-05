@@ -13,8 +13,7 @@ import AuthProvider from "./providers/AuthProvider";
 import UserProvider from "./providers/UserProvider";
 import { AppRoutes } from "./routes";
 import { ThemeProvider } from "./providers/ThemeProvider";
-import { AssetManagerActor } from "./actors";
-import { UserActor } from "./actors";
+import ActorProvider from "./providers/ActorProvider";
 
 export default function App() {
     // const [isReady, setIsReady] = useState(false);
@@ -40,13 +39,11 @@ export default function App() {
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <ReduxProvider>
                 <AuthProvider>
-                    <UserActor>
-                        <AssetManagerActor>
-                            <UserProvider>
-                                <AppRoutes />
-                            </UserProvider>
-                        </AssetManagerActor>
-                    </UserActor>
+                    <ActorProvider>
+                        <UserProvider>
+                            <AppRoutes />
+                        </UserProvider>
+                    </ActorProvider>
                 </AuthProvider>
             </ReduxProvider>
         </ThemeProvider>

@@ -37,17 +37,14 @@ import { canisterId, idlFactory } from "../../../declarations/icp_swap_factory";
 import { _SERVICE } from "../../../declarations/icp_swap_factory/icp_swap_factory.did";
 
 import { ReactNode } from "react";
-import { useIdentity } from "@/hooks/useIdentity";
 import { IcpSwapFactoryContext } from "@/contexts/actors";
-import { useActorErrorHandler } from "@/hooks/actors";
-import { AnonymousIdentity } from "@dfinity/agent";
+import { useActor } from "@/hooks/useActor";
 
 export default function IcpSwapFactoryActor({ children }: { children: ReactNode }) {
-    const { identity, clear, isInitializing, isLoggingIn } = useIdentity();
-    const { errorToast, handleRequest, handleResponse, handleResponseError } = useActorErrorHandler(clear);
+    const { identity, errorToast, handleResponseError, handleRequest, handleResponse } = useActor();
 
 	// Don't render the ActorProvider until we know the identity state
-    if (isInitializing || isLoggingIn) return <>{children}</>;
+    // if (isInitializing || isLoggingIn) return <>{children}</>;
 
     return (
 		<ActorProvider<_SERVICE>
@@ -55,7 +52,7 @@ export default function IcpSwapFactoryActor({ children }: { children: ReactNode 
 			// reference authUtils.ts icp_swap_factory_canister_id
 			canisterId={"ggzvv-5qaaa-aaaag-qck7a-cai"}
 			context={IcpSwapFactoryContext}
-			identity={identity || new AnonymousIdentity()}
+			identity={identity}
 			idlFactory={idlFactory}
 			onRequest={handleRequest}
 			onRequestError={(error) => errorToast(error)}

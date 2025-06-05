@@ -1,5 +1,3 @@
-export { default as useActorErrorHandler } from './useActorErrorHandler';
-
 export { default as useAlexBackend } from './useAlexBackend';
 export { default as useAlex } from './useAlex';
 export { default as useAssetCanister } from './useAssetCanister';

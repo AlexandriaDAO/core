@@ -5,23 +5,20 @@ import { canisterId, idlFactory } from "../../../declarations/icrc7";
 import { _SERVICE } from "../../../declarations/icrc7/icrc7.did";
 
 import { ReactNode } from "react";
-import { useIdentity } from "@/hooks/useIdentity";
 import { Icrc7Context } from "@/contexts/actors";
-import { useActorErrorHandler } from "@/hooks/actors";
-import { AnonymousIdentity } from "@dfinity/agent";
+import { useActor } from "@/hooks/useActor";
 
 export default function Icrc7Actor({ children }: { children: ReactNode }) {
-    const { identity, clear, isInitializing, isLoggingIn } = useIdentity();
-    const { errorToast, handleRequest , handleResponse, handleResponseError} = useActorErrorHandler(clear);
+    const { identity, errorToast, handleResponseError, handleRequest, handleResponse } = useActor();
 
 	// Don't render the ActorProvider until we know the identity state
-    if (isInitializing || isLoggingIn) return <>{children}</>;
+    // if (isInitializing || isLoggingIn) return <>{children}</>;
 
 	return (
 		<ActorProvider<_SERVICE>
 			canisterId={canisterId}
 			context={Icrc7Context}
-			identity={identity || new AnonymousIdentity()}
+			identity={identity}
 			idlFactory={idlFactory}
 			onRequest={handleRequest}
 			onRequestError={(error) => errorToast(error)}

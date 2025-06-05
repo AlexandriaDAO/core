@@ -8,13 +8,12 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React, { useEffect } from "react";
 
-interface NFIDUserProviderProps {
+interface UserProviderProps {
 	children: React.ReactNode;
 }
 
-const NFIDUserProvider: React.FC<NFIDUserProviderProps> = ({ children }) => {
-	// const {identity, isInitializing, isLoggingIn, loginStatus, loginError, clear} = useInternetIdentity();
-	const {identity, isInitializing} = useIdentity();
+const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
+	const {identity, isInitializing, isLoggingIn} = useIdentity();
     const {actor} = useUser();
     const {actor: assetManagerActor} = useAssetManager();
 
@@ -24,7 +23,7 @@ const NFIDUserProvider: React.FC<NFIDUserProviderProps> = ({ children }) => {
     // Handle authentication state changes and user synchronization
     useEffect(()=>{
         // Skip any auth checks while Internet Identity is initializing
-        if(isInitializing) return;
+        if(isInitializing || isLoggingIn) return;
 
         // Clear user data when there's no identity (user logged out)
         if(!identity){
@@ -40,7 +39,8 @@ const NFIDUserProvider: React.FC<NFIDUserProviderProps> = ({ children }) => {
         if(!user){
             dispatch(login(actor));
         }
-    }, [isInitializing, actor, identity, user, dispatch]);
+    }, [isInitializing, isLoggingIn, actor, identity, user, dispatch]);
+
 
     // fetch authenticated user's canister
     useEffect(()=>{
@@ -57,4 +57,4 @@ const NFIDUserProvider: React.FC<NFIDUserProviderProps> = ({ children }) => {
 }
 
 
-export default NFIDUserProvider;
+export default UserProvider;
