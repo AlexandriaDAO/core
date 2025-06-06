@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Link as RouterLink } from 'react-router-dom';
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { cn } from "@/lib/utils";
 import { appsData, thirdPartyAppsData } from "@/config/apps";
 import AppCard from "@/components/AppCard";
-import IntroductionAnimation from '@/components/IntroductionAnimation';
+const IntroductionAnimation = lazy(()=>import("@/components/IntroductionAnimation"));
 
 const HomePage: React.FC = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -17,6 +16,8 @@ const HomePage: React.FC = () => {
     const introShown = localStorage.getItem("IntroductionShown");
     if (introShown) {
       setHasSeenIntro(true);
+    }else{
+      setIsIntroOpen(true);
     }
   }, []);
 
@@ -193,7 +194,11 @@ const HomePage: React.FC = () => {
           )}
         </div>
       </div>
-      <IntroductionAnimation isOpen={isIntroOpen} onClose={closeIntroduction} />
+      {!hasSeenIntro && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <IntroductionAnimation isOpen={isIntroOpen} onClose={closeIntroduction} />
+        </Suspense>
+      )}
     </>
   );
 };

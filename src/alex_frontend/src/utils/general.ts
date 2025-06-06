@@ -1,5 +1,6 @@
 import { Principal } from "@dfinity/principal";
 import { clsx, type ClassValue } from "clsx"
+import { toast } from "sonner";
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -95,6 +96,11 @@ export const convertTimestamp = (timestamp: bigint, format: 'iso' | 'readable' |
     }
 };
 
+export const errorToast = (error: unknown) => {
+    if (typeof error === "object" && error !== null && "message" in error) {
+        toast.error(error.message as string);
+    }
+};
 
 // Standard way to check for expired delegation
 export const isIdentityExpired = (error: unknown): boolean => {

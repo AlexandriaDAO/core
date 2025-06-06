@@ -5,7 +5,7 @@ import BaseLayout from "@/layouts/BaseLayout";
 import MainLayout from "@/layouts/MainLayout";
 import AuthGuard from "@/guards/AuthGuard";
 import LibrarianGuard from "@/guards/LibrarianGuard";
-import ErrorBoundary from "@/components/ErrorBoundary";
+// import ErrorBoundary from "@/components/fallbacks/ErrorBoundary";
 import { ROUTES } from "./routeConfig";
 
 // Common loading fallback to reduce duplication
@@ -445,9 +445,9 @@ const router = createBrowserRouter([
 	{
 		path: "/",
 		element: (
-			<ErrorBoundary>
+			// <ErrorBoundary>
 				<BaseLayout />
-			</ErrorBoundary>
+			// </ErrorBoundary>
 		),
 		children: [...mainRoutes, authRoutes],
 	},

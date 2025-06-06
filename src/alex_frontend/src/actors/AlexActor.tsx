@@ -1,18 +1,17 @@
 import React from "react";
-import { ActorProvider } from "ic-use-actor";
+import { ActorProvider, InterceptorErrorData, InterceptorRequestData, InterceptorResponseData } from "ic-use-actor";
 import { canisterId, idlFactory } from "../../../declarations/ALEX";
 
 import { _SERVICE } from "../../../declarations/ALEX/ALEX.did";
 
 import { ReactNode } from "react";
 import { AlexContext } from "@/contexts/actors";
-import { useActor } from "@/hooks/useActor";
+import { toast } from "sonner";
+import useAuth from "@/hooks/useAuth";
+import { errorToast, isIdentityExpired } from "@/utils/general";
 
 export default function AlexActor({ children }: { children: ReactNode }) {
-    const { identity, errorToast, handleResponseError, handleRequest, handleResponse } = useActor();
-
-	// Don't render the ActorProvider until we know the identity state
-    // if (isInitializing || isLoggingIn) return <>{children}</>;
+    const { identity, clear } = useAuth();
 
 	return (
 		<ActorProvider<_SERVICE>
@@ -20,10 +19,22 @@ export default function AlexActor({ children }: { children: ReactNode }) {
 			context={AlexContext}
 			identity={identity}
 			idlFactory={idlFactory}
-			onRequest={handleRequest}
+
+			onRequest={(data: InterceptorRequestData) => data.args}
 			onRequestError={(error) => errorToast(error)}
-			onResponse={handleResponse}
-			onResponseError={handleResponseError}
+			onResponse={(data: InterceptorResponseData) => data.response}
+			onResponseError={(data: InterceptorErrorData) => {
+				console.error("onResponseError", data);
+				if (isIdentityExpired(data.error)) {
+					toast.error("Session expired.");
+					setTimeout(() => {
+						clear();
+						window.location.reload();
+					}, 2000);
+					return;
+				}
+				errorToast(data);
+			}}
 		>
 			{children}
 		</ActorProvider>

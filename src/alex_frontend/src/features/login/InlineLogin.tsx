@@ -15,7 +15,7 @@ const InlineLogin = () => {
 	const dispatch = useAppDispatch();
 	const {open} = useAppSelector(state => state.login);
 	return (
-		<Suspense fallback={<Processing message="Loading..." />}>
+		<Suspense fallback={<Processing message="Opening..." />}>
 			<Dialog open={open} >
 				<DialogTrigger>
 					<div onClick={() => dispatch(setOpen(true))} className="flex-shrink h-auto flex justify-between gap-1 px-4 py-2 items-center bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 text-white hover:text-white hover:border-white hover:from-gray-600 hover:to-gray-500 rounded-full cursor-pointer transition-all duration-300 font-medium">

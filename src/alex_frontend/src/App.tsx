@@ -1,4 +1,5 @@
 import React from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import ReduxProvider from "./providers/ReduxProvider";
 
 import "./styles/tailwind.css";
@@ -14,6 +15,8 @@ import UserProvider from "./providers/UserProvider";
 import { AppRoutes } from "./routes";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import ActorProvider from "./providers/ActorProvider";
+import IdentityProvider from "./providers/IdentityProvider";
+import ErrorFallback from "./components/fallbacks/ErrorFallback";
 
 export default function App() {
     // const [isReady, setIsReady] = useState(false);
@@ -36,16 +39,20 @@ export default function App() {
     // }, []);
 
     return (
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-            <ReduxProvider>
-                <AuthProvider>
-                    <ActorProvider>
-                        <UserProvider>
-                            <AppRoutes />
-                        </UserProvider>
-                    </ActorProvider>
-                </AuthProvider>
-            </ReduxProvider>
-        </ThemeProvider>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+                <ReduxProvider>
+                    <IdentityProvider>
+                        <AuthProvider>
+                            <ActorProvider>
+                               <UserProvider>
+                                    <AppRoutes />
+                                </UserProvider>
+                            </ActorProvider>
+                        </AuthProvider>
+                    </IdentityProvider>
+                </ReduxProvider>
+            </ThemeProvider>
+        </ErrorBoundary>
     )
 }

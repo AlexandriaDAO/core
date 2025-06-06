@@ -6,19 +6,19 @@ import LayoutSkeleton from "@/layouts/skeletons/LayoutSkeleton";
 
 import BaseLayout from "@/layouts/BaseLayout";
 import MainLayout from "@/layouts/MainLayout";
-import AuthGuard from "@/guards/AuthGuard";
+const AuthGuard = lazy(()=>import("@/guards/AuthGuard"));
 import MainPageSkeleton from "@/layouts/skeletons/MainPageSkeleton";
 import PinaxSkeleton from "@/layouts/skeletons/PinaxSkeleton";
-import UnauthorizedPage from "@/pages/UnauthorizedPage";
+const UnauthorizedPage = lazy(()=>import("@/pages/UnauthorizedPage"));
 import Protected from "@/guards/Protected";
 import LibrarianGuard from "@/guards/LibrarianGuard";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import RouteFallback from "@/components/fallbacks/RouteFallback";
 import { ROUTES } from "./routeConfig";
 
 import MarketSkeleton from "@/layouts/skeletons/emporium/MarketSkeleton";
 import GeneralSkeleton from "@/layouts/skeletons/emporium/GeneralSkeleton";
 import MyNftsSkeleton from "@/layouts/skeletons/emporium/MyNftsSkeleton";
-import Imporium from "@/pages/emporium";
+const Imporium = lazy(()=>import("@/pages/emporium"));
 const HomePage = lazy(()=>import("@/pages/HomePage"));
 
 const DashboardLayout = lazy(()=>import("@/layouts/DashboardLayout"));
@@ -72,7 +72,7 @@ const AlexBackendActor = lazy(() => import("@/actors").then(module => ({ default
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
-		<Route element={<ErrorBoundary><BaseLayout /></ErrorBoundary>}>
+		<Route element={<BaseLayout />} errorElement={<RouteFallback />}>
 			<Route path={ROUTES.HOME} element={<MainLayout />}>
 				<Route index element={<Suspense key="home" fallback={<TopProgressBar />}><HomePage /></Suspense>} />
 				<Route path={ROUTES.NFT} element={<Suspense key="nft" fallback={<TopProgressBar />}><SingleTokenView /></Suspense>} />
@@ -172,7 +172,7 @@ const router = createBrowserRouter(
 				<Route path={ROUTES.NOT_FOUND} element={<Suspense key="404" fallback={<TopProgressBar />}><NotFoundPage /></Suspense>} />
 			</Route>
 
-			<Route element={<AuthGuard />}>
+			<Route element={<Suspense key="auth-guard" fallback={<TopProgressBar />}><AuthGuard /></Suspense>}>
 				<Route element={<MainLayout />}>
 					<Route path={ROUTES.PINAX} element={
 						<Suspense key="pinax" fallback={<PinaxSkeleton />}>

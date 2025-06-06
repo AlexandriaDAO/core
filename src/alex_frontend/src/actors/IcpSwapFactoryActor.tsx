@@ -31,17 +31,19 @@
 
 
 import React from "react";
-import { ActorProvider } from "ic-use-actor";
+import { ActorProvider, InterceptorErrorData, InterceptorRequestData, InterceptorResponseData } from "ic-use-actor";
 import { canisterId, idlFactory } from "../../../declarations/icp_swap_factory";
 
 import { _SERVICE } from "../../../declarations/icp_swap_factory/icp_swap_factory.did";
 
 import { ReactNode } from "react";
 import { IcpSwapFactoryContext } from "@/contexts/actors";
-import { useActor } from "@/hooks/useActor";
+import useAuth from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { errorToast, isIdentityExpired } from "@/utils/general";
 
 export default function IcpSwapFactoryActor({ children }: { children: ReactNode }) {
-    const { identity, errorToast, handleResponseError, handleRequest, handleResponse } = useActor();
+    const { identity, clear } = useAuth();
 
 	// Don't render the ActorProvider until we know the identity state
     // if (isInitializing || isLoggingIn) return <>{children}</>;
@@ -54,10 +56,21 @@ export default function IcpSwapFactoryActor({ children }: { children: ReactNode 
 			context={IcpSwapFactoryContext}
 			identity={identity}
 			idlFactory={idlFactory}
-			onRequest={handleRequest}
+			onRequest={(data: InterceptorRequestData) => data.args}
 			onRequestError={(error) => errorToast(error)}
-			onResponse={handleResponse}
-			onResponseError={handleResponseError}
+			onResponse={(data: InterceptorResponseData) => data.response}
+			onResponseError={(data: InterceptorErrorData) => {
+				console.error("onResponseError", data);
+				if (isIdentityExpired(data.error)) {
+					toast.error("Session expired.");
+					setTimeout(() => {
+						clear();
+						window.location.reload();
+					}, 2000);
+					return;
+				}
+				errorToast(data);
+			}}
 		>
 			{children}
 		</ActorProvider>

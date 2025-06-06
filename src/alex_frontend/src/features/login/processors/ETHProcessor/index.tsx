@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/lib/components/button";
 import { useAccount, useChainId } from "wagmi";
-import { isChainIdSupported } from "@/providers/AuthProvider/wagmi.config";
+import { isChainIdSupported } from "@/providers/IdentityProvider/wagmi.config";
 import LoginButton from "./LoginButton";
 import ConnectWallet from "./ConnectWallet";
 
