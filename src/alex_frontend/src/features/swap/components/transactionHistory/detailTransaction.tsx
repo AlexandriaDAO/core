@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
 import { faAngleLeft, faAngleRight, faCheck } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate, useSearch } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { TransactionType } from "../../thunks/lbryIcrc/getTransactions";
 import { useTheme } from "@/providers/ThemeProvider";
@@ -30,11 +30,11 @@ const DetailTransaction = () => {
             <div className="container pt-10 px-3">
                 <div className="bread-crumbs">
                     <nav className="flex items-center space-x-2 text-foreground">
-                        <a href="/" className="hover:text-muted-foreground">Home</a>
+                        <Link to="/" className="hover:text-muted-foreground">Home</Link>
                         <span className="w-1"><FontAwesomeIcon icon={faAngleRight} /></span>
-                        <a href="/category" className="hover:text-muted-foreground">Transaction History</a>
+                        <Link to="/swap/history" className="hover:text-muted-foreground">Transaction History</Link>
                         <span className="w-1"><FontAwesomeIcon icon={faAngleRight} /></span>
-                        <a href="/category/product" className="text-muted-foreground">Transaction Info</a>
+                        <span className="text-muted-foreground">Transaction Info</span>
                     </nav>
                 </div>
             </div>

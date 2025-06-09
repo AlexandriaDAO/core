@@ -19,7 +19,7 @@ const TransactionHistoryObj: React.FC<{
 
     const handleClick = (id: any) => {
         localStorage.setItem("tab", "trx");
-        navigate({to: "/swap/transaction", search: {id: id.toString()}});
+        navigate({to: "/swap/transaction", search: {id: id}});
     }
 
     return (<>
