@@ -14,7 +14,6 @@ import TimeSort from "@/features/imporium/listings/components/TimeSort";
 import { setPage } from "@/features/imporium/listings/listingsSlice";
 import ReactPaginate from 'react-paginate';
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
-import { useParams } from "react-router";
 import EditListedNft from "@/features/imporium/listings/components/EditListedNft";
 import UnListNft from "@/features/imporium/listings/components/UnListNft";
 import { EmporiumActor, Icrc7Actor } from "@/actors";

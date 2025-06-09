@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useBlocker } from "react-router";
+import { useBlocker } from "@tanstack/react-router";
 
 interface NavigationGuardProps {
     uploading: boolean;
@@ -41,24 +41,26 @@ export default function useNavigationGuard({ uploading, minting, transaction, mi
     }, [uploading, minting, transaction, minted]);
 
     // Handle in-app navigation
-    useBlocker(({ currentLocation, nextLocation }) => {
-        if (currentLocation.pathname !== nextLocation.pathname) {
-            if (uploading) {
-                return !window.confirm(
-                    "You have an upload in progress. Are you sure you want to leave? The upload will be lost."
-                );
+    useBlocker({
+        shouldBlockFn: ({ next, current }) => {
+            if (current.pathname !== next.pathname) {
+                if (uploading) {
+                    return !window.confirm(
+                        "You have an upload in progress. Are you sure you want to leave? The upload will be lost."
+                    );
+                }
+                if (minting) {
+                    return !window.confirm(
+                        "You have a minting process in progress. Are you sure you want to leave? Minting can fail in the process."
+                    );
+                }
+                if (transaction && minted !== transaction) {
+                    return !window.confirm(
+                        "Your file is not minted. If you leave now you will lose the transaction. Make sure to copy the transaction id and file url."
+                    );
+                }
             }
-            if (minting) {
-                return !window.confirm(
-                    "You have a minting process in progress. Are you sure you want to leave? Minting can fail in the process."
-                );
-            }
-            if (transaction && minted !== transaction) {
-                return !window.confirm(
-                    "Your file is not minted. If you leave now you will lose the transaction. Make sure to copy the transaction id and file url."
-                );
-            }
+            return false;
         }
-        return false;
     });
 }

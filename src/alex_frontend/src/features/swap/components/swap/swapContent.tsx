@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
-import { Link } from "react-router";
+import { Link } from "@tanstack/react-router";
 import swapLbry from "../../thunks/swapLbry";
 import { flagHandler } from "../../swapSlice";
 import { LoaderCircle } from "lucide-react";

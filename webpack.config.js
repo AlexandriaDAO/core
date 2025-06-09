@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const { TanStackRouterWebpack } = require('@tanstack/router-plugin/webpack')
 
 
 const isDevelopment = process.env.NODE_ENV !== "production";
@@ -242,6 +243,12 @@ module.exports = {
       'require("./model_imports/inception_v3")': '{}',
       'require("./model_imports/mobilenet_v2")': '{}',
       'require("./model_imports/mobilenet_v2_mid")': '{}'
+    }),
+    TanStackRouterWebpack({
+      target: 'react',
+      autoCodeSplitting: true,
+      routesDirectory: path.join(__dirname, "src", frontendDirectory, "src", "routes"),
+      generatedRouteTree: path.join(__dirname, "src", frontendDirectory, "src", "routeTree.gen.ts"),
     }),
     // new BundleAnalyzerPlugin({
     //   analyzerMode: 'server',

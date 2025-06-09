@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { visit } from 'unist-util-visit';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '@tanstack/react-router';
 
 // Define types for component props
 type MarkdownComponentProps = {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from '@tanstack/react-router';
 import FAQPage from './FAQPage';
 import WhitepaperPage from './WhitepaperPage';
 import AuditPage from './AuditPage';
@@ -14,7 +14,7 @@ function InfoPage() {
 
     const handleTabChange = (tab: 'faq' | 'whitepaper' | 'audit') => {
         setActiveTab(tab);
-        navigate(`/info/${tab}`);
+        navigate({ to: `/info/${tab}` });
     };
 
     return (

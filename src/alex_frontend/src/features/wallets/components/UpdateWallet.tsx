@@ -10,8 +10,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import updateWalletStatus from "../thunks/updateWalletStatus";
 import { LoaderCircle } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/lib/components/alert-dialog";
-import { NavLink } from "react-router";
-import { APP_ROUTES } from "@/routes/routeConfig";
+import { Link } from "@tanstack/react-router";
 
 interface UpdateWalletProps {
 	wallet: SerializedWallet;
@@ -80,13 +79,13 @@ const UpdateWallet = ({ wallet }: UpdateWalletProps) => {
 							<span>
 								The wallet will be deactivated.
 								<br />
-								Users will not be able to use this wallet to upload files in the <NavLink to={APP_ROUTES.PINAX}><Button variant="link" scale="sm" className="h-6 px-1">Pinax App</Button></NavLink>.
+								Users will not be able to use this wallet to upload files in the <Link to="/app/pinax"><Button variant="link" scale="sm" className="h-6 px-1">Pinax App</Button></Link>.
 							</span>
 						) : (
 							<span>
 								The wallet will be activated.
 								<br />
-								Users will be able to use this wallet to upload files in the <NavLink to={APP_ROUTES.PINAX}><Button variant="link" scale="sm" className="h-6 px-1">Pinax App</Button></NavLink>
+								Users will be able to use this wallet to upload files in the <Link to="/app/pinax"><Button variant="link" scale="sm" className="h-6 px-1">Pinax App</Button></Link>
 								<br />
 								Wallet selection process is automatic.
 							</span>

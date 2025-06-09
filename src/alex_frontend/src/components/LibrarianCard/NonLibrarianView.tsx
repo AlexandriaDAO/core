@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/lib/components/button";
 import { LockKeyhole } from "lucide-react";
 
@@ -18,7 +18,7 @@ function NonLibrarianView() {
             <Button
                 variant={"link"}
                 scale={"sm"}
-                onClick={() => navigate('/dashboard/profile/upgrade')}>
+                onClick={() => navigate({to: '/dashboard/profile/upgrade'})}>
                 <span>Become Librarian</span>
             </Button>
         </div>

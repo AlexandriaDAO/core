@@ -1,5 +1,5 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { buildRoutes } from "@/routes/routeConfig";
+import { useNavigate, useLocation } from "@tanstack/react-router";
+import { buildRoutes } from "@/react-router-routes/routeConfig";
 import { usePerpetuaNavigation } from "@/apps/app/Perpetua/routes";
 
 /**
@@ -12,42 +12,42 @@ export const useAppNavigation = () => {
   const perpetuaNavigation = usePerpetuaNavigation();
   
   // Base navigation
-  const goToHome = () => navigate(buildRoutes.home());
-  const goToNft = (tokenId: string) => navigate(buildRoutes.nft(tokenId));
-  const goToManager = () => navigate(buildRoutes.manager());
-  const goToInfo = () => navigate(buildRoutes.info());
-  const goToInfoFaq = () => navigate(buildRoutes.infoFaq());
-  const goToInfoWhitepaper = () => navigate(buildRoutes.infoWhitepaper());
-  const goToInfoAudit = () => navigate(buildRoutes.infoAudit());
+  const goToHome = () => navigate({to: buildRoutes.home()});
+  const goToNft = (tokenId: string) => navigate({to: buildRoutes.nft(tokenId)});
+  const goToManager = () => navigate({to: buildRoutes.manager()});
+  const goToInfo = () => navigate({to: buildRoutes.info()});
+  const goToInfoFaq = () => navigate({to: buildRoutes.infoFaq()});
+  const goToInfoWhitepaper = () => navigate({to: buildRoutes.infoWhitepaper()});
+  const goToInfoAudit = () => navigate({to: buildRoutes.infoAudit()});
   
   // App navigation
-  const goToBibliotheca = () => navigate(buildRoutes.bibliotheca());
-  const goToAlexandrian = () => navigate(buildRoutes.alexandrian());
-  const goToSyllogos = () => navigate(buildRoutes.syllogos());
-  const goToDialectica = () => navigate(buildRoutes.dialectica());
-  const goToPermasearch = () => navigate(buildRoutes.permasearch());
-  const goToEmporium = () => navigate(buildRoutes.emporium());
-  const goToPinax = () => navigate(buildRoutes.pinax());
+  const goToBibliotheca = () => navigate({to: buildRoutes.bibliotheca()});
+  const goToAlexandrian = () => navigate({to: buildRoutes.alexandrian()});
+  const goToSyllogos = () => navigate({to: buildRoutes.syllogos()});
+  const goToDialectica = () => navigate({to: buildRoutes.dialectica()});
+  const goToPermasearch = () => navigate({to: buildRoutes.permasearch()});
+  const goToEmporium = () => navigate({to: buildRoutes.emporium()});
+  const goToPinax = () => navigate({to: buildRoutes.pinax()});
   
   // Swap navigation
-  const goToSwap = () => navigate(buildRoutes.swap());
-  const goToSwapBalance = () => navigate(buildRoutes.swapBalance());
-  const goToSwapSwap = () => navigate(buildRoutes.swapSwap());
-  const goToSwapTopup = () => navigate(buildRoutes.swapTopup());
-  const goToSwapSend = () => navigate(buildRoutes.swapSend());
-  const goToSwapReceive = () => navigate(buildRoutes.swapReceive());
-  const goToSwapBurn = () => navigate(buildRoutes.swapBurn());
-  const goToSwapStake = () => navigate(buildRoutes.swapStake());
-  const goToSwapRedeem = () => navigate(buildRoutes.swapRedeem());
-  const goToSwapHistory = () => navigate(buildRoutes.swapHistory());
-  const goToSwapInsights = () => navigate(buildRoutes.swapInsights());
-  const goToSwapTransaction = () => navigate(buildRoutes.swapTransaction());
+  const goToSwap = () => navigate({to: buildRoutes.swap()});
+  const goToSwapBalance = () => navigate({to: buildRoutes.swapBalance()});
+  const goToSwapSwap = () => navigate({to: buildRoutes.swapSwap()});
+  const goToSwapTopup = () => navigate({to: buildRoutes.swapTopup()});
+  const goToSwapSend = () => navigate({to: buildRoutes.swapSend()});
+  const goToSwapReceive = () => navigate({to: buildRoutes.swapReceive()});
+  const goToSwapBurn = () => navigate({to: buildRoutes.swapBurn()});
+  const goToSwapStake = () => navigate({to: buildRoutes.swapStake()});
+  const goToSwapRedeem = () => navigate({to: buildRoutes.swapRedeem()});
+  const goToSwapHistory = () => navigate({to: buildRoutes.swapHistory()});
+  const goToSwapInsights = () => navigate({to: buildRoutes.swapInsights()});
+  const goToSwapTransaction = () => navigate({to: buildRoutes.swapTransaction()});
   
   // Dashboard navigation
-  const goToDashboard = () => navigate(buildRoutes.dashboard());
-  const goToDashboardProfile = () => navigate(buildRoutes.dashboardProfile());
-  const goToDashboardProfileUpgrade = () => navigate(buildRoutes.dashboardProfileUpgrade());
-  const goToDashboardWallets = () => navigate(buildRoutes.dashboardWallets());
+  const goToDashboard = () => navigate({to: buildRoutes.dashboard()});
+  const goToDashboardProfile = () => navigate({to: buildRoutes.dashboardProfile()});
+  const goToDashboardProfileUpgrade = () => navigate({to: buildRoutes.dashboardProfileUpgrade()});
+  const goToDashboardWallets = () => navigate({to: buildRoutes.dashboardWallets()});
   
   return {
     // Current location info

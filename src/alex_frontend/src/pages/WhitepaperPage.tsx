@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MarkdownRenderer from "../components/MarkdownRenderer";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "@tanstack/react-router";
 
 function WhitepaperPage() {
 	const [content, setContent] = useState('Please wait...');

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { appsData, App } from "@/config/apps";
 import { LayoutGrid } from "lucide-react";
 import NavMenu from "./NavMenu";
@@ -36,7 +36,7 @@ export const AppsTab: React.FC = () => {
 							key={app.name}
 							className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-800 rounded"
 							onClick={() => {
-								navigate(app.path)
+								navigate({to: app.path})
 								setIsHovered(false)
 							}}
 						>
@@ -61,7 +61,7 @@ export const AppsTab: React.FC = () => {
 					<div
 						className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-800 rounded"
 						onClick={() => {
-							navigate("/")
+							navigate({to: "/"})
 							setIsHovered(false)
 						}}
 					>

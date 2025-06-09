@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
-import { Link } from "react-router";
+import { Link } from "@tanstack/react-router";
 import { flagHandler } from "../../swapSlice";
 import burnLbry from "../../thunks/burnLBRY";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";

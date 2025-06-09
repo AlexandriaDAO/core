@@ -12,7 +12,6 @@ const getCanisters = createAsyncThunk<
 >( "auth/getCanisters", async ( {actor}, { rejectWithValue }) => {
 		try {
 			const result = await actor.get_all_user_asset_canisters();
-			console.log("get_all_user_asset_canisters result", result);
 
 			const canisters: Record<string, string> = {};
 

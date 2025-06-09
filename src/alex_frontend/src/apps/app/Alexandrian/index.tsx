@@ -1,8 +1,6 @@
 import React, { useCallback, useRef } from "react";
 import { SearchContainer } from '@/apps/Modules/shared/components/SearchContainer';
 import { AlexandrianLibrary } from "@/apps/Modules/LibModules/nftSearch";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/store";
 import { performSearch, updateSearchParams } from '@/apps/Modules/shared/state/librarySearch/libraryThunks';
 import { resetSearch } from '@/apps/Modules/shared/state/librarySearch/librarySlice';
 import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
@@ -10,13 +8,15 @@ import { toast } from 'sonner';
 import { clearNfts } from '@/apps/Modules/shared/state/nftData/nftDataSlice';
 import { clearAllTransactions } from '@/apps/Modules/shared/state/transactions/transactionThunks';
 import { useAssetManager } from "@/hooks/actors";
+import { useAppDispatch } from "@/store/hooks/useAppDispatch";
+import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 function Alexandrian() {
 	const {actor: assetManagerActor} = useAssetManager();
-	const dispatch = useDispatch<AppDispatch>();
-	const { isLoading, searchParams } = useSelector((state: RootState) => state.library);
-	const transactions = useSelector((state: RootState) => state.transactions.transactions);
-	const nfts = useSelector((state: RootState) => state.nftData.nfts);
+	const dispatch = useAppDispatch();
+	const { isLoading, searchParams } = useAppSelector(state => state.library);
+	const transactions = useAppSelector(state => state.transactions.transactions);
+	const nfts = useAppSelector(state => state.nftData.nfts);
 	// Track if assets have been loaded to prevent state wiping
 	const assetsLoadedRef = useRef(false);
 

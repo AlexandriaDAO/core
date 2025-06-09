@@ -4,7 +4,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import Loading from "@/components/Loading";
 import { FullPageSignup } from "@/features/signup";
 import { FullPageLogin } from "@/features/login";
-import { Outlet } from "react-router";
+import { Outlet } from "@tanstack/react-router";
 
 
 const AuthGuard = () => {

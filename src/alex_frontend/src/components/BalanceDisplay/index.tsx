@@ -8,7 +8,7 @@ import getIcpBal from '@/features/icp-ledger/thunks/getIcpBal';
 import { LoaderCircle, ChevronDown, ChevronUp, Layers, Wallet } from 'lucide-react';
 import { useAlex, useIcpLedger, useLbry, useNftManager } from '@/hooks/actors';
 
-import { NavLink } from "react-router";
+import { Link } from "@tanstack/react-router";
 
 import {
 	DropdownMenu,
@@ -86,27 +86,27 @@ const BalanceDisplay: React.FC = () => {
                 </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="font-roboto-condensed">
-                <NavLink to='/swap/balance'>
+                <Link to='/swap/balance'>
                     <DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
                         <Wallet />
                         <span className="flex-grow text-left">ICP</span>
                         {icpLoading && icpBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span className="pl-4">{formatBalance(icpBalance)}</span>}
                     </DropdownMenuItem>
-                </NavLink>
-                <NavLink to='/swap/balance'>
+                </Link>
+                <Link to='/swap/balance'>
                     <DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
                         <Wallet />
                         <span className="flex-grow text-left">ALEX</span>
                         {alexLoading && mainAlexBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span className="pl-4">{formatBalance(mainAlexBalance)}</span>}
                     </DropdownMenuItem>
-                </NavLink>
-                <NavLink to='/swap/balance'>
+                </Link>
+                <Link to='/swap/balance'>
                     <DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
                         <Wallet />
                         <span className="flex-grow text-left">LBRY</span>
                         {swapLoading && lbryBalance === "0" ? <LoaderCircle size={12} className="animate-spin" /> : <span className="pl-4">{formatBalance(lbryBalance)}</span>}
                     </DropdownMenuItem>
-                </NavLink>
+                </Link>
             </DropdownMenuContent>
         </DropdownMenu>
     );

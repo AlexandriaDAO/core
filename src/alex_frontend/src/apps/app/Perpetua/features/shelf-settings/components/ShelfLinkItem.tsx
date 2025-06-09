@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { useShelfById } from '../../../state/hooks/usePerpetuaSelectors';
 import { buildRoutes } from '../../../routes';
 import { NormalizedShelf } from '../../../state/perpetuaSlice';

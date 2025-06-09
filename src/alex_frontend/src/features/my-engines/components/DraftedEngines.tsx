@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/lib/components/table";
 import { Button } from "@/lib/components/button";
-import { NavLink } from "react-router";
+import { Link } from "@tanstack/react-router";
 import updateEngineStatus from "../thunks/updateEngineStatus";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useUser } from "@/hooks/actors";
@@ -51,9 +51,9 @@ function DraftedEngines() {
                         <TableCell>{engine.owner.slice(0, 6) + "..." + engine.owner.slice(-4)}</TableCell>
                         <TableCell>{engine.created_at}</TableCell>
                         <TableCell className="text-center flex justify-center items-center gap-2">
-                            <NavLink to={'/dashboard/engines/'+engine.id}>
+                            <Link to={'/dashboard/engines/'+engine.id}>
                                 <Button variant="link" scale="sm">View Engine</Button>
-                            </NavLink>
+                            </Link>
                             {updating === engine.id ?
                                 <Button variant='inverted' scale="sm" disabled>
                                     <span>Publishing...</span>

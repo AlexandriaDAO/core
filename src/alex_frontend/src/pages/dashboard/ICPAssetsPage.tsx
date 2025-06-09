@@ -3,7 +3,7 @@ import { useAppSelector } from "@/store/hooks/useAppSelector";
 import AssetCanisterActor from "@/actors/AssetCanisterActor";
 import { Alert } from "@/components/Alert";
 import { Button } from "@/lib/components/button";
-import { Link } from "react-router";
+import { Link } from "@tanstack/react-router";
 import ICPAssetUploader from "@/features/icp-assets/components/ICPAssetUploader";
 import ICPAssets from "@/features/icp-assets/components/ICPAssets";
 

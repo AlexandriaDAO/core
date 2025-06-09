@@ -7,7 +7,7 @@ import { LoaderCircle, Save } from "lucide-react";
 import { useUser } from "@/hooks/actors";
 import upgrade from "@/features/auth/thunks/upgrade";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { useNavigate } from "react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 const LibrarianSchema = Yup.object().shape({});
 
@@ -21,7 +21,7 @@ const UpgradePage = () => {
 
 	useEffect(()=>{
 		if(!user || user.librarian){
-			navigate('/dashboard/profile')
+			navigate({ to: "/dashboard/profile" });
 		}
 	}, [user])
 

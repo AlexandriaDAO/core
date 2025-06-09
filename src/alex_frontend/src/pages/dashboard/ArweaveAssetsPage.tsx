@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import AssetTable from "@/features/arweave-assets/components/AssetTable";
 import AssetDetail from "@/features/arweave-assets/components/AssetDetail";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Button } from "@/lib/components/button";
 import { Alert } from "@/components/Alert";
-import { Link } from "react-router";
+import { Link } from "@tanstack/react-router";
 import { Download, RefreshCw } from "lucide-react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { fetchUserArweaveAssets } from "@/features/arweave-assets/thunks/fetchUserArweaveAssets";

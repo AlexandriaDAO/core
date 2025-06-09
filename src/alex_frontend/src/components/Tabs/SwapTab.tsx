@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "@tanstack/react-router";
 import {
 	LayoutGrid,
 	Wallet,
@@ -59,7 +59,7 @@ export const SwapTab: React.FC = () => {
 							key={path}
 							className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-800 rounded"
 							onClick={() => {
-								navigate(`/swap/${path}`)
+								navigate({to: `/swap/${path}`})
 								setIsHovered(false)
 							}}
 						>
@@ -73,7 +73,7 @@ export const SwapTab: React.FC = () => {
 					<div
 						className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-800 rounded"
 						onClick={() => {
-							navigate("/swap")
+							navigate({to: "/swap"})
 							setIsHovered(false)
 						}}
 					>

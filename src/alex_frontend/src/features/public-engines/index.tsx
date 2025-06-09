@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router";
+import { Link } from "@tanstack/react-router";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
 import './styles/table.module.css';
@@ -46,9 +46,9 @@ function PublicEngines() {
 							<TableCell>{engine.owner.slice(0, 6) + "..." + engine.owner.slice(-4)}</TableCell>
 							<TableCell>{engine.created_at}</TableCell>
 							<TableCell className="text-center">
-								<NavLink to={'/dashboard/engines/'+engine.id}>
+								<Link to={'/dashboard/engines/'+engine.id}>
 									<Button variant="inverted" scale="sm">View Engine</Button>
-								</NavLink>
+								</Link>
 							</TableCell>
 						</TableRow>
 					))}

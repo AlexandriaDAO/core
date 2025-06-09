@@ -1,16 +1,14 @@
 import React from "react";
-import { useNavigate } from "react-router";
+import { Link } from "@tanstack/react-router";
 
 interface LogoProps {
   className?: string;
 }
 
 function Logo({ className = "" }: LogoProps) {
-  const navigate = useNavigate();
-  
   return (
-    <div
-      onClick={() => navigate('/')}
+    <Link
+      to="/"
       className={`cursor-pointer hover:opacity-80 ${className}`}
     >
       <div className="flex flex-col items-center">
@@ -40,7 +38,7 @@ function Logo({ className = "" }: LogoProps) {
           pre-alpha
         </span>
       </div>
-    </div>
+    </Link>
   );
 }
 

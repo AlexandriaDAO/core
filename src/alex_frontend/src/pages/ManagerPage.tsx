@@ -4,7 +4,6 @@ import MyEngines from "@/features/my-engines";
 import EngineOverview from "@/features/engine-overview";
 import PublicEngines from "@/features/public-engines";
 import LibrarianCard from "@/components/LibrarianCard";
-import MainLayout from "@/layouts/MainLayout";
 
 function ManagerPage() {
 	const { activeEngine } = useAppSelector(

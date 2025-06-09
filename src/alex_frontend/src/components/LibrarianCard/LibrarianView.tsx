@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/lib/components/button";
 import { Check } from "lucide-react";
 
@@ -16,7 +16,7 @@ function LibrarianView() {
             <Button
                 variant={"link"}
                 scale={"sm"}
-                onClick={()=>navigate("/dashboard")}>
+                onClick={()=>navigate({to: "/dashboard"})}>
                 View Home
             </Button>
         </div>

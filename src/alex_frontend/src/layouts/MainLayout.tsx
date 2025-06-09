@@ -1,8 +1,6 @@
-import React, { ReactNode, useEffect } from "react";
-import BaseLayout from "./BaseLayout";
+import React from "react";
 import Header from "./parts/Header";
-import { Outlet } from "react-router";
-// Define the type for the component's props
+import { Outlet } from "@tanstack/react-router";
 
 const MainLayout = () => {
 	return (

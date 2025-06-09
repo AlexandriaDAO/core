@@ -1,7 +1,7 @@
 import UpgradePage from "@/pages/dashboard/UpgradePage";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import React from "react";
-import { Outlet } from "react-router";
+import { Outlet } from "@tanstack/react-router";
 
 const LibrarianGuard = () => {
     const { user } = useAppSelector(state => state.auth);

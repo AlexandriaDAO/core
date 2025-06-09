@@ -1,7 +1,7 @@
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useTheme } from "@/providers/ThemeProvider";
 
 const TransactionHistoryObj: React.FC<{
@@ -19,7 +19,7 @@ const TransactionHistoryObj: React.FC<{
 
     const handleClick = (id: any) => {
         localStorage.setItem("tab", "trx");
-        navigate("transaction?id=" + id);
+        navigate({to: "/swap/transaction", search: {id: id.toString()}});
     }
 
     return (<>

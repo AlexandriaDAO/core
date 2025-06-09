@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
 import { faAngleLeft, faAngleRight, faCheck } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate, useParams, useSearchParams } from "react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { TransactionType } from "../../thunks/lbryIcrc/getTransactions";
-import MainLayout from "@/layouts/MainLayout";
 import { useTheme } from "@/providers/ThemeProvider";
 
 const DetailTransaction = () => {
-    const [searchParams] = useSearchParams();
+    const search: any = useSearch({
+        strict: false,
+    });
     const navigate = useNavigate();
     const swap = useAppSelector(state => state.swap);
     const [transactaion, setTransaction] = useState<TransactionType>();
@@ -17,15 +18,14 @@ const DetailTransaction = () => {
     const isDark = theme === "dark";
 
     useEffect(() => {
-        const id = searchParams.get("id");
-        setTransaction(swap?.transactions[Number(id)] || null);
+        setTransaction(swap?.transactions[Number(search.id)] || null);
         if (swap.transactions.length === 0) {
-            navigate("/swap");
+            navigate({to: "/swap"});
         }
-    }, [searchParams])
+    }, [search])
 
     return (<>
-        <>        
+        <>    
         <div className="overflow-x-auto lg:overflow-x-auto">
             <div className="container pt-10 px-3">
                 <div className="bread-crumbs">

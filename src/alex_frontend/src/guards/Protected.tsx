@@ -1,6 +1,7 @@
 import React from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import { Navigate, Outlet } from "react-router";
+import { Outlet } from "@tanstack/react-router";
+import UnauthorizedPage from "@/pages/UnauthorizedPage";
 
 interface ProtectedProps {
 	children?: React.ReactNode;
@@ -13,7 +14,7 @@ const Protected = ({ children, route = false, unauthorizedComponent }: Protected
 
 	const allowed = user?.username === "evanmcfarland" || user?.username === "zeeshan101" || user?.username === "sikandar" || user?.username === "asdfasdf" || user?.username === "adill323" || user?.username === "marcorubio";
 
-	if(route) return allowed ? <Outlet /> : <Navigate to="/401" replace />;
+	if(route) return allowed ? <Outlet /> : <UnauthorizedPage />;
 
 	return allowed ? <>{children}</> : <>{unauthorizedComponent || <></>}</>;
 };

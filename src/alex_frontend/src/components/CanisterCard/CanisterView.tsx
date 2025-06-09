@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Button } from "@/lib/components/button";
@@ -60,7 +60,7 @@ function CanisterView() {
             <Button
                 variant={"link"}
                 scale={"sm"}
-                onClick={()=>navigate('/dashboard/icp-assets')}>
+                onClick={()=>navigate({to: '/dashboard/icp-assets'})}>
                 View Assets
             </Button>
         </div>

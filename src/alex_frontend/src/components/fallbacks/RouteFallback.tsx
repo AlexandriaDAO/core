@@ -1,17 +1,24 @@
 import React from "react";
-import { useRouteError } from "react-router";
-import ErrorFallback from "./ErrorFallback";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/lib/components/dialog";
+import { Button } from "@/lib/components/button";
+import { ErrorComponentProps } from "@tanstack/router-core";
 
-const RouteFallback = () => {
-    const error = useRouteError();
-
-    if (error instanceof Error) {
-        return <ErrorFallback error={error} />;
-    }
-
-    const customError = new Error('Unknown error');
-
-    return <ErrorFallback error={customError} />;
+const RouteFallback = ({error, reset, info}: ErrorComponentProps) => {
+    return (
+        <Dialog open modal>
+            <DialogContent
+                closeIcon={null}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                className="font-roboto-condensed outline-none mx-auto max-w-md bg-white p-8 text-[#828282]"
+            >
+                <DialogTitle className="sr-only w-full">Error</DialogTitle>
+                <DialogDescription className="text-center w-full">Something went wrong.</DialogDescription>
+                <p className="text-destructive w-full break-words">{error.message}</p>
+                {info && <p className="text-destructive w-full break-words">{info.componentStack}</p>}
+                <Button variant="link" className="w-full" onClick={reset}>Reset Page</Button>
+            </DialogContent>
+        </Dialog>
+    );
 };
 
 

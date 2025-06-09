@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { LayoutGrid, HelpCircle, FileText, ShieldCheck } from "lucide-react";
 import NavMenu from "./NavMenu";
@@ -52,7 +52,7 @@ export const InfoTab: React.FC = () => {
 							)}
 							onClick={() =>{
 								if(!item.disabled){
-									navigate(`/info/${item.path}`)
+									navigate({to: `/info/${item.path}`})
 									setIsHovered(false)
 								}
 							}}
@@ -72,7 +72,7 @@ export const InfoTab: React.FC = () => {
 					<div
 						className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-800 rounded"
 						onClick={() => {
-							navigate("/info")
+							navigate({to: "/info"})
 							setIsHovered(false)
 						}}
 					>

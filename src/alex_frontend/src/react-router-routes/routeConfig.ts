@@ -4,7 +4,7 @@ import { ROUTES as PERPETUA_ROUTES } from "@/apps/app/Perpetua/routes";
 // Base routes
 export const BASE_ROUTES = {
   HOME: '/',
-  NFT: '/nft/:tokenId',
+  NFT: '/nft/$tokenId',
   MANAGER: '/manager',
   INFO: '/info',
   INFO_FAQ: '/info/faq',

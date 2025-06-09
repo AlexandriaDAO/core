@@ -6,7 +6,7 @@ import { copyToClipboard } from "@/features/pinax/utils";
 // import { copyToClipboard } from "@/features/upload/utils";
 // import { Copy as CopyIcon, ExternalLink } from "lucide-react";
 // import { Label } from "@/lib/components/label";
-import { Link } from "react-router";
+import { Link } from "@tanstack/react-router";
 
 interface AttributesProps {
 	owner: string;
@@ -38,7 +38,7 @@ const Attributes: React.FC<AttributesProps> = ({
 					{/* <Copy text={owner} size="sm"/> */}
 					<div className="flex justify-between items-center gap-2">
 						<CopyIcon className="w-4 h-4 hover:opacity-70 cursor-pointer" onClick={() => copyToClipboard(owner)} />
-						<Link to={`/app/imporium/marketplace?search=${owner}`}>
+						<Link to={`/app/imporium/marketplace`} search={{search: owner}}>
 							<ExternalLink className="w-4 h-4 hover:opacity-70 cursor-pointer" />
 						</Link>
 					</div>

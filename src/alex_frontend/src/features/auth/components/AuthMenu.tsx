@@ -17,7 +17,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/lib/components/dropdown-menu";
-import { NavLink } from "react-router";
+import { Link } from "@tanstack/react-router";
 import { useLogout } from "@/hooks/useLogout";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
@@ -65,24 +65,24 @@ export default function AuthMenu() {
 				<DropdownMenuLabel className="text-center">@{user?.username}</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 					<DropdownMenuGroup>
-						<NavLink to='/dashboard'>
+						<Link to='/dashboard'>
 							<DropdownMenuItem className="cursor-pointer">
 								<LayoutDashboard />
 								<span>Dashboard</span>
 							</DropdownMenuItem>
-						</NavLink>
-						<NavLink to='/dashboard/profile'>
-						<DropdownMenuItem className="cursor-pointer">
-							<User />
-							<span>Profile</span>
-						</DropdownMenuItem>
-						</NavLink>
-						<NavLink to='/dashboard/settings'>
+						</Link>
+						<Link to='/dashboard/profile'>
+							<DropdownMenuItem className="cursor-pointer">
+								<User />
+								<span>Profile</span>
+							</DropdownMenuItem>
+						</Link>
+						<Link to='/dashboard/settings'>
 							<DropdownMenuItem className="cursor-pointer">
 								<Settings />
 								<span>Settings</span>
 							</DropdownMenuItem>
-						</NavLink>
+						</Link>
 					</DropdownMenuGroup>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem className="cursor-pointer" onClick={logout}>

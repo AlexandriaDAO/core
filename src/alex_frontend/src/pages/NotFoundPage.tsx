@@ -1,6 +1,5 @@
 import React from "react";
-import MainLayout from "@/layouts/MainLayout";
-import { useNavigate } from "react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/lib/components/button";
 import { ArrowLeft, Home } from "lucide-react";
 
@@ -24,11 +23,11 @@ const NotFoundPage: React.FC = () => {
 						</p>
 
 						<div className="mt-8 flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
-                            <Button variant="info" className="px-8 flex gap-2 justify-center items-center" onClick={() => navigate(-1)}>
+                            <Button variant="info" className="px-8 flex gap-2 justify-center items-center" onClick={() => navigate({ to: '..' })}>
                                 <ArrowLeft size={20}/>
                                 <span>Go Back</span>
                             </Button>
-                            <Button variant="link" className="px-8 flex gap-2 justify-center items-center" onClick={() => navigate("/")}>
+                            <Button variant="link" className="px-8 flex gap-2 justify-center items-center" onClick={() => navigate({to: "/"})}>
                                 <Home size={18} />
                                 <span>Go Home</span>
                             </Button>

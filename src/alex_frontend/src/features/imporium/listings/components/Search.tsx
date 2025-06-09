@@ -4,25 +4,26 @@ import { Button } from '@/lib/components/button';
 import { SearchIcon, X } from 'lucide-react';
 import useEmporium from '@/hooks/actors/useEmporium';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
-import search from '../thunks/search';
+import searchThunk from '../thunks/search';
 import { clearFound } from '../listingsSlice';
-import { useSearchParams } from 'react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 
 const Search: React.FC = () => {
     const { actor } = useEmporium();
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const [query, setQuery] = useState('');
 
-    const [searchParams, setSearchParams] = useSearchParams();
+    const search:any = useSearch({ strict: false});
 
     useEffect(() => {
         if (!actor) return;
-        const searchTerm = searchParams.get('search');
+        const searchTerm = search.search;
         if (searchTerm) {
             setQuery(searchTerm);
-            dispatch(search({actor, query: searchTerm}))
+            dispatch(searchThunk({actor, query: searchTerm}))
         }
-    }, [searchParams]);
+    }, [search]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value);
@@ -32,22 +33,16 @@ const Search: React.FC = () => {
         setQuery('');
         dispatch(clearFound());
 
-        searchParams.delete('search');
-        setSearchParams(searchParams);
+        navigate({
+            to: '/app/imporium/marketplace'
+        })
     };
 
     const handleSearch = async () => {
         if (!actor) return;
 
-        if (query.trim()) {
-            setSearchParams({ search: query });
-            dispatch(search({actor, query}))
-        } else {
-            // Remove search param if query is empty
-            searchParams.delete('search');
-            setSearchParams(searchParams);
-            handleClear();
-        }
+        if (query.trim()) navigate({ to: '/app/imporium/marketplace', search: { search: query } })
+        else handleClear();
     };
 
     return (

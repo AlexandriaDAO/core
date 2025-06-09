@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Use react-router-dom
+import { Link } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
 import { App } from '@/config/apps'; // Import from the new location
 
@@ -74,7 +74,7 @@ const AppCard: React.FC<AppCardProps> = ({ app, size = 'default', className }) =
         target="_blank"
         rel="noopener noreferrer"
         className="no-underline w-full"
-        onClick={(e) => isComingSoon && e.preventDefault()}
+        onClick={(e: React.MouseEvent<HTMLAnchorElement>) => isComingSoon && e.preventDefault()}
       >
         {cardContent}
       </a>
@@ -85,7 +85,7 @@ const AppCard: React.FC<AppCardProps> = ({ app, size = 'default', className }) =
     <Link
       to={isComingSoon ? '#' : app.path}
       className="no-underline w-full"
-      onClick={(e) => isComingSoon && e.preventDefault()}
+      onClick={(e: React.MouseEvent<HTMLAnchorElement>) => isComingSoon && e.preventDefault()}
     >
       {cardContent}
     </Link>

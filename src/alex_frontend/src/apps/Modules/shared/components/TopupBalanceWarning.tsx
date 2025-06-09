@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import getSpendingBalance from '@/features/swap/thunks/lbryIcrc/getSpendingBalance';
-import { Link } from 'react-router-dom';
+import { Link } from '@tanstack/react-router';
 import { useLbry, useNftManager } from '@/hooks/actors';
 import { AlertCircle } from 'lucide-react';
 import { Alert } from '@/components/Alert';

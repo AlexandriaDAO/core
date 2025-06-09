@@ -1,5 +1,5 @@
 // Perpetua route utilities
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useMatch } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { Principal } from "@dfinity/principal";
 
@@ -43,9 +43,33 @@ export const parsePathInfo = (path: string) => {
 // Custom hook for Perpetua navigation
 export const usePerpetuaNavigation = () => {
   const navigate = useNavigate();
-  const params = useParams<{ shelfId?: string; userId?: string }>();
   const location = useLocation();
-  
+
+  const shelfMatch = useMatch({
+    from: '/app/perpetua/shelf/$shelfId',
+    shouldThrow: false,
+  });
+  const userMatch = useMatch({
+    from: '/app/perpetua/user/$userId/',
+    shouldThrow: false,
+  });
+  const userShelfMatch = useMatch({
+    from: '/app/perpetua/user/$userId/shelf/$shelfId',
+    shouldThrow: false,
+  });
+  const userItemMatch = useMatch({
+    from: '/app/perpetua/user/$userId/item/$itemId',
+    shouldThrow: false,
+  });
+
+  const params: { shelfId?: string; userId?: string; } = useMemo(() => {
+    if (shelfMatch) return { shelfId: shelfMatch.params.shelfId };
+    if (userMatch) return { userId: userMatch.params.userId };
+    if (userShelfMatch) return { userId: userShelfMatch.params.userId, shelfId: userShelfMatch.params.shelfId };
+    if (userItemMatch) return { userId: userItemMatch.params.userId };
+    return {};
+  }, [shelfMatch, userMatch, userShelfMatch, userItemMatch]);
+
   // Determine the current view based on URL path
   const { isUserView, userId, backPath } = useMemo(() => {
     const pathInfo = parsePathInfo(location.pathname);
@@ -59,27 +83,27 @@ export const usePerpetuaNavigation = () => {
   // Navigation functions
   const goToShelves = () => {
     if (isUserView && (userId || params.userId)) {
-      navigate(buildRoutes.user(userId || params.userId || ''));
+      navigate({to: buildRoutes.user(userId || params.userId || '')});
     } else {
-      navigate(buildRoutes.home());
+      navigate({to: buildRoutes.home()});
     }
   };
 
   const goToShelf = (shelfId: string) => {
     if (isUserView && (userId || params.userId)) {
-      navigate(buildRoutes.userShelf(userId || params.userId || '', shelfId));
+      navigate({to: buildRoutes.userShelf(userId || params.userId || '', shelfId)});
     } else {
-      navigate(buildRoutes.shelf(shelfId));
+      navigate({to: buildRoutes.shelf(shelfId)});
     }
   };
 
   const goToUser = (userId: string | Principal) => {
     const userIdString = userId.toString();
-    navigate(buildRoutes.user(userIdString));
+    navigate({to: buildRoutes.user(userIdString)});
   };
   
   const goToMainShelves = () => {
-    navigate(buildRoutes.home());
+    navigate({to: buildRoutes.home()});
   };
 
   // Return navigation helpers

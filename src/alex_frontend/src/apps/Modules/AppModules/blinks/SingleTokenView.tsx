@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from '@tanstack/react-router';
 import ContentRenderer from '../safeRender/ContentRenderer';
 import { ContentCard } from '@/apps/Modules/AppModules/contentGrid/Card';
 import { Dialog, DialogContent, DialogTitle } from '@/lib/components/dialog';
@@ -20,7 +20,6 @@ import { Badge } from "@/lib/components/badge";
 import { Copy, Check, Link, X, Calendar, Info } from "lucide-react";
 import { copyToClipboard } from '@/apps/Modules/AppModules/contentGrid/utils/clipboard';
 import { getNftOwnerInfo, UserInfo } from '../../shared/utils/nftOwner';
-import { Button } from "@/lib/components/button";
 import { convertE8sToToken, formatPrincipal, formatBalance } from '../../shared/utils/tokenUtils';
 import { createTokenAdapter, determineTokenType, TokenType } from '../../shared/adapters/TokenAdapter';
 import { ShelvesPreloader } from '../shared/components/ShelvesPreloader';
@@ -29,7 +28,7 @@ import { PerpetuaActor } from '@/actors';
 const NFT_MANAGER_PRINCIPAL = "5sh5r-gyaaa-aaaap-qkmra-cai";
 
 function SingleTokenView() {
-  const { tokenId } = useParams<{ tokenId: string }>();
+  const { tokenId } = useParams({ from: "/nft/$tokenId" });
   const [isLoading, setIsLoading] = useState(true);
   const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [contentUrls, setContentUrls] = useState<any>(null);

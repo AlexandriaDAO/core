@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from '@tanstack/react-router';
 import "./style.css"
 
 import { useAppSelector } from '@/store/hooks/useAppSelector';
@@ -62,7 +62,7 @@ const SwapMain = () => {
         dispatch(getLbryFee(lbryActor));
         dispatch(getAlexFee(alexActor));
         if (localStorage.getItem("tab")) {
-            navigate('/swap/stake');
+            navigate({to: "/swap/stake"});
             localStorage.removeItem("tab");
         }
     }, [lbryActor, alexActor, icpSwapActor, tokenomicsActor]);
@@ -84,7 +84,7 @@ const SwapMain = () => {
                             {tabs.map(tab => (
                                 <button
                                     key={tab.id}
-                                    onClick={() => navigate(`/swap/${tab.path}`)}
+                                    onClick={() => navigate({to: `/swap/${tab.path}`})}
                                     className={`px-2 py-2 flex items-center ${activeTab === tab.id
                                         ? 'text-base 2xl:text-xl bg-black text-white dark:bg-white dark:text-black px-5'
                                         : 'bg-white text-black dark:bg-black dark:text-white'} transition-colors duration-300 text-base font-semibold leading-6 min-w-24 h-11 border dark:border-gray-700 border-gray-400 rounded-2xl mr-3 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black px-5 mb-4 z-20`}
