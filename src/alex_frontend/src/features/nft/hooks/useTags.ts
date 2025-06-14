@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Tag, Tags, TransactionStatusType } from "../types";
-import { getFileTypeInfo } from "@/features/pinax/constants";
 
 const useTags = ( id: string, status: TransactionStatusType ) => {
 	const [tags, setTags] = useState<Tags>([]);
@@ -46,11 +45,7 @@ const useTags = ( id: string, status: TransactionStatusType ) => {
 		fetchTags();
 	}, [id, status]);
 
-	const contentType = tags.find(tag => tag.name.toLowerCase() === "content-type")?.value || '';
-
-	const assetType = contentType ? getFileTypeInfo(contentType)?.label : undefined;
-
-	return { tags, loading, error, contentType, assetType };
+	return { tags, loading, error };
 };
 
 export default useTags;

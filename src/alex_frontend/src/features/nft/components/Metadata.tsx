@@ -13,7 +13,7 @@ const Metadata: React.FC<MetadataProps> = ({
 	status,
 }) => {
 	return (
-		<div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs font-roboto-condensed">
+		<div className="flex justify-start items-center gap-16 text-xs font-roboto-condensed">
 			<div>
 				<span className="text-gray-500 text-sm">Date:</span>
 				<p className="font-medium text-sm">

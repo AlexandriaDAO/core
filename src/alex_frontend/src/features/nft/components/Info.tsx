@@ -1,92 +1,80 @@
-import React, { useState, useEffect } from "react";
-import { X, Loader } from "lucide-react";
+import React from "react";
+import { X, ExternalLink, Info as InfoIcon } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogHeader, DialogTrigger, DialogFooter } from "@/lib/components/dialog";
+import Asset from "./Asset";
+import Tags from "./Tags";
+import Metadata from "./Metadata";
+import CollectionLink from "./CollectionLink";
+import { Badge } from "@/lib/components/badge";
+
+import useStatus from "../hooks/useStatus";
+import useSize from "../hooks/useSize";
+import useTags from "../hooks/useTags";
+import useTimestamp from "../hooks/useTimestamp";
+import { getFileTypeInfo } from "@/features/pinax/constants";
 import { Button } from "@/lib/components/button";
-import Copy from "@/components/Copy";
-import { Alert } from "@/components/Alert";
+
 
 interface InfoProps {
-	tags: { name: string; value: string }[];
+	id: string;
+	owner?: string;
+	data: Uint8Array | null;
 	loading: boolean;
-	error: string | null;
-	onClose: () => void;
+	progress: number;
+	type: string | null;
+	setFullscreen: (fullscreen: boolean) => void;
+	action: React.ReactNode;
 }
 
-const Info: React.FC<InfoProps> = ({ tags, onClose, loading, error }) => {
-	const [isClosing, setIsClosing] = useState(false);
+const Info: React.FC<InfoProps> = ({ id, owner, data, loading, progress, type, setFullscreen, action }) => {
+	const { status } = useStatus(id);
+	const { readableTimestamp } = useTimestamp(status);
+	const { readableSize } = useSize(id, status);
+	const { tags, loading: tagsLoading, error: tagsError } = useTags(id, status);
 
-	const handleClose = () => {
-		setIsClosing(true);
-		setTimeout(() => {
-			onClose();
-		}, 300); // Match this with the animation duration
-	};
+	const contentType = tags.find(tag => tag.name.toLowerCase() === "content-type")?.value || '';
 
-	// if (loading) {
-	// 	return <div>Loading...</div>;
-	// }
-
-	// if (error) {
-	// 	return <div>Error: {error}</div>;
-	// }
-
-
-	const scrollClasses = "overflow-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400";
+	const assetType = contentType ? getFileTypeInfo(contentType)?.label : undefined;
 
 	return (
-		// slide out from top right corner
-		// <div className="absolute inset-0 bg-black/90 text-white p-2 overflow-auto w-full h-full flex flex-col justify-between items-center animate-in zoom-in duration-300 origin-top-right">
-		<div className={`z-10 gap-2 font-roboto-condensed absolute inset-0 bg-black/90 text-white p-2 overflow-auto w-full h-full flex flex-col justify-between items-center ${
-			isClosing ? 'animate-out slide-out-to-top duration-300' : 'animate-in slide-in-from-top duration-300'
-		}`}>
+		<Dialog open={true}>
+			<DialogTrigger asChild>
+				<InfoIcon strokeWidth={2} size={20} className="p-0.5 text-muted-foreground hover:text-muted-foreground/50 cursor-pointer flex-shrink-0"/>
+			</DialogTrigger>
+			<DialogContent className="max-w-4xl w-full p-4" closeIcon={null} onOpenAutoFocus={(e) => e.preventDefault()}>
+				<DialogHeader className="flex flex-col space-y-0">
+					<DialogTitle className="flex items-center justify-between gap-2">
+						<span>{id}</span>
+						<div className="flex items-center justify-between gap-3">
+							{assetType && <Badge variant="outline">{assetType}</Badge>}
+							<ExternalLink xlinkTitle="View on ViewBlock" strokeWidth={1} onClick={()=>window.open(`https://viewblock.io/arweave/tx/${id}`, "_blank")} size={22} className="text-muted-foreground hover:text-black dark:hover:text-white transition-all cursor-pointer" />
+							<X xlinkTitle="Close fullscreen view" strokeWidth={1} onClick={()=>setFullscreen(false)} size={26} className="text-muted-foreground hover:text-black dark:hover:text-white transition-all cursor-pointer"/>
+						</div>
+					</DialogTitle>
+					<DialogDescription>
+						Here you can view the general Information about your NFT.
+					</DialogDescription>
+				</DialogHeader>
 
-			<div className="flex justify-between items-center w-full">
-				<h3 className="font-bold">Tags</h3>
-				<Button
-					onClick={handleClose}
-					variant="outline"
-					scale="icon"
-					rounded="full"
-				>
-					<X size={18} />
-				</Button>
-			</div>
-
-			<div className="flex-grow flex justify-center items-center text-xs w-full overflow-hidden">
-				{loading ? (
-					<Loader className="animate-spin text-white h-8 w-8" />
-				) : error ? (
-					// <div>Error: {error}</div>
-					<Alert variant="danger" title="Error" className="w-11/12">
-						{error}
-					</Alert>
-
-				) : tags.length <= 0 ? (
-					<Alert variant="default" title="No Tags" className="w-11/12">
-						No tags were found for this transaction
-					</Alert>
-				) : (
-					<div className={`max-h-full border border-white/20 rounded p-2 bg-black/50 space-y-1 ${scrollClasses}`}>
-						{tags.map((tag, index) => (
-							<div
-								key={index}
-								className="flex flex-wrap items-start border-b border-white/10 last:border-0"
-							>
-								<span className="font-semibold text-blue-300 mr-2 whitespace-nowrap">
-									{tag.name}:
-								</span>
-								<span className="text-white/90 break-all flex-1">
-									{tag.value}
-								</span>
-								<Copy size="sm" text={tag.value} />
-							</div>
-						))}
-					</div>
-				)}
-			</div>
-
-
-		</div>
-	);
+				<Asset data={data} loading={loading} progress={progress} type={type} fullscreen />
+				<CollectionLink owner={owner} />
+				<Tags tags={tags} loading={tagsLoading} error={tagsError} />
+				<div className="flex items-center justify-between gap-2">
+					<Metadata
+						readableTimestamp={readableTimestamp}
+						readableSize={readableSize}
+						status={status}
+					/>
+					<DialogFooter className="flex items-center justify-between gap-2">
+						{action}
+						<Button variant="primary" scale="sm" onClick={()=>setFullscreen(false)}>
+							Close
+						</Button>
+					</DialogFooter>
+				</div>
+			</DialogContent>
+		</Dialog>
+	)
 };
 
 export default Info;

@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { TransactionStatusType } from "../types";
 
 const isLocal = process.env.DFX_NETWORK == "local";
 
-const useData = (id: string, status: TransactionStatusType, canister?: string) => {
+const useData = (id: string, canister?: string) => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [data, setData] = useState<Uint8Array | null>(null);
+	const [inCanister, setInCanister] = useState<boolean>(false);
+	const [type, setType] = useState<string | null>(null);
 	// const [progress, setProgress] = useState(0);
 	const progress = useRef(0);
 
@@ -89,10 +90,12 @@ const useData = (id: string, status: TransactionStatusType, canister?: string) =
 
 	// fetch with progress
 	useEffect(() => {
-		if (!id || status === null) return;
+		if (!id) return;
 
 		const fetchData = async () => {
 			try {
+				if(id.length !== 43) throw new Error("Invalid ID");
+
 				setLoading(true);
 				progress.current = 0;
 
@@ -109,12 +112,19 @@ const useData = (id: string, status: TransactionStatusType, canister?: string) =
 					if(!response.ok){
 						throw new Error("Asset not found in canister");
 					}
+					setInCanister(true);
 				} catch (error) {
 					console.warn("Failed to fetch Asset from canister", error);
 					response = await fetch('https://arweave.net/' + id);
 					if(!response.ok){
 						throw new Error("Failed to fetch Asset data from arweave");
 					}
+				}
+
+				// type is the same as the tag Content-Type is set while uploading the asset
+				const contentType = response.headers.get('Content-Type');
+				if(contentType){
+					setType(contentType);
 				}
 
 				// Get the total size if available
@@ -169,9 +179,9 @@ const useData = (id: string, status: TransactionStatusType, canister?: string) =
 		return () => {
 			progress.current = 0;
 		};
-	}, [id, status]);
+	}, [id]);
 
-	return { data, loading, error, progress: progress.current };
+	return { data, loading, error, progress: progress.current, inCanister, type };
 };
 
 export default useData;
