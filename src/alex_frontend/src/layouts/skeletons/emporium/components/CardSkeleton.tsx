@@ -11,7 +11,6 @@ const CardSkeleton = () => {
                     <Skeleton className="h-6 w-12 rounded-full" />
                     <Skeleton className="h-6 w-20 rounded-full" />
                 </div>
-                <Skeleton className="h-24 w-full mt-4" />
             </CardContent>
             <CardFooter className="p-4 pt-0">
                 <Skeleton className="h-10 w-full" />

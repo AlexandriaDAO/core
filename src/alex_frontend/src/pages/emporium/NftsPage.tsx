@@ -1,37 +1,29 @@
 import React, { useEffect } from "react";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
-import { useAssetManager } from "@/hooks/useAssetManager";
-import { useIdentity } from "@/hooks/useIdentity";
-import fetch from "@/features/icp-assets/thunks/fetch";
 import getMyTokens from "@/features/imporium/nfts/thunks/getMyTokens";
 import NftsSkeleton from "@/layouts/skeletons/emporium/components/NftsSkeleton";
 import { Alert } from "@/components/Alert";
 import Nft from "@/features/nft";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { ListNft } from "@/features/imporium/nfts/components/ListNft";
 import { EmporiumActor, Icrc7Actor } from "@/actors";
-
+import { useLoaderData } from "@tanstack/react-router";
+import { Button } from "@/lib/components/button";
+import { RefreshCcw } from "lucide-react";
 
 const NftsPage = () => {
+    const fetched = useLoaderData({from: '/_auth/app/imporium/nfts'});
     const dispatch = useAppDispatch();
 
     const { canister } = useAppSelector((state) => state.auth);
     const { ids, loading, error } = useAppSelector((state) => state.imporium.nfts);
-    const { identity } = useIdentity();
 
-    const assetManager = useAssetManager({
-		canisterId: canister ?? undefined,
-		identity,
-	});
-
-    useEffect(() => {
-		if (!assetManager) return;
-		dispatch(fetch({ assetManager }));
-	}, [assetManager]);
-
-    useEffect(() => {
+    const refresh = () => {
         dispatch(getMyTokens());
+    }
+
+    useEffect(() => {
+        if(!fetched) refresh();
     }, []);
 
     return (
@@ -41,9 +33,18 @@ const NftsPage = () => {
                 <div className="flex flex-col items-center gap-1 text-foreground text-center font-syne">
                     <h2 className="m-0 font-semibold text-base sm:text-lg md:text-xl lg:text-2xl">My Nfts</h2>
                     <p className="m-0 font-normal text-sm sm:text-base md:text-lg lg:text-xl">Here you will find the list of all your minted NFTs</p>
+                    <Button
+                        variant="muted"
+                        className="font-roboto-condensed text-sm text-primary/70 hover:text-primary cursor-pointer flex items-center justify-start gap-1"
+                        onClick={refresh}
+                        disabled={loading}
+                    >
+                        <span>Refresh List</span>
+                        <RefreshCcw strokeWidth={2} size={16} className={`${loading ? 'animate-spin' : ''}`} />
+                    </Button>
                 </div>
             </div>
-            
+
             {loading ? (
                 <NftsSkeleton />
             ) : error ? (
@@ -57,42 +58,15 @@ const NftsPage = () => {
                             <div className="text-center py-12">
                                 <p className="text-muted-foreground text-lg">You don't have any NFTs yet.</p>
                             </div>
-                        ) : (<>
-                            {/* <div className="columns-1 max-w-[400px] mx-auto sm:max-w-none sm:columns-2 md:columns-3 lg:columns-4 gap-4">
-                                {ids.map((id) => (
-                                    <Nft key={id} id={id} action={<SellButton />}/>
-                                ))}
-                            </div> */}
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {ids.map((id) => (
-                                    <Nft key={id} id={id} action={
-                                        <EmporiumActor>
-                                            <Icrc7Actor>
-                                                <ListNft id={id} />
-                                            </Icrc7Actor>
-                                        </EmporiumActor>
-                                    } canister={canister}/>
-                                ))}
-                            </div>
-
-                            {/* <ResponsiveMasonry
-                                columnsCountBreakPoints={{ 0: 1, 640: 2, 768: 3, 1024: 4 }}
-                            >
-                                <Masonry gutter="16px">
-                                    {ids.map((id) => (
-                                        <Nft key={id} id={id} action={
-                                            <EmporiumActor>
-                                                <Icrc7Actor>
-                                                    <ListNft id={id} />
-                                                </Icrc7Actor>
-                                            </EmporiumActor>
-                                        }/>
-                                    ))}
-                                </Masonry>
-                            </ResponsiveMasonry> */}
-
-                        </>)}
+                        ) : (
+                            <EmporiumActor>
+                                <Icrc7Actor>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-20">
+                                        {ids.map(id => <Nft key={id} id={id} action={<ListNft id={id} />} canister={canister}/>)}
+                                    </div>
+                                </Icrc7Actor>
+                            </EmporiumActor>
+                        )}
                     </div>
                 </div>
             )}
