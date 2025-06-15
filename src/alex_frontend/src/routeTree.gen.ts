@@ -15,6 +15,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as SwapTransactionImport } from './routes/swap/transaction'
 import { Route as AuthAppImporiumNftsImport } from './routes/_auth/app/imporium/nfts'
+import { Route as AuthAppImporiumMarketplaceImport } from './routes/_auth/app/imporium/marketplace'
+import { Route as AuthAppImporiumMarketLogsImport } from './routes/_auth/app/imporium/market-logs'
 import { Route as AuthAppImporiumListingsImport } from './routes/_auth/app/imporium/listings'
 
 // Create Virtual Routes
@@ -63,6 +65,7 @@ const AuthAppPinaxLazyImport = createFileRoute('/_auth/app/pinax')()
 const AuthDashboardLibrarianRouteLazyImport = createFileRoute(
   '/_auth/dashboard/_librarian',
 )()
+const AuthAppImporiumRouteLazyImport = createFileRoute('/_auth/app/imporium')()
 const AuthDashboardLibrarianIndexLazyImport = createFileRoute(
   '/_auth/dashboard/_librarian/',
 )()
@@ -81,12 +84,6 @@ const AuthDashboardLibrarianWalletsLazyImport = createFileRoute(
 )()
 const AuthAppImporiumMyLogsLazyImport = createFileRoute(
   '/_auth/app/imporium/my-logs',
-)()
-const AuthAppImporiumMarketplaceLazyImport = createFileRoute(
-  '/_auth/app/imporium/marketplace',
-)()
-const AuthAppImporiumMarketLogsLazyImport = createFileRoute(
-  '/_auth/app/imporium/market-logs',
 )()
 const AppPerpetuaUserUserIdIndexLazyImport = createFileRoute(
   '/app/perpetua/user/$userId/',
@@ -340,6 +337,14 @@ const AuthDashboardLibrarianRouteLazyRoute =
     ),
   )
 
+const AuthAppImporiumRouteLazyRoute = AuthAppImporiumRouteLazyImport.update({
+  id: '/app/imporium',
+  path: '/app/imporium',
+  getParentRoute: () => AuthRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/app/imporium/route.lazy').then((d) => d.Route),
+)
+
 const AuthDashboardLibrarianIndexLazyRoute =
   AuthDashboardLibrarianIndexLazyImport.update({
     id: '/',
@@ -352,9 +357,9 @@ const AuthDashboardLibrarianIndexLazyRoute =
   )
 
 const AuthAppImporiumIndexLazyRoute = AuthAppImporiumIndexLazyImport.update({
-  id: '/app/imporium/',
-  path: '/app/imporium/',
-  getParentRoute: () => AuthRouteLazyRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_auth/app/imporium/index.lazy').then((d) => d.Route),
 )
@@ -399,43 +404,43 @@ const AuthDashboardLibrarianWalletsLazyRoute =
   )
 
 const AuthAppImporiumMyLogsLazyRoute = AuthAppImporiumMyLogsLazyImport.update({
-  id: '/app/imporium/my-logs',
-  path: '/app/imporium/my-logs',
-  getParentRoute: () => AuthRouteLazyRoute,
+  id: '/my-logs',
+  path: '/my-logs',
+  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_auth/app/imporium/my-logs.lazy').then((d) => d.Route),
 )
 
-const AuthAppImporiumMarketplaceLazyRoute =
-  AuthAppImporiumMarketplaceLazyImport.update({
-    id: '/app/imporium/marketplace',
-    path: '/app/imporium/marketplace',
-    getParentRoute: () => AuthRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./routes/_auth/app/imporium/marketplace.lazy').then((d) => d.Route),
-  )
-
-const AuthAppImporiumMarketLogsLazyRoute =
-  AuthAppImporiumMarketLogsLazyImport.update({
-    id: '/app/imporium/market-logs',
-    path: '/app/imporium/market-logs',
-    getParentRoute: () => AuthRouteLazyRoute,
-  } as any).lazy(() =>
-    import('./routes/_auth/app/imporium/market-logs.lazy').then((d) => d.Route),
-  )
-
 const AuthAppImporiumNftsRoute = AuthAppImporiumNftsImport.update({
-  id: '/app/imporium/nfts',
-  path: '/app/imporium/nfts',
-  getParentRoute: () => AuthRouteLazyRoute,
+  id: '/nfts',
+  path: '/nfts',
+  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_auth/app/imporium/nfts.lazy').then((d) => d.Route),
 )
 
+const AuthAppImporiumMarketplaceRoute = AuthAppImporiumMarketplaceImport.update(
+  {
+    id: '/marketplace',
+    path: '/marketplace',
+    getParentRoute: () => AuthAppImporiumRouteLazyRoute,
+  } as any,
+).lazy(() =>
+  import('./routes/_auth/app/imporium/marketplace.lazy').then((d) => d.Route),
+)
+
+const AuthAppImporiumMarketLogsRoute = AuthAppImporiumMarketLogsImport.update({
+  id: '/market-logs',
+  path: '/market-logs',
+  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/app/imporium/market-logs.lazy').then((d) => d.Route),
+)
+
 const AuthAppImporiumListingsRoute = AuthAppImporiumListingsImport.update({
-  id: '/app/imporium/listings',
-  path: '/app/imporium/listings',
-  getParentRoute: () => AuthRouteLazyRoute,
+  id: '/listings',
+  path: '/listings',
+  getParentRoute: () => AuthAppImporiumRouteLazyRoute,
 } as any)
 
 const AppPerpetuaUserUserIdIndexLazyRoute =
@@ -671,6 +676,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SwapIndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/_auth/app/imporium': {
+      id: '/_auth/app/imporium'
+      path: '/app/imporium'
+      fullPath: '/app/imporium'
+      preLoaderRoute: typeof AuthAppImporiumRouteLazyImport
+      parentRoute: typeof AuthRouteLazyImport
+    }
     '/_auth/dashboard/_librarian': {
       id: '/_auth/dashboard/_librarian'
       path: ''
@@ -722,38 +734,38 @@ declare module '@tanstack/react-router' {
     }
     '/_auth/app/imporium/listings': {
       id: '/_auth/app/imporium/listings'
-      path: '/app/imporium/listings'
+      path: '/listings'
       fullPath: '/app/imporium/listings'
       preLoaderRoute: typeof AuthAppImporiumListingsImport
-      parentRoute: typeof AuthRouteLazyImport
-    }
-    '/_auth/app/imporium/nfts': {
-      id: '/_auth/app/imporium/nfts'
-      path: '/app/imporium/nfts'
-      fullPath: '/app/imporium/nfts'
-      preLoaderRoute: typeof AuthAppImporiumNftsImport
-      parentRoute: typeof AuthRouteLazyImport
+      parentRoute: typeof AuthAppImporiumRouteLazyImport
     }
     '/_auth/app/imporium/market-logs': {
       id: '/_auth/app/imporium/market-logs'
-      path: '/app/imporium/market-logs'
+      path: '/market-logs'
       fullPath: '/app/imporium/market-logs'
-      preLoaderRoute: typeof AuthAppImporiumMarketLogsLazyImport
-      parentRoute: typeof AuthRouteLazyImport
+      preLoaderRoute: typeof AuthAppImporiumMarketLogsImport
+      parentRoute: typeof AuthAppImporiumRouteLazyImport
     }
     '/_auth/app/imporium/marketplace': {
       id: '/_auth/app/imporium/marketplace'
-      path: '/app/imporium/marketplace'
+      path: '/marketplace'
       fullPath: '/app/imporium/marketplace'
-      preLoaderRoute: typeof AuthAppImporiumMarketplaceLazyImport
-      parentRoute: typeof AuthRouteLazyImport
+      preLoaderRoute: typeof AuthAppImporiumMarketplaceImport
+      parentRoute: typeof AuthAppImporiumRouteLazyImport
+    }
+    '/_auth/app/imporium/nfts': {
+      id: '/_auth/app/imporium/nfts'
+      path: '/nfts'
+      fullPath: '/app/imporium/nfts'
+      preLoaderRoute: typeof AuthAppImporiumNftsImport
+      parentRoute: typeof AuthAppImporiumRouteLazyImport
     }
     '/_auth/app/imporium/my-logs': {
       id: '/_auth/app/imporium/my-logs'
-      path: '/app/imporium/my-logs'
+      path: '/my-logs'
       fullPath: '/app/imporium/my-logs'
       preLoaderRoute: typeof AuthAppImporiumMyLogsLazyImport
-      parentRoute: typeof AuthRouteLazyImport
+      parentRoute: typeof AuthAppImporiumRouteLazyImport
     }
     '/_auth/dashboard/_librarian/wallets': {
       id: '/_auth/dashboard/_librarian/wallets'
@@ -785,10 +797,10 @@ declare module '@tanstack/react-router' {
     }
     '/_auth/app/imporium/': {
       id: '/_auth/app/imporium/'
-      path: '/app/imporium'
-      fullPath: '/app/imporium'
+      path: '/'
+      fullPath: '/app/imporium/'
       preLoaderRoute: typeof AuthAppImporiumIndexLazyImport
-      parentRoute: typeof AuthRouteLazyImport
+      parentRoute: typeof AuthAppImporiumRouteLazyImport
     }
     '/_auth/dashboard/_librarian/': {
       id: '/_auth/dashboard/_librarian/'
@@ -877,26 +889,40 @@ const AuthDashboardRouteLazyRouteWithChildren =
     AuthDashboardRouteLazyRouteChildren,
   )
 
-interface AuthRouteLazyRouteChildren {
-  AuthDashboardRouteLazyRoute: typeof AuthDashboardRouteLazyRouteWithChildren
-  AuthAppPinaxLazyRoute: typeof AuthAppPinaxLazyRoute
+interface AuthAppImporiumRouteLazyRouteChildren {
   AuthAppImporiumListingsRoute: typeof AuthAppImporiumListingsRoute
+  AuthAppImporiumMarketLogsRoute: typeof AuthAppImporiumMarketLogsRoute
+  AuthAppImporiumMarketplaceRoute: typeof AuthAppImporiumMarketplaceRoute
   AuthAppImporiumNftsRoute: typeof AuthAppImporiumNftsRoute
-  AuthAppImporiumMarketLogsLazyRoute: typeof AuthAppImporiumMarketLogsLazyRoute
-  AuthAppImporiumMarketplaceLazyRoute: typeof AuthAppImporiumMarketplaceLazyRoute
   AuthAppImporiumMyLogsLazyRoute: typeof AuthAppImporiumMyLogsLazyRoute
   AuthAppImporiumIndexLazyRoute: typeof AuthAppImporiumIndexLazyRoute
 }
 
+const AuthAppImporiumRouteLazyRouteChildren: AuthAppImporiumRouteLazyRouteChildren =
+  {
+    AuthAppImporiumListingsRoute: AuthAppImporiumListingsRoute,
+    AuthAppImporiumMarketLogsRoute: AuthAppImporiumMarketLogsRoute,
+    AuthAppImporiumMarketplaceRoute: AuthAppImporiumMarketplaceRoute,
+    AuthAppImporiumNftsRoute: AuthAppImporiumNftsRoute,
+    AuthAppImporiumMyLogsLazyRoute: AuthAppImporiumMyLogsLazyRoute,
+    AuthAppImporiumIndexLazyRoute: AuthAppImporiumIndexLazyRoute,
+  }
+
+const AuthAppImporiumRouteLazyRouteWithChildren =
+  AuthAppImporiumRouteLazyRoute._addFileChildren(
+    AuthAppImporiumRouteLazyRouteChildren,
+  )
+
+interface AuthRouteLazyRouteChildren {
+  AuthDashboardRouteLazyRoute: typeof AuthDashboardRouteLazyRouteWithChildren
+  AuthAppImporiumRouteLazyRoute: typeof AuthAppImporiumRouteLazyRouteWithChildren
+  AuthAppPinaxLazyRoute: typeof AuthAppPinaxLazyRoute
+}
+
 const AuthRouteLazyRouteChildren: AuthRouteLazyRouteChildren = {
   AuthDashboardRouteLazyRoute: AuthDashboardRouteLazyRouteWithChildren,
+  AuthAppImporiumRouteLazyRoute: AuthAppImporiumRouteLazyRouteWithChildren,
   AuthAppPinaxLazyRoute: AuthAppPinaxLazyRoute,
-  AuthAppImporiumListingsRoute: AuthAppImporiumListingsRoute,
-  AuthAppImporiumNftsRoute: AuthAppImporiumNftsRoute,
-  AuthAppImporiumMarketLogsLazyRoute: AuthAppImporiumMarketLogsLazyRoute,
-  AuthAppImporiumMarketplaceLazyRoute: AuthAppImporiumMarketplaceLazyRoute,
-  AuthAppImporiumMyLogsLazyRoute: AuthAppImporiumMyLogsLazyRoute,
-  AuthAppImporiumIndexLazyRoute: AuthAppImporiumIndexLazyRoute,
 }
 
 const AuthRouteLazyRouteWithChildren = AuthRouteLazyRoute._addFileChildren(
@@ -950,6 +976,7 @@ export interface FileRoutesByFullPath {
   '/swap/topup': typeof SwapTopupLazyRoute
   '/info/': typeof InfoIndexLazyRoute
   '/swap': typeof SwapIndexLazyRoute
+  '/app/imporium': typeof AuthAppImporiumRouteLazyRouteWithChildren
   '/app/pinax': typeof AuthAppPinaxLazyRoute
   '/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
   '/dashboard/icp-assets': typeof AuthDashboardIcpAssetsLazyRoute
@@ -957,15 +984,15 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/app/perpetua': typeof AppPerpetuaIndexLazyRoute
   '/app/imporium/listings': typeof AuthAppImporiumListingsRoute
+  '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
+  '/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
   '/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
-  '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsLazyRoute
-  '/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceLazyRoute
   '/app/imporium/my-logs': typeof AuthAppImporiumMyLogsLazyRoute
   '/dashboard/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
   '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
   '/app/perpetua/item/$itemId': typeof AppPerpetuaItemItemIdLazyRoute
   '/app/perpetua/shelf/$shelfId': typeof AppPerpetuaShelfShelfIdLazyRoute
-  '/app/imporium': typeof AuthAppImporiumIndexLazyRoute
+  '/app/imporium/': typeof AuthAppImporiumIndexLazyRoute
   '/dashboard/': typeof AuthDashboardLibrarianIndexLazyRoute
   '/app/perpetua/user/$userId': typeof AppPerpetuaUserUserIdIndexLazyRoute
   '/app/perpetua/user/$userId/item/$itemId': typeof AppPerpetuaUserUserIdItemItemIdLazyRoute
@@ -1007,9 +1034,9 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/app/perpetua': typeof AppPerpetuaIndexLazyRoute
   '/app/imporium/listings': typeof AuthAppImporiumListingsRoute
+  '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
+  '/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
   '/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
-  '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsLazyRoute
-  '/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceLazyRoute
   '/app/imporium/my-logs': typeof AuthAppImporiumMyLogsLazyRoute
   '/dashboard/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
   '/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
@@ -1051,6 +1078,7 @@ export interface FileRoutesById {
   '/swap/topup': typeof SwapTopupLazyRoute
   '/info/': typeof InfoIndexLazyRoute
   '/swap/': typeof SwapIndexLazyRoute
+  '/_auth/app/imporium': typeof AuthAppImporiumRouteLazyRouteWithChildren
   '/_auth/dashboard/_librarian': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   '/_auth/app/pinax': typeof AuthAppPinaxLazyRoute
   '/_auth/dashboard/arweave-assets': typeof AuthDashboardArweaveAssetsLazyRoute
@@ -1059,9 +1087,9 @@ export interface FileRoutesById {
   '/_auth/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/app/perpetua/': typeof AppPerpetuaIndexLazyRoute
   '/_auth/app/imporium/listings': typeof AuthAppImporiumListingsRoute
+  '/_auth/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
+  '/_auth/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceRoute
   '/_auth/app/imporium/nfts': typeof AuthAppImporiumNftsRoute
-  '/_auth/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsLazyRoute
-  '/_auth/app/imporium/marketplace': typeof AuthAppImporiumMarketplaceLazyRoute
   '/_auth/app/imporium/my-logs': typeof AuthAppImporiumMyLogsLazyRoute
   '/_auth/dashboard/_librarian/wallets': typeof AuthDashboardLibrarianWalletsLazyRoute
   '/_auth/dashboard/profile/upgrade': typeof AuthDashboardProfileUpgradeLazyRoute
@@ -1105,6 +1133,7 @@ export interface FileRouteTypes {
     | '/swap/topup'
     | '/info/'
     | '/swap'
+    | '/app/imporium'
     | '/app/pinax'
     | '/dashboard/arweave-assets'
     | '/dashboard/icp-assets'
@@ -1112,15 +1141,15 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/app/perpetua'
     | '/app/imporium/listings'
-    | '/app/imporium/nfts'
     | '/app/imporium/market-logs'
     | '/app/imporium/marketplace'
+    | '/app/imporium/nfts'
     | '/app/imporium/my-logs'
     | '/dashboard/wallets'
     | '/dashboard/profile/upgrade'
     | '/app/perpetua/item/$itemId'
     | '/app/perpetua/shelf/$shelfId'
-    | '/app/imporium'
+    | '/app/imporium/'
     | '/dashboard/'
     | '/app/perpetua/user/$userId'
     | '/app/perpetua/user/$userId/item/$itemId'
@@ -1161,9 +1190,9 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/app/perpetua'
     | '/app/imporium/listings'
-    | '/app/imporium/nfts'
     | '/app/imporium/market-logs'
     | '/app/imporium/marketplace'
+    | '/app/imporium/nfts'
     | '/app/imporium/my-logs'
     | '/dashboard/wallets'
     | '/dashboard/profile/upgrade'
@@ -1203,6 +1232,7 @@ export interface FileRouteTypes {
     | '/swap/topup'
     | '/info/'
     | '/swap/'
+    | '/_auth/app/imporium'
     | '/_auth/dashboard/_librarian'
     | '/_auth/app/pinax'
     | '/_auth/dashboard/arweave-assets'
@@ -1211,9 +1241,9 @@ export interface FileRouteTypes {
     | '/_auth/dashboard/settings'
     | '/app/perpetua/'
     | '/_auth/app/imporium/listings'
-    | '/_auth/app/imporium/nfts'
     | '/_auth/app/imporium/market-logs'
     | '/_auth/app/imporium/marketplace'
+    | '/_auth/app/imporium/nfts'
     | '/_auth/app/imporium/my-logs'
     | '/_auth/dashboard/_librarian/wallets'
     | '/_auth/dashboard/profile/upgrade'
@@ -1341,13 +1371,8 @@ export const routeTree = rootRoute
       "filePath": "_auth/route.lazy.tsx",
       "children": [
         "/_auth/dashboard",
-        "/_auth/app/pinax",
-        "/_auth/app/imporium/listings",
-        "/_auth/app/imporium/nfts",
-        "/_auth/app/imporium/market-logs",
-        "/_auth/app/imporium/marketplace",
-        "/_auth/app/imporium/my-logs",
-        "/_auth/app/imporium/"
+        "/_auth/app/imporium",
+        "/_auth/app/pinax"
       ]
     },
     "/info": {
@@ -1446,6 +1471,18 @@ export const routeTree = rootRoute
     "/swap/": {
       "filePath": "swap/index.lazy.tsx"
     },
+    "/_auth/app/imporium": {
+      "filePath": "_auth/app/imporium/route.lazy.tsx",
+      "parent": "/_auth",
+      "children": [
+        "/_auth/app/imporium/listings",
+        "/_auth/app/imporium/market-logs",
+        "/_auth/app/imporium/marketplace",
+        "/_auth/app/imporium/nfts",
+        "/_auth/app/imporium/my-logs",
+        "/_auth/app/imporium/"
+      ]
+    },
     "/_auth/dashboard/_librarian": {
       "filePath": "_auth/dashboard/_librarian/route.lazy.tsx",
       "parent": "/_auth/dashboard",
@@ -1482,23 +1519,23 @@ export const routeTree = rootRoute
     },
     "/_auth/app/imporium/listings": {
       "filePath": "_auth/app/imporium/listings.tsx",
-      "parent": "/_auth"
+      "parent": "/_auth/app/imporium"
+    },
+    "/_auth/app/imporium/market-logs": {
+      "filePath": "_auth/app/imporium/market-logs.tsx",
+      "parent": "/_auth/app/imporium"
+    },
+    "/_auth/app/imporium/marketplace": {
+      "filePath": "_auth/app/imporium/marketplace.tsx",
+      "parent": "/_auth/app/imporium"
     },
     "/_auth/app/imporium/nfts": {
       "filePath": "_auth/app/imporium/nfts.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/app/imporium/market-logs": {
-      "filePath": "_auth/app/imporium/market-logs.lazy.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/app/imporium/marketplace": {
-      "filePath": "_auth/app/imporium/marketplace.lazy.tsx",
-      "parent": "/_auth"
+      "parent": "/_auth/app/imporium"
     },
     "/_auth/app/imporium/my-logs": {
       "filePath": "_auth/app/imporium/my-logs.lazy.tsx",
-      "parent": "/_auth"
+      "parent": "/_auth/app/imporium"
     },
     "/_auth/dashboard/_librarian/wallets": {
       "filePath": "_auth/dashboard/_librarian/wallets.lazy.tsx",
@@ -1516,7 +1553,7 @@ export const routeTree = rootRoute
     },
     "/_auth/app/imporium/": {
       "filePath": "_auth/app/imporium/index.lazy.tsx",
-      "parent": "/_auth"
+      "parent": "/_auth/app/imporium"
     },
     "/_auth/dashboard/_librarian/": {
       "filePath": "_auth/dashboard/_librarian/index.lazy.tsx",

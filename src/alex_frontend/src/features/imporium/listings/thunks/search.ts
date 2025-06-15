@@ -1,24 +1,18 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { natToArweaveId } from "@/utils/id_convert";
 import { Listing, ListingItem } from "../types";
-import { ActorSubclass } from "@dfinity/agent/lib/cjs";
-import { _SERVICE } from "../../../../../../declarations/emporium/emporium.did";
+import { emporium } from "../../../../../../declarations/emporium/index";
 import LedgerService from "@/utils/LedgerService";
 
-
-// search by id
 const search = createAsyncThunk<
 	Listing, // Return structure
-	{
-		actor: ActorSubclass<_SERVICE>,
-		query: string,
-	},
+	string,
 	{ rejectValue: string }
 >(
 	"imporium/listings/search",
-	async ({actor, query}, { rejectWithValue }) => {
+	async (query, { rejectWithValue }) => {
 		try {
-			const result = await actor.search_listing(query);
+			const result = await emporium.search_listing(query);
 
 			if (result.length === 0) {
 				return rejectWithValue("No nfts found");

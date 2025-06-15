@@ -39,9 +39,7 @@ service : {
   get_caller_logs : (opt nat64, opt nat64, opt nat) -> (Logs) query;
   get_listing : (opt nat64, opt nat64) -> (Listing) query;
   get_listing_total_count : () -> (nat64) query;
-  get_listings : (opt text, opt nat64, opt nat64, opt bool, opt bool) -> (
-      Listing,
-    ) query;
+  get_listings : (opt nat64, opt nat64, opt bool, opt bool) -> (Listing) query;
   get_logs : (opt nat64, opt nat64, opt nat) -> (Logs) query;
   get_search_listing : (
       opt nat64,

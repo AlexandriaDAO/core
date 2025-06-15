@@ -1,8 +1,7 @@
 import { natToArweaveId } from "@/utils/id_convert";
 import LedgerService from "@/utils/LedgerService";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE } from "../../../../../../declarations/emporium/emporium.did";
+import { emporium } from "../../../../../../declarations/emporium";
 import { RootState } from "@/store";
 import { Listing, ListingItem } from "../types";
 
@@ -15,19 +14,18 @@ interface MyListingsResponse {
 
 export const getListings = createAsyncThunk<
 	MyListingsResponse,
-	{actor: ActorSubclass<_SERVICE>, owner?: string},
+	void,
 	{ rejectValue: string, state: RootState }
 >(
 	"imporium/listings/getListings",
-	async ({ actor, owner }, { rejectWithValue, getState }) => {
+	async (_, { rejectWithValue, getState }) => {
 		try {
 			const { page, size, sortByPrice, sortByTime } = getState().imporium.listings;
 
 			const ledgerService = LedgerService();
 
 			// Fetch market listings
-			const result = await actor.get_listings(
-				owner ? [owner] : [],
+			const result = await emporium.get_listings(
 				// page number defaults to 1 if not provided, so pass page + 1
 				[BigInt(page + 1)],
 				// page size defaults to 10 if not provided
@@ -64,16 +62,6 @@ export const getListings = createAsyncThunk<
 					listings[arweaveId] = listItem;
 				}
 			});
-
-			// if (Object.keys(listings).length === 0) {
-			// 	console.warn("No valid tokens found in market listings.");
-			// 	return {
-			// 		nfts: listings,
-			// 		totalPages: result.total_pages || 0,
-			// 		pageSize: result.page_size || 0,
-			// 		currentPage: result.current_page || 0,
-			// 	};
-			// }
 
 			return {
 				nfts: listings,

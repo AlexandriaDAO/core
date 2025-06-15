@@ -105,7 +105,6 @@ pub fn get_listing_total_count() -> usize {
 
 #[query]
 pub fn get_listings(
-    owner: Option<String>,
     page: Option<u64>,
     page_size: Option<u64>,
     sort_by_price: Option<bool>, // true for ascending, false for descending
@@ -120,20 +119,6 @@ pub fn get_listings(
         // Filter listings based on owner parameter
         let mut filtered_nfts: Vec<(String, Nft)> = nft_map
             .iter()
-            .filter(|(_, nft)| {
-                match &owner {
-                    None => true, // No owner specified, return all listings
-                    Some(owner_str) => {
-                        // Try to parse the owner as a Principal
-                        if let Ok(owner_principal) = Principal::from_text(owner_str) {
-                            nft.owner == owner_principal
-                        } else {
-                            // If invalid Principal format, return no NFTs (empty result)
-                            false
-                        }
-                    }
-                }
-            })
             .map(|(token_id, nft)| (token_id.clone(), nft.clone())) // Clone to ensure ownership
             .collect();
 

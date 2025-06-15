@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { PageSizeOptions, setSize, setPage } from "../listingsSlice";
 import { useAppDispatch} from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from '@/store/hooks/useAppSelector';
@@ -11,20 +11,23 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/lib/components/select";
+import getListings from '../thunks/getListings';
 
 const PageSize: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const { size, found } = useAppSelector((state) => state.imporium.listings);
 
-	useEffect(() => {
+    const handleSizeChange = (value: string) => {
+        dispatch(setSize(Number(value)));
 		dispatch(setPage(0));
-	}, [size]);
+        dispatch(getListings());
+    };
 
 	return (
         <Select
             disabled={Object.keys(found).length > 0}
             value={size.toString()}
-            onValueChange={(value) => dispatch(setSize(Number(value)))}
+            onValueChange={handleSizeChange}
         >
             <SelectTrigger className="w-32 min-w-28 h-12 font-syne border-border focus:ring-1 focus:outline-0">
                 <SelectValue placeholder="Page Size" />

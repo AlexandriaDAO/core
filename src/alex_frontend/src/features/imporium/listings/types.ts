@@ -11,6 +11,9 @@ export interface ListingsState {
 	// arweave ids
 	nfts: Listing;
 
+	// search query
+	query: string;
+
 	// search results
 	found: Listing;
 

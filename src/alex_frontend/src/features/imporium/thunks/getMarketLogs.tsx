@@ -1,5 +1,4 @@
-import { ActorSubclass } from "@dfinity/agent";
-import { _SERVICE } from "../../../../../declarations/emporium/emporium.did";
+import { emporium } from "../../../../../declarations/emporium/index";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { TransformedLog } from "../types";
 import { transformLogEntry } from "../utils";
@@ -12,16 +11,15 @@ const getMarketLogs = createAsyncThunk<
 		currentPage: number;
 	},
 	{
-		actor: ActorSubclass<_SERVICE>;
 		page?: number;
 		pageSize?: number;
 	},
 	{ rejectValue: string }
 >(
 	"imporium/getMarketLogs",
-	async ({ actor, page = 1, pageSize = 10 }, { rejectWithValue }) => {
+	async ({ page = 1, pageSize = 10 }, { rejectWithValue }) => {
 		try {
-			const response = await actor.get_logs(
+			const response = await emporium.get_logs(
 				[BigInt(page)],
 				[BigInt(pageSize)],
 				[]

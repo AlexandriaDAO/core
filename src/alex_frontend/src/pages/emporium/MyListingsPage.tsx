@@ -28,7 +28,7 @@ const MyListingsPage = () => {
 
     useEffect(() => {
         if(!actor || !user) return;
-        dispatch(getListings({actor, owner: user.principal}));
+        // dispatch(getListings({actor, owner: user.principal}));
     }, [actor, user, page, size, sortByPrice, sortByTime]);
 
     const handlePageClick = (event: { selected: number }) => {

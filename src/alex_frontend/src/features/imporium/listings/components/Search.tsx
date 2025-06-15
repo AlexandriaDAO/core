@@ -1,46 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/lib/components/input';
 import { Button } from '@/lib/components/button';
 import { SearchIcon, X } from 'lucide-react';
-import useEmporium from '@/hooks/actors/useEmporium';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
-import searchThunk from '../thunks/search';
-import { clearFound } from '../listingsSlice';
-import { useNavigate, useSearch } from '@tanstack/react-router';
+import { clearSearch, setQuery } from '../listingsSlice';
+import { useNavigate } from '@tanstack/react-router';
+import { useAppSelector } from '@/store/hooks/useAppSelector';
 
 const Search: React.FC = () => {
-    const { actor } = useEmporium();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const [query, setQuery] = useState('');
 
-    const search:any = useSearch({ strict: false});
-
-    useEffect(() => {
-        if (!actor) return;
-        const searchTerm = search.search;
-        if (searchTerm) {
-            setQuery(searchTerm);
-            dispatch(searchThunk({actor, query: searchTerm}))
-        }
-    }, [search]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setQuery(e.target.value);
-    };
+    const { query } = useAppSelector((state) => state.imporium.listings);
 
     const handleClear = () => {
-        setQuery('');
-        dispatch(clearFound());
+        dispatch(clearSearch());
 
         navigate({
-            to: '/app/imporium/marketplace'
+            to: '/app/imporium/marketplace',
+            search: { search: undefined }
         })
     };
 
     const handleSearch = async () => {
-        if (!actor) return;
-
         if (query.trim()) navigate({ to: '/app/imporium/marketplace', search: { search: query } })
         else handleClear();
     };
@@ -51,7 +33,7 @@ const Search: React.FC = () => {
                 <SearchIcon className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2" />
                 <Input
                     value={query}
-                    onChange={handleChange}
+                    onChange={(e) => dispatch(setQuery(e.target.value))}
                     placeholder="Search by ID or Principal"
                     className='w-full h-full px-8 bg-transparent font-syne border-border'
                     scale="md"

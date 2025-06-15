@@ -4,7 +4,6 @@ import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketLogs from "../thunks/getMarketLogs";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import CopyHelper from "@/features/swap/components/copyHelper";
-import useEmporium from "@/hooks/actors/useEmporium";
 import "./style.css"
 
 // Define table columns
@@ -92,8 +91,6 @@ const columns = [
 const MarketLogs: React.FC = () => {
     const dispatch = useAppDispatch();
 
-    const {actor} = useEmporium();
-
     const {logs, totalPages, pageSize} = useAppSelector((state) => state.imporium);
 
     return (
@@ -109,8 +106,7 @@ const MarketLogs: React.FC = () => {
                 total: totalPages * 10,
                 pageSize: 10,
                 onChange: (page, pageSize) => {
-                    if(!actor) return;
-                    dispatch(getMarketLogs({actor, page, pageSize }));
+                    dispatch(getMarketLogs({page, pageSize }));
                 },
                 className: "custom-pagination"
             }}

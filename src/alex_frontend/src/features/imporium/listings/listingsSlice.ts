@@ -17,6 +17,7 @@ export const PageSizeOptions: number[] = [4, 8, 16, 48];
 const initialState: ListingsState = {
 	nfts: {},
 	found: {},
+	query: '',
 	page: 0,
 	size: PageSizeOptions[0],
 	pages: null,
@@ -41,6 +42,9 @@ const listingsSlice = createSlice({
 	name: "imporium/listings",
 	initialState,
 	reducers: {
+		setQuery(state, action: PayloadAction<string>) {
+			state.query = action.payload;
+		},
 		setSize(state, action: PayloadAction<number>) {
 			state.size = action.payload;
 		},
@@ -61,7 +65,8 @@ const listingsSlice = createSlice({
 			state.sortByPrice = null;
 			state.sortByTime = state.sortByTime === null ? true : state.sortByTime ? false : null;
 		},
-		clearFound(state) {
+		clearSearch(state) {
+			state.query = '';
 			state.found = {};
 			state.error = null;
 		},
@@ -173,6 +178,6 @@ const listingsSlice = createSlice({
 	},
 });
 
-export const { setSize, setPage, setLoading, setError, toggleSortByPrice, toggleSortByTime, clearFound } = listingsSlice.actions;
+export const { setQuery, setSize, setPage, setLoading, setError, toggleSortByPrice, toggleSortByTime, clearSearch } = listingsSlice.actions;
 
 export default listingsSlice.reducer;
