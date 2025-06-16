@@ -5,7 +5,7 @@ import AuthNavigation from "./AuthNavigation";
 
 const DashboardSidebar = () => {
     return (
-        <div className="h-full flex flex-col justify-between p-4">
+        <div className="flex flex-col justify-between p-4">
             <div className="flex flex-col gap-8">
                 <div className="flex flex-col gap-3">
                     <Link
