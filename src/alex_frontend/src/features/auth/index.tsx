@@ -12,6 +12,7 @@ const AlexActor = lazy(() => import("@/actors").then(module => ({ default: modul
 const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
 const LbryActor = lazy(() => import("@/actors").then(module => ({ default: module.LbryActor })));
 const IcpLedgerActor = lazy(() => import("@/actors").then(module => ({ default: module.IcpLedgerActor })));
+const IcpSwapFactoryActor = lazy(() => import("@/actors").then(module => ({ default: module.IcpSwapFactoryActor })));
 
 const Auth = () => {
     // const {provider} = useAuth();
@@ -22,7 +23,9 @@ const Auth = () => {
                     <LbryActor>
                         <IcpLedgerActor>
                             <AlexActor>
-                                <BalanceDisplay />
+                                <IcpSwapFactoryActor>
+                                    <BalanceDisplay />
+                                </IcpSwapFactoryActor>
                             </AlexActor>
                         </IcpLedgerActor>
                     </LbryActor>
