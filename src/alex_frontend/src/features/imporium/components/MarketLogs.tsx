@@ -1,122 +1,114 @@
 import React from "react";
-import { Table, Tag } from "antd";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import getMarketLogs from "../thunks/getMarketLogs";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
-import CopyHelper from "@/features/swap/components/copyHelper";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/lib/components/table";
+import ReactPaginate from 'react-paginate';
 import "./style.css"
-
-// Define table columns
-const columns = [
-    {
-        title: <div className="text-lg font-bold text-[#333] font-[Syne] whitespace-nowrap dark:text-white">Timestamp</div>,
-        dataIndex: "timestamp",
-        key: "timestamp",
-        width: "15%",
-        render: (timestamp: string) => {
-            const formattedDate = new Date(parseInt(timestamp) / 1e6).toLocaleString(); // Convert timestamp to readable format
-
-            return (
-                <div className="text-[15px]  p-0 bg-[transparent] border-[0] font-medium font-[Syne] dark:text-white">
-                    🕒 {formattedDate}
-                </div>
-            );
-        }
-    },
-    {
-        title: <div className="text-lg font-bold text-[#333] font-[Syne] whitespace-nowrap dark:text-white">Token ID</div>,
-        dataIndex: "token_id",
-        key: "token_id",
-        width: "15%",
-        render: (token_id: string) => {
-
-            return (
-                <div className="text-[15px]  p-0 bg-[transparent] border-[0] font-medium font-[Syne] dark:text-white flex items-center">
-                    {token_id.slice(0, 5) + "..." + token_id.slice(-4) }<span className="ml-2"><CopyHelper account={token_id} /></span> 
-                </div>
-            );
-        }
-
-    },
-    {
-        title: <div className="text-lg font-bold text-[#333] font-[Syne] whitespace-nowrap dark:text-white">Owner</div>,
-        dataIndex: "seller",
-        key: "seller",
-        width: "15%",
-        render: (seller: string) => {
-
-            return (
-                <div className="text-[15px]  p-0 bg-[transparent] border-[0] font-medium font-[Syne] dark:text-white flex items-center">
-                     {seller.slice(0, 5) + "..." + seller.slice(-4) } <span className="ml-2"><CopyHelper account={seller} /></span> 
-                </div>
-            );
-        }
-    },
-
-    {
-        title: <div className="text-lg font-bold text-[#333] font-[Syne] whitespace-nowrap dark:text-white">Action</div>,
-        dataIndex: "action",
-        key: "action",
-        width: "15%",
-        render: (action: any, record: any) => {
-                   let actionText = action?.type;
-                   if (action?.type === "PriceUpdate" ) {
-                       actionText = `📈 Price Changed: ${Number(action.oldPrice) / 1e8} → ${Number(action.newPrice) / 1e8} ICP`;
-                   } else if (action?.type === "Sold") {
-                       actionText = `🛍️ Sold at  ${Number(action.price) / 1e8}  ICP`;
-                   } else if (action?.type === "Listed") {
-                       actionText = `🏷️ Listed at ${Number(action.price) / 1e8} ICP`;
-                   } else if (action?.type === "Removed") {
-                       actionText = `🚫 Delisted`;
-       
-                   }
-       
-                   return (
-                       <div style={{ overflowX: "auto" }}>
-                           <Tag className="text-[15px] p-0 whitespace-nowrap bg-[transparent] border-[0] font-medium font-[Syne] dark:text-white">
-                               {actionText}
-                           </Tag>
-                           {record.buyer && (
-                               <div className="mt-[10px] text-sm text-[#333] whitespace-nowrap dark:text-white">
-                                   🛒 <b>Buyer:</b> <span className="text-[#333] dark:text-white">{record.buyer}</span>
-                               </div>
-                           )}
-                       </div>
-                   );
-               },
-            
-    },
-];
+import Copy from "@/components/Copy";
 
 const MarketLogs: React.FC = () => {
     const dispatch = useAppDispatch();
+    const { logs, totalPages, pageSize } = useAppSelector((state) => state.imporium);
+    const [page, setPage] = React.useState(0);
 
-    const {logs, totalPages, pageSize} = useAppSelector((state) => state.imporium);
+    const handlePageClick = (event: { selected: number }) => {
+        const newPage = event.selected + 1; // ReactPaginate is 0-based, our API is 1-based
+        setPage(event.selected);
+        dispatch(getMarketLogs({ page: newPage, pageSize }));
+    };
 
     return (
-        <Table
-            columns={columns}
-            dataSource={logs}
-            rowKey="timestamp"
-            className="custom-pagination-table"
-            rowClassName={(record, index) =>
-                ` hover:bg-[#F3F3F2] dark:hover:bg-gray-600 ${index % 2 === 0 ? "bg-gray-100 dark:bg-[#2D2A26]" : "bg-white dark:bg-[#3A3630]"} `
-            }
-            pagination={{
-                total: totalPages * 10,
-                pageSize: 10,
-                onChange: (page, pageSize) => {
-                    dispatch(getMarketLogs({page, pageSize }));
-                },
-                className: "custom-pagination"
-            }}
-            bordered
-            rowHoverable={false}
-            scroll={{ x: "max-content" }} 
-            style={{ minWidth: "100%" }}
-        />
-
+        <div className="">
+            <Table className="rounded-md border">
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="text-lg font-bold text-[#333] font-[Syne] whitespace-nowrap dark:text-white">Timestamp</TableHead>
+                        <TableHead className="text-lg font-bold text-[#333] font-[Syne] whitespace-nowrap dark:text-white">Token ID</TableHead>
+                        <TableHead className="text-lg font-bold text-[#333] font-[Syne] whitespace-nowrap dark:text-white">Owner</TableHead>
+                        <TableHead className="text-lg text-center font-bold text-[#333] font-[Syne] whitespace-nowrap dark:text-white">Action</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {logs && Array.isArray(logs) && logs.length > 0 ? logs.map((log, index) => (
+                        <TableRow
+                            key={log.timestamp}
+                            className={`hover:bg-[#F3F3F2] dark:hover:bg-gray-600 ${
+                                index % 2 === 0
+                                    ? "bg-gray-100 dark:bg-[#2D2A26]"
+                                    : "bg-white dark:bg-[#3A3630]"
+                            }`}
+                        >
+                            <TableCell>
+                                🕒 {new Date(parseInt(log.timestamp) / 1e6).toLocaleString()}
+                            </TableCell>
+                            <TableCell>
+                                <div className="flex items-center gap-2">
+                                    {log.token_id.slice(0, 5) + "..." + log.token_id.slice(-4)}
+                                    <Copy text={log.token_id} size="sm"/>
+                                </div>
+                            </TableCell>
+                            <TableCell>
+                                <div className="flex items-center gap-2">
+                                    {log.seller.slice(0, 5) + "..." + log.seller.slice(-4)}
+                                    <Copy text={log.seller} size="sm"/>
+                                </div>
+                            </TableCell>
+                            <TableCell>
+                                <div className="overflow-x-auto text-center">
+                                    <div className="text-[15px] p-0 whitespace-nowrap bg-[transparent] border-[0] font-medium font-[Syne] dark:text-white">
+                                        {log.action.type === "PriceUpdate" && `📈 Price Changed: ${Number(log.action.oldPrice) / 1e8} → ${Number(log.action.newPrice) / 1e8} ICP`}
+                                        {log.action.type === "Sold" && `🛍️ ${'price' in log.action ? `Sold at ${Number(log.action.price) / 1e8} ICP` : 'Sold'}`}
+                                        {log.action.type === "Listed" && `🏷️ ${'price' in log.action ? `Listed at ${Number(log.action.price) / 1e8} ICP` : 'Listed'}`}
+                                        {log.action.type === "Removed" && `🚫 Delisted`}
+                                    </div>
+                                    {log.buyer && (
+                                        <div className="mt-[10px] text-sm text-[#333] whitespace-nowrap dark:text-white">
+                                            🛒 <b>Buyer:</b> <span className="text-[#333] dark:text-white">{log.buyer}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    )) : (
+                        <TableRow>
+                            <TableCell colSpan={4} className="text-center">No logs found</TableCell>
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+            
+            {/* Pagination */}
+            {totalPages > 0 && (
+                <div className="flex justify-center my-8">
+                    <ReactPaginate
+                        previousLabel="←"
+                        nextLabel="→"
+                        breakLabel="..."
+                        pageCount={totalPages}
+                        marginPagesDisplayed={2}
+                        pageRangeDisplayed={3}
+                        onPageChange={handlePageClick}
+                        forcePage={page}
+                        containerClassName="flex items-center gap-1"
+                        pageLinkClassName="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-accent transition-colors duration-200"
+                        previousLinkClassName="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-accent transition-colors duration-200"
+                        nextLinkClassName="flex items-center justify-center w-10 h-10 rounded-lg border border-border hover:bg-accent transition-colors duration-200"
+                        breakLinkClassName="flex items-center justify-center w-10 h-10 text-muted-foreground"
+                        activeLinkClassName="!bg-primary text-white hover:!bg-primary/90"
+                        disabledLinkClassName="opacity-50 cursor-not-allowed hover:bg-transparent"
+                    />
+                </div>
+            )}
+        </div>
     );
-}
+};
 
 export default MarketLogs;

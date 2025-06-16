@@ -35,14 +35,12 @@ const MarketLogsPage = () => {
                     <RefreshCcw strokeWidth={2} size={16} className={`${loading ? 'animate-spin' : ''}`} />
                 </Button>
             </div>
-            <div className="p-2">
-                <div className="lg:mb-20 md:mb-16 sm:mb-10 xs:mb-6">
-                    {logs && Array.isArray(logs) && logs.length <= 0 ? (
-                        <div className="text-center py-12">
-                            <p className="text-muted-foreground text-lg">There are no logs yet.</p>
-                        </div>
-                    ) : <MarketLogs />}
-                </div>
+            <div className="lg:mb-20 md:mb-16 sm:mb-10 xs:mb-6">
+                {logs && Array.isArray(logs) && logs.length <= 0 ? (
+                    <div className="text-center py-12">
+                        <p className="text-muted-foreground text-lg">There are no logs yet.</p>
+                    </div>
+                ) : <MarketLogs />}
             </div>
         </div>
     );
