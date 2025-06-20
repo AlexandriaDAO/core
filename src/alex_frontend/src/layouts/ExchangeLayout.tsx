@@ -174,36 +174,53 @@ function ExchangeLayout() {
             )}
             <div className="bg-card rounded-bordertb shadow">
                 <nav className="flex justify-center gap-2 p-2" aria-label="Tabs">
-                    <Link
-                        to="/exchange"
-                        className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
-                        activeProps={{
-                            className: "bg-primary text-primary-foreground shadow-md"
-                        }}
-                        inactiveProps={{
-                            className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
-                        }}
-                        activeOptions={{
-                            exact: true
-                        }}
-                    >
-                        Exchange
-                    </Link>
-                    <Link
-                        to="/exchange/burn"
-                        className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
-                        activeProps={{
-                            className: "bg-primary text-primary-foreground shadow-md"
-                        }}
-                        inactiveProps={{
-                            className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
-                        }}
-                        activeOptions={{
-                            exact: true
-                        }}
-                    >
-                        Burn
-                    </Link>
+                    {user && <>
+                        <Link
+                            to="/exchange"
+                            className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
+                            activeProps={{
+                                className: "bg-primary text-primary-foreground shadow-md"
+                            }}
+                            inactiveProps={{
+                                className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
+                            }}
+                            activeOptions={{
+                                exact: true
+                            }}
+                        >
+                            Exchange
+                        </Link>
+                        <Link
+                            to="/exchange/burn"
+                            className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
+                            activeProps={{
+                                className: "bg-primary text-primary-foreground shadow-md"
+                            }}
+                            inactiveProps={{
+                                className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
+                            }}
+                            activeOptions={{
+                                exact: true
+                            }}
+                        >
+                            Burn
+                        </Link>
+                        <Link
+                            to="/exchange/redeem"
+                            className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
+                            activeProps={{
+                                className: "bg-primary text-primary-foreground shadow-md"
+                            }}
+                            inactiveProps={{
+                                className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
+                            }}
+                            activeOptions={{
+                                exact: true
+                            }}
+                        >
+                            Redeem
+                        </Link>
+                    </>}
                     <Link
                         to="/exchange/stake"
                         className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
@@ -217,22 +234,7 @@ function ExchangeLayout() {
                             exact: true
                         }}
                     >
-                        Stake
-                    </Link>
-                    <Link
-                        to="/exchange/redeem"
-                        className="px-6 py-2 rounded-bordertb font-medium text-tabsheading transition-colors duration-200"
-                        activeProps={{
-                            className: "bg-primary text-primary-foreground shadow-md"
-                        }}
-                        inactiveProps={{
-                            className: "bg-transparent text-muted-foreground hover:bg-muted hover:text-primary"
-                        }}
-                        activeOptions={{
-                            exact: true
-                        }}
-                    >
-                        Redeem
+                        Staking
                     </Link>
                     <Link
                         to="/exchange/history"
