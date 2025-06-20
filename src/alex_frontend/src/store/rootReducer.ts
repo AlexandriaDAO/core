@@ -40,6 +40,7 @@ import imporiumReducer from '@/features/imporium/imporiumSlice';
 import userDisplayReducer from './slices/userDisplaySlice';
 import balanceReducer from '@/features/balance/balanceSlice';
 import insightsReducer from '@/features/insights/insightsSlice';
+import historyReducer from '@/features/history/historySlice';
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -84,6 +85,7 @@ const rootReducer = combineReducers({
 	userDisplay: userDisplayReducer,
 	balance: balanceReducer,
 	insights: insightsReducer,
+	history: historyReducer,
 });
 
 export default rootReducer;
