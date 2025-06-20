@@ -1,8 +1,8 @@
-import { _SERVICE as _SERVICELBRY } from "../../../../../declarations/LBRY/LBRY.did";
-import { _SERVICE as _SERVICEALEX } from "../../../../../declarations/ALEX/ALEX.did";
+import { LBRY } from "../../../../../declarations/LBRY";
+import { ALEX } from "../../../../../declarations/ALEX";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import LedgerService from "@/utils/LedgerService";
-import { ActorSubclass } from "@dfinity/agent";
+import { RootState } from "@/store";
 
 export interface TransactionType {
   type: string;
@@ -15,35 +15,33 @@ export interface TransactionType {
 
 const fetchTransactions = createAsyncThunk<
   TransactionType[],
-  {
-    lbryActor: ActorSubclass<_SERVICELBRY>,
-    alexActor: ActorSubclass<_SERVICEALEX>,
-    account: string
-  },
-  { rejectValue: string }
->("history/fetchTransactions", async ({ lbryActor, alexActor, account }, { rejectWithValue }) => {
+  void,
+  { rejectValue: string, state: RootState }
+>("history/fetchTransactions", async (_, { rejectWithValue , getState}) => {
   try {
+    const user = getState().auth;
+
     // Retrieve LBRY transactions
-    const resultLbryPeek = await lbryActor.get_transactions({
+    const resultLbryPeek = await LBRY.get_transactions({
       start: 0n,
       length: 1n,
     });
-    const lbryResult = await lbryActor.get_transactions({
+    const lbryResult = await LBRY.get_transactions({
       start: 0n,
       length: resultLbryPeek.log_length,
     });
 
-    const resultAlexPeek = await lbryActor.get_transactions({
+    const resultAlexPeek = await LBRY.get_transactions({
       start: 0n,
       length: 1n,
     });
-    const resultAlexResult = await alexActor.get_transactions({
+    const resultAlexResult = await ALEX.get_transactions({
       start: 0n,
       length: resultAlexPeek.log_length,
     });
 
     // Retrieve ALEX transactions
-    const alexResult = await alexActor.get_transactions({
+    const alexResult = await ALEX.get_transactions({
       start: 0n,
       length: resultAlexResult.log_length,
     });
@@ -56,6 +54,7 @@ const fetchTransactions = createAsyncThunk<
     
     // Filter transactions where the `to` or `from` owner matches the provided account
     const filteredTransactions = allTransactions.filter((transaction) => {
+      if(!(user && 'principal' in user)) return true;
       // Check for the owner in different transaction types
       const toOwner =
           transaction.mint?.[0]?.to?.owner ||
@@ -68,7 +67,7 @@ const fetchTransactions = createAsyncThunk<
           transaction.burn?.[0]?.from?.owner;
   
       return (
-          toOwner?.toString() === account || fromOwner?.toString() === account
+          toOwner?.toString() === user.principal || fromOwner?.toString() === user.principal
       );
   });
 

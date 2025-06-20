@@ -3,29 +3,17 @@ import { useAppSelector } from '@/store/hooks/useAppSelector';
 import TransactionHistory from '@/features/history/components/TransactionHistory';
 import TransactionPreview from '@/features/history/components/TransactionPreview';
 import { Alert } from '@/components/Alert';
-import { useAlex, useLbry } from '@/hooks/actors';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import { fetchTransactions } from '@/features/history';
 
 const HistoryPage: React.FC = () => {
-  const {actor: lbryActor} = useLbry();
-  const {actor: alexActor} = useAlex();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-
   const { transactions, loading, error } = useAppSelector((state) => state.history);
 
-
   useEffect(() => {
-    if(!user || !lbryActor || !alexActor) return;
-    
-    console.log('Fetching transactions for user:', user.principal);
-    dispatch(fetchTransactions({lbryActor, alexActor, account: user.principal}));
-  }, [user, lbryActor, alexActor, dispatch]);
-
-console.log('History state:', history);
-
-
+    dispatch(fetchTransactions());
+  }, [user]);
 
   if (loading) {
     return (

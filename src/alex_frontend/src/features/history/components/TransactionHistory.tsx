@@ -15,6 +15,7 @@ import {
 
 const TransactionHistory = () => {
     const history = useAppSelector((state) => state.history);
+    const {user} = useAppSelector(state=>state.auth);
 
     return (
         <div className="space-y-6">
@@ -22,7 +23,7 @@ const TransactionHistory = () => {
             <div className="space-y-2">
                 <h2 className="text-2xl font-semibold text-foreground">Transaction History</h2>
                 <p className="text-sm text-muted-foreground">
-                    View your recent transaction activity across all tokens
+                    {user ? 'View your recent transaction activity across all tokens': 'View recent Public transactions across all tokens'}
                 </p>
             </div>
 
