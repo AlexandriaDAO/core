@@ -38,6 +38,7 @@ import arweaveAssetsReducer from '@/features/arweave-assets/arweaveAssetsSlice';
 import icpAssetsReducer from '@/features/icp-assets/icpAssetsSlice';
 import imporiumReducer from '@/features/imporium/imporiumSlice';
 import userDisplayReducer from './slices/userDisplaySlice';
+import balanceReducer from '@/features/balance/balanceSlice';
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -80,6 +81,7 @@ const rootReducer = combineReducers({
 	arweaveAssets: arweaveAssetsReducer,
 	icpAssets: icpAssetsReducer,
 	userDisplay: userDisplayReducer,
+	balance: balanceReducer,
 });
 
 export default rootReducer;
