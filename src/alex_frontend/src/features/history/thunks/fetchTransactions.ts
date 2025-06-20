@@ -19,7 +19,7 @@ const fetchTransactions = createAsyncThunk<
   { rejectValue: string, state: RootState }
 >("history/fetchTransactions", async (_, { rejectWithValue , getState}) => {
   try {
-    const user = getState().auth;
+    const {user} = getState().auth;
 
     // Retrieve LBRY transactions
     const resultLbryPeek = await LBRY.get_transactions({
@@ -54,7 +54,7 @@ const fetchTransactions = createAsyncThunk<
     
     // Filter transactions where the `to` or `from` owner matches the provided account
     const filteredTransactions = allTransactions.filter((transaction) => {
-      if(!(user && 'principal' in user)) return true;
+      if(!user || !user.principal) return true;
       // Check for the owner in different transaction types
       const toOwner =
           transaction.mint?.[0]?.to?.owner ||

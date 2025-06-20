@@ -25,14 +25,6 @@ const AlexLockedBalance: React.FC<AlexLockedBalanceProps> = ({ menu }) => {
         <DropdownMenuItem className="cursor-pointer flex justify-between items-center gap-2">
           <Lock />
           <span className="flex-grow text-left">ALEX</span>
-          {lockedLoading ? (
-            <LoaderCircle size={12} className="animate-spin" />
-          ) : (
-            <span className="font-mono text-xs">
-              {locked} ALEX
-            </span>
-          )}
-
 					{lockedLoading ? (
 						<LoaderCircle size={12} className="animate-spin" />
 					) : locked >=0 ? locked.toFixed(3):(

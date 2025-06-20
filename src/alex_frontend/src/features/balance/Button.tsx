@@ -105,7 +105,6 @@ const BalanceButton = () => {
             <DropdownMenuTrigger asChild>
                 <div className="flex-shrink h-auto w-max flex justify-center items-center gap-1 px-4 py-2 bg-gradient-to-r from-gray-800 to-gray-700 border border-gray-600 text-white hover:text-white/90 hover:border-white rounded-full cursor-pointer duration-300 transition-all">
                     {total > 0 ? <>
-                        <span className="text-gray-400">≈</span>
                         <span className="text-base font-normal font-roboto-condensed tracking-wider">${total.toFixed(2)}</span>
                     </> : (
                         <span className="text-base font-normal font-roboto-condensed tracking-wider">Balance</span>
