@@ -14,6 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as SwapTransactionImport } from './routes/swap/transaction'
+import { Route as ExchangeInsightsImport } from './routes/exchange/insights'
 import { Route as AuthAppImporiumNftsImport } from './routes/_auth/app/imporium/nfts'
 import { Route as AuthAppImporiumMarketplaceImport } from './routes/_auth/app/imporium/marketplace'
 import { Route as AuthAppImporiumMarketLogsImport } from './routes/_auth/app/imporium/market-logs'
@@ -45,7 +46,6 @@ const InfoFaqLazyImport = createFileRoute('/info/faq')()
 const InfoAuditLazyImport = createFileRoute('/info/audit')()
 const ExchangeStakeLazyImport = createFileRoute('/exchange/stake')()
 const ExchangeRedeemLazyImport = createFileRoute('/exchange/redeem')()
-const ExchangeInsightsLazyImport = createFileRoute('/exchange/insights')()
 const ExchangeHistoryLazyImport = createFileRoute('/exchange/history')()
 const ExchangeBurnLazyImport = createFileRoute('/exchange/burn')()
 const AppSyllogosLazyImport = createFileRoute('/app/syllogos')()
@@ -257,14 +257,6 @@ const ExchangeRedeemLazyRoute = ExchangeRedeemLazyImport.update({
   import('./routes/exchange/redeem.lazy').then((d) => d.Route),
 )
 
-const ExchangeInsightsLazyRoute = ExchangeInsightsLazyImport.update({
-  id: '/insights',
-  path: '/insights',
-  getParentRoute: () => ExchangeRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/exchange/insights.lazy').then((d) => d.Route),
-)
-
 const ExchangeHistoryLazyRoute = ExchangeHistoryLazyImport.update({
   id: '/history',
   path: '/history',
@@ -336,6 +328,14 @@ const SwapTransactionRoute = SwapTransactionImport.update({
   path: '/swap/transaction',
   getParentRoute: () => rootRoute,
 } as any)
+
+const ExchangeInsightsRoute = ExchangeInsightsImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => ExchangeRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/exchange/insights.lazy').then((d) => d.Route),
+)
 
 const AppPerpetuaIndexLazyRoute = AppPerpetuaIndexLazyImport.update({
   id: '/app/perpetua/',
@@ -576,6 +576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ManagerLazyImport
       parentRoute: typeof rootRoute
     }
+    '/exchange/insights': {
+      id: '/exchange/insights'
+      path: '/insights'
+      fullPath: '/exchange/insights'
+      preLoaderRoute: typeof ExchangeInsightsImport
+      parentRoute: typeof ExchangeRouteLazyImport
+    }
     '/swap/transaction': {
       id: '/swap/transaction'
       path: '/swap/transaction'
@@ -644,13 +651,6 @@ declare module '@tanstack/react-router' {
       path: '/history'
       fullPath: '/exchange/history'
       preLoaderRoute: typeof ExchangeHistoryLazyImport
-      parentRoute: typeof ExchangeRouteLazyImport
-    }
-    '/exchange/insights': {
-      id: '/exchange/insights'
-      path: '/insights'
-      fullPath: '/exchange/insights'
-      preLoaderRoute: typeof ExchangeInsightsLazyImport
       parentRoute: typeof ExchangeRouteLazyImport
     }
     '/exchange/redeem': {
@@ -1040,18 +1040,18 @@ const AuthRouteLazyRouteWithChildren = AuthRouteLazyRoute._addFileChildren(
 )
 
 interface ExchangeRouteLazyRouteChildren {
+  ExchangeInsightsRoute: typeof ExchangeInsightsRoute
   ExchangeBurnLazyRoute: typeof ExchangeBurnLazyRoute
   ExchangeHistoryLazyRoute: typeof ExchangeHistoryLazyRoute
-  ExchangeInsightsLazyRoute: typeof ExchangeInsightsLazyRoute
   ExchangeRedeemLazyRoute: typeof ExchangeRedeemLazyRoute
   ExchangeStakeLazyRoute: typeof ExchangeStakeLazyRoute
   ExchangeIndexLazyRoute: typeof ExchangeIndexLazyRoute
 }
 
 const ExchangeRouteLazyRouteChildren: ExchangeRouteLazyRouteChildren = {
+  ExchangeInsightsRoute: ExchangeInsightsRoute,
   ExchangeBurnLazyRoute: ExchangeBurnLazyRoute,
   ExchangeHistoryLazyRoute: ExchangeHistoryLazyRoute,
-  ExchangeInsightsLazyRoute: ExchangeInsightsLazyRoute,
   ExchangeRedeemLazyRoute: ExchangeRedeemLazyRoute,
   ExchangeStakeLazyRoute: ExchangeStakeLazyRoute,
   ExchangeIndexLazyRoute: ExchangeIndexLazyRoute,
@@ -1084,6 +1084,7 @@ export interface FileRoutesByFullPath {
   '/exchange': typeof ExchangeRouteLazyRouteWithChildren
   '/info': typeof InfoRouteLazyRouteWithChildren
   '/manager': typeof ManagerLazyRoute
+  '/exchange/insights': typeof ExchangeInsightsRoute
   '/swap/transaction': typeof SwapTransactionRoute
   '/dashboard': typeof AuthDashboardLibrarianRouteLazyRouteWithChildren
   '/app/alexandrian': typeof AppAlexandrianLazyRoute
@@ -1094,7 +1095,6 @@ export interface FileRoutesByFullPath {
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/burn': typeof ExchangeBurnLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
-  '/exchange/insights': typeof ExchangeInsightsLazyRoute
   '/exchange/redeem': typeof ExchangeRedeemLazyRoute
   '/exchange/stake': typeof ExchangeStakeLazyRoute
   '/info/audit': typeof InfoAuditLazyRoute
@@ -1141,6 +1141,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '': typeof AuthRouteLazyRouteWithChildren
   '/manager': typeof ManagerLazyRoute
+  '/exchange/insights': typeof ExchangeInsightsRoute
   '/swap/transaction': typeof SwapTransactionRoute
   '/dashboard': typeof AuthDashboardLibrarianIndexLazyRoute
   '/app/alexandrian': typeof AppAlexandrianLazyRoute
@@ -1151,7 +1152,6 @@ export interface FileRoutesByTo {
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/burn': typeof ExchangeBurnLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
-  '/exchange/insights': typeof ExchangeInsightsLazyRoute
   '/exchange/redeem': typeof ExchangeRedeemLazyRoute
   '/exchange/stake': typeof ExchangeStakeLazyRoute
   '/info/audit': typeof InfoAuditLazyRoute
@@ -1199,6 +1199,7 @@ export interface FileRoutesById {
   '/exchange': typeof ExchangeRouteLazyRouteWithChildren
   '/info': typeof InfoRouteLazyRouteWithChildren
   '/manager': typeof ManagerLazyRoute
+  '/exchange/insights': typeof ExchangeInsightsRoute
   '/swap/transaction': typeof SwapTransactionRoute
   '/_auth/dashboard': typeof AuthDashboardRouteLazyRouteWithChildren
   '/app/alexandrian': typeof AppAlexandrianLazyRoute
@@ -1209,7 +1210,6 @@ export interface FileRoutesById {
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/burn': typeof ExchangeBurnLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
-  '/exchange/insights': typeof ExchangeInsightsLazyRoute
   '/exchange/redeem': typeof ExchangeRedeemLazyRoute
   '/exchange/stake': typeof ExchangeStakeLazyRoute
   '/info/audit': typeof InfoAuditLazyRoute
@@ -1261,6 +1261,7 @@ export interface FileRouteTypes {
     | '/exchange'
     | '/info'
     | '/manager'
+    | '/exchange/insights'
     | '/swap/transaction'
     | '/dashboard'
     | '/app/alexandrian'
@@ -1271,7 +1272,6 @@ export interface FileRouteTypes {
     | '/app/syllogos'
     | '/exchange/burn'
     | '/exchange/history'
-    | '/exchange/insights'
     | '/exchange/redeem'
     | '/exchange/stake'
     | '/info/audit'
@@ -1317,6 +1317,7 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/manager'
+    | '/exchange/insights'
     | '/swap/transaction'
     | '/dashboard'
     | '/app/alexandrian'
@@ -1327,7 +1328,6 @@ export interface FileRouteTypes {
     | '/app/syllogos'
     | '/exchange/burn'
     | '/exchange/history'
-    | '/exchange/insights'
     | '/exchange/redeem'
     | '/exchange/stake'
     | '/info/audit'
@@ -1373,6 +1373,7 @@ export interface FileRouteTypes {
     | '/exchange'
     | '/info'
     | '/manager'
+    | '/exchange/insights'
     | '/swap/transaction'
     | '/_auth/dashboard'
     | '/app/alexandrian'
@@ -1383,7 +1384,6 @@ export interface FileRouteTypes {
     | '/app/syllogos'
     | '/exchange/burn'
     | '/exchange/history'
-    | '/exchange/insights'
     | '/exchange/redeem'
     | '/exchange/stake'
     | '/info/audit'
@@ -1552,9 +1552,9 @@ export const routeTree = rootRoute
     "/exchange": {
       "filePath": "exchange/route.lazy.tsx",
       "children": [
+        "/exchange/insights",
         "/exchange/burn",
         "/exchange/history",
-        "/exchange/insights",
         "/exchange/redeem",
         "/exchange/stake",
         "/exchange/"
@@ -1571,6 +1571,10 @@ export const routeTree = rootRoute
     },
     "/manager": {
       "filePath": "manager.lazy.tsx"
+    },
+    "/exchange/insights": {
+      "filePath": "exchange/insights.tsx",
+      "parent": "/exchange"
     },
     "/swap/transaction": {
       "filePath": "swap/transaction.tsx"
@@ -1610,10 +1614,6 @@ export const routeTree = rootRoute
     },
     "/exchange/history": {
       "filePath": "exchange/history.lazy.tsx",
-      "parent": "/exchange"
-    },
-    "/exchange/insights": {
-      "filePath": "exchange/insights.lazy.tsx",
       "parent": "/exchange"
     },
     "/exchange/redeem": {

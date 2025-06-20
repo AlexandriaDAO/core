@@ -39,6 +39,7 @@ import icpAssetsReducer from '@/features/icp-assets/icpAssetsSlice';
 import imporiumReducer from '@/features/imporium/imporiumSlice';
 import userDisplayReducer from './slices/userDisplaySlice';
 import balanceReducer from '@/features/balance/balanceSlice';
+import insightsReducer from '@/features/insights/insightsSlice';
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -82,6 +83,7 @@ const rootReducer = combineReducers({
 	icpAssets: icpAssetsReducer,
 	userDisplay: userDisplayReducer,
 	balance: balanceReducer,
+	insights: insightsReducer,
 });
 
 export default rootReducer;
