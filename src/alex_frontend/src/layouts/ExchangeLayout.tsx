@@ -173,7 +173,7 @@ function ExchangeLayout() {
                 </div>
             )}
             <div className="bg-card rounded-bordertb shadow">
-                <nav className="flex justify-center gap-2 p-2" aria-label="Tabs">
+                <nav className="flex flex-wrap items-center justify-center gap-2 p-2" aria-label="Tabs">
                     {user && <>
                         <Link
                             to="/exchange"

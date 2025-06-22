@@ -7,7 +7,6 @@ import unstake from "./thunks/unstake";
 import getStaked from "./thunks/getStaked";
 import getStakers from "./thunks/getStakers";
 import getYield from "./thunks/getYield";
-import { ErrorMessage } from "./utils/errors";
 
 export interface Stake {
   // stake Alex
