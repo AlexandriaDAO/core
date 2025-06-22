@@ -41,6 +41,7 @@ import userDisplayReducer from './slices/userDisplaySlice';
 import balanceReducer from '@/features/balance/balanceSlice';
 import insightsReducer from '@/features/insights/insightsSlice';
 import historyReducer from '@/features/history/historySlice';
+import stakeReducer from '@/features/stake/stakeSlice';
 
 const rootReducer = combineReducers({
 	home: homeReducer,
@@ -86,6 +87,7 @@ const rootReducer = combineReducers({
 	balance: balanceReducer,
 	insights: insightsReducer,
 	history: historyReducer,
+	stake: stakeReducer,
 });
 
 export default rootReducer;
