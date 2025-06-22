@@ -2,6 +2,8 @@ import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import { toast } from "sonner";
 import amount from './thunks/amount';
 import price from './thunks/price';
+import archived from './thunks/archived';
+import redeem from './thunks/redeem';
 
 export interface IcpBalanceState {
 	amount: number;
@@ -11,6 +13,13 @@ export interface IcpBalanceState {
 	price: number;
 	priceLoading: boolean;
 	priceError: string | null;
+
+	archived: number;
+	archiveLoading: boolean;
+	archiveError: string | null;
+
+	redeeming: boolean;
+	redeemError: string | null;
 
 	lastRefresh: number | null;
 }
@@ -23,6 +32,13 @@ const initialState: IcpBalanceState = {
 	price: -1,
 	priceLoading: false,
 	priceError: null,
+
+	archived: -1,
+	archiveLoading: false,
+	archiveError: null,
+
+	redeeming: false,
+	redeemError: null,
 
 	lastRefresh: null,
 };
@@ -37,9 +53,17 @@ const icpSlice = createSlice({
 		clearPriceError: (state) => {
 			state.priceError = null;
 		},
+		clearArchiveError: (state) => {
+			state.archiveError = null;
+		},
+		clearRedeemError: (state) => {
+			state.redeemError = null;
+		},
 		clearAllErrors: (state) => {
 			state.amountError = null;
 			state.priceError = null;
+			state.archiveError = null;
+			state.redeemError = null;
 		},
 		setLastRefresh: (state) => {
 			state.lastRefresh = Date.now();
@@ -80,9 +104,42 @@ const icpSlice = createSlice({
 				state.priceLoading = false;
 				state.priceError = action.payload as string;
 				state.price = -1;
+			})
+
+			// Archived Balance
+			.addCase(archived.pending, (state) => {
+				state.archiveLoading = true;
+				state.archiveError = null;
+			})
+			.addCase(archived.fulfilled, (state, action) => {
+				state.archived = action.payload;
+				state.archiveLoading = false;
+				state.archiveError = null;
+				state.lastRefresh = Date.now();
+			})
+			.addCase(archived.rejected, (state, action) => {
+				state.archiveLoading = false;
+				state.archiveError = action.payload as string;
+				state.archived = -1;
+				toast.error("Failed to fetch archived balance");
+			})
+
+			// Redeem
+			.addCase(redeem.pending, (state) => {
+				state.redeeming = true;
+				state.redeemError = null;
+			})
+			.addCase(redeem.fulfilled, (state, action) => {
+				state.redeeming = false;
+				state.redeemError = null;
+				toast.success("Successfully redeemed archived balance");
+			})
+			.addCase(redeem.rejected, (state, action) => {
+				state.redeeming = false;
+				state.redeemError = action.payload || "Failed to redeem";
 			});
 	},
 });
 
-export const { clearAmountError, clearPriceError, clearAllErrors, setLastRefresh } = icpSlice.actions;
+export const { clearAmountError, clearPriceError, clearArchiveError, clearRedeemError, clearAllErrors, setLastRefresh } = icpSlice.actions;
 export default icpSlice.reducer;

@@ -44,6 +44,7 @@ const InfoWhitepaperLazyImport = createFileRoute('/info/whitepaper')()
 const InfoFaqLazyImport = createFileRoute('/info/faq')()
 const InfoAuditLazyImport = createFileRoute('/info/audit')()
 const ExchangeStakeLazyImport = createFileRoute('/exchange/stake')()
+const ExchangeRedeemLazyImport = createFileRoute('/exchange/redeem')()
 const ExchangeHistoryLazyImport = createFileRoute('/exchange/history')()
 const AppSyllogosLazyImport = createFileRoute('/app/syllogos')()
 const AppPermasearchLazyImport = createFileRoute('/app/permasearch')()
@@ -55,7 +56,6 @@ const AuthExchangeRouteLazyImport = createFileRoute('/_auth/exchange')()
 const AuthDashboardRouteLazyImport = createFileRoute('/_auth/dashboard')()
 const AppPerpetuaIndexLazyImport = createFileRoute('/app/perpetua/')()
 const AuthExchangeIndexLazyImport = createFileRoute('/_auth/exchange/')()
-const AuthExchangeRedeemLazyImport = createFileRoute('/_auth/exchange/redeem')()
 const AuthExchangeBurnLazyImport = createFileRoute('/_auth/exchange/burn')()
 const AuthDashboardSettingsLazyImport = createFileRoute(
   '/_auth/dashboard/settings',
@@ -242,6 +242,14 @@ const ExchangeStakeLazyRoute = ExchangeStakeLazyImport.update({
   import('./routes/exchange/stake.lazy').then((d) => d.Route),
 )
 
+const ExchangeRedeemLazyRoute = ExchangeRedeemLazyImport.update({
+  id: '/redeem',
+  path: '/redeem',
+  getParentRoute: () => ExchangeRouteLazyRoute,
+} as any).lazy(() =>
+  import('./routes/exchange/redeem.lazy').then((d) => d.Route),
+)
+
 const ExchangeHistoryLazyRoute = ExchangeHistoryLazyImport.update({
   id: '/history',
   path: '/history',
@@ -338,14 +346,6 @@ const AuthExchangeIndexLazyRoute = AuthExchangeIndexLazyImport.update({
   getParentRoute: () => AuthExchangeRouteLazyRoute,
 } as any).lazy(() =>
   import('./routes/_auth/exchange/index.lazy').then((d) => d.Route),
-)
-
-const AuthExchangeRedeemLazyRoute = AuthExchangeRedeemLazyImport.update({
-  id: '/redeem',
-  path: '/redeem',
-  getParentRoute: () => AuthExchangeRouteLazyRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/exchange/redeem.lazy').then((d) => d.Route),
 )
 
 const AuthExchangeBurnLazyRoute = AuthExchangeBurnLazyImport.update({
@@ -664,6 +664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExchangeHistoryLazyImport
       parentRoute: typeof ExchangeRouteLazyImport
     }
+    '/exchange/redeem': {
+      id: '/exchange/redeem'
+      path: '/redeem'
+      fullPath: '/exchange/redeem'
+      preLoaderRoute: typeof ExchangeRedeemLazyImport
+      parentRoute: typeof ExchangeRouteLazyImport
+    }
     '/exchange/stake': {
       id: '/exchange/stake'
       path: '/stake'
@@ -839,13 +846,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthExchangeBurnLazyImport
       parentRoute: typeof AuthExchangeRouteLazyImport
     }
-    '/_auth/exchange/redeem': {
-      id: '/_auth/exchange/redeem'
-      path: '/redeem'
-      fullPath: '/exchange/redeem'
-      preLoaderRoute: typeof AuthExchangeRedeemLazyImport
-      parentRoute: typeof AuthExchangeRouteLazyImport
-    }
     '/_auth/exchange/': {
       id: '/_auth/exchange/'
       path: '/'
@@ -1019,13 +1019,11 @@ const AuthDashboardRouteLazyRouteWithChildren =
 
 interface AuthExchangeRouteLazyRouteChildren {
   AuthExchangeBurnLazyRoute: typeof AuthExchangeBurnLazyRoute
-  AuthExchangeRedeemLazyRoute: typeof AuthExchangeRedeemLazyRoute
   AuthExchangeIndexLazyRoute: typeof AuthExchangeIndexLazyRoute
 }
 
 const AuthExchangeRouteLazyRouteChildren: AuthExchangeRouteLazyRouteChildren = {
   AuthExchangeBurnLazyRoute: AuthExchangeBurnLazyRoute,
-  AuthExchangeRedeemLazyRoute: AuthExchangeRedeemLazyRoute,
   AuthExchangeIndexLazyRoute: AuthExchangeIndexLazyRoute,
 }
 
@@ -1079,12 +1077,14 @@ const AuthRouteLazyRouteWithChildren = AuthRouteLazyRoute._addFileChildren(
 interface ExchangeRouteLazyRouteChildren {
   ExchangeInsightsRoute: typeof ExchangeInsightsRoute
   ExchangeHistoryLazyRoute: typeof ExchangeHistoryLazyRoute
+  ExchangeRedeemLazyRoute: typeof ExchangeRedeemLazyRoute
   ExchangeStakeLazyRoute: typeof ExchangeStakeLazyRoute
 }
 
 const ExchangeRouteLazyRouteChildren: ExchangeRouteLazyRouteChildren = {
   ExchangeInsightsRoute: ExchangeInsightsRoute,
   ExchangeHistoryLazyRoute: ExchangeHistoryLazyRoute,
+  ExchangeRedeemLazyRoute: ExchangeRedeemLazyRoute,
   ExchangeStakeLazyRoute: ExchangeStakeLazyRoute,
 }
 
@@ -1125,6 +1125,7 @@ export interface FileRoutesByFullPath {
   '/app/permasearch': typeof AppPermasearchLazyRoute
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
+  '/exchange/redeem': typeof ExchangeRedeemLazyRoute
   '/exchange/stake': typeof ExchangeStakeLazyRoute
   '/info/audit': typeof InfoAuditLazyRoute
   '/info/faq': typeof InfoFaqLazyRoute
@@ -1149,7 +1150,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/exchange/burn': typeof AuthExchangeBurnLazyRoute
-  '/exchange/redeem': typeof AuthExchangeRedeemLazyRoute
   '/exchange/': typeof AuthExchangeIndexLazyRoute
   '/app/perpetua': typeof AppPerpetuaIndexLazyRoute
   '/app/imporium/listings': typeof AuthAppImporiumListingsRoute
@@ -1183,6 +1183,7 @@ export interface FileRoutesByTo {
   '/app/permasearch': typeof AppPermasearchLazyRoute
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
+  '/exchange/redeem': typeof ExchangeRedeemLazyRoute
   '/exchange/stake': typeof ExchangeStakeLazyRoute
   '/info/audit': typeof InfoAuditLazyRoute
   '/info/faq': typeof InfoFaqLazyRoute
@@ -1206,7 +1207,6 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/exchange/burn': typeof AuthExchangeBurnLazyRoute
-  '/exchange/redeem': typeof AuthExchangeRedeemLazyRoute
   '/app/perpetua': typeof AppPerpetuaIndexLazyRoute
   '/app/imporium/listings': typeof AuthAppImporiumListingsRoute
   '/app/imporium/market-logs': typeof AuthAppImporiumMarketLogsRoute
@@ -1241,6 +1241,7 @@ export interface FileRoutesById {
   '/app/permasearch': typeof AppPermasearchLazyRoute
   '/app/syllogos': typeof AppSyllogosLazyRoute
   '/exchange/history': typeof ExchangeHistoryLazyRoute
+  '/exchange/redeem': typeof ExchangeRedeemLazyRoute
   '/exchange/stake': typeof ExchangeStakeLazyRoute
   '/info/audit': typeof InfoAuditLazyRoute
   '/info/faq': typeof InfoFaqLazyRoute
@@ -1266,7 +1267,6 @@ export interface FileRoutesById {
   '/_auth/dashboard/profile': typeof AuthDashboardProfileLazyRouteWithChildren
   '/_auth/dashboard/settings': typeof AuthDashboardSettingsLazyRoute
   '/_auth/exchange/burn': typeof AuthExchangeBurnLazyRoute
-  '/_auth/exchange/redeem': typeof AuthExchangeRedeemLazyRoute
   '/_auth/exchange/': typeof AuthExchangeIndexLazyRoute
   '/app/perpetua/': typeof AppPerpetuaIndexLazyRoute
   '/_auth/app/imporium/listings': typeof AuthAppImporiumListingsRoute
@@ -1303,6 +1303,7 @@ export interface FileRouteTypes {
     | '/app/permasearch'
     | '/app/syllogos'
     | '/exchange/history'
+    | '/exchange/redeem'
     | '/exchange/stake'
     | '/info/audit'
     | '/info/faq'
@@ -1327,7 +1328,6 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/settings'
     | '/exchange/burn'
-    | '/exchange/redeem'
     | '/exchange/'
     | '/app/perpetua'
     | '/app/imporium/listings'
@@ -1360,6 +1360,7 @@ export interface FileRouteTypes {
     | '/app/permasearch'
     | '/app/syllogos'
     | '/exchange/history'
+    | '/exchange/redeem'
     | '/exchange/stake'
     | '/info/audit'
     | '/info/faq'
@@ -1383,7 +1384,6 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/settings'
     | '/exchange/burn'
-    | '/exchange/redeem'
     | '/app/perpetua'
     | '/app/imporium/listings'
     | '/app/imporium/market-logs'
@@ -1416,6 +1416,7 @@ export interface FileRouteTypes {
     | '/app/permasearch'
     | '/app/syllogos'
     | '/exchange/history'
+    | '/exchange/redeem'
     | '/exchange/stake'
     | '/info/audit'
     | '/info/faq'
@@ -1441,7 +1442,6 @@ export interface FileRouteTypes {
     | '/_auth/dashboard/profile'
     | '/_auth/dashboard/settings'
     | '/_auth/exchange/burn'
-    | '/_auth/exchange/redeem'
     | '/_auth/exchange/'
     | '/app/perpetua/'
     | '/_auth/app/imporium/listings'
@@ -1588,6 +1588,7 @@ export const routeTree = rootRoute
       "children": [
         "/exchange/insights",
         "/exchange/history",
+        "/exchange/redeem",
         "/exchange/stake"
       ]
     },
@@ -1626,7 +1627,6 @@ export const routeTree = rootRoute
       "parent": "/_auth",
       "children": [
         "/_auth/exchange/burn",
-        "/_auth/exchange/redeem",
         "/_auth/exchange/"
       ]
     },
@@ -1650,6 +1650,10 @@ export const routeTree = rootRoute
     },
     "/exchange/history": {
       "filePath": "exchange/history.lazy.tsx",
+      "parent": "/exchange"
+    },
+    "/exchange/redeem": {
+      "filePath": "exchange/redeem.lazy.tsx",
       "parent": "/exchange"
     },
     "/exchange/stake": {
@@ -1753,10 +1757,6 @@ export const routeTree = rootRoute
     },
     "/_auth/exchange/burn": {
       "filePath": "_auth/exchange/burn.lazy.tsx",
-      "parent": "/_auth/exchange"
-    },
-    "/_auth/exchange/redeem": {
-      "filePath": "_auth/exchange/redeem.lazy.tsx",
       "parent": "/_auth/exchange"
     },
     "/_auth/exchange/": {
