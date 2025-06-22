@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import locked from './thunks/locked';
 import price from './thunks/price';
 import unlocked from './thunks/unlocked';
+import rate from './thunks/rate';
 
 export interface AlexBalanceState {
 	locked: number;
@@ -16,6 +17,10 @@ export interface AlexBalanceState {
 	price: number;
 	priceLoading: boolean;
 	priceError: string | null;
+
+	rate: number;
+	rateLoading: boolean;
+	rateError: string | null;
 
 	lastRefresh: number | null;
 }
@@ -33,6 +38,10 @@ const initialState: AlexBalanceState = {
 	priceLoading: false,
 	priceError: null,
 
+	rate: -1,
+	rateLoading: false,
+	rateError: null,
+
 	lastRefresh: null,
 };
 
@@ -49,10 +58,14 @@ const alexSlice = createSlice({
 		clearPriceError: (state) => {
 			state.priceError = null;
 		},
+		clearRateError: (state) => {
+			state.rateError = null;
+		},
 		clearAllErrors: (state) => {
 			state.lockedError = null;
 			state.unlockedError = null;
 			state.priceError = null;
+			state.rateError = null;
 		},
 		setLastRefresh: (state) => {
 			state.lastRefresh = Date.now();
@@ -109,9 +122,25 @@ const alexSlice = createSlice({
 				state.priceLoading = false;
 				state.priceError = action.payload as string;
 				state.price = -1;
+			})
+
+			// ALEX Rate (Mint Rate)
+			.addCase(rate.pending, (state) => {
+				state.rateLoading = true;
+				state.rateError = null;
+			})
+			.addCase(rate.fulfilled, (state, action) => {
+				state.rate = action.payload;
+				state.rateLoading = false;
+				state.rateError = null;
+			})
+			.addCase(rate.rejected, (state, action) => {
+				state.rateLoading = false;
+				state.rateError = action.payload || "Failed to fetch ALEX mint rate";
+				state.rate = -1;
 			});
 	},
 });
 
-export const { clearUnlockedError, clearLockedError, clearPriceError, clearAllErrors, setLastRefresh } = alexSlice.actions;
+export const { clearUnlockedError, clearLockedError, clearPriceError, clearRateError, clearAllErrors, setLastRefresh } = alexSlice.actions;
 export default alexSlice.reducer;

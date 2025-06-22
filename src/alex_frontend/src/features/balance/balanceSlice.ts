@@ -3,6 +3,9 @@ import { toast } from "sonner";
 import icpReducer from './icp/icpSlice';
 import alexReducer from './alex/alexSlice';
 import lbryReducer from './lbry/lbrySlice';
+import amount from './thunks/amount';
+import archived from './thunks/archived';
+import unclaimed from './thunks/unclaimed';
 
 // Define the interface for main balance state
 export interface BalanceState {
@@ -11,6 +14,22 @@ export interface BalanceState {
   loading: boolean;
   error: string | null;
   lastRefresh: number | null;
+
+  // maxBurnAllowed
+  burnable: number;
+
+  // Canister balance states
+  amount: number;
+  amountLoading: boolean;
+  amountError: string | null;
+
+  archived: number;
+  archivedLoading: boolean;
+  archivedError: string | null;
+
+  unclaimed: number;
+  unclaimedLoading: boolean;
+  unclaimedError: string | null;
 }
 
 // Define the initial state
@@ -19,6 +38,20 @@ const initialState: BalanceState = {
   loading: false,
   error: null,
   lastRefresh: null,
+
+  burnable: -1,
+
+  amount: -1,
+  amountLoading: false,
+  amountError: null,
+
+  archived: -1,
+  archivedLoading: false,
+  archivedError: null,
+
+  unclaimed: -1,
+  unclaimedLoading: false,
+  unclaimedError: null,
 };
 
 const balanceSlice = createSlice({
@@ -38,14 +71,63 @@ const balanceSlice = createSlice({
     setTotal: (state, action) => {
       state.total = action.payload;
     },
+    setBurnable: (state, action)=>{
+      state.burnable = action.payload
+    }
   },
   extraReducers: (builder: ActionReducerMapBuilder<BalanceState>) => {
-    // Main balance slice doesn't handle specific balance actions
-    // Sub-slices handle their own actions
+    builder
+      // Canister Amount (Balance)
+      .addCase(amount.pending, (state) => {
+        state.amountLoading = true;
+        state.amountError = null;
+      })
+      .addCase(amount.fulfilled, (state, action) => {
+        state.amount = action.payload;
+        state.amountLoading = false;
+        state.amountError = null;
+      })
+      .addCase(amount.rejected, (state, action) => {
+        state.amountLoading = false;
+        state.amountError = action.payload as string;
+        state.amount = -1;
+      })
+
+      // Canister Archived
+      .addCase(archived.pending, (state) => {
+        state.archivedLoading = true;
+        state.archivedError = null;
+      })
+      .addCase(archived.fulfilled, (state, action) => {
+        state.archived = action.payload;
+        state.archivedLoading = false;
+        state.archivedError = null;
+      })
+      .addCase(archived.rejected, (state, action) => {
+        state.archivedLoading = false;
+        state.archivedError = action.payload as string;
+        state.archived = -1;
+      })
+
+      // Canister Unclaimed
+      .addCase(unclaimed.pending, (state) => {
+        state.unclaimedLoading = true;
+        state.unclaimedError = null;
+      })
+      .addCase(unclaimed.fulfilled, (state, action) => {
+        state.unclaimed = action.payload;
+        state.unclaimedLoading = false;
+        state.unclaimedError = null;
+      })
+      .addCase(unclaimed.rejected, (state, action) => {
+        state.unclaimedLoading = false;
+        state.unclaimedError = action.payload as string;
+        state.unclaimed = -1;
+      });
   },
 });
 
-export const { clearError, setLastRefresh, setLoading, setTotal } = balanceSlice.actions;
+export const { clearError, setLastRefresh, setLoading, setTotal, setBurnable } = balanceSlice.actions;
 
 // Create a custom root reducer that combines the main slice with sub-feature slices
 const balanceReducer = (state: any = {}, action: any) => {
