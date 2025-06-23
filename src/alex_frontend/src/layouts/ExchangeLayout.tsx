@@ -1,13 +1,15 @@
 import React, { lazy, Suspense } from "react";
-import { Link, Outlet } from "@tanstack/react-router";
+import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 import { Skeleton } from "@/lib/components/skeleton";
+import ExchangePageSkeleton from "@/components/skeletons/ExchangePageSkeleton";
 
 const AccountPanel = lazy(() => import("@/features/account/Panel"));
 const BalancePanel = lazy(() => import("@/features/balance/Panel"));
 
 function ExchangeLayout() {
     const {user} = useAppSelector(state=>state.auth)
+    const {isLoading} = useRouterState()
 	return (
         <div className='flex-grow p-4 flex flex-col gap-4'>
             {user ? (
@@ -266,7 +268,7 @@ function ExchangeLayout() {
                 </nav>
             </div>
 
-            <Outlet />
+            {isLoading ? <ExchangePageSkeleton />: <Outlet />}
             {/* <div className="flex-grow bg-card rounded-bordertb shadow">
             </div> */}
         </div>

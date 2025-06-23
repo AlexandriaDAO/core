@@ -11,7 +11,6 @@ const price = createAsyncThunk<
 	{ rejectValue: string }
 >('balance/alex/price', async (_, { rejectWithValue }) => {
 	try {
-		return 0.3;
 		// Check if ICP Swap Factory actor is available
 		if (!icp_swap_factory) {
 			return rejectWithValue('ICP Swap Factory canister not available');
