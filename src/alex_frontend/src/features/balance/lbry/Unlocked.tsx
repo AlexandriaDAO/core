@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/lib/
 import { DropdownMenuItem } from "@/lib/components/dropdown-menu";
 import { Link, useNavigate } from "@tanstack/react-router";
 import fetchUnlockedLbry from './thunks/unlocked';
+import Withdraw from './components/Withdraw';
 
 interface LbryUnlockedBalanceProps {
   menu?: boolean;
@@ -56,14 +57,7 @@ const LbryUnlockedBalance: React.FC<LbryUnlockedBalanceProps> = ({ menu }) => {
 							<p>Swap</p>
 						</TooltipContent>
 					</Tooltip>
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<ArrowUpFromLine size={18} className="text-gray-400 hover:text-gray-200 cursor-pointer transition-colors" />
-						</TooltipTrigger>
-						<TooltipContent>
-							<p>Withdraw</p>
-						</TooltipContent>
-					</Tooltip>
+					<Withdraw />
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<RotateCw size={18} className={`transition-colors text-gray-400  ${unlockedLoading ? 'cursor-not-allowed animate-spin': 'cursor-pointer hover:text-gray-200'}`} onClick={handleRefresh}/>
