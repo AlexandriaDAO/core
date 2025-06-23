@@ -7,6 +7,7 @@ import ratio from './thunks/ratio';
 import fee from './thunks/fee';
 import swapLbry from './thunks/swapLbry';
 import withdraw from './thunks/withdraw';
+import transfer from './thunks/transfer';
 
 export interface LbryBalanceState {
   unlocked: number;
@@ -33,6 +34,9 @@ export interface LbryBalanceState {
 
   withdrawing: boolean;
   withdrawError: string | null;
+
+  transferring: boolean;
+  transferError: string | null;
 
   lastRefresh: number | null;
 }
@@ -63,6 +67,9 @@ const initialState: LbryBalanceState = {
   withdrawing: false,
   withdrawError: null,
 
+  transferring: false,
+  transferError: null,
+
   lastRefresh: null,
 };
 
@@ -91,6 +98,9 @@ const lbrySlice = createSlice({
     clearWithdrawError: (state) => {
       state.withdrawError = null;
     },
+    clearTransferError: (state) => {
+      state.transferError = null;
+    },
     clearAllErrors: (state) => {
       state.unlockedError = null;
       state.lockedError = null;
@@ -99,6 +109,7 @@ const lbrySlice = createSlice({
       state.feeError = null;
       state.swapError = null;
       state.withdrawError = null;
+      state.transferError = null;
     },
     setLastRefresh: (state) => {
       state.lastRefresh = Date.now();
@@ -217,9 +228,24 @@ const lbrySlice = createSlice({
       .addCase(withdraw.rejected, (state, action) => {
         state.withdrawing = false;
         state.withdrawError = action.payload || "Failed to withdraw";
+      })
+
+      // LBRY Transfer (to locked balance)
+      .addCase(transfer.pending, (state) => {
+        state.transferring = true;
+        state.transferError = null;
+      })
+      .addCase(transfer.fulfilled, (state) => {
+        state.transferring = false;
+        state.transferError = null;
+        toast.success("Successfully transferred LBRY to locked balance");
+      })
+      .addCase(transfer.rejected, (state, action) => {
+        state.transferring = false;
+        state.transferError = action.payload || "Failed to transfer";
       });
   },
 });
 
-export const { clearUnlockedError, clearLockedError, clearBurnError, clearRatioError, clearFeeError, clearSwapError, clearWithdrawError, clearAllErrors, setLastRefresh } = lbrySlice.actions;
+export const { clearUnlockedError, clearLockedError, clearBurnError, clearRatioError, clearFeeError, clearSwapError, clearWithdrawError, clearTransferError, clearAllErrors, setLastRefresh } = lbrySlice.actions;
 export default lbrySlice.reducer;
