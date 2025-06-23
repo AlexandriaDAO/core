@@ -8,6 +8,7 @@ import fee from './thunks/fee';
 import swapLbry from './thunks/swapLbry';
 import withdraw from './thunks/withdraw';
 import transfer from './thunks/transfer';
+import transferAll from './thunks/transferAll';
 
 export interface LbryBalanceState {
   unlocked: number;
@@ -243,6 +244,21 @@ const lbrySlice = createSlice({
       .addCase(transfer.rejected, (state, action) => {
         state.transferring = false;
         state.transferError = action.payload || "Failed to transfer";
+      })
+
+      // LBRY Transfer All (from locked balance)
+      .addCase(transferAll.pending, (state) => {
+        state.transferring = true;
+        state.transferError = null;
+      })
+      .addCase(transferAll.fulfilled, (state) => {
+        state.transferring = false;
+        state.transferError = null;
+        toast.success("Successfully transferred all LBRY from locked balance");
+      })
+      .addCase(transferAll.rejected, (state, action) => {
+        state.transferring = false;
+        state.transferError = action.payload || "Failed to transfer all";
       });
   },
 });
