@@ -4,6 +4,7 @@ import amount from './thunks/amount';
 import price from './thunks/price';
 import archived from './thunks/archived';
 import redeem from './thunks/redeem';
+import withdraw from './thunks/withdraw';
 
 export interface IcpBalanceState {
 	amount: number;
@@ -20,6 +21,9 @@ export interface IcpBalanceState {
 
 	redeeming: boolean;
 	redeemError: string | null;
+
+	withdrawing: boolean;
+	withdrawError: string | null;
 
 	lastRefresh: number | null;
 }
@@ -40,6 +44,9 @@ const initialState: IcpBalanceState = {
 	redeeming: false,
 	redeemError: null,
 
+	withdrawing: false,
+	withdrawError: null,
+
 	lastRefresh: null,
 };
 
@@ -59,11 +66,15 @@ const icpSlice = createSlice({
 		clearRedeemError: (state) => {
 			state.redeemError = null;
 		},
+		clearWithdrawError: (state) => {
+			state.withdrawError = null;
+		},
 		clearAllErrors: (state) => {
 			state.amountError = null;
 			state.priceError = null;
 			state.archiveError = null;
 			state.redeemError = null;
+			state.withdrawError = null;
 		},
 		setLastRefresh: (state) => {
 			state.lastRefresh = Date.now();
@@ -137,9 +148,24 @@ const icpSlice = createSlice({
 			.addCase(redeem.rejected, (state, action) => {
 				state.redeeming = false;
 				state.redeemError = action.payload || "Failed to redeem";
+			})
+
+			// Withdraw
+			.addCase(withdraw.pending, (state) => {
+				state.withdrawing = true;
+				state.withdrawError = null;
+			})
+			.addCase(withdraw.fulfilled, (state, action) => {
+				state.withdrawing = false;
+				state.withdrawError = null;
+				toast.success("Successfully withdrew ICP");
+			})
+			.addCase(withdraw.rejected, (state, action) => {
+				state.withdrawing = false;
+				state.withdrawError = action.payload || "Failed to withdraw";
 			});
 	},
 });
 
-export const { clearAmountError, clearPriceError, clearArchiveError, clearRedeemError, clearAllErrors, setLastRefresh } = icpSlice.actions;
+export const { clearAmountError, clearPriceError, clearArchiveError, clearRedeemError, clearWithdrawError, clearAllErrors, setLastRefresh } = icpSlice.actions;
 export default icpSlice.reducer;

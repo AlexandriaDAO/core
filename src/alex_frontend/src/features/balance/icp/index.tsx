@@ -1,12 +1,13 @@
 import React from 'react';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
-import { LoaderCircle, Wallet, RotateCw, ArrowUpFromLine, DollarSign, TriangleAlert } from 'lucide-react';
+import { LoaderCircle, Wallet, RotateCw, DollarSign, TriangleAlert } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/lib/components/tooltip";
 import { DropdownMenuItem } from "@/lib/components/dropdown-menu";
 import { Link } from "@tanstack/react-router";
 import fetchIcpAmount from './thunks/amount';
 import fetchIcpPrice from './thunks/price';
+import Withdraw from './components/Withdraw';
 
 interface IcpBalanceProps {
   menu?: boolean;
@@ -64,14 +65,7 @@ const IcpBalance: React.FC<IcpBalanceProps> = ({ menu }) => {
               {price > 0 ? <>ICPUSD≈{price.toFixed(2)}</> : 'View ICP Price'}
             </TooltipContent>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ArrowUpFromLine size="18" className="text-gray-400 hover:text-gray-200 cursor-pointer transition-colors" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Withdraw</p>
-            </TooltipContent>
-          </Tooltip>
+          <Withdraw />
           <Tooltip>
             <TooltipTrigger asChild>
               <RotateCw size="18" className={`transition-colors text-gray-400  ${amountLoading ? 'cursor-not-allowed animate-spin': 'cursor-pointer hover:text-gray-200'}`} onClick={handleRefresh}/>
