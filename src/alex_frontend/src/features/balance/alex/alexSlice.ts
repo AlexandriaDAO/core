@@ -4,6 +4,8 @@ import locked from './thunks/locked';
 import price from './thunks/price';
 import unlocked from './thunks/unlocked';
 import rate from './thunks/rate';
+import fee from './thunks/fee';
+import withdraw from './thunks/withdraw';
 
 export interface AlexBalanceState {
 	locked: number;
@@ -21,6 +23,13 @@ export interface AlexBalanceState {
 	rate: number;
 	rateLoading: boolean;
 	rateError: string | null;
+
+	fee: number;
+	feeLoading: boolean;
+	feeError: string | null;
+
+	withdrawing: boolean;
+	withdrawError: string | null;
 
 	lastRefresh: number | null;
 }
@@ -42,6 +51,13 @@ const initialState: AlexBalanceState = {
 	rateLoading: false,
 	rateError: null,
 
+	fee: -1,
+	feeLoading: false,
+	feeError: null,
+
+	withdrawing: false,
+	withdrawError: null,
+
 	lastRefresh: null,
 };
 
@@ -61,11 +77,19 @@ const alexSlice = createSlice({
 		clearRateError: (state) => {
 			state.rateError = null;
 		},
+		clearFeeError: (state) => {
+			state.feeError = null;
+		},
+		clearWithdrawError: (state) => {
+			state.withdrawError = null;
+		},
 		clearAllErrors: (state) => {
 			state.lockedError = null;
 			state.unlockedError = null;
 			state.priceError = null;
 			state.rateError = null;
+			state.feeError = null;
+			state.withdrawError = null;
 		},
 		setLastRefresh: (state) => {
 			state.lastRefresh = Date.now();
@@ -138,9 +162,40 @@ const alexSlice = createSlice({
 				state.rateLoading = false;
 				state.rateError = action.payload || "Failed to fetch ALEX mint rate";
 				state.rate = -1;
+			})
+
+			// ALEX Fee
+			.addCase(fee.pending, (state) => {
+				state.feeLoading = true;
+				state.feeError = null;
+			})
+			.addCase(fee.fulfilled, (state, action) => {
+				state.fee = action.payload;
+				state.feeLoading = false;
+				state.feeError = null;
+			})
+			.addCase(fee.rejected, (state, action) => {
+				state.feeLoading = false;
+				state.feeError = action.payload || "Failed to fetch ALEX fee";
+				state.fee = -1;
+			})
+
+			// Withdraw
+			.addCase(withdraw.pending, (state) => {
+				state.withdrawing = true;
+				state.withdrawError = null;
+			})
+			.addCase(withdraw.fulfilled, (state, action) => {
+				state.withdrawing = false;
+				state.withdrawError = null;
+				toast.success("Successfully withdrew ALEX");
+			})
+			.addCase(withdraw.rejected, (state, action) => {
+				state.withdrawing = false;
+				state.withdrawError = action.payload || "Failed to withdraw";
 			});
 	},
 });
 
-export const { clearUnlockedError, clearLockedError, clearPriceError, clearRateError, clearAllErrors, setLastRefresh } = alexSlice.actions;
+export const { clearUnlockedError, clearLockedError, clearPriceError, clearRateError, clearFeeError, clearWithdrawError, clearAllErrors, setLastRefresh } = alexSlice.actions;
 export default alexSlice.reducer;

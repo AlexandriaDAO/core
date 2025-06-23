@@ -7,6 +7,7 @@ import { DropdownMenuItem } from "@/lib/components/dropdown-menu";
 import { Link } from "@tanstack/react-router";
 import fetchUnlockedAlex from './thunks/unlocked';
 import fetchAlexPrice from './thunks/price';
+import Withdraw from './components/Withdraw';
 
 interface AlexUnlockedBalanceProps {
   menu?: boolean;
@@ -62,14 +63,7 @@ const AlexUnlockedBalance: React.FC<AlexUnlockedBalanceProps> = ({ menu }) => {
               {unlocked > 0 ? <>ALEXUSD≈{price.toFixed(3)}</> : 'View ALEX Price'}
             </TooltipContent>
           </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ArrowUpFromLine size={18} className="text-gray-400 hover:text-gray-200 cursor-pointer transition-colors" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Withdraw</p>
-            </TooltipContent>
-          </Tooltip>
+          <Withdraw />
           <Tooltip>
             <TooltipTrigger asChild>
               <RotateCw size={18} className={`transition-colors text-gray-400  ${unlockedLoading ? 'cursor-not-allowed animate-spin': 'cursor-pointer hover:text-gray-200'}`} onClick={handleRefresh}/>
