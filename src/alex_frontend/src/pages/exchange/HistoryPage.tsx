@@ -49,7 +49,9 @@ const HistoryPage: React.FC = () => {
           <TransactionHistory />
         </div>
         <div className="lg:col-span-1">
-          <TransactionPreview />
+          <div className="sticky top-6">
+            <TransactionPreview />
+          </div>
         </div>
       </div>
     </div>
