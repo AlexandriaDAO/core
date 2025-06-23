@@ -5,6 +5,7 @@ import locked from './thunks/locked';
 import burn from './thunks/burn';
 import ratio from './thunks/ratio';
 import fee from './thunks/fee';
+import swapLbry from './thunks/swapLbry';
 
 export interface LbryBalanceState {
   unlocked: number;
@@ -25,6 +26,9 @@ export interface LbryBalanceState {
   fee: number;
   feeLoading: boolean;
   feeError: string | null;
+
+  swapping: boolean;
+  swapError: string | null;
 
   lastRefresh: number | null;
 }
@@ -49,6 +53,9 @@ const initialState: LbryBalanceState = {
   feeLoading: false,
   feeError: null,
 
+  swapping: false,
+  swapError: null,
+
   lastRefresh: null,
 };
 
@@ -71,12 +78,16 @@ const lbrySlice = createSlice({
     clearFeeError: (state) => {
       state.feeError = null;
     },
+    clearSwapError: (state) => {
+      state.swapError = null;
+    },
     clearAllErrors: (state) => {
       state.unlockedError = null;
       state.lockedError = null;
       state.burnError = null;
       state.ratioError = null;
       state.feeError = null;
+      state.swapError = null;
     },
     setLastRefresh: (state) => {
       state.lastRefresh = Date.now();
@@ -165,9 +176,24 @@ const lbrySlice = createSlice({
         state.feeLoading = false;
         state.feeError = action.payload || "Failed to fetch LBRY fee";
         state.fee = -1;
+      })
+
+      // LBRY Swap
+      .addCase(swapLbry.pending, (state) => {
+        state.swapping = true;
+        state.swapError = null;
+      })
+      .addCase(swapLbry.fulfilled, (state) => {
+        state.swapping = false;
+        state.swapError = null;
+        toast.success("Successfully swapped ICP to LBRY tokens");
+      })
+      .addCase(swapLbry.rejected, (state, action) => {
+        state.swapping = false;
+        state.swapError = action.payload || "Failed to swap ICP to LBRY";
       });
   },
 });
 
-export const { clearUnlockedError, clearLockedError, clearBurnError, clearRatioError, clearFeeError, clearAllErrors, setLastRefresh } = lbrySlice.actions;
+export const { clearUnlockedError, clearLockedError, clearBurnError, clearRatioError, clearFeeError, clearSwapError, clearAllErrors, setLastRefresh } = lbrySlice.actions;
 export default lbrySlice.reducer;
