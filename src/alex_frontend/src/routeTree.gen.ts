@@ -290,7 +290,9 @@ const SwapTransactionRoute = SwapTransactionRouteImport.update({
   id: '/swap/transaction',
   path: '/swap/transaction',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() =>
+  import('./routes/swap/transaction.lazy').then((d) => d.Route),
+)
 const ExchangeInsightsRoute = ExchangeInsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
@@ -464,7 +466,9 @@ const AuthAppImporiumListingsRoute = AuthAppImporiumListingsRouteImport.update({
   id: '/listings',
   path: '/listings',
   getParentRoute: () => AuthAppImporiumRouteLazyRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_auth/app/imporium/listings.lazy').then((d) => d.Route),
+)
 const AppPerpetuaUserUserIdIndexLazyRoute =
   AppPerpetuaUserUserIdIndexLazyRouteImport.update({
     id: '/app/perpetua/user/$userId/',
