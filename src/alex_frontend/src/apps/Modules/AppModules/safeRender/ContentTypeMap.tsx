@@ -68,21 +68,22 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   const { theme } = useTheme();
   const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || 'application/octet-stream';
   const { fullUrl, coverUrl, thumbnailUrl } = contentUrls;
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  // const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [generatedThumbnail, setGeneratedThumbnail] = useState<string | null>(null);
   const [isVideoThumbLoading, setIsVideoThumbLoading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
 
   // Handle blob URL cleanup
   useEffect(() => {
-    if (fullUrl.startsWith('blob:')) {
-      setBlobUrl(fullUrl);
-      return () => {
-        URL.revokeObjectURL(fullUrl);
-      };
-    } else {
-      setBlobUrl(fullUrl);
-    }
+    if(!fullUrl) return;
+    // if (fullUrl.startsWith('blob:')) {
+    //   setBlobUrl(fullUrl);
+    //   return () => {
+    //     URL.revokeObjectURL(fullUrl);
+    //   };
+    // } else {
+    //   setBlobUrl(fullUrl);
+    // }
 
     if (contentType.includes("video/") && !thumbnailUrl) {
       setIsVideoThumbLoading(true);
@@ -125,7 +126,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
         return (
           <ReaderProvider>
             <div className="h-[85vh] w-[800px] max-w-[95vw]">
-              <Reader bookUrl={blobUrl || fullUrl} />
+              <Reader bookUrl={fullUrl} />
             </div>
           </ReaderProvider>
         );
@@ -156,7 +157,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
               </div>
             </div>
             <audio
-              src={blobUrl || fullUrl}
+              src={fullUrl}
               controls
               className="w-full relative z-30"
               onError={() => handleRenderError(transaction.id)}
@@ -171,7 +172,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
         {inModal ? (
           <div className="flex items-center justify-center">
             <video
-              src={blobUrl || fullUrl}
+              src={fullUrl}
               controls
               playsInline
               controlsList="nodownload"
@@ -217,7 +218,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
       inModal ? (
         <div className="flex items-center justify-center">
           <img
-            src={blobUrl || fullUrl}
+            src={fullUrl}
             alt="Content"
             decoding="async"
             className="max-w-[95vw] max-h-[90vh] w-auto h-auto object-contain"
@@ -228,7 +229,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
       ) : (
         <AspectRatio ratio={1} className="bg-gray-200 dark:bg-gray-800">
           <img
-            src={blobUrl || fullUrl}
+            src={fullUrl}
             alt="Content"
             decoding="async"
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isImageLoading ? 'opacity-0' : 'opacity-100'}`}
@@ -387,7 +388,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
         {inModal ? (
           <div className="w-[800px] max-w-[95vw] h-[90vh]">
             <iframe
-              src={`${blobUrl || fullUrl}#view=FitH`}
+              src={`${fullUrl}#view=FitH`}
               className="w-full h-full"
               sandbox="allow-scripts allow-same-origin"
               title="PDF Viewer"
@@ -408,7 +409,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
               <AspectRatio ratio={1}>
                 <div className="relative w-full h-full">
                   <iframe
-                    src={`${blobUrl || fullUrl}#page=1&view=FitH&zoom=50&toolbar=0&navpanes=0`}
+                    src={`${fullUrl}#page=1&view=FitH&zoom=50&toolbar=0&navpanes=0`}
                     className="w-full h-full rounded-lg"
                     sandbox="allow-scripts allow-same-origin"
                     title="PDF Preview"

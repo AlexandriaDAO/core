@@ -8,6 +8,7 @@ const getIcpPrice = createAsyncThunk<
   { rejectValue: string }
 >("icp_swap/getIcpPrice", async (_, { rejectWithValue }) => {
   try {
+    // https://api.binance.com/api/v3/ticker/price?symbol=ICPUSDT
     const options = {
       method: "GET",
       url: "https://api.coingecko.com/api/v3/coins/markets",

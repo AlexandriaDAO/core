@@ -11,12 +11,23 @@ import { useUser } from "@/hooks/actors";
 import { lazy } from "react";
 import { ModeToggle } from "@/lib/components/mode-toggle";
 
+import { LoaderCircle } from "lucide-react";
+
 const InlineSignup = lazy(() =>
 	import("@/features/signup").then((module) => ({
 		default: module.InlineSignup,
 	}))
 );
+
 const Auth = lazy(() => import("@/features/auth"));
+
+const BalanceButton = lazy(() => import("@/features/balance").then(module=>({
+	default: module.BalanceButton
+})));
+
+const AccountButton = lazy(() => import("@/features/account").then((module) => ({
+	default: module.AccountButton,
+})));
 
 export const Entry = () => {
 	const { actor } = useUser();
@@ -89,9 +100,27 @@ export const Entry = () => {
 	// Finally, show the authenticated component
 	// load auth module only when needed
 	return (
-		<Suspense fallback={<Processing message="Loading Auth..." />}>
-			<Auth />
-		</Suspense>
+		<div className="flex gap-2 sm:justify-center xs:justify-start items-stretch">
+			<Suspense fallback={
+				<div className="w-28 bg-gradient-to-r from-gray-800 to-gray-500 border border-gray-600 text-white hover:border-white rounded-full cursor-not-allowed duration-800 transition-all animate-pulse">
+				</div>
+			}>
+				<BalanceButton />
+			</Suspense>
+			<Suspense fallback={
+				<div className="w-36 bg-gradient-to-r from-gray-800 to-gray-500 border border-gray-600 text-white hover:border-white rounded-full cursor-not-allowed duration-800 transition-all animate-pulse">
+				</div>
+			}>
+				<AccountButton/>
+			</Suspense>
+			<Suspense fallback={
+				<div className="w-[42px] h-[42px] border border-white rounded-full cursor-not-allowed overflow-hidden flex justify-center items-center">
+					<LoaderCircle color="white" size={18} className="animate animate-spin"/>
+				</div>
+			}>
+				<Auth />
+			</Suspense>
+		</div>
 	);
 };
 

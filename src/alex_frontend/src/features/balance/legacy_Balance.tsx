@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy } from 'react';
 import { useAppSelector } from '@/store/hooks/useAppSelector';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch';
 import getLbryBalance from '../../features/swap/thunks/lbryIcrc/getLbryBalance';
@@ -171,4 +171,27 @@ const BalanceDisplay: React.FC = () => {
     );
 };
 
-export default BalanceDisplay; 
+
+const AlexActor = lazy(() => import("@/actors").then(module => ({ default: module.AlexActor })));
+const NftManagerActor = lazy(() => import("@/actors").then(module => ({ default: module.NftManagerActor })));
+const LbryActor = lazy(() => import("@/actors").then(module => ({ default: module.LbryActor })));
+const IcpLedgerActor = lazy(() => import("@/actors").then(module => ({ default: module.IcpLedgerActor })));
+const IcpSwapFactoryActor = lazy(() => import("@/actors").then(module => ({ default: module.IcpSwapFactoryActor })));
+
+const Balance = () => {
+    return (
+        <NftManagerActor>
+            <LbryActor>
+                <IcpLedgerActor>
+                    <AlexActor>
+                        <IcpSwapFactoryActor>
+                            <BalanceDisplay />
+                        </IcpSwapFactoryActor>
+                    </AlexActor>
+                </IcpLedgerActor>
+            </LbryActor>
+        </NftManagerActor>
+    );
+}
+
+export default Balance;
