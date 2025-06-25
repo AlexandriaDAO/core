@@ -139,10 +139,10 @@ export const useNftData = (tokenId: string | undefined) => {
             // Dispatch to update nftDataSlice with the owner
             dispatch(setNFTs({
               [tokenId]: {
-                ...nftStaticDataFromCache, // Preserve existing data like arweaveId, collection, balances
+                ...(nftStaticDataFromCache || {}), // Preserve existing data like arweaveId, collection, balances
                 principal: currentOwnerPrincipal.toString(),
                 collection: tokenType, // Ensure collection type is also set/updated
-                arweaveId: primaryArweaveId // Ensure arweaveId is also set/updated
+                arweaveId: primaryArweaveId || '' // Ensure arweaveId is also set/updated
               }
             }));
             console.log(`[useNftData ${tokenId}] Owner fetched: ${currentOwnerPrincipal.toString()}`);
@@ -180,25 +180,26 @@ export const useNftData = (tokenId: string | undefined) => {
             if (ownerAssetCanisterId) {
               try {
                 console.log(`[useNftData ${tokenId}] Owner ${ownerPrincipalStr} has asset canister ${ownerAssetCanisterId}. Attempting to load ArweaveID ${primaryArweaveId} (key: /arweave/${primaryArweaveId}) from it.`);
-                const assetActor = await getActorUserAssetCanister(ownerAssetCanisterId) as unknown as AssetCanisterService;
-                const assetKeyInCanister = `/arweave/${primaryArweaveId}`;
-                
-                const assetResult = await fetchAssetFromUserCanister(assetKeyInCanister, assetActor);
-                if (assetResult?.blob) {
-                  console.log(`[useNftData ${tokenId}] SUCCESS: Asset ${assetKeyInCanister} found in owner's IC canister ${ownerAssetCanisterId}.`);
-                  const assetUrl = URL.createObjectURL(assetResult.blob);
-                  loadedContent = { 
-                    id: primaryArweaveId, 
-                    data: assetResult.blob,
-                    contentType: assetResult.contentType,
-                    source: 'ic_canister' 
+
+                const baseUrl = process.env.DFX_NETWORK == "local" ? `http://${ownerAssetCanisterId}.localhost:4943` : `https://${ownerAssetCanisterId}.raw.icp0.io`;
+                const assetUrl = `${baseUrl}/arweave/${primaryArweaveId}`;
+
+                const response = await fetch(assetUrl);
+                if(response.ok){
+                  console.log(`[useNftData ${tokenId}] SUCCESS: Asset /arweave/${primaryArweaveId} found in owner's IC canister ${ownerAssetCanisterId}.`);
+                  const contentType = response.headers.get('Content-Type');
+
+                  loadedContent = {
+                    id: primaryArweaveId,
+                    contentType: contentType,
+                    source: 'ic_canister',
                   };
-                  loadedUrls = { primary: assetUrl, display: assetUrl, thumbnail: assetUrl }; 
-                  if (mounted) setContentUrls(loadedUrls); 
+                  loadedUrls = { fullUrl: assetUrl, display: assetUrl, thumbnail: assetUrl };
+                  if (mounted) setContentUrls(loadedUrls);
                   loadedFromIC = true;
                   contentSource = 'ic_canister';
-                } else {
-                  console.log(`[useNftData ${tokenId}] Asset ${assetKeyInCanister} NOT found in owner's IC canister ${ownerAssetCanisterId}.`);
+                }else{
+                  console.log(`[useNftData ${tokenId}] Asset /arweave/${primaryArweaveId} NOT found in owner's IC canister ${ownerAssetCanisterId}.`);
                 }
               } catch (icError) {
                 console.warn(`[useNftData ${tokenId}] ERROR fetching asset with ArweaveID ${primaryArweaveId} from owner's IC canister ${ownerAssetCanisterId}:`, icError);
@@ -267,9 +268,9 @@ export const useNftData = (tokenId: string | undefined) => {
           if (mounted) {
             dispatch(setNFTs({
               [tokenId]: {
-                ...nftStaticDataFromCache, // Preserve other data like principal, arweaveId, collection
+                ...(nftStaticDataFromCache || {}), // Preserve other data like principal, arweaveId, collection
                 principal: currentOwnerPrincipal.toString(), // Ensure owner is also part of this update
-                arweaveId: primaryArweaveId, // Ensure arweaveId is part of this update
+                arweaveId: primaryArweaveId || '', // Ensure arweaveId is part of this update
                 collection: tokenType, // Ensure collection is part of this update
                 balances: { alex: alexTokens, lbry: lbryTokens }
               }
@@ -316,7 +317,7 @@ export const useNftData = (tokenId: string | undefined) => {
   // Key dependencies: tokenId, tokenType, arweaveTxData (from Redux), primaryArweaveId (derived), 
   // allUserAssetCanistersMap, authCanisterMapLoading (global states from Redux)
   // nftStaticDataFromCache, contentItem (to check if refetch is needed)
-  }, [tokenId, tokenType, arweaveTxData, primaryArweaveId, dispatch, allUserAssetCanistersMap, authCanisterMapLoading, nftStaticDataFromCache, contentItem, ownerPrincipal]);
+  }, [tokenId, tokenType, arweaveTxData, dispatch, allUserAssetCanistersMap, authCanisterMapLoading]);
 
   const handleRenderError = (transactionId?: string) => {
     if (arweaveTxData) {

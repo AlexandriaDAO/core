@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import React, { lazy, Suspense } from "react";
 
 const AppsTab = lazy(() => import("./AppsTab").then(module => ({ default: module.AppsTab })));

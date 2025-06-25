@@ -56,7 +56,8 @@ const AlexUnlockedBalance: React.FC<AlexUnlockedBalanceProps> = ({ menu }) => {
               <DollarSign
                 size={18}
                 className="text-gray-400 hover:text-gray-200 cursor-pointer transition-colors"
-                onClick={() => window.open('https://app.icpswap.com/swap?input=ryjl3-tyaaa-aaaaa-aaaba-cai&output=ysy5f-2qaaa-aaaap-qkmmq-cai', '_blank')}
+                // onClick={() => window.open('https://app.icpswap.com/swap?input=ryjl3-tyaaa-aaaaa-aaaba-cai&output=ysy5f-2qaaa-aaaap-qkmmq-cai', '_blank')}
+                onClick={() => window.open('https://www.geckoterminal.com/icp/pools/kb4fz-oiaaa-aaaag-qnema-cai', '_blank')}
               />
             </TooltipTrigger>
             <TooltipContent>
