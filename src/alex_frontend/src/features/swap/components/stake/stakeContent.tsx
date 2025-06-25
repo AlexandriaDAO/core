@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
 
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
@@ -220,7 +219,7 @@ const StakeContent = () => {
                                         <strong className='text-base text-multygray dark:text-gray-400 font-medium me-2'>Available Balance:<span className='text-base text-darkgray dark:text-white ms-2'>{alex.alexBal} ALEX</span></strong>
                                         <img className='w-5 h-5' src="images/alex-logo.svg" alt="alex" />
                                     </div>
-                                    <Link to="" role="button" className='text-[#A7B1D7] dark:text-gray-400 underline text-base font-bold hover:text-[#8494C7] dark:hover:text-gray-300' onClick={() => handleMaxAlex()} >Max</Link>
+                                    <button type="button" className='text-[#A7B1D7] dark:text-gray-400 underline text-base font-bold hover:text-[#8494C7] dark:hover:text-gray-300' onClick={() => handleMaxAlex()} >Max</button>
                                 </div>
                             </div>
                         </div>

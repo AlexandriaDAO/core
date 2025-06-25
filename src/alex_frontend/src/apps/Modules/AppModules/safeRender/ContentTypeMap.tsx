@@ -70,22 +70,12 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   const { theme } = useTheme();
   const contentType = transaction.tags.find(tag => tag.name === "Content-Type")?.value || 'application/octet-stream';
   const { fullUrl, coverUrl, thumbnailUrl } = contentUrls;
-  // const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [generatedThumbnail, setGeneratedThumbnail] = useState<string | null>(null);
   const [isVideoThumbLoading, setIsVideoThumbLoading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
 
-  // Handle blob URL cleanup
   useEffect(() => {
     if(!fullUrl) return;
-    // if (fullUrl.startsWith('blob:')) {
-    //   setBlobUrl(fullUrl);
-    //   return () => {
-    //     URL.revokeObjectURL(fullUrl);
-    //   };
-    // } else {
-    //   setBlobUrl(fullUrl);
-    // }
 
     if (contentType.includes("video/") && !thumbnailUrl) {
       setIsVideoThumbLoading(true);
@@ -129,7 +119,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
           <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><Skeleton className="h-12 w-12 rounded-full" /></div>}>
             <ReaderProvider>
               <div className="h-[85vh] w-[800px] max-w-[95vw]">
-                <Reader bookUrl={blobUrl || fullUrl} />
+                <Reader bookUrl={fullUrl} />
               </div>
             </ReaderProvider>
           </Suspense>

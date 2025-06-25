@@ -1,7 +1,7 @@
 // import React, { useEffect, useState } from "react";
 // import { ActorContextType } from "ic-use-actor";
 
-// import { _SERVICE } from "../../../declarations/icp_swap_factory/icp_swap_factory.did";
+// import { _SERVICE } from "../../../declarations/icp_swap_factory";
 
 // import { ReactNode } from "react";
 // import { useIdentity } from "@/hooks/useIdentity";
@@ -34,7 +34,7 @@ import React from "react";
 import { ActorProvider, InterceptorErrorData, InterceptorRequestData, InterceptorResponseData } from "ic-use-actor";
 import { canisterId, idlFactory } from "../../../declarations/icp_swap_factory";
 
-import { _SERVICE } from "../../../declarations/icp_swap_factory/icp_swap_factory.did";
+import { _SERVICE } from "../../../declarations/icp_swap_factory";
 
 import { ReactNode } from "react";
 import { IcpSwapFactoryContext } from "@/contexts/actors";

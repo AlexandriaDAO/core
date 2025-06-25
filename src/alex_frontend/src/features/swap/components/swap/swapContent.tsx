@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
-import { Link } from "@tanstack/react-router";
 import swapLbry from "../../thunks/swapLbry";
 import { flagHandler } from "../../swapSlice";
 import { LoaderCircle } from "lucide-react";
@@ -129,14 +128,13 @@ const SwapContent: React.FC = () => {
                   Balance:{icpLedger.accountBalance}
                 </strong>
 
-                <Link
-                  role="button"
-                  className="text-base font-blod text-[#A7B1D7] dark:text-blue-400 underline"
-                  to={""}
+                <button
+                  type="button"
+                  className="text-base font-bold text-[#A7B1D7] dark:text-blue-400 underline"
                   onClick={() => handleMaxIcp()}
                 >
                   Max
-                </Link>
+                </button>
               </div>
             </div>
             <div className="bg-white dark:bg-gray-800 border border-[#bdbec4] dark:border-gray-700 py-5 px-7 rounded-borderbox me-0 2xl:ms-2 xl:ms-2 lg:ms-2 md:ms-2 sm:me-0 w-full 2xl:w-6/12 xl:w-6/12 lg:w-6/12 md:w-6/12 sm:w-full">

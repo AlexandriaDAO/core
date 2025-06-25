@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
 import { useAppSelector } from "@/store/hooks/useAppSelector";
 
-import { Link } from "@tanstack/react-router";
 import { flagHandler } from "../../swapSlice";
 import burnLbry from "../../thunks/burnLBRY";
 import getLbryBalance from "../../thunks/lbryIcrc/getLbryBalance";
@@ -132,7 +131,7 @@ const BurnContent = () => {
                                     <strong className='text-base text-multygray dark:text-gray-300 font-medium me-1'>Balance:<span className='text-darkgray dark:text-gray-200 ms-2'>{swap.lbryBalance} LBRY</span></strong>
                                     <img className='w-4 h-4' src="images/lbry-logo.svg" alt="lbry" />
                                 </div>
-                                <Link to="" role="button" className='text-[#A7B1D7] dark:text-blue-400 underline text-base font-bold' onClick={() => handleMaxLbry()} >Max</Link>
+                                <button type="button" className='text-[#A7B1D7] dark:text-blue-400 underline text-base font-bold' onClick={() => handleMaxLbry()} >Max</button>
                             </div>
                         </div>
                         <h5 className='text-xl font-medium mb-4 dark:text-gray-200'>you get</h5>

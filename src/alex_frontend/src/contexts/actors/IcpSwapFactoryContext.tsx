@@ -1,6 +1,6 @@
 import { createActorContext } from "ic-use-actor";
 
-import { _SERVICE } from "../../../../declarations/icp_swap_factory/icp_swap_factory.did";
+import { _SERVICE } from "../../../../declarations/icp_swap_factory";
 
 const IcpSwapFactoryContext = createActorContext<_SERVICE>();
 

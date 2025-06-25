@@ -1,6 +1,6 @@
 import { ActorSubclass } from "@dfinity/agent";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { _SERVICE } from "../../../../../../declarations/icp_swap_factory/icp_swap_factory.did";
+import { _SERVICE } from "../../../../../../declarations/icp_swap_factory";
 
 const getAlexPrice = createAsyncThunk<string, ActorSubclass<_SERVICE>, { rejectValue: string }>(
   "alex/getAlexPrice",

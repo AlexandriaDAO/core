@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
 
 import transferICP from "@/features/icp-ledger/thunks/transferICP";
 import { useAppDispatch } from "@/store/hooks/useAppDispatch";
@@ -266,7 +265,7 @@ const SendContent = () => {
                                     {selectedOption === "ALEX" && <img className='w-5 h-5' src="images/alex-logo.svg" alt="alex" />}
                                     {selectedOption === "LBRY" && <img className='w-5 h-5' src="images/lbry-logo.svg" alt="lbry" />}
                                 </div>
-                                <Link role="button" to="" className='text-[#A7B1D7] dark:text-blue-400 underline text-base font-medium' onClick={() => { handleMax() }}>Max</Link>
+                                <button type="button" className='text-[#A7B1D7] dark:text-blue-400 underline text-base font-medium' onClick={() => { handleMax() }}>Max</button>
                             </div>
                         </div>
                     </div>
