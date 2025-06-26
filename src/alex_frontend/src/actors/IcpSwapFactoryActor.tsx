@@ -34,7 +34,7 @@ import React from "react";
 import { ActorProvider, InterceptorErrorData, InterceptorRequestData, InterceptorResponseData } from "ic-use-actor";
 import { canisterId, idlFactory } from "../../../declarations/icp_swap_factory";
 
-import { _SERVICE } from "../../../declarations/icp_swap_factory";
+import { _SERVICE } from "../../../declarations/icp_swap_factory/icp_swap_factory.did";
 
 import { ReactNode } from "react";
 import { IcpSwapFactoryContext } from "@/contexts/actors";
