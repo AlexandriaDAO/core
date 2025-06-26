@@ -291,8 +291,21 @@ touch .dfx/local/canisters/ALEX/ALEX.did
 # For icp_swap_factory
 mkdir -p src/icp_swap_factory && dfx canister --network ic metadata ggzvv-5qaaa-aaaag-qck7a-cai candid:service > src/icp_swap_factory/icp_swap_factory.did
 
+# Ensure icp_swap_factory declarations are properly generated
+dfx generate icp_swap_factory
+
+# Add _SERVICE export to index.d.ts if not already present
+if ! grep -q "export { _SERVICE }" src/declarations/icp_swap_factory/index.d.ts; then
+    sed -i '/import { _SERVICE }/a\\nexport { _SERVICE };' src/declarations/icp_swap_factory/index.d.ts
+fi
 
 npm i
+
+# Fix _SERVICE export after npm install (which may run dfx generate)
+if ! grep -q "export { _SERVICE }" src/declarations/icp_swap_factory/index.d.ts; then
+    sed -i '/import { _SERVICE }/a\\nexport { _SERVICE };' src/declarations/icp_swap_factory/index.d.ts
+fi
+
 dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
 
 ## Helpful extras for testing.

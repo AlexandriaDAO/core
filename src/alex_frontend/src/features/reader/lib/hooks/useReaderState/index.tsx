@@ -40,8 +40,8 @@ export interface IReaderState {
 	coverUrl: string|null;
 	setCoverUrl: Dispatch<SetStateAction<string|null>>;
 
-	renderLocation: RefObject<HTMLDivElement>;
-	bookLocation: RefObject<HTMLDivElement>;
+	renderLocation: RefObject<HTMLDivElement | null>;
+	bookLocation: RefObject<HTMLDivElement | null>;
 
 	isLoaded: Boolean;
 	setIsLoaded: Dispatch<SetStateAction<Boolean>>;

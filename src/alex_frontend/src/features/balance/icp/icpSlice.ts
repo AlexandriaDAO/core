@@ -1,7 +1,7 @@
 import { ActionReducerMapBuilder, createSlice } from "@reduxjs/toolkit";
 import { toast } from "sonner";
 import amount from './thunks/amount';
-import price from './thunks/price';
+import price from '../../icp-ledger/thunks/getIcpPrice';
 import archived from './thunks/archived';
 import redeem from './thunks/redeem';
 import withdraw from './thunks/withdraw';

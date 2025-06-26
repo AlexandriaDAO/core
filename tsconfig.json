@@ -19,7 +19,7 @@
       "@/*": ["src/alex_frontend/src/*"],
       "*": ["node_modules/*"]
     },
-    "types": ["vite/client"]
+    "types": ["react", "react-dom"]
   },
   "include": [
     "src/**/*.ts",

@@ -264,9 +264,10 @@ function SingleTokenView() {
     e.stopPropagation();
     if (!tokenId) return;
     
+    const publicUrl = process.env.PUBLIC_URL || '';
     const lbryUrl = process.env.NODE_ENV === 'development' 
       ? `http://localhost:8080/nft/${tokenId}` 
-      : `https://lbry.app/nft/${tokenId}`;
+      : `${publicUrl}/nft/${tokenId}`;
     const copied = await copyToClipboard(lbryUrl);
     if (copied) {
       setCopiedLink(true);

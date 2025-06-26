@@ -9,6 +9,11 @@ const { TanStackRouterWebpack } = require('@tanstack/router-plugin/webpack')
 
 
 const isDevelopment = process.env.NODE_ENV !== "production";
+// Load the appropriate .env file based on NODE_ENV
+if (process.env.NODE_ENV === 'production') {
+  require("dotenv").config({ path: '.env.production' });
+}
+const publicUrl = process.env.PUBLIC_URL || '';
 
 const frontendDirectory = "alex_frontend";
 
@@ -113,7 +118,7 @@ module.exports = {
     filename: '[name].[contenthash].js',
     chunkFilename: '[name].[contenthash].js',
     path: path.join(__dirname, "dist", frontendDirectory),
-    publicPath: '/',
+    publicPath: publicUrl + '/',
   },
 
   module: {
@@ -177,15 +182,20 @@ module.exports = {
       template: path.join(__dirname, frontend_entry),
       cache: false,
     }),
-    new webpack.EnvironmentPlugin([
+    new webpack.EnvironmentPlugin({
       ...Object.keys(process.env).filter((key) => {
         if (key.includes("CANISTER")) return true;
         if (key.includes("DFX")) return true;
         if (key.startsWith("ETH_")) return true;
         if (key.startsWith("REACT_")) return true;
+        if (key === "PUBLIC_URL") return true;
         return false;
-      }),
-    ]),
+      }).reduce((env, key) => {
+        env[key] = process.env[key];
+        return env;
+      }, {}),
+      PUBLIC_URL: ''  // Default value if not set
+    }),
     new webpack.ProvidePlugin({
       process: "process/browser.js",
       Buffer: ["buffer", "Buffer"],

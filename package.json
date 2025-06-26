@@ -22,7 +22,7 @@
 
     "dev": "webpack serve --mode development --open",
 
-    "build": "webpack",
+    "build": "NODE_ENV=production webpack --mode production",
 
     "prebuild": "dfx generate",
 
@@ -326,7 +326,11 @@
 
     "@types/pako": "^2.0.3",
 
+    "@types/react": "^19.1.8",
+
     "@types/react-csv": "^1.1.10",
+
+    "@types/react-dom": "^19.1.6",
 
     "@types/react-instantsearch-dom": "^6.12.8",
 

@@ -24,7 +24,11 @@ const AlexBalanceCard = () => {
     }
     useEffect(() => {
         if(!icpSwapFactoryActor) return;
-        dispatch(getAlexPrice(icpSwapFactoryActor))
+        try {
+            dispatch(getAlexPrice(icpSwapFactoryActor))
+        } catch (error) {
+            console.error("Failed to get ALEX price:", error);
+        }
     }, [icpSwapFactoryActor])
 
     useEffect(() => {

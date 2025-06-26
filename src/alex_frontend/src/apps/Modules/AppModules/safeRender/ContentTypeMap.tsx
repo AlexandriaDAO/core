@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, Suspense } from 'react';
+import React, { useEffect, useRef, useState, Suspense, JSX } from 'react';
 import DOMPurify from 'dompurify';
 import { BookOpen, File, Play, Music } from 'lucide-react';
 import { AspectRatio } from "@/lib/components/aspect-ratio";

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { Copy, Check, Link, Database, User, Search, Flag, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from "sonner";
@@ -103,9 +103,10 @@ const TransactionDetails: React.FC<TransactionDetailsProps> = ({
     e.stopPropagation();
     if (!tokenId) return;
     
+    const publicUrl = process.env.PUBLIC_URL || '';
     const lbryUrl = process.env.NODE_ENV === 'development' 
       ? `http://localhost:8080/nft/${tokenId}` 
-      : `https://lbry.app/nft/${tokenId}`;
+      : `${publicUrl}/nft/${tokenId}`;
     
     const success = await copyToClipboard(lbryUrl, 'NFT link');
     if (success) {

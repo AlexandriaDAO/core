@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/lib/
 import { DropdownMenuItem } from "@/lib/components/dropdown-menu";
 import { Link } from "@tanstack/react-router";
 import fetchIcpAmount from './thunks/amount';
-import fetchIcpPrice from './thunks/price';
+import fetchIcpPrice from '../../icp-ledger/thunks/getIcpPrice';
 import Withdraw from './components/Withdraw';
 
 interface IcpBalanceProps {

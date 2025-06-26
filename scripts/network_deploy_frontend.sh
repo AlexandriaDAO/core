@@ -1,24 +1,5 @@
 #!/bin/bash
 
-# # Get the directory of the current script
-# SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-# # Change to the project root directory (assuming scripts is one level below root)
-# cd "$SCRIPT_DIR/.." || exit 1
-
-# # Ensure build.sh is executable
-# chmod +x "$SCRIPT_DIR/build.sh"
-
-# # # This step fixes azle type errors.
-# # rm -rf node_modules
-# # rm -rf .dfx
-# # npm cache clean --force
-# # npm install
-
-# # Run build.sh with its full path
-# "$SCRIPT_DIR/build.sh"
-
-
 cp dfx_mainnet.json dfx.json
 
 cd ./.dfx/
@@ -36,4 +17,9 @@ wget https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797b
 
 
 dfx identity use alex
+
+# Build the frontend (will use .env.production automatically)
+npm run build
+
+# Deploy to IC
 dfx deploy alex_frontend --network ic

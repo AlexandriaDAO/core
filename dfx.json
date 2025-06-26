@@ -25,17 +25,17 @@
       "package": "alex_backend",
       "type": "rust"
     },
-    "perpetua": {
-      "candid": "src/perpetua/perpetua.did",
-      "package": "perpetua",
-      "type": "rust",
-      "specified_id": "ya6k4-waaaa-aaaap-qkmpq-cai"
-    },
     "asset_manager": {
       "candid": "src/asset_manager/asset_manager.did",
       "package": "asset_manager",
       "type": "rust",
       "specified_id": "zhcno-qqaaa-aaaap-qpv7a-cai"
+    },
+    "perpetua": {
+      "candid": "src/perpetua/perpetua.did",
+      "package": "perpetua",
+      "type": "rust",
+      "specified_id": "ya6k4-waaaa-aaaap-qkmpq-cai"
     },
     "icp_swap": {
       "candid": "src/icp_swap/icp_swap.did",
@@ -69,6 +69,24 @@
       "type": "rust",
       "id": "5abki-kiaaa-aaaap-qkmsa-cai"
     },
+    "ic_siwo": {
+      "type": "rust",
+      "package": "ic_siwo",
+      "candid": "src/ic_siwo/ic_siwo.did",
+      "specified_id": "odkrm-viaaa-aaaap-qp2oq-cai"
+    },
+    "ic_siwe_provider": {
+      "type": "custom",
+      "candid": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.did",
+      "wasm": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.wasm.gz",
+      "specified_id": "w4vlu-paaaa-aaaaj-azxyq-cai"
+    },  
+    "ic_siws_provider": {
+      "type": "custom",
+      "candid": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.did",
+      "wasm": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.wasm.gz",
+      "specified_id": "w3una-cyaaa-aaaaj-azxya-cai"
+    },
     "LBRY": {
       "type": "custom",
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
@@ -80,6 +98,12 @@
       "candid": "https://raw.githubusercontent.com/dfinity/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/rs/rosetta-api/icrc1/ledger/ledger.did",
       "wasm": "https://download.dfinity.systems/ic/b9a0f18dd5d6019e3241f205de797bca0d9cc3f8/canisters/ic-icrc1-ledger.wasm.gz",
       "id": "ysy5f-2qaaa-aaaap-qkmmq-cai"
+    },
+    "registry": {
+      "candid": "src/registry/registry.did",
+      "package": "registry",
+      "type": "rust",
+      "id": "uxyan-oyaaa-aaaap-qhezq-cai"
     },
     "alex_frontend": {
       "dependencies": ["alex_backend"],
@@ -100,47 +124,17 @@
       },
       "specified_id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
     },
-    "ic_siwo": {
-      "type": "rust",
-      "package": "ic_siwo",
-      "candid": "src/ic_siwo/ic_siwo.did",
-      "specified_id": "odkrm-viaaa-aaaap-qp2oq-cai"
-    },
-    "ic_siwe_provider": {
-      "type": "custom",
-      "candid": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.did",
-      "wasm": "https://github.com/kristoferlund/ic-siwe/releases/download/v0.1.1/ic_siwe_provider.wasm.gz",
-      "specified_id": "w4vlu-paaaa-aaaaj-azxyq-cai"
-    },  
-    "ic_siws_provider": {
-      "type": "custom",
-      "candid": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.did",
-      "wasm": "https://github.com/kristoferlund/ic-siws/releases/download/v0.0.1/ic_siws_provider.wasm.gz",
-      "specified_id": "w3una-cyaaa-aaaaj-azxya-cai"
-    },
-    "emporium": {
-      "candid": "src/emporium/emporium.did",
-      "package": "emporium",
-      "type": "rust",
-      "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
-    },
     "logs": {
       "candid": "src/logs/logs.did",
       "package": "logs",
       "type": "rust",
       "specified_id": "yn33w-uaaaa-aaaap-qpk5q-cai"
     },
-    "xrc": {
-      "candid": "src/xrc/xrc.did",
-      "package": "xrc",
+    "emporium": {
+      "candid": "src/emporium/emporium.did",
+      "package": "emporium",
       "type": "rust",
-      "specified_id": "uf6dk-hyaaa-aaaaq-qaaaq-cai"
-    },
-    "icp_swap_factory": {
-      "type": "rust",
-      "package": "icp_swap_factory",
-      "candid": "src/icp_swap_factory/icp_swap_factory.did",
-      "specified_id": "ggzvv-5qaaa-aaaag-qck7a-cai"
+      "specified_id": "zdcg2-dqaaa-aaaap-qpnha-cai"
     },
     "feed": {
       "candid": "src/feed/feed.did",

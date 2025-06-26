@@ -40,3 +40,6 @@ keys.json
 node_repl_history
 bundle-stats.json
 src/alex_frontend/src/apps/app/Perpetua/state/perpetuaThunks.ts
+
+# Environment files
+.env.production

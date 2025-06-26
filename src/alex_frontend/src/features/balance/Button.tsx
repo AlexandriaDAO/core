@@ -22,7 +22,7 @@ import {LbryLockedBalance} from './lbry';
 
 // Import thunks from sub-slices
 import fetchIcpAmount from './icp/thunks/amount';
-import fetchIcpPrice from './icp/thunks/price';
+import fetchIcpPrice from '../icp-ledger/thunks/getIcpPrice';
 
 import fetchUnlockedAlex from './alex/thunks/unlocked';
 import fetchLockedAlex from './alex/thunks/locked';

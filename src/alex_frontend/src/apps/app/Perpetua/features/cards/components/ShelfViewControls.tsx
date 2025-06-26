@@ -200,7 +200,7 @@ export const ShelfViewControls: React.FC<ShelfViewControlsProps> = ({
                 <div className="py-1">
                   {!isEditMode && settingsButton && (
                     <div className="px-2 py-1">
-                      {React.cloneElement(settingsButton as React.ReactElement, { className: "w-full justify-start" })}
+                      {React.isValidElement(settingsButton) && React.cloneElement(settingsButton as React.ReactElement<any>, { className: "w-full justify-start" })}
                     </div>
                   )}
                   
