@@ -8,6 +8,7 @@ import { Transaction } from "@/apps/Modules/shared/types/queries";
 import { ContentUrlInfo } from './types';
 import ReactMarkdown from 'react-markdown';
 import { useTheme } from "@/providers/ThemeProvider";
+import { getCover } from '@/utils/epub';
 
 interface ContentTypeMapProps {
   transaction: Transaction;
@@ -74,8 +75,16 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   const [isVideoThumbLoading, setIsVideoThumbLoading] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
 
+  const [cover, setCover] = useState<string | null>(null);
+  const [coverLoading, setCoverLoading] = useState<boolean>(false);
+
   useEffect(() => {
     if(!fullUrl) return;
+
+    if(contentType.startsWith('application/epub') && !cover && !coverLoading){
+      setCoverLoading(true);
+      getCover(fullUrl).then(setCover).finally(()=>{setCoverLoading(false)})
+    }
 
     if (contentType.includes("video/") && !thumbnailUrl) {
       setIsVideoThumbLoading(true);
@@ -112,34 +121,41 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
     </div>
   );
 
-  const contentMap: ContentMap = {
-    "application/epub+zip": () => {
-      if (inModal) {
-        return (
-          <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><Skeleton className="h-12 w-12 rounded-full" /></div>}>
-            <ReaderProvider>
-              <div className="h-[85vh] w-[800px] max-w-[95vw]">
-                <Reader bookUrl={fullUrl} />
-              </div>
-            </ReaderProvider>
-          </Suspense>
-        );
-      }
+  const BookView = ()=>{
+    if (inModal) {
       return (
-        <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
-          {coverUrl ? (
-            <AspectRatio ratio={1}>
-              <img src={coverUrl} alt="Book cover" {...commonProps} crossOrigin="anonymous" />
-            </AspectRatio>
-          ) : (
-            <>
-              <BookOpen className="text-gray-500 text-4xl absolute" />
-              <Skeleton className="h-8 w-32" />
-            </>
-          )}
-        </div>
+        <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><Skeleton className="h-12 w-12 rounded-full" /></div>}>
+          <ReaderProvider>
+            <div className="h-[85vh] w-[800px] max-w-[95vw]">
+              <Reader bookUrl={fullUrl} />
+            </div>
+          </ReaderProvider>
+        </Suspense>
       );
-    },
+    }
+
+    if(coverLoading) return (
+      <div className="relative w-full h-full bg-gray-200 flex items-center justify-center text-black">
+        Loading Please Wait..
+      </div>
+    )
+
+    if(!cover) return (
+      <div className="relative w-full h-full bg-gray-200 flex items-center justify-center text-black">
+        Preview Not Available
+      </div>
+    )
+
+    return (
+      <div className="relative w-full h-full bg-gray-200 flex items-center justify-center">
+        <AspectRatio ratio={1}>
+          <img src={cover} alt="Book cover" {...commonProps} crossOrigin="anonymous" />
+        </AspectRatio>
+      </div>
+    );
+  }
+
+  const contentMap: ContentMap = {
     "audio/": () => (
       <div className="relative w-full h-full">
         <AspectRatio ratio={1}>
@@ -423,6 +439,7 @@ export const ContentTypeMap: React.FC<ContentTypeMapProps> = ({
   };
 
   const renderContent = () => {
+    if(contentType && contentType.startsWith("application/epub")) return <BookView />
     // First check for exact content type match
     if (contentMap[contentType]) {
       return contentMap[contentType]();
