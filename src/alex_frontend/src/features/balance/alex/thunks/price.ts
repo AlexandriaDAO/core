@@ -1,15 +1,16 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import { icp_swap_factory } from '../../../../../../declarations/icp_swap_factory';
+import { _SERVICE } from '../../../../../../declarations/icp_swap_factory/icp_swap_factory.did';
+import { ActorSubclass } from '@dfinity/agent';
 
 // ALEX token canister ID
 const ALEX_TOKEN_ID = 'ysy5f-2qaaa-aaaap-qkmmq-cai';
 
 const price = createAsyncThunk<
 	number,
-	void,
+	ActorSubclass<_SERVICE>,
 	{ rejectValue: string }
->('balance/alex/price', async (_, { rejectWithValue }) => {
+>('balance/alex/price', async (icp_swap_factory, { rejectWithValue }) => {
 	try {
 		// Check if ICP Swap Factory actor is available
 		if (!icp_swap_factory) {
