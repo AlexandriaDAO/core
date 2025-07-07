@@ -1,6 +1,6 @@
 import React from "react";
 import PerpetuaLayout from "./layouts/PerpetuaLayout";
-import { PerpetuaActor } from "@/actors";
+import { NftManagerActor, PerpetuaActor } from "@/actors";
 // import { TopupBalanceWarning } from '@/apps/Modules/shared/components/TopupBalanceWarning';
 
 // Export public API
@@ -13,8 +13,10 @@ export * from "./utils";
 const Perpetua: React.FC = () => {
 	return (
 		<PerpetuaActor>
-			{/* <TopupBalanceWarning /> */}
-			<PerpetuaLayout />
+			<NftManagerActor>
+				{/* <TopupBalanceWarning /> */}
+				<PerpetuaLayout />
+			</NftManagerActor>
 		</PerpetuaActor>
 	);
 };
