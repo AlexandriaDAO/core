@@ -289,20 +289,38 @@ touch .dfx/local/canisters/LBRY/LBRY.did
 touch .dfx/local/canisters/ALEX/ALEX.did
 
 # For icp_swap_factory
-mkdir -p src/icp_swap_factory && dfx canister --network ic metadata ggzvv-5qaaa-aaaag-qck7a-cai candid:service > src/icp_swap_factory/icp_swap_factory.did
+mkdir -p src/icp_swap_factory && export DFX_WARNING=-mainnet_plaintext_identity && dfx canister --network ic metadata ggzvv-5qaaa-aaaag-qck7a-cai candid:service > src/icp_swap_factory/icp_swap_factory.did
+
+# Copy the .did file to declarations directory
+cp src/icp_swap_factory/icp_swap_factory.did src/declarations/icp_swap_factory/icp_swap_factory.did
 
 # Ensure icp_swap_factory declarations are properly generated
 dfx generate icp_swap_factory
 
+# Verify the .did.js file was generated properly, if not try to fix it
+if [ ! -s "src/declarations/icp_swap_factory/icp_swap_factory.did.js" ] || ! grep -q "export const idlFactory" src/declarations/icp_swap_factory/icp_swap_factory.did.js 2>/dev/null; then
+    echo "Warning: icp_swap_factory.did.js was not generated properly, attempting to fix..."
+    # Force regeneration
+    rm -f src/declarations/icp_swap_factory/icp_swap_factory.did.js
+    dfx generate icp_swap_factory
+fi
+
 # Add _SERVICE export to index.d.ts if not already present
-if ! grep -q "export { _SERVICE }" src/declarations/icp_swap_factory/index.d.ts; then
+if [ -f "src/declarations/icp_swap_factory/index.d.ts" ] && ! grep -q "export { _SERVICE }" src/declarations/icp_swap_factory/index.d.ts; then
     sed -i '/import { _SERVICE }/a\\nexport { _SERVICE };' src/declarations/icp_swap_factory/index.d.ts
 fi
 
 npm i
 
+# Fix declarations after npm install (which may run dfx generate and overwrite our changes)
+# Re-check and fix the .did.js file
+if [ ! -s "src/declarations/icp_swap_factory/icp_swap_factory.did.js" ] || ! grep -q "export const idlFactory" src/declarations/icp_swap_factory/icp_swap_factory.did.js 2>/dev/null; then
+    echo "Warning: icp_swap_factory.did.js was overwritten by npm install, regenerating..."
+    dfx generate icp_swap_factory
+fi
+
 # Fix _SERVICE export after npm install (which may run dfx generate)
-if ! grep -q "export { _SERVICE }" src/declarations/icp_swap_factory/index.d.ts; then
+if [ -f "src/declarations/icp_swap_factory/index.d.ts" ] && ! grep -q "export { _SERVICE }" src/declarations/icp_swap_factory/index.d.ts; then
     sed -i '/import { _SERVICE }/a\\nexport { _SERVICE };' src/declarations/icp_swap_factory/index.d.ts
 fi
 
