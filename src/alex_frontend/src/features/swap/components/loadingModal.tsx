@@ -22,11 +22,11 @@ const LoadingModal: React.FC<SuccessModalProps> = ({ show, message1, message2, s
                     <div className="absolute loader inset-0 border-4 border-[#000000] border-t-white rounded-full h-full w-full animate-spin"></div> */}
                     <svg viewBox="0 0 160 160" className="animate-spin">
                         <g id="Group_6891" data-name="Group 6891" transform="translate(-3382 704)">
-                            <g id="Ellipse_110" data-name="Ellipse 110" transform="translate(3382 -704)" fill="none" stroke="currentColor" stroke-opacity="0.2" stroke-width="5">
+                            <g id="Ellipse_110" data-name="Ellipse 110" transform="translate(3382 -704)" fill="none" stroke="currentColor" strokeOpacity="0.2" strokeWidth="5">
                                 <circle cx="80" cy="80" r="80" stroke="none" />
                                 <circle cx="80" cy="80" r="77.5" fill="none" />
                             </g>
-                            <g id="Ellipse_111" data-name="Ellipse 111" transform="translate(3382 -704)" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="161 362">
+                            <g id="Ellipse_111" data-name="Ellipse 111" transform="translate(3382 -704)" fill="none" stroke="currentColor" strokeWidth="5" strokeDasharray="161 362">
                                 <circle cx="80" cy="80" r="80" stroke="none" />
                                 <circle cx="80" cy="80" r="77.5" fill="none" />
                             </g>
