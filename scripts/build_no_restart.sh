@@ -1,0 +1,303 @@
+#!/bin/bash
+# Modified version of build.sh that works with existing deployment
+# This version does NOT restart dfx and skips II/ICP ledger deployment
+
+set -x 
+
+# Make mops accessible:
+echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
+
+cp dfx_local.json dfx.json
+
+# REMOVED: dfx stop and dfx start to preserve existing deployment
+
+# SKIP: Internet Identity deployment (already deployed by orbit)
+echo "Skipping Internet Identity deployment (using existing from orbit)..."
+
+## xrc first because it's used in init functions of others.
+dfx canister create xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
+cargo build --release --target wasm32-unknown-unknown --package xrc
+candid-extractor target/wasm32-unknown-unknown/release/xrc.wasm > src/xrc/xrc.did
+dfx deploy xrc --specified-id uf6dk-hyaaa-aaaaq-qaaaq-cai
+
+# Step 3: Deploy nft_manager, which deploys icrc7
+
+dfx canister create icrc7 --specified-id 53ewn-qqaaa-aaaap-qkmqq-cai
+dfx build icrc7
+dfx canister update-settings icrc7 --add-controller 5sh5r-gyaaa-aaaap-qkmra-cai
+dfx canister update-settings icrc7 --add-controller $(dfx identity get-principal)
+
+
+dfx canister create icrc7_scion --specified-id uxyan-oyaaa-aaaap-qhezq-cai
+dfx build icrc7_scion
+dfx canister update-settings icrc7_scion --add-controller 5sh5r-gyaaa-aaaap-qkmra-cai
+dfx canister update-settings icrc7_scion --add-controller $(dfx identity get-principal)
+
+cargo build --release --target wasm32-unknown-unknown --package nft_manager
+candid-extractor target/wasm32-unknown-unknown/release/nft_manager.wasm > src/nft_manager/nft_manager.did
+
+dfx deploy nft_manager --specified-id 5sh5r-gyaaa-aaaap-qkmra-cai
+
+# Step 4: Generate all other backend canisters.
+
+# For alex_backend
+cargo build --release --target wasm32-unknown-unknown --package alex_backend
+candid-extractor target/wasm32-unknown-unknown/release/alex_backend.wasm > src/alex_backend/alex_backend.did
+dfx deploy alex_backend --specified-id y42qn-baaaa-aaaap-qkmnq-cai
+# For perpetua
+cargo build --release --target wasm32-unknown-unknown --package perpetua
+candid-extractor target/wasm32-unknown-unknown/release/perpetua.wasm > src/perpetua/perpetua.did
+dfx deploy perpetua --specified-id ya6k4-waaaa-aaaap-qkmpq-cai
+dfx generate perpetua
+# For feed
+cargo build --release --target wasm32-unknown-unknown --package feed
+candid-extractor target/wasm32-unknown-unknown/release/feed.wasm > src/feed/feed.did
+dfx deploy feed --specified-id okj2q-daaaa-aaaap-qp2pa-cai
+# For icp_swap
+cargo build --release --target wasm32-unknown-unknown --package icp_swap
+candid-extractor target/wasm32-unknown-unknown/release/icp_swap.wasm > src/icp_swap/icp_swap.did
+dfx deploy icp_swap --specified-id 54fqz-5iaaa-aaaap-qkmqa-cai
+# For tokenomics
+cargo build --release --target wasm32-unknown-unknown --package tokenomics
+candid-extractor target/wasm32-unknown-unknown/release/tokenomics.wasm > src/tokenomics/tokenomics.did
+dfx deploy tokenomics --specified-id 5abki-kiaaa-aaaap-qkmsa-cai
+
+# for user
+cargo build --release --target wasm32-unknown-unknown --package user
+candid-extractor target/wasm32-unknown-unknown/release/user.wasm > src/user/user.did
+dfx deploy user --specified-id yo4hu-nqaaa-aaaap-qkmoq-cai
+
+# for alex_wallet
+cargo build --release --target wasm32-unknown-unknown --package alex_wallet
+candid-extractor target/wasm32-unknown-unknown/release/alex_wallet.wasm > src/alex_wallet/alex_wallet.did
+dfx deploy alex_wallet --specified-id "yh7mi-3yaaa-aaaap-qkmpa-cai";
+
+# for vetkd
+cargo build --release --target wasm32-unknown-unknown --package vetkd
+candid-extractor target/wasm32-unknown-unknown/release/vetkd.wasm > src/vetkd/vetkd.did
+dfx deploy vetkd --specified-id 5ham4-hqaaa-aaaap-qkmsq-cai
+# For Emporium
+cargo build --release --target wasm32-unknown-unknown --package emporium
+candid-extractor target/wasm32-unknown-unknown/release/emporium.wasm > src/emporium/emporium.did
+dfx deploy emporium --specified-id zdcg2-dqaaa-aaaap-qpnha-cai
+# For Logs
+cargo build --release --target wasm32-unknown-unknown --package logs
+candid-extractor target/wasm32-unknown-unknown/release/logs.wasm > src/logs/logs.did
+dfx deploy logs --specified-id yn33w-uaaaa-aaaap-qpk5q-cai
+
+# For Asset Manager canister
+cargo build --release --target wasm32-unknown-unknown --package asset_manager
+candid-extractor target/wasm32-unknown-unknown/release/asset_manager.wasm > src/asset_manager/asset_manager.did
+dfx deploy asset_manager --specified-id zhcno-qqaaa-aaaap-qpv7a-cai
+
+
+dfx ledger fabricate-cycles --canister zhcno-qqaaa-aaaap-qpv7a-cai --cycles 10000000000000000
+
+
+
+cargo update
+
+
+dfx deploy system_api --specified-id 5vg3f-laaaa-aaaap-qkmrq-cai
+
+dfx deploy alex_wallet --specified-id yh7mi-3yaaa-aaaap-qkmpa-cai
+
+
+dfx deploy asset_manager --specified-id aax3a-h4aaa-aaaaa-qaahq-cai
+
+
+# Step 5: Configure Local Identities for token launches
+dfx identity new minter --storage-mode plaintext || echo "Minter identity already exists"
+dfx identity use minter
+export MINTER_ACCOUNT_ID=$(dfx ledger account-id)
+export MINTER_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+
+dfx identity use user_1
+export ALICE_ACCOUNT_ID=$(dfx ledger account-id)
+export ALICE_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+dfx identity use user_2
+export BOB_ACCOUNT_ID=$(dfx ledger account-id)
+export BOB_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+dfx identity use user_3
+export CHARLIE_ACCOUNT_ID=$(dfx ledger account-id)
+export CHARLIE_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+
+dfx identity use default
+export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id)
+export DEFAULT_ACCOUNT_PRINCIPAL=$(dfx identity get-principal)
+
+
+
+
+# SKIP: ICP Ledger deployment (already deployed by orbit)
+echo "Skipping ICP Ledger deployment (using existing from orbit)..."
+
+
+dfx deploy LBRY --specified-id y33wz-myaaa-aaaap-qkmna-cai --argument '(variant { Init = 
+record {
+     token_symbol = "LBRY";
+     token_name = "LBRY";
+     minting_account = record { owner = principal "'$(dfx canister id icp_swap)'" };
+     transfer_fee = 4_000_000;
+     metadata = vec {};
+     initial_balances = vec {};
+     archive_options = record {
+         num_blocks_to_archive = 1000;
+         trigger_threshold = 2000;
+         controller_id = principal "'$(dfx canister id icp_swap)'";
+     };
+     feature_flags = opt record {
+        icrc2 = true;
+     };
+ }
+})'
+
+
+dfx deploy ALEX --specified-id ysy5f-2qaaa-aaaap-qkmmq-cai --argument '(variant { Init = 
+record {
+     token_symbol = "ALEX";
+     token_name = "ALEX";
+     minting_account = record { owner = principal "'$(dfx canister id tokenomics)'" };
+     transfer_fee = 10_000;
+     metadata = vec {};
+     initial_balances = vec {};
+     archive_options = record {
+         num_blocks_to_archive = 1000;
+         trigger_threshold = 2000;
+         controller_id = principal "'$(dfx canister id tokenomics)'";
+     };
+     feature_flags = opt record {
+        icrc2 = true;
+     };
+ }
+})'
+
+
+# for ic_siwo
+cargo build --release --target wasm32-unknown-unknown --package ic_siwo
+candid-extractor target/wasm32-unknown-unknown/release/ic_siwo.wasm > src/ic_siwo/ic_siwo.did
+
+# create and deploy sign in with ethereum provider
+dfx canister create ic_siwo --specified-id odkrm-viaaa-aaaap-qp2oq-cai
+
+dfx deploy ic_siwo --argument $'(
+    record {
+        domain = "yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io";
+        uri = "https://yj5ba-aiaaa-aaaap-qkmoa-cai.icp0.io";
+        salt = "FuriousSalter";
+        scheme = opt "https";
+        statement = opt "Login to Alexandria";
+        challenge_expires_in = opt 300000000000;
+        session_expires_in = opt 604800000000000;
+        targets = opt vec {
+            "'$(dfx canister id ic_siwo)'";
+            "'$(dfx canister id nft_manager)'";
+            "'$(dfx canister id user)'";
+        };
+    }
+)'
+
+# create and deploy sign in with ethereum provider
+dfx canister create ic_siwe_provider --specified-id w4vlu-paaaa-aaaaj-azxyq-cai
+
+# opt 300000000000; /* 5 minutes */
+# opt 604800000000000; /* 1 week */
+dfx deploy ic_siwe_provider --argument $'(
+    record {
+        domain = "127.0.0.1";
+        uri = "http://127.0.0.1:4943";
+        salt = "secretsalt000";
+        chain_id = opt 1;
+        scheme = opt "http";
+        statement = opt "Login to the Alexandria";
+        sign_in_expires_in = opt 300000000000;
+        session_expires_in = opt 604800000000000;
+        targets = opt vec {
+            "'$(dfx canister id ic_siwe_provider)'";
+            "'$(dfx canister id nft_manager)'";
+            "'$(dfx canister id user)'";
+        };
+    }
+)'
+
+# create and deploy sign in with solana provider
+dfx canister create ic_siws_provider --specified-id w3una-cyaaa-aaaaj-azxya-cai
+dfx deploy ic_siws_provider --argument $'(
+    record {
+        domain = "127.0.0.1";
+        uri = "http://127.0.0.1:4943";
+        salt = "secretsalt000";
+        chain_id = opt "mainnet";
+        scheme = opt "http";
+        statement = opt "Login to the Alexandria";
+        sign_in_expires_in = opt 300000000000;
+        session_expires_in = opt 604800000000000;
+        targets = opt vec {
+            "'$(dfx canister id ic_siws_provider)'";
+            "'$(dfx canister id nft_manager)'";
+            "'$(dfx canister id user)'";
+        };
+    }
+)'
+
+
+# echo "Backend canisters finished. Copy and paste remainder of the build script manually to deploy on the network."
+# exit 1
+
+# Step 7: Deploy frontend ManuallyS.
+
+mkdir -p .dfx/local/canisters/LBRY
+mkdir -p .dfx/local/canisters/ALEX
+touch .dfx/local/canisters/LBRY/LBRY.did
+touch .dfx/local/canisters/ALEX/ALEX.did
+
+# For icp_swap_factory
+mkdir -p src/icp_swap_factory && export DFX_WARNING=-mainnet_plaintext_identity && dfx canister --network ic metadata ggzvv-5qaaa-aaaag-qck7a-cai candid:service > src/icp_swap_factory/icp_swap_factory.did
+
+# Copy the .did file to declarations directory
+cp src/icp_swap_factory/icp_swap_factory.did src/declarations/icp_swap_factory/icp_swap_factory.did
+
+# Ensure icp_swap_factory declarations are properly generated
+dfx generate icp_swap_factory
+
+# Verify the .did.js file was generated properly, if not try to fix it
+if [ ! -s "src/declarations/icp_swap_factory/icp_swap_factory.did.js" ] || ! grep -q "export const idlFactory" src/declarations/icp_swap_factory/icp_swap_factory.did.js 2>/dev/null; then
+    echo "Warning: icp_swap_factory.did.js was not generated properly, attempting to fix..."
+    # Force regeneration
+    rm -f src/declarations/icp_swap_factory/icp_swap_factory.did.js
+    dfx generate icp_swap_factory
+fi
+
+# Add _SERVICE export to index.d.ts if not already present
+if [ -f "src/declarations/icp_swap_factory/index.d.ts" ] && ! grep -q "export { _SERVICE }" src/declarations/icp_swap_factory/index.d.ts; then
+    sed -i '/import { _SERVICE }/a\\nexport { _SERVICE };' src/declarations/icp_swap_factory/index.d.ts
+fi
+
+npm i
+
+# Fix declarations after npm install (which may run dfx generate and overwrite our changes)
+# Re-check and fix the .did.js file
+if [ ! -s "src/declarations/icp_swap_factory/icp_swap_factory.did.js" ] || ! grep -q "export const idlFactory" src/declarations/icp_swap_factory/icp_swap_factory.did.js 2>/dev/null; then
+    echo "Warning: icp_swap_factory.did.js was overwritten by npm install, regenerating..."
+    dfx generate icp_swap_factory
+fi
+
+# Fix _SERVICE export after npm install (which may run dfx generate)
+if [ -f "src/declarations/icp_swap_factory/index.d.ts" ] && ! grep -q "export { _SERVICE }" src/declarations/icp_swap_factory/index.d.ts; then
+    sed -i '/import { _SERVICE }/a\\nexport { _SERVICE };' src/declarations/icp_swap_factory/index.d.ts
+fi
+
+dfx deploy alex_frontend --specified-id yj5ba-aiaaa-aaaap-qkmoa-cai
+
+echo "========================================="
+echo "Core deployment complete!"
+echo "========================================="
+echo "Note: Using existing Internet Identity and ICP Ledger from orbit deployment"
+echo ""
+echo "Deployed canisters:"
+echo "  All core canisters including alex_backend, nft_manager, tokenomics, etc."
+echo "  LBRY and ALEX tokens"
+echo "  alex_frontend"
+echo ""
+echo "Frontend URL: http://$(dfx canister id alex_frontend).localhost:4943"
+echo "========================================="
